@@ -1,0 +1,94 @@
+---
+pagetitle: "Honglin Li"
+page-layout: full
+toc: false
+description: "Honglin Li, Ph.D. — energy systems researcher: optimization and techno-economic analysis of low-carbon energy systems."
+image: images/profile.jpg
+---
+
+::: {.home}
+
+```{=html}
+<section class="hero">
+  <div class="hero-photo"><img src="images/profile.jpg" alt="Portrait of Honglin Li"></div>
+  <div class="hero-text">
+    <div class="hero-name" role="heading" aria-level="1">Honglin Li, Ph.D.</div>
+    <p class="hero-role">Postdoctoral Fellow, Electrical and Computer Engineering</p>
+    <p class="hero-affil">Kansas State University</p>
+    <p class="hero-bio">I build optimization and techno-economic models for the design, operation and long-term planning of
+      low-carbon energy systems, from hydrogen-integrated renewables and nuclear plants to firm power for AI data centers.</p>
+    <div class="social">
+      <a href="mailto:hlli@ksu.edu"><i class="bi bi-envelope"></i>Email</a>
+      <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"><i class="ai ai-google-scholar"></i>Google Scholar</a>
+      <a href="https://orcid.org/0000-0002-8405-3032"><i class="ai ai-orcid"></i>ORCID</a>
+      <a href="https://github.com/Henryutd2021"><i class="bi bi-github"></i>GitHub</a>
+      <a href="https://www.linkedin.com/in/honglin-li-998b18221/"><i class="bi bi-linkedin"></i>LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<div class="two-col">
+  <div class="card-box">
+    <h3>Research interests</h3>
+    <div class="chips">
+      <span class="chip">Energy system optimization</span>
+      <span class="chip">Techno-economic analysis</span>
+      <span class="chip">Hydrogen systems</span>
+      <span class="chip">Nuclear–hydrogen integration</span>
+      <span class="chip">Small modular reactors</span>
+      <span class="chip">AI data-center power</span>
+      <span class="chip">Electricity markets</span>
+      <span class="chip">Carbon accounting</span>
+      <span class="chip">Uncertainty quantification</span>
+    </div>
+  </div>
+  <div class="card-box">
+    <h3>Education</h3>
+    <ul class="edu">
+      <li><span class="deg">Ph.D., Mechanical Engineering, 2025</span><span class="school">The University of Texas at Dallas</span></li>
+      <li><span class="deg">M.S. in Engineering (Industrial Engineering), 2021</span><span class="school">Texas State University</span></li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="section-title"><i class="bi bi-newspaper"></i>News</h2>
+<ul class="news">
+  <li><span class="date">Fall 2026</span><span>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</span></li>
+  <li><span class="date">Aug 2026</span><span>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</span></li>
+  <li><span class="date">2026</span><span>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.</span></li>
+  <li><span class="date">2026</span><span>Our paper on hydrogen integration and policy support for U.S. nuclear power plants is published in <em>Nature Communications</em>.</span></li>
+  <li><span class="date">2026</span><span>Perspective on small modular reactors for data centers published in <em>Cell Reports Sustainability</em>.</span></li>
+  <li><span class="date">Apr 2026</span><span>Joined the Department of Electrical and Computer Engineering at Kansas State University as a Postdoctoral Fellow.</span></li>
+  <li><span class="date">2025</span><span>Completed my Ph.D. in Mechanical Engineering at The University of Texas at Dallas.</span></li>
+  <li><span class="date">2025</span><span>Paper on emission-intensity-informed load regulation published in <em>Cell Reports Sustainability</em> and featured by <a href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">UT Dallas News</a>.</span></li>
+</ul>
+
+<h2 class="section-title"><i class="bi bi-journal-text"></i>Selected publications</h2>
+```
+
+{{< include _selected.qmd >}}
+
+```{=html}
+<p><a href="publications.html">All publications <i class="bi bi-arrow-right"></i></a></p>
+
+<h2 class="section-title"><i class="bi bi-lightning-charge"></i>Research themes</h2>
+<div class="theme-grid">
+  <a class="theme-card theme-datacenter" href="research.html#nuclear-energy-and-ai-data-centers">
+    <span class="ticon"><i class="bi bi-cpu"></i></span><h4>Nuclear energy and AI data centers</h4>
+    <p>Firm, low-carbon power for fast-growing data-center loads, and the cost of waiting for the grid.</p></a>
+  <a class="theme-card theme-hydrogen" href="research.html#hydrogen-integrated-energy-systems">
+    <span class="ticon"><i class="bi bi-droplet-half"></i></span><h4>Hydrogen-integrated energy systems</h4>
+    <p>From co-located wind and solar plants to regional networks and the U.S. nuclear fleet.</p></a>
+  <a class="theme-card theme-carbon" href="research.html#carbon-aware-grid-operation">
+    <span class="ticon"><i class="bi bi-globe-americas"></i></span><h4>Carbon-aware grid operation</h4>
+    <p>Re-timing electricity use with hourly grid emission intensity.</p></a>
+  <a class="theme-card theme-microgrid" href="research.html#supply-chains-with-on-site-microgrids">
+    <span class="ticon"><i class="bi bi-diagram-3"></i></span><h4>Supply chains with on-site microgrids</h4>
+    <p>Joint siting of facilities and microgrids, transactive energy and reliability.</p></a>
+  <a class="theme-card theme-wind" href="research.html#wind-power-uncertainty">
+    <span class="ticon"><i class="bi bi-wind"></i></span><h4>Wind power uncertainty</h4>
+    <p>Multi-fidelity Gaussian processes for probabilistic wind farm power curves.</p></a>
+</div>
+```
+
+:::

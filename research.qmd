@@ -1,0 +1,57 @@
+---
+title: "Research"
+---
+
+My work combines optimization and techno-economic analysis to ask when low-carbon energy technologies pay off, for whom, and under which market and policy conditions. Each theme below links to project pages with the research question, my contribution, the method, the key findings with their boundary conditions, and the published outputs.
+
+::: {.theme-section .theme-datacenter}
+## Nuclear energy and AI data centers
+
+Rapid growth in AI data centers raises the question of how firm, low-carbon power can be supplied on the timelines these loads require.
+
+- [Small modular reactors for data centers](projects/smr-dc.qmd): a Perspective on the economic dimensions a credible assessment must capture.
+- [The cost of delayed energization for AI data centers](projects/data-center-delay-economics.qmd): what waiting for grid connection costs, and who bears it.
+- **Current work (Kansas State University):** techno-economic analysis of firm, low-carbon supply options, including small modular reactors, for large data-center loads.
+:::
+
+::: {.theme-section .theme-hydrogen}
+## Hydrogen-integrated energy systems
+
+This theme follows hydrogen from single projects to regional networks to the nuclear fleet. It was the subject of my Ph.D. dissertation.
+
+- [Hydrogen integration and policy support for U.S. nuclear power plants](projects/npph2.qmd)
+- [Hydrogen's role in expanding renewable energy in Texas](projects/txh2.qmd)
+- [Co-located wind and hydrogen energy systems](projects/wind-hydrogen.qmd)
+- [Co-located solar and hydrogen plants](projects/solar-hydrogen.qmd)
+- [Intelligent operation and maintenance in offshore wind–hydrogen systems](projects/offshore-wind-hydrogen-om.qmd)
+:::
+
+::: {.theme-section .theme-carbon}
+## Carbon-aware grid operation
+
+- [Emission-intensity-informed load regulation for grid decarbonization](projects/ghg.qmd)
+:::
+
+::: {.theme-section .theme-microgrid}
+## Supply chains with on-site microgrids
+
+This theme began in my M.S. research and covers joint siting of facilities and microgrids, transactive energy, and reliability.
+
+- [Supply chains with on-site microgrids and transactive energy](projects/facility-microgrid-location.qmd)
+:::
+
+::: {.theme-section .theme-wind}
+## Wind power uncertainty
+
+- [Multi-fidelity Gaussian processes for wind power curves](projects/uq-mfgpr.qmd)
+:::
+
+## Methods
+
+The methods I use across these themes are:
+
+- linear, mixed-integer and stochastic optimization (Pyomo, AMPL, Gurobi);
+- techno-economic analysis: discounted cash flow, levelized costs, tax-credit modeling;
+- life-cycle and carbon accounting;
+- discrete-event and Monte Carlo simulation;
+- Gaussian-process and machine-learning surrogates.

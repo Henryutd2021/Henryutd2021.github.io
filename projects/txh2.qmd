@@ -1,0 +1,47 @@
+---
+title: "Hydrogen's role in expanding renewable energy in Texas"
+subtitle: "International Journal of Hydrogen Energy (2025), first author"
+description: "Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?"
+order: 2
+categories: ["Hydrogen systems"]
+themekey: "hydrogen"
+themelabel: "Hydrogen systems"
+themeicon: "droplet-half"
+body-classes: "project-page theme-hydrogen"
+---
+
+## Research question
+
+::: {.question}
+Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?
+:::
+
+## My contribution
+
+First author. Developed the data pipeline from public ERCOT market disclosures, the stochastic planning model and the analysis.
+
+## Method
+
+Two-stage stochastic mixed-integer program over ERCOT's eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data.
+
+## Key findings
+
+::: {.findings}
+- In the benchmark case, renewable (green) hydrogen met about 3.8% of ERCOT's industrial hydrogen demand, roughly 131 thousand tonnes per year.
+- Electrolyzers clustered in central zones, with hydrogen flowing west to east and north to south.
+- Halving hydrogen equipment costs did not change the optimal configuration.
+- Modest load flexibility (±5%) reduced combined-cycle gas CO₂ emissions by about 0.28 million tonnes per year.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1016/j.ijhydene.2025.02.303){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Code and data (Zenodo)](https://doi.org/10.5281/zenodo.14894611){.out-link}
+
+
+## Reproducibility
+
+Code and processed inputs publicly archived. Last updated 2026-10.

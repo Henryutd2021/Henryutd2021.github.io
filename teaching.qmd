@@ -1,0 +1,25 @@
+---
+title: "Teaching"
+---
+
+## Instruction
+
+- **ECE 685 Power Systems Design**, Kansas State University, Fall 2026: Instructor.
+
+## Teaching assistant
+
+- **Engineering Optimization; Numerical Methods**, The University of Texas at Dallas, Fall 2022.
+- **Probability & Statistics; Operations Research**, Texas State University, 2019–2021.
+
+## Mentoring
+
+- Mentored undergraduate researchers at The University of Texas at Dallas, 2022–2025, including through the Research Experience for Undergraduates (REU) program. Their projects covered techno-economic analysis of renewable and hydrogen systems.
+
+## Teaching materials
+
+Open teaching modules built on my research are in preparation. Planned topics:
+
+- energy-system optimization with open solvers;
+- techno-economic analysis of hydrogen systems;
+- carbon-aware load scheduling;
+- facility and microgrid co-siting.

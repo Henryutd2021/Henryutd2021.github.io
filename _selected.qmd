@@ -1,0 +1,39 @@
+::: {.pub-item}
+[Nat. Commun.]{.pub-badge} [2026]{.pub-year}
+
+[Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support]{.pub-title}
+
+[**H. Li**, J. Huang, B. Poudel, M. Sun, T. Westover, D. Wendt, J. Zhang]{.pub-authors}
+
+[*Nature Communications*, vol. 17, article 7090, 2026.]{.pub-venue} [DOI](https://doi.org/10.1038/s41467-026-73630-y){.pub-link}
+:::
+
+::: {.pub-item}
+[Cell Rep. Sustain.]{.pub-badge} [2026]{.pub-year}
+
+[The role of small modular reactors in powering data centers for a sustainable digital economy]{.pub-title}
+
+[R. A. Jacob\*, **H. Li**\*, A. M. Rad, B. Poudel, Y. Li, M. Sun, T. R. McJunkin, J. Zhang]{.pub-authors}
+
+[*Cell Reports Sustainability*, vol. 3, article 100820, 2026. Co-first authors.]{.pub-venue} [DOI](https://doi.org/10.1016/j.crsus.2026.100820){.pub-link}
+:::
+
+::: {.pub-item}
+[Cell Rep. Sustain.]{.pub-badge} [2025]{.pub-year}
+
+[Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization]{.pub-title}
+
+[**H. Li**, G. Shen, S. Senemmar, A. Mehmani, J. Zhang]{.pub-authors}
+
+[*Cell Reports Sustainability*, vol. 2, article 100367, 2025. ([UTD News](https://news.utdallas.edu/science-technology/electricity-timing-2025/)).]{.pub-venue} [DOI](https://doi.org/10.1016/j.crsus.2025.100367){.pub-link}
+:::
+
+::: {.pub-item}
+[Int. J. Hydrogen Energy]{.pub-badge} [2025]{.pub-year}
+
+[Hydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas]{.pub-title}
+
+[**H. Li**, J. Zhang]{.pub-authors}
+
+[*International Journal of Hydrogen Energy*, vol. 113, pp. 77–89, 2025.]{.pub-venue} [DOI](https://doi.org/10.1016/j.ijhydene.2025.02.303){.pub-link}
+:::

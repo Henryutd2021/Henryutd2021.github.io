@@ -1,0 +1,11 @@
+---
+title: "Projects"
+listing:
+  contents: projects/*.qmd
+  template: project-cards.ejs
+  sort: "order"
+  fields: [title, subtitle, description, themekey, themelabel, themeicon]
+toc: false
+---
+
+Each project page follows the same order: research question, my contribution, method, key findings with their boundary conditions, outputs, and reproducibility status. Only published or accepted work is shown here.

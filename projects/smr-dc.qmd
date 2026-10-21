@@ -1,0 +1,46 @@
+---
+title: "Small modular reactors for data centers"
+subtitle: "Cell Reports Sustainability (2026), Perspective, co-first author"
+description: "What would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?"
+order: 4
+categories: ["Nuclear & data centers"]
+themekey: "datacenter"
+themelabel: "Nuclear & data centers"
+themeicon: "cpu"
+body-classes: "project-page theme-datacenter"
+---
+
+## Research question
+
+::: {.question}
+What would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?
+:::
+
+## My contribution
+
+Co-first author. Wrote the techno-economic analysis section, introduction and conclusions.
+
+## Method
+
+Perspective synthesizing technology, economics and policy for SMR-powered data centers.
+
+## Key findings
+
+::: {.findings}
+- Data-center reliability requirements add a substantial premium to the capital cost of on-site nuclear supply.
+- First-of-a-kind and nth-of-a-kind cost estimates for SMRs diverge widely, so assumptions must be explicit.
+- Service-based metrics, such as cost per unit of computing, and co-products such as heat matter for comparisons.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+A Perspective: it frames the questions and evidence rather than presenting a new case-study model.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1016/j.crsus.2026.100820){.out-link}
+
+
+## Reproducibility
+
+Not applicable (Perspective). Last updated 2026-10.

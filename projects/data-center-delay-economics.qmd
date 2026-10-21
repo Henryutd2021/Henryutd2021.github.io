@@ -1,0 +1,46 @@
+---
+title: "The cost of delayed energization for AI data centers"
+subtitle: "IEEE North American Power Symposium (NAPS 2026), first author; accepted"
+description: "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
+order: 5
+categories: ["Nuclear & data centers"]
+themekey: "datacenter"
+themelabel: "Nuclear & data centers"
+themeicon: "cpu"
+body-classes: "project-page theme-datacenter"
+---
+
+## Research question
+
+::: {.question}
+What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?
+:::
+
+## My contribution
+
+First author. Developed the framework, model and analysis with Buxin She.
+
+## Method
+
+Present-value framework that converts delayed IT capacity into grid capacity requirements and prices the delay in separate developer, ratepayer and social ledgers, summarized by a delay cost intensity and a break-even acceleration payment; sensitivity and dependence stress tests.
+
+## Key findings
+
+::: {.findings}
+- For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.
+- Staged energization can recover a large share of that cost.
+- Ratepayer exposure depends strongly on large-load tariff design.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+The delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.
+:::
+
+## Outputs
+
+Publication details are on the [Publications](../publications.qmd) page.
+
+
+## Reproducibility
+
+Code not yet public. Last updated 2026-10.

@@ -1,0 +1,12 @@
+---
+title: "Software & Data"
+---
+
+These code and data packages accompany published papers.
+
+| Package | Accompanies | Archive |
+|---|---|---|
+| ERCOT hydrogen-network planning model and processed inputs | International Journal of Hydrogen Energy (2025) | [10.5281/zenodo.14894611](https://doi.org/10.5281/zenodo.14894611) |
+| Emission-intensity load-regulation code and results; input data | Cell Reports Sustainability (2025) | [10.5281/zenodo.14658398](https://doi.org/10.5281/zenodo.14658398); [10.17632/jfcc62strg.1](https://doi.org/10.17632/jfcc62strg.1) |
+
+For other papers, see each paper's data and code availability statement. Documented releases of earlier models are in preparation.
