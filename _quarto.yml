@@ -10,9 +10,10 @@ project:
     - software-data.qmd
     # notes.qmd and notes/*.qmd are hidden until there is content (Henry 2026-10-21)
     - teaching.qmd
-    # cv.qmd is hidden: Henry does not want the CV public yet (2026-10-21)
+    - cv.qmd
   resources:
     - images/
+    - files/
 
 website:
   title: "Honglin Li"
@@ -35,6 +36,8 @@ website:
         text: Software & Data
       - href: teaching.qmd
         text: Teaching
+      - href: cv.qmd
+        text: CV
     right:
       - icon: mortarboard-fill
         href: https://scholar.google.com/citations?user=O1BZdHQAAAAJ&hl=en
