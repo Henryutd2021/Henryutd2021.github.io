@@ -1,0 +1,12 @@
+---
+title: "CV"
+toc: false
+---
+
+[<i class="bi bi-download"></i> Download CV (PDF)](files/Honglin_Li_CV.pdf){.out-link}
+
+```{=html}
+<object class="cv-frame" data="files/Honglin_Li_CV.pdf" type="application/pdf" aria-label="Curriculum vitae of Honglin Li">
+  <p>Your browser cannot display the PDF here. <a href="files/Honglin_Li_CV.pdf">Download the CV</a> instead.</p>
+</object>
+```

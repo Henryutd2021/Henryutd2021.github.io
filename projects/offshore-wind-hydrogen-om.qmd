@@ -1,0 +1,45 @@
+---
+title: "Intelligent operation and maintenance in offshore wind–hydrogen systems"
+subtitle: "TORQUE 2024, first author"
+description: "How much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?"
+order: 8
+categories: ["Hydrogen systems"]
+themekey: "hydrogen"
+themelabel: "Hydrogen systems"
+themeicon: "droplet-half"
+body-classes: "project-page theme-hydrogen"
+---
+
+## Research question
+
+::: {.question}
+How much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?
+:::
+
+## My contribution
+
+First author. Linked an operation-and-maintenance simulation developed with University of Strathclyde collaborators to the system techno-economic optimization.
+
+## Method
+
+Two-stage approach: Monte Carlo operation-and-maintenance simulation, then techno-economic optimization for a Gulf of Mexico site supplying Houston-area refineries.
+
+## Key findings
+
+::: {.findings}
+- Prognostics-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.
+- At the system level, the levelized cost of hydrogen fell by about 2%.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+Single site; 2012 wind-resource data paired with 2022 electricity prices; maintenance parameters from the collaborators' framework.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1088/1742-6596/2767/6/062016){.out-link}
+
+
+## Reproducibility
+
+Results archived privately. Last updated 2026-10.

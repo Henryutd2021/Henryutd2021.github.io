@@ -1,0 +1,27 @@
+/*-- scss:defaults --*/
+// Light theme on top of cosmo: deep blue + teal, Inter for text, Source Serif 4 for headings.
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap');
+
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$headings-font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+$headings-font-weight: 700;
+$font-size-base: 1rem;
+$line-height-base: 1.65;
+
+$primary: #1f4e79;
+$secondary: #5b6b7d;
+$info: #0e6e8c;
+$body-bg: #ffffff;
+$body-color: #1f2933;
+$link-color: #0e6e8c;
+$link-hover-color: #1f4e79;
+
+$navbar-bg: #ffffff;
+$navbar-fg: #3c4b5c;
+$navbar-hl: #0e6e8c;
+$footer-bg: #f5f8fb;
+$footer-fg: #5b6b7d;
+$callout-color-note: #0e6e8c;
+
+/*-- scss:rules --*/
+.navbar { border-bottom: 1px solid #e3e8ef; }

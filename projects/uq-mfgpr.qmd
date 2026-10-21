@@ -1,0 +1,44 @@
+---
+title: "Multi-fidelity Gaussian processes for wind power curves"
+subtitle: "ASME IDETC 2023, first author"
+description: "Can multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?"
+order: 10
+categories: ["Wind uncertainty"]
+themekey: "wind"
+themelabel: "Wind uncertainty"
+themeicon: "wind"
+body-classes: "project-page theme-wind"
+---
+
+## Research question
+
+::: {.question}
+Can multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?
+:::
+
+## My contribution
+
+First author. Implemented and evaluated the models, as part of a DOE Wind Energy Technologies Office project led by national laboratories.
+
+## Method
+
+Linear and nonlinear multi-fidelity Gaussian process regression, using kernel-density-sampled SCADA points from the open SDWPF dataset as high-fidelity data, compared with single-fidelity regression.
+
+## Key findings
+
+::: {.findings}
+- Averaged over eight of nine tested turbines, nonlinear multi-fidelity regression reduced RMSE by 3.9% and MAE by 3.5%; one turbine was worse, and probabilistic criteria did not all favor it.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+One dataset and one generic low-fidelity curve.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1115/detc2023-114762){.out-link}
+
+
+## Reproducibility
+
+Results archived privately. Last updated 2026-10.

@@ -1,0 +1,11 @@
+---
+title: "Notes"
+listing:
+  contents: notes/*.qmd
+  type: default
+  sort: "date desc"
+  fields: [date, title, description]
+toc: false
+---
+
+These are short technical notes on methods, data and lessons from my projects. They will be added over time.

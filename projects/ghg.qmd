@@ -1,0 +1,47 @@
+---
+title: "Emission-intensity-informed load regulation for grid decarbonization"
+subtitle: "Cell Reports Sustainability (2025), first author"
+description: "How much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?"
+order: 3
+categories: ["Carbon-aware grid"]
+themekey: "carbon"
+themelabel: "Carbon-aware grid"
+themeicon: "globe-americas"
+body-classes: "project-page theme-carbon"
+---
+
+## Research question
+
+::: {.question}
+How much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?
+:::
+
+## My contribution
+
+First author. I contributed to the methodology, data processing, optimization modeling, analysis and writing with my co-authors.
+
+## Method
+
+Hourly load-shifting optimization for selected U.S. regions (2023) using EIA hourly emission data, varying the optimization window, the allowed adjustment range and a regulation penalty, and grouping regions by renewable share, generation diversity and intensity fluctuation.
+
+## Key findings
+
+::: {.findings}
+- Longer optimization windows and wider adjustment ranges increase the reduction in attributed emissions, most in renewable-rich and diverse grids.
+- In the reported scenarios, reductions in attributed emissions are modest, on the order of one to two percent of regional totals or less.
+- Regions with low intensity fluctuation are more sensitive to the cost of regulating load.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1016/j.crsus.2025.100367){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Code and results (Zenodo)](https://doi.org/10.5281/zenodo.14658398){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Input data (Mendeley Data)](https://doi.org/10.17632/jfcc62strg.1){.out-link}
+
+- Demand-side management under real-time greenhouse gas emission factors for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author).
+
+## Reproducibility
+
+Code, results and inputs publicly archived. Last updated 2026-10.

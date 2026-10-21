@@ -1,0 +1,15 @@
+```{=html}
+<div class="project-grid list">
+<% for (const item of items) { %>
+<div <%= metadataAttrs(item) %>>
+<a class="project-card theme-<%= item.themekey %>" href="<%- item.path %>">
+<span class="pc-theme"><i class="bi bi-<%= item.themeicon %>"></i><%= item.themelabel %></span>
+<h3><%= item.title %></h3>
+<div class="pc-venue"><%= item.subtitle %></div>
+<div class="pc-desc"><%= item.description %></div>
+<span class="pc-more">Read more <i class="bi bi-arrow-right"></i></span>
+</a>
+</div>
+<% } %>
+</div>
+```

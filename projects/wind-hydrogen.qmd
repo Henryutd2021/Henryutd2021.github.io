@@ -1,0 +1,46 @@
+---
+title: "Co-located wind and hydrogen energy systems"
+subtitle: "Journal of Mechanical Design (2024, featured article), first author; TORQUE 2022, first author"
+description: "How do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?"
+order: 6
+categories: ["Hydrogen systems"]
+themekey: "hydrogen"
+themelabel: "Hydrogen systems"
+themeicon: "droplet-half"
+body-classes: "project-page theme-hydrogen"
+---
+
+## Research question
+
+::: {.question}
+How do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?
+:::
+
+## My contribution
+
+First author. Extended NREL's REopt optimization model with hydrogen components and ran the analysis.
+
+## Method
+
+Mixed-integer sizing and dispatch optimization for a 253-MW West Texas wind farm with ERCOT prices, with sensitivities to hydrogen price, region and future technology costs.
+
+## Key findings
+
+::: {.findings}
+- In the Journal of Mechanical Design case study, adding an electrolyzer reduced total system cost by about 7%.
+- In the same study, using hydrogen storage with fuel cells reduced it by about 26% and sharply cut curtailment (the earlier TORQUE 2022 case reported about 9% and 30%).
+:::
+
+::: {.callout-note title="Boundary conditions"}
+Cost assumptions date from 2020–2023 and predate final federal hydrogen credit rules.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> JMD paper (DOI)](https://doi.org/10.1115/1.4063971){.out-link} [<i class="bi bi-box-arrow-up-right"></i> TORQUE 2022 paper (DOI)](https://doi.org/10.1088/1742-6596/2265/4/042063){.out-link}
+
+- Integrating offshore wind farms with unmanned hydrogen and battery ships — IEEE KPEC 2022 (third author).
+
+## Reproducibility
+
+Results archived privately; public release planned. Last updated 2026-10.

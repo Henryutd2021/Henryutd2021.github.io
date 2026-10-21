@@ -1,0 +1,44 @@
+---
+title: "Co-located solar and hydrogen plants"
+subtitle: "European Energy Market Conference (EEM 2023), first author"
+description: "Is concentrated solar power with thermal storage feeding high-temperature electrolysis more economic than photovoltaics feeding low-temperature electrolysis in West Texas?"
+order: 7
+categories: ["Hydrogen systems"]
+themekey: "hydrogen"
+themelabel: "Hydrogen systems"
+themeicon: "droplet-half"
+body-classes: "project-page theme-hydrogen"
+---
+
+## Research question
+
+::: {.question}
+Is concentrated solar power with thermal storage feeding high-temperature electrolysis more economic than photovoltaics feeding low-temperature electrolysis in West Texas?
+:::
+
+## My contribution
+
+First author. Added a concentrated-solar module to the REopt-based model and ran the analysis.
+
+## Method
+
+Optimization of a 115-MW solar plant with electrolysis using SAM solar models, ERCOT prices and ATB cost trajectories.
+
+## Key findings
+
+::: {.findings}
+- Among the cases studied, concentrated solar power with thermal storage running the electrolyzer at variable power gave the lowest levelized hydrogen cost; constant-power operation was the most expensive.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+The solar-thermal levelized costs divide whole-system financial cost by undiscounted hydrogen output, while the photovoltaic case adds the electricity cost of delivered energy to electrolyzer costs; the ranking held when both were recomputed on a common basis, but the absolute values are not directly comparable. Conference-length study.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1109/eem58374.2023.10161786){.out-link}
+
+
+## Reproducibility
+
+Results archived privately. Last updated 2026-10.

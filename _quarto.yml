@@ -1,0 +1,62 @@
+project:
+  type: website
+  output-dir: _site
+  render:            # explicit allowlist: only these pages are rendered and published
+    - index.qmd
+    - research.qmd
+    - projects.qmd
+    - projects/*.qmd
+    - publications.qmd
+    - software-data.qmd
+    # notes.qmd and notes/*.qmd are hidden until there is content (Henry 2026-10-21)
+    - teaching.qmd
+    # cv.qmd is hidden: Henry does not want the CV public yet (2026-10-21)
+  resources:
+    - images/
+
+website:
+  title: "Honglin Li"
+  site-url: "https://henryutd2021.github.io"
+  description: "Energy systems optimization and techno-economic analysis"
+  favicon: images/favicon.svg
+  open-graph: true
+  image: images/profile.jpg
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: research.qmd
+        text: Research
+      - href: projects.qmd
+        text: Projects
+      - href: publications.qmd
+        text: Publications
+      - href: software-data.qmd
+        text: Software & Data
+      - href: teaching.qmd
+        text: Teaching
+    right:
+      - icon: mortarboard-fill
+        href: https://scholar.google.com/citations?user=O1BZdHQAAAAJ&hl=en
+        aria-label: Google Scholar
+      - icon: github
+        href: https://github.com/Henryutd2021
+        aria-label: GitHub
+      - icon: linkedin
+        href: https://www.linkedin.com/in/honglin-li-998b18221/
+        aria-label: LinkedIn
+  page-footer:
+    left: "© 2026 Honglin Li · [hlli@ksu.edu](mailto:hlli@ksu.edu)"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      light: [cosmo, theme-light.scss]
+      dark: [darkly, theme-dark.scss]
+    css: styles.css
+    include-in-header:
+      text: |
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+    toc: true
+    smooth-scroll: true

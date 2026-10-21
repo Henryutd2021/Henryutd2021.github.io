@@ -1,0 +1,46 @@
+---
+title: "Supply chains with on-site microgrids and transactive energy"
+subtitle: "Applied Mathematical Modelling (2023) and IEEE SEGRE 2023, first author; Journal of the Operational Research Society (2022), second author"
+description: "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?"
+order: 9
+categories: ["Microgrids & supply chains"]
+themekey: "microgrid"
+themelabel: "Microgrids & supply chains"
+themeicon: "diagram-3"
+body-classes: "project-page theme-microgrid"
+---
+
+## Research question
+
+::: {.question}
+Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?
+:::
+
+## My contribution
+
+First author of the location-allocation papers (AMM, SEGRE). Second author of the JORS paper, for which I built the optimization models and the revision cases.
+
+## Method
+
+JORS sizes on-site microgrids for fixed facility locations with production and inventory planning; AMM and SEGRE add facility location-allocation decisions, and AMM compares linearization formulations.
+
+## Key findings
+
+::: {.findings}
+- Facility siting trades transport cost against renewable resource quality (AMM).
+- On-site renewables lower total supply-chain cost under the modeled time-of-use tariffs.
+- In the AMM price scenarios, batteries became attractive at high peak electricity prices; in JORS, capping grid imports made storage worthwhile.
+:::
+
+::: {.callout-note title="Boundary conditions"}
+Stylized multi-echelon networks with synthetic distances and costs; renewable capacity factors provided by a co-author.
+:::
+
+## Outputs
+
+[<i class="bi bi-box-arrow-up-right"></i> AMM paper (DOI)](https://doi.org/10.1016/j.apm.2023.02.014){.out-link} [<i class="bi bi-box-arrow-up-right"></i> SEGRE paper (DOI)](https://doi.org/10.1109/segre58867.2023.00071){.out-link} [<i class="bi bi-box-arrow-up-right"></i> JORS paper (DOI)](https://doi.org/10.1080/01605682.2022.2035273){.out-link}
+
+
+## Reproducibility
+
+Models archived privately; a cleaned release is planned. Last updated 2026-10.
