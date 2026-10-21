@@ -22,7 +22,7 @@ First author. Developed the data pipeline from public ERCOT market disclosures, 
 
 ## Method
 
-Two-stage stochastic mixed-integer program over ERCOT's eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data.
+Two-stage stochastic linear program over ERCOT's eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data.
 
 ## Key findings
 
