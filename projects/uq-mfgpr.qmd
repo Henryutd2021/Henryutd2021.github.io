@@ -27,7 +27,7 @@ Linear and nonlinear multi-fidelity Gaussian process regression, using kernel-de
 ## Key findings
 
 ::: {.findings}
-- Averaged over eight of nine tested turbines, nonlinear multi-fidelity regression reduced RMSE by 3.9% and MAE by 3.5%; one turbine was worse, and probabilistic criteria did not all favor it.
+- In the reported test on nine turbines, nonlinear multi-fidelity regression lowered RMSE on eight of them (3.9% on average across the nine); the probabilistic criteria did not all favor it.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
