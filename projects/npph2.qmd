@@ -8,40 +8,62 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 body-classes: "project-page theme-hydrogen"
+title-block-banner: true
+page-layout: full
+toc: false
 ---
 
+::: {.proj-layout}
+::: {.proj-main}
+::: {.question-card}
 ## Research question
 
-::: {.question}
 Can existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?
 :::
 
+::: {.proj-cards}
+::: {.info-card .glow-card .ic-contribution}
 ## My contribution
 
 First author. I co-developed the methodology and the optimization and lifetime techno-economic models with co-authors from Idaho National Laboratory and UT Dallas, and contributed to the analysis and writing.
+:::
 
+::: {.info-card .glow-card .ic-method}
 ## Method
 
 Hourly mixed-integer optimization of turbine, electrolyzer and storage dispatch for 42 reactors in seven U.S. ISO/RTO markets using 2024 prices, linked to a lifetime cash-flow model with federal tax credits (45U, a 45V-type hydrogen credit, 45Y and 48E).
+:::
+
+:::
 
 ## Key findings
 
 ::: {.findings}
-- Operated as baseload-only plants at 2024 market prices, nearly all reactors studied had negative net present value.
-- With hydrogen integration, including the assumed hydrogen production credit, a majority of the reactors reached positive net present value.
-- Integrated operation added output flexibility; ancillary-service revenue was a few percent of the total.
-- For new builds, investment and production tax credits substantially lowered the levelized cost of hydrogen.
+1. Operated as baseload-only plants at 2024 market prices, nearly all reactors studied had negative net present value.
+2. With hydrogen integration, including the assumed hydrogen production credit, a majority of the reactors reached positive net present value.
+3. Integrated operation added output flexibility; ancillary-service revenue was a few percent of the total.
+4. For new builds, investment and production tax credits substantially lowered the levelized cost of hydrogen.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
 Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years) and a dispatch held fixed after the credit expires; price feedback from large-scale adoption is not modeled.
 :::
 
+:::
+
+::: {.proj-aside}
+::: {.aside-card .outputs}
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1038/s41467-026-73630-y){.out-link}
+[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1038/s41467-026-73630-y){.out-link}
 
+:::
 
+::: {.aside-card .repro}
 ## Reproducibility
 
 Code and data: see the paper's Data Availability statement. Last updated 2026-10.
+:::
+
+:::
+:::

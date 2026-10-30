@@ -8,38 +8,60 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 body-classes: "project-page theme-hydrogen"
+title-block-banner: true
+page-layout: full
+toc: false
 ---
 
+::: {.proj-layout}
+::: {.proj-main}
+::: {.question-card}
 ## Research question
 
-::: {.question}
 Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?
 :::
 
+::: {.proj-cards}
+::: {.info-card .glow-card .ic-contribution}
 ## My contribution
 
 First author. Developed the data pipeline from public ERCOT market disclosures, the stochastic planning model and the analysis.
+:::
 
+::: {.info-card .glow-card .ic-method}
 ## Method
 
 Two-stage stochastic linear program. The first stage sizes electrolyzers, hydrogen tanks and fuel cells in each of ERCOT's eight weather zones; the second stage schedules batteries, electrolysis, fuel cells, gas-fired backup, reformer hydrogen and inter-zonal hydrogen transport hour by hour over a full year, in nine scenarios (three electricity-demand levels by three completion rates of planned renewable capacity). Inputs are built from ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data.
+:::
+
+:::
 
 ## Key findings
 
 ::: {.findings}
-- Renewable (green) hydrogen covered only a few percent of industrial hydrogen demand; reformer hydrogen remained the main supply.
-- Modest load flexibility (±5%) reduced CO₂ emissions from combined-cycle gas generation.
+1. Renewable (green) hydrogen covered only a few percent of industrial hydrogen demand; reformer hydrogen remained the main supply.
+2. Modest load flexibility (±5%) reduced CO₂ emissions from combined-cycle gas generation.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
 Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.
 :::
 
+:::
+
+::: {.proj-aside}
+::: {.aside-card .outputs}
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1016/j.ijhydene.2025.02.303){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/txh2-ercot-hydrogen){.out-link}
+[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1016/j.ijhydene.2025.02.303){.out-link} [<i class="bi bi-github"></i> Model framework (GitHub)](https://github.com/Henryutd2021/txh2-ercot-hydrogen){.out-link}
 
+:::
 
+::: {.aside-card .repro}
 ## Reproducibility
 
 Model framework with documentation, examples and tests on GitHub. For the study's data and code, see the paper's data availability statement. Last updated 2026-10.
+:::
+
+:::
+:::

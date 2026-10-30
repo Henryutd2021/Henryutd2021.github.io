@@ -54,12 +54,13 @@ website:
 
 format:
   html:
-    theme:
-      light: [cosmo, theme-light.scss]
-      dark: [darkly, theme-dark.scss]
-    css: styles.css
+    # one dark theme (2026-10-30 redesign); design tokens in assets/base.css
+    theme: [darkly, theme-dark.scss]
+    css: [assets/base.css, styles.css, assets/home.css]
     include-in-header:
       text: |
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+        <meta name="theme-color" content="#070d18">
+    include-after-body: [assets/site-js.html, assets/pages-js.html, assets/home-js.html]   # inline JS (written by scripts/build_site.py from assets/*.js)
     toc: true
-    smooth-scroll: true
+    smooth-scroll: false   # native CSS smooth scrolling, off under reduced motion or 'Pause motion'

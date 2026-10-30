@@ -8,38 +8,60 @@ themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
 body-classes: "project-page theme-hydrogen"
+title-block-banner: true
+page-layout: full
+toc: false
 ---
 
+::: {.proj-layout}
+::: {.proj-main}
+::: {.question-card}
 ## Research question
 
-::: {.question}
 How much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?
 :::
 
+::: {.proj-cards}
+::: {.info-card .glow-card .ic-contribution}
 ## My contribution
 
 First author. Linked an operation-and-maintenance simulation developed with University of Strathclyde collaborators to the system techno-economic optimization.
+:::
 
+::: {.info-card .glow-card .ic-method}
 ## Method
 
 Two-stage approach: Monte Carlo operation-and-maintenance simulation, then techno-economic optimization for a Gulf of Mexico site supplying Houston-area refineries.
+:::
+
+:::
 
 ## Key findings
 
 ::: {.findings}
-- Prognostics-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.
-- At the system level, the levelized cost of hydrogen fell by about 2%.
+1. Prognostics-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.
+2. At the system level, the levelized cost of hydrogen fell by about 2%.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
 Single site and one weather year; maintenance parameters from the collaborators' framework.
 :::
 
+:::
+
+::: {.proj-aside}
+::: {.aside-card .outputs}
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1088/1742-6596/2767/6/062016){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
+[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1088/1742-6596/2767/6/062016){.out-link} [<i class="bi bi-github"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
 
+:::
 
+::: {.aside-card .repro}
 ## Reproducibility
 
 The system optimization follows the model framework on GitHub; the maintenance simulation belongs to the collaborators and is not public; study results archived privately. Last updated 2026-10.
+:::
+
+:::
+:::

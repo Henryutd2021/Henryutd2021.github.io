@@ -1,16 +1,93 @@
 ---
 title: "Software & Data"
+subtitle: "Open model frameworks"
+title-block-banner: true
+page-layout: full
+toc: false
+body-classes: "page-software"
 ---
 
+::: {.page-lede}
 Documented model frameworks associated with published and accepted research. Each repository gives the model formulation with references to the source equations, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic data and tests.
+:::
 
-| Framework | Accompanies | Repository |
-|---|---|---|
-| Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport | International Journal of Hydrogen Energy (2025) | [txh2-ercot-hydrogen](https://github.com/Henryutd2021/txh2-ercot-hydrogen) |
-| Demand-side load regulation guided by real-time emission intensity | Cell Reports Sustainability (2025) | [ghg-load-regulation](https://github.com/Henryutd2021/ghg-load-regulation) |
-| Supply-chain facility location with on-site microgrids; virtual power plant scheduling | Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021) | [supply-chain-microgrid-models](https://github.com/Henryutd2021/supply-chain-microgrid-models) |
-| Multi-fidelity Gaussian process regression for probabilistic wind power curves | ASME IDETC 2023 | [mfgpr-wind-power-curve](https://github.com/Henryutd2021/mfgpr-wind-power-curve) |
-| Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells (REopt-type MILP, with a concentrated-solar option) | Journal of Mechanical Design (2024); TORQUE 2022; IEEE EEM 2023; TORQUE 2024 | [reopt-hydrogen-framework](https://github.com/Henryutd2021/reopt-hydrogen-framework) |
-| Cost of delayed energization for AI data centers: developer, ratepayer and social accounts | IEEE NAPS 2026 (accepted) | [code-delayed-energization](https://github.com/Henryutd2021/code-delayed-energization) |
+::: {.feature-strip}
+::: {.feature}
+[<i class="bi bi-braces"></i>]{.ft-icon} [Model formulation]{.ft-label}
+:::
+::: {.feature}
+[<i class="bi bi-diagram-2"></i>]{.ft-icon} [Data pipeline and input formats]{.ft-label}
+:::
+::: {.feature}
+[<i class="bi bi-cpu"></i>]{.ft-icon} [Runnable implementation]{.ft-label}
+:::
+::: {.feature}
+[<i class="bi bi-check2-circle"></i>]{.ft-icon} [Synthetic examples and tests]{.ft-label}
+:::
+:::
 
+::: {.repo-grid}
+::: {.repo-card .glow-card .theme-hydrogen}
+[Hydrogen systems]{.rc-theme}
+
+## Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport
+
+[Accompanies]{.rc-label} International Journal of Hydrogen Energy (2025)
+
+[<i class="bi bi-github"></i> txh2-ercot-hydrogen](https://github.com/Henryutd2021/txh2-ercot-hydrogen){.rc-link}
+:::
+
+::: {.repo-card .glow-card .theme-carbon}
+[Carbon-aware grid]{.rc-theme}
+
+## Demand-side load regulation guided by real-time emission intensity
+
+[Accompanies]{.rc-label} Cell Reports Sustainability (2025)
+
+[<i class="bi bi-github"></i> ghg-load-regulation](https://github.com/Henryutd2021/ghg-load-regulation){.rc-link}
+:::
+
+::: {.repo-card .glow-card .theme-microgrid}
+[Microgrids & supply chains]{.rc-theme}
+
+## Supply-chain facility location with on-site microgrids; virtual power plant scheduling
+
+[Accompanies]{.rc-label} Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021)
+
+[<i class="bi bi-github"></i> supply-chain-microgrid-models](https://github.com/Henryutd2021/supply-chain-microgrid-models){.rc-link}
+:::
+
+::: {.repo-card .glow-card .theme-wind}
+[Wind uncertainty]{.rc-theme}
+
+## Multi-fidelity Gaussian process regression for probabilistic wind power curves
+
+[Accompanies]{.rc-label} ASME IDETC 2023
+
+[<i class="bi bi-github"></i> mfgpr-wind-power-curve](https://github.com/Henryutd2021/mfgpr-wind-power-curve){.rc-link}
+:::
+
+::: {.repo-card .glow-card .theme-hydrogen}
+[Hydrogen systems]{.rc-theme}
+
+## Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells (REopt-type MILP, with a concentrated-solar option)
+
+[Accompanies]{.rc-label} Journal of Mechanical Design (2024); TORQUE 2022; IEEE EEM 2023; TORQUE 2024
+
+[<i class="bi bi-github"></i> reopt-hydrogen-framework](https://github.com/Henryutd2021/reopt-hydrogen-framework){.rc-link}
+:::
+
+::: {.repo-card .glow-card .theme-datacenter}
+[Nuclear & data centers]{.rc-theme}
+
+## Cost of delayed energization for AI data centers: developer, ratepayer and social accounts
+
+[Accompanies]{.rc-label} IEEE NAPS 2026 (accepted)
+
+[<i class="bi bi-github"></i> code-delayed-energization](https://github.com/Henryutd2021/code-delayed-energization){.rc-link}
+:::
+:::
+
+::: {.page-note}
 For the data and code of individual studies, see each paper's data availability statement.
+:::

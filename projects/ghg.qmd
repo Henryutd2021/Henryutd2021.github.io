@@ -8,40 +8,67 @@ themekey: "carbon"
 themelabel: "Carbon-aware grid"
 themeicon: "globe-americas"
 body-classes: "project-page theme-carbon"
+title-block-banner: true
+page-layout: full
+toc: false
 ---
 
+::: {.proj-layout}
+::: {.proj-main}
+::: {.question-card}
 ## Research question
 
-::: {.question}
 How much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?
 :::
 
+::: {.proj-cards}
+::: {.info-card .glow-card .ic-contribution}
 ## My contribution
 
 First author. I contributed to the methodology, data processing, optimization modeling, analysis and writing with my co-authors.
+:::
 
+::: {.info-card .glow-card .ic-method}
 ## Method
 
 Mixed-integer load-regulation model solved for each optimization cycle (month, quarter or year): hourly load moves toward lower-intensity hours within an allowed adjustment range, without lowering the cycle's total consumption, and each adjusted hour carries a penalty. Applied to U.S. grid regions with EIA hourly data (2023), varying the cycle, the adjustment range and the penalty, and grouping regions by renewable penetration, generation diversity and intensity fluctuation.
+:::
+
+:::
 
 ## Key findings
 
 ::: {.findings}
-- Longer optimization windows and wider adjustment ranges increase the reduction in attributed emissions, most in renewable-rich and diverse grids.
-- In the reported scenarios, reductions in attributed emissions are modest, on the order of one to two percent of regional totals or less.
-- Regions with low intensity fluctuation are more sensitive to the cost of regulating load.
+1. Longer optimization windows and wider adjustment ranges increase the reduction in attributed emissions, most in renewable-rich and diverse grids.
+2. In the reported scenarios, reductions in attributed emissions are modest, on the order of one to two percent of regional totals or less.
+3. Regions with low intensity fluctuation are more sensitive to the cost of regulating load.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
 Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.
 :::
 
+:::
+
+::: {.proj-aside}
+::: {.aside-card .outputs}
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1016/j.crsus.2025.100367){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/ghg-load-regulation){.out-link}
+[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1016/j.crsus.2025.100367){.out-link} [<i class="bi bi-github"></i> Model framework (GitHub)](https://github.com/Henryutd2021/ghg-load-regulation){.out-link}
+
+::: {.related}
+Related
 
 - Demand-side management under real-time greenhouse gas emission factors for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author).
+:::
 
+:::
+
+::: {.aside-card .repro}
 ## Reproducibility
 
 Model framework with documentation, examples and tests on GitHub. For the study's data and code, see the paper's data availability statement. Last updated 2026-10.
+:::
+
+:::
+:::

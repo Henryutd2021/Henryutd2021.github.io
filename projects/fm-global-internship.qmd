@@ -8,31 +8,53 @@ themekey: "microgrid"
 themelabel: "Industry"
 themeicon: "briefcase"
 body-classes: "project-page theme-microgrid"
+title-block-banner: true
+page-layout: full
+toc: false
 ---
 
+::: {.proj-layout}
+::: {.proj-main}
+::: {.question-card}
 ## Research question
 
-::: {.question}
 How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?
 :::
 
+::: {.proj-cards}
+::: {.info-card .glow-card .ic-contribution}
 ## My contribution
 
 Intern. Built the microgrid sizing model and the production-line simulation, and proposed the wind-farm maintenance framework.
+:::
 
+::: {.info-card .glow-card .ic-method}
 ## Method
 
 Techno-economic optimization for resilient microgrid sizing; discrete-event simulation of a battery manufacturing line; and optimization methods for wind-farm maintenance planning.
+:::
+
+:::
 
 ::: {.callout-note title="Boundary conditions"}
 Industry work: company data, models and results are confidential and are not shown here.
 :::
 
+:::
+
+::: {.proj-aside}
+::: {.aside-card .outputs}
 ## Outputs
 
 Internal company reports; not public.
 
+:::
 
+::: {.aside-card .repro}
 ## Reproducibility
 
 Not public (company work). Last updated 2026-10.
+:::
+
+:::
+:::

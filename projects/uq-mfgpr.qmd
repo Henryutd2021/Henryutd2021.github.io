@@ -8,37 +8,59 @@ themekey: "wind"
 themelabel: "Wind uncertainty"
 themeicon: "wind"
 body-classes: "project-page theme-wind"
+title-block-banner: true
+page-layout: full
+toc: false
 ---
 
+::: {.proj-layout}
+::: {.proj-main}
+::: {.question-card}
 ## Research question
 
-::: {.question}
 Can multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?
 :::
 
+::: {.proj-cards}
+::: {.info-card .glow-card .ic-contribution}
 ## My contribution
 
 First author. Implemented and evaluated the models, as part of a DOE Wind Energy Technologies Office project led by national laboratories.
+:::
 
+::: {.info-card .glow-card .ic-method}
 ## Method
 
 Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression that fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), compared with single-fidelity regression on point and probabilistic metrics.
+:::
+
+:::
 
 ## Key findings
 
 ::: {.findings}
-- In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.
+1. In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
 One dataset and one generic low-fidelity curve.
 :::
 
+:::
+
+::: {.proj-aside}
+::: {.aside-card .outputs}
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1115/detc2023-114762){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Method framework (GitHub)](https://github.com/Henryutd2021/mfgpr-wind-power-curve){.out-link}
+[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1115/detc2023-114762){.out-link} [<i class="bi bi-github"></i> Method framework (GitHub)](https://github.com/Henryutd2021/mfgpr-wind-power-curve){.out-link}
 
+:::
 
+::: {.aside-card .repro}
 ## Reproducibility
 
 Method framework with documentation, examples and tests on GitHub; case-study results archived privately. Last updated 2026-10.
+:::
+
+:::
+:::

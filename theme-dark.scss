@@ -1,27 +1,28 @@
 /*-- scss:defaults --*/
-// Dark theme on top of darkly, matching the light palette.
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap');
+// The site's single theme (dark-first design, 2026-10-30 redesign). Colors and fonts mirror assets/base.css tokens.
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 $font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$headings-font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+$headings-font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
 $headings-font-weight: 700;
-$font-size-base: 1rem;
-$line-height-base: 1.65;
+$font-size-base: 1.02rem;
+$line-height-base: 1.7;
 
-$primary: #8cc3ea;
-$secondary: #9aa8b8;
-$info: #5cc0d0;
-$body-bg: #0f1720;
-$body-color: #d7dee7;
-$link-color: #5cc0d0;
-$link-hover-color: #8cc3ea;
+$primary: #38bdf8;
+$secondary: #94a3b8;
+$info: #2dd4bf;
+$body-bg: #070d18;
+$body-color: #d5deea;
+$link-color: #5eead4;
+$link-hover-color: #a5f3fc;
 
-$navbar-bg: #111b26;
-$navbar-fg: #c8d2dc;
-$navbar-hl: #5cc0d0;
-$footer-bg: #111b26;
-$footer-fg: #9aa8b8;
-$callout-color-note: #5cc0d0;
+$navbar-bg: #070d18;
+$navbar-fg: #c7d2e0;
+$navbar-hl: #5eead4;
+$footer-bg: #050a13;
+$footer-fg: #8b9bb0;
+$callout-color-note: #38bdf8;
+$border-color: #1c2a3d;
 
 /*-- scss:rules --*/
-.navbar { border-bottom: 1px solid #223142; }

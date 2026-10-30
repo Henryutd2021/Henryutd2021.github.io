@@ -1,12 +1,20 @@
 ---
 title: "CV"
+subtitle: "Curriculum vitae"
+title-block-banner: true
+page-layout: full
 toc: false
+body-classes: "page-cv"
 ---
 
-[<i class="bi bi-download"></i> Download CV (PDF)](files/Honglin_Li_CV.pdf){.out-link}
+::: {.cv-actions}
+[<i class="bi bi-download"></i> Download CV (PDF)](files/Honglin_Li_CV.pdf){.btn-glow}
+:::
 
 ```{=html}
+<div class="cv-shell">
 <object class="cv-frame" data="files/Honglin_Li_CV.pdf" type="application/pdf" aria-label="Curriculum vitae of Honglin Li">
   <p>Your browser cannot display the PDF here. <a href="files/Honglin_Li_CV.pdf">Download the CV</a> instead.</p>
 </object>
+</div>
 ```
