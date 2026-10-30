@@ -30,7 +30,7 @@ Industry work: company data, models and results are confidential and are not sho
 
 ## Outputs
 
-Publication details are on the [Publications](../publications.qmd) page.
+Internal company reports; not public.
 
 
 ## Reproducibility
