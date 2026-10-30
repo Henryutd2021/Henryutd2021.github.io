@@ -36,9 +36,9 @@ Single West Texas site; cost trajectories from NREL's Annual Technology Baseline
 
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1109/eem58374.2023.10161786){.out-link}
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1109/eem58374.2023.10161786){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
 
 
 ## Reproducibility
 
-Results archived privately. Last updated 2026-10.
+Model framework (including the concentrated-solar option) with documentation, examples and tests on GitHub; study inputs and results archived privately. Last updated 2026-10.

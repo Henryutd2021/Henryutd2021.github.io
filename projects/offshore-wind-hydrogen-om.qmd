@@ -37,9 +37,9 @@ Single site and one weather year; maintenance parameters from the collaborators'
 
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1088/1742-6596/2767/6/062016){.out-link}
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1088/1742-6596/2767/6/062016){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
 
 
 ## Reproducibility
 
-Results archived privately. Last updated 2026-10.
+The system optimization follows the model framework on GitHub; the maintenance simulation belongs to the collaborators and is not public; study results archived privately. Last updated 2026-10.

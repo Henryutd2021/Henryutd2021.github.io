@@ -37,10 +37,10 @@ Cost assumptions date from 2020–2023 and predate final federal hydrogen credit
 
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> JMD paper (DOI)](https://doi.org/10.1115/1.4063971){.out-link} [<i class="bi bi-box-arrow-up-right"></i> TORQUE 2022 paper (DOI)](https://doi.org/10.1088/1742-6596/2265/4/042063){.out-link}
+[<i class="bi bi-box-arrow-up-right"></i> JMD paper (DOI)](https://doi.org/10.1115/1.4063971){.out-link} [<i class="bi bi-box-arrow-up-right"></i> TORQUE 2022 paper (DOI)](https://doi.org/10.1088/1742-6596/2265/4/042063){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
 
 - Integrating offshore wind farms with unmanned hydrogen and battery ships — IEEE KPEC 2022 (third author).
 
 ## Reproducibility
 
-Results archived privately; a model framework release is planned. Last updated 2026-10.
+Model framework with documentation, examples and tests on GitHub; study inputs and results archived privately. Last updated 2026-10.
