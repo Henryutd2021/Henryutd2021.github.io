@@ -1,0 +1,292 @@
+/* pubs.css — publications, projects listing and project pages (third redesign, 2026-10-30).
+   al-folio / Hugo Academic conventions on the tokens of assets/base.css (white by day, night via the navbar toggle).
+   Also styles the home page's selected publications: scripts/build_site.py emits the same rows (ol.pubs > li.pub)
+   for _selected.qmd, the Publications page and each project page's Publications list.
+   Also styles the publications stat row (.pub-stats, site/_stats.qmd), which the About page can include.
+   Sections: tokens · page header · publications header and chart · stat row · filter bar · publication rows ·
+   BibTeX · projects grid · project page · responsive. */
+
+/* ---------- tokens added here ---------- */
+body.quarto-light { --industry: #475569; }
+body.quarto-dark  { --industry: #94a3b8; }
+.theme-industry { --t: var(--industry); }
+/* theme colour helpers (need --t on the same element): text-safe ink, soft fill, border */
+.project-page, .project-card {
+  --t-ink: color-mix(in srgb, var(--t, var(--accent)) 64%, var(--ink));
+  --t-soft: color-mix(in srgb, var(--t, var(--accent)) 8%, var(--surface));
+  --t-line: color-mix(in srgb, var(--t, var(--accent)) 30%, var(--line));
+}
+/* publication types: solid badges by day (white text, AA), tinted badges at night */
+body.quarto-light .pt-journal    { --pt-bg: #1d4ed8; --pt-fg: #fff; --pt-line: #1d4ed8; --pt-dot: #1d4ed8; }
+body.quarto-light .pt-conference { --pt-bg: #0f766e; --pt-fg: #fff; --pt-line: #0f766e; --pt-dot: #0f766e; }
+body.quarto-light .pt-preprint   { --pt-bg: #b45309; --pt-fg: #fff; --pt-line: #b45309; --pt-dot: #b45309; }
+body.quarto-light .pt-thesis     { --pt-bg: #7e22ce; --pt-fg: #fff; --pt-line: #7e22ce; --pt-dot: #7e22ce; }
+body.quarto-dark .pt-journal    { --pt-bg: #172554; --pt-fg: #bfdbfe; --pt-line: #1e40af; --pt-dot: #60a5fa; }
+body.quarto-dark .pt-conference { --pt-bg: #042f2e; --pt-fg: #99f6e4; --pt-line: #115e59; --pt-dot: #2dd4bf; }
+body.quarto-dark .pt-preprint   { --pt-bg: #431407; --pt-fg: #fde68a; --pt-line: #92400e; --pt-dot: #fbbf24; }
+body.quarto-dark .pt-thesis     { --pt-bg: #3b0764; --pt-fg: #e9d5ff; --pt-line: #6b21a8; --pt-dot: #c084fc; }
+
+/* ---------- page frame and header ----------
+   Publications and Projects: Quarto's title band (title-block-banner) holds the page's only h1, styled like the
+   band of the Research, Software, Teaching and CV pages (pages.css) so all inner pages share one header.
+   Project pages: no band; Quarto's plain title block holds the h1 and main is a flex column, so the breadcrumb,
+   which follows the title block in the source, sits above it (order: -1).
+   main is centred on the navbar's content width, as on the other inner pages. */
+body.page-publications main.content, body.page-projects main.content, body.project-page main.content {
+  width: 100%; max-width: var(--wrap); justify-self: center; padding-bottom: 4.5rem; }
+body.page-publications main.content, body.page-projects main.content { margin-top: 2.6rem; }
+body.page-publications .quarto-title-banner, body.page-projects .quarto-title-banner {
+  position: relative; overflow: hidden; margin-bottom: 0; padding: 3.4rem 0 2.6rem; color: var(--ink);
+  background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%); border-bottom: 1px solid var(--line); }
+body.page-publications .quarto-title-banner::after, body.page-projects .quarto-title-banner::after {   /* faint dot grid, right half */
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .75;
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1.3px); background-size: 20px 20px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 45%, #000 100%); mask-image: linear-gradient(90deg, transparent 45%, #000 100%); }
+body.page-publications .quarto-title-banner .quarto-title, body.page-projects .quarto-title-banner .quarto-title {
+  position: relative; z-index: 1; width: 100%; max-width: var(--wrap); justify-self: center; }
+body.page-publications .quarto-title-banner .quarto-title::before, body.page-projects .quarto-title-banner .quarto-title::before {
+  content: ""; display: block; width: 72px; height: 4px; margin-bottom: 1.1rem; border-radius: 2px;   /* one segment per theme */
+  background: linear-gradient(90deg, var(--datacenter) 0 20%, var(--hydrogen) 20% 40%, var(--carbon) 40% 60%, var(--microgrid) 60% 80%, var(--wind) 80% 100%); }
+body.page-publications h1.title, body.page-projects h1.title {
+  margin: 0; font-size: clamp(2.1rem, 1.4rem + 2.6vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; color: var(--ink); }
+body.page-publications .quarto-title .subtitle, body.page-projects .quarto-title .subtitle {
+  margin: .6rem 0 0; font-size: clamp(1.02rem, .95rem + .4vw, 1.18rem); font-weight: 400; color: var(--ink-2); opacity: 1; }
+body.page-publications #title-block-header .quarto-title-meta, body.page-projects #title-block-header .quarto-title-meta,
+body.page-publications #title-block-header .description, body.page-projects #title-block-header .description { display: none; }
+.pg-lede { margin: 0 0 1.6rem; max-width: 76ch; font-size: 1.04rem; line-height: 1.7; color: var(--ink-2); }
+
+/* ---------- Publications header: counts, citation total (OpenAlex) and the publications-per-year chart ----------
+   The chart is an inline SVG from scripts/build_site.py: bar segments carry .pt-<type> (badge colours, both themes),
+   text takes the ink tokens. pages.js sets data-type on .pub-chart to fade the types a pressed tab leaves out. */
+.pub-head { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.4rem clamp(2rem, 5vw, 3.75rem); align-items: start; margin-bottom: 1.8rem; }
+.pub-head .pg-lede { margin: 0; }
+.pub-cites { display: flex; align-items: flex-start; gap: .65rem; max-width: 76ch; margin: 1rem 0 0; font-size: .92rem; line-height: 1.65; color: var(--muted); }
+.pub-cites > .bi { flex: none; display: inline-grid; place-items: center; width: 1.65rem; height: 1.65rem; margin-top: .02rem; border-radius: 6px;
+  font-size: .85rem; color: var(--accent-ink); background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.pub-cites strong { font-weight: 700; color: var(--ink); }
+.pub-chart { display: block; margin: 0; padding: .85rem 1rem .8rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-sm); }
+.pub-chart figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; margin: 0 0 .3rem;
+  font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.pub-chart-total { font-size: .78rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.pub-chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pub-chart .axis { stroke: var(--line-strong); stroke-width: 1; }
+.pub-chart .seg { fill: var(--pt-dot); transition: opacity .2s var(--ease); }
+.pub-chart text { font-family: var(--font); font-size: 12px; font-variant-numeric: tabular-nums; }
+.pub-chart .n { fill: var(--ink-2); font-weight: 650; }
+.pub-chart .yl { fill: var(--muted); }
+.pub-chart-key { display: grid; grid-template-columns: repeat(2, max-content); gap: .2rem 1.4rem; margin: .5rem 0 0; padding: 0; list-style: none; font-size: .76rem; color: var(--muted); }
+.pub-chart-key li { display: inline-flex; align-items: center; gap: .35rem; }
+.pub-chart-key .dot, .pub-stats .dot { flex: none; width: .55rem; height: .55rem; border-radius: 50%; background: var(--pt-dot); }
+.pub-chart:not([data-type="all"]) .seg { opacity: .2; }
+.pub-chart[data-type="journal"] .seg.pt-journal, .pub-chart[data-type="conference"] .seg.pt-conference,
+.pub-chart[data-type="preprint"] .seg.pt-preprint, .pub-chart[data-type="thesis"] .seg.pt-thesis { opacity: 1; }
+
+/* ---------- stat row (site/_stats.qmd): journal articles, conference papers, theses, citations ----------
+   sized by the row's own width, not the viewport: four cells in one row when it is at least 36rem wide, else two per
+   row (the basis switches from 25% to 50%; never 3 + 1); a short last row stretches. Each cell draws its left and
+   top divider as a 1px shadow, which the frame clips at its outer edges. */
+.pub-stats { display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.pub-stats li { flex: 1 1 calc(min(50%, max(25%, (36rem - 100%) * 999)) - 1px); min-width: 0;
+  box-shadow: -1px 0 0 var(--line), 0 -1px 0 var(--line); }
+.pub-stats a { display: flex; flex-direction: column; gap: .25rem; height: 100%; padding: .8rem .9rem .85rem; color: inherit; text-decoration: none !important;
+  transition: background .15s var(--ease); }
+.pub-stats a:hover { background: var(--bg-2); }
+.pub-stats a:hover .ps-n { color: var(--accent); }
+.pub-stats a:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.ps-n { font-size: 1.6rem; font-weight: 800; line-height: 1.1; letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums;
+  transition: color .15s var(--ease); }
+.ps-l { display: flex; align-items: baseline; gap: .4rem; font-size: .8rem; font-weight: 500; line-height: 1.35; color: var(--ink-2); }   /* dot stays on line 1 */
+.ps-l .bi { font-size: .8rem; color: var(--accent); }
+.ps-src { font-size: .74rem; color: var(--muted); }
+
+/* project pages: plain title block below the breadcrumb */
+body.project-page main.content { display: flex; flex-direction: column; }
+body.project-page main.content > * { min-width: 0; }
+.crumbs { order: -1; }
+body.project-page #title-block-header { display: block; margin: 0; padding: 0; border: 0; background: none; }
+body.project-page #title-block-header .quarto-title { display: block; }
+body.project-page h1.title { max-width: 26ch; margin: 0; font-size: clamp(1.95rem, 1.35rem + 2.3vw, 2.85rem); font-weight: 800; line-height: 1.12;
+  letter-spacing: -.03em; color: var(--ink); }
+body.project-page #title-block-header .subtitle { margin: .8rem 0 0; font-size: 1.06rem; font-weight: 400; color: var(--muted); opacity: 1; }
+/* a project page's description is its research question (shown below) and its theme is in the breadcrumb */
+body.project-page #title-block-header .description, body.project-page #title-block-header .quarto-categories,
+body.project-page #title-block-header .quarto-title-meta { display: none; }
+/* Quarto underlines every h2 (border-bottom); these pages use spacing instead */
+body.page-publications main h2, body.page-projects main h2, body.project-page main h2, .pubs-selected h2 { border-bottom: 0; padding-bottom: 0; }
+
+/* ---------- filter bar: search box and type / theme tabs (shown by pages.js) ---------- */
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem 1.2rem; margin: 0;
+  padding: .75rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.proj-filter { justify-content: flex-start; padding: 0; background: none; border: 0; border-radius: 0; }
+.search-box { position: relative; flex: 1 1 280px; max-width: 420px; }
+.search-box .bi { position: absolute; left: .95rem; top: 50%; transform: translateY(-50%); font-size: .9rem; color: var(--muted); pointer-events: none; }
+.search-box input { width: 100%; height: 2.6rem; padding: 0 1rem 0 2.5rem; border-radius: 999px; border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink); font: inherit; font-size: .94rem; transition: border-color .15s var(--ease), box-shadow .15s var(--ease); }
+.search-box input::placeholder { color: var(--muted); opacity: 1; }
+.search-box input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-line); }
+.ftabs { display: flex; flex-wrap: wrap; gap: .45rem; }
+.ftab { display: inline-flex; align-items: center; gap: .45rem; height: 2.3rem; padding: 0 .95rem; border-radius: 999px; border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink-2); font: inherit; font-size: .88rem; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease); }
+.ftab:hover { border-color: var(--accent); color: var(--accent-ink); }
+.ftab .n { min-width: 1.45rem; padding: .05rem .4rem; border-radius: 999px; background: var(--bg-3); color: var(--ink-2); font-size: .74rem; font-weight: 600; text-align: center; }
+.ftab .dot, .ftab .tdot { width: .55rem; height: .55rem; border-radius: 50%; background: var(--pt-dot, var(--t)); flex: none; }
+.ftab[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+body.quarto-dark .ftab[aria-pressed="true"] { color: #0b1220; }
+.ftab[aria-pressed="true"] .n { background: rgba(255, 255, 255, .92); color: var(--accent-ink); }   /* AA in both themes */
+body.quarto-dark .ftab[aria-pressed="true"] .n { background: rgba(11, 18, 32, .16); color: inherit; }
+.ftab[aria-pressed="true"] .dot, .ftab[aria-pressed="true"] .tdot { box-shadow: 0 0 0 2px rgba(255, 255, 255, .85); }
+.filter-status { min-height: 1.4em; margin: .5rem 0 0; font-size: .85rem; color: var(--muted); }
+.filter-empty { margin-top: 1.5rem; padding: 2.6rem 1rem; text-align: center; color: var(--muted); border: 1px dashed var(--line-strong); border-radius: var(--r); }
+.filter-empty p { margin: 0 0 1rem; }
+
+/* ---------- publication rows (al-folio): Publications page, home page, project pages ---------- */
+.year-h { display: flex; align-items: center; gap: 1rem; margin: 2.2rem 0 .3rem; font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+.year-h::after { content: ""; flex: 1; height: 1px; background: var(--line); order: 9; }
+.year-h .anchorjs-link { order: 10; margin-left: 0 !important; font-size: .9rem; }   /* hover anchor after the rule */
+.pub-year:first-child .year-h { margin-top: 1rem; }
+ol.pubs { list-style: none; margin: 0; padding: 0; }
+.pub { display: grid; grid-template-columns: 7.6rem minmax(0, 1fr); gap: 1.4rem; padding: 1.15rem 0; }
+.pub + .pub { border-top: 1px solid var(--line); }
+.pub-badge { padding-top: .2rem; }
+.pub .abbr { width: 100%; min-width: 0; padding: .4rem .45rem; background: var(--pt-bg, var(--accent)); color: var(--pt-fg, #fff);
+  box-shadow: inset 0 0 0 1px var(--pt-line, transparent); font-size: .72rem; line-height: 1.3; }
+.pub-title { font-size: 1.04rem; font-weight: 650; line-height: 1.45; color: var(--ink); letter-spacing: -.005em; }
+.pub-authors { margin-top: .25rem; font-size: .93rem; line-height: 1.55; color: var(--ink-2); }
+.me { font-weight: 700; color: var(--ink); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-color: var(--accent); }
+.pub-venue { margin-top: .15rem; font-size: .92rem; line-height: 1.55; color: var(--muted); }
+.pub-venue em { color: var(--ink-2); }
+.pub-tag { display: inline-block; margin-left: .3rem; padding: .04rem .55rem; border-radius: 999px; font-size: .72rem; font-weight: 600; font-style: normal; line-height: 1.6; vertical-align: .05em; white-space: nowrap; }
+.tag-featured { background: var(--accent-soft); color: var(--accent-ink); }
+.tag-note { background: var(--bg-3); color: var(--ink-2); }
+body.quarto-light .tag-ok { background: #dcfce7; color: #166534; }
+body.quarto-light .tag-review { background: #fef3c7; color: #92400e; }
+body.quarto-dark .tag-ok { background: #052e16; color: #86efac; }
+body.quarto-dark .tag-review { background: #422006; color: #fcd34d; }
+.pub-links { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
+.pub-links .btn-xs { font-family: var(--font); line-height: 1.5; }
+.pub-links .btn-xs:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* "Cited by N" (OpenAlex): a pill after the buttons, same height as them */
+.pub-links .cite-chip { gap: .3rem; padding: .16rem .6rem; font-size: .72rem; font-weight: 600; line-height: 1.5; white-space: nowrap;
+  color: var(--ink-2); background: var(--bg-2); border-color: var(--line-strong); text-decoration: none !important;
+  transition: border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease); }
+.pub-links .cite-chip .bi { font-size: .78rem; color: var(--accent); }
+.pub-links .cite-chip:hover { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-soft); }
+.pub-links .cite-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* BibTeX panel (BIB button) */
+.pub-bib { position: relative; margin-top: .75rem; }
+.pub-bib pre { margin: 0; padding: .95rem 1.1rem; padding-right: 6rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-sm);
+  font-size: .78rem; line-height: 1.6; color: var(--ink-2); white-space: pre; overflow-x: auto; }
+.pub-bib pre code { padding: 0; background: none; color: inherit; font-family: var(--font-mono); font-size: inherit; white-space: inherit; }
+.bib-copy { position: absolute; top: .55rem; right: .55rem; display: inline-flex; align-items: center; gap: .35rem; padding: .22rem .6rem; border-radius: 4px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); font-size: .74rem; font-weight: 600; cursor: pointer;
+  transition: color .15s var(--ease), border-color .15s var(--ease); }
+.bib-copy:hover { color: var(--accent); border-color: var(--accent); }
+.bib-copy.done { color: var(--accent-ink); border-color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- projects listing (al-folio "projects" grid) ---------- */
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr)); gap: 1.6rem; margin-top: 1.1rem; }
+.pc-cell { display: flex; min-width: 0; }
+.project-card { display: flex; flex-direction: column; width: 100%; overflow: hidden; border-radius: var(--r-lg); }
+.pc-cover { aspect-ratio: 16 / 9; overflow: hidden; background: var(--surface); border-bottom: 1px solid var(--line); }
+.pc-cover img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .45s var(--ease); }
+.project-card:hover .pc-cover img { transform: scale(1.035); }
+.pc-body { display: flex; flex: 1; flex-direction: column; padding: 1.15rem 1.25rem 1.2rem; }
+.pc-body p { margin: 0; }
+.pc-theme { display: inline-flex; align-items: center; gap: .4rem; font-size: .74rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--t-ink); }
+.pc-title { margin: .45rem 0 .35rem; font-size: 1.13rem; font-weight: 700; line-height: 1.35; letter-spacing: -.012em; }
+.pc-title a { color: var(--ink); font-weight: inherit; text-decoration: none !important; }
+.pc-title a::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }   /* whole card clickable */
+.pc-title a:focus-visible { outline: none; }
+.project-card:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+.project-card:hover .pc-title a { color: var(--accent); }
+.pc-venue { font-size: .86rem; line-height: 1.5; color: var(--muted); }
+.pc-desc { margin-top: .55rem !important; font-size: .92rem; line-height: 1.6; color: var(--ink-2);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.pc-more { display: inline-flex; align-items: center; gap: .35rem; margin-top: auto !important; padding-top: .9rem; font-size: .86rem; font-weight: 600; color: var(--accent); }
+.pc-more .bi { transition: transform .2s var(--ease); }
+.project-card:hover .pc-more .bi { transform: translateX(3px); }
+
+/* ---------- project page ---------- */
+.crumbs { margin: clamp(1.8rem, 4.5vw, 3rem) 0 1rem; }
+.crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: 0; padding: 0; list-style: none; font-size: .88rem; }
+.crumbs li + li::before { content: "/"; margin-right: .45rem; color: var(--faint); }
+.crumbs a { color: var(--muted); }
+.crumbs a:hover { color: var(--accent); }
+.crumbs li:last-child a { display: inline-flex; align-items: center; gap: .35rem; color: var(--t-ink); font-weight: 600; }
+.proj-banner { margin: 2rem 0 2.6rem; aspect-ratio: 3 / 1; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
+.proj-banner img { display: block; width: 100%; height: 100%; margin: 0; object-fit: cover; }
+.proj-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: clamp(2rem, 4.5vw, 3.75rem); align-items: start; }
+.proj-main { min-width: 0; }
+.proj-main > section + section, .proj-main > figure + section, .proj-main > section + figure { margin-top: 2.4rem; }
+.proj-main p { margin: 0; font-size: 1.02rem; line-height: 1.75; }
+.proj-sec h2, .proj-q h2, .aside-card h2 { display: flex; align-items: center; gap: .6rem; margin: 0 0 .8rem; font-size: 1.22rem; font-weight: 700; letter-spacing: -.012em; color: var(--ink); }
+.proj-sec h2 .bi { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 8px; font-size: 1rem; color: var(--t-ink); background: var(--t-soft); border: 1px solid var(--t-line); }
+/* research question, highlighted */
+.proj-q { padding: 1.5rem 1.7rem 1.6rem; border: 1px solid var(--t-line); border-left: 4px solid var(--t); border-radius: var(--r); background: var(--t-soft); }
+.proj-q h2 { margin-bottom: .6rem; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--t-ink); }
+.proj-q h2 .bi { font-size: 1rem; }
+.proj-main .proj-question { font-size: clamp(1.12rem, 1rem + .45vw, 1.32rem); font-weight: 500; line-height: 1.6; color: var(--ink); letter-spacing: -.008em; }
+/* numbered findings */
+ol.findings { display: grid; gap: .8rem; margin: 0; padding: 0; list-style: none; counter-reset: finding; }
+ol.findings li { position: relative; padding: 1rem 1.2rem 1rem 3.7rem; counter-increment: finding; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--shadow-sm); line-height: 1.65; }
+ol.findings li::before { content: counter(finding); position: absolute; left: 1.05rem; top: .95rem; display: grid; place-items: center; width: 1.75rem; height: 1.75rem;
+  border-radius: 50%; font-size: .82rem; font-weight: 700; color: var(--t-ink); background: var(--t-soft); border: 1px solid var(--t-line); }
+/* boundary conditions, as a quiet note */
+.proj-bounds { padding: 1.25rem 1.45rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); }
+.proj-bounds h2 { font-size: 1.05rem; }
+.proj-bounds h2 .bi { width: 1.75rem; height: 1.75rem; font-size: .9rem; }
+.proj-main .proj-bounds p { font-size: .97rem; color: var(--ink-2); }
+.proj-main .pubs .pub:first-child { padding-top: .2rem; }
+.related { margin: 0; padding-left: 1.2rem; }
+.related li { margin-bottom: .35rem; line-height: 1.65; }
+.proj-figure img { max-width: 100%; height: auto; border-radius: var(--r); border: 1px solid var(--line); }
+/* side column: outputs and reproducibility */
+.proj-aside { position: sticky; top: calc(var(--nav-h) + 1.5rem); display: grid; gap: 1.1rem; }
+.aside-card { padding: 1.3rem 1.35rem 1.35rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow-sm); }
+.aside-card h2 { margin-bottom: .9rem; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.aside-card h2 .bi { font-size: .95rem; color: var(--t-ink); }
+.aside-card p { margin: 0 0 .7rem; font-size: .92rem; line-height: 1.6; color: var(--ink-2); }
+.out-btns { display: grid; gap: .55rem; }
+.out-btns a { justify-content: flex-start; width: 100%; padding: .6rem .9rem; font-size: .9rem; line-height: 1.35; }
+.out-btns .bi { font-size: 1rem; }
+.aside-card .updated { display: flex; align-items: center; gap: .4rem; margin: .2rem 0 0; padding-top: .7rem; border-top: 1px solid var(--line); font-size: .82rem; color: var(--muted); }
+/* previous / next */
+.proj-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3.4rem; padding-top: 1.8rem; border-top: 1px solid var(--line); }
+.pager-link { display: flex; flex-direction: column; gap: .3rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  text-decoration: none !important; transition: border-color .15s var(--ease), box-shadow .15s var(--ease); }
+.pager-link.next { align-items: flex-end; text-align: right; }
+.pager-label { display: inline-flex; align-items: center; gap: .4rem; font-size: .74rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.pager-title { font-weight: 600; line-height: 1.4; color: var(--ink); }
+.pager-link:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.pager-link:hover .pager-title { color: var(--accent); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 991.98px) {
+  .pub-head { grid-template-columns: minmax(0, 1fr); }
+  .pub-chart { max-width: 360px; }
+  .proj-layout { grid-template-columns: minmax(0, 1fr); }
+  .proj-aside { position: static; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+  .proj-banner { aspect-ratio: 5 / 2; }
+}
+@media (max-width: 640px) {
+  .pub { grid-template-columns: minmax(0, 1fr); gap: .55rem; }
+  .pub .abbr { width: auto; min-width: 0; padding: .28rem .6rem; }
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .search-box { max-width: none; flex-basis: auto; }
+  .ftabs { gap: .35rem; }
+  .ftab { height: 2.05rem; padding: 0 .7rem; gap: .35rem; font-size: .82rem; }
+  .ftab .n { min-width: 1.25rem; padding: 0 .3rem; font-size: .7rem; }
+  .proj-banner { aspect-ratio: 16 / 9; margin-bottom: 2rem; }
+  .proj-q { padding: 1.2rem 1.2rem 1.3rem; }
+  ol.findings li { padding-left: 3.3rem; }
+  .proj-pager { grid-template-columns: minmax(0, 1fr); }
+  .pager-link.next { align-items: flex-start; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pc-cover img, .pc-more .bi, .ftab, .search-box input, .bib-copy, .pager-link, .cite-chip, .pub-chart .seg, .pub-stats a, .ps-n { transition: none; }
+  .project-card:hover .pc-cover img { transform: none; }
+}

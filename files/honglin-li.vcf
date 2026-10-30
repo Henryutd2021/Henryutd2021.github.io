@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Li;Honglin;;;
+FN:Honglin Li
+TITLE:Postdoctoral Fellow
+ORG:Kansas State University;Department of Electrical and Computer Engineering
+EMAIL;TYPE=INTERNET,WORK:hlli@ksu.edu
+URL:https://henryutd2021.github.io
+ADR;TYPE=WORK:;;;Manhattan;KS;;United States
+NOTE:Energy systems optimization and techno-economic analysis
+END:VCARD

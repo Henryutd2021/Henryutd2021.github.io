@@ -41,12 +41,15 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d8bff2a3f9758368867dffeb723f7513.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -75,19 +78,183 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
-<meta name="theme-color" content="#fbfaf7">
+<meta name="theme-color" content="#ffffff">
 
 
 <link rel="stylesheet" href="assets/base.css">
-<link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/pubs.css">
+<link rel="stylesheet" href="assets/pages.css">
+<link rel="stylesheet" href="assets/map.css">
 <meta property="og:title" content="CV – Honglin Li">
 <meta property="og:description" content="Curriculum vitae">
 <meta property="og:image" content="https://henryutd2021.github.io/images/profile.jpg">
 <meta property="og:site_name" content="Honglin Li">
 </head>
 
-<body class="nav-fixed page-inner page-cv quarto-light">
+<body class="nav-fixed page-inner page-folio page-cv quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -106,7 +273,7 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
+<span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./research.html"> 
@@ -122,7 +289,7 @@ ul.task-list li input[type="checkbox"] {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./software-data.html"> 
-<span class="menu-text">Software &amp; Data</span></a>
+<span class="menu-text">Software</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./teaching.html"> 
@@ -152,6 +319,7 @@ ul.task-list li input[type="checkbox"] {
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -185,22 +353,334 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="cv-actions">
-<p><a href="files/Honglin_Li_CV.pdf" class="btn-solid"><i class="bi bi-download" aria-hidden="true"></i> Download CV (PDF)</a></p>
+
+<!-- CV page (third redesign, 2026-10-30; styles in assets/pages.css).
+     Transcribed from the public web CV (the PDF in files/): Education, Academic Experience, Internships,
+     Work Experience, Mentoring Experience, Grant Writing Experience, Skills, Conference Presentations and
+     Reviews of Manuscripts. The PDF also has the summary, research projects and publications (linked at the end).
+     Keep this page and the PDF in step when the CV changes. -->
+<div class="cv-top">
+<div class="cv-id">
+<p><span class="cv-name">Honglin Li, Ph.D.</span></p>
+<p><span class="cv-pos">Postdoctoral Fellow, Department of Electrical and Computer Engineering, Kansas State University</span></p>
+<div class="cv-contact">
+<p><a href="mailto:hlli@ksu.edu"><i class="bi bi-envelope" aria-hidden="true"></i> hlli@ksu.edu</a> <a href="https://www.linkedin.com/in/honglin-li-998b18221/"><i class="bi bi-linkedin" aria-hidden="true"></i> Honglin Li</a> <a href="https://github.com/Henryutd2021"><i class="bi bi-github" aria-hidden="true"></i> Henryutd2021</a></p>
 </div>
-<div class="cv-shell">
-<object class="cv-frame" data="files/Honglin_Li_CV.pdf" type="application/pdf" aria-label="Curriculum vitae of Honglin Li">
-  <p>Your browser cannot display the PDF here. <a href="files/Honglin_Li_CV.pdf">Download the CV</a> instead.</p>
-</object>
+</div>
+<div class="cv-actions">
+<p><a href="files/Honglin_Li_CV.pdf" class="btn-solid"><i class="bi bi-download" aria-hidden="true"></i> Download CV (PDF)</a> <a href="#cv-pdf" class="cv-viewlink">or view it on this page</a></p>
+</div>
+</div>
+<div class="cv-layout">
+<div class="cv-side" role="navigation" aria-label="CV sections">
+<p><span class="label">On this page</span></p>
+<p><a href="#education"><i class="bi bi-mortarboard" aria-hidden="true"></i> Education</a> <a href="#academic-experience"><i class="bi bi-building" aria-hidden="true"></i> Academic experience</a> <a href="#internships"><i class="bi bi-lightning-charge" aria-hidden="true"></i> Internships</a> <a href="#work-experience"><i class="bi bi-briefcase" aria-hidden="true"></i> Work experience</a> <a href="#mentoring-experience"><i class="bi bi-people" aria-hidden="true"></i> Mentoring</a> <a href="#grant-writing-experience"><i class="bi bi-award" aria-hidden="true"></i> Grant writing</a> <a href="#skills"><i class="bi bi-sliders" aria-hidden="true"></i> Skills</a> <a href="#conference-presentations"><i class="bi bi-easel" aria-hidden="true"></i> Presentations</a> <a href="#reviews-of-manuscripts"><i class="bi bi-journal-check" aria-hidden="true"></i> Reviews</a></p>
+</div>
+<div class="cv-main">
+<!-- ============ Education ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-mortarboard" aria-hidden="true"></i></span></p>
+<section id="education" class="level2">
+<h2 data-anchor-id="education">Education</h2>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">2021 – 2025</span></p>
+<section id="ph.d.-mechanical-engineering" class="level3 cv-body">
+<h3 data-anchor-id="ph.d.-mechanical-engineering">Ph.D.&nbsp;(Mechanical Engineering)</h3>
+<p><span class="cv-org"><strong>The University of Texas at Dallas</strong></span></p>
+<p><span class="cv-detail">Dissertation: <em>Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems</em></span></p>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">2019 – 2021</span></p>
+<section id="m.s.-in-engineering-industrial-engineering" class="level3 cv-body">
+<h3 data-anchor-id="m.s.-in-engineering-industrial-engineering">M.S. in Engineering (Industrial Engineering)</h3>
+<p><span class="cv-org"><strong>Texas State University</strong></span></p>
+<p><span class="cv-detail">Thesis: <em>Planning Virtual Power Plants for Smart Factories and Industry 4.0 with Renewable and Thermal Cogeneration</em></span></p>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">2016 – 2018</span></p>
+<section id="m.e.-in-computer-engineering" class="level3 cv-body">
+<h3 data-anchor-id="m.e.-in-computer-engineering">M.E. in Computer Engineering</h3>
+<p><span class="cv-org"><strong>Dalian Maritime University</strong></span></p>
+<p><span class="cv-detail"><em>Focus: Machine Learning</em></span></p>
+</section>
+</div>
+</div>
+<!-- ============ Academic Experience ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-building" aria-hidden="true"></i></span></p>
+<section id="academic-experience" class="level2">
+<h2 data-anchor-id="academic-experience">Academic Experience</h2>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">Apr 2026 – present</span></p>
+<section id="kansas-state-university" class="level3 cv-body">
+<h3 data-anchor-id="kansas-state-university"><a href="https://www.k-state.edu/">Kansas State University</a></h3>
+<div class="cv-roles">
+<p><span class="cv-role"><span class="cv-r"><strong>Postdoctoral Fellow</strong> · Department of Electrical and Computer Engineering</span></span> <span class="cv-role"><span class="cv-r"><strong>Instructor</strong> · ECE 685 Power Systems Design</span><span class="cv-when">Fall 2026</span></span></p>
+</div>
+<ul>
+<li>Leading techno-economic and optimization research on small modular reactor (SMR)-powered data centers, quantifying colocation economics, delayed grid energization, and alternative grid-coupling architectures under load and market uncertainty.</li>
+<li>Developing system-level evaluation metrics and a multi-account cost framework spanning private, ratepayer, and social perspectives, extending prior nuclear–hydrogen–battery and carbon-aware scheduling work to AI-driven electricity demand growth.</li>
+</ul>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">Sep 2025 – Apr 2026</span></p>
+<section id="university-of-texas-at-dallas" class="level3 cv-body">
+<h3 data-anchor-id="university-of-texas-at-dallas"><a href="https://personal.utdallas.edu/~jiezhang/group.html">University of Texas at Dallas</a></h3>
+<div class="cv-roles">
+<p><span class="cv-role"><span class="cv-r"><strong>Research Associate</strong></span></span></p>
+</div>
+<ul>
+<li>Led a techno-economic study of a BWRX-300 small modular reactor whose turbine-extracted steam drives absorption chillers, supplying a data center with both power and cooling; steam, cooling, and power were co-optimized hourly with ERCOT prices (first author, manuscript under review).</li>
+<li>Mapped where SMR supply becomes competitive with grid supply, and how an output-based production credit shifts steam from cooling to generation.</li>
+</ul>
+</section>
+</div>
+</div>
+<!-- ============ Internships ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-lightning-charge" aria-hidden="true"></i></span></p>
+<section id="internships" class="level2">
+<h2 data-anchor-id="internships">Internships</h2>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">Feb 2025 – Aug 2025</span></p>
+<section id="idaho-national-laboratory-inl" class="level3 cv-body">
+<h3 data-anchor-id="idaho-national-laboratory-inl"><a href="https://inl.gov/">Idaho National Laboratory (INL)</a></h3>
+<ul>
+<li><strong>Optimization of Hydrogen Integration in Nuclear Grid Services:</strong> Developed an <strong>optimization framework</strong> using mathematical programming techniques to identify the most profitable deployment strategies for nuclear-powered hydrogen production. Integrated techno-economic analysis, historical market data (ISO prices), and policy incentives (45V tax credits) to maximize revenue from hydrogen sales and grid ancillary services; results published in <em>Nature Communications</em> (2026, first author).</li>
+<li><strong>Techno-Economic Analysis of Non-Powered Dam Retrofits:</strong> Contributed a pro-forma techno-economic module to an INL toolset for retrofitting U.S. non-powered dams with hydropower and battery storage; integration with floating PV was scoped in planning.</li>
+</ul>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">Aug 2024 – Jan 2025</span></p>
+<section id="fm" class="level3 cv-body">
+<h3 data-anchor-id="fm"><a href="https://www.fm.com/">FM</a></h3>
+<ul>
+<li><strong>Solar PV Microgrid Design Optimization:</strong> Developed and implemented a techno-economic model incorporating <strong>optimization techniques</strong> to determine the optimal sizing of solar PV, battery storage, and backup generation for an industrial research campus microgrid. Minimized levelized cost of energy subject to meeting demand in modeled grid-outage scenarios, using a DOE reference load profile scaled to the campus’s annual consumption and site solar resource data.</li>
+<li><strong>Lithium Battery Production Line Simulation and Bottleneck Optimization:</strong> Built a discrete-event simulation model (Arena) of a lithium battery production line to quantify the economic impact of equipment failures and maintenance schedules. Identified production bottlenecks and analyzed potential improvements through simulation, implicitly informing optimization of maintenance and buffer strategies.</li>
+<li><strong>Wind Farm Maintenance Strategy Optimization:</strong> Proposed a research framework featuring an <strong>optimization model</strong> to determine the optimal predictive and corrective maintenance scheduling for wind farms. Aimed at balancing O&amp;M costs, maximizing energy production (reducing downtime), and ensuring long-term asset reliability.</li>
+</ul>
+</section>
+</div>
+</div>
+<!-- ============ Work Experience ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-briefcase" aria-hidden="true"></i></span></p>
+<section id="work-experience" class="level2">
+<h2 data-anchor-id="work-experience">Work Experience</h2>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">2021 – 2024</span></p>
+<section id="the-university-of-texas-at-dallas" class="level3 cv-body">
+<h3 data-anchor-id="the-university-of-texas-at-dallas">The University of Texas at Dallas</h3>
+<div class="cv-roles">
+<p><span class="cv-role"><span class="cv-r">Research Assistant (Focus: Energy System Optimization Modeling)</span><span class="cv-when">Aug 2021 – Aug 2024</span></span> <span class="cv-role"><span class="cv-r">Teaching Assistant (Courses: Engineering Optimization, Numerical Methods)</span><span class="cv-when">Aug 2022 – Dec 2022</span></span></p>
+</div>
+<ul>
+<li>Conducted comprehensive techno-economic analyses of hydrogen-integrated sustainable energy systems.</li>
+<li>Developed optimization-based techno-economic strategies for nuclear–renewable integrated systems.</li>
+<li>Studied green hydrogen production and its integration with renewable and nuclear supply.</li>
+</ul>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">2019 – 2021</span></p>
+<section id="texas-state-university" class="level3 cv-body">
+<h3 data-anchor-id="texas-state-university">Texas State University</h3>
+<div class="cv-roles">
+<p><span class="cv-role"><span class="cv-r">Research Assistant (Focus: Operations Research in Energy/Manufacturing)</span><span class="cv-when">Aug 2019 – Jul 2021</span></span> <span class="cv-role"><span class="cv-r">Teaching Assistant (Courses: Probability &amp; Statistics, Operations Research)</span><span class="cv-when">Aug 2019 – Jul 2021</span></span></p>
+</div>
+</section>
+</div>
+<div class="cv-item">
+<p><span class="cv-date">2014 – 2019</span></p>
+<section id="shanghai-electric-power-construction-co.-ltd.-sepc" class="level3 cv-body">
+<h3 data-anchor-id="shanghai-electric-power-construction-co.-ltd.-sepc">Shanghai Electric Power Construction Co., Ltd.&nbsp;(SEPC)</h3>
+<div class="cv-roles">
+<p><span class="cv-role"><span class="cv-r">Ipaye Power Plant Project, Ajebandele, Nigeria</span><span class="cv-when">Sep 2016 – Apr 2019</span></span> <span class="cv-role"><span class="cv-r">Eritrea HIRGIGO Power Plant 2×23MW Extension Project, Shanghai, China</span><span class="cv-when">Nov 2015 – Sep 2016</span></span> <span class="cv-role"><span class="cv-r">Phase I in 3×142MW Coal Fired Power Plant Project, Bali, Indonesia</span><span class="cv-when">Sep 2014 – Oct 2015</span></span></p>
+</div>
+</section>
+</div>
+</div>
+<!-- ============ Mentoring Experience ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-people" aria-hidden="true"></i></span></p>
+<section id="mentoring-experience" class="level2">
+<h2 data-anchor-id="mentoring-experience">Mentoring Experience</h2>
+</section>
+</div>
+<div class="cv-list">
+<ul>
+<li><span class="cv-date">Summer 2022</span> <span class="cv-lt">Undergraduate student <strong>Mirabella Herrera</strong> (UT-Dallas)</span> <span class="cv-ld">Mentored undergraduate researcher Mirabella through the Research Experience for Undergraduates (REU) program, focusing on techno-economic analysis of co-located wind and green hydrogen systems.</span></li>
+<li><span class="cv-date">Summer 2022</span> <span class="cv-lt">High school student</span> <span class="cv-ld">Co-advised a high school student in the TAST STEM Summer Research Program, focusing on techno-economic analysis modeling.</span></li>
+<li><span class="cv-date">Summer 2023</span> <span class="cv-lt">Undergraduate student <strong>Jonathon Matutes</strong> (University of Indianapolis)</span> <span class="cv-ld">Mentored undergraduate researcher Jonathon Matutes through the REU program, focusing on techno-economic analysis of potential offshore wind energy development along the northeastern US coast.</span></li>
+<li><span class="cv-date">Summer 2024</span> <span class="cv-lt">Undergraduate student <strong>Zaina Anarwala</strong> (UIUC)</span> <span class="cv-ld">Mentored undergraduate researcher Zaina through the REU program, focusing on techno-economic analysis of potential offshore wind energy development in the US Gulf of Mexico.</span></li>
+<li><span class="cv-date">Spring 2025</span> <span class="cv-lt">Undergraduate student <strong>Kevin Sun</strong> (UT-Dallas)</span> <span class="cv-ld">Mentored Kevin on a research project focused on techno-economic analysis of nuclear and hydrogen systems.</span></li>
+</ul>
+</div>
+</div>
+<!-- ============ Grant Writing Experience ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-award" aria-hidden="true"></i></span></p>
+<section id="grant-writing-experience" class="level2">
+<h2 data-anchor-id="grant-writing-experience">Grant Writing Experience</h2>
+</section>
+</div>
+<div class="cv-list">
+<ul>
+<li><span class="cv-date">2026</span> <span class="cv-lt"><strong>K-State Secure Energy Initiative (SEI) Seed Grant Proposal: Secure Power for Kansas Data Centers: Socio-Techno-Economic Pathways for SMR Deployment and Grid Integration</strong></span> <span class="cv-ld">Co-PI; under review.</span></li>
+<li><span class="cv-date">2024 – 2025</span> <span class="cv-lt"><strong>NSF INTERN supplement (funded)</strong></span> <span class="cv-ld">Helped prepare a funded NSF INTERN supplement (<strong>$55,000</strong>; PI Prof.&nbsp;Jie Zhang) that supported my nuclear–hydrogen research at Idaho National Laboratory.</span></li>
+</ul>
+</div>
+</div>
+<!-- ============ Skills ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-sliders" aria-hidden="true"></i></span></p>
+<section id="skills" class="level2">
+<h2 data-anchor-id="skills">Skills</h2>
+</section>
+</div>
+<div class="cv-skills">
+<dl>
+<dt>Optimization Techniques</dt>
+<dd>
+Linear Programming (LP), Mixed-Integer Linear Programming (MILP), Non-Linear Programming (NLP), Stochastic Programming, Dynamic Programming, Constraint Programming Basics.
+</dd>
+<dt>Optimization Software</dt>
+<dd>
+Solvers: <strong>Gurobi</strong>, <strong>CPLEX</strong>, <strong>SCIP</strong>; Modeling Languages: <strong>AMPL</strong>, <strong>Pyomo</strong> (Python), <strong>JuMP</strong> (Julia), <strong>GAMS</strong>.
+</dd>
+<dt>Programming &amp; Data Analysis</dt>
+<dd>
+<strong>Python</strong> (Pandas, NumPy, SciPy, Matplotlib, Scikit-learn, Pyomo), <strong>SQL</strong>, <strong>MATLAB</strong>, <strong>R</strong>, <strong>Julia</strong>.
+</dd>
+<dt>Simulation</dt>
+<dd>
+Discrete-Event Simulation (<strong>Arena</strong>), Monte Carlo Methods, System Dynamics Modeling.
+</dd>
+<dt>Techno-Economic Analysis (TEA)</dt>
+<dd>
+LCOE/LCOH, NPV, IRR, Cash Flow Analysis, Sensitivity Analysis (applied for optimization model inputs &amp; validation).
+</dd>
+<dt>Life-Cycle Assessment (LCA)</dt>
+<dd>
+Carbon Footprint Accounting, Integration with TEA.
+</dd>
+<dt>Machine Learning for OR</dt>
+<dd>
+Surrogate Modeling (Gaussian Processes), Uncertainty Quantification, Time Series Forecasting (LSTM).
+</dd>
+<dt>Domain Knowledge</dt>
+<dd>
+Renewable Energy Systems (Wind, Solar PV), Data Centers, Energy Storage (Battery, Hydrogen), Power Grid Operations &amp; Ancillary Services, Electricity Markets (ERCOT, MISO basics), Carbon Neutrality Strategies, Manufacturing Systems.
+</dd>
+</dl>
+</div>
+</div>
+<!-- ============ Conference Presentations ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-easel" aria-hidden="true"></i></span></p>
+<section id="conference-presentations" class="level2">
+<h2 data-anchor-id="conference-presentations">Conference Presentations</h2>
+</section>
+</div>
+<div class="cv-list cv-talks">
+<ul>
+<li><span class="cv-date">Mar 10, 2021</span> <span class="cv-lt"><em>Power Demand Prediction using LSTM Neural Network with Multiple Features</em></span> <span class="cv-ld">2021 International Research Conference</span></li>
+<li><span class="cv-date">May 24, 2021</span> <span class="cv-lt"><em>Allocating microgrid for transactive energy operations in a multi-echelon manufacturing supply chain</em></span> <span class="cv-ld">Annual IISE Conference and Expo 2021</span></li>
+<li><span class="cv-date">Jun 2, 2022</span> <span class="cv-lt"><em>Optimal Planning of Co-Located Wind Energy and Hydrogen Plants: A Techno-Economic Analysis</em></span> <span class="cv-ld">TORQUE 2022, Netherlands</span></li>
+<li><span class="cv-date">Oct 17, 2022</span> <span class="cv-lt"><em>Redesign Supply Chain for Transactive Energy Operations in Manufacturing-Microgrid-Climate Nexus</em></span> <span class="cv-ld">Annual INFORMS Conference 2022</span></li>
+<li><span class="cv-date">Aug 20, 2023</span> <span class="cv-lt"><em>A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation</em></span> <span class="cv-ld">ASME 2023 IDETC/CIE</span></li>
+<li><span class="cv-date">Oct 31, 2023</span> <span class="cv-lt"><em>Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas</em></span> <span class="cv-ld">NAWEA/WindTech 2023 Conference</span></li>
+<li><span class="cv-date">Nov 1, 2024</span> <span class="cv-lt"><em>Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas</em></span> <span class="cv-ld">NAWEA/WindTech 2024 Conference</span></li>
+</ul>
+</div>
+</div>
+<!-- ============ Reviews of Manuscripts ============ -->
+<div class="cv-sec">
+<div class="cv-head">
+<p><span class="cv-ico"><i class="bi bi-journal-check" aria-hidden="true"></i></span></p>
+<section id="reviews-of-manuscripts" class="level2">
+<h2 data-anchor-id="reviews-of-manuscripts">Reviews of Manuscripts</h2>
+</section>
+</div>
+<div class="cv-rev">
+<p><span class="cv-rk">Journals</span></p>
+<div class="chips">
+<p><span class="chip">Applied Energy</span> <span class="chip">Journal of Cleaner Production</span> <span class="chip">Energy</span> <span class="chip">International Journal of Hydrogen Energy</span> <span class="chip">Journal of Mechanical Design</span> <span class="chip">Journal of Energy Storage</span> <span class="chip">Scientific Reports</span> <span class="chip">Journal of Energy Engineering</span> <span class="chip">Energy Conversion and Management: X</span> <span class="chip">Sustainable Energy Technologies and Assessments</span> <span class="chip">Journal of Electrical Engineering</span> <span class="chip">Discover Sustainability</span> <span class="chip">Sustainable Energy, Grids and Networks</span> <span class="chip">International Journal of Electrical Power &amp; Energy Systems</span> <span class="chip">Journal of Thermal Analysis and Calorimetry</span> <span class="chip">Next Energy</span> <span class="chip">Sustainable Futures</span></p>
+</div>
+<p><span class="cv-rk">Conferences</span></p>
+<div class="chips">
+<p><span class="chip">ASME-IDETC-2024</span> <span class="chip">ASME-IDETC-2025</span> <span class="chip">ASME-IDETC-2026</span> <span class="chip">NAPS 2026</span></p>
+</div>
+</div>
+</div>
+<div class="cv-more">
+<p><span class="cv-ico"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i></span></p>
+<p>The PDF also lists research projects and publications. See <a href="./projects.html">Projects</a> and <a href="./publications.html">Publications</a>.</p>
+</div>
+<details class="cv-pdf" id="cv-pdf">
+  <summary><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Show the PDF version</summary>
+  <div class="cv-shell">
+    <object class="cv-frame" data="files/Honglin_Li_CV.pdf" type="application/pdf" aria-label="Curriculum vitae of Honglin Li (PDF)">
+      <p>Your browser cannot display the PDF here. <a href="files/Honglin_Li_CV.pdf">Download the CV</a> instead.</p>
+    </object>
+  </div>
+</details>
+<script>
+  (function () {
+    // open the PDF panel when the page is reached with #cv-pdf (the link under the download button)
+    var d = document.getElementById("cv-pdf");
+    function sync() { if (d && location.hash === "#cv-pdf") d.open = true; }
+    sync(); window.addEventListener("hashchange", sync);
+    // highlight the section in view in the side navigation
+    var links = Array.prototype.slice.call(document.querySelectorAll(".cv-side a[href^='#']"));
+    var pairs = links.map(function (a) {
+      var s = document.getElementById(a.getAttribute("href").slice(1));
+      return { a: a, card: s && s.closest(".cv-sec") };
+    }).filter(function (p) { return p.card; });
+    var ticking = false;
+    function spy() {
+      ticking = false;
+      var line = window.innerHeight * 0.3, cur = null;
+      pairs.forEach(function (p) { if (p.card.getBoundingClientRect().top <= line) cur = p; });
+      pairs.forEach(function (p) {
+        var on = p === cur;
+        p.a.classList.toggle("is-current", on);
+        if (on) p.a.setAttribute("aria-current", "location"); else p.a.removeAttribute("aria-current");
+      });
+    }
+    window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+    spy();
+  })();
+</script>
+</div>
 </div>
 
 
 
 </main> <!-- /main -->
 <script>
-// site.js — site-wide behaviour (2026-10-30, second redesign: calm). Skip link, a thin shadow under the navbar
-// once the page scrolls, and a gentle one-time fade-in of content blocks. No continuous animation anywhere.
-// Without JS (or under reduced motion) every page is complete and static.
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
 (function () {
   const root = document.documentElement;
   const body = document.body;
@@ -215,20 +695,30 @@ ul.task-list li input[type="checkbox"] {
     body.insertBefore(skip, body.firstChild);
   }
 
-  // navbar: thin shadow once scrolled
-  function onScroll() { body.classList.toggle("scrolled", window.scrollY > 8); }
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    top.classList.toggle("show", y > window.innerHeight * 0.8);
+  }
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
   // gentle fade-in, once per block
-  const auto = document.querySelectorAll("main .card, main .glow-card, main .pub-item, main .project-card, main .theme-section, main .reveal-auto > *");
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
   auto.forEach(function (el) { el.classList.add("reveal"); });
   const items = document.querySelectorAll(".reveal");
   if (!reduce && "IntersectionObserver" in window) {
     root.classList.add("js-reveal");
     const io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.06 });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
     items.forEach(function (el) { io.observe(el); });
   } else {
     items.forEach(function (el) { el.classList.add("in"); });
@@ -236,125 +726,474 @@ ul.task-list li input[type="checkbox"] {
 })();
 </script>
 <script>
-// pages.js — inner-page behaviour (2026-10-30, second redesign: simple and calm).
-//   1. Project pages: a breadcrumb "Projects / <theme>" above the title (replaces the category label).
-//   2. Projects: text tabs that filter the cards by research theme.
-//   3. Publications: text tabs that filter the groups by type.
-// Each feature runs only when its elements exist. Without JS every page is complete; nothing here animates.
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
 (function () {
-  // ---------- 1. breadcrumb on project pages ----------
-  const title = document.querySelector(".project-page #title-block-header .quarto-title");
-  if (title && !title.querySelector(".crumbs")) {
-    const cat = title.querySelector(".quarto-category");
-    const nav = document.createElement("nav");
-    nav.className = "crumbs";
-    nav.setAttribute("aria-label", "Breadcrumb");
-    const a = document.createElement("a");
-    a.href = "../projects.html";
-    a.textContent = "Projects";
-    const sep = document.createElement("span");
-    sep.className = "sep";
-    sep.setAttribute("aria-hidden", "true");
-    sep.textContent = "/";
-    const here = document.createElement("span");
-    here.className = "here";
-    here.textContent = cat ? cat.textContent.trim() : "Project";
-    nav.append(a, sep, here);
-    title.prepend(nav);
-    title.classList.add("has-crumbs");   // styles.css then hides the category label it replaces
-  }
+  "use strict";
 
-  // ---------- shared: a row of text tabs (toggle buttons) ----------
-  // groups = [{key, label, count, cls}]; the first one is "all". cls (a theme-* class) adds a small colour dot.
-  // A visually hidden live region announces how many items are shown after each change.
-  function filterTabs(ariaLabel, before, groups, noun, apply) {
-    const bar = document.createElement("div");
-    bar.className = "filter-bar";
-    bar.setAttribute("role", "group");
-    bar.setAttribute("aria-label", ariaLabel);
-    const status = document.createElement("p");
-    status.className = "visually-hidden";
-    status.setAttribute("aria-live", "polite");
-    groups.forEach(function (g, i) {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "filter-chip" + (g.cls ? " " + g.cls : "");
-      b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
-      b.setAttribute("aria-label", g.label + " (" + g.count + ")");   // label and count would otherwise run together
-      if (g.cls) {
-        const dot = document.createElement("span");
-        dot.className = "dot";
-        dot.setAttribute("aria-hidden", "true");
-        b.appendChild(dot);
-      }
-      const lbl = document.createElement("span");
-      lbl.className = "lbl";
-      lbl.textContent = g.label;
-      const count = document.createElement("span");
-      count.className = "count";
-      count.textContent = g.count;
-      b.append(lbl, count);
-      b.addEventListener("click", function () {
-        bar.querySelectorAll(".filter-chip").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-        apply(g.key);
-        status.textContent = "Showing " + g.count + " " + noun + (g.count === 1 ? "" : "s") + (i === 0 ? "" : ": " + g.label);
-      });
-      bar.appendChild(b);
-    });
-    before.parentNode.insertBefore(bar, before);
-    before.parentNode.insertBefore(status, before);
-  }
-  function show(el, on) {
-    el.classList.toggle("is-hidden", !on);
-    if (!on) return;   // content shown by a filter is shown at once (no fade)
-    if (el.classList.contains("reveal")) el.classList.add("in");
-    el.querySelectorAll(".reveal").forEach(function (r) { r.classList.add("in"); });
-  }
-
-  // ---------- 2. Projects: filter cards by research theme ----------
-  const grid = document.querySelector(".project-grid");
-  if (grid) {
-    const items = Array.prototype.slice.call(grid.querySelectorAll("[data-label]"));
-    const seen = new Map();
-    items.forEach(function (it) {
-      const k = it.dataset.label;
-      if (!seen.has(k)) seen.set(k, { key: k, label: k, count: 0, cls: "theme-" + it.dataset.theme });
-      seen.get(k).count++;
-    });
-    if (seen.size > 1) {
-      filterTabs("Filter projects by research theme", grid,
-        [{ key: "*", label: "All", count: items.length }].concat(Array.from(seen.values())), "project",
-        function (key) { items.forEach(function (it) { show(it, key === "*" || it.dataset.label === key); }); });
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
     }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
   }
 
-  // ---------- 3. Publications: filter groups by type ----------
-  const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-group[data-group]"));
-  if (groups.length > 1) {
-    const total = document.querySelectorAll(".pub-group .pub-item").length;
-    filterTabs("Filter publications by type", groups[0],
-      [{ key: "*", label: "All", count: total }].concat(groups.map(function (g) {
-        return { key: g.dataset.group, label: g.dataset.label, count: g.querySelectorAll(".pub-item").length };
-      })), "publication",
-      function (key) { groups.forEach(function (g) { show(g, key === "*" || g.dataset.group === key); }); });
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    if (initial) select(initial, false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
   }
 })();
 </script>
 <script>
-// home.js — intentionally empty (2026-10-30, second redesign: simple and calm).
-// The home page has no script of its own: no canvas, counters, rotating words or parallax. Its only motion is the
-// shared gentle fade-in from site.js. scripts/build_site.py inlines this file on every page as assets/home-js.html,
-// so anything added here later must check for `main.home` first and do nothing elsewhere.
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  const tilesKey = root.getAttribute("data-tiles-key");
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span></li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "";
-    const anchorJS = new window.AnchorJS();
-    anchorJS.options = {
-      placement: 'right',
-      icon: icon
-    };
-    anchorJS.add('.anchored');
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
         if (clz.startsWith('code-annotation-')) {                     
@@ -750,13 +1589,13 @@ ul.task-list li input[type="checkbox"] {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2026 Honglin Li · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
     <div class="nav-footer-right">
-<p>Built with <a href="https://quarto.org">Quarto</a></p>
+<p>Last updated: October 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
 </div>
   </div>
 </footer>
