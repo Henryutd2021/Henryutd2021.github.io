@@ -188,6 +188,26 @@
    "count": 1
   },
   {
+   "name": "Nantum AI",
+   "type": "company",
+   "city": "New York",
+   "region": "New York",
+   "country": "United States",
+   "country_code": "US",
+   "lat": 40.7563,
+   "lon": -73.9702,
+   "id": "X-nantum-ai",
+   "home": false,
+   "papers": [
+    {
+     "title": "Real-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization",
+     "year": 2025,
+     "doi": "10.1016/j.crsus.2025.100367"
+    }
+   ],
+   "count": 1
+  },
+  {
    "id": "I1297288678",
    "name": "National Laboratory of the Rockies (formerly NREL)",
    "type": "facility",
