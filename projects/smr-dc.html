@@ -471,13 +471,19 @@ ul.task-list li input[type="checkbox"] {
   const top = document.createElement("button");
   top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
   top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
-  top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
   body.appendChild(top);
 
   function onScroll() {
     const y = window.scrollY;
     body.classList.toggle("scrolled", y > 8);
-    top.classList.toggle("show", y > window.innerHeight * 0.8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
   }
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
@@ -646,7 +652,7 @@ ul.task-list li input[type="checkbox"] {
     tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
     projBar.hidden = false;
     const initial = decodeURIComponent((location.hash || "").slice(1));
-    if (initial) select(initial, false);
+    select(initial || "all", false);
     window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
   }
 })();
@@ -739,7 +745,8 @@ ul.task-list li input[type="checkbox"] {
   function paperList(papers, max) {
     const items = papers.slice(0, max).map(function (p) {
       const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
-      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span></li>";
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
     });
     if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
     return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";

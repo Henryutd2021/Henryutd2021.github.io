@@ -103,3 +103,6 @@ a.card:hover, a.glow-card:hover, .card.is-link:hover { box-shadow: var(--shadow-
   .js-reveal .reveal { opacity: 1; transform: none; transition: none; }
   .card, .glow-card, .btn-solid, .btn-outline, .btn-xs, .to-top { transition: none; }
 }
+
+main[tabindex="-1"]:focus { outline: none; }   /* programmatic focus target after "Back to top" */
+.to-top[hidden] { display: none; }

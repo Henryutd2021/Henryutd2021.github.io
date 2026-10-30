@@ -2,8 +2,8 @@
    Markup from scripts/build_map.py (_map.qmd); behaviour in assets/map.js (Leaflet 1.9.4 + CARTO tiles).
    Colours come from the base.css tokens, so day and night follow Quarto's toggle; the presentation colour is local. */
 
-body.quarto-light { --cmap-talk: #ea580c; --cmap-attr-bg: rgba(255, 255, 255, .82); }
-body.quarto-dark  { --cmap-talk: #fb923c; --cmap-attr-bg: rgba(17, 19, 24, .78); }
+body.quarto-light { --cmap-talk: #ea580c; --cmap-talk-text: #c2410c; --cmap-attr-bg: rgba(255, 255, 255, .82); }  /* text: AA on white */
+body.quarto-dark  { --cmap-talk: #fb923c; --cmap-talk-text: #fb923c; --cmap-attr-bg: rgba(17, 19, 24, .78); }
 
 .cmap-sec { margin-top: 1.2rem; }
 .cmap-stats { display: flex; flex-wrap: wrap; gap: .35rem 1.4rem; margin: -.5rem 0 1.1rem; font-size: .88rem; color: var(--muted); }
@@ -54,7 +54,7 @@ body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) inver
 .cmap-pop h3 { margin: 0 1rem .15rem 0; font-size: .95rem; font-weight: 650; line-height: 1.3; color: var(--ink); }
 .cmap .cmap-pop p { margin: 0; }
 .cmap-pop-kind { font-size: .68rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem !important; }
-.cmap-pop-kind--talk { color: var(--cmap-talk); }
+.cmap-pop-kind--talk { color: var(--cmap-talk-text); }
 .cmap-pop-place { color: var(--muted); font-size: .8rem; }
 .cmap-pop-n { margin-top: .45rem !important; color: var(--ink-2); }
 .cmap-pop-n strong { color: var(--ink); }
@@ -110,3 +110,6 @@ body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) inver
 @media (prefers-reduced-motion: reduce) {
   .cmap-mk > span { transition: none; }
 }
+
+.cmap-pop-st { display: inline-block; margin-left: .3rem; padding: 0 .35rem; border-radius: 3px; font-size: .72em; font-weight: 600;
+  text-transform: capitalize; color: var(--muted); border: 1px solid var(--line-strong); }
