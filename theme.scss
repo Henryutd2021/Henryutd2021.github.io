@@ -1,0 +1,27 @@
+/*-- scss:defaults --*/
+// The site's theme (2026-10-30, second redesign: simple, spacious, calm). Light paper background, one deep accent,
+// serif headings. Colors and fonts mirror the tokens in assets/base.css.
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap');
+
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$headings-font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+$headings-font-weight: 600;
+$font-size-base: 1.02rem;
+$line-height-base: 1.7;
+
+$primary: #1f4e6b;
+$secondary: #5f6b7a;
+$body-bg: #fbfaf7;
+$body-color: #2f3946;
+$link-color: #1f4e6b;
+$link-hover-color: #143347;
+
+$navbar-bg: #fbfaf7;
+$navbar-fg: #2f3946;
+$navbar-hl: #1f4e6b;
+$footer-bg: #f4f2ec;
+$footer-fg: #5f6b7a;
+$callout-color-note: #1f4e6b;
+$border-color: #e3dfd6;
+
+/*-- scss:rules --*/

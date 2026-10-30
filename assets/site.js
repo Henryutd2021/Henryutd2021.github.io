@@ -1,12 +1,10 @@
-// site.js — site-wide behaviour (2026-10-30 redesign): skip link, motion control ("Pause motion" switch and the
-// system reduced-motion setting, announced to other scripts as a "motionchange" event), navbar state, scroll
-// progress, reveal-on-scroll, cursor-following glow on .glow-card, and count-up numbers.
-// Everything degrades gracefully: without JS the page is complete and static.
+// site.js — site-wide behaviour (2026-10-30, second redesign: calm). Skip link, a thin shadow under the navbar
+// once the page scrolls, and a gentle one-time fade-in of content blocks. No continuous animation anywhere.
+// Without JS (or under reduced motion) every page is complete and static.
 (function () {
   const root = document.documentElement;
   const body = document.body;
-  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (document.querySelector(".hero-full")) body.classList.add("has-hero");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // skip link to the page's main landmark
   const main = document.querySelector("main");
@@ -17,94 +15,22 @@
     body.insertBefore(skip, body.firstChild);
   }
 
-  // motion control: off when the system asks for reduced motion or the visitor pauses it
-  let paused = false;
-  try { paused = localStorage.getItem("motion-paused") === "1"; } catch (e) { /* storage unavailable */ }
-  const toggle = document.createElement("button");
-  toggle.type = "button"; toggle.className = "motion-toggle";
-  function motionOff() { return mq.matches || paused; }
-  function applyMotion() {
-    const off = motionOff();
-    root.classList.toggle("motion-off", off);
-    toggle.hidden = mq.matches;  // the system setting already stops motion
-    toggle.setAttribute("aria-pressed", paused ? "true" : "false");
-    toggle.innerHTML = paused ? '<i class="bi bi-play-fill" aria-hidden="true"></i><span>Play motion</span>'
-                              : '<i class="bi bi-pause-fill" aria-hidden="true"></i><span>Pause motion</span>';
-    if (off) document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
-    document.dispatchEvent(new CustomEvent("motionchange", { detail: { off: off } }));
-  }
-  toggle.addEventListener("click", function () {
-    paused = !paused;
-    try { localStorage.setItem("motion-paused", paused ? "1" : "0"); } catch (e) { /* storage unavailable */ }
-    applyMotion();
-  });
-  if (mq.addEventListener) mq.addEventListener("change", applyMotion); else if (mq.addListener) mq.addListener(applyMotion);
-  window.siteMotionOff = motionOff;
-  body.appendChild(toggle);
-
-  // navbar state and scroll progress
-  const bar = document.createElement("div");
-  bar.className = "scroll-progress";
-  body.appendChild(bar);
-  function onScroll() {
-    const y = window.scrollY;
-    body.classList.toggle("at-top", y < 24);
-    body.classList.toggle("scrolled", y >= 24);
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.setProperty("--p", max > 0 ? Math.min(1, y / max) : 0);
-  }
+  // navbar: thin shadow once scrolled
+  function onScroll() { body.classList.toggle("scrolled", window.scrollY > 8); }
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  // reveal on scroll: elements marked .reveal, plus common blocks of every page. Content is visible by default;
-  // it is hidden and animated in only once the observer is running (.js-reveal on <html>).
-  const auto = document.querySelectorAll(
-    "main .glow-card, main .pub-item, main .project-card, main .theme-section, main .findings li, main .reveal-auto > *");
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .pub-item, main .project-card, main .theme-section, main .reveal-auto > *");
   auto.forEach(function (el) { el.classList.add("reveal"); });
   const items = document.querySelectorAll(".reveal");
-  if (!motionOff() && "IntersectionObserver" in window) {
+  if (!reduce && "IntersectionObserver" in window) {
     root.classList.add("js-reveal");
     const io = new IntersectionObserver(function (entries) {
-      let n = 0;  // stagger siblings that enter together
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          if (!e.target.style.getPropertyValue("--i")) e.target.style.setProperty("--i", n++);
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
-      });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.06 });
     items.forEach(function (el) { io.observe(el); });
   } else {
     items.forEach(function (el) { el.classList.add("in"); });
   }
-
-  // cursor-following glow
-  document.addEventListener("pointermove", function (ev) {
-    const card = ev.target.closest && ev.target.closest(".glow-card");
-    if (!card) return;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty("--mx", (ev.clientX - r.left) + "px");
-    card.style.setProperty("--my", (ev.clientY - r.top) + "px");
-  }, { passive: true });
-
-  // count-up numbers: <span class="count-up" data-target="7">7</span>
-  const counters = document.querySelectorAll(".count-up[data-target]");
-  function run(el) {
-    const target = parseFloat(el.dataset.target), dur = 1400, t0 = performance.now();
-    function step(t) {
-      const k = motionOff() ? 1 : Math.min(1, (t - t0) / dur), eased = 1 - Math.pow(1 - k, 3);
-      el.textContent = Math.round(target * eased);
-      if (k < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  if (!motionOff() && "IntersectionObserver" in window) {
-    const co = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) { run(e.target); co.unobserve(e.target); } });
-    }, { threshold: 0.6 });
-    counters.forEach(function (el) { el.textContent = "0"; co.observe(el); });
-  }
-
-  applyMotion();
 })();

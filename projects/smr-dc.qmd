@@ -7,7 +7,7 @@ categories: ["Nuclear & data centers"]
 themekey: "datacenter"
 themelabel: "Nuclear & data centers"
 themeicon: "cpu"
-body-classes: "project-page theme-datacenter"
+body-classes: "page-inner project-page theme-datacenter"
 title-block-banner: true
 page-layout: full
 toc: false
@@ -15,20 +15,20 @@ toc: false
 
 ::: {.proj-layout}
 ::: {.proj-main}
-::: {.question-card}
+::: {.proj-question}
 ## Research question
 
 What would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?
 :::
 
-::: {.proj-cards}
-::: {.info-card .glow-card .ic-contribution}
+::: {.proj-pair}
+::: {.proj-col}
 ## My contribution
 
 Co-first author. Wrote the techno-economic analysis section, introduction and conclusions.
 :::
 
-::: {.info-card .glow-card .ic-method}
+::: {.proj-col}
 ## Method
 
 Perspective synthesizing technology, economics and policy for SMR-powered data centers.
@@ -36,6 +36,7 @@ Perspective synthesizing technology, economics and policy for SMR-powered data c
 
 :::
 
+::: {.proj-findings}
 ## Key findings
 
 ::: {.findings}
@@ -43,22 +44,25 @@ Perspective synthesizing technology, economics and policy for SMR-powered data c
 2. First-of-a-kind and nth-of-a-kind cost estimates for SMRs diverge widely, so assumptions must be explicit.
 3. Service-based metrics, such as cost per unit of computing, and co-products such as heat matter for comparisons.
 :::
+:::
 
-::: {.callout-note title="Boundary conditions"}
+::: {.proj-bounds}
+## Boundary conditions
+
 A Perspective: it frames the questions and evidence rather than presenting a new case-study model.
 :::
 
 :::
 
 ::: {.proj-aside}
-::: {.aside-card .outputs}
+::: {.aside-block .outputs}
 ## Outputs
 
-[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1016/j.crsus.2026.100820){.out-link}
+- [<i class="bi bi-journal-text" aria-hidden="true"></i> Paper (DOI)](https://doi.org/10.1016/j.crsus.2026.100820){.out-link}
 
 :::
 
-::: {.aside-card .repro}
+::: {.aside-block .repro}
 ## Reproducibility
 
 Not applicable (Perspective). Last updated 2026-10.

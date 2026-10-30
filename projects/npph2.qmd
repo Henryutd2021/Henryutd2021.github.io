@@ -7,7 +7,7 @@ categories: ["Hydrogen systems"]
 themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
-body-classes: "project-page theme-hydrogen"
+body-classes: "page-inner project-page theme-hydrogen"
 title-block-banner: true
 page-layout: full
 toc: false
@@ -15,20 +15,20 @@ toc: false
 
 ::: {.proj-layout}
 ::: {.proj-main}
-::: {.question-card}
+::: {.proj-question}
 ## Research question
 
 Can existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?
 :::
 
-::: {.proj-cards}
-::: {.info-card .glow-card .ic-contribution}
+::: {.proj-pair}
+::: {.proj-col}
 ## My contribution
 
 First author. I co-developed the methodology and the optimization and lifetime techno-economic models with co-authors from Idaho National Laboratory and UT Dallas, and contributed to the analysis and writing.
 :::
 
-::: {.info-card .glow-card .ic-method}
+::: {.proj-col}
 ## Method
 
 Hourly mixed-integer optimization of turbine, electrolyzer and storage dispatch for 42 reactors in seven U.S. ISO/RTO markets using 2024 prices, linked to a lifetime cash-flow model with federal tax credits (45U, a 45V-type hydrogen credit, 45Y and 48E).
@@ -36,6 +36,7 @@ Hourly mixed-integer optimization of turbine, electrolyzer and storage dispatch 
 
 :::
 
+::: {.proj-findings}
 ## Key findings
 
 ::: {.findings}
@@ -44,22 +45,25 @@ Hourly mixed-integer optimization of turbine, electrolyzer and storage dispatch 
 3. Integrated operation added output flexibility; ancillary-service revenue was a few percent of the total.
 4. For new builds, investment and production tax credits substantially lowered the levelized cost of hydrogen.
 :::
+:::
 
-::: {.callout-note title="Boundary conditions"}
+::: {.proj-bounds}
+## Boundary conditions
+
 Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years) and a dispatch held fixed after the credit expires; price feedback from large-scale adoption is not modeled.
 :::
 
 :::
 
 ::: {.proj-aside}
-::: {.aside-card .outputs}
+::: {.aside-block .outputs}
 ## Outputs
 
-[<i class="bi bi-journal-text"></i> Paper (DOI)](https://doi.org/10.1038/s41467-026-73630-y){.out-link}
+- [<i class="bi bi-journal-text" aria-hidden="true"></i> Paper (DOI)](https://doi.org/10.1038/s41467-026-73630-y){.out-link}
 
 :::
 
-::: {.aside-card .repro}
+::: {.aside-block .repro}
 ## Reproducibility
 
 Code and data: see the paper's Data Availability statement. Last updated 2026-10.

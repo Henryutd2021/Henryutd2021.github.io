@@ -4,12 +4,12 @@ subtitle: "Research and industry projects, by theme"
 title-block-banner: true
 page-layout: full
 toc: false
-body-classes: "page-projects"
+body-classes: "page-inner page-projects"
 listing:
   contents: projects/*.qmd
   template: project-cards.ejs
   sort: "order"
-  fields: [title, subtitle, description, themekey, themelabel, themeicon]
+  fields: [title, subtitle, description, themekey, themelabel]
 ---
 
 ::: {.page-lede}

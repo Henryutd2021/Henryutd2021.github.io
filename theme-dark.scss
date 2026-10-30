@@ -1,28 +1,3 @@
 /*-- scss:defaults --*/
-// The site's single theme (dark-first design, 2026-10-30 redesign). Colors and fonts mirror assets/base.css tokens.
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
-$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-$headings-font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
-$headings-font-weight: 700;
-$font-size-base: 1.02rem;
-$line-height-base: 1.7;
-
-$primary: #38bdf8;
-$secondary: #94a3b8;
-$info: #2dd4bf;
-$body-bg: #070d18;
-$body-color: #d5deea;
-$link-color: #5eead4;
-$link-hover-color: #a5f3fc;
-
-$navbar-bg: #070d18;
-$navbar-fg: #c7d2e0;
-$navbar-hl: #5eead4;
-$footer-bg: #050a13;
-$footer-fg: #8b9bb0;
-$callout-color-note: #38bdf8;
-$border-color: #1c2a3d;
-
+// Unused since 2026-10-30 (second redesign); the site uses theme.scss.
 /*-- scss:rules --*/

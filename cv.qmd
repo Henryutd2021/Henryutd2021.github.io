@@ -4,11 +4,11 @@ subtitle: "Curriculum vitae"
 title-block-banner: true
 page-layout: full
 toc: false
-body-classes: "page-cv"
+body-classes: "page-inner page-cv"
 ---
 
 ::: {.cv-actions}
-[<i class="bi bi-download"></i> Download CV (PDF)](files/Honglin_Li_CV.pdf){.btn-glow}
+[<i class="bi bi-download" aria-hidden="true"></i> Download CV (PDF)](files/Honglin_Li_CV.pdf){.btn-solid}
 :::
 
 ```{=html}

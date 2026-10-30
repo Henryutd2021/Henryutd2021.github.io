@@ -7,7 +7,7 @@ categories: ["Nuclear & data centers"]
 themekey: "datacenter"
 themelabel: "Nuclear & data centers"
 themeicon: "cpu"
-body-classes: "project-page theme-datacenter"
+body-classes: "page-inner project-page theme-datacenter"
 title-block-banner: true
 page-layout: full
 toc: false
@@ -15,20 +15,20 @@ toc: false
 
 ::: {.proj-layout}
 ::: {.proj-main}
-::: {.question-card}
+::: {.proj-question}
 ## Research question
 
 What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?
 :::
 
-::: {.proj-cards}
-::: {.info-card .glow-card .ic-contribution}
+::: {.proj-pair}
+::: {.proj-col}
 ## My contribution
 
 First author. Developed the framework, model and analysis with Buxin She.
 :::
 
-::: {.info-card .glow-card .ic-method}
+::: {.proj-col}
 ## Method
 
 Present-value framework that converts delayed IT capacity into grid capacity requirements and prices the delay in separate developer, ratepayer and social ledgers, summarized by a delay cost intensity and a break-even acceleration payment; sensitivity and dependence stress tests.
@@ -36,6 +36,7 @@ Present-value framework that converts delayed IT capacity into grid capacity req
 
 :::
 
+::: {.proj-findings}
 ## Key findings
 
 ::: {.findings}
@@ -43,22 +44,25 @@ Present-value framework that converts delayed IT capacity into grid capacity req
 2. Staged energization can recover a large share of that cost.
 3. Ratepayer exposure depends strongly on large-load tariff design.
 :::
+:::
 
-::: {.callout-note title="Boundary conditions"}
+::: {.proj-bounds}
+## Boundary conditions
+
 The delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.
 :::
 
 :::
 
 ::: {.proj-aside}
-::: {.aside-card .outputs}
+::: {.aside-block .outputs}
 ## Outputs
 
-[<i class="bi bi-github"></i> Model framework (GitHub)](https://github.com/Henryutd2021/code-delayed-energization){.out-link}
+- [<i class="bi bi-github" aria-hidden="true"></i> Model framework (GitHub)](https://github.com/Henryutd2021/code-delayed-energization){.out-link}
 
 :::
 
-::: {.aside-card .repro}
+::: {.aside-block .repro}
 ## Reproducibility
 
 Model framework with documentation, examples and tests on GitHub; the study's own parameter files and results are archived privately. Last updated 2026-10.

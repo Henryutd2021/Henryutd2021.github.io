@@ -2,6 +2,7 @@
 pagetitle: "Honglin Li"
 page-layout: custom
 toc: false
+anchor-sections: false   # no hover anchors: theme titles sit inside row links
 description: "Honglin Li, Ph.D. — energy systems researcher: optimization and techno-economic analysis of low-carbon energy systems."
 image: images/profile.jpg
 ---
@@ -9,122 +10,90 @@ image: images/profile.jpg
 ```{=html}
 <main id="main-content" class="home">
 
-<!-- ============ 1. HERO ============ -->
-<section class="hero-full" aria-labelledby="hero-name">
-  <canvas class="hero-canvas" aria-hidden="true"></canvas>
-  <div class="hero-floor" aria-hidden="true"></div>
-  <div class="hero-shade" aria-hidden="true"></div>
-
-  <div class="hero-inner">
-    <div class="hero-copy">
-      <p class="eyebrow hero-eyebrow"><span class="live-dot" aria-hidden="true"></span>Energy systems · Optimization · Techno-economics</p>
-      <h1 id="hero-name" class="hero-title"><span class="hero-first">Honglin</span> <span class="hero-last">Li</span></h1>
-      <p class="hero-role">Postdoctoral Fellow, Electrical and Computer Engineering<span class="hero-affil"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i>Kansas State University</span></p>
-
-      <p class="hero-rotator">
-        <span class="sr-only">I model hydrogen networks, nuclear–hydrogen plants, firm power for AI data centers, carbon-aware grids and supply chains with microgrids.</span>
-        <span aria-hidden="true">I model <span class="rot-wrap"><span class="rot-word theme-hydrogen is-on">hydrogen networks</span><span class="rot-word theme-datacenter">nuclear–hydrogen plants</span><span class="rot-word theme-datacenter">firm power for AI data centers</span><span class="rot-word theme-carbon">carbon-aware grids</span><span class="rot-word theme-microgrid">supply chains with microgrids</span></span><span class="rot-caret"></span></span>
-      </p>
-
-      <p class="hero-bio">I build optimization and techno-economic models for the design, operation and long-term planning of
-        low-carbon energy systems, from hydrogen-integrated renewables and nuclear plants to firm power for AI data centers.</p>
-
-      <div class="hero-cta">
-        <a class="btn-glow" href="research.html">Explore research <i class="bi bi-arrow-right"></i></a>
-        <a class="btn-ghost" href="publications.html"><i class="bi bi-journal-text"></i>Publications</a>
-        <a class="btn-ghost" href="cv.html"><i class="bi bi-file-earmark-person"></i>CV</a>
+<!-- ============ 1. INTRO ============ -->
+<section class="intro" aria-labelledby="h-name">
+  <div class="wrap intro-wrap">
+    <div class="intro-grid">
+      <div class="intro-aside">
+        <figure class="intro-photo">
+          <img src="images/profile.jpg" alt="Portrait of Honglin Li" width="600" height="600">
+        </figure>
+        <p class="intro-now"><span class="label">Currently</span>Firm, low-carbon power for AI data centers. Teaching ECE 685 Power Systems Design, Fall 2026.</p>
       </div>
 
-      <ul class="hero-social" aria-label="Links">
-        <li><a href="mailto:hlli@ksu.edu" aria-label="Email" data-tip="Email"><i class="bi bi-envelope"></i></a></li>
-        <li><a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" aria-label="Google Scholar" data-tip="Scholar"><i class="ai ai-google-scholar"></i></a></li>
-        <li><a href="https://orcid.org/0000-0002-8405-3032" aria-label="ORCID" data-tip="ORCID"><i class="ai ai-orcid"></i></a></li>
-        <li><a href="https://github.com/Henryutd2021" aria-label="GitHub" data-tip="GitHub"><i class="bi bi-github"></i></a></li>
-        <li><a href="https://www.linkedin.com/in/honglin-li-998b18221/" aria-label="LinkedIn" data-tip="LinkedIn"><i class="bi bi-linkedin"></i></a></li>
-        <li><a href="files/Honglin_Li_CV.pdf" aria-label="CV (PDF)" data-tip="CV PDF"><i class="bi bi-file-earmark-arrow-down"></i></a></li>
+      <div class="intro-copy">
+        <p class="label">Energy systems · Optimization · Techno-economic analysis</p>
+        <h1 id="h-name">Honglin Li</h1>
+        <p class="intro-role">Postdoctoral Fellow, Department of Electrical and Computer Engineering<br><span class="org">Kansas State University</span></p>
+        <p class="intro-bio">I build optimization and techno-economic models for the design, operation and long-term planning of
+          low-carbon energy systems, from hydrogen-integrated renewables and nuclear plants to firm power for AI data centers.</p>
+        <div class="intro-actions">
+          <a class="btn-solid" href="research.html">Research <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          <a class="btn-outline" href="publications.html">Publications</a>
+        </div>
+        <ul class="intro-links" aria-label="Contact and profiles">
+          <li><a href="mailto:hlli@ksu.edu"><i class="bi bi-envelope" aria-hidden="true"></i>Email</a></li>
+          <li><a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"><i class="ai ai-google-scholar" aria-hidden="true"></i>Google Scholar</a></li>
+          <li><a href="https://orcid.org/0000-0002-8405-3032"><i class="ai ai-orcid" aria-hidden="true"></i>ORCID</a></li>
+          <li><a href="https://github.com/Henryutd2021"><i class="bi bi-github" aria-hidden="true"></i>GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/honglin-li-998b18221/"><i class="bi bi-linkedin" aria-hidden="true"></i>LinkedIn</a></li>
+          <li><a href="files/Honglin_Li_CV.pdf"><i class="bi bi-file-earmark-text" aria-hidden="true"></i>CV (PDF)</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="glance">
+      <p class="label">At a glance</p>
+      <p class="glance-line"><span><b>7</b> journal articles</span><span class="sep" aria-hidden="true">·</span><span><b>10</b> conference papers</span><span class="sep" aria-hidden="true">·</span><span><b>2</b> theses</span><span class="sep" aria-hidden="true">·</span><span><b>6</b> open model frameworks</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. RESEARCH ============ -->
+<section class="sec" aria-labelledby="h-research">
+  <div class="wrap sec-grid">
+    <header class="sec-rail">
+      <h2 id="h-research">Research</h2>
+      <a class="rail-link" href="research.html">Research overview <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </header>
+    <div class="sec-body">
+      <p class="lead"><span>When do low-carbon energy technologies pay off&nbsp;—</span> <span>for whom, and under which conditions?</span></p>
+      <p class="sec-note">My work combines optimization and techno-economic analysis to answer that question across five research themes.</p>
+      <ul class="themes">
+        <li class="theme-datacenter"><a href="research.html#nuclear-energy-and-ai-data-centers">
+          <span class="mk" aria-hidden="true"></span><h3>Nuclear energy and AI data centers</h3>
+          <p>Firm, low-carbon power for fast-growing data-center loads, and the cost of waiting for the grid.</p>
+          <i class="bi bi-arrow-right go" aria-hidden="true"></i></a></li>
+        <li class="theme-hydrogen"><a href="research.html#hydrogen-integrated-energy-systems">
+          <span class="mk" aria-hidden="true"></span><h3>Hydrogen-integrated energy systems</h3>
+          <p>From co-located wind and solar plants to regional networks and the U.S. nuclear fleet.</p>
+          <i class="bi bi-arrow-right go" aria-hidden="true"></i></a></li>
+        <li class="theme-carbon"><a href="research.html#carbon-aware-grid-operation">
+          <span class="mk" aria-hidden="true"></span><h3>Carbon-aware grid operation</h3>
+          <p>Re-timing electricity use with hourly grid emission intensity.</p>
+          <i class="bi bi-arrow-right go" aria-hidden="true"></i></a></li>
+        <li class="theme-microgrid"><a href="research.html#supply-chains-with-on-site-microgrids">
+          <span class="mk" aria-hidden="true"></span><h3>Supply chains with on-site microgrids</h3>
+          <p>Joint siting of facilities and microgrids, transactive energy and reliability.</p>
+          <i class="bi bi-arrow-right go" aria-hidden="true"></i></a></li>
+        <li class="theme-wind"><a href="research.html#wind-power-uncertainty">
+          <span class="mk" aria-hidden="true"></span><h3>Wind power uncertainty</h3>
+          <p>Multi-fidelity Gaussian processes for probabilistic wind farm power curves.</p>
+          <i class="bi bi-arrow-right go" aria-hidden="true"></i></a></li>
       </ul>
     </div>
-
-    <div class="hero-visual">
-      <div class="portrait">
-        <div class="portrait-orbit orbit-a" aria-hidden="true"><span class="orb theme-hydrogen"></span><span class="orb theme-wind"></span></div>
-        <div class="portrait-orbit orbit-b" aria-hidden="true"><span class="orb theme-datacenter"></span><span class="orb theme-carbon"></span><span class="orb theme-microgrid"></span></div>
-        <div class="portrait-ring" aria-hidden="true"></div>
-        <img src="images/profile.jpg" alt="Portrait of Honglin Li" width="420" height="420">
-      </div>
-      <div class="now-chip"><span class="live-dot" aria-hidden="true"></span><span><b>Now</b> · Firm, low-carbon power for AI data centers</span></div>
-    </div>
-  </div>
-
-  <a class="scroll-cue" href="#numbers" aria-label="Scroll to content"><span class="mouse" aria-hidden="true"><span></span></span><span class="cue-text">Scroll</span></a>
-</section>
-
-<!-- ============ 2. NUMBERS ============ -->
-<section id="numbers" class="band-stats" aria-label="At a glance">
-  <div class="wrap stats">
-    <div class="stat reveal"><span class="num"><span class="count-up" data-target="7">7</span></span><span class="lbl">Journal articles</span></div>
-    <div class="stat reveal"><span class="num"><span class="count-up" data-target="10">10</span></span><span class="lbl">Conference papers</span></div>
-    <div class="stat reveal"><span class="num"><span class="count-up" data-target="2">2</span></span><span class="lbl">Theses</span></div>
-    <div class="stat reveal"><span class="num"><span class="count-up" data-target="6">6</span></span><span class="lbl">Open model frameworks</span></div>
-    <div class="stat reveal"><span class="num"><span class="count-up" data-target="5">5</span></span><span class="lbl">Research themes</span></div>
   </div>
 </section>
 
-<!-- ============ 3. RESEARCH THEMES ============ -->
-<section class="band band-themes" aria-labelledby="h-themes">
-  <div class="wrap">
-    <header class="sec-head reveal">
-      <p class="sec-index">01 <span>/</span> Research</p>
-      <h2 id="h-themes">When do low-carbon energy technologies pay off — <span class="text-grad">for whom, and under which conditions?</span></h2>
-      <p class="sec-lede">My work combines optimization and techno-economic analysis to answer that question across five research themes.</p>
+<!-- ============ 3. SELECTED PUBLICATIONS (cards generated by scripts/build_site.py) ============ -->
+<section class="sec" aria-labelledby="h-pubs">
+  <div class="wrap sec-grid">
+    <header class="sec-rail">
+      <h2 id="h-pubs">Selected publications</h2>
+      <a class="rail-link" href="publications.html">All publications <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </header>
-
-    <div class="bento">
-      <a class="tile glow-card theme-datacenter t-big reveal" href="research.html#nuclear-energy-and-ai-data-centers">
-        <span class="tile-no">01</span><span class="tile-icon"><i class="bi bi-cpu"></i></span>
-        <h3>Nuclear energy and AI data centers</h3>
-        <p>Firm, low-carbon power for fast-growing data-center loads, and the cost of waiting for the grid.</p>
-        <span class="tile-go">Explore <i class="bi bi-arrow-up-right"></i></span><i class="bi bi-cpu tile-mark" aria-hidden="true"></i>
-      </a>
-      <a class="tile glow-card theme-hydrogen t-big reveal" href="research.html#hydrogen-integrated-energy-systems">
-        <span class="tile-no">02</span><span class="tile-icon"><i class="bi bi-droplet-half"></i></span>
-        <h3>Hydrogen-integrated energy systems</h3>
-        <p>From co-located wind and solar plants to regional networks and the U.S. nuclear fleet.</p>
-        <span class="tile-go">Explore <i class="bi bi-arrow-up-right"></i></span><i class="bi bi-droplet-half tile-mark" aria-hidden="true"></i>
-      </a>
-      <a class="tile glow-card theme-carbon reveal" href="research.html#carbon-aware-grid-operation">
-        <span class="tile-no">03</span><span class="tile-icon"><i class="bi bi-globe-americas"></i></span>
-        <h3>Carbon-aware grid operation</h3>
-        <p>Re-timing electricity use with hourly grid emission intensity.</p>
-        <span class="tile-go">Explore <i class="bi bi-arrow-up-right"></i></span><i class="bi bi-globe-americas tile-mark" aria-hidden="true"></i>
-      </a>
-      <a class="tile glow-card theme-microgrid reveal" href="research.html#supply-chains-with-on-site-microgrids">
-        <span class="tile-no">04</span><span class="tile-icon"><i class="bi bi-diagram-3"></i></span>
-        <h3>Supply chains with on-site microgrids</h3>
-        <p>Joint siting of facilities and microgrids, transactive energy and reliability.</p>
-        <span class="tile-go">Explore <i class="bi bi-arrow-up-right"></i></span><i class="bi bi-diagram-3 tile-mark" aria-hidden="true"></i>
-      </a>
-      <a class="tile glow-card theme-wind reveal" href="research.html#wind-power-uncertainty">
-        <span class="tile-no">05</span><span class="tile-icon"><i class="bi bi-wind"></i></span>
-        <h3>Wind power uncertainty</h3>
-        <p>Multi-fidelity Gaussian processes for probabilistic wind farm power curves.</p>
-        <span class="tile-go">Explore <i class="bi bi-arrow-up-right"></i></span><i class="bi bi-wind tile-mark" aria-hidden="true"></i>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 4. SELECTED PUBLICATIONS ============ -->
-<section class="band band-pubs" aria-labelledby="h-pubs">
-  <div class="wrap">
-    <header class="sec-head sec-head-row reveal">
-      <div>
-        <p class="sec-index">02 <span>/</span> Publications</p>
-        <h2 id="h-pubs">Selected publications</h2>
-      </div>
-      <a class="btn-ghost" href="publications.html">All publications <i class="bi bi-arrow-right"></i></a>
-    </header>
-    <div class="home-pubs">
+    <div class="sec-body pubs">
 ```
 
 {{< include _selected.qmd >}}
@@ -134,126 +103,120 @@ image: images/profile.jpg
   </div>
 </section>
 
-<!-- ============ 5. OPEN FRAMEWORKS ============ -->
-<section class="band band-code" aria-labelledby="h-code">
-  <div class="wrap">
-    <header class="sec-head sec-head-row reveal">
-      <div>
-        <p class="sec-index">03 <span>/</span> Open source</p>
-        <h2 id="h-code">Open model frameworks</h2>
-        <p class="sec-lede">Documented model frameworks associated with published and accepted research: formulations, data pipelines and runnable implementations with examples and tests.</p>
-      </div>
-      <a class="btn-ghost" href="software-data.html">Software &amp; Data <i class="bi bi-arrow-right"></i></a>
+<!-- ============ 4. OPEN MODEL FRAMEWORKS ============ -->
+<section class="sec" aria-labelledby="h-code">
+  <div class="wrap sec-grid">
+    <header class="sec-rail">
+      <h2 id="h-code">Open model frameworks</h2>
+      <a class="rail-link" href="software-data.html">Software &amp; Data <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </header>
-
-    <div class="repo-grid">
-      <a class="repo glow-card theme-hydrogen reveal" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">
-        <span class="repo-name"><i class="bi bi-github"></i>txh2-ercot-hydrogen</span>
-        <p>Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport</p>
-        <span class="repo-for">International Journal of Hydrogen Energy (2025)</span>
-      </a>
-      <a class="repo glow-card theme-carbon reveal" href="https://github.com/Henryutd2021/ghg-load-regulation">
-        <span class="repo-name"><i class="bi bi-github"></i>ghg-load-regulation</span>
-        <p>Demand-side load regulation guided by real-time emission intensity</p>
-        <span class="repo-for">Cell Reports Sustainability (2025)</span>
-      </a>
-      <a class="repo glow-card theme-microgrid reveal" href="https://github.com/Henryutd2021/supply-chain-microgrid-models">
-        <span class="repo-name"><i class="bi bi-github"></i>supply-chain-microgrid-models</span>
-        <p>Supply-chain facility location with on-site microgrids; virtual power plant scheduling</p>
-        <span class="repo-for">Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021)</span>
-      </a>
-      <a class="repo glow-card theme-wind reveal" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">
-        <span class="repo-name"><i class="bi bi-github"></i>mfgpr-wind-power-curve</span>
-        <p>Multi-fidelity Gaussian process regression for probabilistic wind power curves</p>
-        <span class="repo-for">ASME IDETC 2023</span>
-      </a>
-      <a class="repo glow-card theme-hydrogen reveal" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">
-        <span class="repo-name"><i class="bi bi-github"></i>reopt-hydrogen-framework</span>
-        <p>Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells (REopt-type MILP, with a concentrated-solar option)</p>
-        <span class="repo-for">Journal of Mechanical Design (2024); TORQUE 2022; IEEE EEM 2023; TORQUE 2024</span>
-      </a>
-      <a class="repo glow-card theme-datacenter reveal" href="https://github.com/Henryutd2021/code-delayed-energization">
-        <span class="repo-name"><i class="bi bi-github"></i>code-delayed-energization</span>
-        <p>Cost of delayed energization for AI data centers: developer, ratepayer and social accounts</p>
-        <span class="repo-for">IEEE NAPS 2026 (accepted)</span>
-      </a>
+    <div class="sec-body">
+      <p class="sec-note sec-note-first">Documented model frameworks associated with published and accepted research: formulations, data pipelines and runnable implementations with examples and tests.</p>
+      <ul class="fw-grid">
+        <li><a class="card fw theme-hydrogen" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">
+          <span class="fw-name"><span class="mk" aria-hidden="true"></span>txh2-ercot-hydrogen<i class="bi bi-github go" aria-hidden="true"></i></span>
+          <span class="fw-desc">Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport</span>
+          <span class="fw-venue">International Journal of Hydrogen Energy (2025)</span></a></li>
+        <li><a class="card fw theme-carbon" href="https://github.com/Henryutd2021/ghg-load-regulation">
+          <span class="fw-name"><span class="mk" aria-hidden="true"></span>ghg-load-regulation<i class="bi bi-github go" aria-hidden="true"></i></span>
+          <span class="fw-desc">Demand-side load regulation guided by real-time emission intensity</span>
+          <span class="fw-venue">Cell Reports Sustainability (2025)</span></a></li>
+        <li><a class="card fw theme-microgrid" href="https://github.com/Henryutd2021/supply-chain-microgrid-models">
+          <span class="fw-name"><span class="mk" aria-hidden="true"></span>supply-chain-microgrid-models<i class="bi bi-github go" aria-hidden="true"></i></span>
+          <span class="fw-desc">Supply-chain facility location with on-site microgrids; virtual power plant scheduling</span>
+          <span class="fw-venue">Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021)</span></a></li>
+        <li><a class="card fw theme-wind" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">
+          <span class="fw-name"><span class="mk" aria-hidden="true"></span>mfgpr-wind-power-curve<i class="bi bi-github go" aria-hidden="true"></i></span>
+          <span class="fw-desc">Multi-fidelity Gaussian process regression for probabilistic wind power curves</span>
+          <span class="fw-venue">ASME IDETC 2023</span></a></li>
+        <li><a class="card fw theme-hydrogen" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">
+          <span class="fw-name"><span class="mk" aria-hidden="true"></span>reopt-hydrogen-framework<i class="bi bi-github go" aria-hidden="true"></i></span>
+          <span class="fw-desc">Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells (REopt-type MILP, with a concentrated-solar option)</span>
+          <span class="fw-venue">Journal of Mechanical Design (2024); TORQUE 2022; IEEE EEM 2023; TORQUE 2024</span></a></li>
+        <li><a class="card fw theme-datacenter" href="https://github.com/Henryutd2021/code-delayed-energization">
+          <span class="fw-name"><span class="mk" aria-hidden="true"></span>code-delayed-energization<i class="bi bi-github go" aria-hidden="true"></i></span>
+          <span class="fw-desc">Cost of delayed energization for AI data centers: developer, ratepayer and social accounts</span>
+          <span class="fw-venue">IEEE NAPS 2026 (accepted)</span></a></li>
+      </ul>
     </div>
   </div>
 </section>
 
-<!-- ============ 6. JOURNEY ============ -->
-<section class="band band-journey" aria-labelledby="h-journey">
-  <div class="wrap">
-    <header class="sec-head reveal">
-      <p class="sec-index">04 <span>/</span> Journey</p>
-      <h2 id="h-journey">From machine learning to energy systems</h2>
+<!-- ============ 5. BACKGROUND (dates as in the public CV; degrees by completion year) ============ -->
+<section class="sec" aria-labelledby="h-background">
+  <div class="wrap sec-grid">
+    <header class="sec-rail">
+      <h2 id="h-background">Background</h2>
+      <a class="rail-link" href="cv.html">Full CV <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </header>
+    <div class="sec-body">
+      <h3 class="label sub">Positions</h3>
+      <ul class="rows">
+        <li><span class="when">Apr 2026 – present</span><div>
+          <p class="cv-title">Postdoctoral Fellow, Department of Electrical and Computer Engineering</p>
+          <p class="cv-org">Kansas State University</p>
+          <p class="cv-note">Instructor, ECE 685 Power Systems Design (Fall 2026)</p></div></li>
+        <li><span class="when">Sep 2025 – Apr 2026</span><div>
+          <p class="cv-title">Research Associate</p>
+          <p class="cv-org">The University of Texas at Dallas</p></div></li>
+        <li><span class="when">Feb 2025 – Aug 2025</span><div>
+          <p class="cv-title">Intern</p>
+          <p class="cv-org">Idaho National Laboratory</p>
+          <p class="cv-note">Optimization of hydrogen integration in nuclear grid services</p></div></li>
+        <li><span class="when">Aug 2024 – Jan 2025</span><div>
+          <p class="cv-title">Intern</p>
+          <p class="cv-org">FM</p>
+          <p class="cv-note">Resilient microgrid sizing, production-line simulation and wind-farm maintenance planning</p></div></li>
+      </ul>
 
-    <ol class="timeline">
-      <li class="tl-item reveal" data-kind="edu">
-        <span class="tl-dot"><i class="bi bi-mortarboard"></i></span>
-        <div class="tl-card"><span class="tl-date">2018</span><h3>M.E., Computer Engineering</h3><p class="tl-org">Dalian Maritime University</p><p class="tl-note">Focus: machine learning</p></div>
-      </li>
-      <li class="tl-item reveal" data-kind="edu">
-        <span class="tl-dot"><i class="bi bi-mortarboard"></i></span>
-        <div class="tl-card"><span class="tl-date">2021</span><h3>M.S. in Engineering (Industrial Engineering)</h3><p class="tl-org">Texas State University</p><p class="tl-note">Thesis: Planning Virtual Power Plants for Smart Factories and Industry 4.0 with Renewable and Thermal Cogeneration</p></div>
-      </li>
-      <li class="tl-item reveal" data-kind="work">
-        <span class="tl-dot"><i class="bi bi-briefcase"></i></span>
-        <div class="tl-card"><span class="tl-date">Aug 2024 – Jan 2025</span><h3>Intern</h3><p class="tl-org">FM</p><p class="tl-note">Resilient microgrid sizing, production-line simulation and wind-farm maintenance planning</p></div>
-      </li>
-      <li class="tl-item reveal" data-kind="work">
-        <span class="tl-dot"><i class="bi bi-briefcase"></i></span>
-        <div class="tl-card"><span class="tl-date">Feb 2025 – Aug 2025</span><h3>Intern</h3><p class="tl-org">Idaho National Laboratory</p><p class="tl-note">Optimization of hydrogen integration in nuclear grid services</p></div>
-      </li>
-      <li class="tl-item reveal" data-kind="edu">
-        <span class="tl-dot"><i class="bi bi-mortarboard"></i></span>
-        <div class="tl-card"><span class="tl-date">2025</span><h3>Ph.D., Mechanical Engineering</h3><p class="tl-org">The University of Texas at Dallas</p><p class="tl-note">Dissertation: Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems</p></div>
-      </li>
-      <li class="tl-item reveal" data-kind="work">
-        <span class="tl-dot"><i class="bi bi-building"></i></span>
-        <div class="tl-card"><span class="tl-date">Sep 2025 – Apr 2026</span><h3>Research Associate</h3><p class="tl-org">The University of Texas at Dallas</p></div>
-      </li>
-      <li class="tl-item tl-now reveal" data-kind="work">
-        <span class="tl-dot"><i class="bi bi-lightning-charge-fill"></i></span>
-        <div class="tl-card"><span class="tl-date">Apr 2026 – present</span><h3>Postdoctoral Fellow, Electrical and Computer Engineering</h3><p class="tl-org">Kansas State University</p><p class="tl-note">Instructor, ECE 685 Power Systems Design (Fall 2026)</p></div>
-      </li>
-    </ol>
+      <h3 class="label sub">Education</h3>
+      <ul class="rows">
+        <li><span class="when">2025</span><div>
+          <p class="cv-title">Ph.D., Mechanical Engineering</p>
+          <p class="cv-org">The University of Texas at Dallas</p>
+          <p class="cv-note">Dissertation: <i>Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems</i></p></div></li>
+        <li><span class="when">2021</span><div>
+          <p class="cv-title">M.S. in Engineering (Industrial Engineering)</p>
+          <p class="cv-org">Texas State University</p>
+          <p class="cv-note">Thesis: <i>Planning Virtual Power Plants for Smart Factories and Industry 4.0 with Renewable and Thermal Cogeneration</i></p></div></li>
+        <li><span class="when">2018</span><div>
+          <p class="cv-title">M.E., Computer Engineering</p>
+          <p class="cv-org">Dalian Maritime University</p>
+          <p class="cv-note">Focus: machine learning</p></div></li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<!-- ============ 7. NEWS ============ -->
-<section class="band band-news" aria-labelledby="h-news">
-  <div class="wrap news-grid">
-    <header class="sec-head news-head reveal">
-      <p class="sec-index">05 <span>/</span> News</p>
-      <h2 id="h-news">Recent news</h2>
+<!-- ============ 6. NEWS ============ -->
+<section class="sec" aria-labelledby="h-news">
+  <div class="wrap sec-grid">
+    <header class="sec-rail">
+      <h2 id="h-news">News</h2>
     </header>
-    <ul class="news-list">
-      <li class="reveal"><span class="date">Fall 2026</span><span>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</span></li>
-      <li class="reveal"><span class="date">Aug 2026</span><span>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</span></li>
-      <li class="reveal"><span class="date">2026</span><span>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.</span></li>
-      <li class="reveal"><span class="date">2026</span><span>Our paper on hydrogen integration and policy support for U.S. nuclear power plants is published in <em>Nature Communications</em>.</span></li>
-      <li class="reveal"><span class="date">2026</span><span>Perspective on small modular reactors for data centers published in <em>Cell Reports Sustainability</em>.</span></li>
-      <li class="reveal"><span class="date">Apr 2026</span><span>Joined the Department of Electrical and Computer Engineering at Kansas State University as a Postdoctoral Fellow.</span></li>
-      <li class="reveal"><span class="date">2025</span><span>Completed my Ph.D. in Mechanical Engineering at The University of Texas at Dallas.</span></li>
-      <li class="reveal"><span class="date">2025</span><span>Paper on emission-intensity-informed load regulation published in <em>Cell Reports Sustainability</em> and featured by <a href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">UT Dallas News</a>.</span></li>
-    </ul>
+    <div class="sec-body">
+      <ul class="rows news">
+        <li><span class="when">Fall 2026</span><p>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</p></li>
+        <li><span class="when">Aug 2026</span><p>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</p></li>
+        <li><span class="when">2026</span><p>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.</p></li>
+        <li><span class="when">2026</span><p>Our paper on hydrogen integration and policy support for U.S. nuclear power plants is published in <em>Nature Communications</em>.</p></li>
+        <li><span class="when">2026</span><p>Perspective on small modular reactors for data centers published in <em>Cell Reports Sustainability</em>.</p></li>
+        <li><span class="when">Apr 2026</span><p>Joined the Department of Electrical and Computer Engineering at Kansas State University as a Postdoctoral Fellow.</p></li>
+        <li><span class="when">2025</span><p>Completed my Ph.D. in Mechanical Engineering at The University of Texas at Dallas.</p></li>
+        <li><span class="when">2025</span><p>Paper on emission-intensity-informed load regulation published in <em>Cell Reports Sustainability</em> and featured by <a href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">UT Dallas News</a>.</p></li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<!-- ============ 8. CONTACT ============ -->
-<section class="band-contact" aria-labelledby="h-contact">
-  <div class="contact-glow" aria-hidden="true"></div>
-  <div class="wrap contact-inner reveal">
-    <p class="sec-index">06 <span>/</span> Contact</p>
-    <h2 id="h-contact">Questions about a paper, a model framework or a collaboration? <span class="text-grad">Get in touch.</span></h2>
-    <div class="contact-cta">
-      <a class="btn-glow btn-lg" href="mailto:hlli@ksu.edu"><i class="bi bi-envelope"></i>hlli@ksu.edu</a>
-      <a class="btn-ghost" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"><i class="ai ai-google-scholar"></i>Google Scholar</a>
-      <a class="btn-ghost" href="https://orcid.org/0000-0002-8405-3032"><i class="ai ai-orcid"></i>ORCID</a>
-      <a class="btn-ghost" href="https://github.com/Henryutd2021"><i class="bi bi-github"></i>GitHub</a>
-      <a class="btn-ghost" href="https://www.linkedin.com/in/honglin-li-998b18221/"><i class="bi bi-linkedin"></i>LinkedIn</a>
+<!-- ============ 7. CONTACT ============ -->
+<section class="sec sec-last" aria-labelledby="h-contact">
+  <div class="wrap sec-grid">
+    <header class="sec-rail">
+      <h2 id="h-contact">Contact</h2>
+    </header>
+    <div class="sec-body">
+      <p class="contact-line">Questions about a paper, a model framework or a collaboration? Write to <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a>.</p>
     </div>
   </div>
 </section>

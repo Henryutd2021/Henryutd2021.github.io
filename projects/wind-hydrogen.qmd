@@ -7,7 +7,7 @@ categories: ["Hydrogen systems"]
 themekey: "hydrogen"
 themelabel: "Hydrogen systems"
 themeicon: "droplet-half"
-body-classes: "project-page theme-hydrogen"
+body-classes: "page-inner project-page theme-hydrogen"
 title-block-banner: true
 page-layout: full
 toc: false
@@ -15,20 +15,20 @@ toc: false
 
 ::: {.proj-layout}
 ::: {.proj-main}
-::: {.question-card}
+::: {.proj-question}
 ## Research question
 
 How do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?
 :::
 
-::: {.proj-cards}
-::: {.info-card .glow-card .ic-contribution}
+::: {.proj-pair}
+::: {.proj-col}
 ## My contribution
 
 First author. Extended NREL's REopt optimization model with hydrogen components and ran the analysis.
 :::
 
-::: {.info-card .glow-card .ic-method}
+::: {.proj-col}
 ## Method
 
 Mixed-integer sizing and dispatch optimization for a 253-MW West Texas wind farm with ERCOT prices, with sensitivities to hydrogen price, region and future technology costs.
@@ -36,34 +36,40 @@ Mixed-integer sizing and dispatch optimization for a 253-MW West Texas wind farm
 
 :::
 
+::: {.proj-findings}
 ## Key findings
 
 ::: {.findings}
 1. In the Journal of Mechanical Design case study, adding an electrolyzer reduced total system cost by about 7%.
 2. In the same study, using hydrogen storage with fuel cells reduced it by about 26% and sharply cut curtailment (the earlier TORQUE 2022 case reported about 9% and 30%).
 :::
+:::
 
-::: {.callout-note title="Boundary conditions"}
+::: {.proj-bounds}
+## Boundary conditions
+
 Cost assumptions date from 2020–2023 and predate final federal hydrogen credit rules.
 :::
 
 :::
 
 ::: {.proj-aside}
-::: {.aside-card .outputs}
+::: {.aside-block .outputs}
 ## Outputs
 
-[<i class="bi bi-journal-text"></i> JMD paper (DOI)](https://doi.org/10.1115/1.4063971){.out-link} [<i class="bi bi-journal-text"></i> TORQUE 2022 paper (DOI)](https://doi.org/10.1088/1742-6596/2265/4/042063){.out-link} [<i class="bi bi-github"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
+- [<i class="bi bi-journal-text" aria-hidden="true"></i> JMD paper (DOI)](https://doi.org/10.1115/1.4063971){.out-link}
+- [<i class="bi bi-journal-text" aria-hidden="true"></i> TORQUE 2022 paper (DOI)](https://doi.org/10.1088/1742-6596/2265/4/042063){.out-link}
+- [<i class="bi bi-github" aria-hidden="true"></i> Model framework (GitHub)](https://github.com/Henryutd2021/reopt-hydrogen-framework){.out-link}
 
 ::: {.related}
-Related
+### Related
 
 - Integrating offshore wind farms with unmanned hydrogen and battery ships — IEEE KPEC 2022 (third author).
 :::
 
 :::
 
-::: {.aside-card .repro}
+::: {.aside-block .repro}
 ## Reproducibility
 
 Model framework with documentation, examples and tests on GitHub; study inputs and results archived privately. Last updated 2026-10.
