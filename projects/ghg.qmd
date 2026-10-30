@@ -78,11 +78,12 @@ toc: false
 </div>
 </li>
 </ol>
+<p class="pub-cite-src">Citation counts: Google Scholar, October 30, 2026.</p>
 </section>
 <section class="proj-sec" aria-labelledby="h-related">
 <h2 id="h-related"><i class="bi bi-link-45deg" aria-hidden="true"></i>Related work</h2>
 <ul class="related">
-<li>Demand-side management under real-time greenhouse gas emission factors for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author).</li>
+<li>Demand-side management under real-time greenhouse gas emission factor for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author).</li>
 </ul>
 </section>
 </div>

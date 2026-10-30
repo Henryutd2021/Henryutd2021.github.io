@@ -290,3 +290,5 @@ ol.findings li::before { content: counter(finding); position: absolute; left: 1.
   .pc-cover img, .pc-more .bi, .ftab, .search-box input, .bib-copy, .pager-link, .cite-chip, .pub-chart .seg, .pub-stats a, .ps-n { transition: none; }
   .project-card:hover .pc-cover img { transform: none; }
 }
+
+.pub-cite-src { margin: .6rem 0 0; font-size: .8rem; color: var(--muted); }

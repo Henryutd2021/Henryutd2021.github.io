@@ -18,13 +18,19 @@
   const top = document.createElement("button");
   top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
   top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
-  top.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
   body.appendChild(top);
 
   function onScroll() {
     const y = window.scrollY;
     body.classList.toggle("scrolled", y > 8);
-    top.classList.toggle("show", y > window.innerHeight * 0.8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
   }
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });

@@ -67,7 +67,7 @@ image: images/profile.jpg
     <figure class="about-photo">
       <img src="images/profile.jpg" alt="Portrait of Honglin Li" width="600" height="600">
       <figcaption>
-        <span><i class="bi bi-geo-alt" aria-hidden="true"></i>Manhattan, Kansas</span>
+        <span><i class="bi bi-geo-alt" aria-hidden="true"></i>Manhattan, Kansas</span><!-- workplace: KSU, Manhattan, KS (author line of the NAPS 2026 papers) -->
         <a href="mailto:hlli@ksu.edu"><i class="bi bi-envelope" aria-hidden="true"></i>hlli@ksu.edu</a>
       </figcaption>
     </figure>

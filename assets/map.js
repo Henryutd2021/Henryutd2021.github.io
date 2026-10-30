@@ -82,7 +82,8 @@
   function paperList(papers, max) {
     const items = papers.slice(0, max).map(function (p) {
       const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
-      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span></li>";
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
     });
     if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
     return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";

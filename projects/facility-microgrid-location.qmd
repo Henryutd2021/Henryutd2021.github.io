@@ -129,6 +129,7 @@ toc: false
 </div>
 </li>
 </ol>
+<p class="pub-cite-src">Citation counts: Google Scholar, October 30, 2026.</p>
 </section>
 </div>
 <div class="proj-aside" role="complementary" aria-label="Outputs and reproducibility">

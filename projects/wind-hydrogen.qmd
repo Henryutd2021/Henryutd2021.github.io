@@ -106,6 +106,7 @@ toc: false
 </div>
 </li>
 </ol>
+<p class="pub-cite-src">Citation counts: Google Scholar, October 30, 2026.</p>
 </section>
 <section class="proj-sec" aria-labelledby="h-related">
 <h2 id="h-related"><i class="bi bi-link-45deg" aria-hidden="true"></i>Related work</h2>
