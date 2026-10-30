@@ -18,11 +18,11 @@ Where should a manufacturing supply chain place its facilities, and how much on-
 
 ## My contribution
 
-First author of the location-allocation papers (AMM, SEGRE). Second author of the JORS paper, for which I built the optimization models and the revision cases.
+First author of the location-allocation papers (AMM, SEGRE). Second author of the JORS paper, for which I built the optimization models and the case-study analyses.
 
 ## Method
 
-JORS sizes on-site microgrids for fixed facility locations with production and inventory planning; AMM and SEGRE add facility location-allocation decisions, and AMM compares linearization formulations.
+JORS sizes on-site microgrids for fixed facility locations with production and inventory planning; AMM and SEGRE add facility location-allocation decisions.
 
 ## Key findings
 

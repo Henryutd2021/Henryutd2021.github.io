@@ -27,7 +27,7 @@ Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression
 ## Key findings
 
 ::: {.findings}
-- In the reported test on nine turbines, nonlinear multi-fidelity regression improved point accuracy for most turbines; the probabilistic criteria did not uniformly favor it.
+- In the reported nine-turbine test, nonlinear multi-fidelity regression achieved lower RMSE for most turbines; performance depended on the evaluation metric.
 :::
 
 ::: {.callout-note title="Boundary conditions"}

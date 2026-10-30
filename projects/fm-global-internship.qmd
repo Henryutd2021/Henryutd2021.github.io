@@ -22,7 +22,7 @@ Intern. Built the microgrid sizing model and the production-line simulation, and
 
 ## Method
 
-Techno-economic optimization of solar PV, battery and backup sizing that minimizes the levelized cost of energy while meeting demand in modeled grid-outage scenarios, using a DOE reference load profile scaled to the campus's annual consumption and site solar data; discrete-event simulation (Arena) of a lithium battery production line to quantify the effect of equipment failures and maintenance schedules and to locate bottlenecks; a proposed optimization framework for predictive and corrective maintenance scheduling of wind farms.
+Techno-economic optimization for resilient microgrid sizing; discrete-event simulation of a battery manufacturing line; and optimization methods for wind-farm maintenance planning.
 
 ::: {.callout-note title="Boundary conditions"}
 Industry work: company data, models and results are confidential and are not shown here.
