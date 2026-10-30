@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" aria-hidden="true">
+<defs>
+<radialGradient id="glow" cx="62%" cy="38%" r="70%"><stop offset="0" stop-color="#0d9488" stop-opacity=".16"/><stop offset="1" stop-color="#0d9488" stop-opacity=".03"/></radialGradient>
+<pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="#0d9488" fill-opacity=".28"/></pattern>
+<radialGradient id="fade" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<mask id="m"><rect width="640" height="360" fill="url(#fade)"/></mask>
+</defs>
+<rect width="640" height="360" fill="#0d9488" fill-opacity=".06"/>
+<rect width="640" height="360" fill="url(#glow)"/>
+<rect width="640" height="360" fill="url(#dots)" mask="url(#m)"/>
+<circle cx="560" cy="70" r="150" fill="#0284c7" fill-opacity=".07"/>
+<circle cx="70" cy="340" r="130" fill="#0d9488" fill-opacity=".06"/>
+<g transform="translate(320 178) scale(.88) translate(-320 -178)" stroke-linecap="round" stroke-linejoin="round">
+<line x1="40" y1="287" x2="600" y2="287" stroke="#0d9488" stroke-opacity=".35" stroke-width="2" stroke-dasharray="1 8"/>
+<line x1="120.6" y1="144.9" x2="167.4" y2="117.1" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="185.2" y1="115.9" x2="236.8" y2="138.1" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="239.3" y1="149.5" x2="205" y2="187.9" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="120.7" y1="155" x2="184.3" y2="191.3" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="184.1" y1="204.4" x2="130.8" y2="233.2" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="208.1" y1="204" x2="263.1" y2="231.5" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="279.6" y1="229.5" x2="319.8" y2="194.8" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="254.9" y1="146.6" x2="318" y2="179.7" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="328.5" y1="172.6" x2="323.1" y2="125.9" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<line x1="255.5" y1="138.8" x2="312.5" y2="119.2" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+<circle cx="112" cy="150" r="7" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="2.8"/>
+<circle cx="176" cy="112" r="7" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="2.8"/>
+<circle cx="246" cy="142" r="7" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="2.8"/>
+<circle cx="196" cy="198" r="10.5" fill="#0284c7" fill-opacity="0.3" stroke="#0284c7" stroke-width="2.8"/>
+<circle cx="122" cy="238" r="7" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="2.8"/>
+<circle cx="272" cy="236" r="7" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="2.8"/>
+<circle cx="330" cy="186" r="10.5" fill="#0284c7" fill-opacity="0.3" stroke="#0284c7" stroke-width="2.8"/>
+<circle cx="322" cy="116" r="7" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="2.8"/>
+<line x1="366" y1="196" x2="420" y2="196" fill="none" stroke="#0d9488" stroke-width="2.6" stroke-opacity="0.7" stroke-dasharray="2 9"/>
+<path d="M 381 189 l 7 7 l -7 7" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+<path d="M 399 189 l 7 7 l -7 7" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+<rect x="441" y="146" width="58" height="134" rx="29" fill="#0d9488" fill-opacity="0.1" stroke="#0d9488" stroke-width="3.2"/>
+<line x1="442.5" y1="196.4" x2="497.5" y2="196.4" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-opacity="0.7"/>
+<line x1="442.5" y1="235.6" x2="497.5" y2="235.6" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-opacity="0.7"/>
+<line x1="470" y1="146" x2="470" y2="132" fill="none" stroke="#0d9488" stroke-width="3"/>
+<line x1="461" y1="132" x2="479" y2="132" fill="none" stroke="#0d9488" stroke-width="3"/>
+<circle cx="470" cy="216" r="7" fill="none" stroke="#0284c7" stroke-width="2.4"/>
+<line x1="445" y1="286" x2="495" y2="286" fill="none" stroke="#0d9488" stroke-width="3"/>
+<line x1="451" y1="280" x2="447" y2="286" fill="none" stroke="#0d9488" stroke-width="3"/>
+<line x1="489" y1="280" x2="493" y2="286" fill="none" stroke="#0d9488" stroke-width="3"/>
+<line x1="541.1" y1="106.6" x2="550.9" y2="101.4" fill="none" stroke="#0d9488" stroke-width="5"/>
+<circle cx="526.9" cy="114.1" r="16" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="3.2"/>
+<path d="M 518.1 113.3 A 8.8 8.8 0 0 1 526.1 105.3" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+<circle cx="565.1" cy="93.9" r="16" fill="#0d9488" fill-opacity="0.2" stroke="#0d9488" stroke-width="3.2"/>
+<path d="M 556.3 93.1 A 8.8 8.8 0 0 1 564.3 85.1" fill="none" stroke="#0284c7" stroke-width="2.6"/>
+<path d="M 564.5 286 L 566.7 196 L 569.3 196 L 571.5 286 Z" fill="#0d9488" fill-opacity="0.1" stroke="#0d9488" stroke-width="2.6"/>
+<rect x="564" y="184" width="17.5" height="11" rx="5" fill="none" stroke="#0d9488" stroke-width="2.2"/>
+<path d="M 568 190 C 578.5 181.6 584 160.6 583.7 146.8 C 576.7 158.9 568.6 179.5 568 190 Z" fill="#0d9488" fill-opacity="0.1" stroke="#0d9488" stroke-width="2.2"/>
+<path d="M 568 190 C 570 203.3 585.5 218.6 597.6 225.2 C 590.6 213.1 576.8 195.8 568 190 Z" fill="#0d9488" fill-opacity="0.1" stroke="#0d9488" stroke-width="2.2"/>
+<path d="M 568 190 C 555.5 185.1 534.5 190.8 522.7 198 C 536.7 198.1 558.6 194.7 568 190 Z" fill="#0d9488" fill-opacity="0.1" stroke="#0d9488" stroke-width="2.2"/>
+<circle cx="568" cy="190" r="5.5" fill="#0d9488" fill-opacity="0.4" stroke="#0d9488" stroke-width="2.2"/>
+</g>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" aria-hidden="true">
+<defs>
+<radialGradient id="glow" cx="62%" cy="38%" r="70%"><stop offset="0" stop-color="#0284c7" stop-opacity=".16"/><stop offset="1" stop-color="#0284c7" stop-opacity=".03"/></radialGradient>
+<pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.3" fill="#0284c7" fill-opacity=".28"/></pattern>
+<radialGradient id="fade" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<mask id="m"><rect width="640" height="360" fill="url(#fade)"/></mask>
+</defs>
+<rect width="640" height="360" fill="#0284c7" fill-opacity=".06"/>
+<rect width="640" height="360" fill="url(#glow)"/>
+<rect width="640" height="360" fill="url(#dots)" mask="url(#m)"/>
+<circle cx="560" cy="50" r="150" fill="#0d9488" fill-opacity=".07"/>
+<circle cx="70" cy="340" r="130" fill="#0284c7" fill-opacity=".06"/>
+<g transform="translate(320 178) scale(.88) translate(-320 -178)" stroke-linecap="round" stroke-linejoin="round">
+<line x1="40" y1="287" x2="600" y2="287" stroke="#0284c7" stroke-opacity=".35" stroke-width="2" stroke-dasharray="1 8"/>
+<path d="M 134.3 286 L 137.9 144 L 142.1 144 L 145.7 286 Z" fill="#0284c7" fill-opacity="0.1" stroke="#0284c7" stroke-width="3.2"/>
+<rect x="136" y="132" width="25" height="11" rx="5" fill="none" stroke="#0284c7" stroke-width="2.7"/>
+<path d="M 140 138 C 152.5 122.1 161.7 87.5 163.5 65.7 C 154.1 86.6 142.3 121.2 140 138 Z" fill="#0284c7" fill-opacity="0.1" stroke="#0284c7" stroke-width="2.7"/>
+<path d="M 140 138 C 147.5 156.8 172.9 182 190.9 194.5 C 177.5 175.9 153.4 148.4 140 138 Z" fill="#0284c7" fill-opacity="0.1" stroke="#0284c7" stroke-width="2.7"/>
+<path d="M 140 138 C 120 135.1 85.4 144.5 65.7 153.8 C 88.5 151.5 124.3 144.4 140 138 Z" fill="#0284c7" fill-opacity="0.1" stroke="#0284c7" stroke-width="2.7"/>
+<circle cx="140" cy="138" r="5.5" fill="#0284c7" fill-opacity="0.4" stroke="#0284c7" stroke-width="2.7"/>
+<path d="M 298 253.2 L 305 251.2 L 312 249.1 L 319 246.9 L 326 244.6 L 333 242.1 L 340 239.4 L 347 236.5 L 354 233.3 L 361 229.7 L 368 225.5 L 375 220.7 L 382 215.2 L 389 208.8 L 396 201.5 L 403 193.4 L 410 184.6 L 417 175.3 L 424 165.8 L 431 156.5 L 438 147.7 L 445 139.7 L 452 132.7 L 459 126.9 L 466 122.3 L 473 118.8 L 480 116.3 L 487 114.7 L 494 113.8 L 501 113.4 L 508 113.6 L 515 113.7 L 522 112.8 L 529 112.1 L 536 111.5 L 543 111.1 L 550 110.8 L 557 110.5 L 564 110.3 L 571 110.2 L 578 110.1 L 578 120.2 L 571 120.3 L 564 120.4 L 557 120.6 L 550 120.9 L 543 121.2 L 536 121.6 L 529 122.1 L 522 122.9 L 515 123.8 L 508 126.3 L 501 129.5 L 494 133.2 L 487 137.4 L 480 142.1 L 473 147.6 L 466 153.8 L 459 161 L 452 169 L 445 178 L 438 187.7 L 431 197.9 L 424 208.3 L 417 218.5 L 410 228.2 L 403 237.1 L 396 244.9 L 389 251.5 L 382 256.8 L 375 261.1 L 368 264.2 L 361 266 L 354 266 L 347 266 L 340 266 L 333 266 L 326 266 L 319 266 L 312 266 L 305 264.7 L 298 263.3 Z" fill="#0d9488" fill-opacity="0.2"/>
+<circle cx="388.7" cy="223.3" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="318.3" cy="247.1" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="448" cy="157.2" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="440.1" cy="162.8" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="308.5" cy="260.7" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="323.4" cy="255.3" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="416.9" cy="195.1" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="360.5" cy="252.1" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="473.7" cy="122.3" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="409.1" cy="211.2" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="571.4" cy="99.3" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="379.1" cy="233.4" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="338.4" cy="249.1" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="526.5" cy="112.5" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="348.6" cy="262.6" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="402.3" cy="222" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="451.4" cy="148.8" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="355.7" cy="248.9" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="488.5" cy="132" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="462" cy="138.1" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="424.9" cy="190.4" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="493.7" cy="109.4" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="366.3" cy="254.8" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="543" cy="120.8" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="502.2" cy="126.7" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="331.1" cy="232.8" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="415.1" cy="199.4" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="434.9" cy="176.6" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="309" cy="264.7" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="458.4" cy="156.9" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="543.1" cy="121.2" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="464.4" cy="127.4" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="460.4" cy="158.2" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<circle cx="562.5" cy="111.1" r="2.8" fill="#0284c7" fill-opacity="0.6"/>
+<path d="M 286 88 V 276 H 590" fill="none" stroke="#0284c7" stroke-width="2.6" stroke-opacity="0.7"/>
+<path d="M 298 258.3 C 312 258.3 312 256.3 326 256.3 C 340 256.3 340 250.6 354 250.6 C 368 250.6 368 236 382 236 C 396 236 396 206.4 410 206.4 C 424 206.4 424 167.7 438 167.7 C 452 167.7 452 138.1 466 138.1 C 480 138.1 480 123.5 494 123.5 C 508 123.5 508 117.8 522 117.8 C 536 117.8 536 115.8 550 115.8 C 564 115.8 564 115.1 578 115.1" fill="none" stroke="#0284c7" stroke-width="3.4"/>
+</g>
+</svg>

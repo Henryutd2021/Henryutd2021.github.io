@@ -4,114 +4,184 @@ subtitle: "Optimization and techno-economic analysis of low-carbon energy system
 title-block-banner: true
 page-layout: full
 toc: false
-body-classes: "page-inner page-research"
+body-classes: "page-inner page-folio page-research"
 ---
 
-::: {.page-lede}
-My work combines optimization and techno-economic analysis to ask when low-carbon energy technologies pay off, for whom, and under which market and policy conditions. Each theme below links to project pages with the research question, my contribution, the method, the key findings with their boundary conditions, and the published outputs.
+<!-- Research page (third redesign, 2026-10-30; styles in assets/pages.css).
+     Intro and theme index, then one card per theme: a tinted panel on the left (icon, number, heading, intro) and the
+     project links on the right (cover image, title, venue). theme-<key> sets the colour (assets/base.css).
+     The heading ids are linked from the home page; keep them. Cover images: images/projects/<slug>.svg (a tinted
+     tile with the theme icon shows when an image is missing). -->
+
+::: {.rs-intro}
+::: {.rs-lede}
+My work combines optimization and techno-economic analysis to ask when low-carbon energy technologies pay off, for whom, and under which market and policy conditions.
+
+Each theme below links to project pages with the research question, my contribution, the method, the key findings with their boundary conditions, and the published outputs.
 :::
 
-<!-- One section per theme: number and colour marker, heading and a short intro on the left; project links as
-     list rows (title, venue) on the right. theme-<key> sets the marker colour (assets/base.css). -->
+::: {.rs-index}
+[Five research themes]{.label}
 
-::: {.theme-section .theme-datacenter}
-::: {.ts-head}
-[01]{.ts-num}
+[[]{.dot}[Nuclear energy and AI data centers]{.ix-name}[2 projects]{.ix-n}](#nuclear-energy-and-ai-data-centers){.ix .theme-datacenter}
+[[]{.dot}[Hydrogen-integrated energy systems]{.ix-name}[5 projects]{.ix-n}](#hydrogen-integrated-energy-systems){.ix .theme-hydrogen}
+[[]{.dot}[Carbon-aware grid operation]{.ix-name}[1 project]{.ix-n}](#carbon-aware-grid-operation){.ix .theme-carbon}
+[[]{.dot}[Supply chains with on-site microgrids]{.ix-name}[1 project]{.ix-n}](#supply-chains-with-on-site-microgrids){.ix .theme-microgrid}
+[[]{.dot}[Wind power uncertainty]{.ix-name}[1 project]{.ix-n}](#wind-power-uncertainty){.ix .theme-wind}
+[[]{.dot}[Methods and toolkit]{.ix-name}[5 methods]{.ix-n}](#methods){.ix .ix-methods}
+:::
+:::
 
+<!-- ============ 01 Nuclear energy and AI data centers ============ -->
+::: {.tb .theme-datacenter}
+::: {.tb-panel}
 ## Nuclear energy and AI data centers {#nuclear-energy-and-ai-data-centers}
 
-Rapid growth in AI data centers raises the question of how firm, low-carbon power can be supplied on the timelines these loads require.
+::: {.tb-top}
+[<i class="bi bi-cpu" aria-hidden="true"></i>]{.tb-icon} [Theme 01]{.tb-num}
 :::
 
-::: {.ts-links}
-[[Small modular reactors for data centers]{.tl-title} [A Perspective on the economic dimensions a credible assessment must capture.]{.tl-venue}](projects/smr-dc.qmd){.tl-row}
+Rapid growth in AI data centers raises the question of how firm, low-carbon power can be supplied on the timelines these loads require.
 
-[[The cost of delayed energization for AI data centers]{.tl-title} [What waiting for grid connection costs, and who bears it.]{.tl-venue}](projects/data-center-delay-economics.qmd){.tl-row}
-
-::: {.ts-note}
+::: {.tb-note}
 **Current work (Kansas State University):** techno-economic analysis of firm, low-carbon supply options, including small modular reactors, for large data-center loads.
 :::
 :::
+
+::: {.tb-list}
+[[<i class="bi bi-cpu" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/smr-dc.svg)"}]{.pr-thumb}[[Small modular reactors for data centers]{.pr-title}[Cell Reports Sustainability (2026), Perspective]{.pr-venue}[The economic dimensions a credible assessment must capture.]{.pr-desc}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/smr-dc.qmd){.pr-row}
+
+[[<i class="bi bi-cpu" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/data-center-delay-economics.svg)"}]{.pr-thumb}[[The cost of delayed energization for AI data centers]{.pr-title}[IEEE NAPS 2026 (accepted)]{.pr-venue}[What waiting for grid connection costs, and who bears it.]{.pr-desc}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/data-center-delay-economics.qmd){.pr-row}
+:::
 :::
 
-::: {.theme-section .theme-hydrogen}
-::: {.ts-head}
-[02]{.ts-num}
-
+<!-- ============ 02 Hydrogen-integrated energy systems ============ -->
+::: {.tb .theme-hydrogen}
+::: {.tb-panel}
 ## Hydrogen-integrated energy systems {#hydrogen-integrated-energy-systems}
+
+::: {.tb-top}
+[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.tb-icon} [Theme 02]{.tb-num}
+:::
 
 This theme follows hydrogen from single projects to regional networks to the nuclear fleet. It was the subject of my Ph.D. dissertation.
 :::
 
-::: {.ts-links}
-[[Hydrogen integration and policy support for U.S. nuclear power plants]{.tl-title} [Nature Communications (2026)]{.tl-venue}](projects/npph2.qmd){.tl-row}
+::: {.tb-list}
+[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/npph2.svg)"}]{.pr-thumb}[[Hydrogen integration and policy support for U.S. nuclear power plants]{.pr-title}[Nature Communications (2026)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/npph2.qmd){.pr-row}
 
-[[Hydrogen's role in expanding renewable energy in Texas]{.tl-title} [International Journal of Hydrogen Energy (2025)]{.tl-venue}](projects/txh2.qmd){.tl-row}
+[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/txh2.svg)"}]{.pr-thumb}[[Hydrogen's role in expanding renewable energy in Texas]{.pr-title}[International Journal of Hydrogen Energy (2025)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/txh2.qmd){.pr-row}
 
-[[Co-located wind and hydrogen energy systems]{.tl-title} [Journal of Mechanical Design (2024); TORQUE 2022]{.tl-venue}](projects/wind-hydrogen.qmd){.tl-row}
+[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/wind-hydrogen.svg)"}]{.pr-thumb}[[Co-located wind and hydrogen energy systems]{.pr-title}[Journal of Mechanical Design (2024); TORQUE 2022]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/wind-hydrogen.qmd){.pr-row}
 
-[[Co-located solar and hydrogen plants]{.tl-title} [European Energy Market Conference (EEM 2023)]{.tl-venue}](projects/solar-hydrogen.qmd){.tl-row}
+[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/solar-hydrogen.svg)"}]{.pr-thumb}[[Co-located solar and hydrogen plants]{.pr-title}[European Energy Market Conference (EEM 2023)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/solar-hydrogen.qmd){.pr-row}
 
-[[Intelligent operation and maintenance in offshore wind–hydrogen systems]{.tl-title} [TORQUE 2024]{.tl-venue}](projects/offshore-wind-hydrogen-om.qmd){.tl-row}
+[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/offshore-wind-hydrogen-om.svg)"}]{.pr-thumb}[[Intelligent operation and maintenance in offshore wind–hydrogen systems]{.pr-title}[TORQUE 2024]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/offshore-wind-hydrogen-om.qmd){.pr-row}
 :::
 :::
 
-::: {.theme-section .theme-carbon}
-::: {.ts-head}
-[03]{.ts-num}
-
+<!-- ============ 03 Carbon-aware grid operation ============ -->
+::: {.tb .theme-carbon}
+::: {.tb-panel}
 ## Carbon-aware grid operation {#carbon-aware-grid-operation}
+
+::: {.tb-top}
+[<i class="bi bi-globe-americas" aria-hidden="true"></i>]{.tb-icon} [Theme 03]{.tb-num}
+:::
 
 Re-timing electricity use with hourly grid emission intensity.
 :::
 
-::: {.ts-links}
-[[Emission-intensity-informed load regulation for grid decarbonization]{.tl-title} [Cell Reports Sustainability (2025)]{.tl-venue}](projects/ghg.qmd){.tl-row}
+::: {.tb-list}
+[[<i class="bi bi-globe-americas" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/ghg.svg)"}]{.pr-thumb}[[Emission-intensity-informed load regulation for grid decarbonization]{.pr-title}[Cell Reports Sustainability (2025)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/ghg.qmd){.pr-row}
 :::
 :::
 
-::: {.theme-section .theme-microgrid}
-::: {.ts-head}
-[04]{.ts-num}
-
+<!-- ============ 04 Supply chains with on-site microgrids ============ -->
+::: {.tb .theme-microgrid}
+::: {.tb-panel}
 ## Supply chains with on-site microgrids {#supply-chains-with-on-site-microgrids}
+
+::: {.tb-top}
+[<i class="bi bi-diagram-3" aria-hidden="true"></i>]{.tb-icon} [Theme 04]{.tb-num}
+:::
 
 This theme began in my M.S. research and covers joint siting of facilities and microgrids, transactive energy, and reliability.
 :::
 
-::: {.ts-links}
-[[Supply chains with on-site microgrids and transactive energy]{.tl-title} [Applied Mathematical Modelling (2023); IEEE SEGRE 2023; Journal of the Operational Research Society (2022)]{.tl-venue}](projects/facility-microgrid-location.qmd){.tl-row}
+::: {.tb-list}
+[[<i class="bi bi-diagram-3" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/facility-microgrid-location.svg)"}]{.pr-thumb}[[Supply chains with on-site microgrids and transactive energy]{.pr-title}[Applied Mathematical Modelling (2023); IEEE SEGRE 2023; Journal of the Operational Research Society (2022)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/facility-microgrid-location.qmd){.pr-row}
 :::
 :::
 
-::: {.theme-section .theme-wind}
-::: {.ts-head}
-[05]{.ts-num}
-
+<!-- ============ 05 Wind power uncertainty ============ -->
+::: {.tb .theme-wind}
+::: {.tb-panel}
 ## Wind power uncertainty {#wind-power-uncertainty}
+
+::: {.tb-top}
+[<i class="bi bi-wind" aria-hidden="true"></i>]{.tb-icon} [Theme 05]{.tb-num}
+:::
 
 Multi-fidelity Gaussian processes for probabilistic wind farm power curves.
 :::
 
-::: {.ts-links}
-[[Multi-fidelity Gaussian processes for wind power curves]{.tl-title} [ASME IDETC 2023]{.tl-venue}](projects/uq-mfgpr.qmd){.tl-row}
+::: {.tb-list}
+[[<i class="bi bi-wind" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/uq-mfgpr.svg)"}]{.pr-thumb}[[Multi-fidelity Gaussian processes for wind power curves]{.pr-title}[ASME IDETC 2023]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/uq-mfgpr.qmd){.pr-row}
 :::
 :::
 
-::: {.theme-section .methods-section}
-::: {.ts-head}
-[Toolkit]{.ts-num}
-
-## Methods {#methods}
+<!-- ============ Methods and toolkit ============ -->
+::: {.fx-sec .rs-methods}
+::: {.fx-head}
+## Methods and toolkit {#methods}
 
 The methods I use across these themes are:
 :::
 
-::: {.method-list}
-- Linear, mixed-integer and stochastic optimization (Pyomo, AMPL, Gurobi)
-- Techno-economic analysis: discounted cash flow, levelized costs, tax-credit modeling
-- Life-cycle and carbon accounting
-- Discrete-event and Monte Carlo simulation
-- Gaussian-process and machine-learning surrogates
+::: {.method-grid}
+::: {.method}
+[<i class="bi bi-bounding-box-circles" aria-hidden="true"></i>]{.m-icon}
+
+[Optimization]{.m-title}
+
+Linear, mixed-integer and stochastic optimization
+
+[Pyomo]{.chip} [AMPL]{.chip} [Gurobi]{.chip}
+:::
+
+::: {.method}
+[<i class="bi bi-cash-coin" aria-hidden="true"></i>]{.m-icon}
+
+[Techno-economic analysis]{.m-title}
+
+Discounted cash flow, levelized costs, tax-credit modeling
+:::
+
+::: {.method}
+[<i class="bi bi-recycle" aria-hidden="true"></i>]{.m-icon}
+
+[Carbon accounting]{.m-title}
+
+Life-cycle and carbon accounting
+:::
+
+::: {.method}
+[<i class="bi bi-shuffle" aria-hidden="true"></i>]{.m-icon}
+
+[Simulation]{.m-title}
+
+Discrete-event and Monte Carlo simulation
+:::
+
+::: {.method}
+[<i class="bi bi-bezier2" aria-hidden="true"></i>]{.m-icon}
+
+[Surrogate models]{.m-title}
+
+Gaussian-process and machine-learning surrogates
+:::
+
+[[<i class="bi bi-github" aria-hidden="true"></i>]{.m-icon}[Open model frameworks]{.m-title}[Six documented, runnable frameworks that accompany the papers.]{.m-text}[Software <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.m-more}](software-data.qmd){.method .method-link}
 :::
 :::

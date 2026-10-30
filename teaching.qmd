@@ -4,37 +4,169 @@ subtitle: "Courses, teaching assistantships and mentoring"
 title-block-banner: true
 page-layout: full
 toc: false
-body-classes: "page-inner page-teaching"
+body-classes: "page-inner page-folio page-teaching"
 ---
 
-<!-- One row per topic: heading on the left, content on the right, separated by thin rules (styles.css .row-section). -->
+<!-- Teaching page (third redesign, 2026-10-30; styles in assets/pages.css).
+     Instruction (course card), teaching assistant roles (two cards), mentoring (timeline, from the CV's Mentoring
+     Experience) and planned teaching materials (tiles). -->
 
-::: {.row-section}
-## Instruction
-
-- **ECE 685 Power Systems Design**, Kansas State University, Fall 2026: Instructor.
+::: {.fx-sec .tc-first}
+::: {.fx-head}
+## Instruction {#instruction}
 :::
 
-::: {.row-section}
-## Teaching assistant
-
-- **Engineering Optimization; Numerical Methods**, The University of Texas at Dallas, Fall 2022.
-- **Probability & Statistics; Operations Research**, Texas State University, 2019–2021.
+::: {.course}
+::: {.course-code}
+[ECE]{.cc-dept}
+[685]{.cc-num}
 :::
 
-::: {.row-section}
-## Mentoring
+::: {.course-body}
+[Course]{.label}
 
-- Mentored undergraduate researchers at The University of Texas at Dallas, 2022–2025, including through the Research Experience for Undergraduates (REU) program. Their projects covered techno-economic analysis of renewable and hydrogen systems.
+### Power Systems Design
+
+::: {.course-meta}
+[<i class="bi bi-building" aria-hidden="true"></i> Kansas State University]{.cm}
+[<i class="bi bi-lightning-charge" aria-hidden="true"></i> Electrical and Computer Engineering]{.cm}
+[<i class="bi bi-calendar3" aria-hidden="true"></i> Fall 2026]{.cm}
+[<i class="bi bi-person-video3" aria-hidden="true"></i> Instructor]{.cm}
+:::
+:::
+:::
 :::
 
-::: {.row-section}
-## Teaching materials
+::: {.fx-sec}
+::: {.fx-head}
+## Teaching assistant {#teaching-assistant}
+:::
+
+::: {.ta-grid}
+::: {.ta}
+[<i class="bi bi-mortarboard" aria-hidden="true"></i>]{.ta-icon}
+
+::: {.ta-body}
+### The University of Texas at Dallas
+
+[Fall 2022]{.ta-when}
+
+[Engineering Optimization]{.chip} [Numerical Methods]{.chip}
+:::
+:::
+
+::: {.ta}
+[<i class="bi bi-mortarboard" aria-hidden="true"></i>]{.ta-icon}
+
+::: {.ta-body}
+### Texas State University
+
+[2019–2021]{.ta-when}
+
+[Probability & Statistics]{.chip} [Operations Research]{.chip}
+:::
+:::
+:::
+:::
+
+::: {.fx-sec}
+::: {.fx-head}
+## Mentoring {#mentoring}
+
+Mentored undergraduate researchers at The University of Texas at Dallas, 2022–2025, including through the Research Experience for Undergraduates (REU) program. Their projects covered techno-economic analysis of renewable and hydrogen systems.
+:::
+
+::: {.tl}
+::: {.tl-item}
+[Summer 2022]{.tl-when}
+
+::: {.tl-body}
+[Undergraduate student **Mirabella Herrera** (UT-Dallas)]{.tl-who} [REU]{.tl-tag}
+
+Techno-economic analysis of co-located wind and green hydrogen systems.
+:::
+:::
+
+::: {.tl-item}
+[Summer 2022]{.tl-when}
+
+::: {.tl-body}
+[High school student]{.tl-who} [TAST STEM Summer Research Program]{.tl-tag}
+
+Co-advised, focusing on techno-economic analysis modeling.
+:::
+:::
+
+::: {.tl-item}
+[Summer 2023]{.tl-when}
+
+::: {.tl-body}
+[Undergraduate student **Jonathon Matutes** (University of Indianapolis)]{.tl-who} [REU]{.tl-tag}
+
+Techno-economic analysis of potential offshore wind energy development along the northeastern US coast.
+:::
+:::
+
+::: {.tl-item}
+[Summer 2024]{.tl-when}
+
+::: {.tl-body}
+[Undergraduate student **Zaina Anarwala** (UIUC)]{.tl-who} [REU]{.tl-tag}
+
+Techno-economic analysis of potential offshore wind energy development in the US Gulf of Mexico.
+:::
+:::
+
+::: {.tl-item}
+[Spring 2025]{.tl-when}
+
+::: {.tl-body}
+[Undergraduate student **Kevin Sun** (UT-Dallas)]{.tl-who}
+
+A research project focused on techno-economic analysis of nuclear and hydrogen systems.
+:::
+:::
+:::
+:::
+
+::: {.fx-sec}
+::: {.fx-head}
+## Teaching materials {#teaching-materials}
 
 Open teaching modules built on my research are in preparation. Planned topics:
+:::
 
-- energy-system optimization with open solvers;
-- techno-economic analysis of hydrogen systems;
-- carbon-aware load scheduling;
-- facility and microgrid co-siting.
+::: {.mods}
+::: {.mod .theme-wind}
+[<i class="bi bi-bounding-box-circles" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
+
+[Energy-system optimization with open solvers]{.mod-title}
+
+[Related: open model frameworks](software-data.qmd){.mod-link}
+:::
+
+::: {.mod .theme-hydrogen}
+[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
+
+[Techno-economic analysis of hydrogen systems]{.mod-title}
+
+[Related: hydrogen-integrated energy systems](research.qmd#hydrogen-integrated-energy-systems){.mod-link}
+:::
+
+::: {.mod .theme-carbon}
+[<i class="bi bi-globe-americas" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
+
+[Carbon-aware load scheduling]{.mod-title}
+
+[Related: carbon-aware grid operation](research.qmd#carbon-aware-grid-operation){.mod-link}
+:::
+
+::: {.mod .theme-microgrid}
+[<i class="bi bi-diagram-3" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
+
+[Facility and microgrid co-siting]{.mod-title}
+
+[Related: supply chains with on-site microgrids](research.qmd#supply-chains-with-on-site-microgrids){.mod-link}
+:::
+:::
 :::

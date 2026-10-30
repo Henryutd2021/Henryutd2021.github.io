@@ -25,7 +25,7 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: About
       - href: research.qmd
         text: Research
       - href: projects.qmd
@@ -33,7 +33,7 @@ website:
       - href: publications.qmd
         text: Publications
       - href: software-data.qmd
-        text: Software & Data
+        text: Software
       - href: teaching.qmd
         text: Teaching
       - href: cv.qmd
@@ -49,18 +49,20 @@ website:
         href: https://www.linkedin.com/in/honglin-li-998b18221/
         aria-label: LinkedIn
   page-footer:
-    left: "© 2026 Honglin Li · [hlli@ksu.edu](mailto:hlli@ksu.edu)"
-    right: "Built with [Quarto](https://quarto.org)"
+    left: "© 2026 Honglin Li · Kansas State University · [hlli@ksu.edu](mailto:hlli@ksu.edu)"
+    right: "Last updated: October 2026 · Built with [Quarto](https://quarto.org)"
 
 format:
   html:
-    # one light theme (2026-10-30, second redesign: simple and calm); design tokens in assets/base.css
-    theme: [cosmo, theme.scss]
-    css: [assets/base.css, styles.css, assets/home.css]
+    # day theme by default, night theme via the navbar toggle (third redesign, 2026-10-30); tokens in assets/base.css
+    theme:
+      light: [cosmo, theme-light.scss]
+      dark: [darkly, theme-dark.scss]
+    css: [assets/base.css, assets/home.css, assets/pubs.css, assets/pages.css]
     include-in-header:
       text: |
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
-        <meta name="theme-color" content="#fbfaf7">
+        <meta name="theme-color" content="#ffffff">
     include-after-body: [assets/site-js.html, assets/pages-js.html, assets/home-js.html]   # inline JS (written by scripts/build_site.py from assets/*.js)
-    toc: true
-    smooth-scroll: false   # native CSS smooth scrolling, off under reduced motion or 'Pause motion'
+    toc: false
+    smooth-scroll: false

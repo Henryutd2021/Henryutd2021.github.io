@@ -4,85 +4,278 @@ subtitle: "Open model frameworks"
 title-block-banner: true
 page-layout: full
 toc: false
-body-classes: "page-inner page-software"
+body-classes: "page-inner page-folio page-software"
 ---
 
-::: {.page-lede}
+<!-- Software page (third redesign, 2026-10-30; styles in assets/pages.css).
+     Intro, a strip with what every repository contains, one card per repository (in the order of the research
+     themes), and the data-availability note. Facts per card are taken from the repository README
+     (model type, the papers it accompanies, the Python packages and solvers it uses). -->
+
+::: {.rs-intro .sw-intro}
+::: {.rs-lede}
 Documented model frameworks associated with published and accepted research. Each repository gives the model formulation with references to the source equations, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic data and tests.
+
+::: {.sw-cta}
+[<i class="bi bi-github" aria-hidden="true"></i> All repositories on GitHub](https://github.com/Henryutd2021){.btn-solid}
+[Research themes <i class="bi bi-arrow-right" aria-hidden="true"></i>](research.qmd){.btn-outline}
+:::
 :::
 
-::: {.feature-list}
-- Model formulation
-- Data pipeline and input formats
-- Runnable implementation
-- Synthetic examples and tests
+::: {.sw-facts}
+[6]{.sf-n}[framework repositories]{.sf-l}
+
+[Python]{.sf-n}[3.10 or later, pip or conda]{.sf-l}
+
+[HiGHS]{.sf-n}[open solver by default for the optimization models; Gurobi optional]{.sf-l}
+:::
 :::
 
-<!-- One quiet card per repository: theme marker and label, the model in one line, the paper(s) it accompanies,
-     and the repository link. theme-<key> sets the marker colour (assets/base.css). -->
+::: {.fx-sec}
+::: {.fx-head}
+## What every repository contains {#contents}
+:::
+
+::: {.contains}
+::: {.ct}
+[<i class="bi bi-journal-text" aria-hidden="true"></i>]{.ct-icon}
+
+[Formulation]{.ct-title}
+
+The mathematics, keyed to the article's equation numbers.
+:::
+
+::: {.ct}
+[<i class="bi bi-database" aria-hidden="true"></i>]{.ct-icon}
+
+[Data pipeline]{.ct-title}
+
+How each input is prepared, and the input file formats.
+:::
+
+::: {.ct}
+[<i class="bi bi-terminal" aria-hidden="true"></i>]{.ct-icon}
+
+[Implementation]{.ct-title}
+
+A Python package with a command line.
+:::
+
+::: {.ct}
+[<i class="bi bi-play-circle" aria-hidden="true"></i>]{.ct-icon}
+
+[Examples]{.ct-title}
+
+Runnable examples on synthetic or illustrative data.
+:::
+
+::: {.ct}
+[<i class="bi bi-check2-circle" aria-hidden="true"></i>]{.ct-icon}
+
+[Tests]{.ct-title}
+
+A pytest suite, run with one command after installation.
+:::
+
+::: {.ct}
+[<i class="bi bi-unlock" aria-hidden="true"></i>]{.ct-icon}
+
+[Open licences]{.ct-title}
+
+MIT for code, CC BY 4.0 for documentation; citation metadata in CITATION.cff.
+:::
+:::
+:::
+
+::: {.fx-sec}
+::: {.fx-head}
+## Repositories {#repositories}
+
+One repository per framework, each with the paper or papers it accompanies.
+:::
 
 ::: {.repo-grid}
-::: {.repo-card .theme-hydrogen}
-[Hydrogen systems]{.rc-theme}
 
-## Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport
-
-[Accompanies]{.rc-label} International Journal of Hydrogen Energy (2025)
-
-[<i class="bi bi-github" aria-hidden="true"></i> txh2-ercot-hydrogen](https://github.com/Henryutd2021/txh2-ercot-hydrogen){.rc-link}
+<!-- CoDE -->
+::: {.repo .theme-datacenter}
+::: {.repo-top}
+[<i class="bi bi-cpu" aria-hidden="true"></i>]{.repo-icon} [Nuclear & data centers]{.repo-theme} [Multi-account cost framework]{.repo-type}
 :::
 
-::: {.repo-card .theme-carbon}
-[Carbon-aware grid]{.rc-theme}
+### CoDE framework
 
-## Demand-side load regulation guided by real-time emission intensity
+[Henryutd2021/code-delayed-energization]{.repo-slug}
 
-[Accompanies]{.rc-label} Cell Reports Sustainability (2025)
+The cost of delayed energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.
 
-[<i class="bi bi-github" aria-hidden="true"></i> ghg-load-regulation](https://github.com/Henryutd2021/ghg-load-regulation){.rc-link}
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [IEEE NAPS 2026 (accepted)](projects/data-center-delay-economics.qmd)
 :::
 
-::: {.repo-card .theme-microgrid}
-[Microgrids & supply chains]{.rc-theme}
-
-## Supply-chain facility location with on-site microgrids; virtual power plant scheduling
-
-[Accompanies]{.rc-label} Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021)
-
-[<i class="bi bi-github" aria-hidden="true"></i> supply-chain-microgrid-models](https://github.com/Henryutd2021/supply-chain-microgrid-models){.rc-link}
+::: {.repo-tools}
+[Python]{.chip} [NumPy]{.chip} [pandas]{.chip}
 :::
 
-::: {.repo-card .theme-wind}
-[Wind uncertainty]{.rc-theme}
-
-## Multi-fidelity Gaussian process regression for probabilistic wind power curves
-
-[Accompanies]{.rc-label} ASME IDETC 2023
-
-[<i class="bi bi-github" aria-hidden="true"></i> mfgpr-wind-power-curve](https://github.com/Henryutd2021/mfgpr-wind-power-curve){.rc-link}
-:::
-
-::: {.repo-card .theme-hydrogen}
-[Hydrogen systems]{.rc-theme}
-
-## Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells (REopt-type MILP, with a concentrated-solar option)
-
-[Accompanies]{.rc-label} Journal of Mechanical Design (2024); TORQUE 2022; IEEE EEM 2023; TORQUE 2024
-
-[<i class="bi bi-github" aria-hidden="true"></i> reopt-hydrogen-framework](https://github.com/Henryutd2021/reopt-hydrogen-framework){.rc-link}
-:::
-
-::: {.repo-card .theme-datacenter}
-[Nuclear & data centers]{.rc-theme}
-
-## Cost of delayed energization for AI data centers: developer, ratepayer and social accounts
-
-[Accompanies]{.rc-label} IEEE NAPS 2026 (accepted)
-
-[<i class="bi bi-github" aria-hidden="true"></i> code-delayed-energization](https://github.com/Henryutd2021/code-delayed-energization){.rc-link}
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/code-delayed-energization){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/code-delayed-energization/blob/main/docs/formulation.md){.btn-quiet}
 :::
 :::
 
-::: {.page-note}
-For the data and code of individual studies, see each paper's data availability statement.
+<!-- TXH2 -->
+::: {.repo .theme-hydrogen}
+::: {.repo-top}
+[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.repo-icon} [Hydrogen systems]{.repo-theme} [Two-stage stochastic LP]{.repo-type}
+:::
+
+### TXH2 framework
+
+[Henryutd2021/txh2-ercot-hydrogen]{.repo-slug}
+
+Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport, under uncertain renewable build-out and electricity demand.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [International Journal of Hydrogen Energy (2025)](projects/txh2.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [linopy]{.chip} [HiGHS]{.chip} [Gurobi (optional)]{.chip .chip-opt}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/txh2-ercot-hydrogen){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
+
+<!-- REopt hydrogen -->
+::: {.repo .theme-hydrogen}
+::: {.repo-top}
+[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.repo-icon} [Hydrogen systems]{.repo-theme} [MILP]{.repo-type}
+:::
+
+### REopt hydrogen framework
+
+[Henryutd2021/reopt-hydrogen-framework]{.repo-slug}
+
+Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells: a REopt-type MILP, with a concentrated-solar option.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [Journal of Mechanical Design (2024); TORQUE 2022](projects/wind-hydrogen.qmd)
+- [IEEE EEM 2023](projects/solar-hydrogen.qmd)
+- [TORQUE 2024](projects/offshore-wind-hydrogen-om.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [linopy]{.chip} [HiGHS]{.chip} [Gurobi (optional)]{.chip .chip-opt}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/reopt-hydrogen-framework){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
+
+<!-- GHG -->
+::: {.repo .theme-carbon}
+::: {.repo-top}
+[<i class="bi bi-globe-americas" aria-hidden="true"></i>]{.repo-icon} [Carbon-aware grid]{.repo-theme} [MILP]{.repo-type}
+:::
+
+### GHG load-regulation framework
+
+[Henryutd2021/ghg-load-regulation]{.repo-slug}
+
+Demand-side load regulation guided by real-time emission intensity, with a classification of grid regions by renewable penetration, generation diversity and emission-intensity fluctuation.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [Cell Reports Sustainability (2025)](projects/ghg.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [linopy]{.chip} [HiGHS]{.chip} [Gurobi (optional)]{.chip .chip-opt}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/ghg-load-regulation){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/ghg-load-regulation/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
+
+<!-- Supply chains with on-site microgrids -->
+::: {.repo .theme-microgrid}
+::: {.repo-top}
+[<i class="bi bi-diagram-3" aria-hidden="true"></i>]{.repo-icon} [Microgrids & supply chains]{.repo-theme} [MILP and LP models]{.repo-type}
+:::
+
+### Supply chains with on-site microgrids
+
+[Henryutd2021/supply-chain-microgrid-models]{.repo-slug}
+
+Supply-chain facility location with on-site microgrids; virtual power plant scheduling in the day-ahead and intraday markets.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [Applied Mathematical Modelling (2023); IEEE SEGRE 2023](projects/facility-microgrid-location.qmd)
+- [M.S. thesis (2021)](https://hdl.handle.net/10877/17829)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [Pyomo]{.chip} [HiGHS]{.chip} [Gurobi (optional)]{.chip .chip-opt}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/supply-chain-microgrid-models){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/supply-chain-microgrid-models/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
+
+<!-- MF-GPR -->
+::: {.repo .theme-wind}
+::: {.repo-top}
+[<i class="bi bi-wind" aria-hidden="true"></i>]{.repo-icon} [Wind uncertainty]{.repo-theme} [Gaussian processes]{.repo-type}
+:::
+
+### MF-GPR framework
+
+[Henryutd2021/mfgpr-wind-power-curve]{.repo-slug}
+
+Multi-fidelity Gaussian process regression for probabilistic wind power curves, fusing the theoretical curve of the turbine type with measured operating records.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [ASME IDETC 2023](projects/uq-mfgpr.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [NumPy]{.chip} [SciPy]{.chip} [pandas]{.chip}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/mfgpr-wind-power-curve){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Method](https://github.com/Henryutd2021/mfgpr-wind-power-curve/blob/main/docs/method.md){.btn-quiet}
+:::
+:::
+
+:::
+:::
+
+::: {.data-note}
+[<i class="bi bi-info-circle" aria-hidden="true"></i>]{.dn-icon}
+
+::: {.dn-body}
+[Data availability]{.dn-title}
+
+The repositories present the modelling frameworks. They do not contain the code, the input data or the results used for the published articles. For the data and code of individual studies, see each paper's data availability statement.
+:::
 :::

@@ -4,17 +4,392 @@ subtitle: "Curriculum vitae"
 title-block-banner: true
 page-layout: full
 toc: false
-body-classes: "page-inner page-cv"
+anchor-sections: false
+body-classes: "page-inner page-folio page-cv"
 ---
+
+<!-- CV page (third redesign, 2026-10-30; styles in assets/pages.css).
+     Transcribed from the public web CV (the PDF in files/): Education, Academic Experience, Internships,
+     Work Experience, Mentoring Experience, Grant Writing Experience, Skills, Conference Presentations and
+     Reviews of Manuscripts. The PDF also has the summary, research projects and publications (linked at the end).
+     Keep this page and the PDF in step when the CV changes. -->
+
+::: {.cv-top}
+::: {.cv-id}
+[Honglin Li, Ph.D.]{.cv-name}
+
+[Postdoctoral Fellow, Department of Electrical and Computer Engineering, Kansas State University]{.cv-pos}
+
+::: {.cv-contact}
+[<i class="bi bi-envelope" aria-hidden="true"></i> hlli@ksu.edu](mailto:hlli@ksu.edu)
+[<i class="bi bi-linkedin" aria-hidden="true"></i> Honglin Li](https://www.linkedin.com/in/honglin-li-998b18221/)
+[<i class="bi bi-github" aria-hidden="true"></i> Henryutd2021](https://github.com/Henryutd2021)
+:::
+:::
 
 ::: {.cv-actions}
 [<i class="bi bi-download" aria-hidden="true"></i> Download CV (PDF)](files/Honglin_Li_CV.pdf){.btn-solid}
+[or view it on this page](#cv-pdf){.cv-viewlink}
+:::
+:::
+
+::: {.cv-layout}
+::: {.cv-side role="navigation" aria-label="CV sections"}
+[On this page]{.label}
+
+[<i class="bi bi-mortarboard" aria-hidden="true"></i> Education](#education)
+[<i class="bi bi-building" aria-hidden="true"></i> Academic experience](#academic-experience)
+[<i class="bi bi-lightning-charge" aria-hidden="true"></i> Internships](#internships)
+[<i class="bi bi-briefcase" aria-hidden="true"></i> Work experience](#work-experience)
+[<i class="bi bi-people" aria-hidden="true"></i> Mentoring](#mentoring-experience)
+[<i class="bi bi-award" aria-hidden="true"></i> Grant writing](#grant-writing-experience)
+[<i class="bi bi-sliders" aria-hidden="true"></i> Skills](#skills)
+[<i class="bi bi-easel" aria-hidden="true"></i> Presentations](#conference-presentations)
+[<i class="bi bi-journal-check" aria-hidden="true"></i> Reviews](#reviews-of-manuscripts)
+:::
+
+::: {.cv-main}
+
+<!-- ============ Education ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-mortarboard" aria-hidden="true"></i>]{.cv-ico}
+
+## Education {#education}
+:::
+
+::: {.cv-item}
+[2021 – 2025]{.cv-date}
+
+::: {.cv-body}
+### Ph.D. (Mechanical Engineering)
+
+[**The University of Texas at Dallas**]{.cv-org}
+
+[Dissertation: *Techno-Economic Analysis of Hydrogen-Integrated Sustainable Energy Systems*]{.cv-detail}
+:::
+:::
+
+::: {.cv-item}
+[2019 – 2021]{.cv-date}
+
+::: {.cv-body}
+### M.S. in Engineering (Industrial Engineering)
+
+[**Texas State University**]{.cv-org}
+
+[Thesis: *Planning Virtual Power Plants for Smart Factories and Industry 4.0 with Renewable and Thermal Cogeneration*]{.cv-detail}
+:::
+:::
+
+::: {.cv-item}
+[2016 – 2018]{.cv-date}
+
+::: {.cv-body}
+### M.E. in Computer Engineering
+
+[**Dalian Maritime University**]{.cv-org}
+
+[*Focus: Machine Learning*]{.cv-detail}
+:::
+:::
+:::
+
+<!-- ============ Academic Experience ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-building" aria-hidden="true"></i>]{.cv-ico}
+
+## Academic Experience {#academic-experience}
+:::
+
+::: {.cv-item}
+[Apr 2026 – present]{.cv-date}
+
+::: {.cv-body}
+### [Kansas State University](https://www.k-state.edu/)
+
+::: {.cv-roles}
+[[**Postdoctoral Fellow** · Department of Electrical and Computer Engineering]{.cv-r}]{.cv-role}
+[[**Instructor** · ECE 685 Power Systems Design]{.cv-r}[Fall 2026]{.cv-when}]{.cv-role}
+:::
+
+- Leading techno-economic and optimization research on small modular reactor (SMR)-powered data centers, quantifying colocation economics, delayed grid energization, and alternative grid-coupling architectures under load and market uncertainty.
+- Developing system-level evaluation metrics and a multi-account cost framework spanning private, ratepayer, and social perspectives, extending prior nuclear–hydrogen–battery and carbon-aware scheduling work to AI-driven electricity demand growth.
+:::
+:::
+
+::: {.cv-item}
+[Sep 2025 – Apr 2026]{.cv-date}
+
+::: {.cv-body}
+### [University of Texas at Dallas](https://personal.utdallas.edu/~jiezhang/group.html)
+
+::: {.cv-roles}
+[[**Research Associate**]{.cv-r}]{.cv-role}
+:::
+
+- Led a techno-economic study of a BWRX-300 small modular reactor whose turbine-extracted steam drives absorption chillers, supplying a data center with both power and cooling; steam, cooling, and power were co-optimized hourly with ERCOT prices (first author, manuscript under review).
+- Mapped where SMR supply becomes competitive with grid supply, and how an output-based production credit shifts steam from cooling to generation.
+:::
+:::
+:::
+
+<!-- ============ Internships ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-lightning-charge" aria-hidden="true"></i>]{.cv-ico}
+
+## Internships {#internships}
+:::
+
+::: {.cv-item}
+[Feb 2025 – Aug 2025]{.cv-date}
+
+::: {.cv-body}
+### [Idaho National Laboratory (INL)](https://inl.gov/)
+
+- **Optimization of Hydrogen Integration in Nuclear Grid Services:** Developed an **optimization framework** using mathematical programming techniques to identify the most profitable deployment strategies for nuclear-powered hydrogen production. Integrated techno-economic analysis, historical market data (ISO prices), and policy incentives (45V tax credits) to maximize revenue from hydrogen sales and grid ancillary services; results published in *Nature Communications* (2026, first author).
+- **Techno-Economic Analysis of Non-Powered Dam Retrofits:** Contributed a pro-forma techno-economic module to an INL toolset for retrofitting U.S. non-powered dams with hydropower and battery storage; integration with floating PV was scoped in planning.
+:::
+:::
+
+::: {.cv-item}
+[Aug 2024 – Jan 2025]{.cv-date}
+
+::: {.cv-body}
+### [FM](https://www.fm.com/)
+
+- **Solar PV Microgrid Design Optimization:** Developed and implemented a techno-economic model incorporating **optimization techniques** to determine the optimal sizing of solar PV, battery storage, and backup generation for an industrial research campus microgrid. Minimized levelized cost of energy subject to meeting demand in modeled grid-outage scenarios, using a DOE reference load profile scaled to the campus's annual consumption and site solar resource data.
+- **Lithium Battery Production Line Simulation and Bottleneck Optimization:** Built a discrete-event simulation model (Arena) of a lithium battery production line to quantify the economic impact of equipment failures and maintenance schedules. Identified production bottlenecks and analyzed potential improvements through simulation, implicitly informing optimization of maintenance and buffer strategies.
+- **Wind Farm Maintenance Strategy Optimization:** Proposed a research framework featuring an **optimization model** to determine the optimal predictive and corrective maintenance scheduling for wind farms. Aimed at balancing O&M costs, maximizing energy production (reducing downtime), and ensuring long-term asset reliability.
+:::
+:::
+:::
+
+<!-- ============ Work Experience ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-briefcase" aria-hidden="true"></i>]{.cv-ico}
+
+## Work Experience {#work-experience}
+:::
+
+::: {.cv-item}
+[2021 – 2024]{.cv-date}
+
+::: {.cv-body}
+### The University of Texas at Dallas
+
+::: {.cv-roles}
+[[Research Assistant (Focus: Energy System Optimization Modeling)]{.cv-r}[Aug 2021 – Aug 2024]{.cv-when}]{.cv-role}
+[[Teaching Assistant (Courses: Engineering Optimization, Numerical Methods)]{.cv-r}[Aug 2022 – Dec 2022]{.cv-when}]{.cv-role}
+:::
+
+- Conducted comprehensive techno-economic analyses of hydrogen-integrated sustainable energy systems.
+- Developed optimization-based techno-economic strategies for nuclear–renewable integrated systems.
+- Studied green hydrogen production and its integration with renewable and nuclear supply.
+:::
+:::
+
+::: {.cv-item}
+[2019 – 2021]{.cv-date}
+
+::: {.cv-body}
+### Texas State University
+
+::: {.cv-roles}
+[[Research Assistant (Focus: Operations Research in Energy/Manufacturing)]{.cv-r}[Aug 2019 – Jul 2021]{.cv-when}]{.cv-role}
+[[Teaching Assistant (Courses: Probability & Statistics, Operations Research)]{.cv-r}[Aug 2019 – Jul 2021]{.cv-when}]{.cv-role}
+:::
+:::
+:::
+
+::: {.cv-item}
+[2014 – 2019]{.cv-date}
+
+::: {.cv-body}
+### Shanghai Electric Power Construction Co., Ltd. (SEPC)
+
+::: {.cv-roles}
+[[Ipaye Power Plant Project, Ajebandele, Nigeria]{.cv-r}[Sep 2016 – Apr 2019]{.cv-when}]{.cv-role}
+[[Eritrea HIRGIGO Power Plant 2×23MW Extension Project, Shanghai, China]{.cv-r}[Nov 2015 – Sep 2016]{.cv-when}]{.cv-role}
+[[Phase I in 3×142MW Coal Fired Power Plant Project, Bali, Indonesia]{.cv-r}[Sep 2014 – Oct 2015]{.cv-when}]{.cv-role}
+:::
+:::
+:::
+:::
+
+<!-- ============ Mentoring Experience ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-people" aria-hidden="true"></i>]{.cv-ico}
+
+## Mentoring Experience {#mentoring-experience}
+:::
+
+::: {.cv-list}
+- [Summer 2022]{.cv-date} [Undergraduate student **Mirabella Herrera** (UT-Dallas)]{.cv-lt} [Mentored undergraduate researcher Mirabella through the Research Experience for Undergraduates (REU) program, focusing on techno-economic analysis of co-located wind and green hydrogen systems.]{.cv-ld}
+- [Summer 2022]{.cv-date} [High school student]{.cv-lt} [Co-advised a high school student in the TAST STEM Summer Research Program, focusing on techno-economic analysis modeling.]{.cv-ld}
+- [Summer 2023]{.cv-date} [Undergraduate student **Jonathon Matutes** (University of Indianapolis)]{.cv-lt} [Mentored undergraduate researcher Jonathon Matutes through the REU program, focusing on techno-economic analysis of potential offshore wind energy development along the northeastern US coast.]{.cv-ld}
+- [Summer 2024]{.cv-date} [Undergraduate student **Zaina Anarwala** (UIUC)]{.cv-lt} [Mentored undergraduate researcher Zaina through the REU program, focusing on techno-economic analysis of potential offshore wind energy development in the US Gulf of Mexico.]{.cv-ld}
+- [Spring 2025]{.cv-date} [Undergraduate student **Kevin Sun** (UT-Dallas)]{.cv-lt} [Mentored Kevin on a research project focused on techno-economic analysis of nuclear and hydrogen systems.]{.cv-ld}
+:::
+:::
+
+<!-- ============ Grant Writing Experience ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-award" aria-hidden="true"></i>]{.cv-ico}
+
+## Grant Writing Experience {#grant-writing-experience}
+:::
+
+::: {.cv-list}
+- [2026]{.cv-date} [**K-State Secure Energy Initiative (SEI) Seed Grant Proposal: Secure Power for Kansas Data Centers: Socio-Techno-Economic Pathways for SMR Deployment and Grid Integration**]{.cv-lt} [Co-PI; under review.]{.cv-ld}
+- [2024 – 2025]{.cv-date} [**NSF INTERN supplement (funded)**]{.cv-lt} [Helped prepare a funded NSF INTERN supplement (**\$55,000**; PI Prof. Jie Zhang) that supported my nuclear–hydrogen research at Idaho National Laboratory.]{.cv-ld}
+:::
+:::
+
+<!-- ============ Skills ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-sliders" aria-hidden="true"></i>]{.cv-ico}
+
+## Skills {#skills}
+:::
+
+::: {.cv-skills}
+Optimization Techniques
+:   Linear Programming (LP), Mixed-Integer Linear Programming (MILP), Non-Linear Programming (NLP), Stochastic Programming, Dynamic Programming, Constraint Programming Basics.
+
+Optimization Software
+:   Solvers: **Gurobi**, **CPLEX**, **SCIP**; Modeling Languages: **AMPL**, **Pyomo** (Python), **JuMP** (Julia), **GAMS**.
+
+Programming & Data Analysis
+:   **Python** (Pandas, NumPy, SciPy, Matplotlib, Scikit-learn, Pyomo), **SQL**, **MATLAB**, **R**, **Julia**.
+
+Simulation
+:   Discrete-Event Simulation (**Arena**), Monte Carlo Methods, System Dynamics Modeling.
+
+Techno-Economic Analysis (TEA)
+:   LCOE/LCOH, NPV, IRR, Cash Flow Analysis, Sensitivity Analysis (applied for optimization model inputs & validation).
+
+Life-Cycle Assessment (LCA)
+:   Carbon Footprint Accounting, Integration with TEA.
+
+Machine Learning for OR
+:   Surrogate Modeling (Gaussian Processes), Uncertainty Quantification, Time Series Forecasting (LSTM).
+
+Domain Knowledge
+:   Renewable Energy Systems (Wind, Solar PV), Data Centers, Energy Storage (Battery, Hydrogen), Power Grid Operations & Ancillary Services, Electricity Markets (ERCOT, MISO basics), Carbon Neutrality Strategies, Manufacturing Systems.
+:::
+:::
+
+<!-- ============ Conference Presentations ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-easel" aria-hidden="true"></i>]{.cv-ico}
+
+## Conference Presentations {#conference-presentations}
+:::
+
+::: {.cv-list .cv-talks}
+- [Mar 10, 2021]{.cv-date} [*Power Demand Prediction using LSTM Neural Network with Multiple Features*]{.cv-lt} [2021 International Research Conference]{.cv-ld}
+- [May 24, 2021]{.cv-date} [*Allocating microgrid for transactive energy operations in a multi-echelon manufacturing supply chain*]{.cv-lt} [Annual IISE Conference and Expo 2021]{.cv-ld}
+- [Jun 2, 2022]{.cv-date} [*Optimal Planning of Co-Located Wind Energy and Hydrogen Plants: A Techno-Economic Analysis*]{.cv-lt} [TORQUE 2022, Netherlands]{.cv-ld}
+- [Oct 17, 2022]{.cv-date} [*Redesign Supply Chain for Transactive Energy Operations in Manufacturing-Microgrid-Climate Nexus*]{.cv-lt} [Annual INFORMS Conference 2022]{.cv-ld}
+- [Aug 20, 2023]{.cv-date} [*A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation*]{.cv-lt} [ASME 2023 IDETC/CIE]{.cv-ld}
+- [Oct 31, 2023]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2023 Conference]{.cv-ld}
+- [Nov 1, 2024]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2024 Conference]{.cv-ld}
+:::
+:::
+
+<!-- ============ Reviews of Manuscripts ============ -->
+::: {.cv-sec}
+::: {.cv-head}
+[<i class="bi bi-journal-check" aria-hidden="true"></i>]{.cv-ico}
+
+## Reviews of Manuscripts {#reviews-of-manuscripts}
+:::
+
+::: {.cv-rev}
+[Journals]{.cv-rk}
+
+::: {.chips}
+[Applied Energy]{.chip}
+[Journal of Cleaner Production]{.chip}
+[Energy]{.chip}
+[International Journal of Hydrogen Energy]{.chip}
+[Journal of Mechanical Design]{.chip}
+[Journal of Energy Storage]{.chip}
+[Scientific Reports]{.chip}
+[Journal of Energy Engineering]{.chip}
+[Energy Conversion and Management: X]{.chip}
+[Sustainable Energy Technologies and Assessments]{.chip}
+[Journal of Electrical Engineering]{.chip}
+[Discover Sustainability]{.chip}
+[Sustainable Energy, Grids and Networks]{.chip}
+[International Journal of Electrical Power & Energy Systems]{.chip}
+[Journal of Thermal Analysis and Calorimetry]{.chip}
+[Next Energy]{.chip}
+[Sustainable Futures]{.chip}
+:::
+
+[Conferences]{.cv-rk}
+
+::: {.chips}
+[ASME-IDETC-2024]{.chip}
+[ASME-IDETC-2025]{.chip}
+[ASME-IDETC-2026]{.chip}
+[NAPS 2026]{.chip}
+:::
+:::
+:::
+
+::: {.cv-more}
+[<i class="bi bi-arrow-right-circle" aria-hidden="true"></i>]{.cv-ico}
+
+The PDF also lists research projects and publications. See [Projects](projects.qmd) and [Publications](publications.qmd).
 :::
 
 ```{=html}
-<div class="cv-shell">
-<object class="cv-frame" data="files/Honglin_Li_CV.pdf" type="application/pdf" aria-label="Curriculum vitae of Honglin Li">
-  <p>Your browser cannot display the PDF here. <a href="files/Honglin_Li_CV.pdf">Download the CV</a> instead.</p>
-</object>
-</div>
+<details class="cv-pdf" id="cv-pdf">
+  <summary><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Show the PDF version</summary>
+  <div class="cv-shell">
+    <object class="cv-frame" data="files/Honglin_Li_CV.pdf" type="application/pdf" aria-label="Curriculum vitae of Honglin Li (PDF)">
+      <p>Your browser cannot display the PDF here. <a href="files/Honglin_Li_CV.pdf">Download the CV</a> instead.</p>
+    </object>
+  </div>
+</details>
+<script>
+  (function () {
+    // open the PDF panel when the page is reached with #cv-pdf (the link under the download button)
+    var d = document.getElementById("cv-pdf");
+    function sync() { if (d && location.hash === "#cv-pdf") d.open = true; }
+    sync(); window.addEventListener("hashchange", sync);
+    // highlight the section in view in the side navigation
+    var links = Array.prototype.slice.call(document.querySelectorAll(".cv-side a[href^='#']"));
+    var pairs = links.map(function (a) {
+      var s = document.getElementById(a.getAttribute("href").slice(1));
+      return { a: a, card: s && s.closest(".cv-sec") };
+    }).filter(function (p) { return p.card; });
+    var ticking = false;
+    function spy() {
+      ticking = false;
+      var line = window.innerHeight * 0.3, cur = null;
+      pairs.forEach(function (p) { if (p.card.getBoundingClientRect().top <= line) cur = p; });
+      pairs.forEach(function (p) {
+        var on = p === cur;
+        p.a.classList.toggle("is-current", on);
+        if (on) p.a.setAttribute("aria-current", "location"); else p.a.removeAttribute("aria-current");
+      });
+    }
+    window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+    spy();
+  })();
+</script>
 ```
+
+:::
+:::
