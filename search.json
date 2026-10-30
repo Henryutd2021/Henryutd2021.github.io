@@ -88,7 +88,7 @@
     "href": "projects/txh2.html#method",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "Method",
-    "text": "Method\nTwo-stage stochastic mixed-integer program over ERCOT’s eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data."
+    "text": "Method\nTwo-stage stochastic linear program over ERCOT’s eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data."
   },
   {
     "objectID": "projects/txh2.html#key-findings",
@@ -550,7 +550,7 @@
     "href": "projects/uq-mfgpr.html#key-findings",
     "title": "Multi-fidelity Gaussian processes for wind power curves",
     "section": "Key findings",
-    "text": "Key findings\n\n\nAveraged over eight of nine tested turbines, nonlinear multi-fidelity regression reduced RMSE by 3.9% and MAE by 3.5%; one turbine was worse, and probabilistic criteria did not all favor it.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nOne dataset and one generic low-fidelity curve."
+    "text": "Key findings\n\n\nIn the reported test on nine turbines, nonlinear multi-fidelity regression lowered RMSE on eight of them (3.9% on average across the nine); the probabilistic criteria did not all favor it.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nOne dataset and one generic low-fidelity curve."
   },
   {
     "objectID": "projects/uq-mfgpr.html#outputs",
