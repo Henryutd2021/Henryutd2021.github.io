@@ -44,10 +44,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a8ed1fdfbcec6579b90b7ee144169e0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5a2e220ee884ec086c4730331a3a03e9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-d8bff2a3f9758368867dffeb723f7513.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -76,7 +76,7 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
-<meta name="theme-color" content="#070d18">
+<meta name="theme-color" content="#fbfaf7">
 
 
 <link rel="stylesheet" href="../assets/base.css">
@@ -88,7 +88,7 @@ ul.task-list li input[type="checkbox"] {
 <meta property="og:site_name" content="Honglin Li">
 </head>
 
-<body class="nav-fixed project-page theme-hydrogen quarto-light">
+<body class="nav-fixed page-inner project-page theme-hydrogen quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -196,21 +196,21 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="proj-layout">
 <div class="proj-main">
-<section id="research-question" class="level2 question-card">
+<section id="research-question" class="level2 proj-question">
 <h2 class="anchored" data-anchor-id="research-question">Research question</h2>
 <p>How much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?</p>
 </section>
-<div class="proj-cards">
-<section id="my-contribution" class="level2 info-card glow-card ic-contribution">
+<div class="proj-pair">
+<section id="my-contribution" class="level2 proj-col">
 <h2 class="anchored" data-anchor-id="my-contribution">My contribution</h2>
 <p>First author. Linked an operation-and-maintenance simulation developed with University of Strathclyde collaborators to the system techno-economic optimization.</p>
 </section>
-<section id="method" class="level2 info-card glow-card ic-method">
+<section id="method" class="level2 proj-col">
 <h2 class="anchored" data-anchor-id="method">Method</h2>
 <p>Two-stage approach: Monte Carlo operation-and-maintenance simulation, then techno-economic optimization for a Gulf of Mexico site supplying Houston-area refineries.</p>
 </section>
 </div>
-<section id="key-findings" class="level2">
+<section id="key-findings" class="level2 proj-findings">
 <h2 class="anchored" data-anchor-id="key-findings">Key findings</h2>
 <div class="findings">
 <ol type="1">
@@ -218,27 +218,21 @@ ul.task-list li input[type="checkbox"] {
 <li>At the system level, the levelized cost of hydrogen fell by about 2%.</li>
 </ol>
 </div>
-<div class="callout callout-style-default callout-note callout-titled" title="Boundary conditions">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Boundary conditions
-</div>
-</div>
-<div class="callout-body-container callout-body">
+</section>
+<section id="boundary-conditions" class="level2 proj-bounds">
+<h2 class="anchored" data-anchor-id="boundary-conditions">Boundary conditions</h2>
 <p>Single site and one weather year; maintenance parameters from the collaborators’ framework.</p>
-</div>
-</div>
 </section>
 </div>
 <div class="proj-aside">
-<section id="outputs" class="level2 aside-card outputs">
+<section id="outputs" class="level2 aside-block outputs">
 <h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
-<p><a href="https://doi.org/10.1088/1742-6596/2767/6/062016" class="out-link"><i class="bi bi-journal-text"></i> Paper (DOI)</a> <a href="https://github.com/Henryutd2021/reopt-hydrogen-framework" class="out-link"><i class="bi bi-github"></i> Model framework (GitHub)</a></p>
+<ul>
+<li><a href="https://doi.org/10.1088/1742-6596/2767/6/062016" class="out-link"><i class="bi bi-journal-text" aria-hidden="true"></i> Paper (DOI)</a></li>
+<li><a href="https://github.com/Henryutd2021/reopt-hydrogen-framework" class="out-link"><i class="bi bi-github" aria-hidden="true"></i> Model framework (GitHub)</a></li>
+</ul>
 </section>
-<section id="reproducibility" class="level2 aside-card repro">
+<section id="reproducibility" class="level2 aside-block repro">
 <h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
 <p>The system optimization follows the model framework on GitHub; the maintenance simulation belongs to the collaborators and is not public; study results archived privately. Last updated 2026-10.</p>
 </section>
@@ -249,15 +243,13 @@ ul.task-list li input[type="checkbox"] {
 
 </main> <!-- /main -->
 <script>
-// site.js — site-wide behaviour (2026-10-30 redesign): skip link, motion control ("Pause motion" switch and the
-// system reduced-motion setting, announced to other scripts as a "motionchange" event), navbar state, scroll
-// progress, reveal-on-scroll, cursor-following glow on .glow-card, and count-up numbers.
-// Everything degrades gracefully: without JS the page is complete and static.
+// site.js — site-wide behaviour (2026-10-30, second redesign: calm). Skip link, a thin shadow under the navbar
+// once the page scrolls, and a gentle one-time fade-in of content blocks. No continuous animation anywhere.
+// Without JS (or under reduced motion) every page is complete and static.
 (function () {
   const root = document.documentElement;
   const body = document.body;
-  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (document.querySelector(".hero-full")) body.classList.add("has-hero");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // skip link to the page's main landmark
   const main = document.querySelector("main");
@@ -268,157 +260,103 @@ ul.task-list li input[type="checkbox"] {
     body.insertBefore(skip, body.firstChild);
   }
 
-  // motion control: off when the system asks for reduced motion or the visitor pauses it
-  let paused = false;
-  try { paused = localStorage.getItem("motion-paused") === "1"; } catch (e) { /* storage unavailable */ }
-  const toggle = document.createElement("button");
-  toggle.type = "button"; toggle.className = "motion-toggle";
-  function motionOff() { return mq.matches || paused; }
-  function applyMotion() {
-    const off = motionOff();
-    root.classList.toggle("motion-off", off);
-    toggle.hidden = mq.matches;  // the system setting already stops motion
-    toggle.setAttribute("aria-pressed", paused ? "true" : "false");
-    toggle.innerHTML = paused ? '<i class="bi bi-play-fill" aria-hidden="true"></i><span>Play motion</span>'
-                              : '<i class="bi bi-pause-fill" aria-hidden="true"></i><span>Pause motion</span>';
-    if (off) document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
-    document.dispatchEvent(new CustomEvent("motionchange", { detail: { off: off } }));
-  }
-  toggle.addEventListener("click", function () {
-    paused = !paused;
-    try { localStorage.setItem("motion-paused", paused ? "1" : "0"); } catch (e) { /* storage unavailable */ }
-    applyMotion();
-  });
-  if (mq.addEventListener) mq.addEventListener("change", applyMotion); else if (mq.addListener) mq.addListener(applyMotion);
-  window.siteMotionOff = motionOff;
-  body.appendChild(toggle);
-
-  // navbar state and scroll progress
-  const bar = document.createElement("div");
-  bar.className = "scroll-progress";
-  body.appendChild(bar);
-  function onScroll() {
-    const y = window.scrollY;
-    body.classList.toggle("at-top", y < 24);
-    body.classList.toggle("scrolled", y >= 24);
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.setProperty("--p", max > 0 ? Math.min(1, y / max) : 0);
-  }
+  // navbar: thin shadow once scrolled
+  function onScroll() { body.classList.toggle("scrolled", window.scrollY > 8); }
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  // reveal on scroll: elements marked .reveal, plus common blocks of every page. Content is visible by default;
-  // it is hidden and animated in only once the observer is running (.js-reveal on <html>).
-  const auto = document.querySelectorAll(
-    "main .glow-card, main .pub-item, main .project-card, main .theme-section, main .findings li, main .reveal-auto > *");
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .pub-item, main .project-card, main .theme-section, main .reveal-auto > *");
   auto.forEach(function (el) { el.classList.add("reveal"); });
   const items = document.querySelectorAll(".reveal");
-  if (!motionOff() && "IntersectionObserver" in window) {
+  if (!reduce && "IntersectionObserver" in window) {
     root.classList.add("js-reveal");
     const io = new IntersectionObserver(function (entries) {
-      let n = 0;  // stagger siblings that enter together
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          if (!e.target.style.getPropertyValue("--i")) e.target.style.setProperty("--i", n++);
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
-      });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.06 });
     items.forEach(function (el) { io.observe(el); });
   } else {
     items.forEach(function (el) { el.classList.add("in"); });
   }
-
-  // cursor-following glow
-  document.addEventListener("pointermove", function (ev) {
-    const card = ev.target.closest && ev.target.closest(".glow-card");
-    if (!card) return;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty("--mx", (ev.clientX - r.left) + "px");
-    card.style.setProperty("--my", (ev.clientY - r.top) + "px");
-  }, { passive: true });
-
-  // count-up numbers: <span class="count-up" data-target="7">7</span>
-  const counters = document.querySelectorAll(".count-up[data-target]");
-  function run(el) {
-    const target = parseFloat(el.dataset.target), dur = 1400, t0 = performance.now();
-    function step(t) {
-      const k = motionOff() ? 1 : Math.min(1, (t - t0) / dur), eased = 1 - Math.pow(1 - k, 3);
-      el.textContent = Math.round(target * eased);
-      if (k < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  if (!motionOff() && "IntersectionObserver" in window) {
-    const co = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) { run(e.target); co.unobserve(e.target); } });
-    }, { threshold: 0.6 });
-    counters.forEach(function (el) { el.textContent = "0"; co.observe(el); });
-  }
-
-  applyMotion();
 })();
 </script>
 <script>
-// pages.js — inner-page behaviour (2026-10-30 redesign): project breadcrumb, theme filter on Projects,
-// type filter on Publications. Each feature runs only when its elements exist; without JS the pages are complete.
+// pages.js — inner-page behaviour (2026-10-30, second redesign: simple and calm).
+//   1. Project pages: a breadcrumb "Projects / <theme>" above the title (replaces the category label).
+//   2. Projects: text tabs that filter the cards by research theme.
+//   3. Publications: text tabs that filter the groups by type.
+// Each feature runs only when its elements exist. Without JS every page is complete; nothing here animates.
 (function () {
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // breadcrumb on project pages: Projects / <theme>
-  if (document.body.classList.contains("project-page")) {
-    const title = document.querySelector("#title-block-header .quarto-title");
-    const cat = document.querySelector("#title-block-header .quarto-category");
-    if (title && !title.querySelector(".crumbs")) {
-      const nav = document.createElement("nav");
-      nav.className = "crumbs";
-      nav.setAttribute("aria-label", "Breadcrumb");
-      const a = document.createElement("a");
-      a.href = "../projects.html";
-      a.textContent = "Projects";
-      const sep = document.createElement("span");
-      sep.setAttribute("aria-hidden", "true");
-      sep.textContent = "/";
-      const here = document.createElement("span");
-      here.className = "here";
-      here.setAttribute("aria-current", "page");
-      here.textContent = cat ? cat.textContent.trim() : "Project";
-      nav.append(a, sep, here);
-      title.prepend(nav);
-    }
+  // ---------- 1. breadcrumb on project pages ----------
+  const title = document.querySelector(".project-page #title-block-header .quarto-title");
+  if (title && !title.querySelector(".crumbs")) {
+    const cat = title.querySelector(".quarto-category");
+    const nav = document.createElement("nav");
+    nav.className = "crumbs";
+    nav.setAttribute("aria-label", "Breadcrumb");
+    const a = document.createElement("a");
+    a.href = "../projects.html";
+    a.textContent = "Projects";
+    const sep = document.createElement("span");
+    sep.className = "sep";
+    sep.setAttribute("aria-hidden", "true");
+    sep.textContent = "/";
+    const here = document.createElement("span");
+    here.className = "here";
+    here.textContent = cat ? cat.textContent.trim() : "Project";
+    nav.append(a, sep, here);
+    title.prepend(nav);
+    title.classList.add("has-crumbs");   // styles.css then hides the category label it replaces
   }
 
-  // a row of toggle chips; groups = [{key, label, count, cls}], the first one is "all"
-  function filterBar(ariaLabel, before, groups, apply) {
+  // ---------- shared: a row of text tabs (toggle buttons) ----------
+  // groups = [{key, label, count, cls}]; the first one is "all". cls (a theme-* class) adds a small colour dot.
+  // A visually hidden live region announces how many items are shown after each change.
+  function filterTabs(ariaLabel, before, groups, noun, apply) {
     const bar = document.createElement("div");
     bar.className = "filter-bar";
     bar.setAttribute("role", "group");
     bar.setAttribute("aria-label", ariaLabel);
+    const status = document.createElement("p");
+    status.className = "visually-hidden";
+    status.setAttribute("aria-live", "polite");
     groups.forEach(function (g, i) {
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "filter-chip" + (i === 0 ? " is-all" : "") + (g.cls ? " " + g.cls : "");
+      b.className = "filter-chip" + (g.cls ? " " + g.cls : "");
       b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
-      b.innerHTML = '<span class="dot" aria-hidden="true"></span><span class="lbl"></span><span class="count"></span>';
-      b.querySelector(".lbl").textContent = g.label;
-      b.querySelector(".count").textContent = g.count;
+      b.setAttribute("aria-label", g.label + " (" + g.count + ")");   // label and count would otherwise run together
+      if (g.cls) {
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        dot.setAttribute("aria-hidden", "true");
+        b.appendChild(dot);
+      }
+      const lbl = document.createElement("span");
+      lbl.className = "lbl";
+      lbl.textContent = g.label;
+      const count = document.createElement("span");
+      count.className = "count";
+      count.textContent = g.count;
+      b.append(lbl, count);
       b.addEventListener("click", function () {
         bar.querySelectorAll(".filter-chip").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
         apply(g.key);
+        status.textContent = "Showing " + g.count + " " + noun + (g.count === 1 ? "" : "s") + (i === 0 ? "" : ": " + g.label);
       });
       bar.appendChild(b);
     });
     before.parentNode.insertBefore(bar, before);
+    before.parentNode.insertBefore(status, before);
   }
   function show(el, on) {
     el.classList.toggle("is-hidden", !on);
-    if (on && !reduce) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
-    if (on) el.querySelectorAll(".reveal").forEach(function (r) { r.classList.add("in"); });
-    if (on && el.classList.contains("reveal")) el.classList.add("in");
+    if (!on) return;   // content shown by a filter is shown at once (no fade)
+    if (el.classList.contains("reveal")) el.classList.add("in");
+    el.querySelectorAll(".reveal").forEach(function (r) { r.classList.add("in"); });
   }
 
-  // Projects: filter cards by research theme (label), colored by theme key
+  // ---------- 2. Projects: filter cards by research theme ----------
   const grid = document.querySelector(".project-grid");
   if (grid) {
     const items = Array.prototype.slice.call(grid.querySelectorAll("[data-label]"));
@@ -429,270 +367,29 @@ ul.task-list li input[type="checkbox"] {
       seen.get(k).count++;
     });
     if (seen.size > 1) {
-      filterBar("Filter projects by research theme", grid,
-        [{ key: "*", label: "All", count: items.length }].concat(Array.from(seen.values())),
+      filterTabs("Filter projects by research theme", grid,
+        [{ key: "*", label: "All", count: items.length }].concat(Array.from(seen.values())), "project",
         function (key) { items.forEach(function (it) { show(it, key === "*" || it.dataset.label === key); }); });
     }
   }
 
-  // Publications: filter groups by type
+  // ---------- 3. Publications: filter groups by type ----------
   const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-group[data-group]"));
   if (groups.length > 1) {
     const total = document.querySelectorAll(".pub-group .pub-item").length;
-    filterBar("Filter publications by type", groups[0],
+    filterTabs("Filter publications by type", groups[0],
       [{ key: "*", label: "All", count: total }].concat(groups.map(function (g) {
-        return { key: g.dataset.group, label: g.dataset.label, count: g.querySelectorAll(".pub-item").length, cls: "pt-" + g.dataset.group };
-      })),
+        return { key: g.dataset.group, label: g.dataset.label, count: g.querySelectorAll(".pub-item").length };
+      })), "publication",
       function (key) { groups.forEach(function (g) { show(g, key === "*" || g.dataset.group === key); }); });
   }
 })();
 </script>
 <script>
-// home.js — full-screen home page behaviour (2026-10-30 redesign). Runs only when .hero-full exists.
-// 1) the hero's living energy network (canvas), 2) rotating focus line, 3) timeline fill on scroll,
-// 4) small touches: pub cards get the cursor glow, portrait parallax. No libraries.
-(function () {
-  const hero = document.querySelector(".hero-full");
-  if (!hero) return;
-  document.body.classList.add("home-page");
-  // motion is off under the system reduced-motion setting or the "Pause motion" switch (site.js); it can change live
-  const off = function () { return window.siteMotionOff ? window.siteMotionOff() : window.matchMedia("(prefers-reduced-motion: reduce)").matches; };
-
-  /* ---------- 1. energy network ---------- */
-  const canvas = hero.querySelector(".hero-canvas");
-  const ctx = canvas && canvas.getContext("2d");
-  // theme colors: hydrogen teal, data-center violet, carbon green, microgrid amber, wind blue, flow cyan
-  const COLORS = [[45, 212, 191], [167, 139, 250], [74, 222, 128], [251, 191, 36], [96, 165, 250], [56, 189, 248]];
-  const WEIGHTS = [0.24, 0.16, 0.12, 0.12, 0.14, 0.22];
-  let W = 0, H = 0, dpr = 1, nodes = [], edges = [], particles = [], pulses = [], running = false, visible = true, raf = 0;
-  const mouse = { x: -9999, y: -9999, on: false };
-
-  function pickColor() {
-    let r = Math.random(), i = 0;
-    for (; i < WEIGHTS.length - 1; i++) { r -= WEIGHTS[i]; if (r <= 0) break; }
-    return COLORS[i];
-  }
-
-  function build() {
-    const rect = hero.getBoundingClientRect();
-    W = rect.width; H = rect.height;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const small = W < 700;
-    const n = Math.max(22, Math.min(small ? 38 : 96, Math.round((W * H) / (small ? 14000 : 17000))));
-    nodes = [];
-    // jittered grid placement keeps the network evenly spread; denser on the right where there is no text
-    const cols = Math.ceil(Math.sqrt(n * W / H)), rows = Math.ceil(n / cols);
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (nodes.length >= n) break;
-        const x = (c + 0.15 + Math.random() * 0.7) / cols * W, y = (r + 0.15 + Math.random() * 0.7) / rows * H;
-        if (!small && x < W * 0.42 && Math.random() < 0.45) continue; // thinner behind the copy
-        const hub = Math.random() < 0.12;
-        nodes.push({ ax: x, ay: y, x: x, y: y, ph: Math.random() * Math.PI * 2, sp: 0.15 + Math.random() * 0.25,
-          amp: 10 + Math.random() * 22, r: hub ? 3.2 + Math.random() * 1.6 : 1.4 + Math.random() * 1.4,
-          hub: hub, c: hub ? COLORS[Math.floor(Math.random() * 5)] : pickColor(), glow: 0 });
-      }
-    }
-    // edges: each node to its 2-3 nearest neighbours (undirected, no duplicates)
-    edges = [];
-    const seen = new Set(), maxD = Math.max(W, H) * 0.22;
-    nodes.forEach(function (a, i) {
-      const near = nodes.map(function (b, j) { return [j, (a.ax - b.ax) ** 2 + (a.ay - b.ay) ** 2]; })
-        .filter(function (p) { return p[0] !== i; }).sort(function (p, q) { return p[1] - q[1]; })
-        .slice(0, a.hub ? 4 : 2 + (Math.random() < 0.4 ? 1 : 0));
-      near.forEach(function (p) {
-        if (Math.sqrt(p[1]) > maxD) return;
-        const key = Math.min(i, p[0]) + "-" + Math.max(i, p[0]);
-        if (!seen.has(key)) { seen.add(key); edges.push([i, p[0]]); }
-      });
-    });
-    // energy packets travelling along edges
-    particles = [];
-    const np = Math.round(edges.length * (small ? 0.35 : 0.55));
-    for (let k = 0; k < np; k++) particles.push(newParticle());
-    pulses = [];
-  }
-
-  function newParticle() {
-    const e = edges[Math.floor(Math.random() * edges.length)] || [0, 0];
-    const fwd = Math.random() < 0.5;
-    return { e: e, a: fwd ? e[0] : e[1], b: fwd ? e[1] : e[0], t: Math.random(), v: 0.0025 + Math.random() * 0.0055 };
-  }
-
-  function rgba(c, a) { return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")"; }
-
-  let last = 0, nextPulse = 0;
-  function frame(now) {
-    const t = now / 1000, dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
-    last = now;
-    ctx.clearRect(0, 0, W, H);
-
-    // drift and cursor influence
-    nodes.forEach(function (p) {
-      p.x = p.ax + Math.cos(t * p.sp + p.ph) * p.amp;
-      p.y = p.ay + Math.sin(t * p.sp * 0.8 + p.ph) * p.amp * 0.7;
-      const d = mouse.on ? Math.hypot(p.x - mouse.x, p.y - mouse.y) : 1e9;
-      const target = d < 170 ? 1 - d / 170 : 0;
-      p.glow += (target - p.glow) * 0.08;
-    });
-
-    // edges
-    ctx.lineWidth = 1;
-    edges.forEach(function (e) {
-      const a = nodes[e[0]], b = nodes[e[1]];
-      const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-      const boost = Math.max(a.glow, b.glow);
-      g.addColorStop(0, rgba(a.c, 0.10 + boost * 0.45));
-      g.addColorStop(1, rgba(b.c, 0.10 + boost * 0.45));
-      ctx.strokeStyle = g;
-      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-    });
-
-    // cursor links
-    if (mouse.on) {
-      nodes.forEach(function (p) {
-        if (p.glow > 0.25) {
-          ctx.strokeStyle = rgba(p.c, p.glow * 0.5);
-          ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(p.x, p.y); ctx.stroke();
-        }
-      });
-    }
-
-    // packets
-    ctx.globalCompositeOperation = "lighter";
-    particles.forEach(function (q, k) {
-      q.t += q.v * (dt * 60);
-      if (q.t >= 1) {
-        // continue onto a neighbouring edge, like flow through the network
-        const nextEdges = edges.filter(function (e) { return (e[0] === q.b || e[1] === q.b) && !(e[0] === q.a || e[1] === q.a); });
-        if (nextEdges.length && Math.random() < 0.85) {
-          const e = nextEdges[Math.floor(Math.random() * nextEdges.length)];
-          q.a = q.b; q.b = e[0] === q.b ? e[1] : e[0]; q.e = e; q.t = 0;
-        } else { particles[k] = newParticle(); particles[k].t = 0; return; }
-      }
-      const a = nodes[q.a], b = nodes[q.b];
-      const x = a.x + (b.x - a.x) * q.t, y = a.y + (b.y - a.y) * q.t;
-      const tx = a.x + (b.x - a.x) * Math.max(0, q.t - 0.09), ty = a.y + (b.y - a.y) * Math.max(0, q.t - 0.09);
-      const c = q.t < 0.5 ? a.c : b.c;
-      ctx.strokeStyle = rgba(c, 0.55); ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
-      ctx.fillStyle = rgba(c, 0.95);
-      ctx.beginPath(); ctx.arc(x, y, 1.6, 0, Math.PI * 2); ctx.fill();
-    });
-
-    // occasional pulse rings from hubs
-    if (now > nextPulse) {
-      const hubs = nodes.filter(function (p) { return p.hub; });
-      if (hubs.length) { const h = hubs[Math.floor(Math.random() * hubs.length)]; pulses.push({ n: h, r: 0, a: 0.5 }); }
-      nextPulse = now + 1600 + Math.random() * 2400;
-    }
-    pulses = pulses.filter(function (p) { return p.a > 0.01; });
-    pulses.forEach(function (p) {
-      p.r += 0.9 * (dt * 60); p.a *= 0.975;
-      ctx.strokeStyle = rgba(p.n.c, p.a); ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(p.n.x, p.n.y, p.r, 0, Math.PI * 2); ctx.stroke();
-    });
-
-    // nodes
-    nodes.forEach(function (p) {
-      const pulse = 0.5 + 0.5 * Math.sin(t * 2 + p.ph);
-      const r = p.r * (1 + p.glow * 0.8) + (p.hub ? pulse * 0.8 : 0);
-      const halo = r * (p.hub ? 6 : 4) * (1 + p.glow);
-      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, halo);
-      g.addColorStop(0, rgba(p.c, (p.hub ? 0.35 : 0.22) + p.glow * 0.35));
-      g.addColorStop(1, rgba(p.c, 0));
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(p.x, p.y, halo, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = rgba(p.c, 0.85 + p.glow * 0.15);
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
-      if (p.hub) { ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.beginPath(); ctx.arc(p.x, p.y, r * 0.38, 0, Math.PI * 2); ctx.fill(); }
-    });
-    ctx.globalCompositeOperation = "source-over";
-
-    if (running) raf = requestAnimationFrame(frame);
-  }
-
-  function start() { if (!running && visible && !document.hidden && !off()) { running = true; last = 0; raf = requestAnimationFrame(frame); } }
-  function stop() { running = false; cancelAnimationFrame(raf); }
-
-  if (ctx) {
-    build();
-    if (off()) { frame(performance.now()); } else { start(); }
-    let resizeT = 0;
-    window.addEventListener("resize", function () {
-      clearTimeout(resizeT);
-      resizeT = setTimeout(function () { build(); if (off() || !running) frame(performance.now()); }, 150);
-    });
-    document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (en) { visible = en[0].isIntersecting; visible ? start() : stop(); }, { threshold: 0.02 }).observe(hero);
-    }
-    hero.addEventListener("pointermove", function (ev) {
-      const r = hero.getBoundingClientRect();
-      mouse.x = ev.clientX - r.left; mouse.y = ev.clientY - r.top; mouse.on = true;
-    }, { passive: true });
-    hero.addEventListener("pointerleave", function () { mouse.on = false; });
-    document.addEventListener("motionchange", function (e) { if (e.detail.off) { stop(); frame(performance.now()); } else { start(); } });
-  }
-
-  /* ---------- 2. rotating focus line ---------- */
-  const wrap = hero.querySelector(".rot-wrap");
-  const words = Array.prototype.slice.call(hero.querySelectorAll(".rot-word"));
-  if (wrap && words.length > 1) {
-    let i = 0;
-    const size = function () { wrap.style.width = words[i].offsetWidth + "px"; };
-    wrap.classList.add("js"); size();
-    window.addEventListener("resize", size);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
-    setInterval(function () {
-      if (document.hidden || off() || !visible) return;  // paused, or the hero is off-screen
-      const cur = words[i]; i = (i + 1) % words.length; const nxt = words[i];
-      cur.classList.remove("is-on"); cur.classList.add("is-out");
-      nxt.classList.remove("is-out"); nxt.classList.add("is-on"); size();
-      setTimeout(function () { cur.classList.remove("is-out"); }, 600);
-    }, 2800);
-  }
-
-  /* ---------- 3. timeline fill ---------- */
-  const tl = document.querySelector(".home .timeline");
-  if (tl) {
-    const fill = function () {
-      const r = tl.getBoundingClientRect(), vh = window.innerHeight;
-      const k = off() ? 1 : Math.max(0, Math.min(1, (vh * 0.62 - r.top) / r.height));
-      tl.style.setProperty("--fill", k.toFixed(3));
-    };
-    fill();
-    window.addEventListener("scroll", fill, { passive: true });
-    window.addEventListener("resize", fill);
-  }
-
-  /* ---------- 4. small touches ---------- */
-  // publication cards (generated markdown): cursor glow and their own reveal, since site.js only scans <main>
-  const pubs = document.querySelectorAll(".home-pubs .pub-item");
-  pubs.forEach(function (el) { el.classList.add("glow-card"); });
-  if (!off() && "IntersectionObserver" in window) {
-    const io = new IntersectionObserver(function (en) {
-      let n = 0;
-      en.forEach(function (e) { if (e.isIntersecting) { e.target.style.setProperty("--i", n++); e.target.classList.add("in"); io.unobserve(e.target); } });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-    pubs.forEach(function (el) { el.classList.add("reveal"); io.observe(el); });
-  }
-  document.querySelectorAll(".home-pubs .pub-link, .home .repo, .home .tile").forEach(function (a) {
-    if (/^https?:/.test(a.getAttribute("href") || "") && a.host !== location.host) { a.target = "_blank"; a.rel = "noopener"; }
-  });
-  const portrait = hero.querySelector(".portrait");
-  if (portrait && window.matchMedia("(pointer: fine)").matches) {
-    hero.addEventListener("pointermove", function (ev) {
-      if (off()) { portrait.style.transform = ""; return; }
-      const r = hero.getBoundingClientRect();
-      const dx = (ev.clientX - r.left) / r.width - 0.5, dy = (ev.clientY - r.top) / r.height - 0.5;
-      portrait.style.transform = "translate3d(" + (dx * -14).toFixed(1) + "px," + (dy * -14).toFixed(1) + "px,0)";
-    }, { passive: true });
-    portrait.style.transition = "transform .6s cubic-bezier(.2,.8,.2,1)";
-  }
-})();
+// home.js — intentionally empty (2026-10-30, second redesign: simple and calm).
+// The home page has no script of its own: no canvas, counters, rotating words or parallax. Its only motion is the
+// shared gentle fade-in from site.js. scripts/build_site.py inlines this file on every page as assets/home-js.html,
+// so anything added here later must check for `main.home` first and do nothing elsewhere.
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
