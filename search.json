@@ -11,7 +11,7 @@
     "href": "software-data.html",
     "title": "Software & Data",
     "section": "",
-    "text": "These code and data packages accompany published papers.\n\n\n\nPackage\nAccompanies\nArchive\n\n\n\n\nERCOT hydrogen-network planning model and processed inputs\nInternational Journal of Hydrogen Energy (2025)\n10.5281/zenodo.14894611\n\n\nEmission-intensity load-regulation code and results; input data\nCell Reports Sustainability (2025)\n10.5281/zenodo.14658398; 10.17632/jfcc62strg.1\n\n\n\nFor other papers, see each paper’s data and code availability statement. Documented releases of earlier models are in preparation."
+    "text": "Documented model frameworks that accompany published papers. Each repository states the model with the paper’s equation numbers, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic data and tests.\n\n\n\nFramework\nAccompanies\nRepository\n\n\n\n\nTwo-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport\nInternational Journal of Hydrogen Energy (2025)\ntxh2-ercot-hydrogen\n\n\nDemand-side load regulation guided by real-time emission intensity\nCell Reports Sustainability (2025)\nghg-load-regulation\n\n\nSupply-chain facility location with on-site microgrids; virtual power plant scheduling\nApplied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021)\nsupply-chain-microgrid-models\n\n\nMulti-fidelity Gaussian process regression for probabilistic wind power curves\nASME IDETC 2023\nmfgpr-wind-power-curve\n\n\nCost of delayed energization for AI data centers: private, ratepayer and social accounts\nIEEE NAPS 2026 (accepted)\ncode-delayed-energization\n\n\n\nFor the data and code of individual studies, see each paper’s data availability statement."
   },
   {
     "objectID": "projects/wind-hydrogen.html",
@@ -60,21 +60,21 @@
     "href": "projects/wind-hydrogen.html#reproducibility",
     "title": "Co-located wind and hydrogen energy systems",
     "section": "Reproducibility",
-    "text": "Reproducibility\nResults archived privately; public release planned. Last updated 2026-10."
+    "text": "Reproducibility\nResults archived privately; a model framework release is planned. Last updated 2026-10."
   },
   {
     "objectID": "projects/txh2.html",
     "href": "projects/txh2.html",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "",
-    "text": "Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?"
+    "text": "Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?"
   },
   {
     "objectID": "projects/txh2.html#research-question",
     "href": "projects/txh2.html#research-question",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "",
-    "text": "Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?"
+    "text": "Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?"
   },
   {
     "objectID": "projects/txh2.html#my-contribution",
@@ -88,28 +88,28 @@
     "href": "projects/txh2.html#method",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "Method",
-    "text": "Method\nTwo-stage stochastic linear program over ERCOT’s eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data."
+    "text": "Method\nTwo-stage stochastic linear program. The first stage sizes electrolyzers, hydrogen tanks and fuel cells in each of ERCOT’s eight weather zones; the second stage schedules batteries, electrolysis, fuel cells, gas-fired backup, reformer hydrogen and inter-zonal hydrogen transport hour by hour over a full year, in nine scenarios (three electricity-demand levels by three completion rates of planned renewable capacity). Inputs are built from ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data."
   },
   {
     "objectID": "projects/txh2.html#key-findings",
     "href": "projects/txh2.html#key-findings",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "Key findings",
-    "text": "Key findings\n\n\nIn the benchmark case, renewable (green) hydrogen met about 3.8% of ERCOT’s industrial hydrogen demand, roughly 131 thousand tonnes per year.\nElectrolyzers clustered in central zones, with hydrogen flowing west to east and north to south.\nHalving hydrogen equipment costs did not change the optimal configuration.\nModest load flexibility (±5%) reduced combined-cycle gas CO₂ emissions by about 0.28 million tonnes per year.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nInputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
+    "text": "Key findings\n\n\nRenewable (green) hydrogen covered only a few percent of industrial hydrogen demand; reformer hydrogen remained the main supply.\nModest load flexibility (±5%) reduced CO₂ emissions from combined-cycle gas generation.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nInputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
   },
   {
     "objectID": "projects/txh2.html#outputs",
     "href": "projects/txh2.html#outputs",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "Outputs",
-    "text": "Outputs\n Paper (DOI)  Code and data (Zenodo)"
+    "text": "Outputs\n Paper (DOI)  Model framework (GitHub)"
   },
   {
     "objectID": "projects/txh2.html#reproducibility",
     "href": "projects/txh2.html#reproducibility",
     "title": "Hydrogen’s role in expanding renewable energy in Texas",
     "section": "Reproducibility",
-    "text": "Reproducibility\nCode and processed inputs publicly archived. Last updated 2026-10."
+    "text": "Reproducibility\nModel framework with documentation, examples and tests on GitHub. For the study’s data and code, see the paper’s data availability statement. Last updated 2026-10."
   },
   {
     "objectID": "projects/smr-dc.html",
@@ -210,67 +210,95 @@
     "text": "Reproducibility\nCode and data: see the paper’s Data Availability statement. Last updated 2026-10."
   },
   {
-    "objectID": "projects/facility-microgrid-location.html",
-    "href": "projects/facility-microgrid-location.html",
-    "title": "Supply chains with on-site microgrids and transactive energy",
+    "objectID": "projects/fm-global-internship.html",
+    "href": "projects/fm-global-internship.html",
+    "title": "Industry internship at FM: resilience and operations modeling",
     "section": "",
-    "text": "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?"
+    "text": "How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?"
   },
   {
-    "objectID": "projects/facility-microgrid-location.html#research-question",
-    "href": "projects/facility-microgrid-location.html#research-question",
-    "title": "Supply chains with on-site microgrids and transactive energy",
+    "objectID": "projects/fm-global-internship.html#research-question",
+    "href": "projects/fm-global-internship.html#research-question",
+    "title": "Industry internship at FM: resilience and operations modeling",
     "section": "",
-    "text": "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?"
+    "text": "How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?"
   },
   {
-    "objectID": "projects/facility-microgrid-location.html#my-contribution",
-    "href": "projects/facility-microgrid-location.html#my-contribution",
-    "title": "Supply chains with on-site microgrids and transactive energy",
+    "objectID": "projects/fm-global-internship.html#my-contribution",
+    "href": "projects/fm-global-internship.html#my-contribution",
+    "title": "Industry internship at FM: resilience and operations modeling",
     "section": "My contribution",
-    "text": "My contribution\nFirst author of the location-allocation papers (AMM, SEGRE). Second author of the JORS paper, for which I built the optimization models and the revision cases."
+    "text": "My contribution\nIntern. Built the microgrid sizing model and the production-line simulation, and proposed the wind-farm maintenance framework."
   },
   {
-    "objectID": "projects/facility-microgrid-location.html#method",
-    "href": "projects/facility-microgrid-location.html#method",
-    "title": "Supply chains with on-site microgrids and transactive energy",
+    "objectID": "projects/fm-global-internship.html#method",
+    "href": "projects/fm-global-internship.html#method",
+    "title": "Industry internship at FM: resilience and operations modeling",
     "section": "Method",
-    "text": "Method\nJORS sizes on-site microgrids for fixed facility locations with production and inventory planning; AMM and SEGRE add facility location-allocation decisions, and AMM compares linearization formulations."
+    "text": "Method\nTechno-economic optimization of solar PV, battery and backup sizing that minimizes the levelized cost of energy while meeting demand in modeled grid-outage scenarios, using a DOE reference load profile scaled to the campus’s annual consumption and site solar data; discrete-event simulation (Arena) of a lithium battery production line to quantify the effect of equipment failures and maintenance schedules and to locate bottlenecks; a proposed optimization framework for predictive and corrective maintenance scheduling of wind farms.\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nIndustry work: company data, models and results are confidential and are not shown here."
   },
   {
-    "objectID": "projects/facility-microgrid-location.html#key-findings",
-    "href": "projects/facility-microgrid-location.html#key-findings",
-    "title": "Supply chains with on-site microgrids and transactive energy",
-    "section": "Key findings",
-    "text": "Key findings\n\n\nFacility siting trades transport cost against renewable resource quality (AMM).\nOn-site renewables lower total supply-chain cost under the modeled time-of-use tariffs.\nIn the AMM price scenarios, batteries became attractive at high peak electricity prices; in JORS, capping grid imports made storage worthwhile.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nStylized multi-echelon networks with synthetic distances and costs; renewable capacity factors provided by a co-author."
-  },
-  {
-    "objectID": "projects/facility-microgrid-location.html#outputs",
-    "href": "projects/facility-microgrid-location.html#outputs",
-    "title": "Supply chains with on-site microgrids and transactive energy",
+    "objectID": "projects/fm-global-internship.html#outputs",
+    "href": "projects/fm-global-internship.html#outputs",
+    "title": "Industry internship at FM: resilience and operations modeling",
     "section": "Outputs",
-    "text": "Outputs\n AMM paper (DOI)  SEGRE paper (DOI)  JORS paper (DOI)"
+    "text": "Outputs\nInternal company reports; not public."
   },
   {
-    "objectID": "projects/facility-microgrid-location.html#reproducibility",
-    "href": "projects/facility-microgrid-location.html#reproducibility",
-    "title": "Supply chains with on-site microgrids and transactive energy",
+    "objectID": "projects/fm-global-internship.html#reproducibility",
+    "href": "projects/fm-global-internship.html#reproducibility",
+    "title": "Industry internship at FM: resilience and operations modeling",
     "section": "Reproducibility",
-    "text": "Reproducibility\nModels archived privately; a cleaned release is planned. Last updated 2026-10."
+    "text": "Reproducibility\nNot public (company work). Last updated 2026-10."
   },
   {
-    "objectID": "projects.html",
-    "href": "projects.html",
-    "title": "Projects",
+    "objectID": "projects/data-center-delay-economics.html",
+    "href": "projects/data-center-delay-economics.html",
+    "title": "The cost of delayed energization for AI data centers",
     "section": "",
-    "text": "Each project page follows the same order: research question, my contribution, method, key findings with their boundary conditions, outputs, and reproducibility status. Only published or accepted work is shown here.\n\n\n\n\n\n\n\n\n\nHydrogen systems\nHydrogen integration and policy support for U.S. nuclear power plants\nNature Communications (2026), first author\nCan existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?\nRead more \n\n\n\n\n\nHydrogen systems\nHydrogen's role in expanding renewable energy in Texas\nInternational Journal of Hydrogen Energy (2025), first author\nWhere should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?\nRead more \n\n\n\n\n\nCarbon-aware grid\nEmission-intensity-informed load regulation for grid decarbonization\nCell Reports Sustainability (2025), first author\nHow much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?\nRead more \n\n\n\n\n\nNuclear & data centers\nSmall modular reactors for data centers\nCell Reports Sustainability (2026), Perspective, co-first author\nWhat would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?\nRead more \n\n\n\n\n\nNuclear & data centers\nThe cost of delayed energization for AI data centers\nIEEE North American Power Symposium (NAPS 2026), first author; accepted\nWhat does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?\nRead more \n\n\n\n\n\nHydrogen systems\nCo-located wind and hydrogen energy systems\nJournal of Mechanical Design (2024, featured article), first author; TORQUE 2022, first author\nHow do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?\nRead more \n\n\n\n\n\nHydrogen systems\nCo-located solar and hydrogen plants\nEuropean Energy Market Conference (EEM 2023), first author\nIs concentrated solar power with thermal storage feeding high-temperature electrolysis more economic than photovoltaics feeding low-temperature electrolysis in West Texas?\nRead more \n\n\n\n\n\nHydrogen systems\nIntelligent operation and maintenance in offshore wind–hydrogen systems\nTORQUE 2024, first author\nHow much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?\nRead more \n\n\n\n\n\nMicrogrids & supply chains\nSupply chains with on-site microgrids and transactive energy\nApplied Mathematical Modelling (2023) and IEEE SEGRE 2023, first author; Journal of the Operational Research Society (2022), second author\nWhere should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?\nRead more \n\n\n\n\n\nWind uncertainty\nMulti-fidelity Gaussian processes for wind power curves\nASME IDETC 2023, first author\nCan multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?\nRead more \n\n\n\n\nNo matching items"
+    "text": "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Honglin Li",
+    "objectID": "projects/data-center-delay-economics.html#research-question",
+    "href": "projects/data-center-delay-economics.html#research-question",
+    "title": "The cost of delayed energization for AI data centers",
     "section": "",
-    "text": "Honglin Li, Ph.D.\n    Postdoctoral Fellow, Electrical and Computer Engineering\n    Kansas State University\n    I build optimization and techno-economic models for the design, operation and long-term planning of\n      low-carbon energy systems, from hydrogen-integrated renewables and nuclear plants to firm power for AI data centers.\n    \n      Email\n      Google Scholar\n      ORCID\n      GitHub\n      LinkedIn\n      CV (PDF)\n    \n  \n\n\n\n  \n    Research interests\n    \n      Energy system optimization\n      Techno-economic analysis\n      Hydrogen systems\n      Nuclear–hydrogen integration\n      Small modular reactors\n      AI data-center power\n      Electricity markets\n      Carbon accounting\n      Uncertainty quantification\n    \n  \n  \n    Education\n    \n      Ph.D., Mechanical Engineering, 2025The University of Texas at Dallas\n      M.S. in Engineering (Industrial Engineering), 2021Texas State University\n    \n  \n\n\nNews\n\n  Fall 2026Teaching ECE 685 Power Systems Design at Kansas State University.\n  Aug 2026Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on arXiv.\n  2026Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.\n  2026Our paper on hydrogen integration and policy support for U.S. nuclear power plants is published in Nature Communications.\n  2026Perspective on small modular reactors for data centers published in Cell Reports Sustainability.\n  Apr 2026Joined the Department of Electrical and Computer Engineering at Kansas State University as a Postdoctoral Fellow.\n  2025Completed my Ph.D. in Mechanical Engineering at The University of Texas at Dallas.\n  2025Paper on emission-intensity-informed load regulation published in Cell Reports Sustainability and featured by UT Dallas News.\n\n\nSelected publications\n\nNat. Commun. 2026\nRethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support\nH. Li, J. Huang, B. Poudel, M. Sun, T. Westover, D. Wendt, J. Zhang\nNature Communications, vol. 17, article 7090, 2026. DOI\n\n\nCell Rep. Sustain. 2026\nThe role of small modular reactors in powering data centers for a sustainable digital economy\nR. A. Jacob*, H. Li*, A. M. Rad, B. Poudel, Y. Li, M. Sun, T. R. McJunkin, J. Zhang\nCell Reports Sustainability, vol. 3, article 100820, 2026. Co-first authors. DOI\n\n\nCell Rep. Sustain. 2025\nReal-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization\nH. Li, G. Shen, S. Senemmar, A. Mehmani, J. Zhang\nCell Reports Sustainability, vol. 2, article 100367, 2025. (UTD News). DOI\n\n\nInt. J. Hydrogen Energy 2025\nHydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas\nH. Li, J. Zhang\nInternational Journal of Hydrogen Energy, vol. 113, pp. 77–89, 2025. DOI\n\nAll publications \n\nResearch themes\n\n  \n    Nuclear energy and AI data centers\n    Firm, low-carbon power for fast-growing data-center loads, and the cost of waiting for the grid.\n  \n    Hydrogen-integrated energy systems\n    From co-located wind and solar plants to regional networks and the U.S. nuclear fleet.\n  \n    Carbon-aware grid operation\n    Re-timing electricity use with hourly grid emission intensity.\n  \n    Supply chains with on-site microgrids\n    Joint siting of facilities and microgrids, transactive energy and reliability.\n  \n    Wind power uncertainty\n    Multi-fidelity Gaussian processes for probabilistic wind farm power curves."
+    "text": "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
+  },
+  {
+    "objectID": "projects/data-center-delay-economics.html#my-contribution",
+    "href": "projects/data-center-delay-economics.html#my-contribution",
+    "title": "The cost of delayed energization for AI data centers",
+    "section": "My contribution",
+    "text": "My contribution\nFirst author. Developed the framework, model and analysis with Buxin She."
+  },
+  {
+    "objectID": "projects/data-center-delay-economics.html#method",
+    "href": "projects/data-center-delay-economics.html#method",
+    "title": "The cost of delayed energization for AI data centers",
+    "section": "Method",
+    "text": "Method\nPresent-value framework that converts delayed IT capacity into grid capacity requirements and prices the delay in separate developer, ratepayer and social ledgers, summarized by a delay cost intensity and a break-even acceleration payment; sensitivity and dependence stress tests."
+  },
+  {
+    "objectID": "projects/data-center-delay-economics.html#key-findings",
+    "href": "projects/data-center-delay-economics.html#key-findings",
+    "title": "The cost of delayed energization for AI data centers",
+    "section": "Key findings",
+    "text": "Key findings\n\n\nFor a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.\nStaged energization can recover a large share of that cost.\nRatepayer exposure depends strongly on large-load tariff design.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nThe delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example."
+  },
+  {
+    "objectID": "projects/data-center-delay-economics.html#outputs",
+    "href": "projects/data-center-delay-economics.html#outputs",
+    "title": "The cost of delayed energization for AI data centers",
+    "section": "Outputs",
+    "text": "Outputs\n Model framework (GitHub)"
+  },
+  {
+    "objectID": "projects/data-center-delay-economics.html#reproducibility",
+    "href": "projects/data-center-delay-economics.html#reproducibility",
+    "title": "The cost of delayed energization for AI data centers",
+    "section": "Reproducibility",
+    "text": "Reproducibility\nModel framework with documentation, examples and tests on GitHub; the study’s own parameter files and results are archived privately. Last updated 2026-10."
   },
   {
     "objectID": "research.html",
@@ -322,53 +350,67 @@
     "text": "Methods\nThe methods I use across these themes are:\n\nlinear, mixed-integer and stochastic optimization (Pyomo, AMPL, Gurobi);\ntechno-economic analysis: discounted cash flow, levelized costs, tax-credit modeling;\nlife-cycle and carbon accounting;\ndiscrete-event and Monte Carlo simulation;\nGaussian-process and machine-learning surrogates."
   },
   {
-    "objectID": "projects/data-center-delay-economics.html",
-    "href": "projects/data-center-delay-economics.html",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Honglin Li",
     "section": "",
-    "text": "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
+    "text": "Honglin Li, Ph.D.\n    Postdoctoral Fellow, Electrical and Computer Engineering\n    Kansas State University\n    I build optimization and techno-economic models for the design, operation and long-term planning of\n      low-carbon energy systems, from hydrogen-integrated renewables and nuclear plants to firm power for AI data centers.\n    \n      Email\n      Google Scholar\n      ORCID\n      GitHub\n      LinkedIn\n      CV (PDF)\n    \n  \n\n\n\n  \n    Research interests\n    \n      Energy system optimization\n      Techno-economic analysis\n      Hydrogen systems\n      Nuclear–hydrogen integration\n      Small modular reactors\n      AI data-center power\n      Electricity markets\n      Carbon accounting\n      Uncertainty quantification\n    \n  \n  \n    Education\n    \n      Ph.D., Mechanical Engineering, 2025The University of Texas at Dallas\n      M.S. in Engineering (Industrial Engineering), 2021Texas State University\n    \n  \n\n\nNews\n\n  Fall 2026Teaching ECE 685 Power Systems Design at Kansas State University.\n  Aug 2026Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on arXiv.\n  2026Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.\n  2026Our paper on hydrogen integration and policy support for U.S. nuclear power plants is published in Nature Communications.\n  2026Perspective on small modular reactors for data centers published in Cell Reports Sustainability.\n  Apr 2026Joined the Department of Electrical and Computer Engineering at Kansas State University as a Postdoctoral Fellow.\n  2025Completed my Ph.D. in Mechanical Engineering at The University of Texas at Dallas.\n  2025Paper on emission-intensity-informed load regulation published in Cell Reports Sustainability and featured by UT Dallas News.\n\n\nSelected publications\n\nNat. Commun. 2026\nRethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support\nH. Li, J. Huang, B. Poudel, M. Sun, T. Westover, D. Wendt, J. Zhang\nNature Communications, vol. 17, article 7090, 2026. DOI\n\n\nCell Rep. Sustain. 2026\nThe role of small modular reactors in powering data centers for a sustainable digital economy\nR. A. Jacob*, H. Li*, A. M. Rad, B. Poudel, Y. Li, M. Sun, T. R. McJunkin, J. Zhang\nCell Reports Sustainability, vol. 3, article 100820, 2026. Co-first authors. DOI\n\n\nCell Rep. Sustain. 2025\nReal-time greenhouse gas emission intensity informed demand-side load regulation for power grid decarbonization\nH. Li, G. Shen, S. Senemmar, A. Mehmani, J. Zhang\nCell Reports Sustainability, vol. 2, article 100367, 2025. (UTD News). DOI\n\n\nInt. J. Hydrogen Energy 2025\nHydrogen’s role in expanding renewable energy and reducing carbon emissions in Texas\nH. Li, J. Zhang\nInternational Journal of Hydrogen Energy, vol. 113, pp. 77–89, 2025. DOI\n\nAll publications \n\nResearch themes\n\n  \n    Nuclear energy and AI data centers\n    Firm, low-carbon power for fast-growing data-center loads, and the cost of waiting for the grid.\n  \n    Hydrogen-integrated energy systems\n    From co-located wind and solar plants to regional networks and the U.S. nuclear fleet.\n  \n    Carbon-aware grid operation\n    Re-timing electricity use with hourly grid emission intensity.\n  \n    Supply chains with on-site microgrids\n    Joint siting of facilities and microgrids, transactive energy and reliability.\n  \n    Wind power uncertainty\n    Multi-fidelity Gaussian processes for probabilistic wind farm power curves."
   },
   {
-    "objectID": "projects/data-center-delay-economics.html#research-question",
-    "href": "projects/data-center-delay-economics.html#research-question",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
     "section": "",
-    "text": "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
+    "text": "Each project page follows the same order: research question, my contribution, method, key findings with their boundary conditions, outputs, and reproducibility status. Only published or accepted work is shown here.\n\n\n\n\n\n\n\n\n\nHydrogen systems\nHydrogen integration and policy support for U.S. nuclear power plants\nNature Communications (2026), first author\nCan existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?\nRead more \n\n\n\n\n\nHydrogen systems\nHydrogen's role in expanding renewable energy in Texas\nInternational Journal of Hydrogen Energy (2025), first author\nWhere should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?\nRead more \n\n\n\n\n\nCarbon-aware grid\nEmission-intensity-informed load regulation for grid decarbonization\nCell Reports Sustainability (2025), first author\nHow much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?\nRead more \n\n\n\n\n\nNuclear & data centers\nSmall modular reactors for data centers\nCell Reports Sustainability (2026), Perspective, co-first author\nWhat would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?\nRead more \n\n\n\n\n\nNuclear & data centers\nThe cost of delayed energization for AI data centers\nIEEE North American Power Symposium (NAPS 2026), first author; accepted\nWhat does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?\nRead more \n\n\n\n\n\nHydrogen systems\nCo-located wind and hydrogen energy systems\nJournal of Mechanical Design (2024, featured article), first author; TORQUE 2022, first author\nHow do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?\nRead more \n\n\n\n\n\nHydrogen systems\nCo-located solar and hydrogen plants\nEuropean Energy Market Conference (EEM 2023), first author\nIs concentrated solar power with thermal storage feeding high-temperature electrolysis more economic than photovoltaics feeding low-temperature electrolysis in West Texas?\nRead more \n\n\n\n\n\nHydrogen systems\nIntelligent operation and maintenance in offshore wind–hydrogen systems\nTORQUE 2024, first author\nHow much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?\nRead more \n\n\n\n\n\nMicrogrids & supply chains\nSupply chains with on-site microgrids and transactive energy\nApplied Mathematical Modelling (2023) and IEEE SEGRE 2023, first author; Journal of the Operational Research Society (2022), second author\nWhere should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?\nRead more \n\n\n\n\n\nWind uncertainty\nMulti-fidelity Gaussian processes for wind power curves\nASME IDETC 2023, first author\nCan multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?\nRead more \n\n\n\n\n\nIndustry\nIndustry internship at FM: resilience and operations modeling\nInternship, FM (August 2024 – January 2025)\nHow should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?\nRead more \n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "projects/data-center-delay-economics.html#my-contribution",
-    "href": "projects/data-center-delay-economics.html#my-contribution",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "projects/facility-microgrid-location.html",
+    "href": "projects/facility-microgrid-location.html",
+    "title": "Supply chains with on-site microgrids and transactive energy",
+    "section": "",
+    "text": "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?"
+  },
+  {
+    "objectID": "projects/facility-microgrid-location.html#research-question",
+    "href": "projects/facility-microgrid-location.html#research-question",
+    "title": "Supply chains with on-site microgrids and transactive energy",
+    "section": "",
+    "text": "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?"
+  },
+  {
+    "objectID": "projects/facility-microgrid-location.html#my-contribution",
+    "href": "projects/facility-microgrid-location.html#my-contribution",
+    "title": "Supply chains with on-site microgrids and transactive energy",
     "section": "My contribution",
-    "text": "My contribution\nFirst author. Developed the framework, model and analysis with Buxin She."
+    "text": "My contribution\nFirst author of the location-allocation papers (AMM, SEGRE). Second author of the JORS paper, for which I built the optimization models and the revision cases."
   },
   {
-    "objectID": "projects/data-center-delay-economics.html#method",
-    "href": "projects/data-center-delay-economics.html#method",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "projects/facility-microgrid-location.html#method",
+    "href": "projects/facility-microgrid-location.html#method",
+    "title": "Supply chains with on-site microgrids and transactive energy",
     "section": "Method",
-    "text": "Method\nPresent-value framework that converts delayed IT capacity into grid capacity requirements and prices the delay in separate developer, ratepayer and social ledgers, summarized by a delay cost intensity and a break-even acceleration payment; sensitivity and dependence stress tests."
+    "text": "Method\nJORS sizes on-site microgrids for fixed facility locations with production and inventory planning; AMM and SEGRE add facility location-allocation decisions, and AMM compares linearization formulations."
   },
   {
-    "objectID": "projects/data-center-delay-economics.html#key-findings",
-    "href": "projects/data-center-delay-economics.html#key-findings",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "projects/facility-microgrid-location.html#key-findings",
+    "href": "projects/facility-microgrid-location.html#key-findings",
+    "title": "Supply chains with on-site microgrids and transactive energy",
     "section": "Key findings",
-    "text": "Key findings\n\n\nFor a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.\nStaged energization can recover a large share of that cost.\nRatepayer exposure depends strongly on large-load tariff design.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nThe delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example."
+    "text": "Key findings\n\n\nFacility siting trades transport cost against renewable resource quality (AMM).\nOn-site renewables lower total supply-chain cost under the modeled time-of-use tariffs.\nIn the AMM price scenarios, batteries became attractive at high peak electricity prices; in JORS, capping grid imports made storage worthwhile.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nStylized multi-echelon networks with synthetic distances and costs."
   },
   {
-    "objectID": "projects/data-center-delay-economics.html#outputs",
-    "href": "projects/data-center-delay-economics.html#outputs",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "projects/facility-microgrid-location.html#outputs",
+    "href": "projects/facility-microgrid-location.html#outputs",
+    "title": "Supply chains with on-site microgrids and transactive energy",
     "section": "Outputs",
-    "text": "Outputs\nPublication details are on the Publications page."
+    "text": "Outputs\n AMM paper (DOI)  SEGRE paper (DOI)  JORS paper (DOI)  Model framework (GitHub)"
   },
   {
-    "objectID": "projects/data-center-delay-economics.html#reproducibility",
-    "href": "projects/data-center-delay-economics.html#reproducibility",
-    "title": "The cost of delayed energization for AI data centers",
+    "objectID": "projects/facility-microgrid-location.html#reproducibility",
+    "href": "projects/facility-microgrid-location.html#reproducibility",
+    "title": "Supply chains with on-site microgrids and transactive energy",
     "section": "Reproducibility",
-    "text": "Reproducibility\nCode not yet public. Last updated 2026-10."
+    "text": "Reproducibility\nModel framework for the AMM and SEGRE location models and the M.S. thesis models, with documentation, examples and tests on GitHub; study inputs and results archived privately. Last updated 2026-10."
   },
   {
     "objectID": "projects/ghg.html",
@@ -396,7 +438,7 @@
     "href": "projects/ghg.html#method",
     "title": "Emission-intensity-informed load regulation for grid decarbonization",
     "section": "Method",
-    "text": "Method\nHourly load-shifting optimization for selected U.S. regions (2023) using EIA hourly emission data, varying the optimization window, the allowed adjustment range and a regulation penalty, and grouping regions by renewable share, generation diversity and intensity fluctuation."
+    "text": "Method\nMixed-integer load-regulation model solved for each optimization cycle (month, quarter or year): hourly load moves toward lower-intensity hours within an allowed adjustment range, without lowering the cycle’s total consumption, and each adjusted hour carries a penalty. Applied to U.S. grid regions with EIA hourly data (2023), varying the cycle, the adjustment range and the penalty, and grouping regions by renewable penetration, generation diversity and intensity fluctuation."
   },
   {
     "objectID": "projects/ghg.html#key-findings",
@@ -410,14 +452,14 @@
     "href": "projects/ghg.html#outputs",
     "title": "Emission-intensity-informed load regulation for grid decarbonization",
     "section": "Outputs",
-    "text": "Outputs\n Paper (DOI)  Code and results (Zenodo)  Input data (Mendeley Data)\n\nDemand-side management under real-time greenhouse gas emission factors for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author)."
+    "text": "Outputs\n Paper (DOI)  Model framework (GitHub)\n\nDemand-side management under real-time greenhouse gas emission factors for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author)."
   },
   {
     "objectID": "projects/ghg.html#reproducibility",
     "href": "projects/ghg.html#reproducibility",
     "title": "Emission-intensity-informed load regulation for grid decarbonization",
     "section": "Reproducibility",
-    "text": "Reproducibility\nCode, results and inputs publicly archived. Last updated 2026-10."
+    "text": "Reproducibility\nModel framework with documentation, examples and tests on GitHub. For the study’s data and code, see the paper’s data availability statement. Last updated 2026-10."
   },
   {
     "objectID": "projects/offshore-wind-hydrogen-om.html",
@@ -452,7 +494,7 @@
     "href": "projects/offshore-wind-hydrogen-om.html#key-findings",
     "title": "Intelligent operation and maintenance in offshore wind–hydrogen systems",
     "section": "Key findings",
-    "text": "Key findings\n\n\nPrognostics-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.\nAt the system level, the levelized cost of hydrogen fell by about 2%.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nSingle site; 2012 wind-resource data paired with 2022 electricity prices; maintenance parameters from the collaborators’ framework."
+    "text": "Key findings\n\n\nPrognostics-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%.\nAt the system level, the levelized cost of hydrogen fell by about 2%.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nSingle site and one weather year; maintenance parameters from the collaborators’ framework."
   },
   {
     "objectID": "projects/offshore-wind-hydrogen-om.html#outputs",
@@ -501,7 +543,7 @@
     "href": "projects/solar-hydrogen.html#key-findings",
     "title": "Co-located solar and hydrogen plants",
     "section": "Key findings",
-    "text": "Key findings\n\n\nAmong the cases studied, concentrated solar power with thermal storage running the electrolyzer at variable power gave the lowest levelized hydrogen cost; constant-power operation was the most expensive.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nThe solar-thermal levelized costs divide whole-system financial cost by undiscounted hydrogen output, while the photovoltaic case adds the electricity cost of delivered energy to electrolyzer costs; the ranking held when both were recomputed on a common basis, but the absolute values are not directly comparable. Conference-length study."
+    "text": "Key findings\n\n\nAmong the cases studied, concentrated solar power with thermal storage running the electrolyzer at variable power gave the lowest levelized hydrogen cost; constant-power operation was the most expensive.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nSingle West Texas site; cost trajectories from NREL’s Annual Technology Baseline; conference-length study."
   },
   {
     "objectID": "projects/solar-hydrogen.html#outputs",
@@ -543,28 +585,28 @@
     "href": "projects/uq-mfgpr.html#method",
     "title": "Multi-fidelity Gaussian processes for wind power curves",
     "section": "Method",
-    "text": "Method\nLinear and nonlinear multi-fidelity Gaussian process regression, using kernel-density-sampled SCADA points from the open SDWPF dataset as high-fidelity data, compared with single-fidelity regression."
+    "text": "Method\nLinear (autoregressive) and nonlinear multi-fidelity Gaussian process regression that fuse the turbine type’s theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), compared with single-fidelity regression on point and probabilistic metrics."
   },
   {
     "objectID": "projects/uq-mfgpr.html#key-findings",
     "href": "projects/uq-mfgpr.html#key-findings",
     "title": "Multi-fidelity Gaussian processes for wind power curves",
     "section": "Key findings",
-    "text": "Key findings\n\n\nIn the reported test on nine turbines, nonlinear multi-fidelity regression lowered RMSE on eight of them (3.9% on average across the nine); the probabilistic criteria did not all favor it.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nOne dataset and one generic low-fidelity curve."
+    "text": "Key findings\n\n\nIn the reported test on nine turbines, nonlinear multi-fidelity regression improved point accuracy for most turbines; the probabilistic criteria did not uniformly favor it.\n\n\n\n\n\n\n\n\nNoteBoundary conditions\n\n\n\nOne dataset and one generic low-fidelity curve."
   },
   {
     "objectID": "projects/uq-mfgpr.html#outputs",
     "href": "projects/uq-mfgpr.html#outputs",
     "title": "Multi-fidelity Gaussian processes for wind power curves",
     "section": "Outputs",
-    "text": "Outputs\n Paper (DOI)"
+    "text": "Outputs\n Paper (DOI)  Method framework (GitHub)"
   },
   {
     "objectID": "projects/uq-mfgpr.html#reproducibility",
     "href": "projects/uq-mfgpr.html#reproducibility",
     "title": "Multi-fidelity Gaussian processes for wind power curves",
     "section": "Reproducibility",
-    "text": "Reproducibility\nResults archived privately. Last updated 2026-10."
+    "text": "Reproducibility\nMethod framework with documentation, examples and tests on GitHub; case-study results archived privately. Last updated 2026-10."
   },
   {
     "objectID": "publications.html",

@@ -384,7 +384,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="method" class="level2">
 <h2 class="anchored" data-anchor-id="method">Method</h2>
-<p>Hourly load-shifting optimization for selected U.S. regions (2023) using EIA hourly emission data, varying the optimization window, the allowed adjustment range and a regulation penalty, and grouping regions by renewable share, generation diversity and intensity fluctuation.</p>
+<p>Mixed-integer load-regulation model solved for each optimization cycle (month, quarter or year): hourly load moves toward lower-intensity hours within an allowed adjustment range, without lowering the cycle’s total consumption, and each adjusted hour carries a penalty. Applied to U.S. grid regions with EIA hourly data (2023), varying the cycle, the adjustment range and the penalty, and grouping regions by renewable penetration, generation diversity and intensity fluctuation.</p>
 </section>
 <section id="key-findings" class="level2">
 <h2 class="anchored" data-anchor-id="key-findings">Key findings</h2>
@@ -411,14 +411,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="outputs" class="level2">
 <h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
-<p><a href="https://doi.org/10.1016/j.crsus.2025.100367" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Paper (DOI)</a> <a href="https://doi.org/10.5281/zenodo.14658398" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Code and results (Zenodo)</a> <a href="https://doi.org/10.17632/jfcc62strg.1" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Input data (Mendeley Data)</a></p>
+<p><a href="https://doi.org/10.1016/j.crsus.2025.100367" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Paper (DOI)</a> <a href="https://github.com/Henryutd2021/ghg-load-regulation" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)</a></p>
 <ul>
 <li>Demand-side management under real-time greenhouse gas emission factors for electricity — 2024 ACEEE Summer Study on Energy Efficiency in Buildings (second author).</li>
 </ul>
 </section>
 <section id="reproducibility" class="level2">
 <h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
-<p>Code, results and inputs publicly archived. Last updated 2026-10.</p>
+<p>Model framework with documentation, examples and tests on GitHub. For the study’s data and code, see the paper’s data availability statement. Last updated 2026-10.</p>
 
 
 </section>

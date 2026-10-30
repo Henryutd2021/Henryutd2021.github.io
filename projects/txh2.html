@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?">
+<meta name="description" content="Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?">
 
 <title>Hydrogen’s role in expanding renewable energy in Texas – Honglin Li</title>
 <style>
@@ -85,7 +85,7 @@ ul.task-list li input[type="checkbox"] {
 
 <link rel="stylesheet" href="../styles.css">
 <meta property="og:title" content="Hydrogen’s role in expanding renewable energy in Texas – Honglin Li">
-<meta property="og:description" content="Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?">
+<meta property="og:description" content="Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?">
 <meta property="og:image" content="https://henryutd2021.github.io/projects/images/profile.jpg">
 <meta property="og:site_name" content="Honglin Li">
 </head>
@@ -355,7 +355,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div>
   <div class="description">
-    Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?
+    Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?
   </div>
 </div>
 
@@ -375,7 +375,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="research-question" class="level2">
 <h2 class="anchored" data-anchor-id="research-question">Research question</h2>
 <div class="question">
-<p>Where should electrolyzers, hydrogen storage, fuel cells and inter-zonal hydrogen pipelines be built in ERCOT to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?</p>
+<p>Where should electrolyzers, hydrogen storage and fuel cells be built in ERCOT, and how should hydrogen move between zones, to absorb surplus renewable generation and supply industrial hydrogen demand under uncertain 2030 renewable build-out?</p>
 </div>
 </section>
 <section id="my-contribution" class="level2">
@@ -384,16 +384,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="method" class="level2">
 <h2 class="anchored" data-anchor-id="method">Method</h2>
-<p>Two-stage stochastic linear program over ERCOT’s eight weather zones, 8,760 hours and nine scenarios of renewable completion and demand growth, using ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data.</p>
+<p>Two-stage stochastic linear program. The first stage sizes electrolyzers, hydrogen tanks and fuel cells in each of ERCOT’s eight weather zones; the second stage schedules batteries, electrolysis, fuel cells, gas-fired backup, reformer hydrogen and inter-zonal hydrogen transport hour by hour over a full year, in nine scenarios (three electricity-demand levels by three completion rates of planned renewable capacity). Inputs are built from ERCOT 60-day SCED disclosures, the LBNL interconnection queue and EIA data.</p>
 </section>
 <section id="key-findings" class="level2">
 <h2 class="anchored" data-anchor-id="key-findings">Key findings</h2>
 <div class="findings">
 <ul>
-<li>In the benchmark case, renewable (green) hydrogen met about 3.8% of ERCOT’s industrial hydrogen demand, roughly 131 thousand tonnes per year.</li>
-<li>Electrolyzers clustered in central zones, with hydrogen flowing west to east and north to south.</li>
-<li>Halving hydrogen equipment costs did not change the optimal configuration.</li>
-<li>Modest load flexibility (±5%) reduced combined-cycle gas CO₂ emissions by about 0.28 million tonnes per year.</li>
+<li>Renewable (green) hydrogen covered only a few percent of industrial hydrogen demand; reformer hydrogen remained the main supply.</li>
+<li>Modest load flexibility (±5%) reduced CO₂ emissions from combined-cycle gas generation.</li>
 </ul>
 </div>
 <div class="callout callout-style-default callout-note callout-titled" title="Boundary conditions">
@@ -412,11 +410,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="outputs" class="level2">
 <h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
-<p><a href="https://doi.org/10.1016/j.ijhydene.2025.02.303" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Paper (DOI)</a> <a href="https://doi.org/10.5281/zenodo.14894611" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Code and data (Zenodo)</a></p>
+<p><a href="https://doi.org/10.1016/j.ijhydene.2025.02.303" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Paper (DOI)</a> <a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen" class="out-link"><i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)</a></p>
 </section>
 <section id="reproducibility" class="level2">
 <h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
-<p>Code and processed inputs publicly archived. Last updated 2026-10.</p>
+<p>Model framework with documentation, examples and tests on GitHub. For the study’s data and code, see the paper’s data availability statement. Last updated 2026-10.</p>
 
 
 </section>
