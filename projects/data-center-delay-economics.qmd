@@ -38,9 +38,9 @@ The delay is treated as exogenous and parameters are illustrative; network feasi
 
 ## Outputs
 
-Publication details are on the [Publications](../publications.qmd) page.
+[<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/code-delayed-energization){.out-link}
 
 
 ## Reproducibility
 
-Code not yet public. Last updated 2026-10.
+Model framework with documentation, examples and tests on GitHub; the study's own parameter files and results are archived privately. Last updated 2026-10.

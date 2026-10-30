@@ -10,5 +10,6 @@ Documented model frameworks that accompany published papers. Each repository sta
 | Demand-side load regulation guided by real-time emission intensity | Cell Reports Sustainability (2025) | [ghg-load-regulation](https://github.com/Henryutd2021/ghg-load-regulation) |
 | Supply-chain facility location with on-site microgrids; virtual power plant scheduling | Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021) | [supply-chain-microgrid-models](https://github.com/Henryutd2021/supply-chain-microgrid-models) |
 | Multi-fidelity Gaussian process regression for probabilistic wind power curves | ASME IDETC 2023 | [mfgpr-wind-power-curve](https://github.com/Henryutd2021/mfgpr-wind-power-curve) |
+| Cost of delayed energization for AI data centers: private, ratepayer and social accounts | IEEE NAPS 2026 (accepted) | [code-delayed-energization](https://github.com/Henryutd2021/code-delayed-energization) |
 
 For the data and code of individual studies, see each paper's data availability statement.
