@@ -1,0 +1,13 @@
+{
+ "source": "Google Scholar",
+ "profile": "https://scholar.google.com/citations?user=O1BZdHQAAAAJ&hl=en",
+ "fetched": "2026-10-30",
+ "how_updated": "Read by hand from the public profile page (no API, no scraping); update by reading the page again and editing this file.",
+ "totals": {"citations": 121, "h_index": 7, "i10_index": 6},
+ "works": {
+  "li2024towards": 28, "badakhshan2022integrating": 18, "li2022optimal": 17, "li2023facility": 12,
+  "li2025ghg": 10, "jin2021supply": 10, "li2025hydrogen": 9, "li2023techno": 5, "jin2021system": 5,
+  "Li2026": 3, "li2024techno": 2, "shen2024demand": 1, "li2023multi": 1,
+  "jacob2026role": 0, "li2026smrcogeneration": 0, "li2025dissertation": 0, "li2023locating": 0, "li2021thesis": 0
+ }
+}

@@ -58,11 +58,11 @@ format:
     theme:
       light: [cosmo, theme-light.scss]
       dark: [darkly, theme-dark.scss]
-    css: [assets/base.css, assets/home.css, assets/pubs.css, assets/pages.css]
+    css: [assets/base.css, assets/home.css, assets/pubs.css, assets/pages.css, assets/map.css]
     include-in-header:
       text: |
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
         <meta name="theme-color" content="#ffffff">
-    include-after-body: [assets/site-js.html, assets/pages-js.html, assets/home-js.html]   # inline JS (written by scripts/build_site.py from assets/*.js)
+    include-after-body: [assets/site-js.html, assets/pages-js.html, assets/home-js.html, assets/map-js.html]   # inline JS (written by scripts/build_site.py from assets/*.js)
     toc: false
     smooth-scroll: false

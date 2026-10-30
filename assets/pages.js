@@ -1,7 +1,9 @@
 // pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
 // Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
 //   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
-//   2. Publications: search box and type tabs; hides empty year groups; live result count
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
 //   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
 // Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
 (function () {
@@ -72,6 +74,7 @@
     const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
     const status = document.querySelector(".filter-status");
     const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
     const total = items.length;
     let type = "all";
     items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
@@ -88,6 +91,7 @@
       });
       groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
       if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
       if (status) status.textContent = (shown === total && !terms.length) ? "" :
         "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
     }
@@ -99,6 +103,13 @@
     const reset = document.querySelector(".filter-reset");
     if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
     pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
   }
 
   // ---------- 3. Projects: theme tabs ----------

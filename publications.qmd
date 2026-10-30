@@ -12,7 +12,31 @@ body-classes: "page-inner page-publications"
 
 ```{=html}
 <div class="pg">
+<div class="pub-head">
+<div class="pub-head-text">
 <p class="pg-lede">Newest first: 7 journal articles, 10 conference papers, 1 paper under review and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>.</p>
+<p class="pub-cites"><i class="bi bi-quote" aria-hidden="true"></i><span><strong>121 citations</strong> · h-index 7 · i10-index 6 (<a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>, as of October 30, 2026). Per-paper counts are from the same profile; papers it does not list use OpenAlex.</span></p>
+</div>
+<figure class="pub-chart" data-type="all">
+<figcaption><span>Publications per year</span><span class="pub-chart-total">20 in total</span></figcaption>
+<svg class="pub-chart-svg" viewBox="0 0 300 132" role="img" focusable="false" aria-label="Bar chart of publications per year, 2021 to 2026. 2021: 2; 2022: 3; 2023: 4; 2024: 3; 2025: 3; 2026: 5. The table that follows gives the counts by type.">
+<line class="axis" x1="0" x2="300" y1="108.5" y2="108.5"/>
+<g class="yr"><title>2021: 1 conference paper, 1 thesis</title><rect class="seg pt-conference" x="10.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-thesis" x="10.5" y="72.0" width="29.0" height="18.0" rx="2"/><text class="n" x="25.0" y="67.0" text-anchor="middle">2</text><text class="yl" x="25.0" y="126" text-anchor="middle">2021</text></g>
+<g class="yr"><title>2022: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="60.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="60.5" y="54.0" width="29.0" height="36.0" rx="2"/><text class="n" x="75.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="75.0" y="126" text-anchor="middle">2022</text></g>
+<g class="yr"><title>2023: 1 journal article, 3 conference papers</title><rect class="seg pt-journal" x="110.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="110.5" y="36.0" width="29.0" height="54.0" rx="2"/><text class="n" x="125.0" y="31.0" text-anchor="middle">4</text><text class="yl" x="125.0" y="126" text-anchor="middle">2023</text></g>
+<g class="yr"><title>2024: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="160.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="160.5" y="54.0" width="29.0" height="36.0" rx="2"/><text class="n" x="175.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="175.0" y="126" text-anchor="middle">2024</text></g>
+<g class="yr"><title>2025: 2 journal articles, 1 thesis</title><rect class="seg pt-journal" x="210.5" y="73.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-thesis" x="210.5" y="54.0" width="29.0" height="18.0" rx="2"/><text class="n" x="225.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="225.0" y="126" text-anchor="middle">2025</text></g>
+<g class="yr"><title>2026: 2 journal articles, 2 conference papers, 1 paper under review</title><rect class="seg pt-journal" x="260.5" y="73.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-conference" x="260.5" y="37.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-preprint" x="260.5" y="18.0" width="29.0" height="18.0" rx="2"/><text class="n" x="275.0" y="13.0" text-anchor="middle">5</text><text class="yl" x="275.0" y="126" text-anchor="middle">2026</text></g>
+</svg>
+<ul class="pub-chart-key" aria-hidden="true">
+<li><span class="dot pt-journal"></span>Journal</li>
+<li><span class="dot pt-conference"></span>Conference</li>
+<li><span class="dot pt-preprint"></span>Under review</li>
+<li><span class="dot pt-thesis"></span>Thesis</li>
+</ul>
+<table class="visually-hidden" data-quarto-disable-processing="true"><caption>Publications per year by type</caption><thead><tr><th scope="col">Year</th><th scope="col">Journal</th><th scope="col">Conference</th><th scope="col">Under review</th><th scope="col">Thesis</th><th scope="col">Total</th></tr></thead><tbody><tr><th scope="row">2026</th><td>2</td><td>2</td><td>1</td><td>0</td><td>5</td></tr><tr><th scope="row">2025</th><td>2</td><td>0</td><td>0</td><td>1</td><td>3</td></tr><tr><th scope="row">2024</th><td>1</td><td>2</td><td>0</td><td>0</td><td>3</td></tr><tr><th scope="row">2023</th><td>1</td><td>3</td><td>0</td><td>0</td><td>4</td></tr><tr><th scope="row">2022</th><td>1</td><td>2</td><td>0</td><td>0</td><td>3</td></tr><tr><th scope="row">2021</th><td>0</td><td>1</td><td>0</td><td>1</td><td>2</td></tr></tbody></table>
+</figure>
+</div>
 <div class="filter-bar pub-filter" hidden>
 <div class="search-box"><i class="bi bi-search" aria-hidden="true"></i><label class="visually-hidden" for="pub-q">Search publications</label><input id="pub-q" type="search" placeholder="Search title, author, venue…" autocomplete="off" spellcheck="false"></div>
 <div class="ftabs" role="group" aria-label="Filter by publication type">
@@ -38,6 +62,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
 <a class="btn-xs" href="projects/npph2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 3</a>
 </div>
 <div class="pub-bib" id="bib-Li2026" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -166,6 +191,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <a class="btn-xs" href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">News</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025ghg">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 10</a>
 </div>
 <div class="pub-bib" id="bib-li2025ghg" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -193,6 +219,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">Code</a>
 <a class="btn-xs" href="projects/txh2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025hydrogen">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 9</a>
 </div>
 <div class="pub-bib" id="bib-li2025hydrogen" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -247,6 +274,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/wind-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2024towards">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 28</a>
 </div>
 <div class="pub-bib" id="bib-li2024towards" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -276,6 +304,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/offshore-wind-hydrogen-om.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2024techno">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 2</a>
 </div>
 <div class="pub-bib" id="bib-li2024techno" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -302,6 +331,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-links">
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-shen2024demand">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 1</a>
 </div>
 <div class="pub-bib" id="bib-shen2024demand" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -331,6 +361,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/supply-chain-microgrid-models">Code</a>
 <a class="btn-xs" href="projects/facility-microgrid-location.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023facility">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 12</a>
 </div>
 <div class="pub-bib" id="bib-li2023facility" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -358,6 +389,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">Code</a>
 <a class="btn-xs" href="projects/uq-mfgpr.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023multi">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 1</a>
 </div>
 <div class="pub-bib" id="bib-li2023multi" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -411,6 +443,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/solar-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023techno">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 5</a>
 </div>
 <div class="pub-bib" id="bib-li2023techno" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -441,6 +474,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://doi.org/10.1080/01605682.2022.2035273">DOI</a>
 <a class="btn-xs" href="projects/facility-microgrid-location.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jin2021supply">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 10</a>
 </div>
 <div class="pub-bib" id="bib-jin2021supply" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -468,6 +502,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://doi.org/10.1109/kpec54747.2022.9814722">DOI</a>
 <a class="btn-xs" href="projects/wind-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-badakhshan2022integrating">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 18</a>
 </div>
 <div class="pub-bib" id="bib-badakhshan2022integrating" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -494,6 +529,7 @@ body-classes: "page-inner page-publications"
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/wind-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2022optimal">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 17</a>
 </div>
 <div class="pub-bib" id="bib-li2022optimal" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -525,6 +561,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-links">
 
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jin2021system">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 5</a>
 </div>
 <div class="pub-bib" id="bib-jin2021system" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>

@@ -10,6 +10,7 @@
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
 <a class="btn-xs" href="projects/npph2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 3</a>
 </div>
 <div class="pub-bib" id="bib-Li2026" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -65,6 +66,7 @@
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <a class="btn-xs" href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">News</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025ghg">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 10</a>
 </div>
 <div class="pub-bib" id="bib-li2025ghg" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
@@ -92,6 +94,7 @@
 <a class="btn-xs" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">Code</a>
 <a class="btn-xs" href="projects/txh2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025hydrogen">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 9</a>
 </div>
 <div class="pub-bib" id="bib-li2025hydrogen" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>

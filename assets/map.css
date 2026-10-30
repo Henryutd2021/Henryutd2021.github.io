@@ -1,0 +1,112 @@
+/* map.css — "Collaborations around the world" section on the About page (2026-10-30).
+   Markup from scripts/build_map.py (_map.qmd); behaviour in assets/map.js (Leaflet 1.9.4 + CARTO tiles).
+   Colours come from the base.css tokens, so day and night follow Quarto's toggle; the presentation colour is local. */
+
+body.quarto-light { --cmap-talk: #ea580c; --cmap-attr-bg: rgba(255, 255, 255, .82); }
+body.quarto-dark  { --cmap-talk: #fb923c; --cmap-attr-bg: rgba(17, 19, 24, .78); }
+
+.cmap-sec { margin-top: 1.2rem; }
+.cmap-stats { display: flex; flex-wrap: wrap; gap: .35rem 1.4rem; margin: -.5rem 0 1.1rem; font-size: .88rem; color: var(--muted); }
+.cmap-stats strong { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+
+/* ---------- map box ---------- */
+.cmap { position: relative; height: clamp(300px, 44vw, 460px); border: 1px solid var(--line); border-radius: var(--r);
+  overflow: hidden; background: var(--bg-3); box-shadow: var(--shadow-sm); font-family: var(--font); z-index: 0; }
+.cmap.is-loading::after { content: "Loading map…"; position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: .86rem; color: var(--muted); }
+.cmap.leaflet-container { background: var(--bg-3); font: inherit; font-size: .84rem; }
+.cmap.leaflet-container:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cmap.is-armed { border-color: var(--accent-line); }
+/* OpenStreetMap fallback tiles (no CARTO key yet): toned to a quiet grey by day, inverted to a dark map by night */
+.cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) contrast(.88) brightness(1.06); }
+body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) invert(1) contrast(.82) brightness(.82); }
+
+/* zoom and "show all" buttons, attribution: token colours in both themes */
+.cmap.leaflet-container .leaflet-bar { border: 1px solid var(--line-strong); box-shadow: var(--shadow-sm); border-radius: var(--r-sm); }
+.cmap.leaflet-container .leaflet-bar a { background: var(--surface); color: var(--ink-2); border-bottom-color: var(--line); width: 32px; height: 32px;
+  line-height: 32px; text-decoration: none; }
+.cmap.leaflet-container .leaflet-bar a:hover, .cmap.leaflet-container .leaflet-bar a:focus-visible { background: var(--bg-2); color: var(--accent); }
+.cmap.leaflet-container .leaflet-bar a.leaflet-disabled { background: var(--bg-2); color: var(--faint); }
+.cmap.leaflet-container.leaflet-touch .leaflet-bar a { width: 34px; height: 34px; line-height: 34px; }
+.cmap.leaflet-container .cmap-reset a { display: grid; place-items: center; font-size: 1rem; }
+.cmap.leaflet-container .leaflet-control-attribution { background: var(--cmap-attr-bg); color: var(--muted); font-size: .7rem; padding: 0 .4rem; }
+.cmap.leaflet-container .leaflet-control-attribution a { color: var(--ink-2); }
+
+/* ---------- markers (divIcons; the inner span is what you see, so it can be nudged apart when markers overlap) ---------- */
+.cmap-mk { background: none; border: 0; }
+.cmap-mk > span { display: block; width: 100%; height: 100%; border-radius: 50%; box-sizing: border-box;
+  transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(calc(var(--s, 1) * var(--k, 1))) rotate(var(--rot, 0deg));
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease); box-shadow: 0 1px 3px rgba(0, 0, 0, .28); }
+.cmap-mk--collab > span { background: var(--accent); border: 2px solid var(--surface); }
+.cmap-mk--home > span { background: var(--surface); border: 4px solid var(--accent); }
+.cmap-mk--talk > span { --rot: 45deg; border-radius: 2px; background: var(--cmap-talk); border: 2px solid var(--surface); }
+.cmap-mk:hover > span, .cmap-mk:focus-visible > span { --s: 1.25; }
+.cmap-mk:focus { outline: none; }
+.cmap-mk:focus-visible > span { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---------- popups ---------- */
+.cmap.leaflet-container .leaflet-popup-content-wrapper { background: var(--surface); color: var(--ink-2); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--shadow-lg); }
+.cmap.leaflet-container .leaflet-popup-tip { background: var(--surface); box-shadow: none; border: 1px solid var(--line); }
+.cmap.leaflet-container .leaflet-popup-content { margin: .8rem 1rem .85rem; font-size: .84rem; line-height: 1.45; }
+.cmap.leaflet-container a.leaflet-popup-close-button { color: var(--muted); top: 4px; right: 4px; }
+.cmap.leaflet-container a.leaflet-popup-close-button:hover { color: var(--ink); }
+.cmap-pop h3 { margin: 0 1rem .15rem 0; font-size: .95rem; font-weight: 650; line-height: 1.3; color: var(--ink); }
+.cmap .cmap-pop p { margin: 0; }
+.cmap-pop-kind { font-size: .68rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem !important; }
+.cmap-pop-kind--talk { color: var(--cmap-talk); }
+.cmap-pop-place { color: var(--muted); font-size: .8rem; }
+.cmap-pop-n { margin-top: .45rem !important; color: var(--ink-2); }
+.cmap-pop-n strong { color: var(--ink); }
+.cmap-pop-talk { margin-top: .45rem !important; font-style: italic; color: var(--ink-2); }
+.cmap-pop-papers { margin: .35rem 0 0; padding-left: 1rem; font-size: .8rem; color: var(--ink-2); }
+.cmap-pop-papers li { margin: .2rem 0; }
+.cmap .cmap-pop-papers a { color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+.cmap .cmap-pop-papers a:hover { color: var(--accent); text-decoration-color: currentColor; }
+.cmap-pop-yr { color: var(--muted); font-variant-numeric: tabular-nums; }
+.cmap-pop-more { list-style: none; margin-left: -1rem !important; color: var(--muted); }
+
+/* ---------- legend and hint ---------- */
+.cmap-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .4rem 1.5rem;
+  margin-top: .65rem; font-size: .84rem; color: var(--muted); }
+.cmap-legend { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin: 0; padding: 0; list-style: none; color: var(--ink-2); }
+.cmap-legend li { display: inline-flex; align-items: center; gap: .45rem; }
+.cmap-hint { margin: 0; font-size: .8rem; }
+
+/* legend keys and list bullets: the marker shapes, small */
+.cmap-key { display: inline-block; flex: none; width: 11px; height: 11px; border-radius: 50%; box-sizing: border-box; vertical-align: -1px; }
+.cmap-key--collab { background: var(--accent); }
+.cmap-key--home { background: var(--surface); border: 3px solid var(--accent); width: 12px; height: 12px; }
+.cmap-key--talk { width: 9px; height: 9px; border-radius: 1px; background: var(--cmap-talk); transform: rotate(45deg); margin-inline: 1px; }
+
+/* ---------- list of institutions by country (always shown; the content when the map cannot load) ---------- */
+.cmap-list { columns: 3 250px; column-gap: 2.2rem; margin-top: 1.6rem; }
+.cmap-country { margin-bottom: 1.1rem; }
+.cmap-country h3 { margin: 0 0 .45rem; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); break-after: avoid; }
+.cmap-country ul { margin: 0; padding: 0; list-style: none; }
+.cmap-country li { break-inside: avoid; display: grid; grid-template-columns: 14px 1fr; column-gap: .5rem; align-items: baseline;
+  padding: .28rem 0; font-size: .9rem; line-height: 1.4; }
+.cmap-country li .cmap-key { justify-self: center; }
+.cmap-name { color: var(--ink); font-weight: 500; }
+.cmap-tag { display: inline-block; margin-left: .35rem; padding: 0 .4rem; border-radius: 999px; font-size: .68rem; font-weight: 600;
+  letter-spacing: .03em; color: var(--accent-ink); background: var(--accent-soft); border: 1px solid var(--accent-line); vertical-align: 1px; }
+.cmap-meta { display: block; font-size: .8rem; color: var(--muted); }
+
+/* ---------- visitor map (third-party widget from site/_visitor_widget.html; inserted by map.js after load) ---------- */
+.visitor-map { margin-top: 1.6rem; max-width: 480px; }
+.cmap-sub { margin: 0 0 .2rem; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.visitor-note { margin: 0 0 .6rem; font-size: .8rem; color: var(--muted); }
+/* the widget draws its own blue panel with white text (readable in both themes); a quiet neutral frame around it */
+.visitor-map-body { min-height: 120px; padding: 6px; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2);
+  overflow: hidden; }
+.visitor-map-body > * { max-width: 100%; }
+.visitor-map-body img { max-width: 100%; height: auto; }
+
+@media (max-width: 600px) {
+  .cmap { height: 320px; }
+  .cmap-foot { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cmap-mk > span { transition: none; }
+}

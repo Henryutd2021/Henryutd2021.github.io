@@ -85,6 +85,15 @@ image: images/profile.jpg
 </section>
 
 <!-- ============ 4. NEWS (al-folio news table) ============ -->
+<!-- ============ 3b. AT A GLANCE (generated: _stats.qmd by scripts/build_site.py) ============ -->
+<section class="home-wrap home-sec home-stats" aria-label="Publications and citations at a glance">
+```
+
+{{< include _stats.qmd >}}
+
+```{=html}
+</section>
+
 <section class="home-wrap home-sec" aria-labelledby="h-news">
   <div class="section-title"><h2 id="h-news">News</h2></div>
   <table class="news-table" data-quarto-disable-processing="true">
@@ -153,6 +162,12 @@ image: images/profile.jpg
   </div>
 </section>
 
+<!-- ============ 7b. MAP: collaborating institutions and presentations; visitor map (generated: _map.qmd) ============ -->
+```
+
+{{< include _map.qmd >}}
+
+```{=html}
 <!-- ============ 8. SOCIAL ICONS (al-folio contact row) ============ -->
 <section class="home-wrap home-social" aria-labelledby="h-contact">
   <h2 id="h-contact" class="visually-hidden">Contact and profiles</h2>
@@ -163,6 +178,7 @@ image: images/profile.jpg
     <li><a href="https://github.com/Henryutd2021" aria-label="GitHub" title="GitHub"><i class="bi bi-github" aria-hidden="true"></i></a></li>
     <li><a href="https://www.linkedin.com/in/honglin-li-998b18221/" aria-label="LinkedIn" title="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a></li>
     <li><a href="files/Honglin_Li_CV.pdf" aria-label="CV (PDF)" title="CV (PDF)"><i class="bi bi-file-earmark-person-fill" aria-hidden="true"></i></a></li>
+    <li><a href="files/honglin-li.vcf" download aria-label="Add to contacts (vCard)" title="Add to contacts (vCard)"><i class="bi bi-person-vcard-fill" aria-hidden="true"></i></a></li>
   </ul>
   <p class="contact-note">Questions about a paper, a model framework or a collaboration? Write to <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a>.</p>
 </section>

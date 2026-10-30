@@ -1,0 +1,297 @@
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  const tilesKey = root.getAttribute("data-tiles-key");
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span></li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>

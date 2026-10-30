@@ -1,0 +1,19 @@
+<!--
+  _visitor_widget.html: optional visitor map (MapMyVisitors / ClustrMaps style) on the About page, below the
+  collaboration map. Only this page loads it.
+
+  While this file holds only comments, the site outputs nothing for it (the container in _map.qmd stays hidden).
+  With a snippet below this comment, scripts/build_map.py puts it in an inert <template> in _map.qmd; assets/map.js
+  then inserts it after the page has loaded (never blocking the page) and hides the "Visitors" box again if the
+  provider's script fails or draws nothing within 15 seconds.
+
+  To change or add the widget:
+    1. Copy the provider's HTML snippet (use an explicit https:// URL in src).
+    2. Paste it below this comment, unchanged otherwise.
+    3. From the repository root run: python3 scripts/build_map.py   then   python3 scripts/build_site.py
+       and re-render the site.
+  To remove it, delete the snippet again (keep this comment) and repeat step 3.
+
+  Current widget: MapMyVisitors, set up by Henry on 2026-10-30.
+-->
+<script type="text/javascript" id="mapmyvisitors" src="https://mapmyvisitors.com/map.js?d=dTtq3oTCLFrNLMK0zar8qTaqpgqc0SdBITzkxt5uIvg&cl=ffffff&w=a"></script>

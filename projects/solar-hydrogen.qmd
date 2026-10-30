@@ -57,6 +57,7 @@ toc: false
 <a class="btn-xs" href="https://doi.org/10.1109/eem58374.2023.10161786">DOI</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023techno">Bib</button>
+<a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 5</a>
 </div>
 <div class="pub-bib" id="bib-li2023techno" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>

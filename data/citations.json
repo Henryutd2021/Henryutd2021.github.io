@@ -1,0 +1,179 @@
+{
+ "source": "OpenAlex",
+ "source_url": "https://openalex.org",
+ "fetched": "2026-10-30",
+ "total": 79,
+ "by_year": {
+  "2022": 2,
+  "2023": 10,
+  "2024": 21,
+  "2025": 29,
+  "2026": 17
+ },
+ "works": {
+  "jin2021supply": {
+   "doi": "10.1080/01605682.2022.2035273",
+   "openalex_id": "W4210824215",
+   "cited_by_count": 10,
+   "counts_by_year": {
+    "2022": 2,
+    "2023": 2,
+    "2024": 3,
+    "2025": 3
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4210824215",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "badakhshan2022integrating": {
+   "doi": "10.1109/kpec54747.2022.9814722",
+   "openalex_id": "W4284884114",
+   "cited_by_count": 9,
+   "counts_by_year": {
+    "2023": 4,
+    "2024": 3,
+    "2025": 2
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4284884114",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2022optimal": {
+   "doi": "10.1088/1742-6596/2265/4/042063",
+   "openalex_id": "W4281762744",
+   "cited_by_count": 10,
+   "counts_by_year": {
+    "2023": 3,
+    "2024": 5,
+    "2025": 2
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4281762744",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2023multi": {
+   "doi": "10.1115/detc2023-114762",
+   "openalex_id": "W4388873712",
+   "cited_by_count": 1,
+   "counts_by_year": {
+    "2025": 1
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4388873712",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2023facility": {
+   "doi": "10.1016/j.apm.2023.02.014",
+   "openalex_id": "W4321350184",
+   "cited_by_count": 11,
+   "counts_by_year": {
+    "2024": 4,
+    "2025": 4,
+    "2026": 3
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4321350184",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2023locating": {
+   "doi": "10.1109/segre58867.2023.00071",
+   "openalex_id": "W4387412887",
+   "cited_by_count": 0,
+   "counts_by_year": {},
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4387412887",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2023techno": {
+   "doi": "10.1109/eem58374.2023.10161786",
+   "openalex_id": "W4382935409",
+   "cited_by_count": 5,
+   "counts_by_year": {
+    "2023": 1,
+    "2024": 2,
+    "2025": 1,
+    "2026": 1
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4382935409",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2024techno": {
+   "doi": "10.1088/1742-6596/2767/6/062016",
+   "openalex_id": "W4399490483",
+   "cited_by_count": 2,
+   "counts_by_year": {
+    "2024": 1,
+    "2026": 1
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4399490483",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2024towards": {
+   "doi": "10.1115/1.4063971",
+   "openalex_id": "W4388230912",
+   "cited_by_count": 20,
+   "counts_by_year": {
+    "2024": 3,
+    "2025": 10,
+    "2026": 7
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4388230912",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2025ghg": {
+   "doi": "10.1016/j.crsus.2025.100367",
+   "openalex_id": "W4409361263",
+   "cited_by_count": 3,
+   "counts_by_year": {
+    "2025": 1,
+    "2026": 2
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4409361263",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2025hydrogen": {
+   "doi": "10.1016/j.ijhydene.2025.02.303",
+   "openalex_id": "W4408083860",
+   "cited_by_count": 8,
+   "counts_by_year": {
+    "2025": 5,
+    "2026": 3
+   },
+   "cited_by_url": "https://openalex.org/works?filter=cites:W4408083860",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "Li2026": {
+   "doi": "10.1038/s41467-026-73630-y",
+   "openalex_id": "W7163199564",
+   "cited_by_count": 0,
+   "counts_by_year": {},
+   "cited_by_url": "https://openalex.org/works?filter=cites:W7163199564",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "jacob2026role": {
+   "doi": "10.1016/j.crsus.2026.100820",
+   "openalex_id": "W7203886371",
+   "cited_by_count": 0,
+   "counts_by_year": {},
+   "cited_by_url": "https://openalex.org/works?filter=cites:W7203886371",
+   "found": true,
+   "fetched": "2026-10-30"
+  },
+  "li2026smrcogeneration": {
+   "doi": "10.48550/arxiv.2608.10999",
+   "openalex_id": "W7202266063",
+   "cited_by_count": 0,
+   "counts_by_year": {},
+   "cited_by_url": "https://openalex.org/works?filter=cites:W7202266063",
+   "found": true,
+   "fetched": "2026-10-30"
+  }
+ },
+ "note": "Counts of citing works indexed by OpenAlex; usually lower than Google Scholar."
+}
