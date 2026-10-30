@@ -1,0 +1,38 @@
+---
+title: "Industry internship at FM: resilience and operations modeling"
+subtitle: "Internship, FM (August 2024 – January 2025)"
+description: "How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?"
+order: 11
+categories: ["Industry"]
+themekey: "microgrid"
+themelabel: "Industry"
+themeicon: "briefcase"
+body-classes: "project-page theme-microgrid"
+---
+
+## Research question
+
+::: {.question}
+How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?
+:::
+
+## My contribution
+
+Intern. Built the microgrid sizing model and the production-line simulation, and proposed the wind-farm maintenance framework.
+
+## Method
+
+Techno-economic optimization of solar PV, battery and backup sizing that minimizes the levelized cost of energy while meeting demand in modeled grid-outage scenarios, using a DOE reference load profile scaled to the campus's annual consumption and site solar data; discrete-event simulation (Arena) of a lithium battery production line to quantify the effect of equipment failures and maintenance schedules and to locate bottlenecks; a proposed optimization framework for predictive and corrective maintenance scheduling of wind farms.
+
+::: {.callout-note title="Boundary conditions"}
+Industry work: company data, models and results are confidential and are not shown here.
+:::
+
+## Outputs
+
+Publication details are on the [Publications](../publications.qmd) page.
+
+
+## Reproducibility
+
+Not public (company work). Last updated 2026-10.

@@ -22,12 +22,12 @@ First author. Implemented and evaluated the models, as part of a DOE Wind Energy
 
 ## Method
 
-Linear and nonlinear multi-fidelity Gaussian process regression, using kernel-density-sampled SCADA points from the open SDWPF dataset as high-fidelity data, compared with single-fidelity regression.
+Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression that fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), compared with single-fidelity regression on point and probabilistic metrics.
 
 ## Key findings
 
 ::: {.findings}
-- In the reported test on nine turbines, nonlinear multi-fidelity regression lowered RMSE on eight of them (3.9% on average across the nine); the probabilistic criteria did not all favor it.
+- In the reported test on nine turbines, nonlinear multi-fidelity regression improved point accuracy for most turbines; the probabilistic criteria did not uniformly favor it.
 :::
 
 ::: {.callout-note title="Boundary conditions"}
@@ -36,9 +36,9 @@ One dataset and one generic low-fidelity curve.
 
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1115/detc2023-114762){.out-link}
+[<i class="bi bi-box-arrow-up-right"></i> Paper (DOI)](https://doi.org/10.1115/detc2023-114762){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Method framework (GitHub)](https://github.com/Henryutd2021/mfgpr-wind-power-curve){.out-link}
 
 
 ## Reproducibility
 
-Results archived privately. Last updated 2026-10.
+Method framework with documentation, examples and tests on GitHub; case-study results archived privately. Last updated 2026-10.

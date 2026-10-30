@@ -33,14 +33,14 @@ JORS sizes on-site microgrids for fixed facility locations with production and i
 :::
 
 ::: {.callout-note title="Boundary conditions"}
-Stylized multi-echelon networks with synthetic distances and costs; renewable capacity factors provided by a co-author.
+Stylized multi-echelon networks with synthetic distances and costs.
 :::
 
 ## Outputs
 
-[<i class="bi bi-box-arrow-up-right"></i> AMM paper (DOI)](https://doi.org/10.1016/j.apm.2023.02.014){.out-link} [<i class="bi bi-box-arrow-up-right"></i> SEGRE paper (DOI)](https://doi.org/10.1109/segre58867.2023.00071){.out-link} [<i class="bi bi-box-arrow-up-right"></i> JORS paper (DOI)](https://doi.org/10.1080/01605682.2022.2035273){.out-link}
+[<i class="bi bi-box-arrow-up-right"></i> AMM paper (DOI)](https://doi.org/10.1016/j.apm.2023.02.014){.out-link} [<i class="bi bi-box-arrow-up-right"></i> SEGRE paper (DOI)](https://doi.org/10.1109/segre58867.2023.00071){.out-link} [<i class="bi bi-box-arrow-up-right"></i> JORS paper (DOI)](https://doi.org/10.1080/01605682.2022.2035273){.out-link} [<i class="bi bi-box-arrow-up-right"></i> Model framework (GitHub)](https://github.com/Henryutd2021/supply-chain-microgrid-models){.out-link}
 
 
 ## Reproducibility
 
-Models archived privately; a cleaned release is planned. Last updated 2026-10.
+Model framework for the AMM and SEGRE location models and the M.S. thesis models, with documentation, examples and tests on GitHub; study inputs and results archived privately. Last updated 2026-10.

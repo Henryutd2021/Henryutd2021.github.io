@@ -2,11 +2,13 @@
 title: "Software & Data"
 ---
 
-These code and data packages accompany published papers.
+Documented model frameworks that accompany published papers. Each repository states the model with the paper's equation numbers, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic data and tests.
 
-| Package | Accompanies | Archive |
+| Framework | Accompanies | Repository |
 |---|---|---|
-| ERCOT hydrogen-network planning model and processed inputs | International Journal of Hydrogen Energy (2025) | [10.5281/zenodo.14894611](https://doi.org/10.5281/zenodo.14894611) |
-| Emission-intensity load-regulation code and results; input data | Cell Reports Sustainability (2025) | [10.5281/zenodo.14658398](https://doi.org/10.5281/zenodo.14658398); [10.17632/jfcc62strg.1](https://doi.org/10.17632/jfcc62strg.1) |
+| Two-stage stochastic planning of electrolyzers, hydrogen storage and fuel cells with inter-zonal hydrogen transport | International Journal of Hydrogen Energy (2025) | [txh2-ercot-hydrogen](https://github.com/Henryutd2021/txh2-ercot-hydrogen) |
+| Demand-side load regulation guided by real-time emission intensity | Cell Reports Sustainability (2025) | [ghg-load-regulation](https://github.com/Henryutd2021/ghg-load-regulation) |
+| Supply-chain facility location with on-site microgrids; virtual power plant scheduling | Applied Mathematical Modelling (2023); IEEE SEGRE 2023; M.S. thesis (2021) | [supply-chain-microgrid-models](https://github.com/Henryutd2021/supply-chain-microgrid-models) |
+| Multi-fidelity Gaussian process regression for probabilistic wind power curves | ASME IDETC 2023 | [mfgpr-wind-power-curve](https://github.com/Henryutd2021/mfgpr-wind-power-curve) |
 
-For other papers, see each paper's data and code availability statement. Documented releases of earlier models are in preparation.
+For the data and code of individual studies, see each paper's data availability statement.

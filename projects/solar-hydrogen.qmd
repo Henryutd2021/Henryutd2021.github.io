@@ -31,7 +31,7 @@ Optimization of a 115-MW solar plant with electrolysis using SAM solar models, E
 :::
 
 ::: {.callout-note title="Boundary conditions"}
-The solar-thermal levelized costs divide whole-system financial cost by undiscounted hydrogen output, while the photovoltaic case adds the electricity cost of delivered energy to electrolyzer costs; the ranking held when both were recomputed on a common basis, but the absolute values are not directly comparable. Conference-length study.
+Single West Texas site; cost trajectories from NREL's Annual Technology Baseline; conference-length study.
 :::
 
 ## Outputs

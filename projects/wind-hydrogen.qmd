@@ -43,4 +43,4 @@ Cost assumptions date from 2020–2023 and predate final federal hydrogen credit
 
 ## Reproducibility
 
-Results archived privately; public release planned. Last updated 2026-10.
+Results archived privately; a model framework release is planned. Last updated 2026-10.

@@ -32,7 +32,7 @@ Two-stage approach: Monte Carlo operation-and-maintenance simulation, then techn
 :::
 
 ::: {.callout-note title="Boundary conditions"}
-Single site; 2012 wind-resource data paired with 2022 electricity prices; maintenance parameters from the collaborators' framework.
+Single site and one weather year; maintenance parameters from the collaborators' framework.
 :::
 
 ## Outputs
