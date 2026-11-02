@@ -103,8 +103,11 @@
   form: cards
   icon: bolt
   tier: foundations
+  status: active
+  path: 01-power-energy.qmd
   minutes: 15
   title: "Power or energy? What is the difference between kW and kWh?"
+  subtitle: "Switch a home's appliances on and watch power and energy part ways"
   short: "Power or energy?"
   does: "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country."
   outcome: "Convert between units and make quick estimates."
@@ -115,8 +118,11 @@
   form: cards
   icon: curve
   tier: foundations
+  status: active
+  path: 02-demand.qmd
   minutes: 15
   title: "Why does electricity demand rise and fall?"
+  subtitle: "Read a real year of demand, then add solar and dig the duck curve"
   short: "The shape of demand"
   does: "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”."
   outcome: "Read a demand curve and explain its peaks."

@@ -1,4 +1,9 @@
 {
+ "average-power": {
+  "term": "Average power",
+  "short": "The energy used over a period divided by the length of that period.",
+  "lesson": "1"
+ },
  "balancing": {
   "term": "Balancing",
   "short": "Keeping the power that plants make equal to the power that people use, at every moment.",
@@ -74,6 +79,11 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
  },
+ "fermi-estimate": {
+  "term": "Fermi estimate",
+  "short": "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right.",
+  "lesson": "1"
+ },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
@@ -88,6 +98,11 @@
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
+ },
+ "kilowatt": {
+  "term": "Kilowatt (kW)",
+  "short": "A unit of power equal to 1,000 watts.",
+  "lesson": "1"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -104,6 +119,16 @@
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
   "lesson": 10
  },
+ "load-factor": {
+  "term": "Load factor",
+  "short": "Average demand over a period divided by the peak demand in that period.",
+  "lesson": "2"
+ },
+ "load-duration-curve": {
+  "term": "Load-duration curve",
+  "short": "A year's hourly demand sorted from highest to lowest, showing for how many hours each level of demand is needed.",
+  "lesson": "2"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -119,6 +144,11 @@
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0
  },
+ "net-demand": {
+  "term": "Net demand (net load)",
+  "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
+  "lesson": "2"
+ },
  "objective": {
   "term": "Objective",
   "short": "What an optimization tries to make as small or as large as possible, such as the total cost.",
@@ -133,6 +163,11 @@
   "term": "Pareto frontier",
   "short": "The set of plans that cannot be made cheaper without becoming dirtier, or cleaner without becoming more expensive.",
   "lesson": 12
+ },
+ "peak-demand": {
+  "term": "Peak demand",
+  "short": "The highest demand in a period, such as the busiest hour of a year, which sets how much capacity the grid needs.",
+  "lesson": "2"
  },
  "peaker": {
   "term": "Peaker",
@@ -174,6 +209,11 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11
  },
+ "terawatt-hour": {
+  "term": "Terawatt-hour (TWh)",
+  "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
+  "lesson": "1"
+ },
  "unserved-energy": {
   "term": "Unserved energy",
   "short": "Demand that could not be met, so some customers lost power.",
@@ -183,6 +223,11 @@
   "term": "Variable renewables",
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0
+ },
+ "watt-hour": {
+  "term": "Watt-hour (Wh)",
+  "short": "A unit of energy: one watt kept up for one hour; 1,000 Wh make one kilowatt-hour.",
+  "lesson": "1"
  },
  "wholesale-price": {
   "term": "Wholesale price",
