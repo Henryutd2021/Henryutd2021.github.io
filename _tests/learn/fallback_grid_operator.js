@@ -9,16 +9,18 @@ const path = require("path");
 const SITE = path.resolve(__dirname, "..", "..");
 const M = require(path.join(SITE, "assets/learn/grid-operator.js"));
 const town = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8"));
+const days = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_days.json"), "utf8"));
+const world = M.prepare(town, days, "lesson0");
 const QMD = path.join(SITE, "learn/00-grid-operator.qmd");
 
 function svg() {
-  const ex = M.expert(town, "spring"), W = 720, H = 300, Mg = { l: 52, r: 10, t: 30, b: 34 }, YMAX = 400;
+  const ex = M.expert(world), W = 720, H = 300, Mg = { l: 52, r: 10, t: 30, b: 34 }, YMAX = 400;
   const pw = W - Mg.l - Mg.r, ph = H - Mg.t - Mg.b;
   const x = t => Mg.l + pw * t / 24, y = v => Mg.t + ph * (1 - v / YMAX), f = v => v.toFixed(1);
   const out = [];
   out.push(`<svg class="lx-static" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="lx-static-title">`);
   out.push(`<title id="lx-static-title">Prairie Town's day under the expert rule: stacked hourly supply from nuclear, wind, solar, ` +
-           `the combined-cycle gas plant and the gas peaker, with demand as a line. Demand peaks at ${Math.max(...ex.hours.map(r => r.demand))} MW at 19:00.</title>`);
+           `the combined-cycle gas plant and the gas peaker, with demand as a line. Demand peaks at ${Math.max(...ex.hours.map(r => r.demand))} MW in the afternoon, and gas runs hardest after sunset.</title>`);
   out.push('<g class="ex-grid">' + [0, 100, 200, 300, 400].map(v => `<line x1="${Mg.l}" x2="${Mg.l + pw}" y1="${f(y(v))}" y2="${f(y(v))}"/>`).join("") + "</g>");
   out.push('<g class="ex-axis">' + [0, 100, 200, 300, 400].map(v => `<text x="${Mg.l - 8}" y="${f(y(v) + 5)}" text-anchor="end">${v}</text>`).join("") +
            `<text x="${Mg.l - 8}" y="14" text-anchor="end">MW</text>` +
@@ -40,7 +42,7 @@ function svg() {
   out.push("</svg>");
   const legend = [["nuclear", "Nuclear"], ["wind", "Wind"], ["solar", "Solar"], ["cc", "Gas combined-cycle"], ["pk", "Gas peaker"]]
     .map(([k, s]) => `<li><span class="ex-swatch lx-bg-${k}" aria-hidden="true"></span>${s}</li>`).join("") +
-    '<li><span class="lx-swatch-line" aria-hidden="true"></span>Demand</li><li><span class="ex-swatch lx-sw-spilled" aria-hidden="true"></span>Spilled wind</li>';
+    '<li><span class="lx-swatch-line" aria-hidden="true"></span>Demand</li><li><span class="ex-swatch lx-sw-spilled" aria-hidden="true"></span>Spilled wind or solar</li>';
   return out.join("\n") + `\n<ul class="ex-legend lx-legend">${legend}</ul>`;
 }
 

@@ -1,8 +1,10 @@
 // learn/learn.js — shared components for the Learn section (pilot, 2026-11-02; design: reports 09, sections 4 and 7).
 //   Learn.progress     lessons completed, guesses and quiz answers, kept in this browser only (localStorage, wrapped in
 //                      try/catch: with storage blocked the page still works, it just forgets)
-//   Learn.mount        start a lesson interactive: load its data (data-src), then init(root, helpers, data); the static
-//                      fallback (.ex-fallback) stays visible unless init succeeds
+//   Learn.mount        start a lesson interactive: load its data files (data-src, space-separated JSON URLs), then
+//                      init(root, helpers, data) with data = {basename: parsed JSON}, e.g. {town: ..., town_days: ...};
+//                      the static fallback (.ex-fallback) stays visible unless init succeeds
+//   back-to-top guard  hides the site's floating back-to-top button while it would cover lesson controls
 //   predict / reveal   one-click guess before the interactive; the answer later on the page names the stored guess
 //   quiz               "Check yourself" and "Myth or fact?": instant feedback that explains each option
 //   course map         ticks completed lessons on the landing page; "mark complete" buttons on lesson pages
@@ -41,7 +43,7 @@
   function mount(slug, init) {
     document.querySelectorAll('.lx-interactive[data-learn="' + slug + '"]').forEach(function (root) {
       if (root.classList.contains("is-live")) return;
-      var src = root.getAttribute("data-src");
+      var srcs = (root.getAttribute("data-src") || "").split(/\s+/).filter(Boolean);
       var go = function (data) {
         var live = document.createElement("div");
         live.className = "lx-live";
@@ -50,7 +52,7 @@
         catch (e) { console.error("Learn interactive " + slug + " failed:", e); root.removeChild(live); }
       };
       var fail = function (e) {
-        console.error("Learn data " + src + " could not be loaded:", e);
+        console.error("Learn data " + srcs.join(", ") + " could not be loaded:", e);
         if (location.protocol === "file:") {
           var p = document.createElement("p");
           p.className = "lx-offline";
@@ -59,9 +61,17 @@
         }
       };
       if (!H) { console.error("Learn: assets/explainers/common.js must load before learn.js"); return; }
-      if (!src) { go(null); return; }
-      fetch(src).then(function (r) { if (!r.ok) throw new Error(r.status + " " + r.statusText); return r.json(); }).then(go, fail);
+      if (!srcs.length) { go({}); return; }
+      Promise.all(srcs.map(getJSON)).then(function (list) {
+        var data = {};
+        srcs.forEach(function (u, i) { data[u.split("/").pop().replace(/\.json$/, "").replace(/[^A-Za-z0-9_]/g, "_")] = list[i]; });
+        go(data);
+      }, fail);
     });
+  }
+
+  function getJSON(url) {
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error(url + ": " + r.status + " " + r.statusText); return r.json(); });
   }
 
   // ---------------------------------------------------------------- small DOM helpers
@@ -207,11 +217,37 @@
     });
   }
 
+  // ---------------------------------------------------------------- keep the back-to-top button off lesson controls
+  function guardToTop() {
+    var zones = document.querySelectorAll(".lx-interactive, .lx-quiz, .lx-predict");
+    if (!zones.length) return;
+    var pending = false;
+    function check() {
+      pending = false;
+      var btn = document.querySelector(".to-top");
+      if (!btn) return;
+      // the button's box (fixed, bottom right); while it is hidden, use where it would appear
+      var s = getComputedStyle(btn), w = btn.offsetWidth || 42, hgt = btn.offsetHeight || 42;
+      var right = window.innerWidth - (parseFloat(s.right) || 19), bottom = window.innerHeight - (parseFloat(s.bottom) || 19);
+      var b = { left: right - w - 8, right: right + 8, top: bottom - hgt - 8, bottom: bottom + 8 };
+      var hit = Array.prototype.some.call(zones, function (z) {
+        var r = z.getBoundingClientRect();
+        return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
+      });
+      document.body.classList.toggle("lx-totop-off", hit);
+    }
+    function request() { if (!pending) { pending = true; window.requestAnimationFrame(check); } }
+    window.addEventListener("scroll", request, { passive: true });
+    window.addEventListener("resize", request);
+    request();
+  }
+
   function start() {
     document.querySelectorAll(".lx-predict").forEach(setupPredict);
     document.querySelectorAll(".lx-reveal").forEach(setupReveal);
     document.querySelectorAll(".lx-quiz").forEach(setupQuiz);
     document.querySelectorAll("button[data-complete]").forEach(setupComplete);
+    guardToTop();
     paintMap();
   }
 

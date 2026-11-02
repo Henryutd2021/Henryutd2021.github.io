@@ -102,7 +102,7 @@ body.page-learn .lesson .lx-kicker-h::before { display: none; }
 .lx-fleet .lx-yours { background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
 .lx-howto { margin: 0 0 1.2rem; padding-left: 1.3rem; }
 .lx-howto li { margin: .2rem 0; }
-.lx-fictional { display: flex; align-items: center; gap: .4rem; margin: .6rem 0 0 !important; font-size: .84rem !important; color: var(--muted) !important; }
+.lx-fictional { display: flex; align-items: flex-start; gap: .45rem; margin: .6rem 0 0 !important; font-size: .84rem !important; color: var(--muted) !important; }
 
 /* ---------- the interactive ---------- */
 .lx-interactive { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow); padding: 1.15rem 1.25rem 1.25rem; }
@@ -303,6 +303,12 @@ body.quarto-light .lx-deeper-k { color: color-mix(in srgb, var(--tier-a) 85%, #0
 .lx-sources ul { margin: 0; padding-left: 1.1rem; }
 .lx-sources li { font-size: .88rem; line-height: 1.55; margin: .3rem 0; }
 .lx-corrections { margin: 1.2rem 0 0 !important; font-size: .84rem !important; color: var(--muted) !important; }
+
+/* back-to-top button: hidden while it would cover lesson controls (learn.js toggles the class) */
+body.lx-totop-off .to-top { opacity: 0 !important; visibility: hidden; pointer-events: none; }
+/* licence line under every Learn page */
+.lx-license { margin: .4rem 0 0 !important; font-size: .82rem !important; color: var(--muted) !important; }
+.lx-license a { color: var(--ink-2); }
 
 /* =====================================================================================
    Landing page: doors, the starter-path tour, the three tiers

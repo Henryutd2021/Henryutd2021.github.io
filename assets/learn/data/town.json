@@ -1,34 +1,30 @@
 {
   "name": "Prairie Town",
-  "note": "Prairie Town is fictional; its numbers are illustrative. Profiles are hand-made shapes for a windy spring day on the Plains, not measured data.",
+  "note": "Prairie Town is fictional. Its plants, sizes and prices are illustrative. Hourly demand, wind and solar follow the shapes of real days on the Southwest Power Pool grid (town_days.json, from EIA-930), scaled down to the town.",
   "units": {
-    "demand": "MW, average over each hour",
-    "wind": "share of the farm's size (0-1) available in each hour",
-    "solar": "share of the farm's size (0-1) available in each hour",
+    "mw": "MW (plant size, or average output over an hour)",
     "cost": "$ per MWh (running cost: fuel and other costs that grow with output)",
     "co2": "t CO2 per MWh",
     "ramp": "MW per hour"
   },
   "fleet": {
     "nuclear": { "label": "Nuclear plant", "mw": 100, "cost": 10, "co2": 0, "behaviour": "runs flat" },
-    "wind": { "label": "Wind farm", "mw": 150, "cost": 0, "co2": 0, "behaviour": "follows the wind" },
-    "solar": { "label": "Solar farm", "mw": 150, "cost": 0, "co2": 0, "behaviour": "follows the sun" },
+    "wind": { "label": "Wind farm", "mw": 100, "cost": 0, "co2": 0, "behaviour": "follows the wind" },
+    "solar": { "label": "Solar farm", "mw": 250, "cost": 0, "co2": 0, "behaviour": "follows the sun" },
     "cc": { "label": "Gas combined-cycle plant", "mw": 200, "cost": 40, "co2": 0.37, "ramp": 40, "behaviour": "adjustable, slow to change" },
     "peaker": { "label": "Gas peaker", "mw": 100, "cost": 100, "co2": 0.55, "behaviour": "adjustable, fast" }
   },
-  "game": {
-    "step": 5,
-    "startCC": 0,
-    "startPeaker": 0,
-    "hzPerMW": 0.01,
-    "hzLimit": 0.5
-  },
-  "days": {
-    "spring": {
-      "label": "A windy spring day",
-      "demand": [196, 187, 183, 185, 189, 195, 214, 250, 275, 281, 279, 268, 261, 255, 258, 259, 277, 305, 337, 367, 361, 330, 292, 254],
-      "wind": [0.64, 0.68, 0.72, 0.70, 0.66, 0.60, 0.54, 0.46, 0.36, 0.30, 0.26, 0.22, 0.18, 0.18, 0.18, 0.18, 0.20, 0.22, 0.24, 0.28, 0.34, 0.40, 0.48, 0.56],
-      "solar": [0, 0, 0, 0, 0, 0, 0.02, 0.14, 0.34, 0.54, 0.70, 0.80, 0.86, 0.82, 0.74, 0.58, 0.38, 0.18, 0.04, 0, 0, 0, 0, 0]
+  "scenarios": {
+    "lesson0": {
+      "about": "Lesson 0: one real day, scaled. Demand = shape x demandPeakMW; wind and solar = shape x farm size (SPP's highest hour of 2025 = the farm at full output), rounded to whole MW; demand then rounded by at most 2.5 MW so that the gas needed each hour is a multiple of `step` (a careful player can balance exactly).",
+      "day": "summer_peak",
+      "date": "2025-07-29",
+      "demandPeakMW": 380,
+      "step": 5,
+      "startCC": 100,
+      "startPeaker": 0,
+      "hzPerMW": 0.01,
+      "hzLimit": 0.5
     }
   }
 }

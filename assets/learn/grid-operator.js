@@ -1,9 +1,14 @@
 // learn/grid-operator.js — Lesson 0, "Be the grid operator for a day" (Learn pilot, 2026-11-02).
 //
-// Toy model (illustrative; Prairie Town is fictional). One day in 24 hourly steps. Each hour has a demand d (MW) and an
-// available output from the wind and solar farms (share of farm size x farm size). The nuclear plant runs flat. The reader
-// sets two gas plants: a combined-cycle plant (0-200 MW, may change at most `ramp` MW from one hour to the next) and a
-// peaker (0-100 MW, no ramp limit). Settling an hour:
+// Data: assets/learn/data/town.json (Prairie Town's fleet and the lesson's scenario; illustrative) and
+// assets/learn/data/town_days.json (hourly shapes of real days on the Southwest Power Pool grid, from EIA-930).
+// prepare() scales the scenario's day to the town: demand = shape x demandPeakMW, wind and solar = shape x farm size,
+// rounded to whole MW; demand is then rounded (by at most step/2) so the gas needed each hour is a multiple of the
+// controls' step, so a careful player can balance exactly.
+//
+// Toy model (Prairie Town is fictional). One day in 24 hourly steps. The nuclear plant runs flat. The reader sets two
+// gas plants: a combined-cycle plant (0-200 MW, may change at most `ramp` MW from one hour to the next) and a peaker
+// (0-100 MW, no ramp limit). Settling an hour:
 //   available A = nuclear + wind + solar + cc + peaker
 //   A < d  -> unserved u = d - A                       (customers disconnected; frequency below 60 Hz)
 //   A >= d -> surplus = A - d; wind and solar are spilled first: curtailed c = min(surplus, wind + solar);
@@ -16,7 +21,7 @@
 // "Expert" rule (greedy, cheapest first, one hour at a time, no look-ahead): wind, solar and nuclear first; the
 // combined-cycle plant takes the remaining need, clamped to what its ramp and size allow this hour; the peaker takes
 // what is still missing (up to its size); any surplus spills wind and solar. Planning the whole day at once (an
-// optimization over all 24 hours) can do slightly better by warming up the slow plant before the evening peak; the
+// optimization over all 24 hours) can do slightly better by warming up the slow plant before the evening climb; the
 // Node test computes that optimum for comparison (_tests/learn/test_grid_operator.js).
 //
 // The pure model functions are exported for Node; the view needs assets/explainers/common.js (helpers) and
@@ -26,23 +31,34 @@
   var HOURS = 24;
 
   // ---------------------------------------------------------------- pure model
-  function avail(share, mw) { return Math.round(share * mw * 1000) / 1000; }
+  // the playable day ("world") for one scenario of town.json, built from a real day's shapes in town_days.json
+  function prepare(town, townDays, key) {
+    var sc = town.scenarios[key || "lesson0"], d = townDays.days[sc.day], f = town.fleet, step = sc.step;
+    var wind = d.wind.map(function (v) { return Math.round(v / 1000 * f.wind.mw); });
+    var solar = d.solar.map(function (v) { return Math.round(v / 1000 * f.solar.mw); });
+    var raw = d.demand.map(function (v) { return v / 1000 * sc.demandPeakMW; });
+    var demand = raw.map(function (v, t) {
+      var need = v - f.nuclear.mw - wind[t] - solar[t];
+      return Math.round(need / step) * step + f.nuclear.mw + wind[t] + solar[t];
+    });
+    return { fleet: f, game: sc, demand: demand, wind: wind, solar: solar, rawDemand: raw,
+             date: d.date || sc.date, dayNote: d.note || "", source: (townDays.meta || {}).source || "" };
+  }
 
   // the fixed facts of hour t: demand and the output nobody controls
-  function facts(town, day, t) {
-    var f = town.fleet, d = town.days[day];
-    return { t: t, demand: d.demand[t], nuclear: f.nuclear.mw, wind: avail(d.wind[t], f.wind.mw), solar: avail(d.solar[t], f.solar.mw) };
+  function facts(W, t) {
+    return { t: t, demand: W.demand[t], nuclear: W.fleet.nuclear.mw, wind: W.wind[t], solar: W.solar[t] };
   }
 
   // what the combined-cycle plant can reach this hour, given last hour's output
-  function ccRange(town, prev) {
-    var cc = town.fleet.cc;
+  function ccRange(W, prev) {
+    var cc = W.fleet.cc;
     return { lo: Math.max(0, prev - cc.ramp), hi: Math.min(cc.mw, prev + cc.ramp) };
   }
 
   // settle one hour for gas set-points cc and pk (MW)
-  function settle(town, x, cc, pk) {
-    var f = town.fleet, g = town.game;
+  function settle(W, x, cc, pk) {
+    var f = W.fleet, g = W.game;
     var A = x.nuclear + x.wind + x.solar + cc + pk;
     var unserved = 0, curtailed = 0, over = 0;
     if (A < x.demand - 1e-9) unserved = x.demand - A;
@@ -78,30 +94,30 @@
   }
 
   // settle a whole plan [{cc, pk}, ...]; rampOK is false if any hour leaves the combined-cycle plant's reach
-  function simulate(town, day, plan) {
-    var prev = town.game.startCC, hours = [], rampOK = true;
+  function simulate(W, plan) {
+    var prev = W.game.startCC, hours = [], rampOK = true;
     for (var t = 0; t < plan.length; t++) {
-      var r = ccRange(town, prev), p = plan[t];
-      if (p.cc < r.lo - 1e-9 || p.cc > r.hi + 1e-9 || p.pk < -1e-9 || p.pk > town.fleet.peaker.mw + 1e-9) rampOK = false;
-      hours.push(settle(town, facts(town, day, t), p.cc, p.pk));
+      var r = ccRange(W, prev), p = plan[t];
+      if (p.cc < r.lo - 1e-9 || p.cc > r.hi + 1e-9 || p.pk < -1e-9 || p.pk > W.fleet.peaker.mw + 1e-9) rampOK = false;
+      hours.push(settle(W, facts(W, t), p.cc, p.pk));
       prev = p.cc;
     }
     return { hours: hours, totals: totals(hours), rampOK: rampOK };
   }
 
   // the expert's rule: cheapest first, one hour at a time, within ramp and size limits
-  function expertPlan(town, day) {
-    var prev = town.game.startCC, plan = [];
+  function expertPlan(W) {
+    var prev = W.game.startCC, plan = [];
     for (var t = 0; t < HOURS; t++) {
-      var x = facts(town, day, t), need = x.demand - x.nuclear - x.wind - x.solar, r = ccRange(town, prev);
+      var x = facts(W, t), need = x.demand - x.nuclear - x.wind - x.solar, r = ccRange(W, prev);
       var cc = Math.min(r.hi, Math.max(r.lo, need));
-      var pk = Math.min(town.fleet.peaker.mw, Math.max(0, need - cc));
+      var pk = Math.min(W.fleet.peaker.mw, Math.max(0, need - cc));
       plan.push({ cc: cc, pk: pk });
       prev = cc;
     }
     return plan;
   }
-  function expert(town, day) { return simulate(town, day, expertPlan(town, day)); }
+  function expert(W) { return simulate(W, expertPlan(W)); }
 
   // one to three stars on reliability, cost and CO2; cost and CO2 are compared with the expert rule and need the lights on
   function stars(you, ref) {
@@ -113,31 +129,31 @@
 
   // share links: each hour's two set-points as one number (combined-cycle level x peaker levels + peaker level, in steps
   // of `step` MW), written as two base-36 characters; 24 hours -> 48 characters
-  function encodePlan(plan, town) {
-    var step = town.game.step, n = Math.round(town.fleet.peaker.mw / step) + 1;
+  function encodePlan(plan, W) {
+    var step = W.game.step, n = Math.round(W.fleet.peaker.mw / step) + 1;
     return plan.map(function (p) {
       var v = Math.round(p.cc / step) * n + Math.round(p.pk / step);
       return (v < 36 ? "0" : "") + v.toString(36);
     }).join("");
   }
-  function decodePlan(str, town) {
-    var step = town.game.step, n = Math.round(town.fleet.peaker.mw / step) + 1, plan = [];
+  function decodePlan(str, W) {
+    var step = W.game.step, n = Math.round(W.fleet.peaker.mw / step) + 1, plan = [];
     if (typeof str !== "string" || !/^[0-9a-z]{48}$/.test(str)) return null;
     for (var t = 0; t < HOURS; t++) {
       var v = parseInt(str.substr(2 * t, 2), 36), cc = Math.floor(v / n) * step, pk = (v % n) * step;
-      if (cc > town.fleet.cc.mw || pk > town.fleet.peaker.mw) return null;
+      if (cc > W.fleet.cc.mw || pk > W.fleet.peaker.mw) return null;
       plan.push({ cc: cc, pk: pk });
     }
     return plan;
   }
 
-  var model = { HOURS: HOURS, facts: facts, ccRange: ccRange, settle: settle, totals: totals, simulate: simulate,
+  var model = { HOURS: HOURS, prepare: prepare, facts: facts, ccRange: ccRange, settle: settle, totals: totals, simulate: simulate,
                 expertPlan: expertPlan, expert: expert, stars: stars, encodePlan: encodePlan, decodePlan: decodePlan };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.Learn) return;
 
   // ---------------------------------------------------------------- view
-  var LESSON = "00-grid-operator", DAY = "spring";
+  var LESSON = "00-grid-operator";
   var TECH = [["nuclear", "Nuclear"], ["wind", "Wind"], ["solar", "Solar"], ["cc", "Gas combined-cycle"], ["pk", "Gas peaker"]];
 
   function hhmm(t) { return (t < 10 ? "0" : "") + t + ":00"; }
@@ -146,9 +162,10 @@
   function mwh(v) { return Math.round(v).toLocaleString("en-US") + " MWh"; }
   function mw(v) { return Math.round(v).toLocaleString("en-US") + " MW"; }
 
-  function view(root, h, town) {
-    var el = h.el, f = town.fleet, g = town.game, step = g.step;
-    var ref = expert(town, DAY);
+  function view(root, h, data) {
+    var W = prepare(data.town, data.town_days, "lesson0");
+    var el = h.el, f = W.fleet, g = W.game, step = g.step;
+    var ref = expert(W);
     var S = { t: 0, prev: g.startCC, cc: g.startCC, pk: g.startPeaker, plan: [], hours: [], done: false, shared: false, show: "you" };
 
     var game = el("div", { class: "lx-game" }, root);
@@ -276,8 +293,8 @@
     function rowFor(t) {
       if (S.done) return { mode: "past", r: (S.show === "expert" ? ref.hours : S.hours)[t] };
       if (t < S.t) return { mode: "past", r: S.hours[t] };
-      if (t === S.t) return { mode: "now", r: settle(town, facts(town, DAY, t), S.cc, S.pk) };
-      var x = facts(town, DAY, t);
+      if (t === S.t) return { mode: "now", r: settle(W, facts(W, t), S.cc, S.pk) };
+      var x = facts(W, t);
       return { mode: "future", r: { demand: x.demand, nuclear: x.nuclear, wind: x.wind, solar: x.solar, cc: 0, pk: 0, unserved: 0, curtailed: 0, over: 0 } };
     }
 
@@ -317,8 +334,8 @@
         if (r.curtailed > 0) el("rect", { class: "lx-spilled", x: bx + 0.5, y: y(base + r.curtailed), width: bw - 1, height: y(base) - y(base + r.curtailed) }, bars);
       }
       // demand as a step line across the day
-      var d = "M" + x(0).toFixed(1) + "," + y(town.days[DAY].demand[0]).toFixed(1);
-      town.days[DAY].demand.forEach(function (v, t) {
+      var d = "M" + x(0).toFixed(1) + "," + y(W.demand[0]).toFixed(1);
+      W.demand.forEach(function (v, t) {
         d += "V" + y(v).toFixed(1) + "H" + x(t + 1).toFixed(1);
       });
       el("path", { class: "lx-demand", d: d }, svg);
@@ -327,7 +344,7 @@
     function drawGauge(w) {
       var H = 52, x = h.scale(-g.hzLimit, g.hzLimit, 8, w - 8);
       h.clear(gaugeSvgBox);
-      var cur = settle(town, facts(town, DAY, Math.min(S.t, HOURS - 1)), S.cc, S.pk);
+      var cur = settle(W, facts(W, Math.min(S.t, HOURS - 1)), S.cc, S.pk);
       var df = S.done ? 0 : cur.freq - 60;
       var svg = h.svg(gaugeSvgBox, { width: w, height: H, label: "Balance gauge: grid frequency " + (60 + df).toFixed(2) + " hertz." });
       var zones = [[-g.hzLimit, -0.2, "lx-z-bad"], [-0.2, -0.025, "lx-z-warn"], [-0.025, 0.025, "lx-z-ok"], [0.025, 0.2, "lx-z-warn"], [0.2, g.hzLimit, "lx-z-bad"]];
@@ -348,7 +365,7 @@
     // ---------- updates
     function refresh() {
       if (S.done) return;
-      var x = facts(town, DAY, S.t), cur = settle(town, x, S.cc, S.pk), r = ccRange(town, S.prev);
+      var x = facts(W, S.t), cur = settle(W, x, S.cc, S.pk), r = ccRange(W, S.prev);
       clockTime.textContent = hhmm(S.t) + "–" + hhmm(S.t + 1);
       clockCount.textContent = "Hour " + (S.t + 1) + " of 24";
       barFill.style.width = (100 * S.t / HOURS).toFixed(1) + "%";
@@ -385,7 +402,7 @@
 
     // set the controls' reach for the current hour; values carry over from the last hour unless given
     function startHour(values) {
-      var r = ccRange(town, S.prev);
+      var r = ccRange(W, S.prev);
       ccCtl.range(r.lo, r.hi, "This hour: " + r.lo + "–" + mw(r.hi) + " (it changes at most " + f.cc.ramp + " MW an hour).");
       pkCtl.range(0, f.peaker.mw, "Any level from 0 to " + mw(f.peaker.mw) + ", at once.");
       if (values) { ccCtl.set(values.cc); pkCtl.set(values.pk); }
@@ -395,7 +412,7 @@
 
     function next() {
       if (S.done) return;
-      var cur = settle(town, facts(town, DAY, S.t), S.cc, S.pk);
+      var cur = settle(W, facts(W, S.t), S.cc, S.pk);
       S.plan.push({ cc: S.cc, pk: S.pk });
       S.hours.push(cur);
       S.prev = S.cc;
@@ -526,7 +543,7 @@
         var shareBtn = el("button", { type: "button", class: "btn-outline", text: "Copy a link to this result" }, btns);
         var shareOut = el("p", { class: "lx-d-small lx-share", "aria-live": "polite" }, debrief);
         shareBtn.addEventListener("click", function () {
-          var url = location.href.split("#")[0] + "#play=" + encodePlan(S.plan, town);
+          var url = location.href.split("#")[0] + "#play=" + encodePlan(S.plan, W);
           var text = "I ran Prairie Town for " + money(you.cost) + " and " + tonnes(you.co2) + " of CO₂ (" +
             (you.unserved > 0 ? mwh(you.unserved) + " unserved" : "lights on all day") + "). ";
           var done = function (ok) {
@@ -558,9 +575,9 @@
 
     // a shared result in the URL (#play=...): replay it if every hour is within the plants' limits
     var m = /^#play=([0-9a-z]{48})$/.exec(location.hash || "");
-    var shared = m && decodePlan(m[1], town);
+    var shared = m && decodePlan(m[1], W);
     if (shared) {
-      var sim = simulate(town, DAY, shared);
+      var sim = simulate(W, shared);
       if (sim.rampOK) { S.plan = shared; S.hours = sim.hours; S.t = HOURS; finish(true); }
     }
   }
