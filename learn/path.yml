@@ -277,7 +277,7 @@
   tier: foundations
   form: checkpoint
   icon: check
-  status: upcoming
+  status: active
   minutes: 40
   title: "Foundations checkpoint: estimate an unfamiliar situation"
   does: "Estimate an unfamiliar situation without hints (for example the electricity for a town's school buses if they went electric): units, a range, the main uncertainty and one way to check the answer."
@@ -327,7 +327,7 @@
   tier: modeler
   form: cards
   icon: tower
-  status: upcoming
+  status: active
   minutes: 40
   title: "From dispatch to locational prices: the linear program behind the market"
   does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."

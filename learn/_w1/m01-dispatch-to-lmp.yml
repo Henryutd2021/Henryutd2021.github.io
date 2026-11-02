@@ -1,0 +1,27 @@
+# Sidecar for M1 (m01-dispatch-to-lmp), builder learn-w1-i, 2026-11-02. Read by scripts/build_learn.py.
+id: m01-dispatch-to-lmp
+lesson: M1
+glossary:
+  - id: bus
+    term: Bus
+    def: "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus."
+  - id: dc-power-flow
+    term: DC power flow
+    def: "A linear approximation of how power splits over the lines of a network, which ignores losses and voltage and sets each line's flow from voltage angles and the line's reactance."
+  - id: reactance
+    term: Reactance
+    def: "A line's opposition to alternating current; when several paths join two places, each carries a share of the power that falls as its reactance rises."
+  - id: locational-marginal-price
+    term: Locational marginal price (LMP)
+    def: "The cost of serving one more megawatt-hour at one place on the grid in one interval, given the plants running and the limits of the lines."
+  - id: congestion
+    term: Transmission congestion
+    def: "A line carrying all it is allowed to, so that cheaper power cannot reach where it is needed and prices differ by location."
+  - id: congestion-rent
+    term: Congestion rent
+    def: "What loads pay at their locational prices minus what generators are paid at theirs, equal to each full line's shadow price times its flow."
+requests:
+  - "Promote three lesson-local parts of assets/learn/m01-dispatch-to-lmp.js into components when a second lesson needs them: Formulation (i-formulation: rules in words, symbols and a table, linked), Network (i-network: buses with prices, lines with flows, limits and congestion, tap a bus) and PriceChart (hourly price lines for several buses with an hour picker). M2, M3 and A17 are the next users."
+  - "After the W1 merge, point M1's back links at the live pages: index.html#lesson-8, #lesson-10 and #lesson-11 should become 08-merit-order.html, 10-write-it-down.html and 11-solver.html; B1-B3 are named as upcoming in the real-world card."
+  - "deeper.css: the lesson-local rule .page-lesson .lx-deeper-body {grid-template-columns: minmax(0,1fr)} plus horizontal scroll for display math (also asked for by lesson 8) keeps Go deeper text inside the card on phones; please promote it."
+  - "learn/path.yml M1 entry: consider adding outcome (\"Formulate a dispatch LP, solve it, and explain each bus price as a dual in words\") and lab (\"a SciPy/HiGHS notebook that rebuilds the model and asserts the browser's prices, about 45 minutes\") so the generated header and next box show them; builders may only change status."

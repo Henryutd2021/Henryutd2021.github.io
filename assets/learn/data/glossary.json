@@ -9,6 +9,11 @@
   "short": "The organisation that keeps supply and demand balanced, moment to moment, in its own part of the grid.",
   "lesson": 0
  },
+ "bus": {
+  "term": "Bus",
+  "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
+  "lesson": "M1"
+ },
  "capacity": {
   "term": "Capacity",
   "short": "The most power a plant can produce at once, often called its nameplate size.",
@@ -29,6 +34,11 @@
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
   "lesson": 0
  },
+ "congestion-rent": {
+  "term": "Congestion rent",
+  "short": "What loads pay at their locational prices minus what generators are paid at theirs, equal to each full line's shadow price times its flow.",
+  "lesson": "M1"
+ },
  "constraint": {
   "term": "Constraint",
   "short": "A rule every solution must obey, such as supply equals demand or no plant above its size.",
@@ -38,6 +48,11 @@
   "term": "Curtailment (spilling)",
   "short": "Turning a wind or solar farm below what the weather allows, usually because the grid has more power than it can use at that moment.",
   "lesson": 0
+ },
+ "dc-power-flow": {
+  "term": "DC power flow",
+  "short": "A linear approximation of how power splits over the lines of a network, which ignores losses and voltage and sets each line's flow from voltage angles and the line's reactance.",
+  "lesson": "M1"
  },
  "decision-variable": {
   "term": "Decision variable",
@@ -104,6 +119,11 @@
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
   "lesson": 10
  },
+ "locational-marginal-price": {
+  "term": "Locational marginal price (LMP)",
+  "short": "The cost of serving one more megawatt-hour at one place on the grid in one interval, given the plants running and the limits of the lines.",
+  "lesson": "M1"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -149,6 +169,11 @@
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
   "lesson": 0
  },
+ "reactance": {
+  "term": "Reactance",
+  "short": "A line's opposition to alternating current; when several paths join two places, each carries a share of the power that falls as its reactance rises.",
+  "lesson": "M1"
+ },
  "reserves": {
   "term": "Reserves",
   "short": "Spare capacity that operators keep ready to cover the sudden loss of a plant or a forecast that misses.",
@@ -173,6 +198,11 @@
   "term": "Solver",
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11
+ },
+ "congestion": {
+  "term": "Transmission congestion",
+  "short": "A line carrying all it is allowed to, so that cheaper power cannot reach where it is needed and prices differ by location.",
+  "lesson": "M1"
  },
  "unserved-energy": {
   "term": "Unserved energy",
