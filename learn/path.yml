@@ -106,8 +106,12 @@
   form: cards
   icon: wave
   tier: foundations
+  status: active
+  path: 03-balancing.qmd
   minutes: 15
   title: "How does the grid stay balanced every second?"
+  subtitle: "Trip a plant and watch the grid catch it"
+  teaches: [frequency, inertia, primary frequency response, automatic generation control, operating reserves, under-frequency load shedding]
   short: "Balancing every second"
   does: "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in."
   outcome: "Explain frequency, reserves and why outages can cascade."
@@ -119,8 +123,12 @@
   icon: cloud
   tier: foundations
   tier2: analyst
+  status: active
+  path: 04-forecasts.qmd
   minutes: 15
   title: "Forecasts and surprises: how do you plan for weather you can't see yet?"
+  subtitle: "Score a real forecast, then plan for its misses"
+  teaches: [demand forecasting, forecast error, persistence baseline, MAE and MAPE, prediction intervals, reserves under uncertainty]
   short: "Forecasts and surprises"
   does: "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line."
   outcome: "Explain forecast error and why operators hold reserves."
