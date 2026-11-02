@@ -1,0 +1,19 @@
+# Sidecar for lesson 13 (T13, 13-capstone), builder learn-w1-g, 2026-11-02. Read by scripts/build_learn.py.
+id: 13-capstone
+lesson: 13
+glossary:
+  - id: capital-recovery-factor
+    term: Capital recovery factor
+    def: "The share of a plant's up-front cost to pay each year so that, with interest, the cost is repaid over its life."
+  - id: representative-period
+    term: Representative period
+    def: "A real stretch of time, such as a week, chosen to stand for many similar ones so that a model can run faster."
+  - id: capacity-expansion
+    term: Capacity expansion model
+    def: "An optimization model that decides what to build, as well as how to run it, at least cost."
+requests:
+  - "Scope allow-list: GenX is described in lesson 13's 'What real planning models do' table without a link, because neither its documentation (genxproject.github.io/GenX.jl) nor its repository (github.com/GenXProject/GenX) is on the curriculum §20.3 allow-list. Please allow-list genxproject.github.io (official documentation) if Henry agrees, so the table can link all three models neutrally."
+  - "Promote the lesson-local e-boundary component (Boundary in assets/learn/13-capstone.js: a 'This holds when / It leaves out' box with a source line, lx13-bound styles) and the i-share pattern (the plan in a name-safe hash, #plan-w530-s160-g220-p70-n0-b10-e50, plus non-default scenario values -fuel385-nk8255; copy to clipboard with a select-and-copy fallback)."
+  - "Solver: the 7-week planning LP has 5,953 columns and 8,389 rows; the debrief's full-year check (a fixed plan on 8,760 hours) has 26,280 columns and 8,760 rows without a battery, about 52,600 and 17,500 with one. Please add a T13 instance to scripts/learn_solver_bench.mjs (_tests/learn/solver_models.js) for the W1 device measurements; LX.townPlan.weekModel and fullYearModel build them."
+  - "learn_screenshots.mjs: lesson 13 shows the optimizer's plan at the 200 kt target loaded into the sliders when the hash is #lx-demo-mid, and the scored debrief with #lx-demo-done."
+  - "path.yml: besides status, the entry gained path: and subtitle: (build_learn.py requires the page's subtitle to match path.yml)."

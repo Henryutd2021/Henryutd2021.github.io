@@ -777,8 +777,8 @@
     "title": "Cheap or clean? How do you weigh cost against emissions?",
     "short": "Cheap or clean?",
     "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
-    "href": "index.html#lesson-12",
-    "ready": false
+    "href": "12-trade-offs.html",
+    "ready": true
    }
   },
   {
@@ -787,7 +787,7 @@
    "total": 14,
    "code": null,
    "title": "Cheap or clean? How do you weigh cost against emissions?",
-   "subtitle": null,
+   "subtitle": "Spot the plan nobody should pick, slide a carbon price, and trace the frontier with a solver",
    "short": "Cheap or clean?",
    "tier": "analyst",
    "tier2": null,
@@ -803,8 +803,8 @@
    "scales": [],
    "teaches": [],
    "lab": null,
-   "href": "index.html#lesson-12",
-   "ready": false,
+   "href": "12-trade-offs.html",
+   "ready": true,
    "after": [
     {
      "id": "11-solver",
@@ -831,8 +831,8 @@
     "title": "What should Prairie Town build? Plan its power system",
     "short": "Capstone: plan the town",
     "does": "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap.",
-    "href": "index.html#lesson-13",
-    "ready": false
+    "href": "13-capstone.html",
+    "ready": true
    }
   },
   {
@@ -841,7 +841,7 @@
    "total": 14,
    "code": null,
    "title": "What should Prairie Town build? Plan its power system",
-   "subtitle": null,
+   "subtitle": "Choose what to build, run a year of real weather, and ask the optimizer",
    "short": "Capstone: plan the town",
    "tier": "modeler",
    "tier2": "analyst",
@@ -857,8 +857,8 @@
    "scales": [],
    "teaches": [],
    "lab": null,
-   "href": "index.html#lesson-13",
-   "ready": false,
+   "href": "13-capstone.html",
+   "ready": true,
    "after": [
     {
      "id": "09-storage",
@@ -875,8 +875,8 @@
      "title": "Cheap or clean? How do you weigh cost against emissions?",
      "short": "Cheap or clean?",
      "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
-     "href": "index.html#lesson-12",
-     "ready": false
+     "href": "12-trade-offs.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -885,8 +885,8 @@
     "title": "Cheap or clean? How do you weigh cost against emissions?",
     "short": "Cheap or clean?",
     "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
-    "href": "index.html#lesson-12",
-    "ready": false
+    "href": "12-trade-offs.html",
+    "ready": true
    },
    "next": null
   }
