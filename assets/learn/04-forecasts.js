@@ -293,7 +293,8 @@
           var said = function () {
             var d = DAYS[S_.day], w = worst(d.A, d.F);
             if (S_.day === "typical") api.saw((S_.pick ? (ok ? "You called it: " : "Not quite: ") : "") + "on " + typ.label.short + " the forecast missed by " + pct(mpT) + " on average, " + gw2(mae(typ.A, typ.F)) + ". Over January–April the average miss was " + pct(Q.mape) + ".");
-            else { api.saw("On " + d.label.weekday + " " + d.label.short + " demand beat the forecast in every hour, by up to " + gw(w.mw) + " (" + spct(w.pct) + ") at " + LX.fmt.hh(w.t) + ". The average miss was about " + (mape(d.A, d.F).value / mpT).toFixed(0) + " times the typical day's.", true); api.done(); }
+            else { var above = d.A.filter(function (v, t) { return v > d.F[t]; }).length;
+              api.saw("On " + d.label.weekday + " " + d.label.short + " demand came in above the forecast in " + (above === 24 ? "every hour" : above + " of 24 hours") + ", by up to " + gw(w.mw) + " (" + spct(w.pct) + ") at " + LX.fmt.hh(w.t) + ". The average miss was about " + (mape(d.A, d.F).value / mpT).toFixed(0) + " times the typical day's.", true); api.done(); }
           };
           seg(act, "Day", [["typical", "Typical day · " + dayName("typical")], ["miss", "Biggest miss · " + dayName("miss")]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
           said(); if (S_.day === "miss") api.done();
@@ -397,7 +398,7 @@
     var typ = DAYS.typical, PM = Q.persistence_mae_mw;
     LX.CompareTable(c2, {
       title: "Four ways to score a forecast",
-      columns: [{ key: "name", label: "Score", main: true }, { key: "spp", label: "SPP, Jan–Apr 2025", num: true }, { key: "trap", label: "Misleads when", phoneHide: true }],
+      columns: [{ key: "name", label: "Score", main: true }, { key: "spp", label: "SPP, Jan–Apr 2025", num: true }, { key: "trap", label: "Misleads when" }],
       rows: [
         { key: "mae", color: "var(--lx-accent)", name: "MAE", note: "average miss, in MW", spp: { text: gw2(Q.mae_mw) }, trap: "comparing grids of different sizes" },
         { key: "mape", color: "var(--lx-warn)", name: "MAPE", note: "average miss, in % of actual", spp: { text: pct(Q.mape) }, trap: "actual values get near zero (solar, wind)" },

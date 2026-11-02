@@ -33,6 +33,7 @@ const T = M.prepare(days, year, fc, "typical_forecast"), X = M.prepare(days, yea
   ok(self.A.join() === d.A.join(), d.date + ": prepare is consistent");
   [d.date, d.yDate, d.wDate].forEach(x => ok(fc.neighbours_valid[x] === true, x + ": a day with no repaired demand, wind or solar hours"));
 });
+ok(X.A.every((v, t) => v > X.F[t]), "4 Feb: demand came in above the forecast in every hour (the step text says so)");
 ok(T.label.weekday === "Monday" && T.yLabel.weekday === "Sunday" && X.label.weekday === "Tuesday", "labels: Monday 10 Feb (yesterday a Sunday), Tuesday 4 Feb");
 const q = fc.jan_apr.quantiles, errs = M.errors(fc), n = errs.length;
 ok(n === fc.jan_apr.hours && errs.every((e, i) => i === 0 || e >= errs[i - 1]), "errors: one sorted value per scored hour");

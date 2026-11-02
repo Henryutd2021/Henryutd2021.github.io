@@ -478,7 +478,7 @@
     var L = D.layers;
     LX.CompareTable(c3, {
       title: "Four layers of defence",
-      columns: [{ key: "name", label: "Layer", main: true }, { key: "time", label: "Acts within" }, { key: "from", label: "Where the power comes from", phoneHide: true }],
+      columns: [{ key: "name", label: "Layer", main: true }, { key: "time", label: "Acts within" }, { key: "from", label: "Where the power comes from" }],
       rows: L.rows.map(function (r) { return { key: r.key, color: { inertia: "var(--lx-ink-3)", primary: "var(--lx-accent)", secondary: "var(--lx-good)", tertiary: "var(--lx-tier-3)" }[r.key], name: r.name, note: r.who, time: r.time, from: r.from }; }),
       sorts: [{ label: "Fastest first", order: ["inertia", "primary", "secondary", "tertiary"], note: "Time frames from NERC's control continuum (" + L.asOf + "); each layer buys time for the next." }]
     });
