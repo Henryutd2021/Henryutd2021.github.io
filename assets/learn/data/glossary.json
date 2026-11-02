@@ -14,15 +14,30 @@
   "short": "The most power a plant can produce at once, often called its nameplate size.",
   "lesson": 5
  },
+ "capacity-expansion": {
+  "term": "Capacity expansion model",
+  "short": "An optimization model that decides what to build, as well as how to run it, at least cost.",
+  "lesson": "13"
+ },
  "capacity-factor": {
   "term": "Capacity factor",
   "short": "The energy a plant actually made over a period, divided by the energy it would have made running at full capacity the whole time.",
   "lesson": 5
  },
+ "capital-recovery-factor": {
+  "term": "Capital recovery factor",
+  "short": "The share of a plant's up-front cost to pay each year so that, with interest, the cost is repaid over its life.",
+  "lesson": "13"
+ },
  "carbon-intensity": {
   "term": "Carbon intensity",
   "short": "The CO2 emitted for each unit of electricity, for example in tonnes per megawatt-hour.",
   "lesson": 12
+ },
+ "carbon-price": {
+  "term": "Carbon price",
+  "short": "A charge per tonne of CO2 emitted, added to costs so that cleaner choices become relatively cheaper.",
+  "lesson": "12"
  },
  "combined-cycle": {
   "term": "Combined-cycle plant",
@@ -59,10 +74,20 @@
   "short": "A power plant whose output the operator can turn up or down on request, such as a gas plant.",
   "lesson": 0
  },
+ "dominated-plan": {
+  "term": "Dominated plan",
+  "short": "A plan that another plan beats on every count: no more cost, no more emissions, and better on at least one.",
+  "lesson": "12"
+ },
  "duck-curve": {
   "term": "Duck curve",
   "short": "The daily shape of demand minus solar output, with a dip at midday and a steep climb in the evening.",
   "lesson": 2
+ },
+ "emissions-cap": {
+  "term": "Emissions cap",
+  "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
+  "lesson": "12"
  },
  "energy": {
   "term": "Energy",
@@ -73,6 +98,11 @@
   "term": "Energy storage",
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
+ },
+ "epsilon-constraint": {
+  "term": "Epsilon-constraint method",
+  "short": "A way to trace a trade-off by optimizing one goal while capping the other, then moving the cap step by step.",
+  "lesson": "12"
  },
  "firm-capacity": {
   "term": "Firm capacity",
@@ -149,6 +179,11 @@
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
   "lesson": 0
  },
+ "representative-period": {
+  "term": "Representative period",
+  "short": "A real stretch of time, such as a week, chosen to stand for many similar ones so that a model can run faster.",
+  "lesson": "13"
+ },
  "reserves": {
   "term": "Reserves",
   "short": "Spare capacity that operators keep ready to cover the sudden loss of a plant or a forecast that misses.",
@@ -183,6 +218,11 @@
   "term": "Variable renewables",
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0
+ },
+ "weighted-sum": {
+  "term": "Weighted sum",
+  "short": "A way to combine several goals into one score by adding them up, each multiplied by a weight.",
+  "lesson": "12"
  },
  "wholesale-price": {
   "term": "Wholesale price",

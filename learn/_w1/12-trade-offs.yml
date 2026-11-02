@@ -1,0 +1,23 @@
+# Sidecar for lesson 12 (T12, 12-trade-offs), builder learn-w1-g, 2026-11-02. Read by scripts/build_learn.py.
+id: 12-trade-offs
+lesson: 12
+glossary:
+  - id: dominated-plan
+    term: Dominated plan
+    def: "A plan that another plan beats on every count: no more cost, no more emissions, and better on at least one."
+  - id: carbon-price
+    term: Carbon price
+    def: "A charge per tonne of CO2 emitted, added to costs so that cleaner choices become relatively cheaper."
+  - id: emissions-cap
+    term: Emissions cap
+    def: "A limit on the total CO2 that may be emitted in a period, such as a year."
+  - id: weighted-sum
+    term: Weighted sum
+    def: "A way to combine several goals into one score by adding them up, each multiplied by a weight."
+  - id: epsilon-constraint
+    term: Epsilon-constraint method
+    def: "A way to trace a trade-off by optimizing one goal while capping the other, then moving the cap step by step."
+requests:
+  - "Lesson 12 loads assets/learn/13-capstone.js before its own script: that file holds lesson 13's planning engine (LX.townPlan) and a lesson-local cost-against-CO2 chart (LX.townPlan.ui.FrontierChart). Promote the chart to components/ as i-pareto (frontier line with an out-of-reach shade, labelled plan dots that can be picked by mouse or keyboard, an equal-score line for a weighted sum, a text-version table), and consider moving the engine to components/ as the S2 planning engine."
+  - "learn_screenshots.mjs: lesson 12 opens step n with its earlier actions done when the page hash is #lx-demo-<n> (n = 1-5); the shots for this build used learn/12-trade-offs.html#lx-demo-2 and #lx-demo-4."
+  - "path.yml: besides status, the entry gained path: and subtitle: (build_learn.py requires the page's subtitle to match path.yml)."
