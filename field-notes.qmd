@@ -39,5 +39,5 @@ Notes from the intersection I work on: large new electricity loads such as AI da
 -->
 
 ::: {.fn-disclosure}
-Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own. Views are my own and do not represent my employer.
+Every item is checked against its primary source. Views are my own and do not represent my employer.
 :::

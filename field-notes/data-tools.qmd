@@ -366,6 +366,6 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 ---
 
-*Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own.*
+*Every item is checked against its primary source; the views are my own.*
 
 *Views are my own and do not represent my employer. This guide is reviewed each quarter; corrections are made in place and noted here with the date.*

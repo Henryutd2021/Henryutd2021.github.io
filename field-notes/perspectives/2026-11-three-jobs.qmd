@@ -1,0 +1,62 @@
+---
+title: "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System"
+date: 2026-11-10
+author: "Honglin Li"
+description: "Through 2050 the U.S. grid will rest on three jobs rather than three fuels: cheap energy, firm capacity and flexibility. This decade the scarce job is firm capacity that can actually connect, and policy should pay for the service a plant delivers."
+categories:
+  - Large loads & interconnection
+  - Nuclear & SMRs
+  - Markets & tariffs
+  - Policy & credits
+draft: true
+---
+
+For the next two decades, the U.S. power system will rest on three pillars: renewables, nuclear and natural gas. The more useful way to say it is that the system needs three jobs done (cheap energy, firm capacity and flexibility), and each fuel is good at some of them. Gas will lose weight over that period, but it will remain a pillar until at least 2050. And in this decade the scarcest job is not cheap energy but firm capacity that can actually connect to the grid.
+
+## Three jobs, not three fuels
+
+Today these three pillars already carry the system: in 2025, gas supplied about 41% of U.S. utility-scale generation, nuclear about 18%, wind about 11% and solar about 7% ([EIA](https://www.eia.gov/energyexplained/electricity/electricity-in-the-us.php)). Listing fuels, though, hides what each one is for.
+
+- **Cheap energy.** Wind and solar produce the cheapest megawatt-hours when they run, and they dominate what is being built: of the 86 GW planned for 2026, solar and batteries make up nearly 80% ([EIA](https://www.eia.gov/todayinenergy/detail.php?id=67205)). I count geothermal here too. The first next-generation geothermal units only began commercial operation this year ([Fervo](https://fervoenergy.com/fervo-energy-declares-commercial-operation-at-cape-station-ahead-of-schedule-leading-the-race-for-next-generation-geothermal-energy/)), so its contribution is still ahead of us.
+- **Firm capacity.** Nuclear and gas run when the weather does not cooperate and when a large load needs power around the clock.
+- **Flexibility.** Batteries, hydrogen and flexible demand move energy in time. In my own work, hydrogen earned its place as a flexibility tool, not as a fourth pillar: in Texas, renewable hydrogen covered only a small share of industrial demand ([*International Journal of Hydrogen Energy*, 2025](https://doi.org/10.1016/j.ijhydene.2025.02.303)), while at nuclear plants its value came from turning baseload output into a flexible product ([*Nature Communications*, 2026](https://doi.org/10.1038/s41467-026-73630-y)).
+
+I leave fusion out of this picture. It may matter later, but it will not shape planning decisions made this decade.
+
+## Gas: still a pillar, with less weight
+
+The Energy Information Administration's 2026 outlook projects that gas, solar and wind together supply about 80% of U.S. generation by 2050 in most of its cases ([EIA, April 2026](https://eia.gov/pressroom/releases/press587.php)). I read that as confirmation that gas stays a pillar for the next two decades. I expect its weight to shrink, and its role to move from bulk energy toward firm capacity that backs up renewables and large new loads.
+
+What no longer holds is the planning habit of assuming that a gas plant can appear whenever a model wants it. GE Vernova reports 122 GW of gas-turbine backlog and slot reservations, has sold delivery slots into 2032, and prices 2026 orders roughly 50% higher per kilowatt than 2025 orders ([GE Vernova, Q3 2026](https://www.sec.gov/Archives/edgar/data/0001996810/000199681026000162/gevpressrelease3q26.htm)). The supply chain is not broken, so the assumption still holds in part. But a turbine slot is now a constraint with a date on it.
+
+## Why now: the scarce job is firm capacity that can connect
+
+Data centers used about 4.7% of U.S. electricity in 2024, and the Lawrence Berkeley National Laboratory's reference case reaches 11.8% by 2030 ([LBNL, 2025 update](https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update)). That demand arrives faster than the grid can absorb it:
+
+- Projects that reached operation in 2025 spent a median of more than five years in interconnection queues, and only 13% of the capacity that requested interconnection from 2000 to 2020 was built ([LBNL Queued Up](https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics)).
+- The country built 322 miles of new high-voltage (345 kV and above) transmission in 2024 ([Grid Strategies and ACEG](https://gridstrategiesllc.com/wp-content/uploads/ACEG_Grid-Strategies_Fewer-New-Miles-2025_vF.pdf)).
+- PJM's 2028/29 capacity auction cleared at its price cap and still fell about 6.8 GW short of its reliability requirement ([PJM](https://insidelines.pjm.com/pjm-capacity-auction-procures-138318-mw-of-generation-resources-as-work-continues-to-address-growing-electricity-demand/)).
+
+When connection is the bottleneck, waiting becomes a cost in its own right. In my work on delayed grid energization, the cost to the developer of a 300 MW (IT) data center waiting 36 months ran to the order of \$0.7 billion in present value, and who ends up paying depended on how large-load tariffs are designed ([CoDE framework](https://github.com/Henryutd2021/code-delayed-energization)).
+
+## The nuclear pillar starts with the plants we already have
+
+The fastest firm, carbon-free megawatts are often the ones already built. In a study of 42 U.S. reactors at 2024 prices, nearly all had negative net present value when run as baseload plants; adding hydrogen production and grid services, with the assumed hydrogen credit, brought most of them above zero ([*Nature Communications*, 2026](https://doi.org/10.1038/s41467-026-73630-y)). The same logic shows up in today's news: DOE has offered up to \$5 billion for uprates that add about 1.1 GW at eight existing plants ([DOE](https://www.energy.gov/articles/energy-department-announces-5-billion-loan-boost-nuclear-power-and-help-lower-costs)), and retired reactors are being prepared for restart. New reactors are a different decision: for a reactor serving a hyperscale data center, I found that capital cost and policy, far more than operating choices, decide whether it beats grid supply ([*Energy Conversion and Management*, accepted](https://arxiv.org/abs/2608.10999)).
+
+## Policy should pay for the service, not for one output
+
+If the system needs three jobs, incentives should pay for the job a plant does. Today's main clean-electricity credit pays per megawatt-hour generated. In the same data-center study, that design made it more expensive to use reactor steam for cooling, because every unit of steam sent to the chiller forgoes both electricity and its credit; an incentive meant to close a capital gap ends up discouraging the more efficient use of the plant. The tax law also treats the three jobs unevenly: wind and solar lose the main credits for projects placed in service after 2027 unless construction began by July 4, 2026, while nuclear, geothermal and storage keep them into the next decade ([26 U.S.C. § 45Y](https://www.law.cornell.edu/uscode/text/26/45Y)). Paying for delivered services (energy, firm capacity, flexibility, and heat or cooling where it is used) would let each pillar compete for the job it does best.
+
+## What would change my mind
+
+<!-- EDITOR NOTE for Henry: proposed; confirm, edit or replace before publication. -->
+
+- If gas-turbine delivery times fall back to about three years and gas's share falls much faster than EIA projects, gas is a bridge, not a pillar.
+- If enhanced geothermal reaches DOE's cost goal at scale, it belongs among the firm-capacity sources as much as among the cheap-energy ones.
+- If large loads show verified, measured flexibility in the gigawatts, flexibility becomes a pillar in its own right and the firm-capacity gap shrinks.
+
+---
+
+*Every item is checked against its primary source; the views are my own.*
+
+*Views are my own and do not represent my employer. Corrections are made in place and noted here with the date.*
