@@ -1,10 +1,8 @@
 # Sidecar for bridge B1 (b01-algebra-to-lp), builder learn-w1-h, 2026-11-02. Read by scripts/build_learn.py.
 id: b01-algebra-to-lp
 lesson: B1
-glossary:
-  - id: feasible-region
-    term: Feasible region
-    def: "All the plans that keep every rule of a model at once; with two decisions it is a shape on a graph."
+# feasible-region is defined once, in learn/_w1/09-storage.yml (lesson 10), since the W1 merge.
+glossary: []
 requests:
   - "Promote the lesson-local two-variable LP pieces into shared components. (1) i-lp-playground: the rule plane Plane() and the pure rule algebra le/holds/clip/region plus optimum() (vertex enumeration with infeasible, unbounded and tie detection), now copied in assets/learn/k04-linear-equations.js and b01-algebra-to-lp.js, with the .w1h-* styles from the pages' <style> blocks. (2) i-formulation: Builder() in b01 (goal and rule rows as inputs, drawn live, checked by compare(): same feasible region within 0.5% of the view and the same goal direction, with per-rule diagnostics; modes one-rule-left and from-scratch; three staged hints). (3) e-equation: EquationCard() in b01 (tappable symbols with words, story and code); b03 has a variant inline in explain(). (4) e-checklist: the tick list in b03 and k07 (.b3-list). T10 (learn-w1-f) also needs i-lp-playground; one shared copy avoids two."
   - "learn_screenshots.mjs: add the generic root.lxDemo(state) hook that learn-w1-b requested. This branch used a copy of their patched script. States: K4 mid, region; B1 mid, diy, mx, signs; B3 mid, bugs, check; K7 mid, fixed."

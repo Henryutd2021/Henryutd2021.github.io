@@ -139,7 +139,7 @@ const visible = OWN + JSON.stringify(RAWF.meta) + stepTexts.join(" ") + NBSRC;
 [/\bAI\b/i, /artificial intelligence/i, /\bClaude\b/, /ChatGPT/, /\bFOAK\b/, /learning[- ](curve|rate)/i, /projects\//, /research\.(html|qmd)/, /nuclear|reactor|\bSMR\b/i].forEach(rx =>
   ok(!rx.test(visible), "scope: no " + rx));
 [...QMD.matchAll(/href="([^"]+)"/g)].map(m => m[1]).forEach(h =>
-  ok(/^https:\/\/([a-z0-9-]+\.)*(eia\.gov|creativecommons\.org|opensource\.org)\//.test(h) || /^(index\.html|00-grid-operator\.html|notebooks\/b02-python-data\.ipynb|\.\.\/assets\/learn\/data\/[a-z0-9_-]+\.json|mailto:)/.test(h) || h.startsWith("#"),
+  ok(/^https:\/\/([a-z0-9-]+\.)*(eia\.gov|creativecommons\.org|opensource\.org)\//.test(h) || /^([a-z0-9-]+\.html(#[a-z0-9-]+)?$|notebooks\/b02-python-data\.ipynb|\.\.\/assets\/learn\/data\/[a-z0-9_-]+\.json|mailto:)/.test(h) || h.startsWith("#"),
     "scope: link allowed: " + h));
 
 console.log(`${checks} checks, ${fails} failures`);

@@ -14,9 +14,6 @@ glossary:
   - id: locational-marginal-price
     term: Locational marginal price (LMP)
     def: "The cost of serving one more megawatt-hour at one place on the grid in one interval, given the plants running and the limits of the lines."
-  - id: congestion
-    term: Transmission congestion
-    def: "A line carrying all it is allowed to, so that cheaper power cannot reach where it is needed and prices differ by location."
   - id: congestion-rent
     term: Congestion rent
     def: "What loads pay at their locational prices minus what generators are paid at theirs, equal to each full line's shadow price times its flow."

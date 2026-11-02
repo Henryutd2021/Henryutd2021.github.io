@@ -2,9 +2,6 @@
 id: b03-read-check-formulation
 lesson: B3
 glossary:
-  - id: parameter
-    term: Parameter
-    def: "A given number in a model, such as a demand or a price, which the solver uses but does not choose."
   - id: verification
     term: Verification
     def: "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases."

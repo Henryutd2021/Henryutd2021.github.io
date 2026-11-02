@@ -2,9 +2,6 @@
 id: 13-capstone
 lesson: 13
 glossary:
-  - id: capital-recovery-factor
-    term: Capital recovery factor
-    def: "The share of a plant's up-front cost to pay each year so that, with interest, the cost is repaid over its life."
   - id: representative-period
     term: Representative period
     def: "A real stretch of time, such as a week, chosen to stand for many similar ones so that a model can run faster."

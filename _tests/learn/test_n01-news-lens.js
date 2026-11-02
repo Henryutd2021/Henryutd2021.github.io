@@ -113,7 +113,7 @@ const visible = QMD + JSON.stringify(D) + stepTexts.join(" ");
 [/\bAI\b/i, /artificial intelligence/i, /\bClaude\b/, /ChatGPT/, /\bFOAK\b/, /learning[- ](curve|rate)/i, /projects\//, /research\.(html|qmd)/, /nuclear|reactor|\bSMR\b/i].forEach(rx =>
   ok(!rx.test(visible), "scope: no " + rx));
 const hrefs = [...QMD.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
-hrefs.forEach(h => ok(/^https:\/\/([a-z0-9-]+\.)*(eia\.gov|energy\.gov|entsoe\.eu|creativecommons\.org|opensource\.org)\//.test(h) || /^(index\.html|00-grid-operator\.html|mailto:)/.test(h) || h.startsWith("#"),
+hrefs.forEach(h => ok(/^https:\/\/([a-z0-9-]+\.)*(eia\.gov|energy\.gov|entsoe\.eu|creativecommons\.org|opensource\.org)\//.test(h) || /^(index\.html|[a-z0-9-]+\.html(#[a-z0-9-]+)?|mailto:)$/.test(h) || /^mailto:/.test(h) || h.startsWith("#"),
   "scope: link allowed: " + h));
 
 console.log(`${checks} checks, ${fails} failures`);
