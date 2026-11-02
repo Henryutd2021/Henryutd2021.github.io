@@ -29,6 +29,7 @@ project:
     - assets/explainers/
     - assets/learn/*.js
     - assets/learn/data/
+    - assets/learn/vendor/      # HiGHS (WebAssembly, MIT) for the in-browser solver; loaded only when a lesson solves
 
 website:
   title: "Honglin Li"
