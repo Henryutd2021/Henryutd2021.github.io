@@ -13,6 +13,7 @@ project:
     - cv.qmd
   resources:
     - robots.txt
+    - google10b8e69b53ee897d.html   # Google Search Console file verification
     - images/
     - files/
     - assets/explainers/
