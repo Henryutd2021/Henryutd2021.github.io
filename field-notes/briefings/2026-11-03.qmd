@@ -10,7 +10,6 @@ categories:
   - Hydrogen
   - Policy & credits
   - Data & methods
-draft: true
 ---
 
 Several announcements in the past two weeks came with large headline numbers, and each carried a qualifier that matters more to anyone modeling new large loads and firm power. Below are five U.S. items and one from Europe, each with its primary source and my view of why it matters.

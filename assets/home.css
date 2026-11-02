@@ -153,3 +153,7 @@ main.home > #title-block-header { display: none; }   /* guard: Quarto inserts an
 @media (prefers-reduced-motion: reduce) {
   .home .section-title a .bi, .home .fw-name, .home .social-icons a { transition: none; }
 }
+
+/* ---------- 4b. latest from Field Notes (website v3) ---------- */
+.home .home-fn .quarto-listing-default .quarto-post { border-bottom: 0; padding: .4rem 0; }
+.home .home-fn .listing-title { font-size: 1.05rem; }
