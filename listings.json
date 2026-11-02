@@ -1,12 +1,6 @@
 [
   {
-    "listing": "/field-notes.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html"
-    ]
-  },
-  {
-    "listing": "/index.html",
+    "listing": "/field-notes/briefings.html",
     "items": [
       "/field-notes/briefings/2026-11-03.html"
     ]
@@ -31,7 +25,13 @@
     ]
   },
   {
-    "listing": "/field-notes/briefings.html",
+    "listing": "/index.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
+    ]
+  },
+  {
+    "listing": "/field-notes.html",
     "items": [
       "/field-notes/briefings/2026-11-03.html"
     ]

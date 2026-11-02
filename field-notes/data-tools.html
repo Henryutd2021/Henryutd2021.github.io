@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Honglin Li">
+<meta name="dcterms.date" content="2026-11-02">
+<meta name="description" content="A practical guide to the public data and open tools I use to model U.S. power markets, large new loads and clean firm power: what each covers, how to get it, what its terms allow, and the pitfalls to expect.">
+
+<title>Data &amp; Tools for Energy-Systems Modeling – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<meta property="og:title" content="Data &amp; Tools for Energy-Systems Modeling – Honglin Li">
+<meta property="og:description" content="A practical guide to the public data and open tools I use to model U.S. power markets, large new loads and clean firm power: what each covers, how to get it, what its terms allow, and the pitfalls to expect.">
+<meta property="og:image" content="https://henryutd2021.github.io/field-notes/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Field Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data &amp; Tools for Energy-Systems Modeling</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Data &amp; methods</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    A practical guide to the public data and open tools I use to model U.S. power markets, large new loads and clean firm power: what each covers, how to get it, what its terms allow, and the pitfalls to expect.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Honglin Li </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 2, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This guide is for researchers, students and analysts who build models of U.S. power markets, of large new loads such as data centers and electrolyzers, and of the clean firm supply that may serve them. It covers fifteen public datasets and open tools in five groups: grid operations and markets; generation, load and emissions; interconnection and planning; costs and technology; and modeling tools. Each entry says who publishes the source, what it covers, how to get it, what its terms allow (including whether you may redistribute what you download), and the pitfalls that tend to cost time. Where a pitfall comes from my own published work, the entry links the public documentation of the framework repository in which the step is written down; the others come from the publisher’s own documentation. <strong>As of 2 November 2026</strong>, every fact below was checked against the publisher’s official pages. Terms, versions and addresses change, so confirm them at the source before you rely on them. One naming note: on 1 December 2025 the U.S. Department of Energy changed the name of the lab known as NREL (National Renewable Energy Laboratory); it is now the National Laboratory of the Rockies (NLR). Its tools and data now live on nlr.gov, and older nrel.gov links no longer resolve.</p>
+<section id="contents" class="level2">
+<h2 class="anchored" data-anchor-id="contents">Contents</h2>
+<ul>
+<li><a href="#at-a-glance">Terms at a glance</a></li>
+<li><a href="#grid-markets">Grid operations &amp; markets</a>: <a href="#ercot-60-day">ERCOT 60-day disclosures</a> · <a href="#ercot-portal">ERCOT prices, data portal and API</a> · <a href="#pjm-data-miner">PJM Data Miner</a></li>
+<li><a href="#generation-load">Generation, load &amp; emissions</a>: <a href="#eia-930">EIA-930</a> · <a href="#eia-860-923">EIA-860, 860M, 861 and 923</a> · <a href="#iea-energy-ai">IEA Energy and AI</a> · <a href="#sdwpf">SDWPF wind-farm data</a></li>
+<li><a href="#interconnection-planning">Interconnection &amp; planning</a>: <a href="#queued-up">LBNL Queued Up</a> · <a href="#reeds">ReEDS</a> · <a href="#nrc-doe">NRC and DOE advanced-reactor resources</a></li>
+<li><a href="#costs-technology">Costs &amp; technology</a>: <a href="#atb">Annual Technology Baseline</a> · <a href="#cambium">Cambium</a></li>
+<li><a href="#modeling-tools">Modeling tools</a>: <a href="#reopt">REopt</a> · <a href="#sam">SAM and PySAM</a> · <a href="#highs-linopy">HiGHS and linopy</a></li>
+</ul>
+</section>
+<section id="at-a-glance" class="level2">
+<h2 class="anchored" data-anchor-id="at-a-glance">Terms at a glance</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Source</th>
+<th>Publisher</th>
+<th>Can you redistribute what you download?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ERCOT disclosures and prices</td>
+<td>ERCOT</td>
+<td>Yes, if files are unmodified and notices kept; charts and analyses built from the raw data are allowed</td>
+</tr>
+<tr class="even">
+<td>PJM Data Miner</td>
+<td>PJM Interconnection</td>
+<td>No, not without PJM authorization (membership or a PJM redistribution license); non-members may use the data internally</td>
+</tr>
+<tr class="odd">
+<td>EIA-930, EIA-860/860M/861/923</td>
+<td>U.S. Energy Information Administration</td>
+<td>Yes; public domain, with credit to EIA</td>
+</tr>
+<tr class="even">
+<td>IEA Energy and AI</td>
+<td>International Energy Agency</td>
+<td>Report text and figures: yes, under CC BY 4.0. Data explorer and datasets: not CC BY; check IEA’s separate terms</td>
+</tr>
+<tr class="odd">
+<td>SDWPF</td>
+<td>Dataset authors, via figshare</td>
+<td>Yes, under CC BY 4.0</td>
+</tr>
+<tr class="even">
+<td>Queued Up</td>
+<td>Berkeley Lab with GridTracker</td>
+<td>Yes, under CC BY 4.0, crediting both</td>
+</tr>
+<tr class="odd">
+<td>ReEDS</td>
+<td>NLR</td>
+<td>Code: yes, BSD-3-Clause. Running it needs a commercial GAMS license; inputs come from many sources</td>
+</tr>
+<tr class="even">
+<td>NRC and DOE resources</td>
+<td>NRC; DOE</td>
+<td>NRC-authored material: yes, it is not subject to copyright. Third-party documents may be protected</td>
+</tr>
+<tr class="odd">
+<td>Annual Technology Baseline</td>
+<td>NLR</td>
+<td>Yes, under CC BY 4.0</td>
+</tr>
+<tr class="even">
+<td>Cambium</td>
+<td>NLR</td>
+<td>Workbooks: copies allowed if the license notice travels with them, with credit. Full datasets: link to the viewer</td>
+</tr>
+<tr class="odd">
+<td>REopt</td>
+<td>NLR</td>
+<td>REopt.jl code: Apache-2.0. API and web tool: free, with a key for the API</td>
+</tr>
+<tr class="even">
+<td>SAM and PySAM</td>
+<td>NLR</td>
+<td>Free; open-source code under BSD-3-Clause</td>
+</tr>
+<tr class="odd">
+<td>HiGHS and linopy</td>
+<td>HiGHS project; linopy maintainers</td>
+<td>Yes; both MIT</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="grid-markets" class="level2">
+<h2 class="anchored" data-anchor-id="grid-markets">Grid operations &amp; markets</h2>
+<section id="ercot-60-day" class="level3">
+<h3 class="anchored" data-anchor-id="ercot-60-day">ERCOT 60-day SCED and DAM disclosure reports</h3>
+<p><strong>What it is.</strong> ERCOT, the grid and market operator for most of Texas, publishes resource-level dispatch, offer and award data once a 60-day confidentiality period has passed. The <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP3-965-ER">60-Day SCED Disclosure Reports</a> (NP3-965-ER) cover real-time security-constrained economic dispatch. The <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP3-966-ER">60-Day DAM Disclosure Reports</a> (NP3-966-ER) cover the day-ahead market.</p>
+<p><strong>Coverage.</strong> Both reports have run daily since 29 January 2011, with one ZIP package of CSV files per operating day. The SCED package includes separate files for generation resources, load resources and energy storage resources in SCED, at SCED-interval resolution. The DAM package includes energy bids and awards, resource data and ancillary-service offers and awards. ERCOT’s <a href="https://www.ercot.com/mktinfo/reports/index">market reports index</a> lists these alongside the shorter 2-day and 3-day disclosures.</p>
+<p><strong>Access.</strong></p>
+<ol type="1">
+<li>Open the product page and download the daily ZIP files. ERCOT’s <em>Disclosure Reports Column Definitions Guide</em>, linked there, defines the columns.</li>
+<li>For long histories, use the ERCOT Data Access Portal or the Public API (see the <a href="#ercot-portal">next entry</a>).</li>
+<li>Expect a lag of about 60 days. For example, ERCOT’s notices show that the report for operating day 27 June 2024 was posted on 26 August 2024.</li>
+</ol>
+<p><strong>License and terms.</strong> ERCOT’s <a href="https://www.ercot.com/help/terms">Terms of Use</a> let you use, reproduce and redistribute public content on two conditions: the content is not modified, and its copyright and other notices are kept. Raw data may go into your own compilations, charts and analyses without those notices. ERCOT does not warrant the accuracy of the data, and its name and logo need written permission. <strong>Redistribution: allowed for unmodified files; derived analyses allowed.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Clock.</em> ERCOT data follow Central Prevailing Time, so every spring has a missing hour and every fall a repeated one. On the long day, ERCOT labels the repeated hour separately from the normal one. My Texas hydrogen framework converts every series to one fixed-offset clock before aggregating, then reindexes it to a complete hourly axis.</li>
+<li><em>From intervals to hours.</em> Average each resource’s SCED intervals within each hour to get its energy for that hour. An hour without a record is missing, not zero. Fill only short gaps, resource by resource, <em>before</em> summing to zones; after summing, a silent resource is hidden by its neighbours.</li>
+<li><em>Locations.</em> Disclosure files identify resources by ERCOT name, not by county. The framework matches each one to its plant in EIA-860, which gives the county and from that the weather zone. The mapping table is kept under version control, and unmatched capacity is reviewed.</li>
+<li><em>Capacity factors.</em> The denominator should be the capacity actually operating in that hour, taken from commissioning dates; year-end capacity understates early-year capacity factors. Look at the maximum before any clipping: a value above 1 means a matching or capacity error.</li>
+<li><em>Corrections.</em> ERCOT sometimes reposts disclosure data. A March 2026 <a href="https://www.ercot.com/services/comm/mkt_notices/M-B030626-02">market notice</a>, for example, announced supplemental files for a load-resource file affected from December 2025 to January 2026. Watch the market notices and re-download the affected days.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/txh2.html">Hydrogen’s role in expanding renewable energy in Texas (TXH2)</a>. The full recipe and its checks are in the <a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/data_pipeline.md">txh2-ercot-hydrogen data pipeline</a>.</p>
+</section>
+<section id="ercot-portal" class="level3">
+<h3 class="anchored" data-anchor-id="ercot-portal">ERCOT prices, the Data Access Portal and the Public API</h3>
+<p><strong>What it is.</strong> ERCOT’s public market reports, including prices, are available through three routes: the data-product pages on ercot.com, the <a href="https://data.ercot.com/">ERCOT Data Access Portal</a> for search and archives, and the <a href="https://apiexplorer.ercot.com/">ERCOT Public API</a>.</p>
+<p><strong>Coverage.</strong> <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP4-190-CD">DAM Settlement Point Prices</a> (NP4-190-CD) give day-ahead prices at resource nodes, load zones and trading hubs. <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP6-905-CD">Real-time settlement point prices</a> (NP6-905-CD) are posted every 15 minutes. Bus-level <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP4-183-CD">DAM Hourly LMPs</a> (NP4-183-CD) are a separate product. These nodal products have run since late November 2010. The product pages list only recent files; the DAM hourly LMP page, for example, keeps the last 30 days.</p>
+<p><strong>Access.</strong></p>
+<ol type="1">
+<li>For a quick look, download recent files from the product page.</li>
+<li>For history, search the Data Access Portal. Its search reaches back to 30 November 2023; older archives come as downloadable file packages.</li>
+<li>For programmatic access, register on the ERCOT API Explorer and subscribe to the Public API product to obtain a subscription key. Then request an ID token with your account credentials; it is valid for one hour and cannot be refreshed. Send both the key and the token with every request, as the <a href="https://developer.ercot.com/applications/pubapi/user-guide/registration-and-authentication">registration guide</a> describes. Data through the API start on 11 December 2023.</li>
+<li>Open-source clients such as <a href="https://github.com/gridstatus/gridstatus">gridstatus</a> (BSD-3-Clause) wrap these steps. My nuclear–data-center framework retrieved ERCOT day-ahead hub prices with it.</li>
+</ol>
+<p><strong>License and terms.</strong> ERCOT’s API support page states that the same <a href="https://www.ercot.com/help/terms">Terms of Use</a> govern the API: unmodified redistribution with notices kept, and free use in your own analyses. Keep your API credentials out of scripts and repositories. <strong>Redistribution: as for the disclosure reports.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Settlement point price or LMP.</em> Prices at hubs, load zones and resource nodes, and prices at individual electrical buses, are separate products with separate report IDs. Choose the one for the location your site would face; the nuclear–data-center framework uses the day-ahead price at a hub.</li>
+<li><em>15-minute prices.</em> Average each hour’s intervals before joining them to hourly data. Check that every hour has its full set of intervals, and treat a missing interval as an error, not as a zero.</li>
+<li><em>Negative prices.</em> Keep them. A model that buys and sells at the grid should see hours in which exporting costs money.</li>
+<li><em>Year length.</em> After converting clocks, check that a normal year has exactly 8,760 rows. In a leap year, treat all series alike: remove the leap day from each of them, or keep all 8,784 hours throughout.</li>
+<li><em>Units.</em> Market prices are in $/MWh. Models that work in kW, such as REopt-based ones, need $/kWh, so divide by 1,000.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/nuclear-dc.html">Small modular reactor cogeneration for a hyperscale data center</a>, with its <a href="https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/data_pipeline.md">smr-datacenter-cogeneration data pipeline</a>; <a href="../projects/wind-hydrogen.html">co-located wind and hydrogen</a>, <a href="../projects/solar-hydrogen.html">co-located solar and hydrogen</a> and <a href="../projects/offshore-wind-hydrogen-om.html">offshore wind–hydrogen O&amp;M</a>, with the <a href="https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/data_pipeline.md">reopt-hydrogen-framework data pipeline</a>.</p>
+</section>
+<section id="pjm-data-miner" class="level3">
+<h3 class="anchored" data-anchor-id="pjm-data-miner">PJM Data Miner</h3>
+<p><strong>What it is.</strong> <a href="https://www.pjm.com/markets-and-operations/etools/data-miner-2">Data Miner</a>, still called Data Miner 2 on many pages, is PJM Interconnection’s tool for its public market and operations data. It has a web interface and an API.</p>
+<p><strong>Coverage.</strong> Data are organized as <em>feeds</em>, each with its own definition, posting frequency and retention. Feeds include day-ahead and real-time hourly LMPs, five-minute real-time LMPs, settlement-verified LMPs, hourly load (preliminary, estimated and metered), load forecasts and generation by fuel type. Price feeds cover all bus locations, including aggregates.</p>
+<p><strong>Access.</strong></p>
+<ol type="1">
+<li>The <a href="https://dataminer2.pjm.com/">web interface</a> needs no account. Choose a feed, set the dates, filter, and export to CSV.</li>
+<li>For the API, create a PJM account, sign in to the <a href="https://apiportal.pjm.com/">API portal</a> and obtain a key. A non-member must also confirm to PJM by e-mail that the data will be used only for internal business purposes. The steps are in PJM’s <a href="https://www.pjm.com/-/media/DotCom/etools/data-miner-2/data-miner-2-api-guide.ashx">Data Miner API Guide</a>.</li>
+<li>Every API query needs a date filter, and a standard query is limited to about one year of data.</li>
+</ol>
+<p><strong>License and terms.</strong> Under the <a href="https://pjm.com/-/media/etools/edatafeed/data-license-agreement-edata-feed-data-miner-2.ashx">Data Miner terms of use</a>, PJM members may republish data and non-members may not. PJM’s API guide adds that commercial use, including publishing data or making derivatives of it, requires PJM membership (at least Associate Membership). PJM’s API portal states that passing on Data Miner data, or anything derived from it, requires a Redistribution License issued by PJM. Non-members are limited to 6 data connections per minute (members to 600). <strong>Redistribution: not allowed without PJM authorization.</strong> In practice, publish your code and a download recipe, not the PJM data. The documentation of my supply-chain framework recommends the same approach for any source whose terms forbid redistribution.</p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Two clocks.</em> Feeds carry both Eastern Prevailing Time (<code>_ept</code>, which observes daylight saving) and UTC (<code>_utc</code>) timestamp columns. PJM recommends filtering and sorting on the same one. Pick one and convert once.</li>
+<li><em>Archive rules.</em> Hourly LMP feeds older than 731 days, and five-minute LMPs older than 186 days, move to an archive. Archive queries must stay within one UTC calendar year, must not span archived and recent data, and allow fewer filters. PJM’s example is that you can request all aggregates by pnode type, but not one specific pnode.</li>
+<li><em>Preliminary and final values.</em> Hourly load comes in preliminary, estimated and metered versions, and LMPs have settlement-verified feeds. State which version you used.</li>
+<li><em>Throughput.</em> At six connections per minute, a non-member’s bulk download of nodal history takes time. Plan it, and keep the raw files with their download dates.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/npph2.html">Hydrogen integration and policy support for U.S. nuclear power plants (NPPH2)</a>. PJM is one of the seven U.S. ISO/RTO markets in that study.</p>
+</section>
+</section>
+<section id="generation-load" class="level2">
+<h2 class="anchored" data-anchor-id="generation-load">Generation, load &amp; emissions</h2>
+<section id="eia-930" class="level3">
+<h3 class="anchored" data-anchor-id="eia-930">EIA-930 Hourly Electric Grid Monitor</h3>
+<p><strong>What it is.</strong> The U.S. Energy Information Administration (EIA) collects hourly operating data from the balancing authorities (BAs) of the Lower 48 states on Form EIA-930. It publishes them through the <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>.</p>
+<p><strong>Coverage.</strong> Hourly data for each BA: demand, demand forecast, net generation, total interchange and interchange with each neighbouring BA. EIA aggregates them into 13 regions and a Lower 48 total. Data start on 1 July 2015. Net generation by energy source, subregion demand and EIA’s estimated CO₂ emissions start on 1 July 2018, and battery storage became a separate energy source on 1 January 2025.</p>
+<p><strong>Access.</strong> Use the dashboards, the six-month CSV files (balance, interchange and subregion), or the full-history workbooks for each BA and region. The <a href="https://www.eia.gov/opendata/">EIA API</a> needs a free registered key and serves EIA-930 data from 1 January 2019 onward; older data are in the downloadable files. EIA’s <a href="https://www.eia.gov/electricity/930-content/about.html">About the EIA-930 data</a> page is the best single reference.</p>
+<p><strong>License and terms.</strong> EIA’s <a href="https://www.eia.gov/about/copyrights_reuse.php">copyright and reuse policy</a> places its publications, as federal government works, in the public domain, and lets you use and distribute its data. EIA asks for an acknowledgment that names it and gives the publication date. <strong>Redistribution: allowed.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Clock.</em> Values are hour-ending. Each BA reports in a local time zone of its own choosing, and a few choices are unexpected: El Paso Electric reports in Arizona time and Idaho Power in Pacific time, for example. The six-month files carry both a local and a UTC end-of-hour stamp. My carbon-aware load framework works in UTC or local standard time, never in a clock that repeats an hour.</li>
+<li><em>Daylight-saving days.</em> These days have 23 or 25 hours, and EIA notes that they are often misreported, with duplicated, missing or mislabeled hours. Check them before anything else.</li>
+<li><em>Raw, imputed or adjusted.</em> EIA publishes BA-level data as reported, while its regional and national totals include imputation. The six-month files carry raw, imputed and adjusted columns side by side. Choose one deliberately and say which.</li>
+<li><em>Revisions.</em> Values can change after first release. My framework records the access date and a SHA-256 checksum of every downloaded file, so a result can be traced to the exact data used.</li>
+<li><em>Zeros and negatives.</em> An hour with zero demand is a reporting gap and should be treated as missing. My carbon-aware load framework clips negative net generation, such as pumping or station use, to zero and reports how many values were clipped.</li>
+<li><em>Units.</em> Emission intensity comes in lb CO₂/kWh. Converting to kg CO₂/MWh multiplies by 453.59237, so a result that is off by a factor of about 450 signals a unit mix-up.</li>
+<li><em>Changing categories.</em> New energy-source columns, such as battery storage from 2025, change the set of fuels. Map every year to one consistent set before comparing years.</li>
+<li><em>Average, not marginal.</em> EIA’s CO₂ estimates use annual average emission factors, so hourly intensities built from these data are averages. My studies that used them state this boundary explicitly.</li>
+<li><em>Totals.</em> Hourly totals can differ from EIA’s monthly and annual publications because coverage and methods differ. Compare annual totals with EIA’s published figures as a check.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/ghg.html">Emission-intensity-informed load regulation (GHG)</a>, with the <a href="https://github.com/Henryutd2021/ghg-load-regulation/blob/main/docs/data_pipeline.md">ghg-load-regulation data pipeline</a>; <a href="../projects/nuclear-dc.html">SMR cogeneration for a hyperscale data center</a>, for hourly grid carbon intensity.</p>
+</section>
+<section id="eia-860-923" class="level3">
+<h3 class="anchored" data-anchor-id="eia-860-923">EIA-860, EIA-860M, EIA-861 and EIA-923</h3>
+<p><strong>What it is.</strong> These are EIA’s core surveys of U.S. power plants and utilities: generators (<a href="https://www.eia.gov/electricity/data/eia860/">EIA-860</a>, annual, and <a href="https://www.eia.gov/electricity/data/eia860m/">EIA-860M</a>, monthly), utilities and retail sales (<a href="https://www.eia.gov/electricity/data/eia861/">EIA-861</a>), and generation and fuel (<a href="https://www.eia.gov/electricity/data/eia923/">EIA-923</a>).</p>
+<p><strong>Coverage.</strong></p>
+<ul>
+<li><strong>EIA-860.</strong> Generator-level data on existing, proposed and retired units at plants of 1 MW or more, organized as operable, proposed and retired-or-canceled tabs. Annual files cover 2001–2025; the final 2025 data were released on 10 September 2026.</li>
+<li><strong>EIA-860M.</strong> The monthly status of existing and proposed generators. Monthly files run from July 2015 to September 2026; the September file was released on 23 October 2026.</li>
+<li><strong>EIA-861.</strong> An annual census of U.S. electric utilities: retail sales, revenue and customers by state, sector and balancing authority, plus net metering, demand response, service territories and more. Data cover 1990–2025, with the final 2025 data released on 7 October 2026. A monthly companion, EIA-861M, also exists.</li>
+<li><strong>EIA-923.</strong> Monthly and annual generation, fuel consumption, fuel stocks, fuel receipts and costs, and environmental data. Data cover 2001–2026; the latest monthly release covers August 2026, and the final 2025 data were released on 14 September 2026.</li>
+</ul>
+<p><strong>Access.</strong> Download ZIP archives of Excel workbooks from each survey page. Many series are also on the EIA API.</p>
+<p><strong>License and terms.</strong> Public domain, as for <a href="#eia-930">EIA-930</a>. <strong>Redistribution: allowed, with credit to EIA.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Preliminary and final values.</em> EIA-860M capacities are preliminary estimates that EIA later corrects without specific notice. Early-release annual data are not yet fully validated. Monthly EIA-923 releases cover only the plants in the monthly survey (about 3,000); the final annual file adds the plants that report annually.</li>
+<li><em>Planned is not committed.</em> EIA notes that capacities reported for planned units are not commitments by the facilities.</li>
+<li><em>Retirements.</em> The Retired tab of the annual EIA-860 is not comprehensive. The monthly inventory tracks retirements back to 2002.</li>
+<li><em>Location and timing.</em> EIA-860 gives each plant’s county and each generator’s operating month and year. My Texas framework uses the county to place market resources in zones, and the operating dates to count capacity only from the hour it entered service.</li>
+<li><em>QA.</em> Before using hourly inputs, compare annual energy by zone and technology with EIA-923.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/txh2.html">TXH2</a>: EIA-860 for locations, capacity and storage, and EIA-923 for QA. See the <a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/data_pipeline.md">txh2-ercot-hydrogen data pipeline</a>.</p>
+</section>
+<section id="iea-energy-ai" class="level3">
+<h3 class="anchored" data-anchor-id="iea-energy-ai">IEA Energy and AI</h3>
+<p><strong>What it is.</strong> The International Energy Agency’s special report <a href="https://www.iea.org/reports/energy-and-ai">Energy and AI</a> (10 April 2025), its follow-up <a href="https://www.iea.org/reports/key-questions-on-energy-and-ai">Key Questions on Energy and AI</a> (16 April 2026), and the online <a href="https://www.iea.org/data-and-statistics/data-tools/energy-and-ai-observatory">Energy and AI Observatory</a>. A further IEA report, <a href="https://www.iea.org/reports/powering-artificial-intelligence">Powering Artificial Intelligence</a> (14 October 2026), deals with integrating data centers into power systems.</p>
+<p><strong>Coverage.</strong> Global and regional estimates of data-center electricity consumption and installed capacity, with projections to 2030 and 2035. The 2025 report has a Base Case and three sensitivity cases: Lift-Off, Headwinds and High Efficiency. The Observatory (last updated 16 June 2025) shows installed capacity by data-center type (enterprise, colocation and hyperscale), capacity by region, and a map of large data-center hubs.</p>
+<p><strong>Access.</strong> Read the reports online or download the PDFs; the Observatory is interactive.</p>
+<p><strong>License and terms.</strong> The report pages carry a CC BY 4.0 licence. The IEA’s <a href="https://www.iea.org/terms">terms</a> exclude standalone datasets, data explorers and data annexes from that licence and place them under its terms for non-CC material. <strong>Redistribution: report text and figures allowed with attribution under CC BY 4.0. Data from the Observatory are not CC BY; check the IEA’s terms or ask the IEA before republishing them.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Modeled, not metered.</em> The IEA notes that there are no comprehensive global statistics on data-center electricity use. Its figures come from its own model, so treat them as estimates.</li>
+<li><em>Cases and editions.</em> The cases diverge widely by 2035. Always name the case and the publication you cite, and check whether a later IEA publication has updated the figure.</li>
+<li><em>Granularity.</em> The figures are national and regional. They cannot stand in for utility, interconnection or nodal load data.</li>
+<li><em>Recording.</em> In my framework for the cost of delayed grid energization (CoDE), values drawn from capacity outlooks become scenario values, such as case sizes, and never observations. Each one is recorded in a provenance table with its source and access date.</li>
+</ul>
+<p><strong>Used in.</strong> Not used directly in my published studies. For the provenance rule, see the <a href="https://github.com/Henryutd2021/code-delayed-energization/blob/main/docs/data_pipeline.md">code-delayed-energization data pipeline</a>.</p>
+</section>
+<section id="sdwpf" class="level3">
+<h3 class="anchored" data-anchor-id="sdwpf">SDWPF wind-farm SCADA dataset</h3>
+<p><strong>What it is.</strong> SDWPF (Spatial Dynamic Wind Power Forecasting) is an open set of SCADA records from one wind farm of 134 turbines. It was released for the KDD Cup 2022 challenge and documented by its authors (Zhou et al.) in <a href="https://doi.org/10.1038/s41597-024-03427-5"><em>Scientific Data</em> (2024)</a>.</p>
+<p><strong>Coverage.</strong> Records are at 10-minute resolution per turbine and include wind speed and direction, nacelle direction, blade pitch angles and active power. The full release, <code>sdwpf_full</code>, spans January 2020 to December 2021 (about 11.4 million records) with real timestamps, ERA5 weather variables and turbine elevations. The competition release, <code>sdwpf_kddcup</code>, holds the original 245-day file, which gives only a day index and time of day, with relative turbine positions.</p>
+<p><strong>Access.</strong> Download the CSV or Parquet files from <a href="https://doi.org/10.6084/m9.figshare.24798654">figshare</a>.</p>
+<p><strong>License and terms.</strong> The figshare record is licensed CC BY 4.0. Cite the <em>Scientific Data</em> article. <strong>Redistribution: allowed with attribution.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Quality flags are defined but not applied.</em> The dataset paper defines zero, missing, unknown and abnormal values. Power is <em>unknown</em> when it is at or below zero while wind speed exceeds 2.5 m/s, or when any pitch angle exceeds 89°; these cases often reflect curtailment or stops. The authors leave it to users to decide how to treat them.</li>
+<li><em>Filter for your purpose.</em> Forecast evaluation excludes those records. My multi-fidelity power-curve method keeps stops and curtailment on purpose, because its density-based sampling is meant to represent the turbines’ full operating behaviour. It removes only rows with missing or non-finite values and negative power, and reports how many rows each rule removed.</li>
+<li><em>Time.</em> In the 245-day file, a timestamp is built as (day − 1) days plus the time of day.</li>
+<li><em>Units and sensors.</em> Check power units against the 1.5 MW turbine rating. Nacelle anemometers sit behind the rotor, which affects the wind-speed readings. Look for duplicate intervals after merges and for long runs of stuck values.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/uq-mfgpr.html">Multi-fidelity Gaussian processes for wind power curves</a>, with the <a href="https://github.com/Henryutd2021/mfgpr-wind-power-curve/blob/main/docs/data_pipeline.md">mfgpr-wind-power-curve data pipeline</a>.</p>
+</section>
+</section>
+<section id="interconnection-planning" class="level2">
+<h2 class="anchored" data-anchor-id="interconnection-planning">Interconnection &amp; planning</h2>
+<section id="queued-up" class="level3">
+<h3 class="anchored" data-anchor-id="queued-up">LBNL Queued Up</h3>
+<p><strong>What it is.</strong> <a href="https://emp.lbl.gov/queues">Queued Up</a> is Lawrence Berkeley National Laboratory’s annual compilation of U.S. interconnection queues, produced with GridTracker. Interconnection queues list the proposed generation and storage projects that have asked to connect to the transmission grid.</p>
+<p><strong>Coverage.</strong> The 2026 edition covers requests through the end of 2025. It includes all seven ISOs/RTOs and 50 non-ISO utilities, which together hold about 98% of installed U.S. generating capacity. The Excel data file (updated May 2026) contains the project-level dataset, a codebook and summary tabs; a PDF slide deck (June 2026) and interactive maps accompany it. The scope is generation and storage seeking transmission-level connection. Load requests, distribution-connected projects and behind-the-meter projects are not included.</p>
+<p><strong>Access.</strong> Download the data file and slide deck from the Queued Up page. No registration is required.</p>
+<p><strong>License and terms.</strong> The data file is licensed CC BY 4.0, and the page asks that it be attributed to Lawrence Berkeley National Laboratory and GridTracker. <strong>Redistribution: allowed with that attribution.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Requests are not plans.</em> Most requested capacity is withdrawn. Berkeley Lab reports that of the capacity requested in 2000–2020, only 13% had reached commercial operation by the end of 2025. My Texas study treated queued capacity as an upper bound, at a 100% completion rate, and applied completion rates as scenarios in the model.</li>
+<li><em>Selection.</em> The framework filters for requests whose status is active and whose proposed in-service date falls on or before the target year. It sums their capacity by county, then by zone, and converts it to output with the zone capacity factors.</li>
+<li><em>Power and energy.</em> Storage requests are usually stated in MW. If a model needs MWh, convert with an explicit storage duration and record that assumption.</li>
+<li><em>Not a load queue.</em> Queued Up does not track large-load requests such as data centers. Utility and ISO large-load disclosures are separate sources.</li>
+<li><em>Editions.</em> Figures change from one edition to the next. Cite the edition and the date of the data file.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/txh2.html">TXH2</a>, via the <a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/data_pipeline.md">txh2-ercot-hydrogen data pipeline</a>.</p>
+</section>
+<section id="reeds" class="level3">
+<h3 class="anchored" data-anchor-id="reeds">ReEDS</h3>
+<p><strong>What it is.</strong> The Regional Energy Deployment System (<a href="https://www.nlr.gov/analysis/reeds/">ReEDS</a>) is NLR’s open-source capacity planning and dispatch model of the U.S. power system. Its <code>inputs</code> folder is a documented collection of planning data, covering load, supply curves, transmission, plant characteristics, fuel prices, financing and state policies.</p>
+<p><strong>Coverage.</strong> The contiguous United States, represented as 133 model balancing areas, over multi-decade planning horizons. The latest release, 2026.09.21, was published on 30 September 2026.</p>
+<p><strong>Access.</strong></p>
+<ol type="1">
+<li>Clone <a href="https://github.com/ReEDS-Model/ReEDS">github.com/ReEDS-Model/ReEDS</a>. The earlier NatLabRockies/ReEDS-2.0 repository is archived.</li>
+<li>Follow the <a href="https://reeds-model.github.io/ReEDS/">documentation</a> to set up the conda and Julia environments.</li>
+<li>Large files, such as hourly demand and wind and solar profiles, are downloaded at run time from the hosts listed in <code>inputs/remote_files.csv</code>. Each input folder has a README that describes its sources.</li>
+</ol>
+<p><strong>License and terms.</strong> The code is BSD-3-Clause. ReEDS is written in Python, GAMS and Julia, and GAMS requires a commercial license; the documentation asks for a combined GAMS/CPLEX license. Small systems have been solved with an open-source solver, but the developers say that path is not actively maintained. The inputs are compiled from many sources. <strong>Redistribution: code allowed under BSD-3-Clause; for derived input data, check the terms of the original source first.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Version pinning.</em> Inputs change from release to release. Record the release tag and the identifiers of the remote files a run used.</li>
+<li><em>Dollar years.</em> The model documentation reports different inputs in different dollar years. Convert everything to one constant-dollar year before reusing it, as all my frameworks do.</li>
+<li><em>Scope.</em> Each balancing area is treated as a copper plate, and capacity decisions have limited foresight unless intertemporal mode is used. The results are least-cost planning outcomes under stated assumptions, not forecasts.</li>
+</ul>
+<p><strong>Used in.</strong> Not used directly in my published studies.</p>
+</section>
+<section id="nrc-doe" class="level3">
+<h3 class="anchored" data-anchor-id="nrc-doe">NRC and DOE advanced-reactor licensing resources</h3>
+<p><strong>What it is.</strong> The U.S. Nuclear Regulatory Commission’s public pages and records on licensing new and <a href="https://www.nrc.gov/reactors/new-reactors/advanced.html">advanced reactors</a>, and the Department of Energy’s <a href="https://gain.inl.gov/">Gateway for Accelerated Innovation in Nuclear</a> (GAIN), which gives developers access to technical, regulatory and financial support.</p>
+<p><strong>Coverage.</strong></p>
+<ul>
+<li><em>Licensing pathways.</em> Under 10 CFR Part 50, a plant needs a construction permit and then an operating license. Part 52 offers a combined license, early site permits and certified standard designs. The NRC’s <a href="https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-nuclear-power-plant-licensing-process">licensing backgrounder</a> explains both. <a href="https://www.govinfo.gov/content/pkg/FR-2026-03-30/html/2026-06048.htm">Part 53</a>, a technology-inclusive licensing framework based on risk insights, was published as a final rule on 30 March 2026 and took effect on 29 April 2026. It is optional; Parts 50 and 52 remain available. The NRC also lists proposed Part 57 requirements for microreactors.</li>
+<li><em>Project status.</em> The NRC publishes licensing dashboards for advanced-reactor applications under review. Its <a href="https://www.nrc.gov/reading-rm/adams.html">ADAMS</a> public library holds more than three million documents released since November 1999.</li>
+</ul>
+<p><strong>Access.</strong> Everything is free. ADAMS has a public search, the dashboards are linked from the advanced-reactor page, and Federal Register notices are on govinfo.gov.</p>
+<p><strong>License and terms.</strong> The NRC’s <a href="https://www.nrc.gov/site-help/disclaimer.html">site disclaimer</a> treats its website as a U.S. Government work that is not subject to copyright and asks for credit when material is republished. Copyrighted third-party items on the site need the owner’s permission, and documents submitted by applicants may fall into that category. <strong>Redistribution: NRC-authored material allowed; check third-party documents first.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Milestones are distinct.</em> Acceptance of an application for review, completion of the safety and environmental reviews, the hearing, issuance of a construction permit, and authorization to operate are separate events. Under Part 52, operation is authorized only after the required inspections, tests and analyses are verified. Record which milestone a date refers to.</li>
+<li><em>Cite the record.</em> Use the ADAMS accession number (it starts with “ML”) or the Federal Register citation rather than a news report.</li>
+<li><em>Pathway matters.</em> The same design can be licensed under different parts of the regulations. Note the pathway when you compare schedules.</li>
+</ul>
+<p><strong>Used in.</strong> The <a href="https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/data_pipeline.md">smr-datacenter-cogeneration data pipeline</a> lists public regulatory documents among the sources for reactor design parameters in the <a href="../projects/nuclear-dc.html">SMR cogeneration study</a>.</p>
+</section>
+</section>
+<section id="costs-technology" class="level2">
+<h2 class="anchored" data-anchor-id="costs-technology">Costs &amp; technology</h2>
+<section id="atb" class="level3">
+<h3 class="anchored" data-anchor-id="atb">Annual Technology Baseline</h3>
+<p><strong>What it is.</strong> NLR’s <a href="https://atb.nlr.gov/">Annual Technology Baseline</a> (ATB) is a yearly set of cost and performance estimates for electricity generation and storage technologies, with projections through 2050. A transportation ATB is published alongside it, and the electricity ATB pairs with NLR’s Standard Scenarios.</p>
+<p><strong>Coverage.</strong> The 2025 electricity edition was posted to the Open Energy Data Initiative (OEDI) in late August 2026. It covers capital cost, O&amp;M, capacity factor, financial assumptions and levelized cost of energy by technology. Projections come in conservative, moderate and advanced versions, and there are separate financial cases, including an R&amp;D-only case. The OEDI data lake holds the 2019–2025 editions.</p>
+<p><strong>Access.</strong> The <a href="https://atb.nlr.gov/electricity/2025/data">data page</a> links an Excel workbook, summary CSV and Parquet files on OEDI, Tableau workbooks, and the <a href="https://github.com/NatLabRockies/ATB-calc">ATB-calc</a> Python code. Read the disclaimer and the <a href="https://atb.nlr.gov/electricity/2025/technical_limitations">technical limitations</a> first.</p>
+<p><strong>License and terms.</strong> The <a href="https://data.openei.org/submissions/8759">OEDI record</a> is licensed CC BY 4.0. Cite the edition you use. <strong>Redistribution: allowed with attribution.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Representative, not site-specific.</em> The ATB leaves out site-specific resources, designs and regional labor and material costs. For a site-level cash flow, NLR points to SAM (see <a href="#sam">below</a>).</li>
+<li><em>Compare components.</em> NLR’s guidance is that comparing capital cost, O&amp;M and capacity factor directly is more reliable than comparing levelized costs.</li>
+<li><em>Financial cases.</em> The R&amp;D-only projections reflect technology change alone, not short-term market swings, and separate cases include tax credits. Do not mix values from different cases.</li>
+<li><em>Editions and errata.</em> Values change between editions, and each edition has an errata page. My nuclear–data-center framework records the edition used, together with one constant-dollar year for every cost and price in a run.</li>
+<li><em>Units.</em> Convert each cost to the size unit the model uses (per kW of net output, per kWh of storage, or per kg/h of electrolyzer capacity) before use, not inside the model.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/nuclear-dc.html">SMR cogeneration for a hyperscale data center</a> (reactor, gas-plant and battery costs) and <a href="../projects/solar-hydrogen.html">co-located solar and hydrogen</a> (cost trajectories). See also the <a href="https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/data_pipeline.md">reopt-hydrogen-framework data pipeline</a>.</p>
+</section>
+<section id="cambium" class="level3">
+<h3 class="anchored" data-anchor-id="cambium">Cambium</h3>
+<p><strong>What it is.</strong> NLR’s <a href="https://www.nlr.gov/analysis/cambium">Cambium</a> datasets are modeled hourly projections of the U.S. electricity sector through 2050. They are built from ReEDS capacity-expansion runs and production-cost modeling for a range of futures, as a companion to the Standard Scenarios. Metrics include long-run and short-run marginal emission rates, average emission rates and several marginal-cost measures. The latest release, Cambium 2024, is the fifth annual edition, documented in an <a href="https://docs.nlr.gov/docs/fy25osti/93005.pdf">April 2025 report</a>.</p>
+<p><strong>Coverage.</strong> Hourly data for a series of solve years from 2025 to 2050. The underlying models represent the contiguous United States as 133 balancing areas. Summary workbooks use 18 regions and include levelization tools.</p>
+<p><strong>Access.</strong> Download the full datasets from the <a href="https://scenarioviewer.nlr.gov/">Scenario Viewer</a> (Cambium 2024 project, Download tab) and the summary workbooks from the <a href="https://data.nlr.gov/submissions/289">NLR Data Catalog</a>.</p>
+<p><strong>License and terms.</strong> The Data Catalog’s dataset license allows free use and copying, provided the full notice appears in every copy and publications credit DOE, the laboratory and its operator; their names may not be used for endorsement. The Scenario Viewer’s disclaimer likewise asks for credit and provides the data as is. <strong>Redistribution: catalog workbooks may be copied with the notice. For the full datasets I found no separate redistribution grant, so link to the viewer.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Clock.</em> The <code>timestamp</code> field is in Eastern Standard Time and <code>timestamp_local</code> in local standard time. Both are hour-beginning and ignore daylight saving. Every year has 8,760 hours and starts on a Sunday, and leap days are dropped. Market and EIA data are usually hour-ending in local or prevailing time, so shift before joining.</li>
+<li><em>Purpose.</em> NLR designs Cambium for long-term, forward-looking analysis, not for historical accounting or real-time decisions. For the 2020s, it suggests observed data instead.</li>
+<li><em>Costs are not prices.</em> Cambium’s marginal costs can differ from market prices and should not be used as retail rates.</li>
+<li><em>Small changes only.</em> The data carry no elasticities, so the values become less reliable the larger the intervention being analyzed.</li>
+<li><em>Average or marginal.</em> Choose the emission rate that fits the question. My load-regulation and nuclear–data-center studies used average intensities from historical EIA data and state that boundary.</li>
+</ul>
+<p><strong>Used in.</strong> Not used directly in my published studies.</p>
+</section>
+</section>
+<section id="modeling-tools" class="level2">
+<h2 class="anchored" data-anchor-id="modeling-tools">Modeling tools</h2>
+<section id="reopt" class="level3">
+<h3 class="anchored" data-anchor-id="reopt">REopt</h3>
+<p><strong>What it is.</strong> <a href="https://www.nlr.gov/reopt/">REopt</a> is NLR’s techno-economic optimization platform for sizing and dispatching energy systems at buildings, campuses, communities and microgrids. It is available as a <a href="https://reopt.nlr.gov/tool">web tool</a>, as an <a href="https://developer.nlr.gov/docs/energy-optimization/reopt/">API</a>, and as the open-source Julia package <a href="https://github.com/NatLabRockies/REopt.jl">REopt.jl</a>, which is the optimization engine behind both.</p>
+<p><strong>Coverage.</strong> One year of operation, at hourly or finer resolution, for PV, wind, storage, combined heat and power, conventional generation and electrification options. Resource profiles come from PVWatts and the Wind Toolkit, and utility tariffs from the Utility Rate Database.</p>
+<p><strong>Access.</strong> The API is at version 3; versions 1 and 2 were decommissioned on 31 March 2024. It needs a free key from developer.nlr.gov, limited by default to 1,000 requests per hour. To use <a href="https://natlabrockies.github.io/REopt.jl/stable/">REopt.jl</a>, add the REopt, JuMP and HiGHS packages in Julia. An NLR developer key is needed to fetch PV and wind resource profiles, and a separate key to fetch utility rates.</p>
+<p><strong>License and terms.</strong> REopt.jl is licensed Apache-2.0. The web tool and API are free. <strong>Redistribution: code allowed under Apache-2.0.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Series length.</em> Every time series must have exactly 8,760 values per time step per hour, so drop 29 February in leap years. REopt.jl rejects a load series of the wrong length.</li>
+<li><em>Calendar year.</em> Set the load year to the year of your data so that tariff periods line up with weekdays. Built-in reference building profiles default to 2017, a year that starts on a Sunday.</li>
+<li><em>Units.</em> REopt works in kW and $/kWh, so convert market prices from $/MWh.</li>
+<li><em>Keys.</em> REopt.jl reads its keys from environment variables. Keep them there, never in scripts or repositories.</li>
+<li><em>Extensions.</em> When I started my wind–hydrogen studies, REopt had no electrolyzer, hydrogen tank or fuel cell. I added them, and the reopt-hydrogen-framework documents that formulation.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/wind-hydrogen.html">Co-located wind and hydrogen</a>, <a href="../projects/solar-hydrogen.html">co-located solar and hydrogen</a> and <a href="../projects/offshore-wind-hydrogen-om.html">offshore wind–hydrogen O&amp;M</a>, with the <a href="https://github.com/Henryutd2021/reopt-hydrogen-framework">reopt-hydrogen-framework</a>.</p>
+</section>
+<section id="sam" class="level3">
+<h3 class="anchored" data-anchor-id="sam">SAM and PySAM</h3>
+<p><strong>What it is.</strong> The <a href="https://sam.nlr.gov/">System Advisor Model</a> (SAM) is NLR’s free desktop application for the performance and financial modeling of energy technologies such as PV, wind, concentrating solar power and storage. <a href="https://github.com/NatLabRockies/pysam">PySAM</a> is its Python wrapper.</p>
+<p><strong>Coverage.</strong> Simulations of one year at hourly or subhourly time steps, driven by a weather file and coupled to financial models. NSRDB solar data can be downloaded from within SAM, and other weather sources are listed on SAM’s site.</p>
+<p><strong>Access.</strong> Download SAM for Windows, macOS or Linux. Install PySAM with <code>pip install nlr-pysam</code>. The package was renamed from <code>nrel-pysam</code>, whose last release is 7.1.1. PySAM 8.0.0 (July 2026) matches SAM 2026.7.3 and supports Python 3.9–3.14. The documentation is at <a href="https://nlr-pysam.readthedocs.io/">nlr-pysam.readthedocs.io</a>.</p>
+<p><strong>License and terms.</strong> SAM is free, and its <a href="https://sam.nlr.gov/sam-open-source.html">open-source code</a> is licensed BSD-3-Clause, as is PySAM. <strong>Redistribution: code allowed under BSD-3-Clause.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>Version match.</em> Each PySAM release is built against a specific SAM version, and default inputs can change between versions. Pin the version and record it with your results.</li>
+<li><em>Renamed package.</em> Requirements files that pin <code>nrel-pysam</code> stay on the 7.x line.</li>
+<li><em>Same year, same weather.</em> My solar–hydrogen framework runs the SAM plant model with the same year and weather file as the rest of the inputs. It divides hourly thermal output and parasitic load by the plant’s design thermal output, so the optimizer can scale the plant.</li>
+<li><em>One clock.</em> Align SAM output to the model’s calendar year and time-zone convention before joining it to market prices.</li>
+</ul>
+<p><strong>Used in.</strong> <a href="../projects/solar-hydrogen.html">Co-located solar and hydrogen</a>, with the <a href="https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/data_pipeline.md">reopt-hydrogen-framework data pipeline</a>.</p>
+</section>
+<section id="highs-linopy" class="level3">
+<h3 class="anchored" data-anchor-id="highs-linopy">HiGHS and linopy</h3>
+<p><strong>What it is.</strong> <a href="https://highs.dev/">HiGHS</a> is an open-source solver for linear, mixed-integer and quadratic programs. It is a C++ library with interfaces for C, C#, Fortran, Julia and Python (<code>highspy</code>). <a href="https://linopy.readthedocs.io/">linopy</a> is a Python library, built on xarray, that writes linear, mixed-integer and quadratic models with labeled, N-dimensional variables and passes them to a solver.</p>
+<p><strong>Access.</strong> Install with <code>pip install highspy</code>; the current release is 1.15.1. Install linopy with pip, uv or conda-forge; the current release is 0.10.1. linopy does not work without a solver, so install at least one.</p>
+<p><strong>License and terms.</strong> HiGHS and linopy are both MIT-licensed. Commercial solvers that linopy can call, such as Gurobi or CPLEX, need their own licenses. <strong>Redistribution: allowed under MIT.</strong></p>
+<p><strong>Known pitfalls.</strong></p>
+<ul>
+<li><em>MIP gap.</em> The default relative MIP gap in <a href="https://ergo-code.github.io/HiGHS/dev/options/definitions/">HiGHS</a> is 10⁻⁴. My frameworks set the gap explicitly (10⁻⁶) and document it.</li>
+<li><em>Check the status.</em> My frameworks stop with an error unless the solver reports an optimal solution, and some recompute the balance equations from the solution as a check.</li>
+<li><em>Scale.</em> Full-year, multi-zone or stochastic planning models can exceed what an open-source solver handles in practical time. The framework docs record where a commercial barrier solver was needed, and where a shorter horizon with hour weights served for screening.</li>
+<li><em>Nonconvex terms.</em> My supply-chain models use Pyomo with HiGHS. One bilinear variant needs a solver that handles nonconvex problems, so the framework offers an enumeration form that HiGHS can solve.</li>
+</ul>
+<p><strong>Used in.</strong> linopy with HiGHS: <a href="https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/architecture.md">txh2-ercot-hydrogen</a>, <a href="https://github.com/Henryutd2021/ghg-load-regulation/blob/main/docs/architecture.md">ghg-load-regulation</a>, <a href="https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/architecture.md">reopt-hydrogen-framework</a> and <a href="https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/architecture.md">smr-datacenter-cogeneration</a>. Pyomo with HiGHS: <a href="https://github.com/Henryutd2021/supply-chain-microgrid-models/blob/main/docs/architecture.md">supply-chain-microgrid-models</a>.</p>
+<hr>
+<p><em>Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own.</em></p>
+<p><em>Views are my own and do not represent my employer. This guide is reviewed each quarter; corrections are made in place and noted here with the date.</em></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

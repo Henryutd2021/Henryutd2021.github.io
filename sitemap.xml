@@ -1,99 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://henryutd2021.github.io/field-notes/briefings/2026-11-03.html</loc>
+    <loc>https://henryutd2021.github.io/field-notes/data-tools.html</loc>
+    <lastmod>2026-11-02T17:45:39.293Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/field-notes/briefings.html</loc>
     <lastmod>2026-11-02T17:09:17.626Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes.html</loc>
-    <lastmod>2026-11-02T17:11:27.602Z</lastmod>
+    <loc>https://henryutd2021.github.io/cv.html</loc>
+    <lastmod>2026-11-02T17:45:21.944Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/teaching.html</loc>
-    <lastmod>2026-11-02T16:22:34.253Z</lastmod>
+    <loc>https://henryutd2021.github.io/software-data.html</loc>
+    <lastmod>2026-11-02T17:48:34.475Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/publications.html</loc>
-    <lastmod>2026-11-02T17:11:36.669Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/wind-hydrogen.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/uq-mfgpr.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/txh2.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/solar-hydrogen.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/smr-dc.html</loc>
+    <lastmod>2026-11-02T17:48:40.644Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/smr-dc-national.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/offshore-wind-hydrogen-om.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/nuclear-dc.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/npph2.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/national-wind-uq.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/ghg.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/fm-global-internship.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/data-center-delay-economics.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/research.html</loc>
-    <lastmod>2026-11-02T17:02:24.962Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/index.html</loc>
-    <lastmod>2026-11-02T17:09:29.607Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/facility-microgrid-location.html</loc>
+    <lastmod>2026-11-02T17:48:40.646Z</lastmod>
   </url>
   <url>
     <loc>https://henryutd2021.github.io/projects.html</loc>
     <lastmod>2026-11-02T16:22:34.254Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/facility-microgrid-location.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
+    <loc>https://henryutd2021.github.io/index.html</loc>
+    <lastmod>2026-11-02T17:48:34.475Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/ghg.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
+    <loc>https://henryutd2021.github.io/research.html</loc>
+    <lastmod>2026-11-02T17:02:24.962Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/npph2.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/data-center-delay-economics.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/offshore-wind-hydrogen-om.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/fm-global-internship.html</loc>
+    <lastmod>2026-11-02T17:48:40.646Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/smr-dc.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/national-wind-uq.html</loc>
+    <lastmod>2026-11-02T17:48:40.646Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/txh2.html</loc>
-    <lastmod>2026-11-02T17:11:36.666Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/nuclear-dc.html</loc>
+    <lastmod>2026-11-02T17:48:40.644Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/wind-hydrogen.html</loc>
-    <lastmod>2026-11-02T17:11:36.665Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/smr-dc-national.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/software-data.html</loc>
-    <lastmod>2026-11-02T17:02:18.223Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/solar-hydrogen.html</loc>
+    <lastmod>2026-11-02T17:48:40.645Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/cv.html</loc>
+    <loc>https://henryutd2021.github.io/projects/uq-mfgpr.html</loc>
+    <lastmod>2026-11-02T17:48:40.646Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/publications.html</loc>
+    <lastmod>2026-11-02T17:48:40.648Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/teaching.html</loc>
     <lastmod>2026-11-02T16:22:34.253Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes/briefings.html</loc>
+    <loc>https://henryutd2021.github.io/field-notes.html</loc>
+    <lastmod>2026-11-02T17:45:39.293Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/field-notes/briefings/2026-11-03.html</loc>
     <lastmod>2026-11-02T17:09:17.626Z</lastmod>
   </url>
 </urlset>
