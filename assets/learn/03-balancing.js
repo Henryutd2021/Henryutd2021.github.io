@@ -272,7 +272,7 @@
       var pts = U.points.map(function (p) { return [clock(p[0]), p[1]]; });
       ttl.textContent = "ERCOT (Texas) frequency, 15 February 2021, 1:15–2:30 a.m.";
       chip("Time", e.at + " a.m."); chip("Frequency", hz3(e.hz), e.hz < 59.45 ? "bad" : e.hz < 59.9 ? "warn" : ""); chip("Customer demand ordered off", mw(e.shedMW));
-      var marks = U.events.slice(0, S_.uri + 1).map(function (ev, i) { return { x: clock(ev.at), y: ev.hz, label: i === S_.uri ? ev.at : "", color: i === S_.uri ? COL.uri : "var(--lx-ink-3)", above: ev.hz > 59.8 }; });
+      var marks = U.events.slice(0, S_.uri + 1).map(function (ev, i) { return { x: clock(ev.at), y: ev.hz, color: i === S_.uri ? COL.uri : "var(--lx-ink-3)", above: ev.hz > 59.8 }; });
       var cut = clock(e.at), shown = pts.filter(function (p) { return p[0] <= cut; });
       P.render({ x: { min: clock("1:15"), max: clock("2:30"), ticks: [[clock("1:15"), "1:15"], [clock("1:30"), "1:30"], [clock("1:45"), "1:45"], [clock("2:00"), "2:00"], [clock("2:15"), "2:15"], [clock("2:30"), "2:30 a.m."]], ticksN: [[clock("1:15"), "1:15"], [clock("1:45"), "1:45"], [clock("2:15"), "2:15 a.m."]] },
         y: { min: lo, max: hi, ticks: ticksHz(lo, hi), unit: "Hz" },
@@ -392,11 +392,11 @@
           var row = H("div", { class: "lx-step-foot" }, act);
           var prev = H("button", { class: "lx-btn ghost small", type: "button", html: LX.icon("back") + "Earlier" }, row);
           var pos = H("span", { class: "lx-step-n" }, row);
-          var nxt = H("button", { class: "lx-btn small", type: "button", html: "Next event" + LX.icon("arrow") }, row);
+          var nxt = H("button", { class: "lx-btn small", type: "button", html: "Later" + LX.icon("arrow") }, row);
           function show(i) {
             S_.uri = i; draw(false); var e = U.events[i];
             card.innerHTML = ""; H("p", { class: "w1-event-t", html: "<b>" + e.at + " a.m.</b> " + LX.esc(e.title) }, card); H("p", { text: e.text }, card);
-            pos.textContent = "Event " + (i + 1) + " of " + U.events.length; prev.disabled = i === 0; nxt.disabled = i === U.events.length - 1;
+            pos.textContent = (i + 1) + " of " + U.events.length; prev.disabled = i === 0; nxt.disabled = i === U.events.length - 1;
             if (i === U.events.length - 1) { api.done(); LX.progress.done(LESSON); api.saw("Below 59.4 Hz for " + U.below594 + " of the " + U.relayMinutes + " minutes allowed. The same layers you just used, at the scale of a state, with too little reserve."); }
           }
           prev.addEventListener("click", function () { show(Math.max(0, S_.uri - 1)); });

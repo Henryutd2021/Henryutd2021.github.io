@@ -211,7 +211,7 @@
       if (bd) all = all.concat(bd.lo, bd.hi);
       var lo = Math.floor(Math.min.apply(null, all) / 2000) * 2, hi = Math.ceil(Math.max.apply(null, all) / 2000) * 2;
       if (bd) {
-        for (var k = 0; k < 24; k++) bars.push({ x0: k + 0.04, x1: k + 0.96, y0: bd.lo[k], y1: bd.hi[k], color: COL.band, op: 0.16 });
+        for (var k = 0; k < 24; k++) bars.push({ x0: k + 0.04, x1: k + 0.96, y0: bd.lo[k], y1: bd.hi[k], color: COL.band, op: LX.isDark() ? 0.32 : 0.18 });
         legend.push({ label: S_.level + "% band from Jan–Apr errors", color: "color-mix(in srgb, var(--lx-accent) 30%, transparent)" });
       }
       if (S_.show === "forecast") for (var u = 0; u < 24; u++) bars.push({ x0: u + 0.2, x1: u + 0.8, y0: d.F[u], y1: A[u], color: A[u] > d.F[u] ? COL.under : COL.over, op: 0.4 });
@@ -328,7 +328,7 @@
           enter({ chart: "day", show: "band", series: "demand" });
           var said = function () {
             var d = DAYS[S_.day], b = band(fc, d.F, S_.level), o = outside(d.A, b);
-            api.saw(S_.level + "% band: " + spct(b.qlo) + " to " + spct(b.qhi) + " around the forecast. On " + d.label.short + ", " + o + " of 24 hours fell outside" + (o > 24 * (1 - b.level / 100) * 2 ? ": misses bunch together on bad-weather days." : "."), o > 24 * (1 - b.level / 100) * 2);
+            api.saw(S_.level + "% band: " + spct(b.qlo) + " to " + spct(b.qhi) + " around the forecast. On " + d.label.short + ", " + o + " of 24 hours fell outside" + (o > 24 * (1 - b.level / 100) * 2 ? ": misses come in runs, and when a day goes wrong most of its hours do." : "."), o > 24 * (1 - b.level / 100) * 2);
           };
           seg(act, "Band", [["50", "50% band"], ["80", "80% band"], ["95", "95% band"]], S_.level, function (v) { S_.level = v; draw(false); said(); remember(); api.done(); });
           seg(act, "Day", [["typical", dayName("typical")], ["miss", dayName("miss")]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
@@ -360,7 +360,7 @@
         } }
     ];
     var cards = LX.StepCards(live, { id: "l4-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
-    draw(false);
+    draw(false); LX.onTheme(function () { draw(false); });   // the band's opacity depends on day or night
     root.lxDemo = function (state) {
       if (state === "mid") { S_.day = "miss"; cards.go(1); }
       if (state === "band") { S_.day = "miss"; S_.level = "80"; cards.go(4); }
