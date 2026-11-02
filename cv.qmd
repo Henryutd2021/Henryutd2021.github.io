@@ -23,7 +23,7 @@ body-classes: "page-inner page-folio page-cv"
 ::: {.cv-contact}
 [<i class="bi bi-envelope" aria-hidden="true"></i> hlli@ksu.edu](mailto:hlli@ksu.edu)
 [<i class="bi bi-linkedin" aria-hidden="true"></i> Honglin Li](https://www.linkedin.com/in/honglin-li-998b18221/)
-[<i class="bi bi-globe2" aria-hidden="true"></i> henryutd2021.github.io](https://henryutd2021.github.io/)
+[<i class="bi bi-globe2" aria-hidden="true"></i> Website](https://henryutd2021.github.io/)
 :::
 :::
 
