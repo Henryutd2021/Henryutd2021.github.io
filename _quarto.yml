@@ -12,6 +12,7 @@ project:
     - teaching.qmd
     - cv.qmd
   resources:
+    - robots.txt
     - images/
     - files/
     - assets/explainers/

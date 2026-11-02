@@ -3,8 +3,11 @@ pagetitle: "Honglin Li"
 page-layout: custom
 toc: false
 anchor-sections: false
-description: "Honglin Li, Ph.D. — energy systems researcher: optimization and techno-economic analysis of low-carbon energy systems."
+description: "Honglin Li, Ph.D. — energy systems researcher at Kansas State University: optimization and techno-economic analysis of firm low-carbon power, hydrogen and small modular reactors for AI data centers."
 image: images/profile-square.jpg
+include-in-header:
+  text: |
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Honglin Li", "honorificSuffix": "Ph.D.", "url": "https://henryutd2021.github.io/", "image": "https://henryutd2021.github.io/images/profile-square.jpg", "email": "mailto:hlli@ksu.edu", "jobTitle": "Postdoctoral Fellow", "worksFor": {"@type": "CollegeOrUniversity", "name": "Kansas State University", "department": "Department of Electrical and Computer Engineering"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "The University of Texas at Dallas"}, {"@type": "CollegeOrUniversity", "name": "Texas State University"}, {"@type": "CollegeOrUniversity", "name": "Dalian Maritime University"}], "knowsAbout": ["Energy systems optimization", "Techno-economic analysis", "Small modular reactors", "AI data center power supply", "Hydrogen energy systems", "Electricity markets", "Stochastic optimization"], "sameAs": ["https://scholar.google.com/citations?user=O1BZdHQAAAAJ", "https://orcid.org/0000-0002-8405-3032", "https://www.linkedin.com/in/honglin-li-998b18221/", "https://github.com/Henryutd2021"]}</script>
 ---
 
 <!-- About (home) page — third redesign, 2026-10-30: al-folio "about" layout with Hugo Academic touches.

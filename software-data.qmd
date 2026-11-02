@@ -1,4 +1,5 @@
 ---
+description: "Open model frameworks by Honglin Li: documented formulations and runnable Python implementations for hydrogen, nuclear–data-center, carbon-aware and microgrid energy-system models."
 title: "Software & Data"
 subtitle: "Open model frameworks"
 title-block-banner: true

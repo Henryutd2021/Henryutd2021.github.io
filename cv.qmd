@@ -1,4 +1,5 @@
 ---
+description: "Curriculum vitae of Honglin Li, Ph.D., energy systems researcher and Postdoctoral Fellow at Kansas State University."
 title: "CV"
 subtitle: "Curriculum vitae"
 title-block-banner: true

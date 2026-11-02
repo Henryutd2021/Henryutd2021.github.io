@@ -1,4 +1,5 @@
 ---
+description: "Research of Honglin Li: optimization and techno-economic analysis of hydrogen, nuclear and firm low-carbon power for large new loads such as AI data centers."
 title: "Research"
 subtitle: "Which low-carbon technology mixes deliver reliable, affordable energy, and who pays for them"
 title-block-banner: true

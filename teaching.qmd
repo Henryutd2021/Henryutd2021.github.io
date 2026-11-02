@@ -1,4 +1,5 @@
 ---
+description: "Teaching and mentoring of Honglin Li: ECE 685 Power Systems Design, teaching assistantships, student mentoring and interactive explainers for energy-systems modeling."
 title: "Teaching"
 subtitle: "How I teach, courses, mentoring and interactive teaching material"
 title-block-banner: true

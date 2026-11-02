@@ -1,0 +1,19 @@
+---
+title: "Briefings"
+subtitle: "Every two weeks: a few developments in large loads and clean firm power, and why they matter"
+description: "Briefings by Honglin Li on AI data-center load, interconnection, nuclear and SMRs, hydrogen, electricity markets and energy policy."
+draft: true
+listing:
+  contents: "briefings/*.qmd"
+  type: default
+  sort: "date desc"
+  categories: true
+  feed: true
+  fields: [date, title, description, categories]
+page-layout: full
+toc: false
+---
+
+::: {.fn-disclosure}
+Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own. Views are my own and do not represent my employer.
+:::

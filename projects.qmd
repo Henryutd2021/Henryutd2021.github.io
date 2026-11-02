@@ -1,7 +1,7 @@
 ---
 title: "Projects"
 subtitle: "Case studies of research and industry projects, grouped by theme"
-description: "Research and industry projects of Honglin Li: hydrogen systems, nuclear power and data centers, carbon-aware grids, microgrids and supply chains, wind uncertainty, and industry."
+description: "Case studies by Honglin Li: SMR cogeneration for data centers, hydrogen-integrated nuclear and renewable systems, carbon-aware load, microgrid supply chains and wind uncertainty."
 title-block-banner: true
 page-layout: full
 toc: false

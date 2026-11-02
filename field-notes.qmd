@@ -1,0 +1,50 @@
+---
+title: "Field Notes"
+subtitle: "Large new loads and clean firm power: briefings, perspectives and practical data guides"
+description: "Field Notes by Honglin Li: sourced briefings and perspectives on AI data-center load, nuclear and SMRs, hydrogen, electricity markets and the data and tools for modeling them."
+title-block-banner: true
+page-layout: full
+toc: false
+draft: true
+body-classes: "page-inner page-folio page-fieldnotes"
+listing:
+  - id: latest-briefings
+    contents: field-notes/briefings/*.qmd
+    type: default
+    sort: "date desc"
+    max-items: 3
+    fields: [date, title, description, categories]
+  - id: latest-perspectives
+    contents: field-notes/perspectives/*.qmd
+    type: default
+    sort: "date desc"
+    max-items: 3
+    fields: [date, title, description]
+---
+
+<!-- Field Notes hub (website v3, reports/08_field_notes_design.md). draft: true until the first briefing is
+     approved; then the navbar item is added in _quarto.yml. Listings skip draft posts. -->
+
+::: {.fn-intro}
+Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. **Briefings** pick a few developments every two weeks and say why they matter for planning and modeling. **Perspectives** argue one claim at a time. The **Data & Tools** guide collects the public data and software I use, with the pitfalls I have run into.
+
+[<i class="bi bi-rss" aria-hidden="true"></i> Briefings RSS](field-notes/briefings.xml){.btn-outline} [<i class="bi bi-database" aria-hidden="true"></i> Data & Tools guide](field-notes/data-tools.qmd){.btn-outline}
+:::
+
+## Latest briefings {#briefings}
+
+::: {#latest-briefings}
+:::
+
+[All briefings <i class="bi bi-arrow-right" aria-hidden="true"></i>](field-notes/briefings.qmd)
+
+## Perspectives {#perspectives}
+
+::: {#latest-perspectives}
+:::
+
+[All perspectives <i class="bi bi-arrow-right" aria-hidden="true"></i>](field-notes/perspectives.qmd)
+
+::: {.fn-disclosure}
+Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own. Views are my own and do not represent my employer.
+:::
