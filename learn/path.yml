@@ -235,6 +235,44 @@
   outcome: "Reason about planning trade-offs and know what real planning models do."
   after: [9, 12]
 
+# ---------- W1 lessons outside the starter path (builder e, 2026-11-02). Minimal entries so the pages build on this
+#            branch; the v2 path.yml from the infrastructure branch supersedes them (titles as in learn_map_v2.yml).
+- kind: lesson
+  id: n01-news-lens
+  code: N1
+  form: cards
+  icon: question
+  tier: foundations
+  tier2: analyst
+  status: active
+  path: n01-news-lens.qmd
+  minutes: 20
+  title: "How do you read an energy headline like a researcher?"
+  subtitle: "Tag, check and weigh three real energy stories"
+  short: "Read a headline"
+  teaches: [the seven-question news lens, power and energy in headlines, the evidence ladder, back-of-envelope checks with units]
+  does: "Tag the phrases of three real energy stories with seven questions, check one number in each with units, and write a three-sentence take."
+  outcome: "Read an energy headline critically and spot a units or scale error."
+  after: [1]
+- kind: lesson
+  id: b02-python-data
+  code: B2
+  form: cards
+  icon: chart
+  tier: analyst
+  tier2: modeler
+  status: active
+  path: b02-python-data.qmd
+  minutes: 20
+  title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
+  subtitle: "Find the bad hours in a real year of grid data"
+  short: "Python and data"
+  teaches: [loading hourly data with a time index, time zones and daylight saving, frozen-sensor and physics checks, resampling, duration curves, assert checks]
+  lab: "a notebook (about 60 minutes) that repeats every step in pandas, with auto-check cells."
+  does: "Load a real year of hourly grid data, fix its time stamps, find a spike and stuck sensors, resample and plot it, and write assert checks."
+  outcome: "Load, check, resample and plot a year of hourly energy data, and stop bad rows with asserts."
+  after: [5]
+
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
 - {kind: lesson, tier: foundations, title: "How a thermal power plant works"}

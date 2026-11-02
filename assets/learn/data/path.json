@@ -837,6 +837,30 @@
  "more": [
   {
    "tier": "foundations",
+   "code": "N1",
+   "title": "How do you read an energy headline like a researcher?",
+   "ready": true,
+   "href": "n01-news-lens.html",
+   "scales": [],
+   "id": "n01-news-lens",
+   "tier2": "analyst",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "B2",
+   "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
+   "ready": true,
+   "href": "b02-python-data.html",
+   "scales": [],
+   "id": "b02-python-data",
+   "tier2": "modeler",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
    "ready": false,
