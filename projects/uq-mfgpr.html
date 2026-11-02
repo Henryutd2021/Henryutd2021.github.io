@@ -88,6 +88,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/pubs.css">
 <link rel="stylesheet" href="../assets/pages.css">
 <link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
 <meta property="og:title" content="Multi-fidelity Gaussian processes for wind power curves – Honglin Li">
 <meta property="og:description" content="Can multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?">
 <meta property="og:image" content="https://henryutd2021.github.io/images/projects/uq-mfgpr.svg">
@@ -371,13 +372,38 @@ ul.task-list li input[type="checkbox"] {
 <figure class="proj-banner figure"><img src="../images/projects/uq-mfgpr.svg" alt="" width="640" height="360" class="figure-img"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Open SDWPF SCADA data</li><li>Nine test turbines</li><li>Kernel density sampling</li><li>Multi-fidelity Gaussian processes</li><li>Point and probabilistic metrics</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question" class="anchored"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">Can multi-fidelity Gaussian process regression, combining a theoretical power curve with limited measured data, improve probabilistic wind turbine power-curve estimation?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight" class="anchored"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">A theoretical power curve helped, but the gain depended on the metric</p>
+<p>The method fuses about two hundred sampled measurements with the theoretical power curve of the turbine type, which covers all wind speeds but does not show how a turbine actually runs. In the reported nine-turbine test, nonlinear multi-fidelity regression had a lower RMSE than standard Gaussian process regression for most turbines, but the ranking depended on the evaluation metric.</p>
+</section>
+<section class="proj-sec proj-explainer" id="explainer" aria-labelledby="h-explainer">
+<h2 id="h-explainer" class="anchored"><i class="bi bi-sliders" aria-hidden="true"></i>How does a theoretical curve help a few measurements?</h2>
+<div class="explainer" data-explainer="uq-mfgpr">
+<p class="ex-fallback">A Gaussian process fitted to a few measured points is uncertain wherever the points are sparse, so its band widens between them. A multi-fidelity model also learns from the turbine's theoretical power curve, which covers every wind speed, and uses it to fill in the shape between measurements, so the band can narrow there. In the paper's test, the result depended on the evaluation metric.</p>
+</div>
+<p class="ex-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Illustrative model with stylized numbers: it shows the mechanism described in the paper, not the study's data or results.</p>
+</section>
+<script src="../assets/explainers/common.js" defer=""></script>
+<script src="../assets/explainers/uq-mfgpr.js" defer=""></script>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution" class="anchored"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
-<p>First author. Implemented and evaluated the models, as part of a DOE Wind Energy Technologies Office project led by national laboratories.</p>
+<p>First author. Implemented and evaluated the models, with funding from the U.S. Department of Energy through the National Renewable Energy Laboratory.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach" class="anchored"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Measured SCADA records show real behaviour, including scatter, stops and curtailment, but are noisy and very numerous.</p><p class="ap-did"><span class="ap-k">What I did</span>I drew a few hundred representative points from a kernel density estimate of the records, which keeps the shape of the scatter without manual cleaning.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>A Gaussian process solve grows with the cube of the training points, so a compact training set matters.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>The theoretical curve covers every wind speed but not how a turbine actually operates.</p><p class="ap-did"><span class="ap-k">What I did</span>I compared linear and nonlinear multi-fidelity models, which link the curve to the measurements, with a standard Gaussian process on measurements alone, on point and probabilistic metrics.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Testing both kinds of metric showed that the gain depended on which error matters.</p></li>
+</ol>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method" class="anchored"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>

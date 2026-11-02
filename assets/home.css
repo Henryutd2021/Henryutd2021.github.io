@@ -39,7 +39,7 @@ main.home > #title-block-header { display: none; }   /* guard: Quarto inserts an
 
 /* photo and caption */
 .home .about-photo { margin: .35rem 0 0; }
-.home .about-photo img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover;
+.home .about-photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover;  /* portrait 800x1000 (2026-11-02) */
   border-radius: var(--r-lg); border: 1px solid var(--line); box-shadow: var(--shadow-lg); }
 .home .about-photo figcaption { display: flex; flex-direction: column; align-items: center; gap: .15rem; margin-top: .95rem;
   font-size: .9rem; line-height: 1.5; color: var(--muted); text-align: center; }
@@ -93,6 +93,18 @@ main.home > #title-block-header { display: none; }   /* guard: Quarto inserts an
 .home .fw-desc { font-size: .9rem; line-height: 1.55; color: var(--ink-2); }
 .home .fw-link { display: inline-flex; align-items: center; gap: .4rem; margin-top: auto; padding-top: .35rem; font-size: .84rem; font-weight: 600; color: var(--accent); }
 .home a.fw:hover .fw-name { color: var(--accent); }
+
+/* ---------- 3a. what I bring: ability cards (website v2, 2026-11-02) ---------- */
+.home .ability-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.home .ability { display: flex; flex-direction: column; gap: .5rem; padding: 1.15rem 1.25rem 1.1rem; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--shadow-sm); }
+.home .ab-icon { display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 8px; font-size: 1.05rem; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.home .ability h3 { margin: .2rem 0 0; font-size: 1.02rem; font-weight: 700; color: var(--ink); }
+.home .ability p { margin: 0; font-size: .9rem; line-height: 1.6; color: var(--ink-2); }
+.home .ability .ab-links { display: flex; flex-wrap: wrap; gap: .3rem .9rem; margin-top: auto; padding-top: .5rem; border-top: 1px solid var(--line); font-size: .84rem; font-weight: 600; }
+.home .ability .ab-links a::after { content: " \2192"; }
+@media (max-width: 991.98px) { .home .ability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) { .home .ability-grid { grid-template-columns: 1fr; } }
 
 /* ---------- 8. social icons (al-folio contact row) ---------- */
 .home .home-social { padding-block: 3.2rem 2.6rem; text-align: center; }

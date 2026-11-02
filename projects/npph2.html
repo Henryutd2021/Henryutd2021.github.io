@@ -88,6 +88,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/pubs.css">
 <link rel="stylesheet" href="../assets/pages.css">
 <link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
 <meta property="og:title" content="Hydrogen integration and policy support for U.S. nuclear power plants – Honglin Li">
 <meta property="og:description" content="Can existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?">
 <meta property="og:image" content="https://henryutd2021.github.io/images/projects/npph2.svg">
@@ -371,13 +372,45 @@ ul.task-list li input[type="checkbox"] {
 <figure class="proj-banner figure"><img src="../images/projects/npph2.svg" alt="" width="640" height="360" class="figure-img"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>42 reactors</li><li>7 ISO/RTO markets</li><li>Hourly MILP dispatch</li><li>Lifetime cash-flow analysis</li><li>2024 market prices</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question" class="anchored"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">Can existing and new U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight" class="anchored"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">With the assumed hydrogen credit, hydrogen revenue can sustain an existing reactor but not pay for a new one</p>
+<p>The study treats an existing reactor's capital as already spent, so revenue from power, hydrogen and reserves, with the assumed hydrogen credit, must cover running costs and the new equipment; most reactors studied then reached positive net present value. A new plant must also recover the reactor's capital cost, and new builds stayed below zero even with tax credits.</p>
+</section>
+<section class="proj-sec proj-explainer" id="explainer" aria-labelledby="h-explainer">
+<h2 id="h-explainer" class="anchored"><i class="bi bi-sliders" aria-hidden="true"></i>Why does hydrogen help an existing reactor more than a new one?</h2>
+<div class="explainer" data-explainer="npph2">
+<p class="ex-fallback">A reactor earns from electricity; with an electrolyzer it can also sell hydrogen and offer reserves, and a hydrogen production credit adds to that. The study treats an existing reactor's capital as already spent, so these revenues need to cover operating costs and the new equipment. A new plant must also recover the reactor's capital cost, and in the study the same revenues did not cover it.</p>
+</div>
+<p class="ex-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Illustrative model with stylized numbers: it shows the mechanism described in the paper, not the study's data or results.</p>
+</section>
+<script src="../assets/explainers/common.js" defer=""></script>
+<script src="../assets/explainers/npph2.js" defer=""></script>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution" class="anchored"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
-<p>First author. I co-developed the methodology and the optimization and lifetime techno-economic models with co-authors from Idaho National Laboratory and UT Dallas, and contributed to the analysis and writing.</p>
+<p>First author. I co-developed the methodology and the optimization and lifetime techno-economic models during my internship at Idaho National Laboratory, and contributed to the analysis and writing.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach" class="anchored"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Seven U.S. markets price energy and ancillary services differently, and each of 42 reactors faces its own prices.</p><p class="ap-did"><span class="ap-k">What I did</span>I co-developed an hourly dispatch model that co-optimizes electricity sales, hydrogen production, storage and ancillary services under each market's products, run for every reactor.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>It showed how market design, not only the reactor, shapes the value of flexibility.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Electrolyzers and turbines are not ideal: efficiency varies with load, starts wear equipment, and ramping is limited.</p><p class="ap-did"><span class="ap-k">What I did</span>I helped represent turbine and electrolyzer efficiency with piecewise-linear curves, track electrolyzer degradation from operation and start-ups, and enforce ramp limits and minimum stable load.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Flexibility estimates then respect what the equipment can actually do.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>One year of hourly dispatch had to become a lifetime investment case under several federal credits.</p><p class="ap-did"><span class="ap-k">What I did</span>I co-developed a discounted cash-flow model with component-level capital costs, scheduled replacements and the 45U, 45V-type, 45Y and 48E credits, linked to the dispatch results.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The same operation could be judged as a retrofit (with and without 45U) or as a new build (no credit, 45Y or 48E); the hydrogen credit is assumed throughout.</p></li>
+</ol>
+</section>
+<section class="proj-sec" id="choices" aria-labelledby="h-choices">
+<h2 id="h-choices" class="anchored"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
+<dl class="choices">
+<div class="choice"><dt>Take electricity and hydrogen prices as given (price-taking)</dt><dd><span class="ch-alt">Alternatives considered: equilibrium or game-theoretic market models with price feedback</span>The study evaluates plant operation against observed 2024 prices; price feedback from wide adoption is stated as a limit and left to future work.</dd></div>
+</dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method" class="anchored"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -395,6 +428,10 @@ ul.task-list li input[type="checkbox"] {
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds" class="anchored"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
 <p>Results rely on 2024 prices, price-taking market participation, modeled ancillary-service participation parameters, the assumed hydrogen credit ($3/kg for ten years) and a dispatch held fixed after the credit expires; price feedback from large-scale adoption is not modeled.</p>
+</section>
+<section class="proj-next" id="led-to" aria-labelledby="h-next">
+<h2 id="h-next" class="anchored"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>
+<p>New plants did not pay for themselves here, which raised the question of what could cover a new reactor's capital cost; AI data centers are the candidate buyer my next studies examine. <a class="next-link" href="nuclear-dc.html">Small modular reactor cogeneration for a hyperscale data center<i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
 </section>
 <section class="proj-sec" aria-labelledby="h-pubs">
 <h2 id="h-pubs" class="anchored"><i class="bi bi-journal-text" aria-hidden="true"></i>Publications</h2>
@@ -444,8 +481,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<span></span>
-<a class="pager-link next" href="txh2.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Hydrogen's role in expanding renewable energy in Texas</span></a>
+<a class="pager-link prev" href="txh2.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Hydrogen's role in expanding renewable energy in Texas</span></a>
+<a class="pager-link next" href="ghg.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Emission-intensity-informed load regulation for grid decarbonization</span></a>
 </nav>
 </article>
 

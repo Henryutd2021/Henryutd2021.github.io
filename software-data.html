@@ -87,9 +87,10 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="assets/pubs.css">
 <link rel="stylesheet" href="assets/pages.css">
 <link rel="stylesheet" href="assets/map.css">
+<link rel="stylesheet" href="assets/explainers.css">
 <meta property="og:title" content="Software &amp; Data – Honglin Li">
 <meta property="og:description" content="Open model frameworks">
-<meta property="og:image" content="https://henryutd2021.github.io/images/profile.jpg">
+<meta property="og:image" content="https://henryutd2021.github.io/images/profile-square.jpg">
 <meta property="og:site_name" content="Honglin Li">
 </head>
 
@@ -367,7 +368,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="sw-facts">
-<p><span class="sf-n">6</span><span class="sf-l">framework repositories</span></p>
+<p><span class="sf-n">7</span><span class="sf-l">framework repositories</span></p>
 <p><span class="sf-n">Python</span><span class="sf-l">3.10 or later, pip or conda</span></p>
 <p><span class="sf-n">HiGHS</span><span class="sf-l">open solver by default for the optimization models; Gurobi optional</span></p>
 </div>
@@ -415,6 +416,29 @@ ul.task-list li input[type="checkbox"] {
 <p>One repository per framework, each with the paper or papers it accompanies.</p>
 </section>
 <div class="repo-grid">
+<!-- SMR cogeneration (website v2, 2026-11-02; published by Henry with scripts/henry_release_nuclear_dc_2026-11-02.sh) -->
+<div class="repo theme-datacenter">
+<div class="repo-top">
+<p><span class="repo-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span> <span class="repo-theme">Nuclear &amp; data centers</span> <span class="repo-type">Hourly MILP co-optimization</span></p>
+</div>
+<section id="smr-cogeneration-framework" class="level3">
+<h3 class="anchored" data-anchor-id="smr-cogeneration-framework">SMR cogeneration framework</h3>
+<p><span class="repo-slug">Henryutd2021/smr-datacenter-cogeneration</span></p>
+<p>A small modular reactor that supplies a data center with power and, through turbine steam extraction to an absorption chiller, with cooling: hourly co-optimization of reactor output, cooling and grid exchange, cost accounting and break-even metrics.</p>
+<div class="repo-papers">
+<p><span class="label">Accompanies</span></p>
+<ul>
+<li><a href="./projects/nuclear-dc.html">Energy Conversion and Management (2026, accepted)</a></li>
+</ul>
+</div>
+<div class="repo-tools">
+<p><span class="chip">Python</span> <span class="chip">linopy</span> <span class="chip">HiGHS</span> <span class="chip">Gurobi (optional)</span></p>
+</div>
+<div class="repo-actions">
+<p><a href="https://github.com/Henryutd2021/smr-datacenter-cogeneration" class="btn-outline btn-sm-x"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a> <a href="https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/formulation.md" class="btn-quiet"><i class="bi bi-journal-text" aria-hidden="true"></i> Formulation</a></p>
+</div>
+</section>
+</div>
 <!-- CoDE -->
 <div class="repo theme-datacenter">
 <div class="repo-top">
@@ -423,7 +447,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="code-framework" class="level3">
 <h3 class="anchored" data-anchor-id="code-framework">CoDE framework</h3>
 <p><span class="repo-slug">Henryutd2021/code-delayed-energization</span></p>
-<p>The cost of delayed energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.</p>
+<p>The cost of delayed grid energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.</p>
 <div class="repo-papers">
 <p><span class="label">Accompanies</span></p>
 <ul>

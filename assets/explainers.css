@@ -1,0 +1,77 @@
+/* explainers.css — interactive mechanism explainers on project pages (website v2, 2026-11-02; JS in assets/explainers/).
+   A bordered card in the page's theme colour (--t from .theme-<key>, helpers --t-ink/--t-soft/--t-line in pubs.css):
+   title, controls, chart, readouts and one live sentence. Without JS only the static fallback paragraph shows. */
+
+.explainer { border: 1px solid var(--t-line, var(--line)); border-radius: var(--r); background: var(--surface); padding: 1.2rem 1.3rem 1.25rem; box-shadow: var(--shadow-sm); }
+.explainer .ex-fallback { margin: 0; color: var(--ink-2); }
+.explainer.is-live .ex-fallback { display: none; }
+.ex-live { display: grid; grid-template-columns: minmax(0, 1fr) 15.5rem; grid-template-areas: "title title" "controls controls" "figure side"; gap: .9rem 1.4rem; }
+.ex-title { grid-area: title; margin: 0; font-weight: 600; font-size: 1.04rem; color: var(--ink); line-height: 1.45; }
+.ex-controls { grid-area: controls; display: flex; flex-wrap: wrap; gap: .8rem 1.6rem; align-items: flex-start; padding: .85rem 1rem; border-radius: var(--r-sm); background: var(--t-soft, var(--bg-2)); border: 1px solid var(--t-line, var(--line)); }
+.ex-figure { grid-area: figure; min-width: 0; }
+.ex-side { grid-area: side; display: flex; flex-direction: column; gap: .8rem; }
+
+/* controls */
+.ex-control { display: flex; flex-direction: column; gap: .3rem; min-width: 13rem; flex: 1 1 13rem; margin: 0; padding: 0; border: 0; }
+.ex-label { font-size: .84rem; font-weight: 600; color: var(--ink-2); margin: 0; padding: 0; }
+.ex-value { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--t-ink, var(--accent)); margin-left: .15rem; }
+.ex-hint { font-size: .76rem; color: var(--ink-2); }
+/* range slider drawn explicitly (accent-color alone gives a dark unfilled track with some theme colours in Chrome);
+   --fill is set by common.js */
+.ex-control input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 1.5rem; margin: 0; background: transparent; cursor: pointer; }
+.ex-control input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--t, var(--accent)) 0 var(--fill, 50%), var(--line-strong) var(--fill, 50%) 100%); }
+.ex-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 50%;
+  background: var(--surface); border: 2px solid var(--t, var(--accent)); box-shadow: var(--shadow-sm); }
+.ex-control input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--line-strong); }
+.ex-control input[type="range"]::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--t, var(--accent)); }
+.ex-control input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--t, var(--accent)); }
+.ex-control input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.ex-seg { display: flex; width: 100%; border: 1px solid var(--line-strong); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); }
+.ex-seg-opt { position: relative; flex: 1 1 0; min-width: 0; margin: 0; cursor: pointer; }
+.ex-seg-opt input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.ex-seg-opt span { display: block; padding: .32rem .5rem; font-size: .84rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); border-right: 1px solid var(--line); }
+.ex-seg-opt:last-child span { border-right: 0; }
+/* selected option: the darkened theme colour by day (white text at 4.5:1 or more), the light theme colour at night */
+.ex-seg-opt input:checked + span { background: color-mix(in srgb, var(--t, var(--accent)) 62%, #0b1220); color: #fff; font-weight: 600; }
+body.quarto-dark .ex-seg-opt input:checked + span { background: var(--t, var(--accent)); color: #0b1220; }
+.ex-seg-opt input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ex-check { flex-direction: row; align-items: center; gap: .5rem; font-size: .88rem; color: var(--ink-2); cursor: pointer; }
+.ex-check input { accent-color: var(--t, var(--accent)); width: 1rem; height: 1rem; }
+
+/* chart: text and lines take the theme tokens; explainer code sets data colours with h.color() */
+.ex-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font); }
+.ex-svg text { fill: var(--muted); font-size: 11px; }
+.ex-svg .ex-axis line, .ex-svg .ex-axis path { stroke: var(--line-strong); }
+.ex-svg .ex-grid line { stroke: var(--line); stroke-width: 1; }
+.ex-svg .ex-strong { fill: var(--ink); font-weight: 600; }
+.ex-svg .ex-trans { transition: all .25s var(--ease); }
+
+/* readouts and the live sentence */
+.ex-readouts { display: grid; gap: .5rem; margin: 0; }
+.ex-readout { padding: .55rem .75rem; border-radius: var(--r-sm); background: var(--bg-2); border: 1px solid var(--line); }
+.ex-readout dt { font-size: .74rem; font-weight: 600; letter-spacing: .02em; color: var(--muted); }
+.ex-readout dd { margin: .1rem 0 0; font-size: 1.12rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ex-sentence { margin: 0; font-size: .93rem; line-height: 1.55; color: var(--ink-2); }
+.ex-sentence strong { color: var(--t-ink, var(--ink)); }
+.ex-note { margin: .65rem 0 0; font-size: .8rem; color: var(--muted); }
+/* legend row and fixed caption under a chart (shared by the explainers) */
+.ex-legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: .35rem 0 0; padding: 0; list-style: none; font-size: .8rem; color: var(--ink-2); }
+.ex-legend li { display: inline-flex; align-items: center; gap: .4rem; }
+.ex-legend .ex-swatch { width: .9rem; height: .55rem; border-radius: 2px; flex: none; }
+.ex-caption { display: block; margin: .4rem 0 0; font-size: .78rem; line-height: 1.5; color: var(--muted); }
+.ex-note .bi { margin-right: .35rem; }
+
+@media (max-width: 767.98px) {
+  .ex-live { grid-template-columns: 1fr; grid-template-areas: "title" "controls" "figure" "side"; }
+  .ex-readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .ex-svg .ex-trans { transition: none; } }
+
+/* numbers behind a chart, as a table (keyboard and screen-reader access) */
+.ex-data { margin-top: .5rem; font-size: .82rem; color: var(--ink-2); }
+.ex-data summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.ex-data table { width: 100%; margin-top: .4rem; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ex-data caption { caption-side: top; text-align: left; font-size: .76rem; color: var(--muted); padding-bottom: .2rem; }
+.ex-data th, .ex-data td { padding: .2rem .4rem; border-bottom: 1px solid var(--line); text-align: left; font-weight: 400; }
+.ex-data td { text-align: right; }

@@ -88,6 +88,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../assets/pubs.css">
 <link rel="stylesheet" href="../assets/pages.css">
 <link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
 <meta property="og:title" content="Emission-intensity-informed load regulation for grid decarbonization – Honglin Li">
 <meta property="og:description" content="How much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?">
 <meta property="og:image" content="https://henryutd2021.github.io/images/projects/ghg.svg">
@@ -371,13 +372,44 @@ ul.task-list li input[type="checkbox"] {
 <figure class="proj-banner figure"><img src="../images/projects/ghg.svg" alt="" width="640" height="360" class="figure-img"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>12 U.S. grid regions</li><li>Hourly EIA data, 2023</li><li>Mixed-integer load regulation</li><li>Month, quarter, year windows</li><li>Three case studies</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question" class="anchored"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">How much do the emissions attributed to electricity consumption fall when load is re-timed according to hourly average grid emission intensity across U.S. regions, and which strategies suit which types of grid?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight" class="anchored"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">Shifting load toward cleaner hours cuts attributed emissions only modestly</p>
+<p>Because total use in each window cannot fall, emissions drop only through the gap in intensity between hours, and the allowed range limits how much load can move. In the reported scenarios, reductions were on the order of one to two percent of regional totals or less, largest with longer windows and wider ranges in renewable-rich, diverse grids.</p>
+</section>
+<section class="proj-sec proj-explainer" id="explainer" aria-labelledby="h-explainer">
+<h2 id="h-explainer" class="anchored"><i class="bi bi-sliders" aria-hidden="true"></i>How much can re-timing load cut emissions?</h2>
+<div class="explainer" data-explainer="ghg">
+<p class="ex-fallback">Each hour of the grid has an average emission intensity. The model moves part of the load from high-intensity hours to low-intensity hours in the same window, within an allowed range, and keeps total use unchanged. Attributed emissions fall by the load moved times the intensity gap between those hours. Because the range is limited, the reduction is modest; it grows with a wider range and a longer window.</p>
+</div>
+<p class="ex-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Illustrative model with stylized numbers: it shows the mechanism described in the paper, not the study's data or results.</p>
+</section>
+<script src="../assets/explainers/common.js" defer=""></script>
+<script src="../assets/explainers/ghg.js" defer=""></script>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution" class="anchored"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
-<p>First author. I contributed to the methodology, data processing, optimization modeling, analysis and writing with my co-authors.</p>
+<p>First author. I contributed to the conception, methodology, investigation and writing with my co-authors.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach" class="anchored"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Grid regions differ in renewable share, generation mix and intensity swings, so one strategy cannot fit all.</p><p class="ap-did"><span class="ap-k">What I did</span>I helped group the regions by renewable penetration, generation diversity and intensity fluctuation, and tested one strategy dimension on each: window length, adjustment range and adjustment penalty.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>This showed which strategies suit which types of grid, the question the study set out to answer.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Re-timing load inconveniences users, which an emissions-only objective ignores.</p><p class="ap-did"><span class="ap-k">What I did</span>I helped add a penalty on each adjusted hour, counted with a binary variable, and varied its weight.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>It revealed that regions with low intensity fluctuation are more sensitive to the cost of regulating load.</p></li>
+</ol>
+</section>
+<section class="proj-sec" id="choices" aria-labelledby="h-choices">
+<h2 id="h-choices" class="anchored"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
+<dl class="choices">
+<div class="choice"><dt>Re-time load without reducing total use</dt><dd><span class="ch-alt">Alternatives considered: also allowing demand reduction</span>Emissions then fall only because load moves to cleaner hours, so the study isolates the value of timing.</dd></div>
+</dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method" class="anchored"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -452,8 +484,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<a class="pager-link prev" href="txh2.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Hydrogen's role in expanding renewable energy in Texas</span></a>
-<a class="pager-link next" href="smr-dc.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Small modular reactors for data centers</span></a>
+<a class="pager-link prev" href="npph2.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Hydrogen integration and policy support for U.S. nuclear power plants</span></a>
+<a class="pager-link next" href="facility-microgrid-location.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Supply chains with on-site microgrids and transactive energy</span></a>
 </nav>
 </article>
 
