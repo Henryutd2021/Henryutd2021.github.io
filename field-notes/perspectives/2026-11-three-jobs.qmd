@@ -1,6 +1,6 @@
 ---
 title: "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System"
-date: 2026-11-10
+date: 2026-11-03
 author: "Honglin Li"
 description: "Through 2050 the U.S. grid will rest on three jobs rather than three fuels: cheap energy, firm capacity and flexibility. This decade the scarce job is firm capacity that can actually connect, and policy should pay for the service a plant delivers."
 categories:
@@ -8,7 +8,6 @@ categories:
   - Nuclear & SMRs
   - Markets & tariffs
   - Policy & credits
-draft: true
 ---
 
 For the next two decades, the U.S. power system will rest on three pillars: renewables, nuclear and natural gas. The more useful way to say it is that the system needs three jobs done (cheap energy, firm capacity and flexibility), and each fuel is good at some of them. Gas will lose weight over that period, but it will remain a pillar until at least 2050. And in this decade the scarcest job is not cheap energy but firm capacity that can actually connect to the grid.
@@ -48,8 +47,6 @@ The fastest firm, carbon-free megawatts are often the ones already built. In a s
 If the system needs three jobs, incentives should pay for the job a plant does. Today's main clean-electricity credit pays per megawatt-hour generated. In the same data-center study, that design made it more expensive to use reactor steam for cooling, because every unit of steam sent to the chiller forgoes both electricity and its credit; an incentive meant to close a capital gap ends up discouraging the more efficient use of the plant. The tax law also treats the three jobs unevenly: wind and solar lose the main credits for projects placed in service after 2027 unless construction began by July 4, 2026, while nuclear, geothermal and storage keep them into the next decade ([26 U.S.C. § 45Y](https://www.law.cornell.edu/uscode/text/26/45Y)). Paying for delivered services (energy, firm capacity, flexibility, and heat or cooling where it is used) would let each pillar compete for the job it does best.
 
 ## What would change my mind
-
-<!-- EDITOR NOTE for Henry: proposed; confirm, edit or replace before publication. -->
 
 - If gas-turbine delivery times fall back to about three years and gas's share falls much faster than EIA projects, gas is a bridge, not a pillar.
 - If enhanced geothermal reaches DOE's cost goal at scale, it belongs among the firm-capacity sources as much as among the cheap-energy ones.

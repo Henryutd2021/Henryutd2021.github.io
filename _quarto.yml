@@ -16,7 +16,8 @@ project:
     - field-notes/briefings.qmd
     - field-notes/briefings/*.qmd
     - field-notes/data-tools.qmd
-    # add when live: field-notes/perspectives.qmd, field-notes/perspectives/*.qmd
+    - field-notes/perspectives.qmd
+    - field-notes/perspectives/*.qmd
   resources:
     - robots.txt
     - google10b8e69b53ee897d.html   # Google Search Console file verification

@@ -2,7 +2,6 @@
 title: "Perspectives"
 subtitle: "One claim at a time about the energy transition, argued with evidence"
 description: "Perspectives by Honglin Li on firm low-carbon power, large new loads and the future energy mix."
-draft: true
 listing:
   contents: "perspectives/*.qmd"
   type: default

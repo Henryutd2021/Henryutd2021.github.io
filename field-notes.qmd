@@ -13,15 +13,21 @@ listing:
     sort: "date desc"
     max-items: 3
     fields: [date, title, description, categories]
+  - id: latest-perspectives
+    contents: field-notes/perspectives/*.qmd
+    type: default
+    sort: "date desc"
+    max-items: 3
+    fields: [date, title, description]
 ---
 
 <!-- Field Notes hub (website v3, reports/08_field_notes_design.md). draft: true until the first briefing is
      approved; then the navbar item is added in _quarto.yml. Listings skip draft posts. -->
 
 ::: {.fn-intro}
-Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. **Briefings** pick a few developments every two weeks and say why they matter for planning and modeling. The **Data & Tools** guide collects the public data and software I use, with the pitfalls I have run into. **Perspectives**, one claim at a time, will follow.
+Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. **Briefings** pick a few developments every two weeks and say why they matter for planning and modeling. **Perspectives** argue one claim at a time. The **Data & Tools** guide collects the public data and software I use, with the pitfalls I have run into.
 
-[<i class="bi bi-rss" aria-hidden="true"></i> Briefings RSS](field-notes/briefings.xml){.btn-outline}
+[<i class="bi bi-rss" aria-hidden="true"></i> Briefings RSS](field-notes/briefings.xml){.btn-outline} [<i class="bi bi-rss" aria-hidden="true"></i> Perspectives RSS](field-notes/perspectives.xml){.btn-outline}
 [<i class="bi bi-database" aria-hidden="true"></i> Data & Tools guide](field-notes/data-tools.qmd){.btn-outline}
 :::
 
@@ -32,11 +38,12 @@ Notes from the intersection I work on: large new electricity loads such as AI da
 
 [All briefings <i class="bi bi-arrow-right" aria-hidden="true"></i>](field-notes/briefings.qmd)
 
-<!-- Perspectives section: restore when the first perspective is published
 ## Perspectives {#perspectives}
+
 ::: {#latest-perspectives}
 :::
--->
+
+[All perspectives <i class="bi bi-arrow-right" aria-hidden="true"></i>](field-notes/perspectives.qmd)
 
 ::: {.fn-disclosure}
 Every item is checked against its primary source. Views are my own and do not represent my employer.
