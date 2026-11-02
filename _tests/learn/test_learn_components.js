@@ -24,7 +24,7 @@ comp.forEach(f => {
 const depth = css.replace(/\/\*[\s\S]*?\*\//g, "").split("").reduce((d, ch) => d < 0 ? d : d + (ch === "{") - (ch === "}"), 0);
 ok(depth === 0, "learn.css: braces balance");
 ["Scene", "Meters", "Slider", "DayChart", "Missions", "Stars", "Notes", "Coach", "StepCards", "Predict", "Guess", "ConceptMap", "Flowchart",
- "CompareTable", "CausalChain", "EnergyChain", "Metro", "metroLayout", "rich", "mount"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
+ "CompareTable", "CausalChain", "EnergyChain", "Metro", "metroLayout", "rich", "mount", "solver", "SolverStatus", "townProfile", "cfScale"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
 
 // ---------------- metro layout: real course, then a synthetic course with a fourth tier
 const ctx = { window: { LX: {} }, module: { exports: {} } };
@@ -46,12 +46,22 @@ function checkLayout(P, label) {
   });
 }
 checkLayout(pathJson, "course");
-const four = JSON.parse(JSON.stringify(pathJson));
-four.tiers.push({ id: "researcher", title: "Researcher", level: "L4", slot: 4, icon: "flask", door: "Ready for research" });
-four.more.push({ tier: "researcher", title: "From a question to a paper" }, { tier: "researcher", title: "Peer review" });
-checkLayout(four, "four tiers");
-ok(layout(four, "h").H > layout(pathJson, "h").H, "four tiers: the map grows a line");
-ok(layout(four, "h").ext[3].none && /2 Researcher lessons/.test(layout(four, "h").ext[3].label), "four tiers: an empty line says what is coming");
+ok(pathJson.tiers.length === 4 && pathJson.tiers.map(t => t.title).join() === "Foundations,Analyst,Modeler,Researcher", "course: four tiers, Researcher last");
+const res = pathJson.tiers.find(t => t.id === "researcher"), resK = pathJson.tiers.indexOf(res);
+ok(res && res.status === "upcoming" && layout(pathJson, "h").ext[resK].none && layout(pathJson, "h").ext[resK].upcoming &&
+   /10 Researcher lessons, coming later/.test(layout(pathJson, "h").ext[resK].label), "course: the Researcher line is empty, upcoming and says what is coming");
+const extra = JSON.parse(JSON.stringify(pathJson));
+extra.tiers.push({ id: "extra", title: "Extra", level: "L5", slot: 5, icon: "flask", door: "A fifth line" });
+extra.more.push({ tier: "extra", title: "From a question to a paper" }, { tier: "extra", title: "Peer review" });
+checkLayout(extra, "five tiers");
+ok(layout(extra, "h").H > layout(pathJson, "h").H, "five tiers: the map grows a line");
+ok(layout(extra, "h").ext[4].none && /2 Extra lessons in preparation/.test(layout(extra, "h").ext[4].label), "five tiers: an empty line says what is coming");
+// off-path lessons: every live one has a page; every W1 module of curriculum v2 is on the map with its code
+(pathJson.more || []).filter(m => m.ready).forEach(m => ok(fs.existsSync(path.join(SITE, "learn", m.href.replace(/\.html$/, ".qmd"))), `path.json: ${m.code || m.title} page exists`));
+["N1", "CK-F", "B1", "B2", "B3", "M1"].forEach(c => ok(pathJson.more.some(m => m.code === c && m.id), `path.json: W1 module ${c} is listed with an id`));
+["K4", "K7"].forEach(c => ok(pathJson.toolbox.some(t => t.code === c && t.id), `path.json: toolbox ${c} is listed with an id`));
+const pathYml = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8");
+ok(/id: 00-grid-operator[\s\S]*?status: active/.test(pathYml), "path.yml: lesson 0 stays active");
 
 // ---------------- path.json and the pages
 pathJson.starter.forEach(l => {
