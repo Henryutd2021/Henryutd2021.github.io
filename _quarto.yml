@@ -18,12 +18,16 @@ project:
     - field-notes/data-tools.qmd
     - field-notes/perspectives.qmd
     - field-notes/perspectives/*.qmd
+    # Learn (pilot on branch learn-pilot; enters main only after Henry approves the format)
+    - learn/index.qmd
+    - learn/*.qmd
   resources:
     - robots.txt
     - google10b8e69b53ee897d.html   # Google Search Console file verification
     - images/
     - files/
     - assets/explainers/
+    - assets/learn/
 
 website:
   title: "Honglin Li"
@@ -46,6 +50,8 @@ website:
         text: Software
       - href: teaching.qmd
         text: Teaching
+      - href: learn/index.qmd
+        text: Learn
       - href: field-notes.qmd
         text: Field Notes
       - href: cv.qmd

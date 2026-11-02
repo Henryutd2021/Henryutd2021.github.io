@@ -1,0 +1,40 @@
+---
+title: "Energy Systems, Step by Step"
+subtitle: "An interactive course companion: from how the grid keeps the lights on to building your own models"
+description: "Free interactive lessons on energy systems by Honglin Li: how the power grid works, what electricity costs, and how to build and question optimization models, in three tiers from beginner to graduate level."
+title-block-banner: true
+page-layout: full
+toc: false
+css: ../assets/learn/learn.css
+body-classes: "page-inner page-folio page-learn page-learn-home"
+listing:
+  id: learn-map
+  contents: path.yml
+  template: map.ejs
+  sort: false
+  fields: [kind, id, title, short, path, starter, tier, tier2, code, status, minutes, does, outcome, after,
+           level, reader, math, assumes, goal, door, doord, doorcta, doorlink]
+---
+
+<!-- Learn landing page (pilot, branch learn-pilot, 2026-11-02; design in reports 09 §2, §5, §6).
+     The course map comes from learn/path.yml through learn/map.ejs; edit the YAML to change the curriculum.
+     Styles in assets/learn/learn.css; progress ticks from assets/learn/learn.js (browser storage only). -->
+
+::: {.lx-landing}
+
+::: {.lx-intro}
+Electricity is the one product that has to be made at the very moment it is used. These lessons explain how that works, what it costs and how people plan for it, with one small fictional town, Prairie Town, as the running example. Each lesson starts from a situation, asks you to guess, lets you try it in an interactive model, and then explains what happened in plain language. You can stop after any tier with a complete picture, or keep going until you can build, solve and question an optimization model of your own.
+:::
+
+::: {#learn-map}
+:::
+
+::: {.lx-landing-note}
+Prairie Town is fictional, and its numbers are illustrative; every real-world number in the lessons carries a source and a date. Your guesses, answers and progress stay in your browser and are never sent anywhere. Written by Honglin Li.
+:::
+
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+```

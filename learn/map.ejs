@@ -1,0 +1,98 @@
+```{=html}
+<%
+/* map.ejs — the Learn course map, rendered from learn/path.yml (Quarto listing; see the header of path.yml).
+   Order: three entry doors (one per tier), the starter path as a guided tour that crosses the tiers, then each tier
+   with its starter lessons (cards) and the rest of its lessons (in preparation), then the math toolbox.
+   Progress ticks: elements with data-lesson-id are marked .is-done by assets/learn/learn.js. */
+const tiers = items.filter(i => i.kind === "tier");
+const lessons = items.filter(i => i.kind === "lesson");
+const has = v => v !== undefined && v !== null && v !== "";
+const starter = lessons.filter(i => has(i.starter)).sort((a, b) => Number(a.starter) - Number(b.starter));
+const tools = items.filter(i => i.kind === "tool");
+const tierOf = {}; tiers.forEach(t => { tierOf[t.id] = t; });
+const key = id => "lx-tier-" + String(id).charAt(0);
+const link = p => String(p).replace(/\.qmd($|#)/, ".html$1");
+const minutes = starter.reduce((s, i) => s + Number(i.minutes || 0), 0);
+const hours = Math.round(minutes / 30) / 2;
+const first = starter.filter(i => has(i.path))[0];
+const span = l => has(l.tier2) ? tierOf[l.tier].level + "–" + tierOf[l.tier2].level : tierOf[l.tier].level;
+const spanName = l => has(l.tier2) ? tierOf[l.tier].title + " to " + tierOf[l.tier2].title : tierOf[l.tier].title;
+%>
+<section class="lx-sec lx-sec-doors" aria-labelledby="h-doors">
+<h2 id="h-doors">Where do you start?</h2>
+<ul class="lx-doors">
+<% for (const t of tiers) { %>
+<li><a class="lx-door <%= key(t.id) %>" href="<%- link(t.doorlink) %>">
+<span class="lx-door-q"><%= t.door %></span>
+<span class="lx-door-tier"><%= t.title %> · <%= t.level %></span>
+<span class="lx-door-d"><%= t.doord %></span>
+<span class="lx-door-go"><%= t.doorcta %> <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+</a></li>
+<% } %>
+</ul>
+</section>
+
+<section class="lx-sec" id="tour" aria-labelledby="h-tour">
+<h2 id="h-tour">The starter path: a guided tour</h2>
+<p class="lx-sec-lede"><%= starter.length %> lessons, about <%= hours %> hours in all. The path crosses all three tiers at a beginner's depth: it starts with a game, takes the system apart piece by piece, and ends with you planning Prairie Town's power system with a real optimizer.</p>
+<ol class="lx-tour">
+<% for (const l of starter) { %>
+<li class="lx-stop <%= key(l.tier) %><%= has(l.tier2) ? ' is-span' : '' %><%= l.status === 'active' ? ' is-active' : '' %>" data-lesson-id="<%= l.id %>"<% if (has(l.tier2)) { %> style="--tier2: var(--tier-<%= String(l.tier2).charAt(0) %>)"<% } %>>
+<a href="#lesson-<%= l.starter %>" aria-label="Lesson <%= l.starter %>: <%= l.short %> (<%= spanName(l) %><%= l.status === 'active' ? '' : ', upcoming' %>)"><span class="lx-stop-n"><%= l.starter %></span><span class="lx-stop-t" aria-hidden="true"><%= l.short %></span></a>
+</li>
+<% } %>
+</ol>
+<ul class="lx-tour-key" aria-label="Colours">
+<% for (const t of tiers) { %><li class="<%= key(t.id) %>"><span class="lx-dot" aria-hidden="true"></span><%= t.title %> (<%= t.level %>)</li><% } %>
+</ul>
+<div class="lx-tour-cta">
+<% if (first) { %><a class="btn-solid" href="<%- link(first.path) %>">Start the path <i class="bi bi-arrow-right" aria-hidden="true"></i></a><% } %>
+<span class="lx-tour-sum">Finished lessons get a tick. Your progress stays in this browser.</span>
+</div>
+</section>
+
+<section class="lx-sec" id="tiers" aria-labelledby="h-tiers">
+<h2 id="h-tiers">Three tiers</h2>
+<p class="lx-sec-lede">Each tier is complete on its own, so you can stop after any of them with a coherent picture. The same ideas come back in each tier with sharper tools.</p>
+<% for (const t of tiers) {
+     const mine = starter.filter(l => l.tier === t.id);
+     const more = lessons.filter(l => l.tier === t.id && !has(l.starter)); %>
+<div class="lx-tierbox <%= key(t.id) %>" id="<%= t.id %>">
+<div class="lx-tier-head">
+<div>
+<h3 class="lx-tier-name"><%= t.title %> <span class="lx-tier-lv"><%= t.level %></span></h3>
+<p class="lx-tier-goal"><%= t.goal %></p>
+</div>
+<dl class="lx-tier-facts"><dt>For</dt><dd><%= t.reader %></dd><dt>Math</dt><dd><%= t.math %></dd><dt>Assumes</dt><dd><%= t.assumes %></dd></dl>
+</div>
+<ul class="lx-cardgrid" aria-label="<%= t.title %> lessons on the starter path">
+<% for (const l of mine) { const active = has(l.path); %>
+<li><article class="lx-card <%= key(l.tier) %><%= active ? ' is-active' : '' %>" id="lesson-<%= l.starter %>" data-lesson-id="<%= l.id %>">
+<div class="lx-card-top"><span class="lx-card-n" title="Starter path, lesson <%= l.starter %>"><%= l.starter %></span><span class="lx-card-meta"><%= span(l) %> · <%= l.minutes %> min</span><span class="lx-card-state"><%= active ? 'Ready' : 'Upcoming' %></span><span class="lx-done-tag lx-card-state" hidden>✓ Completed</span></div>
+<p class="lx-card-t"><% if (active) { %><a href="<%- link(l.path) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %></p>
+<p class="lx-card-d"><%= l.does %></p>
+<p class="lx-card-o"><strong>Afterwards:</strong> <%= l.outcome %><% if (l.after && l.after.length) { %> <span class="lx-card-after">Builds on <%= l.after.length > 1 ? 'lessons' : 'lesson' %> <%= l.after.join(' and ') %>.</span><% } %></p>
+<% if (active) { %><a class="btn-solid btn-sm-x lx-card-go" href="<%- link(l.path) %>" tabindex="-1" aria-hidden="true">Start lesson <i class="bi bi-arrow-right"></i></a><% } %>
+</article></li>
+<% } %>
+</ul>
+<% if (more.length) { %>
+<div class="lx-more">
+<p class="lx-more-h">More in <%= t.title %> · in preparation</p>
+<ul>
+<% for (const l of more) { %><li><% if (has(l.code)) { %><span class="lx-code"><%= l.code %></span><% } %><span><%= l.title %></span></li><% } %>
+</ul>
+</div>
+<% } %>
+</div>
+<% } %>
+</section>
+
+<% if (tools.length) { %>
+<section class="lx-sec" id="toolbox" aria-labelledby="h-toolbox">
+<h2 id="h-toolbox">The math toolbox</h2>
+<p class="lx-sec-lede">Short lessons that fill a gap exactly when a lesson needs it, so the climb to the Modeler tier works from zero. In preparation.</p>
+<ul class="lx-toolbox"><% for (const t of tools) { %><li><%= t.title %></li><% } %></ul>
+</section>
+<% } %>
+```

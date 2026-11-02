@@ -1,0 +1,329 @@
+---
+title: "How does the grid keep the lights on?"
+subtitle: "Be the grid operator for a day"
+description: "Lesson 0 of Energy Systems, Step by Step: run a small fictional town's power plants for 24 hours, keep supply equal to demand, and meet balancing, power and energy, dispatchable and variable plants, and cheapest-first dispatch."
+title-block-banner: true
+page-layout: full
+toc: false
+css: ../assets/learn/learn.css
+body-classes: "page-inner page-folio page-learn page-lesson"
+---
+
+<!-- Learn pilot (branch learn-pilot, 2026-11-02; design in reports 09 §4). Lesson template, fixed order: header, hook,
+     predict, play (interactive), explain (+ Go deeper, Modeler's note), check yourself (myth or fact, quiz), numbers to
+     remember, in the real world, go further. Interactive: assets/learn/grid-operator.js with data from
+     assets/learn/data/town.json; shared components in assets/learn/learn.js and learn.css. Model tests:
+     node _tests/learn/test_grid_operator.js. The static figure between the fallback markers is written by
+     node _tests/learn/fallback_grid_operator.js (do not edit it by hand). -->
+
+```{=html}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "LearningResource",
+ "name": "How does the grid keep the lights on? Be the grid operator for a day",
+ "description": "An interactive beginner lesson: run a small fictional town's power plants for 24 hours and keep supply equal to demand.",
+ "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT15M", "inLanguage": "en",
+ "teaches": ["balancing supply and demand", "power and energy", "dispatchable and variable generation", "merit order dispatch"],
+ "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"},
+ "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}
+</script>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li><a href="index.html#tour">Starter path</a></li><li aria-current="page">Lesson 0</li></ol></nav>
+<div class="lx-meta">
+<ul class="lx-badges" aria-label="About this lesson">
+<li class="lx-tier lx-tier-f">Foundations · L1</li>
+<li><i class="bi bi-clock" aria-hidden="true"></i>About 15 minutes</li>
+<li><i class="bi bi-signpost" aria-hidden="true"></i>No prerequisites</li>
+<li><i class="bi bi-map" aria-hidden="true"></i>Lesson 0 of the 14-lesson starter path</li>
+<li class="lx-done-tag" data-lesson-id="00-grid-operator" hidden><i class="bi bi-check2-circle" aria-hidden="true"></i>Completed</li>
+</ul>
+<nav class="lx-steps" aria-label="In this lesson"><ol>
+<li><a href="#hook">Start</a></li><li><a href="#predict">Predict</a></li><li><a href="#play">Play</a></li><li><a href="#explain">Explain</a></li>
+<li><a href="#check">Check yourself</a></li><li><a href="#numbers">Numbers</a></li><li><a href="#real-world">Real world</a></li><li><a href="#further">Go further</a></li>
+</ol></nav>
+</div>
+```
+
+::: {.lesson}
+
+::: {.lx-hook #hook}
+## How old is the electricity in your lamp?
+
+Most people guess minutes, or hours, as if electricity waited in a warehouse until someone needed it. Almost always, the answer is less than a second. The grid stores very little. So at every moment, power plants must make as much electricity as everyone is using: no more, no less.
+
+Someone has to keep that balance. In Prairie Town, a small town on the Great Plains, that someone is you. Your shift lasts 24 hours.
+:::
+
+```{=html}
+<section class="lx-predict" id="predict" data-predict="g0-evening" aria-labelledby="h-predict">
+<h2 id="h-predict" class="lx-kicker-h"><span class="lx-kicker">Predict</span>Make a guess first</h2>
+<p class="lx-q">In the evening the sun sets just as people come home and switch things on. Which plant do you think will fill that gap?</p>
+<ul class="lx-choices">
+<li data-value="nuclear">The nuclear plant: it is big and steady</li>
+<li data-value="wind">The wind farm: evenings are often windy</li>
+<li data-value="gas">The gas plants: they can be turned up</li>
+<li data-value="less">None: the town will have to use less</li>
+</ul>
+<p class="lx-nojs">Pick one in your head. The answer comes after you play.</p>
+</section>
+```
+
+## Play: run Prairie Town for a day {#play}
+
+Your town has five power plants. Three of them run on their own. You control the two gas plants.
+
+```{=html}
+<div class="lx-table-wrap">
+<table class="lx-fleet">
+<caption>Prairie Town's power plants. <strong>MW</strong> (megawatt) measures power: how fast a plant makes electricity at a moment. <strong>MWh</strong> (megawatt-hour) measures energy: 1 MW kept up for one hour. The running cost is what one more MWh costs in fuel and upkeep; building costs are not included.</caption>
+<thead><tr><th scope="col">Plant</th><th scope="col">Size</th><th scope="col">What it does</th><th scope="col">Running cost</th><th scope="col">CO₂</th></tr></thead>
+<tbody>
+<tr><th scope="row"><span class="lx-dot lx-bg-nuclear" aria-hidden="true"></span>Nuclear plant</th><td data-label="Size">100 MW</td><td data-label="What it does">Runs flat at 100 MW all day</td><td data-label="Running cost">$10 per MWh</td><td data-label="CO₂">none</td></tr>
+<tr><th scope="row"><span class="lx-dot lx-bg-wind" aria-hidden="true"></span>Wind farm</th><td data-label="Size">150 MW</td><td data-label="What it does">Follows the wind</td><td data-label="Running cost">$0</td><td data-label="CO₂">none</td></tr>
+<tr><th scope="row"><span class="lx-dot lx-bg-solar" aria-hidden="true"></span>Solar farm</th><td data-label="Size">150 MW</td><td data-label="What it does">Follows the sun</td><td data-label="Running cost">$0</td><td data-label="CO₂">none</td></tr>
+<tr class="lx-yours"><th scope="row"><span class="lx-dot lx-bg-cc" aria-hidden="true"></span>Gas combined-cycle plant</th><td data-label="Size">0–200 MW</td><td data-label="What it does"><strong>You set it.</strong> Slow: it changes by at most 40 MW from one hour to the next</td><td data-label="Running cost">$40 per MWh</td><td data-label="CO₂">0.37 t per MWh</td></tr>
+<tr class="lx-yours"><th scope="row"><span class="lx-dot lx-bg-pk" aria-hidden="true"></span>Gas peaker</th><td data-label="Size">0–100 MW</td><td data-label="What it does"><strong>You set it.</strong> Fast: any level, any hour</td><td data-label="Running cost">$100 per MWh</td><td data-label="CO₂">0.55 t per MWh</td></tr>
+</tbody>
+</table>
+</div>
+<ol class="lx-howto">
+<li><strong>Read the hour:</strong> the town's demand, and what nuclear, wind and solar give.</li>
+<li><strong>Set the two gas plants</strong> so that supply equals demand. When you get it right, the needle sits at 60.00 Hz.</li>
+<li><strong>Press Next hour.</strong> Night is easy. Watch the evening.</li>
+</ol>
+<div class="lx-interactive" data-learn="grid-operator" data-src="../assets/learn/data/town.json">
+<div class="ex-fallback">
+<p class="lx-fallback-title">The day as the expert's rule runs it</p>
+<!-- fallback-svg:start -->
+<svg class="lx-static" viewBox="0 0 720 300" role="img" aria-labelledby="lx-static-title">
+<title id="lx-static-title">Prairie Town's day under the expert rule: stacked hourly supply from nuclear, wind, solar, the combined-cycle gas plant and the gas peaker, with demand as a line. Demand peaks at 367 MW at 19:00.</title>
+<g class="ex-grid"><line x1="52" x2="710" y1="266.0" y2="266.0"/><line x1="52" x2="710" y1="207.0" y2="207.0"/><line x1="52" x2="710" y1="148.0" y2="148.0"/><line x1="52" x2="710" y1="89.0" y2="89.0"/><line x1="52" x2="710" y1="30.0" y2="30.0"/></g>
+<g class="ex-axis"><text x="44" y="271.0" text-anchor="end">0</text><text x="44" y="212.0" text-anchor="end">100</text><text x="44" y="153.0" text-anchor="end">200</text><text x="44" y="94.0" text-anchor="end">300</text><text x="44" y="35.0" text-anchor="end">400</text><text x="44" y="14" text-anchor="end">MW</text><text x="52.0" y="292" text-anchor="start">00:00</text><text x="216.5" y="292" text-anchor="middle">06:00</text><text x="381.0" y="292" text-anchor="middle">12:00</text><text x="545.5" y="292" text-anchor="middle">18:00</text><text x="710.0" y="292" text-anchor="end">24:00</text></g>
+<g><rect class="lx-fill-nuclear" x="55.6" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="55.6" y="150.4" width="20.3" height="56.6"/><rect class="lx-fill-nuclear" x="83.0" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="83.0" y="155.7" width="20.3" height="51.3"/><rect class="lx-spilled" x="83.5" y="146.8" width="19.3" height="8.8"/><rect class="lx-fill-nuclear" x="110.4" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="110.4" y="158.0" width="20.3" height="49.0"/><rect class="lx-spilled" x="110.9" y="143.3" width="19.3" height="14.8"/><rect class="lx-fill-nuclear" x="137.8" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="137.8" y="156.8" width="20.3" height="50.2"/><rect class="lx-spilled" x="138.3" y="145.1" width="19.3" height="11.8"/><rect class="lx-fill-nuclear" x="165.2" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="165.2" y="154.5" width="20.3" height="52.5"/><rect class="lx-spilled" x="165.7" y="148.6" width="19.3" height="5.9"/><rect class="lx-fill-nuclear" x="192.6" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="192.6" y="153.9" width="20.3" height="53.1"/><rect class="lx-fill-cc" x="192.6" y="150.9" width="20.3" height="3.0"/><rect class="lx-fill-nuclear" x="220.1" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="220.1" y="159.2" width="20.3" height="47.8"/><rect class="lx-fill-solar" x="220.1" y="157.4" width="20.3" height="1.8"/><rect class="lx-fill-cc" x="220.1" y="139.7" width="20.3" height="17.7"/><rect class="lx-fill-nuclear" x="247.5" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="247.5" y="166.3" width="20.3" height="40.7"/><rect class="lx-fill-solar" x="247.5" y="153.9" width="20.3" height="12.4"/><rect class="lx-fill-cc" x="247.5" y="118.5" width="20.3" height="35.4"/><rect class="lx-fill-nuclear" x="274.9" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="274.9" y="175.1" width="20.3" height="31.9"/><rect class="lx-fill-solar" x="274.9" y="145.1" width="20.3" height="30.1"/><rect class="lx-fill-cc" x="274.9" y="103.8" width="20.3" height="41.3"/><rect class="lx-fill-nuclear" x="302.3" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="302.3" y="180.4" width="20.3" height="26.6"/><rect class="lx-fill-solar" x="302.3" y="132.7" width="20.3" height="47.8"/><rect class="lx-fill-cc" x="302.3" y="100.2" width="20.3" height="32.5"/><rect class="lx-fill-nuclear" x="329.7" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="329.7" y="184.0" width="20.3" height="23.0"/><rect class="lx-fill-solar" x="329.7" y="122.0" width="20.3" height="62.0"/><rect class="lx-fill-cc" x="329.7" y="101.4" width="20.3" height="20.7"/><rect class="lx-fill-nuclear" x="357.1" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="357.1" y="187.5" width="20.3" height="19.5"/><rect class="lx-fill-solar" x="357.1" y="116.7" width="20.3" height="70.8"/><rect class="lx-fill-cc" x="357.1" y="107.9" width="20.3" height="8.9"/><rect class="lx-fill-nuclear" x="384.6" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="384.6" y="191.1" width="20.3" height="15.9"/><rect class="lx-fill-solar" x="384.6" y="115.0" width="20.3" height="76.1"/><rect class="lx-fill-cc" x="384.6" y="112.0" width="20.3" height="2.9"/><rect class="lx-fill-nuclear" x="412.0" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="412.0" y="191.1" width="20.3" height="15.9"/><rect class="lx-fill-solar" x="412.0" y="118.5" width="20.3" height="72.6"/><rect class="lx-fill-cc" x="412.0" y="115.6" width="20.3" height="2.9"/><rect class="lx-fill-nuclear" x="439.4" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="439.4" y="191.1" width="20.3" height="15.9"/><rect class="lx-fill-solar" x="439.4" y="125.6" width="20.3" height="65.5"/><rect class="lx-fill-cc" x="439.4" y="113.8" width="20.3" height="11.8"/><rect class="lx-fill-nuclear" x="466.8" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="466.8" y="191.1" width="20.3" height="15.9"/><rect class="lx-fill-solar" x="466.8" y="139.7" width="20.3" height="51.3"/><rect class="lx-fill-cc" x="466.8" y="113.2" width="20.3" height="26.5"/><rect class="lx-fill-nuclear" x="494.2" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="494.2" y="189.3" width="20.3" height="17.7"/><rect class="lx-fill-solar" x="494.2" y="155.7" width="20.3" height="33.6"/><rect class="lx-fill-cc" x="494.2" y="105.5" width="20.3" height="50.2"/><rect class="lx-fill-pk" x="494.2" y="102.6" width="20.3" height="2.9"/><rect class="lx-fill-nuclear" x="521.6" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="521.6" y="187.5" width="20.3" height="19.5"/><rect class="lx-fill-solar" x="521.6" y="171.6" width="20.3" height="15.9"/><rect class="lx-fill-cc" x="521.6" y="97.8" width="20.3" height="73.8"/><rect class="lx-fill-pk" x="521.6" y="86.1" width="20.3" height="11.8"/><rect class="lx-fill-nuclear" x="549.1" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="549.1" y="185.8" width="20.3" height="21.2"/><rect class="lx-fill-solar" x="549.1" y="182.2" width="20.3" height="3.5"/><rect class="lx-fill-cc" x="549.1" y="84.9" width="20.3" height="97.3"/><rect class="lx-fill-pk" x="549.1" y="67.2" width="20.3" height="17.7"/><rect class="lx-fill-nuclear" x="576.5" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="576.5" y="182.2" width="20.3" height="24.8"/><rect class="lx-fill-cc" x="576.5" y="64.2" width="20.3" height="118.0"/><rect class="lx-fill-pk" x="576.5" y="49.5" width="20.3" height="14.7"/><rect class="lx-fill-nuclear" x="603.9" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="603.9" y="176.9" width="20.3" height="30.1"/><rect class="lx-fill-cc" x="603.9" y="58.9" width="20.3" height="118.0"/><rect class="lx-fill-pk" x="603.9" y="53.0" width="20.3" height="5.9"/><rect class="lx-fill-nuclear" x="631.3" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="631.3" y="171.6" width="20.3" height="35.4"/><rect class="lx-fill-cc" x="631.3" y="71.3" width="20.3" height="100.3"/><rect class="lx-fill-nuclear" x="658.7" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="658.7" y="170.4" width="20.3" height="36.6"/><rect class="lx-fill-cc" x="658.7" y="93.7" width="20.3" height="76.7"/><rect class="lx-spilled" x="659.2" y="87.8" width="19.3" height="5.9"/><rect class="lx-fill-nuclear" x="686.1" y="207.0" width="20.3" height="59.0"/><rect class="lx-fill-wind" x="686.1" y="169.2" width="20.3" height="37.8"/><rect class="lx-fill-cc" x="686.1" y="116.1" width="20.3" height="53.1"/><rect class="lx-spilled" x="686.6" y="104.3" width="19.3" height="11.8"/></g>
+<path class="lx-demand" d="M52.0,150.4V150.4H79.4V155.7H106.8V158.0H134.3V156.8H161.7V154.5H189.1V150.9H216.5V139.7H243.9V118.5H271.3V103.8H298.8V100.2H326.2V101.4H353.6V107.9H381.0V112.0H408.4V115.6H435.8V113.8H463.3V113.2H490.7V102.6H518.1V86.1H545.5V67.2H572.9V49.5H600.3V53.0H627.8V71.3H655.2V93.7H682.6V116.1H710.0"/>
+</svg>
+<ul class="ex-legend lx-legend"><li><span class="ex-swatch lx-bg-nuclear" aria-hidden="true"></span>Nuclear</li><li><span class="ex-swatch lx-bg-wind" aria-hidden="true"></span>Wind</li><li><span class="ex-swatch lx-bg-solar" aria-hidden="true"></span>Solar</li><li><span class="ex-swatch lx-bg-cc" aria-hidden="true"></span>Gas combined-cycle</li><li><span class="ex-swatch lx-bg-pk" aria-hidden="true"></span>Gas peaker</li><li><span class="lx-swatch-line" aria-hidden="true"></span>Demand</li><li><span class="ex-swatch lx-sw-spilled" aria-hidden="true"></span>Spilled wind</li></ul>
+<!-- fallback-svg:end -->
+<p>In the interactive, you step through the 24 hours of one spring day. Each hour shows the town's demand and what the nuclear plant (a flat 100 MW), the wind farm and the solar farm produce. You set the combined-cycle gas plant and the gas peaker, and a gauge shows the grid frequency: 60 Hz when supply equals demand, lower when power is short, higher when there is too much. Tallies add up the running cost, the CO₂ and the energy served, unserved and spilled. The figure above shows the day as a simple expert rule runs it: wind and solar fill much of the morning and midday, the combined-cycle plant follows the rest, and the peaker helps in the evening, when demand peaks and the sun has set.</p>
+</div>
+</div>
+<p class="lx-fictional"><i class="bi bi-info-circle" aria-hidden="true"></i>Prairie Town is fictional; its numbers are illustrative.</p>
+```
+
+::: {.lx-explain #explain}
+## What just happened
+
+```{=html}
+<div class="lx-reveal" data-reveal="g0-evening" data-answer="gas">
+<p class="lx-kicker">Your prediction</p>
+<details><summary>Show the answer</summary>
+<p><strong>The gas plants.</strong> The nuclear plant runs flat, so it cannot follow the evening rise. Wind and solar give only what the weather gives, and the sun is gone. Only the gas plants can be turned up on request. At the evening peak, even the combined-cycle plant at full power is not enough, so the peaker runs too.</p>
+</details>
+</div>
+```
+
+### Balancing: supply must equal demand {#balancing}
+
+Electricity is used the moment it is made. If the plants make less than people use, the big spinning generators slow down a little, and the grid's frequency drops below 60 hertz (60 cycles per second). If they make more, the generators speed up and the frequency rises. North American grids are designed to stay in a very narrow band around 60 Hz ([EIA](https://www.eia.gov/todayinenergy/detail.php?id=3990)). That is why your gauge reads hertz: frequency is the grid's balance meter. If it falls too far, protective equipment disconnects some customers so that the rest of the grid survives. In the game, that is *unserved* energy.
+
+### Power and energy {#power-and-energy}
+
+Your sliders set **power**, in megawatts (MW): how fast a plant makes electricity right now. The tallies count **energy**, in megawatt-hours (MWh): how much was made over time. One equation links them:
+
+::: {.lx-equation}
+energy (MWh) = power (MW) × time (hours)
+:::
+
+A plant running at 50 MW for one hour makes 50 MWh. Each step of the game is one hour, so every MW you set becomes that many MWh in the tallies. Lesson 1 is all about this difference.
+
+### Dispatchable and variable plants {#dispatchable-and-variable}
+
+The gas plants are **dispatchable**: the operator can order them up or down. Wind and solar are **variable**: they make what the weather gives. The operator can turn them down (this is called spilling, or *curtailing*, their output) but cannot turn them up.
+
+The nuclear plant ran flat. Real nuclear plants can change their output, but most run near full power almost all the time: in 2025, U.S. nuclear plants averaged 91% of their full output over the year ([EIA](https://www.eia.gov/energyexplained/nuclear/us-nuclear-industry.php)).
+
+Gas plants differ in speed. Your combined-cycle plant could change by only 40 MW an hour. Real combined-cycle plants change faster once they are running, but starting one from cold can take hours; the game's limit stands in for that. The peaker can jump to any level, which makes it useful in the evening rush.
+
+### Cheapest first {#cheapest-first}
+
+The expert's rule uses the plants in order of running cost: wind and solar first (they burn no fuel), then nuclear (cheap fuel, and here it runs anyway), then the combined-cycle plant, and the peaker last. This order is called the **merit order**. Two mistakes cost money: running the peaker when the cheaper gas plant could do the job, and burning gas while free wind is spilled. The second also adds CO₂ for nothing.
+
+The rule is simple, and it does not plan ahead. In the evening its slow gas plant falls behind and the peaker fills in. If you warm up the combined-cycle plant an hour or two early, you can beat it.
+
+### What the game leaves out {#simplifications}
+
+- **Prairie Town is an island.** It cannot buy power from its neighbours. Real grids connect plants and towns across thousands of miles.
+- **The forecast is perfect.** Real operators plan with forecasts that miss (lesson 4).
+- **The game moves in one-hour steps.** Real grids balance second by second (lesson 3).
+- **Nothing breaks.** Plants never fail, and the power lines never fill up.
+- **The gauge's scale is made up.** In the game, each MW out of balance moves the frequency by 0.01 Hz.
+
+```{=html}
+<details class="lx-deeper">
+<summary><span class="lx-deeper-k">Go deeper · Analyst</span><span class="lx-deeper-t">The balance, energy and cost as equations</span></summary>
+<div class="lx-deeper-body">
+```
+
+For every hour $t$, let $p_g(t)$ be the output of plant $g$ in MW (for wind and solar, what the weather allows), $u(t)$ the unserved demand, $s(t)$ the spilled power and $d(t)$ the demand. Then
+
+$$\sum_g p_g(t) + u(t) - s(t) = d(t).$$
+
+Energy, cost and CO₂ are sums over the hours, with $\Delta t = 1$ hour, a running cost $c_g$ in \$/MWh and an emission rate $e_g$ in t/MWh:
+
+$$E_g = \sum_t p_g(t)\,\Delta t, \qquad C = \sum_t \sum_g c_g\,p_g(t)\,\Delta t, \qquad \mathrm{CO_2} = \sum_t \sum_g e_g\,p_g(t)\,\Delta t.$$
+
+Check it against the expert's day: 2,400 MWh of nuclear, 1,510 MWh from the combined-cycle plant and 90 MWh from the peaker give $C = 2400 \times 10 + 1510 \times 40 + 90 \times 100 = \$93{,}400$ and $1510 \times 0.37 + 90 \times 0.55 = 608.2$ t of CO₂.
+
+```{=html}
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="lx-deeper-k">Go deeper · Modeler</span><span class="lx-deeper-t">The operator's job as a small optimization problem</span></summary>
+<div class="lx-deeper-body">
+```
+
+The decisions are the gas outputs $p_\mathrm{cc}(t)$ and $p_\mathrm{pk}(t)$, the spilled power $s(t)$ and the unserved demand $u(t)$, for each of the 24 hours. With $w(t)$ and $v(t)$ the available wind and solar output and $V$ a large penalty for unserved energy:
+
+$$\min \; \sum_{t} \big( 40\,p_\mathrm{cc}(t) + 100\,p_\mathrm{pk}(t) + V\,u(t) \big)$$
+
+subject to, for every hour $t$:
+
+$$
+\begin{aligned}
+100 + w(t) + v(t) + p_\mathrm{cc}(t) + p_\mathrm{pk}(t) + u(t) - s(t) &= d(t) && \text{(balance)}\\
+0 \le p_\mathrm{cc}(t) \le 200, \qquad 0 \le p_\mathrm{pk}(t) &\le 100 && \text{(plant sizes)}\\
+-40 \le p_\mathrm{cc}(t) - p_\mathrm{cc}(t-1) &\le 40 && \text{(ramp limit)}\\
+0 \le s(t) \le w(t) + v(t), \qquad u(t) &\ge 0.
+\end{aligned}
+$$
+
+The nuclear plant's cost is the same in every plan, so it drops out. Every term is linear, so this is a *linear program*. The expert's rule solves it one hour at a time, without looking ahead. Solving all 24 hours together warms up the combined-cycle plant before the evening climb. On this day that saves \$1,300, about 1.4% of the running cost, and cuts the peaker's energy from 90 to 65 MWh. Can you find that plan by hand?
+
+```{=html}
+</div>
+</details>
+<p class="lx-modnote"><i class="bi bi-diagram-3" aria-hidden="true"></i><span><strong>Modeler's note.</strong> The decisions, goal and rules in your end-of-day summary are the three parts of every optimization model. Lesson 10, <a href="index.html#lesson-10">Write it down</a>, turns them into symbols. Lesson 11, <a href="index.html#lesson-11">Ask the solver</a>, gives this problem to a real solver and shows how to check its answer. Both are upcoming.</span></p>
+```
+:::
+
+::: {.lx-check #check}
+## Check yourself
+
+```{=html}
+<div class="lx-quiz lx-myths" data-quiz="g0-myth">
+<p class="lx-kicker">Myth or fact?</p>
+<div class="lx-cards">
+<div class="lx-qq" data-id="store" data-answer="myth">
+<p class="lx-qtext">“A power plant can store electricity for later.”</p>
+<ul class="lx-choices">
+<li data-value="myth">Myth<span class="lx-why">Plants make electricity at the moment it is used. Storing it takes a separate device, such as a battery. Prairie Town has none, which is why spilled wind is simply lost.</span></li>
+<li data-value="fact">Fact<span class="lx-why">It sounds plausible, but plants make electricity at the moment it is used. Storing it takes a separate device, such as a battery.</span></li>
+</ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Plants make electricity at the moment it is used; storing it takes a separate device, such as a battery.</p></details>
+</div>
+<div class="lx-qq" data-id="freq" data-answer="fact">
+<p class="lx-qtext">“If supply is greater than demand, the grid's frequency rises.”</p>
+<ul class="lx-choices">
+<li data-value="myth">Myth<span class="lx-why">It is a fact. Extra power speeds up the spinning generators, so the frequency climbs above 60 Hz. Too little power does the opposite.</span></li>
+<li data-value="fact">Fact<span class="lx-why">Extra power speeds up the spinning generators, so the frequency climbs above 60 Hz. Too little power does the opposite.</span></li>
+</ul>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. Extra power speeds up the spinning generators, so the frequency climbs above 60 Hz.</p></details>
+</div>
+<div class="lx-qq" data-id="wind" data-answer="myth">
+<p class="lx-qtext">“A wind farm can be told to make more power when demand rises.”</p>
+<ul class="lx-choices">
+<li data-value="myth">Myth<span class="lx-why">Operators can turn a wind farm down, but not up beyond what the wind allows. That is what <em>variable</em> means.</span></li>
+<li data-value="fact">Fact<span class="lx-why">Operators can turn a wind farm down, but not up beyond what the wind allows. That is what <em>variable</em> means.</span></li>
+</ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A wind farm can be turned down, but not up beyond what the wind allows.</p></details>
+</div>
+</div>
+</div>
+
+<div class="lx-quiz" data-quiz="g0">
+<p class="lx-kicker">Quick questions</p>
+<div class="lx-qq" data-id="gap" data-answer="b">
+<p class="lx-qtext"><span class="lx-qnum">1</span>At 7 p.m., demand is 367 MW. Nuclear makes 100 MW, wind 42 MW and solar nothing. How much must the two gas plants make together?</p>
+<ul class="lx-choices">
+<li data-value="a">367 MW<span class="lx-why">That would double the supply. Gas only fills the gap that the other plants leave: 367 − 100 − 42 = 225 MW.</span></li>
+<li data-value="b">225 MW<span class="lx-why">367 − 100 − 42 − 0 = 225 MW. That is more than the combined-cycle plant's 200 MW, so the peaker must help.</span></li>
+<li data-value="c">267 MW<span class="lx-why">That leaves out the wind. Subtract every plant that is already running: 367 − 100 − 42 = 225 MW.</span></li>
+<li data-value="d">325 MW<span class="lx-why">That leaves out the nuclear plant's 100 MW: 367 − 100 − 42 = 225 MW.</span></li>
+</ul>
+<details class="lx-answer"><summary>Answer</summary><p>225 MW: 367 − 100 − 42 − 0. That is more than the combined-cycle plant's 200 MW, so the peaker must help.</p></details>
+</div>
+<div class="lx-qq" data-id="energy" data-answer="b">
+<p class="lx-qtext"><span class="lx-qnum">2</span>The peaker runs at 50 MW for 3 hours. How much energy does it make?</p>
+<ul class="lx-choices">
+<li data-value="a">50 MWh<span class="lx-why">That is one hour's worth. Energy adds up over time: 50 MW × 3 h = 150 MWh.</span></li>
+<li data-value="b">150 MWh<span class="lx-why">Energy = power × time = 50 MW × 3 h = 150 MWh.</span></li>
+<li data-value="c">150 MW<span class="lx-why">The number is right, the unit is not. MW is power, a rate. An amount of energy is in MWh.</span></li>
+<li data-value="d">53 MWh<span class="lx-why">Power and time multiply; they do not add. 50 MW × 3 h = 150 MWh.</span></li>
+</ul>
+<details class="lx-answer"><summary>Answer</summary><p>150 MWh: energy = power × time = 50 MW × 3 h.</p></details>
+</div>
+<div class="lx-qq" data-id="spill" data-answer="b">
+<p class="lx-qtext"><span class="lx-qnum">3</span>On a sunny afternoon, nuclear, wind and solar already make more than the town needs. Your combined-cycle plant is still at 40 MW. What happens?</p>
+<ul class="lx-choices">
+<li data-value="a">The lights go out<span class="lx-why">No: there is too much power, not too little.</span></li>
+<li data-value="b">More wind and solar is spilled, and you pay for gas nobody needed<span class="lx-why">The grid stays balanced by spilling wind and solar, so you pay for gas and emit CO₂ for nothing. Turn gas down when the sun is strong.</span></li>
+<li data-value="c">The extra power is saved for the evening<span class="lx-why">Prairie Town has no storage. Power that is not used at once is lost.</span></li>
+<li data-value="d">The frequency falls below 60 Hz<span class="lx-why">Too much power would push the frequency up, not down. Here the grid spills wind and solar instead, so it stays at 60 Hz.</span></li>
+</ul>
+<details class="lx-answer"><summary>Answer</summary><p>More wind and solar is spilled, and you pay for gas (and emit CO₂) for nothing.</p></details>
+</div>
+</div>
+```
+:::
+
+::: {.lx-numbers #numbers}
+## Numbers to remember
+
+```{=html}
+<ul class="lx-facts">
+<li class="lx-fact"><p class="lx-fact-n">60 <span>Hz</span></p><p class="lx-fact-t">The frequency North American grids are designed to hold. Below 60 Hz, demand is greater than supply at that instant.</p><p class="lx-fact-s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=3990">EIA, Today in Energy</a> · design standard; checked 2 Nov 2026</p></li>
+<li class="lx-fact"><p class="lx-fact-n">63</p><p class="lx-fact-t">Balancing authorities in the contiguous United States: the organisations that keep supply and demand balanced in their area, as you did today.</p><p class="lx-fact-s"><a href="https://www.eia.gov/survey/frn/electricity/FRN-30-Day-Electricity-March-23-2026.pdf">EIA notice on Form EIA-930</a> (PDF) · as of March 2026</p></li>
+<li class="lx-fact"><p class="lx-fact-n">759 <span>GW</span></p><p class="lx-fact-t">Record peak demand of the Lower 48 states, set on July 29, 2025 (preliminary data). That is about 2,000 Prairie Towns at their evening peak.</p><p class="lx-fact-s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</p></li>
+<li class="lx-fact"><p class="lx-fact-n">4.20 <span>trillion kWh</span></p><p class="lx-fact-t">Total U.S. electricity use in 2025, the highest on record. One trillion kWh is one billion MWh.</p><p class="lx-fact-s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025</p></li>
+<li class="lx-fact"><p class="lx-fact-n">10,791 <span>kWh</span></p><p class="lx-fact-t">Electricity bought by an average U.S. home in a year, about 899 kWh a month.</p><p class="lx-fact-s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA, Frequently Asked Questions</a> · data for 2022</p></li>
+</ul>
+```
+:::
+
+::: {.lx-real #real-world}
+## In the real world
+
+Each hour of your day had its own mix of plants, so each hour's electricity carried a different amount of CO₂: the evening hours, when gas ran hardest, were the dirtiest. Real grids work the same way, and the data are public. The U.S. Energy Information Administration's [Hourly Electric Grid Monitor](https://www.eia.gov/electricity/gridmonitor/) shows demand and generation by fuel for each balancing authority, hour by hour. In my [study of carbon-aware electricity use](../projects/ghg.qmd), I used these hourly data to ask how much the emissions attributed to electricity use fall when consumption moves toward cleaner hours. The answer was modest: moving load helps, but the gain is limited by how much load can move and by how much the grid's mix changes over a day.
+:::
+
+::: {.lx-further #further}
+## Go further
+
+```{=html}
+<div class="lx-further-grid">
+<div class="lx-next">
+<p class="lx-kicker">Next on the starter path</p>
+<p class="lx-next-t"><a href="index.html#lesson-1">Lesson 1 · Power or energy? kW vs kWh</a></p>
+<p class="lx-next-d">Upcoming. An appliance board with live power and the energy it adds up, and a ladder of scales from a phone charger to the whole country.</p>
+<p class="lx-next-d"><strong>Related lab:</strong> download and plot a day of hourly U.S. grid data (upcoming).</p>
+<button type="button" class="btn-outline lx-complete" data-complete="00-grid-operator" aria-pressed="false" hidden>Mark this lesson as complete</button>
+</div>
+<div class="lx-sources">
+<p class="lx-kicker">Sources and further reading</p>
+<ul>
+<li>EIA (2011). <a href="https://www.eia.gov/todayinenergy/detail.php?id=3990">Electric systems respond quickly to the sudden loss of supply or demand</a>. Today in Energy.</li>
+<li>NERC (2021). <a href="https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf">Balancing and Frequency Control Reference Document</a> (PDF). For readers who want the engineering detail.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>: hourly demand and generation for U.S. balancing authorities.</li>
+<li>EIA. <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">Use of electricity</a>. Energy Explained.</li>
+</ul>
+</div>
+</div>
+<p class="lx-corrections">Spotted an error, or stuck somewhere? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20lesson%200">hlli@ksu.edu</a>. Corrections are made in place and noted here with the date.</p>
+```
+:::
+
+:::
+
+```{=html}
+<script src="../assets/explainers/common.js" defer></script>
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/grid-operator.js" defer></script>
+```
