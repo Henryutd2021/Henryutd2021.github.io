@@ -76,7 +76,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 3. For programmatic access, register on the ERCOT API Explorer and subscribe to the Public API product to obtain a subscription key. Then request an ID token with your account credentials; it is valid for one hour and cannot be refreshed. Send both the key and the token with every request, as the [registration guide](https://developer.ercot.com/applications/pubapi/user-guide/registration-and-authentication) describes. Data through the API start on 11 December 2023.
 4. Open-source clients such as [gridstatus](https://github.com/gridstatus/gridstatus) (BSD-3-Clause) wrap these steps. My nuclear–data-center framework retrieved ERCOT day-ahead hub prices with it.
 
-**License and terms.** ERCOT's API support page states that the same [Terms of Use](https://www.ercot.com/help/terms) govern the API: unmodified redistribution with notices kept, and free use in your own analyses. Keep your subscription key and password out of scripts and repositories. **Redistribution: as for the disclosure reports.**
+**License and terms.** ERCOT's API support page states that the same [Terms of Use](https://www.ercot.com/help/terms) govern the API: unmodified redistribution with notices kept, and free use in your own analyses. Keep your API credentials out of scripts and repositories. **Redistribution: as for the disclosure reports.**
 
 **Known pitfalls.**
 
@@ -250,7 +250,7 @@ This guide is for researchers, students and analysts who build models of U.S. po
 
 **Coverage.**
 
-- *Licensing pathways.* Under 10 CFR Part 50, a plant needs a construction permit and then an operating license. Part 52 offers a combined license, early site permits and certified standard designs. The NRC's [licensing backgrounder](https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-nuclear-power-plant-licensing-process) explains both. [Part 53](https://www.govinfo.gov/content/pkg/FR-2026-03-30/html/2026-06048.htm), a risk-informed, technology-inclusive framework, was published as a final rule on 30 March 2026 and took effect on 29 April 2026. It is optional; Parts 50 and 52 remain available. The NRC also lists proposed Part 57 requirements for microreactors.
+- *Licensing pathways.* Under 10 CFR Part 50, a plant needs a construction permit and then an operating license. Part 52 offers a combined license, early site permits and certified standard designs. The NRC's [licensing backgrounder](https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-nuclear-power-plant-licensing-process) explains both. [Part 53](https://www.govinfo.gov/content/pkg/FR-2026-03-30/html/2026-06048.htm), a technology-inclusive licensing framework based on risk insights, was published as a final rule on 30 March 2026 and took effect on 29 April 2026. It is optional; Parts 50 and 52 remain available. The NRC also lists proposed Part 57 requirements for microreactors.
 - *Project status.* The NRC publishes licensing dashboards for advanced-reactor applications under review. Its [ADAMS](https://www.nrc.gov/reading-rm/adams.html) public library holds more than three million documents released since November 1999.
 
 **Access.** Everything is free. ADAMS has a public search, the dashboards are linked from the advanced-reactor page, and Federal Register notices are on govinfo.gov.

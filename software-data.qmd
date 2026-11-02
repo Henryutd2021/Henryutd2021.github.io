@@ -24,7 +24,7 @@ Documented model frameworks associated with published and accepted research. Eac
 :::
 
 ::: {.sw-facts}
-[7]{.sf-n}[framework repositories]{.sf-l}
+[8]{.sf-n}[framework repositories]{.sf-l}
 
 [Python]{.sf-n}[3.10 or later, pip or conda]{.sf-l}
 
@@ -265,6 +265,34 @@ Supply-chain facility location with on-site microgrids; virtual power plant sche
 ::: {.repo-actions}
 [<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/supply-chain-microgrid-models){.btn-outline .btn-sm-x}
 [<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/supply-chain-microgrid-models/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
+
+<!-- Wind UQ (2026-11-02; published by Henry with scripts/henry_release_wind_uq_2026-11-02.sh) -->
+::: {.repo .theme-wind}
+::: {.repo-top}
+[<i class="bi bi-wind" aria-hidden="true"></i>]{.repo-icon} [Wind uncertainty]{.repo-theme} [Uncertainty metrics and surrogates]{.repo-type}
+:::
+
+### Wind UQ surrogate framework
+
+[Henryutd2021/wind-uq-surrogate]{.repo-slug}
+
+Uncertainty metrics of a wind power model's inputs, calibrated uncertainty targets at observed plants, and surrogate models validated on held-out plants, for plant-level power uncertainty where no measurements exist.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [DOE-funded project (no paper)](projects/national-wind-uq.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [NumPy]{.chip} [SciPy]{.chip} [scikit-learn]{.chip}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/wind-uq-surrogate){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Metrics](https://github.com/Henryutd2021/wind-uq-surrogate/blob/main/docs/metrics.md){.btn-quiet}
 :::
 :::
 

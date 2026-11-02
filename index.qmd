@@ -194,6 +194,11 @@ include-in-header:
         <span class="fw-name">supply-chain-microgrid-models</span>
         <span class="fw-desc">Supply-chain facility location with on-site microgrids; virtual power plant scheduling.</span>
         <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
+      <li><a class="card fw theme-wind" href="https://github.com/Henryutd2021/wind-uq-surrogate">
+        <span class="fw-theme">Wind uncertainty</span>
+        <span class="fw-name">wind-uq-surrogate</span>
+        <span class="fw-desc">Uncertainty metrics and surrogate models for plant-level wind power uncertainty.</span>
+        <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
       <li><a class="card fw theme-wind" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">
         <span class="fw-theme">Wind uncertainty</span>
         <span class="fw-name">mfgpr-wind-power-curve</span>

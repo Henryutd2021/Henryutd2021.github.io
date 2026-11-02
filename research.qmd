@@ -179,6 +179,7 @@ body-classes: "page-inner page-folio page-research"
       <h3><span class="cdot"></span>Uncertainty quantification</h3>
       <p>Multi-fidelity Gaussian processes that combine the turbine's theoretical power curve with scarce measurements for probabilistic wind power.</p>
       <a href="projects/uq-mfgpr.html">Wind power curves</a>
+      <a href="projects/national-wind-uq.html">Plant-level wind uncertainty</a>
     </li>
     <li class="support-item theme-datacenter">
       <h3><span class="cdot"></span>Interconnection economics</h3>
@@ -240,7 +241,7 @@ Discrete-event and Monte Carlo simulation
 Gaussian-process and machine-learning surrogates
 :::
 
-[[<i class="bi bi-github" aria-hidden="true"></i>]{.m-icon}[Open model frameworks]{.m-title}[Seven documented, runnable frameworks that accompany the papers.]{.m-text}[Software <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.m-more}](software-data.qmd){.method .method-link}
+[[<i class="bi bi-github" aria-hidden="true"></i>]{.m-icon}[Open model frameworks]{.m-title}[Documented, runnable frameworks that accompany my research.]{.m-text}[Software <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.m-more}](software-data.qmd){.method .method-link}
 :::
 :::
 

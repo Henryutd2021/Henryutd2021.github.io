@@ -2,7 +2,7 @@
 title: "Industry internship at FM: resilience and operations modeling"
 subtitle: "Internship, FM (August 2024 – January 2025)"
 description: "How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?"
-order: 13
+order: 14
 categories: ["Industry"]
 themekey: "industry"
 themelabel: "Industry"
@@ -62,7 +62,7 @@ toc: false
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<a class="pager-link prev" href="uq-mfgpr.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Multi-fidelity Gaussian processes for wind power curves</span></a>
+<a class="pager-link prev" href="national-wind-uq.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">UQ metrics and surrogate models for plant-level wind power</span></a>
 <span></span>
 </nav>
 </article>
