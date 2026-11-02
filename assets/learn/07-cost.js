@@ -92,7 +92,7 @@
   var LX = window.LX, H = LX.H, S = LX.S, LESSON = "07-cost";
   var COMP = [["capital", "Building the plant", "var(--lx-tier-2)", "building the plant"], ["fom", "Fixed upkeep", "var(--lx-tier-5)", "fixed upkeep"],
               ["fuel", "Fuel", "var(--lx-tier-4)", "fuel"], ["vom", "Upkeep per MWh", "var(--lx-ink-3)", "upkeep per MWh"]];
-  function usd(v, d) { return (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); }
+  function usd(v, d) { return (v < 0 ? "−\u2060$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); }
   function pct(v, d) { return (v < 0 ? "−" : "") + Math.abs(v).toFixed(d == null ? 1 : d) + "%"; }
 
   // lesson-local styles (tokens only, so day and night both work); promoted to the shared library later if reused
@@ -241,7 +241,7 @@
           model.TECHS.forEach(function (k) { H("li", { text: T[k].label + ": " + usd(base[k].total) + " per MWh (" + splitText(base[k]) + ")." }, ul); });
         } },
       // 3 discounting
-      { text: "A dollar later is worth less than a dollar now: today's dollar could earn a return meanwhile. Slide the discount rate and see what $100 paid in 10, 20 or 30 years is worth today.",
+      { text: "A dollar later is worth less than a dollar now: today's dollar could earn a return meanwhile. Slide the [[discount-rate|discount rate]] and see what $100 paid in 10, 20 or 30 years is worth today.",
         build: function (act, api) {
           var Dd = D.discount, rows = H("div", { class: "lx7-pv" }, act);
           var sl = Slider(act, { label: "Discount rate", color: "var(--lx-tier-2)", min: 0, max: Dd.rateMax, step: 0.5, value: Dd.rate, fmt: function (v) { return v.toFixed(1) + "% a year"; }, onChange: function () { draw(true); } });
@@ -264,7 +264,7 @@
           draw(false);
         } },
       // 4 WACC
-      { text: "Where does the rate come from? A plant is paid for with loans and with owners' money, and owners take more risk, so they want more. The blend is the WACC. Slide the loan share.",
+      { text: "Where does the rate come from? A plant is paid for with loans and with owners' money, and owners take more risk, so they want more. The blend is the [[wacc|WACC]]. Slide the loan share.",
         build: function (act, api) {
           var tiles = H("div", { class: "lx7-grid" }, act), mix = H("span", { class: "lx7-bar", "aria-hidden": "true", style: "height:14px" }, act);
           var sl = Slider(act, { label: "Share paid with loans", color: "var(--lx-tier-5)", min: 0, max: 80, step: 5, value: fin.debtShare, fmt: function (v) { return v + "%"; },
@@ -323,7 +323,7 @@
       { text: "Now the full calculator. Pick a plant, then change its building cost, capacity factor, rate or gas price. Defaults are U.S. averages in 2025 dollars, from EIA and the ATB.",
         build: function (act, api) { calculator(act, api); } },
       // 7 tornado
-      { text: "Which input moves the LCOE most? Guess first. Then each bar swings one input from low to high while the others stay at their defaults: a tornado chart.",
+      { text: "Which input moves the LCOE most? Guess first. Then each bar swings one input from low to high while the others stay at their defaults: a [[tornado-chart|tornado chart]].",
         build: function (act, api) {
           var box = H("div", null, act), out = H("div", { hidden: true, style: "display:grid;gap:10px" }, act);
           var p = LX.Predict(box, { id: "c7-torn", q: "For the wind farm, which input moves the LCOE most?", answer: "cf", fresh: true,
@@ -505,11 +505,11 @@
     Object.keys(SYM).forEach(function (id) { H("li", { text: SYM[id][0] + ": " + SYM[id][1] + " Here: " + SYM[id][2] + "." }, u1); });
 
     // 2 the four plants compared
-    var row = H("div", { class: "lx-row2" }, host), c2 = H("div", { class: "lx-xcard" }, row), c3 = H("div", { class: "lx-xcard" }, row);
+    var c2 = H("div", { class: "lx-xcard" }, host), c3 = H("div", { class: "lx-xcard" }, host);
     LX.CompareTable(c2, {
       title: "The four plants at U.S. averages",
       columns: [{ key: "name", label: "Plant", main: true }, { key: "capex", label: "Building cost", num: true, phoneHide: true },
-                { key: "cf", label: "Capacity factor", phone: "CF", num: true }, { key: "lcoe", label: "LCOE, $/MWh", phone: "LCOE", num: true, bar: { max: 110 } },
+                { key: "cf", label: "Capacity factor", num: true, phoneHide: true }, { key: "lcoe", label: "LCOE, $/MWh", phone: "LCOE", num: true, bar: { max: 110 } },
                 { key: "share", label: "Share: building", phone: "Building", num: true }],
       rows: model.TECHS.map(function (kk) {
         var Lk = base[kk];
@@ -527,7 +527,7 @@
               { title: "Yearly repayment grows", text: "The capital recovery factor rises.", value: base.wind.crf.toFixed(4) + " → " + Lw.crf.toFixed(4) },
               { title: "Wind's LCOE jumps", text: "Its cost is mostly the plant.", value: usd(base.wind.total) + " → " + usd(Lw.total) },
               { title: "Gas moves less", text: "Its cost is mostly fuel.", value: usd(base.cc.total) + " → " + usd(Lc.total) }],
-      note: "Wind: " + pct((Lw.total / base.wind.total - 1) * 100) + "; combined-cycle: " + pct((Lc.total / base.cc.total - 1) * 100) + ". Financing conditions can change which plant looks cheapest."
+      note: "Wind's LCOE rises " + pct((Lw.total / base.wind.total - 1) * 100) + ", the combined-cycle plant's " + pct((Lc.total / base.cc.total - 1) * 100) + ". Financing conditions can change which plant looks cheapest."
     });
     // 4 steelman: is LCOE a fair yardstick?
     var c4 = H("div", { class: "lx-xcard" }, host), h4 = H("header", { class: "lx-x-head" }, c4);

@@ -1,0 +1,24 @@
+# Lesson 8 (08-merit-order) sidecar, W1 builder d (2026-11-02): new glossary terms and requests for shared files.
+lesson: 8
+glossary:
+  - id: supply-stack
+    term: Supply stack
+    def: "All the offers to sell power in one hour, lined up from the cheapest to the most expensive."
+  - id: clearing-price
+    term: Clearing price
+    def: "The price at which supply meets demand in a market, paid to every seller that runs in that hour."
+  - id: marginal-plant
+    term: Marginal plant
+    def: "The plant that serves the last megawatt of demand, whose offer sets the clearing price."
+  - id: negative-price
+    term: Negative price
+    def: "A wholesale price below zero, which happens when the last plant needed would rather pay than stop running."
+  - id: production-credit
+    term: Production credit
+    def: "A payment for each megawatt-hour a plant produces, set by a policy such as a tax credit."
+  - id: congestion
+    term: Congestion
+    def: "A power line carrying as much as it safely can, so cheaper power cannot reach more customers through it."
+requests:
+  - "Promote lesson-local components from assets/learn/08-merit-order.js if A3 or M1 need them: the supply stack chart (i-supply-stack: blocks as wide as MW and as high as offers, demand line, clearing price, spilled part, negative offers, text version) and the Formulate-it box (e-formulate: decisions, goal, rules, what comes back, with an optional symbols view)."
+  - "Lesson 8 uses LX.solver (step 7, on request only) to show that the stack equals the LP solution and that the demand row's dual equals the clearing price; the Node test checks this with the vendored HiGHS on 200 random hours."

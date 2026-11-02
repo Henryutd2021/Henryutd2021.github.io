@@ -118,6 +118,25 @@ const all = (BODY + JS + JSON.stringify(D)).toLowerCase();
 ["learning curve", "learning rate", "foak", "noak", "subsidy-free", "break-even capital", "order book", "projects/", "research.html"].forEach(w => ok(all.indexOf(w) < 0, `scope: no "${w}"`));
 ok(!/\bai\b/i.test(BODY + JS), "scope: no AI wording");
 
-console.log(`19:00: demand ${h.demand} MW, wind ${h.wind}, solar ${h.solar}; price ${money(r0.price)}; $10 from ${first10} MW of wind, $0 from ${first0} MW; credit ${money(rC.price)}`);
-console.log(`${checks} checks, ${fails} failed`);
-process.exit(fails ? 1 : 0);
+// ---------------- the stack is the LP's solution: HiGHS (vendored, the same core the page's worker runs) agrees
+const vm = require("vm");
+const ctx = { window: { LX: {} }, module: { exports: {} }, performance };
+vm.runInNewContext(fs.readFileSync(path.join(SITE, "assets/learn/components/solver.js"), "utf8"), ctx);
+const { core, VERSION } = ctx.module.exports;
+require(path.join(SITE, `assets/learn/vendor/highs-${VERSION}/highs.js`))().then(highs => {
+  const solve = m => core.solveWith(highs, m, {});
+  const r = solve(M.lp(M.stack(town, D, h, {}), h.demand));
+  ok(r.ok && r.kind === "lp", "solver: the 19:00 dispatch is an optimal LP");
+  ok(near(r.objective, 6800, 1e-6) && near(r.duals.demand, 40, 1e-6), `solver: cost ${r.objective} = $6,800 and demand dual ${r.duals.demand} = $40`);
+  M.ORDER.forEach(k => ok(near(r.values[k], r0.plants[k].run, 1e-6), `solver: ${k} runs ${r.values[k]} MW, as in the stack`));
+  for (let i = 0; i < 200; i++) {
+    const st = { gas: D.gas.min + rnd() * (D.gas.max - D.gas.min), windMW: D.wind.min + Math.floor(rnd() * 25) * 25, credit: rnd() < 0.3, inflexible: rnd() < 0.3 };
+    const blocks = M.stack(town, D, h, st), tot = blocks.reduce((a, b) => a + b.mw, 0), d = 20 + Math.floor(rnd() * (tot - 21)) + 0.5;
+    const c = M.clear(blocks, d), x = solve(M.lp(blocks, d));
+    ok(x.ok && near(x.objective, c.cost, 1e-6), `solver random ${i}: optimal cost = the stack's cost`);
+    ok(near(x.duals.demand, c.price, 1e-6), `solver random ${i}: demand dual ${x.duals.demand} = clearing price ${c.price}`);
+  }
+  console.log(`19:00: demand ${h.demand} MW, wind ${h.wind}, solar ${h.solar}; price ${money(r0.price)}; $10 from ${first10} MW of wind, $0 from ${first0} MW; credit ${money(rC.price)}`);
+  console.log(`${checks} checks, ${fails} failed`);
+  process.exit(fails ? 1 : 0);
+});

@@ -19,15 +19,35 @@
   "short": "The energy a plant actually made over a period, divided by the energy it would have made running at full capacity the whole time.",
   "lesson": 5
  },
+ "capital-cost": {
+  "term": "Capital cost",
+  "short": "The money spent to build a power plant, usually given per kilowatt of capacity, before it makes any electricity.",
+  "lesson": "7"
+ },
+ "capital-recovery-factor": {
+  "term": "Capital recovery factor (CRF)",
+  "short": "The share of a building cost that must be repaid each year, with interest, to pay it off over a given number of years.",
+  "lesson": "7"
+ },
  "carbon-intensity": {
   "term": "Carbon intensity",
   "short": "The CO2 emitted for each unit of electricity, for example in tonnes per megawatt-hour.",
   "lesson": 12
  },
+ "clearing-price": {
+  "term": "Clearing price",
+  "short": "The price at which supply meets demand in a market, paid to every seller that runs in that hour.",
+  "lesson": "8"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
   "lesson": 0
+ },
+ "congestion": {
+  "term": "Congestion",
+  "short": "A power line carrying as much as it safely can, so cheaper power cannot reach more customers through it.",
+  "lesson": "8"
  },
  "constraint": {
   "term": "Constraint",
@@ -48,6 +68,11 @@
   "term": "Demand (load)",
   "short": "The total power that all users on a grid draw at a given moment.",
   "lesson": 0
+ },
+ "discount-rate": {
+  "term": "Discount rate",
+  "short": "The yearly rate used to turn money paid or received in the future into its value today.",
+  "lesson": "7"
  },
  "dispatch": {
   "term": "Dispatch",
@@ -79,6 +104,11 @@
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
   "lesson": 6
  },
+ "fixed-om": {
+  "term": "Fixed O&M",
+  "short": "Operation and maintenance costs a plant pays every year whether or not it runs, such as staff and insurance.",
+  "lesson": "7"
+ },
  "forecast-error": {
   "term": "Forecast error",
   "short": "The difference between what was forecast, such as tomorrow's demand or wind, and what actually happened.",
@@ -88,6 +118,11 @@
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
+ },
+ "heat-rate": {
+  "term": "Heat rate",
+  "short": "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient.",
+  "lesson": "7"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -104,6 +139,11 @@
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
   "lesson": 10
  },
+ "marginal-plant": {
+  "term": "Marginal plant",
+  "short": "The plant that serves the last megawatt of demand, whose offer sets the clearing price.",
+  "lesson": "8"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -118,6 +158,11 @@
   "term": "Merit order",
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0
+ },
+ "negative-price": {
+  "term": "Negative price",
+  "short": "A wholesale price below zero, which happens when the last plant needed would rather pay than stop running.",
+  "lesson": "8"
  },
  "objective": {
   "term": "Objective",
@@ -143,6 +188,16 @@
   "term": "Power",
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
   "lesson": 0
+ },
+ "present-value": {
+  "term": "Present value",
+  "short": "What an amount of money paid or received in the future is worth today, once it is discounted.",
+  "lesson": "7"
+ },
+ "production-credit": {
+  "term": "Production credit",
+  "short": "A payment for each megawatt-hour a plant produces, set by a policy such as a tax credit.",
+  "lesson": "8"
  },
  "ramp-rate": {
   "term": "Ramp rate",
@@ -174,15 +229,35 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11
  },
+ "supply-stack": {
+  "term": "Supply stack",
+  "short": "All the offers to sell power in one hour, lined up from the cheapest to the most expensive.",
+  "lesson": "8"
+ },
+ "tornado-chart": {
+  "term": "Tornado chart",
+  "short": "A chart that ranks inputs by how far a result moves when each input is swung from a low to a high value, one at a time.",
+  "lesson": "7"
+ },
  "unserved-energy": {
   "term": "Unserved energy",
   "short": "Demand that could not be met, so some customers lost power.",
   "lesson": 0
  },
+ "variable-om": {
+  "term": "Variable O&M",
+  "short": "Operation and maintenance costs, apart from fuel, that grow with every megawatt-hour a plant makes.",
+  "lesson": "7"
+ },
  "variable-renewables": {
   "term": "Variable renewables",
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0
+ },
+ "wacc": {
+  "term": "Weighted average cost of capital (WACC)",
+  "short": "The blended return a project must pay its lenders and its owners, used as the project's discount rate.",
+  "lesson": "7"
  },
  "wholesale-price": {
   "term": "Wholesale price",

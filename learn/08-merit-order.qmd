@@ -81,6 +81,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <div class="lx-deepers">
+<style>/* lesson-local: keep Go deeper text inside the card on phones; wide equations scroll on their own (requested for deeper.css) */
+.page-lesson .lx-deeper-body{grid-template-columns:minmax(0,1fr)}.page-lesson .lx-deeper-body .math.display{overflow-x:auto;overflow-y:hidden}</style>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>Economic dispatch as a linear program</summary>
 <div class="lx-deeper-body">
@@ -88,7 +90,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 For one hour, with $p_g$ the output of plant $g$ in MW, $c_g$ its offer in \$/MWh, $\bar P_g$ what it can make this hour and $D$ the demand:
 
-$$\min_{p}\; \sum_g c_g\, p_g \quad\text{subject to}\quad \sum_g p_g = D \;\;(\lambda), \qquad 0 \le p_g \le \bar P_g .$$
+$$
+\begin{aligned}
+\min_{p}\;\; & \textstyle\sum_g c_g\, p_g \\
+\text{subject to}\;\; & \textstyle\sum_g p_g = D \quad (\lambda)\\
+& 0 \le p_g \le \bar P_g \quad (\text{each } g).
+\end{aligned}
+$$
 
 Every term is linear, so this is a [linear program]{.lx-term term="linear-program"}. At 19:00, with $c = (0, 0, 10, 40, 100)$, $\bar P = (72, 14, 100, 150, 100)$ and $D = 331$, the answer is $p = (72, 14, 100, 145, 0)$ and a running cost of $100 \times 10 + 145 \times 40 = \$6{,}800$. With $D = 332$ it is \$6,840: the [shadow price]{.lx-term term="shadow-price"} $\lambda$ of the balance rule is \$40 per MWh, the clearing price.
 

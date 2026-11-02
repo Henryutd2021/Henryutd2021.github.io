@@ -64,7 +64,13 @@
     var windAll = Math.round(h.windShape * (st.windMW || town.fleet.wind.mw));
     return { town: clear(b, h.demand), windAvail: windAll, windToTown: Math.min(windAll, lineMW), stranded: Math.max(0, windAll - lineMW) };
   }
-  var model = { ORDER: ORDER, hourOf: hourOf, gasOffer: gasOffer, stack: stack, clear: clear, run: run, lineCase: lineCase };
+  // the same hour as a linear program for the solver: one variable per plant (0 to its MW, cost = its offer), one balance row
+  function lp(blocks, demand) {
+    var terms = {}; blocks.forEach(function (b) { terms[b.key] = 1; });
+    return { sense: "min", variables: blocks.map(function (b) { return { name: b.key, lb: 0, ub: b.mw, cost: b.offer }; }),
+             constraints: [{ name: "demand", terms: terms, eq: demand }] };
+  }
+  var model = { ORDER: ORDER, hourOf: hourOf, gasOffer: gasOffer, stack: stack, clear: clear, run: run, lineCase: lineCase, lp: lp };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -73,7 +79,7 @@
   var COL = { wind: "var(--lx-wind)", solar: "var(--lx-solar)", nuclear: "var(--lx-nuc)", cc: "var(--lx-cc)", peaker: "var(--lx-pk)" };
   var NAME = { wind: "Wind farm", solar: "Solar farm", nuclear: "Nuclear plant", cc: "Gas combined-cycle", peaker: "Gas peaker" };
   var SHORT = { wind: "Wind", solar: "Solar", nuclear: "Nuclear", cc: "Gas CC", peaker: "Peaker" };
-  function usd(v, d) { d = d == null ? 2 : d; return (v < -1e-9 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function usd(v, d) { d = d == null ? 2 : d; return (v < -1e-9 ? "−\u2060$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
 
   function css() {
     if (document.getElementById("lx8-css")) return;
@@ -176,7 +182,7 @@
       }
       for (var q = 0; q <= xMax; q += xMax > 500 ? 150 : 100) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
       S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
-      S("text", { x: m.l, y: 12 }, svg).textContent = "Offer, $ per MWh";
+      S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
       var cum = 0;
       blocks.forEach(function (b) {
         if (b.mw <= 0) return;
@@ -185,7 +191,7 @@
         if (!show || p.run < b.mw) S("rect", { x: show ? xr : x0, y: top, width: Math.max(0, x1 - (show ? xr : x0)), height: Math.max(2, bot - top), fill: COL[b.key], "fill-opacity": show ? 0.28 : 0.9 }, svg);
         S("rect", { x: x0, y: top, width: Math.max(0, x1 - x0), height: Math.max(2, bot - top), fill: "none", stroke: show && res.marginal === b.key ? "var(--lx-ink)" : "var(--lx-surface)", "stroke-width": show && res.marginal === b.key ? 2 : 1 }, svg);
         if (x1 - x0 > 34) {
-          var ly = b.offer >= 0 ? Math.min(y(b.offer), y(0) - 4) - 6 : Math.max(y(b.offer), y(0)) + 14;
+          var ly = b.offer >= 0 ? Math.min(y(b.offer), y(0) - 4) - 6 : (y(0) + y(b.offer)) / 2 + 4;
           var t1 = S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab bg" }, svg); t1.textContent = SHORT[b.key];
           var t2 = S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab" }, svg); t2.textContent = SHORT[b.key];
         }
@@ -196,8 +202,8 @@
         S("path", { d: "M" + m.l + " " + yp + "H" + xd, stroke: "var(--lx-ink)", "stroke-width": 1.6, "stroke-dasharray": "2 3" }, svg);
         S("path", { d: "M" + xd + " " + (m.t - 6) + "V" + (Hh - m.b), stroke: "var(--lx-ink)", "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
         var anchor = xd > W - 120 ? "end" : "start", dx = anchor === "end" ? -6 : 6;
-        [["bg", 0], ["", 0]].forEach(function (c) { S("text", { x: xd + dx, y: m.t - 10 + 12, "text-anchor": anchor, class: "big " + c[0] }, svg).textContent = "Demand " + Math.round(demand) + " MW"; });
-        [["bg", 0], ["", 0]].forEach(function (c) { S("text", { x: m.l + 6, y: yp - 6 + (res.price < 0 ? 18 : 0), class: "big " + c[0] }, svg).textContent = "Price " + usd(res.price); });
+        [["bg", 0], ["", 0]].forEach(function (c) { S("text", { x: xd + dx, y: 13, "text-anchor": anchor, class: "big " + c[0] }, svg).textContent = "Demand " + Math.round(demand) + " MW"; });
+        [["bg", 0], ["", 0]].forEach(function (c) { S("text", { x: m.l + 6, y: res.price < 0 ? m.t + 14 : yp - 6, class: "big " + c[0] }, svg).textContent = "Price " + usd(res.price); });
       }
       alt.innerHTML = "";
       var ul = H("ul", null, alt);
@@ -219,7 +225,7 @@
 
     var steps = [
       // 1 build the stack
-      { text: "Each plant offers its power at its running cost. The operator lines the offers up, cheapest first: the supply stack. Build it: tap Prairie Town's plants from cheapest to dearest.",
+      { text: "Each plant offers its power at its running cost. The operator lines the offers up, cheapest first: the [[supply-stack|supply stack]]. Build it: tap Prairie Town's plants from cheapest to dearest.",
         build: function (act, api) {
           var box = H("div", { class: "lx8-plants" }, act), chart = StackChart(act, { noLegend: true }), blocks = stack(town, D, h, base), built = [];
           var shuffled = ["peaker", "wind", "cc", "nuclear", "solar"], btn = {};
@@ -241,7 +247,7 @@
           drawBuilt();
         } },
       // 2 move the demand line
-      { text: "Demand is a vertical line: this hour the town needs that many MW, whatever the price. Slide it. The last plant needed is the marginal plant, and its offer sets the clearing price.",
+      { text: "Demand is a vertical line: this hour the town needs that many MW, whatever the price. Slide it. The last plant needed is the [[marginal-plant|marginal plant]], and its offer sets the [[clearing-price|clearing price]].",
         build: function (act, api) {
           var chart = StackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["c", "Running cost this hour"]]), seen = {};
           var res0 = run(town, D, h, base);
@@ -333,19 +339,33 @@
           draw(false);
         } },
       // 7 it is an optimization
-      { text: "The stack is the cheapest way to meet demand: the answer to a small dispatch [[optimization|optimization]]. Check it: add 1 MW of demand and compare the extra running cost with the price.",
+      { text: "The stack is the cheapest way to meet demand: the answer to a small dispatch [[optimization|optimization]]. Check it two ways: add 1 MW of demand, or hand the problem to a real solver.",
         build: function (act, api) {
-          var st = Object.assign({}, base, { gas: S_.st.gas }), chart = StackChart(act, {}), d = h.demand;
+          var st = Object.assign({}, base, { gas: S_.st.gas }), chart = StackChart(act, {}), d = h.demand, blocks = stack(town, D, h, st);
           var tl = tiles(act, [["c0", "Running cost at " + d + " MW"], ["c1", "Running cost at " + (d + 1) + " MW"], ["dc", "Extra cost"], ["p", "Clearing price"]]);
-          var r0 = chart.draw(stack(town, D, h, st), d), r1 = run(town, D, h, st, d + 1);
+          var r0 = chart.draw(blocks, d), r1 = run(town, D, h, st, d + 1);
           tl.c0.b.textContent = usd(r0.cost); tl.p.b.textContent = usd(r0.price);
           tl.c1.b.textContent = "?"; tl.dc.b.textContent = "?";
-          H("button", { type: "button", class: "lx-btn small", html: "Add 1 MW of demand", onclick: function () {
-            chart.draw(stack(town, D, h, st), d + 1);
+          var row = H("div", { class: "lx8-sw" }, act), out = H("div", { "aria-live": "polite" }, act), said = [];
+          function saw(t) { if (said.indexOf(t) < 0) said.push(t); api.done(); api.saw(said.join(" ")); }
+          H("button", { type: "button", class: "lx-btn small", text: "Add 1 MW of demand", onclick: function () {
+            chart.draw(blocks, d + 1);
             tl.c1.b.textContent = usd(r1.cost); tl.dc.b.textContent = usd(r1.cost - r0.cost);
-            api.done();
-            api.saw("The cost rose by " + usd(r1.cost - r0.cost) + ", exactly the clearing price: the price is the cost of one more MWh, the [[shadow-price|shadow price]] of the rule that supply equals demand.");
-          } }, act);
+            saw("The cost rose by " + usd(r1.cost - r0.cost) + ", exactly the clearing price: the price is the cost of one more MWh, the [[shadow-price|shadow price]] of \u201csupply equals demand\u201d.");
+          } }, row);
+          var sb = H("button", { type: "button", class: "lx-btn ghost small", text: "Solve it with HiGHS" }, row);
+          sb.addEventListener("click", function () {
+            if (!LX.solver) { out.textContent = "The solver is not available in this browser."; return; }
+            out.innerHTML = ""; var stat = LX.SolverStatus(out); stat.set("loading"); sb.disabled = true;
+            LX.solver.solve(lp(blocks, d), { timeLimit: 5, key: "m8" }).then(function (r) {
+              stat.set(r); sb.disabled = false;
+              if (!r.ok) return;
+              var ul = H("ul", { class: "lx-hint", style: "margin:4px 0 0;padding-left:1.1rem" }, out);
+              H("li", { text: "Outputs: " + ORDER.map(function (k) { return SHORT[k] + " " + Math.round(r.values[k]) + " MW"; }).join(", ") + ", the same as the stack." }, ul);
+              H("li", { text: "Running cost " + usd(r.objective) + "; the demand row's dual is " + usd(r.duals.demand) + " per MWh." }, ul);
+              saw("HiGHS finds the same outputs, and its dual for the demand rule is " + usd(r.duals.demand) + "/MWh: a marginal value with this hour's plants fixed.");
+            });
+          });
         } },
       // 8 teaser: a full line
       { text: "One question is left. What if the wind farm sits far away and the line into town is full? Then one price splits into two. Formulate it below, then meet M1.",
@@ -377,7 +397,7 @@
       if (i === 3) q(".lx8-marks .lx-btn")[0].click();
       if (i === 4) { var p2 = q(".lx-ctl-row button")[1]; for (var j = 0; j < 20; j++) p2.click(); }
       if (i === 5) q(".lx8-sw .lx-choice")[0].click();
-      if (i === 6) q(".lx-step-act > .lx-btn")[0].click();
+      if (i === 6) q(".lx8-sw .lx-btn").forEach(function (b) { b.click(); });
     }
     root.lxLesson = { model: model, data: D, hour: h, demo: demo, cards: cards };
     buildExplain(D, town, h);
@@ -401,11 +421,11 @@
     var sym = H("details", { class: "lx-textalt" }, c1); H("summary", { text: "Show it in symbols" }, sym);
     H("div", { class: "lx8-sym", html: "minimize &nbsp;Σ<sub>g</sub> c<sub>g</sub> p<sub>g</sub><br>subject to &nbsp;Σ<sub>g</sub> p<sub>g</sub> = D &nbsp;&nbsp;(its shadow price λ is the clearing price)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 ≤ p<sub>g</sub> ≤ P<sub>g</sub> &nbsp;for each plant g" }, sym);
     // 2 who runs and who is paid what
-    var row = H("div", { class: "lx-row2" }, host), c2 = H("div", { class: "lx-xcard" }, row), c3 = H("div", { class: "lx-xcard" }, row);
+    var c2 = H("div", { class: "lx-xcard" }, host), c3 = H("div", { class: "lx-xcard" }, host);
     var order = stack(town, D, h, base).map(function (b) { return b.key; });
     LX.CompareTable(c2, {
       title: "Who runs at " + D.hourLabel + ", and who keeps what",
-      columns: [{ key: "name", label: "Plant", main: true }, { key: "offer", label: "Offer, $/MWh", phone: "Offer", num: true }, { key: "runs", label: "Runs", num: true },
+      columns: [{ key: "name", label: "Plant", main: true }, { key: "offer", label: "Offer, $/MWh", phone: "Offer", num: true }, { key: "runs", label: "Runs", num: true, phoneHide: true },
                 { key: "keeps", label: "Keeps per MWh", phone: "Keeps", num: true, bar: { max: 45 } }],
       rows: ORDER.map(function (k) {
         var p = r.plants[k];

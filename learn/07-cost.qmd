@@ -80,6 +80,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <div class="lx-deepers">
+<style>/* lesson-local: keep Go deeper text inside the card on phones; wide equations scroll on their own (requested for deeper.css) */
+.page-lesson .lx-deeper-body{grid-template-columns:minmax(0,1fr)}.page-lesson .lx-deeper-body .math.display{overflow-x:auto;overflow-y:hidden}</style>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>The LCOE formula and the capital recovery factor</summary>
 <div class="lx-deeper-body">
@@ -87,11 +89,15 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 Paying off a building cost $C$ (\$/kW) with $n$ equal yearly payments $A$ at a real rate $r$ means the payments' present value equals $C$:
 
-$$C = \sum_{t=1}^{n} \frac{A}{(1+r)^t} = A\,\frac{1-(1+r)^{-n}}{r} \quad\Longrightarrow\quad A = \underbrace{\frac{r}{1-(1+r)^{-n}}}_{\text{CRF}}\; C .$$
+$$C = \sum_{t=1}^{n} \frac{A}{(1+r)^t} = A\,\frac{1-(1+r)^{-n}}{r},$$
 
-When $r = 0$ the CRF is simply $1/n$. The [LCOE]{.lx-term term="lcoe"} is the steady price $p$ at which the plant's discounted sales repay everything, so its net present value is zero. With $E = \mathrm{CF} \times 8{,}760 / 1{,}000$ MWh made per kW each year (the [capacity factor]{.lx-term term="capacity-factor"} from [lesson 5](index.html#lesson-5)):
+$$\text{so}\quad A = \frac{r}{1-(1+r)^{-n}}\, C = \mathrm{CRF}\cdot C .$$
 
-$$\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{heat rate}\times\text{gas price} + \mathrm{VOM}.$$
+When $r = 0$ the [capital recovery factor]{.lx-term term="capital-recovery-factor"} is simply $1/n$. The [LCOE]{.lx-term term="lcoe"} is the steady price $p$ at which the plant's discounted sales repay everything, so its net present value is zero. With $E = \mathrm{CF} \times 8{,}760 / 1{,}000$ MWh made per kW each year (the [capacity factor]{.lx-term term="capacity-factor"} from [lesson 5](index.html#lesson-5)):
+
+$$\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{fuel} + \mathrm{VOM},$$
+
+with fuel per MWh = heat rate × gas price.
 
 Check it on the wind farm: $\mathrm{CRF}(4\%, 30) = 0.05783$, so $0.05783 \times 1{,}712 + 34.57 = 133.58$ \$/kW each year; $E = 0.338 \times 8.76 = 2.961$ MWh per kW; $133.58 / 2.961 = \$45.11$ per MWh. The 2025 ATB writes the same equation with a fixed charge rate, $\mathrm{FCR} = \mathrm{CRF} \times$ a factor for taxes and depreciation; here that factor is 1.
 
