@@ -1,0 +1,38 @@
+/* scene.css — the Prairie Town picture (scene.js): callouts on wide scenes, numbered legend on narrow ones. */
+.lx-scene { position: relative; border-radius: var(--lx-r); overflow: hidden; border: 1px solid var(--lx-line); background: var(--lx-sky-day-bot); }
+.lx-scene svg.lx-art { display: block; width: 100%; height: auto; }
+.lx-scene .plant { transition: opacity .3s ease; }
+.lx-scene.tappable .plant-hit { cursor: pointer; }
+.lx-scene.has-hl .plant:not(.hl) { opacity: .42; }
+.lx-scene .tapring { fill: none; stroke: var(--lx-accent); stroke-width: 2.5; stroke-dasharray: 5 4; opacity: 0; transition: opacity .2s; }
+.lx-scene.tappable .plant:not(.met) .tapring { opacity: .9; }
+.lx-scene .win { transition: fill .35s ease; }
+.lx-scene .flow { fill: none; stroke-linecap: round; stroke-width: 4; stroke-dasharray: 0 13; animation: lx-flow var(--dur, 1.6s) linear infinite; }
+@keyframes lx-flow { to { stroke-dashoffset: -26; } }
+.lx-scene .marker { display: none; }
+.lx-scenebox.narrow .lx-scene .marker { display: inline; }
+.lx-callout { position: absolute; transform: translate(-50%, -100%); display: flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px; border-radius: 8px;
+  background: var(--lx-surface); color: var(--lx-ink); border: 1px solid var(--lx-line); font-size: 12.5px; line-height: 1.25; white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(10, 20, 40, .14); pointer-events: none; transition: opacity .25s ease; }
+.lx-callout::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 8px; height: 8px; background: var(--lx-surface);
+  border-right: 1px solid var(--lx-line); border-bottom: 1px solid var(--lx-line); transform: translateX(-50%) rotate(45deg); }
+.lx-callout i { width: 9px; height: 9px; border-radius: 2px; background: var(--c); flex: none; }
+.lx-callout b { font-family: var(--lx-f-mono); font-weight: 600; font-variant-numeric: tabular-nums; }
+.lx-callout.off { opacity: 0 !important; }
+.lx-scene.has-hl .lx-callout:not(.hl) { opacity: .35; }
+.lx-scenebox.narrow .lx-callout { display: none; }
+.lx-clockchip { position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 8px; background: color-mix(in srgb, var(--lx-surface) 88%, transparent);
+  border: 1px solid var(--lx-line); font-family: var(--lx-f-mono); font-size: 13px; font-weight: 600; color: var(--lx-ink); }
+.lx-eventchip { position: absolute; right: 10px; top: 10px; max-width: 62%; padding: 4px 10px; border-radius: 8px; background: var(--lx-surface);
+  border: 1px solid var(--lx-line-2); font-size: 12.5px; color: var(--lx-ink); }
+.lx-legendstrip { display: none; flex-wrap: wrap; gap: 4px 12px; padding: 8px 2px 0; font-size: 13px; color: var(--lx-ink-2); }
+.lx-legendstrip > span { display: inline-flex; align-items: center; gap: 5px; }
+.lx-legendstrip i { width: 9px; height: 9px; border-radius: 2px; background: var(--c); }
+.lx-legendstrip b { font-family: var(--lx-f-mono); font-weight: 600; color: var(--lx-ink); font-variant-numeric: tabular-nums; }
+.lx-legendstrip .n { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--lx-ink); color: var(--lx-surface);
+  font-size: 10px; font-family: var(--lx-f-mono); }
+.lx-scenebox.narrow .lx-legendstrip { display: flex; }
+@media (prefers-reduced-motion: reduce) {
+  .lx-scene .flow { animation: none; }
+  .lx-scene .win { transition: none; }
+}

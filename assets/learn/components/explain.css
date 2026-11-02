@@ -1,0 +1,41 @@
+/* explain.css — shared frame of the explain layer (concept map, flowchart, table, causal chain, energy chain) and the
+   concept map itself (conceptmap.js). Every lesson ends with this layer: diagrams with one or two sentences per element. */
+.lx-xgrid { display: grid; gap: 18px; }
+.lx-xcard { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 18px 20px; display: grid; gap: 12px; min-width: 0; }
+.lx-x-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; }
+.page-learn .lx-x-head h3 { font-size: 20px; }
+.lx-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.lx-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 4px 12px 4px 10px; border-radius: 10px; border: 1px solid var(--lx-line-2);
+  background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; font-family: var(--lx-f-display); font-size: 14px; font-weight: 500; }
+.lx-chip i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.lx-chip small { font-family: var(--lx-f-body); font-weight: 400; color: var(--lx-ink-3); font-size: 12.5px; }
+.lx-cmap { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+.lx-cmap svg { display: block; width: 100%; height: auto; }
+.cnode { cursor: pointer; }
+.cnode rect { fill: var(--lx-surface); stroke: var(--lx-line-2); stroke-width: 1.5; transition: fill .2s, stroke .2s; }
+.cnode text { font-family: var(--lx-f-display); font-size: 13.5px; font-weight: 500; fill: var(--lx-ink); }
+.cnode .grp { fill: var(--c); stroke: none; }
+.cnode:hover rect { stroke: var(--lx-ink-3); }
+.cnode:focus { outline: none; }
+.cnode:focus-visible rect { stroke: var(--lx-accent); stroke-width: 3; }
+.cnode.sel rect { fill: var(--lx-ink); stroke: var(--lx-ink); }
+.cnode.sel text { fill: var(--lx-bg); }
+.cnode.dim { opacity: .38; }
+.cedge path { fill: none; stroke: var(--lx-line-2); stroke-width: 1.5; }
+.cedge text { font-family: var(--lx-f-body); font-size: 11.5px; fill: var(--lx-ink-3); }
+.cedge text.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
+.cedge.on path { stroke: var(--lx-ink); stroke-width: 2; }
+.cedge.on text { fill: var(--lx-ink); }
+.cedge.dim { opacity: .35; }
+.lx-cmap.narrow .cedge text { display: none; }
+.lx-cdetail { border: 1px solid var(--lx-line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; background: var(--lx-surface-2); align-content: start; }
+.page-learn .lx-cdetail h4 { font-size: 18px; margin: 0; }
+.lx-cdetail p { font-size: 15px; }
+.lx-cdetail .ingame { font-size: 14px; color: var(--lx-ink-2); border-top: 1px dashed var(--lx-line-2); padding-top: 8px; }
+.lx-cdetail .ingame > b { font-family: var(--lx-f-display); font-weight: 500; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--lx-ink-3); display: block; }
+.lx-cdetail .you { margin-top: 4px; color: var(--lx-ink); font-weight: 600; }
+.lx-cgroups { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-cgroups span { display: inline-flex; align-items: center; gap: 5px; }
+.lx-cgroups i { width: 10px; height: 4px; border-radius: 2px; background: var(--c); }
+@media (max-width: 860px) { .lx-cmap { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .lx-xcard { padding: 14px; } }

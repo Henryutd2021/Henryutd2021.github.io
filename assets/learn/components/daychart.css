@@ -1,0 +1,16 @@
+/* daychart.css — LX.DayChart (daychart.js) and the small legend used by charts. */
+.lx-chart { position: relative; margin-top: 8px; }
+.lx-chart svg { display: block; width: 100%; height: auto; }
+.lx-chart-tip { position: absolute; pointer-events: none; background: var(--lx-surface); border: 1px solid var(--lx-line-2); border-radius: 8px; padding: 6px 9px;
+  font-size: 12.5px; color: var(--lx-ink); box-shadow: 0 2px 8px rgba(10, 20, 40, .16); min-width: 140px; z-index: 3; }
+.lx-chart-tip div { display: flex; justify-content: space-between; gap: 10px; }
+.lx-chart-tip b { font-family: var(--lx-f-mono); font-weight: 600; }
+.lx-chart-tip .bad { color: var(--lx-bad); }
+.lx-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--lx-ink-2); margin-top: 6px; }
+.lx-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.lx-legend i { width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
+.lx-legend i.line { height: 0; border-top: 2px dashed var(--lx-ink); border-radius: 0; background: none; width: 14px; }
+.lx-mini-table { border-collapse: collapse; font-size: 12.5px; margin-top: 6px; font-family: var(--lx-f-mono); }
+.lx-mini-table th, .lx-mini-table td { padding: 2px 8px 2px 0; text-align: right; border-bottom: 1px solid var(--lx-line); }
+.lx-mini-table th { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink-3); }
+.lx-scroll-x { overflow-x: auto; max-width: 100%; }

@@ -1,6 +1,6 @@
-// fallback_grid_operator.js — writes the static fallback figure of Lesson 0 (the expert rule's day, as inline SVG) into
-// learn/00-grid-operator.qmd between the "fallback-svg" markers, so readers without JavaScript still see the day.
-// Colours come from CSS classes (assets/learn/learn.css), so the figure follows day and night mode.
+// fallback_grid_operator.js — writes the static fallback figure of Lesson 0 (the cheapest-first rule's day, as inline SVG)
+// into learn/00-grid-operator.qmd between the "fallback-svg" markers, so readers without JavaScript still see the day.
+// Colours are the Learn tokens (assets/learn/components/base.css), so the figure follows day and night mode.
 // Usage (from the site folder):  node _tests/learn/fallback_grid_operator.js          (rewrite)
 //                                node _tests/learn/fallback_grid_operator.js --check  (exit 1 if out of date)
 "use strict";
@@ -9,41 +9,41 @@ const path = require("path");
 const SITE = path.resolve(__dirname, "..", "..");
 const M = require(path.join(SITE, "assets/learn/grid-operator.js"));
 const town = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8"));
-const days = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_days.json"), "utf8"));
-const world = M.prepare(town, days, "lesson0");
+const year = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_year.json"), "utf8"));
+const world = M.prepare(town, year, "lesson0");
 const QMD = path.join(SITE, "learn/00-grid-operator.qmd");
+const C = { nuclear: "--lx-nuc", solar: "--lx-solar", wind: "--lx-wind", cc: "--lx-cc", pk: "--lx-pk" };
+const NAMES = { nuclear: "Nuclear", solar: "Solar", wind: "Wind", cc: "Gas combined-cycle", pk: "Gas peaker" };
 
 function svg() {
-  const ex = M.expert(world), W = 720, H = 300, Mg = { l: 52, r: 10, t: 30, b: 34 }, YMAX = 400;
+  const ex = M.expert(world), W = 720, H = 280, Mg = { l: 46, r: 8, t: 14, b: 28 }, YMAX = 400;
   const pw = W - Mg.l - Mg.r, ph = H - Mg.t - Mg.b;
   const x = t => Mg.l + pw * t / 24, y = v => Mg.t + ph * (1 - v / YMAX), f = v => v.toFixed(1);
+  const peak = Math.max(...ex.hours.map(r => r.demand)), pkH = ex.hours.filter(r => r.pk > 0).map(r => r.t);
   const out = [];
-  out.push(`<svg class="lx-static" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="lx-static-title">`);
-  out.push(`<title id="lx-static-title">Prairie Town's day under the expert rule: stacked hourly supply from nuclear, wind, solar, ` +
-           `the combined-cycle gas plant and the gas peaker, with demand as a line. Demand peaks at ${Math.max(...ex.hours.map(r => r.demand))} MW in the afternoon, and gas runs hardest after sunset.</title>`);
-  out.push('<g class="ex-grid">' + [0, 100, 200, 300, 400].map(v => `<line x1="${Mg.l}" x2="${Mg.l + pw}" y1="${f(y(v))}" y2="${f(y(v))}"/>`).join("") + "</g>");
-  out.push('<g class="ex-axis">' + [0, 100, 200, 300, 400].map(v => `<text x="${Mg.l - 8}" y="${f(y(v) + 5)}" text-anchor="end">${v}</text>`).join("") +
-           `<text x="${Mg.l - 8}" y="14" text-anchor="end">MW</text>` +
-           [0, 6, 12, 18, 24].map(v => `<text x="${f(x(v))}" y="${H - 8}" text-anchor="${v === 0 ? "start" : v === 24 ? "end" : "middle"}">${(v < 10 ? "0" : "") + v}:00</text>`).join("") + "</g>");
-  const cw = x(1) - x(0), bw = cw * 0.74, off = (cw - bw) / 2, bars = [];
+  out.push(`<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="lx-static-title">`);
+  out.push(`<title id="lx-static-title">Prairie Town's day under the cheapest-first rule: hourly supply stacked by plant, with demand as a dashed line. ` +
+           `Demand peaks at ${peak} MW; the peaker runs at ${pkH.map(t => (t < 10 ? "0" : "") + t + ":00").join(" and ")}.</title>`);
+  out.push("<g>" + [0, 100, 200, 300, 400].map(v => `<line x1="${Mg.l}" x2="${Mg.l + pw}" y1="${f(y(v))}" y2="${f(y(v))}" stroke="var(--lx-line)"/>` +
+           `<text x="${Mg.l - 6}" y="${f(y(v) + 4)}" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">${v}</text>`).join("") +
+           [0, 6, 12, 18, 24].map(v => `<text x="${f(x(v))}" y="${H - 8}" text-anchor="${v === 0 ? "start" : v === 24 ? "end" : "middle"}" font-size="13" fill="var(--lx-ink-3)">${(v < 10 ? "0" : "") + v}:00</text>`).join("") + "</g>");
+  const cw = x(1) - x(0), bw = cw * 0.8, off = (cw - bw) / 2, bars = [];
   ex.hours.forEach((r, t) => {
     let base = 0;
-    [["nuclear", r.nuclear], ["wind", r.wind], ["solar", r.solar], ["cc", r.cc], ["pk", r.pk]].forEach(([k, v]) => {
-      if (v <= 0) return;
-      bars.push(`<rect class="lx-fill-${k}" x="${f(x(t) + off)}" y="${f(y(base + v))}" width="${f(bw)}" height="${f(y(base) - y(base + v))}"/>`);
+    ["nuclear", "solar", "wind", "cc", "pk"].forEach(k => {
+      const v = r[k]; if (v <= 0) return;
+      bars.push(`<rect x="${f(x(t) + off)}" y="${f(y(base + v))}" width="${f(bw)}" height="${f(y(base) - y(base + v))}" fill="var(${C[k]})"/>`);
       base += v;
     });
-    if (r.curtailed > 0) bars.push(`<rect class="lx-spilled" x="${f(x(t) + off + 0.5)}" y="${f(y(base + r.curtailed))}" width="${f(bw - 1)}" height="${f(y(base) - y(base + r.curtailed))}"/>`);
   });
   out.push("<g>" + bars.join("") + "</g>");
   let d = `M${f(x(0))},${f(y(ex.hours[0].demand))}`;
   ex.hours.forEach((r, t) => { d += `V${f(y(r.demand))}H${f(x(t + 1))}`; });
-  out.push(`<path class="lx-demand" d="${d}"/>`);
+  out.push(`<path d="${d}" fill="none" stroke="var(--lx-ink)" stroke-width="2" stroke-dasharray="5 3"/>`);
   out.push("</svg>");
-  const legend = [["nuclear", "Nuclear"], ["wind", "Wind"], ["solar", "Solar"], ["cc", "Gas combined-cycle"], ["pk", "Gas peaker"]]
-    .map(([k, s]) => `<li><span class="ex-swatch lx-bg-${k}" aria-hidden="true"></span>${s}</li>`).join("") +
-    '<li><span class="lx-swatch-line" aria-hidden="true"></span>Demand</li><li><span class="ex-swatch lx-sw-spilled" aria-hidden="true"></span>Spilled wind or solar</li>';
-  return out.join("\n") + `\n<ul class="ex-legend lx-legend">${legend}</ul>`;
+  const legend = ["nuclear", "solar", "wind", "cc", "pk"].map(k => `<span><i style="--c:var(${C[k]})"></i>${NAMES[k]}</span>`).join("") +
+    '<span><i class="line"></i>Demand</span>';
+  return out.join("\n") + `\n<div class="lx-legend" aria-hidden="true">${legend}</div>`;
 }
 
 const START = "<!-- fallback-svg:start -->", END = "<!-- fallback-svg:end -->";

@@ -1,0 +1,120 @@
+---
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+title: "A question a learner would type into a search box?"
+subtitle: "What the reader does in this lesson"
+description: "Lesson N of Energy Systems, Step by Step: one sentence on what the reader does and learns (for search and sharing)."
+page-layout: full
+toc: false
+title-block-banner: false
+css: ../assets/learn/learn.css
+body-classes: "page-learn page-lesson lx-form-cards"
+---
+
+<!-- Step-card lesson (the default form). Guide: assets/learn/README.md. Replace <slug> with the lesson's JS name.
+     Order: step cards (the interactive) -> explain layer (diagrams) -> check -> sources. Text budget: one or two
+     sentences per element; depth goes in Go deeper boxes. After editing path.yml, run in the ResearchPortfolio folder:
+     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+
+<!-- learn:meta:start -->
+<!-- learn:meta:end -->
+
+::: {#steps .lx-sec}
+```{=html}
+<div class="lx-interactive lx-cards" data-learn="<slug>" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">The idea in one picture</p>
+<!-- a static SVG or a short table: what a reader without JavaScript sees -->
+<p class="lx-hint">With JavaScript on, you work through this step by step.</p>
+</div>
+</div>
+<p class="lx-datanote"><span>Where the numbers come from, with a date (or: Prairie Town is fictional; its numbers are illustrative).</span></p>
+```
+:::
+
+::: {#explain .lx-sec}
+::: {.lx-sec-h}
+## What you just did, as diagrams
+:::
+
+```{=html}
+<div id="<slug>-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Idea one</dt><dd>One sentence.</dd>
+<dt>Idea two</dt><dd>One sentence.</dd>
+</dl>
+</div>
+</div>
+```
+
+```{=html}
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>The next tier's view, as a title</summary>
+<div class="lx-deeper-body">
+```
+
+Markdown and math go here, for example $E = P \times t$, with every number from the lesson's model.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#check .lx-sec}
+::: {.lx-sec-h}
+## Check yourself
+:::
+
+```{=html}
+<div class="lx-myths" data-quiz="<slug>-myth">
+<div class="lx-qq" data-id="one" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A common belief, in quotes.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. One or two sentences why.</p></details>
+</div>
+</div>
+```
+:::
+
+::: {#sources .lx-sec}
+::: {.lx-sec-h}
+## Numbers, sources and what's next
+:::
+
+::: {.lx-end}
+```{=html}
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td class="n">0 unit</td><td>One sentence.</td><td class="s"><a href="https://www.eia.gov/">Primary source</a> · as of Month Year</td></tr>
+</tbody>
+</table>
+</div>
+```
+
+::: {.lx-stack}
+<!-- learn:next:start -->
+<!-- learn:next:end -->
+
+```{=html}
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul><li>Author (year). <a href="https://example.org/">Title</a>.</li></ul>
+</div>
+```
+:::
+:::
+
+<!-- learn:footer:start -->
+<!-- learn:footer:end -->
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/<slug>.js" defer></script>
+```

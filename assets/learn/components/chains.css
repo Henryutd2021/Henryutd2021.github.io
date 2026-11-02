@@ -1,0 +1,30 @@
+/* chains.css — causal chain (causal.js) and energy chain (energychain.js). */
+.lx-chain { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 0; align-items: stretch; margin: 0; padding: 0; list-style: none; }
+.lx-clink { position: relative; padding: 12px 14px 12px 12px; border-radius: 12px; border: 1px solid var(--lx-line); background: var(--lx-surface); display: grid; gap: 4px;
+  align-content: start; transition: border-color .25s, background .25s; margin-right: 20px; min-width: 0; }
+.lx-clink:not(:last-child)::after { content: ""; position: absolute; right: -15px; top: 50%; width: 10px; height: 10px; border-top: 2px solid var(--lx-ink-3);
+  border-right: 2px solid var(--lx-ink-3); transform: translateY(-50%) rotate(45deg); }
+.lx-clink:last-child { margin-right: 0; }
+.lx-clink b { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); line-height: 1.25; }
+.lx-clink span { font-size: 13.5px; color: var(--lx-ink-2); line-height: 1.35; }
+.lx-clink em { font-style: normal; font-family: var(--lx-f-mono); font-size: 13px; color: var(--lx-ink); }
+.lx-clink .n { font-family: var(--lx-f-mono); font-size: 11.5px; color: var(--lx-ink-3); }
+.lx-clink.on { border-color: var(--lx-ink); background: var(--lx-surface-2); }
+.lx-echain { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
+.lx-estop { display: grid; justify-items: center; gap: 4px; text-align: center; padding: 6px; position: relative; min-width: 0; }
+.lx-estop .ic .lx-ic { width: 46px; height: 46px; color: var(--lx-ink-2); }
+.lx-estop b { font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; color: var(--lx-ink); }
+.lx-estop span { font-size: 13px; color: var(--lx-ink-3); }
+.lx-estop em { font-style: normal; font-family: var(--lx-f-mono); font-size: 13.5px; font-weight: 600; color: var(--lx-ink); }
+.lx-estop:not(:last-child)::after { content: ""; position: absolute; top: 28px; left: calc(50% + 32px); right: calc(-50% + 32px); height: 2px;
+  background: repeating-linear-gradient(90deg, var(--lx-sun) 0 6px, transparent 6px 12px); background-size: 24px 2px; animation: lx-dash 1.2s linear infinite; }
+@keyframes lx-dash { to { background-position: 24px 0; } }
+@media (prefers-reduced-motion: reduce) { .lx-estop:not(:last-child)::after { animation: none; } .lx-clink { transition: none; } }
+@media (max-width: 860px) {
+  .lx-chain { grid-template-columns: minmax(0, 1fr); }
+  .lx-clink { margin-right: 0; margin-bottom: 20px; }
+  .lx-clink:last-child { margin-bottom: 0; }
+  .lx-clink:not(:last-child)::after { right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%) rotate(135deg); }
+  .lx-echain { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+  .lx-estop:nth-child(2n)::after { display: none; }
+}

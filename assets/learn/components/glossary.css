@@ -1,0 +1,9 @@
+/* glossary.css — tap-to-define terms and their popover (glossary.js). */
+.lx-term.on:not(.plain) { cursor: help; text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); border-radius: 3px; }
+.lx-term.on:not(.plain):hover, .lx-term[aria-expanded="true"] { text-decoration-style: solid; background: var(--lx-accent-soft); }
+.lx-pop { position: absolute; z-index: 1040; background: var(--lx-surface); color: var(--lx-ink); border: 1px solid var(--lx-ink); border-radius: 12px; padding: 10px 12px;
+  box-shadow: var(--lx-shadow-lg); display: grid; gap: 4px; font-family: var(--lx-f-body); font-size: 14.5px; line-height: 1.4; }
+.lx-pop b { font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; }
+.lx-pop p { margin: 0; color: var(--lx-ink-2); }
+.lx-pop a { font-size: 13px; color: var(--lx-accent); }

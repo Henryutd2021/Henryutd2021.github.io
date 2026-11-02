@@ -1,6 +1,6 @@
 {
   "name": "Prairie Town",
-  "note": "Prairie Town is fictional. Its plants, sizes and prices are illustrative. Hourly demand, wind and solar follow the shapes of real days on the Southwest Power Pool grid (town_days.json, from EIA-930), scaled down to the town.",
+  "note": "Prairie Town is fictional. Its plants, sizes and prices are illustrative. Hourly demand, wind and solar follow the shapes of real days on the Southwest Power Pool grid (town_year.json and town_days.json, from EIA-930), scaled down to the town.",
   "units": {
     "mw": "MW (plant size, or average output over an hour)",
     "cost": "$ per MWh (running cost: fuel and other costs that grow with output)",
@@ -9,22 +9,24 @@
   },
   "fleet": {
     "nuclear": { "label": "Nuclear plant", "mw": 100, "cost": 10, "co2": 0, "behaviour": "runs flat" },
-    "wind": { "label": "Wind farm", "mw": 100, "cost": 0, "co2": 0, "behaviour": "follows the wind" },
-    "solar": { "label": "Solar farm", "mw": 250, "cost": 0, "co2": 0, "behaviour": "follows the sun" },
-    "cc": { "label": "Gas combined-cycle plant", "mw": 200, "cost": 40, "co2": 0.37, "ramp": 40, "behaviour": "adjustable, slow to change" },
+    "wind": { "label": "Wind farm", "mw": 150, "cost": 0, "co2": 0, "behaviour": "follows the wind" },
+    "solar": { "label": "Solar farm", "mw": 200, "cost": 0, "co2": 0, "behaviour": "follows the sun" },
+    "cc": { "label": "Gas combined-cycle plant", "mw": 150, "cost": 40, "co2": 0.37, "ramp": 40, "behaviour": "adjustable, slow to change" },
     "peaker": { "label": "Gas peaker", "mw": 100, "cost": 100, "co2": 0.55, "behaviour": "adjustable, fast" }
   },
   "scenarios": {
     "lesson0": {
-      "about": "Lesson 0: one real day, scaled. Demand = shape x demandPeakMW; wind and solar = shape x farm size (SPP's highest hour of 2025 = the farm at full output), rounded to whole MW; demand then rounded by at most 2.5 MW so that the gas needed each hour is a multiple of `step` (a careful player can balance exactly).",
-      "day": "summer_peak",
-      "date": "2025-07-29",
-      "demandPeakMW": 380,
+      "about": "Lesson 0: one real late-summer day, scaled. The day is read from town_year.json by local date (Central daylight time, UTC-5; index i is the hour ending at start_utc + i). Demand = shape x demandPeakMW; wind and solar = shape x farm size (SPP's highest hour of 2025 = the farm at full output), rounded to whole MW; demand then rounded by at most 2.5 MW so that the gas needed each hour is a multiple of `step` (a careful player can balance exactly). Chosen on 2026-11-02 from June-September 2025 for a real midday solar dip (14:00-15:00, SPP solar 737 -> 553 -> 730 MW) and an evening climb faster than the combined-cycle plant's ramp limit.",
+      "date": "2025-09-03",
+      "dateLabel": "3 September 2025",
+      "utcOffsetHours": -5,
+      "demandPeakMW": 450,
       "step": 5,
-      "startCC": 100,
+      "startCC": 115,
       "startPeaker": 0,
       "hzPerMW": 0.01,
-      "hzLimit": 0.5
+      "hzLimit": 0.5,
+      "cloudDip": 0.12
     }
   }
 }

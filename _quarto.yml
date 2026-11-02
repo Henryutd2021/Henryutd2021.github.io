@@ -27,7 +27,8 @@ project:
     - images/
     - files/
     - assets/explainers/
-    - assets/learn/
+    - assets/learn/*.js
+    - assets/learn/data/
 
 website:
   title: "Honglin Li"

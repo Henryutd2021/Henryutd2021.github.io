@@ -1,0 +1,119 @@
+---
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+# The "play first" form is for lesson 0 and capstones: the page opens straight into the game.
+title: "A question a learner would type into a search box?"
+subtitle: "Run / plan / build something for a day"
+description: "Lesson N of Energy Systems, Step by Step: one sentence on what the reader does and learns (for search and sharing)."
+page-layout: full
+toc: false
+title-block-banner: false
+css: ../assets/learn/learn.css
+body-classes: "page-learn page-lesson lx-form-play"
+---
+
+<!-- Play-first lesson. Worked example: learn/00-grid-operator.qmd with assets/learn/grid-operator.js. Guide:
+     assets/learn/README.md. The game (built in <slug>.js) uses LX.Missions above an .lx-play grid: the stage (LX.Scene +
+     LX.Meters) beside a panel (clock, hour strip, events, LX.Slider controls, a Next button, tallies); a three-step
+     LX.Coach tour on the first visit; in-game questions (LX.Guess, LX.Predict) instead of paragraphs; a debrief with
+     LX.Stars and collectible LX.Notes; then the explain layer below. Text budget: one or two sentences per element. -->
+
+<!-- learn:meta:start -->
+<!-- learn:meta:end -->
+
+::: {#play .lx-sec}
+```{=html}
+<div class="lx-interactive" data-learn="<slug>" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">The game's day, as a simple rule plays it</p>
+<!-- fallback-svg:start -->
+<!-- fallback-svg:end -->
+<p class="lx-hint">With JavaScript on, you play this yourself.</p>
+</div>
+</div>
+<p class="lx-datanote"><span>Where the numbers come from, with a date. Prairie Town, its plants and its prices are illustrative.</span></p>
+```
+:::
+
+::: {#explain .lx-sec}
+::: {.lx-sec-h}
+## What you just did, as diagrams
+:::
+
+```{=html}
+<div id="<slug>-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Idea one</dt><dd>One sentence.</dd>
+</dl>
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The problem as a model</summary>
+<div class="lx-deeper-body">
+```
+
+Markdown and math here; every number checked against the model by the lesson's Node test.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#check .lx-sec}
+::: {.lx-sec-h}
+## Check yourself
+:::
+
+```{=html}
+<div class="lx-myths" data-quiz="<slug>-myth">
+<div class="lx-qq" data-id="one" data-answer="fact">
+<p class="lx-qtext">Myth or fact? “A statement about what the reader just played.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. One or two sentences why.</p></details>
+</div>
+</div>
+```
+:::
+
+::: {#sources .lx-sec}
+::: {.lx-sec-h}
+## Numbers, sources and what's next
+:::
+
+::: {.lx-end}
+```{=html}
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td class="n">0 unit</td><td>One sentence.</td><td class="s"><a href="https://www.eia.gov/">Primary source</a> · as of Month Year</td></tr>
+</tbody>
+</table>
+</div>
+```
+
+::: {.lx-stack}
+<!-- learn:next:start -->
+<!-- learn:next:end -->
+
+```{=html}
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul><li>Author (year). <a href="https://example.org/">Title</a>.</li></ul>
+</div>
+```
+:::
+:::
+
+<!-- learn:footer:start -->
+<!-- learn:footer:end -->
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/<slug>.js" defer></script>
+```

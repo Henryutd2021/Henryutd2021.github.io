@@ -1,28 +1,38 @@
-# path.yml — the curriculum behind learn/index.qmd (rendered by learn/map.ejs through a Quarto listing).
-# Edit this file to change the course map; no code changes are needed.
-#   kind: tier    one per tier, in display order (also feeds the three entry doors)
-#   kind: lesson  starter: N puts the lesson on the starter path as stop N; tier is where it sits, tier2 marks a lesson
-#                 that bridges two tiers; path only for lessons that exist (others show as upcoming); after = starter
-#                 lessons it builds on; code labels tier lessons that are not on the starter path (M1, ...)
+# path.yml — the curriculum behind the course map (learn/index.qmd) and every lesson's header, next box and footer.
+# Edit this file to change the course; no code changes are needed. Then run, in the ResearchPortfolio folder:
+#   python3 scripts/build_learn.py --site <site folder>        (writes assets/learn/data/path.json and the lesson blocks)
+# Kinds of entries (a flat YAML subset: "- key: value" lines, or one "- {key: value, ...}" line; nothing nested):
+#   kind: tier    one per tier, in display order; any number of tiers (the map draws one line each, first at the bottom).
+#                 id, title, level, slot (colour 1-5: --lx-tier-<slot> in assets/learn/components/base.css), icon (a name
+#                 in LX.IC), door (the entry-door question), doord, reader, math, assumes, goal
+#   kind: scale   optional system scales (e.g. microgrid, regional grid, city, nation): id, title, short, icon;
+#                 lessons list theirs in `scales: [id, ...]`
+#   kind: lesson  starter: N puts the lesson on the starter path as stop N; tier is where it sits; tier2 marks a lesson that
+#                 bridges two tiers; path only for lessons that exist (others show as coming soon); after = starter lessons
+#                 it builds on; form: play (opens with the game: lesson 0, capstones) or cards (step cards; the default);
+#                 icon for its map stop; code labels tier lessons that are not on the starter path (M1, ...)
 #   kind: tool    the just-in-time math toolbox
-# Lesson pages also get their header, next-lesson box and footer from this file: python3 scripts/build_learn.py
 # (The name has no leading underscore because Quarto listings skip files that start with "_".)
-# Source: design report 09, sections 2 and 5 (revised 2026-11-02).
+# Source: design report 09, sections 2 and 5 (revised 2026-11-02); course map form chosen by Henry on 2026-11-02 (metro).
 
 - kind: tier
   id: foundations
+  slot: 1
+  icon: bulb
   title: Foundations
   level: L1
   reader: "High-school students and curious readers"
   math: "Arithmetic and reading a chart"
   assumes: "Nothing. Start here."
   goal: "Explain how the power system works and reason with its numbers."
-  door: "New to energy"
+  door: "Totally new to energy"
   doord: "Start with a game: run a small town's power plants for a day, then find out what you just did."
   doorcta: "Start with lesson 0"
   doorlink: "00-grid-operator.qmd"
 - kind: tier
   id: analyst
+  slot: 2
+  icon: bars
   title: Analyst
   level: L2
   reader: "Undergraduates, career changers, and professionals from outside the power sector"
@@ -35,13 +45,15 @@
   doorlink: "#analyst"
 - kind: tier
   id: modeler
+  slot: 3
+  icon: braces
   title: Modeler
   level: L3
   reader: "Upper-level undergraduates, graduate students and engineers"
   math: "Programming and linear algebra (the math toolbox teaches what you need)"
   assumes: "Analyst-level economics; the toolbox fills gaps in math and Python."
   goal: "Formulate, build, solve and critique an energy-system optimization model."
-  door: "I want to build models"
+  door: "Ready to build models"
   doord: "From a first linear program to capacity expansion, uncertainty and research practice."
   doorcta: "Go to the Modeler tier"
   doorlink: "#modeler"
@@ -50,6 +62,8 @@
 - kind: lesson
   id: 00-grid-operator
   starter: 0
+  form: play
+  icon: gauge
   tier: foundations
   status: active
   path: 00-grid-operator.qmd
@@ -65,6 +79,8 @@
 - kind: lesson
   id: 01-power-energy
   starter: 1
+  form: cards
+  icon: bolt
   tier: foundations
   minutes: 15
   title: "Power or energy? What is the difference between kW and kWh?"
@@ -75,6 +91,8 @@
 - kind: lesson
   id: 02-demand
   starter: 2
+  form: cards
+  icon: curve
   tier: foundations
   minutes: 15
   title: "Why does electricity demand rise and fall?"
@@ -85,6 +103,8 @@
 - kind: lesson
   id: 03-balancing
   starter: 3
+  form: cards
+  icon: wave
   tier: foundations
   minutes: 15
   title: "How does the grid stay balanced every second?"
@@ -95,6 +115,8 @@
 - kind: lesson
   id: 04-forecasts
   starter: 4
+  form: cards
+  icon: cloud
   tier: foundations
   tier2: analyst
   minutes: 15
@@ -106,6 +128,8 @@
 - kind: lesson
   id: 05-capacity-factor
   starter: 5
+  form: cards
+  icon: turbine
   tier: foundations
   minutes: 15
   title: "Capacity factor: why is 1 MW not always 1 MW?"
@@ -116,6 +140,8 @@
 - kind: lesson
   id: 06-three-jobs
   starter: 6
+  form: cards
+  icon: blocks
   tier: foundations
   minutes: 15
   title: "Cheap energy, firm capacity, flexibility: which plant does which job?"
@@ -126,6 +152,8 @@
 - kind: lesson
   id: 07-cost
   starter: 7
+  form: cards
+  icon: coin
   tier: analyst
   minutes: 15
   title: "What does electricity cost to make?"
@@ -136,6 +164,8 @@
 - kind: lesson
   id: 08-merit-order
   starter: 8
+  form: cards
+  icon: stairs
   tier: analyst
   minutes: 15
   title: "Who runs, and what sets the price?"
@@ -146,6 +176,8 @@
 - kind: lesson
   id: 09-storage
   starter: 9
+  form: cards
+  icon: battery
   tier: analyst
   minutes: 15
   title: "How does storage move energy through time?"
@@ -156,6 +188,8 @@
 - kind: lesson
   id: 10-write-it-down
   starter: 10
+  form: cards
+  icon: pencil
   tier: analyst
   minutes: 15
   title: "Write it down: what are the decisions, the goal and the rules?"
@@ -166,6 +200,8 @@
 - kind: lesson
   id: 11-solver
   starter: 11
+  form: cards
+  icon: target
   tier: modeler
   minutes: 15
   title: "Ask the solver, then check its answer"
@@ -176,6 +212,8 @@
 - kind: lesson
   id: 12-trade-offs
   starter: 12
+  form: cards
+  icon: frontier
   tier: analyst
   minutes: 15
   title: "Cheap or clean? How do you weigh cost against emissions?"
@@ -186,6 +224,8 @@
 - kind: lesson
   id: 13-capstone
   starter: 13
+  form: play
+  icon: blueprint
   tier: modeler
   tier2: analyst
   minutes: 20

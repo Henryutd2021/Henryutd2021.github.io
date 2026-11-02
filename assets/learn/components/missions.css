@@ -1,0 +1,45 @@
+/* missions.css — mission bars, stars and collectible notes (missions.js). */
+.lx-missions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.lx-mission { border: 1px solid var(--lx-line); background: var(--lx-surface); border-radius: 12px; padding: 9px 11px; display: grid; gap: 5px; min-width: 0; }
+.lx-mission b { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; line-height: 1.25; color: var(--lx-ink); }
+.lx-mission .bar { height: 6px; border-radius: 3px; background: var(--lx-surface-3); overflow: hidden; }
+.lx-mission .bar i { display: block; height: 100%; width: 0; background: var(--lx-good); transition: width .3s; }
+.lx-mission.fail .bar i { background: var(--lx-bad); }
+.lx-mission small { font-size: 12.5px; color: var(--lx-ink-3); font-family: var(--lx-f-mono); }
+.lx-mission.main { border-color: var(--lx-ink); }
+.lx-mission.won { border-color: var(--lx-good); background: color-mix(in srgb, var(--lx-good) 7%, var(--lx-surface)); }
+.lx-mission .s { display: none; }
+@media (max-width: 860px) {
+  .lx-missions { gap: 6px; }
+  .lx-mission { padding: 7px 8px; gap: 4px; }
+  .lx-mission .l { display: none; }
+  .lx-mission .s { display: inline; }
+  .lx-mission b { font-size: 13px; }
+  .lx-mission small { font-size: 11px; }
+}
+.lx-starrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lx-starbox { border: 1px solid var(--lx-line); border-radius: 12px; padding: 10px; text-align: center; background: var(--lx-surface); min-width: 0; }
+.lx-starbox > span { display: block; font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-stars { display: flex; justify-content: center; gap: 2px; margin: 4px 0 2px; }
+.lx-stars svg { width: 22px; height: 22px; display: block; }
+.lx-stars .on { color: var(--lx-star); animation: lx-pop .42s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: var(--d, 0s); }
+.lx-stars .off { color: var(--lx-line-2); }
+@keyframes lx-pop { 0% { transform: scale(.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.lx-starbox b { font-family: var(--lx-f-mono); font-size: 13.5px; font-weight: 600; color: var(--lx-ink); }
+.lx-notes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.lx-note { perspective: 900px; }
+.lx-note-in { position: relative; display: grid; height: 100%; transition: transform .6s cubic-bezier(.3, .8, .3, 1); transform-style: preserve-3d; transition-delay: var(--d, 0s); }
+.lx-note.flip .lx-note-in { transform: rotateY(180deg); }
+.lx-note-f, .lx-note-b { grid-area: 1 / 1; position: relative; min-height: 150px; border-radius: 12px; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.lx-note-f { background: repeating-linear-gradient(135deg, var(--lx-surface-2) 0 6px, var(--lx-surface-3) 6px 12px); border: 1px solid var(--lx-line-2);
+  align-items: center; justify-content: center; text-align: center; color: var(--lx-ink-3); font-size: 13px; }
+.lx-note-f .lx-ic { width: 22px; height: 22px; }
+.lx-note-b { background: var(--lx-surface); border: 1px solid var(--lx-ink); transform: rotateY(180deg); }
+.lx-note-b .ic { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--lx-surface-2); color: var(--lx-ink); }
+.lx-note-b .ic .lx-ic { width: 18px; height: 18px; }
+.page-learn .lx-note-b h4 { font-size: 15px; margin: 0; }
+.lx-note-b p { font-size: 13.5px; color: var(--lx-ink-2); line-height: 1.38; }
+.lx-note-b .moment { font-size: 12.5px; color: var(--lx-ink-3); margin-top: auto !important; }
+.lx-note-b a { font-size: 12.5px; }
+@media (prefers-reduced-motion: reduce) { .lx-note-in { transition: none; } .lx-stars .on { animation: none; } .lx-mission .bar i { transition: none; } }

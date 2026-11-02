@@ -1,0 +1,62 @@
+/* play.css — the "play first" frame (lesson 0, capstones): missions above, the stage (scene + meters) beside a control
+   panel, game parts (clock, hour strip, events, tallies, operator's view) and the debrief that replaces the panel.
+   Markup is built by the lesson's JS with LX.H; class names: lx-play > lx-play-stage + lx-play-panel; lx-debrief. */
+.lx-play { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, 1fr); gap: 22px; align-items: start; }
+.lx-play-panel { display: grid; gap: 14px; }
+.lx-ghead { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.lx-gclock { font-family: var(--lx-f-mono); font-size: 28px; font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; color: var(--lx-ink); }
+.lx-gclock small { font-family: var(--lx-f-body); font-size: 13px; font-weight: 400; color: var(--lx-ink-3); margin-left: 8px; letter-spacing: 0; }
+.lx-hstrip { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 2px; }
+.lx-hstrip span { height: 10px; border-radius: 2px; background: var(--lx-surface-3); }
+.lx-hstrip span.ok { background: var(--lx-good); } .lx-hstrip span.short { background: var(--lx-bad); } .lx-hstrip span.over { background: var(--lx-warn); }
+.lx-hstrip span.now { box-shadow: 0 0 0 2px var(--lx-ink); }
+.lx-hstrip-l { display: flex; justify-content: space-between; font-family: var(--lx-f-mono); font-size: 11px; color: var(--lx-ink-3); margin-top: 3px; }
+.lx-events { display: grid; gap: 10px; }
+.lx-events:empty { display: none; }
+.lx-gctl { display: grid; gap: 14px; }
+.lx-gnext { width: 100%; min-height: 52px; font-size: 16.5px; }
+.lx-tallies { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lx-tally { background: var(--lx-surface-2); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.lx-tally span { display: block; font-size: 12px; color: var(--lx-ink-3); }
+.lx-tally b { font-family: var(--lx-f-mono); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--lx-ink); }
+.lx-event { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 11px; border: 1px solid var(--lx-line-2); background: var(--lx-surface-2); font-size: 15px; color: var(--lx-ink); }
+.lx-event .lx-ic { width: 20px; height: 20px; margin-top: 1px; color: var(--lx-ink-2); }
+.lx-event b { font-family: var(--lx-f-mono); }
+.lx-ecard { border: 1px solid var(--lx-ink); border-radius: 14px; padding: 14px; background: var(--lx-surface); display: grid; gap: 10px; }
+.lx-etime { font-family: var(--lx-f-mono); font-size: 13px; font-weight: 600; color: var(--lx-ink-3); }
+.lx-ecard .lx-link { justify-self: start; }
+.lx-ops { border-top: 1px solid var(--lx-line); padding-top: 6px; }
+.lx-ops > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px;
+  color: var(--lx-ink-2); min-height: 40px; }
+.lx-ops > summary::-webkit-details-marker { display: none; }
+.lx-ops > summary .lx-ic { width: 18px; height: 18px; }
+.lx-play-links { margin-top: 12px !important; font-size: 14px; color: var(--lx-ink-3); }
+.lx-play-links .lx-link { font-size: 14px; }
+.lx-debrief { display: grid; gap: 14px; }
+.lx-debrief .lx-notes { grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 8px; }
+.lx-debrief .lx-note-f, .lx-debrief .lx-note-b { min-height: 140px; padding: 10px; }
+@media (max-width: 860px) { .lx-debrief { margin-top: 4px; } }
+.lx-debrief:focus { outline: none; }
+.lx-deb-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.page-learn .lx-deb-head h3 { font-size: 20px; }
+.page-learn .lx-deb-notes { font-size: 16px; margin: 0; }
+.lx-debrief > .lx-btn { justify-self: start; }
+.lx-zip { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--lx-surface-2); }
+.lx-zip > .lx-ic { width: 28px; height: 28px; color: var(--lx-ink-2); }
+.lx-zip .wire { position: relative; height: 2px; background: var(--lx-line-2); margin-top: 12px; }
+.lx-zip .wire i { position: absolute; top: -4px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--lx-sun);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lx-sun) 35%, transparent); animation: lx-zip .5s ease-in forwards; }
+.lx-zip .wire b { position: absolute; left: 50%; top: -24px; transform: translateX(-50%); font-family: var(--lx-f-mono); font-size: 13px; white-space: nowrap; color: var(--lx-ink); }
+@keyframes lx-zip { from { left: 0; } to { left: calc(100% - 10px); } }
+@media (prefers-reduced-motion: reduce) { .lx-zip .wire i { animation: none; left: calc(100% - 10px); } }
+/* the no-JS list of ideas in the explain layer */
+dl.lx-ideas { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 15px; }
+dl.lx-ideas dt { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
+dl.lx-ideas dd { margin: 0; color: var(--lx-ink-2); }
+.lx-deepers { margin-top: 18px; }
+@media (max-width: 860px) { .lx-play { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) {
+  .lx-gclock { font-size: 24px; }
+  dl.lx-ideas { grid-template-columns: minmax(0, 1fr); }
+  .lx-tally { padding: 7px 8px; } .lx-tally b { font-size: 14.5px; }
+}

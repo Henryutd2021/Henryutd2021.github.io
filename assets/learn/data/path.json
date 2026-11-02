@@ -10,11 +10,13 @@
    "id": "foundations",
    "title": "Foundations",
    "level": "L1",
+   "slot": 1,
+   "icon": "bulb",
    "reader": "High-school students and curious readers",
    "math": "Arithmetic and reading a chart",
    "assumes": "Nothing. Start here.",
    "goal": "Explain how the power system works and reason with its numbers.",
-   "door": "New to energy",
+   "door": "Totally new to energy",
    "doord": "Start with a game: run a small town's power plants for a day, then find out what you just did.",
    "doorcta": "Start with lesson 0",
    "doorlink": "00-grid-operator.qmd"
@@ -23,6 +25,8 @@
    "id": "analyst",
    "title": "Analyst",
    "level": "L2",
+   "slot": 2,
+   "icon": "bars",
    "reader": "Undergraduates, career changers, and professionals from outside the power sector",
    "math": "Algebra and spreadsheets",
    "assumes": "Foundations, or starter lessons 0–6.",
@@ -36,16 +40,19 @@
    "id": "modeler",
    "title": "Modeler",
    "level": "L3",
+   "slot": 3,
+   "icon": "braces",
    "reader": "Upper-level undergraduates, graduate students and engineers",
    "math": "Programming and linear algebra (the math toolbox teaches what you need)",
    "assumes": "Analyst-level economics; the toolbox fills gaps in math and Python.",
    "goal": "Formulate, build, solve and critique an energy-system optimization model.",
-   "door": "I want to build models",
+   "door": "Ready to build models",
    "doord": "From a first linear program to capacity expansion, uncertainty and research practice.",
    "doorcta": "Go to the Modeler tier",
    "doorlink": "#modeler"
   }
  ],
+ "scales": [],
  "starter": [
   {
    "id": "00-grid-operator",
@@ -59,9 +66,14 @@
    "tier2": null,
    "tierLabel": "Foundations · L1",
    "level": "L1",
+   "slot": 1,
+   "slot2": null,
    "minutes": 15,
    "does": "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.",
    "outcome": "Say what balancing means and why cheap plants run first.",
+   "icon": "gauge",
+   "form": "play",
+   "scales": [],
    "teaches": [
     "balancing supply and demand",
     "power and energy",
@@ -95,9 +107,14 @@
    "tier2": null,
    "tierLabel": "Foundations · L1",
    "level": "L1",
+   "slot": 1,
+   "slot2": null,
    "minutes": 15,
    "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
    "outcome": "Convert between units and make quick estimates.",
+   "icon": "bolt",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-1",
@@ -134,9 +151,14 @@
    "tier2": null,
    "tierLabel": "Foundations · L1",
    "level": "L1",
+   "slot": 1,
+   "slot2": null,
    "minutes": 15,
    "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
    "outcome": "Read a demand curve and explain its peaks.",
+   "icon": "curve",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-2",
@@ -183,9 +205,14 @@
    "tier2": null,
    "tierLabel": "Foundations · L1",
    "level": "L1",
+   "slot": 1,
+   "slot2": null,
    "minutes": 15,
    "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
    "outcome": "Explain frequency, reserves and why outages can cascade.",
+   "icon": "wave",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-3",
@@ -232,9 +259,14 @@
    "tier2": "analyst",
    "tierLabel": "Foundations to Analyst · L1–L2",
    "level": "L1",
+   "slot": 1,
+   "slot2": 2,
    "minutes": 15,
    "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
    "outcome": "Explain forecast error and why operators hold reserves.",
+   "icon": "cloud",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-4",
@@ -290,9 +322,14 @@
    "tier2": null,
    "tierLabel": "Foundations · L1",
    "level": "L1",
+   "slot": 1,
+   "slot2": null,
    "minutes": 15,
    "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
    "outcome": "Turn a plant's size in MW into the energy it makes in a year.",
+   "icon": "turbine",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-5",
@@ -339,9 +376,14 @@
    "tier2": null,
    "tierLabel": "Foundations · L1",
    "level": "L1",
+   "slot": 1,
+   "slot2": null,
    "minutes": 15,
    "does": "Sort technologies into the jobs they do, with key numbers for each.",
    "outcome": "Compare technologies by the job they do.",
+   "icon": "blocks",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-6",
@@ -397,9 +439,14 @@
    "tier2": null,
    "tierLabel": "Analyst · L2",
    "level": "L2",
+   "slot": 2,
+   "slot2": null,
    "minutes": 15,
    "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
    "outcome": "Compute a levelized cost of electricity and say what it leaves out.",
+   "icon": "coin",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-7",
@@ -446,9 +493,14 @@
    "tier2": null,
    "tierLabel": "Analyst · L2",
    "level": "L2",
+   "slot": 2,
+   "slot2": null,
    "minutes": 15,
    "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
    "outcome": "Explain wholesale prices and price spikes.",
+   "icon": "stairs",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-8",
@@ -504,9 +556,14 @@
    "tier2": null,
    "tierLabel": "Analyst · L2",
    "level": "L2",
+   "slot": 2,
+   "slot2": null,
    "minutes": 15,
    "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
    "outcome": "Size and value simple storage.",
+   "icon": "battery",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-9",
@@ -562,9 +619,14 @@
    "tier2": null,
    "tierLabel": "Analyst · L2",
    "level": "L2",
+   "slot": 2,
+   "slot2": null,
    "minutes": 15,
    "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
    "outcome": "Formulate a small optimization problem in words and symbols.",
+   "icon": "pencil",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-10",
@@ -620,9 +682,14 @@
    "tier2": null,
    "tierLabel": "Modeler · L3",
    "level": "L3",
+   "slot": 3,
+   "slot2": null,
    "minutes": 15,
    "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
    "outcome": "Solve, interpret and check a linear program.",
+   "icon": "target",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-11",
@@ -669,9 +736,14 @@
    "tier2": null,
    "tierLabel": "Analyst · L2",
    "level": "L2",
+   "slot": 2,
+   "slot2": null,
    "minutes": 15,
    "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
    "outcome": "Reason about trade-offs between goals.",
+   "icon": "frontier",
+   "form": "cards",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-12",
@@ -718,9 +790,14 @@
    "tier2": "analyst",
    "tierLabel": "Modeler to Analyst · L3–L2",
    "level": "L3",
+   "slot": 3,
+   "slot2": 2,
    "minutes": 20,
    "does": "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap.",
    "outcome": "Reason about planning trade-offs and know what real planning models do.",
+   "icon": "blueprint",
+   "form": "play",
+   "scales": [],
    "teaches": [],
    "lab": null,
    "href": "index.html#lesson-13",
@@ -763,224 +840,256 @@
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "How a thermal power plant works",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Wind power",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Solar power",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Nuclear power basics",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Hydro and geothermal power",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Batteries and hydrogen basics",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Transmission and distribution",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "foundations",
    "code": null,
    "title": "Large loads and data centers",
    "ready": false,
-   "href": "index.html#foundations"
+   "href": "index.html#foundations",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Money over time: discounting and net present value",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Techno-economic analysis of a project: cash flows, returns, sensitivity",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Markets and institutions: grid operators, FERC and state commissions",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Capacity, reserves and resource adequacy",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Policy instruments: tax credits, carbon prices, large-load tariffs",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Emissions accounting: average or marginal, annual or hourly",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Reading energy data from EIA",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "Scenarios and sensitivity in a spreadsheet",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "analyst",
    "code": null,
    "title": "How to read an energy study critically",
    "ready": false,
-   "href": "index.html#analyst"
+   "href": "index.html#analyst",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M1",
    "title": "Optimization in one page: variables, objective, constraints",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M2",
    "title": "Linear programming and economic dispatch; prices as shadow prices",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M3",
    "title": "Integer decisions: unit commitment",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M4",
    "title": "Networks: power flow, congestion and locational prices",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M5",
    "title": "Capacity expansion: investment plus operation",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M6",
    "title": "Storage and coupled systems: power, hydrogen and heat",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M7",
    "title": "Multiple objectives: cost against emissions",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M8",
    "title": "Uncertainty I: scenarios, sensitivity and Monte Carlo",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M9",
    "title": "Uncertainty II: stochastic and robust optimization",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M10",
    "title": "Surrogate models and uncertainty quantification",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M11",
    "title": "Techno-economic analysis inside models",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M12",
    "title": "Emissions accounting in models: hourly matching",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M13",
    "title": "Modelling practice: data, validation, reproducibility, open tools",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   },
   {
    "tier": "modeler",
    "code": "M14",
    "title": "From a model to a research question",
    "ready": false,
-   "href": "index.html#modeler"
+   "href": "index.html#modeler",
+   "scales": []
   }
  ],
  "toolbox": [

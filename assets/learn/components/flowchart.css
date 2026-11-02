@@ -1,0 +1,17 @@
+/* flowchart.css — decision flowchart with traced cases (flowchart.js). */
+.lx-flow svg { display: block; width: 100%; height: auto; }
+.fnode rect, .fnode polygon { fill: var(--lx-surface); stroke: var(--lx-line-2); stroke-width: 1.5; transition: fill .25s, stroke .25s; }
+.fnode text { font-family: var(--lx-f-display); font-size: 13px; font-weight: 500; fill: var(--lx-ink); }
+.fnode.q text { font-size: 12.5px; }
+.fnode text.sub { font-family: var(--lx-f-body); font-weight: 400; font-size: 11.5px; fill: var(--lx-ink-3); }
+.fnode.on rect, .fnode.on polygon { fill: var(--lx-ink); stroke: var(--lx-ink); }
+.fnode.on text { fill: var(--lx-bg); }
+.fedge path { fill: none; stroke: var(--lx-line-2); stroke-width: 1.6; }
+.fedge text { font-family: var(--lx-f-mono); font-size: 11px; fill: var(--lx-ink-3); }
+.fedge.on path { stroke: var(--lx-ink); stroke-width: 2.4; }
+.fedge.on text { fill: var(--lx-ink); font-weight: 600; }
+.lx-ftrace { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lx-choice.small { min-height: 42px; font-size: 14px; padding: 6px 12px; }
+.lx-ftrace-out { font-size: 14.5px; color: var(--lx-ink-2); min-height: 44px; }
+.lx-ftrace-out b { font-family: var(--lx-f-mono); color: var(--lx-ink); }
+@media (prefers-reduced-motion: reduce) { .fnode rect, .fnode polygon { transition: none; } }

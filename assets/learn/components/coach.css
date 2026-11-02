@@ -1,0 +1,15 @@
+/* coach.css — coach tour ring and tip (coach.js). */
+.lx-coach { position: absolute; z-index: 8; max-width: 290px; background: var(--lx-ink); color: var(--lx-bg); border-radius: 12px; padding: 12px 14px;
+  box-shadow: var(--lx-shadow-lg); font-size: 15px; line-height: 1.4; display: grid; gap: 10px; }
+.lx-coach::before { content: ""; position: absolute; width: 12px; height: 12px; background: var(--lx-ink); transform: rotate(45deg); left: var(--ax, 30px); }
+.lx-coach.below::before { top: -6px; } .lx-coach.above::before { bottom: -6px; }
+.lx-coach .cn { font-family: var(--lx-f-mono); font-size: 12px; opacity: .75; }
+.lx-coach .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.lx-coach button { min-height: 36px; border-radius: 8px; border: 0; padding: 0 12px; font-family: var(--lx-f-display); font-weight: 500; font-size: 14px;
+  cursor: pointer; background: var(--lx-bg); color: var(--lx-ink); }
+.lx-coach button.skip { background: transparent; color: var(--lx-bg); opacity: .85; text-decoration: underline; padding: 0; }
+.lx-coach button:focus-visible { outline: 3px solid var(--lx-accent-soft); outline-offset: 2px; }
+.lx-coach .lx-term { color: inherit; }
+.lx-coach-ring { position: absolute; z-index: 7; border-radius: 14px; pointer-events: none; transition: all .25s ease;
+  box-shadow: 0 0 0 3px var(--lx-accent), 0 0 0 9999px color-mix(in srgb, var(--lx-bg) 55%, transparent); }
+@media (prefers-reduced-motion: reduce) { .lx-coach-ring { transition: none; } }

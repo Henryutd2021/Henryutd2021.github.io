@@ -1,0 +1,14 @@
+/* predict.css — predict buttons, the ordered-scale guess, and reveal lines (predict.js). */
+.lx-predictbox, .lx-guess { display: grid; gap: 10px; }
+.lx-q { font-family: var(--lx-f-display); font-weight: 500; font-size: 18px; line-height: 1.35; color: var(--lx-ink); }
+.lx-predict-out { display: grid; gap: 10px; }
+.lx-predict-out:empty { display: none; }
+.lx-guess-scale input { width: 100%; accent-color: var(--lx-ink); height: 32px; margin: 0; }
+.lx-guess-ticks { display: grid; font-size: 13px; color: var(--lx-ink-3); text-align: center; gap: 2px; }
+.lx-guess-ticks span:first-child { text-align: left; } .lx-guess-ticks span:last-child { text-align: right; }
+.lx-guess-ticks span.sel { color: var(--lx-ink); font-weight: 700; }
+.lx-guess-ticks span.ans { color: var(--lx-good); font-weight: 700; }
+.lx-predict { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 16px 18px; display: grid; gap: 10px; }
+.lx-predict .lx-choices { margin: 0; padding-left: 1.2rem; }
+.lx-reveal { display: grid; gap: 6px; }
+.lx-reveal-guess { font-size: 14.5px; color: var(--lx-ink-2); }

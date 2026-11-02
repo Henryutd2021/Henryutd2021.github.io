@@ -1,0 +1,26 @@
+/* controls.css — LX.Slider (controls.js). */
+.lx-ctl { display: grid; gap: 6px; }
+.lx-ctl-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.lx-ctl-top label { display: flex; align-items: center; gap: 8px; font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); margin: 0; }
+.lx-ctl-top label i { width: 11px; height: 11px; border-radius: 3px; background: var(--c); }
+.lx-ctl-top output { font-family: var(--lx-f-mono); font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--lx-ink); }
+.lx-ctl-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; align-items: center; }
+.lx-ctl-row button { height: 44px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink);
+  font-family: var(--lx-f-mono); font-size: 20px; cursor: pointer; padding: 0; }
+.lx-ctl-row button:disabled { opacity: .4; cursor: not-allowed; }
+.lx-ctl-track { position: relative; height: 44px; }
+.lx-ctl-rail { position: absolute; left: 0; right: 0; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px;
+  background: repeating-linear-gradient(135deg, var(--lx-surface-3) 0 4px, var(--lx-surface-2) 4px 8px); }
+.lx-ctl-band { position: absolute; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px; background: color-mix(in srgb, var(--c) 30%, var(--lx-surface)); transition: left .25s, width .25s; }
+.lx-ctl-fill { position: absolute; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px; left: 0; background: var(--c); }
+.lx-ctl input[type="range"] { position: absolute; inset: 0; width: 100%; height: 44px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.lx-ctl input[type="range"]::-webkit-slider-runnable-track { height: 44px; background: transparent; }
+.lx-ctl input[type="range"]::-moz-range-track { height: 44px; background: transparent; }
+.lx-ctl input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: 9px; border-radius: 50%; background: var(--lx-surface);
+  border: 3px solid var(--c); box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
+.lx-ctl input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--lx-surface); border: 3px solid var(--c); }
+.lx-ctl input[type="range"]:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; border-radius: 10px; }
+.lx-ctl-hint { font-size: 13px; color: var(--lx-ink-3); min-height: 1.2em; }
+.lx-ctl-hint.bump { color: var(--lx-warn); animation: lx-bump .45s ease; }
+@keyframes lx-bump { 30% { transform: translateX(4px); } 60% { transform: translateX(-3px); } }
+@media (prefers-reduced-motion: reduce) { .lx-ctl-hint.bump { animation: none; } .lx-ctl-band { transition: none; } }
