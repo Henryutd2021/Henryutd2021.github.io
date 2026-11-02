@@ -1,6 +1,6 @@
 ---
 title: "Projects"
-subtitle: "Research and industry projects, grouped by theme"
+subtitle: "Case studies of research and industry projects, grouped by theme"
 description: "Research and industry projects of Honglin Li: hydrogen systems, nuclear power and data centers, carbon-aware grids, microgrids and supply chains, wind uncertainty, and industry."
 title-block-banner: true
 page-layout: full
@@ -19,7 +19,7 @@ listing:
 
 ```{=html}
 <div class="pg">
-<p class="pg-lede">Each project page follows the same order: research question, my contribution, method, key findings with their boundary conditions, outputs, and reproducibility status. Research projects show published or accepted work; the industry project is summarized at the level of methods.</p>
+<p class="pg-lede">Each project page is a case study: the research question, the key insight, my contribution, the hard parts and how I approached them, the design choices, and the findings with their boundary conditions. Several pages include a small interactive model of the main mechanism. Published and accepted work is shown in full; upcoming work is described in broad terms; the industry project is summarized at the level of methods.</p>
 <div class="filter-bar proj-filter" hidden>
 <div class="ftabs" role="group" aria-label="Filter projects by theme"></div>
 </div>

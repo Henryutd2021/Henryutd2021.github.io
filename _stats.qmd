@@ -2,7 +2,7 @@
      site/data/citations.json); include it with Quarto's include shortcode; styles: .pub-stats in assets/pubs.css -->
 ```{=html}
 <ul class="pub-stats" aria-label="Publication statistics">
-<li class="pt-journal"><a href="publications.html#journal"><span class="ps-n">7</span><span class="ps-l"><span class="dot" aria-hidden="true"></span>Journal articles</span></a></li>
+<li class="pt-journal"><a href="publications.html#journal"><span class="ps-n">8</span><span class="ps-l"><span class="dot" aria-hidden="true"></span>Journal articles</span></a></li>
 <li class="pt-conference"><a href="publications.html#conference"><span class="ps-n">10</span><span class="ps-l"><span class="dot" aria-hidden="true"></span>Conference papers</span></a></li>
 <li class="pt-thesis"><a href="publications.html#thesis"><span class="ps-n">2</span><span class="ps-l"><span class="dot" aria-hidden="true"></span>Theses</span></a></li>
 <li class="ps-cites"><a href="publications.html"><span class="ps-n">121</span><span class="ps-l"><i class="bi bi-quote" aria-hidden="true"></i>Citations</span><span class="ps-src">Google Scholar, Oct 30, 2026 · h-index 7</span></a></li>

@@ -2,7 +2,7 @@
 title: "Industry internship at FM: resilience and operations modeling"
 subtitle: "Internship, FM (August 2024 – January 2025)"
 description: "How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?"
-order: 11
+order: 13
 categories: ["Industry"]
 themekey: "industry"
 themelabel: "Industry"
@@ -22,6 +22,10 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/fm-global-internship.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>Industry intern</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Resilient microgrid sizing</li><li>Discrete-event simulation</li><li>Maintenance planning</li><li>August 2024 – January 2025</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">How should solar PV, battery storage and backup generation be sized for an industrial research campus to meet demand through grid outages, and how do equipment failures and maintenance affect a battery production line and a wind farm?</p>
@@ -29,6 +33,12 @@ toc: false
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
 <p>Intern. Built the microgrid sizing model and the production-line simulation, and proposed the wind-farm maintenance framework.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Three industrial questions, outage resilience, production-line reliability and wind-farm maintenance, called for different modeling tools.</p><p class="ap-did"><span class="ap-k">What I did</span>I built a techno-economic sizing model for the campus microgrid and a discrete-event simulation of the battery production line, and proposed an optimization-based maintenance framework for the wind farm.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Each method fits its question: meeting demand through grid outages, and how failures and maintenance affect a production line.</p></li>
+</ol>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>

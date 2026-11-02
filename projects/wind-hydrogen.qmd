@@ -2,7 +2,7 @@
 title: "Co-located wind and hydrogen energy systems"
 subtitle: "Journal of Mechanical Design (2024, featured article), first author; TORQUE 2022, first author"
 description: "How do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?"
-order: 6
+order: 5
 categories: ["Hydrogen systems"]
 themekey: "hydrogen"
 themelabel: "Hydrogen systems"
@@ -22,13 +22,45 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/wind-hydrogen.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>253-MW wind farm, Texas</li><li>8,760 hours</li><li>Four system configurations</li><li>MILP (REopt extension)</li><li>Four ISO wind profiles</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">How do electrolyzers, hydrogen storage and fuel cells change the cost, curtailment and firm output of a grid-connected wind farm?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">A higher hydrogen price raised hydrogen&#x27;s levelized cost but lowered system cost</p>
+<p>As the hydrogen price rose, the optimizer built a larger electrolyzer to use more surplus wind. The larger unit ran at lower utilization, so each kilogram carried more capital and the levelized cost of hydrogen rose, while hydrogen revenue lowered total system cost. The cost per kilogram and the system&#x27;s cost moved in opposite directions.</p>
+</section>
+<section class="proj-sec proj-explainer" id="explainer" aria-labelledby="h-explainer">
+<h2 id="h-explainer"><i class="bi bi-sliders" aria-hidden="true"></i>Why can a costlier kilogram mean a cheaper system?</h2>
+<div class="explainer" data-explainer="wind-hydrogen">
+<p class="ex-fallback">A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system&#x27;s cost move in opposite directions.</p>
+</div>
+<p class="ex-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Illustrative model with stylized numbers: it shows the mechanism described in the paper, not the study&#x27;s data or results.</p>
+</section>
+<script src="../assets/explainers/common.js" defer></script>
+<script src="../assets/explainers/wind-hydrogen.js" defer></script>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
 <p>First author. Extended NREL&#x27;s REopt optimization model with hydrogen components and ran the analysis.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>NREL&#x27;s REopt optimization model had no electrolyzer, hydrogen tank or fuel cell.</p><p class="ap-did"><span class="ap-k">What I did</span>I extended REopt with these three components, with their costs, efficiencies, hydrogen sales and constraints, so it sizes and dispatches wind, battery and hydrogen equipment together.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Four system configurations could then be compared in one mixed-integer model.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>A wind farm&#x27;s value to the grid depends on firm output, not only on the energy it sells.</p><p class="ap-did"><span class="ap-k">What I did</span>I set the model to deliver the largest stabilized output in every hour at the lowest life-cycle cost, and compared battery, hydrogen and hybrid storage on that basis.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Hybrid hydrogen and battery storage delivered the highest stabilized output of the four configurations.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Results from one site and one weather year may not hold elsewhere, or as equipment costs fall.</p><p class="ap-did"><span class="ap-k">What I did</span>I repeated the analysis with wind profiles from four ISO regions and with projected component costs to 2050.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The ERCOT site had the lowest costs but the highest curtailment, and falling costs led to larger electrolyzers and less curtailment.</p></li>
+</ol>
+</section>
+<section class="proj-sec" id="choices" aria-labelledby="h-choices">
+<h2 id="h-choices"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
+<dl class="choices">
+<div class="choice"><dt>Fix the wind farm at its planned 253 MW</dt><dd><span class="ch-alt">Alternatives considered: optimizing wind capacity together with storage</span>The study asks how storage and hydrogen should be added to a planned farm near Snyder, Texas, so only those components are sized.</dd></div>
+</dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -44,6 +76,10 @@ toc: false
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
 <p>Cost assumptions date from 2020–2023 and predate final federal hydrogen credit rules.</p>
+</section>
+<section class="proj-next" id="led-to" aria-labelledby="h-next">
+<h2 id="h-next"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>
+<p>I reused the extended model and added a concentrated-solar module to compare solar-hydrogen designs. <a class="next-link" href="solar-hydrogen.html">Co-located solar and hydrogen plants<i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
 </section>
 <section class="proj-sec" aria-labelledby="h-pubs">
 <h2 id="h-pubs"><i class="bi bi-journal-text" aria-hidden="true"></i>Publications</h2>
@@ -132,7 +168,7 @@ toc: false
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<a class="pager-link prev" href="data-center-delay-economics.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">The cost of delayed energization for AI data centers</span></a>
+<a class="pager-link prev" href="data-center-delay-economics.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">The cost of delayed grid energization for AI data centers</span></a>
 <a class="pager-link next" href="solar-hydrogen.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Co-located solar and hydrogen plants</span></a>
 </nav>
 </article>

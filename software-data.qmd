@@ -23,7 +23,7 @@ Documented model frameworks associated with published and accepted research. Eac
 :::
 
 ::: {.sw-facts}
-[6]{.sf-n}[framework repositories]{.sf-l}
+[7]{.sf-n}[framework repositories]{.sf-l}
 
 [Python]{.sf-n}[3.10 or later, pip or conda]{.sf-l}
 
@@ -96,6 +96,34 @@ One repository per framework, each with the paper or papers it accompanies.
 
 ::: {.repo-grid}
 
+<!-- SMR cogeneration (website v2, 2026-11-02; published by Henry with scripts/henry_release_nuclear_dc_2026-11-02.sh) -->
+::: {.repo .theme-datacenter}
+::: {.repo-top}
+[<i class="bi bi-cpu" aria-hidden="true"></i>]{.repo-icon} [Nuclear & data centers]{.repo-theme} [Hourly MILP co-optimization]{.repo-type}
+:::
+
+### SMR cogeneration framework
+
+[Henryutd2021/smr-datacenter-cogeneration]{.repo-slug}
+
+A small modular reactor that supplies a data center with power and, through turbine steam extraction to an absorption chiller, with cooling: hourly co-optimization of reactor output, cooling and grid exchange, cost accounting and break-even metrics.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [Energy Conversion and Management (2026, accepted)](projects/nuclear-dc.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [linopy]{.chip} [HiGHS]{.chip} [Gurobi (optional)]{.chip}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/smr-datacenter-cogeneration){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
+
 <!-- CoDE -->
 ::: {.repo .theme-datacenter}
 ::: {.repo-top}
@@ -106,7 +134,7 @@ One repository per framework, each with the paper or papers it accompanies.
 
 [Henryutd2021/code-delayed-energization]{.repo-slug}
 
-The cost of delayed energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.
+The cost of delayed grid energization for AI data centers, kept in separate developer, ratepayer and social accounts, with the delay cost intensity and the break-even acceleration payment as metrics.
 
 ::: {.repo-papers}
 [Accompanies]{.label}

@@ -220,7 +220,8 @@ body.quarto-dark .tag-review { background: #422006; color: #fcd34d; }
 .proj-banner img { display: block; width: 100%; height: 100%; margin: 0; object-fit: cover; }
 .proj-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: clamp(2rem, 4.5vw, 3.75rem); align-items: start; }
 .proj-main { min-width: 0; }
-.proj-main > section + section, .proj-main > figure + section, .proj-main > section + figure { margin-top: 2.4rem; }
+.proj-main > * + *:not(script) { margin-top: 2.4rem; }   /* scripts of the explainer sit between sections */
+.proj-main > .proj-glance + * { margin-top: 1.1rem; }
 .proj-main p { margin: 0; font-size: 1.02rem; line-height: 1.75; }
 .proj-sec h2, .proj-q h2, .aside-card h2 { display: flex; align-items: center; gap: .6rem; margin: 0 0 .8rem; font-size: 1.22rem; font-weight: 700; letter-spacing: -.012em; color: var(--ink); }
 .proj-sec h2 .bi { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 8px; font-size: 1rem; color: var(--t-ink); background: var(--t-soft); border: 1px solid var(--t-line); }
@@ -292,3 +293,39 @@ ol.findings li::before { content: counter(finding); position: absolute; left: 1.
 }
 
 .pub-cite-src { margin: .6rem 0 0; font-size: .8rem; color: var(--muted); }
+
+/* ---------- website v2 case-study blocks (scripts/build_site.py case_blocks; 2026-11-02) ---------- */
+/* at a glance: role and scale/method tags above the question */
+.proj-glance { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; }
+.proj-main .glance-role { display: inline-flex; align-items: center; gap: .45rem; margin: 0; font-size: .9rem; font-weight: 600; color: var(--ink); }
+.glance-role .bi { color: var(--t-ink); }
+.glance-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.glance-tags li { padding: .18rem .6rem; border-radius: 999px; font-size: .8rem; color: var(--ink-2); background: var(--bg-2); border: 1px solid var(--line); }
+/* key insight: the one finding and its mechanism */
+.proj-insight { position: relative; padding: 1.35rem 1.6rem 1.45rem; border-radius: var(--r); background: var(--surface); border: 1px solid var(--t-line); box-shadow: var(--shadow); }
+.proj-insight h2 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .55rem; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--t-ink); }
+.proj-main .insight-title { margin: 0 0 .45rem; font-size: clamp(1.1rem, 1rem + .35vw, 1.25rem); font-weight: 650; line-height: 1.45; color: var(--ink); }
+/* how I approached it: challenge / what I did / why it mattered */
+ol.approach { display: grid; gap: .9rem; margin: 0; padding: 0; list-style: none; }
+.ap-card { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 0; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow-sm); overflow: hidden; }
+.proj-main .ap-card p { padding: .95rem 1.05rem 1rem; font-size: .94rem; line-height: 1.6; }
+.ap-card .ap-challenge { grid-column: 1 / -1; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+.ap-card .ap-why { border-left: 1px solid var(--line); }
+.ap-k { display: block; margin-bottom: .3rem; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ap-did .ap-k { color: var(--t-ink); }
+/* design choices */
+dl.choices { display: grid; gap: .75rem; margin: 0; }
+.choice { padding: .95rem 1.15rem 1rem; border-left: 3px solid var(--t-line); background: var(--bg-2); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.choice dt { font-weight: 650; color: var(--ink); line-height: 1.5; }
+.choice dd { margin: .3rem 0 0; font-size: .95rem; line-height: 1.65; color: var(--ink-2); }
+.ch-alt { display: block; margin-bottom: .25rem; font-size: .85rem; color: var(--muted); }
+/* what it led to */
+.proj-next { padding: 1.1rem 1.35rem; border: 1px dashed var(--t-line); border-radius: var(--r); }
+.proj-next h2 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .45rem; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--t-ink); }
+.proj-main .proj-next p { font-size: .98rem; }
+.next-link { display: inline-flex; align-items: center; gap: .35rem; font-weight: 600; margin-left: .25rem; }
+.proj-main .proj-status { margin-top: .8rem; }
+@media (max-width: 767.98px) {
+  .ap-card { grid-template-columns: 1fr; }
+  .ap-card .ap-why { border-left: 0; border-top: 1px solid var(--line); }
+}

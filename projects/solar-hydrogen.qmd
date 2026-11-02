@@ -2,7 +2,7 @@
 title: "Co-located solar and hydrogen plants"
 subtitle: "European Energy Market Conference (EEM 2023), first author"
 description: "Is concentrated solar power with thermal storage feeding high-temperature electrolysis more economic than photovoltaics feeding low-temperature electrolysis in West Texas?"
-order: 7
+order: 6
 categories: ["Hydrogen systems"]
 themekey: "hydrogen"
 themelabel: "Hydrogen systems"
@@ -22,13 +22,34 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/solar-hydrogen.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>115-MW solar plant</li><li>West Texas site</li><li>Three design cases</li><li>REopt linked to SAM</li><li>MILP sizing and dispatch</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">Is concentrated solar power with thermal storage feeding high-temperature electrolysis more economic than photovoltaics feeding low-temperature electrolysis in West Texas?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">With cheap thermal storage, a variable-power electrolyzer gave the lowest hydrogen cost</p>
+<p>Among the cases studied, concentrated solar power with thermal storage, running a high-temperature electrolyzer at variable power, gave the lowest levelized cost of hydrogen; holding the electrolyzer at constant power was the most expensive. The paper attributes the advantage of concentrated solar mainly to the low cost of thermal energy storage.</p>
+</section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
 <p>First author. Added a concentrated-solar module to the REopt-based model and ran the analysis.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>The REopt-based model had no concentrated solar power or high-temperature electrolysis.</p><p class="ap-did"><span class="ap-k">What I did</span>I simulated the solar field and tower with NREL&#x27;s System Advisor Model and linked it to REopt through PySAM, adding an electrolyzer whose heat and electricity needs are met from the plant&#x27;s output.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>One optimization could then size the electrolyzer and thermal storage and plan their dispatch in each case.</p></li>
+</ol>
+</section>
+<section class="proj-sec" id="choices" aria-labelledby="h-choices">
+<h2 id="h-choices"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
+<dl class="choices">
+<div class="choice"><dt>Run the photovoltaic case without a battery</dt><dd><span class="ch-alt">Alternatives considered: photovoltaics with battery storage</span>A battery would not be cost-effective when hydrogen can be stored downstream, and low-temperature electrolyzers tolerate fluctuating input better than high-temperature ones.</dd></div>
+</dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -43,6 +64,10 @@ toc: false
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
 <p>Single West Texas site; cost trajectories from NREL&#x27;s Annual Technology Baseline; conference-length study.</p>
+</section>
+<section class="proj-next" id="led-to" aria-labelledby="h-next">
+<h2 id="h-next"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>
+<p>The same plant-scale optimization next went offshore, linked to a simulation of wind-farm maintenance. <a class="next-link" href="offshore-wind-hydrogen-om.html">Intelligent operation and maintenance in offshore wind–hydrogen systems<i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
 </section>
 <section class="proj-sec" aria-labelledby="h-pubs">
 <h2 id="h-pubs"><i class="bi bi-journal-text" aria-hidden="true"></i>Publications</h2>

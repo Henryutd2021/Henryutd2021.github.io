@@ -129,7 +129,7 @@ body-classes: "page-inner page-folio page-cv"
 [[**Research Associate**]{.cv-r}]{.cv-role}
 :::
 
-- Led a techno-economic study of a BWRX-300 small modular reactor whose turbine-extracted steam drives absorption chillers, supplying a data center with both power and cooling; steam, cooling, and power were co-optimized hourly with ERCOT prices (first author, manuscript under review).
+- Led a techno-economic study of a BWRX-300 small modular reactor whose turbine-extracted steam drives absorption chillers, supplying a data center with both power and cooling; steam, cooling, and power were co-optimized hourly with ERCOT prices (first author; accepted in Energy Conversion and Management).
 - Mapped where SMR supply becomes competitive with grid supply, and how an output-based production credit shifts steam from cooling to generation.
 :::
 :::
@@ -300,8 +300,9 @@ Domain Knowledge
 - [Jun 2, 2022]{.cv-date} [*Optimal Planning of Co-Located Wind Energy and Hydrogen Plants: A Techno-Economic Analysis*]{.cv-lt} [TORQUE 2022, Netherlands]{.cv-ld}
 - [Oct 17, 2022]{.cv-date} [*Redesign Supply Chain for Transactive Energy Operations in Manufacturing-Microgrid-Climate Nexus*]{.cv-lt} [Annual INFORMS Conference 2022]{.cv-ld}
 - [Aug 20, 2023]{.cv-date} [*A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation*]{.cv-lt} [ASME 2023 IDETC/CIE]{.cv-ld}
-- [Oct 31, 2023]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2023 Conference]{.cv-ld}
-- [Nov 1, 2024]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2024 Conference]{.cv-ld}
+- [Oct 31, 2023]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2023 Conference, Denver, Colorado]{.cv-ld}
+- [Nov 1, 2024]{.cv-date} [*Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas*]{.cv-lt} [NAWEA/WindTech 2024 Conference, Rutgers University, New Brunswick, New Jersey]{.cv-ld}
+- [Oct 2026]{.cv-date} [*Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers*]{.cv-lt} [2026 North American Power Symposium (NAPS), Michigan Technological University, Houghton, Michigan]{.cv-ld}
 :::
 :::
 

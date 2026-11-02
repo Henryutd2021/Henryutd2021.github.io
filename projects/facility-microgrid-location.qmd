@@ -2,7 +2,7 @@
 title: "Supply chains with on-site microgrids and transactive energy"
 subtitle: "Applied Mathematical Modelling (2023) and IEEE SEGRE 2023, first author; Journal of the Operational Research Society (2022), second author"
 description: "Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?"
-order: 9
+order: 11
 categories: ["Microgrids & supply chains"]
 themekey: "microgrid"
 themelabel: "Microgrids & supply chains"
@@ -22,13 +22,29 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/facility-microgrid-location.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author (AMM, SEGRE)</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Multi-tier supply chain</li><li>On-site wind, solar, storage</li><li>Hourly grid buying and selling</li><li>52 weeks of 168 hours</li><li>Mixed-integer location model</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">Where should a manufacturing supply chain place its facilities, and how much on-site wind, solar and storage should each facility install when facilities can trade energy with the grid?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">With on-site renewables, wind and sun become part of the siting decision</p>
+<p>When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site&#x27;s renewable resource affects its operating cost. The model then weighs transport cost against resource quality, and storage became worthwhile under high peak prices or capped grid imports.</p>
+</section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
 <p>First author of the location-allocation papers (AMM, SEGRE). Second author of the JORS paper, for which I built the optimization models and the case-study analyses.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Where a facility opens decides its wind and solar resource, while transport, production and energy costs depend on the same decisions.</p><p class="ap-did"><span class="ap-k">What I did</span>With my co-authors, I developed a mixed-integer model that opens factories and warehouses, routes products and sizes each open site&#x27;s wind, solar and storage, with an hourly energy balance and grid trade.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Solving these together showed that facility siting trades transport cost against renewable resource quality.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Weekly store demand is uncertain, yet the network has to meet it reliably.</p><p class="ap-did"><span class="ap-k">What I did</span>I modeled demand as a chance constraint with a set service level, written as its deterministic equivalent.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The model stays a mixed-integer linear program while holding the chance of a stock-out to the chosen level.</p></li>
+</ol>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -150,7 +166,7 @@ toc: false
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<a class="pager-link prev" href="offshore-wind-hydrogen-om.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Intelligent operation and maintenance in offshore wind–hydrogen systems</span></a>
+<a class="pager-link prev" href="ghg.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Emission-intensity-informed load regulation for grid decarbonization</span></a>
 <a class="pager-link next" href="uq-mfgpr.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Multi-fidelity Gaussian processes for wind power curves</span></a>
 </nav>
 </article>

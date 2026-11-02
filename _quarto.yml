@@ -14,6 +14,7 @@ project:
   resources:
     - images/
     - files/
+    - assets/explainers/
 
 website:
   title: "Honglin Li"
@@ -21,7 +22,7 @@ website:
   description: "Energy systems optimization and techno-economic analysis"
   favicon: images/favicon.svg
   open-graph: true
-  image: images/profile.jpg
+  image: images/profile-square.jpg
   navbar:
     left:
       - href: index.qmd
@@ -58,7 +59,7 @@ format:
     theme:
       light: [cosmo, theme-light.scss]
       dark: [darkly, theme-dark.scss]
-    css: [assets/base.css, assets/home.css, assets/pubs.css, assets/pages.css, assets/map.css]
+    css: [assets/base.css, assets/home.css, assets/pubs.css, assets/pages.css, assets/map.css, assets/explainers.css]
     include-in-header:
       text: |
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">

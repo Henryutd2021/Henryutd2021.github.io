@@ -1,8 +1,8 @@
 ---
-title: "The cost of delayed energization for AI data centers"
+title: "The cost of delayed grid energization for AI data centers"
 subtitle: "IEEE North American Power Symposium (NAPS 2026), first author; accepted"
 description: "What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?"
-order: 5
+order: 4
 categories: ["Nuclear & data centers"]
 themekey: "datacenter"
 themelabel: "Nuclear & data centers"
@@ -22,13 +22,36 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/data-center-delay-economics.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Present-value framework</li><li>Developer, ratepayer, social ledgers</li><li>300 MW-IT case</li><li>Latin hypercube screening</li><li>Staged service, bridge power</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">What does it cost when a large AI data center must wait for grid energization, and how does the delay affect the developer, electricity ratepayers and society?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">The cost of delayed grid energization depends on who is counting</p>
+<p>A late grid connection costs the developer lost margin and carrying costs; ratepayers face utility carrying and stranding costs; society bears external costs. I keep these present-value accounts separate. In the study, a 36-month delay for a 300 MW-IT facility cost the developer on the order of $0.7 billion, while ratepayer exposure depended strongly on large-load tariff design.</p>
+</section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
-<p>First author. Developed the framework, model and analysis with Buxin She.</p>
+<p>First author. Developed the framework, model and analysis with my co-author.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Delay costs fall on different parties, and a single total hides who pays.</p><p class="ap-did"><span class="ap-k">What I did</span>I priced the delay in three separate present-value ledgers (developer, utility ratepayers and society) with a net-benefit test that states when they may be combined.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>An acceleration option can then be judged against what it saves each party and what it costs.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Delay costs of projects with different sizes and waits are hard to compare.</p><p class="ap-did"><span class="ap-k">What I did</span>I defined two metrics: a delay cost intensity per MW-month, and a break-even acceleration payment for options that shorten the wait.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>They make results comparable across project sizes, delays and mitigation options such as staged service or bridge power.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Inputs are uncertain, and the length of a delay and whether a project goes ahead may be linked.</p><p class="ap-did"><span class="ap-k">What I did</span>I screened inputs with Latin hypercube sampling and rank correlations, and stress-tested the dependence between delay and realization and the large-load tariff.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>The parameters are illustrative, so the study reports which inputs move the result, not a single forecast.</p></li>
+</ol>
+</section>
+<section class="proj-sec" id="choices" aria-labelledby="h-choices">
+<h2 id="h-choices"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
+<dl class="choices">
+<div class="choice"><dt>Treat the delay as given</dt><dd><span class="ch-alt">Alternatives considered: modeling the interconnection process that causes it</span>The framework prices the consequences of late service; why service is late, and network feasibility, are outside its scope.</dd></div>
+</dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -52,7 +75,7 @@ toc: false
 <li class="pub" data-type="conference" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-conference">NAPS 2026</span></div>
 <div class="pub-main">
-<div class="pub-title">Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers</div>
+<div class="pub-title">Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers</div>
 <div class="pub-authors"><span class="me">H. Li</span>, B. She</div>
 <div class="pub-venue"><em>2026 North American Power Symposium (NAPS)</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
 <div class="pub-links">
@@ -62,7 +85,7 @@ toc: false
 <div class="pub-bib" id="bib-li2026code" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
 <pre><code>@inproceedings{li2026code,
-  title     = {Quantifying the Cost of Delayed Energization ({CoDE}) for {AI} Data Centers},
+  title     = {Quantifying the Cost of Delayed Grid Energization ({CoDE}) for {AI} Data Centers},
   author    = {Li, Honglin and She, Buxin},
   booktitle = {2026 North American Power Symposium (NAPS)},
   year      = {2026}
@@ -88,7 +111,7 @@ toc: false
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<a class="pager-link prev" href="smr-dc.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Small modular reactors for data centers</span></a>
+<a class="pager-link prev" href="smr-dc-national.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Data-center demand and the commercialization of small modular reactors</span></a>
 <a class="pager-link next" href="wind-hydrogen.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Co-located wind and hydrogen energy systems</span></a>
 </nav>
 </article>

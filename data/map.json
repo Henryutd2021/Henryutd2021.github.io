@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-30",
+ "generated": "2026-11-02",
  "note": "Built by scripts/build_map.py from OpenAlex (institutions, geo), Crossref (event locations), the publication list and the public CV. Institutions only; no people's names.",
  "institutions": [
   {
@@ -23,8 +23,8 @@
     {
      "title": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads",
      "year": 2026,
-     "doi": "10.48550/arxiv.2608.10999",
-     "status": "under review"
+     "doi": null,
+     "status": "accepted"
     },
     {
      "title": "The role of small modular reactors in powering data centers for a sustainable digital economy",
@@ -114,7 +114,7 @@
      "status": "accepted"
     },
     {
-     "title": "Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers",
+     "title": "Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers",
      "year": 2026,
      "doi": null,
      "status": "accepted"
@@ -122,8 +122,8 @@
     {
      "title": "Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads",
      "year": 2026,
-     "doi": "10.48550/arxiv.2608.10999",
-     "status": "under review"
+     "doi": null,
+     "status": "accepted"
     }
    ],
    "count": 3
@@ -337,6 +337,39 @@
    "title": "A Multi-fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation",
    "date": "2023-08",
    "source": "Crossref event location of 10.1115/detc2023-114762"
+  },
+  {
+   "city": "Denver",
+   "region": "Colorado",
+   "country": "United States",
+   "lat": 39.7392,
+   "lon": -104.9903,
+   "event": "NAWEA/WindTech 2023",
+   "title": "Economic Feasibility and Decarbonization Potential of Hybrid Wind and Hydrogen Systems in Texas",
+   "date": "2023-10",
+   "source": "city stated in the CV"
+  },
+  {
+   "city": "New Brunswick",
+   "region": "New Jersey",
+   "country": "United States",
+   "lat": 40.4862,
+   "lon": -74.4518,
+   "event": "NAWEA/WindTech 2024",
+   "title": "Economic Feasibility and Decarbonization Potential of Hybrid Renewables and Hydrogen Systems in Texas",
+   "date": "2024-11",
+   "source": "city stated in the CV"
+  },
+  {
+   "city": "Houghton",
+   "region": "Michigan",
+   "country": "United States",
+   "lat": 47.1211,
+   "lon": -88.5694,
+   "event": "IEEE NAPS 2026",
+   "title": "Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers",
+   "date": "2026-10",
+   "source": "city stated in the CV"
   }
  ],
  "dropped_institutions": [],
@@ -367,16 +400,6 @@
   {
    "event": "Annual INFORMS Conference 2022",
    "date": "2022-10",
-   "reason": "no city stated in the CV, and no publication in the bib for this talk"
-  },
-  {
-   "event": "NAWEA/WindTech 2023 Conference",
-   "date": "2023-10",
-   "reason": "no city stated in the CV, and no publication in the bib for this talk"
-  },
-  {
-   "event": "NAWEA/WindTech 2024 Conference",
-   "date": "2024-11",
    "reason": "no city stated in the CV, and no publication in the bib for this talk"
   }
  ]

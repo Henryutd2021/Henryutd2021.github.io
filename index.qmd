@@ -4,7 +4,7 @@ page-layout: custom
 toc: false
 anchor-sections: false
 description: "Honglin Li, Ph.D. — energy systems researcher: optimization and techno-economic analysis of low-carbon energy systems."
-image: images/profile.jpg
+image: images/profile-square.jpg
 ---
 
 <!-- About (home) page — third redesign, 2026-10-30: al-folio "about" layout with Hugo Academic touches.
@@ -26,27 +26,28 @@ image: images/profile.jpg
 
     <div class="about-bio">
       <p>I am an energy systems researcher and a Postdoctoral Fellow in the Department of Electrical and Computer Engineering
-        at Kansas State University. I build optimization and techno-economic models for the design, operation and long-term
-        planning of low-carbon energy systems, from hydrogen-integrated renewables and nuclear plants to firm power for AI data
-        centers. My current research focuses on firm, low-carbon power for large and fast-growing electricity loads such as
-        AI data centers, including small modular reactors.</p>
+        at Kansas State University. I build optimization and techno-economic models that show which low-carbon technology
+        mixes deliver reliable, affordable energy, and who pays for them. My doctoral research asked when flexibility, from
+        hydrogen or from demand, adds value to a low-carbon energy system, at the scale of a plant, a state and the U.S. nuclear
+        fleet. My current research asks how large new electricity loads such as AI data centers can be supplied with firm,
+        low-carbon power, including small modular reactors.</p>
       <p>My methods include linear, mixed-integer, nonlinear, stochastic and multi-objective optimization, combined with life
         cycle cost and carbon footprint analysis, simulation and reliability modeling. Applications span wind, solar and
         hydrogen systems, regional hydrogen networks, nuclear–hydrogen integration, small modular reactors for data centers,
         grid integration of data centers, and energy storage. My first-author papers appear in <em>Nature Communications</em>,
-        <em>Cell Reports Sustainability</em> and the <em>International Journal of Hydrogen Energy</em>.</p>
+        <em>Cell Reports Sustainability</em> and the <em>International Journal of Hydrogen Energy</em>, with one accepted in <em>Energy Conversion and Management</em>.</p>
     </div>
 
     <div class="about-cols">
       <div class="about-col">
         <h2 id="h-interests">Interests</h2>
         <ul class="icon-list" aria-labelledby="h-interests">
-          <li><span class="ico" aria-hidden="true"><i class="bi bi-sliders"></i></span><a href="research.html">Optimization and techno-economic analysis</a></li>
-          <li class="theme-datacenter"><span class="ico" aria-hidden="true"><i class="bi bi-cpu"></i></span><a href="research.html#nuclear-energy-and-ai-data-centers">Nuclear energy and AI data centers</a></li>
-          <li class="theme-hydrogen"><span class="ico" aria-hidden="true"><i class="bi bi-droplet"></i></span><a href="research.html#hydrogen-integrated-energy-systems">Hydrogen-integrated energy systems</a></li>
-          <li class="theme-carbon"><span class="ico" aria-hidden="true"><i class="bi bi-lightning-charge"></i></span><a href="research.html#carbon-aware-grid-operation">Carbon-aware grid operation</a></li>
-          <li class="theme-microgrid"><span class="ico" aria-hidden="true"><i class="bi bi-diagram-3"></i></span><a href="research.html#supply-chains-with-on-site-microgrids">Supply chains with on-site microgrids</a></li>
-          <li class="theme-wind"><span class="ico" aria-hidden="true"><i class="bi bi-wind"></i></span><a href="research.html#wind-power-uncertainty">Wind power uncertainty</a></li>
+          <li class="theme-datacenter"><span class="ico" aria-hidden="true"><i class="bi bi-cpu"></i></span><a href="research.html#data-centers">Firm low-carbon power for AI data centers</a></li>
+          <li class="theme-hydrogen"><span class="ico" aria-hidden="true"><i class="bi bi-droplet"></i></span><a href="research.html#flexibility">Hydrogen and flexibility, from plant to nation</a></li>
+          <li><span class="ico" aria-hidden="true"><i class="bi bi-sliders"></i></span><a href="research.html#methods">Optimization and techno-economic analysis</a></li>
+          <li class="theme-carbon"><span class="ico" aria-hidden="true"><i class="bi bi-lightning-charge"></i></span><a href="research.html#supporting">Carbon-aware electricity demand</a></li>
+          <li class="theme-microgrid"><span class="ico" aria-hidden="true"><i class="bi bi-diagram-3"></i></span><a href="research.html#supporting">Supply chains with on-site microgrids</a></li>
+          <li class="theme-wind"><span class="ico" aria-hidden="true"><i class="bi bi-wind"></i></span><a href="research.html#supporting">Wind power uncertainty</a></li>
         </ul>
       </div>
       <div class="about-col">
@@ -65,7 +66,7 @@ image: images/profile.jpg
 
   <div class="about-side">
     <figure class="about-photo">
-      <img src="images/profile.jpg" alt="Portrait of Honglin Li" width="600" height="600">
+      <img src="images/profile.jpg" alt="Portrait of Honglin Li" width="800" height="1000">
       <figcaption>
         <span><i class="bi bi-geo-alt" aria-hidden="true"></i>Manhattan, Kansas</span><!-- workplace: KSU, Manhattan, KS (author line of the NAPS 2026 papers) -->
         <a href="mailto:hlli@ksu.edu"><i class="bi bi-envelope" aria-hidden="true"></i>hlli@ksu.edu</a>
@@ -84,6 +85,51 @@ image: images/profile.jpg
 
 </section>
 
+<!-- ============ 3a. WHAT I BRING: ability cards, each linking to its evidence elsewhere on the site (website v2,
+     reports/07_website_v2_design.md §5). Claims stay general here; the linked sections carry the detail. ============ -->
+<section class="home-wrap home-sec" aria-labelledby="h-abilities">
+  <div class="section-title"><h2 id="h-abilities">What I bring</h2></div>
+  <p class="sec-lede">Each card links to the work that shows it.</p>
+  <ul class="ability-grid">
+    <li class="ability">
+      <span class="ab-icon" aria-hidden="true"><i class="bi bi-lightbulb"></i></span>
+      <h3>Independent thinking</h3>
+      <p>I look for the interaction that a simpler analysis misses, and explain the mechanism behind results that run against intuition.</p>
+      <p class="ab-links"><a href="projects/wind-hydrogen.html#insight">Wind–hydrogen</a><a href="projects/npph2.html#insight">Nuclear–hydrogen</a><a href="projects/nuclear-dc.html#insight">SMR cogeneration</a></p>
+    </li>
+    <li class="ability">
+      <span class="ab-icon" aria-hidden="true"><i class="bi bi-layers"></i></span>
+      <h3>Research across scales</h3>
+      <p>One research question followed from a single wind farm to a state grid and the U.S. nuclear fleet, and its answer led to data-center campuses; each step changed who decides and which uncertainty matters.</p>
+      <p class="ab-links"><a href="research.html#path">Research path</a><a href="publications.html">Publications</a></p>
+    </li>
+    <li class="ability">
+      <span class="ab-icon" aria-hidden="true"><i class="bi bi-tools"></i></span>
+      <h3>Solving applied problems</h3>
+      <p>I turn design and investment questions into models built on public market data, hourly operation, policy and cost details, and I state where the answer holds.</p>
+      <p class="ab-links"><a href="projects.html">Project case studies</a><a href="projects/txh2.html#approach">Texas hydrogen</a><a href="projects/fm-global-internship.html">Industry internship</a></p>
+    </li>
+    <li class="ability">
+      <span class="ab-icon" aria-hidden="true"><i class="bi bi-github"></i></span>
+      <h3>Building usable tools</h3>
+      <p>Open model frameworks with documented formulations, examples, tests and open-source solvers, so that others can check and reuse the methods.</p>
+      <p class="ab-links"><a href="software-data.html">Software</a><a href="https://github.com/Henryutd2021">GitHub</a></p>
+    </li>
+    <li class="ability">
+      <span class="ab-icon" aria-hidden="true"><i class="bi bi-easel"></i></span>
+      <h3>Teaching and mentoring</h3>
+      <p>Instructor of ECE 685 Power Systems Design; mentored student researchers; I teach students to state a model's assumptions before solving it.</p>
+      <p class="ab-links"><a href="teaching.html">Teaching</a><a href="teaching.html#explainers">Interactive explainers</a></p>
+    </li>
+    <li class="ability">
+      <span class="ab-icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+      <h3>Proposals and teamwork</h3>
+      <p>Co-PI on an interdisciplinary seed proposal on secure power for Kansas data centers; helped prepare a funded NSF supplement for national-laboratory research.</p>
+      <p class="ab-links"><a href="research.html#sei">Proposal</a><a href="cv.html#grant-writing-experience">Grants on the CV</a></p>
+    </li>
+  </ul>
+</section>
+
 <!-- ============ 4. NEWS (al-folio news table) ============ -->
 <!-- ============ 3b. AT A GLANCE (generated: _stats.qmd by scripts/build_site.py) ============ -->
 <section class="home-wrap home-sec home-stats" aria-label="Publications and citations at a glance">
@@ -98,6 +144,7 @@ image: images/profile.jpg
   <div class="section-title"><h2 id="h-news">News</h2></div>
   <table class="news-table" data-quarto-disable-processing="true">
     <tbody>
+      <tr><th scope="row">Nov 2026</th><td>Paper on small modular reactor cogeneration for hyperscale data-center IT and cooling loads accepted in <em>Energy Conversion and Management</em>.</td></tr>
       <tr><th scope="row">Fall 2026</th><td>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</td></tr>
       <tr><th scope="row">Aug 2026</th><td>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</td></tr>
       <tr><th scope="row">2026</th><td>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.</td></tr>
@@ -153,10 +200,15 @@ image: images/profile.jpg
         <span class="fw-name">reopt-hydrogen-framework</span>
         <span class="fw-desc">Sizing and dispatch of wind, solar, storage, electrolyzers, hydrogen tanks and fuel cells (REopt-type MILP).</span>
         <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
+      <li><a class="card fw theme-datacenter" href="https://github.com/Henryutd2021/smr-datacenter-cogeneration">
+        <span class="fw-theme">Nuclear &amp; data centers</span>
+        <span class="fw-name">smr-datacenter-cogeneration</span>
+        <span class="fw-desc">Small modular reactor power and steam-driven cooling for a data center: hourly co-optimization with the grid.</span>
+        <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
       <li><a class="card fw theme-datacenter" href="https://github.com/Henryutd2021/code-delayed-energization">
         <span class="fw-theme">Nuclear &amp; data centers</span>
         <span class="fw-name">code-delayed-energization</span>
-        <span class="fw-desc">Cost of delayed energization for AI data centers: developer, ratepayer and social accounts.</span>
+        <span class="fw-desc">Cost of delayed grid energization for AI data centers: developer, ratepayer and social accounts.</span>
         <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
     </ul>
   </div>

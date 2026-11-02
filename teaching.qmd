@@ -1,6 +1,6 @@
 ---
 title: "Teaching"
-subtitle: "Courses, teaching assistantships and mentoring"
+subtitle: "How I teach, courses, mentoring and interactive teaching material"
 title-block-banner: true
 page-layout: full
 toc: false
@@ -11,7 +11,48 @@ body-classes: "page-inner page-folio page-teaching"
      Instruction (course card), teaching assistant roles (two cards), mentoring (timeline, from the CV's Mentoring
      Experience) and planned teaching materials (tiles). -->
 
-::: {.fx-sec .tc-first}
+<!-- website v2 (2026-11-02): "How I teach" condenses Henry's teaching statement; "Interactive explainers" links the six
+     mechanism explainers on the project pages (assets/explainers/), which double as teaching material. -->
+
+::: {.fx-sec .tc-first .teach-approach}
+::: {.fx-head}
+## How I teach {#approach}
+:::
+
+::: {.vignette}
+[<i class="bi bi-chat-square-quote" aria-hidden="true"></i>]{.vg-icon}
+
+During office hours for Numerical Methods, students brought Python code for Newton's method on the Colebrook pipe-friction equation that returned NaN. The code was correct: their initial guess had sent the method outside the equation's domain, which a plot of the function and the iterates made obvious. They could run the method but could not yet explain when it would fail. That gap shapes how I teach.
+:::
+
+::: {.principles}
+::: {.principle}
+[1]{.pr-num}
+
+[Concepts in context]{.pr-title}
+
+Before solving a model, students state its assumptions in words, predict how a change will move the result, and then test the prediction.
+:::
+
+::: {.principle}
+[2]{.pr-num}
+
+[From guided practice to independent work]{.pr-title}
+
+I teach the foundations explicitly, work an example, then ask for a related problem with less support, until students can adapt a model and defend its assumptions.
+:::
+
+::: {.principle}
+[3]{.pr-num}
+
+[Understanding over answers]{.pr-title}
+
+When explanations are a click away, I assess formulation and interpretation as well as accuracy, and students explain their work and check any generated code.
+:::
+:::
+:::
+
+::: {.fx-sec}
 ::: {.fx-head}
 ## Instruction {#instruction}
 :::
@@ -73,7 +114,7 @@ body-classes: "page-inner page-folio page-teaching"
 ::: {.fx-head}
 ## Mentoring {#mentoring}
 
-Mentored undergraduate researchers at The University of Texas at Dallas, 2022–2025, including through the Research Experience for Undergraduates (REU) program. Their projects covered techno-economic analysis of renewable and hydrogen systems.
+Mentored undergraduate researchers at The University of Texas at Dallas, 2022–2025, including through the Research Experience for Undergraduates (REU) program. Their projects covered techno-economic analysis of renewable and hydrogen systems. In these projects, students moved from following a worked model to adapting it and defending their own assumptions.
 :::
 
 ::: {.tl}
@@ -131,42 +172,24 @@ A research project focused on techno-economic analysis of nuclear and hydrogen s
 
 ::: {.fx-sec}
 ::: {.fx-head}
-## Teaching materials {#teaching-materials}
+## Interactive explainers {#explainers}
 
-Open teaching modules built on my research are in preparation. Planned topics:
+Each explainer is a small interactive model on a project page that shows one mechanism from my research: move a slider and see why the result changes. They are designed to double as teaching material for techno-economic analysis, optimization and uncertainty quantification. The numbers are illustrative, not study results.
 :::
 
-::: {.mods}
-::: {.mod .theme-wind}
-[<i class="bi bi-bounding-box-circles" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
+::: {.exp-grid}
+[[Levelized cost vs. system cost]{.exp-topic}[Why a higher hydrogen price can raise the cost per kilogram while the system's cost falls]{.exp-title}[Wind–hydrogen <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/wind-hydrogen.qmd#explainer){.exp .theme-hydrogen}
 
-[Energy-system optimization with open solvers]{.mod-title}
+[[Coupled markets]{.exp-topic}[How dearer gas-fired power can divert green hydrogen and raise emissions]{.exp-title}[Texas hydrogen <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/txh2.qmd#explainer){.exp .theme-hydrogen}
 
-[Related: open model frameworks](software-data.qmd){.mod-link}
+[[Investment appraisal]{.exp-topic}[Revenue stacking for an existing and a new nuclear plant]{.exp-title}[Nuclear–hydrogen <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/npph2.qmd#explainer){.exp .theme-hydrogen}
+
+[[Policy design]{.exp-topic}[How a per-MWh production credit changes the value of steam for cooling]{.exp-title}[SMR cogeneration <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/nuclear-dc.qmd#explainer){.exp .theme-datacenter}
+
+[[Carbon accounting]{.exp-topic}[Re-timing electricity use with hourly emission intensity]{.exp-title}[Load regulation <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/ghg.qmd#explainer){.exp .theme-carbon}
+
+[[Uncertainty quantification]{.exp-topic}[How a theoretical power curve and a few measurements narrow the uncertainty band]{.exp-title}[Wind power curves <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/uq-mfgpr.qmd#explainer){.exp .theme-wind}
 :::
 
-::: {.mod .theme-hydrogen}
-[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
-
-[Techno-economic analysis of hydrogen systems]{.mod-title}
-
-[Related: hydrogen-integrated energy systems](research.qmd#hydrogen-integrated-energy-systems){.mod-link}
-:::
-
-::: {.mod .theme-carbon}
-[<i class="bi bi-globe-americas" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
-
-[Carbon-aware load scheduling]{.mod-title}
-
-[Related: carbon-aware grid operation](research.qmd#carbon-aware-grid-operation){.mod-link}
-:::
-
-::: {.mod .theme-microgrid}
-[<i class="bi bi-diagram-3" aria-hidden="true"></i>]{.mod-icon} [In preparation]{.mod-state}
-
-[Facility and microgrid co-siting]{.mod-title}
-
-[Related: supply chains with on-site microgrids](research.qmd#supply-chains-with-on-site-microgrids){.mod-link}
-:::
-:::
+[Longer open teaching modules built on the [model frameworks](software-data.qmd) are in preparation.]{.exp-more}
 :::

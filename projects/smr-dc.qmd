@@ -2,7 +2,7 @@
 title: "Small modular reactors for data centers"
 subtitle: "Cell Reports Sustainability (2026), Perspective, co-first author"
 description: "What would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?"
-order: 4
+order: 2
 categories: ["Nuclear & data centers"]
 themekey: "datacenter"
 themelabel: "Nuclear & data centers"
@@ -22,13 +22,29 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/smr-dc.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>Co-first author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Perspective article</li><li>Techno-economic section</li><li>FOAK and NOAK costs</li><li>Reliability premium</li><li>Levelized cost of computing</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">What would it take for small modular reactors to power data centers, and which economic dimensions must a credible techno-economic assessment capture?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">Reliability requirements add a capital premium that levelized cost leaves out</p>
+<p>A hyperscale campus needs Tier IV-level availability, so one reactor is not enough: with N+1 redundancy, a 300 MW campus may need 400 MW of SMR capacity. Standard levelized-cost estimates omit this reliability premium, so they understate the cost of firm on-site supply.</p>
+</section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
 <p>Co-first author. Wrote the techno-economic analysis section, introduction and conclusions.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Published SMR cost figures mix first-of-a-kind budgets with long-run nth-of-a-kind targets.</p><p class="ap-did"><span class="ap-k">What I did</span>I set first-of-a-kind and nth-of-a-kind capital costs of SMR projects side by side and argued that assessments treat them as separate cases, each with its own financing and risk.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>Long-run figures make first projects look more viable than they are, and early data-center buyers carry that risk.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Levelized cost of electricity leaves out cooling, which takes 30–40% of a hyperscale facility&#x27;s energy.</p><p class="ap-did"><span class="ap-k">What I did</span>In the section I drafted, I proposed a service-based metric, the levelized cost of computing, which puts electricity and cooling costs over units of computing service.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>It compares on-site nuclear, grid and renewable-plus-storage supply by what each delivers to the data center.</p></li>
+</ol>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -45,6 +61,10 @@ toc: false
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
 <p>A Perspective: it frames the questions and evidence rather than presenting a new case-study model.</p>
+</section>
+<section class="proj-next" id="led-to" aria-labelledby="h-next">
+<h2 id="h-next"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>
+<p>Pricing the heat used for cooling, hour by hour, became the core of my boundary analysis for one data-center campus. <a class="next-link" href="nuclear-dc.html">Small modular reactor cogeneration for a hyperscale data center<i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
 </section>
 <section class="proj-sec" aria-labelledby="h-pubs">
 <h2 id="h-pubs"><i class="bi bi-journal-text" aria-hidden="true"></i>Publications</h2>
@@ -93,8 +113,8 @@ toc: false
 </div>
 </div>
 <nav class="proj-pager" aria-label="More projects">
-<a class="pager-link prev" href="ghg.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Emission-intensity-informed load regulation for grid decarbonization</span></a>
-<a class="pager-link next" href="data-center-delay-economics.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">The cost of delayed energization for AI data centers</span></a>
+<a class="pager-link prev" href="nuclear-dc.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Small modular reactor cogeneration for a hyperscale data center</span></a>
+<a class="pager-link next" href="smr-dc-national.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Data-center demand and the commercialization of small modular reactors</span></a>
 </nav>
 </article>
 ```

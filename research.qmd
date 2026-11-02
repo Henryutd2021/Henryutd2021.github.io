@@ -1,142 +1,199 @@
 ---
 title: "Research"
-subtitle: "Optimization and techno-economic analysis of low-carbon energy systems"
+subtitle: "Which low-carbon technology mixes deliver reliable, affordable energy, and who pays for them"
 title-block-banner: true
 page-layout: full
 toc: false
 body-classes: "page-inner page-folio page-research"
 ---
 
-<!-- Research page (third redesign, 2026-10-30; styles in assets/pages.css).
-     Intro and theme index, then one card per theme: a tinted panel on the left (icon, number, heading, intro) and the
-     project links on the right (cover image, title, venue). theme-<key> sets the colour (assets/base.css).
-     The heading ids are linked from the home page; keep them. Cover images: images/projects/<slug>.svg (a tinted
-     tile with the theme icon shows when an image is missing). -->
+<!-- Research page (website v2, 2026-11-02; reports/07_website_v2_design.md §8; styles in assets/pages.css, "research v2").
+     The story of the research, not the project details: the path, then one question at three scales (Ph.D.), the
+     turning point, firm low-carbon supply for AI data centers (current), supporting capabilities, methods, outlook.
+     Follows the past-research part of Henry's research statement; findings stay within the audited project-page text
+     and the accepted boundary paper (arXiv preprint). Upcoming work: broad question and status only. No collaborator names (Henry 2026-11-02).
+     Anchors linked from the home page: path, flexibility, data-centers, sei, supporting, methods. -->
 
-::: {.rs-intro}
-::: {.rs-lede}
-My work combines optimization and techno-economic analysis to ask when low-carbon energy technologies pay off, for whom, and under which market and policy conditions.
+```{=html}
+<div class="rs-intro">
+  <div class="rs-lede">
+    <p>I build optimization and techno-economic models for decisions about low-carbon energy systems: what to build, where, how to run it, and under which market and policy conditions it pays off.</p>
+    <p>My doctoral research asked one question at three scales: when does flexibility, from hydrogen or from demand, add value to a low-carbon energy system? The answer at the national scale raised the question behind my current work: what can carry the capital cost of new firm, low-carbon supply, now that AI data centers need hundreds of megawatts around the clock?</p>
+    <p>Each project page shows the problem, the hard parts, the design choices and the findings with their limits.</p>
+  </div>
+  <nav class="rs-index" aria-label="On this page">
+    <span class="label">On this page</span>
+    <a class="ix" href="#path"><span class="dot dot-plain"></span><span class="ix-name">Research path</span></a>
+    <a class="ix theme-hydrogen" href="#flexibility"><span class="dot"></span><span class="ix-name">Flexibility from plant to nation</span><span class="ix-n">Ph.D.</span></a>
+    <a class="ix theme-datacenter" href="#data-centers"><span class="dot"></span><span class="ix-name">Firm low-carbon power for AI data centers</span><span class="ix-n">Current</span></a>
+    <a class="ix" href="#supporting"><span class="dot dot-plain"></span><span class="ix-name">Supporting capabilities</span></a>
+    <a class="ix" href="#methods"><span class="dot dot-plain"></span><span class="ix-name">Methods and toolkit</span></a>
+  </nav>
+</div>
 
-Each theme below links to project pages with the research question, my contribution, the method, the key findings with their boundary conditions, and the published outputs.
-:::
+<!-- ============ research path: one ordered list, horizontal on wide screens, vertical on phones ============ -->
+<section class="rp-sec" id="path" aria-labelledby="h-path">
+  <h2 id="h-path" class="rs-h2">Research path</h2>
+  <ol class="rpath">
+    <li class="rp-step theme-microgrid">
+      <span class="rp-when">2019–2021 · M.S.</span>
+      <span class="rp-scale">Foundations</span>
+      <span class="rp-what">Operations research for supply chains with on-site microgrids</span>
+      <a class="rp-link" href="projects/facility-microgrid-location.html">Supply chains and microgrids</a>
+    </li>
+    <li class="rp-step theme-hydrogen">
+      <span class="rp-when">2021–2024 · Ph.D.</span>
+      <span class="rp-scale">Plant</span>
+      <span class="rp-what">Hydrogen with wind and solar plants</span>
+      <a class="rp-link" href="projects/wind-hydrogen.html">Wind–hydrogen</a>
+      <a class="rp-link" href="projects/solar-hydrogen.html">Solar–hydrogen</a>
+      <a class="rp-link" href="projects/offshore-wind-hydrogen-om.html">Offshore wind–hydrogen</a>
+    </li>
+    <li class="rp-step theme-hydrogen">
+      <span class="rp-when">2022–2025 · Ph.D.</span>
+      <span class="rp-scale">State</span>
+      <span class="rp-what">Hydrogen across the Texas grid under uncertain renewable build-out</span>
+      <a class="rp-link" href="projects/txh2.html">Texas hydrogen</a>
+    </li>
+    <li class="rp-step theme-hydrogen">
+      <span class="rp-when">2025–2026 · Ph.D. and INL</span>
+      <span class="rp-scale">National fleet</span>
+      <span class="rp-what">Hydrogen and grid services for U.S. nuclear plants</span>
+      <a class="rp-link" href="projects/npph2.html">Nuclear–hydrogen</a>
+    </li>
+    <li class="rp-step theme-datacenter">
+      <span class="rp-when">2025– · UT Dallas and Kansas State</span>
+      <span class="rp-scale">Data-center campus and nation</span>
+      <span class="rp-what">Firm low-carbon supply, including small modular reactors, for AI data centers</span>
+      <a class="rp-link" href="projects/nuclear-dc.html">SMR cogeneration</a>
+      <a class="rp-link" href="projects/smr-dc.html">SMR perspective</a>
+    </li>
+  </ol>
+  <p class="rp-branches"><span class="label">Supporting work</span>
+    <a class="chip theme-carbon" href="projects/ghg.html"><span class="cdot"></span>Carbon-aware demand</a>
+    <a class="chip theme-wind" href="projects/uq-mfgpr.html"><span class="cdot"></span>Wind power uncertainty</a>
+    <a class="chip theme-datacenter" href="projects/data-center-delay-economics.html"><span class="cdot"></span>Cost of delayed grid connection</a>
+  </p>
+</section>
 
-::: {.rs-index}
-[Five research themes]{.label}
+<!-- ============ chapter 1: flexibility from plant to nation (Ph.D.) ============ -->
+<section class="chapter theme-hydrogen" id="flexibility" aria-labelledby="h-flex">
+  <div class="ch-head">
+    <span class="ch-num">Chapter 1 · Ph.D., The University of Texas at Dallas, and Idaho National Laboratory</span>
+    <h2 id="h-flex" class="rs-h2">Flexibility from plant to nation</h2>
+    <p>One question at three scales: when does flexibility, from hydrogen or from demand, add value to a low-carbon energy system? Each step up in scale changed who makes the decision, which uncertainty matters most, and where flexibility gets its value.</p>
+  </div>
+  <ol class="steps">
+    <li class="step">
+      <span class="step-scale">Plant</span>
+      <h3>Hydrogen makes wind output firmer and more valuable</h3>
+      <p>I extended an open optimization model with electrolysis, hydrogen storage and fuel cells, and co-optimized equipment sizes with hourly operation for a wind farm, then for solar and offshore wind plants. Two of the studies showed that the cost per kilogram of hydrogen and the cost of the whole system can move in opposite directions. These models took the site as given, so they could not say where to build across a region.</p>
+      <p class="step-links"><a href="projects/wind-hydrogen.html">Wind–hydrogen</a><a href="projects/solar-hydrogen.html">Solar–hydrogen</a><a href="projects/offshore-wind-hydrogen-om.html">Offshore O&amp;M</a></p>
+    </li>
+    <li class="step">
+      <span class="step-scale">State</span>
+      <h3>Coordinating hydrogen supply and demand under uncertainty</h3>
+      <p>For Texas, I built the inputs from public market disclosures and a two-stage stochastic model that sizes hydrogen assets in eight weather zones and schedules them hour by hour across scenarios of demand and renewable build-out. The model showed how the price of gas-fired backup power changes where green hydrogen goes.</p>
+      <p class="step-links"><a href="projects/txh2.html">Texas hydrogen</a></p>
+    </li>
+    <li class="step">
+      <span class="step-scale">National fleet</span>
+      <h3>Making firm low-carbon supply flexible</h3>
+      <p>During my internship at Idaho National Laboratory, I co-developed an hourly model that splits a reactor's output among grid sales, high-temperature electrolysis, storage and reserves, linked to a lifetime cash-flow analysis of 42 reactors in seven U.S. markets. Operated as baseload-only plants at 2024 prices, nearly all had negative net present value; with hydrogen integration, including the assumed hydrogen production credit, a majority reached positive net present value.</p>
+      <p class="step-links"><a href="projects/npph2.html">Nuclear–hydrogen</a></p>
+    </li>
+  </ol>
+</section>
 
-[[]{.dot}[Nuclear energy and AI data centers]{.ix-name}[2 projects]{.ix-n}](#nuclear-energy-and-ai-data-centers){.ix .theme-datacenter}
-[[]{.dot}[Hydrogen-integrated energy systems]{.ix-name}[5 projects]{.ix-n}](#hydrogen-integrated-energy-systems){.ix .theme-hydrogen}
-[[]{.dot}[Carbon-aware grid operation]{.ix-name}[1 project]{.ix-n}](#carbon-aware-grid-operation){.ix .theme-carbon}
-[[]{.dot}[Supply chains with on-site microgrids]{.ix-name}[1 project]{.ix-n}](#supply-chains-with-on-site-microgrids){.ix .theme-microgrid}
-[[]{.dot}[Wind power uncertainty]{.ix-name}[1 project]{.ix-n}](#wind-power-uncertainty){.ix .theme-wind}
-[[]{.dot}[Methods and toolkit]{.ix-name}[5 methods]{.ix-n}](#methods){.ix .ix-methods}
-:::
-:::
+<!-- ============ turning point ============ -->
+<div class="turn" role="note" aria-labelledby="h-turn">  <!-- a div: Quarto moves aside elements into the margin -->
+  <span class="turn-icon" aria-hidden="true"><i class="bi bi-signpost-split"></i></span>
+  <div>
+    <h2 id="h-turn" class="turn-title">The question that led to data centers</h2>
+    <p>The fleet study showed that hydrogen, with the assumed production credit, and grid services can change the economics of existing reactors, while new reactors depend on capital cost and policy support. What could carry the capital cost of new firm, low-carbon supply? Large AI data centers, which need hundreds of megawatts around the clock, often where the grid cannot connect them for years, made that question concrete.</p>
+  </div>
+</div>
 
-<!-- ============ 01 Nuclear energy and AI data centers ============ -->
-::: {.tb .theme-datacenter}
-::: {.tb-panel}
-## Nuclear energy and AI data centers {#nuclear-energy-and-ai-data-centers}
+<!-- ============ chapter 2: firm low-carbon power for AI data centers (current) ============ -->
+<section class="chapter theme-datacenter" id="data-centers" aria-labelledby="h-dc">
+  <div class="ch-head">
+    <span class="ch-num">Chapter 2 · Research Associate, The University of Texas at Dallas; Postdoctoral Fellow, Kansas State University</span>
+    <h2 id="h-dc" class="rs-h2">Firm low-carbon power for AI data centers</h2>
+    <p>Small modular reactors can supply firm power at the scale of an AI campus. I study when such supply can compete with the alternatives, at the scale of one campus and of the United States.</p>
+  </div>
+  <ol class="steps">
+    <li class="step">
+      <span class="step-scale">Framing</span>
+      <h3>What a credible assessment must capture</h3>
+      <p>In a co-first-authored Perspective, I wrote the techno-economic analysis: reliability requirements, wide first-of-a-kind cost ranges, service-based metrics and co-products such as heat all change the comparison.</p>
+      <p class="step-links"><a href="projects/smr-dc.html">SMR perspective</a></p>
+    </li>
+    <li class="step">
+      <span class="step-scale">One campus</span>
+      <h3>Where SMR cogeneration becomes competitive</h3>
+      <p>For a hyperscale campus in Texas, I co-optimized reactor output, turbine steam extraction for absorption cooling and grid exchange, hour by hour. Capital cost and policy set the competitiveness boundary far more than operating choices do, and an output-based credit discourages using steam for cooling. <span class="status">Accepted in <em>Energy Conversion and Management</em>.</span></p>
+      <p class="step-links"><a href="projects/nuclear-dc.html">SMR cogeneration</a></p>
+    </li>
+    <li class="step">
+      <span class="step-scale">United States</span>
+      <h3>Data-center demand and SMR commercialization</h3>
+      <p>A national study asks whether data-center demand can help small modular reactors move from their first units to wider commercial deployment. <span class="status">Manuscript in preparation.</span></p>
+      <p class="step-links"><a href="projects/smr-dc-national.html">Upcoming study</a></p>
+    </li>
+  </ol>
 
-::: {.tb-top}
-[<i class="bi bi-cpu" aria-hidden="true"></i>]{.tb-icon} [Theme 01]{.tb-num}
-:::
+  <div class="sei" id="sei">
+    <div class="sei-head">
+      <span class="label">Proposal · Co-PI · under review (2026)</span>
+      <h3>Secure power for Kansas data centers</h3>
+      <p class="sei-src">Kansas State University Secure Energy Initiative, seed funding</p>
+    </div>
+    <p>Kansas is seeing data-center proposals of several hundred megawatts. The proposal asks how small modular reactors, their recoverable heat, data-center cooling and grid connections can be planned together, so that computing and cooling continue through disruptions at a cost the region can bear, with community priorities in siting and design.</p>
+    <ol class="sei-modules" aria-label="Four research modules">
+      <li><strong>Community and policy</strong> preferences and local conditions</li>
+      <li><strong>Physical models</strong> of reactor heat, cooling and data-center operation</li>
+      <li><strong>Integrated planning</strong> of locations, capacities and timing under uncertainty</li>
+      <li><strong>Kansas demonstration</strong> at county level, with stakeholder review</li>
+    </ol>
+    <p class="sei-role"><strong>My role:</strong> coupled models, optimization, economics and software, in an interdisciplinary team spanning electrical, nuclear and civil engineering, water research and political science.</p>
+  </div>
+</section>
 
-Rapid growth in AI data centers raises the question of how firm, low-carbon power can be supplied on the timelines these loads require.
-
-::: {.tb-note}
-**Current work (Kansas State University):** techno-economic analysis of firm, low-carbon supply options, including small modular reactors, for large data-center loads.
-:::
-:::
-
-::: {.tb-list}
-[[<i class="bi bi-cpu" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/smr-dc.svg)"}]{.pr-thumb}[[Small modular reactors for data centers]{.pr-title}[Cell Reports Sustainability (2026), Perspective]{.pr-venue}[The economic dimensions a credible assessment must capture.]{.pr-desc}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/smr-dc.qmd){.pr-row}
-
-[[<i class="bi bi-cpu" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/data-center-delay-economics.svg)"}]{.pr-thumb}[[The cost of delayed energization for AI data centers]{.pr-title}[IEEE NAPS 2026 (accepted)]{.pr-venue}[What waiting for grid connection costs, and who bears it.]{.pr-desc}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/data-center-delay-economics.qmd){.pr-row}
-:::
-:::
-
-<!-- ============ 02 Hydrogen-integrated energy systems ============ -->
-::: {.tb .theme-hydrogen}
-::: {.tb-panel}
-## Hydrogen-integrated energy systems {#hydrogen-integrated-energy-systems}
-
-::: {.tb-top}
-[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.tb-icon} [Theme 02]{.tb-num}
-:::
-
-This theme follows hydrogen from single projects to regional networks to the nuclear fleet. It was the subject of my Ph.D. dissertation.
-:::
-
-::: {.tb-list}
-[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/npph2.svg)"}]{.pr-thumb}[[Hydrogen integration and policy support for U.S. nuclear power plants]{.pr-title}[Nature Communications (2026)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/npph2.qmd){.pr-row}
-
-[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/txh2.svg)"}]{.pr-thumb}[[Hydrogen's role in expanding renewable energy in Texas]{.pr-title}[International Journal of Hydrogen Energy (2025)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/txh2.qmd){.pr-row}
-
-[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/wind-hydrogen.svg)"}]{.pr-thumb}[[Co-located wind and hydrogen energy systems]{.pr-title}[Journal of Mechanical Design (2024); TORQUE 2022]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/wind-hydrogen.qmd){.pr-row}
-
-[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/solar-hydrogen.svg)"}]{.pr-thumb}[[Co-located solar and hydrogen plants]{.pr-title}[European Energy Market Conference (EEM 2023)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/solar-hydrogen.qmd){.pr-row}
-
-[[<i class="bi bi-droplet-half" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/offshore-wind-hydrogen-om.svg)"}]{.pr-thumb}[[Intelligent operation and maintenance in offshore wind–hydrogen systems]{.pr-title}[TORQUE 2024]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/offshore-wind-hydrogen-om.qmd){.pr-row}
-:::
-:::
-
-<!-- ============ 03 Carbon-aware grid operation ============ -->
-::: {.tb .theme-carbon}
-::: {.tb-panel}
-## Carbon-aware grid operation {#carbon-aware-grid-operation}
-
-::: {.tb-top}
-[<i class="bi bi-globe-americas" aria-hidden="true"></i>]{.tb-icon} [Theme 03]{.tb-num}
-:::
-
-Re-timing electricity use with hourly grid emission intensity.
-:::
-
-::: {.tb-list}
-[[<i class="bi bi-globe-americas" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/ghg.svg)"}]{.pr-thumb}[[Emission-intensity-informed load regulation for grid decarbonization]{.pr-title}[Cell Reports Sustainability (2025)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/ghg.qmd){.pr-row}
-:::
-:::
-
-<!-- ============ 04 Supply chains with on-site microgrids ============ -->
-::: {.tb .theme-microgrid}
-::: {.tb-panel}
-## Supply chains with on-site microgrids {#supply-chains-with-on-site-microgrids}
-
-::: {.tb-top}
-[<i class="bi bi-diagram-3" aria-hidden="true"></i>]{.tb-icon} [Theme 04]{.tb-num}
-:::
-
-This theme began in my M.S. research and covers joint siting of facilities and microgrids, transactive energy, and reliability.
-:::
-
-::: {.tb-list}
-[[<i class="bi bi-diagram-3" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/facility-microgrid-location.svg)"}]{.pr-thumb}[[Supply chains with on-site microgrids and transactive energy]{.pr-title}[Applied Mathematical Modelling (2023); IEEE SEGRE 2023; Journal of the Operational Research Society (2022)]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/facility-microgrid-location.qmd){.pr-row}
-:::
-:::
-
-<!-- ============ 05 Wind power uncertainty ============ -->
-::: {.tb .theme-wind}
-::: {.tb-panel}
-## Wind power uncertainty {#wind-power-uncertainty}
-
-::: {.tb-top}
-[<i class="bi bi-wind" aria-hidden="true"></i>]{.tb-icon} [Theme 05]{.tb-num}
-:::
-
-Multi-fidelity Gaussian processes for probabilistic wind farm power curves.
-:::
-
-::: {.tb-list}
-[[<i class="bi bi-wind" aria-hidden="true"></i>[]{.pr-img style="background-image:url(images/projects/uq-mfgpr.svg)"}]{.pr-thumb}[[Multi-fidelity Gaussian processes for wind power curves]{.pr-title}[ASME IDETC 2023]{.pr-venue}]{.pr-text}[<i class="bi bi-arrow-right" aria-hidden="true"></i>]{.pr-go}](projects/uq-mfgpr.qmd){.pr-row}
-:::
-:::
+<!-- ============ supporting capabilities ============ -->
+<section class="support" id="supporting" aria-labelledby="h-support">
+  <h2 id="h-support" class="rs-h2">Supporting capabilities</h2>
+  <p class="support-lede">Side studies that built methods and skills used across the main line.</p>
+  <ul class="support-grid">
+    <li class="support-item theme-microgrid">
+      <h3><span class="cdot"></span>Operations research foundations</h3>
+      <p>Facility location, production planning and microgrid sizing for supply chains that trade energy with the grid (M.S.).</p>
+      <a href="projects/facility-microgrid-location.html">Supply chains and microgrids</a>
+    </li>
+    <li class="support-item theme-carbon">
+      <h3><span class="cdot"></span>Carbon signals and demand</h3>
+      <p>Re-timing electricity use with hourly emission intensity across U.S. regions, and what that accounting can and cannot show.</p>
+      <a href="projects/ghg.html">Emission-informed load regulation</a>
+    </li>
+    <li class="support-item theme-wind">
+      <h3><span class="cdot"></span>Uncertainty quantification</h3>
+      <p>Multi-fidelity Gaussian processes that combine the turbine's theoretical power curve with scarce measurements for probabilistic wind power.</p>
+      <a href="projects/uq-mfgpr.html">Wind power curves</a>
+    </li>
+    <li class="support-item theme-datacenter">
+      <h3><span class="cdot"></span>Interconnection economics</h3>
+      <p>What waiting for grid energization costs a data-center developer, other ratepayers and society, and how staging recovers part of it.</p>
+      <a href="projects/data-center-delay-economics.html">Cost of delayed energization</a>
+    </li>
+  </ul>
+</section>
+```
 
 <!-- ============ Methods and toolkit ============ -->
 ::: {.fx-sec .rs-methods}
 ::: {.fx-head}
 ## Methods and toolkit {#methods}
 
-The methods I use across these themes are:
+Methods I use across these studies:
 :::
 
 ::: {.method-grid}
@@ -147,7 +204,7 @@ The methods I use across these themes are:
 
 Linear, mixed-integer and stochastic optimization
 
-[Pyomo]{.chip} [AMPL]{.chip} [Gurobi]{.chip}
+[Pyomo]{.chip} [linopy]{.chip} [AMPL]{.chip} [Gurobi]{.chip} [HiGHS]{.chip}
 :::
 
 ::: {.method}
@@ -182,6 +239,15 @@ Discrete-event and Monte Carlo simulation
 Gaussian-process and machine-learning surrogates
 :::
 
-[[<i class="bi bi-github" aria-hidden="true"></i>]{.m-icon}[Open model frameworks]{.m-title}[Six documented, runnable frameworks that accompany the papers.]{.m-text}[Software <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.m-more}](software-data.qmd){.method .method-link}
+[[<i class="bi bi-github" aria-hidden="true"></i>]{.m-icon}[Open model frameworks]{.m-title}[Seven documented, runnable frameworks that accompany the papers.]{.m-text}[Software <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.m-more}](software-data.qmd){.method .method-link}
 :::
 :::
+
+<!-- ============ looking ahead: brief and general (Henry 2026-11-02: no named future projects) ============ -->
+```{=html}
+<section class="outlook" id="outlook" aria-labelledby="h-outlook">
+  <h2 id="h-outlook" class="rs-h2">Looking ahead</h2>
+  <p>I want to keep working on how low-carbon energy systems should be planned as electricity demand grows: how large new loads can be supplied reliably and affordably, how to invest when demand and technology costs are uncertain, and who bears the costs. The models behind each study are designed to be reused, checked and extended.</p>
+</section>
+```
+

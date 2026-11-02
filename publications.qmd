@@ -14,7 +14,7 @@ body-classes: "page-inner page-publications"
 <div class="pg">
 <div class="pub-head">
 <div class="pub-head-text">
-<p class="pg-lede">Newest first: 7 journal articles, 10 conference papers, 1 paper under review and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>.</p>
+<p class="pg-lede">Newest first: 8 journal articles, 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>.</p>
 <p class="pub-cites"><i class="bi bi-quote" aria-hidden="true"></i><span><strong>121 citations</strong> · h-index 7 · i10-index 6 (<a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>, as of October 30, 2026). Per-paper counts are from the same profile; papers it does not list use OpenAlex.</span></p>
 </div>
 <figure class="pub-chart" data-type="all">
@@ -26,24 +26,22 @@ body-classes: "page-inner page-publications"
 <g class="yr"><title>2023: 1 journal article, 3 conference papers</title><rect class="seg pt-journal" x="110.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="110.5" y="36.0" width="29.0" height="54.0" rx="2"/><text class="n" x="125.0" y="31.0" text-anchor="middle">4</text><text class="yl" x="125.0" y="126" text-anchor="middle">2023</text></g>
 <g class="yr"><title>2024: 1 journal article, 2 conference papers</title><rect class="seg pt-journal" x="160.5" y="91.5" width="29.0" height="16.5" rx="2"/><rect class="seg pt-conference" x="160.5" y="54.0" width="29.0" height="36.0" rx="2"/><text class="n" x="175.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="175.0" y="126" text-anchor="middle">2024</text></g>
 <g class="yr"><title>2025: 2 journal articles, 1 thesis</title><rect class="seg pt-journal" x="210.5" y="73.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-thesis" x="210.5" y="54.0" width="29.0" height="18.0" rx="2"/><text class="n" x="225.0" y="49.0" text-anchor="middle">3</text><text class="yl" x="225.0" y="126" text-anchor="middle">2025</text></g>
-<g class="yr"><title>2026: 2 journal articles, 2 conference papers, 1 paper under review</title><rect class="seg pt-journal" x="260.5" y="73.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-conference" x="260.5" y="37.5" width="29.0" height="34.5" rx="2"/><rect class="seg pt-preprint" x="260.5" y="18.0" width="29.0" height="18.0" rx="2"/><text class="n" x="275.0" y="13.0" text-anchor="middle">5</text><text class="yl" x="275.0" y="126" text-anchor="middle">2026</text></g>
+<g class="yr"><title>2026: 3 journal articles, 2 conference papers</title><rect class="seg pt-journal" x="260.5" y="55.5" width="29.0" height="52.5" rx="2"/><rect class="seg pt-conference" x="260.5" y="18.0" width="29.0" height="36.0" rx="2"/><text class="n" x="275.0" y="13.0" text-anchor="middle">5</text><text class="yl" x="275.0" y="126" text-anchor="middle">2026</text></g>
 </svg>
 <ul class="pub-chart-key" aria-hidden="true">
 <li><span class="dot pt-journal"></span>Journal</li>
 <li><span class="dot pt-conference"></span>Conference</li>
-<li><span class="dot pt-preprint"></span>Under review</li>
 <li><span class="dot pt-thesis"></span>Thesis</li>
 </ul>
-<table class="visually-hidden" data-quarto-disable-processing="true"><caption>Publications per year by type</caption><thead><tr><th scope="col">Year</th><th scope="col">Journal</th><th scope="col">Conference</th><th scope="col">Under review</th><th scope="col">Thesis</th><th scope="col">Total</th></tr></thead><tbody><tr><th scope="row">2026</th><td>2</td><td>2</td><td>1</td><td>0</td><td>5</td></tr><tr><th scope="row">2025</th><td>2</td><td>0</td><td>0</td><td>1</td><td>3</td></tr><tr><th scope="row">2024</th><td>1</td><td>2</td><td>0</td><td>0</td><td>3</td></tr><tr><th scope="row">2023</th><td>1</td><td>3</td><td>0</td><td>0</td><td>4</td></tr><tr><th scope="row">2022</th><td>1</td><td>2</td><td>0</td><td>0</td><td>3</td></tr><tr><th scope="row">2021</th><td>0</td><td>1</td><td>0</td><td>1</td><td>2</td></tr></tbody></table>
+<table class="visually-hidden" data-quarto-disable-processing="true"><caption>Publications per year by type</caption><thead><tr><th scope="col">Year</th><th scope="col">Journal</th><th scope="col">Conference</th><th scope="col">Thesis</th><th scope="col">Total</th></tr></thead><tbody><tr><th scope="row">2026</th><td>3</td><td>2</td><td>0</td><td>5</td></tr><tr><th scope="row">2025</th><td>2</td><td>0</td><td>1</td><td>3</td></tr><tr><th scope="row">2024</th><td>1</td><td>2</td><td>0</td><td>3</td></tr><tr><th scope="row">2023</th><td>1</td><td>3</td><td>0</td><td>4</td></tr><tr><th scope="row">2022</th><td>1</td><td>2</td><td>0</td><td>3</td></tr><tr><th scope="row">2021</th><td>0</td><td>1</td><td>1</td><td>2</td></tr></tbody></table>
 </figure>
 </div>
 <div class="filter-bar pub-filter" hidden>
 <div class="search-box"><i class="bi bi-search" aria-hidden="true"></i><label class="visually-hidden" for="pub-q">Search publications</label><input id="pub-q" type="search" placeholder="Search title, author, venue…" autocomplete="off" spellcheck="false"></div>
 <div class="ftabs" role="group" aria-label="Filter by publication type">
 <button type="button" class="ftab" data-filter="all" aria-pressed="true">All <span class="n">20</span></button>
-<button type="button" class="ftab" data-filter="journal" aria-pressed="false"><span class="dot pt-journal" aria-hidden="true"></span>Journal <span class="n">7</span></button>
+<button type="button" class="ftab" data-filter="journal" aria-pressed="false"><span class="dot pt-journal" aria-hidden="true"></span>Journal <span class="n">8</span></button>
 <button type="button" class="ftab" data-filter="conference" aria-pressed="false"><span class="dot pt-conference" aria-hidden="true"></span>Conference <span class="n">10</span></button>
-<button type="button" class="ftab" data-filter="preprint" aria-pressed="false"><span class="dot pt-preprint" aria-hidden="true"></span>Under review <span class="n">1</span></button>
 <button type="button" class="ftab" data-filter="thesis" aria-pressed="false"><span class="dot pt-thesis" aria-hidden="true"></span>Theses <span class="n">2</span></button>
 </div>
 </div>
@@ -106,10 +104,37 @@ body-classes: "page-inner page-publications"
 </div>
 </div>
 </li>
+<li class="pub" data-type="journal" data-year="2026">
+<div class="pub-badge"><span class="abbr pt-journal">Energy Convers. Manag.</span></div>
+<div class="pub-main">
+<div class="pub-title">Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads</div>
+<div class="pub-authors"><span class="me">H. Li</span>, B. She, J. Zhang</div>
+<div class="pub-venue"><em>Energy Conversion and Management</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
+<div class="pub-links">
+<a class="btn-xs" href="https://arxiv.org/abs/2608.10999">arXiv</a>
+<a class="btn-xs" href="https://github.com/Henryutd2021/smr-datacenter-cogeneration">Code</a>
+<a class="btn-xs" href="projects/nuclear-dc.html">Project</a>
+<button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2026smrcogeneration">Bib</button>
+</div>
+<div class="pub-bib" id="bib-li2026smrcogeneration" hidden>
+<button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
+<pre><code>@article{li2026smrcogeneration,
+  author        = {Li, Honglin and She, Buxin and Zhang, Jie},
+  title         = {{Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads}},
+  journal       = {Energy Conversion and Management},
+  year          = {2026},
+  eprint        = {2608.10999},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.SY},
+  note          = {Accepted}
+}</code></pre>
+</div>
+</div>
+</li>
 <li class="pub" data-type="conference" data-year="2026">
 <div class="pub-badge"><span class="abbr pt-conference">NAPS 2026</span></div>
 <div class="pub-main">
-<div class="pub-title">Quantifying the Cost of Delayed Energization (CoDE) for AI Data Centers</div>
+<div class="pub-title">Quantifying the Cost of Delayed Grid Energization (CoDE) for AI Data Centers</div>
 <div class="pub-authors"><span class="me">H. Li</span>, B. She</div>
 <div class="pub-venue"><em>2026 North American Power Symposium (NAPS)</em>, 2026. <span class="pub-tag tag-ok">Accepted</span></div>
 <div class="pub-links">
@@ -120,7 +145,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-bib" id="bib-li2026code" hidden>
 <button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
 <pre><code>@inproceedings{li2026code,
-  title     = {Quantifying the Cost of Delayed Energization ({CoDE}) for {AI} Data Centers},
+  title     = {Quantifying the Cost of Delayed Grid Energization ({CoDE}) for {AI} Data Centers},
   author    = {Li, Honglin and She, Buxin},
   booktitle = {2026 North American Power Symposium (NAPS)},
   year      = {2026}
@@ -145,31 +170,6 @@ body-classes: "page-inner page-publications"
   author    = {She, Buxin and Li, Honglin and Feng, Guangxu and Zhang, Qiwei},
   booktitle = {2026 North American Power Symposium (NAPS)},
   year      = {2026}
-}</code></pre>
-</div>
-</div>
-</li>
-<li class="pub" data-type="preprint" data-year="2026">
-<div class="pub-badge"><span class="abbr pt-preprint">Preprint</span></div>
-<div class="pub-main">
-<div class="pub-title">Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads</div>
-<div class="pub-authors"><span class="me">H. Li</span>, B. She, J. Zhang</div>
-<div class="pub-venue"><em>arXiv preprint</em> arXiv:2608.10999, 2026. <span class="pub-tag tag-review">Under review</span></div>
-<div class="pub-links">
-<a class="btn-xs" href="https://arxiv.org/abs/2608.10999">arXiv</a>
-<button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2026smrcogeneration">Bib</button>
-</div>
-<div class="pub-bib" id="bib-li2026smrcogeneration" hidden>
-<button type="button" class="bib-copy"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copy</span></button>
-<pre><code>@misc{li2026smrcogeneration,
-  author        = {Li, Honglin and She, Buxin and Zhang, Jie},
-  title         = {{Techno-Economic Boundary Analysis of Small Modular Reactor Cogeneration for Hyperscale Data Center IT and Cooling Loads}},
-  year          = {2026},
-  eprint        = {2608.10999},
-  archivePrefix = {arXiv},
-  primaryClass  = {eess.SY},
-  doi           = {10.48550/arXiv.2608.10999},
-  note          = {Under review}
 }</code></pre>
 </div>
 </div>

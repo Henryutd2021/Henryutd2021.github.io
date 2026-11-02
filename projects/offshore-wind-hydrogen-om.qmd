@@ -2,7 +2,7 @@
 title: "Intelligent operation and maintenance in offshore wind–hydrogen systems"
 subtitle: "TORQUE 2024, first author"
 description: "How much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?"
-order: 8
+order: 7
 categories: ["Hydrogen systems"]
 themekey: "hydrogen"
 themelabel: "Hydrogen systems"
@@ -22,13 +22,35 @@ toc: false
 <figure class="proj-banner"><img src="../images/projects/offshore-wind-hydrogen-om.svg" alt="" width="640" height="360"></figure>
 <div class="proj-layout">
 <div class="proj-main">
+<div class="proj-glance">
+<p class="glance-role"><i class="bi bi-person-check" aria-hidden="true"></i>First author</p>
+<ul class="glance-tags" aria-label="Scale and methods"><li>Gulf of Mexico wind area</li><li>Houston refinery hydrogen demand</li><li>Monte Carlo maintenance simulation</li><li>Two-stage optimization</li><li>54 sensitivity scenarios</li></ul>
+</div>
 <section class="proj-q" aria-labelledby="h-question">
 <h2 id="h-question"><i class="bi bi-question-circle" aria-hidden="true"></i>Research question</h2>
 <p class="proj-question">How much does prognostics-based operation and maintenance change the cost of an offshore wind farm supplying electrolytic hydrogen?</p>
 </section>
+<section class="proj-insight" id="insight" aria-labelledby="h-insight">
+<h2 id="h-insight"><i class="bi bi-stars" aria-hidden="true"></i>Key insight</h2>
+<p class="insight-title">A large maintenance saving became a small hydrogen-cost saving</p>
+<p>Prognostics-based maintenance lowered wind operation-and-maintenance cost by about 10% and downtime by about 11%. The saving applies to the turbines alone, so its effect on the whole system was smaller: the levelized cost of hydrogen fell by about 2%.</p>
+</section>
 <section class="proj-sec" aria-labelledby="h-contribution">
 <h2 id="h-contribution"><i class="bi bi-person-check" aria-hidden="true"></i>My contribution</h2>
-<p>First author. Linked an operation-and-maintenance simulation developed with University of Strathclyde collaborators to the system techno-economic optimization.</p>
+<p>First author. Linked an operation-and-maintenance simulation developed with my co-authors to the system techno-economic optimization.</p>
+</section>
+<section class="proj-sec" id="approach" aria-labelledby="h-approach">
+<h2 id="h-approach"><i class="bi bi-tools" aria-hidden="true"></i>How I approached it</h2>
+<ol class="approach">
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>Maintenance strategy and system design were optimized in separate models.</p><p class="ap-did"><span class="ap-k">What I did</span>I took the expected maintenance cost and turbine downtime from the maintenance optimization and used them as inputs to the system sizing and dispatch model.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>This traced the effect of maintenance through to the levelized costs of hydrogen and electricity.</p></li>
+<li class="ap-card"><p class="ap-challenge"><span class="ap-k">Challenge</span>An offshore hydrogen plant needs a realistic site, buyer and price signal.</p><p class="ap-did"><span class="ap-k">What I did</span>I placed the system in a federal Gulf of Mexico wind energy area, estimated Houston-area refinery hydrogen demand from the capacities of ten refineries, and used Houston load-zone prices.</p><p class="ap-why"><span class="ap-k">Why it mattered</span>This tied the case study to a designated site and an existing demand centre.</p></li>
+</ol>
+</section>
+<section class="proj-sec" id="choices" aria-labelledby="h-choices">
+<h2 id="h-choices"><i class="bi bi-signpost-split" aria-hidden="true"></i>Design choices</h2>
+<dl class="choices">
+<div class="choice"><dt>Apply prognostics-based maintenance only to the wind turbines</dt><dd><span class="ch-alt">Alternatives considered: applying it to the hydrogen equipment as well</span>Condition monitoring and prognostics are more mature for offshore wind than for hydrogen assets.</dd></div>
+</dl>
 </section>
 <section class="proj-sec" aria-labelledby="h-method">
 <h2 id="h-method"><i class="bi bi-diagram-3" aria-hidden="true"></i>Method</h2>
@@ -44,6 +66,10 @@ toc: false
 <section class="proj-sec proj-bounds" aria-labelledby="h-bounds">
 <h2 id="h-bounds"><i class="bi bi-exclamation-circle" aria-hidden="true"></i>Boundary conditions</h2>
 <p>Single site and one weather year; maintenance parameters from the collaborators&#x27; framework.</p>
+</section>
+<section class="proj-next" id="led-to" aria-labelledby="h-next">
+<h2 id="h-next"><i class="bi bi-arrow-right-circle" aria-hidden="true"></i>What it led to</h2>
+<p>These plant studies took the site as given; where hydrogen assets should go across a whole grid became the question of my Texas study. <a class="next-link" href="txh2.html">Hydrogen&#x27;s role in expanding renewable energy in Texas<i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
 </section>
 <section class="proj-sec" aria-labelledby="h-pubs">
 <h2 id="h-pubs"><i class="bi bi-journal-text" aria-hidden="true"></i>Publications</h2>
@@ -97,7 +123,7 @@ toc: false
 </div>
 <nav class="proj-pager" aria-label="More projects">
 <a class="pager-link prev" href="solar-hydrogen.html"><span class="pager-label"><i class="bi bi-arrow-left" aria-hidden="true"></i>Previous project</span><span class="pager-title">Co-located solar and hydrogen plants</span></a>
-<a class="pager-link next" href="facility-microgrid-location.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Supply chains with on-site microgrids and transactive energy</span></a>
+<a class="pager-link next" href="txh2.html"><span class="pager-label">Next project<i class="bi bi-arrow-right" aria-hidden="true"></i></span><span class="pager-title">Hydrogen&#x27;s role in expanding renewable energy in Texas</span></a>
 </nav>
 </article>
 ```
