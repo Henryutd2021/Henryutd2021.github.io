@@ -423,8 +423,8 @@
     "title": "What does electricity cost to make?",
     "short": "What it costs",
     "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
-    "href": "index.html#lesson-7",
-    "ready": false
+    "href": "07-cost.html",
+    "ready": true
    }
   },
   {
@@ -433,7 +433,7 @@
    "total": 14,
    "code": null,
    "title": "What does electricity cost to make?",
-   "subtitle": null,
+   "subtitle": "Split a plant's costs, discount the future and build a levelized cost",
    "short": "What it costs",
    "tier": "analyst",
    "tier2": null,
@@ -449,8 +449,8 @@
    "scales": [],
    "teaches": [],
    "lab": null,
-   "href": "index.html#lesson-7",
-   "ready": false,
+   "href": "07-cost.html",
+   "ready": true,
    "after": [
     {
      "id": "05-capacity-factor",
@@ -477,8 +477,8 @@
     "title": "Who runs, and what sets the price?",
     "short": "Merit order",
     "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
-    "href": "index.html#lesson-8",
-    "ready": false
+    "href": "08-merit-order.html",
+    "ready": true
    }
   },
   {
@@ -487,7 +487,7 @@
    "total": 14,
    "code": null,
    "title": "Who runs, and what sets the price?",
-   "subtitle": null,
+   "subtitle": "Build Prairie Town's supply stack and find the price",
    "short": "Merit order",
    "tier": "analyst",
    "tier2": null,
@@ -503,8 +503,8 @@
    "scales": [],
    "teaches": [],
    "lab": null,
-   "href": "index.html#lesson-8",
-   "ready": false,
+   "href": "08-merit-order.html",
+   "ready": true,
    "after": [
     {
      "id": "06-three-jobs",
@@ -521,8 +521,8 @@
      "title": "What does electricity cost to make?",
      "short": "What it costs",
      "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
-     "href": "index.html#lesson-7",
-     "ready": false
+     "href": "07-cost.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -531,8 +531,8 @@
     "title": "What does electricity cost to make?",
     "short": "What it costs",
     "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
-    "href": "index.html#lesson-7",
-    "ready": false
+    "href": "07-cost.html",
+    "ready": true
    },
    "next": {
     "id": "09-storage",
@@ -584,8 +584,8 @@
      "title": "Who runs, and what sets the price?",
      "short": "Merit order",
      "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
-     "href": "index.html#lesson-8",
-     "ready": false
+     "href": "08-merit-order.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -594,8 +594,8 @@
     "title": "Who runs, and what sets the price?",
     "short": "Merit order",
     "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
-    "href": "index.html#lesson-8",
-    "ready": false
+    "href": "08-merit-order.html",
+    "ready": true
    },
    "next": {
     "id": "10-write-it-down",
@@ -647,8 +647,8 @@
      "title": "Who runs, and what sets the price?",
      "short": "Merit order",
      "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
-     "href": "index.html#lesson-8",
-     "ready": false
+     "href": "08-merit-order.html",
+     "ready": true
     }
    ],
    "prev": {

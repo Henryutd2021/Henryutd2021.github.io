@@ -1,0 +1,26 @@
+{
+  "about": "Lesson 8 (Who runs, and what sets the price?): Prairie Town's five plants offer their power at their running cost in one hour of lesson 0's real day; the operator stacks the offers cheapest first and the last plant needed sets the price for everyone (a uniform-price market). The hour's demand, wind and solar are cut from town_year.json exactly as lesson 0 does (town.json, scenario lesson0). Gas plants' running cost = heat rate x gas price + other running costs; at the reference gas price this gives lesson 0's $40 and $100 per MWh. All Prairie Town numbers are illustrative.",
+  "accessed": "2026-11-02",
+  "hour": 19,
+  "hourLabel": "19:00",
+  "gas": {
+    "ref": 6.00, "min": 2.00, "max": 12.00, "step": 0.05,
+    "marks": [{ "value": 3.85, "label": "2025 U.S. average for power plants" }, { "value": 7.21, "label": "2022 average" }],
+    "note": "$6.00/MMBtu is Prairie Town's illustrative reference, the price behind lesson 0's costs. Marks: average cost of natural gas to U.S. power plants (EIA, Electric Power Annual, Table 7.4, final data)."
+  },
+  "plants": {
+    "cc": { "heatRate": 6.0, "other": 4.0, "note": "Illustrative. A new combined-cycle plant needs about 6.2 MMBtu per MWh (EIA AEO2026)." },
+    "peaker": { "heatRate": 15.0, "other": 10.0, "note": "Illustrative: an old, inefficient peaker. A new combustion turbine needs about 9.1 MMBtu per MWh (EIA AEO2026)." }
+  },
+  "wind": { "min": 150, "max": 750, "step": 25, "big": 750 },
+  "credit": { "value": 25, "note": "Illustrative: a payment per MWh produced, so the wind farm still earns at prices down to minus the credit." },
+  "inflexible": { "offer": -40, "note": "Illustrative: the price the plant would accept rather than stop and restart later." },
+  "teaser": { "lineMW": 200 },
+  "sources": {
+    "eia-2012-negative": { "text": "EIA, Today in Energy: Negative wholesale electricity prices occur in RTOs", "url": "https://www.eia.gov/todayinenergy/detail.php?id=6730", "asOf": "18 June 2012" },
+    "eia-2014-texas": { "text": "EIA, Today in Energy: Fewer wind curtailments and negative power prices seen in Texas after major grid expansion", "url": "https://www.eia.gov/todayinenergy/detail.php?id=16831", "asOf": "24 June 2014" },
+    "eia-epa-gas": { "text": "EIA, Electric Power Annual, Table 7.4", "url": "https://www.eia.gov/electricity/annual/html/epa_07_04.html", "asOf": "final 2025 data, October 2026" },
+    "eia-aeo2026-emm": { "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3", "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf", "asOf": "April 2026" },
+    "eia-930": { "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool", "url": "https://www.eia.gov/electricity/gridmonitor/", "asOf": "2025 data, accessed 2 November 2026" }
+  }
+}
