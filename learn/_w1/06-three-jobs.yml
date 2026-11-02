@@ -1,0 +1,18 @@
+# Sidecar for lesson 6 (T6, 06-three-jobs), builder learn-w1-c, 2026-11-02. Read by scripts/build_learn.py.
+id: 06-three-jobs
+lesson: 6
+glossary:
+  - id: flexibility
+    term: Flexibility
+    def: "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks."
+  - id: firm-share
+    term: Firm share (ELCC)
+    def: "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC)."
+  - id: demand-response
+    term: Demand response
+    def: "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment."
+requests:
+  - "Allow-list request: pjm.com, for PJM's ELCC Class Ratings for the 2028/2029 Base Residual Auction, https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf (one-page PDF, read 2026-11-02; values also in reports/learn/dossiers/regional-grid.md, key number 8). The lesson's firm shares (nuclear 96%, demand resource 91%, gas combined cycle 78%, gas combustion turbine 67% or 79% dual fuel, 4/6/8/10-hour storage 59/68/71/78%, onshore wind 34%, offshore wind 60%, hydro intermittent 35%, fixed-tilt solar 7%, tracking 10%) are cited by title only until the domain is approved; then add the link in learn/06-three-jobs.qmd (data note, facts table, sources) and the url in assets/learn/data/06-three-jobs.json. No allow-listed agency publishes these class ratings."
+  - "Promote three lesson-local components from assets/learn/06-three-jobs.js: JobSorter (i-card-sort with several bins per card, as toggles, scored against a reference with 'partly' cells that accept either answer), Scatter (a two-measure dot chart with keyboard-operable points and a text version) and Steelman (the Steelman card: both strongest cases, opened in turn). Their styles are the lx6- rules in the page's style block."
+  - "Shared technology palette: battery, hydro, geothermal and demand-response colours are lesson-local (--lx6-bat, --lx6-hyd, --lx6-geo, --lx6-dr, day and night values in the page's style block); the pictograms atom, flame, drop, geo and dial are added to LX.IC by the lesson. Please move both into base.css and core.js so later lessons (T9, T13, F4) use the same ones."
+  - "ConceptMap (conceptmap.js) labels a node's `game` field 'In the game', which only fits lesson 0; an option such as gameLabel would let step-card lessons show the reader's own numbers there. This lesson puts its numbers in the node text instead."

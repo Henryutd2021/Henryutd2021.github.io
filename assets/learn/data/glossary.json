@@ -1,9 +1,4 @@
 {
- "agc": {
-  "term": "Automatic generation control (AGC)",
-  "short": "The grid operator's computer system that raises or lowers plants over minutes to bring frequency back to 60 Hz.",
-  "lesson": "3"
- },
  "balancing": {
   "term": "Balancing",
   "short": "Keeping the power that plants make equal to the power that people use, at every moment.",
@@ -13,11 +8,6 @@
   "term": "Balancing authority",
   "short": "The organisation that keeps supply and demand balanced, moment to moment, in its own part of the grid.",
   "lesson": 0
- },
- "forecast-bias": {
-  "term": "Bias",
-  "short": "The average signed miss of a forecast, showing whether it tends to run too high or too low.",
-  "lesson": "4"
  },
  "capacity": {
   "term": "Capacity",
@@ -44,15 +34,20 @@
   "short": "A rule every solution must obey, such as supply equals demand or no plant above its size.",
   "lesson": 10
  },
+ "cube-law": {
+  "term": "Cube law",
+  "short": "The power carried by the wind grows with the cube of its speed, so twice the speed carries eight times the power.",
+  "lesson": "5"
+ },
  "curtailment": {
   "term": "Curtailment (spilling)",
   "short": "Turning a wind or solar farm below what the weather allows, usually because the grid has more power than it can use at that moment.",
   "lesson": 0
  },
- "day-ahead-forecast": {
-  "term": "Day-ahead forecast",
-  "short": "A grid operator's estimate, made the day before, of how much power customers will use in each hour.",
-  "lesson": "4"
+ "cut-out-speed": {
+  "term": "Cut-out speed",
+  "short": "The wind speed above which a turbine shuts down to protect itself.",
+  "lesson": "5"
  },
  "decision-variable": {
   "term": "Decision variable",
@@ -63,6 +58,11 @@
   "term": "Demand (load)",
   "short": "The total power that all users on a grid draw at a given moment.",
   "lesson": 0
+ },
+ "demand-response": {
+  "term": "Demand response",
+  "short": "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment.",
+  "lesson": "6"
  },
  "dispatch": {
   "term": "Dispatch",
@@ -89,35 +89,30 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
  },
- "fast-frequency-response": {
-  "term": "Fast frequency response",
-  "short": "Power from batteries or other inverter-based resources delivered within a fraction of a second of a frequency drop.",
-  "lesson": "3"
- },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
   "lesson": 6
+ },
+ "firm-share": {
+  "term": "Firm share (ELCC)",
+  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC).",
+  "lesson": "6"
+ },
+ "flexibility": {
+  "term": "Flexibility",
+  "short": "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks.",
+  "lesson": "6"
  },
  "forecast-error": {
   "term": "Forecast error",
   "short": "The difference between what was forecast, such as tomorrow's demand or wind, and what actually happened.",
   "lesson": 4
  },
- "governor": {
-  "term": "Governor",
-  "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
-  "lesson": "3"
- },
  "frequency": {
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
- },
- "inertia": {
-  "term": "Inertia",
-  "short": "Energy stored in the spinning machines of a power grid; it slows a fall in frequency but cannot stop it.",
-  "lesson": "3"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -134,16 +129,6 @@
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
   "lesson": 10
  },
- "mae": {
-  "term": "Mean absolute error (MAE)",
-  "short": "The average size of a forecast's misses, in the units of what is forecast, ignoring whether they were too high or too low.",
-  "lesson": "4"
- },
- "mape": {
-  "term": "Mean absolute percentage error (MAPE)",
-  "short": "The average miss as a percentage of the actual value; it breaks down when actual values are near zero.",
-  "lesson": "4"
- },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -158,11 +143,6 @@
   "term": "Merit order",
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0
- },
- "nadir": {
-  "term": "Nadir",
-  "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
-  "lesson": "3"
  },
  "objective": {
   "term": "Objective",
@@ -184,35 +164,30 @@
   "short": "A power plant that runs only in the hours of highest demand, because it starts quickly but is expensive to run.",
   "lesson": 0
  },
- "persistence-forecast": {
-  "term": "Persistence forecast",
-  "short": "The simplest forecast: the next value will be the same as the last one seen, or as the same hour a day or a week before.",
-  "lesson": "4"
- },
  "power": {
   "term": "Power",
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
   "lesson": 0
  },
- "prediction-interval": {
-  "term": "Prediction interval",
-  "short": "A range that should contain the actual value with a stated probability, drawn as a band around a forecast.",
-  "lesson": "4"
- },
- "primary-response": {
-  "term": "Primary frequency response",
-  "short": "Automatic extra output from power plants' governors within seconds of a frequency drop; it stops the fall but does not restore 60 Hz.",
-  "lesson": "3"
+ "power-curve": {
+  "term": "Power curve",
+  "short": "A chart of how much power a wind turbine makes at each wind speed.",
+  "lesson": "5"
  },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
   "lesson": 0
  },
- "rocof": {
-  "term": "Rate of change of frequency",
-  "short": "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second.",
-  "lesson": "3"
+ "rated-speed": {
+  "term": "Rated wind speed",
+  "short": "The wind speed at which a turbine first reaches its full rated power; above it, the blades turn to spill the extra wind.",
+  "lesson": "5"
+ },
+ "refuelling-outage": {
+  "term": "Refuelling outage",
+  "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
+  "lesson": "5"
  },
  "reserves": {
   "term": "Reserves",
@@ -234,20 +209,10 @@
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
   "lesson": 11
  },
- "skill-score": {
-  "term": "Skill score",
-  "short": "How much smaller a forecast's error is than that of a simple baseline such as persistence.",
-  "lesson": "4"
- },
  "solver": {
   "term": "Solver",
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11
- },
- "ufls": {
-  "term": "Under-frequency load shedding",
-  "short": "Relays that automatically disconnect blocks of customers when the frequency falls to a set level, to save the rest of the grid.",
-  "lesson": "3"
  },
  "unserved-energy": {
   "term": "Unserved energy",

@@ -1,0 +1,23 @@
+# Sidecar for lesson 5 (T5, 05-capacity-factor), builder learn-w1-c, 2026-11-02. Read by scripts/build_learn.py.
+id: 05-capacity-factor
+lesson: 5
+glossary:
+  - id: power-curve
+    term: Power curve
+    def: "A chart of how much power a wind turbine makes at each wind speed."
+  - id: cube-law
+    term: Cube law
+    def: "The power carried by the wind grows with the cube of its speed, so twice the speed carries eight times the power."
+  - id: rated-speed
+    term: Rated wind speed
+    def: "The wind speed at which a turbine first reaches its full rated power; above it, the blades turn to spill the extra wind."
+  - id: cut-out-speed
+    term: Cut-out speed
+    def: "The wind speed above which a turbine shuts down to protect itself."
+  - id: refuelling-outage
+    term: Refuelling outage
+    def: "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance."
+requests:
+  - "Shared profile helper: lesson 5 now uses LX.cfScale and LX.townProfile (profiles.js) with method power, so each plant's best hours reach its size (with scale, SPP wind scaled to 33.8% never passes 64% of the farm's size, which reads as 'a 100 MW farm cannot make 100 MW'). Two lesson-local steps run first and belong in the shared helper or in scripts/build_learn_town_data.py: (1) night-time solar cleaning: town_year.json reports solar output at night from 18 February to 21 March 2025 and on a few other nights (370 hours, 1.3% of the shape's energy; up to 14% of the year's best hour at 02:00), which is telemetry error; the lesson zeroes hours when the sun is below the horizon across a box covering SPP (31-40 N, 94-104 W; sunUp() in assets/learn/05-capacity-factor.js); (2) an option {monthlyCF: [12 values]}: the SPP shapes contain the fleets' growth during 2025 (solar's January maximum is 0.56 of its November maximum), so an annual-only scaling gives December solar about 22% against EIA's 13.1%; the lesson brings each month to EIA's 2025 monthly value with LX.cfScale(month, cf, 'power') before townProfile sets the year."
+  - "Promote the lesson-local EquationCard (the e-equation explain component: tappable symbols with meaning, the reader's numbers, a code view and a text version) from assets/learn/05-capacity-factor.js into assets/learn/components/, with its lx5-eq styles from the page's style block."
+  - "learn_screenshots.mjs: its mid, done and explain states drive lesson 0's game only. Lessons 5 and 6 expose root.lxDemo(n) and open step n with its action done when the page hash is #lx-demo-<n>; a generic state such as --states step:<n> would replace the per-step wrapper used for this build."

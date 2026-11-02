@@ -1,0 +1,350 @@
+// 06-three-jobs.js — Lesson 6, "Cheap energy, firm capacity, flexibility: which plant does which job?" (step cards, W1,
+// 2026-11-02).
+//
+// Data: assets/learn/data/06-three-jobs.json (nine technologies with sourced key numbers and the reference sort) and
+// assets/learn/data/town_year.json (SPP's 2025 wind shape, for the longest calm spell in the Steelman card).
+//
+// No optimization model (model mode "none"). The pure functions below:
+//   score(marks, tech)   compares the reader's sort with the reference: a 'yes' or 'no' cell agrees or differs; a 'partly'
+//                        cell accepts either answer (it depends on the plant, the place or the rules)
+//   lull(shape, thr)     the longest run of hours with the wind shape below thr (thousandths of its 2025 best hour)
+//   rank(tech, key)      table order by a key, missing values last
+// Two numbers per technology: the 2025 U.S. capacity factor (EIA, Electric Power Monthly, Tables 6.07.A/B) and the
+// firm share, PJM's ELCC class rating for its 2028/2029 auction (one market, one auction; pjm.com is cited as text until
+// the domain is approved for links). Neutral by design: the reference sort gives the evidence for every cell, and the
+// contested pairing (wind plus storage as firm capacity) gets both strongest cases.
+//
+// Lesson-local components (for the coordinator to promote): JobSorter (i-card-sort with several bins per card, as
+// toggles), Scatter (a two-measure dot chart with tappable points), Steelman (two strongest cases, opened in turn).
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------- pure model
+  var JOBS = ["energy", "firm", "flex"];
+  function score(marks, tech) {
+    var res = { agree: 0, differ: 0, partly: 0, clear: 0, cells: {} };
+    tech.forEach(function (t) {
+      res.cells[t.key] = {};
+      JOBS.forEach(function (j) {
+        var ref = t.jobs[j], on = !!(marks[t.key] && marks[t.key][j]), c;
+        if (ref === "partly") { c = "partly"; res.partly++; }
+        else { res.clear++; c = (ref === "yes") === on ? "agree" : "differ"; res[c]++; }
+        res.cells[t.key][j] = c;
+      });
+    });
+    return res;
+  }
+  function referenceMarks(tech) {
+    var m = {}; tech.forEach(function (t) { m[t.key] = {}; JOBS.forEach(function (j) { m[t.key][j] = t.jobs[j] === "yes"; }); }); return m;
+  }
+  function lull(shape, thr) {
+    var best = 0, cur = 0, end = -1;
+    for (var i = 0; i < shape.length; i++) { cur = shape[i] < thr ? cur + 1 : 0; if (cur > best) { best = cur; end = i; } }
+    return { hours: best, start: end - best + 1, end: end };
+  }
+  // local date of hour index i (index 0 = 00:00 Central standard time, 1 January 2025; see 05-capacity-factor.json)
+  function localDate(i) { var d = new Date(Date.UTC(2025, 0, 1) + i * 3600000); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate(), h: d.getUTCHours() }; }
+  function rank(tech, key) {
+    return tech.slice().sort(function (a, b) {
+      var x = a[key], y = b[key];
+      if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+      return y - x;
+    }).map(function (t) { return t.key; });
+  }
+  var model = { JOBS: JOBS, score: score, referenceMarks: referenceMarks, lull: lull, localDate: localDate, rank: rank };
+  if (typeof module !== "undefined" && module.exports) module.exports = model;
+  if (typeof window === "undefined" || !window.LX) return;
+
+  // ---------------------------------------------------------------- view
+  var LX = window.LX, H = LX.H, S = LX.S, LESSON = "06-three-jobs";
+  // lesson-local pictograms (24-unit strokes, like LX.IC)
+  LX.IC.atom = LX.IC.atom || '<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>';
+  LX.IC.flame = LX.IC.flame || '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.4 3.6-8.3.6 1.6 1.4 2.6 2.6 3.2C12 6.7 13.6 4.4 15.4 3c-.2 3 1 4.8 2.2 6.6 1 1.4 1.4 2.9 1.4 4.9 0 3.7-2.7 6.5-7 6.5z"/>';
+  LX.IC.drop = LX.IC.drop || '<path d="M12 3.5c3 4 6 7.4 6 10.8a6 6 0 0 1-12 0c0-3.4 3-6.8 6-10.8z"/><path d="M9 15a3 3 0 0 0 3 3"/>';
+  LX.IC.geo = LX.IC.geo || '<path d="M3 15h18M5.5 19h13"/><path d="M12 15V5M9 8l3-3 3 3"/><path d="M7 12.5c0-1.5 1.5-1.5 1.5-3M17 12.5c0-1.5-1.5-1.5-1.5-3"/>';
+  LX.IC.dial = LX.IC.dial || '<path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l-4-3"/><path d="M3 20h18"/>';
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function pct(x, d) { return (x * 100).toFixed(d === undefined ? 1 : d) + "%"; }
+  function firmText(t) { return t.firm == null ? t.firmLabel : t.firmLabel + (t.firmNote ? " (" + t.firmNote + ")" : ""); }
+  // the first key number: capacity factor, or what replaces it for technologies that make no energy of their own
+  function first(t) {
+    if (t.cf != null) return ["Capacity factor, U.S. 2025", pct(t.cf)];
+    if (t.rte) return ["Round-trip efficiency, U.S. fleet (2019 data)", pct(t.rte, 0)];
+    if (t.drMW) return ["Enrolled in U.S. wholesale markets, 2024", LX.fmt.int(t.drMW) + " MW, " + pct(t.drShare) + " of peak"];
+    return ["Capacity factor", "–"];
+  }
+
+  function view(live, data, root) {
+    var D = data["06_three_jobs"], year = data.town_year, TECH = D.tech, byKey = {};
+    TECH.forEach(function (t) { byKey[t.key] = t; });
+    var jobBy = {}; D.jobs.forEach(function (j) { jobBy[j.key] = j; });
+    var L = lull(year.wind, D.steelman.lullThreshold), ls = localDate(L.start), le = localDate(L.end);
+    var lullText = L.hours + " hours in a row, from " + ls.d + " " + MONTHS[ls.m] + " to " + le.d + " " + MONTHS[le.m];
+    var log = LX.store.get("t6-log", {}) || {};
+    function keep(k, v) { log[k] = v; LX.store.set("t6-log", log); }
+    var openedJobs = {}, openedTech = {}, marks = log.marks || {}, checked = false, sides = {}, pred = null;
+
+    var steps = [
+      { text: "A power system needs three jobs done. Cheap energy fills the year with MWh; [[firm-capacity|firm capacity]] is there in the riskiest hours; [[flexibility|flexibility]] follows the changes in between. Open each job.",
+        build: function (act, api) {
+          var row = H("div", { class: "lx6-jobs" }, act);
+          D.jobs.forEach(function (j) {
+            var b = H("button", { class: "lx6-job", type: "button", "aria-expanded": openedJobs[j.key] ? "true" : "false" }, row);
+            b.innerHTML = LX.icon(j.icon) + "<b>" + LX.esc(j.label) + "</b><span class='q'>" + LX.esc(j.question) + "</span><span class='m'>Measured by: " + LX.esc(j.measure) + "</span>";
+            b.addEventListener("click", function () {
+              openedJobs[j.key] = true; b.setAttribute("aria-expanded", "true");
+              if (D.jobs.every(function (x) { return openedJobs[x.key]; })) { api.done(); api.saw("Three jobs, three different measures. A plant can be good at one and poor at another."); }
+            });
+          });
+          if (D.jobs.every(function (x) { return openedJobs[x.key]; })) api.done();
+        } },
+      { text: "Before the cards, a prediction. The riskiest hours are the few each year when demand is high and supply is tight. Pick the plant you think a grid trusts most then.",
+        build: function (act, api) {
+          LX.Predict(act, { id: "t6-firm", q: D.predict.q, answer: D.predict.answer, fresh: true, lockText: "Locked in. Step 4 shows the numbers.",
+            options: D.predict.options.map(function (k) { return { value: k, label: byKey[k].label + (k === "battery" ? " (4-hour)" : ""), color: byKey[k].color }; }),
+            onPick: function (p) { pred = p; keep("pred", p); api.done(); } });
+          if (pred) api.done();
+        } },
+      { text: "Meet nine technologies. Each card gives two key numbers: its capacity factor (lesson 5) and its [[firm-share|firm share]], the part of its MW that one large U.S. grid counts at the peak. Open every card.",
+        build: function (act, api) {
+          var chips = H("div", { class: "lx6-chips", role: "group", "aria-label": "Technologies" }, act), card = H("div", { class: "lx6-card", "aria-live": "polite" }, act);
+          var count = H("p", { class: "lx-hint" }, act), btns = {};
+          TECH.forEach(function (t) {
+            var b = H("button", { class: "lx-chip", type: "button", "aria-pressed": "false", style: "--c:" + t.color }, chips);
+            H("i", null, b); H("span", { text: t.label }, b);
+            b.addEventListener("click", function () { show(t.key); });
+            btns[t.key] = b;
+          });
+          function show(k) {
+            var t = byKey[k]; openedTech[k] = true;
+            Object.keys(btns).forEach(function (x) { btns[x].setAttribute("aria-pressed", x === k ? "true" : "false"); btns[x].classList.toggle("seen", !!openedTech[x]); });
+            card.innerHTML = ""; card.style.setProperty("--c", t.color);
+            var hd = H("div", { class: "lx6-card-h" }, card); hd.innerHTML = LX.icon(t.icon); H("h4", { text: t.label }, hd);
+            H("p", { class: "lx6-how", text: t.how }, card);
+            var nums = H("div", { class: "lx6-nums" }, card);
+            var f1 = first(t), n1 = H("div", null, nums); H("span", { text: f1[0] }, n1); H("b", { text: f1[1] }, n1);
+            var n2 = H("div", null, nums); H("span", { text: "Firm share, PJM 2028/29" }, n2); H("b", { text: firmText(t) }, n2);
+            var jb = H("ul", { class: "lx6-why" }, card);
+            JOBS.forEach(function (j) { var li = H("li", { class: "j-" + t.jobs[j] }, jb); H("b", { text: jobBy[j].label + ": " + t.jobs[j] }, li); H("span", { text: " " + t.why[j] }, li); });
+            var n = Object.keys(openedTech).length;
+            count.textContent = n < TECH.length ? "Cards opened: " + n + " of " + TECH.length + "." : "All " + TECH.length + " cards opened.";
+            if (n === TECH.length) { api.done(); api.saw("No card says yes to every job. The next step puts the two numbers side by side."); }
+          }
+          show(TECH.filter(function (t) { return !openedTech[t.key]; }).concat(TECH)[0].key);
+        } },
+      { text: "Each dot is a plant: capacity factor across, firm share up. Tap the plant that runs the least of the year but counts the most at the peak.",
+        build: function (act, api) {
+          var pts = TECH.filter(function (t) { return t.cf != null && t.firm != null && t.key !== "hydro"; });
+          var sc = Scatter(act, pts, function (k) {
+            var t = byKey[k], ok = k === "pk";
+            keep("scatter", k);
+            var pr = !pred ? "" : pred === D.predict.answer ? " Your prediction was right too." : " Your prediction, " + byKey[pred].label.toLowerCase() + ", counts " + byKey[pred].firmLabel + ".";
+            if (ok) { api.done(); api.saw("Right: the gas peaker ran only " + pct(t.cf) + " of 2025, yet PJM counts " + t.firmLabel + " of its MW. Solar is the opposite: " + pct(byKey.solar.cf) + " against " + byKey.solar.firmLabel + ". Capacity factor and firm share measure different jobs." + pr); }
+            else api.saw(t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel + ". Look further left, near the top.", true);
+          });
+          void sc;
+        } },
+      { text: "Now sort. Mark the jobs each technology does well; some do more than one. Then check your sort against the evidence.",
+        build: function (act, api) {
+          JobSorter(act, TECH, D.jobs, marks, function (m) { marks = m; keep("marks", m); }, function (res) {
+            checked = true; keep("score", { agree: res.agree, clear: res.clear, partly: res.partly });
+            api.done();
+            api.saw("You agree with the evidence on " + res.agree + " of " + res.clear + " clear cells. The other " + res.partly + " are “partly”: the answer depends on the plant, the place or the market's rules, so either is fair. Open “Why” on any row.", res.differ > 4);
+          }, checked);
+          if (checked) api.done();
+        } },
+      { text: "Some pairings are contested, and the evidence points both ways. Open the strongest case on each side before you make up your mind.",
+        build: function (act, api) {
+          var sr = D.steelman.storageRatings;
+          Steelman(act, {
+            title: D.steelman.title,
+            forTitle: "The strongest case for", againstTitle: "The strongest case against",
+            forPts: ["Longer storage counts for more: PJM counts " + pct(sr["4"], 0) + " of a 4-hour battery's MW, " + pct(sr["8"], 0) + " for 8 hours and " + pct(sr["10"], 0) + " for 10 hours.",
+                     "Steadier wind counts for more: PJM counts " + pct(D.steelman.offshoreWind, 0) + " for offshore wind, against " + byKey.wind.firmLabel + " onshore."],
+            againstPts: ["Calm spells outlast batteries: the Southwest Power Pool's whole wind fleet stayed below a quarter of its best 2025 hour for " + lullText + ".",
+                         "A battery must be recharged before the next calm spell, often by the same wind."],
+            onOpen: function (side) {
+              sides[side] = true;
+              if (sides["for"] && sides.against) { api.done(); keep("steelman", true); api.saw("Both cases rest on real numbers. Settling it for one grid takes many weather years of hourly data and a reliability test: Analyst lesson A5 (upcoming)."); }
+            }, opened: sides
+          });
+          if (sides["for"] && sides.against) api.done();
+        } },
+      { text: D.apply.q,
+        build: function (act, api) {
+          var why = { energy: "Cheap energy fills the year, but this need lasts a few hours. The job is firm capacity.",
+                      firm: "Right: a few hours a year at the peak is a firm-capacity job. Peakers, batteries, demand response and reservoir hydro could all compete for it, each with its limits.",
+                      flex: "Flexibility helps follow the evening ramp, but the need here is to be there at all: firm capacity." };
+          var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Job" }, act), bs = {};
+          D.jobs.forEach(function (j) {
+            var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": "false" }, row); b.innerHTML = LX.icon(j.icon) + "<span>" + LX.esc(j.label) + "</span>";
+            b.addEventListener("click", function () {
+              Object.keys(bs).forEach(function (x) { bs[x].setAttribute("aria-pressed", x === j.key ? "true" : "false"); });
+              keep("apply", j.key); api.saw(why[j.key], j.key !== D.apply.answer);
+              if (j.key === D.apply.answer) { api.done(); LX.progress.done(LESSON); }
+            });
+            bs[j.key] = b;
+          });
+        } }
+    ];
+    var cards = LX.StepCards(live, { id: "t6-steps", steps: steps });
+    // screenshot and demo hook: #lx-demo-<n> opens step n (1-7) with its action done (scripts/learn_screenshots.mjs, state "mid";
+    // plain #lx-demo opens the sorter, partly filled and checked). Readers never see it unless they type the hash.
+    root.lxDemo = function (n) {
+      var i = Math.max(0, Math.min(steps.length - 1, (n || 5) - 1));
+      var click = function (sel, k) { var b = cards.el.querySelectorAll(sel)[k || 0]; if (b) b.click(); };
+      pred = "battery"; TECH.forEach(function (t) { openedTech[t.key] = true; });
+      if (i === 4) { marks = referenceMarks(TECH); marks.wind.flex = true; marks.battery.energy = true; checked = true; }
+      cards.go(i);
+      if (i === 0) { click(".lx6-job", 0); click(".lx6-job", 1); click(".lx6-job", 2); }
+      if (i === 1) click(".lx-choice", 2);
+      if (i === 2) click(".lx6-chips .lx-chip", 2);
+      if (i === 3) { var d = cards.el.querySelectorAll(".lx6-dot"); if (d[2]) d[2].dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+      if (i === 4) click(".lx6-sorter .lx-btn");
+      if (i === 5) { click(".lx6-side .lx-btn", 0); click(".lx6-side .lx-btn", 1); }
+      if (i === 6) click(".lx-choice", 1);
+    };
+    var dm = /^#lx-demo(?:-(\d+))?$/.exec(location.hash);
+    if (dm) setTimeout(function () { root.lxDemo(dm[1] ? +dm[1] : 5); }, 50);
+    buildExplain(D, byKey, jobBy);
+  }
+
+  // ---- lesson-local: a dot chart of two measures with tappable points
+  function Scatter(host, pts, onPick) {
+    var cw = host.clientWidth || 560, phone = cw < 520;   // on phones the drawing is laid out at its real width, so labels stay legible
+    var Wd = phone ? Math.max(300, cw) : 560, Hh = phone ? 300 : 330, m = { l: 46, r: 16, t: 14, b: 40 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b;
+    var svg = S("svg", { viewBox: "0 0 " + Wd + " " + Hh, class: "lx6-scatter", role: "group", "aria-label": "Capacity factor (across) against firm share (up) for five technologies" }, host);
+    var x = function (v) { return m.l + v * iw; }, y = function (v) { return m.t + ih - v * ih; };
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (v) {
+      S("path", { d: "M" + m.l + " " + y(v) + "H" + (Wd - m.r), stroke: "var(--lx-line)" }, svg);
+      S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end", class: "lx6-ax" }, svg).textContent = v * 100 + "%";
+      S("text", { x: x(v), y: m.t + ih + 16, "text-anchor": "middle", class: "lx6-ax" }, svg).textContent = v * 100 + "%";
+    });
+    S("path", { d: "M" + x(0) + " " + y(0) + "L" + x(1) + " " + y(1), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 4" }, svg);
+    S("text", { x: phone ? x(0.55) : x(0.7), y: phone ? y(0.19) : y(0.58), "text-anchor": "start", class: "lx6-ax" }, svg).textContent = phone ? "firm share = CF" : "firm share = capacity factor";
+    S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "lx6-axt" }, svg).textContent = phone ? "Capacity factor, U.S. 2025" : "Capacity factor, U.S. 2025 (how much of the year it runs)";
+    S("text", { x: 12, y: m.t + ih / 2, "text-anchor": "middle", class: "lx6-axt", transform: "rotate(-90 12 " + (m.t + ih / 2) + ")" }, svg).textContent = "Firm share, PJM 2028/29";
+    var dots = {};
+    pts.forEach(function (t) {
+      var g = S("g", { class: "lx6-dot", tabindex: 0, role: "button", "aria-label": t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel, "aria-pressed": "false" }, svg);
+      S("circle", { cx: x(t.cf), cy: y(t.firm), r: 11, fill: t.color, stroke: "var(--lx-surface)", "stroke-width": 2 }, g);
+      // label to the right of the dot if it fits, else to the left, else above it (centred and kept inside the chart)
+      var tw = t.label.length * 7.4, px = x(t.cf), py = y(t.firm), lx, ly = py + 5, an;
+      if (px + 16 + tw <= Wd - m.r) { lx = px + 16; an = "start"; }
+      else if (px - 16 - tw >= m.l) { lx = px - 16; an = "end"; }
+      else { lx = Math.max(m.l + tw / 2, Math.min(Wd - m.r - tw / 2, px)); ly = py - 17; an = "middle"; }
+      S("text", { x: lx, y: ly, "text-anchor": an, class: "lx6-dl" }, g).textContent = t.label;
+      function pick() { Object.keys(dots).forEach(function (k) { dots[k].setAttribute("aria-pressed", k === t.key ? "true" : "false"); }); onPick(t.key); }
+      g.addEventListener("click", pick);
+      g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(); } });
+      dots[t.key] = g;
+    });
+    var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version" }, alt);
+    var ul = H("ul", null, alt);
+    pts.forEach(function (t) { H("li", { text: t.label + ": capacity factor " + pct(t.cf) + "; firm share " + t.firmLabel + "." }, ul); });
+    return { el: svg };
+  }
+
+  // ---- lesson-local: sort cards into several bins at once (toggles), then compare with the evidence
+  function JobSorter(host, tech, jobs, marks, onChange, onCheck, wasChecked) {
+    var box = H("div", { class: "lx6-sorter" }, host), rows = {}, res = null;
+    var head = H("div", { class: "lx6-srow head", "aria-hidden": "true" }, box); H("span", null, head);
+    jobs.forEach(function (j) { H("span", { class: "jh", html: LX.icon(j.icon) + LX.esc(j.short) }, head); });
+    tech.forEach(function (t) {
+      var r = H("div", { class: "lx6-srow", role: "group", "aria-label": t.label, style: "--c:" + t.color }, box);
+      var nm = H("div", { class: "nm" }, r), nl = H("span", { class: "nl" }, nm); H("i", null, nl); H("span", { text: t.label }, nl);
+      var wb = H("button", { type: "button", class: "lx-link lx6-whyb", "aria-expanded": "false", text: "Why" }, nm);
+      var cells = {};
+      jobs.forEach(function (j) {
+        var on = !!(marks[t.key] && marks[t.key][j.key]);
+        var b = H("button", { type: "button", class: "tg", "aria-pressed": on ? "true" : "false", "aria-label": t.label + ": " + j.label }, r);
+        b.innerHTML = LX.icon("check");
+        b.addEventListener("click", function () {
+          marks[t.key] = marks[t.key] || {}; marks[t.key][j.key] = !marks[t.key][j.key];
+          b.setAttribute("aria-pressed", marks[t.key][j.key] ? "true" : "false"); onChange(marks);
+          if (res) paint();
+        });
+        cells[j.key] = b;
+      });
+      var why = H("div", { class: "lx6-swhy", hidden: true }, r), ul = H("ul", null, why);
+      jobs.forEach(function (j) { H("li", { html: "<b>" + LX.esc(j.label) + ": " + t.jobs[j.key] + ".</b> " + LX.esc(t.why[j.key]) }, ul); });
+      wb.addEventListener("click", function () { why.hidden = !why.hidden; wb.setAttribute("aria-expanded", why.hidden ? "false" : "true"); LX.emit("layout"); });
+      rows[t.key] = { cells: cells, why: why };
+    });
+    var foot = H("div", { class: "lx-step-foot" }, box);
+    var chk = H("button", { class: "lx-btn small", type: "button", text: "Check my sort" }, foot);
+    var key = H("p", { class: "lx-hint lx6-key" }, foot);
+    key.innerHTML = '<span class="k agree"></span>agrees · <span class="k differ"></span>differs · <span class="k partly"></span>“partly”: either is fair';
+    function paint() {
+      res = score(marks, tech);
+      tech.forEach(function (t) {
+        jobs.forEach(function (j) { var c = rows[t.key].cells[j.key]; c.classList.remove("agree", "differ", "partly"); c.classList.add(res.cells[t.key][j.key]); });
+      });
+      box.classList.add("is-checked");
+      return res;
+    }
+    chk.addEventListener("click", function () { onCheck(paint()); });
+    if (wasChecked) paint();
+    return { check: function () { return paint(); } };
+  }
+
+  // ---- lesson-local: the Steelman card (both strongest cases of a contested point)
+  function Steelman(host, o) {
+    var box = H("div", { class: "lx6-steel" }, host);
+    H("p", { class: "lx-eyebrow", text: "Steelman card" }, box); H("h4", { text: o.title }, box);
+    var cols = H("div", { class: "lx6-steel-cols" }, box);
+    [["for", o.forTitle, o.forPts], ["against", o.againstTitle, o.againstPts]].forEach(function (s) {
+      var c = H("div", { class: "lx6-side " + s[0] }, cols);
+      var b = H("button", { class: "lx-btn ghost small", type: "button", "aria-expanded": o.opened[s[0]] ? "true" : "false", text: s[1] }, c);
+      var ul = H("ul", { hidden: !o.opened[s[0]] }, c);
+      s[2].forEach(function (p) { H("li", { html: LX.rich(p) }, ul); });
+      b.addEventListener("click", function () { ul.hidden = false; b.setAttribute("aria-expanded", "true"); o.onOpen(s[0]); });
+    });
+    return { el: box };
+  }
+
+  // ---------------------------------------------------------------- the explain layer
+  function buildExplain(D, byKey, jobBy) {
+    var host = document.getElementById("t6-explain"); if (!host) return;
+    host.innerHTML = ""; host.classList.add("is-live");
+    var TECH = D.tech, GROUP = { energy: "var(--lx-tier-1)", firm: "var(--lx-tier-2)", flex: "var(--lx-tier-4)" };
+    var c1 = H("div", { class: "lx-xcard" }, host);
+    function jobsNote(t) { return JOBS.filter(function (j) { return t.jobs[j] === "yes"; }).map(function (j) { return jobBy[j].label; }).join(" · ") +
+      (JOBS.some(function (j) { return t.jobs[j] === "partly"; }) ? "; partly: " + JOBS.filter(function (j) { return t.jobs[j] === "partly"; }).map(function (j) { return jobBy[j].label.toLowerCase(); }).join(", ") : ""); }
+    LX.CompareTable(c1, {
+      title: "Nine technologies, two numbers, three jobs",
+      columns: [{ key: "name", label: "Technology and the jobs it does well", main: true }, { key: "cf", label: "Capacity factor, U.S. 2025", phone: "CF", num: true, bar: { max: 1 } },
+                { key: "firm", label: "Firm share, PJM 2028/29", phone: "Firm", num: true, bar: { max: 1, color: "var(--lx-tier-2)" } }],
+      rows: TECH.map(function (t) {
+        return { key: t.key, color: t.color, name: t.label, note: jobsNote(t), cf: t.cf != null ? { text: pct(t.cf), value: t.cf } : { text: "–" },
+                 firm: t.firm != null ? { text: t.firmLabel, unit: t.firmUnit ? " " + t.firmUnit : "", value: t.firm } : { text: "–" } };
+      }),
+      sorts: [{ label: "As listed", order: TECH.map(function (t) { return t.key; }), note: "Two numbers per technology; “–” means the number does not apply or is not rated." },
+              { label: "By capacity factor", order: rank(TECH, "cf"), ranked: true, note: "<b>Capacity factor ranks the energy job.</b> Batteries and demand response make no energy of their own." },
+              { label: "By firm share", order: rank(TECH, "firm"), ranked: true, note: "<b>Firm share ranks the peak job.</b> The order changes: the peaker climbs, solar falls." }]
+    });
+    var c2 = H("div", { class: "lx-xcard" }, host);
+    var G = { tech: ["Technologies", "var(--lx-ink-3)"], job: ["Jobs", "var(--lx-tier-1)"], measure: ["Measures", "var(--lx-tier-2)"] };
+    LX.ConceptMap(c2, {
+      title: "The three jobs, and who does them", lede: "Tap a node to see what it means and how it links to the others.", groups: G,
+      cols: 4, rows: 3, colsN: 3, rowsN: 4, sel: "firm",
+      nodes: [
+        { id: "vre", g: "tech", label: "Wind and solar", lines: ["Wind and", "solar"], at: [0, 0], atN: [0, 0], text: "No fuel, but the weather sets their output. Capacity factor " + pct(byKey.wind.cf) + " and " + pct(byKey.solar.cf) + "; firm share " + byKey.wind.firmLabel + " and " + byKey.solar.firmLabel + "." },
+        { id: "steady", g: "tech", label: "Nuclear, geothermal", lines: ["Nuclear,", "geothermal"], at: [0.95, 0], atN: [2, 0], text: "Steady plants that run most of the year: capacity factor " + pct(byKey.nuclear.cf) + " and " + pct(byKey.geo.cf) + " in 2025." },
+        { id: "gas", g: "tech", label: "Gas and hydro", lines: ["Gas and", "hydro"], at: [1.9, 0], atN: [0, 1], text: "Fuel or water on hand, so they can follow orders within limits. Firm share " + byKey.cc.firmLabel + " (combined-cycle) and " + byKey.pk.firmLabel + " (peaker)." },
+        { id: "shift", g: "tech", label: "Batteries, demand response", lines: ["Batteries,", "demand", "response"], at: [2.85, 0], atN: [2, 1], text: "They make no energy; they move or trim demand in time. Firm share " + byKey.battery.firmLabel + " (4-hour battery) and " + byKey.dr.firmLabel + " (demand response)." },
+        { id: "energy", g: "job", label: "Cheap energy", at: [0.45, 1], atN: [0, 2], text: jobBy.energy.question },
+        { id: "firm", g: "job", label: "Firm capacity", at: [1.4, 1], atN: [1, 2], text: jobBy.firm.question },
+        { id: "flex", g: "job", label: "Flexibility", at: [2.35, 1], atN: [2, 2], text: jobBy.flex.question },
+        { id: "cf", g: "measure", label: "Capacity factor", lines: ["Capacity", "factor"], at: [0.45, 2], atN: [0, 3], text: "Energy made ÷ (size × hours): lesson 5." },
+        { id: "fs", g: "measure", label: "Firm share", lines: ["Firm", "share"], at: [1.4, 2], atN: [1, 3], text: "The part of a plant's MW a grid counts in its riskiest hours; PJM calls it an ELCC class rating.", later: "Later: Analyst lesson A5 (upcoming) estimates it with many weather years." },
+        { id: "ramp", g: "measure", label: "Ramp and start", lines: ["Ramp and", "start"], at: [2.35, 2], atN: [2, 3], text: "How fast a plant changes output, and how quickly it starts: the [[ramp-rate|ramp limit]] of lesson 0." }
+      ],
+      edges: [["vre", "energy", "mainly"], ["steady", "energy", "mainly"], ["steady", "firm", "also"], ["gas", "firm", "mainly"], ["gas", "flex", "also"],
+              ["shift", "flex", "mainly"], ["shift", "firm", "within limits"], ["energy", "cf", "measured by"], ["firm", "fs", "measured by"], ["flex", "ramp", "measured by"]]
+    });
+    void GROUP;
+  }
+
+  LX.mount("three-jobs", function (live, data, root) { view(live, data, root); });
+})();
