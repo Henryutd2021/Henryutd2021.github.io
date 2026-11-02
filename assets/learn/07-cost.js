@@ -475,7 +475,7 @@
     H("h3", { text: "The LCOE equation, symbol by symbol" }, hd);
     var saved = LX.store.get("c7-calc", null), k = saved && T[saved.tech] ? saved.tech : "wind";
     var p = saved && T[saved.tech] ? saved.inputs : inputs(D, k), L = lcoe(p);
-    H("p", { class: "lx-lede", text: "Tap a symbol. The numbers are " + (saved ? "your last calculator settings" : "the wind farm's defaults") + ": " + T[k].label.toLowerCase() + "." }, c1);
+    H("p", { class: "lx-lede", text: "Tap a symbol. The numbers are " + (saved ? "your last calculator settings for the " + T[k].label.toLowerCase() : "the onshore wind farm's defaults") + "." }, c1);
     var eq = H("div", { class: "lx7-eq", role: "group", "aria-label": "LCOE equation" }, c1), det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, c1);
     var SYM = {
       lcoe: ["LCOE", "Levelized cost of electricity: the steady price per MWh that repays every cost over the plant's life.", usd(L.total) + "/MWh"],
