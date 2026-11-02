@@ -11,7 +11,7 @@ listing:
   contents: path.yml
   template: map.ejs
   sort: false
-  fields: [kind, id, title, short, path, starter, tier, tier2, code, status, minutes, does, outcome, after, form, icon, scales,
+  fields: [kind, id, title, short, path, starter, tier, tier2, code, status, minutes, does, outcome, after, next, form, icon, scales,
            slot, level, reader, math, assumes, goal, door, doord, doorcta, doorlink]
 ---
 
