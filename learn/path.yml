@@ -11,9 +11,15 @@
 #                 bridges two tiers; path only for lessons that exist (others show as coming soon); after = starter lessons
 #                 it builds on; form: play (opens with the game: lesson 0, capstones) or cards (step cards; the default);
 #                 icon for its map stop; code labels tier lessons that are not on the starter path (M1, ...)
-#   kind: tool    the just-in-time math toolbox
+#   kind: tool    the just-in-time math toolbox (code K1-K8; a tool with id and path gets a page like a lesson)
+#   status        `status: active` makes a lesson or tool live: linked, with generated blocks, page learn/<id>.qmd (or
+#                 `path:`); `status: upcoming` or no page = coming soon. A tier with `status: upcoming` shows as later.
+#   off the path  lessons with a `code` (N1, B1, M1, CK-F, ...) may list prerequisites as starter numbers or codes
+#                 (`after: [10, K4]`) and the module that follows (`next: B2`); `form: checkpoint` for checkpoint pages
 # (The name has no leading underscore because Quarto listings skip files that start with "_".)
 # Source: design report 09, sections 2 and 5 (revised 2026-11-02); course map form chosen by Henry on 2026-11-02 (metro).
+# Curriculum v2 (reports/learn/learn_map_v2.yml, approved 2026-11-02): fourth tier Researcher (upcoming), the W1 modules
+# N1, B1-B3, M1 and CK-F, the Modeler and Researcher module lists and the toolbox K1-K8, titles as in that file.
 
 - kind: tier
   id: foundations
@@ -57,6 +63,21 @@
   doord: "From a first linear program to capacity expansion, uncertainty and research practice."
   doorcta: "Go to the Modeler tier"
   doorlink: "#modeler"
+- kind: tier
+  id: researcher
+  slot: 4
+  icon: flask
+  status: upcoming
+  title: Researcher
+  level: L4
+  reader: "Learners who have finished the Modeler core, or graduate students starting a project"
+  math: "As the Modeler tier"
+  assumes: "The Modeler core."
+  goal: "Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views."
+  door: "Ready for research"
+  doord: "Coming later: frame a question, find what is known, choose a method and defend a study."
+  doorcta: "See what is coming"
+  doorlink: "#researcher"
 
 # ---------- the starter path: 14 lessons, the guided tour across the tiers
 - kind: lesson
@@ -243,6 +264,83 @@
   outcome: "Reason about planning trade-offs and know what real planning models do."
   after: [9, 12]
 
+# ---------- wave W1 modules off the starter path (curriculum v2: the news lens, the Foundations checkpoint, the bridges
+#            into modelling and the first Modeler lesson); live once a builder sets status: active
+- kind: lesson
+  id: n01-news-lens
+  code: N1
+  tier: foundations
+  tier2: analyst
+  form: cards
+  icon: globe
+  status: upcoming
+  minutes: 20
+  title: "How do you read an energy headline like a researcher?"
+  does: "Dissect a headline: tag phrases with the seven lens questions, run a back-of-envelope check, then write your take in three sentences (claim, what would change your mind, confidence)."
+  after: [1]
+  next: CK-F
+- kind: lesson
+  id: ck-f-estimate
+  code: CK-F
+  tier: foundations
+  form: checkpoint
+  icon: check
+  status: upcoming
+  minutes: 40
+  title: "Foundations checkpoint: estimate an unfamiliar situation"
+  does: "Estimate an unfamiliar situation without hints (for example the electricity for a town's school buses if they went electric): units, a range, the main uncertainty and one way to check the answer."
+  after: [6, N1]
+- kind: lesson
+  id: b01-algebra-to-lp
+  code: B1
+  tier: analyst
+  tier2: modeler
+  form: cards
+  icon: pencil
+  status: upcoming
+  minutes: 30
+  title: "From algebra to a linear program: how do equations become a model?"
+  does: "Start with a ten-question readiness check that routes you to the toolbox if needed; turn three word problems into equations and inequalities, then into a linear program; drag the constraints of a two-variable LP; write the same model as Ax <= b with a linked view."
+  after: [10, K4]
+  next: B2
+- kind: lesson
+  id: b02-python-data
+  code: B2
+  tier: analyst
+  tier2: modeler
+  form: cards
+  icon: chart
+  status: upcoming
+  minutes: 20
+  title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
+  does: "In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows."
+  after: [5, K7]
+  next: B3
+- kind: lesson
+  id: b03-read-check-formulation
+  code: B3
+  tier: analyst
+  tier2: modeler
+  form: cards
+  icon: question
+  status: upcoming
+  minutes: 30
+  title: "How do you read a formulation, and check that a model is right?"
+  does: "Read a published-style formulation (sets, indices, parameters, variables, constraints) and translate each line into words and units; find five planted errors (unit, sign, missing index, wrong sum, a free lunch); check a solved model's energy balance and the signs of its duals."
+  after: [B1]
+  next: M1
+- kind: lesson
+  id: m01-dispatch-to-lmp
+  code: M1
+  tier: modeler
+  form: cards
+  icon: tower
+  status: upcoming
+  minutes: 40
+  title: "From dispatch to locational prices: the linear program behind the market"
+  does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."
+  after: [11, 8, B1, B2, B3]
+
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
 - {kind: lesson, tier: foundations, title: "How a thermal power plant works"}
@@ -262,26 +360,48 @@
 - {kind: lesson, tier: analyst, title: "Reading energy data from EIA"}
 - {kind: lesson, tier: analyst, title: "Scenarios and sensitivity in a spreadsheet"}
 - {kind: lesson, tier: analyst, title: "How to read an energy study critically"}
-- {kind: lesson, tier: modeler, code: M1, title: "Optimization in one page: variables, objective, constraints"}
-- {kind: lesson, tier: modeler, code: M2, title: "Linear programming and economic dispatch; prices as shadow prices"}
-- {kind: lesson, tier: modeler, code: M3, title: "Integer decisions: unit commitment"}
-- {kind: lesson, tier: modeler, code: M4, title: "Networks: power flow, congestion and locational prices"}
-- {kind: lesson, tier: modeler, code: M5, title: "Capacity expansion: investment plus operation"}
-- {kind: lesson, tier: modeler, code: M6, title: "Storage and coupled systems: power, hydrogen and heat"}
-- {kind: lesson, tier: modeler, code: M7, title: "Multiple objectives: cost against emissions"}
-- {kind: lesson, tier: modeler, code: M8, title: "Uncertainty I: scenarios, sensitivity and Monte Carlo"}
-- {kind: lesson, tier: modeler, code: M9, title: "Uncertainty II: stochastic and robust optimization"}
-- {kind: lesson, tier: modeler, code: M10, title: "Surrogate models and uncertainty quantification"}
-- {kind: lesson, tier: modeler, code: M11, title: "Techno-economic analysis inside models"}
-- {kind: lesson, tier: modeler, code: M12, title: "Emissions accounting in models: hourly matching"}
-- {kind: lesson, tier: modeler, code: M13, title: "Modelling practice: data, validation, reproducibility, open tools"}
-- {kind: lesson, tier: modeler, code: M14, title: "From a model to a research question"}
+- {kind: lesson, tier: modeler, code: M2, title: "On or off? Unit commitment as a mixed-integer program"}
+- {kind: lesson, tier: modeler, code: M3, title: "What should be built? Capacity expansion with representative periods, validated"}
+- {kind: lesson, tier: modeler, code: M4, title: "Storage and coupled carriers: modelling power, hydrogen and heat together"}
+- {kind: lesson, tier: modeler, code: M5, title: "Size and run a microgrid that survives an outage"}
+- {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
+- {kind: lesson, tier: modeler, code: M7, title: "What could happen? Scenarios, Monte Carlo and global sensitivity"}
+- {kind: lesson, tier: modeler, code: M8, title: "Deciding before the uncertainty resolves: stochastic and robust optimization"}
+- {kind: lesson, tier: modeler, code: M9, title: "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data"}
+- {kind: lesson, tier: modeler, code: M10, title: "Forecasting load, wind, solar and prices with machine learning, and judging it honestly"}
+- {kind: lesson, tier: modeler, code: M11, title: "Techno-economic analysis inside an optimization model"}
+- {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
+- {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
+- {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
+- {kind: lesson, tier: researcher, code: R1, title: "What makes a question worth researching?"}
+- {kind: lesson, tier: researcher, code: R2, title: "How do you find out what is already known?"}
+- {kind: lesson, tier: researcher, code: R3, title: "Which system, which boundary, which method?"}
+- {kind: lesson, tier: researcher, code: R4, title: "Data you can defend: sources, cleaning, licences and provenance"}
+- {kind: lesson, tier: researcher, code: R5, title: "Can you trust your analysis? Verification, validation and reproducibility"}
+- {kind: lesson, tier: researcher, code: R6, title: "Uncertainty done properly: what to vary, how, and how to say it"}
+- {kind: lesson, tier: researcher, code: R7, title: "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual"}
+- {kind: lesson, tier: researcher, code: R8, title: "How do you show results so people understand their limits?"}
+- {kind: lesson, tier: researcher, code: R9, title: "Research integrity, and working with the people your study is about"}
+- {kind: lesson, tier: researcher, code: R10, title: "What could you study? The question studio"}
 
-# ---------- the math toolbox
-- {kind: tool, title: "Units and orders of magnitude"}
-- {kind: tool, title: "Rates and efficiencies"}
-- {kind: tool, title: "Exponentials and discounting"}
-- {kind: tool, title: "Linear equations and inequalities"}
-- {kind: tool, title: "Probability"}
-- {kind: tool, title: "Vectors and matrices"}
-- {kind: tool, title: "Python in 30 minutes"}
+# ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 are built in wave W1)
+- {kind: tool, code: K1, minutes: 10, title: "Units and orders of magnitude"}
+- {kind: tool, code: K2, minutes: 10, title: "Rates and efficiencies"}
+- {kind: tool, code: K3, minutes: 15, title: "Exponentials and discounting"}
+- kind: tool
+  id: k04-linear-equations
+  code: K4
+  status: upcoming
+  minutes: 15
+  title: "Linear equations and inequalities"
+  next: B1
+- {kind: tool, code: K5, minutes: 25, title: "Probability and statistics"}
+- {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax <= b means"}
+- kind: tool
+  id: k07-spreadsheets
+  code: K7
+  status: upcoming
+  minutes: 20
+  title: "Spreadsheets in practice"
+  next: B2
+- {kind: tool, code: K8, minutes: 20, title: "Git and reproducible notebooks"}

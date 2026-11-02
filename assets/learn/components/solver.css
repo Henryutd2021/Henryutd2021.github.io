@@ -1,0 +1,17 @@
+/* solver.css — the live solver status line (LX.SolverStatus in solver.js): loading, solving, then the outcome in plain
+   words with the time the page waited. Colour follows the outcome; the text alone carries the meaning. */
+.lx-solver-status { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; margin: 6px 0 0; padding: 2px 12px; border-radius: 999px;
+  font-size: 14px; line-height: 1.35; color: var(--lx-ink-2); background: var(--lx-surface-2); }
+.lx-solver-status:empty { display: none; }
+.lx-solver-status::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--lx-ink-3); }
+.lx-solver-status[data-status="optimal"] { color: var(--lx-good); background: var(--lx-good-soft); }
+.lx-solver-status[data-status="optimal"]::before { background: var(--lx-good); }
+.lx-solver-status[data-status="infeasible"], .lx-solver-status[data-status="unbounded"], .lx-solver-status[data-status="infeasible-or-unbounded"],
+.lx-solver-status[data-status="error"] { color: var(--lx-bad); background: var(--lx-bad-soft); }
+.lx-solver-status[data-status="infeasible"]::before, .lx-solver-status[data-status="unbounded"]::before,
+.lx-solver-status[data-status="infeasible-or-unbounded"]::before, .lx-solver-status[data-status="error"]::before { background: var(--lx-bad); }
+.lx-solver-status[data-status="time-limit"] { color: var(--lx-warn); background: var(--lx-warn-soft); }
+.lx-solver-status[data-status="time-limit"]::before { background: var(--lx-warn); }
+.lx-solver-status[data-status="loading"]::before, .lx-solver-status[data-status="solving"]::before { animation: lx-solver-pulse 1s ease-in-out infinite alternate; }
+@keyframes lx-solver-pulse { from { opacity: .25; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lx-solver-status::before { animation: none !important; } }

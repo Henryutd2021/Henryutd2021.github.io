@@ -9,7 +9,19 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
 
 ## Start a new lesson
 
-1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for a capstone), `icon`, `path`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`.
+1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for a capstone), `icon`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`. The lesson goes live (linked, with its generated header, next box and footer) when you set `status: active`; its page is then `learn/<id>.qmd` (or the file named by `path:`). Until then keep `status: upcoming`, or leave the status out: it shows as coming soon.
+   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources.
+   - New glossary terms and requests for shared files go in a sidecar, `learn/_w1/<id>.yml` (wave W1):
+
+     ```yaml
+     glossary:
+       - term: capacity factor
+         def: "One plain sentence."
+     requests:
+       - "Plain text for the coordinator."
+     ```
+
+     `build_learn.py` merges the terms into `glossary.json` (if an id is already in `glossary.yml`, that definition wins and the clash is printed) and prints every request.
 2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`) to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
 3. In the ResearchPortfolio folder, run `python3 scripts/build_learn.py --site <site>`. Add `_tests/learn/test_<id>.js`, which checks every number on the page against the model.
 
@@ -207,7 +219,50 @@ LX.EnergyChain(host, {title, aside, lede, stops: [{icon, title, text, value}]});
 **Course map** (`metro.js`): `<div data-lx-metro>` on `learn/index.qmd` draws from `data/path.json`.
 
 - Use `LX.metroLayout(path, "h"|"v")` for tests.
-- It supports any number of tiers: give each tier a colour `slot` 1–5.
+- It supports any number of tiers: give each tier a colour `slot` 1–5. Four tiers now; Researcher has `status: upcoming` (a dashed door and line, "coming later").
+- Each line's "+N more" label opens the tier card, which links the tier's live lessons off the starter path.
+
+**Solver** (`solver.js`): linear and mixed-integer programs in the browser with HiGHS.
+
+```js
+var r = await LX.solver.solve({
+  sense: "min",
+  variables: [{ name: "coal", ub: 50, cost: 10 }, { name: "gas", ub: 50, cost: 30 }, { name: "on", type: "binary", cost: 500 }],
+  constraints: [{ name: "demand", terms: { coal: 1, gas: 1 }, eq: 80 }]   // or le, ge, lb/ub, op + rhs
+}, { timeLimit: 1, key: "slider" });
+// r.status ("optimal", "infeasible", "unbounded", "time-limit", "cancelled", ...), r.objective, r.values, r.rows,
+// r.duals (LP only: dObjective/dRHS), r.reducedCosts (LP only), r.mipGap (MILP), r.ms.roundTrip
+var p = await LX.solver.fixAndReprice(model, r);   // MILP: fix the integers, re-solve the LP; p.conditional === true
+var st = LX.SolverStatus(host); st.set("solving"); st.set(r);   // live status line in plain words
+```
+
+- **Loading.** Nothing is fetched until the first `solve()` or `preload()`. Then a Web Worker loads `vendor/highs-1.15.4/` (about 3.5 MB, once) and every solve runs there, so the page stays responsive. `LX.solver.cancel()` stops the running and queued solves. A newer solve with the same `key` replaces an older queued one (slider sweeps). An `AbortSignal` works too. `opts.timeLimit` (seconds) goes to HiGHS and a watchdog backs it up.
+- **Prices.** For an LP, `r.duals[name]` is the change of the optimal objective per unit increase of that constraint's bound. A demand-balance dual is the marginal cost of one more MWh: say "marginal value under stated assumptions" (fixed capacities, a convex model, the modelled market), not "the market price".
+- **MILP.** A MILP returns `duals: null`: a mixed-integer program has no shadow prices. For prices after a commitment, call `fixAndReprice`; label them *conditional on the commitment*, and say that start-up and no-load costs need uplift payments.
+- **Errors.** It never throws for a bad model: `status: "error"` with a `message` (unknown or repeated names, a constraint without a bound).
+- **Benchmark.** `node scripts/learn_solver_bench.mjs --site <worktree>` (ResearchPortfolio folder) times the W1 set in headless Chrome (24-hour dispatch LP, 168-hour storage LP, 24-hour unit-commitment MILP, from `_tests/learn/solver_models.js`), with CPU slowed 4× and 6× as a phone stand-in. It also checks the page API (duals, conditional prices, time limit, cancel). On an Apple M5 (2 Nov 2026) the worst p95 was 24 ms at full speed and 100 ms at 6× slowdown; the W1 budget is 1 s on a laptop and 3 s on phones. Real devices still need to be measured for the W1 report.
+- **Vendored code.** `vendor/highs-1.15.4/` holds `highs.js`, `highs.wasm` and `LICENSE` (MIT) from the npm package `highs` 1.15.4 (HiGHS 1.15, published 16 Oct 2026). The tarball was checked against the registry: `sha512-vsC03XHDqWAVrEFUt22h8e4CDDMb+LAFa0bycjPUq2kadRigK5pNLVIlwspKvMxxVtrr4NAucZHP/CAgigxiDQ==`, shasum `2ce13b7a543a564ab5449cae215736fdbd484a57`. File SHA-256: `highs.js` 0bd23843…b5c7c, `highs.wasm` f13134e3…f8acd, `LICENSE` 9f8d8dcf…98bfa. To update, repeat the check on a version at least 14 days old and change `VERSION` in `solver.js`.
+
+**Wind and solar output** (`profiles.js`, data `data/cf_targets.json`).
+
+- **The data convention.** The wind and solar shapes in `town_days.json` and `town_year.json` are each normalised to their own 2025 maximum hour. Their mean/max (wind 0.53, solar 0.24) is **not** a capacity factor.
+- **Sized output.** To give a plant of a given size a realistic year, scale the shape to a sourced annual capacity factor: `cf_targets.json` holds EIA, Electric Power Monthly, Table 6.07.B, 2025 (U.S. utility scale): wind 33.8%, solar PV 24.0%. It also has nuclear 91.1% and hydro 34.4% for reference.
+
+```js
+var p = LX.townProfile("wind", 150, { year: data.town_year, targets: data.cf_targets });          // method "scale"
+var q = LX.townProfile("wind", 150, { year: data.town_year, targets: data.cf_targets, method: "power" });
+// p.mw (8760 MW values), p.cf (= target), p.k or q.gamma, p.peakFrac, p.clippedHours, p.scaleDay(day.wind), p.source
+```
+
+- **`scale`** (default): output = capacity × min(1, k × shape). If the target is above the shape's mean, the best hours are clipped at capacity. If it is below, output never reaches capacity; for SPP wind against 33.8%, the windiest hour reaches 64% of capacity.
+- **`power`**: output = capacity × shape^g. The best hour stays at capacity and no hour is clipped.
+- Say on the page which method a lesson uses. Lesson 0 keeps its single real day scaled to farm size, labelled as such.
+
+**Scope and QA** (ResearchPortfolio folder).
+
+- `python3 scripts/learn_scope_scan.py --site <worktree>` runs the curriculum v2 §20 scan on the rendered `_site/learn/` pages, the data files and the scripts. `build_learn.py --check` runs it whenever a rendered site exists, and fails on any violation.
+- `scripts/learn_qa.sh <worktree> [lesson ids]` runs the whole pipeline: build check, Node tests, render, link check, scope scan, and screenshots at 1280 and 375 px in light and dark.
+- `scripts/learn_codex_review.sh <worktree> <lesson id>…` runs the read-only two-persona review.
 
 Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`.
 
@@ -221,5 +276,7 @@ node _tests/learn/test_<id>.js
 node _tests/learn/test_learn_components.js
 python3 scripts/check_site.py
 ```
+
+Or all of it at once: `scripts/learn_qa.sh <worktree> <lesson id>`.
 
 Then render, and take screenshots at 1280 and 375 px, in light and dark, with `scripts/learn_screenshots.mjs`. Look at them. Finally, check that there is no horizontal scroll at 375 px; the screenshot tool prints the overflow.
