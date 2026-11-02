@@ -128,7 +128,6 @@
   icon: wave
   tier: foundations
   status: active
-  path: 03-balancing.qmd
   minutes: 15
   title: "How does the grid stay balanced every second?"
   subtitle: "Trip a plant and watch the grid catch it"
@@ -145,7 +144,6 @@
   tier: foundations
   tier2: analyst
   status: active
-  path: 04-forecasts.qmd
   minutes: 15
   title: "Forecasts and surprises: how do you plan for weather you can't see yet?"
   subtitle: "Score a real forecast, then plan for its misses"
