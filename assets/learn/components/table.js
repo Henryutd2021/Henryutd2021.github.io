@@ -2,7 +2,7 @@
    LX.CompareTable(host, { title: "The five plants", lede: "One sentence.",
      columns: [{key: "name", label: "Plant and who decides", main: true},          main: the name column (colour dot + small note)
                {key: "size", label: "Size", num: true, phoneHide: true},
-               {key: "cost", label: "Running cost", num: true, bar: {max: 100}}], bar: a small bar after the number
+               {key: "cost", label: "Running cost", num: true, bar: {max: 100}, phone: "$/MWh"}], bar: a small bar; phone: short label on phones
      rows: [{key: "nuclear", color: "var(--lx-nuc)", name: "Nuclear plant", note: "Runs flat", size: "100 MW",
              cost: {text: "$10", unit: "/MWh", value: 10}}],
      sorts: [{label: "As built", order: ["nuclear", ...], note: "One sentence."},
@@ -31,10 +31,10 @@
           var nm = H("div", null, pn); H("span", { html: LX.rich(r.name || v || "") }, nm); if (r.note) H("small", { html: LX.rich(r.note) }, nm);
           return;
         }
-        var cell = H("td", { class: (c.num ? "n " : "") + (c.phoneHide ? "ph " : "") + (c.key) }, tr);
+        var cell = H("td", { class: (c.num ? "n " : "") + (c.phoneHide ? "ph " : "") + (c.key), "data-label": c.phone || c.label }, tr);
         if (v && typeof v === "object") {
           cell.innerHTML = LX.esc(v.text) + (v.unit ? "<small>" + LX.esc(v.unit) + "</small>" : "");
-          if (c.bar && v.value) H("span", { class: "mini", style: "width:" + Math.max(3, 44 * v.value / c.bar.max) + "px" + (c.bar.color ? ";--c:" + c.bar.color : "") }, cell);
+          if (c.bar && v.value) H("span", { class: "mini", style: "width:" + Math.max(3, 30 * v.value / c.bar.max) + "px" + (c.bar.color ? ";--c:" + c.bar.color : "") }, cell);
         } else cell.innerHTML = LX.rich(v == null ? "" : String(v));
       });
     });

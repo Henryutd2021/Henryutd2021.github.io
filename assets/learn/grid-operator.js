@@ -423,12 +423,12 @@
     });
     LX.CompareTable(c3, {
       title: "The five plants", columns: [{ key: "name", label: "Plant and who decides", main: true }, { key: "size", label: "Size", num: true, phoneHide: true },
-        { key: "cost", label: "Running cost", num: true, bar: { max: 100 } }, { key: "co2", label: "CO₂", num: true, bar: { max: 0.6, color: "var(--lx-ink-3)" } }],
+        { key: "cost", label: "Running cost, $/MWh", phone: "$/MWh", num: true, bar: { max: 100 } }, { key: "co2", label: "CO₂, t/MWh", phone: "t CO₂/MWh", num: true, bar: { max: 0.6, color: "var(--lx-ink-3)" } }],
       rows: [["nuclear", "Runs flat at " + f.nuclear.mw + " MW"], ["wind", "The wind decides"], ["solar", "The sun decides"], ["cc", "You, up to " + f.cc.ramp + " MW per hour"], ["pk", "You, any change at once"]]
         .map(function (r) {
           var k = r[0], p = f[k === "pk" ? "peaker" : k];
           return { key: k, color: "var(--lx-" + (k === "nuclear" ? "nuc" : k) + ")", name: p.label.replace(" plant", k === "nuclear" ? " plant" : ""), note: r[1], size: p.mw + " MW",
-                   cost: { text: "$" + p.cost, unit: "/MWh", value: p.cost }, co2: p.co2 ? { text: p.co2.toFixed(2), unit: " t/MWh", value: p.co2 } : { text: "0" } };
+                   cost: { text: "$" + p.cost, value: p.cost }, co2: p.co2 ? { text: p.co2.toFixed(2), value: p.co2 } : { text: "0" } };
         }),
       sorts: [{ label: "As built", order: ["nuclear", "wind", "solar", "cc", "pk"], note: "Sort by running cost to see the order a careful operator uses them." },
               { label: "By running cost", order: ["wind", "solar", "nuclear", "cc", "pk"], ranked: true, note: "<b>This order is the [[merit-order|merit order]].</b> Free wind and sun first, the $" + f.peaker.cost + "/MWh peaker last." }]
