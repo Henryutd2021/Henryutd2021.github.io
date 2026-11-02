@@ -1,0 +1,29 @@
+{
+  "about": "Lesson 10 (T10, 10-write-it-down). Prairie Town is fictional; its plants, costs, CO2 rates and the CO2 cap are illustrative. The hour is 19:00 of lesson 0's real day (3 September 2025, SPP shapes from EIA-930 in town_year.json), cut and rounded exactly as lesson 0 does; the gas the hour needs (demand minus nuclear, wind and sun) comes out of that day, not from this file.",
+  "built": "2026-11-02",
+  "hour": 19,
+  "cap": 100,
+  "capNote": "CO2 cap for the hour in tonnes: illustrative, chosen slack at the given demand (and still feasible up to about 230 MW of gas) so the reader can tighten it.",
+  "view": { "x": [0, 240], "y": [0, 160] },
+  "dot": [60, 40],
+  "level0": 12000,
+  "ranges": { "D": [60, 240], "cap": [0, 150], "cost": [-20, 150], "level": [0, 16000] },
+  "bins": [
+    { "id": "decision", "label": "Decisions", "sub": "what the model chooses", "color": "var(--lx-tier-2)" },
+    { "id": "goal", "label": "Goal", "sub": "what it makes smallest", "color": "var(--lx-good)" },
+    { "id": "rule", "label": "Rules", "sub": "what must always hold", "color": "var(--lx-warn)" },
+    { "id": "given", "label": "Given", "sub": "data it takes as it is", "color": "var(--lx-ink-3)" }
+  ],
+  "cards": [
+    { "id": "cc", "text": "Combined-cycle output, each hour", "bin": "decision", "why": "the operator sets it every hour: it is what the model chooses." },
+    { "id": "demand", "text": "Demand, each hour", "bin": "given", "why": "the town uses what it uses; the model must meet demand, not choose it." },
+    { "id": "cost", "text": "The day's total running cost, as low as possible", "bin": "goal", "why": "this is what the model tries to make smallest." },
+    { "id": "balance", "text": "Supply equals demand every hour", "bin": "rule", "why": "it must hold in every hour; no plan may break it." },
+    { "id": "wind", "text": "Wind and sun available, each hour", "bin": "given", "why": "the weather sets it; the model can spill some but cannot add more." },
+    { "id": "pk", "text": "Peaker output, each hour", "bin": "decision", "why": "the operator chooses it, like the combined-cycle's output." },
+    { "id": "size", "text": "No plant above its size", "bin": "rule", "why": "a limit that every plan must obey." },
+    { "id": "price", "text": "Running cost per MWh of each plant", "bin": "given", "why": "fixed numbers ($40 and $100 per MWh) that weight the goal; the model does not choose them." },
+    { "id": "ramp", "text": "The combined-cycle changes at most 40 MW an hour", "bin": "rule", "why": "a rule that links each hour to the next." },
+    { "id": "spill", "text": "Spilled wind and sun, each hour", "bin": "decision", "why": "when there is too much power the operator chooses how much to spill, within what the weather gives." }
+  ]
+}

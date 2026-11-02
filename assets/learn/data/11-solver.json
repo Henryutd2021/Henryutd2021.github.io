@@ -1,0 +1,173 @@
+{
+  "about": "Lesson 11 (T11, 11-solver). Prairie Town is fictional; its plants, costs and the unserved-energy penalty are illustrative. The day is lesson 0's (3 September 2025, SPP shapes from EIA-930 in town_year.json). 'rule', 'signError', 'threshold' and 'precomputed' are written by node _tests/learn/test_11-solver.js --write from the lesson-0 model (grid-operator.js) and this lesson's model with the vendored HiGHS; the page solves live and uses 'precomputed' only if the solver cannot load. The test fails if any of them drifts.",
+  "built": "2026-11-02",
+  "penalty": 3000,
+  "penaltyNote": "Cost per MWh of unserved demand: a large illustrative number so that the solver keeps the lights on whenever it can.",
+  "editHour": 13,
+  "probe": {
+    "hour": 3,
+    "answer": 40
+  },
+  "degenerateHours": [
+    7,
+    9
+  ],
+  "milpRamp": 30,
+  "ranges": {
+    "pkCost": [
+      40,
+      150
+    ],
+    "ramp": [
+      10,
+      80
+    ],
+    "demandPct": [
+      -10,
+      20
+    ],
+    "windMW": [
+      0,
+      300
+    ]
+  },
+  "facts": [
+    {
+      "n": "MIT",
+      "what": "HiGHS, the solver on this page, is open source under the MIT licence; it solves linear programs by simplex, interior point or first-order methods, and mixed-integer programs by branch-and-cut.",
+      "source": "HiGHS documentation",
+      "url": "https://ergo-code.github.io/HiGHS/dev/",
+      "asof": "checked 2 Nov 2026"
+    },
+    {
+      "n": "5 minutes",
+      "what": "How often the western Energy Imbalance Market dispatches generating units: real operators re-solve dispatch problems like this one every few minutes.",
+      "source": "EIA, Today in Energy",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=32052",
+      "asof": "published 14 Jul 2017"
+    }
+  ],
+  "rule": {
+    "cost": 104400,
+    "pk": 20,
+    "sp": 15,
+    "co2": 736.2
+  },
+  "signError": {
+    "cost": 52160
+  },
+  "threshold": 80,
+  "precomputed": {
+    "cost": 104000,
+    "cc": [
+      120,
+      115,
+      110,
+      105,
+      100,
+      95,
+      110,
+      105,
+      65,
+      25,
+      20,
+      15,
+      20,
+      55,
+      95,
+      60,
+      45,
+      75,
+      115,
+      145,
+      130,
+      105,
+      90,
+      80
+    ],
+    "pk": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sp": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      15,
+      0,
+      0,
+      0,
+      0,
+      10,
+      0,
+      0,
+      0,
+      10,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "duals": [
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      80,
+      0,
+      40,
+      40,
+      40,
+      40,
+      0,
+      80,
+      40,
+      40,
+      0,
+      80,
+      40,
+      40,
+      40,
+      40,
+      40
+    ]
+  },
+  "milp": {
+    "lpCost": 106300,
+    "lpPk": 35,
+    "cost": 107200,
+    "pk": 0
+  }
+}

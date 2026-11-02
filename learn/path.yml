@@ -223,36 +223,45 @@
   after: [6, 7]
 - kind: lesson
   id: 09-storage
+  status: active
   starter: 9
   form: cards
   icon: battery
   tier: analyst
   minutes: 15
   title: "How does storage move energy through time?"
+  subtitle: "Charge with midday sun, discharge at sunset"
+  teaches: [energy storage, round-trip efficiency, state of charge, valuing storage, linear programming]
   short: "Storage"
   does: "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule."
   outcome: "Size and value simple storage."
   after: [2, 8]
 - kind: lesson
   id: 10-write-it-down
+  status: active
   starter: 10
   form: cards
   icon: pencil
   tier: analyst
   minutes: 15
   title: "Write it down: what are the decisions, the goal and the rules?"
+  subtitle: "Sort a model into its parts, then find the best plan on a graph"
+  teaches: [decision variables, objective, constraints, parameters, feasible region, linear programming outcomes]
   short: "Write it down"
   does: "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph."
   outcome: "Formulate a small optimization problem in words and symbols."
   after: [0, 8]
 - kind: lesson
   id: 11-solver
+  status: active
   starter: 11
   form: cards
   icon: target
   tier: modeler
   minutes: 15
   title: "Ask the solver, then check its answer"
+  subtitle: "HiGHS in your browser: solve, check, and read prices"
+  teaches: [solvers, model checking, shadow prices, sensitivity analysis, mixed-integer programming]
   short: "Ask the solver"
   does: "A real solver in your browser: try to beat it, check its answer, and read prices from it."
   outcome: "Solve, interpret and check a linear program."
