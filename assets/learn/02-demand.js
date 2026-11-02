@@ -187,7 +187,7 @@
         if (mk.label) {
           var pos = mk.pos || (mk.vline ? "bottom" : "above"), ty = pos === "bottom" ? m.t + ih - 8 : pos === "below" ? my + 22 : my - 13, anchor, tx;
           if (ty > m.t + ih - 4) ty = my - 13;
-          if (ty < m.t + 10) ty = my + 22;
+          if (ty < 12) ty = my + 22;
           if (mk.vline) { var rt = mx < m.l + iw * 0.7; anchor = rt ? "start" : "end"; tx = mx + (rt ? 6 : -6); }
           else { anchor = mx < m.l + 70 ? "start" : mx > m.l + iw - 70 ? "end" : "middle"; tx = mx + (anchor === "start" ? -4 : anchor === "end" ? 4 : 0); }
           S("text", { x: tx, y: ty, "text-anchor": anchor, class: "t2-mk" }, svg).textContent = mk.label;
@@ -315,7 +315,7 @@
       series: function () { return [{ label: Wd.winter.label, color: "var(--lx-wind)", values: Wd.winter.demand, hidden: !showWinter }, { label: Wd.summer.label, color: "var(--lx-cc)", values: Wd.summer.demand, area: 0.12 }]; },
       xticks: function () { return [0, 6, 12, 18, 24].map(function (h) { return { at: h, label: h === 24 ? "24:00" : hh(h) }; }); },
       marks: function () {
-        var mk = [{ i: Wd.s.tmax, v: Wd.s.max, label: "Peak " + num(Wd.s.max) + " MW at " + hh(Wd.s.tmax), color: "var(--lx-cc)" }];
+        var mk = [{ i: Wd.s.tmax, v: Wd.s.max, label: "Peak " + num(Wd.s.max) + " MW", color: "var(--lx-cc)" }];
         if (guess) mk.push({ i: +guess, v: Wd.summer.demand[+guess], vline: true, label: "Your guess" });
         if (showWinter) mk.push({ i: Wd.w.tam, v: Wd.w.am, label: num(Wd.w.am) + " MW", color: "var(--lx-wind)" }, { i: Wd.w.tpm, v: Wd.w.pm, label: num(Wd.w.pm) + " MW", color: "var(--lx-wind)", pos: "below" });
         return mk;
@@ -372,7 +372,7 @@
           var b = H("button", { class: "lx-btn ghost small", type: "button", "aria-pressed": showWinter ? "true" : "false", html: LX.icon("cloud") + "Add " + Wd.winter.label }, act);
           attach(act, dayChart);
           function upd() {
-            b.setAttribute("aria-pressed", showWinter ? "true" : "false"); dayChart.render();
+            b.setAttribute("aria-pressed", showWinter ? "true" : "false"); b.innerHTML = LX.icon("cloud") + (showWinter ? "Hide " : "Add ") + Wd.winter.label; dayChart.render();
             if (showWinter) {
               api.done(); keep("winter", true);
               api.saw("Summer: one hump, from " + num(Wd.s.min) + " MW at " + hh(Wd.s.tmin) + " to " + num(Wd.s.max) + " MW at " + hh(Wd.s.tmax) + " (cooling). Winter: two humps, " +
