@@ -296,7 +296,7 @@
             else { var above = d.A.filter(function (v, t) { return v > d.F[t]; }).length;
               api.saw("On " + d.label.weekday + " " + d.label.short + " demand came in above the forecast in " + (above === 24 ? "every hour" : above + " of 24 hours") + ", by up to " + gw(w.mw) + " (" + spct(w.pct) + ") at " + LX.fmt.hh(w.t) + ". The average miss was about " + (mape(d.A, d.F).value / mpT).toFixed(0) + " times the typical day's.", true); api.done(); }
           };
-          seg(act, "Day", [["typical", "Typical day · " + dayName("typical")], ["miss", "Biggest miss · " + dayName("miss")]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
+          seg(act, "Day", [["typical", "Typical · " + DAYS.typical.label.short], ["miss", "Worst · " + DAYS.miss.label.short]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
           said(); if (S_.day === "miss") api.done();
         } },
       { text: "Is SPP's forecast any good? Compare it with the laziest forecast there is, [[persistence-forecast|persistence]]: tomorrow looks like today. Pick a baseline and see which misses less.",
@@ -306,7 +306,7 @@
             var d = DAYS[S_.day], B = S_.base === "week" ? d.Wk : d.Y, ms = mae(d.A, d.F), mb = mae(d.A, B), J = S_.base === "week" ? [PM.spp_same_hours_last_week, PM.last_week] : [PM.spp_same_hours_yesterday, PM.yesterday];
             api.saw("On " + d.label.short + ": SPP " + gw2(ms) + " against " + gw2(mb) + " for the baseline. Over January–April SPP's average miss was " + pct(1 - J[0] / J[1], 0) + " smaller than this baseline's: real skill.");
           };
-          seg(act, "Baseline", [["yesterday", "Same hour yesterday"], ["week", "Same hour last week"]], S_.base, function (v) { S_.base = v; draw(false); said(); remember(); api.done(); });
+          seg(act, "Baseline", [["yesterday", "Yesterday"], ["week", "Last week"]], S_.base, function (v) { S_.base = v; draw(false); said(); remember(); api.done(); });
           seg(act, "Day", [["typical", dayName("typical")], ["miss", dayName("miss")]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
           said();
         } },
