@@ -327,15 +327,19 @@ Domain Knowledge
 [Journal of Energy Storage]{.chip}
 [Scientific Reports]{.chip}
 [Journal of Energy Engineering]{.chip}
+[Energy Conversion and Management]{.chip}
 [Energy Conversion and Management: X]{.chip}
+[Energies]{.chip}
 [Sustainable Energy Technologies and Assessments]{.chip}
 [Journal of Electrical Engineering]{.chip}
 [Discover Sustainability]{.chip}
+[Discover Environment]{.chip}
 [Sustainable Energy, Grids and Networks]{.chip}
 [International Journal of Electrical Power & Energy Systems]{.chip}
 [Journal of Thermal Analysis and Calorimetry]{.chip}
 [Next Energy]{.chip}
 [Sustainable Futures]{.chip}
+[Cleaner Manufacturing]{.chip}
 :::
 
 [Conferences]{.cv-rk}

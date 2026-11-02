@@ -5,7 +5,6 @@ date: 2026-11-02
 author: "Honglin Li"
 categories:
   - Data & methods
-draft: true
 ---
 
 This guide is for researchers, students and analysts who build models of U.S. power markets, of large new loads such as data centers and electrolyzers, and of the clean firm supply that may serve them. It covers fifteen public datasets and open tools in five groups: grid operations and markets; generation, load and emissions; interconnection and planning; costs and technology; and modeling tools. Each entry says who publishes the source, what it covers, how to get it, what its terms allow (including whether you may redistribute what you download), and the pitfalls that tend to cost time. Where a pitfall comes from my own published work, the entry links the public documentation of the framework repository in which the step is written down; the others come from the publisher's own documentation. **As of 2 November 2026**, every fact below was checked against the publisher's official pages. Terms, versions and addresses change, so confirm them at the source before you rely on them. One naming note: on 1 December 2025 the U.S. Department of Energy changed the name of the lab known as NREL (National Renewable Energy Laboratory); it is now the National Laboratory of the Rockies (NLR). Its tools and data now live on nlr.gov, and older nrel.gov links no longer resolve.

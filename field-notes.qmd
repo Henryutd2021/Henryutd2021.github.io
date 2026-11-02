@@ -19,10 +19,10 @@ listing:
      approved; then the navbar item is added in _quarto.yml. Listings skip draft posts. -->
 
 ::: {.fn-intro}
-Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. **Briefings** pick a few developments every two weeks and say why they matter for planning and modeling. **Perspectives**, one claim at a time, and a **Data & Tools** guide to the public data and software I use will follow.
+Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. **Briefings** pick a few developments every two weeks and say why they matter for planning and modeling. The **Data & Tools** guide collects the public data and software I use, with the pitfalls I have run into. **Perspectives**, one claim at a time, will follow.
 
 [<i class="bi bi-rss" aria-hidden="true"></i> Briefings RSS](field-notes/briefings.xml){.btn-outline}
-<!-- add when live: [<i class="bi bi-database" aria-hidden="true"></i> Data & Tools guide](field-notes/data-tools.qmd){.btn-outline} -->
+[<i class="bi bi-database" aria-hidden="true"></i> Data & Tools guide](field-notes/data-tools.qmd){.btn-outline}
 :::
 
 ## Latest briefings {#briefings}
