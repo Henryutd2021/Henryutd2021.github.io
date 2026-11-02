@@ -225,7 +225,7 @@
   // ---- steps 5-6: the clean power curve
   function Curve(host, tb) {
     var cw = host.clientWidth || 600, phone = cw < 520;
-    var Wd = phone ? Math.max(300, cw) : 600, Hh = phone ? 236 : 262, m = { l: 48, r: 10, t: 14, b: 42 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b, vmax = tb.maxSlider, pmax = 3200;
+    var Wd = phone ? Math.max(300, cw) : 600, Hh = phone ? 236 : 262, m = { l: 48, r: 10, t: 14, b: 42 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b, vmax = tb.maxSlider, pmax = 3700;
     var svg = S("svg", { viewBox: "0 0 " + Wd + " " + Hh, class: "lx5-curve", role: "img" }, host);
     var x = function (v) { return m.l + v / vmax * iw; }, y = function (p) { return m.t + ih - p / pmax * ih; };
     S("rect", { x: x(tb.cutIn), y: m.t, width: x(tb.ratedSpeed) - x(tb.cutIn), height: ih, fill: "var(--lx-wind)", opacity: 0.08 }, svg);
@@ -236,10 +236,9 @@
     [0, 5, 10, 15, 20, 25].forEach(function (v) { S("text", { x: x(v), y: m.t + ih + 16, "text-anchor": "middle", class: "lx5-ax" }, svg).textContent = v; });
     S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "lx5-ax" }, svg).textContent = "wind speed, m/s";
     S("text", { x: m.l + 4, y: m.t + 10, class: "lx5-ax" }, svg).textContent = "output, kW";
-    [[tb.ratedSpeed, "rated " + tb.ratedSpeed + " m/s"], [tb.cutOut, "cut-out " + tb.cutOut]].forEach(function (r) {
-      S("path", { d: "M" + x(r[0]) + " " + m.t + "V" + (m.t + ih), stroke: "var(--lx-ink-3)", "stroke-dasharray": "3 3" }, svg);
-      S("text", { x: x(r[0]) - 4, y: m.t + ih - 6, "text-anchor": "end", class: "lx5-ax" }, svg).textContent = r[1];
-    });
+    [tb.ratedSpeed, tb.cutOut].forEach(function (v) { S("path", { d: "M" + x(v) + " " + m.t + "V" + (m.t + ih), stroke: "var(--lx-ink-3)", "stroke-dasharray": "3 3" }, svg); });
+    S("text", { x: x(tb.ratedSpeed) + 5, y: y(tb.ratedKW) - 7, class: "lx5-ax" }, svg).textContent = "rated " + tb.ratedSpeed + " m/s";
+    S("text", { x: x(tb.cutOut) - 4, y: m.t + ih - 6, "text-anchor": "end", class: "lx5-ax" }, svg).textContent = "cut-out " + tb.cutOut;
     S("text", { x: (x(tb.cutIn) + x(tb.ratedSpeed)) / 2, y: y(2400), "text-anchor": "middle", class: "lx5-lab" }, svg).textContent = "cube law";
     var d = "";
     for (var v = 0; v <= vmax + 1e-9; v += 0.1) d += (d ? " L" : "M") + x(v).toFixed(1) + " " + y(power(v, tb)).toFixed(1);
@@ -312,7 +311,7 @@
           var top = H("div", null, act), map = H("div", null, act), note = H("p", { class: "lx-hint" }, act), stat = H("div", { class: "lx5-stats", "aria-live": "polite" }, act);
           var fb = FillBar(act), mb = H("div", { class: "lx5-mwrap" }, act);
           var ym = YearMap(map, W, D);
-          var tabs = seg(top, KEYS.map(function (k) { return { value: k, label: TECH[k].label + " 100 MW", color: TECH[k].col }; }), "Plant", function (k) {
+          var tabs = seg(top, KEYS.map(function (k) { return { value: k, label: TECH[k].label, color: TECH[k].col }; }), "Plant, 100 MW each", function (k) {
             seen[k] = true; ym.show(k); note.innerHTML = LX.rich(NOTES[k](W[k]));
             stat.innerHTML = "<div><span>Energy in the year</span><b>" + F.int(W[k].energy) + " MWh</b></div><div><span>Capacity factor</span><b>" + pct(W[k].cf) +
               "</b></div><div><span>Best hour</span><b>" + Math.round(W[k].max) + " MW</b></div>";

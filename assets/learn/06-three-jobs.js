@@ -221,8 +221,8 @@
       S("text", { x: x(v), y: m.t + ih + 16, "text-anchor": "middle", class: "lx6-ax" }, svg).textContent = v * 100 + "%";
     });
     S("path", { d: "M" + x(0) + " " + y(0) + "L" + x(1) + " " + y(1), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 4" }, svg);
-    S("text", { x: phone ? x(0.55) : x(0.7), y: phone ? y(0.25) : y(0.58), "text-anchor": "start", class: "lx6-ax" }, svg).textContent = phone ? "firm share = CF" : "firm share = capacity factor";
-    S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "lx6-axt" }, svg).textContent = "Capacity factor, U.S. 2025 (how much of the year it runs)";
+    S("text", { x: phone ? x(0.55) : x(0.7), y: phone ? y(0.19) : y(0.58), "text-anchor": "start", class: "lx6-ax" }, svg).textContent = phone ? "firm share = CF" : "firm share = capacity factor";
+    S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "lx6-axt" }, svg).textContent = phone ? "Capacity factor, U.S. 2025" : "Capacity factor, U.S. 2025 (how much of the year it runs)";
     S("text", { x: 12, y: m.t + ih / 2, "text-anchor": "middle", class: "lx6-axt", transform: "rotate(-90 12 " + (m.t + ih / 2) + ")" }, svg).textContent = "Firm share, PJM 2028/29";
     var dots = {};
     pts.forEach(function (t) {
