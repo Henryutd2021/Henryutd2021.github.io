@@ -3,13 +3,17 @@
 /* map.ejs — the course as plain lists, rendered from learn/path.yml (Quarto listing). It is the text version of the
    metro map (metro.js draws the map above it and closes this box) and what readers without JavaScript see.
    One block per tier (any number of tiers): its starter-path lessons (ids lesson-N, ticked when done), then the rest of
-   the tier, then the math toolbox. Progress ticks: elements with data-lesson-id get .is-done from learn.js. */
+   the tier, then the math toolbox. Progress ticks: elements with data-lesson-id get .is-done from learn.js.
+   A lesson or tool links to its page only when it is live: `path`, or `status: active` (page <id>.qmd), and not
+   status: upcoming (path.yml; the same rule as scripts/build_learn.py). */
 const has = v => v !== undefined && v !== null && v !== "";
 const tiers = items.filter(i => i.kind === "tier");
 const lessons = items.filter(i => i.kind === "lesson");
 const starter = lessons.filter(i => has(i.starter)).sort((a, b) => Number(a.starter) - Number(b.starter));
 const tools = items.filter(i => i.kind === "tool");
 const link = p => String(p).replace(/\.qmd($|#)/, ".html$1");
+const page = l => has(l.path) ? l.path : (l.status === "active" && has(l.id) ? l.id + ".qmd" : "");
+const live = l => has(page(l)) && l.status !== "upcoming";
 const name = {}; tiers.forEach(t => { name[t.id] = t.title; });
 %>
 <details class="lx-listview" id="lx-list" open>
@@ -19,18 +23,18 @@ const name = {}; tiers.forEach(t => { name[t.id] = t.title; });
 <h3 id="h-path"><i style="--c:var(--lx-ink-3)"></i>The starter path: <%= starter.length %> lessons across the tiers</h3>
 <ol start="0">
 <% for (const l of starter) { %>
-<li id="lesson-<%= l.starter %>" data-lesson-id="<%= l.id %>"><% if (has(l.path)) { %><a href="<%- link(l.path) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· <%= name[l.tier] %><%= has(l.tier2) ? " to " + name[l.tier2] : "" %> · <%= l.minutes %> min<%= has(l.path) ? "" : " · coming soon" %></span></li>
+<li id="lesson-<%= l.starter %>" data-lesson-id="<%= l.id %>"><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· <%= name[l.tier] %><%= has(l.tier2) ? " to " + name[l.tier2] : "" %> · <%= l.minutes %> min<%= live(l) ? "" : " · coming soon" %></span></li>
 <% } %>
 </ol>
 </section>
 <% for (const t of tiers) {
      const more = lessons.filter(l => l.tier === t.id && !has(l.starter)); %>
 <section id="<%= t.id %>" aria-labelledby="h-<%= t.id %>">
-<h3 id="h-<%= t.id %>"><i style="--c:var(--lx-tier-<%= t.slot || (tiers.indexOf(t) + 1) %>)"></i><%= t.title %><%= has(t.level) ? " · " + t.level : "" %></h3>
+<h3 id="h-<%= t.id %>"><i style="--c:var(--lx-tier-<%= t.slot || (tiers.indexOf(t) + 1) %>)"></i><%= t.title %><%= has(t.level) ? " · " + t.level : "" %><%= t.status === "upcoming" ? " · coming later" : "" %></h3>
 <p class="lx-hint"><%= t.goal %></p>
 <% if (more.length) { %>
 <ul>
-<% for (const l of more) { %><li><% if (has(l.code)) { %><span class="lx-code"><%= l.code %></span><% } %><%= l.title %></li><% } %>
+<% for (const l of more) { %><li<% if (has(l.id)) { %> data-lesson-id="<%= l.id %>"<% } %>><% if (has(l.code)) { %><span class="lx-code"><%= l.code %></span><% } %><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %><% if (has(l.minutes)) { %> <span class="lx-code">· <%= l.minutes %> min<%= live(l) ? "" : " · coming soon" %></span><% } %></li><% } %>
 </ul>
 <% } %>
 </section>
@@ -38,7 +42,7 @@ const name = {}; tiers.forEach(t => { name[t.id] = t.title; });
 <% if (tools.length) { %>
 <section id="toolbox" aria-labelledby="h-toolbox">
 <h3 id="h-toolbox"><i style="--c:var(--lx-ink-3)"></i>The math toolbox</h3>
-<ul><% for (const t of tools) { %><li><%= t.title %></li><% } %></ul>
+<ul><% for (const t of tools) { %><li<% if (has(t.id)) { %> data-lesson-id="<%= t.id %>"<% } %>><% if (has(t.code)) { %><span class="lx-code"><%= t.code %></span><% } %><% if (live(t)) { %><a href="<%- link(page(t)) %>"><%= t.title %></a><% } else { %><%= t.title %><% } %><% if (has(t.minutes)) { %> <span class="lx-code">· <%= t.minutes %> min<%= live(t) ? "" : (has(t.id) ? " · coming soon" : "") %></span><% } %></li><% } %></ul>
 </section>
 <% } %>
 </div>

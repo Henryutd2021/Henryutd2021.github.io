@@ -50,6 +50,22 @@
    "doord": "From a first linear program to capacity expansion, uncertainty and research practice.",
    "doorcta": "Go to the Modeler tier",
    "doorlink": "#modeler"
+  },
+  {
+   "id": "researcher",
+   "title": "Researcher",
+   "level": "L4",
+   "slot": 4,
+   "icon": "flask",
+   "reader": "Learners who have finished the Modeler core, or graduate students starting a project",
+   "math": "As the Modeler tier",
+   "assumes": "The Modeler core.",
+   "goal": "Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.",
+   "door": "Ready for research",
+   "doord": "Coming later: frame a question, find what is known, choose a method and defend a study.",
+   "doorcta": "See what is coming",
+   "doorlink": "#researcher",
+   "status": "upcoming"
   }
  ],
  "scales": [],
@@ -845,6 +861,76 @@
  "more": [
   {
    "tier": "foundations",
+   "code": "N1",
+   "title": "How do you read an energy headline like a researcher?",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": [],
+   "id": "n01-news-lens",
+   "tier2": "analyst",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "CK-F",
+   "title": "Foundations checkpoint: estimate an unfamiliar situation",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": [],
+   "id": "ck-f-estimate",
+   "minutes": 40,
+   "form": "checkpoint"
+  },
+  {
+   "tier": "analyst",
+   "code": "B1",
+   "title": "From algebra to a linear program: how do equations become a model?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "id": "b01-algebra-to-lp",
+   "tier2": "modeler",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "B2",
+   "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "id": "b02-python-data",
+   "tier2": "modeler",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "B3",
+   "title": "How do you read a formulation, and check that a model is right?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "id": "b03-read-check-formulation",
+   "tier2": "modeler",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
+   "tier": "modeler",
+   "code": "M1",
+   "title": "From dispatch to locational prices: the linear program behind the market",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": [],
+   "id": "m01-dispatch-to-lmp",
+   "minutes": 40,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
    "ready": false,
@@ -989,16 +1075,8 @@
   },
   {
    "tier": "modeler",
-   "code": "M1",
-   "title": "Optimization in one page: variables, objective, constraints",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
-  },
-  {
-   "tier": "modeler",
    "code": "M2",
-   "title": "Linear programming and economic dispatch; prices as shadow prices",
+   "title": "On or off? Unit commitment as a mixed-integer program",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1006,7 +1084,7 @@
   {
    "tier": "modeler",
    "code": "M3",
-   "title": "Integer decisions: unit commitment",
+   "title": "What should be built? Capacity expansion with representative periods, validated",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1014,7 +1092,7 @@
   {
    "tier": "modeler",
    "code": "M4",
-   "title": "Networks: power flow, congestion and locational prices",
+   "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1022,7 +1100,7 @@
   {
    "tier": "modeler",
    "code": "M5",
-   "title": "Capacity expansion: investment plus operation",
+   "title": "Size and run a microgrid that survives an outage",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1030,7 +1108,7 @@
   {
    "tier": "modeler",
    "code": "M6",
-   "title": "Storage and coupled systems: power, hydrogen and heat",
+   "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1038,7 +1116,7 @@
   {
    "tier": "modeler",
    "code": "M7",
-   "title": "Multiple objectives: cost against emissions",
+   "title": "What could happen? Scenarios, Monte Carlo and global sensitivity",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1046,7 +1124,7 @@
   {
    "tier": "modeler",
    "code": "M8",
-   "title": "Uncertainty I: scenarios, sensitivity and Monte Carlo",
+   "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1054,7 +1132,7 @@
   {
    "tier": "modeler",
    "code": "M9",
-   "title": "Uncertainty II: stochastic and robust optimization",
+   "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1062,7 +1140,7 @@
   {
    "tier": "modeler",
    "code": "M10",
-   "title": "Surrogate models and uncertainty quantification",
+   "title": "Forecasting load, wind, solar and prices with machine learning, and judging it honestly",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1070,7 +1148,7 @@
   {
    "tier": "modeler",
    "code": "M11",
-   "title": "Techno-economic analysis inside models",
+   "title": "Techno-economic analysis inside an optimization model",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1078,7 +1156,7 @@
   {
    "tier": "modeler",
    "code": "M12",
-   "title": "Emissions accounting in models: hourly matching",
+   "title": "Model a city's energy system: an energy hub with grid limits and screening fairness outputs",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1086,7 +1164,7 @@
   {
    "tier": "modeler",
    "code": "M13",
-   "title": "Modelling practice: data, validation, reproducibility, open tools",
+   "title": "Build a nation's pathway: a multi-region, multi-decade model",
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
@@ -1094,33 +1172,138 @@
   {
    "tier": "modeler",
    "code": "M14",
-   "title": "From a model to a research question",
+   "title": "Did it work? Learning from data with regression and natural experiments",
    "ready": false,
    "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R1",
+   "title": "What makes a question worth researching?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R2",
+   "title": "How do you find out what is already known?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R3",
+   "title": "Which system, which boundary, which method?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R4",
+   "title": "Data you can defend: sources, cleaning, licences and provenance",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R5",
+   "title": "Can you trust your analysis? Verification, validation and reproducibility",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R6",
+   "title": "Uncertainty done properly: what to vary, how, and how to say it",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R7",
+   "title": "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R8",
+   "title": "How do you show results so people understand their limits?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R9",
+   "title": "Research integrity, and working with the people your study is about",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R10",
+   "title": "What could you study? The question studio",
+   "ready": false,
+   "href": "index.html#researcher",
    "scales": []
   }
  ],
  "toolbox": [
   {
-   "title": "Units and orders of magnitude"
+   "title": "Units and orders of magnitude",
+   "code": "K1",
+   "minutes": 10
   },
   {
-   "title": "Rates and efficiencies"
+   "title": "Rates and efficiencies",
+   "code": "K2",
+   "minutes": 10
   },
   {
-   "title": "Exponentials and discounting"
+   "title": "Exponentials and discounting",
+   "code": "K3",
+   "minutes": 15
   },
   {
-   "title": "Linear equations and inequalities"
+   "title": "Linear equations and inequalities",
+   "ready": false,
+   "href": "index.html#toolbox",
+   "code": "K4",
+   "id": "k04-linear-equations",
+   "minutes": 15
   },
   {
-   "title": "Probability"
+   "title": "Probability and statistics",
+   "code": "K5",
+   "minutes": 25
   },
   {
-   "title": "Vectors and matrices"
+   "title": "Vectors and matrices: what Ax <= b means",
+   "code": "K6",
+   "minutes": 25
   },
   {
-   "title": "Python in 30 minutes"
+   "title": "Spreadsheets in practice",
+   "ready": false,
+   "href": "index.html#toolbox",
+   "code": "K7",
+   "id": "k07-spreadsheets",
+   "minutes": 20
+  },
+  {
+   "title": "Git and reproducible notebooks",
+   "code": "K8",
+   "minutes": 20
   }
  ],
  "minutes": 215
