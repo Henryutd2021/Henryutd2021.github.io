@@ -1,4 +1,9 @@
 {
+ "absolute-reference": {
+  "term": "Absolute reference",
+  "short": "A spreadsheet address with $ signs, such as $E$1, that stays the same when a formula is copied to other cells.",
+  "lesson": "K7"
+ },
  "balancing": {
   "term": "Balancing",
   "short": "Keeping the power that plants make equal to the power that people use, at every moment.",
@@ -74,6 +79,11 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
  },
+ "feasible-region": {
+  "term": "Feasible region",
+  "short": "All the plans that keep every rule of a model at once; with two decisions it is a shape on a graph.",
+  "lesson": "B1"
+ },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
@@ -88,6 +98,11 @@
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
+ },
+ "inequality": {
+  "term": "Inequality",
+  "short": "A rule that allows a range of values, written with ≤ (at most) or ≥ (at least).",
+  "lesson": "K4"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -128,6 +143,11 @@
   "term": "Optimization",
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10
+ },
+ "parameter": {
+  "term": "Parameter",
+  "short": "A given number in a model, such as a demand or a price, which the solver uses but does not choose.",
+  "lesson": "B3"
  },
  "pareto-frontier": {
   "term": "Pareto frontier",
@@ -179,10 +199,20 @@
   "short": "Demand that could not be met, so some customers lost power.",
   "lesson": 0
  },
+ "validation": {
+  "term": "Validation",
+  "short": "Checking that a model represents the real system well enough for the question it is used to answer.",
+  "lesson": "B3"
+ },
  "variable-renewables": {
   "term": "Variable renewables",
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0
+ },
+ "verification": {
+  "term": "Verification",
+  "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
+  "lesson": "B3"
  },
  "wholesale-price": {
   "term": "Wholesale price",

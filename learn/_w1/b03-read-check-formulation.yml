@@ -1,0 +1,15 @@
+# Sidecar for bridge B3 (b03-read-check-formulation), builder learn-w1-h, 2026-11-02. Read by scripts/build_learn.py.
+id: b03-read-check-formulation
+lesson: B3
+glossary:
+  - id: parameter
+    term: Parameter
+    def: "A given number in a model, such as a demand or a price, which the solver uses but does not choose."
+  - id: verification
+    term: Verification
+    def: "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases."
+  - id: validation
+    term: Validation
+    def: "Checking that a model represents the real system well enough for the question it is used to answer."
+requests:
+  - "B3 solves six small LPs with LX.solver in the browser (the correct four-hour dispatch and five planted bugs); the page falls back to a precomputed solution (data file 'ref', re-checked by the Node test) if the solver cannot load. Worth adding to the W1 solver benchmark set (scripts/learn_solver_bench.mjs) as a 'many tiny solves' case."

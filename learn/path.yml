@@ -289,7 +289,7 @@
   tier2: modeler
   form: cards
   icon: pencil
-  status: upcoming
+  status: active
   minutes: 30
   title: "From algebra to a linear program: how do equations become a model?"
   does: "Start with a ten-question readiness check that routes you to the toolbox if needed; turn three word problems into equations and inequalities, then into a linear program; drag the constraints of a two-variable LP; write the same model as Ax <= b with a linked view."
@@ -315,7 +315,7 @@
   tier2: modeler
   form: cards
   icon: question
-  status: upcoming
+  status: active
   minutes: 30
   title: "How do you read a formulation, and check that a model is right?"
   does: "Read a published-style formulation (sets, indices, parameters, variables, constraints) and translate each line into words and units; find five planted errors (unit, sign, missing index, wrong sum, a free lunch); check a solved model's energy balance and the signs of its duals."
@@ -383,7 +383,7 @@
 - kind: tool
   id: k04-linear-equations
   code: K4
-  status: upcoming
+  status: active
   minutes: 15
   title: "Linear equations and inequalities"
   next: B1
@@ -392,7 +392,7 @@
 - kind: tool
   id: k07-spreadsheets
   code: K7
-  status: upcoming
+  status: active
   minutes: 20
   title: "Spreadsheets in practice"
   next: B2

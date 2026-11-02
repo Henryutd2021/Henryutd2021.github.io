@@ -1,0 +1,86 @@
+{
+ "meta": {
+  "title": "Bridge B1 (From algebra to a linear program): readiness check and word problems",
+  "built_by": "by hand, 2026-11-02; every number is checked by _tests/learn/test_b01-algebra-to-lp.js",
+  "license": "CC BY 4.0",
+  "notes": "The dispatch story is built in the page from town.json and town_year.json (19:00 on 3 September 2025, as in lesson 0). The planning story takes its energy per MW from cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 U.S. capacity factors: solar 24.0%, wind 33.8%), rounded to 2.1 and 3.0 GWh per MW-year. All prices, costs, sizes and limits in the stories are illustrative."
+ },
+ "ready": {
+  "groups": {
+   "units": {"label": "Power and energy", "route": "starter:1", "advice": "Revisit lesson 1 on power and energy first (about 15 minutes)."},
+   "rates": {"label": "Rates and efficiencies", "route": "tool:K2", "advice": "Toolbox K2, rates and efficiencies, is coming soon; lesson 7's cost steps cover the same ground."},
+   "linear": {"label": "Equations and inequalities", "route": "tool:K4", "advice": "Take toolbox K4 first (about 15 minutes): this lesson builds on it at every step."},
+   "vectors": {"label": "Multiply and add", "route": "tool:K6", "advice": "Not needed yet: steps 9 and 10 introduce it gently. Toolbox K6 (coming later) goes further."}
+  },
+  "items": [
+   {"id": "r1", "group": "units", "q": "A plant makes 40 MW for 6 hours. How much energy is that?", "choices": ["46 MWh", "240 MWh", "240 MW", "6.7 MWh"], "answer": 1, "why": "Energy = power × time: 40 MW × 6 h = 240 MWh."},
+   {"id": "r2", "group": "units", "q": "How many kWh are in 1 MWh?", "choices": ["10", "100", "1,000", "1,000,000"], "answer": 2, "why": "Mega is a thousand times kilo: 1 MWh = 1,000 kWh."},
+   {"id": "r3", "group": "rates", "q": "A boiler turns fuel into heat at 90% efficiency. 100 MWh of fuel gives…", "choices": ["90 MWh of heat", "111 MWh of heat", "10 MWh of heat", "100 MWh of heat"], "answer": 0, "why": "Heat out = 0.9 × 100 MWh = 90 MWh; the other 10 MWh is lost."},
+   {"id": "r4", "group": "rates", "q": "Energy at $40 per MWh. What do 25 MWh cost?", "choices": ["$65", "$1.60", "$1,000", "$10,000"], "answer": 2, "why": "$40/MWh × 25 MWh = $1,000: the MWh cancel."},
+   {"id": "r5", "group": "linear", "q": "100 + 98 + g = 303. What is g?", "choices": ["105", "203", "501", "98"], "answer": 0, "why": "g = 303 − 100 − 98 = 105."},
+   {"id": "r6", "group": "linear", "q": "2x + 10 = 50. What is x?", "choices": ["30", "20", "25", "40"], "answer": 1, "why": "Take 10 from both sides (2x = 40), then halve: x = 20."},
+   {"id": "r7", "group": "linear", "q": "“The line carries at most 150 MW.” In symbols, with x the flow in MW:", "choices": ["x ≤ 150", "x ≥ 150", "x < 150", "x = 150"], "answer": 0, "why": "At most means ≤: exactly 150 MW is still allowed."},
+   {"id": "r8", "group": "linear", "q": "−2x ≤ 6 means…", "choices": ["x ≤ −3", "x ≥ −3", "x ≥ 3", "x ≤ 3"], "answer": 1, "why": "Divide by −2 and flip the sign: x ≥ −3."},
+   {"id": "r9", "group": "linear", "q": "Which plan passes both x ≤ 100 and x + y ≥ 120?", "choices": ["x = 110, y = 20", "x = 90, y = 20", "x = 100, y = 20", "x = 60, y = 50"], "answer": 2, "why": "100 ≤ 100 and 100 + 20 = 120 ≥ 120. The others break the 100 limit or reach only 110."},
+   {"id": "r10", "group": "vectors", "q": "Three plants cost $10, $40 and $100 per MWh and run at 100, 50 and 20 MW for one hour. Total cost?", "choices": ["$150", "$5,000", "$7,000", "$19,000"], "answer": 1, "why": "Multiply pairwise and add: 10 × 100 + 40 × 50 + 100 × 20 = $5,000."}
+  ]
+ },
+ "stories": {
+  "planning": {
+   "title": "New wind and solar for Prairie Town",
+   "text": ["Prairie Town wants at least 300 GWh a year from new solar and wind farms.", "Each MW of solar makes about {solarGWh} GWh a year and each MW of wind about {windGWh} GWh ({solarCF} and {windCF} capacity factors, U.S. 2025, rounded).", "Solar costs $120k and wind $180k per MW each year, building and upkeep together.", "The substation can connect at most 115 MW in total.", "Which mix is cheapest?"],
+   "vars": [{"sym": "S", "name": "solar to build", "unit": "MW"}, {"sym": "W", "name": "wind to build", "unit": "MW"}],
+   "sense": "min", "c": [120, 180], "goalUnit": "$k a year",
+   "rows": [
+    {"a": [2.1, 3.0], "op": ">=", "b": 300, "key": "energy", "says": "at least 300 GWh a year", "given": true},
+    {"a": [1, 1], "op": "<=", "b": 115, "key": "connect", "says": "the substation can connect at most 115 MW in total", "given": false},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "S0", "says": "no negative solar", "given": true},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "W0", "says": "no negative wind", "given": true}],
+   "view": [0, 160, 0, 160], "ticks": [0, 40, 80, 120, 160],
+   "hints": ["Read the story again: which sentence has no rule in the model yet?", "The substation counts solar and wind MW together: each MW of either uses one MW of the connection.", "S + W ≤ 115: one for S, one for W, ≤, and 115 on the right."]
+  },
+  "battery": {
+   "title": "Prairie Town's battery: buy tonight, sell tomorrow",
+   "text": ["Prairie Town's battery stores up to 80 MWh and charges or discharges at up to 40 MW.", "Tonight it can charge for three hours at $30 per MWh; tomorrow evening it can sell for two hours at $120 per MWh.", "Only 90% of the energy it takes in comes back out.", "Choose c, the MWh it buys tonight, and d, the MWh it sells tomorrow, to earn the most."],
+   "vars": [{"sym": "c", "name": "energy bought tonight", "unit": "MWh"}, {"sym": "d", "name": "energy sold tomorrow", "unit": "MWh"}],
+   "sense": "max", "c": [-30, 120], "goalUnit": "$",
+   "rows": [
+    {"a": [1, 0], "op": "<=", "b": 120, "key": "chargeHours", "says": "it charges at up to 40 MW for three hours (40 × 3 = 120 MWh)"},
+    {"a": [1, 0], "op": "<=", "b": 80, "key": "store", "says": "it stores up to 80 MWh"},
+    {"a": [0, 1], "op": "<=", "b": 80, "key": "sellHours", "says": "it sells at up to 40 MW for two hours (40 × 2 = 80 MWh)"},
+    {"a": [-0.9, 1], "op": "<=", "b": 0, "key": "loss", "says": "only 90% of what it takes in comes back out (d ≤ 0.9c)"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "c0", "says": "it cannot buy a negative amount"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "d0", "says": "it cannot sell a negative amount"}],
+   "view": [0, 140, 0, 100], "ticks": [0, 20, 40, 60, 80, 100, 120, 140],
+   "hints": ["Two decisions, c and d, both in MWh. The goal is money earned: sales minus purchases, so 120d − 30c. Is that a min or a max?", "Four limits come from the story: charging (40 MW for 3 h), the storage size, selling (40 MW for 2 h) and the losses: d is at most 90% of c. And neither can be negative.", "max 120d − 30c, subject to c ≤ 120, c ≤ 80, d ≤ 80, −0.9c + d ≤ 0, c ≥ 0 and d ≥ 0."]
+  },
+  "heat": {
+   "title": "Heat for Prairie Campus tonight",
+   "text": ["Prairie Campus needs at least 40 MWh of heat tonight.", "Its heat pump turns 1 MWh of electricity into 3 MWh of heat; electricity costs $60 per MWh, so heat from it costs $20 per MWh.", "Its gas boiler turns fuel into heat at 90% efficiency; fuel costs $27 per MWh, so heat from it costs $30 per MWh.", "The campus feeder can supply at most 10 MWh of electricity for heating tonight.", "Choose h, the heat from the heat pump, and b, the heat from the boiler, both in MWh, at the lowest cost."],
+   "vars": [{"sym": "h", "name": "heat from the heat pump", "unit": "MWh"}, {"sym": "b", "name": "heat from the boiler", "unit": "MWh"}],
+   "sense": "min", "c": [20, 30], "goalUnit": "$",
+   "rows": [
+    {"a": [1, 1], "op": ">=", "b": 40, "key": "heat", "says": "at least 40 MWh of heat"},
+    {"a": [1, 0], "op": "<=", "b": 30, "key": "feeder", "says": "at most 10 MWh of electricity, which makes at most 30 MWh of heat (h/3 ≤ 10)"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "h0", "says": "no negative heat from the heat pump"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "b0", "says": "no negative heat from the boiler"}],
+   "view": [0, 60, 0, 60], "ticks": [0, 10, 20, 30, 40, 50, 60],
+   "hints": ["The goal adds the cost of each MWh of heat: $20 from the heat pump, $30 from the boiler. Minimize it.", "Heat must reach 40 MWh in total. The feeder limits electricity, and the heat pump makes 3 MWh of heat per MWh of electricity.", "min 20h + 30b, subject to h + b ≥ 40, h ≤ 30 (the same as h/3 ≤ 10), h ≥ 0 and b ≥ 0."]
+  },
+  "carbon": {
+   "title": "A carbon cap on the Plains Grid",
+   "text": ["A plant owner on the Plains Grid must deliver exactly 150 MW this hour from two units.", "An older steam unit costs $32 per MWh, emits 0.6 t CO₂ per MWh and makes up to 120 MW.", "A combined-cycle unit costs $40 per MWh, emits 0.4 t CO₂ per MWh and makes up to 100 MW.", "A permit caps this hour's emissions at 76 t CO₂.", "Choose s and c, the MW from each unit, at the lowest cost."],
+   "vars": [{"sym": "s", "name": "steam unit output", "unit": "MW"}, {"sym": "c", "name": "combined-cycle output", "unit": "MW"}],
+   "sense": "min", "c": [32, 40], "goalUnit": "$ this hour",
+   "rows": [
+    {"a": [1, 1], "op": "=", "b": 150, "key": "deliver", "says": "exactly 150 MW"},
+    {"a": [0.6, 0.4], "op": "<=", "b": 76, "key": "cap", "says": "at most 76 t CO₂ this hour"},
+    {"a": [1, 0], "op": "<=", "b": 120, "key": "sMax", "says": "the steam unit makes up to 120 MW"},
+    {"a": [0, 1], "op": "<=", "b": 100, "key": "cMax", "says": "the combined-cycle unit makes up to 100 MW"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "s0", "says": "no negative output"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "c0", "says": "no negative output"}],
+   "view": [0, 160, 0, 160], "ticks": [0, 40, 80, 120, 160],
+   "hints": ["Cost is $32 × s + $40 × c for one hour. Emissions are 0.6 × s + 0.4 × c tonnes.", "Five rules: deliver exactly 150 MW, the 76 t cap, each unit's size, and no negative output.", "min 32s + 40c, subject to s + c = 150, 0.6s + 0.4c ≤ 76, s ≤ 120, c ≤ 100, s ≥ 0 and c ≥ 0."]
+  }
+ }
+}
