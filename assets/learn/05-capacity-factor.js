@@ -1,15 +1,22 @@
 // 05-capacity-factor.js — Lesson 5, "Capacity factor: why is 1 MW not always 1 MW?" (step cards, W1, 2026-11-02).
 //
-// Data: assets/learn/data/town_year.json (every hour of 2025 on the Southwest Power Pool grid, EIA-930, as shapes) and
-// assets/learn/data/05-capacity-factor.json (sourced 2025 capacity factors, the solar day, the illustrative turbine).
+// Data: assets/learn/data/town_year.json (every hour of 2025 on the Southwest Power Pool grid, EIA-930, as shapes),
+// assets/learn/data/cf_targets.json (shared: EIA Electric Power Monthly, Table 6.07.B, 2025 annual capacity factors) and
+// assets/learn/data/05-capacity-factor.json (the 2025 monthly capacity factors, the solar day, the illustrative turbine).
 //
 // IMPORTANT data rule. The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so
-// their mean is not a capacity factor (wind 0.528, solar 0.238). profile() rescales a shape linearly, clipping at the
-// plant's size, so that the year's capacity factor equals the 2025 U.S. average from EIA (Electric Power Monthly, Table
-// 6.07.B): output(t) = min(MW, k x shape(t) / 1000 x MW), with k found by bisection (fitScale). Nuclear has no shape: it
-// runs at full size except for one illustrative refuelling outage sized to the same target. Lesson-local for now; the
-// shared helper townProfile(tech, MW, {annualCF}) from the infrastructure branch should replace profile() once it lands
-// (sidecar learn/_w1/05-capacity-factor.yml), and _tests/learn/test_05-capacity-factor.js checks both agree.
+// their mean is not a capacity factor (wind 0.528, solar 0.238). profile() turns a shape into a plant's output with the
+// shared helper (assets/learn/components/profiles.js: LX.cfScale, LX.townProfile), method "power": output = size x s^g,
+// so the best hours reach the plant's size and the year's capacity factor equals the 2025 U.S. average. "power" rather
+// than "scale" because this lesson shows output against nameplate: with "scale", the SPP wind shape scaled down to 33.8%
+// never passes 64% of the farm's size, which reads as "a 100 MW farm cannot make 100 MW", the opposite of the point
+// (it can; it rarely does). Two lesson-local steps come first (requested for the shared helper in the sidecar):
+//   (1) solar hours with the sun below the horizon across the SPP region are set to zero (sunUp): the shape reports
+//       night-time output from 18 February to 21 March 2025 and on a few other nights, which is telemetry error;
+//   (2) each month is brought to the U.S. monthly capacity factor (LX.cfScale, "power", per month), because the SPP
+//       shapes contain the fleets' growth during 2025 (solar's January maximum is 0.56 of its November maximum);
+// then LX.townProfile sets the annual capacity factor exactly. Nuclear has no shape: it runs at full size except for
+// one illustrative refuelling outage sized to the same target.
 //
 // Model (closed form):
 //   capacity factor  CF = E / (P x T)      E energy made (MWh), P size (MW), T hours in the period
@@ -25,17 +32,10 @@
   var HOURS = 8760;
 
   // ---------------------------------------------------------------- pure model
-  // k such that mean(min(1, k x v)) = cf, for relative outputs v >= 0 (bisection; the mean grows with k)
-  function fitScale(v, cf) {
-    if (!(cf > 0 && cf < 1)) throw new Error("capacity factor must be between 0 and 1");
-    var n = v.length, pos = v.filter(function (x) { return x > 0; }), lo = 0, hi = 1 / Math.min.apply(null, pos);
-    if (pos.length / n < cf) throw new Error("this shape cannot reach that capacity factor");
-    for (var it = 0; it < 200; it++) {
-      var k = (lo + hi) / 2, m = 0;
-      for (var i = 0; i < n; i++) m += Math.min(1, k * v[i]);
-      if (m / n < cf) lo = k; else hi = k;
-    }
-    return (lo + hi) / 2;
+  // the shared capacity-factor helper: window.LX in the browser (learn.js bundle), the component file in Node
+  function helper() {
+    if (typeof window !== "undefined" && window.LX && window.LX.townProfile) return window.LX;
+    return require("./components/profiles.js");
   }
   // Is the sun above the horizon at some point of the hour, somewhere in the region (D.solarClean: a latitude and
   // longitude box)? Hour index i: 00:00 Central standard time on 1 January 2025 + i hours. Simple solar geometry
@@ -52,33 +52,25 @@
     });
     return best > 0;
   }
-  // hourly output (MW) of a plant of size mw over the year, with annual capacity factor cf.
-  //   nuclear: full size except one refuelling outage (D.nuclear).
-  //   wind, solar: the shape (thousandths of its 2025 maximum hour) is first rescaled month by month to the monthly
-  //   capacity factors in `monthlyCF` (if given), then the whole year once more so that the annual capacity factor is
-  //   exactly cf; every hour is clipped at the plant's size. The monthly step removes the growth of the SPP fleets during
-  //   2025 from the seasons (the solar shape's January maximum is 0.56 of its November maximum). Solar hours with the sun
-  //   below the horizon everywhere in the region are set to zero first (D.solarClean): the shape reports night-time output
-  //   from 18 February to 21 March 2025 and on a few other nights, which is telemetry error, not sunlight.
+  // hourly output (MW) of a plant of size mw over the year, with annual capacity factor cf (see the header).
   function profile(year, tech, mw, cf, D, monthlyCF) {
-    var out = new Array(HOURS), t;
+    var out = new Array(HOURS), t, HP = helper();
     if (tech === "nuclear") {
       var nu = D.nuclear, a = nu.outageStartDay * 24, b = a + nu.outageHours;
       for (t = 0; t < HOURS; t++) out[t] = t >= a && t < b ? 0 : mw;
       return out;
     }
-    var rel = year[tech].map(function (x, i) { return tech === "solar" && D.solarClean && !sunUp(i, D.solarClean) ? 0 : x / 1000; });
+    var shape = year[tech].map(function (x, i) { return tech === "solar" && D.solarClean && !sunUp(i, D.solarClean) ? 0 : x; });
     if (monthlyCF) {
       var t0 = 0;
       D.year.monthDays.forEach(function (d, m) {
-        var seg = rel.slice(t0, t0 + d * 24), k = fitScale(seg, monthlyCF[m]);
-        for (var h = 0; h < seg.length; h++) rel[t0 + h] = Math.min(1, k * seg[h]);
+        var seg = shape.slice(t0, t0 + d * 24), g = HP.cfScale(seg, monthlyCF[m], "power");
+        for (var h = 0; h < seg.length; h++) shape[t0 + h] = seg[h] > 0 ? 1000 * Math.pow(Math.min(1, seg[h] / 1000), g) : 0;
         t0 += d * 24;
       });
     }
-    var kk = fitScale(rel, cf);
-    for (t = 0; t < HOURS; t++) out[t] = Math.min(1, kk * rel[t]) * mw;
-    return out;
+    var y = {}; y[tech] = shape;
+    return HP.townProfile(tech, mw, { year: y, annualCF: cf, method: "power" }).mw;
   }
   function sum(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s; }
   function capacityFactor(outputs, mw) { return sum(outputs) / (mw * outputs.length); }
@@ -116,8 +108,9 @@
   function windPower(v, tb) { var A = Math.PI * Math.pow(tb.rotorM / 2, 2); return 0.5 * tb.airDensity * A * Math.pow(v, 3) / 1000; }
   function homes(mwh, kwhPerHome) { return mwh * 1000 / kwhPerHome; }
   // everything the page states, from one place (used by the view and by the Node test)
-  function world(year, D) {
-    var P = D.plantMW, T = D.targets_2025, w = {};
+  function targets(CT) { return { nuclear: CT.reference.nuclear.cf, wind: CT.targets.wind.cf, solar: CT.targets.solar.cf }; }
+  function world(year, D, CT) {
+    var P = D.plantMW, T = targets(CT), w = { T: T };
     ["nuclear", "wind", "solar"].forEach(function (k) {
       var out = profile(year, k, P, T[k], D, k === "nuclear" ? null : D.monthly_2025[k]), E = sum(out);
       w[k] = { out: out, energy: E, cf: E / (P * HOURS), max: Math.max.apply(null, out), monthly: monthly(out, P, D.year.monthDays),
@@ -130,8 +123,8 @@
     w.applyMWh = annualEnergy(D.apply.mw, T.wind);
     return w;
   }
-  var model = { HOURS: HOURS, fitScale: fitScale, sunUp: sunUp, profile: profile, capacityFactor: capacityFactor, annualEnergy: annualEnergy, monthly: monthly,
-                dayIndex: dayIndex, day: day, levels: levels, levelled: levelled, power: power, windPower: windPower, homes: homes, world: world, sum: sum };
+  var model = { HOURS: HOURS, sunUp: sunUp, profile: profile, capacityFactor: capacityFactor, annualEnergy: annualEnergy, monthly: monthly,
+                dayIndex: dayIndex, day: day, levels: levels, levelled: levelled, power: power, windPower: windPower, homes: homes, targets: targets, world: world, sum: sum };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -141,8 +134,8 @@
                solar: { label: "Solar", tok: "solar", col: "var(--lx-solar)" } };
   var NOTES = {
     nuclear: function () { return "Flat at 100 MW, except an illustrative [[refuelling-outage|refuelling outage]] of 32.5 days in spring: the gap in late March and April."; },
-    wind: function (w) { return "A whole region's wind fleet never runs flat out at once; scaled to the U.S. average, this farm's best hour is " + Math.round(w.max) + " MW."; },
-    solar: function () { return "Bright in summer, faint in winter, nothing at night: the region's solar shape, scaled to the U.S. monthly averages."; }
+    wind: function (w) { return "Gusty and calm by turns: in its best hours the farm makes its full " + Math.round(w.max) + " MW, but on average a third of that."; },
+    solar: function () { return "Bright in summer, faint in winter, nothing at night: the farm reaches 100 MW only near noon on the clearest days."; }
   };
   var KEYS = ["nuclear", "wind", "solar"], MON = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -296,7 +289,7 @@
   }
 
   function view(live, data, root) {
-    var D = data["05_capacity_factor"], year = data.town_year, W = world(year, D), T = D.targets_2025, P = D.plantMW, tb = D.turbine;
+    var D = data["05_capacity_factor"], year = data.town_year, W = world(year, D, data.cf_targets), T = W.T, P = D.plantMW, tb = D.turbine;
     var log = LX.store.get("t5-log", {}) || {};
     function keep(k, v) { log[k] = v; LX.store.set("t5-log", log); LX.emit("t5-log", log); }
     var seen = {}, seenMW = {}, doubled = {}, pred = null, level = 15, speed = 5, prevSpeed = null;
@@ -459,7 +452,7 @@
   function buildExplain(W, D) {
     var host = document.getElementById("t5-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
-    var P = D.plantMW, T = D.targets_2025;
+    var P = D.plantMW, T = W.T;
     var c1 = H("div", { class: "lx-xcard" }, host);
     var reasons = { nuclear: "Off for refuelling about a month in spring", wind: "Wind speed varies; output follows its cube", solar: "Night, clouds and short winter days" };
     LX.CompareTable(c1, {

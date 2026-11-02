@@ -11,7 +11,9 @@ const D = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/05-capac
 const town = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8"));
 const QMD = fs.readFileSync(path.join(SITE, "learn/05-capacity-factor.qmd"), "utf8");
 const JS = fs.readFileSync(path.join(SITE, "assets/learn/05-capacity-factor.js"), "utf8");
-const W = M.world(year, D), H = M.HOURS, P = D.plantMW, T = D.targets_2025, tb = D.turbine;
+const CT = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/cf_targets.json"), "utf8"));
+const PR = require(path.join(SITE, "assets/learn/components/profiles.js"));
+const W = M.world(year, D, CT), H = M.HOURS, P = D.plantMW, T = W.T, tb = D.turbine;
 
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
@@ -24,7 +26,9 @@ const KEYS = ["nuclear", "wind", "solar"];
 {
   Object.keys(D.sources).forEach(k => ok(/^https:\/\//.test(D.sources[k].url) && D.sources[k].as_of, `source ${k} has a URL and an as-of date`));
   const EIA2025 = { nuclear: 0.911, wind: 0.338, solar: 0.240 };   // second entry of the same table, by hand
-  KEYS.forEach(k => ok(T[k] === EIA2025[k], `target ${k} = EIA 2025 annual ${EIA2025[k]}`));
+  KEYS.forEach(k => ok(T[k] === EIA2025[k], `target ${k} (shared cf_targets.json) = EIA 2025 annual ${EIA2025[k]}`));
+  ok(/6\.07\.B/.test(CT.source.short) && /released 23 October 2026/.test(CT.source.issue), "shared targets cite Table 6.07.B, released 23 October 2026");
+  ok(QMD.indexOf("cf_targets.json") >= 0 && !D.targets_2025, "the page loads the shared cf_targets.json; no second copy of the targets");
   KEYS.forEach(k => ok(D.monthly_2025[k].length === 12 && D.monthly_2025[k].every(v => v > 0 && v < 1), `monthly ${k}: 12 values`));
   // the 2025 annual value is the hour-weighted mean of the monthly values, within EIA's rounding and capacity weighting
   KEYS.forEach(k => {
@@ -53,10 +57,14 @@ const KEYS = ["nuclear", "wind", "solar"];
   ["wind", "solar"].forEach(k => W[k].monthly.forEach((v, i) => ok(near(v, D.monthly_2025[k][i], 0.0035), `${k} month ${i + 1}: ${pct(v)} close to EIA ${pct(D.monthly_2025[k][i])}`)));
   const a = D.nuclear.outageStartDay * 24, b = a + D.nuclear.outageHours, md = D.year.monthDays;
   ok(a >= (md[0] + md[1]) * 24 && b <= (md[0] + md[1] + md[2] + md[3]) * 24, "nuclear outage lies in March and April (spring)");
-  // fitScale: mean(min(1, k v)) = cf, and clipping happens only above the size
-  const v = year.wind.map(x => x / 1000);
-  [0.1, 0.338, 0.6, 0.9].forEach(cf => { const k = M.fitScale(v, cf); ok(near(v.reduce((s, x) => s + Math.min(1, k * x), 0) / v.length, cf, 1e-9), `fitScale: wind shape to ${cf}`); });
-  let threw = false; try { M.fitScale(v, 1.2); } catch (e) { threw = true; } ok(threw, "fitScale rejects a capacity factor above 1");
+  // the shared helper does the scaling, method "power": the best hours reach the plant's size (why: see the JS header)
+  ["wind", "solar"].forEach(k => ok(near(W[k].max, P, 1e-6), `${k}: the best hour reaches the full ${P} MW (power method)`));
+  const plain = PR.townProfile("wind", P, { year: year, targets: CT, method: "scale" });
+  ok(plain.peakFrac < 0.66 && near(plain.cf, T.wind, 1e-9), `the "scale" method would cap wind at ${Math.round(plain.peakFrac * 100)}% of its size, which this lesson avoids`);
+  ok(JS.indexOf('method: "power"') >= 0 && JS.indexOf("HP.cfScale(seg, monthlyCF[m], \"power\")") >= 0, "profile() calls the shared helper (cfScale per month, townProfile for the year)");
+  // the same result as calling the helper directly on the cleaned, month-adjusted shape
+  const again = M.profile(year, "wind", P, T.wind, D, D.monthly_2025.wind);
+  ok(again.every((x, i) => near(x, W.wind.out[i], 1e-9)), "profile() is deterministic");
   // night-time telemetry removed from the solar shape before rescaling
   const nights = year.solar.map((x, i) => (x > 0 && !M.sunUp(i, D.solarClean)) ? 1 : 0).reduce((p, q) => p + q);
   ok(nights > 300 && W.solar.out.every((x, i) => M.sunUp(i, D.solarClean) || x === 0), `solar: ${nights} night-time hours of telemetry set to zero`);

@@ -4,15 +4,9 @@
     "title": "Lesson 5 data: capacity factors, the year profiles' targets, the solar day and the illustrative turbine",
     "built": "2026-11-02",
     "license": "Numbers from EIA are U.S. government works in the public domain; this file CC BY 4.0",
-    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.238). The lesson rescales each shape linearly, clipping at the plant's size, so that the year's capacity factor equals the 2025 U.S. average in targets_2025 (05-capacity-factor.js: fitScale and profile). Nuclear has no shape in town_year.json: it runs at full size except for one illustrative refuelling outage sized to the same target. Once the shared helper townProfile(tech, MW, {annualCF}) lands (infrastructure branch), the lesson should call it; the Node test checks that both give the same numbers."
+    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.238). The lesson turns them into a plant's output with the shared helper LX.townProfile (assets/learn/components/profiles.js), method \"power\", to the annual targets in the shared cf_targets.json (EIA Table 6.07.B, 2025), after two lesson-local steps: night-time solar telemetry set to zero (solarClean) and each month brought to the 2025 U.S. monthly capacity factor (monthly_2025). Nuclear runs at full size except for one illustrative refuelling outage (nuclear). Why \"power\": the best hours reach the plant's size, so the year view shows output against nameplate."
   },
   "sources": {
-    "eia_epm_607b": {
-      "title": "EIA, Electric Power Monthly, Table 6.07.B: Capacity factors for utility scale generators primarily using non-fossil fuels",
-      "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
-      "as_of": "Electric Power Monthly with data for August 2026, released 23 October 2026; values for 2025 are final",
-      "accessed": "2026-11-02"
-    },
     "eia930": {
       "title": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
       "url": "https://www.eia.gov/electricity/gridmonitor/",
@@ -41,16 +35,9 @@
       "as_of": "v1.0.0"
     }
   },
-  "targets_2025": {
-    "about": "Annual capacity factor of U.S. utility-scale generators in 2025 (EIA Table 6.07.B, final): nuclear, wind, solar photovoltaic.",
-    "source": "eia_epm_607b",
-    "nuclear": 0.911,
-    "wind": 0.338,
-    "solar": 0.24
-  },
   "monthly_2025": {
     "about": "Monthly capacity factor of U.S. utility-scale generators in 2025, January to December (EIA Table 6.07.B, final). Used in Go deeper.",
-    "source": "eia_epm_607b",
+    "source": "cf_targets.json source (EIA, Electric Power Monthly, Table 6.07.B, data for August 2026, released 23 October 2026; 2025 values final)",
     "nuclear": [
       0.983,
       0.936,

@@ -93,7 +93,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="capacity-factor" data-src="../assets/learn/data/town_year.json ../assets/learn/data/05-capacity-factor.json">
+<div class="lx-interactive lx-cards" data-learn="capacity-factor" data-src="../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json ../assets/learn/data/05-capacity-factor.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The idea in one table: three plants of 100 MW, one year (2025 U.S. capacity factors)</p>
 <table class="lx-mini-table">
@@ -108,7 +108,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you work through this step by step: a year of output, one real day of solar, a wind turbine's power curve and a quick calculation.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Capacity factors are the 2025 U.S. averages from EIA's <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a> (released 23 October 2026). Wind and solar keep the hour-by-hour pattern of the Southwest Power Pool in 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), rescaled month by month to those U.S. averages. The nuclear outage and the 3 MW turbine are illustrative.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Capacity factors are the 2025 U.S. averages from EIA's <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a> (released 23 October 2026). Wind and solar keep the hour-by-hour pattern of the Southwest Power Pool in 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), reshaped month by month to those U.S. averages with each plant's best hours at full size. The nuclear outage and the 3 MW turbine are illustrative.</span></p>
 ```
 :::
 
@@ -176,7 +176,7 @@ A measured power curve is a cloud of 10-minute records around such a line: gusts
 <div class="lx-deeper-body">
 <ul>
 <li>The wind and solar shapes are whole regional fleets, smoother than any single farm.</li>
-<li>Each shape is rescaled to the U.S. monthly averages, so its seasons are national, while its hours are those of one region.</li>
+<li>Wind and solar use the shared “power” scaling, output = size × shape<sup>g</sup>: each month matches the U.S. average and the best hours reach full size. The seasons are national; the hours are those of one region.</li>
 <li>The nuclear plant's outage and the turbine are illustrative, not a real plant or model.</li>
 <li>Air density changes with temperature and altitude, which shifts a real power curve.</li>
 </ul>
