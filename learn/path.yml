@@ -197,8 +197,11 @@
   form: cards
   icon: coin
   tier: analyst
+  status: active
+  path: 07-cost.qmd
   minutes: 15
   title: "What does electricity cost to make?"
+  subtitle: "Split a plant's costs, discount the future and build a levelized cost"
   short: "What it costs"
   does: "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses."
   outcome: "Compute a levelized cost of electricity and say what it leaves out."
@@ -209,8 +212,11 @@
   form: cards
   icon: stairs
   tier: analyst
+  status: active
+  path: 08-merit-order.qmd
   minutes: 15
   title: "Who runs, and what sets the price?"
+  subtitle: "Build Prairie Town's supply stack and find the price"
   short: "Merit order"
   does: "A supply stack, a demand line and the price where they meet; add wind and watch prices fall."
   outcome: "Explain wholesale prices and price spikes."
