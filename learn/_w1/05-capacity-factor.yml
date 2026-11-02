@@ -1,0 +1,24 @@
+# Sidecar for lesson 5 (T5, 05-capacity-factor), builder learn-w1-c, 2026-11-02. Read by scripts/build_learn.py.
+id: 05-capacity-factor
+lesson: 5
+glossary:
+  - id: power-curve
+    term: Power curve
+    def: "A chart of how much power a wind turbine makes at each wind speed."
+  - id: cube-law
+    term: Cube law
+    def: "The power carried by the wind grows with the cube of its speed, so twice the speed carries eight times the power."
+  - id: rated-speed
+    term: Rated wind speed
+    def: "The wind speed at which a turbine first reaches its full rated power; above it, the blades turn to spill the extra wind."
+  - id: cut-out-speed
+    term: Cut-out speed
+    def: "The wind speed above which a turbine shuts down to protect itself."
+  - id: refuelling-outage
+    term: Refuelling outage
+    def: "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance."
+requests:
+  - "Shared profile helper: when townProfile(tech, MW, {annualCF}) lands (infrastructure branch), swap it in for the lesson-local profile() in assets/learn/05-capacity-factor.js. The lesson needs two things the plain annual rescale does not give, so please add them to the helper (or to scripts/build_learn_town_data.py): (1) {monthlyCF: [12 values]}, rescaling each month first, because the SPP shapes contain the fleets' growth during 2025 (solar's January maximum is 0.56 of its November maximum, so an annual-only rescale gives December solar 21.8% against EIA's 13.1%); (2) night-time solar cleaning: town_year.json reports solar output at night from 18 February to 21 March 2025 and on a few other nights (370 hours, 1.3% of the shape's energy; up to 14% of the year's best hour at 02:00), which is telemetry error. The lesson zeroes hours when the sun is below the horizon across a box covering SPP (31-40 N, 94-104 W; sunUp()). _tests/learn/test_05-capacity-factor.js should then assert that the helper and the lesson give the same hourly outputs."
+  - "Promote the lesson-local EquationCard (the e-equation explain component: tappable symbols with meaning, the reader's numbers, a code view and a text version) from assets/learn/05-capacity-factor.js into assets/learn/components/, with its lx5-eq styles from the page's style block."
+  - "learn_screenshots.mjs: its mid, done and explain states drive lesson 0's game only. Lessons 5 and 6 expose root.lxDemo(n) and open step n with its action done when the page hash is #lx-demo-<n>; a generic state such as --states step:<n> would replace the per-step wrapper used for this build."
+  - "Lesson 0 (not this builder's file) links to ../projects/ghg.html in its real-world box; the scope scan flags it as an excluded path."

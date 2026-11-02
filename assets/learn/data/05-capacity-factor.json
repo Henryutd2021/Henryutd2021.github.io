@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "lesson": "05-capacity-factor",
+    "title": "Lesson 5 data: capacity factors, the year profiles' targets, the solar day and the illustrative turbine",
+    "built": "2026-11-02",
+    "license": "Numbers from EIA are U.S. government works in the public domain; this file CC BY 4.0",
+    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.238). The lesson rescales each shape linearly, clipping at the plant's size, so that the year's capacity factor equals the 2025 U.S. average in targets_2025 (05-capacity-factor.js: fitScale and profile). Nuclear has no shape in town_year.json: it runs at full size except for one illustrative refuelling outage sized to the same target. Once the shared helper townProfile(tech, MW, {annualCF}) lands (infrastructure branch), the lesson should call it; the Node test checks that both give the same numbers."
+  },
+  "sources": {
+    "eia_epm_607b": {
+      "title": "EIA, Electric Power Monthly, Table 6.07.B: Capacity factors for utility scale generators primarily using non-fossil fuels",
+      "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+      "as_of": "Electric Power Monthly with data for August 2026, released 23 October 2026; values for 2025 are final",
+      "accessed": "2026-11-02"
+    },
+    "eia930": {
+      "title": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
+      "url": "https://www.eia.gov/electricity/gridmonitor/",
+      "as_of": "calendar year 2025 (shapes in town_year.json, accessed 2026-11-02)"
+    },
+    "eia_refuel": {
+      "title": "EIA, Today in Energy (14 October 2022): Daily U.S. summer nuclear capacity outages were 19% lower this summer than last summer",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=54239",
+      "as_of": "October 2022: plants typically refuel every 18 to 24 months; the average planned refuelling outage in 2022 lasted 38 days",
+      "accessed": "2026-11-02"
+    },
+    "eia_homes": {
+      "title": "EIA, Frequently Asked Questions: How much electricity does an American home use?",
+      "url": "https://www.eia.gov/tools/faqs/faq.php?id=97&t=3",
+      "as_of": "data for 2022: 10,791 kWh per home per year",
+      "accessed": "2026-11-02"
+    },
+    "paper_mfgpr": {
+      "title": "A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation (ASME IDETC/CIE 2023)",
+      "url": "https://doi.org/10.1115/DETC2023-114762",
+      "as_of": "published 2023"
+    },
+    "repo_mfgpr": {
+      "title": "mfgpr-wind-power-curve (public framework repository)",
+      "url": "https://github.com/Henryutd2021/mfgpr-wind-power-curve",
+      "as_of": "v1.0.0"
+    }
+  },
+  "targets_2025": {
+    "about": "Annual capacity factor of U.S. utility-scale generators in 2025 (EIA Table 6.07.B, final): nuclear, wind, solar photovoltaic.",
+    "source": "eia_epm_607b",
+    "nuclear": 0.911,
+    "wind": 0.338,
+    "solar": 0.24
+  },
+  "monthly_2025": {
+    "about": "Monthly capacity factor of U.S. utility-scale generators in 2025, January to December (EIA Table 6.07.B, final). Used in Go deeper.",
+    "source": "eia_epm_607b",
+    "nuclear": [
+      0.983,
+      0.936,
+      0.854,
+      0.818,
+      0.849,
+      0.934,
+      0.967,
+      0.966,
+      0.924,
+      0.81,
+      0.902,
+      0.992
+    ],
+    "wind": [
+      0.374,
+      0.372,
+      0.431,
+      0.407,
+      0.321,
+      0.322,
+      0.275,
+      0.238,
+      0.231,
+      0.338,
+      0.354,
+      0.392
+    ],
+    "solar": [
+      0.162,
+      0.187,
+      0.236,
+      0.275,
+      0.293,
+      0.319,
+      0.319,
+      0.297,
+      0.267,
+      0.224,
+      0.169,
+      0.131
+    ]
+  },
+  "homes": {
+    "kwhPerHomeYear": 10791,
+    "source": "eia_homes"
+  },
+  "plantMW": 100,
+  "year": {
+    "about": "town_year.json: index i is the hour ending at start_utc + i (UTC). start_utc is 2025-01-01T07:00, so index 0 is the hour 00:00-01:00 Central Standard Time on 1 January and the 8,760 hours make 365 whole local days (standard time, UTC-6, all year).",
+    "utcOffsetHours": -6,
+    "monthDays": [
+      31,
+      28,
+      31,
+      30,
+      31,
+      30,
+      31,
+      31,
+      30,
+      31,
+      30,
+      31
+    ]
+  },
+  "solarClean": {
+    "about": "Night-time telemetry in the SPP solar shape (18 February to 21 March 2025 and a few other nights; 370 hours, 1.3% of the shape's energy) is set to zero before rescaling: an hour is night when the sun is below the horizon at the start and the end of the hour at all four corners of this box, which spans the Southwest Power Pool's solar farms (simple solar geometry, 05-capacity-factor.js sunUp).",
+    "latS": 31,
+    "latN": 40,
+    "lonW": -104,
+    "lonE": -94
+  },
+  "nuclear": {
+    "about": "Illustrative: the plant runs at full size all year except one spring refuelling outage of 780 hours (32.5 days, from 25 March), so that the year's capacity factor is (8760 - 780) / 8760 = 91.1%, the 2025 U.S. average. EIA: plants refuel every 18 to 24 months, mostly in spring and fall; the average planned outage in 2022 lasted 38 days.",
+    "outageStartDay": 83,
+    "outageHours": 780,
+    "source": "eia_refuel"
+  },
+  "day": {
+    "about": "The solar day: the 100 MW solar farm's hourly output on the lesson-0 day, Central daylight time (UTC-5), rounded to whole MW.",
+    "date": "2025-09-03",
+    "dateLabel": "3 September 2025",
+    "utcOffsetHours": -5,
+    "tech": "solar"
+  },
+  "turbine": {
+    "about": "Illustrative onshore turbine with a clean power curve: below the rated speed the output follows the cube law, P = rated x (v / ratedSpeed)^3; from the rated speed to the cut-out speed it holds its rated power; outside [cutIn, cutOut] it makes nothing. With a 100 m rotor and air at 1.225 kg/m3 this is a power coefficient of 0.36 at the rated speed, below the Betz limit 16/27.",
+    "ratedKW": 3000,
+    "cutIn": 3,
+    "ratedSpeed": 12,
+    "cutOut": 25,
+    "rotorM": 100,
+    "airDensity": 1.225,
+    "maxSlider": 26
+  },
+  "apply": {
+    "about": "Step 8: Prairie Town's wind farm (town.json fleet.wind.mw) at the 2025 U.S. wind capacity factor.",
+    "mw": 150
+  }
+}

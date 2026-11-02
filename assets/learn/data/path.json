@@ -306,8 +306,8 @@
     "title": "Capacity factor: why is 1 MW not always 1 MW?",
     "short": "Capacity factor",
     "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
-    "href": "index.html#lesson-5",
-    "ready": false
+    "href": "05-capacity-factor.html",
+    "ready": true
    }
   },
   {
@@ -316,7 +316,7 @@
    "total": 14,
    "code": null,
    "title": "Capacity factor: why is 1 MW not always 1 MW?",
-   "subtitle": null,
+   "subtitle": "Run three 100 MW plants for a year and count what they make",
    "short": "Capacity factor",
    "tier": "foundations",
    "tier2": null,
@@ -330,10 +330,14 @@
    "icon": "turbine",
    "form": "cards",
    "scales": [],
-   "teaches": [],
-   "lab": null,
-   "href": "index.html#lesson-5",
-   "ready": false,
+   "teaches": [
+    "capacity factor",
+    "power and energy over a year",
+    "the wind power curve and the cube law"
+   ],
+   "lab": "compute capacity factors from a year of hourly data in Python (bridge B2, upcoming).",
+   "href": "05-capacity-factor.html",
+   "ready": true,
    "after": [
     {
      "id": "01-power-energy",
@@ -360,8 +364,8 @@
     "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
     "short": "Three jobs",
     "does": "Sort technologies into the jobs they do, with key numbers for each.",
-    "href": "index.html#lesson-6",
-    "ready": false
+    "href": "06-three-jobs.html",
+    "ready": true
    }
   },
   {
@@ -370,7 +374,7 @@
    "total": 14,
    "code": null,
    "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
-   "subtitle": null,
+   "subtitle": "Sort the technologies by the jobs they do",
    "short": "Three jobs",
    "tier": "foundations",
    "tier2": null,
@@ -384,10 +388,14 @@
    "icon": "blocks",
    "form": "cards",
    "scales": [],
-   "teaches": [],
+   "teaches": [
+    "the three jobs of a power system",
+    "capacity factor against firm share",
+    "comparing technologies by the job they do"
+   ],
    "lab": null,
-   "href": "index.html#lesson-6",
-   "ready": false,
+   "href": "06-three-jobs.html",
+   "ready": true,
    "after": [
     {
      "id": "04-forecasts",
@@ -404,8 +412,8 @@
      "title": "Capacity factor: why is 1 MW not always 1 MW?",
      "short": "Capacity factor",
      "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
-     "href": "index.html#lesson-5",
-     "ready": false
+     "href": "05-capacity-factor.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -414,8 +422,8 @@
     "title": "Capacity factor: why is 1 MW not always 1 MW?",
     "short": "Capacity factor",
     "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
-    "href": "index.html#lesson-5",
-    "ready": false
+    "href": "05-capacity-factor.html",
+    "ready": true
    },
    "next": {
     "id": "07-cost",
@@ -458,8 +466,8 @@
      "title": "Capacity factor: why is 1 MW not always 1 MW?",
      "short": "Capacity factor",
      "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
-     "href": "index.html#lesson-5",
-     "ready": false
+     "href": "05-capacity-factor.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -468,8 +476,8 @@
     "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
     "short": "Three jobs",
     "does": "Sort technologies into the jobs they do, with key numbers for each.",
-    "href": "index.html#lesson-6",
-    "ready": false
+    "href": "06-three-jobs.html",
+    "ready": true
    },
    "next": {
     "id": "08-merit-order",
@@ -512,8 +520,8 @@
      "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
      "short": "Three jobs",
      "does": "Sort technologies into the jobs they do, with key numbers for each.",
-     "href": "index.html#lesson-6",
-     "ready": false
+     "href": "06-three-jobs.html",
+     "ready": true
     },
     {
      "id": "07-cost",

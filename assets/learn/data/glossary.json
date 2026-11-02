@@ -34,10 +34,20 @@
   "short": "A rule every solution must obey, such as supply equals demand or no plant above its size.",
   "lesson": 10
  },
+ "cube-law": {
+  "term": "Cube law",
+  "short": "The power carried by the wind grows with the cube of its speed, so twice the speed carries eight times the power.",
+  "lesson": "5"
+ },
  "curtailment": {
   "term": "Curtailment (spilling)",
   "short": "Turning a wind or solar farm below what the weather allows, usually because the grid has more power than it can use at that moment.",
   "lesson": 0
+ },
+ "cut-out-speed": {
+  "term": "Cut-out speed",
+  "short": "The wind speed above which a turbine shuts down to protect itself.",
+  "lesson": "5"
  },
  "decision-variable": {
   "term": "Decision variable",
@@ -48,6 +58,11 @@
   "term": "Demand (load)",
   "short": "The total power that all users on a grid draw at a given moment.",
   "lesson": 0
+ },
+ "demand-response": {
+  "term": "Demand response",
+  "short": "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment.",
+  "lesson": "6"
  },
  "dispatch": {
   "term": "Dispatch",
@@ -78,6 +93,16 @@
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
   "lesson": 6
+ },
+ "firm-share": {
+  "term": "Firm share (ELCC)",
+  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC).",
+  "lesson": "6"
+ },
+ "flexibility": {
+  "term": "Flexibility",
+  "short": "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks.",
+  "lesson": "6"
  },
  "forecast-error": {
   "term": "Forecast error",
@@ -144,10 +169,25 @@
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
   "lesson": 0
  },
+ "power-curve": {
+  "term": "Power curve",
+  "short": "A chart of how much power a wind turbine makes at each wind speed.",
+  "lesson": "5"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
   "lesson": 0
+ },
+ "rated-speed": {
+  "term": "Rated wind speed",
+  "short": "The wind speed at which a turbine first reaches its full rated power; above it, the blades turn to spill the extra wind.",
+  "lesson": "5"
+ },
+ "refuelling-outage": {
+  "term": "Refuelling outage",
+  "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
+  "lesson": "5"
  },
  "reserves": {
   "term": "Reserves",
