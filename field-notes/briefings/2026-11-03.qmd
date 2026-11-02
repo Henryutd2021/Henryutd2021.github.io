@@ -17,7 +17,7 @@ Several announcements in the past two weeks came with large headline numbers, an
 
 ## Exelon splits its data-center pipeline by maturity
 
-**What happened:** In third-quarter materials filed on 30 October 2026, Exelon counted about 11 GW of data-center demand as high probability. These are projects in advanced design or backed by FERC-approved transmission security agreements; about 45% have such agreements, with roughly \$1.2 billion of collateral. A separate group of about 23 GW sits in current or future cluster studies that conclude in 2026 and 2027. Data-center load actually served in northern Illinois is still below 1 GW.
+**What happened:** In third-quarter materials filed on 30 October 2026, Exelon counted about 11 GW of data-center demand as high probability. These are projects in advanced design or backed by FERC-approved transmission security agreements. It listed a further future pipeline of about 23 GW, of which about 14 GW at its Illinois utility sits in current or future cluster studies that conclude in 2026 and 2027; the two groups should not be added together. Data-center load actually served in northern Illinois is still below 1 GW.
 
 **Why it matters (my view):** Signed, studied and energized load are different quantities, and adding them together overstates near-term demand. In my work on delayed grid energization (CoDE), how long a project waits and whether it goes ahead can be linked, and the cost to ratepayers depended strongly on large-load tariff design. Disclosures by maturity level let a model treat these separately.
 

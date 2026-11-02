@@ -1,0 +1,372 @@
+---
+title: "Data & Tools for Energy-Systems Modeling"
+description: "A practical guide to the public data and open tools I use to model U.S. power markets, large new loads and clean firm power: what each covers, how to get it, what its terms allow, and the pitfalls to expect."
+date: 2026-11-02
+author: "Honglin Li"
+categories:
+  - Data & methods
+draft: true
+---
+
+This guide is for researchers, students and analysts who build models of U.S. power markets, of large new loads such as data centers and electrolyzers, and of the clean firm supply that may serve them. It covers fifteen public datasets and open tools in five groups: grid operations and markets; generation, load and emissions; interconnection and planning; costs and technology; and modeling tools. Each entry says who publishes the source, what it covers, how to get it, what its terms allow (including whether you may redistribute what you download), and the pitfalls that tend to cost time. Where a pitfall comes from my own published work, the entry links the public documentation of the framework repository in which the step is written down; the others come from the publisher's own documentation. **As of 2 November 2026**, every fact below was checked against the publisher's official pages. Terms, versions and addresses change, so confirm them at the source before you rely on them. One naming note: on 1 December 2025 the U.S. Department of Energy changed the name of the lab known as NREL (National Renewable Energy Laboratory); it is now the National Laboratory of the Rockies (NLR). Its tools and data now live on nlr.gov, and older nrel.gov links no longer resolve.
+
+## Contents {#contents}
+
+- [Terms at a glance](#at-a-glance)
+- [Grid operations & markets](#grid-markets): [ERCOT 60-day disclosures](#ercot-60-day) · [ERCOT prices, data portal and API](#ercot-portal) · [PJM Data Miner](#pjm-data-miner)
+- [Generation, load & emissions](#generation-load): [EIA-930](#eia-930) · [EIA-860, 860M, 861 and 923](#eia-860-923) · [IEA Energy and AI](#iea-energy-ai) · [SDWPF wind-farm data](#sdwpf)
+- [Interconnection & planning](#interconnection-planning): [LBNL Queued Up](#queued-up) · [ReEDS](#reeds) · [NRC and DOE advanced-reactor resources](#nrc-doe)
+- [Costs & technology](#costs-technology): [Annual Technology Baseline](#atb) · [Cambium](#cambium)
+- [Modeling tools](#modeling-tools): [REopt](#reopt) · [SAM and PySAM](#sam) · [HiGHS and linopy](#highs-linopy)
+
+## Terms at a glance {#at-a-glance}
+
+| Source | Publisher | Can you redistribute what you download? |
+|---|---|---|
+| ERCOT disclosures and prices | ERCOT | Yes, if files are unmodified and notices kept; charts and analyses built from the raw data are allowed |
+| PJM Data Miner | PJM Interconnection | No, not without PJM authorization (membership or a PJM redistribution license); non-members may use the data internally |
+| EIA-930, EIA-860/860M/861/923 | U.S. Energy Information Administration | Yes; public domain, with credit to EIA |
+| IEA Energy and AI | International Energy Agency | Report text and figures: yes, under CC BY 4.0. Data explorer and datasets: not CC BY; check IEA's separate terms |
+| SDWPF | Dataset authors, via figshare | Yes, under CC BY 4.0 |
+| Queued Up | Berkeley Lab with GridTracker | Yes, under CC BY 4.0, crediting both |
+| ReEDS | NLR | Code: yes, BSD-3-Clause. Running it needs a commercial GAMS license; inputs come from many sources |
+| NRC and DOE resources | NRC; DOE | NRC-authored material: yes, it is not subject to copyright. Third-party documents may be protected |
+| Annual Technology Baseline | NLR | Yes, under CC BY 4.0 |
+| Cambium | NLR | Workbooks: copies allowed if the license notice travels with them, with credit. Full datasets: link to the viewer |
+| REopt | NLR | REopt.jl code: Apache-2.0. API and web tool: free, with a key for the API |
+| SAM and PySAM | NLR | Free; open-source code under BSD-3-Clause |
+| HiGHS and linopy | HiGHS project; linopy maintainers | Yes; both MIT |
+
+## Grid operations & markets {#grid-markets}
+
+### ERCOT 60-day SCED and DAM disclosure reports {#ercot-60-day}
+
+**What it is.** ERCOT, the grid and market operator for most of Texas, publishes resource-level dispatch, offer and award data once a 60-day confidentiality period has passed. The [60-Day SCED Disclosure Reports](https://www.ercot.com/mp/data-products/data-product-details?id=NP3-965-ER) (NP3-965-ER) cover real-time security-constrained economic dispatch. The [60-Day DAM Disclosure Reports](https://www.ercot.com/mp/data-products/data-product-details?id=NP3-966-ER) (NP3-966-ER) cover the day-ahead market.
+
+**Coverage.** Both reports have run daily since 29 January 2011, with one ZIP package of CSV files per operating day. The SCED package includes separate files for generation resources, load resources and energy storage resources in SCED, at SCED-interval resolution. The DAM package includes energy bids and awards, resource data and ancillary-service offers and awards. ERCOT's [market reports index](https://www.ercot.com/mktinfo/reports/index) lists these alongside the shorter 2-day and 3-day disclosures.
+
+**Access.**
+
+1. Open the product page and download the daily ZIP files. ERCOT's *Disclosure Reports Column Definitions Guide*, linked there, defines the columns.
+2. For long histories, use the ERCOT Data Access Portal or the Public API (see the [next entry](#ercot-portal)).
+3. Expect a lag of about 60 days. For example, ERCOT's notices show that the report for operating day 27 June 2024 was posted on 26 August 2024.
+
+**License and terms.** ERCOT's [Terms of Use](https://www.ercot.com/help/terms) let you use, reproduce and redistribute public content on two conditions: the content is not modified, and its copyright and other notices are kept. Raw data may go into your own compilations, charts and analyses without those notices. ERCOT does not warrant the accuracy of the data, and its name and logo need written permission. **Redistribution: allowed for unmodified files; derived analyses allowed.**
+
+**Known pitfalls.**
+
+- *Clock.* ERCOT data follow Central Prevailing Time, so every spring has a missing hour and every fall a repeated one. On the long day, ERCOT labels the repeated hour separately from the normal one. My Texas hydrogen framework converts every series to one fixed-offset clock before aggregating, then reindexes it to a complete hourly axis.
+- *From intervals to hours.* Average each resource's SCED intervals within each hour to get its energy for that hour. An hour without a record is missing, not zero. Fill only short gaps, resource by resource, *before* summing to zones; after summing, a silent resource is hidden by its neighbours.
+- *Locations.* Disclosure files identify resources by ERCOT name, not by county. The framework matches each one to its plant in EIA-860, which gives the county and from that the weather zone. The mapping table is kept under version control, and unmatched capacity is reviewed.
+- *Capacity factors.* The denominator should be the capacity actually operating in that hour, taken from commissioning dates; year-end capacity understates early-year capacity factors. Look at the maximum before any clipping: a value above 1 means a matching or capacity error.
+- *Corrections.* ERCOT sometimes reposts disclosure data. A March 2026 [market notice](https://www.ercot.com/services/comm/mkt_notices/M-B030626-02), for example, announced supplemental files for a load-resource file affected from December 2025 to January 2026. Watch the market notices and re-download the affected days.
+
+**Used in.** [Hydrogen's role in expanding renewable energy in Texas (TXH2)](../projects/txh2.qmd). The full recipe and its checks are in the [txh2-ercot-hydrogen data pipeline](https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/data_pipeline.md).
+
+### ERCOT prices, the Data Access Portal and the Public API {#ercot-portal}
+
+**What it is.** ERCOT's public market reports, including prices, are available through three routes: the data-product pages on ercot.com, the [ERCOT Data Access Portal](https://data.ercot.com/) for search and archives, and the [ERCOT Public API](https://apiexplorer.ercot.com/).
+
+**Coverage.** [DAM Settlement Point Prices](https://www.ercot.com/mp/data-products/data-product-details?id=NP4-190-CD) (NP4-190-CD) give day-ahead prices at resource nodes, load zones and trading hubs. [Real-time settlement point prices](https://www.ercot.com/mp/data-products/data-product-details?id=NP6-905-CD) (NP6-905-CD) are posted every 15 minutes. Bus-level [DAM Hourly LMPs](https://www.ercot.com/mp/data-products/data-product-details?id=NP4-183-CD) (NP4-183-CD) are a separate product. These nodal products have run since late November 2010. The product pages list only recent files; the DAM hourly LMP page, for example, keeps the last 30 days.
+
+**Access.**
+
+1. For a quick look, download recent files from the product page.
+2. For history, search the Data Access Portal. Its search reaches back to 30 November 2023; older archives come as downloadable file packages.
+3. For programmatic access, register on the ERCOT API Explorer and subscribe to the Public API product to obtain a subscription key. Then request an ID token with your account credentials; it is valid for one hour and cannot be refreshed. Send both the key and the token with every request, as the [registration guide](https://developer.ercot.com/applications/pubapi/user-guide/registration-and-authentication) describes. Data through the API start on 11 December 2023.
+4. Open-source clients such as [gridstatus](https://github.com/gridstatus/gridstatus) (BSD-3-Clause) wrap these steps. My nuclear–data-center framework retrieved ERCOT day-ahead hub prices with it.
+
+**License and terms.** ERCOT's API support page states that the same [Terms of Use](https://www.ercot.com/help/terms) govern the API: unmodified redistribution with notices kept, and free use in your own analyses. Keep your subscription key and password out of scripts and repositories. **Redistribution: as for the disclosure reports.**
+
+**Known pitfalls.**
+
+- *Settlement point price or LMP.* Prices at hubs, load zones and resource nodes, and prices at individual electrical buses, are separate products with separate report IDs. Choose the one for the location your site would face; the nuclear–data-center framework uses the day-ahead price at a hub.
+- *15-minute prices.* Average each hour's intervals before joining them to hourly data. Check that every hour has its full set of intervals, and treat a missing interval as an error, not as a zero.
+- *Negative prices.* Keep them. A model that buys and sells at the grid should see hours in which exporting costs money.
+- *Year length.* After converting clocks, check that a normal year has exactly 8,760 rows. In a leap year, treat all series alike: remove the leap day from each of them, or keep all 8,784 hours throughout.
+- *Units.* Market prices are in $/MWh. Models that work in kW, such as REopt-based ones, need $/kWh, so divide by 1,000.
+
+**Used in.** [Small modular reactor cogeneration for a hyperscale data center](../projects/nuclear-dc.qmd), with its [smr-datacenter-cogeneration data pipeline](https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/data_pipeline.md); [co-located wind and hydrogen](../projects/wind-hydrogen.qmd), [co-located solar and hydrogen](../projects/solar-hydrogen.qmd) and [offshore wind–hydrogen O&M](../projects/offshore-wind-hydrogen-om.qmd), with the [reopt-hydrogen-framework data pipeline](https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/data_pipeline.md).
+
+### PJM Data Miner {#pjm-data-miner}
+
+**What it is.** [Data Miner](https://www.pjm.com/markets-and-operations/etools/data-miner-2), still called Data Miner 2 on many pages, is PJM Interconnection's tool for its public market and operations data. It has a web interface and an API.
+
+**Coverage.** Data are organized as *feeds*, each with its own definition, posting frequency and retention. Feeds include day-ahead and real-time hourly LMPs, five-minute real-time LMPs, settlement-verified LMPs, hourly load (preliminary, estimated and metered), load forecasts and generation by fuel type. Price feeds cover all bus locations, including aggregates.
+
+**Access.**
+
+1. The [web interface](https://dataminer2.pjm.com/) needs no account. Choose a feed, set the dates, filter, and export to CSV.
+2. For the API, create a PJM account, sign in to the [API portal](https://apiportal.pjm.com/) and obtain a key. A non-member must also confirm to PJM by e-mail that the data will be used only for internal business purposes. The steps are in PJM's [Data Miner API Guide](https://www.pjm.com/-/media/DotCom/etools/data-miner-2/data-miner-2-api-guide.ashx).
+3. Every API query needs a date filter, and a standard query is limited to about one year of data.
+
+**License and terms.** Under the [Data Miner terms of use](https://pjm.com/-/media/etools/edatafeed/data-license-agreement-edata-feed-data-miner-2.ashx), PJM members may republish data and non-members may not. PJM's API guide adds that commercial use, including publishing data or making derivatives of it, requires PJM membership (at least Associate Membership). PJM's API portal states that passing on Data Miner data, or anything derived from it, requires a Redistribution License issued by PJM. Non-members are limited to 6 data connections per minute (members to 600). **Redistribution: not allowed without PJM authorization.** In practice, publish your code and a download recipe, not the PJM data. The documentation of my supply-chain framework recommends the same approach for any source whose terms forbid redistribution.
+
+**Known pitfalls.**
+
+- *Two clocks.* Feeds carry both Eastern Prevailing Time (`_ept`, which observes daylight saving) and UTC (`_utc`) timestamp columns. PJM recommends filtering and sorting on the same one. Pick one and convert once.
+- *Archive rules.* Hourly LMP feeds older than 731 days, and five-minute LMPs older than 186 days, move to an archive. Archive queries must stay within one UTC calendar year, must not span archived and recent data, and allow fewer filters. PJM's example is that you can request all aggregates by pnode type, but not one specific pnode.
+- *Preliminary and final values.* Hourly load comes in preliminary, estimated and metered versions, and LMPs have settlement-verified feeds. State which version you used.
+- *Throughput.* At six connections per minute, a non-member's bulk download of nodal history takes time. Plan it, and keep the raw files with their download dates.
+
+**Used in.** [Hydrogen integration and policy support for U.S. nuclear power plants (NPPH2)](../projects/npph2.qmd). PJM is one of the seven U.S. ISO/RTO markets in that study.
+
+## Generation, load & emissions {#generation-load}
+
+### EIA-930 Hourly Electric Grid Monitor {#eia-930}
+
+**What it is.** The U.S. Energy Information Administration (EIA) collects hourly operating data from the balancing authorities (BAs) of the Lower 48 states on Form EIA-930. It publishes them through the [Hourly Electric Grid Monitor](https://www.eia.gov/electricity/gridmonitor/).
+
+**Coverage.** Hourly data for each BA: demand, demand forecast, net generation, total interchange and interchange with each neighbouring BA. EIA aggregates them into 13 regions and a Lower 48 total. Data start on 1 July 2015. Net generation by energy source, subregion demand and EIA's estimated CO₂ emissions start on 1 July 2018, and battery storage became a separate energy source on 1 January 2025.
+
+**Access.** Use the dashboards, the six-month CSV files (balance, interchange and subregion), or the full-history workbooks for each BA and region. The [EIA API](https://www.eia.gov/opendata/) needs a free registered key and serves EIA-930 data from 1 January 2019 onward; older data are in the downloadable files. EIA's [About the EIA-930 data](https://www.eia.gov/electricity/930-content/about.html) page is the best single reference.
+
+**License and terms.** EIA's [copyright and reuse policy](https://www.eia.gov/about/copyrights_reuse.php) places its publications, as federal government works, in the public domain, and lets you use and distribute its data. EIA asks for an acknowledgment that names it and gives the publication date. **Redistribution: allowed.**
+
+**Known pitfalls.**
+
+- *Clock.* Values are hour-ending. Each BA reports in a local time zone of its own choosing, and a few choices are unexpected: El Paso Electric reports in Arizona time and Idaho Power in Pacific time, for example. The six-month files carry both a local and a UTC end-of-hour stamp. My carbon-aware load framework works in UTC or local standard time, never in a clock that repeats an hour.
+- *Daylight-saving days.* These days have 23 or 25 hours, and EIA notes that they are often misreported, with duplicated, missing or mislabeled hours. Check them before anything else.
+- *Raw, imputed or adjusted.* EIA publishes BA-level data as reported, while its regional and national totals include imputation. The six-month files carry raw, imputed and adjusted columns side by side. Choose one deliberately and say which.
+- *Revisions.* Values can change after first release. My framework records the access date and a SHA-256 checksum of every downloaded file, so a result can be traced to the exact data used.
+- *Zeros and negatives.* An hour with zero demand is a reporting gap and should be treated as missing. My carbon-aware load framework clips negative net generation, such as pumping or station use, to zero and reports how many values were clipped.
+- *Units.* Emission intensity comes in lb CO₂/kWh. Converting to kg CO₂/MWh multiplies by 453.59237, so a result that is off by a factor of about 450 signals a unit mix-up.
+- *Changing categories.* New energy-source columns, such as battery storage from 2025, change the set of fuels. Map every year to one consistent set before comparing years.
+- *Average, not marginal.* EIA's CO₂ estimates use annual average emission factors, so hourly intensities built from these data are averages. My studies that used them state this boundary explicitly.
+- *Totals.* Hourly totals can differ from EIA's monthly and annual publications because coverage and methods differ. Compare annual totals with EIA's published figures as a check.
+
+**Used in.** [Emission-intensity-informed load regulation (GHG)](../projects/ghg.qmd), with the [ghg-load-regulation data pipeline](https://github.com/Henryutd2021/ghg-load-regulation/blob/main/docs/data_pipeline.md); [SMR cogeneration for a hyperscale data center](../projects/nuclear-dc.qmd), for hourly grid carbon intensity.
+
+### EIA-860, EIA-860M, EIA-861 and EIA-923 {#eia-860-923}
+
+**What it is.** These are EIA's core surveys of U.S. power plants and utilities: generators ([EIA-860](https://www.eia.gov/electricity/data/eia860/), annual, and [EIA-860M](https://www.eia.gov/electricity/data/eia860m/), monthly), utilities and retail sales ([EIA-861](https://www.eia.gov/electricity/data/eia861/)), and generation and fuel ([EIA-923](https://www.eia.gov/electricity/data/eia923/)).
+
+**Coverage.**
+
+- **EIA-860.** Generator-level data on existing, proposed and retired units at plants of 1 MW or more, organized as operable, proposed and retired-or-canceled tabs. Annual files cover 2001–2025; the final 2025 data were released on 10 September 2026.
+- **EIA-860M.** The monthly status of existing and proposed generators. Monthly files run from July 2015 to September 2026; the September file was released on 23 October 2026.
+- **EIA-861.** An annual census of U.S. electric utilities: retail sales, revenue and customers by state, sector and balancing authority, plus net metering, demand response, service territories and more. Data cover 1990–2025, with the final 2025 data released on 7 October 2026. A monthly companion, EIA-861M, also exists.
+- **EIA-923.** Monthly and annual generation, fuel consumption, fuel stocks, fuel receipts and costs, and environmental data. Data cover 2001–2026; the latest monthly release covers August 2026, and the final 2025 data were released on 14 September 2026.
+
+**Access.** Download ZIP archives of Excel workbooks from each survey page. Many series are also on the EIA API.
+
+**License and terms.** Public domain, as for [EIA-930](#eia-930). **Redistribution: allowed, with credit to EIA.**
+
+**Known pitfalls.**
+
+- *Preliminary and final values.* EIA-860M capacities are preliminary estimates that EIA later corrects without specific notice. Early-release annual data are not yet fully validated. Monthly EIA-923 releases cover only the plants in the monthly survey (about 3,000); the final annual file adds the plants that report annually.
+- *Planned is not committed.* EIA notes that capacities reported for planned units are not commitments by the facilities.
+- *Retirements.* The Retired tab of the annual EIA-860 is not comprehensive. The monthly inventory tracks retirements back to 2002.
+- *Location and timing.* EIA-860 gives each plant's county and each generator's operating month and year. My Texas framework uses the county to place market resources in zones, and the operating dates to count capacity only from the hour it entered service.
+- *QA.* Before using hourly inputs, compare annual energy by zone and technology with EIA-923.
+
+**Used in.** [TXH2](../projects/txh2.qmd): EIA-860 for locations, capacity and storage, and EIA-923 for QA. See the [txh2-ercot-hydrogen data pipeline](https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/data_pipeline.md).
+
+### IEA Energy and AI {#iea-energy-ai}
+
+**What it is.** The International Energy Agency's special report [Energy and AI](https://www.iea.org/reports/energy-and-ai) (10 April 2025), its follow-up [Key Questions on Energy and AI](https://www.iea.org/reports/key-questions-on-energy-and-ai) (16 April 2026), and the online [Energy and AI Observatory](https://www.iea.org/data-and-statistics/data-tools/energy-and-ai-observatory). A further IEA report, [Powering Artificial Intelligence](https://www.iea.org/reports/powering-artificial-intelligence) (14 October 2026), deals with integrating data centers into power systems.
+
+**Coverage.** Global and regional estimates of data-center electricity consumption and installed capacity, with projections to 2030 and 2035. The 2025 report has a Base Case and three sensitivity cases: Lift-Off, Headwinds and High Efficiency. The Observatory (last updated 16 June 2025) shows installed capacity by data-center type (enterprise, colocation and hyperscale), capacity by region, and a map of large data-center hubs.
+
+**Access.** Read the reports online or download the PDFs; the Observatory is interactive.
+
+**License and terms.** The report pages carry a CC BY 4.0 licence. The IEA's [terms](https://www.iea.org/terms) exclude standalone datasets, data explorers and data annexes from that licence and place them under its terms for non-CC material. **Redistribution: report text and figures allowed with attribution under CC BY 4.0. Data from the Observatory are not CC BY; check the IEA's terms or ask the IEA before republishing them.**
+
+**Known pitfalls.**
+
+- *Modeled, not metered.* The IEA notes that there are no comprehensive global statistics on data-center electricity use. Its figures come from its own model, so treat them as estimates.
+- *Cases and editions.* The cases diverge widely by 2035. Always name the case and the publication you cite, and check whether a later IEA publication has updated the figure.
+- *Granularity.* The figures are national and regional. They cannot stand in for utility, interconnection or nodal load data.
+- *Recording.* In my framework for the cost of delayed grid energization (CoDE), values drawn from capacity outlooks become scenario values, such as case sizes, and never observations. Each one is recorded in a provenance table with its source and access date.
+
+**Used in.** Not used directly in my published studies. For the provenance rule, see the [code-delayed-energization data pipeline](https://github.com/Henryutd2021/code-delayed-energization/blob/main/docs/data_pipeline.md).
+
+### SDWPF wind-farm SCADA dataset {#sdwpf}
+
+**What it is.** SDWPF (Spatial Dynamic Wind Power Forecasting) is an open set of SCADA records from one wind farm of 134 turbines. It was released for the KDD Cup 2022 challenge and documented by its authors (Zhou et al.) in [*Scientific Data* (2024)](https://doi.org/10.1038/s41597-024-03427-5).
+
+**Coverage.** Records are at 10-minute resolution per turbine and include wind speed and direction, nacelle direction, blade pitch angles and active power. The full release, `sdwpf_full`, spans January 2020 to December 2021 (about 11.4 million records) with real timestamps, ERA5 weather variables and turbine elevations. The competition release, `sdwpf_kddcup`, holds the original 245-day file, which gives only a day index and time of day, with relative turbine positions.
+
+**Access.** Download the CSV or Parquet files from [figshare](https://doi.org/10.6084/m9.figshare.24798654).
+
+**License and terms.** The figshare record is licensed CC BY 4.0. Cite the *Scientific Data* article. **Redistribution: allowed with attribution.**
+
+**Known pitfalls.**
+
+- *Quality flags are defined but not applied.* The dataset paper defines zero, missing, unknown and abnormal values. Power is *unknown* when it is at or below zero while wind speed exceeds 2.5 m/s, or when any pitch angle exceeds 89°; these cases often reflect curtailment or stops. The authors leave it to users to decide how to treat them.
+- *Filter for your purpose.* Forecast evaluation excludes those records. My multi-fidelity power-curve method keeps stops and curtailment on purpose, because its density-based sampling is meant to represent the turbines' full operating behaviour. It removes only rows with missing or non-finite values and negative power, and reports how many rows each rule removed.
+- *Time.* In the 245-day file, a timestamp is built as (day − 1) days plus the time of day.
+- *Units and sensors.* Check power units against the 1.5 MW turbine rating. Nacelle anemometers sit behind the rotor, which affects the wind-speed readings. Look for duplicate intervals after merges and for long runs of stuck values.
+
+**Used in.** [Multi-fidelity Gaussian processes for wind power curves](../projects/uq-mfgpr.qmd), with the [mfgpr-wind-power-curve data pipeline](https://github.com/Henryutd2021/mfgpr-wind-power-curve/blob/main/docs/data_pipeline.md).
+
+## Interconnection & planning {#interconnection-planning}
+
+### LBNL Queued Up {#queued-up}
+
+**What it is.** [Queued Up](https://emp.lbl.gov/queues) is Lawrence Berkeley National Laboratory's annual compilation of U.S. interconnection queues, produced with GridTracker. Interconnection queues list the proposed generation and storage projects that have asked to connect to the transmission grid.
+
+**Coverage.** The 2026 edition covers requests through the end of 2025. It includes all seven ISOs/RTOs and 50 non-ISO utilities, which together hold about 98% of installed U.S. generating capacity. The Excel data file (updated May 2026) contains the project-level dataset, a codebook and summary tabs; a PDF slide deck (June 2026) and interactive maps accompany it. The scope is generation and storage seeking transmission-level connection. Load requests, distribution-connected projects and behind-the-meter projects are not included.
+
+**Access.** Download the data file and slide deck from the Queued Up page. No registration is required.
+
+**License and terms.** The data file is licensed CC BY 4.0, and the page asks that it be attributed to Lawrence Berkeley National Laboratory and GridTracker. **Redistribution: allowed with that attribution.**
+
+**Known pitfalls.**
+
+- *Requests are not plans.* Most requested capacity is withdrawn. Berkeley Lab reports that of the capacity requested in 2000–2020, only 13% had reached commercial operation by the end of 2025. My Texas study treated queued capacity as an upper bound, at a 100% completion rate, and applied completion rates as scenarios in the model.
+- *Selection.* The framework filters for requests whose status is active and whose proposed in-service date falls on or before the target year. It sums their capacity by county, then by zone, and converts it to output with the zone capacity factors.
+- *Power and energy.* Storage requests are usually stated in MW. If a model needs MWh, convert with an explicit storage duration and record that assumption.
+- *Not a load queue.* Queued Up does not track large-load requests such as data centers. Utility and ISO large-load disclosures are separate sources.
+- *Editions.* Figures change from one edition to the next. Cite the edition and the date of the data file.
+
+**Used in.** [TXH2](../projects/txh2.qmd), via the [txh2-ercot-hydrogen data pipeline](https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/data_pipeline.md).
+
+### ReEDS {#reeds}
+
+**What it is.** The Regional Energy Deployment System ([ReEDS](https://www.nlr.gov/analysis/reeds/)) is NLR's open-source capacity planning and dispatch model of the U.S. power system. Its `inputs` folder is a documented collection of planning data, covering load, supply curves, transmission, plant characteristics, fuel prices, financing and state policies.
+
+**Coverage.** The contiguous United States, represented as 133 model balancing areas, over multi-decade planning horizons. The latest release, 2026.09.21, was published on 30 September 2026.
+
+**Access.**
+
+1. Clone [github.com/ReEDS-Model/ReEDS](https://github.com/ReEDS-Model/ReEDS). The earlier NatLabRockies/ReEDS-2.0 repository is archived.
+2. Follow the [documentation](https://reeds-model.github.io/ReEDS/) to set up the conda and Julia environments.
+3. Large files, such as hourly demand and wind and solar profiles, are downloaded at run time from the hosts listed in `inputs/remote_files.csv`. Each input folder has a README that describes its sources.
+
+**License and terms.** The code is BSD-3-Clause. ReEDS is written in Python, GAMS and Julia, and GAMS requires a commercial license; the documentation asks for a combined GAMS/CPLEX license. Small systems have been solved with an open-source solver, but the developers say that path is not actively maintained. The inputs are compiled from many sources. **Redistribution: code allowed under BSD-3-Clause; for derived input data, check the terms of the original source first.**
+
+**Known pitfalls.**
+
+- *Version pinning.* Inputs change from release to release. Record the release tag and the identifiers of the remote files a run used.
+- *Dollar years.* The model documentation reports different inputs in different dollar years. Convert everything to one constant-dollar year before reusing it, as all my frameworks do.
+- *Scope.* Each balancing area is treated as a copper plate, and capacity decisions have limited foresight unless intertemporal mode is used. The results are least-cost planning outcomes under stated assumptions, not forecasts.
+
+**Used in.** Not used directly in my published studies.
+
+### NRC and DOE advanced-reactor licensing resources {#nrc-doe}
+
+**What it is.** The U.S. Nuclear Regulatory Commission's public pages and records on licensing new and [advanced reactors](https://www.nrc.gov/reactors/new-reactors/advanced.html), and the Department of Energy's [Gateway for Accelerated Innovation in Nuclear](https://gain.inl.gov/) (GAIN), which gives developers access to technical, regulatory and financial support.
+
+**Coverage.**
+
+- *Licensing pathways.* Under 10 CFR Part 50, a plant needs a construction permit and then an operating license. Part 52 offers a combined license, early site permits and certified standard designs. The NRC's [licensing backgrounder](https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-nuclear-power-plant-licensing-process) explains both. [Part 53](https://www.govinfo.gov/content/pkg/FR-2026-03-30/html/2026-06048.htm), a risk-informed, technology-inclusive framework, was published as a final rule on 30 March 2026 and took effect on 29 April 2026. It is optional; Parts 50 and 52 remain available. The NRC also lists proposed Part 57 requirements for microreactors.
+- *Project status.* The NRC publishes licensing dashboards for advanced-reactor applications under review. Its [ADAMS](https://www.nrc.gov/reading-rm/adams.html) public library holds more than three million documents released since November 1999.
+
+**Access.** Everything is free. ADAMS has a public search, the dashboards are linked from the advanced-reactor page, and Federal Register notices are on govinfo.gov.
+
+**License and terms.** The NRC's [site disclaimer](https://www.nrc.gov/site-help/disclaimer.html) treats its website as a U.S. Government work that is not subject to copyright and asks for credit when material is republished. Copyrighted third-party items on the site need the owner's permission, and documents submitted by applicants may fall into that category. **Redistribution: NRC-authored material allowed; check third-party documents first.**
+
+**Known pitfalls.**
+
+- *Milestones are distinct.* Acceptance of an application for review, completion of the safety and environmental reviews, the hearing, issuance of a construction permit, and authorization to operate are separate events. Under Part 52, operation is authorized only after the required inspections, tests and analyses are verified. Record which milestone a date refers to.
+- *Cite the record.* Use the ADAMS accession number (it starts with "ML") or the Federal Register citation rather than a news report.
+- *Pathway matters.* The same design can be licensed under different parts of the regulations. Note the pathway when you compare schedules.
+
+**Used in.** The [smr-datacenter-cogeneration data pipeline](https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/data_pipeline.md) lists public regulatory documents among the sources for reactor design parameters in the [SMR cogeneration study](../projects/nuclear-dc.qmd).
+
+## Costs & technology {#costs-technology}
+
+### Annual Technology Baseline {#atb}
+
+**What it is.** NLR's [Annual Technology Baseline](https://atb.nlr.gov/) (ATB) is a yearly set of cost and performance estimates for electricity generation and storage technologies, with projections through 2050. A transportation ATB is published alongside it, and the electricity ATB pairs with NLR's Standard Scenarios.
+
+**Coverage.** The 2025 electricity edition was posted to the Open Energy Data Initiative (OEDI) in late August 2026. It covers capital cost, O&M, capacity factor, financial assumptions and levelized cost of energy by technology. Projections come in conservative, moderate and advanced versions, and there are separate financial cases, including an R&D-only case. The OEDI data lake holds the 2019–2025 editions.
+
+**Access.** The [data page](https://atb.nlr.gov/electricity/2025/data) links an Excel workbook, summary CSV and Parquet files on OEDI, Tableau workbooks, and the [ATB-calc](https://github.com/NatLabRockies/ATB-calc) Python code. Read the disclaimer and the [technical limitations](https://atb.nlr.gov/electricity/2025/technical_limitations) first.
+
+**License and terms.** The [OEDI record](https://data.openei.org/submissions/8759) is licensed CC BY 4.0. Cite the edition you use. **Redistribution: allowed with attribution.**
+
+**Known pitfalls.**
+
+- *Representative, not site-specific.* The ATB leaves out site-specific resources, designs and regional labor and material costs. For a site-level cash flow, NLR points to SAM (see [below](#sam)).
+- *Compare components.* NLR's guidance is that comparing capital cost, O&M and capacity factor directly is more reliable than comparing levelized costs.
+- *Financial cases.* The R&D-only projections reflect technology change alone, not short-term market swings, and separate cases include tax credits. Do not mix values from different cases.
+- *Editions and errata.* Values change between editions, and each edition has an errata page. My nuclear–data-center framework records the edition used, together with one constant-dollar year for every cost and price in a run.
+- *Units.* Convert each cost to the size unit the model uses (per kW of net output, per kWh of storage, or per kg/h of electrolyzer capacity) before use, not inside the model.
+
+**Used in.** [SMR cogeneration for a hyperscale data center](../projects/nuclear-dc.qmd) (reactor, gas-plant and battery costs) and [co-located solar and hydrogen](../projects/solar-hydrogen.qmd) (cost trajectories). See also the [reopt-hydrogen-framework data pipeline](https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/data_pipeline.md).
+
+### Cambium {#cambium}
+
+**What it is.** NLR's [Cambium](https://www.nlr.gov/analysis/cambium) datasets are modeled hourly projections of the U.S. electricity sector through 2050. They are built from ReEDS capacity-expansion runs and production-cost modeling for a range of futures, as a companion to the Standard Scenarios. Metrics include long-run and short-run marginal emission rates, average emission rates and several marginal-cost measures. The latest release, Cambium 2024, is the fifth annual edition, documented in an [April 2025 report](https://docs.nlr.gov/docs/fy25osti/93005.pdf).
+
+**Coverage.** Hourly data for a series of solve years from 2025 to 2050. The underlying models represent the contiguous United States as 133 balancing areas. Summary workbooks use 18 regions and include levelization tools.
+
+**Access.** Download the full datasets from the [Scenario Viewer](https://scenarioviewer.nlr.gov/) (Cambium 2024 project, Download tab) and the summary workbooks from the [NLR Data Catalog](https://data.nlr.gov/submissions/289).
+
+**License and terms.** The Data Catalog's dataset license allows free use and copying, provided the full notice appears in every copy and publications credit DOE, the laboratory and its operator; their names may not be used for endorsement. The Scenario Viewer's disclaimer likewise asks for credit and provides the data as is. **Redistribution: catalog workbooks may be copied with the notice. For the full datasets I found no separate redistribution grant, so link to the viewer.**
+
+**Known pitfalls.**
+
+- *Clock.* The `timestamp` field is in Eastern Standard Time and `timestamp_local` in local standard time. Both are hour-beginning and ignore daylight saving. Every year has 8,760 hours and starts on a Sunday, and leap days are dropped. Market and EIA data are usually hour-ending in local or prevailing time, so shift before joining.
+- *Purpose.* NLR designs Cambium for long-term, forward-looking analysis, not for historical accounting or real-time decisions. For the 2020s, it suggests observed data instead.
+- *Costs are not prices.* Cambium's marginal costs can differ from market prices and should not be used as retail rates.
+- *Small changes only.* The data carry no elasticities, so the values become less reliable the larger the intervention being analyzed.
+- *Average or marginal.* Choose the emission rate that fits the question. My load-regulation and nuclear–data-center studies used average intensities from historical EIA data and state that boundary.
+
+**Used in.** Not used directly in my published studies.
+
+## Modeling tools {#modeling-tools}
+
+### REopt {#reopt}
+
+**What it is.** [REopt](https://www.nlr.gov/reopt/) is NLR's techno-economic optimization platform for sizing and dispatching energy systems at buildings, campuses, communities and microgrids. It is available as a [web tool](https://reopt.nlr.gov/tool), as an [API](https://developer.nlr.gov/docs/energy-optimization/reopt/), and as the open-source Julia package [REopt.jl](https://github.com/NatLabRockies/REopt.jl), which is the optimization engine behind both.
+
+**Coverage.** One year of operation, at hourly or finer resolution, for PV, wind, storage, combined heat and power, conventional generation and electrification options. Resource profiles come from PVWatts and the Wind Toolkit, and utility tariffs from the Utility Rate Database.
+
+**Access.** The API is at version 3; versions 1 and 2 were decommissioned on 31 March 2024. It needs a free key from developer.nlr.gov, limited by default to 1,000 requests per hour. To use [REopt.jl](https://natlabrockies.github.io/REopt.jl/stable/), add the REopt, JuMP and HiGHS packages in Julia. An NLR developer key is needed to fetch PV and wind resource profiles, and a separate key to fetch utility rates.
+
+**License and terms.** REopt.jl is licensed Apache-2.0. The web tool and API are free. **Redistribution: code allowed under Apache-2.0.**
+
+**Known pitfalls.**
+
+- *Series length.* Every time series must have exactly 8,760 values per time step per hour, so drop 29 February in leap years. REopt.jl rejects a load series of the wrong length.
+- *Calendar year.* Set the load year to the year of your data so that tariff periods line up with weekdays. Built-in reference building profiles default to 2017, a year that starts on a Sunday.
+- *Units.* REopt works in kW and $/kWh, so convert market prices from $/MWh.
+- *Keys.* REopt.jl reads its keys from environment variables. Keep them there, never in scripts or repositories.
+- *Extensions.* When I started my wind–hydrogen studies, REopt had no electrolyzer, hydrogen tank or fuel cell. I added them, and the reopt-hydrogen-framework documents that formulation.
+
+**Used in.** [Co-located wind and hydrogen](../projects/wind-hydrogen.qmd), [co-located solar and hydrogen](../projects/solar-hydrogen.qmd) and [offshore wind–hydrogen O&M](../projects/offshore-wind-hydrogen-om.qmd), with the [reopt-hydrogen-framework](https://github.com/Henryutd2021/reopt-hydrogen-framework).
+
+### SAM and PySAM {#sam}
+
+**What it is.** The [System Advisor Model](https://sam.nlr.gov/) (SAM) is NLR's free desktop application for the performance and financial modeling of energy technologies such as PV, wind, concentrating solar power and storage. [PySAM](https://github.com/NatLabRockies/pysam) is its Python wrapper.
+
+**Coverage.** Simulations of one year at hourly or subhourly time steps, driven by a weather file and coupled to financial models. NSRDB solar data can be downloaded from within SAM, and other weather sources are listed on SAM's site.
+
+**Access.** Download SAM for Windows, macOS or Linux. Install PySAM with `pip install nlr-pysam`. The package was renamed from `nrel-pysam`, whose last release is 7.1.1. PySAM 8.0.0 (July 2026) matches SAM 2026.7.3 and supports Python 3.9–3.14. The documentation is at [nlr-pysam.readthedocs.io](https://nlr-pysam.readthedocs.io/).
+
+**License and terms.** SAM is free, and its [open-source code](https://sam.nlr.gov/sam-open-source.html) is licensed BSD-3-Clause, as is PySAM. **Redistribution: code allowed under BSD-3-Clause.**
+
+**Known pitfalls.**
+
+- *Version match.* Each PySAM release is built against a specific SAM version, and default inputs can change between versions. Pin the version and record it with your results.
+- *Renamed package.* Requirements files that pin `nrel-pysam` stay on the 7.x line.
+- *Same year, same weather.* My solar–hydrogen framework runs the SAM plant model with the same year and weather file as the rest of the inputs. It divides hourly thermal output and parasitic load by the plant's design thermal output, so the optimizer can scale the plant.
+- *One clock.* Align SAM output to the model's calendar year and time-zone convention before joining it to market prices.
+
+**Used in.** [Co-located solar and hydrogen](../projects/solar-hydrogen.qmd), with the [reopt-hydrogen-framework data pipeline](https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/data_pipeline.md).
+
+### HiGHS and linopy {#highs-linopy}
+
+**What it is.** [HiGHS](https://highs.dev/) is an open-source solver for linear, mixed-integer and quadratic programs. It is a C++ library with interfaces for C, C#, Fortran, Julia and Python (`highspy`). [linopy](https://linopy.readthedocs.io/) is a Python library, built on xarray, that writes linear, mixed-integer and quadratic models with labeled, N-dimensional variables and passes them to a solver.
+
+**Access.** Install with `pip install highspy`; the current release is 1.15.1. Install linopy with pip, uv or conda-forge; the current release is 0.10.1. linopy does not work without a solver, so install at least one.
+
+**License and terms.** HiGHS and linopy are both MIT-licensed. Commercial solvers that linopy can call, such as Gurobi or CPLEX, need their own licenses. **Redistribution: allowed under MIT.**
+
+**Known pitfalls.**
+
+- *MIP gap.* The default relative MIP gap in [HiGHS](https://ergo-code.github.io/HiGHS/dev/options/definitions/) is 10⁻⁴. My frameworks set the gap explicitly (10⁻⁶) and document it.
+- *Check the status.* My frameworks stop with an error unless the solver reports an optimal solution, and some recompute the balance equations from the solution as a check.
+- *Scale.* Full-year, multi-zone or stochastic planning models can exceed what an open-source solver handles in practical time. The framework docs record where a commercial barrier solver was needed, and where a shorter horizon with hour weights served for screening.
+- *Nonconvex terms.* My supply-chain models use Pyomo with HiGHS. One bilinear variant needs a solver that handles nonconvex problems, so the framework offers an enumeration form that HiGHS can solve.
+
+**Used in.** linopy with HiGHS: [txh2-ercot-hydrogen](https://github.com/Henryutd2021/txh2-ercot-hydrogen/blob/main/docs/architecture.md), [ghg-load-regulation](https://github.com/Henryutd2021/ghg-load-regulation/blob/main/docs/architecture.md), [reopt-hydrogen-framework](https://github.com/Henryutd2021/reopt-hydrogen-framework/blob/main/docs/architecture.md) and [smr-datacenter-cogeneration](https://github.com/Henryutd2021/smr-datacenter-cogeneration/blob/main/docs/architecture.md). Pyomo with HiGHS: [supply-chain-microgrid-models](https://github.com/Henryutd2021/supply-chain-microgrid-models/blob/main/docs/architecture.md).
+
+---
+
+*Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own.*
+
+*Views are my own and do not represent my employer. This guide is reviewed each quarter; corrections are made in place and noted here with the date.*
