@@ -2,8 +2,10 @@
    LX.Metro(host, path)            entry doors (one per tier), a progress bar, the map, a legend and a preview card per stop
    LX.metroLayout(path, "h"|"v")   pure layout (also used by the Node tests): one line per tier, any number of tiers;
                                    the starter path runs across the lines; a lesson with tier2 bridges two lines.
-   Tier fields used: id, title, slot (colour --lx-tier-<slot>), icon, door. Lesson fields: starter, short, title, tier, tier2,
-   minutes, href, ready, icon, does. "more" adds "+N more" to each line. Progress ticks come from this browser only.
+   Tier fields used: id, title, slot (colour --lx-tier-<slot>), icon, door, goal, status ("upcoming": a dashed door and line,
+   "coming later"). Lesson fields: starter, short, title, tier, tier2, minutes, href, ready, icon, does. "more" adds
+   "+N more" to each line; that label opens the tier's card, which links the open lessons off the starter path (code,
+   title, href, ready). Progress ticks come from this browser only.
    Wide (≥ 720 px): lines run left to right, first tier at the bottom. Phones: lines run top to bottom, names on the right. */
 (function () {
   "use strict";
@@ -34,12 +36,13 @@
       });
       tiers.forEach(function (t, k) {
         var mine = L.stations.filter(function (s) { return s.row === k; }), last = mine.length ? mine[mine.length - 1].x + 24 : x0 - 20;
-        L.ext.push({ tier: t.id, color: slot(t, k), x0: last, y0: ty(k), x1: L.W - 20, y1: ty(k), more: more[t.id], none: !mine.length,
-          label: mine.length ? "+" + more[t.id] + " more " + t.title + " lessons" : (more[t.id] ? more[t.id] + " " + t.title + " lessons in preparation" : t.title + ": in preparation"),
+        var later = t.status === "upcoming" ? ", coming later" : "";
+        L.ext.push({ tier: t.id, k: k, color: slot(t, k), x0: last, y0: ty(k), x1: L.W - 20, y1: ty(k), more: more[t.id], none: !mine.length, upcoming: !!later,
+          label: mine.length ? "+" + more[t.id] + " more " + t.title + " lessons" : (more[t.id] ? more[t.id] + " " + t.title + " lessons" + (later || " in preparation") : t.title + ": in preparation"),
           lx: L.W - 20, ly: ty(k) + 22, anchor: "end" });
       });
     } else {
-      var cw = 44, x00 = 34, rowH = 66, top2 = 50;
+      var cw = nT > 3 ? 36 : 44, x00 = nT > 3 ? 28 : 34, rowH = 66, top2 = 50;
       L.W = 360; L.H = top2 + n * rowH + 60;
       var tx = function (k) { return x00 + k * cw; };
       tiers.forEach(function (t, k) { L.tiers.push({ id: t.id, title: t.title, color: slot(t, k), x: tx(k), labelX: tx(k), labelY: 22, short: t.title.charAt(0) }); });
@@ -49,8 +52,8 @@
       });
       tiers.forEach(function (t, k) {
         var mine = L.stations.filter(function (s) { return s.row === k; }), last = mine.length ? mine[mine.length - 1].y + 26 : top2;
-        L.ext.push({ tier: t.id, color: slot(t, k), x0: tx(k), y0: last, x1: tx(k), y1: L.H - 30, more: more[t.id], none: !mine.length,
-          label: "+" + more[t.id], lx: tx(k), ly: L.H - 10, anchor: "middle" });
+        L.ext.push({ tier: t.id, k: k, color: slot(t, k), x0: tx(k), y0: last, x1: tx(k), y1: L.H - 30, more: more[t.id], none: !mine.length,
+          upcoming: t.status === "upcoming", label: "+" + more[t.id], lx: tx(k), ly: L.H - 10, anchor: "middle" });
       });
     }
     // route segments between consecutive stops, coloured by the stop they lead to
@@ -84,9 +87,10 @@
     tiers.forEach(function (t, k) { var s = H("span", null, lg); H("i", { style: "--c:" + slot(t, k) }, s); H("span", { text: t.title }, s); });
     [["o fill", "Open now"], ["o done", "Done"], ["o dash", "Coming soon"]].forEach(function (x) { var s = H("span", null, lg); H("i", { class: x[0] }, s); H("span", { text: x[1] }, s); });
     tiers.forEach(function (t, k) {
-      var d = H("button", { class: "lx-door", type: "button", "aria-pressed": "false", style: "--c:" + slot(t, k) }, doors);
+      var soon = t.status === "upcoming";
+      var d = H("button", { class: "lx-door" + (soon ? " soon" : ""), type: "button", "aria-pressed": "false", style: "--c:" + slot(t, k) }, doors);
       H("span", { class: "ic", html: LX.icon(t.icon || "bulb") }, d);
-      H("b", { text: t.door || t.title }, d); H("small", { text: t.title }, d); H("span", { class: "knob", "aria-hidden": "true" }, d);
+      H("b", { text: t.door || t.title }, d); H("small", { text: t.title + (soon ? " · later" : "") }, d); H("span", { class: "knob", "aria-hidden": "true" }, d);
       d.addEventListener("click", function () {
         var on = M.tier !== t.id; M.tier = on ? t.id : null;
         [].forEach.call(doors.children, function (c) { c.setAttribute("aria-pressed", c === d && on ? "true" : "false"); });
@@ -129,14 +133,22 @@
       var p = Lc.stations[n]; place(vb(p.x, p.y), Lc.mode === "v");
       var f = c.querySelector("a, button.x"); if (f && !fromDoor) f.focus({ preventScroll: true });
     }
-    function openTier(k) {
+    function openTier(k, fromKey) {
+      if (fromKey) lastFocus = document.activeElement;
       var T = tiers[k], c = frame(k), ph = H("div", { class: "ph" }, c);
       H("div", { class: "ic", html: LX.icon(T.icon || "map") }, ph);
-      var tt = H("div", null, ph); H("div", { class: "k", text: T.title + (T.level ? " · " + T.level : "") }, tt); H("h3", { text: T.door || T.title }, tt);
+      var tt = H("div", null, ph); H("div", { class: "k", text: T.title + (T.level ? " · " + T.level : "") + (T.status === "upcoming" ? " · coming later" : "") }, tt); H("h3", { text: T.door || T.title }, tt);
       if (T.goal) H("p", { text: T.goal }, c);
-      var cnt = (path.more || []).filter(function (m) { return m.tier === T.id; }).length;
-      H("div", { class: "pf", html: '<span class="lx-pill neutral">' + LX.icon("lock") + (cnt ? cnt + " lessons in preparation" : "In preparation") + "</span>" }, c);
-      var e = Lc.ext[k]; place(vb(Lc.mode === "h" ? (e.x0 + e.x1) / 2 : e.x0, Lc.mode === "h" ? e.y0 : (e.y0 + e.y1) / 2), Lc.mode === "v");
+      var mine = (path.more || []).filter(function (m) { return m.tier === T.id; });
+      var openL = mine.filter(function (m) { return m.ready; }), cnt = mine.length - openL.length;
+      if (openL.length) {
+        var ul = H("ul", { class: "lx-preview-list" }, c);
+        openL.forEach(function (m) { var li = H("li", null, ul); if (m.code) H("span", { class: "lx-code", text: m.code }, li); H("a", { href: m.href, text: m.title }, li); });
+      }
+      H("div", { class: "pf", html: '<span class="lx-pill neutral">' + LX.icon("lock") + (cnt ? cnt + (openL.length ? " more" : "") + " lessons in preparation" : (openL.length ? "More lessons in preparation" : "In preparation")) + "</span>" }, c);
+      var e = Lc.ext[k]; place(vb(Lc.mode === "h" ? (e.x0 + e.x1) / 2 : e.x0, Lc.mode === "h" ? e.y0 : Math.min((e.y0 + e.y1) / 2, e.y0 + 40)), Lc.mode === "v");
+      if (c.scrollIntoView) c.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
+      if (fromKey) { var f = c.querySelector("a, button.x"); if (f) f.focus({ preventScroll: true }); }
     }
     function render() {
       var mode = wrap.clientWidth >= 720 ? "h" : "v", L = Lc = LX.metroLayout(path, mode);
@@ -147,9 +159,13 @@
       var dim = function (tid) { return M.tier && tid !== M.tier; };
       L.tiers.forEach(function (t) { S("text", { x: t.labelX, y: t.labelY, class: "mtier", fill: t.color, "text-anchor": mode === "v" ? "middle" : "start" }, svg).textContent = mode === "v" ? t.short : t.title; });
       L.ext.forEach(function (e) {
-        var g = S("g", { class: dim(e.tier) ? "seg-dim" : "" }, svg);
-        S("path", { d: "M" + e.x0 + " " + e.y0 + " L" + e.x1 + " " + e.y1, stroke: e.color, "stroke-width": 6, "stroke-linecap": "round", opacity: .28, "stroke-dasharray": "1 10" }, g);
+        var g = S("g", { class: "mext" + (dim(e.tier) ? " seg-dim" : ""), tabindex: 0, role: "button",
+          "aria-label": tiers[e.k].title + " tier: " + (mode === "v" ? e.more + " more lessons" : e.label) + ". Open the tier card" }, svg);
+        S("path", { d: "M" + e.x0 + " " + e.y0 + " L" + e.x1 + " " + e.y1, stroke: "transparent", "stroke-width": 26, "stroke-linecap": "round" }, g);
+        S("path", { d: "M" + e.x0 + " " + e.y0 + " L" + e.x1 + " " + e.y1, stroke: e.color, "stroke-width": 6, "stroke-linecap": "round", opacity: .28, "stroke-dasharray": e.upcoming ? "1 16" : "1 10" }, g);
         S("text", { x: e.lx, y: e.ly, "text-anchor": e.anchor, class: mode === "v" ? "mlabel sub" : "mtext" }, g).textContent = e.label;
+        g.addEventListener("click", function () { openTier(e.k, true); });
+        g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openTier(e.k, true); } });
       });
       if (mode === "v") S("text", { x: L.stations.length ? L.stations[0].textX : 180, y: L.H - 10, class: "mtext" }, svg).textContent = "more lessons on each line";
       var rg = S("g", { fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }, svg);

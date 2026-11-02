@@ -1,4 +1,9 @@
 {
+ "assert": {
+  "term": "Assert",
+  "short": "A line of code that stops a program with a message when a stated condition is false.",
+  "lesson": "b02-python-data"
+ },
  "balancing": {
   "term": "Balancing",
   "short": "Keeping the power that plants make equal to the power that people use, at every moment.",
@@ -8,6 +13,11 @@
   "term": "Balancing authority",
   "short": "The organisation that keeps supply and demand balanced, moment to moment, in its own part of the grid.",
   "lesson": 0
+ },
+ "battery-duration": {
+  "term": "Battery duration",
+  "short": "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW.",
+  "lesson": "n01-news-lens"
  },
  "capacity": {
   "term": "Capacity",
@@ -34,10 +44,30 @@
   "short": "A rule every solution must obey, such as supply equals demand or no plant above its size.",
   "lesson": 10
  },
+ "utc": {
+  "term": "Coordinated Universal Time (UTC)",
+  "short": "The world reference clock, with no daylight saving; EIA stamps its hourly grid data in it.",
+  "lesson": "b02-python-data"
+ },
+ "counterfactual": {
+  "term": "Counterfactual",
+  "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
+  "lesson": "n01-news-lens"
+ },
  "curtailment": {
   "term": "Curtailment (spilling)",
   "short": "Turning a wind or solar farm below what the weather allows, usually because the grid has more power than it can use at that moment.",
   "lesson": 0
+ },
+ "dataframe": {
+  "term": "DataFrame",
+  "short": "A pandas table with named columns and an index, such as one row per hour.",
+  "lesson": "b02-python-data"
+ },
+ "daylight-saving-time": {
+  "term": "Daylight saving time",
+  "short": "Clocks moved an hour ahead in summer, giving one 23-hour day in spring and one 25-hour day in autumn.",
+  "lesson": "b02-python-data"
  },
  "decision-variable": {
   "term": "Decision variable",
@@ -64,6 +94,11 @@
   "short": "The daily shape of demand minus solar output, with a dip at midday and a steep climb in the evening.",
   "lesson": 2
  },
+ "duration-curve": {
+  "term": "Duration curve",
+  "short": "A year of hourly values sorted from highest to lowest, showing for how many hours each level is reached.",
+  "lesson": "b02-python-data"
+ },
  "energy": {
   "term": "Energy",
   "short": "An amount of electricity made or used over a stretch of time, equal to power multiplied by time and measured in kilowatt-hours (kWh) or megawatt-hours (MWh).",
@@ -73,6 +108,11 @@
   "term": "Energy storage",
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
+ },
+ "evidence-ladder": {
+  "term": "Evidence ladder",
+  "short": "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output.",
+  "lesson": "n01-news-lens"
  },
  "firm-capacity": {
   "term": "Firm capacity",
@@ -84,10 +124,25 @@
   "short": "The difference between what was forecast, such as tomorrow's demand or wind, and what actually happened.",
   "lesson": 4
  },
+ "frozen-telemetry": {
+  "term": "Frozen telemetry",
+  "short": "A measurement feed stuck on its last value, which shows up as the same reading hour after hour.",
+  "lesson": "b02-python-data"
+ },
+ "gigawatt": {
+  "term": "Gigawatt (GW)",
+  "short": "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand.",
+  "lesson": "n01-news-lens"
+ },
  "frequency": {
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
+ },
+ "hour-ending": {
+  "term": "Hour ending",
+  "short": "A time stamp that labels each hour by its last moment, so 01:00 means the hour from midnight to 01:00.",
+  "lesson": "b02-python-data"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -144,10 +199,25 @@
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
   "lesson": 0
  },
+ "projection": {
+  "term": "Projection",
+  "short": "A model's estimate of a future quantity under stated assumptions, not a measurement or a promise.",
+  "lesson": "n01-news-lens"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
   "lesson": 0
+ },
+ "reactive-power": {
+  "term": "Reactive power",
+  "short": "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally.",
+  "lesson": "n01-news-lens"
+ },
+ "resample": {
+  "term": "Resample",
+  "short": "Regroup a time series to a coarser step, such as hours to days, by averaging or summing.",
+  "lesson": "b02-python-data"
  },
  "reserves": {
   "term": "Reserves",
@@ -174,6 +244,21 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11
  },
+ "system-boundary": {
+  "term": "System boundary",
+  "short": "The line that decides which parts, costs and emissions a study counts and which it leaves out.",
+  "lesson": "n01-news-lens"
+ },
+ "telemetry": {
+  "term": "Telemetry",
+  "short": "Measurements sent automatically from plants and substations to the grid operator.",
+  "lesson": "b02-python-data"
+ },
+ "terawatt-hour": {
+  "term": "Terawatt-hour (TWh)",
+  "short": "A billion kilowatt-hours, the usual unit for a year of a country's or a sector's electricity use.",
+  "lesson": "n01-news-lens"
+ },
  "unserved-energy": {
   "term": "Unserved energy",
   "short": "Demand that could not be met, so some customers lost power.",
@@ -183,6 +268,11 @@
   "term": "Variable renewables",
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0
+ },
+ "voltage": {
+  "term": "Voltage",
+  "short": "The electrical pressure that pushes current along a line; grids hold it within a narrow band at every point.",
+  "lesson": "n01-news-lens"
  },
  "wholesale-price": {
   "term": "Wholesale price",

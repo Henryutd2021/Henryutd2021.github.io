@@ -216,7 +216,7 @@ Lesson 10 writes this down step by step, and lesson 11 hands it to a real solver
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Each hour of your day carried a different amount of CO₂ per MWh: the hours when gas ran hardest were the dirtiest. Real grids publish these data hourly in EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>, which my <a href="../projects/ghg.html">study of carbon-aware electricity use</a> builds on.</p>
+<p>Each hour of your day carried a different amount of CO₂ per MWh: the hours when gas ran hardest were the dirtiest. Real grids publish these data hourly in EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>, which my <a href="https://github.com/Henryutd2021/ghg-load-regulation">open framework for carbon-aware electricity use</a> builds on.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

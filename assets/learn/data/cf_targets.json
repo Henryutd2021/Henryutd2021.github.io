@@ -1,0 +1,25 @@
+{
+ "meta": {
+  "title": "Annual capacity-factor targets for Prairie Town's wind and solar plants",
+  "convention": "The wind and solar shapes in town_days.json and town_year.json are each normalised to their own 2025 maximum hour, so their mean over max (wind 0.528, solar 0.238) is not a capacity factor. Lessons scale a shape to the targets below with LX.townProfile(tech, capacityMW, {year, targets}) (assets/learn/components/profiles.js), which states its clipping rule.",
+  "built_by": "by hand from the source table below; checked 2026-11-02",
+  "license": "EIA data are U.S. government works in the public domain; this file CC BY 4.0"
+ },
+ "targets": {
+  "wind": {"cf": 0.338, "label": "Wind, U.S. utility-scale fleet", "year": 2025, "time_adjusted_capacity_MW": 155344.4},
+  "solar": {"cf": 0.240, "label": "Solar photovoltaic, U.S. utility-scale fleet", "year": 2025, "time_adjusted_capacity_MW": 134526.3}
+ },
+ "reference": {
+  "nuclear": {"cf": 0.911, "label": "Nuclear, U.S. fleet", "year": 2025, "time_adjusted_capacity_MW": 98408.2},
+  "hydro": {"cf": 0.344, "label": "Hydroelectric, U.S. fleet", "year": 2025, "time_adjusted_capacity_MW": 79984.0}
+ },
+ "source": {
+  "publisher": "U.S. Energy Information Administration",
+  "short": "Electric Power Monthly, Table 6.07.B",
+  "title": "Electric Power Monthly, Table 6.07.B. Capacity Factors for Utility Scale Generators Primarily Using Non-Fossil Fuels",
+  "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+  "issue": "Data for August 2026, released 23 October 2026",
+  "accessed": "2026-11-02",
+  "notes": "Annual values for 2025 are final (EIA's note on the table). EIA compares net generation with available capacity: the time-adjusted summer capacity of utility-scale generators (1 MW and larger); small-scale rooftop solar is not included. These are national fleet averages; regional fleets differ, and no SPP-specific primary capacity-factor table was used."
+ }
+}

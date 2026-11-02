@@ -220,7 +220,7 @@
       var body = H("p", { class: "n1-body" }, art), btns = {}, sel = null;
       story.parts.forEach(function (part) {
         if (typeof part === "string") { body.appendChild(document.createTextNode(part)); return; }
-        var b = H("button", { class: "n1-ph", type: "button", "data-p": part.p }, body);
+        var b = H("button", { class: "n1-ph", type: "button", "data-p": part.p, text: part.text }, body);
         btns[part.p] = { b: b, ph: part };
         b.addEventListener("click", function () { select(part.p); });
       });
@@ -508,7 +508,7 @@
       { text: "Tap each highlighted phrase and tag it with the question it raises. Then choose the question the story leaves unanswered, and compare with a researcher's notes.", build: tagStep(D, A, 0) },
       { text: "Now one check with units. The report gives [[energy|energy]] per year; grids are sized in [[power|power]]. Turn 649 TWh a year into average GW.", build: envelopeA(A) },
       { text: "Tag the second story. Watch for power against energy, and for plans against results. Then compare with a researcher's notes.", build: tagStep(D, B, 1) },
-      { text: "The story gives power, not energy. Choose a duration and see how much energy 15 GW could hold, and how long that would run the whole country.", build: envelopeB(B) },
+      { text: "The story gives power, not energy. Choose a [[battery-duration|duration]] and see how much energy 15 GW could hold, and how long that would run the whole country.", build: envelopeB(B) },
       { text: "The third story is a claim about a cause, made the day after a blackout. Tag its phrases, then choose the question the headline skips.", build: tagStep(D, C, 2) },
       { text: "Evidence takes time. Guess how long the formal investigation took before its final report, then lock in your guess.", build: clockStep(C) },
       { text: "Spot the units or scale error. Four of these six sentences break a unit or a sense of scale; two read right. Judge each one.", build: spotStep(D) },

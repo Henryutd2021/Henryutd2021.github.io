@@ -186,7 +186,7 @@
       ".lx-checklist label small{font-size:12.5px;color:var(--lx-ink-3);font-family:var(--lx-f-mono);overflow-wrap:anywhere}",
       ".lx-checklist li.on{border-color:color-mix(in srgb,var(--lx-good) 45%,var(--lx-line))}",
       ".lx-checklist-foot{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13.5px;color:var(--lx-ink-3)}",
-      "@media (max-width:560px){.b2-code pre{font-size:12px}.b2-tbl{font-size:13px}.b2-tbl th,.b2-tbl td{padding:4px 5px}}"
+      "@media (max-width:560px){.b2-code pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.b2-tbl{font-size:13px}.b2-tbl th,.b2-tbl td{padding:4px 5px}}"
     ].join("\n");
     H("style", { id: "b2-css", text: css }, document.head);
   }
@@ -246,7 +246,7 @@
     var alt = o.alt ? H("details", { class: "lx-textalt" }, host) : null;
     if (alt) { H("summary", { text: "Text version" }, alt); H("div", { html: o.alt }, alt); }
     function draw() {
-      var W = Math.max(300, box.clientWidth || 640), Hh = o.height || (W < 480 ? 170 : 200), m = { l: 46, r: 8, t: 10, b: 22 };
+      var W = Math.max(300, box.clientWidth || 640), Hh = (o.height || (W < 480 ? 170 : 200)) + (o.title ? 14 : 0), m = { l: 46, r: 8, t: o.title ? 24 : 10, b: 22 };
       var iw = W - m.l - m.r, ih = Hh - m.t - m.b, n = o.n, ymax = o.yMax;
       var x = function (i) { return m.l + (o.bars ? (i + 0.5) : i) / (o.bars ? n : Math.max(1, n - 1)) * iw; }, y = function (v) { return m.t + ih - v / ymax * ih; };
       if (svg) svg.remove();
@@ -274,7 +274,7 @@
         if (s.area) S("path", { d: p + "L" + x(n - 1) + " " + y(0) + "L" + x(0) + " " + y(0) + "Z", fill: s.color, opacity: 0.22 }, svg);
         S("path", { d: p, fill: "none", stroke: s.color, "stroke-width": s.width || 1.4, "stroke-linejoin": "round" }, svg);
       });
-      if (o.title) S("text", { x: m.l + 4, y: m.t + 12, class: "t" }, svg).textContent = o.title;
+      if (o.title) S("text", { x: m.l, y: 13, class: "t" }, svg).textContent = o.title;
     }
     if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(box)) draw(); }).observe(box);
     setTimeout(draw, 0);
@@ -351,7 +351,7 @@
 
     // 3 time stamps
     var ways = [["utc-end", "UTC date, stamp at hour end"], ["local-end", "Local date, stamp at hour end"], ["local-start", "Local date, stamp at hour start"]];
-    steps.push({ text: "EIA stamps each hour in UTC, at the hour's end; Prairie Town runs on Central time. Count the hours in each day three ways, and see which way is right.",
+    steps.push({ text: "EIA stamps each hour in [[utc|UTC]], at the [[hour-ending|hour's end]]; Prairie Town runs on Central time. Count the hours in each day three ways, and see which way is right.",
       build: function (act, api) {
         var out = H("div", { "aria-live": "polite" }, act);
         var sg = seg(act, "How to group hours into days", ways, show);
@@ -375,7 +375,7 @@
 
     // 4 repeats
     var BUILD = { wind: stats.frozen_hours_filled.wind, solar: stats.frozen_hours_filled.solar, demand: stats.demand_hours_flagged_as_implausible };
-    steps.push({ text: "A stuck sensor repeats its last reading. Flag runs of the same non-zero value that last at least N hours. Find the N the data build used: your count will match its count.",
+    steps.push({ text: "A [[frozen-telemetry|stuck sensor]] repeats its last reading. Flag runs of the same non-zero value that last at least N hours. Find the N the data build used: your count will match its count.",
       build: function (act, api) {
         var col = "solar", minRun = 2, dayTicks = monthTicks(R, Math.ceil(R.n / 24), "day");
         var sg = seg(act, "Column", [["wind", "Wind"], ["solar", "Solar"], ["demand", "Demand"]], function (k) { col = k; draw(); });
@@ -453,7 +453,7 @@
     // 7 resample
     var ticksH = monthTicks(C, C.n, "hour"), dWind = resample(C, P.wind, "day", "mean"), mWind = resample(C, P.wind, "month", "sum");
     var best = mWind.reduce(function (b, x) { return !b || x.value > b.value ? x : b; }, null), worst = mWind.reduce(function (b, x) { return !b || x.value < b.value ? x : b; }, null);
-    steps.push({ text: "Switch to the cleaned file, scaled to Prairie Town's " + P.sizes.wind + " MW wind farm. 8,760 points are too many to read: resample to daily averages, then to monthly energy.",
+    steps.push({ text: "Switch to the cleaned file, scaled to Prairie Town's " + P.sizes.wind + " MW wind farm. 8,760 points are too many to read: [[resample|resample]] to daily averages, then to monthly energy.",
       build: function (act, api) {
         var seen = {}, host = H("div", null, act);
         var sg = seg(act, "Time step", [["h", "Hourly (MW)"], ["d", "Daily mean (MW)"], ["m", "Monthly energy (GWh)"]], show);
@@ -473,7 +473,7 @@
 
     // 8 duration curve and capacity factor
     var cfW = capacityFactor(P.wind, P.sizes.wind), cfS = capacityFactor(P.solar, P.sizes.solar), h90 = hoursAbove(P.demand, 0.9 * P.sizes.demand), h95 = hoursAbove(P.demand, 0.95 * P.sizes.demand);
-    steps.push({ text: "Sort a year of hours from highest to lowest: a duration curve. It shows how many hours a level is reached, and the capacity factor as an area.",
+    steps.push({ text: "Sort a year of hours from highest to lowest: a [[duration-curve|duration curve]]. It shows how many hours a level is reached, and the capacity factor as an area.",
       build: function (act, api) {
         var col = "demand", sorted = false;
         var sg = seg(act, "Series", [["demand", "Demand"], ["wind", "Wind farm"], ["solar", "Solar farm"]], function (k) { col = k; draw(); });
@@ -498,7 +498,7 @@
 
     // 9 asserts
     var kR = checks(R), kC = checks(C);
-    steps.push({ text: "Turn each check into an assert, so a bad file stops the notebook with a message instead of slipping into your results. Run the five asserts on both files.",
+    steps.push({ text: "Turn each check into an [[assert|assert]], so a bad file stops the notebook with a message instead of slipping into your results. Run the five asserts on both files.",
       build: function (act, api) {
         var row = H("div", { class: "b2-pills" }, act), ran = {};
         var bR = H("button", { class: "lx-btn small ghost", type: "button", text: "Run on the raw file" }, row), bC = H("button", { class: "lx-btn small ghost", type: "button", text: "Run on the cleaned file" }, row);
