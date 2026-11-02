@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Honglin Li</title>
+<link>https://henryutd2021.github.io/field-notes/briefings.html</link>
+<atom:link href="https://henryutd2021.github.io/field-notes/briefings.xml" rel="self" type="application/rss+xml"/>
+<description>Briefings by Honglin Li on AI data-center load, interconnection, nuclear and SMRs, hydrogen, electricity markets and energy policy.</description>
+<image>
+<url>https://henryutd2021.github.io/images/profile-square.jpg</url>
+<title>Honglin Li</title>
+<link>https://henryutd2021.github.io/field-notes/briefings.html</link>
+</image>
+<generator>quarto-1.10.19</generator>
+<lastBuildDate>Tue, 03 Nov 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Briefing — 3 November 2026</title>
+  <dc:creator>Honglin Li</dc:creator>
+  <link>https://henryutd2021.github.io/field-notes/briefings/2026-11-03.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Several announcements in the past two weeks came with large headline numbers, and each carried a qualifier that matters more to anyone modeling new large loads and firm power. Below are five U.S. items and one from Europe, each with its primary source and my view of why it matters.</p>
+<section id="exelon-splits-its-data-center-pipeline-by-maturity" class="level2">
+<h2 class="anchored" data-anchor-id="exelon-splits-its-data-center-pipeline-by-maturity">Exelon splits its data-center pipeline by maturity</h2>
+<p><strong>What happened:</strong> In third-quarter materials filed on 30 October 2026, Exelon counted about 11 GW of data-center demand as high probability. These are projects in advanced design or backed by FERC-approved transmission security agreements. It listed a further future pipeline of about 23 GW, of which about 14 GW at its Illinois utility sits in current or future cluster studies that conclude in 2026 and 2027; the two groups should not be added together. Data-center load actually served in northern Illinois is still below 1 GW.</p>
+<p><strong>Why it matters (my view):</strong> Signed, studied and energized load are different quantities, and adding them together overstates near-term demand. In my work on delayed grid energization (CoDE), how long a project waits and whether it goes ahead can be linked, and the cost to ratepayers depended strongly on large-load tariff design. Disclosures by maturity level let a model treat these separately.</p>
+<p><strong>Source:</strong> <a href="https://www.sec.gov/Archives/edgar/data/1109357/000110935726000092/exc-20261030ex992.htm">Exelon Q3 2026 earnings presentation, slide 15 (SEC Form 8-K, Exhibit 99.2)</a></p>
+</section>
+<section id="pjm-tells-ferc-that-flat-data-center-demand-squeezes-maintenance-seasons" class="level2">
+<h2 class="anchored" data-anchor-id="pjm-tells-ferc-that-flat-data-center-demand-squeezes-maintenance-seasons">PJM tells FERC that flat data-center demand squeezes maintenance seasons</h2>
+<p><strong>What happened:</strong> At FERC’s reliability technical conference on 21 October 2026, PJM’s Christopher Pilong said that near-constant data-center demand makes reliability harder to keep in spring and fall, the seasons when generators and transmission owners usually take equipment out for maintenance. He likened it to “a rising sea level”. PJM’s prefiled statement asks for enforceable ride-through rules for large loads, and for energization decisions that allow for the time needed to build supply and transmission.</p>
+<p><strong>Why it matters (my view):</strong> Maintenance calendars are usually fixed model inputs, but with flat loads the shoulder season itself can become the binding constraint. Tying energization to supply build-out also creates exactly the wait that CoDE prices. In CoDE, staged service and bridge power are the main ways to recover value during that wait.</p>
+<p><strong>Source:</strong> <a href="https://insidelines.pjm.com/pjm-ferc-focus-on-large-load-challenges-at-tech-conference/">PJM Inside Lines, 22 October 2026</a></p>
+</section>
+<section id="gas-turbine-backlogs-keep-growing" class="level2">
+<h2 class="anchored" data-anchor-id="gas-turbine-backlogs-keep-growing">Gas-turbine backlogs keep growing</h2>
+<p><strong>What happened:</strong> GE Vernova reported on 28 October 2026 that its gas power equipment backlog plus slot reservations reached 122 GW at the end of September, up from 116 GW a quarter earlier. It expects at least 130 GW by year-end. In the quarter, 13 GW of reservations became firm orders and 5 GW of equipment shipped.</p>
+<p><strong>Why it matters (my view):</strong> Models usually let a gas turbine appear in whatever year it is cheapest. A 122 GW pipeline against 5 GW of quarterly shipments argues for an explicit and uncertain lead time. For a large load that plans on-site gas as bridge power, the delivery slot can bind as tightly as the grid connection it stands in for.</p>
+<p><strong>Source:</strong> <a href="https://www.sec.gov/Archives/edgar/data/1996810/000199681026000162/gev3q2026form8-k10282026.pdf">GE Vernova third-quarter 2026 results (SEC Form 8-K)</a></p>
+</section>
+<section id="doe-offers-up-to-5-billion-for-constellation-nuclear-uprates" class="level2">
+<h2 class="anchored" data-anchor-id="doe-offers-up-to-5-billion-for-constellation-nuclear-uprates">DOE offers up to $5 billion for Constellation nuclear uprates</h2>
+<p><strong>What happened:</strong> On 27 October 2026, DOE’s Office of Energy Dominance Financing made a conditional commitment to lend up to $5 billion for uprates and modernization at eight Constellation nuclear plants in Illinois, Maryland and Pennsylvania. The work is expected to add nearly 1.1 GW in PJM and MISO. No money flows until Constellation meets technical, legal, environmental and financial conditions.</p>
+<p><strong>Why it matters (my view):</strong> An uprate adds firm, carbon-free capacity where the reactor’s capital is already sunk, so it behaves more like an add-on than a new build. My NPPH2 study found the same asymmetry for hydrogen. With the assumed credit, hydrogen revenue sustained most existing reactors studied but did not cover a new plant’s capital.</p>
+<p><strong>Source:</strong> <a href="https://www.energy.gov/articles/energy-department-announces-5-billion-loan-boost-nuclear-power-and-help-lower-costs">U.S. Department of Energy, 27 October 2026</a></p>
+</section>
+<section id="the-eu-reopens-its-hydrogen-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="the-eu-reopens-its-hydrogen-strategy">The EU reopens its hydrogen strategy</h2>
+<p><strong>What happened:</strong> On 26 October 2026, the European Commission opened a targeted consultation on a renewed hydrogen strategy. Authorities, industry, finance, NGOs and academia can respond until 23 November. The Commission is frank about the reason: six years after its 2020 strategy, little renewable or low-carbon hydrogen capacity is operating, and projects have been slow to mature.</p>
+<p><strong>Why it matters (my view):</strong> The gap between announced and operating capacity runs through this whole issue, on both sides of the Atlantic. In my NPPH2 work, market design, not only the plant, set the value of hydrogen flexibility. That makes a review of demand barriers and support design the place where model inputs are most likely to move.</p>
+<p><strong>Source:</strong> <a href="https://energy.ec.europa.eu/resources/consultations/targeted-consultation-renewed-hydrogen-strategy_en">European Commission, consultation page</a></p>
+</section>
+<section id="ercot-flags-daylight-saving-glitches-in-dashboard-data" class="level2">
+<h2 class="anchored" data-anchor-id="ercot-flags-daylight-saving-glitches-in-dashboard-data">ERCOT flags daylight-saving glitches in dashboard data</h2>
+<p><strong>What happened:</strong> ERCOT warned on 30 October 2026 that the end of daylight saving time on 1 November would distort several public dashboards from 31 October to 2 November. Downloaded supply-and-demand files label hour ending 02 as 01, and the wind-and-solar series is empty for the repeated hour.</p>
+<p><strong>Why it matters (my view):</strong> These are display problems, not physical events, so a gap or a zero in that data is not an outage. Hourly series should be keyed to UTC or carry a daylight-saving flag, and such gaps should never be filled with zeros.</p>
+<p><strong>Source:</strong> <a href="https://www.ercot.com/services/comm/mkt_notices/M-B103026-01">ERCOT market notice M-B103026-01</a></p>
+</section>
+<section id="what-im-watching" class="level2">
+<h2 class="anchored" data-anchor-id="what-im-watching">What I’m watching</h2>
+<ol type="1">
+<li>Of the gigawatts that utilities call high probability, how many will be energized on their original dates? Will utilities start reporting that conversion rate?</li>
+<li>Will FERC and NERC turn large-load ride-through and interim, non-firm service into binding rules, and how soon?</li>
+<li>Will turbine slot reservations keep converting to firm orders at this pace, or start to lapse?</li>
+</ol>
+<hr>
+<p><em>Compiled with AI-assisted research and drafting tools; every item is checked against its primary source, and the views are my own.</em></p>
+<p><em>Views are my own and do not represent my employer. Corrections are made in place and noted here with the date.</em></p>
+
+
+</section>
+
+ ]]></description>
+  <category>Large loads &amp; interconnection</category>
+  <category>Markets &amp; tariffs</category>
+  <category>Nuclear &amp; SMRs</category>
+  <category>Hydrogen</category>
+  <category>Policy &amp; credits</category>
+  <category>Data &amp; methods</category>
+  <guid>https://henryutd2021.github.io/field-notes/briefings/2026-11-03.html</guid>
+  <pubDate>Tue, 03 Nov 2026 05:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

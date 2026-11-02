@@ -1,5 +1,17 @@
 [
   {
+    "listing": "/field-notes.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
+    ]
+  },
+  {
     "listing": "/projects.html",
     "items": [
       "/projects/nuclear-dc.html",
@@ -14,7 +26,14 @@
       "/projects/ghg.html",
       "/projects/facility-microgrid-location.html",
       "/projects/uq-mfgpr.html",
+      "/projects/national-wind-uq.html",
       "/projects/fm-global-internship.html"
+    ]
+  },
+  {
+    "listing": "/field-notes/briefings.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html"
     ]
   }
 ]
