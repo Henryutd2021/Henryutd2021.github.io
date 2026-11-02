@@ -352,7 +352,7 @@
           ladder.onDone = function (right) { keep("ladder", right); chk(); };
           if (ladder.done) chk();
         } },
-      { text: "A Fermi estimate. The U.S. used about " + num(Math.round(W.wh.us / 1e12), 0) + " TWh of electricity in 2025, and a year has 8,760 hours. Roughly what was the average power, all year round?",
+      { text: "A [[fermi-estimate|Fermi estimate]]. The U.S. used about " + num(Math.round(W.wh.us / 1e12), 0) + " TWh of electricity in 2025, and a year has 8,760 hours. Roughly what was the [[average-power|average power]], all year round?",
         build: function (act, api) {
           board.listen(null);
           var F = W.fermi;

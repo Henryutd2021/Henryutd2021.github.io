@@ -87,7 +87,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-The load factor is average demand over peak demand:
+The [load factor]{.lx-term term="load-factor"} is average demand over peak demand:
 
 $$LF = \frac{\bar d}{d_{\max}} = \frac{282\ \text{MW}}{450\ \text{MW}} = 0.63 .$$
 

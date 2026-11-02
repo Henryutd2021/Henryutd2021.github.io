@@ -1,0 +1,19 @@
+# Sidecar for lesson 2 (02-demand), W1 builder a, 2026-11-02: new glossary terms and requests for shared files.
+lesson: 2
+glossary:
+  - id: load-duration-curve
+    term: Load-duration curve
+    def: "A year's hourly demand sorted from highest to lowest, showing for how many hours each level of demand is needed."
+  - id: net-demand
+    term: Net demand (net load)
+    def: "Demand minus the output of wind and solar, which is what the other power plants must still supply."
+  - id: load-factor
+    term: Load factor
+    def: "Average demand over a period divided by the peak demand in that period."
+  - id: peak-demand
+    term: Peak demand
+    def: "The highest demand in a period, such as the busiest hour of a year, which sets how much capacity the grid needs."
+requests:
+  - "Promote lesson-local components from assets/learn/02-demand.js: LineChart (hourly lines and areas, shading, marks, tooltip, text version; the curriculum's i-curve-viewer) and YearDots (8,760 hourly dots on a canvas that re-sort into a load-duration curve, with a month highlight and a threshold line). CSS in the style block of learn/02-demand.qmd (classes t2-*)."
+  - "town_days.json: the winter_peak note says 'the winter day with the highest hourly demand', but 20 February 2025 07:00 is higher (881 vs 864 thousandths); the builder picks only days without repaired hours (19 February had frozen demand). Suggest the note 'the winter day with the highest hourly demand among fully reported days'. Lesson 2 calls 21 January 'a cold winter day' and does not repeat the claim."
+  - "Glossary: the existing duck-curve definition says 'demand minus solar output'; with net-demand added, it could read 'net demand on a sunny day'."

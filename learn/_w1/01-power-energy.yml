@@ -1,0 +1,26 @@
+# Sidecar for lesson 1 (01-power-energy), W1 builder a, 2026-11-02: new glossary terms and requests for shared files.
+lesson: 1
+glossary:
+  - id: kilowatt
+    term: Kilowatt (kW)
+    def: "A unit of power equal to 1,000 watts."
+  - id: watt-hour
+    term: Watt-hour (Wh)
+    def: "A unit of energy: one watt kept up for one hour; 1,000 Wh make one kilowatt-hour."
+  - id: terawatt-hour
+    term: Terawatt-hour (TWh)
+    def: "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries."
+  - id: average-power
+    term: Average power
+    def: "The energy used over a period divided by the length of that period."
+  - id: fermi-estimate
+    term: Fermi estimate
+    def: "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right."
+requests:
+  - "Promote lesson-local components from assets/learn/01-power-energy.js: the appliance board (toggles, power and energy meters, two-panel power and energy chart with a text version), the energy ladder (place items on Wh to TWh rungs), the bathtub annotated diagram, and the scale strip (the curriculum's e-scale-strip). Their CSS is in the style block at the end of learn/01-power-energy.qmd (classes t1-*)."
+  - "LX.CompareTable: an option for text-heavy rows. On phones the shared layout (22px | 1fr | auto | auto, right-aligned cells) overlaps long text; lessons 1 and 2 override it locally with .t1-tt and .t2-tt (one column, left-aligned labelled lines)."
+  - "LX.ConceptMap: a configurable heading for the per-node example (o.gameLabel); step-card lessons have no game, so 'In the game' should read 'In the lesson'."
+  - "LX.Slider: an optional output formatter (thousands separators, decimals); with step 0.1 the output shows floating-point noise, and 1230 W prints without a separator."
+  - "LX.Predict and LX.Guess inside step cards: a way to read a stored guess back as a label (lesson 1 keeps its own map)."
+  - "build_learn.py: sidecar glossary `lesson` values arrive as strings ('1'), while glossary.yml gives numbers; glossary.js compares with ===, so the tooltip on lesson 1 still offers 'Taught in lesson 1'. Suggest coercing to int."
+  - "Lesson-local icons laptop, tv, microwave, dryer (hair dryer), car (EV) and phone could join LX.IC."

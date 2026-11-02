@@ -417,7 +417,7 @@
           attach(act, year);
           year.month(P.month != null ? P.month : -1);
         } },
-      { text: "Now line up the same 8,760 hours from highest to lowest demand. Press Sort and watch the year turn into a load-duration curve.",
+      { text: "Now line up the same 8,760 hours from highest to lowest demand. Press Sort and watch the year turn into a [[load-duration-curve|load-duration curve]].",
         build: function (act, api) {
           var b = H("button", { class: "lx-btn small", type: "button", html: LX.icon("bars") + "Sort the hours" }, act);
           year.month(-1); attach(act, year);
@@ -447,7 +447,7 @@
           }
           sl.set(P.thr || D.threshold.start); upd();
         } },
-      { text: Wd.duckDay.label + " was mild and sunny. Slide Prairie Town's solar farm up and watch net demand: the demand left for other plants after solar.",
+      { text: Wd.duckDay.label + " was mild and sunny. Slide Prairie Town's solar farm up and watch [[net-demand|net demand]]: the demand left for other plants after solar.",
         build: function (act, api) {
           year.thr(null);
           var sl = LX.Slider(act, { label: "Solar farm", min: D.solar.min, max: D.solar.max, step: D.solar.step, unit: "MW", color: "var(--lx-solar)",
