@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "title": "Lesson 2 settings: which real days and weeks to show, and the sourced anchors",
+    "lesson": "learn/02-demand.qmd (model and view: assets/learn/02-demand.js; tests: _tests/learn/test_02-demand.js)",
+    "built": "2026-11-02",
+    "note": "All curves are the real 2025 hourly shapes of the Southwest Power Pool (town_days.json, town_year.json; EIA-930), scaled so that Prairie Town's highest hour of 2025 is town_peak_mw, the same scale as lesson 0 (town.json, scenario lesson0, demandPeakMW). The solar slider adds a hypothetical solar farm that follows SPP's real solar shape of the chosen day."
+  },
+  "town_peak_mw": 450,
+  "predict": { "day": "summer_peak", "options": [8, 12, 16, 21] },
+  "days": {
+    "summer": { "key": "summer_peak", "label": "29 July 2025", "note": "SPP's highest hour of 2025 fell on this day" },
+    "winter": { "key": "winter_peak", "label": "21 January 2025", "note": "a cold winter day with a morning and an evening hump; picked by the data builder among days with no repaired hours" },
+    "duck": { "key": "sunny_mild", "label": "30 May 2025", "note": "the April-May day with the most solar relative to demand" }
+  },
+  "week": { "start": 14 },
+  "threshold": { "min": 50, "max": 100, "step": 1, "start": 100, "target": 90 },
+  "solar": { "min": 0, "max": 600, "step": 50, "start": 0, "target": 200 },
+  "anchors": {
+    "heat": {
+      "quote": "Hot weather, which increases electricity demand for cooling, combined with an underlying trend of demand increases",
+      "what": "EIA on the July 2025 records; the article also names data centers and manufacturing in forecast demand growth",
+      "source": "EIA, Today in Energy: U.S. electricity peak demand set new records twice in July",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=65864",
+      "as_of": "article of 5 August 2025"
+    },
+    "us_peak": {
+      "value": 759180, "unit": "MW",
+      "what": "Record coincident peak demand of the Lower 48 states, 29 July 2025 (the same day as SPP's 2025 peak)",
+      "source": "EIA, Today in Energy",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=65864",
+      "as_of": "article of 5 August 2025, from preliminary hourly data"
+    },
+    "us_year": {
+      "value": 4.20e12, "unit": "kWh",
+      "what": "Total U.S. electricity consumption in 2025, the highest on record",
+      "source": "EIA, Electricity explained: Use of electricity",
+      "url": "https://www.eia.gov/energyexplained/electricity/use-of-electricity.php",
+      "as_of": "data for 2025; checked 2 November 2026"
+    },
+    "net_load": {
+      "quote": "the demand remaining after subtracting variable renewable generation",
+      "what": "EIA's definition of net load, in its article on California's deepening duck curve",
+      "source": "EIA, Today in Energy: As solar capacity grows, duck curves are getting deeper in California",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=56880",
+      "as_of": "article of 21 June 2023"
+    },
+    "spp": {
+      "what": "SPP's 2025 totals and shares (annual demand, peak hour, solar share of net generation) as computed from the EIA-930 files listed in town_days.json meta, in its `stats` block",
+      "source": "EIA, Hourly Electric Grid Monitor (Form EIA-930), six-month BALANCE files 2025, balancing authority SWPP",
+      "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+      "as_of": "accessed 2 November 2026"
+    }
+  }
+}

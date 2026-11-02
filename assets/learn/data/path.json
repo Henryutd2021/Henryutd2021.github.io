@@ -91,8 +91,8 @@
     "title": "Power or energy? What is the difference between kW and kWh?",
     "short": "Power or energy?",
     "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
-    "href": "index.html#lesson-1",
-    "ready": false
+    "href": "01-power-energy.html",
+    "ready": true
    }
   },
   {
@@ -101,7 +101,7 @@
    "total": 14,
    "code": null,
    "title": "Power or energy? What is the difference between kW and kWh?",
-   "subtitle": null,
+   "subtitle": "Switch a home's appliances on and watch power and energy part ways",
    "short": "Power or energy?",
    "tier": "foundations",
    "tier2": null,
@@ -117,8 +117,8 @@
    "scales": [],
    "teaches": [],
    "lab": null,
-   "href": "index.html#lesson-1",
-   "ready": false,
+   "href": "01-power-energy.html",
+   "ready": true,
    "after": [],
    "prev": {
     "id": "00-grid-operator",
@@ -135,8 +135,8 @@
     "title": "Why does electricity demand rise and fall?",
     "short": "The shape of demand",
     "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
-    "href": "index.html#lesson-2",
-    "ready": false
+    "href": "02-demand.html",
+    "ready": true
    }
   },
   {
@@ -145,7 +145,7 @@
    "total": 14,
    "code": null,
    "title": "Why does electricity demand rise and fall?",
-   "subtitle": null,
+   "subtitle": "Read a real year of demand, then add solar and dig the duck curve",
    "short": "The shape of demand",
    "tier": "foundations",
    "tier2": null,
@@ -161,8 +161,8 @@
    "scales": [],
    "teaches": [],
    "lab": null,
-   "href": "index.html#lesson-2",
-   "ready": false,
+   "href": "02-demand.html",
+   "ready": true,
    "after": [
     {
      "id": "01-power-energy",
@@ -170,8 +170,8 @@
      "title": "Power or energy? What is the difference between kW and kWh?",
      "short": "Power or energy?",
      "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
-     "href": "index.html#lesson-1",
-     "ready": false
+     "href": "01-power-energy.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -180,8 +180,8 @@
     "title": "Power or energy? What is the difference between kW and kWh?",
     "short": "Power or energy?",
     "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
-    "href": "index.html#lesson-1",
-    "ready": false
+    "href": "01-power-energy.html",
+    "ready": true
    },
    "next": {
     "id": "03-balancing",
@@ -234,8 +234,8 @@
     "title": "Why does electricity demand rise and fall?",
     "short": "The shape of demand",
     "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
-    "href": "index.html#lesson-2",
-    "ready": false
+    "href": "02-demand.html",
+    "ready": true
    },
    "next": {
     "id": "04-forecasts",
@@ -278,8 +278,8 @@
      "title": "Why does electricity demand rise and fall?",
      "short": "The shape of demand",
      "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
-     "href": "index.html#lesson-2",
-     "ready": false
+     "href": "02-demand.html",
+     "ready": true
     },
     {
      "id": "03-balancing",
@@ -341,8 +341,8 @@
      "title": "Power or energy? What is the difference between kW and kWh?",
      "short": "Power or energy?",
      "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
-     "href": "index.html#lesson-1",
-     "ready": false
+     "href": "01-power-energy.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -575,8 +575,8 @@
      "title": "Why does electricity demand rise and fall?",
      "short": "The shape of demand",
      "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
-     "href": "index.html#lesson-2",
-     "ready": false
+     "href": "02-demand.html",
+     "ready": true
     },
     {
      "id": "08-merit-order",
