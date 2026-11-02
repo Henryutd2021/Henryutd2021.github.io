@@ -205,8 +205,8 @@
     "title": "How does the grid stay balanced every second?",
     "short": "Balancing every second",
     "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
-    "href": "index.html#lesson-3",
-    "ready": false
+    "href": "03-balancing.html",
+    "ready": true
    }
   },
   {
@@ -215,7 +215,7 @@
    "total": 14,
    "code": null,
    "title": "How does the grid stay balanced every second?",
-   "subtitle": null,
+   "subtitle": "Trip a plant and watch the grid catch it",
    "short": "Balancing every second",
    "tier": "foundations",
    "tier2": null,
@@ -229,10 +229,17 @@
    "icon": "wave",
    "form": "cards",
    "scales": [],
-   "teaches": [],
+   "teaches": [
+    "frequency",
+    "inertia",
+    "primary frequency response",
+    "automatic generation control",
+    "operating reserves",
+    "under-frequency load shedding"
+   ],
    "lab": null,
-   "href": "index.html#lesson-3",
-   "ready": false,
+   "href": "03-balancing.html",
+   "ready": true,
    "after": [
     {
      "id": "00-grid-operator",
@@ -259,8 +266,8 @@
     "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
     "short": "Forecasts and surprises",
     "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
-    "href": "index.html#lesson-4",
-    "ready": false
+    "href": "04-forecasts.html",
+    "ready": true
    }
   },
   {
@@ -269,7 +276,7 @@
    "total": 14,
    "code": null,
    "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
-   "subtitle": null,
+   "subtitle": "Score a real forecast, then plan for its misses",
    "short": "Forecasts and surprises",
    "tier": "foundations",
    "tier2": "analyst",
@@ -283,10 +290,17 @@
    "icon": "cloud",
    "form": "cards",
    "scales": [],
-   "teaches": [],
+   "teaches": [
+    "demand forecasting",
+    "forecast error",
+    "persistence baseline",
+    "MAE and MAPE",
+    "prediction intervals",
+    "reserves under uncertainty"
+   ],
    "lab": null,
-   "href": "index.html#lesson-4",
-   "ready": false,
+   "href": "04-forecasts.html",
+   "ready": true,
    "after": [
     {
      "id": "02-demand",
@@ -303,8 +317,8 @@
      "title": "How does the grid stay balanced every second?",
      "short": "Balancing every second",
      "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
-     "href": "index.html#lesson-3",
-     "ready": false
+     "href": "03-balancing.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -313,8 +327,8 @@
     "title": "How does the grid stay balanced every second?",
     "short": "Balancing every second",
     "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
-    "href": "index.html#lesson-3",
-    "ready": false
+    "href": "03-balancing.html",
+    "ready": true
    },
    "next": {
     "id": "05-capacity-factor",
@@ -367,8 +381,8 @@
     "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
     "short": "Forecasts and surprises",
     "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
-    "href": "index.html#lesson-4",
-    "ready": false
+    "href": "04-forecasts.html",
+    "ready": true
    },
    "next": {
     "id": "06-three-jobs",
@@ -411,8 +425,8 @@
      "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
      "short": "Forecasts and surprises",
      "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
-     "href": "index.html#lesson-4",
-     "ready": false
+     "href": "04-forecasts.html",
+     "ready": true
     },
     {
      "id": "05-capacity-factor",

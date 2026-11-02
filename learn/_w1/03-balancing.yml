@@ -1,0 +1,32 @@
+# Sidecar for lesson 3 (T3, 03-balancing), builder learn-w1-b, 2026-11-02. Read by scripts/build_learn.py.
+id: 03-balancing
+lesson: 3
+glossary:
+  - id: inertia
+    term: Inertia
+    def: "Energy stored in the spinning machines of a power grid; it slows a fall in frequency but cannot stop it."
+  - id: rocof
+    term: Rate of change of frequency
+    def: "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second."
+  - id: nadir
+    term: Nadir
+    def: "The lowest point the frequency reaches after a power plant trips, before it starts to recover."
+  - id: primary-response
+    term: Primary frequency response
+    def: "Automatic extra output from power plants' governors within seconds of a frequency drop; it stops the fall but does not restore 60 Hz."
+  - id: governor
+    term: Governor
+    def: "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes."
+  - id: agc
+    term: Automatic generation control (AGC)
+    def: "The grid operator's computer system that raises or lowers plants over minutes to bring frequency back to 60 Hz."
+  - id: ufls
+    term: Under-frequency load shedding
+    def: "Relays that automatically disconnect blocks of customers when the frequency falls to a set level, to save the rest of the grid."
+  - id: fast-frequency-response
+    term: Fast frequency response
+    def: "Power from batteries or other inverter-based resources delivered within a fraction of a second of a frequency drop."
+requests:
+  - "Promote the lesson-local plot() helper (identical copies in assets/learn/03-balancing.js and 04-forecasts.js: lines with draw-on animation, bars, reference lines, marks, axis unit, phone tick sets, hover tip, legend) into assets/learn/components/ as a shared XY chart (it covers i-band and simple line charts), together with the .w1-stage / .w1-chips / .w1-chip styles from the pages' style blocks (a chart card with value chips above it)."
+  - "learn_screenshots.mjs: its mid, done and explain states drive lesson 0's game only. Lessons 3 and 4 expose root.lxDemo(state) on the .lx-interactive (lesson 3: mid = step 5 with 30 MW of reserve, agc = step 6, uri = step 8; lesson 4: mid = step 2 on the biggest-miss day, band = step 5, cost = step 6 at the cheapest margin). This build used a patched copy of the script (scratchpad/w1b_tools/shots.mjs) that calls lxDemo(state) for any state other than top, nojs, explain, open, full and quiz. A generic hook in the shared script would remove the copy."
+  - "path.yml: besides status, this branch added subtitle and teaches to the 03-balancing entry (the template asks for a subtitle equal to the page's; teaches feeds the JSON-LD)."

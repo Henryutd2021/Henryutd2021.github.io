@@ -1,0 +1,30 @@
+# Sidecar for lesson 4 (T4, 04-forecasts), builder learn-w1-b, 2026-11-02. Read by scripts/build_learn.py.
+id: 04-forecasts
+lesson: 4
+glossary:
+  - id: day-ahead-forecast
+    term: Day-ahead forecast
+    def: "A grid operator's estimate, made the day before, of how much power customers will use in each hour."
+  - id: persistence-forecast
+    term: Persistence forecast
+    def: "The simplest forecast: the next value will be the same as the last one seen, or as the same hour a day or a week before."
+  - id: mae
+    term: Mean absolute error (MAE)
+    def: "The average size of a forecast's misses, in the units of what is forecast, ignoring whether they were too high or too low."
+  - id: mape
+    term: Mean absolute percentage error (MAPE)
+    def: "The average miss as a percentage of the actual value; it breaks down when actual values are near zero."
+  - id: forecast-bias
+    term: Bias
+    def: "The average signed miss of a forecast, showing whether it tends to run too high or too low."
+  - id: skill-score
+    term: Skill score
+    def: "How much smaller a forecast's error is than that of a simple baseline such as persistence."
+  - id: prediction-interval
+    term: Prediction interval
+    def: "A range that should contain the actual value with a stated probability, drawn as a band around a forecast."
+requests:
+  - "Data script: assets/learn/data/04-forecasts.json was built by scratchpad/w1b_tools/build_04_forecasts_data.py (standard library; reuses scripts/build_learn_town_data.py's reader and cleaning rules on the same raw EIA-930 files; usage: python3 build_04_forecasts_data.py RAW_DIR SITE_DIR). Please promote it to scripts/ (for example as scripts/build_learn_forecast_data.py) so the file can be rebuilt; its meta names it."
+  - "Approved source excerpt:uq-mfgpr (listed for T4 in learn_map_v2.yml): no approved excerpt text was found, so the lesson cites none of Henry's work and links only forward, as plain text, to 'a case file (upcoming)' on a wind turbine's power-curve band. Add the excerpt to the Real-world box once Henry approves its wording."
+  - "The shared plot() helper and the screenshot hook: see the requests in learn/_w1/03-balancing.yml."
+  - "path.yml: besides status, this branch added subtitle and teaches to the 04-forecasts entry."
