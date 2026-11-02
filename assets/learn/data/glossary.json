@@ -1,4 +1,9 @@
 {
+ "absolute-reference": {
+  "term": "Absolute reference",
+  "short": "A spreadsheet address with $ signs, such as $E$1, that stays the same when a formula is copied to other cells.",
+  "lesson": "K7"
+ },
  "balancing": {
   "term": "Balancing",
   "short": "Keeping the power that plants make equal to the power that people use, at every moment.",
@@ -14,30 +19,15 @@
   "short": "The most power a plant can produce at once, often called its nameplate size.",
   "lesson": 5
  },
- "capacity-expansion": {
-  "term": "Capacity expansion model",
-  "short": "An optimization model that decides what to build, as well as how to run it, at least cost.",
-  "lesson": "13"
- },
  "capacity-factor": {
   "term": "Capacity factor",
   "short": "The energy a plant actually made over a period, divided by the energy it would have made running at full capacity the whole time.",
   "lesson": 5
  },
- "capital-recovery-factor": {
-  "term": "Capital recovery factor",
-  "short": "The share of a plant's up-front cost to pay each year so that, with interest, the cost is repaid over its life.",
-  "lesson": "13"
- },
  "carbon-intensity": {
   "term": "Carbon intensity",
   "short": "The CO2 emitted for each unit of electricity, for example in tonnes per megawatt-hour.",
   "lesson": 12
- },
- "carbon-price": {
-  "term": "Carbon price",
-  "short": "A charge per tonne of CO2 emitted, added to costs so that cleaner choices become relatively cheaper.",
-  "lesson": "12"
  },
  "combined-cycle": {
   "term": "Combined-cycle plant",
@@ -74,20 +64,10 @@
   "short": "A power plant whose output the operator can turn up or down on request, such as a gas plant.",
   "lesson": 0
  },
- "dominated-plan": {
-  "term": "Dominated plan",
-  "short": "A plan that another plan beats on every count: no more cost, no more emissions, and better on at least one.",
-  "lesson": "12"
- },
  "duck-curve": {
   "term": "Duck curve",
   "short": "The daily shape of demand minus solar output, with a dip at midday and a steep climb in the evening.",
   "lesson": 2
- },
- "emissions-cap": {
-  "term": "Emissions cap",
-  "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
-  "lesson": "12"
  },
  "energy": {
   "term": "Energy",
@@ -99,10 +79,10 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
  },
- "epsilon-constraint": {
-  "term": "Epsilon-constraint method",
-  "short": "A way to trace a trade-off by optimizing one goal while capping the other, then moving the cap step by step.",
-  "lesson": "12"
+ "feasible-region": {
+  "term": "Feasible region",
+  "short": "All the plans that keep every rule of a model at once; with two decisions it is a shape on a graph.",
+  "lesson": "B1"
  },
  "firm-capacity": {
   "term": "Firm capacity",
@@ -118,6 +98,11 @@
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
+ },
+ "inequality": {
+  "term": "Inequality",
+  "short": "A rule that allows a range of values, written with ≤ (at most) or ≥ (at least).",
+  "lesson": "K4"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -159,6 +144,11 @@
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10
  },
+ "parameter": {
+  "term": "Parameter",
+  "short": "A given number in a model, such as a demand or a price, which the solver uses but does not choose.",
+  "lesson": "B3"
+ },
  "pareto-frontier": {
   "term": "Pareto frontier",
   "short": "The set of plans that cannot be made cheaper without becoming dirtier, or cleaner without becoming more expensive.",
@@ -178,11 +168,6 @@
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
   "lesson": 0
- },
- "representative-period": {
-  "term": "Representative period",
-  "short": "A real stretch of time, such as a week, chosen to stand for many similar ones so that a model can run faster.",
-  "lesson": "13"
  },
  "reserves": {
   "term": "Reserves",
@@ -214,15 +199,20 @@
   "short": "Demand that could not be met, so some customers lost power.",
   "lesson": 0
  },
+ "validation": {
+  "term": "Validation",
+  "short": "Checking that a model represents the real system well enough for the question it is used to answer.",
+  "lesson": "B3"
+ },
  "variable-renewables": {
   "term": "Variable renewables",
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0
  },
- "weighted-sum": {
-  "term": "Weighted sum",
-  "short": "A way to combine several goals into one score by adding them up, each multiplied by a weight.",
-  "lesson": "12"
+ "verification": {
+  "term": "Verification",
+  "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
+  "lesson": "B3"
  },
  "wholesale-price": {
   "term": "Wholesale price",

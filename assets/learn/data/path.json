@@ -919,8 +919,8 @@
    "tier": "analyst",
    "code": "B1",
    "title": "From algebra to a linear program: how do equations become a model?",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "b01-algebra-to-lp.html",
    "scales": [],
    "id": "b01-algebra-to-lp",
    "tier2": "modeler",
@@ -943,8 +943,8 @@
    "tier": "analyst",
    "code": "B3",
    "title": "How do you read a formulation, and check that a model is right?",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "b03-read-check-formulation.html",
    "scales": [],
    "id": "b03-read-check-formulation",
    "tier2": "modeler",
@@ -1309,8 +1309,8 @@
   },
   {
    "title": "Linear equations and inequalities",
-   "ready": false,
-   "href": "index.html#toolbox",
+   "ready": true,
+   "href": "k04-linear-equations.html",
    "code": "K4",
    "id": "k04-linear-equations",
    "minutes": 15
@@ -1327,8 +1327,8 @@
   },
   {
    "title": "Spreadsheets in practice",
-   "ready": false,
-   "href": "index.html#toolbox",
+   "ready": true,
+   "href": "k07-spreadsheets.html",
    "code": "K7",
    "id": "k07-spreadsheets",
    "minutes": 20
