@@ -1,0 +1,18 @@
+# Sidecar of lesson N1 (builder e, W1, 2026-11-02): new glossary terms and requests for shared files.
+lesson: n01-news-lens
+glossary:
+  - {id: counterfactual, term: "Counterfactual", def: "What would have happened without the change being judged; every saving or effect is measured against one."}
+  - {id: system-boundary, term: "System boundary", def: "The line that decides which parts, costs and emissions a study counts and which it leaves out."}
+  - {id: projection, term: "Projection", def: "A model's estimate of a future quantity under stated assumptions, not a measurement or a promise."}
+  - {id: evidence-ladder, term: "Evidence ladder", def: "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output."}
+  - {id: terawatt-hour, term: "Terawatt-hour (TWh)", def: "A billion kilowatt-hours, the usual unit for a year of a country's or a sector's electricity use."}
+  - {id: gigawatt, term: "Gigawatt (GW)", def: "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand."}
+  - {id: battery-duration, term: "Battery duration", def: "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW."}
+  - {id: voltage, term: "Voltage", def: "The electrical pressure that pushes current along a line; grids hold it within a narrow band at every point."}
+  - {id: reactive-power, term: "Reactive power", def: "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally."}
+requests:
+  - "Promote the lesson-local components in assets/learn/n01-news-lens.js to the shared library: LX.Checklist (e-checklist; the same code is in b02-python-data.js), the evidence ladder (e-evidence-ladder), the phrase tagger (i-dissector), the unit chain and the evidence clock (i-envelope). Their CSS is injected by injectCSS() and uses --lx-* tokens only."
+  - "Field Notes link: learn_scope_scan.py flags ../field-notes/briefings.html as an internal link outside learn/, so the page names Field Notes in plain text only (scan not weakened). If Henry wants the link, the scanner needs field-notes/ on its internal allow-list."
+  - "path.yml v2 entry: no subtitle, short or outcome. The page dropped its subtitle to match. Suggested: subtitle 'Tag, check and weigh three real energy stories'; short 'Read a headline'; outcome 'Read an energy headline critically and spot a units or scale error.'"
+  - "The no-JS fallback inside the fallback:start/end markers of learn/n01-news-lens.qmd is generated from assets/learn/data/n01-news-lens.json by a small Node script (scratchpad n1build/fallback.js); worth adding to scripts/ so a data edit regenerates it. The test checks they agree."
+  - "Screenshot tool: the mid state is lesson-0 specific. This page supports learn/n01-news-lens.html#lx-demo (story 1 tagged and compared); a generic hook in learn_screenshots.mjs would remove the hash convention."

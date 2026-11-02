@@ -292,7 +292,7 @@
   tier2: analyst
   form: cards
   icon: globe
-  status: upcoming
+  status: active
   minutes: 20
   title: "How do you read an energy headline like a researcher?"
   does: "Dissect a headline: tag phrases with the seven lens questions, run a back-of-envelope check, then write your take in three sentences (claim, what would change your mind, confidence)."
@@ -329,7 +329,7 @@
   tier2: modeler
   form: cards
   icon: chart
-  status: upcoming
+  status: active
   minutes: 20
   title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
   does: "In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows."
