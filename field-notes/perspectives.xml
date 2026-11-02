@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Honglin Li</title>
+<link>https://henryutd2021.github.io/field-notes/perspectives.html</link>
+<atom:link href="https://henryutd2021.github.io/field-notes/perspectives.xml" rel="self" type="application/rss+xml"/>
+<description>Perspectives by Honglin Li on firm low-carbon power, large new loads and the future energy mix.</description>
+<image>
+<url>https://henryutd2021.github.io/images/profile-square.jpg</url>
+<title>Honglin Li</title>
+<link>https://henryutd2021.github.io/field-notes/perspectives.html</link>
+</image>
+<generator>quarto-1.10.19</generator>
+<lastBuildDate>Tue, 03 Nov 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System</title>
+  <dc:creator>Honglin Li</dc:creator>
+  <link>https://henryutd2021.github.io/field-notes/perspectives/2026-11-three-jobs.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>For the next two decades, the U.S. power system will rest on three pillars: renewables, nuclear and natural gas. The more useful way to say it is that the system needs three jobs done (cheap energy, firm capacity and flexibility), and each fuel is good at some of them. Gas will lose weight over that period, but it will remain a pillar until at least 2050. And in this decade the scarcest job is not cheap energy but firm capacity that can actually connect to the grid.</p>
+<section id="three-jobs-not-three-fuels" class="level2">
+<h2 class="anchored" data-anchor-id="three-jobs-not-three-fuels">Three jobs, not three fuels</h2>
+<p>Today these three pillars already carry the system: in 2025, gas supplied about 41% of U.S. utility-scale generation, nuclear about 18%, wind about 11% and solar about 7% (<a href="https://www.eia.gov/energyexplained/electricity/electricity-in-the-us.php">EIA</a>). Listing fuels, though, hides what each one is for.</p>
+<ul>
+<li><strong>Cheap energy.</strong> Wind and solar produce the cheapest megawatt-hours when they run, and they dominate what is being built: of the 86 GW planned for 2026, solar and batteries make up nearly 80% (<a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">EIA</a>). I count geothermal here too. The first next-generation geothermal units only began commercial operation this year (<a href="https://fervoenergy.com/fervo-energy-declares-commercial-operation-at-cape-station-ahead-of-schedule-leading-the-race-for-next-generation-geothermal-energy/">Fervo</a>), so its contribution is still ahead of us.</li>
+<li><strong>Firm capacity.</strong> Nuclear and gas run when the weather does not cooperate and when a large load needs power around the clock.</li>
+<li><strong>Flexibility.</strong> Batteries, hydrogen and flexible demand move energy in time. In my own work, hydrogen earned its place as a flexibility tool, not as a fourth pillar: in Texas, renewable hydrogen covered only a small share of industrial demand (<a href="https://doi.org/10.1016/j.ijhydene.2025.02.303"><em>International Journal of Hydrogen Energy</em>, 2025</a>), while at nuclear plants its value came from turning baseload output into a flexible product (<a href="https://doi.org/10.1038/s41467-026-73630-y"><em>Nature Communications</em>, 2026</a>).</li>
+</ul>
+<p>I leave fusion out of this picture. It may matter later, but it will not shape planning decisions made this decade.</p>
+</section>
+<section id="gas-still-a-pillar-with-less-weight" class="level2">
+<h2 class="anchored" data-anchor-id="gas-still-a-pillar-with-less-weight">Gas: still a pillar, with less weight</h2>
+<p>The Energy Information Administration’s 2026 outlook projects that gas, solar and wind together supply about 80% of U.S. generation by 2050 in most of its cases (<a href="https://eia.gov/pressroom/releases/press587.php">EIA, April 2026</a>). I read that as confirmation that gas stays a pillar for the next two decades. I expect its weight to shrink, and its role to move from bulk energy toward firm capacity that backs up renewables and large new loads.</p>
+<p>What no longer holds is the planning habit of assuming that a gas plant can appear whenever a model wants it. GE Vernova reports 122 GW of gas-turbine backlog and slot reservations, has sold delivery slots into 2032, and prices 2026 orders roughly 50% higher per kilowatt than 2025 orders (<a href="https://www.sec.gov/Archives/edgar/data/0001996810/000199681026000162/gevpressrelease3q26.htm">GE Vernova, Q3 2026</a>). The supply chain is not broken, so the assumption still holds in part. But a turbine slot is now a constraint with a date on it.</p>
+</section>
+<section id="why-now-the-scarce-job-is-firm-capacity-that-can-connect" class="level2">
+<h2 class="anchored" data-anchor-id="why-now-the-scarce-job-is-firm-capacity-that-can-connect">Why now: the scarce job is firm capacity that can connect</h2>
+<p>Data centers used about 4.7% of U.S. electricity in 2024, and the Lawrence Berkeley National Laboratory’s reference case reaches 11.8% by 2030 (<a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">LBNL, 2025 update</a>). That demand arrives faster than the grid can absorb it:</p>
+<ul>
+<li>Projects that reached operation in 2025 spent a median of more than five years in interconnection queues, and only 13% of the capacity that requested interconnection from 2000 to 2020 was built (<a href="https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics">LBNL Queued Up</a>).</li>
+<li>The country built 322 miles of new high-voltage (345 kV and above) transmission in 2024 (<a href="https://gridstrategiesllc.com/wp-content/uploads/ACEG_Grid-Strategies_Fewer-New-Miles-2025_vF.pdf">Grid Strategies and ACEG</a>).</li>
+<li>PJM’s 2028/29 capacity auction cleared at its price cap and still fell about 6.8 GW short of its reliability requirement (<a href="https://insidelines.pjm.com/pjm-capacity-auction-procures-138318-mw-of-generation-resources-as-work-continues-to-address-growing-electricity-demand/">PJM</a>).</li>
+</ul>
+<p>When connection is the bottleneck, waiting becomes a cost in its own right. In my work on delayed grid energization, the cost to the developer of a 300 MW (IT) data center waiting 36 months ran to the order of $0.7 billion in present value, and who ends up paying depended on how large-load tariffs are designed (<a href="https://github.com/Henryutd2021/code-delayed-energization">CoDE framework</a>).</p>
+</section>
+<section id="the-nuclear-pillar-starts-with-the-plants-we-already-have" class="level2">
+<h2 class="anchored" data-anchor-id="the-nuclear-pillar-starts-with-the-plants-we-already-have">The nuclear pillar starts with the plants we already have</h2>
+<p>The fastest firm, carbon-free megawatts are often the ones already built. In a study of 42 U.S. reactors at 2024 prices, nearly all had negative net present value when run as baseload plants; adding hydrogen production and grid services, with the assumed hydrogen credit, brought most of them above zero (<a href="https://doi.org/10.1038/s41467-026-73630-y"><em>Nature Communications</em>, 2026</a>). The same logic shows up in today’s news: DOE has offered up to $5 billion for uprates that add about 1.1 GW at eight existing plants (<a href="https://www.energy.gov/articles/energy-department-announces-5-billion-loan-boost-nuclear-power-and-help-lower-costs">DOE</a>), and retired reactors are being prepared for restart. New reactors are a different decision: for a reactor serving a hyperscale data center, I found that capital cost and policy, far more than operating choices, decide whether it beats grid supply (<a href="https://arxiv.org/abs/2608.10999"><em>Energy Conversion and Management</em>, accepted</a>).</p>
+</section>
+<section id="policy-should-pay-for-the-service-not-for-one-output" class="level2">
+<h2 class="anchored" data-anchor-id="policy-should-pay-for-the-service-not-for-one-output">Policy should pay for the service, not for one output</h2>
+<p>If the system needs three jobs, incentives should pay for the job a plant does. Today’s main clean-electricity credit pays per megawatt-hour generated. In the same data-center study, that design made it more expensive to use reactor steam for cooling, because every unit of steam sent to the chiller forgoes both electricity and its credit; an incentive meant to close a capital gap ends up discouraging the more efficient use of the plant. The tax law also treats the three jobs unevenly: wind and solar lose the main credits for projects placed in service after 2027 unless construction began by July 4, 2026, while nuclear, geothermal and storage keep them into the next decade (<a href="https://www.law.cornell.edu/uscode/text/26/45Y">26 U.S.C. § 45Y</a>). Paying for delivered services (energy, firm capacity, flexibility, and heat or cooling where it is used) would let each pillar compete for the job it does best.</p>
+</section>
+<section id="what-would-change-my-mind" class="level2">
+<h2 class="anchored" data-anchor-id="what-would-change-my-mind">What would change my mind</h2>
+<ul>
+<li>If gas-turbine delivery times fall back to about three years and gas’s share falls much faster than EIA projects, gas is a bridge, not a pillar.</li>
+<li>If enhanced geothermal reaches DOE’s cost goal at scale, it belongs among the firm-capacity sources as much as among the cheap-energy ones.</li>
+<li>If large loads show verified, measured flexibility in the gigawatts, flexibility becomes a pillar in its own right and the firm-capacity gap shrinks.</li>
+</ul>
+<hr>
+<p><em>Every item is checked against its primary source; the views are my own.</em></p>
+<p><em>Views are my own and do not represent my employer. Corrections are made in place and noted here with the date.</em></p>
+
+
+</section>
+
+ ]]></description>
+  <category>Large loads &amp; interconnection</category>
+  <category>Nuclear &amp; SMRs</category>
+  <category>Markets &amp; tariffs</category>
+  <category>Policy &amp; credits</category>
+  <guid>https://henryutd2021.github.io/field-notes/perspectives/2026-11-three-jobs.html</guid>
+  <pubDate>Tue, 03 Nov 2026 05:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

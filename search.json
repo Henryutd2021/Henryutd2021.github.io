@@ -1,5 +1,54 @@
 [
   {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "",
+    "text": "For the next two decades, the U.S. power system will rest on three pillars: renewables, nuclear and natural gas. The more useful way to say it is that the system needs three jobs done (cheap energy, firm capacity and flexibility), and each fuel is good at some of them. Gas will lose weight over that period, but it will remain a pillar until at least 2050. And in this decade the scarcest job is not cheap energy but firm capacity that can actually connect to the grid."
+  },
+  {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html#three-jobs-not-three-fuels",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html#three-jobs-not-three-fuels",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "Three jobs, not three fuels",
+    "text": "Three jobs, not three fuels\nToday these three pillars already carry the system: in 2025, gas supplied about 41% of U.S. utility-scale generation, nuclear about 18%, wind about 11% and solar about 7% (EIA). Listing fuels, though, hides what each one is for.\n\nCheap energy. Wind and solar produce the cheapest megawatt-hours when they run, and they dominate what is being built: of the 86 GW planned for 2026, solar and batteries make up nearly 80% (EIA). I count geothermal here too. The first next-generation geothermal units only began commercial operation this year (Fervo), so its contribution is still ahead of us.\nFirm capacity. Nuclear and gas run when the weather does not cooperate and when a large load needs power around the clock.\nFlexibility. Batteries, hydrogen and flexible demand move energy in time. In my own work, hydrogen earned its place as a flexibility tool, not as a fourth pillar: in Texas, renewable hydrogen covered only a small share of industrial demand (International Journal of Hydrogen Energy, 2025), while at nuclear plants its value came from turning baseload output into a flexible product (Nature Communications, 2026).\n\nI leave fusion out of this picture. It may matter later, but it will not shape planning decisions made this decade."
+  },
+  {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html#gas-still-a-pillar-with-less-weight",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html#gas-still-a-pillar-with-less-weight",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "Gas: still a pillar, with less weight",
+    "text": "Gas: still a pillar, with less weight\nThe Energy Information Administration’s 2026 outlook projects that gas, solar and wind together supply about 80% of U.S. generation by 2050 in most of its cases (EIA, April 2026). I read that as confirmation that gas stays a pillar for the next two decades. I expect its weight to shrink, and its role to move from bulk energy toward firm capacity that backs up renewables and large new loads.\nWhat no longer holds is the planning habit of assuming that a gas plant can appear whenever a model wants it. GE Vernova reports 122 GW of gas-turbine backlog and slot reservations, has sold delivery slots into 2032, and prices 2026 orders roughly 50% higher per kilowatt than 2025 orders (GE Vernova, Q3 2026). The supply chain is not broken, so the assumption still holds in part. But a turbine slot is now a constraint with a date on it."
+  },
+  {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html#why-now-the-scarce-job-is-firm-capacity-that-can-connect",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html#why-now-the-scarce-job-is-firm-capacity-that-can-connect",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "Why now: the scarce job is firm capacity that can connect",
+    "text": "Why now: the scarce job is firm capacity that can connect\nData centers used about 4.7% of U.S. electricity in 2024, and the Lawrence Berkeley National Laboratory’s reference case reaches 11.8% by 2030 (LBNL, 2025 update). That demand arrives faster than the grid can absorb it:\n\nProjects that reached operation in 2025 spent a median of more than five years in interconnection queues, and only 13% of the capacity that requested interconnection from 2000 to 2020 was built (LBNL Queued Up).\nThe country built 322 miles of new high-voltage (345 kV and above) transmission in 2024 (Grid Strategies and ACEG).\nPJM’s 2028/29 capacity auction cleared at its price cap and still fell about 6.8 GW short of its reliability requirement (PJM).\n\nWhen connection is the bottleneck, waiting becomes a cost in its own right. In my work on delayed grid energization, the cost to the developer of a 300 MW (IT) data center waiting 36 months ran to the order of $0.7 billion in present value, and who ends up paying depended on how large-load tariffs are designed (CoDE framework)."
+  },
+  {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html#the-nuclear-pillar-starts-with-the-plants-we-already-have",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html#the-nuclear-pillar-starts-with-the-plants-we-already-have",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "The nuclear pillar starts with the plants we already have",
+    "text": "The nuclear pillar starts with the plants we already have\nThe fastest firm, carbon-free megawatts are often the ones already built. In a study of 42 U.S. reactors at 2024 prices, nearly all had negative net present value when run as baseload plants; adding hydrogen production and grid services, with the assumed hydrogen credit, brought most of them above zero (Nature Communications, 2026). The same logic shows up in today’s news: DOE has offered up to $5 billion for uprates that add about 1.1 GW at eight existing plants (DOE), and retired reactors are being prepared for restart. New reactors are a different decision: for a reactor serving a hyperscale data center, I found that capital cost and policy, far more than operating choices, decide whether it beats grid supply (Energy Conversion and Management, accepted)."
+  },
+  {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html#policy-should-pay-for-the-service-not-for-one-output",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html#policy-should-pay-for-the-service-not-for-one-output",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "Policy should pay for the service, not for one output",
+    "text": "Policy should pay for the service, not for one output\nIf the system needs three jobs, incentives should pay for the job a plant does. Today’s main clean-electricity credit pays per megawatt-hour generated. In the same data-center study, that design made it more expensive to use reactor steam for cooling, because every unit of steam sent to the chiller forgoes both electricity and its credit; an incentive meant to close a capital gap ends up discouraging the more efficient use of the plant. The tax law also treats the three jobs unevenly: wind and solar lose the main credits for projects placed in service after 2027 unless construction began by July 4, 2026, while nuclear, geothermal and storage keep them into the next decade (26 U.S.C. § 45Y). Paying for delivered services (energy, firm capacity, flexibility, and heat or cooling where it is used) would let each pillar compete for the job it does best."
+  },
+  {
+    "objectID": "field-notes/perspectives/2026-11-three-jobs.html#what-would-change-my-mind",
+    "href": "field-notes/perspectives/2026-11-three-jobs.html#what-would-change-my-mind",
+    "title": "Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System",
+    "section": "What would change my mind",
+    "text": "What would change my mind\n\nIf gas-turbine delivery times fall back to about three years and gas’s share falls much faster than EIA projects, gas is a bridge, not a pillar.\nIf enhanced geothermal reaches DOE’s cost goal at scale, it belongs among the firm-capacity sources as much as among the cheap-energy ones.\nIf large loads show verified, measured flexibility in the gigawatts, flexibility becomes a pillar in its own right and the firm-capacity gap shrinks.\n\n\nEvery item is checked against its primary source; the views are my own.\nViews are my own and do not represent my employer. Corrections are made in place and noted here with the date."
+  },
+  {
     "objectID": "field-notes/data-tools.html",
     "href": "field-notes/data-tools.html",
     "title": "Data & Tools for Energy-Systems Modeling",
@@ -326,14 +375,21 @@
     "href": "field-notes.html",
     "title": "Field Notes",
     "section": "",
-    "text": "Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. Briefings pick a few developments every two weeks and say why they matter for planning and modeling. The Data & Tools guide collects the public data and software I use, with the pitfalls I have run into. Perspectives, one claim at a time, will follow.\n Briefings RSS  Data & Tools guide"
+    "text": "Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. Briefings pick a few developments every two weeks and say why they matter for planning and modeling. Perspectives argue one claim at a time. The Data & Tools guide collects the public data and software I use, with the pitfalls I have run into.\n Briefings RSS  Perspectives RSS  Data & Tools guide"
   },
   {
     "objectID": "field-notes.html#briefings",
     "href": "field-notes.html#briefings",
     "title": "Field Notes",
     "section": "Latest briefings",
-    "text": "Latest briefings\n\n\n\n\n\nBriefing — 3 November 2026\n\n\n\nLarge loads & interconnection\n\nMarkets & tariffs\n\nNuclear & SMRs\n\nHydrogen\n\nPolicy & credits\n\nData & methods\n\n\n\nExelon’s data-center load by maturity, PJM at FERC on flat large loads, gas-turbine backlogs, DOE’s uprate loan, the EU hydrogen review and an ERCOT data note.\n\n\n\n\n\nNov 3, 2026\n\n\n\n\n\nNo matching items\n\nAll briefings \n\n\nEvery item is checked against its primary source. Views are my own and do not represent my employer."
+    "text": "Latest briefings\n\n\n\n\n\nBriefing — 3 November 2026\n\n\n\nLarge loads & interconnection\n\nMarkets & tariffs\n\nNuclear & SMRs\n\nHydrogen\n\nPolicy & credits\n\nData & methods\n\n\n\nExelon’s data-center load by maturity, PJM at FERC on flat large loads, gas-turbine backlogs, DOE’s uprate loan, the EU hydrogen review and an ERCOT data note.\n\n\n\n\n\nNov 3, 2026\n\n\n\n\n\nNo matching items\n\nAll briefings"
+  },
+  {
+    "objectID": "field-notes.html#perspectives",
+    "href": "field-notes.html#perspectives",
+    "title": "Field Notes",
+    "section": "Perspectives",
+    "text": "Perspectives\n\n\n\n\n\nThree Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System\n\n\nThrough 2050 the U.S. grid will rest on three jobs rather than three fuels: cheap energy, firm capacity and flexibility. This decade the scarce job is firm capacity that can actually connect, and policy should pay for the service a plant delivers.\n\n\n\n\n\nNov 3, 2026\n\n\n\n\n\nNo matching items\n\nAll perspectives \n\nEvery item is checked against its primary source. Views are my own and do not represent my employer."
   },
   {
     "objectID": "field-notes/briefings/2026-11-03.html",
@@ -390,5 +446,12 @@
     "title": "Briefing — 3 November 2026",
     "section": "What I’m watching",
     "text": "What I’m watching\n\nOf the gigawatts that utilities call high probability, how many will be energized on their original dates? Will utilities start reporting that conversion rate?\nWill FERC and NERC turn large-load ride-through and interim, non-firm service into binding rules, and how soon?\nWill turbine slot reservations keep converting to firm orders at this pace, or start to lapse?\n\n\nEvery item is checked against its primary source; the views are my own.\nViews are my own and do not represent my employer. Corrections are made in place and noted here with the date."
+  },
+  {
+    "objectID": "field-notes/perspectives.html",
+    "href": "field-notes/perspectives.html",
+    "title": "Perspectives",
+    "section": "",
+    "text": "Every item is checked against its primary source. Views are my own and do not represent my employer.\n\n\n\n\n\n\n\n\n\n\nThree Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System\n\n\nThrough 2050 the U.S. grid will rest on three jobs rather than three fuels: cheap energy, firm capacity and flexibility. This decade the scarce job is firm capacity that can actually connect, and policy should pay for the service a plant delivers.\n\n\n\n\n\nNov 3, 2026\n\n\n\n\n\nNo matching items"
   }
 ]

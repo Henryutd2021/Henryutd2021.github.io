@@ -109,6 +109,34 @@ ul.task-list li input[type="checkbox"] {
       window['quarto-listing-loaded']();
     }
   })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-latest-perspectives .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-date','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-latest-perspectives'] = new List('listing-latest-perspectives', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
   </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
 <meta name="theme-color" content="#ffffff">
@@ -429,8 +457,8 @@ window.Quarto = {
 <!-- Field Notes hub (website v3, reports/08_field_notes_design.md). draft: true until the first briefing is
      approved; then the navbar item is added in _quarto.yml. Listings skip draft posts. -->
 <div class="fn-intro">
-<p>Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. <strong>Briefings</strong> pick a few developments every two weeks and say why they matter for planning and modeling. The <strong>Data &amp; Tools</strong> guide collects the public data and software I use, with the pitfalls I have run into. <strong>Perspectives</strong>, one claim at a time, will follow.</p>
-<p><a href="field-notes/briefings.xml" class="btn-outline"><i class="bi bi-rss" aria-hidden="true"></i> Briefings RSS</a> <a href="./field-notes/data-tools.html" class="btn-outline"><i class="bi bi-database" aria-hidden="true"></i> Data &amp; Tools guide</a></p>
+<p>Notes from the intersection I work on: large new electricity loads such as AI data centers and electrolyzers, and the clean firm power that could serve them. <strong>Briefings</strong> pick a few developments every two weeks and say why they matter for planning and modeling. <strong>Perspectives</strong> argue one claim at a time. The <strong>Data &amp; Tools</strong> guide collects the public data and software I use, with the pitfalls I have run into.</p>
+<p><a href="field-notes/briefings.xml" class="btn-outline"><i class="bi bi-rss" aria-hidden="true"></i> Briefings RSS</a> <a href="field-notes/perspectives.xml" class="btn-outline"><i class="bi bi-rss" aria-hidden="true"></i> Perspectives RSS</a> <a href="./field-notes/data-tools.html" class="btn-outline"><i class="bi bi-database" aria-hidden="true"></i> Data &amp; Tools guide</a></p>
 </div>
 <section id="briefings" class="level2">
 <h2 class="anchored" data-anchor-id="briefings">Latest briefings</h2>
@@ -472,11 +500,32 @@ Nov 3, 2026
 <div class="listing-no-matching d-none">No matching items</div>
 </div>
 <p><a href="./field-notes/briefings.html">All briefings <i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
-<!-- Perspectives section: restore when the first perspective is published
-## Perspectives {#perspectives}
-::: {#latest-perspectives}
-:::
--->
+</section>
+<section id="perspectives" class="level2">
+<h2 class="anchored" data-anchor-id="perspectives">Perspectives</h2>
+<div id="listing-latest-perspectives" class="quarto-listing quarto-listing-container-default">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-categories="TGFyZ2UlMjBsb2FkcyUyMCUyNiUyMGludGVyY29ubmVjdGlvbiUyQ051Y2xlYXIlMjAlMjYlMjBTTVJzJTJDTWFya2V0cyUyMCUyNiUyMHRhcmlmZnMlMkNQb2xpY3klMjAlMjYlMjBjcmVkaXRz" data-listing-date-sort="1793682000000" data-listing-file-modified-sort="1793642014234" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1016">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./field-notes/perspectives/2026-11-three-jobs.html" class="no-external">Three Pillars, Three Jobs: How Renewables, Nuclear and Gas Will Share the U.S. Power System</a>
+</h3>
+<div class="delink listing-description"><a href="./field-notes/perspectives/2026-11-three-jobs.html" class="no-external">
+<p>Through 2050 the U.S. grid will rest on three jobs rather than three fuels: cheap energy, firm capacity and flexibility. This decade the scarce job is firm capacity that can actually connect, and policy should pay for the service a plant delivers.</p>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./field-notes/perspectives/2026-11-three-jobs.html" class="no-external">
+<div class="listing-date">
+Nov 3, 2026
+</div>
+</a>
+</div>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div>
+<p><a href="./field-notes/perspectives.html">All perspectives <i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
 <div class="fn-disclosure">
 <p>Every item is checked against its primary source. Views are my own and do not represent my employer.</p>
 </div>
