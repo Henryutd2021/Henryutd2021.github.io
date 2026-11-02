@@ -197,6 +197,11 @@ include-in-header:
     <div class="section-title"><h2 id="h-code">Open-source model frameworks</h2><a href="software-data.html">Software <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
     <p class="sec-lede">Documented model frameworks associated with published and accepted research: formulations, data pipelines and runnable implementations with examples and tests.</p>
     <ul class="fw-grid">
+      <li><a class="card fw theme-hydrogen" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">
+        <span class="fw-theme">Hydrogen systems</span>
+        <span class="fw-name">nuclear-hydrogen-integration</span>
+        <span class="fw-desc">Nuclear plants with electrolysis, storage and ancillary services: hourly operation and lifecycle economics.</span>
+        <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
       <li><a class="card fw theme-hydrogen" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">
         <span class="fw-theme">Hydrogen systems</span>
         <span class="fw-name">txh2-ercot-hydrogen</span>

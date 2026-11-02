@@ -8,6 +8,7 @@
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
+<a class="btn-xs" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">Code</a>
 <a class="btn-xs" href="projects/npph2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 3</a>

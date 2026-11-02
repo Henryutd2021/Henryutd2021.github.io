@@ -24,7 +24,7 @@ Documented model frameworks associated with published and accepted research. Eac
 :::
 
 ::: {.sw-facts}
-[8]{.sf-n}[framework repositories]{.sf-l}
+[9]{.sf-n}[framework repositories]{.sf-l}
 
 [Python]{.sf-n}[3.10 or later, pip or conda]{.sf-l}
 
@@ -96,6 +96,34 @@ One repository per framework, each with the paper or papers it accompanies.
 :::
 
 ::: {.repo-grid}
+
+<!-- NPPH2 (2026-11-02; published by Henry with scripts/henry_release_npph2_2026-11-02.sh; no PJM data) -->
+::: {.repo .theme-hydrogen}
+::: {.repo-top}
+[<i class="bi bi-droplet-half" aria-hidden="true"></i>]{.repo-icon} [Hydrogen systems]{.repo-theme} [Hourly MILP and lifecycle TEA]{.repo-type}
+:::
+
+### Nuclear–hydrogen integration framework
+
+[Henryutd2021/nuclear-hydrogen-integration]{.repo-slug}
+
+Hourly operation and sizing of a nuclear plant with high-temperature electrolysis, hydrogen storage and batteries, selling energy, hydrogen and ancillary services, linked to a lifecycle cash-flow model with federal tax credits. Runs on synthetic data; PJM market inputs require authorization from PJM.
+
+::: {.repo-papers}
+[Accompanies]{.label}
+
+- [Nature Communications (2026)](projects/npph2.qmd)
+:::
+
+::: {.repo-tools}
+[Python]{.chip} [linopy]{.chip} [HiGHS]{.chip} [Gurobi (optional)]{.chip}
+:::
+
+::: {.repo-actions}
+[<i class="bi bi-github" aria-hidden="true"></i> GitHub](https://github.com/Henryutd2021/nuclear-hydrogen-integration){.btn-outline .btn-sm-x}
+[<i class="bi bi-journal-text" aria-hidden="true"></i> Formulation](https://github.com/Henryutd2021/nuclear-hydrogen-integration/blob/main/docs/formulation.md){.btn-quiet}
+:::
+:::
 
 <!-- SMR cogeneration (website v2, 2026-11-02; published by Henry with scripts/henry_release_nuclear_dc_2026-11-02.sh) -->
 ::: {.repo .theme-datacenter}
