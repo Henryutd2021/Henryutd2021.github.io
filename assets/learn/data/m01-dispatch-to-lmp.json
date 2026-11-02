@@ -1,0 +1,58 @@
+{
+ "about": "M1 (From dispatch to locational prices). Prairie Town's fleet from lesson 0 (town.json) on lesson 0's real day, 3 September 2025 (Southwest Power Pool shapes from EIA-930 in town_year.json, cut and scaled exactly as assets/learn/grid-operator.js prepare() does; _tests/learn/test_m01-dispatch-to-lmp.js checks the arrays below against it). Part A solves the day on one bus; part B places the plants on three buses joined by three lines of equal reactance (DC power flow). Plant sizes, costs, the network and every line limit are illustrative. The reference block is a precomputed solve (110 MW case, labelled precomputed on the page); the Node test re-solves it.",
+ "accessed": "2026-11-02",
+ "day": {
+  "date": "2025-09-03",
+  "label": "3 September 2025",
+  "units": "MW, hour by hour (local time, Central daylight time)",
+  "demand": [250, 243, 238, 235, 236, 237, 253, 260, 266, 278, 286, 300, 311, 327, 340, 344, 353, 349, 344, 331, 319, 303, 285, 269],
+  "wind": [30, 28, 28, 30, 36, 42, 43, 48, 46, 35, 36, 38, 35, 33, 33, 37, 47, 54, 59, 72, 89, 98, 95, 89],
+  "solar": [0, 0, 0, 0, 0, 0, 0, 7, 70, 118, 130, 147, 156, 149, 112, 147, 161, 130, 70, 14, 0, 0, 0, 0]
+ },
+ "fleet": {
+  "nuclear": { "label": "Nuclear plant", "short": "Nuclear", "mw": 100, "cost": 10, "bus": "T", "flat": true, "color": "var(--lx-nuc)" },
+  "wind": { "label": "Wind farm", "short": "Wind", "mw": 150, "cost": 0, "bus": "R", "color": "var(--lx-wind)" },
+  "solar": { "label": "Solar farm", "short": "Solar", "mw": 200, "cost": 0, "bus": "R", "color": "var(--lx-solar)" },
+  "cc": { "label": "Gas combined-cycle plant", "short": "Gas CC", "mw": 150, "cost": 40, "ramp": 40, "start": 115, "bus": "G", "color": "var(--lx-cc)" },
+  "pk": { "label": "Gas peaker", "short": "Peaker", "mw": 100, "cost": 100, "bus": "G", "color": "var(--lx-pk)" }
+ },
+ "buses": [
+  { "id": "T", "name": "Prairie Town", "short": "Town", "color": "var(--lx-demand)", "reference": true },
+  { "id": "R", "name": "Wind Ridge", "short": "Ridge", "color": "var(--lx-wind)" },
+  { "id": "G", "name": "Gas Hub", "short": "Gas Hub", "color": "var(--lx-cc)" }
+ ],
+ "lines": [
+  { "id": "RT", "from": "R", "to": "T", "name": "Ridge–Town", "b": 1000, "limit": 200 },
+  { "id": "RG", "from": "R", "to": "G", "name": "Ridge–Gas Hub", "b": 1000, "limit": 200 },
+  { "id": "GT", "from": "G", "to": "T", "name": "Gas Hub–Town", "b": 1000, "limit": 200 }
+ ],
+ "units_note": "b is the line's susceptance in MW per radian (1/x on a 100 MVA base with x = 0.1 per unit), equal on all three lines; flow = b x (angle difference).",
+ "lesson": {
+  "t8Hour": 19,
+  "rampHour": 14,
+  "noon": 12,
+  "split": { "from": "R", "to": "T", "mw": 90 },
+  "slider": { "line": "RT", "min": 90, "max": 200, "step": 10, "start": 200, "example": 110 },
+  "eps": 0.1
+ },
+ "reference": {
+  "label": "precomputed: Ridge–Town limit 110 MW, 12:00",
+  "limit": 110,
+  "hour": 12,
+  "cost": 133160,
+  "price": { "T": 80, "R": 0, "G": 40 },
+  "flow": { "RT": 110, "RG": 9, "GT": 101 },
+  "mu": 120,
+  "rent": 13200,
+  "cc": 92,
+  "ridge": 119,
+  "ridgeAvail": 191,
+  "congestedHours": [9, 18]
+ },
+ "sources": {
+  "ferc-primer": { "text": "FERC staff, Energy Primer: A Handbook of Energy Market Basics, chapter 3, p. 64", "url": "https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf", "asOf": "April 2020 edition; checked 2 November 2026" },
+  "ferc-markets": { "text": "FERC, Electric Power Markets", "url": "https://www.ferc.gov/electric-power-markets", "asOf": "page accessed 2 November 2026 (regional-grid dossier, verified)" },
+  "eia-930": { "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool", "url": "https://www.eia.gov/electricity/gridmonitor/", "asOf": "2025 data, accessed 2 November 2026" },
+  "highs": { "text": "HiGHS, open-source linear and mixed-integer solver (documentation)", "url": "https://ergo-code.github.io/HiGHS/", "asOf": "solver 1.15 in the browser; accessed 2 November 2026" }
+ }
+}
