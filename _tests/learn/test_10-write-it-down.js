@@ -1,0 +1,142 @@
+// test_10-write-it-down.js — Node tests for Lesson 10 (assets/learn/10-write-it-down.js), its data
+// (assets/learn/data/10-write-it-down.json) and every number the page (learn/10-write-it-down.qmd) states.
+//   - the hour is lesson 0's 19:00 (grid-operator.js prepare()), and its gas need is the page's 145 MW
+//   - solve2() (exact two-variable LP) agrees with HiGHS on 3,000 random cases: status and best cost
+//   - the four outcomes appear where the page says (slack, binding, infeasible, tied, unbounded, lights out)
+//   - the simplex walk goes downhill corner by corner and ends at the best corner
+//   - the card sort's answer key; the page's numbers, Python snippet and fallback figure
+// Usage (from the site folder):  node _tests/learn/test_10-write-it-down.js [--write]   (--write: the fallback figure)
+"use strict";
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const SITE = path.resolve(__dirname, "..", "..");
+const L = p => path.join(SITE, "assets/learn", p);
+const WRITE = process.argv.includes("--write");
+const ctx = { window: { LX: {} }, module: { exports: {} }, performance };
+vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), ctx);
+const { core, VERSION } = ctx.module.exports;
+const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
+const M = require(L("10-write-it-down.js"));
+const M0 = require(L("grid-operator.js"));
+const town = JSON.parse(fs.readFileSync(L("data/town.json"), "utf8"));
+const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
+const D = JSON.parse(fs.readFileSync(L("data/10-write-it-down.json"), "utf8"));
+const QPATH = path.join(SITE, "learn/10-write-it-down.qmd");
+let checks = 0, fails = 0;
+function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
+const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
+const money = v => "$" + Math.round(v).toLocaleString("en-US");
+let seed = 20261102;
+const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+
+(async () => {
+  const highs = await loadHighs();
+  const day = M.dayOf(town, year), W0 = M0.prepare(town, year, "lesson0"), f = town.fleet, h = D.hour;
+  ["demand", "wind", "solar", "need"].forEach(k => ok(day[k].join() === W0[k].join(), `day: ${k} equals lesson 0's`));
+  const p = M.params(town, day, D), s = M.solve2(p);
+  ok(p.D === 145 && day.need[h] === 145, `hour: gas needed at ${h}:00 is 145 MW (${p.D})`);
+  ok(day.wind[h] + day.solar[h] === 86, `hour: 86 MW of wind and sun could be spilled at ${h}:00`);
+  ok(s.status === "optimal" && near(s.x, 145) && near(s.y, 0) && near(s.cost, 5800), `default: one best corner (145, 0) at $5,800 (${s.status} ${s.x} ${s.y} ${s.cost})`);
+  ok(near(s.co2, 53.65) && !s.binding.co2 && s.binding.demand, "default: 53.65 t of CO2, cap slack, demand binding");
+  ok(s.corners.length === 5, `default: the region is a pentagon (${s.corners.length} corners)`);
+
+  // ---------------- exact two-variable LP against HiGHS
+  const hi = q => {
+    const m = { sense: "min", variables: [{ name: "x", ub: q.on.cc ? q.X : Infinity, cost: q.cx }, { name: "y", ub: q.on.pk ? q.Y : Infinity, cost: q.cy }], constraints: [] };
+    if (q.on.demand) m.constraints.push({ name: "demand", terms: { x: 1, y: 1 }, ge: q.D });
+    if (q.on.co2) m.constraints.push({ name: "co2", terms: { x: q.ex, y: q.ey }, le: q.cap });
+    if (!m.constraints.length) m.constraints.push({ name: "dummy", terms: { x: 1 }, ge: 0 });
+    return core.solveWith(highs, m, {});
+  };
+  let agree = 0, n = 0;
+  for (let k = 0; k < 3000; k++) {
+    const q = M.params(town, day, D, { D: Math.round(rnd() * 240), cap: Math.round(rnd() * 150), cx: Math.round(rnd() * 34 - 4) * 5, cy: Math.round(rnd() * 34 - 4) * 5,
+      on: { demand: rnd() > 0.1, cc: rnd() > 0.25, pk: rnd() > 0.25, co2: rnd() > 0.25 } });
+    const a = M.solve2(q), b = hi(q); n++;
+    const same = (a.status === "infeasible" && b.status === "infeasible") ||
+      (a.status === "unbounded" && (b.status === "unbounded" || b.status === "infeasible-or-unbounded")) ||
+      ((a.status === "optimal" || a.status === "tied") && b.status === "optimal" && near(a.cost, b.objective, 1e-6 * (1 + Math.abs(b.objective))));
+    if (same) agree++; else if (n - agree <= 3) console.log("  mismatch:", JSON.stringify({ D: q.D, cap: q.cap, cx: q.cx, cy: q.cy, on: q.on }), a.status, a.cost, b.status, b.objective);
+  }
+  ok(agree === n, `solve2 agrees with HiGHS on ${agree} of ${n} random cases`);
+
+  // ---------------- the steps' outcomes
+  const s200 = M.solve2(M.params(town, day, D, { D: 200 }));
+  ok(s200.status === "optimal" && near(s200.x, 150) && near(s200.y, 50) && near(s200.cost, 11000), `demand 200: the corner jumps to (150, 50), $11,000 (${s200.x}, ${s200.y}, ${s200.cost})`);
+  ok(M.solve2(M.params(town, day, D, { D: 150 })).y === 0 && M.solve2(M.params(town, day, D, { D: 155 })).y > 0, "demand: the peaker enters just above 150 MW");
+  const minCO2 = f.cc.co2 * 145;
+  ok(M.solve2(M.params(town, day, D, { cap: Math.ceil(minCO2) })).status === "optimal" && !M.solve2(M.params(town, day, D, { cap: Math.ceil(minCO2) })).binding.co2, "cap 54 t: still feasible and slack");
+  ok(M.solve2(M.params(town, day, D, { cap: minCO2 })).binding.co2, "cap 53.65 t: binding at the best corner");
+  ok(M.solve2(M.params(town, day, D, { cap: Math.floor(minCO2) })).status === "infeasible", "cap 53 t: infeasible");
+  ok(D.ranges.cap[0] < minCO2 && D.cap > minCO2, "cap slider: starts slack and can reach infeasible");
+  const tie = M.solve2(M.params(town, day, D, { cy: f.cc.cost }));
+  ok(tie.status === "tied" && tie.best.length === 2 && near(tie.cost, 5800), `equal costs: tied along an edge (${tie.best.map(v => "(" + v.x + "," + v.y + ")")}) at $5,800`);
+  ok(tie.best.some(v => near(v.x, 45) && near(v.y, 100)) && tie.best.some(v => near(v.x, 145) && near(v.y, 0)), "equal costs: the tied edge runs from (45, 100) to (145, 0)");
+  const unb = M.solve2(M.params(town, day, D, { cx: -10, on: { cc: false, co2: false } }));
+  ok(unb.status === "unbounded" && unb.ray && unb.ray[0] > 0, "paid to run, no size, no cap: unbounded along +x");
+  ok(M.solve2(M.params(town, day, D, { cx: -10, on: { cc: false } })).status === "optimal", "paid to run, no size but the CO2 cap on: still bounded");
+  ok(M.solve2(M.params(town, day, D, { cx: -10, on: { co2: false } })).status === "optimal", "paid to run, cap off but the size rule on: still bounded");
+  const dark = M.solve2(M.params(town, day, D, { on: { demand: false } }));
+  ok(dark.status === "optimal" && dark.x === 0 && dark.y === 0, "no demand rule: the cheapest plan makes nothing");
+  ok(D.ranges.cost[0] < 0, "cost slider reaches below $0");
+  const lv = D.level0; ok(lv > s.cost && lv <= D.ranges.level[1], "cost line starts above the best cost");
+  ok(M.check(p, { x: D.dot[0], y: D.dot[1] }).ok === false, "the plan dot starts outside the region (so the reader moves it in)");
+
+  // ---------------- simplex walk
+  const walk = M.simplexWalk(p);
+  ok(walk.length >= 2 && near(walk[walk.length - 1].cost, s.cost) && near(walk[walk.length - 1].x, 145), `walk: ends at the best corner (${walk.map(v => Math.round(v.cost)).join(" > ")})`);
+  ok(walk.every((v, i) => !i || v.cost < walk[i - 1].cost - 1e-9), "walk: every step is downhill");
+  ok(walk.slice(1).every(v => v.along), "walk: every step follows an edge (a rule line)");
+  ok(near(walk[0].cost, Math.max(...s.corners.map(v => M.costOf(p, v)))), "walk: starts at the most expensive corner");
+
+  // ---------------- card sort
+  const key = {}; D.cards.forEach(c => { key[c.id] = c.bin; });
+  const g = M.grade(D.cards, key);
+  ok(g.right === 10 && g.total === 10, "cards: the answer key grades 10 of 10");
+  const byBin = {}; D.cards.forEach(c => { byBin[c.bin] = (byBin[c.bin] || 0) + 1; });
+  ok(byBin.decision === 3 && byBin.goal === 1 && byBin.rule === 3 && byBin.given === 3, `cards: 3 decisions, 1 goal, 3 rules, 3 given (${JSON.stringify(byBin)})`);
+  ok(D.bins.map(b => b.id).join() === "decision,goal,rule,given" && D.cards.every(c => c.why && c.why.length < 140), "cards: four bins and a short reason on every card");
+  ok(M.grade(D.cards, {}).placed === 0, "cards: grading an empty sort");
+
+  // ---------------- the page
+  if (fs.existsSync(QPATH)) {
+    let Q = fs.readFileSync(QPATH, "utf8");
+    const svg = fallbackSVG(p, s);
+    if (WRITE) { Q = Q.replace(/<!-- fallback-svg:start -->[\s\S]*?<!-- fallback-svg:end -->/, "<!-- fallback-svg:start -->\n" + svg + "\n<!-- fallback-svg:end -->"); fs.writeFileSync(QPATH, Q); console.log("wrote the fallback figure"); }
+    ok(Q.includes(svg), "page: the static fallback figure matches the model");
+    ["145 MW", money(s.cost).replace("$", "\\$"), "53.7 t", money(s200.cost).replace("$", "\\$"), "86 MW", "$x = 150$, $y = 50$", "$11,000"].forEach(x => ok(Q.includes(x), `page: states ${x}`));
+    ok(Q.includes("A_ub=[[-1, -1],") && Q.includes("[0.37, 0.55]]") && Q.includes("b_ub=[-145, " + D.cap + "]") && Q.includes("bounds=[(0, 150), (0, 100)]") && Q.includes("# [145.   0.] 5800.0"), "page: the Python snippet uses the model's numbers and its printed answer");
+    ok(Q.includes("-145\\\\ " + D.cap + "\\end"), "page: the matrix form uses the model's numbers");
+    ok(!/learning[- ]curve|FOAK|NOAK/i.test(Q), "page: no excluded terms");
+  } else ok(false, "page: learn/10-write-it-down.qmd missing");
+
+  console.log(`${checks} checks, ${fails} failed`);
+  process.exit(fails ? 1 : 0);
+})().catch(e => { console.log("FAIL:", e && e.stack || e); process.exit(1); });
+
+// the static figure for readers without JavaScript: the region, the rule lines and the best corner
+function fallbackSVG(p, s) {
+  const view = D.view, Wd = 720, Hh = 400, m = { l: 50, r: 12, t: 14, b: 44 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b;
+  const sx = x => (m.l + (x - view.x[0]) / (view.x[1] - view.x[0]) * iw).toFixed(1), sy = y => (m.t + ih - (y - view.y[0]) / (view.y[1] - view.y[0]) * ih).toFixed(1);
+  const out = [`<svg viewBox="0 0 ${Wd} ${Hh}" role="img" aria-labelledby="w10-static-title">`,
+    `<title id="w10-static-title">Plans for the two gas plants at 19:00: combined-cycle output across, peaker output up. The shaded region meets every rule; the best plan is the corner x = ${s.x} MW, y = ${s.y} MW, costing $${Math.round(s.cost).toLocaleString("en-US")}.</title>`];
+  let g = "<g>";
+  for (let x = 0; x <= view.x[1]; x += 40) g += `<line x1="${sx(x)}" x2="${sx(x)}" y1="${sy(0)}" y2="${sy(view.y[1])}" stroke="var(--lx-line)"/><text x="${sx(x)}" y="${Hh - 24}" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">${x}</text>`;
+  for (let y = 0; y <= view.y[1]; y += 40) g += `<line x1="${sx(0)}" x2="${sx(view.x[1])}" y1="${sy(y)}" y2="${sy(y)}" stroke="var(--lx-line)"/><text x="${m.l - 6}" y="${(+sy(y) + 4).toFixed(1)}" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">${y}</text>`;
+  g += `<text x="${sx(view.x[1])}" y="${Hh - 6}" text-anchor="end" font-size="13" fill="var(--lx-ink-2)">Combined-cycle x (MW)</text><text x="${m.l + 4}" y="${m.t + 12}" font-size="13" fill="var(--lx-ink-2)">Peaker y (MW)</text>`;
+  out.push(g + "</g>");
+  const poly = M.clipPolygon(p, view);
+  out.push(`<polygon points="${poly.map(v => sx(v[0]) + "," + sy(v[1])).join(" ")}" fill="color-mix(in srgb, var(--lx-accent) 16%, transparent)"/>`);
+  const col = { demand: "var(--lx-ink)", cc: "var(--lx-cc)", pk: "var(--lx-pk)", co2: "var(--lx-warn)" }, lab = { demand: "Demand", cc: "Combined-cycle size", pk: "Peaker size", co2: "CO₂ cap" };
+  M.rulesOf(p).forEach(r => {
+    const seg = M.clipLine(r.a, r.b, view); if (!seg) return;
+    out.push(`<line x1="${sx(seg[0][0])}" y1="${sy(seg[0][1])}" x2="${sx(seg[1][0])}" y2="${sy(seg[1][1])}" stroke="${col[r.id]}" stroke-width="2"${r.id === "cc" || r.id === "pk" ? ' stroke-dasharray="6 4"' : ""}/>`);
+    const f = r.id === "demand" ? 0.82 : r.id === "co2" ? 0.2 : 0.5, lx = seg[0][0] + f * (seg[1][0] - seg[0][0]), ly = seg[0][1] + f * (seg[1][1] - seg[0][1]);
+    out.push(`<text x="${(+sx(lx) + 6).toFixed(1)}" y="${(+sy(ly) - 6).toFixed(1)}" font-size="13" fill="${col[r.id]}">${lab[r.id]}</text>`);
+  });
+  out.push(`<circle cx="${sx(s.x)}" cy="${sy(s.y)}" r="8" fill="var(--lx-good)" stroke="var(--lx-surface)" stroke-width="2.5"/>`);
+  out.push(`<text x="${(+sx(s.x) - 10).toFixed(1)}" y="${(+sy(s.y) - 14).toFixed(1)}" text-anchor="end" font-size="13" fill="var(--lx-good)">Best: $${Math.round(s.cost).toLocaleString("en-US")}</text>`);
+  out.push("</svg>");
+  return out.join("\n");
+}

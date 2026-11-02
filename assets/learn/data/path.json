@@ -556,8 +556,8 @@
     "title": "How does storage move energy through time?",
     "short": "Storage",
     "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
-    "href": "index.html#lesson-9",
-    "ready": false
+    "href": "09-storage.html",
+    "ready": true
    }
   },
   {
@@ -566,7 +566,7 @@
    "total": 14,
    "code": null,
    "title": "How does storage move energy through time?",
-   "subtitle": null,
+   "subtitle": "Charge with midday sun, discharge at sunset",
    "short": "Storage",
    "tier": "analyst",
    "tier2": null,
@@ -580,10 +580,16 @@
    "icon": "battery",
    "form": "cards",
    "scales": [],
-   "teaches": [],
+   "teaches": [
+    "energy storage",
+    "round-trip efficiency",
+    "state of charge",
+    "valuing storage",
+    "linear programming"
+   ],
    "lab": null,
-   "href": "index.html#lesson-9",
-   "ready": false,
+   "href": "09-storage.html",
+   "ready": true,
    "after": [
     {
      "id": "02-demand",
@@ -619,8 +625,8 @@
     "title": "Write it down: what are the decisions, the goal and the rules?",
     "short": "Write it down",
     "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
-    "href": "index.html#lesson-10",
-    "ready": false
+    "href": "10-write-it-down.html",
+    "ready": true
    }
   },
   {
@@ -629,7 +635,7 @@
    "total": 14,
    "code": null,
    "title": "Write it down: what are the decisions, the goal and the rules?",
-   "subtitle": null,
+   "subtitle": "Sort a model into its parts, then find the best plan on a graph",
    "short": "Write it down",
    "tier": "analyst",
    "tier2": null,
@@ -643,10 +649,17 @@
    "icon": "pencil",
    "form": "cards",
    "scales": [],
-   "teaches": [],
+   "teaches": [
+    "decision variables",
+    "objective",
+    "constraints",
+    "parameters",
+    "feasible region",
+    "linear programming outcomes"
+   ],
    "lab": null,
-   "href": "index.html#lesson-10",
-   "ready": false,
+   "href": "10-write-it-down.html",
+   "ready": true,
    "after": [
     {
      "id": "00-grid-operator",
@@ -673,8 +686,8 @@
     "title": "How does storage move energy through time?",
     "short": "Storage",
     "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
-    "href": "index.html#lesson-9",
-    "ready": false
+    "href": "09-storage.html",
+    "ready": true
    },
    "next": {
     "id": "11-solver",
@@ -682,8 +695,8 @@
     "title": "Ask the solver, then check its answer",
     "short": "Ask the solver",
     "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
-    "href": "index.html#lesson-11",
-    "ready": false
+    "href": "11-solver.html",
+    "ready": true
    }
   },
   {
@@ -692,7 +705,7 @@
    "total": 14,
    "code": null,
    "title": "Ask the solver, then check its answer",
-   "subtitle": null,
+   "subtitle": "HiGHS in your browser: solve, check, and read prices",
    "short": "Ask the solver",
    "tier": "modeler",
    "tier2": null,
@@ -706,10 +719,16 @@
    "icon": "target",
    "form": "cards",
    "scales": [],
-   "teaches": [],
+   "teaches": [
+    "solvers",
+    "model checking",
+    "shadow prices",
+    "sensitivity analysis",
+    "mixed-integer programming"
+   ],
    "lab": null,
-   "href": "index.html#lesson-11",
-   "ready": false,
+   "href": "11-solver.html",
+   "ready": true,
    "after": [
     {
      "id": "10-write-it-down",
@@ -717,8 +736,8 @@
      "title": "Write it down: what are the decisions, the goal and the rules?",
      "short": "Write it down",
      "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
-     "href": "index.html#lesson-10",
-     "ready": false
+     "href": "10-write-it-down.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -727,8 +746,8 @@
     "title": "Write it down: what are the decisions, the goal and the rules?",
     "short": "Write it down",
     "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
-    "href": "index.html#lesson-10",
-    "ready": false
+    "href": "10-write-it-down.html",
+    "ready": true
    },
    "next": {
     "id": "12-trade-offs",
@@ -771,8 +790,8 @@
      "title": "Ask the solver, then check its answer",
      "short": "Ask the solver",
      "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
-     "href": "index.html#lesson-11",
-     "ready": false
+     "href": "11-solver.html",
+     "ready": true
     }
    ],
    "prev": {
@@ -781,8 +800,8 @@
     "title": "Ask the solver, then check its answer",
     "short": "Ask the solver",
     "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
-    "href": "index.html#lesson-11",
-    "ready": false
+    "href": "11-solver.html",
+    "ready": true
    },
    "next": {
     "id": "13-capstone",
@@ -825,8 +844,8 @@
      "title": "How does storage move energy through time?",
      "short": "Storage",
      "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
-     "href": "index.html#lesson-9",
-     "ready": false
+     "href": "09-storage.html",
+     "ready": true
     },
     {
      "id": "12-trade-offs",

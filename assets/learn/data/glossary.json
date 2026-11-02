@@ -9,6 +9,11 @@
   "short": "The organisation that keeps supply and demand balanced, moment to moment, in its own part of the grid.",
   "lesson": 0
  },
+ "binding-constraint": {
+  "term": "Binding constraint",
+  "short": "A rule that holds with no room to spare at the best plan, so loosening it would change the answer.",
+  "lesson": "10"
+ },
  "capacity": {
   "term": "Capacity",
   "short": "The most power a plant can produce at once, often called its nameplate size.",
@@ -74,6 +79,11 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9
  },
+ "feasible-region": {
+  "term": "Feasible region",
+  "short": "The set of all plans that meet every rule of a model; on a two-variable chart it is a shaded polygon.",
+  "lesson": "10"
+ },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
@@ -88,6 +98,11 @@
   "term": "Grid frequency",
   "short": "The number of cycles per second of the grid's alternating current, 60 hertz (Hz) in North America, which falls when power is short and rises when there is too much.",
   "lesson": 0
+ },
+ "infeasible": {
+  "term": "Infeasible",
+  "short": "Said of a model whose rules contradict each other, so that no plan meets them all.",
+  "lesson": "10"
  },
  "kilowatt-hour": {
   "term": "Kilowatt-hour (kWh)",
@@ -104,6 +119,11 @@
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
   "lesson": 10
  },
+ "marginal-cost": {
+  "term": "Marginal cost",
+  "short": "What one more unit costs, here the extra running cost of one more megawatt-hour of demand.",
+  "lesson": "9"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -119,6 +139,11 @@
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0
  },
+ "mixed-integer-program": {
+  "term": "Mixed-integer program",
+  "short": "An optimization model in which some decisions must be whole numbers, such as a plant being on (1) or off (0).",
+  "lesson": "11"
+ },
  "objective": {
   "term": "Objective",
   "short": "What an optimization tries to make as small or as large as possible, such as the total cost.",
@@ -128,6 +153,11 @@
   "term": "Optimization",
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10
+ },
+ "parameter": {
+  "term": "Parameter",
+  "short": "A number a model is given and takes as it is, such as demand or a plant's running cost, as opposed to a decision it makes.",
+  "lesson": "10"
  },
  "pareto-frontier": {
   "term": "Pareto frontier",
@@ -164,15 +194,35 @@
   "short": "What it costs a plant to make one more megawatt-hour, mostly fuel, leaving out the cost of building it.",
   "lesson": 0
  },
+ "sensitivity-analysis": {
+  "term": "Sensitivity analysis",
+  "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
+  "lesson": "11"
+ },
  "shadow-price": {
   "term": "Shadow price",
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
   "lesson": 11
  },
+ "simplex-method": {
+  "term": "Simplex method",
+  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, always improving the goal, until no neighbour is better.",
+  "lesson": "11"
+ },
  "solver": {
   "term": "Solver",
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11
+ },
+ "state-of-charge": {
+  "term": "State of charge",
+  "short": "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next.",
+  "lesson": "9"
+ },
+ "unbounded": {
+  "term": "Unbounded",
+  "short": "Said of a model whose goal can improve without limit, which usually means a rule is missing.",
+  "lesson": "10"
  },
  "unserved-energy": {
   "term": "Unserved energy",

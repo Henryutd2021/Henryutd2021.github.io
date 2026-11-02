@@ -1,0 +1,51 @@
+# Sidecar for lessons 9-11 (T9 09-storage, T10 10-write-it-down, T11 11-solver), builder learn-w1-f, 2026-11-02.
+# Read by scripts/build_learn.py. Glossary terms for all three lessons live here (one file per builder is enough; the
+# other two sidecars carry only their lesson's requests).
+id: 09-storage
+lesson: 9
+glossary:
+  - id: state-of-charge
+    term: State of charge
+    def: "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next."
+    lesson: 9
+  - id: marginal-cost
+    term: Marginal cost
+    def: "What one more unit costs, here the extra running cost of one more megawatt-hour of demand."
+    lesson: 9
+  - id: parameter
+    term: Parameter
+    def: "A number a model is given and takes as it is, such as demand or a plant's running cost, as opposed to a decision it makes."
+    lesson: 10
+  - id: feasible-region
+    term: Feasible region
+    def: "The set of all plans that meet every rule of a model; on a two-variable chart it is a shaded polygon."
+    lesson: 10
+  - id: binding-constraint
+    term: Binding constraint
+    def: "A rule that holds with no room to spare at the best plan, so loosening it would change the answer."
+    lesson: 10
+  - id: infeasible
+    term: Infeasible
+    def: "Said of a model whose rules contradict each other, so that no plan meets them all."
+    lesson: 10
+  - id: unbounded
+    term: Unbounded
+    def: "Said of a model whose goal can improve without limit, which usually means a rule is missing."
+    lesson: 10
+  - id: simplex-method
+    term: Simplex method
+    def: "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, always improving the goal, until no neighbour is better."
+    lesson: 11
+  - id: mixed-integer-program
+    term: Mixed-integer program
+    def: "An optimization model in which some decisions must be whole numbers, such as a plant being on (1) or off (0)."
+    lesson: 11
+  - id: sensitivity-analysis
+    term: Sensitivity analysis
+    def: "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on."
+    lesson: 11
+requests:
+  - "Lesson-local components to promote (all in assets/learn/10-write-it-down.js under window.W1F, CSS injected as #w1f-css): W1F.CardSort (i-formulation: tap a card, tap a bin, Check with one-line reasons), W1F.LPPlot (i-lp-playground: region by half-plane clipping, rule lines draggable by pointer, cost line, best corners or tied edge, unbounded arrow, simplex walk, plan dot movable by arrow keys), W1F.Views (words, symbols and a table linked to each other and to the plot), W1F.EquationCard (e-equation: symbols as buttons that open their words and their code), W1F.FormulateBox (e-formulate), W1F.Ctl (LX.Slider look with min, a formatter and keyboard steps) and W1F.Toggle. Lesson 11 loads 10-write-it-down.js for LPPlot, the simplex walk and EquationCard; lesson 9 has its own copy of the formulate box. After promotion, point both pages at the shared components and drop the extra script tag on 11-solver.qmd."
+  - "learn_screenshots.mjs: the mid and other states drive lesson 0 only. Lessons 9-11 expose root.lxDemo(state) on the .lx-interactive (09: mid = a hand schedule, best = the solver's schedule, sizes = four batteries; 10: mid = the cost line above the best corner, corner, jump, tied, views, sort; 11: mid = solved, prices, error, milp). This build used a copy of learn-w1-b's patched script that calls lxDemo(state) for any other state."
+  - "path.yml: besides status, this branch added subtitle (the build checks it against each page's front matter) and teaches to the 09-storage, 10-write-it-down and 11-solver entries."
+  - "Links to lessons 1, 2 and 8 point at the course map (index.html#lesson-N) because those pages are on other branches; switch them to the lesson pages after the merge (09-storage.qmd, 10-write-it-down.qmd, 11-solver.qmd)."

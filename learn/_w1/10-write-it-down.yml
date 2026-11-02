@@ -1,0 +1,6 @@
+# Sidecar for lesson 10 (T10, 10-write-it-down), builder learn-w1-f, 2026-11-02. Glossary terms for lessons 9-11 are in
+# learn/_w1/09-storage.yml.
+id: 10-write-it-down
+lesson: 10
+requests:
+  - "The card sort uses a fourth bin, Given (data), next to Decisions, Goal and Rules: telling parameters from decisions is the most common formulation error. The curriculum's i-formulation names three bins; keep the fourth when promoting."
