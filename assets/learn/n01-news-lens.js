@@ -76,7 +76,8 @@
       ".page-learn .n1-head{font-family:var(--lx-f-display);font-weight:600;font-size:20px;line-height:1.25;margin:0;color:var(--lx-ink)}",
       ".n1-framing,.n1-src{font-size:13px;color:var(--lx-ink-3)}",
       ".n1-body{font-size:16.5px;line-height:1.9;color:var(--lx-ink)}",
-      ".n1-ph{font:inherit;line-height:1.5;color:var(--lx-ink);background:transparent;border:0;border-bottom:2px dashed var(--lx-ink-3);border-radius:4px 4px 0 0;padding:0 3px;cursor:pointer;display:inline}",
+      ".n1-ph{color:var(--lx-ink);border-bottom:2px dashed var(--lx-ink-3);border-radius:4px 4px 0 0;padding:1px 3px;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone}",
+      ".n1-ph:focus-visible{outline:3px solid var(--lx-accent);outline-offset:2px}",
       ".n1-ph.sel{outline:2px solid var(--lx-ink);outline-offset:1px}",
       ".n1-ph.tagged{background:color-mix(in srgb,var(--c) 18%,var(--lx-surface));border-bottom:2px solid var(--c)}",
       ".n1-ph .n1-n{margin-left:5px;vertical-align:1px;font-size:11px;height:17px;min-width:17px}",
@@ -220,9 +221,11 @@
       var body = H("p", { class: "n1-body" }, art), btns = {}, sel = null;
       story.parts.forEach(function (part) {
         if (typeof part === "string") { body.appendChild(document.createTextNode(part)); return; }
-        var b = H("button", { class: "n1-ph", type: "button", "data-p": part.p, text: part.text }, body);
+        // an inline span with button semantics, so a long phrase wraps with the sentence (a <button> would not)
+        var b = H("span", { class: "n1-ph", role: "button", tabindex: "0", "data-p": part.p, text: part.text }, body);
         btns[part.p] = { b: b, ph: part };
         b.addEventListener("click", function () { select(part.p); });
+        b.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(part.p); } });
       });
       sourceLine(art, story);
       var pal = H("div", { class: "n1-pal", role: "group", "aria-label": "Tag the selected phrase" }, act);
@@ -268,6 +271,7 @@
           var old = x.b.querySelector(".n1-n"); if (old) old.remove();
           if (l) { H("span", { class: "n1-n", style: "--c:" + l.color, "aria-hidden": "true", text: l.n }, x.b); n++; }
           x.b.setAttribute("aria-label", x.ph.text + (l ? ", tagged " + l.label : ", not tagged yet"));
+          x.b.setAttribute("aria-pressed", k === sel ? "true" : "false");
         });
         D.lens.forEach(function (l) {
           chipBtns[l.id].setAttribute("aria-pressed", sel && picks[sel] === l.id ? "true" : "false");

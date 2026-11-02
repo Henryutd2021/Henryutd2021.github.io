@@ -175,7 +175,7 @@
       ".b2-chart text{font-family:var(--lx-f-mono);font-size:11px;fill:var(--lx-ink-3)}",
       ".b2-chart text.t{font-family:var(--lx-f-display);font-size:12px;fill:var(--lx-ink-2)}",
       ".b2-ok{color:var(--lx-good);font-weight:600} .b2-bad{color:var(--lx-bad);font-weight:600} .b2-na{color:var(--lx-ink-3)}",
-      ".b2-asserts td.code{text-align:left;white-space:normal;font-size:12.5px;min-width:16ch}",
+      
       ".b2-dl{display:flex;flex-wrap:wrap;gap:8px}",
       ".lx-checklist{display:grid;gap:6px;margin:0;padding:0;list-style:none}",
       ".lx-checklist li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:start;padding:8px 10px;border-radius:10px;border:1px solid var(--lx-line);background:var(--lx-surface)}",
@@ -186,7 +186,11 @@
       ".lx-checklist label small{font-size:12.5px;color:var(--lx-ink-3);font-family:var(--lx-f-mono);overflow-wrap:anywhere}",
       ".lx-checklist li.on{border-color:color-mix(in srgb,var(--lx-good) 45%,var(--lx-line))}",
       ".lx-checklist-foot{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13.5px;color:var(--lx-ink-3)}",
-      "@media (max-width:560px){.b2-code pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.b2-tbl{font-size:13px}.b2-tbl th,.b2-tbl td{padding:4px 5px}}"
+      ".b2-asserts{display:grid;gap:8px;margin:0;padding:0;list-style:none}",
+      ".b2-asserts li{display:grid;gap:6px;padding:9px 11px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface)}",
+      ".b2-asserts code{font-family:var(--lx-f-mono);font-size:12.5px;color:var(--lx-ink);white-space:pre-wrap;overflow-wrap:anywhere;background:none;padding:0}",
+      ".b2-asserts .r{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--lx-f-mono);font-size:12.5px}",
+      "@media (max-width:560px){.page-learn .b2-code pre,.page-learn .b2-code pre code{font-size:12px;white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:break-word}.b2-tbl{font-size:13px}.b2-tbl th,.b2-tbl td{padding:4px 5px}}"
     ].join("\n");
     H("style", { id: "b2-css", text: css }, document.head);
   }
@@ -252,12 +256,13 @@
       if (svg) svg.remove();
       svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, role: "img", "aria-label": o.label }, box);
       (o.shade || []).forEach(function (sp) { S("rect", { x: x(sp[0]), y: m.t, width: Math.max(2, x(sp[1]) - x(sp[0])), height: ih, fill: "var(--lx-bad-soft)" }, svg); });
-      for (var k = 0; k <= 4; k++) {
-        var v = ymax * k / 4;
+      var ys = o.yStep || ymax / 4;
+      for (var k = 0; k * ys <= ymax + 1e-9; k++) {
+        var v = k * ys;
         S("path", { d: "M" + m.l + " " + y(v) + " H" + (W - m.r), stroke: "var(--lx-line)", "stroke-width": 1 }, svg);
         S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }, svg).textContent = o.yFmt ? o.yFmt(v) : int(v);
       }
-      (o.ticks || []).forEach(function (t) { S("text", { x: x(t[0]), y: Hh - 6, "text-anchor": t[2] || "middle" }, svg).textContent = t[1]; });
+      (typeof o.ticks === "function" ? o.ticks(W) : o.ticks || []).forEach(function (t) { S("text", { x: x(t[0]), y: Hh - 6, "text-anchor": t[2] || "middle" }, svg).textContent = t[1]; });
       if (o.level != null) {
         S("path", { d: "M" + m.l + " " + y(o.level) + " H" + (W - m.r), stroke: "var(--lx-bad)", "stroke-width": 1.5, "stroke-dasharray": "5 4" }, svg);
         if (o.levelLabel) S("text", { x: W - m.r - 4, y: y(o.level) - 5, "text-anchor": "end", class: "t" }, svg).textContent = o.levelLabel;
@@ -279,6 +284,12 @@
     if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(box)) draw(); }).observe(box);
     setTimeout(draw, 0);
     return { draw: draw, el: box, set: function (p) { for (var k in p) o[k] = p[k]; draw(); } };
+  }
+  // a round axis top and gridline step: the smallest step of 1, 2, 2.5 or 5 x 10^n that covers mx in at most 5 steps
+  function nice(mx) {
+    var p = Math.pow(10, Math.floor(Math.log10(Math.max(mx, 1e-9) / 5))), steps = [1, 2, 2.5, 5, 10, 20];
+    for (var i = 0; i < steps.length; i++) { var st = steps[i] * p; if (Math.ceil(mx / st - 1e-9) <= 5) return { max: Math.ceil(mx / st - 1e-9) * st, step: st }; }
+    return { max: mx, step: mx / 4 };
   }
   function monthTicks(F, n, by) {
     var out = [], seen = {};
@@ -390,7 +401,7 @@
           H("p", { class: "b2-big", text: int(n) + " hours flagged in " + rs.length + " runs" }, res);
           var match = n === BUILD[col] || (col === "demand" && n + 1 === BUILD[col]);
           H("p", { class: "k", text: "The data build flagged " + int(BUILD[col]) + (col === "demand" ? " demand hours: its repeats plus the one spike." : " hours.") + (match ? " Your count matches." : "") }, res);
-          var opts = { n: per.length, bars: true, yMax: 24, height: 120, series: [{ values: per, color: "var(--lx-bad)" }], ticks: dayTicks,
+          var opts = { n: per.length, bars: true, yMax: 24, yStep: 6, height: 120, series: [{ values: per, color: "var(--lx-bad)" }], ticks: dayTicks,
             label: "Flagged hours per day of 2025 for " + col + ": " + int(n) + " hours in " + rs.length + " runs.", yFmt: function (v) { return v + " h"; },
             title: "Flagged hours per day, " + COLS[col].label.toLowerCase() };
           if (strip) strip.set(opts); else strip = chart(stripHost, opts);
@@ -412,12 +423,12 @@
           b.disabled = true; out.innerHTML = "";
           var i0 = 0; while (local(beginning(R, i0)).date !== "2025-12-12") i0++;
           var i1 = i0; while (i1 < R.n && local(beginning(R, i1)).date <= "2025-12-24") i1++;
-          var ticks = []; for (var i = i0; i < i1; i += 48) ticks.push([i - i0, local(beginning(R, i)).d + " Dec"]);
+          var ticks = function (W) { var t = [], every = W < 480 ? 96 : 48; for (var i = i0; i < i1; i += every) t.push([i - i0, local(beginning(R, i)).d + (i === i0 || W >= 480 ? " Dec" : ""), i === i0 ? "start" : "middle"]); return t; };
           var spans = runs(R.cols.solar, 3).filter(function (r) { return r.start < i1 && r.start + r.len > i0; })
             .map(function (r) { return [Math.max(0, r.start - i0), Math.min(i1 - i0 - 1, r.start - i0 + r.len - 1)]; });
           ["demand", "wind", "solar"].forEach(function (k) {
-            var v = R.cols[k].slice(i0, i1), mx = Math.max.apply(null, v);
-            chart(out, { n: v.length, yMax: Math.ceil(mx / 100) * 100 * 1.05, height: 120, series: [{ values: v, color: COLS[k].color, width: 1.8 }], shade: spans, ticks: ticks,
+            var v = R.cols[k].slice(i0, i1), ny = nice(Math.max.apply(null, v));
+            chart(out, { n: v.length, yMax: ny.max, yStep: ny.step, height: 120, series: [{ values: v, color: COLS[k].color, width: 1.8 }], shade: spans, ticks: ticks,
               title: COLS[k].label + ", MW", label: COLS[k].label + " from 12 to 24 December 2025, with the hours flagged as repeats shaded." });
           });
           H("p", { class: "lx-hint", text: "Shaded: solar hours flagged as repeats. The longest run lasts " + lr.len + " hours, from " + lrA.d + " December " + pad(lrA.h) + ":00 to " + lrB.d + " December " + pad(lrB.h) + ":00 (local); a second run at another value follows straight after." }, out);
@@ -456,13 +467,13 @@
     steps.push({ text: "Switch to the cleaned file, scaled to Prairie Town's " + P.sizes.wind + " MW wind farm. 8,760 points are too many to read: [[resample|resample]] to daily averages, then to monthly energy.",
       build: function (act, api) {
         var seen = {}, host = H("div", null, act);
-        var sg = seg(act, "Time step", [["h", "Hourly (MW)"], ["d", "Daily mean (MW)"], ["m", "Monthly energy (GWh)"]], show);
+        var sg = seg(act, "Time step", [["h", "Hourly MW"], ["d", "Daily MW"], ["m", "Monthly GWh"]], show);
         act.insertBefore(act.lastChild, host);
         function show(k) {
           host.innerHTML = ""; seen[k] = true;
-          if (k === "h") chart(host, { n: C.n, yMax: P.sizes.wind, series: [{ values: P.wind, color: "var(--lx-wind)", width: 0.6 }], ticks: ticksH, title: "Wind farm output, every hour (MW)", label: "Prairie Town's wind farm, 8,760 hourly values: a dense band." });
-          else if (k === "d") chart(host, { n: dWind.length, yMax: P.sizes.wind, series: [{ values: dWind.map(function (x) { return x.value; }), color: "var(--lx-wind)", width: 1.4 }], ticks: monthTicks(C, dWind.length, "day"), title: "Daily mean output (MW)", label: "Daily mean output of Prairie Town's wind farm, 365 values." });
-          else chart(host, { n: 12, bars: true, yMax: Math.ceil(best.value / 1000 / 10) * 10, yFmt: function (v) { return int(v); }, series: [{ values: mWind.map(function (x) { return x.value / 1000; }), color: "var(--lx-wind)" }],
+          if (k === "h") chart(host, { n: C.n, yMax: nice(P.sizes.wind).max, yStep: nice(P.sizes.wind).step, series: [{ values: P.wind, color: "var(--lx-wind)", width: 0.6 }], ticks: ticksH, title: "Wind farm output, every hour (MW)", label: "Prairie Town's wind farm, 8,760 hourly values: a dense band." });
+          else if (k === "d") chart(host, { n: dWind.length, yMax: nice(P.sizes.wind).max, yStep: nice(P.sizes.wind).step, series: [{ values: dWind.map(function (x) { return x.value; }), color: "var(--lx-wind)", width: 1.4 }], ticks: monthTicks(C, dWind.length, "day"), title: "Daily mean output (MW)", label: "Daily mean output of Prairie Town's wind farm, 365 values." });
+          else chart(host, { n: 12, bars: true, yMax: nice(best.value / 1000).max, yStep: nice(best.value / 1000).step, yFmt: function (v) { return int(v); }, series: [{ values: mWind.map(function (x) { return x.value / 1000; }), color: "var(--lx-wind)" }],
             ticks: MON.map(function (m, i) { return [i, m.charAt(0)]; }), title: "Energy each month (GWh)", label: "Monthly wind energy of Prairie Town's farm, in GWh.",
             alt: "<table class='b2-tbl'><thead><tr><th scope='col'>Month</th><th scope='col'>GWh</th><th scope='col'>Hours</th></tr></thead><tbody>" + mWind.map(function (x, i) { return "<tr><td class='l'>" + MONTHS[i] + "</td><td>" + (x.value / 1000).toFixed(1) + "</td><td>" + x.hours + "</td></tr>"; }).join("") + "</tbody></table>" });
           if (seen.h && seen.d && seen.m) { api.done(); api.saw("Average power uses the mean; energy uses the sum, because each hourly MW value is also that hour's MWh. Most wind energy: " + MONTHS[+best.key.slice(5) - 1] + " (" + (best.value / 1000).toFixed(1) + " GWh); least: " + MONTHS[+worst.key.slice(5) - 1] + " (" + (worst.value / 1000).toFixed(1) + " GWh)."); }
@@ -483,8 +494,8 @@
         function draw() {
           var size = P.sizes[col], v = sorted ? sortedDesc(P[col]) : P[col];
           host.innerHTML = "";
-          chart(host, { n: v.length, yMax: size, series: [{ values: v, color: COLS[col].color, area: col !== "demand" && sorted, width: sorted ? 2 : 0.6 }],
-            ticks: sorted ? [[0, "1", "start"], [2190, "2,190"], [4380, "4,380"], [6570, "6,570"], [8759, "8,760 h", "end"]] : ticksH,
+          chart(host, { n: v.length, yMax: nice(size).max, yStep: nice(size).step, series: [{ values: v, color: COLS[col].color, area: col !== "demand" && sorted, width: sorted ? 2 : 0.6 }],
+            ticks: sorted ? function (W) { return W < 480 ? [[0, "1", "start"], [4380, "4,380"], [8759, "8,760 h", "end"]] : [[0, "1", "start"], [2190, "2,190"], [4380, "4,380"], [6570, "6,570"], [8759, "8,760 h", "end"]]; } : ticksH,
             level: col === "demand" ? 0.9 * size : null, levelLabel: col === "demand" ? "90% of peak" : null,
             title: (sorted ? "Hours sorted from highest to lowest" : "Calendar order") + " (MW)", label: COLS[col].label + " of Prairie Town, " + (sorted ? "as a duration curve." : "in calendar order.") });
           res.innerHTML = "";
@@ -502,12 +513,14 @@
       build: function (act, api) {
         var row = H("div", { class: "b2-pills" }, act), ran = {};
         var bR = H("button", { class: "lx-btn small ghost", type: "button", text: "Run on the raw file" }, row), bC = H("button", { class: "lx-btn small ghost", type: "button", text: "Run on the cleaned file" }, row);
-        var sc = H("div", { class: "b2-scroll" }, act), t = H("table", { class: "b2-tbl b2-asserts" }, sc), hr = H("tr", null, H("thead", null, t));
-        ["Assert", "Raw", "Cleaned"].forEach(function (h) { H("th", { scope: "col", text: h }, hr); });
-        var tb = H("tbody", null, t), cells = ASSERTS.map(function (a) { var tr = H("tr", null, tb); H("td", { class: "code", text: a.code }, tr); return [H("td", { class: "b2-na", text: "not run" }, tr), H("td", { class: "b2-na", text: "not run" }, tr)]; });
+        var ul = H("ul", { class: "b2-asserts" }, act), cells = ASSERTS.map(function (a) {
+          var li = H("li", null, ul); H("code", { text: a.code }, li); var r = H("div", { class: "r" }, li);
+          var c1 = H("span", { class: "b2-na", text: "raw: not run" }, r), c2 = H("span", { class: "b2-na", text: "cleaned: not run" }, r);
+          return [c1, c2];
+        });
         function run(which) {
           ran[which] = true;
-          (which === "raw" ? kR : kC).forEach(function (r, i) { var c = cells[i][which === "raw" ? 0 : 1]; c.className = r.ok ? "b2-ok" : "b2-bad"; c.textContent = (r.ok ? "pass" : "FAIL") + " · " + r.detail; });
+          (which === "raw" ? kR : kC).forEach(function (r, i) { var c = cells[i][which === "raw" ? 0 : 1]; c.className = r.ok ? "b2-ok" : "b2-bad"; c.textContent = (which === "raw" ? "raw: " : "cleaned: ") + (r.ok ? "pass" : "FAIL") + " · " + r.detail; });
           if (ran.raw && ran.clean) {
             var fR = kR.filter(function (r) { return !r.ok; }).length, fC = kC.filter(function (r) { return !r.ok; }).length;
             api.done(); api.saw("The raw file fails " + fR + " of 5; the cleaned file fails " + fC + ", the night check. A failing assert is doing its job: it stops the run until someone decides what to do. The notebook shows one fix.");
@@ -566,13 +579,15 @@
   LX.mount("python-data", function (live, data, root) {
     injectCSS();
     root.lxLesson = view(live, data);
-    // screenshot hook: learn/b02-python-data.html#lx-demo loads the file, then opens step 4 at N = 3 for solar
-    if (location.hash === "#lx-demo") setTimeout(function () {
-      var card = live.querySelector(".lx-stepcard"), next = function () { card.querySelector(".lx-step-foot .lx-btn:not(.ghost)").click(); };
-      card.querySelector(".lx-step-act .lx-btn").click(); next();
-      card.querySelectorAll(".b2-cell")[9].click(); next();
-      card.querySelectorAll(".lx-seg button")[2].click(); next();
-      var plus = card.querySelectorAll(".lx-ctl-row button")[1]; plus.click();
+    // screenshot hook: learn/b02-python-data.html#lx-demo-N plays steps 1..N with their actions (#lx-demo = step 4 at N = 3)
+    var m = /^#lx-demo(?:-(\d))?$/.exec(location.hash);
+    if (m) setTimeout(function () {
+      var card = live.querySelector(".lx-stepcard"), upto = +(m[1] || 4);
+      var q = function (sel, i) { return card.querySelectorAll(sel)[i || 0]; }, click = function (el) { if (el) el.click(); };
+      var acts = [function () { click(q(".lx-step-act .lx-btn")); }, function () { click(q(".b2-cell", 9)); }, function () { click(q(".lx-seg button", 2)); },
+        function () { click(q(".lx-ctl-row button", 1)); }, function () { click(q(".lx-step-act > .lx-btn")); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); },
+        function () { click(q(".lx-seg button", 1)); click(q(".lx-seg button", 2)); }, function () { click(q(".lx-step-act > .lx-btn")); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); }];
+      for (var k = 0; k < upto && k < acts.length; k++) { acts[k](); if (k < upto - 1) click(q(".lx-step-foot .lx-btn:not(.ghost)")); }
     }, 60);
   });
 })();
