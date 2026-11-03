@@ -232,7 +232,7 @@ Among them: <mark>gaps in voltage and reactive-power control</mark>, power swing
 </div>
 <div class="lx-qq" data-id="cf" data-answer="c">
 <p class="lx-qtext">A story says a policy saved money “compared with a year without it”. Which lens question is that phrase about?</p>
-<ul class="lx-choices"><li data-value="a">Scale</li><li data-value="b">Boundary</li><li data-value="c">Counterfactual</li><li data-value="d">Uncertainty</li></ul>
+<ul class="lx-choices"><li data-value="a">Scale</li><li data-value="b">Boundary</li><li data-value="c">Counter&shy;factual</li><li data-value="d">Uncertainty</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p><span class="lx-term" data-term="counterfactual">Counterfactual</span>: it names the baseline. Next, ask whether that baseline would really have happened.</p></details>
 </div>
 </div>

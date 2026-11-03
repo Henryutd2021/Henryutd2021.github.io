@@ -129,7 +129,8 @@
       var grid = H("div", { class: "n1-lens" }, act), opened = {}, prog = H("p", { class: "n1-count", "aria-live": "polite", text: "0 of " + D.lens.length + " opened." }, act);
       D.lens.forEach(function (l) {
         var b = H("button", { class: "n1-q", type: "button", "aria-expanded": "false", style: "--c:" + l.color }, grid);
-        H("b", { html: LX.PhraseTagger.badge(l, true) }, b);
+        // a soft hyphen where the card is narrow (phones): "Counter-factual" breaks inside the card instead of running out of it
+        H("b", { html: LX.PhraseTagger.badge(Object.assign({}, l, { label: l.label.replace(/^Counterfactual$/, "Counter\u00ADfactual") }), true) }, b);
         H("span", { class: "t", text: l.ask }, b);
         var trap = H("small", { text: "Trap: " + l.trap, hidden: true }, b);
         if (l.sub) H("small", { text: "Covers " + l.sub }, b);
