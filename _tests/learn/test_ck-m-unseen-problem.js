@@ -6,6 +6,9 @@
 // and summary, the supplied model's data (three real days, scaled with the course's profile helper), the page's no-JS
 // blocks, and the notebooks' data and asserted numbers.
 // Usage (from the site folder):  node _tests/learn/test_ck-m-unseen-problem.js [--ref] [--write]
+// The data file and the four notebooks are generated (ResearchPortfolio folder):
+//   python3 scripts/build_learn_ckm_data.py --site <site> && python3 scripts/build_learn_ckm_notebooks.py --site <site>
+// then run this test with --ref (the supplied model's report) and --write (the page's blocks).
 //   --ref    rewrite the data file's `ref` block (the supplied model's report, shown if the solver cannot load)
 //   --write  rewrite the page's blocks between the ckm-* markers
 "use strict";

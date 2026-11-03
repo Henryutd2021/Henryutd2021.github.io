@@ -5,6 +5,7 @@
 // results the page falls back to (data file `ref`), every number the page and its exemplars state, the page's no-JS
 // blocks, and the notebook's data and asserted numbers.
 // Usage (from the site folder):  node _tests/learn/test_r05-build-validate.js [--ref | --write]
+// The practice notebook is generated (ResearchPortfolio folder): python3 scripts/build_learn_r05_notebook.py --site <site>
 //   --ref    rewrite the data file's `ref` block from the HiGHS solutions, then run the checks
 //   --write  rewrite the page's blocks between the r5-* markers from the model, then run the checks
 "use strict";
