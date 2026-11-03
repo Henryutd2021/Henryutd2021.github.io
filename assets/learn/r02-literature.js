@@ -372,7 +372,7 @@
       var box = H("div", { class: "r2-string" }, act);
       H("p", { class: "lx-eyebrow", text: "String 6 · " + T.label }, box);
       H("code", { text: T.query }, box);
-      H("p", { class: "lx-hint", html: "<b>" + f0(T.count) + "</b> works on " + dateText(S.meta.as_of) + " (<a href=\"" + LX.esc(T.url) + "\">raw results</a>). Screening them by abstract, three do both:" }, box);
+      H("p", { class: "lx-hint", html: "<b>" + f0(T.count) + "</b> works on " + dateText(S.meta.as_of) + " (<a href=\"" + LX.esc(T.url) + "\">raw results</a>). Among them, at least three do both, by their abstracts:" }, box);
       var ul = H("ul", { class: "r2-list" }, act);
       D.fillers.forEach(function (f) { var li = H("li", null, ul); doiLink(f.doi, f.name, H("b", null, li)); H("span", { text: " · " + f.summary }, li); });
       var h = D.fillers[0], hs = S.snowball.fillers_citing_review.indexOf(h.doi) >= 0;

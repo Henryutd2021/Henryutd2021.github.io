@@ -336,7 +336,13 @@
       ".r4-form .lx-hint{font-family:var(--lx-f-body,inherit);font-weight:400}",
       ".r4-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}",
       ".r4-plan{margin:0;padding-left:1.2rem;font-size:14px;color:var(--lx-ink-2)} .r4-plan li{margin:3px 0}",
-      "@media (max-width:760px){.r4-read{grid-template-columns:repeat(2,minmax(0,1fr))}}"
+      ".r4-opts.compact{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}",
+      "@media (max-width:760px){.r4-read{grid-template-columns:repeat(2,minmax(0,1fr))}}",
+      // on phones the sensitivity table becomes one card per row, each value with its label
+      "@media (max-width:640px){.r4-tbl.cards thead{display:none}.r4-tbl.cards,.r4-tbl.cards tbody{display:block}" +
+      ".r4-tbl.cards tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 10px;padding:8px 0;border-bottom:1px solid var(--lx-line)}" +
+      ".r4-tbl.cards th[scope=row]{grid-column:1/-1;border:0;padding:0 0 2px}.r4-tbl.cards td{border:0;padding:0;text-align:left;white-space:normal}" +
+      ".r4-tbl.cards td::before{content:attr(data-l);display:block;font-size:11px;color:var(--lx-ink-3);font-weight:400}}"
     ].join("\n");
     H("style", { id: "r4-css", text: css }, document.head);
   }
@@ -374,7 +380,7 @@
       return function (act, api) {
         var dec = D.decisions[key], ro;
         H("p", { class: "lx-eyebrow", text: dec.q }, act);
-        var opts = H("div", { class: "r4-opts", role: "group", "aria-label": dec.q }, act), fb = H("div", { "aria-live": "polite" }, act);
+        var opts = H("div", { class: "r4-opts" + (dec.options.length > 4 ? " compact" : ""), role: "group", "aria-label": dec.q }, act), fb = H("div", { "aria-live": "polite" }, act);
         var roBox = H("div", null, act); ro = Readout(roBox, D, raw); ro.set(rep);
         var more = H("div", null, act), logp = H("pre", { class: "r4-log", hidden: true }, act);
         var bs = dec.options.map(function (o) {
@@ -447,17 +453,17 @@
     // ---- step 6: one choice at a time
     function sensStep(act, api) {
       var S = sensitivity(F, ch), sw = swings(S), pick = LX.store.get("r4-predict", null);
-      var t = H("table", { class: "r4-tbl" }, H("div", { class: "lx-scroll-x" }, act)), hr = H("tr", null, H("thead", null, t));
+      var t = H("table", { class: "r4-tbl cards" }, H("div", { class: "lx-scroll-x" }, act)), hr = H("tr", null, H("thead", null, t));
       H("th", { scope: "col", class: "l", text: "Change one choice" }, hr);
       D.numbers.forEach(function (n) { H("th", { scope: "col", text: n.label }, hr); });
       var tb = H("tbody", null, t), b0 = H("tr", { class: "base" }, tb); H("th", { scope: "row", text: "Your choices" }, b0);
-      D.numbers.forEach(function (n) { H("td", { text: val(S.base, n.id) }, b0); });
+      D.numbers.forEach(function (n) { H("td", { text: val(S.base, n.id), "data-l": n.label }, b0); });
       S.rows.forEach(function (r) {
         var tr = H("tr", null, tb), o = optLabel(D, r.key, r.option);
         H("th", { scope: "row", text: D.decisions[r.key].label + ": " + o.label.replace(/ \(the course's rule\)/, "") }, tr);
         D.numbers.forEach(function (n) {
           var v = val(r.rep, n.id), big = n.id === "peakAt" ? v !== val(S.base, n.id) : n.id === "minGW" ? Math.abs(r.rep.minGW - S.base.minGW) > 1 : Math.abs(r.rep[n.id] - S.base[n.id]) > 1;
-          var td = H("td", { class: big ? "big" : "" }, tr); if (big) H("span", { "aria-hidden": "true", text: "◆ " }, td); td.appendChild(document.createTextNode(v)); if (big) H("span", { class: "lx-sr", text: " (moved)" }, td);
+          var td = H("td", { class: big ? "big" : "", "data-l": n.label }, tr); if (big) H("span", { "aria-hidden": "true", text: "◆ " }, td); td.appendChild(document.createTextNode(v)); if (big) H("span", { class: "lx-sr", text: " (moved)" }, td);
         });
       });
       var rel = { demandTWh: 0, minGW: 0, windTWh: 0 };
@@ -568,7 +574,7 @@
         { key: "drop", name: "Leave out", shape: "Not needed", fits: "Statistics of real readings only", risk: "Totals add up fewer hours: energy is understated" },
         { key: "lin", name: "Straight line", shape: "Lost over long gaps", fits: "Gaps of an hour or two", risk: "Flattens a week-long freeze" },
         { key: "same", name: "Same hour, nearby days", note: "the course's rule for wind and solar", shape: "Kept", fits: "Gaps of hours to weeks", risk: "Borrows other days' weather; log the hours filled" },
-        { key: "fc", name: "Scaled day-ahead forecast", note: "the course's rule for demand", shape: "Kept", fits: "Demand, when a forecast column exists", risk: "Inherits any forecast bias; the course's build uses January to April checks" },
+        { key: "fc", name: "Scaled day-ahead forecast", note: "the course's rule for demand", shape: "Kept", fits: "Demand, when a forecast column exists", risk: "Inherits errors in the forecast's daily shape; the course rescales it to the demand around each gap" },
         { key: "model", name: "A model of the series", note: "for example a regression on weather", shape: "Kept", fits: "Long gaps with good inputs", risk: "Needs its own validation, and more to explain" }
       ] });
   }
