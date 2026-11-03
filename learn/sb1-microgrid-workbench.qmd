@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <div class="lx-card lx-sb-brief">
 <p class="lx-eyebrow">The brief</p>
 <dl class="lx-sb-facts">
-<div><dt>The site</dt><dd>Prairie Campus (fictional, from F7): a county hospital, a water and heating plant, dorms and labs, <b>1,200 kW</b> in all, on one feeder.</dd></div>
+<div><dt>The site</dt><dd>Prairie Campus (fictional, from <a href="f07-microgrids.html">F7</a>): a county hospital, a water and heating plant, dorms and labs, <b>1,200 kW</b> in all, on one feeder.</dd></div>
 <div><dt>You decide</dt><dd>What must stay on; solar (kW), battery (kWh), 200 kW generator sets and diesel (gallons); the feeder's limits, the tariff and the owner.</dd></div>
 <div><dt>The engine works out</dt><dd>A normal year on the grid, then each outage hour by hour as an island; or the cheapest sizes, with a small <span class="lx-term" data-term="mixed-integer-program">mixed-integer program</span>.</dd></div>
 <div><dt>It leaves out</dt><dd>Prices (a mixed-integer program gives none), the wiring inside the campus, part-load fuel use, battery wear, and outages you do not choose.</dd></div>
@@ -184,7 +184,7 @@ The three named outages are real 2025 stretches of sun with the grid assumed dow
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Built on</p>
 <ul class="sb1-links">
-<li><a href="09-storage.html">Lesson 9</a> (storage) and <a href="03-balancing.html">lesson 3</a> (outages and balance); <a href="m02-unit-commitment.html">M2</a> for whole numbers in a model.</li>
+<li><a href="f07-microgrids.html">F7</a> (the campus and its island) and <a href="a14-microgrid-value.html">A14</a> (what a microgrid is worth); <a href="09-storage.html">lesson 9</a> (storage) and <a href="03-balancing.html">lesson 3</a> (outages and balance); <a href="m02-unit-commitment.html">M2</a> for whole numbers in a model.</li>
 <li>Formalised in <a href="m05-microgrid-size-and-run.html">M5</a>; applied in the capstone <a href="c1-keep-the-campus-running.html">C1</a>.</li>
 <li>Open tools for larger microgrid models: <a href="https://docs.pypsa.org/">PyPSA</a>, <a href="https://www.pyomo.org/">Pyomo</a> and <a href="https://jump.dev/">JuMP</a>.</li>
 </ul>

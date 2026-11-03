@@ -48,7 +48,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <div class="lx-datanote m5-note"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
-<li><b>Illustrative:</b> Prairie Campus and its flat loads (from <a href="sb1-microgrid-workbench.html">the Workbench</a> and F7), equipment costs, fuel use, the export credit and the owner's 5% cost of capital, in 2025 dollars.</li>
+<li><b>Illustrative:</b> Prairie Campus and its flat loads (from <a href="sb1-microgrid-workbench.html">the Workbench</a> and <a href="f07-microgrids.html">F7</a>), equipment costs, fuel use, the export credit and the owner's 5% cost of capital, in 2025 dollars.</li>
 <li><b>Real:</b> the sun, SPP's hourly solar in 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), per kW of panels; the tariff's level, EIA's 2025 U.S. commercial average, 13.37¢/kWh.</li>
 <li><b>The storm:</b> 72 hours from 00:00 on 20 January 2025, the grid assumed down; the battery and the 675-gallon tank start full.</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</li>
@@ -162,7 +162,7 @@ The sizing asks HiGHS to stop only within 0.0001% of the best bound, so two plan
 <div class="lx-deeper-body">
 <ul>
 <li>Prices of any kind from the model: a mixed-integer program has no duals.</li>
-<li>The campus's wiring and protection, voltage and frequency inside the island (lesson F7 shows who forms the island).</li>
+<li>The campus's wiring and protection, voltage and frequency inside the island (lesson <a href="f07-microgrids.html">F7</a> shows who forms the island).</li>
 <li>Part-load fuel use (a lightly loaded set burns more per kWh), start-up limits and a set that fails to start.</li>
 <li>Battery wear, fuel deliveries during the storm, and how often outages happen.</li>
 <li>Loads that change through the day: every load is flat here.</li>
@@ -251,7 +251,7 @@ The sizing asks HiGHS to stop only within 0.0001% of the best bound, so two plan
 <blockquote class="lx-excerpt" data-source="excerpt:supply-chain-mg"><p>When each facility can install its own wind, solar and storage and trade energy with the grid, a candidate site's renewable resource affects its operating cost.</p><p>Transactive energy, time-of-use tariffs and climate conditions played a critical role in locating factories, warehouses, wind turbines, solar photovoltaics and energy storage systems.</p><p>Contrary to intuition, energy storage systems, which balance intermittent power and uncertain load, had limited benefits for cost saving.</p><p>A mixed-integer model opens factories and warehouses, routes products and sizes each open site's wind, solar and storage, with an hourly energy balance and grid trade. Uncertain weekly store demand enters as a chance constraint with a set service level, written as its deterministic equivalent, so the model stays a mixed-integer linear program.</p><p>Holds when: stylized networks with synthetic distances and costs, candidate sites in California, Arizona and Nevada, and one year, planned week by week for products and hour by hour for energy. Leaves out: grid outages, which the studies do not model.</p><footer>Approved excerpt of: Li et al. (2023), <a href="https://doi.org/10.1016/j.apm.2023.02.014">Applied Mathematical Modelling</a>.</footer></blockquote>
 <ul class="m5-links">
 <li>Open code: <a href="https://github.com/Henryutd2021/supply-chain-microgrid-models">supply-chain-microgrid-models</a> on GitHub.</li>
-<li>Builds on: <a href="m02-unit-commitment.html">M2</a> (whole numbers and branch and bound), <a href="sb1-microgrid-workbench.html">the Microgrid Workbench</a> (the same engine) and <a href="09-storage.html">lesson 9</a> (storage).</li>
+<li>Builds on: <a href="m02-unit-commitment.html">M2</a> (whole numbers and branch and bound), <a href="sb1-microgrid-workbench.html">the Microgrid Workbench</a> (the same engine), <a href="f07-microgrids.html">F7</a> and <a href="a14-microgrid-value.html">A14</a> (the campus and its value) and <a href="09-storage.html">lesson 9</a> (storage).</li>
 <li>Applied in: the capstone <a href="c1-keep-the-campus-running.html">C1</a>. Open tools for larger models: <a href="https://docs.pypsa.org/">PyPSA</a>, <a href="https://www.pyomo.org/">Pyomo</a> and <a href="https://jump.dev/">JuMP</a>.</li>
 </ul>
 </div>
