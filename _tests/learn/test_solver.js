@@ -4,6 +4,7 @@
 //     with a finite difference of the optimal objective; reduced costs follow the same dObjective/dBound convention
 //   - infeasible and unbounded models are reported as such, with no values and no duals
 //   - a MILP never reports duals or reduced costs; fixedModel + re-solve gives prices labelled conditional
+//   - HiGHS early stops at an objective bound (model status 11) or target (12) are not "optimal" and not ok
 //   - authoring errors (unknown or repeated names, missing bounds) come back as status "error" with a message
 //   - the benchmark models (solver_models.js) solve to optimality; their timings are printed (p50/p95, Node, this machine)
 // Usage (from the site folder):  node _tests/learn/test_solver.js
@@ -73,6 +74,21 @@ const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
   ok(/conditional|fixAndReprice/.test(fs.readFileSync(L("components/solver.js"), "utf8")), "solver.js documents the conditional re-pricing");
   let threw = false; try { core.fixedModel(milp, { g1: 1 }); } catch (e) { threw = /no value/.test(e.message); }
   ok(threw, "fixedModel: refuses to fix an integer variable without a value");
+
+  // ---------------- early stops: HiGHS model status 11 (objective bound) and 12 (objective target) are not "optimal".
+  // No lesson sets these options; the test adds them to HiGHS's options through a thin wrapper around the module.
+  const withOpts = extra => ({ constants: highs.constants, createModel: d => {
+    const m = highs.createModel(d), set = m.options.set.bind(m.options);
+    return new Proxy(m, { get: (t, k) => k === "options" ? { set: o => set(Object.assign({}, o, extra)) } : typeof t[k] === "function" ? t[k].bind(t) : t[k] });
+  } });
+  const tw = JSON.parse(fs.readFileSync(L("data/town.json"), "utf8")), dy = JSON.parse(fs.readFileSync(L("data/town_days.json"), "utf8"));
+  const ucBase = solve(MODELS.uc24(tw, dy));
+  const tgt = core.solveWith(withOpts({ objective_target: 1e9 }), MODELS.uc24(tw, dy), {});
+  ok(tgt.status === "objective-target" && !tgt.ok, `objective target: a MILP stopped at its first plan under the target is ${tgt.status}, ok ${tgt.ok}`);
+  ok(tgt.values && tgt.objective > ucBase.objective + 1, `objective target: the early plan is kept (${tgt.objective && tgt.objective.toFixed(0)} against the optimum ${ucBase.objective.toFixed(0)})`);
+  const bnd = core.solveWith(withOpts({ objective_bound: 1, presolve: "off", solver: "simplex", simplex_strategy: 1 }), MODELS.storage168(tw, dy), {});
+  ok(bnd.status === "objective-bound" && !bnd.ok && bnd.duals === null, `objective bound: dual simplex stopped at the bound is ${bnd.status}, ok ${bnd.ok}, no duals`);
+  ok(core.STATUS[11] === "objective-bound" && core.STATUS[12] === "objective-target", "status map: 11 objective-bound, 12 objective-target");
 
   // ---------------- authoring errors
   [[{ variables: [{ name: "x" }], constraints: [{ name: "c", terms: { y: 1 }, le: 1 }] }, /unknown variable y/],

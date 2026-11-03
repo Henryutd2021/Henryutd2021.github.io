@@ -1813,7 +1813,9 @@
                        eq: v | le: v | ge: v | lb: v, ub: v | op: "<=" | ">=" | "=", rhs: v }] }
    LX.solver.solve(model, opts) -> Promise of a result (it never rejects; problems come back as status "error"):
      { status: "optimal" | "infeasible" | "unbounded" | "infeasible-or-unbounded" | "time-limit" | "iteration-limit"
-               | "interrupted" | "cancelled" | "superseded" | "error",
+               | "objective-bound" | "objective-target" | "interrupted" | "cancelled" | "superseded" | "error",
+               (objective-bound and objective-target are HiGHS early stops at a bound or target set in its options:
+               the plan, if any, is not proved optimal)
        ok (status is optimal), kind: "lp" | "milp", sense, objective, values: {var: x}, rows: {constraint: activity},
        duals: {constraint: y} | null, reducedCosts: {var: d} | null, mipGap (MILP), conditional, fixed, message,
        ms: { build, solve, total (inside the solver), load (first call only), queued, roundTrip (what the page waited) } }
@@ -1844,8 +1846,10 @@
   // ---------------------------------------------------------------- the pure core (no outer references: it is also
   // serialised with toString() into the worker, so keep everything it needs inside this function)
   function solverCore() {
-    var STATUS = { 6: "optimal", 7: "optimal", 8: "infeasible", 9: "infeasible-or-unbounded", 10: "unbounded", 11: "optimal",
-      12: "optimal", 13: "time-limit", 14: "iteration-limit", 15: "error", 16: "time-limit", 17: "interrupted" };
+    // HiGHS model status -> ours. 11 (objective bound reached) and 12 (objective target reached) are early stops, not
+    // proofs of optimality, so they get statuses of their own and ok stays false (a plan found before the stop is kept).
+    var STATUS = { 6: "optimal", 7: "optimal", 8: "infeasible", 9: "infeasible-or-unbounded", 10: "unbounded", 11: "objective-bound",
+      12: "objective-target", 13: "time-limit", 14: "iteration-limit", 15: "error", 16: "time-limit", 17: "interrupted" };
     function num(v, dflt, what) {
       if (v === undefined || v === null) return dflt;
       if (typeof v !== "number" || isNaN(v)) throw new Error(what + ": not a number (" + v + ")");
@@ -2134,6 +2138,8 @@
     unbounded: "Unbounded: the objective can improve without limit, so a rule is missing.",
     "infeasible-or-unbounded": "No answer: the rules either cannot all hold or leave the objective without limit.",
     "time-limit": "Stopped at the time limit; the plan shown, if any, may not be the best.", "iteration-limit": "Stopped at the iteration limit.",
+    "objective-bound": "Stopped at the objective bound set for this run; the plan shown, if any, may not be the best.",
+    "objective-target": "Stopped on reaching the objective target set for this run; the plan shown may not be the best.",
     interrupted: "Interrupted.", cancelled: "Cancelled.", superseded: "Replaced by a newer run.", error: "The solver reported an error." };
   S.describe = function (r) {
     if (!r) return "";
