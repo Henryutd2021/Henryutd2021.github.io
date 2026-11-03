@@ -344,8 +344,8 @@
     },
     "tol": 50
   },
-  "validationText": "The plan's prediction of 20 August is its forecast: 19 August's measured net load (demand minus wind and solar), copied. Compare it with 20 August as measured. Tolerance, set before comparing: within the battery's 50 MW in every hour.",
-  "validationSaw": "The forecast misses by **{fcMAE} MW** on average and by **{fcMax} MW** at {fcMaxHour}, beyond the tolerance in {fcOver} of 24 hours. So the claim is narrowed: **{honest}** with this forecast, and **{ok}** only as an upper bound.",
+  "validationText": "The plan's prediction of 20 August is its forecast: 19 August's measured net load (demand minus wind and solar). Compare it with 20 August as measured. Tolerance, set first: the battery's 50 MW, in every hour.",
+  "validationSaw": "The forecast misses by **{fcMAE} MW** on average and **{fcMax} MW** at {fcMaxHour}: beyond the tolerance in {fcOver} of 24 hours. So the claim is narrowed: **{honest}** with this forecast; **{ok}** only as an upper bound.",
   "inputCheck": {
     "text": "One input can be checked against measured data: the [[round-trip-efficiency|round trip]]. The study assumed 85% (NLR's 2025 ATB); the U.S. battery fleet averaged 82% in 2019 (EIA). Does the saving hinge on it?",
     "saw": "**{eta82}** instead of **{ok}**: {eta82Change}% less, so the conclusion does not hinge on this input. That is an input check and a [[sensitivity-analysis|sensitivity run]], not a validation of the saving."

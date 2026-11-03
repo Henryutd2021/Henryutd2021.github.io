@@ -539,7 +539,7 @@
           var g = H("div", { class: "r5-checks", role: "group", "aria-label": "Which is validation?" }, act), fb = H("div", { "aria-live": "polite" }, act), more = H("div", { hidden: true }, act), bs = {};
           var V = J.validation;
           V.options.forEach(function (o2) {
-            bs[o2[0]] = H("button", { type: "button", class: "lx-choice small", "aria-pressed": "false", text: o2[1], onclick: function () {
+            bs[o2[0]] = H("button", { type: "button", class: "lx-choice small", "aria-pressed": "false", "data-key": o2[0], text: o2[1], onclick: function () {
               var right = o2[0] === V.answer; if (!picks.validation) picks.validation = { first: o2[0], right: right };
               Object.keys(bs).forEach(function (k) { bs[k].setAttribute("aria-pressed", k === o2[0] ? "true" : "false"); bs[k].classList.toggle("right", right && k === o2[0]); bs[k].classList.toggle("wrong", !right && k === o2[0]); });
               fb.innerHTML = ""; H("div", { class: "lx-saw" + (right ? "" : " no"), html: LX.icon(right ? "check" : "question") + "<div>" + LX.rich(V.why[o2[0]]) + "</div>" }, fb);
@@ -576,7 +576,7 @@
           pre.appendChild(document.createTextNode(R.log.join("\n")));
           var g = H("div", { class: "r5-checks", role: "group", "aria-label": "What makes the rerun fail?" }, act), fb = H("div", { "aria-live": "polite" }, act), more = H("div", { hidden: true }, act), bs = {};
           R.options.forEach(function (o2) {
-            bs[o2[0]] = H("button", { type: "button", class: "lx-choice small", "aria-pressed": "false", text: o2[1], onclick: function () {
+            bs[o2[0]] = H("button", { type: "button", class: "lx-choice small", "aria-pressed": "false", "data-key": o2[0], text: o2[1], onclick: function () {
               var right = o2[0] === R.answer; if (!picks.repro) picks.repro = { first: o2[0], right: right };
               Object.keys(bs).forEach(function (k) { bs[k].setAttribute("aria-pressed", k === o2[0] ? "true" : "false"); bs[k].classList.toggle("right", right && k === o2[0]); bs[k].classList.toggle("wrong", !right && k === o2[0]); });
               fb.innerHTML = ""; H("div", { class: "lx-saw" + (right ? "" : " no"), html: LX.icon(right ? "check" : "question") + "<div>" + LX.rich(R.why[o2[0]]) + "</div>" }, fb);
@@ -679,7 +679,10 @@
     LX.demo(root, function (state) {
       var n = state === "mid" ? 2 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
       V.cards.go(n - 1);
-      var card = live.querySelector(".lx-stepcard"), b = card.querySelector(".r5-run .lx-btn");
+      var card = live.querySelector(".lx-stepcard");
+      // a card that asks first (validation, rerun): pick the right answer, then run
+      var pick = card.querySelector('.r5-checks [data-key="measured"], .r5-checks [data-key="path"]'); if (pick && state !== "mid") pick.click();
+      var b = card.querySelector(".r5-run .lx-btn");
       if (b && !b.disabled) b.click();
       if (state === "mid") V.solveAll().then(function () { setTimeout(function () { var c = card.querySelector(".r5-checks .lx-choice"); if (c) c.click(); }, 50); });
       return { view: "step " + n };
