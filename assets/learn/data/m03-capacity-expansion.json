@@ -60,6 +60,7 @@
   "set": "wk7",
   "cap": 200,
   "energyCapex": 20,
+  "energyCapexNote": "An illustrative what-if, not a forecast or a sourced cost: battery energy at $20 per kWh (lesson 13 uses the sourced $241 per kWh in 13-capstone.json, techs.battery), chosen so that the solver builds a battery large enough for the three rules between weeks to differ.",
   "modes": [
    "linked",
    "cyclic",

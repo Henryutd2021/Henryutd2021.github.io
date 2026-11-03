@@ -5,15 +5,17 @@
 // learn.js; in Node it is required). This file extends it through its public API and duplicates none of it:
 //   - the same town, costs and year (13-capstone.json, town_year.json, cf_targets.json);
 //   - more choices of representative weeks (selectWeeks' perSeason and extremes options): 4, 7, 8, 11 or 15 weeks;
-//   - three treatments of the battery's state between weeks (link()): "linked" (the engine's own: a calendar chain of 52
+//   - three treatments of the battery's state between weeks (TP.link()): "linked" (the engine's own: a calendar chain of 52
 //     start levels, after Kotzur et al. 2018), "cyclic" (each representative week ends where it starts, so no energy
 //     moves between weeks) and "free" (no rule between weeks: each week may start at any level, so stored energy can
 //     appear from nothing);
 //   - validation: the chosen plan re-dispatched hour by hour on all 8,760 hours of 2025 (fullYearModel with the plan
 //     fixed) and on a second weather year, 2024 (data/m03-capacity-expansion-2024.json: SPP's 2024 shapes, scaled to the
 //     same yearly demand energy and the same wind and solar capacity factors as 2025, so only the hourly pattern differs);
-//   - stated error measures (errors()): the cost estimate against the full-year optimum (precomputed: about a minute in
+//   - stated error measures (TP.errors(), on TP.readCheck() of the full-year run): the cost estimate against the full-year optimum (precomputed: about a minute in
 //     Node), and, for the re-dispatched plan, unserved energy (MWh, hours, largest shortfall) and CO2 against the cap.
+// link(), readCheck() and errors() began here and were promoted to the engine at the W2 integration (2026-11-03), as was
+// the 52-week calendar strip (LX.WeekStrip, components/weekstrip.js); this file keeps no copy.
 // Data: assets/learn/data/m03-capacity-expansion.json (the lesson's choices and its reference results; the Node test
 // re-solves every reference number and --write rewrites them). Every number on the page is checked by
 // _tests/learn/test_m03-capacity-expansion.js with the vendored HiGHS; the notebook rebuilds the model in SciPy.
@@ -57,27 +59,14 @@
   function setOf(D, id) { return D.sets.filter(function (s) { return s.id === id; })[0]; }
 
   // ---------------------------------------------------------------- the battery between weeks
-  // m: a model from TP.weekModel (the linked chain); RW: its weeks. Variable names are the engine's: s<p>_<h> is the level
-  // in representative week p after hour h, relative to the week's start; W<i> the level at the start of calendar week i;
-  // constraint W<i> is the chain W<i+1> = W<i> + s<rep(i)>_167.
-  function link(m, RW, mode) {
-    if (!mode || mode === "linked") return m;
-    if (mode !== "cyclic" && mode !== "free") throw new Error("link: mode must be linked, cyclic or free");
-    var cons = m.constraints;
-    if (mode === "free") cons = cons.filter(function (c) { return !/^W\d+$/.test(c.name); });
-    else {
-      cons = cons.slice();
-      RW.reps.forEach(function (r, p) { var t = {}; t["s" + p + "_" + (HPW - 1)] = 1; cons.push({ name: "cyc" + p, terms: t, eq: 0 }); });
-    }
-    return { sense: m.sense, variables: m.variables, constraints: cons };
-  }
+  // TP.link(m, RW, mode) (planengine.js, promoted from this lesson): "linked" (the engine's own calendar chain),
+  // "cyclic" (each representative week ends where it starts) or "free" (no rule between weeks)
   // the planning LP on representative weeks: o = {cap (t CO2 a year), mode}
-  function planModel(C, RW, o) { return link(TP.weekModel(C, RW, { cap: o.cap }), RW, o.mode); }
+  function planModel(C, RW, o) { return TP.link(TP.weekModel(C, RW, { cap: o.cap }), RW, o.mode); }
   // the checks: a fixed plan run hour by hour on a whole year (unserved demand allowed, at the penalty)
   function checkModel(C, Y, plan) { return TP.fullYearModel(C, Y, { plan: plan }); }
   // the reference: the same LP with every one of the 8,760 hours (heavy: precomputed for the page)
   function fullModel(C, Y, cap) { return TP.fullYearModel(C, Y, { cap: cap }); }
-  function yearPeriods(Y) { return [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }]; }
 
   // ---------------------------------------------------------------- reading results
   // sizes rounded to 0.001 MW (MWh), so that the page, the reference block and the notebook check exactly the same plan
@@ -88,27 +77,8 @@
     return { plan: roundPlan(s.plan), cost: s.cost, co2: s.co2, fixed: s.fixed, fuel: s.fuel, dis: s.energy.dis, capDual: s.capDual,
              spilled: s.spilledShare, hours: RW.reps.length * HPW, weeks: RW.reps.length };
   }
-  // a solved check on a whole year: totals, plus where the shortfalls fall (MWh in each calendar week; the last 24 hours
-  // of the year, 31 December, count in week 52)
-  function readCheck(C, Y, r, plan) {
-    var s = TP.summarize(C, yearPeriods(Y), r, { plan: plan }), v = r.values, byWeek = [], hours = 0;
-    for (var i = 0; i < WEEKS; i++) byWeek.push(0);
-    for (var h = 0; h < Y.demand.length; h++) {
-      var u = v["u0_" + h] || 0;
-      if (u > 0.05) { hours++; byWeek[Math.min(WEEKS - 1, Math.floor(h / HPW))] += u; }
-    }
-    return { cost: s.cost, co2: s.co2, unserved: s.unserved, unservedShare: s.unservedShare, hours: hours, maxShort: s.maxUnservedMW,
-             byWeek: byWeek, spilled: s.spilledShare, dis: s.energy.dis, demand: s.demand };
-  }
-  // the stated error measures. est: readPlan(); full: readCheck() of the same plan; cap in t; ref: the full-year optimum
-  //   costGap  (cost of the plan on the full year) / (cost the weeks estimated) - 1
-  //   co2Over  (CO2 of the plan on the full year) / cap - 1          (positive: over the cap)
-  //   estErr   (cost the weeks estimated) / (cost of the full-year optimum) - 1   (negative: the weeks were too optimistic)
-  //   served   no hour short by more than 0.05 MW (0.5 MWh in the year in all)
-  function errors(est, full, cap, ref) {
-    return { costGap: full.cost / est.cost - 1, co2Over: full.co2 / cap - 1, estErr: ref ? est.cost / ref.cost - 1 : null,
-             unserved: full.unserved, hours: full.hours, maxShort: full.maxShort, served: full.unserved < 0.5, co2ok: full.co2 <= cap + 0.5 };
-  }
+  // a fixed plan's full-year run (TP.readCheck: totals and MWh unserved in each calendar week) and the stated error
+  // measures (TP.errors: cost gap, CO2 over the cap, estimate error) are in the planning engine, promoted from here
   // the weeks as the page lists them: kind, season, how many calendar weeks each stands for, its weight and start date
   function weekList(RW) {
     return RW.reps.map(function (r, p) {
@@ -129,12 +99,11 @@
     spct: function (x, d) { var s = (x * 100).toFixed(d == null ? 1 : d); if (/^-?0(\.0+)?$/.test(s)) return s.replace("-", "") + "%"; return (x > 0 ? "+" : "−") + s.replace("-", "") + "%"; },
     hours: function (n) { return n.toLocaleString("en-US") + (n === 1 ? " hour" : " hours"); }
   };
-  var KIND = { season: "Typical", peak: "Peak demand", netpeak: "Peak net load", calm: "Least wind", winter: "Cold, still winter" };
-  function weekName(r) { return r.kind === "season" ? "Typical " + r.season : KIND[r.kind]; }
 
+  // link, yearPeriods, readCheck and errors are the engine's own functions (TP.*), listed here for the lesson's callers
   var model = { HPW: HPW, WEEKS: WEEKS, TP: TP, prepare: prepare, prepareYear2: prepareYear2, costsWith: costsWith, weeksOf: weeksOf, setOf: setOf,
-                link: link, roundPlan: roundPlan, planModel: planModel, checkModel: checkModel, fullModel: fullModel, yearPeriods: yearPeriods,
-                readPlan: readPlan, readCheck: readCheck, errors: errors, weekList: weekList, calendar: calendar, fm: fm, weekName: weekName };
+                link: TP.link, roundPlan: roundPlan, planModel: planModel, checkModel: checkModel, fullModel: fullModel, yearPeriods: TP.yearPeriods,
+                readPlan: readPlan, readCheck: TP.readCheck, errors: TP.errors, weekList: weekList, calendar: calendar, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -142,10 +111,6 @@
   var LX = window.LX, H = LX.H, LESSON = "m03-capacity-expansion", KEY = "m3-own";
   var TECH = [["wind", "Wind", "var(--lx-wind)", "MW"], ["solar", "Solar", "var(--lx-solar)", "MW"], ["cc", "Gas combined-cycle", "var(--lx-cc)", "MW"],
               ["pk", "Gas peaker", "var(--lx-pk)", "MW"], ["nuc", "Nuclear", "var(--lx-nuc)", "MW"], ["bat", "Battery", "var(--lx-bat)", "MW / MWh"]];
-  var SEASON = { winter: "var(--lx-hyd)", spring: "var(--lx-good)", summer: "var(--lx-solar)", fall: "var(--lx-pk)" };
-  var XCOL = { peak: "var(--lx-bad)", netpeak: "var(--lx-tier-4)", calm: "var(--lx-ink-3)", winter: "var(--lx-tier-2)" };
-  var XLET = { peak: "P", netpeak: "N", calm: "C", winter: "X" };
-  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function css() {
     if (document.getElementById("m3-css")) return;
     H("style", { id: "m3-css", text: [
@@ -164,16 +129,6 @@
       ".m3-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.m3-tbl td:first-child{font-family:var(--lx-f-body)}",
       ".m3-tbl td.bad{color:var(--lx-bad)}.m3-tbl td.ok{color:var(--lx-good)}.m3-tbl tr.pre td:first-child::after{content:' · precomputed';color:var(--lx-ink-3);font-size:12px}",
       ".m3-tbl td i{display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--c);margin-right:6px;vertical-align:baseline}",
-      ".m3-strip{display:grid;gap:6px;min-width:0}",
-      ".m3-grid{display:grid;grid-template-columns:4.6em repeat(13,minmax(0,1fr));gap:3px;align-items:center}",
-      ".m3-grid span.rl{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-mono)}",
-      ".m3-cell{position:relative;height:26px;border-radius:5px;background:var(--c);color:var(--lx-bg);font:600 11px/26px var(--lx-f-mono);text-align:center;overflow:hidden}",
-      ".m3-cell.x{outline:2px solid var(--lx-ink);outline-offset:-2px}",
-      ".m3-cell.short::after{content:'';position:absolute;right:2px;top:2px;width:8px;height:8px;border-radius:50%;background:var(--lx-bad);box-shadow:0 0 0 1.5px var(--lx-surface)}",
-      "@media (max-width:560px){.m3-cell.short::after{width:6px;height:6px;right:1px;top:1px}}",
-      ".m3-keys{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--lx-ink-2);margin:0;padding:0;list-style:none}",
-      ".m3-keys li{display:flex;align-items:center;gap:6px}.m3-keys i{width:12px;height:12px;border-radius:3px;background:var(--c);flex:none}",
-      ".m3-keys i.dot{background:var(--lx-bad);border-radius:50%;width:9px;height:9px}",
       ".m3-verdict{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:15px}.m3-verdict li{display:flex;gap:8px;align-items:flex-start}",
       ".m3-verdict .ok{color:var(--lx-good)}.m3-verdict .no{color:var(--lx-bad)}.m3-verdict .lx-ic{flex:none;margin-top:3px}",
       ".m3-formula{font-family:var(--lx-f-mono);font-size:14.5px;padding:10px 12px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface-2);overflow-x:auto;white-space:nowrap}",
@@ -183,59 +138,12 @@
       ".m3-bars .bar{height:12px;border-radius:6px;background:var(--lx-surface-3);overflow:hidden}.m3-bars .bar i{display:block;height:100%;background:var(--lx-accent)}",
       ".m3-bars b{font-family:var(--lx-f-mono);font-weight:600;text-align:right}",
       ".m3-note{font-size:13.5px;color:var(--lx-ink-3)}",
-      "@media (max-width:560px){.m3-grid{grid-template-columns:3.4em repeat(13,minmax(0,1fr));gap:2px}.m3-cell{font-size:9px;height:24px;line-height:24px;letter-spacing:-.03em}.m3-tbl table{font-size:13px}.m3-tbl th,.m3-tbl td{white-space:normal;padding:4px 3px}.m3-tbl .ph{display:none}}"
+      "@media (max-width:560px){.m3-tbl table{font-size:13px}.m3-tbl th,.m3-tbl td{white-space:normal;padding:4px 3px}.m3-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
   }
   function kpi(host, label, value, bad) { var k = H("div", { class: "m3-kpi" + (bad ? " bad" : "") }, host); H("small", { text: label }, k); H("b", { text: value }, k); return k; }
   function capKt(D) { return D.cap; }
   function batText(p) { return Math.round(p.bp) + " / " + Math.round(p.be); }
-  function dateOf(Y, i) { var d = TP.weekStart(Y, i); return d.getUTCDate() + " " + MON[d.getUTCMonth()]; }
-
-  // ---------------------------------------------------------------- the calendar strip: 52 weeks, coloured by the
-  // representative week that stands for each; a red dot marks a week with unserved energy in a full-year check
-  // (lesson-local component; candidate for the library)
-  function repColor(RW, k) {
-    var r = RW.reps[k];
-    if (r.kind !== "season") return XCOL[r.kind] || "var(--lx-ink-2)";
-    var same = RW.reps.filter(function (q) { return q.kind === "season" && q.season === r.season; }), j = same.indexOf(r);
-    return j === 0 ? SEASON[r.season] : "color-mix(in srgb, " + SEASON[r.season] + " " + (100 - 28 * j) + "%, var(--lx-ink))";
-  }
-  function repLetter(RW, k) {
-    var r = RW.reps[k];
-    if (r.kind !== "season") return XLET[r.kind];
-    var same = RW.reps.filter(function (q) { return q.kind === "season" && q.season === r.season; });
-    return { winter: "W", spring: "Sp", summer: "Su", fall: "F" }[r.season] + (same.length > 1 ? same.indexOf(r) + 1 : "");
-  }
-  function WeekStrip(host, Y) {
-    var box = H("div", { class: "m3-strip" }, host);
-    var grid = H("div", { class: "m3-grid", role: "img" }, box), keys = H("ul", { class: "m3-keys", "aria-hidden": "true" }, box);
-    var tv = H("details", { class: "lx-textalt" }, box); H("summary", { text: "Text version: the 52 weeks of 2025" }, tv);
-    var tvb = H("div", { class: "m3-tbl" }, tv);
-    function draw(RW, byWeek) {
-      grid.innerHTML = ""; keys.innerHTML = "";
-      var rows = [];
-      for (var q = 0; q < 4; q++) {
-        H("span", { class: "rl", text: dateOf(Y, q * 13) }, grid);
-        for (var j = 0; j < 13; j++) {
-          var i = q * 13 + j, k = RW.chrono[i], r = RW.reps[k], sh = byWeek && byWeek[i] > 0.05;
-          H("span", { class: "m3-cell" + (r.kind !== "season" ? " x" : "") + (sh ? " short" : ""), style: "--c:" + repColor(RW, k), text: repLetter(RW, k) }, grid);
-          rows.push("<tr><td>" + dateOf(Y, i) + "</td><td>" + LX.esc(weekName(r)) + (r.kind === "season" && RW.reps.filter(function (x) { return x.season === r.season && x.kind === "season"; }).length > 1 ? " " + repLetter(RW, k).replace(/^\D+/, "") : "") + "</td>" +
-            (byWeek ? "<td>" + (sh ? fm.mwh(byWeek[i]) : "0") + "</td>" : "") + "</tr>");
-        }
-      }
-      RW.reps.forEach(function (r, k) {
-        var li = H("li", null, keys); H("i", { style: "--c:" + repColor(RW, k) }, li);
-        H("span", { text: repLetter(RW, k) + " " + weekName(r).replace("Typical ", "") + " ×" + r.n }, li);
-      });
-      if (byWeek) { var li = H("li", null, keys); H("i", { class: "dot" }, li); H("span", { text: "demand unserved that week" }, li); }
-      var nShort = byWeek ? byWeek.filter(function (x) { return x > 0.05; }).length : 0;
-      grid.setAttribute("aria-label", "The 52 weeks of 2025 in four rows of 13, each coloured by the representative week that stands for it: " +
-        RW.reps.map(function (r) { return weekName(r) + " for " + r.n + (r.n === 1 ? " week" : " weeks"); }).join(", ") + "." +
-        (byWeek ? " " + (nShort ? nShort + " weeks have unserved demand in the full-year check." : "No week has unserved demand in the full-year check.") : ""));
-      tvb.innerHTML = "<table><thead><tr><th scope='col'>Week starting</th><th scope='col'>Stands in</th>" + (byWeek ? "<th scope='col'>Unserved, full year</th>" : "") + "</tr></thead><tbody>" + rows.join("") + "</tbody></table>";
-    }
-    return { el: box, draw: draw };
-  }
 
   // ---------------------------------------------------------------- tables
   // head: column titles; a title "~Name" is hidden on phones (its cells too)
@@ -292,13 +200,13 @@
         if (x[k] || !x.est) return x;
         var Yx = y === 2024 ? S.Y2 : S.Y;
         return LX.solver.solve(checkModel(S.C, Yx, x.est.plan), { timeLimit: 20, key: "m3-check-" + id + k, label: "m3-check" }).then(function (r) {
-          x["r" + k] = r; if (r.ok) x[k] = readCheck(S.C, Yx, r, x.est.plan); else x.fail = r;
+          x["r" + k] = r; if (r.ok) x[k] = TP.readCheck(S.C, Yx, r, x.est.plan); else x.fail = r;
           return x;
         });
       });
     }
     function verdict(host, x, k, year) {
-      var c = x[k], e = errors(x.est, c, cap, null), ul = H("ul", { class: "m3-verdict" }, host);
+      var c = x[k], e = TP.errors(x.est, c, cap, null), ul = H("ul", { class: "m3-verdict" }, host);
       function line(good, html) { var li = H("li", null, ul); H("span", { class: good ? "ok" : "no", html: LX.icon(good ? "check" : "question") }, li); H("span", { html: html }, li); }
       line(Math.abs(e.costGap) <= 0.02, "Cost: <b>" + fm.musd(c.cost) + "</b> a year on all of " + year + ", " + fm.spct(e.costGap) + " on the estimate.");
       line(e.co2ok, "CO₂: <b>" + fm.kt(c.co2) + "</b> against the " + D.cap + " kt cap (" + fm.spct(e.co2Over) + ").");
@@ -333,7 +241,7 @@
       { text: "Each [[representative-period|representative week]] stands for several calendar weeks; its weight says how many. Pick two of the five ways of choosing them and compare the calendars.",
         build: function (act, api) {
           var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Ways of choosing the representative weeks" }, act);
-          var strip = WeekStrip(act, S.Y), seen = {};
+          var strip = LX.WeekStrip(act, S.Y), seen = {};
           var bs = D.sets.map(function (s) { return H("button", { type: "button", "aria-pressed": "false", text: s.short, onclick: function () { pick(s.id); } }, seg); });
           function pick(id) {
             var RW = S.weeks(id), set = setOf(D, id);
@@ -375,7 +283,7 @@
       { text: "Now the check. Keep the sizes fixed and run the plan hour by hour on all 8,760 hours of 2025. Demand the plants cannot meet counts as [[unserved-energy|unserved]].",
         build: function (act, api) {
           var row = H("div", { class: "m3-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Run all 8,760 hours" }, row);
-          var st = LX.SolverStatus(row), out = H("div", { "aria-live": "polite" }, act), strip = WeekStrip(act, S.Y);
+          var st = LX.SolverStatus(row), out = H("div", { "aria-live": "polite" }, act), strip = LX.WeekStrip(act, S.Y);
           strip.draw(S.weeks("typ4"), null);
           function show(x) { out.innerHTML = ""; verdict(out, x, "y25", 2025); strip.draw(S.weeks("typ4"), x.y25.byWeek); }
           if (res.typ4 && res.typ4.y25) { show(res.typ4); api.done(); }
@@ -385,7 +293,7 @@
               api.busy(false); go.disabled = false;
               if (!x.y25) { st.set(x.fail); return; }
               st.set(x.ry25); show(x); api.done();
-              var e = errors(x.est, x.y25, cap, null);
+              var e = TP.errors(x.est, x.y25, cap, null);
               api.saw("The cost holds within " + fm.pct(Math.abs(e.costGap)) + ". But " + fm.mwh(x.y25.unserved) + " go unserved in " + fm.hours(x.y25.hours) + ", spread over " + x.y25.byWeek.filter(function (v) { return v > 0.05; }).length + " weeks (red dots), and CO₂ is " + fm.kt(x.y25.co2) + " against " + D.cap + ".");
             });
           });
@@ -394,7 +302,7 @@
       { text: "Keep the extremes: add the weeks of peak demand, of peak [[net-demand|net load]] (demand minus wind and sun) and of least wind, each standing only for itself. Solve and check again.",
         build: function (act, api) {
           var row = H("div", { class: "m3-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve and check 4 + 3 extreme weeks" }, row);
-          var st = LX.SolverStatus(row), tb = H("div", null, act), strip = WeekStrip(act, S.Y);
+          var st = LX.SolverStatus(row), tb = H("div", null, act), strip = LX.WeekStrip(act, S.Y);
           strip.draw(S.weeks("wk7"), null);
           function show() { resultsTable(tb, ["typ4", "wk7"]); strip.draw(S.weeks("wk7"), res.wk7.y25.byWeek); }
           if (res.wk7 && res.wk7.y25 && res.typ4 && res.typ4.y25) { show(); api.done(); }
@@ -445,14 +353,14 @@
       // 8 storage between weeks
       { text: "A battery needs a rule between weeks. Linked: one calendar chain of 52 start levels. Cyclic: each week ends where it starts. No link: each week may start at any level. Which plan looks cheapest?",
         build: function (act, api) {
-          H("p", { class: "m3-note", html: LX.rich("What-if, so the solver builds more storage: battery energy at $" + D.storage.energyCapex + " per kWh instead of $" + cfg.techs.battery.energyCapex + " (illustrative). Six solves: a few seconds on a laptop, longer on a phone.") }, act);
+          H("p", { class: "m3-note", html: LX.rich("**An illustrative what-if, not a forecast or a sourced cost:** battery energy at $" + D.storage.energyCapex + " per kWh instead of the sourced $" + cfg.techs.battery.energyCapex + " (lesson 13), so the solver builds more storage. Six solves: a few seconds on a laptop, longer on a phone.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, act);
           var tb, row, st, out = {};
           var NAMES = { linked: "Linked across the calendar", cyclic: "Cyclic within each week", free: "No link between weeks" };
           function show() {
             tb.innerHTML = "";
             table(tb, ["Rule between weeks", "Battery MW / MWh", "Estimate", "Full year: CO₂", "Full year: unserved"], D.storage.modes.map(function (m) {
               var o = out[m]; return { cells: [NAMES[m], batText(o.est.plan), fm.musd(o.est.cost), { text: fm.kt(o.full.co2), cls: o.full.co2 > cap + 0.5 ? "bad" : "ok" }, { text: o.full.unserved < 0.5 ? "0" : fm.mwh(o.full.unserved), cls: o.full.unserved < 0.5 ? "ok" : "bad" }] };
-            }), "Three rules for the battery between weeks, what-if storage cost");
+            }), "Three rules for the battery between weeks, at the illustrative what-if storage cost");
           }
           function solveAll() {
             var RW = S.weeks(D.storage.set), modes = D.storage.modes, i = 0, scap = D.storage.cap * 1e3;
@@ -465,7 +373,7 @@
                   var est = readPlan(S.Cw, RW, r, { cap: scap });
                   return LX.solver.solve(checkModel(S.Cw, S.Y, est.plan), { timeLimit: 20, label: "m3-storage-check" }).then(function (rc) {
                     if (!rc.ok) throw rc;
-                    out[m] = { est: est, full: readCheck(S.Cw, S.Y, rc, est.plan) }; st.set(rc);
+                    out[m] = { est: est, full: TP.readCheck(S.Cw, S.Y, rc, est.plan) }; st.set(rc);
                   });
                 });
               });
@@ -480,7 +388,7 @@
                 if (!okk) return; show(); api.done();
                 var L = out.linked, F = out.free, Cy = out.cyclic;
                 var same = Math.abs(L.est.cost - Cy.est.cost) < 0.005 * L.est.cost;
-                api.saw("No link: " + fm.mwh(F.est.plan.be) + " of battery and a plan " + fm.musd(L.est.cost - F.est.cost) + " cheaper on paper; on the full year it emits " + fm.kt(F.full.co2) + ". Each week could start charged, for free. " +
+                api.saw("In this illustrative what-if, no link: " + fm.mwh(F.est.plan.be) + " of battery and a plan " + fm.musd(L.est.cost - F.est.cost) + " cheaper on paper; on the full year it emits " + fm.kt(F.full.co2) + ". Each week could start charged, for free. " +
                   (same ? "Linked and cyclic agree here: this battery empties and refills within a week." : "Cyclic differs from linked by " + fm.musd(Math.abs(Cy.est.cost - L.est.cost)) + "."));
               });
             } });
