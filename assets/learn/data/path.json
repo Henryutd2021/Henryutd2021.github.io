@@ -1310,8 +1310,8 @@
   },
   {
    "title": "Exponentials and discounting",
-   "ready": false,
-   "href": "index.html#toolbox",
+   "ready": true,
+   "href": "k03-discounting.html",
    "code": "K3",
    "id": "k03-discounting",
    "minutes": 15

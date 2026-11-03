@@ -5,6 +5,12 @@
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
  },
+ "annuity-factor": {
+  "term": "Annuity factor",
+  "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
+  "lesson": "K3",
+  "href": "k03-discounting.html"
+ },
  "array": {
   "term": "Array",
   "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
@@ -676,6 +682,12 @@
   "short": "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "real-rate": {
+  "term": "Real rate",
+  "short": "An interest or discount rate with inflation taken out, used with costs stated in one year's dollars.",
+  "lesson": "K3",
+  "href": "k03-discounting.html"
  },
  "refuelling-outage": {
   "term": "Refuelling outage",
