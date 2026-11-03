@@ -54,6 +54,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>EIA and ATB inputs in real 2025 dollars, with no taxes, credits or grid costs, so not the agencies' own LCOEs; Prairie Town's plants are illustrative. Sources and dates: <a href="#inputs">where the inputs come from</a>.</span></p>
+<p class="lx-hint">Need a refresher? Toolbox <a href="k01-units.html">K1</a> ($ per kW against $ per MWh) and <a href="k02-rates-efficiencies.html">K2</a> (fuel cost per MWh from a heat rate).</p>
 ```
 :::
 
@@ -92,6 +93,8 @@ $$C = \sum_{t=1}^{n} \frac{A}{(1+r)^t} = A\,\frac{1-(1+r)^{-n}}{r},$$
 $$\text{so}\quad A = \frac{r}{1-(1+r)^{-n}}\, C = \mathrm{CRF}\cdot C .$$
 
 When $r = 0$ the [capital recovery factor]{.lx-term term="capital-recovery-factor"} is simply $1/n$.
+
+<p class="lx-hint">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and the capital recovery factor).</p>
 
 The [LCOE]{.lx-term term="lcoe"} is the steady price at which the plant's discounted sales repay everything, so its net present value is zero.
 

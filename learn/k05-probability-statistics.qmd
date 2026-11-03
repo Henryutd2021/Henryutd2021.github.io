@@ -38,11 +38,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.k5-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.k5-ans label { font-family: var(--lx-f-display); font-weight: 500; }
-.k5-num { width: 7em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
-  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
-.k5-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
 .k5-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .k5-lab { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink-2); }
 .k5-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -51,9 +46,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k5-prog { font-size: 13.5px; color: var(--lx-ink-3); }
 .k5-cases:empty { display: none; }
 .k5-cases .lx-mini-table th:first-child, .k5-cases .lx-mini-table td:first-child { text-align: left; font-family: var(--lx-f-body, inherit); }
-.k5-drill, .k5-practice { display: grid; gap: 10px; }
-.k5-drill .lx-btn { justify-self: start; }
-.k5-drill-q { display: grid; gap: 10px; }
+.k5-practice { display: grid; gap: 10px; }
 .k5-tasks { margin: 0; padding-left: 1.3rem; display: grid; gap: 14px; font-size: 15px; color: var(--lx-ink-2); }
 .k5-tasks li { display: grid; gap: 6px; }
 .k5-tasks li p { margin: 0; }

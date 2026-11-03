@@ -126,6 +126,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real data.</b> Capacity factors are the 2025 U.S. averages from EIA's <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a> (released 23 October 2026).</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real shapes, reshaped.</b> Wind and solar keep the Southwest Power Pool's 2025 hour-by-hour pattern (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), reshaped month by month to those U.S. averages. So the solar day is illustrative, not one farm's meter.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative.</b> The nuclear plant's refuelling outage and the 3 MW wind turbine.</span></p>
+<p class="lx-hint">Need a refresher? Toolbox <a href="k01-units.html">K1</a> (MW held for 8,760 h is MWh) and <a href="k02-rates-efficiencies.html">K2</a> (capacity factor as a rate).</p>
 ```
 :::
 

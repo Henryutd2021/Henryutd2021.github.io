@@ -21,6 +21,9 @@
 //   expected MW out = sum over the four cases of MW x chance = p1 x MW1 + p2 x MW2 (true with or without independence)
 (function () {
   "use strict";
+  // shared pieces: LX.Drill (the seeded practice drill; its rng also draws the samples here) and LX.NumAnswer (number boxes)
+  var DR = (typeof window !== "undefined" && window.LX && window.LX.Drill) || require("./components/drill.js");
+  var rng = DR.rng;
 
   // ---------------------------------------------------------------- pure model
   function tenths(fc) { return fc.jan_apr.rel_error_tenths_pct.slice().sort(function (a, b) { return a - b; }); }
@@ -44,7 +47,6 @@
     t10.forEach(function (t) { bins[Math.floor(t / w) - k0].n++; });
     return bins;
   }
-  function rng(seed) { var s = seed >>> 0 || 1; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
   function draw(x, n, r) { var out = []; for (var i = 0; i < n; i++) out.push(x[Math.floor(r() * x.length)]); return out; }
   // reps samples of n hours each; each gives the share of its hours above t (a fraction)
   function sampleShares(x, n, reps, r, t) {
@@ -145,7 +147,7 @@
              choices: ["Sample 1", "Sample 2", "Equally trustworthy"], answer: aFirst ? 1 : 0,
              why: "The sample of " + int(nB) + " hours: a share from more hours scatters less (its standard error shrinks with the square root of the sample size)." };
   }
-  function drill(fc, seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(fc, k, r)); return out; }
+  function drill(fc, seed, n) { return DR.series(function (k, r) { return drillItem(fc, k, r); }, seed, n); }
   // the four data tasks under the drill: answers from the data, with the tolerance the check allows
   function tasks(fc) {
     var x = errors(fc), n = x.length, S = { below0: countBelow(x, 0), within2: countIn(x, -2, 2), below5: countBelow(x, -THRESH), p99: quantile(x, 0.99) };
@@ -194,17 +196,8 @@
     });
     return { el: g, buttons: bs, set: function (i) { bs.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); }); } };
   }
-  function numInput(host, o) {
-    var id = LX.uid("in"), row = H("div", { class: "k5-ans" }, host);
-    H("label", { for: id, text: o.label }, row);
-    var inp = H("input", { id: id, type: "text", inputmode: "decimal", autocomplete: "off", class: "k5-num" }, row);
-    if (o.unit) H("span", { class: "k5-unit", text: o.unit }, row);
-    var btn = H("button", { type: "button", class: "lx-btn small", text: o.button || "Check" }, row);
-    function go() { var v = parseFloat(String(inp.value).replace(/[−–]/g, "-").replace(/,/g, "").replace(/%/g, "")); o.onCheck(isNaN(v) ? null : v, inp); }
-    btn.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    return { input: inp, button: btn, row: row };
-  }
+  // the page's number boxes (LX.NumAnswer, 7em wide)
+  function numBox(host, o) { return LX.NumAnswer(host, Object.assign({ width: "7em" }, o)); }
   function miniTable(host, head, rows) {
     host.innerHTML = "";
     var sc = H("div", { class: "lx-scroll-x" }, host), tb = H("table", { class: "lx-mini-table" }, sc), hr = H("tr", null, H("thead", null, tb));
@@ -384,7 +377,7 @@
       text: "An illustrative case: Prairie Town's two gas plants are each out of service in " + share(PL.p, 0) + " of hours. If the outages are [[independent-events|independent]], the chance both are out is the product of the two chances. Work it out.",
       build: function (act, api) {
         var tbl = H("div", { class: "k5-cases" }, act), tries = 0;
-        numInput(act, { label: "Both out:", unit: "% of hours", onCheck: function (v) {
+        numBox(act, { label: "Both out:", unit: "% of hours", onCheck: function (v) {
           tries++;
           if (v != null && Math.abs(v - 100 * PL.both) < 0.0051) {
             miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false));
@@ -400,7 +393,7 @@
       build: function (act, api) {
         var tbl = H("div", { class: "k5-cases" }, act), tries = 0;
         miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false));
-        numInput(act, { label: "Average MW out:", unit: "MW", onCheck: function (v) {
+        numBox(act, { label: "Average MW out:", unit: "MW", onCheck: function (v) {
           tries++;
           if (v != null && Math.abs(v - PL.ev) < 0.051) {
             miniTable(tbl, ["Case", "MW out", "Hours in 10,000", "MW × chance"], caseRows(true));
@@ -463,37 +456,11 @@
     });
   }
 
-  // ---- practice drill: a seeded stream of short items with instant feedback (this browser only)
+  // ---- practice drill: a seeded stream of short items with instant feedback (LX.Drill; this visit only)
   function drillView(fc) {
     var host = document.getElementById("k5-drill"); if (!host) return; host.innerHTML = "";
-    var seed = (Date.now() % 100000) + 1, r = rng(seed), k = 0, right = 0, done = 0;
-    var card = H("div", { class: "lx-card k5-drill" }, host);
-    var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice drill" }, top);
-    var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    H("p", { class: "lx-hint", text: "Seven kinds of item in rotation, new numbers each time (about 20 minutes). Aim for fifteen, two rounds of seven and one more." }, card);
-    var box = H("div", { class: "k5-drill-q" }, card);
-    var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
-    function show(focus) {
-      var it = drillItem(fc, k, r); k++; box.innerHTML = "";
-      var q = H("p", { class: "lx-qtext", tabindex: "-1", text: it.q }, box);
-      var fb = H("div", { "aria-live": "polite" }, box), answered = false;
-      function mark(ok) {
-        if (answered) return; answered = true; done++; if (ok) right++;
-        score.textContent = right + " of " + done + " right";
-        fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
-      }
-      if (it.choices) {
-        var row = H("div", { class: "lx-qbtns" }, box);
-        it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
-        box.insertBefore(row, fb);
-      } else {
-        var ni = numInput(box, { label: "Answer", unit: it.unit || "", onCheck: function (v) { if (v != null) mark(Math.abs(v - it.answer) <= it.tol + 1e-9); } });
-        box.insertBefore(ni.row, fb);
-      }
-      if (focus) q.focus();
-    }
-    next.addEventListener("click", function () { show(true); });
-    show(false);
+    LX.Drill(host, { hint: "Seven kinds of item in rotation, new numbers each time (about 20 minutes). Aim for fifteen, two rounds of seven and one more.",
+                     width: "7em", item: function (k, r) { return drillItem(fc, k, r); } });
   }
 
   // ---- four data tasks with a range explorer over the real hours
@@ -518,7 +485,7 @@
     T.forEach(function (t) {
       var li = H("li", null, ol); H("p", { text: t.text }, li);
       var fb = H("div", { "aria-live": "polite" }, li);
-      var ni = numInput(li, { label: "Answer", unit: t.unit, onCheck: function (v) {
+      var ni = numBox(li, { label: "Answer", unit: t.unit, onCheck: function (v) {
         if (v == null) return;
         var ok = Math.abs(v - t.answer) <= t.tol + 1e-9;
         if (ok) { doneK[t.key] = 1; li.classList.add("done"); score.textContent = Object.keys(doneK).length + " of " + T.length + " done"; }

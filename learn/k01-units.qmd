@@ -38,13 +38,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.k1-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.k1-ans label { font-family: var(--lx-f-display); font-weight: 500; }
-.k1-num { width: 8.5em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
-  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
-.k1-num.right { border-color: var(--lx-good); box-shadow: inset 0 0 0 1px var(--lx-good); }
-.k1-num.wrong { border-color: var(--lx-warn); box-shadow: inset 0 0 0 1px var(--lx-warn); }
-.k1-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
 .k1-eq { font-family: var(--lx-f-mono); font-size: 15.5px; color: var(--lx-ink); margin: 0; overflow-wrap: anywhere; }
 .k1-test { margin: 0; font-size: 15.5px; color: var(--lx-ink-2); min-height: 1.5em; overflow-wrap: anywhere; }
 .k1-test b { font-family: var(--lx-f-mono); color: var(--lx-ink); }
@@ -73,11 +66,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k1-pick { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
 .k1-selw { display: inline-flex; align-items: center; gap: 6px; font-family: var(--lx-f-display); }
 .k1-sel { min-height: 40px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); font-size: 15px; }
-.k1-drill { display: grid; gap: 10px; }
-.k1-drill .lx-btn { justify-self: start; }
-.k1-drill-q { display: grid; gap: 10px; }
-.k1-drill-q .lx-qtext { overflow-wrap: anywhere; }
-.k1-drill-q .lx-qtext:focus { outline: none; }
 .k1-tables { overflow-x: auto; }
 .k1-static { border-collapse: collapse; font-size: 14px; }
 .k1-static th, .k1-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: right; vertical-align: top; }
@@ -91,7 +79,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
   .k1-magrow b { font-size: 12px; }
   .k1-row .k1-mark { grid-row: 3; grid-column: 1; text-align: left; }
   .k1-static .k1-wh { display: none; }
-  .k1-num { width: 6.5em; }
 }
 </style>
 ```

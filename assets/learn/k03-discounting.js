@@ -26,6 +26,9 @@
 // them against lessons 7 and 13 and against the page (it also writes the no-JS blocks: --write).
 (function () {
   "use strict";
+  // shared pieces: LX.NumAnswer (number boxes; close() is its tolerance check) and LX.Drill (the seeded practice drill)
+  var NA = (typeof window !== "undefined" && window.LX && window.LX.NumAnswer) || require("./components/numanswer.js");
+  var DR = (typeof window !== "undefined" && window.LX && window.LX.Drill) || require("./components/drill.js");
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
   function fv(x, r, t) { return x * Math.pow(1 + r, t); }
@@ -94,8 +97,7 @@
     return { money: money, crf: crfT };
   }
 
-  // ---------------------------------------------------------------- practice drill (seeded, so tests can replay it)
-  function rng(seed) { var x = seed >>> 0 || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+  // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["grow", "discount", "double", "crf", "yearly", "compare"];
   var DOUBLE_RATES = [2, 3.5, 5, 7, 10, 14];
   function drillItem(k, r) {
@@ -135,29 +137,18 @@
     return { kind: kind, q: "At " + crate + "% a year, which is worth more today: $" + now + " now, or $" + later + " in " + ct + " years?", choices: ["$" + now + " now", "$" + later + " in " + ct + " years"], answer: laterWins ? 1 : 0,
              why: "$" + later + " in " + ct + " years is worth " + usd(v) + " today, " + (laterWins ? "more" : "less") + " than $" + now + "." };
   }
-  function drill(seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(k, r)); return out; }
-  function close(v, ans, tol) { return v != null && Math.abs(v - ans) <= tol + 1e-9; }
+  function drill(seed, n) { return DR.series(drillItem, seed, n); }
+  var close = NA.close;   // v within tol of ans (plus 1e-9 for rounding); null is never close
 
   var model = { fv: fv, simple: simple, pv: pv, annuity: annuity, annuitySum: annuitySum, crf: crf, crf13: crf13, yearly: yearly,
                 doubling: doubling, firstYearAt: firstYearAt, realRate: realRate, story: story, staticBlocks: staticBlocks,
-                drill: drill, drillItem: drillItem, rng: rng, close: close, KINDS: KINDS, usd: usd, f4: f4, f5: f5, pct: pct };
+                drill: drill, drillItem: drillItem, rng: DR.rng, close: close, KINDS: KINDS, usd: usd, f4: f4, f5: f5, pct: pct };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ================================================================ view
   var LX = window.LX, H = LX.H;
 
-  function numInput(host, o) {
-    var id = LX.uid("in"), row = H("div", { class: "k3-ans" }, host);
-    H("label", { for: id, text: o.label }, row);
-    var inp = H("input", { id: id, type: "text", inputmode: "decimal", autocomplete: "off", class: "k3-num" }, row);
-    if (o.unit) H("span", { class: "k3-unit", text: o.unit }, row);
-    var btn = H("button", { type: "button", class: "lx-btn small", text: o.button || "Check" }, row);
-    function go() { var v = parseFloat(String(inp.value).replace(/[−–]/g, "-").replace(/[$,\s]/g, "")); o.onCheck(isNaN(v) ? null : v, inp); }
-    btn.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    return { input: inp, button: btn, go: go };
-  }
   function textAlt(host, title, items) {
     var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title || "Text version" }, d);
     var ul = H("ul", null, d); (items || []).forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
@@ -210,7 +201,7 @@
       build: function (act, api) {
         H("p", { class: "k3-eq", html: "today × " + (1 + s.rate).toFixed(2) + "<sup>10</sup> = " + A + "&nbsp;&nbsp;so&nbsp;&nbsp;today = " + A + " ÷ " + (1 + s.rate).toFixed(2) + "<sup>10</sup>" }, act);
         var tries = 0, want = s.pv7[1];
-        var n = numInput(act, { label: "Worth today:", unit: "$", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Worth today:", unit: "$", onCheck: function (v) {
           tries++;
           if (close(v, +want.toFixed(2), 0.015)) { api.done(); api.saw(usd(want) + " is the [[present-value|present value]] of " + A + " in 10 years: put " + usd(want) + " in today at " + R + " and it grows to " + A + "."); }
           else api.saw(tries < 2 ? "Not yet. Divide " + A + " by " + (1 + s.rate).toFixed(2) + " ten times (or by " + (1 + s.rate).toFixed(2) + "^10 = " + Math.pow(1 + s.rate, 10).toFixed(4) + ")." : A + " ÷ " + Math.pow(1 + s.rate, 10).toFixed(4) + " = " + usd(want) + ".", true);
@@ -284,7 +275,7 @@
       build: function (act, api) {
         H("p", { class: "k3-eq", html: usd(s.capex, 0) + " ÷ " + s.af.toFixed(2) + " = ? per kW a year" }, act);
         var tries = 0;
-        var n = numInput(act, { label: "Yearly payment:", unit: "$ per kW", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Yearly payment:", unit: "$ per kW", onCheck: function (v) {
           tries++;
           if (close(v, s.payment, 0.5)) {
             LX.store.set("k3-own", { rate: s.plantRate * 100, life: s.life });
@@ -383,37 +374,11 @@
     });
   }
 
-  // ---------------------------------------------------------------- practice drill (this browser only)
+  // ---------------------------------------------------------------- practice drill (LX.Drill; this visit only)
   function drillView() {
     var host = document.getElementById("k3-drill"); if (!host) return; host.innerHTML = "";
-    var seed = (Date.now() % 100000) + 1, r = rng(seed), k = 0, right = 0, done = 0;
-    var card = H("div", { class: "lx-card k3-drill" }, host);
-    var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice drill" }, top);
-    var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    H("p", { class: "lx-hint", text: "Six kinds of item in rotation, new numbers each time; a calculator helps. Aim for twelve, about 15 minutes." }, card);
-    var box = H("div", { class: "k3-drill-q" }, card);
-    var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
-    function show(focus) {
-      var it = drillItem(k, r); k++; box.innerHTML = "";
-      var qp = H("p", { class: "lx-qtext", tabindex: "-1", text: it.q }, box);
-      var fb = H("div", { "aria-live": "polite" }, box), answered = false;
-      function mark(ok) {
-        if (answered) return; answered = true; done++; if (ok) right++;
-        score.textContent = right + " of " + done + " right";
-        fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
-      }
-      if (it.choices) {
-        var row = H("div", { class: "lx-qbtns" }, box);
-        it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
-        box.insertBefore(row, fb);
-      } else {
-        var n = numInput(box, { label: "Answer", unit: it.unit === "$" ? "dollars" : "", onCheck: function (v) { if (v == null) { fb.textContent = "Type a number first."; return; } mark(close(v, it.answer, it.tol)); } });
-        box.insertBefore(n.input.parentNode, fb);
-      }
-      if (focus) qp.focus();
-    }
-    next.addEventListener("click", function () { show(true); });
-    show(false);
+    LX.Drill(host, { hint: "Six kinds of item in rotation, new numbers each time; a calculator helps. Aim for twelve, about 15 minutes.",
+                     unit: function (it) { return it.unit === "$" ? "dollars" : ""; }, empty: "Type a number first.", item: drillItem });
   }
 
   LX.mount("k03", function (live, data, root) { view(live, data, root); });

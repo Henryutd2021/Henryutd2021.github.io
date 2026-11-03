@@ -25,6 +25,9 @@
 // checks them against lessons 1, 5, 7 and 13 and against the page (it also writes the no-JS table: --write).
 (function () {
   "use strict";
+  // shared pieces: LX.NumAnswer (number boxes; close() is its tolerance check) and LX.Drill (the seeded practice drill)
+  var NA = (typeof window !== "undefined" && window.LX && window.LX.NumAnswer) || require("./components/numanswer.js");
+  var DR = (typeof window !== "undefined" && window.LX && window.LX.Drill) || require("./components/drill.js");
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
   function avgKW(kwh, hours) { return kwh / hours; }
@@ -85,8 +88,7 @@
       '<thead><tr><th scope="col">Rate</th><th scope="col">Unit</th><th scope="col">Worked on this page</th></tr></thead>\n<tbody>\n' + rows + "\n</tbody></table>" };
   }
 
-  // ---------------------------------------------------------------- practice drill (seeded, so tests can replay it)
-  function rng(seed) { var x = seed >>> 0 || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+  // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["avg", "fuel", "eff", "back", "co2", "cf", "chain"];
   var HOURS = 8760, K_MMBTU = 3.412, CO2_COEF = 52.91;
   function drillItem(k, r) {
@@ -137,29 +139,18 @@
              choices: order.map(function (p) { return p[1]; }), answer: order.map(function (p) { return p[2]; }).indexOf(0),
              why: pct(e1, 0) + " × " + pct(e2, 0) + " = " + pct(right) + ": efficiencies multiply; they do not add or average." };
   }
-  function drill(seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(k, r)); return out; }
-  function close(v, ans, tol) { return v != null && Math.abs(v - ans) <= tol + 1e-9; }
+  function drill(seed, n) { return DR.series(drillItem, seed, n); }
+  var close = NA.close;   // v within tol of ans (plus 1e-9 for rounding); null is never close
 
   var model = { avgKW: avgKW, fuelCost: fuelCost, co2Kg: co2Kg, efficiency: efficiency, heatRateFor: heatRateFor, chain: chain, energyOut: energyOut,
                 energyIn: energyIn, cfEnergy: cfEnergy, cfOf: cfOf, story: story, rateRows: rateRows, staticBlocks: staticBlocks, drill: drill,
-                drillItem: drillItem, rng: rng, close: close, KINDS: KINDS, num: num, usd: usd, pct: pct, K_MMBTU: K_MMBTU, CO2_COEF: CO2_COEF, HOURS: HOURS };
+                drillItem: drillItem, rng: DR.rng, close: close, KINDS: KINDS, num: num, usd: usd, pct: pct, K_MMBTU: K_MMBTU, CO2_COEF: CO2_COEF, HOURS: HOURS };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ================================================================ view
   var LX = window.LX, H = LX.H;
 
-  function numInput(host, o) {
-    var id = LX.uid("in"), row = H("div", { class: "k2-ans" }, host);
-    H("label", { for: id, text: o.label }, row);
-    var inp = H("input", { id: id, type: "text", inputmode: "decimal", autocomplete: "off", class: "k2-num" }, row);
-    if (o.unit) H("span", { class: "k2-unit", text: o.unit }, row);
-    var btn = H("button", { type: "button", class: "lx-btn small", text: o.button || "Check" }, row);
-    function go() { var v = parseFloat(String(inp.value).replace(/[−–]/g, "-").replace(/[$,%\s]/g, "")); o.onCheck(isNaN(v) ? null : v, inp); }
-    btn.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    return { input: inp, button: btn, go: go };
-  }
   function textAlt(host, title, items) {
     var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title || "Text version" }, d);
     var ul = H("ul", null, d); (items || []).forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
@@ -182,7 +173,7 @@
       build: function (act, api) {
         var uc = LX.UnitChain(act, { label: "Average draw", steps: [{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: "? kW", u: "average draw", out: true }] });
         var tries = 0;
-        var n = numInput(act, { label: "Average draw:", unit: "W", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Average draw:", unit: "W", onCheck: function (v) {
           tries++;
           if (close(v, s.homeW, 1)) {
             uc.set([{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: num(s.homeKW, 3) + " kW", u: "= " + num(s.homeW) + " W", out: true }]);
@@ -275,7 +266,7 @@
       build: function (act, api) {
         var uc = LX.UnitChain(act, { label: "Battery round trip", steps: [{ v: "? MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }] });
         var tries = 0;
-        var n = numInput(act, { label: "Charge:", unit: "MWh", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Charge:", unit: "MWh", onCheck: function (v) {
           tries++;
           if (close(v, s.need, 0.06)) {
             uc.set([{ v: num(s.need, 1) + " MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }]);
@@ -298,7 +289,7 @@
         var bar = LX.CostSplit.bar(r2, [], 100, { height: 18 }), made = H("b", { text: "?" }, r2);
         H("p", { class: "k2-key", text: num(s.windMW) + " MW × " + num(s.hours) + " h = " + num(s.windMax) + " MWh: the farm at full output every hour of the year." }, act);
         var tries = 0;
-        var n = numInput(act, { label: "A year's energy:", unit: "MWh", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "A year's energy:", unit: "MWh", onCheck: function (v) {
           tries++;
           if (close(v, s.windE, 1000)) {
             LX.CostSplit.fill(bar, [{ color: "var(--lx-wind)", value: s.windCF * 100 }], 100); made.textContent = num(s.windE);
@@ -371,37 +362,11 @@
     });
   }
 
-  // ---------------------------------------------------------------- practice drill (this browser only)
+  // ---------------------------------------------------------------- practice drill (LX.Drill; this visit only)
   function drillView() {
     var host = document.getElementById("k2-drill"); if (!host) return; host.innerHTML = "";
-    var seed = (Date.now() % 100000) + 1, r = rng(seed), k = 0, right = 0, done = 0;
-    var card = H("div", { class: "lx-card k2-drill" }, host);
-    var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice drill" }, top);
-    var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    H("p", { class: "lx-hint", text: "Seven kinds of item in rotation, new numbers each time; a calculator helps. Aim for eight, about 10 minutes." }, card);
-    var box = H("div", { class: "k2-drill-q" }, card);
-    var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
-    function show(focus) {
-      var it = drillItem(k, r); k++; box.innerHTML = "";
-      var qp = H("p", { class: "lx-qtext", tabindex: "-1", text: it.q }, box);
-      var fb = H("div", { "aria-live": "polite" }, box), answered = false;
-      function mark(ok) {
-        if (answered) return; answered = true; done++; if (ok) right++;
-        score.textContent = right + " of " + done + " right";
-        fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
-      }
-      if (it.choices) {
-        var row = H("div", { class: "lx-qbtns" }, box);
-        it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
-        box.insertBefore(row, fb);
-      } else {
-        var n = numInput(box, { label: "Answer", unit: it.unit === "$" ? "dollars" : it.unit, onCheck: function (v) { if (v == null) { fb.textContent = "Type a number first."; return; } mark(close(v, it.answer, it.tol)); } });
-        box.insertBefore(n.input.parentNode, fb);
-      }
-      if (focus) qp.focus();
-    }
-    next.addEventListener("click", function () { show(true); });
-    show(false);
+    LX.Drill(host, { hint: "Seven kinds of item in rotation, new numbers each time; a calculator helps. Aim for eight, about 10 minutes.",
+                     unit: function (it) { return it.unit === "$" ? "dollars" : it.unit; }, empty: "Type a number first.", item: drillItem });
   }
 
   LX.mount("k02", function (live, data, root) { view(live, data, root); });

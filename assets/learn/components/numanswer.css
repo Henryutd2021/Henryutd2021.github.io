@@ -1,0 +1,11 @@
+/* numanswer.css — LX.NumAnswer (numanswer.js): a number box with its label, unit and Check button. The box's width comes
+   from --lx-na-w (default 7.5em) and, at 560 px and below, --lx-na-wp (default: the same); set them with the width and
+   widthPhone options. Promoted from the toolbox (K1 to K5, K8). */
+.lx-na { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lx-na label { font-family: var(--lx-f-display); font-weight: 500; }
+.lx-na-num { width: var(--lx-na-w, 7.5em); min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
+  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
+.lx-na-num.right { border-color: var(--lx-good); box-shadow: inset 0 0 0 1px var(--lx-good); }
+.lx-na-num.wrong { border-color: var(--lx-warn); box-shadow: inset 0 0 0 1px var(--lx-warn); }
+.lx-na-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
+@media (max-width: 560px) { .lx-na-num { width: var(--lx-na-wp, var(--lx-na-w, 7.5em)); } }

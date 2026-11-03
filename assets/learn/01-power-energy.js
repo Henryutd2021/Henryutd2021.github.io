@@ -3,8 +3,9 @@
 //
 // Data: assets/learn/data/01-power-energy.json (appliance powers, illustrative; sourced real-world anchors with URLs and
 // dates; the ladder and the wind-farm claim), assets/learn/data/town.json and town_year.json (Prairie Town's lesson-0 day:
-// the SPP shape of 3 September 2025 scaled to the town's 450 MW peak, exactly as in lesson 0), and town_days.json
-// (`stats`: the Southwest Power Pool's 2025 energy and peak from EIA-930).
+// the SPP shape of 3 September 2025 scaled to the town's 450 MW peak and rounded hour by hour exactly as in lesson 0, so
+// the day adds up to 6,957 MWh as in lesson 0, K1, K4 and K7), and town_days.json (`stats`: the Southwest Power Pool's
+// 2025 energy and peak from EIA-930).
 //
 // Model (closed form, no solver):
 //   power P (W) = sum of the watts of the appliances switched on
@@ -59,12 +60,19 @@
     if (min < 60) return Math.round(min) + " min";
     return h + " h" + (m ? " " + m + " min" : "");
   }
-  // Prairie Town's lesson-0 day: the same slice and scale as grid-operator.js prepare() (before its 5 MW rounding)
+  // Prairie Town's lesson-0 day: the same slice, scale and rounding as grid-operator.js prepare() (wind and solar to whole
+  // MW, the gas need to the 5 MW step, demand = need + the flat plant + wind + solar; the test checks they agree), so the
+  // day is the 24 hourly MW values lesson 0 plays, which add up to 6,957 MWh (the unrounded shape is 0.9 MWh less)
   function townDay(town, year, key) {
-    var sc = town.scenarios[key || "lesson0"], t0 = Date.parse(year.start_utc + "Z"), d0 = Date.parse(sc.date + "T00:00:00Z");
-    var i = Math.round((d0 - t0) / 3600000) + 1 - (sc.utcOffsetHours || 0), mwh = 0, peak = 0;
-    for (var k = 0; k < 24; k++) { var v = year.demand[i + k] / 1000 * sc.demandPeakMW; mwh += v; peak = Math.max(peak, v); }
-    return { date: sc.date, label: sc.dateLabel || sc.date, mwh: mwh, peakMW: peak, scalePeakMW: sc.demandPeakMW };
+    var sc = town.scenarios[key || "lesson0"], f = town.fleet, t0 = Date.parse(year.start_utc + "Z"), d0 = Date.parse(sc.date + "T00:00:00Z");
+    var i = Math.round((d0 - t0) / 3600000) + 1 - (sc.utcOffsetHours || 0), demand = [];
+    for (var k = 0; k < 24; k++) {
+      var w = Math.round(year.wind[i + k] / 1000 * f.wind.mw), s = Math.round(year.solar[i + k] / 1000 * f.solar.mw);
+      var need = Math.round((year.demand[i + k] / 1000 * sc.demandPeakMW - f.nuclear.mw - w - s) / sc.step) * sc.step;
+      demand.push(need + f.nuclear.mw + w + s);
+    }
+    return { date: sc.date, label: sc.dateLabel || sc.date, demand: demand, mwh: demand.reduce(function (a, b) { return a + b; }, 0),
+             peakMW: Math.max.apply(null, demand), scalePeakMW: sc.demandPeakMW };
   }
   function homes(mw, cf, homeW) { return mw * 1e6 * cf / homeW; }
   function closestTick(ticks, v) {

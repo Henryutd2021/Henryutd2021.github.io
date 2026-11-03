@@ -36,11 +36,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.w1h-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.w1h-ans label { font-family: var(--lx-f-display); font-weight: 500; }
-.w1h-num { width: 7.5em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
-  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
-.w1h-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
 .k4-eq { font-family: var(--lx-f-mono); font-size: 22px; color: var(--lx-ink); }
 .k4-words { display: grid; gap: 10px; }
 .k4-word { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); }
@@ -56,9 +51,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k4-forms .lx-choice { font-family: var(--lx-f-mono); justify-content: center; }
 .k4-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .k4-chips .lx-chip[aria-pressed="true"] { border-color: var(--lx-accent); box-shadow: inset 0 0 0 1px var(--lx-accent); }
-.k4-drill { display: grid; gap: 10px; }
-.k4-drill .lx-btn { justify-self: start; }
-.k4-drill-q { display: grid; gap: 10px; }
 .k4-prog { font-size: 13.5px; color: var(--lx-ink-3); }
 .k4-fixed { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--lx-line-2); font-size: 13.5px; color: var(--lx-ink-2); }
 .page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }

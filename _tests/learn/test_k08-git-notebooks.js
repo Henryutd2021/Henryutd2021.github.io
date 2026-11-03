@@ -212,7 +212,13 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
   has("eight suspects (commits 2 to 9), halved three times"); ok(K.maxChecks(9) === 3, "page: 3 checks for 9 commits");
   has("40-character SHA-1"); has("7-character fingerprints");
   has("3 September 2025");
-  has("R5 (upcoming)");
+  has("[R5](r05-build-validate.html) puts a whole model through planted bugs");
+  // the version pins are illustrative wherever they show: step 8's fix, step 9's install, the drill item, the fallback, the data note
+  ok(K.FIXES[0].key === "pin" && /illustrative/.test(K.FIXES[0].label) && /illustrative/.test(K.FIXES[0].why), "pins: step 8's fix and the fallback row say the version is illustrative");
+  ok(/install the pinned versions \(illustrative numbers\)/.test(JS), "pins: step 9 says the installed versions are illustrative");
+  ok(K.REPRO.filter(p => /==/.test(p.a)).every(p => /illustrative/.test(p.why)), "pins: the drill's pin item says the version is illustrative");
+  has("The version numbers in requirements.txt (pandas==2.2.3 and the others) are illustrative");
+  ok((QMD.match(/\d+\.\d+\.\d+/g) || []).length === (QMD.match(/pandas==2\.2\.3[^<]{0,40}illustrative/g) || []).length, "pins: every version number on the page sits next to the word illustrative");
   // the quiz: only the first (staged) edit is committed
   { let q = K.edit(S.base, "model.py", "first"); q = K.add(q, "model.py"); q = K.edit(q, "model.py", "second"); ok(K.treeOf(K.commit(q, "m").repo)["model.py"] === "first", "quiz: only the first edit"); }
   // the step texts and saw lines carry model numbers, not typed ones

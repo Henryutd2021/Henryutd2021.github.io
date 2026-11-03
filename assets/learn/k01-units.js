@@ -21,8 +21,12 @@
 //   ratio           (a1 x 10^n1) / (a2 x 10^n2) = (a1 / a2) x 10^(n1 - n2); "powers of ten apart" = round(log10 ratio)
 // Every number the page states comes from this model or the data files; _tests/learn/test_k01-units.js checks them
 // against lesson 0's and lesson 1's models and against the page (it also writes the no-JS table: --write).
+// Shared pieces: the number boxes are LX.NumAnswer (its parser is parseNum here) and the practice drill is LX.Drill
+// (rng and the seeded series), components/numanswer.js and drill.js.
 (function () {
   "use strict";
+  var NA = (typeof window !== "undefined" && window.LX && window.LX.NumAnswer) || require("./components/numanswer.js");
+  var DR = (typeof window !== "undefined" && window.LX && window.LX.Drill) || require("./components/drill.js");
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
   var PREFIX = [{ p: "", name: "", exp: 0 }, { p: "k", name: "kilo", exp: 3 }, { p: "M", name: "mega", exp: 6 }, { p: "G", name: "giga", exp: 9 }, { p: "T", name: "tera", exp: 12 }];
@@ -106,8 +110,7 @@
       '<thead><tr><th scope="col">Amount of energy</th><th scope="col">As published</th><th scope="col" class="k1-wh">In Wh</th><th scope="col">Scientific notation</th></tr></thead>\n<tbody>\n' + rows + "\n</tbody></table>";
   }
 
-  // ---------------------------------------------------------------- practice drill (seeded, so tests can replay it)
-  function rng(seed) { var x = seed >>> 0 || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+  // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["prefix", "energy", "unit", "sci", "average", "apart"];
   var UNITS = [   // [expression, unit left, why]
     ["MW × h", "MWh", "power times time: the units multiply into MWh."], ["MWh ÷ h", "MW", "h on top of MWh cancels the h underneath."],
@@ -159,35 +162,22 @@
     return { kind: kind, q: "How many powers of ten apart are " + sig(m1, 3) + " × 10" + sup(n1) + " Wh and " + sig(m2, 3) + " × 10" + sup(n2) + " Wh?", answer: gap,
              why: "The exponents differ by " + n2 + " − " + n1 + " = " + gap + (m1 === m2 ? ", and the leading numbers are equal: " : ", and " + sig(m2, 3) + " ÷ " + sig(m1, 3) + " is close to 1: about ") + "10" + sup(gap) + " times." };
   }
-  function drill(D, seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(D, k, r)); return out; }
+  function drill(D, seed, n) { return DR.series(function (k, r) { return drillItem(D, k, r); }, seed, n); }
   function close(v, ans, tol) { if (v == null) return false; var t = tol != null ? tol + 1e-12 : Math.abs(ans) * 1e-9 + 1e-15; return Math.abs(v - ans) <= t; }
-  function parseNum(text) {   // "450,000", "0.45", "6.96e9", "6.96 × 10^9", "6.96x10^9", "−3"
-    var t = String(text).replace(/[−–]/g, "-").replace(/[,\s$]/g, "");
-    var m = /^(-?\d*\.?\d+)(?:[x×*]10\^?(-?\d+))?$/i.exec(t);
-    if (m) return m[2] != null ? +m[1] * Math.pow(10, +m[2]) : +m[1];
-    var v = parseFloat(t); return isNaN(v) ? null : v;
-  }
+  var parseNum = NA.parse;   // "450,000", "0.45", "6.96e9", "6.96 × 10^9", "6.96x10^9", "−3" (LX.NumAnswer's parser)
 
   var model = { PREFIX: PREFIX, sup: sup, num: num, plain: plain, expOf: expOf, mant: mant, sci: sci, sig: sig, convert: convert,
                 powersApart: powersApart, ratio: ratio, townDay: townDay, story: story, pairText: pairText, staticTable: staticTable,
-                drill: drill, drillItem: drillItem, rng: rng, close: close, parseNum: parseNum, KINDS: KINDS, UNITS: UNITS, hh: hh, sum: sum };
+                drill: drill, drillItem: drillItem, rng: DR.rng, close: close, parseNum: parseNum, KINDS: KINDS, UNITS: UNITS, hh: hh, sum: sum };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ================================================================ view
   var LX = window.LX, H = LX.H;
 
-  function numInput(host, o) {
-    var id = LX.uid("in"), row = H("div", { class: "k1-ans" }, host);
-    H("label", { for: id, text: o.label }, row);
-    var inp = H("input", { id: id, type: "text", inputmode: "decimal", autocomplete: "off", class: "k1-num" }, row);
-    if (o.unit) H("span", { class: "k1-unit", text: o.unit }, row);
-    var btn = H("button", { type: "button", class: "lx-btn small", text: o.button || "Check" }, row);
-    function go() { o.onCheck(parseNum(inp.value), inp); }
-    btn.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    return { input: inp, button: btn, go: go };
-  }
+  // the page's number boxes (LX.NumAnswer), wide enough for answers such as 450,000 or 6.96e9
+  var BOX = { width: "8.5em", widthPhone: "6.5em" };
+  function numBox(host, o) { return LX.NumAnswer(host, Object.assign({}, BOX, o)); }
   function textAlt(host, title, items) {
     var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title || "Text version" }, d);
     var ul = H("ul", null, d); (items || []).forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
@@ -226,8 +216,8 @@
           fb.textContent = right ? plain(s.peak) + " MW = " + plain(vals[i]) + " " + PREFIX[i].p + "W." : (i === 1 ? "kW is the smaller unit, so the number grows: × 1,000." : "GW is the bigger unit, so the number shrinks: ÷ 1,000.");
           if (got[1] && got[3]) { api.done(); api.saw("A step down the ladder multiplies by 1,000; a step up divides. " + s.peak + " MW = " + num(s.peakKW) + " kW = " + plain(s.peakGW) + " GW: the same power, three ways."); }
         }
-        var a = numInput(act, { label: s.peak + " MW in kW:", unit: "kW", onCheck: function (v, inp) { check(1, v, inp); } });
-        var b = numInput(act, { label: s.peak + " MW in GW:", unit: "GW", onCheck: function (v, inp) { check(3, v, inp); } });
+        var a = numBox(act, { label: s.peak + " MW in kW:", unit: "kW", onCheck: function (v, inp) { check(1, v, inp); } });
+        var b = numBox(act, { label: s.peak + " MW in GW:", unit: "GW", onCheck: function (v, inp) { check(3, v, inp); } });
         fb = H("p", { class: "k1-test", "aria-live": "polite" }, act);
         autos[0] = function () { a.input.value = String(s.peakKW); a.go(); b.input.value = String(s.peakGW); b.go(); };
       }
@@ -250,7 +240,7 @@
         }
         draw();
         var tries = 0;
-        var n = numInput(act, { label: "The day:", unit: "GWh", onCheck: function (v) {
+        var n = numBox(act, { label: "The day:", unit: "GWh", onCheck: function (v) {
           tries++;
           if (close(v, s.dayGWh, 0.006)) { LX.store.set("k1-day", { gwh: s.dayGWh }); api.done(); api.saw(num(s.dayMWh) + " MWh ÷ 1,000 = " + plain(s.dayGWh) + " GWh. One hour at 1 MW is 1 MWh, so a day of hourly MW adds straight up to MWh."); }
           else api.saw(tries < 2 ? "Not yet. Add all 24 hours (slide to the end), then step up one rung: ÷ 1,000." : num(s.dayMWh) + " MWh ÷ 1,000 = " + plain(s.dayGWh) + " GWh (" + sig(s.dayGWh, 3) + " is fine).", true);
@@ -311,7 +301,7 @@
         }
         pair();
         var tries = 0;
-        var n = numInput(act, { label: "Phone to U.S. year:", unit: "powers of ten", onCheck: function (v) {
+        var n = numBox(act, { label: "Phone to U.S. year:", unit: "powers of ten", onCheck: function (v) {
           tries++;
           if (v === s.span) { api.done(); api.saw("10" + sup(s.byId.us.exp) + " ÷ 10" + sup(s.byId.phone.exp) + " = 10" + sup(s.span) + ": " + s.span + " powers of ten. The U.S. year is about " + sci(s.spanRatio, 2) + " phone charges. Subtract the exponents to divide."); }
           else api.saw(tries < 2 ? "Not yet. Compare the exponents of the two: " + s.byId.phone.sci + " and " + s.byId.us.sci + "." : s.byId.us.exp + " − " + s.byId.phone.exp + " = " + s.span + ".", true);
@@ -400,37 +390,12 @@
     });
   }
 
-  // ---------------------------------------------------------------- practice drill (this browser only)
+  // ---------------------------------------------------------------- practice drill (LX.Drill; this visit only)
   function drillView(D) {
     var host = document.getElementById("k1-drill"); if (!host) return; host.innerHTML = "";
-    var seed = (Date.now() % 100000) + 1, r = rng(seed), k = 0, right = 0, done = 0;
-    var card = H("div", { class: "lx-card k1-drill" }, host);
-    var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice drill" }, top);
-    var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    H("p", { class: "lx-hint", text: "Six kinds of item in rotation, new numbers each time. Aim for ten, about 10 minutes. Large numbers can be typed as 6.96e9." }, card);
-    var box = H("div", { class: "k1-drill-q" }, card);
-    var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
-    function show(focus) {
-      var it = drillItem(D, k, r); k++; box.innerHTML = "";
-      var qp = H("p", { class: "lx-qtext", tabindex: "-1", text: it.q }, box);
-      var fb = H("div", { "aria-live": "polite" }, box), answered = false;
-      function mark(ok) {
-        if (answered) return; answered = true; done++; if (ok) right++;
-        score.textContent = right + " of " + done + " right";
-        fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
-      }
-      if (it.choices) {
-        var row = H("div", { class: "lx-qbtns" }, box);
-        it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
-        box.insertBefore(row, fb);
-      } else {
-        var n = numInput(box, { label: "Answer", unit: it.unit || "", onCheck: function (v) { if (v == null) { fb.textContent = "Type a number first."; return; } mark(close(v, it.answer, it.tol)); } });
-        box.insertBefore(n.input.parentNode, fb);
-      }
-      if (focus) qp.focus();
-    }
-    next.addEventListener("click", function () { show(true); });
-    show(false);
+    LX.Drill(host, { hint: "Six kinds of item in rotation, new numbers each time. Aim for ten, about 10 minutes. Large numbers can be typed as 6.96e9.",
+                     width: BOX.width, widthPhone: BOX.widthPhone, empty: "Type a number first.",
+                     item: function (k, r) { return drillItem(D, k, r); }, check: function (v, it) { return close(v, it.answer, it.tol); } });
   }
 
   LX.mount("k01", function (live, data, root) { view(live, data, root); });
