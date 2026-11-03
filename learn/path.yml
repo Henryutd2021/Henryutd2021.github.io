@@ -507,15 +507,15 @@
   code: K5
   form: cards
   path: k05-probability-statistics.qmd
-  status: upcoming
+  status: active
   minutes: 25
   practice_minutes: 30
   title: "Probability and statistics"
   subtitle: "Read four months of real forecast errors as a distribution: centre, spread, tails and chance"
   short: "Probability and statistics"
-  does: "With a grid operator's real day-ahead forecast errors, build a histogram, compare mean and median, measure spread, read quantiles and intervals, estimate a probability by counting and by sampling, and combine independent events."
+  does: "With a grid operator's real day-ahead forecast errors, build a histogram, compare mean and median, measure spread, read percentiles and intervals, and estimate a chance by counting and by sampling; then combine two plants' outages into a joint chance and an expected value."
   outcome: "Describe a distribution by its centre, spread and quantiles, estimate a probability from data, and say when probabilities multiply."
-  teaches: [histograms, mean and median, standard deviation and quantiles, probability as frequency, independence, sampling and Monte Carlo]
+  teaches: [histograms, mean and median, standard deviation and percentiles, probability as frequency, sampling and Monte Carlo, independence and expected value]
   after: []
   next: 4
 

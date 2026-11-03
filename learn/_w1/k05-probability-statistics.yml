@@ -1,0 +1,25 @@
+# Sidecar for toolbox K5 (k05-probability-statistics), builder learn-w2-e (fork for K5), 2026-11-03. Read by scripts/build_learn.py.
+id: k05-probability-statistics
+lesson: K5
+glossary:
+  - id: histogram
+    term: Histogram
+    def: "A chart that sorts values into bins of equal width and shows how many fall in each bin."
+  - id: mean
+    term: Mean
+    def: "The average of a set of values: their sum divided by how many there are."
+  - id: percentile
+    term: Percentile
+    def: "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile."
+  - id: independent-events
+    term: Independent events
+    def: "Events where knowing that one happened says nothing about whether the other did, so the chance of both is the product of their chances."
+  - id: expected-value
+    term: Expected value
+    def: "The long-run average of an uncertain quantity: each possible outcome multiplied by its chance, then added up."
+  - id: monte-carlo
+    term: Monte Carlo
+    def: "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results."
+requests:
+  - "K5 reuses lesson 4's data file (assets/learn/data/04-forecasts.json, jan_apr) as is; any rebuild of that file should rerun node _tests/learn/test_k05-probability-statistics.js --write (no-JS fallback) and the test."
+  - "Possible shared component: a dot strip of repeated sample estimates (K5 step 6, drawn as small rounded bars on LX.Plot because LX.Plot skips the dots of a width-0 line). If M7 needs it, LX.Plot could draw dots for width-0 lines."
