@@ -106,6 +106,21 @@ function uc24(town, days, which) {
 //             step-6 staircase solves)
 //   m2relax   M2's root relaxation (the LP behind step 2 and the first node of the step-4 tree; the tree solves 11 like it)
 //   m2fixed   M2's dispatch LP with the switches fixed at the MILP's plan (step 7's conditional prices)
+// M3 (capacity expansion with representative weeks), built with the planning engine's own functions as the page builds
+// them (LX.townPlan.weekModel, .link, .fullYearModel; data/m03-capacity-expansion.json, its reference plans):
+//   m3typ4    the plan LP on 4 typical weeks at 200 kt (step 3; solved on the page)
+//   m3typ8    the plan LP on 8 typical weeks (step 6; solved on the page). 4 + 3 extreme weeks is lesson 13's t13week
+//   m3wk11    the plan LP on 8 typical + 3 extreme weeks (precomputed on the page, as are 12 + 3 and the full-year optimum)
+//   m3link, m3cyc, m3free   step 8's storage what-if (battery energy at an illustrative $20 per kWh) on the seven weeks,
+//             the battery linked across the calendar, cyclic within each week, or free between weeks (solved on the page)
+//   m3chk25   the 4-week plan, fixed, on all 8,760 hours of 2025 (step 4's check; steps 5-6 run the same LP for other plans)
+//   m3chkfree the no-link storage plan (the largest battery), fixed, on 2025 (step 8's checks)
+//   m3y24     the seven-week plan, fixed, on all 8,760 hours of 2024 (step 9)
+// A22 (trade-off explorer):
+//   a22plan   a reader's plan (plan E with 50 MW more wind: a battery plan, the heaviest kind), fixed, on all 8,760 hours:
+//             the full-year re-solve after each slider change; step 7's check of the solver's plan is the same LP
+//   a22lim    step 7's limits LP on the seven weeks: 200 kt, 25% gas, a 33% low-income share under the income-graduated
+//             charge (feasible; the same limits under a fixed charge per home are infeasible and solve faster)
 function lessonSet(site) {
   const path = require("path"), fs = require("fs");
   const A = p => path.join(site, "assets/learn", p), J = p => JSON.parse(fs.readFileSync(A("data/" + p), "utf8"));
@@ -118,6 +133,13 @@ function lessonSet(site) {
   const M2 = require(A("m02-unit-commitment.js")), D2 = J("m02-unit-commitment.json");
   const on2 = D2.day.demand.map((_, t) => (t >= 17 && t <= 22 ? 1 : 0));   // the MILP's plan: the peaker on 17:00-22:00
   const p200 = cfg.frontier.points.find(p => p.cap === 200), plan = M13.ceilPlan(p200.plan, cfg.limits);
+  const prof = require(A("components/profiles.js")).townProfile;
+  const M3 = require(A("m03-capacity-expansion.js")), D3 = J("m03-capacity-expansion.json"), R3 = D3.reference;
+  const S3 = M3.prepare(cfg, D3, year, targets, J("m03-capacity-expansion-2024.json"), prof), cap3 = D3.cap * 1e3, scap3 = D3.storage.cap * 1e3;
+  const m3plan = (Cx, id, cap, mode) => M13.link(M13.weekModel(Cx, S3.weeks(id), { cap }), S3.weeks(id), mode);
+  const A22 = require(A("a22-tradeoff-explorer.js")), DA = J("a22-tradeoff-explorer.json"), g = DA.groups;
+  const DD = { cv: A22.capValues(Y, DA.reserve.hours), peak: Y.peak, groups: { homes: g.homesM / g.totalHomesM, use: g.kwhB / g.totalKwhB }, graded: DA.graded, batteryHours: DA.reserve.batteryHours };
+  const a22p = A22.blank(DA.plans.find(p => p.id === "E").plan); a22p.wind += 50;
   return [
     ["t11", "T11 day LP (lesson 11)", M11.buildLP(W11, M11.settings(), D11.penalty)],
     ["m1net", "M1 three-bus day LP, congested", M1.build(D1, { network: true, limit: 110 })],
@@ -127,6 +149,17 @@ function lessonSet(site) {
     ["m2milp", "M2 unit commitment MILP", M2.build(D2, { onoff: true })],
     ["m2relax", "M2 root relaxation LP", M2.build(D2, { onoff: true, relax: true })],
     ["m2fixed", "M2 LP with switches fixed", M2.build(D2, { onoff: true, relax: true, fix: M2.planFix(D2, on2) })],
+    ["m3typ4", "M3 plan LP, 4 typical weeks, 200 kt", m3plan(S3.C, "typ4", cap3)],
+    ["m3typ8", "M3 plan LP, 8 typical weeks, 200 kt", m3plan(S3.C, "typ8", cap3)],
+    ["m3wk11", "M3 plan LP, 8 + 3 weeks (precomputed)", m3plan(S3.C, "wk11", cap3)],
+    ["m3link", "M3 storage what-if, linked", m3plan(S3.Cw, D3.storage.set, scap3, "linked")],
+    ["m3cyc", "M3 storage what-if, cyclic", m3plan(S3.Cw, D3.storage.set, scap3, "cyclic")],
+    ["m3free", "M3 storage what-if, no link", m3plan(S3.Cw, D3.storage.set, scap3, "free")],
+    ["m3chk25", "M3 check on 2025, 4-week plan", M13.fullYearModel(S3.C, S3.Y, { plan: R3.sets.typ4.plan })],
+    ["m3chkfree", "M3 check on 2025, no-link plan", M13.fullYearModel(S3.Cw, S3.Y, { plan: R3.storage.free.plan })],
+    ["m3y24", "M3 check on 2024, 7-week plan", M13.fullYearModel(S3.C, S3.Y2, { plan: R3.sets.wk7.plan })],
+    ["a22plan", "A22 slider re-solve, full year", M13.fullYearModel(C, Y, { plan: a22p })],
+    ["a22lim", "A22 limits LP, seven weeks", A22.limitModel(M13, C, null, RW, { co2: DA.limits.co2.start * 1e3, gas: DA.limits.gas.start / 100, fair: DA.limits.fair.start / 100, tariff: "graded" }, DD)],
   ];
 }
 
