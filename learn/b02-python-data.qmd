@@ -122,7 +122,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><b>What it proves.</b> Hours set to zero pass a night check by construction; the check does not test the daytime values, so look at those too.</li>
 <li>The notebook applies the median and clock parts of the rule to the raw file.</li>
 </ul>
-<p>Upcoming: R4 (data you can defend) turns these choices into a written data note.</p>
+<p>Next: <a href="r04-data.html">R4</a> (data you can defend) turns these choices into a written data note.</p>
 </div>
 </details>
 </div>
@@ -205,7 +205,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Where this leads</p>
-<p>The data are the same Southwest Power Pool year behind Prairie Town in <a href="00-grid-operator.html">lesson 0</a>; lessons <a href="02-demand.html">2</a> (the shape of demand) and <a href="05-capacity-factor.html">5</a> (capacity factor) read it without code. Upcoming: R4 (data you can defend), M10 (forecasting) and M14 (learning from data).</p>
+<p>The data are the same Southwest Power Pool year behind Prairie Town in <a href="00-grid-operator.html">lesson 0</a>; lessons <a href="02-demand.html">2</a> (the shape of demand) and <a href="05-capacity-factor.html">5</a> (capacity factor) read it without code. Then <a href="r04-data.html">R4</a> (data you can defend); upcoming: M10 (forecasting), M14 (learning from data).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

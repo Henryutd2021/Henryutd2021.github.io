@@ -177,7 +177,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Monte Carlo.** Draw a model's uncertain inputs from their distributions, run the model each time, and read percentiles of the result (Modeler lesson M7, upcoming).
+- **Monte Carlo.** Draw a model's uncertain inputs from their distributions, run the model each time, and read percentiles of the result (Modeler lesson [M7](m07-monte-carlo.html)).
 - **Scenarios with chances.** A stochastic program is an optimization model that plans against several scenarios at once, weighted by their chances, to minimise expected cost: step 8's expected value inside a model (M8, upcoming).
 - **Surrogates.** A surrogate is a fast stand-in fitted to a slow model's runs. One kind, a Gaussian-process model, gives each prediction a mean and a standard deviation (M9, upcoming).
 - **Draw together what moves together.** Sample whole hours or days, so demand, wind and outages keep their joint behaviour; drawing each input separately assumes independence.

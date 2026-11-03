@@ -167,7 +167,7 @@ The sizing asks HiGHS to stop only within 0.0001% of the best bound, so two plan
 <li>Battery wear, fuel deliveries during the storm, and how often outages happen.</li>
 <li>Loads that change through the day: every load is flat here.</li>
 </ul>
-<p>Modeler's note: M7 (upcoming) samples uncertain inputs with Monte Carlo, and M8 (upcoming) decides before the uncertainty resolves.</p>
+<p>Modeler's note: <a href="m07-monte-carlo.html">M7</a> samples uncertain inputs with Monte Carlo, and M8 (upcoming) decides before the uncertainty resolves.</p>
 </div>
 </details>
 </div>

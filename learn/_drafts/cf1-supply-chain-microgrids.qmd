@@ -110,7 +110,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 
 - Opening a site is a yes-or-no choice, so a location model is a [mixed-integer program]{.lx-term term="mixed-integer-program"}: [lesson 10](10-write-it-down.html) writes such a model down and [lesson 11](11-solver.html) solves one.
 - The toy above tries every pair of whole-MW sizes at two sites; a solver searches far larger networks without listing every choice.
-- Lesson [F7](f07-microgrids.html) builds an hourly energy balance by hand, and Modeler lesson M5 (upcoming) sizes a microgrid with a solver.
+- Lesson [F7](f07-microgrids.html) builds an hourly energy balance by hand, and Modeler lesson [M5](m05-microgrid-size-and-run.html) sizes a microgrid with a solver.
 
 ```{=html}
 </div>

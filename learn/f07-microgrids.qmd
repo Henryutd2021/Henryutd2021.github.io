@@ -129,7 +129,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - This lesson runs the island by one fixed rule: generator first, then the battery. It is a rule, not the best way.
 - A sizing model makes each size a [decision variable]{.lx-term term="decision-variable"} and writes every hour's balance, and each outage, as rules; [lesson 10](10-write-it-down.html) writes a small model like this down.
-- Modeler lesson M5 (upcoming) sizes a microgrid that must survive an outage, with on/off decisions solved as in [lesson 11](11-solver.html).
+- Modeler lesson [M5](m05-microgrid-size-and-run.html) sizes a microgrid that must survive an outage, with on/off decisions solved as in [lesson 11](11-solver.html).
 
 ```{=html}
 </div>

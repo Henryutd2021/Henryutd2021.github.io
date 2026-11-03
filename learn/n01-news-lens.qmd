@@ -61,7 +61,7 @@ Serving that load would take <mark>about 148 GW of grid connections</mark>.
 <li><strong>within a range of 521–843 TWh</strong> (Uncertainty): The authors' own range: its top is 1.6 times its bottom. The IEA's early-2025 projection, about 430 TWh, sits below it, as the report notes (p. 11).</li>
 <li><strong>about 148 GW of grid connections</strong> (Physics): Capacity, not energy: the report turns 649 TWh into GW by assuming connections are used at 50% on average.</li>
 <li><strong>Cryptocurrency mining is not counted</strong> (Boundary): What counts as a data center is a choice; a study that includes mining reports a larger number.</li>
-<li><strong>Left unanswered</strong> (Who pays): Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Upcoming: lesson A4 on large-load tariffs.</li>
+<li><strong>Left unanswered</strong> (Who pays): Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Analyst lesson A4 covers large-load tariffs.</li>
 <li><strong>A researcher's take</strong>: I accept the direction, strong growth in U.S. data-center use by 2030, but not the exact 11.8%. A new estimate built on lower chip shipments or lower server power would change my mind. Confidence: medium, since credible projections still differ by about 50%.</li></ul></details>
 <p class="lx-hint">Source: <a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">LBNL, United States Data Center Energy Usage Report: 2025 Update, pp. 5, 8–11 (PDF)</a> (published 18 June 2026)</p>
 <p class="lx-eyebrow">Story 2 · Storage · United States</p>
@@ -77,7 +77,7 @@ At the start of the year, <mark>18.2 GW had been planned</mark>.
 <li><strong>Solar led with 27.2 GW</strong> (Physics): A GW of solar makes less energy in a year than a GW of a plant that runs most hours. Compare capacity factors (average output ÷ rated power), not GW.</li>
 <li><strong>53 GW in total</strong> (Scale): Big for one year. For scale, U.S. use averaged about 480 GW across 2025 (4.20 trillion kWh ÷ 8,760 h).</li>
 <li><strong>The count covers utility-scale plants of 1 MW and up</strong> (Boundary): Home batteries and rooftop solar sit outside this count.</li>
-<li><strong>Left unanswered</strong> (Who pays): Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Upcoming: lesson A2 on contracts and risk.</li>
+<li><strong>Left unanswered</strong> (Who pays): Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Analyst lesson A2 covers contracts and risk.</li>
 <li><strong>A researcher's take</strong>: I accept that a record amount of battery power, about 15 GW, came online in 2025, as a preliminary count. Final annual data showing a much lower figure would change my mind. Confidence: high for the power; the energy stored cannot be known from this story.</li></ul></details>
 <p class="lx-hint">Source: <a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">EIA, Today in Energy: 2025 additions, preliminary</a> (20 February 2026); <a href="https://www.eia.gov/todayinenergy/detail.php?id=64586">EIA, Today in Energy: additions planned for 2025</a> (24 February 2025); <a href="https://www.eia.gov/energyexplained/electricity/electricity-in-the-us-generation-capacity-and-sales.php">EIA, Energy Explained: utility-scale means 1 MW or more</a> (checked 2 November 2026); <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained: U.S. use 4.20 trillion kWh in 2025</a> (data for 2025); <a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA, Today in Energy: battery duration = MWh ÷ MW</a> (25 March 2022)</p>
 <p class="lx-eyebrow">Story 3 · Reliability · Spain and Portugal</p>
@@ -174,7 +174,7 @@ Among them: <mark>gaps in voltage and reactive-power control</mark>, power swing
 <summary><span class="k">Go deeper · Modeler</span>Which model would test each claim?</summary>
 <div class="lx-deeper-body">
 <ul>
-<li><strong>Story 1:</strong> a planning model that adds the new load hour by hour and asks what must be built to serve it (upcoming: M3, capacity expansion).</li>
+<li><strong>Story 1:</strong> a planning model that adds the new load hour by hour and asks what must be built to serve it (<a href="m03-capacity-expansion.html">M3</a>, capacity expansion).</li>
 <li><strong>Story 2:</strong> a storage dispatch model, where the duration limits how long each battery can discharge (lesson 9 on the <a href="09-storage.html">course map</a>).</li>
 <li><strong>Story 3:</strong> a power-flow and dynamics study of voltage and protection; the course shows when an energy-only answer fails (upcoming: A17) but stops short of dynamic simulation.</li>
 </ul>
@@ -278,7 +278,7 @@ Among them: <mark>gaps in voltage and reactive-power control</mark>, power swing
 <p>Pick one item from this site's Field Notes briefings, or from today's news. Run the seven questions on it, then write your three-sentence take.</p>
 <ul>
 <li>Concepts from <a href="00-grid-operator.html">lesson 0</a> (power and energy, frequency) and lessons <a href="01-power-energy.html">1</a> and <a href="05-capacity-factor.html">5</a> (units, capacity factor).</li>
-<li>Upcoming: A2 and A4 (who pays), R2 (what is already known).</li>
+<li>Next: <a href="a02-contracts-risk.html">A2</a> and <a href="a04-retail-tariffs.html">A4</a> (who pays), <a href="r02-literature.html">R2</a> (what is already known).</li>
 </ul>
 </div>
 <div class="lx-card lx-sources">

@@ -143,7 +143,7 @@ const S = sm.solar;
   const vis = QMD.replace(/<!--[\s\S]*?-->/g, "");
   ok(!/\bthe risk is \$|\brisk of \$|\bwill (earn|pay)\b/i.test(vis), "statistics: no risk number is stated as the outcome");
   ["a01-project-tea.html", "k05-probability-statistics.html", "07-cost.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links " + h));
-  ok(!/href="[^"]*(m07|x05|projects\/|research\.)/i.test(QMD) && /M7 \(upcoming\)/.test(QMD) && /X5 \(upcoming\)/.test(QMD), "upcoming lessons are named, not linked");
+  ok(!/href="[^"]*(x05|projects\/|research\.)/i.test(QMD) && /href="m07-monte-carlo\.html">M7<\/a>/.test(QMD) && !/M7 \(upcoming\)/.test(QMD) && /X5 \(upcoming\)/.test(QMD), "upcoming lessons are named, not linked; M7 linked now that it is live (W3)");
   ok(/68227\.pdf">Wind Energy Finance[\s\S]*pp\. 27–28/.test(QMD) && /Physical PPA<\/a> \(updated 10 July 2026\)/.test(QMD) && /Financial PPA<\/a> \(updated 14 July 2026\)/.test(QMD) && /pp\. 121–122/.test(QMD) && /p\. 5 \(Table 1 note\) and p\. 34/.test(QMD) && /From the abstract/.test(QMD), "sources: primary, with pages or dates; the Joule paper read from its abstract");
 }
 

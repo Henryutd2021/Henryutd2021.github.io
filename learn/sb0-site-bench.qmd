@@ -110,7 +110,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 - Each hour adds a balance row: for the home, bought − sent back + battery out − battery in = need − solar. For the farm, sold + spilled + into the battery + into the electrolyzer − battery out = wind.
 - The battery's [state of charge]{.lx-term term="state-of-charge"} is one more variable per hour: this hour's level = last hour's + 0.85 × charge − discharge.
 - "Size it for me" makes the sizes decisions too, each charged its yearly cost through the [capital recovery factor]{.lx-term term="capital-recovery-factor"}. It runs on a few [representative weeks]{.lx-term term="representative-period"}, as [lesson 13](13-capstone.html) and [M3](m03-capacity-expansion.html) do.
-- Storage and coupled carriers, modelling power, hydrogen and heat together (M4, upcoming in the Modeler tier), writes this model in Python.
+- Storage and coupled carriers, modelling power, hydrogen and heat together ([M4](m04-storage-multienergy.html), in the Modeler tier), writes this model in Python.
 
 ```{=html}
 </div>

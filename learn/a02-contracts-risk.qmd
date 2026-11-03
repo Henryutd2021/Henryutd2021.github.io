@@ -137,7 +137,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Seeded, so reproducible.** The same seed gives the same 200 years on any computer. A new seed gives other years, and the P10 and P90 move a little: that is sampling noise (K5's standard error).
-- **Independence is an assumption.** Here the five drivers are drawn independently. In real markets a high-price year may also be a wide-spread year for the battery; drawing linked inputs, and global sensitivity, are Modeler lesson M7 (upcoming).
+- **Independence is an assumption.** Here the five drivers are drawn independently. In real markets a high-price year may also be a wide-spread year for the battery; drawing linked inputs, and global sensitivity, are Modeler lesson [M7](m07-monte-carlo.html).
 - **Hours inside a year.** Each driver is one number per year. An hourly model would settle each hour, and lets the battery fill a shaped contract's evening hours.
 
 ```{=html}
@@ -233,7 +233,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>FERC staff (2024). <a href="https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf">Energy Primer: A Handbook of Energy Market Basics</a> (PDF). Locational prices p. 70; contract quantity, location (nodes, zones, hubs), fixed and floating prices, forwards and swaps pp. 121–122.</li>
 <li>Kahrl, F. (2021). <a href="https://eta-publications.lbl.gov/sites/default/files/all_source_competitive_solutions_20210217_gmlc_format.pdf">All-Source Competitive Solicitations: State and Electric Utility Practices</a> (PDF). Lawrence Berkeley National Laboratory. Tolling agreements: p. 5 (Table 1 note) and p. 34.</li>
 <li>Millstein, D., Wiser, R., Mills, A. D., Bolinger, M., Seel, J. and Jeong, S. (2021). <a href="https://doi.org/10.1016/j.joule.2021.05.009">Solar and wind grid system value in the United States: The effect of transmission congestion, generation profiles, and curtailment</a>. Joule 5(7), 1749–1775. From the abstract: solar's loss of value is most sensitive to its output profile, its shape.</li>
-<li>Where this goes: Modeler lesson M7 (upcoming) samples linked inputs; side shelf X5 (upcoming) covers how lenders size loans.</li>
+<li>Where this goes: Modeler lesson <a href="m07-monte-carlo.html">M7</a> samples linked inputs; side shelf X5 (upcoming) covers how lenders size loans.</li>
 </ul>
 </div>
 ```

@@ -132,7 +132,7 @@ A capacity-expansion model can account for these costs directly, instead of comp
 
 - Capacity expansion with representative periods ([M3](m03-capacity-expansion.qmd), in the Modeler tier) uses exactly this yearly charge.
 - Techno-economic analysis inside an optimization model (M11, upcoming) adds taxes, credits and a boundary choice.
-- Year-by-year cash flows, NPV, IRR and payback for one project are the Analyst lesson A1 (upcoming).
+- Year-by-year cash flows, NPV, IRR and payback for one project are Analyst lesson [A1](a01-project-tea.html).
 
 ```{=html}
 </div>

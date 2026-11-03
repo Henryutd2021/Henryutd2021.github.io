@@ -214,7 +214,7 @@ Storage needs both kinds of number: MW (how fast it charges) and MWh (how much i
 <p class="lx-eyebrow">In the real world</p>
 <p>Your bill counts kWh.</p>
 <p>EIA's own worked example: a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh.</p>
-<p>Many business tariffs also charge for the month's highest power, in $/kW. The Analyst tier (upcoming) covers tariffs.</p>
+<p>Many business tariffs also charge for the month's highest power, in $/kW. Analyst lesson <a href="a04-retail-tariffs.qmd">A4</a> covers tariffs.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

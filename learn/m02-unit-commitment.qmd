@@ -182,7 +182,7 @@ Other pricing rules have been proposed and used that fold part of these costs in
 <li>Tomorrow and yesterday: the day ends with the combined-cycle plant on, run and down times count within the day (a start at 23:00 owes nothing after midnight), and the hours before it are assumed to meet them; real schedules roll forward.</li>
 <li>Offers and market rules: costs stand in for offers; real settlements follow each market's tariff.</li>
 </ul>
-<p>Modeler's note: M5 (upcoming) sizes a microgrid with a mixed-integer program, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen.</p>
+<p>Modeler's note: <a href="m05-microgrid-size-and-run.html">M5</a> sizes a microgrid with a mixed-integer program, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen.</p>
 </div>
 </details>
 </div>

@@ -101,7 +101,7 @@ A sum paid now becomes a cost a year through the [capital recovery factor]{.lx-t
 $$\text{CRF} = \frac{r}{1-(1+r)^{-n}}$$
 
 - $r$ is the borrowing rate a year (here 7%, or the owner's) and $n$ the number of years (15). At 7% over 15 years, CRF ≈ 0.1098: $740,000 of equipment costs about $81,248 a year.
-- [K3](k03-discounting.html) explains discounting; Analyst lesson A1 (upcoming) builds a project's cash flows year by year.
+- [K3](k03-discounting.html) explains discounting; Analyst lesson [A1](a01-project-tea.html) builds a project's cash flows year by year.
 
 ```{=html}
 </div>
@@ -113,7 +113,7 @@ $$\text{CRF} = \frac{r}{1-(1+r)^{-n}}$$
 
 - This lesson tests one size at a time. A sizing model chooses battery, generator and solar together, hour by hour, and can treat the hospital's survival as a rule rather than a cost.
 - A rule ("survive 72 hours") and a cost ("an hour without power costs $9,000") can give different designs: the second weighs the rare long outages by how rarely they come.
-- Modeler lesson M5 (upcoming) sizes a microgrid that must survive an outage.
+- Modeler lesson [M5](m05-microgrid-size-and-run.html) sizes a microgrid that must survive an outage.
 
 ```{=html}
 </div>

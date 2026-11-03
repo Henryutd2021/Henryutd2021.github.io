@@ -117,7 +117,7 @@ const usd = K.usd, f4 = K.f4;
   ["07-cost.html", "12-trade-offs.html", "13-capstone.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0 || QMD.indexOf("](" + h + ")") >= 0, "links back to " + h));
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(2025 dollars, April 2026\)/.test(QMD) && /financial_cases_&amp;_methods">NLR, 2025 ATB<\/a> · September 2026/.test(QMD), "sources: EIA and NLR with their dates");
   ok(/\$100 and 7% are illustrative/.test(QMD), "the illustrative values are labelled");
-  ok(!/href="[^"]*(a01|m11|m13)/i.test(QMD) && /A1 and Modeler lesson M11 \(both upcoming\)/.test(QMD) && /M13, upcoming/.test(QMD), "upcoming lessons are named, not linked");
+  ok(!/href="[^"]*(m11|m13)/i.test(QMD) && /<a href="a01-project-tea\.html">A1<\/a> builds on it, and Modeler lesson M11 \(upcoming\)/.test(QMD) && /M13, upcoming/.test(QMD), "upcoming lessons are named, not linked; A1 linked now that it is live (W3)");
   ok(!/nuclear|reactor|\bSMR\b|learning|data cent/i.test(QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "")) && !/nuclear|reactor|learning|data cent/i.test(JS.replace(/\/\/.*$/gm, "")), "scope: no nuclear, no learning wording, no data centers");
 }
 

@@ -562,7 +562,7 @@
     H("p", { class: "lx-lede", text: "The course climbs five scales. The units grow with them, but power and energy stay the same two ideas." }, c3);
     var strip = H("ol", { class: "t1-strip" }, c3);
     [["S0", "Device and plant", "W to MW", "A phone charge: " + fmtE(W.wh.phone) + ". A home's year: " + fmtE(W.wh.homeyear) + ".", true],
-     ["S1", "Microgrid and community", "kW to MW", "A campus or village keeping its lights on (upcoming lessons).", false],
+     ["S1", "Microgrid and community", "kW to MW", "A campus or village keeping its lights on", false, ["f07-microgrids.html", "F7"]],
      ["S2", "Regional grid", "MW to GW", "Prairie Town peaks at " + num(W.town.scalePeakMW, 0) + " MW; the Southwest Power Pool peaked at " + num(W.spp.peakGW, 1) + " GW in 2025.", false],
      ["S3", "City and region", "hundreds of MW", "Prairie City's buildings, transport and industry (upcoming).", false],
      ["S4", "Nation", "hundreds of GW", "The U.S. used " + num(Math.round(W.wh.us / 1e12), 0) + " TWh in 2025; the Lower 48's record hour needed " + num(W.fermi.peakGW, 0) + " GW.", false]]
@@ -570,7 +570,9 @@
         var li = H("li", { class: s[4] ? "here" : "" }, strip);
         var top = H("div", { class: "t" }, li); H("span", { class: "code", text: s[0] }, top);
         if (s[4]) H("span", { class: "lx-pill good", text: "This lesson" }, top);
-        H("b", { text: s[1] }, li); H("span", { class: "pw", text: "Power: " + s[2] }, li); H("span", { class: "ex", text: s[3] }, li);
+        H("b", { text: s[1] }, li); H("span", { class: "pw", text: "Power: " + s[2] }, li);
+        var ex = H("span", { class: "ex", text: s[3] + (s[5] ? " (" : "") }, li);   // s[5]: the live lesson that teaches this scale
+        if (s[5]) { H("a", { href: s[5][0], text: s[5][1] }, ex); ex.appendChild(document.createTextNode(").")); }
       });
   }
 

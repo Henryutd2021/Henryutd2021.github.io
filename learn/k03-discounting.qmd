@@ -237,7 +237,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ul>
 <li>EIA (2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a> (PDF). Table 3: building cost and upkeep.</li>
 <li>NLR (2026). 2025 Electricity Annual Technology Baseline: <a href="https://atb.nlr.gov/electricity/2025/equations_&amp;_variables">Equations and Variables</a> (the capital recovery factor); <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">Financial Cases and Methods</a> (rates and the 30-year period).</li>
-<li>Where this is used: <a href="07-cost.html">lesson 7</a> (present value, the capital recovery factor, LCOE), <a href="12-trade-offs.html">lesson 12</a> and <a href="13-capstone.html">lesson 13</a> (yearly costs in a planning model). Analyst lesson A1 and Modeler lesson M11 (both upcoming) build on it.</li>
+<li>Where this is used: <a href="07-cost.html">lesson 7</a> (present value, the capital recovery factor, LCOE), <a href="12-trade-offs.html">lesson 12</a> and <a href="13-capstone.html">lesson 13</a> (yearly costs in a planning model). Analyst lesson <a href="a01-project-tea.html">A1</a> builds on it, and Modeler lesson M11 (upcoming) will.</li>
 </ul>
 </div>
 ```

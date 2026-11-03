@@ -107,7 +107,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 <div class="lx-deeper-body">
 ```
 
-- Storage and coupled carriers, modelling power, hydrogen and heat together (M4, upcoming in the Modeler tier), writes the bench's [linear program]{.lx-term term="linear-program"} in Python and adds a heat store.
+- Storage and coupled carriers, modelling power, hydrogen and heat together ([M4](m04-storage-multienergy.html), in the Modeler tier), writes the bench's [linear program]{.lx-term term="linear-program"} in Python and adds a heat store.
 - Hand in, with the note: your plan's sizes, the notebook's NPV for them, and one sentence on why it differs from the bench's.
 - About 45 minutes once M4 is live; until then, write the formulation in words, as [B3](b03-read-check-formulation.html) does.
 

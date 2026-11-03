@@ -138,7 +138,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Decisions:** the two outputs, $x$ and $y$.
 - **Rules:** each of step 6's five inequalities becomes one row of a table, all written as ≤ (the ≥ rules flipped).
 - **In one line:** the rows stack into $A x \le b$, with $A$ holding the numbers in front of $x$ and $y$, and $b$ the limits.
-- **Where next:** [Bridge B1](b01-algebra-to-lp.html) builds this table from a word problem and hands it to a real solver; toolbox K6 (upcoming) covers vectors and matrices.
+- **Where next:** [Bridge B1](b01-algebra-to-lp.html) builds this table from a word problem and hands it to a real solver; toolbox [K6](k06-vectors-matrices.html) covers vectors and matrices.
 
 ```{=html}
 </div>

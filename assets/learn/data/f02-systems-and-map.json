@@ -213,7 +213,7 @@
       {"node": "upg", "dir": "up", "from": "grid", "why": "Someone pays for the new lines and substations."}
      ]},
      {"label": "Years", "effects": [
-      {"node": "bill", "dir": "mixed", "from": "upg", "why": "Whether other customers' bills rise depends on who pays for upgrades under the tariff: Analyst lesson A4 (upcoming)."},
+      {"node": "bill", "dir": "mixed", "from": "upg", "why": "Whether other customers' bills rise depends on who pays for upgrades under the tariff: Analyst lesson A4."},
       {"node": "build", "dir": "up", "from": "margin", "why": "Developers and planners may add new supply and lines."}
      ]}
     ]
