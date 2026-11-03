@@ -83,13 +83,13 @@
     var rows = s.years.map(function (t, i) {
       return "<tr><td>" + (t === 0 ? "Today" : "In " + t + " years") + "</td><td>" + usd(fv(s.amount, s.rate, t)) + "</td><td>" + usd(s.pv7[i]) + "</td><td>" + usd(s.pv4[i]) + "</td></tr>";
     }).join("\n");
-    var money = '<table class="lx-facts k3-static" aria-label="$100 grown and discounted at 7% and 4% a year">\n' +
+    var money = '<table class="k3-static" aria-label="$100 grown and discounted at 7% and 4% a year">\n' +
       '<thead><tr><th scope="col">When</th><th scope="col">$100 today grows at 7% to</th><th scope="col">$100 paid then is worth today, at 7%</th><th scope="col">… at 4%</th></tr></thead>\n<tbody>\n' + rows + "\n</tbody></table>";
     var rates = [0, s.plantRate, s.rate].map(function (r) {
       var y = yearly(s.capex, s.fom, r, s.life);
       return "<tr><td>" + pct(r) + "</td><td>" + f4(y.crf) + "</td><td>" + usd(y.capital) + "</td><td>" + usd(y.total) + "</td></tr>";
     }).join("\n");
-    var crfT = '<table class="lx-facts k3-static" aria-label="The wind farm\'s yearly cost at three rates over ' + s.life + ' years">\n' +
+    var crfT = '<table class="k3-static" aria-label="The wind farm\'s yearly cost at three rates over ' + s.life + ' years">\n' +
       '<thead><tr><th scope="col">Rate (real)</th><th scope="col">CRF over ' + s.life + ' years</th><th scope="col">Repayment, $ per kW a year</th><th scope="col">Plus upkeep: yearly cost, $ per kW</th></tr></thead>\n<tbody>\n' + rates + "\n</tbody></table>";
     return { money: money, crf: crfT };
   }

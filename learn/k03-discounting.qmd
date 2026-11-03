@@ -60,8 +60,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k3-drill .lx-btn { justify-self: start; }
 .k3-drill-q { display: grid; gap: 10px; }
 .k3-drill-q .lx-qtext:focus { outline: none; }
-.k3-tables { display: grid; gap: 12px; }
-.k3-static td { font-family: var(--lx-f-mono); font-size: 14px; }
+.k3-tables { display: grid; gap: 12px; overflow-x: auto; }
+.k3-static { border-collapse: collapse; font-size: 14px; }
+.k3-static th, .k3-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: right; vertical-align: top; }
+.k3-static th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-2); }
+.k3-static td { font-family: var(--lx-f-mono); }
+.k3-static td:first-child { text-align: left; font-family: var(--lx-f-body); }
 .page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
 .page-learn .lx-datanote li { margin: 0; }
 @media (max-width: 560px) { .k3-pvrow { grid-template-columns: 4.6em minmax(0, 1fr) 4.8em; } }
@@ -83,7 +87,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </ol>
 <div class="k3-tables">
 <!-- k3-money:start (written by _tests/learn/test_k03-discounting.js --write; do not edit) -->
-<table class="lx-facts k3-static" aria-label="$100 grown and discounted at 7% and 4% a year">
+<table class="k3-static" aria-label="$100 grown and discounted at 7% and 4% a year">
 <thead><tr><th scope="col">When</th><th scope="col">$100 today grows at 7% to</th><th scope="col">$100 paid then is worth today, at 7%</th><th scope="col">… at 4%</th></tr></thead>
 <tbody>
 <tr><td>Today</td><td>$100.00</td><td>$100.00</td><td>$100.00</td></tr>
@@ -93,7 +97,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </tbody></table>
 <!-- k3-money:end -->
 <!-- k3-crf:start (written by _tests/learn/test_k03-discounting.js --write; do not edit) -->
-<table class="lx-facts k3-static" aria-label="The wind farm's yearly cost at three rates over 30 years">
+<table class="k3-static" aria-label="The wind farm's yearly cost at three rates over 30 years">
 <thead><tr><th scope="col">Rate (real)</th><th scope="col">CRF over 30 years</th><th scope="col">Repayment, $ per kW a year</th><th scope="col">Plus upkeep: yearly cost, $ per kW</th></tr></thead>
 <tbody>
 <tr><td>0%</td><td>0.0333</td><td>$57.07</td><td>$91.64</td></tr>
