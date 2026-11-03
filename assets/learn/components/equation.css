@@ -1,0 +1,45 @@
+/* equation.css — LX.EquationCard (equation.js): an equation whose symbols are buttons, with a detail panel (.lx-cdetail,
+   explain.css), an optional code box and a text version. Two looks: large symbol buttons (default) and .dense, a formula box
+   whose symbols are dotted-underlined words. */
+.lx-eqc { display: grid; gap: 12px; }
+.lx-eqc.lx-eqc-side { grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+.lx-eqc-main { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.lx-eqc-main details.lx-textalt { margin: 0; }
+.lx-eq { display: grid; gap: 14px; align-content: start; color: var(--lx-ink); min-width: 0; }
+.lx-eq-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-family: var(--lx-f-mono); font-size: 20px; color: var(--lx-ink); min-width: 0; }
+.lx-eq-row .op { color: var(--lx-ink-2); }
+.lx-eq-row .op.txt { font-size: .82em; }
+.lx-eq-row .note { font-family: var(--lx-f-body); font-size: 13px; color: var(--lx-ink-3); flex-basis: 100%; }
+.lx-eq .tag { font-family: var(--lx-f-body); font-size: 13px; color: var(--lx-ink-3); margin-left: 10px; }
+.lx-eq var { font-style: italic; font-family: Georgia, "Times New Roman", serif; font-size: 1.08em; }
+.lx-eq sub, .lx-eq sup { font-size: 70%; }
+.lx-eq-sym { min-width: 44px; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
+  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 20px; font-weight: 500; cursor: pointer; }
+.lx-eq-sym.c { border-bottom: 4px solid var(--c); }
+.lx-eq-sym:hover { border-color: var(--lx-ink-3); }
+.lx-eq-sym.c:hover { border-bottom-color: var(--c); }
+.lx-eq-sym[aria-pressed="true"] { background: var(--lx-ink); color: var(--lx-bg); border-color: var(--lx-ink); }
+.lx-eq-sym.c[aria-pressed="true"] { border-bottom-color: var(--c); }
+/* a fraction: numerator over denominator */
+.lx-eq .frac { display: inline-grid; justify-items: center; gap: 4px; vertical-align: middle; }
+.lx-eq .frac > span { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 8px; }
+.lx-eq .frac > .num { border-bottom: 2px solid var(--lx-ink); padding-bottom: 4px; }
+/* dense: a whole model in a formula box */
+.lx-eq.dense { gap: 6px; padding: 12px; border-radius: 12px; background: var(--lx-surface-2); overflow-x: auto; }
+.lx-eq.dense .lx-eq-row { display: block; white-space: nowrap; font-family: var(--lx-f-body); font-size: 16px; line-height: 1.7; }
+.lx-eq.dense .lx-eq-sym { min-width: 0; min-height: 0; margin: 0; padding: 0 1px; border: 0; border-bottom: 2px dotted var(--lx-ink-3); border-radius: 0;
+  background: none; color: inherit; font: inherit; line-height: 1.2; }
+.lx-eq.dense .lx-eq-sym[aria-pressed="true"] { background: var(--lx-accent-soft); border-bottom-color: var(--lx-accent); border-radius: 4px 4px 0 0; color: inherit; }
+/* the panel and the code box */
+.lx-eq-det code { display: block; margin-top: 4px; padding: 4px 8px; border-radius: 6px; background: var(--lx-surface); color: var(--lx-ink);
+  font-family: var(--lx-f-mono); font-size: 13.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.page-learn .lx-eq-det code { background: var(--lx-surface) !important; color: var(--lx-ink) !important; }
+.lx-eq-code pre { margin: 6px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--lx-surface-2); color: var(--lx-ink); font-family: var(--lx-f-mono);
+  font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; border: 0; }
+@media (max-width: 860px) { .lx-eqc.lx-eqc-side { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) {
+  .lx-eq-row { font-size: 18px; gap: 6px 5px; }
+  .lx-eq-sym { min-width: 40px; min-height: 42px; padding: 0 7px; font-size: 18px; }
+  .lx-eq .frac > span { gap: 6px 5px; }
+  .lx-eq.dense .lx-eq-row { font-size: 15px; }
+}

@@ -309,30 +309,6 @@
     return { result: function () { R.items.forEach(function (it) { if (ans[it.id] == null) ans[it.id] = it.answer; }); k = R.items.length; show(); } };
   }
 
-  // ---- equation card (explain layer): an equation whose symbols link to words, the dispatch story and code
-  function EquationCard(host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var eq = H("p", { class: "b1-eqline", role: "group", "aria-label": "Symbols of the equation; select one" }, host), det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, host), btns = {};
-    o.tokens.forEach(function (tk) {
-      if (!tk.key) { H("span", { class: "b1-eqtxt", html: tk.html }, eq); return; }
-      var b = H("button", { type: "button", class: "b1-eqtok", "aria-pressed": "false", html: tk.html }, eq);
-      b.addEventListener("click", function () { pick(tk.key); });
-      btns[tk.key] = (btns[tk.key] || []).concat([b]);
-    });
-    function pick(key) {
-      Object.keys(btns).forEach(function (k) { btns[k].forEach(function (b) { b.setAttribute("aria-pressed", k === key ? "true" : "false"); }); });
-      var d = o.defs[key]; det.innerHTML = "";
-      H("h4", { text: d.name }, det); H("p", { html: LX.rich(d.words) }, det);
-      if (d.story) { var s1 = H("div", { class: "ingame" }, det); H("b", { text: "In the dispatch story" }, s1); H("span", { text: d.story }, s1); }
-      if (d.code) { var s2 = H("div", { class: "ingame" }, det); H("b", { text: "In code" }, s2); H("code", { text: d.code }, s2); }
-    }
-    pick(o.sel || o.tokens.filter(function (t) { return t.key; })[0].key);
-    var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version of the equation" }, alt);
-    var ul = H("ul", null, alt); Object.keys(o.defs).forEach(function (k) { var d = o.defs[k]; H("li", { text: d.name + ": " + d.words.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1") + (d.story ? " Dispatch story: " + d.story : "") }, ul); });
-    return { pick: pick };
-  }
-
   // ================================================================ the lesson
   function view(live, data, root) {
     var J = data.b01_algebra_to_lp, P = data.path || {};
@@ -607,12 +583,14 @@
         { key: "p", color: "var(--lx-solar)", name: "Planning", note: "one rule left", dec: "S, W in MW", goal: "min " + planning.c[0] + "S + " + planning.c[1] + "W", rules: "energy, connection, S, W ≥ 0", best: "(" + bestP.x.join(", ") + "), $" + (bestP.value / 1000).toFixed(1) + "M/yr" },
         { key: "b", color: "var(--lx-wind)", name: "Battery", note: "your own", dec: "c, d in MWh", goal: "max 120d − 30c", rules: "charging, storage, selling, losses, c, d ≥ 0", best: "(" + bestB.x.join(", ") + "), " + money(bestB.value) }]
     });
-    EquationCard(H("div", { class: "lx-xcard" }, x), {
+    LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
       title: "Every linear program, in one line",
       lede: "Tap a symbol: what it means, where it was in the dispatch story, and how code writes it.",
-      tokens: [{ html: "minimize " }, { key: "c", html: "<i>c</i><sup>T</sup>" }, { key: "x", html: "<i>x</i>" }, { html: " subject to " },
-               { key: "A", html: "<i>A</i>" }, { key: "x", html: "<i>x</i>" }, { key: "le", html: " ≤ " }, { key: "b", html: "<i>b</i>" }, { html: ", " }, { key: "x0", html: "<i>x</i> ≥ 0" }],
-      defs: {
+      rows: [{ parts: [{ html: "minimize " }, { k: "c", html: "<i>c</i><sup>T</sup>" }, { k: "x", html: "<i>x</i>" }, { html: " subject to " },
+               { k: "A", html: "<i>A</i>" }, { k: "x", html: "<i>x</i>" }, { k: "le", html: " ≤ " }, { k: "b", html: "<i>b</i>" }, { html: ", " }, { k: "x0", html: "<i>x</i> ≥ 0" }] }],
+      textLabel: "Text version of the equation",
+      fields: [{ key: "story", label: "In the dispatch story", alt: "Dispatch story" }, { key: "code", label: "In code", code: true }],
+      symbols: {
         c: { name: "c: the costs", words: "One number per decision: what one unit of it adds to the [[objective|goal]]. cᵀx multiplies pairwise and adds.", story: "c = (" + d1.c.join(", ") + ") dollars per MWh; cᵀx = " + d1.c[0] + "x + " + d1.c[1] + "y.", code: "c = [" + d1.c.join(", ") + "]" },
         x: { name: "x: the decisions", words: "The [[decision-variable|decision variables]], stacked in a column; the solver chooses them.", story: "x = (x, y): the two gas plants' output in MW.", code: "res.x  # the solver's answer" },
         A: { name: "A: the rule table", words: "One row per rule, one column per decision; each entry says how much a decision counts in that rule.", story: "Rows (−1, −1), (1, 0), (1, 0), (0, 1): cover, ramp, size, peaker.", code: "A_ub = [[-1, -1], [1, 0], [1, 0], [0, 1]]" },

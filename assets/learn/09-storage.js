@@ -357,25 +357,23 @@
     var host = document.getElementById("w9-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
     var f = town.fleet, B = D.battery, P = D.precomputed, best = P[String(B.E)];
-    // 1 formulate it (e-formulate; the same box as lesson 10's, kept lesson-local here)
-    var c1 = H("div", { class: "lx-xcard" }, host), hd = H("header", { class: "lx-x-head" }, c1);
-    H("h3", { text: "Formulate it: the battery's day in words" }, hd);
-    H("p", { class: "lx-lede", text: "The same three parts as every optimization model, plus the data it is given." }, c1);
-    var g = H("div", { class: "w9-form", style: "display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px" }, c1);
-    [["Decisions", "var(--lx-tier-2)", "For each hour: how much the battery charges and discharges, and how much it then holds; plus the gas plants and spilled sun, as in lesson 0."],
-     ["Goal", "var(--lx-good)", "Make the town's running cost for the day as small as possible. The saving against no battery is the battery's value: " + usd(best.save) + " on " + W.dateLabel + "."],
-     ["Rules", "var(--lx-warn)", "Charge and discharge at most " + B.P + " MW. Hold between 0 and " + B.E + " MWh. Stored energy grows by " + Math.round(B.eta * 100) + "% of what goes in. Supply equals demand every hour."],
-     ["Given", "var(--lx-ink-3)", "Demand, wind and sun for each hour; plant sizes and costs; the battery's ratings. It starts the day empty."]].forEach(function (x) {
-      var d = H("div", { style: "border:1px solid var(--lx-line);border-top:4px solid " + x[1] + ";border-radius:12px;padding:10px 12px;display:grid;gap:4px;align-content:start" }, g);
-      H("h4", { text: x[0], style: "font-family:var(--lx-f-display);font-weight:600;font-size:15px;margin:0" }, d); H("p", { text: x[2], style: "font-size:14.5px;color:var(--lx-ink-2);margin:0" }, d);
+    // 1 formulate it (LX.FormulateBox, components/formulate.js)
+    var tag = function (t) { return ' &nbsp;<span class="tag">' + t + "</span>"; };
+    LX.FormulateBox(H("div", { class: "lx-xcard" }, host), {
+      title: "Formulate it: the battery's day in words",
+      lede: "The same three parts as every optimization model, plus the data it is given.",
+      parts: [
+        { k: "Decisions", color: "var(--lx-tier-2)", text: "For each hour: how much the battery charges and discharges, and how much it then holds; plus the gas plants and spilled sun, as in lesson 0." },
+        { k: "Goal", color: "var(--lx-good)", text: "Make the town's running cost for the day as small as possible. The saving against no battery is the battery's value: " + usd(best.save) + " on " + W.dateLabel + "." },
+        { k: "Rules", color: "var(--lx-warn)", text: "Charge and discharge at most " + B.P + " MW. Hold between 0 and " + B.E + " MWh. Stored energy grows by " + Math.round(B.eta * 100) + "% of what goes in. Supply equals demand every hour." },
+        { k: "Given", color: "var(--lx-ink-3)", text: "Demand, wind and sun for each hour; plant sizes and costs; the battery's ratings. It starts the day empty." }
+      ],
+      symbols: "min Σ<sub>t</sub> ( " + f.cc.cost + " cc<sub>t</sub> + " + f.peaker.cost + " pk<sub>t</sub> )<br>" +
+        "cc<sub>t</sub> + pk<sub>t</sub> − sp<sub>t</sub> + dis<sub>t</sub> − ch<sub>t</sub> = gap<sub>t</sub>" + tag("balance") + "<br>" +
+        "soc<sub>t</sub> = soc<sub>t−1</sub> + " + B.eta + " ch<sub>t</sub> − dis<sub>t</sub>, &nbsp;soc<sub>−1</sub> = 0" + tag("state of charge") + "<br>" +
+        "0 ≤ ch<sub>t</sub>, dis<sub>t</sub> ≤ " + B.P + ", &nbsp;0 ≤ soc<sub>t</sub> ≤ " + B.E + tag("power and energy") + "<br>" +
+        "0 ≤ cc<sub>t</sub> ≤ " + f.cc.mw + ", 0 ≤ pk<sub>t</sub> ≤ " + f.peaker.mw + ", 0 ≤ sp<sub>t</sub> ≤ wind<sub>t</sub> + sun<sub>t</sub>"
     });
-    var det = H("details", { class: "lx-textalt" }, c1); H("summary", { text: "Show it in symbols" }, det);
-    H("div", { style: "font-family:var(--lx-f-mono);font-size:14px;line-height:1.8;overflow-x:auto;padding:10px 12px;background:var(--lx-surface-2);border-radius:10px", html:
-      "min Σ<sub>t</sub> ( " + f.cc.cost + " cc<sub>t</sub> + " + f.peaker.cost + " pk<sub>t</sub> )<br>" +
-      "cc<sub>t</sub> + pk<sub>t</sub> − sp<sub>t</sub> + dis<sub>t</sub> − ch<sub>t</sub> = gap<sub>t</sub> &nbsp;<span style=\"color:var(--lx-ink-3)\">balance</span><br>" +
-      "soc<sub>t</sub> = soc<sub>t−1</sub> + " + B.eta + " ch<sub>t</sub> − dis<sub>t</sub>, &nbsp;soc<sub>−1</sub> = 0 &nbsp;<span style=\"color:var(--lx-ink-3)\">state of charge</span><br>" +
-      "0 ≤ ch<sub>t</sub>, dis<sub>t</sub> ≤ " + B.P + ", &nbsp;0 ≤ soc<sub>t</sub> ≤ " + B.E + " &nbsp;<span style=\"color:var(--lx-ink-3)\">power and energy</span><br>" +
-      "0 ≤ cc<sub>t</sub> ≤ " + f.cc.mw + ", 0 ≤ pk<sub>t</sub> ≤ " + f.peaker.mw + ", 0 ≤ sp<sub>t</sub> ≤ wind<sub>t</sub> + sun<sub>t</sub>" }, det);
     // 2 comparison table: four batteries on the same day
     var rows = D.durations.map(function (h) {
       var o = P[String(B.P * h)];

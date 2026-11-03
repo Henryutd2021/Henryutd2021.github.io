@@ -1,0 +1,14 @@
+/* formulate.css — LX.FormulateBox (formulate.js): the parts of a model in words, each under a colour bar, and the
+   symbols in a collapsed box. */
+.lx-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.lx-form.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.lx-form > div { border: 1px solid var(--lx-line); border-top: 4px solid var(--c); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px;
+  align-content: start; background: var(--lx-surface); min-width: 0; }
+.page-learn .lx-form h4 { font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; margin: 0; color: var(--lx-ink); }
+.lx-form p { font-size: 14.5px; color: var(--lx-ink-2); margin: 0; }
+details.lx-form-symbols { margin: 0; }
+.lx-form-sym { margin-top: 6px; font-family: var(--lx-f-mono); font-size: 14px; line-height: 1.8; color: var(--lx-ink); background: var(--lx-surface-2);
+  border-radius: 10px; padding: 10px 12px; overflow-x: auto; }
+.lx-form-sym .tag { font-family: var(--lx-f-body); font-size: 13px; color: var(--lx-ink-3); }
+@media (max-width: 860px) { .lx-form, .lx-form.three { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .lx-form, .lx-form.three { grid-template-columns: minmax(0, 1fr); } }

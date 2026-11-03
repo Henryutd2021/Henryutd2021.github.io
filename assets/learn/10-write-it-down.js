@@ -18,10 +18,9 @@
 // improves without limit along a feasible direction). _tests/learn/test_10-write-it-down.js checks it against HiGHS on
 // random cases, and every number the page states against this model.
 //
-// Shared components: LX.LPPlane and LX.lp2 (the plane and its rule algebra), LX.CardSort, LX.LinkedViews, LX.Toggle and
-// LX.Slider. Lesson-local: W1F.EquationCard (e-equation: symbols that open their words and their code) and
-// W1F.FormulateBox (e-formulate), plus the stage's look and the helpers W1F.fmt1, W1F.usd and W1F.saw, which lesson 11
-// still loads this file for. Their CSS is injected once (id "w1f-css").
+// Shared components: LX.LPPlane and LX.lp2 (the plane and its rule algebra), LX.CardSort, LX.LinkedViews, LX.Toggle,
+// LX.Slider, and in the explain layer LX.FormulateBox and LX.EquationCard (components/formulate.js, equation.js).
+// Lesson-local: the stage's look and the helpers W1F.fmt1, W1F.usd and W1F.saw (CSS injected once, id "w1f-css").
 (function () {
   "use strict";
   var HOURS = 24;
@@ -108,61 +107,8 @@
     ".w1f-mission .lx-ic{width:18px;height:18px;margin-top:2px;color:var(--lx-ink-3)}.w1f-mission.won .lx-ic{color:var(--lx-good)}.w1f-mission.won{color:var(--lx-ink)}",
     ".lx-step-act>.lx-btn,.lx-step-act>a.lx-btn{justify-self:start}",
     ".w1f-sym var,.w1f-eq var{font-style:italic;font-family:Georgia,'Times New Roman',serif;font-size:1.08em}",
-    // formulate box and equation card
-    ".w1f-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}",
-    "@media(max-width:860px){.w1f-form{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.w1f-form{grid-template-columns:minmax(0,1fr)}}",
-    ".w1f-form>div{border:1px solid var(--lx-line);border-top:4px solid var(--c);border-radius:12px;padding:10px 12px;display:grid;gap:4px;align-content:start;background:var(--lx-surface)}",
-    ".w1f-form h4{font-family:var(--lx-f-display);font-weight:600;font-size:15px;margin:0;color:var(--lx-ink)}",
-    ".w1f-form p{font-size:14.5px;color:var(--lx-ink-2);margin:0}",
-    ".w1f-eq{display:grid;gap:6px;padding:12px;border-radius:12px;background:var(--lx-surface-2);overflow-x:auto;font-size:16px;line-height:1.7;color:var(--lx-ink)}",
-    ".w1f-eq .ln{white-space:nowrap}.w1f-eq .tag{font-family:var(--lx-f-body);font-size:13px;color:var(--lx-ink-3);margin-left:10px}",
-    ".w1f-eq button.s{border:0;border-bottom:2px dotted var(--lx-ink-3);background:none;padding:0 1px;margin:0;cursor:pointer;color:inherit;font:inherit;line-height:1.2}",
-    ".w1f-eq button.s.on{background:var(--lx-accent-soft);border-bottom-color:var(--lx-accent);border-radius:4px 4px 0 0}",
-    ".w1f-eqd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}@media(max-width:640px){.w1f-eqd{grid-template-columns:minmax(0,1fr)}}",
-    ".w1f-eqd>div{border:1px solid var(--lx-line);border-radius:10px;padding:10px 12px;display:grid;gap:4px;align-content:start}",
-    ".w1f-eqd h4{font-family:var(--lx-f-display);font-size:12px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--lx-ink-3);margin:0}",
-    ".w1f-eqd p{font-size:14.5px;margin:0;color:var(--lx-ink)}",
-    ".w1f-eqd pre{margin:0;font-family:var(--lx-f-mono);font-size:12.5px;white-space:pre-wrap;word-break:break-word;color:var(--lx-ink);background:none;border:0;padding:0}",
   ].join("\n");
   W1F.css = function () { if (!document.getElementById("w1f-css")) H("style", { id: "w1f-css", text: CSS }, document.head); };
-
-  // formulate-it box (e-formulate): the parts of a model in words, and the symbols on request
-  W1F.FormulateBox = function (host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var g = H("div", { class: "w1f-form" }, host);
-    o.parts.forEach(function (pt) { var d = H("div", { style: "--c:" + pt.color }, g); H("h4", { text: pt.k }, d); H("p", { html: LX.rich(pt.text) }, d); });
-    if (o.symbols) { var det = H("details", { class: "lx-textalt" }, host); H("summary", { text: o.symbolsLabel || "Show it in symbols" }, det); H("div", { class: "w1f-eq", html: o.symbols }, det); }
-    return { el: g };
-  };
-
-  // equation card (e-equation): each symbol is a button that opens its words and its code
-  // o: {title, lede, lines: [html with <button class="s" data-s="id">...</button>], symbols: {id: {name, words, code}}, sel}
-  W1F.EquationCard = function (host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var eq = H("div", { class: "w1f-eq", role: "group", "aria-label": "The model; each symbol is a button" }, host);
-    o.lines.forEach(function (l) { H("div", { class: "ln", html: l }, eq); });
-    var dt = H("div", { class: "w1f-eqd", "aria-live": "polite" }, host);
-    var dw = H("div", null, dt), dc = H("div", null, dt);
-    H("h4", { text: "In words" }, dw); var pw = H("p", null, dw);
-    H("h4", { text: "In code" }, dc); var pc = H("pre", null, dc);
-    function sel(id) {
-      var s = o.symbols[id]; if (!s) return;
-      eq.querySelectorAll("button.s").forEach(function (b) { var on = b.getAttribute("data-s") === id; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
-      pw.innerHTML = "<b>" + s.name + "</b>: " + LX.rich(s.words); pc.textContent = s.code;
-    }
-    eq.querySelectorAll("button.s").forEach(function (b) {
-      var s = o.symbols[b.getAttribute("data-s")]; b.setAttribute("type", "button");
-      if (s) b.setAttribute("aria-label", s.label || s.name);
-      b.addEventListener("click", function () { sel(b.getAttribute("data-s")); });
-    });
-    var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version: every symbol" }, alt);
-    var ul = H("ul", null, alt);
-    Object.keys(o.symbols).forEach(function (k) { var s = o.symbols[k]; H("li", { html: "<b>" + s.name + "</b>: " + LX.rich(s.words) }, ul); });
-    sel(o.sel || Object.keys(o.symbols)[0]);
-    return { select: sel };
-  };
 
   // ================================================================ the lesson
   var fmt1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }); };
@@ -407,7 +353,7 @@
     host.innerHTML = ""; host.classList.add("is-live");
     var f = town.fleet, nPk = f.peaker.mw;
     // 1 formulate it
-    W1F.FormulateBox(H("div", { class: "lx-xcard" }, host), {
+    LX.FormulateBox(H("div", { class: "lx-xcard" }, host), {
       title: "Formulate it: lesson 0's day in words",
       lede: "The ten cards, put together. This is the whole model a solver needs; lesson 11 hands it to one.",
       parts: [
@@ -418,16 +364,17 @@
       ]
     });
     // 2 equation card
-    var sym = function (id, html) { return '<button class="s" data-s="' + id + '">' + html + "</button>"; };
-    W1F.EquationCard(H("div", { class: "lx-xcard" }, host), {
+    var sym = LX.EquationCard.sym;
+    LX.EquationCard(H("div", { class: "lx-xcard" }, host), {
       title: "The same model in symbols",
       lede: "Tap a symbol to see what it means and how it looks in code (the model format this site's solver reads).",
-      lines: [
-        "min&nbsp; Σ<sub><var>t</var></sub> ( " + sym("c", "40") + " " + sym("pcc", "<var>p</var><sub>cc</sub>(<var>t</var>)") + " + " + sym("cpk", f.peaker.cost) + " " + sym("ppk", "<var>p</var><sub>pk</sub>(<var>t</var>)") + " + " + sym("V", "<var>V</var>") + " " + sym("u", "<var>u</var>(<var>t</var>)") + " )<span class=\"tag\">goal</span>",
-        sym("n", "100") + " + " + sym("wv", "<var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>)") + " + <var>p</var><sub>cc</sub>(<var>t</var>) + <var>p</var><sub>pk</sub>(<var>t</var>) + <var>u</var>(<var>t</var>) − " + sym("s", "<var>s</var>(<var>t</var>)") + " = " + sym("d", "<var>d</var>(<var>t</var>)") + "<span class=\"tag\">balance, every hour</span>",
-        "0 ≤ <var>p</var><sub>cc</sub>(<var>t</var>) ≤ 150, &nbsp;0 ≤ <var>p</var><sub>pk</sub>(<var>t</var>) ≤ " + nPk + "<span class=\"tag\">sizes</span>",
-        "−" + sym("R", "40") + " ≤ <var>p</var><sub>cc</sub>(<var>t</var>) − <var>p</var><sub>cc</sub>(<var>t</var>−1) ≤ 40<span class=\"tag\">ramp limit</span>",
-        "0 ≤ <var>s</var>(<var>t</var>) ≤ <var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>), &nbsp;<var>u</var>(<var>t</var>) ≥ 0<span class=\"tag\">spill and unserved</span>"
+      dense: true, label: "The model; each symbol is a button", textLabel: "Text version: every symbol", fields: [{ key: "code", label: "In code", code: true }],
+      rows: [
+        { html: "min&nbsp; Σ<sub><var>t</var></sub> ( " + sym("c", "40") + " " + sym("pcc", "<var>p</var><sub>cc</sub>(<var>t</var>)") + " + " + sym("cpk", f.peaker.cost) + " " + sym("ppk", "<var>p</var><sub>pk</sub>(<var>t</var>)") + " + " + sym("V", "<var>V</var>") + " " + sym("u", "<var>u</var>(<var>t</var>)") + " )", tag: "goal" },
+        { html: sym("n", "100") + " + " + sym("wv", "<var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>)") + " + <var>p</var><sub>cc</sub>(<var>t</var>) + <var>p</var><sub>pk</sub>(<var>t</var>) + <var>u</var>(<var>t</var>) − " + sym("s", "<var>s</var>(<var>t</var>)") + " = " + sym("d", "<var>d</var>(<var>t</var>)"), tag: "balance, every hour" },
+        { html: "0 ≤ <var>p</var><sub>cc</sub>(<var>t</var>) ≤ 150, &nbsp;0 ≤ <var>p</var><sub>pk</sub>(<var>t</var>) ≤ " + nPk, tag: "sizes" },
+        { html: "−" + sym("R", "40") + " ≤ <var>p</var><sub>cc</sub>(<var>t</var>) − <var>p</var><sub>cc</sub>(<var>t</var>−1) ≤ 40", tag: "ramp limit" },
+        { html: "0 ≤ <var>s</var>(<var>t</var>) ≤ <var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>), &nbsp;<var>u</var>(<var>t</var>) ≥ 0", tag: "spill and unserved" }
       ],
       symbols: {
         pcc: { name: "p_cc(t)", label: "p cc of t", words: "The combined-cycle's output in hour t, in MW: a [[decision-variable|decision]], one for each of the 24 hours.", code: '{ name: "cc_19", lb: 0, ub: 150, cost: 40 }' },

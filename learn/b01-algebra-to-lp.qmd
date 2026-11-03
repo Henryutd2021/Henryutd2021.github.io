@@ -106,12 +106,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .page-learn .b1-code { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--lx-surface-2); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 13px;
   line-height: 1.5; overflow-x: auto; white-space: pre; }
 .b1-cl.sel { background: var(--lx-accent-soft); }
-.b1-eqline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px; font-family: var(--lx-f-mono); font-size: 20px; color: var(--lx-ink); }
-.b1-eqtok { border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); border-radius: 8px; min-height: 40px; min-width: 40px; padding: 0 8px;
-  font-family: var(--lx-f-mono); font-size: 20px; cursor: pointer; }
-.b1-eqtok[aria-pressed="true"] { background: var(--lx-ink); color: var(--lx-bg); border-color: var(--lx-ink); }
-.b1-eqtxt { padding: 0 4px; color: var(--lx-ink-2); font-size: 17px; }
-.page-learn .lx-cdetail code { font-family: var(--lx-f-mono); font-size: 13.5px; display: block; margin-top: 4px; padding: 4px 8px; border-radius: 6px; background: var(--lx-surface) !important; color: var(--lx-ink) !important; white-space: pre-wrap; }
 .b1-practice { display: grid; gap: 12px; }
 .b1-static-model { font-family: var(--lx-f-mono); font-size: 15px; margin: 0; padding-left: 1.2rem; }
 @media (max-width: 640px) {

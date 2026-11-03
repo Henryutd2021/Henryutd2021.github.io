@@ -116,11 +116,6 @@
       ".lx7-chart text{font-family:var(--lx-f-mono);font-size:11px;fill:var(--lx-ink-3)}",
       ".lx7-chart text.lab{font-family:var(--lx-f-body);font-size:12px;fill:var(--lx-ink-2)}",
       ".lx7-tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
-      ".lx7-eq{font-family:var(--lx-f-mono);font-size:16px;line-height:2.1;color:var(--lx-ink);display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}",
-      ".lx7-eq button{font:inherit;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);border-radius:8px;padding:0 8px;min-height:36px;cursor:pointer}",
-      ".lx7-eq button[aria-pressed=true]{background:var(--lx-ink);color:var(--lx-bg);border-color:var(--lx-ink)}",
-      ".lx7-frac{display:inline-grid;text-align:center;vertical-align:middle}",
-      ".lx7-frac>span:first-child{border-bottom:2px solid var(--lx-ink);padding-bottom:2px}",
       "@media (max-width:560px){.lx7-pvrow{grid-template-columns:4.6em minmax(0,1fr) 4.8em}.lx7-big b{font-size:26px}}"
     ].join("\n") }, document.head);
   }
@@ -400,39 +395,28 @@
     var host = document.getElementById("cost-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
     var T = D.techs, fin = D.finance;
-    // 1 the equation, symbol by symbol, with the wind farm's (or the reader's) numbers
-    var c1 = H("div", { class: "lx-xcard" }, host), hd = H("header", { class: "lx-x-head" }, c1);
-    H("h3", { text: "The LCOE equation, symbol by symbol" }, hd);
+    // 1 the equation, symbol by symbol, with the wind farm's (or the reader's) numbers (LX.EquationCard, components/equation.js)
     var saved = LX.store.get("c7-calc", null), k = saved && T[saved.tech] ? saved.tech : "wind";
     var p = saved && T[saved.tech] ? saved.inputs : inputs(D, k), L = lcoe(p);
-    H("p", { class: "lx-lede", text: "Tap a symbol. The numbers are " + (saved ? "your last calculator settings for the " + T[k].label.toLowerCase() : "the onshore wind farm's defaults") + "." }, c1);
-    var eq = H("div", { class: "lx7-eq", role: "group", "aria-label": "LCOE equation" }, c1), det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, c1);
-    var SYM = {
-      lcoe: ["LCOE", "Levelized cost of electricity: the steady price per MWh that repays every cost over the plant's life.", usd(L.total) + "/MWh"],
-      crf: ["CRF", "Capital recovery factor: the share of the building cost to repay each year, with interest, so it is paid off over the life.", L.crf.toFixed(4) + " (at " + pct(p.wacc) + " over " + p.life + " years)"],
-      capex: ["C", "Building (overnight) cost per kW of capacity.", usd(p.capex, 0) + "/kW"],
-      fom: ["FOM", "Fixed upkeep per kW per year, paid whether the plant runs or not.", usd(p.fom) + "/kW-yr"],
-      cf: ["CF × 8.76", "MWh each kW makes in a year: the capacity factor times 8,760 hours, divided by 1,000.", L.E.toFixed(3) + " MWh per kW-yr"],
-      fuel: ["fuel", "Fuel per MWh: the heat rate (MMBtu per MWh) times the gas price.", usd(L.fuel) + "/MWh"],
-      vom: ["VOM", "Upkeep that grows with output, per MWh.", usd(L.vom) + "/MWh"]
-    };
-    var btns = {};
-    function sym(id) { btns[id] = H("button", { type: "button", "aria-pressed": "false", text: SYM[id][0], onclick: function () { pick(id); } }, eq); }
-    sym("lcoe"); H("span", { text: "=" }, eq);
-    var fr = H("span", { class: "lx7-frac" }, eq), num = H("span", null, fr), den = H("span", null, fr);
-    btns.crf = H("button", { type: "button", "aria-pressed": "false", text: "CRF", onclick: function () { pick("crf"); } }, num); H("span", { text: " × " }, num);
-    btns.capex = H("button", { type: "button", "aria-pressed": "false", text: "C", onclick: function () { pick("capex"); } }, num); H("span", { text: " + " }, num);
-    btns.fom = H("button", { type: "button", "aria-pressed": "false", text: "FOM", onclick: function () { pick("fom"); } }, num);
-    btns.cf = H("button", { type: "button", "aria-pressed": "false", text: "CF × 8.76", onclick: function () { pick("cf"); } }, den);
-    H("span", { text: "+" }, eq); sym("fuel"); H("span", { text: "+" }, eq); sym("vom");
-    function pick(id) {
-      Object.keys(btns).forEach(function (j) { btns[j].setAttribute("aria-pressed", j === id ? "true" : "false"); });
-      det.innerHTML = ""; H("h4", { text: SYM[id][0] }, det); H("p", { text: SYM[id][1] }, det); H("p", { class: "you", text: SYM[id][2] }, det);
-    }
-    pick("crf");
-    H("p", { class: "lx-hint", text: "CRF = r ÷ (1 − (1 + r)^−n), with r the real WACC and n the life in years; when r = 0 it is simply 1 ÷ n." }, c1);
-    var a1 = textAlt(c1), u1 = H("ul", null, a1);
-    Object.keys(SYM).forEach(function (id) { H("li", { text: SYM[id][0] + ": " + SYM[id][1] + " Here: " + SYM[id][2] + "." }, u1); });
+    var sy = function (name, words, here) { return { sym: LX.esc(name), name: name, words: words, you: here }; };
+    LX.EquationCard(H("div", { class: "lx-xcard" }, host), {
+      title: "The LCOE equation, symbol by symbol",
+      lede: "Tap a symbol. The numbers are " + (saved ? "your last calculator settings for the " + T[k].label.toLowerCase() : "the onshore wind farm's defaults") + ".",
+      label: "LCOE equation",
+      rows: [{ parts: [{ k: "lcoe" }, "=", { frac: [[{ k: "crf" }, "×", { k: "capex" }, "+", { k: "fom" }], [{ k: "cf" }]] }, "+", { k: "fuel" }, "+", { k: "vom" }] }],
+      symbols: {
+        lcoe: sy("LCOE", "Levelized cost of electricity: the steady price per MWh that repays every cost over the plant's life.", usd(L.total) + "/MWh"),
+        crf: sy("CRF", "Capital recovery factor: the share of the building cost to repay each year, with interest, so it is paid off over the life.", L.crf.toFixed(4) + " (at " + pct(p.wacc) + " over " + p.life + " years)"),
+        capex: sy("C", "Building (overnight) cost per kW of capacity.", usd(p.capex, 0) + "/kW"),
+        fom: sy("FOM", "Fixed upkeep per kW per year, paid whether the plant runs or not.", usd(p.fom) + "/kW-yr"),
+        cf: sy("CF × 8.76", "MWh each kW makes in a year: the capacity factor times 8,760 hours, divided by 1,000.", L.E.toFixed(3) + " MWh per kW-yr"),
+        fuel: sy("fuel", "Fuel per MWh: the heat rate (MMBtu per MWh) times the gas price.", usd(L.fuel) + "/MWh"),
+        vom: sy("VOM", "Upkeep that grows with output, per MWh.", usd(L.vom) + "/MWh")
+      },
+      fields: [{ key: "you", label: null, alt: "Here" }],
+      sel: "crf",
+      hint: "CRF = r ÷ (1 − (1 + r)^−n), with r the real WACC and n the life in years; when r = 0 it is simply 1 ÷ n."
+    });
 
     // 2 the four plants compared
     var c2 = H("div", { class: "lx-xcard" }, host), c3 = H("div", { class: "lx-xcard" }, host);

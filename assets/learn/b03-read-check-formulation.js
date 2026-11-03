@@ -149,18 +149,13 @@
     };
   }
 
-  // a formulation shown line by line; lines are buttons when o.onPick is given
-  function Formulation(host, J, o) {
-    var box = H("div", { class: "b3-form", role: o.onPick ? "group" : null, "aria-label": o.aria || null }, host), btns = {};
-    ["par", "obj", "bal", "size", "wx", "ramp", "must"].forEach(function (k, i) {
-      var html = (o.lines && o.lines[k]) || J.lines[k];
-      var el = o.onPick ? H("button", { type: "button", class: "b3-line", "aria-pressed": "false" }, box) : H("div", { class: "b3-line" }, box);
-      H("span", { class: "b3-ln", text: k === "par" ? "data" : k === "obj" ? "goal" : "(" + (i - 1) + ")" }, el);
-      H("span", { class: "b3-lx", html: html }, el);
-      if (o.onPick) { el.setAttribute("aria-label", J.lineNames[k] + ": " + el.textContent.replace(/\s+/g, " ")); el.addEventListener("click", function () { o.onPick(k, el); }); }
-      btns[k] = el;
-    });
-    return { btns: btns, el: box };
+  // the published-style formulation, line by line: LX.Formulation (components/formulation.js) with one view, the symbols;
+  // lines are buttons when o.onPick is given, and o.lines replaces some lines (a suspect model)
+  var LINES = ["par", "obj", "bal", "size", "wx", "ramp", "must"];
+  function readLines(host, J, o) {
+    return LX.Formulation(host, { views: ["symbols"], aria: o.aria, onPick: o.onPick, rules: LINES.map(function (k, i) {
+      return { id: k, name: J.lineNames[k], tag: k === "par" ? "data" : k === "obj" ? "goal" : "(" + (i - 1) + ")", sym: (o.lines && o.lines[k]) || J.lines[k] };
+    }) });
   }
 
   function view(live, data, root) {
@@ -253,7 +248,7 @@
     steps.push({
       text: "“∀ t ∈ T” means one row for each hour. With four hours and five plants, how many rows does the balance stand for, and how many the size rule?",
       build: function (act, api) {
-        Formulation(act, J, {});
+        readLines(act, J, {});
         var got = {}, out = H("div", { "aria-live": "polite" }, act);
         numInput(act, { label: "Balance (1):", unit: "rows", onCheck: function (v) { if (v === N.balance) { got.b = 1; fin(); } else saw(out, false, "∀ t ∈ T: one balance row per hour. How many hours are in T?"); } });
         numInput(act, { label: "Sizes (2):", unit: "rows", onCheck: function (v) { if (v === N.size) { got.s = 1; fin(); } else saw(out, false, "∀ g ∈ G, t ∈ T: one row per plant and hour."); } });
@@ -271,14 +266,14 @@
         var found = {}, cur = 0, tabs = H("div", { class: "b3-tabs" }, act);
         var sg = seg(tabs, J.bugs.map(function (b, i) { return "Suspect " + (i + 1); }), 0, function (i) { cur = i; show(); }, "Choose a suspect model");
         var area = H("div", { class: "b3-suspect" }, act);
-        var ref0 = H("details", { class: "lx-textalt" }, act); H("summary", { text: "Compare with the correct model" }, ref0); Formulation(ref0, J, {});
+        var ref0 = H("details", { class: "lx-textalt" }, act); H("summary", { text: "Compare with the correct model" }, ref0); readLines(ref0, J, {});
         function show() {
           var b = J.bugs[cur], lines = {}; lines[b.line] = b.html; area.innerHTML = "";
           var fb = null, runOut = null;
-          var F = Formulation(area, J, { lines: lines, aria: "Suspect " + (cur + 1) + ": select the wrong line", onPick: function (k, el) {
-            Object.keys(F.btns).forEach(function (x) { F.btns[x].setAttribute("aria-pressed", x === k ? "true" : "false"); F.btns[x].classList.remove("right", "wrong"); });
-            if (k === b.line) { el.classList.add("right"); found[b.key] = 1; mark(); reveal(); }
-            else { el.classList.add("wrong"); saw(fb, false, "This line is the same as in the correct model. Read the others again, units and signs included."); }
+          var F = readLines(area, J, { lines: lines, aria: "Suspect " + (cur + 1) + ": select the wrong line", onPick: function (k) {
+            F.mark();
+            if (k === b.line) { F.mark(k, "right"); found[b.key] = 1; mark(); reveal(); }
+            else { F.mark(k, "wrong"); saw(fb, false, "This line is the same as in the correct model. Read the others again, units and signs included."); }
           } });
           fb = H("div", { "aria-live": "polite" }, area);
           function reveal() {
@@ -292,7 +287,7 @@
             });
             if (Object.keys(found).length === J.bugs.length) { api.done(); api.saw("All five found. Each model still solves to “optimal”: the solver checks the mathematics, not whether the mathematics says what you meant."); }
           }
-          if (found[b.key]) { F.btns[b.line].classList.add("right"); reveal(); }
+          if (found[b.key]) { F.mark(b.line, "right"); reveal(); }
         }
         function mark() { sg.buttons.forEach(function (bt, i) { bt.textContent = (found[J.bugs[i].key] ? "✓ " : "") + "Suspect " + (i + 1); }); }
         show();
@@ -366,7 +361,7 @@
     LX.demo(root, function (state) {   // core.js LX.demo: mid = step 3 with both sums; bugs = step 6, first suspect found; check = step 7 solved
       var k = { mid: 2, bugs: 5, check: 6, units: 3 }[state]; if (k == null) return null; cards.go(k);
       if (state === "mid") { var ch = live.querySelectorAll(".b3-ch")[2], rh = live.querySelectorAll(".b3-rh")[3]; if (ch) ch.click(); if (rh) rh.click(); }
-      if (state === "bugs") { var l = live.querySelector(".b3-line[aria-label^='costs']"); if (l) l.click(); var r = [].filter.call(live.querySelectorAll(".b3-suspect .lx-btn"), function (b) { return /Run/.test(b.textContent); })[0]; if (r) r.click(); }
+      if (state === "bugs") { var l = live.querySelector(".lx-fline[aria-label^='costs']"); if (l) l.click(); var r = [].filter.call(live.querySelectorAll(".b3-suspect .lx-btn"), function (b) { return /Run/.test(b.textContent); })[0]; if (r) r.click(); }
       if (state === "check") { var g = live.querySelector(".b3-check") && [].filter.call(live.querySelectorAll(".lx-btn"), function (b) { return /Solve the correct/.test(b.textContent); })[0]; if (g) g.click(); setTimeout(function () { live.querySelectorAll(".b3-cr:not(.head)").forEach(function (b) { b.click(); }); var p = live.querySelector(".b3-predseg button"); if (p) p.click(); }, 600); }
       return { view: "step " + (k + 1) };
     }, cards);
@@ -375,30 +370,23 @@
 
   function explain(J, inst, ref, N) {
     var x = document.getElementById("b3-explain"); if (!x) return; x.innerHTML = "";
-    var c1 = H("div", { class: "lx-xcard" }, x), hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "The balance, symbol by symbol" }, hd);
-    H("p", { class: "lx-lede", text: "Tap a symbol: what it means, its units, and how a modelling language writes it." }, c1);
-    var D = {
-      sum: { name: "Σ over g ∈ G", words: "Add the next term once for every plant in the set G: five terms.", unit: "keeps the unit of the term", code: "sum(m.p[g, t] for g in m.G)" },
-      p: { name: "p(g,t): output", words: "A decision variable with two indices: the output of plant g in hour t.", unit: "MW", code: "m.p = Var(m.G, m.T, within=NonNegativeReals)" },
-      u: { name: "u(t): unserved demand", words: "Demand left unmet in hour t; it carries the penalty V in the objective so the solver uses it only as a last resort.", unit: "MW", code: "m.u = Var(m.T, within=NonNegativeReals)" },
-      d: { name: "d(t): demand", words: "A parameter: given, not chosen. Here it comes from the real shape of 3 September 2025.", unit: "MW", code: "m.d = Param(m.T, initialize=demand)" },
-      all: { name: "∀ t ∈ T: for all hours", words: "Write this row once for every hour: " + N.balance + " rows from one line. Forget it and the rule holds for one hour only.", unit: "", code: "Constraint(m.T, rule=balance)" }
-    };
-    var eq = H("p", { class: "b3-eqline", role: "group", "aria-label": "Symbols of the balance rule; select one" }, c1), det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, c1), bt = {};
-    [["sum", "Σ<sub>g∈G</sub>"], ["p", "<i>p<sub>g,t</sub></i>"], [null, " + "], ["u", "<i>u<sub>t</sub></i>"], [null, " = "], ["d", "<i>d<sub>t</sub></i>"], [null, "  "], ["all", "∀ <i>t</i> ∈ <i>T</i>"]].forEach(function (tk) {
-      if (!tk[0]) { H("span", { class: "b1-eqtxt", html: tk[1] }, eq); return; }
-      var b = H("button", { type: "button", class: "b1-eqtok", "aria-pressed": "false", html: tk[1] }, eq); bt[tk[0]] = b;
-      b.addEventListener("click", function () { pick(tk[0]); });
+    // the balance, symbol by symbol (LX.EquationCard, components/equation.js)
+    LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
+      title: "The balance, symbol by symbol",
+      lede: "Tap a symbol: what it means, its units, and how a modelling language writes it.",
+      label: "Symbols of the balance rule; select one",
+      rows: [{ parts: [{ k: "sum", html: "Σ<sub>g∈G</sub>" }, { k: "p", html: "<i>p<sub>g,t</sub></i>" }, "+", { k: "u", html: "<i>u<sub>t</sub></i>" }, "=", { k: "d", html: "<i>d<sub>t</sub></i>" },
+                       { k: "all", html: "∀ <i>t</i> ∈ <i>T</i>" }] }],
+      symbols: {
+        sum: { name: "Σ over g ∈ G", words: "Add the next term once for every plant in the set G: five terms.", units: "keeps the unit of the term", code: "sum(m.p[g, t] for g in m.G)" },
+        p: { name: "p(g,t): output", words: "A decision variable with two indices: the output of plant g in hour t.", units: "MW", code: "m.p = Var(m.G, m.T, within=NonNegativeReals)" },
+        u: { name: "u(t): unserved demand", words: "Demand left unmet in hour t; it carries the penalty V in the objective so the solver uses it only as a last resort.", units: "MW", code: "m.u = Var(m.T, within=NonNegativeReals)" },
+        d: { name: "d(t): demand", words: "A parameter: given, not chosen. Here it comes from the real shape of 3 September 2025.", units: "MW", code: "m.d = Param(m.T, initialize=demand)" },
+        all: { name: "∀ t ∈ T: for all hours", words: "Write this row once for every hour: " + N.balance + " rows from one line. Forget it and the rule holds for one hour only.", units: "", code: "Constraint(m.T, rule=balance)" }
+      },
+      fields: [{ key: "units", label: "Units", alt: true }, { key: "code", label: "In Pyomo", code: true }],
+      sel: "sum", textLabel: "Text version of the equation"
     });
-    function pick(k) {
-      Object.keys(bt).forEach(function (q) { bt[q].setAttribute("aria-pressed", q === k ? "true" : "false"); });
-      var d = D[k]; det.innerHTML = ""; H("h4", { text: d.name }, det); H("p", { text: d.words }, det);
-      if (d.unit) { var u = H("div", { class: "ingame" }, det); H("b", { text: "Units" }, u); H("span", { text: d.unit }, u); }
-      var c = H("div", { class: "ingame" }, det); H("b", { text: "In Pyomo" }, c); H("code", { text: d.code }, c);
-    }
-    pick("sum");
-    var alt = H("details", { class: "lx-textalt" }, c1); H("summary", { text: "Text version of the equation" }, alt);
-    var ul = H("ul", null, alt); Object.keys(D).forEach(function (k) { H("li", { text: D[k].name + ": " + D[k].words + (D[k].unit ? " Units: " + D[k].unit + "." : "") }, ul); });
 
     // checklist
     var c2 = H("div", { class: "lx-xcard" }, x), h2 = H("header", { class: "lx-x-head" }, c2); H("h3", { text: "Check a model in eight moves" }, h2);
