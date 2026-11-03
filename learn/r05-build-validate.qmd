@@ -74,7 +74,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <ol class="r5-nb-steps">
 <li>Download the notebook; the data are inside it.</li>
 <li>Run it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
-<li>For the Git part, work locally: the notebook lists the commands, and K8 (Git and reproducible notebooks) shows them step by step.</li>
+<li>For the Git part, work locally: the notebook lists the commands, and <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks) shows them step by step.</li>
 </ol>
 <p class="r5-dl"><a class="lx-btn small" href="notebooks/r05-build-validate.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/r05-build-validate.json" download>Study data (JSON)</a></p>
 </div>

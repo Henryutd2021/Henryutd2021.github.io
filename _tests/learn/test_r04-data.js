@@ -113,6 +113,9 @@ ok(/about 299 TWh/.test(weak) && Math.round(R0.demandTWh) === 299 && Math.round(
 
 // ---------------- the page and the data
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(r && PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + ": the page's no-JS block equals the model's (run with --write after a change)"); });
+{ const brief = PAGE.indexOf('<div class="lx-card lx-studio-brief">'), inter = PAGE.indexOf('<div class="lx-interactive');
+  ok(brief >= 0 && brief < inter && /<b>Produce:<\/b>[\s\S]*<b>From:<\/b>[\s\S]*<b>Done when:<\/b>[\s\S]*About 30 minutes guided here, then about 2 hours on your own/.test(PAGE.slice(brief, inter)),
+    "the task card (produce, from, done when, time) sits above the interactive, outside its fallback, so readers with JavaScript see it"); }
 ok(D.licences.cards.length === 8 && D.licences.bins.every(b => D.licences.cards.some(k => k.bin === b.id)) && D.licences.cards.every(k => D.licences.bins.some(b => b.id === k.bin) && k.why), "licences: 8 cards, every bin used, a reason each");
 ok(D.spatial.questions.every(q => q.options.some(o => o[0] === q.answer) && q.options.every(o => q.why[o[0]])), "spatial: answers and a reason for every option");
 ok(D.practice.reduce((s, p) => s + p.min, 0) === 120, "practice adds up to 120 minutes, as path.yml says");

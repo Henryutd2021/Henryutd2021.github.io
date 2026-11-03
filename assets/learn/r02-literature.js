@@ -77,15 +77,10 @@
     var a = p.authors, who = a.length === 1 ? a[0].split(" ").pop() : a.length === 2 ? a[0].split(" ").pop() + " and " + a[1].split(" ").pop() : a[0].split(" ").pop() + " et al.";
     return who + " (" + p.year + ")";
   }
-  // the no-JS version of the task: the ladder, the routes, the matrix and the follow-up search, as HTML
+  // the no-JS version of the task (what to produce is the page's task card, above the interactive): the ladder, the
+  // routes, the matrix and the follow-up search, as HTML
   function staticTask(D, S) {
     var h = [], date = dateText(S.meta.as_of), R = routes(S);
-    h.push('<p class="lx-eyebrow">The task</p>');
-    h.push('<ol class="lx-studio-task">');
-    h.push("<li><b>Produce:</b> a search log, a concept matrix of 12 papers with an empty cell searched directly, a first-pass note on the closest paper, and a gap statement with its evidence.</li>");
-    h.push("<li><b>From:</b> the question below, two open databases (OpenAlex and one more) and one review to snowball from.</li>");
-    h.push("<li><b>Done when:</b> the rubric's bar for positioning: a concept matrix of at least 12 sources and a stated gap with evidence.</li></ol>");
-    h.push('<p class="lx-hint">About 30 minutes guided here, then about 4 hours on your own.</p>');
     h.push('<p><b>The worked question:</b> ' + esc(D.question) + "</p>");
     h.push('<p class="lx-eyebrow">Five search strings, OpenAlex titles and abstracts, ' + date + "</p>");
     h.push('<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Change</th><th scope="col">String</th><th scope="col">Works</th></tr></thead><tbody>');

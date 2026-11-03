@@ -8,7 +8,7 @@
    two alternatives, one from another family; then a design card to copy.
    Exemplars: a weak and a strong method defence (LX.Exemplars), the steps as a flowchart (LX.Flowchart, e-flowchart) and
    the nine families compared (LX.CompareTable, e-table). Self-check: the five scales with typical time steps and horizons
-   (a lesson-local scale strip, e-scale-strip) and the course rubric's Framing and Method fit (LX.Rubric).
+   and the reader's brief marked (LX.ScaleStrip, e-scale-strip) and the course rubric's Framing and Method fit (LX.Rubric).
    Node: module.exports = the pure model (checks, fit lookups, the defence checks, the design card as text, the no-JS
    version of the task); the test is _tests/learn/test_r03-system-and-method.js (it writes the no-JS blocks with --write). */
 (function () {
@@ -101,13 +101,8 @@
       + D.scales.map(function (s) { return "<li><b>" + esc(s.id + " " + s.name) + ":</b> decides " + esc(s.decides) + "; " + esc(s.who) + ". Time step: " + esc(s.step) + "; horizon: " + esc(s.horizon) + ".</li>"; }).join("") + "</ul>";
     return { task: staticTask(D), exemplars: C.exemplars(D.exemplars) + "\n" + fam, rubric: C.rubric(D.rubric.competences) + sc };
   }
-  function ref(P, code) {
-    var all = [].concat((P && P.starter) || [], (P && P.more) || [], (P && P.toolbox) || []), num = typeof code === "number";
-    var hit = all.filter(function (l) { return num ? l.starter === code : l.code === code; })[0];
-    return hit ? { href: hit.href, ready: !!hit.ready, label: num ? "lesson " + code : code } : { href: null, ready: false, label: num ? "lesson " + code : String(code) };
-  }
   var model = { SCALE_IDS: SCALE_IDS, brief: brief, family: family, option: option, fit: fit, check: check, defenceChecks: defenceChecks,
-                designText: designText, staticTask: staticTask, staticBlocks: staticBlocks, ref: ref, words: words, plainMarks: plainMarks };
+                designText: designText, staticTask: staticTask, staticBlocks: staticBlocks, words: words, plainMarks: plainMarks };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -147,13 +142,7 @@
       ".r3-cks{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:14px}",
       ".r3-cks li{display:flex;gap:6px;align-items:flex-start}.r3-cks li.ok .lx-ic{color:var(--lx-good)}.r3-cks li.warn .lx-ic{color:var(--lx-warn)}",
       ".r3-cks .lx-ic{width:16px;height:16px;flex:none;margin-top:2px}",
-      ".r3-strip{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}",
-      ".r3-strip li{display:grid;gap:4px;align-content:start;padding:10px;border-radius:12px;border:1px solid var(--lx-line);border-top:4px solid var(--lx-tier-4);background:var(--lx-surface);font-size:13.5px;color:var(--lx-ink-2);min-width:0}",
-      ".r3-strip li b{font-family:var(--lx-f-display);font-weight:500;font-size:15px;color:var(--lx-ink)}",
-      ".r3-strip li .code{font-family:var(--lx-f-mono);font-size:12.5px;color:var(--lx-ink-3)}",
-      ".r3-strip li.mine{background:var(--lx-accent-soft);border-color:var(--lx-accent)}",
-      ".r3-strip li .tag{font-size:12px;font-weight:600;color:var(--lx-ink)}",
-      "@media (max-width:860px){.r3-strip{grid-template-columns:minmax(0,1fr)}.r3-fams{grid-template-columns:repeat(2,minmax(0,1fr))}}",
+      "@media (max-width:860px){.r3-fams{grid-template-columns:repeat(2,minmax(0,1fr))}}",
       "@media (max-width:560px){.r3-two{grid-template-columns:minmax(0,1fr)}}"
     ].join("\n") }, document.head);
   }
@@ -392,32 +381,24 @@
         rows: D.families.map(function (f, i) {
           return { key: f.id, color: tiers[i % 5], name: f.label, note: "Typical types: " + f.types.join(", "), answers: f.answers, needs: f.needs, limit: f.limit };
         }),
-        sorts: [{ label: "All nine", order: D.families.map(function (f) { return f.id; }), note: "No family is the default: the question type, the data and the decision set the choice." }]
+        caption: "No family is the default: the question type, the data and the decision set the choice."
       });
     }
 
-    // ---- self-check: the scale strip (with the reader's brief) and the rubric
+    // ---- self-check: the scale strip (LX.ScaleStrip, with the reader's brief marked) and the rubric
     var sc = document.getElementById("r03-rubric"), strip = null;
+    function stripMark() {
+      var b = brief(D, st.brief), mine = b && st.per[b.id] && st.per[b.id].scale;
+      return { mark: b ? b.scale : null, markText: b ? "Your brief sits here" + (mine && mine !== b.scale ? " (you placed it at " + mine + ")" : "") + "." : "" };
+    }
     if (sc) {
       sc.innerHTML = "";
-      var c1 = H("div", { class: "lx-xcard" }, sc), hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "Five scales: who decides, and typical steps and horizons" }, hd);
-      H("p", { class: "lx-lede", text: "Typical choices, not rules: check yours against them, and say why if you differ." }, c1);
-      strip = H("ol", { class: "r3-strip" }, c1);
+      strip = LX.ScaleStrip(H("div", { class: "lx-xcard" }, sc), Object.assign({ title: "Five scales: who decides, and typical steps and horizons",
+        lede: "Typical choices, not rules: check yours against them, and say why if you differ.", scales: D.scales, decides: true, steps: true,
+        color: "var(--lx-tier-4)" }, stripMark()));
       LX.Rubric(H("div", { class: "lx-xcard" }, sc), D.rubric);
     }
-    function paintStrip() {
-      if (!strip) return;
-      strip.innerHTML = "";
-      var b = brief(D, st.brief), mine = b && st.per[b.id] && st.per[b.id].scale;
-      D.scales.forEach(function (s) {
-        var li = H("li", { class: b && s.id === b.scale ? "mine" : "" }, strip);
-        H("span", { class: "code", text: s.id }, li); H("b", { text: s.name }, li);
-        H("span", { text: "Decides " + s.decides + "; " + s.who + "." }, li);
-        H("span", { text: "Time step: " + s.step + "." }, li); H("span", { text: "Horizon: " + s.horizon + "." }, li);
-        if (b && s.id === b.scale) H("span", { class: "tag", text: "Your brief sits here" + (mine && mine !== s.id ? " (you placed it at " + mine + ")" : "") + "." }, li);
-      });
-    }
-    paintStrip();
+    function paintStrip() { if (strip) strip.update(stripMark()); }
     root.lxLesson = { data: D, model: model };
     // demo states: "mid" = the hospital brief chosen and placed on the ladder (step 2 shown); "step-N" = the hospital brief
     // with a researcher's choices made up to step N (step 3: one item left out where it is given; step 6: compared)

@@ -48,15 +48,10 @@
       answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: E.weak }, { key: "good", label: "Strong answer", level: "Proficient", parts: E.good }],
       diff: E.diff, note: E.note };
   }
-  // the no-JS version of the task: what to produce, the norms, the six dilemmas with every option and its verdict
+  // the no-JS version of the task (what to produce is the page's task card, above the interactive): the norms, the six
+  // dilemmas with every option and its verdict
   function staticTask(D) {
     var h = [], V = { good: "Defensible", ok: "Partly", bad: "Hard to defend" };
-    h.push('<p class="lx-eyebrow">The task</p>');
-    h.push('<ol class="lx-studio-task">');
-    h.push("<li><b>Produce:</b> an integrity statement for your own study: funding and conflicts, contributions, data and licences, ethics and consent, stakeholders, corrections.</li>");
-    h.push("<li><b>From:</b> six dilemmas, the norms behind them and the people your study affects.</li>");
-    h.push("<li><b>Done when:</b> the rubric's bar for integrity: licences checked, credit and conflicts stated, stakeholders treated fairly.</li></ol>");
-    h.push('<p class="lx-hint">About 30 minutes guided here, then about 30 minutes on your own statement.</p>');
     h.push('<p class="lx-eyebrow">Five norms</p><ul>');
     D.norms.forEach(function (n) {
       h.push("<li><b>" + esc(n.label) + "</b> (" + esc(n.sub) + "): " + D.practices.filter(function (p) { return p.bin === n.id; }).map(function (p) { return esc(p.text); }).join(" ") + "</li>");

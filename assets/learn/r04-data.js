@@ -267,19 +267,13 @@
              { label: "Effect", weak: "One rounded number", good: "Raw against cleaned, and the rejected alternative" }],
       note: "Both notes are illustrative; every number in them is computed on this page from the raw file." };
   }
-  // the no-JS version of the task: what to produce, the four numbers raw and with the course's choices, the
-  // one-choice-at-a-time table, the licence sort and the coordinate systems, as HTML
+  // the no-JS version of the task (what to produce is the page's task card, above the interactive): the four numbers raw
+  // and with the course's choices, the one-choice-at-a-time table, the licence sort and the coordinate systems, as HTML
   function staticTask(F, D, build) {
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var raw = report(F, clean(F, RAW)), S = sensitivity(F, DEFAULT), h = [];
     var v = function (rep, id) { return id === "peakAt" ? rep.peakAt : id === "minGW" ? f1(rep.minGW) + " GW" : f2(rep[id]) + " TWh"; };
     var lab = function (key, id) { return D.decisions[key].options.filter(function (o) { return String(o.id) === String(id); })[0].label; };
-    h.push('<p class="lx-eyebrow">The task</p>');
-    h.push('<ol class="lx-studio-task">');
-    h.push("<li><b>Produce:</b> a cleaning log (rule, count, reason and effect for each step), a licence check of every source, and a data note someone else can rerun from.</li>");
-    h.push("<li><b>From:</b> SPP's raw hourly file for 2025 (demand, wind, solar; EIA-930, public domain) and, in practice, one spatial layer.</li>");
-    h.push("<li><b>Done when:</b> the rubric's bar: a complete audit trail and a verification log, with licences checked and credit stated.</li></ol>");
-    h.push('<p class="lx-hint">About 30 minutes guided here, then about 2 hours on your own.</p>');
     h.push('<p class="lx-eyebrow">Four numbers, raw and with the course\'s choices</p>');
     h.push('<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Choices</th>' + D.numbers.map(function (n) { return '<th scope="col">' + esc(n.label) + "</th>"; }).join("") + "</tr></thead><tbody>");
     h.push("<tr><td>Raw: UTC labels, no rules</td>" + D.numbers.map(function (n) { return '<td class="n">' + esc(v(raw, n.id)) + "</td>"; }).join("") + "</tr>");

@@ -17,6 +17,8 @@
 .lx-ex-ans.weak .lx-ex-level { color: var(--lx-warn); }
 .lx-ex-ans.good .lx-ex-level { color: var(--lx-good); }
 .page-learn .lx-ex-text { font-size: 16px; line-height: 1.85; color: var(--lx-ink); }
+/* lines: true, an answer written as a card (one field per line), in the view and in staticHTML's no-JS version */
+.lx-ex-lines { white-space: pre-line; }
 .lx-ex-mark { border-bottom: 2px dashed var(--lx-ink-3); border-radius: 4px 4px 0 0; padding: 1px 2px; cursor: pointer;
   -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .lx-ex-mark:hover { background: var(--lx-surface-2); }

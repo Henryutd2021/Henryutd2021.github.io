@@ -117,7 +117,10 @@ const task = M.staticTask(D, S);
 ok(S.ladder.every(r => task.indexOf(M.f0(r.count)) >= 0) && task.indexOf(M.f0(S.targeted.count)) >= 0 && D.matrix.every(p => task.indexOf(p.doi) >= 0), "no-JS task: every count and every matrix DOI");
 ok(/at least three do both, by their abstracts/.test(JS) && !/three do both:/.test(JS.replace(/at least three do both/g, "")), "step 7 says at least three: only the three abstracts were read");
 ok(/3 November 2026/.test(PAGE) && M.dateText(S.meta.as_of) === "3 November 2026", "the data note dates the snapshot");
-ok(/About 30 minutes guided here, then about 4 hours/.test(task) && D.practice.reduce((s, p) => s + p.min, 0) === 240, "practice plan adds up to 240 minutes (4 hours), as path.yml says");
+ok(/About 30 minutes guided here, then about 4 hours/.test(PAGE) && D.practice.reduce((s, p) => s + p.min, 0) === 240, "practice plan adds up to 240 minutes (4 hours), as path.yml says");
+const brief = PAGE.indexOf('<div class="lx-card lx-studio-brief">'), inter = PAGE.indexOf('<div class="lx-interactive');
+ok(brief >= 0 && brief < inter && /<b>Produce:<\/b>[\s\S]*<b>From:<\/b>[\s\S]*<b>Done when:<\/b>[\s\S]*About 30 minutes guided here/.test(PAGE.slice(brief, inter)) && !/<b>Produce:<\/b>/.test(task),
+  "the task card (produce, from, done when, time) sits above the interactive, outside its fallback, so readers with JavaScript see it");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = (OWN + task + JSON.stringify(D) + JSON.stringify(S)).match(/https?:\/\/[^\s"'<>)]+/g) || [];
 const allowed = /^https:\/\/((api|help)\.)?openalex\.org\/|^https:\/\/doi\.org\//;

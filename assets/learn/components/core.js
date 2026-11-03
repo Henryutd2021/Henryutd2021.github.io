@@ -10,10 +10,32 @@
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
              LX.anim({visible, step}) one shared animation loop; LX.onTheme(fn) when Quarto's day/night toggle flips
              LX.tokens(el, names)  read colour tokens (#rrggbb) as [r, g, b]
-   Also: the back-to-top guard (hides the site's button while it would cover lesson controls) and course ticks. */
+   Links:    LX.lessonRef(P, code)  a lesson by starter number (3) or code ("R2"), from data/path.json (P, loaded with the
+                                   page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
+             LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
+                                   page's links appear by themselves when a lesson goes live
+   Also: the back-to-top guard (hides the site's button while it would cover lesson controls) and course ticks.
+   Node: module.exports = { lessonRef, lessonRefHTML } (pure; the rest needs a browser). */
 (function () {
   "use strict";
+  // ---------------------------------------------------------------- pure (no DOM; exported for Node)
+  function escHTML(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function lessonRef(P, code) {
+    var all = [].concat((P && P.starter) || [], (P && P.more) || [], (P && P.toolbox) || []), num = typeof code === "number";
+    var hit = all.filter(function (l) { return num ? l.starter === code : l.code === code; })[0];
+    var label = num ? "lesson " + code : String(code);
+    return hit ? { href: hit.href || null, ready: !!(hit.ready && hit.href), label: label } : { href: null, ready: false, label: label };
+  }
+  function lessonRefHTML(P, code) {
+    var r = lessonRef(P, code);
+    return r.ready ? '<a href="' + escHTML(r.href) + '">' + escHTML(r.label) + "</a>" : escHTML(r.label) + " (upcoming)";
+  }
+  if (typeof module !== "undefined" && module.exports) module.exports = { lessonRef: lessonRef, lessonRefHTML: lessonRefHTML };
+  if (typeof window === "undefined") return;
+
   var LX = window.LX = window.LX || {};
+  LX.lessonRef = lessonRef;
+  LX.lessonRefHTML = lessonRefHTML;
   var NS = "http://www.w3.org/2000/svg";
   var me = document.currentScript && document.currentScript.src;
   LX.base = me ? me.replace(/[^/]*$/, "") : "../assets/learn/";

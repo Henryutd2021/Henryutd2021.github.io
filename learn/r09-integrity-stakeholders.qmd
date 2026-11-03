@@ -36,15 +36,18 @@ body-classes: "page-learn page-lesson lx-form-studio"
 
 ::: {#task .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="r09" data-src="../assets/learn/data/r09-integrity-stakeholders.json">
-<div class="lx-fallback">
-<!-- r09-task:start (written by the test's --write mode from the data file; do not edit) -->
+<div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
 <li><b>Produce:</b> an integrity statement for your own study: funding and conflicts, contributions, data and licences, ethics and consent, stakeholders, corrections.</li>
 <li><b>From:</b> six dilemmas, the norms behind them and the people your study affects.</li>
-<li><b>Done when:</b> the rubric's bar for integrity: licences checked, credit and conflicts stated, stakeholders treated fairly.</li></ol>
+<li><b>Done when:</b> the rubric's bar for integrity: licences checked, credit and conflicts stated, stakeholders treated fairly.</li>
+</ol>
 <p class="lx-hint">About 30 minutes guided here, then about 30 minutes on your own statement.</p>
+</div>
+<div class="lx-interactive lx-cards" data-learn="r09" data-src="../assets/learn/data/r09-integrity-stakeholders.json">
+<div class="lx-fallback">
+<!-- r09-task:start (written by the test's --write mode from the data file; do not edit) -->
 <p class="lx-eyebrow">Five norms</p><ul>
 <li><b>Consent</b> (people agree, knowing what you will do): Tell survey participants how their answers will be used, and that they can say no. Get the ethics board's decision before the first interview.</li>
 <li><b>Credit</b> (who did what, and whose work you used): List who did what, using contributor roles. Cite the dataset, not only the paper that describes it.</li>

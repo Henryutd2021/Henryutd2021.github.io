@@ -37,15 +37,18 @@ body-classes: "page-learn page-lesson lx-form-studio"
 
 ::: {#task .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="r02" data-src="../assets/learn/data/r02-literature.json ../assets/learn/data/r02-literature-openalex.json">
-<div class="lx-fallback">
-<!-- r02-task:start (written by the test's --write mode from the two data files; do not edit) -->
+<div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
 <li><b>Produce:</b> a search log, a concept matrix of 12 papers with an empty cell searched directly, a first-pass note on the closest paper, and a gap statement with its evidence.</li>
 <li><b>From:</b> the question below, two open databases (OpenAlex and one more) and one review to snowball from.</li>
-<li><b>Done when:</b> the rubric's bar for positioning: a concept matrix of at least 12 sources and a stated gap with evidence.</li></ol>
+<li><b>Done when:</b> the rubric's bar for positioning: a concept matrix of at least 12 sources and a stated gap with evidence.</li>
+</ol>
 <p class="lx-hint">About 30 minutes guided here, then about 4 hours on your own.</p>
+</div>
+<div class="lx-interactive lx-cards" data-learn="r02" data-src="../assets/learn/data/r02-literature.json ../assets/learn/data/r02-literature-openalex.json">
+<div class="lx-fallback">
+<!-- r02-task:start (written by the test's --write mode from the two data files; do not edit) -->
 <p><b>The worked question:</b> How do capacity-expansion models stand in for a whole year with a few representative periods, and what happens to storage and to extreme periods when they do?</p>
 <p class="lx-eyebrow">Five search strings, OpenAlex titles and abstracts, 3 November 2026</p>
 <div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Change</th><th scope="col">String</th><th scope="col">Works</th></tr></thead><tbody>
@@ -112,7 +115,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper</span>Why the course never calls a question “novel”</summary>
 <div class="lx-deeper-body">
-<p>Few papers on a topic is not evidence that a question is new, important or feasible: it can mean the words differ, the field is small, or the question was tried and dropped. The rubric asks for a gap stated with evidence, and the Strong level asks that it survive a reviewer's search. The question studio (R10, upcoming) shows how much has been written on a topic only as context, for the same reason.</p>
+<p>Few papers on a topic is not evidence that a question is new, important or feasible: it can mean the words differ, the field is small, or the question was tried and dropped. The rubric asks for a gap stated with evidence, and the Strong level asks that it survive a reviewer's search. The question studio (<a href="r10-question-studio.html">R10</a>) shows how much has been written on a topic only as context, for the same reason.</p>
 </div>
 </details>
 <details class="lx-deeper">
@@ -149,7 +152,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From this map to your capstone proposal</summary>
 <div class="lx-deeper-body">
-<p>The capstone research project starts from a typed question (<a href="index.html#researcher">R1</a>, upcoming) and needs this studio's matrix and gap statement in its proposal. The closest prior work you found here becomes the benchmark you compare against when you build and check your analysis (<a href="r04-data.html">R4</a>, then R5, upcoming).</p>
+<p>The capstone research project starts from a typed question (<a href="r01-framing.html">R1</a>) and needs this studio's matrix and gap statement in its proposal. The closest prior work you found here becomes the benchmark you compare against when you build and check your analysis (<a href="r04-data.html">R4</a>, then <a href="r05-build-validate.html">R5</a>).</p>
 </div>
 </details>
 </div>

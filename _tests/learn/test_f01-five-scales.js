@@ -14,6 +14,9 @@ const TOWN = JSON.parse(rd("assets/learn/data/town.json"));
 const QMD = rd("learn/f01-five-scales.qmd");
 const JS = rd("assets/learn/f01-five-scales.js");
 const PATH = rd("learn/path.yml");
+const PJ = JSON.parse(rd("assets/learn/data/path.json"));
+const CORE = require(path.join(SITE, "assets/learn/components/core.js"));
+const SS = require(path.join(SITE, "assets/learn/components/scalestrip.js"));
 
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
@@ -48,7 +51,7 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   ok(L.S0.who === false && L.S1.who === true && L.S4.physics === true, "ladder: a misplaced card shows on its own scale");
   ok(M.ladder(D, {}).S2.what === null, "ladder: unsorted cards show as not sorted");
   ok(D.predict.answer === "S2" && D.predict.options.length === 5 && D.apply.answer === "changes" && Object.keys(D.apply.feedback).length === 3, "predict and apply questions");
-  ok(/M5 \(upcoming\)/.test(JS) && /M5 \(size and run a microgrid\)/.test(JSON.stringify(D.lessons)), "the campus question points at M5, upcoming");
+  ok(/M5 \(upcoming\)/.test(JS) && D.lessons.S1.some(x => x.code === "M5" && x.note === "size and run a microgrid") && !CORE.lessonRef(PJ, "M5").ready, "the campus question points at M5, upcoming");
 }
 
 // ---------------- the real anchors of the zoom
@@ -112,7 +115,19 @@ const sentences = s => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
   const ALLOW = /^(https:\/\/(www\.|docs\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|nlr\.gov|nrel\.gov|doi\.org|ipcc\.ch)\/|#|\.\.\/assets\/|[0-9a-z-]+\.(qmd|html)(#[a-z0-9-]*)?$)/;
   let nl = 0;
   for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)/g)) { const u = (h[1] || h[2]).replace(/&amp;/g, "&"); nl++; ok(ALLOW.test(u), `link on the allow-list: ${u}`); }
-  JSON.stringify(D.lessons).match(/"[0-9a-z-]+\.html"/g).forEach(h => ok(fs.existsSync(path.join(SITE, "learn", h.slice(1, -6) + ".qmd")), `explain link ${h} is a live page`));
+  // the lessons per scale follow path.json (LX.ScaleStrip with LX.lessonRef): a live one links to its page, the rest are
+  // named as upcoming with their note
+  let nLive = 0;
+  D.scales.forEach(sc => {
+    const L = SS.lessonParts(D.lessons[sc.id], PJ, CORE.lessonRef);
+    ok(L.live.length + L.upcoming.length === D.lessons[sc.id].length, `${sc.id}: every lesson listed is linked or named as upcoming`);
+    L.live.forEach(x => { nLive++; ok(/^[0-9a-z-]+\.html$/.test(x.href) && fs.existsSync(path.join(SITE, "learn", x.href.replace(/\.html$/, ".qmd"))), `explain link ${x.href} (${x.label}) is a live page`); });
+    L.upcoming.forEach(u => ok(!CORE.lessonRef(PJ, u.split(" ")[0]).ready, `${sc.id}: "${u}" is not live yet`));
+  });
+  ok(nLive >= 8 && SS.lessonParts(D.lessons.S2, PJ, CORE.lessonRef).live.some(x => x.label === "M2" && x.href === "m02-unit-commitment.html"), `${nLive} lessons per scale linked, M2 among them now that it is live`);
+  ok(/LX\.ScaleStrip\(/.test(JS) && !/function ScaleStrip\s*\(/.test(JS) && !/f1s-/.test(JS + QMD) && !/--f1-s\d/.test(JS + QMD) && /--lx-scale-\d/.test(QMD),
+    "F1 uses the shared LX.ScaleStrip and the --lx-scale-0 ... 4 colours, and keeps no copy of either");
+  ok(/data\/path\.json/.test((QMD.match(/data-learn="five-scales"[^>]*/) || [""])[0]), "F1 loads path.json, so its lesson links follow what is live");
   ok(nl >= 8, `${nl} lesson links checked`);
 }
 

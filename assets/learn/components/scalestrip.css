@@ -1,0 +1,28 @@
+/* scalestrip.css — LX.ScaleStrip (scalestrip.js): the five scales side by side, and the scale palette.
+   The palette (--lx-scale-0 ... --lx-scale-4, S0 device and plant to S4 nation; day, then night) is the only place these
+   colours are defined: F1's zoom, card sorts and comparison table, and any later scale route, use the same tokens.
+   Everything else takes colours from the --lx-* tokens. */
+body.page-learn { --lx-scale-0: #2F8F80; --lx-scale-1: #2A7FA0; --lx-scale-2: #2E66B5; --lx-scale-3: #5150B0; --lx-scale-4: #6A3F9E; }
+body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx-scale-2: #7CA6EE; --lx-scale-3: #9A9BEA; --lx-scale-4: #B496E6; }
+.lx-ss { display: grid; gap: 10px; min-width: 0; }
+.lx-ss-flow { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13.5px; color: var(--lx-ink-2); }
+.lx-ss-flow span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--lx-surface-2); }
+.lx-ss-flow .lx-ic { width: 16px; height: 16px; }
+.lx-ss-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.lx-ss-strip li { border: 1px solid var(--lx-line); border-top: 4px solid var(--c); border-radius: 12px; padding: 10px 12px; display: grid; gap: 5px;
+  align-content: start; background: var(--lx-surface); font-size: 13.5px; color: var(--lx-ink-2); min-width: 0; }
+.lx-ss-strip li.is-marked { background: var(--lx-accent-soft); border-color: var(--lx-accent); }
+.lx-ss-top { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.lx-ss-code { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; color: var(--c); }
+.lx-ss-pw { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
+.lx-ss-strip .lx-ss-name { font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; color: var(--lx-ink); }
+.lx-ss-who, .lx-ss-line { font-size: 13.5px; color: var(--lx-ink-2); }
+.lx-ss-res { display: flex; flex-wrap: wrap; gap: 4px; }
+.lx-ss-tick { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; padding: 2px 7px; border-radius: 999px; background: var(--lx-surface-2); color: var(--lx-ink-3); }
+.lx-ss-tick .lx-ic { width: 12px; height: 12px; }
+.lx-ss-tick.ok { color: var(--lx-good); background: var(--lx-good-soft); }
+.lx-ss-tick.no { color: var(--lx-warn); background: var(--lx-warn-soft); }
+.page-learn .lx-ss-les { font-size: 13px; color: var(--lx-ink-3); }
+.lx-ss-tag { font-size: 12.5px; font-weight: 600; color: var(--lx-ink); }
+@media (max-width: 860px) { .lx-ss-strip { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .lx-ss-flow { flex-direction: column; } }
