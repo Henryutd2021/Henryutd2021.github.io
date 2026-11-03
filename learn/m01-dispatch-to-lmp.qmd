@@ -64,7 +64,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Run all cells, then try the practice questions at the end.</li>
 </ol>
 <p class="m1-dl"><a class="lx-btn small" href="notebooks/m01-dispatch-to-lmp.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m01-dispatch-to-lmp.json" download>Lesson data (JSON)</a></p>
-<p class="lx-hint">Need a refresher? Toolbox <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks).</p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks).</p>
 </div>
 <style>/* lesson-local */
 .m1-nb { margin-top: 1.2rem; max-width: 980px; } .m1-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
