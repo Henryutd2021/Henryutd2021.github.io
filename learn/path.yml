@@ -567,7 +567,7 @@
   short: "Finding what is known"
   outcome: "Search open databases with logged strings, snowball from a review, map twelve papers in a concept matrix and test an empty cell before calling it a gap."
   teaches: [search strings, Boolean operators, snowballing, concept matrix, three-pass reading, research gap]
-  does: "Build a search string block by block against a dated OpenAlex snapshot; snowball backward and forward from one review; code four papers into a twelve-paper concept matrix and spot the empty cell; search it directly; read the closest paper in three passes."
+  does: "Build a search string block by block against a dated OpenAlex snapshot; snowball backward and forward from one review; code four papers into a twelve-paper concept matrix and spot the empty cell; search it directly; read the closest paper in a first and a second pass."
   after: [R1, N1]
   next: R3
 - kind: lesson
@@ -639,7 +639,7 @@
   short: "Integrity and stakeholders"
   outcome: "Name the norm behind an integrity dilemma (consent, credit, conflicts of interest, data licences, corrections), choose a defensible action, and write an integrity statement for your own study."
   teaches: [informed consent, ethics review, authorship and credit, conflicts of interest, data licences, corrections, stakeholders]
-  does: "Sort eight practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
+  does: "Sort ten practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
   after: [R1]
 - kind: lesson
   id: r10-question-studio

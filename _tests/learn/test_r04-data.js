@@ -6,6 +6,10 @@
 //   - the four reported numbers, raw and cleaned, against the course's build (annual demand, peak and its hour)
 //   - every number written on the page (step texts, notes, Go deeper, exemplars) comes from the model or a dated source
 //   - the no-JS blocks equal the model's (--write rewrites them); licences, coordinate systems, practice time, links
+//   - after the Codex review (2026-11-03): the prediction is graded against the raw file in percent; the fill contrast
+//     names both cases for any fill; the night check on solar and its count; each log line's effect; the spatial log
+//     records proposed systems only; flags are provisional; the chart's text version; the starter notebook's asserts
+//     carry the model's numbers; text budget of the exemplar lines, notes, data note and Go deeper
 // Usage (from the site folder):  node _tests/learn/test_r04-data.js [--write]
 "use strict";
 const fs = require("fs");
@@ -90,13 +94,64 @@ ok(S.rows.length === 3 + 2 + 6 + 2, "the table varies 13 alternatives");
 ok(sw.spike.minGW > 20 && sw.fill.minGW === 0 && sw.frozen.minGW === 0, "only the spike rule moves the lowest hour");
 ok(sw.fill.demandTWh > 20 && sw.fill.demandTWh > sw.frozen.demandTWh && sw.fill.windTWh > 9, "the fill moves the annual totals most (leaving hours out)");
 ok(sw.time.peak === 1 && sw.spike.peak === 0 && sw.fill.peak === 0, "only the time base moves the peak's clock time");
-const rel = k => Math.max(...S.rows.map(r => Math.abs(r.rep[k] - S.base[k]) / S.base[k]));
-ok(rel("minGW") > rel("demandTWh") && rel("minGW") > rel("windTWh") && D.predict.answer === "minGW", "the lowest hour moves most relative to its value: the prediction's answer");
+// the prediction: compared with the raw file, in percent (review R4 #4)
+const VR = M.vsRaw(R0, raw);
+ok(VR.most === "minGW" && D.predict.answer === "minGW" && VR.peakMoved && Math.abs(VR.pct.demandTWh) < 1, "with the course's choices the lowest hour moves most against the raw file (" + M.f0(VR.pct.minGW) + "%): the stored answer");
+{ const noop = M.vsRaw(M.report(F, M.clean(F, { time: "utc", spike: "keep", frozen: 0, fill: "drop" })), raw);
+  ok(noop.most === null && !noop.peakMoved, "UTC, every value kept, frozen rule off: nothing moves against raw, so no number is 'most'"); }
+ok(!/peakAt/.test(JSON.stringify(D.predict)) && /label/.test(D.predict.q) && /n\.unit/.test(JS), "the clock time is checked apart: the prediction offers the three quantities only");
+// the fill contrast names both cases whatever fill is selected (review R4 #3)
+["same", "linear", "drop"].forEach(f => { const fc = M.fillContrast(F, Object.assign({}, M.DEFAULT, { fill: f }));
+  ok(M.f2(fc.drop) === "275.09" && M.f2(fc.same) === "298.56" && M.f2(fc.diff) === "23.47", "fill " + f + " selected: left out 275.09 TWh, same-hour fill 298.56 TWh, 23.47 apart"); });
+ok(Math.abs(M.fillContrast(F, { spike: "keep", frozen: 0 }).diff) < 1e-9, "nothing flagged: the fill changes nothing");
+ok(!/cuts the year's demand by/.test(JS), "no fixed 'cuts by' sentence");
+// the night check on solar (review R4 #5): the same rule as B2's notebook
+{ const ns = f => M.nightSolar(F, M.clean(F, Object.assign({}, M.DEFAULT, { fill: f })));
+  ok(ns("same").hours === 65 && ns("same").filled === 49, "course's choices: 65 night hours with solar above 5% of its peak, 49 of them filled");
+  ok(ns("linear").hours === 220 && ns("drop").hours === 16 && ns("drop").filled === 0, "straight-line fill 220, left out 16");
+  ok(M.nightSolar(F, M.clean(F, M.RAW)).hours === 214, "raw: 214 night hours fail, as B2's notebook asserts"); }
+ok(/same UTC hour \(rows 24 apart\)/.test(D.decisions.fill.options.find(o => o.id === "same").log) && /give or take an hour/.test(D.decisions.fill.options.find(o => o.id === "same").note), "the same-hour fill names its clock (UTC rows) and its daylight-saving offset");
+// each log line's effect against the alternative (review R4 #7)
+{ const L = M.logLines(F, base, D), E = k => L.find(l => l.key === k).effect;
+  ok(E("spike") === "lowest hour 24.4 GW (1.5 GW with every value kept)", "log effect, spike: " + E("spike"));
+  ok(E("fill") === "demand 298.56 TWh (left out: 275.09; straight line: 297.72)", "log effect, fill: " + E("fill"));
+  ok(E("frozen") === "demand 298.56 TWh, wind 110.73 TWh (299.51 and 110.46 with the rule off)", "log effect, frozen: " + E("frozen"));
+  ok(E("time") === "peak hour labelled 16:00–17:00 CDT, 29 July (21:00–22:00 UTC, 29 July in UTC)", "log effect, time: " + E("time"));
+  ok(L.find(l => l.key === "check").count === "65 hours, 49 of them filled", "the log reports the night check that fails"); }
+{ const t = M.sensitivity(F, M.DEFAULT).rows; ok(M.f2(t.find(r => r.key === "frozen" && r.option === 0).rep.demandTWh) === "299.51", "the log's 'rule off' figure equals the table's frozen-off row (299.51 TWh)"); }
+// the spatial log: what the reader chose, as proposed (review R4 #1)
+{ const sl = M.spatialLine(D, { buffer: "web", area: "deg" });
+  ok(/proposed, not yet processed/.test(sl) && /Web Mercator \(EPSG:3857\) for the 1 km buffers/.test(sl) && /EPSG:4326 \(degrees\) for areas/.test(sl) && !/reprojected/.test(sl), "spatial log: the reader's own picks, marked proposed, never 'reprojected'");
+  ok(M.spatialLine(D, { buffer: "utm" }) === "" && !/reprojected/.test(JSON.stringify(D.spatial)), "spatial log: nothing until both are chosen");
+  const n2 = M.dataNote(RAWF.meta, F, base, D, {}, { buffer: "utm", area: "alb" });
+  ok(/the local UTM zone \(metres\) for the 1 km buffers/.test(n2) && M.dataNote(RAWF.meta, F, base, D, {}).indexOf("Spatial layer") < 0, "data note: the spatial line only when chosen"); }
+// provenance: the extraction's changes are in the note and on the page (review R4 #8)
+ok(/Extraction \(before this note's cleaning\): .*negative values set to 0/.test(M.dataNote(RAWF.meta, F, base, D, {})) && /negative values set to 0/.test(PAGE) && !/not cleaned before this page/.test(PAGE), "provenance: summed columns and clipped negatives stated");
+// flags are provisional (review R4 #6), and the 12-hour rule's boundary (#13)
+ok(!/impossible|not possible|Physically possible/.test(JSON.stringify(D) + JS) && /implausible/.test(JSON.stringify(D.decisions.spike)) && /suspected frozen telemetry/.test(JSON.stringify(D.decisions.frozen)), "flags are 'implausible' and 'suspected', not proof");
+ok(d[spikeRow - 1] > 10 * d[spikeRow] && d[spikeRow + 1] > 10 * d[spikeRow], "the spike is under a tenth of the hours around it, as its note says");
+{ const a = [5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 5]; ok(M.runFlags(a, 12).filter(Boolean).length === 12 && M.runFlags(a, 13).filter(Boolean).length === 0, "a run of exactly 12 is flagged by the 12-hour rule");
+  ok(/shorter than 12 hours slip through/.test(D.decisions.frozen.options.find(o => o.id === 12).note), "the 12-hour note says freezes shorter than 12 hours slip through"); }
+// licences: database against produced work (review R4 #12)
+ok(!/travel with/.test(JSON.stringify(D) + JS + PAGE) && /produced work/.test(JS) && /map made from it/.test(D.licences.cards.find(k => k.id === "osm").why), "share-alike: a derived database and a map are told apart");
+// the chart's text version (review R4 #11)
+{ const W = M.week(F, base, "2025-12-12", "2025-12-24"), T = M.weekText(F, W), long = T.runs.find(r => r.hours === 155);
+  ok(T.days.length === 13 && long && long.value != null && long.filled != null, "chart text: 13 days and the 155-hour run, with its repeated value and its filled mean");
+  ok(M.weekHTML(F, W, "same").indexOf("155") >= 0 && /repeated/.test(M.weekHTML(F, W, "same")) && /left out/.test(M.weekHTML(F, M.week(F, M.clean(F, Object.assign({}, M.DEFAULT, { fill: "drop" })), "2025-12-12", "2025-12-24"), "drop")), "chart text: the runs table, and 'left out' for left-out hours"); }
+// the starter notebook (review R4 #2)
+{ const NB = fs.readFileSync(path.join(SITE, "learn/notebooks/r04-data.ipynb"), "utf8"), nb = JSON.parse(NB), src = nb.cells.map(c => c.source.join("")).join("\n");
+  ok(nb.nbformat === 4 && nb.cells.every(c => c.cell_type !== "code" || (c.outputs.length === 0 && c.execution_count === null)), "starter notebook: nbformat 4, no outputs");
+  ok(/"demand TWh": "298\.56", "lowest hour GW": "24\.4", "peak hour": "16:00–17:00 CDT, 29 July", "wind TWh": "110\.73"/.test(src) && /"demand TWh": "299\.48", "lowest hour GW": "1\.5", "peak hour": "21:00–22:00 UTC, 29 July", "wind TWh": "110\.46"/.test(src),
+    "starter notebook: asserts the page's four numbers, raw and cleaned");
+  ok(/== "275\.09"/.test(src) && /== \(65, 49\)/.test(src) && /\(699, 671, 1377\)/.test(src) && /1 \+ 13/.test(src), "starter notebook: 275.09 TWh, 65 and 49 night hours, the build's counts, 13 alternatives");
+  ok(/Ford County/.test(src) && /EPSG:32614/.test(src) && /EPSG:5070/.test(src) && /b02-python-data\.json/.test(src) && !/town_year/.test(src.replace(/town_year\.json come from/, "")), "starter notebook: the named county, the systems, and only the raw file");
+  ok(/href="notebooks\/r04-data\.ipynb"/.test(PAGE) && /notebooks\/r04-data\.ipynb/.test(JS) && /town_year\.json/.test(PAGE), "the page links the starter notebook and B2's second file"); }
 
 // ---------------- numbers written on the page
 ok(/lowest hour of 23\.7 GW/.test(PAGE) && T.min_demand_GW === 23.7, "Go deeper: the build's lowest hour 23.7 GW");
 ok(new RegExp("gives " + M.f1(R0.minGW) + " GW").test(PAGE), "Go deeper: this page's lowest hour " + M.f1(R0.minGW) + " GW");
 ok(/downloaded on 2 November 2026/.test(PAGE) && RAWF.meta.accessed === "2026-11-02", "data note: the download date");
+ok(/R4's part/.test(PAGE) && /Proficient \(audit trail\)/.test(JS) && /R5 adds the verification log/.test(JS), "R4's share of the rubric is named; the verification log and validation are left to R5");
 const note = M.dataNote(RAWF.meta, F, base, D, { why: { spike: "Impossible for this grid." }, limits: "x", rerun: "y" });
 ok(RAWF.meta.files.every(f => note.indexOf(f.sha256) >= 0) && note.indexOf("2026-11-02") >= 0 && /Why: Impossible for this grid\./.test(note), "data note: checksums, access date and the reader's reason");
 const lines = M.logLines(F, base, D);
@@ -123,10 +178,24 @@ Object.keys(D.decisions).forEach(k => ok(D.decisions[k].options.some(o => String
 ok(M.OPTIONS.frozen.every(n => D.decisions.frozen.options.some(o => o.id === n)), "every frozen option has text");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const urls = (OWN + JSON.stringify(D)).match(/https?:\/\/[^\s"'<>)]+/g) || [];
-const allowed = /^https:\/\/([\w-]+\.)*(eia\.gov|usgs\.gov|ember-energy\.org|iea\.org|entsoe\.eu|nlr\.gov|epa\.gov|doi\.org)\//;
+const allowed = /^https:\/\/([\w-]+\.)*(eia\.gov|usgs\.gov|ember-energy\.org|iea\.org|entsoe\.eu|nlr\.gov|epa\.gov|doi\.org|qgis\.org)\//;
 ok(urls.every(u => allowed.test(u)), "every link on an allow-listed host: " + urls.filter(u => !allowed.test(u)).join(" "));
 ok(!/\bAI\b|artificial intelligence|nuclear|reactor|\bSMR\b|learning[- ](curve|rate)/i.test(JSON.stringify(D) + JS + OWN), "no deny-listed or out-of-scope words");
-const words = s => s.trim().split(/\s+/).length;
+const words = s => M.plain(s).trim().split(/\s+/).length;
+const strip = h => h.replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, "x");
+EX.plain(spec.answers[1]).replace(/ \[\d+\]/g, "").split("\n").forEach((l, i) => ok(words(l) <= 35, "strong note line " + (i + 1) + ": at most 35 words (" + words(l) + ")"));
+ok(EX.plain(spec.answers[1]).split("\n").length >= 10, "strong note in labelled lines, one field each");
+spec.answers.forEach(a => EX.marks(a).forEach(m => ok(words(m.note) <= 25, a.key + " note " + m.n + ": at most 25 words")));
+D.licences.cards.forEach(k => ok(words(k.why) <= 35, "licence " + k.id + ": reason at most 35 words (" + words(k.why) + ")"));
+D.spatial.questions.forEach(q => Object.keys(q.why).forEach(k => ok(words(q.why[k]) <= 30, "spatial " + q.id + "/" + k + ": reason at most 30 words")));
+D.practice.forEach(p => ok(words(p.task) <= 30, "practice task at most 30 words (" + words(p.task) + ")"));
+{ const dn = (PAGE.match(/<p class="lx-datanote">[\s\S]*?<\/p>/) || [""])[0].split(/<br>/).map(strip);
+  ok(dn.length >= 3, "data note in labelled rows");
+  dn.forEach((r, i) => ok(words(r) <= 35, "data note row " + (i + 1) + ": at most 35 words (" + words(r) + ")"));
+  const bits = ((PAGE.match(/<div class="lx-deeper-body">[\s\S]*?<\/div>\n<\/details>/g) || []).join("").match(/<(p|li)>[\s\S]*?<\/\1>/g) || []).map(strip);
+  ok(bits.length >= 5, "Go deeper in short paragraphs and items");
+  bits.forEach(b => ok(words(b) <= 35, "Go deeper element at most 35 words (" + words(b) + "): " + b.slice(0, 40)));
+  ((PAGE.match(/<dl class="lx-ideas">[\s\S]*?<\/dl>/) || [""])[0].match(/<dd>[\s\S]*?<\/dd>/g) || []).map(strip).forEach(b => ok(words(b) <= 35, "idea at most 35 words: " + b.slice(0, 30))); }
 const stepTexts = (JS.match(/\{ text: "([^"]+)", build/g) || []).map(s => s.slice(9, -8));
 ok(stepTexts.length === 9, "nine step cards");
 stepTexts.forEach((t, i) => ok(words(t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1")) <= 35, "step " + (i + 1) + ": at most 35 words (" + words(t) + ")"));
