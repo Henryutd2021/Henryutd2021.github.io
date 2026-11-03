@@ -102,7 +102,7 @@
       ".a16-kpis{display:flex;flex-wrap:wrap;gap:8px}",
       ".a16-kpi{display:grid;padding:7px 11px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface-2);min-width:100px}",
       ".a16-kpi small{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-display)}.a16-kpi b{font-family:var(--lx-f-mono);font-size:16px;font-weight:600}",
-      ".a16-kpi.bad b{color:var(--lx-bad)}.a16-kpi.good b{color:var(--lx-good)}",
+      ".a16-kpi.bad b{color:var(--lx-bad)}",
       ".a16-tbl{overflow-x:auto;max-width:100%}.a16-tbl table{width:100%;border-collapse:collapse;font-size:14px}",
       ".a16-tbl th,.a16-tbl td{padding:5px 6px;border-bottom:1px solid var(--lx-line);text-align:right;font-weight:400}",
       ".a16-tbl th:first-child,.a16-tbl td:first-child{text-align:left}.a16-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3);vertical-align:bottom}",
@@ -175,8 +175,8 @@
           function draw() {
             var b = best(Y, "spare", st.tech, st.price), s = b.sweep;
             P.render({ x: { min: 0, max: 60, ticks: [[0, "0"], [20, "20"], [40, "40"], [60, "60 MW"]] }, y: { min: 0, max: 12, step: 2, fmt: function (v) { return "$" + v; }, unit: "$ per kg" },
-              lines: [{ pts: s.map(function (r) { return [r.X, r.lcoh]; }), color: "var(--lx-accent)", dots: true }], refs: [{ y: st.price, label: "Price $" + st.price.toFixed(2), dash: "5 4" }],
-              marks: [{ x: b.lcoh.X, y: b.lcoh.lcoh, label: "Cheapest kg", kind: "dot", pos: "below" }, { x: b.net.X, y: b.net.lcoh, label: "Best for the owner", kind: "ring" }],
+              lines: [{ pts: s.map(function (r) { return [r.X, r.lcoh]; }), color: "var(--lx-accent)", dots: true }], refs: [{ y: st.price, label: "Price $" + st.price.toFixed(2), labelN: "$" + st.price.toFixed(2), dash: "5 4", below: true }],
+              marks: b.net.X === b.lcoh.X ? [{ x: b.net.X, y: b.net.lcoh, label: "Cheapest kg, and best for the owner", kind: "ring", above: true }] : [{ x: b.lcoh.X, y: b.lcoh.lcoh, label: "Cheapest kg", kind: "dot", pos: "below" }, { x: b.net.X, y: b.net.lcoh, label: "Best for the owner", kind: "ring", above: true }],
               legend: [{ label: "Cost per kg (partial)", color: "var(--lx-accent)" }], aria: "Cost per kilogram against electrolyzer size, with the hydrogen price",
               text: { head: ["Size, MW", "Cost per kg", "Owner's net change a year"], rows: s.map(function (r) { return [String(r.X), fm.kg2(r.lcoh), fm.musd(r.net)]; }) } });
             out.innerHTML = LX.rich("At $" + st.price.toFixed(2) + "/kg: cheapest kg at **" + b.lcoh.X + " MW** (" + fm.kg2(b.lcoh.lcoh) + "); best for the owner at **" + b.net.X + " MW** (" + fm.musd(b.net.net) + " a year, cost per kg " + fm.kg2(b.net.lcoh) + ").").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");

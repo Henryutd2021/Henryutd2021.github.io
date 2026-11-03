@@ -124,7 +124,7 @@
       ".m4-kpis{display:flex;flex-wrap:wrap;gap:8px}",
       ".m4-kpi{display:grid;padding:7px 11px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface-2);min-width:100px}",
       ".m4-kpi small{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-display)}.m4-kpi b{font-family:var(--lx-f-mono);font-size:16px;font-weight:600}",
-      ".m4-kpi.good b{color:var(--lx-good)}.m4-kpi.bad b{color:var(--lx-bad)}",
+      ".m4-kpi.bad b{color:var(--lx-bad)}",
       ".m4-formula{font-family:var(--lx-f-mono);font-size:14px;padding:9px 12px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface-2);overflow-x:auto;white-space:nowrap}",
       ".m4-formula var{font-family:var(--lx-f-body);font-style:italic}",
       ".m4-tbl{overflow-x:auto;max-width:100%}.m4-tbl table{width:100%;border-collapse:collapse;font-size:14px}",
@@ -313,17 +313,17 @@
       title: "The plant, annotated", lede: "Winter week, all devices on (one best plan). Tap a part: what it does and what flowed through it.",
       groups: { p: ["Power", "var(--lx-wind)"], h: ["Hydrogen", "var(--lx-good)"], q: ["Heat", "var(--lx-pk)"] },
       nodes: [
-        { id: "wind", g: "p", label: "Wind, 100 MW", text: "Real SPP shape, 33.8% over the year. This week: " + fm.mwh(F.wind) + ".", at: [1, 0] },
-        { id: "grid", g: "p", label: "Grid, 50 MW each way", text: "Sold " + fm.mwh(F.exp) + ", bought " + fm.mwh(F.imp) + " at the town's price.", at: [0, 0] },
-        { id: "bat", g: "p", label: "Battery, 80 MWh", text: "State of charge links the hours; 83% round trip.", at: [2, 0] },
-        { id: "ez", g: "h", label: "Electrolyzer, 20 MW", text: "57 kWh per kg; " + fm.t(F.kg) + " made this week.", at: [0, 1] },
-        { id: "tank", g: "h", label: "Tank, 4,000 kg", text: "Kept between 400 and 4,000 kg; " + fm.t(F.tr) + " trucked in.", at: [0, 2] },
-        { id: "hp", g: "q", label: "Heat pump, 5 MW", text: "3 MWh of heat per MWh; " + fm.mwh(F.hp) + " of heat.", at: [2, 1] },
-        { id: "store", g: "q", label: "Heat store, 60 MWh", text: "Loses 2% a day; the network takes at most 12 MW.", at: [2, 2] },
+        { id: "wind", g: "p", label: "Wind", text: "100 MW; real SPP shape, 33.8% over the year. This week: " + fm.mwh(F.wind) + ".", at: [1, 0] },
+        { id: "grid", g: "p", label: "Grid", text: "50 MW each way. Sold " + fm.mwh(F.exp) + ", bought " + fm.mwh(F.imp) + " at the town's price.", at: [0, 0] },
+        { id: "bat", g: "p", label: "Battery", text: "20 MW, 80 MWh. State of charge links the hours; 83% round trip.", at: [2, 0] },
+        { id: "ez", g: "h", label: "Electrolyzer", text: "20 MW; 57 kWh per kg; " + fm.t(F.kg) + " made this week.", at: [0, 1] },
+        { id: "tank", g: "h", label: "Tank", text: "Kept between 400 and 4,000 kg; " + fm.t(F.tr) + " trucked in.", at: [0, 2] },
+        { id: "hp", g: "q", label: "Heat pump", text: "5 MW; 3 MWh of heat per MWh; " + fm.mwh(F.hp) + " of heat.", at: [2, 1] },
+        { id: "store", g: "q", label: "Heat store", text: "60 MWh; loses 2% a day; the network takes at most 12 MW.", at: [2, 2] },
         { id: "town", g: "q", label: "Town's heat", text: "Boiler " + fm.mwh(F.boil) + "; waste heat " + fm.mwh(F.rec) + ".", at: [1, 2] }
       ],
       edges: [["wind", "grid", "sell"], ["wind", "bat", "shift"], ["wind", "ez", "power"], ["ez", "tank", "kg"], ["wind", "hp", "power"], ["hp", "store", "heat"], ["store", "town", "≤ 12 MW"], ["ez", "town", "waste heat"]],
-      cols: 3, rows: 3, colsN: 2, rowsN: 4, atN: { wind: [0, 0], grid: [1, 0], ez: [0, 1], bat: [1, 1], tank: [0, 2], hp: [1, 2], store: [0, 3], town: [1, 3] }, sel: "ez", gameLabel: "In this lesson"
+      cols: 3, rows: 3, colsN: 2, rowsN: 4, atN: { wind: [0, 0], grid: [1, 0], ez: [0, 1], bat: [1, 1], tank: [0, 2], hp: [1, 2], store: [0, 3], town: [1, 3] }, sel: "wind", gameLabel: "In this lesson"
     });
     var sym = LX.EquationCard.sym;
     LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
