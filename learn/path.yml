@@ -514,7 +514,26 @@
 - {kind: lesson, tier: modeler, code: M4, title: "Storage and coupled carriers: modelling power, hydrogen and heat together"}
 - {kind: lesson, tier: modeler, code: M5, title: "Size and run a microgrid that survives an outage"}
 - {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
-- {kind: lesson, tier: modeler, code: M7, title: "What could happen? Scenarios, Monte Carlo and global sensitivity"}
+- kind: lesson
+  id: m07-monte-carlo
+  path: m07-monte-carlo.qmd
+  code: M7
+  tier: modeler
+  form: cards
+  icon: bars
+  status: active
+  minutes: 35
+  practice_minutes: 60   # the notebook's practice tasks, after its 45-minute lab (learn_map_v2.yml)
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
+  title: "What could happen? Scenarios, Monte Carlo and global sensitivity"
+  subtitle: "Sample five uncertain inputs with a Latin hypercube, run a delay-cost model 1,000 times and rank the inputs by influence"
+  short: "Scenarios and Monte Carlo"
+  outcome: "Run a seeded Latin hypercube study, report percentiles and chances with their Monte Carlo error, and rank inputs by rank correlation within stated ranges."
+  teaches: [scenarios, one-at-a-time sensitivity, Latin hypercube sampling, Monte Carlo error, global sensitivity by rank correlation]
+  lab: "a NumPy notebook that reruns the page's seeded study and checks it, then SciPy's Latin hypercube, rank correlations and variance shares, about 45 minutes, then 60 minutes of practice."
+  does: "Sample uncertain inputs with a Latin hypercube, run a model a thousand times, rank inputs by influence and read the distribution, not one number."
+  after: [B2, K5]
+  next: M8
 - {kind: lesson, tier: modeler, code: M8, title: "Deciding before the uncertainty resolves: stochastic and robust optimization"}
 - {kind: lesson, tier: modeler, code: M9, title: "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data"}
 - {kind: lesson, tier: modeler, code: M10, title: "Forecasting load, wind, solar and prices with machine learning, and judging it honestly"}
