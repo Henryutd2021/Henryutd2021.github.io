@@ -20,7 +20,7 @@
 //   P(e <= r) reaches cUnder / (cUnder + cOver).
 // Every number the page states comes from these functions or the data files and is checked in
 // _tests/learn/test_04_forecasts.js. The pure model is exported for Node; the view uses the component library.
-// Lesson-local helper: plot(), the same small XY chart as in 03-balancing.js (a candidate shared component).
+// The chart card is the shared LX.PlotCard and its chart LX.Plot (components/plot.js, W1 integration).
 (function () {
   "use strict";
   var COSTS = { over: 10, under: 300 };                     // $/MWh, illustrative (the page says so)
@@ -77,83 +77,10 @@
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view helpers
-  var LX = window.LX, H = LX.H, S = LX.S, LESSON = "04-forecasts";
+  var LX = window.LX, H = LX.H, LESSON = "04-forecasts";
   var gw = function (mw) { return (mw / 1000).toFixed(1) + " GW"; }, gw2 = function (mw) { return (mw / 1000).toFixed(2) + " GW"; };
   var pct = function (x, d) { return (100 * x).toFixed(d == null ? 1 : d) + "%"; }, spct = function (x) { return (x >= 0 ? "+" : "−") + Math.abs(100 * x).toFixed(1) + "%"; };
   var mwf = function (v) { return Math.round(v).toLocaleString("en-US") + " MW"; }, money = function (v) { return "$" + Math.round(v).toLocaleString("en-US"); };
-
-  // lesson-local XY plot: spec {x: {min, max, ticks: [[v, label]]}, y: {...}, lines: [{pts, color, width, dash, anim}],
-  //   bars: [{x0, x1, y0, y1, color, op}], refs: [{y, label, color, dash}], marks: [{x, y, label, color, side}],
-  //   legend: [{label, color, dash}], tip: fn(x) -> html, aria: text, height}
-  function plot(host, o) {
-    var wrap = H("div", { class: "lx-chart w1-plot" }, host);
-    var tip = H("div", { class: "lx-chart-tip", hidden: true, "aria-hidden": "true" }, wrap);
-    var legend = H("div", { class: "lx-legend" }, host), svg = null, spec = null;
-    function render(s, animate) {
-      if (s) spec = s; if (!spec || !LX.visible(wrap)) return;
-      var W = Math.max(280, wrap.clientWidth || 600), narrow = W < 480, Hh = spec.height || (narrow ? 220 : 260);
-      var m = { l: spec.ml || 52, r: 14, t: 18, b: 28 }, iw = W - m.l - m.r, ih = Hh - m.t - m.b;
-      var X = function (v) { return m.l + (v - spec.x.min) / (spec.x.max - spec.x.min) * iw; };
-      var Y = function (v) { return m.t + ih - (v - spec.y.min) / (spec.y.max - spec.y.min) * ih; };
-      if (svg) svg.remove();
-      svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, width: W, height: Hh, role: "img", "aria-label": spec.aria || "" });
-      wrap.insertBefore(svg, tip);
-      var txt = function (x, y, t, a, c, sz) { var e = S("text", { x: x, y: y, "text-anchor": a || "middle", "font-size": sz || 11, "font-family": "var(--lx-f-mono)", fill: c || "var(--lx-ink-3)" }, svg); e.textContent = t; return e; };
-      spec.y.ticks.forEach(function (tk) { S("path", { d: "M" + m.l + " " + Y(tk[0]) + " H" + (W - m.r), stroke: "var(--lx-line)", "stroke-width": 1 }, svg); txt(m.l - 6, Y(tk[0]) + 4, tk[1], "end"); });
-      var xt = narrow && spec.x.ticksN ? spec.x.ticksN : spec.x.ticks;
-      xt.forEach(function (tk, i) { txt(X(tk[0]), Hh - 8, tk[1], i === 0 && tk[0] === spec.x.min ? "start" : i === xt.length - 1 && tk[0] === spec.x.max ? "end" : "middle"); });
-      if (spec.y.unit) txt(4, 10, spec.y.unit, "start");
-      var clip = LX.uid("clip"); S("rect", { x: m.l, y: m.t - 2, width: iw, height: ih + 4 }, S("clipPath", { id: clip }, S("defs", null, svg)));
-      var g = S("g", { "clip-path": "url(#" + clip + ")" }, svg);
-      (spec.bars || []).forEach(function (b) {
-        var y0 = Y(Math.max(b.y0, b.y1)), y1 = Y(Math.min(b.y0, b.y1));
-        S("rect", { x: X(b.x0), y: y0, width: Math.max(1, X(b.x1) - X(b.x0)), height: Math.max(1, y1 - y0), fill: b.color, opacity: b.op == null ? 1 : b.op, rx: b.rx || 0 }, g);
-      });
-      (spec.refs || []).forEach(function (r) {
-        S("path", { d: "M" + m.l + " " + Y(r.y) + " H" + (W - m.r), stroke: r.color || "var(--lx-ink-3)", "stroke-width": 1.3, "stroke-dasharray": r.dash || "" }, svg);
-        var rl = narrow && r.labelN ? r.labelN : r.label;
-        if (rl) { var lt = txt(W - m.r - 4, Y(r.y) + (r.below ? 13 : -5), rl, "end", r.color || "var(--lx-ink-3)"); lt.setAttribute("font-family", "var(--lx-f-body)"); }
-      });
-      (spec.lines || []).forEach(function (ln) {
-        if (!ln.pts.length) return;
-        var d = ln.pts.map(function (p, i) { return (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ");
-        var p = S("path", { d: d, fill: "none", stroke: ln.color, "stroke-width": ln.width || 2.4, "stroke-dasharray": ln.dash || "", "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
-        if (ln.dots) ln.pts.forEach(function (q) { S("circle", { cx: X(q[0]), cy: Y(q[1]), r: 3, fill: ln.color }, g); });
-        if (animate && ln.anim && !LX.reduced() && !ln.dash && p.getTotalLength) {
-          var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
-          p.getBoundingClientRect(); p.style.transition = "stroke-dashoffset 1.8s ease-out"; p.style.strokeDashoffset = 0;
-        }
-      });
-      (spec.marks || []).forEach(function (mk) {
-        var cx = X(mk.x), cy = Y(mk.y);
-        S("circle", { cx: cx, cy: cy, r: 5, fill: "var(--lx-surface)", stroke: mk.color || "var(--lx-ink)", "stroke-width": 2.4 }, svg);
-        if (mk.label) {
-          var right = cx < m.l + iw * 0.62, ty = cy + (mk.above ? -10 : 18);
-          var lt = txt(cx + (right ? 9 : -9), ty, mk.label, right ? "start" : "end", "var(--lx-ink)", 12);
-          lt.setAttribute("font-weight", "600"); lt.setAttribute("paint-order", "stroke"); lt.setAttribute("stroke", "var(--lx-surface)"); lt.setAttribute("stroke-width", "4");
-        }
-      });
-      if (spec.tip) {
-        var hit = S("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" }, svg);
-        var show = function (ev) {
-          var rr = svg.getBoundingClientRect(), x = spec.x.min + ((ev.clientX - rr.left) / rr.width * W - m.l) / iw * (spec.x.max - spec.x.min);
-          x = LX.clamp(x, spec.x.min, spec.x.max); var html = spec.tip(x); if (!html) { tip.hidden = true; return; }
-          tip.innerHTML = html; tip.hidden = false;
-          var px = X(x) / W * rr.width; tip.style.left = LX.clamp(px + 12, 0, rr.width - 170) + "px"; tip.style.top = "6px";
-        };
-        hit.addEventListener("pointermove", show); hit.addEventListener("pointerdown", show);
-        hit.addEventListener("pointerleave", function () { tip.hidden = true; });
-      }
-      legend.innerHTML = "";
-      (spec.legend || []).forEach(function (l) {
-        var sp = H("span", null, legend);
-        H("i", l.dash ? { class: "line", style: "border-top-color:" + l.color } : { style: "--c:" + l.color }, sp); H("span", { text: l.label }, sp);
-      });
-    }
-    if (window.ResizeObserver) new ResizeObserver(function () { render(); }).observe(wrap);
-    LX.onTheme(function () { render(); });
-    return { render: render, el: wrap };
-  }
 
   // ---------------------------------------------------------------- the lesson
   var COL = { actual: "var(--lx-ink)", spp: "var(--lx-accent)", base: "var(--lx-tier-4)", under: "var(--lx-warn)", over: "var(--lx-tier-3)", band: "var(--lx-accent)", solar: "var(--lx-solar)", wind: "var(--lx-wind)" };
@@ -166,13 +93,9 @@
     var fc = data["04_forecasts"], DAYS = { typical: prepare(data.town_days, data.town_year, fc, "typical_forecast"), miss: prepare(data.town_days, data.town_year, fc, "big_forecast_miss") };
     var ERR = errors(fc), GRID = marginGrid(0, 0.10, 0.005), BEST = bestMargin(fc, ERR, GRID), NEAR = 1.05;
     var S_ = { day: "typical", show: "actual", base: "yesterday", series: "demand", level: "80", margin: 0, lead: 24, pick: null, chart: "day" };
-    var stage = H("div", { class: "lx-xcard w1-stage" }, live);
-    var ttl = H("p", { class: "lx-eyebrow" }, H("div", { class: "w1-stage-head" }, stage));
-    var chips = H("div", { class: "w1-chips", "aria-live": "polite" }, stage);
-    var P = plot(stage, {});
-    var alt = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "Text version of the chart" }, alt);
-    var altBody = H("div", null, alt);
-    function chip(l, v, tone) { var c = H("div", { class: "w1-chip" + (tone ? " " + tone : "") }, chips); H("span", { text: l }, c); H("b", { text: v }, c); }
+    // the chart card (plot.js): title, value chips, the chart and its text version
+    var card = LX.PlotCard(live, { text: "Text version of the chart" }), ttl = card.title, chips = card.chips, P = card.plot, altBody = card.text;
+    function chip(l, v, tone) { card.chip(l, v, tone); }
     function hourTicks() { return [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]]; }
     function hourTicksN() { return [[0, "00:00"], [12, "12:00"], [24, "24:00"]]; }
     function series(arr) { var p = []; arr.forEach(function (v, t) { p.push([t + 0.5, v]); }); return p; }

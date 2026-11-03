@@ -39,17 +39,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ::: {#steps .lx-sec}
 ```{=html}
 <style>
-.w1-stage { gap: 10px; align-content: start; }
-.w1-stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.w1-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.w1-chip { display: grid; gap: 1px; padding: 6px 10px; border-radius: 10px; background: var(--lx-surface-2); min-width: 0; }
-.w1-chip span { font-family: var(--lx-f-display); font-size: 12px; color: var(--lx-ink-3); }
-.w1-chip b { font-family: var(--lx-f-mono); font-size: 16px; font-weight: 600; color: var(--lx-ink); font-variant-numeric: tabular-nums; }
-.w1-chip.good b { color: var(--lx-good); } .w1-chip.bad b { color: var(--lx-bad); } .w1-chip.warn b { color: var(--lx-warn); }
 .w1-event { border-left: 3px solid var(--lx-cc); padding: 2px 0 2px 12px; display: grid; gap: 4px; }
 .w1-event p { margin: 0; font-size: 15.5px; }
 .w1-event-t b { font-family: var(--lx-f-mono); }
-.w1-plot svg text { font-variant-numeric: tabular-nums; }
 </style>
 <div class="lx-interactive lx-cards" data-learn="balancing" data-src="../assets/learn/data/03-balancing.json">
 <div class="lx-fallback">

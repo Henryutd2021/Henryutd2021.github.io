@@ -232,16 +232,11 @@ The load-duration curve throws the time order away. That is fine for asking how 
 
 ```{=html}
 <style>
-/* Lesson 2, lesson-local styles (line charts, the 8,760-dot canvas, month picker, annotations); colours from --lx- tokens. */
-.t2-cv, .t2-year { display: grid; gap: 4px; min-width: 0; }
+/* Lesson 2, lesson-local styles (the 8,760-dot canvas, month picker, annotations; the line charts are LX.Plot); colours from --lx- tokens. */
+.t2-year { display: grid; gap: 4px; min-width: 0; }
 .t2-go { justify-self: start; }
 .t2-cv-t { font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; color: var(--lx-ink-2); }
 .t2-cv-t:empty { display: none; }
-.t2-chart { position: relative; }
-.t2-chart svg { display: block; width: 100%; height: auto; }
-.t2-ax { font-family: var(--lx-f-mono); font-size: 11px; fill: var(--lx-ink-3); }
-.t2-mk { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; fill: var(--lx-ink); paint-order: stroke; stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
-.t2-num { font-family: var(--lx-f-display); font-size: 13px; font-weight: 600; fill: var(--lx-bg); }
 .t2-canvas { position: relative; }
 .t2-canvas canvas { display: block; max-width: 100%; }
 .t2-months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; }

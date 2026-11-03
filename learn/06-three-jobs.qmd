@@ -65,12 +65,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .lx6-why li { padding-left: 12px; border-left: 3px solid var(--lx-line-2); }
 .lx6-why li.j-yes { border-left-color: var(--lx-good); } .lx6-why li.j-partly { border-left-color: var(--lx-warn); }
 .lx6-why b { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
-.lx6-scatter { display: block; width: 100%; height: auto; max-width: 620px; }
-.lx6-ax { font-family: var(--lx-f-mono); font-size: 11px; fill: var(--lx-ink-3); }
-.lx6-axt { font-family: var(--lx-f-display); font-size: 12.5px; fill: var(--lx-ink-2); }
-.lx6-dl { font-family: var(--lx-f-display); font-size: 13.5px; font-weight: 500; fill: var(--lx-ink); }
-.lx6-dot { cursor: pointer; } .lx6-dot:focus { outline: none; }
-.lx6-dot:focus-visible circle, .lx6-dot[aria-pressed="true"] circle { stroke: var(--lx-ink); stroke-width: 3.5; }
 .lx6-sorter { display: grid; gap: 2px; }
 .lx6-srow { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 60px); gap: 6px 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--lx-line); }
 .lx6-srow.head { border: 0; padding: 0; font-family: var(--lx-f-display); font-size: 12px; color: var(--lx-ink-3); text-transform: uppercase; letter-spacing: .05em; }

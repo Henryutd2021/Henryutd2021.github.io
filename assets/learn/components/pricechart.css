@@ -1,0 +1,5 @@
+/* pricechart.css — LX.PriceChart and LX.HourPicker (pricechart.js). The chart itself is styled by plot.css; this file
+   holds the hour picker (previous / next buttons, the hour, jump buttons). Promoted from M1 (W1 integration). */
+.lx-hours { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lx-hours output { font-family: var(--lx-f-mono); font-size: 16px; font-weight: 600; min-width: 58px; text-align: center; color: var(--lx-ink); }
+.lx-hours button { min-width: 44px; }

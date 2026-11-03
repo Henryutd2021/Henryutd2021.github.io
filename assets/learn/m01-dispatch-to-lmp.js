@@ -23,8 +23,9 @@
 // words. ptdf() and decompose() give the textbook split LMP_n = LMP_ref - sum_l PTDF[l][n] mu_l (Go deeper).
 //
 // Every number the page states is produced by this model and checked by _tests/learn/test_m01-dispatch-to-lmp.js.
-// The view uses the component library (assets/learn/learn.js); lesson-local parts (formulation viewer, network diagram,
-// price chart) are built here and listed as requests in learn/_w1/m01-dispatch-to-lmp.yml.
+// The view uses the component library (assets/learn/learn.js); the price chart and hour picker are the shared
+// LX.PriceChart and LX.HourPicker (components/pricechart.js); lesson-local parts (formulation viewer, network diagram) are
+// built here and listed as requests in learn/_w1/m01-dispatch-to-lmp.yml.
 (function () {
   "use strict";
   var PLANTS = ["nuclear", "wind", "solar", "cc", "pk"];
@@ -232,11 +233,6 @@
       ".m1-kpi b{font-family:var(--lx-f-mono);font-size:18px;font-weight:600;color:var(--lx-ink)}",
       ".m1-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}",
       "@media (max-width:720px){.m1-split{grid-template-columns:minmax(0,1fr)}}",
-      ".m1-chart{position:relative}.m1-chart svg{display:block;width:100%;height:auto}",
-      ".m1-chart .col{cursor:pointer}.m1-chart .col:hover rect.hit{fill:var(--lx-surface-3)}",
-      ".m1-hours{display:flex;align-items:center;gap:8px;flex-wrap:wrap}",
-      ".m1-hours output{font-family:var(--lx-f-mono);font-size:16px;font-weight:600;min-width:58px;text-align:center}",
-      ".m1-hours button{min-width:44px}",
       ".m1-net svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}",
       ".m1-net .bus{cursor:pointer}.m1-net .bus:focus{outline:none}",
       ".m1-net .bus:focus-visible rect.box{stroke:var(--lx-accent);stroke-width:3}",
@@ -359,73 +355,17 @@
     return { set: function (x) { if (x.sel !== undefined) sel = x.sel; if (x.view) view = x.view; if (x.network !== undefined) net = x.network; paint(); }, el: w };
   }
 
-  // ---- 24-hour price chart: one line per bus (they coincide without congestion); tap an hour to select it
+  // ---- 24-hour price chart and hour picker: the shared LX.PriceChart and LX.HourPicker (pricechart.js). This adapter turns
+  //      a solved day into the chart's series: one line per bus on the network, one price without it.
   function PriceChart(host, o) {
-    var w = E("div", { class: "m1-chart" }, host), legend = E("div", { class: "lx-legend" }, host);
-    var alt = E("details", { class: "lx-textalt" }, host); E("summary", { text: "Text version" }, alt);
-    var svg = null, state = { day: null, ghost: null, sel: 12 };
-    function series() {
-      var d = state.day; if (!d) return [];
+    var ch = LX.PriceChart(host, { label: o.label, ghostLabel: o.ghostLabel, onPick: o.onPick });
+    function series(d) {
       if (!d.network) return [{ id: "one", label: "Price, one bus", color: "var(--lx-ink)", v: d.hours.map(function (h) { return h.price.T; }) }];
       return o.D.buses.map(function (b) { return { id: b.id, label: b.name, color: b.color, v: d.hours.map(function (h) { return h.price[b.id]; }) }; });
     }
-    function render() {
-      var W = Math.max(280, w.clientWidth || 600), Hh = W < 480 ? 200 : 230, ser = series();
-      var all = []; ser.forEach(function (s) { all = all.concat(s.v); }); if (state.ghost) all = all.concat(state.ghost);
-      var top = Math.max(100, Math.ceil(Math.max.apply(null, all.concat([0])) / 50) * 50);
-      var m = { l: 44, r: 10, t: 12, b: 26 }, iw = W - m.l - m.r, ih = Hh - m.t - m.b, n = 24, bw = iw / n;
-      var y = function (v) { return m.t + ih - v / top * ih; };
-      if (svg) svg.remove();
-      svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, width: W, height: Hh, role: "img", "aria-label": o.label || "Price in each hour, dollars per MWh." }, w);
-      for (var v = 0; v <= top; v += top / 4) {
-        S("path", { d: "M" + m.l + " " + y(v) + " H" + (W - m.r), stroke: "var(--lx-line)", "stroke-width": 1 }, svg);
-        S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end", "font-size": 11, "font-family": "var(--lx-f-mono)", fill: "var(--lx-ink-3)" }, svg).textContent = "$" + v;
-      }
-      [0, 6, 12, 18, 24].forEach(function (h) {
-        S("text", { x: m.l + h * bw, y: Hh - 7, "text-anchor": h === 0 ? "start" : h === 24 ? "end" : "middle", "font-size": 11, "font-family": "var(--lx-f-mono)", fill: "var(--lx-ink-3)" }, svg).textContent = hh(h % 24 === 0 && h ? 0 : h).replace(/^00:00$/, h ? "24:00" : "00:00");
-      });
-      for (var t = 0; t < n; t++) {
-        var g = S("g", { class: "col" }, svg);
-        S("rect", { class: "hit", x: m.l + t * bw, y: m.t, width: bw, height: ih, fill: t === state.sel ? "var(--lx-accent-soft)" : "transparent" }, g);
-        (function (tt) { g.addEventListener("click", function () { if (o.onPick) o.onPick(tt); }); })(t);
-      }
-      if (state.ghost) {
-        var dg = ""; state.ghost.forEach(function (p, t) { dg += (t ? " L" : "M") + (m.l + t * bw) + " " + y(p) + " H" + (m.l + (t + 1) * bw); });
-        S("path", { d: dg, fill: "none", stroke: "var(--lx-ink-3)", "stroke-width": 2, "stroke-dasharray": "4 3", opacity: .8 }, svg);
-      }
-      ser.forEach(function (s, k) {
-        var d = "", off = ser.length > 1 ? (k - 1) * 1.6 : 0;
-        s.v.forEach(function (p, t) { d += (t ? " L" : "M") + (m.l + t * bw) + " " + (y(p) + off) + " H" + (m.l + (t + 1) * bw); });
-        S("path", { d: d, fill: "none", stroke: s.color, "stroke-width": ser.length > 1 ? 2.4 : 2.6, "stroke-linejoin": "round" }, svg);
-      });
-      legend.innerHTML = "";
-      ser.forEach(function (s) { var sp = E("span", null, legend); E("i", { style: "--c:" + s.color }, sp); E("span", { text: s.label }, sp); });
-      if (state.ghost) { var gp = E("span", null, legend); E("i", { class: "line" }, gp); E("span", { text: o.ghostLabel || "Before" }, gp); }
-      alt.querySelectorAll(".lx-scroll-x").forEach(function (x) { x.remove(); });
-      var tb = E("table", { class: "lx-mini-table" }, E("div", { class: "lx-scroll-x" }, alt)), hr = E("tr", null, E("thead", null, tb));
-      E("th", { scope: "col", text: "Hour" }, hr); ser.forEach(function (s) { E("th", { scope: "col", text: s.label + " ($/MWh)" }, hr); });
-      var body = E("tbody", null, tb);
-      for (t = 0; t < n; t++) { var tr = E("tr", null, body); E("td", { text: hh(t) }, tr); ser.forEach(function (s) { E("td", { text: Math.round(s.v[t]) }, tr); }); }
-    }
-    if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(w) && state.day) render(); }).observe(w);
-    LX.onTheme(function () { if (LX.visible(w) && state.day) render(); });
-    return { set: function (x) { for (var k in x) state[k] = x[k]; if (state.day) render(); }, el: w };
+    return { el: ch.el, set: function (x) { var p = {}; for (var k in x) if (k !== "day") p[k] = x[k]; if (x.day) p.series = series(x.day); ch.set(p); } };
   }
-
-  // ---- hour picker: previous / next buttons and the hour
-  function HourPicker(host, o) {
-    var w = E("div", { class: "m1-hours", role: "group", "aria-label": "Hour" }, host), t = o.start;
-    E("span", { class: "lx-eyebrow", text: "Hour" }, w);
-    var prev = E("button", { type: "button", class: "lx-btn ghost small", "aria-label": "Previous hour", html: LX.icon("back") }, w);
-    var out = E("output", { "aria-live": "polite" }, w);
-    var next = E("button", { type: "button", class: "lx-btn ghost small", "aria-label": "Next hour", html: LX.icon("arrow") }, w);
-    (o.jumps || []).forEach(function (j) { E("button", { type: "button", class: "lx-btn ghost small", text: j[1], onclick: function () { set(j[0], true); } }, w); });
-    function set(v, user) { t = (v + 24) % 24; out.textContent = hh(t); if (user && o.onChange) o.onChange(t); }
-    prev.addEventListener("click", function () { set(t - 1, true); });
-    next.addEventListener("click", function () { set(t + 1, true); });
-    set(t);
-    return { set: function (v) { set(v); }, val: function () { return t; } };
-  }
+  function HourPicker(host, o) { return LX.HourPicker(host, o); }
 
   // ---- the three-bus network: buses with their prices, lines with flows and limits; tap a bus to explain its price
   var POS = { R: [78, 62], G: [282, 62], T: [180, 238] };

@@ -171,9 +171,6 @@
       ".b2-big{font-family:var(--lx-f-mono);font-size:20px;font-weight:600;color:var(--lx-ink)}",
       ".b2-res{display:grid;gap:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--lx-line);background:var(--lx-surface)}",
       ".b2-res .k{font-size:13px;color:var(--lx-ink-3)}",
-      ".b2-chart svg{display:block;width:100%;height:auto}",
-      ".b2-chart text{font-family:var(--lx-f-mono);font-size:11px;fill:var(--lx-ink-3)}",
-      ".b2-chart text.t{font-family:var(--lx-f-display);font-size:12px;fill:var(--lx-ink-2)}",
       ".b2-ok{color:var(--lx-good);font-weight:600} .b2-bad{color:var(--lx-bad);font-weight:600} .b2-na{color:var(--lx-ink-3)}",
       
       ".b2-dl{display:flex;flex-wrap:wrap;gap:8px}",
@@ -244,46 +241,28 @@
     return { set: set };
   }
 
-  // ---- a light chart: lines (with optional area) or bars, shaded spans, a level line; redrawn on resize
+  // ---- charts: the shared LX.Plot (components/plot.js) draws them; this adapter turns B2's options into its spec.
+  //      o: n, series [{values, color, width, area}], bars (true: one bar per value), yMax, yStep, yFmt, height, title,
+  //      ticks ([[i, label, anchor]] or function (W)), shade ([[from, to]] index spans), level + levelLabel, label, alt (HTML)
   function chart(host, o) {
-    var box = H("div", { class: "b2-chart" }, host), svg = null;
-    var alt = o.alt ? H("details", { class: "lx-textalt" }, host) : null;
-    if (alt) { H("summary", { text: "Text version" }, alt); H("div", { html: o.alt }, alt); }
-    function draw() {
-      var W = Math.max(300, box.clientWidth || 640), Hh = (o.height || (W < 480 ? 170 : 200)) + (o.title ? 14 : 0), m = { l: 46, r: 8, t: o.title ? 24 : 10, b: 22 };
-      var iw = W - m.l - m.r, ih = Hh - m.t - m.b, n = o.n, ymax = o.yMax;
-      var x = function (i) { return m.l + (o.bars ? (i + 0.5) : i) / (o.bars ? n : Math.max(1, n - 1)) * iw; }, y = function (v) { return m.t + ih - v / ymax * ih; };
-      if (svg) svg.remove();
-      svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, role: "img", "aria-label": o.label }, box);
-      (o.shade || []).forEach(function (sp) { S("rect", { x: x(sp[0]), y: m.t, width: Math.max(2, x(sp[1]) - x(sp[0])), height: ih, fill: "var(--lx-bad-soft)" }, svg); });
-      var ys = o.yStep || ymax / 4;
-      for (var k = 0; k * ys <= ymax + 1e-9; k++) {
-        var v = k * ys;
-        S("path", { d: "M" + m.l + " " + y(v) + " H" + (W - m.r), stroke: "var(--lx-line)", "stroke-width": 1 }, svg);
-        S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }, svg).textContent = o.yFmt ? o.yFmt(v) : int(v);
-      }
-      (typeof o.ticks === "function" ? o.ticks(W) : o.ticks || []).forEach(function (t) { S("text", { x: x(t[0]), y: Hh - 6, "text-anchor": t[2] || "middle" }, svg).textContent = t[1]; });
-      if (o.level != null) {
-        S("path", { d: "M" + m.l + " " + y(o.level) + " H" + (W - m.r), stroke: "var(--lx-bad)", "stroke-width": 1.5, "stroke-dasharray": "5 4" }, svg);
-        if (o.levelLabel) S("text", { x: W - m.r - 4, y: y(o.level) - 5, "text-anchor": "end", class: "t" }, svg).textContent = o.levelLabel;
-      }
-      o.series.forEach(function (s) {
-        if (o.bars) {
-          var bw = iw / n * 0.7, d = "";
-          s.values.forEach(function (v, i) { d += "M" + (x(i) - bw / 2) + " " + y(0) + " V" + y(v) + " H" + (x(i) + bw / 2) + " V" + y(0) + " Z"; });
-          S("path", { d: d, fill: s.color }, svg);
-          return;
-        }
-        var p = "";
-        s.values.forEach(function (v, i) { p += (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); });
-        if (s.area) S("path", { d: p + "L" + x(n - 1) + " " + y(0) + "L" + x(0) + " " + y(0) + "Z", fill: s.color, opacity: 0.22 }, svg);
-        S("path", { d: p, fill: "none", stroke: s.color, "stroke-width": s.width || 1.4, "stroke-linejoin": "round" }, svg);
-      });
-      if (o.title) S("text", { x: m.l, y: 13, class: "t" }, svg).textContent = o.title;
+    var P = LX.Plot(host, { box: true, legend: false, text: o.alt ? "Text version" : null });
+    function spec() {
+      var bars = !!o.bars, n = o.n;
+      var ticks = function (W) { return (typeof o.ticks === "function" ? o.ticks(W) : o.ticks || []).map(function (t) { return [bars ? t[0] + 0.5 : t[0], t[1], t[2]]; }); };
+      return {
+        x: { min: 0, max: bars ? n : Math.max(1, n - 1), ticks: ticks },
+        y: { min: 0, max: o.yMax, step: o.yStep || o.yMax / 4, fmt: o.yFmt || int },
+        height: o.height || 200, heightN: o.height || 170, margin: { l: 46, r: 8, t: 10, b: 22 }, title: o.title, aria: o.label,
+        spans: (o.shade || []).map(function (sp) { return { x0: sp[0], x1: sp[1], color: "var(--lx-bad-soft)" }; }),
+        refs: o.level != null ? [{ y: o.level, color: "var(--lx-bad)", dash: "5 4", width: 1.5, label: o.levelLabel, labelColor: "var(--lx-ink-2)" }] : [],
+        bars: !bars ? [] : [].concat.apply([], o.series.map(function (s) { return s.values.map(function (v, i) { return v ? { x0: i + 0.15, x1: i + 0.85, y0: 0, y1: v, color: s.color } : null; }).filter(Boolean); })),
+        lines: bars ? [] : o.series.map(function (s) { return { values: s.values, color: s.color, width: s.width || 1.4, area: s.area ? 0.22 : 0, cap: "butt" }; }),
+        text: o.alt ? { html: o.alt } : null
+      };
     }
-    if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(box)) draw(); }).observe(box);
-    setTimeout(draw, 0);
-    return { draw: draw, el: box, set: function (p) { for (var k in p) o[k] = p[k]; draw(); } };
+    var api = { el: P.box, draw: function () { P.render(spec()); }, set: function (p) { for (var k in p) o[k] = p[k]; api.draw(); } };
+    api.draw();   // LX.Plot draws once the chart is visible, and again on resize
+    return api;
   }
   // a round axis top and gridline step: the smallest step of 1, 2, 2.5 or 5 x 10^n that covers mx in at most 5 steps
   function nice(mx) {
