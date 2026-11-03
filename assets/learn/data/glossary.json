@@ -119,6 +119,18 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "concept-matrix": {
+  "term": "Concept matrix",
+  "short": "A table with papers in rows and ideas in columns, coded by a stated rule, that shows what a literature covers and what it leaves out.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
+ "conflict-of-interest": {
+  "term": "Conflict of interest",
+  "short": "A financial or other tie that could bias, or seem to bias, a researcher's work, and so must be declared.",
+  "lesson": "R9",
+  "href": "r09-integrity-stakeholders.html"
+ },
  "congestion": {
   "term": "Congestion",
   "short": "A power line carrying all it is allowed to, so cheaper power cannot reach where it is needed and prices can differ by location.",
@@ -136,6 +148,12 @@
   "short": "A rule every solution must obey, such as supply equals demand or no plant above its size.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "coordinate-reference-system": {
+  "term": "Coordinate reference system (CRS)",
+  "short": "The rule that ties map coordinates to places on Earth; some keep areas true, others keep distances, none keeps both everywhere.",
+  "lesson": "R4",
+  "href": "r04-data.html"
  },
  "utc": {
   "term": "Coordinated Universal Time (UTC)",
@@ -172,6 +190,18 @@
   "short": "The wind speed above which a turbine shuts down to protect itself.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "data-licence": {
+  "term": "Data licence",
+  "short": "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement.",
+  "lesson": "R4",
+  "href": "r04-data.html"
+ },
+ "data-note": {
+  "term": "Data note",
+  "short": "A short record of where a dataset came from, its licence, units and time base, and every cleaning step with its rule, count and effect.",
+  "lesson": "R4",
+  "href": "r04-data.html"
  },
  "dataframe": {
   "term": "DataFrame",
@@ -280,6 +310,12 @@
   "short": "A way to trace a trade-off by optimizing one goal while capping the other, then moving the cap step by step.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "ethics-board": {
+  "term": "Ethics board (IRB)",
+  "short": "The committee that reviews research with people before it starts; in the United States, an institutional review board.",
+  "lesson": "R9",
+  "href": "r09-integrity-stakeholders.html"
  },
  "evidence-ladder": {
   "term": "Evidence ladder",
@@ -394,6 +430,12 @@
   "short": "Said of a model whose rules contradict each other, so that no plan meets them all.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "informed-consent": {
+  "term": "Informed consent",
+  "short": "A person's agreement to take part in research, given freely after being told what will happen, the risks and how their data will be used.",
+  "lesson": "R9",
+  "href": "r09-integrity-stakeholders.html"
  },
  "inverter": {
   "term": "Inverter",
@@ -641,6 +683,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "provenance": {
+  "term": "Provenance",
+  "short": "The documented origin and history of a piece of data: source, version, access date, checksums and every change made to it.",
+  "lesson": "R4",
+  "href": "r04-data.html"
+ },
  "quartile": {
   "term": "Quartile",
   "short": "The values that cut a sorted set into four equal parts: 25% of values lie below the first, 50% below the second (the median), 75% below the third.",
@@ -695,6 +743,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "research-gap": {
+  "term": "Research gap",
+  "short": "A question the literature has not answered, shown with a logged search and the closest prior work, not just asserted.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
  "reserves": {
   "term": "Reserves",
   "short": "Spare capacity that operators keep ready to cover the sudden loss of a plant or a forecast that misses.",
@@ -737,11 +791,23 @@
   "lesson": 4,
   "href": "04-forecasts.html"
  },
+ "snowballing": {
+  "term": "Snowballing",
+  "short": "Finding papers from one you already have: backward through its references, forward through the works that cite it.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
  "solver": {
   "term": "Solver",
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "stakeholder": {
+  "term": "Stakeholder",
+  "short": "A person or group affected by a study or the decision it informs, or able to affect it.",
+  "lesson": "R9",
+  "href": "r09-integrity-stakeholders.html"
  },
  "standard-deviation": {
   "term": "Standard deviation",

@@ -1,0 +1,411 @@
+{
+ "meta": {
+  "title": "OpenAlex snapshot for Learn studio R2: representative periods in capacity-expansion models",
+  "source": "OpenAlex works API, filter title_and_abstract.search (titles and abstracts; plain words must all appear)",
+  "source_url": "https://openalex.org/",
+  "license": "OpenAlex data CC0 (https://help.openalex.org/data/licenses); this file CC BY 4.0",
+  "as_of": "2026-11-03",
+  "note": "Counts and citations are as of the run date; OpenAlex adds works every day, so a rerun gives larger numbers. Metadata only: titles, authors, venues and DOIs; no abstracts.",
+  "built_by": "scripts/build_learn_r02_snapshot.py"
+ },
+ "ladder": [
+  {
+   "id": "words",
+   "label": "Plain words",
+   "query": "representative days capacity expansion",
+   "count": 344,
+   "url": "https://api.openalex.org/works?filter=title_and_abstract.search:representative%20days%20capacity%20expansion"
+  },
+  {
+   "id": "phrase",
+   "label": "One quoted phrase",
+   "query": "\"representative days\"",
+   "count": 649,
+   "url": "https://api.openalex.org/works?filter=title_and_abstract.search:%22representative%20days%22"
+  },
+  {
+   "id": "synonyms",
+   "label": "Synonyms joined by OR",
+   "query": "\"representative days\" OR \"representative periods\" OR \"time series aggregation\" OR \"typical days\"",
+   "count": 2191,
+   "url": "https://api.openalex.org/works?filter=title_and_abstract.search:%22representative%20days%22%20OR%20%22representative%20periods%22%20OR%20%22time%20series%20aggregation%22%20OR%20%22typical%20days%22"
+  },
+  {
+   "id": "model",
+   "label": "AND the model block",
+   "query": "(\"representative days\" OR \"representative periods\" OR \"time series aggregation\" OR \"typical days\") AND (\"capacity expansion\" OR \"generation expansion\" OR \"energy system model\" OR \"investment planning\")",
+   "count": 113,
+   "url": "https://api.openalex.org/works?filter=title_and_abstract.search:%28%22representative%20days%22%20OR%20%22representative%20periods%22%20OR%20%22time%20series%20aggregation%22%20OR%20%22typical%20days%22%29%20AND%20%28%22capacity%20expansion%22%20OR%20%22generation%20expansion%22%20OR%20%22energy%20system%20model%22%20OR%20%22investment%20planning%22%29"
+  },
+  {
+   "id": "storage",
+   "label": "AND storage",
+   "query": "(\"representative days\" OR \"representative periods\" OR \"time series aggregation\" OR \"typical days\") AND (\"capacity expansion\" OR \"generation expansion\" OR \"energy system model\" OR \"investment planning\") AND storage",
+   "count": 49,
+   "url": "https://api.openalex.org/works?filter=title_and_abstract.search:%28%22representative%20days%22%20OR%20%22representative%20periods%22%20OR%20%22time%20series%20aggregation%22%20OR%20%22typical%20days%22%29%20AND%20%28%22capacity%20expansion%22%20OR%20%22generation%20expansion%22%20OR%20%22energy%20system%20model%22%20OR%20%22investment%20planning%22%29%20AND%20storage"
+  }
+ ],
+ "targeted": {
+  "id": "extreme-storage",
+  "label": "The empty cell, searched directly",
+  "query": "(\"representative days\" OR \"representative periods\" OR \"time series aggregation\" OR \"typical days\") AND extreme AND storage",
+  "count": 23,
+  "url": "https://api.openalex.org/works?filter=title_and_abstract.search:%28%22representative%20days%22%20OR%20%22representative%20periods%22%20OR%20%22time%20series%20aggregation%22%20OR%20%22typical%20days%22%29%20AND%20extreme%20AND%20storage"
+ },
+ "top": [
+  {
+   "openalex": "W2740319643",
+   "doi": "10.1016/j.renene.2017.10.017",
+   "title": "Impact of different time series aggregation methods on optimal energy system design",
+   "year": 2017,
+   "venue": "Renewable Energy",
+   "authors": [
+    "Leander Kotzur",
+    "Peter Markewitz",
+    "Martin Robinius",
+    "Detlef Stolten"
+   ],
+   "cited_by": 378,
+   "open_access": true
+  },
+  {
+   "openalex": "W2765847801",
+   "doi": "10.1016/j.apenergy.2018.01.023",
+   "title": "Time series aggregation for energy system design: Modeling seasonal storage",
+   "year": 2018,
+   "venue": "Applied Energy",
+   "authors": [
+    "Leander Kotzur",
+    "Peter Markewitz",
+    "Martin Robinius",
+    "Detlef Stolten"
+   ],
+   "cited_by": 308,
+   "open_access": true
+  },
+  {
+   "openalex": "W2965087844",
+   "doi": "10.1016/j.apenergy.2019.113603",
+   "title": "Clustering representative days for power systems generation expansion planning: Capturing the effects of variable renewables and energy storage",
+   "year": 2019,
+   "venue": "Applied Energy",
+   "authors": [
+    "Ian James Scott",
+    "Pedro M. S. Carvalho",
+    "Audun Botterud",
+    "Carlos Silva"
+   ],
+   "cited_by": 127,
+   "open_access": true
+  },
+  {
+   "openalex": "W3216847430",
+   "doi": "10.1016/j.apenergy.2022.119029",
+   "title": "The Pareto-optimal temporal aggregation of energy system models",
+   "year": 2022,
+   "venue": "Applied Energy",
+   "authors": [
+    "Maximilian Hoffmann",
+    "Leander Kotzur",
+    "Detlef Stolten"
+   ],
+   "cited_by": 106,
+   "open_access": true
+  },
+  {
+   "openalex": "W3151525219",
+   "doi": "10.1016/j.apenergy.2021.117825",
+   "title": "Typical periods or typical time steps? A multi-model analysis to determine the optimal temporal aggregation for energy system models",
+   "year": 2021,
+   "venue": "Applied Energy",
+   "authors": [
+    "Maximilian Hoffmann",
+    "Jan Priesmann",
+    "Lars Nolting",
+    "Aaron Praktiknjo",
+    "Leander Kotzur",
+    "Detlef Stolten"
+   ],
+   "cited_by": 80,
+   "open_access": true
+  }
+ ],
+ "found_by": {
+  "model": [
+   "10.1109/tpwrs.2016.2596803",
+   "10.1016/j.renene.2017.10.017",
+   "10.1016/j.apenergy.2018.01.023",
+   "10.1109/tpwrs.2017.2746379",
+   "10.1016/j.energy.2018.08.015",
+   "10.1109/tpwrs.2019.2892619",
+   "10.1016/j.apenergy.2020.115224",
+   "10.1016/j.apenergy.2021.117696",
+   "10.1007/s12667-022-00533-4"
+  ],
+  "storage": [
+   "10.1016/j.renene.2017.10.017",
+   "10.1016/j.apenergy.2018.01.023"
+  ],
+  "targeted": [
+   "10.1016/j.apenergy.2022.120624",
+   "10.1109/powertech55446.2023.10202993",
+   "10.1016/j.epsr.2024.110788"
+  ]
+ },
+ "review": {
+  "openalex": "W3003497120",
+  "doi": "10.3390/en13030641",
+  "title": "A Review on Time Series Aggregation Methods for Energy System Models",
+  "year": 2020,
+  "venue": "Energies",
+  "authors": [
+   "Maximilian Hoffmann",
+   "Leander Kotzur",
+   "Detlef Stolten",
+   "Martin Robinius"
+  ],
+  "cited_by": 229,
+  "open_access": true
+ },
+ "matrix": [
+  {
+   "openalex": "W2506700101",
+   "doi": "10.1109/tpwrs.2016.2596803",
+   "title": "Selecting Representative Days for Capturing the Implications of Integrating Intermittent Renewables in Generation Expansion Planning Problems",
+   "year": 2016,
+   "venue": "IEEE Transactions on Power Systems",
+   "authors": [
+    "Kris Poncelet",
+    "Hanspeter Höschle",
+    "Erik D. Delarue",
+    "Ana Virag",
+    "William Denis D’haeseleer"
+   ],
+   "cited_by": 342,
+   "open_access": true
+  },
+  {
+   "openalex": "W2740319643",
+   "doi": "10.1016/j.renene.2017.10.017",
+   "title": "Impact of different time series aggregation methods on optimal energy system design",
+   "year": 2017,
+   "venue": "Renewable Energy",
+   "authors": [
+    "Leander Kotzur",
+    "Peter Markewitz",
+    "Martin Robinius",
+    "Detlef Stolten"
+   ],
+   "cited_by": 378,
+   "open_access": true
+  },
+  {
+   "openalex": "W2605167157",
+   "doi": "10.1016/j.apenergy.2017.03.051",
+   "title": "Dealing with multiple decades of hourly wind and PV time series in energy models: A comparison of methods to reduce time resolution and the planning implications of inter-annual variability",
+   "year": 2017,
+   "venue": "Applied Energy",
+   "authors": [
+    "Stefan Pfenninger"
+   ],
+   "cited_by": 372,
+   "open_access": true
+  },
+  {
+   "openalex": "W2765847801",
+   "doi": "10.1016/j.apenergy.2018.01.023",
+   "title": "Time series aggregation for energy system design: Modeling seasonal storage",
+   "year": 2018,
+   "venue": "Applied Energy",
+   "authors": [
+    "Leander Kotzur",
+    "Peter Markewitz",
+    "Martin Robinius",
+    "Detlef Stolten"
+   ],
+   "cited_by": 308,
+   "open_access": true
+  },
+  {
+   "openalex": "W2753393992",
+   "doi": "10.1109/tpwrs.2017.2746379",
+   "title": "Hierarchical Clustering to Find Representative Operating Periods for Capacity-Expansion Modeling",
+   "year": 2017,
+   "venue": "IEEE Transactions on Power Systems",
+   "authors": [
+    "Yixian Liu",
+    "Ramteen Sioshansi",
+    "Antonio J. Conejo"
+   ],
+   "cited_by": 142,
+   "open_access": false
+  },
+  {
+   "openalex": "W2754499935",
+   "doi": "10.1109/tpwrs.2018.2819578",
+   "title": "Enhanced Representative Days and System States Modeling for Energy Storage Investment Analysis",
+   "year": 2018,
+   "venue": "IEEE Transactions on Power Systems",
+   "authors": [
+    "Diego  Alejandro Tejada-Arango",
+    "Maya Domeshek",
+    "Sonja Wogrin",
+    "Efraim Centeno"
+   ],
+   "cited_by": 150,
+   "open_access": true
+  },
+  {
+   "openalex": "W2887117961",
+   "doi": "10.1016/j.energy.2018.08.015",
+   "title": "Impact of model resolution on scenario outcomes for electricity sector system expansion",
+   "year": 2018,
+   "venue": "Energy",
+   "authors": [
+    "Dharik Sanchan Mallapragada",
+    "Dimitri J. Papageorgiou",
+    "Aranya Venkatesh",
+    "Cristiana L. Lara",
+    "Ignacio E. Grossmann"
+   ],
+   "cited_by": 67,
+   "open_access": false
+  },
+  {
+   "openalex": "W2912829604",
+   "doi": "10.1016/j.apenergy.2019.02.012",
+   "title": "Clustering methods to find representative periods for the optimization of energy systems: An initial framework and comparison",
+   "year": 2019,
+   "venue": "Applied Energy",
+   "authors": [
+    "Holger Teichgraeber",
+    "Adam R. Brandt"
+   ],
+   "cited_by": 263,
+   "open_access": false
+  },
+  {
+   "openalex": "W2910148935",
+   "doi": "10.1109/tpwrs.2019.2892619",
+   "title": "Data-Driven Representative Day Selection for Investment Decisions: A Cost-Oriented Approach",
+   "year": 2019,
+   "venue": "IEEE Transactions on Power Systems",
+   "authors": [
+    "Mingyang Sun",
+    "Fei Teng",
+    "Xi Zhang",
+    "Goran Štrbac",
+    "Danny Pudjianto"
+   ],
+   "cited_by": 81,
+   "open_access": false
+  },
+  {
+   "openalex": "W3034119211",
+   "doi": "10.1016/j.apenergy.2020.115224",
+   "title": "Improvement of representative days selection in power system planning by incorporating the extreme days of the net load to take account of the variability and intermittency of renewable resources",
+   "year": 2020,
+   "venue": "Applied Energy",
+   "authors": [
+    "Ali Yeganefar",
+    "Mohammad Reza Amin‐Naseri",
+    "Mohammad Kazem Sheikh‐El‐Eslami"
+   ],
+   "cited_by": 54,
+   "open_access": false
+  },
+  {
+   "openalex": "W3199598006",
+   "doi": "10.1016/j.apenergy.2021.117696",
+   "title": "Designing reliable future energy systems by iteratively including extreme periods in time-series aggregation",
+   "year": 2021,
+   "venue": "Applied Energy",
+   "authors": [
+    "Holger Teichgraeber",
+    "Lucas Elias Küpper",
+    "Adam R. Brandt"
+   ],
+   "cited_by": 44,
+   "open_access": false
+  },
+  {
+   "openalex": "W4296196479",
+   "doi": "10.1007/s12667-022-00533-4",
+   "title": "The error induced by using representative periods in capacity expansion models: system cost, total capacity mix and regional capacity mix",
+   "year": 2022,
+   "venue": "Energy Systems",
+   "authors": [
+    "Lina Reichenberg",
+    "Fredrik Hedenus"
+   ],
+   "cited_by": 16,
+   "open_access": true
+  }
+ ],
+ "fillers": [
+  {
+   "openalex": "W4316035733",
+   "doi": "10.1016/j.apenergy.2022.120624",
+   "title": "Reducing climate risk in energy system planning: A posteriori time series aggregation for models with storage",
+   "year": 2023,
+   "venue": "Applied Energy",
+   "authors": [
+    "Adriaan P. Hilbers",
+    "David James Brayshaw",
+    "Axel Gandy"
+   ],
+   "cited_by": 32,
+   "open_access": true
+  },
+  {
+   "openalex": "W4385694985",
+   "doi": "10.1109/powertech55446.2023.10202993",
+   "title": "Capturing Chronology and Extreme Values of Representative Days for Planning of Transmission Lines and Long-Term Energy Storage Systems",
+   "year": 2023,
+   "venue": "IEEE PowerTech Conference",
+   "authors": [
+    "Mojtaba Moradi‐Sepahvand",
+    "Simon H. Tindemans"
+   ],
+   "cited_by": 7,
+   "open_access": true
+  },
+  {
+   "openalex": "W4399992848",
+   "doi": "10.1016/j.epsr.2024.110788",
+   "title": "Representative days and hours with piecewise linear transitions for power system planning",
+   "year": 2024,
+   "venue": "Electric Power Systems Research",
+   "authors": [
+    "Mojtaba Moradi‐Sepahvand",
+    "Simon H. Tindemans"
+   ],
+   "cited_by": 16,
+   "open_access": true
+  }
+ ],
+ "snowball": {
+  "review": "10.3390/en13030641",
+  "references": 196,
+  "cited_by": 229,
+  "backward": [
+   "10.1109/tpwrs.2016.2596803",
+   "10.1016/j.renene.2017.10.017",
+   "10.1016/j.apenergy.2017.03.051",
+   "10.1016/j.apenergy.2018.01.023",
+   "10.1109/tpwrs.2017.2746379",
+   "10.1109/tpwrs.2018.2819578",
+   "10.1016/j.energy.2018.08.015",
+   "10.1016/j.apenergy.2019.02.012",
+   "10.1109/tpwrs.2019.2892619"
+  ],
+  "forward": [
+   "10.1016/j.apenergy.2021.117696"
+  ],
+  "fillers_citing_review": [
+   "10.1016/j.apenergy.2022.120624"
+  ],
+  "backward_url": "https://api.openalex.org/works?filter=cited_by:W3003497120",
+  "forward_url": "https://api.openalex.org/works?filter=cites:W3003497120"
+ }
+}

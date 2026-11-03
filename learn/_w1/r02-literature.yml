@@ -1,0 +1,10 @@
+# Sidecar of research studio R2 (builder g, W2, 2026-11-03): new glossary terms and requests for shared files.
+lesson: r02-literature
+glossary:
+  - {id: snowballing, term: "Snowballing", def: "Finding papers from one you already have: backward through its references, forward through the works that cite it."}
+  - {id: concept-matrix, term: "Concept matrix", def: "A table with papers in rows and ideas in columns, coded by a stated rule, that shows what a literature covers and what it leaves out."}
+  - {id: research-gap, term: "Research gap", def: "A question the literature has not answered, shown with a logged search and the closest prior work, not just asserted."}
+requests:
+  - "Header badge: R2's practice is 240 minutes; build_learn.py prints 'about 240 min practice'. Consider printing hours from 120 minutes up ('about 4 h practice'); R4 has 120."
+  - "Data: assets/learn/data/r02-literature-openalex.json is written by scripts/build_learn_r02_snapshot.py in the ResearchPortfolio folder (new, untracked there). It queries OpenAlex once (about ten requests) and stores a dated snapshot; the page makes no live API call."
+  - "Scope scan: the page links api.openalex.org search addresses (allow-listed host openalex.org) so readers can repeat each search; they open raw JSON."
