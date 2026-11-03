@@ -178,13 +178,13 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 <div class="lx-deeper-body">
 <ul>
 <li>Plant outages and reserve margins: adequacy studies treat them over many weather years (A5, upcoming).</li>
-<li>Start-up costs and minimum run times: on/off decisions make a mixed-integer program (M2, upcoming).</li>
+<li>Start-up costs and minimum run times: on/off decisions make a mixed-integer program (<a href="m02-unit-commitment.html">M2</a>).</li>
 <li>Transmission and regions: the town is one bus with no imports.</li>
 <li>Several years of investment, retirements and residual value: a pathway model (M13, upcoming).</li>
 <li>Uncertainty when building: here the weather is known when the sizes are chosen (M8, upcoming, chooses them before it is known).</li>
 <li>Costs that change with time: every cost is constant within the year modelled.</li>
 </ul>
-<p>Modeler's note: R5 (upcoming) turns these checks into a verification and validation plan, and the Modeler checkpoint CK-M (upcoming) asks you to formulate, solve and verify a model you have not seen.</p>
+<p>Modeler's note: <a href="r05-build-validate.html">R5</a> turns these checks into a verification and validation plan, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen.</p>
 </div>
 </details>
 </div>

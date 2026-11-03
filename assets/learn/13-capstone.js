@@ -486,7 +486,7 @@
     var C = model.costs(cfg, {}), pts = cfg.frontier.points, at200 = pts.filter(function (p) { return p.cap === cfg.game.co2Target; })[0];
     var free = pts.filter(function (p) { return p.cap == null; })[0];
     var log = function () { return LX.store.get("t13-log", null); };
-    var later = "Upcoming: M3 (capacity expansion) writes this model in code and solves it with a modelling language.";
+    var later = "Next: M3 (capacity expansion) writes this model in code, on representative weeks checked against the full year.";
     var cm = LX.ConceptMap(H("div", { class: "lx-xcard" }, host), {
       title: "The planning problem, and how its parts connect", lede: "Tap an idea to see what it means and where it appeared in your plan.",
       groups: { dec: ["Decisions", "var(--lx-tier-3)"], ops: ["Operation", "var(--lx-cc)"], time: ["Time", "var(--lx-tier-2)"], out: ["Results", "var(--lx-good)"] },

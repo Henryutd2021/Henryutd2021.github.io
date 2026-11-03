@@ -1026,7 +1026,7 @@
        ["Clean", "CO₂", "<a href='12-trade-offs.html'>Lesson 12</a> (cost against CO₂); A10, emissions accounting (upcoming)"],
        ["Reliable", "Unserved energy, reserve margin", "<a href='03-balancing.html'>Lesson 3</a> and <a href='06-three-jobs.html'>lesson 6</a>; A5, adequacy (upcoming)"],
        ["Fair", "Who pays", "A4, tariffs, and A13, energy burden (upcoming)"],
-       ["Secure", "Fuel and supply risk", "F2, the whole-system map, and A21, resilience (upcoming)"]].forEach(function (r) {
+       ["Secure", "Fuel and supply risk", "<a href='f02-systems-and-map.html'>F2</a>, the whole-system map, and A21, resilience (upcoming)"]].forEach(function (r) {
         var li = H("li", null, ul); H("b", { text: r[0] }, li); H("span", { class: "a22-sub", text: r[1] }, li); H("span", { html: r[2] }, li);
       });
     }

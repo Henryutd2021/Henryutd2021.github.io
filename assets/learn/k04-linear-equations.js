@@ -342,10 +342,11 @@
   }
 
   // ---- practice drill: a seeded stream of short items with instant feedback (LX.Drill; this visit only). As before the
-  // promotion: focus stays on "Next item", and an empty box counts as a wrong answer.
+  // promotion, focus stays on "Next item"; since the W2 integration an empty box asks for a number (as in K1 to K3)
+  // instead of counting as a wrong answer.
   function drillView(D) {
     var host = document.getElementById("k4-drill"); if (!host) return; host.innerHTML = "";
-    LX.Drill(host, { hint: "Five kinds of item in rotation, new numbers each time. Aim for ten in a row.", focus: false, empty: false,
+    LX.Drill(host, { hint: "Five kinds of item in rotation, new numbers each time. Aim for ten in a row.", focus: false, empty: "Type a number first.",
                      item: function (k, r) { return drillItem(D, k, r); } });
   }
 

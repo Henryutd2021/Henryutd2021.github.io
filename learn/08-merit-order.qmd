@@ -117,7 +117,7 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 <div class="lx-deeper-body">
 <ul>
 <li><a href="m01-dispatch-to-lmp.html">M1</a> (Modeler tier) builds a 24-hour dispatch linear program with ramps, adds a three-bus network, fills a line and reads one price per bus from the solver.</li>
-<li>With on/off decisions and start-up costs (M2, upcoming), the energy price may not cover a running plant's start-up costs; some markets then add side payments, called uplift.</li>
+<li>With on/off decisions and start-up costs (<a href="m02-unit-commitment.html">M2</a>), the energy price may not cover a running plant's start-up costs; some markets then add side payments, called uplift.</li>
 </ul>
 </div>
 </details>

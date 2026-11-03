@@ -140,7 +140,7 @@ $$
 - **Losses.** Here the whole loss sits on charging; many models split it, $\sqrt{0.8}$ each way.
 - **Left out of the goal.** The nuclear plant's \$24,000 for the day is the same in every plan.
 - **Always an answer.** The page's code also allows unserved demand at \$3,000/MWh, so the model always has a solution; on this day none is needed.
-- **Next.** [Lesson 10](10-write-it-down.qmd) writes such a model down and [lesson 11](11-solver.qmd) checks a solver's answer. Lessons A8 (how long should storage last?) and M3 (capacity expansion), both upcoming, choose the battery's size too.
+- **Next.** [Lesson 10](10-write-it-down.qmd) writes such a model down and [lesson 11](11-solver.qmd) checks a solver's answer. [M3](m03-capacity-expansion.qmd) (capacity expansion) chooses the battery's size too, and A8 (how long should storage last?, upcoming) will.
 
 ```{=html}
 </div>

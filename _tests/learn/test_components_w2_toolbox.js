@@ -210,7 +210,7 @@ function drillEnv(opts) {
   const src = id => fs.readFileSync(L(id + ".js"), "utf8");
   ok(/empty: "Type a number first\."/.test(src("k01-units")) && /check: function \(v, it\) \{ return close\(v, it\.answer, it\.tol\); \}/.test(src("k01-units")) && /width: "8\.5em", widthPhone: "6\.5em"/.test(src("k01-units")), "K1: empty message, its own check, wide boxes (6.5em on phones)");
   ["k02-rates-efficiencies", "k03-discounting"].forEach(id => ok(/empty: "Type a number first\."/.test(src(id)) && /it\.unit === "\$" \? "dollars"/.test(src(id)), `${id}: empty message and "dollars"`));
-  ok(/focus: false, empty: false/.test(src("k04-linear-equations")), "K4 (live since W1): focus stays on Next and an empty box counts as wrong, as before");
+  ok(/focus: false, empty: "Type a number first\."/.test(src("k04-linear-equations")), "K4 (live since W1): focus stays on Next, as before; an empty box asks for a number, as in K1 to K3");
   ok(/width: "7em"/.test(src("k05-probability-statistics")) && !/empty:/.test(src("k05-probability-statistics").slice(src("k05-probability-statistics").indexOf("function drillView"))), "K5: 7em boxes; an empty box does nothing, as before");
   ok(/focus: "answer", width: "8em", choicesClass: "k8-choices"/.test(src("k08-git-notebooks")) && /"dollars" : "checks"/.test(src("k08-git-notebooks")), "K8: focus on the new item's first control, 8em box, wrapping choices, units");
   ok(fs.readFileSync(path.join(SITE, "learn/k08-git-notebooks.qmd"), "utf8").indexOf('<div class="lx-card lx-drill"><div class="lx-x-head"><h3>Practice drill</h3></div>') >= 0, "K8: the no-JS drill card uses the shared class");

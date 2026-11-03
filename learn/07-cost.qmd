@@ -130,7 +130,7 @@ A capacity-expansion model can account for these costs directly, instead of comp
 - It charges each kW it builds a yearly $\mathrm{CRF}\cdot C + \mathrm{FOM}$, and every MWh its fuel and upkeep.
 - It chooses what to build and how to run it, hour by hour, in one optimization, so step 8's timing problem is inside the model.
 
-- Capacity expansion with representative days (M3, upcoming in the Modeler tier) uses exactly this yearly charge.
+- Capacity expansion with representative periods ([M3](m03-capacity-expansion.qmd), in the Modeler tier) uses exactly this yearly charge.
 - Techno-economic analysis inside an optimization model (M11, upcoming) adds taxes, credits and a boundary choice.
 - Year-by-year cash flows, NPV, IRR and payback for one project are the Analyst lesson A1 (upcoming).
 
