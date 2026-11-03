@@ -1,0 +1,65 @@
+# Sidecar for F6 (f06-grid-and-outages), builder learn-w3-a (F6 fork), 2026-11-03. Read by scripts/build_learn.py.
+id: f06-grid-and-outages
+lesson: F6
+glossary:
+  - id: voltage
+    term: Voltage
+    def: "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V."
+  - id: electric-current
+    term: Electric current
+    def: "The flow of electric charge through a wire, measured in amperes (A); for the same power, a higher voltage needs less current."
+  - id: transformer
+    term: Transformer
+    def: "A device with two coils that raises or lowers an alternating voltage, such as from 18 kV to 345 kV at a plant or from 12.47 kV to 240/120 V near a home."
+  - id: transmission
+    term: Transmission
+    def: "The high-voltage part of the grid (115 to 765 kV in the U.S.) that carries power over long distances between plants, regions and substations."
+  - id: distribution
+    term: Distribution
+    def: "The lower-voltage part of the grid, from substations along feeders and laterals to homes and businesses."
+  - id: substation
+    term: Substation
+    def: "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start."
+  - id: circuit-breaker
+    term: Circuit breaker
+    def: "A switch that opens by itself when it senses a fault, cutting the power to everything beyond it, and can be closed again."
+  - id: recloser
+    term: Recloser
+    def: "A breaker on a feeder that opens on a fault and tries closing again in seconds, so a passing fault, such as a brushing branch, causes only a blink."
+  - id: fuse
+    term: Fuse
+    def: "A wire that melts on a fault and cuts the power beyond it; a crew must replace it."
+  - id: lateral
+    term: Lateral
+    def: "A side branch of a distribution feeder that serves one street or block, often protected by its own fuse."
+  - id: radial-network
+    term: Radial network
+    def: "A network shaped like a tree, with one path from the source to each customer, as most distribution feeders are."
+  - id: meshed-network
+    term: Meshed network
+    def: "A network with loops, so power can reach a place by more than one path, as transmission networks do."
+  - id: n-minus-one
+    term: N−1
+    def: "A planning rule: the system keeps serving its customers after any one element, such as a line, fails."
+  - id: customer-minutes
+    term: Customer-minutes
+    def: "The number of customers without power times the minutes they wait: 10 homes dark for an hour is 600 customer-minutes."
+  - id: saidi
+    term: SAIDI
+    def: "System Average Interruption Duration Index: the minutes without power the average customer has in a year, customer-minutes divided by customers served."
+  - id: saifi
+    term: SAIFI
+    def: "System Average Interruption Frequency Index: the number of interruptions the average customer has in a year, customers interrupted divided by customers served."
+  - id: caidi
+    term: CAIDI
+    def: "Customer Average Interruption Duration Index: the average minutes to restore one interruption, SAIDI divided by SAIFI."
+  - id: major-event-day
+    term: Major event day
+    def: "A day with so many outage minutes, usually from a big storm, that it passes a threshold set from a utility's past five years (IEEE 1366); reports give reliability with and without them."
+requests:
+  - "path.yml: F7 (f07-microgrids) has no row on this branch, so F6 has no `next:`. Once F7's row exists, add `next: F7` to F6 (F7 lists F6 as a prerequisite)."
+  - "Promote, if wanted: GridNet (assets/learn/f06-grid-and-outages.js, i-network for distribution plus i-hazard): a one-line diagram whose parts are SVG buttons (role button, Enter and Space, aria-pressed) that fail and repair; pure protection logic (outage(): the closest fuse, recloser or breaker upstream of a fault opens; a meshed loop checked for a path to a source); dark homes; a free mode and a storm mode; a text-version table. F7, A9 and A17 could reuse it with their own layouts."
+  - "Promote, if wanted: VoltPath (same file): a plant-to-socket path drawn in two layouts (one row from 560 px, two rows below), a rail of stop buttons with a log-scale voltage staircase, a live detail panel and a text version."
+  - "Shared glossary: voltage, electric-current, transformer, transmission, distribution, substation and circuit-breaker are general terms other lessons (F4, F7, A17) may want; they are defined here once."
+  - "Resolved on learn-w3-a (commit after the F5/F6 merge): F1 now links F6, and teaching.qmd counts 47 lessons live. Later W3 branches change that count again; take the merged total."
+  - "Layout audit (scripts/learn_layout_audit.mjs, F6 at 1280 and 375, light and dark): no clipping, viewport, overlap, tap-target or overflow findings. The remaining contrast findings are the shared LX.ConceptMap's dimmed nodes and edge labels (unselected and unconnected: 1.6:1 to 3.2:1); lessons 2 and 6 show the same, so the fix belongs in components/conceptmap.css. The site chrome's back-to-top button covers the footer's last line at the page bottom (site-wide)."
