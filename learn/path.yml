@@ -489,7 +489,7 @@
   outcome: "Formulate a unit commitment with start-up costs and minimum run times, solve it by branch and bound, and price it with the switches fixed, stating what the prices leave unpaid."
   teaches: [unit commitment, mixed-integer programming, LP relaxation, branch and bound, conditional prices, uplift payments]
   lab: "a SciPy/HiGHS notebook that rebuilds the model, grows the same tree and asserts the browser's numbers, about 45 minutes."
-  does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program has no shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
+  does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program gives no ordinary shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
   after: [M1]
   next: M3
 - kind: lesson
