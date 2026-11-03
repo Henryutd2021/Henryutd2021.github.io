@@ -1302,7 +1302,10 @@
      traces: [{label: "14:00 · the cloud", path: ["start", "q1", "a1", "q2", "a2", "end"], text: "What happened, with numbers."}],
      sel: 1 });
    The chosen trace lights up box by box (all at once under reduced motion); its text is announced. A "Text version"
-   spells out every branch. */
+   spells out every branch.
+   Returns { build(), run(i, quick), update(traces) }. update(traces) changes the traces without redrawing the chart (e.g.
+   a "Your settings" trace that follows the reader's numbers): the buttons take the new labels, and the selected trace
+   shows its new path and text at once. update() with no argument rereads the same list after an in-place change. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S;
@@ -1399,14 +1402,22 @@
       }
       if (quick || LX.reduced()) { while (k < tr.path.length) stepOn(); } else { stepOn(); timer = setInterval(stepOn, 420); }
     }
-    var btns = o.traces.map(function (t, i) {
-      var b = H("button", { class: "lx-choice small", type: "button", "aria-pressed": "false", text: t.label }, trace);
+    function button(t, i) {
+      var b = H("button", { class: "lx-choice small", type: "button", "aria-pressed": i === cur ? "true" : "false", text: t.label }, trace);
       b.addEventListener("click", function () { build(); run(i); });
       return b;
-    });
+    }
+    var btns = o.traces.map(button);
+    function update(traces) {
+      if (traces) o.traces = traces;
+      cur = Math.max(0, Math.min(cur, o.traces.length - 1));
+      if (o.traces.length === btns.length) o.traces.forEach(function (t, i) { btns[i].textContent = t.label; });   // in place: focus stays
+      else { trace.innerHTML = ""; btns = o.traces.map(button); }
+      if (mode) run(cur, true); else btns.forEach(function (b, j) { b.setAttribute("aria-pressed", j === cur ? "true" : "false"); });
+    }
     if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(box)) build(); }).observe(box);
     setTimeout(build, 0);
-    return { build: build, run: run };
+    return { build: build, run: run, update: update };
   };
 })();
 
@@ -4725,7 +4736,8 @@
        { op: "÷ 8,760 h =" }, { v: "74.1 GW", u: "average power", out: true }] });
    uc.set(steps)   redraws the chain (for a slider or a choice that changes a number)
    Steps: { v, u } a value and what it is (unit words); { op } the operation between two values; out: true marks the result.
-   Returns { el (the <ol>), set(steps) }. The chain is an ordered list, so it reads as text; it wraps on phones.
+   Returns { el (the <ol class="lx-uchain">), set(steps) }. The chain is an ordered list, so it reads as text; it wraps on
+   phones. (Not .lx-chain: that class is the causal chain's, causal.js.)
 
    var ck = LX.EvidenceClock(host, { label: "Timeline: ...", marks: [
        { d: 0, label: "Blackout", value: "28 Apr 2025" },
@@ -4743,7 +4755,7 @@
 
   LX.UnitChain = function (host, o) {
     o = o || {};
-    var ol = H("ol", { class: "lx-chain", "aria-label": o.label || "Unit chain" }, host);
+    var ol = H("ol", { class: "lx-uchain", "aria-label": o.label || "Unit chain" }, host);
     function set(steps) {
       ol.innerHTML = "";
       (steps || []).forEach(function (s) {

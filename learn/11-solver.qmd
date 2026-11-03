@@ -82,7 +82,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · inside the solver</span>Peek inside: the simplex method walks the corners</summary>
 <div class="lx-deeper-body">
-<p>Lesson 10's hour again. The <span class="lx-term" data-term="simplex-method">simplex method</span> starts at a corner and moves along an edge to a cheaper neighbouring corner, again and again, until no neighbour is cheaper. In a linear program that corner is the best plan overall.</p>
+<p>Lesson 10's hour again. The <span class="lx-term" data-term="simplex-method">simplex method</span> starts at a corner and moves along an edge to a neighbouring corner that is never worse, again and again, until no neighbour is cheaper. In a linear program that corner is the best plan overall. On this hour every move is cheaper.</p>
 <div id="w11-peek" class="lx-guard"><p class="lx-hint">With JavaScript on, step through the walk here.</p></div>
 </div>
 </details>

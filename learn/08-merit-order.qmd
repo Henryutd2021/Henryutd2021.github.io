@@ -215,7 +215,7 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>West Texas, as EIA reported it (<a href="https://www.eia.gov/todayinenergy/detail.php?id=16831">June 2014</a>):</p>
-<ol style="font-size:14.5px;color:var(--lx-ink-2);margin:0 0 8px;padding-left:1.3rem">
+<ol>
 <li>Wind farms far from the cities filled the lines out of the region: the grid was <span class="lx-term" data-term="congestion">congested</span>.</li>
 <li>Local prices fell below zero, and wind was curtailed.</li>
 <li>A major grid expansion added more than 3,500 miles of lines by the end of 2013.</li>

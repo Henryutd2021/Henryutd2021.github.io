@@ -55,7 +55,7 @@
  },
  "binding-constraint": {
   "term": "Binding constraint",
-  "short": "A rule that the best plan meets exactly, with no slack left.",
+  "short": "A rule that holds exactly at the selected plan, with no room to spare; loosening it may or may not improve the best cost.",
   "lesson": 10,
   "href": "10-write-it-down.html"
  },

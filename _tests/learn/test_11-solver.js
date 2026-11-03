@@ -185,6 +185,11 @@ const sum = a => a.reduce((x, y) => x + y, 0);
     [["page", Q], ["js", JS]].forEach(([k, txt]) => ok(!/spill(ed|s|ing)? (sun|solar)|of sun|sun is spilled|Spilled sun/i.test(txt), `${k}: curtailment is named as wind and solar, never spilled sun`));
     ok(!/no (single )?slope/i.test(Q + JS) && /conditional on that commitment/.test(Q) && /returns no (ordinary )?(LP )?shadow prices/.test(Q), "page: a mixed-integer solve returns no shadow prices; prices conditional on the commitment");
     ok(/July 2017/.test(Q), "page: the 5-minute dispatch fact is dated (EIA, July 2017)");
+    // the simplex method in general: a move is never worse (a degenerate pivot can keep the cost); this hour's walk is
+    // strictly downhill, which is what the step-through text ("to a cheaper neighbour") says
+    ok(!/to a cheaper neighbouring corner/.test(Q) && /moves along an edge to a neighbouring corner that is never worse/.test(Q) && /On this hour every move is cheaper\./.test(Q),
+       "page: the simplex method's moves are never worse (not always cheaper); this hour's are cheaper");
+    ok(/var sol = LX\.lp2\.solve\(m10\), walk = LX\.lp2\.simplexWalk\(m10\)/.test(JS) && /to a cheaper neighbour\. /.test(JS), "peek: the step-through walks lesson 10's hour (its steps are tested downhill in test_10)");
     // every symbol button of the equation card has its words (a source check of the explain layer)
     const symIds = [...JS.matchAll(/sym\("(\w+)"/g)].map(m => m[1]), defs = new Set([...JS.matchAll(/^ {10}(\w+): \{ name: /gm)].map(m => m[1]));
     ok(symIds.length >= 15 && symIds.every(k => defs.has(k)), `equation card: all ${new Set(symIds).size} symbols have words (${symIds.filter(k => !defs.has(k))})`);

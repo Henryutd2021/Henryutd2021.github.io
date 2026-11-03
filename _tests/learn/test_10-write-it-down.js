@@ -113,6 +113,14 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
   ok(dark.status === "optimal" && dark.x === 0 && dark.y === 0, "no demand rule: the cheapest plan makes nothing");
   ok(D.ranges.cost[0] < 0, "cost slider reaches below $0");
   ok(M.fixedCost(town, 1) === 1000 && M.fixedCost(town, 24) === 24000 && day.startCC === 115 && day.startCC === W0.game.startCC, "constants: the fixed-output plant's $1,000 an hour ($24,000 a day); the combined-cycle starts at 115 MW");
+  // the explain layer's ramp rule states where it starts (p_cc(-1) = day.startCC, 115 MW): in words, in symbols, read aloud
+  const SRC = fs.readFileSync(L("10-write-it-down.js"), "utf8");
+  ok(/c0 = day\.startCC\b/.test(SRC) && /"The combined-cycle changes at most " \+ f\.cc\.ramp \+ " MW from the hour before \(" \+ c0 \+ " MW before midnight\)\."/.test(SRC),
+     "explain: the Rules list gives the ramp's starting value (" + day.startCC + " MW before midnight)");
+  ok(/sym\("p0", "<var>p<\/var><sub>cc<\/sub>\(−1\) = " \+ c0\)/.test(SRC) && /p0: \{ name: "p_cc\(−1\) = " \+ c0, label: "p cc of minus 1 equals " \+ c0, words: "[^"]*" \+ c0 \+ " MW: given/.test(SRC),
+     "explain: the ramp row shows p_cc(−1) = " + day.startCC + " as a symbol, with words (and so in the text version)");
+  ok(/say: "Ramp limit, every hour: [^"]*" \+ f\.cc\.ramp \+ " MW, up or down\. In the hour before midnight it ran at " \+ c0 \+ " MW\."/.test(SRC),
+     "explain: the ramp row's spoken text (text version) gives the starting value");
   const lv = D.level0; ok(lv > s.cost && lv <= D.ranges.level[1], "cost line starts above the best cost");
   ok(M.check(p, { x: D.dot[0], y: D.dot[1] }).ok === false, "the plan dot starts outside the region (so the reader moves it in)");
 

@@ -121,7 +121,7 @@ has("1,045 generating units had 4,124 outages"); has("58% were gas-fired, 27% wi
 ok(/"No controls \(inertia and load relief\)"/.test(JS) && !/Inertia only \(nothing else acts\)/.test(JS), "chart: the no-controls trace is labelled with its load relief");
 has("No controls (inertia and load relief)");
 ok(/gov = S_\.gov && S_\.stage >= 3/.test(JS) && /ffr = S_\.ffr && S_\.stage === 6/.test(JS), "cards: a card shows only the controls introduced so far");
-ok(/LX\.on\("l3-change", function \(\) \{\s*mineTrace\(\);/.test(JS), "explain: the 'Your settings' trace follows changes");
+ok(/LX\.on\("l3-change", function \(\) \{\s*mineTrace\(\); fc\.update\(traces\);/.test(JS) && !/lx-ftrace button/.test(JS), "explain: the 'Your settings' trace follows changes (LX.Flowchart's update)");
 ok(/label: "Typical time scale"/.test(JS) && /The layers overlap/.test(JS), "explain: time scales overlap, not a relay race");
 // every glossary mark on the page and in the script names a known term (glossary.yml or a sidecar)
 const GIDS = new Set();

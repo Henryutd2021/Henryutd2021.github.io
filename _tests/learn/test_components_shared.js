@@ -6,8 +6,12 @@
 //   - sheet.js (LX.Sheet): "Fill down" follows the selected cell after Enter and after set(), not only after a move
 //   - cards.js (LX.StepCards): api.busy(on) holds Next shut while a solve runs (and marks the card aria-busy); a late call
 //     from a card no longer shown changes nothing; M1 step 8 uses it instead of reaching into the card's buttons
-//   - frontier.js, plot.css, equation.css: the default shade label, the model-lab stage's single shrinkable column, and a
-//     dense row's note on its own line (equation.js's units in the text version are tested in test_components_d.js)
+//   - unitchain.js/.css (LX.UnitChain) is .lx-uchain, so a page with a causal chain (.lx-chain, chains.css) keeps both
+//     layouts (the bundle's rules cascaded onto stub elements)
+//   - flowchart.js (LX.Flowchart): update(traces) changes the traces without redrawing; lesson 3 uses it
+//   - frontier.js, plot.css, equation.css, base.css: the default shade label, the model-lab stage's single shrinkable
+//     column, a dense row's note on its own line, and .lx-real ol styled as the sources list (lesson 8 drops its inline
+//     style); equation.js's units in the text version are tested in test_components_d.js
 // Usage (from the site folder):  node _tests/learn/test_components_shared.js
 "use strict";
 const fs = require("fs");
@@ -105,6 +109,7 @@ function env() {
 }
 function load(name, E) {
   const ctx = { window: E.window, document: E.document, location: { hash: "" }, performance: E.window.performance, navigator: {}, setTimeout: () => 0,
+    setInterval: () => 0, clearInterval: () => {},
     console, module: { exports: {} } };
   vm.runInNewContext(fs.readFileSync(L("components/" + name + ".js"), "utf8"), ctx);
   return ctx.module.exports;
@@ -224,7 +229,88 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
   cards.go(0); ok(!next().disabled && busyAttr() === null, "cards: going back, a done step is open and not busy");
 })();
 
-// ---------------------------------------------------------------- M1 step 8, frontier, plot.css, equation.css (source)
+// ---------------------------------------------------------------- a causal chain and a unit chain on one page
+// The bundle's top-level rules (no @media) are cascaded onto the stub elements: highest specificity, then the last rule.
+// Selectors the stub cannot match (pseudo-classes, child combinators) count as not matching.
+function cssRules(text) {
+  const out = []; text = text.replace(/\/\*[\s\S]*?\*\//g, "");
+  let i = 0, order = 0;
+  while (i < text.length) {
+    const open = text.indexOf("{", i); if (open < 0) break;
+    const head = text.slice(i, open).trim();
+    if (head.charAt(0) === "@") {   // skip the whole at-rule block
+      let d = 1, j = open + 1; while (j < text.length && d) { if (text[j] === "{") d++; else if (text[j] === "}") d--; j++; }
+      i = j; continue;
+    }
+    const close = text.indexOf("}", open), decl = {};
+    text.slice(open + 1, close).split(";").forEach(x => { const k = x.indexOf(":"); if (k > 0) decl[x.slice(0, k).trim()] = x.slice(k + 1).trim(); });
+    head.split(",").forEach(sel => out.push({ sel: sel.trim(), decl, order: order++ }));
+    i = close + 1;
+  }
+  return out;
+}
+function spec(sel) { const c = (sel.match(/[.#[]/g) || []).length, t = sel.split(/\s+/).filter(p => /^[a-z]/i.test(p)).length; return c * 100 + t; }
+function computed(rules, el, prop) {
+  let best = null;
+  rules.forEach(r => {
+    if (!(prop in r.decl)) return;
+    let hit = false; try { hit = el.matchChain(r.sel.split(/\s+/)); } catch (e) { hit = false; }
+    if (hit && (!best || spec(r.sel) > spec(best.sel) || (spec(r.sel) === spec(best.sel) && r.order > best.order))) best = r;
+  });
+  return best ? best.decl[prop] : null;
+}
+function twoChains(cssText) {
+  const E = env(); load("causal", E); load("unitchain", E);
+  const host = E.LX.H("div", null, E.body);
+  E.LX.CausalChain(E.LX.H("div", null, host), { title: "Cause and effect", links: [{ title: "Clouds", text: "Less sun.", value: "149 → 112 MW" }, { title: "Gas", text: "More gas." }, { title: "Price", text: "Up." }] });
+  E.LX.UnitChain(E.LX.H("div", null, host), { steps: [{ v: "649 TWh", u: "a year" }, { op: "÷ 8,760 h =" }, { v: "74.1 GW", u: "average power", out: true }] });
+  const R = cssRules(cssText), lists = host.querySelectorAll("ol"), cl = lists[0].children[0], ul = lists[1].children[0];
+  return { lists, R, causal: { display: computed(R, lists[0], "display"), cols: computed(R, lists[0], "grid-template-columns"), liPad: computed(R, cl, "padding"), liRad: computed(R, cl, "border-radius") },
+    unit: { display: computed(R, lists[1], "display"), liPad: computed(R, ul, "padding"), liRad: computed(R, ul, "border-radius") } };
+}
+(function () {
+  const bundleCss = fs.readFileSync(L("learn.css"), "utf8"), two = twoChains(bundleCss);
+  ok(two.lists.length === 2 && two.lists[0].className === "lx-chain" && two.lists[1].className === "lx-uchain", "chains: the causal chain is ol.lx-chain, the unit chain ol.lx-uchain");
+  ok(two.causal.display === "grid" && /^repeat\(var\(--n/.test(two.causal.cols) && two.causal.liPad === "12px 14px 12px 12px" && two.causal.liRad === "12px",
+     "chains: with both on one page, the causal chain keeps its grid and its step boxes (learn.css)");
+  ok(two.unit.display === "flex" && two.unit.liPad === "7px 10px" && two.unit.liRad === "10px", "chains: and the unit chain keeps its wrapping row of value boxes");
+  // the same harness on the bundle as it was (unit chain on .lx-chain) shows the clash it guards against
+  const old = twoChains(bundleCss.replace(/\.lx-uchain/g, ".lx-chain"));
+  ok(old.causal.display === "flex" && old.causal.liPad === "7px 10px", "chains: the harness detects the old clash (both on .lx-chain: the causal chain turns into a row)");
+  const unitCss = fs.readFileSync(L("components/unitchain.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  ok(!/\.lx-chain\b/.test(unitCss) && !/\.lx-uchain\b/.test(fs.readFileSync(L("components/chains.css"), "utf8")), "chains: unitchain.css and chains.css style separate classes");
+})();
+
+// ---------------------------------------------------------------- flowchart: update(traces)
+(function () {
+  const E = env(); load("flowchart", E);
+  const host = E.LX.H("div", null, E.body);
+  const o = { title: "Flow", nodes: { a: { t: "Start", k: "end" }, q: { t: "Short?", k: "q" }, b: { t: "Turn up" }, c: { t: "Hold" } },
+    at: { a: [1, 0], q: [1, 1], b: [0, 2], c: [2, 2] }, edges: [["a", "q"], ["q", "b", "yes"], ["q", "c", "no"]],
+    traces: [{ label: "Yours", path: ["a", "q", "b"], text: "**Yours:** short." }, { label: "Calm", path: ["a", "q", "c"], text: "Calm." }] };
+  const fc = E.LX.Flowchart(host, o);
+  ok(typeof fc.update === "function", "flowchart: returns update()");
+  const btn = () => host.querySelectorAll(".lx-ftrace button"), out = host.querySelector("p.lx-ftrace-out");
+  const lit = () => host.querySelectorAll("g.fnode").filter(g => g.classList.contains("on")).map(g => g.textContent).join(",");
+  fc.update([{ label: "Yours", path: ["a", "q", "c"], text: "Before drawing." }, o.traces[1]]);   // before the chart is drawn: no error
+  ok(btn()[0].getAttribute("aria-pressed") === "true" && out.innerHTML === "", "flowchart: update() before the first draw only marks the selected button");
+  fc.build();
+  ok(lit() === "Start,Short?,Hold" && out.innerHTML === "Before drawing.", "flowchart: the first draw shows the updated selected trace");
+  const first = btn()[0];
+  fc.update([{ label: "Your settings", path: ["a", "q", "b"], text: "**Yours:** now short." }, { label: "Calm", path: ["a", "q", "c"], text: "Calm." }]);
+  ok(btn()[0] === first && first.textContent === "Your settings" && lit() === "Start,Short?,Turn up" && out.innerHTML === "<b>Yours:</b> now short.",
+     "flowchart: update() relabels the buttons in place and shows the selected trace's new path and text at once");
+  const svg = host.querySelector(".lx-flow svg");
+  fc.run(1, true); o.traces = null;
+  fc.update([{ label: "A", path: ["a"], text: "A." }, { label: "B", path: ["a", "q", "b"], text: "B." }, { label: "C", path: ["a", "q", "c"], text: "C." }]);
+  ok(btn().length === 3 && btn()[1].getAttribute("aria-pressed") === "true" && lit() === "Start,Short?,Turn up" && out.innerHTML === "B." && host.querySelector(".lx-flow svg") === svg,
+     "flowchart: a longer list rebuilds the buttons, keeps the selection, and does not redraw the chart");
+  fc.update([{ label: "Only", path: ["a"], text: "Only." }]);
+  ok(btn().length === 1 && btn()[0].getAttribute("aria-pressed") === "true" && out.innerHTML === "Only.", "flowchart: a shorter list moves the selection to the last trace");
+  btn()[0].click(); ok(out.innerHTML === "Only.", "flowchart: rebuilt buttons still run their trace");
+})();
+
+// ---------------------------------------------------------------- M1 step 8, frontier, plot.css, equation.css, base.css (source)
 const m1 = fs.readFileSync(L("m01-dispatch-to-lmp.js"), "utf8");
 const s8 = m1.slice(m1.indexOf("// 8 tighten the line"), m1.indexOf("// 9 explain a bus price"));
 ok(/api\.busy\(true\)/.test(s8) && /api\.busy\(false\)/.test(s8) && !/lx-step-foot|nx\.disabled|function busy\(/.test(s8), "M1 step 8: Next waits through api.busy, not through the card's buttons");
@@ -236,6 +322,11 @@ ok(/\.lx-stage \{ display: grid; grid-template-columns: minmax\(0, 1fr\);/.test(
    "plot.css: the model-lab stage has one shrinkable column (in the bundle too)");
 ok(/\.lx-eq\.dense \.lx-eq-row \.note \{ display: block; white-space: normal;/.test(css("equation.css")) && bundleCss.indexOf(".lx-eq.dense .lx-eq-row .note { display: block;") >= 0,
    "equation.css: a dense row's note sits on its own line and wraps (in the bundle too)");
+
+const baseCss = css("base.css"), lx8 = fs.readFileSync(path.join(SITE, "learn/08-merit-order.qmd"), "utf8");
+ok(/\.lx-sources ul, \.lx-real ol \{ margin: 6px 0 0; padding-left: 1\.1rem;/.test(baseCss) && /\.lx-sources li, \.lx-real ol > li \{ margin: 4px 0; \}/.test(baseCss) &&
+   /\.lx-real p:not\(\.lx-eyebrow\), \.lx-sources ul, \.lx-real ol \{ font-size: 14\.5px;/.test(baseCss), "base.css: a list in an In-the-real-world card is styled as the sources list");
+ok(!/<ol style=/.test(lx8) && /<div class="lx-card lx-real">[\s\S]*?<ol>/.test(lx8), "lesson 8: its real-world list has no inline style");
 
 console.log(`components (shared fixes): ${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

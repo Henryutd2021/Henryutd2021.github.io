@@ -136,8 +136,9 @@ LX.StepCards(host, { steps: [{ text: "One or two sentences.", build: function (a
 ```
 
 "Next" waits for `api.done()`. Use `free: true` for a card without an action. `api.saw(text)` takes glossary marks and
-`**bold**`. The returned object has `go(i)` (clamped), `index()` and `count`. On phones the progress dots shrink so
-"Step 8 of 10" stays on one line.
+`**bold**`. `api.busy(true)` holds Next shut while a solve runs (the card is `aria-busy`), even after `api.done()`;
+`api.busy(false)` releases it (M1 step 8). A late call from a card that is no longer shown changes nothing. The returned
+object has `go(i)` (clamped), `index()` and `count`. On phones the progress dots shrink so "Step 8 of 10" stays on one line.
 
 **Coach tour** (`coach.js`)
 
@@ -214,7 +215,9 @@ LX.Flowchart(host, {title, lede, nodes: {k: {t, tN, s, sN, k: "q"|"end"}}, at, a
   edges: [[a, b, label, {v, d, dN, l, lN}]], traces: [{label, path: [...], text}], sel});
 ```
 
-Routing is automatic; give a hand-made path only for a crossing.
+Routing is automatic; give a hand-made path only for a crossing. Returns `{ build, run(i, quick), update(traces) }`:
+`update` changes the traces without redrawing (relabelled buttons; the selected trace shows its new path and text at
+once), e.g. lesson 3's "Your settings" trace.
 
 **Comparison table** (`table.js`)
 
@@ -291,7 +294,7 @@ These components began as lesson-local code in wave W1 and replace every copy. T
 (`W1_PROMOTED` in `scripts/build_learn.py`); Node tests: `_tests/learn/test_components_{a,b,c,d,e}.js`.
 
 **Model-lab stage** (`plot.css`, markup only): `.lx-stage` (a card) with `.lx-stage-head` (an `h3` and `.lx-readouts`),
-`.lx-ctls` (a grid of sliders), `.lx-stage-status` and `.lx-goals` / `.lx-goal.won`. Lessons 10 and 11.
+`.lx-ctls` (a grid of sliders), `.lx-stage-status` and `.lx-goals` / `.lx-goal.won`. Lessons 10 and 11. Its one column shrinks, so a wide text-version table scrolls inside its box.
 
 #### Charts
 
@@ -372,7 +375,7 @@ var res = ch.draw(blocks /* [{key, mw, offer}], cheapest first */, demandMW, { x
 - The legend and text version follow the step's controls (`later: false` puts them right under the chart); `noLegend: true` hides the legend.
 - Replaces lesson 8's `StackChart` (steps 1 to 7). Candidates: A3, M1.
 
-**Cost and CO₂ frontier** (`frontier.js`): the cheapest plan at each CO₂ level as a line over an "out of reach" shade, labelled plan dots, and an equal-score line for a carbon price.
+**Cost and CO₂ frontier** (`frontier.js`): the cheapest plan at each CO₂ level as a line over an "out of reach (approximately)" shade (straight lines join the solved points), labelled plan dots, and an equal-score line for a carbon price.
 
 ```js
 var fc = LX.Frontier(host, { label: "Six plans for Prairie Town, cost against CO₂" });
@@ -491,7 +494,8 @@ var sym = LX.EquationCard.sym;   // html rows: { html: "min " + sym("c", "40") +
 
 - A part is a string (an operator or word), `{k}` (a symbol button), `{html}` or `{frac: [num, den]}`; or the row is `html` with `<button data-s>` symbols.
 - `fields` lists the lines under the words (default: you, story, code). `label: null` shows the value bold with no label; `alt` copies a line into the text version.
-- `dense: true` is a formula box with dotted-underlined symbols (long models); the default is large symbol buttons. `aside: true` puts the panel beside the equation on wide cards.
+- `dense: true` is a formula box with dotted-underlined symbols (long models); the default is large symbol buttons. `aside: true` puts the panel beside the equation on wide cards. A dense row's `note` sits on its own line under the formula.
+- A symbol's `unit` follows its name in the panel heading and in the text version: "Capacity factor (%)".
 - Used by lessons 5 (capacity factor), 7 (LCOE, a fraction), 10 and 11 (dense model and price), B1 (cᵀx, Ax ≤ b) and B3 (the balance row).
 
 **Formulate box** (`formulate.js`): "Formulate it", a model's parts in words, with the symbols on request (e-formulate).
@@ -581,7 +585,7 @@ LX.EvidenceClock(host, { label: "Timeline: ...", marks: [{ d: 0, label: "Blackou
   { d: 1, label: "One-cause claim", value: "within a day", warn: true, anchor: "start", dx: 4 }, { d: 326, label: "Final report", value: "326 days" }] });
 ```
 
-- The chain is an ordered list (it reads as text and wraps on phones); the clock is an SVG with a label and a "Text version of the timeline".
+- The chain is an ordered list, `ol.lx-uchain` (it reads as text and wraps on phones); `.lx-chain` is the causal chain's class, and both can sit on one page. The clock is an SVG with a label and a "Text version of the timeline".
 - Replaces N1's envelope checks (steps 3, 5) and its evidence clock (step 7).
 
 **Checkpoint** (`checkpoint.js`): the checkpoint runner for CK-F, and next for CK-A, CK-M and CK-R. One task at a time; a clock that runs only while the task is on screen and the tab is visible; first-try recording; five task kinds (choice, order, number with a unit, open-short, estimate); a rubric self-rating read from the page's rubric table; a results view; a plain-text summary to copy (clipboard, else select-and-copy).
@@ -594,7 +598,8 @@ cp.show(0); cp.results();   // for the lesson's LX.demo states
 ```
 
 - Data: `version`, `rule` ({auto, autoProficient, autoStrong, autoDeveloping (default 3), criteria, levels}) and `tasks` (fields per kind in the header comment).
-- In the page, mark the worked-solution block `class="lx-ck-gated"` (shut with JavaScript until the estimate is submitted, open without it) and the lock box `class="lx-ck-lock"`; rubric rows are `<tr data-c="criterion">`.
+- In the page, mark the worked-solution block `class="lx-ck-gated"` (shut with JavaScript until the estimate is submitted or opened early, open without it; "Start again" shuts it again) and the lock box `class="lx-ck-lock"`; rubric rows are `<tr data-c="criterion">`.
+- An estimate needs a high above its low (one number is not submitted, and the reader is told why). Solutions, points and choice feedback take `[[glossary-id|words]]` marks.
 - Keep `key` and the summary format fixed once testers use a checkpoint: summaries are compared across versions. The summary's first line is "Learn · <code> results (<version>)".
 - Pure (Node: `require("components/checkpoint.js")`): `task`, `checkChoice`, `checkOrder`, `checkNumeric`, `checkEstimate`, `level`, `summary(D, st, env, {code})`, `fmtMs`, `firstWord`. `checks`, `level` and `summary` options replace them for a checkpoint with other units or another rule.
 - Replaces the runner in `ck-f-estimate.js`, which now holds only CK-F's configuration, its two charts, `worked()` and the mount.
@@ -610,9 +615,11 @@ sh.set("E5", "=B5-C5-D5-E1"); sh.select("E5"); sh.fill();
 
 - Engine: numbers, + − × ÷ ^ (as Excel: −2^2 = 4), addresses with $, ranges, SUM, AVERAGE, MIN, MAX, COUNT, ABS, ROUND; errors #DIV/0!, #VALUE!, #NAME?, #REF!, #CYCLE!.
 - Pure engine (Node: `require("components/sheet.js")`; page: `LX.Sheet.engine`): `tokenize`, `parse`, `value(sheet, name)`, `changed(sheet)`, `shift(raw, rows, cols)`, `refsIn`, `colName`, `colNum`, `isErr`, `show`.
+- "Fill down" follows the selected cell: it turns on as soon as a formula is entered there (Enter or `set()`), and off for a value.
 - Replaces K7's engine and SheetView (K7 keeps its day, layout, steps and practice tasks). B2 or T7 can use it for an in-page sheet.
 
 Tests: `node _tests/learn/test_components_e.js` (each file defines its `LX.<Name>` with a stub `window.LX`; the pure parts; no lesson keeps a copy).
+The shared fixes after the W1 reviews (checkpoint solution lock and ranges, fill-down state, `api.busy`, `Flowchart.update`, the unit chain's class) run on a stub document in `node _tests/learn/test_components_shared.js`.
 
 **Faded practice** (`practice.js`, `practice.css`): sets of exercises that fade from a worked example to a blank page, with
 two or three staged hints and an automatic check with a one-line reason.
