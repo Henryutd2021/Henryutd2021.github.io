@@ -40,20 +40,21 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive lx-cards" data-learn="storage" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/09-storage.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">9 June 2025 in Prairie Town: the price of one more MWh, and the best battery schedule</p>
+<p class="lx-eyebrow">9 June 2025 in Prairie Town: the price of one more MWh in each hour, and the best battery schedule</p>
 <!-- fallback-svg:start -->
 <svg viewBox="0 0 720 300" role="img" aria-labelledby="w9-static-title">
-<title id="w9-static-title">9 June 2025: one more MWh costs $0 from 08:00 to 16:00 (sun spilled), $100 from 20:00 to 22:00 (peaker) and $40 otherwise. The best schedule fills the 100 MWh battery with spilled sun by 16:00 and empties it in the evening, saving the town $7,240.</title>
+<title id="w9-static-title">9 June 2025, hour by hour: one more MWh costs $0 from 08:00 to 17:00 (sun spilled; shaded, no bar), $100 from 20:00 to 23:00 (peaker) and $40 otherwise. The best schedule fills the 100 MWh battery with spilled sun by 17:00 and empties it in the evening, saving the town $7,240.</title>
 <g><line x1="46" x2="674" y1="270.0" y2="270.0" stroke="var(--lx-line)"/><text x="40" y="274.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">$0</text><text x="680" y="274.0" font-size="13" fill="var(--lx-good)">0</text><line x1="46" x2="674" y1="142.0" y2="142.0" stroke="var(--lx-line)"/><text x="40" y="146.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">$50</text><text x="680" y="146.0" font-size="13" fill="var(--lx-good)">50</text><line x1="46" x2="674" y1="14.0" y2="14.0" stroke="var(--lx-line)"/><text x="40" y="18.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">$100</text><text x="680" y="18.0" font-size="13" fill="var(--lx-good)">100</text><text x="46.0" y="292" text-anchor="start" font-size="13" fill="var(--lx-ink-3)">00:00</text><text x="203.0" y="292" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">06:00</text><text x="360.0" y="292" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">12:00</text><text x="517.0" y="292" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">18:00</text><text x="674.0" y="292" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">24:00</text></g>
-<g><rect x="47.0" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="73.2" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="99.3" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="125.5" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="151.7" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="177.8" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="204.0" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="230.2" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="256.3" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="282.5" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="308.7" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="334.8" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="361.0" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="387.2" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="413.3" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="439.5" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="465.7" y="264.9" width="24.2" height="5.1" fill="var(--lx-solar)" opacity="0.75"/><rect x="491.8" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="518.0" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="544.2" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="570.3" y="14.0" width="24.2" height="256.0" fill="var(--lx-pk)" opacity="0.75"/><rect x="596.5" y="14.0" width="24.2" height="256.0" fill="var(--lx-pk)" opacity="0.75"/><rect x="622.7" y="14.0" width="24.2" height="256.0" fill="var(--lx-pk)" opacity="0.75"/><rect x="648.8" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/></g>
+<g><rect x="47.0" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="73.2" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="99.3" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="125.5" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="151.7" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="177.8" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="204.0" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="230.2" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="255.3" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="281.5" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="307.7" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="333.8" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="360.0" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="386.2" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="412.3" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="438.5" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="464.7" y="14" width="26.2" height="256" fill="var(--lx-solar)" opacity="0.18"/><rect x="491.8" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="518.0" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="544.2" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/><rect x="570.3" y="14.0" width="24.2" height="256.0" fill="var(--lx-pk)" opacity="0.75"/><rect x="596.5" y="14.0" width="24.2" height="256.0" fill="var(--lx-pk)" opacity="0.75"/><rect x="622.7" y="14.0" width="24.2" height="256.0" fill="var(--lx-pk)" opacity="0.75"/><rect x="648.8" y="167.6" width="24.2" height="102.4" fill="var(--lx-cc)" opacity="0.75"/></g>
 <polyline points="46.0,270.0 72.2,270.0 98.3,270.0 124.5,270.0 150.7,270.0 176.8,270.0 203.0,270.0 229.2,270.0 255.3,270.0 281.5,270.0 307.7,263.9 333.8,237.2 360.0,198.3 386.2,149.2 412.3,106.2 438.5,55.0 464.7,26.3 490.8,14.0 517.0,14.0 543.2,14.0 569.3,78.0 595.5,142.0 621.7,206.0 647.8,270.0 674.0,270.0" fill="none" stroke="var(--lx-good)" stroke-width="3"/>
 </svg>
-<div class="lx-legend" aria-hidden="true"><span><i style="--c:var(--lx-solar)"></i>$0: sun spilled</span><span><i style="--c:var(--lx-cc)"></i>$40: combined-cycle</span><span><i style="--c:var(--lx-pk)"></i>$100: peaker</span><span><i style="--c:var(--lx-good)"></i>Best schedule: MWh stored (right scale)</span></div>
+<div class="lx-legend" aria-hidden="true"><span><i style="--c:var(--lx-solar);opacity:.35"></i>$0: sun spilled (shaded hours)</span><span><i style="--c:var(--lx-cc)"></i>$40: combined-cycle</span><span><i style="--c:var(--lx-pk)"></i>$100: peaker</span><span><i style="--c:var(--lx-good)"></i>Best schedule: MWh stored (right scale)</span></div>
 <!-- fallback-svg:end -->
 <p class="lx-hint">With JavaScript on, you schedule the battery yourself, then ask a solver for the best schedule.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 9 June 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town as in <a href="00-grid-operator.html">lesson 0</a>. Prairie Town, its plants, prices and battery are illustrative. The nuclear plant runs flat, and this lesson leaves out the combined-cycle's ramp limit.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real shapes.</b> Demand, wind and solar follow the hourly shapes of 9 June 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town as in <a href="00-grid-operator.html">lesson 0</a>.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative.</b> Prairie Town, its plants, prices and battery. The nuclear plant runs flat; this lesson leaves out the combined-cycle's ramp limit.</span></p>
 ```
 :::
 
@@ -70,7 +71,20 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Round-trip efficiency</dt><dd>This battery returns 80% of what goes in; the rest becomes heat.</dd>
 <dt>State of charge</dt><dd>The energy stored at the end of each hour; it links each hour to the next.</dd>
 <dt>Value</dt><dd>The battery's value is what it saves the town: $7,240 on this day with the best schedule.</dd>
+<dt>Decisions</dt><dd>For each hour: how much the battery charges and discharges, and how much it then holds.</dd>
+<dt>Goal</dt><dd>The lowest running cost for the town's day.</dd>
+<dt>Rules</dt><dd>At most 25 MW in or out; 0 to 100 MWh stored; 80% of what goes in is stored; supply equals demand every hour.</dd>
 </dl>
+<table class="lx-facts">
+<caption>Four 25 MW batteries on 9 June 2025, each with its best schedule</caption>
+<thead><tr><th scope="col">Battery</th><th scope="col">Saving that day</th><th scope="col">Per MWh of storage</th></tr></thead>
+<tbody>
+<tr><td>1 hour, 25 MWh</td><td class="n">$2,500</td><td class="n">$100</td></tr>
+<tr><td>2 hours, 50 MWh</td><td class="n">$5,000</td><td class="n">$100</td></tr>
+<tr><td>4 hours, 100 MWh</td><td class="n">$7,240</td><td class="n">$72</td></tr>
+<tr><td>8 hours, 200 MWh</td><td class="n">$7,336</td><td class="n">$37</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 ```
@@ -82,9 +96,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-A MWh stored at a price $p_\text{in}$ comes back as 0.8 MWh. It pays only if the selling price beats $p_\text{in}/0.8$: buy at \$40, and you must sell above \$50. Buying spilled sun at \$0 always passes this test, which is why the best schedule charges at midday.
-
-The [price]{.lx-term term="marginal-cost"} on each hour is the cost of *one more* MWh. A 25 MW battery is not one MWh: at 08:00 only 3 MW of sun is spilled, so charging at full power takes 22 MW from the gas plant at \$40. This lesson therefore counts the town's real saving. The best full-power schedule you can tap saves \$6,360; the solver saves \$7,240 because it charges at part power, exactly what each hour spills.
+- **Break-even.** A MWh stored at price $p_\text{in}$ comes back as 0.8 MWh, so it pays only if the selling price beats $p_\text{in}/0.8$: buy at \$40, sell above \$50.
+- **Spilled sun.** It costs \$0, so storing it always passes that test.
+- **One more MWh.** Each hour's [price]{.lx-term term="marginal-cost"} is the cost of one more MWh. A 25 MW battery is more than that: at 08:00 only 3 MW of sun is spilled, so full-power charging takes 22 MW from gas at \$40.
+- **The real saving.** So this lesson counts what the town actually saves. Your best full-power schedule saves \$6,360; the solver saves \$7,240 by charging at part power, matching each hour's spill.
 
 ```{=html}
 </div>
@@ -94,21 +109,38 @@ The [price]{.lx-term term="marginal-cost"} on each hour is the cost of *one more
 <div class="lx-deeper-body">
 ```
 
-For each hour $t$: charging $c_t$, discharging $d_t$ and the [state of charge]{.lx-term term="state-of-charge"} $e_t$ (MWh), with the gas plants, spill and the gap $g_t$ (demand minus nuclear, wind and sun) as in lesson 0:
+Decisions for each hour $t$: charging, discharging and the [state of charge]{.lx-term term="state-of-charge"}, with the gas plants and spill as in lesson 0.
+
+| Symbol | Meaning | Unit |
+|---|---|---|
+| $t$ | the hour, 0 to 23 (1 MW for one hour = 1 MWh) | – |
+| $p_{\mathrm{cc},t}$, $p_{\mathrm{pk},t}$ | combined-cycle and peaker output | MW |
+| $s_t$ | spilled wind and sun | MW |
+| $c_t$, $d_t$ | battery charging and discharging | MW |
+| $e_t$ | energy stored at the end of hour $t$ | MWh |
+| $g_t$ | the gap: demand minus nuclear, wind and sun | MW |
+| $w_t$, $\sigma_t$ | wind and sun output | MW |
 
 $$\min \sum_t \big(40\,p_{\mathrm{cc},t} + 100\,p_{\mathrm{pk},t}\big)$$
 
+Rules for every hour, top to bottom: balance, state of charge, power, energy, the gas plants' sizes and spill.
+
 $$
-\begin{aligned}
-p_{\mathrm{cc},t} + p_{\mathrm{pk},t} - s_t + d_t - c_t &= g_t && \text{(balance)}\\
-e_t &= e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0 && \text{(state of charge)}\\
-0 \le c_t,\ d_t \le 25, \qquad 0 \le e_t &\le 100 && \text{(power and energy)}
-\end{aligned}
+\begin{gathered}
+p_{\mathrm{cc},t} + p_{\mathrm{pk},t} - s_t + d_t - c_t = g_t\\
+e_t = e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0\\
+0 \le c_t,\ d_t \le 25\\
+0 \le e_t \le 100\\
+0 \le p_{\mathrm{cc},t} \le 150, \quad 0 \le p_{\mathrm{pk},t} \le 100\\
+0 \le s_t \le w_t + \sigma_t
+\end{gathered}
 $$
 
-The state-of-charge rule is the only rule that links one hour to the next: it is what makes storage a problem over time. Here the whole loss sits on charging; many models split it, $\sqrt{0.8}$ each way. Charging and discharging in the same hour would only waste energy, so the solver never does it here.
-
-Lesson 10 shows how to write such a model down, and lesson 11 how to check a solver's answer. Lessons A8 (how long should storage last?) and M3 (capacity expansion), both upcoming, choose the battery's size too.
+- **Over time.** The state-of-charge rule is the only one linking one hour to the next; it makes storage a problem over time.
+- **Losses.** Here the whole loss sits on charging; many models split it, $\sqrt{0.8}$ each way.
+- **Left out of the goal.** The nuclear plant's \$24,000 for the day is the same in every plan.
+- **Always an answer.** The page's code also allows unserved demand at \$3,000/MWh, so the model always has a solution; on this day none is needed.
+- **Next.** [Lesson 10](10-write-it-down.qmd) writes such a model down and [lesson 11](11-solver.qmd) checks a solver's answer. Lessons A8 (how long should storage last?) and M3 (capacity expansion), both upcoming, choose the battery's size too.
 
 ```{=html}
 </div>
@@ -136,9 +168,9 @@ Lesson 10 shows how to write such a model down, and lesson 11 how to check a sol
 ```{=html}
 <div class="lx-myths" data-quiz="w9-myth">
 <div class="lx-qq" data-id="mw" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A 100 MWh battery can deliver 100 MW.”</p>
+<p class="lx-qtext">Myth or fact? “A battery's MWh rating tells you its maximum power.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Its power rating sets how fast it can discharge: Prairie Town's 100 MWh battery delivers at most 25 MW, for four hours.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. The MWh say how much it holds; a separate MW rating says how fast. Prairie Town's 100 MWh battery delivers at most 25 MW, for four hours.</p></details>
 </div>
 <div class="lx-qq" data-id="make" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A battery adds energy to the grid.”</p>
@@ -161,7 +193,7 @@ Lesson 10 shows how to write such a model down, and lesson 11 how to check a sol
 <div class="lx-qq" data-id="dur" data-answer="c">
 <p class="lx-qtext">On 9 June 2025, going from a 4-hour to an 8-hour battery (both 25 MW) raises Prairie Town's saving by how much?</p>
 <ul class="lx-choices"><li data-value="a">It doubles</li><li data-value="b">About half again</li><li data-value="c">Only $96</li><li data-value="d">Nothing at all</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Only $96, from $7,240 to $7,336: there is no more spilled sun to store and no more peaker to replace on this day.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Only $96 ($7,240 to $7,336): it stores the last 3 MWh of spilled sun and returns 2.4 MWh at $40. The peaker's last 5 MWh remain, since both discharge at most 25 MW.</p></details>
 </div>
 </div>
 ```
@@ -180,7 +212,7 @@ Lesson 10 shows how to write such a model down, and lesson 11 how to check a sol
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">82%</td><td>Average monthly round-trip efficiency of U.S. utility-scale batteries in 2019 (pumped storage: 79%).</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">EIA, Today in Energy</a> · published 12 Feb 2021; data for 2019</td></tr>
-<tr><td class="n">43.6 GW</td><td>U.S. operational battery storage capacity at the end of 2025; nearly 52 GW by the end of June 2026.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=67925">EIA, Today in Energy</a> · published 7 Aug 2026</td></tr>
+<tr><td class="n">43.6 GW</td><td>U.S. operational utility-scale battery storage capacity at the end of 2025; nearly 52 GW by the end of June 2026.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=67925">EIA, Today in Energy</a> · published 7 Aug 2026</td></tr>
 <tr><td class="n">4 to 8 hours</td><td>Batteries of this duration are typically cycled once a day to shift electricity from low-demand to high-demand times.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA, Today in Energy</a> · published 25 Mar 2022; data through 2020</td></tr>
 <tr><td class="n">$7,240</td><td>What the best schedule of Prairie Town's 25 MW, 100 MWh battery saves on 9 June 2025, against $80,460 for the day without it.</td><td class="s">This lesson's model (illustrative)</td></tr>
 </tbody>
@@ -202,7 +234,7 @@ Lesson 10 shows how to write such a model down, and lesson 11 how to check a sol
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>U.S. battery capacity reached 43.6 GW at the end of 2025 and was still growing fast in 2026. Batteries that last four to eight hours are typically cycled once a day, moving energy from low-demand to high-demand hours: the pattern the solver found here (<a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA</a>).</p>
+<p>U.S. utility-scale battery capacity reached 43.6 GW at the end of 2025. Batteries of four to eight hours typically cycle once a day, from low-demand to high-demand hours: the pattern the solver found here (<a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA</a>).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

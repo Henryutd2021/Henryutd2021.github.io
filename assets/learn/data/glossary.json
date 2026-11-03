@@ -49,7 +49,7 @@
  },
  "binding-constraint": {
   "term": "Binding constraint",
-  "short": "A rule that holds with no room to spare at the best plan, so loosening it would change the answer.",
+  "short": "A rule that the best plan meets exactly, with no slack left.",
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
@@ -643,7 +643,7 @@
  },
  "simplex-method": {
   "term": "Simplex method",
-  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, always improving the goal, until no neighbour is better.",
+  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
   "lesson": 11,
   "href": "11-solver.html"
  },

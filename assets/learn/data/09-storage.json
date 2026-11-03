@@ -6,7 +6,7 @@
     "dateLabel": "9 June 2025",
     "utcOffsetHours": -5,
     "demandPeakMW": 450,
-    "why": "Chosen on 2026-11-02 by scanning every 2025 day (scaled as lesson 0, nuclear flat at 100 MW): the clean day (no filled or frozen hours in the EIA-930 data) with the most hours of midday surplus (9, 08:00-16:00) that also needs the peaker in the evening (3 hours, 20:00-22:00)."
+    "why": "Chosen on 2026-11-02 by scanning every 2025 day (scaled as lesson 0, nuclear flat at 100 MW): the clean day (no filled or frozen hours in the EIA-930 data) with the most hours of midday surplus (9 hours, 08:00-17:00) that also needs the peaker in the evening (3 hours, 20:00-23:00)."
   },
   "battery": {
     "P": 25,
@@ -31,7 +31,7 @@
     },
     {
       "n": "43.6 GW",
-      "what": "U.S. operational battery storage capacity at the end of 2025; nearly 52 GW by the end of June 2026.",
+      "what": "U.S. operational utility-scale battery storage capacity at the end of 2025; nearly 52 GW by the end of June 2026.",
       "source": "EIA, Today in Energy",
       "url": "https://www.eia.gov/todayinenergy/detail.php?id=67925",
       "asof": "published 7 Aug 2026"
