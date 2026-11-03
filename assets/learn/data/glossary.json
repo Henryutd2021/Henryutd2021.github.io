@@ -743,6 +743,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "global-sensitivity-analysis": {
+  "term": "Global sensitivity analysis",
+  "short": "Ranking a model's inputs by their influence on a result while all of them vary together across their assumed ranges, rather than one at a time.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
+ },
  "governor": {
   "term": "Governor",
   "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
@@ -1121,6 +1127,12 @@
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
  },
+ "monte-carlo-error": {
+  "term": "Monte Carlo error",
+  "short": "How far an estimate from a Monte Carlo study would move with another random seed; it shrinks roughly with the square root of the number of runs.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
+ },
  "multi-objective": {
   "term": "Multi-objective problem",
   "short": "A choice with several goals that cannot all be at their best at once.",
@@ -1361,6 +1373,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "probability-distribution": {
+  "term": "Probability distribution",
+  "short": "A rule that says how likely each value of an uncertain input is; a uniform distribution makes every value in its range equally likely.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
+ },
  "procurement-rule": {
   "term": "Procurement rule",
   "short": "A rule for which purchased electricity a buyer may count as clean, for example by region, by hour and by how new the plant is; it sets a claim, not the emissions the purchase causes.",
@@ -1414,6 +1432,12 @@
   "short": "A fixed starting number for a random-number generator, so a random draw comes out the same on every run.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "rank-correlation": {
+  "term": "Rank correlation (Spearman's ρ)",
+  "short": "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls with the other, whatever the shape of the link.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
  },
  "rocof": {
   "term": "Rate of change of frequency",
@@ -1552,6 +1576,12 @@
   "short": "A very high wholesale price in hours when available supply barely covers demand.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "scenario": {
+  "term": "Scenario",
+  "short": "A coherent what-if set of a model's inputs, such as a 36-month wait, studied without a probability attached.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
  },
  "scientific-notation": {
   "term": "Scientific notation",

@@ -1,0 +1,26 @@
+# Sidecar for M7 (m07-monte-carlo), builder learn-w3-f, 2026-11-03. Read by scripts/build_learn.py.
+id: m07-monte-carlo
+lesson: M7
+glossary:
+  - id: scenario
+    term: Scenario
+    def: "A coherent what-if set of a model's inputs, such as a 36-month wait, studied without a probability attached."
+  - id: probability-distribution
+    term: Probability distribution
+    def: "A rule that says how likely each value of an uncertain input is; a uniform distribution makes every value in its range equally likely."
+  - id: rank-correlation
+    term: Rank correlation (Spearman's ρ)
+    def: "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls with the other, whatever the shape of the link."
+  - id: global-sensitivity-analysis
+    term: Global sensitivity analysis
+    def: "Ranking a model's inputs by their influence on a result while all of them vary together across their assumed ranges, rather than one at a time."
+  - id: monte-carlo-error
+    term: Monte Carlo error
+    def: "How far an estimate from a Monte Carlo study would move with another random seed; it shrinks roughly with the square root of the number of runs."
+requests:
+  - "M7's prerequisites in the curriculum are A1 and B2 (learn_map_v2.yml). A1's path.yml row has no code yet, so M7 lists after: [B2, K5]; please make it [A1, B2] (or [A1, B2, K5]) once A1's row carries code: A1."
+  - "Promote candidate (i-montecarlo): the rank-correlation bars with ± 2 standard-error whiskers and tie-rule ranks (RhoBars in m07-monte-carlo.js), the seeded Latin hypercube with its permutation ranks (units, study), the repeat-based Monte Carlo error (repeats, se) and the tie rule (rankGroups). M8, M9, A5 and C1 can reuse them; mulberry32 (rng) could sit beside LX.Drill.rng as the generator for studies."
+  - "K5's Go deeper names M7 as upcoming ('Modeler lesson M7, upcoming') in step 6's saw text and its Modeler box; with M7 live these can become links (k05-probability-statistics.js and .qmd). CF7's Go deeper does the same ('M7, upcoming')."
+  - "Lesson 11's glossary entry sensitivity-analysis says 'one at a time'; M7 adds global-sensitivity-analysis for the all-together view. No change needed, listed for the glossary review."
+  - "Shared files touched in a separate commit so that QA passes (drop or merge at integration): teaching.qmd's Teaching card says 44 lessons live (43 + M7); every W3 page that goes live raises it again, so set the final count at the merge. _tests/learn/test_components_w2_int.js listed exactly M2 and M3 as the pages with a lab; it now checks M2 and M3 plus every live page whose path.yml row has lab_minutes (M4, M5 and later labs pass without edits)."
+  - "Popover demo state: m07-monte-carlo.js answers lxDemo('gloss') (step 9 with its rank-correlation term open) for the layout audit of popovers at 375 px."

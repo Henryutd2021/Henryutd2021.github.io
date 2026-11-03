@@ -1242,9 +1242,12 @@
    "tier": "modeler",
    "code": "M7",
    "title": "What could happen? Scenarios, Monte Carlo and global sensitivity",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m07-monte-carlo.html",
+   "scales": [],
+   "id": "m07-monte-carlo",
+   "minutes": 35,
+   "form": "cards"
   },
   {
    "tier": "modeler",
