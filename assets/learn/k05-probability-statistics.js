@@ -7,18 +7,23 @@
 // the Southwest Power Pool grid (EIA-930), each as e = (actual demand - day-ahead forecast) / forecast, stored sorted in
 // tenths of a percent (so every value is a multiple of 0.1 percentage point). May-December is left out, as in lesson 4:
 // from May the forecast SPP reports runs 8-15% above its reported demand in every month (monthly_forecast_ratio), cause
-// unverified. assets/learn/data/town.json gives Prairie Town's two gas plant sizes (illustrative) for cards 7 and 8.
+// unverified. assets/learn/data/town.json gives the sizes of Prairie Town's two gas plants (illustrative), called gas plants A
+// (150 MW) and B (100 MW) in cards 7 and 8, where their technology plays no part.
 //
 // Model (statistical, no solver; every number the page states comes from these functions and is checked by
 // _tests/learn/test_k05-probability-statistics.js, which also writes the no-JS fallback block with --write):
 //   mean = sum / n;  sd = sqrt(sum (x - mean)^2 / n) (population; n - 1 changes it by under 0.001 point here)
 //   percentile q_p: linear interpolation between sorted values at rank (n - 1) p (the common "type 7" rule); with these
 //   rounded values it agrees with lesson 4's quantiles to 0.1 point
-//   share above t = count(x > t) / n;  hours in [a, b] = count(a <= x <= b) (ends included; values sit on a 0.1 grid)
+//   share above t = count(x > t) / n;  hours in [a, b] = count(a <= x <= b) (ends included; values sit on a 0.1 grid, so
+//   hours tied at an interval's ends count in, and a nominal 50% interval holds a little more than 50%)
+//   median check: a marker m is a median when at least half the hours are at or below m and at least half at or above
 //   histogram: integer tenths t into bins floor(t / w) of w tenths (exact, no floating-point edges)
-//   sampling: n draws with replacement from a seeded generator; standard error of a share sqrt(p (1 - p) / n)
+//   sampling: n independent draws with replacement from this fixed list (hours may repeat) from a seeded generator;
+//   standard error of a share sqrt(p (1 - p) / n). It shows sampling scatter, not how other months or years differ.
 //   two plants out independently with chances p1, p2: both p1 p2; at least one 1 - (1 - p1)(1 - p2);
-//   expected MW out = sum over the four cases of MW x chance = p1 x MW1 + p2 x MW2 (true with or without independence)
+//   expected MW out = sum over the four cases of MW x chance = p1 x MW1 + p2 x MW2 (true with or without independence,
+//   as long as each plant's own outage chance stays p1, p2)
 (function () {
   "use strict";
   // shared pieces: LX.Drill (the seeded practice drill; its rng also draws the samples here) and LX.NumAnswer (number boxes)
@@ -56,14 +61,23 @@
   }
   function stdErr(p, n) { return Math.sqrt(p * (1 - p) / n); }
   function joint(p1, p2) { return { both: p1 * p2, one: p1 * (1 - p2) + p2 * (1 - p1), none: (1 - p1) * (1 - p2), any: 1 - (1 - p1) * (1 - p2) }; }
-  // the two plants (Prairie Town's combined-cycle and peaker sizes) out independently with chance p each
+  // gas plants A and B (the sizes of Prairie Town's combined-cycle plant and peaker) out independently with chance p each
   function plantCases(town, p) {
     var a = town.fleet.cc.mw, b = town.fleet.peaker.mw;
     return [{ key: "none", label: "Neither out", mw: 0, p: (1 - p) * (1 - p) },
-            { key: "cc", label: "Only the combined-cycle plant out", mw: a, p: p * (1 - p) },
-            { key: "pk", label: "Only the peaker out", mw: b, p: (1 - p) * p },
+            { key: "cc", label: "Only plant A out", mw: a, p: p * (1 - p) },
+            { key: "pk", label: "Only plant B out", mw: b, p: (1 - p) * p },
             { key: "both", label: "Both out", mw: a + b, p: p * p }];
   }
+  // is marker m a median? at least half the hours at or below it and at least half at or above it (ties count both ways)
+  function medianCheck(x, m) {
+    var below = countBelow(x, m), above = countAbove(x, m), at = x.length - below - above;
+    return { below: below, above: above, at: at, ok: 2 * (below + at) >= x.length && 2 * (above + at) >= x.length };
+  }
+  // the histogram's x axis: -10% to +10%, widened to the outer bin edges when wide bins reach past them
+  function histRange(bins) { return { min: Math.min(-10, bins[0].lo), max: Math.max(10, bins[bins.length - 1].hi) }; }
+  // the sampling chart's x axis, in %: 0 to 30, widened in steps of 10 so every estimate drawn sits inside, clear of the end
+  function sampleMax(est) { var m = 0; est.forEach(function (e) { if (100 * e > m) m = 100 * e; }); return Math.max(30, 10 * Math.ceil((m + 1) / 10)); }
   function expected(cases) { return cases.reduce(function (s, c) { return s + c.mw * c.p; }, 0); }
   // what one wildly wrong reading does to each summary (the explain layer's table)
   function wild(x, v) {
@@ -93,6 +107,7 @@
     S.mayDec = [Math.min.apply(null, r), Math.max.apply(null, r)].map(function (v) { return (v - 1) * 100; });
     S.below5 = countBelow(x, -THRESH); S.within2 = countIn(x, -2, 2) / n;
     S.p99 = q(0.99);
+    S.med = medianCheck(x, S.median);
     return S;
   }
 
@@ -141,9 +156,12 @@
       return { kind: kind, q: "A wind farm's output in an hour is " + lv[0] + " MW with chance " + pr[0] + "%, " + lv[1] + " MW with chance " + pr[1] + "%, or " + lv[2] + " MW with chance " + pr[2] + "% (illustrative). Its expected output, in MW?",
                answer: ev, tol: 0.05, unit: "MW", why: lv[1] + " × " + pr[1] / 100 + " + " + lv[2] + " × " + pr[2] / 100 + " = " + ev + " MW (0 MW adds nothing)." };
     }
-    var nA = [20, 50, 100][pick(0, 2)], nB = [500, 1000, 2000][pick(0, 2)], aFirst = r() < 0.5, eA = (pick(0, 4) * 5), eB = 4 + pick(0, 2);
-    var A = { n: nA, e: eA }, B = { n: nB, e: eB }, first = aFirst ? A : B, second = aFirst ? B : A;
-    return { kind: kind, q: "Two random samples estimate the share of hours with demand more than 5% above the forecast. Sample 1: " + int(first.n) + " hours, " + first.e + "%. Sample 2: " + int(second.n) + " hours, " + second.e + "%. Which estimate is more trustworthy?",
+    // a whole number of hours first, then its share, so every share shown is one a sample of that size can give
+    var nA = [20, 50, 100][pick(0, 2)], nB = [500, 1000, 2000][pick(0, 2)], aFirst = r() < 0.5;
+    var cA = pick(0, nA / 5), cB = nB / 100 * (4 + pick(0, 2));
+    var A = { n: nA, c: cA, e: 100 * cA / nA }, B = { n: nB, c: cB, e: 100 * cB / nB }, first = aFirst ? A : B, second = aFirst ? B : A;
+    var said = function (o) { return int(o.n) + " hours, " + int(o.c) + " of them above (" + o.e + "%)"; };
+    return { kind: kind, q: "Two random samples estimate the share of hours with demand more than 5% above the forecast. Sample 1: " + said(first) + ". Sample 2: " + said(second) + ". Which estimate is more trustworthy?",
              choices: ["Sample 1", "Sample 2", "Equally trustworthy"], answer: aFirst ? 1 : 0,
              why: "The sample of " + int(nB) + " hours: a share from more hours scatters less (its standard error shrinks with the square root of the sample size)." };
   }
@@ -165,8 +183,8 @@
   // the explain layer's flowchart traces: estimate a chance by counting, with all hours, a small sample, or the reader's threshold
   function traces(fc, own) {
     var x = errors(fc), n = x.length, c = countAbove(x, THRESH), out = [
-      { label: "All " + int(n) + " hours", path: ["event", "count", "divide", "q", "report"], text: "**" + int(c) + " of " + int(n) + " hours, " + share(c / n) + ".** Report it with the period (January–April 2025) and the count." },
-      { label: "A sample of 10 hours", path: ["event", "count", "divide", "q", "more"], text: "**A share from 10 hours** scatters by about " + (100 * stdErr(c / n, 10)).toFixed(1) + " points (one standard error): say it is rough, or use more hours." }];
+      { label: "All " + int(n) + " hours", path: ["event", "count", "divide", "q", "report"], text: "**" + int(c) + " of " + int(n) + " hours above " + pct(THRESH, 0) + ", " + share(c / n) + ".** Report it with the period (January–April 2025) and the count." },
+      { label: "A sample of 10 hours", path: ["event", "count", "divide", "q", "more"], text: "**A share above " + pct(THRESH, 0) + " from 10 hours** scatters by about " + (100 * stdErr(c / n, 10)).toFixed(1) + " points (one standard error): say it is rough, or use more hours." }];
     if (own && own.t != null && Math.abs(own.t - THRESH) > 1e-9) {
       var k = countAbove(x, own.t);
       out.push({ label: "Your threshold, " + pct(own.t), path: ["event", "count", "divide", "q", "report"], text: "**" + int(k) + " of " + int(n) + " hours above " + pct(own.t) + ", " + share(k / n) + ".**" });
@@ -176,7 +194,7 @@
 
   var model = { tenths: tenths, errors: errors, mean: mean, sd: sd, quantile: quantile, median: median, countAbove: countAbove, countBelow: countBelow,
                 countIn: countIn, histogram: histogram, rng: rng, draw: draw, sampleShares: sampleShares, stdErr: stdErr, joint: joint,
-                plantCases: plantCases, expected: expected, wild: wild, summary: summary, sgn: sgn, pct: pct, share: share, int: int,
+                plantCases: plantCases, expected: expected, medianCheck: medianCheck, histRange: histRange, sampleMax: sampleMax, wild: wild, summary: summary, sgn: sgn, pct: pct, share: share, int: int,
                 drill: drill, drillItem: drillItem, tasks: tasks, traces: traces,
                 LEVELS: LEVELS, PLANT_P: PLANT_P, THRESH: THRESH, SIZES: SIZES, REPS: REPS, WIDTHS: WIDTHS, WILD: WILD, KINDS: KINDS };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -207,12 +225,13 @@
   }
   function niceMax(v) { var s = [10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000]; for (var i = 0; i < s.length; i++) if (v <= s[i] * 5) return Math.ceil(v / s[i]) * s[i]; return Math.ceil(v / 1000) * 1000; }
 
-  // the histogram chart (LX.Plot) with optional spans and lines
+  // the histogram chart (LX.Plot) with optional spans and lines; the x axis reaches the outer bin edges (4-point bins run
+  // from -12% to +12%), and the chart's text version lists every bin plus a note on what is marked or shaded
   function histSpec(t10, w, o) {
     o = o || {};
-    var bins = histogram(t10, w), top = niceMax(Math.max.apply(null, bins.map(function (b) { return b.n; })));
+    var bins = histogram(t10, w), top = niceMax(Math.max.apply(null, bins.map(function (b) { return b.n; }))), xr = histRange(bins);
     var spec = {
-      x: { min: -10, max: 10, ticks: XT },
+      x: { min: xr.min, max: xr.max, ticks: [[xr.min, pct(xr.min, 0)]].concat(XT.filter(function (t) { return Math.abs(t[0]) < 10; }), [[xr.max, pct(xr.max, 0)]]) },
       y: { min: 0, max: top, step: top / 4, fmt: function (v) { return int(v); }, unit: "hours" },
       height: 240, heightN: 210,
       bars: bins.map(function (b) { return { x0: b.lo, x1: b.hi, y0: 0, y1: b.n, color: COL.bar, op: 0.75 }; }),
@@ -222,7 +241,8 @@
         return b ? "<div><b>" + int(b.n) + " hours</b> with an error from " + pct(b.lo) + " up to " + pct(b.hi) + "</div>" : null;
       },
       tipStep: w / 10,
-      aria: o.aria || "Histogram of the " + int(t10.length) + " hourly forecast errors, bins " + (w / 10) + " point wide."
+      aria: o.aria || "Histogram of the " + int(t10.length) + " hourly forecast errors, bins " + (w / 10) + (w === 10 ? " point" : " points") + " wide.",
+      text: { head: ["Error, from", "up to", "Hours"], rows: bins.map(function (b) { return [pct(b.lo), pct(b.hi), int(b.n)]; }), note: o.note || null }
     };
     return { spec: spec, bins: bins };
   }
@@ -236,15 +256,14 @@
 
     // ---- 1 histogram and bin width
     steps.push({
-      text: "Each of " + N + " hours (January–April 2025) has a [[forecast-error|forecast error]]: actual demand minus the day-ahead forecast, as a % of the forecast. A [[histogram|histogram]] counts the hours in each bin. Try all three bin widths.",
+      text: "Each of " + N + " hours (January–April 2025) has a [[forecast-error|forecast error]]: actual demand minus the day-ahead forecast, as a % of the forecast. Count the hours per bin, a [[histogram|histogram]], with all three bin widths.",
       build: function (act, api) {
         var tried = { 10: 1 }, w = 10;
         var ctl = H("div", { class: "k5-ctl" }, act); H("span", { class: "k5-lab", text: "Bin width, points" }, ctl);
         seg(ctl, ["0.2", "1", "4"], 1, function (i) { w = WIDTHS[i]; tried[w] = 1; drawIt(); }, "Bin width");
         var P = LX.Plot(act, { text: "Text version of the chart" }), prog = H("p", { class: "k5-prog", "aria-live": "polite" }, act);
         function drawIt() {
-          var h = histSpec(t10, w); P.render(h.spec);
-          miniTable(P.text, ["Error, from", "up to", "Hours"], h.bins.map(function (b) { return [pct(b.lo), pct(b.hi), int(b.n)]; }));
+          P.render(histSpec(t10, w, { note: "Bins " + (w / 10) + (w === 10 ? " point" : " points") + " wide; each runs from its lower edge up to, not including, its upper edge." }).spec);
           var k = Object.keys(tried).length;
           prog.textContent = k >= 3 ? "All three widths tried: Next is open." : "Bin widths tried: " + k + " of 3.";
           if (k >= 3) { api.done(); api.saw("Narrow bins look jagged; wide ones hide the shape. With 1-point bins, " + share(S.mid, 0) + " of hours lie from −2% up to +3%, and the right tail reaches further (" + pct(S.max) + ") than the left (" + pct(S.min) + ")."); }
@@ -253,46 +272,60 @@
       }
     });
 
-    // ---- 2 mean and median
+    // ---- 2 mean and median (a median: at least half the hours at or below the marker, and at least half at or above)
     steps.push({
-      text: "Two centres: the [[mean|mean]] adds all " + N + " errors and divides by " + N + "; the [[median|median]] is the middle hour once they are sorted. Move the marker until half the hours lie on each side, then check.",
+      text: "Two centres: the [[mean|mean]] averages all " + N + " errors; the [[median|median]] is the middle value once sorted. Place the marker so at least half the hours are at or below it, and half at or above.",
       build: function (act, api) {
-        var P = LX.Plot(act, {}), out = H("p", { class: "k5-test", "aria-live": "polite" }, act);
+        var P = LX.Plot(act, { text: "Text version of the chart" }), out = H("p", { class: "k5-test", "aria-live": "polite" }, act);
         var sl = LX.Slider(act, { label: "Your marker", color: COL.median, min: -3, max: 3, step: 0.1, value: -2, fmt: function (v) { return pct(v); }, onChange: drawIt });
-        var row = H("div", { class: "k5-row" }, act), btn = H("button", { type: "button", class: "lx-btn small", text: "Check" }, row), checked = false;
-        btn.addEventListener("click", function () { checked = true; drawIt(); keep("marker", sl.val());
-          api.done(); api.saw("Median " + pct(S.median) + ", mean " + pct(S.mean) + ". Demand came in above the forecast in " + share(S.pos, 0) + " of hours: a small [[forecast-bias|bias]], the forecast running low."); });
+        var row = H("div", { class: "k5-row" }, act), btn = H("button", { type: "button", class: "lx-btn small", text: "Check" }, row), shown = false, tries = 0;
+        btn.addEventListener("click", function () {
+          var v = sl.val(), M = medianCheck(x, v); keep("marker", v);
+          if (M.ok) {
+            shown = true; drawIt();
+            api.done(); api.saw("Right: " + pct(v) + " is the median, with " + int(M.below) + " hours below, " + int(M.at) + " at it and " + int(M.above) + " above. The mean is " + pct(S.mean) + ": demand beat the forecast in " + share(S.pos, 0) + " of hours, a small [[forecast-bias|bias]].");
+            return;
+          }
+          tries++;
+          var low = 2 * (M.below + M.at) < n;
+          if (tries >= 2) { shown = true; drawIt(); }
+          api.saw("Not yet: only " + int(low ? M.below + M.at : M.above + M.at) + " of " + N + " hours are at or " + (low ? "below" : "above") + " " + pct(v) + ". Move the marker " + (low ? "right" : "left") + (tries >= 2 ? ", to the median line." : "."), true);
+        });
         function drawIt() {
-          var v = sl.val(), lo = countBelow(x, v), hi = countAbove(x, v), marks = [{ x: v, y: 0, vline: true, label: "You " + pct(v), color: COL.median }];
-          if (checked) marks.push({ x: S.median, y: 0, vline: true, label: "Median", color: COL.q }, meanMark("Mean"));
-          P.render(histSpec(t10, 10, { marks: marks, aria: "Histogram of the errors with your marker at " + pct(v) + "." }).spec);
-          out.innerHTML = "Below " + pct(v) + ": <b>" + int(lo) + "</b> hours. Above: <b>" + int(hi) + "</b>." + (n - lo - hi ? " At it: " + int(n - lo - hi) + "." : "");
+          var v = sl.val(), M = medianCheck(x, v), marks = [{ x: v, y: 0, vline: true, label: "You " + pct(v), color: COL.median }];
+          if (shown) marks.push({ x: S.median, y: 0, vline: true, label: "Median", color: COL.q }, meanMark("Mean"));
+          var said = "Below " + pct(v) + ": " + int(M.below) + " hours. At it: " + int(M.at) + ". Above: " + int(M.above) + ".";
+          P.render(histSpec(t10, 10, { marks: marks, aria: "Histogram of the errors with your marker at " + pct(v) + ".",
+                                       note: "Your marker: " + pct(v) + ". " + said + (shown ? " Median " + pct(S.median) + ", mean " + pct(S.mean) + "." : "") }).spec);
+          out.innerHTML = "Below " + pct(v) + ": <b>" + int(M.below) + "</b> hours. At it: <b>" + int(M.at) + "</b>. Above: <b>" + int(M.above) + "</b>.";
         }
         drawIt();
       }
     });
 
-    // ---- 3 spread
+    // ---- 3 spread (mean ± 1 SD shown to two decimals: its unrounded ends are what the 72% counts)
+    var sdEnds = pct(S.lo1sd, 2) + " to " + pct(S.hi1sd, 2);
     steps.push({
-      text: "The centre says nothing about how far misses scatter. Two measures of spread: the [[standard-deviation|standard deviation]] (SD) around the mean, and the middle half between the [[quartile|quartiles]]. Show each on the chart.",
+      text: "Spread is how far the misses scatter. Show both measures: the [[standard-deviation|standard deviation]] (SD), a typical distance from the mean, and the middle half of the hours, between the [[quartile|quartiles]].",
       build: function (act, api) {
         var seen = {}, mode = -1;
         var ctl = H("div", { class: "k5-ctl" }, act);
         seg(ctl, ["Mean ± 1 SD", "Middle half (quartiles)"], -1, function (i) { mode = i; seen[i] = 1; drawIt(); }, "Measure of spread");
-        var P = LX.Plot(act, {}), out = H("p", { class: "k5-test", "aria-live": "polite" }, act), prog = H("p", { class: "k5-prog" }, act);
+        var P = LX.Plot(act, { text: "Text version of the chart" }), out = H("p", { class: "k5-test", "aria-live": "polite" }, act), prog = H("p", { class: "k5-prog" }, act);
         function drawIt() {
-          var spans = [], marks = [];
+          var spans = [], marks = [], note;
           if (mode === 0) { spans.push({ x0: S.lo1sd, x1: S.hi1sd, color: COL.sd, op: 0.16, label: "± 1 SD" }); marks.push(meanMark()); }
           if (mode === 1) { spans.push({ x0: S.q25, x1: S.q75, color: COL.q, op: 0.18, label: "Middle half" }); }
-          P.render(histSpec(t10, 10, { spans: spans, marks: marks, aria: "Histogram of the errors with a measure of spread shaded." }).spec);
-          out.innerHTML = mode === 0 ? "SD <b>" + S.sd.toFixed(1) + " points</b>: from " + pct(S.lo1sd) + " to " + pct(S.hi1sd) + " holds <b>" + share(S.in1sd, 0) + "</b> of hours."
+          out.innerHTML = mode === 0 ? "SD <b>" + S.sd.toFixed(2) + " points</b>: mean ± 1 SD runs from " + sdEnds + " and holds <b>" + share(S.in1sd, 0) + "</b> of hours."
             : mode === 1 ? "Quartiles <b>" + pct(S.q25) + "</b> and <b>" + pct(S.q75) + "</b>: the middle half of the hours, " + (S.q75 - S.q25).toFixed(1) + " points wide." : "Pick a measure to shade it.";
+          note = mode === 0 ? "Shaded: mean ± 1 SD, " + sdEnds + ", holding " + share(S.in1sd, 0) + " of hours." : mode === 1 ? "Shaded: the middle half, " + pct(S.q25) + " to " + pct(S.q75) + "." : null;
+          P.render(histSpec(t10, 10, { spans: spans, marks: marks, note: note, aria: "Histogram of the errors with a measure of spread shaded." }).spec);
           var k = Object.keys(seen).length;
           prog.textContent = k >= 2 ? "Both shown: Next is open." : "Measures shown: " + k + " of 2.";
-          if (k >= 2) { api.done(); api.saw("A bell-shaped curve would put 68% of values within 1 SD of the mean; these hours put " + share(S.in1sd, 0) + " there. Rules of thumb are approximate; count the real data when you have it."); }
+          if (k >= 2) { api.done(); api.saw("A [[normal-distribution|normal (Gaussian) distribution]] puts about 68% of values within 1 SD of the mean; these hours put " + share(S.in1sd, 0) + " there. Rules of thumb are approximate; count the real data when you have it."); }
         }
         drawIt();
-        H("p", { class: "lx-hint", html: "Spreads are in <b>percentage points</b>: the gap between two percentages, such as " + pct(S.mean) + " and " + pct(S.hi1sd) + "." }, act);
+        H("p", { class: "lx-hint", html: "Spreads are in <b>percentage points</b>, the gap between two percentages: " + pct(S.mean) + " and " + pct(S.mean + 1) + " are 1 point apart." }, act);
       }
     });
 
@@ -300,12 +333,12 @@
     steps.push({
       text: "Pick one of these hours at random: the chance its error is above a threshold is the share of hours above it. Find the threshold that only 1 hour in 20 (5%) exceeds.",
       build: function (act, api) {
-        var P = LX.Plot(act, {}), out = H("p", { class: "k5-test", "aria-live": "polite" }, act);
+        var P = LX.Plot(act, { text: "Text version of the chart" }), out = H("p", { class: "k5-test", "aria-live": "polite" }, act);
         var sl = LX.Slider(act, { label: "Threshold", color: COL.warn, min: 0, max: 9, step: 0.1, value: 2, fmt: function (v) { return pct(v); }, onChange: function () { drawIt(true); } });
         function drawIt(user) {
           var t = sl.val(), c = countAbove(x, t), f = c / n;
           P.render(histSpec(t10, 10, { spans: [{ x0: t, x1: 10, color: COL.warn, op: 0.16, label: "Above" }], marks: [{ x: t, y: 0, vline: true, label: pct(t), color: COL.warn }],
-                                       aria: "Histogram with the hours above " + pct(t) + " shaded: " + int(c) + " hours." }).spec);
+                                       note: "Shaded: the " + int(c) + " hours above " + pct(t) + ", a share of " + share(f) + ".", aria: "Histogram with the hours above " + pct(t) + " shaded: " + int(c) + " hours." }).spec);
           out.innerHTML = "Above " + pct(t) + ": <b>" + int(c) + " of " + N + "</b> hours, a share of <b>" + share(f) + "</b>.";
           if (user) keep("t", t);
           if (user && f >= 0.045 && f <= 0.055) { api.done(); api.saw("Above " + pct(THRESH) + ": " + int(S.above) + " of " + N + " hours, " + share(S.aboveShare) + ". That share estimates the chance for hours like these; other months or years may differ."); }
@@ -315,17 +348,19 @@
       }
     });
 
-    // ---- 5 percentiles and intervals
+    // ---- 5 percentiles and intervals (nominal shares: hours tied at the ends count in, so each holds a little more)
     steps.push({
-      text: "A [[percentile|percentile]] turns this round: the 90th percentile is the error that 90% of hours stay at or below. Two percentiles make an interval. Show all three: 50%, 80% and 95%.",
+      text: "A [[percentile|percentile]] turns this round: 90% of hours stay at or below the 90th percentile. Two percentiles bound an interval; show the nominal 50%, 80% and 95% ones.",
       build: function (act, api) {
         var seen = {}, lv = null, keys = ["50", "80", "95"];
         var ctl = H("div", { class: "k5-ctl" }, act); H("span", { class: "k5-lab", text: "Interval" }, ctl);
         seg(ctl, ["50%", "80%", "95%"], -1, function (i) { lv = keys[i]; seen[lv] = 1; drawIt(); }, "Interval");
-        var P = LX.Plot(act, {}), out = H("p", { class: "k5-test", "aria-live": "polite" }, act), prog = H("p", { class: "k5-prog" }, act);
+        var P = LX.Plot(act, { text: "Text version of the chart" }), out = H("p", { class: "k5-test", "aria-live": "polite" }, act), prog = H("p", { class: "k5-prog" }, act);
+        H("p", { class: "lx-hint", text: "Many hours share each 0.1-point value, so hours tied at the ends count in: an interval holds a little more than its nominal share." }, act);
         function drawIt() {
           var L = lv && S.levels[lv], q = lv && LEVELS[lv];
-          P.render(histSpec(t10, 10, { spans: L ? [{ x0: L.lo, x1: L.hi, color: COL.band, op: 0.18, label: lv + "%" }] : [], aria: "Histogram with an interval shaded." }).spec);
+          var said = L ? "Percentiles " + Math.round(q[0] * 1000) / 10 + " and " + Math.round(q[1] * 1000) / 10 + ": " + pct(L.lo) + " to " + pct(L.hi) + ", holding " + int(L.n) + " hours (" + share(L.n / n) + ", ends included)." : null;
+          P.render(histSpec(t10, 10, { spans: L ? [{ x0: L.lo, x1: L.hi, color: COL.band, op: 0.18, label: lv + "%" }] : [], note: L ? "Shaded: the nominal " + lv + "% interval. " + said : null, aria: "Histogram with an interval shaded." }).spec);
           out.innerHTML = L ? "Percentiles " + Math.round(q[0] * 1000) / 10 + " and " + Math.round(q[1] * 1000) / 10 + ": <b>" + pct(L.lo) + " to " + pct(L.hi) + "</b>, holding " + int(L.n) + " hours (" + share(L.n / n) + ", ends included)." : "Pick an interval.";
           var k = Object.keys(seen).length;
           prog.textContent = k >= 3 ? "All three shown: Next is open." : "Intervals shown: " + k + " of 3.";
@@ -335,30 +370,33 @@
       }
     });
 
-    // ---- 6 sampling
+    // ---- 6 sampling (independent draws with replacement from this list: sampling scatter, not next winter)
     var SAMPLE_SEED = 20250101;
     steps.push({
-      text: "Often you have only a sample. Draw 20 random samples of 10, 100 and 1,000 hours, and from each estimate the share above +5%. Watch how far the estimates scatter.",
+      text: "With only a sample, a share is an estimate. Draw 20 random samples of 10, 100 and 1,000 hours, and watch how far their shares above +5% scatter.",
       build: function (act, api) {
         var r = rng(SAMPLE_SEED), got = {};
         var row = H("div", { class: "k5-row" }, act);
         SIZES.forEach(function (k) { var b = H("button", { type: "button", class: "lx-btn small ghost", text: "20 samples of " + int(k) }, row); b.addEventListener("click", function () { got[k] = sampleShares(x, k, REPS, r, THRESH); drawIt(true); }); });
+        H("p", { class: "lx-hint", text: "Each draw picks one of the " + N + " hours at random, so an hour can repeat. This shows how samples scatter, not how next winter will differ." }, act);
         var P = LX.Plot(act, { text: "Text version of the chart" }), out = H("p", { class: "k5-test", "aria-live": "polite" }, act);
         function drawIt(user) {
-          var dots = [], rowsT = [];
+          var dots = [], rowsT = [], all = [];
           SIZES.forEach(function (k, i) {
             if (!got[k]) return;
-            var jr = rng(k);
-            got[k].forEach(function (e) { var y = i + 1 + (jr() - 0.5) * 0.4; dots.push({ x0: 100 * e - 0.28, x1: 100 * e + 0.28, y0: y - 0.08, y1: y + 0.08, color: COL.bar, op: 0.7, rx: 3 }); });
+            var jr = rng(k), d = k >= 1000 ? 1 : 0;
+            got[k].forEach(function (e) { var y = i + 1 + (jr() - 0.5) * 0.4; all.push(e); dots.push({ x0: 100 * e - 0.28, x1: 100 * e + 0.28, y0: y - 0.08, y1: y + 0.08, color: COL.bar, op: 0.7, rx: 3 }); });
             var lo = Math.min.apply(null, got[k]), hi = Math.max.apply(null, got[k]);
-            rowsT.push([int(k) + " hours", share(lo, 0) + " to " + share(hi, 0), share(mean(got[k]))]);
+            rowsT.push([int(k) + " hours", sorted(got[k]).map(function (e) { return share(e, d); }).join(", "), share(lo, d) + " to " + share(hi, d), share(mean(got[k]))]);
           });
-          P.render({ x: { min: -1.5, max: 30, ticks: [[0, "0%", "middle"], [10, "10%"], [20, "20%"], [30, "30%", "end"]] },
+          var top = sampleMax(all), xt = [[0, "0%", "middle"]];
+          for (var v = 10; v <= top; v += 10) xt.push([v, v + "%", v === top ? "end" : "middle"]);
+          P.render({ x: { min: -1.5, max: top, ticks: xt },
                      y: { min: 0.4, max: 3.6, ticks: [[1, "10 h"], [2, "100 h"], [3, "1,000 h"]] }, height: 200, heightN: 180, ml: 64,
                      bars: dots, marks: [{ x: 100 * S.aboveShare, y: 0.4, vline: true, color: COL.mean }], legend: [{ label: "Dots: one sample each", color: COL.bar }, { label: "All " + N + " hours: " + share(S.aboveShare), color: COL.mean, dash: true }],
-                     aria: "Estimates from repeated random samples, one row per sample size, against the share in all hours." });
-          miniTable(P.text, ["Sample size", "Estimates range", "Average estimate"], rowsT);
-          out.textContent = rowsT.length ? rowsT.map(function (t) { return t[0] + ": " + t[1]; }).join(" · ") : "Draw some samples.";
+                     aria: "Estimates from repeated random samples, one row per sample size, against the share in all hours.",
+                     text: { head: ["Sample size", "The 20 estimates, sorted", "Range", "Average"], rows: rowsT, note: "All " + N + " hours: " + share(S.aboveShare) + " above +5%." } });
+          out.textContent = rowsT.length ? rowsT.map(function (t) { return t[0] + ": " + t[2]; }).join(" · ") : "Draw some samples.";
           if (user && Object.keys(got).length >= 3) {
             keep("samples", SIZES.map(function (k) { return [Math.min.apply(null, got[k]), Math.max.apply(null, got[k])]; }));
             api.done(); api.saw("Bigger samples scatter less: the typical scatter shrinks with the square root of the sample size. Running a model on many random draws is a [[monte-carlo|Monte Carlo]] study (Modeler lesson M7, upcoming).");
@@ -368,20 +406,21 @@
       }
     });
 
-    // ---- 7 independence
+    // ---- 7 independence (gas plants A and B: Prairie Town's two gas plant sizes; the outage chances are illustrative)
     var PL = S.plants;
     function caseRows(showEv) {
       return PL.cases.map(function (c) { var hrs = Math.round(c.p * 10000); return [c.label, int(c.mw) + " MW", int(hrs)].concat(showEv ? [(c.mw * c.p).toFixed(2) + " MW"] : []); });
     }
     steps.push({
-      text: "An illustrative case: Prairie Town's two gas plants are each out of service in " + share(PL.p, 0) + " of hours. If the outages are [[independent-events|independent]], the chance both are out is the product of the two chances. Work it out.",
+      text: "Illustrative: gas plants A (" + PL.cc + " [[megawatt|MW]]) and B (" + PL.pk + " MW) are each out of service in " + share(PL.p, 0) + " of hours. If outages are [[independent-events|independent]], the chance both are out is the product of the two chances.",
       build: function (act, api) {
-        var tbl = H("div", { class: "k5-cases" }, act), tries = 0;
+        var tbl = H("div", { class: "k5-cases" }, act), tries = 0, caveat = null;
         numBox(act, { label: "Both out:", unit: "% of hours", onCheck: function (v) {
           tries++;
           if (v != null && Math.abs(v - 100 * PL.both) < 0.0051) {
             miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false));
-            api.done(); api.saw(share(PL.p, 0) + " × " + share(PL.p, 0) + " = " + share(PL.both, 2) + " of hours, about " + Math.round(PL.hoursYear) + " of a year's 8,760. The product needs independence: a shared cause, such as one cold spell hitting both plants, makes joint outages more likely.");
+            if (!caveat) caveat = H("p", { class: "lx-hint", text: "Only if independent: a shared cause, such as one cold spell hitting both plants, makes joint outages more likely." }, act);
+            api.done(); api.saw(share(PL.p, 0) + " × " + share(PL.p, 0) + " = " + share(PL.both, 2) + " of hours: about " + Math.round(PL.hoursYear) + " of a year's 8,760 hours.");
           } else api.saw(tries < 2 ? "Not yet. Multiply the two chances as decimals: 0.05 × 0.05." : "0.05 × 0.05 = 0.0025, which is 0.25%.", true);
         } });
       }
@@ -389,7 +428,7 @@
 
     // ---- 8 expected value
     steps.push({
-      text: "The [[expected-value|expected value]] weights each outcome by its chance. With the " + PL.cc + " MW combined-cycle plant and the " + PL.pk + " MW peaker each out in " + share(PL.p, 0) + " of hours, independently, how many MW are out on average?",
+      text: "The [[expected-value|expected value]] weights each outcome by its chance. With plants A and B each out in " + share(PL.p, 0) + " of hours, independently, how many MW are out on average?",
       build: function (act, api) {
         var tbl = H("div", { class: "k5-cases" }, act), tries = 0;
         miniTable(tbl, ["Case", "MW out", "Hours in 10,000"], caseRows(false));
@@ -398,7 +437,7 @@
           if (v != null && Math.abs(v - PL.ev) < 0.051) {
             miniTable(tbl, ["Case", "MW out", "Hours in 10,000", "MW × chance"], caseRows(true));
             keep("ev", PL.ev);
-            api.done(); api.saw(PL.ev + " MW = " + share(PL.p, 0) + " × " + PL.cc + " + " + share(PL.p, 0) + " × " + PL.pk + ". Expected values add like this with or without independence; the chance of both out does not.");
+            api.done(); api.saw(PL.ev + " MW = " + share(PL.p, 0) + " × " + PL.cc + " + " + share(PL.p, 0) + " × " + PL.pk + ". While each plant stays out " + share(PL.p, 0) + " of the time, this holds with or without independence; the chance of both out does not.");
           } else api.saw(tries < 2 ? "Not yet. Multiply each case's MW by its share of hours, then add." : "0 × 0.9025 + 150 × 0.0475 + 100 × 0.0475 + 250 × 0.0025.", true);
         } });
       }
@@ -426,14 +465,14 @@
       rows: [
         { key: "mean", color: "var(--lx-ink)", name: "Mean", value: pct(S.mean), asks: "the average miss, signed", wild: pts(W.mean) },
         { key: "median", color: "var(--lx-tier-4)", name: "Median", value: pct(S.median), asks: "the middle hour", wild: pts(W.median) },
-        { key: "sd", color: "var(--lx-tier-2)", name: "Standard deviation", value: S.sd.toFixed(1) + " points", asks: "a typical distance from the mean", wild: pts(W.sd) },
+        { key: "sd", color: "var(--lx-tier-2)", name: "Standard deviation", value: S.sd.toFixed(2) + " points", asks: "a typical distance from the mean", wild: pts(W.sd) },
         { key: "iqr", color: "var(--lx-tier-3)", name: "Middle half", value: pct(S.q25) + " to " + pct(S.q75), asks: "where the central 50% lie", wild: pts(W.iqr) + " in width" },
         { key: "above", color: "var(--lx-warn)", name: "Share above +5%", value: share(S.aboveShare), asks: "how often a big miss comes", wild: pts(100 * W.above5) }]
     });
     X.flow = LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "Estimate a chance from data", lede: "Count, divide, then ask whether there were enough hours. Trace each case; your own threshold from step 4 joins them.",
+      title: "Estimate a chance from data", lede: "Count, divide, then ask whether there were enough hours. Each trace names its threshold; yours from step 4 joins them.",
       nodes: {
-        event: { t: "Name the event", s: "error above +5%", k: "end" },
+        event: { t: "Name the event", s: "error above a threshold", k: "end" },
         count: { t: "Count the hours", s: "where it happened" },
         divide: { t: "Divide by all hours", s: "a share, 0 to 1" },
         q: { t: "Enough hours?", tN: ["Enough", "hours?"], k: "q" },
@@ -448,11 +487,11 @@
     LX.CausalChain(H("div", { class: "lx-xcard" }, x), {
       title: "Why a shared cause breaks the product rule",
       links: [
-        { title: "One cause hits both plants", text: "Illustrative: a cold spell, or a shared fuel supply.", value: "not independent" },
+        { title: "One cause hits both plants", text: "Illustrative: a cold spell, or a shared fuel supply, hitting plants A and B.", value: "not independent" },
         { title: "Outages come together", text: "One plant being out makes the other more likely to be out." },
         { title: "Both out more often", text: "The joint chance rises above the product.", value: "> " + share(S.plants.both, 2) },
         { title: "A count that multiplies looks too safe", text: "Adequacy studies sample outages together when causes are shared (A5, upcoming)." }],
-      note: "Expected MW out (" + S.plants.ev + " MW) does not change; only the joint chances do."
+      note: "Holding each plant's outage chance at " + share(S.plants.p, 0) + ", dependence leaves expected MW out (" + S.plants.ev + " MW) unchanged; only the joint chances change."
     });
   }
 

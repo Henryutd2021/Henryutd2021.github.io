@@ -90,9 +90,9 @@ const usd = K.usd, f4 = K.f4;
   has("Simple interest gives $170.00 after 10 years");
   has("$100 ÷ 1.07¹⁰ = $50.83 today");
   has("from 7% to 4%, $100 in 30 years rises from $13.14 to $30.83 today");
-  has("$1 a year for 30 years at 4% is worth $17.29 today, not $30");
-  has("1 ÷ 17.29 = 0.05783: the wind farm's $1,712 per kW becomes $99.01 a year for 30 years");
-  has("Add upkeep of $34.57: the yearly cost is $133.58 per kW, or $133,575 per MW. At 0% the factor is 1 ÷ 30 = 0.0333.");
+  has("$1 paid at the end of each year for 30 years is worth $17.29 today at 4%, not $30");
+  has("$1,712 ÷ 17.292 = $99.01 per kW a year. The capital recovery factor is 1 ÷ 17.292 = 0.05783.");
+  has("Add upkeep: $99.01 + $34.57 = $133.58 per kW a year; per MW, before rounding, 1,000 × $133.575 = $133,575. At 0% the factor is 1 ÷ 30 = 0.0333.");
   has("the sum of the discounted dollars, 17.29 at 4% over 30 years");
   has("the share of a building cost repaid each year, 0.0578 at 4% over 30 years");
   has("$133.58 per kW a year for the wind farm");
@@ -104,7 +104,7 @@ const usd = K.usd, f4 = K.f4;
   has("From 3.5% to 7% it falls from $35.63 to $13.14, by 63%");
   has("$25.84: 100 ÷ 1.07²⁰. $41.67 divides by 1 + 20 × 0.07 (simple interest); $386.97 grows the $100 forward instead.");
   has("0.0333 is 1 ÷ 30, the 0% case; 0.0400 pays the return but never the cost; 0.0806 is the factor at 7%.");
-  has("10 years at 7%"); has("0.0578 × $1,712 + $34.57");
+  has("10 years at 7%"); has("$99.01 of repayment plus $34.57 of upkeep");
   // the quiz answers point at the right options
   ok(/data-id="pv20" data-answer="c"[\s\S]{0,200}<li data-value="c">\$25\.84<\/li>/.test(QMD), "quiz: pv20's answer c is $25.84");
   ok(/data-id="crf" data-answer="c"[\s\S]{0,200}<li data-value="c">0\.0578<\/li>/.test(QMD), "quiz: crf's answer c is 0.0578");
@@ -133,10 +133,10 @@ const usd = K.usd, f4 = K.f4;
    s.wind0.total, s.wind0.capital, s.wind7.total, s.wind7.capital, s.half.pvLo, s.half.pvHi, s.quiz.pv20, s.quiz.simple20, s.quiz.grow20, s.af]
     .concat(s.pv7, s.pv4, s.years.map(t => K.fv(s.amount, s.rate, t))).forEach(money);
   [s.crf, s.wind0.crf, s.wind7.crf, s.crfBattery, 0.04].forEach(v => add(f4(v)));
-  add(K.f5(s.crf)); add(s.af.toFixed(2)); add((1 + s.rate).toFixed(2)); add(s.rate.toFixed(2));
+  add(K.f5(s.crf)); add(s.af.toFixed(2)); add(s.af.toFixed(3)); add((1 + s.rate).toFixed(2)); add(s.rate.toFixed(2)); add(s.doubling.toFixed(1)); add(s.wind.total.toFixed(3));
   add((s.blendReal * 100).toFixed(2)); add(D7.finance.inflation); add((s.half.lo * 100).toFixed(1)); money(s.amount / 2); add(Math.round(s.half.cut * 100));
   // structural numbers: rates and years of the story, lesson numbers, years and dates, step counts, the 1,000 kW per MW
-  [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 17, 20, 30, 70, 2024, 2025, 2026, "1,000", "2.5"].forEach(add);
+  [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 17, 20, 30, 70, 2024, 2025, 2026, "1,000", "1000", "2.5"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
   ok(unknown.length === 0, "every number on the page is from the model or a structural count; unknown: " + unknown.join(" "));
@@ -172,6 +172,116 @@ const usd = K.usd, f4 = K.f4;
   ok(Object.keys(counts).length === 6, "drill: all six kinds appear: " + JSON.stringify(counts));
   const a = K.drill(7, 12).map(x => x.q).join("|"), b = K.drill(7, 12).map(x => x.q).join("|");
   ok(a === b, "drill: a seed replays the same items");
+}
+
+// ---------------- every printed calculation reproduces from the operands it prints (Codex review 2026-11-03, point 3)
+// A chain such as "$1,712 ÷ 17.292 = $99.01" is evaluated with the shown operands: "=" must round to the shown result at
+// its shown precision; "≈" marks a rounded operand and must agree within 0.5%. A side that starts or ends with a word or an
+// unknown ("today × 1.07^10 = $100", "= ? per kW") is not a calculation and is skipped; skips are listed and must match SKIP_OK.
+const SUPS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+function normCalc(str) {
+  let t = String(str).replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/<sup>([^<]*)<\/sup>/g, "^$1").replace(/&nbsp;/g, " ").replace(/<[^>]+>/g, " ")
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+/g, m => "^" + m.split("").map(c => c === "⁻" ? "-" : SUPS.indexOf(c)).join(""))
+    .replace(/[−–]/g, "-").replace(/\$/g, "");
+  while (/(\d),(\d{3})/.test(t)) t = t.replace(/(\d),(\d{3})/g, "$1$2");
+  return t;
+}
+const decimals = v => (String(v).split(".")[1] || "").length;
+function evalSide(side) {
+  const e = side.replace(/×/g, "*").replace(/÷/g, "/").replace(/\^/g, "**");
+  if (!/^[\d.\s()+\-*/]+$/.test(e)) return null;
+  try { const v = Function('"use strict"; return (' + e + ");")(); return typeof v === "number" && isFinite(v) ? v : null; } catch (err) { return null; }
+}
+function calcCheck(label, str, skips) {
+  let n = 0;
+  const runs = normCalc(str).match(/[\d.()+\-×÷^=≈ ]*[=≈][\d.()+\-×÷^=≈ ]*/g) || [];
+  runs.forEach(run => {
+    const parts = run.split(/([=≈])/);
+    for (let i = 1; i < parts.length - 1; i += 2) {
+      let L = parts[i - 1].trim(), R = parts[i + 1].trim();
+      const bal = x => { x = x.replace(/\.$/, "").trim(); while (x.startsWith("(") && (x.match(/\(/g) || []).length > (x.match(/\)/g) || []).length) x = x.slice(1).trim(); while (x.endsWith(")") && (x.match(/\)/g) || []).length > (x.match(/\(/g) || []).length) x = x.slice(0, -1).trim(); return x; };
+      L = bal(L); R = bal(R);
+      if (!L) continue;                                         // a word on the left ("CRF = 1 ÷ 30"): a definition, not a sum
+      if (!/^[\d(]/.test(L) || !/[\d)]$/.test(L)) { skips.push(label + ": " + run.trim()); continue; }
+      const lv = evalSide(L);
+      if (lv === null) { skips.push(label + ": " + run.trim()); continue; }
+      if (!/^\d[\d.]*$/.test(R)) {                             // a further expression: both sides must agree
+        const rx = evalSide(R);
+        if (rx === null) { skips.push(label + ": " + run.trim()); continue; }
+        n++; ok(Math.abs(lv - rx) <= 1e-9 * Math.max(1, Math.abs(rx)), `calc (${label}): ${L} = ${R}`); continue;
+      }
+      const rv = +R;
+      n++;
+      if (parts[i] === "=") ok(lv.toFixed(decimals(R)) === R || (decimals(R) === 0 && Math.round(lv) === rv), `calc (${label}): ${L} = ${R} reproduces from its shown operands (gives ${lv})`);
+      else ok(Math.abs(lv - rv) <= Math.max(0.005 * Math.abs(rv), 0.5 * Math.pow(10, -decimals(R))), `calc (${label}): ${L} ≈ ${R} is within rounding (gives ${lv})`);
+    }
+  });
+  return n;
+}
+{
+  const skips = [];
+  // the page's visible text: the HTML blocks as they are, the Markdown parts without their TeX (MathJax shows it as formulas)
+  const vis = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<style>[\s\S]*?<\/style>/g, "");
+  const mdParts = vis.split(/```\{=html\}[\s\S]*?```/), htmlParts = vis.match(/```\{=html\}[\s\S]*?```/g) || [];
+  let n = 0;
+  htmlParts.forEach((h, i) => { n += calcCheck("page html " + i, h, skips); });
+  mdParts.forEach((m, i) => { n += calcCheck("page md " + i, m.replace(/\\\$/g, "$").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/(^|[^\d])\$[^$\n]*?[a-z\\{}][^$\n]*?\$/gi, "$1 "), skips); });
+  ok(n >= 7, `calc: the page's printed calculations were found and checked (${n})`);
+  // the step cards' messages, the yearly-cost line at every step-6 setting, and the explain layer's "Your numbers"
+  const T = K.texts(s);
+  let m = 0;
+  Object.keys(T).forEach(k => { if (typeof T[k] === "string") m += calcCheck("texts." + k, T[k], skips); });
+  for (let ri = 0; ri <= 20; ri++) for (let n2 = 10; n2 <= 40; n2++) { m += calcCheck(`note ${ri / 2}% ${n2} y`, T.note(ri / 2, n2), skips); m += calcCheck(`zero ${n2}`, T.zero(n2), skips); }
+  ok(m > 1900, `calc: step messages and every step-6 setting were checked (${m})`);
+  // the drill's explanations
+  let d = 0; K.drill(42, 600).forEach((it, i) => { d += calcCheck("drill " + i, it.why, skips); });
+  ok(d >= 300, `calc: the drill's worked answers were checked (${d})`);
+  // what was skipped is only ever an algebra line or an open question, never a calculation
+  const SKIP_OK = [/^texts\.pvEq: × 1\.07\^10 = 100$/, /^texts\.payEq: 1712 ÷ 17\.292 =$/];
+  const bad = skips.filter(x => !SKIP_OK.some(re => re.test(x)));
+  ok(bad.length === 0, "calc: only algebra lines and open questions are skipped; unexpected: " + JSON.stringify([...new Set(bad)].slice(0, 8)));
+  // the old mismatches are gone (1 ÷ 17.29 = 0.05783, $1,712 ÷ 17.29 = $99.01, 0.0578 × $1,712 + $34.57 = $133.58)
+  ok(!/17\.29 = 0\.05783|1,712 ÷ 17\.29 =|0\.0578 × \$1,712 \+ \$34\.57 =/.test(QMD + JS), "calc: the three printed mismatches the review found are gone");
+}
+
+// ---------------- the other review fixes (Codex review 2026-11-03)
+{
+  const T = K.texts(s);
+  // 2: the planning equation carries the 1,000 kW per MW
+  ok(/\$1000 \\sum_k \(\\mathrm\{CRF\}_k\\, C_k \+ \\mathrm\{FOM\}_k\)\\,K_k\$/.test(QMD) && /\\\$ per kW and \$K_k\$ is in MW/.test(QMD), "modeler: the yearly-cost sum is 1000 Σ (CRF C + FOM) K, with K in MW");
+  ok(near(1000 * (s.crf * s.capex + s.fom), s.wind.perMW, 1e-6) && usd(s.wind.perMW, 0) === "$133,575", "modeler: 1,000 × (CRF × C + FOM) = $133,575 for one MW of wind");
+  // 4: the code handles r = 0 (read the Python line as JavaScript and run it)
+  const code = K.CRF_CODE.replace(/^crf = (.+) if (.+) else (.+)$/, "($2) ? ($1) : ($3)").replace(/==/g, "===");
+  const crfCode = (r, n) => Function("r", "n", '"use strict"; return ' + code + ";")(r, n);
+  ok(/if r == 0 else/.test(K.CRF_CODE) && crfCode(0, 30) === 1 / 30 && near(crfCode(0.04, 30), s.crf, 1e-15) && /code: CRF_CODE/.test(JS), "code: the CRF line gives 1/n at r = 0 and the formula otherwise");
+  // 5: step 6 refreshes the explain layer's "Your numbers"
+  ok(/if \(eqc\) eqc\.refresh\(\);/.test(JS) && /eqc = explain\(s\);/.test(JS) && /return \{ refresh: function \(\) \{ if \(seen\) redraw\(\); else dirty = true; \} \};/.test(JS) && /card\.select\(card\.current\(\)\)/.test(JS), "explain: step 6's setting redraws the open symbol (when on screen, else on scrolling to it)");
+  // 6: symbols and terms
+  ok(/caption: "r is the yearly rate as a fraction \(0\.04 for 4%\); t is the number of years from now\."/.test(JS), "terms: the comparison table defines r and t");
+  ok(!/ln 2 ÷ ln/.test(QMD.slice(QMD.indexOf('id="sources"'))) && /where \$\\ln\$ is the natural logarithm/.test(QMD), "terms: ln is explained in Go deeper, not used bare in the summary");
+  ok(/\[\[lcoe\|LCOE\]\]/.test(JS) && /\[\[megawatt-hour\|MWh\]\]/.test(JS) && /levelized cost of electricity/.test(JS), "terms: LCOE expanded and marked, MWh marked");
+  ok(/\[nominal rate\]\{\.lx-term term="nominal-rate"\} includes inflation/.test(QMD) && /a sum in which each term is the one before times the same factor/.test(QMD), "terms: nominal and geometric series defined");
+  ok(/yearly payments \$P\$/.test(QMD) && /\$P = \\frac/.test(QMD) && !/payments \$A\$/.test(QMD), "terms: the derivation's yearly repayment is P; A stays the equation card's yearly cost");
+  const side = fs.readFileSync(path.join(SITE, "learn/_w1/k03-discounting.yml"), "utf8");
+  ["annuity-factor", "real-rate", "nominal-rate"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(side), "glossary: the sidecar defines " + id));
+  // 7: payments at the end of each year; "cost recovery period", never "payback"
+  ok(/at the end of each year/.test(QMD) && /\$1 paid at the end of each year, for " \+ s\.life/.test(JS) && /\$1 at each year's end for/.test(JS) && /Each yearly payment falls at the end of its year/.test(QMD), "timing: payments come at the end of each year (steps, fallback, explain, data note)");
+  ok(!/payback|pay it off|Years to pay off/i.test(QMD + JS) && /label: "Cost recovery period"/.test(JS) && /name: "Cost recovery period"/.test(JS) && /real rate and cost recovery period/.test(QMD), "terms: cost recovery period throughout, no payback");
+  // 8: one result and one interpretation per message; totals as readouts; a shorter description
+  Object.keys(T).forEach(k => { if (typeof T[k] === "string" && !/Eq$/.test(k)) { const w = T[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: texts.${k} is ${w} words (≤ 36)`); } });
+  ok(T.zero(30).split(/\s+/).length <= 30 && T.note(4, 30).split(/\s+/).length <= 30, "budget: step 6's messages are short");
+  ok(!/rule of 70/i.test(T.grow) && /\["r70", "Rule of 70: rough years to double"\]/.test(JS) && T.rule70 === "70 ÷ 7 = 10 years", "budget: the rule of 70 is its own readout in step 1, not in the feedback");
+  ok(!/payments total|pays lenders/.test(T.payOk) && T.payTotal === "30 × $99.01 = $2,970" && T.payWait === "$2,970 − $1,712 = $1,258" && /\["wait", "Paid for the wait/.test(JS), "budget: step 5's totals are labelled readouts");
+  const desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
+  ok(desc.split(/\s+/).length <= 35, `budget: the page description is ${desc.split(/\s+/).length} words (≤ 35)`);
+  // 9: step 4's text version lists every payment
+  const rows = K.streamRows(s);
+  ok(rows.length === 30 && rows[0][0] === "1" && rows[29][0] === "30" && rows[0][1] === "$0.962" && rows[29][1] === "$0.308" && /rows: streamRows\(s\)/.test(JS) && /\(summed before rounding\)/.test(JS), "text version: all 30 discounted dollars, $0.962 to $0.308, with the unrounded sum");
+  ok(near(rows.reduce((a, r) => a + +r[1].slice(1), 0), s.af, 30 * 0.0005), "text version: the rows add up to the annuity factor within rounding");
+  // 10: the sensitivity claim is qualified
+  ok(/With the same recovery period and output, a larger repayment share makes the cost per MWh more sensitive, in percent, to the rate/.test(JS) && !/moves more than a gas plant's/.test(JS), "causal chain: the wind-against-gas claim is proportional and conditional");
+  // the number box labels carry their unit
+  ok(/label: "Worth today, in dollars:"/.test(JS) && /label: "Yearly payment, \$ per kW:"/.test(JS), "labels: the number boxes name their unit");
 }
 
 console.log(`k03-discounting: ${checks - fails} of ${checks} checks passed`);

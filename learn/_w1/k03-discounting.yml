@@ -8,3 +8,6 @@ glossary:
   - id: real-rate
     term: Real rate
     def: "An interest or discount rate with inflation taken out, used with costs stated in one year's dollars."
+  - id: nominal-rate
+    term: Nominal rate
+    def: "An interest or discount rate that includes inflation, used with cash counted in the dollars of each future year."

@@ -24,6 +24,8 @@
 //   real rate        (1 + nominal) / (1 + inflation) − 1                  (lesson 7's realRate)
 // Every number the page states comes from this model or the data files; _tests/learn/test_k03-discounting.js checks
 // them against lessons 7 and 13 and against the page (it also writes the no-JS blocks: --write).
+// texts() and costLine() hold every calculation the cards print; the test recomputes each one from the operands it shows.
+// Payments fall at the end of each year (an ordinary annuity), as the capital recovery factor assumes.
 (function () {
   "use strict";
   // shared pieces: LX.NumAnswer (number boxes; close() is its tolerance check) and LX.Drill (the seeded practice drill)
@@ -79,6 +81,37 @@
     // the quiz: $100 in 20 years at 7%
     s.quiz = { pv20: pv(s.amount, s.rate, 20), simple20: s.amount / (1 + s.rate * 20), grow20: fv(s.amount, s.rate, 20) };
     return s;
+  }
+
+  // ---------------------------------------------------------------- the calculations the page prints (pure, so the test can
+  // recompute each one from the operands it shows: "=" must reproduce at the shown precision, "≈" marks a rounded operand)
+  function eqs(a, b) { return Math.abs(a - b) < 1e-9 ? " = " : " ≈ "; }
+  // repayment and yearly cost at one setting: "0.0578 × $1,712 ≈ $99.01 repayment; $99.01 + $34.57 = $133.58 per kW a year"
+  function costLine(s, r, n) {
+    var y = yearly(s.capex, s.fom, r, n), cap = Math.round(y.capital * 100) / 100;
+    return f4(y.crf) + " × " + usd(s.capex, 0) + eqs(+f4(y.crf) * s.capex, cap) + usd(cap) + " repayment; " + usd(cap) + " + " + usd(s.fom) + " = " + usd(y.total) + " per kW a year";
+  }
+  function texts(s) {
+    var A = usd(s.amount, 0), R = pct(s.rate), R4 = pct(s.plantRate), g = (1 + s.rate).toFixed(2), g10 = Math.pow(1 + s.rate, 10).toFixed(4), af3 = s.af.toFixed(3);
+    var want = s.pv7[1], last = s.pv7.length - 1;
+    return {
+      grow: "It first passes " + usd(2 * s.amount, 0) + " in year " + s.firstDouble + " (" + usd(s.atFirstDouble) + "). Simple interest, paid on the first " + A + " only, takes until year " + s.simpleDouble + ".",
+      rule70: "70 ÷ " + s.ratePct + eqs(70 / s.ratePct, s.rule70) + s.rule70 + " years",
+      pvEq: "today × " + g + "<sup>10</sup> = " + A + "&nbsp;&nbsp;so&nbsp;&nbsp;today = " + A + " ÷ " + g + "<sup>10</sup>",
+      pvOk: usd(want) + " is the [[present-value|present value]] of " + A + " in 10 years: put " + usd(want) + " in today at " + R + " and it grows to " + A + ".",
+      pvHint: "Not yet. Divide " + A + " by " + g + " ten times (or by " + g + "^10 = " + g10 + ").",
+      pvShow: A + " ÷ " + g10 + " = " + usd(want) + ".",
+      rate: "From " + R + " to " + R4 + ", " + A + " in " + s.years[last] + " years goes from " + usd(s.pv7[last]) + " to " + usd(s.pv4[last]) + " today, ×" + (s.pv4[last] / s.pv7[last]).toFixed(2) + "; " + A + " in " + s.years[1] + " years grows only ×" + (s.pv4[1] / s.pv7[1]).toFixed(2) + ". The further off the money, the more the rate matters.",
+      stream: "The " + s.life + " discounted dollars add up to " + usd(s.af) + ", not " + usd(s.life, 0) + ": year " + s.life + "'s dollar is worth only " + usd(s.lastDollar) + " today. This sum is the [[annuity-factor|annuity factor]].",
+      payEq: usd(s.capex, 0) + " ÷ " + af3 + " = ? per kW a year",
+      payOk: usd(s.payment) + " a year. Dividing by " + af3 + " is multiplying by 1 ÷ " + af3 + " = " + f5(s.crf) + ", the [[capital-recovery-factor|capital recovery factor]]: the share of the building cost repaid each year.",
+      payHint: "Not yet. Divide the building cost by " + af3 + ", the annuity factor.",
+      payShow: usd(s.capex, 0) + " ÷ " + af3 + " = " + usd(s.payment) + ".",
+      payTotal: s.life + " × " + usd(s.payment) + " = " + usd(s.life * Math.round(s.payment * 100) / 100, 0),
+      payWait: usd(s.life * Math.round(s.payment * 100) / 100, 0) + " − " + usd(s.capex, 0) + " = " + usd(s.life * Math.round(s.payment * 100) / 100 - s.capex, 0),
+      zero: function (n) { return "At 0%, CRF = 1 ÷ " + n + " = " + f4(1 / n) + ": the building cost is simply split evenly over the years, with no return for the wait."; },
+      note: function (ratePct, n) { return costLine(s, ratePct / 100, n) + ", at " + (+ratePct).toFixed(1).replace(/\.0$/, "") + "% a year over " + n + " years."; }
+    };
   }
 
   // ---------------------------------------------------------------- the no-JS blocks (written into the page by the test)
@@ -137,11 +170,19 @@
     return { kind: kind, q: "At " + crate + "% a year, which is worth more today: $" + now + " now, or $" + later + " in " + ct + " years?", choices: ["$" + now + " now", "$" + later + " in " + ct + " years"], answer: laterWins ? 1 : 0,
              why: "$" + later + " in " + ct + " years is worth " + usd(v) + " today, " + (laterWins ? "more" : "less") + " than $" + now + "." };
   }
+  // step 4's text version: every one of the n discounted dollars (to a tenth of a cent), and their unrounded sum
+  function streamRows(s) {
+    var rows = []; for (var t = 1; t <= s.life; t++) rows.push([String(t), usd(pv(1, s.plantRate, t), 3)]);
+    return rows;
+  }
+  // the capital recovery factor in code (Python), with the zero-rate case the formula alone cannot handle (0 ÷ 0)
+  var CRF_CODE = "crf = 1 / n if r == 0 else r / (1 - (1 + r) ** -n)";
   function drill(seed, n) { return DR.series(drillItem, seed, n); }
   var close = NA.close;   // v within tol of ans (plus 1e-9 for rounding); null is never close
 
   var model = { fv: fv, simple: simple, pv: pv, annuity: annuity, annuitySum: annuitySum, crf: crf, crf13: crf13, yearly: yearly,
-                doubling: doubling, firstYearAt: firstYearAt, realRate: realRate, story: story, staticBlocks: staticBlocks,
+                doubling: doubling, firstYearAt: firstYearAt, realRate: realRate, story: story, staticBlocks: staticBlocks, texts: texts, costLine: costLine,
+                streamRows: streamRows, CRF_CODE: CRF_CODE,
                 drill: drill, drillItem: drillItem, rng: DR.rng, close: close, KINDS: KINDS, usd: usd, f4: f4, f5: f5, pct: pct };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -162,7 +203,7 @@
   var rateFmt = function (v) { return v.toFixed(1).replace(/\.0$/, "") + "% a year"; };
 
   function view(live, data, root) {
-    var D7 = data["07_cost"], D13 = data["13_capstone"], s = story(D7, D13), steps = [], autos = {};
+    var D7 = data["07_cost"], D13 = data["13_capstone"], s = story(D7, D13), T = texts(s), steps = [], autos = {}, eqc = null;
     var A = usd(s.amount, 0), R = pct(s.rate), R4 = pct(s.plantRate);
 
     // ---- step 1: growth compounds
@@ -170,7 +211,8 @@
       text: "Put " + A + " in an account that pays " + R + " a year and leave the interest in. Each year adds " + R + " of what is there now. Slide the years: when does it first pass " + usd(2 * s.amount, 0) + "?",
       build: function (act, api) {
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
-        var ro = readouts(act, [["c", "Compound: interest left in"], ["s", "Simple: " + R + " of the first " + A + " only"]]);
+        var ro = readouts(act, [["c", "Compound: interest left in"], ["s", "Simple: " + R + " of the first " + A + " only"], ["r70", "Rule of 70: rough years to double"]]);
+        ro.r70.textContent = T.rule70;
         var sl = LX.Slider(act, { label: "Years", color: "var(--lx-tier-2)", min: 0, max: 30, step: 1, value: 0, fmt: function (v) { return v + (v === 1 ? " year" : " years"); }, onChange: draw });
         var yrs = []; for (var t = 0; t <= 30; t++) yrs.push(t);
         function draw() {
@@ -187,7 +229,7 @@
             text: { head: ["Year", "Compound", "Simple"], rows: [0, 5, 10, 15, 20, 25, 30].map(function (t) { return [String(t), usd(fv(s.amount, s.rate, t)), usd(simple(s.amount, s.rate, t))]; }) } });
           if (c >= 2 * s.amount) {
             api.done();
-            api.saw("It first passes " + usd(2 * s.amount, 0) + " in year " + s.firstDouble + " (" + usd(s.atFirstDouble) + "). The rule of 70: doubling takes about 70 ÷ " + s.ratePct + " = " + s.rule70 + " years (exactly " + s.doubling.toFixed(1) + "). Simple interest needs " + s.simpleDouble + " years.");
+            api.saw(T.grow);
           }
         }
         autos[0] = function () { sl.set(s.firstDouble, true); };
@@ -199,12 +241,12 @@
     steps.push({
       text: "Run it backwards. " + A + " that arrives in 10 years is worth the amount that would grow to " + A + " by then: " + A + " ÷ " + (1 + s.rate).toFixed(2) + "¹⁰. Type it to the cent.",
       build: function (act, api) {
-        H("p", { class: "k3-eq", html: "today × " + (1 + s.rate).toFixed(2) + "<sup>10</sup> = " + A + "&nbsp;&nbsp;so&nbsp;&nbsp;today = " + A + " ÷ " + (1 + s.rate).toFixed(2) + "<sup>10</sup>" }, act);
+        H("p", { class: "k3-eq", html: T.pvEq }, act);
         var tries = 0, want = s.pv7[1];
-        var n = LX.NumAnswer(act, { label: "Worth today:", unit: "$", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Worth today, in dollars:", unit: "$", onCheck: function (v) {
           tries++;
-          if (close(v, +want.toFixed(2), 0.015)) { api.done(); api.saw(usd(want) + " is the [[present-value|present value]] of " + A + " in 10 years: put " + usd(want) + " in today at " + R + " and it grows to " + A + "."); }
-          else api.saw(tries < 2 ? "Not yet. Divide " + A + " by " + (1 + s.rate).toFixed(2) + " ten times (or by " + (1 + s.rate).toFixed(2) + "^10 = " + Math.pow(1 + s.rate, 10).toFixed(4) + ")." : A + " ÷ " + Math.pow(1 + s.rate, 10).toFixed(4) + " = " + usd(want) + ".", true);
+          if (close(v, +want.toFixed(2), 0.015)) { api.done(); api.saw(T.pvOk); }
+          else api.saw(tries < 2 ? T.pvHint : T.pvShow, true);
         } });
         autos[1] = function () { n.input.value = want.toFixed(2); n.go(); };
       }
@@ -229,7 +271,7 @@
           alt.set(list);
           if (user && Math.abs(r - s.plantRate) < 1e-9) {
             api.done();
-            api.saw("From " + R + " to " + R4 + ", the bars grow ×" + (s.pv4[1] / s.pv7[1]).toFixed(2) + " (10 years), ×" + (s.pv4[2] / s.pv7[2]).toFixed(2) + " (20) and ×" + (s.pv4[3] / s.pv7[3]).toFixed(2) + " (30): " + A + " in 30 years goes from " + usd(s.pv7[3]) + " to " + usd(s.pv4[3]) + ". The further off the money, the more the rate matters.");
+            api.saw(T.rate);
           }
         }
         autos[2] = function () { sl.set(s.plantRate * 100, true); };
@@ -240,7 +282,7 @@
     // ---- step 4: a stream of equal payments
     var GUESS = [{ v: s.life, label: "About " + usd(s.life, 0) }, { v: Math.round(s.af), label: "About " + usd(Math.round(s.af), 0) }, { v: Math.round(s.life * s.lastDollar), label: "About " + usd(Math.round(s.life * s.lastDollar), 0) }];
     steps.push({
-      text: "A plant is paid off in equal yearly payments. What is $1 a year for " + s.life + " years worth today at " + R4 + "? Guess, then see each dollar discounted.",
+      text: "A plant is paid off in equal yearly payments. What is $1 paid at the end of each year, for " + s.life + " years, worth today at " + R4 + "? Guess, then see each dollar discounted.",
       build: function (act, api) {
         var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Your guess" }, act), btns = [];
         var box = H("div", { class: "k3-stream" }, act);
@@ -249,20 +291,19 @@
           b.addEventListener("click", function () {
             btns.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); x.classList.toggle("right", j === i && g.v === Math.round(s.af)); x.classList.toggle("wrong", j === i && g.v !== Math.round(s.af)); });
             reveal(); api.done();
-            api.saw((g.v === Math.round(s.af) ? "Right. " : "") + "The " + s.life + " discounted dollars add up to " + usd(s.af) + ", not " + usd(s.life, 0) + ": year " + s.life + "'s dollar is worth only " + usd(s.lastDollar) + " today. This sum is the [[annuity-factor|annuity factor]].");
+            api.saw((g.v === Math.round(s.af) ? "Right. " : "") + T.stream);
           });
           btns.push(b);
         });
         var shown = false;
         function reveal() {
           if (shown) return; shown = true;
-          var P = LX.Plot(box, { text: "Text version of the chart", box: true }), bars = [], tl = [];
+          var P = LX.Plot(box, { text: "Text version of the chart", box: true }), bars = [];
           for (var t = 1; t <= s.life; t++) { var v = pv(1, s.plantRate, t); bars.push({ x0: t - 0.38, x1: t + 0.38, y0: 0, y1: v, color: "var(--lx-tier-2)" }); }
-          for (t = 0; t <= s.life; t += 5) if (t) tl.push([String(t), usd(pv(1, s.plantRate, t))]);
           P.render({ x: { min: 0.4, max: s.life + 0.6, ticks: [[1, "year 1"], [10, "10"], [20, "20"], [s.life, String(s.life)]] }, y: { min: 0, max: 1, step: 0.25, fmt: function (v) { return "$" + v.toFixed(2); } },
             height: 200, heightN: 180, bars: bars, refs: [{ y: 1, label: "$1 paid", dash: "3 4" }], legend: false,
             aria: "Each $1 of " + s.life + " yearly payments, discounted at " + R4 + ": from " + usd(pv(1, s.plantRate, 1)) + " for year 1 to " + usd(s.lastDollar) + " for year " + s.life + "; together " + usd(s.af) + ".",
-            text: { head: ["Year", "Worth today"], rows: tl, note: "All " + s.life + " together: " + usd(s.af) + "." } });
+            text: { head: ["Year", "$1 paid that year-end, worth today"], rows: streamRows(s), note: "All " + s.life + " together: " + usd(s.af) + " (summed before rounding)." } });
           H("p", { class: "k3-sum", html: "Sum of the " + s.life + " bars: <b>" + usd(s.af) + "</b>" }, box);
         }
         autos[3] = function () { btns[1].click(); };
@@ -273,14 +314,18 @@
     steps.push({
       text: "A wind farm costs " + usd(s.capex, 0) + " per kW to build. Which equal yearly payment for " + s.life + " years at " + R4 + " is worth " + usd(s.capex, 0) + " today? Divide by the annuity factor.",
       build: function (act, api) {
-        H("p", { class: "k3-eq", html: usd(s.capex, 0) + " ÷ " + s.af.toFixed(2) + " = ? per kW a year" }, act);
-        var tries = 0;
-        var n = LX.NumAnswer(act, { label: "Yearly payment:", unit: "$ per kW", onCheck: function (v) {
+        H("p", { class: "k3-eq", html: T.payEq }, act);
+        var tries = 0, totals = null;
+        var n = LX.NumAnswer(act, { label: "Yearly payment, $ per kW:", unit: "$ per kW", onCheck: function (v) {
           tries++;
           if (close(v, s.payment, 0.5)) {
             LX.store.set("k3-own", { rate: s.plantRate * 100, life: s.life });
-            api.done(); api.saw(usd(s.payment) + " a year. 1 ÷ " + s.af.toFixed(2) + " = " + f5(s.crf) + " is the [[capital-recovery-factor|capital recovery factor]]: the share of the building cost repaid each year. The " + s.life + " payments total " + usd(s.paidTotal, 0) + ": " + usd(s.returnPaid, 0) + " pays lenders and owners for the wait.");
-          } else api.saw(tries < 2 ? "Not yet. Divide the building cost by " + s.af.toFixed(2) + "." : usd(s.capex, 0) + " ÷ " + s.af.toFixed(2) + " = " + usd(s.payment) + ".", true);
+            api.done(); api.saw(T.payOk);
+            if (!totals) {   // the totals, as labelled readouts of their own
+              totals = readouts(act, [["all", "All " + s.life + " payments"], ["wait", "Paid for the wait (the return to lenders and owners)"]], "k3-ro");
+              totals.all.textContent = T.payTotal; totals.wait.textContent = T.payWait;
+            }
+          } else api.saw(tries < 2 ? T.payHint : T.payShow, true);
         } });
         autos[4] = function () { n.input.value = s.payment.toFixed(2); n.go(); };
       }
@@ -292,19 +337,17 @@
       build: function (act, api) {
         var ro = readouts(act, [["crf", "Recovery factor (CRF)"], ["cap", "Repayment per kW a year"], ["tot", "Plus upkeep, per kW a year"], ["mw", "Yearly cost per MW"]], "k3-ro");
         var slR = LX.Slider(act, { label: "Rate (real)", color: "var(--lx-tier-2)", min: 0, max: 10, step: 0.5, value: s.plantRate * 100, fmt: rateFmt, onChange: draw });
-        var slN = LX.Slider(act, { label: "Years to pay it off", color: "var(--lx-tier-5)", min: 10, max: 40, step: 1, value: s.life, fmt: function (v) { return v + " years"; }, onChange: draw });
-        var bat = H("button", { type: "button", class: "lx-btn ghost small", text: "Try " + s.batteryLife + " years, lesson 13's battery life" }, act);
+        var slN = LX.Slider(act, { label: "Cost recovery period", color: "var(--lx-tier-5)", min: 10, max: 40, step: 1, value: s.life, fmt: function (v) { return v + " years"; }, onChange: draw });
+        var bat = H("button", { type: "button", class: "lx-btn ghost small", text: "Try " + s.batteryLife + " years, lesson 13's battery" }, act);
         bat.addEventListener("click", function () { slN.set(s.batteryLife, true); });
         var note = H("p", { class: "k3-note", "aria-live": "polite" }, act), zero = false;
         function draw() {
           var r = slR.val() / 100, n = slN.val(), y = yearly(s.capex, s.fom, r, n);
           ro.crf.textContent = f4(y.crf); ro.cap.textContent = usd(y.capital); ro.tot.textContent = usd(y.total); ro.mw.textContent = usd(y.perMW, 0);
-          note.textContent = f4(y.crf) + " × " + usd(s.capex, 0) + " + " + usd(s.fom) + " = " + usd(y.total) + " per kW a year, at " + rateFmt(slR.val()) + " over " + n + " years.";
+          note.textContent = T.note(slR.val(), n);
           LX.store.set("k3-own", { rate: slR.val(), life: n });
-          if (r === 0 && !zero) {
-            zero = true; api.done();
-            api.saw("At 0%, CRF = 1 ÷ " + n + " = " + f4(1 / n) + ": the cost is simply split evenly. At " + R4 + " over " + s.life + " years it is " + f4(s.crf) + ": with upkeep, " + usd(s.wind.total) + " per kW a year (" + usd(s.wind.perMW, 0) + " per MW), the yearly cost lessons 12 and 13 use.");
-          }
+          if (eqc) eqc.refresh();   // the explain layer's "Your numbers" follow this setting
+          if (r === 0 && !zero) { zero = true; api.done(); api.saw(T.zero(n)); }
         }
         autos[5] = function () { slN.set(s.life); slR.set(0, true); };
         draw();
@@ -319,13 +362,13 @@
       return { view: "step " + (k + 1) };
     }, cards);
 
-    explain(s);
+    eqc = explain(s);
     drillView();
   }
 
   // ---------------------------------------------------------------- explain layer
   function explain(s) {
-    var x = document.getElementById("k3-explain"); if (!x) return; x.innerHTML = "";
+    var x = document.getElementById("k3-explain"); if (!x) return null; x.innerHTML = "";
     function own() { var o = LX.store.get("k3-own"); return o && o.rate != null && o.life ? o : null; }
     function you(kind) {
       return function () {
@@ -334,44 +377,51 @@
         if (kind === "crf") return head + "CRF(" + pct(r, 1) + ", " + n + ") = " + f4(y.crf) + ".";
         if (kind === "r") return head + pct(r, 1) + " a year (real).";
         if (kind === "n") return head + n + " years.";
-        if (kind === "A") return head + f4(y.crf) + " × " + usd(s.capex, 0) + " + " + usd(s.fom) + " = " + usd(y.total) + " per kW a year.";
+        if (kind === "A") return head + costLine(s, r, n) + ".";
         return null;
       };
     }
-    LX.EquationCard(H("div", { class: "lx-xcard k3-eqcard" }, x), {
+    var card = LX.EquationCard(H("div", { class: "lx-xcard k3-eqcard" }, x), {
       title: "The capital recovery factor", lede: "Tap a symbol: its meaning, its unit and your own numbers from step 6.",
       rows: [
         { parts: [{ k: "crf" }, "=", { frac: [[{ k: "r" }], ["1 − (1 + ", { k: "r" }, ")", { k: "n", html: "−n" }]] }],
           say: "CRF equals r divided by one minus one plus r to the power minus n.", note: "the same as r(1 + r)ⁿ ÷ ((1 + r)ⁿ − 1); 1 ÷ n when r = 0" },
         { parts: [{ k: "A" }, "=", { k: "crf" }, "×", { k: "C" }, "+", { k: "fom" }], say: "Yearly cost equals CRF times the building cost, plus fixed upkeep.", tag: "yearly cost" }],
       symbols: {
-        crf: { sym: "CRF", name: "Capital recovery factor", unit: "per year", color: "var(--lx-tier-2)", words: "The share of the building cost repaid each year so it is paid off, with the return, over n years.", you: you("crf"), code: "r / (1 - (1 + r) ** -n)" },
+        crf: { sym: "CRF", name: "Capital recovery factor", unit: "per year", color: "var(--lx-tier-2)", words: "The share of the building cost repaid each year so it is paid off, with the return, over n years.", you: you("crf"), code: CRF_CODE },
         r: { sym: "r", name: "Discount rate (real)", unit: "a fraction per year", color: "var(--lx-tier-5)", words: "The yearly return the money could earn elsewhere; 4% is written 0.04.", you: you("r"), code: "r = 0.04" },
-        n: { sym: "n", name: "Years to pay off", unit: "years", color: "var(--lx-tier-3)", words: "The cost recovery period: " + s.life + " years for plants in lessons 7, 12 and 13, " + s.batteryLife + " for lesson 13's battery.", you: you("n"), code: "n = 30" },
+        n: { sym: "n", name: "Cost recovery period", unit: "years", color: "var(--lx-tier-3)", words: "The years over which the building cost is repaid: " + s.life + " for plants in lessons 7, 12 and 13, " + s.batteryLife + " for lesson 13's battery.", you: you("n"), code: "n = 30" },
         A: { sym: "A", name: "Yearly cost", unit: "$ per kW a year", color: "var(--lx-ink)", words: "What one kW of the plant costs each year before any fuel: repayment plus upkeep.", you: you("A"), code: "A = crf * C + fom" },
         C: { sym: "C", name: "Building cost", unit: "$ per kW", color: "var(--lx-tier-4)", words: "The [[overnight-cost|overnight]] building cost: " + usd(s.capex, 0) + " per kW for the wind farm (EIA, 2025 dollars).", code: "C = 1712" },
         fom: { sym: "FOM", name: "Fixed upkeep", unit: "$ per kW a year", color: "var(--lx-tier-1)", words: "[[fixed-om|Fixed operation and maintenance]]: paid every year whether the plant runs or not; " + usd(s.fom) + " for the wind farm.", code: "fom = 34.57" } },
       fields: [{ key: "you", label: "Your numbers" }, { key: "code", label: "In code", code: true }],
-      sel: "crf", hint: "Lesson 7's LCOE divides A by the MWh each kW makes in a year."
+      sel: "crf", hint: "Lesson 7's levelized cost of electricity ([[lcoe|LCOE]]) divides A by the [[megawatt-hour|MWh]] one kW makes in a year."
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
       title: "Four moves with money over time", text: true,
+      caption: "r is the yearly rate as a fraction (0.04 for 4%); t is the number of years from now.",
       columns: [{ key: "name", label: "Move", main: true }, { key: "rule", label: "Rule" }, { key: "ex", label: "On this page" }, { key: "used", label: "Used in", phoneHide: true }],
       rows: [
         { key: "grow", color: "var(--lx-tier-2)", name: "Grow", note: "now → later", rule: "× (1 + r)ᵗ", ex: usd(s.amount, 0) + " at " + pct(s.rate) + ": " + usd(s.grow10) + " in 10 years", used: "returns, loans" },
         { key: "disc", color: "var(--lx-tier-5)", name: "Discount", note: "later → now", rule: "÷ (1 + r)ᵗ", ex: usd(s.amount, 0) + " in 10 years: " + usd(s.pv7[1]) + " today", used: "lesson 7, step 3" },
-        { key: "stream", color: "var(--lx-tier-3)", name: "Add a stream", note: "yearly → now", rule: "× annuity factor", ex: "$1 a year for " + s.life + " years at " + pct(s.plantRate) + ": " + usd(s.af), used: "lesson 7, step 5" },
+        { key: "stream", color: "var(--lx-tier-3)", name: "Add a stream", note: "yearly → now", rule: "× annuity factor", ex: "$1 at each year's end for " + s.life + " years, at " + pct(s.plantRate) + ": " + usd(s.af), used: "lesson 7, step 5" },
         { key: "spread", color: "var(--lx-tier-4)", name: "Spread", note: "now → yearly", rule: "× CRF", ex: usd(s.capex, 0) + " per kW: " + usd(s.payment) + " a year", used: "lessons 7, 12 and 13" }]
     });
     LX.CausalChain(H("div", { class: "lx-xcard" }, x), {
       title: "Raise the rate from " + pct(s.plantRate) + " to " + pct(s.rate)
       , links: [
-        { title: "Far-off money shrinks", text: "Each later dollar is divided by a bigger (1 + r)^t.", value: usd(s.amount, 0) + " in 30 years: " + usd(s.pv4[3]) + " → " + usd(s.pv7[3]) },
+        { title: "Far-off money shrinks", text: "A dollar t years away is divided by a bigger (1 + r)ᵗ.", value: usd(s.amount, 0) + " in 30 years: " + usd(s.pv4[3]) + " → " + usd(s.pv7[3]) },
         { title: "Repayments must grow", text: "The same building cost needs a larger yearly share.", value: "CRF " + f4(s.crf) + " → " + f4(s.wind7.crf) },
         { title: "The yearly cost rises", text: "Upkeep stays; the repayment part grows.", value: usd(s.wind.total) + " → " + usd(s.wind7.total) + " per kW" },
-        { title: "Building-heavy plants feel it most", text: "Wind's yearly cost is mostly repayment, so its LCOE moves more than a gas plant's (lesson 7, step 4).", value: pct(s.capShare) + " of it is repayment at " + pct(s.plantRate) }],
+        { title: "Repayment-heavy costs feel it most", text: "With the same recovery period and output, a larger repayment share makes the cost per MWh more sensitive, in percent, to the rate (lesson 7, step 4).", value: pct(s.capShare) + " of wind's is repayment at " + pct(s.plantRate) }],
       note: "All in real 2025 dollars; the wind farm's inputs are EIA's, the rates as in lessons 7 and 13."
     });
+    // "Your numbers" follow step 6: the open symbol is redrawn when the setting changes while this section is on screen,
+    // or as soon as the section scrolls into view (so its live panel does not speak at every slider step from afar)
+    var sec = document.getElementById("explain"), seen = !("IntersectionObserver" in window) || !sec, dirty = false;
+    function redraw() { dirty = false; card.select(card.current()); }
+    if (!seen) new IntersectionObserver(function (es) { seen = es[0].isIntersecting; if (seen && dirty) redraw(); }).observe(sec);
+    return { refresh: function () { if (seen) redraw(); else dirty = true; } };
   }
 
   // ---------------------------------------------------------------- practice drill (LX.Drill; this visit only)

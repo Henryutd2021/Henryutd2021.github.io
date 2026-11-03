@@ -35,7 +35,12 @@ const num = K.num;
   const W = G0.prepare(town, year, "lesson0"), D = s.D;
   ["demand", "need"].forEach(k => ok(D[k].join() === W[k].join(), `data: ${k} equals lesson 0's prepare()`));
   ok(D.dateLabel === "3 September 2025" && s.peak === 450 && town.scenarios.lesson0.demandPeakMW === 450, "data: 3 September 2025, the town's busiest hour of 2025 = 450 MW");
-  ok(s.dayMWh === 6957 && s.gasMWh === 1965 && s.gasCost === 40 && s.gasDollars === 78600, "data: the day 6,957 MWh, gas 1,965 MWh at $40 = $78,600 (as K7)");
+  ok(s.dayMWh === 6957 && s.gasMWh === 1965 && s.gasCost === 40 && s.gasDollars === 78600, "data: the day 6,957 MWh, gas need 1,965 MWh at a flat $40 = $78,600 (as K7)");
+  // $78,600 is a flat-price product, not a schedule: lesson 0's cheapest-first day (ramp limits, curtailment, the peaker) differs
+  const EX = G0.expert(W).totals, schedGas = EX.cc * town.fleet.cc.cost + EX.pk * town.fleet.peaker.cost;
+  ok(EX.cc === 1960 && EX.pk === 20 && s.pkCost === 100 && schedGas === 80400 && schedGas !== s.gasDollars, `data: lesson 0's schedule runs gas CC ${EX.cc} MWh and the peaker ${EX.pk} MWh: $${schedGas}, not the flat $${s.gasDollars}`);
+  has("<b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at $40/MWh. Lesson 0's schedule also runs the $100/MWh peaker for 20 MWh, so its gas costs $80,400.", "the flat price is labelled, with lesson 0's schedule");
+  ok(/note: "the day's gas need, all at one flat price"/.test(JS) && !/at its running cost/.test(JS), "step 3: the $ row says it is a flat price, not the day's running cost");
   ok(s.hiMW === 353 && s.loMW === 235 && s.hiAt === 16 && s.loAt === 3 && s.need19 === 145 && s.ramp === 40, "data: highest hour 353 MW (16:00), lowest 235 MW (03:00), gas at 19:00 145 MW, ramp 40 MW/h");
   const Wd = L1.world(D1, town, year, days);
   ok(Wd.wh.phone === s.byId.phone.wh && Wd.wh.homeyear === s.byId.home.wh && Wd.wh.spp === s.byId.spp.wh && Wd.wh.us === s.byId.us.wh, "data: the phone, home, SPP and U.S. anchors equal lesson 1's world()");
@@ -81,16 +86,24 @@ const num = K.num;
 {
   has("Prairie Town's busiest hour of 2025, 450 MW, is 450,000 kW or 0.45 GW");
   has("on 3 September 2025 the town's 24 hourly values add up to 6,957 MWh, or 6.957 GWh");
-  has("1,965 MWh × $40/MWh = $78,600, and 6,957 MWh ÷ 24 h = 289.9 MW, the day's average power");
+  has("at a flat $40/MWh, 1,965 MWh × $40/MWh = $78,600; and 6,957 MWh ÷ 24 h ≈ 289.9 MW, the day's average power");
+  has("Scientific notation writes a number as a × 10ⁿ, with a at least 1 and less than 10: 1,000 = 10³, and the day's 6,957,000,000 Wh ≈ 6.96 × 10⁹ Wh");
+  has("Units and powers of ten, in six moves");
   has("a phone charge (1.9 × 10¹) and the U.S. year (4.2 × 10¹⁵) are 14 powers of ten apart");
   has("The day lies between 235 MW × 24 h = 5,640 MWh and 353 MW × 24 h = 8,472 MWh, so a report of 6,957 GWh has a slipped prefix");
-  has("6.96 × 10⁹ Wh is the town's day");
+  has("A number at least 1 and less than 10, times a power of ten: the town's day is about 6.96 × 10⁹ Wh");
+  const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/k01-units.yml"), "utf8");
+  ok(/at least 1 and less than 10, times a power of ten/.test(SIDE) && !/from 1 to 10|between 1 and 10/.test(SIDE + QMD + JS), "scientific notation: 1 <= a < 10 in the glossary, the page and the script (never 'from 1 to 10')");
   has("$\\dfrac{4.2 \\times 10^{15}}{1.9 \\times 10^{1}} \\approx 2.2 \\times 10^{14}$");
   has("$\\log_{10}(6.96 \\times 10^9) \\approx 9.84$"); ok(Math.log10(6.957e9).toFixed(2) === "9.84", "deeper: log10 of the day in Wh is 9.84");
   has("1 Wh = 3,600 J and 1 kWh = 3.6 MJ, exactly");
   has("ramp limit</span> of 40 MW per hour"); ok(town.fleet.cc.ramp === 40, "myth: lesson 0's ramp limit is 40 MW/h");
   has("298,600 GWh: a TWh is 1,000 GWh"); has("298,600,000 is the same energy in MWh");
-  has("7: the exponents differ by 14 − 7 = 7, and 2.99 ÷ 1.08 is about 2.8, so the ratio is about 2.8 × 10⁷");
+  has("7: the exponents differ by 14 − 7 = 7, and 2.99 ÷ 1.08 is about 2.8, so the ratio is about 2.8 × 10⁷. 2.8 is below 3.16, half a power of ten, so the nearest power stays 10⁷");
+  ok(!K.pairText(s, "home", "spp").up && K.pairText(s, "home", "spp").apart === 7 && near(K.HALF, Math.sqrt(10)) && K.HALF.toFixed(2) === "3.16", "quiz: 2.8 < 3.16 = √10, so 10⁷");
+  has("Terms added together must share a unit: MW plus MW, never MW plus MWh");
+  ok(!/A sum of terms with different names/.test(QMD), "modeler: the naming advice is about units, not names");
+  has("coefficients (the fixed numbers in front of each unknown)"); has('A [solver]{.lx-term term="solver"} treats values within a small tolerance, an allowed rounding error, as equal or zero');
   ok(/data-id="spp" data-answer="b"[\s\S]{0,300}<li data-value="b">298,600 GWh<\/li>/.test(QMD), "quiz: spp's answer b is 298,600 GWh");
   ok(/data-id="apart" data-answer="b"[\s\S]{0,300}<li data-value="b">7<\/li>/.test(QMD), "quiz: apart's answer b is 7");
   ok(298.6 * 1000 === 298600 && Math.round(298.6 * 1e6) === 298600000, "quiz: the distractors are the TWh in GWh and MWh");
@@ -99,8 +112,11 @@ const num = K.num;
   ok(a && b > a.index && QMD.slice(a.index + a[0].length, b).trim() === T.trim(), "page: the k1-table equals staticTable() (run with --write)");
   // links back to the lessons that need this, and dated primary sources
   ["01-power-energy.html", "05-capacity-factor.html", "07-cost.html", "00-grid-operator.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links to " + h));
-  ok(/EIA-930<\/a>\), scaled as in <a href="00-grid-operator\.html">lesson 0<\/a>/.test(QMD) && /checked 2 November 2026/.test(QMD) && /\(2022 data\)/.test(QMD) && /\(2025 data\)/.test(QMD), "sources: the day, the anchors and their dates");
-  ok(/The town, its scale and the \$40\/MWh gas running cost are illustrative/.test(QMD), "the illustrative values are labelled");
+  ok(/<b>Source\.<\/b> Prairie Town's day is the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid \(<a href="https:\/\/www\.eia\.gov\/electricity\/gridmonitor\/">EIA-930<\/a>\)/.test(QMD) && /<b>Illustrative\.<\/b> The shape is scaled as in <a href="00-grid-operator\.html">lesson 0<\/a>/.test(QMD) && /checked 2 November 2026/.test(QMD) && /\(2022 data\)/.test(QMD) && /\(2025 data\)/.test(QMD), "sources: the day, the anchors and their dates, source and assumptions in separate entries");
+  ok(/The town, its scale and the flat \$40\/MWh gas running cost are illustrative/.test(QMD), "the illustrative values are labelled");
+  // each data-note entry is one labelled idea, within the text budget
+  const notes = ((QMD.match(/<div class="lx-datanote">[\s\S]*?<\/ul><\/div>/) || [""])[0].match(/<li>[\s\S]*?<\/li>/g) || []).map(t => t.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length);
+  ok(notes.length === 4 && notes.every(n => n <= 36), "data note: four labelled entries of at most 36 words: " + notes.join(", "));
   const hrefs = (QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").match(/href="([^"]+)"|\]\(([^)]+)\)/g) || []).map(h => h.replace(/^href="|"$|^\]\(|\)$/g, ""));
   ok(hrefs.every(h => /^(https:\/\/www\.(eia|epa)\.gov\/|[a-z0-9-]+\.html$)/.test(h)), "links: only learn pages, eia.gov and epa.gov: " + hrefs.filter(h => !/^(https:\/\/www\.(eia|epa)\.gov\/|[a-z0-9-]+\.html$)/.test(h)).join(" "));
   const strings = (JS.replace(/^\s*\/\/.*$/gm, "").match(/"(?:[^"\\]|\\.)*"/g) || []).join(" ");
@@ -115,7 +131,8 @@ const num = K.num;
   const allowed = new Set(), add = v => allowed.add(String(v));
   [s.peak, num(s.peakKW), s.peakGW, s.dayMWh, num(s.dayMWh), s.dayGWh, K.sig(s.dayGWh, 3), num(s.gasMWh), s.gasCost, num(s.gasDollars), num(s.avgMW, 1),
    s.loMW, s.hiMW, num(s.loBound), num(s.hiBound), s.span, s.ramp, num(s.sppGWh), num(s.sppGWh * 1000), s.homeToSpp, num(s.dayMWh * 1000),
-   Math.round(s.dayGWh), Math.round(s.dayGWh) * 10, "298.6", "0.2986", "2,986", "10,791", "4,200", "1,000", "0.019"].forEach(add);
+   Math.round(s.dayGWh), Math.round(s.dayGWh) * 10, "298.6", "0.2986", "2,986", "10,791", "4,200", "1,000", "0.019",
+   num(G0.expert(G0.prepare(town, year, "lesson0")).totals.pk), s.pkCost, num(80400), K.HALF.toFixed(2)].forEach(add);
   s.items.forEach(it => { add(K.sig(it.mant, 3)); add(it.exp); add(K.plain(it.wh)); });
   ["2.2", "2.8", "9.84", "3,600", "3.6", "8,760", "24", "1", "2", "3", "4", "5", "6", "7", "9", "10", "12", "13", "14", "15", "16", "21", "100", "0", "2019", "2022", "2025", "2026", "0.45", "930"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
@@ -124,11 +141,32 @@ const num = K.num;
   ok(found.length > 80, `the scan saw the page's numbers (${found.length})`);
 }
 
+// ---------------- displayed calculations: "=" only where exact, "≈" across a rounding; the nearest power of ten is explained
+{
+  ok(K.eqSci(19) === "= 1.9 × 10¹" && K.eqSci(6957e6) === "≈ 6.96 × 10⁹" && K.eqSci(7000e6) === "= 7 × 10⁹" && K.eqSci(6957e9) === "≈ 6.96 × 10¹²", "eqSci: = when exact, ≈ when rounded");
+  ok(K.eqNum(289.875, 1) === "≈ 289.9" && K.eqNum(290, 1) === "= 290.0" && K.eqNum(1965 * 40) === "= 78,600", "eqNum: = when exact, ≈ when rounded");
+  ok(/\+ " ≈ \(" \+ sig\(p\.big\.mant, 3\)/.test(JS) && /"<\/sup> ≈ <b>" \+ p\.ratioText/.test(JS) && /\{ op: "≈" \},\n\s+\{ v: "\(" \+ sig\(p\.big\.mant/.test(JS), "step 5 and the explain chain use ≈ between rounded leading numbers and the ratio");
+  ok(!/\{ op: "=" \}/.test(JS) && /" MWh ÷ 24 h " \+ eqNum\(s\.avgMW, 1\)/.test(JS) && /" h " \+ eqNum\(avg, 1\) \+ " MW/.test(JS), "the average-power lines pick = or ≈ from the numbers");
+  // the default pair: 6,957 MWh against 10,791 kWh
+  const P = K.pairText(s, "town", "home");
+  ok(near(P.ratio, 6957e6 / 10791e3) && K.num(P.ratio) === "645" && !K.isExact(6.96 / 1.08 * 100, P.ratio) && K.num(6.96 / 1.08 * 100) === "644" && P.up && P.rexp === 2 && K.sig(P.rmant, 3) === "6.45", "default pair: the unrounded ratio 644.7 shows as 645; the rounded leading numbers give 644, so the page writes ≈");
+  ok(K.nearestWhy(P) === "6.45 is above 3.16, half a power of ten, so the nearest power is 10³.", "default pair: why 645 is assigned to 10³: " + K.nearestWhy(P));
+  ok(K.nearestWhy(K.pairText(s, "phone", "us")) === "2.2 is below 3.16, half a power of ten, so the nearest power is 10¹⁴." && K.sci(s.spanRatio, 2) === "2.2 × 10¹⁴", "step 5: the phone-to-U.S. reason uses the 2.2 the feedback shows");
+  // every pair: the stated reason agrees with the count (above 3.16 rounds up, below stays)
+  s.items.forEach(a => s.items.forEach(b => { if (a.id !== b.id) { const p = K.pairText(s, a.id, b.id); ok(p.apart === p.rexp + (p.up ? 1 : 0) && p.apart === Math.round(Math.log10(p.ratio)) && p.rmant >= 1 && p.rmant < 10, `pair ${a.id}/${b.id}: nearest power ${p.apart} = exponent ${p.rexp} + (${K.sig(p.rmant, 3)} ≥ 3.16)`); } }));
+  // the flowchart traces: the slipped report is not a round number in Wh, so it takes ≈; the right one is exact
+  ok(K.eqSci(s.claims[0].mwh * 1e6) === "≈ 6.96 × 10¹²" && K.eqSci(s.claims[2].mwh * 1e6) === "= 7 × 10⁹", "flowchart: the traces' signs");
+  ok(/Scientific notation \(3 figures\)/.test(T), "no-JS table: the scientific-notation column says it is rounded to 3 figures");
+}
+
 // ---------------- the interactive: the actions Next waits for, the live regions, the demo hook
 {
-  ok(/if \(got\[1\] && got\[3\]\)/.test(JS) && /close\(v, s\.dayGWh, 0\.006\)/.test(JS) && /CHAINS\.every/.test(JS) && /v === s\.span/.test(JS) && /s\.claims\.every/.test(JS), "steps: each card's action is checked before Next opens");
+  ok(/if \(got\[1\] && got\[3\]\)/.test(JS) && /close\(v, s\.dayGWh, 0\.006\)/.test(JS) && /CHAINS\.every/.test(JS) && /v === s\.byId\.town\.exp/.test(JS) && /v === s\.span/.test(JS) && /s\.claims\.every/.test(JS), "steps: each card's action is checked before Next opens");
+  ok((JS.match(/steps\.push\(\{/g) || []).length === 6 && s.byId.town.exp === 9, "steps: six cards; step 4 asks for the town's day's exponent, 9");
+  // each number box names its unit in its own label (a screen reader reads the label, not the unit after the box)
+  ok(/label: s\.peak \+ " MW in kW:"/.test(JS) && /label: s\.peak \+ " MW in GW:"/.test(JS) && /label: "Day's energy in GWh:"/.test(JS) && /label: "Exponent n for the day in Wh:"/.test(JS) && /label: "Powers of ten, phone to U\.S\. year:"/.test(JS) && !/label: "The day:"/.test(JS), "steps: every number box's label carries its unit");
   ok((JS.match(/"aria-live": "polite"/g) || []).length >= 4, "steps: results are announced in live regions (the drill's are LX.Drill's)");
-  ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 2/.test(JS) && /state === "done"/.test(JS) && /autos\[4\]/.test(JS), "demo: mid, step-N and done states");
+  ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 2/.test(JS) && /state === "done"/.test(JS) && /autos\[5\]/.test(JS) && [0, 1, 2, 3, 4, 5].every(k => JS.indexOf("autos[" + k + "] = function") >= 0), "demo: mid, step-N and done states; every card has a finish-for-me");
   ok(/LX\.store\.set\("k1-pair"/.test(JS) && /LX\.store\.get\("k1-pair"\)/.test(JS), "explain: the unit chain reads the reader's own pair from step 4");
   ok(/LX\.CompareTable\(/.test(JS) && /LX\.UnitChain\(/.test(JS) && /LX\.Flowchart\(/.test(JS), "explain: comparison table, unit chain and flowchart");
   ok(/LX\.Drill\(host, \{/.test(JS) && !/focus: false/.test(JS), "drill: LX.Drill, whose next item takes focus");

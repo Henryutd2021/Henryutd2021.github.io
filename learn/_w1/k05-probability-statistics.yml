@@ -20,6 +20,12 @@ glossary:
   - id: monte-carlo
     term: Monte Carlo
     def: "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results."
+  - id: normal-distribution
+    term: Normal distribution
+    def: "A symmetric, bell-shaped spread of values set by its mean and standard deviation, also called Gaussian; about 68% of its values lie within one standard deviation of the mean."
+  - id: standard-error
+    term: Standard error
+    def: "How far an estimate from a random sample typically lands from the value for the whole set; it shrinks as the sample grows."
 requests:
   - "K5 reuses lesson 4's data file (assets/learn/data/04-forecasts.json, jan_apr) as is; any rebuild of that file should rerun node _tests/learn/test_k05-probability-statistics.js --write (no-JS fallback) and the test."
   - "Possible shared component: a dot strip of repeated sample estimates (K5 step 6, drawn as small rounded bars on LX.Plot because LX.Plot skips the dots of a width-0 line). If M7 needs it, LX.Plot could draw dots for width-0 lines."

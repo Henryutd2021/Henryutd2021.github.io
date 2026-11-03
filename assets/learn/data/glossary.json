@@ -1,7 +1,7 @@
 {
  "gitignore": {
   "term": ".gitignore",
-  "short": "A file listing names and folders that Git leaves out of the repository, such as keys and large raw data.",
+  "short": "A file listing names and folders, such as keys and large raw data, that git add skips while they are untracked; it does not remove files already committed.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
@@ -16,6 +16,12 @@
   "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
   "lesson": "K3",
   "href": "k03-discounting.html"
+ },
+ "api-key": {
+  "term": "API key",
+  "short": "A private code that identifies you to an online data service; treat it like a password and keep it out of shared files.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "array": {
   "term": "Array",
@@ -193,7 +199,7 @@
  },
  "commit": {
   "term": "Commit",
-  "short": "A saved snapshot of every file in a project, with a message, its author and time, and a link to the commit before it.",
+  "short": "A recorded snapshot of a project's tracked files as they were staged, with a message, its author and time, and a link to the commit before it.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
@@ -551,6 +557,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "git-head": {
+  "term": "HEAD (Git)",
+  "short": "Git's name for the commit you are on now; usually it points at a branch label, which points at that commit.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "heat-pump": {
   "term": "Heat pump",
   "short": "A device that uses electricity to move heat, into a building to warm it or out of it to cool it.",
@@ -863,6 +875,24 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "nominal-rate": {
+  "term": "Nominal rate",
+  "short": "An interest or discount rate that includes inflation, used with cash counted in the dollars of each future year.",
+  "lesson": "K3",
+  "href": "k03-discounting.html"
+ },
+ "normal-distribution": {
+  "term": "Normal distribution",
+  "short": "A symmetric, bell-shaped spread of values set by its mean and standard deviation, also called Gaussian; about 68% of its values lie within one standard deviation of the mean.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
+ "notebook": {
+  "term": "Notebook",
+  "short": "A document of code cells and text, such as a Jupyter notebook: you run each cell on its own, and its output appears under it.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "notebook-kernel": {
   "term": "Notebook kernel",
   "short": "The running program behind a notebook that holds its variables in memory between cells, whatever order the cells were run in.",
@@ -1159,7 +1189,7 @@
  },
  "scientific-notation": {
   "term": "Scientific notation",
-  "short": "A way to write a number as a value from 1 to 10 times a power of ten, so very large and very small numbers are easy to compare.",
+  "short": "A way to write a number as a value at least 1 and less than 10, times a power of ten, so very large and very small numbers are easy to compare.",
   "lesson": "K1",
   "href": "k01-units.html"
  },
@@ -1229,6 +1259,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "standard-error": {
+  "term": "Standard error",
+  "short": "How far an estimate from a random sample typically lands from the value for the whole set; it shrinks as the sample grows.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "start-up-cost": {
   "term": "Start-up cost",
   "short": "The fuel and wear spent to bring a plant from off to on, paid once per start.",
@@ -1294,6 +1330,12 @@
   "short": "A chart that ranks inputs by how far a result moves when each input is swung from a low to a high value, one at a time.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "tracked-file": {
+  "term": "Tracked file",
+  "short": "A file Git already knows, because it is in the last commit or the staging area; a new file stays untracked until git add.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "unbounded": {
   "term": "Unbounded",

@@ -10,7 +10,7 @@ glossary:
     def: "A project folder together with its full history of commits, as kept by a version-control tool such as Git."
   - id: commit
     term: Commit
-    def: "A saved snapshot of every file in a project, with a message, its author and time, and a link to the commit before it."
+    def: "A recorded snapshot of a project's tracked files as they were staged, with a message, its author and time, and a link to the commit before it."
   - id: staging-area
     term: Staging area
     def: "Git's list of changes picked for the next commit: git add puts a file's current version there."
@@ -34,7 +34,19 @@ glossary:
     def: "Values in a notebook's memory that no longer match the code on the page, for example after a cell was edited but not rerun."
   - id: gitignore
     term: .gitignore
-    def: "A file listing names and folders that Git leaves out of the repository, such as keys and large raw data."
+    def: "A file listing names and folders, such as keys and large raw data, that git add skips while they are untracked; it does not remove files already committed."
+  - id: tracked-file
+    term: Tracked file
+    def: "A file Git already knows, because it is in the last commit or the staging area; a new file stays untracked until git add."
+  - id: git-head
+    term: HEAD (Git)
+    def: "Git's name for the commit you are on now; usually it points at a branch label, which points at that commit."
+  - id: notebook
+    term: Notebook
+    def: "A document of code cells and text, such as a Jupyter notebook: you run each cell on its own, and its output appears under it."
+  - id: api-key
+    term: API key
+    def: "A private code that identifies you to an online data service; treat it like a password and keep it out of shared files."
   - id: checksum
     term: Checksum
     def: "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes."

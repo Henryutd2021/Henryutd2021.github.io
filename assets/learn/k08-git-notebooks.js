@@ -13,9 +13,13 @@
 //
 // Pure model (exported for Node, no DOM): townDay; the project's files and history (story()); the Git state machine
 // (newRepo, edit, add, commit, restore, switchCreate, switchTo, detach, merge, revert, pull, cloneRepo, status, log,
-// diffLines and the text each command prints); bisect() and maxChecks(); the notebook (nbNew, nbRun, nbEdit,
-// nbRestartRunAll); the practice drill's items (seeded by the shared LX.Drill, components/drill.js, which also draws the
-// drill; its number box is LX.NumAnswer); staticFallback() for the page's no-JS blocks.
+// diffLines and the text each command prints); bisect() and maxChecks(); step 7's notebook (nbNew, nbRun, nbEdit,
+// nbRestartRunAll); the shared project of steps 8 and 9 (shareFiles, shareRepo, finalRepo: step 8's five fixes applied to
+// the files one by one), its notebook file day.ipynb (valid nbformat 4 JSON, notebookJSON) and what
+// `pip install -r requirements.txt` and `jupyter nbconvert --to notebook --execute day.ipynb` do with it (installFrom,
+// nbExecute: a small kernel that runs the notebook's own cells, top to bottom, including cell 6's balance assert); the
+// practice drill's items (seeded by the shared LX.Drill, components/drill.js, which also draws the drill; its number box
+// is LX.NumAnswer); staticFallback() for the page's no-JS blocks.
 // Commit ids are 7-hex fingerprints this page computes (FNV-1a of parents, message and files), not Git's SHA-1 ids.
 // Every number on the page is checked by node _tests/learn/test_k08-git-notebooks.js, which also writes the no-JS
 // blocks (--write).
@@ -34,7 +38,7 @@
     var raw = cut(year.demand).map(function (v) { return v / 1000 * sc.demandPeakMW; });
     var need = raw.map(function (v, t) { return Math.round((v - f.nuclear.mw - wind[t] - solar[t]) / sc.step) * sc.step; });
     var demand = need.map(function (n, t) { return n + f.nuclear.mw + wind[t] + solar[t]; });
-    return { date: sc.date, dateLabel: sc.dateLabel, flat: f.nuclear.mw, demand: demand, wind: wind, solar: solar, need: need };
+    return { date: sc.date, dateLabel: sc.dateLabel, flat: f.nuclear.mw, demand: demand, wind: wind, solar: solar, need: need, meta: year.meta };
   }
 
   function copy(o) { return JSON.parse(JSON.stringify(o)); }
@@ -81,10 +85,13 @@
   }
   var PLOT = ["import matplotlib.pyplot as plt", "from model import day, gas_mw", 'plt.step(day.hour, gas_mw, where="post")',
               'plt.ylabel("Gas, MW")', 'plt.savefig("gas_day.png")'].join("\n");
-  var REQS = "pandas==2.2.3\npyyaml==6.0.2\nmatplotlib==3.9.2";   // illustrative pins (the page says so wherever they show)
+  // requirements.txt before and after step 8's first fix. The pins are illustrative (the page says so wherever they show):
+  // they show what an exact pin looks like. nbconvert runs a notebook without a browser; ipykernel is its Python kernel.
+  var REQS_LOOSE = "pandas\npyyaml\nmatplotlib\nnbconvert\nipykernel";
+  var REQS = "pandas==2.2.3\npyyaml==6.0.2\nmatplotlib==3.9.2\nnbconvert==7.16.4\nipykernel==6.29.5";
+  var MODULE = { pandas: "pandas", pyyaml: "yaml", matplotlib: "matplotlib", nbconvert: "nbconvert", ipykernel: "ipykernel" };   // pip name -> import name
   var IGNORE = ".env\ndata/raw/\n*.png";
-  var NOTEBOOK = ["cell 1: import pandas as pd; day = pd.read_csv(\"data/town_day.csv\")", "cell 2: gas_cost = 40",
-                  "cell 3: gas_mwh = (day.demand_mw - day.wind_mw - day.solar_mw - 100).sum()", "cell 4: gas_mwh * gas_cost"].join("\n");
+  var ENV = "EIA_API_KEY=(your own key, never committed)", RAW = "data/raw/EIA930_BALANCE_2025.csv";
 
   // ---------------------------------------------------------------- running the project: what model.py and check.py print
   // tokens of the right-hand side of the gas_mw line: day.<column>, p["<key>"], a name, a number, + − ( )
@@ -183,6 +190,16 @@
     });
     st.clean = !st.staged.length && !st.modified.length;
     return st;
+  }
+  // a working-folder file's label: staged and committed are different places, so they get different words
+  function fileState(st, k) {
+    var stg = st.staged.indexOf(k) >= 0, mod = st.modified.indexOf(k) >= 0;
+    if (st.untracked.indexOf(k) >= 0) return "new, untracked";
+    if (st.ignored.indexOf(k) >= 0) return "ignored";
+    if (stg && mod) return "edited after staging";
+    if (stg) return "staged, not committed";
+    if (mod) return "edited";
+    return "matches the last commit";
   }
   function kind(a, b) { return a == null ? "new file" : b == null ? "deleted" : "modified"; }
   function statusText(r) {
@@ -368,15 +385,32 @@
     r = revert(r, S.ids.c4).repo;
     return r;
   }
-  // the shared project after step 8's fixes: the notebook, pinned versions, .gitignore; with a .env and raw data that
-  // stay out of the repository
-  function finalRepo(S, msg) {
-    var r = stepStart(S, 5, msg), R = run(r.work);
-    r = edit(edit(edit(edit(r, "requirements.txt", REQS), ".gitignore", IGNORE), "day.ipynb", NOTEBOOK), "README.md", readme(R, 3));
-    r = commit(add(r, "."), MSG.c8).repo;
-    r = edit(edit(r, ".env", "EIA_API_KEY=(your own key, never committed)"), "data/raw/EIA930_BALANCE_2025.csv", "(a large raw download)");
-    return r;
+  // the shared project of steps 8 and 9: after step 5's revert, the notebook day.ipynb, requirements.txt and a README that
+  // says how to run it, with step 8's fixes applied to the files one by one (fixed: {pin, path, data, seed, secret}, each
+  // true or false). A .env with an API key and a raw download sit in the folder, untracked.
+  function dataLine(D, fixed) {
+    if (!fixed) return "Raw data: downloaded from EIA";
+    var M = D.meta || {}, F = M.files || [], a = /^(\d{4})-(\d\d)-(\d\d)$/.exec(M.accessed || "");
+    var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return "Raw data: EIA-930 BALANCE files, SWPP, 2025, downloaded " + (a ? +a[3] + " " + MON[+a[2] - 1] + " " + a[1] : "(date)") +
+      ", SHA-256 " + F.map(function (f) { return f.sha256.slice(0, 8) + "…"; }).join(" and ");
   }
+  function shareFiles(S, msg, fixed) {
+    fixed = fixed || {};
+    var r = stepStart(S, 5, msg), R = run(r.work);
+    r = edit(r, "requirements.txt", fixed.pin ? REQS : REQS_LOOSE);
+    r = edit(r, "day.ipynb", notebookJSON(shareCells(fixed)));
+    var L = readme(R, 3).split("\n"), iRun = L.findIndex(function (l) { return /^Run: /.test(l); });
+    L.splice(iRun + 1, 0, "Notebook: jupyter nbconvert --to notebook --execute day.ipynb");
+    L.splice(L.findIndex(function (l) { return /^Data: /.test(l); }) + 1, 0, dataLine(S.D, fixed.data));
+    r = edit(r, "README.md", L.join("\n"));
+    if (fixed.secret) r = edit(r, ".gitignore", IGNORE);
+    return edit(edit(r, ".env", ENV), RAW, "(a large raw download)");
+  }
+  // `git add .` and a commit: with the .gitignore in place, .env and the raw data stay untracked; without it they go in
+  function shareRepo(S, msg, fixed) { return commit(add(shareFiles(S, msg, fixed), "."), MSG.c8).repo; }
+  function allFixed() { var f = {}; FIXES.forEach(function (x) { f[x.key] = true; }); return f; }
+  function finalRepo(S, msg, fixed) { return shareRepo(S, msg, fixed || allFixed()); }
 
   // ---------------------------------------------------------------- finding the first bad commit by halving
   // ids oldest first; ids[0] is known good and the last is known bad; isBad(id) runs the check
@@ -392,14 +426,17 @@
   // the most checks halving needs when commit 1 is good and commit n is bad (n − 1 suspects)
   function maxChecks(n) { var k = 0; while (Math.pow(2, k) < n - 1) k++; return k; }
 
-  // ---------------------------------------------------------------- the notebook: four cells and a kernel's memory
+  // ---------------------------------------------------------------- the notebook: four cells and a kernel's memory (step 7)
+  // Step 7's notebook is the project's day.ipynb as it runs on your laptop: cell 1 still reads a file on your Desktop
+  // (step 8 fixes that). Its cells 1 to 4 are run here by a model of the kernel's memory.
+  var PATH_LAPTOP = "/Users/me/Desktop/town_day.csv", PATH_PROJECT = "data/town_day.csv";
   var CELLS = [
-    'import pandas as pd\nday = pd.read_csv("data/town_day.csv")',
+    'import pandas as pd\nday = pd.read_csv("{path}")',
     "gas_cost = {v}      # $/MWh",
-    "gas_mwh = (day.demand_mw - day.wind_mw - day.solar_mw - 100).sum()   # 100 MW runs flat",
+    "gas_mwh = (day.demand_mw - day.wind_mw - day.solar_mw - 100).sum()   # MWh from gas; 100 MW runs flat",
     "gas_mwh * gas_cost"];
   function nbNew() { return { v: GAS_COST, mem: {}, count: 0, cells: [{}, {}, {}, {}], log: [] }; }
-  function nbSrc(nb, i) { return CELLS[i].replace("{v}", nb.v); }
+  function nbSrc(nb, i) { return CELLS[i].replace("{v}", nb.v).replace("{path}", PATH_LAPTOP); }
   function nbEdit(nb, v) { nb = copy(nb); nb.v = v; nb.log.push("edit:" + v); return nb; }
   function nbRun(nb, D, i) {
     nb = copy(nb); nb.count++;
@@ -426,13 +463,130 @@
   // cell 4 shows a number the cells as written would not give (memory older than the code)
   function nbStale(nb, D) { var c = nb.cells[3]; return c.out != null && c.out !== nbClean(nb, D); }
 
+  // ---------------------------------------------------------------- the shared notebook file and a clean execution (steps 8, 9)
+  // day.ipynb as shared: step 7's four cells (gas cost $40), a test draw of six hours (cell 5) and the balance check
+  // (cell 6, the same assert as check.py). Step 8's path and seed fixes change cells 1 and 5.
+  var CELL5 = { laptop: "test = day.sample(6)   # six hours to spot-check", fixed: "test = day.sample(6, random_state=1)   # six hours to spot-check" };
+  var CELL6 = 'supply = 24 * 100 + day.wind_mw.sum() + day.solar_mw.sum() + gas_mwh\nassert day.demand_mw.sum() == supply, "energy balance is off"\nprint("balance OK")';
+  function shareCells(fixed) {
+    fixed = fixed || {};
+    return [CELLS[0].replace("{path}", fixed.path ? PATH_PROJECT : PATH_LAPTOP), CELLS[1].replace("{v}", GAS_COST), CELLS[2], CELLS[3],
+            fixed.seed ? CELL5.fixed : CELL5.laptop, CELL6];
+  }
+  // a valid notebook file (nbformat 4): code cells with their source lines, no outputs yet, a Python 3 kernel
+  function notebookJSON(cells) {
+    return JSON.stringify({
+      cells: cells.map(function (src) {
+        var L = src.split("\n");
+        return { cell_type: "code", execution_count: null, metadata: {}, outputs: [], source: L.map(function (l, i) { return i < L.length - 1 ? l + "\n" : l; }) };
+      }),
+      metadata: { kernelspec: { display_name: "Python 3", language: "python", name: "python3" }, language_info: { name: "python" } },
+      nbformat: 4, nbformat_minor: 4 }, null, 1);
+  }
+  // what `pip install -r requirements.txt` puts in a fresh environment: {import name: version or "newest"}
+  function installFrom(files) {
+    var out = {};
+    (files["requirements.txt"] || "").split("\n").forEach(function (l) {
+      var m = /^([A-Za-z0-9_.-]+)(?:==([\w.]+))?\s*$/.exec(l.trim()); if (m) out[MODULE[m[1]] || m[1]] = m[2] || "newest";
+    });
+    return out;
+  }
+  // an expression in a cell: numbers, names, day.<column>, .sum(), * + − and parentheses
+  function nbEval(src, mem) {
+    var tk = [], rx = /\s*(\d+(?:\.\d+)?|[A-Za-z_]\w*|\.\w+|[-+*()])/y, m, k = 0;
+    src = src.trim(); rx.lastIndex = 0;
+    while (rx.lastIndex < src.length) { m = rx.exec(src); if (!m) throw new Error("SyntaxError: invalid syntax"); tk.push(m[1]); }
+    function bin(a, b, f) {
+      var A = Array.isArray(a), B = Array.isArray(b);
+      if (!A && !B) return f(a, b);
+      var n = A ? a.length : b.length, o = [];
+      for (var i = 0; i < n; i++) o.push(f(A ? a[i] : a, B ? b[i] : b));
+      return o;
+    }
+    function post(v) {
+      while (tk[k] && tk[k].charAt(0) === ".") {
+        var a = tk[k++].slice(1);
+        if (tk[k] === "(" && tk[k + 1] === ")") { k += 2; if (a !== "sum" || !Array.isArray(v)) throw new Error("AttributeError: " + a); v = sum(v); }
+        else { if (!v || !v.frame || !v.frame[a]) throw new Error("AttributeError: no column '" + a + "'"); v = v.frame[a]; }
+      }
+      return v;
+    }
+    function atom() {
+      var t = tk[k++];
+      if (t === "(") { var v = expr(); if (tk[k++] !== ")") throw new Error("SyntaxError: missing )"); return post(v); }
+      if (t === "-") return bin(0, atom(), function (a, b) { return a - b; });
+      if (/^\d/.test(t)) return +t;
+      if (/^[A-Za-z_]/.test(t)) { if (!Object.prototype.hasOwnProperty.call(mem, t)) throw new Error("NameError: name '" + t + "' is not defined"); return post(mem[t]); }
+      throw new Error("SyntaxError: invalid syntax");
+    }
+    function term() { var v = atom(); while (tk[k] === "*") { k++; v = bin(v, atom(), function (a, b) { return a * b; }); } return v; }
+    function expr() { var v = term(); while (tk[k] === "+" || tk[k] === "-") { var s = tk[k++] === "+" ? 1 : -1; v = bin(v, term(), function (a, b) { return a + s * b; }); } return v; }
+    var v = expr();
+    if (k !== tk.length) throw new Error("SyntaxError: invalid syntax");
+    return v;
+  }
+  // `jupyter nbconvert --to notebook --execute day.ipynb` in a fresh environment: it needs nbconvert and a Python kernel
+  // (ipykernel), reads the file as notebook JSON, then runs every code cell top to bottom in one new kernel and stops at
+  // the first error, as nbconvert does. installed: installFrom(...); run: a number that changes the draw of an unseeded
+  // sample from one run to the next. Returns {cells: [{n, out, stdout, err}], mem, ok, error, sample}.
+  function nbExecute(files, installed, run) {
+    var res = { cells: [], mem: {}, ok: false };
+    installed = installed || {};
+    if (!installed.nbconvert) { res.error = "Jupyter command `jupyter-nbconvert` not found."; return res; }
+    var nb;
+    try { nb = JSON.parse(files["day.ipynb"]); } catch (e) { res.error = "NotJSONError: Notebook does not appear to be JSON"; return res; }
+    if (!nb || nb.nbformat !== 4 || !Array.isArray(nb.cells)) { res.error = "NotJSONError: Notebook does not appear to be JSON"; return res; }
+    var ks = nb.metadata && nb.metadata.kernelspec && nb.metadata.kernelspec.name;
+    if (ks !== "python3" || !installed.ipykernel) { res.error = "No such kernel named " + (ks || "python3"); return res; }
+    var mem = res.mem, n = 0;
+    function line(l, last, cell) {
+      l = l.replace(/\s+#.*$/, "").trim(); if (!l) return;
+      var m;
+      if ((m = /^import (\w+)(?: as (\w+))?$/.exec(l))) { if (!installed[m[1]]) throw new Error("ModuleNotFoundError: No module named '" + m[1] + "'"); mem[m[2] || m[1]] = { module: m[1] }; return; }
+      if ((m = /^(\w+) = (\w+)\.read_csv\("([^"]+)"\)$/.exec(l))) {
+        if (!mem[m[2]] || mem[m[2]].module !== "pandas") throw new Error("NameError: name '" + m[2] + "' is not defined");
+        if (files[m[3]] == null) throw new Error("FileNotFoundError: [Errno 2] No such file or directory: '" + m[3] + "'");
+        mem[m[1]] = { frame: readCSV(files[m[3]]) }; return;
+      }
+      if ((m = /^(\w+) = (\w+)\.sample\((\d+)(?:, random_state=(\d+))?\)$/.exec(l))) {
+        var f = mem[m[2]]; if (!f || !f.frame) throw new Error("NameError: name '" + m[2] + "' is not defined");
+        var seeded = m[4] != null, r = DR.rng(seeded ? +m[4] + 1 : 1000 + (run || 0) * 7919), hrs = f.frame.hour.slice(), pickd = [];
+        for (var j = 0; j < +m[3]; j++) pickd.push(hrs.splice(Math.floor(r() * hrs.length), 1)[0]);
+        mem[m[1]] = { sample: pickd, seeded: seeded }; res.sample = mem[m[1]]; return;
+      }
+      if ((m = /^assert (.+) == (.+), "([^"]*)"$/.exec(l))) { if (nbEval(m[1], mem) !== nbEval(m[2], mem)) throw new Error("AssertionError: " + m[3]); return; }
+      if ((m = /^print\("([^"]*)"\)$/.exec(l))) { cell.stdout.push(m[1]); return; }
+      if ((m = /^(\w+) = (.+)$/.exec(l))) { mem[m[1]] = nbEval(m[2], mem); return; }
+      var v = nbEval(l, mem); if (last) cell.out = v;
+    }
+    for (var i = 0; i < nb.cells.length; i++) {
+      var c = nb.cells[i]; if (c.cell_type !== "code") continue;
+      var src = Array.isArray(c.source) ? c.source.join("") : String(c.source || ""), L = src.split("\n"), cell = { n: ++n, out: null, stdout: [] };
+      res.cells.push(cell);
+      try { L.forEach(function (l, j) { line(l, j === L.length - 1, cell); }); }
+      catch (e) { cell.err = e.message; res.error = "CellExecutionError in cell " + cell.n + ": " + e.message; return res; }
+    }
+    res.ok = true;
+    return res;
+  }
+
   // ---------------------------------------------------------------- step 8: five things that stop a stranger's rerun
+  // Each fix changes the shared project's files (shareFiles): before is what the file says on your laptop, after what it
+  // says once fixed. title (with glossary marks) and file show in the view; label in the no-JS table.
   var FIXES = [
-    { key: "pin", label: "exact versions (pandas==2.2.3, an illustrative version)", file: "requirements.txt", before: "pandas", after: "pandas==2.2.3", why: "An exact version (the number is illustrative): a later pandas may change a default and the numbers with it." },
-    { key: "path", label: "a path inside the project", file: "day.ipynb, cell 1", before: 'pd.read_csv("/Users/me/Desktop/town_day.csv")', after: 'pd.read_csv("data/town_day.csv")', why: "A path inside the project works on every computer, not only yours." },
-    { key: "data", label: "the raw data's source, download date and checksum", file: "README.md", before: "Data: downloaded from EIA", after: "Data: EIA-930 2025 balance files, downloaded 2 Nov 2026, SHA-256 fac4bb99…", why: "Source, date and checksum let anyone confirm they have the same file." },
-    { key: "seed", label: "a fixed random seed", file: "day.ipynb, cell 5", before: "test = day.sample(6)", after: "test = day.sample(6, random_state=1)", why: "A fixed seed draws the same six hours on every run." },
-    { key: "secret", label: ".env and data/raw/ in .gitignore", file: ".gitignore", before: "(no .gitignore: .env with an API key would be committed)", after: ".env\ndata/raw/", why: "Keys stay on your computer; large raw downloads stay out of the history." }];
+    { key: "pin", title: "Exact versions", label: "exact versions (pandas==2.2.3, an illustrative version)", file: "requirements.txt (version numbers illustrative)",
+      before: REQS_LOOSE, after: REQS, why: "Exact versions: a later pandas may change a default, and the numbers with it. These version numbers are illustrative, not a recommendation." },
+    { key: "path", title: "A path inside the project", label: "a path inside the project", file: "day.ipynb, cell 1",
+      before: 'day = pd.read_csv("' + PATH_LAPTOP + '")', after: 'day = pd.read_csv("' + PATH_PROJECT + '")', why: "A path inside the project works on every computer, not only yours." },
+    { key: "data", title: "The raw data's source, download date and [[checksum|checksum]]", label: "the raw data's source, download date and checksum", file: "README.md",
+      before: "Raw data: downloaded from EIA", after: null, why: "Source, date and checksum let anyone confirm they have the same files." },
+    { key: "seed", title: "A fixed [[random-seed|random seed]]", label: "a fixed random seed", file: "day.ipynb, cell 5",
+      before: CELL5.laptop, after: CELL5.fixed, why: "A fixed seed draws the same six hours on every run." },
+    { key: "secret", title: "Ignore rules before you stage", label: ".env, data/raw/ and charts in .gitignore before anything is staged", file: ".gitignore · .env holds your [[api-key|API key]]",
+      before: "(no .gitignore yet: git add . would stage .env and the raw data)", after: IGNORE,
+      why: "Ignore rules keep untracked matching files out of git add, so add them before you stage. They do not remove a file already committed." }];
+
+  function fixAfter(S, f) { return f.key === "data" ? dataLine(S.D, true) : f.after; }   // the README's line comes from the data's own metadata
 
   // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["where", "next", "cost", "halve", "notebook", "repro", "order"];
@@ -484,12 +638,12 @@
     }
     if (kind === "cost") {
       var c = [30, 35, 45, 50, 55, 60, 65, 70][pick(8)], R = S.R1;
-      return { kind: kind, q: "A commit's diff shows “- gas_cost: 40” and “+ gas_cost: " + c + "” in params.yml. The model makes " + int(R.gasMWh) + " MWh of gas. What is the day's gas cost after this commit, in $?",
+      return { kind: kind, q: "A commit's diff shows “- gas_cost: 40” and “+ gas_cost: " + c + "” in params.yml. The model makes " + int(R.gasMWh) + " MWh of electricity from gas. What is the day's gas cost after this commit, in $?",
                answer: R.gasMWh * c, unit: "$", why: int(R.gasMWh) + " MWh × $" + c + "/MWh = " + usd(R.gasMWh * c) + " (it was " + usd(R.cost) + ")." };
     }
     if (kind === "halve") {
       var n = 5 + pick(60), m = maxChecks(n);
-      return { kind: kind, q: "Commit 1 of " + n + " passes the check; commit " + n + " fails it. Checking the middle commit each time, at most how many commits must you check to find the first bad one?",
+      return { kind: kind, q: "Commit 1 of " + n + " passes the check; commit " + n + " fails it, and once the bug appears every later commit fails. Checking the middle commit each time, at most how many commits must you check to find the first bad one?",
                answer: m, n: n, why: n - 1 + " suspects; each check halves them: 2^" + m + " = " + Math.pow(2, m) + " ≥ " + (n - 1) + (m > 0 ? " > 2^" + (m - 1) + " = " + Math.pow(2, m - 1) : "") + ", so " + m + " checks." };
     }
     if (kind === "notebook") {
@@ -517,17 +671,18 @@
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   function staticFallback(S) {
     var H = S.hist, R1 = S.R1, bug = H[3].R, B = bisect(H.map(function (h) { return h.id; }), function (id) { return !run(S.team.commits[id].tree).ok; });
+    var C = cloneRepo(finalRepo(S)), X = nbExecute(C.work, installFrom(C.work), 1);
     var o = '<table class="k8-static" aria-label="The steps of this page: command and what it shows">\n<thead><tr><th scope="col">Step</th><th scope="col">Command</th><th scope="col">What it shows</th></tr></thead>\n<tbody>\n';
     var rows = [
       ["1", "git log --oneline", "Three commits, newest first: " + H.slice(0, 3).reverse().map(function (h) { return h.id + " " + h.msg; }).join("; ") + "."],
       ["2", "git status, git diff", "After gas_cost 40 → " + HIGH + " in params.yml: one modified file, the line “−gas_cost: 40” and “+gas_cost: " + HIGH + "”; the day's cost goes from " + usd(R1.cost) + " to " + usd(S.Rhigh.cost) + "."],
       ["3", "git switch -c high-gas, git add params.yml, git commit -m", "A new branch, the change staged, then recorded as a commit on high-gas only."],
       ["4", "git switch main", "params.yml says 40 again and the result is " + usd(R1.cost) + "; git switch high-gas brings back " + HIGH + "."],
-      ["5", "git pull, then git switch --detach &lt;id&gt; and python check.py", "A teammate's three commits arrive; the balance check fails by " + int(Math.abs(bug.balance)) + " MWh. Halving the history: commit " + (B.checks[0].i + 1) + " passes, commit " + (B.checks[1].i + 1) + " fails, so commit " + (B.first + 1) + " (" + B.id + ") is the first bad one, found in " + B.checks.length + " checks."],
+      ["5", "git pull, then git switch --detach &lt;id&gt; and python check.py", "A teammate's three commits arrive; the balance check fails by " + int(Math.abs(bug.balance)) + " MWh. Halving the history (once a commit fails, every later one fails too): commit " + (B.checks[0].i + 1) + " passes, commit " + (B.checks[1].i + 1) + " fails, so commit " + (B.first + 1) + " (" + B.id + ") is the first bad one, found in " + B.checks.length + " checks."],
       ["6", "git diff " + H[2].id + " " + H[3].id + ", git revert " + H[3].id, "The line became −(wind − solar): solar is added, not subtracted, so gas is " + int(bug.gasMWh) + " MWh instead of " + int(R1.gasMWh) + " (2 × " + int(R1.solarMWh) + " MWh too much). The revert commit brings back " + int(R1.gasMWh) + " MWh."],
       ["7", "a notebook: edit cell 2, run only cell 4", "Cell 4 still shows " + R1.cost + " (memory holds gas_cost = 40) under a cell that says " + HIGH + "; Restart and run all gives " + S.Rhigh.cost + "."],
       ["8", "five fixes", "Before sharing: " + FIXES.map(function (f) { return f.label; }).join("; ") + "."],
-      ["9", "git clone, pip install -r requirements.txt, run all", "The fresh copy has no .env and no raw data, yet gives " + int(R1.gasMWh) + " MWh, " + usd(R1.cost) + " and “balance OK”, as the README says."]];
+      ["9", "git clone, pip install -r requirements.txt, jupyter nbconvert --to notebook --execute day.ipynb", "The fresh copy has no .env and no raw data. Its notebook runs top to bottom: cell 3 gives " + int(X.mem.gas_mwh) + " MWh, cell 4 shows " + X.cells[3].out + " (dollars), and cell 6's balance assert prints “" + X.cells[5].stdout[0] + "”, as the README says."]];
     rows.forEach(function (x) { o += '<tr><td data-label="Step">' + x[0] + '</td><td class="k8-mono">' + x[1] + "</td><td>" + x[2] + "</td></tr>\n"; });
     o += "</tbody></table>\n";
     var h = '<table class="k8-static" aria-label="The project\'s history after the teammate\'s commits">\n<thead><tr><th scope="col">Commit</th><th scope="col">Message</th><th scope="col">Gas, MWh</th><th scope="col">Balance check</th></tr></thead>\n<tbody>\n';
@@ -540,18 +695,20 @@
     var o = '<ol class="k8-static-drill">\n';
     it.forEach(function (x) {
       var a = x.choices ? x.choices[x.answer] : (x.unit === "$" ? usd(x.answer) : String(x.answer));
-      o += "<li>" + esc(x.q) + " <b>Answer: " + esc(a) + ".</b> " + esc(x.why) + "</li>\n";
+      o += "<li><p>" + esc(x.q) + "</p><p><b>Answer: " + esc(a) + ".</b></p><p>Why: " + esc(x.why) + "</p></li>\n";
     });
     return o + "</ol>\n";
   }
 
   var model = { townDay: townDay, fp: fp, csv: csv, params: params, run: run, runText: runText, evalLine: evalLine, readYml: readYml,
-                newRepo: newRepo, headId: headId, treeOf: treeOf, status: status, statusText: statusText, edit: edit, add: add, commit: commit,
+                newRepo: newRepo, headId: headId, treeOf: treeOf, status: status, fileState: fileState, statusText: statusText, edit: edit, add: add, commit: commit,
                 restore: restore, restoreStaged: restoreStaged, switchCreate: switchCreate, switchTo: switchTo, detach: detach, merge: merge,
                 revert: revert, pull: pull, cloneRepo: cloneRepo, log: log, logText: logText, diffLines: diffLines, diffText: diffText,
                 ignored: ignored, isAncestor: isAncestor, mergeBase: mergeBase, story: story, stepStart: stepStart, finalRepo: finalRepo,
                 bisect: bisect, maxChecks: maxChecks, nbNew: nbNew, nbSrc: nbSrc, nbEdit: nbEdit, nbRun: nbRun, nbRestartRunAll: nbRestartRunAll,
-                nbClean: nbClean, nbStale: nbStale, FIXES: FIXES, COMMIT_MSGS: COMMIT_MSGS, MSG: MSG, KINDS: KINDS, WHERE: WHERE, REPRO: REPRO,
+                nbClean: nbClean, nbStale: nbStale, shareCells: shareCells, notebookJSON: notebookJSON, installFrom: installFrom, nbEval: nbEval,
+                nbExecute: nbExecute, shareFiles: shareFiles, shareRepo: shareRepo, allFixed: allFixed, dataLine: dataLine, fixAfter: fixAfter,
+                CELLS: CELLS, CELL5: CELL5, CELL6: CELL6, PATH_LAPTOP: PATH_LAPTOP, PATH_PROJECT: PATH_PROJECT, REQS_LOOSE: REQS_LOOSE, ENV: ENV, RAW: RAW, FIXES: FIXES, COMMIT_MSGS: COMMIT_MSGS, MSG: MSG, KINDS: KINDS, WHERE: WHERE, REPRO: REPRO,
                 ORDERS: ORDERS, drill: drill, drillItem: drillItem, rng: DR.rng, whereOf: whereOf, staticFallback: staticFallback, staticDrill: staticDrill,
                 GAS_COST: GAS_COST, HIGH: HIGH, BUG: BUG, GOOD3: GOOD3, REQS: REQS, IGNORE: IGNORE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -579,9 +736,10 @@
   function GitStage(host, o) {
     var box = H("div", { class: "k8-git" }, host);
     var only = o.only || ["w", "s", "h"], zones = H("div", { class: "k8-zones", style: "--k8-cols:" + only.length }, box);
-    var zW = zone("w", "Working folder", "your files as you edit them"), zS = zone("s", "Staging area", "picked for the next commit"), zH = zone("h", "History", "commits, newest first");
+    var zW = zone("w", "Working folder", "your files as you edit them"), zS = zone("s", "Staging area", "picked for the next commit"),
+        zH = zone("h", "History", "commits, newest first; [[git-head|HEAD]] marks the one you are on");
     function zone(k, t, s) {
-      var z = H("section", { class: "k8-zone" }, only.indexOf(k) >= 0 ? zones : null); H("h4", { text: t }, z); H("p", { class: "k8-zsub", text: s }, z);
+      var z = H("section", { class: "k8-zone" }, only.indexOf(k) >= 0 ? zones : null); H("h4", { text: t }, z); H("p", { class: "k8-zsub", html: LX.rich(s) }, z);
       return H("ul", { class: "k8-list" }, z);
     }
     var res = H("p", { class: "k8-result", "aria-live": "polite" }, box);
@@ -591,9 +749,8 @@
       var st = status(r), T = treeOf(r);
       zW.innerHTML = ""; zS.innerHTML = ""; zH.innerHTML = "";
       Object.keys(r.work).sort().forEach(function (k) {
-        var mod = st.modified.indexOf(k) >= 0, unt = st.untracked.indexOf(k) >= 0, ign = st.ignored.indexOf(k) >= 0;
-        var li = H("li", { class: "k8-file" + (mod ? " mod" : ign ? " ign" : "") }, zW); H("span", { text: k }, li);
-        H("small", { text: mod ? "edited" : unt ? "new, untracked" : ign ? "ignored" : "as committed" }, li);
+        var li = H("li", { class: "k8-file" + (st.modified.indexOf(k) >= 0 ? " mod" : st.ignored.indexOf(k) >= 0 ? " ign" : "") }, zW); H("span", { text: k }, li);
+        H("small", { text: fileState(st, k) }, li);
       });
       if (!st.staged.length) H("li", { class: "k8-empty", text: "nothing staged" }, zS);
       st.staged.forEach(function (k) { var li = H("li", { class: "k8-file stg" }, zS); H("span", { text: k }, li); H("small", { text: kind(T[k], r.index[k]) }, li); });
@@ -611,9 +768,10 @@
         if (c.id === headId(r)) tags.unshift(r.head.branch ? "HEAD → " + r.head.branch : "HEAD (detached)");
         tags.filter(function (t) { return !r.head.branch || t !== r.head.branch; }).forEach(function (t) { H("b", { class: "k8-tag", text: t }, li); });
       });
+      if (o.result) { res.innerHTML = o.result(r); return; }
       var R = run(r.work);
       res.innerHTML = R.error ? "Running these files: <b>" + LX.esc(R.error) + "</b>" :
-        "Running these files gives <b>" + int(R.gasMWh) + " MWh</b> of gas at $" + R.gasCost + "/MWh: <b>" + usd(R.cost) + "</b>. Balance check: <b>" + (R.ok ? "passes" : "fails by " + int(Math.abs(R.balance)) + " MWh") + "</b>.";
+        "Running these files gives <b>" + int(R.gasMWh) + " MWh</b> of electricity from gas, at $" + R.gasCost + "/MWh: <b>" + usd(R.cost) + "</b>. Balance check: <b>" + (R.ok ? "passes" : "fails by " + int(Math.abs(R.balance)) + " MWh") + "</b>.";
     }
     function say(cmd, lines, cls) {
       var blk = H("div", { class: "k8-blk" }, term);
@@ -647,8 +805,9 @@
 
     // ---- step 1: the history
     steps.push({
-      text: "A [[repository|repository]] is a project folder plus its history. Each [[commit|commit]] is a saved snapshot of every file, with a message and a short id. Run both commands.",
+      text: "A [[repository|repository]] is a project folder plus its history. Each [[commit|commit]] records the staged versions of its [[tracked-file|tracked files]], with a message and a short id. Run both commands.",
       build: function (act, api) {
+        H("p", { class: "k8-prog", html: LX.rich("The project: each hour, gas fills the [[megawatt|MW]] that demand leaves after wind, solar and a 100 MW plant that runs flat. model.py adds the day's hours into MWh of electricity from gas; check.py [[assert|asserts]] that supply equals demand.") }, act);
         var r = stepStart(S, 0), g = GitStage(act, {}), did = {};
         g.draw(r);
         function check() { if (did.log && did.status) { api.done(); api.saw("Three commits, newest first. “Working tree clean”: your files match the last commit, which gives " + int(R1.gasMWh) + " MWh and " + usd(R1.cost) + "."); } }
@@ -730,7 +889,7 @@
 
     // ---- step 5: find the first bad commit
     steps.push({
-      text: "A teammate's three commits arrive on main (git pull). Now the balance check fails. Commit 1 passed when it was written; check older commits to find the first bad one.",
+      text: "A teammate's three commits arrive on main (git pull), and the balance check fails. Commit 1 passed; here, once a commit fails, every later one fails too. Check commits to find the first bad one.",
       build: function (act, api) {
         var r = stepStart(S, 4, chosen.msg), checked = {}, n = 0;
         H("p", { class: "k8-term k8-mono", text: "$ python check.py   →   AssertionError: energy balance is off (by " + int(Math.abs(bugR.balance)) + " MWh)" }, act);
@@ -800,13 +959,20 @@
 
     // ---- step 7: a notebook's hidden state
     steps.push({
-      text: "A notebook keeps variables in a [[notebook-kernel|kernel's]] memory. Run cells 1 to 4, change cell 2 to $" + HIGH + ", run only cell 4. Then restart and run all.",
+      text: "A [[notebook|notebook]] runs code in cells, one at a time; its [[notebook-kernel|kernel]] keeps the variables in memory. Run cells 1 to 4, change cell 2 to $" + HIGH + ", run only cell 4. Then restart and run all.",
       build: function (act, api) {
-        var nb = nbNew(), sawOdd = false, cleanHigh = false, focusKey = null;
+        // saw: what the reader actually made cell 4 show (a stale number, or an error); the feedback is built from it
+        var nb = nbNew(), saw = null, after = null, focusKey = null;
         var wrap = H("div", { class: "k8-nb" }, act), mem = H("p", { class: "k8-mem", "aria-live": "polite" }, act), prog = H("p", { class: "k8-prog" }, act);
         var bar = H("div", { class: "k8-cmds" }, act);
         var rr = H("button", { type: "button", class: "lx-btn small", text: "Restart and run all" }, bar);
-        rr.addEventListener("click", function () { nb = nbRestartRunAll(nb, D); if (nb.v === HIGH && sawOdd) cleanHigh = true; focusKey = null; draw(); });
+        function restart() { nb = nbRestartRunAll(nb, D); if (saw) after = { out: nb.cells[3].out, v: nb.v }; focusKey = null; draw(); }
+        function runCell(i) {
+          nb = nbRun(nb, D, i);
+          if (i === 3 && nbStale(nb, D)) saw = { out: nb.cells[3].out, v: nb.v, clean: nbClean(nb, D) };
+          draw();
+        }
+        rr.addEventListener("click", restart);
         function draw() {
           var active = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute("data-k");
           if (active) focusKey = active;
@@ -816,7 +982,7 @@
             var top = H("div", { class: "k8-cell-top" }, cell);
             H("span", { class: "k8-in", text: "In [" + (c.n || " ") + "]:" }, top);
             var rb = H("button", { type: "button", class: "lx-btn ghost small", "data-k": "run" + i, "aria-label": "Run cell " + (i + 1), html: LX.icon("play") + "Run" }, top);
-            rb.addEventListener("click", function () { nb = nbRun(nb, D, i); if (nb.cells[i].err || nbStale(nb, D)) sawOdd = true; draw(); });
+            rb.addEventListener("click", function () { runCell(i); });
             if (i === 1) {
               var s = seg(top, ["40", String(HIGH)], nb.v === HIGH ? 1 : 0, function (k) { nb = nbEdit(nb, k ? HIGH : GAS_COST); draw(); }, "Value written in cell 2, $/MWh");
               s.el.querySelectorAll("button").forEach(function (b, k) { b.setAttribute("data-k", "v" + k); });
@@ -827,64 +993,84 @@
           })(i);
           if (focusKey) { var f = wrap.querySelector('[data-k="' + focusKey + '"]'); if (f) f.focus(); }
           var m = nb.mem, vars = [m.day ? "day (24 rows)" : null, m.gas_cost != null ? "gas_cost = " + m.gas_cost : null, m.gas_mwh != null ? "gas_mwh = " + m.gas_mwh : null].filter(Boolean);
-          mem.innerHTML = "Kernel memory: <b>" + (vars.length ? LX.esc(vars.join(", ")) : "empty") + "</b>." + (nbStale(nb, D) ? " Cell 4 shows " + nb.cells[3].out + ", but the cells as written give " + nbClean(nb, D) + "." : "");
-          var left = [sawOdd ? null : "make cell 4 show a number the cells as written would not give (or an error)", cleanHigh ? null : "restart and run all with $" + HIGH].filter(Boolean);
+          var note = nbStale(nb, D) ? " Cell 4 shows " + nb.cells[3].out + ", but the cells as written give " + nbClean(nb, D) + "." :
+                     nb.cells[3].err ? " Cell 4 stopped: a cell it needs has not run yet. An error is easy to spot; hidden state shows none." : "";
+          mem.innerHTML = "Kernel memory: <b>" + (vars.length ? LX.esc(vars.join(", ")) : "empty") + "</b>." + LX.esc(note);
+          var left = [saw ? null : "make cell 4 show a number the cells as written would not give", after ? null : (saw ? "now restart and run all" : "then restart and run all")].filter(Boolean);
           prog.textContent = left.length ? "Still to do: " + left.join("; ") + "." : "Both done: Next is open.";
-          if (!left.length) { api.done(); api.saw("Out of order, cell 4 used the memory, not the page: " + R1.cost + " under a cell that says " + HIGH + ". Restart and run all gives " + S.Rhigh.cost + ", counters 1 to 4."); }
+          if (!left.length) { api.done(); api.saw("Cell 4 showed " + saw.out + " under a cell that says " + saw.v + ": it used the memory, not the page. Restart and run all gave " + after.out + ", from the cells as written, counters 1 to 4."); }
         }
         draw();
         textAlt(act, "Text version", ["Cells: (1) load the day; (2) gas_cost = 40 or " + HIGH + "; (3) gas_mwh = " + R1.gasMWh + "; (4) gas_mwh * gas_cost.",
           "Run 1 to 4, edit cell 2 to " + HIGH + ", run only cell 4: it shows " + R1.cost + ", because memory still holds gas_cost = 40.",
           "Run cell 4 in a fresh kernel and it stops with a NameError: gas_mwh is not defined yet.", "Restart and run all: counters 1, 2, 3, 4 and " + S.Rhigh.cost + "."]);
-        finish[6] = function () { [0, 1, 2, 3].forEach(function (i) { nb = nbRun(nb, D, i); }); nb = nbEdit(nb, HIGH); nb = nbRun(nb, D, 3); sawOdd = true; nb = nbRestartRunAll(nb, D); cleanHigh = true; draw(); };
+        finish[6] = function () { [0, 1, 2, 3].forEach(function (i) { runCell(i); }); nb = nbEdit(nb, HIGH); runCell(3); restart(); };
       }
     });
 
-    // ---- step 8: five fixes before sharing
+    // ---- step 8: five fixes before sharing, one at a time; each changes the shared project's files (shareFiles), which
+    // step 9 clones and runs
+    var fixedKeys = null;   // null until step 8 is built in this visit (step 9 then uses all five fixes)
     steps.push({
-      text: "The notebook runs on your laptop. Five things would stop it on a stranger's, or change its numbers. Fix each one.",
+      text: "The project now has a notebook, day.ipynb: step 7's cells (gas cost $40), a test draw and a balance check. It runs on your laptop. Fix, one by one, five things that would stop it on a stranger's.",
       build: function (act, api) {
-        var fixed = {}, list = H("ul", { class: "k8-fixes" }, act), prog = H("p", { class: "k8-prog", "aria-live": "polite" }, act);
-        FIXES.forEach(function (f) {
-          var li = H("li", { class: "k8-fix" }, list);
-          H("p", { class: "k8-ffile", text: f.file }, li);
+        var list = H("ol", { class: "k8-fixes" }, act), prog = H("p", { class: "k8-prog", "aria-live": "polite" }, act), shown = 0;
+        function show() {
+          var f = FIXES[shown], li = H("li", { class: "k8-fix" }, list); shown++;
+          H("p", { class: "k8-ftitle", html: LX.rich(shown + " of " + FIXES.length + " · " + f.title) }, li);
+          H("p", { class: "k8-ffile", html: LX.rich(f.file) }, li);
           var code = H("pre", { class: "k8-code", text: f.before }, li);
           var why = H("p", { class: "k8-why" }, li);
           var b = H("button", { type: "button", class: "lx-btn ghost small", "aria-pressed": "false", text: "Fix it" }, li);
           b.addEventListener("click", function () {
-            if (fixed[f.key]) return;
-            fixed[f.key] = 1; code.textContent = f.after; code.classList.add("ok"); why.textContent = f.why; b.textContent = "Fixed"; b.setAttribute("aria-pressed", "true");
-            var n = Object.keys(fixed).length;
-            prog.textContent = n + " of " + FIXES.length + " fixed.";
-            if (n === FIXES.length) { api.done(); api.saw("Pinned versions, a relative path, a checksum, a seed and a [[gitignore|.gitignore]]: each removes one thing that lived only on your computer."); }
+            if (fixedKeys[f.key]) return;
+            fixedKeys[f.key] = true; code.textContent = fixAfter(S, f); code.classList.add("ok"); why.innerHTML = LX.rich(f.why); b.textContent = "Fixed"; b.setAttribute("aria-pressed", "true");
+            var n = Object.keys(fixedKeys).length;
+            prog.textContent = n + " of " + FIXES.length + " fixed." + (n < FIXES.length ? " The next one is below." : "");
+            if (n < FIXES.length) show();
+            else { api.done(); api.saw("Pinned versions, a path inside the project, a checksum, a seed and a [[gitignore|.gitignore]] made before staging: each removes one thing that lived only on your computer. Step 9 runs these files."); }
           });
-        });
+          return b;
+        }
+        fixedKeys = {};
+        show();
         prog.textContent = "0 of " + FIXES.length + " fixed.";
-        finish[7] = function () { list.querySelectorAll("button").forEach(function (b) { b.click(); }); };
+        finish[7] = function () { var b; while ((b = list.querySelector("button[aria-pressed=false]"))) b.click(); };
       }
     });
 
-    // ---- step 9: a clean clone reruns
+    // ---- step 9: a clean clone reruns the notebook itself
     steps.push({
       text: "The real test: a fresh copy. [[clone|Clone]] the project, install the pinned versions (illustrative numbers), run the notebook top to bottom, and compare with the README.",
       build: function (act, api) {
-        var F = finalRepo(S, chosen.msg), C = cloneRepo(F), Rc = run(C.work), k = 0;
-        var g = GitStage(act, { only: ["w", "h"] }), CMD = ["git clone ../prairie-day fresh-copy && cd fresh-copy", "pip install -r requirements.txt", "jupyter nbconvert --to notebook --execute day.ipynb"];
+        var F = finalRepo(S, chosen.msg, fixedKeys || allFixed()), C = cloneRepo(F), inst = null, X = null, k = 0, cloned = false;
+        var left = Object.keys(F.work).filter(function (f) { return C.work[f] == null; }).sort(), reqs = C.work["requirements.txt"].split("\n");
+        var g = GitStage(act, { only: ["w", "h"], result: function () {
+          if (X) return X.ok ? "The notebook in the fresh copy: cell 3 gives <b>" + int(X.mem.gas_mwh) + " MWh</b> of electricity from gas, cell 4 shows <b>" + X.cells[3].out + "</b> (dollars), cell 6 prints <b>" + LX.esc(X.cells[5].stdout[0]) + "</b>." : "The notebook stopped: <b>" + LX.esc(X.error) + "</b>";
+          return cloned ? "A fresh copy, nothing installed or run yet." : "Your project, committed and ready to share.";
+        } });
+        var CMD = ["git clone ../prairie-day fresh-copy && cd fresh-copy", "pip install -r requirements.txt", "jupyter nbconvert --to notebook --execute day.ipynb"];
         g.draw(F);
         var bs = CMD.map(function (c, i) {
           var b = g.button(c, function () {
             if (i !== k) return;
             k++; bs.forEach(function (x, j) { x.disabled = j !== k; });
-            if (i === 0) { g.say(c, ["Cloning into 'fresh-copy'...", "In the copy: " + Object.keys(C.work).sort().join(", "), "Not copied: .env, data/raw/ (ignored)"]); g.draw(C); }
-            if (i === 1) g.say(c, ["Installing " + REQS.split("\n").join(", ")]);
+            if (i === 0) { cloned = true; g.say(c, ["Cloning into 'fresh-copy'...", "In the copy: " + Object.keys(C.work).sort().join(", "), left.length ? "Not in the copy: " + left.join(", ") + " (ignored, never committed)" : "Nothing left behind: .env and the raw data were committed, so every copy has your key"]); g.draw(C); }
+            if (i === 1) { inst = installFrom(C.work); g.say(c, ["Installing " + reqs.join(", ") + (reqs.every(function (l) { return /==/.test(l); }) ? " (version numbers illustrative)" : " (whatever versions are newest today)")]); }
             if (i === 2) {
-              g.say(c, ["Executed day.ipynb, cells in order 1 to 4", "gas_mwh = " + Rc.gasMWh + ", cost $ " + Rc.cost, Rc.ok ? "balance OK" : "AssertionError"]);
-              api.done(); api.saw("Fresh copy, fresh install, same numbers: " + int(Rc.gasMWh) + " MWh and " + usd(Rc.cost) + ", as the README says. That shows the code and inputs reproduce the result, not that the result is right: R5's checks do that.");
+              X = nbExecute(C.work, inst, 1);
+              g.say(c, ["[NbConvertApp] Converting notebook day.ipynb to notebook"].concat(X.ok ?
+                ["Ran cells 1 to " + X.cells.length + " in a new kernel; cell 6: " + X.cells[5].stdout[0], "[NbConvertApp] Writing day.nbconvert.ipynb (the notebook with its outputs)"] : [X.error]));
+              g.draw(C);
+              if (X.ok) api.done();
+              api.saw(X.ok ? "Fresh copy, fresh install, notebook run top to bottom: " + int(X.mem.gas_mwh) + " MWh, " + usd(X.cells[3].out) + " and “" + X.cells[5].stdout[0] + "”, as the README says. Reproduced is not the same as right: R5's checks test that." : X.error, !X.ok);
             }
           });
           b.disabled = i !== 0;
           return b;
         });
+        var cells = JSON.parse(C.work["day.ipynb"]).cells.map(function (c) { return c.source.join(""); });   // the file the run reads
+        textAlt(act, "day.ipynb in the copy: its " + cells.length + " cells", cells.map(function (c, i) { return "Cell " + (i + 1) + ": " + c.split("\n").join(" · "); }));
         finish[8] = function () { bs.forEach(function (b) { b.click(); }); };
       }
     });
@@ -910,34 +1096,39 @@
       rows: [
         { key: "w", color: "var(--lx-warn)", name: "Working folder", holds: "your files as you edit them", in: "edit and save", undo: "git restore <file> throws an edit away" },
         { key: "s", color: "var(--lx-accent)", name: "Staging area", holds: "the changes picked for the next commit", in: "git add <file>", undo: "git restore --staged <file>" },
-        { key: "h", color: "var(--lx-good)", name: "History", holds: "every commit: snapshot, message, parent", in: "git commit -m \"why\"", undo: "git revert <id> adds an undoing commit" }]
+        { key: "h", color: "var(--lx-good)", name: "History", holds: "every commit: the staged snapshot, a message, a parent", in: "git commit -m \"why\"", undo: "git revert <id> adds an undoing commit" }]
     });
     LX.CausalChain(LX.H("div", { class: "lx-xcard" }, x), {
       title: "Halving the history: the bug hunt",
       links: [
-        { title: "Two ends known", text: "Commit 1 passed when written; commit 6 fails the balance check. The first bad one is among commits 2–6.", value: (hist.length - 1) + " suspects" },
+        { title: "Two ends known", text: "Commit 1 passes; commit 6 fails the balance check. Once the bug appears it stays, so the first bad one is among commits 2–6.", value: (hist.length - 1) + " suspects" },
         { title: "Check the middle", text: "Commit " + (B.checks[0].i + 1) + " " + (B.checks[0].bad ? "fails" : "passes") + ".", value: "commits " + (B.checks[0].i + 2) + "–6 left" },
         { title: "Check the middle again", text: "Commit " + (B.checks[1].i + 1) + " " + (B.checks[1].bad ? "fails" : "passes") + ": it sits next to a passing one.", value: B.checks.length + " checks" },
         { title: "Read its diff", text: "−(wind − solar) adds the solar instead of subtracting it.", value: "+" + int(Math.abs(hist[3].R.balance)) + " MWh" },
         { title: "Fix forward", text: "git revert adds a commit that undoes it; the history keeps both.", value: int(R1.gasMWh) + " MWh again" }],
-      note: "Git can run the halving for you: git bisect. Halving needs at most " + maxChecks(1000) + " checks for 1,000 commits."
+      note: "Git can run the halving for you: git bisect. Halving needs at most " + maxChecks(1000) + " checks for 1,000 commits, as long as every commit after the first bad one also fails."
     });
+    // each repair loops back to the check it failed; sharing comes only after both checks pass. Checks sit in column 0.5,
+    // repairs in column 2; the two back edges are drawn by hand (up from the repair, then across into the line above
+    // its check), at the rows set here (wide: x = 255 and 570, y = 34 + 88 * row; phones: x = 92 and 268, y = 34 + 92 * row)
     LX.Flowchart(LX.H("div", { class: "lx-xcard" }, x), {
-      title: "Does it rerun? Check before you share", lede: "Two reruns, each catching a different problem. Trace three cases from this page.",
+      title: "Does it rerun? Check before you share", lede: "Two reruns, each catching a different problem; after a repair, run the same check again. Trace three cases from this page.",
       nodes: {
         start: { t: "Your notebook", k: "end" },
         q1: { t: "Restart, run all: same numbers?", tN: ["Restart, run all:", "same numbers?"], k: "q" },
-        a1: { t: "Hidden state", s: "rerun in order, fix cells" },
-        q2: { t: "Clean clone: same numbers?", tN: ["Clean clone:", "same numbers?"], k: "q" },
-        a2: { t: "Something lives outside", s: "path, version, data, seed", tN: ["Something", "lives outside"] },
+        a1: { t: "Hidden state", s: "fix the cells", sN: "fix the cells" },
+        q2: { t: "Clean clone: same numbers?", tN: ["Clean clone run:", "same numbers?"], k: "q" },
+        a2: { t: "Something lives outside", s: "path, version, data or seed", tN: ["Something", "lives outside"], sN: "fix it" },
         end: { t: "Share, with the commit id", tN: ["Share, with", "the commit id"], k: "end" }
       },
-      cols: 3, at: { start: [1, 0], q1: [1, 1], a1: [0, 2], q2: [1, 3], a2: [2, 4], end: [1, 5] },
-      colsN: 2, atN: { start: [0.5, 0], q1: [0.5, 1], a1: [0, 2], q2: [0.5, 3], a2: [1, 4], end: [0.5, 5] },
-      edges: [["start", "q1"], ["q1", "a1", "no"], ["q1", "q2", "yes"], ["a1", "q2", null, { v: true }], ["q2", "a2", "no"], ["q2", "end", "yes"], ["a2", "end", null, { v: true }]],
+      cols: 3, at: { start: [0.5, 0], q1: [0.5, 1.25], a1: [2, 1.25], q2: [0.5, 2.6], a2: [2, 2.6], end: [0.5, 3.7] },
+      colsN: 2, atN: { start: [0, 0], q1: [0, 1.25], a1: [1, 1.25], q2: [0, 2.6], a2: [1, 2.6], end: [0, 3.7] },
+      edges: [["start", "q1"], ["q1", "a1", "no"], ["q1", "q2", "yes"], ["q2", "a2", "no"], ["q2", "end", "yes"],
+              ["a1", "q1", "fixed", { d: "M570 121.5 V80 H259", l: [420, 72], dN: "M268 126.5 V92 H96", lN: [182, 84] }],
+              ["a2", "q2", "fixed", { d: "M570 240.3 V212 H259", l: [420, 204], dN: "M268 242.7 V215 H96", lN: [182, 207] }]],
       traces: [
-        { label: "Cell 4 after the edit", path: ["start", "q1", "a1", "q2", "end"], text: "**Cell 4 showed " + R1.cost + " under a cell that says " + HIGH + ".** Restart and run all gives " + S.Rhigh.cost + "." },
-        { label: "A path on one laptop", path: ["start", "q1", "q2", "a2", "end"], text: "**/Users/me/Desktop/town_day.csv runs at home, fails in the clone.** A path inside the project fixes it." },
+        { label: "Cell 4 after the edit", path: ["start", "q1", "a1", "q1", "q2", "end"], text: "**Cell 4 showed " + R1.cost + " under a cell that says " + HIGH + ".** Restart and run all gives " + S.Rhigh.cost + ": hidden state. Run from the top again and the numbers match." },
+        { label: "A path on one laptop", path: ["start", "q1", "q2", "a2", "q2", "end"], text: "**/Users/me/Desktop/town_day.csv runs at home, fails in the clone.** A path inside the project fixes it; a second clone then reruns." },
         { label: "The fresh clone", path: ["start", "q1", "q2", "end"], text: "**" + int(R1.gasMWh) + " MWh and " + usd(R1.cost) + " again, as the README says.** Same code and inputs, same result." }],
       sel: 0
     });
@@ -949,7 +1140,7 @@
         { id: "data", label: "Data traceable", text: "Small processed data committed; raw data has a source, a date and a [[checksum|checksum]]." },
         { id: "paths", label: "Relative paths", text: "Every path starts inside the project folder." },
         { id: "seed", label: "Seeds fixed", text: "Every random draw has a fixed [[random-seed|seed]]." },
-        { id: "secret", label: "Secrets out", text: "Keys and large raw files are in .gitignore, never committed." },
+        { id: "secret", label: "Secrets out", text: "Keys and large raw files are in .gitignore before anything is staged; ignoring does not remove a file already committed." },
         { id: "order", label: "Runs top to bottom", text: "Restart and run all gives the shared numbers." },
         { id: "assert", label: "Checks that fail loudly", text: "An assert stops the run if a balance or total is off." },
         { id: "readme", label: "README", text: "How to install and run, and the key numbers to expect." },

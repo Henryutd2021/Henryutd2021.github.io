@@ -1,6 +1,6 @@
 // k02-rates-efficiencies.js — Toolbox K2, "Rates and efficiencies" (step cards, Learn W2, 2026-11-03).
 //
-// Just-in-time math for lesson 1 (a home's average draw), lesson 5 (capacity factor), lesson 7 (fuel cost per MWh from a
+// Just-in-time math for lesson 1 (the average power a home buys from the grid), lesson 5 (capacity factor), lesson 7 (fuel cost per MWh from a
 // heat rate) and lessons 9 and 13 (a battery's round trip). Five step cards, an explain layer and a practice drill.
 //
 // Data (read through data-src, so every number stays the same as in the lessons that use it):
@@ -11,10 +11,12 @@
 //                                           NREL 2025)
 //   assets/learn/data/town.json             fleet.wind.mw (Prairie Town's 150 MW wind farm, illustrative)
 //   assets/learn/data/cf_targets.json       targets.wind.cf (EIA: U.S. wind 33.8% in 2025)
-//   assets/learn/data/k02-rates-efficiencies.json   the one new constant: 3,412 Btu per kWh (EIA FAQ, checked 3 Nov 2026)
+//   assets/learn/data/k02-rates-efficiencies.json   the one new constant: 3,412 Btu per kWh (EIA FAQ, checked 3 Nov 2026), and
+//                                           the cited 82% U.S. battery benchmark (EIA, 2019 data) behind the battery note
 //
 // Model (closed form):
-//   average power (kW)       = energy (kWh) ÷ hours
+//   average power (kW)       = energy (kWh) ÷ hours; the EIA home figure is electricity bought from the grid, so its
+//                              quotient is the average power bought (homes with their own solar use more than they buy)
 //   fuel cost ($/MWh)        = heat rate (MMBtu/MWh) × gas price ($/MMBtu)              (lesson 7's lcoe().fuel)
 //   CO2 (kg/MWh)             = heat rate (MMBtu/MWh) × 52.91 kg/MMBtu                   (lesson 13's costs().co2 × 1,000)
 //                              operating CO2 at the plant only (no fuel supply, no construction)
@@ -72,7 +74,7 @@
   // the rates of the page, one row each (the explain table and the no-JS table)
   function rateRows(s) {
     return [
-      { key: "avg", name: "Average draw", unit: "kW = kWh per hour", ex: num(s.homeKWh) + " kWh ÷ " + num(s.hours) + " h = " + num(s.homeKW, 3) + " kW", used: "lesson 1" },
+      { key: "avg", name: "Average power bought from the grid", unit: "kW = kWh per hour", ex: num(s.homeKWh) + " kWh ÷ " + num(s.hours) + " h = " + num(s.homeKW, 3) + " kW", used: "lesson 1" },
       { key: "hr", name: "Heat rate", unit: "MMBtu per MWh", ex: num(s.hrCC, 3) + " (combined-cycle), " + num(s.hrPK, 3) + " (peaker)", used: "lessons 7, 12, 13" },
       { key: "fuel", name: "Fuel cost", unit: "$ per MWh", ex: num(s.hrCC, 3) + " × " + usd(s.gas) + " = " + usd(s.fuelCC), used: "lesson 7" },
       { key: "co2", name: "CO₂ at the plant", unit: "kg per MWh", ex: num(s.hrCC, 3) + " × " + num(s.co2Coef, 2) + " = " + num(s.co2CC) + " kg", used: "lessons 12, 13" },
@@ -95,7 +97,7 @@
     var kind = KINDS[k % KINDS.length], pick = function (a) { return a[Math.floor(r() * a.length)]; };
     if (kind === "avg") {
       var e = pick([4380, 6000, 8760, 10791, 12000, 17520]), w = e * 1000 / HOURS;
-      return { kind: kind, q: "A home uses " + num(e) + " kWh in a year (" + num(HOURS) + " h). What is its average draw, in watts?", answer: w, tol: 1.5, unit: "W",
+      return { kind: kind, q: "A home uses " + num(e) + " kWh in a year (" + num(HOURS) + " h). What is its average power, in watts?", answer: w, tol: 1.5, unit: "W",
                why: num(e) + " kWh ÷ " + num(HOURS) + " h = " + num(e / HOURS, 3) + " kW = " + num(w) + " W." };
     }
     if (kind === "fuel") {
@@ -169,15 +171,15 @@
 
     // ---- step 1: a rate is a "per"
     steps.push({
-      text: "A rate is one amount per another. An average U.S. home buys " + num(s.homeKWh) + " [[kilowatt-hour|kWh]] of electricity in a year of " + num(s.hours) + " hours. What is its [[average-power|average draw]] in watts (W)?",
+      text: "A rate is one amount per another. An average U.S. home buys " + num(s.homeKWh) + " [[kilowatt-hour|kWh]] from the grid in a year of " + num(s.hours) + " hours: what is the [[average-power|average power]] it buys, in watts (W)?",
       build: function (act, api) {
-        var uc = LX.UnitChain(act, { label: "Average draw", steps: [{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: "? kW", u: "average draw", out: true }] });
+        var uc = LX.UnitChain(act, { label: "Average power bought from the grid", steps: [{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: "? kW", u: "average power bought", out: true }] });
         var tries = 0;
-        var n = LX.NumAnswer(act, { label: "Average draw:", unit: "W", onCheck: function (v) {
+        var n = LX.NumAnswer(act, { label: "Average power bought:", unit: "W", onCheck: function (v) {
           tries++;
           if (close(v, s.homeW, 1)) {
             uc.set([{ v: num(s.homeKWh) + " kWh", u: "in a year" }, { op: "÷ " + num(s.hours) + " h =" }, { v: num(s.homeKW, 3) + " kW", u: "= " + num(s.homeW) + " W", out: true }]);
-            api.done(); api.saw("kWh per hour is kW: " + num(s.homeKW, 3) + " kW, or " + num(s.homeW) + " W, lesson 1's home. A rate's unit says what was divided by what.");
+            api.done(); api.saw("kWh per hour is kW: " + num(s.homeKW, 3) + " kW, or " + num(s.homeW) + " W bought from the grid on average, as in lesson 1. A rate's unit says what was divided by what.");
           } else if (v != null && close(v, s.homeKW, 0.002)) api.saw("That is in kW. One kW is 1,000 W: multiply by 1,000.", true);
           else api.saw(tries < 2 ? "Not yet. Divide the kWh by the hours, then turn kW into W." : num(s.homeKWh) + " ÷ " + num(s.hours) + " = " + num(s.homeKW, 3) + " kW = " + num(s.homeW) + " W.", true);
         } });
@@ -192,7 +194,7 @@
       { key: "k", label: KK + " MMBtu per MWh", unit: null }];
     var GOALS = [{ key: "gas", want: "$ per MWh", title: "Fuel cost, $ per MWh" }, { key: "co2", want: "kg CO₂ per MWh", title: "CO₂, kg per MWh" }];
     steps.push({
-      text: "Lesson 7's [[combined-cycle|combined-cycle plant]] burns " + HR + " [[mmbtu|MMBtu]] of gas per MWh, its [[heat-rate|heat rate]]. Rates multiply when the units cancel. For each goal, pick the rate that cancels MMBtu.",
+      text: "Lesson 7's [[combined-cycle|combined-cycle plant]] burns " + HR + " [[mmbtu|MMBtu]] of gas per MWh: its [[heat-rate|heat rate]]. Rates multiply when the units cancel, so for each goal pick the rate that cancels MMBtu.",
       build: function (act, api) {
         var right = {};
         GOALS.forEach(function (gl) {
@@ -228,7 +230,7 @@
     // ---- step 3: heat rate to efficiency
     var PLANTS = [{ key: "cc", name: "Combined-cycle plant", hr: s.hrCC, eff: s.effCC, color: "var(--lx-cc)" }, { key: "pk", name: "Peaker", hr: s.hrPK, eff: s.effPK, color: "var(--lx-pk)" }];
     steps.push({
-      text: "One MWh of electricity holds " + KK + " MMBtu of energy. So [[efficiency|efficiency]] = " + KK + " ÷ heat rate: " + pct(s.effCC) + " for the combined-cycle plant. The [[peaker|peaker]]'s heat rate is " + HRP + ". More or less efficient?",
+      text: "One MWh of electricity holds " + KK + " MMBtu, so [[efficiency|efficiency]] = " + KK + " ÷ heat rate: " + pct(s.effCC) + " for the combined-cycle plant. Is the [[peaker|peaker]], with a heat rate of " + HRP + ", more or less efficient?",
       build: function (act, api) {
         var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Your answer" }, act), btns = [];
         var box = H("div", { class: "k2-eff" }, act), shown = false;
@@ -240,7 +242,7 @@
             reveal();
             LX.store.set("k2-own", Object.assign({}, LX.store.get("k2-own") || {}, { plant: "pk" }));
             api.done();
-            api.saw((ok ? "Right: " : "Less: ") + KK + " ÷ " + HRP + " = " + pct(s.effPK) + ". The peaker burns " + num(s.gasRatio, 2) + " times as much gas per MWh. A higher heat rate means a lower efficiency; the rest leaves as heat.");
+            api.saw((ok ? "Right: " : "Less: ") + KK + " ÷ " + HRP + " = " + pct(s.effPK) + ", so the peaker burns " + num(s.gasRatio, 2) + " times as much gas per MWh. A higher heat rate means a lower efficiency; the rest leaves as heat.");
           });
           btns.push(b);
         });
@@ -262,7 +264,7 @@
 
     // ---- step 4: losses multiply; dividing undoes them
     steps.push({
-      text: "Lesson 13's battery gives back " + pct(s.rte, 0) + " of what it takes in: its [[round-trip-efficiency|round-trip efficiency]]. Charge " + num(s.target) + " MWh and " + num(s.back) + " come back. To get " + num(s.target) + " MWh back, how much must you charge?",
+      text: "Lesson 13's battery gives back " + pct(s.rte, 0) + " of what it takes in, its [[round-trip-efficiency|round-trip efficiency]]: charge " + num(s.target) + " MWh and " + num(s.back) + " come back. To get " + num(s.target) + " MWh back, how much must you charge?",
       build: function (act, api) {
         var uc = LX.UnitChain(act, { label: "Battery round trip", steps: [{ v: "? MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }] });
         var tries = 0;
@@ -270,7 +272,7 @@
           tries++;
           if (close(v, s.need, 0.06)) {
             uc.set([{ v: num(s.need, 1) + " MWh", u: "charged" }, { op: "× " + num(s.rte, 2) + " =" }, { v: num(s.target) + " MWh", u: "back", out: true }]);
-            api.done(); api.saw(num(s.target) + " ÷ " + num(s.rte, 2) + " = " + num(s.need, 1) + " MWh. Going backwards, divide. Losses also multiply: store the combined-cycle plant's electricity and only " + pct(s.effCC) + " × " + pct(s.rte, 0) + " = " + pct(s.chainEff) + " of the gas's energy comes back.");
+            api.done(); api.saw(num(s.target) + " ÷ " + num(s.rte, 2) + " = " + num(s.need, 1) + " MWh. Going forward through a loss, multiply; going backwards, divide.");
           } else if (v != null && close(v, s.naive, 0.5)) api.saw("Adding " + pct(1 - s.rte, 0) + " is not enough: " + num(s.naive) + " × " + num(s.rte, 2) + " = " + num(s.naiveBack, 2) + " MWh back. Divide by " + num(s.rte, 2) + " instead.", true);
           else api.saw(tries < 2 ? "Not yet. What times " + num(s.rte, 2) + " gives " + num(s.target) + "? Divide." : num(s.target) + " ÷ " + num(s.rte, 2) + " = " + num(s.need, 1) + " MWh.", true);
         } });
@@ -280,7 +282,7 @@
 
     // ---- step 5: capacity factor is a ratio
     steps.push({
-      text: "A [[capacity-factor|capacity factor]] is a year's energy ÷ the most a plant could make. Prairie Town's " + num(s.windMW) + " MW wind farm could make " + num(s.windMax) + " MWh. At U.S. wind's " + pct(s.windCF) + " in 2025, how many MWh?",
+      text: "A [[capacity-factor|capacity factor]] is energy made ÷ energy at full output over the same period; here, one year. Prairie Town's " + num(s.windMW) + " MW wind farm could make " + num(s.windMax) + " MWh: at U.S. wind's " + pct(s.windCF) + " in 2025, how many MWh?",
       build: function (act, api) {
         var rows = H("div", { class: "k2-cf" }, act);
         var r1 = H("div", { class: "k2-effrow" }, rows); H("span", { class: "k2-effnm", text: "Most possible" }, r1);

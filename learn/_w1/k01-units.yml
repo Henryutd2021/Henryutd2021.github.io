@@ -4,7 +4,7 @@ lesson: K1
 glossary:
   - id: scientific-notation
     term: Scientific notation
-    def: "A way to write a number as a value from 1 to 10 times a power of ten, so very large and very small numbers are easy to compare."
+    def: "A way to write a number as a value at least 1 and less than 10, times a power of ten, so very large and very small numbers are easy to compare."
   - id: order-of-magnitude
     term: Order of magnitude
     def: "The power of ten a quantity sits at; two quantities are an order of magnitude apart when one is about ten times the other."

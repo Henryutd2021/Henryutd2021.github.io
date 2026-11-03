@@ -10,7 +10,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- Toolbox K1 in the step-card form (Learn W2, 2026-11-03): just-in-time math for lessons 1 (power and energy), 5 (MW held
-     for the hours of a year) and 7 ($ per kW against $ per MWh). Five cards of one idea and one action each, an explain layer
+     for the hours of a year) and 7 ($ per kW against $ per MWh). Six cards of one idea and one action each, an explain layer
      and a practice drill. Model, view and drill: assets/learn/k01-units.js with town.json and town_year.json (the day is cut
      and scaled exactly as in lesson 0), town_days.json (SPP's 2025 demand) and 01-power-energy.json (lesson 1's sourced
      anchors). Every number below is checked against the model, and against lessons 0 and 1, by
@@ -87,18 +87,19 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive lx-cards" data-learn="k01" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/town_days.json ../assets/learn/data/01-power-energy.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">Units and powers of ten, in five moves</p>
+<p class="lx-eyebrow">Units and powers of ten, in six moves</p>
 <ol>
 <li>Each prefix is 1,000 times the one below: Prairie Town's busiest hour of 2025, 450 MW, is 450,000 kW or 0.45 GW.</li>
 <li>Energy is power × time: on 3 September 2025 the town's 24 hourly values add up to 6,957 MWh, or 6.957 GWh.</li>
-<li>Units cancel like numbers: 1,965 MWh × $40/MWh = $78,600, and 6,957 MWh ÷ 24 h = 289.9 MW, the day's average power.</li>
+<li>Units cancel like numbers: at a flat $40/MWh, 1,965 MWh × $40/MWh = $78,600; and 6,957 MWh ÷ 24 h ≈ 289.9 MW, the day's average power.</li>
+<li>Scientific notation writes a number as a × 10ⁿ, with a at least 1 and less than 10: 1,000 = 10³, and the day's 6,957,000,000 Wh ≈ 6.96 × 10⁹ Wh.</li>
 <li>Written in Wh as powers of ten, a phone charge (1.9 × 10¹) and the U.S. year (4.2 × 10¹⁵) are 14 powers of ten apart.</li>
 <li>The day lies between 235 MW × 24 h = 5,640 MWh and 353 MW × 24 h = 8,472 MWh, so a report of 6,957 GWh has a slipped prefix.</li>
 </ol>
 <div class="k1-tables">
 <!-- k1-table:start (written by _tests/learn/test_k01-units.js --write; do not edit) -->
 <table class="k1-static" aria-label="Five amounts of energy in watt-hours and in scientific notation">
-<thead><tr><th scope="col">Amount of energy</th><th scope="col">As published</th><th scope="col" class="k1-wh">In Wh</th><th scope="col">Scientific notation</th></tr></thead>
+<thead><tr><th scope="col">Amount of energy</th><th scope="col">As published</th><th scope="col" class="k1-wh">In Wh</th><th scope="col">Scientific notation (3 figures)</th></tr></thead>
 <tbody>
 <tr><td>Charging a smartphone once</td><td>0.019 kWh</td><td class="k1-wh">19</td><td>1.9 × 10¹ Wh</td></tr>
 <tr><td>An average U.S. home's year</td><td>10,791 kWh</td><td class="k1-wh">10,791,000</td><td>1.08 × 10⁷ Wh</td></tr>
@@ -112,8 +113,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
-<li>Prairie Town's day: the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a> so that the town's busiest hour of 2025 is 450 MW. The town, its scale and the $40/MWh gas running cost are illustrative.</li>
-<li>A phone charge: <a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA</a> (checked 2 November 2026). A home's year: <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA</a> (2022 data). The Southwest Power Pool's year: EIA-930 (2025 data). The U.S. year: <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA</a> (2025 data).</li>
+<li><b>Source.</b> Prairie Town's day is the real hourly demand shape of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).</li>
+<li><b>Illustrative.</b> The shape is scaled as in <a href="00-grid-operator.html">lesson 0</a> so that the town's busiest hour of 2025 is 450 MW. The town, its scale and the flat $40/MWh gas running cost are illustrative.</li>
+<li><b>Not a schedule.</b> $78,600 prices all 1,965 MWh of gas at $40/MWh. Lesson 0's schedule also runs the $100/MWh peaker for 20 MWh, so its gas costs $80,400.</li>
+<li><b>Anchors.</b> A phone charge: <a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA</a> (checked 2 November 2026). A home's year: <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA</a> (2022 data). The Southwest Power Pool's year: EIA-930 (2025 data). The U.S. year: <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA</a> (2025 data).</li>
 </ul></div>
 ```
 :::
@@ -130,7 +133,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Prefix</dt><dd>A letter that multiplies a unit: k by 1,000, M by a million, G by a billion, T by a trillion.</dd>
 <dt>Power and energy</dt><dd>Power (MW) is a rate; energy (MWh) is power held over time: MW × h = MWh.</dd>
 <dt>Units cancel</dt><dd>A unit on top cancels the same unit underneath: $/MWh × MWh leaves $.</dd>
-<dt>Scientific notation</dt><dd>A number between 1 and 10 times a power of ten: 6.96 × 10⁹ Wh is the town's day.</dd>
+<dt>Scientific notation</dt><dd>A number at least 1 and less than 10, times a power of ten: the town's day is about 6.96 × 10⁹ Wh.</dd>
 <dt>Order-of-magnitude check</dt><dd>Bound a number from both sides; missing by a power of ten points to a slipped prefix or unit.</dd>
 </dl>
 </div>
@@ -157,9 +160,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Choose units that keep numbers modest.** Models write MW and \$/MWh, not W and \$/Wh, so their coefficients stay within a few powers of ten of each other.
-- **Why it matters.** Solvers judge "equal" and "zero" within small tolerances; coefficients spread over many powers of ten can hide an error or slow a solve.
-- **Put the unit in the name.** `demand_mw * hours` is MWh; `gas_mwh * price_usd_per_mwh` is dollars. A sum of terms with different names is a bug to look at.
+- **Choose units that keep numbers modest.** Models write MW and \$/MWh, not W and \$/Wh, so their coefficients (the fixed numbers in front of each unknown) stay within a few powers of ten of each other.
+- **Why it matters.** A [solver]{.lx-term term="solver"} treats values within a small tolerance, an allowed rounding error, as equal or zero; coefficients spread over many powers of ten can hide an error or slow a solve.
+- **Put the unit in the name.** `demand_mw * hours` is MWh and `gas_mwh * price_usd_per_mwh` is dollars. Terms added together must share a unit: MW plus MW, never MW plus MWh.
 - **Where next.** Bridge [B3](b03-read-check-formulation.html) checks that every term of a model's balance has one unit; [M1](m01-dispatch-to-lmp.html) builds a dispatch model in MW and \$/MWh.
 
 ```{=html}
@@ -197,7 +200,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="apart" data-answer="b">
 <p class="lx-qtext">About how many powers of ten from an average U.S. home's year (1.08 × 10⁷ Wh) to the Southwest Power Pool's year (2.99 × 10¹⁴ Wh)?</p>
 <ul class="lx-choices"><li data-value="a">5</li><li data-value="b">7</li><li data-value="c">14</li><li data-value="d">21</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>7: the exponents differ by 14 − 7 = 7, and 2.99 ÷ 1.08 is about 2.8, so the ratio is about 2.8 × 10⁷.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>7: the exponents differ by 14 − 7 = 7, and 2.99 ÷ 1.08 is about 2.8, so the ratio is about 2.8 × 10⁷. 2.8 is below 3.16, half a power of ten, so the nearest power stays 10⁷.</p></details>
 </div>
 </div>
 <div id="k1-drill"></div>
