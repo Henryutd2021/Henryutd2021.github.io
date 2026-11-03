@@ -67,7 +67,7 @@ When explanations are a click away, I assess formulation and interpretation as w
 A course for high-school and undergraduate students and curious adults. It starts with running a small town's power grid for one real day and builds up to writing, solving and questioning the optimization models that grid operators and planners use.
 
 ::: {.lc-facts}
-[<i class="bi bi-collection" aria-hidden="true"></i> 43 lessons live; more coming]{.lc-fact}
+[<i class="bi bi-collection" aria-hidden="true"></i> 47 lessons live; more coming]{.lc-fact}
 [<i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Four tiers: Foundations, Analyst, Modeler, Researcher]{.lc-fact}
 [<i class="bi bi-graph-up" aria-hidden="true"></i> Real 2025 hourly grid data (EIA-930)]{.lc-fact}
 [<i class="bi bi-cpu" aria-hidden="true"></i> An optimization solver that runs in the browser]{.lc-fact}

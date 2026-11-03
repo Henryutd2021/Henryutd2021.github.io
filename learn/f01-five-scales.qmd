@@ -193,7 +193,7 @@ When two scales' models pass numbers back and forth, a modeler must check whethe
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Grid physics: how a grid stays balanced is <a href="03-balancing.html">lesson 3</a>; wires and outages are F6 (upcoming).</li>
+<li>Grid physics: how a grid stays balanced is <a href="03-balancing.html">lesson 3</a>; wires and outages are <a href="f06-grid-and-outages.html">F6</a>.</li>
 <li>Rules and money: who pays at each scale is Analyst lessons A4 and A6 (upcoming).</li>
 <li>Countries: institutions differ by country, and the course's regional cards and F10 (upcoming) compare them.</li>
 <li>Whole-system effects: how one change ripples across every scale is <a href="f02-systems-and-map.html">F2</a>.</li>
