@@ -1,0 +1,31 @@
+# Sidecar for F2 (f02-systems-and-map), builder learn-w2-a, 2026-11-03. Read by scripts/build_learn.py.
+id: f02-systems-and-map
+lesson: F2
+glossary:
+  - id: stock
+    term: Stock
+    def: "An amount that builds up or drains over time, such as water in a reservoir, energy in a battery or CO₂ emitted so far."
+  - id: flow
+    term: Flow
+    def: "A rate that fills or drains a stock, such as megawatts into a battery or tonnes of CO₂ a year; only flows change a stock."
+  - id: feedback-loop
+    term: Feedback loop
+    def: "A chain of causes that leads back to where it started, so a change comes back to push on itself."
+  - id: reinforcing-loop
+    term: Reinforcing loop
+    def: "A feedback loop with an even number of negative links, in which a change feeds itself, as growth or as decline."
+  - id: balancing-loop
+    term: Balancing loop
+    def: "A feedback loop with an odd number of negative links, which pulls a change back toward a level."
+  - id: causal-loop-diagram
+    term: Causal-loop diagram
+    def: "A map of causes and effects in which every arrow carries a sign: plus if more of the cause brings more of the effect, minus if it brings less."
+  - id: rebound-effect
+    term: Rebound effect
+    def: "Part of an efficiency saving taken back because the cheaper service gets used more."
+  - id: carbon-budget
+    term: Carbon budget
+    def: "A cap on the total CO₂ emitted over many years, a limit on a stock rather than on one year's flow."
+requests:
+  - "Promote three lesson-local components if later lessons want them (all in assets/learn/f02-systems-and-map.js, styles in the page's style block with the f2- prefix): StockFlow (i-stockflow: a tub drawn from the stock and both flows, flow and stock charts on LX.Plot, a Play button and a time scrubber; pure steppers simReservoir, simBattery, simCarbon), LoopBuilder with cldSVG (i-cld: sign each link with + or −, check, polarity count, name each loop R or B, behaviour sketches; a static mode used by the explain layer's e-loop card) and RippleMap (i-ripple: five dimension lanes, levers, a prediction per lever, three waves with edges drawn between the cards, a hubs view). A22, A9, A21 and C2-C4 could reuse RippleMap; A8 and M13 StockFlow."
+  - "Glossary ids added here (stock, flow, feedback-loop, reinforcing-loop, balancing-loop, causal-loop-diagram, rebound-effect, carbon-budget): check for clashes with other W2 sidecars at the merge."

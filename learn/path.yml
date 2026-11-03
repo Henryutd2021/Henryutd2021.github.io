@@ -396,6 +396,42 @@
   does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."
   after: [11, 8, B1, B2, B3]
 
+# ---------- wave W2 hubs (curriculum v2 §8): the five scales (F1) and the whole system (F2), builder learn-w2-a
+- kind: lesson
+  id: f01-five-scales
+  code: F1
+  tier: foundations
+  form: cards
+  icon: city
+  status: active
+  minutes: 15
+  practice_minutes: 10
+  title: "Who decides what, from a light switch to a nation?"
+  subtitle: "Zoom from one home to a whole nation, and sort who decides what at each scale"
+  short: "Five scales"
+  teaches: [system scales, who decides at each scale, what a model needs at each scale, signals and needs passed between scales, local and system optimum]
+  does: "A zoom from one home to Prairieland; at each scale, sort who decides, what they decide, what physics a model needs and what passes between scales."
+  outcome: "Place a question at its scale and name who decides it, what a model of it needs and what it takes from other scales."
+  after: [0]
+  next: F2
+- kind: lesson
+  id: f02-systems-and-map
+  code: F2
+  tier: foundations
+  tier2: analyst
+  form: play
+  icon: map
+  status: active
+  minutes: 25
+  practice_minutes: 10
+  title: "How does everything connect? Stocks, flows, feedback and the whole-system map"
+  subtitle: "Fill a reservoir, close a feedback loop, then pull a lever and watch the whole system ripple"
+  short: "Stocks, loops and the system map"
+  teaches: [stocks and flows, reinforcing and balancing feedback loops, causal-loop diagrams, the rebound effect, ripple effects across a whole energy system]
+  does: "A stock-and-flow simulator (a reservoir, a battery, a carbon budget), a causal-loop builder (chargers and EVs, the rebound effect) and a whole-system map: pull one lever and watch the ripples."
+  outcome: "Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security."
+  after: [F1, 6]
+
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
 - {kind: lesson, tier: foundations, title: "How a thermal power plant works"}

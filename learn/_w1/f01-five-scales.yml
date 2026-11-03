@@ -1,0 +1,22 @@
+# Sidecar for F1 (f01-five-scales), builder learn-w2-a, 2026-11-03. Read by scripts/build_learn.py.
+id: f01-five-scales
+lesson: F1
+glossary:
+  - id: system-scale
+    term: Scale (of an energy system)
+    def: "A level of an energy system, from one device or plant to a whole nation, set apart by who decides what and by the physics a model of it needs."
+  - id: microgrid
+    term: Microgrid
+    def: "A local group of loads and sources, such as a campus or a village, that is managed as one system and can disconnect from the main grid and run on its own."
+  - id: islanding
+    term: Islanding
+    def: "A microgrid or part of a grid disconnecting from the main grid and keeping its own loads supplied."
+  - id: feeder
+    term: Feeder
+    def: "A distribution line that carries power from a substation to the homes and businesses along it."
+  - id: local-optimum
+    term: Local optimum
+    def: "The best plan for one part of a system judged inside its own boundary, which need not be best for the system it sits in."
+requests:
+  - "Promote two lesson-local components if later lessons want them: ScaleZoom (assets/learn/f01-five-scales.js: a powers-of-ten zoom through five drawn scenes with a keyboard rail, Zoom in/out and a text version; the scenes use only --lx-* tokens) and ScaleStrip (e-scale-strip: five scales with the reader's sort ticks, signals passed down and needs passed up, lessons per scale). Lesson 1's t1-strip could then use ScaleStrip."
+  - "Add a scale palette to base.css if the five-scale colours should be shared (F1 defines --f1-s0 ... --f1-s4 locally, day and night): T1, R3, the course map's scale filter and later scale routes could reuse it."
