@@ -125,7 +125,8 @@ has(money(130 / (0.30 * 8.76)) + "/MWh: 130 ÷ 2.628 = " + (130 / 2.628).toFixed
 ok((0.30 * 8.76).toFixed(3) === "2.628", "quiz: 30% capacity factor = 2.628 MWh per kW-yr");
 has(money(M.pv(100, 0.07, 10)) + ": 100 ÷ 1.07¹⁰ = " + M.pv(100, 0.07, 10).toFixed(2), "quiz: present value");
 const cw = M.crf(D.finance.wacc / 100, D.finance.life), Lw = L("wind");
-has("= " + cw.toFixed(5) + "$", "Go deeper: CRF(4%, 30)");
+has("= " + cw.toFixed(7) + "$", "Go deeper: CRF(4%, 30)");
+ok((+cw.toFixed(7) * 1712 + 34.57).toFixed(2) === (cw * 1712 + 34.57).toFixed(2) && QMD.indexOf("$" + cw.toFixed(7) + " \\times 1{,}712 + 34.57 = " + (+cw.toFixed(7) * 1712 + 34.57).toFixed(2) + "$") >= 0, "Go deeper: the printed factor reproduces the printed yearly cost (shared fix 11, K3)");
 has("\\times 1{,}712 + 34.57 = " + (cw * 1712 + 34.57).toFixed(2), "Go deeper: yearly cost per kW");
 has("0.338 \\times 8.76 = " + Lw.E.toFixed(3), "Go deeper: MWh per kW");
 has("= \\$" + Lw.total.toFixed(2) + "$ per MWh", "Go deeper: wind LCOE");

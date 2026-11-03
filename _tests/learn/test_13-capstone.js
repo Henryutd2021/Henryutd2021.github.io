@@ -91,7 +91,8 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   ok(near(C.techs.cc.co2, 6.226 * 0.05291, 1e-12) && near(C.techs.cc.co2, 0.329, 0.0005) && near(C.techs.pk.co2, 0.484, 0.0005), "CO2: 0.329 t/MWh (CC), 0.484 (peaker)");
   ok(near(C.techs.nuc.fixedTotal, C.techs.nuc.fixed + (6.64 + 2.62) * 0.911 * 8760, 1e-6), "nuclear runs flat: fuel and O&M per MWh become a yearly cost per MW");
   ok(near(C.techs.be.fixed, 1000 * 241 * (M.crf(0.04, 15) + 0.04), 1e-6) && near(C.techs.bp.fixed, 1000 * 372 * (M.crf(0.04, 15) + 0.04), 1e-6), "battery: energy and power parts, 15-year recovery + 4% O&M");
-  onPage("0.0578", "the capital recovery factor"); onPage("1{,}712 \\times 0.0578 + 34.57 = \\$133.6", "wind's yearly cost");
+  onPage("0.0578", "the capital recovery factor"); onPage("1{,}712 \\times 0.05783 + 34.57 = \\$133.6", "wind's yearly cost");
+  ok((1712 * 0.05783 + 34.57).toFixed(1) === "133.6" && (1712 * M.crf(0.04, 30) + 34.57).toFixed(1) === "133.6", "the printed factor 0.05783 reproduces the printed $133.6 (shared fix 11, K3)");
   onPage("6.226 \\times \\$3.85 + \\$3.49 = \\$27.46", "the CC running cost"); onPage("6.226 \\times 0.05291 = 0.329", "the CC CO2 rate");
   onPage("0.329\\, g_t + 0.484\\, q_t", "the CO2 row"); onPage("0.911\\,K_\\mathrm{nuc}", "nuclear availability"); onPage("0.85\\,c_t", "the round trip");
   // a scenario changes only what it should

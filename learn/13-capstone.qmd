@@ -117,12 +117,12 @@ $$
 | $w_t$ | hours of the year that modelled hour $t$ stands for | h |
 | $0.911$ | nuclear output per MW built, the same every hour: a simplification | MW per MW |
 
-- **Yearly cost** of a plant: [overnight capital cost]{.lx-term term="capital-cost"} × [capital recovery factor]{.lx-term term="capital-recovery-factor"} + [fixed O&M]{.lx-term term="fixed-om"} (operation and maintenance). At a 4% real (after-inflation) [cost of capital]{.lx-term term="wacc"} over 30 years, the factor is 0.0578.
+- **Yearly cost** of a plant: [overnight capital cost]{.lx-term term="capital-cost"} × [capital recovery factor]{.lx-term term="capital-recovery-factor"} + [fixed O&M]{.lx-term term="fixed-om"} (operation and maintenance). At a 4% real (after-inflation) [cost of capital]{.lx-term term="wacc"} over 30 years, the factor is 0.05783.
 - **Running cost** of gas: [heat rate]{.lx-term term="heat-rate"} × gas price + [variable O&M]{.lx-term term="variable-om"}. MMBtu is a million Btu of fuel energy.
 
 $$
 \begin{aligned}
-\text{wind, per kW-year:}\;\; & 1{,}712 \times 0.0578 + 34.57 = \$133.6\\
+\text{wind, per kW-year:}\;\; & 1{,}712 \times 0.05783 + 34.57 = \$133.6\\
 \text{combined-cycle, per MWh:}\;\; & 6.226 \times \$3.85 + \$3.49 = \$27.46\\
 \text{its CO}_2\text{, t per MWh:}\;\; & 6.226 \times 0.05291 = 0.329
 \end{aligned}
