@@ -327,7 +327,7 @@
   status: active
   minutes: 40
   title: "Foundations checkpoint: estimate an unfamiliar situation"
-  subtitle: "Nine short tasks on situations you have not seen, then one estimate with units, a range and a check"
+  subtitle: "Nine tasks on situations you have not seen, the last an estimate with units, a range and a check"
   short: "Foundations checkpoint"
   does: "Estimate an unfamiliar situation without hints (for example the electricity for a town's school buses if they went electric): units, a range, the main uncertainty and one way to check the answer."
   after: [6, N1]
@@ -393,6 +393,8 @@
   icon: tower
   status: active
   minutes: 40
+  practice_minutes: 90   # the notebook's practice, after its 45-minute lab (as the page's lab card says)
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired, as on M2 and M3
   title: "From dispatch to locational prices: the linear program behind the market"
   subtitle: "Solve a day of dispatch, read each hourly price as a dual, then congest a line and watch one price split into three"
   short: "Dispatch to locational prices"
