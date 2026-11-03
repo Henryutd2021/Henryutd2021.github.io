@@ -293,6 +293,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "expected-value": {
+  "term": "Expected value",
+  "short": "The long-run average of an uncertain quantity: each possible outcome multiplied by its chance, then added up.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "fast-frequency-response": {
   "term": "Fast frequency response",
   "short": "Power from batteries or other inverter-based resources delivered within a fraction of a second of a frequency drop.",
@@ -377,11 +383,23 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "histogram": {
+  "term": "Histogram",
+  "short": "A chart that sorts values into bins of equal width and shows how many fall in each bin.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "hour-ending": {
   "term": "Hour ending",
   "short": "A time stamp that labels each hour by its last moment, so 01:00 means the hour from midnight to 01:00.",
   "lesson": "B2",
   "href": "b02-python-data.html"
+ },
+ "independent-events": {
+  "term": "Independent events",
+  "short": "Events where knowing that one happened says nothing about whether the other did, so the chance of both is the product of their chances.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
  },
  "inequality": {
   "term": "Inequality",
@@ -473,6 +491,12 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "mean": {
+  "term": "Mean",
+  "short": "The average of a set of values: their sum divided by how many there are.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "mae": {
   "term": "Mean absolute error (MAE)",
   "short": "The average size of a forecast's misses, in the units of what is forecast, ignoring whether they were too high or too low.",
@@ -520,6 +544,12 @@
   "short": "One million British thermal units, a unit of fuel heat; about 0.29 MWh of heat, and gas is priced in dollars per MMBtu.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "monte-carlo": {
+  "term": "Monte Carlo",
+  "short": "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
  },
  "nadir": {
   "term": "Nadir",
@@ -592,6 +622,12 @@
   "short": "A power plant that runs only in the hours of highest demand, because it starts quickly but is expensive to run.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "percentile": {
+  "term": "Percentile",
+  "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
  },
  "persistence-forecast": {
   "term": "Persistence forecast",

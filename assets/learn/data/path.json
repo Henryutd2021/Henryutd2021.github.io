@@ -1326,8 +1326,8 @@
   },
   {
    "title": "Probability and statistics",
-   "ready": false,
-   "href": "index.html#toolbox",
+   "ready": true,
+   "href": "k05-probability-statistics.html",
    "code": "K5",
    "id": "k05-probability-statistics",
    "minutes": 25
