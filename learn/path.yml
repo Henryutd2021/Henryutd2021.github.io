@@ -557,7 +557,7 @@
   teaches: [value of lost load, expected outage cost, the marginal hour of endurance, value stacking, ownership and risk, productive use in mini-grids]
   does: "Price an outage for a household, a dairy and a hospital; size Prairie Campus's microgrid against a year of outages; add everyday savings; compare a utility, a co-op, the county and a private company as owners; then lower a village mini-grid's cost per kWh with a mill and a cold store."
   outcome: "Estimate a year's expected outage cost, find the size where one more hour of backup stops paying, and say who pays, who gains and who carries the risk under each owner."
-  after: [F7]
+  after: [F7, A1, A4]
 
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
@@ -684,7 +684,7 @@
   teaches: [microgrid sizing as a mixed-integer program, outage scenarios, host-feeder limits, cost of resilience from two solved plans, rolling-horizon dispatch, forecast error]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E1's sizing and outage models, runs the seeded winter outages and the rolling horizon, and asserts the browser's numbers, about 60 minutes."
   does: "A MILP sizes solar, a battery and generator sets for Prairie Campus under outage scenarios; add the host feeder's export limit and the utility's tariff and watch the campus optimum change; then run the storm with rolling-horizon dispatch on forecasts and see what forecast error costs."
-  after: [M2]
+  after: [M2, A14]
 - {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
 - kind: lesson
   id: m07-monte-carlo
@@ -704,7 +704,7 @@
   teaches: [scenarios, one-at-a-time sensitivity, Latin hypercube sampling, Monte Carlo error, global sensitivity by rank correlation]
   lab: "a NumPy notebook that reruns the page's seeded study and checks it, then SciPy's Latin hypercube, rank correlations and variance shares, about 45 minutes, then 60 minutes of practice."
   does: "Sample uncertain inputs with a Latin hypercube, run a model a thousand times, rank inputs by influence and read the distribution, not one number."
-  after: [B2, K5]
+  after: [A1, B2, K5]
   next: M8
 - {kind: lesson, tier: modeler, code: M8, title: "Deciding before the uncertainty resolves: stochastic and robust optimization"}
 - {kind: lesson, tier: modeler, code: M9, title: "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data"}
@@ -953,7 +953,7 @@
   outcome: "Recommend what one site should install and defend it with its net present value, its emissions, a sensitivity test and its limits."
   teaches: [a recommendation defended with NPV and CO₂, one-at-a-time sensitivity, stating a model's limits, what one site cannot do alone]
   lab: "the M4 notebook: power, hydrogen and heat in one linear program, about 45 minutes."
-  after: [9, SB0]
+  after: [9, A1, SB0]
 
 # ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3)
 - kind: lesson
@@ -989,7 +989,7 @@
   outcome: "Recommend a campus microgrid for a three-day winter outage, within the feeder's limits, with its cost, unserved critical load and emissions, a comparison of owners and a sensitivity to the outage's length."
   teaches: [capstone plan and note, cost and unserved critical load on one boundary, ownership and cost of capital, sensitivity to outage length]
   does: "Size Prairie Campus's microgrid (solar, battery, generator, load priorities) to keep the hospital and the dormitories heated through a three-day outage; respect the host feeder's limits; compare utility, co-op and community ownership; report cost, unserved critical load and emissions."
-  after: [SB1, M2]
+  after: [SB1, F7, A14, A4]
 
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
