@@ -169,6 +169,16 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     const g = B.readiness(R.items, all); ok(Object.keys(g).every(k => g[k].ok), "ready: all right routes nowhere");
     const one = Object.assign({}, all, { r8: 0 }); ok(B.readiness(R.items, one).linear.ok, "ready: one slip in the linear group still passes");
     const two = Object.assign({}, one, { r6: 0 }); ok(!B.readiness(R.items, two).linear.ok, "ready: two slips route to K4");
+    // the advice follows path.json: a live toolbox page is never called coming soon, one still to come is
+    const P = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8")), ref = require(L("components/core.js")).lessonRef;
+    Object.keys(R.groups).forEach(k => {
+      const G = R.groups[k], code = G.route.split(":")[1], live = G.route.indexOf("tool:") === 0 ? ref(P, code).ready : true, a = B.adviceFor(G, P, ref);
+      ok(live ? !/coming (soon|later)|upcoming/i.test(a) : /coming (soon|later)|upcoming/i.test(a), `ready ${k}: ${G.route} is ${live ? "live" : "not live"}, advice "${a}"`);
+      if (G.soon) {
+        const P2 = JSON.parse(JSON.stringify(P)); P2.toolbox.forEach(x => { if (x.code === code) { x.ready = true; x.href = x.href || "x.html"; } });
+        ok(B.adviceFor(G, P2, ref) === G.advice, `ready ${k}: once ${code} is live the advice drops "coming"`);
+      }
+    });
   }
 
   // ---------------- what the page says

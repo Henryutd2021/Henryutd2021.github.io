@@ -94,7 +94,7 @@
   subtitle: "Be the grid operator for a day"
   short: "Be the grid operator"
   teaches: [balancing supply and demand, power and energy, dispatchable and variable generation, merit order dispatch]
-  lab: "download and plot a day of hourly U.S. grid data (upcoming)."
+  lab: "load and plot a year of hourly U.S. grid data in Python (bridge B2)."
   does: "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand."
   outcome: "Say what balancing means and why cheap plants run first."
   after: []
@@ -327,6 +327,8 @@
   status: active
   minutes: 40
   title: "Foundations checkpoint: estimate an unfamiliar situation"
+  subtitle: "Nine short tasks on situations you have not seen, then one estimate with units, a range and a check"
+  short: "Foundations checkpoint"
   does: "Estimate an unfamiliar situation without hints (for example the electricity for a town's school buses if they went electric): units, a range, the main uncertainty and one way to check the answer."
   after: [6, N1]
 - kind: lesson
@@ -340,6 +342,7 @@
   minutes: 30
   practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "From algebra to a linear program: how do equations become a model?"
+  subtitle: "Turn word problems into a linear program, find its best corner on a graph, and hand it to a real solver"
   short: "Algebra to a linear program"
   outcome: "Turn a word problem into a linear program, find its best corner on a graph and write it as Ax <= b."
   teaches: [formulating a linear program, feasible region, Ax <= b form, solver use]
@@ -375,6 +378,7 @@
   minutes: 30
   practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "How do you read a formulation, and check that a model is right?"
+  subtitle: "Read a dispatch model line by line, hunt five planted bugs, and check a solved model's balance and duals"
   short: "Read and check a formulation"
   outcome: "Read a published formulation line by line, find planted errors and check a solved model's balance and duals."
   teaches: [reading a formulation, sets, parameters and variables, model verification, dual signs]
@@ -390,6 +394,7 @@
   status: active
   minutes: 40
   title: "From dispatch to locational prices: the linear program behind the market"
+  subtitle: "Solve a day of dispatch, read each hourly price as a dual, then congest a line and watch one price split into three"
   short: "Dispatch to locational prices"
   outcome: "Formulate a dispatch LP, solve it, and explain each bus price as a dual in words."
   teaches: [economic dispatch as a linear program, balance duals, DC power flow, transmission congestion, locational marginal prices]
@@ -532,6 +537,8 @@
   status: active
   minutes: 240
   title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
+  subtitle: "About four hours on problems the course has not shown; worked formulations and code open when you submit"
+  short: "Modeler checkpoint"
   does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
   after: [M1, M3, B3, R5]
 
@@ -766,6 +773,8 @@
   minutes: 15
   practice_minutes: 20   # the drill (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "Linear equations and inequalities"
+  subtitle: "Solve a balance for one unknown, turn words into ≤, ≥ and =, and find the plans that pass several rules at once"
+  short: "Linear equations"
   outcome: "Solve a balance for one unknown and read a set of inequalities as the region of plans that pass them."
   teaches: [linear equations, inequalities, half-planes, systems of rules]
   next: B1
@@ -795,6 +804,8 @@
   status: active
   minutes: 20
   title: "Spreadsheets in practice"
+  subtitle: "Work through Prairie Town's real day in a spreadsheet: formulas, fill-down, absolute references and a check cell"
+  short: "Spreadsheets"
   outcome: "Build a small energy calculation in a spreadsheet with relative and absolute references and a check cell."
   teaches: [cell references, fill-down, absolute references, SUM and MAX, check cells]
   next: B2
