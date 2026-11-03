@@ -106,7 +106,7 @@ function lessonSet(site) {
   const path = require("path"), fs = require("fs");
   const A = p => path.join(site, "assets/learn", p), J = p => JSON.parse(fs.readFileSync(A("data/" + p), "utf8"));
   const town = J("town.json"), year = J("town_year.json"), targets = J("cf_targets.json");
-  const M11 = require(A("11-solver.js")), M1 = require(A("m01-dispatch-to-lmp.js")), M13 = require(A("13-capstone.js")), B3 = require(A("b03-read-check-formulation.js"));
+  const M11 = require(A("11-solver.js")), M1 = require(A("m01-dispatch-to-lmp.js")), M13 = require(A("components/planengine.js")), B3 = require(A("b03-read-check-formulation.js"));
   const D11 = J("11-solver.json"), W11 = M11.dayOf(town, year);
   const D1 = J("m01-dispatch-to-lmp.json");
   const cfg = J("13-capstone.json"), Y = M13.prepareYear(year, targets, cfg, require(A("components/profiles.js")).townProfile);

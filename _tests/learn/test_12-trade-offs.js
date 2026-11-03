@@ -1,6 +1,6 @@
 // test_12-trade-offs.js — Node tests for lesson 12 (assets/learn/12-trade-offs.js, data/12-trade-offs.json) and every
-// number that learn/12-trade-offs.qmd states. The plans' years and the frontier come from lesson 13's model
-// (assets/learn/13-capstone.js), solved here with the vendored HiGHS.
+// number that learn/12-trade-offs.qmd states. The plans' years and the frontier come from the shared planning engine of
+// lessons 12 and 13 (assets/learn/components/planengine.js, LX.townPlan), solved here with the vendored HiGHS.
 //   - the six plans: each precomputed year matches a fresh solve; every light stays on
 //   - dominance: exactly plan E is dominated, and D beats it on both counts
 //   - weighted sums: the winners A, B, D, F and their price breakpoints; C (not dominated) never wins at any price
@@ -21,7 +21,7 @@ vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), sctx);
 const { core, VERSION } = sctx.module.exports;
 const pctx = { window: { LX: {} }, module: { exports: {} } };
 vm.runInNewContext(fs.readFileSync(L("components/profiles.js"), "utf8"), pctx);
-const TP = require(L("13-capstone.js"));
+const TP = require(L("components/planengine.js"));
 const M = require(L("12-trade-offs.js"));
 const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
 const cfg = JSON.parse(fs.readFileSync(L("data/13-capstone.json"), "utf8"));

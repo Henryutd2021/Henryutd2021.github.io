@@ -1,0 +1,33 @@
+/* timeline.css — LX.Timeline (timeline.js): an ordered list on a vertical rule; each event a marker, its date and kind
+   (in words), its label, text and source line; the time that passed above it; key steps ringed and tagged. On wide
+   screens the date column sits left of the event. Kind colours: study tier-4, data tier-2, policy tier-3, event ink-3. */
+.lx-tl { display: grid; gap: 10px; min-width: 0; }
+.lx-tl-lede { font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-tl-list { position: relative; margin: 0; padding: 0 0 0 26px; list-style: none; display: grid; gap: 14px; }
+.lx-tl-list::before { content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px; background: var(--lx-line-2); border-radius: 1px; }
+.lx-tl-ev { --c: var(--lx-ink-3); position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
+.lx-tl-ev.k-study { --c: var(--lx-tier-4); } .lx-tl-ev.k-data { --c: var(--lx-tier-2); } .lx-tl-ev.k-policy { --c: var(--lx-tier-3); }
+.lx-tl-dot { position: absolute; left: -24px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--lx-surface); border: 3px solid var(--c); }
+.lx-tl-gap ~ .lx-tl-dot { top: 27px; }
+.lx-tl-ev.key .lx-tl-dot { background: var(--c); box-shadow: 0 0 0 3px var(--lx-surface), 0 0 0 5px var(--lx-accent); }
+.lx-tl-gap { font-size: 12.5px; color: var(--lx-ink-3); font-style: italic; }
+.lx-tl-when { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.lx-tl-date { font-family: var(--lx-f-mono); font-weight: 600; font-size: 14px; color: var(--lx-ink); }
+.lx-tl-kind, .lx-tl-keytag { font-family: var(--lx-f-display); font-size: 11.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--c); }
+.lx-tl-keytag { color: var(--lx-accent); }
+.lx-tl-body { display: grid; gap: 3px; min-width: 0; }
+.page-learn .lx-tl-label { font-family: var(--lx-f-display); font-weight: 500; font-size: 16px; color: var(--lx-ink); }
+.page-learn .lx-tl-text { font-size: 15px; color: var(--lx-ink-2); }
+.page-learn .lx-tl-src { font-size: 13px; color: var(--lx-ink-3); overflow-wrap: anywhere; }
+.lx-tl-more { margin: 0; }
+.lx-tl-more summary { cursor: pointer; font-family: var(--lx-f-display); font-size: 13.5px; color: var(--lx-ink-3); min-height: 30px; display: flex; align-items: center; }
+.lx-tl-more p { font-size: 14.5px; color: var(--lx-ink-2); }
+@media (min-width: 760px) {
+  .lx-tl-list { padding-left: 0; }
+  .lx-tl-list::before { left: 152px; }
+  .lx-tl-ev { grid-template-columns: 136px minmax(0, 1fr); column-gap: 40px; }
+  .lx-tl-gap { grid-column: 2; }
+  .lx-tl-when { flex-direction: column; align-items: flex-end; gap: 0; text-align: right; }
+  .lx-tl-dot { left: 146px; }
+  .lx-tl-gap ~ .lx-tl-dot { top: 27px; }
+}

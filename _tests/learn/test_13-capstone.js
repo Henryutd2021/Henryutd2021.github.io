@@ -1,4 +1,5 @@
-// test_13-capstone.js — Node tests for lesson 13's planning model (assets/learn/13-capstone.js), its data
+// test_13-capstone.js — Node tests for lesson 13's planning model (assets/learn/components/planengine.js, LX.townPlan; the
+// game is assets/learn/13-capstone.js), its data
 // (assets/learn/data/13-capstone.json) and every number that learn/13-capstone.qmd states.
 //   - inputs: EIA and NREL costs and their sources; capital recovery factors, yearly fixed costs, running costs, CO2 rates
 //   - the town's year: wind and solar at EIA's 2025 capacity factors, no solar at night, a 450 MW peak
@@ -25,12 +26,12 @@ const { core, VERSION } = sctx.module.exports;
 const pctx = { window: { LX: {} }, module: { exports: {} } };
 vm.runInNewContext(fs.readFileSync(L("components/profiles.js"), "utf8"), pctx);
 const P = pctx.module.exports;
-const M = require(L("13-capstone.js"));
+const M = require(L("components/planengine.js"));
 const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
 const cfgPath = L("data/13-capstone.json"), t12Path = L("data/12-trade-offs.json");
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
 const T = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
-const page = fs.readFileSync(path.join(SITE, "learn/13-capstone.qmd"), "utf8"), JS = fs.readFileSync(L("13-capstone.js"), "utf8");
+const page = fs.readFileSync(path.join(SITE, "learn/13-capstone.qmd"), "utf8"), JS = fs.readFileSync(L("13-capstone.js"), "utf8") + fs.readFileSync(L("components/planengine.js"), "utf8");
 const FULL = process.argv.includes("--full"), WRITE = process.argv.includes("--write");
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }

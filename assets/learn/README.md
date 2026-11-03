@@ -10,7 +10,7 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
 ## Start a new lesson
 
 1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for a capstone), `icon`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`. The lesson goes live (linked, with its generated header, next box and footer) when you set `status: active`; its page is then `learn/<id>.qmd` (or the file named by `path:`). Until then keep `status: upcoming`, or leave the status out: it shows as coming soon.
-   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources.
+   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources; `form: studio` and `form: case` are described under "Studios and case files".
    - New glossary terms and requests for shared files go in a sidecar, `learn/_w1/<id>.yml` (wave W1):
 
      ```yaml
@@ -22,7 +22,7 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
      ```
 
      `build_learn.py` merges the terms into `glossary.json` (if an id is already in `glossary.yml`, that definition wins and the clash is printed) and prints every request.
-2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`) to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
+2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`; for a research studio `_template-studio.qmd`, for a case file `_template-case.qmd`, see "Studios and case files") to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
 3. In the ResearchPortfolio folder, run `python3 scripts/build_learn.py --site <site>`. Add `_tests/learn/test_<id>.js`, which checks every number on the page against the model.
 
 Then render, take screenshots (`node scripts/learn_screenshots.mjs`), and check the result at 1280 px and 375 px, in day and night mode.
@@ -59,6 +59,39 @@ Then render, take screenshots (`node scripts/learn_screenshots.mjs`), and check 
 ```
 
 The section ids `play`/`steps`, `explain`, `check` and `sources` match the header's step links. `build_learn.py` writes the header, the next-lesson box and the footer between the `learn:meta`, `learn:next` and `learn:footer` markers.
+
+## Studios and case files (wave W2)
+
+Two more forms, each with a template. `form:` in `path.yml` sets the header's step links, and each step link is the id of a section on the page.
+
+| `form:` | Template | Sections (step links) | Header badge | For |
+|---|---|---|---|---|
+| `studio` | `learn/_template-studio.qmd` | `#task` Task · `#exemplars` Exemplars · `#selfcheck` Self-check · `#sources` Sources | Research studio | R1–R10 (curriculum v2 §11) |
+| `case` | `learn/_template-case.qmd` | `#case` The case · `#explain` Explain · `#check` Check · `#sources` Sources | Case file | CF1–CF8 (§13) |
+
+The older forms keep their sections: `cards` (`#steps`, `#explain`, `#check`, `#sources`), `play` (`#play`, ...) and `checkpoint` (`#task`, `#solution`, `#rubric`, `#sources`).
+
+**Research studio.**
+
+- **Order.** The task comes first: what to produce, from what, and when it is done. Then the exemplars: a good and a weak answer to the same task, side by side, with tap-to-reveal notes (`LX.Exemplars`). Then a self-check against the course rubric (`LX.Rubric`). R1 and R10 also give the reader a question card (`LX.QuestionCard`).
+- **Time.** Give `minutes` (the guided part) and `practice_minutes` (the independent work) in `path.yml`; the header then shows both. Be honest: R2's literature matrix is 240 minutes.
+- **Method-neutral.** Per §11.2, optimization is one method family among several. The rubric's words are the course's own (§3.4): pick the competences a studio builds and add a "look for" line, never reword the levels.
+- **Fallbacks.** The exemplars and rubric fallbacks are written from the data by the components' `staticHTML` (see the components below), between `<!-- <slug>-exemplars:start -->` and `:end` markers, by the test's `--write` mode. The test then checks that they are still the same.
+
+**Case file** (about 10 minutes; §13).
+
+- **Order.** The case comes first, as static parts in `.lx-case`: the puzzle; the question in one sentence; scale and boundary, with what was left out; decisions, goal and rules, in words; data and method; and what came out, with its boundary conditions. Then the study's dated steps (`LX.Timeline`, from the data file). Then the explain section (`LX.Boundary`, and an allow-listed explainer if there is one), the check with "Try it yourself" (toy variations with the allow-listed repository), and the sources. There is no list of open questions.
+- **Approved sources only (guard G-SRC).** Henry's research enters only through approved excerpts, allow-listed repositories, allow-listed explainers and citations (doi.org). Never link a project page or the Research page.
+  - Quote each excerpt as `<blockquote class="lx-excerpt" data-source="excerpt:<key>">`. Give every sentence, with its source, in `reports/learn/excerpts_for_approval.md`.
+  - The scope scan fails on a `data-source` key that is not in the curriculum's `ALLOWED_SOURCES`, and on a script from `assets/explainers/` other than `common.js` and the allow-listed explainers (`ghg`, `txh2`, `wind-hydrogen`, `uq-mfgpr`). It also scans the strings of every explainer a Learn page loads.
+- **Drafts.** Until Henry approves every excerpt sentence, the page lives in `learn/_drafts/<id>.qmd`, and its `path.yml` row stays `status: upcoming`.
+  - Quarto does not render `learn/_drafts/`: the render list names `learn/*.qmd` only, and `_` folders are never rendered.
+  - `build_learn.py` still fills the draft's three blocks exactly as they will read once the page is live, and checks its title, subtitle and glossary marks. `learn_scope_scan.py` scans the draft's source (front matter, text, Markdown and HTML links, scripts).
+  - `learn_qa.sh` renders a preview of a draft named on its command line (see Checks).
+  - Write links for the page's live place, `learn/<id>.html` (`../assets/...`, `index.html`).
+  - After approval: `git mv learn/_drafts/<id>.qmd learn/<id>.qmd` and set `status: active`. The build fails while a live page and a draft share an id.
+- **Screenshots.** `scripts/learn_screenshots.mjs --states top,explain,sec-selfcheck` works for both forms. On a studio, `explain` (and `open`) show `#exemplars`; `sec-<id>` scrolls to any section and clips the shot to it (`sec-task`, `sec-selfcheck`, `sec-case`, `sec-check`, `sec-sources`). A draft needs a rendered preview first: `learn_qa.sh` makes one.
+- **The `path.yml` row.** A case file is a `kind: lesson` row with `form: case`, its `code` and `id` from `reports/learn/learn_map_v2.yml` (for example `CF7`, `cf7-cost-of-waiting`), a `tier` (every lesson row needs one; the coordinator confirms which), `minutes: 10`, `after:` its prerequisites, and `status: upcoming`.
 
 ## Lesson JS skeleton
 
@@ -385,7 +418,7 @@ fc.price(44, { co2, cost });   fc.pick(function (id) {});   fc.focusDot("A");
 ```
 
 - `pick` makes the plan dots buttons (Tab, Enter, Space). Axis texts, scales and labels have options (`xMax`, `yMin`, `xLabel`, `fmtX`, ...).
-- Replaces lesson 13's `FrontierChart`, which lesson 12 read as `LX.townPlan.ui.FrontierChart` (gone from `ui`).
+- Replaces lesson 13's `FrontierChart`, which lesson 12 read as `LX.townPlan.ui.FrontierChart` (gone from `ui`). With the planning engine (`planengine.js`, W2), it is the i-pareto pair: `LX.townPlan` solves, `LX.Frontier` draws.
 
 #### Cards for the explain layer and contested points
 
@@ -635,10 +668,92 @@ var P = LX.Practice(host, { id: "b1-practice", title: "Practice", lede: "One sen
 - Exercise pieces in `practice.css`: `.lx-fp-model` (a model in symbols), `.lx-fp-tab` (a table, `tr.best`, `tr.ask`),
   `.lx-fp-pt`, `.lx-fp-ans`, `.lx-fp-ask`, `.lx-fp-worked`, `.lx-fp-choices`. Used by B1 and B3.
 
+### Added in wave W2 (2026-11-03): studios and case files
+
+The build bundles these after the W1 set (`W2_JS`, `W2_CSS` in `scripts/build_learn.py`), the planning engine last. Node tests: `_tests/learn/test_components_w2.js`, which also compares the rubric's words with curriculum v2 §3.4 when `LEARN_CURRICULUM=<path to curriculum_v2.md>` is set, or when the curriculum sits at `../reports/learn/` from the site folder. `_tests/learn/stubdom.js` is a small stub document for testing a view in Node (`env()`, `load(name, E)`, `buttons()`); it is not a test itself.
+
+Each component's pure part has a `staticHTML` that writes the no-JS fallback from the same data. A lesson's test can write it between markers in `--write` mode and check it otherwise, as CK-F does.
+
+**Exemplars** (`exemplars.js`, e-exemplars): a good and a weak answer to the same task, side by side, with tap-to-reveal notes on the phrases that make the difference.
+
+```js
+LX.Exemplars(H("div", { class: "lx-xcard" }, x), { title: "Two answers to the same brief", task: "The task, in one line.",
+  answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: ["Is ", { text: "community solar", note: "No type and no metric." }, " good?"] },
+            { key: "good", label: "Strong answer", level: "Proficient", parts: ["Did ", { text: "renters' energy burden", note: "A metric with units." }, " fall ...?"] }],
+  diff: [{ label: "Type", weak: "None", good: "Evaluative" }], id: "r1-ex", note: "Both answers are illustrative." });   // -> { el, open(key, n), openAll(), opened() }
+```
+
+- Each marked phrase is a button (`role="button"`, Tab, Enter, Space) with a number badge. It opens or shuts its note under the answer (`aria-expanded`, `aria-controls`), and the note is read out.
+- "Show all notes" opens every note. Notes start with "Falls short:" (weak) or "Works:" (good); `lead` changes the word.
+- With `id`, the open notes are remembered in this browser.
+- Two columns from 700 px. The "What made the difference" table becomes labelled lines on phones.
+- Pure (Node: `require("components/exemplars.js")`): `marks`, `plain` (text with `[n]`), `validate` (the view throws on a malformed pair), `staticHTML`.
+
+**Rubric self-check** (`rubric.js`): the course rubric (§3.4) as a self-check.
+
+```js
+LX.Rubric(H("div", { class: "lx-xcard" }, x), { id: "r1-rubric", code: "R1", title: "Rate your card against the rubric",
+  competences: [{ id: "framing", look: "All eight checks pass, and the card says why the question matters." }, "method"] });   // -> { el, picks(), set(id, level), clear(), summary() }
+```
+
+- **Competences.** The ids are `framing`, `positioning`, `method`, `trust`, `uncertainty`, `accounting`, `realism`, `communication` and `integrity`. Their words are §3.4's, word for word.
+- **Levels.** Not yet, Developing, Proficient (the bar) and Strong. "Not yet" reads "Developing is not reached yet."
+- **Do not reword.** A studio picks its competences and adds a `look` line; it never rewords the levels.
+- **Controls.** Each competence is a fieldset of native radios whose labels carry the anchored descriptions. The result line counts competences at Proficient or above.
+- **Copy.** "Copy my self-check" copies a plain-text summary whose first line is "Learn · R1 self-check (rubric v1 ...)". Without a clipboard, the summary shows in a box to select. Keep `VERSION` fixed once testers send summaries.
+- **Pure.** `LEVELS`, `COMPETENCES`, `competence`, `count`, `summary`, `staticHTML` (also on `LX.Rubric`).
+
+**Question card** (`questioncard.js`, the card of i-studio and i-share): a structured research question.
+
+```js
+var qc = LX.QuestionCard(H("div", { class: "lx-xcard" }, live), { id: "r10-card", code: "R10", title: "Your question card", share: true,
+  values: { type: "evaluative", question: "Did ...?", audience: "...", metric: "...", units: "...", counterfactual: "...", scale: "S1",
+            boundary: "...", wrong: "...", uncertainty: "..." },
+  fix: { metric: { href: "a01-....html", label: "A1" } }, onChange: function (values, checks) {} });   // -> { el, get(), set(values), text(), checks(), share }
+```
+
+- **Fields.** The question in one sentence, then the type (five radios, §11.2, each showing its template and typical methods), audience, metric and units, counterfactual, scale (S0–S4) and boundary, "I would be wrong if…", and the main uncertainty.
+- **Checks.** Eight: the question is written, then the seven rigour checks of §11.3. Each passes or is marked to do, in words and with an icon, with an optional fix link. They never block a question, and they never judge originality, importance or novelty (R10 rule, §11.3).
+- **Pickers.** R10's pickers fill the card with `set()`.
+- **Saving and sharing.** With `id`, the draft stays in this browser. `share: true` adds "Share this card": the card travels in a `#q-...` hash (base64url JSON, through `LX.Share`), and opening such a link loads that card. Link text only ever goes into form fields.
+- **Pure.** `TYPES`, `SCALES`, `FIELDS`, `CHECKS`, `check`, `text`, `encode`, `decode`, `clean`.
+
+**Timeline** (`timeline.js`, e-timeline): dated events, each with its source, for case files (and A1, X3).
+
+```js
+LX.Timeline(H("div", { class: "lx-card" }, live), { title: "The study in time",
+  events: [{ date: "2024", label: "Data year", kind: "data", text: "One sentence.", source: { label: "EIA-930", url: "https://www.eia.gov/...", as_of: "2025-11-01" } },
+           { date: "2026-06", label: "Paper accepted", kind: "study", key: true, source: { label: "Conference paper" }, deeper: "Longer text." }] });
+```
+
+- **Dates.** `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. They show as "2024", "June 2026" or "14 March 2025", in `<time datetime>`.
+- **Gaps.** The time between events appears above each one ("15 months later"; `gaps: false` drops it), at the coarser precision of the two dates.
+- **Kinds.** Study, data, policy or event, written in words beside the date. `key: true` rings the marker and adds a "Key step" tag.
+- **Sources.** Every event needs a source (a label; an http(s) `url` and an `as_of` date are optional). The view throws on a malformed event.
+- **Layout.** An ordered list, so it is its own text version. The date column sits on the left from 760 px.
+- **Pure.** `parse`, `fmt`, `sortEvents`, `gap`, `validate`, `staticHTML` (the page's `<ol class="lx-tl-static">`).
+
+**Planning engine** (`planengine.js`, `planengine.css`; a one-region capacity-expansion LP): `LX.townPlan`, Prairie Town's capacity plan as a linear program, promoted unchanged from lesson 13. Lessons 12 and 13 use this shared copy; lesson 12 no longer loads `13-capstone.js`.
+
+```js
+var TP = LX.townPlan;   // Node: require("assets/learn/components/planengine.js"); require("13-capstone.js") returns the same object
+var Y = TP.prepareYear(data.town_year, data.cf_targets, cfg), RW = TP.selectWeeks(Y, cfg.weeks), C = TP.costs(cfg, {});
+LX.solver.solve(TP.weekModel(C, RW, { cap: 200e3 }), { timeLimit: 10 }).then(function (r) { var s = TP.summarize(C, TP.periodsOf(RW), r, { cap: 200e3 }); });
+TP.fullYearModel(C, Y, { plan: plan });   // the same LP on all 8,760 hours (a plan fixed, or optimized: slow)
+```
+
+- **Model.** Seven representative weeks of 2025 with linked battery states (or the full year), a CO₂ cap or a carbon price, and wind and solar scaled to EIA's 2025 capacity factors. `cfg` is `data/13-capstone.json`, with costs from primary sources and dates. The model, the time representation and the checks are described in the file's header.
+- **Pure helpers.** `summarize`, `encodePlan` and `decodePlan` (`#plan-...` links), `weekSeries`, `frontierAt`, `ceilPlan`, `stars`, `capReading`, `fullVerdict`, `crf`, `fixedCost`, `build`, `KEYS`.
+- **Page kit.** `LX.townPlan.ui` holds `TECH` (names and colours), `fm` (`musd`, `kt`, `pct`, `mwh`, `k`), `Num` (a numeric control in the slider look), `TextTable` (a table of words that becomes cards on phones) and `css()`, now a no-op because the styles are in `planengine.css`. They keep their `lx13-` class names, because both lessons use them.
+- **Tests.** `node _tests/learn/test_13-capstone.js [--full]` and `test_12-trade-offs.js` load the component. Their output was identical before and after the move. `_tests/learn/solver_models.js` (the solver benchmark) loads it too.
+- **Building on it (M3, A22).** Use `LX.townPlan` for the model and `LX.Frontier` for the frontier chart. Keep MILP duals out (§9.2): this LP's cap dual is a marginal value under its stated assumptions. A different planning model belongs in its own component, not in a fork of this one.
+
+**Form pieces** (`forms.css`, CSS only): `.lx-studio-task` (the studio's task list), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try`, and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`.
+
 **Scope and QA** (ResearchPortfolio folder).
 
 - `python3 scripts/learn_scope_scan.py --site <worktree>` runs the curriculum v2 §20 scan on the rendered `_site/learn/` pages, the data files and the scripts. `build_learn.py --check` runs it whenever a rendered site exists, and fails on any violation.
-- `scripts/learn_qa.sh <worktree> [lesson ids]` runs the whole pipeline: build check, Node tests, render, link check, scope scan, and screenshots at 1280 and 375 px in light and dark.
+- `scripts/learn_qa.sh <worktree> [lesson ids]` runs the whole pipeline: build check, Node tests, render, link check, scope scan, and screenshots at 1280 and 375 px in light and dark. A case file that is still a draft is named by its id like any page: the script copies `learn/_drafts/<id>.qmd` to `learn/<id>.qmd`, renders that one page into `_site/`, and moves the copy out of the worktree into its output folder, so the link check, scope scan and screenshots see a preview while the worktree stays unchanged.
 - `scripts/learn_codex_review.sh <worktree> <lesson id>…` runs the read-only two-persona review.
 
 Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`.

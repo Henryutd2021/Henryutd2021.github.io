@@ -1,0 +1,30 @@
+/* forms.css — page pieces of the two W2 forms (learn/_template-studio.qmd, learn/_template-case.qmd): the studio's task
+   list; the case file's numbered parts, its question line and the approved-excerpt quote (blockquote.lx-excerpt with
+   data-source="excerpt:<key>", checked by the scope scan); the static lists of the no-JS fallbacks (timeline, exemplar
+   notes, rubric table). Colours from --lx-* tokens only. */
+.lx-studio-task { margin: 0; padding-left: 1.3rem; display: grid; gap: 6px; font-size: 16px; color: var(--lx-ink-2); }
+.lx-studio-task b { color: var(--lx-ink); font-family: var(--lx-f-display); font-weight: 500; }
+.lx-case { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.lx-case-part { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r); padding: 14px 16px; display: grid;
+  gap: 6px; align-content: start; min-width: 0; }
+.lx-case-part.wide { grid-column: 1 / -1; }
+.lx-case-part p:not(.lx-eyebrow), .lx-case-part ul { font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-case-part ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; }
+.lx-case-part b { color: var(--lx-ink); }
+.page-learn .lx-case-q { font-family: var(--lx-f-display); font-weight: 500; font-size: 18px; line-height: 1.35; color: var(--lx-ink); }
+.lx-excerpt { margin: 0; padding: 10px 14px; border-left: 4px solid var(--lx-tier-4); background: var(--lx-surface-2); border-radius: 0 10px 10px 0;
+  display: grid; gap: 6px; }
+.page-learn .lx-excerpt p { font-size: 16px; color: var(--lx-ink); }
+.lx-excerpt footer { font-size: 13px; color: var(--lx-ink-3); }
+.lx-tl-static, .lx-ex-static { margin: 0; padding-left: 1.2rem; display: grid; gap: 5px; font-size: 15px; color: var(--lx-ink-2); }
+.lx-tl-static b { font-family: var(--lx-f-mono); font-weight: 600; color: var(--lx-ink); }
+.lx-case-try { display: grid; gap: 8px; margin-top: 14px; }
+.lx-case-try ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-rb-static th[scope="row"] { font-family: var(--lx-f-display); font-weight: 500; text-align: left; vertical-align: top; padding: 9px 8px;
+  border-bottom: 1px solid var(--lx-line); }
+.lx-rb-static td { font-size: 14px; }
+@media (max-width: 640px) {
+  .lx-case { grid-template-columns: minmax(0, 1fr); }
+  .lx-case-part { padding: 12px 14px; }
+  .lx-rb-static th[scope="row"] { display: block; border: 0; padding: 6px 0 2px; }
+}
