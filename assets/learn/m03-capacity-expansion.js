@@ -1,8 +1,8 @@
 // m03-capacity-expansion.js — Modeler lesson M3, "What should be built? Capacity expansion with representative periods,
 // validated" (model-lab: step cards with a solver run), wave W2, 2026-11-03.
 //
-// Engine: lesson 13's planning LP (LX.townPlan, assets/learn/13-capstone.js, loaded first on the page; in Node it is
-// required). This file extends it and duplicates none of it:
+// Engine: lesson 13's planning LP, the shared component LX.townPlan (assets/learn/components/planengine.js, bundled into
+// learn.js; in Node it is required). This file extends it through its public API and duplicates none of it:
 //   - the same town, costs and year (13-capstone.json, town_year.json, cf_targets.json);
 //   - more choices of representative weeks (selectWeeks' perSeason and extremes options): 4, 7, 8, 11 or 15 weeks;
 //   - three treatments of the battery's state between weeks (link()): "linked" (the engine's own: a calendar chain of 52
@@ -19,9 +19,9 @@
 // _tests/learn/test_m03-capacity-expansion.js with the vendored HiGHS; the notebook rebuilds the model in SciPy.
 (function () {
   "use strict";
-  var TP = typeof module !== "undefined" && module.exports && typeof require === "function" ? require("./13-capstone.js")
+  var TP = typeof module !== "undefined" && module.exports && typeof require === "function" ? require("./components/planengine.js")
     : (typeof window !== "undefined" && window.LX && window.LX.townPlan);
-  if (!TP) throw new Error("m03: lesson 13's planning engine (LX.townPlan) must load first");
+  if (!TP) throw new Error("m03: the planning engine (LX.townPlan, components/planengine.js in learn.js) must load first");
   var HPW = TP.HPW, WEEKS = TP.WEEKS;
 
   // ---------------------------------------------------------------- inputs
@@ -577,7 +577,7 @@
           say: "The weighted sum of CO2, the emission rate e times gas output, stays within the cap." }
       ],
       symbols: {
-        f: { name: "f_i", label: "f i, yearly cost of one unit built", unit: "$ per MW-year", words: "Capital cost spread over the plant's life at a 4% real cost of capital, plus fixed upkeep: what one MW costs every year, used or not.", you: "Wind: $" + (C.techs.wind.fixed / 1e3).toFixed(1) + "k per MW-year; gas combined-cycle: $" + (C.techs.cc.fixed / 1e3).toFixed(1) + "k.", code: "C.techs.wind.fixed   // costs() in 13-capstone.js" },
+        f: { name: "f_i", label: "f i, yearly cost of one unit built", unit: "$ per MW-year", words: "Capital cost spread over the plant's life at a 4% real cost of capital, plus fixed upkeep: what one MW costs every year, used or not.", you: "Wind: $" + (C.techs.wind.fixed / 1e3).toFixed(1) + "k per MW-year; gas combined-cycle: $" + (C.techs.cc.fixed / 1e3).toFixed(1) + "k.", code: "C.techs.wind.fixed   // LX.townPlan.costs()" },
         K: { name: "K_i", label: "K i, size built", unit: "MW (battery energy: MWh)", words: "The investment decisions: one number per technology, the same in every hour of the year.", you: "The 4 + 3 plan: " + fm.mw(w7.plan.wind) + " of wind, " + fm.mw(w7.plan.cc) + " of gas combined-cycle.", code: '"K_wind", "K_cc", ... "K_be"' },
         w: { name: "w_p", label: "w p, the weight of representative week p", unit: "h per modelled hour", words: "How many hours of the year each modelled hour stands for: the number of calendar weeks the week represents, times 8,760 ÷ 8,736.", you: "A typical week standing for 13 weeks: " + (13 * 8760 / 8736).toFixed(2) + "; an extreme week: " + (8760 / 8736).toFixed(3) + ".", code: "RW.reps[p].weight" },
         r: { name: "r", label: "r, running cost", unit: "$/MWh", words: "Fuel and variable upkeep per MWh of gas output.", you: "Combined-cycle $" + C.techs.cc.run.toFixed(2) + "/MWh, peaker $" + C.techs.pk.run.toFixed(2) + "/MWh.", code: "C.techs.cc.run" },
@@ -599,9 +599,9 @@
         solve: { t: "Solve the expansion LP", tN: ["Solve the", "expansion LP"], s: "an estimate", sN: "an estimate" },
         full: { t: "Re-run the plan on 8,760 h", tN: ["Re-run on", "8,760 hours"], s: "sizes fixed", sN: "sizes fixed" },
         q1: { t: "Hours short?", tN: ["Hours", "short?"], k: "q" },
-        more: { t: "Keep extremes, add weeks", tN: ["Keep extremes,", "add weeks"], s: "and start again", sN: "start again", k: "end" },
+        more: { t: "Add extreme weeks", tN: ["Add extreme", "weeks"], s: "start again", sN: "start again", k: "end" },
         q2: { t: "Over the cap?", tN: ["Over the", "cap?"], k: "q" },
-        tight: { t: "Tighten the planning cap", tN: ["Tighten the", "planning cap"], s: "and start again", sN: "start again", k: "end" },
+        tight: { t: "Tighten the cap", tN: ["Tighten", "the cap"], s: "start again", sN: "start again", k: "end" },
         y2: { t: "Re-run on another year", tN: ["Another", "weather year"], s: "2024", sN: "2024" },
         ad: { t: "Adequacy study (A5)", tN: ["Adequacy", "study (A5)"], s: "many years, outages", sN: "many years" },
         rep: { t: "Report with error measures", tN: ["Report with", "error measures"], k: "end" }

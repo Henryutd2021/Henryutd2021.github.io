@@ -10,8 +10,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- M3 in the model-lab form (step cards with a solver run), wave W2, 2026-11-03. Model, step cards and explain layer:
-     assets/learn/m03-capacity-expansion.js, which extends lesson 13's planning engine (assets/learn/13-capstone.js,
-     loaded first) with assets/learn/data/m03-capacity-expansion.json (the lesson's choices and its reference results),
+     assets/learn/m03-capacity-expansion.js, which extends lesson 13's planning engine (LX.townPlan, the shared component
+     assets/learn/components/planengine.js in learn.js) with assets/learn/data/m03-capacity-expansion.json (the lesson's choices and its reference results),
      m03-capacity-expansion-2024.json (a second weather year, built by scripts/build_learn_m03_weather_year.py in the
      ResearchPortfolio folder), 13-capstone.json, town_year.json and cf_targets.json. Lab: learn/notebooks/
      m03-capacity-expansion.ipynb (SciPy linprog with HiGHS; asserts the reference block). Tests: node
@@ -294,6 +294,5 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/13-capstone.js" defer></script>
 <script src="../assets/learn/m03-capacity-expansion.js" defer></script>
 ```

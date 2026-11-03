@@ -1,5 +1,5 @@
-// test_m03-capacity-expansion.js — Node tests for M3 (assets/learn/m03-capacity-expansion.js on lesson 13's planning
-// engine, assets/learn/13-capstone.js) with the vendored HiGHS, the solver core the page runs in its Web Worker.
+// test_m03-capacity-expansion.js — Node tests for M3 (assets/learn/m03-capacity-expansion.js on the shared planning
+// engine, assets/learn/components/planengine.js) with the vendored HiGHS, the solver core the page runs in its Web Worker.
 //   - inputs: the second weather year (2024) has 8,760 hours, the 2025 town's demand energy and the same capacity factors;
 //     the seven-week set is lesson 13's model exactly (same objective as 13-capstone.json's 200 kt frontier point)
 //   - the weeks: for every set, weights add up to 8,760 h and every calendar week maps to the representative standing
@@ -25,7 +25,7 @@ const pctx = { window: { LX: {} }, module: { exports: {} } };
 vm.runInNewContext(fs.readFileSync(L("components/profiles.js"), "utf8"), pctx);
 const P = pctx.module.exports;
 const M = require(L("m03-capacity-expansion.js"));
-const TP = require(L("13-capstone.js"));
+const TP = require(L("components/planengine.js"));
 const J = p => JSON.parse(fs.readFileSync(L("data/" + p), "utf8"));
 const readOr = p => (fs.existsSync(p) ? fs.readFileSync(p, "utf8") : "");
 const DPATH = L("data/m03-capacity-expansion.json");

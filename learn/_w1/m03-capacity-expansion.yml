@@ -12,7 +12,7 @@ glossary:
     term: Medoid
     def: "The member of a group whose total distance to the other members is smallest; unlike an average, it is a real member."
 requests:
-  - "Planning engine: M3 loads assets/learn/13-capstone.js before m03-capacity-expansion.js (as lesson 12 does) and requires ./13-capstone.js in Node. When the engine moves into components/, switch the page's script tag and the require in m03-capacity-expansion.js (one line each); nothing else in M3 depends on the file name."
+  - "Planning engine: M3 uses the shared LX.townPlan (components/planengine.js, in learn.js) through its public API only (weekModel, fullYearModel, selectWeeks, summarize, costs, prepareYear); planengine.js is unchanged."
   - "Promote candidates: (1) link(model, RW, mode) in m03-capacity-expansion.js (linked / cyclic / no link between representative periods) and readCheck/errors (full-year re-dispatch and error measures) belong in the planning engine; (2) WeekStrip, a 52-week calendar strip coloured by representative period with shortfall marks and a text version (M13 and C2 can reuse it)."
   - "Solver benchmark: add the M3 instances to lessonSet in _tests/learn/solver_models.js (the snippet used for the W2 benchmark is in the builder report): m3typ4, m3typ8, m3wk11, m3link, m3cyc, m3free, m3y24."
   - "New data builder in the ResearchPortfolio folder: scripts/build_learn_m03_weather_year.py (imports the cleaning rules of build_learn_town_data.py) wrote assets/learn/data/m03-capacity-expansion-2024.json from EIA-930's 2024 six-month files; please commit it with the W2 merge."
