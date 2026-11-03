@@ -110,6 +110,9 @@ M.panelChoices(V).forEach(p => [null, "noon", "evening"].forEach(m => M.batteryC
 ok(M.panelChoices(V).every(p => { const a = M.minBattery(V, p, "noon"), b = M.minBattery(V, p, "evening"); return a === null || b === null || b > a; }), "with the same panels, the evening mill always needs a bigger battery");
 ok(near(M.villageLoad(V, "noon").reduce((a, b) => a + b, 0), M.villageLoad(V, "evening").reduce((a, b) => a + b, 0), 1e-9), "the mill's day uses the same energy at noon and in the evening (the predict's feedback)");
 ok(near(M.villageLoad(V, null).reduce((a, b) => a + b, 0), 58.5, 1e-9) && V.mill.kw * 4 === 30, "village: 58.5 kWh a day for the households, 30 kWh for the mill");
+const hh = h => (h < 10 ? "0" : "") + h + ":00", span = a => hh(a[0]) + " to " + hh(a[a.length - 1] + 1);
+ok(span(V.mill.noon) === "10:00 to 14:00" && span(V.mill.evening) === "18:00 to 22:00" && JS.indexOf("runs from " + span(V.mill.noon)) >= 0 && JS.indexOf("grind from " + span(V.mill.evening)) >= 0 &&
+   JS.indexOf('"10:00–14:00"') >= 0 && JS.indexOf('"18:00–22:00"') >= 0, "the mill's hours in the step texts and labels equal the data (10:00 to 14:00; 18:00 to 22:00)");
 ok(V.panels.start === 10 && M.minBattery(V, 10, "noon") === null, "the village starts short (10 kW of panels serves no hour plan): the reader must act");
 
 // ---------------- numbers on the page

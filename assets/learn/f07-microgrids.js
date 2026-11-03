@@ -120,8 +120,8 @@
     var rows = C.loads.map(function (l) { return "<tr><td>" + l.label + "</td><td>" + kw(l.kw) + "</td><td>" + (l.critical ? "critical" : "can be shed") + "</td></tr>"; }).join("");
     var hours = function (r) { return r.full ? "all 72 hours" : r.lasts + " hours"; };
     return "<p class=\"lx-eyebrow\">" + C.name + " in a storm, and a village with no grid (illustrative)</p>" +
-      "<table class=\"lx-mini-table f7-fb\"><caption class=\"lx-hint\">The campus's loads; its sources: " + kw(C.solarKW) + " of solar, a " + kw(C.battery.kw) + " battery holding " + kwh(C.battery.kwh) + ", a " + kw(C.gen.kw) + " generator with fuel for " + C.gen.fuelHours + " hours at full power.</caption>" +
-      "<thead><tr><th scope=\"col\">Load</th><th scope=\"col\">Power</th><th scope=\"col\">In an outage</th></tr></thead><tbody>" + rows + "</tbody></table>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f7-fb\"><caption class=\"lx-hint\">The campus's loads; its sources: " + kw(C.solarKW) + " of solar, a " + kw(C.battery.kw) + " battery holding " + kwh(C.battery.kwh) + ", a " + kw(C.gen.kw) + " generator with fuel for " + C.gen.fuelHours + " hours at full power.</caption>" +
+      "<thead><tr><th scope=\"col\">Load</th><th scope=\"col\">Power</th><th scope=\"col\">In an outage</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
       "<ul><li>Ordinary grid-connected solar switches off when the grid fails. The battery's " + rich("[[grid-forming|grid-forming]]") + " inverter, or the generator, can form an island.</li>" +
       "<li>At night the island can give " + kw(nightKW(C)) + " (battery plus generator); the campus draws " + kw(totalKW(C)) + ", so some loads must be shed.</li>" +
       X.map(function (x) { return "<li>Keeping " + names(C, x.keys) + " (" + kw(x.kw) + "): " + hours(x.jul) + " from midnight on " + C.windows.jul.first + ", " + hours(x.jan) + " from midnight on " + C.windows.jan.first + ".</li>"; }).join("") +
@@ -138,9 +138,9 @@
     ];
     return "<dl class=\"lx-ideas\">" + ideas.map(function (i) { return "<dt>" + i[0] + "</dt><dd>" + i[1] + "</dd>"; }).join("") + "</dl>" +
       "<p class=\"lx-eyebrow\">The parts of a microgrid</p><ol class=\"f7-notes\">" + D.parts.map(function (p) { return "<li><b>" + p.name + ".</b> " + rich(p.note) + "</li>"; }).join("") + "</ol>" +
-      "<p class=\"lx-eyebrow\">" + D.kinds.title + "</p><table class=\"lx-mini-table f7-fb\"><caption class=\"lx-hint\">" + D.kinds.caption + "</caption><thead><tr>" +
+      "<p class=\"lx-eyebrow\">" + D.kinds.title + "</p><div class=\"lx-scroll-x\"><table class=\"lx-mini-table f7-fb\"><caption class=\"lx-hint\">" + D.kinds.caption + "</caption><thead><tr>" +
       D.kinds.columns.map(function (c) { return "<th scope=\"col\">" + c.label + "</th>"; }).join("") + "</tr></thead><tbody>" +
-      D.kinds.rows.map(function (r) { return "<tr>" + D.kinds.columns.map(function (c) { return "<td>" + r[c.key] + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
+      D.kinds.rows.map(function (r) { return "<tr>" + D.kinds.columns.map(function (c) { return "<td>" + r[c.key] + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
   }
   function staticMyth(D) {
     var C = D.campus, X = cases(C)[1];
@@ -245,7 +245,7 @@
         var g = S("g", { class: "f7-part" + (st.pick === k ? " picked" : "") + (lit(k) ? " is-lit" : ""), role: "button", tabindex: "0", "aria-label": aria, "data-part": k }, svg);
         draw1(g);
         if (o.numbered) {
-          var bb = { feeder: [Lo.feeder[0] + 10, Lo.feeder[1] + 16], switch: [(Lo.sw[0] + Lo.sw[1]) / 2, Lo.sw[2] - 20], controller: [Lo.ctrl[0] + Lo.ctrl[2] - 2, Lo.ctrl[1] + 2] }[k] || [Lo.at[k][0] + 27, Lo.at[k][1] - 10];
+          var bb = { feeder: [Lo.feeder[0] + 10, Lo.feeder[1] + 16], switch: [Lo.sw[1] + 10, Lo.sw[2] - 12], controller: [Lo.ctrl[0] + Lo.ctrl[2] - 2, Lo.ctrl[1] + 2] }[k] || [Lo.at[k][0] + 27, Lo.at[k][1] - 10];
           S("circle", { cx: bb[0], cy: bb[1], r: 8, class: "f7-num" }, g); S("text", { x: bb[0], y: bb[1] + 4, class: "f7-numt", "text-anchor": "middle" }, g).textContent = num[k];
         }
         function act() { st.pick = k; if (o.onPick) o.onPick(k); draw(); var again = box.querySelector('[data-part="' + k + '"]'); if (again) again.focus(); }
@@ -334,7 +334,8 @@
       if (h.short > 0.05) bars.push({ x0: h.h + 0.08, x1: h.h + 0.92, y0: h.direct + h.bat, y1: h.load, color: COLOR.short, op: 0.3 });
     });
     return {
-      x: { min: 0, max: 24, ticks: [[0, "00:00", "start"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00", "end"]] },
+      x: { min: 0, max: 24, ticks: [[0, "00:00", "start"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00", "end"]],
+           ticksN: [[0, "0", "start"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h", "end"]] },
       y: { min: 0, max: 16, step: 4, fmt: function (v) { return int(v); }, unit: "kW" }, height: 220, heightN: 200, bars: bars,
       lines: [{ values: r.rows.map(function (h) { return h.load; }), x0: 0, step: 1, color: COLOR.load, width: 1.6 }],
       legend: [{ label: "From the panels", color: COLOR.solar }, { label: "From the battery", color: COLOR.battery }, { label: "Short", color: COLOR.short }, { label: "Village load", color: COLOR.load }],
@@ -510,6 +511,7 @@
     // "village" (the smallest design with the mill at midday), "evening" (the mill moved, the smallest design)
     function keep3() { var k = {}; C.loads.forEach(function (l) { k[l.key] = l.key !== "labs"; }); return k; }
     LX.demo(root, function (state) {
+      if (state === "term") { cards.go(0); setTimeout(function () { var tm = live.querySelector(".lx-step-text .lx-term"); if (tm) tm.click(); }, 600); return { view: "a glossary popover open" }; }
       if (state === "mid") { saved = keep3(); S0.former = "battery"; cards.go(3); return { view: "loads kept" }; }
       if (state === "july" || state === "step-5") { S0.keep = keep3(); S0.former = "battery"; S0.autorun = true; cards.go(4); S0.autorun = false; return { view: "July outage" }; }
       if (state === "january" || state === "step-6") { S0.keep = keep3(); S0.former = "battery"; S0.autorun = true; cards.go(5); var b = live.querySelector(".lx-step-act .lx-predictbox .lx-choice"); if (b) b.click(); S0.autorun = false; return { view: "January outage" }; }
@@ -537,12 +539,12 @@
     // 1 the annotated diagram (e-annotated)
     var c1 = H("div", { class: "lx-xcard wide" }, x);
     H("header", { class: "lx-x-head", html: "<h3>The parts of a microgrid</h3>" }, c1);
-    H("p", { class: "lx-hint", html: LX.rich("Your island: " + kw(jul.load) + " kept, " + lastsText(jul) + " in July and " + lastsText(jan).replace(/^rode/, "rode") + " in January. Tap a number to read its part.") }, c1);
+    H("p", { class: "lx-hint", text: "Your island: " + kw(jul.load) + " kept, " + lastsText(jul) + " in July and " + lastsText(jan) + " in January. Tap a part to read about it." }, c1);
     var note = H("p", { class: "f7-note", "aria-live": "polite", text: "" }, c1);
-    var dg = CampusLine(c1, C, Pth, { numbered: true, onPick: function (k) { var p = D.parts.filter(function (q) { return q.key === k; })[0]; note.innerHTML = LX.rich("<b>" + p.name + ".</b> " + p.note); } });
+    var dg = CampusLine(c1, C, Pth, { numbered: true, onPick: function (k) { var p = D.parts.filter(function (q) { return q.key === k; })[0]; note.innerHTML = "<b>" + LX.esc(p.name) + ".</b> " + LX.rich(p.note); } });
     dg.set({ grid: false, sw: "open", former: "battery", keep: keep });
     var ol = H("ol", { class: "f7-notes" }, c1);
-    D.parts.forEach(function (p) { H("li", { html: LX.rich("<b>" + p.name + ".</b> " + p.note) }, ol); });
+    D.parts.forEach(function (p) { H("li", { html: "<b>" + LX.esc(p.name) + ".</b> " + LX.rich(p.note) }, ol); });
     // 2 the flowchart (e-flowchart): what happens when the grid goes down, with the reader's loads as one trace
     var c2 = H("div", { class: "lx-xcard" }, x), F = D.flow;
     var traces = F.traces.map(function (t) { return Object.assign({}, t); });

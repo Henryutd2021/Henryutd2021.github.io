@@ -135,12 +135,12 @@
   }
   function staticSteps(D) {
     var I = D.ice, F = facts(D), O = D.outages;
-    var ice = "<table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">What one outage costs, on average, rural co-op members (2025 survey, 2025 dollars)</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">A household</th><th scope=\"col\">A business</th><th scope=\"col\">Household, per kWh not delivered</th></tr></thead><tbody>" +
-      I.hours.map(function (h, i) { return "<tr><td>" + I.names[i] + "</td><td class=\"n\">" + usd2(I.household.event[i]) + "</td><td class=\"n\">" + usd(I.business.event[i]) + "</td><td class=\"n\">" + usd2(I.household.kwh[i]) + "</td></tr>"; }).join("") + "</tbody></table>";
-    var out = "<table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">A year of outages at Prairie Campus (illustrative), at " + usd(F.c) + " an hour for the hospital</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">Outages a year</th><th scope=\"col\">Hours a year</th><th scope=\"col\">Cost a year</th></tr></thead><tbody>" +
-      contributions(O, F.c).map(function (x) { return "<tr><td>" + x.hours + " h</td><td class=\"n\">" + x.perYear + "</td><td class=\"n\">" + f2(x.expHours) + "</td><td class=\"n\">" + usd(x.cost) + "</td></tr>"; }).join("") + "</tbody></table>";
-    var dz = "<table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">Three designs a year (illustrative), net without and with the everyday savings</caption><thead><tr><th scope=\"col\">Design</th><th scope=\"col\">Annual cost</th><th scope=\"col\">Net, outages only</th><th scope=\"col\">Net, with everyday savings</th></tr></thead><tbody>" +
-      F.designs.map(function (r) { return "<tr><td>" + r.d.label + "</td><td class=\"n\">" + usd(r.no.annual) + "</td><td class=\"n\">" + signed(r.no.net) + "</td><td class=\"n\">" + signed(r.yes.net) + "</td></tr>"; }).join("") + "</tbody></table>";
+    var ice = "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">What one outage costs, on average, rural co-op members (2025 survey, 2025 dollars)</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">A household</th><th scope=\"col\">A business</th><th scope=\"col\">Household, per kWh not delivered</th></tr></thead><tbody>" +
+      I.hours.map(function (h, i) { return "<tr><td>" + I.names[i] + "</td><td class=\"n\">" + usd2(I.household.event[i]) + "</td><td class=\"n\">" + usd(I.business.event[i]) + "</td><td class=\"n\">" + usd2(I.household.kwh[i]) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    var out = "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">A year of outages at Prairie Campus (illustrative), at " + usd(F.c) + " an hour for the hospital</caption><thead><tr><th scope=\"col\">Length</th><th scope=\"col\">Outages a year</th><th scope=\"col\">Hours a year</th><th scope=\"col\">Cost a year</th></tr></thead><tbody>" +
+      contributions(O, F.c).map(function (x) { return "<tr><td>" + x.hours + " h</td><td class=\"n\">" + x.perYear + "</td><td class=\"n\">" + f2(x.expHours) + "</td><td class=\"n\">" + usd(x.cost) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    var dz = "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">Three designs a year (illustrative), net without and with the everyday savings</caption><thead><tr><th scope=\"col\">Design</th><th scope=\"col\">Annual cost</th><th scope=\"col\">Net, outages only</th><th scope=\"col\">Net, with everyday savings</th></tr></thead><tbody>" +
+      F.designs.map(function (r) { return "<tr><td>" + r.d.label + "</td><td class=\"n\">" + usd(r.no.annual) + "</td><td class=\"n\">" + signed(r.no.net) + "</td><td class=\"n\">" + signed(r.yes.net) + "</td></tr>"; }).join("") + "</tbody></table></div>";
     var vg = "<ul>" + F.village.map(function (v) { return "<li>Village mini-grid, " + v.k.label.replace(/^\+ /, "with the ").toLowerCase() + ": " + v.x.kw + " kW of panels and " + v.x.kwh + " kWh of battery, " + usd2(v.x.perKWh) + " per kWh.</li>"; }).join("") + "</ul>";
     return "<p class=\"lx-eyebrow\">Price an outage, then size Prairie Campus's microgrid against it (2025 dollars)</p>" + ice + out +
       "<ul><li>The hospital's expected outage cost: " + usd(F.cost) + " a year (illustrative: " + usd(F.c) + " an hour). Outages of 12 hours or more are " + pct0(F.longShare) + " of the outages but " + pct0(F.longHours / F.hours) + " of the hours.</li>" +
@@ -154,8 +154,8 @@
       "<dt>The next hour</dt><dd>Buy another hour of backup while it saves more a year than it costs; then check that the whole design covers its fixed costs.</dd>" +
       "<dt>Value stacking</dt><dd>Everyday savings can carry a design that outage savings alone cannot.</dd>" +
       "<dt>Who owns it</dt><dd>The net is the same for everyone together; the owner decides who pays, who gains and who carries the risk.</dd></dl>" +
-      "<table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">Four owners of the battery-and-generator design (illustrative deals and rates)</caption><thead><tr><th scope=\"col\">Owner</th><th scope=\"col\">Who pays</th><th scope=\"col\">Carries the risk</th><th scope=\"col\">Annual cost</th></tr></thead><tbody>" +
-      F.owners.map(function (r) { return "<tr><td>" + r.o.label + " (" + (r.o.rate * 100).toFixed(0) + "%)</td><td>" + r.o.pays + "</td><td>" + r.o.risk + "</td><td class=\"n\">" + usd(r.x.annual) + "</td></tr>"; }).join("") + "</tbody></table>";
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table a14-tab\"><caption class=\"lx-hint\">Four owners of the battery-and-generator design (illustrative deals and rates)</caption><thead><tr><th scope=\"col\">Owner</th><th scope=\"col\">Who pays</th><th scope=\"col\">Carries the risk</th><th scope=\"col\">Annual cost</th></tr></thead><tbody>" +
+      F.owners.map(function (r) { return "<tr><td>" + r.o.label + " (" + (r.o.rate * 100).toFixed(0) + "%)</td><td>" + r.o.pays + "</td><td>" + r.o.risk + "</td><td class=\"n\">" + usd(r.x.annual) + "</td></tr>"; }).join("") + "</tbody></table></div>";
   }
   function staticMyth(D) {
     var F = facts(D), b = F.designs[0], I = D.ice;
@@ -379,6 +379,7 @@
     // demo states (core.js LX.demo): "mid" = step 3 with a 2-hour battery; "value" (step 4 at the highest value),
     // "gen" (step 5 at its best tank), "stack" (step 6), "owners" (step 7, the co-op), "village" (step 8, two cases)
     LX.demo(root, function (state) {
+      if (state === "term") { cards.go(0); setTimeout(function () { var tm = live.querySelector(".lx-step-text .lx-term"); if (tm) tm.click(); }, 600); return { view: "a glossary popover open" }; }
       if (state === "mid") { St.bat = 2; cards.go(2); return { view: "battery 2 h" }; }
       if (state === "value") { cards.go(3); var bs = live.querySelectorAll(".lx-step-act .lx-seg button"); if (bs.length) bs[bs.length - 1].click(); return { view: "value $27,000" }; }
       if (state === "gen") { St.gen = 72; cards.go(4); return { view: "generator 72 h" }; }
