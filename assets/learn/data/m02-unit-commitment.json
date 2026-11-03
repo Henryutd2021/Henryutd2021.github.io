@@ -1,0 +1,260 @@
+{
+ "about": "M2 (On or off? Unit commitment as a mixed-integer program). Prairie Town's fleet from lesson 0 (town.json) on 29 July 2025, the 2025 summer day with the highest hourly demand on the Southwest Power Pool grid (EIA-930 shapes in town_days.json, key summer_peak), scaled to the town exactly as lesson 0 scales its day (grid-operator.js prepare(): wind and solar = shape x farm size, rounded; demand = shape x 450 MW, rounded so that the need left for gas is a multiple of 5 MW). The switching data of the two gas plants (minimum output, no-load and start-up costs, minimum run and down times, states before and after the day) and the unserved-energy penalty are illustrative. The reference block is precomputed with the vendored HiGHS (labelled precomputed where the page shows it before a solve); _tests/learn/test_m02-unit-commitment.js re-solves every number in it.",
+ "accessed": "2026-11-03",
+ "day": {
+  "date": "2025-07-29",
+  "label": "29 July 2025",
+  "note": "the 2025 summer day with the highest hourly demand, among days with no repaired hours",
+  "units": "MW, hour by hour (local time, Central daylight time)",
+  "demand": [337, 321, 311, 302, 298, 302, 310, 321, 338, 360, 384, 407, 423, 426, 442, 452, 449, 449, 445, 434, 420, 400, 380, 354],
+  "wind": [117, 116, 111, 107, 103, 102, 94, 81, 53, 40, 33, 30, 35, 42, 47, 50, 51, 55, 64, 75, 86, 105, 110, 109],
+  "solar": [0, 0, 0, 0, 0, 0, 1, 35, 125, 160, 181, 177, 173, 159, 160, 157, 163, 139, 111, 54, 4, 0, 0, 0]
+ },
+ "fleet": {
+  "nuclear": {
+   "label": "Nuclear plant",
+   "short": "Nuclear",
+   "mw": 100,
+   "cost": 10,
+   "flat": true,
+   "color": "var(--lx-nuc)"
+  },
+  "wind": {
+   "label": "Wind farm",
+   "short": "Wind",
+   "mw": 150,
+   "cost": 0,
+   "color": "var(--lx-wind)"
+  },
+  "solar": {
+   "label": "Solar farm",
+   "short": "Solar",
+   "mw": 200,
+   "cost": 0,
+   "color": "var(--lx-solar)"
+  },
+  "cc": {
+   "label": "Gas combined-cycle plant",
+   "short": "Gas CC",
+   "mw": 150,
+   "cost": 40,
+   "min": 50,
+   "noload": 300,
+   "startup": 8000,
+   "up": 6,
+   "down": 6,
+   "init": 1,
+   "end": 1,
+   "color": "var(--lx-cc)"
+  },
+  "pk": {
+   "label": "Gas peaker",
+   "short": "Peaker",
+   "mw": 100,
+   "cost": 100,
+   "min": 30,
+   "noload": 300,
+   "startup": 2000,
+   "up": 2,
+   "down": 2,
+   "init": 0,
+   "color": "var(--lx-pk)"
+  }
+ },
+ "fleet_note": "min = minimum output when on (MW); noload = $ per hour on; startup = $ per start; up and down = minimum run and down times (hours); init = on (1) or off (0) before the day; end = state required in the last hour. All illustrative; the peaker's 30 MW minimum is lesson 11's.",
+ "penalty": 3000,
+ "penalty_note": "Cost per MWh of unserved demand: a large illustrative number, as in lesson 11, so that every node of the branch-and-bound tree has an answer.",
+ "lesson": {
+  "focus": 17,
+  "edit": [15, 16, 17, 18, 19, 20, 21, 22, 23],
+  "stair": {
+   "hour": 23,
+   "max": 10
+  },
+  "check": [18, 20]
+ },
+ "reference": {
+  "label": "precomputed with HiGHS 1.15 (the steps above solve the same models live)",
+  "focus": 17,
+  "lp": 159500,
+  "lpFocus": 5,
+  "lpHigh": "17:00–22:00",
+  "relax": 168975,
+  "relaxFocus": "5%",
+  "relaxFocusSw": "0.05",
+  "relaxStarts": "0.8",
+  "milp": 173200,
+  "peakerOn": "17:00–22:00",
+  "condPrices": [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 100, 100, 100, 40, 40],
+  "condHigh": "19:00–21:00",
+  "uplift": 9200,
+  "settle": {
+   "pk": {
+    "revenue": 21600,
+    "cost": 30800,
+    "running": 27000,
+    "noload": 1800,
+    "startup": 2000,
+    "energyShort": 5400
+   },
+   "cc": {
+    "revenue": 138200,
+    "cost": 118400,
+    "profit": 19800
+   }
+  },
+  "stair": [0, 40, 80, 120, 160, 200, 2340, 2380, 2420, 2460, 2500],
+  "tree": {
+   "lps": 11,
+   "branchings": 5,
+   "rootFrac": 6,
+   "nodes": [
+    {
+     "id": 0,
+     "parent": null,
+     "by": null,
+     "val": null,
+     "bound": 168975,
+     "status": "branched",
+     "shed": 0
+    },
+    {
+     "id": 1,
+     "parent": 0,
+     "by": "u_pk_19",
+     "val": 0,
+     "bound": 328920,
+     "status": "pruned",
+     "shed": 55
+    },
+    {
+     "id": 2,
+     "parent": 0,
+     "by": "u_pk_19",
+     "val": 1,
+     "bound": 169510,
+     "status": "branched",
+     "shed": 0
+    },
+    {
+     "id": 3,
+     "parent": 2,
+     "by": "u_pk_21",
+     "val": 0,
+     "bound": 300695,
+     "status": "pruned",
+     "shed": 45
+    },
+    {
+     "id": 4,
+     "parent": 2,
+     "by": "u_pk_21",
+     "val": 1,
+     "bound": 169735,
+     "status": "branched",
+     "shed": 0
+    },
+    {
+     "id": 5,
+     "parent": 4,
+     "by": "u_pk_18",
+     "val": 0,
+     "bound": 242160,
+     "status": "pruned",
+     "shed": 25
+    },
+    {
+     "id": 6,
+     "parent": 4,
+     "by": "u_pk_18",
+     "val": 1,
+     "bound": 170575,
+     "status": "branched",
+     "shed": 0
+    },
+    {
+     "id": 7,
+     "parent": 6,
+     "by": "u_pk_22",
+     "val": 0,
+     "bound": 228515,
+     "status": "pruned",
+     "shed": 20
+    },
+    {
+     "id": 8,
+     "parent": 6,
+     "by": "u_pk_22",
+     "val": 1,
+     "bound": 171415,
+     "status": "branched",
+     "shed": 0
+    },
+    {
+     "id": 9,
+     "parent": 8,
+     "by": "u_pk_17",
+     "val": 0,
+     "bound": 185900,
+     "status": "integer",
+     "shed": 5
+    },
+    {
+     "id": 10,
+     "parent": 8,
+     "by": "u_pk_17",
+     "val": 1,
+     "bound": 173200,
+     "status": "best",
+     "shed": 0
+    }
+   ],
+   "first": {
+    "t": 19,
+    "x": 0.55
+   },
+   "last": {
+    "t": 17
+   },
+   "firstOff": {
+    "bound": 328920,
+    "shed": 55
+   },
+   "firstPlan": 185900,
+   "firstPlanShed": 5,
+   "prunedByFirst": 4
+  }
+ },
+ "sources": {
+  "eia-930": {
+   "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "asOf": "2025 data, accessed 2 November 2026"
+  },
+  "ferc-primer": {
+   "text": "FERC staff, Energy Primer: A Handbook of Energy Market Basics (April 2020), p. 55: day-ahead unit commitment",
+   "url": "https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf",
+   "asOf": "April 2020 edition; checked 3 November 2026"
+  },
+  "ferc-844": {
+   "text": "FERC Order No. 844, Uplift Cost Allocation and Transparency in Markets Operated by RTOs and ISOs, 163 FERC ¶ 61,041 (issued 19 April 2018), P 7",
+   "url": "https://www.ferc.gov/sites/default/files/2020-06/Order-844.pdf",
+   "asOf": "checked 3 November 2026"
+  },
+  "oneill-2005": {
+   "text": "O'Neill, Sotkiewicz, Hobbs, Rothkopf and Stewart (2005), Efficient market-clearing prices in markets with nonconvexities, European Journal of Operational Research 164(1), 269-285",
+   "url": "https://doi.org/10.1016/j.ejor.2003.12.011",
+   "asOf": "checked 3 November 2026"
+  },
+  "knueven-2020": {
+   "text": "Knueven, Ostrowski and Watson (2020), On Mixed-Integer Programming Formulations for the Unit Commitment Problem, INFORMS Journal on Computing",
+   "url": "https://doi.org/10.1287/ijoc.2019.0944",
+   "asOf": "checked 3 November 2026"
+  },
+  "highs": {
+   "text": "HiGHS, open-source linear and mixed-integer solver (documentation; option mip_rel_gap, default 0.0001)",
+   "url": "https://ergo-code.github.io/HiGHS/dev/",
+   "asOf": "solver 1.15 in the browser; checked 3 November 2026"
+  }
+ }
+}

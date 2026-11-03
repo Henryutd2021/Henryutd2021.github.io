@@ -1110,9 +1110,12 @@
    "tier": "modeler",
    "code": "M2",
    "title": "On or off? Unit commitment as a mixed-integer program",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m02-unit-commitment.html",
+   "scales": [],
+   "id": "m02-unit-commitment",
+   "minutes": 40,
+   "form": "cards"
   },
   {
    "tier": "modeler",
