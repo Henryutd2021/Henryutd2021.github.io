@@ -14,7 +14,9 @@
      The first ring is drawn solid, the others dashed; the answer line is aria-live; a "Text version" lists every group.
      Returns { el, open(id) }.
    Pure (Node: require("components/stakeholders.js"); also on LX.Stakeholders): WORD, cellText, staticHTML(o) (the role
-   table as a plain table for a no-JS fallback), mapItems(o) (every group with its ring, in order). Colours: --lx-* only. */
+   table as a plain table for a no-JS fallback), mapItems(o) (every group with its ring, in order), mapStaticHTML(o) (the
+   map as a plain table for a no-JS fallback: group, ring, what it is owed, where it appears; staticTitle, owedHead and
+   alsoHead name its parts). Colours: --lx-* only. */
 (function () {
   "use strict";
   var WORD = { yes: "Yes", part: "Partly", no: "No" };
@@ -33,7 +35,18 @@
     o.rings.forEach(function (r, k) { r.items.forEach(function (s) { out.push({ id: s.id, ring: r.ring, k: k, label: s.label, owed: s.owed, also: s.also || [] }); }); });
     return out;
   }
-  var pure = { WORD: WORD, cellText: cellText, staticHTML: staticHTML, mapItems: mapItems };
+  // the map as a plain table for a no-JS fallback: one row per group (group, ring, what it is owed and, when any group
+  // has them, where it appears, joined with "; "), with an optional eyebrow above it. Labels: o.staticTitle (eyebrow;
+  // none by default), o.owedHead ("What it is owed"), o.alsoHead (the also column; default o.alsoLabel or "In")
+  function mapStaticHTML(o) {
+    var items = mapItems(o), also = items.some(function (s) { return s.also.length; });
+    return (o.staticTitle ? '<p class="lx-eyebrow">' + esc(o.staticTitle) + "</p>" : "") +
+      '<div class="lx-scroll-x"><table class="lx-facts lx-smap-static"><thead><tr><th scope="col">Group</th><th scope="col">Ring</th><th scope="col">' + esc(o.owedHead || "What it is owed") + "</th>" +
+      (also ? '<th scope="col">' + esc(o.alsoHead || o.alsoLabel || "In") + "</th>" : "") + "</tr></thead><tbody>" +
+      items.map(function (s) { return '<tr><th scope="row">' + esc(s.label) + "</th><td>" + esc(s.ring) + "</td><td>" + esc(plain(s.owed)) + "</td>" + (also ? "<td>" + esc(s.also.join("; ")) + "</td>" : "") + "</tr>"; }).join("") +
+      "</tbody></table></div>";
+  }
+  var pure = { WORD: WORD, cellText: cellText, staticHTML: staticHTML, mapItems: mapItems, mapStaticHTML: mapStaticHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 

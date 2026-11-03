@@ -30,6 +30,19 @@ ok(/^<table class="lx-stake-static"><thead><tr><th scope="col">Who<\/th><th scop
    st.indexOf('<th scope="row">Households (including renters)</th><td>Partly: comment at hearings</td><td>Yes</td>') > 0, "stakeholders: staticHTML writes a plain table for a no-JS fallback");
 const M = { rings: [{ ring: "Inside", items: [{ id: "a", label: "Co-authors", owed: "credit", also: ["The error"] }] }, { ring: "Around", items: [{ id: "b", label: "Renters", owed: "a say" }] }] };
 ok(JSON.stringify(SH.mapItems(M).map(x => [x.id, x.ring, x.k, x.also.length])) === JSON.stringify([["a", "Inside", 0, 1], ["b", "Around", 1, 0]]), "stakeholder map: every group with its ring, in order");
+// the map's no-JS table (shared fix 23; R9 uses it and keeps no table of its own)
+{
+  const t = SH.mapStaticHTML(M), t2 = SH.mapStaticHTML(Object.assign({}, M, { staticTitle: "Who your study owes what", alsoHead: "In the dilemmas" }));
+  const rows = (t.match(/<tr><th scope="row">/g) || []).length;
+  ok(rows === SH.mapItems(M).length && /^<div class="lx-scroll-x"><table class="lx-facts lx-smap-static"><thead><tr><th scope="col">Group<\/th><th scope="col">Ring<\/th><th scope="col">What it is owed<\/th><th scope="col">In<\/th>/.test(t),
+     "stakeholder map: mapStaticHTML writes one row per group, with group, ring, what it is owed and where it appears");
+  ok(t2.indexOf('<p class="lx-eyebrow">Who your study owes what</p>') === 0 && t2.indexOf('<th scope="col">In the dilemmas</th>') > 0 && !/\[\[/.test(t2), "stakeholder map: an eyebrow and column names as options; glossary marks dropped");
+  const noAlso = SH.mapStaticHTML({ rings: [{ ring: "Inside", items: [{ id: "x", label: "X", owed: "a say" }] }] });
+  ok(noAlso.indexOf("<th scope=\"col\">In</th>") < 0 && noAlso.indexOf("<td>a say</td></tr>") > 0, "stakeholder map: no also column when no group has one");
+  const R9 = require(L("r09-integrity-stakeholders.js")), D9 = JSON.parse(rd("assets/learn/data/r09-integrity-stakeholders.json"));
+  ok(R9.mapHTML(D9) === SH.mapStaticHTML({ rings: R9.mapRings(D9), staticTitle: "Who your study owes what", alsoHead: "In the dilemmas" }) && !/<table class="lx-facts"><thead><tr><th scope="col">Group/.test(rd("assets/learn/r09-integrity-stakeholders.js")),
+     "R9's no-JS stakeholder table is the component's (R9 writes none of its own)");
+}
 
 // ---------------------------------------------------------------- stakeholders: the views on a stub page
 {

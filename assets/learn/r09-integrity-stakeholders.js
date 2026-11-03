@@ -18,6 +18,8 @@
 (function () {
   "use strict";
   var NORM_EXTRA = { stakeholders: "Working with stakeholders" };
+  // the shared stakeholder pieces (components/stakeholders.js): the map's no-JS table comes from there
+  var SH = (typeof window !== "undefined" && window.LX && window.LX.Stakeholders) || require("./components/stakeholders.js");
 
   // ---------------------------------------------------------------- pure model
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -60,12 +62,14 @@
     return '<p class="lx-eyebrow">The fact sheet both answers use (fictional)</p><dl class="lx-ideas r9-facts">' +
       D.exemplars.facts.map(function (f) { return "<dt>" + esc(f.k) + "</dt><dd>" + rich(f.v) + "</dd>"; }).join("") + "</dl>";
   }
-  // the stakeholder map as a table (the no-JS version of LX.StakeholderMap): ring, group, what it is owed, its dilemmas
-  function mapHTML(D) {
-    return '<p class="lx-eyebrow">Who your study owes what</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Group</th><th scope="col">Ring</th><th scope="col">What it is owed</th><th scope="col">In the dilemmas</th></tr></thead><tbody>' +
-      people(D).map(function (p) { return '<tr><th scope="row">' + esc(p.label) + "</th><td>" + esc(p.ring) + "</td><td>" + esc(p.owed) + "</td><td>" + esc(p.dilemmas.join("; ")) + "</td></tr>"; }).join("") +
-      "</tbody></table></div>";
+  // the stakeholder map's rings for LX.StakeholderMap: each group with what it is owed and the dilemmas it appears in
+  function mapRings(D) {
+    var P = people(D);
+    return D.stakeholders.map(function (r) { return { ring: r.ring, items: r.items.map(function (s) { var p = P.filter(function (x) { return x.id === s.id; })[0]; return { id: s.id, label: s.label, owed: s.owed, also: p.dilemmas }; }) }; });
   }
+  var MAP = { staticTitle: "Who your study owes what", alsoHead: "In the dilemmas" };
+  // the stakeholder map as a table (the no-JS version of LX.StakeholderMap): the component's own (stakeholders.js)
+  function mapHTML(D) { return SH.mapStaticHTML({ rings: mapRings(D), staticTitle: MAP.staticTitle, alsoHead: MAP.alsoHead }); }
   // the no-JS version of the task (what to produce is the page's task card, above the interactive): the norms, the six
   // dilemmas with every option and its verdict
   function staticTask(D) {
@@ -109,7 +113,7 @@
       { label: "The error", path: ["s", "f", "q1", "q2", "q3", "a3", "e"], text: "The main result changes: tell co-authors and the journal, and correct the record." }
     ], sel: 0 };
   var model = { FLOW: FLOW, normLabel: normLabel, best: best, score: score, people: people, statement: statement, hint: hint, exemplarsSpec: exemplarsSpec, staticTask: staticTask,
-                factsHTML: factsHTML, mapHTML: mapHTML, rich: rich, plain: plain };
+                factsHTML: factsHTML, mapHTML: mapHTML, mapRings: mapRings, rich: rich, plain: plain };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -138,11 +142,7 @@
     H("div", { class: "lx-saw" + (kind === "good" ? "" : " no"), html: LX.icon(kind === "good" ? "check" : "question") + "<div>" + html + "</div>" }, host);
   }
   // the stakeholder map: three rings, a chip per group; a chip opens what the group is owed and the dilemmas it appears in
-  // (LX.StakeholderMap, components/stakeholders.js; promoted from this file at the W2 integration)
-  function mapRings(D) {
-    var P = people(D);
-    return D.stakeholders.map(function (r) { return { ring: r.ring, items: r.items.map(function (s) { var p = P.filter(function (x) { return x.id === s.id; })[0]; return { id: s.id, label: s.label, owed: s.owed, also: p.dilemmas }; }) }; });
-  }
+  // (LX.StakeholderMap, components/stakeholders.js; promoted from this file at the W2 integration; mapRings above)
 
   function view(live, data, root) {
     var D = data.r09_integrity_stakeholders, picks = LX.store.get("r9-picks", {}) || {};
