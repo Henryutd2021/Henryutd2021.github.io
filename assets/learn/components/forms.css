@@ -1,9 +1,13 @@
 /* forms.css — page pieces of the two W2 forms (learn/_template-studio.qmd, learn/_template-case.qmd): the studio's task
-   list; the case file's numbered parts, its question line and the approved-excerpt quote (blockquote.lx-excerpt with
+   card above the interactive (div.lx-card.lx-studio-brief, seen with and without JavaScript) and its task list; the
+   case file's numbered parts, its question line and the approved-excerpt quote (blockquote.lx-excerpt with
    data-source="excerpt:<key>", checked by the scope scan); the static lists of the no-JS fallbacks (timeline, exemplar
    notes, rubric table). Colours from --lx-* tokens only. */
+.lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
 .lx-studio-task { margin: 0; padding-left: 1.3rem; display: grid; gap: 6px; font-size: 16px; color: var(--lx-ink-2); }
 .lx-studio-task b { color: var(--lx-ink); font-family: var(--lx-f-display); font-weight: 500; }
+/* the myth-or-fact cards under a studio's self-check (:where keeps a page's own spacing able to override it) */
+:where(.lx-form-studio) #selfcheck .lx-myths { margin-top: 18px; }
 .lx-case { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
 .lx-case-part { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r); padding: 14px 16px; display: grid;
   gap: 6px; align-content: start; min-width: 0; }

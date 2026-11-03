@@ -37,9 +37,6 @@ body-classes: "page-learn page-lesson lx-form-studio"
 
 ::: {#task .lx-sec}
 ```{=html}
-<style>#r10-exemplars .lx-ex-ans > p:not(.lx-eyebrow), #r10-exemplars .lx-ex-text { white-space: pre-line; }
-.lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
-#selfcheck .lx-myths { margin-top: 18px; }</style>
 <div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
@@ -96,13 +93,13 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <p>Spin: S3 city and region · society and livelihoods · heat pumps · low-income renters · a heat wave. Write a question card.</p>
 <!-- r10-exemplars:start (written from the data file by LX.Exemplars' staticHTML, and the example cards from the data file, in the test's --write mode; do not edit) -->
 <div class="lx-ex-cols">
-<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p>Question: How will heat pumps help [1] low-income renters in heat waves?
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Question: How will heat pumps help [1] low-income renters in heat waves?
 Type: predictive
 Audience: low-income renters [2]
 Metric: comfort [3]
 Compared with: (blank) [4]
 I would be wrong if: (left blank) [5]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> Help with what? The word hides the metric.</li><li value="2"><b>Falls short:</b> The people affected, not the ones who decide: landlords and the city act on the answer.</li><li value="3"><b>Falls short:</b> No units: hours above a safe indoor temperature could be counted.</li><li value="4"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: help compared with what?</li><li value="5"><b>Falls short:</b> No falsification statement, so no result could count against it.</li></ol></div>
-<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p>Question: During a week-long heat wave, how many hours above the city's indoor-heat safety threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines">Question: During a week-long heat wave, how many hours above the city's indoor-heat safety threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?
 Type: predictive
 Audience: the city's housing office, which sets rental standards [1]
 Metric: hours above the indoor-heat threshold, per household per heat wave [2]
@@ -206,7 +203,7 @@ Main uncertainty: whether renters can afford to run the cooling during the heat 
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From a card to a study</summary>
 <div class="lx-deeper-body">
-<p>The research capstone (CR, upcoming) starts from a card made here. R2 (upcoming) maps the literature around it, <a href="r03-system-and-method.html">R3</a> chooses the system, boundary and method, and the later studios cover data, verification, uncertainty, accounting, communication and integrity.</p>
+<p>The research capstone (CR, upcoming) starts from a card made here. <a href="r02-literature.html">R2</a> maps the literature around it, <a href="r03-system-and-method.html">R3</a> chooses the system, boundary and method, and the later studios cover data, verification, uncertainty, accounting, communication and integrity.</p>
 </div>
 </details>
 <details class="lx-deeper">

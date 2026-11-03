@@ -9,7 +9,8 @@
    (LX.Flowchart, e-flowchart). Self-check: the reader's question card (LX.QuestionCard, filled from a rewrite), the Framing
    competence of the course rubric (LX.Rubric) and a reusable checklist (LX.Checklist, e-checklist); the myth-or-fact cards
    (e-myth) are page markup.
-   Node: module.exports = the pure model below (checks, grading, the no-JS version of the task, lesson links); the test is
+   Lesson links follow data/path.json through LX.lessonRef (core.js).
+   Node: module.exports = the pure model below (checks, grading, the no-JS version of the task); the test is
    _tests/learn/test_r01-framing.js (it also writes the page's no-JS blocks with --write). */
 (function () {
   "use strict";
@@ -86,18 +87,8 @@
         + D.checklist.map(function (c) { return "<li><b>" + rich(c.label) + ":</b> " + rich(c.text) + "</li>"; }).join("") + "</ul>"
     };
   }
-  // a lesson by starter number or code, from path.json: {href, ready, label}
-  function ref(P, code) {
-    var all = [].concat((P && P.starter) || [], (P && P.more) || [], (P && P.toolbox) || []), num = typeof code === "number";
-    var hit = all.filter(function (l) { return num ? l.starter === code : l.code === code; })[0];
-    return hit ? { href: hit.href, ready: !!hit.ready, label: num ? "lesson " + code : code } : { href: null, ready: false, label: num ? "lesson " + code : String(code) };
-  }
-  function refHTML(P, code) {
-    var r = ref(P, code);
-    return r.ready ? '<a href="' + esc(r.href) + '">' + esc(r.label) + "</a>" : esc(r.label) + " (upcoming)";
-  }
   var model = { BIN_IDS: BIN_IDS, TYPE_IDS: TYPE_IDS, RW_FIELDS: RW_FIELDS, cards: cards, grade: grade, fillRest: fillRest, filled: filled,
-                check: check, staticTask: staticTask, staticBlocks: staticBlocks, rich: rich, ref: ref, refHTML: refHTML, words: words };
+                check: check, staticTask: staticTask, staticBlocks: staticBlocks, rich: rich, words: words };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -120,7 +111,6 @@
       ".r1-model{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 12px;margin:0;padding:10px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:14.5px}",
       ".r1-model dt{font-family:var(--lx-f-display);font-weight:500;color:var(--lx-ink-3)}.r1-model dd{margin:0;color:var(--lx-ink)}",
       ".r1-load{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
-      "#r01-exemplars .lx-ex-text{white-space:pre-line}",
       "@media (max-width:560px){.r1-form{grid-template-columns:minmax(0,1fr)}.r1-model{grid-template-columns:minmax(0,1fr)}.r1-model dd{margin-bottom:4px}}"
     ].join("\n") }, document.head);
   }
@@ -230,7 +220,7 @@
     var hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "Your question card" }, hd);
     H("p", { class: "lx-lede", text: "Start from one of your three rewrites, then add the type, scale, boundary, a falsification statement and the main uncertainty." }, c1);
     var load = H("div", { class: "r1-load", role: "group", "aria-label": "Start from a rewrite" }, c1), msg = H("span", { class: "lx-hint", "aria-live": "polite" }, null);
-    var fix = {}, r3 = ref(P, "R3"), r6 = ref(P, "R6");
+    var fix = {}, r3 = LX.lessonRef(P, "R3"), r6 = LX.lessonRef(P, "R6"), r2 = LX.lessonRef(P, "R2");
     if (r3.ready) fix.scale = { href: r3.href, label: "R3" };
     if (r6.ready) fix.uncertainty = { href: r6.href, label: "R6" };
     var qcHost = H("div", null, c1);
@@ -250,7 +240,7 @@
     LX.Rubric(H("div", { class: "lx-xcard" }, host), D.rubric);
     LX.Checklist(H("div", { class: "lx-xcard" }, host), { id: "r1-checklist", title: "Is it worth researching? A checklist to reuse",
       lede: "Run it on the next question you meet in a course, a seminar or the news.", columns: 2,
-      doneText: "Now ask what is already known (" + refHTML(P, "R2").replace(/<[^>]+>/g, "") + ").", items: D.checklist });
+      doneText: "Now ask what is already known (" + r2.label + (r2.ready ? "" : ", upcoming") + ").", items: D.checklist });
     return qc;
   }
 

@@ -74,9 +74,11 @@ The older forms keep their sections: `cards` (`#steps`, `#explain`, `#check`, `#
 **Research studio.**
 
 - **Order.** The task comes first: what to produce, from what, and when it is done. Then the exemplars: a good and a weak answer to the same task, side by side, with tap-to-reveal notes (`LX.Exemplars`). Then a self-check against the course rubric (`LX.Rubric`). R1 and R10 also give the reader a question card (`LX.QuestionCard`).
+- **The task card.** Put the task (Produce, From, Done when, and the time) in `div.lx-card.lx-studio-brief` above the interactive, outside its `.lx-fallback`: the fallback is hidden once the interactive mounts, so a task inside it never reaches readers with JavaScript. The fallback keeps the static version of the steps.
+- **Links to other lessons.** Load `data/path.json` with the page's `data-src` and name lessons with `LX.lessonRef` or `LX.lessonRefHTML`: a lesson is linked once it is live and named "upcoming" until then, with no edit. In static text, link only live lessons and name the rest "(upcoming)".
 - **Time.** Give `minutes` (the guided part) and `practice_minutes` (the independent work) in `path.yml`; the header then shows both. Be honest: R2's literature matrix is 240 minutes.
 - **Method-neutral.** Per §11.2, optimization is one method family among several. The rubric's words are the course's own (§3.4): pick the competences a studio builds and add a "look for" line, never reword the levels.
-- **Fallbacks.** The exemplars and rubric fallbacks are written from the data by the components' `staticHTML` (see the components below), between `<!-- <slug>-exemplars:start -->` and `:end` markers, by the test's `--write` mode. The test then checks that they are still the same.
+- **Fallbacks.** The exemplars and rubric fallbacks are written from the data by the components' `staticHTML` (see the components below), between `<!-- <slug>-exemplars:start -->` and `:end` markers, by the test's `--write` mode. The test then checks that they are still the same. Answers written as a card, one field per line, take `lines: true`.
 
 **Case file** (about 10 minutes; §13).
 
@@ -126,6 +128,7 @@ The header comment of each file in `components/` gives the full options.
 - `LX.fmt.money`, `.tonnes`, `.mw`, `.mwh`, `.hh`.
 - `LX.progress.done(id)`, `.guess`, `.answer`, and `LX.store.get/set`: this browser only.
 - `LX.mount(slug, init)`, `LX.json(url)`, `LX.onTheme(fn)`, `LX.reduced()`.
+- `LX.lessonRef(P, code)` → `{ href, ready, label }` and `LX.lessonRefHTML(P, code)`: a lesson by starter number (`3`, "lesson 3") or code (`"R2"`), from `data/path.json` (`P`, loaded with the page's `data-src`). The HTML is a link when the lesson is live and "R2 (upcoming)" otherwise, so links appear by themselves when a lesson goes live. Node: `require("components/core.js")` gives both (pure).
 - `LX.demo(root, fn, cards)`: the lesson's demo states, for screenshots and curious readers. `fn(state)` puts the page into a
   state and returns `{view}` when it handled it, or `null`. Every lesson accepts `"mid"` (one interaction done) and
   `"step-N"` (step card N open, its action done where the lesson knows how; with `cards`, an unhandled `step-N` simply
@@ -680,12 +683,13 @@ Each component's pure part has a `staticHTML` that writes the no-JS fallback fro
 LX.Exemplars(H("div", { class: "lx-xcard" }, x), { title: "Two answers to the same brief", task: "The task, in one line.",
   answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: ["Is ", { text: "community solar", note: "No type and no metric." }, " good?"] },
             { key: "good", label: "Strong answer", level: "Proficient", parts: ["Did ", { text: "renters' energy burden", note: "A metric with units." }, " fall ...?"] }],
-  diff: [{ label: "Type", weak: "None", good: "Evaluative" }], id: "r1-ex", note: "Both answers are illustrative." });   // -> { el, open(key, n), openAll(), opened() }
+  diff: [{ label: "Type", weak: "None", good: "Evaluative" }], id: "r1-ex", lines: true, note: "Both answers are illustrative." });   // -> { el, open(key, n), openAll(), opened() }
 ```
 
 - Each marked phrase is a button (`role="button"`, Tab, Enter, Space) with a number badge. It opens or shuts its note under the answer (`aria-expanded`, `aria-controls`), and the note is read out.
 - "Show all notes" opens every note. Notes start with "Falls short:" (weak) or "Works:" (good); `lead` changes the word.
 - With `id`, the open notes are remembered in this browser.
+- `lines: true` keeps an answer's line breaks (an answer written as a card, one field per line: R1, R10), in the view and in `staticHTML`'s `<p class="lx-ex-lines">`. No page style is needed.
 - Two columns from 700 px. The "What made the difference" table becomes labelled lines on phones.
 - Pure (Node: `require("components/exemplars.js")`): `marks`, `plain` (text with `[n]`), `validate` (the view throws on a malformed pair), `staticHTML`.
 
@@ -716,6 +720,7 @@ var qc = LX.QuestionCard(H("div", { class: "lx-xcard" }, live), { id: "r10-card"
 - **Checks.** Eight: the question is written, then the seven rigour checks of §11.3. Each passes or is marked to do, in words and with an icon, with an optional fix link. They never block a question, and they never judge originality, importance or novelty (R10 rule, §11.3).
 - **Pickers.** R10's pickers fill the card with `set()`.
 - **Saving and sharing.** With `id`, the draft stays in this browser. `share: true` adds "Share this card": the card travels in a `#q-...` hash (base64url JSON, through `LX.Share`), and opening such a link loads that card. Link text only ever goes into form fields.
+- **A link is applied once.** The first card built takes the link's card as its stored draft and drops the hash from the address (`history.replaceState`). A card built again later (R10's step 3 after Back and Next) shows the reader's edits, and a hash the page wrote itself ("Share this card") is never applied over them. Pages need no workaround.
 - **Pure.** `TYPES`, `SCALES`, `FIELDS`, `CHECKS`, `check`, `text`, `encode`, `decode`, `clean`.
 
 **Timeline** (`timeline.js`, e-timeline): dated events, each with its source, for case files (and A1, X3).
@@ -733,6 +738,21 @@ LX.Timeline(H("div", { class: "lx-card" }, live), { title: "The study in time",
 - **Layout.** An ordered list, so it is its own text version. The date column sits on the left from 760 px.
 - **Pure.** `parse`, `fmt`, `sortEvents`, `gap`, `validate`, `staticHTML` (the page's `<ol class="lx-tl-static">`).
 
+**Scale strip** (`scalestrip.js`, e-scale-strip): the five scales of §5.3 side by side, S0 device and plant to S4 nation, one card each (F1's explain layer, R3's self-check; lesson 1's `t1-strip` is a later user).
+
+```js
+var ss = LX.ScaleStrip(H("div", { class: "lx-xcard" }, x), { title: "Five scales at a glance", lede: "One sentence.", scales: D.scales,
+  power: true, flow: true, ticks: { S0: { who: true, what: false, physics: null } },        // F1: power range, what passes down and up, the reader's sorts
+  lessons: { S2: [{ code: 8 }, { code: "M2", note: "unit commitment" }] }, path: data.path });   // lessons per scale, linked when live
+var r3 = LX.ScaleStrip(card, { title: "...", scales: D.scales, decides: true, steps: true, color: "var(--lx-tier-4)",   // R3: who decides what, step and horizon
+  mark: "S1", markText: "Your brief sits here." });   // -> { el, update({ mark, markText, ticks, ... }) }
+```
+
+- **Scales.** `{ id: "S0", name, power, who, decides, step, horizon }`, in order. Each card's top edge takes its scale's colour, `--lx-scale-0` ... `--lx-scale-4` (day and night, defined in `scalestrip.css`: use these tokens wherever a page colours a scale), or one `color` for all.
+- **Parts on request.** `power` (top right), `decides` ("Decides …; who."), `steps` (time step and horizon), `flow` (chips for what passes down and up; `{ down, up }` changes the words), `ticks` (the reader's sorts, right, elsewhere or not sorted, in words and icons, summed up in one sentence for screen readers; `tickKeys` names them), `lessons` with `path` ("Go further:", through `LX.lessonRef`; an `{ href, label }` item is always linked), `mark` and `markText` (one scale outlined, with a line of text).
+- **Layout.** Five columns from 861 px, one card per row below. The list is its own text version. `update(patch)` redraws the cards (R3 moves the mark when the reader picks a brief).
+- **Pure.** `scaleIndex`, `colorOf`, `lessonParts`, `tickSummary`, `TICKS` (Node: `require("components/scalestrip.js")`; also on `LX.ScaleStrip`).
+
 **Planning engine** (`planengine.js`, `planengine.css`; a one-region capacity-expansion LP): `LX.townPlan`, Prairie Town's capacity plan as a linear program, promoted unchanged from lesson 13. Lessons 12 and 13 use this shared copy; lesson 12 no longer loads `13-capstone.js`.
 
 ```js
@@ -748,7 +768,7 @@ TP.fullYearModel(C, Y, { plan: plan });   // the same LP on all 8,760 hours (a p
 - **Tests.** `node _tests/learn/test_13-capstone.js [--full]` and `test_12-trade-offs.js` load the component. Their output was identical before and after the move. `_tests/learn/solver_models.js` (the solver benchmark) loads it too.
 - **Building on it (M3, A22).** Use `LX.townPlan` for the model and `LX.Frontier` for the frontier chart. Keep MILP duals out (§9.2): this LP's cap dual is a marginal value under its stated assumptions. A different planning model belongs in its own component, not in a fork of this one.
 
-**Form pieces** (`forms.css`, CSS only): `.lx-studio-task` (the studio's task list), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try`, and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`.
+**Form pieces** (`forms.css`, CSS only): `.lx-studio-brief` (the studio's task card, a `div.lx-card` above the interactive and outside its fallback; no page style needed) and `.lx-studio-task` (its task list; the myth cards under a studio's self-check are spaced too), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try`, and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`.
 
 **Scope and QA** (ResearchPortfolio folder).
 

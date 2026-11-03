@@ -8,7 +8,10 @@
      title: "Your question card", lede: "One sentence.",
      values: { type: "evaluative", question: "Did ...?", audience: "...", metric: "...", units: "...", counterfactual:
                "...", scale: "S1", boundary: "...", wrong: "...", uncertainty: "..." },   a starting card (an example); a
-                                 stored draft or a #q-... link wins over it
+                                 stored draft or a #q-... link wins over it. A link is applied once: its card becomes the
+                                 stored draft and the hash leaves the address (history.replaceState), so a card built
+                                 again later (a step card after Back and Next) shows the reader's edits, not the link's
+                                 card; a hash this page wrote itself ("Share this card") is not applied again
      fix: { metric: { href: "a01-....html", label: "A1" } },   per check, the lesson that helps (a link in the warning)
      share: true,                a "Share this card" button: the card travels in the link's #q-... hash (LX.Share)
      onChange: function (values, checks) {} });
@@ -161,8 +164,22 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H;
+  var own = {};   // link hashes this page has applied or written itself: never applied (again) over the reader's edits
+  function hashNow() { return typeof location !== "undefined" ? String(location.hash || "").replace(/^#/, "") : ""; }
+  // apply a shared #q- link once: keep its card as the draft and take the hash out of the address
+  function takeLink(id) {
+    var h = hashNow(), card = own[h] ? null : decode(h);
+    if (!card) return null;
+    own[h] = true;
+    if (id) LX.store.set(id, card);
+    try {
+      var hist = window.history;
+      if (hist && hist.replaceState) hist.replaceState(hist.state, "", String(location.href).split("#")[0]);
+    } catch (e) { /* the address keeps the hash; the stored draft still wins next time, as own[] remembers the link */ }
+    return card;
+  }
   LX.QuestionCard = function (host, o) {
-    var fromLink = typeof location !== "undefined" ? decode(location.hash) : null;
+    var fromLink = takeLink(o.id);
     var stored = o.id ? LX.store.get(o.id) : null;
     var v = clean(fromLink || stored || o.values || {});
     var box = H("div", { class: "lx-qc" }, host), ctl = {};
@@ -215,7 +232,7 @@
     var bar = H("div", { class: "lx-qc-foot" }, box);
     var copyBtn = H("button", { class: "lx-btn ghost small", type: "button", text: "Copy as text" }, bar);
     var sh = null;
-    if (o.share && LX.Share) sh = LX.Share(box, { button: bar, buttonText: "Share this card", hash: function () { return encode(v); },
+    if (o.share && LX.Share) sh = LX.Share(box, { button: bar, buttonText: "Share this card", hash: function () { var h = encode(v); own[h] = true; return h; },
       note: "Anyone who opens this link sees this card. Nothing is stored on a server." });
     var copyBox = H("div", { class: "lx-qc-copy", hidden: true }, box);
     var area = H("textarea", { readonly: true, rows: "10", "aria-label": "Your question card as text" }, copyBox);

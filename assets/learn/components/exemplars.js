@@ -14,6 +14,8 @@
                      (default "Falls short" for weak, "Works" for good)
      diff: [{ label: "Framing", weak: "No audience", good: "A co-op board" }],   optional table "What made the difference"
      diffTitle: "What made the difference",
+     lines: true,                keep the answers' line breaks (an answer written as a card, one field per line); the
+                                 no-JS version from staticHTML keeps them too
      id: "r1-ex",                which notes the reader opened, kept in this browser (optional)
      onOpen: function (key, n) {},   a note opened by the reader
      note: "Both answers are illustrative." });   a hint under the card
@@ -24,7 +26,8 @@
    place, so no separate text version.
    Node: module.exports = { marks, plain, validate, staticHTML } (pure): marks(answer) the numbered marks [{n, text, note}];
    plain(answer) the text with [n] after each marked phrase; validate(o) a list of problems (empty when fine);
-   staticHTML(o) the no-JS version for the page's fallback (each answer, its level, its text with [n], its notes). */
+   staticHTML(o) the no-JS version for the page's fallback (each answer, its level, its text with [n], its notes; with
+   o.lines the text's <p> has class lx-ex-lines, which keeps line breaks). */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
@@ -75,7 +78,7 @@
     var h = ['<div class="lx-ex-cols">'];
     o.answers.forEach(function (a) {
       h.push('<div class="lx-ex-ans ' + esc(a.key || "") + '"><p class="lx-eyebrow">' + esc(a.label) + (a.level ? " · " + esc(a.level) : "") + "</p>"
-        + "<p>" + esc(plain(a)) + "</p>"
+        + (o.lines ? '<p class="lx-ex-lines">' : "<p>") + esc(plain(a)) + "</p>"
         + '<ol class="lx-ex-static">' + marks(a).map(function (x) {
           return '<li value="' + x.n + '">' + (lead(a) ? "<b>" + esc(lead(a)) + ":</b> " : "") + rich(x.note) + "</li>";
         }).join("") + "</ol></div>");
@@ -110,7 +113,7 @@
       var head = H("div", { class: "lx-ex-head" }, col);
       H("h4", { text: a.label }, head);
       if (a.level) H("span", { class: "lx-ex-level", text: a.level }, head);
-      var text = H("p", { class: "lx-ex-text" }, col), list = H("ol", { class: "lx-ex-notes" }, col), k = 0;
+      var text = H("p", { class: "lx-ex-text" + (o.lines ? " lx-ex-lines" : "") }, col), list = H("ol", { class: "lx-ex-notes" }, col), k = 0;
       (a.parts || []).forEach(function (p) {
         if (!p || typeof p !== "object") { text.appendChild(document.createTextNode(words(p == null ? "" : p))); return; }
         k = p.n != null ? p.n : k + 1;

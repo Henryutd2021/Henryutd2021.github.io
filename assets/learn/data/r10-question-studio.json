@@ -225,6 +225,7 @@
   },
   "exemplars": {
     "id": "r10-ex",
+    "lines": true,
     "title": "Two cards from the same spin",
     "task": "Spin: S3 city and region · society and livelihoods · heat pumps · low-income renters · a heat wave. Write a question card.",
     "answers": [

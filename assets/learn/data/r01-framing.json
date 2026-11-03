@@ -122,6 +122,7 @@
   },
   "exemplars": {
     "id": "r1-ex",
+    "lines": true,
     "title": "Two cards for the same vague question",
     "task": "Turn “Is community solar good for low-income families?” into a question card.",
     "answers": [

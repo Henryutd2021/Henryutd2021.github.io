@@ -3,6 +3,7 @@
   "title": "F1 numbers and cards: the five scales of an energy system",
   "lesson": "learn/f01-five-scales.qmd (model and view: assets/learn/f01-five-scales.js; tests: _tests/learn/test_f01-five-scales.js)",
   "built": "2026-11-03",
+  "lessons": "Per scale, the lessons that go further, by starter number or code: LX.ScaleStrip links a lesson when data/path.json marks it live, and names it as upcoming (with its note) otherwise.",
   "note": "The scale definitions follow curriculum v2 §5.3 (decisions, authority, physics, inputs, outputs). Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland are fictional; their sizes are illustrative. The real anchors (a U.S. home's average draw, the Southwest Power Pool's 2025 peak, the Lower 48 record hour) are read from 01-power-energy.json and town_days.json, where each carries its source and date."
  },
  "scales": [
@@ -148,10 +149,10 @@
   }
  },
  "lessons": {
-  "S0": {"live": [["01-power-energy.html", "lesson 1"], ["05-capacity-factor.html", "lesson 5"], ["09-storage.html", "lesson 9"]], "upcoming": "F3 (energy services), C0 (behind one meter)"},
-  "S1": {"live": [], "upcoming": "F7 (microgrids), M5 (size and run a microgrid), C1 (keep the campus running)"},
-  "S2": {"live": [["00-grid-operator.html", "lesson 0"], ["03-balancing.html", "lesson 3"], ["08-merit-order.html", "lesson 8"], ["m01-dispatch-to-lmp.html", "M1"]], "upcoming": "M2 (unit commitment), C2 (the Plains Grid in a hard year)"},
-  "S3": {"live": [], "upcoming": "F9 (a city's energy), A18 (a city plan), M12 (a city model), C3"},
-  "S4": {"live": [], "upcoming": "F10 (why nations differ), M13 (a national pathway), C4"}
+  "S0": [{"code": 1}, {"code": 5}, {"code": 9}, {"code": "F3", "note": "energy services"}, {"code": "C0", "note": "behind one meter"}],
+  "S1": [{"code": "F7", "note": "microgrids"}, {"code": "M5", "note": "size and run a microgrid"}, {"code": "C1", "note": "keep the campus running"}],
+  "S2": [{"code": 0}, {"code": 3}, {"code": 8}, {"code": "M1"}, {"code": "M2", "note": "unit commitment"}, {"code": "C2", "note": "the Plains Grid in a hard year"}],
+  "S3": [{"code": "F9", "note": "a city's energy"}, {"code": "A18", "note": "a city plan"}, {"code": "M12", "note": "a city model"}, {"code": "C3"}],
+  "S4": [{"code": "F10", "note": "why nations differ"}, {"code": "M13", "note": "a national pathway"}, {"code": "C4"}]
  }
 }

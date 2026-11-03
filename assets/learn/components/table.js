@@ -6,7 +6,9 @@
      rows: [{key: "nuclear", color: "var(--lx-nuc)", name: "Nuclear plant", note: "Runs flat", size: "100 MW",
              cost: {text: "$10", unit: "/MWh", value: 10}}],
      sorts: [{label: "As built", order: ["nuclear", ...], note: "One sentence."},
-             {label: "By running cost", order: [...], ranked: true, note: "<b>This order is the merit order.</b> ..."}] });
+             {label: "By running cost", order: [...], ranked: true, note: "<b>This order is the merit order.</b> ..."}],
+     caption: "One sentence." });   the line under the title when no sort is given (rows in the given order), or when the
+                                    shown sort has no note
    On phones the rows become small cards. The table is a real <table>, so it reads well without the diagram.
    text: true   for rows of words rather than numbers: on phones each row becomes a card of left-aligned lines, each with
                 its column label on the left, and no rank column (long text in the number layout would overlap);
@@ -41,10 +43,11 @@
         } else cell.innerHTML = LX.rich(v == null ? "" : String(v));
       });
     });
+    function capHTML(t) { return LX.rich(t).replace(/&lt;b&gt;(.+?)&lt;\/b&gt;/g, "<b>$1</b>"); }
     function order(s, i) {
       var first = {}; Object.keys(rows).forEach(function (k) { first[k] = rows[k].tr.getBoundingClientRect().top; });
       s.order.forEach(function (k, j) { body.appendChild(rows[k].tr); rows[k].rank.textContent = s.ranked ? j + 1 : ""; });
-      cap.innerHTML = s.note ? LX.rich(s.note).replace(/&lt;b&gt;(.+?)&lt;\/b&gt;/g, "<b>$1</b>") : "";
+      cap.innerHTML = s.note ? capHTML(s.note) : o.caption ? capHTML(o.caption) : "";
       if (seg) [].forEach.call(seg.children, function (b, j) { b.setAttribute("aria-pressed", j === i ? "true" : "false"); });
       if (!LX.reduced()) s.order.forEach(function (k) {
         var tr = rows[k].tr, d = first[k] - tr.getBoundingClientRect().top; if (!d) return;
@@ -56,6 +59,7 @@
       if (seg) H("button", { type: "button", "aria-pressed": i === 0 ? "true" : "false", text: s.label, onclick: function () { order(s, i); } }, seg);
     });
     if (o.sorts && o.sorts.length) order(o.sorts[0], 0);
+    else if (o.caption) cap.innerHTML = capHTML(o.caption);
     return { el: tb, order: function (i) { order(o.sorts[i], i); } };
   };
 })();

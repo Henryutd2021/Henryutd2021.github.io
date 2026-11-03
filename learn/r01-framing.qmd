@@ -37,9 +37,6 @@ body-classes: "page-learn page-lesson lx-form-studio"
 
 ::: {#task .lx-sec}
 ```{=html}
-<style>#r01-exemplars .lx-ex-ans > p:not(.lx-eyebrow), #r01-exemplars .lx-ex-text { white-space: pre-line; }
-.lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
-#selfcheck .lx-myths { margin-top: 18px; }</style>
 <div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
@@ -107,14 +104,14 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <p>Turn “Is community solar good for low-income families?” into a question card.</p>
 <!-- r01-exemplars:start (written from the data file by LX.Exemplars' staticHTML in the test's --write mode; do not edit) -->
 <div class="lx-ex-cols">
-<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p>Question: Is community solar good for low-income families [1]?
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Question: Is community solar good for low-income families [1]?
 Type: not named [2]
 Audience: low-income families
 Metric: savings [3]
 Compared with: (blank) [4]
 Scale and boundary: rural areas [5]
 I would be wrong if: (left blank) [6]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> “Good” is not a metric: any result could be read as success.</li><li value="2"><b>Falls short:</b> Without a type, a survey, a model and a regression could all claim to answer it.</li><li value="3"><b>Falls short:</b> No units and no period: dollars a month, or a share of income, over which years?</li><li value="4"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: savings compared with what?</li><li value="5"><b>Falls short:</b> A place, not a <span class="lx-term" data-term="system-boundary">boundary</span>: which programme, which members, which years, and what is left out?</li><li value="6"><b>Falls short:</b> No falsification statement: no result could show the expectation wrong.</li></ol></div>
-<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p>Question: Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines">Question: Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?
 Type: evaluative [1]
 Audience: the co-op's board [2]
 Metric: energy burden, yearly energy bills as % of household income [3]
@@ -159,7 +156,7 @@ Main uncertainty: renters who moved away during the four years</p><ol class="lx-
 <div class="lx-qq" data-id="novel" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A question is worth researching only if nobody has written about it.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Novelty can be a new question, new evidence, a new place or a new mix of methods, and it has to survive a literature search (R2, upcoming).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Novelty can be a new question, new evidence, a new place or a new mix of methods, and it has to survive a literature search (<a href="r02-literature.html">R2</a>).</p></details>
 </div>
 <div class="lx-qq" data-id="optim" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A ‘what should … do?’ question needs an <span class="lx-term" data-term="optimization">optimization</span> model.”</p>
@@ -182,7 +179,7 @@ Main uncertainty: renters who moved away during the four years</p><ol class="lx-
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From a card to a proposal</summary>
 <div class="lx-deeper-body">
-<p>In the research capstone (CR, upcoming), your proposal opens with this card. <a href="r10-question-studio.html">R10</a>, the question studio, helps you generate candidate questions; R2 (upcoming) tests what is already known; <a href="r03-system-and-method.html">R3</a> picks the system, the boundary and the method.</p>
+<p>In the research capstone (CR, upcoming), your proposal opens with this card. <a href="r10-question-studio.html">R10</a>, the question studio, helps you generate candidate questions; <a href="r02-literature.html">R2</a> tests what is already known; <a href="r03-system-and-method.html">R3</a> picks the system, the boundary and the method.</p>
 </div>
 </details>
 <details class="lx-deeper">

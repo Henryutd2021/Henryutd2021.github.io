@@ -77,6 +77,9 @@ const good = EX.plain(spec.answers[1]);
 ok(D.statement.every(f => ({ funding: /Funding:/, credit: /Contributions:/, data: /Data:/, ethics: /Ethics:/, people: /Stakeholders:/, corrections: /Corrections:/ })[f.id].test(good)), "the strong statement covers the statement's parts");
 ok(/conceptualization, formal analysis, writing \(original draft\)/.test(good) && /data curation, writing \(review and editing\)/.test(good), "contributor roles named as CRediT lists them");
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(r && PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + ": the page's no-JS block equals the model's (run with --write after a data edit)"); });
+{ const brief = PAGE.indexOf('<div class="lx-card lx-studio-brief">'), inter = PAGE.indexOf('<div class="lx-interactive');
+  ok(brief >= 0 && brief < inter && /<b>Produce:<\/b>[\s\S]*<b>From:<\/b>[\s\S]*<b>Done when:<\/b>[\s\S]*About 30 minutes guided here, then about 30 minutes on your own/.test(PAGE.slice(brief, inter)),
+    "the task card (produce, from, done when, time) sits above the interactive, outside its fallback, so readers with JavaScript see it"); }
 const task = M.staticTask(D);
 ok(D.dilemmas.every(d => task.indexOf(d.title) >= 0) && D.dilemmas.every(d => d.options.every(o => task.indexOf(o.text.replace(/&/g, "&amp;")) >= 0)), "no-JS task: every dilemma and option");
 ok(/approved 5 August 2026/.test(PAGE) && /CC BY 4\.0/.test(PAGE) && /174–182/.test(PAGE) && /151–155/.test(PAGE), "sources: dates and pages as checked");

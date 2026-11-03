@@ -251,7 +251,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 
 - **Simulation** steps such equations forward from given decisions: system dynamics.
 - **Optimization** chooses the decisions ([lessons 10 to 13](10-write-it-down.html)).
-- Which one a study needs is Researcher lesson R3 (upcoming).
+- Which one a study needs is Researcher lesson [R3](r03-system-and-method.html).
 
 ```{=html}
 </div>
@@ -263,7 +263,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <li>Sizes: the map shows directions, not how much. Sizes need a model with data, prices and rules (Analyst and Modeler tiers).</li>
 <li>Place and time: the same lever plays out differently in another region, market or year.</li>
 <li>Many more links: a real system has far more parts and loops than fourteen cards and two diagrams.</li>
-<li>Who decides: each ripple crosses the scales of <a href="f01-five-scales.html">F1</a>, and trade-offs between goals are Analyst lesson A22 (upcoming).</li>
+<li>Who decides: each ripple crosses the scales of <a href="f01-five-scales.html">F1</a>, and trade-offs between goals are Analyst lesson <a href="a22-tradeoff-explorer.html">A22</a>.</li>
 </ul>
 </div>
 </details>

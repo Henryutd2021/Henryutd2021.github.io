@@ -11,6 +11,7 @@
    Rules (§11.3, §20): the studio makes no originality judgement (no combination is called new, hot or a gap; counts are
    context only); the pickers' lists contain no excluded topic, so no spin or draft can produce one, and data centers
    appear only as a load ("data-center loads" in every draft); a learner may still type any question.
+   Lesson links follow data/path.json through LX.lessonRef and LX.lessonRefHTML (core.js).
    Node: module.exports = the pure model (drafts, search strings, crowding, spin weights, realism states, the card's
    automatic fields, the no-JS blocks); the test is _tests/learn/test_r10-question-studio.js. */
 (function () {
@@ -108,12 +109,6 @@
     list.forEach(function (x) { if (x.state) n[x.state]++; else n.open++; });
     return n;
   }
-  function ref(P, code) {
-    var all = [].concat((P && P.starter) || [], (P && P.more) || [], (P && P.toolbox) || []), num = typeof code === "number";
-    var hit = all.filter(function (l) { return num ? l.starter === code : l.code === code; })[0];
-    return hit ? { href: hit.href, ready: !!hit.ready, label: num ? "lesson " + code : code } : { href: null, ready: false, label: num ? "lesson " + code : String(code) };
-  }
-  function refHTML(P, code) { var r = ref(P, code); return r.ready ? '<a href="' + esc(r.href) + '">' + esc(r.label) + "</a>" : esc(r.label) + " (upcoming)"; }
   // the whole studio result as text: the card (LX.QuestionCard's text), realism, search strings and the three papers
   function summary(D, st, cardText) {
     var lines = [cardText || "", "Combination: " + (combo(D, st.picks) || "(not yet)")];
@@ -176,7 +171,7 @@
   }
   var model = { KEYS: KEYS, REQUIRED: REQUIRED, item: item, clean: clean, complete: complete, combo: combo, draft: draft, autoCard: autoCard, merge: merge,
                 searchStrings: searchStrings, searchURL: searchURL, operators: operators, crowd: crowd, crowdText: crowdText, cluster: cluster,
-                weights: weights, spin: spin, realism: realism, realismCount: realismCount, ref: ref, refHTML: refHTML, summary: summary,
+                weights: weights, spin: spin, realism: realism, realismCount: realismCount, summary: summary,
                 check: check, staticTask: staticTask, staticExamples: staticExamples, staticCrowding: staticCrowding, staticBlocks: staticBlocks, rich: rich, fmtInt: fmtInt };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -214,7 +209,6 @@
       ".r10-out{width:100%;box-sizing:border-box;font-family:var(--lx-f-mono);font-size:13px;padding:8px 10px;border-radius:10px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink)}",
       ".r10-load{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-width:0}",
       ".r10-load select{font:inherit;font-size:14.5px;padding:6px 8px;border-radius:10px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);max-width:100%}",
-      "#r10-exemplars .lx-ex-text{white-space:pre-line}",
       "@media (max-width:640px){.r10-picks,.r10-paper{grid-template-columns:minmax(0,1fr)}}"
     ].join("\n") }, document.head);
   }
@@ -228,7 +222,7 @@
     // a card already written (or opened from a shared link) lets the reader go straight on to it
     function hasCard() { var c = LX.store.get("r10-card", null); return !!(c && String(c.question || "").trim()); }
     function iconLine(cls, word, html) { return '<p class="r10-res ' + cls + '">' + LX.icon(cls === "pass" ? "check" : cls === "warn" ? "question" : "cross") + "<span><b>" + word + "</b> " + html + "</span></p>"; }
-    function fixLinks(list) { return list && list.length ? " See " + list.map(function (c) { return refHTML(P, c); }).join(" and ") + "." : ""; }
+    function fixLinks(list) { return list && list.length ? " See " + list.map(function (c) { return LX.lessonRefHTML(P, c); }).join(" and ") + "." : ""; }
     // the card's automatic fields follow the picks; the learner's own edits are kept
     function syncCard() {
       var auto = autoCard(D, st.picks, st.type), cur = LX.store.get("r10-card", null) || {};
@@ -316,14 +310,10 @@
         build: function (act, api) {
           if (st.type) syncCard();
           var fix = {}, map = { type: "R1", audience: "R1", metric: "R1", counterfactual: "R1", wrong: "R1", scale: "R3", uncertainty: "R6" };
-          Object.keys(map).forEach(function (k) { var r = ref(P, map[k]); if (r.ready) fix[k] = { href: r.href, label: r.label }; });
+          Object.keys(map).forEach(function (k) { var r = LX.lessonRef(P, map[k]); if (r.ready) fix[k] = { href: r.href, label: r.label }; });
+          // a #q- link is applied once by the card itself (kept as the draft, the hash dropped), so coming back to this
+          // step shows the reader's edits rather than the link's card again
           var qc = LX.QuestionCard(act, { id: "r10-card", code: "R10", share: true, fix: fix, onChange: status });
-          // a card that came with a #q- link is kept in this browser once, and the link's hash is dropped, so that coming
-          // back to this step shows the reader's edits rather than the link's card again
-          if (QC.decode(location.hash)) {
-            LX.store.set("r10-card", qc.get());
-            if (window.history && history.replaceState) history.replaceState(null, "", location.pathname + location.search);
-          }
           function status(v, c) {
             var q = (v || qc.get()).question, written = /\?\s*$/.test(q) && q.indexOf("[") < 0;
             if (written) { api.done(); api.saw((c || qc.checks()).pass + " of 8 checks pass. Next, ask whether the study could really be done."); }
@@ -389,7 +379,7 @@
           var ctx = H("div", { class: "r10-ctx" }, lit);
           crowd(D, st.picks).forEach(function (x) { H("span", { html: LX.rich(crowdText(x).replace("RGI", "[[relative-growth-index|RGI]]")) }, ctx); });
           H("span", { text: D.crowding.caveat }, ctx);
-          var r2 = ref(P, "R2");
+          var r2 = LX.lessonRef(P, "R2");
           api.saw("The studio makes no originality judgement. Read the closest papers yourself; " + (r2.ready ? "R2" : "R2, upcoming,") + " shows how to map them.");
         } },
       { text: "Save your work. Copy the card, the checks, the search strings and your three papers into your notes, or share the card as a link from step 3.",
@@ -402,7 +392,7 @@
           var cp = H("button", { class: "lx-btn small", type: "button", text: "Copy everything" }, row);
           var m = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
           cp.addEventListener("click", function () { LX.copyText(txt, { select: ta }).then(function (ok) { m.textContent = ok ? "Copied to the clipboard." : "Select the text and copy it."; }); });
-          var r2 = ref(P, "R2");
+          var r2 = LX.lessonRef(P, "R2");
           api.saw("Take the card to " + (r2.ready ? "R2" : "R2 (upcoming)") + " to map the literature, and to R3 to choose the system, boundary and method.");
         } }
     ];
@@ -417,7 +407,7 @@
       LX.CompareTable(c2, { title: "Seven example cards", text: true,
         columns: [{ key: "name", label: "Combination", main: true }, { key: "type", label: "Type" }, { key: "question", label: "Question" }],
         rows: D.examples.map(function (e, i) { return { key: e.id, name: (i + 1) + ". " + e.combo, type: e.type, question: e.question }; }),
-        sorts: [{ label: "As listed", order: D.examples.map(function (e) { return e.id; }), note: "Illustrative cards, one per row. Load one to see how the studio fills a card, then make it your own." }] });
+        caption: "Illustrative cards, one per row. Load one to see how the studio fills a card, then make it your own." });
       var load = H("div", { class: "r10-load" }, c2), lid = LX.uid("r10l");
       H("label", { for: lid, text: "Example" }, load);
       var sel = H("select", { id: lid }, load);

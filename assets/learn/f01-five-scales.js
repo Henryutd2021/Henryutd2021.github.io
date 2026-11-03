@@ -12,9 +12,10 @@
 //   ladder(results)     per scale, which of the three sorts (who, what, physics) the reader placed right
 // A scale is set apart by who decides what, not by size or by land: Prairie City and the Plains Grid cover the same land.
 //
-// Lesson-local components (candidates for promotion): ScaleZoom (the powers-of-ten zoom through five drawn scenes,
-// keyboard rail, text version) and ScaleStrip (e-scale-strip: five scales with signals passed down and needs passed up).
-// Shared components: LX.StepCards, LX.Predict, LX.CardSort ("cards" mode), LX.CompareTable.
+// Lesson-local component (a candidate for promotion): ScaleZoom (the powers-of-ten zoom through five drawn scenes,
+// keyboard rail, text version). Shared components: LX.StepCards, LX.Predict, LX.CardSort ("cards" mode), LX.CompareTable,
+// LX.ScaleStrip (e-scale-strip: the five scales with the reader's sorts, signals passed down and needs passed up, and the
+// lessons per scale, linked when live by data/path.json). The five scale colours are the shared --lx-scale-0 ... 4.
 (function () {
   "use strict";
 
@@ -47,6 +48,7 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, LESSON = "f01-five-scales";
+  function scol(s) { return "var(--lx-scale-" + LX.ScaleStrip.scaleIndex(s.id) + ")"; }   // the scale's colour token
 
   // ---- the five scenes (viewBox 400 × 230); class names style them from the page's tokens (f1z- in the page's style block)
   var SCENE = {
@@ -165,7 +167,7 @@
     var D = o.scales, W = o.anchors, w = H("div", { class: "f1z" }, host), cur = o.start || 0, seen = {};
     var rail = H("div", { class: "f1z-rail", role: "group", "aria-label": "Zoom level" }, w), btns = [];
     D.forEach(function (s, i) {
-      var b = H("button", { type: "button", class: "f1z-stop", "aria-pressed": "false", "aria-label": s.id + ", " + s.name, style: "--c:var(--f1-" + s.key + ")" }, rail);
+      var b = H("button", { type: "button", class: "f1z-stop", "aria-pressed": "false", "aria-label": s.id + ", " + s.name, style: "--c:" + scol(s) }, rail);
       H("span", { class: "c", text: s.id }, b); H("span", { class: "n", text: s.short }, b);
       b.addEventListener("click", function () { go(i); });
       btns.push(b);
@@ -194,7 +196,7 @@
       svgBox.innerHTML = '<svg class="f1z-svg ' + s.key + '" viewBox="0 0 400 230" role="img" aria-label="' + LX.esc(s.id + ", " + s.name + ": " + SCENE_ALT[s.id]) + '">' + SCENE[s.id](W) + "</svg>";
       if (dir && !LX.reduced()) { var sv = svgBox.firstChild; sv.classList.add("z-" + dir); requestAnimationFrame(function () { requestAnimationFrame(function () { sv.classList.remove("z-" + dir); }); }); }
       cap.innerHTML = "";
-      var t = H("p", { class: "f1z-title", style: "--c:var(--f1-" + s.key + ")" }, cap); H("span", { class: "c", text: s.id }, t); H("b", { text: s.name }, t);
+      var t = H("p", { class: "f1z-title", style: "--c:" + scol(s) }, cap); H("span", { class: "c", text: s.id }, t); H("b", { text: s.name }, t);
       H("p", { class: "f1z-set", text: s.setting }, cap);
       var ch = H("p", { class: "f1z-power" }, cap); H("span", { class: "lx-pill neutral", text: "Power: " + s.power }, ch); H("span", { text: power(s.id) }, ch);
       H("p", { class: "f1z-q", html: "<span>Its question</span> " + LX.esc(s.question) }, cap);
@@ -213,44 +215,13 @@
     return { el: w, go: go, seen: function () { return Object.keys(seen).length; } };
   }
 
-  // ---- ScaleStrip (e-scale-strip): the five scales, the reader's sorts, signals down and needs up (lesson-local)
-  function ScaleStrip(host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var flow = H("div", { class: "f1s-flow", "aria-hidden": "true" }, host);
-    H("span", { class: "down", html: LX.icon("back") + "Passed down: prices, tariffs, limits, targets" }, flow);
-    H("span", { class: "up", html: "Passed up: load profiles, flexibility, forecasts, siting needs" + LX.icon("arrow") }, flow);
-    var ol = H("ol", { class: "f1s-strip" }, host);
-    o.scales.forEach(function (s) {
-      var li = H("li", { style: "--c:var(--f1-" + s.key + ")" }, ol);
-      var top = H("div", { class: "t" }, li); H("span", { class: "code", text: s.id }, top); H("span", { class: "pw", text: s.power }, top);
-      H("b", { text: s.name }, li);
-      H("span", { class: "who", text: s.who }, li);
-      var r = o.results[s.id] || {}, row = H("div", { class: "f1s-res", "aria-label": "Your sorts for " + s.name }, li);
-      [["who", "Who"], ["what", "What"], ["physics", "Physics"]].forEach(function (k) {
-        var v = r[k[0]], cls = v == null ? "na" : v ? "ok" : "no";
-        H("span", { class: "f1s-tick " + cls, html: (v == null ? "" : LX.icon(v ? "check" : "cross")) + k[1],
-          title: k[1] + ": " + (v == null ? "not sorted yet" : v ? "placed right" : "placed elsewhere") }, row);
-      });
-      var L = o.lessons[s.id] || {}, les = H("p", { class: "les" }, li);
-      H("span", { text: "Go further: " }, les);
-      (L.live || []).forEach(function (x, k) { if (k) les.appendChild(document.createTextNode(", ")); H("a", { href: x[0], text: x[1] }, les); });
-      if (L.upcoming) les.appendChild(document.createTextNode(((L.live || []).length ? "; upcoming: " : "upcoming: ") + L.upcoming));
-    });
-    var sr = H("p", { class: "lx-sr" }, host);
-    sr.textContent = "Your sorts, scale by scale: " + o.scales.map(function (s) {
-      var r = o.results[s.id] || {};
-      return s.id + " " + ["who", "what", "physics"].map(function (k) { return k + " " + (r[k] == null ? "not sorted" : r[k] ? "right" : "elsewhere"); }).join(", ");
-    }).join("; ") + ".";
-  }
-
   function view(live, data, root) {
-    var D = data.f01_five_scales, W = anchors(data), byId = {};
+    var D = data.f01_five_scales, W = anchors(data), P = data.path, byId = {};
     D.scales.forEach(function (s) { byId[s.id] = s; });
     var log = LX.store.get("f1-log", {}) || {};
     function keep(k, v) { log[k] = v; LX.store.set("f1-log", log); }
     var placed = log.placed || {}, done = log.done || {}, zoomSeen = log.zoom || [], pred = null, apply = null;
-    var scaleBins = D.scales.map(function (s) { return { id: s.id, label: s.id + " · " + s.short, sub: s.place, color: "var(--f1-" + s.key + ")" }; });
+    var scaleBins = D.scales.map(function (s) { return { id: s.id, label: s.id + " · " + s.short, sub: s.place, color: scol(s) }; });
 
     // one card round: tap a card, then a scale; Next opens once every card is placed and checked
     function round(key, act, api, bins, onCheck) {
@@ -262,7 +233,7 @@
           if (g.placed < g.total) { api.saw("Place every card first: " + (g.total - g.placed) + " still in the pool.", true); return; }
           done[key] = g.right; keep("done", done); api.done();
           onCheck(g);
-          buildExplain(D, W, placed);
+          buildExplain(D, W, placed, P);
         } });
       if (placed[key]) cs.place(JSON.parse(JSON.stringify(placed[key])));
       if (done[key] != null) api.done();
@@ -303,7 +274,7 @@
         } },
       { text: "Scales talk to each other. Does each message travel down the ladder, from a larger scale, or up, from a smaller one?",
         build: function (act, api) {
-          var bins = D.rounds.exchange.bins.map(function (b) { return { id: b.id, label: b.label, sub: b.sub, color: b.id === "down" ? "var(--f1-s4)" : "var(--f1-s0)" }; });
+          var bins = D.rounds.exchange.bins.map(function (b) { return { id: b.id, label: b.label, sub: b.sub, color: b.id === "down" ? "var(--lx-scale-4)" : "var(--lx-scale-0)" }; });
           round("exchange", act, api, bins, function (g) { api.saw(scoreText(g) + " Signals and limits travel down; profiles and needs travel up. A model at one scale takes these arrows as given data, like the Given bin of lesson 10.", g.right < 4); });
         } },
       { text: "Same question, five scales: “" + D.rounds.battery.question + "” Each scale asks it differently. Match each version to its scale.",
@@ -340,23 +311,23 @@
       if (i === 7) click(".lx-choice", 1);
       return { view: "step " + (i + 1) };
     }, cards);
-    buildExplain(D, W, placed);
+    buildExplain(D, W, placed, P);
   }
 
   // ---------------------------------------------------------------- the explain layer
-  function buildExplain(D, W, placed) {
+  function buildExplain(D, W, placed, P) {
     var host = document.getElementById("f1-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
     var res = ladder(D, placed), c1 = H("div", { class: "lx-xcard" }, host);
-    ScaleStrip(c1, { title: "Five scales at a glance", scales: D.scales, results: res, lessons: D.lessons,
+    LX.ScaleStrip(c1, { title: "Five scales at a glance", scales: D.scales, power: true, flow: true, ticks: res, lessons: D.lessons, path: P,
       lede: "Each scale has its own decision makers. Signals and limits pass down; profiles and needs pass up. Your sorts are ticked on each scale." });
     var c2 = H("div", { class: "lx-xcard" }, host);
     LX.CompareTable(c2, {
       title: "What sets each scale apart", text: true,
       columns: [{ key: "name", label: "Scale", main: true }, { key: "who", label: "Who decides" }, { key: "what", label: "What they decide" },
                 { key: "physics", label: "What a model needs" }, { key: "inputs", label: "Takes in from other scales" }, { key: "outputs", label: "Passes on" }],
-      rows: D.scales.map(function (s) { return { key: s.id, color: "var(--f1-" + s.key + ")", name: s.id + " · " + s.name, note: s.power, who: s.who, what: s.what, physics: s.physics, inputs: s.inputs, outputs: s.outputs }; }),
-      sorts: [{ label: "From one site to a nation", order: D.scales.map(function (s) { return s.id; }), note: "Read across a row for one scale; read down a column to see one question change with scale." }]
+      rows: D.scales.map(function (s) { return { key: s.id, color: scol(s), name: s.id + " · " + s.name, note: s.power, who: s.who, what: s.what, physics: s.physics, inputs: s.inputs, outputs: s.outputs }; }),
+      caption: "Read across a row for one scale; read down a column to see one question change with scale."
     });
   }
 

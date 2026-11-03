@@ -37,8 +37,6 @@ body-classes: "page-learn page-lesson lx-form-studio"
 
 ::: {#task .lx-sec}
 ```{=html}
-<style>.lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
-#selfcheck .lx-myths { margin-top: 18px; }</style>
 <div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
@@ -46,7 +44,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <li><b>From:</b> three illustrative briefs at three scales, each a different type of question.</li>
 <li><b>Done when:</b> your method is defended against two alternatives, one of them a different family, and the scale and boundary are stated.</li>
 </ol>
-<p class="lx-hint">About 30 minutes guided here, then about an hour on your own: take your own question card from R1 through the same moves, and write a defence of three or four sentences.</p>
+<p class="lx-hint">About 30 minutes guided here, then about an hour on your own: take your own question card from <a href="r01-framing.html">R1</a> through the same moves, and write a defence of three or four sentences.</p>
 </div>
 <div class="lx-interactive lx-cards" data-learn="r03-system-and-method" data-src="../assets/learn/data/r03-system-and-method.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
@@ -156,7 +154,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>Where the defence goes next</summary>
 <div class="lx-deeper-body">
-<p>In the research capstone (CR, upcoming), this design card becomes the method section of your proposal, and the mock review in CK-R asks you to defend it again. The Modeler lessons build the families in depth: <a href="m01-dispatch-to-lmp.html">M1</a> (a dispatch linear program) now, and capacity expansion, uncertainty and data analysis in the lessons to come.</p>
+<p>In the research capstone (CR, upcoming), this design card becomes the method section of your proposal, and the mock review in CK-R asks you to defend it again. The Modeler lessons build the families in depth: <a href="m01-dispatch-to-lmp.html">M1</a> (a dispatch linear program), <a href="m02-unit-commitment.html">M2</a> (unit commitment) and <a href="m03-capacity-expansion.html">M3</a> (capacity expansion) now, and uncertainty and data analysis in the lessons to come.</p>
 </div>
 </details>
 <details class="lx-deeper">

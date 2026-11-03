@@ -26,8 +26,9 @@ body-classes: "page-learn page-lesson lx-form-studio"
 
 ::: {#task .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="<slug>" data-src="../assets/learn/data/<id>.json">
-<div class="lx-fallback">
+<!-- The task card sits above the interactive, outside its fallback, so readers see it with and without JavaScript
+     (the fallback is hidden once the interactive mounts). Styles: .lx-studio-brief and .lx-studio-task in forms.css. -->
+<div class="lx-card lx-studio-brief">
 <p class="lx-eyebrow">The task</p>
 <ol class="lx-studio-task">
 <li><b>Produce:</b> one line on what the reader hands in (a question card, a concept matrix, a verification log).</li>
@@ -35,6 +36,10 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <li><b>Done when:</b> one line, in the rubric's words.</li>
 </ol>
 <p class="lx-hint">About N minutes guided here, then about M hours on your own.</p>
+</div>
+<div class="lx-interactive lx-cards" data-learn="<slug>" data-src="../assets/learn/data/<id>.json">
+<div class="lx-fallback">
+<p>The steps as a static list or table: what readers without JavaScript need to do the task (the key numbers, a text table).</p>
 <p class="lx-hint">With JavaScript on, you work through this step by step and keep your draft in this browser.</p>
 </div>
 </div>
