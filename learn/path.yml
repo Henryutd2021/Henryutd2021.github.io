@@ -358,6 +358,7 @@
   icon: chart
   status: active
   minutes: 20
+  lab_minutes: 60   # the notebook lab (its eyebrow on the page: about 60 minutes)
   title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
   subtitle: "Find the bad hours in a real year of grid data"
   short: "Python and data"
@@ -460,25 +461,50 @@
   after: [F2, 12]
   next: R1
 
-# ---------- the rest of each tier (in preparation)
-- {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
-- {kind: lesson, tier: foundations, title: "How a thermal power plant works"}
-- {kind: lesson, tier: foundations, title: "Wind power"}
-- {kind: lesson, tier: foundations, title: "Solar power"}
-- {kind: lesson, tier: foundations, title: "Nuclear power basics"}
-- {kind: lesson, tier: foundations, title: "Hydro and geothermal power"}
-- {kind: lesson, tier: foundations, title: "Batteries and hydrogen basics"}
-- {kind: lesson, tier: foundations, title: "Transmission and distribution"}
-- {kind: lesson, tier: foundations, title: "Large loads and data centers"}
-- {kind: lesson, tier: analyst, title: "Money over time: discounting and net present value"}
-- {kind: lesson, tier: analyst, title: "Techno-economic analysis of a project: cash flows, returns, sensitivity"}
-- {kind: lesson, tier: analyst, title: "Markets and institutions: grid operators, FERC and state commissions"}
-- {kind: lesson, tier: analyst, title: "Capacity, reserves and resource adequacy"}
-- {kind: lesson, tier: analyst, title: "Policy instruments: tax credits, carbon prices, large-load tariffs"}
-- {kind: lesson, tier: analyst, title: "Emissions accounting: average or marginal, annual or hourly"}
-- {kind: lesson, tier: analyst, title: "Reading energy data from EIA"}
-- {kind: lesson, tier: analyst, title: "Scenarios and sensitivity in a spreadsheet"}
-- {kind: lesson, tier: analyst, title: "How to read an energy study critically"}
+# ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
+#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 are left out until their excerpts are approved.
+- {kind: lesson, tier: foundations, code: F3, title: "What do people actually want from energy?"}
+- {kind: lesson, tier: foundations, code: F4, title: "How do power plants turn heat, water, wind and sunlight into electricity?"}
+- {kind: lesson, tier: foundations, code: F5, title: "How does a nuclear reactor make electricity, and heat?"}
+- {kind: lesson, tier: foundations, code: F6, title: "How does power reach your plug, and why does it sometimes fail?"}
+- {kind: lesson, tier: foundations, code: F7, title: "What is a microgrid? From a hospital that keeps its lights on to a village with no grid"}
+- {kind: lesson, tier: foundations, code: F8, title: "What happens when a data center moves to town?"}
+- {kind: lesson, tier: foundations, code: F9, title: "What does a city run on, and who controls what?"}
+- {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
+- {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}
+- {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
+- {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
+- {kind: lesson, tier: analyst, code: A1, title: "Is this project worth building? Cash flows, discounting and the cost of capital"}
+- {kind: lesson, tier: analyst, code: A2, title: "Who carries the risk? Power purchase agreements and risk allocation"}
+- {kind: lesson, tier: analyst, code: A3, title: "Energy-only or capacity market? How wholesale markets are designed for high renewable shares"}
+- {kind: lesson, tier: analyst, code: A4, title: "How should an electricity bill be designed? Retail, dynamic and large-load tariffs"}
+- {kind: lesson, tier: analyst, code: A5, title: "Will there be enough power when it matters? Resource adequacy and capacity accreditation"}
+- {kind: lesson, tier: analyst, code: A6, title: "Why does it take years to connect a power plant or a data center?"}
+- {kind: lesson, tier: analyst, code: A7, title: "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading"}
+- {kind: lesson, tier: analyst, code: A8, title: "How long should storage last? From batteries to seasonal stores"}
+- {kind: lesson, tier: analyst, code: A9, title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"}
+- {kind: lesson, tier: analyst, code: A10, title: "Which emissions question are you asking? Inventories, consequences and procurement claims"}
+- {kind: lesson, tier: analyst, code: A11, title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"}
+- {kind: lesson, tier: analyst, code: A12, title: "How do governments steer energy? Taxes, credits, standards and carbon prices"}
+- {kind: lesson, tier: analyst, code: A13, title: "Who pays and who benefits? Energy burden, fairness and jobs"}
+- {kind: lesson, tier: analyst, code: A14, title: "Does a microgrid pay off, and for whom?"}
+- {kind: lesson, tier: analyst, code: A15, title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"}
+- {kind: lesson, tier: analyst, code: A16, title: "Where does hydrogen make sense? From renewables to electrolysis, storage and use"}
+- {kind: lesson, tier: analyst, code: A17, title: "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity"}
+- {kind: lesson, tier: analyst, code: A18, title: "How is a city or regional energy plan made?"}
+- {kind: lesson, tier: analyst, code: A19, title: "Where should it go? Siting with maps, from layers to a suitability score"}
+- {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}
+- {kind: lesson, tier: analyst, code: A21, title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"}
+- {kind: lesson, tier: analyst, code: X2, title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"}
+- {kind: lesson, tier: analyst, code: X4, title: "How are energy rules made?"}
+- {kind: lesson, tier: analyst, code: X5, title: "How are big energy projects actually financed?"}
+- {kind: lesson, tier: analyst, code: CK-A, form: checkpoint, title: "Analyst checkpoint: an auditable spreadsheet for a new case"}
+- {kind: lesson, tier: analyst, code: SB0, form: sandbox, title: "Site Bench"}
+- {kind: lesson, tier: analyst, code: C0, form: capstone, title: "Behind one meter: what should one home or one plant install?"}
+- {kind: lesson, tier: analyst, code: SB1, form: sandbox, title: "Microgrid Workbench"}
+- {kind: lesson, tier: analyst, code: C1, form: capstone, title: "Keep the campus running: a microgrid for a three-day winter outage"}
+- {kind: lesson, tier: analyst, code: SB3, form: sandbox, title: "City Planner"}
+- {kind: lesson, tier: analyst, code: C3, form: capstone, title: "Prairie City 2040: write the city's energy plan"}
 - kind: lesson
   id: m02-unit-commitment
   path: m02-unit-commitment.qmd
@@ -529,6 +555,10 @@
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 - {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
+- {kind: lesson, tier: modeler, code: SB2, form: sandbox, title: "Grid Room"}
+- {kind: lesson, tier: modeler, code: C2, form: capstone, title: "The Plains Grid in a hard year"}
+- {kind: lesson, tier: modeler, code: SB4, form: sandbox, title: "Pathway Explorer"}
+- {kind: lesson, tier: modeler, code: C4, form: capstone, title: "Prairieland 2050: design and defend a nation's pathway"}
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
 - kind: lesson
   id: ck-m-unseen-problem
@@ -668,6 +698,9 @@
   after: [R1, F1]
   next: R2
 
+- {kind: lesson, tier: researcher, code: X6, title: "How do social scientists study energy and people?"}
+- {kind: lesson, tier: researcher, code: CK-R, form: checkpoint, title: "Researcher checkpoint: defend your question and method, then revise"}
+- {kind: lesson, tier: researcher, code: CR, form: capstone, title: "Your own study: from a question to a report"}
 # ---------- research case files (curriculum v2 §13; Henry approved every excerpt sentence on 2026-11-03,
 # reports/learn/excerpts_for_approval.md; live from wave W2; tier confirmed by the coordinator)
 - kind: lesson
@@ -716,6 +749,9 @@
   teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
   after: [8]
 
+- {kind: lesson, tier: analyst, code: CF1, form: case, title: "Where should a factory go when sun and wind are part of the decision?"}
+- {kind: lesson, tier: analyst, code: CF3, form: case, title: "Where should hydrogen go when nobody knows how much wind will be built?"}
+- {kind: lesson, tier: analyst, code: CF8, form: case, title: "Learning a wind turbine's power curve from scarce data"}
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
   id: k01-units
@@ -798,7 +834,7 @@
   after: []
   next: 4
 
-- {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax <= b means"}
+- {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax ≤ b means"}
 
 - kind: tool
   id: k07-spreadsheets

@@ -997,147 +997,346 @@
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "The energy system map: from primary energy to the uses we pay for",
+   "code": "F3",
+   "title": "What do people actually want from energy?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "How a thermal power plant works",
+   "code": "F4",
+   "title": "How do power plants turn heat, water, wind and sunlight into electricity?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Wind power",
+   "code": "F5",
+   "title": "How does a nuclear reactor make electricity, and heat?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Solar power",
+   "code": "F6",
+   "title": "How does power reach your plug, and why does it sometimes fail?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Nuclear power basics",
+   "code": "F7",
+   "title": "What is a microgrid? From a hospital that keeps its lights on to a village with no grid",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Hydro and geothermal power",
+   "code": "F8",
+   "title": "What happens when a data center moves to town?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Batteries and hydrogen basics",
+   "code": "F9",
+   "title": "What does a city run on, and who controls what?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Transmission and distribution",
+   "code": "F10",
+   "title": "Why does every country's energy system look different?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "foundations",
-   "code": null,
-   "title": "Large loads and data centers",
+   "code": "F11",
+   "title": "What does energy do to the air, the climate and people's lives?",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": "X1",
+   "title": "What engineering lies beneath the system?",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": "X3",
+   "title": "How fast have energy transitions happened before?",
    "ready": false,
    "href": "index.html#foundations",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Money over time: discounting and net present value",
+   "code": "A1",
+   "title": "Is this project worth building? Cash flows, discounting and the cost of capital",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Techno-economic analysis of a project: cash flows, returns, sensitivity",
+   "code": "A2",
+   "title": "Who carries the risk? Power purchase agreements and risk allocation",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Markets and institutions: grid operators, FERC and state commissions",
+   "code": "A3",
+   "title": "Energy-only or capacity market? How wholesale markets are designed for high renewable shares",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Capacity, reserves and resource adequacy",
+   "code": "A4",
+   "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Policy instruments: tax credits, carbon prices, large-load tariffs",
+   "code": "A5",
+   "title": "Will there be enough power when it matters? Resource adequacy and capacity accreditation",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Emissions accounting: average or marginal, annual or hourly",
+   "code": "A6",
+   "title": "Why does it take years to connect a power plant or a data center?",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Reading energy data from EIA",
+   "code": "A7",
+   "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Scenarios and sensitivity in a spreadsheet",
+   "code": "A8",
+   "title": "How long should storage last? From batteries to seasonal stores",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "How to read an energy study critically",
+   "code": "A9",
+   "title": "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?",
    "ready": false,
    "href": "index.html#analyst",
    "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A10",
+   "title": "Which emissions question are you asking? Inventories, consequences and procurement claims",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A11",
+   "title": "What does 'clean' mean from cradle to grave? Life cycles, water and land",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A12",
+   "title": "How do governments steer energy? Taxes, credits, standards and carbon prices",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A13",
+   "title": "Who pays and who benefits? Energy burden, fairness and jobs",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A14",
+   "title": "Does a microgrid pay off, and for whom?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A15",
+   "title": "How much can efficiency and electrification change demand? Buildings, heat, transport and industry",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A16",
+   "title": "Where does hydrogen make sense? From renewables to electrolysis, storage and use",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A17",
+   "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A18",
+   "title": "How is a city or regional energy plan made?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A19",
+   "title": "Where should it go? Siting with maps, from layers to a suitability score",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A20",
+   "title": "Why do national energy scenarios disagree?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "A21",
+   "title": "What makes a nation's energy secure? Imports, minerals, supply chains and factories",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "X2",
+   "title": "What happens to gas, coal and oil systems in a transition, and can carbon be removed?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "X4",
+   "title": "How are energy rules made?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "X5",
+   "title": "How are big energy projects actually financed?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": "CK-A",
+   "title": "Analyst checkpoint: an auditable spreadsheet for a new case",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "checkpoint"
+  },
+  {
+   "tier": "analyst",
+   "code": "SB0",
+   "title": "Site Bench",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "sandbox"
+  },
+  {
+   "tier": "analyst",
+   "code": "C0",
+   "title": "Behind one meter: what should one home or one plant install?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "capstone"
+  },
+  {
+   "tier": "analyst",
+   "code": "SB1",
+   "title": "Microgrid Workbench",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "sandbox"
+  },
+  {
+   "tier": "analyst",
+   "code": "C1",
+   "title": "Keep the campus running: a microgrid for a three-day winter outage",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "capstone"
+  },
+  {
+   "tier": "analyst",
+   "code": "SB3",
+   "title": "City Planner",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "sandbox"
+  },
+  {
+   "tier": "analyst",
+   "code": "C3",
+   "title": "Prairie City 2040: write the city's energy plan",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "capstone"
   },
   {
    "tier": "modeler",
@@ -1248,6 +1447,42 @@
    "ready": false,
    "href": "index.html#modeler",
    "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "SB2",
+   "title": "Grid Room",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": [],
+   "form": "sandbox"
+  },
+  {
+   "tier": "modeler",
+   "code": "C2",
+   "title": "The Plains Grid in a hard year",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": [],
+   "form": "capstone"
+  },
+  {
+   "tier": "modeler",
+   "code": "SB4",
+   "title": "Pathway Explorer",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": [],
+   "form": "sandbox"
+  },
+  {
+   "tier": "modeler",
+   "code": "C4",
+   "title": "Prairieland 2050: design and defend a nation's pathway",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": [],
+   "form": "capstone"
   },
   {
    "tier": "modeler",
@@ -1362,6 +1597,32 @@
    "form": "studio"
   },
   {
+   "tier": "researcher",
+   "code": "X6",
+   "title": "How do social scientists study energy and people?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "CK-R",
+   "title": "Researcher checkpoint: defend your question and method, then revise",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": [],
+   "form": "checkpoint"
+  },
+  {
+   "tier": "researcher",
+   "code": "CR",
+   "title": "Your own study: from a question to a report",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": [],
+   "form": "capstone"
+  },
+  {
    "tier": "analyst",
    "code": "CF2",
    "title": "When the cost per kilogram and the cost of the system disagree",
@@ -1392,6 +1653,33 @@
    "scales": [],
    "id": "cf7-cost-of-waiting",
    "minutes": 10,
+   "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF1",
+   "title": "Where should a factory go when sun and wind are part of the decision?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF3",
+   "title": "Where should hydrogen go when nobody knows how much wind will be built?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF8",
+   "title": "Learning a wind turbine's power curve from scarce data",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
    "form": "case"
   }
  ],
@@ -1437,7 +1725,7 @@
    "minutes": 25
   },
   {
-   "title": "Vectors and matrices: what Ax <= b means",
+   "title": "Vectors and matrices: what Ax ≤ b means",
    "code": "K6",
    "minutes": 25
   },
