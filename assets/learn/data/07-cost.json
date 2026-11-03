@@ -1,0 +1,93 @@
+{
+  "about": "Lesson 7 (What does electricity cost to make?): inputs of the levelized-cost calculator and the tornado chart, and the settings of the 'when the energy arrives' step. All money is in real 2025 dollars (no inflation inside the calculation). The calculator leaves out taxes, tax credits, depreciation, interest during construction, transmission and degradation, so its results are not the agencies' own LCOE figures.",
+  "accessed": "2026-11-02",
+  "techs": {
+    "wind": {
+      "label": "Onshore wind farm", "short": "Wind", "color": "var(--lx-wind)",
+      "capex": 1712, "fom": 34.57, "vom": 0, "heatRate": 0, "cf": 33.8,
+      "cfRange": [25, 43],
+      "design": "onshore wind, EIA's capacity-weighted average of 2024 regional costs",
+      "cfNote": "33.8%: average of U.S. wind plants in 2025. Range 25-43%: the low end is illustrative; 43% is the 2023 market-average new turbine in the 2025 ATB.",
+      "src": ["eia-aeo2026-emm", "eia-epa-cf"]
+    },
+    "solar": {
+      "label": "Solar farm (single-axis tracking)", "short": "Solar", "color": "var(--lx-solar)",
+      "capex": 1484, "fom": 23.60, "vom": 0, "heatRate": 0, "cf": 24.0,
+      "cfRange": [19.4, 31.5],
+      "design": "single-axis tracking, EIA's capacity-weighted average of 2024 regional costs",
+      "cfNote": "24.0%: average of U.S. solar photovoltaic plants in 2025. Range 19.4-31.5%: the weakest and best resource classes in the 2025 ATB (2023 values).",
+      "src": ["eia-aeo2026-emm", "eia-epa-cf", "atb2025-pv"]
+    },
+    "cc": {
+      "label": "Gas combined-cycle plant", "short": "Gas CC", "color": "var(--lx-cc)",
+      "capex": 1032, "fom": 12.69, "vom": 3.57, "heatRate": 6.226, "cf": 58.7,
+      "cfRange": [40, 80],
+      "design": "multi-shaft combined-cycle (1,227 MW)",
+      "cfNote": "58.7%: average of U.S. combined-cycle plants in 2025. Range 40-80%: illustrative.",
+      "src": ["eia-aeo2026-emm", "eia-epa-cf-fossil"]
+    },
+    "peaker": {
+      "label": "Gas peaker (combustion turbine)", "short": "Peaker", "color": "var(--lx-pk)",
+      "capex": 1158, "fom": 7.18, "vom": 4.17, "heatRate": 9.142, "cf": 13.6,
+      "cfRange": [5, 25],
+      "design": "industrial-frame combustion turbine (419 MW)",
+      "cfNote": "13.6%: average of U.S. gas turbines in 2025 (EIA's own LCOE uses 10% for peakers). Range 5-25%: illustrative.",
+      "src": ["eia-aeo2026-emm", "eia-epa-cf-fossil"]
+    }
+  },
+  "units": {
+    "capex": "$ per kW of capacity, total overnight cost (no interest during construction)",
+    "fom": "$ per kW per year (fixed operation and maintenance)",
+    "vom": "$ per MWh (variable operation and maintenance)",
+    "heatRate": "MMBtu of gas per MWh (EIA's Btu/kWh divided by 1,000)",
+    "cf": "% (capacity factor)",
+    "gas": "$ per MMBtu"
+  },
+  "finance": {
+    "wacc": 4.0,
+    "waccRange": [2, 7],
+    "waccNote": "4% real: a round value inside the 2025 ATB's range, about 3.0-4.3% real (5.6-6.5% nominal after tax for renewables, 6.9% for gas, 2.5% inflation). Range 2-7%: illustrative.",
+    "life": 30,
+    "lifeRange": [20, 40],
+    "lifeNote": "30 years: the cost recovery period in both the 2025 ATB and EIA's AEO2026 levelized costs. Range 20-40 years: illustrative.",
+    "inflation": 2.5,
+    "debtRate": 5.0,
+    "equityRate": 10.0,
+    "debtShare": 60,
+    "blendNote": "Debt at 5% and equity at 10% (nominal) are illustrative; inflation 2.5% is the 2025 ATB's assumption.",
+    "src": ["atb2025-fin"]
+  },
+  "fuel": {
+    "gas": 3.85,
+    "gasRange": [2.40, 7.21],
+    "gasNote": "$3.85/[[mmbtu|MMBtu]]: average cost of gas to U.S. power plants in 2025. Range $2.40-$7.21: illustrative bounds in 2025 dollars, set at the 2020 and 2022 averages without adjusting for inflation.",
+    "src": ["eia-epa-gas"]
+  },
+  "tornadoRanges": {
+    "capex": [-25, 25],
+    "fom": [-25, 25],
+    "note": "Building cost and fixed upkeep: plus or minus 25%, illustrative.",
+    "gasNote": "Gas $2.40-$7.21 per MMBtu: illustrative bounds in 2025 dollars."
+  },
+  "discount": { "amount": 100, "years": [0, 10, 20, 30], "rate": 7.0, "rateMax": 12 },
+  "blindspot": {
+    "day": "summer_peak",
+    "dateLabel": "29 July 2025",
+    "about": "Prairie Town's summer peak-demand day: the 2025 summer day with the highest hourly demand on the Southwest Power Pool grid (town_days.json, from EIA-930). Demand = shape x 450 MW (lesson 0's scale), wind = shape x 150 MW, solar = shape x farm size, each rounded to whole MW. Each hour, one more MWh saves the running cost of the most expensive plant still needed (town.json, illustrative): $0 if wind and sun are already being spilled, $40 if the combined-cycle plant is the last one running, $100 if the peaker is. A plant's value per MWh is the output-weighted average of those hourly values (a marginal value, not the total cost a whole farm avoids); its output counts all MWh it could make, spilled or used.",
+    "demandPeakMW": 450,
+    "solarMW": 200,
+    "solarMax": 600,
+    "solarStep": 50
+  },
+  "sources": {
+    "eia-aeo2026-emm": { "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3 (2025 dollars)", "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf", "asOf": "April 2026" },
+    "eia-aeo2026-lcoe": { "text": "EIA, Levelized Costs of New Generation Resources in the Annual Energy Outlook 2026", "url": "https://www.eia.gov/outlooks/aeo/electricity_generation/pdf/LCOE_report.pdf", "asOf": "April 2026" },
+    "eia-epa-cf": { "text": "EIA, Electric Power Annual, Table 4.08.B (capacity factors, non-fossil)", "url": "https://www.eia.gov/electricity/annual/html/epa_04_08_b.html", "asOf": "final 2025 data, October 2026" },
+    "eia-epa-cf-fossil": { "text": "EIA, Electric Power Annual, Table 4.08.A (capacity factors, fossil)", "url": "https://www.eia.gov/electricity/annual/html/epa_04_08_a.html", "asOf": "final 2025 data, October 2026" },
+    "eia-epa-gas": { "text": "EIA, Electric Power Annual, Table 7.4 (average cost of fossil fuels for the electric power industry)", "url": "https://www.eia.gov/electricity/annual/html/epa_07_04.html", "asOf": "final 2025 data, October 2026" },
+    "atb2025-fin": { "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods (R&D cost drivers, without tax credits)", "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods", "asOf": "released 2 September 2026" },
+    "atb2025-pv": { "text": "NLR, 2025 Electricity ATB, Utility-Scale PV (base year 2023)", "url": "https://atb.nlr.gov/electricity/2025/utility-scale_pv", "asOf": "released 2 September 2026" },
+    "atb2025-wind": { "text": "NLR, 2025 Electricity ATB, Land-Based Wind (base year 2023)", "url": "https://atb.nlr.gov/electricity/2025/land-based_wind", "asOf": "released 2 September 2026" },
+    "atb2025-eq": { "text": "NLR, 2025 Electricity ATB, Equations and Variables (LCOE, CRF, FCR)", "url": "https://atb.nlr.gov/electricity/2025/equations_&_variables", "asOf": "released 2 September 2026" }
+  }
+}

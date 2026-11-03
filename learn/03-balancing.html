@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Lesson 3 of Energy Systems, Step by Step: trip a power plant on a small regional grid and watch inertia, governors, automatic generation control and, as a last resort, automatic load shedding hold the frequency; then step through the real night of 15 February 2021 in Texas.">
+
+<title>How does the grid stay balanced every second? – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="How does the grid stay balanced every second? – Honglin Li">
+<meta property="og:description" content="Lesson 3 of Energy Systems, Step by Step: trip a power plant on a small regional grid and watch inertia, governors, automatic generation control and, as a last resort, automatic load shedding hold the frequency; then step through the real night of 15 February 2021 in Texas.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Field Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">How does the grid stay balanced every second?</h1>
+<p class="subtitle lead">Trip a plant and watch the grid catch it</p>
+</div>
+
+<div>
+  <div class="description">
+    Lesson 3 of Energy Systems, Step by Step: trip a power plant on a small regional grid and watch inertia, governors, automatic generation control and, as a last resort, automatic load shedding hold the frequency; then step through the real night of 15 February 2021 in Texas.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- Lesson 3 in the step-card form (Learn W1, 2026-11-02). Text budget: one idea and one action per card, about 35 words;
+     depth lives in the collapsed Go deeper boxes. Model, step cards and explain layer: assets/learn/03-balancing.js with
+     assets/learn/data/03-balancing.json (the Plains Grid model, illustrative; the Uri chronology and reference numbers,
+     real, with sources and pages). Tests: node _tests/learn/test_03_balancing.js (every number below is checked against the
+     model or the data file); node _tests/learn/test_03_balancing.js --fallback rewrites the static figure.
+     Generated, do not edit by hand: the fallback figure and the learn:meta, learn:next and learn:footer blocks. -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How does the grid stay balanced every second? Trip a plant and watch the grid catch it", "description": "Lesson 3 of Energy Systems, Step by Step: trip a power plant on a small regional grid and watch inertia, governors, automatic generation control and, as a last resort, automatic load shedding hold the frequency; then step through the real night of 15 February 2021 in Texas.", "learningResourceType": "Interactive lesson", "educationalLevel": "Beginner", "timeRequired": "PT15M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["frequency", "inertia", "primary frequency response", "automatic generation control", "operating reserves", "under-frequency load shedding"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/03-balancing.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"03-balancing","starter":3,"total":14,"code":null,"title":"How does the grid stay balanced every second?","subtitle":"Trip a plant and watch the grid catch it","short":"Balancing every second","tier":"foundations","tier2":null,"tierLabel":"Foundations · L1","level":"L1","slot":1,"slot2":null,"minutes":15,"does":"Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.","outcome":"Explain frequency, reserves and why outages can cascade.","icon":"wave","form":"cards","scales":[],"teaches":["frequency","inertia","primary frequency response","automatic generation control","operating reserves","under-frequency load shedding"],"lab":null,"href":"03-balancing.html","ready":true,"after":[{"id":"00-grid-operator","starter":0,"title":"How does the grid keep the lights on?","short":"Be the grid operator","does":"Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.","href":"00-grid-operator.html","ready":true}],"prev":{"id":"02-demand","starter":2,"title":"Why does electricity demand rise and fall?","short":"The shape of demand","does":"Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.","href":"02-demand.html","ready":true},"next":{"id":"04-forecasts","starter":4,"title":"Forecasts and surprises: how do you plan for weather you can't see yet?","short":"Forecasts and surprises","does":"Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.","href":"04-forecasts.html","ready":true}}</script>
+<div class="lx-head" data-lesson-id="03-balancing" data-starter="3" data-total="14" data-tier="foundations" data-level="L1" data-minutes="15" data-form="cards" data-prev-href="02-demand.html" data-next-href="04-forecasts.html">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">Lesson 3</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-1)"><span class="lx-dot" aria-hidden="true"></span>Foundations · L1</li>
+<li>Lesson 3 of 14</li>
+<li>15 min</li>
+<li>After <a href="00-grid-operator.html">lesson 0</a></li>
+<li class="lx-done-tag" data-lesson-id="03-balancing" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#steps"><span class="lx-n">1</span>Step by step</a></li><li><a href="#explain"><span class="lx-n">2</span>Explain</a></li><li><a href="#check"><span class="lx-n">3</span>Check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<div id="steps" class="lx-sec">
+<style>
+.w1-event { border-left: 3px solid var(--lx-cc); padding: 2px 0 2px 12px; display: grid; gap: 4px; }
+.w1-event p { margin: 0; font-size: 15.5px; }
+.w1-event-t b { font-family: var(--lx-f-mono); }
+</style>
+<div class="lx-interactive lx-cards" data-learn="balancing" data-src="../assets/learn/data/03-balancing.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">One plant trips: what holds the frequency</p>
+<!-- fallback-svg:start -->
+<svg viewbox="0 0 720 280" role="img" aria-labelledby="l3-static-title">
+<title id="l3-static-title">The Plains Grid's frequency after a 100 MW plant trips (illustrative). With no controls acting (inertia and load relief only) it would fall to 59.3 Hz after 5.5 s; with governors it stops at 59.60 Hz after 4.1 s and levels off near 59.85 Hz.</title>
+<g><line x1="52" x2="706" y1="250.0" y2="250.0" stroke="var(--lx-line)"></line><text x="46" y="254.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">59.2</text><line x1="52" x2="706" y1="202.8" y2="202.8" stroke="var(--lx-line)"></line><text x="46" y="206.8" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">59.4</text><line x1="52" x2="706" y1="155.6" y2="155.6" stroke="var(--lx-line)"></line><text x="46" y="159.6" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">59.6</text><line x1="52" x2="706" y1="108.4" y2="108.4" stroke="var(--lx-line)"></line><text x="46" y="112.4" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">59.8</text><line x1="52" x2="706" y1="61.2" y2="61.2" stroke="var(--lx-line)"></line><text x="46" y="65.2" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">60.0</text><line x1="52" x2="706" y1="14.0" y2="14.0" stroke="var(--lx-line)"></line><text x="46" y="18.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">60.2</text><text x="52.0" y="272" text-anchor="start" font-size="13" fill="var(--lx-ink-3)">0 s</text><text x="270.0" y="272" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">10 s</text><text x="488.0" y="272" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">20 s</text><text x="706.0" y="272" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">30 s</text></g>
+<line x1="52" x2="706" y1="226.4" y2="226.4" stroke="var(--lx-bad)" stroke-dasharray="5 4"></line><text x="702" y="241.4" text-anchor="end" font-size="13" fill="var(--lx-bad)">Relays cut customers · 59.3 Hz</text>
+<path d="M52.0 61.2 L62.9 82.5 L73.8 102.3 L84.7 120.7 L95.6 137.7 L106.5 153.5 L117.4 168.2 L128.3 181.8 L139.2 194.4 L150.1 206.1 L161.0 216.9 L171.2 226.4" fill="none" stroke="var(--lx-ink-3)" stroke-width="2" stroke-dasharray="6 4"></path>
+<path d="M52.0 61.2 L57.5 72.0 L62.9 82.4 L68.3 92.2 L73.8 101.4 L79.3 109.9 L84.7 117.7 L90.2 124.8 L95.6 131.2 L101.0 136.7 L106.5 141.6 L111.9 145.6 L117.4 148.9 L122.9 151.5 L128.3 153.4 L133.8 154.5 L139.2 155.1 L144.6 155.0 L150.1 154.4 L155.6 153.3 L161.0 151.6 L166.4 149.6 L171.9 147.2 L177.4 144.4 L182.8 141.3 L188.3 138.1 L193.7 134.6 L199.2 131.0 L204.6 127.3 L210.1 123.5 L215.5 119.7 L221.0 116.0 L226.4 112.3 L231.9 108.7 L237.3 105.2 L242.8 101.8 L248.2 98.6 L253.7 95.6 L259.1 92.8 L264.6 90.2 L270.0 87.9 L275.5 85.8 L280.9 83.9 L286.4 82.2 L291.8 80.8 L297.3 79.7 L302.7 78.7 L308.1 78.0 L313.6 77.5 L319.1 77.3 L324.5 77.2 L329.9 77.3 L335.4 77.6 L340.8 78.0 L346.3 78.6 L351.8 79.3 L357.2 80.1 L362.6 81.1 L368.1 82.1 L373.6 83.1 L379.0 84.2 L384.4 85.4 L389.9 86.6 L395.4 87.8 L400.8 89.0 L406.3 90.2 L411.7 91.3 L417.2 92.4 L422.6 93.5 L428.0 94.5 L433.5 95.5 L438.9 96.4 L444.4 97.3 L449.8 98.1 L455.3 98.8 L460.8 99.4 L466.2 100.0 L471.7 100.5 L477.1 100.9 L482.6 101.2 L488.0 101.4 L493.5 101.6 L498.9 101.8 L504.3 101.8 L509.8 101.8 L515.3 101.7 L520.7 101.6 L526.1 101.5 L531.6 101.3 L537.0 101.0 L542.5 100.7 L548.0 100.4 L553.4 100.1 L558.9 99.8 L564.3 99.4 L569.8 99.0 L575.2 98.7 L580.6 98.3 L586.1 97.9 L591.5 97.5 L597.0 97.2 L602.5 96.8 L607.9 96.5 L613.4 96.2 L618.8 95.9 L624.3 95.6 L629.7 95.3 L635.1 95.1 L640.6 94.9 L646.0 94.7 L651.5 94.5 L657.0 94.4 L662.4 94.3 L667.9 94.2 L673.3 94.1 L678.8 94.1 L684.2 94.0 L689.6 94.0 L695.1 94.1 L700.6 94.1 L706.0 94.1" fill="none" stroke="var(--lx-accent)" stroke-width="2.6"></path>
+<circle cx="141.4" cy="155.1" r="5" fill="var(--lx-surface)" stroke="var(--lx-accent)" stroke-width="2.4"></circle><text x="150.4" y="173.1" font-size="13" fill="var(--lx-ink)">Lowest 59.60 Hz</text>
+</svg>
+<div class="lx-legend" aria-hidden="true"><span><i class="line" style="border-top-color:var(--lx-ink-3)"></i>No controls (inertia and load relief)</span><span><i style="--c:var(--lx-accent)"></i>With governors (reserve 150 MW)</span></div>
+<!-- fallback-svg:end -->
+<ol>
+<li>Inertia: every spinning machine slows together and gives up stored energy (the first seconds).</li>
+<li>Primary response: governors on plants holding reserve add power and stop the fall (seconds).</li>
+<li>Secondary response: automatic generation control raises reserve plants until 60 Hz returns (minutes).</li>
+<li>Last line: if the fall reaches 59.3 Hz, relays disconnect a block of customers automatically.</li>
+</ol>
+<p class="lx-hint">With JavaScript on, you trip the plant yourself, set the inertia and the reserve, and step through a real night in Texas.</p>
+</div>
+</div>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Model.</b> The Plains Grid is illustrative: a 4,000 MW region with one frequency and no power lines.<br><b>Time scales.</b> The layers follow <a href="https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf">NERC (2021)</a>; real responses overlap.<br><b>Texas.</b> The night of 15 February 2021 is real: readings from the <a href="https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf">FERC–NERC report</a> (November 2021, pp. 135–138).</span></p>
+</div>
+<div id="explain" class="lx-sec">
+<section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="what-you-just-did-as-diagrams">What you just did, as diagrams</h2>
+</section>
+<div id="l3-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Frequency</dt><dd>The grid's pulse, 60 Hz in North America; it falls whenever supply is short of demand.</dd>
+<dt>Inertia</dt><dd>Energy stored in spinning machines; it slows the fall but cannot stop it.</dd>
+<dt>Primary response</dt><dd>Governors add power within seconds and stop the fall at its lowest point, the nadir.</dd>
+<dt>Secondary response</dt><dd>Automatic generation control brings frequency back to 60 Hz within minutes.</dd>
+<dt>Reserve</dt><dd>Spare capacity held back for a trip. In this model, governors and AGC share it on running plants; real reserves can also come from offline plants, storage and responsive loads.</dd>
+<dt>Automatic load shedding</dt><dd>The last line: relays cut a block of customers at 59.3 Hz to save the rest of the grid.</dd>
+</dl>
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>The first second and where the fall stops, in two lines</summary>
+<div class="lx-deeper-body">
+<p>Let <span class="math inline">\(f_0 = 60\)</span> Hz, <span class="math inline">\(\Delta P\)</span> the lost power in MW and <span class="math inline">\(E\)</span> the stored rotational energy in MW·s (1 GW·s = 1,000 MW·s). In the first instant only inertia acts, so the <span class="lx-term" data-term="rocof">rate of change of frequency</span> is</p>
+<p><span class="math display">\[\frac{df}{dt}\Big|_{t=0} = -\frac{f_0\,\Delta P}{2E} = -\frac{60 \times 100}{2 \times 16{,}000} \approx -0.19 \text{ Hz/s}.\]</span></p>
+<p>Halve <span class="math inline">\(E\)</span> and the fall is twice as fast. Once governors have caught up, the frequency settles where the governors’ extra output, <span class="math inline">\(K\)</span> MW per Hz of drop, and the load’s own relief, <span class="math inline">\(D\)</span> MW per Hz, cover the lost power. The size of that drop, in Hz below 60, is</p>
+<p><span class="math display">\[\text{drop} = \frac{\Delta P}{K + D} = \frac{100}{600 + 80} \approx 0.15 \text{ Hz}, \quad f \approx 59.85 \text{ Hz}.\]</span></p>
+<p><span class="math inline">\(K = 600\)</span> MW/Hz is what a 5% <strong>droop</strong> setting gives on 1,800 MW of plants: a 5% drop in frequency (3 Hz) would call for their full output. All Plains Grid numbers are illustrative.</p>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>What the trace's model assumes</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong>One frequency.</strong> The whole region shares it; there are no power lines.</li>
+<li><strong>Stored spin.</strong> It sets how fast the frequency moves when power is short.</li>
+<li><strong>Governors.</strong> They add power in step with the drop, about 8 s behind, never more than the reserve.</li>
+<li><strong>AGC.</strong> It keeps adding, slowly, until 60 Hz returns, also within the reserve.</li>
+<li><strong>Load.</strong> Demand eases a little as frequency falls; at 59.3 Hz relays cut one block of 5% of load.</li>
+</ul>
+<p>Every 10 ms the page applies one balance:</p>
+<p><span class="math display">\[\text{change in frequency} \;\propto\; \frac{\text{power added} - \text{power lost}}{\text{stored energy}}\]</span></p>
+<p>Scheduling and planning models usually skip these seconds and keep a rule instead, such as “hold reserve at least as large as the biggest plant”. <a href="../learn/10-write-it-down.html">Lesson 10</a> shows how to write a rule like that down, and <a href="../learn/11-solver.html">lesson 11</a> how a solver meets it.</p>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper</span>How big is inertia on a real grid?</summary>
+<div class="lx-deeper-body">
+<ul>
+<li>On the night of 15 February 2021, ERCOT's measured inertia ranged from 254 to 349 GW·s; its operators used 100 GW·s as a minimum (FERC–NERC report, 2021, p. 138).</li>
+<li>That is far more stored rotational energy than the Plains Grid's 6–30 GW·s; the amount depends on which machines are connected at the time.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper</span>What the model leaves out</summary>
+<div class="lx-deeper-body">
+<ul>
+<li>One frequency for the whole region: on a real grid, machines in different places swing against each other along the power lines.</li>
+<li>Governors have dead bands and limits, and many plants run with no spare capacity at all.</li>
+<li>Real load-shedding programmes cut customers in several smaller steps.</li>
+<li>Real AGC also watches the power flowing to neighbouring regions, not only the frequency.</li>
+<li>Voltage, which can collapse on its own, is not modelled; lesson A17 (upcoming) checks steady voltages and line loadings with a small power flow.</li>
+</ul>
+</div>
+</details>
+</div>
+</div>
+<div id="check" class="lx-sec">
+<section id="check-yourself" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-yourself">Check yourself</h2>
+</section>
+<div class="lx-myths" data-quiz="l3-myth">
+<div class="lx-qq" data-id="restore" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “After a plant trips, governors bring the frequency back to exactly 60 Hz.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Governors stop the fall but leave the frequency a little low; automatic generation control restores 60 Hz over minutes.</p></details>
+</div>
+<div class="lx-qq" data-id="inertia" data-answer="fact">
+<p class="lx-qtext">Myth or fact? “With less inertia online, the frequency falls faster after the same trip.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. The first-second fall rate is proportional to the lost power divided by the stored energy: half the inertia, twice the speed.</p></details>
+</div>
+<div class="lx-qq" data-id="uri" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “The February 2021 Texas outages were caused by frozen wind turbines.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Every kind of plant failed. Of the 1,045 units with outages across ERCOT, SPP and MISO South, 58% were gas-fired, 27% wind and 6% coal: shares of units, not of lost MW (FERC–NERC report, 2021, p. 15).</p></details>
+</div>
+</div>
+
+<div class="lx-quiz" data-quiz="l3">
+<div class="lx-qq" data-id="rocof" data-answer="b">
+<p class="lx-qtext">A 200 MW plant trips on a grid storing 20 GW·s (20,000 MW·s) of rotational energy. How fast does the frequency fall in the first instant?</p>
+<ul class="lx-choices"><li data-value="a">0.03 Hz per second</li><li data-value="b">0.3 Hz per second</li><li data-value="c">3 Hz per second</li><li data-value="d">0.6 Hz per second</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>0.3 Hz per second: 60 × 200 ÷ (2 × 20,000) = 0.3. Twice the lost power or half the inertia doubles it.</p></details>
+</div>
+<div class="lx-qq" data-id="last" data-answer="d">
+<p class="lx-qtext">Which of these acts last after a plant trips?</p>
+<ul class="lx-choices"><li data-value="a">Inertia</li><li data-value="b">Governors</li><li data-value="c">Automatic generation control</li><li data-value="d">Operators starting another plant to rebuild the reserve</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Operators rebuilding the reserve: this tertiary layer takes ten minutes to hours, so the grid is ready for the next trip.</p></details>
+</div>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="numbers-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="numbers-sources-and-whats-next">Numbers, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number</th>
+<th data-quarto-table-cell-role="th" scope="col">What it means</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">0–12 s · 1–10 min</td>
+<td>Typical time scales of inertia and of automatic generation control after a disturbance; governors overlap with both, and operators follow.</td>
+<td class="s"><a href="https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf">NERC, Balancing and Frequency Control</a> (PDF), Table 1.1 · May 2021</td>
+</tr>
+<tr class="even">
+<td class="n">59.3 Hz</td>
+<td>Where the first block of automatic load shedding starts in Texas (ERCOT, at least 5% of load) and in the Southwest Power Pool (at least 10%).</td>
+<td class="s"><a href="https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf">FERC–NERC report</a> (PDF), pp. 44–45 · settings as of February 2021</td>
+</tr>
+<tr class="odd">
+<td class="n">59.304 Hz</td>
+<td>ERCOT's lowest frequency on 15 February 2021; it stayed below 59.4 Hz for 4 min 23 s of the 9 minutes its generator protection allowed.</td>
+<td class="s"><a href="https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf">FERC–NERC report</a> (PDF), p. 137 · 15 Feb 2021</td>
+</tr>
+<tr class="even">
+<td class="n">20,000 MW</td>
+<td>Customer demand ERCOT ordered off at the worst point of Winter Storm Uri.</td>
+<td class="s"><a href="https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf">FERC–NERC report</a> (PDF), p. 9 · Feb 2021</td>
+</tr>
+<tr class="odd">
+<td class="n">4.5 million</td>
+<td>Customers in Texas who lost power during Winter Storm Uri.</td>
+<td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=54639">EIA, Today in Energy</a> · November 2022</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="04-forecasts">
+<p class="lx-eyebrow">Next on the starter path</p>
+<p class="lx-next-t"><a href="04-forecasts.html">Lesson 4 · Forecasts and surprises: how do you plan for weather you can't see yet?</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="03-balancing" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-real">
+<p class="lx-eyebrow">In the real world</p>
+<p><b>Across the region.</b> In ERCOT, SPP and MISO South, 1,045 generating units had 4,124 outages, derates or failures to start; three-quarters came from freezing or fuel problems.</p>
+<p><b>In Texas.</b> Plants failed faster than the reserve could be rebuilt, so operators cut customers by hand to hold the frequency.</p>
+<p><b>Next.</b> Lesson 4 looks at the forecasts that tell operators how much reserve to hold.</p>
+</div>
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>NERC Resources Subcommittee (2021). <a href="https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf">Balancing and Frequency Control Reference Document</a> (PDF). The control continuum, inertia, governors, AGC.</li>
+<li>FERC, NERC and Regional Entity Staff (2021). <a href="https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf">The February 2021 Cold Weather Outages in Texas and the South Central United States</a> (PDF). Chronology of 15 February, pp. 135–138 (relay trips at 1:54 a.m., p. 137); load-shedding settings, pp. 44–45; unit outages in ERCOT, SPP and MISO South, p. 15.</li>
+<li>EIA (2022). <a href="https://www.eia.gov/todayinenergy/detail.php?id=54639">U.S. electricity customers averaged seven hours of power interruptions in 2021</a>. Today in Energy.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20lesson%203">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/03-balancing.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

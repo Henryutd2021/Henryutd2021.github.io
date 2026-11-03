@@ -1,0 +1,77 @@
+{
+ "meta": {
+  "title": "Lesson 3: the Plains Grid frequency model (illustrative) and the Winter Storm Uri timeline (real)",
+  "note": "The Plains Grid and every model parameter below are illustrative, chosen so that the trace shows the textbook stages at sizes a reader can follow. The Uri timeline and the reference numbers are real, from the primary sources listed with each item.",
+  "checked": "2026-11-02"
+ },
+ "grid": {
+  "about": "One aggregate frequency for the whole Plains Grid (no network, no voltage). Prairie Town's combined-cycle plant (lesson 0) trips while making tripMW. Swing equation with load relief, governor droop with a first-order lag (upward output capped by the reserve), AGC as integral control on the frequency error (also within the reserve), one block of under-frequency load shedding, and an optional battery with fast droop. Integrated with 10 ms steps.",
+  "f0": 60,
+  "loadMW": 4000,
+  "tripMW": 100,
+  "inertia": { "min": 6, "max": 30, "step": 2, "start": 16, "unit": "GW·s" },
+  "reserve": { "min": 0, "max": 200, "step": 10, "start": 150, "unit": "MW" },
+  "govMWperHz": 600,
+  "govT": 8,
+  "reliefMWperHz": 80,
+  "agcBetaMWperHz": 680,
+  "agcT": 100,
+  "uflsHz": 59.3,
+  "uflsPct": 5,
+  "ffrMW": 50,
+  "ffrMWperHz": 250,
+  "ffrT": 0.3,
+  "dt": 0.01,
+  "secondsWindow": 30,
+  "minutesWindow": 600,
+  "backBandHz": 0.01,
+  "lowInertia": 6
+ },
+ "layers": {
+  "source": "NERC (2021), Balancing and Frequency Control Reference Document, Table 1.1 (control continuum) and chapter 1",
+  "url": "https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf",
+  "asOf": "11 May 2021",
+  "rows": [
+   { "key": "inertia", "name": "Inertial response", "time": "0–12 s", "from": "Stored spin of every synchronous machine", "who": "Physics, no control" },
+   { "key": "primary", "name": "Primary response", "time": "10–60 s", "from": "Governors on plants holding reserve; motors slowing", "who": "Automatic, at each plant" },
+   { "key": "secondary", "name": "Secondary response (AGC)", "time": "1–10 min", "from": "Reserve plants raised by the control centre's computers", "who": "Automatic, grid operator" },
+   { "key": "tertiary", "name": "Tertiary response", "time": "10 min to hours", "from": "Plants started or re-dispatched to rebuild reserves", "who": "Grid operator, by hand" }
+  ]
+ },
+ "ufls_real": {
+  "source": "FERC, NERC and Regional Entity Staff (2021), The February 2021 Cold Weather Outages in Texas and the South Central United States, printed pp. 44–45",
+  "url": "https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf",
+  "asOf": "February 2021",
+  "ercot_first_step": { "hz": 59.3, "pct": 5 },
+  "spp_first_step": { "hz": 59.3, "pct": 10 },
+  "ercot_generator_relay": { "hz": 59.4, "minutes": 9 }
+ },
+ "uri": {
+  "source": "FERC, NERC and Regional Entity Staff (2021), The February 2021 Cold Weather Outages in Texas and the South Central United States, printed pp. 135–138 (ERCOT chronology, 15 February 2021; about 276 MW tripped by under-frequency relays at 1:54 a.m., p. 137); p. 9 (20,000 MW); EIA (2022) for customers",
+  "url": "https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf",
+  "eia_url": "https://www.eia.gov/todayinenergy/detail.php?id=54639",
+  "note": "Points are the frequency readings the report's chronology gives, minute by minute; the measured trace moves between them. At 1:51 and 2:02 a.m. the report gives only a threshold crossing (below 59.4 Hz, above 60.0 Hz), not a reading.",
+  "points": [
+   ["1:18", 59.932], ["1:20", 59.944], ["1:26", 60.001], ["1:35", 59.978], ["1:44", 59.817], ["1:49", 59.504],
+   ["1:50", 59.496], ["1:54", 59.304], ["1:55", 59.401], ["1:57", 59.689], ["2:09", 60.094], ["2:30", 60.062]
+  ],
+  "events": [
+   { "at": "1:20", "hz": 59.944, "shedMW": 1000, "title": "Highest emergency level", "text": "Responsive reserve had fallen below the 1,430 MW minimum. ERCOT declared its top energy emergency (EEA 3) and ordered 1,000 MW of customer demand cut." },
+   { "at": "1:49", "hz": 59.504, "shedMW": 2000, "title": "Plants keep failing", "text": "From 1:44, five more generators tripped or ran down: 1,712 MW in five minutes. Frequency fell from 59.817 to 59.504 Hz." },
+   { "at": "1:51", "hz": 59.4, "cross": "below", "shedMW": 5000, "title": "The nine-minute timer starts", "text": "Frequency dropped below 59.4 Hz. Generator protection allows nine minutes there; had it run out, about 17,000 MW more could have tripped." },
+   { "at": "1:54", "hz": 59.304, "shedMW": 5000, "title": "The lowest point", "text": "The lowest reading, 59.304 Hz. Relays set near 59.3 Hz still tripped about 276 MW of load automatically. Responsive reserve was down to 1,044 MW." },
+   { "at": "1:55", "hz": 59.401, "shedMW": 8500, "title": "Back above 59.4 Hz", "text": "With 8,500 MW of customer demand ordered off, frequency climbed back above 59.4 Hz after 4 minutes 23 seconds below it." },
+   { "at": "2:02", "hz": 60, "cross": "above", "shedMW": 10500, "title": "60 Hz again, at a price", "text": "Frequency rose above 60 Hz with 10,500 MW ordered off. Later that day shedding peaked at 20,000 MW; about 4.5 million Texas customers lost power." }
+  ],
+  "lowestHz": 59.304,
+  "uflsTripMW": 276,
+  "below594": "4 min 23 s",
+  "relayMinutes": 9,
+  "couldTripMW": 17000,
+  "peakShedMW": 20000,
+  "customersMillion": 4.5,
+  "reserveMinMW": 1430,
+  "inertiaRangeGWs": [254, 349],
+  "inertiaMinOpsGWs": 100
+ }
+}

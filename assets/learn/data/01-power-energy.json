@@ -1,0 +1,86 @@
+{
+  "meta": {
+    "title": "Lesson 1 numbers: the appliance board, the scale ladder and the real-world anchors",
+    "lesson": "learn/01-power-energy.qmd (model and view: assets/learn/01-power-energy.js; tests: _tests/learn/test_01-power-energy.js)",
+    "built": "2026-11-02",
+    "note": "Appliance powers are illustrative. Every other real-world number below carries its source URL and an 'as of' date. Prairie Town's day and the Southwest Power Pool's year are computed by the lesson from town.json, town_year.json and town_days.json (EIA-930, 2025)."
+  },
+  "devices": {
+    "basis": "Typical nameplate power of each appliance, rounded; illustrative. The label on your own appliance gives its real power, and many appliances (heaters, refrigerators) cycle on and off.",
+    "list": [
+      { "id": "led", "label": "LED bulb", "watts": 10, "icon": "bulb" },
+      { "id": "laptop", "label": "Laptop", "watts": 50, "icon": "laptop" },
+      { "id": "tv", "label": "Television", "watts": 100, "icon": "tv" },
+      { "id": "microwave", "label": "Microwave", "watts": 1000, "icon": "microwave" },
+      { "id": "hairdryer", "label": "Hair dryer", "watts": 1500, "icon": "dryer" },
+      { "id": "ev", "label": "EV charger", "watts": 7200, "icon": "car" }
+    ]
+  },
+  "predict": {
+    "a": { "id": "hairdryer", "minutes": 10 },
+    "b": { "id": "laptop", "minutes": 300 }
+  },
+  "anchors": {
+    "phone_charge": {
+      "value": 0.019, "unit": "kWh",
+      "what": "Electricity to charge a smartphone once",
+      "source": "U.S. EPA, Greenhouse Gas Equivalencies Calculator: Calculations and References (number of smartphones charged)",
+      "url": "https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references",
+      "as_of": "page updated 4 August 2026; checked 2 November 2026"
+    },
+    "home_year": {
+      "value": 10791, "unit": "kWh",
+      "what": "Electricity bought by an average U.S. residential customer in a year (about 899 kWh a month)",
+      "source": "EIA, Frequently Asked Questions: How much electricity does an American home use?",
+      "url": "https://www.eia.gov/tools/faqs/faq.php?id=97&t=3",
+      "as_of": "data for 2022 (page updated 8 January 2024); checked 2 November 2026"
+    },
+    "us_year": {
+      "value": 4.20e12, "unit": "kWh",
+      "what": "Total U.S. electricity consumption in 2025, the highest on record",
+      "source": "EIA, Electricity explained: Use of electricity",
+      "url": "https://www.eia.gov/energyexplained/electricity/use-of-electricity.php",
+      "as_of": "data for 2025; checked 2 November 2026"
+    },
+    "us_peak": {
+      "value": 759180, "unit": "MW",
+      "what": "Record coincident peak demand of the Lower 48 states, 29 July 2025",
+      "source": "EIA, Today in Energy: U.S. electricity peak demand set new records twice in July",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=65864",
+      "as_of": "article of 5 August 2025, from preliminary hourly data"
+    },
+    "wind_cf": {
+      "value": 0.338, "unit": "fraction",
+      "what": "Capacity factor of U.S. utility-scale wind in 2025",
+      "source": "EIA, Electric Power Monthly, Table 6.07.B: Capacity factors for utility scale generators primarily using non-fossil fuels",
+      "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+      "as_of": "2025 annual value (final); table released 23 October 2026"
+    },
+    "bulb_example": {
+      "watts": 40, "hours": 5, "kwh": 0.2,
+      "what": "EIA's own worked example: a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh",
+      "source": "EIA, Electricity explained: Measuring electricity",
+      "url": "https://www.eia.gov/energyexplained/electricity/measuring-electricity.php",
+      "as_of": "checked 2 November 2026"
+    }
+  },
+  "ladder": {
+    "rungs": ["Wh", "kWh", "MWh", "GWh", "TWh"],
+    "names": ["watt-hours", "thousands of Wh", "millions of Wh", "billions of Wh", "trillions of Wh"],
+    "items": [
+      { "id": "phone", "label": "Charging a smartphone once", "from": "phone_charge" },
+      { "id": "homeday", "label": "An average U.S. home's day", "from": "home_year", "per_day": true },
+      { "id": "homeyear", "label": "An average U.S. home's year", "from": "home_year" },
+      { "id": "town", "label": "Prairie Town's day in lesson 0 (3 September 2025)", "from": "town_day" },
+      { "id": "spp", "label": "The Southwest Power Pool's year (2025)", "from": "spp_year" },
+      { "id": "us", "label": "The whole United States' year (2025)", "from": "us_year" }
+    ]
+  },
+  "fermi": { "ticks_gw": [5, 50, 500, 5000], "hours": 8760 },
+  "wind": {
+    "note": "Steps fine enough to reach EIA's averages exactly (33.8% and 1,232 W); a 'Use EIA's averages' button sets both. The home benchmark is EIA's 2022 average residential purchases, so the result is an illustrative annual-energy equivalent.",
+    "mw": 100, "claim_homes": 100000,
+    "cf": { "min": 10, "max": 100, "step": 0.1, "start": 100 },
+    "home_w": { "min": 500, "max": 2000, "step": 1, "start": 1000 }
+  }
+}

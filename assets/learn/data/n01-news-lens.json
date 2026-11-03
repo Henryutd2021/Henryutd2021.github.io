@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "title": "N1 news lens: three worked stories, a units spotter and the evidence ladder",
+    "built": "2026-11-02",
+    "note": "Headlines are paraphrased in our own words; no outlet is quoted. Facts come from the primary sources linked, as of the dates given (all checked 2026-11-02). Story 3's early single-cause claims are described, not dated. Spotter sentences are illustrative composites; where they use a real number, its source is named. Toy durations and utilisation rates are labelled illustrative.",
+    "used_by": "learn/n01-news-lens.qmd via assets/learn/n01-news-lens.js; checked by _tests/learn/test_n01-news-lens.js"
+  },
+  "lens": [
+    { "id": "scale", "n": 1, "label": "Scale", "sub": "", "ask": "How big is it next to the whole?", "trap": "A big-sounding number that is a small share, or a national figure read as a global one.", "color": "var(--lx-tier-1)" },
+    { "id": "time", "n": 2, "label": "Time", "sub": "horizon · power or energy", "ask": "Power or energy? Which hour, which year?", "trap": "GW read as GWh, or a 2030 projection read as today's fact.", "color": "var(--lx-tier-2)" },
+    { "id": "physics", "n": 3, "label": "Physics", "sub": "units · limits", "ask": "Do the units, losses and limits make sense?", "trap": "Nameplate (the maximum rated power) treated as typical output, or a unit that cannot be right.", "color": "var(--lx-tier-3)" },
+    { "id": "pays", "n": 4, "label": "Who pays", "sub": "", "ask": "Who pays, who benefits, who carries the risk?", "trap": "Savings for one group that other customers end up paying for.", "color": "var(--lx-tier-4)" },
+    { "id": "boundary", "n": 5, "label": "Boundary", "sub": "", "ask": "What is counted, and what is left out?", "trap": "A total that quietly leaves out part of the system.", "color": "var(--lx-tier-5)" },
+    { "id": "counter", "n": 6, "label": "Counterfactual", "sub": "", "ask": "Compared with what?", "trap": "A change measured against a baseline that would never have happened.", "color": "var(--lx-pk)" },
+    { "id": "uncert", "n": 7, "label": "Uncertainty", "sub": "", "ask": "How sure, says who, with what range?", "trap": "One number from one party, with no range.", "color": "var(--lx-warn)" }
+  ],
+  "stories": [
+    {
+      "id": "a",
+      "kicker": "Data centers as a load · United States",
+      "headline": "U.S. data centers could use nearly 12% of the nation's electricity by 2030",
+      "framing": "Our paraphrase of how such reports get headlined.",
+      "parts": [
+        "A national-laboratory report estimates that data centers used ",
+        { "p": "a1", "text": "192 TWh in 2024", "tag": "time", "also": ["physics"], "note": "Energy over a whole year, not power. Spread over 8,760 hours it is about 22 GW of average demand." },
+        ", or ",
+        { "p": "a2", "text": "4.7% of U.S. electricity", "tag": "scale", "also": [], "note": "A share of one country's use. Read it next to the whole, and never mix it with a global share." },
+        ".\nIts Reference Case puts ",
+        { "p": "a3", "text": "2030 use at 649 TWh", "tag": "time", "also": ["uncert"], "note": "A model's projection six years ahead, not a measurement: 2024 is the report's last historical year." },
+        ", ",
+        { "p": "a4", "text": "within a range of 521–843 TWh", "tag": "uncert", "also": [], "note": "The authors' own range: its top is 1.6 times its bottom. The IEA's early-2025 projection, about 430 TWh, sits below it, as the report notes (p. 11)." },
+        ".\nServing that load would take ",
+        { "p": "a5", "text": "about 148 GW of grid connections", "tag": "physics", "also": ["time"], "note": "Capacity, not energy: the report turns 649 TWh into GW by assuming connections are used at 50% on average." },
+        ".\n",
+        { "p": "a6", "text": "Cryptocurrency mining is not counted", "tag": "boundary", "also": [], "note": "What counts as a data center is a choice; a study that includes mining reports a larger number." },
+        "."
+      ],
+      "missing": { "answer": "pays", "also": ["counter"], "note": "Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Upcoming: lesson A4 on large-load tariffs." },
+      "envelope": {
+        "kind": "energy-to-power",
+        "q": "649 TWh in a year is how much power, on average?",
+        "options": ["7 GW", "74 GW", "649 GW", "5,700 GW"],
+        "answer": 1,
+        "twh": 649, "hours": 8760, "util": 50, "report_gw": 148,
+        "feedback": ["That divides by 87.6 instead of 8.76: check the powers of ten.", "Right: 649,000 GWh ÷ 8,760 h ≈ 74 GW, running all year.", "TWh and GW are different kinds of unit: one is an amount, the other a rate.", "That multiplies by the hours instead of dividing."]
+      },
+      "take": "I accept the direction, strong growth in U.S. data-center use by 2030, but not the exact 11.8%. A new estimate built on lower chip shipments or lower server power would change my mind. Confidence: medium, since credible projections still differ by about 50%.",
+      "sources": [
+        { "label": "LBNL, United States Data Center Energy Usage Report: 2025 Update, pp. 5, 8–11 (PDF)", "url": "https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update", "as_of": "published 18 June 2026" }
+      ]
+    },
+    {
+      "id": "b",
+      "kicker": "Storage · United States",
+      "headline": "A record 15 GW of batteries joined the U.S. grid in 2025",
+      "framing": "Our paraphrase of how the data release was headlined.",
+      "parts": [
+        "Developers added ",
+        { "p": "b1", "text": "a record 15 GW of battery storage", "tag": "time", "also": ["physics", "counter"], "note": "GW is power: how fast the batteries can deliver, not how much energy they hold. Energy in GWh needs the duration, which the story does not give." },
+        " in 2025, ",
+        { "p": "b2", "text": "according to preliminary data", "tag": "uncert", "also": [], "note": "Preliminary counts come from a monthly inventory and are revised when the final annual data arrive." },
+        ".\nAt the start of the year, ",
+        { "p": "b3", "text": "18.2 GW had been planned", "tag": "uncert", "also": ["time", "counter"], "note": "Planned is not built: actual additions were about 82% of the amount first planned (15 ÷ 18.2)." },
+        ".\n",
+        { "p": "b4", "text": "Solar led with 27.2 GW", "tag": "physics", "also": [], "note": "A GW of solar makes less energy in a year than a GW of a plant that runs most hours. Compare capacity factors (average output ÷ rated power), not GW." },
+        " of ",
+        { "p": "b5", "text": "53 GW in total", "tag": "scale", "also": [], "note": "Big for one year. For scale, U.S. use averaged about 480 GW across 2025 (4.20 trillion kWh ÷ 8,760 h)." },
+        ".\n",
+        { "p": "b6", "text": "The count covers utility-scale plants of 1 MW and up", "tag": "boundary", "also": [], "note": "Home batteries and rooftop solar sit outside this count." },
+        "."
+      ],
+      "missing": { "answer": "pays", "also": [], "note": "Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Upcoming: lesson A2 on contracts and risk." },
+      "envelope": {
+        "kind": "power-to-energy",
+        "q": "How much energy can 15 GW of batteries store?",
+        "options": ["15 GWh", "60 GWh", "It depends on how many hours they last"],
+        "answer": 2,
+        "gw": 15, "durations": [1, 2, 4, 8], "duration": 4, "us_twh": 4200, "hours": 8760, "planned_gw": 18.2,
+        "feedback": ["Only if every battery lasts exactly one hour at full power.", "Only if they average exactly four hours; the story does not say.", "Right: energy (GWh) = power (GW) × duration (h), and the duration is missing."]
+      },
+      "take": "I accept that a record amount of battery power, about 15 GW, came online in 2025, as a preliminary count. Final annual data showing a much lower figure would change my mind. Confidence: high for the power; the energy stored cannot be known from this story.",
+      "sources": [
+        { "label": "EIA, Today in Energy: 2025 additions, preliminary", "url": "https://www.eia.gov/todayinenergy/detail.php?id=67205", "as_of": "20 February 2026" },
+        { "label": "EIA, Today in Energy: additions planned for 2025", "url": "https://www.eia.gov/todayinenergy/detail.php?id=64586", "as_of": "24 February 2025" },
+        { "label": "EIA, Energy Explained: utility-scale means 1 MW or more", "url": "https://www.eia.gov/energyexplained/electricity/electricity-in-the-us-generation-capacity-and-sales.php", "as_of": "checked 2 November 2026" },
+        { "label": "EIA, Energy Explained: U.S. use 4.20 trillion kWh in 2025", "url": "https://www.eia.gov/energyexplained/electricity/use-of-electricity.php", "as_of": "data for 2025" },
+        { "label": "EIA, Today in Energy: battery duration = MWh ÷ MW", "url": "https://www.eia.gov/todayinenergy/detail.php?id=51798", "as_of": "25 March 2022" }
+      ]
+    },
+    {
+      "id": "c",
+      "kicker": "Reliability · Spain and Portugal",
+      "headline": "Renewables caused the Iberian blackout",
+      "framing": "Our paraphrase of a claim that circulated soon after; no single outlet is quoted.",
+      "parts": [
+        "At 12:33 CEST (11:33 in Portugal) on 28 April 2025, ",
+        { "p": "c1", "text": "the continental power systems of Spain and Portugal", "tag": "scale", "also": [], "note": "The mainland grids of two countries went dark, not one plant or one city: that is why a formal investigation followed." },
+        " collapsed.\n",
+        { "p": "c2", "text": "Early posts and headlines named one cause", "tag": "time", "also": ["uncert"], "note": "The claim came before the evidence: the expert panel's factual report took 158 days, its final report 326." },
+        ": ",
+        { "p": "c3", "text": "renewables", "tag": "uncert", "also": ["counter"], "note": "A single cause from early, partial information. Ask who says it and what data they had." },
+        ".\nThe European grid operators' expert panel found ",
+        { "p": "c4", "text": "many interacting factors", "tag": "boundary", "also": ["uncert"], "note": "Control rules, regulation practices and protection settings are part of the system, not only the power plants." },
+        ".\nAmong them: ",
+        { "p": "c5", "text": "gaps in voltage and reactive-power control", "tag": "physics", "also": [], "note": "Frequency responds to any gap between supply and demand (lesson 0). Voltage also depends on local network conditions and reactive-power control, so a yearly energy total cannot diagnose this blackout." },
+        ", power swings (oscillations), and generators tripping off one after another (a cascade)."
+      ],
+      "missing": { "answer": "counter", "also": [], "q": "Which question would test the headline's claim of a cause?", "note": "Compared with what? The headline skips the test: would the same plants with different control settings, or different plants with the same settings, have held? The panel's event-by-event analysis is how such questions get answered." },
+      "envelope": {
+        "kind": "evidence-clock",
+        "q": "How long after the blackout did the expert panel publish its final report?",
+        "ticks": ["1 day", "1 week", "1 month", "5 months", "11 months", "2 years"],
+        "answer": 4,
+        "event": "2025-04-28", "factual": "2025-10-03", "final": "2026-03-20"
+      },
+      "take": "I reject the claim that renewables alone caused the blackout. An investigation tracing the collapse to one cause would change my mind. Confidence: high that there was no single cause, because the expert panel found many interacting factors.",
+      "sources": [
+        { "label": "ENTSO-E, 28 April 2025 Iberian blackout: expert panel reports", "url": "https://www.entsoe.eu/publications/blackout/28-april-2025-iberian-blackout/", "as_of": "factual report 3 October 2025; final report 20 March 2026" }
+      ]
+    }
+  ],
+  "spotter": [
+    { "id": "s1", "text": "The new battery can store 100 MW.", "answer": "error", "kind": "unit", "fix": "Stored energy is in MWh; 100 MW is how fast it charges or discharges. A 100 MW, four-hour battery stores 400 MWh." },
+    { "id": "s2", "text": "U.S. data centers used about 192 TWh of electricity in 2024.", "answer": "ok", "kind": "", "fix": "TWh over a year is an amount of energy: LBNL's estimate for 2024." },
+    { "id": "s3", "text": "A 13 kWh home battery can run an average U.S. home for a month.", "answer": "error", "kind": "scale", "fix": "An average home bought about 899 kWh a month (EIA, 2022 data), so 13 kWh lasts about 10 hours." },
+    { "id": "s4", "text": "The plant's two 500 MW units will generate 1,000 MW every hour of the year.", "answer": "error", "kind": "physics", "fix": "Nameplate (the maximum rated power) is a ceiling, not an output: plants run below it and stop for maintenance. Average output ÷ nameplate is the capacity factor (lesson 5)." },
+    { "id": "s5", "text": "In 2025 the United States used about 4,200 TWh of electricity.", "answer": "ok", "kind": "", "fix": "4.20 trillion kWh is 4,200 TWh (EIA, data for 2025)." },
+    { "id": "s6", "text": "A town of 10,000 homes needs about 10 GW of power.", "answer": "error", "kind": "scale", "fix": "At EIA's 10,791 kWh a home a year (2022 data), 10,000 homes use about 108 GWh a year: about 12 MW on average. Even a peak a few times higher is far below 10 GW." }
+  ],
+  "ladder": {
+    "rungs": [
+      { "id": "announced", "label": "Announced", "text": "Someone says it will happen." },
+      { "id": "funded", "label": "Funded", "text": "The money is committed." },
+      { "id": "permitted", "label": "Permitted", "text": "Regulators have approved it." },
+      { "id": "construction", "label": "Under construction", "text": "Work has started on site." },
+      { "id": "operating", "label": "Operating", "text": "It runs and is counted as in service." },
+      { "id": "design", "label": "At design output", "text": "It delivers what it was built to deliver." }
+    ],
+    "items": [
+      { "id": "l1", "text": "15 GW of batteries entered service in 2025 (preliminary count)", "answer": ["operating"], "note": "Operating, as counted so far. Whether each battery delivers its rated hours is the next rung up." },
+      { "id": "l2", "text": "18.2 GW of batteries planned for 2025, as reported at the start of the year", "answer": ["announced", "funded", "permitted", "construction"], "note": "Below operating: plans in EIA's inventory sit on different rungs. Actual additions were about 82% of this planned total." },
+      { "id": "l3", "text": "649 TWh of U.S. data-center use in 2030", "answer": ["projection"], "note": "Not on the ladder at all: a projection is a model's output, not a stage of anything being built." }
+    ],
+    "projection_label": "Not on the ladder: a projection"
+  },
+  "sensitivity": { "src": "LBNL 2025 Update, p. 5", "url": "https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update", "as_of": "published 18 June 2026", "used_by": "the Steelman box in learn/n01-news-lens.qmd",
+    "reference_twh": 649, "bounds": [521, 843],
+    "lower": [{ "what": "fewer IT installations than forecast", "twh": 578 }, { "what": "shorter working lives for specialised chips", "twh": 590 }],
+    "higher": [{ "what": "more specialised graphics chips installed", "twh": 664 }, { "what": "servers that draw more power when idle and run busier", "twh": 782 }] },
+  "numbers": [
+    { "n": "8,760 h", "what": "Hours in a year (not a leap year): 1 GW running all year is 8.76 TWh.", "src": "", "url": "", "as_of": "arithmetic" },
+    { "n": "192 TWh", "what": "U.S. data-center electricity use in 2024, about 4.7% of the total.", "src": "LBNL 2025 Update, p. 8", "url": "https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update", "as_of": "published June 2026" },
+    { "n": "15 GW", "what": "U.S. utility-scale battery power added in 2025, a record (preliminary).", "src": "EIA, Today in Energy", "url": "https://www.eia.gov/todayinenergy/detail.php?id=67205", "as_of": "February 2026" },
+    { "n": "4.20 trillion kWh", "what": "U.S. electricity use in 2025, about 480 GW on average.", "src": "EIA, Energy Explained", "url": "https://www.eia.gov/energyexplained/electricity/use-of-electricity.php", "as_of": "data for 2025" },
+    { "n": "326 days", "what": "From the Iberian blackout to the expert panel's final report.", "src": "ENTSO-E", "url": "https://www.entsoe.eu/publications/blackout/28-april-2025-iberian-blackout/", "as_of": "final report 20 March 2026" }
+  ]
+}

@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Bridge B3 of Energy Systems, Step by Step: read a published-style dispatch model (sets, parameters, variables, objective, constraints) in plain words and units, hunt five planted bugs and run each with a real solver, then check a solved model’s energy balance and dual signs, and tell verification from validation.">
+
+<title>How do you read a formulation, and check that a model is right? – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="How do you read a formulation, and check that a model is right? – Honglin Li">
+<meta property="og:description" content="Bridge B3 of Energy Systems, Step by Step: read a published-style dispatch model (sets, parameters, variables, objective, constraints) in plain words and units, hunt five planted bugs and run each with a real solver, then check a solved model’s energy balance and dual signs, and tell verification from validation.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Field Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">How do you read a formulation, and check that a model is right?</h1>
+</div>
+
+<div>
+  <div class="description">
+    Bridge B3 of Energy Systems, Step by Step: read a published-style dispatch model (sets, parameters, variables, objective, constraints) in plain words and units, hunt five planted bugs and run each with a real solver, then check a solved model’s energy balance and dual signs, and tell verification from validation.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- Bridge B3 in the step-card form (Learn W1, 2026-11-02). Eight cards of one idea and one action each. Model, view and
+     checks: assets/learn/b03-read-check-formulation.js with assets/learn/data/b03-read-check-formulation.json, town.json and
+     town_year.json; the models are solved in the browser with HiGHS (assets/learn/components/solver.js). The Check section
+     ends with the practice set (#b3-practice): nine exercises in three sets (Read a line, Hunt the bug, Check a solution),
+     each worked -> partly worked -> from scratch, about 39 minutes plus the quick questions. Every number below is checked
+     by node _tests/learn/test_b03-read-check-formulation.js, which solves the same models with the vendored HiGHS.
+     The learn:meta, learn:next and learn:footer blocks are written by scripts/build_learn.py (ResearchPortfolio folder). -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "How do you read a formulation, and check that a model is right?", "description": "Bridge B3 of Energy Systems, Step by Step: read a published-style dispatch model (sets, parameters, variables, objective, constraints) in plain words and units, hunt five planted bugs and run each with a real solver, then check a solved model's energy balance and dual signs, and tell verification from validation.", "learningResourceType": "Interactive lesson", "educationalLevel": "Intermediate", "timeRequired": "PT75M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["reading a formulation", "sets", "parameters and variables", "model verification", "dual signs"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/b03-read-check-formulation.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"b03-read-check-formulation","starter":null,"total":14,"code":"B3","title":"How do you read a formulation, and check that a model is right?","subtitle":null,"short":"Read and check a formulation","tier":"analyst","tier2":"modeler","tierLabel":"Analyst to Modeler · L2–L3","level":"L2","slot":2,"slot2":3,"minutes":30,"does":"Read a published-style formulation (sets, indices, parameters, variables, constraints) and translate each line into words and units; find five planted errors (unit, sign, missing index, wrong sum, a free lunch); check a solved model's energy balance and the signs of its duals.","outcome":"Read a published formulation line by line, find planted errors and check a solved model's balance and duals.","icon":"question","form":"cards","scales":[],"teaches":["reading a formulation","sets","parameters and variables","model verification","dual signs"],"lab":null,"href":"b03-read-check-formulation.html","ready":true,"after":[{"id":"b01-algebra-to-lp","code":"B1","title":"From algebra to a linear program: how do equations become a model?","short":"Algebra to a linear program","does":"Start with a ten-question readiness check that routes you to the toolbox if needed; turn three word problems into equations and inequalities, then into a linear program; drag the constraints of a two-variable LP; write the same model as Ax <= b with a linked view.","href":"b01-algebra-to-lp.html","ready":true}],"prev":null,"next":{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true},"practice":45}</script>
+<div class="lx-head" data-lesson-id="b03-read-check-formulation" data-total="14" data-tier="analyst" data-tier2="modeler" data-level="L2" data-minutes="30" data-form="cards" data-next-href="m01-dispatch-to-lmp.html">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">B3</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst to Modeler · L2–L3</li>
+<li>30 min guided · about 45 min practice</li>
+<li>After <a href="b01-algebra-to-lp.html">B1</a></li>
+<li class="lx-done-tag" data-lesson-id="b03-read-check-formulation" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#steps"><span class="lx-n">1</span>Step by step</a></li><li><a href="#explain"><span class="lx-n">2</span>Explain</a></li><li><a href="#check"><span class="lx-n">3</span>Check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<style>
+.w1h-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.w1h-ans label { font-family: var(--lx-f-display); font-weight: 500; min-width: 7em; }
+.w1h-num { width: 6em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
+  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
+.w1h-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
+.k4-mark { font-size: 13.5px; font-family: var(--lx-f-display); }
+.k4-mark.good { color: var(--lx-good); } .k4-mark.bad { color: var(--lx-warn); }
+.b3-note { font-size: 13.5px; color: var(--lx-ink-3); font-family: var(--lx-f-body); }
+.b3-blocks { display: grid; gap: 6px; }
+.b3-block { border: 1px solid var(--lx-line); border-radius: 10px; background: var(--lx-surface-2); padding: 0 12px; }
+.b3-block > summary { display: grid; grid-template-columns: 1.6em 7.5em minmax(0, 1fr); gap: 4px 8px; align-items: baseline; min-height: 46px; padding: 10px 0; cursor: pointer; list-style: none; }
+.b3-block > summary::-webkit-details-marker { display: none; }
+.b3-block[open] > summary b { color: var(--lx-accent); }
+.b3-bn { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
+.b3-block b { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
+.b3-block { position: relative; } .b3-block > summary { padding-right: 34px; }
+.b3-block > summary::after { content: "+"; position: absolute; right: 10px; top: 10px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px;
+  border: 1px solid var(--lx-line-2); font-family: var(--lx-f-mono); font-size: 14px; color: var(--lx-ink-2); }
+.b3-block[open] > summary::after { content: "\2212"; }
+.b3-bh { font-family: var(--lx-f-mono); font-size: 14.5px; color: var(--lx-ink); }
+.b3-block p { padding: 0 0 12px; font-size: 15px; color: var(--lx-ink-2); }
+@media (max-width: 560px) { .b3-block > summary { grid-template-columns: 1.6em minmax(0, 1fr); } .b3-bh { grid-column: 2; } }
+.b3-grid { display: grid; gap: 3px; font-family: var(--lx-f-mono); max-width: 560px; }
+.b3-gr { display: grid; grid-template-columns: 8.2em repeat(4, minmax(0, 1fr)); gap: 3px; }
+.b3-gr.head { font-size: 13px; }
+.b3-corner { color: var(--lx-ink-3); font-size: 12.5px; align-self: center; }
+.b3-ch, .b3-rh, .b3-cell { min-height: 40px; border-radius: 8px; border: 1px solid var(--lx-line); background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 15px; cursor: pointer; }
+.b3-ch, .b3-rh { background: var(--lx-surface-2); font-family: var(--lx-f-display); font-size: 13.5px; }
+.b3-rh { text-align: left; padding: 0 8px; }
+.b3-cell { text-align: right; padding: 0 8px; }
+.b3-cell.on { background: var(--lx-accent-soft); border-color: var(--lx-accent); font-weight: 600; }
+.b3-ch.on, .b3-rh.on { border-color: var(--lx-accent); box-shadow: inset 0 0 0 1px var(--lx-accent); }
+@media (max-width: 560px) { .b3-gr { grid-template-columns: 6.6em repeat(4, minmax(0, 1fr)); gap: 2px; } .b3-cell { padding: 0 4px; font-size: 13.5px; }
+  .b3-ch, .b3-rh { font-size: 12px; padding: 0 4px; } }
+.b3-units { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.b3-unit { display: grid; gap: 4px; justify-items: center; }
+.b3-usym { font-family: var(--lx-f-mono); font-size: 17px; }
+.b3-sel { min-height: 42px; border-radius: 9px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 15px; padding: 0 6px; }
+.b3-times { font-family: var(--lx-f-mono); font-size: 20px; color: var(--lx-ink-3); align-self: end; padding-bottom: 8px; }
+.b3-res { font-family: var(--lx-f-mono); font-size: 20px; font-weight: 600; align-self: end; padding-bottom: 8px; }
+.b3-tabs .lx-seg { flex-wrap: wrap; }
+.b3-suspect { display: grid; gap: 8px; }
+.b3-caught { display: block; margin-top: 4px; color: var(--lx-ink-2); font-size: 14px; }
+.b3-sym { font-size: 15px; color: var(--lx-ink); min-height: 1.4em; }
+.b3-check { display: grid; gap: 3px; font-family: var(--lx-f-mono); }
+.b3-cr { display: grid; grid-template-columns: 4em minmax(0, 1fr) 4.6em 4.4em 4.4em; gap: 4px; align-items: center; padding: 6px 8px; border-radius: 8px;
+  border: 1px solid var(--lx-line); background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 14px; text-align: right; cursor: pointer; }
+.b3-cr span:first-child, .b3-cr .pl { text-align: left; }
+.b3-cr.head { border: 0; background: transparent; cursor: default; font-size: 11.5px; color: var(--lx-ink-3); text-transform: uppercase; letter-spacing: .04em; }
+.b3-cr.ok { border-color: var(--lx-good); } .b3-cr.ok .sum { color: var(--lx-good); font-weight: 600; } .b3-cr.bad .sum { color: var(--lx-bad); }
+@media (max-width: 560px) { .b3-cr { grid-template-columns: 3.4em minmax(0, 1fr) 3em 3.6em 3.6em; font-size: 12.5px; padding: 6px 4px; } .b3-cr.head { font-size: 10px; } }
+.b3-pred { display: grid; gap: 8px; }
+.b3-vv { display: grid; gap: 8px; }
+.b3-vvrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); }
+.b3-vvrow p { grid-column: 1 / -1; font-size: 15px; }
+.b3-vvrow .lx-seg { grid-row: 2; grid-column: 1; justify-self: start; }
+.b3-vvrow .k4-mark { grid-row: 2; grid-column: 2; }
+.b3-static { font-family: var(--lx-f-mono); font-size: 14.5px; display: grid; gap: 4px; margin: 0; padding-left: 1.4rem; }
+/* faded practice (Check section), the same frame as B1's: sets of worked -> partly worked -> from-scratch exercises */
+  .lx-fp-tab.b3-ptab th, .lx-fp-tab.b3-ptab td { padding: 5px 4px; font-size: 13px; }
+.lx-fp-wl { display: grid; gap: 4px; }
+/* the symbol key (steps 1 and 5, and the fallback) and the practice set without JavaScript */
+.page-learn .b3-keytab td, .page-learn .b3-keytab th[scope="row"] { font-size: 14px; vertical-align: top; }
+.page-learn .b3-keytab th[scope="row"] { font-family: var(--lx-f-mono); text-transform: none; letter-spacing: 0; color: var(--lx-ink); white-space: nowrap; }
+@media (max-width: 560px) {
+  .page-learn .b3-keytab thead { display: none; }
+  .page-learn .b3-keytab tr { display: grid; grid-template-columns: 6.2em minmax(0, 1fr); gap: 2px 10px; padding: 7px 0; border-bottom: 1px solid var(--lx-line); }
+  .page-learn .b3-keytab th[scope="row"], .page-learn .b3-keytab td { border: 0; padding: 0; white-space: normal; }
+  .page-learn .b3-keytab th[scope="row"] { grid-row: span 3; }
+  .page-learn .b3-keytab td { grid-column: 2; }
+  .page-learn .b3-keytab td:nth-of-type(2) { color: var(--lx-ink-3); font-size: 13px; }
+  .page-learn .b3-keytab td:empty { display: none; }
+}
+.b3-pstatic { display: grid; gap: 10px; }
+.page-learn .b3-pstatic h3 { margin: 6px 0 0; font-size: 18px; }
+.page-learn .b3-ps { margin: 0; padding-left: 1.3rem; display: grid; gap: 14px; }
+.page-learn .b3-ps > li { display: grid; gap: 6px; }
+.page-learn .b3-ps p, .page-learn .b3-ps li li { font-size: 15px; margin: 0; }
+.page-learn .b3-static-line { font-family: var(--lx-f-mono); }
+.page-learn .b3-static-worked, .page-learn .b3-static-ch { margin: 0; padding-left: 1.2rem; display: grid; gap: 3px; }
+.b3-static-n { color: var(--lx-ink-3); font-size: 13px; }
+.page-learn .b3-why { margin: 8px 0 0; padding-left: 1.2rem; display: grid; gap: 6px; font-size: 14.5px; color: var(--lx-ink-2); }
+.page-learn .b3-why li { margin: 0; }
+.page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+.page-learn .lx-datanote li { margin: 0; }
+.lx-fp-wrow { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 4px 12px; align-items: baseline; padding: 7px 10px; border-radius: 10px; background: var(--lx-surface-2); }
+.lx-fp-wk { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
+.lx-fp-wv { font-size: 15px; color: var(--lx-ink); }
+@media (max-width: 560px) { .lx-fp-wrow { grid-template-columns: minmax(0, 1fr); } }
+.lx-fp-field label { min-width: 0; flex: 0 1 19em; font-size: 15px; }
+.b3-ptab thead th:not(:first-child) { text-align: right; }
+.lx-fp-field .w1h-num { width: 7em; }
+.page-learn .lx-fp-given { margin: 0; padding-left: 1.2rem; font-size: 15px; }
+.b3-ptab th[scope="row"] { font-family: var(--lx-f-display); font-weight: 500; font-size: 13.5px; color: var(--lx-ink-2); text-transform: none; letter-spacing: 0; white-space: nowrap; }
+.b3-ptab td.n { text-align: right; }
+.b3-ptab tr.dem td, .b3-ptab tr.dem th { border-top: 2px solid var(--lx-line-2); }
+@media (max-width: 560px) { .b3-ptab th[scope="row"] { white-space: normal; } }
+.b3-ptab td.hi { background: var(--lx-accent-soft); font-weight: 600; }
+</style>
+<div id="steps" class="lx-sec">
+<div class="lx-interactive lx-cards" data-learn="b03" data-src="../assets/learn/data/b03-read-check-formulation.json ../assets/learn/data/town.json ../assets/learn/data/town_year.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">Prairie Town's <span class="lx-term" data-term="dispatch">dispatch</span>, 17:00 to 20:00 on 3 September 2025, as a published model would write it</p>
+<ol class="b3-static">
+<li>min Σ<sub>t∈T</sub> Σ<sub>g∈G</sub> c<sub>g</sub> p<sub>g,t</sub> Δt + Σ<sub>t∈T</sub> V u<sub>t</sub> Δt</li>
+<li>Σ<sub>g∈G</sub> p<sub>g,t</sub> + u<sub>t</sub> = d<sub>t</sub> ∀ t ∈ T (balance)</li>
+<li>p<sub>g,t</sub> ≤ P̄<sub>g</sub> ∀ g ∈ G, t ∈ T (sizes)</li>
+<li>p<sub>g,t</sub> ≤ a<sub>g,t</sub> ∀ g ∈ {wind, solar}, t ∈ T (weather)</li>
+<li>−R Δt ≤ p<sub>cc,t</sub> − p<sub>cc,t−1</sub> ≤ R Δt ∀ t ∈ T (ramp; the start p<sub>cc,16</sub> = 45 MW is given)</li>
+<li>p<sub>nuc,t</sub> = P̄<sub>nuc</sub> ∀ t ∈ T (nuclear runs flat); p, u ≥ 0</li>
+</ol>
+<!-- b3-static-key:start -->
+<details class="lx-textalt b3-key"><summary>Symbol key and input values</summary>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-keytab caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Symbol</th>
+<th data-quarto-table-cell-role="th" scope="col">Meaning</th>
+<th data-quarto-table-cell-role="th" scope="col">Unit</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuc, wind, solar, cc, pk</th>
+<td>the plants in G: nuclear, wind farm, solar farm, combined-cycle gas plant, peaker</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row"><em>d<sub>t</sub></em></th>
+<td>demand in hour t</td>
+<td>MW</td>
+<td>17:00 349, 18:00 344, 19:00 331, 20:00 319</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row"><em>a</em><sub>wind,<em>t</em></sub></th>
+<td>wind the weather allows</td>
+<td>MW</td>
+<td>17:00 54, 18:00 59, 19:00 72, 20:00 89</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row"><em>a</em><sub>solar,<em>t</em></sub></th>
+<td>sun the weather allows</td>
+<td>MW</td>
+<td>17:00 130, 18:00 70, 19:00 14, 20:00 0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row"><em>c<sub>g</sub></em></th>
+<td>running cost of plant g</td>
+<td>$/MWh</td>
+<td>nuc 10, wind 0, solar 0, cc 40, pk 100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row"><em>P̄<sub>g</sub></em></th>
+<td>size of plant g</td>
+<td>MW</td>
+<td>nuc 100, wind 150, solar 200, cc 150, pk 100</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row"><em>R</em></th>
+<td>how far the cc plant can move in an hour</td>
+<td>MW per hour</td>
+<td>40</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row"><em>p</em><sub>cc,16</sub></th>
+<td>cc output at 16:00, the start: given, not chosen</td>
+<td>MW</td>
+<td>45</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row"><em>V</em></th>
+<td>charge for each MWh of unserved demand</td>
+<td>$/MWh</td>
+<td>10,000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Δ<em>t</em></th>
+<td>length of one step</td>
+<td>h</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div></details>
+<!-- b3-static-key:end -->
+<p>Its solution costs $22,600: the combined-cycle plant makes 75, 115, 145 and 130 MW, the peaker nothing, and the balance holds in all four hours.</p>
+<p class="lx-hint">With JavaScript on, you read it line by line, hunt five planted bugs and check the solution with a real solver.</p>
+</div>
+</div>
+<div class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
+<li>Demand, wind and solar: the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
+<li>Start: the combined-cycle plant's 45 MW at 16:00, from lesson 0's cheapest-first plan.</li>
+<li>Plant sizes and costs are Prairie Town's; the $10,000/MWh charge for unserved demand is illustrative.</li>
+<li>Solver: HiGHS 1.15, in your browser.</li>
+</ul></div>
+</div>
+<div id="explain" class="lx-sec">
+<section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="what-you-just-did-as-diagrams">What you just did, as diagrams</h2>
+</section>
+<div id="b3-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Reading sequence</dt><dd>Sets, parameters, variables, objective, constraints: what is counted, given, chosen, scored and ruled out.</dd>
+<dt>Indices and sums</dt><dd>p with indices g and t is a table; Σ over g adds a column, Σ over t a row.</dd>
+<dt>Units</dt><dd>$/MWh × MW × h = $: every term of the objective in dollars, with Δt written out.</dd>
+<dt>For all</dt><dd>One line with ∀ t ∈ T stands for one row per hour.</dd>
+<dt>Verification</dt><dd>Does the model do what its equations say? Units, signs, balance, duals, a hand check.</dd>
+<dt>Validation</dt><dd>Is the model right enough for the question? Compare with real data and expert judgement.</dd>
+</dl>
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Analyst</span>Why the balance dual is $0 at 17:00 and $80 at 18:00</summary>
+<div class="lx-deeper-body">
+<p>A <span class="lx-term" data-term="shadow-price">balance dual</span> is the change in the cheapest total cost when one hour’s demand rises by 1 MWh.</p>
+<ul>
+<li><strong>19:00 and 20:00: $40.</strong> The combined-cycle plant simply makes 1 MW more.</li>
+<li><strong>18:00: $80.</strong> The plant already climbs its full 40 MW from 17:00, so 1 MW more at 18:00 needs 1 MW more at 17:00 too, where it pushes out free wind: $40 + $40 = $80, still below the $100 peaker.</li>
+<li><strong>17:00: $0.</strong> The plan already spills 10 MW of wind and sun to warm the plant up for the evening; one more MWh there just spills less.</li>
+<li><strong>Linked hours.</strong> The ramp links the hours, so it links their prices. The Modeler lesson M1 reads such duals as marginal values for a whole day.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The objective and the balance in Pyomo</summary>
+<div class="lx-deeper-body">
+<p>Each line of the formulation becomes one line of code, with the sets doing the copying. Here are the objective and the balance in <a href="https://www.pyomo.org/">Pyomo</a>, with <code>c</code>, <code>d</code>, <code>V</code> and <code>dt</code> holding the parameters; the sizes, weather, ramp and nuclear lines are left out:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyomo.environ <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> ConcreteModel()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>m.T <span class="op">=</span> Set(initialize<span class="op">=</span>[<span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">19</span>, <span class="dv">20</span>])</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>m.G <span class="op">=</span> Set(initialize<span class="op">=</span>[<span class="st">"nuc"</span>, <span class="st">"wind"</span>, <span class="st">"solar"</span>, <span class="st">"cc"</span>, <span class="st">"pk"</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>m.p <span class="op">=</span> Var(m.G, m.T, within<span class="op">=</span>NonNegativeReals)   <span class="co"># MW</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>m.u <span class="op">=</span> Var(m.T, within<span class="op">=</span>NonNegativeReals)        <span class="co"># MW</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>m.cost <span class="op">=</span> Objective(expr<span class="op">=</span><span class="bu">sum</span>(c[g] <span class="op">*</span> m.p[g, t] <span class="op">*</span> dt <span class="cf">for</span> g <span class="kw">in</span> m.G <span class="cf">for</span> t <span class="kw">in</span> m.T)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                        <span class="op">+</span> <span class="bu">sum</span>(V <span class="op">*</span> m.u[t] <span class="op">*</span> dt <span class="cf">for</span> t <span class="kw">in</span> m.T))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>m.balance <span class="op">=</span> Constraint(m.T, rule<span class="op">=</span><span class="kw">lambda</span> m, t:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">sum</span>(m.p[g, t] <span class="cf">for</span> g <span class="kw">in</span> m.G) <span class="op">+</span> m.u[t] <span class="op">==</span> d[t])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Suspect 3 in code is a single balance row for hour 17, in place of the indexed one:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m.balance <span class="op">=</span> Constraint(expr<span class="op">=</span><span class="bu">sum</span>(m.p[g, <span class="dv">17</span>] <span class="cf">for</span> g <span class="kw">in</span> m.G) <span class="op">+</span> m.u[<span class="dv">17</span>] <span class="op">==</span> d[<span class="dv">17</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><strong>Drop <code>* dt</code>:</strong> the objective is then right only at one-hour steps.</li>
+<li><strong>The skill:</strong> reading code against the formulation, line by line, as in this lesson.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Researcher</span>Validation in published energy studies</summary>
+<div class="lx-deeper-body">
+<p>Validating an optimization model is hard: it describes what would be cheapest, not what will happen.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Approach</th>
+<th>Evidence</th>
+<th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Look back</td>
+<td>For the UK’s electricity transition from 1990 to 2014, the cumulative cost of the real path deviated by 9 to 23% from the cost-optimal paths of a model, under the study’s alternative assumptions (<a href="https://doi.org/10.1016/j.energy.2016.03.038">Trutnevyte, 2016</a>).</td>
+<td>One country and one model; the real path was never meant to be cost-optimal.</td>
+</tr>
+<tr class="even">
+<td>Good practice</td>
+<td>Guidance for energy-system optimization studies asks for documented, verifiable models and for uncertainty to be explored, not hidden (<a href="https://doi.org/10.1016/j.apenergy.2017.03.001">DeCarolis et al., 2017</a>).</td>
+<td>A standard to meet, not a test that passes or fails.</td>
+</tr>
+</tbody>
+</table>
+<p>The Researcher lesson R5 (upcoming) turns both into a routine.</p>
+</div>
+</details>
+</div>
+</div>
+<div id="check" class="lx-sec">
+<section id="check-yourself" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-yourself">Check yourself</h2>
+</section>
+<div class="lx-myths" data-quiz="b3-myth">
+<div class="lx-qq" data-id="optimal" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A model that solves to ‘optimal’ has passed verification.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. All five suspects solved to optimal. The solver checks the mathematics, not whether it says what you meant.</p></details>
+</div>
+<div class="lx-qq" data-id="neg2" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A balance dual can never be negative.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Here all four are ≥ 0, but when output is forced above demand, more demand saves money: cut 17:00 demand to 105 MW and its dual becomes −$140. Real markets see <span class="lx-term" data-term="negative-price">negative prices</span> for the same reason.</p></details>
+</div>
+<div class="lx-qq" data-id="dt" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “Adding up p in MW over the hours gives energy in MWh.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Multiply by Δt first. With one-hour steps the number happens to be the same; at 15-minute steps the plain sum is four times too big.</p></details>
+</div>
+</div>
+
+<div class="lx-quiz" data-quiz="b3">
+<div class="lx-qq" data-id="fast" data-answer="a">
+<p class="lx-qtext">A model's cost is far below your hand estimate, and the dearest plant runs first. Which check finds the bug fastest?</p>
+<ul class="lx-choices"><li data-value="a">The units of every parameter</li><li data-value="b">The balance in every hour</li><li data-value="c">Counting rows</li><li data-value="d">The signs of the duals</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>The units: a cost in $/kWh read as $/MWh makes a plant look a thousand times cheaper, as suspect 1 showed. The balance still holds.</p></details>
+</div>
+<div class="lx-qq" data-id="rows" data-answer="c">
+<p class="lx-qtext">How many rows does p(g,t) ≤ P̄(g) ∀ g ∈ G, t ∈ T stand for, with 5 plants and a whole day of 24 hours?</p>
+<ul class="lx-choices"><li data-value="a">5</li><li data-value="b">24</li><li data-value="c">120</li><li data-value="d">29</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>120: one row for each plant in each hour, 5 × 24.</p></details>
+</div>
+</div>
+<div id="b3-practice">
+<!-- b3-static-practice:start -->
+<div class="lx-card b3-pstatic">
+<p class="lx-eyebrow">Practice: nine exercises in three sets · about 39 min</p>
+<p class="lx-hint">With JavaScript on, each exercise runs the solver, gives hints one at a time and checks your answer.</p>
+<h3 class="anchored">Read a line</h3>
+<p>Say what a line means, the unit of every symbol, and how many rows it stands for.</p>
+<ol class="b3-ps">
+<li><p><b>The ramp line, word by word</b> (worked example, about 2 min)</p>
+<p class="b3-static-line">−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i></p>
+<ul class="b3-static-worked"><li><b>In words.</b> From one hour to the next, the combined-cycle plant's output changes by at most R, up or down.</li><li><b>Units.</b> p is in MW; R = 40 MW per hour times Δt = 1 h is MW too: every side in MW.</li><li><b>Rows.</b> Two limits per hour, one on each side: 4 hours give 8 rows.</li><li><b>First hour.</b> At t = 17, p(cc, 16) is not a variable but the start, 45 MW: a parameter.</li></ul>
+<p>How many rows would this line stand for over a whole day of 24 hours?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Two rows per hour, 2 × 24 = 48.</p></details></li>
+<li><p><b>A storage line: the units</b> (partly worked, about 3 min)</p>
+<p class="b3-static-line"><i>e<sub>t</sub></i> = <i>e</i><sub><i>t</i>−1</sub> + η <i>q<sub>t</sub></i> Δ<i>t</i> − <i>w<sub>t</sub></i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i></p>
+<p>The energy in a battery at the end of hour t is what it held an hour before, plus what charging adds after losses, minus what it discharges.</p>
+<ul class="b3-static-worked"><li><i>e<sub>t</sub></i>, energy stored: <b>MWh</b> (given)</li><li>Δ<i>t</i>, the step: <b>h</b> (given)</li></ul>
+<p>Give the unit of each: <i>q<sub>t</sub></i>, charging power, η, the share kept, <i>w<sub>t</sub></i>, discharging power. Rows for the 4 hours of T?</p>
+<details class="lx-answer"><summary>Answer</summary><p>q(t): MW; η: no unit; w(t): MW. MWh = MWh + (no unit × MW × h) − (MW × h), and 4 rows, one per hour.</p></details></li>
+<li><p><b>A reserve line, from scratch</b> (from scratch, about 5 min)</p>
+<p class="b3-static-line">Σ<sub><i>g</i>∈{cc, pk}</sub> (<i>P̄<sub>g</sub></i> − <i>p<sub>g,t</sub></i>) ≥ <i>r<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i></p>
+<p>What does this line ask for?</p>
+<ol class="b3-static-ch" type="a"><li>Every hour, the two gas plants keep at least r(t) of unused capacity in hand.</li><li>Every hour, the two gas plants make at least r(t).</li><li>Over the whole day, the gas plants' unused capacity adds up to at least r.</li><li>Every hour, each gas plant keeps r(t) unused.</li></ol>
+<p>The unit of r(t)? Its rows over a day of 24 hours? Rows of the 24-hour model with this line added?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Every hour, the two gas plants keep at least r(t) of unused capacity in hand. Unused gas capacity in MW, one row per hour; 264 rows for the day plus 24 reserve rows: 288.</p></details></li>
+</ol>
+<h3 class="anchored">Hunt the bug</h3>
+<p>Three more colleagues, three more planted errors: run each model and let its numbers point to the line.</p>
+<ol class="b3-ps">
+<li><p><b>The penalty in the wrong unit</b> (worked example, about 3 min)</p>
+<ol class="b3-static"><li><i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk); <i>V</i> = 10 $/kWh <span class="b3-static-n">(costs)</span></li><li>min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i> <span class="b3-static-n">(objective)</span></li><li>Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(balance)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(sizes)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(weather)</span></li><li>−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(ramp)</span></li><li><i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(nuclear runs flat)</span></li></ol>
+<p>The solved plan:</p>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-ptab caption-top table">
+<caption>The solved plan, MW, by plant and hour</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">MW</th>
+<th data-quarto-table-cell-role="th" scope="col">17:00</th>
+<th data-quarto-table-cell-role="th" scope="col">18:00</th>
+<th data-quarto-table-cell-role="th" scope="col">19:00</th>
+<th data-quarto-table-cell-role="th" scope="col">20:00</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuclear</th>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">wind</th>
+<td class="n">54</td>
+<td class="n">59</td>
+<td class="n">72</td>
+<td class="n">89</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">solar</th>
+<td class="n">130</td>
+<td class="n">70</td>
+<td class="n">14</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">combined-cycle</th>
+<td class="n">5</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">peaker</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">unserved</th>
+<td class="n">60</td>
+<td class="n">115</td>
+<td class="n">145</td>
+<td class="n">130</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">demand</th>
+<td class="n">349</td>
+<td class="n">344</td>
+<td class="n">331</td>
+<td class="n">319</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="b3-static-worked"><li><b>Symptom.</b> Optimal at $8,700. 60–145 MW unserved every hour, while the combined-cycle plant makes at most 5 MW.</li><li><b>Caught by.</b> The units of every parameter: V = 10 $/kWh is $10,000/MWh, yet the model used 10.</li><li><b>Also caught by.</b> The duals: every balance dual is $10/MWh, below the $40 of the cheapest gas plant. Unserved demand became the cheapest “plant”.</li><li><b>Fix.</b> Convert first: 10 $/kWh × 1,000 kWh per MWh = $10,000/MWh.</li></ul>
+<p>Which number in the solution gives the bug away first?</p>
+<ol class="b3-static-ch" type="a"><li>60–145 MW unserved while a gas plant idles</li><li>Nuclear at 100 MW every hour</li><li>Wind at 89 MW at 20:00</li><li>No output from the peaker</li></ol>
+<details class="lx-answer"><summary>Answer</summary><p>60–145 MW unserved while a gas plant idles. Demand left unserved while a cheaper plant could run is the first thing to explain.</p></details></li>
+<li><p><b>Nuclear no longer flat</b> (partly worked, about 5 min)</p>
+<p>Optimal at $22,500: $100 less than the right model's $22,600. Nuclear makes 90 MW at 17:00.</p>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-ptab caption-top table">
+<caption>The solved plan, MW, by plant and hour</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">MW</th>
+<th data-quarto-table-cell-role="th" scope="col">17:00</th>
+<th data-quarto-table-cell-role="th" scope="col">18:00</th>
+<th data-quarto-table-cell-role="th" scope="col">19:00</th>
+<th data-quarto-table-cell-role="th" scope="col">20:00</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuclear</th>
+<td class="n">90</td>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">wind</th>
+<td class="n">54</td>
+<td class="n">59</td>
+<td class="n">72</td>
+<td class="n">89</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">solar</th>
+<td class="n">130</td>
+<td class="n">70</td>
+<td class="n">14</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">combined-cycle</th>
+<td class="n">75</td>
+<td class="n">115</td>
+<td class="n">145</td>
+<td class="n">130</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">peaker</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">unserved</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">demand</th>
+<td class="n">349</td>
+<td class="n">344</td>
+<td class="n">331</td>
+<td class="n">319</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol class="b3-static"><li><i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk) <span class="b3-static-n">(costs)</span></li><li>min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i> <span class="b3-static-n">(objective)</span></li><li>Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(balance)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(sizes)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(weather)</span></li><li>−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(ramp)</span></li><li><i>p</i><sub>nuc,<i>t</i></sub> ≤ <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(nuclear runs flat)</span></li></ol>
+<p>Which line was changed, and which check catches it: Units of every parameter; The balance, hour by hour; Outputs against what each plant must do; Counting rows?</p>
+<details class="lx-answer"><summary>Answer</summary><p>= became ≤ in line (5). The 17:00 balance dual moves from $0 to $10: one more MWh of demand now raises nuclear from 90 to 91 MW, at $10. Caught by: outputs against what each plant must do.</p></details></li>
+<li><p><b>A plant counted twice</b> (from scratch, about 7 min)</p>
+<ol class="b3-static"><li><i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk) <span class="b3-static-n">(costs)</span></li><li>min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i> <span class="b3-static-n">(objective)</span></li><li>Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>p</i><sub>wind,<i>t</i></sub> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(balance)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(sizes)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(weather)</span></li><li>−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(ramp)</span></li><li><i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(nuclear runs flat)</span></li></ol>
+<p>The solved plan:</p>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-ptab caption-top table">
+<caption>The solved plan, MW, by plant and hour</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">MW</th>
+<th data-quarto-table-cell-role="th" scope="col">17:00</th>
+<th data-quarto-table-cell-role="th" scope="col">18:00</th>
+<th data-quarto-table-cell-role="th" scope="col">19:00</th>
+<th data-quarto-table-cell-role="th" scope="col">20:00</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuclear</th>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">wind</th>
+<td class="n">51.5</td>
+<td class="n">59</td>
+<td class="n">72</td>
+<td class="n">89</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">solar</th>
+<td class="n">130</td>
+<td class="n">70</td>
+<td class="n">14</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">combined-cycle</th>
+<td class="n">16</td>
+<td class="n">56</td>
+<td class="n">73</td>
+<td class="n">41</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">peaker</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">unserved</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">demand</th>
+<td class="n">349</td>
+<td class="n">344</td>
+<td class="n">331</td>
+<td class="n">319</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Supply at 19:00, all five plants? Shortfall at 19:00? Which line causes it?</p>
+<details class="lx-answer"><summary>Answer</summary><p>259 MW against 331: 72 MW short, exactly the wind output. The balance line counts wind twice, so the model believes it is balanced.</p></details></li>
+</ol>
+<h3 class="anchored">Check a solution</h3>
+<p>Before you trust a solution: the balance in an hour, the cost by hand, and the signs and sizes of the duals.</p>
+<ol class="b3-ps">
+<li><p><b>Three checks on the right solution</b> (worked example, about 3 min)</p>
+<p>The solved plan:</p>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-ptab caption-top table">
+<caption>The solved plan, MW, by plant and hour</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">MW</th>
+<th data-quarto-table-cell-role="th" scope="col">17:00</th>
+<th data-quarto-table-cell-role="th" scope="col">18:00</th>
+<th data-quarto-table-cell-role="th" scope="col">19:00</th>
+<th data-quarto-table-cell-role="th" scope="col">20:00</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuclear</th>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">wind</th>
+<td class="n">44</td>
+<td class="n">59</td>
+<td class="n">72</td>
+<td class="n">89</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">solar</th>
+<td class="n">130</td>
+<td class="n">70</td>
+<td class="n">14</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">combined-cycle</th>
+<td class="n">75</td>
+<td class="n">115</td>
+<td class="n">145</td>
+<td class="n">130</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">peaker</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">unserved</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">supply</th>
+<td class="n">349</td>
+<td class="n">344</td>
+<td class="n">331</td>
+<td class="n">319</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">demand</th>
+<td class="n">349</td>
+<td class="n">344</td>
+<td class="n">331</td>
+<td class="n">319</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="b3-static-worked"><li><b>Balance at 19:00.</b> 100 + 72 + 14 + 145 + 0 = 331 MW, the demand ✓</li><li><b>Cost by hand.</b> nuclear 400 MWh × $10 = $4,000; combined-cycle 465 MWh × $40 = $18,600; total $22,600, the solver's objective ✓</li><li><b>Duals.</b> $0, $80, $40 and $40 per MWh: all ≥ 0 ✓</li></ul>
+<p>If the peaker made 10 MW at 19:00 in place of 10 MW of combined-cycle output, how much would the cost rise?</p>
+<details class="lx-answer"><summary>Answer</summary><p>10 × ($100 − $40) = $600, which is why the solver leaves the peaker off.</p></details></li>
+<li><p><b>Check the evening, 18:00 to 21:00</b> (partly worked, about 4 min)</p>
+<p>The combined-cycle plant starts from 65 MW at 17:00, lesson 0's cheapest-first plan.</p>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-ptab caption-top table">
+<caption>The solved plan, MW, by plant and hour</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">MW</th>
+<th data-quarto-table-cell-role="th" scope="col">18:00</th>
+<th data-quarto-table-cell-role="th" scope="col">19:00</th>
+<th data-quarto-table-cell-role="th" scope="col">20:00</th>
+<th data-quarto-table-cell-role="th" scope="col">21:00</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuclear</th>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">wind</th>
+<td class="n">59</td>
+<td class="n">72</td>
+<td class="n">89</td>
+<td class="n">98</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">solar</th>
+<td class="n">70</td>
+<td class="n">14</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">combined-cycle</th>
+<td class="n">105</td>
+<td class="n">145</td>
+<td class="n">130</td>
+<td class="n">105</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">peaker</th>
+<td class="n">10</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">unserved</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">demand</th>
+<td class="n">344</td>
+<td class="n">331</td>
+<td class="n">319</td>
+<td class="n">303</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="b3-static-worked"><li><b>Balance at 18:00.</b> 100 + 59 + 70 + 105 + 10 = 344 MW, the demand ✓</li><li><b>Nuclear.</b> 400 MWh × $10 = $4,000</li><li><b>Combined-cycle.</b> 485 MWh × $40 = $19,400</li></ul>
+<p>Peaker cost? Total, by hand?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Peaker $1,000. $24,400, the solver's objective too: the model's cost and a hand count agree.</p></details></li>
+<li><p><b>Check the solar dip, 14:00 to 17:00</b> (from scratch, about 7 min)</p>
+<p>The combined-cycle plant starts from 45 MW at 13:00, lesson 0's cheapest-first plan.</p>
+<div class="lx-fp-tabw">
+<table class="lx-fp-tab b3-ptab caption-top table">
+<caption>The solved plan, MW, by plant and hour</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">MW</th>
+<th data-quarto-table-cell-role="th" scope="col">14:00</th>
+<th data-quarto-table-cell-role="th" scope="col">15:00</th>
+<th data-quarto-table-cell-role="th" scope="col">16:00</th>
+<th data-quarto-table-cell-role="th" scope="col">17:00</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">nuclear</th>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+<td class="n">100</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">wind</th>
+<td class="n">33</td>
+<td class="n">37</td>
+<td class="n">47</td>
+<td class="n">54</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">solar</th>
+<td class="n">112</td>
+<td class="n">147</td>
+<td class="n">161</td>
+<td class="n">130</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">combined-cycle</th>
+<td class="n">85</td>
+<td class="n">60</td>
+<td class="n">45</td>
+<td class="n">65</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">peaker</th>
+<td class="n">10</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">unserved</th>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">demand</th>
+<td class="n">340</td>
+<td class="n">344</td>
+<td class="n">353</td>
+<td class="n">349</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Supply at 14:00? Cost by hand, all four hours? Your guess for the 14:00 balance dual?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Balanced (340 MW), $15,200 by hand, the solver's objective, and a $100 dual: the peaker is the marginal plant at 14:00. The solver's balance duals: 14:00 $100, 15:00 $40, 16:00 $40 and 17:00 $40 per MWh.</p></details></li>
+</ol>
+<p class="lx-fp-foot">The models are this lesson's dispatch of 3 September 2025, solved by HiGHS in your browser (a precomputed answer if it cannot load). The 65 MW and 45 MW starts are lesson 0's cheapest-first plan at 17:00 and 13:00; the storage and reserve lines are illustrative.</p>
+</div>
+<!-- b3-static-practice:end -->
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="checks-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="checks-sources-and-whats-next">Checks, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Which check catches which bug</p>
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Bug</th>
+<th data-quarto-table-cell-role="th" scope="col">What the solver says</th>
+<th data-quarto-table-cell-role="th" scope="col">Caught by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">unit</td>
+<td>optimal, with the dearest plant running first</td>
+<td class="s">units of every parameter</td>
+</tr>
+<tr class="even">
+<td class="n">sign</td>
+<td>optimal, with demand unmet in every hour</td>
+<td class="s">balance, hour by hour</td>
+</tr>
+<tr class="odd">
+<td class="n">index</td>
+<td>optimal, balanced at 17:00 only</td>
+<td class="s">counting rows; balance</td>
+</tr>
+<tr class="even">
+<td class="n">double</td>
+<td>optimal, cost far above a hand calculation</td>
+<td class="s">a hand-calculated cost</td>
+</tr>
+<tr class="odd">
+<td class="n">lunch</td>
+<td>optimal, wind above what the wind allowed</td>
+<td class="s">outputs against their limits</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="m01-dispatch-to-lmp">
+<p class="lx-eyebrow">Next</p>
+<p class="lx-next-t"><a href="m01-dispatch-to-lmp.html">M1 · From dispatch to locational prices: the linear program behind the market</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="b03-read-check-formulation" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day, 2025.</li>
+<li>DeCarolis, J. et al. (2017). <a href="https://doi.org/10.1016/j.apenergy.2017.03.001">Formalizing best practice for energy system optimization modelling</a>. Applied Energy 194.</li>
+<li>Trutnevyte, E. (2016). <a href="https://doi.org/10.1016/j.energy.2016.03.038">Does cost optimization approximate the real-world energy transition?</a> Energy 106.</li>
+<li><a href="https://www.pyomo.org/">Pyomo</a>, <a href="https://jump.dev/">JuMP</a> and <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a>: the modelling languages and the solver of the Modeler tier.</li>
+<li>First time with a linear program? Bridge <a href="b01-algebra-to-lp.html">B1, from algebra to a linear program</a>.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20How%20do%20you%20read%20a%20formulation%2C%20and%20check%20that%20a%20model%20is%20right?">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/b03-read-check-formulation.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

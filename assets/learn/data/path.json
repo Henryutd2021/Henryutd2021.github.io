@@ -1,0 +1,1343 @@
+{
+ "generated_by": "scripts/build_learn.py from learn/path.yml",
+ "course": "Energy Systems, Step by Step",
+ "license": {
+  "text": "https://creativecommons.org/licenses/by/4.0/",
+  "code": "https://opensource.org/license/mit"
+ },
+ "tiers": [
+  {
+   "id": "foundations",
+   "title": "Foundations",
+   "level": "L1",
+   "slot": 1,
+   "icon": "bulb",
+   "reader": "High-school students and curious readers",
+   "math": "Arithmetic and reading a chart",
+   "assumes": "Nothing. Start here.",
+   "goal": "Explain how the power system works and reason with its numbers.",
+   "door": "Totally new to energy",
+   "doord": "Start with a game: run a small town's power plants for a day, then find out what you just did.",
+   "doorcta": "Start with lesson 0",
+   "doorlink": "00-grid-operator.qmd"
+  },
+  {
+   "id": "analyst",
+   "title": "Analyst",
+   "level": "L2",
+   "slot": 2,
+   "icon": "bars",
+   "reader": "Undergraduates, career changers, and professionals from outside the power sector",
+   "math": "Algebra and spreadsheets",
+   "assumes": "Foundations, or starter lessons 0–6.",
+   "goal": "Work out costs, prices and trade-offs on paper and in a spreadsheet, and read an energy study critically.",
+   "door": "I know the basics",
+   "doord": "Costs, prices, storage and trade-offs, with numbers you can check yourself.",
+   "doorcta": "Go to the Analyst tier",
+   "doorlink": "#analyst"
+  },
+  {
+   "id": "modeler",
+   "title": "Modeler",
+   "level": "L3",
+   "slot": 3,
+   "icon": "braces",
+   "reader": "Upper-level undergraduates, graduate students and engineers",
+   "math": "Programming and linear algebra (the math toolbox teaches what you need)",
+   "assumes": "Analyst-level economics; the toolbox fills gaps in math and Python.",
+   "goal": "Formulate, build, solve and critique an energy-system optimization model.",
+   "door": "Ready to build models",
+   "doord": "From a first linear program to capacity expansion, uncertainty and research practice.",
+   "doorcta": "Go to the Modeler tier",
+   "doorlink": "#modeler"
+  },
+  {
+   "id": "researcher",
+   "title": "Researcher",
+   "level": "L4",
+   "slot": 4,
+   "icon": "flask",
+   "reader": "Learners who have finished the Modeler core, or graduate students starting a project",
+   "math": "As the Modeler tier",
+   "assumes": "The Modeler core.",
+   "goal": "Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.",
+   "door": "Ready for research",
+   "doord": "Coming later: frame a question, find what is known, choose a method and defend a study.",
+   "doorcta": "See what is coming",
+   "doorlink": "#researcher",
+   "status": "upcoming"
+  }
+ ],
+ "scales": [],
+ "starter": [
+  {
+   "id": "00-grid-operator",
+   "starter": 0,
+   "total": 14,
+   "code": null,
+   "title": "How does the grid keep the lights on?",
+   "subtitle": "Be the grid operator for a day",
+   "short": "Be the grid operator",
+   "tier": "foundations",
+   "tier2": null,
+   "tierLabel": "Foundations · L1",
+   "level": "L1",
+   "slot": 1,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.",
+   "outcome": "Say what balancing means and why cheap plants run first.",
+   "icon": "gauge",
+   "form": "play",
+   "scales": [],
+   "teaches": [
+    "balancing supply and demand",
+    "power and energy",
+    "dispatchable and variable generation",
+    "merit order dispatch"
+   ],
+   "lab": "download and plot a day of hourly U.S. grid data (upcoming).",
+   "href": "00-grid-operator.html",
+   "ready": true,
+   "after": [],
+   "prev": null,
+   "next": {
+    "id": "01-power-energy",
+    "starter": 1,
+    "title": "Power or energy? What is the difference between kW and kWh?",
+    "short": "Power or energy?",
+    "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
+    "href": "01-power-energy.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "01-power-energy",
+   "starter": 1,
+   "total": 14,
+   "code": null,
+   "title": "Power or energy? What is the difference between kW and kWh?",
+   "subtitle": "Switch a home's appliances on and watch power and energy part ways",
+   "short": "Power or energy?",
+   "tier": "foundations",
+   "tier2": null,
+   "tierLabel": "Foundations · L1",
+   "level": "L1",
+   "slot": 1,
+   "slot2": null,
+   "minutes": 15,
+   "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
+   "outcome": "Convert between units and make quick estimates.",
+   "icon": "bolt",
+   "form": "cards",
+   "scales": [],
+   "teaches": [],
+   "lab": null,
+   "href": "01-power-energy.html",
+   "ready": true,
+   "after": [],
+   "prev": {
+    "id": "00-grid-operator",
+    "starter": 0,
+    "title": "How does the grid keep the lights on?",
+    "short": "Be the grid operator",
+    "does": "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.",
+    "href": "00-grid-operator.html",
+    "ready": true
+   },
+   "next": {
+    "id": "02-demand",
+    "starter": 2,
+    "title": "Why does electricity demand rise and fall?",
+    "short": "The shape of demand",
+    "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
+    "href": "02-demand.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "02-demand",
+   "starter": 2,
+   "total": 14,
+   "code": null,
+   "title": "Why does electricity demand rise and fall?",
+   "subtitle": "Read a real year of demand, then add solar and dig the duck curve",
+   "short": "The shape of demand",
+   "tier": "foundations",
+   "tier2": null,
+   "tierLabel": "Foundations · L1",
+   "level": "L1",
+   "slot": 1,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
+   "outcome": "Read a demand curve and explain its peaks.",
+   "icon": "curve",
+   "form": "cards",
+   "scales": [],
+   "teaches": [],
+   "lab": null,
+   "href": "02-demand.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "01-power-energy",
+     "starter": 1,
+     "title": "Power or energy? What is the difference between kW and kWh?",
+     "short": "Power or energy?",
+     "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
+     "href": "01-power-energy.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "01-power-energy",
+    "starter": 1,
+    "title": "Power or energy? What is the difference between kW and kWh?",
+    "short": "Power or energy?",
+    "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
+    "href": "01-power-energy.html",
+    "ready": true
+   },
+   "next": {
+    "id": "03-balancing",
+    "starter": 3,
+    "title": "How does the grid stay balanced every second?",
+    "short": "Balancing every second",
+    "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
+    "href": "03-balancing.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "03-balancing",
+   "starter": 3,
+   "total": 14,
+   "code": null,
+   "title": "How does the grid stay balanced every second?",
+   "subtitle": "Trip a plant and watch the grid catch it",
+   "short": "Balancing every second",
+   "tier": "foundations",
+   "tier2": null,
+   "tierLabel": "Foundations · L1",
+   "level": "L1",
+   "slot": 1,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
+   "outcome": "Explain frequency, reserves and why outages can cascade.",
+   "icon": "wave",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "frequency",
+    "inertia",
+    "primary frequency response",
+    "automatic generation control",
+    "operating reserves",
+    "under-frequency load shedding"
+   ],
+   "lab": null,
+   "href": "03-balancing.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "00-grid-operator",
+     "starter": 0,
+     "title": "How does the grid keep the lights on?",
+     "short": "Be the grid operator",
+     "does": "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.",
+     "href": "00-grid-operator.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "02-demand",
+    "starter": 2,
+    "title": "Why does electricity demand rise and fall?",
+    "short": "The shape of demand",
+    "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
+    "href": "02-demand.html",
+    "ready": true
+   },
+   "next": {
+    "id": "04-forecasts",
+    "starter": 4,
+    "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
+    "short": "Forecasts and surprises",
+    "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
+    "href": "04-forecasts.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "04-forecasts",
+   "starter": 4,
+   "total": 14,
+   "code": null,
+   "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
+   "subtitle": "Score a real forecast, then plan for its misses",
+   "short": "Forecasts and surprises",
+   "tier": "foundations",
+   "tier2": "analyst",
+   "tierLabel": "Foundations to Analyst · L1–L2",
+   "level": "L1",
+   "slot": 1,
+   "slot2": 2,
+   "minutes": 15,
+   "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
+   "outcome": "Explain forecast error and why operators hold reserves.",
+   "icon": "cloud",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "demand forecasting",
+    "forecast error",
+    "persistence baseline",
+    "MAE and MAPE",
+    "prediction intervals",
+    "reserves under uncertainty"
+   ],
+   "lab": null,
+   "href": "04-forecasts.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "02-demand",
+     "starter": 2,
+     "title": "Why does electricity demand rise and fall?",
+     "short": "The shape of demand",
+     "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
+     "href": "02-demand.html",
+     "ready": true
+    },
+    {
+     "id": "03-balancing",
+     "starter": 3,
+     "title": "How does the grid stay balanced every second?",
+     "short": "Balancing every second",
+     "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
+     "href": "03-balancing.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "03-balancing",
+    "starter": 3,
+    "title": "How does the grid stay balanced every second?",
+    "short": "Balancing every second",
+    "does": "Trip a power plant and watch the frequency fall, then the fast response and the reserves step in.",
+    "href": "03-balancing.html",
+    "ready": true
+   },
+   "next": {
+    "id": "05-capacity-factor",
+    "starter": 5,
+    "title": "Capacity factor: why is 1 MW not always 1 MW?",
+    "short": "Capacity factor",
+    "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
+    "href": "05-capacity-factor.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "05-capacity-factor",
+   "starter": 5,
+   "total": 14,
+   "code": null,
+   "title": "Capacity factor: why is 1 MW not always 1 MW?",
+   "subtitle": "Run three 100 MW plants for a year and count what they make",
+   "short": "Capacity factor",
+   "tier": "foundations",
+   "tier2": null,
+   "tierLabel": "Foundations · L1",
+   "level": "L1",
+   "slot": 1,
+   "slot2": null,
+   "minutes": 15,
+   "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
+   "outcome": "Turn a plant's size in MW into the energy it makes in a year.",
+   "icon": "turbine",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "capacity factor",
+    "power and energy over a year",
+    "the wind power curve and the cube law"
+   ],
+   "lab": "compute capacity factors from a year of hourly data in Python (bridge B2).",
+   "href": "05-capacity-factor.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "01-power-energy",
+     "starter": 1,
+     "title": "Power or energy? What is the difference between kW and kWh?",
+     "short": "Power or energy?",
+     "does": "An appliance board with live power and the energy it adds up, and a ladder of scales from a phone to the whole country.",
+     "href": "01-power-energy.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "04-forecasts",
+    "starter": 4,
+    "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
+    "short": "Forecasts and surprises",
+    "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
+    "href": "04-forecasts.html",
+    "ready": true
+   },
+   "next": {
+    "id": "06-three-jobs",
+    "starter": 6,
+    "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
+    "short": "Three jobs",
+    "does": "Sort technologies into the jobs they do, with key numbers for each.",
+    "href": "06-three-jobs.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "06-three-jobs",
+   "starter": 6,
+   "total": 14,
+   "code": null,
+   "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
+   "subtitle": "Sort the technologies by the jobs they do",
+   "short": "Three jobs",
+   "tier": "foundations",
+   "tier2": null,
+   "tierLabel": "Foundations · L1",
+   "level": "L1",
+   "slot": 1,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Sort technologies into the jobs they do, with key numbers for each.",
+   "outcome": "Compare technologies by the job they do.",
+   "icon": "blocks",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "the three jobs of a power system",
+    "capacity factor against firm share",
+    "comparing technologies by the job they do"
+   ],
+   "lab": null,
+   "href": "06-three-jobs.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "04-forecasts",
+     "starter": 4,
+     "title": "Forecasts and surprises: how do you plan for weather you can't see yet?",
+     "short": "Forecasts and surprises",
+     "does": "Forecast against actual demand and wind, a simple baseline to beat, and a band of possibilities instead of one line.",
+     "href": "04-forecasts.html",
+     "ready": true
+    },
+    {
+     "id": "05-capacity-factor",
+     "starter": 5,
+     "title": "Capacity factor: why is 1 MW not always 1 MW?",
+     "short": "Capacity factor",
+     "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
+     "href": "05-capacity-factor.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "05-capacity-factor",
+    "starter": 5,
+    "title": "Capacity factor: why is 1 MW not always 1 MW?",
+    "short": "Capacity factor",
+    "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
+    "href": "05-capacity-factor.html",
+    "ready": true
+   },
+   "next": {
+    "id": "07-cost",
+    "starter": 7,
+    "title": "What does electricity cost to make?",
+    "short": "What it costs",
+    "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
+    "href": "07-cost.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "07-cost",
+   "starter": 7,
+   "total": 14,
+   "code": null,
+   "title": "What does electricity cost to make?",
+   "subtitle": "Split a plant's costs, discount the future and build a levelized cost",
+   "short": "What it costs",
+   "tier": "analyst",
+   "tier2": null,
+   "tierLabel": "Analyst · L2",
+   "level": "L2",
+   "slot": 2,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
+   "outcome": "Compute a levelized cost of electricity and say what it leaves out.",
+   "icon": "coin",
+   "form": "cards",
+   "scales": [],
+   "teaches": [],
+   "lab": null,
+   "href": "07-cost.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "05-capacity-factor",
+     "starter": 5,
+     "title": "Capacity factor: why is 1 MW not always 1 MW?",
+     "short": "Capacity factor",
+     "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
+     "href": "05-capacity-factor.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "06-three-jobs",
+    "starter": 6,
+    "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
+    "short": "Three jobs",
+    "does": "Sort technologies into the jobs they do, with key numbers for each.",
+    "href": "06-three-jobs.html",
+    "ready": true
+   },
+   "next": {
+    "id": "08-merit-order",
+    "starter": 8,
+    "title": "Who runs, and what sets the price?",
+    "short": "Merit order",
+    "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
+    "href": "08-merit-order.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "08-merit-order",
+   "starter": 8,
+   "total": 14,
+   "code": null,
+   "title": "Who runs, and what sets the price?",
+   "subtitle": "Build Prairie Town's supply stack and find the price",
+   "short": "Merit order",
+   "tier": "analyst",
+   "tier2": null,
+   "tierLabel": "Analyst · L2",
+   "level": "L2",
+   "slot": 2,
+   "slot2": null,
+   "minutes": 15,
+   "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
+   "outcome": "Explain wholesale prices and price spikes.",
+   "icon": "stairs",
+   "form": "cards",
+   "scales": [],
+   "teaches": [],
+   "lab": null,
+   "href": "08-merit-order.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "06-three-jobs",
+     "starter": 6,
+     "title": "Cheap energy, firm capacity, flexibility: which plant does which job?",
+     "short": "Three jobs",
+     "does": "Sort technologies into the jobs they do, with key numbers for each.",
+     "href": "06-three-jobs.html",
+     "ready": true
+    },
+    {
+     "id": "07-cost",
+     "starter": 7,
+     "title": "What does electricity cost to make?",
+     "short": "What it costs",
+     "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
+     "href": "07-cost.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "07-cost",
+    "starter": 7,
+    "title": "What does electricity cost to make?",
+    "short": "What it costs",
+    "does": "Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.",
+    "href": "07-cost.html",
+    "ready": true
+   },
+   "next": {
+    "id": "09-storage",
+    "starter": 9,
+    "title": "How does storage move energy through time?",
+    "short": "Storage",
+    "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
+    "href": "09-storage.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "09-storage",
+   "starter": 9,
+   "total": 14,
+   "code": null,
+   "title": "How does storage move energy through time?",
+   "subtitle": "Charge with midday sun, discharge at sunset",
+   "short": "Storage",
+   "tier": "analyst",
+   "tier2": null,
+   "tierLabel": "Analyst · L2",
+   "level": "L2",
+   "slot": 2,
+   "slot2": null,
+   "minutes": 15,
+   "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
+   "outcome": "Size and value simple storage.",
+   "icon": "battery",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "energy storage",
+    "round-trip efficiency",
+    "state of charge",
+    "valuing storage",
+    "linear programming"
+   ],
+   "lab": null,
+   "href": "09-storage.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "02-demand",
+     "starter": 2,
+     "title": "Why does electricity demand rise and fall?",
+     "short": "The shape of demand",
+     "does": "Daily, weekly and seasonal demand curves, and a solar slider that digs the “duck curve”.",
+     "href": "02-demand.html",
+     "ready": true
+    },
+    {
+     "id": "08-merit-order",
+     "starter": 8,
+     "title": "Who runs, and what sets the price?",
+     "short": "Merit order",
+     "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
+     "href": "08-merit-order.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "08-merit-order",
+    "starter": 8,
+    "title": "Who runs, and what sets the price?",
+    "short": "Merit order",
+    "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
+    "href": "08-merit-order.html",
+    "ready": true
+   },
+   "next": {
+    "id": "10-write-it-down",
+    "starter": 10,
+    "title": "Write it down: what are the decisions, the goal and the rules?",
+    "short": "Write it down",
+    "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
+    "href": "10-write-it-down.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "10-write-it-down",
+   "starter": 10,
+   "total": 14,
+   "code": null,
+   "title": "Write it down: what are the decisions, the goal and the rules?",
+   "subtitle": "Sort a model into its parts, then find the best plan on a graph",
+   "short": "Write it down",
+   "tier": "analyst",
+   "tier2": null,
+   "tierLabel": "Analyst · L2",
+   "level": "L2",
+   "slot": 2,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
+   "outcome": "Formulate a small optimization problem in words and symbols.",
+   "icon": "pencil",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "decision variables",
+    "objective",
+    "constraints",
+    "parameters",
+    "feasible region",
+    "linear programming outcomes"
+   ],
+   "lab": null,
+   "href": "10-write-it-down.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "00-grid-operator",
+     "starter": 0,
+     "title": "How does the grid keep the lights on?",
+     "short": "Be the grid operator",
+     "does": "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand.",
+     "href": "00-grid-operator.html",
+     "ready": true
+    },
+    {
+     "id": "08-merit-order",
+     "starter": 8,
+     "title": "Who runs, and what sets the price?",
+     "short": "Merit order",
+     "does": "A supply stack, a demand line and the price where they meet; add wind and watch prices fall.",
+     "href": "08-merit-order.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "09-storage",
+    "starter": 9,
+    "title": "How does storage move energy through time?",
+    "short": "Storage",
+    "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
+    "href": "09-storage.html",
+    "ready": true
+   },
+   "next": {
+    "id": "11-solver",
+    "starter": 11,
+    "title": "Ask the solver, then check its answer",
+    "short": "Ask the solver",
+    "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
+    "href": "11-solver.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "11-solver",
+   "starter": 11,
+   "total": 14,
+   "code": null,
+   "title": "Ask the solver, then check its answer",
+   "subtitle": "HiGHS in your browser: solve, check, and read prices",
+   "short": "Ask the solver",
+   "tier": "modeler",
+   "tier2": null,
+   "tierLabel": "Modeler · L3",
+   "level": "L3",
+   "slot": 3,
+   "slot2": null,
+   "minutes": 15,
+   "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
+   "outcome": "Solve, interpret and check a linear program.",
+   "icon": "target",
+   "form": "cards",
+   "scales": [],
+   "teaches": [
+    "solvers",
+    "model checking",
+    "shadow prices",
+    "sensitivity analysis",
+    "mixed-integer programming"
+   ],
+   "lab": null,
+   "href": "11-solver.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "10-write-it-down",
+     "starter": 10,
+     "title": "Write it down: what are the decisions, the goal and the rules?",
+     "short": "Write it down",
+     "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
+     "href": "10-write-it-down.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "10-write-it-down",
+    "starter": 10,
+    "title": "Write it down: what are the decisions, the goal and the rules?",
+    "short": "Write it down",
+    "does": "Sort Prairie Town's choices into decisions, goal and rules, then find the best plan for two plants on a graph.",
+    "href": "10-write-it-down.html",
+    "ready": true
+   },
+   "next": {
+    "id": "12-trade-offs",
+    "starter": 12,
+    "title": "Cheap or clean? How do you weigh cost against emissions?",
+    "short": "Cheap or clean?",
+    "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
+    "href": "12-trade-offs.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "12-trade-offs",
+   "starter": 12,
+   "total": 14,
+   "code": null,
+   "title": "Cheap or clean? How do you weigh cost against emissions?",
+   "subtitle": "Spot the plan nobody should pick, slide a carbon price, and trace the frontier with a solver",
+   "short": "Cheap or clean?",
+   "tier": "analyst",
+   "tier2": null,
+   "tierLabel": "Analyst · L2",
+   "level": "L2",
+   "slot": 2,
+   "slot2": null,
+   "minutes": 15,
+   "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
+   "outcome": "Reason about trade-offs between goals.",
+   "icon": "frontier",
+   "form": "cards",
+   "scales": [],
+   "teaches": [],
+   "lab": null,
+   "href": "12-trade-offs.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "11-solver",
+     "starter": 11,
+     "title": "Ask the solver, then check its answer",
+     "short": "Ask the solver",
+     "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
+     "href": "11-solver.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "11-solver",
+    "starter": 11,
+    "title": "Ask the solver, then check its answer",
+    "short": "Ask the solver",
+    "does": "A real solver in your browser: try to beat it, check its answer, and read prices from it.",
+    "href": "11-solver.html",
+    "ready": true
+   },
+   "next": {
+    "id": "13-capstone",
+    "starter": 13,
+    "title": "What should Prairie Town build? Plan its power system",
+    "short": "Capstone: plan the town",
+    "does": "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap.",
+    "href": "13-capstone.html",
+    "ready": true
+   }
+  },
+  {
+   "id": "13-capstone",
+   "starter": 13,
+   "total": 14,
+   "code": null,
+   "title": "What should Prairie Town build? Plan its power system",
+   "subtitle": "Choose what to build, run a year of real weather, and ask the optimizer",
+   "short": "Capstone: plan the town",
+   "tier": "modeler",
+   "tier2": "analyst",
+   "tierLabel": "Modeler to Analyst · L3–L2",
+   "level": "L3",
+   "slot": 3,
+   "slot2": 2,
+   "minutes": 15,
+   "does": "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap.",
+   "outcome": "Reason about planning trade-offs and know what real planning models do.",
+   "icon": "blueprint",
+   "form": "play",
+   "scales": [],
+   "teaches": [],
+   "lab": null,
+   "href": "13-capstone.html",
+   "ready": true,
+   "after": [
+    {
+     "id": "09-storage",
+     "starter": 9,
+     "title": "How does storage move energy through time?",
+     "short": "Storage",
+     "does": "A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.",
+     "href": "09-storage.html",
+     "ready": true
+    },
+    {
+     "id": "12-trade-offs",
+     "starter": 12,
+     "title": "Cheap or clean? How do you weigh cost against emissions?",
+     "short": "Cheap or clean?",
+     "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
+     "href": "12-trade-offs.html",
+     "ready": true
+    }
+   ],
+   "prev": {
+    "id": "12-trade-offs",
+    "starter": 12,
+    "title": "Cheap or clean? How do you weigh cost against emissions?",
+    "short": "Cheap or clean?",
+    "does": "Spot the plans nobody should pick, slide a carbon price, and trace the frontier between cost and CO₂.",
+    "href": "12-trade-offs.html",
+    "ready": true
+   },
+   "next": null
+  }
+ ],
+ "more": [
+  {
+   "tier": "foundations",
+   "code": "N1",
+   "title": "How do you read an energy headline like a researcher?",
+   "ready": true,
+   "href": "n01-news-lens.html",
+   "scales": [],
+   "id": "n01-news-lens",
+   "tier2": "analyst",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "CK-F",
+   "title": "Foundations checkpoint: estimate an unfamiliar situation",
+   "ready": true,
+   "href": "ck-f-estimate.html",
+   "scales": [],
+   "id": "ck-f-estimate",
+   "minutes": 40,
+   "form": "checkpoint"
+  },
+  {
+   "tier": "analyst",
+   "code": "B1",
+   "title": "From algebra to a linear program: how do equations become a model?",
+   "ready": true,
+   "href": "b01-algebra-to-lp.html",
+   "scales": [],
+   "id": "b01-algebra-to-lp",
+   "tier2": "modeler",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "B2",
+   "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
+   "ready": true,
+   "href": "b02-python-data.html",
+   "scales": [],
+   "id": "b02-python-data",
+   "tier2": "modeler",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "B3",
+   "title": "How do you read a formulation, and check that a model is right?",
+   "ready": true,
+   "href": "b03-read-check-formulation.html",
+   "scales": [],
+   "id": "b03-read-check-formulation",
+   "tier2": "modeler",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
+   "tier": "modeler",
+   "code": "M1",
+   "title": "From dispatch to locational prices: the linear program behind the market",
+   "ready": true,
+   "href": "m01-dispatch-to-lmp.html",
+   "scales": [],
+   "id": "m01-dispatch-to-lmp",
+   "minutes": 40,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "The energy system map: from primary energy to the uses we pay for",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "How a thermal power plant works",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Wind power",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Solar power",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Nuclear power basics",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Hydro and geothermal power",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Batteries and hydrogen basics",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Transmission and distribution",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "foundations",
+   "code": null,
+   "title": "Large loads and data centers",
+   "ready": false,
+   "href": "index.html#foundations",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Money over time: discounting and net present value",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Techno-economic analysis of a project: cash flows, returns, sensitivity",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Markets and institutions: grid operators, FERC and state commissions",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Capacity, reserves and resource adequacy",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Policy instruments: tax credits, carbon prices, large-load tariffs",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Emissions accounting: average or marginal, annual or hourly",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Reading energy data from EIA",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "Scenarios and sensitivity in a spreadsheet",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "analyst",
+   "code": null,
+   "title": "How to read an energy study critically",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M2",
+   "title": "On or off? Unit commitment as a mixed-integer program",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M3",
+   "title": "What should be built? Capacity expansion with representative periods, validated",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M4",
+   "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M5",
+   "title": "Size and run a microgrid that survives an outage",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M6",
+   "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M7",
+   "title": "What could happen? Scenarios, Monte Carlo and global sensitivity",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M8",
+   "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M9",
+   "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M10",
+   "title": "Forecasting load, wind, solar and prices with machine learning, and judging it honestly",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M11",
+   "title": "Techno-economic analysis inside an optimization model",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M12",
+   "title": "Model a city's energy system: an energy hub with grid limits and screening fairness outputs",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M13",
+   "title": "Build a nation's pathway: a multi-region, multi-decade model",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "modeler",
+   "code": "M14",
+   "title": "Did it work? Learning from data with regression and natural experiments",
+   "ready": false,
+   "href": "index.html#modeler",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R1",
+   "title": "What makes a question worth researching?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R2",
+   "title": "How do you find out what is already known?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R3",
+   "title": "Which system, which boundary, which method?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R4",
+   "title": "Data you can defend: sources, cleaning, licences and provenance",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R5",
+   "title": "Can you trust your analysis? Verification, validation and reproducibility",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R6",
+   "title": "Uncertainty done properly: what to vary, how, and how to say it",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R7",
+   "title": "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R8",
+   "title": "How do you show results so people understand their limits?",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R9",
+   "title": "Research integrity, and working with the people your study is about",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  },
+  {
+   "tier": "researcher",
+   "code": "R10",
+   "title": "What could you study? The question studio",
+   "ready": false,
+   "href": "index.html#researcher",
+   "scales": []
+  }
+ ],
+ "toolbox": [
+  {
+   "title": "Units and orders of magnitude",
+   "code": "K1",
+   "minutes": 10
+  },
+  {
+   "title": "Rates and efficiencies",
+   "code": "K2",
+   "minutes": 10
+  },
+  {
+   "title": "Exponentials and discounting",
+   "code": "K3",
+   "minutes": 15
+  },
+  {
+   "title": "Linear equations and inequalities",
+   "ready": true,
+   "href": "k04-linear-equations.html",
+   "code": "K4",
+   "id": "k04-linear-equations",
+   "minutes": 15
+  },
+  {
+   "title": "Probability and statistics",
+   "code": "K5",
+   "minutes": 25
+  },
+  {
+   "title": "Vectors and matrices: what Ax <= b means",
+   "code": "K6",
+   "minutes": 25
+  },
+  {
+   "title": "Spreadsheets in practice",
+   "ready": true,
+   "href": "k07-spreadsheets.html",
+   "code": "K7",
+   "id": "k07-spreadsheets",
+   "minutes": 20
+  },
+  {
+   "title": "Git and reproducible notebooks",
+   "code": "K8",
+   "minutes": 20
+  }
+ ],
+ "minutes": 210
+}

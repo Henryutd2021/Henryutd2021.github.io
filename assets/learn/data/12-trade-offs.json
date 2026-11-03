@@ -1,0 +1,121 @@
+{
+ "about": "Lesson 12 (Cheap or clean?): six hand-made plans for Prairie Town, each with a yearly cost and CO2 estimated by lesson 13's model from seven representative weeks of 2025 (EIA and NREL costs, default scenario; a full-year check is separate). 'result' is precomputed with that model; _tests/learn/test_12-trade-offs.js re-solves each plan and checks every number the page states. Plans are illustrative choices, not recommendations.",
+ "accessed": "2026-11-02",
+ "plans": [
+  {
+   "id": "A",
+   "label": "Gas only",
+   "note": "380 MW combined-cycle and 80 MW of peakers",
+   "plan": {
+    "cc": 380,
+    "pk": 80
+   },
+   "result": {
+    "cost": 103867722,
+    "co2": 814675,
+    "unserved": 0,
+    "spilled": 0
+   }
+  },
+  {
+   "id": "B",
+   "label": "Gas + 300 MW wind",
+   "note": "the same gas plants, plus a 300 MW wind farm",
+   "plan": {
+    "wind": 300,
+    "cc": 380,
+    "pk": 80
+   },
+   "result": {
+    "cost": 119438019,
+    "co2": 520648,
+    "unserved": 0,
+    "spilled": 0
+   }
+  },
+  {
+   "id": "C",
+   "label": "Gas + 500 MW solar",
+   "note": "the same gas plants, plus a 500 MW solar farm",
+   "plan": {
+    "solar": 500,
+    "cc": 380,
+    "pk": 80
+   },
+   "result": {
+    "cost": 131393775,
+    "co2": 488481,
+    "unserved": 0,
+    "spilled": 0.061
+   }
+  },
+  {
+   "id": "D",
+   "label": "Gas + 600 MW wind",
+   "note": "the same gas plants, plus 600 MW of wind",
+   "plan": {
+    "wind": 600,
+    "cc": 380,
+    "pk": 80
+   },
+   "result": {
+    "cost": 136840434,
+    "co2": 248692,
+    "unserved": 0,
+    "spilled": 0.0356
+   }
+  },
+  {
+   "id": "E",
+   "label": "Gas + 800 MW solar",
+   "note": "the same gas plants, plus 800 MW of solar and no storage",
+   "plan": {
+    "solar": 800,
+    "cc": 380,
+    "pk": 80
+   },
+   "result": {
+    "cost": 159606254,
+    "co2": 433136,
+    "unserved": 0,
+    "spilled": 0.3132
+   }
+  },
+  {
+   "id": "F",
+   "label": "Wind, solar, battery and gas backup",
+   "note": "600 MW wind, 200 MW solar, a 100 MW / 400 MWh battery, and 300 MW combined-cycle gas plus 80 MW of peakers as backup",
+   "plan": {
+    "wind": 600,
+    "solar": 200,
+    "bp": 100,
+    "be": 400,
+    "cc": 300,
+    "pk": 80
+   },
+   "result": {
+    "cost": 158606195,
+    "co2": 114866,
+    "unserved": 0,
+    "spilled": 0.0309
+   }
+  }
+ ],
+ "priceMax": 300,
+ "priceStep": 5,
+ "caps": {
+  "min": 0,
+  "max": 800,
+  "step": 25,
+  "start": 400,
+  "sweep": [
+   700,
+   500,
+   300,
+   200,
+   150,
+   100,
+   50
+  ]
+ }
+}

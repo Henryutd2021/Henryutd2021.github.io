@@ -1,0 +1,478 @@
+{
+ "about": "Lesson 13 (What should Prairie Town build?) and lesson 12 (Cheap or clean?): the planning model's inputs. Prairie Town is fictional; its demand, wind and solar follow the real 2025 hourly shapes of the Southwest Power Pool grid (town_year.json, EIA-930). Demand = shape x 450 MW (lesson 0's scale). Wind and solar output per MW built = LX.townProfile('scale') scaled to EIA's 2025 U.S. capacity factors (cf_targets.json). Technology costs are constant for the whole year modelled (no change over time); only the gas price and the nuclear capital cost can be changed by the reader.",
+ "accessed": "2026-11-02",
+ "town": {
+  "demandPeakMW": 450,
+  "profileMethod": "scale"
+ },
+ "techs": {
+  "wind": {
+   "label": "Wind farm",
+   "short": "Wind",
+   "capex": 1712,
+   "fom": 34.57,
+   "vom": 0,
+   "src": [
+    "eia-aeo2026-emm"
+   ]
+  },
+  "solar": {
+   "label": "Solar farm (single-axis tracking)",
+   "short": "Solar",
+   "capex": 1484,
+   "fom": 23.6,
+   "vom": 0,
+   "src": [
+    "eia-aeo2026-emm"
+   ]
+  },
+  "cc": {
+   "label": "Gas combined-cycle plant",
+   "short": "Gas CC",
+   "capex": 1086,
+   "fom": 16.23,
+   "vom": 3.49,
+   "heatRate": 6.226,
+   "note": "EIA's single-shaft design (627 MW), the closer of EIA's two combined-cycle designs to the town's size",
+   "src": [
+    "eia-aeo2026-emm",
+    "eia-epa-gas",
+    "eia-co2"
+   ]
+  },
+  "pk": {
+   "label": "Gas peaker (combustion turbine)",
+   "short": "Peaker",
+   "capex": 1158,
+   "fom": 7.18,
+   "vom": 4.17,
+   "heatRate": 9.142,
+   "note": "EIA's industrial-frame combustion turbine",
+   "src": [
+    "eia-aeo2026-emm",
+    "eia-epa-gas",
+    "eia-co2"
+   ]
+  },
+  "nuc": {
+   "label": "Nuclear plant (generic, firm, low-carbon)",
+   "short": "Nuclear",
+   "capex": 8255,
+   "fom": 163.4,
+   "vom": 2.62,
+   "fuel": 6.64,
+   "avail": 0.911,
+   "note": "A generic firm low-carbon option. Default capital cost: EIA's value for a large light-water plant; the reader can change it. Modelled as a constant 91.1% of its size every hour, the U.S. fleet's 2025 capacity factor: a simplification, since real output varies with refuelling and outages.",
+   "src": [
+    "eia-aeo2026-emm",
+    "eia-epa-opex",
+    "eia-epm-cf"
+   ]
+  },
+  "battery": {
+   "label": "Lithium-ion battery",
+   "short": "Battery",
+   "powerCapex": 372,
+   "energyCapex": 241,
+   "fomShare": 0.04,
+   "life": 15,
+   "rte": 0.85,
+   "note": "Cost = $241 per kWh of energy + $372 per kW of power (2024 dollars); a 4-hour battery costs $334/kWh. Fixed O&M 4% of capital cost per year; 15-year life; 85% round trip.",
+   "src": [
+    "nrel-battery-2025"
+   ]
+  }
+ },
+ "units": {
+  "capex": "$ per kW, overnight capital cost (2025 dollars; battery 2024 dollars); battery energy in $ per kWh",
+  "fom": "$ per kW per year (fixed operation and maintenance)",
+  "vom": "$ per MWh (variable operation and maintenance)",
+  "fuel": "$ per MWh (nuclear fuel expense)",
+  "heatRate": "MMBtu of gas per MWh",
+  "gas": "$ per MMBtu",
+  "co2PerMMBtu": "kg CO2 per MMBtu of natural gas"
+ },
+ "finance": {
+  "wacc": 4,
+  "life": 30,
+  "note": "4% real cost of capital and a 30-year cost recovery period for every plant (the 2025 ATB's period; 4% real is a round value inside the ATB's financing range, as in lesson 7). The battery is paid off over its 15-year life.",
+  "src": [
+   "atb2025-fin"
+  ]
+ },
+ "fuel": {
+  "gas": 3.85,
+  "co2PerMMBtu": 52.91,
+  "note": "$3.85/MMBtu: average cost of natural gas to U.S. power plants in 2025. 52.91 kg CO2 per MMBtu burned.",
+  "src": [
+   "eia-epa-gas",
+   "eia-co2"
+  ]
+ },
+ "unservedPenalty": 10000,
+ "unservedNote": "Illustrative: $10,000 per MWh of demand left unserved steers the reader's year towards keeping the lights on. It is not counted in the plan's cost; unserved energy is reported on its own.",
+ "limits": {
+  "wind": {
+   "max": 1500,
+   "step": 10
+  },
+  "solar": {
+   "max": 1500,
+   "step": 10
+  },
+  "cc": {
+   "max": 600,
+   "step": 10
+  },
+  "pk": {
+   "max": 600,
+   "step": 10
+  },
+  "nuc": {
+   "max": 500,
+   "step": 10
+  },
+  "bp": {
+   "max": 600,
+   "step": 5
+  },
+  "be": {
+   "max": 4000,
+   "step": 10
+  },
+  "gas": {
+   "min": 1.5,
+   "max": 8,
+   "step": 0.25
+  },
+  "nucCapex": {
+   "min": 2000,
+   "max": 14000,
+   "step": 250
+  }
+ },
+ "sources": {
+  "eia-aeo2026-emm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3 (2025 dollars)",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+   "asOf": "April 2026"
+  },
+  "eia-epa-gas": {
+   "text": "EIA, Electric Power Annual, Table 7.4 (average cost of fossil fuels for the electric power industry)",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_07_04.html",
+   "asOf": "final 2025 data; checked 2 Nov 2026"
+  },
+  "eia-epa-opex": {
+   "text": "EIA, Electric Power Annual, Table 8.4 (average power plant operating expenses, major investor-owned utilities): nuclear fuel 6.64 mills/kWh in 2025",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_08_04.html",
+   "asOf": "2025 data; checked 2 Nov 2026"
+  },
+  "eia-co2": {
+   "text": "EIA, Carbon Dioxide Emissions Coefficients: natural gas 52.91 kg CO2 per MMBtu",
+   "url": "https://www.eia.gov/environment/emissions/co2_vol_mass.php",
+   "asOf": "released 18 Sep 2024; checked 2 Nov 2026"
+  },
+  "eia-epm-cf": {
+   "text": "EIA, Electric Power Monthly, Table 6.07.B (capacity factors, non-fossil): wind 33.8%, solar PV 24.0%, nuclear 91.1% in 2025",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+   "asOf": "issue of 23 Oct 2026"
+  },
+  "nrel-battery-2025": {
+   "text": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281 (2024 costs, section 2 and Figure 2; O&M, life and efficiency, section 3); the cost basis of the 2025 ATB's battery page",
+   "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+   "asOf": "June 2025"
+  },
+  "atb2025-fin": {
+   "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+   "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+   "asOf": "checked 2 Nov 2026"
+  },
+  "atb2025-battery": {
+   "text": "NLR, 2025 Electricity ATB, Utility-Scale Battery Storage (cost structure, 85% round trip, 15-year life)",
+   "url": "https://atb.nlr.gov/electricity/2025/utility-scale_battery_storage",
+   "asOf": "checked 2 Nov 2026"
+  },
+  "eia-930": {
+   "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "asOf": "accessed 2 Nov 2026"
+  }
+ },
+ "weeks": {
+  "extremes": [
+   "peak",
+   "netpeak",
+   "calm"
+  ],
+  "netRef": {
+   "wind": 150,
+   "solar": 200
+  },
+  "note": "One medoid week per season (scaled to keep the season's demand, wind and solar energy), plus three weeks kept as they are: the week of the year's highest demand, the week of the highest net load (demand minus the output of lesson 0's 150 MW wind farm and 200 MW solar farm) and the week with the least wind."
+ },
+ "start": {
+  "plan": {
+   "wind": 150,
+   "solar": 200,
+   "cc": 150,
+   "pk": 100,
+   "nuc": 100,
+   "bp": 0,
+   "be": 0
+  },
+  "note": "The reader starts from lesson 0's five plants (illustrative sizes), now asked to serve a whole year."
+ },
+ "game": {
+  "co2Target": 200,
+  "costSlack": 0.05,
+  "capDefault": 200,
+  "capMax": 800,
+  "capStep": 25,
+  "note": "Missions: every light on in the modelled weeks; under 200 kt of CO2 a year (about a quarter of the least-cost plan's emissions with no limit); a cost within 5% of the frontier at the plan's own CO2."
+ },
+ "frontier": {
+  "about": "Least-cost plans under a CO2 cap (kt per year; null = no cap), solved with this model on the seven weeks at the default scenario (EIA and NREL costs, gas $3.85/MMBtu). Precomputed so the page can draw the frontier at once; _tests/learn/test_13-capstone.js re-solves every point. With other scenario settings the page solves the frontier again.",
+  "caps": [
+   null,
+   700,
+   600,
+   500,
+   400,
+   300,
+   250,
+   200,
+   150,
+   100,
+   75,
+   50,
+   25,
+   0
+  ],
+  "points": [
+   {
+    "cap": null,
+    "cost": 102898890,
+    "co2": 792211,
+    "dual": null,
+    "spilled": 0,
+    "plan": {
+     "wind": 0,
+     "solar": 33.1,
+     "cc": 353.2,
+     "pk": 71.8,
+     "nuc": 0,
+     "bp": 0,
+     "be": 0
+    }
+   },
+   {
+    "cap": 700,
+    "cost": 105580757,
+    "co2": 700000,
+    "dual": 29.29,
+    "spilled": 0,
+    "plan": {
+     "wind": 82.4,
+     "solar": 48.9,
+     "cc": 333.4,
+     "pk": 61,
+     "nuc": 0,
+     "bp": 0,
+     "be": 0
+    }
+   },
+   {
+    "cap": 600,
+    "cost": 108834622,
+    "co2": 600000,
+    "dual": 38.89,
+    "spilled": 0,
+    "plan": {
+     "wind": 180.7,
+     "solar": 54.4,
+     "cc": 307.6,
+     "pk": 59.6,
+     "nuc": 0,
+     "bp": 0,
+     "be": 0
+    }
+   },
+   {
+    "cap": 500,
+    "cost": 112970858,
+    "co2": 500000,
+    "dual": 43.43,
+    "spilled": 0,
+    "plan": {
+     "wind": 287.8,
+     "solar": 47.8,
+     "cc": 286.7,
+     "pk": 66.9,
+     "nuc": 0,
+     "bp": 0,
+     "be": 0
+    }
+   },
+   {
+    "cap": 400,
+    "cost": 117336500,
+    "co2": 400000,
+    "dual": 44.03,
+    "spilled": 0.0001,
+    "plan": {
+     "wind": 388.8,
+     "solar": 50.3,
+     "cc": 264,
+     "pk": 76.8,
+     "nuc": 0,
+     "bp": 0,
+     "be": 0
+    }
+   },
+   {
+    "cap": 300,
+    "cost": 122215133,
+    "co2": 300000,
+    "dual": 55.17,
+    "spilled": 0.0076,
+    "plan": {
+     "wind": 493.5,
+     "solar": 52.8,
+     "cc": 250.8,
+     "pk": 75.6,
+     "nuc": 0,
+     "bp": 1.2,
+     "be": 1.2
+    }
+   },
+   {
+    "cap": 250,
+    "cost": 125355109,
+    "co2": 250000,
+    "dual": 71.36,
+    "spilled": 0.0193,
+    "plan": {
+     "wind": 550.8,
+     "solar": 54.6,
+     "cc": 245.2,
+     "pk": 69,
+     "nuc": 0,
+     "bp": 6,
+     "be": 6
+    }
+   },
+   {
+    "cap": 200,
+    "cost": 129253235,
+    "co2": 200000,
+    "dual": 85.18,
+    "spilled": 0.0269,
+    "plan": {
+     "wind": 575.9,
+     "solar": 100,
+     "cc": 229.3,
+     "pk": 72.8,
+     "nuc": 0,
+     "bp": 15.1,
+     "be": 15.1
+    }
+   },
+   {
+    "cap": 150,
+    "cost": 134517023,
+    "co2": 150000,
+    "dual": 136.26,
+    "spilled": 0.0486,
+    "plan": {
+     "wind": 612.7,
+     "solar": 144.9,
+     "cc": 220,
+     "pk": 77.3,
+     "nuc": 0,
+     "bp": 15.1,
+     "be": 15.1
+    }
+   },
+   {
+    "cap": 100,
+    "cost": 143037067,
+    "co2": 100000,
+    "dual": 211.21,
+    "spilled": 0.0873,
+    "plan": {
+     "wind": 649.2,
+     "solar": 215.8,
+     "cc": 209.2,
+     "pk": 71,
+     "nuc": 0,
+     "bp": 27.6,
+     "be": 40
+    }
+   },
+   {
+    "cap": 75,
+    "cost": 149521793,
+    "co2": 75000,
+    "dual": 314.52,
+    "spilled": 0.1117,
+    "plan": {
+     "wind": 684.5,
+     "solar": 238.8,
+     "cc": 201.8,
+     "pk": 51.1,
+     "nuc": 0,
+     "bp": 50.4,
+     "be": 112.6
+    }
+   },
+   {
+    "cap": 50,
+    "cost": 159784666,
+    "co2": 50000,
+    "dual": 500.92,
+    "spilled": 0.16,
+    "plan": {
+     "wind": 730.7,
+     "solar": 286.6,
+     "cc": 204.6,
+     "pk": 28.3,
+     "nuc": 0,
+     "bp": 64.5,
+     "be": 168.3
+    }
+   },
+   {
+    "cap": 25,
+    "cost": 178095989,
+    "co2": 25000,
+    "dual": 1293.81,
+    "spilled": 0.2345,
+    "plan": {
+     "wind": 843.8,
+     "solar": 303.3,
+     "cc": 169,
+     "pk": 28.3,
+     "nuc": 0,
+     "bp": 85.8,
+     "be": 335.5
+    }
+   },
+   {
+    "cap": 0,
+    "cost": 288459004,
+    "co2": 0,
+    "dual": 231283.17,
+    "spilled": 0.2751,
+    "plan": {
+     "wind": 220,
+     "solar": 59.1,
+     "cc": 0,
+     "pk": 0,
+     "nuc": 329.7,
+     "bp": 61.9,
+     "be": 446.7
+    }
+   }
+  ]
+ }
+}

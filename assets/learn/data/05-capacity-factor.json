@@ -1,0 +1,394 @@
+{
+  "meta": {
+    "lesson": "05-capacity-factor",
+    "title": "Lesson 5 data: capacity factors, the year profiles' targets, the solar day and the illustrative turbine",
+    "built": "2026-11-02",
+    "license": "Numbers from EIA are U.S. government works in the public domain; this file CC BY 4.0",
+    "about": "The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so their mean is NOT a capacity factor (wind 0.528, solar 0.235). The lesson turns them into a plant's output with the shared helper LX.townProfile (assets/learn/components/profiles.js), method \"power\", to the annual targets in the shared cf_targets.json (EIA Table 6.07.B, 2025), with each month first brought to the 2025 U.S. monthly capacity factor (the helper's monthlyCF option; the values are in cf_targets.json, monthly). Night-time solar telemetry is already zero in town_year.json (scripts/build_learn_town_data.py). Nuclear runs at full size except for one illustrative refuelling outage (nuclear). Why \"power\": the best hours reach the plant's size, so the year view shows output against nameplate."
+  },
+  "sources": {
+    "eia930": {
+      "title": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
+      "url": "https://www.eia.gov/electricity/gridmonitor/",
+      "as_of": "calendar year 2025 (shapes in town_year.json, accessed 2026-11-02)"
+    },
+    "eia_refuel": {
+      "title": "EIA, Today in Energy (14 October 2022): Daily U.S. summer nuclear capacity outages were 19% lower this summer than last summer",
+      "url": "https://www.eia.gov/todayinenergy/detail.php?id=54239",
+      "as_of": "October 2022: plants typically refuel every 18 to 24 months; the average planned refuelling outage in 2022 lasted 38 days",
+      "accessed": "2026-11-02"
+    },
+    "eia_homes": {
+      "title": "EIA, Frequently Asked Questions: How much electricity does an American home use?",
+      "url": "https://www.eia.gov/tools/faqs/faq.php?id=97&t=3",
+      "as_of": "data for 2022: 10,791 kWh a year per U.S. residential utility customer (electricity bought; a yearly energy total, not supply in every hour)",
+      "accessed": "2026-11-02"
+    },
+    "paper_mfgpr": {
+      "title": "A Multi-Fidelity Gaussian Process Regression Method for Probabilistic Wind Farm Power Curve Estimation (ASME IDETC/CIE 2023)",
+      "url": "https://doi.org/10.1115/DETC2023-114762",
+      "as_of": "published 2023"
+    },
+    "repo_mfgpr": {
+      "title": "mfgpr-wind-power-curve (public framework repository)",
+      "url": "https://github.com/Henryutd2021/mfgpr-wind-power-curve",
+      "as_of": "v1.0.0"
+    },
+    "nrel_dl15": {
+      "title": "NREL (2015), Power Performance Test Report for the U.S. Department of Energy 1.5-Megawatt Wind Turbine, Technical Report NREL/TP-5000-63684, Table 6 (measured power curve, database A, sea-level air density 1.225 kg/m3)",
+      "url": "https://docs.nlr.gov/docs/fy15osti/63684.pdf",
+      "as_of": "test from 28 February to 21 June 2011 at the National Wind Technology Center near Boulder, Colorado; report August 2015",
+      "accessed": "2026-11-02"
+    }
+  },
+  "homes": {
+    "kwhPerHomeYear": 10791,
+    "source": "eia_homes"
+  },
+  "plantMW": 100,
+  "year": {
+    "about": "town_year.json: index i is the hour ending at start_utc + i (UTC). start_utc is 2025-01-01T07:00, so index 0 is the hour 00:00-01:00 Central Standard Time on 1 January and the 8,760 hours make 365 whole local days (standard time, UTC-6, all year).",
+    "utcOffsetHours": -6,
+    "monthDays": [
+      31,
+      28,
+      31,
+      30,
+      31,
+      30,
+      31,
+      31,
+      30,
+      31,
+      30,
+      31
+    ]
+  },
+  "nuclear": {
+    "about": "Illustrative: the plant runs at full size all year except one spring refuelling outage of 780 hours (32.5 days, from 25 March), so that the year's capacity factor is (8760 - 780) / 8760 = 91.1%, the 2025 U.S. average. EIA: plants refuel every 18 to 24 months, mostly in spring and fall; the average planned outage in 2022 lasted 38 days.",
+    "outageStartDay": 83,
+    "outageHours": 780,
+    "source": "eia_refuel"
+  },
+  "day": {
+    "about": "An illustrative solar day based on SPP observations: the 100 MW solar farm's hourly output on the lesson-0 day, Central daylight time (UTC-5), rounded to whole MW. It is the year profile's day (SPP's 2025 shape, reshaped month by month to the U.S. capacity factors) as built from town_year.json after the 2026-11-02 night-time solar refresh (scripts/build_learn_town_data.py: solar is zero when the sun is below the horizon at SPP's centre), stored here so the page's static table, the steps and the explain layer state the same 24 numbers. The lesson's test checks it against the year profile hour by hour (within 1 MW).",
+    "date": "2025-09-03",
+    "dateLabel": "3 September 2025",
+    "utcOffsetHours": -5,
+    "tech": "solar",
+    "bars": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      32,
+      56,
+      62,
+      71,
+      76,
+      72,
+      53,
+      72,
+      79,
+      63,
+      31,
+      6,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "turbine": {
+    "about": "Illustrative onshore turbine with a clean power curve: below the rated speed the output follows the cube law, P = rated x (v / ratedSpeed)^3; from the rated speed to the cut-out speed it holds its rated power; outside [cutIn, cutOut] it makes nothing. With a 100 m rotor and air at 1.225 kg/m3 this is a power coefficient of 0.36 at the rated speed, below the Betz limit 16/27.",
+    "ratedKW": 3000,
+    "cutIn": 3,
+    "ratedSpeed": 12,
+    "cutOut": 25,
+    "rotorM": 100,
+    "airDensity": 1.225,
+    "maxSlider": 26
+  },
+  "apply": {
+    "about": "Step 8: Prairie Town's wind farm (town.json fleet.wind.mw) at the 2025 U.S. wind capacity factor.",
+    "mw": 150
+  },
+  "measured": {
+    "about": "Go deeper (Modeler): a measured power curve. Bins of 0.5 m/s from the report's Table 6, transcribed by hand: [normalised wind speed m/s, average power kW, number of 10-minute data sets, Category A standard uncertainty kW]. The test met the IEC 61400-12-1 power-performance standard; 262 hours of valid 10-minute averages, normalised to sea-level air density, the same density as the lesson's turbine. The report publishes bins, not the individual 10-minute points. The spread drawn on the page is one standard deviation of the 10-minute averages in a bin, recovered as Category A uncertainty x sqrt(number of data sets), because the report's Category A uncertainty is that standard deviation divided by sqrt(N) (IEC 61400-12-1, Annex E). Below about 3 m/s the idle turbine draws a few kW for its controls, so those bins are slightly negative.",
+    "source": "nrel_dl15",
+    "ratedKW": 1500,
+    "rotorM": 77,
+    "hubM": 80,
+    "ratedSpeed": 14,
+    "cutOut": 25,
+    "airDensity": 1.225,
+    "hoursValid": 262,
+    "cutIn": 3,
+    "cpBest": 0.52,
+    "cleanAbout": "The clean curve drawn beside the measurements is built the lesson's way for this turbine: no output below cutIn (3 m/s, where the measured output turns positive; the report states no cut-in speed) or above cutOut; otherwise 1/2 x airDensity x rotor area x v^3 x cpBest, capped at ratedKW. cpBest = 0.52 is the highest binned power coefficient in the report's Table 6 (at 7.04 m/s).",
+    "columns": [
+      "windMs",
+      "powerKW",
+      "n10min",
+      "catAKW"
+    ],
+    "bins": [
+      [
+        1.01,
+        -4.92,
+        11,
+        0.08
+      ],
+      [
+        1.53,
+        -5.44,
+        25,
+        0.19
+      ],
+      [
+        1.99,
+        -5.78,
+        34,
+        0.17
+      ],
+      [
+        2.43,
+        -5.56,
+        34,
+        0.5
+      ],
+      [
+        2.97,
+        0.59,
+        15,
+        3.59
+      ],
+      [
+        3.51,
+        18.91,
+        31,
+        3.46
+      ],
+      [
+        3.97,
+        58.88,
+        42,
+        4.37
+      ],
+      [
+        4.52,
+        100.82,
+        42,
+        7.15
+      ],
+      [
+        5.01,
+        162.89,
+        47,
+        7.04
+      ],
+      [
+        5.52,
+        235.1,
+        57,
+        6.68
+      ],
+      [
+        5.99,
+        303.63,
+        81,
+        5.82
+      ],
+      [
+        6.52,
+        399.01,
+        74,
+        6.45
+      ],
+      [
+        7.04,
+        513.9,
+        64,
+        5.87
+      ],
+      [
+        7.51,
+        608.8,
+        75,
+        10.55
+      ],
+      [
+        8.0,
+        742.33,
+        78,
+        8.37
+      ],
+      [
+        8.49,
+        853.63,
+        73,
+        13.68
+      ],
+      [
+        9.01,
+        975.43,
+        80,
+        13.18
+      ],
+      [
+        9.52,
+        1096.64,
+        74,
+        14.76
+      ],
+      [
+        10.03,
+        1200.18,
+        62,
+        9.53
+      ],
+      [
+        10.48,
+        1259.6,
+        50,
+        10.78
+      ],
+      [
+        10.99,
+        1317.72,
+        61,
+        10.9
+      ],
+      [
+        11.49,
+        1389.96,
+        71,
+        6.7
+      ],
+      [
+        11.98,
+        1400.22,
+        41,
+        19.78
+      ],
+      [
+        12.52,
+        1453.27,
+        59,
+        5.39
+      ],
+      [
+        12.97,
+        1452.29,
+        41,
+        7.53
+      ],
+      [
+        13.51,
+        1477.63,
+        36,
+        4.53
+      ],
+      [
+        13.97,
+        1481.77,
+        35,
+        7.93
+      ],
+      [
+        14.43,
+        1495.62,
+        22,
+        4.82
+      ],
+      [
+        15.01,
+        1497.75,
+        23,
+        4.58
+      ],
+      [
+        15.49,
+        1494.8,
+        14,
+        3.95
+      ],
+      [
+        15.98,
+        1496.56,
+        13,
+        4.74
+      ],
+      [
+        16.46,
+        1505.16,
+        13,
+        5.06
+      ],
+      [
+        16.97,
+        1505.79,
+        20,
+        2.86
+      ],
+      [
+        17.52,
+        1511.65,
+        18,
+        4.22
+      ],
+      [
+        18.0,
+        1497.01,
+        16,
+        6.82
+      ],
+      [
+        18.47,
+        1509.12,
+        13,
+        3.41
+      ],
+      [
+        19.06,
+        1499.37,
+        8,
+        6.16
+      ],
+      [
+        19.4,
+        1501.96,
+        4,
+        6.0
+      ],
+      [
+        19.96,
+        1511.18,
+        3,
+        6.3
+      ],
+      [
+        20.51,
+        1507.56,
+        7,
+        3.8
+      ],
+      [
+        20.95,
+        1502.55,
+        3,
+        6.54
+      ],
+      [
+        21.45,
+        1499.1,
+        4,
+        8.33
+      ]
+    ]
+  }
+}

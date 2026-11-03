@@ -1,6 +1,33 @@
 [
   {
-    "listing": "/field-notes/briefings.html",
+    "listing": "/learn/index.html",
+    "items": [
+      "/learn/00-grid-operator.html",
+      "/learn/01-power-energy.html",
+      "/learn/02-demand.html",
+      "/learn/05-capacity-factor.html",
+      "/learn/06-three-jobs.html",
+      "/learn/07-cost.html",
+      "/learn/08-merit-order.html",
+      "/learn/12-trade-offs.html",
+      "/learn/13-capstone.html"
+    ]
+  },
+  {
+    "listing": "/field-notes/perspectives.html",
+    "items": [
+      "/field-notes/perspectives/2026-11-three-jobs.html"
+    ]
+  },
+  {
+    "listing": "/field-notes.html",
+    "items": [
+      "/field-notes/briefings/2026-11-03.html",
+      "/field-notes/perspectives/2026-11-three-jobs.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
     "items": [
       "/field-notes/briefings/2026-11-03.html"
     ]
@@ -25,22 +52,9 @@
     ]
   },
   {
-    "listing": "/index.html",
+    "listing": "/field-notes/briefings.html",
     "items": [
       "/field-notes/briefings/2026-11-03.html"
-    ]
-  },
-  {
-    "listing": "/field-notes.html",
-    "items": [
-      "/field-notes/briefings/2026-11-03.html",
-      "/field-notes/perspectives/2026-11-three-jobs.html"
-    ]
-  },
-  {
-    "listing": "/field-notes/perspectives.html",
-    "items": [
-      "/field-notes/perspectives/2026-11-three-jobs.html"
     ]
   }
 ]

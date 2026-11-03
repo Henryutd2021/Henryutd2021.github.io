@@ -1,0 +1,233 @@
+{
+ "meta": {
+  "title": "Bridge B1 (From algebra to a linear program): readiness check and word problems",
+  "built_by": "by hand, 2026-11-02; every number is checked by _tests/learn/test_b01-algebra-to-lp.js",
+  "license": "CC BY 4.0",
+  "notes": "The dispatch story is built in the page from town.json and town_year.json (19:00 on 3 September 2025, as in lesson 0). The planning story takes its energy per MW from cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 U.S. capacity factors: solar 24.0%, wind 33.8%), rounded to 2.1 and 3.0 GWh per MW-year. All prices, costs, sizes and limits in the stories are illustrative. The dispatch stories limit only how fast the combined-cycle plant climbs (the drop is left out), and gas above the need is matched by spilling wind or sun (checked by the test)."
+ },
+ "ready": {
+  "groups": {
+   "units": {"label": "Power and energy", "route": "starter:1", "advice": "Revisit lesson 1 on power and energy first (about 15 minutes)."},
+   "rates": {"label": "Rates and efficiencies", "route": "tool:K2", "advice": "Toolbox K2, rates and efficiencies, is coming soon; lesson 7's cost steps cover the same ground."},
+   "linear": {"label": "Equations and inequalities", "route": "tool:K4", "advice": "Take toolbox K4 first (about 15 minutes): this lesson builds on it at every step."},
+   "vectors": {"label": "Multiply and add", "route": "tool:K6", "advice": "Not needed yet: steps 9 and 10 introduce it gently. Toolbox K6 (coming later) goes further."}
+  },
+  "items": [
+   {"id": "r1", "group": "units", "q": "A plant makes 40 MW for 6 hours. How much energy is that?", "choices": ["46 MWh", "240 MWh", "240 MW", "6.7 MWh"], "answer": 1, "why": "Energy = power × time: 40 MW × 6 h = 240 MWh."},
+   {"id": "r2", "group": "units", "q": "How many kWh are in 1 MWh?", "choices": ["10", "100", "1,000", "1,000,000"], "answer": 2, "why": "Mega is a thousand times kilo: 1 MWh = 1,000 kWh."},
+   {"id": "r3", "group": "rates", "q": "A boiler turns fuel into heat at 90% efficiency. 100 MWh of fuel gives…", "choices": ["90 MWh of heat", "111 MWh of heat", "10 MWh of heat", "100 MWh of heat"], "answer": 0, "why": "Heat out = 0.9 × 100 MWh = 90 MWh; the other 10 MWh is lost."},
+   {"id": "r4", "group": "rates", "q": "Energy at $40 per MWh. What do 25 MWh cost?", "choices": ["$65", "$1.60", "$1,000", "$10,000"], "answer": 2, "why": "$40/MWh × 25 MWh = $1,000: the MWh cancel."},
+   {"id": "r5", "group": "linear", "q": "100 + 98 + g = 303. What is g?", "choices": ["105", "203", "501", "98"], "answer": 0, "why": "g = 303 − 100 − 98 = 105."},
+   {"id": "r6", "group": "linear", "q": "2x + 10 = 50. What is x?", "choices": ["30", "20", "25", "40"], "answer": 1, "why": "Take 10 from both sides (2x = 40), then halve: x = 20."},
+   {"id": "r7", "group": "linear", "q": "“The line carries at most 150 MW.” In symbols, with x the flow in MW:", "choices": ["x ≤ 150", "x ≥ 150", "x < 150", "x = 150"], "answer": 0, "why": "At most means ≤: exactly 150 MW is still allowed."},
+   {"id": "r8", "group": "linear", "q": "−2x ≤ 6 means…", "choices": ["x ≤ −3", "x ≥ −3", "x ≥ 3", "x ≤ 3"], "answer": 1, "why": "Divide by −2 and flip the sign: x ≥ −3."},
+   {"id": "r9", "group": "linear", "q": "Which plan passes both x ≤ 100 and x + y ≥ 120?", "choices": ["x = 110, y = 20", "x = 90, y = 20", "x = 100, y = 20", "x = 60, y = 50"], "answer": 2, "why": "100 ≤ 100 and 100 + 20 = 120 ≥ 120. The others break the 100 limit or reach only 110."},
+   {"id": "r10", "group": "vectors", "q": "Three plants cost $10, $40 and $100 per MWh and run at 100, 50 and 20 MW for one hour. Total cost?", "choices": ["$150", "$5,000", "$7,000", "$19,000"], "answer": 1, "why": "Multiply pairwise and add: 10 × 100 + 40 × 50 + 100 × 20 = $5,000."}
+  ]
+ },
+ "stories": {
+  "planning": {
+   "title": "New wind and solar for Prairie Town",
+   "labels": ["Need", "Output per MW", "Costs", "Limit", "Choose"],
+   "text": ["Prairie Town wants at least 300 GWh a year from new solar and wind farms.", "Each MW of solar makes about {solarGWh} GWh a year and each MW of wind about {windGWh} GWh ({solarCF} and {windCF} capacity factors, U.S. 2025, rounded).", "Solar costs $120k and wind $180k per MW each year, building and upkeep together.", "The substation can connect at most 115 MW in total.", "Which mix is cheapest?"],
+   "vars": [{"sym": "S", "name": "solar to build", "unit": "MW"}, {"sym": "W", "name": "wind to build", "unit": "MW"}],
+   "sense": "min", "c": [120, 180], "goalUnit": "$k a year",
+   "rows": [
+    {"a": [2.1, 3.0], "op": ">=", "b": 300, "key": "energy", "says": "at least 300 GWh a year", "given": true},
+    {"a": [1, 1], "op": "<=", "b": 115, "key": "connect", "says": "the substation can connect at most 115 MW in total", "given": false},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "S0", "says": "no negative solar", "given": true},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "W0", "says": "no negative wind", "given": true}],
+   "view": [0, 160, 0, 160], "ticks": [0, 40, 80, 120, 160],
+   "hints": ["Read the story again: which sentence has no rule in the model yet?", "The substation counts solar and wind MW together: each MW of either uses one MW of the connection.", "S + W ≤ 115: one for S, one for W, ≤, and 115 on the right."]
+  },
+  "battery": {
+   "title": "Prairie Town's battery: buy tonight, sell tomorrow",
+   "labels": ["Battery", "Prices", "Losses", "Choose"],
+   "text": ["Prairie Town's battery starts empty, stores up to 80 MWh, and charges or discharges at up to 40 MW.", "Tonight it can charge for three hours at $30 per MWh; tomorrow evening it can sell for two hours at $120 per MWh.", "Charging loses nothing; discharging delivers 90% of the energy stored.", "Choose c, the MWh it buys tonight, and d, the MWh it sells tomorrow, to earn the most."],
+   "vars": [{"sym": "c", "name": "energy bought tonight", "unit": "MWh"}, {"sym": "d", "name": "energy sold tomorrow", "unit": "MWh"}],
+   "sense": "max", "c": [-30, 120], "goalUnit": "$",
+   "rows": [
+    {"a": [1, 0], "op": "<=", "b": 120, "key": "chargeHours", "says": "it charges at up to 40 MW for three hours (40 × 3 = 120 MWh)"},
+    {"a": [1, 0], "op": "<=", "b": 80, "key": "store", "says": "it stores up to 80 MWh"},
+    {"a": [0, 1], "op": "<=", "b": 80, "key": "sellHours", "says": "it sells at up to 40 MW for two hours (40 × 2 = 80 MWh)"},
+    {"a": [-0.9, 1], "op": "<=", "b": 0, "key": "loss", "says": "only 90% of what it takes in comes back out (d ≤ 0.9c)"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "c0", "says": "it cannot buy a negative amount"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "d0", "says": "it cannot sell a negative amount"}],
+   "view": [0, 140, 0, 100], "ticks": [0, 20, 40, 60, 80, 100, 120, 140],
+   "hints": ["Two decisions, c and d, both in MWh. The goal is money earned: sales minus purchases, so 120d − 30c. Is that a min or a max?", "Four limits come from the story: charging (40 MW for 3 h), the storage size, selling (40 MW for 2 h) and the losses: d is at most 90% of c. And neither can be negative.", "max 120d − 30c, subject to c ≤ 120, c ≤ 80, d ≤ 80, −0.9c + d ≤ 0, c ≥ 0 and d ≥ 0."]
+  },
+  "heat": {
+   "title": "Heat for Prairie Campus tonight",
+   "labels": ["Need", "Heat pump", "Boiler", "Limit", "Choose"],
+   "text": ["Prairie Campus needs at least 40 MWh of heat tonight.", "Its heat pump uses 1 MWh of electricity to move 2 MWh of heat in from the outside air, delivering 3 MWh; at $60 per MWh of electricity, its heat costs $20 per MWh.", "Its gas boiler turns fuel into heat at 90% efficiency; at $27 per MWh of fuel, its heat costs $30 per MWh.", "The campus's electricity supply line can carry at most 10 MWh for heating tonight.", "Choose h, the heat from the heat pump, and b, the heat from the boiler, both in MWh, at the lowest cost."],
+   "vars": [{"sym": "h", "name": "heat from the heat pump", "unit": "MWh"}, {"sym": "b", "name": "heat from the boiler", "unit": "MWh"}],
+   "sense": "min", "c": [20, 30], "goalUnit": "$",
+   "rows": [
+    {"a": [1, 1], "op": ">=", "b": 40, "key": "heat", "says": "at least 40 MWh of heat"},
+    {"a": [1, 0], "op": "<=", "b": 30, "key": "feeder", "says": "at most 10 MWh of electricity, which delivers at most 30 MWh of heat (h/3 ≤ 10)"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "h0", "says": "no negative heat from the heat pump"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "b0", "says": "no negative heat from the boiler"}],
+   "view": [0, 60, 0, 60], "ticks": [0, 10, 20, 30, 40, 50, 60],
+   "hints": ["The goal adds the cost of each MWh of heat: $20 from the heat pump, $30 from the boiler. Minimize it.", "Heat must reach 40 MWh in total. The supply line limits electricity, and the heat pump delivers 3 MWh of heat per MWh of electricity.", "min 20h + 30b, subject to h + b ≥ 40, h ≤ 30 (the same as h/3 ≤ 10), h ≥ 0 and b ≥ 0."]
+  },
+  "carbon": {
+   "title": "A carbon cap on the Plains Grid",
+   "labels": ["Need", "Steam unit", "Combined-cycle", "Cap", "Choose"],
+   "text": ["A plant owner on the Plains Grid must deliver exactly 150 MW this hour from two units.", "An older steam unit costs $32 per MWh, emits 0.6 t CO₂ per MWh and makes up to 120 MW.", "A combined-cycle unit costs $40 per MWh, emits 0.4 t CO₂ per MWh and makes up to 100 MW.", "A permit caps this hour's emissions at 76 t CO₂.", "Choose s and c, the MW from each unit, at the lowest cost."],
+   "vars": [{"sym": "s", "name": "steam unit output", "unit": "MW"}, {"sym": "c", "name": "combined-cycle output", "unit": "MW"}],
+   "sense": "min", "c": [32, 40], "goalUnit": "$ this hour",
+   "rows": [
+    {"a": [1, 1], "op": "=", "b": 150, "key": "deliver", "says": "exactly 150 MW"},
+    {"a": [0.6, 0.4], "op": "<=", "b": 76, "key": "cap", "says": "at most 76 t CO₂ this hour"},
+    {"a": [1, 0], "op": "<=", "b": 120, "key": "sMax", "says": "the steam unit makes up to 120 MW"},
+    {"a": [0, 1], "op": "<=", "b": 100, "key": "cMax", "says": "the combined-cycle unit makes up to 100 MW"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "s0", "says": "no negative output"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "c0", "says": "no negative output"}],
+   "view": [0, 160, 0, 160], "ticks": [0, 40, 80, 120, 160],
+   "hints": ["Cost is $32 × s + $40 × c for one hour. Emissions are 0.6 × s + 0.4 × c tonnes.", "Five rules: deliver exactly 150 MW, the 76 t cap, each unit's size, and no negative output.", "min 32s + 40c, subject to s + c = 150, 0.6s + 0.4c ≤ 76, s ≤ 120, c ≤ 100, s ≥ 0 and c ≥ 0."]
+  },
+  "imports": {
+   "title": "Prairie Town's imports tonight",
+   "labels": ["Need", "Prices", "Limits", "Decisions"],
+   "text": ["Tonight Prairie Town must import at least 100 MWh from two neighbours.", "The north sells at $30 per MWh and emits 0.9 t CO₂ per MWh; the south sells at $50 per MWh and emits 0.4 t.", "The north line carries at most 80 MWh tonight, and the town's permit caps tonight's emissions at 64 t.", "x is the energy from the north and y from the south, in MWh."],
+   "vars": [
+    {"sym": "x", "name": "energy from the north", "unit": "MWh"},
+    {"sym": "y", "name": "energy from the south", "unit": "MWh"}],
+   "sense": "min",
+   "c": [30, 50],
+   "goalUnit": "$",
+   "rows": [
+    {"a": [1, 1], "op": ">=", "b": 100, "key": "cover", "name": "cover", "says": "at least 100 MWh tonight"},
+    {"a": [0.9, 0.4], "op": "<=", "b": 64, "key": "cap", "name": "cap", "says": "at most 64 t CO₂ tonight"},
+    {"a": [1, 0], "op": "<=", "b": 80, "key": "north", "name": "north line", "says": "the north line carries at most 80 MWh"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "x0", "name": "x ≥ 0", "says": "no negative imports"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "y0", "name": "y ≥ 0", "says": "no negative imports"}],
+   "view": [0, 100, 0, 180],
+   "ticks": [0, 20, 40, 60, 80, 100, 120, 140, 160, 180]
+  },
+  "bus": {
+   "title": "Prairie Town's bus depot tonight",
+   "labels": ["Need", "Prices", "Connection", "Shuttle", "Choose"],
+   "text": ["The depot must charge Prairie Town's electric buses with at least 6 MWh between 22:00 and 6:00.", "Power costs $45 per MWh before midnight and $25 per MWh after.", "Its 2 MW connection fits at most 4 MWh before midnight (2 MW × 2 h) and 12 MWh after (2 MW × 6 h).", "Two buses run a late shuttle, so at least 1 MWh must go in before midnight.", "x is the energy charged before midnight and y after, in MWh; the depot wants the cheapest plan."],
+   "vars": [
+    {"sym": "x", "name": "charged before midnight", "unit": "MWh"},
+    {"sym": "y", "name": "charged after midnight", "unit": "MWh"}],
+   "sense": "min",
+   "c": [45, 25],
+   "goalUnit": "$",
+   "rows": [
+    {"a": [1, 1], "op": ">=", "b": 6, "key": "need", "says": "at least 6 MWh in total"},
+    {"a": [1, 0], "op": "<=", "b": 4, "key": "early", "says": "at most 4 MWh before midnight"},
+    {"a": [0, 1], "op": "<=", "b": 12, "key": "late", "says": "at most 12 MWh after midnight"},
+    {"a": [1, 0], "op": ">=", "b": 1, "key": "shuttle", "says": "at least 1 MWh before midnight, for the shuttle"},
+    {"a": [1, 0], "op": ">=", "b": 0, "key": "x0", "says": "no negative charging"},
+    {"a": [0, 1], "op": ">=", "b": 0, "key": "y0", "says": "no negative charging"}],
+   "view": [0, 8, 0, 14],
+   "ticks": [0, 2, 4, 6, 8, 10, 12, 14]
+  }
+ },
+ "practice": {
+  "title": "Practice: eight exercises in three sets",
+  "lede": "Each set fades from a worked example to a blank page; Formulate starts blank, because steps 3, 7 and 8 did its fade. Hints come one at a time, and every check says why.",
+  "foot": "Prices, costs, emissions and limits in these exercises are illustrative; the gas needs at 14:00 and 18:00 follow the real day of 3 September 2025, as in step 2.",
+  "tracks": [
+   {"key": "formulate", "label": "Formulate", "intro": "Write the whole model from the story: decisions, goal and rules.", "items": ["heat", "carbon"]},
+   {"key": "corner", "label": "Best corner", "intro": "Find the corners of the allowed region, cost each one and keep the cheapest.", "items": ["c14", "c18", "imports"]},
+   {"key": "arrays", "label": "A x ≤ b", "intro": "Write a model the way a solver reads it: costs c, rows of A and limits b, every row ≤.", "items": ["aplan", "abat", "abus"]}],
+  "items": {
+   "heat": {
+    "kind": "scratch",
+    "minutes": 8,
+    "story": "heat"
+   },
+   "carbon": {
+    "kind": "scratch",
+    "minutes": 9,
+    "story": "carbon"
+   },
+   "c14": {
+    "kind": "worked",
+    "minutes": 3,
+    "title": "The cheapest corner at 14:00",
+    "hour": 14,
+    "prev": 45,
+    "whatIfPK": 35,
+    "labels": ["Need", "Combined-cycle", "Peaker"],
+    "text": ["At {hh} on {date}, in the midday solar dip, Prairie Town's gas plants must cover at least {need} MW.", "The combined-cycle plant (${costCC}/MWh) made {prev} MW at {hhPrev} and can climb by at most {ramp} MW an hour.", "The peaker (${costPK}/MWh) makes at most {pkMax} MW."],
+    "worked": "The rules leave {nCorners} corners. Cost each one with {goal} dollars: the cheapest, {best}, is the best plan.",
+    "q": "What if the peaker cost ${alt} per MWh, less than the combined-cycle plant? Tap the corner that would be cheapest.",
+    "hints": ["The corners stay where they are; only their costs change. Recompute {costCC}x + {alt}y at each corner.", "Every MW from the peaker is now the cheaper MW, so use as little combined-cycle output as the rules allow."],
+    "right": "Right: {altBest} costs {altBestCost}, the least of all {nCorners} corners. A new price can move the best plan to another corner.",
+    "wrong": "{pick} would cost {pickCost}; {altBest} costs {altBestCost}."
+   },
+   "c18": {
+    "kind": "partly",
+    "minutes": 4,
+    "title": "One corner left at 18:00",
+    "hour": 18,
+    "prev": 65,
+    "labels": ["Need", "Combined-cycle", "Peaker"],
+    "text": ["At {hh} the evening climb begins: the gas plants must cover at least {need} MW.", "The combined-cycle plant (${costCC}/MWh) made {prev} MW at {hhPrev} and can climb by at most {ramp} MW an hour.", "The peaker (${costPK}/MWh) makes at most {pkMax} MW."],
+    "ask": "Two corners are costed for you. Find the third, where the cover line meets the ramp line, and its cost.",
+    "hints": ["The corner lies on both lines: x + y = {need} and x = {reach}.", "Put x = {reach} into x + y = {need}: y = {need} − {reach}.", "Its cost is {costCC} × {reach} + {costPK} × y dollars; then compare it with the other two corners."],
+    "right": "Right: ({bx}, {by}) at {bestCost}, the cheapest of the three corners, and the plan lesson 0's cheapest-first rule finds for {hh}.",
+    "offLine": "({x}, {y}) is not on both lines: a corner here must satisfy x + y = {need} and x = {reach}.",
+    "badCost": "The corner is right; recompute its cost, {costCC} × {bx} + {costPK} × {by}."
+   },
+   "imports": {
+    "kind": "scratch",
+    "minutes": 7,
+    "title": "Tonight's imports",
+    "story": "imports",
+    "ask": "Find every corner of the allowed region, cost each one, and enter the cheapest.",
+    "hints": ["Read the region's edges: the cover line, the cap line and the y-axis. Where do they cross?", "There are {nCorners} corners: {nAxis} on the y-axis, and one where x + y = {need} meets {capA}x + {capB}y = {cap}.", "Put y = {need} − x into the cap line: {k}x = {rhs}, so x = {bx}."],
+    "right": "Right: ({bx}, {by}) at {bestCost}. The north line's {north} MWh limit never touches the region: a redundant rule.",
+    "breaks": "({x}, {y}) breaks a rule: “{says}”.",
+    "notBest": "({x}, {y}) is allowed but costs {cost}; a corner costs less.",
+    "badCost": "That is the right corner; recompute its cost, {cN} × {bx} + {cS} × {by}."
+   },
+   "aplan": {
+    "kind": "worked",
+    "minutes": 2,
+    "title": "The planning model as arrays",
+    "story": "planning",
+    "newGoal": 330,
+    "why": {
+     "energy": "≥ in the story: every sign multiplied by −1",
+     "connect": "already ≤: copied as it is"
+    },
+    "q": "The town raises its goal to {newGoal} GWh a year. What changes in the arrays?",
+    "choices": ["b₁ becomes −{newGoal}", "b₁ becomes {newGoal}", "A's first row changes", "b₂ becomes {newGoal}"],
+    "answer": 0,
+    "hints": ["The goal is the right-hand side of the energy rule, row 1.", "Row 1 was multiplied by −1 to become ≤; its new limit is too."],
+    "reasons": ["Right: only the limit moves, with the flipped sign: −{newGoal}.", "Row 1 was flipped, so its limit enters as −{newGoal}, not {newGoal}.", "A holds the GWh per MW, {s} and {w}; they stay. Only the limit moves.", "b₂ is the connection limit, {conn} MW; the energy goal is row 1."]
+   },
+   "abat": {
+    "kind": "partly",
+    "minutes": 4,
+    "title": "The battery model as arrays",
+    "story": "battery",
+    "ask": "Three rows are written for you. Write the costs in min form, and the losses row.",
+    "locked": ["chargeHours", "store", "sellHours"],
+    "hints": ["A max goal enters a min-form solver with every sign flipped: max {gmax} is min {gmin}.", "The losses rule {lossRule}, with every term on the left: {lossLe}.", "Costs ({c1}, {c2}); losses row ({l1}, {l2}) with b = {lb}."]
+   },
+   "abus": {
+    "kind": "scratch",
+    "minutes": 6,
+    "title": "The bus depot, straight to arrays",
+    "story": "bus",
+    "ask": "Write the costs c, then one ≤ row for every rule except x ≥ 0 and y ≥ 0. The plane draws your rows as you type.",
+    "hints": ["The goal is already a min, so c holds the two prices as they are.", "Two rules say “at least”: the {need} MWh in total and the {shuttle} MWh for the shuttle. Each becomes ≤ with every sign flipped.", "c = ({c1}, {c2}); rows {rows}."]
+   }
+  },
+  "checks": {
+   "blank": "Fill in every box; write 0 where a decision is missing.",
+   "reversed": "The costs point the wrong way: a min goal keeps them as they are, a max goal enters with every sign flipped.",
+   "weights": "The costs weigh the two decisions differently from the story's goal.",
+   "copied": "Row {k} copies a ≥ rule as ≤: multiply both sides by −1 first.",
+   "cuts": "Row {k} rules out plans the story allows: check its signs and its right-hand side.",
+   "missing": "Your rows let through plans that break “{says}”.",
+   "ok": "Right: every rule as a ≤ row and the costs in min form, the same model as the story. Best plan {best}, {value}."
+  }
+ }
+}
