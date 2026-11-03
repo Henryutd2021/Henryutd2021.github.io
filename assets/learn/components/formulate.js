@@ -7,7 +7,7 @@
      symbols: "min Σ<sub>t</sub> ... <span class=\"tag\">balance</span><br>...",   optional: the same model in symbols, as html
                                                                                      (.tag = a small grey label after a line)
      symbolsLabel: "Show it in symbols" });                                         the summary of the collapsed symbols box
-   Four parts sit in one row on wide cards, two by two under 860 px, and stacked under 520 px. The symbols box is a
+   Four parts (or three) sit in one row on wide cards, two to a row under 860 px, and stacked under 520 px. The symbols box is a
    <details>, so it is keyboard operable and readable as text; long lines scroll inside the box, not the page.
    Returns { el, parts: [part elements], symbols: the symbols box or null }. */
 (function () {
