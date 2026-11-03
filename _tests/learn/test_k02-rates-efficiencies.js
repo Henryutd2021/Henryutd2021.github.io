@@ -109,9 +109,9 @@ const { num, usd, pct } = K;
     const [ra, end] = blockRe(name), a = QMD.match(ra), b = QMD.indexOf(end);
     ok(a && b > a.index && QMD.slice(a.index + a[0].length, b).trim() === B[BLOCKS[name]].trim(), `page: the ${name} table equals staticBlocks() (run with --write)`);
   });
-  // links back to the lessons that need this, forward to K3; K1 named in plain text until it is live
+  // links back to the lessons that need this, back to K1 and forward to K3
   ["01-power-energy.html", "05-capacity-factor.html", "07-cost.html", "09-storage.html", "13-capstone.html", "k03-discounting.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0 || QMD.indexOf("](" + h + ")") >= 0, "links to " + h));
-  ok(!/href="k01/.test(QMD) && /Toolbox K1 covers the units underneath/.test(QMD), "K1 is named, not linked");
+  ok(/Toolbox <a href="k01-units.html">K1<\/a> covers the units underneath/.test(QMD), "K1 is linked");
   // sources: primary, dated
   ok(/faq\.php\?id=107&amp;t=3">EIA FAQ on plant efficiency<\/a> \(checked 3 November 2026\)/.test(QMD), "source: EIA FAQ, 3,412 Btu per kWh, dated");
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(April 2026\)/.test(QMD) && /co2_vol_mass\.php">EIA<\/a> \(checked 2 November 2026\)/.test(QMD) && /93281\.pdf">NREL's 2025 battery cost study<\/a> \(June 2025\)/.test(QMD) && /Table 6\.07\.B<\/a> \(released 23 October 2026\)/.test(QMD), "sources: EIA, NREL with their dates");

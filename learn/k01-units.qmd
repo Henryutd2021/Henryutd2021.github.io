@@ -160,7 +160,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Multiply: add the exponents.** $10^3 \times 10^6 = 10^9$: a thousand MW is a GW.
 - **Divide: subtract them.** $\dfrac{4.2 \times 10^{15}}{1.9 \times 10^{1}} \approx 2.2 \times 10^{14}$: the U.S. year in phone charges.
 - **The logarithm is the exponent.** $\log_{10}(6.96 \times 10^9) \approx 9.84$. A [log scale]{.lx-term term="log-scale"} spaces 1, 10 and 100 Wh evenly, so one chart holds a phone and a nation.
-- **The joule.** A watt is one joule per second, so 1 Wh = 3,600 J and 1 kWh = 3.6 MJ, exactly. Heat units such as the MMBtu come in toolbox K2.
+- **The joule.** A watt is one joule per second, so 1 Wh = 3,600 J and 1 kWh = 3.6 MJ, exactly. Heat units such as the MMBtu come in [toolbox K2](k02-rates-efficiencies.html).
 
 ```{=html}
 </div>

@@ -41,3 +41,5 @@ glossary:
   - id: random-seed
     term: Random seed
     def: "A fixed starting number for a random-number generator, so a random draw comes out the same on every run."
+requests:
+  - "K7's Go deeper 'When to leave the spreadsheet' still says 'toolbox K8, upcoming': now that K8 is live, link it (k08-git-notebooks.html) and drop 'upcoming'."
