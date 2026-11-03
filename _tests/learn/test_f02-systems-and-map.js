@@ -134,7 +134,7 @@ const range = (a, b, s) => { const o = []; for (let v = a; v <= b + 1e-9; v += s
   ok(all.join() === "bill,build,co2,mix,whp", `hubs (all four levers): ${all.join(", ")}`);
   ok(/The wholesale price, household bills, the plant mix, CO₂ and what gets built moved under all four levers/.test(JS), "the concept map names the same hubs");
   // the no-JS table says what the data say
-  const fb = (QMD.match(/<table class="lx-mini-table">[\s\S]*?<\/table>/) || [""])[0];
+  const fb = (QMD.match(/<table class="lx-mini-table[^"]*">[\s\S]*?<\/table>/) || [""])[0];
   R.levers.forEach(lv => ok(fb.indexOf("<td>" + lv.label + "</td>") >= 0, `fallback table: ${lv.label}`));
   const mixed = []; R.levers.forEach(lv => lv.waves.forEach(w => w.effects.forEach(e => { if (e.dir === "mixed") mixed.push(lv.id + ":" + e.node); })));
   ok(mixed.sort().join() === "carbon:burden,carbon:margin,dc:bill,dc:co2,dc:local,gas:co2", `"depends" cells: ${mixed.join(", ")}`);

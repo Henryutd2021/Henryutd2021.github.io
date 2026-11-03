@@ -199,7 +199,10 @@
       var ch = H("p", { class: "f1z-power" }, cap); H("span", { class: "lx-pill neutral", text: "Power: " + s.power }, ch); H("span", { text: power(s.id) }, ch);
       H("p", { class: "f1z-q", html: "<span>Its question</span> " + LX.esc(s.question) }, cap);
       btns.forEach(function (b, k) { b.setAttribute("aria-pressed", k === i ? "true" : "false"); b.classList.toggle("seen", !!seen[k]); });
+      var had = document.activeElement;
       bIn.disabled = i === 0; bOut.disabled = i === D.length - 1;
+      if (had === bOut && bOut.disabled) bIn.focus({ preventScroll: true });   // keep keyboard focus on the nav row
+      if (had === bIn && bIn.disabled) bOut.focus({ preventScroll: true });
       var n = Object.keys(seen).length;
       count.textContent = n < D.length ? "Scales visited: " + n + " of " + D.length + "." : "All five scales visited.";
       if (!quiet && o.onGo) o.onGo(i, n);

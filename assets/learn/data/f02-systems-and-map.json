@@ -129,7 +129,7 @@
      ]},
      {"label": "Weeks to months", "effects": [
       {"node": "mix", "dir": "shift", "from": "whp", "why": "Plants that burn other fuels, where they exist, run more; gas plants run less."},
-      {"node": "co2", "dir": "mixed", "from": "mix", "why": "If coal fills in, CO₂ rises; if wind and solar already run flat out, little changes."},
+      {"node": "co2", "dir": "mixed", "from": "mix", "why": "If coal plants fill in, CO₂ rises; if no other plant can take over, gas keeps running and little changes."},
       {"node": "burden", "dir": "up", "from": "bill", "why": "Low-income homes spend a larger share of their income on energy."}
      ]},
      {"label": "Years", "effects": [
@@ -149,7 +149,7 @@
       {"node": "health", "dir": "up", "from": "lever", "why": "People without cooling face more risk to their health."}
      ]},
      {"label": "Hours to days", "effects": [
-      {"node": "margin", "dir": "down", "from": "dem", "why": "Demand is up while lines deliver less, so spare capacity shrinks from both sides."},
+      {"node": "margin", "dir": "down", "from": "dem", "why": "Demand is up while hot lines and some thermal plants deliver less, so spare capacity shrinks from both sides (NERC)."},
       {"node": "mix", "dir": "shift", "from": "dem", "why": "Peakers and power from neighbouring grids fill the gap."},
       {"node": "whp", "dir": "up", "from": "margin", "why": "Tight hours bring scarcity prices."},
       {"node": "co2", "dir": "up", "from": "mix", "why": "In a grid like Prairie Town's, the extra MWh come from gas peakers (lesson 0)."}
@@ -167,11 +167,11 @@
     "loop": null,
     "waves": [
      {"label": "Days to months", "effects": [
-      {"node": "mix", "dir": "shift", "from": "lever", "why": "Coal's running cost rises more than gas's, since it emits more CO₂ per MWh, so gas moves ahead of coal in the merit order."},
+      {"node": "mix", "dir": "shift", "from": "lever", "why": "Coal's running cost rises more than gas's, since it emits more CO₂ per MWh, so gas plants can move ahead of coal plants in the merit order."},
       {"node": "whp", "dir": "up", "from": "lever", "why": "When a fossil plant sets the price, the price now includes its carbon cost."}
      ]},
      {"label": "Months", "effects": [
-      {"node": "co2", "dir": "down", "from": "mix", "why": "Less coal and more gas, wind and solar cut CO₂ per MWh."},
+      {"node": "co2", "dir": "down", "from": "mix", "why": "Running less coal and more gas cuts CO₂ per MWh."},
       {"node": "local", "dir": "down", "from": "mix", "why": "Burning less coal also cuts local air pollution."},
       {"node": "bill", "dir": "up", "from": "whp", "why": "Power bills rise with the wholesale price."},
       {"node": "burden", "dir": "mixed", "from": "bill", "why": "It depends on the revenue: returned to households as rebates, it can offset the burden."}
@@ -219,6 +219,8 @@
    "source": "Li, Tong, Xing and Zhou (2017), The market for electric vehicles: indirect network effects and policy design, Journal of the Association of Environmental and Resource Economists 4(1), 89-133", "url": "https://doi.org/10.1086/689702", "as_of": "published 2017; abstract read 3 November 2026"},
   "bathtub": {"what": "Business-school students with no prior exposure to system dynamics showed a poor understanding of stocks, flows and time delays.",
    "source": "Booth Sweeney and Sterman (2000), Bathtub dynamics: initial results of a systems thinking inventory, System Dynamics Review 16(4), 249-286", "url": "https://doi.org/10.1002/sdr.198", "as_of": "published 2000; abstract read 3 November 2026"},
+  "nerc_sra": {"what": "NERC's summer assessment counts derates of thermal plants in extreme heat among the risks to supply; in one U.S. region they could take about 3 GW from available supply.",
+   "source": "NERC (May 2025), 2025 Summer Reliability Assessment, Table 3, p. 14", "url": "https://www.nerc.com/pa/RAPA/ra/Reliability%20Assessments%20DL/NERC_SRA_2025.pdf", "as_of": "May 2025; read 3 November 2026"},
   "doe_dlr": {"what": "A line's thermal limit depends on the air temperature, wind speed and sunshine; conductors sag as they heat up.",
    "source": "U.S. DOE (June 2019), Dynamic Line Rating, Report to Congress, p. 11", "url": "https://www.energy.gov/sites/prod/files/2019/08/f66/Congressional_DLR_Report_June2019_final_508_0.pdf", "as_of": "published June 2019; read 3 November 2026"},
   "eia_peak": {"what": "Hot weather, with an underlying rise in demand, pushed Lower 48 coincident peak demand to a record 759,180 MW on 29 July 2025.", "value": 759180,

@@ -137,10 +137,13 @@
   function rich(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
   function loopName(lp) { return "Loop " + lp.id.replace(/^L/, ""); }
   function lower(s) { return s.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); }
+  // keyboard focus survives a re-render: controls carry data-fk; refocus() finds the new copy
+  function focusKey() { var a = document.activeElement; return a && a.getAttribute ? a.getAttribute("data-fk") : null; }
+  function refocus(root, k) { if (!k) return; var e = root.querySelector('[data-fk="' + k + '"]'); if (e && !e.hidden && !e.disabled) e.focus({ preventScroll: true }); }
   function seg(host, label, items, sel, onPick) {
     var g = H("div", { class: "lx-seg f2-seg", role: "group", "aria-label": label }, host), bs = {};
     items.forEach(function (it) {
-      var b = H("button", { type: "button", "aria-pressed": it.id === sel ? "true" : "false", html: (it.icon ? LX.icon(it.icon) : "") + "<span>" + LX.esc(it.label) + "</span>" + (it.done ? LX.icon("check", "f2-done") : "") }, g);
+      var b = H("button", { type: "button", "data-fk": "seg-" + label + "-" + it.id, "aria-pressed": it.id === sel ? "true" : "false", html: (it.icon ? LX.icon(it.icon) : "") + "<span>" + LX.esc(it.label) + "</span>" + (it.done ? LX.icon("check", "f2-done") : "") }, g);
       b.addEventListener("click", function () { onPick(it.id); });
       bs[it.id] = b;
     });
@@ -195,12 +198,12 @@
     var scrub = H("input", { type: "range", id: scrubId, min: 0, max: 1, step: 1, value: 0 }, timeRow);
     void scrubL;
     var segBox = H("div", null, areaPanel), task = H("p", { class: "f2-task" }, areaPanel), predBox = H("div", null, areaPanel);
-    var ctlBox = H("div", { class: "lx-gctl" }, areaPanel), chips = H("div", { class: "lx-tallies f2-chips", "aria-live": "polite" }, areaPanel);
+    var ctlBox = H("div", { class: "lx-gctl" }, areaPanel), chips = H("div", { class: "lx-tallies f2-chips" }, areaPanel);
     var saw = H("div", { "aria-live": "polite" }, areaPanel), about = H("p", { class: "lx-hint f2-about" }, areaPanel);
     var segC = null;
     function paintSeg() {
       segBox.innerHTML = "";
-      segC = seg(segBox, "Which stock", kinds.map(function (k) { return { id: k.id, label: k.label, icon: k.icon, done: !!(st.won || {})[k.id] }; }), kind, function (id) { kind = id; st.sfKind = id; ctx.save(); build(); });
+      segC = seg(segBox, "Which stock", kinds.map(function (k) { return { id: k.id, label: k.label, icon: k.icon, done: !!(st.won || {})[k.id] }; }), kind, function (id) { var fk = focusKey(); kind = id; st.sfKind = id; ctx.save(); build(); refocus(el, fk); });
     }
     function chip(label, value, tone) { var t = H("div", { class: "lx-tally" + (tone ? " f2-" + tone : "") }, chips); H("span", { text: label }, t); H("b", { text: value }, t); }
     function setSaw(text, bad) { saw.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + rich(text) + "</div>" }, saw); }
@@ -342,7 +345,7 @@
       }
       setSaw(msg, bad);
       if (won && (kind !== "carbon" || st.pred)) { (st.wonAt = st.wonAt || {})[kind] = JSON.parse(JSON.stringify(st.ctl[kind])); ctx.save(); }
-      if (won && !(st.won || {})[kind] && (kind !== "carbon" || st.pred)) { (st.won = st.won || {})[kind] = true; ctx.save(); paintSeg(); ctx.note(); }
+      if (won && !(st.won || {})[kind] && (kind !== "carbon" || st.pred)) { var fk = focusKey(); (st.won = st.won || {})[kind] = true; ctx.save(); paintSeg(); ctx.note(); refocus(el, fk); }
       ctx.progress();
     }
     paintSeg(); build();
@@ -416,7 +419,7 @@
       stage.innerHTML = ""; panel.innerHTML = "";
       var L = D[which], S0 = st.loops[which] = st.loops[which] || { signs: {}, checked: false, named: {} };
       seg(panel, "Which diagram", [{ id: "ev", label: D.ev.label, done: !!(st.loops.ev || {}).done }, { id: "rebound", label: D.rebound.label, done: !!(st.loops.rebound || {}).done }], which,
-        function (id) { which = id; st.lbWhich = id; ctx.save(); build(); });
+        function (id) { var fk = focusKey(); which = id; st.lbWhich = id; ctx.save(); build(); refocus(el, fk); });
       H("p", { class: "f2-task", text: L.lede }, panel);
       cld = cldSVG(stage, L, { aria: "Causal-loop diagram: " + L.label + ". The links and their signs are listed beside it." });
       var bh = H("div", { class: "f2-behave" }, stage);
@@ -433,7 +436,7 @@
         rows[l.id] = { li: li, bp: bp, bm: bm, why: why, txt: txt };
       });
       var foot = H("div", { class: "lx-step-foot" }, panel);
-      var chk = H("button", { type: "button", class: "lx-btn small", text: "Check my signs" }, foot);
+      var chk = H("button", { type: "button", class: "lx-btn small", "data-fk": "chk", text: "Check my signs" }, foot);
       var score = H("span", { class: "lx-hint", "aria-live": "polite" }, foot);
       var nameBox = H("div", { class: "f2-name" }, panel), saw = H("div", { "aria-live": "polite" }, panel), extra = H("div", null, panel);
       chk.addEventListener("click", function () { S0.checked = true; ctx.save(); paint(); });
@@ -459,8 +462,8 @@
           H("p", { class: "path", html: "<b>" + loopName(lp) + ":</b> " + LX.esc(nm.concat([nm[0]]).join(" → ")) }, row);
           var ch = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Name the loop through " + nm.join(", ") }, row);
           [["R", "Reinforcing"], ["B", "Balancing"]].forEach(function (x) {
-            var b = H("button", { type: "button", class: "lx-choice", "aria-pressed": S0.named[lp.id] === x[0] ? "true" : "false", text: x[1] }, ch);
-            b.addEventListener("click", function () { S0.named[lp.id] = x[0]; ctx.save(); cld.light(lp); names(gradeSigns(L, S0.signs)); });
+            var b = H("button", { type: "button", class: "lx-choice", "data-fk": "name-" + lp.id + "-" + x[0], "aria-pressed": S0.named[lp.id] === x[0] ? "true" : "false", text: x[1] }, ch);
+            b.addEventListener("click", function () { var fk = focusKey(); S0.named[lp.id] = x[0]; ctx.save(); cld.light(lp); names(gradeSigns(L, S0.signs)); refocus(el, fk); });
             b.addEventListener("focus", function () { cld.light(lp); });
           });
           var pick = S0.named[lp.id];
@@ -475,7 +478,7 @@
         bh.innerHTML = "";
         if (all) {
           L.loops.forEach(function (lp) { var f = H("figure", { class: "f2-fig" }, bh); sketch(f, lp.type); H("figcaption", { text: loopName(lp) + (lp.type === "R" ? ", reinforcing: growth or decline that feeds itself" : ", balancing: settles toward a level") }, f); });
-          if (!S0.done) { S0.done = true; ctx.save(); ctx.note(); build(); return; }
+          if (!S0.done) { var fk = focusKey(); S0.done = true; ctx.save(); ctx.note(); build(); refocus(el, fk); return; }
           var src = ctx.D.sources;
           H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich(which === "ev"
             ? "Both [[feedback-loop|feedback loops]] closed. Which one wins depends on their strength and delays. Researchers have measured this loop: EV sales and chargers fed each other in " + src.li_ev.value + " U.S. metro areas, 2011 to 2013 (Li et al., 2017)."
@@ -533,7 +536,7 @@
         nodeEl[n.id] = b;
       });
     });
-    var panel = H("div", { class: "f2-rpanel" }, el), live = H("div", { "aria-live": "polite" }, panel);
+    var panel = H("div", { class: "f2-rpanel" }, el), live = H("div", { "aria-live": "polite" }, panel), say = H("p", { class: "lx-sr", "aria-live": "polite" }, el);
     var lever = null, wave = -1, showHubs = false;
     function pull(id) {
       lever = R.levers.filter(function (l) { return l.id === id; })[0]; showHubs = false;
@@ -586,14 +589,17 @@
         H("p", { class: "lx-q", text: pr.q }, q);
         LX.Predict(q, { id: "f2-" + lever.id, answer: pr.answer, fresh: true, title: false,
           options: ["up", "down", "mixed"].map(function (d) { return { value: d, label: d === "mixed" ? "It depends" : cap(dirs[d].word) }; }),
-          onPick: function (v) { st.preds[lever.id] = v; wave = 0; st.levers[lever.id] = Math.max(st.levers[lever.id] || 0, 1); ctx.save(); render(); } });
+          onPick: function (v) { st.preds[lever.id] = v; wave = 0; st.levers[lever.id] = Math.max(st.levers[lever.id] || 0, 1); ctx.save(); render(); focusWave(); } });
         return;
       }
       var head = H("div", { class: "f2-wavehead" }, pv);
-      H("b", { text: "Wave " + (wave + 1) + " of " + lever.waves.length + " · " + lever.waves[wave].label }, head);
-      var nx = H("button", { type: "button", class: "lx-btn small", html: "Next wave" + LX.icon("arrow") }, head);
+      H("b", { tabindex: "-1", "data-fk": "wavehead", text: "Wave " + (wave + 1) + " of " + lever.waves.length + " · " + lever.waves[wave].label }, head);
+      var nx = H("button", { type: "button", class: "lx-btn small", "data-fk": "next", html: "Next wave" + LX.icon("arrow") }, head);
+      var now = ripple(lever, wave).effects.filter(function (e) { return e.wave === wave; });
+      say.textContent = lever.label + ", wave " + (wave + 1) + " of " + lever.waves.length + ", " + lever.waves[wave].label.toLowerCase() + ": " +
+        now.map(function (e) { return lower(nodeBy[e.node].label) + " " + dirs[e.dir].word; }).join("; ") + ".";
       nx.hidden = wave >= lever.waves.length - 1;
-      nx.addEventListener("click", function () { wave = Math.min(lever.waves.length - 1, wave + 1); st.levers[lever.id] = Math.max(st.levers[lever.id] || 0, wave + 1); ctx.save(); render(); if (wave === lever.waves.length - 1) ctx.note(); });
+      nx.addEventListener("click", function () { wave = Math.min(lever.waves.length - 1, wave + 1); st.levers[lever.id] = Math.max(st.levers[lever.id] || 0, wave + 1); ctx.save(); render(); if (wave === lever.waves.length - 1) ctx.note(); focusWave(); });
       var ul = H("ul", { class: "f2-effects" }, pv);
       ripple(lever, wave).effects.slice().reverse().forEach(function (e) {
         var n = nodeBy[e.node], li = H("li", { class: e.wave === wave ? "now" : "", style: "--c:var(--f2-" + n.dim + ")" }, ul);
@@ -611,7 +617,7 @@
         var dr = dimsReached(R, lever);
         H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich("One lever reached **" + dr.length + " of " + R.dims.length + "** dimensions in " + lever.waves.length + " waves" + (lever.loop ? ". " + lever.loop.text : ".") +
           (doneAll() ? " All four levers pulled: show the hubs." : " Pull another lever.")) + "</div>" }, live);
-        if (doneAll()) { var hb = H("button", { type: "button", class: "lx-btn small ghost", text: "Show the hubs" }, live); hb.addEventListener("click", function () { showHubs = true; st.hubs = true; ctx.save(); ctx.note(); render(); }); }
+        if (doneAll()) { var hb = H("button", { type: "button", class: "lx-btn small ghost", text: "Show the hubs" }, live); hb.addEventListener("click", function () { showHubs = true; st.hubs = true; ctx.save(); ctx.note(); render(); var lb = levBtn[lever.id]; if (lb) lb.focus({ preventScroll: true }); }); }
       }
     }
     function info(id) {
@@ -620,6 +626,7 @@
       live.innerHTML = "";
       H("p", { class: "f2-info", html: "<b>" + LX.esc(n.label) + "</b> (" + LX.esc(dimBy[n.dim].label) + "). " + (uses.length ? "So far: " + LX.esc(uses.join("; ")) + "." : "No lever you pulled has reached it yet.") }, live);
     }
+    function focusWave() { var n = panel.querySelector('[data-fk="next"]'); if (n && !n.hidden) n.focus({ preventScroll: true }); else refocus(panel, "wavehead"); }
     function doneAll() { return R.levers.every(function (l) { return (st.levers[l.id] || 0) >= l.waves.length; }); }
     function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
     function list(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }

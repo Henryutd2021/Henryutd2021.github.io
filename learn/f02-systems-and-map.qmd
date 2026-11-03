@@ -159,7 +159,7 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
   .f2-stage { padding: 10px; }
   .f2-seg button { padding: 0 8px; font-size: 12.5px; }
   .f2-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .f2-rb-row { grid-template-columns: 7.5em minmax(0, 1fr) 4.8em; }
+  .f2-rb-row { grid-template-columns: 6.8em minmax(0, 1fr) 5.8em; } .f2-rb-row b { white-space: nowrap; }
   .f2-tabs .f2-seg, .f2-sf-panel .f2-seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .f2-sf-panel .f2-seg { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .f2-seg button { justify-content: center; text-align: center; line-height: 1.2; padding: 4px 6px; }
@@ -168,6 +168,7 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
   .f2-lever { font-size: 13.5px; padding: 6px 10px; }
   .f2-sketch { width: 138px; }
 }
+.f2-fbt th, .f2-fbt td { text-align: left; vertical-align: top; font-family: var(--lx-f-body); font-size: 13.5px; padding: 4px 10px 4px 0; min-width: 7em; }
 </style>
 ```
 
@@ -181,15 +182,15 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 <dt>Feedback loops</dt><dd>More EVs bring more chargers, which bring more EVs: a reinforcing loop. Longer queues at chargers slow the growth, and the rebound effect takes back part of an efficiency saving: balancing loops.</dd>
 <dt>The system map</dt><dd>Each of four levers reaches technology, cost, emissions, people and security within three waves.</dd>
 </dl>
-<table class="lx-mini-table">
+<div class="lx-scroll-x"><table class="lx-mini-table f2-fbt">
 <thead><tr><th scope="col">Lever</th><th scope="col">First wave</th><th scope="col">Later waves</th></tr></thead>
 <tbody>
 <tr><td>Gas price doubles</td><td>Wholesale price rises; gas heating costs more; import bill rises</td><td>Plant mix shifts; CO₂ depends on what replaces gas; energy burden rises; investment shifts and import exposure falls</td></tr>
 <tr><td>A heat wave</td><td>Demand rises; lines carry less; heat health risk rises</td><td>Spare capacity falls; prices and CO₂ rise; bills and burden rise later; more capacity gets built</td></tr>
-<tr><td>A carbon price</td><td>Gas moves ahead of coal; wholesale price rises</td><td>CO₂ and local pollution fall; bills rise; the burden depends on the revenue; jobs shift</td></tr>
+<tr><td>A carbon price</td><td>Gas plants can move ahead of coal plants; wholesale price rises</td><td>CO₂ and local pollution fall; bills rise; the burden depends on the revenue; jobs shift</td></tr>
 <tr><td>A new data center</td><td>Demand rises; it needs new connections; jobs and tax base rise; cooling water depends on the design</td><td>Spare capacity falls until new supply connects; CO₂ depends on what serves it; who pays for upgrades depends on the tariff</td></tr>
 </tbody>
-</table>
+</table></div>
 <p class="lx-hint">With JavaScript on, you run these yourself: three tanks, two loops and four levers.</p>
 </div>
 </div>
@@ -313,8 +314,8 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 </div>
 <div class="lx-qq" data-id="heat" data-answer="a">
 <p class="lx-qtext">Why does a heat wave squeeze spare capacity from both sides?</p>
-<ul class="lx-choices"><li data-value="a">Demand rises while hot lines and some plants deliver less</li><li data-value="b">Prices rise, so plants sell less</li><li data-value="c">Solar stops at noon</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Demand rises for cooling while hot lines sag and carry less: both sides of the balance move against the grid.</p></details>
+<ul class="lx-choices"><li data-value="a">Demand rises while hot lines and some thermal plants deliver less</li><li data-value="b">Prices rise, so plants sell less</li><li data-value="c">Solar stops at noon</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Demand rises for cooling while hot lines sag and carry less and some thermal plants lose output: both sides of the balance move against the grid.</p></details>
 </div>
 <div class="lx-qq" data-id="wave2" data-answer="b">
 <p class="lx-qtext">A 300 MW data center connects. Which is a second-wave effect rather than a first?</p>
@@ -374,6 +375,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <li>Booth Sweeney, L. and Sterman, J. D. (2000). <a href="https://doi.org/10.1002/sdr.198">Bathtub dynamics: initial results of a systems thinking inventory</a>. System Dynamics Review 16(4), 249–286.</li>
 <li>Sorrell, S., Dimitropoulos, J. and Sommerville, M. (2009). <a href="https://doi.org/10.1016/j.enpol.2008.11.026">Empirical estimates of the direct rebound effect: A review</a>. Energy Policy 37(4), 1356–1371.</li>
 <li>Li, S., Tong, L., Xing, J. and Zhou, Y. (2017). <a href="https://doi.org/10.1086/689702">The Market for Electric Vehicles: Indirect Network Effects and Policy Design</a>. Journal of the Association of Environmental and Resource Economists 4(1), 89–133.</li>
+<li>NERC (2025). <a href="https://www.nerc.com/pa/RAPA/ra/Reliability%20Assessments%20DL/NERC_SRA_2025.pdf">2025 Summer Reliability Assessment</a> (PDF), Table 3, p. 14: derates of thermal plants in extreme heat reduce available supply.</li>
 <li>U.S. DOE (2019). <a href="https://www.energy.gov/sites/prod/files/2019/08/f66/Congressional_DLR_Report_June2019_final_508_0.pdf">Dynamic Line Rating: Report to Congress</a> (PDF), p. 11: a line's thermal limit depends on air temperature, wind and sunshine.</li>
 <li>EIA (2025). <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">U.S. electricity peak demand set new records twice in July</a>. Today in Energy, 5 August 2025.</li>
 <li>U.S. DOE (2024). <a href="https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers">DOE Releases New Report Evaluating Increase in Electricity Demand from Data Centers</a>. 20 December 2024.</li>

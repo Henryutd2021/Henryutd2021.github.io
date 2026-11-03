@@ -122,6 +122,7 @@ body.page-learn.quarto-dark { --f1-s0: #5CC0B1; --f1-s1: #5AAED2; --f1-s2: #7CA6
   .f1z-stop { padding: 5px 6px; min-height: 40px; justify-items: center; } .f1z-stop .n { display: none; } .f1z-stop .c { font-size: 14px; font-weight: 600; color: var(--lx-ink); }
   .f1s-flow { flex-direction: column; }
 }
+.f1-fbt th, .f1-fbt td { text-align: left; vertical-align: top; font-family: var(--lx-f-body); font-size: 13.5px; padding: 4px 10px 4px 0; min-width: 7em; }
 </style>
 ```
 
@@ -130,7 +131,7 @@ body.page-learn.quarto-dark { --f1-s0: #5CC0B1; --f1-s1: #5AAED2; --f1-s2: #7CA6
 <div class="lx-interactive lx-cards" data-learn="five-scales" data-src="../assets/learn/data/f01-five-scales.json ../assets/learn/data/01-power-energy.json ../assets/learn/data/town_days.json ../assets/learn/data/town.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The idea in one table: five scales, five sets of decisions</p>
-<table class="lx-mini-table">
+<div class="lx-scroll-x"><table class="lx-mini-table f1-fbt">
 <thead><tr><th scope="col">Scale</th><th scope="col">Who decides</th><th scope="col">What they decide</th><th scope="col">What a model needs</th></tr></thead>
 <tbody>
 <tr><td>S0 Device and plant</td><td>The owner of a home or plant</td><td>What to install at one site, and how to run it hour by hour</td><td>Device ratings, efficiencies, one meter</td></tr>
@@ -139,7 +140,7 @@ body.page-learn.quarto-dark { --f1-s0: #5CC0B1; --f1-s1: #5AAED2; --f1-s2: #7CA6
 <tr><td>S3 City and region</td><td>A city or county</td><td>Codes, heat, transit, land, feeder upgrades</td><td>Feeders, heat networks, links between sectors</td></tr>
 <tr><td>S4 Nation</td><td>A national government and regulators</td><td>Targets, instruments, infrastructure, trade</td><td>Regional energy balances, main corridors</td></tr>
 </tbody>
-</table>
+</table></div>
 <p>A U.S. home draws about 1.2 kW on average; the Southwest Power Pool peaked at 54.4 GW in 2025; the Lower 48 states' record hour needed 759 GW (29 July 2025). Signals and limits pass down the scales; profiles and needs pass up.</p>
 <p class="lx-hint">With JavaScript on, you work through this step by step: a zoom through five scenes, five sorts and one question about a campus.</p>
 </div>
