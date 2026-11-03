@@ -592,7 +592,7 @@
       });
       // 3 one price or three
       var c3 = E("div", { class: "lx-xcard" }, x);
-      LX.CompareTable(c3, { title: "One price or three",
+      LX.CompareTable(c3, { title: "One price or three", text: true,
         columns: [{ key: "name", label: "Model", main: true }, { key: "rows", label: "Balance rows per hour", num: true, phoneHide: true },
           { key: "p19", label: "Price at 19:00", num: true, phone: "19:00" }, { key: "p12", label: "Prices at noon", num: true, phone: "Noon" }],
         rows: [{ key: "t8", color: "var(--lx-ink-3)", name: "Lesson 8: one bus", note: "No lines; the last plant needed sets one price", rows: "1", p19: "$40", p12: "one price" },

@@ -167,19 +167,22 @@
     ".w11-pricehead p{font-size:13.5px;color:var(--lx-ink-3);margin:0}"
   ].join("\n");
 
+  var fmt1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }); };
+  var usd = function (v) { return (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US"); };
+  var saw = function (api, t, bad) { api.saw(t, bad); };   // step cards turn **bold** marks into <b> (cards.js)
+
   function view(live, data, root) {
-    var W1F = window.W1F; W1F.css();
     if (!document.getElementById("w11-css")) H("style", { id: "w11-css", text: CSS }, document.head);
     var town = data.town, D = data["11_solver"], W = dayOf(town, data.town_year), f = town.fleet, V = D.penalty;
-    var usd = W1F.usd, fmt1 = W1F.fmt1, hh = LX.fmt.hh, saw = W1F.saw;
+    var hh = LX.fmt.hh;
     var set = settings(), cur = null, base = null, shown = null, editPlan = null, hook = null, pricePick = null, solving = 0;
 
     // ---------- stage
-    var stage = H("div", { class: "w1f-stage" }, live);
-    var head = H("div", { class: "w1f-head" }, stage);
+    var stage = H("div", { class: "lx-stage" }, live);
+    var head = H("div", { class: "lx-stage-head" }, stage);
     H("h3", { text: W.dateLabel + ": lesson 0's day as one linear program" }, head);
     var st = LX.SolverStatus(head);
-    var chips = H("div", { class: "w1f-chips", "aria-live": "polite" }, stage);
+    var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage);
     var chartHost = H("div", null, stage);
     var SER = [{ key: "nuclear", label: "Nuclear", color: "var(--lx-nuc)" }, { key: "wind", label: "Wind", color: "var(--lx-wind)" }, { key: "solar", label: "Solar", color: "var(--lx-solar)" },
       { key: "cc", label: "Gas combined-cycle", color: "var(--lx-cc)" }, { key: "pk", label: "Gas peaker", color: "var(--lx-pk)" }];
@@ -190,9 +193,9 @@
     H("h3", { text: "Shadow price of the demand rule, $/MWh", style: "font-size:15px;margin:0" }, ph);
     var pnote = H("p", { text: "Tap an hour." }, ph);
     var prices = H("div", { class: "w11-prices", role: "group", "aria-label": "Shadow price of the demand rule for each hour" }, priceBox);
-    var pout = H("p", { class: "w1f-status", "aria-live": "polite" }, priceBox);
+    var pout = H("p", { class: "lx-stage-status", "aria-live": "polite" }, priceBox);
 
-    function chip(label, value, cls) { var c = H("div", { class: "w1f-chip" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
+    function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function rowsOf(sol, s) {
       var hs = hours(W, s);
       return hs.map(function (x, t) {
@@ -394,7 +397,7 @@
         build: function (act, api) {
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = false; hook = null;
-          var g = H("div", { class: "w1f-ctls" }, act), R = D.ranges;
+          var g = H("div", { class: "lx-ctls" }, act), R = D.ranges;
           var go = function () { solve(set, { key: "sens" }).then(function (sol) { if (!sol) return; show(sol, set); say(sol); }); };
           LX.Slider(g, { label: "Peaker running cost", color: "var(--lx-pk)", min: R.pkCost[0], max: R.pkCost[1], step: 5, value: set.pkCost, fmt: function (v) { return "$" + v + "/MWh"; }, onChange: function (v) { set.pkCost = v; go(); } });
           LX.Slider(g, { label: "Combined-cycle ramp limit", color: "var(--lx-cc)", min: R.ramp[0], max: R.ramp[1], step: 5, value: set.ramp, fmt: function (v) { return v + " MW/h"; }, onChange: function (v) { set.ramp = v; go(); } });
@@ -446,7 +449,7 @@
 
   // ---------------------------------------------------------------- the explain layer
   function buildExplain(town, W, D, D10, year) {
-    var W1F = window.W1F, usd = W1F.usd, fmt1 = W1F.fmt1, f = town.fleet;
+    var f = town.fleet;
     var host = document.getElementById("w11-explain");
     if (host) {
       host.innerHTML = ""; host.classList.add("is-live");

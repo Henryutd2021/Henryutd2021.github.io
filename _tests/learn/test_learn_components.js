@@ -24,7 +24,21 @@ comp.forEach(f => {
 const depth = css.replace(/\/\*[\s\S]*?\*\//g, "").split("").reduce((d, ch) => d < 0 ? d : d + (ch === "{") - (ch === "}"), 0);
 ok(depth === 0, "learn.css: braces balance");
 ["Scene", "Meters", "Slider", "DayChart", "Missions", "Stars", "Notes", "Coach", "StepCards", "Predict", "Guess", "ConceptMap", "Flowchart",
- "CompareTable", "CausalChain", "EnergyChain", "Metro", "metroLayout", "rich", "mount", "solver", "SolverStatus", "townProfile", "cfScale"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
+ "CompareTable", "CausalChain", "EnergyChain", "Metro", "metroLayout", "rich", "mount", "solver", "SolverStatus", "townProfile", "cfScale",
+ // promoted at the W1 merge (2026-11-02)
+ "demo", "demoState", "Plot", "PlotCard", "Scatter", "PriceChart", "HourPicker", "Tornado", "CostSplit", "SupplyStack", "Frontier", "Steelman",
+ "Boundary", "Share", "copyText", "LPPlane", "lp2", "CardSort", "LinkedViews", "Toggle", "EquationCard", "FormulateBox", "Formulation",
+ "Network", "Checklist", "EvidenceLadder", "PhraseTagger", "UnitChain", "EvidenceClock", "Checkpoint", "Sheet", "Practice"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
+
+// ---------------- no lesson defines its own copy of a shared component (W1 merge)
+const lessonJs = fs.readdirSync(L(".")).filter(f => /^[0-9a-z-]+\.js$/.test(f) && f !== "learn.js");
+const copies = /\bfunction (plot|LineChart|Scatter|StackChart|FrontierChart|Steelman|Boundary|JobSorter|Plane|EquationCard|Formulation|Network|PriceChart|HourPicker|Practice|Slider)\s*\(|W1F\.(LPPlot|Views|CardSort|Ctl|Toggle|EquationCard|FormulateBox)\s*=|LX\.Checklist\s*=/;
+lessonJs.forEach(f => {
+  const src = fs.readFileSync(L(f), "utf8"), rx = new RegExp(copies.source, "g"), bad = [];
+  let m; while ((m = rx.exec(src))) { const name = m[1] || m[2] || "Checklist", body = src.slice(m.index, m.index + 500);
+    if (!(m[1] && new RegExp("LX\\." + name + "\\b").test(body))) bad.push(m[0]); }   // a thin adapter that calls LX.<Name> is fine
+  ok(!bad.length, `${f}: no lesson-local copy of a shared component${bad.length ? " (" + bad.join(", ") + ")" : ""}`);
+});
 
 // ---------------- metro layout: real course, then a synthetic course with a fourth tier
 const ctx = { window: { LX: {} }, module: { exports: {} } };

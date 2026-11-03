@@ -116,7 +116,6 @@
     ".w9-tile small{font-family:var(--lx-f-mono);font-size:10.5px;color:var(--lx-ink-3)}",
     ".w9-price{width:100%;text-align:center;font-family:var(--lx-f-mono);font-size:11px;font-weight:600;border-radius:5px;padding:2px 0;color:#fff;background:var(--c);overflow:hidden}",
     ".w9-price.dk{color:#16181d}",
-    ".lx-step-act>.lx-btn,.lx-step-act>a.lx-btn{justify-self:start}",
     ".w9-act{width:100%;min-height:40px;border-radius:8px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink-3);cursor:pointer;display:grid;place-items:center;padding:0}",
     ".w9-act:disabled{cursor:default}",
     ".w9-act svg{width:16px;height:16px}",

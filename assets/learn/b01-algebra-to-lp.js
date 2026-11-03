@@ -755,85 +755,8 @@
   }
 
   // ================================================================ practice (Check section)
-  // Practice(host, o): sets ("tracks") of exercises that fade from a worked example to a blank page. Each exercise has two or
-  // three hints, shown one at a time, and an automatic check with a one-line reason; "Show the answer" appears after the
-  // last hint. An exercise with its own check and hints (the Builder) calls api.done() instead. Done marks stay in this
-  // browser (LX.store). o = {id, title, lede, foot, blank (the reason shown while a box is empty), tracks: [{label, intro,
-  // items: [{key, kind: "worked" | "partly" | "scratch", minutes, title, build(area, api)}]}]}; api = {hints([...]),
-  // check(fn -> {ok, why} | null, {button: false for a tap-to-answer question}), run(), answer(fn), done()}.
-  var KIND = { worked: "Worked example", partly: "Partly worked", scratch: "From scratch" };
-  function Practice(host, o) {
-    var card = H("div", { class: "lx-card fp" }, host), done = LX.store.get(o.id, {}) || {};
-    var hd = H("div", { class: "lx-x-head" }, card); H("h3", { text: o.title }, hd);
-    var cnt = H("span", { class: "lx-step-n", "aria-live": "polite" }, hd);
-    if (o.lede) H("p", { class: "fp-lede", html: LX.rich(o.lede) }, card);
-    var tg = seg(H("div", { class: "fp-bar" }, card), o.tracks.map(function (t) { return t.label; }), 0, function (i) { go(i, null, true); }, "Choose a practice set");
-    var intro = H("p", { class: "fp-intro" }, card), fade = H("ol", { class: "fp-fade", "aria-label": "Exercises in this set" }, card);
-    var ex = H("section", { class: "fp-ex", "aria-live": "off" }, card);
-    if (o.foot) H("p", { class: "fp-foot", html: LX.rich(o.foot) }, card);
-    var items = []; o.tracks.forEach(function (t) { items = items.concat(t.items); });
-    var total = items.reduce(function (s, it) { return s + it.minutes; }, 0), T = 0, I = 0, cur = null;
-    function tally() { cnt.textContent = items.filter(function (it) { return done[it.key]; }).length + " of " + items.length + " done · about " + total + " min"; }
-    function mark(it) { done[it.key] = true; LX.store.set(o.id, done); tally(); paintFade(); }
-    function paintFade() {
-      fade.innerHTML = "";
-      o.tracks[T].items.forEach(function (it, i) {
-        var b = H("button", { type: "button", class: "fp-step" + (done[it.key] ? " done" : ""), "aria-pressed": i === I ? "true" : "false",
-          "aria-label": (i + 1) + ". " + KIND[it.kind] + ", about " + it.minutes + " minutes" + (done[it.key] ? ", done" : "") }, H("li", null, fade));
-        H("span", { class: "fp-k", html: (done[it.key] ? LX.icon("check") : "<b>" + (i + 1) + "</b>") + LX.esc(KIND[it.kind]) }, b);
-        H("span", { class: "fp-m", text: "about " + it.minutes + " min" }, b);
-        b.addEventListener("click", function () { go(T, i, true); });
-      });
-    }
-    function go(t, i, focus) {
-      T = t; tg.set(t);
-      var its = o.tracks[t].items, open1 = its.map(function (it) { return !done[it.key]; }).indexOf(true);
-      I = i == null ? Math.max(0, open1) : i;
-      intro.innerHTML = LX.rich(o.tracks[t].intro || ""); paintFade(); open(focus);
-    }
-    function open(focus) {
-      var it = o.tracks[T].items[I], n = 0; ex.innerHTML = "";
-      H("p", { class: "lx-eyebrow", text: KIND[it.kind] + " · " + (I + 1) + " of " + o.tracks[T].items.length + " · about " + it.minutes + " min" }, ex);
-      var h = H("h4", { class: "fp-title", text: it.title, tabindex: "-1" }, ex);
-      var area = H("div", { class: "fp-area" }, ex), reg = { hints: [], check: null, button: true, answer: null };
-      var hb = H("div", { class: "fp-hints", "aria-live": "polite" }, ex), acts = H("div", { class: "fp-acts" }, ex), why = H("div", { class: "fp-why", "aria-live": "polite" }, ex);
-      var api = { hints: function (x) { reg.hints = x || []; }, check: function (fn, opt) { reg.check = fn; reg.button = !(opt && opt.button === false); },
-                  answer: function (fn) { reg.answer = fn; }, run: run, done: function () { mark(it); nextOn(); } };
-      cur = { api: api, hint: hint, show: show };
-      it.build(area, api);
-      var chk = reg.check && reg.button ? H("button", { type: "button", class: "lx-btn small", html: LX.icon("check") + "Check" }, acts) : null;
-      var hbtn = reg.hints.length ? H("button", { type: "button", class: "lx-btn ghost small", text: "Hint 1 of " + reg.hints.length }, acts) : null;
-      var sbtn = reg.answer ? H("button", { type: "button", class: "lx-btn ghost small", text: "Show the answer", hidden: true }, acts) : null;
-      var last = T === o.tracks.length - 1 && I === o.tracks[T].items.length - 1;
-      var nbtn = last ? null : H("button", { type: "button", class: "lx-btn ghost small fp-next", hidden: !done[it.key],
-        html: (I < o.tracks[T].items.length - 1 ? "Next exercise" : "Next set: " + LX.esc(o.tracks[T + 1].label)) + LX.icon("arrow") }, acts);
-      if (chk) chk.addEventListener("click", run);
-      if (hbtn) hbtn.addEventListener("click", hint);
-      if (sbtn) sbtn.addEventListener("click", show);
-      if (nbtn) nbtn.addEventListener("click", function () { if (I < o.tracks[T].items.length - 1) go(T, I + 1, true); else go(T + 1, 0, true); });
-      area.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.tagName === "INPUT" && reg.check) { e.preventDefault(); run(); } });
-      function run() {
-        if (!reg.check) return;
-        var r = reg.check(); why.innerHTML = "";
-        if (!r) r = { ok: false, why: o.blank };
-        H("div", { class: "lx-saw" + (r.ok ? "" : " no"), html: LX.icon(r.ok ? "check" : "question") + "<div>" + LX.rich(r.why) + "</div>" }, why);
-        if (r.ok) { mark(it); nextOn(); }
-      }
-      function hint() {
-        if (!hbtn || n >= reg.hints.length) return;
-        H("p", { class: "fp-hint", html: "<b>Hint " + (n + 1) + ".</b> " + LX.rich(reg.hints[n]) }, hb); n++;
-        hbtn.textContent = n < reg.hints.length ? "Hint " + (n + 1) + " of " + reg.hints.length : "No more hints";
-        hbtn.disabled = n >= reg.hints.length; if (sbtn) sbtn.hidden = n < reg.hints.length;
-      }
-      function show() { if (reg.answer) { reg.answer(); run(); } }
-      function nextOn() { if (nbtn) nbtn.hidden = false; }
-      if (focus) h.focus();
-    }
-    tally(); go(0, null, false);
-    return { go: go, cur: function () { return cur; }, find: function (key) {
-      for (var t = 0; t < o.tracks.length; t++) for (var i = 0; i < o.tracks[t].items.length; i++) if (o.tracks[t].items[i].key === key) return [t, i];
-      return null; } };
-  }
+  // the faded-practice runner is LX.Practice (components/practice.js)
+  var Practice = LX.Practice;
 
   // ---- exercise pieces
   function numIn(host, val, label, onIn, cls) {
@@ -845,7 +768,7 @@
   function valOf(i) { return i.value.trim() === "" ? NaN : parseNum(i.value); }
   function setVal(i, v) { i.value = num(v).replace("−", "-").replace(/,/g, ""); i.classList.remove("bad"); i.dispatchEvent(new Event("input")); }
   function modelList(host, st) {   // the model in symbols: the goal, then each rule (sign rules folded into one line)
-    var sy = syms(st), ul = H("ul", { class: "fp-model", "aria-label": "The model" }, host);
+    var sy = syms(st), ul = H("ul", { class: "lx-fp-model", "aria-label": "The model" }, host);
     H("li", { text: fmtGoal(st) }, ul);
     st.rows.forEach(function (r) { if (!isBound(r)) H("li", { text: fmtRule(r, sy) }, ul); });
     H("li", { text: sy[0] + ", " + sy[1] + " ≥ 0" }, ul);
@@ -891,7 +814,7 @@
   }
   function cornerAlt(T) { return T.map(function (r, i) { return "Corner " + ABC[i] + ": " + pt(r.x) + ", on the lines " + r.on.join(" and ") + "."; }); }
   function tableEl(host, head, rows, cap, nums) {   // nums: the indices of the columns that hold numbers (monospace)
-    var t = H("table", { class: "fp-tab" }, H("div", { class: "fp-tabw" }, host));
+    var t = H("table", { class: "lx-fp-tab" }, H("div", { class: "lx-fp-tabw" }, host));
     if (cap) H("caption", { class: "lx-sr", text: cap }, t);
     var tr = H("tr", null, H("thead", null, t)); head.forEach(function (x) { H("th", { scope: "col", text: x }, tr); });
     var tb = H("tbody", null, t);
@@ -903,7 +826,7 @@
   }
   function choices(host, labels, q, onPick) {   // a question answered by tapping one of its choices
     var qid = LX.uid("fq"); H("p", { class: "lx-qtext", id: qid, text: q }, host);
-    var row = H("div", { class: "lx-qbtns fp-choices", role: "group", "aria-labelledby": qid }, host), bs = [], sel = null;
+    var row = H("div", { class: "lx-qbtns lx-fp-choices", role: "group", "aria-labelledby": qid }, host), bs = [], sel = null;
     labels.forEach(function (l, i) {
       var b = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false", text: l }, row); bs.push(b);
       b.addEventListener("click", function () { sel = i; bs.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); x.classList.remove("right", "wrong"); }); onPick(i); });
@@ -913,7 +836,7 @@
 
   // A x <= b typed by the learner: c (min form), given rows (shown) and rows to write, drawn live on a plane
   function ArraysEx(host, st, o) {
-    var sy = syms(st), box = H("div", { class: "b1-builder fp-arr" }, host), c = [NaN, NaN], mine = [];
+    var sy = syms(st), box = H("div", { class: "b1-builder lx-fp-arr" }, host), c = [NaN, NaN], mine = [];
     var goal = H("div", { class: "b1-goal" }, box); H("span", { class: "b1-k", text: "Costs" }, goal); H("span", { class: "b1-fixed", text: "minimize" }, goal);
     var w = H("span", { class: "b1-lin" }, goal), ci = [];
     ci.push(numIn(w, null, "Cost of " + sy[0] + ", min form", function (v) { c[0] = v; draw(); })); H("span", { class: "b1-sym", text: sy[0] + " +" }, w);
@@ -970,7 +893,7 @@
         cornerPlane(area, st, s.table, function (i) { var b = samePt(s.table[i].x, s.best.x); return { text: ABC[i] + (b ? ", best" : ""), cls: b ? "good" : null }; });
         textAlt(area, "Text version", cornerAlt(s.table));
         tableEl(area, ["Corner", "On the lines", "Cost"], cornerRows(s.table, s.best.x), "The corners and their costs");
-        H("p", { class: "fp-worked", html: LX.icon("check") + "<span>" + LX.esc(s.worked) + "</span>" }, area);
+        H("p", { class: "lx-fp-worked", html: LX.icon("check") + "<span>" + LX.esc(s.worked) + "</span>" }, area);
         var ch = choices(area, s.alt.table.map(function (r, i) { return ABC[i] + " " + pt(r.x); }), s.q, function () { api.run(); });
         api.hints(s.hints); api.check(function () { var r = s.check(ch.val()); if (r) ch.mark(r.ok); return r; }, { button: false });
         api.answer(function () { ch.pick(s.alt.index); });
@@ -980,8 +903,8 @@
         storyBox(area, st); modelList(area, st);
         cornerPlane(area, st, s.table, function (i) { return { text: ABC[i] + (i === s.hidden ? " ?" : "") }; });
         textAlt(area, "Text version", cornerAlt(s.table).map(function (t, i) { return i === s.hidden ? "Corner " + ABC[i] + ": where the cover line meets the ramp line (to find)." : t; }));
-        H("p", { class: "fp-ask", text: s.ask }, area);
-        var rows = cornerRows(s.table, null), r = rows[s.hidden], cell = H("span", { class: "fp-pt" }), cost = H("span", { class: "fp-pt" });
+        H("p", { class: "lx-fp-ask", text: s.ask }, area);
+        var rows = cornerRows(s.table, null), r = rows[s.hidden], cell = H("span", { class: "lx-fp-pt" }), cost = H("span", { class: "lx-fp-pt" });
         cell.appendChild(document.createTextNode(ABC[s.hidden] + " (")); ins.x = numIn(cell, null, "Corner " + ABC[s.hidden] + ": x", null, "sm"); cell.appendChild(document.createTextNode(","));
         ins.y = numIn(cell, null, "Corner " + ABC[s.hidden] + ": y", null, "sm"); cell.appendChild(document.createTextNode(")"));
         cost.appendChild(document.createTextNode("$")); ins.cost = numIn(cost, null, "Cost of the corner, dollars", null, "rhs");
@@ -996,11 +919,11 @@
         storyBox(area, st, true); modelList(area, st);
         cornerPlane(area, st, s.table, null);
         textAlt(area, "Text version", ["The plane draws the rules listed above and shades the plans that pass them all; the corners are yours to find."]);
-        H("p", { class: "fp-ask", text: s.ask }, area);
-        var row = H("div", { class: "fp-ans" }, area); H("span", { class: "b1-k", text: "Cheapest" }, row);
-        var w = H("span", { class: "fp-pt" }, row);
+        H("p", { class: "lx-fp-ask", text: s.ask }, area);
+        var row = H("div", { class: "lx-fp-ans" }, area); H("span", { class: "b1-k", text: "Cheapest" }, row);
+        var w = H("span", { class: "lx-fp-pt" }, row);
         w.appendChild(document.createTextNode("x =")); ins.x = numIn(w, null, "Cheapest corner: x, MWh"); w.appendChild(document.createTextNode("y =")); ins.y = numIn(w, null, "Cheapest corner: y, MWh");
-        var w2 = H("span", { class: "fp-pt" }, row); w2.appendChild(document.createTextNode("cost $")); ins.cost = numIn(w2, null, "Its cost, dollars", null, "rhs");
+        var w2 = H("span", { class: "lx-fp-pt" }, row); w2.appendChild(document.createTextNode("cost $")); ins.cost = numIn(w2, null, "Its cost, dollars", null, "rhs");
         api.hints(s.hints);
         api.check(function () { return s.check({ x: valOf(ins.x), y: valOf(ins.y), cost: valOf(ins.cost) }); });
         api.answer(function () { setVal(ins.x, s.best.x[0]); setVal(ins.y, s.best.x[1]); setVal(ins.cost, s.best.value); });
@@ -1011,7 +934,7 @@
         tableEl(area, ["Row", sy[0], sy[1], "", "b"], A.A.map(function (a, k) {
           return { cells: [String(k + 1), num(a[0]), num(a[1]), "≤", num(A.b[k])] };
         }), "The rows of A x ≤ b", [0, 1, 2, 3, 4]);
-        var why = H("ul", { class: "fp-why-rows" }, area);
+        var why = H("ul", { class: "lx-fp-why-rows" }, area);
         s.why.forEach(function (w, k) { H("li", { html: "<b>Row " + (k + 1) + "</b>: " + LX.esc(w) + "." }, why); });
         H("p", { class: "b1-mxnote", text: "c = (" + A.c.map(num).join(", ") + ") · bounds " + sy[0] + " ≥ 0, " + sy[1] + " ≥ 0" }, area);
         var code = H("pre", { class: "b1-code", "aria-label": "The same arrays in Python" }, area);
@@ -1022,12 +945,12 @@
         api.answer(function () { ch.pick(s.answer); });
       },
       abat: function (area, api) {
-        var s = PS.abat; storyBox(area, s.st); H("p", { class: "fp-ask", text: s.ask }, area);
+        var s = PS.abat; storyBox(area, s.st); H("p", { class: "lx-fp-ask", text: s.ask }, area);
         var E = ArraysEx(area, s.st, { given: s.given, blanks: 1 });
         api.hints(s.hints); api.check(function () { return s.check(E.value()); }); api.answer(function () { E.fill(s.answer); });
       },
       abus: function (area, api) {
-        var s = PS.abus; storyBox(area, s.st); H("p", { class: "fp-ask", text: s.ask }, area);
+        var s = PS.abus; storyBox(area, s.st); H("p", { class: "lx-fp-ask", text: s.ask }, area);
         var E = ArraysEx(area, s.st, { blanks: 2, add: true });
         api.hints(s.hints); api.check(function () { return s.check(E.value()); }); api.answer(function () { E.fill(s.answer); });
       }

@@ -18,9 +18,9 @@
 // Sunday in March to 07:00 UTC on the first Sunday in November, standard time (UTC-6) otherwise. The Node test checks it
 // against the ICU time-zone database (America/Chicago) for every hour of 2025.
 //
-// Lesson-local components (candidates for the shared library; see learn/_w1/b02-python-data.yml): a code panel, a year
-// strip, and a light line/bar chart with a text version. CSS is injected once by injectCSS(), with --lx-* tokens only.
-// The reusable data check in the explain layer is the shared LX.Checklist (components/checklist.js).
+// Shared components: the line and bar charts are LX.Plot (components/plot.js), the reusable data check in the explain
+// layer is LX.Checklist (checklist.js). Lesson-local: a code panel and a year strip; their CSS is injected once by
+// injectCSS(), with --lx-* tokens only.
 (function () {
   "use strict";
   var HOUR = 3600000, NIGHT_END = 4, NIGHT_FRAC = 0.05, SPIKE_FRAC = 0.5, MAX_REPEAT = 6;

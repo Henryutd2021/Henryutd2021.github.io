@@ -235,7 +235,7 @@
     function run(state) {
       state = String(state == null ? "mid" : state);
       var r = fn(state), m = /^step-(\d+)$/.exec(state);
-      if (!r && m && cards) { cards.go(Math.max(0, +m[1] - 1)); r = { view: state }; }
+      if (!r && m && cards) { cards.go(Math.max(0, Math.min((cards.count || Infinity) - 1, +m[1] - 1))); r = { view: state }; }
       LX.emit("layout");
       return r || null;
     }

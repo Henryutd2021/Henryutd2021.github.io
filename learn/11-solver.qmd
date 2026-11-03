@@ -11,8 +11,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 <!-- Lesson 11 in the model-lab form: step cards around an editable model and a live solver run (Learn W1, 2026-11-02).
      Text budget: one idea and one action per card, about 35 words; depth lives in the collapsed Go deeper boxes. Model,
-     step cards and explain layer: assets/learn/11-solver.js with assets/learn/data/11-solver.json; lesson-local
-     components (plot, simplex walk, equation card) come from assets/learn/10-write-it-down.js. Tests:
+     step cards and explain layer: assets/learn/11-solver.js with assets/learn/data/11-solver.json; its
+     components (plane, simplex walk, equation card) are the shared LX.LPPlane, LX.lp2 and LX.EquationCard. Tests:
      node _tests/learn/test_11-solver.js (every number below is checked against the model with the vendored HiGHS);
      --write rewrites the data file's computed blocks and the static figure.
      Generated, do not edit by hand: the fallback figure and the learn:meta, learn:next and learn:footer blocks. -->
@@ -220,6 +220,5 @@ Each price here is a marginal value under stated assumptions: fixed plant sizes,
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/10-write-it-down.js" defer></script>
 <script src="../assets/learn/11-solver.js" defer></script>
 ```

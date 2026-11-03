@@ -20,7 +20,7 @@
 //
 // Shared components: LX.LPPlane and LX.lp2 (the plane and its rule algebra), LX.CardSort, LX.LinkedViews, LX.Toggle,
 // LX.Slider, and in the explain layer LX.FormulateBox and LX.EquationCard (components/formulate.js, equation.js).
-// Lesson-local: the stage's look and the helpers W1F.fmt1, W1F.usd and W1F.saw (CSS injected once, id "w1f-css").
+// The stage uses the shared model-lab classes (.lx-stage, .lx-readouts, .lx-ctls, .lx-goals in plot.css).
 (function () {
   "use strict";
   var HOURS = 24;
@@ -86,42 +86,12 @@
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
-  // ================================================================ lesson-local components
   var LX = window.LX, H = LX.H, S = LX.S;
-  var W1F = window.W1F = window.W1F || {};
-  var CSS = [
-    ".w1f-stage{display:grid;gap:10px;background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;box-shadow:var(--lx-shadow)}",
-    ".w1f-stage[hidden]{display:none}",
-    ".w1f-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}",
-    ".page-learn .w1f-head h3{font-size:16px;margin:0}",
-    ".w1f-chips{display:flex;flex-wrap:wrap;gap:8px}",
-    ".w1f-chip{display:grid;gap:1px;padding:5px 10px;border-radius:10px;background:var(--lx-surface-2);min-width:0}",
-    ".w1f-chip span{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3)}",
-    ".w1f-chip b{font-family:var(--lx-f-mono);font-size:15.5px;font-weight:600;color:var(--lx-ink);font-variant-numeric:tabular-nums}",
-    ".w1f-chip.good b{color:var(--lx-good)}.w1f-chip.bad b{color:var(--lx-bad)}.w1f-chip.warn b{color:var(--lx-warn)}",
-    ".w1f-status{font-size:14.5px;color:var(--lx-ink-2);min-height:1.3em}",
-    ".w1f-status b{font-family:var(--lx-f-display);font-weight:600}",
-    ".w1f-ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px}",
-    ".w1f-missions{display:grid;gap:6px}",
-    ".w1f-mission{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;color:var(--lx-ink-2)}",
-    ".w1f-mission .lx-ic{width:18px;height:18px;margin-top:2px;color:var(--lx-ink-3)}.w1f-mission.won .lx-ic{color:var(--lx-good)}.w1f-mission.won{color:var(--lx-ink)}",
-    ".lx-step-act>.lx-btn,.lx-step-act>a.lx-btn{justify-self:start}",
-    ".w1f-sym var,.w1f-eq var{font-style:italic;font-family:Georgia,'Times New Roman',serif;font-size:1.08em}",
-  ].join("\n");
-  W1F.css = function () { if (!document.getElementById("w1f-css")) H("style", { id: "w1f-css", text: CSS }, document.head); };
-
   // ================================================================ the lesson
   var fmt1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }); };
   var MW = function (v) { return fmt1(v) + " MW"; };
   var usd = function (v) { return (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US"); };
-  W1F.fmt1 = fmt1; W1F.usd = usd;
-
-  // api.saw with **bold** marks (LX.rich keeps the asterisks; they become <b> here)
-  W1F.saw = function (api, t, bad) {
-    api.saw(t, bad);
-    var b = api.card.querySelector(":scope > div[aria-live] > .lx-saw > div"); if (b) b.innerHTML = b.innerHTML.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
-  };
-  var saw = W1F.saw;
+  var saw = function (api, t, bad) { api.saw(t, bad); };   // step cards turn **bold** marks into <b> (cards.js)
   // how the plane draws each rule (LX.LPPlane styles); x >= 0 and y >= 0 are the axes
   var RULE_STYLE = {
     demand: { color: "var(--lx-ink)", label: "Demand", place: "foot", drag: true },            // just above the x-axis, left of the line's foot
@@ -131,16 +101,15 @@
   };
 
   function view(live, data, root) {
-    W1F.css();
     var town = data.town, D = data["10_write_it_down"], day = dayOf(town, data.town_year), h = D.hour;
     var base = params(town, day, D), p = params(town, day, D), level = null, dot = null, hi = null, hook = null, onDotMove = null, ctl = {};
     var hh = LX.fmt.hh(h), sol = solve2(p);
     var NAME = { demand: "demand rule", cc: "combined-cycle size", pk: "peaker size", co2: "CO₂ cap", x0: "x = 0", y0: "y = 0" };
 
     // ---------- the stage: chips, plot, status
-    var stage = H("div", { class: "w1f-stage" }, live);
-    H("h3", { text: hh + " on " + day.dateLabel + ": two gas plants, one hour" }, H("div", { class: "w1f-head" }, stage));
-    var chips = H("div", { class: "w1f-chips", "aria-live": "polite" }, stage);
+    var stage = H("div", { class: "lx-stage" }, live);
+    H("h3", { text: hh + " on " + day.dateLabel + ": two gas plants, one hour" }, H("div", { class: "lx-stage-head" }, stage));
+    var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage);
     var plot = LX.LPPlane(stage, {
       fluid: true, view: D.view, xLabel: "Combined-cycle x (MW)", yLabel: "Peaker y (MW)", styles: RULE_STYLE,
       onDrag: function (id, v) {
@@ -153,7 +122,7 @@
       dotValue: function (d) { return Math.round(d.x) + " and " + Math.round(d.y) + " MW"; },
       describe: describe
     });
-    var status = H("p", { class: "w1f-status", "aria-live": "polite" }, stage);
+    var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
 
     function describe() {
       var s = sol, t = "Plans as points: combined-cycle output x across, peaker output y up. The region of plans that meet every rule " +
@@ -164,7 +133,7 @@
       if (dot) t += " Your plan: x = " + dot.x + ", y = " + dot.y + ".";
       return t;
     }
-    function chip(label, value, cls) { var c = H("div", { class: "w1f-chip" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
+    function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function paint() {
       sol = solve2(p);
       plot.render({ rows: problem(p).rows, c: [p.cx, p.cy], sol: sol, level: level, dot: dot, hi: hi, showBest: level == null || level <= sol.cost + 1 });
@@ -266,7 +235,7 @@
       { text: "Make it tied: give both plants the same running cost. The cost line turns parallel to the demand line. What happens to the best plan?",
         build: function (act, api) {
           reset();
-          var c = H("div", { class: "w1f-ctls" }, act);
+          var c = H("div", { class: "lx-ctls" }, act);
           ctl.cy = costCtl(c, "cy", "Peaker running cost", "var(--lx-pk)");
           ctl.cx = costCtl(c, "cx", "Combined-cycle running cost", "var(--lx-cc)");
           hook = function () {

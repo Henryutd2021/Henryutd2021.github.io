@@ -8,5 +8,6 @@
 .lx-step-n { font-family: var(--lx-f-mono); font-size: 12.5px; color: var(--lx-ink-3); white-space: nowrap; flex: none; }
 .lx-step-text { font-size: 19px; line-height: 1.45; max-width: 46ch; color: var(--lx-ink); }
 .lx-step-act { display: grid; gap: 12px; }
+.lx-step-act > .lx-btn, .lx-step-act > a.lx-btn { justify-self: start; }   /* a lone button keeps its own width */
 .lx-step-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 @media (max-width: 560px) { .lx-stepcard { padding: 14px; } .lx-step-text { font-size: 18px; } .lx-dots { gap: 4px; } .lx-dots i { flex-basis: 14px; } }

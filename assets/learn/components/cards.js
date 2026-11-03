@@ -4,7 +4,8 @@
        build: function (act, api) { ... api.done(); api.saw("What the reader just saw."); },
        free: true }                                             // free: Next is open from the start (no action needed)
    ], onStep: function (i) {} });
-   cards.go(i) | cards.index()        progress dots, "Step n of N", Back and Next; the last card hides Next.
+   cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
+   api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
    Text budget: card text is one or two sentences; anything longer goes in a Go deeper box inside `act`. */
 (function () {
   "use strict";
@@ -31,7 +32,7 @@
       nx.addEventListener("click", function () { if (unlocked[i]) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
         done: function () { unlocked[i] = true; nx.disabled = false; },
-        saw: function (t, bad) { sawBox.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + LX.rich(t) + "</div>" }, sawBox); },
+        saw: function (t, bad) { sawBox.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") + "</div>" }, sawBox); },
         card: card, index: i
       };
       var txt = typeof st.text === "function" ? st.text(act, api) : st.text;
@@ -41,6 +42,6 @@
       LX.emit("layout");
     }
     render(0);
-    return { el: card, go: render, index: function () { return i; } };
+    return { el: card, go: function (k) { render(Math.max(0, Math.min(N - 1, k))); }, index: function () { return i; }, count: N };
   };
 })();
