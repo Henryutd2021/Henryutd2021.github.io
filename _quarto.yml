@@ -39,6 +39,9 @@ website:
   open-graph: true
   image: images/profile-square.jpg
   navbar:
+    # nine links and five icons need about 1,050 px; below 1,200 px they truncate the site name and wrap "Field Notes",
+    # so the menu collapses there (Quarto's default is below 992 px)
+    collapse-below: xl
     left:
       - href: index.qmd
         text: About
