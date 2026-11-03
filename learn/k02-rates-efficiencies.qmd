@@ -39,11 +39,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.k2-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.k2-ans label { font-family: var(--lx-f-display); font-weight: 500; }
-.k2-num { width: 7.5em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
-  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
-.k2-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
 .k2-goal { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--lx-surface-2); }
 .k2-goal-t { margin: 0; font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; }
 .k2-goal .lx-choice { font-family: var(--lx-f-mono); font-size: 14.5px; }
@@ -54,10 +49,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k2-effrow b { font-family: var(--lx-f-mono); font-weight: 600; text-align: right; }
 .k2-hint, .k2-key { margin: 0; font-size: 14px; color: var(--lx-ink-3); }
 .k2-key i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 6px; }
-.k2-drill { display: grid; gap: 10px; }
-.k2-drill .lx-btn { justify-self: start; }
-.k2-drill-q { display: grid; gap: 10px; }
-.k2-drill-q .lx-qtext:focus { outline: none; }
 .k2-tables { overflow-x: auto; }
 .k2-static { border-collapse: collapse; font-size: 14px; }
 .k2-static th, .k2-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: left; vertical-align: top; }

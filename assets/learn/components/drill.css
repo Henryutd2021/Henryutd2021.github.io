@@ -1,0 +1,8 @@
+/* drill.css — LX.Drill (drill.js): the practice drill's card and its current item. The question, the choice buttons and
+   the feedback use the shared .lx-qtext, .lx-qbtns, .lx-choice and .lx-saw; the number box is .lx-na (numanswer.css).
+   Promoted from the toolbox (K1 to K5, K8). */
+.lx-drill { display: grid; gap: 10px; }
+.lx-drill .lx-btn { justify-self: start; }
+.lx-drill-q { display: grid; gap: 10px; }
+.lx-drill-q .lx-qtext { overflow-wrap: anywhere; }
+.lx-drill-q .lx-qtext:focus { outline: none; }

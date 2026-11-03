@@ -111,8 +111,11 @@ ok(W.spanText === "220 trillion" && near(W.span, 4.2e15 / 19, 1e3), "ladder: pho
 ok(/four steps of ×1,000 from Wh to TWh/.test(JS) && !/five rungs of ×1,000/.test(JS), "ladder: five units are four steps of x1,000 (review point 6)");
 // Prairie Town's day: the same slice and scale as lesson 0
 const W0 = G0.prepare(town, year, "lesson0"), game = W0.demand.reduce((a, b) => a + b, 0);
-ok(Math.abs(W.town.mwh - game) <= 24 * W0.game.step / 2 && near(W.town.mwh, W0.rawDemand.reduce((a, b) => a + b, 0), 1e-6), `town day: ${W.town.mwh.toFixed(1)} MWh matches lesson 0 (${game} MWh after its 5 MW rounding)`);
+ok(W.town.demand.join() === W0.demand.join() && W.town.mwh === game && game === 6957 && W.town.peakMW === Math.max(...W0.demand), `town day: lesson 0's hourly MW, ${W.town.mwh} MWh (as K1, K4 and K7)`);
+ok(Math.abs(W.town.mwh - W0.rawDemand.reduce((a, b) => a + b, 0)) < 1, "town day: within 1 MWh of the unrounded shape");
 ok(has("Prairie Town used about " + int(W.town.mwh) + " MWh on lesson 0's day") && has("7 GWh: one GWh is 1,000 MWh"), "page: quiz states Prairie Town's day");
+ok(has("with lesson 0's hourly MW, which add up to " + int(W.town.mwh) + " MWh"), "page: the data note states the day's total");
+ok(!/6,956|6956/.test(QMD + JS), "page: no trace of the unrounded 6,956 MWh");
 ok(W.town.scalePeakMW === town.scenarios.lesson0.demandPeakMW, "town day: Prairie Town's 2025 peak scale is lesson 0's (450 MW)");
 ok(near(W.spp.twh, 298.6) && near(W.spp.peakGW, 54.4), "SPP totals read from town_days.json stats");
 
@@ -160,7 +163,7 @@ Object.keys(A).forEach(k => ok(/^https:\/\/www\.(eia|epa)\.gov\//.test(A[k].url)
 // the generated header, next box and footer (scripts/build_learn.py) are checked by the coordinator's scans; here: my own text
 const OWN = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));
-const ALLOW = /^(https:\/\/(www\.)?(eia\.gov|epa\.gov|energy\.gov|nrel\.gov|ferc\.gov|nerc\.com)\/|[0-9a-z-]+\.qmd(#[a-z0-9-]+)?$|#)/;
+const ALLOW = /^(https:\/\/(www\.)?(eia\.gov|epa\.gov|energy\.gov|nrel\.gov|ferc\.gov|nerc\.com)\/|[0-9a-z-]+\.qmd(#[a-z0-9-]+)?$|k0\d-[a-z-]+\.html$|#)/;   // learn pages as .qmd; toolbox refreshers as .html
 hrefs.forEach(h => ok(ALLOW.test(h), `scope: link ${h} is allow-listed`));
 const visible = QMD + JS;
 ["\\bFOAK\\b", "\\bNOAK\\b", "learning[- ](curve|rate)", "order[- ]book", "anchor[- ](customer|buyer)", "subsidy[- ]free", "projects/", "research\\.(html|qmd)", "\\bAI\\b",

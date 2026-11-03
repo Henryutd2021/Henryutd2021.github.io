@@ -1,7 +1,7 @@
 // k08-git-notebooks.js — Toolbox K8, "Git and reproducible notebooks" (step cards, Learn W2, 2026-11-03).
 //
-// Just-in-time skills for B2 (the first notebook), M1 (a notebook that asserts the browser's prices) and R5 (verification,
-// upcoming). Everything is simulated in the browser: no repository is created and nothing is fetched. Commands are shown
+// Just-in-time skills for B2 (the first notebook), M1 (a notebook that asserts the browser's prices) and R5 (verification).
+// Everything is simulated in the browser: no repository is created and nothing is fetched. Commands are shown
 // as text, and a small state machine plays what each one does to the working folder, the staging area and the history.
 //
 // The project is a tiny model of Prairie Town's day (3 September 2025, cut and scaled exactly as in lesson 0 and K7, from
@@ -14,12 +14,14 @@
 // Pure model (exported for Node, no DOM): townDay; the project's files and history (story()); the Git state machine
 // (newRepo, edit, add, commit, restore, switchCreate, switchTo, detach, merge, revert, pull, cloneRepo, status, log,
 // diffLines and the text each command prints); bisect() and maxChecks(); the notebook (nbNew, nbRun, nbEdit,
-// nbRestartRunAll); the practice drill (seeded); staticFallback() for the page's no-JS blocks.
+// nbRestartRunAll); the practice drill's items (seeded by the shared LX.Drill, components/drill.js, which also draws the
+// drill; its number box is LX.NumAnswer); staticFallback() for the page's no-JS blocks.
 // Commit ids are 7-hex fingerprints this page computes (FNV-1a of parents, message and files), not Git's SHA-1 ids.
 // Every number on the page is checked by node _tests/learn/test_k08-git-notebooks.js, which also writes the no-JS
 // blocks (--write).
 (function () {
   "use strict";
+  var DR = (typeof window !== "undefined" && window.LX && window.LX.Drill) || require("./components/drill.js");
 
   // ---------------------------------------------------------------- the real day, scaled as in lesson 0 (and K4, K7)
   function townDay(town, year, key) {
@@ -79,7 +81,7 @@
   }
   var PLOT = ["import matplotlib.pyplot as plt", "from model import day, gas_mw", 'plt.step(day.hour, gas_mw, where="post")',
               'plt.ylabel("Gas, MW")', 'plt.savefig("gas_day.png")'].join("\n");
-  var REQS = "pandas==2.2.3\npyyaml==6.0.2\nmatplotlib==3.9.2";
+  var REQS = "pandas==2.2.3\npyyaml==6.0.2\nmatplotlib==3.9.2";   // illustrative pins (the page says so wherever they show)
   var IGNORE = ".env\ndata/raw/\n*.png";
   var NOTEBOOK = ["cell 1: import pandas as pd; day = pd.read_csv(\"data/town_day.csv\")", "cell 2: gas_cost = 40",
                   "cell 3: gas_mwh = (day.demand_mw - day.wind_mw - day.solar_mw - 100).sum()", "cell 4: gas_mwh * gas_cost"].join("\n");
@@ -426,14 +428,13 @@
 
   // ---------------------------------------------------------------- step 8: five things that stop a stranger's rerun
   var FIXES = [
-    { key: "pin", label: "exact versions (pandas==2.2.3)", file: "requirements.txt", before: "pandas", after: "pandas==2.2.3", why: "An exact version: a later pandas may change a default and the numbers with it." },
+    { key: "pin", label: "exact versions (pandas==2.2.3, an illustrative version)", file: "requirements.txt", before: "pandas", after: "pandas==2.2.3", why: "An exact version (the number is illustrative): a later pandas may change a default and the numbers with it." },
     { key: "path", label: "a path inside the project", file: "day.ipynb, cell 1", before: 'pd.read_csv("/Users/me/Desktop/town_day.csv")', after: 'pd.read_csv("data/town_day.csv")', why: "A path inside the project works on every computer, not only yours." },
     { key: "data", label: "the raw data's source, download date and checksum", file: "README.md", before: "Data: downloaded from EIA", after: "Data: EIA-930 2025 balance files, downloaded 2 Nov 2026, SHA-256 fac4bb99…", why: "Source, date and checksum let anyone confirm they have the same file." },
     { key: "seed", label: "a fixed random seed", file: "day.ipynb, cell 5", before: "test = day.sample(6)", after: "test = day.sample(6, random_state=1)", why: "A fixed seed draws the same six hours on every run." },
     { key: "secret", label: ".env and data/raw/ in .gitignore", file: ".gitignore", before: "(no .gitignore: .env with an API key would be committed)", after: ".env\ndata/raw/", why: "Keys stay on your computer; large raw downloads stay out of the history." }];
 
-  // ---------------------------------------------------------------- practice drill (seeded, so tests can replay it)
-  function rng(seed) { var x = seed >>> 0 || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+  // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["where", "next", "cost", "halve", "notebook", "repro", "order"];
   var WHERE = ["Only in the working folder", "Staged, not yet committed", "Committed in the history", "Gone: thrown away"];
   var SEQS = [["edit"], ["edit", "add"], ["edit", "add", "commit"], ["edit", "add", "edit"], ["edit", "commit"], ["edit", "add", "commit", "edit"], ["edit", "restore"], ["edit", "add", "commit", "edit", "restore"]];
@@ -452,7 +453,8 @@
   }
   function opText(op, path) { return op === "edit" ? "You change " + path + " and save it." : op === "add" ? "git add " + path : op === "commit" ? 'git commit -m "Change ' + path + '"' : "git restore " + path; }
   var REPRO = [
-    { q: "requirements.txt says only “pandas”. What makes a rerun install the version you used?", a: "pandas==2.2.3", w: ["pandas>=1.0", "the newest pandas", "no requirements file"] },
+    { q: "requirements.txt says only “pandas”. What makes a rerun install the version you used?", a: "pandas==2.2.3", w: ["pandas>=1.0", "the newest pandas", "no requirements file"],
+      why: "“pandas==2.2.3”: an exact version (the number is illustrative)." },
     { q: "Which of these files should stay out of the repository?", a: ".env, which holds an API key", w: ["model.py", "requirements.txt", "README.md"] },
     { q: "A notebook reads /Users/me/Desktop/town_day.csv. What lets it run on another computer?", a: "data/town_day.csv, inside the project", w: ["a copy of the file on the Desktop", "an absolute path with C:\\", "a screenshot of the data"] },
     { q: "A cell draws six random hours as a test set. What keeps the draw the same on every run?", a: "a fixed random seed", w: ["running the cell twice", "a faster computer", "restart and run all"] },
@@ -502,14 +504,14 @@
     }
     if (kind === "repro") {
       var it = REPRO[pick(REPRO.length)], chs = shuffle([it.a].concat(it.w), r);
-      return { kind: kind, q: it.q, choices: chs, answer: chs.indexOf(it.a), why: "“" + it.a + "”." };
+      return { kind: kind, q: it.q, choices: chs, answer: chs.indexOf(it.a), why: it.why || "“" + it.a + "”." };
     }
     var o = ORDERS[pick(ORDERS.length)], right = o.a.join("  →  "), wrong = [];
     [[1, 0, 2], [2, 1, 0], [0, 2, 1], [1, 2, 0], [2, 0, 1]].forEach(function (p) { var s = p.map(function (j) { return o.a[j]; }).join("  →  "); if (s !== right && wrong.indexOf(s) < 0) wrong.push(s); });
     var cs = shuffle([right].concat(shuffle(wrong, r).slice(0, 2)), r);
     return { kind: "order", q: o.q + " Which order works?", choices: cs, answer: cs.indexOf(right), why: right + "." };
   }
-  function drill(S, seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(S, k, r)); return out; }
+  function drill(S, seed, n) { return DR.series(function (k, r) { return drillItem(S, k, r); }, seed, n); }
 
   // ---------------------------------------------------------------- the page's no-JS blocks (written by the test's --write mode)
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -550,7 +552,7 @@
                 ignored: ignored, isAncestor: isAncestor, mergeBase: mergeBase, story: story, stepStart: stepStart, finalRepo: finalRepo,
                 bisect: bisect, maxChecks: maxChecks, nbNew: nbNew, nbSrc: nbSrc, nbEdit: nbEdit, nbRun: nbRun, nbRestartRunAll: nbRestartRunAll,
                 nbClean: nbClean, nbStale: nbStale, FIXES: FIXES, COMMIT_MSGS: COMMIT_MSGS, MSG: MSG, KINDS: KINDS, WHERE: WHERE, REPRO: REPRO,
-                ORDERS: ORDERS, drill: drill, drillItem: drillItem, rng: rng, whereOf: whereOf, staticFallback: staticFallback, staticDrill: staticDrill,
+                ORDERS: ORDERS, drill: drill, drillItem: drillItem, rng: DR.rng, whereOf: whereOf, staticFallback: staticFallback, staticDrill: staticDrill,
                 GAS_COST: GAS_COST, HIGH: HIGH, BUG: BUG, GOOD3: GOOD3, REQS: REQS, IGNORE: IGNORE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -571,17 +573,6 @@
       bs.push(b);
     });
     return { el: g, set: function (i) { bs.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); }); } };
-  }
-  function numInput(host, o) {
-    var id = LX.uid("in"), row = H("div", { class: "k8-ans" }, host);
-    H("label", { for: id, text: o.label }, row);
-    var inp = H("input", { id: id, type: "text", inputmode: "decimal", autocomplete: "off", class: "k8-num" }, row);
-    if (o.unit) H("span", { class: "k8-unit", text: o.unit }, row);
-    var btn = H("button", { type: "button", class: "lx-btn small", text: "Check" }, row);
-    function go() { var v = parseFloat(String(inp.value).replace(/[−–]/g, "-").replace(/[,$\s]/g, "")); o.onCheck(isNaN(v) ? null : v, inp); }
-    btn.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    return { input: inp, button: btn, row: row };
   }
 
   // ---- the Git stage: working folder, staging area, history; a terminal; the snapshot's result
@@ -875,7 +866,7 @@
 
     // ---- step 9: a clean clone reruns
     steps.push({
-      text: "The real test: a fresh copy. [[clone|Clone]] the project, install the pinned versions, run the notebook top to bottom, and compare with the README.",
+      text: "The real test: a fresh copy. [[clone|Clone]] the project, install the pinned versions (illustrative numbers), run the notebook top to bottom, and compare with the README.",
       build: function (act, api) {
         var F = finalRepo(S, chosen.msg), C = cloneRepo(F), Rc = run(C.work), k = 0;
         var g = GitStage(act, { only: ["w", "h"] }), CMD = ["git clone ../prairie-day fresh-copy && cd fresh-copy", "pip install -r requirements.txt", "jupyter nbconvert --to notebook --execute day.ipynb"];
@@ -966,36 +957,13 @@
     });
   }
 
-  // ---- practice drill: a seeded stream of short items with instant feedback (this browser only)
+  // ---- practice drill: a seeded stream of short items with instant feedback (LX.Drill; this visit only); after "Next
+  // item", focus goes to the new item's first button or box
   function drillView(S) {
     var host = document.getElementById("k8-drill"); if (!host) return; host.innerHTML = "";
-    var seed = (Date.now() % 100000) + 1, r = rng(seed), k = 0, right = 0, done = 0;
-    var card = H("div", { class: "lx-card k8-drill" }, host);
-    var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice drill" }, top);
-    var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    H("p", { class: "lx-hint", text: "Seven kinds of item in rotation, new details each time, about two minutes each. Fifteen items take about 30 minutes." }, card);
-    var box = H("div", { class: "k8-drill-q" }, card);
-    var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
-    function show() {
-      var it = drillItem(S, k, r); k++; box.innerHTML = "";
-      H("p", { class: "lx-qtext", text: it.q }, box);
-      var fb = H("div", { "aria-live": "polite" }, box), answered = false;
-      function mark(ok) {
-        if (answered) return; answered = true; done++; if (ok) right++;
-        score.textContent = right + " of " + done + " right";
-        fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
-      }
-      if (it.choices) {
-        var row = H("div", { class: "lx-qbtns k8-choices" }, box);
-        it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
-        box.insertBefore(row, fb);
-      } else {
-        var n = numInput(box, { label: "Answer", unit: it.unit === "$" ? "dollars" : "checks", onCheck: function (v) { if (v != null) mark(v === it.answer); } });
-        box.insertBefore(n.row, fb);
-      }
-    }
-    next.addEventListener("click", function () { show(); var q = box.querySelector("button, input"); if (q) q.focus(); });
-    show();
+    LX.Drill(host, { hint: "Seven kinds of item in rotation, new details each time, about two minutes each. Fifteen items take about 30 minutes.",
+                     focus: "answer", width: "8em", choicesClass: "k8-choices", unit: function (it) { return it.unit === "$" ? "dollars" : "checks"; },
+                     item: function (k, r) { return drillItem(S, k, r); } });
   }
 
   LX.mount("k08", function (live, data, root) { view(live, data, root); });

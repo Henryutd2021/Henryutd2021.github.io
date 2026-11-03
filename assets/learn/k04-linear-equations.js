@@ -13,7 +13,8 @@
 // checks that the 86 MW of wind and sun at 19:00 cover the most surplus any plan in the region makes (85 MW).
 //
 // Pure model (exported for Node): townDay, story(), drill items, and the rule algebra (le, holds, clip, region,
-// verticesOf) re-exported from the shared LX.lp2; the plane is LX.LPPlane (both in components/lpplane.js).
+// verticesOf) re-exported from the shared LX.lp2; the plane is LX.LPPlane (both in components/lpplane.js). The number box
+// is LX.NumAnswer and the practice drill LX.Drill (components/numanswer.js, drill.js; rng and the seeded series from there).
 (function () {
   "use strict";
 
@@ -35,6 +36,7 @@
   // a rule: {a: [a1, a2], op: "<=" | ">=" | "=", b}
   var LP = (typeof window !== "undefined" && window.LX && window.LX.lp2) || require("./components/lpplane.js");
   var holds = LP.holds, region = LP.region, verticesOf = LP.verticesOf;
+  var DR = (typeof window !== "undefined" && window.LX && window.LX.Drill) || require("./components/drill.js");
 
   // ---------------------------------------------------------------- the story numbers (19:00, 3 September 2025)
   var HOUR = 19, PREV_CC = 90;
@@ -55,8 +57,7 @@
     return s;
   }
 
-  // ---------------------------------------------------------------- practice drill (seeded, so tests can replay it)
-  function rng(seed) { var x = seed >>> 0 || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+  // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
   var KINDS = ["gap", "solve", "flip", "test", "words"];
   var WORDS = [["at most", "≤"], ["no more than", "≤"], ["at least", "≥"], ["no less than", "≥"], ["exactly", "="], ["must not fall below", "≥"], ["must not exceed", "≤"]];
   function drillItem(D, k, r) {
@@ -85,7 +86,7 @@
     return { kind: kind, q: "“The line can carry " + w[0] + " " + amt + " MW.” Which sign?", choices: ["≤", "≥", "="], answer: ["≤", "≥", "="].indexOf(w[1]),
              why: "“" + w[0] + "” means " + w[1] + ": flow " + w[1] + " " + amt + " MW." };
   }
-  function drill(D, seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(D, k, r)); return out; }
+  function drill(D, seed, n) { return DR.series(function (k, r) { return drillItem(D, k, r); }, seed, n); }
 
   // ---------------------------------------------------------------- the explain layer's two worked inequalities
   // a·x + m <= n with a != 0: x <= (n − m)/a for a > 0; divide by a negative a and the sign flips. spot: a value to
@@ -104,7 +105,7 @@
   }
 
   var model = { townDay: townDay, le: LP.le, lhs: LP.lhs, holds: holds, clip: LP.clip, region: region, verticesOf: verticesOf, story: story,
-                drill: drill, drillItem: drillItem, rng: rng, traces: traces, solveLe: solveLe, EXAMPLES: EXAMPLES, HOUR: HOUR, PREV_CC: PREV_CC };
+                drill: drill, drillItem: drillItem, rng: DR.rng, traces: traces, solveLe: solveLe, EXAMPLES: EXAMPLES, HOUR: HOUR, PREV_CC: PREV_CC };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -130,17 +131,6 @@
     });
     return { el: g, set: function (i) { bs.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); }); } };
   }
-  function numInput(host, o) {
-    var id = LX.uid("in"), row = H("div", { class: "w1h-ans" }, host);
-    H("label", { for: id, text: o.label }, row);
-    var inp = H("input", { id: id, type: "text", inputmode: "decimal", autocomplete: "off", class: "w1h-num", "aria-describedby": o.unit ? null : null }, row);
-    if (o.unit) H("span", { class: "w1h-unit", text: o.unit }, row);
-    var btn = H("button", { type: "button", class: "lx-btn small", text: o.button || "Check" }, row);
-    function go() { var v = parseFloat(String(inp.value).replace(/[−–]/g, "-").replace(/,/g, "")); o.onCheck(isNaN(v) ? null : v, inp); }
-    btn.addEventListener("click", go);
-    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
-    return { input: inp, button: btn };
-  }
   function textAlt(host, title, items) {
     var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title }, d);
     var ul = H("ul", null, d); items.forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
@@ -161,7 +151,7 @@
       build: function (act, api) {
         H("p", { class: "k4-eq", html: s.nuclear + " + " + s.wind + " + " + s.solar + " + <i>g</i> = " + s.demand }, act);
         var tries = 0;
-        numInput(act, { label: "g =", unit: "MW", onCheck: function (v) {
+        LX.NumAnswer(act, { label: "g =", unit: "MW", onCheck: function (v) {
           tries++;
           if (v === s.need) { api.done(); api.saw("g = " + s.demand + " − " + s.nuclear + " − " + s.wind + " − " + s.solar + " = " + s.need + " MW. Do the same to both sides and the balance holds."); }
           else api.saw(tries < 2 ? "Not yet. Take the known parts away from both sides." : "Subtract each known part from " + s.demand + ": " + s.demand + " − " + s.nuclear + " − " + s.wind + " − " + s.solar + ".", true);
@@ -351,36 +341,12 @@
     });
   }
 
-  // ---- practice drill: a seeded stream of short items with instant feedback (this browser only)
+  // ---- practice drill: a seeded stream of short items with instant feedback (LX.Drill; this visit only). As before the
+  // promotion: focus stays on "Next item", and an empty box counts as a wrong answer.
   function drillView(D) {
     var host = document.getElementById("k4-drill"); if (!host) return; host.innerHTML = "";
-    var seed = (Date.now() % 100000) + 1, r = rng(seed), k = 0, right = 0, done = 0;
-    var card = H("div", { class: "lx-card k4-drill" }, host);
-    var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: "Practice drill" }, top);
-    var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    H("p", { class: "lx-hint", text: "Five kinds of item in rotation, new numbers each time. Aim for ten in a row." }, card);
-    var box = H("div", { class: "k4-drill-q" }, card);
-    var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
-    function show() {
-      var it = drillItem(D, k, r); k++; box.innerHTML = "";
-      H("p", { class: "lx-qtext", text: it.q }, box);
-      var fb = H("div", { "aria-live": "polite" }, box), answered = false;
-      function mark(ok) {
-        if (answered) return; answered = true; done++; if (ok) right++;
-        score.textContent = right + " of " + done + " right";
-        fb.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + LX.esc(it.why) + "</div>" }, fb);
-      }
-      if (it.choices) {
-        var row = H("div", { class: "lx-qbtns" }, box);
-        it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
-        box.insertBefore(row, fb);
-      } else {
-        var n = numInput(box, { label: "Answer", unit: it.unit || "", onCheck: function (v) { mark(v === it.answer); } });
-        box.insertBefore(n.input.parentNode, fb);
-      }
-    }
-    next.addEventListener("click", show);
-    show();
+    LX.Drill(host, { hint: "Five kinds of item in rotation, new numbers each time. Aim for ten in a row.", focus: false, empty: false,
+                     item: function (k, r) { return drillItem(D, k, r); } });
   }
 
   LX.mount("k04", function (live, data, root) { view(live, data, root); });

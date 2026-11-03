@@ -38,11 +38,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.k3-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.k3-ans label { font-family: var(--lx-f-display); font-weight: 500; }
-.k3-num { width: 7.5em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface);
-  color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
-.k3-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
 .k3-eq { font-family: var(--lx-f-mono); font-size: 18px; color: var(--lx-ink); margin: 0; overflow-wrap: anywhere; }
 .k3-pv { display: grid; gap: 6px; }
 .k3-pvrow { display: grid; grid-template-columns: 6.2em minmax(0, 1fr) 5.5em; gap: 10px; align-items: center; font-size: 14px; }
@@ -56,10 +51,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k3-stream { display: grid; gap: 6px; }
 .k3-ro { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
 .k3-eqcard .den .lx-eq-sym[data-s="n"] { min-width: 34px; min-height: 34px; padding: 0 6px; font-size: 15px; align-self: flex-start; transform: translateY(-14px); }
-.k3-drill { display: grid; gap: 10px; }
-.k3-drill .lx-btn { justify-self: start; }
-.k3-drill-q { display: grid; gap: 10px; }
-.k3-drill-q .lx-qtext:focus { outline: none; }
 .k3-tables { display: grid; gap: 12px; overflow-x: auto; }
 .k3-static { border-collapse: collapse; font-size: 14px; }
 .k3-static th, .k3-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: right; vertical-align: top; }

@@ -139,7 +139,7 @@ const visible = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1
 DENY.forEach(rx => { ok(!rx.test(visible), "page: no " + rx); ok(!rx.test(JS.replace(/\/\/.*$/gm, "")), "script: no " + rx); });
 (visible.match(/href="([^"]+)"/g) || []).forEach(h => {
   const u = h.slice(6, -1);
-  ok(/^(https:\/\/(www\.)?(eia\.gov|otexts\.com|creativecommons\.org\/licenses|opensource\.org\/license)\/|#|\.\.\/assets\/|index\.html|0\d-[a-z-]+\.html|mailto:)/.test(u), "page: allowed link " + u);
+  ok(/^(https:\/\/(www\.)?(eia\.gov|otexts\.com|creativecommons\.org\/licenses|opensource\.org\/license)\/|#|\.\.\/assets\/|index\.html|0\d-[a-z-]+\.html|k0\d-[a-z-]+\.html|mailto:)/.test(u), "page: allowed link " + u);
 });
 
 // ---------------- the static figure: the typical day, forecast against actual

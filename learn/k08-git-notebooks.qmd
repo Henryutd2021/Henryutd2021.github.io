@@ -94,13 +94,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k8-ffile { margin: 0; font-family: var(--lx-f-mono); font-size: 12.5px; color: var(--lx-ink-3); }
 .k8-why { margin: 0; font-size: 14px; color: var(--lx-ink-2); }
 .k8-why:empty { display: none; }
-.k8-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.k8-ans label { font-family: var(--lx-f-display); font-weight: 500; }
-.k8-num { width: 8em; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 17px; }
-.k8-unit { font-family: var(--lx-f-mono); color: var(--lx-ink-3); }
-.k8-drill { display: grid; gap: 10px; }
-.k8-drill .lx-btn { justify-self: start; }
-.k8-drill-q { display: grid; gap: 10px; }
 .k8-static { border-collapse: collapse; font-size: 14px; width: 100%; }
 .k8-static th, .k8-static td { border: 1px solid var(--lx-line); padding: 5px 8px; text-align: left; vertical-align: top; }
 .k8-static th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-2); }
@@ -139,7 +132,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td data-label="Step">5</td><td class="k8-mono">git pull, then git switch --detach &lt;id&gt; and python check.py</td><td>A teammate's three commits arrive; the balance check fails by 2,822 MWh. Halving the history: commit 3 passes, commit 4 fails, so commit 4 (2b77767) is the first bad one, found in 2 checks.</td></tr>
 <tr><td data-label="Step">6</td><td class="k8-mono">git diff 7a83e3d 2b77767, git revert 2b77767</td><td>The line became −(wind − solar): solar is added, not subtracted, so gas is 4,787 MWh instead of 1,965 (2 × 1,411 MWh too much). The revert commit brings back 1,965 MWh.</td></tr>
 <tr><td data-label="Step">7</td><td class="k8-mono">a notebook: edit cell 2, run only cell 4</td><td>Cell 4 still shows 78600 (memory holds gas_cost = 40) under a cell that says 55; Restart and run all gives 108075.</td></tr>
-<tr><td data-label="Step">8</td><td class="k8-mono">five fixes</td><td>Before sharing: exact versions (pandas==2.2.3); a path inside the project; the raw data's source, download date and checksum; a fixed random seed; .env and data/raw/ in .gitignore.</td></tr>
+<tr><td data-label="Step">8</td><td class="k8-mono">five fixes</td><td>Before sharing: exact versions (pandas==2.2.3, an illustrative version); a path inside the project; the raw data's source, download date and checksum; a fixed random seed; .env and data/raw/ in .gitignore.</td></tr>
 <tr><td data-label="Step">9</td><td class="k8-mono">git clone, pip install -r requirements.txt, run all</td><td>The fresh copy has no .env and no raw data, yet gives 1,965 MWh, $78,600 and “balance OK”, as the README says.</td></tr>
 </tbody></table>
 <!-- k8-steps:end -->
@@ -162,7 +155,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li>Demand, wind and solar: the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>. The 100 MW plant that runs flat all day and the $40/MWh gas cost are illustrative, as in <a href="k07-spreadsheets.html">K7</a>.</li>
 <li>The project, its files, its messages and the teammate are illustrative. Nothing on this page creates or touches a real repository; commands are shown as text.</li>
-<li>Commit ids here are 7-character fingerprints this page computes. Git's own ids are 40-character SHA-1 hashes. The version numbers in requirements.txt show what an exact pin looks like; they are not a recommendation.</li>
+<li>Commit ids here are 7-character fingerprints this page computes. Git's own ids are 40-character SHA-1 hashes. The version numbers in requirements.txt (pandas==2.2.3 and the others) are illustrative: they show what an exact pin looks like and are not a recommendation.</li>
 </ul></div>
 ```
 :::
@@ -211,7 +204,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Notebooks without hidden state.** Execute them from a fresh kernel without a browser (`jupyter nbconvert --to notebook --execute day.ipynb`), or keep the model in `.py` files and let the notebook call and plot.
 - **Exact environments.** A lock file records the exact version of every package, including the ones your packages depend on.
 - **Tag the result.** `git tag v1.0` marks the commit behind a published number, so anyone can return to it.
-- **Where next:** [M1](m01-dispatch-to-lmp.html)'s notebook asserts the browser's prices; R5 (upcoming) puts a whole model through planted bugs, a benchmark and a clean-clone rerun.
+- **Where next:** [M1](m01-dispatch-to-lmp.html)'s notebook asserts the browser's prices; [R5](r05-build-validate.html) puts a whole model through planted bugs, a benchmark and a clean-clone rerun.
 
 ```{=html}
 </div>
@@ -257,7 +250,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <div id="k8-drill">
-<div class="lx-card k8-drill"><div class="lx-x-head"><h3>Practice drill</h3></div>
+<div class="lx-card lx-drill"><div class="lx-x-head"><h3>Practice drill</h3></div>
 <p class="lx-hint">With JavaScript on, a drill of seven kinds of item, about two minutes each (fifteen items take about 30 minutes). Three worked items:</p>
 <!-- k8-drill:start (written by _tests/learn/test_k08-git-notebooks.js in its write mode; do not edit) -->
 <ol class="k8-static-drill">
@@ -318,7 +311,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Rule, A., et al. (2019). <a href="https://doi.org/10.1371/journal.pcbi.1007007">Ten simple rules for writing and sharing computational analyses in Jupyter Notebooks</a>. PLOS Computational Biology 15(7): e1007007.</li>
 <li>Chacon, S. and Straub, B. (2014). Pro Git, 2nd edition. Apress. Free to read online from the Git project; chapter 10 explains what a commit stores.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day, 2025.</li>
-<li>Bridge <a href="b02-python-data.html">B2, Python and data</a>, is the first notebook; <a href="m01-dispatch-to-lmp.html">M1</a>'s notebook asserts the browser's prices. Researcher lesson R5, on verification and reproducibility, is upcoming.</li>
+<li>Bridge <a href="b02-python-data.html">B2, Python and data</a>, is the first notebook; <a href="m01-dispatch-to-lmp.html">M1</a>'s notebook asserts the browser's prices. Researcher lesson <a href="r05-build-validate.html">R5</a> is on verification and reproducibility.</li>
 </ul>
 </div>
 ```

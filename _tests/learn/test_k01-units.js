@@ -127,11 +127,11 @@ const num = K.num;
 // ---------------- the interactive: the actions Next waits for, the live regions, the demo hook
 {
   ok(/if \(got\[1\] && got\[3\]\)/.test(JS) && /close\(v, s\.dayGWh, 0\.006\)/.test(JS) && /CHAINS\.every/.test(JS) && /v === s\.span/.test(JS) && /s\.claims\.every/.test(JS), "steps: each card's action is checked before Next opens");
-  ok((JS.match(/"aria-live": "polite"/g) || []).length >= 6, "steps: results are announced in live regions");
+  ok((JS.match(/"aria-live": "polite"/g) || []).length >= 4, "steps: results are announced in live regions (the drill's are LX.Drill's)");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 2/.test(JS) && /state === "done"/.test(JS) && /autos\[4\]/.test(JS), "demo: mid, step-N and done states");
   ok(/LX\.store\.set\("k1-pair"/.test(JS) && /LX\.store\.get\("k1-pair"\)/.test(JS), "explain: the unit chain reads the reader's own pair from step 4");
   ok(/LX\.CompareTable\(/.test(JS) && /LX\.UnitChain\(/.test(JS) && /LX\.Flowchart\(/.test(JS), "explain: comparison table, unit chain and flowchart");
-  ok(/qp\.focus\(\)/.test(JS), "drill: the next item takes focus");
+  ok(/LX\.Drill\(host, \{/.test(JS) && !/focus: false/.test(JS), "drill: LX.Drill, whose next item takes focus");
   ok(/\[\[scientific-notation\|/.test(JS) && /\[\[order-of-magnitude\|/.test(JS), "glossary: the sidecar's terms are marked");
   // the step-5 claims are judged by the bounds, and the flowchart traces use the same claims
   ok(s.claims.filter(c => c.ok).length === 1 && s.claims[0].ok === false && s.claims[2].ok === true, "flowchart: trace 1 is a slip, trace 2 fits");

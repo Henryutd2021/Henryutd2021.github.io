@@ -143,11 +143,11 @@ const { num, usd, pct } = K;
 {
   ok(/close\(v, s\.homeW, 1\)/.test(JS) && /right\.gas && right\.co2/.test(JS) && /var ok = c\[0\] === "less"/.test(JS) && /close\(v, s\.need, 0\.06\)/.test(JS) && /close\(v, s\.windE, 1000\)/.test(JS), "steps: each card's action is checked before Next opens");
   ok(/close\(v, s\.naive, 0\.5\)/.test(JS) && /close\(v, s\.homeKW, 0\.002\)/.test(JS) && /close\(v, s\.windE \/ 1000, 1\)/.test(JS), "steps: the common slips (115, kW, GWh) get their own hint");
-  ok((JS.match(/"aria-live": "polite"/g) || []).length >= 4, "steps: results are announced in live regions");
+  ok((JS.match(/"aria-live": "polite"/g) || []).length >= 2, "steps: results are announced in live regions (the drill's are LX.Drill's)");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 1/.test(JS) && /state === "done"/.test(JS) && /autos\[4\]/.test(JS), "demo: mid, step-N and done states");
   ok(/LX\.store\.set\("k2-own"/.test(JS) && /LX\.store\.get\("k2-own"\)/.test(JS), "explain: the equation card reads the reader's own plant");
   ok(/LX\.EquationCard\(/.test(JS) && /LX\.CompareTable\(/.test(JS) && /LX\.EnergyChain\(/.test(JS), "explain: equation card, comparison table and energy chain");
-  ok(/qp\.focus\(\)/.test(JS) && /textAlt\(/.test(JS), "drill focus and text versions");
+  ok(/LX\.Drill\(host, \{/.test(JS) && !/focus: false/.test(JS) && /textAlt\(/.test(JS), "drill focus (LX.Drill: the next item takes focus) and text versions");
 }
 
 // ---------------- drill items

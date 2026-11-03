@@ -59,6 +59,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Real data: hourly demand, the day-ahead demand forecast, and solar and wind output of the Southwest Power Pool (SPP) in 2025, as reported to <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> (accessed 2 Nov 2026). Costs in step 6 are illustrative.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Forecasts are from January–April only. From May the forecast SPP reports runs 8–15% above its reported demand in every month; the cause is unverified (see “Why only January to April?” below).</span></p>
+<p class="lx-hint">Need a refresher? Toolbox <a href="k05-probability-statistics.html">K5</a> (mean, spread and percentiles of forecast errors).</p>
 ```
 :::
 
