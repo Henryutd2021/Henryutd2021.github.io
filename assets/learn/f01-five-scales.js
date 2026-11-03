@@ -101,7 +101,7 @@
         // college
         '<rect class="wall" x="30" y="100" width="82" height="68"/><path class="roof" d="M24 102 L71 74 L118 102 Z"/>' +
         '<path class="col" d="M42 108 V164 M58 108 V164 M74 108 V164 M90 108 V164 M104 108 V164"/>' +
-        '<text x="44" y="96" class="mini">college</text>' +
+        '<text x="71" y="70" text-anchor="middle" class="mini">college</text>' +
         // hospital
         '<rect class="wall" x="126" y="84" width="74" height="84"/><path class="cross" d="M157 98 h12 v10 h10 v12 h-10 v10 h-12 v-10 h-10 v-12 h10 z"/>' +
         '<text x="138" y="80" class="mini">hospital</text>' +

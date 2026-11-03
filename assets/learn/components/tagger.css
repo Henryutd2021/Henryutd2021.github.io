@@ -1,7 +1,7 @@
 /* tagger.css — the phrase tagger (tagger.js): the text card, tappable phrases, tag chips, the comparison list.
    Tag colours come from the data (--c); the number badge repeats the question, so colour is never the only cue. */
 .lx-tagger { display: grid; gap: 12px; }
-.lx-tag-n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--c);
+.lx-tag-n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: color-mix(in srgb, var(--c) 86%, var(--lx-ink));   /* the number at 4.5:1, day and night */
   color: var(--lx-btn-ink); font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; }
 .lx-tagger-text { border: 1px solid var(--lx-line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; background: var(--lx-surface-2); }
 .lx-tagger-kicker { font-family: var(--lx-f-display); font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--lx-ink-3); }

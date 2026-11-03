@@ -26,7 +26,7 @@
   var TP = typeof module !== "undefined" && module.exports && typeof require === "function" ? require("./planengine.js")
     : (typeof window !== "undefined" && window.LX && window.LX.townPlan);
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var SEASON = { winter: "var(--lx-hyd)", spring: "var(--lx-good)", summer: "var(--lx-solar)", fall: "var(--lx-pk)" };
+  var SEASON = { winter: "var(--lx-hyd)", spring: "var(--lx-good)", summer: "var(--lx-warn)", fall: "var(--lx-pk)" };   // summer: amber, not solar yellow (a letter on yellow reads at 2:1)
   var XCOL = { peak: "var(--lx-bad)", netpeak: "var(--lx-tier-4)", calm: "var(--lx-ink-3)", winter: "var(--lx-tier-2)" };
   var XLET = { peak: "P", netpeak: "N", calm: "C", winter: "X" };
   var SLET = { winter: "W", spring: "Sp", summer: "Su", fall: "F" };

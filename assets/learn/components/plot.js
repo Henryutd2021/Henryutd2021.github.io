@@ -144,7 +144,7 @@
       // shading under everything
       (s.spans || []).forEach(function (sp) {
         S("rect", { x: X(sp.x0), y: m.t, width: Math.max(2, X(sp.x1) - X(sp.x0)), height: ih, fill: sp.color || "var(--lx-surface-2)", opacity: sp.op == null ? 1 : sp.op }, svg);
-        if (sp.label) txt((X(sp.x0) + X(sp.x1)) / 2, m.t + 12, sp.label);
+        if (sp.label) txt((X(sp.x0) + X(sp.x1)) / 2, m.t + 12, sp.label, "middle", "ax spanl");   // on its own shading: a darker ink
       });
       (s.hbands || []).forEach(function (hb) {
         var a = Y(Math.max(hb.y0, hb.y1)), b = Y(Math.min(hb.y0, hb.y1));

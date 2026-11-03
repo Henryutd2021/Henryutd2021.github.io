@@ -173,7 +173,7 @@
     ".w11-p{display:grid;gap:1px;justify-items:center;padding:4px 0;border-radius:8px;border:1px solid var(--lx-line);background:var(--lx-surface);color:var(--lx-ink);cursor:pointer;min-width:0;font:inherit}",
     ".w11-p small{font-family:var(--lx-f-mono);font-size:10.5px;color:var(--lx-ink-3)}",
     ".w11-p b{font-family:var(--lx-f-mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}",
-    ".w11-p.odd{border-color:var(--lx-warn);background:var(--lx-warn-soft)}.w11-p.pk b{color:var(--lx-pk)}",
+    ".w11-p.odd{border-color:var(--lx-warn);background:var(--lx-warn-soft)}.w11-p.pk b{color:color-mix(in srgb,var(--lx-pk) 70%,var(--lx-ink))}",
     ".w11-p[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--lx-accent)}",
     ".w11-p.na{cursor:default;opacity:.5}",
     ".w11-checks{display:grid;gap:6px;margin:0;padding:0;list-style:none}",

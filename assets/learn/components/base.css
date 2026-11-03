@@ -11,7 +11,7 @@ body.page-learn {
   --lx-bg: #F5F7FA; --lx-surface: #FFFFFF; --lx-surface-2: #EDF1F5; --lx-surface-3: #E3E9EF;
   --lx-ink: #142030; --lx-ink-2: #435064; --lx-ink-3: #5F6B7E; --lx-line: #D7DFE8; --lx-line-2: #BFCAD6;
   --lx-accent: #1F58C6; --lx-accent-soft: #E3ECFB; --lx-btn: #142030; --lx-btn-ink: #FFFFFF;
-  --lx-good: #1B8452; --lx-good-soft: #E1F3E9; --lx-warn: #A86400; --lx-warn-soft: #FBEFD9; --lx-bad: #C9302F; --lx-bad-soft: #FBE5E4;
+  --lx-good: #18784A; --lx-good-soft: #E1F3E9; --lx-warn: #965800; --lx-warn-soft: #FBEFD9; --lx-bad: #B82B2A; --lx-bad-soft: #FBE5E4;   /* text at 4.5:1 on white, surface-2 and its own soft fill */
   --lx-star: #D19A00;
   --lx-nuc: #7A5BB5; --lx-solar: #D9A60F; --lx-wind: #1E9BB0; --lx-cc: #DB5B2B; --lx-pk: #8E3B4F; --lx-demand: #2B394D;
   --lx-bat: #2C6FCB; --lx-hyd: #3B4FA0; --lx-geo: #9C5B2E; --lx-dr: #2E8540;
@@ -70,6 +70,8 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
    Bootstrap's p/li/td rule and every component's or lesson's own code rule still win; code inside pre is left alone. */
 :where(.page-learn :not(pre)) > code { background-color: var(--lx-surface-2); color: var(--lx-ink); }
 .page-learn :focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; border-radius: 6px; }
+/* captions: Quarto's caption grey is 4.1:1 on white; one class of specificity, so a lesson's own caption colour still wins */
+.page-learn :where(caption, figcaption, .figure-caption, .table-caption, .panel-caption) { color: var(--lx-ink-3); }
 .page-learn main section[id], .page-learn main [id].lx-sec { scroll-margin-top: calc(var(--nav-h, 60px) + 12px); }
 .lx-mono, .lx-num { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
 .lx-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
