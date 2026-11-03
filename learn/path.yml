@@ -482,7 +482,7 @@
   status: active
   minutes: 40
   practice_minutes: 90   # the notebook's practice questions, after its 45-minute lab
-  lab_minutes: 45   # the notebook lab; the badge and timeRequired need build_learn.py to read it (coordinator)
+  lab_minutes: 45   # the notebook lab: build_learn.py adds it to the header badge and timeRequired
   title: "On or off? Unit commitment as a mixed-integer program"
   subtitle: "Switch the gas plants on and off, grow a branch-and-bound tree, and see what the prices leave unpaid"
   short: "Unit commitment"
@@ -501,6 +501,7 @@
   status: active
   minutes: 45
   practice_minutes: 120
+  lab_minutes: 60   # the notebook lab (learn_map_v2.yml): in the header badge and timeRequired
   title: "What should be built? Capacity expansion with representative periods, validated"
   subtitle: "Plan on a few weeks, then test the plan on every hour of two weather years"
   short: "Capacity expansion, validated"
