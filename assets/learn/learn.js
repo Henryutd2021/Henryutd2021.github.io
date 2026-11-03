@@ -1578,7 +1578,13 @@
    "+N more" to each line (a line without starter stops says how many of its lessons are open: "7 Researcher lessons
    open, 3 in preparation"); that label opens the tier's card, which links the open lessons off the starter path (code,
    title, href, ready). Progress ticks come from this browser only.
-   Wide (≥ 720 px): lines run left to right, first tier at the bottom. Phones: lines run top to bottom, names on the right. */
+   Wide (map box ≥ 720 px): lines run left to right, first tier at the bottom. Narrower: lines run top to bottom, names on
+   the right, drawn at most 450 px wide (metro.css).
+   Cards (a station's, a tier's) are dialogs named by their heading. A card stays inside the map's box and inside the
+   window below the site's sticky navbar: it is never taller than either (its body scrolls, with a "More below" cue while
+   more is hidden), sits below or above its anchor when it fits, and the window scrolls just enough to show it all.
+   Escape closes it from anywhere in the map, and focus goes back to the door, line label or station that opened it.
+   Tests: _tests/learn/test_learn_components.js (layout), _tests/learn/test_metro_browser.js (cards, in Chrome). */
 (function () {
   "use strict";
   var LX = window.LX;
@@ -1591,6 +1597,14 @@
     tiers.forEach(function (t, k) { ti[t.id] = k; more[t.id] = 0; live[t.id] = 0; });
     (path.more || []).forEach(function (m) { if (more[m.tier] != null) { more[m.tier]++; if (m.ready) live[m.tier]++; } });
     var L = { mode: mode, tiers: [], stations: [], segs: [], ext: [], caps: [] };
+    // what a line's label says (wide map) and its screen-reader name (both layouts): the rest of a line with starter stops;
+    // a line without them counts its open lessons
+    function desc(t, stops) {
+      var later = t.status === "upcoming" ? ", coming later" : "";
+      return stops ? "+" + more[t.id] + " more " + t.title + " lessons"
+        : live[t.id] ? live[t.id] + " " + t.title + " lessons open" + (more[t.id] > live[t.id] ? ", " + (more[t.id] - live[t.id]) + " in preparation" : "")
+        : (more[t.id] ? more[t.id] + " " + t.title + " lessons" + (later || " in preparation") : t.title + ": in preparation");
+    }
     // the line each stop sits on: a bridge lesson stays on the previous stop's line when that is one of its two tiers
     var row = [];
     st.forEach(function (l, i) {
@@ -1609,12 +1623,8 @@
       });
       tiers.forEach(function (t, k) {
         var mine = L.stations.filter(function (s) { return s.row === k; }), last = mine.length ? mine[mine.length - 1].x + 24 : x0 - 20;
-        var later = t.status === "upcoming" ? ", coming later" : "";
-        L.ext.push({ tier: t.id, k: k, color: slot(t, k), x0: last, y0: ty(k), x1: L.W - 20, y1: ty(k), more: more[t.id], none: !mine.length, upcoming: !!later,
-          label: mine.length ? "+" + more[t.id] + " more " + t.title + " lessons"
-            : live[t.id] ? live[t.id] + " " + t.title + " lessons open" + (more[t.id] > live[t.id] ? ", " + (more[t.id] - live[t.id]) + " in preparation" : "")
-            : (more[t.id] ? more[t.id] + " " + t.title + " lessons" + (later || " in preparation") : t.title + ": in preparation"),
-          lx: L.W - 20, ly: ty(k) + 22, anchor: "end" });
+        L.ext.push({ tier: t.id, k: k, color: slot(t, k), x0: last, y0: ty(k), x1: L.W - 20, y1: ty(k), more: more[t.id], none: !mine.length,
+          upcoming: t.status === "upcoming", label: desc(t, mine.length), desc: desc(t, mine.length), lx: L.W - 20, ly: ty(k) + 22, anchor: "end" });
       });
     } else {
       var cw = nT > 3 ? 36 : 44, x00 = nT > 3 ? 28 : 34, rowH = 66, top2 = 50;
@@ -1628,7 +1638,7 @@
       tiers.forEach(function (t, k) {
         var mine = L.stations.filter(function (s) { return s.row === k; }), last = mine.length ? mine[mine.length - 1].y + 26 : top2;
         L.ext.push({ tier: t.id, k: k, color: slot(t, k), x0: tx(k), y0: last, x1: tx(k), y1: L.H - 30, more: more[t.id], none: !mine.length,
-          upcoming: t.status === "upcoming", label: "+" + more[t.id], lx: tx(k), ly: L.H - 10, anchor: "middle" });
+          upcoming: t.status === "upcoming", label: "+" + more[t.id], desc: desc(t, mine.length), lx: tx(k), ly: L.H - 10, anchor: "middle" });
       });
     }
     // route segments between consecutive stops, coloured by the stop they lead to
@@ -1649,14 +1659,28 @@
   if (typeof module !== "undefined" && module.exports) module.exports = { metroLayout: LX.metroLayout };
   if (typeof document === "undefined") return;
 
-  var H = LX.H, S = LX.S, clamp = LX.clamp;
+  var H = LX.H, S = LX.S, clamp = LX.clamp, uid = 0;
+  // the site's navbar is sticky and covers the top of the window: cards keep clear of it (0 on a page without one)
+  function topInset() {
+    var h = document.getElementById("quarto-header"); if (!h) return 0;
+    var p = getComputedStyle(h).position; return p === "sticky" || p === "fixed" ? h.offsetHeight : 0;
+  }
+  function winH() { return window.innerHeight || document.documentElement.clientHeight; }
+  // scroll the window as little as possible so el is in full view below the navbar ("auto" is at once under reduced
+  // motion: the site turns smooth scrolling on only without it; "instant" is not in every browser's scroll options)
+  function reveal(el) {
+    var r = el.getBoundingClientRect(), t = topInset() + 8, b = winH() - 8, d = 0;
+    if (r.top < t) d = r.top - t; else if (r.bottom > b) d = Math.min(r.bottom - b, r.top - t);
+    if (Math.abs(d) >= 1) window.scrollBy({ top: d, behavior: LX.reduced() ? "auto" : "smooth" });
+  }
   LX.Metro = function (host, path) {
-    var tiers = path.tiers, st = path.starter, M = { tier: null, sel: null };
+    var tiers = path.tiers, st = path.starter, M = { tier: null, sel: null }, hid = "lx-metro-" + (++uid) + "-h";
     var tIdx = {}; tiers.forEach(function (t, k) { tIdx[t.id] = k; });
     var doors = H("div", { class: "lx-doors", role: "group", "aria-label": "Where do you start?", style: "--n:" + tiers.length }, host);
     var bar = H("div", { class: "lx-mapbar" }, host);
     var prog = H("div", { class: "lx-progress" }, bar), pt = H("span", null, prog), pf = H("i", null, H("span", { class: "pbar", "aria-hidden": "true" }, prog));
-    H("span", { class: "lx-hint", text: (path.minutes ? "About " + Math.round(path.minutes / 30) / 2 + " hours in all" : "") }, bar);
+    // the time is the starter path's (path.minutes sums it), not the whole course's
+    H("span", { class: "lx-hint", text: (path.minutes ? "Starter path: " + st.length + " lessons, about " + Math.round(path.minutes / 30) / 2 + " hours" : "") }, bar);
     var wrap = H("div", { class: "lx-mapwrap" }, host), svgHost = H("div", null, wrap);
     var lg = H("div", { class: "lx-mlegend" }, host);
     tiers.forEach(function (t, k) { var s = H("span", null, lg); H("i", { style: "--c:" + slot(t, k) }, s); H("span", { text: t.title }, s); });
@@ -1670,49 +1694,72 @@
         var on = M.tier !== t.id; M.tier = on ? t.id : null;
         [].forEach.call(doors.children, function (c) { c.setAttribute("aria-pressed", c === d && on ? "true" : "false"); });
         close(); render();
-        if (on) { var first = st.filter(function (l) { return l.tier === t.id; })[0]; if (first) open(first.starter, true); else openTier(k); }
+        if (on) { opener = { el: d }; var first = st.filter(function (l) { return l.tier === t.id; })[0]; if (first) open(first.starter, true); else openTier(k); }
       });
     });
+    // Escape closes the open card from anywhere in the map (a door keeps focus when it opens one)
+    host.addEventListener("keydown", function (e) { if (e.key === "Escape" && card) { e.preventDefault(); close(true); } });
     function state(l) { return LX.progress.isDone(l.id) ? "done" : l.ready ? "open" : "up"; }
-    var card = null, lastFocus = null, svg = null, Lc = null;
-    function close(refocus) { if (card) card.remove(); card = null; M.sel = null; if (svg) svg.querySelectorAll(".stn.sel").forEach(function (s) { s.classList.remove("sel"); }); if (refocus && lastFocus) lastFocus.focus({ preventScroll: true }); }
-    function place(px, side) {
-      var W = wrap.clientWidth, Hh = wrap.clientHeight, cw = card.offsetWidth, chh = card.offsetHeight;
-      var left = clamp(px[0] - cw / 2, 8, W - cw - 8), top = px[1] + 30;
-      if (side) { left = clamp(px[0] + 26, 8, W - cw - 8); top = clamp(px[1] - 30, 8, Hh - chh - 8); }
-      else if (top + chh > Hh - 8) top = Math.max(8, px[1] - chh - 30);
-      card.style.left = left + "px"; card.style.top = top + "px";
+    // opener: the element that opened the card, and a selector that finds it again after the map is redrawn
+    var card = null, anchor = null, opener = null, svg = null, Lc = null, ro = null;
+    function setOpener(sel) { var a = document.activeElement; opener = { el: a && a !== document.body && host.contains(a) ? a : null, sel: sel }; }
+    function mark() { if (svg) svg.querySelectorAll(".stn").forEach(function (s) { s.classList.toggle("sel", +s.getAttribute("data-i") === M.sel); }); }
+    function close(refocus) {
+      if (ro) ro.disconnect(); ro = null;
+      if (card) card.remove(); card = null; anchor = null; M.sel = null; mark();
+      if (refocus && opener) {
+        var el = opener.el && opener.el.isConnected ? opener.el : opener.sel ? host.querySelector(opener.sel) : null;
+        if (el) { el.focus({ preventScroll: true }); reveal(el); }
+      }
+    }
+    // "More below" shows while the card's body hides more than it shows
+    function cue() { if (!card) return; var b = card.querySelector(".bd"); card.classList.toggle("more", b.scrollHeight - b.scrollTop - b.clientHeight > 2); }
+    // inside the map's box and the window: the card is never taller than either (8 px margins); below or above its
+    // anchor when it fits there (a station's card in the tall phone map: beside it), else as near as the box allows
+    function place(px, side, again) {
+      var m = 8, W = wrap.clientWidth, Hh = wrap.clientHeight;
+      card.style.maxHeight = Math.max(0, Math.min(Hh - 2 * m, winH() - topInset() - 2 * m)) + "px";
+      var cw = card.offsetWidth, ch = card.offsetHeight, left, top;
+      if (side) { left = px[0] + 26; top = px[1] - 30; }
+      else { left = px[0] - cw / 2; top = px[1] + 30; if (top + ch > Hh - m) top = px[1] - ch - 30; }
+      card.style.left = clamp(left, m, W - cw - m) + "px"; card.style.top = clamp(top, m, Hh - ch - m) + "px";
+      anchor = [px, side, ch]; cue();
+      if (!again) reveal(card);
     }
     function vb(x, y) { var v = svg.viewBox.baseVal, r = svg.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); return [r.left - wr.left + x / v.width * r.width, r.top - wr.top + y / v.height * r.height]; }
-    function frame(tierIdx) {
+    // a card: the close button, a fixed header (icon, kicker, heading that names the dialog), a body that scrolls, the cue
+    function frame(tierIdx, kind, icon, kicker, title) {
+      if (ro) ro.disconnect();
       if (card) card.remove();
-      card = H("div", { class: "lx-preview", role: "dialog", "aria-label": "Lesson details", style: "--c:" + slot(tiers[tierIdx], tierIdx) }, wrap);
+      card = H("div", { class: "lx-preview " + kind, role: "dialog", "aria-labelledby": hid, style: "--c:" + slot(tiers[tierIdx], tierIdx) }, wrap);
       H("button", { class: "x", type: "button", "aria-label": "Close", text: "×", onclick: function () { close(true); } }, card);
-      card.addEventListener("keydown", function (e) { if (e.key === "Escape") close(true); });
-      return card;
+      var ph = H("div", { class: "ph" }, card);
+      H("div", { class: "ic", html: LX.icon(icon) }, ph);
+      var tt = H("div", null, ph); H("div", { class: "k", text: kicker }, tt); H("h3", { id: hid, text: title }, tt);
+      var bd = H("div", { class: "bd" }, card);
+      H("div", { class: "cue", "aria-hidden": "true", html: "<span>More below" + LX.icon("arrow") + "</span>" }, card);
+      bd.addEventListener("scroll", cue, { passive: true });
+      // a late font or a reflow that changes the card's height places it again (without scrolling the window)
+      if (window.ResizeObserver) { var c0 = card; ro = new ResizeObserver(function () { if (card === c0 && anchor && card.offsetHeight !== anchor[2]) place(anchor[0], anchor[1], true); }); ro.observe(card); }
+      return bd;
     }
     function open(n, fromDoor) {
       var l = st[n], k = tIdx[l.tier], s = state(l), T = tiers[k];
-      if (!fromDoor) lastFocus = document.activeElement;
-      M.sel = n; render();
-      var c = frame(k), ph = H("div", { class: "ph" }, c);
-      H("div", { class: "ic", html: LX.icon(l.icon || "map") }, ph);
-      var tt = H("div", null, ph);
-      H("div", { class: "k", text: "Lesson " + n + " · " + T.title + (l.tier2 && tIdx[l.tier2] != null ? " to " + tiers[tIdx[l.tier2]].title : "") + " · " + l.minutes + " min" }, tt);
-      H("h3", { text: l.title }, tt);
+      if (!fromDoor) setOpener('.stn[data-i="' + n + '"]');
+      M.sel = n; mark();
+      var c = frame(k, "stop", l.icon || "map", "Lesson " + n + " · " + T.title + (l.tier2 && tIdx[l.tier2] != null ? " to " + tiers[tIdx[l.tier2]].title : "") + " · " + l.minutes + " min", l.title);
       if (l.does) H("p", { text: l.does }, c);
       var pf2 = H("div", { class: "pf" }, c);
       if (s === "open") { H("a", { class: "lx-btn small", href: l.href, html: "Start" + LX.icon("arrow") }, pf2); H("span", { class: "lx-hint", text: l.after && l.after.length ? "Builds on lesson " + l.after.map(function (a) { return a.starter; }).join(" and ") : "No prerequisites" }, pf2); }
       else if (s === "done") { H("span", { class: "lx-pill good", html: LX.icon("check") + "Done" }, pf2); H("a", { href: l.href, text: "Play again" }, pf2); }
       else { H("span", { class: "lx-pill neutral", html: LX.icon("lock") + "Coming soon" }, pf2); }
       var p = Lc.stations[n]; place(vb(p.x, p.y), Lc.mode === "v");
-      var f = c.querySelector("a, button.x"); if (f && !fromDoor) f.focus({ preventScroll: true });
+      var f = card.querySelector("a, button.x"); if (f && !fromDoor) f.focus({ preventScroll: true });
     }
-    function openTier(k, fromKey) {
-      if (fromKey) lastFocus = document.activeElement;
-      var T = tiers[k], c = frame(k), ph = H("div", { class: "ph" }, c);
-      H("div", { class: "ic", html: LX.icon(T.icon || "map") }, ph);
-      var tt = H("div", null, ph); H("div", { class: "k", text: T.title + (T.level ? " · " + T.level : "") + (T.status === "upcoming" ? " · coming later" : "") }, tt); H("h3", { text: T.door || T.title }, tt);
+    // at: where the reader clicked the line (px in the map box), when known
+    function openTier(k, fromKey, at) {
+      if (fromKey) setOpener('.mext[data-k="' + k + '"]');
+      var T = tiers[k], c = frame(k, "tier", T.icon || "map", T.title + (T.level ? " · " + T.level : "") + (T.status === "upcoming" ? " · coming later" : ""), T.door || T.title);
       if (T.goal) H("p", { text: T.goal }, c);
       var mine = (path.more || []).filter(function (m) { return m.tier === T.id; });
       var openL = mine.filter(function (m) { return m.ready; }), cnt = mine.length - openL.length;
@@ -1721,25 +1768,28 @@
         openL.forEach(function (m) { var li = H("li", null, ul); if (m.code) H("span", { class: "lx-code", text: m.code }, li); H("a", { href: m.href, text: m.title }, li); });
       }
       H("div", { class: "pf", html: '<span class="lx-pill neutral">' + LX.icon("lock") + (cnt ? cnt + (openL.length ? " more" : "") + " lessons in preparation" : (openL.length ? "More lessons in preparation" : "In preparation")) + "</span>" }, c);
-      var e = Lc.ext[k]; place(vb(Lc.mode === "h" ? (e.x0 + e.x1) / 2 : e.x0, Lc.mode === "h" ? e.y0 : Math.min((e.y0 + e.y1) / 2, e.y0 + 40)), Lc.mode === "v");
-      if (c.scrollIntoView) c.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
-      if (fromKey) { var f = c.querySelector("a, button.x"); if (f) f.focus({ preventScroll: true }); }
+      var e = Lc.ext[k], v = Lc.mode === "v", a = vb(v ? e.x0 : (e.x0 + e.x1) / 2, v ? Math.min((e.y0 + e.y1) / 2, e.y0 + 40) : e.y0);
+      // the phone map's line runs the map's length with its label at the foot: the card opens where the line was clicked,
+      // or by the label (keyboard), not a screen away from it
+      if (v && fromKey) a[1] = at ? clamp(at[1], vb(0, e.y0)[1], vb(0, e.ly)[1]) : vb(0, e.ly)[1];
+      place(a, v);
+      if (fromKey) { var f = card.querySelector("a, button.x"); if (f) f.focus({ preventScroll: true }); }
     }
     function render() {
       var mode = wrap.clientWidth >= 720 ? "h" : "v", L = Lc = LX.metroLayout(path, mode);
       var done = st.filter(function (l) { return state(l) === "done"; }).length;
       pt.textContent = done + " of " + st.length + " done"; pf.style.width = (done / Math.max(1, st.length) * 100) + "%";
-      svgHost.innerHTML = "";
+      svgHost.innerHTML = ""; wrap.setAttribute("data-mode", mode);
       svg = S("svg", { viewBox: "0 0 " + L.W + " " + L.H, role: "group", "aria-label": "Course map: the " + st.length + "-lesson starter path across " + tiers.length + " tier lines" }, svgHost);
       var dim = function (tid) { return M.tier && tid !== M.tier; };
       L.tiers.forEach(function (t) { S("text", { x: t.labelX, y: t.labelY, class: "mtier", fill: t.color, "text-anchor": mode === "v" ? "middle" : "start" }, svg).textContent = mode === "v" ? t.short : t.title; });
       L.ext.forEach(function (e) {
-        var g = S("g", { class: "mext" + (dim(e.tier) ? " seg-dim" : ""), tabindex: 0, role: "button",
-          "aria-label": tiers[e.k].title + " tier: " + (mode === "v" ? e.more + " more lessons" : e.label) + ". Open the tier card" }, svg);
+        var g = S("g", { class: "mext" + (dim(e.tier) ? " seg-dim" : ""), tabindex: 0, role: "button", "data-k": e.k,
+          "aria-label": tiers[e.k].title + " tier: " + e.desc + ". Open the tier card" }, svg);
         S("path", { d: "M" + e.x0 + " " + e.y0 + " L" + e.x1 + " " + e.y1, stroke: "transparent", "stroke-width": 26, "stroke-linecap": "round" }, g);
         S("path", { d: "M" + e.x0 + " " + e.y0 + " L" + e.x1 + " " + e.y1, stroke: e.color, "stroke-width": 6, "stroke-linecap": "round", opacity: .28, "stroke-dasharray": e.upcoming ? "1 16" : "1 10" }, g);
         S("text", { x: e.lx, y: e.ly, "text-anchor": e.anchor, class: mode === "v" ? "mlabel sub" : "mtext" }, g).textContent = e.label;
-        g.addEventListener("click", function () { openTier(e.k, true); });
+        g.addEventListener("click", function (ev) { var r = wrap.getBoundingClientRect(); openTier(e.k, true, ev.clientX || ev.clientY ? [ev.clientX - r.left, ev.clientY - r.top] : null); });
         g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openTier(e.k, true); } });
       });
       if (mode === "v") S("text", { x: L.stations.length ? L.stations[0].textX : 180, y: L.H - 10, class: "mtext" }, svg).textContent = "more lessons on each line";
@@ -1756,7 +1806,7 @@
       });
       L.stations.forEach(function (p) {
         var l = p.lesson, s = state(l), g = S("g", { class: dim(l.tier) && l.tier2 !== M.tier ? "seg-dim" : "" }, svg);
-        var stn = S("g", { class: "stn " + s + (M.sel === p.i ? " sel" : ""), tabindex: 0, role: "button", style: "--c:" + p.color,
+        var stn = S("g", { class: "stn " + s + (M.sel === p.i ? " sel" : ""), tabindex: 0, role: "button", "data-i": p.i, style: "--c:" + p.color,
           "aria-label": "Lesson " + p.i + ": " + l.short + (s === "up" ? ", coming soon" : s === "done" ? ", done" : ", open now") }, g);
         if (s === "open") S("circle", { cx: p.x, cy: p.y, r: 17, class: "pulse" }, stn);
         S("circle", { cx: p.x, cy: p.y, r: 21, class: "ring" }, stn);

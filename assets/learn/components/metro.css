@@ -1,4 +1,6 @@
-/* metro.css — course map: doors, progress, transit map, legend, preview card (metro.js). */
+/* metro.css — course map: doors, progress, transit map, legend, preview card (metro.js).
+   The card never leaves the map box: metro.js caps its height to the box and the window, and its body (.bd) scrolls
+   under a fixed header, with a "More below" cue (.cue) while more is hidden. The phone map is drawn at most 450 px wide. */
 .lx-doors { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
 .lx-door { position: relative; display: grid; justify-items: center; gap: 6px; padding: 14px 12px 12px; border-radius: 60px 60px 14px 14px; border: 1.5px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; text-align: center; font-family: var(--lx-f-display); transition: border-color .2s, transform .15s; min-width: 0; }
@@ -15,8 +17,10 @@
 .lx-progress { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lx-ink-2); }
 .lx-progress .pbar { width: 140px; height: 8px; border-radius: 4px; background: var(--lx-surface-3); overflow: hidden; display: block; }
 .lx-progress .pbar i { display: block; height: 100%; background: var(--lx-good); width: 0; transition: width .4s; }
-.lx-mapwrap { position: relative; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 10px; overflow: hidden; }
+.lx-mapwrap { position: relative; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 10px;
+  overflow: hidden; overflow: clip; }   /* clip: not a scroll container, so scrolling a card into view never shifts the map */
 .lx-mapwrap svg { display: block; width: 100%; height: auto; }
+.lx-mapwrap[data-mode="v"] svg { max-width: 450px; margin-inline: auto; }   /* 720-770 px windows: not a 2,000 px tall map */
 .lx-mlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--lx-ink-2); margin-top: 10px; }
 .lx-mlegend span { display: inline-flex; align-items: center; gap: 6px; }
 .lx-mlegend i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
@@ -45,16 +49,25 @@
 .mlabel.up { fill: var(--lx-ink-2); }
 .mtext { font-family: var(--lx-f-body); font-size: 12px; fill: var(--lx-ink-3); }
 .mtier { font-family: var(--lx-f-display); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-.lx-preview { position: absolute; z-index: 6; width: min(290px, calc(100% - 20px)); background: var(--lx-surface); border: 1px solid var(--lx-ink); border-radius: 14px;
-  padding: 14px; box-shadow: var(--lx-shadow-lg); display: grid; gap: 8px; }
-.lx-preview .ph { display: flex; gap: 10px; align-items: center; padding-right: 22px; }
+.lx-preview { position: absolute; z-index: 6; box-sizing: border-box; width: min(290px, calc(100% - 20px)); background: var(--lx-surface); border: 1px solid var(--lx-ink);
+  border-radius: 14px; padding: 14px 14px 0; box-shadow: var(--lx-shadow-lg); display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.lx-preview.tier { width: min(440px, calc(100% - 20px)); }
+.lx-preview .ph { flex: none; display: flex; gap: 10px; align-items: center; padding-right: 22px; }
+.lx-preview .bd { display: grid; gap: 8px; align-content: start; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -14px; padding: 0 14px 14px; }
+.lx-preview .cue { position: absolute; left: 0; right: 0; bottom: 0; height: 52px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px;
+  background: linear-gradient(transparent, var(--lx-surface) 60%); pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; }
+.lx-preview.more .cue { opacity: 1; visibility: visible; }
+.lx-preview .cue span { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border: 1px solid var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-2); }
+.page-learn .lx-preview .cue .lx-ic { width: 13px; height: 13px; transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lx-preview .cue { transition: none; } }
 .lx-preview .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 15%, var(--lx-surface)); color: var(--c); flex: none; }
 .lx-preview .ic .lx-ic { width: 22px; height: 22px; }
 .lx-preview .k { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
 .page-learn .lx-preview h3 { font-size: 16.5px; margin: 0; }
 .lx-preview p { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-preview .pf { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-.lx-preview-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14.5px; }
+.lx-preview-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 14.5px; line-height: 1.35; }
 .lx-preview-list .lx-code { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); margin-right: 6px; }
 .mext { cursor: pointer; }
 .mext:focus { outline: none; }

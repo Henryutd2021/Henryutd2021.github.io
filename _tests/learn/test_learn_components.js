@@ -71,6 +71,9 @@ const resMore = pathJson.more.filter(m => m.tier === "researcher"), resLive = re
 ok(res && res.status !== "upcoming" && layout(pathJson, "h").ext[resK].none && !layout(pathJson, "h").ext[resK].upcoming && resLive > 0 &&
    layout(pathJson, "h").ext[resK].label === resLive + " Researcher lessons open" + (resMore.length > resLive ? ", " + (resMore.length - resLive) + " in preparation" : ""),
    "course: the Researcher line has no starter stops, is live, and counts its open lessons (" + layout(pathJson, "h").ext[resK].label + ")");
+// a line's screen-reader name is the same full description in both layouts (the phone map shows only "+N" on the line)
+ok(["h", "v"].every(m => layout(pathJson, m).ext.every((e, k) => e.desc === layout(pathJson, "h").ext[k].label)) && layout(pathJson, "v").ext[resK].label === "+" + resMore.length,
+   "course: every line has the same description in both layouts, and the phone map's label is +N");
 const soonT = JSON.parse(JSON.stringify(pathJson)); soonT.tiers[resK].status = "upcoming"; soonT.more.forEach(m => { if (m.tier === "researcher") m.ready = false; });
 ok(/^10 Researcher lessons, coming later$/.test(layout(soonT, "h").ext[resK].label) && layout(soonT, "h").ext[resK].upcoming, "course: an upcoming tier with no open lesson still says it is coming later");
 const extra = JSON.parse(JSON.stringify(pathJson));
