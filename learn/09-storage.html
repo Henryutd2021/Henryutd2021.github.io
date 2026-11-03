@@ -576,7 +576,7 @@ e_t = e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0\\
 <li><strong>Losses.</strong> Here the whole loss sits on charging; many models split it, <span class="math inline">\(\sqrt{0.8}\)</span> each way.</li>
 <li><strong>Left out of the goal.</strong> The nuclear plant’s $24,000 for the day is the same in every plan.</li>
 <li><strong>Always an answer.</strong> The page’s code also allows unserved demand at $3,000/MWh, so the model always has a solution; on this day none is needed.</li>
-<li><strong>Next.</strong> <a href="../learn/10-write-it-down.html">Lesson 10</a> writes such a model down and <a href="../learn/11-solver.html">lesson 11</a> checks a solver’s answer. Lessons A8 (how long should storage last?) and M3 (capacity expansion), both upcoming, choose the battery’s size too.</li>
+<li><strong>Next.</strong> <a href="../learn/10-write-it-down.html">Lesson 10</a> writes such a model down and <a href="../learn/11-solver.html">lesson 11</a> checks a solver’s answer. <a href="../learn/m03-capacity-expansion.html">M3</a> (capacity expansion) chooses the battery’s size too, and A8 (how long should storage last?, upcoming) will.</li>
 </ul>
 </div>
 </details>
@@ -680,6 +680,7 @@ e_t = e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0\\
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>U.S. utility-scale battery capacity reached 43.6 GW at the end of 2025. Batteries of four to eight hours typically cycle once a day, from low-demand to high-demand hours: the pattern the solver found here (<a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA</a>).</p>
+<p class="lx-hint">Case file <a href="cf6-shifting-load-to-clean-hours.html">CF6</a> (average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

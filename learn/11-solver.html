@@ -423,7 +423,7 @@ ul.task-list li input[type="checkbox"] {
 <dt>Solver</dt><dd>Software that finds the best plan of a model, or proves that none exists; here HiGHS, in well under a second once it has loaded.</dd>
 <dt>Checks</dt><dd>Balance, limits, ramps, energy and money: a solver answers the model you wrote, so check it against the world.</dd>
 <dt>Shadow price</dt><dd>How much the best cost rises per small extra MWh of demand, away from a kink; $40 in 18 of 24 hours, where the combined-cycle is the marginal plant.</dd>
-<dt>Mixed-integer programs</dt><dd>Their solve returns no ordinary shadow prices; prices come from a linear program with the on-or-off choices fixed (lesson M2).</dd>
+<dt>Mixed-integer programs</dt><dd>Their solve returns no ordinary shadow prices; prices come from a linear program with the on-or-off choices fixed (lesson <a href="m02-unit-commitment.html">M2</a>).</dd>
 </dl>
 </div>
 </div>
@@ -473,7 +473,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<p>To price a mixed-integer plan, fix its <span class="lx-term" data-term="unit-commitment">unit commitment</span> (which plants are on), re-solve the linear program, and read prices <em>conditional on that commitment</em>. Lesson M2 (upcoming) builds that model.</p>
+<p>To price a mixed-integer plan, fix its <span class="lx-term" data-term="unit-commitment">unit commitment</span> (which plants are on), re-solve the linear program, and read prices <em>conditional on that commitment</em>. Lesson <a href="m02-unit-commitment.html">M2</a> builds that model.</p>
 </div>
 </details>
 <details class="lx-deeper">

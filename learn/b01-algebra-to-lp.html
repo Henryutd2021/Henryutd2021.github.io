@@ -629,7 +629,7 @@ window.Quarto = {
 <li>One hour at a time: multi-period models link adjacent hours through ramp limits (B3, M1). Day-ahead models often cover a whole day; real-time dispatch updates the plan many times an hour.</li>
 <li>The ramp here limits only the climb; a real ramp limit also slows the drop, and B3 writes both sides.</li>
 <li>Gas above the need is matched by spilling wind or sun; a model with exports or storage would track where it goes.</li>
-<li>Plants are always available and can run at any level; real units have minimum outputs and start-up costs, which need on-off decisions (M2, upcoming).</li>
+<li>Plants are always available and can run at any level; real units have minimum outputs and start-up costs, which need on-off decisions (<a href="m02-unit-commitment.html">M2</a>).</li>
 <li>Prices and capacity factors are fixed numbers; real studies vary them (lesson 12 and the Modeler tier).</li>
 <li>Two decisions fit on a graph; real models have thousands to millions, which is why solvers exist.</li>
 </ul>
@@ -668,7 +668,7 @@ window.Quarto = {
 <div class="lx-qq" data-id="kind" data-answer="b">
 <p class="lx-qtext">“The peaker is either off, or on at 50 to 100 MW.” Is this still a linear program?</p>
 <ul class="lx-choices"><li data-value="a">Yes, write 50 ≤ y ≤ 100</li><li data-value="b">No: it needs an on-off decision</li><li data-value="c">Yes, write y ≥ 0</li><li data-value="d">No: it needs a curved cost</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>No. “Off or at least 50” leaves a gap between 0 and 50, which no set of straight-line rules can describe; an on-off (binary) decision can. That is a mixed-integer program (M2, upcoming).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>No. “Off or at least 50” leaves a gap between 0 and 50, which no set of straight-line rules can describe; an on-off (binary) decision can. That is a mixed-integer program (<a href="m02-unit-commitment.html">M2</a>).</p></details>
 </div>
 </div>
 <div id="b1-practice"></div>

@@ -1,131 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://henryutd2021.github.io/learn/n01-news-lens.html</loc>
-    <lastmod>2026-11-03T04:43:42.846Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/r10-question-studio.html</loc>
+    <lastmod>2026-11-03T20:28:18.094Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/r05-build-validate.html</loc>
+    <lastmod>2026-11-03T20:28:18.093Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/r03-system-and-method.html</loc>
+    <lastmod>2026-11-03T20:28:18.092Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/r01-framing.html</loc>
+    <lastmod>2026-11-03T20:28:18.092Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/m03-capacity-expansion.html</loc>
+    <lastmod>2026-11-03T20:28:18.089Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/m01-dispatch-to-lmp.html</loc>
+    <lastmod>2026-11-03T20:28:18.089Z</lastmod>
   </url>
   <url>
     <loc>https://henryutd2021.github.io/learn/k07-spreadsheets.html</loc>
-    <lastmod>2026-11-03T04:43:42.845Z</lastmod>
+    <lastmod>2026-11-03T20:28:18.088Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/ck-f-estimate.html</loc>
-    <lastmod>2026-11-03T04:43:42.845Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/k04-linear-equations.html</loc>
+    <lastmod>2026-11-03T20:28:18.087Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/k02-rates-efficiencies.html</loc>
+    <lastmod>2026-11-03T20:28:18.085Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/f02-systems-and-map.html</loc>
+    <lastmod>2026-11-03T20:28:18.084Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/ck-m-unseen-problem.html</loc>
+    <lastmod>2026-11-03T20:28:18.084Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/cf7-cost-of-waiting.html</loc>
+    <lastmod>2026-11-03T20:28:18.083Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/cf2-cost-per-kg-vs-system-cost.html</loc>
+    <lastmod>2026-11-03T20:28:18.083Z</lastmod>
   </url>
   <url>
     <loc>https://henryutd2021.github.io/learn/b02-python-data.html</loc>
-    <lastmod>2026-11-03T04:43:42.845Z</lastmod>
+    <lastmod>2026-11-03T20:28:18.082Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/13-capstone.html</loc>
-    <lastmod>2026-11-03T04:43:42.841Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/a22-tradeoff-explorer.html</loc>
+    <lastmod>2026-11-03T20:28:18.081Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/11-solver.html</loc>
-    <lastmod>2026-11-03T04:43:42.841Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/12-trade-offs.html</loc>
+    <lastmod>2026-11-03T20:28:18.075Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/09-storage.html</loc>
+    <loc>https://henryutd2021.github.io/learn/10-write-it-down.html</loc>
     <lastmod>2026-11-03T04:43:42.840Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/07-cost.html</loc>
+    <loc>https://henryutd2021.github.io/learn/08-merit-order.html</loc>
+    <lastmod>2026-11-03T20:28:18.074Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/06-three-jobs.html</loc>
     <lastmod>2026-11-03T04:43:42.840Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/05-capacity-factor.html</loc>
+    <loc>https://henryutd2021.github.io/learn/04-forecasts.html</loc>
+    <lastmod>2026-11-03T20:28:18.072Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/02-demand.html</loc>
     <lastmod>2026-11-03T04:43:42.839Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/03-balancing.html</loc>
-    <lastmod>2026-11-03T04:43:42.839Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/00-grid-operator.html</loc>
+    <lastmod>2026-11-03T20:28:18.072Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/01-power-energy.html</loc>
-    <lastmod>2026-11-03T04:43:42.839Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/learn/index.html</loc>
-    <lastmod>2026-11-03T04:43:42.845Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/field-notes/perspectives.html</loc>
+    <loc>https://henryutd2021.github.io/field-notes/perspectives/2026-11-three-jobs.html</loc>
     <lastmod>2026-11-02T17:53:34.234Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes/briefings/2026-11-03.html</loc>
-    <lastmod>2026-11-02T17:51:45.061Z</lastmod>
+    <loc>https://henryutd2021.github.io/field-notes/data-tools.html</loc>
+    <lastmod>2026-11-02T17:51:45.060Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes.html</loc>
-    <lastmod>2026-11-02T17:53:34.235Z</lastmod>
+    <loc>https://henryutd2021.github.io/field-notes/briefings.html</loc>
+    <lastmod>2026-11-02T17:51:45.060Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/teaching.html</loc>
-    <lastmod>2026-11-03T04:43:42.847Z</lastmod>
+    <loc>https://henryutd2021.github.io/cv.html</loc>
+    <lastmod>2026-11-02T17:45:21.944Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/publications.html</loc>
-    <lastmod>2026-11-02T17:53:48.026Z</lastmod>
+    <loc>https://henryutd2021.github.io/software-data.html</loc>
+    <lastmod>2026-11-02T17:48:34.475Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/uq-mfgpr.html</loc>
-    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/solar-hydrogen.html</loc>
-    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/smr-dc-national.html</loc>
-    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/nuclear-dc.html</loc>
-    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/national-wind-uq.html</loc>
-    <lastmod>2026-11-02T17:53:48.024Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/fm-global-internship.html</loc>
-    <lastmod>2026-11-02T17:53:48.024Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/data-center-delay-economics.html</loc>
-    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/research.html</loc>
-    <lastmod>2026-11-02T17:02:24.962Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/index.html</loc>
-    <lastmod>2026-11-03T04:43:42.838Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects.html</loc>
-    <lastmod>2026-11-02T16:22:34.254Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/facility-microgrid-location.html</loc>
-    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/ghg.html</loc>
-    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/npph2.html</loc>
-    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/offshore-wind-hydrogen-om.html</loc>
-    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/projects/smr-dc.html</loc>
+    <loc>https://henryutd2021.github.io/projects/wind-hydrogen.html</loc>
     <lastmod>2026-11-02T17:53:48.022Z</lastmod>
   </url>
   <url>
@@ -133,71 +117,171 @@
     <lastmod>2026-11-02T17:53:48.023Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/projects/wind-hydrogen.html</loc>
+    <loc>https://henryutd2021.github.io/projects/smr-dc.html</loc>
     <lastmod>2026-11-02T17:53:48.022Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/software-data.html</loc>
-    <lastmod>2026-11-02T17:48:34.475Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/offshore-wind-hydrogen-om.html</loc>
+    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/cv.html</loc>
-    <lastmod>2026-11-02T17:45:21.944Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/npph2.html</loc>
+    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes/briefings.html</loc>
-    <lastmod>2026-11-02T17:51:45.060Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/ghg.html</loc>
+    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes/data-tools.html</loc>
-    <lastmod>2026-11-02T17:51:45.060Z</lastmod>
+    <loc>https://henryutd2021.github.io/projects/facility-microgrid-location.html</loc>
+    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/field-notes/perspectives/2026-11-three-jobs.html</loc>
+    <loc>https://henryutd2021.github.io/projects.html</loc>
+    <lastmod>2026-11-02T16:22:34.254Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/index.html</loc>
+    <lastmod>2026-11-03T04:43:42.838Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/research.html</loc>
+    <lastmod>2026-11-02T17:02:24.962Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/data-center-delay-economics.html</loc>
+    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/fm-global-internship.html</loc>
+    <lastmod>2026-11-02T17:53:48.024Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/national-wind-uq.html</loc>
+    <lastmod>2026-11-02T17:53:48.024Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/nuclear-dc.html</loc>
+    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/smr-dc-national.html</loc>
+    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/solar-hydrogen.html</loc>
+    <lastmod>2026-11-02T17:53:48.022Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/projects/uq-mfgpr.html</loc>
+    <lastmod>2026-11-02T17:53:48.023Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/publications.html</loc>
+    <lastmod>2026-11-02T17:53:48.026Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/teaching.html</loc>
+    <lastmod>2026-11-03T20:28:18.094Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/field-notes.html</loc>
+    <lastmod>2026-11-02T17:53:34.235Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/field-notes/briefings/2026-11-03.html</loc>
+    <lastmod>2026-11-02T17:51:45.061Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/field-notes/perspectives.html</loc>
     <lastmod>2026-11-02T17:53:34.234Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/00-grid-operator.html</loc>
+    <loc>https://henryutd2021.github.io/learn/index.html</loc>
+    <lastmod>2026-11-03T04:43:42.845Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/01-power-energy.html</loc>
+    <lastmod>2026-11-03T20:28:18.072Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/03-balancing.html</loc>
     <lastmod>2026-11-03T04:43:42.839Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/02-demand.html</loc>
-    <lastmod>2026-11-03T04:43:42.839Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/05-capacity-factor.html</loc>
+    <lastmod>2026-11-03T20:28:18.073Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/04-forecasts.html</loc>
-    <lastmod>2026-11-03T04:43:42.839Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/07-cost.html</loc>
+    <lastmod>2026-11-03T20:28:18.074Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/06-three-jobs.html</loc>
-    <lastmod>2026-11-03T04:43:42.840Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/09-storage.html</loc>
+    <lastmod>2026-11-03T20:28:18.075Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/08-merit-order.html</loc>
-    <lastmod>2026-11-03T04:43:42.840Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/11-solver.html</loc>
+    <lastmod>2026-11-03T20:28:18.075Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/10-write-it-down.html</loc>
-    <lastmod>2026-11-03T04:43:42.840Z</lastmod>
-  </url>
-  <url>
-    <loc>https://henryutd2021.github.io/learn/12-trade-offs.html</loc>
-    <lastmod>2026-11-03T04:43:42.841Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/13-capstone.html</loc>
+    <lastmod>2026-11-03T20:28:18.076Z</lastmod>
   </url>
   <url>
     <loc>https://henryutd2021.github.io/learn/b01-algebra-to-lp.html</loc>
-    <lastmod>2026-11-03T04:43:42.844Z</lastmod>
+    <lastmod>2026-11-03T20:28:18.082Z</lastmod>
   </url>
   <url>
     <loc>https://henryutd2021.github.io/learn/b03-read-check-formulation.html</loc>
+    <lastmod>2026-11-03T20:28:18.082Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/cf6-shifting-load-to-clean-hours.html</loc>
+    <lastmod>2026-11-03T20:28:18.083Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/ck-f-estimate.html</loc>
     <lastmod>2026-11-03T04:43:42.845Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/k04-linear-equations.html</loc>
-    <lastmod>2026-11-03T04:43:42.845Z</lastmod>
+    <loc>https://henryutd2021.github.io/learn/f01-five-scales.html</loc>
+    <lastmod>2026-11-03T20:28:18.084Z</lastmod>
   </url>
   <url>
-    <loc>https://henryutd2021.github.io/learn/m01-dispatch-to-lmp.html</loc>
+    <loc>https://henryutd2021.github.io/learn/k01-units.html</loc>
+    <lastmod>2026-11-03T20:28:18.085Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/k03-discounting.html</loc>
+    <lastmod>2026-11-03T20:28:18.087Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/k05-probability-statistics.html</loc>
+    <lastmod>2026-11-03T20:28:18.087Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/k08-git-notebooks.html</loc>
+    <lastmod>2026-11-03T20:28:18.088Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/m02-unit-commitment.html</loc>
+    <lastmod>2026-11-03T20:28:18.089Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/n01-news-lens.html</loc>
     <lastmod>2026-11-03T04:43:42.846Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/r02-literature.html</loc>
+    <lastmod>2026-11-03T20:28:18.092Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/r04-data.html</loc>
+    <lastmod>2026-11-03T20:28:18.093Z</lastmod>
+  </url>
+  <url>
+    <loc>https://henryutd2021.github.io/learn/r09-integrity-stakeholders.html</loc>
+    <lastmod>2026-11-03T20:28:18.094Z</lastmod>
   </url>
 </urlset>

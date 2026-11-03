@@ -1,0 +1,165 @@
+{
+ "meta": {
+  "title": "F1 numbers and cards: the five scales of an energy system",
+  "lesson": "learn/f01-five-scales.qmd (model and view: assets/learn/f01-five-scales.js; tests: _tests/learn/test_f01-five-scales.js)",
+  "built": "2026-11-03",
+  "lessons": "Per scale, the lessons that go further, by starter number or code: LX.ScaleStrip links a lesson when data/path.json marks it live, and names it as upcoming (with its note) otherwise.",
+  "note": "The scale definitions follow curriculum v2 §5.3 (decisions, authority, physics, inputs, outputs). The scales are overlapping views, not levels of authority: a city and a grid region can share land, and one organisation can act at two scales. Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland are fictional; their sizes are illustrative. The real anchors (electricity bought per U.S. residential customer, as average power; the Southwest Power Pool's 2025 peak; the Lower 48 record hour) are read from 01-power-energy.json and town_days.json, where each carries its source and date. Prairie Town's 450 MW is the highest hour of its illustrative year (SPP's 2025 demand shape scaled so that SPP's highest hour is 450 MW: town.json and town_year.json), not the peak of lesson 0's day.",
+  "gloss": "Each scale's `gloss` is one line under the zoom's caption that defines the scene's terms at first use (glossary marks)."
+ },
+ "scales": [
+  {
+   "id": "S0", "key": "s0", "place": "A Prairie Town home", "name": "Device and plant", "short": "Device and plant", "icon": "house",
+   "setting": "A Prairie Town home, and the wind farm on the ridge",
+   "power": "W to MW",
+   "gloss": "Units: 1 [[kilowatt|kW]] = 1,000 W (watts), 1 [[megawatt|MW]] = 1,000 kW, 1 [[gigawatt|GW]] = 1,000 MW.",
+   "question": "What should one site install, and how should it run hour by hour?",
+   "who": "The owner of the home or plant, within tariffs, codes and connection rules",
+   "what": "What to install at one site, and how to run it hour by hour",
+   "physics": "Device ratings, efficiencies, a battery's state of charge, one meter",
+   "inputs": "Tariffs or prices, weather, connection limits from the host grid",
+   "outputs": "A load or supply profile, and flexibility at the meter"
+  },
+  {
+   "id": "S1", "key": "s1", "place": "Prairie Campus", "name": "Microgrid and community", "short": "Microgrid", "icon": "plant",
+   "setting": "Prairie Campus: a college, the county hospital and a rural co-op",
+   "power": "kW to MW",
+   "gloss": "A [[microgrid|microgrid]] can [[islanding|island]]: disconnect from the grid and keep its own loads running. It links to the grid through a [[feeder|feeder]], a local power line.",
+   "question": "How do we keep critical services running in an outage, and who owns the system?",
+   "who": "A campus owner or a rural co-op, under the utility's connection and tariff rules",
+   "what": "How big to build, which loads stay on when it islands, who owns it, local trading",
+   "physics": "A campus or feeder network that can island, within safe voltage limits",
+   "inputs": "The tariff, the host feeder's export and import limits, outage statistics",
+   "outputs": "Net load, offers of flexibility, resilience of critical services"
+  },
+  {
+   "id": "S2", "key": "s2", "place": "The Plains Grid", "name": "Regional bulk grid", "short": "Regional grid", "icon": "tower",
+   "setting": "The Plains Grid: three zones, with Prairie Town one node in the west",
+   "power": "MW to GW",
+   "gloss": "All the generators on one [[synchronous-grid|synchronous grid]] turn in step at one [[frequency|frequency]]; several operators can share it, each balancing its own region.",
+   "question": "Will there be enough power, what sets prices, and how should a large new load connect?",
+   "who": "A grid operator (a regional market operator or a utility, acting as balancing authority), overseen by regulators",
+   "what": "Which plants run in its region, reserves, new transmission, capacity and connections",
+   "physics": "Power flow on lines; frequency and inertia when a study looks at fast disturbances",
+   "inputs": "Aggregated loads and small resources, fuel prices, policy, power traded with neighbouring regions",
+   "outputs": "Prices, reliability, emission factors, connection timelines"
+  },
+  {
+   "id": "S3", "key": "s3", "place": "Prairie City", "name": "City and region", "short": "City", "icon": "city",
+   "setting": "Prairie City (about 250,000 people), its farms, an industrial park and a new data-center campus (a large load)",
+   "power": "hundreds of MW",
+   "gloss": "A city's [[building-code|building codes]] and land rules shape its demand; the grid region that overlaps the same land is run by someone else.",
+   "question": "How should a city save, heat, cool, move and power itself, fairly?",
+   "who": "A city or county (often building codes, land, transit), with utilities and owners; running the regional grid is a different role",
+   "what": "Buildings, heat, transport, land use, local supply, distribution upgrades",
+   "physics": "Distribution feeders, heat networks, coupling across buildings, transport and power",
+   "inputs": "Grid prices and emission factors, state and national policy",
+   "outputs": "Demand trajectories, local siting, distribution needs"
+  },
+  {
+   "id": "S4", "key": "s4", "place": "Prairieland", "name": "Nation", "short": "Nation", "icon": "globe",
+   "setting": "Prairieland: five regions, one strait for oil imports, coal-dependent Ridge County",
+   "power": "hundreds of GW",
+   "gloss": "A national energy balance adds up every fuel that enters and leaves each region, from imported oil to electricity.",
+   "question": "Which pathway keeps a nation secure, affordable, clean and fair?",
+   "who": "A national government and its regulators",
+   "what": "Targets, instruments, infrastructure, emergency stocks, trade",
+   "physics": "Energy balances for each region (primary and final), the main power lines between regions",
+   "inputs": "World prices, technology availability, climate commitments",
+   "outputs": "Policy and price signals, targets and budgets passed down to regions"
+  }
+ ],
+ "predict": {
+  "id": "f1-heatwave",
+  "q": "A heat wave is pushing demand toward a record. Who decides which power plants run in the next hour?",
+  "answer": "S2",
+  "options": [
+   {"value": "S0", "label": "Each homeowner"},
+   {"value": "S1", "label": "The campus co-op"},
+   {"value": "S2", "label": "The regional grid operator"},
+   {"value": "S3", "label": "The city council"},
+   {"value": "S4", "label": "The national government"}
+  ]
+ },
+ "rounds": {
+  "who": {
+   "title": "Who decides",
+   "cards": [
+    {"id": "who0", "bin": "S0", "text": "A homeowner, or a plant's owner, within the tariff and building codes", "why": "One owner decides for one site: what to install behind one meter and how to run it, under the utility's [[tariff|tariff]]."},
+    {"id": "who1", "bin": "S1", "text": "A campus owner or a rural co-op, under the utility's rules", "why": "A microgrid's owner sizes it and sets its priorities, but the host utility sets the rules at the connection."},
+    {"id": "who2", "bin": "S2", "text": "A grid operator (a regional market operator or a utility), overseen by regulators", "why": "A regional operator, a [[balancing-authority|balancing authority]], runs plants so that supply equals demand in its region at every moment."},
+    {"id": "who3", "bin": "S3", "text": "A city or county: building codes (rules for new buildings), land, transit", "why": "City planning often shapes buildings, land and transport. Running the regional grid is a different role, even when a city owns a utility."},
+    {"id": "who4", "bin": "S4", "text": "A national government and its regulators", "why": "A nation sets targets, instruments, national infrastructure and trade."}
+   ]
+  },
+  "what": {
+   "title": "What they decide",
+   "cards": [
+    {"id": "what0", "bin": "S0", "text": "What to install at one site, and how to run it hour by hour", "why": "Rooftop solar, a heat pump or a battery, and their hourly schedule, are one site's choices."},
+    {"id": "what1", "bin": "S1", "text": "How big to build, and which loads stay on when it runs alone", "why": "Sizing and load priorities in an outage are the microgrid's own decisions."},
+    {"id": "what2", "bin": "S2", "text": "Which plants run each hour, the reserves, new lines and connections", "why": "An operator decides these for its own region and trades power with its neighbours; several regions can share one synchronous grid."},
+    {"id": "what3", "bin": "S3", "text": "Building codes, heat networks, transit, where solar may go, feeder upgrades", "why": "These shape a city's demand and local supply over years."},
+    {"id": "what4", "bin": "S4", "text": "Targets, taxes and standards, emergency fuel stocks, trade", "why": "National instruments set the signals every smaller scale works within."}
+   ]
+  },
+  "physics": {
+   "title": "What a model must represent",
+   "cards": [
+    {"id": "phy0", "bin": "S0", "text": "Device ratings, efficiencies, a battery's state of charge, one meter", "why": "Behind one meter, a model needs the devices themselves, not the network."},
+    {"id": "phy1", "bin": "S1", "text": "A small network that can disconnect and run alone, within safe voltage limits", "why": "Islanding is what makes a microgrid; its model must check that the island can keep its loads supplied."},
+    {"id": "phy2", "bin": "S2", "text": "Power flow on lines; frequency and inertia for fast disturbances", "why": "A regional grid's lines limit what can flow where; studies of sudden events also track its [[frequency|frequency]] and [[inertia|inertia]]."},
+    {"id": "phy3", "bin": "S3", "text": "Distribution feeders, heat networks, links between buildings, transport and power", "why": "A city model couples sectors: heat, transport and power share streets and feeders."},
+    {"id": "phy4", "bin": "S4", "text": "Energy balances for each region, the main power lines between regions", "why": "A national model keeps regions and fuels in balance, not individual feeders."}
+   ]
+  },
+  "exchange": {
+   "title": "What passes between scales",
+   "bins": [
+    {"id": "down", "label": "Passed down", "sub": "a signal or a limit sent to a smaller scale", "icon": "back"},
+    {"id": "up", "label": "Passed up", "sub": "a profile or a need sent to a larger scale", "icon": "arrow"}
+   ],
+   "cards": [
+    {"id": "x1", "bin": "down", "text": "Utility → household: a tariff", "why": "Here the utility sets the price; the home's schedule takes it as given."},
+    {"id": "x2", "bin": "down", "text": "Grid operator → campus: an export limit", "why": "The host grid tells a campus or a plant how much it may export or import."},
+    {"id": "x3", "bin": "down", "text": "Nation → regions and cities: targets and budgets", "why": "A nation passes targets and budgets down to its regions and cities."},
+    {"id": "x4", "bin": "up", "text": "Household → grid operator: an hourly load and its flexibility", "why": "Millions of homes' profiles add up to the demand a grid operator plans for."},
+    {"id": "x5", "bin": "up", "text": "Campus → host utility: its net load and outage needs", "why": "A microgrid shows the grid only its net load and what flexibility it offers."},
+    {"id": "x6", "bin": "up", "text": "City → regional planners: a demand forecast and where it wants new solar", "why": "City plans feed regional and national planning."}
+   ]
+  },
+  "battery": {
+   "title": "One question, five scales",
+   "question": "Is a battery worth it?",
+   "cards": [
+    {"id": "bat0", "bin": "S0", "text": "Will it cut my bill under my tariff, and keep the fridge on in an outage?", "why": "A household weighs its own bill and its own outages."},
+    {"id": "bat1", "bin": "S1", "text": "Can it carry the hospital until the generator starts, within the feeder's export limit?", "why": "A microgrid asks about critical loads and the limits at its connection."},
+    {"id": "bat2", "bin": "S2", "text": "Does it lower the cost of the evening peak and supply reserves?", "why": "A grid operator values batteries for the whole system's peak and reserves."},
+    {"id": "bat3", "bin": "S3", "text": "Where would batteries put off a feeder upgrade, and which neighbourhoods gain?", "why": "A city asks where, and who benefits."},
+    {"id": "bat4", "bin": "S4", "text": "How much storage does the national pathway need, and what does it mean for imports?", "why": "A nation asks about totals, pathways and security."}
+   ]
+  }
+ },
+ "apply": {
+  "id": "f1-local",
+  "q": "Prairie Campus planned its cheapest [[microgrid|microgrid]] assuming it could export all its midday solar, but the host [[feeder|feeder]] now sets an export limit below what that plan sends out at noon. What must happen?",
+  "answer": "changes",
+  "options": [
+   {"value": "same", "label": "Nothing: the old plan still stands"},
+   {"value": "changes", "label": "Recheck the plan: its operation must change, and the cheapest equipment may change too"},
+   {"value": "none", "label": "No design works any more"}
+  ],
+  "feedback": {
+   "same": "The old schedule breaks the new limit, so it is no longer allowed. A [[local-optimum|local optimum]] holds only inside its boundary.",
+   "changes": "At least the schedule must change: store or spill some solar. Whether the cheapest equipment changes too takes a new run of the campus model.",
+   "none": "Plans that export less still work: the campus can store, spill or build less. The plan changes; it does not vanish."
+  }
+ },
+ "optimum": "A [[local-optimum|local optimum]] is the best plan inside one boundary, such as one campus. A limit from another scale, like a feeder's export cap, can change it.",
+ "lessons": {
+  "S0": [{"code": 1}, {"code": 5}, {"code": 9}, {"code": "F3", "note": "energy services"}, {"code": "C0", "note": "behind one meter"}],
+  "S1": [{"code": "F7", "note": "microgrids"}, {"code": "M5", "note": "size and run a microgrid"}, {"code": "C1", "note": "keep the campus running"}],
+  "S2": [{"code": 0}, {"code": 3}, {"code": 8}, {"code": "M1"}, {"code": "M2", "note": "unit commitment"}, {"code": "C2", "note": "the Plains Grid in a hard year"}],
+  "S3": [{"code": "F9", "note": "a city's energy"}, {"code": "A18", "note": "a city plan"}, {"code": "M12", "note": "a city model"}, {"code": "C3"}],
+  "S4": [{"code": "F10", "note": "why nations differ"}, {"code": "M13", "note": "a national pathway"}, {"code": "C4"}]
+ }
+}

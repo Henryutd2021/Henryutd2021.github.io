@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Research studio R5 of Energy Systems, Step by Step: check a one-day battery study solved in your browser, find its five planted bugs (a unit error, a sign flip, a free lunch, a missing rule, a leaked future) with named checks, match a benchmark worked by hand, validate the day-before forecast against measured data, check an input and how much the result depends on it, rerun it from a clean clone, and rate your own verification log against the course rubric.">
+
+<title>Can you trust your analysis? Verification, validation and reproducibility – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="Can you trust your analysis? Verification, validation and reproducibility – Honglin Li">
+<meta property="og:description" content="Research studio R5 of Energy Systems, Step by Step: check a one-day battery study solved in your browser, find its five planted bugs (a unit error, a sign flip, a free lunch, a missing rule, a leaked future) with named checks, match a benchmark worked by hand, validate the day-before forecast against measured data, check an input and how much the result depends on it, rerun it from a clean clone, and rate your own verification log against the course rubric.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-studio quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Field Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Can you trust your analysis? Verification, validation and reproducibility</h1>
+<p class="subtitle lead">Find five planted bugs in a battery study, match a benchmark, validate it and rerun it from a clean clone</p>
+</div>
+
+<div>
+  <div class="description">
+    Research studio R5 of Energy Systems, Step by Step: check a one-day battery study solved in your browser, find its five planted bugs (a unit error, a sign flip, a free lunch, a missing rule, a leaked future) with named checks, match a benchmark worked by hand, validate the day-before forecast against measured data, check an input and how much the result depends on it, rerun it from a clean clone, and rate your own verification log against the course rubric.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- R5 in the studio form (curriculum v2 §11 and §16.3), wave W2, 2026-11-03. Study, step cards and explain parts:
+     assets/learn/r05-build-validate.js with assets/learn/data/r05-build-validate.json (Prairie Town's fleet, a battery,
+     the real SPP shapes of 19 and 20 August and 3 September 2025; illustrative). Practice: learn/notebooks/
+     r05-build-validate.ipynb (SciPy linprog with HiGHS: the five versions, the checks as functions, the tie rule, the
+     benchmark, the validation, a loader for other days, results.json and the clean-clone rerun). Tests: node _tests/learn/test_r05-build-validate.js solves every run with the vendored HiGHS and
+     checks every number on this page; --write rewrites the blocks between the r5-* markers from the data file.
+     Generated, do not edit by hand: the learn:meta, learn:next and learn:footer blocks (python3 scripts/build_learn.py). -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Can you trust your analysis? Verification, validation and reproducibility Find five planted bugs in a battery study, match a benchmark, validate it and rerun it from a clean clone", "description": "Research studio R5 of Energy Systems, Step by Step: check a one-day battery study solved in your browser, find its five planted bugs (a unit error, a sign flip, a free lunch, a missing rule, a leaked future) with named checks, match a benchmark worked by hand, validate the day-before forecast against measured data, check an input and how much the result depends on it, rerun it from a clean clone, and rate your own verification log against the course rubric.", "learningResourceType": "Research studio", "educationalLevel": "Advanced", "timeRequired": "PT155M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["verification checks", "benchmarks", "validation", "perfect foresight", "reproducibility", "verification logs"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/r05-build-validate.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"r05-build-validate","starter":null,"total":14,"code":"R5","title":"Can you trust your analysis? Verification, validation and reproducibility","subtitle":"Find five planted bugs in a battery study, match a benchmark, validate it and rerun it from a clean clone","short":"Verify, validate, rerun","tier":"researcher","tier2":null,"tierLabel":"Researcher · L4","level":"L4","slot":4,"slot2":null,"minutes":35,"does":"Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the day-before forecast against measured data and check one input; see why a clean clone fails, rerun it for real in the notebook and write a verification log.","outcome":"Catch planted bugs with named checks, match a benchmark worked by hand, validate a forecast against measured data with a tolerance set first, and rerun a study from a clean clone.","icon":"target","form":"studio","scales":[],"teaches":["verification checks","benchmarks","validation","perfect foresight","reproducibility","verification logs"],"lab":"a SciPy/HiGHS notebook with the study's five versions, the checks as functions, the benchmark as a test and a clean-clone rerun, about 2 hours.","href":"r05-build-validate.html","ready":true,"after":[{"id":"r04-data","code":"R4","title":"Data you can defend: sources, cleaning, licences and provenance","short":"Data you can defend","does":"Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by licence; pick coordinate systems for a spatial layer; write the data note.","href":"r04-data.html","ready":true},{"id":"m01-dispatch-to-lmp","code":"M1","title":"From dispatch to locational prices: the linear program behind the market","short":"Dispatch to locational prices","does":"Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three.","href":"m01-dispatch-to-lmp.html","ready":true},{"id":"k08-git-notebooks","code":"K8","title":"Git and reproducible notebooks","short":"Git and notebooks","does":"In a simulated project, stage and commit changes, read a diff, go back to find the commit that broke a result, try an idea on a branch, and make a notebook rerun cleanly from top to bottom with pinned inputs.","href":"k08-git-notebooks.html","ready":true}],"prev":null,"next":{"id":"r09-integrity-stakeholders","code":"R9","title":"Research integrity, and working with the people your study is about","short":"Integrity and stakeholders","does":"Sort ten practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement.","href":"r09-integrity-stakeholders.html","ready":true},"practice":120}</script>
+<div class="lx-head" data-lesson-id="r05-build-validate" data-total="14" data-tier="researcher" data-level="L4" data-minutes="35" data-form="studio" data-next-href="r09-integrity-stakeholders.html">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">R5</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-4)"><span class="lx-dot" aria-hidden="true"></span>Researcher · L4</li>
+<li>Research studio</li>
+<li>35 min guided · about 2 h practice</li>
+<li>After <a href="r04-data.html">R4</a> and <a href="m01-dispatch-to-lmp.html">M1</a> and <a href="k08-git-notebooks.html">K8</a></li>
+<li class="lx-done-tag" data-lesson-id="r05-build-validate" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#task"><span class="lx-n">1</span>Task</a></li><li><a href="#exemplars"><span class="lx-n">2</span>Exemplars</a></li><li><a href="#selfcheck"><span class="lx-n">3</span>Self-check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<div id="task" class="lx-sec">
+<div class="lx-interactive lx-cards" data-learn="r05-build-validate" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/r05-build-validate.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">The task</p>
+<ol class="lx-studio-task">
+<li><b>Produce:</b> a one-page verification log for a model or a data analysis: each check with its result, one benchmark against a known case, one validation against measured data or an independent reference, and a rerun from a clean <span class="lx-term" data-term="clone">clone</span>.</li>
+<li><b>From:</b> this page's battery study (the notebook has all five versions), or your own project.</li>
+<li><b>Done when:</b> Trustworthy analysis reaches Proficient: reruns from a clean clone (or a complete audit trail); verification log; one validation against real data or an independent reference.</li>
+</ol>
+<p class="lx-hint">About 35 minutes guided here, then about 2 hours on your own: the notebook, Git and your log.</p>
+<!-- r5-study:start (written from the model by _tests/learn/test_r05-build-validate.js --write; do not edit) -->
+<p class="lx-eyebrow">The study, its five buggy versions and the checks that catch them</p>
+<p><b>How much would a 50 MW, 200 MWh battery have saved Prairie Town on Wednesday 20 August 2025?</b> One day of dispatch as a linear program; 50 MW, 200 MWh (4 hours) battery, 85% <span class="lx-term" data-term="round-trip-efficiency">round trip</span>; data: Wednesday 20 August 2025.</p>
+<ul class="r5-static-rules"><li><b>Balance:</b> Plants + battery discharge − battery charge + unserved = demand, every hour (MW). <span class="lx-hint">(24 rows)</span></li><li><b>Stored energy:</b> Stored now = stored an hour ago + (0.85 × charging power − discharging power) × 1 hour, in MWh. All the round-trip loss is counted on charging. <span class="lx-hint">(24 rows)</span></li><li><b>Gas ramp:</b> The <span class="lx-term" data-term="combined-cycle">combined-cycle</span> plant changes by at most 40 MW an hour, from 115 MW. <span class="lx-hint">(24 rows)</span></li><li><b>End of day:</b> The battery ends the day with the 100 MWh it started with. <span class="lx-hint">(1 row)</span></li><li><b>Sizes:</b> Each plant within its size and the weather; battery 0–50 MW, 0–200 MWh. <span class="lx-hint">(limits on the variables)</span></li></ul>
+<p class="r5-sym-k">Prairie Town's plants (lesson 0):</p><div class="lx-scroll-x">
+<table class="lx-facts r5-fleet caption-top table" aria-label="Prairie Town's plants">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Plant</th>
+<th data-quarto-table-cell-role="th" scope="col">Size (MW)</th>
+<th data-quarto-table-cell-role="th" scope="col">Running cost ($/MWh)</th>
+<th data-quarto-table-cell-role="th" scope="col">How it runs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Nuclear plant</th>
+<td class="n" data-l="Size (MW)">100</td>
+<td class="n" data-l="Running cost ($/MWh)">10</td>
+<td data-l="How it runs">runs flat</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Wind farm</th>
+<td class="n" data-l="Size (MW)">150</td>
+<td class="n" data-l="Running cost ($/MWh)">0</td>
+<td data-l="How it runs">follows the wind</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Solar farm</th>
+<td class="n" data-l="Size (MW)">200</td>
+<td class="n" data-l="Running cost ($/MWh)">0</td>
+<td data-l="How it runs">follows the sun</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Gas combined-cycle plant</th>
+<td class="n" data-l="Size (MW)">150</td>
+<td class="n" data-l="Running cost ($/MWh)">40</td>
+<td data-l="How it runs">adjustable, slow to change, at most 40 MW an hour</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Gas peaker</th>
+<td class="n" data-l="Size (MW)">100</td>
+<td class="n" data-l="Running cost ($/MWh)">100</td>
+<td data-l="How it runs">adjustable, fast</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="r5-sym-k">In the code:</p><ul class="r5-sym"><li><code>c[t], d[t]</code>: the battery's charging and discharging power in hour t, MW</li><li><code>e[t]</code>: stored energy at the end of hour t, MWh (the <span class="lx-term" data-term="state-of-charge">state of charge</span>)</li><li><code>E, E0</code>: the battery's energy size, 200 MWh, and what it holds at the start of the day, 100 MWh</li><li><code>cc[t], cc_prev[t]</code>: the gas <span class="lx-term" data-term="combined-cycle">combined-cycle</span> plant's output in hour t and in the hour before, MW (115 MW before the first hour)</li></ul>
+<ol class="r5-static">
+<li><p><b>Version 1: a unit error.</b> Saving reported: <b>$12,150</b>. Most energy stored (the battery holds 200 MWh): <b>279.5 MWh</b>.</p><p>Caught by: <b>Units and sizes</b>. The battery holds more than its size: the energy limit was typed in kWh into a model that counts MWh.</p><p class="r5-static-code"><code>E = 200_000      # battery energy, from the spec sheet</code> → <code>E = 200          # battery energy, MWh (the sheet says 200,000 kWh)</code></p><p>Fixed: <b>$8,205.88</b>, and stored energy never passes 200 MWh.</p></li>
+<li><p><b>Version 2: a sign flip.</b> Saving reported: <b>$19,058.82</b>. Hours charging and discharging at once: <b>22 of 24</b>. Net energy to the town, as the balance rows count it: <b>176.47 MWh</b>. Stored energy at the end of the day: <b>100 MWh, as at the start</b>.</p><p>Caught by: <b>Balance and signs</b>. Charging was counted as supply, so the battery fed the town while filling up: energy from nowhere.</p><p class="r5-static-code"><code>supply[t] += c[t] - d[t]   # battery</code> → <code>supply[t] += d[t] - c[t]   # battery: discharge feeds the town</code></p><p>Fixed: <b>$8,205.88</b>. The battery now charges when the gas plant has room and discharges in the hours the <span class="lx-term" data-term="peaker">peaker</span> would run.</p></li>
+<li><p><b>Version 3: a free lunch.</b> Saving reported: <b>$18,205.88</b>. Stored energy, start and end of the day: <b>100 and 0 MWh</b>.</p><p>Caught by: <b>Closure over the day</b>. The 100 MWh the battery started with cost nothing in the model, and it sold them in the evening.</p><p class="r5-static-code"><code># (no rule for the end of the day)</code> → <code>m.add(e[23] == E0)   # end the day with what it started with</code></p><p>Fixed: <b>$8,205.88</b>. The gap, <b>$10,000</b>, is the starting 100 MWh at the peaker's $100/MWh.</p></li>
+<li><p><b>Version 4: a missing rule.</b> Saving reported (the fixed study: $8,205.88): <b>$8,205.88</b>. Gas plant's biggest change in an hour, in this solution (limit 40): <b>55 MW</b>.</p><p>Caught by: <b>Paper against code</b>. The formulation has 24 ramp rows; the code has 0. Today the headline happens not to move.</p><p class="r5-static-code"><code># (the ramp rows were never written)</code> → <code>for t in T: m.add(-40 &lt;= cc[t] - cc_prev[t] &lt;= 40)   # gas ramp</code></p><p>On <b>3 September 2025 (lesson 0's day)</b> the same code says the day without a battery costs <b>$102,600</b> instead of <b>$104,000</b>, and that the battery saves <b>$0</b> instead of <b>$1,286.49</b>.</p></li>
+<li><p><b>Version 5: a leaked future.</b> Saving reported: <b>$8,205.88</b>. Schedule planned on: <b>20 August itself</b>.</p><p>Caught by: <b>Information at decision time</b>. The schedule is set at midnight, as 20 August begins: all 24 hours of 19 August are measured by then, and none of 20 August.</p><p class="r5-static-code"><code>plan = solve(day='2025-08-20')            # the day itself</code> → <code>plan = solve(day='2025-08-19', tie='keep')  # the last full day measured at 00:00 on 20 August<br>result = run(day='2025-08-20', battery=plan)</code></p><p>Planned on 19 August's measured day (a <span class="lx-term" data-term="persistence-forecast">persistence forecast</span>) and then followed: <b>$3,600</b>, 44% of the $8,205.88 that <span class="lx-term" data-term="perfect-foresight">perfect foresight</span> gives.</p><p>Many schedules tie at $218,050 on 19 August. The rule, set in advance: keep the most energy in store. One that empties the battery first ties too, yet saves only $300 on 20 August.</p></li>
+</ol>
+<p><b>Benchmark</b> (a made-up day: 220 MW in every hour except 330 MW from 12:00 to 17:00, no wind or solar). Without the battery, the gas plant runs 120 MW in the flat hours; in the five dear hours it runs flat out and the <span class="lx-term" data-term="peaker">peaker</span> adds 80 MW, at $100/MWh.</p>
+<ol class="r5-steps"><li><b>Discharge.</b> The battery empties its 200 MWh into the five dear hours: 200 MWh × $100/MWh = $20,000 of peaker output avoided.</li><li><b>Recharge.</b> Over the day it puts 200 MWh into store (100 before noon, 100 after, so it ends as it began): 200 ÷ 0.85 = 235.29 MWh of charging, from the gas plant's 30 MW of spare room, at $40/MWh: $9,411.76.</li><li><b>Saving.</b> $20,000 − $9,411.76 = $10,588.24.</li></ol>
+<div class="lx-scroll-x">
+<table class="lx-facts r5-bench caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Version</th>
+<th data-quarto-table-cell-role="th" scope="col">Saving on the benchmark</th>
+<th data-quarto-table-cell-role="th" scope="col">Matches the hand answer?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Fixed study</td>
+<td class="n">$10,588.24</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td>Version 1 (unit)</td>
+<td class="n">$13,235.29</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>Version 2 (sign)</td>
+<td class="n">$21,044.12</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td>Version 3 (free lunch)</td>
+<td class="n">$15,294.12</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td>Version 4 (missing rule)</td>
+<td class="n">$10,588.24</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><b>Validation:</b> The plan's prediction of 20 August is its forecast: 19 August's measured net load (demand minus wind and solar). Compare it with 20 August as measured. Tolerance, set first: the battery's 50 MW, in every hour. The forecast misses by <b>22.1 MW</b> on average and <b>55 MW</b> at 12:00: beyond the tolerance in 1 of 24 hours. So the claim is narrowed: <b>$3,600</b> with this forecast; <b>$8,205.88</b> only as an upper bound.</p>
+<p><b>Input check:</b> One input can be checked against measured data: the <span class="lx-term" data-term="round-trip-efficiency">round trip</span>. The study assumed 85% (NLR's 2025 ATB); the U.S. battery fleet averaged 82% in 2019 (EIA). Does the saving hinge on it? <b>$7,939.02</b> instead of <b>$8,205.88</b>: 3% less, so the conclusion does not hinge on this input. That is an input check and a <span class="lx-term" data-term="sensitivity-analysis">sensitivity run</span>, not a validation of the saving.</p>
+<p><b>Rerun from a clean clone (simulated here):</b> it failed on a data file read from one laptop's desktop; a download script with a checksum, relative paths, a pinned environment and a tag fix it. The notebook's practice does the rerun for real.</p>
+<!-- r5-study:end -->
+<p class="lx-hint">With JavaScript on, you run each version with a real solver in your browser, pick the check that catches its bug, fix it and run it again, then copy your verification log.</p>
+</div>
+</div>
+<p class="lx-datanote r5-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><span><b>Data:</b> demand, wind and solar follow the real hourly shapes of 19 and 20 August and 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to Prairie Town as in lesson 0.</span> <span><b>Illustrative:</b> Prairie Town, its plants, costs and battery; the benchmark day is made up.</span> <span><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once).</span></span></p>
+<div class="lx-card lx-notebook r5-nb">
+<p class="lx-eyebrow">Practice on your own · notebook and Git, about 2 hours</p>
+<p>The same study in <code>scipy.optimize.linprog(method="highs")</code>, with all five versions behind a switch. You write each check as a function, add the benchmark as a test, put the folder under <span class="lx-term" data-term="version-control">version control</span> and rerun it from a fresh clone.</p>
+<ol class="r5-nb-steps">
+<li>Download the notebook; the page's three days are inside it.</li>
+<li>For the robustness check on other days (practice 3), also download <code>town_year.json</code> and put it next to the notebook.</li>
+<li>Run it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3.9 or later, NumPy and SciPy 1.9 or later.</li>
+<li>For the Git part, work locally: the notebook lists the commands, and <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks) shows them step by step.</li>
+</ol>
+<p class="r5-dl"><a class="lx-btn small" href="notebooks/r05-build-validate.ipynb" download="">Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download="">Year data: town_year.json</a> <a class="lx-btn small ghost" href="../assets/learn/data/r05-build-validate.json" download="">Study data (JSON)</a></p>
+</div>
+<div id="r5-workflow" class="lx-xgrid r5-flow">
+<div class="lx-fallback">
+<p class="lx-eyebrow">Verify, benchmark, validate, rerun</p>
+<ol>
+<li><b>Formulation on paper</b>, then <b>code and data</b>.</li>
+<li><b>Verification checks</b>: units, sizes, balance and signs, closure, paper against code, information at decision time. If one fails, fix the code and run every check again.</li>
+<li><b>Benchmark</b>: a case with a hand answer. If it does not match, fix the code.</li>
+<li><b>Validation</b>: a prediction against measured data or an independent reference, with a tolerance set first. If the model is not close enough for the claim, revisit the assumptions or narrow the claim.</li>
+<li><b>Rerun from a clean clone</b>, then <b>report with limits</b>.</li>
+</ol>
+</div>
+</div>
+<style>/* lesson-local */
+.r5-nb { margin-top: 1.2rem; max-width: 980px; } .r5-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
+.r5-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
+.r5-flow { margin-top: 1.2rem; }
+.r5-task { margin-bottom: 1rem; max-width: 980px; }
+.r5-static, .r5-static-rules { margin: 0; padding-left: 1.3rem; display: grid; gap: 10px; font-size: 15px; }
+.r5-static p { margin: 0 0 4px; } .r5-static-code code { white-space: pre-wrap; word-break: break-word; }
+.r5-rules td, .r5-rules th { font-size: 14.5px; } .r5-rules tbody th { font-family: var(--lx-f-display); font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 14.5px; color: var(--lx-ink); text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--lx-line); white-space: nowrap; }
+.r5-three { margin: .7rem 0 0; padding-left: 1.1rem; display: grid; gap: 4px; font-size: 15px; }
+.r5-run { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 2px 0 10px; }
+.r5-run .lx-solver-status { margin: 0; }
+.r5-ask { margin: 12px 0 6px; font-weight: 500; }
+.r5-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+.r5-checks .lx-choice span { display: grid; gap: 2px; text-align: left; } .r5-checks .lx-choice small { color: var(--lx-ink-3); font-size: 12.5px; line-height: 1.3; }
+.r5-after { margin-top: 10px; display: grid; gap: 10px; justify-items: start; }
+.r5-diff { width: 100%; min-width: 0; border: 1px solid var(--lx-line); border-radius: 10px; overflow: hidden; }
+.r5-diff-k { margin: 0; padding: 4px 10px; font-size: 12.5px; color: var(--lx-ink-3); background: var(--lx-surface-2); }
+.r5-diff pre, .r5-log { margin: 0; padding: 6px 10px; font-family: var(--lx-f-mono); font-size: 13px; white-space: pre-wrap; word-break: break-word; }
+.r5-del { background: color-mix(in srgb, var(--lx-bad) 10%, transparent); } .r5-add { background: color-mix(in srgb, var(--lx-good) 12%, transparent); }
+.r5-log { border: 1px solid var(--lx-line); border-radius: 10px; background: var(--lx-surface-2); margin-bottom: 10px; }
+.r5-fixes { margin: 0 0 10px; padding-left: 1.2rem; display: grid; gap: 4px; font-size: 15px; }
+.r5-bench td.n { font-family: var(--lx-f-mono); } .r5-bench tr.no td:last-child { color: var(--lx-bad); } .r5-bench tr.ok td:last-child { color: var(--lx-good); }
+.r5-logtext { width: 100%; font-family: var(--lx-f-mono); font-size: 13px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); }
+.r5-plot { margin: 4px 0 6px; }
+.r5-fleet { margin: 2px 0 4px; }
+.r5-fleet td, .r5-fleet th { font-size: 14px; } .r5-fleet tbody th { font-family: var(--lx-f-display); font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--lx-ink); text-align: left; white-space: nowrap; }
+.r5-sym-k { margin: 10px 0 2px !important; font-weight: 500; } .r5-sym { margin: 0; padding-left: 1.2rem; display: grid; gap: 3px; font-size: 14.5px; }
+.r5-sym code { white-space: nowrap; } .r5-steps { margin: 6px 0 10px; padding-left: 1.3rem; display: grid; gap: 4px; font-size: 15px; }
+.r5-datanote > span { display: grid; gap: 3px; }
+@media (max-width: 640px) { .r5-fleet td[data-l]::before { content: attr(data-l) ": "; font-family: var(--lx-f-body); font-weight: 400; color: var(--lx-ink-3); font-size: 12.5px; } }
+#selfcheck .lx-myths { margin-top: 1.4rem; }
+</style>
+</div>
+<div id="exemplars" class="lx-sec">
+<section id="two-logs-for-the-same-study" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="two-logs-for-the-same-study">Two logs for the same study</h2>
+</section>
+<div id="r5-exemplars" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- r5-exemplars:start (written from the data file by LX.Exemplars' staticHTML in the test's --write mode; do not edit) -->
+<div class="lx-ex-cols">
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak log · Developing</p><p class="lx-ex-lines"><b>Checks:</b> I checked the model and the results look reasonable [1].
+<b>Benchmark:</b> none.
+<b>Validation:</b> the model was validated [2].
+<b>Input check:</b> none.
+<b>Result:</b> the battery saves $8,205.88 on 20 August [3], so about $3.0 million a year [4].
+<b>Rerun:</b> the code is in a folder on my laptop [5].</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> No check is named, so nobody can repeat it or see what it would have caught.</li><li value="2"><b>Falls short:</b> Validated against what? A validation names its data, its tolerance and the outcome.</li><li value="3"><b>Falls short:</b> This is the perfect-foresight saving, and the log does not say the plan knew the day in advance.</li><li value="4"><b>Falls short:</b> One hot day times 365 is not a year: on 3 September the same battery saves $1,286.49.</li><li value="5"><b>Falls short:</b> Nobody else can rerun a folder on one laptop.</li></ol></div>
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong log · Proficient</p><p class="lx-ex-lines"><b>Checks:</b> stored energy within 0–200 MWh in every hour [1]; every hour balances, and stored energy falls whenever the battery feeds the town [2]; the day ends with its starting 100 MWh [3]; 24 ramp rows in the code, as on paper [4].
+<b>Benchmark:</b> a made-up two-level day, hand answer $10,588.24, model $10,588.24 [5].
+<b>Validation:</b> the day-before forecast against 20 August as measured, off by up to 55 MW, beyond the 50 MW tolerance set in advance, so the claim is narrowed [6].
+<b>Input check:</b> the 85% round trip against the fleet's measured 82%: the saving moves 3% [7].
+<b>Result:</b> $3,600 with the plan made the day before, $8,205.88 with perfect foresight, an upper bound [8].
+<b>Rerun:</b> a clean clone at tag v1.0, with the pinned environment, matches the first run's checksum [9].</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> A size check with its range: it would have caught version 1.</li><li value="2"><b>Works:</b> A balance check that also tests the sign convention: it would have caught version 2.</li><li value="3"><b>Works:</b> A closure check: it would have caught version 3.</li><li value="4"><b>Works:</b> Paper against code: the only check here that catches version 4 on this day.</li><li value="5"><b>Works:</b> A known case, worked by hand, matched to the cent.</li><li value="6"><b>Works:</b> A prediction against measured data, with the tolerance set first, and what the outcome changes.</li><li value="7"><b>Works:</b> An input checked against measured data, then a sensitivity run; the log does not call it validation.</li><li value="8"><b>Works:</b> Both numbers, each labelled with what the plan knew.</li><li value="9"><b>Works:</b> A tag, a pinned environment and a checksum let anyone get the same numbers.</li></ol></div>
+</div>
+
+<table class="lx-facts lx-ex-diff caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col"></th>
+<th data-quarto-table-cell-role="th" scope="col">Weak log</th>
+<th data-quarto-table-cell-role="th" scope="col">Strong log</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Checks</th>
+<td>None named</td>
+<td>Four, each with its result</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Benchmark</th>
+<td>None</td>
+<td>Hand answer matched</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Validation</th>
+<td>Claimed</td>
+<td>A forecast against measured data, tolerance first</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Information</th>
+<td>Perfect foresight, unstated</td>
+<td>Both numbers, labelled</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Rerun</th>
+<td>One laptop</td>
+<td>A tagged clean clone, same checksum</td>
+</tr>
+</tbody>
+</table>
+
+<!-- r5-exemplars:end -->
+</div>
+</div>
+</div>
+<div id="selfcheck" class="lx-sec">
+<section id="check-your-own-log" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-your-own-log">Check your own log</h2>
+</section>
+<div id="r5-rubric" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- r5-rubric:start (written by the test's --write mode from the checklist and LX.Rubric's staticHTML; do not edit) -->
+<div class="lx-xcard"><p class="lx-eyebrow">A verification log in nine lines</p><ol class="r5-static-rules"><li><b>Units:</b> Every input in the model's units, with the unit written beside it.</li><li><b>Sizes:</b> Every result within its physical size and limits.</li><li><b>Balance and signs:</b> Each period balances; a store's energy falls when it feeds the system.</li><li><b>Closure:</b> The end state matches the start, or the difference is valued.</li><li><b>Paper against code:</b> Each rule's rows counted against the formulation.</li><li><b>Information:</b> Every input was known when the decision was made.</li><li><b>Benchmark:</b> One case with a hand answer, matched.</li><li><b>Validation:</b> One prediction compared with measured data or an independent reference, with its source and a tolerance set in advance.</li><li><b>Rerun:</b> A clean clone at a tagged commit, a pinned environment, the same checksum.</li></ol></div>
+<div class="lx-scroll-x">
+<table class="lx-facts lx-rb-static caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Competence</th>
+<th data-quarto-table-cell-role="th" scope="col">Developing</th>
+<th data-quarto-table-cell-role="th" scope="col">Proficient (the bar)</th>
+<th data-quarto-table-cell-role="th" scope="col">Strong</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Trustworthy analysis<br>
+<span class="lx-hint">Look for: Your log names each check with its result, one benchmark with its hand answer, one validation with its data and tolerance, and the tag a clean clone reran.</span></th>
+<td data-l="Developing">Results cannot be rerun.</td>
+<td data-l="Proficient">Reruns from a clean clone (or a complete audit trail); verification log; one validation against real data or an independent reference.</td>
+<td data-l="Strong">Independent reproduction by someone else; validation on data not used to build the analysis.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- r5-rubric:end -->
+</div>
+</div>
+<div class="lx-myths" data-quiz="r5-myth">
+<div class="lx-qq" data-id="optimal" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “If the solver says optimal, the study is right.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. All five versions on this page solved to optimal. Optimal means the best answer to the equations as written, bugs included.</p></details>
+</div>
+<div class="lx-qq" data-id="bench" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A study that matches its benchmark has no bugs.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Version 4, with no ramp rows at all, matched the benchmark to the cent: <!-- r5-myth-bench:start -->$10,588.24<!-- r5-myth-bench:end -->. A benchmark tests only what it exercises.</p></details>
+</div>
+<div class="lx-qq" data-id="same" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “Verification and validation are two words for the same check.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. <span class="lx-term" data-term="verification">Verification</span> compares the code with its own equations; <span class="lx-term" data-term="validation">validation</span> compares the equations with the real system, for the purpose of the claim.</p></details>
+</div>
+<div class="lx-qq" data-id="rerun" data-answer="fact">
+<p class="lx-qtext">Myth or fact? “With the same data, code and pinned environment, a clean clone should reproduce the reported numbers.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Fact, for numbers that are unique. When several plans cost exactly the same, another solver version may return another plan at the same cost. A number that depends on the plan, such as the day-before saving here, needs a tie rule set in advance.</p></details>
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Researcher</span>From Proficient to Strong: someone else reruns it, on data you did not use</summary>
+<div class="lx-deeper-body">
+<p>The rubric’s Strong level asks for two more things.</p>
+<ul>
+<li><strong>Independent reproduction.</strong> A colleague reruns your study from your repository, without your help, and reports any difference.</li>
+<li><strong>Validation on data the analysis did not use.</strong> Here: the day-before forecast checked on many more days than 20 August; or, for a real battery, the model’s stored energy predicted from its metered charging and discharging and compared with its metered state of charge, within a stated tolerance.</li>
+<li><strong>Not validation:</strong> running the same model on other days of 2025 (practice 3). That is a robustness check: it shows how far one day’s saving carries over (3 September gives a very different one), not that the model is right.</li>
+</ul>
+<p>In the capstone research project you show both in the verification log.</p>
+<p>Verification and validation for computer models have their own literature; for energy-system optimization studies, DeCarolis and co-authors set out good practice, including how to test a model and report what it leaves out (<a href="https://doi.org/10.1016/j.apenergy.2017.03.001">DeCarolis et al.&nbsp;2017</a>).</p>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>Perfect foresight is a modelling choice, not a bug, as long as it is named</summary>
+<div class="lx-deeper-body">
+<p>Many planning studies schedule storage knowing the whole day, week or year in advance, because it is simple and gives an upper bound on what storage can earn. That is fine when the report says so. It becomes the leaked future of version 5 when the upper bound is reported as what an operator would have saved. Between the two sit rolling-horizon schedules that re-plan as forecasts improve (M5, upcoming in the Modeler tier).</p>
+</div>
+</details>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="sources-and-whats-next">Sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers and tools used on this page</p>
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number or tool</th>
+<th data-quarto-table-cell-role="th" scope="col">What it is for</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">2025 hourly shapes</td>
+<td>Demand, wind and solar of 19 and 20 August and 3 September 2025, scaled to Prairie Town.</td>
+<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, Southwest Power Pool · accessed 2 Nov 2026</td>
+</tr>
+<tr class="even">
+<td class="n">85%</td>
+<td>The study's round-trip efficiency.</td>
+<td class="s"><a href="https://atb.nlr.gov/electricity/2025/utility-scale_battery_storage">NLR, 2025 Electricity ATB, Utility-Scale Battery Storage</a> · checked 2 Nov 2026</td>
+</tr>
+<tr class="odd">
+<td class="n">82%</td>
+<td>Average monthly round-trip efficiency of U.S. utility-scale batteries, 2019 data: the input check.</td>
+<td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">EIA, Today in Energy, 12 Feb 2021</a> · accessed 3 Nov 2026</td>
+</tr>
+<tr class="even">
+<td class="n">HiGHS</td>
+<td>The open-source solver in the page and, through SciPy, in the notebook.</td>
+<td class="s"><a href="https://ergo-code.github.io/HiGHS/">HiGHS documentation</a></td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="r09-integrity-stakeholders">
+<p class="lx-eyebrow">Next</p>
+<p class="lx-next-t"><a href="r09-integrity-stakeholders.html">R9 · Research integrity, and working with the people your study is about</a></p>
+<p class="lx-next-d"><strong>Related lab:</strong> a SciPy/HiGHS notebook with the study's five versions, the checks as functions, the benchmark as a test and a clean-clone rerun, about 2 hours.</p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="r05-build-validate" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>DeCarolis, J. et al. (2017). <a href="https://doi.org/10.1016/j.apenergy.2017.03.001">Formalizing best practice for energy system optimization modelling</a>. Applied Energy 194, 184–198.</li>
+<li>Pfenninger, S. et al. (2017). <a href="https://doi.org/10.1016/j.enpol.2016.11.046">The importance of open data and software: Is energy research lagging behind?</a> Energy Policy 101, 211–215.</li>
+<li>EIA (2021). <a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">Utility-scale batteries and pumped storage return about 80% of the electricity they store</a>. Today in Energy, 12 February 2021.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind the three days.</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20Can%20you%20trust%20your%20analysis?%20Verification%2C%20validation%20and%20reproducibility">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/r05-build-validate.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

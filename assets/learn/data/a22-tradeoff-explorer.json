@@ -1,0 +1,500 @@
+{
+ "about": "A22 (Cheap, clean, reliable, fair, secure): nine hand-made plans for Prairie Town, each run hour by hour through all 8,760 hours of 2025 with lesson 13's planning model (13-capstone.json costs, EIA and NREL, dated; town_year.json shapes from EIA-930). 'm' holds each plan's precomputed measures; _tests/learn/test_a22-tradeoff-explorer.js re-solves every plan and checks every number the page states. Plans, tariffs, priority weights and radar scales are illustrative choices, not recommendations. Prairie Town is fictional.",
+ "accessed": "2026-11-03",
+ "groups": {
+  "incomeLimit": 40000,
+  "homesM": 42.81,
+  "totalHomesM": 123.53,
+  "kwhB": 386,
+  "totalKwhB": 1305,
+  "note": "Low-income homes: household income under $40,000 in 2020 (four RECS brackets: under $5,000 to $39,999). U.S. 2020: 42.81 of 123.53 million homes (34.7%) and 386 of 1,305 billion kWh of home electricity (29.6%). Prairie Town's homes are assumed to split the same way.",
+  "src": "eia-recs-ce21"
+ },
+ "graded": 0.5,
+ "gradedNote": "Illustrative: under the income-graduated tariff a low-income home pays half the fixed charge of other homes.",
+ "reserve": {
+  "hours": 100,
+  "batteryHours": 4,
+  "note": "Reserve margin = capacity counted at the peak / the year's peak demand - 1. Gas and nuclear count at their full size; wind and solar at their average output per MW built in the year's 100 highest-demand hours; a battery at its MW, or at MWh / 4 when it holds less than four hours. A simple rule chosen for this lesson; grid operators use more detailed methods (lesson 6).",
+  "cv": {
+   "wind": 0.372325,
+   "solar": 0.706711
+  }
+ },
+ "scales": {
+  "cost": {
+   "best": 100000000,
+   "worst": 250000000
+  },
+  "co2": {
+   "best": 0,
+   "worst": 850000
+  },
+  "unserved": {
+   "best": 0,
+   "worst": 2000
+  },
+  "rm": {
+   "best": 1,
+   "worst": 0
+  },
+  "fair": {
+   "best": 0.2,
+   "worst": 0.35
+  },
+  "gas": {
+   "best": 0,
+   "worst": 1
+  },
+  "largest": {
+   "best": 0.25,
+   "worst": 1
+  },
+  "note": "Fixed scales chosen for this lesson: the rim of the radar is the 'best' end, the centre the 'worst'; values beyond an end are drawn at that end. Scores (0 at the centre, 1 at the rim) feed the weighted sums. A value beyond an end scores the same as that end, so the weighted sums weigh only the plans that are unbeaten as shown."
+ },
+ "start": "A",
+ "plans": [
+  {
+   "id": "A",
+   "label": "Gas only",
+   "short": "Gas only",
+   "note": "380 MW combined-cycle gas and 80 MW of peakers",
+   "plan": {
+    "cc": 380,
+    "pk": 80
+   },
+   "m": {
+    "cost": 103892359,
+    "fixed": 35964506,
+    "running": 67927853,
+    "f": 0.346171,
+    "co2": 814999,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0,
+    "shares": {
+     "wind": 0,
+     "solar": 0,
+     "nuc": 0,
+     "gas": 1
+    },
+    "gas": 1,
+    "largest": 1,
+    "rm": 0.022222,
+    "fair": {
+     "fixed": 0.313361,
+     "graded": 0.265949,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "B",
+   "label": "Gas + wind",
+   "short": "Gas + wind",
+   "note": "the same gas plants, plus a 300 MW wind farm",
+   "plan": {
+    "wind": 300,
+    "cc": 380,
+    "pk": 80
+   },
+   "m": {
+    "cost": 119452820,
+    "fixed": 76037045,
+    "running": 43415776,
+    "f": 0.636545,
+    "co2": 520830,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0,
+    "shares": {
+     "wind": 0.359748,
+     "solar": 0,
+     "nuc": 0,
+     "gas": 0.640252
+    },
+    "gas": 0.640252,
+    "largest": 0.640252,
+    "rm": 0.270439,
+    "fair": {
+     "fixed": 0.328103,
+     "graded": 0.240922,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "C",
+   "label": "Wind, sun and battery, full gas backup",
+   "short": "Full backup",
+   "note": "600 MW wind, 200 MW solar, a 100 MW / 400 MWh battery, 300 MW combined-cycle gas and 80 MW of peakers",
+   "plan": {
+    "wind": 600,
+    "solar": 200,
+    "bp": 100,
+    "be": 400,
+    "cc": 300,
+    "pk": 80
+   },
+   "m": {
+    "cost": 161230346,
+    "fixed": 149031009,
+    "running": 12199337,
+    "f": 0.924336,
+    "co2": 146346,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0.07511,
+    "shares": {
+     "wind": 0.661827,
+     "solar": 0.158766,
+     "nuc": 0,
+     "gas": 0.179407
+    },
+    "gas": 0.179407,
+    "largest": 0.661827,
+    "rm": 0.877194,
+    "fair": {
+     "fixed": 0.342714,
+     "graded": 0.216118,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "D",
+   "label": "Wind, sun and battery, lean gas backup",
+   "short": "Lean backup",
+   "note": "plan C without its 80 MW of peakers",
+   "plan": {
+    "wind": 600,
+    "solar": 200,
+    "bp": 100,
+    "be": 400,
+    "cc": 300
+   },
+   "m": {
+    "cost": 155298565,
+    "fixed": 143099229,
+    "running": 12199337,
+    "f": 0.921446,
+    "co2": 146346,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0.07511,
+    "shares": {
+     "wind": 0.661828,
+     "solar": 0.158765,
+     "nuc": 0,
+     "gas": 0.179407
+    },
+    "gas": 0.179407,
+    "largest": 0.661828,
+    "rm": 0.699416,
+    "fair": {
+     "fixed": 0.342567,
+     "graded": 0.216367,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "E",
+   "label": "Sun and battery, gas backup",
+   "short": "Sun + battery",
+   "note": "600 MW solar, a 200 MW / 800 MWh battery, 300 MW combined-cycle gas and 80 MW of peakers",
+   "plan": {
+    "solar": 600,
+    "bp": 200,
+    "be": 800,
+    "cc": 300,
+    "pk": 80
+   },
+   "m": {
+    "cost": 165674827,
+    "fixed": 130014009,
+    "running": 35660818,
+    "f": 0.784754,
+    "co2": 427796,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0.047773,
+    "shares": {
+     "wind": 0,
+     "solar": 0.480513,
+     "nuc": 0,
+     "gas": 0.519487
+    },
+    "gas": 0.519487,
+    "largest": 0.519487,
+    "rm": 1.23117,
+    "fair": {
+     "fixed": 0.335627,
+     "graded": 0.228148,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "F",
+   "label": "Nuclear and gas",
+   "short": "Nuclear + gas",
+   "note": "a generic 300 MW nuclear plant, 100 MW combined-cycle gas and 80 MW of peakers",
+   "plan": {
+    "nuc": 300,
+    "cc": 100,
+    "pk": 80
+   },
+   "m": {
+    "cost": 233733931,
+    "fixed": 206071370,
+    "running": 27662562,
+    "f": 0.881649,
+    "co2": 66053,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0.049746,
+    "shares": {
+     "wind": 0,
+     "solar": 0,
+     "nuc": 0.921382,
+     "gas": 0.078618
+    },
+    "gas": 0.078618,
+    "largest": 0.921382,
+    "rm": 0.066667,
+    "fair": {
+     "fixed": 0.340547,
+     "graded": 0.219797,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "G",
+   "label": "Even mix",
+   "short": "Even mix",
+   "note": "300 MW wind, 150 MW solar, 100 MW nuclear, a 50 MW / 200 MWh battery, 250 MW combined-cycle gas and 80 MW of peakers",
+   "plan": {
+    "wind": 300,
+    "solar": 150,
+    "nuc": 100,
+    "bp": 50,
+    "be": 200,
+    "cc": 250,
+    "pk": 80
+   },
+   "m": {
+    "cost": 175971560,
+    "fixed": 154934484,
+    "running": 21037076,
+    "f": 0.880452,
+    "co2": 163716,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0.013147,
+    "shares": {
+     "wind": 0.354269,
+     "solar": 0.125151,
+     "nuc": 0.31956,
+     "gas": 0.201019
+    },
+    "gas": 0.201019,
+    "largest": 0.354269,
+    "rm": 0.550454,
+    "fair": {
+     "fixed": 0.340486,
+     "graded": 0.2199,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "H",
+   "label": "Wind with thin gas backup",
+   "short": "Thin backup",
+   "note": "400 MW wind, 300 MW combined-cycle gas and 50 MW of peakers",
+   "plan": {
+    "wind": 400,
+    "cc": 300,
+    "pk": 50
+   },
+   "m": {
+    "cost": 116180843,
+    "fixed": 80847461,
+    "running": 35333382,
+    "f": 0.695876,
+    "co2": 423958,
+    "unserved": 1605.3,
+    "unservedShare": 0.00065,
+    "hoursShort": 78,
+    "spilledShare": 0.000082,
+    "shares": {
+     "wind": 0.479936,
+     "solar": 0,
+     "nuc": 0,
+     "gas": 0.520064
+    },
+    "gas": 0.520064,
+    "largest": 0.520064,
+    "rm": 0.108733,
+    "fair": {
+     "fixed": 0.331115,
+     "graded": 0.235808,
+     "flat": 0.295785
+    }
+   }
+  },
+  {
+   "id": "I",
+   "label": "Deep clean",
+   "short": "Deep clean",
+   "note": "900 MW wind, 400 MW solar, a 200 MW / 800 MWh battery and 250 MW combined-cycle gas",
+   "plan": {
+    "wind": 900,
+    "solar": 400,
+    "bp": 200,
+    "be": 800,
+    "cc": 250
+   },
+   "m": {
+    "cost": 220723777,
+    "fixed": 218464198,
+    "running": 2259579,
+    "f": 0.989763,
+    "co2": 27106,
+    "unserved": 0,
+    "unservedShare": 0,
+    "hoursShort": 0,
+    "spilledShare": 0.315405,
+    "shares": {
+     "wind": 0.73451,
+     "solar": 0.232341,
+     "nuc": 0,
+     "gas": 0.033149
+    },
+    "gas": 0.033149,
+    "largest": 0.73451,
+    "rm": 1.372838,
+    "fair": {
+     "fixed": 0.346036,
+     "graded": 0.210478,
+     "flat": 0.295785
+    }
+   }
+  }
+ ],
+ "priorities": [
+  {
+   "id": "bills",
+   "label": "Bills first",
+   "who": "for example, a consumer advocate",
+   "w": {
+    "cost": 40,
+    "co2": 5,
+    "rel": 20,
+    "fair": 30,
+    "sec": 5
+   }
+  },
+  {
+   "id": "climate",
+   "label": "Climate first",
+   "who": "for example, a climate group",
+   "w": {
+    "cost": 10,
+    "co2": 55,
+    "rel": 15,
+    "fair": 10,
+    "sec": 10
+   }
+  },
+  {
+   "id": "lights",
+   "label": "Lights first",
+   "who": "for example, the grid operator",
+   "w": {
+    "cost": 20,
+    "co2": 10,
+    "rel": 50,
+    "fair": 5,
+    "sec": 15
+   }
+  },
+  {
+   "id": "supply",
+   "label": "Supply first",
+   "who": "for example, an energy-security office",
+   "w": {
+    "cost": 15,
+    "co2": 10,
+    "rel": 20,
+    "fair": 5,
+    "sec": 50
+   }
+  },
+  {
+   "id": "equal",
+   "label": "Equal weights",
+   "who": "every measure counts the same, on these scales",
+   "w": {
+    "cost": 20,
+    "co2": 20,
+    "rel": 20,
+    "fair": 20,
+    "sec": 20
+   }
+  }
+ ],
+ "prioritiesNote": "Illustrative weights for kinds of priorities, not the stated views of any real organization.",
+ "limits": {
+  "co2": {
+   "min": 50,
+   "max": 800,
+   "step": 25,
+   "start": 200
+  },
+  "gas": {
+   "min": 5,
+   "max": 100,
+   "step": 5,
+   "start": 25
+  },
+  "fair": {
+   "min": 20,
+   "max": 35,
+   "step": 0.5,
+   "start": 33
+  }
+ },
+ "sources": {
+  "eia-recs-ce21": {
+   "text": "EIA, 2020 Residential Energy Consumption Survey, Table CE2.1: annual household site fuel consumption, totals and averages, by 2020 household income",
+   "url": "https://www.eia.gov/consumption/residential/data/2020/c&e/pdf/ce2.1.pdf",
+   "asOf": "data released March 2023, revised March 2024; checked 3 Nov 2026"
+  },
+  "doe-lead": {
+   "text": "U.S. DOE, Low-Income Energy Affordability Data (LEAD) Tool: national average energy burden 6% for low-income households (0-80% of area median income) and 2% for others (ACS 5-year 2018-2022)",
+   "url": "https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool",
+   "asOf": "checked 3 Nov 2026"
+  },
+  "ferc-2021-freeze": {
+   "text": "FERC, NERC and Regional Entity Staff Report, The February 2021 Cold Weather Outages in Texas and the South Central United States, pp. 15-16: freezing issues caused 44.2% and fuel issues 31.4% of unplanned outages, derates and failures to start; natural gas fuel supply issues caused 27.3% of all of them",
+   "url": "https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf",
+   "asOf": "November 2021"
+  },
+  "lesson13": {
+   "text": "Lesson 13's planning model and its dated EIA and NREL costs",
+   "url": "13-capstone.html#sources",
+   "asOf": "costs checked 2 Nov 2026"
+  }
+ },
+ "peakMW": 450
+}

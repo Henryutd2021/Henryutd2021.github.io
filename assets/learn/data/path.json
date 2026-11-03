@@ -62,10 +62,9 @@
    "assumes": "The Modeler core.",
    "goal": "Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.",
    "door": "Ready for research",
-   "doord": "Coming later: frame a question, find what is known, choose a method and defend a study.",
-   "doorcta": "See what is coming",
-   "doorlink": "#researcher",
-   "status": "upcoming"
+   "doord": "Frame a question, find what is known, choose a method, check your model and defend a study.",
+   "doorcta": "Go to the Researcher tier",
+   "doorlink": "#researcher"
   }
  ],
  "scales": [],
@@ -964,6 +963,40 @@
   },
   {
    "tier": "foundations",
+   "code": "F1",
+   "title": "Who decides what, from a light switch to a nation?",
+   "ready": true,
+   "href": "f01-five-scales.html",
+   "scales": [],
+   "id": "f01-five-scales",
+   "minutes": 15,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "F2",
+   "title": "How does everything connect? Stocks, flows, feedback and the whole-system map",
+   "ready": true,
+   "href": "f02-systems-and-map.html",
+   "scales": [],
+   "id": "f02-systems-and-map",
+   "tier2": "analyst",
+   "minutes": 25,
+   "form": "play"
+  },
+  {
+   "tier": "analyst",
+   "code": "A22",
+   "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
+   "ready": true,
+   "href": "a22-tradeoff-explorer.html",
+   "scales": [],
+   "id": "a22-tradeoff-explorer",
+   "minutes": 25,
+   "form": "play"
+  },
+  {
+   "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
    "ready": false,
@@ -1110,17 +1143,23 @@
    "tier": "modeler",
    "code": "M2",
    "title": "On or off? Unit commitment as a mixed-integer program",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m02-unit-commitment.html",
+   "scales": [],
+   "id": "m02-unit-commitment",
+   "minutes": 40,
+   "form": "cards"
   },
   {
    "tier": "modeler",
    "code": "M3",
    "title": "What should be built? Capacity expansion with representative periods, validated",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m03-capacity-expansion.html",
+   "scales": [],
+   "id": "m03-capacity-expansion",
+   "minutes": 45,
+   "form": "cards"
   },
   {
    "tier": "modeler",
@@ -1211,44 +1250,70 @@
    "scales": []
   },
   {
+   "tier": "modeler",
+   "code": "CK-M",
+   "title": "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result",
+   "ready": true,
+   "href": "ck-m-unseen-problem.html",
+   "scales": [],
+   "id": "ck-m-unseen-problem",
+   "minutes": 240,
+   "form": "checkpoint"
+  },
+  {
    "tier": "researcher",
    "code": "R1",
    "title": "What makes a question worth researching?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r01-framing.html",
+   "scales": [],
+   "id": "r01-framing",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
    "code": "R2",
    "title": "How do you find out what is already known?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r02-literature.html",
+   "scales": [],
+   "id": "r02-literature",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
    "code": "R3",
    "title": "Which system, which boundary, which method?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r03-system-and-method.html",
+   "scales": [],
+   "id": "r03-system-and-method",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
    "code": "R4",
    "title": "Data you can defend: sources, cleaning, licences and provenance",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r04-data.html",
+   "scales": [],
+   "id": "r04-data",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
    "code": "R5",
    "title": "Can you trust your analysis? Verification, validation and reproducibility",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r05-build-validate.html",
+   "scales": [],
+   "id": "r05-build-validate",
+   "minutes": 35,
+   "form": "studio"
   },
   {
    "tier": "researcher",
@@ -1278,33 +1343,81 @@
    "tier": "researcher",
    "code": "R9",
    "title": "Research integrity, and working with the people your study is about",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r09-integrity-stakeholders.html",
+   "scales": [],
+   "id": "r09-integrity-stakeholders",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
    "code": "R10",
    "title": "What could you study? The question studio",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r10-question-studio.html",
+   "scales": [],
+   "id": "r10-question-studio",
+   "minutes": 40,
+   "form": "studio"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF2",
+   "title": "When the cost per kilogram and the cost of the system disagree",
+   "ready": true,
+   "href": "cf2-cost-per-kg-vs-system-cost.html",
+   "scales": [],
+   "id": "cf2-cost-per-kg-vs-system-cost",
+   "minutes": 10,
+   "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF6",
+   "title": "How much can shifting load to cleaner hours cut emissions, and when?",
+   "ready": true,
+   "href": "cf6-shifting-load-to-clean-hours.html",
+   "scales": [],
+   "id": "cf6-shifting-load-to-clean-hours",
+   "minutes": 10,
+   "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF7",
+   "title": "What does waiting for the grid cost, and who pays?",
+   "ready": true,
+   "href": "cf7-cost-of-waiting.html",
+   "scales": [],
+   "id": "cf7-cost-of-waiting",
+   "minutes": 10,
+   "form": "case"
   }
  ],
  "toolbox": [
   {
    "title": "Units and orders of magnitude",
+   "ready": true,
+   "href": "k01-units.html",
    "code": "K1",
+   "id": "k01-units",
    "minutes": 10
   },
   {
    "title": "Rates and efficiencies",
+   "ready": true,
+   "href": "k02-rates-efficiencies.html",
    "code": "K2",
+   "id": "k02-rates-efficiencies",
    "minutes": 10
   },
   {
    "title": "Exponentials and discounting",
+   "ready": true,
+   "href": "k03-discounting.html",
    "code": "K3",
+   "id": "k03-discounting",
    "minutes": 15
   },
   {
@@ -1317,7 +1430,10 @@
   },
   {
    "title": "Probability and statistics",
+   "ready": true,
+   "href": "k05-probability-statistics.html",
    "code": "K5",
+   "id": "k05-probability-statistics",
    "minutes": 25
   },
   {
@@ -1335,7 +1451,10 @@
   },
   {
    "title": "Git and reproducible notebooks",
+   "ready": true,
+   "href": "k08-git-notebooks.html",
    "code": "K8",
+   "id": "k08-git-notebooks",
    "minutes": 20
   }
  ],

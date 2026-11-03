@@ -1,0 +1,570 @@
+{
+ "meta": {
+  "title": "Research studio R9: research integrity and stakeholders (the studio's own text)",
+  "note": "The six dilemmas are fictional, set around Prairie Town; their numbers are illustrative and no real person or organisation is described. Norms are named with their primary sources and sections, checked on 3 November 2026.",
+  "as_of": "2026-11-03",
+  "license": "CC BY 4.0"
+ },
+ "norms": [
+  {
+   "id": "consent",
+   "label": "Consent",
+   "sub": "people agree, knowing what you will do",
+   "color": "var(--lx-tier-2)"
+  },
+  {
+   "id": "credit",
+   "label": "Credit",
+   "sub": "who did what, and whose work you used",
+   "color": "var(--lx-good)"
+  },
+  {
+   "id": "coi",
+   "label": "Conflicts of interest",
+   "sub": "funding and ties, declared",
+   "color": "var(--lx-warn)"
+  },
+  {
+   "id": "licences",
+   "label": "Data licences",
+   "sub": "the terms that come with data",
+   "color": "var(--lx-accent)"
+  },
+  {
+   "id": "honest",
+   "label": "Honest reporting",
+   "sub": "all the results, and corrections",
+   "color": "var(--lx-ink-3)"
+  }
+ ],
+ "practices": [
+  {
+   "id": "c1",
+   "text": "Tell survey participants how their answers will be used, and that they can say no.",
+   "bin": "consent",
+   "why": "Informed consent: people decide with the facts in front of them."
+  },
+  {
+   "id": "c2",
+   "text": "Get the ethics board's decision before the first interview.",
+   "bin": "consent",
+   "why": "Review comes before data collection, not after."
+  },
+  {
+   "id": "c3",
+   "text": "List who did what, using contributor roles.",
+   "bin": "credit",
+   "why": "Roles make authorship credit specific and checkable."
+  },
+  {
+   "id": "c4",
+   "text": "Cite the dataset, not only the paper that describes it.",
+   "bin": "credit",
+   "why": "Data are research products and deserve credit of their own."
+  },
+  {
+   "id": "c5",
+   "text": "State who funded the study and what they saw before publication.",
+   "bin": "coi",
+   "why": "Readers can weigh a funder's interest only if they know it."
+  },
+  {
+   "id": "c6",
+   "text": "Declare that you advise the utility whose programme you evaluate.",
+   "bin": "coi",
+   "why": "A non-financial tie is still a conflict of interest."
+  },
+  {
+   "id": "c7",
+   "text": "Read the data agreement before you post a co-author's data.",
+   "bin": "licences",
+   "why": "The agreement, not your wish to share, sets what is allowed."
+  },
+  {
+   "id": "c8",
+   "text": "Keep the attribution line and the licence when you share an edited map layer.",
+   "bin": "licences",
+   "why": "Share-alike terms apply to the layer you derive and share; the credit line goes with any map made from it."
+  },
+  {
+   "id": "c9",
+   "text": "Say how scenarios were chosen, and report the results that weaken your story.",
+   "bin": "honest",
+   "why": "Leaving out results without justification distorts the record."
+  },
+  {
+   "id": "c10",
+   "text": "Ask the journal for a correction when you find an error.",
+   "bin": "honest",
+   "why": "The published record should match what you now know."
+  }
+ ],
+ "dilemmas": [
+  {
+   "id": "funder",
+   "title": "A funder wants a headline",
+   "norm": "coi",
+   "case": "A regional utility association funds your study of a battery for Prairie Town. Across four scenarios, bills fall by 2 to 9% (illustrative). Its draft press release says “Batteries cut bills by 9%”.",
+   "options": [
+    {
+     "id": "a",
+     "text": "Agree: 9% is one of your results.",
+     "verdict": "bad",
+     "why": "It reports the best case as the result. Letting a funder shape how results are reported is an unacceptable practice in the European code (§3.1)."
+    },
+    {
+     "id": "b",
+     "text": "Ask for “2 to 9%, depending on the scenario”, and name the funder in the paper and the release.",
+     "verdict": "good",
+     "why": "Accurate, with its range, and the support declared (§2.7). The funder still gets a usable sentence."
+    },
+    {
+     "id": "c",
+     "text": "Decline to comment on the release.",
+     "verdict": "ok",
+     "why": "Your paper stays accurate, but the misleading number still goes out near your name. Better to correct it."
+    }
+   ],
+   "source": "ALLEA (2023), §2.7 and §3.1",
+   "who": [
+    "funder",
+    "readers",
+    "ratepayers"
+   ]
+  },
+  {
+   "id": "scenario",
+   "title": "A convenient scenario",
+   "norm": "honest",
+   "case": "You ran eight scenarios. One shows a large benefit; seven show small ones. After seeing the results, a co-author suggests presenting the large one as “the central case”, with no other reason for choosing it.",
+   "options": [
+    {
+     "id": "a",
+     "text": "Present all eight, say how each was chosen, and give the range.",
+     "verdict": "good",
+     "why": "Honest reporting keeps the runs that weaken the story: negative results can be as relevant as positive ones (§2.7)."
+    },
+    {
+     "id": "b",
+     "text": "Put the large one in the main text and the other seven in a supplement.",
+     "verdict": "ok",
+     "why": "Everything is there, but the emphasis misleads: a central case needs its own justification, not its result. Say in the main text how each case was chosen."
+    },
+    {
+     "id": "c",
+     "text": "Present only the large one.",
+     "verdict": "bad",
+     "why": "Omitting results without justification counts as falsification in the European code (§3.1)."
+    }
+   ],
+   "source": "ALLEA (2023), §2.7 and §3.1",
+   "who": [
+    "coauthors",
+    "readers",
+    "regulator"
+   ]
+  },
+  {
+   "id": "data",
+   "title": "A co-author's data",
+   "norm": "licences",
+   "case": "A co-author shared a rural co-op's hourly meter data with you under a data agreement. You want to post the data with your code so that others can rerun the study.",
+   "options": [
+    {
+     "id": "c",
+     "text": "Post it with the co-op's name removed.",
+     "verdict": "bad",
+     "why": "A missing name does not override the agreement, and hourly meter data can still point to households."
+    },
+    {
+     "id": "a",
+     "text": "Post it: the paper is out, so the data are public now.",
+     "verdict": "bad",
+     "why": "Publication does not change the agreement. Posting may break it and expose the co-op's customers."
+    },
+    {
+     "id": "b",
+     "text": "Read the agreement; post the code, a synthetic sample and how to request the data; cite the data and credit your co-author.",
+     "verdict": "good",
+     "why": "As open as possible, as closed as necessary: a [[synthetic-sample|synthetic sample]] lets others run the code, and the route to permission is stated (§2.5)."
+    }
+   ],
+   "source": "ALLEA (2023), §2.5 and §2.7",
+   "who": [
+    "provider",
+    "participants",
+    "coauthors"
+   ]
+  },
+  {
+   "id": "meeting",
+   "title": "A community meeting",
+   "norm": "stakeholders",
+   "case": "Your model ranks three sites for a solar farm near Prairie Town (illustrative). At a public meeting, residents ask why their concern about losing farmland is not in the model.",
+   "options": [
+    {
+     "id": "b",
+     "text": "Say what the model includes and leaves out, record the concern, and report back how you treated it.",
+     "verdict": "good",
+     "why": "Fair process and recognition: the people affected are heard and can see what changed. Treating farmland could mean a new criterion or a sensitivity run."
+    },
+    {
+     "id": "a",
+     "text": "Explain that the model is objective, so the ranking stands.",
+     "verdict": "bad",
+     "why": "A ranking encodes choices about what counts. Calling it objective dismisses the people it affects."
+    },
+    {
+     "id": "c",
+     "text": "Promise that the site they oppose will be dropped.",
+     "verdict": "bad",
+     "why": "Researchers do not decide where farms go. A promise you cannot keep costs trust."
+    }
+   ],
+   "source": "Jenkins et al. (2016); ALLEA (2023), §2.4",
+   "who": [
+    "residents",
+    "future",
+    "regulator"
+   ]
+  },
+  {
+   "id": "survey",
+   "title": "A survey without consent",
+   "norm": "consent",
+   "case": "A student on a DOE-supported project plans to survey renters door to door next week about their energy bills, recording names and addresses. No one has asked the [[ethics-board|ethics board]].",
+   "options": [
+    {
+     "id": "a",
+     "text": "Go ahead: a short survey is harmless.",
+     "verdict": "bad",
+     "why": "Research with people needs an ethics determination first. For a DOE-supported study, even a survey that may be exempt needs one, from a review board, its office or their designee (§4.a)."
+    },
+    {
+     "id": "c",
+     "text": "Go ahead, but do not record names.",
+     "verdict": "ok",
+     "why": "Collecting less is good practice, but the ethics determination is still needed, and addresses identify people."
+    },
+    {
+     "id": "b",
+     "text": "Pause; send the plan to the ethics board; add a consent statement; collect only what the question needs.",
+     "verdict": "good",
+     "why": "Prior review and informed consent, as DOE Order 443.1D requires for this DOE-supported study (§4.a); participants told how their data will be used (§2.5)."
+    }
+   ],
+   "source": "DOE Order 443.1D (2026), §4.a; ALLEA (2023), §2.4 and §2.5",
+   "who": [
+    "participants",
+    "team"
+   ]
+  },
+  {
+   "id": "error",
+   "title": "An error after publication",
+   "norm": "honest",
+   "case": "Months after publication you find a unit slip: one plant's capacity was entered in [[kilowatt|kW]] instead of [[megawatt|MW]] (1 MW = 1,000 kW). Fixing it changes your main result from 12% to 10% (illustrative).",
+   "options": [
+    {
+     "id": "c",
+     "text": "Fix it quietly in the code repository.",
+     "verdict": "ok",
+     "why": "Helpful, but the published record stays wrong. Do both."
+    },
+    {
+     "id": "b",
+     "text": "Tell your co-authors and the journal promptly, and ask for a correction that says what changed.",
+     "verdict": "good",
+     "why": "Authors issue corrections promptly, and get credit for doing so (§2.7). The journal decides which kind of notice fits."
+    },
+    {
+     "id": "a",
+     "text": "Say nothing: the conclusion still holds.",
+     "verdict": "bad",
+     "why": "The published numbers are wrong, and others may reuse them."
+    }
+   ],
+   "source": "ALLEA (2023), §2.7",
+   "who": [
+    "readers",
+    "coauthors"
+   ]
+  }
+ ],
+ "stakeholders": [
+  {
+   "ring": "The study team",
+   "items": [
+    {
+     "id": "team",
+     "label": "You and your students",
+     "owed": "Training, a safe place to raise a problem, and credit for the work each person did."
+    },
+    {
+     "id": "coauthors",
+     "label": "Co-authors",
+     "owed": "Authorship agreed on stated criteria, contributor roles, and a say before anything is submitted."
+    }
+   ]
+  },
+  {
+   "ring": "People the study is about or uses",
+   "items": [
+    {
+     "id": "participants",
+     "label": "Survey participants and households",
+     "owed": "Informed consent, privacy, and only the data the question needs."
+    },
+    {
+     "id": "residents",
+     "label": "Residents near the site",
+     "owed": "To be heard, to see how their concerns were treated, and a share in who decides."
+    },
+    {
+     "id": "provider",
+     "label": "The co-op that shared data",
+     "owed": "The terms of the agreement kept, and the data cited."
+    }
+   ]
+  },
+  {
+   "ring": "People who use or pay for it",
+   "items": [
+    {
+     "id": "funder",
+     "label": "The funder",
+     "owed": "Disclosure of its support, and findings it cannot change."
+    },
+    {
+     "id": "regulator",
+     "label": "The utility and the regulator",
+     "owed": "Results with their limits, all scenarios, and no overclaiming."
+    },
+    {
+     "id": "readers",
+     "label": "The journal and its readers",
+     "owed": "All the results, prompt corrections, and the data or code where allowed."
+    },
+    {
+     "id": "ratepayers",
+     "label": "Ratepayers",
+     "owed": "A clear account of who pays and who benefits."
+    },
+    {
+     "id": "future",
+     "label": "Future residents",
+     "owed": "Effects that last, such as land use, counted even though they cannot speak at the meeting."
+    }
+   ]
+  }
+ ],
+ "statement": [
+  {
+   "id": "funding",
+   "label": "Funding and conflicts of interest",
+   "hint": "Who paid, what they could see or change, and any ties of yours.",
+   "planned": "Who will pay, what they may see or change, and any ties of yours; “pending” if the funding is not settled."
+  },
+  {
+   "id": "credit",
+   "label": "Contributions",
+   "hint": "Each author's [[credit-roles|contributor roles]]: for example conceptualization (shaping the question), data curation (cleaning and documenting data), formal analysis, writing.",
+   "planned": "Who will do what, in the same [[credit-roles|contributor roles]]; agree it now and check it again before you submit."
+  },
+  {
+   "id": "data",
+   "label": "Data and licences",
+   "hint": "Each source and its terms; what is public, and the route to what is not.",
+   "planned": "Each source you plan to use and its terms; which ones still need permission."
+  },
+  {
+   "id": "ethics",
+   "label": "Ethics and consent",
+   "hint": "Who reviewed the work with people, when, and how consent was given; or “not applicable” with the reason.",
+   "planned": "Whether the study involves people or their data; which board or office will decide, and when; “pending” until it has."
+  },
+  {
+   "id": "people",
+   "label": "Stakeholders",
+   "hint": "Who was told, heard or consulted, and how their views were treated.",
+   "planned": "Who you plan to tell or consult, when, and how you will report back to them."
+  },
+  {
+   "id": "corrections",
+   "label": "Corrections",
+   "hint": "How a reader reports an error, and how you will correct it.",
+   "planned": "How a reader will report an error, and how you will correct it."
+  }
+ ],
+ "exemplars": {
+  "task": "Write the integrity statement for this fictional Prairie Town study, using only the facts on its fact sheet.",
+  "weak": [
+   "The authors declare ",
+   {
+    "text": "no competing interests",
+    "note": "Funding is not mentioned at all, and author B's advisory role on the fact sheet is a competing interest to declare."
+   },
+   ". ",
+   {
+    "text": "Data available on request",
+    "note": "Which data, under which terms? Public data should be cited; restricted data need a stated route."
+   },
+   ". ",
+   {
+    "text": "All participants agreed to take part",
+    "note": "Agreement is not informed consent, and the ethics review on the fact sheet is not named."
+   },
+   ". ",
+   {
+    "text": "All authors contributed equally",
+    "note": "It hides who did what; [[credit-roles|contributor roles]] make credit checkable."
+   },
+   "."
+  ],
+  "good": [
+   "Funding: ",
+   {
+    "text": "a regional utility association funded the study; it saw the results one week before publication and could not change them",
+    "note": "The funder is named, with its role and its limits."
+   },
+   ".\nCompeting interests: ",
+   {
+    "text": "author B advises the co-op on tariffs",
+    "note": "An advisory tie is declared, not hidden."
+   },
+   ".\nContributions: ",
+   {
+    "text": "A, conceptualization, formal analysis, writing (original draft); B, data curation, writing (review and editing)",
+    "note": "[[credit-roles|Contributor roles]] (CRediT) make credit specific."
+   },
+   ".\nData: ",
+   {
+    "text": "EIA-930, public domain, cited with its access date; the co-op's meter data are under an agreement that bars sharing, so the code, a synthetic sample and the request route are public",
+    "note": "Each source with its terms: as open as possible, as closed as necessary."
+   },
+   ".\nEthics: ",
+   {
+    "text": "the university's ethics board approved the survey before it began; each household gave written informed consent",
+    "note": "Review before collection, and consent, both stated."
+   },
+   ".\nStakeholders: ",
+   {
+    "text": "results were shown to residents and the co-op board before publication; residents asked about renters' bills, so a renter case was added and a summary sent to the meeting",
+    "note": "One concern, the change it led to, and how people were told: they can see how their view was treated."
+   },
+   ".\nCorrections: ",
+   {
+    "text": "readers can report errors to the corresponding author; any error that changes a result goes to the journal as a correction",
+    "note": "A route for errors, promised before anyone finds one."
+   },
+   "."
+  ],
+  "diff": [
+   {
+    "label": "Funding",
+    "weak": "Not mentioned",
+    "good": "Named, with what the funder could and could not do"
+   },
+   {
+    "label": "Data",
+    "weak": "“On request”",
+    "good": "Each source with its terms and a route"
+   },
+   {
+    "label": "People",
+    "weak": "“Agreed”",
+    "good": "Ethics review, consent, one concern and the change it led to"
+   }
+  ],
+  "note": "Both statements are illustrative and use only the fact sheet; the study, the funder and the people in it are fictional.",
+  "facts": [
+   {
+    "k": "Study",
+    "v": "Would a battery at Prairie Town's co-op lower members' bills? A model on public grid data and the co-op's meter data, plus a household survey."
+   },
+   {
+    "k": "Funding",
+    "v": "A regional utility association. Its contract lets it see the results one week before publication; it cannot change them."
+   },
+   {
+    "k": "Team",
+    "v": "Author A shaped the question, ran the analysis and wrote the draft; author B cleaned and documented the data and edited the text."
+   },
+   {
+    "k": "Ties",
+    "v": "Author B advises the co-op on tariffs."
+   },
+   {
+    "k": "Data",
+    "v": "EIA-930 hourly grid data (public domain); the co-op's hourly meter data, shared under an agreement that bars passing them on."
+   },
+   {
+    "k": "Survey",
+    "v": "The university's ethics board approved it before it began; each household gave written informed consent."
+   },
+   {
+    "k": "People",
+    "v": "Results were shown to residents and the co-op board before publication. Residents asked how renters' bills would change."
+   },
+   {
+    "k": "Response",
+    "v": "A renter case was added to the results, and a one-page summary of the change went to everyone at the meeting."
+   }
+  ]
+ },
+ "steelman": {
+  "title": "Should a funder see results before publication? The strongest case on each side",
+  "sides": [
+   {
+    "key": "for",
+    "title": "For: an early look",
+    "points": [
+     "A funder who knows the field can catch factual errors before they are public.",
+     "Findings that the funder has seen are more likely to be used."
+    ]
+   },
+   {
+    "key": "against",
+    "title": "Against: no preview",
+    "points": [
+     "Any preview invites pressure, even when none is meant.",
+     "Readers may suspect influence whatever actually happened."
+    ]
+   }
+  ],
+  "note": "A common middle path: a written agreement that the funder may comment on facts but cannot change findings, stated in the paper."
+ },
+ "rubric": [
+  {
+   "id": "integrity",
+   "look": "Your statement covers funding and conflicts, contributor roles, the terms of every data source, ethics review and consent, and how the people affected were heard."
+  }
+ ],
+ "sources": [
+  {
+   "label": "ALLEA (2023), The European Code of Conduct for Research Integrity, Revised Edition 2023 (CC BY 4.0)",
+   "url": "https://doi.org/10.26356/ECOC",
+   "as_of": "3 November 2026"
+  },
+  {
+   "label": "U.S. Department of Energy (2026), Order 443.1D, Protection of Human Research Subjects (approved 5 August 2026)",
+   "url": "https://www.energy.gov/documents/doe-o-443-1-dprotection-human-research-subjects2026-07-23pdf",
+   "as_of": "3 November 2026"
+  },
+  {
+   "label": "Brand, A. et al. (2015), Beyond authorship: attribution, contribution, collaboration, and credit, Learned Publishing 28(2), 151–155",
+   "url": "https://doi.org/10.1087/20150211",
+   "as_of": "3 November 2026"
+  },
+  {
+   "label": "Jenkins, K. et al. (2016), Energy justice: a conceptual review, Energy Research & Social Science 11, 174–182",
+   "url": "https://doi.org/10.1016/j.erss.2015.10.004",
+   "as_of": "3 November 2026"
+  },
+  {
+   "label": "EIA, Copyrights and reuse",
+   "url": "https://www.eia.gov/about/copyrights_reuse.php",
+   "as_of": "3 November 2026"
+  }
+ ]
+}

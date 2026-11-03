@@ -501,7 +501,7 @@ window.Quarto = {
 <p class="lx-hint">With JavaScript on, you choose the plants yourself, run the year in a solver and ask it for the cheapest plan under a CO₂ cap.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Prairie Town:</b> fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.<br><b>Prairie Town:</b> fictional.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 15 guided minutes. Practice, about 20 more: by hand, earn all nine stars with a plan under 100 kt, or try a gas price of $6/MMBtu.</p>
 </div>
 <div id="explain" class="lx-sec">
@@ -612,17 +612,20 @@ s_t = s_{t-1} + 0.85\,c_t - d_t, \qquad 0 \le s_t &amp;\le K_\mathrm{be} &amp;&a
 </tbody>
 </table>
 <ul>
-<li><strong>Yearly cost</strong> of a plant: <span class="lx-term" data-term="capital-cost">overnight capital cost</span> × <span class="lx-term" data-term="capital-recovery-factor">capital recovery factor</span> + <span class="lx-term" data-term="fixed-om">fixed O&amp;M</span> (operation and maintenance). At a 4% real (after-inflation) <span class="lx-term" data-term="wacc">cost of capital</span> over 30 years, the factor is 0.0578.</li>
+<li><strong>Yearly cost</strong> of a plant: <span class="lx-term" data-term="capital-cost">overnight capital cost</span> × <span class="lx-term" data-term="capital-recovery-factor">capital recovery factor</span> + <span class="lx-term" data-term="fixed-om">fixed O&amp;M</span> (operation and maintenance). At a 4% real (after-inflation) <span class="lx-term" data-term="wacc">cost of capital</span> over 30 years, the factor is 0.05783.</li>
 <li><strong>Running cost</strong> of gas: <span class="lx-term" data-term="heat-rate">heat rate</span> × gas price + <span class="lx-term" data-term="variable-om">variable O&amp;M</span>. MMBtu is a million Btu of fuel energy.</li>
 </ul>
 <p><span class="math display">\[
 \begin{aligned}
-\text{wind, per kW-year:}\;\; &amp; 1{,}712 \times 0.0578 + 34.57 = \$133.6\\
+\text{wind, per kW-year:}\;\; &amp; 1{,}712 \times 0.05783 + 34.57 = \$133.6\\
 \text{combined-cycle, per MWh:}\;\; &amp; 6.226 \times \$3.85 + \$3.49 = \$27.46\\
 \text{its CO}_2\text{, t per MWh:}\;\; &amp; 6.226 \times 0.05291 = 0.329
 \end{aligned}
 \]</span></p>
-<p>Every term is linear, so this is a <span class="lx-term" data-term="linear-program">linear program</span>. Your plan fixes the <span class="math inline">\(K_i\)</span>; the optimizer chooses them too, with <span class="math inline">\(u_t = 0\)</span>. Upcoming: M3 (capacity expansion) writes the same model in code.</p>
+<p class="lx-hint" style="margin-top:10px">
+Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and the capital recovery factor).
+</p>
+<p>Every term is linear, so this is a <span class="lx-term" data-term="linear-program">linear program</span>. Your plan fixes the <span class="math inline">\(K_i\)</span>; the optimizer chooses them too, with <span class="math inline">\(u_t = 0\)</span>. <a href="../learn/m03-capacity-expansion.html">M3</a> (capacity expansion) writes the same model in code, on representative weeks checked against the full year.</p>
 </div>
 </details>
 <details class="lx-deeper">

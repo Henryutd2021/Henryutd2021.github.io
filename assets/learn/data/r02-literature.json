@@ -1,0 +1,148 @@
+{
+ "meta": {
+  "title": "Research studio R2: finding out what is already known (the studio's own text)",
+  "note": "The one-line summaries are the course's own words, written from each paper's abstract on 3 November 2026 (first-pass coding); no abstract is quoted. Paper metadata and counts are in r02-literature-openalex.json (OpenAlex snapshot of the same date). The three-pass worked example reads the open preprint of Hilbers, Brayshaw and Gandy (arXiv 2210.08351, October 2022); check the published version for changes.",
+  "as_of": "2026-11-03",
+  "license": "CC BY 4.0"
+ },
+ "question": "How do [[capacity-expansion|capacity-expansion]] models stand in for a whole year with a few [[representative-period|representative periods]], and what happens to storage and to extreme periods when they do?",
+ "coding_rule": "Tick a cell only when the abstract says so. “not stated” means the abstract does not say: it is not the same as no, and a second pass can change it.",
+ "values": {"yes": "the abstract reports it", "partly": "the abstract hints at it", "not stated": "the abstract does not say (not the same as no)"},
+ "blocks": [
+  {"id": "A", "label": "The technique", "terms": ["representative days", "representative periods", "time series aggregation", "typical days", "time slices", "clustering"], "start": ["representative days", "representative periods"]},
+  {"id": "B", "label": "The model", "terms": ["capacity expansion", "generation expansion", "energy system model", "investment planning", "unit commitment"], "start": ["capacity expansion"]}
+ ],
+ "ladder_q": [
+  {"from": "words", "to": "phrase", "q": "Two changes at once: quote “representative days” as one phrase, and drop the model words. More results, or fewer?", "answer": "more", "why": "Two changes that pull opposite ways: quotes narrow, dropping two words widens. The count rose, but this pair cannot show what quoting alone does."},
+  {"from": "phrase", "to": "synonyms", "q": "Join three synonyms with OR. More, or fewer?", "answer": "more", "why": "OR widens: a work needs any one of the four phrases."},
+  {"from": "synonyms", "to": "model", "q": "AND the model block. More, or fewer?", "answer": "fewer", "why": "AND narrows: a work now needs one phrase from each block."},
+  {"from": "model", "to": "storage", "q": "AND the word storage. More, or fewer?", "answer": "fewer", "why": "Another AND narrows again, and it can drop relevant papers whose abstracts use other words."}
+ ],
+ "ladder_labels": {"phrase": "Quote one phrase, drop the model words (two changes)"},
+ "bins": [
+  {"key": "storage", "label": "Links storage between periods", "short": "Storage linked"},
+  {"key": "extreme", "label": "Keeps extreme periods", "short": "Extremes"},
+  {"key": "full", "label": "Checks against a full-year run", "short": "Full year"}
+ ],
+ "matrix": [
+  {"key": "p01", "doi": "10.1109/tpwrs.2016.2596803", "name": "Poncelet et al. (2016)", "method": "Optimisation picks the days",
+   "summary": "Picks representative days with an optimisation and compares it with [[clustering|clustering]] and simple rules, using new measures of how representative a set is.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "not stated"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme days.", "full": "The abstract reports comparisons between selection methods, not with a full-year model run."}},
+  {"key": "p02", "doi": "10.1016/j.renene.2017.10.017", "name": "Kotzur et al. (2017)", "method": "Several methods compared", "code": true,
+   "summary": "Compares [[time-series-aggregation|aggregation methods]] across several energy-system designs; the system matters more than the method, and typical periods as usually modelled cannot carry seasonal storage.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "partly"},
+   "why": {"storage": "The abstract names the seasonal-storage problem but reports no link between periods. Mentioning storage is not the same as modelling it.", "extreme": "The abstract does not mention extreme periods; only a second pass can say whether the paper uses them.", "full": "It speaks of the real system cost, but the abstract does not say how that cost was found: a second pass would tell."}},
+  {"key": "p03", "doi": "10.1016/j.apenergy.2017.03.051", "name": "Pfenninger (2017)", "method": "Several methods compared",
+   "summary": "Compares downsampling, clustering and simple rules in a Great Britain power model with 25 years of wind and solar data; the best method depends on the data and the model.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "partly"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme periods.", "full": "It compares results across methods; the abstract does not name a full-resolution benchmark."}},
+  {"key": "p04", "doi": "10.1016/j.apenergy.2018.01.023", "name": "Kotzur et al. (2018)", "method": "Clustering, linked periods", "code": true,
+   "summary": "Links typical periods through a storage level that carries energy from one period to the next, so seasonal storage can be modelled, and compares with optimising the full year.",
+   "ref": {"storage": "yes", "extreme": "not stated", "full": "yes"},
+   "why": {"storage": "The abstract gives this as its contribution: a storage state that connects the periods in sequence.", "extreme": "The abstract does not mention extreme periods.", "full": "The abstract reports a comparison with models of the full annual series."}},
+  {"key": "p05", "doi": "10.1109/tpwrs.2017.2746379", "name": "Liu, Sioshansi and Conejo (2017)", "method": "Hierarchical clustering",
+   "summary": "Picks representative days with two hierarchical clustering methods that keep correlations in time and between places, tested on the Texas power system against the full data.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "yes"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme days.", "full": "The abstract reports investment decisions compared with those from the full, unclustered data."}},
+  {"key": "p06", "doi": "10.1109/tpwrs.2018.2819578", "name": "Tejada-Arango et al. (2018)", "method": "Linked representative days",
+   "summary": "Adds links between representative days so that long-term storage fits an investment model, and benchmarks it against an hourly [[unit-commitment|unit-commitment]] model.",
+   "ref": {"storage": "yes", "extreme": "not stated", "full": "yes"},
+   "why": {"storage": "The abstract reports a transition matrix between representative days that carries long-term storage.", "extreme": "The abstract does not mention extreme days.", "full": "The abstract names an hourly [[unit-commitment|unit-commitment]] model as the benchmark."}},
+  {"key": "p07", "doi": "10.1016/j.energy.2018.08.015", "name": "Mallapragada et al. (2018)", "method": "Representative days against time slices",
+   "summary": "Compares a model with up to 12 representative days against a time-slice model for Texas, then runs both plans through an hourly operations model.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "yes"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme days.", "full": "The abstract reports both plans tested in an hourly grid-operations model."}},
+  {"key": "p08", "doi": "10.1016/j.apenergy.2019.02.012", "name": "Teichgraeber and Brandt (2019)", "method": "Five clustering methods compared",
+   "summary": "Compares five clustering methods on two operating problems, battery and gas-turbine scheduling; a better clustering score does not always give a better result.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "partly"},
+   "why": {"storage": "The abstract names battery scheduling but reports no link between periods.", "extreme": "The abstract does not mention extreme periods.", "full": "It compares objective values; the abstract does not say against what."}},
+  {"key": "p09", "doi": "10.1109/tpwrs.2019.2892619", "name": "Sun et al. (2019)", "method": "Clustering by investment cost",
+   "summary": "Groups days by the investment decisions each day would lead to, rather than by the input data alone, for large power systems with many locations.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "not stated"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme days.", "full": "The abstract names no full-year benchmark."}},
+  {"key": "p10", "doi": "10.1016/j.apenergy.2020.115224", "name": "Yeganefar et al. (2020)", "method": "Clustering plus extreme days", "code": true,
+   "summary": "Adds extreme days of high and low [[net-demand|net load]] to the representative days, picked with self-organising maps, and tests them on two power systems.",
+   "ref": {"storage": "not stated", "extreme": "yes", "full": "partly"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract gives extreme days of [[net-demand|net load]] as its contribution.", "full": "It reports better operating-cost estimates; the abstract does not say against what."}},
+  {"key": "p11", "doi": "10.1016/j.apenergy.2021.117696", "name": "Teichgraeber, Küpper and Brandt (2021)", "method": "Clustering plus extreme periods", "code": true,
+   "summary": "Adds extreme periods one at a time, using the planning model's own results, until the design meets demand in every hour of the full data.",
+   "ref": {"storage": "not stated", "extreme": "yes", "full": "yes"},
+   "why": {"storage": "The abstract does not say whether storage links the periods; a second pass would check.", "extreme": "The abstract gives extreme periods, found from the model's results, as its contribution.", "full": "The abstract reports the design checked on the full input data."}},
+  {"key": "p12", "doi": "10.1007/s12667-022-00533-4", "name": "Reichenberg and Hedenus (2022)", "method": "Error of representative periods",
+   "summary": "Measures how representative periods distort cost and capacity results against a full chronological year, in a European model with 90% wind and solar.",
+   "ref": {"storage": "not stated", "extreme": "not stated", "full": "yes"},
+   "why": {"storage": "The abstract does not mention storage.", "extreme": "The abstract does not mention extreme periods.", "full": "The abstract names a full chronological year as the benchmark."}}
+ ],
+ "fillers": [
+  {"doi": "10.1016/j.apenergy.2022.120624", "name": "Hilbers, Brayshaw and Gandy (2023)",
+   "summary": "Picks periods after a first model run, keeps the extreme periods that drive capacity, and keeps chronology so storage can be modelled."},
+  {"doi": "10.1109/powertech55446.2023.10202993", "name": "Moradi-Sepahvand and Tindemans (2023)",
+   "summary": "A clustering-based aggregation that keeps extreme values and the order of days, for planning lines with short- and long-term storage on a six-bus test system."},
+  {"doi": "10.1016/j.epsr.2024.110788", "name": "Moradi-Sepahvand and Tindemans (2024)",
+   "summary": "Links day blocks in sequence and keeps extreme values with representative days and hours, in a model that plans lines, storage and wind farms together."}
+ ],
+ "review_summary": "Sorts the aggregation methods used in 130 publications by their assumptions, and lists open questions.",
+ "gap_q": {"q": "No abstract in your twelve reports {cell}. Is that a research gap?",
+  "options": [["yes", "Yes: an empty cell is a gap"], ["no", "No: someone must have done it"], ["test", "Not yet: search that cell directly first"]],
+  "answer": "test",
+  "feedback": {"yes": "Not yet. Twelve papers are a sample, and coding from abstracts can miss things. Search the cell itself before you claim it.",
+               "no": "Too quick the other way: nobody knows until the cell is searched. Run the search, then read what it finds.",
+               "test": "Right. An empty cell is a lead, not a gap. Turn it into a search string and log the result."}},
+ "passes": [
+  {"n": 1, "label": "First pass", "time": "5–10 min", "read": "Title, abstract, introduction, section headings, conclusions; glance at the references you already know.", "out": "The five Cs: category, context, correctness, contributions, clarity."},
+  {"n": 2, "label": "Second pass", "time": "up to an hour", "read": "Figures, tables and the argument; skip the proofs. Mark the references to read next.", "out": "The extraction sheet, filled."},
+  {"n": 3, "label": "Third pass, optional", "time": "4–5 hours for a beginner, outside this studio's 4 hours", "read": "Rebuild the work under the same assumptions, and challenge each one.", "out": "What you would do differently, and what it would change."}
+ ],
+ "headings": ["1. Introduction (capacity expansion planning; time series aggregation; inter-period links and storage)", "2. This paper's contribution", "3. Methods (overview; framework; remarks)", "4. Simulation studies (overview; setup; validation; example; discussion)", "5. Conclusions (conclusions; extensions)"],
+ "five_cs": [
+  {"c": "Category", "q": "What kind of paper is it?", "options": [["method", "A new method, tested in simulations on a test system"], ["review", "A review of earlier methods"], ["case", "A case study of one real country's plan"]], "answer": "method",
+   "worked": "A methods paper: a new aggregation framework, tested in simulations on a six-region test system."},
+  {"c": "Context", "q": "Which papers does it build on?", "worked": "Two from your matrix: Kotzur et al. (2018) for linked storage, and Teichgraeber, Küpper and Brandt (2021) for extreme periods taken from model results."},
+  {"c": "Correctness", "q": "Which assumptions will you check in pass two?", "worked": "A test system based on the IEEE six-bus system; demand and wind only, no solar; operation with [[perfect-foresight|perfect foresight]]."},
+  {"c": "Contributions", "q": "What is new?", "worked": "Periods chosen after a first model run that keep chronology for storage and keep the extreme periods that drive capacity; models, data and code released."},
+  {"c": "Clarity", "q": "Is it well written?", "worked": "Your judgement: note one thing you would ask the authors."}
+ ],
+ "sheet": [
+  {"k": "Question", "v": "Can choosing periods after a first model run cut the error of capacity plans built from long weather series, in models with storage?"},
+  {"k": "Scale and boundary", "v": "A six-region test grid: baseload, peaking and wind generation, transmission and storage, built from scratch."},
+  {"k": "Data vintage", "v": "Hourly demand and wind for European countries, 1980–2017, from a published reanalysis-based dataset."},
+  {"k": "Method", "v": "Capacity-expansion optimisation on representative days, then an operations run over the full series."},
+  {"k": "Counterfactual", "v": "Three conventional schemes chosen from the input data alone and, on 3-year samples, the plan from the full series."},
+  {"k": "Sensitivity and validation", "v": "30 and 120 representative days; 40 resampled series; unserved energy checked over the full series."},
+  {"k": "Not modelled", "v": "Solar; operation without [[perfect-foresight|perfect foresight]] (named by the authors as an extension)."},
+  {"k": "Code and data", "v": "Public, with a Zenodo DOI."}
+ ],
+ "write_prompt": "Draft your gap statement: what you searched (where, when, strings), what the matrix shows, what the direct search found, what a second pass on the closest paper showed, and the question that remains.",
+ "practice": [
+  {"min": 30, "task": "Write two concept blocks for your own question; run five logged strings in OpenAlex and one other open database, such as Semantic Scholar or Crossref (string, date, count)."},
+  {"min": 30, "task": "Screen titles and abstracts down to about 30 candidates; note why you dropped the rest."},
+  {"min": 30, "task": "Find one review; snowball backward and forward from it; add what the searches missed."},
+  {"min": 90, "task": "Do a first pass on 12 papers (about 7 minutes each) and code them in a concept matrix with a written coding rule."},
+  {"min": 15, "task": "Search your empty cell directly and log the string, date and count."},
+  {"min": 45, "task": "Read the closest paper in a second pass, fill the extraction sheet, then write the gap statement."}
+ ],
+ "practice_optional": "Optional, beyond the 4 hours: a third pass on the closest paper (4–5 hours for a beginner).",
+ "exemplars": {
+  "task": "Write the gap statement for the question above, from your search log, concept matrix and second-pass sheet.",
+  "weak": ["Representative periods are widely used, but ", {"text": "few studies", "note": "No count, no database, no date: a reader cannot check it."}, " consider ", {"text": "storage and extreme events together", "note": "Undefined: linked between periods? Extremes chosen how?"}, ". ", {"text": "This study is the first", "note": "A novelty claim the evidence cannot carry; a direct search finds at least three papers that do both."}, " to fill this ", {"text": "gap", "note": "Asserted, not shown: no matrix, no search of the cell."}, "."],
+  "good": ["Search: OpenAlex titles and abstracts, ", {"text": "3 November 2026, five logged strings", "note": "Database, date and strings: anyone can repeat the search and see what has changed since."}, "; ",
+           {"text": "one review snowballed both ways", "note": "Search and snowballing find different papers; together they found all twelve."}, ".\nMatrix: ",
+           {"text": "12 papers coded from their abstracts by a written rule", "note": "The rubric's bar for positioning: at least 12 sources, coded with a stated rule."}, "; ",
+           {"text": "no abstract reports both a storage link and extreme periods", "note": "Said as the coding allows: what the abstracts report, not what the papers lack."}, ".\nDirect check: ",
+           {"text": "a search of that cell returned 23 works; by their abstracts, at least three do both", "note": "The empty cell is tested, not assumed, and the gap as first stated does not survive."}, " (Hilbers et al. 2023; Moradi-Sepahvand and Tindemans 2023, 2024).\nClosest work: ",
+           {"text": "a second pass on Hilbers et al. finds a six-region test grid with demand and wind only, no solar", "note": "The closest work is read, not just named: the extraction sheet supplies the distinction."}, ".\nRemaining question: ",
+           {"text": "does choosing periods after a first model run still keep extremes and storage right once solar is added? The two other papers get a second pass before we claim it", "note": "A narrowed gap with its evidence, held as provisional: Proficient. Strong needs the other two read and the gap to survive a reviewer's search."}, "."],
+  "diff": [
+   {"label": "Evidence", "weak": "None given", "good": "Search log, review, matrix of 12"},
+   {"label": "The empty cell", "weak": "Assumed to be a gap", "good": "Searched directly: 23 works, at least 3 do both"},
+   {"label": "After the check", "weak": "\"The first\"", "good": "No novelty claim; a narrowed question, tied to the closest work's second pass"}
+  ],
+  "note": "Both answers are illustrative; the numbers in the strong one come from this page's dated OpenAlex snapshot."
+ },
+ "rubric": [{"id": "positioning", "look": "Your matrix has at least 12 papers and a written coding rule; the empty cell was searched directly; the closest prior work is read in a second pass."}],
+ "sources": [
+  {"label": "OpenAlex (open index of research works; data CC0)", "url": "https://openalex.org/", "as_of": "3 November 2026"},
+  {"label": "OpenAlex data licence", "url": "https://help.openalex.org/data/licenses", "as_of": "2 November 2026"}
+ ]
+}

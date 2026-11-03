@@ -1,0 +1,702 @@
+{
+ "about": "Modeler lesson M3: the choices the lesson offers and its reference results. The model is lesson 13's planning LP (13-capstone.json holds its costs and sources); the year is town_year.json (2025) and the second weather year m03-capacity-expansion-2024.json. The reference block is written by node _tests/learn/test_m03-capacity-expansion.js --write and re-solved by the same test on every run.",
+ "accessed": "2026-11-03",
+ "cap": 200,
+ "sets": [
+  {
+   "id": "typ4",
+   "label": "4 typical weeks",
+   "short": "4 typical",
+   "perSeason": 1,
+   "extremes": [],
+   "live": true
+  },
+  {
+   "id": "wk7",
+   "label": "4 typical + 3 extreme weeks",
+   "short": "4 + 3 extreme",
+   "perSeason": 1,
+   "extremes": [
+    "peak",
+    "netpeak",
+    "calm"
+   ],
+   "live": true
+  },
+  {
+   "id": "typ8",
+   "label": "8 typical weeks",
+   "short": "8 typical",
+   "perSeason": 2,
+   "extremes": [],
+   "live": true
+  },
+  {
+   "id": "wk11",
+   "label": "8 typical + 3 extreme weeks",
+   "short": "8 + 3 extreme",
+   "perSeason": 2,
+   "extremes": [
+    "peak",
+    "netpeak",
+    "calm"
+   ],
+   "live": false
+  },
+  {
+   "id": "wk15",
+   "label": "12 typical + 3 extreme weeks",
+   "short": "12 + 3 extreme",
+   "perSeason": 3,
+   "extremes": [
+    "peak",
+    "netpeak",
+    "calm"
+   ],
+   "live": false
+  }
+ ],
+ "storage": {
+  "set": "wk7",
+  "cap": 200,
+  "energyCapex": 20,
+  "energyCapexNote": "An illustrative what-if, not a forecast or a sourced cost: battery energy at $20 per kWh (lesson 13 uses the sourced $241 per kWh in 13-capstone.json, techs.battery), chosen so that the solver builds a battery large enough for the three rules between weeks to differ.",
+  "modes": [
+   "linked",
+   "cyclic",
+   "free"
+  ]
+ },
+ "reference": {
+  "about": "Written by node _tests/learn/test_m03-capacity-expansion.js --write; re-solved by the same test on every run. Costs in $ a year, CO2 in t a year, energy in MWh, power in MW.",
+  "sets": {
+   "typ4": {
+    "weeks": 4,
+    "hours": 672,
+    "cols": 3427,
+    "rows": 4861,
+    "picks": [
+     {
+      "week": 3,
+      "kind": "season",
+      "season": "winter",
+      "n": 12
+     },
+     {
+      "week": 20,
+      "kind": "season",
+      "season": "spring",
+      "n": 14
+     },
+     {
+      "week": 23,
+      "kind": "season",
+      "season": "summer",
+      "n": 13
+     },
+     {
+      "week": 38,
+      "kind": "season",
+      "season": "fall",
+      "n": 13
+     }
+    ],
+    "plan": {
+     "wind": 562.703,
+     "solar": 116.706,
+     "cc": 205.7,
+     "pk": 66.219,
+     "nuc": 0,
+     "bp": 1.645,
+     "be": 1.645
+    },
+    "cost": 125895803,
+    "co2": 200000,
+    "y2025": {
+     "cost": 127377172,
+     "co2": 217867,
+     "unserved": 878.9,
+     "hours": 53,
+     "maxShort": 53.1,
+     "shortWeeks": [
+      0,
+      3,
+      7,
+      25,
+      26,
+      27,
+      29,
+      30,
+      31,
+      32,
+      33,
+      38
+     ]
+    },
+    "y2024": {
+     "cost": 127091270,
+     "co2": 214474,
+     "unserved": 2343.1,
+     "hours": 85,
+     "maxShort": 67.6,
+     "shortWeeks": [
+      1,
+      2,
+      3,
+      26,
+      27,
+      28,
+      29,
+      30,
+      32,
+      33,
+      34
+     ]
+    }
+   },
+   "wk7": {
+    "weeks": 7,
+    "hours": 1176,
+    "cols": 5953,
+    "rows": 8389,
+    "picks": [
+     {
+      "week": 3,
+      "kind": "season",
+      "season": "winter",
+      "n": 11
+     },
+     {
+      "week": 20,
+      "kind": "season",
+      "season": "spring",
+      "n": 14
+     },
+     {
+      "week": 23,
+      "kind": "season",
+      "season": "summer",
+      "n": 11
+     },
+     {
+      "week": 38,
+      "kind": "season",
+      "season": "fall",
+      "n": 13
+     },
+     {
+      "week": 29,
+      "kind": "peak",
+      "season": "summer",
+      "n": 1
+     },
+     {
+      "week": 7,
+      "kind": "netpeak",
+      "season": "winter",
+      "n": 1
+     },
+     {
+      "week": 34,
+      "kind": "calm",
+      "season": "summer",
+      "n": 1
+     }
+    ],
+    "plan": {
+     "wind": 575.942,
+     "solar": 99.98,
+     "cc": 229.254,
+     "pk": 72.775,
+     "nuc": 0,
+     "bp": 15.057,
+     "be": 15.057
+    },
+    "cost": 129253235,
+    "co2": 200000,
+    "y2025": {
+     "cost": 130705594,
+     "co2": 217467,
+     "unserved": 107.9,
+     "hours": 8,
+     "maxShort": 22.6,
+     "shortWeeks": [
+      31,
+      32
+     ]
+    },
+    "y2024": {
+     "cost": 130459860,
+     "co2": 214552,
+     "unserved": 588.5,
+     "hours": 35,
+     "maxShort": 35.3,
+     "shortWeeks": [
+      1,
+      2,
+      29,
+      30,
+      33,
+      34
+     ]
+    }
+   },
+   "typ8": {
+    "weeks": 8,
+    "hours": 1344,
+    "cols": 6795,
+    "rows": 9565,
+    "picks": [
+     {
+      "week": 5,
+      "kind": "season",
+      "season": "winter",
+      "n": 8
+     },
+     {
+      "week": 50,
+      "kind": "season",
+      "season": "winter",
+      "n": 4
+     },
+     {
+      "week": 20,
+      "kind": "season",
+      "season": "spring",
+      "n": 11
+     },
+     {
+      "week": 18,
+      "kind": "season",
+      "season": "spring",
+      "n": 3
+     },
+     {
+      "week": 23,
+      "kind": "season",
+      "season": "summer",
+      "n": 10
+     },
+     {
+      "week": 32,
+      "kind": "season",
+      "season": "summer",
+      "n": 3
+     },
+     {
+      "week": 38,
+      "kind": "season",
+      "season": "fall",
+      "n": 8
+     },
+     {
+      "week": 42,
+      "kind": "season",
+      "season": "fall",
+      "n": 5
+     }
+    ],
+    "plan": {
+     "wind": 530.981,
+     "solar": 166.533,
+     "cc": 213.931,
+     "pk": 44.615,
+     "nuc": 0,
+     "bp": 19.43,
+     "be": 19.43
+    },
+    "cost": 127579790,
+    "co2": 200000,
+    "y2025": {
+     "cost": 128392865,
+     "co2": 209800,
+     "unserved": 750,
+     "hours": 42,
+     "maxShort": 64.2,
+     "shortWeeks": [
+      0,
+      3,
+      7,
+      27,
+      29,
+      31,
+      32,
+      33,
+      38
+     ]
+    },
+    "y2024": {
+     "cost": 128022931,
+     "co2": 205386,
+     "unserved": 2559.4,
+     "hours": 83,
+     "maxShort": 86.4,
+     "shortWeeks": [
+      1,
+      2,
+      3,
+      26,
+      27,
+      28,
+      29,
+      30,
+      32,
+      33,
+      34
+     ]
+    }
+   },
+   "wk11": {
+    "weeks": 11,
+    "hours": 1848,
+    "cols": 9321,
+    "rows": 13093,
+    "picks": [
+     {
+      "week": 5,
+      "kind": "season",
+      "season": "winter",
+      "n": 7
+     },
+     {
+      "week": 50,
+      "kind": "season",
+      "season": "winter",
+      "n": 4
+     },
+     {
+      "week": 20,
+      "kind": "season",
+      "season": "spring",
+      "n": 11
+     },
+     {
+      "week": 18,
+      "kind": "season",
+      "season": "spring",
+      "n": 3
+     },
+     {
+      "week": 23,
+      "kind": "season",
+      "season": "summer",
+      "n": 8
+     },
+     {
+      "week": 32,
+      "kind": "season",
+      "season": "summer",
+      "n": 3
+     },
+     {
+      "week": 38,
+      "kind": "season",
+      "season": "fall",
+      "n": 8
+     },
+     {
+      "week": 42,
+      "kind": "season",
+      "season": "fall",
+      "n": 5
+     },
+     {
+      "week": 29,
+      "kind": "peak",
+      "season": "summer",
+      "n": 1
+     },
+     {
+      "week": 7,
+      "kind": "netpeak",
+      "season": "winter",
+      "n": 1
+     },
+     {
+      "week": 34,
+      "kind": "calm",
+      "season": "summer",
+      "n": 1
+     }
+    ],
+    "plan": {
+     "wind": 551.532,
+     "solar": 142.679,
+     "cc": 221.517,
+     "pk": 83.656,
+     "nuc": 0,
+     "bp": 15.01,
+     "be": 15.01
+    },
+    "cost": 130856898,
+    "co2": 200000,
+    "y2025": {
+     "cost": 131634819,
+     "co2": 209372,
+     "unserved": 16.6,
+     "hours": 1,
+     "maxShort": 16.6,
+     "shortWeeks": [
+      31
+     ]
+    },
+    "y2024": {
+     "cost": 131336375,
+     "co2": 205826,
+     "unserved": 395.2,
+     "hours": 23,
+     "maxShort": 36.3,
+     "shortWeeks": [
+      1,
+      2
+     ]
+    }
+   },
+   "wk15": {
+    "weeks": 15,
+    "hours": 2520,
+    "cols": 12689,
+    "rows": 17797,
+    "picks": [
+     {
+      "week": 6,
+      "kind": "season",
+      "season": "winter",
+      "n": 3
+     },
+     {
+      "week": 50,
+      "kind": "season",
+      "season": "winter",
+      "n": 4
+     },
+     {
+      "week": 5,
+      "kind": "season",
+      "season": "winter",
+      "n": 4
+     },
+     {
+      "week": 20,
+      "kind": "season",
+      "season": "spring",
+      "n": 8
+     },
+     {
+      "week": 18,
+      "kind": "season",
+      "season": "spring",
+      "n": 3
+     },
+     {
+      "week": 9,
+      "kind": "season",
+      "season": "spring",
+      "n": 3
+     },
+     {
+      "week": 23,
+      "kind": "season",
+      "season": "summer",
+      "n": 8
+     },
+     {
+      "week": 24,
+      "kind": "season",
+      "season": "summer",
+      "n": 1
+     },
+     {
+      "week": 31,
+      "kind": "season",
+      "season": "summer",
+      "n": 2
+     },
+     {
+      "week": 38,
+      "kind": "season",
+      "season": "fall",
+      "n": 5
+     },
+     {
+      "week": 42,
+      "kind": "season",
+      "season": "fall",
+      "n": 3
+     },
+     {
+      "week": 41,
+      "kind": "season",
+      "season": "fall",
+      "n": 5
+     },
+     {
+      "week": 29,
+      "kind": "peak",
+      "season": "summer",
+      "n": 1
+     },
+     {
+      "week": 7,
+      "kind": "netpeak",
+      "season": "winter",
+      "n": 1
+     },
+     {
+      "week": 34,
+      "kind": "calm",
+      "season": "summer",
+      "n": 1
+     }
+    ],
+    "plan": {
+     "wind": 548.029,
+     "solar": 145.94,
+     "cc": 218.663,
+     "pk": 105.929,
+     "nuc": 0,
+     "bp": 8.999,
+     "be": 8.999
+    },
+    "cost": 131691745,
+    "co2": 200000,
+    "y2025": {
+     "cost": 132548132,
+     "co2": 210311,
+     "unserved": 0,
+     "hours": 0,
+     "maxShort": 0,
+     "shortWeeks": []
+    },
+    "y2024": {
+     "cost": 132262535,
+     "co2": 206925,
+     "unserved": 44.9,
+     "hours": 9,
+     "maxShort": 17.4,
+     "shortWeeks": [
+      1,
+      2
+     ]
+    }
+   }
+  },
+  "storage": {
+   "linked": {
+    "plan": {
+     "wind": 594.8,
+     "solar": 55.222,
+     "cc": 197.478,
+     "pk": 36.243,
+     "nuc": 0,
+     "bp": 80.973,
+     "be": 729.25
+    },
+    "cost": 126267014,
+    "full": {
+     "cost": 127748173,
+     "co2": 217866,
+     "unserved": 2101.3,
+     "hours": 59,
+     "maxShort": 125.1,
+     "shortWeeks": [
+      26,
+      30,
+      31,
+      32,
+      33
+     ]
+    },
+    "fullCo2": 217866,
+    "realCost": 129253235
+   },
+   "cyclic": {
+    "plan": {
+     "wind": 594.827,
+     "solar": 55.222,
+     "cc": 197.475,
+     "pk": 36.241,
+     "nuc": 0,
+     "bp": 80.975,
+     "be": 729.284
+    },
+    "cost": 126270305,
+    "full": {
+     "cost": 127750098,
+     "co2": 217849,
+     "unserved": 2101.4,
+     "hours": 59,
+     "maxShort": 125.1,
+     "shortWeeks": [
+      26,
+      30,
+      31,
+      32,
+      33
+     ]
+    },
+    "fullCo2": 217849,
+    "realCost": 129264970
+   },
+   "free": {
+    "plan": {
+     "wind": 547.116,
+     "solar": 54.072,
+     "cc": 173.405,
+     "pk": 10.601,
+     "nuc": 0,
+     "bp": 136.737,
+     "be": 2684.627
+    },
+    "cost": 123744751,
+    "full": {
+     "cost": 127636011,
+     "co2": 246750,
+     "unserved": 8111.8,
+     "hours": 118,
+     "maxShort": 170.1,
+     "shortWeeks": [
+      0,
+      1,
+      26,
+      27,
+      30,
+      31,
+      32,
+      33,
+      34
+     ]
+    },
+    "fullCo2": 246750,
+    "realCost": 129231194
+   }
+  },
+  "full": {
+   "cols": 43807,
+   "rows": 52561,
+   "plan": {
+    "wind": 551.501,
+    "solar": 160.97,
+    "cc": 239.243,
+    "pk": 72.673,
+    "nuc": 0,
+    "bp": 12.249,
+    "be": 12.249
+   },
+   "cost": 133221913,
+   "co2": 200000,
+   "capDual": 138.6,
+   "y2024": {
+    "cost": 132881776,
+    "co2": 195945,
+    "unserved": 238.6,
+    "hours": 18,
+    "maxShort": 29.5,
+    "shortWeeks": [
+     1,
+     2
+    ]
+   }
+  }
+ }
+}

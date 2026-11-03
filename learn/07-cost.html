@@ -478,6 +478,7 @@ window.Quarto = {
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span>EIA and ATB inputs in real 2025 dollars, with no taxes, credits or grid costs, so not the agencies' own LCOEs; Prairie Town's plants are illustrative. Sources and dates: <a href="#inputs">where the inputs come from</a>.</span></p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k01-units.html">K1</a> ($ per kW against $ per MWh) and <a href="k02-rates-efficiencies.html">K2</a> (fuel cost per MWh from a heat rate).</p>
 </div>
 <div id="explain" class="lx-sec">
 <section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
@@ -504,14 +505,17 @@ window.Quarto = {
 <p><span class="math display">\[C = \sum_{t=1}^{n} \frac{A}{(1+r)^t} = A\,\frac{1-(1+r)^{-n}}{r},\]</span></p>
 <p><span class="math display">\[\text{so}\quad A = \frac{r}{1-(1+r)^{-n}}\, C = \mathrm{CRF}\cdot C .\]</span></p>
 <p>When <span class="math inline">\(r = 0\)</span> the <span class="lx-term" data-term="capital-recovery-factor">capital recovery factor</span> is simply <span class="math inline">\(1/n\)</span>.</p>
+<p class="lx-hint" style="margin-top:10px">
+Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and the capital recovery factor).
+</p>
 <p>The <span class="lx-term" data-term="lcoe">LCOE</span> is the steady price at which the plant’s discounted sales repay everything, so its net present value is zero.</p>
 <p>Each kW makes <span class="math inline">\(E = \mathrm{CF} \times 8{,}760 / 1{,}000\)</span> MWh a year, with the <span class="lx-term" data-term="capacity-factor">capacity factor</span> (<a href="05-capacity-factor.html">lesson 5</a>) as a fraction: 33.8% is 0.338.</p>
 <p><span class="math display">\[\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{fuel} + \mathrm{VOM}\]</span></p>
 <p>Here fuel per MWh = <span class="lx-term" data-term="heat-rate">heat rate</span> (MMBtu per MWh) × gas price ($ per MMBtu).</p>
 <p>Check it on the wind farm:</p>
 <ul>
-<li><span class="math inline">\(\mathrm{CRF}(4\%, 30) = 0.05783\)</span>;</li>
-<li>yearly cost: <span class="math inline">\(0.05783 \times 1{,}712 + 34.57 = 133.58\)</span> $/kW;</li>
+<li><span class="math inline">\(\mathrm{CRF}(4\%, 30) = 0.0578301\)</span>;</li>
+<li>yearly cost: <span class="math inline">\(0.0578301 \times 1{,}712 + 34.57 = 133.58\)</span> $/kW;</li>
 <li>yearly output: <span class="math inline">\(E = 0.338 \times 8.76 = 2.961\)</span> MWh per kW;</li>
 <li>LCOE: <span class="math inline">\(133.58 / 2.961 = \$45.11\)</span> per MWh.</li>
 </ul>
@@ -527,7 +531,7 @@ window.Quarto = {
 <ul>
 <li><p>It charges each kW it builds a yearly <span class="math inline">\(\mathrm{CRF}\cdot C + \mathrm{FOM}\)</span>, and every MWh its fuel and upkeep.</p></li>
 <li><p>It chooses what to build and how to run it, hour by hour, in one optimization, so step 8’s timing problem is inside the model.</p></li>
-<li><p>Capacity expansion with representative days (M3, upcoming in the Modeler tier) uses exactly this yearly charge.</p></li>
+<li><p>Capacity expansion with representative periods (<a href="../learn/m03-capacity-expansion.html">M3</a>, in the Modeler tier) uses exactly this yearly charge.</p></li>
 <li><p>Techno-economic analysis inside an optimization model (M11, upcoming) adds taxes, credits and a boundary choice.</p></li>
 <li><p>Year-by-year cash flows, NPV, IRR and payback for one project are the Analyst lesson A1 (upcoming).</p></li>
 </ul>
@@ -646,10 +650,10 @@ window.Quarto = {
 <!-- learn:next:end -->
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>A levelized cost and a system's cost can move in opposite directions. In my study of a wind farm with hydrogen equipment (<a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design, 2024</a>):</p>
-<p>→ a higher hydrogen price led the optimizer to build a larger electrolyzer;</p>
-<p>→ the hydrogen's cost per kilogram rose;</p>
-<p>→ while the whole system's net cost fell.</p>
+<p>A levelized cost and a system's cost can move in opposite directions.</p>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:wind-hydrogen"><p>A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger <span class="lx-term" data-term="electrolyzer">electrolyzer</span> to capture more surplus wind.</p><p>The extra capacity runs fewer full-load hours, so the cost per kilogram, the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span>, goes up.</p><p>Yet the added hydrogen revenue lowers the net cost of the whole system.</p><p>The cost per kilogram and the system's cost move in opposite directions.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
+<p class="lx-hint">The full case: case file <a href="cf2-cost-per-kg-vs-system-cost.html">CF2</a> (when the cost per kilogram and the cost of the system disagree).</p>
+<p class="lx-hint">Case file <a href="cf7-cost-of-waiting.html">CF7</a> (what waiting for a grid connection costs, and who pays).</p>
 </div>
 <div class="lx-card" id="inputs">
 <p class="lx-eyebrow">Where the inputs come from</p>
