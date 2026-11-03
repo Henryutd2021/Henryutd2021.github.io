@@ -1,6 +1,6 @@
 // test_components_w2.js — Node tests for the studio and case-file components added by the W2 infra branch (2026-11-03):
 //   exemplars.js (LX.Exemplars), rubric.js (LX.Rubric), questioncard.js (LX.QuestionCard), timeline.js (LX.Timeline),
-//   and the page pieces of the two forms (forms.css).
+//   the page pieces of the two forms (forms.css), and lesson 13's planning engine promoted to planengine.js/.css.
 //   - each file defines its LX.<Name> with a stub window.LX, exports its pure part to Node, uses --lx-* tokens only, and is
 //     in the generated bundle (learn.js, learn.css)
 //   - the pure parts: exemplar marks, plain text, checks and the no-JS version; the rubric's words (against curriculum v2
@@ -9,6 +9,8 @@
 //     and checks
 //   - the views on a stub document (_tests/learn/stubdom.js): keyboard and click reveal, aria state, live regions,
 //     browser storage, copy boxes, links
+//   - the planning engine: exported for Node and as LX.townPlan (with its page kit), the same object from 13-capstone.js,
+//     no copy left in lesson 13, lesson 12 no longer loads 13-capstone.js (test_12 and test_13 check the numbers)
 // Usage (from the site folder):  node _tests/learn/test_components_w2.js
 "use strict";
 const fs = require("fs");
@@ -267,6 +269,29 @@ function timeline() {
   ok(d.querySelectorAll(".lx-tl-gap")[0].textContent === "17 months earlier" && !d.querySelector("header"), "timeline view: newest first counts back");
   let threw = false; try { E.LX.Timeline(d, { events: [{ date: "x" }] }); } catch (e) { threw = /LX.Timeline: event 1/.test(e.message); }
   ok(threw, "timeline view: malformed events throw with the reason");
+  engine();
+}
+// ---------------------------------------------------------------- the planning engine (planengine.js), shared by lessons 12 and 13
+function engine() {
+  const src = fs.readFileSync(L("components/planengine.js"), "utf8"), css = fs.readFileSync(L("components/planengine.css"), "utf8");
+  const t13 = fs.readFileSync(L("13-capstone.js"), "utf8"), t12 = fs.readFileSync(L("12-trade-offs.js"), "utf8");
+  ok(src.split("\n")[0].indexOf("/* planengine.js — LX.townPlan") === 0 && css.split("\n")[0].indexOf("/* planengine.css — ") === 0, "planengine: header comments");
+  ok(!/#[0-9a-fA-F]{3,6}\b|rgba?\(/.test(css.replace(/\/\*[\s\S]*?\*\//g, "")) && !/#[0-9a-fA-F]{6}\b|rgba?\(/.test(src.replace(/\/\*[\s\S]*?\*\//g, "")), "planengine: colours from --lx-* tokens only");
+  ok(bundleJS.indexOf(src.trim().slice(0, 200)) >= 0 && bundleCSS.indexOf(css.trim().slice(0, 200)) >= 0, "planengine: in the generated bundle");
+  const E = require(L("components/planengine.js"));
+  ["prepareYear", "selectWeeks", "costs", "build", "weekModel", "fullYearModel", "periodsOf", "summarize", "encodePlan", "decodePlan", "frontierAt", "fullVerdict"].forEach(k =>
+    ok(typeof E[k] === "function", `planengine: exports ${k}`));
+  ok(require(L("13-capstone.js")) === E, "planengine: require(\"13-capstone.js\") gives the same engine (older callers)");
+  const ctx = { window: { LX: { H: () => ({}) } }, module: { exports: {} } };
+  vm.runInNewContext(src, ctx);
+  const ui = ctx.window.LX.townPlan && ctx.window.LX.townPlan.ui;
+  ok(ctx.window.LX.townPlan && ui && ["TextTable", "Num", "css", "fm", "TECH"].every(k => k in ui) && ui.fm.musd(129.3e6) === "$129.3M" && ui.fm.kt(200000) === "200 kt",
+     "planengine: LX.townPlan and its page kit (TextTable, Num, css, fm, TECH) in the browser");
+  ok(!/function (weekModel|fullYearModel|selectWeeks|summarize|prepareYear|TextTable|Num)\s*\(/.test(t13) && /require\("\.\/components\/planengine\.js"\)/.test(t13) && !/lx13-css/.test(t13),
+     "lesson 13 keeps no copy of the engine, its page kit or its injected styles");
+  ok(!/<script[^>]*13-capstone\.js/.test(fs.readFileSync(path.join(SITE, "learn/12-trade-offs.qmd"), "utf8")) && !/13-capstone\.js(?!on)/.test(t12.split("\n").filter(l => !/^\s*\/\//.test(l)).join("\n")),
+     "lesson 12 no longer loads 13-capstone.js");
+  ["lx13-card", "lx13-stage", "lx13-head", "lx13-sub", "lx13-tt"].forEach(c => ok(css.indexOf("." + c) >= 0, `planengine.css styles .${c} (used by lessons 12 and 13)`));
   finish();
 }
 function finish() {

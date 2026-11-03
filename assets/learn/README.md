@@ -90,6 +90,7 @@ The older forms keep their sections: `cards` (`#steps`, `#explain`, `#check`, `#
   - `learn_qa.sh` renders a preview of a draft named on its command line (see Checks).
   - Write links for the page's live place, `learn/<id>.html` (`../assets/...`, `index.html`).
   - After approval: `git mv learn/_drafts/<id>.qmd learn/<id>.qmd` and set `status: active`. The build fails while a live page and a draft share an id.
+- **Screenshots.** `scripts/learn_screenshots.mjs --states top,explain,sec-selfcheck` works for both forms. On a studio, `explain` (and `open`) show `#exemplars`; `sec-<id>` scrolls to any section and clips the shot to it (`sec-task`, `sec-selfcheck`, `sec-case`, `sec-check`, `sec-sources`). A draft needs a rendered preview first: `learn_qa.sh` makes one.
 - **The `path.yml` row.** A case file is a `kind: lesson` row with `form: case`, its `code` and `id` from `reports/learn/learn_map_v2.yml` (for example `CF7`, `cf7-cost-of-waiting`), a `tier` (every lesson row needs one; the coordinator confirms which), `minutes: 10`, `after:` its prerequisites, and `status: upcoming`.
 
 ## Lesson JS skeleton
@@ -417,7 +418,7 @@ fc.price(44, { co2, cost });   fc.pick(function (id) {});   fc.focusDot("A");
 ```
 
 - `pick` makes the plan dots buttons (Tab, Enter, Space). Axis texts, scales and labels have options (`xMax`, `yMin`, `xLabel`, `fmtX`, ...).
-- Replaces lesson 13's `FrontierChart`, which lesson 12 read as `LX.townPlan.ui.FrontierChart` (gone from `ui`).
+- Replaces lesson 13's `FrontierChart`, which lesson 12 read as `LX.townPlan.ui.FrontierChart` (gone from `ui`). With the planning engine (`planengine.js`, W2), it is the i-pareto pair: `LX.townPlan` solves, `LX.Frontier` draws.
 
 #### Cards for the explain layer and contested points
 
@@ -669,7 +670,7 @@ var P = LX.Practice(host, { id: "b1-practice", title: "Practice", lede: "One sen
 
 ### Added in wave W2 (2026-11-03): studios and case files
 
-The build bundles these after the W1 set (`W2_JS`, `W2_CSS` in `scripts/build_learn.py`). Node tests: `_tests/learn/test_components_w2.js`, which also compares the rubric's words with curriculum v2 §3.4 when `LEARN_CURRICULUM=<path to curriculum_v2.md>` is set, or when the curriculum sits at `../reports/learn/` from the site folder. `_tests/learn/stubdom.js` is a small stub document for testing a view in Node (`env()`, `load(name, E)`, `buttons()`); it is not a test itself.
+The build bundles these after the W1 set (`W2_JS`, `W2_CSS` in `scripts/build_learn.py`), the planning engine last. Node tests: `_tests/learn/test_components_w2.js`, which also compares the rubric's words with curriculum v2 §3.4 when `LEARN_CURRICULUM=<path to curriculum_v2.md>` is set, or when the curriculum sits at `../reports/learn/` from the site folder. `_tests/learn/stubdom.js` is a small stub document for testing a view in Node (`env()`, `load(name, E)`, `buttons()`); it is not a test itself.
 
 Each component's pure part has a `staticHTML` that writes the no-JS fallback from the same data. A lesson's test can write it between markers in `--write` mode and check it otherwise, as CK-F does.
 
@@ -731,6 +732,21 @@ LX.Timeline(H("div", { class: "lx-card" }, live), { title: "The study in time",
 - **Sources.** Every event needs a source (a label; an http(s) `url` and an `as_of` date are optional). The view throws on a malformed event.
 - **Layout.** An ordered list, so it is its own text version. The date column sits on the left from 760 px.
 - **Pure.** `parse`, `fmt`, `sortEvents`, `gap`, `validate`, `staticHTML` (the page's `<ol class="lx-tl-static">`).
+
+**Planning engine** (`planengine.js`, `planengine.css`; a one-region capacity-expansion LP): `LX.townPlan`, Prairie Town's capacity plan as a linear program, promoted unchanged from lesson 13. Lessons 12 and 13 use this shared copy; lesson 12 no longer loads `13-capstone.js`.
+
+```js
+var TP = LX.townPlan;   // Node: require("assets/learn/components/planengine.js"); require("13-capstone.js") returns the same object
+var Y = TP.prepareYear(data.town_year, data.cf_targets, cfg), RW = TP.selectWeeks(Y, cfg.weeks), C = TP.costs(cfg, {});
+LX.solver.solve(TP.weekModel(C, RW, { cap: 200e3 }), { timeLimit: 10 }).then(function (r) { var s = TP.summarize(C, TP.periodsOf(RW), r, { cap: 200e3 }); });
+TP.fullYearModel(C, Y, { plan: plan });   // the same LP on all 8,760 hours (a plan fixed, or optimized: slow)
+```
+
+- **Model.** Seven representative weeks of 2025 with linked battery states (or the full year), a CO₂ cap or a carbon price, and wind and solar scaled to EIA's 2025 capacity factors. `cfg` is `data/13-capstone.json`, with costs from primary sources and dates. The model, the time representation and the checks are described in the file's header.
+- **Pure helpers.** `summarize`, `encodePlan` and `decodePlan` (`#plan-...` links), `weekSeries`, `frontierAt`, `ceilPlan`, `stars`, `capReading`, `fullVerdict`, `crf`, `fixedCost`, `build`, `KEYS`.
+- **Page kit.** `LX.townPlan.ui` holds `TECH` (names and colours), `fm` (`musd`, `kt`, `pct`, `mwh`, `k`), `Num` (a numeric control in the slider look), `TextTable` (a table of words that becomes cards on phones) and `css()`, now a no-op because the styles are in `planengine.css`. They keep their `lx13-` class names, because both lessons use them.
+- **Tests.** `node _tests/learn/test_13-capstone.js [--full]` and `test_12-trade-offs.js` load the component. Their output was identical before and after the move. `_tests/learn/solver_models.js` (the solver benchmark) loads it too.
+- **Building on it (M3, A22).** Use `LX.townPlan` for the model and `LX.Frontier` for the frontier chart. Keep MILP duals out (§9.2): this LP's cap dual is a marginal value under its stated assumptions. A different planning model belongs in its own component, not in a fork of this one.
 
 **Form pieces** (`forms.css`, CSS only): `.lx-studio-task` (the studio's task list), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try`, and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`.
 
