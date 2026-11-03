@@ -5,8 +5,11 @@
 // duration ladder, 2021 installed costs from DOE's 2022 storage assessment, numbers to remember, and a reference block
 // written by the test), town_year.json (SPP 2025 hourly shapes, EIA-930) and cf_targets.json (EIA capacity factors).
 //
-// The engine (pure, no DOM; exported for Node). It is lesson-local and kept small so that it can later be served by the
-// shared single-site engine E0 (SB0): inputs -> LP -> results.
+// The engine (pure, no DOM; exported for Node): inputs -> LP -> results. It stays lesson-local (W3 integration,
+// 2026-11-03): engine E0 (components/engine-e0.js, SB0 and C0) models one site's bill or revenue, with storage cyclic in
+// each period, one 85% round trip and no unserved energy, so it cannot state this week LP (least unserved energy on the
+// Plains Grid with firm output, four stores each with its own round trip and standing loss, the store full at the start,
+// this tie rule) without a second model inside E0; moving A8 would change the engine, not reuse it.
 //   prepare(D, year, targets, profile) -> W   the week: demand, wind, solar and firm output, hour by hour (168 hours)
 //   build(W, store, opts) -> LP                one store dispatched through the week (LX.solver model format)
 //   read(W, store, r) -> result                unserved energy, the share of the shortfall covered, the store's schedule

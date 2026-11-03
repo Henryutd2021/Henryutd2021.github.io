@@ -10,8 +10,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- A8 in the step-card form with a linear program (Learn W3, builder learn-w3-e, 2026-11-03). Model, step cards and
-     explain layer: assets/learn/a08-storage-duration.js (a small lesson-local engine: inputs -> LP -> results, ready to be
-     served by the shared engine E0 later) with assets/learn/data/a08-storage-duration.json, town_year.json and
+     explain layer: assets/learn/a08-storage-duration.js (a small lesson-local engine: inputs -> LP -> results; engine E0
+     does not state this model, see the JS header) with assets/learn/data/a08-storage-duration.json, town_year.json and
      cf_targets.json. Tests: node _tests/learn/test_a08-storage-duration.js re-solves every number below
      (--write rewrites the data file's reference block). Generated, do not edit by hand: the learn:meta, learn:next and
      learn:footer blocks. -->
