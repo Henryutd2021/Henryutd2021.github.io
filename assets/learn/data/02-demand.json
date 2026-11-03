@@ -3,7 +3,7 @@
     "title": "Lesson 2 settings: which real days and weeks to show, and the sourced anchors",
     "lesson": "learn/02-demand.qmd (model and view: assets/learn/02-demand.js; tests: _tests/learn/test_02-demand.js)",
     "built": "2026-11-02",
-    "note": "All curves are the real 2025 hourly shapes of the Southwest Power Pool (town_days.json, town_year.json; EIA-930), scaled so that Prairie Town's highest hour of 2025 is town_peak_mw, the same scale as lesson 0 (town.json, scenario lesson0, demandPeakMW). The solar slider adds a hypothetical solar farm that follows SPP's real solar shape of the chosen day."
+    "note": "All curves are processed 2025 hourly profiles of the Southwest Power Pool (town_days.json, town_year.json; EIA-930: implausible demand hours rebuilt from the day-ahead forecast, frozen solar telemetry filled from nearby days, solar zeroed after dark; the named days contain no rebuilt or filled hours), scaled so that Prairie Town's highest hour of 2025 is town_peak_mw, the same scale as lesson 0 (town.json, scenario lesson0, demandPeakMW). The solar slider adds a hypothetical solar farm that follows SPP's solar shape of the chosen day; its MW is the farm's output in SPP's top solar hour of 2025 (an illustrative maximum, not a nameplate rating)."
   },
   "town_peak_mw": 450,
   "predict": { "day": "summer_peak", "options": [8, 12, 16, 21] },

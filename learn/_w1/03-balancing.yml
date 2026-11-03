@@ -26,6 +26,12 @@ glossary:
   - id: fast-frequency-response
     term: Fast frequency response
     def: "Power from batteries or other inverter-based resources delivered within a fraction of a second of a frequency drop."
+  - id: inverter
+    term: Inverter
+    def: "Power electronics that convert the direct current of solar panels and batteries, or a wind turbine's varying output, into the grid's alternating current."
+  - id: load-relief
+    term: Load relief
+    def: "The small drop in demand when the frequency falls, because many motors turn a little slower and draw less power."
 requests:
   - "Promote the lesson-local plot() helper (identical copies in assets/learn/03-balancing.js and 04-forecasts.js: lines with draw-on animation, bars, reference lines, marks, axis unit, phone tick sets, hover tip, legend) into assets/learn/components/ as a shared XY chart (it covers i-band and simple line charts), together with the .w1-stage / .w1-chips / .w1-chip styles from the pages' style blocks (a chart card with value chips above it)."
   - "learn_screenshots.mjs: its mid, done and explain states drive lesson 0's game only. Lessons 3 and 4 expose root.lxDemo(state) on the .lx-interactive (lesson 3: mid = step 5 with 30 MW of reserve, agc = step 6, uri = step 8; lesson 4: mid = step 2 on the biggest-miss day, band = step 5, cost = step 6 at the cheapest margin). This build used a patched copy of the script (scratchpad/w1b_tools/shots.mjs) that calls lxDemo(state) for any state other than top, nojs, explain, open, full and quiz. A generic hook in the shared script would remove the copy."

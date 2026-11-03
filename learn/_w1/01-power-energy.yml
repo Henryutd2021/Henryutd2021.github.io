@@ -16,6 +16,9 @@ glossary:
   - id: fermi-estimate
     term: Fermi estimate
     def: "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right."
+  - id: log-scale
+    term: Log scale
+    def: "A scale on which each equal step multiplies the value by the same factor, often 10, so tiny and huge values fit on one chart."
 requests:
   - "Promote lesson-local components from assets/learn/01-power-energy.js: the appliance board (toggles, power and energy meters, two-panel power and energy chart with a text version), the energy ladder (place items on Wh to TWh rungs), the bathtub annotated diagram, and the scale strip (the curriculum's e-scale-strip). Their CSS is in the style block at the end of learn/01-power-energy.qmd (classes t1-*)."
   - "LX.CompareTable: an option for text-heavy rows. On phones the shared layout (22px | 1fr | auto | auto, right-aligned cells) overlaps long text; lessons 1 and 2 override it locally with .t1-tt and .t2-tt (one column, left-aligned labelled lines)."

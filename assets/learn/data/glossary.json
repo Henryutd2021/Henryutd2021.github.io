@@ -245,6 +245,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "electrification": {
+  "term": "Electrification",
+  "short": "Switching a use of energy, such as heating or driving, from burning fuel to using electricity.",
+  "lesson": 2,
+  "href": "02-demand.html"
+ },
  "emissions-cap": {
   "term": "Emissions cap",
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
@@ -347,6 +353,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "heat-pump": {
+  "term": "Heat pump",
+  "short": "A device that uses electricity to move heat, into a building to warm it or out of it to cool it.",
+  "lesson": 2,
+  "href": "02-demand.html"
+ },
  "heat-rate": {
   "term": "Heat rate",
   "short": "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient.",
@@ -376,6 +388,12 @@
   "short": "Said of a model whose rules contradict each other, so that no plan meets them all.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "inverter": {
+  "term": "Inverter",
+  "short": "Power electronics that convert the direct current of solar panels and batteries, or a wind turbine's varying output, into the grid's alternating current.",
+  "lesson": 3,
+  "href": "03-balancing.html"
  },
  "kilowatt": {
   "term": "Kilowatt (kW)",
@@ -407,6 +425,12 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
+ "load-relief": {
+  "term": "Load relief",
+  "short": "The small drop in demand when the frequency falls, because many motors turn a little slower and draw less power.",
+  "lesson": 3,
+  "href": "03-balancing.html"
+ },
  "load-duration-curve": {
   "term": "Load-duration curve",
   "short": "A year's hourly demand sorted from highest to lowest, showing for how many hours each level of demand is needed.",
@@ -418,6 +442,12 @@
   "short": "The extra cost per megawatt-hour of serving a small increase in demand at one place on the grid in one interval, given the plants running and the limits of the lines.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "log-scale": {
+  "term": "Log scale",
+  "short": "A scale on which each equal step multiplies the value by the same factor, often 10, so tiny and huge values fit on one chart.",
+  "lesson": 1,
+  "href": "01-power-energy.html"
  },
  "marginal-cost": {
   "term": "Marginal cost",
@@ -497,6 +527,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "operating-emissions": {
+  "term": "Operating emissions",
+  "short": "The CO2 released where fuel is burned to make electricity, leaving out building the plant and producing and delivering its fuel.",
+  "lesson": 0,
+  "href": "00-grid-operator.html"
+ },
  "optimality-gap": {
   "term": "Optimality gap",
   "short": "For a mixed-integer program, the remaining distance between the best plan the solver has found and the bound it has proven, so 0% means proven best.",
@@ -523,7 +559,7 @@
  },
  "peak-demand": {
   "term": "Peak demand",
-  "short": "The highest demand in a period, such as the busiest hour of a year, which sets how much capacity the grid needs.",
+  "short": "The highest demand in a period, such as the busiest hour of a year; the grid must be able to meet it, with a margin.",
   "lesson": 2,
   "href": "02-demand.html"
  },

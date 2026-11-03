@@ -50,11 +50,12 @@ body-classes: "page-learn page-lesson lx-form-play"
 <path d="M46.0,103.3V103.3H73.8V107.4H101.5V110.4H129.3V112.2H157.0V111.6H184.8V111.0H212.5V101.5H240.3V97.3H268.0V93.7H295.8V86.6H323.5V81.8H351.3V73.5H379.0V67.0H406.8V57.4H434.5V49.7H462.3V47.3H490.0V42.0H517.8V44.3H545.5V47.3H573.3V55.1H601.0V62.2H628.8V71.7H656.5V82.4H684.3V91.9H712.0" fill="none" stroke="var(--lx-ink)" stroke-width="2" stroke-dasharray="5 3"/>
 </svg>
 <div class="lx-legend" aria-hidden="true"><span><i style="--c:var(--lx-nuc)"></i>Nuclear</span><span><i style="--c:var(--lx-solar)"></i>Solar</span><span><i style="--c:var(--lx-wind)"></i>Wind</span><span><i style="--c:var(--lx-cc)"></i>Gas combined-cycle</span><span><i style="--c:var(--lx-pk)"></i>Gas peaker</span><span><i class="line"></i>Demand</span></div>
+<details class="lx-textalt"><summary>Text version: the day as a table, in MW</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Nuclear</th><th scope="col">Wind</th><th scope="col">Solar</th><th scope="col">Gas CC</th><th scope="col">Peaker</th><th scope="col">Spilled</th></tr></thead><tbody><tr><td>00:00</td><td>250</td><td>100</td><td>30</td><td>0</td><td>120</td><td>0</td><td>0</td></tr><tr><td>01:00</td><td>243</td><td>100</td><td>28</td><td>0</td><td>115</td><td>0</td><td>0</td></tr><tr><td>02:00</td><td>238</td><td>100</td><td>28</td><td>0</td><td>110</td><td>0</td><td>0</td></tr><tr><td>03:00</td><td>235</td><td>100</td><td>30</td><td>0</td><td>105</td><td>0</td><td>0</td></tr><tr><td>04:00</td><td>236</td><td>100</td><td>36</td><td>0</td><td>100</td><td>0</td><td>0</td></tr><tr><td>05:00</td><td>237</td><td>100</td><td>42</td><td>0</td><td>95</td><td>0</td><td>0</td></tr><tr><td>06:00</td><td>253</td><td>100</td><td>43</td><td>0</td><td>110</td><td>0</td><td>0</td></tr><tr><td>07:00</td><td>260</td><td>100</td><td>48</td><td>7</td><td>105</td><td>0</td><td>0</td></tr><tr><td>08:00</td><td>266</td><td>100</td><td>40</td><td>61</td><td>65</td><td>0</td><td>15</td></tr><tr><td>09:00</td><td>278</td><td>100</td><td>35</td><td>118</td><td>25</td><td>0</td><td>0</td></tr><tr><td>10:00</td><td>286</td><td>100</td><td>36</td><td>130</td><td>20</td><td>0</td><td>0</td></tr><tr><td>11:00</td><td>300</td><td>100</td><td>38</td><td>147</td><td>15</td><td>0</td><td>0</td></tr><tr><td>12:00</td><td>311</td><td>100</td><td>35</td><td>156</td><td>20</td><td>0</td><td>0</td></tr><tr><td>13:00</td><td>327</td><td>100</td><td>33</td><td>149</td><td>45</td><td>0</td><td>0</td></tr><tr><td>14:00</td><td>340</td><td>100</td><td>33</td><td>112</td><td>85</td><td>10</td><td>0</td></tr><tr><td>15:00</td><td>344</td><td>100</td><td>37</td><td>147</td><td>60</td><td>0</td><td>0</td></tr><tr><td>16:00</td><td>353</td><td>100</td><td>47</td><td>161</td><td>45</td><td>0</td><td>0</td></tr><tr><td>17:00</td><td>349</td><td>100</td><td>54</td><td>130</td><td>65</td><td>0</td><td>0</td></tr><tr><td>18:00</td><td>344</td><td>100</td><td>59</td><td>70</td><td>105</td><td>10</td><td>0</td></tr><tr><td>19:00</td><td>331</td><td>100</td><td>72</td><td>14</td><td>145</td><td>0</td><td>0</td></tr><tr><td>20:00</td><td>319</td><td>100</td><td>89</td><td>0</td><td>130</td><td>0</td><td>0</td></tr><tr><td>21:00</td><td>303</td><td>100</td><td>98</td><td>0</td><td>105</td><td>0</td><td>0</td></tr><tr><td>22:00</td><td>285</td><td>100</td><td>95</td><td>0</td><td>90</td><td>0</td><td>0</td></tr><tr><td>23:00</td><td>269</td><td>100</td><td>89</td><td>0</td><td>80</td><td>0</td><td>0</td></tr></tbody></table></div></details>
 <!-- fallback-svg:end -->
 <p class="lx-hint">With JavaScript on, you run this day yourself: set two gas plants, hour by hour, so that supply equals demand.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants and its prices are illustrative.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, prices and CO₂ rates are illustrative; CO₂ counts fuel burned at the plants only.</span></p>
 ```
 :::
 
@@ -67,8 +68,8 @@ body-classes: "page-learn page-lesson lx-form-play"
 <div id="g0-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Balance</dt><dd>Supply must equal demand at every moment, because the grid stores almost nothing.</dd>
-<dt>Frequency</dt><dd>Generators spin in step at 60 cycles per second; too little power slows them, too much speeds them up.</dd>
+<dt>Balance</dt><dd>Supply must equal demand at every moment. Prairie Town has no storage; real grids also use some, such as batteries (lesson 9).</dd>
+<dt>Frequency</dt><dd>The alternating voltage completes 60 cycles each second, and generators turn in step with it; too little power slows them.</dd>
 <dt>Variable and dispatchable plants</dt><dd>Wind and sun follow the weather; gas plants follow the operator's orders.</dd>
 <dt>Ramp limit</dt><dd>The combined-cycle plant can change its output by only 40 MW from one hour to the next.</dd>
 <dt>Merit order</dt><dd>Run the cheapest plant first and the most expensive last.</dd>
@@ -89,36 +90,40 @@ For every hour $t$, with $p_g(t)$ the output of plant $g$ in MW, $u(t)$ the [uns
 
 $$\sum_g p_g(t) + u(t) - s(t) = d(t).$$
 
-Energy, cost and CO₂ are sums over the hours, with $\Delta t = 1$ hour, a running cost $c_g$ in \$/MWh and an emission rate $e_g$ in t/MWh:
+Energy, cost and CO₂ are sums over the hours, with $\Delta t = 1$ hour, a running cost $c_g$ in \$/MWh and an operating emission rate $e_g$ in t/MWh (t = metric tonnes):
 
 $$E_g = \sum_t p_g(t)\,\Delta t, \qquad C = \sum_t \sum_g c_g\,p_g(t)\,\Delta t, \qquad \mathrm{CO_2} = \sum_t \sum_g e_g\,p_g(t)\,\Delta t.$$
 
-Check it on the cheapest-first rule's day: 2,400 MWh of nuclear, 1,960 MWh from the combined-cycle plant and 20 MWh from the peaker give $C = 2400 \times 10 + 1960 \times 40 + 20 \times 100 = \$104{,}400$ and $1960 \times 0.37 + 20 \times 0.55 = 736.2$ t of CO₂.
+Check it on the cheapest-first rule's day:
+
+- **Energy:** 2,400 MWh of nuclear, 1,960 MWh from the combined-cycle plant, 20 MWh from the peaker.
+- **Cost:** $C = 2400 \times 10 + 1960 \times 40 + 20 \times 100 = \$104{,}400$.
+- **CO₂:** $1960 \times 0.37 + 20 \times 0.55 = 736.2$ t, from the gas plants' fuel only.
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The operator's job as a small optimization problem</summary>
+<summary><span class="k">Go deeper · Modeler</span>Preview: the operator's day as an optimization problem</summary>
 <div class="lx-deeper-body">
+<dl class="lx-ideas">
+<dt>Decisions</dt><dd>Each gas plant's output, every hour: 48 numbers.</dd>
+<dt>Goal</dt><dd>The lowest gas running cost for the day. The flat nuclear output costs the same in every plan, so the goal leaves it out.</dd>
+<dt>Rules</dt><dd>Supply equals demand each hour; each plant stays within its size; the combined-cycle changes by at most 40 MW an hour, starting from 115 MW at midnight.</dd>
+</dl>
 ```
 
-The decisions are the gas outputs $p_\mathrm{cc}(t)$ and $p_\mathrm{pk}(t)$, the spilled power $s(t)$ and the unserved demand $u(t)$ for each of the 24 hours. With $w(t)$ and $v(t)$ the available wind and solar and $V$ a large penalty for unserved energy:
+$$\min \; \sum_{t} \big( 40\,p_\mathrm{cc}(t) + 100\,p_\mathrm{pk}(t) \big)$$
 
-$$\min \; \sum_{t} \big( 40\,p_\mathrm{cc}(t) + 100\,p_\mathrm{pk}(t) + V\,u(t) \big)$$
+| | Cheapest-first rule | Plan all 24 hours together |
+|---|---|---|
+| How it decides | one hour at a time | the whole day at once |
+| Running cost | \$104,400 | \$104,000 |
+| Peaker energy | 20 MWh | 0 MWh |
 
-$$
-\begin{aligned}
-100 + w(t) + v(t) + p_\mathrm{cc}(t) + p_\mathrm{pk}(t) + u(t) - s(t) &= d(t) && \text{(balance)}\\
-0 \le p_\mathrm{cc}(t) \le 150, \qquad 0 \le p_\mathrm{pk}(t) &\le 100 && \text{(plant sizes)}\\
--40 \le p_\mathrm{cc}(t) - p_\mathrm{cc}(t-1) &\le 40 && \text{(ramp limit)}\\
-0 \le s(t) \le w(t) + v(t), \qquad u(t) &\ge 0.
-\end{aligned}
-$$
+Planning saves \$400, about 0.4%, by warming the combined-cycle plant up before the solar dip and the sunset.
 
-Every term is linear, so this is a [linear program]{.lx-term term="linear-program"}. The cheapest-first rule solves it one hour at a time; solving all 24 hours together warms the combined-cycle plant up before the clouds and the sunset. On this day that saves \$400, about 0.4% of the running cost, and cuts the peaker's energy from 20 to 0 MWh.
-
-Lesson 10 writes this down step by step, and lesson 11 hands it to a real solver.
+Every rule and the goal add up outputs times fixed numbers, so this is a [linear program]{.lx-term term="linear-program"}. [Lesson 10](10-write-it-down.qmd) writes it down step by step; [lesson 11](11-solver.qmd) hands it to a solver.
 
 ```{=html}
 </div>
@@ -131,7 +136,8 @@ Lesson 10 writes this down step by step, and lesson 11 hands it to a real solver
 <li>The forecast is perfect; real operators plan with forecasts that miss (lesson 4).</li>
 <li>The game moves in one-hour steps; real grids balance second by second (lesson 3).</li>
 <li>Nothing breaks: plants never fail, and power lines never fill up.</li>
-<li>The dial's scale is made up: each MW out of balance moves it by 0.01 Hz.</li>
+<li>The frequency dial is an illustrative indicator: 0.01 Hz per MW out of balance, capped at 0.5 Hz either way. Real frequency depends on spinning machines and controls (lesson 3).</li>
+<li>CO₂ counts only fuel burned at the plants. Building plants and supplying fuel, including methane leaks, are left out.</li>
 </ul>
 </div>
 </details>
@@ -147,9 +153,9 @@ Lesson 10 writes this down step by step, and lesson 11 hands it to a real solver
 ```{=html}
 <div class="lx-myths" data-quiz="g0-myth">
 <div class="lx-qq" data-id="store" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “A power plant can store electricity for later.”</p>
+<p class="lx-qtext">Myth or fact? “A gas plant can save the electricity it makes and send it out later.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Plants make electricity the moment it is used; storing it takes a separate device, such as a battery.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A gas plant makes electricity as it is used. Saving it for later takes <span class="lx-term" data-term="energy-storage">storage</span>, such as a battery or a pumped-storage hydro plant (lesson 9).</p></details>
 </div>
 <div class="lx-qq" data-id="freq" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “If supply is greater than demand, the grid's frequency rises.”</p>
@@ -215,14 +221,17 @@ Lesson 10 writes this down step by step, and lesson 11 hands it to a real solver
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Each hour of your day carried a different amount of CO₂ per MWh: the hours when gas ran hardest were the dirtiest. Real grids publish these data hourly in EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>, which my <a href="https://github.com/Henryutd2021/ghg-load-regulation">open framework for carbon-aware electricity use</a> builds on.</p>
+<p><b>CO₂ per MWh.</b> Each hour's <span class="lx-term" data-term="carbon-intensity">CO₂ per MWh</span> depends on the mix. Under the cheapest-first rule, gas output peaks at 19:00, but CO₂ per MWh peaks at 00:00: gas is a bigger share of a smaller demand.</p>
+<p><b>Real data.</b> U.S. grids report hourly demand and generation by fuel in EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a>.</p>
+<p><b>Open code.</b> My <a href="https://github.com/Henryutd2021/ghg-load-regulation">open framework for carbon-aware electricity use</a> builds on those data.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
 <li>EIA (2011). <a href="https://www.eia.gov/todayinenergy/detail.php?id=3990">Electric systems respond quickly to the sudden loss of supply or demand</a>. Today in Energy.</li>
 <li>NERC (2021). <a href="https://www.nerc.com/globalassets/who-we-are/standing-committees/rstc/rs/reference_document_nerc_balancing_and_frequency_control.pdf">Balancing and Frequency Control Reference Document</a> (PDF).</li>
-<li>U.S. DOE (2015). <a href="https://www.energy.gov/sites/prod/files/2015/12/f28/united-states-electricity-industry-primer.pdf">United States Electricity Industry Primer</a> (PDF): voltages from plant to substation. Household 120/240 V service: ANSI C84.1.</li>
+<li>U.S. DOE (July 2015). <a href="https://www.energy.gov/sites/prod/files/2015/12/f28/united-states-electricity-industry-primer.pdf">United States Electricity Industry Primer</a> (PDF), p. 12: generation at 5–34.5 kV, transmission at 69–765 kV, distribution at 15–34.5 kV.</li>
+<li>U.S. DOE (January 2017). <a href="https://www.energy.gov/sites/prod/files/2017/01/f34/Appendix%20_0.pdf">Quadrennial Energy Review, second installment, Appendix A: Electricity System Overview</a> (PDF), p. A-6: homes receive two 120 V connections, combined to 240 V for large appliances.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day.</li>
 </ul>
 </div>

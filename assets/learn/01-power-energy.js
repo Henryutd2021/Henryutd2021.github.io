@@ -14,6 +14,10 @@
 //   ladder rung of an amount of energy = the largest of Wh, kWh, MWh, GWh, TWh that keeps the number at 1 or more
 //   average power of a year = energy / 8,760 h
 //   homes a wind farm "powers" = average output / average draw of a home = MW x 10^6 x capacity factor / home watts
+//     (an illustrative annual-energy equivalent: the home benchmark is EIA's 2022 average residential purchases)
+//   the bathtub: its size only grows during an experiment (until "Reset the meter"); every change is announced and the old
+//     brim stays drawn (tubScale)
+//   step 4 accepts exactly the two stated jobs: each appliance run alone for its stated time, nothing else (checkJobs)
 // Every number the page states comes from this model or from the sourced anchors; _tests/learn/test_01-power-energy.js
 // checks them against the .qmd.
 //
@@ -67,6 +71,31 @@
     var best = 0; ticks.forEach(function (t, i) { if (Math.abs(Math.log10(t / v)) < Math.abs(Math.log10(ticks[best] / v))) best = i; });
     return best;
   }
+  // ---- the bathtub on the board: the smallest "nice" size that holds the energy, never smaller than before
+  var KWH_STEPS = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500];
+  function nice(v, steps) { for (var i = 0; i < steps.length; i++) if (v <= steps[i] + 1e-9) return steps[i]; return steps[steps.length - 1]; }
+  // prevCap: the tub's size in kWh so far (null after a reset); wh: the energy used so far
+  function tubScale(prevCap, wh) {
+    var need = nice(Math.max(wh / 1000, 0.1), KWH_STEPS), cap = prevCap ? Math.max(prevCap, need) : need;
+    return { cap: cap, changed: !!prevCap && cap > prevCap, was: prevCap || cap, fill: Math.min(1, wh / 1000 / cap) };
+  }
+  // ---- step 4: did the reader run exactly the two jobs, each alone? (a: first job, b: second job, {id, minutes})
+  function checkJobs(m, a, b) {
+    var r = { aMin: 0, bMin: 0, aWh: m.by[a.id] || 0, bWh: m.by[b.id] || 0, otherWh: 0, mixed: false };
+    m.log.forEach(function (g) {
+      if (!g.ids || g.w <= 0) return;
+      var dt = g.t1 - g.t0, ids = g.ids.split(",");
+      if (g.ids === a.id) r.aMin += dt;
+      else if (g.ids === b.id) r.bMin += dt;
+      else if (ids.indexOf(a.id) >= 0 || ids.indexOf(b.id) >= 0) r.mixed = true;
+    });
+    Object.keys(m.by).forEach(function (k) { if (k !== a.id && k !== b.id) r.otherWh += m.by[k]; });
+    var eps = 1e-6;
+    r.over = r.mixed || r.otherWh > eps || r.aMin > a.minutes + eps || r.bMin > b.minutes + eps;
+    r.ok = !r.over && Math.abs(r.aMin - a.minutes) < eps && Math.abs(r.bMin - b.minutes) < eps;
+    r.state = r.ok ? "ok" : r.over ? "over" : m.wh > eps ? "partial" : "empty";
+    return r;
+  }
   // everything the page states, derived once
   function world(D, town, year, days) {
     var A = D.anchors, st = days.stats, td = townDay(town, year), devs = D.devices.list;
@@ -80,16 +109,19 @@
     return {
       devs: devs, byId: byId, wh: wh, items: items, town: td,
       predict: { a: pa, b: pb, whA: ea, whB: eb, answer: Math.abs(ea - eb) < 1e-9 ? "same" : ea > eb ? "a" : "b" },
-      fermi: { avgGW: avgGW, peakGW: peakGW, ratio: peakGW / avgGW, answer: closestTick(D.fermi.ticks_gw, avgGW),
-               sppAvgGW: st.annual_demand_TWh * 1000 / D.fermi.hours, sppPeakGW: st.peak_demand_GW },
-      span: wh.us / wh.phone,
-      wind: { mw: D.wind.mw, claim: homes(D.wind.mw, 1, 1000), cf: A.wind_cf.value, homeW: homeW, real: homes(D.wind.mw, A.wind_cf.value, homeW) },
+      // the peak-to-average ratio comes from one data set (SPP's 2025 hourly demand), never from mixing U.S. totals
+      fermi: { avgGW: avgGW, peakGW: peakGW, answer: closestTick(D.fermi.ticks_gw, avgGW),
+               sppAvgGW: st.annual_demand_TWh * 1000 / D.fermi.hours, sppPeakGW: st.peak_demand_GW,
+               sppRatio: st.peak_demand_GW / (st.annual_demand_TWh * 1000 / D.fermi.hours) },
+      span: wh.us / wh.phone, spanText: num(Math.round(wh.us / wh.phone / 1e13) * 10, 0) + " trillion",
+      wind: { mw: D.wind.mw, claim: homes(D.wind.mw, 1, 1000), cf: A.wind_cf.value, homeW: homeW, real: homes(D.wind.mw, A.wind_cf.value, homeW),
+              refCF: Math.round(A.wind_cf.value * 1000) / 10, refW: Math.round(homeW) },
       spp: { twh: st.annual_demand_TWh, peakGW: st.peak_demand_GW }
     };
   }
   var model = { RUNGS: RUNGS, power: power, newMeter: newMeter, run: run, logEnergy: logEnergy, minutesPerKWh: minutesPerKWh, rung: rung,
                 fmtE: fmtE, fmtKW: fmtKW, fmtKWh: fmtKWh, fmtW: fmtW, fmtDur: fmtDur, num: num, townDay: townDay, homes: homes,
-                closestTick: closestTick, world: world };
+                closestTick: closestTick, world: world, nice: nice, KWH_STEPS: KWH_STEPS, tubScale: tubScale, checkJobs: checkJobs };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -108,12 +140,21 @@
     if (LX.IC[name]) return LX.icon(name);
     return '<svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (ICON[name] || "") + "</svg>";
   }
-  var nice = function (v, steps) { for (var i = 0; i < steps.length; i++) if (v <= steps[i] + 1e-9) return steps[i]; return steps[steps.length - 1]; };
-  var KW_STEPS = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20], KWH_STEPS = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500], MIN_STEPS = [60, 120, 180, 240, 360, 480, 720, 1440, 2880, 10080];
+  var KW_STEPS = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20], MIN_STEPS = [60, 120, 180, 240, 360, 480, 720, 1440, 2880, 10080];
+
+  // ---- the unit key: the power ladder and the energy ladder side by side (step 1, where W first appears)
+  function unitKey(host) {
+    var dl = H("dl", { class: "t1-units", "aria-label": "Unit key" }, host);
+    H("dt", { html: LX.rich("[[power|Power]], how fast") }, dl);
+    H("dd", { html: LX.rich("W → [[kilowatt|kW]] → [[megawatt|MW]] → GW, each 1,000 times the one before") }, dl);
+    H("dt", { html: LX.rich("[[energy|Energy]], how much") }, dl);
+    H("dd", { html: LX.rich("Wh → [[kilowatt-hour|kWh]] → MWh → GWh → TWh: a power unit kept up for one hour") }, dl);
+    return dl;
+  }
 
   // ---- the appliance board: toggles, two meters, the clock, a power-over-time and energy-over-time chart
   function Board(W) {
-    var el = H("div", { class: "t1-board" }), on = {}, m = newMeter(), listeners = [], busy = false;
+    var el = H("div", { class: "t1-board" }), on = {}, m = newMeter(), listeners = [], busy = false, cap = KWH_STEPS[0];
     var devBox = H("div", { class: "t1-devs", role: "group", "aria-label": "Appliances: switch each on or off" }, el), btn = {};
     W.devs.forEach(function (d) {
       var b = H("button", { class: "t1-dev", type: "button", "aria-pressed": "false" }, devBox);
@@ -130,10 +171,10 @@
     var tk = H("div", { class: "t1-logticks", "aria-hidden": "true" }, pm);
     ["1 W", "10 W", "100 W", "1 kW", "10 kW"].forEach(function (t) { H("span", { text: t }, tk); });
     var em = H("div", { class: "t1-m en" }, meters);
-    H("span", { class: "k", html: "Energy used <small>how much, so far</small>" }, em);
+    H("span", { class: "k", html: "Energy used so far <small>a running total</small>" }, em);
     var ev = H("b", { class: "v", "aria-live": "polite" }, em);
-    var tub = H("div", { class: "t1-tub", "aria-hidden": "true" }, em), water = H("i", null, tub);
-    var tubLab = H("span", { class: "t1-tublab" }, em);
+    var tub = H("div", { class: "t1-tub", "aria-hidden": "true" }, em), water = H("i", null, tub), brim = H("b", { class: "t1-brim", hidden: true }, tub);
+    var tubLab = H("span", { class: "t1-tublab", "aria-live": "polite" }, em);
     var ctl = H("div", { class: "t1-run" }, el);
     var r10 = H("button", { class: "lx-btn small", type: "button", html: LX.icon("clock") + "Run 10 min" }, ctl);
     var r60 = H("button", { class: "lx-btn small", type: "button", html: LX.icon("clock") + "Run 1 hour" }, ctl);
@@ -141,7 +182,7 @@
     var rs = H("button", { class: "lx-link", type: "button", text: "Reset the meter" }, ctl);
     r10.addEventListener("click", function () { go(10); });
     r60.addEventListener("click", function () { go(60); });
-    rs.addEventListener("click", function () { m = newMeter(); paint(); fire(); });
+    rs.addEventListener("click", function () { m = newMeter(); cap = KWH_STEPS[0]; paint(); fire(); });
     var by = H("div", { class: "t1-by", "aria-live": "polite" }, el);
     var chart = H("div", { class: "t1-chart" }, el);
     var alt = H("details", { class: "lx-textalt" }, el); H("summary", { text: "Text version of the chart" }, alt);
@@ -165,9 +206,15 @@
       pv.innerHTML = fmtKW(p) + (p ? " <small>(" + num(p, 0) + " W)</small>" : "");
       barFill.style.width = (p > 0 ? Math.max(2, Math.min(100, Math.log10(p) / 4 * 100)) : 0) + "%";
       ev.textContent = fmtKWh(m.wh);
-      var cap = nice(Math.max(m.wh / 1000, 0.1), KWH_STEPS);
-      water.style.height = Math.min(100, m.wh / 1000 / cap * 100) + "%";
-      tubLab.textContent = "Tub holds " + num(cap, cap < 1 ? 1 : 0) + " kWh";
+      // the tub only grows during an experiment; a bigger tub is announced, and its old brim stays drawn
+      var ts = tubScale(cap, m.wh), kwh = function (v) { return num(v, v < 1 ? 1 : 0) + " kWh"; };
+      water.style.height = ts.fill * 100 + "%";
+      if (ts.changed) {
+        brim.hidden = false; brim.style.bottom = ts.was / ts.cap * 100 + "%";
+        tubLab.textContent = "Bigger tub: it now holds " + kwh(ts.cap) + ". The dashed line is the old " + kwh(ts.was) + " brim, so the same water sits lower.";
+        tubLab.classList.add("is-new");
+      } else if (!m.wh) { brim.hidden = true; tubLab.classList.remove("is-new"); tubLab.textContent = "Tub holds " + kwh(ts.cap) + " (it grows if you need more)"; }
+      cap = ts.cap;
       clock.textContent = "Clock run: " + (m.t ? fmtDur(m.t) : "0 min");
       by.innerHTML = "";
       var ids = Object.keys(m.by).filter(function (k) { return m.by[k] > 1e-9; });
@@ -232,8 +279,8 @@
     paint();
     return {
       el: el, state: state, listen: function (f) { listeners = f ? [f] : []; },
-      reset: function () { m = newMeter(); paint(); },
-      only: function (ids) { on = {}; (ids || []).forEach(function (k) { on[k] = true; }); paint(); },
+      reset: function () { m = newMeter(); cap = KWH_STEPS[0]; paint(); },
+      only: function (ids, f) { on = {}; (ids || []).forEach(function (k) { on[k] = true; }); paint(); if (f) fire(); },
       run: function (min) { m = run(m, W.devs, on, min); paint(); fire(); }
     };
   }
@@ -249,17 +296,23 @@
       rowEl[i] = H("div", { class: "items" }, li);
       if (i > 0) H("span", { class: "x", text: "×1,000", "aria-hidden": "true" }, li);
     });
-    function ask() {
+    // focus: after each answer the next question (or the final score) takes keyboard focus, so the reader keeps their place
+    function ask(moveFocus) {
       q.innerHTML = "";
-      if (k >= W.items.length) { H("p", { class: "lx-q", text: right + " of " + W.items.length + " on the first try." }, q); return; }
+      if (k >= W.items.length) {
+        var fin = H("p", { class: "lx-q", tabindex: "-1", text: "Done: " + right + " of " + W.items.length + " on the first try." }, q);
+        if (moveFocus) fin.focus();
+        return;
+      }
       var it = W.items[k];
       H("p", { class: "lx-eyebrow", text: "Item " + (k + 1) + " of " + W.items.length }, q);
       var qid = LX.uid("lq");
-      H("p", { class: "lx-q", id: qid, text: it.label }, q);
+      var qp = H("p", { class: "lx-q", id: qid, tabindex: "-1", text: it.label }, q);
       var row = H("div", { class: "lx-choices-row t1-rungbtns", role: "group", "aria-labelledby": qid }, q);
       RUNGS.forEach(function (u, i) {
         H("button", { class: "lx-choice", type: "button", text: u, onclick: function () { pick(it, i); } }, row);
       });
+      if (moveFocus) qp.focus();
     }
     var fb = H("div", { class: "t1-lfb", "aria-live": "polite" }, el);
     function pick(it, i) {
@@ -270,7 +323,7 @@
       fb.innerHTML = "";
       H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " +
         LX.esc(it.label) + ": " + LX.esc(it.text) + (ok ? "." : ", so it sits on the " + RUNGS[it.rung] + " rung.") + "</div>" }, fb);
-      k++; ask();
+      k++; ask(true);
       if (k >= W.items.length) { api.done = true; api.right = right; if (api.onDone) api.onDone(right); }
     }
     ask();
@@ -292,6 +345,7 @@
           LX.Predict(act, { id: "t1-two-jobs", options: [{ value: "a", label: "The " + pa.label.toLowerCase() }, { value: "b", label: "The " + pb.label.toLowerCase() }, { value: "same", label: "The same" }],
             lockText: "Locked in. You will test it on the appliance board in step 4.", onPick: function (v) { guess = v; api.done(); } });
           if (LX.progress.guess("t1-two-jobs")) { guess = LX.progress.guess("t1-two-jobs"); api.done(); }
+          unitKey(act);
         } },
       { text: "This is a home's appliance board. Switch on two appliances, then run the clock. [[power|Power]] is how fast the home uses energy right now; energy is how much it has used so far.",
         build: function (act, api) {
@@ -305,24 +359,36 @@
         build: function (act, api) {
           act.appendChild(board.el);
           var chk = function (s) {
-            if (!s.anyOn && s.meter.wh > 0) { api.done(); api.saw("Power is 0 kW, but the " + fmtKWh(s.meter.wh) + " already used stays. Energy only adds up; your bill counts this number."); }
+            if (!s.anyOn && s.meter.wh > 0) { api.done(); api.saw("Power is 0 kW, but the " + fmtKWh(s.meter.wh) + " already used stays. This meter is a running total of energy used: it never goes down, and your bill counts it."); }
           };
           board.listen(chk); chk(board.state());
         } },
       { text: "Test your prediction. Reset the meter, run the " + pa.label.toLowerCase() + " alone for " + W.predict.a.minutes + " minutes, then the " + pb.label.toLowerCase() + " alone for " + W.predict.b.minutes / 60 + " hours.",
         build: function (act, api) {
           act.appendChild(board.el);
-          var chk = function (s) {
-            var a = s.meter.by[pa.id] || 0, b = s.meter.by[pb.id] || 0;
-            if (a >= W.predict.whA - 1e-6 && b >= W.predict.whB - 1e-6) {
-              api.done();
-              var g = guess || LX.progress.guess("t1-two-jobs"), names = { a: "the " + pa.label.toLowerCase(), b: "the " + pb.label.toLowerCase(), same: "the same" };
-              api.saw((g ? (g === W.predict.answer ? "You called it. " : "You guessed " + names[g] + ". ") : "") + "Both use " + fmtKWh(W.predict.whA) + ": " +
-                num(pa.watts / 1000, 1) + " kW × " + W.predict.a.minutes + "/60 h = " + num(pb.watts / 1000, 2) + " kW × " + W.predict.b.minutes / 60 + " h. Energy is power × time.", g && g !== W.predict.answer);
-              keep("predictTested", true);
-            }
+          // only the two stated jobs pass: each appliance alone, for exactly its time (checkJobs); the reader sees their own totals
+          var st = H("p", { class: "t1-jobs", "aria-live": "polite" }, act), acted = false;
+          var totals = function (r) {
+            return pa.label + " " + fmtKWh(r.aWh) + " (" + fmtDur(r.aMin) + " alone), " + pb.label.toLowerCase() + " " + fmtKWh(r.bWh) + " (" + fmtDur(r.bMin) + " alone)" +
+              (r.otherWh > 1e-6 ? ", other appliances " + fmtKWh(r.otherWh) : "");
           };
-          board.listen(chk); chk(board.state());
+          var chk = function (s) {
+            var r = checkJobs(s.meter, W.predict.a, W.predict.b);
+            if (r.ok) {
+              st.textContent = ""; api.done();
+              var g = guess || LX.progress.guess("t1-two-jobs"), names = { a: "the " + pa.label.toLowerCase(), b: "the " + pb.label.toLowerCase(), same: "the same" };
+              api.saw((g ? (g === W.predict.answer ? "You called it. " : "You guessed " + names[g] + ". ") : "") + "Your meter: " + pa.label.toLowerCase() + " " + fmtKWh(r.aWh) + ", " +
+                pb.label.toLowerCase() + " " + fmtKWh(r.bWh) + ". " + num(pa.watts / 1000, 1) + " kW × " + W.predict.a.minutes + "/60 h = " + num(pb.watts / 1000, 2) + " kW × " +
+                W.predict.b.minutes / 60 + " h: energy is power × time.", g && g !== W.predict.answer);
+              keep("predictTested", true);
+              return;
+            }
+            if (!acted) return;
+            if (r.state === "over") st.textContent = "Your totals: " + totals(r) + ". That is more than the two jobs" + (r.mixed ? ", or they ran together" : "") + ": reset the meter and run each one alone, for its stated time.";
+            else if (r.state === "partial") st.textContent = "So far: " + totals(r) + ".";
+            else st.textContent = "Meter at zero. Switch on only the " + pa.label.toLowerCase() + ", then run 10 min.";
+          };
+          board.listen(function (s) { acted = true; chk(s); }); chk(board.state());
         } },
       { text: "One [[kilowatt-hour|kilowatt-hour]], six ways. Tap three appliances to see how long each takes to use 1 kWh. The more power, the faster the energy adds up.",
         build: function (act, api) {
@@ -337,7 +403,7 @@
               var mins = minutesPerKWh(d.watts); res.hidden = false; b.setAttribute("aria-expanded", "true");
               bar.style.width = Math.max(4, Math.log10(mins) / Math.log10(maxM) * 100) + "%";
               lab.textContent = fmtDur(mins);
-              if (++seen >= 3) { api.done(); api.saw("Time to use 1 kWh = 1 kWh ÷ power. Ten times the power, a tenth of the time (the bars use a log scale)."); }
+              if (++seen >= 3) { api.done(); api.saw("Time to use 1 kWh = 1 kWh ÷ power: ten times the power, a tenth of the time. The bars use a [[log-scale|log scale]]: each equal step along a bar means ten times longer."); }
             });
           });
         } },
@@ -347,51 +413,91 @@
           if (!ladder) ladder = Ladder(W);
           act.appendChild(ladder.el);
           var chk = function () {
-            api.done(); api.saw("From a phone charge to the U.S. year is about " + num(Math.round(W.span / 1e14) * 100, 0) + " trillion times more energy: five rungs of ×1,000.");
+            api.done(); api.saw("Five units, each 1,000 times the one below: four steps of ×1,000 from Wh to TWh. The U.S. year is about " + W.spanText + " times a phone charge.");
           };
           ladder.onDone = function (right) { keep("ladder", right); chk(); };
           if (ladder.done) chk();
         } },
-      { text: "A [[fermi-estimate|Fermi estimate]]. The U.S. used about " + num(Math.round(W.wh.us / 1e12), 0) + " TWh of electricity in 2025, and a year has 8,760 hours. Roughly what was the [[average-power|average power]], all year round?",
+      { text: "Stretch, optional: a [[fermi-estimate|Fermi estimate]]. The U.S. used about " + num(Math.round(W.wh.us / 1e12), 0) + " TWh of electricity in 2025, and a year has 8,760 hours. Roughly what was the [[average-power|average power]]?",
+        free: true,
         build: function (act, api) {
           board.listen(null);
-          var F = W.fermi;
+          var F = W.fermi, usTWh = Math.round(W.wh.us / 1e12);
+          H("p", { class: "lx-hint", text: "Hint: 1 TWh = 1,000 GWh, and GWh ÷ hours gives GW." }, act);
           LX.Guess(act, { id: "t1-fermi", ticks: D.fermi.ticks_gw.map(function (t) { return num(t, 0) + " GW"; }), answer: F.answer, start: 0,
             srLabel: "Your estimate of the average U.S. power in 2025",
             onLock: function (g, out) {
-              H("div", { class: "lx-saw" + (g === F.answer ? "" : " no"), html: LX.icon(g === F.answer ? "check" : "question") + "<div><b>" + (g === F.answer ? "Right order of magnitude." : "About " + num(D.fermi.ticks_gw[F.answer], 0) + " GW.") + "</b> " +
-                num(Math.round(W.wh.us / 1e12), 0) + " TWh ÷ 8,760 h ≈ " + num(F.avgGW, 0) + " GW on average. The record hour, 29 July 2025, needed " + num(F.peakGW, 0) + " GW: about " + num(F.ratio, 1) + " times the average. The grid is built for that peak.</div>" }, out);
+              var ok = g === F.answer;
+              H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right order of magnitude." : "About " + num(D.fermi.ticks_gw[F.answer], 0) + " GW.") + "</b> Average power = energy ÷ time.</div>" }, out);
+              LX.UnitChain(out, { label: "Unit chain: the average U.S. power in 2025", steps: [
+                { v: num(usTWh, 0) + " TWh", u: "energy, 2025" }, { op: "× 1,000 =" }, { v: num(usTWh * 1000, 0) + " GWh", u: "the same energy" },
+                { op: "÷ 8,760 h =" }, { v: num(F.avgGW, 0) + " GW", u: "average power", out: true }] });
+              H("p", { class: "t1-note", text: "Peaks run higher. In one grid, the Southwest Power Pool, the 2025 peak hour needed " + num(F.sppPeakGW, 1) + " GW: about " +
+                num(F.sppRatio, 1) + " times its " + num(F.sppAvgGW, 1) + " GW average." }, out);
+              H("p", { class: "t1-note", text: "So a grid must meet its busiest hours as well as supply the year's energy." }, out);
               keep("fermi", g); api.done();
             } });
         } },
-      { text: "Claims often say a " + W.wind.mw + " MW wind farm “powers " + num(W.wind.claim, 0) + " homes”: " + W.wind.mw + " MW ÷ 1 kW per home. Move the sliders to real averages and see what survives.",
+      { text: "Stretch, optional: claims often say a " + W.wind.mw + " MW wind farm “powers " + num(W.wind.claim, 0) + " homes”: " + W.wind.mw + " MW ÷ 1 kW per home. Set the sliders to EIA's averages and see what survives.",
+        free: true,
         build: function (act, api) {
           board.listen(null);
           var box = H("div", { class: "t1-wind" }, act), ctl = H("div", { class: "t1-wind-ctl" }, box), out = H("div", { class: "t1-wind-out" }, box);
-          var cf = LX.Slider(ctl, { label: "Capacity factor", color: "var(--lx-wind)", min: D.wind.cf.min, max: D.wind.cf.max, step: D.wind.cf.step, unit: "%",
-            hint: function () { return "Share of full output, over a year. U.S. wind in 2025: " + num(W.wind.cf * 100, 1) + "% (EIA)."; }, onChange: upd });
-          var hw = LX.Slider(ctl, { label: "Average draw of a home", color: "var(--lx-demand)", min: D.wind.home_w.min, max: D.wind.home_w.max, step: D.wind.home_w.step, unit: "W",
+          var cf = LX.Slider(ctl, { label: "Capacity factor", color: "var(--lx-wind)", min: D.wind.cf.min, max: D.wind.cf.max, step: D.wind.cf.step,
+            fmt: function (v) { return num(v, 1) + "%"; },
+            hint: function () { return "A year's energy as a share of running flat out. U.S. wind in 2025: " + num(W.wind.refCF, 1) + "% (EIA)."; }, onChange: upd });
+          var hw = LX.Slider(ctl, { label: "Average draw of a home", color: "var(--lx-demand)", min: D.wind.home_w.min, max: D.wind.home_w.max, step: D.wind.home_w.step,
             fmt: function (v) { return num(v, 0) + " W"; },
-            hint: function () { return "Average U.S. home: " + num(W.wind.homeW, 0) + " W (10,791 kWh a year ÷ 8,760 h; EIA)."; }, onChange: upd });
+            hint: function () { return "EIA, 2022: an average U.S. home bought 10,791 kWh a year, an average of " + num(W.wind.refW, 0) + " W."; }, onChange: upd });
+          var ref = H("button", { class: "lx-btn ghost small", type: "button", text: "Use EIA's averages" }, ctl);
+          ref.addEventListener("click", function () { cf.set(W.wind.refCF); hw.set(W.wind.refW); upd(); });
           cf.set(D.wind.cf.start); hw.set(D.wind.home_w.start);
-          H("span", { class: "k", text: "Homes whose yearly use it matches" }, out);
+          H("span", { class: "k", text: "Your settings: homes whose yearly purchases it matches" }, out);
           var big = H("b", { class: "v", "aria-live": "polite" }, out), sub = H("span", { class: "sub" }, out);
           function upd() {
             var n = homes(W.wind.mw, cf.val() / 100, hw.val());
             big.textContent = num(Math.round(n / 100) * 100, 0);
-            sub.textContent = "= " + W.wind.mw + " MW × " + cf.val() + "% ÷ " + num(hw.val(), 0) + " W";
+            sub.textContent = "= " + W.wind.mw + " MW × " + num(cf.val(), 1) + "% ÷ " + num(hw.val(), 0) + " W";
             keep("wind", { cf: cf.val(), w: hw.val(), homes: n });
-            if (n <= 50000) {
+            // done only at EIA's averages, so the feedback below always describes the number on screen
+            if (Math.abs(cf.val() - W.wind.refCF) < 0.05 && Math.abs(hw.val() - W.wind.refW) < 0.5) {
               api.done();
-              if (!act.querySelector(".t1-go")) H("a", { class: "lx-btn small t1-go", href: "#explain", html: "See it as diagrams" + LX.icon("arrow") }, act);
-              api.saw("With EIA's averages, " + num(W.wind.cf * 100, 1) + "% and " + num(W.wind.homeW, 0) + " W, the farm's yearly energy matches about " + num(Math.round(W.wind.real / 100) * 100, 0) +
-                " homes. On calm hours it makes little, so those homes still need other plants: lesson 5 explains capacity factor.");
+              if (!act.querySelector(".t1-go")) {
+                var row = H("div", { class: "t1-gorow" }, act);
+                H("a", { class: "lx-btn small t1-go", href: "#explain", html: "See it as diagrams" + LX.icon("arrow") }, row);
+                H("a", { class: "lx-link", href: "05-capacity-factor.html", text: "Capacity factor, step by step: lesson 5" }, row);
+              }
+              api.saw("At EIA's averages the farm's yearly energy matches what about " + num(Math.round(W.wind.real / 100) * 100, 0) +
+                " homes buy: an illustrative equivalent, not " + num(W.wind.claim, 0) + ". On calm hours it makes little, so those homes still need other plants.");
             }
           }
           upd();
         } }
     ];
-    LX.StepCards(live, { id: "t1-steps", steps: steps, onStep: function (i) { if (i === steps.length - 1) LX.progress.done(LESSON); } });
+    var cards = LX.StepCards(live, { id: "t1-steps", steps: steps, onStep: function (i) { if (i === steps.length - 1) LX.progress.done(LESSON); } });
+    // demo states for screenshots (LX.demo): "step-N" opens card N with its action done, "mid" = step 4 tested,
+    // "done" = steps 2, 4, 6 and 7 done, then the last card at EIA's averages
+    var act = function () { return live.querySelector(".lx-step-act"); };
+    var demo = {
+      1: function () {},
+      2: function () { board.reset(); board.only(["hairdryer", "tv"]); board.run(10); },
+      3: function () { board.reset(); board.only(["microwave"]); board.run(60); board.only([], true); },
+      4: function () { board.reset(); board.only([pa.id]); board.run(W.predict.a.minutes); board.only([pb.id]); board.run(W.predict.b.minutes); board.only([], true); },
+      5: function () { [].slice.call(act().querySelectorAll(".t1-kwh .lx-choice"), 0, 3).forEach(function (b) { b.click(); }); },
+      6: function () { W.items.forEach(function (it) { var b = act().querySelectorAll(".t1-rungbtns .lx-choice"); if (b[it.rung]) b[it.rung].click(); }); },
+      7: function () {
+        var g = act().querySelector(".lx-guess input"), lk = act().querySelector(".lx-guess .lx-btn");
+        if (g && lk && !lk.hidden) { g.value = W.fermi.answer; g.dispatchEvent(new Event("input")); lk.click(); }
+      },
+      8: function () { [].forEach.call(act().querySelectorAll("button"), function (b) { if (b.textContent === "Use EIA's averages") b.click(); }); }
+    };
+    LX.demo(root, function (state) {
+      var n = /^step-(\d+)$/.exec(state), k = n ? Math.max(1, Math.min(steps.length, +n[1])) : state === "mid" ? 4 : state === "done" ? steps.length : 0;
+      if (!k) return null;
+      if (state === "done") [2, 4, 6, 7].forEach(function (j) { cards.go(j - 1); demo[j](); });
+      cards.go(k - 1); demo[k]();
+      return { view: "step " + k };
+    }, cards);
     root.lxLesson = { board: board, world: W, model: model };
     buildExplain(W, D, P);
     LX.on("t1-board", debounce(function (s) { keep("maxW", Math.max(P.maxW || 0, s.power)); keep("wh", s.meter.wh); }, 250));
@@ -424,7 +530,7 @@
     var you = P.maxW ? " Your board peaked at " + fmtKW(P.maxW) + "." : "";
     var youE = P.wh ? " Your meter last read " + fmtKWh(P.wh) + "." : "";
     [["Flow from the tap = power", "kW: how fast, right now. Open the tap wider and the flow jumps at once." + you],
-     ["Water in the tub = energy", "kWh: how much has flowed so far. It only rises while the tap runs." + youE],
+     ["Water in the tub = energy used", "kWh: how much has flowed so far. This running total only rises while the tap runs." + youE],
      ["Time the tap runs = hours", "Energy = power × time: 1.5 kW for 10 minutes and 0.05 kW for 5 hours both give 0.25 kWh."]]
       .forEach(function (r) { var li = H("li", null, ol); H("b", { text: r[0] }, li); H("span", { text: r[1] }, li); });
     H("p", { class: "lx-hint", text: "Close the tap: the flow stops at once, and the water stays. A home's meter works the same way." }, c1);
@@ -437,9 +543,9 @@
         { key: "what", name: "What it measures", power: "How fast energy flows, right now", energy: "How much has flowed over a stretch of time" },
         { key: "units", name: "Units", power: "W, kW, MW, GW", energy: "Wh, kWh, MWh, GWh, TWh" },
         { key: "bath", name: "In the bathtub", power: "The flow from the tap", energy: "The water in the tub" },
-        { key: "fall", name: "Can it fall back?", power: "Yes, at once: switch off", energy: "No, it only adds up" },
+        { key: "fall", name: "Can the number fall?", power: "Yes, at once: switch off", energy: "The meter's running total of energy used: no. Stored energy, as in a battery, can fall" },
         { key: "size", name: "What it sizes or pays for", power: "Wires and plants, which must cover the peak hour", energy: "Fuel, and most of a home's bill" },
-        { key: "real", name: "A real number", power: "U.S. record hour: " + num(W.fermi.peakGW, 0) + " GW (29 July 2025)", energy: "U.S. year: " + num(Math.round(W.wh.us / 1e12), 0) + " TWh (2025)" }
+        { key: "real", name: "A real number", power: "Lower 48 record hour: " + num(W.fermi.peakGW, 0) + " GW (29 July 2025)", energy: "U.S. year: " + num(Math.round(W.wh.us / 1e12), 0) + " TWh (2025)" }
       ].map(function (r) { r.color = "var(--lx-ink-3)"; return r; })
     });
     // 3. the scale strip
@@ -451,7 +557,7 @@
      ["S1", "Microgrid and community", "kW to MW", "A campus or village keeping its lights on (upcoming lessons).", false],
      ["S2", "Regional grid", "MW to GW", "Prairie Town peaks at " + num(W.town.scalePeakMW, 0) + " MW; the Southwest Power Pool peaked at " + num(W.spp.peakGW, 1) + " GW in 2025.", false],
      ["S3", "City and region", "hundreds of MW", "Prairie City's buildings, transport and industry (upcoming).", false],
-     ["S4", "Nation", "hundreds of GW", "The U.S.: " + num(W.fermi.peakGW, 0) + " GW in its record hour, " + num(Math.round(W.wh.us / 1e12), 0) + " TWh in 2025.", false]]
+     ["S4", "Nation", "hundreds of GW", "The U.S. used " + num(Math.round(W.wh.us / 1e12), 0) + " TWh in 2025; the Lower 48's record hour needed " + num(W.fermi.peakGW, 0) + " GW.", false]]
       .forEach(function (s) {
         var li = H("li", { class: s[4] ? "here" : "" }, strip);
         var top = H("div", { class: "t" }, li); H("span", { class: "code", text: s[0] }, top);
