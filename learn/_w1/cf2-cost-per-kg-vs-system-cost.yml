@@ -1,5 +1,5 @@
-# Sidecar for CF2 (cf2-cost-per-kg-vs-system-cost), builder learn-w2-i, 2026-11-03. Read by scripts/build_learn.py.
-# The page is a draft (learn/_drafts/) until Henry approves its excerpts (reports/learn/excerpts_for_approval.md, E3-E5).
+# Sidecar for CF2 (cf2-cost-per-kg-vs-system-cost), builder learn-w2-i, 2026-11-03; fixes learn-w2-fix-i. Read by
+# scripts/build_learn.py. Henry approved the page's excerpts on 2026-11-03 (reports/learn/excerpts_for_approval.md, E3-E5).
 id: cf2-cost-per-kg-vs-system-cost
 lesson: CF2
 glossary:
@@ -8,10 +8,28 @@ glossary:
     def: "A machine that uses electricity to split water into hydrogen and oxygen."
   - id: lcoh
     term: Levelized cost of hydrogen (LCOH)
-    def: "The cost of making one kilogram of hydrogen over a plant's life: all its costs divided by all the kilograms it makes, with future money discounted."
+    def: "The cost of making one kilogram of hydrogen over a plant's life: discounted lifetime costs divided by discounted lifetime kilograms (with the same cost and output every year, one year's annualized cost divided by one year's kilograms, as in CF2's toy)."
   - id: prognostics
     term: Prognostics
     def: "Predicting when a machine part is likely to fail, from data on its condition, so that repairs can be planned before it does."
-requests:
-  - "Case-file control row: CF2, CF6 and CF7 each carry the same small page-level style block (.cf-ctl, .cf-ctl-l, .cf-row, .cf-selects, .cf-sel, and .cf-two, a comparison table that becomes labelled lines on phones), plus two fixes to the template pieces: .lx-case-try code wraps on phones (a long command overflowed 375 px) and .lx-case-try p takes the list size (the repository line was larger than the list). Candidates for forms.css when the case files go live."
-  - "Allow-listed explainers on Learn pages: explainers.css is site-wide, but the theme helpers --t-ink, --t-soft and --t-line are defined only on .project-page (pubs.css), so on a Learn page the explainer falls back to the accent colour and --line. Defining them for .page-learn .explainer too would match the project pages."
+  - id: fuel-cell
+    term: Fuel cell
+    def: "A device that turns hydrogen (and oxygen from the air) into electricity, with water as the by-product: an electrolyzer run backwards."
+  - id: firm-output
+    term: Firm output
+    def: "Power a plant can be counted on to deliver steadily, such as the same output in every hour."
+  - id: ercot
+    term: ERCOT
+    def: "The Electric Reliability Council of Texas: the grid operator, and its wholesale market, for most of Texas."
+  - id: concentrated-solar
+    term: Concentrated solar power
+    def: "Mirrors focus sunlight to heat a fluid; the heat runs a turbine or a process, and it can be stored for hours in tanks."
+  - id: thermal-storage
+    term: Thermal storage
+    def: "Storing energy as heat, for example in tanks of hot molten salt, to use it hours later."
+  - id: high-temperature-electrolyzer
+    term: High-temperature electrolyzer
+    def: "An electrolyzer that splits steam at several hundred degrees Celsius; part of the energy comes as heat, so it needs less electricity per kilogram."
+  - id: photovoltaic
+    term: Photovoltaic (PV)
+    def: "Solar panels that turn sunlight directly into electricity."

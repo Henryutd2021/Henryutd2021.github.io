@@ -1,10 +1,11 @@
 // cf6-shifting-load-to-clean-hours.js — Case file CF6, "How much can shifting load to cleaner hours cut emissions, and
-// when?" (case form, wave W2 draft, 2026-11-03).
+// when?" (case form, wave W2, 2026-11-03).
 //
 // Data: assets/learn/data/cf6-shifting-load-to-clean-hours.json (the study's dated steps for LX.Timeline, where its
 // result holds for LX.Boundary, the idea's day and preset moves, the numbers to remember), town.json (Prairie Town's
 // fleet; illustrative) and town_year.json (every hour of 2025 on the Southwest Power Pool grid, from EIA-930, as shapes).
-// Every sentence about the course author's study comes from the approved excerpt (reports/learn/excerpts_for_approval.md, E6).
+// The research text in the data file is approved excerpt wording (reports/learn/excerpts_for_approval.md, E6, and its
+// revisions); this script adds none of its own.
 //
 // The idea (Prairie Town; illustrative plants on real 2025 shapes): average against marginal emission factors.
 // The day is 9 June 2025, cut and scaled exactly as lesson 9 does (demand = shape x 450 MW, wind = shape x 150 MW,
@@ -13,11 +14,13 @@
 // g = demand - 100 - wind - sun; g < 0 is spilled wind and sun; otherwise the combined-cycle plant (up to 150 MW,
 // 0.37 t CO2/MWh), then the peaker (up to 100 MW, 0.55 t CO2/MWh).
 //   average factor of hour t   a_t = CO2_t / demand_t        (t CO2 per MWh: the hour's emissions shared over its use)
-//   marginal factor of hour t  m_t = CO2 of the plant that serves one more MWh (0 while wind or sun is spilled)
+//   marginal factor of hour t  m_t = CO2 rate of the plant that would serve one more MWh, read off the hour's dispatch
+//                              (0 while wind or sun is spilled): it holds for the next small change only
 // Moving q MWh from hour a to hour b (total use unchanged):
 //   average-factor accounting:  q x (a_b - a_a)               (the study's view: each hour keeps its average factor)
 //   what the plants emit:       re-dispatch both hours with demand_a - q and demand_b + q and compare the CO2
-// The two agree only by chance. Every number on the page is checked by _tests/learn/test_cf6-shifting-load-to-clean-hours.js.
+// The two agree only by chance. A 10 MWh move can cross from one plant to the next (22:00 to 14:00: 4 MWh off the peaker,
+// 6 MWh off the combined-cycle plant), so the readout re-dispatches rather than multiplying by m_t. Every number on the page is checked by _tests/learn/test_cf6-shifting-load-to-clean-hours.js.
 (function () {
   "use strict";
   var HOURS = 24;
@@ -74,15 +77,37 @@
   function staticIdea(W, I) {
     var li = I.presets.map(function (p) {
       var r = move(W, p.from, p.to, I.q);
-      return "<li><b>" + p.label + "</b> (" + span(p.from) + " to " + span(p.to) + "): average-factor accounting " + tco2(r.attributed) + "; the town's plants " + tco2(r.system) + ".</li>";
+      return "<li><b>" + p.label + "</b> (" + span(p.from) + " to " + span(p.to) + "): change in attributed emissions " + tco2(r.attributed) + "; change in what the plants emit " + tco2(r.system) + ".</li>";
     }).join("");
     var rows = W.demand.map(function (d, t) {
       return "<tr><td>" + span(t) + "</td><td class=\"n\">" + d + "</td><td class=\"n\">" + (W.h[t].cc + W.h[t].pk) + "</td><td class=\"n\">" + f2(W.avg[t]) + "</td><td>" + PLANT[W.margKey[t]] + " (" + f2(W.marg[t]) + ")</td></tr>";
     }).join("");
     return "<p class=\"lx-eyebrow\">" + I.title + " (Prairie Town, " + W.dateLabel + ", illustrative)</p>" +
-      "<ul>" + li + "</ul>" +
+      "<p class=\"lx-hint\">" + I.how[0] + "</p><ul>" + li + "</ul>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-facts\"><caption class=\"lx-hint\">Each hour: demand (MWh), gas output (MWh), average factor and the plant on the margin with its factor (t CO₂ per MWh).</caption>" +
       "<thead><tr><th scope=\"col\">Hour</th><th scope=\"col\">Demand</th><th scope=\"col\">Gas</th><th scope=\"col\">Average</th><th scope=\"col\">On the margin</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+  }
+  // the live status, one idea per line: what changes in the hour left, in the hour joined, then how the two views compare
+  function statusLines(r) {
+    if (r.same) return ["Pick two different hours."];
+    var c = changes(r), sys = Math.round(r.system * 10), att = Math.round(r.attributed * 10);
+    var out = "Out of " + span(r.a) + ": " + (c.out || "nothing changes") + ".", into = "Into " + span(r.b) + ": " + c.into + ".";
+    var two = sys === 0 && att !== 0 ? "<b>The average books a change the plants never make.</b>"
+      : sys === att ? "<b>Here the two views agree.</b>"
+      : "<b>The plants' change is " + (Math.abs(r.system) > Math.abs(r.attributed) ? "larger" : "smaller") + " than the average says.</b>";
+    return [out, into, two];
+  }
+  // the allow-listed explainer's starting state as a table (its stylized day; m = the explainer's model() result)
+  function staticExplainer(m, range, swing) {
+    var rows = m.load.map(function (d, t) {
+      var y = m.adjust[t];
+      return "<tr><td>" + span(t) + "</td><td class=\"n\">" + m.intensity[t] + "</td><td class=\"n\">" + d.toFixed(1) + "</td><td class=\"n\">" + m.shifted[t].toFixed(1) +
+        "</td><td class=\"n\">" + (y > 0 ? "+" : y < 0 ? "−" : "") + Math.abs(y).toFixed(1) + "</td></tr>";
+    }).join("");
+    return "<p class=\"lx-hint\">At ±" + Math.round(range * 100) + "% on the " + swing + "-swing day, " + m.moved.toFixed(1) + " MWh of " + Math.round(m.total).toLocaleString("en-US") +
+      " MWh moves (" + m.movedPct.toFixed(1) + "%) and attributed emissions fall by " + m.reductionPct.toFixed(2) + "%; the day's total stays " + Math.round(m.newTotal).toLocaleString("en-US") + " MWh.</p>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-facts\"><caption class=\"lx-hint\">Each hour of the stylized day: average intensity (g CO₂ per kWh), load before and after (MWh) and the change.</caption>" +
+      "<thead><tr><th scope=\"col\">Hour</th><th scope=\"col\">Intensity</th><th scope=\"col\">Before</th><th scope=\"col\">After</th><th scope=\"col\">Change</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
   function rich(t) {
     // glossary marks to spans (the attribute is built in pieces so the build's term scanner does not read "$1" as an id)
@@ -96,7 +121,7 @@
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
   var model = { HOURS: HOURS, prepare: prepare, hour: hour, move: move, changes: changes, hm: hm, span: span, f2: f2, tco2: tco2, PLANT: PLANT,
-                staticIdea: staticIdea, staticBoundary: staticBoundary };
+                statusLines: statusLines, staticExplainer: staticExplainer, staticIdea: staticIdea, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -120,6 +145,7 @@
     var stage = H("div", { class: "lx-stage" }, live);
     H("h3", { text: I.title + " · " + W.dateLabel }, H("div", { class: "lx-stage-head" }, stage));
     H("p", { class: "lx-hint", text: I.note }, stage);
+    I.how.slice(1).forEach(function (t) { H("p", { class: "lx-hint", text: t }, stage); });
     var ctl = H("div", { class: "lx-ctls" }, stage);
     var pc = H("div", { class: "cf-ctl" }, ctl);
     H("p", { class: "cf-ctl-l", id: "cf6-pre-l", text: "Try a move" }, pc);
@@ -140,8 +166,10 @@
     }
     var selA = select("cf6-from", "Move 10 MWh out of", "a"), selB = select("cf6-to", "into", "b");
     var chips = H("div", { class: "lx-readouts" }, stage);
+    H("p", { class: "lx-hint", text: I.how[0] }, stage);
     var P = LX.Plot(stage, { text: "Text version of the chart" });
-    var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
+    // one idea per line, read out together when the state changes
+    var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
 
     function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function tone(v) { return v < -0.05 ? "good" : v > 0.05 ? "bad" : null; }
@@ -151,15 +179,15 @@
       if (selA.value !== String(S.a)) selA.value = String(S.a);
       if (selB.value !== String(S.b)) selB.value = String(S.b);
       chips.innerHTML = "";
-      chip("Average-factor accounting", tco2(r.attributed), tone(r.attributed));
-      chip("What the town's plants emit", tco2(r.system), tone(r.system));
+      chip("Change in attributed emissions (average factor)", tco2(r.attributed), tone(r.attributed));
+      chip("Change in what the plants emit", tco2(r.system), tone(r.system));
       var spill = [], t;
       for (t = 0; t < HOURS; t++) if (W.margKey[t] === "spill") spill.push(t);
       P.render({
         x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h"]] },
         y: { min: 0, max: 0.6, step: 0.1, fmt: function (v) { return v.toFixed(1); }, unit: "t CO₂ per MWh" },
         height: 250, heightN: 220,
-        spans: spill.length ? [{ x0: spill[0], x1: spill[spill.length - 1] + 1, color: "var(--lx-solar)", op: 0.14, label: "Spare sun" }] : [],
+        spans: spill.length ? [{ x0: spill[0], x1: spill[spill.length - 1] + 1, color: "var(--lx-solar)", op: 0.14, label: "Spare wind and sun" }] : [],
         lines: [{ values: W.marg, step: 1, color: "var(--lx-warn)", width: 2.2, dash: "6 4" }, { values: W.avg, step: 1, color: "var(--lx-accent)", width: 2.6 }],
         marks: [{ x: S.a + 0.5, y: W.marg[S.a], label: "Out", kind: "dot", pos: "above", vline: true }, { x: S.b + 0.5, y: W.marg[S.b], label: "In", kind: "dot", pos: "above", vline: true }],
         legend: [{ label: "Average factor (the hour's CO₂ ÷ its use)", color: "var(--lx-accent)" }, { label: "Marginal factor (the plant serving one more MWh)", color: "var(--lx-warn)", dash: "6 4" }],
@@ -167,17 +195,8 @@
         text: { head: ["Hour", "Average, t/MWh", "Marginal, t/MWh", "On the margin"],
                 rows: W.avg.map(function (v, t) { return [span(t), f2(v), f2(W.marg[t]), PLANT[W.margKey[t]]]; }) }
       });
-      status.innerHTML = say(r);
+      status.innerHTML = statusLines(r).map(function (t) { return "<p>" + t + "</p>"; }).join("");
       if (acted) LX.store.set("cf6-idea", { a: S.a, b: S.b, preset: S.preset });
-    }
-    function say(r) {
-      if (r.same) return "Pick two different hours.";
-      var c = changes(r), t = "Out of " + span(r.a) + ": " + (c.out || "nothing changes") + ". Into " + span(r.b) + ": " + c.into + ". ";
-      var d = Math.abs(Math.round(r.system * 10) - Math.round(r.attributed * 10));
-      if (Math.round(r.system * 10) === 0 && Math.round(r.attributed * 10) !== 0) t += "<b>The average books a change the plants never make.</b>";
-      else if (d === 0) t += "<b>Here the two views agree.</b>";
-      else t += "<b>The plants' change is " + (Math.abs(r.system) > Math.abs(r.attributed) ? "larger" : "smaller") + " than the average says.</b>";
-      return t;
     }
     paint(false);
     // demo states (core.js LX.demo): "mid" = the second preset (dawn to small hours); "eve-morning" = the third

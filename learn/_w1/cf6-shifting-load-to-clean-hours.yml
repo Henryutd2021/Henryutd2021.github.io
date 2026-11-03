@@ -1,5 +1,5 @@
-# Sidecar for CF6 (cf6-shifting-load-to-clean-hours), builder learn-w2-i, 2026-11-03. Read by scripts/build_learn.py.
-# The page is a draft (learn/_drafts/) until Henry approves its excerpt (reports/learn/excerpts_for_approval.md, E6).
+# Sidecar for CF6 (cf6-shifting-load-to-clean-hours), builder learn-w2-i, 2026-11-03; fixes learn-w2-fix-i. Read by
+# scripts/build_learn.py. Henry approved the page's excerpt on 2026-11-03 (reports/learn/excerpts_for_approval.md, E6).
 id: cf6-shifting-load-to-clean-hours
 lesson: CF6
 glossary:
@@ -8,6 +8,13 @@ glossary:
     def: "An hour's CO₂ from all the plants that ran, divided by all the electricity used in that hour."
   - id: marginal-emission-factor
     term: Marginal emission factor
-    def: "The change in a grid's CO₂ when demand in one hour grows by one megawatt-hour: the CO₂ rate of the plant that serves it."
-requests:
-  - "The page sets body class theme-carbon so the allow-listed ghg explainer finds its theme colour (--t, assets/base.css); without it the explainer draws in grey. A Learn-wide rule (for example .page-learn .explainer { --t: var(--lx-accent); }) would remove the need."
+    def: "The change in a grid's total CO₂ caused by a small change in electricity demand; in Prairie Town, the CO₂ rate of the next plant that responds."
+  - id: attributed-emissions
+    term: Attributed emissions
+    def: "The share of a grid's CO₂ assigned to one user, for example each MWh it uses times that hour's average emission factor."
+  - id: optimization-window
+    term: Optimization window
+    def: "The stretch of time, such as a month, within which a model may move electricity use between hours while keeping the total over that stretch."
+  - id: penalty
+    term: Penalty
+    def: "An extra cost added to a model's objective for an action it should not take too freely, such as adjusting an hour's load."

@@ -1,9 +1,9 @@
 {
-  "about": "Case file CF7 (cf7-cost-of-waiting), wave W2 draft, 2026-11-03. Delay economics only; data centers appear only as loads. 'timeline' gives two public context events (DOE, with their primary sources) and the study's steps; 'boundary' describes the course author's accepted conference paper (Li et al., NAPS 2026; DOI pending), drawn from approved excerpts (reports/learn/excerpts_for_approval.md, E7). 'idea' is an illustrative toy with invented round numbers (not the study's inputs, equations or results): one large load waits for its grid connection, and the wait is priced in three separate accounts in present value.",
+  "about": "Case file CF7 (cf7-cost-of-waiting), 2026-11-03. Delay economics only; data centers appear only as loads. 'timeline' gives two public context events (DOE, with their primary sources), then the study's steps. Research text: the text of the study step, 'boundary' (its lists) and the study fact's 'what' are approved sentences of reports/learn/excerpts_for_approval.md (E7, with its revisions after review), word for word; _tests/learn/test_cf7-cost-of-waiting.js checks them. The paper is cited without its title, DOI pending (E7.14). 'idea' is an illustrative toy with invented round numbers (not the study's inputs, equations or results): one large load waits for its grid connection, and the wait is priced in three separate accounts in present value.",
   "built": "2026-11-03",
   "timeline": {
     "title": "The question in time",
-    "lede": "Two public events that made large-load connections a national question, then the study.",
+    "lede": "Two public events, then the study and its code.",
     "events": [
       { "date": "2024-12-20", "label": "Data-center demand measured", "kind": "data",
         "text": "DOE releases a Berkeley Lab report: U.S. data centers used about 176 TWh in 2023, about 4.4% of U.S. electricity.",
@@ -14,15 +14,13 @@
       { "date": "2026-10", "label": "Paper presented", "kind": "study", "key": true,
         "text": "The delay is priced in three separate accounts: the developer, electricity ratepayers and society.",
         "source": { "label": "Li et al. (2026), North American Power Symposium (NAPS 2026), accepted; DOI pending" } },
-      { "date": "2026-10-30", "label": "Model framework released", "kind": "event",
-        "text": "A documented, open implementation of the framework, with illustrative example inputs (version 1.0.0).",
+      { "date": "2026-10-30", "label": "Code released", "kind": "event",
         "source": { "label": "code-delayed-energization on GitHub", "url": "https://github.com/Henryutd2021/code-delayed-energization", "as_of": "2026-11-03" } }
     ],
     "kinds": { "event": "Code" }
   },
   "boundary": {
-    "title": "Where the study's result holds",
-    "lede": "The accounts are separate prices of one given delay, within the study's stated boundary:",
+    "title": "Where the result holds",
     "holds": [
       "the delay is taken as given, not explained;",
       "the parameters are illustrative, so the study reports which inputs move the result, not a forecast;",
@@ -53,10 +51,20 @@
     "delays": { "min": 0, "max": 48, "step": 6, "start": 24 },
     "tariffShares": [0, 0.5, 1],
     "startShare": 0,
-    "why": "A 100 MW load (a data center or a factory) has $500M of buildings and equipment ready and would earn a $45,000 margin per MW each month once connected. The utility has built $60M of upgrades for it. While the load waits, the utility's money in those upgrades still costs interest, and the chance that the load never arrives grows by 0.5% a month (at most 50%). A large-load tariff (a minimum bill, collateral or an exit fee) decides what share of those two utility costs the waiting load pays; other customers pay the rest. Bridge power: on-site generators run half the load during the wait at $30 per MWh above grid power, emitting 0.1 t CO2 per MWh more than the grid power they replace, valued at $100 per tonne. Every cost is discounted at 8% a year, monthly."
+    "assumptions": [
+      ["The load", "100 MW, such as a data center or a factory"],
+      ["Margin once connected", "$45,000 per MW a month (revenue minus operating costs)"],
+      ["Capital ready and idle", "$500M of buildings and equipment, carried at the discount rate"],
+      ["Grid upgrades built for it", "$60M; while it waits, the utility's money in them still costs interest"],
+      ["Chance it never arrives", "0.5% more each month of waiting, at most 50%; then the upgrades are stranded"],
+      ["Large-load tariff", "decides what share of those utility costs the waiting load pays; other customers pay the rest"],
+      ["Bridge power", "on-site generators run half the load during the wait, at $30 per MWh above grid power"],
+      ["Its CO₂", "0.1 t per MWh more than grid power, had the load been connected on time; $100 per tonne"],
+      ["Discounting", "8% a year, month by month"]
+    ]
   },
   "facts": [
-    { "n": "on the order of $0.7 billion", "what": "Present-value cost to the developer of a 36-month delay for a 300 MW-IT facility (the study's case).", "source": "Li et al. (2026), NAPS 2026 (accepted)", "url": "", "asof": "presented October 2026; DOI pending" },
+    { "n": "on the order of $0.7 billion", "what": "For a 300 MW-IT facility, a 36-month delay costs the developer on the order of $0.7 billion in present value.", "source": "Li et al. (2026), NAPS 2026 (accepted)", "url": "", "asof": "presented October 2026; DOI pending" },
     { "n": "about 4.4%", "what": "Share of U.S. electricity used by data centers in 2023 (about 176 TWh).", "source": "U.S. Department of Energy (Berkeley Lab report)", "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers", "asof": "published 20 December 2024; data for 2023" }
   ]
 }
