@@ -28,8 +28,8 @@
      (dObjective/dRHS, same sign convention for min and max). For a demand balance row in a cost-minimising dispatch
      this is the marginal cost of one more MWh: a marginal value under stated assumptions (fixed capacities, a convex
      model, the modelled market), not a market price. reducedCosts[v] = dObjective per unit increase of v's active bound.
-   MILP: no duals and no reduced costs (null), because a mixed-integer program has no shadow prices. For prices
-     conditional on the integer decisions (for example a unit-commitment schedule) call
+   MILP: no duals and no reduced costs (null): HiGHS returns no duals for a MILP. For prices conditional on the integer
+     decisions (for example a unit-commitment schedule), call
      LX.solver.fixAndReprice(model, milpResult, opts): it fixes every integer and binary variable at its MILP value,
      re-solves the remaining LP and returns its duals with conditional: true and the fixed values in `fixed`. Such
      prices do not cover start-up or no-load costs (those need uplift payments); say so on the page.
