@@ -24,8 +24,8 @@
 //   wind turbine (clean power curve, illustrative): P(v) = rated x (v / v_rated)^3 for cut-in <= v < v_rated; rated for
 //   v_rated <= v <= cut-out; 0 otherwise. Doubling v below the rated speed multiplies P by 2^3 = 8.
 //
-// Lesson-local component (for the coordinator to promote): EquationCard, the e-equation explain element (an equation
-// whose symbols link to words, the reader's numbers and code). The pure model is exported for Node.
+// The explain layer's equation card is the shared LX.EquationCard (components/equation.js). The pure model is exported
+// for Node.
 (function () {
   "use strict";
   var HOURS = 8760;
@@ -228,40 +228,6 @@
       svg.setAttribute("aria-label", "Power curve of an illustrative 3 MW turbine: output rises with the cube of wind speed from " + tb.cutIn + " m/s to the rated speed of " + tb.ratedSpeed + " m/s, stays at " + F.int(tb.ratedKW) + " kW up to " + tb.cutOut + " m/s, then stops. Marked: " + v + " m/s, " + kw(power(v, tb)) + "."); } };
   }
 
-  // ---- lesson-local explain component: an equation whose symbols open their meaning, the reader's numbers and code
-  function EquationCard(host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var wrap = H("div", { class: "lx5-eq" }, host), rows = H("div", { class: "lx5-eq-rows" }, wrap), det = H("div", { class: "lx-cdetail", "aria-live": "polite" }, wrap);
-    var btns = {};
-    o.rows.forEach(function (r) {
-      var row = H("p", { class: "lx5-eq-row", role: "group", "aria-label": r.say }, rows);
-      r.parts.forEach(function (p) {
-        if (typeof p === "string") { H("span", { class: "op", text: p, "aria-hidden": "true" }, row); return; }
-        var s = o.symbols[p.k], b = H("button", { type: "button", class: "sym", style: "--c:" + s.color, "aria-pressed": "false", "aria-label": s.name }, row);
-        b.innerHTML = s.sym; b.addEventListener("click", function () { select(p.k); });
-        (btns[p.k] = btns[p.k] || []).push(b);
-      });
-      if (r.note) H("span", { class: "note", text: r.note }, row);
-    });
-    var code = H("details", { class: "lx-textalt lx5-code" }, rows); H("summary", { text: "The same equation in code (Python)" }, code);
-    H("pre", { text: o.code }, code);
-    var alt = H("details", { class: "lx-textalt" }, rows); H("summary", { text: "Text version" }, alt);
-    var ul = H("ul", null, alt);
-    o.rows.forEach(function (r) { H("li", { text: r.say }, ul); });
-    Object.keys(o.symbols).forEach(function (k) { var s = o.symbols[k]; H("li", { html: "<b>" + LX.esc(s.name) + "</b>: " + LX.rich(s.text) }, ul); });
-    function select(k) {
-      Object.keys(btns).forEach(function (j) { btns[j].forEach(function (b) { b.setAttribute("aria-pressed", j === k ? "true" : "false"); }); });
-      var s = o.symbols[k]; det.innerHTML = "";
-      H("p", { class: "lx-eyebrow", text: "Symbol" }, det); H("h4", { text: s.name + (s.unit ? " (" + s.unit + ")" : "") }, det);
-      H("p", { html: LX.rich(s.text) }, det);
-      var you = typeof s.you === "function" ? s.you() : s.you;
-      if (you) { var ig = H("div", { class: "ingame" }, det); H("b", { text: "In this lesson" }, ig); H("span", { html: LX.rich(you) }, ig); }
-    }
-    select(o.sel || Object.keys(o.symbols)[0]);
-    return { select: select };
-  }
-
   function view(live, data, root) {
     var D = data["05_capacity_factor"], year = data.town_year, W = world(year, D, data.cf_targets), T = W.T, P = D.plantMW, tb = D.turbine;
     var log = LX.store.get("t5-log", {}) || {};
@@ -441,7 +407,7 @@
     });
     var c2 = H("div", { class: "lx-xcard" }, host);
     var log = function () { return LX.store.get("t5-log", {}) || {}; };
-    EquationCard(c2, {
+    LX.EquationCard(c2, {
       title: "The capacity-factor equation",
       lede: "Tap a symbol to see what it means and where it appeared in this lesson.",
       rows: [{ parts: [{ k: "cf" }, "=", { k: "E" }, "÷", "(", { k: "P" }, "×", { k: "T" }, ")"], say: "Capacity factor equals energy made divided by size times hours." },
@@ -455,7 +421,7 @@
              you: "100 MW for each of the three plants; " + D.apply.mw + " MW for Prairie Town's wind farm." },
         T: { sym: "T", name: "Hours in the period", unit: "h", color: "var(--lx-ink-3)", text: "Every hour counts, including nights and calm days.", you: "24 h for one day; 8,760 h for 2025." }
       },
-      sel: "cf",
+      sel: "cf", aside: true, eyebrow: "Symbol", fields: [{ key: "you", label: "In this lesson" }], codeLabel: "The same equation in code (Python)",
       code: "energy_mwh = sum(hourly_mw)            # each hour: MW x 1 h\ncf = energy_mwh / (size_mw * hours)      # e.g. " + F.int(W.dayEnergy) + " / (100 * 24) = " + W.dayCF.toFixed(3) + "\nenergy_year = size_mw * 8760 * cf        # " + D.apply.mw + " * 8760 * " + T.wind + " = " + F.int(W.applyMWh)
     });
   }

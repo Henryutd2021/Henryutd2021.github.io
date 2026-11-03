@@ -103,11 +103,6 @@
       ".lx8-sw .lx-choice .st{margin-left:auto;font-family:var(--lx-f-mono);font-size:12px;color:var(--lx-ink-3)}",
       ".lx8-sw .lx-choice[aria-pressed=true] .st{color:var(--lx-ink)}",
       ".lx8-marks{display:flex;flex-wrap:wrap;gap:6px}",
-      ".lx8-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}",
-      ".lx8-form>div{border:1px solid var(--lx-line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;align-content:start;background:var(--lx-surface-2)}",
-      ".lx8-form h4{font-size:13px;margin:0;letter-spacing:.06em;text-transform:uppercase;color:var(--lx-ink-3)}",
-      ".lx8-form p{font-size:15px;color:var(--lx-ink)}",
-      ".lx8-sym{font-family:var(--lx-f-mono);font-size:14.5px;line-height:1.8;color:var(--lx-ink);background:var(--lx-surface-2);border-radius:10px;padding:10px 14px;overflow-x:auto}",
       ".lx8-steel{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}",
       ".lx8-steel>div{border:1px solid var(--lx-line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;background:var(--lx-surface-2)}",
       ".lx8-steel h4{font-size:15.5px;margin:0}",
@@ -411,18 +406,18 @@
     var host = document.getElementById("merit-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
     var f = town.fleet, base = { gas: D.gas.ref }, r = run(town, D, h, base);
-    // 1 Formulate it
-    var c1 = H("div", { class: "lx-xcard" }, host), hd = H("header", { class: "lx-x-head" }, c1);
-    H("h3", { text: "Formulate it: the operator's problem in words" }, hd);
-    H("p", { class: "lx-lede", text: "The same three parts as lesson 0's day, for one hour: " + D.hourLabel + " on " + h.dateLabel + "." }, c1);
-    var g = H("div", { class: "lx8-form" }, c1);
-    function part(t, x) { var d = H("div", null, g); H("h4", { text: t }, d); H("p", { html: LX.rich(x) }, d); }
-    part("Decisions", "How much each of the five plants makes this hour: five numbers, in MW ([[decision-variable|decision variables]]).");
-    part("Goal", "Make the hour's total running cost as small as possible: each offer times its MW, added up (the [[objective|objective]]).");
-    part("Rules", "Supply equals demand: the five outputs add up to " + h.demand + " MW. Each plant runs between 0 and what it can make now: wind " + h.wind + " MW and solar " + h.solar + " MW (the weather's limit), the others their size ([[constraint|constraints]]).");
-    part("What comes back", "Who runs (the stack) and the price: how much the best cost rises for one more MWh of demand, " + usd(r.price) + " here.");
-    var sym = H("details", { class: "lx-textalt" }, c1); H("summary", { text: "Show it in symbols" }, sym);
-    H("div", { class: "lx8-sym", html: "minimize &nbsp;Σ<sub>g</sub> c<sub>g</sub> p<sub>g</sub><br>subject to &nbsp;Σ<sub>g</sub> p<sub>g</sub> = D &nbsp;&nbsp;(its shadow price λ is the clearing price)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 ≤ p<sub>g</sub> ≤ P<sub>g</sub> &nbsp;for each plant g" }, sym);
+    // 1 Formulate it (LX.FormulateBox, components/formulate.js)
+    LX.FormulateBox(H("div", { class: "lx-xcard" }, host), {
+      title: "Formulate it: the operator's problem in words",
+      lede: "The same three parts as lesson 0's day, for one hour: " + D.hourLabel + " on " + h.dateLabel + ".",
+      parts: [
+        { k: "Decisions", color: "var(--lx-tier-2)", text: "How much each of the five plants makes this hour: five numbers, in MW ([[decision-variable|decision variables]])." },
+        { k: "Goal", color: "var(--lx-good)", text: "Make the hour's total running cost as small as possible: each offer times its MW, added up (the [[objective|objective]])." },
+        { k: "Rules", color: "var(--lx-warn)", text: "Supply equals demand: the five outputs add up to " + h.demand + " MW. Each plant runs between 0 and what it can make now: wind " + h.wind + " MW and solar " + h.solar + " MW (the weather's limit), the others their size ([[constraint|constraints]])." },
+        { k: "What comes back", color: "var(--lx-accent)", text: "Who runs (the stack) and the price: how much the best cost rises for one more MWh of demand, " + usd(r.price) + " here." }
+      ],
+      symbols: "minimize &nbsp;Σ<sub>g</sub> c<sub>g</sub> p<sub>g</sub><br>subject to &nbsp;Σ<sub>g</sub> p<sub>g</sub> = D &nbsp;&nbsp;(its shadow price λ is the clearing price)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 ≤ p<sub>g</sub> ≤ P<sub>g</sub> &nbsp;for each plant g"
+    });
     // 2 who runs and who is paid what
     var c2 = H("div", { class: "lx-xcard" }, host), c3 = H("div", { class: "lx-xcard" }, host);
     var order = stack(town, D, h, base).map(function (b) { return b.key; });

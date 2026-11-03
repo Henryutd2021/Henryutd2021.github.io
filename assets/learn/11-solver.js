@@ -3,7 +3,7 @@
 // Data: assets/learn/data/11-solver.json (slider ranges, the unserved penalty, lesson 0's cheapest-first totals and a
 // precomputed answer used only if the solver cannot load), town.json (Prairie Town's fleet; illustrative), town_year.json
 // (real 2025 SPP shapes) and 10-write-it-down.json (the hour of lesson 10, for the "peek inside the solver" box). The
-// page also loads assets/learn/10-write-it-down.js for its lesson-local components (plot, simplex walk, equation card).
+// page also loads assets/learn/10-write-it-down.js for its lesson-local components (plot, simplex walk).
 //
 // Model: lesson 0's day (3 September 2025, cut and rounded as grid-operator.js prepare() does) as one linear program,
 // solved in the browser by HiGHS (LX.solver):
@@ -452,14 +452,15 @@
     var host = document.getElementById("w11-explain");
     if (host) {
       host.innerHTML = ""; host.classList.add("is-live");
-      var P = D.precomputed, sym = function (id, html) { return '<button class="s" data-s="' + id + '">' + html + "</button>"; };
-      W1F.EquationCard(H("div", { class: "lx-xcard" }, host), {
+      var P = D.precomputed, sym = LX.EquationCard.sym;
+      LX.EquationCard(H("div", { class: "lx-xcard" }, host), {
         title: "The price, as an equation",
         lede: "Tap a symbol. Each one links what the solver returns to what it means.",
-        lines: [
-          sym("lam", "λ(<var>t</var>)") + " = " + sym("dC", "Δ<var>C</var>*") + " / " + sym("dd", "Δ<var>d</var>(<var>t</var>)") + '<span class="tag">shadow price of the demand rule</span>',
-          sym("C", "<var>C</var>*") + " = min Σ<sub><var>t</var></sub> ( 40 <var>p</var><sub>cc</sub>(<var>t</var>) + " + f.peaker.cost + " <var>p</var><sub>pk</sub>(<var>t</var>) + <var>V</var> <var>u</var>(<var>t</var>) ) + 24,000" + '<span class="tag">best running cost</span>',
-          "λ(19) = " + sym("c", "$" + f.cc.cost + "/MWh") + " = " + sym("cc", "<var>c</var><sub>cc</sub>") + '<span class="tag">no ramp rule binds at 19:00</span>'
+        dense: true, label: "The model; each symbol is a button", textLabel: "Text version: every symbol", fields: [{ key: "code", label: "In code", code: true }],
+        rows: [
+          { html: sym("lam", "λ(<var>t</var>)") + " = " + sym("dC", "Δ<var>C</var>*") + " / " + sym("dd", "Δ<var>d</var>(<var>t</var>)"), tag: "shadow price of the demand rule" },
+          { html: sym("C", "<var>C</var>*") + " = min Σ<sub><var>t</var></sub> ( 40 <var>p</var><sub>cc</sub>(<var>t</var>) + " + f.peaker.cost + " <var>p</var><sub>pk</sub>(<var>t</var>) + <var>V</var> <var>u</var>(<var>t</var>) ) + 24,000", tag: "best running cost" },
+          { html: "λ(19) = " + sym("c", "$" + f.cc.cost + "/MWh") + " = " + sym("cc", "<var>c</var><sub>cc</sub>"), tag: "no ramp rule binds at 19:00" }
         ],
         symbols: {
           lam: { name: "λ(t)", label: "lambda of t", words: "The [[shadow-price|shadow price]] of hour t's demand rule: how much the best cost rises per extra MWh of demand in that hour, in $/MWh. HiGHS returns it with the answer, for every rule.", code: 'r.duals["balance_19"]   // ' + P.duals[19] },

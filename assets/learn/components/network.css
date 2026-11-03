@@ -1,0 +1,8 @@
+/* network.css — LX.Network (network.js): buses as boxes, lines with flows; a tapped bus has a thicker border. */
+.lx-net svg { display: block; width: 100%; max-width: 440px; height: auto; margin: 0 auto; }
+.lx-net .bus[role="button"] { cursor: pointer; }
+.lx-net .bus:focus { outline: none; }
+.lx-net .bus:focus-visible rect.box { stroke: var(--lx-accent); stroke-width: 3; }
+.lx-net .bus.sel rect.box { stroke-width: 3.5; }
+.lx-net text { font-family: var(--lx-f-display); }
+.lx-net .num { font-family: var(--lx-f-mono); font-weight: 600; }

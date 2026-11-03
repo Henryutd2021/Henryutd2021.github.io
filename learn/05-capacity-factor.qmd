@@ -66,26 +66,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .lx5-prow { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 7.5em; gap: 10px; align-items: center; font-size: 14px; color: var(--lx-ink-2); }
 .lx5-prow b { font-family: var(--lx-f-mono); font-size: 14px; text-align: right; color: var(--lx-ink); }
 .lx5-prow.sel span { color: var(--lx-ink); font-weight: 600; }
-.lx5-eq { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
-.lx5-eq-rows { display: grid; gap: 14px; align-content: start; }
-.lx5-eq-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-family: var(--lx-f-mono); font-size: 24px; color: var(--lx-ink); }
-.lx5-eq-row .op { color: var(--lx-ink-3); }
-.lx5-eq-row .note { font-family: var(--lx-f-body); font-size: 13px; color: var(--lx-ink-3); flex-basis: 100%; }
-.lx5-eq-row .sym { min-width: 48px; min-height: 46px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); border-bottom: 4px solid var(--c);
-  background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 22px; font-weight: 600; cursor: pointer; }
-.lx5-eq-row .sym[aria-pressed="true"] { background: var(--lx-ink); color: var(--lx-bg); border-color: var(--lx-ink); border-bottom-color: var(--c); }
-.lx5-eq-rows details.lx-textalt, .lx-step-act details.lx-textalt { margin: 0; }
-.lx5-code pre { margin: 6px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--lx-surface-2); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 13px;
-  white-space: pre-wrap; overflow-wrap: anywhere; }
-@media (max-width: 860px) { .lx5-eq { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) {
   .lx5-hours { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .lx5-stats b { font-size: 15px; }
   .lx5-wrow { grid-template-columns: minmax(0, 1fr); }
   .lx5-prow { grid-template-columns: minmax(0, 1fr) 6.5em; }
   .lx5-prow .lx5-fill-bar { grid-column: 1 / -1; grid-row: 2; }
-  .lx5-eq-row { font-size: 18px; gap: 6px 5px; }
-  .lx5-eq-row .sym { min-width: 40px; min-height: 42px; padding: 0 7px; font-size: 19px; }
 }
 @media (prefers-reduced-motion: reduce) { .lx5-fill-bar i { transition: none; } }
 </style>

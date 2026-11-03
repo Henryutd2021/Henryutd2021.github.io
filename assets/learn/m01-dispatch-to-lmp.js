@@ -23,8 +23,8 @@
 // words. ptdf() and decompose() give the textbook split LMP_n = LMP_ref - sum_l PTDF[l][n] mu_l (Go deeper).
 //
 // Every number the page states is produced by this model and checked by _tests/learn/test_m01-dispatch-to-lmp.js.
-// The view uses the component library (assets/learn/learn.js); lesson-local parts (formulation viewer, network diagram,
-// price chart) are built here and listed as requests in learn/_w1/m01-dispatch-to-lmp.yml.
+// The view uses the component library (assets/learn/learn.js): LX.Formulation for the model in full and LX.Network for the
+// three-bus map (components/formulation.js, network.js); the price chart is built here.
 (function () {
   "use strict";
   var PLANTS = ["nuclear", "wind", "solar", "cc", "pk"];
@@ -222,7 +222,6 @@
     E("style", { id: "m1-css", text: [
       ".lx-interactive.m1-lab{max-width:980px}",
       ".m1-cards{display:grid;gap:14px}",
-      ".m1-views>.lx-seg{justify-self:start}",
       ".m1-lab .lx-stepcard{gap:12px}",
       ".m1-lab .lx-step-text{max-width:60ch}",
       ".m1-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
@@ -237,12 +236,6 @@
       ".m1-hours{display:flex;align-items:center;gap:8px;flex-wrap:wrap}",
       ".m1-hours output{font-family:var(--lx-f-mono);font-size:16px;font-weight:600;min-width:58px;text-align:center}",
       ".m1-hours button{min-width:44px}",
-      ".m1-net svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}",
-      ".m1-net .bus{cursor:pointer}.m1-net .bus:focus{outline:none}",
-      ".m1-net .bus:focus-visible rect.box{stroke:var(--lx-accent);stroke-width:3}",
-      ".m1-net .bus.sel rect.box{stroke-width:3.5}",
-      ".m1-net text{font-family:var(--lx-f-display)}",
-      ".m1-net .num{font-family:var(--lx-f-mono);font-weight:600}",
       ".m1-recipe{border:1px solid var(--lx-line);border-radius:12px;padding:10px 14px;background:var(--lx-surface-2);display:grid;gap:6px;font-size:15px}",
       ".m1-recipe ul{margin:0;padding-left:1.1rem}.m1-recipe li{margin:2px 0}",
       ".m1-recipe .sum{font-family:var(--lx-f-mono);font-size:14.5px}",
@@ -256,20 +249,6 @@
       ".m1-rule .det{font-size:14.5px;color:var(--lx-ink-2)}",
       ".m1-sym{font-family:var(--lx-f-mono);font-size:14px;color:var(--lx-ink);overflow-x:auto;white-space:nowrap;padding:2px 0}",
       ".m1-sym i{font-family:var(--lx-f-body);font-style:italic;font-size:15px}",
-      ".m1-ftab{width:100%;border-collapse:collapse;font-size:14px}",
-      ".page-learn .m1-ftab,.page-learn .m1-ftab>:not(caption)>*,.page-learn .m1-ftab>:not(caption)>*>*{background:transparent !important;box-shadow:none !important;color:var(--lx-ink)}",
-      ".page-learn .m1-ftab tr.on>td{background:var(--lx-accent-soft) !important}",
-      ".m1-ftab th{text-align:left;font-family:var(--lx-f-display);font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--lx-ink-3);padding:6px 8px;border-bottom:1px solid var(--lx-line-2)}",
-      ".m1-ftab td{padding:8px;border-bottom:1px solid var(--lx-line);vertical-align:top}",
-      ".m1-ftab td.sym{font-family:var(--lx-f-mono);font-size:13.5px;white-space:nowrap}",
-      ".m1-ftab td.sym i{font-family:var(--lx-f-body);font-style:italic;font-size:14.5px}",
-      ".m1-ftab tr.on td{background:var(--lx-accent-soft)}",
-      ".m1-ftab tr.later td{color:var(--lx-ink-3)}",
-      "@media (max-width:640px){.m1-ftab thead{display:none}.m1-ftab,.m1-ftab tbody,.m1-ftab tr,.m1-ftab td{display:block}.m1-ftab tr{padding:8px 0;border-bottom:1px solid var(--lx-line)}.m1-ftab td{border:0;padding:2px 0}.m1-ftab td.sym{white-space:normal}.m1-ftab td[data-l]::before{content:attr(data-l) \": \";font-family:var(--lx-f-display);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--lx-ink-3)}}",
-      ".m1-views{display:grid;gap:10px}",
-      ".m1-words li{margin:4px 0}.m1-words{margin:0;padding-left:1.2rem;font-size:15.5px}",
-      ".m1-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 16px;font-size:14px;color:var(--lx-ink-2);margin:0}",
-      ".m1-legend dt{font-family:var(--lx-f-mono);color:var(--lx-ink)}.m1-legend dd{margin:0 0 4px}",
       ".m1-anno{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}",
       "@media (max-width:760px){.m1-anno{grid-template-columns:minmax(0,1fr)}}",
       ".m1-anno ol{margin:0;padding-left:1.3rem;display:grid;gap:8px;font-size:15px}",
@@ -278,7 +257,7 @@
     ].join("\n") }, document.head);
   }
 
-  // ---- formulation viewer: words, symbols and a table, linked by rule
+  // ---- the model's rules (the explain layer shows them with LX.Formulation; step 1 lists the one-bus rules)
   var SUB = function (s) { return "<sub>" + s + "</sub>"; };
   var RULES = [
     { id: "obj", name: "Goal", words: "Keep the day's running cost as low as possible.",
@@ -314,50 +293,6 @@
     ["d_n,t", "demand, MW (all of it in town)"], ["A_g,t", "wind or solar the weather gives, MW"],
     ["b_ℓ", "line susceptance, 1,000 MW per radian, equal on all lines"], ["F_ℓ", "line limit, MW (you set Ridge–Town)"]
   ];
-
-  function Formulation(host, o) {
-    o = o || {};
-    var n = o.hours || 24, net = !!o.network, view = o.view || "table", sel = o.sel || null;
-    var w = E("div", { class: "m1-views" }, host);
-    var seg = E("div", { class: "lx-seg", role: "group", "aria-label": "Show the model as" }, w);
-    var body = E("div", null, w);
-    var views = [["words", "In words"], ["symbols", "In symbols"], ["table", "As a table"]];
-    var btns = views.map(function (v) {
-      return E("button", { type: "button", "aria-pressed": v[0] === view ? "true" : "false", text: v[1], onclick: function () { view = v[0]; paint(); } }, seg);
-    });
-    function rules() { return RULES.filter(function (r) { return net || !r.net || o.showLater; }); }
-    function paint() {
-      btns.forEach(function (b, i) { b.setAttribute("aria-pressed", views[i][0] === view ? "true" : "false"); });
-      body.innerHTML = "";
-      if (view === "words") {
-        var ol = E("ol", { class: "m1-words" }, body);
-        rules().forEach(function (r) { var li = E("li", { html: "<b>" + r.name + ".</b> " + r.words + (r.net && !net ? " <span class=\"m1-tag\">(added when the plants go on the map)</span>" : "") }, ol); if (r.id === sel) li.style.fontWeight = "600"; });
-      } else if (view === "symbols") {
-        rules().forEach(function (r) {
-          var d = E("div", { class: "m1-sym", html: "<span class=\"m1-tag\">" + r.name + "</span>&nbsp;&nbsp;" + (!net && r.sym1 ? r.sym1 : r.sym) }, body);
-          if (r.id === sel) d.style.background = "var(--lx-accent-soft)";
-        });
-        var dl = E("dl", { class: "m1-legend" }, body);
-        LEGEND.forEach(function (x) { E("dt", { text: x[0] }, dl); E("dd", { text: x[1] }, dl); });
-      } else {
-        var sc = E("div", { class: "lx-scroll-x" }, body), tb = E("table", { class: "m1-ftab" }, sc);
-        var hr = E("tr", null, E("thead", null, tb));
-        ["Rule", "In words", "In symbols", "How many", "Its dual means"].forEach(function (h) { E("th", { scope: "col", text: h }, hr); });
-        var tbody = E("tbody", null, tb);
-        rules().forEach(function (r) {
-          var tr = E("tr", { class: (r.id === sel ? "on " : "") + (r.net && !net ? "later" : "") }, tbody);
-          E("td", { "data-l": "Rule", html: "<b>" + r.name + "</b>" }, tr);
-          E("td", { "data-l": "In words", text: r.words }, tr);
-          E("td", { class: "sym", "data-l": "In symbols", html: !net && r.sym1 ? r.sym1 : r.sym }, tr);
-          E("td", { "data-l": "How many", text: r.rows(net, n) }, tr);
-          E("td", { "data-l": "Its dual", text: r.dual }, tr);
-        });
-      }
-      LX.emit("layout");
-    }
-    paint();
-    return { set: function (x) { if (x.sel !== undefined) sel = x.sel; if (x.view) view = x.view; if (x.network !== undefined) net = x.network; paint(); }, el: w };
-  }
 
   // ---- 24-hour price chart: one line per bus (they coincide without congestion); tap an hour to select it
   function PriceChart(host, o) {
@@ -427,63 +362,21 @@
     return { set: function (v) { set(v); }, val: function () { return t; } };
   }
 
-  // ---- the three-bus network: buses with their prices, lines with flows and limits; tap a bus to explain its price
+  // ---- the three-bus network: LX.Network (components/network.js) with this lesson's layout; tap a bus to explain its price
   var POS = { R: [78, 62], G: [282, 62], T: [180, 238] };
   function Network(host, o) {
-    var D = o.D, w = E("div", { class: "m1-net" }, host), svg = S("svg", { viewBox: "0 0 360 300", role: "group", "aria-label": "Three-bus network: Wind Ridge, Gas Hub and Prairie Town, joined by three lines." }, w);
-    var alt = E("details", { class: "lx-textalt" }, host); E("summary", { text: "Text version" }, alt); var altBody = E("div", null, alt);
-    var gl = S("g", null, svg), gb = S("g", null, svg), st = { h: null, sel: null, lim: {}, transfer: null };
-    function plantsAt(b) { return Object.keys(D.fleet).filter(function (k) { return D.fleet[k].bus === b; }); }
-    function draw() {
-      gl.innerHTML = ""; gb.innerHTML = "";
-      var lim = st.lim, h = st.h, lines = [];
-      D.lines.forEach(function (l) {
-        var a = POS[l.from], b = POS[l.to], fl = st.transfer ? st.transfer[l.id] : h && h.flow ? h.flow[l.id] : null;
-        var full = h && h.full && h.full[l.id], col = full ? "var(--lx-bad)" : "var(--lx-ink-3)";
-        var wdt = fl == null ? 3 : 2.5 + Math.min(9, Math.abs(fl) / 22);
-        S("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: col, "stroke-width": wdt, "stroke-linecap": "round", opacity: full ? 1 : .75 }, gl);
-        var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
-        if (fl != null && Math.abs(fl) > 0.05) {   // arrow in the flow's direction
-          var dx = b[0] - a[0], dy = b[1] - a[1], L = Math.sqrt(dx * dx + dy * dy), ux = dx / L * (fl > 0 ? 1 : -1), uy = dy / L * (fl > 0 ? 1 : -1);
-          var px = -uy, py = ux, cx = mx + ux * 22, cy = my + uy * 22, s = 7;
-          S("path", { d: "M" + (cx + ux * s) + " " + (cy + uy * s) + " L" + (cx - ux * s + px * s) + " " + (cy - uy * s + py * s) + " L" + (cx - ux * s - px * s) + " " + (cy - uy * s - py * s) + "Z", fill: col }, gl);
-        }
-        var lab = fl == null ? l.name : Math.round(Math.abs(fl)) + (isFinite(lim[l.id]) && !st.transfer ? " / " + lim[l.id] : "") + " MW";
-        // labels sit beside their line: above the top line, left of Ridge-Town, right of Gas Hub-Town
-        var lx = l.id === "RT" ? mx - 14 : l.id === "GT" ? mx + 14 : mx, ly = l.id === "RG" ? 18 : my - 4;
-        var anchor = l.id === "RT" ? "end" : l.id === "GT" ? "start" : "middle";
-        var txa = { x: lx, y: ly, "text-anchor": anchor, "font-size": 13.5, class: "num", fill: full ? "var(--lx-bad)" : "var(--lx-ink-2)", stroke: "var(--lx-surface)", "stroke-width": 4, "paint-order": "stroke" };
-        S("text", txa, gl).textContent = lab;
-        if (full) { var t2 = {}; for (var q in txa) t2[q] = txa[q]; t2.y = ly + 17; S("text", t2, gl).textContent = "full"; }
-        lines.push(l.name + ": " + (fl == null ? "no flow shown" : Math.round(Math.abs(fl) * 10) / 10 + " MW from " + busOf(D, fl >= 0 ? l.from : l.to).short + " to " + busOf(D, fl >= 0 ? l.to : l.from).short) + (isFinite(lim[l.id]) && !st.transfer ? ", limit " + lim[l.id] + " MW" + (full ? " (full)" : "") : ""));
-      });
-      var buses = [];
-      D.buses.forEach(function (b) {
-        var p = POS[b.id], price = h && h.price ? h.price[b.id] : null, sel = st.sel === b.id;
-        var g = S("g", { class: "bus" + (sel ? " sel" : ""), transform: "translate(" + (p[0] - 66) + "," + (p[1] - 34) + ")", tabindex: o.onPick ? 0 : null,
-          role: o.onPick ? "button" : null, "aria-pressed": o.onPick ? (sel ? "true" : "false") : null,
-          "aria-label": b.name + (price != null ? ", price " + money(price) + " per MWh" : "") }, gb);
-        S("rect", { class: "box", x: 0, y: 0, width: 132, height: 68, rx: 12, fill: "var(--lx-surface)", stroke: b.color, "stroke-width": sel ? 3.5 : 2 }, g);
-        S("text", { x: 10, y: 20, "font-size": 14, "font-weight": 500, fill: "var(--lx-ink)" }, g).textContent = b.name;
-        var pl = plantsAt(b.id), x = 10;
-        pl.forEach(function (k) { S("rect", { x: x, y: 29, width: 9, height: 9, rx: 2, fill: D.fleet[k].color }, g); x += 13; });
-        S("text", { x: x + 2, y: 38, "font-size": 11.5, fill: "var(--lx-ink-3)" }, g).textContent = b.reference ? "load + nuclear" : b.id === "R" ? "wind + solar" : "gas plants";
-        if (price != null) {
-          var tt = S("text", { x: 10, y: 59, "font-size": 16, class: "num", fill: "var(--lx-ink)" }, g); tt.textContent = money(price);
-          S("text", { x: 14 + 10 * money(price).length, y: 59, "font-size": 11.5, fill: "var(--lx-ink-3)" }, g).textContent = "/MWh";
-        }
-        if (o.onPick) {
-          g.addEventListener("click", function () { o.onPick(b.id); });
-          g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); o.onPick(b.id); } });
-        }
-        buses.push(b.name + (price != null ? ": " + money(price) + " per MWh" : "") + " (" + (b.reference ? "all the demand and the nuclear plant" : pl.map(function (k) { return D.fleet[k].label.toLowerCase(); }).join(" and ")) + ")");
-      });
-      altBody.innerHTML = "";
-      var ul = E("ul", null, altBody);
-      buses.concat(lines).forEach(function (s) { E("li", { text: s }, ul); });
-    }
-    draw();
-    return { set: function (x) { for (var k in x) st[k] = x[k]; draw(); }, el: w };
+    var D = o.D;
+    return LX.Network(host, { label: "Three-bus network: Wind Ridge, Gas Hub and Prairie Town, joined by three lines.", onPick: o.onPick, money: money,
+      buses: D.buses.map(function (b) {
+        return { id: b.id, name: b.name, short: b.short, color: b.color, reference: b.reference, at: POS[b.id],
+                 note: b.reference ? "load + nuclear" : b.id === "R" ? "wind + solar" : "gas plants", desc: b.reference ? "all the demand and the nuclear plant" : null };
+      }),
+      // labels sit beside their line: above the top line, left of Ridge-Town, right of Gas Hub-Town
+      lines: D.lines.map(function (l) {
+        var a = POS[l.from], c = POS[l.to], mx = (a[0] + c[0]) / 2, my = (a[1] + c[1]) / 2;
+        return { id: l.id, from: l.from, to: l.to, name: l.name, labelAt: l.id === "RT" ? [mx - 14, my - 4, "end"] : l.id === "GT" ? [mx + 14, my - 4, "start"] : [mx, 18, "middle"] };
+      }),
+      plants: Object.keys(D.fleet).map(function (k) { return { bus: D.fleet[k].bus, color: D.fleet[k].color, label: D.fleet[k].label }; }) });
   }
 
   // ---- recipe box: the dual, the finite-difference check, and the plan's change in words
@@ -739,7 +632,8 @@
       var c1 = E("div", { class: "lx-xcard" }, x), h1 = E("header", { class: "lx-x-head" }, c1);
       E("h3", { text: "The model in full" }, h1);
       E("p", { class: "lx-lede", text: "The same eight rules three ways. The table says how many rows each rule adds and what its dual means." }, c1);
-      Formulation(c1, { network: true, view: "table", sel: "bal" });
+      LX.Formulation(c1, { view: "table", sel: "bal", full: true, hours: D.day.demand.length, legend: LEGEND, tagWidth: "9.5em", extraNote: "(added when the plants go on the map)",
+        rules: RULES.map(function (r) { return { id: r.id, name: r.name, words: r.words, sym: r.sym, symBase: r.sym1, rows: r.rows, dual: r.dual, extra: r.net }; }) });
       // 2 the network at noon, annotated
       var c2 = E("div", { class: "lx-xcard" }, x), h2 = E("header", { class: "lx-x-head" }, c2);
       E("h3", { text: "The network at noon, annotated" }, h2);
