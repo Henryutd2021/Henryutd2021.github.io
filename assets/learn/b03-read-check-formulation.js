@@ -388,27 +388,18 @@
       sel: "sum", textLabel: "Text version of the equation"
     });
 
-    // checklist
-    var c2 = H("div", { class: "lx-xcard" }, x), h2 = H("header", { class: "lx-x-head" }, c2); H("h3", { text: "Check a model in eight moves" }, h2);
-    var cnt = H("span", { class: "lx-step-n", "aria-live": "polite" }, h2);
-    H("p", { class: "lx-lede", text: "Use it on every model you build or read; ticks stay in this browser." }, c2);
-    var items = [
-      ["Units", "Every term of the objective and of each rule in one unit, Δt included."],
-      ["Signs", "Each ≤, = and ≥ says what the sentence says."],
-      ["Indices", "Every rule carries its ∀ and the indices it needs."],
-      ["Sums", "Each Σ runs over the right set, and nothing is counted twice."],
-      ["No free lunch", "Every variable has a cost, a limit, or a reason to be free."],
-      ["Balance", "In the solution, supply meets demand in every period."],
-      ["Duals", "Prices and limits have the signs the model implies."],
-      ["Hand check", "A toy small enough to solve by hand gives the code's answer."]];
-    var st = LX.store.get("b3-check", {}) || {}, ol = H("ol", { class: "b3-list" }, c2);
-    items.forEach(function (it, i) {
-      var li = H("li", null, ol), id = LX.uid("ck"), cb = H("input", { type: "checkbox", id: id }, li); cb.checked = !!st[i];
-      var lab = H("label", { for: id }, li); H("b", { text: it[0] }, lab); lab.appendChild(document.createTextNode(" " + it[1]));
-      cb.addEventListener("change", function () { st[i] = cb.checked; LX.store.set("b3-check", st); tally(); });
-    });
-    function tally() { var n = items.filter(function (it, i) { return st[i]; }).length; cnt.textContent = n + " of " + items.length + " ticked"; }
-    tally();
+    // checklist (LX.Checklist; ticks stored by position under "b3-check", as before)
+    LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "b3-check", title: "Check a model in eight moves", count: "head", soft: true, inline: true, ordered: true,
+      lede: "Use it on every model you build or read; ticks stay in this browser.",
+      items: [
+        { label: "Units", text: "Every term of the objective and of each rule in one unit, Δt included." },
+        { label: "Signs", text: "Each ≤, = and ≥ says what the sentence says." },
+        { label: "Indices", text: "Every rule carries its ∀ and the indices it needs." },
+        { label: "Sums", text: "Each Σ runs over the right set, and nothing is counted twice." },
+        { label: "No free lunch", text: "Every variable has a cost, a limit, or a reason to be free." },
+        { label: "Balance", text: "In the solution, supply meets demand in every period." },
+        { label: "Duals", text: "Prices and limits have the signs the model implies." },
+        { label: "Hand check", text: "A toy small enough to solve by hand gives the code's answer." }] });
   }
 
   LX.mount("b03", function (live, data, root) { view(live, data, root); });

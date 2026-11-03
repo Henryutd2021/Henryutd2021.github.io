@@ -6,8 +6,9 @@
 // a what-if; a practice sheet in the Check section has five tasks checked automatically.
 //
 // Pure model (exported for Node, no DOM): townDay (lesson 0's cut and scaling, checked against grid-operator.js by the
-// test), the formula engine (tokenize, parse, evaluate with cycle and error handling), shift() for fill-down, the sheet
-// layout (layout()), and the practice tasks with their expected answers.
+// test), the sheet layout (layout()), and the practice tasks with their expected answers. The spreadsheet itself (the
+// formula engine, the formula bar and grid, fill-down) is the shared LX.Sheet (components/sheet.js); value, shift, refsIn
+// and the rest are re-exported here so the lesson's test reads as before. The "sheet you can trust" list is LX.Checklist.
 (function () {
   "use strict";
 
@@ -24,117 +25,17 @@
     return { date: sc.date, dateLabel: sc.dateLabel, fleet: f, demand: demand, wind: wind, solar: solar, need: need };
   }
 
-  // ---------------------------------------------------------------- formula engine
-  var COLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  function colNum(s) { var n = 0; for (var i = 0; i < s.length; i++) n = n * 26 + (s.charCodeAt(i) - 64); return n; }
-  function colName(n) { var s = ""; while (n > 0) { var m = (n - 1) % 26; s = COLS[m] + s; n = Math.floor((n - 1) / 26); } return s; }
-  var REF = /(\$?)([A-Z]{1,2})(\$?)(\d+)/;
-  function E(code) { return { err: code }; }
-  function isErr(v) { return v && typeof v === "object" && v.err; }
-  function tokenize(src) {
-    var out = [], re = /\s*(\$?[A-Za-z]{1,2}\$?\d+(?::\$?[A-Za-z]{1,2}\$?\d+)?|\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+|[A-Za-z]+(?=\s*\()|[-+*\/^(),])/y, m, pos = 0;
-    src = src.replace(/[−–]/g, "-");
-    while (pos < src.length) {
-      if (/^\s*$/.test(src.slice(pos))) break;
-      re.lastIndex = pos; m = re.exec(src);
-      if (!m) return null;
-      out.push(m[1]); pos = re.lastIndex;
-    }
-    return out;
+  // ---------------------------------------------------------------- formula engine: the shared LX.Sheet (components/sheet.js)
+  // window.LX.Sheet.engine in the page (learn.js loads first), the component file in Node
+  function engine() {
+    if (typeof window !== "undefined" && window.LX && window.LX.Sheet) return window.LX.Sheet.engine;
+    return require("./components/sheet.js");
   }
-  var FUN = {
-    SUM: function (a) { return a.reduce(function (s, v) { return s + v; }, 0); },
-    AVERAGE: function (a) { return a.length ? a.reduce(function (s, v) { return s + v; }, 0) / a.length : E("#DIV/0!"); },
-    MIN: function (a) { return a.length ? Math.min.apply(null, a) : 0; },
-    MAX: function (a) { return a.length ? Math.max.apply(null, a) : 0; },
-    COUNT: function (a) { return a.length; },
-    ABS: function (a) { return a.length === 1 ? Math.abs(a[0]) : E("#VALUE!"); },
-    ROUND: function (a) { if (a.length < 1 || a.length > 2) return E("#VALUE!"); var k = Math.pow(10, a[1] || 0); return Math.round(a[0] * k) / k; }
-  };
-  // parse to a small tree: {n: number} | {r: "A1"} | {rg: ["A1", "B2"]} | {f: name, a: [...]} | {op, x, y} | {neg: x}
-  function parse(src) {
-    var t = tokenize(src); if (!t) return null;
-    var i = 0;
-    function peek() { return t[i]; }
-    function eat(x) { if (t[i] === x) { i++; return true; } return false; }
-    function expr() { var x = term(); while (peek() === "+" || peek() === "-") { var op = t[i++]; x = { op: op, x: x, y: term() }; } return x; }
-    function term() { var x = power(); while (peek() === "*" || peek() === "/") { var op = t[i++]; x = { op: op, x: x, y: power() }; } return x; }
-    function power() { var x = unary(); while (eat("^")) x = { op: "^", x: x, y: unary() }; return x; }   // as Excel: -2^2 = 4, 2^3^2 = 64
-    function unary() { if (eat("-")) return { neg: unary() }; if (eat("+")) return unary(); return primary(); }
-    function primary() {
-      var tk = t[i++]; if (tk === undefined) throw new Error("end");
-      if (tk === "(") { var x = expr(); if (!eat(")")) throw new Error(")"); return x; }
-      if (/^[\d.]/.test(tk)) return { n: parseFloat(tk) };
-      if (/^\$?[A-Za-z]{1,2}\$?\d+:/.test(tk)) { var p = tk.toUpperCase().split(":"); return { rg: p }; }
-      if (/^\$?[A-Za-z]{1,2}\$?\d+$/.test(tk)) return { r: tk.toUpperCase() };
-      if (/^[A-Za-z]+$/.test(tk)) {
-        var name = tk.toUpperCase(); if (!eat("(")) throw new Error("(");
-        var args = []; if (!eat(")")) { do { args.push(expr()); } while (eat(",")); if (!eat(")")) throw new Error(")"); }
-        return { f: name, a: args };
-      }
-      throw new Error("token " + tk);
-    }
-    try { var tree = expr(); return i === t.length ? tree : null; } catch (e) { return null; }
-  }
-  function plain(ref) { var m = REF.exec(ref); return m ? m[2] + m[4] : null; }
-  function rangeCells(a, b) {
-    var p = REF.exec(a), q = REF.exec(b); if (!p || !q) return null;
-    var c0 = colNum(p[2]), c1 = colNum(q[2]), r0 = +p[4], r1 = +q[4], out = [];
-    for (var r = Math.min(r0, r1); r <= Math.max(r0, r1); r++) for (var c = Math.min(c0, c1); c <= Math.max(c0, c1); c++) out.push(colName(c) + r);
-    return out;
-  }
-  // a sheet: {cells: {A1: raw text}, rows, cols}; value(sheet, "E5") evaluates with memo and a cycle guard
-  function value(sheet, name, memo, stack) {
-    memo = memo || sheet._memo || (sheet._memo = {}); stack = stack || {};
-    if (name in memo) return memo[name];
-    var m = /^([A-Z]{1,2})(\d+)$/.exec(name);
-    if (!m || colNum(m[1]) > sheet.cols || +m[2] > sheet.rows || +m[2] < 1) return E("#REF!");
-    var raw = sheet.cells[name];
-    if (raw == null || raw === "") return (memo[name] = "");
-    raw = String(raw);
-    if (raw.charAt(0) !== "=") { var num = Number(raw.replace(/,/g, "")); return (memo[name] = raw.trim() !== "" && isFinite(num) ? num : raw); }
-    if (stack[name]) return E("#CYCLE!");
-    stack[name] = true;
-    var tree = parse(raw.slice(1)), v = tree ? ev(tree) : E("#NAME?");
-    delete stack[name];
-    return (memo[name] = v);
-    function cell(ref) { var p = plain(ref); return p ? value(sheet, p, memo, stack) : E("#REF!"); }
-    function numOf(v) { if (isErr(v)) return v; if (v === "") return 0; if (typeof v === "number") return v; return E("#VALUE!"); }
-    function ev(n) {
-      if ("n" in n) return n.n;
-      if (n.r) return numOf(cell(n.r));
-      if (n.rg) return E("#VALUE!");
-      if (n.neg) { var a = ev(n.neg); return isErr(a) ? a : -a; }
-      if (n.f) {
-        if (!FUN[n.f]) return E("#NAME?");
-        var vals = [];
-        for (var k = 0; k < n.a.length; k++) {
-          var arg = n.a[k];
-          if (arg.rg) {
-            var cs = rangeCells(arg.rg[0], arg.rg[1]); if (!cs) return E("#REF!");
-            for (var j = 0; j < cs.length; j++) { var cv = value(sheet, cs[j], memo, stack); if (isErr(cv)) return cv; if (typeof cv === "number") vals.push(cv); }
-          } else { var av = ev(arg); if (isErr(av)) return av; vals.push(av); }
-        }
-        return FUN[n.f](vals);
-      }
-      var x = ev(n.x); if (isErr(x)) return x; var y = ev(n.y); if (isErr(y)) return y;
-      if (n.op === "+") return x + y; if (n.op === "-") return x - y; if (n.op === "*") return x * y;
-      if (n.op === "/") return y === 0 ? E("#DIV/0!") : x / y;
-      if (n.op === "^") return Math.pow(x, y);
-      return E("#VALUE!");
-    }
-  }
-  function changed(sheet) { sheet._memo = {}; }
-  // fill-down: shift every reference without a $ on that axis
-  function shift(raw, dr, dc) {
-    if (!raw || String(raw).charAt(0) !== "=") return raw;
-    return String(raw).replace(/(\$?)([A-Za-z]{1,2})(\$?)(\d+)(?![A-Za-z(])/g, function (all, c$, c, r$, r, off, s) {
-      var before = s.charAt(off - 1); if (/[A-Za-z]/.test(before)) return all;   // part of a function name
-      var col = c$ ? c.toUpperCase() : colName(colNum(c.toUpperCase()) + (dc || 0)), row = r$ ? +r : +r + dr;
-      return row < 1 || colNum(col) < 1 ? "#REF!" : c$ + col + r$ + row;
-    });
-  }
-  function refsIn(raw) { var t = tokenize(String(raw || "").replace(/^=/, "")) || []; var out = []; t.forEach(function (x) { if (/^\$?[A-Za-z]{1,2}\$?\d+/.test(x)) x.split(":").forEach(function (y) { out.push(y.toUpperCase()); }); }); return out; }
+  function value(sheet, name) { return engine().value(sheet, name); }
+  function changed(sheet) { engine().changed(sheet); }
+  function shift(raw, dr, dc) { return engine().shift(raw, dr, dc); }
+  function refsIn(raw) { return engine().refsIn(raw); }
+  function isErr(v) { return engine().isErr(v); }
 
   // ---------------------------------------------------------------- the sheet of Prairie Town's day
   var R0 = 5;   // first hour row
@@ -161,91 +62,20 @@
       { cell: "E37", label: "Gas cost at $55/MWh", ask: "The day's gas cost if gas cost $55 per MWh, without changing E2.", answer: 55 * sum(D.need), hint: "=E30*55" }];
   }
 
-  var model = { townDay: townDay, tokenize: tokenize, parse: parse, value: value, changed: changed, shift: shift, refsIn: refsIn, colName: colName, colNum: colNum,
-                layout: layout, filled: filled, tasks: tasks, R0: R0, isErr: isErr };
+  var model = { townDay: townDay, value: value, changed: changed, shift: shift, refsIn: refsIn, isErr: isErr,
+                tokenize: function (src) { return engine().tokenize(src); }, parse: function (src) { return engine().parse(src); },
+                colName: function (n) { return engine().colName(n); }, colNum: function (s) { return engine().colNum(s); },
+                layout: layout, filled: filled, tasks: tasks, R0: R0 };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ================================================================ view
   var LX = window.LX, H = LX.H;
-  function show(v, col) {
-    if (isErr(v)) return v.err;
-    if (v === "" || typeof v === "string") return v;
-    var r = Math.abs(v - Math.round(v)) < 1e-9 ? Math.round(v) : Math.round(v * 100) / 100;
-    return (col === "F" ? "$" : "") + r.toLocaleString("en-US");
-  }
-  // the working sheet: formula bar, grid (roving focus, arrow keys), fill-down; o.onChange(sheet), o.onSelect(name)
+  function show(v, col) { return engine().show(v, col === "F" ? "$" : ""); }
+  // the working sheet (LX.Sheet): formula bar, grid (roving focus, arrow keys), fill-down over the 24 hour rows of E and F
   function SheetView(host, sheet, o) {
-    o = o || {};
-    var wrap = H("div", { class: "k7-sheet" }, host);
-    var bar = H("div", { class: "k7-bar" }, wrap);
-    var nameBox = H("span", { class: "k7-name", "aria-live": "polite" }, bar);
-    var fid = LX.uid("fx"); H("label", { for: fid, class: "lx-sr", text: "Formula or value of the selected cell" }, bar);
-    var fx = H("input", { id: fid, type: "text", class: "k7-fx", autocomplete: "off", spellcheck: "false", autocapitalize: "off" }, bar);
-    var enter = H("button", { type: "button", class: "lx-btn small", text: "Enter" }, bar);
-    var tools = H("div", { class: "k7-tools" }, wrap);
-    var fill = H("button", { type: "button", class: "lx-btn ghost small", html: "Fill down to row " + (R0 + 23) }, tools);
-    var msg = H("span", { class: "k7-msg", "aria-live": "polite" }, tools);
-    var scroll = H("div", { class: "k7-scroll", tabindex: "-1" }, wrap);
-    var tb = H("table", { class: "k7-grid", "aria-label": "Spreadsheet of Prairie Town's day; use the arrow keys to move, Enter to edit" }, scroll);
-    var hr = H("tr", null, H("thead", null, tb)); H("th", { class: "k7-corner" }, hr);
-    for (var c = 1; c <= sheet.cols; c++) H("th", { scope: "col", text: colName(c) }, hr);
-    var body = H("tbody", null, tb), btn = {}, sel = o.start || "B5";
-    for (var r = 1; r <= sheet.rows; r++) {
-      var tr = H("tr", null, body); H("th", { scope: "row", text: String(r) }, tr);
-      for (var cc = 1; cc <= sheet.cols; cc++) {
-        var nm = colName(cc) + r, span = sheet.labels[r] && cc === 1 ? 4 : 1;
-        if (sheet.labels[r] && cc > 1 && cc < 5) continue;
-        var td = H("td", { colspan: span > 1 ? span : null, class: "c" + colName(cc) + (sheet.labels[r] && cc === 1 ? " lab" : "") + (r === 4 ? " head" : "") }, tr);
-        var b = H("button", { type: "button", tabindex: "-1", "data-cell": nm }, td);
-        b.addEventListener("click", (function (n) { return function () { select(n, true); }; })(nm));
-        btn[nm] = b;
-      }
-    }
-    function paint() {
-      Object.keys(btn).forEach(function (n) {
-        var v = value(sheet, n), raw = sheet.cells[n], col = n.replace(/\d+/, ""), b = btn[n];
-        b.textContent = show(v, col); b.classList.toggle("f", !!raw && String(raw).charAt(0) === "=");
-        b.classList.toggle("err", !!isErr(v)); b.classList.toggle("sel", n === sel);
-        b.setAttribute("aria-label", n + ": " + (show(v, col) || "empty") + (raw && String(raw).charAt(0) === "=" ? ", formula " + raw : ""));
-      });
-    }
-    function select(n, focusBar) {
-      if (!btn[n]) return; sel = n; nameBox.textContent = n; fx.value = sheet.cells[n] || "";
-      Object.keys(btn).forEach(function (k) { btn[k].tabIndex = k === n ? 0 : -1; btn[k].classList.toggle("sel", k === n); });
-      var row = +n.replace(/[A-Z]+/, ""), col = n.replace(/\d+/, "");
-      fill.disabled = !(row >= R0 && row < R0 + 23 && (col === "E" || col === "F") && sheet.cells[n] && String(sheet.cells[n]).charAt(0) === "=");
-      var b = btn[n], top = b.closest("tr").offsetTop, h = scroll.clientHeight;
-      if (top < scroll.scrollTop + 30 || top > scroll.scrollTop + h - 40) scroll.scrollTop = Math.max(0, top - h / 2);
-      var td = b.parentNode, left = td.offsetLeft, w = scroll.clientWidth;
-      if (left < scroll.scrollLeft + 40 || left + td.offsetWidth > scroll.scrollLeft + w) scroll.scrollLeft = Math.max(0, left + td.offsetWidth - w + 8);
-      if (focusBar) fx.focus();
-      if (o.onSelect) o.onSelect(n);
-    }
-    function commit() {
-      var n = sel, v = fx.value.trim();
-      if (sheet.lock && sheet.lock(n)) { msg.textContent = n + " holds data; edit the yellow cells."; return; }
-      sheet.cells[n] = v; changed(sheet); paint(); msg.textContent = isErr(value(sheet, n)) ? value(sheet, n).err + ": check the formula's spelling and addresses." : "";
-      if (o.onChange) o.onChange(sheet, n);
-    }
-    enter.addEventListener("click", commit);
-    fx.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); commit(); btn[sel].focus(); } if (e.key === "Escape") { fx.value = sheet.cells[sel] || ""; btn[sel].focus(); } });
-    fill.addEventListener("click", function () {
-      var col = sel.replace(/\d+/, ""), r0 = +sel.replace(/[A-Z]+/, ""), src = sheet.cells[sel];
-      for (var r = r0 + 1; r < R0 + 24; r++) sheet.cells[col + r] = shift(src, r - r0, 0);
-      changed(sheet); paint(); msg.textContent = "Copied " + sel + " to " + col + (r0 + 1) + ":" + col + (R0 + 23) + ".";
-      if (o.onChange) o.onChange(sheet, sel, "fill");
-    });
-    tb.addEventListener("keydown", function (e) {
-      var m = /^([A-Z]+)(\d+)$/.exec(sel), c = colNum(m[1]), r = +m[2], k = e.key;
-      var mv = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[k];
-      if (mv) { e.preventDefault(); var nr = LX.clamp(r + mv[1], 1, sheet.rows), nc = LX.clamp(c + mv[0], 1, sheet.cols), n = colName(nc) + nr;
-        while (!btn[n] && nc > 1) { nc--; n = colName(nc) + nr; } select(n); btn[n].focus(); return; }
-      if (k === "Enter" || k === "F2") { e.preventDefault(); fx.focus(); fx.select(); return; }
-      if (k.length === 1 && !e.ctrlKey && !e.metaKey) { fx.value = ""; fx.focus(); }
-    });
-    paint(); select(sel);
-    return { select: select, paint: paint, el: wrap, set: function (n, v) { sheet.cells[n] = v; changed(sheet); paint(); if (o.onChange) o.onChange(sheet, n); }, fill: function () { fill.click(); } };
+    return LX.Sheet(host, sheet, { start: o.start || "B5", fillRows: [R0, R0 + 23], fillCols: "EF", prefix: { F: "$" }, wide: "F", headRow: 4, todo: o.todo,
+      label: "Spreadsheet of Prairie Town's day; use the arrow keys to move, Enter to edit", onSelect: o.onSelect, onChange: o.onChange });
   }
 
   function view(live, data, root) {
@@ -329,20 +159,12 @@
         { key: "row", color: "var(--lx-wind)", name: "E$1", note: "row fixed", down: "E$1", right: "F$1", use: "a row of inputs, one per column" },
         { key: "col", color: "var(--lx-solar)", name: "$E1", note: "column fixed", down: "$E2", right: "$E1", use: "a column of inputs, one per row" }]
     });
-    var c2 = H("div", { class: "lx-xcard" }, x), hd = H("header", { class: "lx-x-head" }, c2); H("h3", { text: "A sheet you can trust" }, hd);
-    var cnt = H("span", { class: "lx-step-n", "aria-live": "polite" }, hd);
-    H("p", { class: "lx-lede", text: "Six habits; tick the ones your own sheets already have (stored in this browser only)." }, c2);
     var items = [["Inputs apart", "Every input in its own labelled cell, with its unit."], ["No numbers inside formulas", "Formulas point at input cells, so one change updates everything."],
                  ["$ for inputs", "Absolute addresses for inputs, relative ones for data."], ["One formula per column", "Write it once, fill it down, spot-check one row by hand."],
                  ["A check cell", "Compute a total two ways and compare, as F30 against E30 × E2."], ["Source and date", "Name where the data came from and when, beside the data."]];
-    var st = LX.store.get("k7-check", {}) || {}, ol = H("ol", { class: "b3-list" }, c2);
-    items.forEach(function (it, i) {
-      var li = H("li", null, ol), id = LX.uid("ck"), cb = H("input", { type: "checkbox", id: id }, li); cb.checked = !!st[i];
-      var lab = H("label", { for: id }, li); H("b", { text: it[0] }, lab); lab.appendChild(document.createTextNode(". " + it[1]));
-      cb.addEventListener("change", function () { st[i] = cb.checked; LX.store.set("k7-check", st); tally(); });
-    });
-    function tally() { cnt.textContent = items.filter(function (it, i) { return st[i]; }).length + " of " + items.length + " ticked"; }
-    tally();
+    LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "k7-check", title: "A sheet you can trust", count: "head", soft: true, inline: true, sep: ". ", ordered: true,
+      lede: "Six habits; tick the ones your own sheets already have (stored in this browser only).",
+      items: items.map(function (it) { return { label: it[0], text: it[1] }; }) });
   }
 
   // ---- practice: the finished sheet and five tasks, each checked when its cell holds a formula with the right value
@@ -356,8 +178,7 @@
     S.lock = function (n) { return T.every(function (t) { return t.cell !== n; }) && n !== "E2"; };
     var ul = H("ol", { class: "k7-tasks" }, card), lis = {};
     T.forEach(function (t) { var li = H("li", null, ul); H("span", { text: t.ask + " " }, li); H("b", { text: "→ " + t.cell }, li); var h = H("details", { class: "k7-hint" }, li); H("summary", { text: "Hint" }, h); H("code", { text: t.hint }, h); lis[t.cell] = li; });
-    var sv = SheetView(card, S, { start: "E33", onChange: grade });
-    T.forEach(function (t) { var b = card.querySelector('[data-cell="' + t.cell + '"]'); if (b) b.classList.add("todo"); });
+    SheetView(card, S, { start: "E33", onChange: grade, todo: T.map(function (t) { return t.cell; }) });
     function grade() {
       var n = 0;
       T.forEach(function (t) { var v = value(S, t.cell), good = /^=/.test(S.cells[t.cell] || "") && typeof v === "number" && Math.abs(v - t.answer) <= 1e-6 * Math.max(1, Math.abs(t.answer)) + 0.005; lis[t.cell].classList.toggle("done", good); if (good) n++; });

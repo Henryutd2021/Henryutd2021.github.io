@@ -1,0 +1,10 @@
+/* unitchain.css — a chain of numbers with units (LX.UnitChain) and the evidence clock (LX.EvidenceClock), unitchain.js. */
+.lx-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.lx-chain li { display: grid; gap: 1px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); }
+.lx-chain li b { font-family: var(--lx-f-mono); font-size: 15.5px; font-weight: 600; color: var(--lx-ink); }
+.lx-chain li span { font-size: 12px; color: var(--lx-ink-3); }
+.lx-chain li.op { border: 0; background: none; padding: 0 2px; font-family: var(--lx-f-mono); font-size: 13px; color: var(--lx-ink-2); }
+.lx-chain li.out { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); }
+.lx-clock svg { width: 100%; height: auto; display: block; }
+.lx-clock text { font-family: var(--lx-f-body); font-size: 12.5px; fill: var(--lx-ink-2); }
+.lx-clock text.v { font-family: var(--lx-f-mono); font-weight: 600; fill: var(--lx-ink); }

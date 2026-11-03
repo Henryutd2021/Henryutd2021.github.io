@@ -1,0 +1,35 @@
+/* tagger.css — the phrase tagger (tagger.js): the text card, tappable phrases, tag chips, the comparison list.
+   Tag colours come from the data (--c); the number badge repeats the question, so colour is never the only cue. */
+.lx-tagger { display: grid; gap: 12px; }
+.lx-tag-n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--c);
+  color: var(--lx-btn-ink); font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; }
+.lx-tagger-text { border: 1px solid var(--lx-line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; background: var(--lx-surface-2); }
+.lx-tagger-kicker { font-family: var(--lx-f-display); font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--lx-ink-3); }
+.page-learn .lx-tagger-head { font-family: var(--lx-f-display); font-weight: 600; font-size: 20px; line-height: 1.25; margin: 0; color: var(--lx-ink); }
+.lx-tagger-framing, .lx-tagger-src { font-size: 13px; color: var(--lx-ink-3); }
+.lx-tagger-body { font-size: 16.5px; line-height: 1.9; color: var(--lx-ink); }
+.lx-ph { color: var(--lx-ink); border-bottom: 2px dashed var(--lx-ink-3); border-radius: 4px 4px 0 0; padding: 1px 3px; cursor: pointer;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.lx-ph:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+.lx-ph.sel { outline: 2px solid var(--lx-ink); outline-offset: 1px; }
+.lx-ph.tagged { background: color-mix(in srgb, var(--c) 18%, var(--lx-surface)); border-bottom: 2px solid var(--c); }
+.lx-ph .lx-tag-n { margin-left: 5px; vertical-align: 1px; font-size: 11px; height: 17px; min-width: 17px; }
+.lx-tagger-pal { display: grid; gap: 8px; }
+.lx-tagger-q { font-family: var(--lx-f-display); font-weight: 500; font-size: 15.5px; }
+.lx-tagger-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lx-tag-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 11px 4px 6px; border-radius: 10px; border: 1px solid var(--lx-line-2);
+  background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; font-family: var(--lx-f-display); font-size: 14px; font-weight: 500; }
+.lx-tag-chip[aria-pressed="true"] { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); background: var(--lx-surface-2); }
+.lx-tag-chip small { font-family: var(--lx-f-body); font-weight: 400; font-size: 12px; color: var(--lx-ink-3); }
+.lx-tag-chip:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+.lx-tagger-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.lx-tagger-count { font-size: 13.5px; color: var(--lx-ink-3); }
+.lx-tagger-cmp { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.lx-tagger-cmp li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--lx-line); background: var(--lx-surface); }
+.lx-tagger-cmp li .lx-ic { width: 18px; height: 18px; margin-top: 2px; }
+.lx-tagger-cmp li.same .lx-ic, .lx-tagger-cmp li.fair .lx-ic { color: var(--lx-good); }
+.lx-tagger-cmp li.other .lx-ic, .lx-tagger-cmp li.none .lx-ic { color: var(--lx-warn); }
+.lx-tagger-cmp b { font-family: var(--lx-f-display); font-weight: 500; }
+.lx-tagger-cmp .why { display: block; font-size: 14px; color: var(--lx-ink-2); margin-top: 2px; }
+.lx-tagger-cmp .tags { display: block; font-size: 13px; color: var(--lx-ink-3); margin-top: 2px; }
+@media (max-width: 560px) { .page-learn .lx-tagger-head { font-size: 18px; } .lx-tagger-body { font-size: 16px; } }

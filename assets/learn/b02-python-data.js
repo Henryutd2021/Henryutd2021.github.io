@@ -18,9 +18,9 @@
 // Sunday in March to 07:00 UTC on the first Sunday in November, standard time (UTC-6) otherwise. The Node test checks it
 // against the ICU time-zone database (America/Chicago) for every hour of 2025.
 //
-// Lesson-local components (candidates for the shared library; see learn/_w1/b02-python-data.yml): LX.Checklist (same code
-// as in n01-news-lens.js), a code panel, a year strip, and a light line/bar chart with a text version. CSS is injected
-// once by injectCSS(), with --lx-* tokens only.
+// Lesson-local components (candidates for the shared library; see learn/_w1/b02-python-data.yml): a code panel, a year
+// strip, and a light line/bar chart with a text version. CSS is injected once by injectCSS(), with --lx-* tokens only.
+// The reusable data check in the explain layer is the shared LX.Checklist (components/checklist.js).
 (function () {
   "use strict";
   var HOUR = 3600000, NIGHT_END = 4, NIGHT_FRAC = 0.05, SPIKE_FRAC = 0.5, MAX_REPEAT = 6;
@@ -174,15 +174,6 @@
       ".b2-ok{color:var(--lx-good);font-weight:600} .b2-bad{color:var(--lx-bad);font-weight:600} .b2-na{color:var(--lx-ink-3)}",
       
       ".b2-dl{display:flex;flex-wrap:wrap;gap:8px}",
-      ".lx-checklist{display:grid;gap:6px;margin:0;padding:0;list-style:none}",
-      ".lx-checklist li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:start;padding:8px 10px;border-radius:10px;border:1px solid var(--lx-line);background:var(--lx-surface)}",
-      ".lx-checklist input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--lx-good)}",
-      ".lx-checklist label{display:grid;gap:2px;cursor:pointer;margin:0}",
-      ".lx-checklist label b{font-family:var(--lx-f-display);font-weight:500;font-size:15px;color:var(--lx-ink)}",
-      ".lx-checklist label span{font-size:14px;color:var(--lx-ink-2)}",
-      ".lx-checklist label small{font-size:12.5px;color:var(--lx-ink-3);font-family:var(--lx-f-mono);overflow-wrap:anywhere}",
-      ".lx-checklist li.on{border-color:color-mix(in srgb,var(--lx-good) 45%,var(--lx-line))}",
-      ".lx-checklist-foot{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13.5px;color:var(--lx-ink-3)}",
       ".b2-asserts{display:grid;gap:8px;margin:0;padding:0;list-style:none}",
       ".b2-asserts li{display:grid;gap:6px;padding:9px 11px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface)}",
       ".b2-asserts code{font-family:var(--lx-f-mono);font-size:12.5px;color:var(--lx-ink);white-space:pre-wrap;overflow-wrap:anywhere;background:none;padding:0}",
@@ -191,33 +182,6 @@
     ].join("\n");
     H("style", { id: "b2-css", text: css }, document.head);
   }
-
-  // ---- lesson-local checklist (a candidate shared component; the same code is in n01-news-lens.js)
-  LX.Checklist = LX.Checklist || function (host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var ul = H("ul", { class: "lx-checklist" }, host), state = LX.store.get(o.id, {}) || {}, boxes = [];
-    o.items.forEach(function (it) {
-      var li = H("li", null, ul), id = LX.uid("ck");
-      var cb = H("input", { type: "checkbox", id: id }, li);
-      var lab = H("label", { for: id }, li);
-      H("b", { html: LX.rich(it.label) }, lab);
-      if (it.text) H("span", { html: LX.rich(it.text) }, lab);
-      if (it.note) H("small", { html: LX.rich(it.note) }, lab);
-      cb.checked = !!state[it.id];
-      cb.addEventListener("change", function () { state[it.id] = cb.checked; LX.store.set(o.id, state); paint(); });
-      boxes.push({ cb: cb, li: li });
-    });
-    var foot = H("div", { class: "lx-checklist-foot" }, host);
-    var cnt = H("span", { "aria-live": "polite" }, foot);
-    var reset = H("button", { class: "lx-link", type: "button", text: "Clear the ticks" }, foot);
-    reset.addEventListener("click", function () { state = {}; LX.store.set(o.id, state); boxes.forEach(function (b) { b.cb.checked = false; }); paint(); });
-    function paint() {
-      var n = boxes.filter(function (b) { b.li.classList.toggle("on", b.cb.checked); return b.cb.checked; }).length;
-      cnt.textContent = n + " of " + boxes.length + " checked" + (o.doneText && n === boxes.length ? ". " + o.doneText : ".");
-    }
-    paint();
-  };
 
   // ---- the same step in pandas: comments after "#" are the readable pseudo-code
   function code(host, lines) {
@@ -543,7 +507,7 @@
       ], sel: 1
     });
     LX.Checklist(c2, { id: "b2-checklist", title: "A data check you can reuse", lede: "Before any analysis, tick each line for your file. The pandas line under each is where to start.",
-      doneText: "Write what you found in a data note.",
+      doneText: "Write what you found in a data note.", code: true,
       items: [
         { id: "rows", label: "Rows and span", text: "One row per hour: 8,760 for 2025, 8,784 in a leap year.", note: "len(df), df.index.min(), df.index.max()" },
         { id: "stamps", label: "Time stamps", text: "Which time zone, and does each stamp mark the hour's start or its end?", note: "df.index.tz" },
