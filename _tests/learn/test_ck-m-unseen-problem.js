@@ -19,6 +19,7 @@ const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const C = require(L("ck-m-unseen-problem.js"));
 const CP = require(L("components/checkpoint.js"));
+const JSC = fs.readFileSync(L("ck-m-unseen-problem.js"), "utf8");
 const PR = require(L("components/profiles.js"));
 const RB = require(L("components/rubric.js"));
 const DATA = L("data/ck-m-unseen-problem.json"), PAGE = path.join(SITE, "learn/ck-m-unseen-problem.qmd");
@@ -102,6 +103,14 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     [].concat(J.variants.model.tasksA, J.variants.model.tasksC, J.variants.empirical.tasksA, J.variants.empirical.tasksC, J.tasksB).filter(t => t.kind === "numeric").forEach(t => {
       ok(t.prompt.indexOf("Within " + (Math.round(t.answer.tol * 1000) / 10) + "%") >= 0 && /counts as right\.$/.test(t.prompt), `task ${t.id}: the prompt states its tolerance (${t.answer.tol * 100}%)`);
     });
+    // with JavaScript the runner shows it under the answer field (shared fix 14): the runner's task moves that sentence
+    // into tolNote, so it is said once; the no-JS list keeps the whole prompt
+    ["model", "empirical"].forEach(k => C.variantData(J, k).tasks.filter(t => t.kind === "numeric").forEach(t => {
+      const raw = [].concat(J.variants[k].tasksA, J.tasksB, J.variants[k].tasksC).filter(u => u.id === t.id)[0];
+      ok(t.tolNote && /^Within .* counts as right\.$/.test(t.tolNote) && !/counts as right/.test(t.prompt) && t.prompt + " " + t.tolNote === raw.prompt && CP.tolText(t) === t.tolNote,
+        `${k} ${t.id}: the runner's prompt leaves the tolerance to the line under the field (${t.tolNote})`);
+    }));
+    ok(/openFirst: "not-right"/.test(JSC) && !/ckm-sol-open", solOpen\)/.test(JSC) && /LX\.Checkpoint\.solOpened\(KEYS\[k\]\)/.test(JSC), "CK-M: the runner records the solutions' opening per runner (the old ckm-sol-open record is still read) and applies openFirst");
     // another valid special case, as task 11's point allows: one flat price and no demand charge
     const Bf = Object.assign({}, B, { price: B.price.map(() => 0.1) }), rF0 = solve(C.waterModel(Bf, { DC: 0 }));
     ok(near(rF0.objective, 0.1 * Bd.energy) && near(rF0.objective, 490) && /flat price/.test(task("m-valid").points[1]) && /\$294\.00/.test(task("m-valid").points[1]), "special case: a flat $0.10/kWh with no demand charge gives $490.00 by hand and by the model; the point accepts any such case");

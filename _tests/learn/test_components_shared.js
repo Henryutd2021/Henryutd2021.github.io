@@ -234,6 +234,67 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
   ok(E.LX.store.get("cku", null).tasks.f1.solFirst === true && E.LX.store.get("cku", null).cur === 0, "checkpoint options: destroy() leaves the attempt saved");
   const cp2 = LX.Checkpoint(host, { data: D, key: "cku", code: "CK-U", lock: "#ck-lock", solution: "#ck-sol", submitTask: "f1" });
   ok(opened() && /How this checkpoint works/.test(host.textContent) && cp2.state().tasks.f1.solFirst, "checkpoint options: a new runner reads the saved attempt (solution still open, recorded)");
+  cp2.destroy();
+})();
+
+// ---------------------------------------------------------------- checkpoint: shared fix 14 (after the CK-M review)
+// the tolerance under a number task's field; the openFirst option of the level rule; the worked solution's opening
+// recorded per runner (kept across Start again), with the submit task's answer time
+(function () {
+  const E = env(); load("checkpoint", E);
+  const page = E.body, LX = E.LX, H = LX.H;
+  const lock = H("div", { id: "ck-lock", class: "lx-ck-lock" }, page), lb = H("button", { type: "button", text: "Open the worked solution now" }, lock);
+  H("div", { id: "ck-sol", class: "lx-ck-gated" }, page);
+  const rule = { autoProficient: 1, autoStrong: 2, autoDeveloping: 1, criteria: [], levels: ["Not yet", "Developing", "Proficient", "Strong"] };
+  const mk = (extra) => ({ version: "ck-v v1", rule: rule, tasks: [
+    Object.assign({ id: "n1", kind: "numeric", title: "Peak", lesson: "M1", skill: "solve", prompt: "The peak draw?", solution: "255 kW.",
+      units: [["kW", 1], ["MW", 1000]], answer: { value: 255, tol: 0.005, show: "about 255 kW" } }, extra || {}),
+    { id: "c1", kind: "choice", title: "Pick", lesson: "M1", skill: "read", prompt: "Which?", options: [["a", "A"], ["b", "B"]], answer: "a", why: {}, solution: "A." },
+    { id: "f1", kind: "open-short", title: "Validate", lesson: "R5", skill: "validate", prompt: "Does it hold?", solution: "Two points.", points: ["One.", "Two."] }] });
+  // the tolerance, under the field and tied to it
+  ok(CP.tolText(mk().tasks[0]) === "Within 0.5% of the right value counts as right." && CP.tolText({ answer: { mwh: 1000, tol: 0.1 } }) === "Within 10% counts as right." &&
+     CP.tolText(mk({ tolNote: "Within 0.5% (about 1 kW) counts as right." }).tasks[0]) === "Within 0.5% (about 1 kW) counts as right." && CP.tolText({ kind: "choice" }) === "",
+     "checkpoint: tolText from the task's tolNote, else from answer.tol (either answer form)");
+  let host = H("div", null, page), cp = LX.Checkpoint(host, { data: mk({ tolNote: "Within 0.5% (about 1 kW) counts as right." }), key: "ckv", code: "CK-V", lock: "#ck-lock", solution: "#ck-sol", submitTask: "f1" });
+  cp.show(0);
+  const tl = host.querySelector(".lx-ck-tol"), inp = host.querySelector(".lx-ck-grid2 input");
+  ok(tl && tl.textContent === "Within 0.5% (about 1 kW) counts as right." && inp.getAttribute("aria-describedby") === tl.id && host.querySelector(".lx-ck-q").textContent === "The peak draw?",
+     "checkpoint view: a number task shows its tolerance under the answer field, before any answer, tied to the field");
+  cp.destroy();
+  host = H("div", null, page); cp = LX.Checkpoint(host, { data: mk(), key: "ckw", code: "CK-W", tolerance: false });
+  cp.show(0); ok(!host.querySelector(".lx-ck-tol") && !host.querySelector(".lx-ck-grid2 input").getAttribute("aria-describedby"), "checkpoint view: tolerance: false hides the line");
+  cp.destroy();
+  // openFirst: a task answered right after its solution was opened
+  const D = mk(), at = { tasks: { n1: { first: true, solFirst: true }, c1: { first: true, solFirst: false }, f1: { answer: "x", points: [true, true] } } };
+  ok(CP.level(D, at).auto === 2 && CP.level(D, at, { openFirst: "not-right" }).auto === 1 && CP.level(D, at, { openFirst: "not-right" }).early === 1 &&
+     CP.level(Object.assign({}, D, { rule: Object.assign({}, rule, { openFirst: "not-right" }) }), at).auto === 1, "checkpoint: openFirst not-right counts a task opened first as not right (option or data.rule); the default keeps CK-F's rule");
+  ok(CP.firstRight({ first: true, solFirst: true }) && !CP.firstRight({ first: true, solFirst: true }, "not-right") && CP.firstRight({ first: true }, "not-right") && !CP.firstRight(null), "checkpoint: firstRight");
+  ok(/1 with the solution opened first, counted as not right/.test(CP.describe(D, CP.level(D, at, { openFirst: "not-right" }))) && !/opened first/.test(CP.describe(D, CP.level(D, at))), "checkpoint: describe names the tasks opened first under that rule");
+  host = H("div", null, page); cp = LX.Checkpoint(host, { data: mk(), key: "ckx", code: "CK-X", openFirst: "not-right" });
+  cp.show(0); buttons(host, /^Show the worked solution now/)[0].click();
+  const inp2 = host.querySelector(".lx-ck-grid2 input"), sel2 = host.querySelector(".lx-ck-grid2 select"); inp2.value = "255"; sel2.value = "kW"; buttons(host, /^Check$/)[0].click();
+  cp.results();
+  ok(/Auto-marked tasks right on the first try: 0 of 2 \(1 with the solution opened first, counted as not right\)/.test(host.querySelector(".lx-ck-describe").textContent), "checkpoint view: the runner's openFirst option reaches its level and results sentence");
+  cp.destroy();
+  // the worked solution's opening, per runner: at the submit task's answer time; kept across Start again; the lock
+  // button's early opening is recorded before onAnswer runs
+  ok(LX.Checkpoint.solOpened("cky") === null, "checkpoint: no opening recorded yet");
+  const seen = [];
+  host = H("div", null, page); cp = LX.Checkpoint(host, { data: mk(), key: "cky", code: "CK-Y", lock: "#ck-lock", solution: "#ck-sol", submitTask: "f1",
+    onAnswer: (id, r) => seen.push([id, LX.Checkpoint.solOpened("cky"), r.at || null]) });
+  cp.show(2); host.querySelector("textarea").value = "It holds."; buttons(host, /^Submit my explanation/)[0].click();
+  const fr = cp.state().tasks.f1;
+  ok(fr.at && LX.Checkpoint.solOpened("cky") === fr.at && seen[seen.length - 1][1] === fr.at, "checkpoint: submitting the submit task records the opening at its answer time (onAnswer sees it)");
+  ok(LX.Checkpoint.solOpened("ckz") === null, "checkpoint: the record is per runner (another key has none)");
+  E.window.confirm = () => true;
+  cp.results(); buttons(host, /^Start again/)[0].click();
+  ok(LX.Checkpoint.solOpened("cky") === fr.at && !cp.state().tasks.f1, "checkpoint: Start again clears the attempt but keeps when the solution first opened");
+  cp.destroy();
+  host = H("div", null, page); seen.length = 0;
+  cp = LX.Checkpoint(host, { data: mk(), key: "ckz", code: "CK-Z", lock: "#ck-lock", solution: "#ck-sol", submitTask: "f1", onAnswer: (id, r) => seen.push([id, LX.Checkpoint.solOpened("ckz"), !!r.solFirst]) });
+  lb.click();
+  ok(seen.length === 1 && seen[0][0] === "f1" && seen[0][1] && seen[0][2] && cp.state().tasks.f1.solFirst, "checkpoint: the lock button records the early opening for this runner, before onAnswer runs");
+  cp.destroy();
 })();
 
 // ---------------------------------------------------------------- sheet: the Fill-down button follows the selected cell

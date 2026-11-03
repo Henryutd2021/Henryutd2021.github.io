@@ -36,6 +36,10 @@
      chart       function (task, body): draws a chart task's chart (LX.Checkpoint.lineChart helps)
      estimateNote  HTML for the estimate's in-task solution box (default: a pointer to the Worked solution section)
      checks      { choice, order, numeric, estimate }: replace a pure check (same arguments and result fields)
+     tolerance   false hides the line under a number task's answer field that states its tolerance (default: shown, from
+                 the task's tolNote, else "Within 1% of the right value counts as right." from answer.tol)
+     openFirst   "not-right": in the shared level rule, a task whose worked solution was opened before its first answer
+                 counts as not right (independent work only; data.rule.openFirst sets it too); default "counts" (CK-F)
      level, summary  replace the pure level rule or the summary text (same arguments)
      describe    function (D, L): the results view's sentence under the level (L = the level rule's result); default
                  describe(), which names CK-F's parts (auto-marked tasks, the estimate's lowest self-rating, the explanation)
@@ -50,12 +54,16 @@
    page's worked-solution block stays as it is. A stored, finished attempt opens on the results (unless the address has a
    #hash); otherwise the overview.
    Measures, per task (stored under data.tasks ids): ms (active time), msFirst (time to the first answer), tries, first
-   (first answer right; for open-short, all points ticked), solFirst (solution opened before answering), skipped, answer.
+   (first answer right; for open-short, all points ticked), solFirst (solution opened before answering), skipped, answer,
+   at (ISO time of the first answer). The time the page's worked solution first opened is kept per runner, under
+   "<key>-sol-open", and survives "Start again": LX.Checkpoint.solOpened(key) reads it (CK-M's rule compares it with the
+   final task's `at`). Stored attempts need no new data version: the new fields are only added.
    Keyboard: every control is a native button, input, select or radio; the task's prompt takes focus on each new task; the
    order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
    Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
-   checkEstimate, level, describe, summary, fmtMs, firstWord.
+   checkEstimate, level(D, st, {openFirst}), firstRight(record, openFirst), tolText(task), describe, summary, fmtMs,
+   firstWord.
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -109,12 +117,25 @@
       : "Give a low and a high value, with the high above the low.";
     return out;
   }
+  // the line under a number task's answer field: its tolerance, before the first answer (t.tolNote, else from answer.tol)
+  function tolText(t) {
+    if (t.tolNote) return t.tolNote;
+    var a = t.answer || {}, tol = a.tol;
+    if (!(tol > 0)) return "";
+    return "Within " + Math.round(tol * 1000) / 10 + "%" + (a.value != null ? " of the right value" : "") + " counts as right.";
+  }
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
+  // a task's first answer counts as right; with openFirst "not-right" (independent work), not when its worked solution
+  // was opened before that answer (solFirst). Default "counts": CK-F's published rule.
+  function firstRight(r, openFirst) { return !!(r && r.first === true && !(openFirst === "not-right" && r.solFirst)); }
   // the published rule: auto-marked items right on the first try, the estimate's self-ratings, the explanation's points.
-  // Levels by index in rule.levels: 0 Not yet, 1 Developing, 2 Proficient, 3 Strong.
-  function level(D, st) {
+  // Levels by index in rule.levels: 0 Not yet, 1 Developing, 2 Proficient, 3 Strong. openFirst: opt.openFirst, else
+  // D.rule.openFirst, else "counts"; the result's `early` counts the auto-marked tasks opened first.
+  function level(D, st, opt) {
     var R = D.rule, autoIds = D.tasks.filter(isAuto).map(function (t) { return t.id; });
-    var k = autoIds.filter(function (id) { return st.tasks[id] && st.tasks[id].first === true; }).length;
+    var of = (opt && opt.openFirst) || R.openFirst || "counts";
+    var k = autoIds.filter(function (id) { return firstRight(st.tasks[id], of); }).length;
+    var early = autoIds.filter(function (id) { return st.tasks[id] && st.tasks[id].solFirst; }).length;
     var exT = ofKind(D, "open-short"), esT = ofKind(D, "estimate");
     var ex = (exT && st.tasks[exT.id]) || {}, es = (esT && st.tasks[esT.id]) || {}, rt = es.rating || {};
     var crit = R.criteria.map(function (c) { return rt[c] != null ? R.levels.indexOf(rt[c]) : -1; });
@@ -125,11 +146,11 @@
     if (k >= R.autoStrong && estMin >= 2 && estStrong >= 2 && explainOk) lv = R.levels[3];
     else if (k >= R.autoProficient && estMin >= 2 && explainOk) lv = R.levels[2];
     else if (k >= (R.autoDeveloping != null ? R.autoDeveloping : 3) && estMin >= 1) lv = R.levels[1];
-    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete };
+    return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete, early: early, openFirst: of };
   }
   // the results view's sentence under the level (CK-F's parts; a checkpoint with another rule passes its own describe)
   function describe(D, L) {
-    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") +
+    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.openFirst === "not-right" && L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") +
       ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
@@ -146,7 +167,7 @@
   // the copied summary: keep its format fixed once testers use it (their summaries are compared across versions)
   function summary(D, st, env, o) {
     env = env || {}; o = o || {};
-    var L = (o.level || level)(D, st), total = 0, lines = [];
+    var L = o.level ? o.level(D, st) : level(D, st, { openFirst: o.openFirst }), total = 0, lines = [];
     D.tasks.forEach(function (t) { var r = st.tasks[t.id]; if (r && r.ms) total += r.ms; });
     lines.push("Learn · " + (o.code || "Checkpoint") + " results (" + D.version + ")");
     lines.push("Finished: " + (st.finished || "not yet") + " (this device's clock) · active time " + fmtMs(total));
@@ -174,7 +195,7 @@
   }
 
   var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
-    checkEstimate: checkEstimate, level: level, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
+    checkEstimate: checkEstimate, level: level, firstRight: firstRight, tolText: tolText, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -220,7 +241,9 @@
   LX.Checkpoint = function (host, o) {
     var D = o.data, KEY = o.key, N = D.tasks.length, code = o.code || "Checkpoint";
     var CK = o.checks || {}, cChoice = CK.choice || checkChoice, cOrder = CK.order || checkOrder, cNum = CK.numeric || checkNumeric, cEst = CK.estimate || checkEstimate;
-    var levelOf = o.level || level, summaryOf = o.summary || function (D, st, env) { return summary(D, st, env, { code: code, level: o.level }); };
+    var levelOf = o.level || function (D, st) { return level(D, st, { openFirst: o.openFirst }); };
+    var summaryOf = o.summary || function (D, st, env) { return summary(D, st, env, { code: code, level: o.level, openFirst: o.openFirst }); };
+    var SOL = KEY + "-sol-open";   // when the page's worked solution first opened for this runner (kept across "Start again")
     var esT = ofKind(D, "estimate"), gateT = o.submitTask ? task(D, o.submitTask) : esT, describeOf = o.describe || describe;
     function fresh() { return { version: D.version, started: null, finished: null, cur: 0, tasks: {} }; }
     var st = LX.store.get(KEY, null);
@@ -239,17 +262,20 @@
     function answered(id, right, answer, extra) {
       tick(); var r = rec(id); r.tries += 1;
       if (r.first == null) { r.first = right; r.msFirst = r.ms; }
+      if (!r.at) r.at = new Date().toISOString();   // when the task was first answered (the submit task: when it was submitted)
       if (answer !== undefined) r.answer = answer;
       if (extra) for (var k in extra) r[k] = extra[k];
       save();
-      if (gateT && id === gateT.id && gateT !== esT) openSolution();   // the estimate opens it itself, after its range check
+      if (gateT && id === gateT.id && gateT !== esT) openSolution(r.at);   // the estimate opens it itself, after its range check
       if (o.onAnswer) o.onAnswer(id, r, st);
       return r;
     }
     // the page's worked solution opened before the submit task is answered: recorded on that task
     function early() {
-      if (gateT) { var r = rec(gateT.id); if (r.first == null && !r.answer) r.solFirst = true; save(); if (o.onAnswer) o.onAnswer(gateT.id, r, st); }
-      openSolution();
+      var r = gateT ? rec(gateT.id) : null;
+      if (r && r.first == null && !r.answer) r.solFirst = true;
+      save(); openSolution();   // recorded before onAnswer runs, so the page reads the opening there
+      if (r && o.onAnswer) o.onAnswer(gateT.id, r, st);
     }
 
     // ---- views: intro, a task, results
@@ -352,7 +378,8 @@
       var f1 = E("div", { class: "lx-ck-field" }, g), id1 = LX.uid("ck");
       E("label", { for: id1, text: "Your answer" }, f1);
       var inp = E("input", { type: "number", id: id1, min: "0", step: "any", inputmode: "decimal", value: r.answer ? r.answer.value : "" }, f1);
-      var sel = unitSelect(g, t, r.answer && r.answer.unit);
+      var sel = unitSelect(g, t, r.answer && r.answer.unit), tt = o.tolerance === false ? "" : tolText(t);
+      if (tt) { var tid = id1 + "-tol"; E("p", { id: tid, class: "lx-hint lx-ck-tol", text: tt }, body); inp.setAttribute("aria-describedby", tid); }
       var row = E("div", { class: "lx-ck-row" }, body);
       E("button", { type: "button", class: "lx-btn small", text: "Check", onclick: function () {
         if (!sel.value) { feedback(fb, false, "Choose a unit first."); return; }
@@ -404,11 +431,11 @@
         var chk = cEst(t, lo, hi, sel.value);
         // a range needs its high above its low: say why and wait (not recorded as an answer, like an empty field)
         if (!chk.ordered) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb); return; }
-        answered(t.id, chk.unitsOk && chk.ordered && !!chk.overlaps, ans, { check: chk });
+        var er = answered(t.id, chk.unitsOk && chk.ordered && !!chk.overlaps, ans, { check: chk });
         fb.innerHTML = "";
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
         if (chk.rangeMsg) E("div", { class: "lx-saw" + (chk.overlaps ? "" : " no"), html: LX.icon(chk.overlaps ? "check" : "question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb);
-        openSolution(); rate(out);
+        openSolution(er.at); rate(out);
       } }, row);
       if (r.answer) rate(out);
       function rate(host) {
@@ -428,9 +455,13 @@
         unlock();
       }
     }
-    function openSolution() {
+    // open the page's worked solution, and record when it first opened for this runner (at: the submit task's answer
+    // time when that opened it, else now); the record outlives "Start again", so a page can tell a fresh attempt from one
+    // made after the solutions were seen (LX.Checkpoint.solOpened(key))
+    function openSolution(at) {
       var lock = q(o.lock), body = q(o.solution);
       if (lock) lock.hidden = true; if (body) body.classList.add("is-open");
+      if ((lock || body) && !LX.store.get(SOL, null)) LX.store.set(SOL, at || new Date().toISOString());
     }
     // "Start again": the page's worked solution shuts again until the new attempt's submit task is answered (or opened early)
     function lockSolution() {
@@ -498,5 +529,7 @@
     return { show: show, results: results, intro: intro, state: function () { return st; }, solutionNow: early, destroy: destroy };
   };
   Object.keys(pure).forEach(function (k) { LX.Checkpoint[k] = pure[k]; });
+  // when the page's worked solution first opened for the runner stored under `key` (ISO time), or null
+  LX.Checkpoint.solOpened = function (key) { return LX.store.get(key + "-sol-open", null); };
   LX.Checkpoint.lineChart = lineChart;
 })();

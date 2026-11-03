@@ -151,9 +151,10 @@
   // right; and an attempt during which the page's full worked solutions had been open before its final task was
   // submitted is practice, with no level: opened early by this attempt (solFirst on the final task), or opened earlier
   // in this browser, by an earlier attempt or by the other variant. D.solOpen = {model, empirical}: the first time the
-  // page's worked solutions opened under each variant (ISO, kept by the page); the final task's `at` is when this
-  // attempt submitted it (the same instant as its own opening, so that one does not count).
-  function firstRight(st, t) { var r = st.tasks[t.id]; return !!(r && r.first === true && !r.solFirst); }
+  // page's worked solutions opened under each variant (ISO, recorded by each variant's runner, LX.Checkpoint.solOpened);
+  // the final task's `at` (set by the runner) is when this attempt submitted it (the same instant as its own opening, so
+  // that one does not count).
+  function firstRight(st, t) { return CPK.firstRight(st.tasks[t.id], "not-right"); }   // the runner's rule, independent work
   function assisted(D, st) {
     var g = D.tasks[D.tasks.length - 1], r = st.tasks[g.id] || {};
     if (r.solFirst) return "early";
@@ -221,7 +222,17 @@
   function variantData(J, key) {
     var V = J.variants[key];
     return { version: J.version, variantLabel: V.label, rule: J.rule, key: key, other: key === "model" ? "empirical" : "model",
-      tasks: V.tasksA.concat(J.tasksB, V.tasksC).map(function (t) { var o = {}; for (var k in t) o[k] = t[k]; if (t.kind === "numeric" && t.unitNote) o.unitNote = t.unitNote; return o; }) };
+      tasks: V.tasksA.concat(J.tasksB, V.tasksC).map(function (t) {
+        var o = {}; for (var k in t) o[k] = t[k];
+        if (t.kind === "numeric") {
+          if (t.unitNote) o.unitNote = t.unitNote;
+          // the prompt's last sentence states the tolerance: the runner shows it under the answer field instead (tolNote),
+          // so it is not said twice; the data file and the no-JS list keep it in the prompt
+          var m = /\s*(Within [^.]*?(?:\.\d[^.]*?)*counts as right\.)$/.exec(t.prompt);
+          if (m) { o.prompt = t.prompt.slice(0, m.index); o.tolNote = m[1]; }
+        }
+        return o;
+      }) };
   }
   // the tasks for readers without JavaScript (written into the page by the test's --write mode): the prompts only. The
   // answers are in the page's worked solutions, which a reader without JavaScript can open; they are not in this list.
@@ -234,7 +245,7 @@
       h.push('<p class="lx-eyebrow">' + esc(D.variantLabel) + ": the tasks</p>");
       h.push('<ol class="ckm-static">');
       D.tasks.forEach(function (t) {
-        var x = "<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p><p>" + esc(t.prompt) + "</p>";
+        var x = "<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p><p>" + esc(t.prompt + (t.tolNote ? " " + t.tolNote : "")) + "</p>";   // the no-JS prompt keeps its tolerance
         if (t.kind === "choice") x += "<ul>" + t.options.map(function (o) { return "<li>" + o[0] + ". " + esc(o[1]) + "</li>"; }).join("") + "</ul>";
         if (t.kind === "numeric") x += "<p>Answer with a number and a unit.</p>";
         if (t.kind === "open-short") x += "<p>Self-rated against " + t.points.length + " points, shown after you submit.</p>";
@@ -396,13 +407,14 @@
     // makes the chosen variant's, which resumes that variant's stored attempt. The runner opens the worked solutions when
     // the variant's final task is submitted, or on purpose (recorded on that task), and shuts them on "Start again".
     var host = H("div", { class: "ckm-runner" }, live), Ds = {};
-    // when the page's worked solutions first opened under each variant (kept in this browser; read by the level rule)
-    var solOpen = LX.store.get("ckm-sol-open", null) || {};
-    function onAnswer(id, rec) {
-      if (id !== finalId(J, cur) || !(rec.answer || rec.solFirst)) return;
-      var now = new Date().toISOString();
-      if (rec.answer && !rec.at) rec.at = now;     // this attempt's submission of its final task
-      if (!solOpen[cur]) { solOpen[cur] = rec.at || now; LX.store.set("ckm-sol-open", solOpen); }
+    // when the page's worked solutions first opened under each variant (read by the level rule): the runner records it
+    // per runner (LX.Checkpoint.solOpened, under "<key>-sol-open"), and the final task's `at` is when it was submitted.
+    // Openings recorded before that, under this page's own key "ckm-sol-open", still count (the earlier of the two).
+    var legacy = LX.store.get("ckm-sol-open", null) || {};
+    function solOpenNow() {
+      var out = {};
+      Object.keys(KEYS).forEach(function (k) { var a = LX.Checkpoint.solOpened(KEYS[k]), b = legacy[k] || null; out[k] = a && b ? (a < b ? a : b) : (a || b); });
+      return out;
     }
     function choose(k, user) {
       if (cur === k && cp) return;
@@ -410,9 +422,10 @@
       cur = k; LX.store.set("ckm-variant", k);
       Object.keys(btns).forEach(function (b) { btns[b].setAttribute("aria-pressed", b === k ? "true" : "false"); });
       host.setAttribute("data-variant", k);
-      D = Ds[k] = Ds[k] || variantData(J, k); D.solOpen = solOpen;
+      D = Ds[k] = Ds[k] || variantData(J, k);
+      if (!Object.getOwnPropertyDescriptor(D, "solOpen")) Object.defineProperty(D, "solOpen", { get: solOpenNow });   // read fresh each time
       cp = LX.Checkpoint(host, { data: D, key: KEYS[k], code: CODE, lessonId: "ck-m-unseen-problem", intro: J.intro,
-        lock: lock, solution: body, submitTask: finalId(J, k), level: level, describe: describe, summary: summary, onAnswer: onAnswer });
+        lock: lock, solution: body, submitTask: finalId(J, k), level: level, describe: describe, summary: summary, openFirst: "not-right" });
       if (user) host.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
     }
     // the lock box's button before any variant is chosen: start the model variant and record the early opening there
