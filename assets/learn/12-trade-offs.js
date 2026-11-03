@@ -1,7 +1,7 @@
 // 12-trade-offs.js — Lesson 12, "Cheap or clean? How do you weigh cost against emissions?" (step cards, W1).
 //
 // Data: assets/learn/data/12-trade-offs.json (six hand-made plans for Prairie Town, each with its precomputed year) and
-// lesson 13's planning model: assets/learn/13-capstone.js (LX.townPlan, loaded first on this page) with
+// the shared planning engine of lessons 12 and 13: assets/learn/components/planengine.js (LX.townPlan, in learn.js) with
 // data/13-capstone.json (EIA and NREL costs, dated), town_year.json and cf_targets.json.
 //
 // Model (pure, exported for Node):
@@ -79,7 +79,7 @@
   var COLORS = { A: "var(--lx-cc)", B: "var(--lx-wind)", C: "var(--lx-solar)", D: "var(--lx-tier-5)", E: "var(--lx-warn)", F: "var(--lx-tier-2)" };
 
   LX.mount("trade-offs", function (live, data, root) {
-    var TP = LX.townPlan; if (!TP || !TP.ui) throw new Error("lesson 13's planning model (13-capstone.js) must load first");
+    var TP = LX.townPlan; if (!TP || !TP.ui) throw new Error("the planning engine (components/planengine.js) is missing from learn.js");
     var U = TP.ui, fm = U.fm; U.css(); css();
     var cfg = data["13_capstone"], t = data["12_trade_offs"];
     var Y = TP.prepareYear(data.town_year, data.cf_targets, cfg), RW = TP.selectWeeks(Y, cfg.weeks), per = TP.periodsOf(RW), C = TP.costs(cfg, {});

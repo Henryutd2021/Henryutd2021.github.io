@@ -1,0 +1,50 @@
+/* exemplars.css — LX.Exemplars (exemplars.js): two answers side by side, marked phrases with number badges, the notes
+   they open, and the "what made the difference" table. Weak and good are told apart by their heading and level as well
+   as the top edge's colour. */
+.lx-ex { display: grid; gap: 12px; min-width: 0; }
+.lx-ex-lede { font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-ex-task { border: 1px dashed var(--lx-line-2); border-radius: 12px; padding: 10px 14px; display: grid; gap: 4px; }
+.lx-ex-task p:not(.lx-eyebrow) { font-size: 15.5px; color: var(--lx-ink); }
+.lx-ex-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 700px) { .lx-ex-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lx-ex-ans { border: 1px solid var(--lx-line); border-top: 4px solid var(--lx-ink-3); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px;
+  align-content: start; background: var(--lx-surface); min-width: 0; }
+.lx-ex-ans.weak { border-top-color: var(--lx-warn); }
+.lx-ex-ans.good { border-top-color: var(--lx-good); }
+.lx-ex-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.page-learn .lx-ex-head h4 { font-size: 16px; margin: 0; }
+.lx-ex-level { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--lx-ink-3); }
+.lx-ex-ans.weak .lx-ex-level { color: var(--lx-warn); }
+.lx-ex-ans.good .lx-ex-level { color: var(--lx-good); }
+.page-learn .lx-ex-text { font-size: 16px; line-height: 1.85; color: var(--lx-ink); }
+.lx-ex-mark { border-bottom: 2px dashed var(--lx-ink-3); border-radius: 4px 4px 0 0; padding: 1px 2px; cursor: pointer;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.lx-ex-mark:hover { background: var(--lx-surface-2); }
+.lx-ex-mark.on { border-bottom-style: solid; border-bottom-color: var(--lx-accent); background: var(--lx-accent-soft); }
+.lx-ex-mark:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+.lx-ex-n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; margin-left: 4px; border-radius: 9px;
+  background: var(--lx-ink-2); color: var(--lx-bg); font-family: var(--lx-f-mono); font-size: 11.5px; font-weight: 600; line-height: 1; vertical-align: 1px; }
+.lx-ex-mark.on .lx-ex-n { background: var(--lx-accent); }
+.lx-ex-notes { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.lx-ex-notes:not(:has(li:not([hidden]))) { display: none; }
+.lx-ex-note { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 6px; align-items: start; padding: 8px 10px; border-radius: 10px;
+  background: var(--lx-surface-2); font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-ex-note .lx-ex-n { margin: 2px 0 0; }
+.lx-ex-note b { color: var(--lx-ink); font-weight: 600; }
+.lx-ex-foot { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.lx-ex-count { font-size: 13.5px; color: var(--lx-ink-3); }
+.lx-ex-diffbox { display: grid; gap: 6px; }
+.lx-ex-diff { width: 100%; border-collapse: collapse; font-size: 14.5px; background: transparent; }
+/* keep the night theme's table fill out, as table.css does for Learn tables */
+.page-learn .lx-ex-diff, .page-learn .lx-ex-diff > * > * > * { background: transparent !important; box-shadow: none !important; }
+.lx-ex-diff th, .lx-ex-diff td { padding: 7px 8px; border-bottom: 1px solid var(--lx-line); text-align: left; vertical-align: top; }
+.lx-ex-diff thead th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--lx-ink-3); }
+.lx-ex-diff tbody th { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
+.lx-ex-diff td { color: var(--lx-ink-2); }
+@media (max-width: 560px) {
+  .lx-ex-diff thead { display: none; }
+  .lx-ex-diff, .lx-ex-diff tbody, .lx-ex-diff tr, .lx-ex-diff th, .lx-ex-diff td { display: block; width: 100%; }
+  .lx-ex-diff tr { padding: 6px 0; border-bottom: 1px solid var(--lx-line); }
+  .lx-ex-diff th, .lx-ex-diff td { border: 0; padding: 2px 0; }
+  .lx-ex-diff td::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; }
+}

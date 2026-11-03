@@ -1,0 +1,134 @@
+---
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+title: "A research skill a learner would type into a search box?"
+subtitle: "What the reader produces in this studio"
+description: "Research studio R<n> of Energy Systems, Step by Step: one sentence on what the reader produces, and how they check it against the course rubric (for search and sharing)."
+page-layout: full
+toc: false
+title-block-banner: false
+css: ../assets/learn/learn.css
+body-classes: "page-learn page-lesson lx-form-studio"
+---
+
+<!-- Research studio (path.yml form: studio; curriculum v2 §11 and §16.3). Guide: assets/learn/README.md, "Studios and
+     case files". Replace <slug> with the studio's JS name.
+     Order: the task (what to produce, from what, by when) -> exemplars (a good and a weak answer to the same task, side by
+     side, with tap-to-reveal notes: LX.Exemplars) -> self-check against the §3.4 rubric (LX.Rubric; R1 and R10 also
+     LX.QuestionCard) -> sources. path.yml: `form: studio`, `minutes` (the guided part) and `practice_minutes` (the
+     independent work, honestly: R2's literature matrix is 240), so the header shows both.
+     Rules: method-neutral (§11.2: optimization is one family among several); the rubric's words are the course's own and
+     are not rewritten per studio (pick the competences, add a "look for" line); exemplars are illustrative and say so.
+     After editing path.yml, run in the ResearchPortfolio folder:
+     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+
+<!-- learn:meta:start -->
+<!-- learn:meta:end -->
+
+::: {#task .lx-sec}
+```{=html}
+<div class="lx-interactive lx-cards" data-learn="<slug>" data-src="../assets/learn/data/<id>.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">The task</p>
+<ol class="lx-studio-task">
+<li><b>Produce:</b> one line on what the reader hands in (a question card, a concept matrix, a verification log).</li>
+<li><b>From:</b> one line on the material (a brief, a dataset, a list of papers).</li>
+<li><b>Done when:</b> one line, in the rubric's words.</li>
+</ol>
+<p class="lx-hint">About N minutes guided here, then about M hours on your own.</p>
+<p class="lx-hint">With JavaScript on, you work through this step by step and keep your draft in this browser.</p>
+</div>
+</div>
+<p class="lx-datanote"><span>What the examples are based on, with a date (or: the briefs and answers on this page are illustrative).</span></p>
+```
+:::
+
+::: {#exemplars .lx-sec}
+::: {.lx-sec-h}
+## Two answers to the same task
+:::
+
+```{=html}
+<div id="<slug>-exemplars" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- <slug>-exemplars:start (written from the data file by LX.Exemplars' staticHTML in the test's --write mode; do not edit) -->
+<div class="lx-ex-cols">
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p>The weak answer, as written, with marks [1].</p><ol class="lx-ex-static"><li>Why that part falls short, in one sentence.</li></ol></div>
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p>The strong answer, as written, with marks [1].</p><ol class="lx-ex-static"><li>Why that part works, in one sentence.</li></ol></div>
+</div>
+<!-- <slug>-exemplars:end -->
+</div>
+</div>
+```
+:::
+
+::: {#selfcheck .lx-sec}
+::: {.lx-sec-h}
+## Check your own work against the rubric
+:::
+
+```{=html}
+<div id="<slug>-rubric" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- <slug>-rubric:start (written by LX.Rubric's staticHTML, from the course rubric, in the test's --write mode; do not edit) -->
+<div class="lx-scroll-x"><table class="lx-facts lx-rb-static"><thead><tr><th scope="col">Competence</th><th scope="col">Developing</th><th scope="col">Proficient (the bar)</th><th scope="col">Strong</th></tr></thead>
+<tbody><tr><th scope="row">Framing</th><td>The course rubric's words.</td><td>…</td><td>…</td></tr></tbody></table></div>
+<!-- <slug>-rubric:end -->
+</div>
+</div>
+```
+
+```{=html}
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Researcher</span>The next tier's view, as a title</summary>
+<div class="lx-deeper-body">
+```
+
+One or two sentences on how the same skill is used in the capstone research project (CR), with a link to the lesson that formalises it.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#sources .lx-sec}
+::: {.lx-sec-h}
+## Sources and what's next
+:::
+
+::: {.lx-end}
+```{=html}
+<div class="lx-card">
+<p class="lx-eyebrow">Tools and data named on this page</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Tool or source</th><th scope="col">What it is for</th><th scope="col">Link</th></tr></thead>
+<tbody>
+<tr><td class="n">OpenAlex</td><td>An open index of research papers (an example).</td><td class="s"><a href="https://openalex.org/">openalex.org</a> · as of Month Year</td></tr>
+</tbody>
+</table>
+</div>
+```
+
+::: {.lx-stack}
+<!-- learn:next:start -->
+<!-- learn:next:end -->
+
+```{=html}
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul><li>Author (year). <a href="https://doi.org/10.0000/example">Title</a>. Journal.</li></ul>
+</div>
+```
+:::
+:::
+
+<!-- learn:footer:start -->
+<!-- learn:footer:end -->
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/<slug>.js" defer></script>
+```

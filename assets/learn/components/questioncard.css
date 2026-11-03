@@ -1,0 +1,35 @@
+/* questioncard.css — LX.QuestionCard (questioncard.js): the card's fields in a two-column grid (one column on phones),
+   the five question types as pill radios, the checks list (a tick or a question mark, and words) and the copy box. */
+.lx-qc { display: grid; gap: 14px; min-width: 0; }
+.lx-qc-lede { font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-qc-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; }
+.lx-qc-field { display: grid; gap: 4px; align-content: start; min-width: 0; margin: 0; padding: 0; border: 0; }
+.lx-qc-field.wide { grid-column: 1 / -1; }
+.lx-qc-field > label, .lx-qc-field > legend { float: none; width: auto; margin: 0; padding: 0; font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; color: var(--lx-ink); }
+.lx-qc-field input[type="text"], .lx-qc-field textarea, .lx-qc-field select, .lx-qc-copy textarea {
+  width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid var(--lx-line-2); border-radius: 10px; background: var(--lx-surface);
+  color: var(--lx-ink); font-family: var(--lx-f-body); font-size: 15.5px; }
+.lx-qc-field textarea { resize: vertical; line-height: 1.4; }
+.lx-qc-field input[type="text"]:focus-visible, .lx-qc-field textarea:focus-visible, .lx-qc-field select:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 1px; }
+.lx-qc-field .lx-hint { font-size: 12.5px; }
+.lx-qc-typerow { display: flex; flex-wrap: wrap; gap: 6px; }
+.lx-qc-type { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin: 0; padding: 4px 12px 4px 8px; border: 1px solid var(--lx-line-2);
+  border-radius: 10px; background: var(--lx-surface); cursor: pointer; font-family: var(--lx-f-display); font-size: 14px; color: var(--lx-ink); }
+.lx-qc-type input { width: 16px; height: 16px; margin: 0; accent-color: var(--lx-accent); }
+.lx-qc-type input:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+.lx-qc-type.on { border-color: var(--lx-accent); box-shadow: inset 0 0 0 1px var(--lx-accent); background: var(--lx-accent-soft); }
+.lx-qc-tinfo { font-size: 14px; color: var(--lx-ink-2); }
+.lx-qc-tinfo b { color: var(--lx-ink); font-weight: 600; }
+.lx-qc-tinfo span { display: block; color: var(--lx-ink-3); font-size: 13px; margin-top: 2px; }
+.lx-qc-checks { display: grid; gap: 6px; border-top: 1px solid var(--lx-line); padding-top: 12px; }
+.lx-qc-ckhead { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
+.lx-qc-cklist { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.lx-qc-cklist li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 6px; align-items: start; font-size: 14.5px; color: var(--lx-ink); }
+.lx-qc-cklist li .lx-ic { width: 18px; height: 18px; margin-top: 2px; }
+.lx-qc-cklist li.ok .lx-ic { color: var(--lx-good); }
+.lx-qc-cklist li.warn .lx-ic { color: var(--lx-warn); }
+.lx-qc-cklist .why { display: block; font-size: 13.5px; color: var(--lx-ink-2); }
+.lx-qc-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lx-qc-copy { display: grid; gap: 4px; }
+.lx-qc-copy textarea { font-family: var(--lx-f-mono); font-size: 13px; line-height: 1.45; background: var(--lx-surface-2); }
+@media (max-width: 640px) { .lx-qc-form { grid-template-columns: minmax(0, 1fr); } }

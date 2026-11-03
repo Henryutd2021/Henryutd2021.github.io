@@ -1,0 +1,41 @@
+/* planengine.css — the page kit of the planning engine (planengine.js, LX.townPlan.ui) shared by lessons 12 and 13:
+   the stage and cards, the plan and comparison tables (TextTable: cards on phones), the scenario box, the week tabs, the
+   hourly table and the verdict list. Moved verbatim from the style block 13-capstone.js used to inject (W2 infra,
+   2026-11-03); the lx13- prefix stays because both lessons use these classes. Colours from --lx-* tokens only. */
+.lx13-stage{display:grid;gap:14px;min-width:0}
+.lx13-card{background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;display:grid;gap:10px;min-width:0}
+.page-learn .lx13-card h3{font-size:17px}
+.lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
+.lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
+.lx13-chart svg{display:block;width:100%;height:auto}
+.lx13-chart text{font-family:var(--lx-f-mono);font-size:12px;fill:var(--lx-ink-3)}
+.lx13-chart text.lab{font-family:var(--lx-f-display);font-size:13px;font-weight:600;fill:var(--lx-ink)}
+.lx13-chart text.note{font-family:var(--lx-f-body);font-size:12.5px;fill:var(--lx-ink-3)}
+.lx13-mix{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--lx-surface-3)}
+.lx13-mix i{display:block;height:100%;background:var(--c)}
+.lx13-group{display:grid;gap:12px}
+.page-learn .lx13-group>p{font-family:var(--lx-f-display);font-weight:500;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--lx-ink-3)}
+.lx13-tallies{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lx13-tallies .lx-tally.bad b{color:var(--lx-bad)}
+.lx13-box{border:1px solid var(--lx-line-2);border-radius:12px;padding:12px;display:grid;gap:10px;background:var(--lx-surface-2)}
+.lx13-plan{width:100%;border-collapse:collapse;font-size:14px}
+.lx13-plan td,.lx13-plan th{padding:3px 4px;border-bottom:1px solid var(--lx-line);text-align:left;font-weight:400}
+.lx13-plan .n{text-align:right;font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lx13-tt{width:100%;border-collapse:collapse;font-size:14.5px}.lx13-tt th,.lx13-tt td{padding:8px 8px;border-bottom:1px solid var(--lx-line);text-align:left;vertical-align:top;font-weight:400}
+.lx13-tt thead th{font-family:var(--lx-f-display);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--lx-ink-3)}
+.lx13-tt tbody th b{display:flex;align-items:center;gap:8px;font-family:var(--lx-f-display);font-weight:600}.lx13-tt tbody th b i{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}
+.lx13-tt tbody th small{display:block;color:var(--lx-ink-3);font-size:12.5px;margin-left:18px}
+@media (max-width:620px){.lx13-tt thead{display:none}.lx13-tt,.lx13-tt tbody,.lx13-tt tr,.lx13-tt th,.lx13-tt td{display:block;width:100%}.lx13-tt tr{border:1px solid var(--lx-line);border-radius:12px;padding:6px 10px;margin-bottom:10px}
+.lx13-tt th,.lx13-tt td{border:0;padding:4px 0}.lx13-tt td::before{content:attr(data-label);display:block;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--lx-ink-3)}}
+.lx13-plan th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}
+.lx13-rowb{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lx13-scen>summary{cursor:pointer;font-family:var(--lx-f-display);font-weight:500;font-size:14.5px;color:var(--lx-ink-2);min-height:40px;display:flex;align-items:center}
+.lx13-scen[open]{display:grid;gap:12px}
+.lx13-week .lx-seg button{min-height:34px;padding:0 9px;font-size:13px}
+.lx13-cmp{width:100%;border-collapse:collapse;font-size:14px}.lx13-cmp th,.lx13-cmp td{padding:4px 6px;border-bottom:1px solid var(--lx-line);text-align:right}
+.lx13-cmp th:first-child,.lx13-cmp td:first-child{text-align:left}.lx13-cmp td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.lx13-cmp td:first-child{font-family:var(--lx-f-body)}
+.lx13-hours{max-height:340px;overflow:auto;margin-top:6px}.lx13-hours table{font-size:12.5px;min-width:640px}.lx13-hours th,.lx13-hours td{padding:2px 5px;white-space:nowrap}
+.lx13-hours thead th{position:sticky;top:0;background:var(--lx-surface)}
+.lx13-verdict{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:14.5px}.lx13-verdict li{display:flex;gap:8px;align-items:flex-start}.lx13-verdict li b{font-family:var(--lx-f-mono);font-weight:600}
+.lx13-verdict .ok{color:var(--lx-good)}.lx13-verdict .no{color:var(--lx-bad)}.lx13-verdict .lx-ic{flex:none;margin-top:2px}
+@media (max-width:560px){.lx13-card{padding:12px}}

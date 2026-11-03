@@ -10,8 +10,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- Lesson 12 (T12) in step cards. View and pure model: assets/learn/12-trade-offs.js with data/12-trade-offs.json; the
-     planning model and the cost-against-CO2 chart come from lesson 13 (assets/learn/13-capstone.js, loaded first, with
-     data/13-capstone.json, town_year.json and cf_targets.json). Tests: node _tests/learn/test_12-trade-offs.js (every number
+     planning model is the shared engine of lessons 12 and 13 (components/planengine.js, LX.townPlan) and the chart is
+     LX.Frontier (components/frontier.js), both in learn.js, with data/13-capstone.json, town_year.json and
+     cf_targets.json. Tests: node _tests/learn/test_12-trade-offs.js (every number
      below is checked against the model). Text budget: one or two sentences per element; depth in the Go deeper boxes.
      The learn:meta, learn:next and learn:footer blocks are written by scripts/build_learn.py. -->
 
@@ -218,6 +219,5 @@ Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Upcoming: M6 (carb
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/13-capstone.js" defer></script>
 <script src="../assets/learn/12-trade-offs.js" defer></script>
 ```

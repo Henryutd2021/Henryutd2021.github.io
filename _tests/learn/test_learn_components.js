@@ -28,7 +28,9 @@ ok(depth === 0, "learn.css: braces balance");
  // promoted at the W1 merge (2026-11-02)
  "demo", "demoState", "Plot", "PlotCard", "Scatter", "PriceChart", "HourPicker", "Tornado", "CostSplit", "SupplyStack", "Frontier", "Steelman",
  "Boundary", "Share", "copyText", "LPPlane", "lp2", "CardSort", "LinkedViews", "Toggle", "EquationCard", "FormulateBox", "Formulation",
- "Network", "Checklist", "EvidenceLadder", "PhraseTagger", "UnitChain", "EvidenceClock", "Checkpoint", "Sheet", "Practice"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
+ "Network", "Checklist", "EvidenceLadder", "PhraseTagger", "UnitChain", "EvidenceClock", "Checkpoint", "Sheet", "Practice",
+ // added in wave W2 (2026-11-03)
+ "Exemplars", "Rubric", "QuestionCard", "Timeline", "townPlan"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
 
 // ---------------- no lesson defines its own copy of a shared component (W1 merge)
 const lessonJs = fs.readdirSync(L(".")).filter(f => /^[0-9a-z-]+\.js$/.test(f) && f !== "learn.js");
