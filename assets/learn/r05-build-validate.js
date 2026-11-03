@@ -8,11 +8,15 @@
 // 100 MWh it started with. Demand, wind and solar follow the real hourly shapes of 20 August 2025 on the Southwest Power
 // Pool grid (town_year.json, EIA-930), scaled to the town exactly as in lesson 0 (town.json) and B3.
 //
-// Ten step cards: the study; five versions of its code, each with one planted bug (a unit error, a sign flip, a free
-// lunch, a missing rule, a leaked future), each run with the real solver to see its symptom, then the check that catches
-// it and the fix; a benchmark day with an answer worked out by hand, run on every version; validation against measured
-// data (EIA's 82% round trip for the U.S. battery fleet in 2019); a rerun from a clean clone; and the reader's
-// verification log to copy. The explain parts (flowchart, checklist, myth or fact) are on the page.
+// Eleven step cards: the study (its rules, plants and code symbols); five versions of its code, each with one planted
+// bug (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each run with the real solver to see
+// its symptom, then the check that catches it and the fix; a benchmark day worked out by hand in three steps, run on
+// every version; a validation (the day-before plan's forecast of 20 August against 20 August as measured, with a
+// tolerance set first); an input check and sensitivity run (EIA's measured 82% round trip for the U.S. battery fleet in
+// 2019); a simulated clean-clone rerun (the real one is the notebook's practice); and the reader's verification log to
+// copy. The explain parts (flowchart, checklist, myth or fact) are on the page.
+// The day-before plan has many least-cost schedules that do very different things on 20 August; a tie rule fixed in
+// advance (keep the most energy in store) picks one, so its saving is reproducible across solvers (RUNS planKeep).
 //
 // buildModel(day, o) writes the LX.solver model (HiGHS, components/solver.js) for the correct study or one bug; RUNS
 // names every model the page solves. The page solves them in the browser; _tests/learn/test_r05-build-validate.js
@@ -52,17 +56,31 @@
       bench: benchDay(J.bench) };
   }
 
-  // o: { battery (default true), bug: null | "unit" | "sign" | "lunch" | "missing", eta, fix: {c: [24], d: [24]} }
+  // o: { battery (default true), bug: null | "unit" | "sign" | "lunch" | "missing", eta, fix: {c: [24], d: [24]},
+  //      tie: {cap, rule: "keep" | "early"} }
   //   unit     the battery's energy size typed from a spec sheet in kWh (200,000) into a model that counts MWh
   //   sign     the battery's terms in the balance with the wrong sign: charging counted as supply
   //   lunch    no end-of-day rule: the battery may end the day emptier than it started
   //   missing  no ramp rows for the gas combined-cycle plant
+  //   tie      the second stage of a tie rule: among the plans that cost at most `cap` (the first stage's optimum), the
+  //            one that keeps the most energy in store (rule "keep": the largest sum of e_t) or empties the battery
+  //            first ("early": the smallest sum). The day-before plan has many least-cost schedules that do very
+  //            different things on 20 August; the rule, fixed in advance and using only the plan day's data, picks
+  //            one, so the day-before saving is reproducible (the Node test checks the picked plan is unique)
   // (the leaked future is not in the model: it is which day the battery's schedule is planned on; see RUNS)
   function buildModel(day, J, o) {
     o = o || {};
     var f = J.fleet, B = J.study.battery, V = J.study.V, bat = o.battery !== false, bug = o.bug || null;
     var eta = o.eta != null ? o.eta : B.eta, E = bug === "unit" ? B.E * 1000 : B.E;
     var vars = [], cons = [];
+    var m = buildRows(day, J, o, f, B, V, bat, bug, eta, E, vars, cons);
+    if (o.tie && bat) {
+      var cap = {}; m.variables.forEach(function (v) { if (v.cost) cap[v.name] = v.cost; v.cost = /^e_/.test(v.name) ? (o.tie.rule === "early" ? 1 : -1) : 0; });
+      m.constraints.push({ name: "cap", terms: cap, le: o.tie.cap });
+    }
+    return m;
+  }
+  function buildRows(day, J, o, f, B, V, bat, bug, eta, E, vars, cons) {
     for (var t = 0; t < 24; t++) {
       G.forEach(function (g) {
         var v = { name: "p_" + g + "_" + t, cost: f[FKEY[g]].cost };
@@ -104,11 +122,18 @@
 
   function r2(v) { return Math.round(v * 100) / 100 + 0; }
   function r6(v) { return Math.round(v * 1e6) / 1e6 + 0; }
+  // the running cost of a solved plan from its values (a tie rule's second stage has another objective)
+  function costOf(J, x) {
+    var f = J.fleet, c = 0;
+    for (var t = 0; t < 24; t++) { G.forEach(function (g) { c += f[FKEY[g]].cost * (x["p_" + g + "_" + t] || 0); }); c += J.study.V * (x["u_" + t] || 0); }
+    return c;
+  }
   // a solved model as hourly rows and the checks' measures (true costs from the true prices, battery convention: d feeds
   // the town, c draws from it)
   function summarize(day, J, r, o) {
     o = o || {};
     if (!r || !r.ok) return { ok: false, status: r ? r.status : "none" };
+    if (o.tie) r = { ok: true, status: r.status, values: r.values, objective: costOf(J, r.values) };
     var f = J.fleet, bat = o.battery !== false, x = r.values, rows = [];
     for (var t = 0; t < 24; t++) {
       var w = { t: t, d: day.demand[t], u: x["u_" + t] || 0, c: bat ? x["c_" + t] || 0 : 0, dis: bat ? x["d_" + t] || 0 : 0, e: bat ? x["e_" + t] || 0 : null };
@@ -157,8 +182,11 @@
     l0ok: { day: "lesson0" },
     l0missingBase: { day: "lesson0", battery: false, bug: "missing" },
     l0missing: { day: "lesson0", bug: "missing" },
-    plan: { day: "forecast" },                          // the schedule planned on the day before (persistence forecast)
-    honest: { day: "study", follow: "plan" },           // 20 August run with that schedule fixed
+    plan: { day: "forecast" },                          // planned on 19 August's measured day (persistence forecast)
+    planKeep: { day: "forecast", tie: "plan", rule: "keep" },    // its tie rule: keep the most energy in store
+    planEarly: { day: "forecast", tie: "plan", rule: "early" },  // another least-cost plan: empty the battery first
+    honest: { day: "study", follow: "planKeep" },       // 20 August run with the rule's schedule fixed
+    honestEarly: { day: "study", follow: "planEarly" }, // and with the other one
     eta82: { day: "study", eta: 0.82 },
     benchBase: { day: "bench", battery: false },
     benchOk: { day: "bench" },
@@ -168,21 +196,45 @@
     benchMissing: { day: "bench", bug: "missing" },
     benchMissingBase: { day: "bench", battery: false, bug: "missing" }
   };
+  // the cap of a tie rule's second stage: the first stage's optimum, with room for rounding only
+  function tieCap(cost) { return cost * (1 + 1e-9) + 1e-7; }
   function runModel(key, D, J, sol) {
     var R = RUNS[key], o = { battery: R.battery, bug: R.bug, eta: R.eta };
     if (R.follow) { var P = sol[R.follow]; o.fix = { c: P.rows.map(function (w) { return w.c; }), d: P.rows.map(function (w) { return w.dis; }) }; }
+    if (R.tie) o.tie = { cap: tieCap(sol[R.tie].cost), rule: R.rule };
     return buildModel(D[R.day], J, o);
   }
-  // the order runs need (a followed schedule first)
-  var ORDER = Object.keys(RUNS).sort(function (a, b) { return (RUNS[a].follow ? 1 : 0) - (RUNS[b].follow ? 1 : 0); });
+  // what a run needs solved first (a followed schedule, or a tie rule's first stage)
+  function needs(k) { return RUNS[k].follow || RUNS[k].tie || null; }
+  function depth(k) { var n = 0; while (needs(k)) { k = needs(k); n++; } return n; }
+  // the order runs need (every run after the ones it needs)
+  var ORDER = Object.keys(RUNS).sort(function (a, b) { return depth(a) - depth(b); });
+
+  // the validation: the day-before plan's forecast of 20 August (19 August's measured net load, a persistence forecast)
+  // against 20 August as measured, hour by hour, with the tolerance set before comparing (the battery's power, MW)
+  function netLoad(day) { return day.demand.map(function (v, t) { return v - day.wind[t] - day.solar[t]; }); }
+  function forecastCheck(D, J) {
+    var f = netLoad(D.forecast), m = netLoad(D.study), err = f.map(function (v, t) { return v - m[t]; }), tol = J.validation.tol;
+    var abs = err.map(Math.abs), max = Math.max.apply(null, abs), at = abs.indexOf(max);
+    return { forecast: f, measured: m, err: err, mae: abs.reduce(function (a, b) { return a + b; }, 0) / 24, max: max, maxHour: at,
+      over: abs.filter(function (e) { return e > tol; }).length, tol: tol };
+  }
 
   // the numbers the page states, from the solved runs. A saving is the version's own day without a battery minus the
   // same version with it, as that version's code would report it.
-  function numbers(J, sol) {
+  function numbers(J, sol, D) {
     var s = sol, sv = function (b, w) { return r2(s[b].cost - s[w].cost); }, B = J.study.battery, x = {};
     x.base = r2(s.base.cost);
     x.ok = sv("base", "ok"); x.unit = sv("base", "unit"); x.sign = sv("base", "sign"); x.lunch = sv("base", "lunch");
-    x.missing = sv("missingBase", "missing"); x.honest = sv("base", "honest"); x.eta82 = sv("base", "eta82");
+    x.missing = sv("missingBase", "missing"); x.honest = sv("base", "honest"); x.honestEarly = sv("base", "honestEarly"); x.eta82 = sv("base", "eta82");
+    x.planCost = r2(s.plan.cost); x.planKeepCost = r2(s.planKeep.cost); x.planEarlyCost = r2(s.planEarly.cost);
+    if (D) {
+      var F = forecastCheck(D, J);
+      x.fcMAE = Math.round(F.mae * 10) / 10; x.fcMax = F.max; x.fcMaxHour = F.maxHour; x.fcOver = F.over; x.fcTol = F.tol;
+    }
+    // the benchmark by hand, in three steps
+    x.benchAvoided = B.E * J.fleet.peaker.cost; x.benchCharge = r2(B.E / B.eta); x.benchChargeCost = r2(B.E / B.eta * J.fleet.cc.cost);
+    x.benchPeak = J.bench.high - J.fleet.nuclear.mw - J.fleet.cc.mw; x.benchCC = J.bench.flat - J.fleet.nuclear.mw; x.benchRoom = J.fleet.cc.mw - x.benchCC;
     x.unitMaxE = r2(s.unit.maxE); x.okMaxE = r2(s.ok.maxE); x.signBoth = s.sign.both; x.signFed = r2(s.sign.fedAsModelled);
     x.lunchEnd = r2(s.lunch.endE); x.lunchGain = r2(x.lunch - x.ok); x.missingRamp = r2(s.missing.maxRamp);
     x.l0base = r2(s.l0base.cost); x.l0missingBase = r2(s.l0missingBase.cost);
@@ -207,50 +259,70 @@
   }
   function num(v) { return (Math.round(v * 100) / 100).toLocaleString("en-US", { maximumFractionDigits: 2 }); }
   // the page's strings for each number
-  var MONEY = ["base", "ok", "unit", "sign", "lunch", "missing", "honest", "eta82", "lunchGain", "l0base", "l0missingBase", "l0ok", "l0missing",
-    "benchOk", "benchUnit", "benchSign", "benchLunch", "benchMissing", "benchHand"];
+  var MONEY = ["base", "ok", "unit", "sign", "lunch", "missing", "honest", "honestEarly", "eta82", "lunchGain", "l0base", "l0missingBase", "l0ok", "l0missing",
+    "benchOk", "benchUnit", "benchSign", "benchLunch", "benchMissing", "benchHand", "benchAvoided", "benchChargeCost", "planCost", "planKeepCost", "planEarlyCost"];
+  function hh(t) { return (t < 10 ? "0" : "") + t + ":00"; }
   function vals(J, x) {
     var v = {};
     Object.keys(x).forEach(function (k) { v[k] = MONEY.indexOf(k) >= 0 ? money(x[k]) : num(x[k]); });
     v.okYear = "$" + (x.okYear / 1e6).toFixed(1) + " million";
     v.lesson0Label = J.study.lesson0Label;
+    if (x.fcMaxHour != null) v.fcMaxHour = hh(x.fcMaxHour);
     return v;
   }
   function fill(t, v) { return String(t).replace(/\{(\w+)\}/g, function (m, k) { return v[k] == null ? m : String(v[k]); }); }
   // the exemplars with their numbers filled in
   function exemplars(J, v) {
     var E = J.exemplars, fp = function (p) { return typeof p === "string" ? fill(p, v) : { text: fill(p.text, v), note: fill(p.note, v) }; };
-    return { title: E.title, task: E.task, note: E.note, diff: E.diff,
+    return { title: E.title, task: E.task, note: E.note, diff: E.diff, lines: !!E.lines,
       answers: E.answers.map(function (a) { return { key: a.key, label: a.label, level: a.level, parts: a.parts.map(fp) }; }) };
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function bold(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
-  // the study for readers without JavaScript: the rules, the five versions with their symptoms, check and fix, the
-  // benchmark table, validation and the rerun (written into the page by the test's --write mode)
+  // glossary marks (double square brackets: id, a bar, the words) and **bold** for the no-JS blocks, as core.js
+  // LX.rich does it in the page (the attribute is split so the build's glossary scan does not read "$1" as an id)
+  var TERM_SPAN = '<span class="lx-term" data-term=' + '"$1">$2</span>';
+  function rich(t) { return esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, TERM_SPAN).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
+  // Prairie Town's plants as a table's rows: [name, size MW, running cost $/MWh, how it runs]
+  function fleetRows(J) {
+    var f = J.fleet;
+    return ["nuclear", "wind", "solar", "cc", "peaker"].map(function (k) {
+      return [f[k].label, String(f[k].mw), String(f[k].cost), f[k].behaviour + (k === "cc" ? ", at most " + f.cc.ramp + " MW an hour" : "")];
+    });
+  }
+  var FLEET_HEAD = ["Plant", "Size (MW)", "Running cost ($/MWh)", "How it runs"];
+  // the study for readers without JavaScript: the rules, the plants, the symbols, the five versions with their symptoms,
+  // check and fix, the benchmark by hand and its table, the validation, the input check and the rerun (written into the
+  // page by the test's --write mode)
   function staticStudy(J, v) {
     var C = {}; J.checks.forEach(function (c) { C[c.id] = c.label; });
     var h = ['<p class="lx-eyebrow">The study, its five buggy versions and the checks that catch them</p>',
-      "<p><b>" + esc(J.study.question) + "</b> One day of dispatch as a linear program; " + esc(J.study.battery.label) + " battery, 85% round trip; data: " + esc(J.study.dateLabel) + ".</p>",
-      '<ul class="r5-static-rules">' + J.rules.map(function (r) { return "<li><b>" + esc(r.name) + ":</b> " + esc(r.words) + " <span class=\"lx-hint\">(" + esc(r.rows) + ")</span></li>"; }).join("") + "</ul>",
+      "<p><b>" + esc(J.study.question) + "</b> One day of dispatch as a linear program; " + esc(J.study.battery.label) + " battery, 85% " + rich("[[round-trip-efficiency|round trip]]") + "; data: " + esc(J.study.dateLabel) + ".</p>",
+      '<ul class="r5-static-rules">' + J.rules.map(function (r) { return "<li><b>" + esc(r.name) + ":</b> " + rich(r.words) + " <span class=\"lx-hint\">(" + esc(r.rows) + ")</span></li>"; }).join("") + "</ul>",
+      '<div class="lx-scroll-x"><table class="lx-facts r5-fleet"><caption>Prairie Town\'s plants (lesson 0)</caption><thead><tr>' + FLEET_HEAD.map(function (x) { return '<th scope="col">' + esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>"
+        + fleetRows(J).map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + '</th><td class="n">' + r[1] + '</td><td class="n">' + r[2] + "</td><td>" + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table></div>",
+      '<p class="r5-sym-k">In the code:</p><ul class="r5-sym">' + J.study.symbols.map(function (s) { return "<li><code>" + esc(s[0]) + "</code>: " + rich(s[1]) + "</li>"; }).join("") + "</ul>",
       '<ol class="r5-static">'];
     J.bugs.forEach(function (b) {
       h.push("<li><p><b>Version " + b.n + ": " + esc(b.kind) + ".</b> " + b.symptoms.map(function (s) { return esc(fill(s[0], v)) + ": <b>" + esc(fill(s[1], v)) + "</b>"; }).join(". ") + ".</p>"
-        + "<p>Caught by: <b>" + esc(C[b.check]) + "</b>. " + esc(fill(b.right, v).replace(/^Right\.\s*/, "")) + "</p>"
+        + "<p>Caught by: <b>" + esc(C[b.check]) + "</b>. " + rich(fill(b.right, v).replace(/^Right\.\s*/, "")) + "</p>"
         + '<p class="r5-static-code"><code>' + esc(b.line.before) + "</code> → <code>" + esc(b.line.after).replace(/\n/g, "<br>") + "</code></p>"
-        + "<p>" + bold(fill(b.fixed, v)) + "</p></li>");
+        + "<p>" + rich(fill(b.fixed, v)) + "</p>" + (b.tie ? "<p>" + rich(fill(b.tie, v)) + "</p>" : "") + "</li>");
     });
     h.push("</ol>");
-    h.push("<p><b>Benchmark</b> (" + esc(J.bench.label) + "): by hand, 200 MWh × ($100 − $40 ÷ 0.85) = " + v.benchHand + ".</p>");
+    h.push("<p><b>Benchmark</b> (" + esc(J.bench.label) + "). " + rich(fill(J.bench.intro, v)) + "</p>");
+    h.push('<ol class="r5-steps">' + J.bench.steps.map(function (s) { return "<li>" + rich(fill(s, v)) + "</li>"; }).join("") + "</ol>");
     h.push('<div class="lx-scroll-x"><table class="lx-facts r5-bench"><thead><tr><th scope="col">Version</th><th scope="col">Saving on the benchmark</th><th scope="col">Matches the hand answer?</th></tr></thead><tbody>'
       + J.benchVersions.map(function (b) { var k = "bench" + b.id.charAt(0).toUpperCase() + b.id.slice(1); return "<tr><td>" + esc(b.label) + '</td><td class="n">' + v[k] + "</td><td>" + (v[k] === v.benchHand ? "yes" : "no") + "</td></tr>"; }).join("")
       + "</tbody></table></div>");
-    h.push("<p><b>Validation:</b> with the U.S. fleet's measured 82% round trip (EIA, 2019 data) instead of 85%, the perfect-foresight saving is " + v.eta82 + " instead of " + v.ok + ".</p>");
-    h.push("<p><b>Rerun from a clean clone:</b> it failed on a data file read from one laptop's desktop; a download script with a checksum, relative paths, a pinned environment and a tag fix it.</p>");
+    h.push("<p><b>Validation:</b> " + rich(J.validationText) + " " + rich(fill(J.validationSaw, v)) + "</p>");
+    h.push("<p><b>Input check:</b> " + rich(J.inputCheck.text) + " " + rich(fill(J.inputCheck.saw, v)) + "</p>");
+    h.push("<p><b>Rerun from a clean clone (simulated here):</b> it failed on a data file read from one laptop's desktop; a download script with a checksum, relative paths, a pinned environment and a tag fix it. The notebook's practice does the rerun for real.</p>");
     return h.join("\n");
   }
 
   var model = { G: G, townDay: townDay, benchDay: benchDay, days: days, buildModel: buildModel, rowCount: rowCount, summarize: summarize,
-    toRef: toRef, fromRef: fromRef, RUNS: RUNS, ORDER: ORDER, runModel: runModel, numbers: numbers, money: money, vals: vals, fill: fill,
+    toRef: toRef, fromRef: fromRef, RUNS: RUNS, ORDER: ORDER, needs: needs, tieCap: tieCap, runModel: runModel, costOf: costOf, netLoad: netLoad,
+    forecastCheck: forecastCheck, numbers: numbers, money: money, vals: vals, fill: fill, rich: rich, fleetRows: fleetRows,
     exemplars: exemplars, staticStudy: staticStudy };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -259,7 +331,6 @@
   var LX = window.LX, H = LX.H;
   var HOURS_X = { min: 0, max: 24, ticks: [[0, "00:00", "start"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00", "end"]],
     ticksN: [[0, "00:00", "start"], [12, "12:00"], [24, "24:00", "end"]] };
-  function hh(t) { return (t < 10 ? "0" : "") + t + ":00"; }
 
   function view(live, data, root) {
     var J = data.r05_build_validate, town = data.town, year = data.town_year;
@@ -268,24 +339,24 @@
     // the precomputed results (data file `ref`, re-solved by the Node test): texts outside the step cards use them;
     // the cards show the browser's own solves
     var refSol = {}; Object.keys(RUNS).forEach(function (k) { refSol[k] = fromRef(D[RUNS[k].day], J.ref[k]); });
-    var v0 = vals(J, numbers(J, refSol)), C = {}; J.checks.forEach(function (c) { C[c.id] = c; });
+    var v0 = vals(J, numbers(J, refSol, D)), C = {}; J.checks.forEach(function (c) { C[c.id] = c; });
     var sol = {}, res = {}, x = null, v = null, fellBack = false, allP = null;
     function solveOne(key) {
       if (sol[key]) return Promise.resolve(sol[key]);
       var R = RUNS[key];
-      var pre = R.follow ? solveOne(R.follow) : Promise.resolve();
+      var pre = needs(key) ? solveOne(needs(key)) : Promise.resolve();
       return pre.then(function () {
         return LX.solver.solve(runModel(key, D, J, sol), { timeLimit: 5, key: "r5-" + key }).then(function (r) {
-          var S = summarize(D[R.day], J, r, { battery: R.battery, bug: R.bug });
+          var S = summarize(D[R.day], J, r, { battery: R.battery, bug: R.bug, tie: R.tie });
           if (!S.ok) { S = refSol[key]; fellBack = true; }
           sol[key] = S; res[key] = r; return S;
         });
       });
     }
-    // every run (about twenty small linear programs, a few milliseconds each), once
+    // every run (about two dozen small linear programs, a few milliseconds each), once
     function solveAll() {
       if (!allP) allP = ORDER.reduce(function (p, k) { return p.then(function () { return solveOne(k); }); }, Promise.resolve())
-        .then(function () { x = numbers(J, sol); v = vals(J, x); return v; });
+        .then(function () { x = numbers(J, sol, D); v = vals(J, x); return v; });
       return allP;
     }
     var picks = {};   // the reader's first pick of a check for each version, and validation and rerun answers
@@ -333,6 +404,16 @@
         var prev = J.study.startCC; spec.marks = [];
         A.rows.forEach(function (w, t) { if (Math.abs(w.cc - prev) > J.fleet.cc.ramp + 1e-6) spec.marks.push({ x: t + 0.5, y: w.cc, kind: "dot", label: (w.cc > prev ? "+" : "−") + num(Math.abs(w.cc - prev)), color: "var(--lx-bad)", pos: w.cc > prev ? "above" : "below" }); prev = w.cc; });
         spec.text = { head: ["Hour", "Gas plant, this run (MW)"].concat(Bfix ? ["With the ramp rows (MW)"] : []), rows: A.rows.map(function (w, t) { return [hh(t), num(w.cc)].concat(Bfix ? [num(Bfix.rows[t].cc)] : []); }) };
+      } else if (kind === "fc") {
+        // the validation: the plan's forecast of 20 August's net load (19 August's measured hours) against 20 August
+        var F = forecastCheck(D, J);
+        spec.y = { min: 150, max: 350, step: 50, fmt: function (q) { return String(q); }, unit: "MW" };
+        spec.lines.push({ values: F.measured, x0: 0, step: 1, color: "var(--lx-ink)", width: 2.6 });
+        spec.lines.push({ values: F.forecast, x0: 0, step: 1, color: "var(--lx-accent)", width: 2.4, dash: "6 4" });
+        spec.legend = [{ label: "Measured, 20 August", color: "var(--lx-ink)" }, { label: "Forecast: 19 August's net load", color: "var(--lx-accent)", dash: true }];
+        spec.marks = [{ x: F.maxHour + 0.5, y: F.measured[F.maxHour], kind: "dot", label: "miss " + F.max + " MW", color: "var(--lx-bad)", pos: "below" }];
+        spec.text = { head: ["Hour", "Forecast (MW)", "Measured (MW)", "Miss (MW)"], rows: F.forecast.map(function (q, t) { return [hh(t), num(q), num(F.measured[t]), num(F.err[t])]; }),
+          note: "Net load = demand minus wind and solar. Tolerance, set before comparing: " + F.tol + " MW in every hour." };
       }
       card.plot.render(spec, true);
     }
@@ -399,7 +480,9 @@
               if (b.id === "missing") { card.chip("Day without a battery", v.l0missingBase + " (should be " + v.l0base + ")", "bad"); card.chip("Battery saves", v.l0missing + " (should be " + v.l0ok + ")", "bad"); }
               else if (b.id === "leak") { card.chip("Perfect foresight", v.ok, "warn"); card.chip("Planned the day before", v.honest, "good"); }
               else { card.chip("Fixed: saving", v.ok, "good"); card.chip("Most energy stored", v.okMaxE + " MWh", "good"); }
-              api.saw(fill(b.fixed, v)); api.done();
+              api.saw(fill(b.fixed, v));
+              if (b.tie) H("p", { class: "lx-hint", html: LX.rich(fill(b.tie, v)) }, after);
+              api.done();
             });
           }
         }
@@ -413,14 +496,27 @@
           ["Rule", "In words", "In the code"].forEach(function (h0) { H("th", { scope: "col", text: h0 }, hr); });
           var bd = H("tbody", null, tb);
           J.rules.forEach(function (r) { var tr = H("tr", null, bd); H("th", { scope: "row", text: r.name }, tr); H("td", { html: LX.rich(r.words) }, tr); H("td", { text: r.rows }, tr); });
+          // the plants (lesson 0's fleet): the sizes and running costs the benchmark below is worked from
+          var ft = H("table", { class: "lx-facts r5-fleet" }, H("div", { class: "lx-scroll-x" }, act));
+          H("caption", { text: "Prairie Town's plants (lesson 0)" }, ft);
+          var fh = H("tr", null, H("thead", null, ft)); FLEET_HEAD.forEach(function (h0) { H("th", { scope: "col", text: h0 }, fh); });
+          var fb0 = H("tbody", null, ft);
+          fleetRows(J).forEach(function (r) { var tr = H("tr", null, fb0); H("th", { scope: "row", text: r[0] }, tr); H("td", { class: "n", text: r[1] }, tr); H("td", { class: "n", text: r[2] }, tr); H("td", { text: r[3] }, tr); });
+          // the code's symbols, before the first code comparison
+          H("p", { class: "r5-sym-k", text: "In the code:" }, act);
+          var sy = H("ul", { class: "r5-sym" }, act);
+          J.study.symbols.forEach(function (x) { H("li", { html: "<code>" + LX.esc(x[0]) + "</code>: " + LX.rich(x[1]) }, sy); });
           var q = H("ul", { class: "r5-three" }, act);
           J.three.forEach(function (x) { H("li", { html: "<b>" + LX.rich(x[0]) + "</b> " + LX.rich(x[1]) }, q); });
           H("p", { class: "lx-hint", text: J.study.dataNote }, act);
         } }
     ].concat(J.bugs.map(bugStep)).concat([
-      { text: "A [[benchmark|benchmark]] is a case with a known answer. On a made-up day, the battery should save 200 MWh × ($100 − $40 ÷ 0.85) = " + v0.benchHand + " by hand. Run every version on it.",
+      { text: "A [[benchmark|benchmark]] is a case with a known answer. Work this made-up day out by hand in three steps, then run every version on it.",
         build: function (act, api) {
-          H("p", { class: "lx-hint", text: "The day: " + J.bench.label + ". The battery fills to 200 MWh before noon, empties into the five dear hours, and refills afterwards." }, act);
+          H("p", { class: "lx-hint", text: "The day: " + J.bench.label + "." }, act);
+          H("p", { html: LX.rich(fill(J.bench.intro, v0)) }, act);
+          var hs = H("ol", { class: "r5-steps" }, act);
+          J.bench.steps.forEach(function (s0) { H("li", { html: LX.rich(fill(s0, v0)) }, hs); });
           var row = H("div", { class: "r5-run" }, act), go = H("button", { type: "button", class: "lx-btn small", html: "Run all five versions on the benchmark" + LX.icon("arrow") }, row), st = LX.SolverStatus(row);
           var out = H("div", { class: "lx-scroll-x" }, act);
           go.addEventListener("click", function () {
@@ -451,20 +547,32 @@
             } }, g);
           });
           H("p", { html: LX.rich(J.validationText) }, more);
-          var row = H("div", { class: "r5-run" }, more), go = H("button", { type: "button", class: "lx-btn small", html: "Run with the measured 82%" + LX.icon("arrow") }, row), st = LX.SolverStatus(row);
-          var chipsBox = H("div", { class: "lx-readouts", "aria-live": "polite" }, more);
+          var row = H("div", { class: "r5-run" }, more), go = H("button", { type: "button", class: "lx-btn small", html: "Compare the forecast with 20 August" + LX.icon("arrow") }, row);
+          var card = chartCard(more); card.title.textContent = "Net load, 20 August 2025: forecast and measured"; card.el.hidden = true;
+          go.addEventListener("click", function () {
+            go.disabled = true; card.el.hidden = false;
+            var w = v || v0;
+            draw(card, "fc", null, null, "Net load on 20 August: the day-before forecast and the measured day");
+            card.clear(); card.chip("Average miss", w.fcMAE + " MW"); card.chip("Largest miss", w.fcMax + " MW at " + w.fcMaxHour, "bad"); card.chip("Hours beyond 50 MW", w.fcOver + " of 24", "bad");
+            api.saw(fill(J.validationSaw, w)); api.done();
+          });
+        } },
+      { text: J.inputCheck.text + " Run the study with 82%.",
+        build: function (act, api) {
+          var row = H("div", { class: "r5-run" }, act), go = H("button", { type: "button", class: "lx-btn small", html: "Run with the measured 82%" + LX.icon("arrow") }, row), st = LX.SolverStatus(row);
+          var chipsBox = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           go.addEventListener("click", function () {
             go.disabled = true; st.set("solving"); api.busy(true);
             solveAll().then(function () {
               api.busy(false); st.set(res.eta82);
               [["85% round trip (the study)", v.ok], ["82% (U.S. fleet, measured, 2019)", v.eta82]].forEach(function (c2) { var r = H("div", { class: "lx-readout" }, chipsBox); H("span", { class: "k", text: c2[0] }, r); H("b", { text: c2[1] }, r); });
-              api.saw(fill(J.validationSaw, v)); api.done();
+              api.saw(fill(J.inputCheck.saw, v)); api.done();
             });
           });
         } },
-      { text: "Can someone else rerun it? A colleague makes a fresh [[clone|clone]] of the study's [[repository|repository]] and runs it. What makes the rerun fail?",
+      { text: "Can someone else rerun it? Below, a colleague's terminal after a fresh [[clone|clone]] of the study's [[repository|repository]] (simulated). What makes the rerun fail?",
         build: function (act, api) {
-          var R = J.repro, pre = H("pre", { class: "r5-log", "aria-label": "The colleague's terminal" }, act);
+          var R = J.repro, pre = H("pre", { class: "r5-log", "aria-label": "A simulated terminal: the colleague's rerun" }, act);
           pre.appendChild(document.createTextNode(R.log.join("\n")));
           var g = H("div", { class: "r5-checks", role: "group", "aria-label": "What makes the rerun fail?" }, act), fb = H("div", { "aria-live": "polite" }, act), more = H("div", { hidden: true }, act), bs = {};
           R.options.forEach(function (o2) {
@@ -477,10 +585,12 @@
           });
           H("p", { class: "r5-ask", text: "The fixes, before anyone else tries:" }, more);
           var ul = H("ul", { class: "r5-fixes" }, more); R.fixes.forEach(function (f2) { H("li", { html: LX.rich(f2).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, ul); });
-          var row = H("div", { class: "r5-run" }, more), go = H("button", { type: "button", class: "lx-btn small", html: "Rerun from a fresh clone" + LX.icon("arrow") }, row), st = LX.SolverStatus(row);
+          var row = H("div", { class: "r5-run" }, more), go = H("button", { type: "button", class: "lx-btn small", html: "Show the rerun with the fixes (simulated)" + LX.icon("arrow") }, row);
           go.addEventListener("click", function () {
-            go.disabled = true; st.set("solving"); api.busy(true);
-            solveAll().then(function () { api.busy(false); st.set(res.ok); api.saw(fill(J.reproSaw, v)); api.done(); });
+            go.disabled = true;
+            var p2 = H("pre", { class: "r5-log", "aria-label": "A simulated terminal: the rerun with the fixes" }, more);
+            p2.appendChild(document.createTextNode(R.logAfter.join("\n")));
+            api.saw(fill(J.reproSaw, v || v0)); api.done();
           });
         } },
       { free: true, text: "Your verification log, from your answers on this page. Copy it as the start of the log for your own study, and add what each check found there.",
@@ -510,9 +620,11 @@
       L.push("- " + C[b.check].label + ": caught version " + b.n + " (" + b.kind + ")" + (p ? (p.right ? "; my first pick was right" : "; my first pick was " + C[p.first].label) : "; not tried yet") + ".");
     });
     L.push("Benchmark: " + J.bench.label + "; hand answer " + v.benchHand + ", fixed model " + v.benchOk + ". Version 4 (missing rule) also passes it.");
-    L.push("Validation: round trip 85% (study) against 82% measured for the U.S. fleet in 2019 (EIA): saving " + v.ok + " against " + v.eta82 + ".");
-    L.push("Result: " + v.honest + " with a plan made the day before; " + v.ok + " with perfect foresight (an upper bound).");
-    L.push("Rerun: a fresh clone failed on a data file outside the repository; fixed with a download script and checksum, relative paths, a pinned environment and a tag.");
+    L.push("Validation: the day-before forecast of net load against 20 August as measured (SPP shapes, EIA-930); tolerance set first, " + v.fcTol + " MW in every hour; missed by " + v.fcMAE + " MW on average and " + v.fcMax + " MW at " + v.fcMaxHour + ", so the claim is narrowed.");
+    L.push("Input check and sensitivity run: round trip 85% (study) against 82% measured for the U.S. fleet in 2019 (EIA): saving " + v.ok + " against " + v.eta82 + ".");
+    L.push("Result: " + v.honest + " with a plan made the day before (persistence forecast; tie rule: keep the most energy in store); " + v.ok + " with perfect foresight (an upper bound).");
+    L.push("Rerun (simulated on this page): a fresh clone failed on a data file outside the repository; fixes: a download script and checksum, relative paths, a pinned environment and a tag.");
+    L.push("My own clean-clone rerun: not done yet. Record the tag and the result of shasum -a 256 -c first-run.sha256 here.");
     L.push("");
     L.push("For your own study: name the commit or tag, the environment file, and where the data come from.");
     return L.join("\n");
@@ -542,11 +654,11 @@
         cols: 3, at: { paper: [1, 0], code: [1, 1], ver: [1, 2], q1: [1, 3], fix: [2, 3], bench: [1, 4], q2: [1, 5], val: [1, 6], q3: [1, 7], rev: [2, 7], rep: [1, 8], end: [1, 9] },
         colsN: 2, atN: { paper: [0, 0], code: [0, 1], ver: [0, 2], q1: [0, 3], fix: [1, 3], bench: [0, 4], q2: [0, 5], val: [0, 6], q3: [0, 7], rev: [1, 7], rep: [0, 8], end: [0, 9] },
         edges: [["paper", "code"], ["code", "ver"], ["ver", "q1"], ["q1", "fix", "no"], ["q1", "bench", "yes"], ["bench", "q2"], ["q2", "fix", "no"], ["q2", "val", "yes"],
-          ["val", "q3"], ["q3", "rev", "no"], ["q3", "rep", "yes"], ["rep", "end"]],
+          ["val", "q3"], ["q3", "rev", "no"], ["q3", "rep", "yes"], ["rev", "rep"], ["rep", "end"]],
         traces: [
           { label: "Version 1 (unit)", path: ["paper", "code", "ver", "q1", "fix"], text: fill("The size check fails: **{unitMaxE} MWh** stored in a 200 MWh battery. Fix the line, run again.", v) },
           { label: "Version 4 (missing rule)", path: ["paper", "code", "ver", "q1", "fix"], text: fill("Only paper against code catches it: {rampRows} ramp rows on paper, {rampRowsMissing} in the code. It would pass the benchmark (**{benchMissing}**).", v) },
-          { label: "The fixed study", path: ["paper", "code", "ver", "q1", "bench", "q2", "val", "q3", "rep", "end"], text: fill("Checks pass, the benchmark matches (**{benchOk}**), the measured 82% round trip moves the saving by {eta82Change}%, and a clean clone reruns it. Report **{honest}** planned the day before, **{ok}** with perfect foresight.", v) }
+          { label: "The fixed study", path: ["paper", "code", "ver", "q1", "bench", "q2", "val", "q3", "rev", "rep", "end"], text: fill("Checks pass and the benchmark matches (**{benchOk}**). The forecast misses its {fcTol} MW tolerance at {fcMaxHour}, so the claim is narrowed: **{honest}** planned the day before, **{ok}** only as an upper bound. Then a clean clone reruns it.", v) }
         ], sel: 2 });
     }
     var x2 = document.getElementById("r5-exemplars");
