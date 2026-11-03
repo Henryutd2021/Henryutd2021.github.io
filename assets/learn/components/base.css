@@ -176,7 +176,7 @@ details.lx-textalt li { margin: 3px 0; }
 .lx-corrections, .lx-license { font-size: 13px; color: var(--lx-ink-3); margin-top: .5rem !important; }
 .lx-foot { margin-top: 2.4rem; padding-top: 1rem; border-top: 1px solid var(--lx-line); }
 
-/* the site's back-to-top button steps aside while it would cover lesson controls (core.js) */
+/* the site's back-to-top button steps aside while it would cover lesson controls or any text (core.js) */
 body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !important; }
 @media (max-width: 560px) {
   body.page-learn main.content { font-size: 16.5px; }

@@ -14,7 +14,7 @@
                                    page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
              LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
                                    page's links appear by themselves when a lesson goes live
-   Also: the back-to-top guard (hides the site's button while it would cover lesson controls) and course ticks.
+   Also: the back-to-top guard (hides the site's button while it would cover lesson controls or any text) and course ticks.
    Node: module.exports = { lessonRef, lessonRefHTML } (pure; the rest needs a browser). */
 (function () {
   "use strict";
@@ -305,7 +305,35 @@
         var r = z.getBoundingClientRect();
         return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
       });
+      // any other text under the button (a landing note, the sources, the footer at the end of the page, where no
+      // scrolling can move it out from under the button): elements under nine points of the button, their own lines
+      if (!hit && !btn.hidden) {
+        var bb = btn.getBoundingClientRect(), box = { left: bb.left - 4, right: bb.right + 4, top: bb.top - 4, bottom: bb.bottom + 4 };
+        if (bb.width) hit = textUnder(btn, box);
+      }
       document.body.classList.toggle("lx-totop-off", hit);
+    }
+    function textUnder(btn, box) {
+      var seen = [], rg = document.createRange();
+      for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) {
+        var x = box.left + (box.right - box.left) * (0.15 + 0.35 * i), y = box.top + (box.bottom - box.top) * (0.15 + 0.35 * j);
+        var stack = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
+        for (var k = 0; k < stack.length; k++) {
+          var e = stack[k];
+          if (e === btn || btn.contains(e) || e === document.body || e === document.documentElement || seen.indexOf(e) >= 0) continue;
+          seen.push(e);
+          for (var n = e.firstChild; n; n = n.nextSibling) {
+            if (n.nodeType !== 3 || !/\S/.test(n.data)) continue;
+            rg.selectNodeContents(n);
+            var rs = rg.getClientRects();
+            for (var q = 0; q < rs.length; q++) {
+              var r = rs[q];
+              if (r.width && r.left < box.right && r.right > box.left && r.top < box.bottom && r.bottom > box.top) return true;
+            }
+          }
+        }
+      }
+      return false;
     }
     function request() { if (!pending) { pending = true; requestAnimationFrame(check); } }
     window.addEventListener("scroll", request, { passive: true });
