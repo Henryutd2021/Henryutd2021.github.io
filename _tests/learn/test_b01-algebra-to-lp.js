@@ -35,15 +35,15 @@ function fallbackSVG() {
   const f = v => v.toFixed(1), best = B.optimum(d1, d1.view), P = B.region(d1.rows, box);
   let o = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-labelledby="b1-static-title">\n<title id="b1-static-title">The dispatch model on a plane: x (combined-cycle, MW) across, y (peaker, MW) up. The rules leave a triangle of allowed plans with corners ${P.map(p => "(" + Math.round(p[0]) + ", " + Math.round(p[1]) + ")").join(", ")}. The cheapest is (${best.x.join(", ")}), at $${best.value.toLocaleString("en-US")}.</title>\n<g>`;
   d1.ticks.forEach((v, i) => {
-    if (v <= box[1]) o += `<line x1="${f(sx(v))}" x2="${f(sx(v))}" y1="${f(sy(box[2]))}" y2="${f(sy(box[3]))}" class="w1h-grid"/>` + (i % 2 ? "" : `<text x="${f(sx(v))}" y="${Hh - m.b + 22}" text-anchor="middle" class="w1h-tick">${v}</text>`);
-    if (v <= box[3]) o += `<line x1="${f(sx(box[0]))}" x2="${f(sx(box[1]))}" y1="${f(sy(v))}" y2="${f(sy(v))}" class="w1h-grid"/><text x="${m.l - 8}" y="${f(sy(v) + 4)}" text-anchor="end" class="w1h-tick">${v}</text>`;
+    if (v <= box[1]) o += `<line x1="${f(sx(v))}" x2="${f(sx(v))}" y1="${f(sy(box[2]))}" y2="${f(sy(box[3]))}" class="lx-lp-grid"/>` + (i % 2 ? "" : `<text x="${f(sx(v))}" y="${Hh - m.b + 22}" text-anchor="middle" class="lx-lp-tick">${v}</text>`);
+    if (v <= box[3]) o += `<line x1="${f(sx(box[0]))}" x2="${f(sx(box[1]))}" y1="${f(sy(v))}" y2="${f(sy(v))}" class="lx-lp-grid"/><text x="${m.l - 8}" y="${f(sy(v) + 4)}" text-anchor="end" class="lx-lp-tick">${v}</text>`;
   });
-  o += `<text x="${f((sx(box[0]) + sx(box[1])) / 2)}" y="${Hh - 10}" text-anchor="middle" class="w1h-axlab">x: combined-cycle output, MW</text>`;
-  o += `<text x="16" y="${f((sy(box[2]) + sy(box[3])) / 2)}" text-anchor="middle" class="w1h-axlab" transform="rotate(-90 16 ${f((sy(box[2]) + sy(box[3])) / 2)})">y: peaker output, MW</text></g>\n`;
-  o += `<path d="M${P.map(p => f(sx(p[0])) + " " + f(sy(p[1]))).join(" L")} Z" class="w1h-region"/>\n`;
+  o += `<text x="${f((sx(box[0]) + sx(box[1])) / 2)}" y="${Hh - 10}" text-anchor="middle" class="lx-lp-axlab">x: combined-cycle output, MW</text>`;
+  o += `<text x="16" y="${f((sy(box[2]) + sy(box[3])) / 2)}" text-anchor="middle" class="lx-lp-axlab" transform="rotate(-90 16 ${f((sy(box[2]) + sy(box[3])) / 2)})">y: peaker output, MW</text></g>\n`;
+  o += `<path d="M${P.map(p => f(sx(p[0])) + " " + f(sy(p[1]))).join(" L")} Z" class="lx-lp-region"/>\n`;
   const iso = [[box[0], best.value / d1.c[1]], [best.value / d1.c[0], box[2]]].map(p => p[1] > box[3] ? [(best.value - d1.c[1] * box[3]) / d1.c[0], box[3]] : p);
-  o += `<line x1="${f(sx(iso[0][0]))}" y1="${f(sy(iso[0][1]))}" x2="${f(sx(iso[1][0]))}" y2="${f(sy(iso[1][1]))}" class="w1h-iso"/>\n`;
-  o += `<circle cx="${f(sx(best.x[0]))}" cy="${f(sy(best.x[1]))}" r="6" class="w1h-fbpt"/><text x="${f(sx(best.x[0]) - 10)}" y="${f(sy(best.x[1]) - 10)}" text-anchor="end" class="w1h-plab">cheapest: (${best.x.join(", ")}), $${best.value.toLocaleString("en-US")}</text>\n</svg>`;
+  o += `<line x1="${f(sx(iso[0][0]))}" y1="${f(sy(iso[0][1]))}" x2="${f(sx(iso[1][0]))}" y2="${f(sy(iso[1][1]))}" class="lx-lp-iso"/>\n`;
+  o += `<circle cx="${f(sx(best.x[0]))}" cy="${f(sy(best.x[1]))}" r="6" class="lx-lp-fbpt"/><text x="${f(sx(best.x[0]) - 10)}" y="${f(sy(best.x[1]) - 10)}" text-anchor="end" class="lx-lp-plab">cheapest: (${best.x.join(", ")}), $${best.value.toLocaleString("en-US")}</text>\n</svg>`;
   return o;
 }
 if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.exit(0); }

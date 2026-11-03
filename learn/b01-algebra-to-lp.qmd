@@ -37,23 +37,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.w1h-plane svg { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto; }
-.w1h-plane svg.pickable { cursor: crosshair; }
-.w1h-grid { stroke: var(--lx-line); stroke-width: 1; }
-.w1h-axis { stroke: var(--lx-ink-3); stroke-width: 1.4; }
-.w1h-tick { font-family: var(--lx-f-mono); font-size: 14px; fill: var(--lx-ink-3); }
-.w1h-axlab { font-family: var(--lx-f-display); font-size: 15px; fill: var(--lx-ink-2); }
-.w1h-region { fill: color-mix(in srgb, var(--lx-accent) 20%, transparent); stroke: var(--lx-accent); stroke-width: 1.5; }
-.w1h-region-line { fill: none; stroke: var(--lx-accent); stroke-width: 5; stroke-linecap: round; opacity: .75; }
-.w1h-rule line { stroke: var(--lx-ink-3); stroke-width: 1.6; }
-.w1h-rule.on line { stroke: var(--lx-ink); stroke-width: 2; }
-.w1h-rule.hot line { stroke: var(--lx-accent); stroke-width: 3; }
-.w1h-rlab, .w1h-plab, .w1h-isolab { font-family: var(--lx-f-mono); font-size: 14px; fill: var(--lx-ink); }
-.w1h-plab { font-weight: 600; } .w1h-isolab { fill: var(--lx-ink-2); font-size: 13px; }
-.w1h-rlab.bg, .w1h-plab.bg, .w1h-isolab.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
-.w1h-iso { stroke: var(--lx-ink-2); stroke-width: 1.6; stroke-dasharray: 6 5; }
-.w1h-pt circle, .w1h-fbpt { fill: var(--lx-surface); stroke: var(--lx-ink); stroke-width: 2.6; }
-.w1h-pt.good circle { stroke: var(--lx-good); } .w1h-pt.bad circle { stroke: var(--lx-bad); }
 .k4-mark { font-size: 13.5px; font-family: var(--lx-f-display); }
 .k4-mark.good { color: var(--lx-good); } .k4-mark.bad { color: var(--lx-warn); }
 .k4-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-family: var(--lx-f-mono); font-size: 18px; }
@@ -154,10 +137,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- fallback-svg:start -->
 <svg viewBox="0 0 440 380" role="img" aria-labelledby="b1-static-title">
 <title id="b1-static-title">The dispatch model on a plane: x (combined-cycle, MW) across, y (peaker, MW) up. The rules leave a triangle of allowed plans with corners (45, 100), (130, 15), (130, 100). The cheapest is (130, 15), at $6,700.</title>
-<g><line x1="58.0" x2="58.0" y1="324.0" y2="12.0" class="w1h-grid"/><text x="58.0" y="346" text-anchor="middle" class="w1h-tick">0</text><line x1="58.0" x2="426.0" y1="324.0" y2="324.0" class="w1h-grid"/><text x="50" y="328.0" text-anchor="end" class="w1h-tick">0</text><line x1="104.0" x2="104.0" y1="324.0" y2="12.0" class="w1h-grid"/><line x1="58.0" x2="426.0" y1="279.4" y2="279.4" class="w1h-grid"/><text x="50" y="283.4" text-anchor="end" class="w1h-tick">20</text><line x1="150.0" x2="150.0" y1="324.0" y2="12.0" class="w1h-grid"/><text x="150.0" y="346" text-anchor="middle" class="w1h-tick">40</text><line x1="58.0" x2="426.0" y1="234.9" y2="234.9" class="w1h-grid"/><text x="50" y="238.9" text-anchor="end" class="w1h-tick">40</text><line x1="196.0" x2="196.0" y1="324.0" y2="12.0" class="w1h-grid"/><line x1="58.0" x2="426.0" y1="190.3" y2="190.3" class="w1h-grid"/><text x="50" y="194.3" text-anchor="end" class="w1h-tick">60</text><line x1="242.0" x2="242.0" y1="324.0" y2="12.0" class="w1h-grid"/><text x="242.0" y="346" text-anchor="middle" class="w1h-tick">80</text><line x1="58.0" x2="426.0" y1="145.7" y2="145.7" class="w1h-grid"/><text x="50" y="149.7" text-anchor="end" class="w1h-tick">80</text><line x1="288.0" x2="288.0" y1="324.0" y2="12.0" class="w1h-grid"/><line x1="58.0" x2="426.0" y1="101.1" y2="101.1" class="w1h-grid"/><text x="50" y="105.1" text-anchor="end" class="w1h-tick">100</text><line x1="334.0" x2="334.0" y1="324.0" y2="12.0" class="w1h-grid"/><text x="334.0" y="346" text-anchor="middle" class="w1h-tick">120</text><line x1="58.0" x2="426.0" y1="56.6" y2="56.6" class="w1h-grid"/><text x="50" y="60.6" text-anchor="end" class="w1h-tick">120</text><line x1="380.0" x2="380.0" y1="324.0" y2="12.0" class="w1h-grid"/><line x1="58.0" x2="426.0" y1="12.0" y2="12.0" class="w1h-grid"/><text x="50" y="16.0" text-anchor="end" class="w1h-tick">140</text><line x1="426.0" x2="426.0" y1="324.0" y2="12.0" class="w1h-grid"/><text x="426.0" y="346" text-anchor="middle" class="w1h-tick">160</text><text x="242.0" y="370" text-anchor="middle" class="w1h-axlab">x: combined-cycle output, MW</text><text x="16" y="168.0" text-anchor="middle" class="w1h-axlab" transform="rotate(-90 16 168.0)">y: peaker output, MW</text></g>
-<path d="M161.5 101.1 L357.0 290.6 L357.0 101.1 Z" class="w1h-region"/>
-<line x1="58.0" y1="174.7" x2="443.3" y2="324.0" class="w1h-iso"/>
-<circle cx="357.0" cy="290.6" r="6" class="w1h-fbpt"/><text x="347.0" y="280.6" text-anchor="end" class="w1h-plab">cheapest: (130, 15), $6,700</text>
+<g><line x1="58.0" x2="58.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><text x="58.0" y="346" text-anchor="middle" class="lx-lp-tick">0</text><line x1="58.0" x2="426.0" y1="324.0" y2="324.0" class="lx-lp-grid"/><text x="50" y="328.0" text-anchor="end" class="lx-lp-tick">0</text><line x1="104.0" x2="104.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><line x1="58.0" x2="426.0" y1="279.4" y2="279.4" class="lx-lp-grid"/><text x="50" y="283.4" text-anchor="end" class="lx-lp-tick">20</text><line x1="150.0" x2="150.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><text x="150.0" y="346" text-anchor="middle" class="lx-lp-tick">40</text><line x1="58.0" x2="426.0" y1="234.9" y2="234.9" class="lx-lp-grid"/><text x="50" y="238.9" text-anchor="end" class="lx-lp-tick">40</text><line x1="196.0" x2="196.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><line x1="58.0" x2="426.0" y1="190.3" y2="190.3" class="lx-lp-grid"/><text x="50" y="194.3" text-anchor="end" class="lx-lp-tick">60</text><line x1="242.0" x2="242.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><text x="242.0" y="346" text-anchor="middle" class="lx-lp-tick">80</text><line x1="58.0" x2="426.0" y1="145.7" y2="145.7" class="lx-lp-grid"/><text x="50" y="149.7" text-anchor="end" class="lx-lp-tick">80</text><line x1="288.0" x2="288.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><line x1="58.0" x2="426.0" y1="101.1" y2="101.1" class="lx-lp-grid"/><text x="50" y="105.1" text-anchor="end" class="lx-lp-tick">100</text><line x1="334.0" x2="334.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><text x="334.0" y="346" text-anchor="middle" class="lx-lp-tick">120</text><line x1="58.0" x2="426.0" y1="56.6" y2="56.6" class="lx-lp-grid"/><text x="50" y="60.6" text-anchor="end" class="lx-lp-tick">120</text><line x1="380.0" x2="380.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><line x1="58.0" x2="426.0" y1="12.0" y2="12.0" class="lx-lp-grid"/><text x="50" y="16.0" text-anchor="end" class="lx-lp-tick">140</text><line x1="426.0" x2="426.0" y1="324.0" y2="12.0" class="lx-lp-grid"/><text x="426.0" y="346" text-anchor="middle" class="lx-lp-tick">160</text><text x="242.0" y="370" text-anchor="middle" class="lx-lp-axlab">x: combined-cycle output, MW</text><text x="16" y="168.0" text-anchor="middle" class="lx-lp-axlab" transform="rotate(-90 16 168.0)">y: peaker output, MW</text></g>
+<path d="M161.5 101.1 L357.0 290.6 L357.0 101.1 Z" class="lx-lp-region"/>
+<line x1="58.0" y1="174.7" x2="443.3" y2="324.0" class="lx-lp-iso"/>
+<circle cx="357.0" cy="290.6" r="6" class="lx-lp-fbpt"/><text x="347.0" y="280.6" text-anchor="end" class="lx-lp-plab">cheapest: (130, 15), $6,700</text>
 </svg>
 <!-- fallback-svg:end -->
 <p class="lx-hint">With JavaScript on, you build this model yourself, then two more, and hand one to a real solver.</p>

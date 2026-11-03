@@ -27,12 +27,12 @@ function fallbackSVG(s) {
   const P = K.region([s.cover].concat(s.limits), box);
   let o = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-labelledby="k4-static-title">\n<title id="k4-static-title">The plans x (combined-cycle, MW) and y (peaker, MW) that pass x + y ≥ ${s.need}, x ≤ ${s.reach}, y ≤ ${s.pkMax}, x ≥ 0 and y ≥ 0 form a triangle with corners ${s.triangle.map(v => "(" + v[0] + ", " + v[1] + ")").join(", ")}.</title>\n<g>`;
   [0, 40, 80, 120, 160].forEach(v => {
-    o += `<line x1="${f(sx(v))}" x2="${f(sx(v))}" y1="${f(sy(box[2]))}" y2="${f(sy(box[3]))}" class="w1h-grid"/><text x="${f(sx(v))}" y="${Hh - m.b + 22}" text-anchor="middle" class="w1h-tick">${v}</text>`;
-    o += `<line x1="${f(sx(box[0]))}" x2="${f(sx(box[1]))}" y1="${f(sy(v))}" y2="${f(sy(v))}" class="w1h-grid"/><text x="${m.l - 8}" y="${f(sy(v) + 4)}" text-anchor="end" class="w1h-tick">${v}</text>`;
+    o += `<line x1="${f(sx(v))}" x2="${f(sx(v))}" y1="${f(sy(box[2]))}" y2="${f(sy(box[3]))}" class="lx-lp-grid"/><text x="${f(sx(v))}" y="${Hh - m.b + 22}" text-anchor="middle" class="lx-lp-tick">${v}</text>`;
+    o += `<line x1="${f(sx(box[0]))}" x2="${f(sx(box[1]))}" y1="${f(sy(v))}" y2="${f(sy(v))}" class="lx-lp-grid"/><text x="${m.l - 8}" y="${f(sy(v) + 4)}" text-anchor="end" class="lx-lp-tick">${v}</text>`;
   });
-  o += `<text x="${f((sx(box[0]) + sx(box[1])) / 2)}" y="${Hh - 10}" text-anchor="middle" class="w1h-axlab">x: combined-cycle plant, MW</text>`;
-  o += `<text x="16" y="${f((sy(box[2]) + sy(box[3])) / 2)}" text-anchor="middle" class="w1h-axlab" transform="rotate(-90 16 ${f((sy(box[2]) + sy(box[3])) / 2)})">y: peaker, MW</text></g>\n`;
-  o += `<path d="M${P.map(p => f(sx(p[0])) + " " + f(sy(p[1]))).join(" L")} Z" class="w1h-region"/>\n<g class="w1h-rule on">`;
+  o += `<text x="${f((sx(box[0]) + sx(box[1])) / 2)}" y="${Hh - 10}" text-anchor="middle" class="lx-lp-axlab">x: combined-cycle plant, MW</text>`;
+  o += `<text x="16" y="${f((sy(box[2]) + sy(box[3])) / 2)}" text-anchor="middle" class="lx-lp-axlab" transform="rotate(-90 16 ${f((sy(box[2]) + sy(box[3])) / 2)})">y: peaker, MW</text></g>\n`;
+  o += `<path d="M${P.map(p => f(sx(p[0])) + " " + f(sy(p[1]))).join(" L")} Z" class="lx-lp-region"/>\n<g class="lx-lp-rule on">`;
   rules.forEach(r => {
     let a, b;
     if (r.a[1] === 0) { a = [r.b / r.a[0], box[2]]; b = [r.b / r.a[0], box[3]]; }
@@ -43,7 +43,7 @@ function fallbackSVG(s) {
   o += `</g>\n<g>`;
   s.triangle.forEach(v => {
     const right = sx(v[0]) < W - 120;
-    o += `<circle cx="${f(sx(v[0]))}" cy="${f(sy(v[1]))}" r="5" class="w1h-fbpt"/><text x="${f(sx(v[0]) + (right ? 10 : -10))}" y="${f(sy(v[1]) - 9)}" text-anchor="${right ? "start" : "end"}" class="w1h-plab">(${v[0]}, ${v[1]})</text>`;
+    o += `<circle cx="${f(sx(v[0]))}" cy="${f(sy(v[1]))}" r="5" class="lx-lp-fbpt"/><text x="${f(sx(v[0]) + (right ? 10 : -10))}" y="${f(sy(v[1]) - 9)}" text-anchor="${right ? "start" : "end"}" class="lx-lp-plab">(${v[0]}, ${v[1]})</text>`;
   });
   o += `</g>\n</svg>`;
   return o;

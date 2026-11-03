@@ -1,0 +1,23 @@
+/* linkedviews.css — LX.LinkedViews (linkedviews.js): panels of linked lines and a linked table. */
+.lx-lv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.lx-lv-view { display: grid; gap: 4px; align-content: start; padding: 10px; border-radius: 12px; border: 1px solid var(--lx-line); background: var(--lx-surface); min-width: 0; }
+.lx-lv-view.tbl { grid-column: 1 / -1; }
+.lx-lv-view h4 { font-family: var(--lx-f-display); font-size: 12px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--lx-ink-3); margin: 0 0 2px; }
+.lx-lv-row { display: block; width: 100%; text-align: left; background: none; border: 1px solid transparent; border-radius: 8px; padding: 5px 7px; font-size: 14px; line-height: 1.35;
+  color: var(--lx-ink); cursor: pointer; }
+.lx-lv-row:hover { border-color: var(--lx-line-2); }
+.lx-lv-row.on { background: var(--lx-accent-soft); border-color: var(--lx-accent); }
+.lx-lv-row.static { cursor: default; color: var(--lx-ink-3); }
+.lx-lv-row.static:hover { border-color: transparent; }
+.lx-lv-sym { font-family: var(--lx-f-mono); font-size: 14px; white-space: nowrap; }
+.lx-lv-sym var { font-style: italic; font-family: Georgia, "Times New Roman", serif; font-size: 1.08em; }
+.lx-lv-tblwrap { overflow-x: auto; max-width: 100%; }
+.lx-lv-tbl { width: 100%; border-collapse: collapse; font-size: 13px; font-family: var(--lx-f-mono); }
+.lx-lv-tbl th { font-family: var(--lx-f-display); font-weight: 500; font-size: 11.5px; color: var(--lx-ink-3); text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--lx-line-2); }
+.lx-lv-tbl th:first-child, .lx-lv-tbl td:first-child { text-align: left; }
+.lx-lv-tbl td { padding: 4px; text-align: right; border-bottom: 1px solid var(--lx-line); white-space: nowrap; }
+.lx-lv-tbl tr { cursor: pointer; }
+.lx-lv-tbl tr.on td { background: var(--lx-accent-soft); }
+.lx-lv-tbl tr:focus { outline: none; }
+.lx-lv-tbl tr:focus-visible td { box-shadow: inset 0 0 0 2px var(--lx-accent); }
+@media (max-width: 640px) { .lx-lv { grid-template-columns: minmax(0, 1fr); } }

@@ -2,8 +2,9 @@
 //
 // Data: assets/learn/data/11-solver.json (slider ranges, the unserved penalty, lesson 0's cheapest-first totals and a
 // precomputed answer used only if the solver cannot load), town.json (Prairie Town's fleet; illustrative), town_year.json
-// (real 2025 SPP shapes) and 10-write-it-down.json (the hour of lesson 10, for the "peek inside the solver" box). The
-// page also loads assets/learn/10-write-it-down.js for its lesson-local components (plot, simplex walk, equation card).
+// (real 2025 SPP shapes) and 10-write-it-down.json (the hour of lesson 10, for the "peek inside the solver" box, drawn
+// with LX.LPPlane and walked with LX.lp2.simplexWalk). The page also loads assets/learn/10-write-it-down.js for its
+// lesson-local equation card, the stage's look and the helpers fmt1, usd and saw.
 //
 // Model: lesson 0's day (3 September 2025, cut and rounded as grid-operator.js prepare() does) as one linear program,
 // solved in the browser by HiGHS (LX.solver):
@@ -273,8 +274,6 @@
         return cs;
       };
     }
-    // a W1F slider wrapper
-    function ctl(host, o) { return W1F.Ctl(host, o); }
 
     // ---------- step cards
     var steps = [
@@ -302,8 +301,8 @@
             if (!sol) return;
             editPlan = sol.cc.map(function (v) { return Math.round(v); });
             var moves = 0, hour = D.editHour;
-            var hc = ctl(act, { label: "Hour", color: "var(--lx-ink-3)", min: 0, max: 23, step: 1, value: hour, fmt: hh, onChange: function (v) { hour = v; cc.set(editPlan[hour]); } });
-            var cc = ctl(act, { label: "Combined-cycle at this hour", color: "var(--lx-cc)", min: 0, max: f.cc.mw, step: 5, value: editPlan[hour], fmt: function (v) { return v + " MW"; },
+            var hc = LX.Slider(act, { label: "Hour", color: "var(--lx-ink-3)", min: 0, max: 23, step: 1, value: hour, fmt: hh, onChange: function (v) { hour = v; cc.set(editPlan[hour]); } });
+            var cc = LX.Slider(act, { label: "Combined-cycle at this hour", color: "var(--lx-cc)", min: 0, max: f.cc.mw, step: 5, value: editPlan[hour], fmt: function (v) { return v + " MW"; },
               onChange: function (v) { editPlan[hour] = v; moves++; paintEdit(); } });
             var rs = H("button", { type: "button", class: "lx-btn ghost small", text: "Back to the solver's plan" }, act);
             rs.addEventListener("click", function () { editPlan = sol.cc.map(function (v) { return Math.round(v); }); cc.set(editPlan[hour]); paintEdit(); });
@@ -398,10 +397,10 @@
           set = settings(); priceBox.hidden = false; hook = null;
           var g = H("div", { class: "w1f-ctls" }, act), R = D.ranges;
           var go = function () { solve(set, { key: "sens" }).then(function (sol) { if (!sol) return; show(sol, set); say(sol); }); };
-          ctl(g, { label: "Peaker running cost", color: "var(--lx-pk)", min: R.pkCost[0], max: R.pkCost[1], step: 5, value: set.pkCost, fmt: function (v) { return "$" + v + "/MWh"; }, onChange: function (v) { set.pkCost = v; go(); } });
-          ctl(g, { label: "Combined-cycle ramp limit", color: "var(--lx-cc)", min: R.ramp[0], max: R.ramp[1], step: 5, value: set.ramp, fmt: function (v) { return v + " MW/h"; }, onChange: function (v) { set.ramp = v; go(); } });
-          ctl(g, { label: "Demand, every hour", color: "var(--lx-ink)", min: R.demandPct[0], max: R.demandPct[1], step: 5, value: set.demandPct, fmt: function (v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + "%"; }, onChange: function (v) { set.demandPct = v; go(); } });
-          ctl(g, { label: "Wind farm size", color: "var(--lx-wind)", min: R.windMW[0], max: R.windMW[1], step: 25, value: set.windMW, fmt: function (v) { return v + " MW"; }, onChange: function (v) { set.windMW = v; go(); } });
+          LX.Slider(g, { label: "Peaker running cost", color: "var(--lx-pk)", min: R.pkCost[0], max: R.pkCost[1], step: 5, value: set.pkCost, fmt: function (v) { return "$" + v + "/MWh"; }, onChange: function (v) { set.pkCost = v; go(); } });
+          LX.Slider(g, { label: "Combined-cycle ramp limit", color: "var(--lx-cc)", min: R.ramp[0], max: R.ramp[1], step: 5, value: set.ramp, fmt: function (v) { return v + " MW/h"; }, onChange: function (v) { set.ramp = v; go(); } });
+          LX.Slider(g, { label: "Demand, every hour", color: "var(--lx-ink)", min: R.demandPct[0], max: R.demandPct[1], step: 5, value: set.demandPct, fmt: function (v) { return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + "%"; }, onChange: function (v) { set.demandPct = v; go(); } });
+          LX.Slider(g, { label: "Wind farm size", color: "var(--lx-wind)", min: R.windMW[0], max: R.windMW[1], step: 25, value: set.windMW, fmt: function (v) { return v + " MW"; }, onChange: function (v) { set.windMW = v; go(); } });
           function say(sol) {
             if (sol.totals.pk > 1e-6) {
               api.done();
@@ -513,19 +512,26 @@
     var pk = document.getElementById("w11-peek");
     if (pk && D10) {
       pk.innerHTML = "";
-      var lp2 = W1F.lp2, day = lp2.dayOf(town, year), p = lp2.params(town, day, D10), sol = lp2.solve2(p), walk = lp2.simplexWalk(p), at = 0, timer = null;
-      var plot = W1F.LPPlot(pk, { view: D10.view, xLabel: "Combined-cycle x (MW)", yLabel: "Peaker y (MW)", describe: function () {
-        return "Lesson 10's hour: the simplex method visits " + walk.length + " corners: " + walk.map(function (v) { return "(" + fmt1(v.x) + ", " + fmt1(v.y) + ") at " + usd(v.cost); }).join(", then ") + ". The last is the best plan."; } });
-      var row = H("div", { class: "w1f-walk" }, pk);
+      // lesson 10's hour as a linear program (as 10-write-it-down.js problem() writes it): x = combined-cycle, y = peaker
+      var h10 = D10.hour, m10 = { sense: "min", c: [f.cc.cost, f.peaker.cost], rows: [
+        { id: "demand", a: [1, 1], op: ">=", b: W.need[h10] }, { id: "cc", a: [1, 0], op: "<=", b: f.cc.mw }, { id: "pk", a: [0, 1], op: "<=", b: f.peaker.mw },
+        { id: "co2", a: [f.cc.co2, f.peaker.co2], op: "<=", b: D10.cap }, { id: "x0", a: [1, 0], op: ">=", b: 0 }, { id: "y0", a: [0, 1], op: ">=", b: 0 }] };
+      var sol = LX.lp2.solve(m10), walk = LX.lp2.simplexWalk(m10), at = 0, timer = null;
+      var plot = LX.LPPlane(pk, { fluid: true, view: D10.view, xLabel: "Combined-cycle x (MW)", yLabel: "Peaker y (MW)",
+        styles: { demand: { color: "var(--lx-ink)", label: "Demand", place: "foot" }, cc: { color: "var(--lx-cc)", dash: "6 4", label: "Combined-cycle size", short: "CC size", place: "top" },
+                  pk: { color: "var(--lx-pk)", dash: "6 4", label: "Peaker size", place: "end" }, co2: { color: "var(--lx-warn)", label: "CO₂ cap", place: "start" } },
+        describe: function () {
+          return "Lesson 10's hour: the simplex method visits " + walk.length + " corners: " + walk.map(function (v) { return "(" + fmt1(v.x) + ", " + fmt1(v.y) + ") at " + usd(v.value); }).join(", then ") + ". The last is the best plan."; } });
+      var row = H("div", { class: "lx-lp-walk" }, pk);
       var bS = H("button", { type: "button", class: "lx-btn small", text: "Next corner" }, row);
       var bP = H("button", { type: "button", class: "lx-btn ghost small", html: LX.icon("play") + "Play" }, row);
       var bR = H("button", { type: "button", class: "lx-btn ghost small", text: "Start again" }, row);
-      var out = H("p", { class: "w1f-walk-out", "aria-live": "polite" }, pk);
+      var out = H("p", { class: "lx-lp-walk-out", "aria-live": "polite" }, pk);
       var NAME = { demand: "the demand line", cc: "the combined-cycle size line", pk: "the peaker size line", co2: "the CO₂ cap line", x0: "the y-axis", y0: "the x-axis" };
       function paint() {
-        plot.render({ p: p, sol: sol, walk: walk, walkAt: at, showBest: at === walk.length - 1 });
+        plot.render({ rows: m10.rows, c: m10.c, sol: sol, walk: walk, walkAt: at, showBest: at === walk.length - 1 });
         var v = walk[at];
-        out.textContent = "Corner " + (at + 1) + " of " + walk.length + ": x = " + fmt1(v.x) + ", y = " + fmt1(v.y) + ", " + usd(v.cost) + ". " +
+        out.textContent = "Corner " + (at + 1) + " of " + walk.length + ": x = " + fmt1(v.x) + ", y = " + fmt1(v.y) + ", " + usd(v.value) + ". " +
           (at === 0 ? "Start at a corner (here the most expensive)." : "Moved along " + NAME[v.along] + " to a cheaper neighbour. ") +
           (at === walk.length - 1 ? "No neighbouring corner is cheaper, so this is the best plan: the solver stops." : at ? "" : "");
         bS.disabled = at >= walk.length - 1;
