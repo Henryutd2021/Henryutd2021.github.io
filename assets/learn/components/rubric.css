@@ -1,0 +1,27 @@
+/* rubric.css — LX.Rubric (rubric.js): one fieldset per competence; its four levels as radio labels that carry the
+   anchored descriptions (a ladder: one column on phones, four from 860 px); the picked level is outlined and ticked, the
+   bar (Proficient) marked in words; the result line, the copy button and the copy box. */
+.lx-rb { display: grid; gap: 14px; min-width: 0; }
+.lx-rb-lede { font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-rb-comp { border: 1px solid var(--lx-line); border-radius: 12px; padding: 10px 14px 14px; margin: 0; display: grid; gap: 8px; min-width: 0; }
+.lx-rb-comp legend { float: none; width: auto; margin: 0; padding: 0 6px; font-size: 16px; }
+.lx-rb-comp legend b { font-family: var(--lx-f-display); font-weight: 600; color: var(--lx-ink); }
+.lx-rb-look { font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-rb-look b { font-weight: 600; color: var(--lx-ink); }
+.lx-rb-levels { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+@media (min-width: 860px) { .lx-rb-levels { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.lx-rb-level { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 2px 8px; align-content: start; margin: 0; padding: 9px 10px;
+  border: 1px solid var(--lx-line); border-radius: 10px; background: var(--lx-surface); cursor: pointer; }
+.lx-rb-level input { grid-row: 1 / span 2; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--lx-accent); }
+.lx-rb-level input:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+.lx-rb-name { font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; color: var(--lx-ink); }
+.lx-rb-name small { margin-left: 6px; font-family: var(--lx-f-body); font-weight: 400; font-size: 12px; color: var(--lx-ink-3); }
+.lx-rb-desc { font-size: 13.5px; line-height: 1.4; color: var(--lx-ink-2); }
+.lx-rb-level.bar { border-style: dashed; border-color: var(--lx-line-2); }
+.lx-rb-level.on { border: 2px solid var(--lx-accent); background: var(--lx-accent-soft); padding: 8px 9px; }
+.lx-rb-level.on .lx-rb-desc { color: var(--lx-ink); }
+.lx-rb-result { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
+.lx-rb-foot { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.lx-rb-copy { display: grid; gap: 4px; }
+.lx-rb-copy textarea { width: 100%; font-family: var(--lx-f-mono); font-size: 13px; line-height: 1.45; padding: 8px 10px; border: 1px solid var(--lx-line-2);
+  border-radius: 10px; background: var(--lx-surface-2); color: var(--lx-ink); resize: vertical; }

@@ -667,6 +667,73 @@ var P = LX.Practice(host, { id: "b1-practice", title: "Practice", lede: "One sen
 - Exercise pieces in `practice.css`: `.lx-fp-model` (a model in symbols), `.lx-fp-tab` (a table, `tr.best`, `tr.ask`),
   `.lx-fp-pt`, `.lx-fp-ans`, `.lx-fp-ask`, `.lx-fp-worked`, `.lx-fp-choices`. Used by B1 and B3.
 
+### Added in wave W2 (2026-11-03): studios and case files
+
+The build bundles these after the W1 set (`W2_JS`, `W2_CSS` in `scripts/build_learn.py`). Node tests: `_tests/learn/test_components_w2.js`, which also compares the rubric's words with curriculum v2 §3.4 when `LEARN_CURRICULUM=<path to curriculum_v2.md>` is set, or when the curriculum sits at `../reports/learn/` from the site folder. `_tests/learn/stubdom.js` is a small stub document for testing a view in Node (`env()`, `load(name, E)`, `buttons()`); it is not a test itself.
+
+Each component's pure part has a `staticHTML` that writes the no-JS fallback from the same data. A lesson's test can write it between markers in `--write` mode and check it otherwise, as CK-F does.
+
+**Exemplars** (`exemplars.js`, e-exemplars): a good and a weak answer to the same task, side by side, with tap-to-reveal notes on the phrases that make the difference.
+
+```js
+LX.Exemplars(H("div", { class: "lx-xcard" }, x), { title: "Two answers to the same brief", task: "The task, in one line.",
+  answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: ["Is ", { text: "community solar", note: "No type and no metric." }, " good?"] },
+            { key: "good", label: "Strong answer", level: "Proficient", parts: ["Did ", { text: "renters' energy burden", note: "A metric with units." }, " fall ...?"] }],
+  diff: [{ label: "Type", weak: "None", good: "Evaluative" }], id: "r1-ex", note: "Both answers are illustrative." });   // -> { el, open(key, n), openAll(), opened() }
+```
+
+- Each marked phrase is a button (`role="button"`, Tab, Enter, Space) with a number badge. It opens or shuts its note under the answer (`aria-expanded`, `aria-controls`), and the note is read out.
+- "Show all notes" opens every note. Notes start with "Falls short:" (weak) or "Works:" (good); `lead` changes the word.
+- With `id`, the open notes are remembered in this browser.
+- Two columns from 700 px. The "What made the difference" table becomes labelled lines on phones.
+- Pure (Node: `require("components/exemplars.js")`): `marks`, `plain` (text with `[n]`), `validate` (the view throws on a malformed pair), `staticHTML`.
+
+**Rubric self-check** (`rubric.js`): the course rubric (§3.4) as a self-check.
+
+```js
+LX.Rubric(H("div", { class: "lx-xcard" }, x), { id: "r1-rubric", code: "R1", title: "Rate your card against the rubric",
+  competences: [{ id: "framing", look: "All eight checks pass, and the card says why the question matters." }, "method"] });   // -> { el, picks(), set(id, level), clear(), summary() }
+```
+
+- **Competences.** The ids are `framing`, `positioning`, `method`, `trust`, `uncertainty`, `accounting`, `realism`, `communication` and `integrity`. Their words are §3.4's, word for word.
+- **Levels.** Not yet, Developing, Proficient (the bar) and Strong. "Not yet" reads "Developing is not reached yet."
+- **Do not reword.** A studio picks its competences and adds a `look` line; it never rewords the levels.
+- **Controls.** Each competence is a fieldset of native radios whose labels carry the anchored descriptions. The result line counts competences at Proficient or above.
+- **Copy.** "Copy my self-check" copies a plain-text summary whose first line is "Learn · R1 self-check (rubric v1 ...)". Without a clipboard, the summary shows in a box to select. Keep `VERSION` fixed once testers send summaries.
+- **Pure.** `LEVELS`, `COMPETENCES`, `competence`, `count`, `summary`, `staticHTML` (also on `LX.Rubric`).
+
+**Question card** (`questioncard.js`, the card of i-studio and i-share): a structured research question.
+
+```js
+var qc = LX.QuestionCard(H("div", { class: "lx-xcard" }, live), { id: "r10-card", code: "R10", title: "Your question card", share: true,
+  values: { type: "evaluative", question: "Did ...?", audience: "...", metric: "...", units: "...", counterfactual: "...", scale: "S1",
+            boundary: "...", wrong: "...", uncertainty: "..." },
+  fix: { metric: { href: "a01-....html", label: "A1" } }, onChange: function (values, checks) {} });   // -> { el, get(), set(values), text(), checks(), share }
+```
+
+- **Fields.** The question in one sentence, then the type (five radios, §11.2, each showing its template and typical methods), audience, metric and units, counterfactual, scale (S0–S4) and boundary, "I would be wrong if…", and the main uncertainty.
+- **Checks.** Eight: the question is written, then the seven rigour checks of §11.3. Each passes or is marked to do, in words and with an icon, with an optional fix link. They never block a question, and they never judge originality, importance or novelty (R10 rule, §11.3).
+- **Pickers.** R10's pickers fill the card with `set()`.
+- **Saving and sharing.** With `id`, the draft stays in this browser. `share: true` adds "Share this card": the card travels in a `#q-...` hash (base64url JSON, through `LX.Share`), and opening such a link loads that card. Link text only ever goes into form fields.
+- **Pure.** `TYPES`, `SCALES`, `FIELDS`, `CHECKS`, `check`, `text`, `encode`, `decode`, `clean`.
+
+**Timeline** (`timeline.js`, e-timeline): dated events, each with its source, for case files (and A1, X3).
+
+```js
+LX.Timeline(H("div", { class: "lx-card" }, live), { title: "The study in time",
+  events: [{ date: "2024", label: "Data year", kind: "data", text: "One sentence.", source: { label: "EIA-930", url: "https://www.eia.gov/...", as_of: "2025-11-01" } },
+           { date: "2026-06", label: "Paper accepted", kind: "study", key: true, source: { label: "Conference paper" }, deeper: "Longer text." }] });
+```
+
+- **Dates.** `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. They show as "2024", "June 2026" or "14 March 2025", in `<time datetime>`.
+- **Gaps.** The time between events appears above each one ("15 months later"; `gaps: false` drops it), at the coarser precision of the two dates.
+- **Kinds.** Study, data, policy or event, written in words beside the date. `key: true` rings the marker and adds a "Key step" tag.
+- **Sources.** Every event needs a source (a label; an http(s) `url` and an `as_of` date are optional). The view throws on a malformed event.
+- **Layout.** An ordered list, so it is its own text version. The date column sits on the left from 760 px.
+- **Pure.** `parse`, `fmt`, `sortEvents`, `gap`, `validate`, `staticHTML` (the page's `<ol class="lx-tl-static">`).
+
+**Form pieces** (`forms.css`, CSS only): `.lx-studio-task` (the studio's task list), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try`, and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`.
+
 **Scope and QA** (ResearchPortfolio folder).
 
 - `python3 scripts/learn_scope_scan.py --site <worktree>` runs the curriculum v2 §20 scan on the rendered `_site/learn/` pages, the data files and the scripts. `build_learn.py --check` runs it whenever a rendered site exists, and fails on any violation.
