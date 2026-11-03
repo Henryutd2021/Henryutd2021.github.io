@@ -18,8 +18,10 @@
 #                 (`after: [10, K4]`) and the module that follows (`next: B2`); `form: checkpoint` for checkpoint pages
 # (The name has no leading underscore because Quarto listings skip files that start with "_".)
 # Source: design report 09, sections 2 and 5 (revised 2026-11-02); course map form chosen by Henry on 2026-11-02 (metro).
-# Curriculum v2 (reports/learn/learn_map_v2.yml, approved 2026-11-02): fourth tier Researcher (upcoming), the W1 modules
+# Curriculum v2 (reports/learn/learn_map_v2.yml, approved 2026-11-02): fourth tier Researcher, the W1 modules
 # N1, B1-B3, M1 and CK-F, the Modeler and Researcher module lists and the toolbox K1-K8, titles as in that file.
+# Wave W2 (2026-11-03): F1, F2, A22, M2, M3, CK-M, the studios R1-R5, R9 and R10 (the Researcher tier is live), the
+# toolbox K1, K2, K3, K5 and K8, and the case files CF2, CF6 and CF7 as drafts (upcoming until Henry approves them).
 
 - kind: tier
   id: foundations
