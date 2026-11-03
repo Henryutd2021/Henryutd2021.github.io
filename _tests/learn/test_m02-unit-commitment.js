@@ -4,10 +4,17 @@
 //     and running costs are town.json's; the peaker's 30 MW minimum and the $3,000/MWh penalty are lesson 11's
 //   - step 1 (the dispatch LP), step 2 (the relaxation as each rule is added), step 3 (the learner's plans: rounding,
 //     rule breaks, the plan with nothing unserved), step 4 (the branch-and-bound tree, node by node), step 5 (the
-//     mixed-integer program: size, cost, gap, no duals), step 6 (the cost staircase at 23:00), step 7 (conditional
-//     prices, their finite-difference checks and the absence of corners), step 8 (settlement and uplift)
-//   - uniqueness: every LP whose solution the page draws (the relaxations, every tree node, the fixed LP) has a unique
-//     optimum, checked by perturbing the costs; so another HiGHS (the notebook's SciPy) grows the same tree
+//     mixed-integer program: size, cost, gap, no duals), step 6 (the day's cost as demand is added at 23:00 in
+//     half-MWh steps: continuous, with unserved energy between 5 and about 5.7 MWh, and a slope that falls once the
+//     peaker stays on, while the LPs' curves only get steeper), step 7 (conditional prices, their finite-difference
+//     checks and the absence of corners), step 8 (settlement and uplift)
+//   - failed solves: a tree node whose LP fails (a time limit injected into one solve) never lets the tree claim
+//     optimality; it keeps its parent's bound, the gap stays open, and a retry closes it
+//   - stability: every LP whose solution the page draws (the dispatch LP, the relaxations, the fixed LP) gives the same
+//     solution when its costs are perturbed a little (an empirical check, not a proof); for every tree node, each switch
+//     and each unserved MWh is ranged over the node's optimal face (min and max with the cost held at its optimum), so
+//     the switch values that steer the branching are unique. That the notebook's SciPy/HiGHS grows the same tree is
+//     then an expectation its assert cells check, not a guarantee across solver versions
 //   - the reference block of the data file equals the model's numbers (the explain layer and the fallback use it)
 //   - page text: chosen strings in learn/m02-unit-commitment.qmd (every number on the page), the sidecar's glossary
 //     entries, the notebook's asserted numbers. The step cards' sentences are built at run time from the solver's
@@ -39,7 +46,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
 const has = (s, msg) => ok(PAGE.indexOf(s) >= 0, "page states " + JSON.stringify(s) + (msg ? " (" + msg + ")" : ""));
 const F = D.fleet, R = D.reference, LS = D.lesson;
-const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1e-6));
+const arr = (a, b, t) => a.length === b.length && a.every((v, i) => near(v, b[i], t == null ? 1e-6 : t));
 
 (async () => {
   const highs = await loadHighs();
@@ -54,6 +61,21 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
       const r = solve(m);
       Object.keys(base.values).forEach(n => { if (/^[uvwp]_|^ren_|^shed_/.test(n)) worst = Math.max(worst, Math.abs(r.values[n] - base.values[n])); });
     }
+    return worst;
+  }
+  // the widest range of the named variables over the optimal face: min and max each one with the cost held within
+  // $0.000001 of the optimum (fixed variables' costs are a constant)
+  function faceRange(model, names) {
+    const opt = solve(model).objective, terms = {};
+    let konst = 0;
+    model.variables.forEach(v => { if (v.lb === v.ub) konst += (v.cost || 0) * v.lb; else if (v.cost) terms[v.name] = v.cost; });
+    const cons = model.constraints.concat([{ name: "face", terms, le: opt - konst + 1e-6 }]);
+    let worst = 0;
+    names.forEach(n => {
+      const vars = model.variables.map(v => Object.assign({}, v, { cost: v.name === n ? 1 : 0 }));
+      const lo = solve({ sense: "min", variables: vars, constraints: cons }), hi = solve({ sense: "max", variables: vars, constraints: cons });
+      worst = Math.max(worst, lo.ok && hi.ok ? hi.objective - lo.objective : Infinity);
+    });
     return worst;
   }
 
@@ -79,13 +101,13 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
   ok(lp.day.hours.every(h => h.t >= 17 && h.t <= 22 ? near(h.price, 100) : near(h.price, 40)), "dispatch LP: $100 from 17:00 to 22:00, $40 otherwise");
   ok(JSON.stringify(M.belowMin(D, lp.day, "pk")) === JSON.stringify([17, 18, 22]), "dispatch LP: the peaker runs below its 30 MW minimum at 17:00, 18:00 and 22:00");
   ok(lp.day.hours.every(h => h.shed === 0), "dispatch LP: nothing unserved");
-  ok(uniqueness(M.build(D, {})) < 1e-6, "dispatch LP: unique solution");
+  ok(uniqueness(M.build(D, {})) < 1e-6, "dispatch LP: stable under small cost perturbations");
 
   // ---------------- step 2: the relaxation, rule by rule (start-up and no-load, then minimum output, then run times)
   const rules = [{ startup: true }, { startup: true, pmin: true }, M.ALL];
   const rx = rules.map(r => run({ onoff: true, relax: true, rules: r }));
   rx.forEach((x, i) => ok(x.r.status === "optimal" && near(x.day.cost, 168975), `relaxation after rule ${i + 1}: $168,975`));
-  rx.forEach((x, i) => ok(uniqueness(M.build(D, { onoff: true, relax: true, rules: rules[i] })) < 1e-6, `relaxation after rule ${i + 1}: unique solution`));
+  rx.forEach((x, i) => ok(uniqueness(M.build(D, { onoff: true, relax: true, rules: rules[i] })) < 1e-6, `relaxation after rule ${i + 1}: stable under small cost perturbations`));
   const X = rx[2].day;
   ok(arr(X.hours.slice(17, 23).map(h => h.u.pk), [0.05, 0.2, 0.55, 0.8, 0.45, 0.2]), "relaxation: peaker switches 0.05, 0.2, 0.55, 0.8, 0.45, 0.2");
   ok(X.hours.every(h => near(h.u.cc, 1)), "relaxation: the combined-cycle plant's switches are whole (1) every hour");
@@ -113,6 +135,11 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
   ok(JSON.stringify(M.planBreaks(D, gap)) === JSON.stringify([{ kind: "run", from: 17, to: 17, hours: 1 }, { kind: "down", from: 18, to: 18, hours: 1 }]), "a one-hour stop at 18:00 breaks the run and down times");
   const late = off.slice(); late[23] = 1;
   ok(M.planBreaks(D, late).length === 0 && run({ onoff: true, fix: M.planFix(D, late) }).r.ok, "a start at 23:00 is allowed (the day ends; the model looks no further)");
+  ok(/Run and down times count within this day only/.test(PAGE) && /a start at 23:00 owes no hour after midnight/.test(JS) && /owes nothing after midnight/.test(PAGE) && /within this day only/.test(JS),
+    "page and step 2 say run and down times count within the day (the start at 23:00 above)");
+  // the run-time sum stops at the day's first hour: a start in hour 0 counts, nothing before it does
+  const upRow = M.build(D, { onoff: true }).constraints.find(c => c.name === "up_pk_0");
+  ok(JSON.stringify(Object.keys(upRow.terms).sort()) === JSON.stringify(["u_pk_0", "v_pk_0"]) && /max\(0,/.test(JS) && /max\(0, t - UT \+ 1\)/.test(JS), "minimum run at hour 0 sums v from max(0, t − UT + 1): no hours before the day");
   ok(M.planBreaks(D, rd).length === 0 && JSON.stringify(rd.slice(17, 23)) === "[0,0,1,1,0,0]", "rounding: 0.55 and 0.8 up, 0.05, 0.2, 0.45, 0.2 down");
 
   // ---------------- step 4: branch and bound
@@ -126,7 +153,13 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
   ok(T.nodes.filter(n => n.prunedBy === 9).length === 4, "tree: the first plan ($185,900) prunes four open nodes");
   ok(T.inc.id === 10 && near(T.inc.bound, 173200) && near(M.treeGap(T), 0), "tree: best plan $173,200, gap 0");
   ok(M.runs(D.day.demand.map((_, t) => (T.inc.u["u_pk_" + t] > 0.5 ? 1 : 0))) === "17:00–22:00", "tree: best plan runs the peaker 17:00–22:00");
-  T.nodes.forEach(n => ok(uniqueness(M.build(D, { onoff: true, relax: true, fix: n.fix })) < 1e-6, `tree node ${n.id}: unique LP solution`));
+  // the branching depends only on each node's switches (and the bounds, which are unique): range them over the optimal face
+  T.nodes.forEach(n => {
+    const m = M.build(D, { onoff: true, relax: true, fix: n.fix });
+    const names = m.variables.filter(v => (/^u_/.test(v.name) && v.lb !== v.ub) || /^shed_/.test(v.name)).map(v => v.name);
+    const w = faceRange(m, names);
+    ok(w < 1e-6, `tree node ${n.id}: every free switch and unserved MWh is unique on the optimal face (widest range ${w.toExponential(1)})`);
+  });
   // ties broken by the earlier hour: at the root 0.55 (19:00) and 0.45 (21:00) are equally far from 1/2
   ok(M.pickSwitch([{ name: "a", x: 0.45, t: 21 }, { name: "b", x: 0.55, t: 19 }].sort((a, b) => a.t - b.t)).name === "b", "tie: the earlier hour wins");
   // the step-by-step path the page takes (pending -> accept in node order) gives the same tree
@@ -135,6 +168,34 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
   settle2(); const snaps = [M.treeBound(T2)];
   while (!M.treeDone(T2)) { M.treeBranch(T2); settle2(); snaps.push(M.treeBound(T2)); }
   ok(arr(snaps, [168975, 169510, 169735, 170575, 171415, 173200]), "tree: best bound after each branching " + snaps);
+  ok(M.treeProven(T) && T.solved === 11 && /proven optimal/.test(M.treeVerdict(D, T).text) && M.treeVerdict(D, T).text.indexOf("5 branchings, 11 LPs. Best plan $173,200, peaker on 17:00–22:00") === 0, "tree: proven, and the page says so");
+  // a node whose LP fails: inject a time limit into one solve (k counts the solves in node order)
+  const failing = (nth, status) => { let k = 0; return m => (++k === nth ? { status: status || "time-limit", ok: false, objective: null, values: null } : solve(m)); };
+  const TF = M.treeRun(D, {}, failing(11));   // the 11th solve is node 10, which holds the $173,200 optimum
+  ok(!M.treeDone(TF) && !M.treeProven(TF), "failed node 10: the tree is not done and proves nothing");
+  ok(TF.nodes[10].status === "error" && TF.nodes[10].inherited && near(TF.nodes[10].bound, 171415), "failed node 10 keeps its parent's bound, $171,415");
+  ok(TF.inc && TF.inc.id === 9 && near(TF.inc.bound, 185900), "failed node 10: the best plan so far is $185,900");
+  ok(near(M.treeBound(TF), 171415) && near(M.treeGap(TF), M.r6((185900 - 171415) / 185900)) && M.treeGap(TF) > 0.07, "failed node 10: best bound $171,415, gap 7.8% " + M.treeGap(TF));
+  const vF = M.treeVerdict(D, TF);
+  ok(vF && !vF.proven && !/optimal/.test(vF.text) && /Not proven/.test(vF.text) && /time-limit/.test(vF.text) && /\$171,415/.test(vF.text) && /7\.8%/.test(vF.text), "failed node 10: the page says not proven, " + (vF && vF.text));
+  ok(M.treeBranch(TF) === null && TF.solved === 10, "failed node 10: nothing left to branch; 10 LPs solved");
+  ok(M.treeRetry(TF) === 1 && TF.nodes[10].status === "pending" && near(M.treeBound(TF), 171415), "retry: the node waits for a new solve, its parent's bound still counts");
+  M.treePending(TF).forEach(p => M.treeAccept(TF, p.id, solve(p.model)));
+  ok(M.treeProven(TF) && TF.inc.id === 10 && near(TF.inc.bound, 173200) && near(M.treeGap(TF), 0) && TF.nodes[10].tries === 2 && TF.solved === 11, "after the retry: $173,200 proven, gap 0");
+  // a failed node far from the optimum keeps the gap open too: the 2nd solve, node 1 (peaker off at 19:00)
+  const T1 = M.treeRun(D, {}, failing(2, "iteration-limit"));
+  ok(!M.treeProven(T1) && T1.nodes[1].status === "error" && near(T1.inc.bound, 173200) && near(M.treeBound(T1), 168975) && near(M.treeGap(T1), M.r6(4225 / 173200)), "failed node 1: best plan found, but the bound stays at the root's $168,975 (gap 2.4%)");
+  // a failed root: no bound at all, nothing to branch
+  const TR = M.treeRun(D, {}, failing(1, "error"));
+  ok(TR.nodes.length === 1 && TR.nodes[0].status === "error" && M.treeBound(TR) === null && M.treeGap(TR) === null && !M.treeDone(TR) && !M.treeVerdict(D, TR).proven, "failed root: no bound, nothing branched, not proven");
+  // a failed node whose parent's bound already cannot beat the best plan is pruned without its LP
+  const TP = M.tree(D, {}); TP.nodes[0] = { id: 0, parent: null, fix: {}, depth: 0, status: "branched", bound: 200000 };
+  TP.nodes.push({ id: 1, parent: 0, fix: {}, depth: 1, status: "pending" }); TP.inc = { id: 9, bound: 190000 };
+  M.treeAccept(TP, 1, { status: "time-limit", ok: false });
+  ok(TP.nodes[1].status === "pruned" && TP.nodes[1].inherited && TP.nodes[1].prunedBy === 9, "a failed node with its parent's bound $200,000 above a $190,000 plan is pruned");
+  // an infeasible LP closes its node without a bound
+  const TI = M.tree(D, {}); M.treeAccept(TI, 0, { status: "infeasible", ok: false });
+  ok(TI.nodes[0].status === "infeasible" && M.treeDone(TI) && !M.treeProven(TI) && /No plan meets every rule/.test(M.treeVerdict(D, TI).text), "an infeasible root closes the tree with no plan");
   const lay = M.treeLayout(T);
   ok(lay.cols === 2 && lay.rows === 6 && T.nodes.every(n => lay.pos[n.id][0] === (n.val === 0 ? 0 : 1)), "tree layout: two columns (on below, off to the left), six rows");
   ok(near(173200 - 168975, 4225) && (4225 / 173200 * 100).toFixed(1) === "2.4", "root gap $4,225, 2.4%");
@@ -150,20 +211,51 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
   ok(near(milp.tot.shed, 0), "MILP: nothing unserved");
   ok(arr(milp.hours.map(h => h.u.pk), D.day.demand.map((_, t) => T.inc.u["u_pk_" + t])), "MILP = the tree's best plan");
 
-  // ---------------- step 6: the staircase at 23:00
-  const stair = []; for (let x = 0; x <= LS.stair.max; x++) stair.push(M.r6(solve(M.build(D, { onoff: true, add: { hour: LS.stair.hour, mw: x } })).objective - mr.objective));
-  ok(arr(stair, [0, 40, 80, 120, 160, 200, 2340, 2380, 2420, 2460, 2500]), "staircase at 23:00 " + stair);
-  ok(near(stair[6] - stair[5], 2140) && near(stair[5] - stair[4], 40) && near(stair[7] - stair[6], 40), "the 5th MWh $40, the 6th $2,140, the 7th $40");
-  const s5 = M.read(D, { onoff: true }, solve(M.build(D, { onoff: true, add: { hour: 23, mw: 5 } }))), s6 = M.read(D, { onoff: true }, solve(M.build(D, { onoff: true, add: { hour: 23, mw: 6 } })));
-  ok(s5.hours[23].u.pk === 0 && near(s5.hours[23].p.cc, 150) && s6.hours[23].u.pk === 1 && near(s6.hours[23].p.pk, 30) && near(s6.hours[23].p.cc, 121), "6th MWh: the peaker stays on at 30 MW, the CC falls from 150 to 121 MW");
-  ok(near(F.pk.noload + 30 * F.pk.cost - 29 * F.cc.cost, 2140), "6th MWh: $300 + 30 × $100 − 29 × $40 = $2,140");
+  // ---------------- step 6: the day's cost as demand is added at 23:00, in half-MWh steps
+  const XS = M.stairPoints(D), H23 = LS.stair.hour;
+  ok(H23 === 23 && LS.stair.step === 0.5 && LS.stair.max === 10 && XS.length === 21 && XS[11] === 5.5 && XS[20] === 10, "step 6: 0 to 10 MWh at 23:00 in half-MWh steps");
+  const curve = XS.map(x => { const o = { onoff: true, add: { hour: H23, mw: x } }, r = solve(M.build(D, o)), h = M.read(D, o, r).hours[H23]; return { x, ok: r.status === "optimal", cost: M.r6(r.objective - mr.objective), shed: h.shed, pk: Math.round(h.u.pk) === 1 }; });
+  const stair = curve.map(p => p.cost);
+  ok(curve.every(p => p.ok) && arr(stair, [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 1700, 2340, 2360, 2380, 2400, 2420, 2440, 2460, 2480, 2500], 1e-4), "extra cost at 23:00 (MILP gap tolerance) " + stair);
+  ok(arr(curve.map(p => p.shed), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]), "unserved at 23:00: 0.5 MWh at 5.5 MWh added, none otherwise");
+  ok(JSON.stringify(curve.map(p => p.pk ? 1 : 0)) === JSON.stringify(XS.map(x => (x >= 6 ? 1 : 0))), "the peaker stays on at 23:00 from 6 MWh added");
+  const slopes = M.stairSlopes(curve);
+  ok(arr(slopes, [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 3000, 1280, 40, 40, 40, 40, 40, 40, 40, 40], 1e-4), "slopes per MWh " + slopes);
+  ok(slopes.some((v, k) => k > 0 && v < slopes[k - 1] - 1), "the mixed-integer program's cost curve gets flatter again: not convex");
+  // the reviewer's points: continuous, no jump (5 → 5.001 MWh costs $3 more, 0.001 MWh unserved)
+  const at = x => { const o = { onoff: true, add: { hour: H23, mw: x } }, r = solve(M.build(D, o)); return { cost: r.objective - mr.objective, shed: M.read(D, o, r).hours[H23].shed }; };
+  const a5 = at(5), a5b = at(5.001);
+  ok(near(a5.cost, 200) && near(a5b.cost, 203, 1e-4) && near(a5b.shed, 0.001, 1e-6), "no jump: +5 MWh $200, +5.001 MWh $203 with 0.001 MWh unserved");
+  // where the peaker takes over: $200 + $3,000/MWh beyond 5 MWh against $2,100 + $40/MWh with the peaker kept on
+  const cross = (F.pk.noload + F.pk.min * (F.pk.cost - F.cc.cost) - 5 * F.cc.cost + 5 * D.penalty) / (D.penalty - F.cc.cost);
+  ok(near(F.pk.noload + F.pk.min * (F.pk.cost - F.cc.cost), 2100) && near(cross, 16900 / 2960) && cross.toFixed(1) === "5.7" && R.stairCross === +cross.toFixed(2), "the peaker takes over at " + cross.toFixed(4) + " MWh (about 5.7)");
+  ok(at(cross - 0.01).shed > 0.5 && at(cross + 0.01).shed === 0 && near(at(cross + 0.01).cost, 2100 + 40 * (cross + 0.01), 1e-4), "just below 5.71 MWh demand goes unserved; just above it the peaker stays on");
+  ok(near(stair[12], 2100 + 40 * 6) && near(stair[20], 2100 + 40 * 10), "with the peaker on: $2,100 + $40/MWh × MWh added");
+  // the LPs' curves at the same points only get steeper (their cost is convex in demand), so the falling slope is the switch's doing
+  [["relaxation", { onoff: true, relax: true }], ["dispatch LP", {}]].forEach(([name, o0]) => {
+    const base = solve(M.build(D, o0)).objective;
+    const c = XS.map(x => ({ x, cost: solve(M.build(D, Object.assign({}, o0, { add: { hour: H23, mw: x } }))).objective - base }));
+    const sl = M.stairSlopes(c);
+    ok(sl.every((v, k) => k === 0 || v >= sl[k - 1] - 1e-6), name + ": slopes never fall " + sl.slice(9, 14));
+  });
+  // the fixed LP's price at 23:00 is the slope of the first 5 MWh only
+  ok(near(slopes[0], 40) && near(slopes[9], 40), "the first 5 MWh at 23:00 cost $40/MWh each");
+  // what step 6 says, at each point the learner can stop
+  const pts = v => curve.filter(p => p.x <= v + 1e-9);
+  const w = v => M.stairWords(D, pts(v));
+  ok(!w(3).done && /each MWh costs \$40\/MWh/.test(w(3).text), "step 6 at 3 MWh: " + w(3).text);
+  ok(!w(5.5).done && /unserved, at \$3,000\/MWh/.test(w(5.5).text), "step 6 at 5.5 MWh: " + w(5.5).text);
+  ok(!w(6).done && /At 6 MWh the peaker stays on/.test(w(6).text), "step 6 at 6 MWh: " + w(6).text);
+  const w7 = w(7).text;
+  ok(w(7).done && w7 === "**Up to 5 MWh:** $40/MWh. **Then** $3,000/MWh, unserved. **From 6 MWh:** the peaker stays on at 23:00, and each MWh costs $40/MWh again. The slope fell, which it never does in a linear program.", "step 6 at 7 MWh: " + w7);
+  ok(w7.replace(/\*\*/g, "").split(/\s+/).length <= 35, "step 6's message is within the 35-word budget");
 
   // ---------------- step 7: conditional prices
   const fx = core.fixedModel(mm, mr.values), fr = solve(fx.model), fixed = M.read(D, { onoff: true }, fr);
   ok(fr.kind === "lp" && fr.ok && near(fr.objective, 173200), "fixed LP: $173,200");
   const P = fixed.hours.map(h => h.price);
   ok(P.every((p, t) => (t >= 19 && t <= 21 ? near(p, 100) : near(p, 40))), "conditional prices: $100 from 19:00 to 21:00, $40 otherwise " + P);
-  ok(uniqueness(fx.model) < 1e-6, "fixed LP: unique solution");
+  ok(uniqueness(fx.model) < 1e-6, "fixed LP: stable under small cost perturbations");
   for (let t = 0; t < 24; t++) {
     const bump = d => { const m = JSON.parse(JSON.stringify(fx.model, (k, v) => (v === Infinity ? "Inf" : v)), (k, v) => (v === "Inf" ? Infinity : v)); const c = m.constraints.find(c => c.name === "bal_" + t); c.lb += d; c.ub += d; return solve(m).objective; };
     const up = (bump(0.1) - fr.objective) / 0.1, dn = (fr.objective - bump(-0.1)) / 0.1;
@@ -190,32 +282,41 @@ const arr = (a, b) => a.length === b.length && a.every((v, i) => near(v, b[i], 1
   // ---------------- the reference block (explain layer, fallback)
   ok(R.lp === 159500 && R.lpFocus === 5 && R.lpHigh === "17:00–22:00" && R.relax === 168975 && R.relaxFocus === "5%" && R.relaxFocusSw === "0.05" && R.relaxStarts === "0.8", "reference: dispatch LP and relaxation");
   ok(R.milp === 173200 && R.peakerOn === "17:00–22:00" && arr(R.condPrices, P) && R.condHigh === "19:00–21:00" && R.uplift === 9200, "reference: MILP, prices, uplift");
-  ok(arr(R.stair, stair) && R.settle.pk.revenue === 21600 && R.settle.pk.cost === 30800 && R.settle.cc.profit === 19800, "reference: staircase and settlement");
+  ok(arr(R.stairShed, curve.map(p => p.shed)) && arr(R.stairPk, curve.map(p => (p.pk ? 1 : 0))), "reference: unserved energy and the peaker at 23:00 along the curve");
+  ok(arr(R.stair, stair, 1e-4) && R.settle.pk.revenue === 21600 && R.settle.pk.cost === 30800 && R.settle.cc.profit === 19800, "reference: staircase and settlement");
   ok(R.tree.lps === 11 && R.tree.branchings === 5 && R.tree.rootFrac === 6 && arr(R.tree.nodes.map(n => n.bound), wantB) && R.tree.first.t === 19 && R.tree.first.x === 0.55 && R.tree.last.t === 17, "reference: tree");
   ok(R.tree.firstOff.bound === 328920 && R.tree.firstOff.shed === 55 && R.tree.firstPlan === 185900 && R.tree.firstPlanShed === 5 && R.tree.prunedByFirst === 4, "reference: tree details");
   ok(R.focus === LS.focus && LS.focus === 17, "reference: focus hour 17:00");
 
   // ---------------- the page states these numbers
-  ["$159,500", "$168,975", "$173,200", "5 MW at 17:00, below its 30 MW minimum", "5% on at 17:00", "5 branchings and 11 LPs", "$40, and $100 from 19:00 to 21:00",
+  ["$159,500", "$168,975", "$173,200", "5 MW at 17:00, below its 30 MW minimum", "5% on at 17:00", "5 branchings and 11 LPs", "$40/MWh, and $100/MWh from 19:00 to 21:00",
    "$9,200 short of its costs", "0.05 at 17:00, 0.2 at 18:00, 0.55 at 19:00, 0.8 at 20:00, 0.45 at 21:00 and 0.2 at 22:00", "fully on from 17:00 to 22:00",
-   "each of the first 5 MWh costs $40, the 6th $2,140", "| Root | nothing | \\$168,975 |", "| 2 | on at 19:00 | \\$169,510 |", "| 4 | and 21:00 | \\$169,735 |",
+   "costs $40/MWh, then $3,000/MWh (unserved), then $40/MWh once the peaker stays on", "| Root | nothing | \\$168,975 |", "| 2 | on at 19:00 | \\$169,510 |", "| 4 | and 21:00 | \\$169,735 |",
    "| 6 | and 18:00 | \\$170,575 |", "| 8 | and 22:00 | \\$171,415 |", "| 10 | and 17:00: every switch whole | \\$173,200 |", "The root gap was \\$4,225, or 2.4% of the best plan",
-   "| Each MWh costs | \\$40 | \\$2,140 | \\$40 |", "\\$300 no-load plus 30 MWh at \\$100, less 29 MWh of combined-cycle output at \\$40",
-   "| Paid: 90 MWh at \\$40, 180 MWh at \\$100 | \\$21,600 |", "| Running cost: 270 MWh at \\$100 | \\$27,000 |", "| No-load: 6 hours at \\$300 | \\$1,800 |",
+   "| MWh added at 23:00 | Each extra MWh costs | What covers it |", "| 0 to 5 | \\$40/MWh | the combined-cycle plant, up to its 150 MW |",
+   "| 5 to about 5.7 | \\$3,000/MWh | nothing: it is unserved |", "| above about 5.7 | \\$40/MWh | the peaker, kept on at 30 MW |",
+   "Keeping the peaker on at 23:00 costs \\$2,100 (\\$300 no-load, and 30 MWh at \\$100/MWh instead of \\$40/MWh), plus \\$40/MWh for each MWh added. Above about 5.7 MWh that is cheaper than unserved energy",
+   "\\$40/MWh at 23:00, the slope of the first 5 MWh only", "$40/MWh, then $3,000/MWh, then $40/MWh again once the peaker stays on",
+   "| Paid: 90 MWh at \\$40/MWh, 180 MWh at \\$100/MWh | \\$21,600 |", "| Running cost: 270 MWh at \\$100/MWh | \\$27,000 |", "| No-load: 6 hours at \\$300 an hour | \\$1,800 |",
    "| One start | \\$2,000 |", "| Short: the uplift | \\$9,200 |", "on only at 19:00 and 20:00 and leaves 90 MWh unserved", "paid $21,600 against $30,800 of costs",
-   "bound of $171,415", "start-up cost doubles to $4,000", "the uplift grows to $11,200", "$168,975 ≤ $173,200", "$40, then $2,140", "0.01%", "`mip_rel_gap = 0.0001`",
+   "bound of $171,415", "start-up cost doubles to $4,000", "stays at $100/MWh", "the uplift grows to $11,200", "$168,975 ≤ $173,200", "$40, $3,000, $40 per MWh", "0.01%", "`mip_rel_gap = 0.0001`",
+   "six hours ending at 23:00", "\"17:00 to 22:00\" is six hours, ending at 23:00",
    "the $3,000/MWh unserved-energy penalty", "29 July 2025", "p. 55", "p. 37", "P 7", "Peaker on 17:00 to 22:00"].forEach(s => has(s));
   ok(R.settle.pk.running === 27000 && 270 * 100 === 27000 && 6 * 300 === 1800, "page tables' arithmetic");
   // wording guards: no MILP duals presented as prices, prices labelled conditional
-  ["MILP prices", "mixed-integer program's prices", "shadow prices of the mixed-integer", "always optimal"].forEach(s => ok(PAGE.indexOf(s) < 0 && JS.indexOf(s) < 0, "page and script do not say " + JSON.stringify(s)));
+  ["MILP prices", "mixed-integer program's prices", "shadow prices of the mixed-integer", "always optimal", "cost jumps", "the 6th $2,140", "nuclear plant's flat cost", "and a smaller tree"].forEach(s => ok(PAGE.indexOf(s) < 0 && JS.indexOf(s) < 0, "page and script do not say " + JSON.stringify(s)));
+  // a price is written with its unit: no "$40," or "$100 " standing alone for a price in the page's sentences about prices
+  ok(!/[Pp]rices? \$\d+[ ,]|\$(40|100)(, and| from| at 2| in most)/.test(PAGE.replace(/\\/g, "")), "page: prices carry /MWh");
   ok(/conditional on this commitment/.test(JS) && /Conditional on the commitment/.test(JS), "the step-7 prices are labelled conditional on the commitment");
-  ok(/HiGHS returns no duals: a mixed-integer program has no \[\[shadow-price\|shadow prices\]\] to read/.test(JS), "step 5 says the MILP returns no duals");
+  ok(/HiGHS returns no duals for a mixed-integer solve, so there are no \[\[shadow-price\|shadow prices\]\] to read/.test(JS), "step 5 says the MILP returns no duals");
+  ok(/treeProven\(S0\.T\)/.test(JS) && /if \(v && v\.proven\)/.test(JS), "step 5 names the tree's plan proved, and step 4 says proven, only after treeProven");
   // fixed numbers in the step cards' script text, each backed by a check above
   [["Peaker, \" + hh(L.edit[0])", JSON.stringify(LS.edit) === "[15,16,17,18,19,20,21,22,23]"], ["2²⁴ on/off patterns", true], ["minimum output", F.pk.min === 30]].forEach(([s, c]) => ok(JS.indexOf(s) >= 0 && c, "step text " + JSON.stringify(s)));
   // sidecar glossary and notebook
   ["lp-relaxation", "lower-bound", "branch-and-bound", "minimum-stable-output", "start-up-cost", "no-load-cost", "minimum-run-time", "conditional-price", "uplift"].forEach(id => ok(SIDE.indexOf("id: " + id) >= 0, "sidecar defines " + id));
   ok(SIDE.indexOf("portion of the cost") < 0, "sidecar: uplift definition in our own words");
-  ["159500", "168975", "173200", "185900", "9200", "2140", "430300", "[168975, 169510, 169735, 170575, 171415, 173200]"].forEach(s => ok(NB.indexOf(s) >= 0, "notebook asserts " + s));
+  ["159500", "168975", "173200", "185900", "9200", "430300", "[168975, 169510, 169735, 170575, 171415, 173200]", "1700, 2340", "3000, 1280", "16900 / 2960", "max(0, t - UT_g + 1)"].forEach(s => ok(NB.indexOf(s) >= 0, "notebook has " + s));
+  ok(NB.indexOf("2140") < 0 && NB.indexOf("Minimum run and down times count within this day only") >= 0, "notebook: no $2,140 jump; run times within the day");
 
   console.log(`${checks - fails} of ${checks} checks passed`);
   process.exit(fails ? 1 : 0);

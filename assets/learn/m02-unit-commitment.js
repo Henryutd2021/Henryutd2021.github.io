@@ -15,17 +15,24 @@
 //               dispatch LP  0 <= p[g,t] <= Pmax_g                                   (M1's model, no switches)
 //               switches     Pmin_g u[g,t] <= p[g,t] <= Pmax_g u[g,t]                (minimum output)
 //                            v[g,t] - w[g,t] = u[g,t] - u[g,t-1], u[g,-1] = initial state (cc on, pk off)
-//                            sum_{tau = t-UT_g+1..t} v[g,tau] <= u[g,t]              (minimum run time)
-//                            sum_{tau = t-DT_g+1..t} w[g,tau] <= 1 - u[g,t]          (minimum down time)
+//                            sum_{tau = max(0, t-UT_g+1)..t} v[g,tau] <= u[g,t]      (minimum run time)
+//                            sum_{tau = max(0, t-DT_g+1)..t} w[g,tau] <= 1 - u[g,t]  (minimum down time)
 //                            u[cc,23] = 1 (the combined-cycle plant is on before and after the day)
 //                            u binary (the mixed-integer program) or 0 <= u <= 1 (the LP relaxation)
+//               Run and down times count within this day only: a start at 23:00 owes no hour after midnight, and the
+//               states before the day are assumed to have lasted long enough (no history before hour 0). The page says so.
 // A mixed-integer solve returns no duals. Prices come from the LP with every switch fixed at the MILP's value
 // (LX.solver.fixAndReprice): they are conditional on that commitment, and settle() shows what they leave unpaid
-// (start-up, no-load and minimum-output costs: the uplift, or make-whole payment).
+// (start-up, no-load and minimum-output costs: the uplift, or make-whole payment). The day's best cost as demand is
+// added at 23:00 is continuous here (unserved energy is allowed, at the penalty) but not convex: its slope rises from
+// $40 to $3,000/MWh and falls back to $40/MWh once the peaker stays on, which no LP's cost curve can do (step 6).
 // Branch and bound (Tree*): every node is the LP relaxation with some switches fixed; rules stated on the page: open
 // the node with the lowest bound (ties: the older node), branch on the switch closest to half on (ties: the earlier hour,
-// then the combined-cycle plant), solve both children ("off" first). The lesson's instance has unique LP solutions at
-// every node (the test checks it by perturbing costs), so the notebook's SciPy/HiGHS rebuilds the same tree.
+// then the combined-cycle plant), solve both children ("off" first). A node whose LP fails (time limit, solver error)
+// stays unresolved with its parent's bound and can be retried; optimality is claimed only when no node is open,
+// pending or unresolved (treeProven). The test ranges every switch over each node's optimal face: the switch values are
+// unique, so an exact LP solver makes the same branching choices. That the notebook's SciPy/HiGHS grows the same tree
+// is an expectation its assert cells check, not a guarantee across solver versions (tolerances differ).
 //
 // Every number the page states is produced by this model and checked by _tests/learn/test_m02-unit-commitment.js.
 // Lesson-local components (candidates to promote): SwitchBoard (on/off switches of several units over 24 hours, with
@@ -138,16 +145,27 @@
   // ---- branch and bound, one branching at a time. The page solves the pending nodes with LX.solver (asynchronously),
   //      the test with core.solveWith; both call treeAccept in node order.
   function tree(D, o) {
-    return { D: D, o: o || {}, nodes: [{ id: 0, parent: null, fix: {}, depth: 0, status: "pending" }], inc: null, seq: 0, branchings: 0, log: [] };
+    return { D: D, o: o || {}, nodes: [{ id: 0, parent: null, fix: {}, depth: 0, status: "pending" }], inc: null, seq: 0, branchings: 0, solved: 0, log: [] };
   }
   function treePending(T) {
     return T.nodes.filter(function (n) { return n.status === "pending"; }).map(function (n) {
       return { id: n.id, model: build(T.D, { onoff: true, relax: true, rules: T.o.rules, fix: n.fix }) };
     });
   }
+  // a node's LP result. Only "optimal" and "infeasible" resolve a node. Any other result (a time limit, an iteration
+  // limit, a solver error) leaves it unresolved ("error"): it keeps its parent's bound, which is still a valid lower
+  // bound for every plan below it, so the best bound and the gap stay honest until treeRetry and a new solve resolve it.
   function treeAccept(T, id, r) {
     var n = T.nodes[id];
-    if (!r || !r.ok) { n.status = r && /infeasible/.test(r.status) ? "infeasible" : "error"; n.bound = null; n.why = r ? r.status : "none"; return n; }
+    n.tries = (n.tries || 0) + 1;
+    if (!r || !r.ok) {
+      n.why = r ? r.status : "none";
+      if (r && r.status === "infeasible") { T.solved++; n.status = "infeasible"; n.bound = null; n.inherited = false; return n; }
+      n.status = "error"; n.inherited = true; n.bound = n.parent == null ? null : T.nodes[n.parent].bound;
+      if (T.inc && n.bound != null && n.bound >= T.inc.bound - TOL) { n.status = "pruned"; n.prunedBy = T.inc.id; }
+      return n;
+    }
+    T.solved++; n.inherited = false; n.why = null;
     n.bound = r6(r.objective); n.frac = fractional(T.D, r.values); n.u = {}; n.p = {}; n.shed = 0;
     for (var t = 0; t < H(T.D); t++) {
       GAS.forEach(function (g) { n.u["u_" + g + "_" + t] = r6(r.values["u_" + g + "_" + t]); n.p["p_" + g + "_" + t] = r6(r.values["p_" + g + "_" + t]); });
@@ -160,14 +178,21 @@
       if (!T.inc || n.bound < T.inc.bound - TOL) {
         if (T.inc) T.inc.status = "integer";
         T.inc = n; n.status = "best";
-        T.nodes.forEach(function (m) { if ((m.status === "open" || m.status === "integer") && m.id !== n.id && m.bound >= n.bound - TOL) { if (m.status === "open") { m.status = "pruned"; m.prunedBy = n.id; } } });
+        // a new best plan prunes every open or unresolved node whose bound cannot beat it
+        T.nodes.forEach(function (m) { if ((m.status === "open" || m.status === "error") && m.id !== n.id && m.bound != null && m.bound >= n.bound - TOL) { m.status = "pruned"; m.prunedBy = n.id; } });
       }
       return n;
     }
     n.status = "open"; return n;
   }
   function treeOpen(T) { return T.nodes.filter(function (n) { return n.status === "open"; }); }
-  function treeDone(T) { return !T.nodes.some(function (n) { return n.status === "open" || n.status === "pending"; }); }
+  function treeFailed(T) { return T.nodes.filter(function (n) { return n.status === "error"; }); }
+  // done: nothing open, nothing waiting for a solve, nothing unresolved
+  function treeDone(T) { return !T.nodes.some(function (n) { return n.status === "open" || n.status === "pending" || n.status === "error"; }); }
+  // proven: done, with a best plan, and the best bound equals it (gap 0)
+  function treeProven(T) { return treeDone(T) && !!T.inc && treeGap(T) != null && treeGap(T) <= TOL; }
+  // put every unresolved node back in the queue; returns how many
+  function treeRetry(T) { var k = 0; T.nodes.forEach(function (n) { if (n.status === "error") { n.status = "pending"; k++; } }); return k; }
   function pickNode(T) { var b = null; treeOpen(T).forEach(function (n) { if (!b || n.bound < b.bound - TOL) b = n; }); return b; }
   function pickSwitch(frac) {
     var b = null;
@@ -186,19 +211,25 @@
     });
     return { node: n, on: f, kids: kids };
   }
-  // the best bound still possible: the lowest bound of the open nodes, or the best plan's cost when none is open
+  // the best bound still possible: the lowest bound of every node not yet resolved (open, waiting for its solve, or
+  // unresolved after a failed solve: those two count with their parent's bound), or the best plan's cost when none is
+  // left. null while an unresolved node has no bound at all (the root before its first successful solve).
   function treeBound(T) {
-    var b = T.inc ? T.inc.bound : Infinity;
-    T.nodes.forEach(function (n) { if (n.status === "open") b = Math.min(b, n.bound); });
-    return b;
+    var b = T.inc ? T.inc.bound : Infinity, none = false;
+    T.nodes.forEach(function (n) {
+      if (n.status !== "open" && n.status !== "pending" && n.status !== "error") return;
+      var nb = n.status === "open" || n.status === "error" ? n.bound : (n.parent == null ? null : T.nodes[n.parent].bound);
+      if (nb == null) none = true; else b = Math.min(b, nb);
+    });
+    return none ? null : b;
   }
-  function treeGap(T) { if (!T.inc) return null; var lb = treeBound(T); return r6((T.inc.bound - lb) / T.inc.bound); }
-  // a whole tree with a synchronous solve (Node tests, benchmark)
+  function treeGap(T) { if (!T.inc) return null; var lb = treeBound(T); if (lb == null) return null; return r6((T.inc.bound - lb) / T.inc.bound); }
+  // a whole tree with a synchronous solve (Node tests, benchmark); stops when nothing is left to branch
   function treeRun(D, o, solveFn) {
     var T = tree(D, o);
     function settleAll() { treePending(T).forEach(function (m) { treeAccept(T, m.id, solveFn(m.model)); }); }
     settleAll();
-    for (var k = 0; k < 200 && !treeDone(T); k++) { treeBranch(T); settleAll(); }
+    for (var k = 0; k < 200 && !treeDone(T); k++) { if (!treeBranch(T)) break; settleAll(); }
     return T;
   }
   // node layout: the "on" child straight below its parent, the "off" child one column to the left (moved further left
@@ -267,6 +298,28 @@
     });
     return out;
   }
+  // step 6: the demand added at the stair hour, 0 to lesson.stair.max MWh in steps of lesson.stair.step
+  function stairPoints(D) { var s = D.lesson.stair, out = []; for (var k = 0; k * s.step <= s.max + 1e-9; k++) out.push(r6(k * s.step)); return out; }
+  // the slope of each step, $ per MWh: pts = [{x, cost}] in order of x
+  function stairSlopes(pts) { var out = []; for (var k = 1; k < pts.length; k++) out.push(r6((pts[k].cost - pts[k - 1].cost) / (pts[k].x - pts[k - 1].x))); return out; }
+  // what step 6 says about the points solved so far, pts = [{x, cost, shed, pk}] from 0 up: {text, done}
+  function stairWords(D, pts) {
+    var cc = D.fleet.cc.cost, sl = stairSlopes(pts), k, full = null, shed = null, on = null;
+    for (k = 0; k < pts.length; k++) {
+      if (pts[k].shed > TOL && shed == null) shed = k;
+      if (pts[k].pk && on == null) on = k;
+      if (!(pts[k].shed > TOL) && !pts[k].pk) full = k;
+    }
+    var per = function (v) { return money(v) + "/MWh"; }, mwh = function (x) { return String(x) + " MWh"; };
+    if (on != null && on + 1 < pts.length) {
+      var hi = Math.max.apply(null, sl), after = sl[on];
+      return { done: after < hi - 1, text: "**Up to " + mwh(pts[full].x) + ":** " + per(sl[0]) + ". **Then** " + per(hi) + (shed != null ? ", unserved" : "") + ". **From " + mwh(pts[on].x) +
+        ":** the peaker stays on at " + hh(D.lesson.stair.hour) + ", and each MWh costs " + per(after) + " again. The slope fell, which it never does in a linear program." };
+    }
+    if (on != null) return { done: false, text: "At " + mwh(pts[on].x) + " the peaker stays on at " + hh(D.lesson.stair.hour) + ". Add one more step to see what the next MWh costs." };
+    if (shed != null) return { done: false, text: "From " + mwh(pts[full].x) + " the combined-cycle plant is full, so extra demand goes unserved, at " + per(sl[shed - 1]) + ". Keep adding." };
+    return { done: false, text: pts.length > 1 ? "So far each MWh costs " + per(cc) + ", the combined-cycle plant's running cost. Keep adding." : "Move the slider to add demand." };
+  }
 
   // ---------------------------------------------------------------- words the page says (pure, so the test can read them)
   function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
@@ -288,10 +341,23 @@
     if (n.parent == null) return "The relaxed day";
     return (n.by.g === "pk" ? "Peaker " : "Combined-cycle plant ") + (n.val ? "on" : "off") + " at " + hh(n.by.t);
   }
-  var STATUS = { open: "open", branched: "branched", pruned: "pruned", integer: "whole numbers", best: "best plan", infeasible: "infeasible", pending: "solving", error: "error" };
+  var STATUS = { open: "open", branched: "branched", pruned: "pruned", integer: "whole numbers", best: "best plan", infeasible: "infeasible", pending: "solving", error: "not solved" };
+  // what the page says once the tree has nothing left to branch: "proven optimal" only when treeProven(T); a node whose
+  // LP failed keeps the gap open and asks for a retry. Returns {text, proven} or null while the tree can still branch.
+  function treeVerdict(D, T) {
+    if (treeProven(T)) return { proven: true, text: T.branchings + " branchings, " + T.solved + " LPs. Best plan " + money(T.inc.bound) + ", peaker on " +
+      runs(D.day.demand.map(function (_, t) { return T.inc.u["u_pk_" + t] > 0.5 ? 1 : 0; })) + ". No node is left open or unsolved, so the gap is 0%: proven optimal." };
+    var bad = treeFailed(T);
+    if (!bad.length && (treeOpen(T).length || T.nodes.some(function (n) { return n.status === "pending"; }))) return null;
+    if (!bad.length) return { proven: false, text: "No plan meets every rule: every branch is infeasible." };
+    var lb = treeBound(T), g = treeGap(T);
+    return { proven: false, text: "Not proven: " + (bad.length === 1 ? "one node's LP" : bad.length + " nodes' LPs") + " did not finish (" + bad[0].why + "). Best plan " +
+      (T.inc ? money(T.inc.bound) : "none yet") + ", best bound " + (lb == null ? "unknown" : money(lb)) + (g != null ? ", gap " + (g * 100).toFixed(1) + "%" : "") + ". Press Retry." };
+  }
 
   var model = { GAS: GAS, ALL: ALL, dayOf: dayOf, need: need, build: build, size: size, read: read, fractional: fractional, belowMin: belowMin,
-    tree: tree, treePending: treePending, treeAccept: treeAccept, treeBranch: treeBranch, treeDone: treeDone, treeBound: treeBound, treeGap: treeGap,
+    tree: tree, treePending: treePending, treeAccept: treeAccept, treeBranch: treeBranch, treeDone: treeDone, treeProven: treeProven, treeRetry: treeRetry,
+    treeFailed: treeFailed, treeBound: treeBound, treeGap: treeGap, treeVerdict: treeVerdict, stairPoints: stairPoints, stairSlopes: stairSlopes, stairWords: stairWords,
     treeRun: treeRun, treeLayout: treeLayout, pickSwitch: pickSwitch, planFix: planFix, planBreaks: planBreaks, rounded: rounded, settle: settle,
     money: money, hh: hh, pct: pct, sw2: sw2, span: span, list: list, runs: runs, peakerWords: peakerWords, nodeLabel: nodeLabel, nodeLabelLong: nodeLabelLong, r6: r6 };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -344,6 +410,15 @@
       ".m2-rule .det{grid-column:1/-1;font-size:14.5px;color:var(--lx-ink-2)}",
       ".m2-sym{font-family:var(--lx-f-mono);font-size:13.5px;color:var(--lx-ink);overflow-x:auto;white-space:nowrap;display:block;padding:2px 0}",
       ".m2-sym i{font-family:var(--lx-f-body);font-style:italic;font-size:15px}",
+      ".m2-more{display:grid;gap:4px;margin-top:4px}",
+      ".m2-key{display:flex;flex-wrap:wrap;gap:2px 14px;margin:0;font-size:13.5px;color:var(--lx-ink-2)}",
+      ".m2-key>div{display:inline-flex;gap:4px;align-items:baseline;max-width:100%}",
+      ".m2-key dt{font-family:var(--lx-f-body);font-style:italic;color:var(--lx-ink);margin:0;white-space:nowrap}",
+      ".m2-key dt::after{content:':';font-style:normal}",
+      ".m2-key dd{margin:0}",
+      ".m2-key .ul{text-decoration:underline}.m2-key .ol{text-decoration:overline}",
+      ".m2-bound{margin:0;font-size:13.5px;color:var(--lx-ink-3)}",
+      ".m2-brules{margin:0;padding-left:1.2rem;font-size:14.5px;display:grid;gap:2px;max-width:62ch}",
       // plan editor (step 3)
       ".m2-edit{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;max-width:520px}",
       ".m2-tg{min-height:44px;border-radius:9px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);font:inherit;font-family:var(--lx-f-mono);font-size:13px;cursor:pointer;padding:2px 0;display:grid;place-items:center;line-height:1.1}",
@@ -366,6 +441,7 @@
       ".m2-tree .nd.integer rect{stroke:var(--lx-warn)}",
       ".m2-tree .nd.best rect{stroke:var(--lx-good);stroke-width:3}",
       ".m2-tree .nd.pending rect{stroke:var(--lx-line);stroke-dasharray:2 3}",
+      ".m2-tree .nd.error rect{stroke:var(--lx-bad);stroke-dasharray:4 3;stroke-width:2}",
       ".m2-tree .nd.sel rect{stroke:var(--lx-accent);stroke-width:3}",
       ".m2-tree .nd:focus{outline:none}.m2-tree .nd:focus rect{stroke:var(--lx-accent);stroke-width:3}",
       ".m2-tree path{stroke:var(--lx-line-2);stroke-width:1.5}",
@@ -478,6 +554,11 @@
     return { render: render };
   }
 
+  // a node's state in words: "$169,510, branched" or "not solved (time-limit); its parent's bound, $171,415, still counts"
+  function nodeState(n) {
+    if (n.status === "error") return "not solved (" + n.why + ")" + (n.bound != null ? "; its parent's bound, " + money(n.bound) + ", still counts" : "; no bound yet");
+    return (n.bound != null ? (n.inherited ? "at least " : "") + money(n.bound) + ", " : "") + STATUS[n.status] + (n.shed > TOL ? ", " + Math.round(n.shed) + " MWh unserved" : "");
+  }
   // ---- the branch-and-bound tree: nodes in a grid ("on" below, "off" to the left), tap or Tab to a node to read it
   function TreeView(host, o) {
     var w = E("div", { class: "m2-tree" }, host), svgHost = E("div", null, w), sel = null, T = null;
@@ -499,19 +580,19 @@
       T.nodes.forEach(function (n) {
         var p = xy(n.id), st = n.status;
         var g = S("g", { class: "nd " + st + (sel === n.id ? " sel" : ""), transform: "translate(" + p[0] + "," + p[1] + ")", tabindex: "0", role: "button",
-          "aria-label": nodeLabelLong(n) + ": " + (n.bound != null ? money(n.bound) + ", " : "") + STATUS[st] + (n.shed > TOL ? ", " + Math.round(n.shed) + " MWh unserved" : "") }, svg);
+          "aria-label": nodeLabelLong(n) + ": " + nodeState(n) }, svg);
         S("rect", { width: RW, height: BH, rx: 9 }, g);
         var t1 = S("text", { x: 9, y: 18 }, g); t1.textContent = nodeLabel(n);
-        var t2 = S("text", { x: 9, y: 36, class: "b" }, g); t2.textContent = n.bound != null ? money(n.bound) : st === "pending" ? "solving…" : "–";
-        var mk = st === "best" ? "★ best" : st === "pruned" ? "✕ pruned" : st === "integer" ? "✓ whole" : st === "branched" ? "↓" : st === "open" ? "open" : "";
+        var t2 = S("text", { x: 9, y: 36, class: "b" }, g); t2.textContent = n.bound != null ? (n.inherited ? "≥ " : "") + money(n.bound) : st === "pending" ? "solving…" : "–";
+        var mk = st === "best" ? "★ best" : st === "pruned" ? "✕ pruned" : st === "integer" ? "✓ whole" : st === "branched" ? "↓" : st === "open" ? "open" : st === "error" ? "! retry" : "";
         var t3 = S("text", { x: RW - 8, y: 36, class: "mk", "text-anchor": "end" }, g); t3.textContent = mk;
         g.addEventListener("click", function () { select(n.id); });
         g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(n.id); } });
       });
       ol.innerHTML = "";
       T.nodes.forEach(function (n) {
-        E("li", { text: nodeLabelLong(n) + (n.parent != null ? " (under node " + (n.parent + 1) + ")" : "") + ": " + (n.bound != null ? money(n.bound) + ", " : "") + STATUS[n.status] +
-          (n.shed > TOL ? ", " + Math.round(n.shed) + " MWh unserved" : "") + (n.on ? ", branched on the " + (n.on.g === "pk" ? "peaker" : "combined-cycle plant") + " at " + hh(n.on.t) + " (" + sw2(n.on.x) + ")" : "") + "." }, ol);
+        E("li", { text: nodeLabelLong(n) + (n.parent != null ? " (under node " + (n.parent + 1) + ")" : "") + ": " + nodeState(n) +
+          (n.on ? ", branched on the " + (n.on.g === "pk" ? "peaker" : "combined-cycle plant") + " at " + hh(n.on.t) + " (" + sw2(n.on.x) + ")" : "") + "." }, ol);
       });
     }
     function select(id) {
@@ -525,13 +606,14 @@
   // what a node says in words (the tree's reading panel)
   function nodeWords(D, T, n) {
     var lines = [];
-    var head = "<b>" + LX.esc(nodeLabelLong(n)) + "</b>" + (n.bound != null ? ": " + money(n.bound) : "") + " · " + STATUS[n.status];
+    var head = "<b>" + LX.esc(nodeLabelLong(n)) + "</b>" + (n.bound != null ? ": " + (n.inherited ? "at least " : "") + money(n.bound) : "") + " · " + STATUS[n.status];
     lines.push(head);
     var fx = Object.keys(n.fix).map(function (k) { var m = /^u_(cc|pk)_(\d+)$/.exec(k); return (m[1] === "pk" ? "peaker " : "CC ") + (n.fix[k] ? "on" : "off") + " at " + hh(+m[2]); });
     if (fx.length) lines.push("Fixed: " + LX.esc(fx.join(", ")) + ".");
     if (n.shed > TOL) lines.push(Math.round(n.shed) + " MWh unserved, at " + money(D.penalty) + " per MWh.");
     if (n.frac && n.frac.length) lines.push("Still between 0 and 1: " + LX.esc(n.frac.map(function (f) { return (f.g === "pk" ? "" : "CC ") + hh(f.t) + " " + sw2(f.x); }).join(", ")) + ".");
-    if (n.status === "pruned") lines.push("Pruned: its bound is no better than the best plan, " + money(T.nodes[n.prunedBy].bound) + ".");
+    if (n.status === "error") lines.push("Its LP did not finish (" + LX.esc(n.why) + "). Until it is solved, its parent's bound, " + (n.bound != null ? money(n.bound) : "none") + ", stays in the best bound: press Retry.");
+    if (n.status === "pruned") lines.push((n.inherited ? "Pruned without its LP: its parent's bound" : "Pruned: its bound") + " is no better than the best plan, " + money(T.nodes[n.prunedBy].bound) + ".");
     if (n.status === "best") lines.push("Every switch is 0 or 1: the best plan so far.");
     if (n.status === "integer") lines.push("Every switch is 0 or 1, but a cheaper plan was found.");
     return lines;
@@ -554,13 +636,18 @@
       S0.milpModel = build(D, { onoff: true });
       return LX.solver.solve(S0.milpModel, { timeLimit: 10, label: "m2" }).then(function (r) { if (r.ok) { S0.milp = read(D, { onoff: true }, r); S0.milp._r = r; } return S0.milp; });
     }
+    // each rule: its name and words (glossary marks), its symbols (shown once added) and a key to every new symbol
     var RULES = [
-      { id: "startup", name: "Start-up and no-load costs", words: "Starting costs $" + D.fleet.pk.startup.toLocaleString("en-US") + " for the peaker, $" + D.fleet.cc.startup.toLocaleString("en-US") + " for the combined-cycle plant; each costs $" + D.fleet.pk.noload + " for every hour it is on.",
-        sym: "+&nbsp;<i>NL</i>&thinsp;<i>u</i>" + "<sub><i>g,t</i></sub>&nbsp;+&nbsp;<i>SU</i>&thinsp;<i>v</i><sub><i>g,t</i></sub>&nbsp;&nbsp;with&nbsp;&nbsp;<i>v</i><sub><i>g,t</i></sub>&nbsp;&minus;&nbsp;<i>w</i><sub><i>g,t</i></sub>&nbsp;=&nbsp;<i>u</i><sub><i>g,t</i></sub>&nbsp;&minus;&nbsp;<i>u</i><sub><i>g,t</i>&minus;1</sub>" },
-      { id: "pmin", name: "Minimum output", words: "When on, the peaker makes at least " + D.fleet.pk.min + " MW, the combined-cycle plant at least " + D.fleet.cc.min + " MW.",
-        sym: "<i>P&#818;</i><sub><i>g</i></sub>&thinsp;<i>u</i><sub><i>g,t</i></sub>&nbsp;&le;&nbsp;<i>p</i><sub><i>g,t</i></sub>&nbsp;&le;&nbsp;<i>P&#772;</i><sub><i>g</i></sub>&thinsp;<i>u</i><sub><i>g,t</i></sub>" },
-      { id: "minrun", name: "Minimum run and down times", words: "Once started, the peaker runs at least " + D.fleet.pk.up + " hours; once stopped, it stays off " + D.fleet.pk.down + " hours (the combined-cycle plant: " + D.fleet.cc.up + " and " + D.fleet.cc.down + ").",
-        sym: "&sum;<sub>&tau;=<i>t</i>&minus;<i>UT</i>+1..<i>t</i></sub>&nbsp;<i>v</i><sub><i>g,&tau;</i></sub>&nbsp;&le;&nbsp;<i>u</i><sub><i>g,t</i></sub>" }
+      { id: "startup", name: "[[start-up-cost|Start-up]] and [[no-load-cost|no-load costs]]", words: "Starting costs $" + D.fleet.pk.startup.toLocaleString("en-US") + " for the peaker, $" + D.fleet.cc.startup.toLocaleString("en-US") + " for the combined-cycle plant; each costs $" + D.fleet.pk.noload + " for every hour it is on.",
+        sym: "+&nbsp;<i>NL</i>&thinsp;<i>u</i>" + "<sub><i>g,t</i></sub>&nbsp;+&nbsp;<i>SU</i>&thinsp;<i>v</i><sub><i>g,t</i></sub>&nbsp;&nbsp;with&nbsp;&nbsp;<i>v</i><sub><i>g,t</i></sub>&nbsp;&minus;&nbsp;<i>w</i><sub><i>g,t</i></sub>&nbsp;=&nbsp;<i>u</i><sub><i>g,t</i></sub>&nbsp;&minus;&nbsp;<i>u</i><sub><i>g,t</i>&minus;1</sub>",
+        key: [["g, t", "gas plant, hour"], ["u", "the switch, 1 on and 0 off"], ["v, w", "1 in the hour of a start, a stop"], ["NL", "no-load cost, $ per hour on"], ["SU", "start-up cost, $ per start"]] },
+      { id: "pmin", name: "[[minimum-stable-output|Minimum output]]", words: "When on, the peaker makes at least " + D.fleet.pk.min + " MW, the combined-cycle plant at least " + D.fleet.cc.min + " MW.",
+        sym: "<i>P&#818;</i><sub><i>g</i></sub>&thinsp;<i>u</i><sub><i>g,t</i></sub>&nbsp;&le;&nbsp;<i>p</i><sub><i>g,t</i></sub>&nbsp;&le;&nbsp;<i>P&#772;</i><sub><i>g</i></sub>&thinsp;<i>u</i><sub><i>g,t</i></sub>",
+        key: [["p", "output, MW"], ["<span class=\"ul\">P</span>", "minimum output, MW"], ["<span class=\"ol\">P</span>", "size, MW"]] },
+      { id: "minrun", name: "[[minimum-run-time|Minimum run]] and [[minimum-down-time|down times]]", words: "Once started, the peaker runs at least " + D.fleet.pk.up + " hours; once stopped, it stays off at least " + D.fleet.pk.down + " hours (the combined-cycle plant: " + D.fleet.cc.up + " and " + D.fleet.cc.down + ").",
+        sym: "&sum;<sub>&tau;=max(0,&thinsp;<i>t</i>&minus;<i>UT</i>+1)..<i>t</i></sub>&nbsp;<i>v</i><sub><i>g,&tau;</i></sub>&nbsp;&le;&nbsp;<i>u</i><sub><i>g,t</i></sub>",
+        key: [["UT", "minimum run time, hours"], ["τ", "each of the last UT hours up to t, none before the day's first hour"], ["DT", "minimum down time: the same rule for stops w, with 1 − u on the right"]],
+        bound: "Counted within this day only: a start at 23:00 owes no hour after midnight, and the states before the day are assumed to have lasted long enough." }
     ];
 
     var steps = [
@@ -586,19 +673,26 @@
           });
         } },
       // 2 add the rules; the LP relaxation
-      { text: "Real gas plants are on or off. Add the three rules of a [[unit-commitment|unit commitment]], one at a time. A linear program can only let each switch slide between 0 and 1: its [[lp-relaxation|relaxation]].",
+      { text: "Real gas plants are on or off. Add the three rules of a [[unit-commitment|unit commitment]], one at a time.",
         build: function (act, api) {
           var list = E("div", { class: "m2-rules", role: "group", "aria-label": "The three rules, added in order" }, act);
+          E("p", { class: "m2-tag", html: LX.rich("A linear program can only let each switch slide from 0 to 1: the [[lp-relaxation|relaxation]]. Hatched cells are partly on.") }, act);
           var kp = E("div", { class: "m2-kpis", "aria-live": "polite" }, act), st = status(act);
           var board = SwitchBoard(E("div", null, act), { D: D, sel: L.focus });
           var added = 0, btns = [];
           RULES.forEach(function (r, i) {
             var c = E("div", { class: "m2-rule" }, list);
-            E("span", { class: "nm", text: r.name }, c);
-            var b = E("button", { type: "button", class: "lx-btn small ghost", text: "Add" }, c);
-            var det = E("div", { class: "det" }, c); det.innerHTML = LX.esc(r.words) + "<span class=\"m2-sym\" hidden>" + r.sym + "</span>";
+            E("span", { class: "nm", html: LX.rich(r.name) }, c);
+            var plain = r.name.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1");
+            var b = E("button", { type: "button", class: "lx-btn small ghost", text: "Add", "aria-label": "Add: " + plain }, c);
+            var det = E("div", { class: "det" }, c); det.innerHTML = LX.esc(r.words);
+            var more = E("div", { class: "m2-more", hidden: true }, det);
+            E("span", { class: "m2-sym", html: r.sym }, more);
+            var key = E("dl", { class: "m2-key", "aria-label": "Symbols in this rule" }, more);
+            r.key.forEach(function (k) { var pr = E("div", null, key); E("dt", { html: k[0] }, pr); E("dd", { text: k[1] }, pr); });
+            if (r.bound) E("p", { class: "m2-bound", text: r.bound }, more);
             b.disabled = i > 0;
-            btns.push({ b: b, c: c, det: det });
+            btns.push({ b: b, c: c, det: det, more: more, plain: plain });
             b.addEventListener("click", function () { add(i); });
           });
           var SAY = {
@@ -616,7 +710,7 @@
               if (!x.day.ok) { btns[i].b.disabled = false; return; }
               var prev = i === 0 ? xs[0].cost : S0.relax[i - 1].cost;
               S0.relax[i] = x.day; added = i + 1;
-              btns[i].c.classList.add("added"); btns[i].b.textContent = "Added"; btns[i].det.querySelector(".m2-sym").hidden = false;
+              btns[i].c.classList.add("added"); btns[i].b.textContent = "Added"; btns[i].b.setAttribute("aria-label", "Added: " + btns[i].plain); btns[i].more.hidden = false;
               if (btns[i + 1]) { btns[i + 1].b.disabled = false; }
               kp.innerHTML = ""; kpi(kp, "Relaxed cost", money(x.day.cost)); kpi(kp, "Peaker switch at " + hh(L.focus), sw2(x.day.hours[L.focus].u.pk), "warn");
               board.set(x.day); board.pick(L.focus);
@@ -625,7 +719,7 @@
               if (added === RULES.length) { S0.relaxAll = x.day; api.done(); }
             });
           }
-          if (S0.relaxAll) { for (var k = 0; k < RULES.length; k++) { btns[k].c.classList.add("added"); btns[k].b.textContent = "Added"; btns[k].b.disabled = true; btns[k].det.querySelector(".m2-sym").hidden = false; } added = RULES.length; board.set(S0.relaxAll); kpi(kp, "Relaxed cost", money(S0.relaxAll.cost)); api.done(); }
+          if (S0.relaxAll) { for (var k = 0; k < RULES.length; k++) { btns[k].c.classList.add("added"); btns[k].b.textContent = "Added"; btns[k].b.setAttribute("aria-label", "Added: " + btns[k].plain); btns[k].b.disabled = true; btns[k].more.hidden = false; } added = RULES.length; board.set(S0.relaxAll); kpi(kp, "Relaxed cost", money(S0.relaxAll.cost)); api.done(); }
         } },
       // 3 the learner's own commitment
       { text: "Why not round? Set the peaker's switches yourself, or start from the relaxation's, rounded. The combined-cycle plant stays on all day. Find a plan with nothing unserved.",
@@ -681,11 +775,15 @@
           paint(); run();
         } },
       // 4 branch and bound
-      { text: "[[branch-and-bound|Branch and bound]] proves it. Solve the relaxation, pick the switch nearest half on, and split it: off, or on. Each node's cost is a [[lower-bound|lower bound]] for every plan below it.",
+      { text: "[[branch-and-bound|Branch and bound]] proves it. Press Branch: the switch nearest half on is split into off and on, and both are solved.",
         build: function (act, api) {
+          var how = E("ol", { class: "m2-brules", "aria-label": "How to read the tree" }, act);
+          ["Each node's cost is a [[lower-bound|lower bound]] for every plan below it.", "A node no cheaper than the best plan is pruned.",
+            "The open node with the lowest bound is split next."].forEach(function (s) { E("li", { html: LX.rich(s) }, how); });
           var row = E("div", { class: "m2-row" }, act);
           var go = E("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Branch" }, row);
-          var fin = E("button", { type: "button", class: "lx-btn small ghost", text: "Finish the tree" }, row), st = status(row);
+          var fin = E("button", { type: "button", class: "lx-btn small ghost", text: "Finish the tree" }, row);
+          var re = E("button", { type: "button", class: "lx-btn small ghost", text: "Retry the unsolved node", hidden: true }, row), st = status(row);
           var kp = E("div", { class: "m2-kpis", "aria-live": "polite" }, act);
           var box = E("div", { class: "m2-treebox" }, act), view, panel = E("div", { class: "m2-tread", "aria-live": "polite" }, null);
           view = TreeView(box, { label: "Branch-and-bound tree for the peaker's switches", onPick: function (n) { readNode(n); } });
@@ -695,51 +793,74 @@
           function readNode(n) { panel.innerHTML = ""; nodeWords(D, T, n).forEach(function (s) { E("p", { html: s }, panel); }); }
           function kpis() {
             kp.innerHTML = "";
-            kpi(kp, "Best bound", money(treeBound(T) === Infinity ? T.nodes[0].bound || 0 : treeBound(T)));
+            var lb = treeBound(T), g = treeGap(T);
+            kpi(kp, "Best bound", lb == null || !isFinite(lb) ? "–" : money(lb));
             kpi(kp, "Best plan", T.inc ? money(T.inc.bound) : "none yet", T.inc ? "good" : null);
-            kpi(kp, "Gap", T.inc ? (treeGap(T) * 100).toFixed(1) + "%" : "–");
-            kpi(kp, "LPs solved", String(T.nodes.filter(function (n) { return n.bound != null; }).length));
+            kpi(kp, "Gap", g == null ? "–" : (g * 100).toFixed(1) + "%", treeFailed(T).length ? "bad" : null);
+            kpi(kp, "LPs solved", String(T.solved));
+          }
+          // Branch needs an open node; Finish also waits for a solve under way; Retry shows while a node is unresolved
+          function controls() {
+            var open = treeOpen(T).length > 0, pend = T.nodes.some(function (n) { return n.status === "pending"; });
+            go.disabled = busy || !open; fin.disabled = !open && !pend; re.hidden = !treeFailed(T).length; re.disabled = busy;
+          }
+          // S0.failAt (demo state "tree-fail" only) turns that node solve into a time limit, to show what the page does then
+          function solveNode(m) {
+            S0.nodeSolves = (S0.nodeSolves || 0) + 1;
+            if (S0.failAt === S0.nodeSolves) return Promise.resolve({ status: "time-limit", ok: false, objective: null, values: null });
+            return LX.solver.solve(m.model, { timeLimit: 5, label: "m2" });
           }
           function settleAll() {
             var pend = treePending(T);
             if (!pend.length) return Promise.resolve();
             st.set(LX.solver.mode ? "solving" : "loading");
-            return Promise.all(pend.map(function (m) { return LX.solver.solve(m.model, { timeLimit: 5, label: "m2" }); })).then(function (rs) {
-              rs.forEach(function (r, k) { treeAccept(T, pend[k].id, r); }); st.set(rs[rs.length - 1]);
+            return Promise.all(pend.map(solveNode)).then(function (rs) {
+              rs.forEach(function (r, k) { treeAccept(T, pend[k].id, r); });
+              st.set(rs.filter(function (r) { return !r.ok && r.status !== "infeasible"; })[0] || rs[rs.length - 1]);
             });
           }
+          function kidWords(n) {
+            if (n.status === "error") return "not solved (" + n.why + ")";
+            if (n.status === "infeasible") return "infeasible";
+            return money(n.bound) + (n.shed > TOL ? ", " + Math.round(n.shed) + " MWh unserved" : "") + (n.status === "best" ? ": every switch whole, the best plan so far" :
+              n.status === "integer" ? ", every switch whole" : n.status === "open" ? ", still fractional" : n.status === "pruned" ? ", pruned" : "");
+          }
+          // what the tree says now: the last split, then the verdict once nothing is left to branch ("proven" only if treeProven)
           function after(br) {
-            view.draw(T); kpis();
+            view.draw(T); kpis(); controls();
             if (br) {
-              var off = T.nodes[br.kids[0].id], on = T.nodes[br.kids[1].id], at = hh(br.on.t);
-              view.select(on.id);
-              var whole = function (n) { return n.status === "best" || n.status === "integer"; };
-              var say = "Split the peaker at " + at + " (" + sw2(br.on.x) + "). **Off:** " + money(off.bound) + (off.shed > TOL ? ", " + Math.round(off.shed) + " MWh unserved" : "") + (whole(off) ? ", every switch whole" : off.status === "open" ? ", still fractional" : "") +
-                ". **On:** " + money(on.bound) + (on.shed > TOL ? ", " + Math.round(on.shed) + " MWh unserved" : "") + (on.status === "best" ? ": every switch whole, the best plan so far" : on.status === "open" ? ", still fractional" : "") + ".";
-              api.saw(say);
+              view.select(br.kids[1].id);
+              api.saw("Split the peaker at " + hh(br.on.t) + " (" + sw2(br.on.x) + "). **Off:** " + kidWords(T.nodes[br.kids[0].id]) + ". **On:** " + kidWords(T.nodes[br.kids[1].id]) + ".");
             }
-            if (treeDone(T)) {
-              go.disabled = true; fin.disabled = true;
-              remember("tree", { lps: T.nodes.length, branchings: T.branchings, best: T.inc.bound, root: T.nodes[0].bound });
-              api.done();
-              api.saw(T.branchings + " branchings, " + T.nodes.length + " LPs. Best plan " + money(T.inc.bound) + ", peaker on " + runs(D.day.demand.map(function (_, t) { return T.inc.u["u_pk_" + t] > 0.5 ? 1 : 0; })) + ". No open node is left, so the gap is 0%: proven optimal.");
-            }
+            var v = treeVerdict(D, T);
+            if (v && v.proven) {
+              remember("tree", { lps: T.solved, branchings: T.branchings, best: T.inc.bound, root: T.nodes[0].bound });
+              api.done(); api.saw(v.text);
+            } else if (v) api.saw(v.text, true);
+            else if (!br) { var r0 = T.nodes[0]; if (T.nodes.length === 1 && r0.frac) api.saw("The root: " + money(r0.bound) + ", with " + r0.frac.length + " switches between 0 and 1. No plan with whole switches can cost less. Press Branch.", true); }
           }
           function step() {
-            if (busy || treeDone(T)) return Promise.resolve();
-            busy = true; api.busy(true);
+            if (busy || !treeOpen(T).length) return Promise.resolve(false);
+            busy = true; api.busy(true); controls();
             var br = treeBranch(T); view.draw(T);
-            return settleAll().then(function () { busy = false; api.busy(false); after(br); });
+            return settleAll().then(function () { busy = false; api.busy(false); after(br); return true; });
           }
           go.addEventListener("click", function () { step(); });
           fin.addEventListener("click", function () {
-            (function loop() { if (treeDone(T)) return; step().then(function () { if (!treeDone(T)) setTimeout(loop, LX.reduced() ? 0 : 350); }); })();
+            (function loop() {
+              if (busy) { setTimeout(loop, 120); return; }   // a solve is under way (the first one loads the solver): wait for it
+              step().then(function (more) { if (more && treeOpen(T).length) setTimeout(loop, LX.reduced() ? 0 : 350); });
+            })();
+          });
+          re.addEventListener("click", function () {
+            if (busy || !treeRetry(T)) return;
+            busy = true; api.busy(true); controls(); view.draw(T);
+            settleAll().then(function () { busy = false; api.busy(false); after(null); var f = T.nodes.filter(function (n) { return n.tries > 1; }).pop(); if (f) view.select(f.id); });
           });
           if (T.nodes[0].status === "pending") {
-            busy = true; api.busy(true);
-            settleAll().then(function () { busy = false; api.busy(false); view.draw(T); kpis(); view.select(0); var r0 = T.nodes[0];
-              api.saw("The root: " + money(r0.bound) + ", with " + r0.frac.length + " switches between 0 and 1. No plan with whole switches can cost less. Press Branch.", true); });
-          } else { view.draw(T); kpis(); if (treeDone(T)) { go.disabled = true; fin.disabled = true; api.done(); } }
+            busy = true; api.busy(true); controls();
+            settleAll().then(function () { busy = false; api.busy(false); after(null); view.select(0); });
+          } else { view.draw(T); kpis(); controls(); var v0 = treeVerdict(D, T); if (v0 && v0.proven) api.done(); }
         } },
       // 5 ask HiGHS for the mixed-integer program
       { text: function () { var z = size(build(D, { onoff: true })); return "Now hand the whole problem to HiGHS as a [[mixed-integer-program|mixed-integer program]]: " + z.vars + " decisions and " + z.rows + " rules, " + z.switches + " switches that must be 0 or 1."; },
@@ -758,65 +879,73 @@
             needMILP().then(function (d) {
               api.busy(false); if (!d) { st.set("error"); return; }
               var r = d._r; st.set(r); show(r); api.done();
-              var tr = S0.T && S0.T.inc ? (Math.abs(S0.T.inc.bound - d.cost) < 0.5 ? ", the plan your tree proved" : "") : "";
-              api.saw("Optimal: " + money(d.cost) + ", gap " + (r.mipGap != null ? (r.mipGap * 100).toFixed(2) : "0.00") + "%" + tr + ". " + peakerWords(d.hours.map(function (h) { return Math.round(h.u.pk); })) + ". HiGHS returns no duals: a mixed-integer program has no [[shadow-price|shadow prices]] to read.");
+              var tr = S0.T && treeProven(S0.T) && Math.abs(S0.T.inc.bound - d.cost) < 0.5 ? ", the plan your tree proved" : "";
+              api.saw("Optimal: " + money(d.cost) + ", gap " + (r.mipGap != null ? (r.mipGap * 100).toFixed(2) : "0.00") + "%" + tr + ". " + peakerWords(d.hours.map(function (h) { return Math.round(h.u.pk); })) + ". HiGHS returns no duals for a mixed-integer solve, so there are no [[shadow-price|shadow prices]] to read.");
             });
           });
         } },
-      // 6 the cost staircase: why there is no shadow price
-      { text: "Then what does one more MWh cost? Add demand at " + hh(L.stair.hour) + " and solve the mixed-integer program again each time. Watch the extra cost of the day.",
+      // 6 the day's cost as demand is added at 23:00, in half-MWh steps: its slope rises, then falls, as no LP's can
+      { text: "Then what does one more MWh cost? Add demand at " + hh(L.stair.hour) + " in half-MWh steps; the mixed-integer program is solved again each time.",
         build: function (act, api) {
-          var sl = LX.Slider(act, { label: "MWh added at " + hh(L.stair.hour), color: "var(--lx-demand)", min: 0, max: L.stair.max, step: 1, fmt: function (v) { return v + " MWh"; }, onChange: function (v) { run(v); } });
+          var XS = stairPoints(D), H0 = L.stair.hour, cc = D.fleet.cc.cost;
+          var sl = LX.Slider(act, { label: "MWh added at " + hh(H0), color: "var(--lx-demand)", min: 0, max: L.stair.max, step: L.stair.step, fmt: function (v) { return v + " MWh"; }, onChange: function (v) { run(v); } });
           var st = status(act), P = LX.Plot(E("div", null, act), { caption: true, text: "Text version of the chart", box: true }), kp = E("div", { class: "m2-kpis", "aria-live": "polite" }, act);
-          var seen = S0.stair;
+          var seen = S0.stair;   // index into XS -> {x, cost (extra cost of the day), shed (MWh unserved at 23:00), pk (peaker on at 23:00)}
+          if (!seen[0]) seen[0] = { x: 0, cost: 0, shed: 0, pk: false };
+          // the points solved so far, from 0 MWh up to v without a gap
+          function pts(v) { var out = []; for (var k = 0; k < XS.length && XS[k] <= v + 1e-9 && seen[k]; k++) out.push(seen[k]); return out; }
+          function tone(p) { return p.shed > TOL ? "var(--lx-warn)" : p.pk ? D.fleet.pk.color : "var(--lx-ink)"; }
           function draw() {
-            var xs = Object.keys(seen).map(Number).sort(function (a, b) { return a - b; });
-            var top = Math.max(500, Math.ceil(Math.max.apply(null, [0].concat(xs.map(function (x) { return seen[x]; }))) / 500) * 500);
+            var a = pts(L.stair.max);
+            var top = Math.max(500, Math.ceil(Math.max.apply(null, a.map(function (p) { return p.cost; })) / 500) * 500);
             P.render({
-              caption: "Extra cost of the day for each MWh added at " + hh(L.stair.hour) + " (mixed-integer program solved each time)",
+              caption: "Extra cost of the day as demand is added at " + hh(H0) + " (mixed-integer program solved each time)",
               x: { min: 0, max: L.stair.max, ticks: [0, 2, 4, 6, 8, 10].filter(function (v) { return v <= L.stair.max; }).map(function (v) { return [v, v + " MWh"]; }), ticksN: [[0, "0"], [5, "5 MWh"], [10, "10"]] },
               y: { min: 0, max: top, step: top / 5, fmt: function (v) { return "$" + Math.round(v).toLocaleString("en-US"); } },
-              lines: [{ pts: [[0, 0], [L.stair.max, D.fleet.cc.cost * L.stair.max]], color: "var(--lx-ink-3)", dash: "5 4", width: 1.6 }],
-              marks: xs.map(function (x) { return { x: x, y: seen[x], kind: "dot", color: seen[x] > D.fleet.cc.cost * x + 1 ? "var(--lx-bad)" : "var(--lx-ink)", label: x === sl.val() ? money(seen[x]) : "" }; }),
-              legend: [{ label: "$" + D.fleet.cc.cost + " for every MWh (the combined-cycle plant)", color: "var(--lx-ink-3)", dash: "5 4" }],
-              aria: "Extra cost of the day against MWh added at " + hh(L.stair.hour),
-              text: { head: ["MWh added", "Extra cost of the day"], rows: xs.map(function (x) { return [x + " MWh", money(seen[x])]; }) }
+              lines: [{ pts: [[0, 0], [L.stair.max, cc * L.stair.max]], color: "var(--lx-ink-3)", dash: "5 4", width: 1.6 }].concat(a.length > 1 ? [{ pts: a.map(function (p) { return [p.x, p.cost]; }), color: "var(--lx-ink-2)", width: 1.6 }] : []),
+              marks: a.map(function (p) { return { x: p.x, y: p.cost, kind: "dot", color: tone(p), label: Math.abs(p.x - sl.val()) < 1e-9 ? money(p.cost) : "" }; }),
+              legend: [{ label: money(cc) + "/MWh, the combined-cycle plant's running cost", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "Some demand unserved", color: "var(--lx-warn)" },
+                { label: "Peaker on at " + hh(H0), color: D.fleet.pk.color }],
+              aria: "Extra cost of the day against MWh added at " + hh(H0),
+              text: { head: ["MWh added", "Extra cost of the day", "Unserved at " + hh(H0), "Peaker at " + hh(H0)],
+                rows: a.map(function (p) { return [p.x + " MWh", money(p.cost), p.shed > TOL ? r6(p.shed) + " MWh" : "–", p.pk ? "on" : "off"]; }) }
             }, false);
           }
-          // every whole MWh from 1 to v is solved (in order, once each), so the staircase has no gaps
+          // every step from 0 to v is solved (in order, once each), so the curve has no gaps
           var req = 0;
           function run(v) {
             var my = ++req; st.set("solving"); api.busy(true);
             needMILP().then(function (base) {
               if (!base) { api.busy(false); return; }
-              var todo = []; for (var x = 1; x <= v; x++) if (seen[x] == null) todo.push(x);
+              seen[0] = { x: 0, cost: 0, shed: base.hours[H0].shed, pk: Math.round(base.hours[H0].u.pk) === 1 };
+              var todo = []; for (var k = 1; k < XS.length && XS[k] <= v + 1e-9; k++) if (!seen[k]) todo.push(k);
               var last = { status: "optimal" };
               (function next() {
                 if (my !== req) return;
                 if (!todo.length) { st.set(last); api.busy(false); draw(); report(v); return; }
-                var x = todo.shift();
-                LX.solver.solve(build(D, { onoff: true, add: { hour: L.stair.hour, mw: x } }), { timeLimit: 10, label: "m2" }).then(function (r) {
-                  last = r; if (!r.ok) { st.set(r); api.busy(false); return; }
-                  seen[x] = r6(r.objective - base.cost); draw(); next();
+                var k = todo.shift(), o = { onoff: true, add: { hour: H0, mw: XS[k] } };
+                LX.solver.solve(build(D, o), { timeLimit: 10, label: "m2" }).then(function (r) {
+                  last = r; if (!r.ok) { st.set(r); api.busy(false); draw(); return; }
+                  var h = read(D, o, r).hours[H0];
+                  seen[k] = { x: XS[k], cost: r6(r.objective - base.cost), shed: h.shed, pk: Math.round(h.u.pk) === 1 };
+                  draw(); next();
                 });
               })();
             });
           }
           function report(v) {
             kp.innerHTML = "";
-            kpi(kp, v + " MWh more", "+" + money(seen[v]));
-            if (v > 0 && seen[v - 1] != null) kpi(kp, "The last MWh", "+" + money(seen[v] - seen[v - 1]), seen[v] - seen[v - 1] > D.fleet.cc.cost + 1 ? "bad" : null);
-            var hi = Object.keys(seen).map(Number).filter(function (x) { return seen[x] > D.fleet.cc.cost * x + 1; });
-            if (hi.length) {
-              var j = Math.min.apply(null, hi), jump = r6(seen[j] - seen[j - 1]);
-              remember("stair", { at: j, cost: seen[j], prev: seen[j - 1] });
-              api.done();
-              api.saw("Each of the first " + (j - 1) + " MWh costs " + money(D.fleet.cc.cost) + ". MWh number " + j + " costs " + money(jump) + ": the peaker must stay on at " + hh(L.stair.hour) + ". The cost jumps, so no single slope is the price.");
-            } else api.saw(v ? "So far each MWh costs " + money(D.fleet.cc.cost) + ", the combined-cycle plant's running cost. Keep adding." : "Move the slider to add demand.", true);
+            var a = pts(v), p = a[a.length - 1];
+            if (!p) return;
+            kpi(kp, p.x + " MWh more", "+" + money(p.cost));
+            if (a.length > 1) { var s1 = stairSlopes(a.slice(-2))[0]; kpi(kp, "Last step costs", money(s1) + "/MWh", s1 > cc + 1 ? "bad" : null); }
+            kpi(kp, "Unserved at " + hh(H0), p.shed > TOL ? r6(p.shed) + " MWh" : "none", p.shed > TOL ? "bad" : null);
+            kpi(kp, "Peaker at " + hh(H0), p.pk ? "on" : "off");
+            var w = stairWords(D, a);
+            if (w.done) { remember("stair", { slopes: stairSlopes(a) }); api.done(); api.saw(w.text); } else api.saw(w.text, true);
           }
           S0.stairUI = { sl: sl, run: run };
-          seen[0] = 0;
-          var maxSeen = Math.max.apply(null, Object.keys(seen).map(Number));
+          var have = pts(L.stair.max), maxSeen = have[have.length - 1].x;
           sl.set(maxSeen); draw();
           if (maxSeen > 0) report(maxSeen);
         } },
@@ -852,7 +981,7 @@
                   api.done();
                   var hi = S0.fixed.hours.filter(function (h) { return h.price > D.fleet.cc.cost + 1; }).map(function (h) { return h.t; });
                   var pkMin = S0.milp.hours.filter(function (h) { return Math.round(h.u.pk) && Math.abs(h.p.pk - D.fleet.pk.min) < TOL; }).map(function (h) { return h.t; });
-                  api.saw(money(D.fleet.cc.cost) + " in most hours, " + money(D.fleet.pk.cost) + " at " + span(hi) + ", confirmed by +1 MWh at " + L.check.map(hh).join(" and ") + ". At " + list(pkMin.map(hh)) + " the peaker runs at its " + D.fleet.pk.min + " MW minimum, so the combined-cycle plant sets the price.");
+                  api.saw(money(D.fleet.cc.cost) + "/MWh in most hours, " + money(D.fleet.pk.cost) + "/MWh at " + span(hi) + ", confirmed by +1 MWh at " + L.check.map(hh).join(" and ") + ". At " + list(pkMin.map(hh)) + " the peaker is held at its " + D.fleet.pk.min + " MW minimum: the combined-cycle plant sets the price.");
                 });
               });
             });
@@ -906,7 +1035,8 @@
       if (i === steps.length - 1) remember("reached", true);
     } });
     // demo states (core.js LX.demo): "mid" = step 1 with the day solved; "step-2" (or "relax") = the three rules added;
-    // "step-3" (or "round") = the rounded plan; "tree" = step 4 with the tree finished; "stair" = step 6 at 7 MWh;
+    // "step-3" (or "round") = the rounded plan; "tree" = step 4 with the tree finished ("tree-fail": with the last node's LP
+    // turned into a time limit, so the page must not claim optimality); "stair" = step 6 at 7 MWh;
     // "prices" = step 7 re-priced; "uplift" = step 8 revealed; any other "step-N" opens card N
     LX.demo(root, function (state) {
       function click(sel) { var b = cardsHost.querySelector(sel); if (b) b.click(); }
@@ -917,7 +1047,10 @@
         return { view: "relax" };
       }
       if (state === "step-3" || state === "round") { cards.go(2); setTimeout(function () { click(".lx-step-act .lx-btn"); }, 300); return { view: "round" }; }
-      if (state === "tree") { cards.go(3); setTimeout(function () { var b = cardsHost.querySelectorAll(".lx-step-act .lx-btn")[1]; if (b) b.click(); }, 400); return { view: "tree" }; }
+      if (state === "tree" || state === "tree-fail") {
+        if (state === "tree-fail") S0.failAt = R.tree.lps;   // the last node's LP comes back as a time limit
+        cards.go(3); setTimeout(function () { var b = cardsHost.querySelectorAll(".lx-step-act .lx-btn")[1]; if (b) b.click(); }, 400); return { view: state };
+      }
       if (state === "stair") { cards.go(5); setTimeout(function () { if (S0.stairUI) { S0.stairUI.sl.set(7); S0.stairUI.run(7); } }, 300); return { view: "stair" }; }
       if (state === "prices") { cards.go(6); click(".lx-step-act .lx-btn"); return { view: "prices" }; }
       if (state === "uplift") { cards.go(7); var c = cardsHost.querySelectorAll(".lx-choice")[2]; if (c) c.click(); return { view: "uplift" }; }
@@ -963,10 +1096,10 @@
       columns: [{ key: "name", label: "Model", main: true }, { key: "sw", label: "Switches", phoneHide: true }, { key: "cost", label: "Cost of the day", num: true },
         { key: "run", label: "Can it be run?", phone: "Runs?" }, { key: "pr", label: "Prices" }],
       rows: [
-        { key: "lp", color: "var(--lx-ink-3)", name: "Dispatch LP", note: "M1's model, no switches", sw: "none", cost: money(R.lp), run: "No: peaker at " + R.lpFocus + " MW", pr: "24 duals; " + money(F.pk.cost) + " at " + R.lpHigh },
+        { key: "lp", color: "var(--lx-ink-3)", name: "Dispatch LP", note: "M1's model, no switches", sw: "none", cost: money(R.lp), run: "No: peaker at " + R.lpFocus + " MW", pr: "24 duals; " + money(F.pk.cost) + "/MWh at " + R.lpHigh },
         { key: "rx", color: "var(--lx-warn)", name: "Relaxed commitment", note: "an LP, switches 0 to 1", sw: "between 0 and 1", cost: money(R.relax), run: "No: peaker " + R.relaxFocus + " on", pr: "duals of plants partly on: not used" },
         { key: "mi", color: "var(--lx-good)", name: "Unit commitment", note: "a mixed-integer program", sw: "0 or 1", cost: money(R.milp), run: "Yes", pr: "none: no duals" },
-        { key: "fx", color: "var(--lx-ink)", name: "Switches fixed", note: "the dispatch LP again", sw: "fixed at the MILP's", cost: money(R.milp), run: "Yes", pr: "conditional: " + money(F.cc.cost) + "; " + money(F.pk.cost) + " at " + R.condHigh + "; uplift " + money(R.uplift) }
+        { key: "fx", color: "var(--lx-ink)", name: "Switches fixed", note: "the dispatch LP again", sw: "fixed at the MILP's", cost: money(R.milp), run: "Yes", pr: "conditional: " + money(F.cc.cost) + "/MWh; " + money(F.pk.cost) + "/MWh at " + R.condHigh + "; uplift " + money(R.uplift) }
       ],
       sorts: [{ label: "As built", order: ["lp", "rx", "mi", "fx"], note: "Each model adds realism. The relaxation's " + money(R.relax) + " is a lower bound on the commitment's " + money(R.milp) + "; prices come back only when the switches are fixed." }]
     });
@@ -978,7 +1111,7 @@
       fields: [{ key: "you", label: "In this lesson" }, { key: "code", label: "In code", code: true }],
       rows: [
         { html: "min " + sym("sum", "Σ<sub><var>t</var>,<var>g</var></sub>") + " ( " + sym("c", "<var>c</var><sub><var>g</var></sub>") + " " + sym("p", "<var>p</var><sub><var>g,t</var></sub>") + " + " + sym("NL", "<var>NL</var><sub><var>g</var></sub>") + " " + sym("u", "<var>u</var><sub><var>g,t</var></sub>") + " + " + sym("SU", "<var>SU</var><sub><var>g</var></sub>") + " " + sym("v", "<var>v</var><sub><var>g,t</var></sub>") + " ) + " + sym("V", "<var>V</var>") + " Σ<sub><var>t</var></sub> " + sym("s", "<var>s</var><sub><var>t</var></sub>"), tag: "goal",
-          say: "Minimise, over hours t and gas plants g, running cost c times output p, plus no-load cost NL times the switch u, plus start-up cost SU times the start-up v; plus the penalty V times unserved demand s. The nuclear plant's flat cost is a constant." },
+          say: "Minimise, over hours t and gas plants g, running cost c times output p, plus no-load cost NL times the switch u, plus start-up cost SU times the start-up v; plus the penalty V times unserved demand s. The 100 MW that runs flat all day adds the same cost to every plan, so it is left out." },
         { html: "100 + " + sym("r", "<var>r</var><sub><var>t</var></sub>") + " + Σ<sub><var>g</var></sub> " + sym("p", "<var>p</var><sub><var>g,t</var></sub>") + " + " + sym("s", "<var>s</var><sub><var>t</var></sub>") + " = " + sym("d", "<var>d</var><sub><var>t</var></sub>"), tag: "balance",
           say: "Every hour, 100 MW of nuclear plus wind and solar used plus the gas outputs plus unserved demand equals demand." },
         { html: sym("Pmin", "<var>P̲</var><sub><var>g</var></sub>") + " " + sym("u", "<var>u</var><sub><var>g,t</var></sub>") + " ≤ " + sym("p", "<var>p</var><sub><var>g,t</var></sub>") + " ≤ " + sym("Pmax", "<var>P̄</var><sub><var>g</var></sub>") + " " + sym("u", "<var>u</var><sub><var>g,t</var></sub>"), tag: "output",
@@ -987,8 +1120,9 @@
           say: "A start-up minus a shut-down equals the change of the switch from the hour before." },
         { html: sym("u", "<var>u</var><sub>cc,−1</sub>") + " = " + sym("u", "<var>u</var><sub>cc,23</sub>") + " = 1,  " + sym("u", "<var>u</var><sub>pk,−1</sub>") + " = 0", tag: "the day's ends",
           say: "The end condition: the combined-cycle plant is on before the day and must be on in the last hour, 23:00, so the day ends as it began. The peaker starts the day off and may end it either way." },
-        { html: "Σ<sub>τ=<var>t</var>−" + sym("UT", "<var>UT</var><sub><var>g</var></sub>") + "+1</sub><sup><var>t</var></sup> " + sym("v", "<var>v</var><sub><var>g</var>,τ</sub>") + " ≤ " + sym("u", "<var>u</var><sub><var>g,t</var></sub>"), tag: "minimum run",
-          say: "A plant started in the last UT hours must still be on. The minimum down time is the same rule for shut-downs: the shut-downs of the last DT hours are at most one minus the switch." },
+        { html: "Σ<sub>" + sym("tau", "τ") + "=max(0, <var>t</var>−" + sym("UT", "<var>UT</var><sub><var>g</var></sub>") + "+1)</sub><sup><var>t</var></sup> " + sym("v", "<var>v</var><sub><var>g</var>,τ</sub>") + " ≤ " + sym("u", "<var>u</var><sub><var>g,t</var></sub>"), tag: "minimum run",
+          note: "within this day only",
+          say: "A plant started in the last UT hours must still be on; the sum starts at the day's first hour at the earliest. The minimum down time is the same rule for shut-downs: the shut-downs of the last DT hours are at most one minus the switch. Both count within this day only: the hours before the day are assumed to meet them, and a start at 23:00 owes nothing after midnight." },
         { html: sym("u", "<var>u</var><sub><var>g,t</var></sub>") + " ∈ {0, 1}", tag: "the switch", note: "the relaxation: 0 ≤ u ≤ 1",
           say: "Each switch is 0 or 1. The relaxation allows any value from 0 to 1." }
       ],
@@ -1007,6 +1141,7 @@
         d: { name: "d_t", label: "demand", unit: "MW", words: "Prairie Town's demand in hour t, from the real shape of " + D.day.label + ".", you: "Peak " + Math.max.apply(null, D.day.demand) + " MW", code: "eq: demand[t]" },
         Pmin: { name: "P̲_g", label: "minimum output", unit: "MW", words: "The lowest steady output when on.", you: "Peaker " + F.pk.min + " MW, CC " + F.cc.min + " MW (illustrative)", code: "min_pk: p - " + F.pk.min + " u >= 0" },
         Pmax: { name: "P̄_g", label: "size", unit: "MW", words: "The most a plant can make.", you: "Peaker " + F.pk.mw + " MW, CC " + F.cc.mw + " MW", code: "max_pk: p - " + F.pk.mw + " u <= 0" },
+        tau: { name: "τ", label: "an hour in the sum", unit: "hour", words: "Each hour summed over: the last UT hours up to hour t, but never before the day's first hour (0).", you: "Peaker at " + hh(R.focus) + ": τ = " + (R.focus - F.pk.up + 1) + " to " + R.focus, code: "for s in range(max(0, t - UT + 1), t + 1)" },
         UT: { name: "UT_g", label: "minimum run time", unit: "hours", words: "Hours a plant must stay on once started. The minimum down time DT is the same for staying off.", you: "Peaker " + F.pk.up + " and " + F.pk.down + " hours, CC " + F.cc.up + " and " + F.cc.down + " (illustrative)", code: "up_pk_t: u_t - (v_t-1 + v_t) >= 0" }
       },
       sel: "u",

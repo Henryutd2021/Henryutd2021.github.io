@@ -24,6 +24,9 @@ glossary:
   - id: minimum-run-time
     term: Minimum run time
     def: "The hours a plant must stay on once started; the minimum down time is the hours it must stay off once stopped."
+  - id: minimum-down-time
+    term: Minimum down time
+    def: "The hours a plant must stay off once stopped before it may start again."
   - id: conditional-price
     term: Conditional price
     def: "A price read from a linear program in which the on/off decisions are held fixed; it holds only for that commitment."
