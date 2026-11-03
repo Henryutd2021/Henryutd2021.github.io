@@ -11,9 +11,14 @@
 //     table, shown as context with their caveat
 //   - search strings: at most five Boolean operators for every element, dimension, stakeholder and twist or lever; the
 //     OpenAlex link form; the road-less-travelled weights favour smaller clusters and never exclude an element
-//   - the card's automatic fields keep the learner's edits; realism states; the copied summary; the seven example cards
-//     are §11.3's, word for word
-//   - the no-JS blocks on the page equal the generated ones (write them with --write after a data edit); text budget
+//   - the card's automatic fields keep the learner's edits and follow the picks only where the automatic value changed;
+//     the audience is filled only for a prescriptive draft; realism states with the learner's evidence; the copied summary
+//   - the seven example cards are §11.3's, word for word; each loads a fresh card with its own question-matched audience,
+//     metric and units, every required part, and three search strings
+//   - the page never claims the checks establish rigour; the search links are labelled live; no production notes or guard
+//     assertions in the public data file
+//   - the no-JS blocks on the page equal the generated ones (write them with --write after a data edit); text budget (step
+//     cards, feedback and every visible text element: at most 35 words and two sentences; option lists excepted)
 // Usage (from the site folder):  node _tests/learn/test_r10-question-studio.js [--write]
 "use strict";
 const fs = require("fs");
@@ -114,7 +119,8 @@ ok(D.drafts.evaluative.indexOf("compared with […]") > 0 && D.drafts.prescripti
 
 // ---------------- no originality judgement; crowding as context
 ok(allStrings.every(s => !/\bnovel|\bhot (topic|spot|area|question)s?\b|untouched|\bgaps?\b|nobody has/i.test(s)), "no data string calls anything novel, a hot topic, untouched or a gap");
-ok(/no originality judgement/i.test(D.meta.note) && /Few papers is no evidence that a question is new, important or feasible/.test(D.crowding.caveat), "the crowding caveat (§11.3)");
+ok(/no originality judgement/i.test(D.meta.note) && D.crowding.caveats.some(c => /^Few papers is no evidence that a question is new, important or feasible\.$/.test(c)) && D.crowding.caveats.every(c => M.rich(c) && c.split(/\s+/).length <= 15), "the crowding caveat (§11.3), as short separate statements");
+ok(D.crowding.caveats.every(c => BLOCKS.crowding.indexOf("<li>" + c + "</li>") >= 0) && /D\.crowding\.caveats\.forEach/.test(JS), "the caveats: one element each, on the page and in the studio");
 ok(/The studio makes no originality judgement/.test(PAGE) && /no originality judgement/.test(JS), "page and studio both say they make no originality judgement");
 const cr = M.crowd(D, base);
 ok(cr.length === 2 && M.crowdText(cr[0]) === "Keyword cluster “heat pumps”: 3,977 papers, 2016–2026; RGI 1.53." && M.crowdText(cr[1]) === "Keyword cluster “extreme weather”: 2,868 papers, 2016–2026; RGI 2.08.", "crowding lines for heat pumps and a heat wave");
@@ -139,14 +145,22 @@ ok(M.searchStrings(D, { element: "heatpumps" }).length === 0, "no search strings
 
 // ---------------- the card, realism, summary
 const auto1 = M.autoCard(D, base, "predictive");
-ok(auto1.audience === "" && auto1.metric === "energy burden" && auto1.units === "% of household income" && auto1.scale === "S3" && auto1.type === "predictive", "card: renters are affected, not deciders, so the audience is left to the learner");
-ok(M.autoCard(D, Object.assign({}, base, { stakeholder: "councils" }), "predictive").audience === "city councils", "card: a deciding stakeholder fills the audience");
-const mine = M.merge({ question: "My own question?", metric: "energy burden", units: "" }, auto1, null);
+ok(auto1.audience === "" && auto1.metric === "energy burden" && auto1.units === "% of household income" && auto1.scale === "S3" && auto1.type === "predictive", "card: for a predictive draft the learner names who would use the answer");
+ok(M.autoCard(D, base, "prescriptive").audience === "low-income renters" && M.autoCard(D, Object.assign({}, base, { stakeholder: "councils" }), "explanatory").audience === "", "card: the audience comes only with a prescriptive draft (which names the stakeholder as the one who acts), for any stakeholder");
+ok(D.pickers.stakeholder.every(x => !("decides" in x)), "stakeholders: no fixed 'decides' class that would rule affected groups out as an audience");
+const mine = M.sync({ question: "My own question?", metric: "energy burden", units: "" }, auto1, null).card;
 ok(mine.question === "My own question?" && mine.units === "% of household income", "card: the learner's question stays; empty fields are filled");
-const auto2 = M.autoCard(D, Object.assign({}, base, { dimension: "SEC" }), "predictive"), moved = M.merge(mine, auto2, auto1);
-ok(moved.metric === "customer hours without power" && moved.question === "My own question?", "card: a field still holding the old automatic value follows the new picks; edits stay");
-const R = M.realism(D, { data: 0, physics: 1, institutions: 2 });
-ok(R.map(r => r.state).join() === "pass,warn,block,," && M.realismCount(R).open === 2 && R[2].text === D.realism[2].block, "realism: pass, warn, block and two open");
+const auto2 = M.autoCard(D, Object.assign({}, base, { dimension: "SEC" }), "predictive"), moved = M.sync(mine, auto2, auto1).card;
+ok(moved.metric === "customer-hours without power" && moved.units === "customer-hours a year (customers out × hours out)" && moved.question === "My own question?", "card: a field still holding the old automatic value follows the new picks; edits stay");
+// after an example: its own fields stay when a pick changes something they do not depend on
+const e4 = M.example(D, "e4"), p4 = M.examplePicks(D, e4), c4 = M.exampleCard(D, e4);
+const put4 = { question: c4.question, type: c4.type, scale: c4.scale, audience: c4.audience, metric: c4.metric, units: c4.units };
+const tw = Object.assign({}, p4, { twist: "heatwave" }), r4 = M.sync(c4, M.autoCard(D, tw, "descriptive"), M.autoCard(D, p4, "descriptive"), put4);
+ok(r4.card.metric === c4.metric && r4.card.audience === c4.audience, "card: after loading example 4, changing the twist keeps its own metric and audience");
+ok(r4.card.question !== c4.question, "card: ... while the question, which names the twist, follows the new picks");
+const R = M.realism(D, { data: 0, physics: 1, institutions: 2 }, { data: "Hourly load, CC BY, 2025" });
+ok(R.map(r => r.state).join() === "pass,warn,block,," && M.realismCount(R).open === 2 && R[2].text === D.realism[2].block && R[0].evidence === "Hourly load, CC BY, 2025", "realism: pass, warn, block, two open, and the evidence kept");
+ok(D.realism.every(r => r.evidence && r.evidence.split(/\s+/).length <= 8) && /below/.test(D.realism[0].pass) && /below/.test(D.realism[2].pass) && !/on the card/.test(D.realism[0].pass + D.realism[2].pass), "realism: every check has a place for its evidence, and the pass notes point to it");
 ok(D.realism.length === 5 && D.realism.map(r => r.label).join() === "Data exist,Physics sanity,Institutions,Scope fits the time,People and ethics", "realism: the five checks of §11.3");
 ok(D.realism.every(r => r.fix.every(c => typeof c === "number" || /^[A-Z]+\d*$/.test(c))), "realism: every fix names a lesson by number or code");
 // the fix links follow path.json's live status (read here, not assumed): every code a realism fix names, plus one upcoming
@@ -161,8 +175,33 @@ ok(liveR && CORE.lessonRefHTML(P, liveR.code) === '<a href="' + liveR.href + '">
 ok(CORE.lessonRef(P, "R9").ready === !!(pentry("R9") || {}).ready && CORE.lessonRef(P, "R3").ready === !!(pentry("R3") || {}).ready, "fix links: R3 and R9 follow path.yml (live on this branch: " + ["R3", "R9"].filter(c => CORE.lessonRef(P, c).ready).join(", ") + ")");
 ok(!/function ref(HTML)?\s*\(/.test(JS) && !("ref" in M) && /LX\.lessonRefHTML\(P, c\)/.test(JS) && /LX\.lessonRef\(P, map\[k\]\)/.test(JS), "fix links: the studio uses LX.lessonRef and LX.lessonRefHTML and keeps no copy");
 ok(!/replaceState/.test(JS), "a shared #q- link is applied once by LX.QuestionCard itself; the studio keeps no workaround");
-const sum = M.summary(D, { picks: base, realism: { data: 0 }, papers: [{ t: "A paper", d: "other city" }, {}, {}] }, "CARD").split("\n");
-ok(sum[0] === "CARD" && sum[1] === "Combination: S3 · Society and livelihoods · heat pumps · new technology · low-income renters · a heat wave" && /^Realism: data exist pass; physics sanity not answered/.test(sum[2]) && sum.indexOf("Close paper 1: A paper (differs: other city)") > 0, "the copied summary");
+const sum = M.summary(D, { picks: base, realism: { data: 0 }, evidence: { data: "Hourly load, CC BY, 2025" }, papers: [{ t: "A paper", d: "other city" }, {}, {}] }, "CARD").split("\n");
+ok(sum[0] === "CARD" && sum[1] === "Combination: S3 · Society and livelihoods · heat pumps · new technology · low-income renters · a heat wave" && sum[2] === "Realism, data exist: pass; evidence: Hourly load, CC BY, 2025" && sum[3] === "Realism, physics sanity: not answered" && sum.indexOf("Close paper 1: A paper (differs: other city)") > 0, "the copied summary, with the realism evidence");
+
+// ---------------- the example cards: question-matched fields, complete picks, three search strings, a fresh card
+D.examples.forEach(e => {
+  const p = M.examplePicks(D, e), c = M.exampleCard(D, e), S = M.searchStrings(D, p);
+  ok(M.complete(D, p) && S.length === 3 && S.every(x => M.operators(x.text) <= 5), e.id + ": every required part, and three search strings of at most five operators");
+  ok(c.question === e.question && c.type === e.type && c.audience && c.metric && c.units && ["counterfactual", "boundary", "wrong", "uncertainty"].every(k => c[k] === ""), e.id + ": a fresh card with the example's own question, audience, metric and units, the rest empty");
+});
+ok(/water/.test(M.exampleCard(D, M.example(D, "e4")).metric) && /MW/.test(M.exampleCard(D, M.example(D, "e4")).units) && !/CO₂/.test(JSON.stringify(M.exampleCard(D, M.example(D, "e4")))), "example 4: water use and summer peak, not CO₂");
+ok(!/unserved/.test(M.exampleCard(D, M.example(D, "e2")).metric) && /\$ a season/.test(M.exampleCard(D, M.example(D, "e2")).units), "example 2: pumping moved and its value, not unserved energy");
+ok(/water use/.test(M.searchStrings(D, M.examplePicks(D, M.example(D, "e4")))[0].text), "example 4: its search strings look for water use");
+ok(M.combo(D, M.examplePicks(D, M.example(D, "e1"))).indexOf("community solar") >= 0 && M.draft(D, M.examplePicks(D, M.example(D, "e1")), "evaluative").indexOf("community solar") >= 0, "example 1: community solar, outside the element list, comes as an extra");
+ok(!M.clean(D, { element: "rooftop", extra: { element: { label: "community solar", terms: ["x"] } } }).extra, "an extra gives way to a pick of the learner's own");
+const LOAD = JS.slice(JS.indexOf('lb.addEventListener("click"'), JS.indexOf('rb.addEventListener("click"'));
+ok(/st\.stash = snapshot\(\)/.test(LOAD) && /st\.realism = \{\}; st\.evidence = \{\}; st\.papers = \[\{\}, \{\}, \{\}\]/.test(LOAD) && /exampleCard\(D, e\)/.test(LOAD), "loading an example: the previous work is kept to restore, realism and papers start empty, and the card is the example's own");
+ok(/if \(st\.autoKey === key\(\)\) return;/.test(JS), "the card's automatic fields change only when the picks or the type do (coming back to step 3 does not overwrite a loaded example)");
+
+// ---------------- what the checks claim; live search links; the public data file
+ok(!/passes its eight checks|checks pass\./.test(PAGE) && /all eight parts of the card are filled in and rated against the rubric/.test(PAGE), "the task: parts filled in and rated by the learner, not 'passes its checks'");
+ok(/of 8 parts filled in\. Rate their rigour against the rubric/.test(JS) && !/of 8 checks pass/.test(JS), "the card step: parts filled in; rigour is the learner's rubric review");
+ok(/live results, new tab/.test(JS) && /current results/.test(D.search.live) && /no request/.test(D.search.noreq), "search links: labelled as OpenAlex's live results; the page sends no request");
+ok(!("built_by" in D.meta) && !("scope" in D.meta), "the public data file carries no production note and no guard assertions");
+ok(/Typical methods for this type: " \+ LX\.rich\(methodsMarked/.test(JS) && ["gis", "econometrics", "mcda", "monte-carlo", "difference-in-differences"].every(id => BLOCKS.task.indexOf('data-term="' + id + '"') >= 0), "method names carry glossary marks (studio and no-JS version)");
+["energy-burden", "customer-hours", "net-present-value", "techno-economic-analysis", "life-cycle-assessment"].forEach(id => ok(D.terms.indexOf("[[" + id + "|") >= 0, "words line: " + id));
+ok(!/Those (who decide|affected)/.test(JSON.stringify(D.exemplars)) && /no use for the answer is stated/.test(JSON.stringify(D.exemplars)), "exemplar audience: a stated use, not affected against deciding");
+ok(/Realism:/.test(EX.plain(D.exemplars.answers[1])) && /Closest papers:/.test(EX.plain(D.exemplars.answers[1])) && /framing and realism/.test(D.exemplars.answers[1].level), "strong exemplar: shows the realism review and the closest-paper notes, labelled for what it rates");
 
 // ---------------- exemplars, rubric, page
 ok(EX.validate(D.exemplars).length === 0, "exemplars are well formed");
@@ -174,13 +213,26 @@ Object.keys(MARK).forEach(k => {
   ok(r && PAGE.slice(r.a, r.b) === BLOCKS[k] + "\n", "no-JS block " + MARK[k] + " equals the generated one (run with --write after a data edit)");
 });
 ok(PAGE.indexOf('class="lx-card lx-studio-brief"') < PAGE.indexOf('data-learn="r10-question-studio"'), "the task card sits above the interactive");
-ok(/About 40 minutes guided here, then about an hour on your own/.test(PAGE), "guided and practice time stated (40 + 60 min)");
+ok(/About 40 minutes guided here, then about an hour on your own: run the three searches, skim the first twenty results of each/.test(PAGE), "guided and practice time stated (40 + 60 min), with the practice bounded to fit an hour");
 ok(/2 November 2026/.test(PAGE) && /retrieved 2 November 2026/.test(D.crowding.source), "counts dated on the page and in the data");
 
 // ---------------- text budget and scope of the page and script
 const words = s => String(s).trim().split(/\s+/).length;
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*(free: true,\s*\n?\s*)?build/g)].map(m => m[1]);
 ok(stepTexts.length === 6 && stepTexts.every(t => words(t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 35), "six step cards, each at most 35 words");
+const sentences = t => (t.replace(/\b(U\.S\.|e\.g\.|i\.e\.)/g, "x").match(/[.!?](\s|$)/g) || []).length;
+ok(stepTexts.every(t => sentences(t) <= 2), "every step card is at most two sentences");
+const sawTexts = [...JS.matchAll(/api\.saw\("([^"]+)"/g)].map(m => m[1]).concat([D.search.live, D.search.note + " Link format checked on 3 November 2026; this page sends no request itself."]);
+ok(sawTexts.length >= 6 && sawTexts.every(t => words(t) <= 35 && sentences(t) <= 2), "studio feedback and notes: at most 35 words and two sentences each");
+// every text element the page shows, with JavaScript off: at most 35 words and two sentences; an answer written as a card
+// is checked line by line; references and the option lists of the pickers (§11.3, word for word) are left out
+const VIS = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "");
+const long = [];
+for (const m of VIS.matchAll(/<(li|p|td|th|caption|summary|dd)\b([^>]*)>((?:(?!<\/?\1\b)[\s\S])*?)<\/\1>/g)) {
+  const parts = /lx-ex-lines/.test(m[2]) ? m[3].split("\n") : [m[3]];
+  parts.forEach(x => { const t = x.replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, "x").replace(/\s+/g, " ").trim(); if (t && !/ · .* · /.test(t) && (words(t) > 35 || sentences(t) > 2)) long.push(t.slice(0, 60)); });
+}
+ok(long.length === 0, "every visible text element of the page is at most 35 words and two sentences: " + long.join(" | "));
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "");
 const code = JS.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
 DENY.concat([NUC, /\bClaude\b|ChatGPT|language model/i]).forEach(re => ok(!re.test(OWN) && !re.test(code), "scope: page and script free of " + re));

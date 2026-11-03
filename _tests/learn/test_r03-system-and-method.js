@@ -4,10 +4,15 @@
 //     bins; exactly one "good" time step and horizon; a fit note for each of the nine method families
 //   - method pluralism (§11.2): the nine families of the curriculum's R3 row; every brief has at least two families that
 //     fit or help; the three example defences use three different families, and optimization is only one of them
-//   - each example defence is for a family that fits well, names a same-family alternative and another family, and passes
-//     the studio's own structure checks; the checks never pass an empty defence
-//   - the design card's text; the five scales are the question card's; the exemplars are well formed and the strong one
-//     states a limit and its mitigation (the rubric's Strong anchor for method fit)
+//   - each example defence is for a family that fits well, names a same-family alternative and another family, and has
+//     every part the reader's form asks for; the structure checks never pass an empty part and never ask for a word
+//   - the defence step is done only when its five required parts are there; opening the example defence completes
+//     nothing, and its feedback follows the fit of the reader's own family
+//   - the design card as fields (a defence with line breaks stays one value) and as text; the five scales are the question
+//     card's; the exemplars are well formed, the strong one reads the question as conditional planning and states a
+//     boundary, a limit and its mitigation (the rubric's Strong anchor for method fit, labelled as such)
+//   - review fixes of 2026-11-03: the boundary bins, the credits' assumption, the adequacy area, the islanding and pausing
+//     assumptions, family limits by variant, glossary marks at first use
 //   - the three no-JS blocks on the page equal the generated ones (write them with --write after a data edit)
 //   - text budget and the scope deny-list on the data, script and page
 // Usage (from the site folder):  node _tests/learn/test_r03-system-and-method.js [--write]
@@ -59,27 +64,45 @@ ok(D.briefs.find(b => b.id === "rebate").fits.opt[0] === "poor", "an evaluative 
 
 // ---------------- defences and their checks
 D.briefs.forEach(b => {
-  const d = b.defence, c = M.defenceChecks({ same: d.same, other: d.other, text: d.text }, d.method);
-  ok(c.every(x => x.ok), b.id + ": the example defence passes the four structure checks");
+  const d = b.defence, v = M.asReader(d), c = M.defenceChecks(v, d.method);
+  ok(c.length === 5 && c.every(x => x.ok) && M.defenceDone(v, d.method) && String(v.reduce || "").trim(), b.id + ": the example defence has the five required parts and a way to reduce its limit");
   ok(b.fits[d.method][0] === "good" && d.other !== d.method, b.id + ": defends a well-fitting family against another family");
-  ok(d.text.indexOf(d.same) >= 0 || d.text.toLowerCase().indexOf(d.same.split(" ").slice(-2).join(" ")) >= 0, b.id + ": the text names the same-family alternative");
+  M.defenceFields(D, d).forEach(f => ok(M.words(f[0] + " " + f[1]) <= 35, b.id + ": defence part within 35 words: " + M.plainMarks(f[0])));
 });
-ok(M.defenceChecks({}, "opt").every(x => !x.ok), "defence checks: an empty defence passes nothing");
-ok(!M.defenceChecks({ other: "opt" }, "opt")[1].ok, "defence checks: the same family does not count as another family");
-const tpl = "I chose optimization over [a simpler version], because … . I chose it over [another family], because … . Its main limit is …; I reduce it by … .";
-ok(M.defenceChecks({ text: tpl }, "opt").filter(c => c.id === "why" || c.id === "limit").every(c => !c.ok), "defence checks: the bare template passes neither the reasons nor the limit");
-const st = { brief: "hospital", per: { hospital: { scale: "S1", placed: { a1: "inside", a6: "out" }, step: "1h", horizon: "yr", method: "opt", same: "an LP", other: "sim", text: "I chose ..." } } };
+ok(M.defenceChecks({}, "opt").every(x => !x.ok) && !M.defenceDone({}, "opt"), "defence checks: an empty defence passes nothing");
+ok(!M.defenceChecks({ other: "opt" }, "opt")[2].ok, "defence checks: the same family does not count as another family");
+const plainDef = { same: "a single run", why1: "One run hides the spread the question asks about.", other: "sd", why2: "It has no hourly grid.", limit: "Foresight inside each case." };
+ok(M.defenceDone(plainDef, "opt") && !/because/.test(JSON.stringify(plainDef)), "defence checks: a defence passes on its parts alone, without any required word (no 'because')");
+ok(!M.defenceDone(Object.assign({}, plainDef, { why2: " " }), "opt"), "defence checks: a blank reason does not count");
+// the defence step: done only from the five parts; the example button completes nothing
+const STEP6 = JS.slice(JS.indexOf('{ text: "Defend your choice'), JS.indexOf('{ text: "Your design card'));
+const CMP = STEP6.slice(STEP6.indexOf('cmp.addEventListener("click"'), STEP6.indexOf("paint();\n        } },"));
+ok((STEP6.match(/api\.done\(\)/g) || []).length === 1 && /if \(done\) api\.done\(\)/.test(STEP6) && CMP.length > 0 && !/api\.done/.test(CMP), "defence step: api.done() only when the five parts are there, never from 'Compare with an example defence'");
+const H0 = D.briefs.find(b => b.id === "hospital");
+ok(/poor fit/.test(M.compareFeedback(D, H0, "ml")) && !/Both/.test(M.compareFeedback(D, H0, "ml")), "comparison feedback: a poorly fitting family is told so, not that both can be defended");
+ok(/Same family/.test(M.compareFeedback(D, H0, "opt")) && /helps with a part/.test(M.compareFeedback(D, H0, "stat")) && /both fit/.test(M.compareFeedback(D, H0, "sim")), "comparison feedback: same family, a family that helps with a part, and one that fits well");
+D.briefs.forEach(b => D.families.forEach(f => ok(M.words(M.compareFeedback(D, b, f.id)) <= 35, "comparison feedback within 35 words (" + b.id + ", " + f.id + ")")));
+const st = { brief: "hospital", per: { hospital: { scale: "S1", placed: { a1: "inside", a6: "out" }, step: "1h", horizon: "yr", method: "opt", same: "an LP", why1: "First sentence.\nSecond sentence.", other: "sim", why2: "A ranking is not a choice.", limit: "Perfect foresight." } } };
+const F = M.designFields(D, st), FL = F.map(x => x[0]);
+const fv = k => (F.find(x => x[0] === k) || [])[1];
+ok(FL.join("|") === "Question|Type|Assumption|Scale|Boundary, decided or computed|Boundary, fixed inputs|Boundary, left out|Time step|Horizon|Method family|Alternative 1|Why not alternative 1|Alternative 2|Why not alternative 2|Main limit|Reduced or checked by", "design card fields, in order: " + FL.join(", "));
+ok(fv("Scale") === "S1 microgrid and community" && fv("Boundary, decided or computed") === "Sizes of solar, battery and generator" && fv("Boundary, left out") === "Wholesale prices across the Plains Grid" && fv("Boundary, fixed inputs") === "(not yet)", "design card: scale and the reader's boundary");
+ok(fv("Time step") === "1 hour" && fv("Horizon") === "A typical year plus the outage" && fv("Method family") === "Optimization" && fv("Alternative 1") === "an LP" && fv("Alternative 2") === "Simulation" && fv("Reduced or checked by") === "(not yet)", "design card: step, horizon, method, alternatives");
+ok(fv("Why not alternative 1") === "First sentence.\nSecond sentence." && F.length === 16, "design card: a reason with a line break stays one field, whole (no extra field, no lost character)");
+ok(/designFields\(D, st\)\.forEach/.test(JS) && !/txt\.split\("\\n"\)/.test(JS) && /white-space:pre-line/.test(JS), "design card: drawn from its fields (not by splitting the text), with line breaks kept");
 const dt = M.designText(D, st).split("\n");
-ok(dt[0] === "Learn · R3 design card" && dt[3] === "Scale: S1 microgrid and community" && dt[4] === "Boundary, inside: Sizes of solar, battery and generator" && dt[6] === "Boundary, left out: Wholesale prices across the Plains Grid", "design card text: scale and the reader's boundary");
-ok(dt[7] === "Time step: 1 hour" && dt[8] === "Horizon: A typical year plus the outage" && dt[9] === "Method family: Optimization" && dt[10] === "Alternatives: an LP; Simulation", "design card text: step, horizon, method, alternatives");
-ok(M.designText(D, { brief: null }) === "", "design card: nothing before a brief is chosen");
+ok(dt[0] === "Learn · R3 design card" && dt[1].indexOf("Question: What sizes") === 0 && !/\[\[/.test(M.designText(D, st)), "design card text: plain, without glossary marks");
+ok(M.designText(D, { brief: null }) === "" && M.designFields(D, { brief: null }).length === 0, "design card: nothing before a brief is chosen");
 
 // ---------------- exemplars and rubric
 ok(EX.validate(D.exemplars).length === 0, "exemplars are well formed: " + EX.validate(D.exemplars).join("; "));
 const good = EX.plain(D.exemplars.answers.find(a => a.key === "good")), weak = EX.plain(D.exemplars.answers.find(a => a.key === "weak"));
-ok(/main limit/.test(good) && /I reduce it/.test(good) && D.exemplars.answers.find(a => a.key === "good").level === "Strong", "strong defence states a limit and its mitigation: labelled Strong (method fit)");
-ok(/I chose it over/.test(good) && /system-dynamics/.test(good), "strong defence: two alternatives, one from another family");
-ok(/standard tool/.test(weak) && !/\bover\b/.test(weak), "weak defence: chosen by habit, no alternatives");
+ok(/Main limit:/.test(good) && /Reduced by:/.test(good) && D.exemplars.answers.find(a => a.key === "good").level === "Strong on method fit", "strong defence states a limit and its mitigation: labelled Strong on method fit");
+ok(/Alternative 1:/.test(good) && /Alternative 2: a system-dynamics/.test(good), "strong defence: two alternatives, one from another family");
+ok(/conditional planning study/.test(good) && /not predicted deployment/.test(good) && !/predictive question/i.test(good), "strong defence: optimization read as conditional planning, its results as model-optimal plans, not predictions");
+ok(/Scale and boundary: S4;/.test(good) && /left out/.test(good), "strong defence: states its scale and boundary, as the weak one is faulted for not doing");
+ok(/standard tool/.test(weak) && !/Alternative/.test(weak), "weak defence: chosen by habit, no alternatives");
+ok(D.exemplars.lines === true && EX.plain(D.exemplars.answers[1]).split("\n").every(l => M.words(l) <= 35), "exemplars: one labelled part per line, each at most 35 words");
 ok(D.rubric.competences.map(c => c.id).join() === "framing,method" && D.rubric.competences.every(c => RB.COMPETENCES.some(x => x.id === c.id)), "rubric: framing and method fit, the course's ids");
 ok(/not a certificate/.test(D.rubric.note), "the narrow promise (§3.1)");
 
@@ -91,6 +114,20 @@ Object.keys(MARK).forEach(k => {
 ok(PAGE.indexOf('class="lx-card lx-studio-brief"') < PAGE.indexOf('data-learn="r03-system-and-method"') && /<b>Done when:<\/b>/.test(PAGE), "the task card sits above the interactive");
 ok(/About 30 minutes guided here, then about an hour on your own/.test(PAGE), "guided and practice time stated (30 + 60 min)");
 ok(/300 MW/.test(D.briefs.find(b => b.id === "flexload").question) && /the 300 MW load are illustrative/.test(PAGE), "the 300 MW load is labelled illustrative");
+ok(/a time step and horizon/.test(PAGE.slice(PAGE.indexOf("<b>Done when:</b>"), PAGE.indexOf("<b>Done when:</b>") + 300)) && /R1 card/.test(D.rubric.competences[0].look), "done when: the time step and horizon too; the rest of Framing comes from the R1 card");
+ok(!("built_by" in D.meta), "the public data file carries no production note");
+
+// ---------------- review fixes (2026-11-03)
+ok(D.bins.map(b => b.label).join("|") === "Decided or computed|Fixed inputs|Left out" && /^in the study/.test(D.bins[1].sub) && /^outside/.test(D.bins[2].sub), "boundary bins: fixed inputs are inside the analysis, not 'from outside'");
+const BR = id => D.briefs.find(b => b.id === id), cardOf = (b, id) => b.boundary.find(c => c.id === id);
+ok(/Assumed to affect both groups alike/.test(cardOf(BR("rebate"), "b5").why) && !/removes them/.test(JSON.stringify(D)), "rebate: federal credits are assumed to affect both groups alike, not removed by the comparison");
+ok(!/synchronous/i.test(JSON.stringify(D) + PAGE) && /planned for a region, such as a market operator's or a utility's planning area/.test(BR("flexload").scaleWhy) && /transfer limits/.test(BR("flexload").scaleWhy), "flexible load: adequacy planned for a region or planning area (as F1 now words it), with transfer limits; no 'whole synchronous grid'");
+ok(/separate, faster study/.test(BR("hospital").steps.find(x => x.id === "5m").why) && /islanding/.test(BR("hospital").assume) && /not the switch itself/.test(BR("hospital").assume), "hospital: five-minute steps do not verify the switch; the result assumes islanding works");
+ok(/four hours in a row per event/.test(BR("flexload").assume) && /events a year/.test(BR("flexload").assume) && /not made up later/.test(BR("flexload").assume) && /apart from unserved energy/.test(BR("flexload").assume), "flexible load: the pausing rule is stated (per event, events a year, no recovery, counted apart)");
+const FAMS = id => D.families.find(f => f.id === id);
+ok(/rolling horizon/.test(FAMS("opt").limit) && /unless/.test(FAMS("opt").limit) && /^Least reliable outside/.test(FAMS("ml").limit) && /^Static versions/.test(FAMS("eq").limit), "family limits by variant: foresight is a formulation choice, ML extrapolates unreliably, static equilibrium");
+["expected-unserved-energy", "linear-program", "mixed-integer-program", "perfect-foresight", "resource-adequacy", "islanding"].forEach(id => ok(JSON.stringify(D).indexOf("[[" + id + "|") >= 0, "glossary mark at first use in the data: " + id));
+ok(/\(LP\)/.test(BR("hospital").defence.same) && /\(MILP\)/.test(BR("hospital").defence.choice), "LP and MILP spelled out at first use");
 ["https://docs.pypsa.org/", "https://jump.dev/", "https://www.pyomo.org/"].forEach(u => ok(PAGE.indexOf('href="' + u + '"') >= 0, "tool link " + u));
 
 // ---------------- text budget and scope
@@ -98,6 +135,18 @@ const words = s => String(s).trim().split(/\s+/).length;
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*(free: true,\s*\n?\s*)?build/g)].map(m => m[1]);
 ok(stepTexts.length === 7 && stepTexts.every(t => words(t.replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1")) <= 35), "seven step cards, each at most 35 words");
 D.briefs.forEach(b => b.boundary.concat(b.steps, b.horizons).forEach(x => ok(words(x.why) <= 25, b.id + " note within budget: " + x.why)));
+D.briefs.forEach(b => [b.scaleWhy, b.assume].filter(Boolean).forEach(t => ok(M.words(t) <= 35, b.id + ": scale note and assumption within 35 words")));
+const sentences = t => (t.replace(/\b(U\.S\.|e\.g\.|i\.e\.)/g, "x").match(/[.!?](\s|$)/g) || []).length;
+ok(stepTexts.every(t => sentences(t) <= 2), "every step card is at most two sentences");
+// every text element the page shows, with JavaScript off: at most 35 words and two sentences (an answer written as a card
+// is checked line by line; references are left out)
+const VIS = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "");
+const long = [];
+for (const m of VIS.matchAll(/<(li|p|td|th|caption|summary|dd)\b([^>]*)>((?:(?!<\/?\1\b)[\s\S])*?)<\/\1>/g)) {
+  const parts = /lx-ex-lines/.test(m[2]) ? m[3].split("\n") : [m[3]];
+  parts.forEach(x => { const t = x.replace(/<[^>]+>/g, " ").replace(/&[a-z]+;/g, "x").replace(/\s+/g, " ").trim(); if (t && (words(t) > 35 || sentences(t) > 2)) long.push(t.slice(0, 60)); });
+}
+ok(long.length === 0, "every visible text element of the page is at most 35 words and two sentences: " + long.join(" | "));
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "");
 const DENY = [/\bFOAK\b/i, /\bNOAK\b/i, /first[- ]of[- ]a[- ]kind/i, /nth[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i,
   /subsidy[- ]free/i, /parity capital/i, /break[- ]even capital/i, /smr-dc/i, /smr-datacenter/i, /projects\//i, /research\.(html|qmd)/i, /\bAI\b/i, /artificial intelligence/i,

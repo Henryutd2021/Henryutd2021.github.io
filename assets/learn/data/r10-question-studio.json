@@ -3,8 +3,6 @@
     "title": "R10 research studio: the question studio. Pickers, draft templates, checks, search terms, crowding counts and example cards",
     "version": "r10-v1",
     "as_of": "2026-11-03",
-    "built_by": "by hand for curriculum v2 §11.3 (the question studio: pickers, checks, literature, crowding counts, blocked combinations, example cards) and §11.2 (question types); rubric from §3.4 (assets/learn/components/rubric.js)",
-    "scope": "Every element, lever, stakeholder and twist below is from §11.3; no combination of them leads outside the course's scope, and data centers appear only as a load. The test checks every draft the pickers can produce.",
     "note": "Draft questions, example cards and exemplars are illustrative. The studio makes no originality judgement: the counts are context only.",
     "license": "CC BY 4.0"
   },
@@ -25,7 +23,7 @@
       { "id": "ENV", "label": "LCA and environment", "metric": "CO₂ emissions", "units": "t CO₂ a year", "goal": "lower CO₂ emissions", "terms": ["emissions", "\"life cycle assessment\""] },
       { "id": "POL", "label": "Policy and regulation", "metric": "the share of the policy's target met", "units": "%", "goal": "more of the policy's target met", "terms": ["policy", "regulation"] },
       { "id": "SOC", "label": "Society and livelihoods", "metric": "energy burden", "units": "% of household income", "goal": "a lower energy burden", "terms": ["\"energy burden\"", "\"energy poverty\""] },
-      { "id": "SEC", "label": "Security, resilience and national strategy", "metric": "customer hours without power", "units": "hours a year", "goal": "fewer customer hours without power", "terms": ["resilience", "\"energy security\""] },
+      { "id": "SEC", "label": "Security, resilience and national strategy", "metric": "customer-hours without power", "units": "customer-hours a year (customers out × hours out)", "goal": "fewer customer-hours without power", "terms": ["resilience", "\"energy security\""] },
       { "id": "RES", "label": "Research methods", "metric": "error against a trusted reference", "units": "% of the reference", "goal": "a smaller error against a trusted reference", "terms": ["validation", "benchmark"] }
     ],
     "element": [
@@ -64,22 +62,22 @@
       { "id": "governance", "label": "governance and ownership", "phrase": "a change in governance or ownership", "terms": ["ownership", "governance"] }
     ],
     "stakeholder": [
-      { "id": "renters", "label": "low-income renters", "decides": false, "terms": ["renters", "\"low-income\""] },
-      { "id": "homeowners", "label": "homeowners", "decides": true, "terms": ["homeowners", "households"] },
-      { "id": "farmers", "label": "farmers", "decides": true, "terms": ["farmers", "agricultural"] },
-      { "id": "coops", "label": "rural co-ops", "decides": true, "terms": ["\"electric cooperative\"", "\"rural cooperative\""] },
-      { "id": "munis", "label": "municipal utilities", "decides": true, "terms": ["\"municipal utility\"", "\"public power\""] },
-      { "id": "ious", "label": "investor-owned utilities", "decides": true, "terms": ["\"investor-owned utility\"", "utility"] },
-      { "id": "operators", "label": "grid operators", "decides": true, "terms": ["\"system operator\"", "\"grid operator\""] },
-      { "id": "regulators", "label": "regulators", "decides": true, "terms": ["regulator", "\"public utility commission\""] },
-      { "id": "developers", "label": "developers", "decides": true, "terms": ["developer", "developers"] },
-      { "id": "largeusers", "label": "large energy users", "decides": true, "terms": ["\"large load\"", "\"industrial customers\""] },
-      { "id": "councils", "label": "city councils", "decides": true, "terms": ["city", "municipal"] },
-      { "id": "transit", "label": "transit agencies", "decides": true, "terms": ["\"transit agency\"", "\"public transport\""] },
-      { "id": "workers", "label": "workers in fossil industries", "decides": false, "terms": ["workers", "\"just transition\""] },
-      { "id": "tribal", "label": "tribal nations", "decides": true, "terms": ["tribal", "Indigenous"] },
-      { "id": "communities", "label": "communities near infrastructure", "decides": false, "terms": ["community", "\"host community\""] },
-      { "id": "future", "label": "future generations", "decides": false, "terms": ["intergenerational", "\"future generations\""] }
+      { "id": "renters", "label": "low-income renters", "terms": ["renters", "\"low-income\""] },
+      { "id": "homeowners", "label": "homeowners", "terms": ["homeowners", "households"] },
+      { "id": "farmers", "label": "farmers", "terms": ["farmers", "agricultural"] },
+      { "id": "coops", "label": "rural co-ops", "terms": ["\"electric cooperative\"", "\"rural cooperative\""] },
+      { "id": "munis", "label": "municipal utilities", "terms": ["\"municipal utility\"", "\"public power\""] },
+      { "id": "ious", "label": "investor-owned utilities", "terms": ["\"investor-owned utility\"", "utility"] },
+      { "id": "operators", "label": "grid operators", "terms": ["\"system operator\"", "\"grid operator\""] },
+      { "id": "regulators", "label": "regulators", "terms": ["regulator", "\"public utility commission\""] },
+      { "id": "developers", "label": "developers", "terms": ["developer", "developers"] },
+      { "id": "largeusers", "label": "large energy users", "terms": ["\"large load\"", "\"industrial customers\""] },
+      { "id": "councils", "label": "city councils", "terms": ["city", "municipal"] },
+      { "id": "transit", "label": "transit agencies", "terms": ["\"transit agency\"", "\"public transport\""] },
+      { "id": "workers", "label": "workers in fossil industries", "terms": ["workers", "\"just transition\""] },
+      { "id": "tribal", "label": "tribal nations", "terms": ["tribal", "Indigenous"] },
+      { "id": "communities", "label": "communities near infrastructure", "terms": ["community", "\"host community\""] },
+      { "id": "future", "label": "future generations", "terms": ["intergenerational", "\"future generations\""] }
     ],
     "twist": [
       { "id": "coldsnap", "label": "a week-long cold snap", "phrase": "during a week-long cold snap", "terms": ["\"cold snap\"", "\"extreme cold\""] },
@@ -96,6 +94,8 @@
       { "id": "queue", "label": "a doubled interconnection queue", "phrase": "with a doubled interconnection queue", "terms": ["\"interconnection queue\""], "cluster": "C32" }
     ]
   },
+  "terms": "[[energy-burden|energy burden]] · [[customer-hours|customer-hours]] · [[net-present-value|net present value]] · [[techno-economic-analysis|techno-economic analysis]] · [[life-cycle-assessment|LCA]] (life cycle assessment)",
+  "methodTerms": { "GIS": "gis", "econometrics": "econometrics", "difference-in-differences": "difference-in-differences", "Monte Carlo": "monte-carlo", "MCDA": "mcda", "decision analysis": "decision-analysis", "optimization": "optimization" },
   "pickerLabels": { "scale": "Scale", "dimension": "Dimension", "element": "System element", "lever": "Lever", "stakeholder": "Stakeholder", "twist": "Twist (optional)" },
   "drafts": {
     "descriptive": "How much does {metric} vary among {stakeholder} with {element} in {scale}{twist}?",
@@ -108,13 +108,15 @@
     { "id": "data", "label": "Data exist",
       "q": "Can you name a dataset that measures your metric, at your scale and time step?",
       "answers": ["Yes", "Not sure", "No"],
-      "pass": "Name it on your card, with its licence and date.",
+      "evidence": "The dataset, its licence and its date",
+      "pass": "Name it below, with its licence and date.",
       "warn": "Look before you commit: find one dataset and open it.",
       "block": "As written, the question cannot be answered: change the metric or the scale, or plan to collect data.",
       "fix": ["B2", "R4"] },
     { "id": "physics", "label": "Physics sanity",
       "q": "Do the units and sizes make sense: power in MW against energy in MWh, nothing above its rating, energy in balance?",
       "answers": ["Yes", "Not sure", "No"],
+      "evidence": "One number you checked, with its units",
       "pass": "Keep the units on the card.",
       "warn": "Check one number with units before you go on.",
       "block": "Fix the units or the sizes before anything else.",
@@ -122,13 +124,15 @@
     { "id": "institutions", "label": "Institutions",
       "q": "Can you say who pays, who permits, and which jurisdiction's rules apply, as of which date?",
       "answers": ["Yes", "Not sure", "No"],
-      "pass": "Write the rule and its date on the card.",
+      "evidence": "The rule that applies, and its date",
+      "pass": "Write the rule and its date below.",
       "warn": "Find the tariff, market rule or regulation that applies.",
       "block": "A rule can flip the answer: find it first.",
       "fix": ["N1", "A4"] },
     { "id": "scope", "label": "Scope fits the time",
       "q": "Could a first version be done in the research capstone's 20 to 40 hours, or in the time your project has?",
       "answers": ["Yes", "Not sure", "No"],
+      "evidence": "What a first version covers",
       "pass": "Note what a second version would add.",
       "warn": "Narrow the scale, the period or the boundary.",
       "block": "Cut it to one scale, one period and one metric.",
@@ -136,6 +140,7 @@
     { "id": "people", "label": "People and ethics",
       "q": "If people or communities are part of the study, do you know how you will get consent and treat them fairly?",
       "answers": ["Yes, or no people involved", "Not sure", "No"],
+      "evidence": "Your consent plan, or “no people involved”",
       "pass": "Keep the plan with the card.",
       "warn": "Ask a mentor before you collect anything about people.",
       "block": "Plan consent and fair treatment, with a mentor, before any data collection.",
@@ -176,35 +181,53 @@
     "source": "OpenAlex, articles and reviews published 2016 to 2 November 2026, keyword search of titles and abstracts (the queries above); retrieved 2 November 2026",
     "url": "https://openalex.org/",
     "rgi": "RGI: growth from 2016–18 to 2022–24, divided by the growth of energy-systems work as a whole (1.70 times). Above 1: faster than the field.",
-    "caveat": "Context only. The clusters overlap, the counts are not weighted by quality, and they are refreshed yearly with the same queries. Few papers is no evidence that a question is new, important or feasible; many papers is no evidence that it is done."
+    "caveats": [
+      "Context only: the clusters overlap, and the counts are not weighted by quality.",
+      "Refreshed yearly with the same queries.",
+      "Few papers is no evidence that a question is new, important or feasible.",
+      "Many papers is no evidence that it is done."
+    ]
   },
   "search": {
     "url": "https://openalex.org/works?search=",
     "checked": "3 November 2026",
-    "note": "OpenAlex accepts AND, OR, quotation marks and brackets. Other databases need small changes to the same string."
+    "note": "OpenAlex accepts AND, OR, quotation marks and brackets; other databases need small changes to the same string.",
+    "live": "Each link opens OpenAlex's current results in a new tab. They change as papers are added, so note the date you search.",
+    "noreq": "This page sends no request itself."
   },
   "examples": [
     { "id": "e1", "combo": "S1 · society · community solar · low-income renters", "type": "evaluative",
       "question": "Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?",
-      "picks": { "scale": "S1", "dimension": "SOC", "stakeholder": "renters" } },
+      "picks": { "scale": "S1", "dimension": "SOC", "lever": "policy", "stakeholder": "renters" },
+      "extra": { "element": { "label": "community solar", "phrase": "community solar", "terms": ["\"community solar\"", "\"shared solar\""] } },
+      "card": { "audience": "the co-op's board, deciding whether to keep the programme", "metric": "energy burden: yearly energy bills as a share of income", "units": "% of household income" } },
     { "id": "e2", "combo": "S0 · operations · irrigation pumps · farmers", "type": "prescriptive",
       "question": "How much irrigation pumping on a Plains farm could move to windy night hours without lowering yield, and what is that worth under the co-op's tariff?",
-      "picks": { "scale": "S0", "dimension": "OPS", "element": "irrigation", "stakeholder": "farmers" } },
+      "picks": { "scale": "S0", "dimension": "OPS", "element": "irrigation", "lever": "operation", "stakeholder": "farmers" },
+      "card": { "audience": "the farm's owner, who sets the pumping schedule", "metric": "pumping energy moved to windy night hours, and the bill saving it brings", "units": "MWh a season; $ a season" } },
     { "id": "e3", "combo": "S3 · security · heat pumps · elderly households · cold snap", "type": "predictive",
       "question": "During a week-long cold snap, how would all-electric heating change the risk of losing heat for elderly households, with and without backup?",
-      "picks": { "scale": "S3", "dimension": "SEC", "element": "heatpumps", "twist": "coldsnap" } },
+      "picks": { "scale": "S3", "dimension": "SEC", "element": "heatpumps", "lever": "tech", "twist": "coldsnap" },
+      "extra": { "stakeholder": { "label": "elderly households", "terms": ["elderly", "\"older adults\""] } },
+      "card": { "audience": "the city's emergency planners, who decide where backup heat goes", "metric": "share of elderly households without heat for more than 12 hours", "units": "% of elderly households, per cold snap" } },
     { "id": "e4", "combo": "S2 · environment · data-center cooling · nearby communities · drought", "type": "descriptive",
       "question": "How do the cooling choices of large data centers shift water use and summer peak demand in a water-stressed region?",
-      "picks": { "scale": "S2", "dimension": "ENV", "element": "datacenters", "stakeholder": "communities", "twist": "drought" } },
+      "picks": { "scale": "S2", "element": "datacenters", "lever": "tech", "stakeholder": "communities", "twist": "drought" },
+      "extra": { "dimension": { "label": "water use and summer peak", "metric": "cooling water use", "units": "million litres a year", "goal": "less cooling water use", "terms": ["\"water use\"", "\"peak demand\""] } },
+      "card": { "audience": "the region's water utility and grid planner", "metric": "cooling water withdrawn, and the data-center load's summer peak", "units": "million litres a year; MW" } },
     { "id": "e5", "combo": "S4 · security · batteries · regulators · mineral disruption", "type": "predictive",
       "question": "How sensitive is a national storage build-out to a one-year disruption of one mineral, and which design choices reduce the risk?",
-      "picks": { "scale": "S4", "dimension": "SEC", "element": "batteries", "stakeholder": "regulators", "twist": "mineral" } },
+      "picks": { "scale": "S4", "dimension": "SEC", "element": "batteries", "lever": "tech", "stakeholder": "regulators", "twist": "mineral" },
+      "card": { "audience": "national energy regulators, who set storage targets", "metric": "storage built by 2040, and total system cost, across disruption cases", "units": "GWh; $ billion" } },
     { "id": "e6", "combo": "S1 · TEA · mini-grids · farmers", "type": "prescriptive",
       "question": "Which productive uses make a solar mini-grid viable without lowering household access?",
-      "picks": { "scale": "S1", "dimension": "TEA", "element": "minigrids", "stakeholder": "farmers" } },
+      "picks": { "scale": "S1", "dimension": "TEA", "element": "minigrids", "lever": "market", "stakeholder": "farmers" },
+      "card": { "audience": "the mini-grid's operator, with the farmers who would buy its power", "metric": "the mini-grid's net present value with each productive use, household supply kept as it is", "units": "$ over 20 years" } },
     { "id": "e7", "combo": "S3 · sufficiency · building retrofits · city council", "type": "explanatory",
       "question": "Why did some neighbourhoods' heating demand fall more than others after a retrofit programme?",
-      "picks": { "scale": "S3", "element": "retrofits", "lever": "sufficiency", "stakeholder": "councils" } }
+      "picks": { "scale": "S3", "element": "retrofits", "lever": "sufficiency", "stakeholder": "councils" },
+      "extra": { "dimension": { "label": "heating demand", "metric": "heating demand", "units": "% of pre-retrofit demand", "goal": "lower heating demand", "terms": ["\"heating demand\"", "\"energy savings\""] } },
+      "card": { "audience": "the city council, which runs the retrofit programme", "metric": "fall in heating demand per home after the retrofit", "units": "% of pre-retrofit demand" } }
   ],
   "rubric": {
     "id": "r10-rubric",
@@ -214,7 +237,7 @@
     "competences": [
       {
         "id": "framing",
-        "look": "all eight card checks pass, and the boundary says what is left out."
+        "look": "all eight parts of the card are filled in, each meets the rubric's words, and the boundary says what is left out."
       },
       {
         "id": "realism",
@@ -234,18 +257,20 @@
           "Question: How will heat pumps ",
           { "text": "help", "note": "Help with what? The word hides the metric." },
           " low-income renters in heat waves?\nType: predictive\nAudience: ",
-          { "text": "low-income renters", "note": "The people affected, not the ones who decide: landlords and the city act on the answer." },
+          { "text": "low-income renters", "note": "A group, but no use for the answer is stated. Renters could use it; say for what, or name who controls the change." },
           "\nMetric: ",
           { "text": "comfort", "note": "No units: hours above a safe indoor temperature could be counted." },
           "\nCompared with: ",
           { "text": "(blank)", "note": "No [[counterfactual|counterfactual]]: help compared with what?" },
           "\nI would be wrong if: ",
-          { "text": "(left blank)", "note": "No falsification statement, so no result could count against it." }
+          { "text": "(left blank)", "note": "No falsification statement, so no result could count against it." },
+          "\nRealism and papers: ",
+          { "text": "(not done)", "note": "No realism review and no closest papers: nobody yet knows whether data exist or what is already known." }
         ] },
-      { "key": "good", "label": "Strong answer", "level": "Proficient",
+      { "key": "good", "label": "Strong answer", "level": "Proficient on framing and realism",
         "parts": [
           "Question: During a week-long heat wave, how many hours above the city's indoor-heat safety threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?\nType: predictive\nAudience: ",
-          { "text": "the city's housing office, which sets rental standards", "note": "Names who acts on the answer." },
+          { "text": "the city's housing office, which sets rental standards", "note": "A user and the use: the office sets the standards the answer informs. Landlords control the installation; that is a separate line." },
           "\nMetric: ",
           { "text": "hours above the indoor-heat threshold, per household per heat wave", "note": "A metric with units, from indoor sensors or a building model." },
           "\nCompared with: ",
@@ -255,21 +280,26 @@
           "\nI would be wrong if: ",
           { "text": "heat-pump homes saw no fewer hot hours than homes with window units", "note": "A result that would show the expectation false." },
           "\nMain uncertainty: ",
-          { "text": "whether renters can afford to run the cooling during the heat wave", "note": "The uncertainty that could change the answer most, and it comes from the spin's society dimension." }
+          { "text": "whether renters can afford to run the cooling during the heat wave", "note": "The uncertainty that could change the answer most, and it comes from the spin's society dimension." },
+          "\nRealism: ",
+          { "text": "data warn (few homes have indoor sensors); physics pass; rules pass (the city's 2026 rental code); time pass; people warn (consent for sensors in homes)", "note": "The five realism checks answered, with the evidence or the reason for each warning." },
+          "\nClosest papers: ",
+          { "text": "three found, each differing (owner-occupied homes; a cooler city; cooling bills, not hot hours)", "note": "How the card differs from each closest paper. The line shows the form of the notes; the papers come from your own searches." }
         ] }
     ],
     "diff": [
       { "label": "Metric and units", "weak": "“Comfort”", "good": "Hours above a threshold" },
-      { "label": "Audience", "weak": "Those affected", "good": "Those who decide" },
+      { "label": "Audience", "weak": "A group, no use stated", "good": "A user, and what they decide" },
       { "label": "Counterfactual", "weak": "None", "good": "Window units in the same homes" },
       { "label": "Boundary", "weak": "Not stated", "good": "Who is counted, what is left out" },
-      { "label": "Falsification", "weak": "None", "good": "A result that would show it wrong" }
+      { "label": "Falsification", "weak": "None", "good": "A result that would show it wrong" },
+      { "label": "Realism and papers", "weak": "Not done", "good": "Five checks; how it differs from three papers" }
     ],
-    "note": "Both cards are illustrative, and the threshold is the city's own. Neither card says whether the question is new: that is for the literature search."
+    "note": "Both cards are illustrative, and the threshold is the city's own. Neither says whether the question is new: that is for reading the closest papers."
   },
   "checklist": [
     { "id": "type", "label": "Type", "text": "Named, with its template." },
-    { "id": "audience", "label": "Audience", "text": "Someone who would act on the answer." },
+    { "id": "audience", "label": "Audience", "text": "Someone who would use the answer, and for what." },
     { "id": "metric", "label": "Metric", "text": "Measurable, with units." },
     { "id": "cf", "label": "Counterfactual", "text": "A realistic alternative to compare with." },
     { "id": "scale", "label": "Scale and boundary", "text": "Including what is left out." },

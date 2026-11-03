@@ -52,7 +52,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <ul>
 <li><b>Researchable:</b> specific, still open, and answerable with data you could get.</li>
 <li><b>Too vague:</b> no metric, no audience or no comparison.</li>
-<li><b>Already answered:</b> a lookup in a public dataset, or settled physics.</li>
+<li><b>Already answered:</b> a lookup in a public dataset, or settled physics, is enough for this task. Re-checking or replicating a published number is research, with its own purpose and evidence plan.</li>
 <li><b>Not answerable with the data at hand:</b> the data the question names cannot show the answer.</li>
 </ul>
 <!-- r01-task:start (written from the data file by the test's --write mode; do not edit) -->
@@ -71,24 +71,27 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <tr><td>Where in Prairie City are rooftop solar systems concentrated, compared with median household income by neighbourhood?</td><td>Researchable · descriptive</td><td>Specific and answerable from permit records and census income data. Descriptive: it maps where, without asking why.</td></tr>
 <tr><td>What is the future of energy storage?</td><td>Too vague</td><td>No place, period, metric or audience: a topic, not a question.</td></tr>
 <tr><td>Using one year of a utility's outage records, how will its customers' outage hours change by 2060?</td><td>Not answerable with the data at hand</td><td>One year cannot separate a trend from a bad year, and 2060 needs scenarios as well as records.</td></tr>
-<tr><td>Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?</td><td>Researchable · evaluative</td><td>A programme, a metric and a fair counterfactual: the same money spent another way. Evaluative: it judges a past programme against an alternative.</td></tr>
+<tr><td>Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?</td><td>Researchable · evaluative</td><td>A programme, a metric and a counterfactual on the same budget: the same money spent another way. Evaluative: it judges a past programme against an alternative.</td></tr>
 <tr><td>What was the average capacity factor of U.S. utility-scale wind farms in 2025?</td><td>Already answered</td><td>EIA reports it: 33.8% (Electric Power Monthly). Why regions differ could be a study.</td></tr>
-<tr><td>What will Prairie City's winter peak demand be in 2035 if half its homes switch to heat pumps, and with what range?</td><td>Researchable · predictive</td><td>A stated change, a metric with units and a range to estimate. Predictive: it asks what a future value will be, with uncertainty.</td></tr>
+<tr><td>What will Prairie City's winter peak demand (MW) be in 2035 if half its homes switch to heat pumps, and with what range?</td><td>Researchable · predictive</td><td>A stated change, a metric with units (<span class="lx-term" data-term="peak-demand">peak demand</span> in <span class="lx-term" data-term="megawatt">MW</span>) and a range to estimate. Predictive: it asks what a future value will be, with uncertainty.</td></tr>
 <tr><td>Are heat pumps worth it?</td><td>Too vague</td><td>Worth what, to whom, over how long, compared with which heating?</td></tr>
 <tr><td>Which pumping schedule should a Plains farm adopt to cut its power bill under the co-op's time-of-use tariff without lowering yield?</td><td>Researchable · prescriptive</td><td>A decision, a goal and a limit, with the tariff and pump data to work from. Prescriptive: it asks what the farm should do.</td></tr>
 <tr><td>Using Prairie Town's hourly grid demand alone, why did each household's electricity use change?</td><td>Not answerable with the data at hand</td><td>Town-level demand mixes thousands of homes; household changes need meter data or a survey.</td></tr>
 <tr><td>Why did some rural co-ops' customers lose power for longer than their neighbours' in the same ice storm?</td><td>Researchable · explanatory</td><td>An observed difference, with outage records and line data to test the reasons. Explanatory: it asks why the same storm had different effects.</td></tr>
-</tbody></table></div></details>
-<details class="lx-textalt"><summary>Three vague questions, rewritten as examples</summary><ul>
-<li><strong>“Is solar power good?”</strong> became: Did the co-op's community-solar array lower members' average yearly bill, compared with buying the same energy at wholesale prices? <em>Evaluative.</em> Audience: the co-op's board, which decides whether to build a second array. Metric: average bill per member ($ a year). Compared with: the same energy bought at wholesale prices.</li>
-<li><strong>“Are heat pumps worth it?”</strong> became: Over 15 years, would a cold-climate heat pump cost a Prairie Town homeowner less than a new gas furnace? <em>Predictive.</em> Audience: homeowners replacing a furnace, and the town's rebate office. Metric: net present cost of heating ($ over 15 years). Compared with: a new gas furnace installed at the same time.</li>
-<li><strong>“How can we fix the grid?”</strong> became: Which would cut Prairie Town's customer outage hours more per dollar over ten years: a second feeder or a battery at the substation? <em>Prescriptive.</em> Audience: the co-op's engineering committee. Metric: customer outage hours avoided per $1 million spent (hours per $ million). Compared with: today's single feeder, with no upgrade.</li>
-</ul></details>
+</tbody></table></div>
+<p class="lx-hint">Words in round 1: <span class="lx-term" data-term="co-op">co-op</span> · <span class="lx-term" data-term="time-of-use-tariff">time-of-use tariff</span> · <span class="lx-term" data-term="round-trip-efficiency">round-trip efficiency</span></p>
+<p class="lx-hint">Words in round 2: <span class="lx-term" data-term="energy-burden">energy burden</span> · <span class="lx-term" data-term="capacity-factor">capacity factor</span> · <span class="lx-term" data-term="peak-demand">peak demand</span> · <span class="lx-term" data-term="heat-pump">heat pump</span> · <span class="lx-term" data-term="time-of-use-tariff">time-of-use tariff</span></p>
+</details>
+<details class="lx-textalt"><summary>Three vague questions, rewritten as examples</summary>
+<table class="lx-facts r1-rw"><caption>“Is solar power good?”, rewritten</caption><tbody><tr><th scope="row">Rewrite</th><td>Did the co-op's community-solar array lower members' average yearly bill, compared with buying the same energy at wholesale prices?</td></tr><tr><th scope="row">Type</th><td>Evaluative</td></tr><tr><th scope="row">Audience</th><td>the co-op's board, which decides whether to build a second array</td></tr><tr><th scope="row">Metric</th><td>average bill per member</td></tr><tr><th scope="row">Units</th><td>$ a year</td></tr><tr><th scope="row">Compared with</th><td>the same energy bought at <span class="lx-term" data-term="wholesale-price">wholesale prices</span></td></tr></tbody></table>
+<table class="lx-facts r1-rw"><caption>“Are heat pumps worth it?”, rewritten</caption><tbody><tr><th scope="row">Rewrite</th><td>Over 15 years, would a cold-climate heat pump cost a Prairie Town homeowner less than a new gas furnace?</td></tr><tr><th scope="row">Type</th><td>Predictive</td></tr><tr><th scope="row">Audience</th><td>homeowners replacing a furnace, and the town's rebate office</td></tr><tr><th scope="row">Metric</th><td>15-year cost of heating: purchase, installation and bills, as a <span class="lx-term" data-term="present-value">present value</span></td></tr><tr><th scope="row">Units</th><td>$ in today's dollars</td></tr><tr><th scope="row">Compared with</th><td>a new gas furnace installed at the same time</td></tr></tbody></table>
+<table class="lx-facts r1-rw"><caption>“How can we fix the grid?”, rewritten</caption><tbody><tr><th scope="row">Rewrite</th><td>Which would cut Prairie Town's customer-hours of outage more per dollar over ten years: a second <span class="lx-term" data-term="feeder">feeder</span> or a battery at the <span class="lx-term" data-term="substation">substation</span>?</td></tr><tr><th scope="row">Type</th><td>Prescriptive</td></tr><tr><th scope="row">Audience</th><td>the co-op's engineering committee</td></tr><tr><th scope="row">Metric</th><td>customer-hours of outage avoided per $1 million spent</td></tr><tr><th scope="row">Units</th><td>customer-hours per $1 million (one customer out for one hour is one customer-hour)</td></tr><tr><th scope="row">Compared with</th><td>today's single feeder, with no upgrade</td></tr></tbody></table>
+</details>
 <!-- r01-task:end -->
 <p class="lx-hint">With JavaScript on, you sort and rewrite step by step, and your drafts stay in this browser.</p>
 </div>
 </div>
-<p class="lx-datanote"><span>The twenty questions, the rewrites, the co-ops, Prairie Town and Prairie City are illustrative. Two answers quote public numbers, U.S. electricity use in 2025 and the 2025 wind capacity factor, with their sources at the end of the page.</span></p>
+<p class="lx-datanote"><span>The questions, rewrites, co-ops, Prairie Town and Prairie City are illustrative. Two answers quote public numbers (U.S. electricity use and the wind capacity factor, both for 2025), sourced at the end of the page.</span></p>
 ```
 :::
 
@@ -106,26 +109,26 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <div class="lx-ex-cols">
 <div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Question: Is community solar good for low-income families [1]?
 Type: not named [2]
-Audience: low-income families
-Metric: savings [3]
-Compared with: (blank) [4]
-Scale and boundary: rural areas [5]
-I would be wrong if: (left blank) [6]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> “Good” is not a metric: any result could be read as success.</li><li value="2"><b>Falls short:</b> Without a type, a survey, a model and a regression could all claim to answer it.</li><li value="3"><b>Falls short:</b> No units and no period: dollars a month, or a share of income, over which years?</li><li value="4"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: savings compared with what?</li><li value="5"><b>Falls short:</b> A place, not a <span class="lx-term" data-term="system-boundary">boundary</span>: which programme, which members, which years, and what is left out?</li><li value="6"><b>Falls short:</b> No falsification statement: no result could show the expectation wrong.</li></ol></div>
+Audience: low-income families [3]
+Metric: savings [4]
+Compared with: (blank) [5]
+Scale and boundary: rural areas [6]
+I would be wrong if: (left blank) [7]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> “Good” is not a metric: any result could be read as success.</li><li value="2"><b>Falls short:</b> Without a type, a survey, a model and a regression could all claim to answer it.</li><li value="3"><b>Falls short:</b> A broad group, with no use for the answer stated: who would do what with it?</li><li value="4"><b>Falls short:</b> No units and no period: dollars a month, or a share of income, over which years?</li><li value="5"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: savings compared with what?</li><li value="6"><b>Falls short:</b> A place, not a <span class="lx-term" data-term="system-boundary">boundary</span>: which programme, which members, which years, and what is left out?</li><li value="7"><b>Falls short:</b> No falsification statement: no result could show the expectation wrong.</li></ol></div>
 <div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines">Question: Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?
 Type: evaluative [1]
-Audience: the co-op's board [2]
+Audience: the co-op's board, deciding whether to keep the programme [2]
 Metric: energy burden, yearly energy bills as % of household income [3]
-Compared with: bill credits of the same total cost [4]
+Compared with: bill credits of the same total cost, paid by the co-op over the same years [4]
 Scale and boundary: S1 community; the co-op's renter members, 2022–2025; landlords' costs left out [5]
-I would be wrong if: participants' burden fell no more than that of similar renters given credits [6]
-Main uncertainty: renters who moved away during the four years</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> Names the type: a past programme judged against a comparison.</li><li value="2"><b>Works:</b> Names who would act on the answer.</li><li value="3"><b>Works:</b> A metric with units that bills and income data can compute.</li><li value="4"><b>Works:</b> The counterfactual spends the same money another way, so the comparison is fair.</li><li value="5"><b>Works:</b> Says who and which years are counted, and what is left out.</li><li value="6"><b>Works:</b> Names the result that would show the expectation false.</li></ol></div>
+I would be wrong if: participants' burden fell no more than that of renters given credits, matched on income and housing type [6]
+Main uncertainty: renters who moved away during the four years</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> Names the type: a past programme judged against a comparison.</li><li value="2"><b>Works:</b> A specific audience and its use. Renters could be the audience of a question that serves their own choices.</li><li value="3"><b>Works:</b> A metric with units that bills and income data can compute.</li><li value="4"><b>Works:</b> Same budget, same payer, same years. Other differences between the groups that affect bills or income still need checking.</li><li value="5"><b>Works:</b> Says who and which years are counted, and what is left out.</li><li value="6"><b>Works:</b> Names the result that would show the expectation false, and how the two groups are made comparable.</li></ol></div>
 </div>
-<table class="lx-facts lx-ex-diff"><thead><tr><th scope="col"></th><th scope="col">Weak answer</th><th scope="col">Strong answer</th></tr></thead><tbody><tr><th scope="row">Type</th><td>Not named</td><td>Evaluative</td></tr><tr><th scope="row">Audience</th><td>Those affected</td><td>Those who decide</td></tr><tr><th scope="row">Metric and units</th><td>“Savings”, no units</td><td>Bills as % of income</td></tr><tr><th scope="row">Counterfactual</th><td>None</td><td>Credits of the same cost</td></tr><tr><th scope="row">Boundary</th><td>“Rural areas”</td><td>Members, years, what is left out</td></tr><tr><th scope="row">Falsification</th><td>None</td><td>A result that would show it wrong</td></tr></tbody></table>
+<table class="lx-facts lx-ex-diff"><thead><tr><th scope="col"></th><th scope="col">Weak answer</th><th scope="col">Strong answer</th></tr></thead><tbody><tr><th scope="row">Type</th><td>Not named</td><td>Evaluative</td></tr><tr><th scope="row">Audience</th><td>A broad group, no use stated</td><td>A specific audience and its use</td></tr><tr><th scope="row">Metric and units</th><td>“Savings”, no units</td><td>Bills as % of income</td></tr><tr><th scope="row">Counterfactual</th><td>None</td><td>Credits: same cost, payer and years</td></tr><tr><th scope="row">Boundary</th><td>“Rural areas”</td><td>Members, years, what is left out</td></tr><tr><th scope="row">Falsification</th><td>None</td><td>A result that would show it wrong</td></tr></tbody></table>
 <!-- r01-exemplars:end -->
 <p class="lx-eyebrow">Four tests before a question is worth researching</p>
 <ol>
 <li>Specific? If not, it is too vague: rewrite it.</li>
-<li>Already answered by a public dataset or settled physics? Then use the answer, and ask what is still open.</li>
+<li>Is a lookup in a public dataset, or settled physics, enough? Use the answer; to re-check or replicate it, say why and with what evidence.</li>
 <li>Can the data at hand show the answer? If not, change the data or narrow the question.</li>
 <li>Then it is researchable: name its type.</li>
 </ol>
@@ -143,11 +146,16 @@ Main uncertainty: renters who moved away during the four years</p><ol class="lx-
 <div id="r01-rubric" class="lx-xgrid">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The question card</p>
-<p>Write one sentence ending in a question mark, then its type, audience or decision-maker, metric and units, counterfactual, scale and boundary, “I would be wrong if…”, and the uncertainty that matters most. With JavaScript on, a card form checks each part.</p>
+<ol>
+<li>Write the question as one sentence ending in a question mark.</li>
+<li>Add its type, its audience or decision-maker, a metric with units, and the counterfactual.</li>
+<li>Add the scale and boundary, “I would be wrong if…”, and the uncertainty that matters most.</li>
+</ol>
+<p class="lx-hint">With JavaScript on, a card form shows which parts are still empty.</p>
 <!-- r01-rubric:start (written by LX.Rubric's staticHTML, from the course rubric, and from the data file's checklist, in the test's --write mode; do not edit) -->
-<div class="lx-scroll-x"><table class="lx-facts lx-rb-static"><thead><tr><th scope="col">Competence</th><th scope="col">Developing</th><th scope="col">Proficient (the bar)</th><th scope="col">Strong</th></tr></thead><tbody><tr><th scope="row">Framing<br><span class="lx-hint">Look for: your card passes all eight checks, and its boundary says what is left out.</span></th><td data-l="Developing">Question vague or untyped; no audience or counterfactual.</td><td data-l="Proficient">Typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement.</td><td data-l="Strong">Also explains why the question matters to its audience and what answer would change a decision.</td></tr></tbody></table></div>
+<div class="lx-scroll-x"><table class="lx-facts lx-rb-static"><thead><tr><th scope="col">Competence</th><th scope="col">Developing</th><th scope="col">Proficient (the bar)</th><th scope="col">Strong</th></tr></thead><tbody><tr><th scope="row">Framing<br><span class="lx-hint">Look for: all eight parts of your card are filled in, each meets the rubric's words, and the boundary says what is left out.</span></th><td data-l="Developing">Question vague or untyped; no audience or counterfactual.</td><td data-l="Proficient">Typed question with audience or decision-maker, metric with units, counterfactual, scale and boundary; one falsification statement.</td><td data-l="Strong">Also explains why the question matters to its audience and what answer would change a decision.</td></tr></tbody></table></div>
 <p class="lx-eyebrow">A checklist to reuse</p>
-<ul><li><b>One sentence:</b> About one system and one period, ending in a question mark.</li><li><b>Typed:</b> Descriptive, explanatory, evaluative, predictive or prescriptive.</li><li><b>Audience:</b> Someone who would act on the answer, or read it.</li><li><b>Metric with units:</b> Something you could measure or compute, such as <span class="lx-term" data-term="energy-burden">energy burden</span> in % of income.</li><li><b>Counterfactual:</b> What happens otherwise: the baseline you compare with.</li><li><b>Still open:</b> Not a lookup in a public dataset, and not settled physics.</li><li><b>Answerable:</b> Data you can get show the effect, at the time step it needs.</li><li><b>Falsifiable:</b> You can name a result that would show you wrong.</li></ul>
+<ul><li><b>One sentence:</b> About one system and one period, ending in a question mark.</li><li><b>Typed:</b> Descriptive, explanatory, evaluative, predictive or prescriptive.</li><li><b>Audience:</b> Someone who would use the answer, and for what: to act on it, or to inform their own choices.</li><li><b>Metric with units:</b> Something you could measure or compute, such as <span class="lx-term" data-term="energy-burden">energy burden</span> in % of income.</li><li><b>Counterfactual:</b> What happens otherwise: the baseline you compare with.</li><li><b>More than a lookup:</b> If a public dataset or settled physics already answers it, say what you add: a replication, a re-check or a new place.</li><li><b>Answerable:</b> Data you can get show the effect, at the time step it needs.</li><li><b>Falsifiable:</b> You can name a result that would show you wrong.</li></ul>
 <!-- r01-rubric:end -->
 </div>
 </div>
@@ -161,7 +169,7 @@ Main uncertainty: renters who moved away during the four years</p><ol class="lx-
 <div class="lx-qq" data-id="optim" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A ‘what should … do?’ question needs an <span class="lx-term" data-term="optimization">optimization</span> model.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Optimization is one way. Decision analysis and multi-criteria methods also answer prescriptive questions (<a href="r03-system-and-method.html">R3</a> compares the families).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Optimization is one way; decision analysis and multi-criteria methods also answer prescriptive questions (<a href="r03-system-and-method.html">R3</a> compares the families).</p></details>
 </div>
 <div class="lx-qq" data-id="data" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If the data at hand cannot answer a question, the question is useless.”</p>
@@ -179,7 +187,12 @@ Main uncertainty: renters who moved away during the four years</p><ol class="lx-
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Researcher</span>From a card to a proposal</summary>
 <div class="lx-deeper-body">
-<p>In the research capstone (CR, upcoming), your proposal opens with this card. <a href="r10-question-studio.html">R10</a>, the question studio, helps you generate candidate questions; <a href="r02-literature.html">R2</a> tests what is already known; <a href="r03-system-and-method.html">R3</a> picks the system, the boundary and the method.</p>
+<p>In the research capstone (CR, upcoming), your proposal opens with this card.</p>
+<ul>
+<li><a href="r10-question-studio.html">R10</a>, the question studio, helps you generate candidate questions.</li>
+<li><a href="r02-literature.html">R2</a> tests what is already known.</li>
+<li><a href="r03-system-and-method.html">R3</a> picks the system, the boundary and the method.</li>
+</ul>
 </div>
 </details>
 <details class="lx-deeper">
@@ -208,8 +221,8 @@ Main uncertainty: renters who moved away during the four years</p><ol class="lx-
 <table class="lx-facts">
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><td class="n">4.20 trillion kWh</td><td>U.S. electricity use in 2025: a lookup, so “already answered”.</td><td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025</td></tr>
-<tr><td class="n">33.8%</td><td>Capacity factor of the U.S. utility-scale wind fleet in 2025: also a lookup.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · final 2025 values</td></tr>
+<tr><td class="n">4.20 trillion kWh</td><td>U.S. electricity use in 2025: a lookup, so “already answered”.</td><td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025; checked 2 November 2026</td></tr>
+<tr><td class="n">33.8%</td><td>Capacity factor of the U.S. utility-scale wind fleet in 2025: also a lookup.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · final 2025 values; checked 2 November 2026</td></tr>
 </tbody>
 </table>
 </div>

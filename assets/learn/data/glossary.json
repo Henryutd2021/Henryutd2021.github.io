@@ -191,6 +191,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "co-op": {
+  "term": "Co-op (electric cooperative)",
+  "short": "An electric utility owned by the members it serves, common in rural areas.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
@@ -269,6 +275,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "customer-hours": {
+  "term": "Customer-hours",
+  "short": "Customers without power times the hours they are out: 100 customers out for 3 hours is 300 customer-hours.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
+ },
  "cut-in-speed": {
   "term": "Cut-in speed",
   "short": "The lowest wind speed at which a turbine starts to make electricity.",
@@ -316,6 +328,12 @@
   "short": "A linear approximation of real-power flows that sets each line's flow from the voltage-angle difference across it, holds voltage magnitudes fixed, assumes small angles, and leaves out losses and reactive power.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "decision-analysis": {
+  "term": "Decision analysis",
+  "short": "A structured way to choose among options under uncertainty, weighing each possible outcome by how likely and how valuable it is.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
  },
  "decision-variable": {
   "term": "Decision variable",
@@ -383,6 +401,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "econometrics": {
+  "term": "Econometrics",
+  "short": "Statistics applied to economic data, often to estimate whether a change caused an effect.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
+ },
  "efficiency": {
   "term": "Efficiency",
   "short": "The share of the energy put into a plant or device that comes out in the useful form, such as electricity.",
@@ -448,6 +472,12 @@
   "short": "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "expected-unserved-energy": {
+  "term": "Expected unserved energy",
+  "short": "Demand left unmet, averaged over many simulated years, in MWh a year: an amount of energy, unlike a load's size in MW.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "expected-value": {
   "term": "Expected value",
@@ -544,6 +574,12 @@
   "short": "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "gis": {
+  "term": "GIS (geographic information system)",
+  "short": "Software and methods for mapping and analysing data tied to places, such as land use, lines and population.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
  },
  "governor": {
   "term": "Governor",
@@ -665,6 +701,12 @@
   "lesson": "CF2",
   "href": "index.html#analyst"
  },
+ "life-cycle-assessment": {
+  "term": "Life cycle assessment (LCA)",
+  "short": "Counting a product's environmental effects, such as CO₂ emissions or water use, over its whole life, from materials to disposal.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
+ },
  "linear-program": {
   "term": "Linear program",
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
@@ -742,6 +784,12 @@
   "short": "The plant that serves the last megawatt of demand, whose offer sets the clearing price.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "mcda": {
+  "term": "MCDA (multi-criteria decision analysis)",
+  "short": "Scoring options against several goals at once, such as cost, emissions and fairness, with weights that the people deciding set.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
  },
  "mean": {
   "term": "Mean",
@@ -874,6 +922,12 @@
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-present-value": {
+  "term": "Net present value",
+  "short": "The present value of a project's future income minus the present value of its costs; above zero, it earns more than it costs at the chosen discount rate.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
  },
  "net-zero": {
   "term": "Net zero (CO₂)",
@@ -1283,6 +1337,12 @@
   "lesson": "CF7",
   "href": "index.html#analyst"
  },
+ "substation": {
+  "term": "Substation",
+  "short": "A site where transformers lower the voltage from transmission lines for the feeders that serve customers.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
+ },
  "supply-diversity": {
   "term": "Supply diversity",
   "short": "How evenly the energy supply is spread over different sources, so that losing one does not lose most of it.",
@@ -1313,6 +1373,12 @@
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "techno-economic-analysis": {
+  "term": "Techno-economic analysis (TEA)",
+  "short": "Estimating what a technology costs and earns from its engineering design, its prices and its operating pattern.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
+ },
  "telemetry": {
   "term": "Telemetry",
   "short": "Measurements sent automatically from plants and substations to the grid operator.",
@@ -1330,6 +1396,12 @@
   "short": "The length of one step in a model or dataset, such as five minutes, an hour or a year.",
   "lesson": "R3",
   "href": "r03-system-and-method.html"
+ },
+ "time-of-use-tariff": {
+  "term": "Time-of-use tariff",
+  "short": "An electricity price that changes with the hour of the day, usually higher in the evening peak.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
  },
  "tornado-chart": {
   "term": "Tornado chart",

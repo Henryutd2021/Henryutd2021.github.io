@@ -5,10 +5,11 @@
    Task (step cards): sort twenty questions in two rounds into researchable, too vague, already answered and not answerable
    with the data at hand (LX.CardSort); name the type of the ten researchable ones (five types, §11.2); rewrite three vague
    questions with an audience, a metric with units and a counterfactual, then compare with an example.
+   A rewrite is done when all five parts are written; its example can be opened at any time and does not complete it.
    Exemplars: a weak and a strong card for the same vague question (LX.Exemplars) and the four tests as a flowchart
-   (LX.Flowchart, e-flowchart). Self-check: the reader's question card (LX.QuestionCard, filled from a rewrite), the Framing
-   competence of the course rubric (LX.Rubric) and a reusable checklist (LX.Checklist, e-checklist); the myth-or-fact cards
-   (e-myth) are page markup.
+   (LX.Flowchart, e-flowchart). Self-check: the reader's question card (LX.QuestionCard, started from a rewrite: each
+   rewrite keeps its own card, so switching never mixes two questions), the Framing competence of the course rubric
+   (LX.Rubric) and a reusable checklist (LX.Checklist, e-checklist); the myth-or-fact cards (e-myth) are page markup.
    Lesson links follow data/path.json through LX.lessonRef (core.js).
    Node: module.exports = the pure model below (checks, grading, the no-JS version of the task); the test is
    _tests/learn/test_r01-framing.js (it also writes the page's no-JS blocks with --write). */
@@ -18,10 +19,13 @@
   var BIN_IDS = ["research", "vague", "answered", "nodata"];
   var TYPE_IDS = ["descriptive", "explanatory", "evaluative", "predictive", "prescriptive"];
   var RW_FIELDS = ["question", "audience", "metric", "units", "counterfactual"];
+  // the card's other parts, which the reader adds on the card itself (kept per rewrite)
+  var EXTRA = ["type", "scale", "boundary", "wrong", "uncertainty"];
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   // glossary marks (double brackets) as spans, built from parts so the build's glossary scan finds no placeholder id
   function rich(t) { return esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; }); }
-  function words(s) { return String(s || "").trim().split(/\s+/).filter(Boolean).length; }
+  function plainMarks(t) { return String(t == null ? "" : t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"); }
+  function words(s) { return plainMarks(s).trim().split(/\s+/).filter(Boolean).length; }
   function round(D, n) { return D.questions.filter(function (q) { return q.round === n; }); }
   function researchable(D) { return D.questions.filter(function (q) { return q.bin === "research"; }); }
   // the cards of a sort: round 1 or 2 into the four bins, or "types": the researchable ones into the five types
@@ -42,6 +46,29 @@
     return out;
   }
   function filled(v) { return RW_FIELDS.filter(function (k) { return v && String(v[k] || "").trim(); }).length; }
+  function hasAny(c) { return Object.keys(c || {}).some(function (k) { return String(c[k] || "").trim(); }); }
+  // the question card follows one source at a time: a rewrite ("rw1" ...) or the card the reader typed ("own").
+  // Switching keeps the current card under its source, then builds the new one: a rewrite's five parts from the reader's
+  // rewrite (a blank part stays blank), and the other parts only from that same rewrite's earlier card, never from
+  // another question. Returns { cards, card, from }.
+  function switchCard(cards, from, current, to, v) {
+    var out = {}, card = {};
+    Object.keys(cards || {}).forEach(function (k) { out[k] = cards[k]; });
+    if (hasAny(current)) out[from || "own"] = JSON.parse(JSON.stringify(current));
+    var kept = out[to] || {};
+    EXTRA.concat(RW_FIELDS).forEach(function (k) { card[k] = String(kept[k] || ""); });
+    if (to !== "own") RW_FIELDS.forEach(function (k) { card[k] = String((v && v[k]) || "").trim(); });
+    return { cards: out, card: card, from: to };
+  }
+  // a rewrite's feedback, in separate pieces: progress (a count), a short guidance line, and (last rewrite) what comes next
+  function rewriteFeedback(n, opened, last) {
+    var f = { progress: n + " of 5 parts written.", saw: null, bad: false, next: null };
+    if (n === 5) {
+      f.saw = "All five parts written. Compare your counterfactual with the example's: a good one could really have happened instead.";
+      if (last) f.next = "Next: put your best rewrite on a question card in the self-check below.";
+    } else if (opened) { f.saw = "The example is open. Write all five parts of your own to finish this rewrite."; f.bad = true; }
+    return f;
+  }
   // data checks: counts per bin and type, ids, notes within the text budget
   function check(D) {
     var out = [], ids = {};
@@ -65,17 +92,24 @@
       '<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Question</th><th scope="col">Where it goes</th><th scope="col">Why</th></tr></thead><tbody>'];
     D.questions.forEach(function (q) {
       h.push("<tr><td>" + esc(q.text) + "</td><td>" + esc(B[q.bin]) + (q.type ? " · " + esc((T[q.type] || q.type).toLowerCase()) : "") + "</td><td>"
-        + esc(q.why) + (q.typeWhy ? " " + esc(q.typeWhy) : "") + "</td></tr>");
+        + rich(q.why) + (q.typeWhy ? " " + rich(q.typeWhy) : "") + "</td></tr>");
     });
-    h.push("</tbody></table></div></details>");
-    h.push('<details class="lx-textalt"><summary>Three vague questions, rewritten as examples</summary><ul>');
+    h.push("</tbody></table></div>");
+    Object.keys(D.terms || {}).forEach(function (k) { h.push('<p class="lx-hint">Words in round ' + esc(k) + ": " + rich(D.terms[k]) + "</p>"); });
+    h.push("</details>");
+    h.push('<details class="lx-textalt"><summary>Three vague questions, rewritten as examples</summary>');
     D.rewrites.forEach(function (r) {
-      var e = r.example;
-      h.push("<li><strong>“" + esc(r.vague) + "”</strong> became: " + esc(e.question) + " <em>" + esc(T[e.type] || e.type) + ".</em> Audience: "
-        + esc(e.audience) + ". Metric: " + esc(e.metric) + " (" + esc(e.units) + "). Compared with: " + esc(e.counterfactual) + ".</li>");
+      h.push(rewriteTable(r, T));
     });
-    h.push("</ul></details>");
+    h.push("</details>");
     return h.join("\n");
+  }
+  // one example rewrite as a labelled table: one part per row
+  function rewriteTable(r, T) {
+    var e = r.example;
+    return '<table class="lx-facts r1-rw"><caption>“' + esc(r.vague) + "”, rewritten</caption><tbody>"
+      + [["Rewrite", e.question], ["Type", T[e.type] || e.type], ["Audience", e.audience], ["Metric", e.metric], ["Units", e.units], ["Compared with", e.counterfactual]]
+        .map(function (x) { return '<tr><th scope="row">' + esc(x[0]) + "</th><td>" + rich(x[1]) + "</td></tr>"; }).join("") + "</tbody></table>";
   }
   // the page's three no-JS blocks, from the data and the components' own staticHTML (the test writes and checks them):
   // C = { types: LX.QuestionCard.TYPES, exemplars: LX.Exemplars staticHTML, rubric: LX.Rubric staticHTML }
@@ -87,8 +121,9 @@
         + D.checklist.map(function (c) { return "<li><b>" + rich(c.label) + ":</b> " + rich(c.text) + "</li>"; }).join("") + "</ul>"
     };
   }
-  var model = { BIN_IDS: BIN_IDS, TYPE_IDS: TYPE_IDS, RW_FIELDS: RW_FIELDS, cards: cards, grade: grade, fillRest: fillRest, filled: filled,
-                check: check, staticTask: staticTask, staticBlocks: staticBlocks, rich: rich, words: words };
+  var model = { BIN_IDS: BIN_IDS, TYPE_IDS: TYPE_IDS, RW_FIELDS: RW_FIELDS, EXTRA: EXTRA, cards: cards, grade: grade, fillRest: fillRest, filled: filled,
+                switchCard: switchCard, rewriteFeedback: rewriteFeedback, check: check, staticTask: staticTask, staticBlocks: staticBlocks,
+                rich: rich, words: words, plainMarks: plainMarks };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -111,6 +146,7 @@
       ".r1-model{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 12px;margin:0;padding:10px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:14.5px}",
       ".r1-model dt{font-family:var(--lx-f-display);font-weight:500;color:var(--lx-ink-3)}.r1-model dd{margin:0;color:var(--lx-ink)}",
       ".r1-load{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
+      ".r1-terms{margin:0 0 8px}",
       "@media (max-width:560px){.r1-form{grid-template-columns:minmax(0,1fr)}.r1-model{grid-template-columns:minmax(0,1fr)}.r1-model dd{margin-bottom:4px}}"
     ].join("\n") }, document.head);
   }
@@ -126,6 +162,7 @@
     return function (act, api) {
       var list = cards(D, which), key = "r1-sort-" + which, placed = LX.store.get(key, {}) || {};
       var bins = which === "types" ? typeBins() : D.bins;
+      if (D.terms && D.terms[which]) H("p", { class: "lx-hint r1-terms", html: "Words in these questions: " + LX.rich(D.terms[which]) }, act);
       var cs = LX.CardSort(act, { bins: bins, cards: list, maxWhy: 10, checkLabel: "Check my sort", cls: "r1-sort",
         onCheck: function (g) { LX.store.set(key, placed); report(g); } });
       cs.place(placed); placed = cs.placed();
@@ -151,7 +188,8 @@
     };
   }
 
-  // a rewrite: five fields kept in this browser, a parts count, then an example to compare with
+  // a rewrite: five fields kept in this browser and a parts count. The step is done when all five are written; the
+  // example can be opened at any time to compare, and opening it completes nothing.
   function rewriteStep(D, k, last) {
     return function (act, api) {
       var r = D.rewrites[k], all = LX.store.get("r1-rewrites", {}) || {}, v = all[r.id] || {};
@@ -163,22 +201,34 @@
         lab.appendChild(document.createTextNode(labels[f]));
         var inp = f === "question" ? H("textarea", { rows: "2" }, lab) : H("input", { type: "text" }, lab);
         inp.setAttribute("maxlength", "400"); inp.value = v[f] || "";
-        inp.addEventListener("input", function () { v[f] = inp.value; all[r.id] = v; LX.store.set("r1-rewrites", all); count.textContent = filled(v) + " of 5 parts written."; });
+        inp.addEventListener("input", function () { v[f] = inp.value; all[r.id] = v; LX.store.set("r1-rewrites", all); paint(); });
       });
       var row = H("div", { class: "r1-row" }, act);
-      var cmp = H("button", { class: "lx-btn small", type: "button", text: "Compare with an example" }, row);
-      var count = H("span", { class: "lx-hint", "aria-live": "polite", text: filled(v) + " of 5 parts written." }, row);
+      var cmp = H("button", { class: "lx-btn ghost small", type: "button", text: "Compare with an example", "aria-expanded": "false" }, row);
+      var count = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
       var ex = H("dl", { class: "r1-model", hidden: true }, act), e = r.example;
-      [["Question", e.question], ["Type", typeLabel(e.type)], ["Audience", e.audience], ["Metric", e.metric + " (" + e.units + ")"], ["Compared with", e.counterfactual]]
-        .forEach(function (p) { H("dt", { text: p[0] }, ex); H("dd", { text: p[1] }, ex); });
+      [["Question", e.question], ["Type", typeLabel(e.type)], ["Audience", e.audience], ["Metric", e.metric], ["Units", e.units], ["Compared with", e.counterfactual]]
+        .forEach(function (p) { H("dt", { text: p[0] }, ex); H("dd", { html: LX.rich(p[1]) }, ex); });
+      var nextP = H("p", { class: "lx-hint", hidden: true }, act);
+      var opened = false, shown = null;
+      function paint() {
+        var n = filled(v), f = rewriteFeedback(n, opened, last), key = n === 5 ? "done" : opened ? "open" : null;
+        count.textContent = f.progress;
+        if (n === 5) api.done();
+        // guidance changes only when the state does, so a screen reader is not interrupted at every keystroke
+        if (key !== shown) {
+          if (f.saw) api.saw(f.saw, f.bad); else if (shown) api.saw("Write all five parts to finish this rewrite.", true);
+          shown = key;
+        }
+        nextP.hidden = !f.next; nextP.textContent = f.next || "";
+      }
       cmp.addEventListener("click", function () {
-        ex.hidden = false; api.done();
-        var n = filled(v);
-        api.saw((n === 5 ? "All five parts written. " : "You wrote " + n + " of 5 parts; the example shows the rest. ")
-          + "Compare the counterfactuals: a fair one is something that could really have happened instead."
-          + (last ? " Next, put your best rewrite on a question card in the self-check below." : ""));
-        LX.emit("layout");
+        ex.hidden = !ex.hidden; opened = opened || !ex.hidden;
+        cmp.setAttribute("aria-expanded", ex.hidden ? "false" : "true");
+        cmp.textContent = ex.hidden ? "Compare with an example" : "Hide the example";
+        paint(); LX.emit("layout");
       });
+      paint();
     };
   }
 
@@ -195,7 +245,7 @@
         q1: { t: "Specific?", k: "q" },
         vague: { t: "Too vague", s: "rewrite it", k: "end" },
         q2: { t: "Already answered?", tN: ["Already", "answered?"], k: "q" },
-        ans: { t: "Use the answer", s: "ask what is still open", sN: "ask what is open", k: "end" },
+        ans: { t: "Use the answer", s: "or plan a re-check", sN: "or re-check it", k: "end" },
         q3: { t: "Data at hand can show it?", tN: ["Data at hand", "can show it?"], k: "q" },
         nod: { t: "Change the data", s: "or narrow the question", sN: "or the question", k: "end" },
         res: { t: "Researchable", s: "now name its type", k: "end" }
@@ -225,17 +275,28 @@
     if (r6.ready) fix.uncertainty = { href: r6.href, label: "R6" };
     var qcHost = H("div", null, c1);
     var qc = LX.QuestionCard(qcHost, { id: "r1-card", code: "R1", fix: fix });
+    // each rewrite keeps its own card (r1-cards), so a card never mixes parts of two questions
+    var cards = LX.store.get("r1-cards", {}) || {}, from = LX.store.get("r1-card-from", null);
+    function go(to, v, done) {
+      var s = switchCard(cards, from, qc.get(), to, v);
+      cards = s.cards; from = s.from;
+      LX.store.set("r1-cards", cards); LX.store.set("r1-card-from", from);
+      qc.set(s.card); paintOwn(); msg.textContent = done;
+    }
     D.rewrites.forEach(function (r, i) {
       var b = H("button", { class: "lx-btn ghost small", type: "button", text: "Start from rewrite " + (i + 1) }, load);
       b.addEventListener("click", function () {
         var v = (LX.store.get("r1-rewrites", {}) || {})[r.id] || {};
         if (!filled(v)) { msg.textContent = "Rewrite " + (i + 1) + " is still empty: write it in the task above first."; return; }
-        var cur = qc.get();
-        RW_FIELDS.forEach(function (f) { if (String(v[f] || "").trim()) cur[f] = v[f]; });
-        qc.set(cur);
-        msg.textContent = "Rewrite " + (i + 1) + " is on the card. Fill in the parts still marked to do.";
+        var back = !!cards[r.id] && hasAny(cards[r.id]);
+        go(r.id, v, "Rewrite " + (i + 1) + " is on the card" + (back ? ", with the parts you added to it before" : ", on a fresh card")
+          + ". Your other cards are kept.");
       });
     });
+    var own = H("button", { class: "lx-btn ghost small", type: "button", text: "Back to the card you typed", hidden: true }, load);
+    own.addEventListener("click", function () { go("own", null, "Your own card is back."); });
+    function paintOwn() { own.hidden = !(cards.own && hasAny(cards.own) && from !== "own"); }
+    paintOwn();
     load.appendChild(msg);
     LX.Rubric(H("div", { class: "lx-xcard" }, host), D.rubric);
     LX.Checklist(H("div", { class: "lx-xcard" }, host), { id: "r1-checklist", title: "Is it worth researching? A checklist to reuse",
@@ -253,7 +314,7 @@
       { text: "Ten more. Watch for questions that name data which cannot show the answer: yearly totals for an hourly question, one year for a trend.",
         build: sortStep(D, 2, { saw: function (g) { return "You placed " + g.right + " of " + g.total + " where a researcher would. Of the twenty, ten are researchable: next, name their types."; } }) },
       { text: "Name the [[question-type|type]] of each researchable question. The type sets the kind of answer, and so which methods can give it.",
-        build: sortStep(D, "types", { saw: function (g) { return "You typed " + g.right + " of " + g.total + " as a researcher would; there are two of each type. Optimization answers only one type, prescriptive, and it is not the only way to answer it."; } }) },
+        build: sortStep(D, "types", { saw: function (g) { return "You typed " + g.right + " of " + g.total + " as a researcher would; there are two of each type. Optimization is often used for prescriptive questions, alongside decision analysis and multi-criteria methods; it also supports other analyses."; } }) },
       { text: "Now rewrite a vague question so it could be researched: an audience, a metric with units and a [[counterfactual|counterfactual]]. Then compare with an example.",
         build: rewriteStep(D, 0) },
       { text: "Next: worth what, to whom, over how long, compared with which heating? Same five parts, then compare.",
@@ -266,7 +327,8 @@
     selfcheck(D, P);
     root.lxLesson = { data: D, model: model };
     // demo states (core.js LX.demo): "mid" = round 1 sorted (eight right, two in a neighbouring bin) and checked;
-    // "step-1" to "step-3": that sort done the same way; "step-4" to "step-6": a partial rewrite, compared with the example
+    // "step-1" to "step-3": that sort done the same way; "step-4" to "step-6": the rewrite written (the example's words, as
+    // plain text) and the example opened
     function clickText(re) { setTimeout(function () { [].forEach.call(live.querySelectorAll("button"), function (b) { if (re.test(b.textContent)) b.click(); }); }, 60); }
     LX.demo(root, function (state) {
       var m = /^step-(\d)$/.exec(state), n = state === "mid" ? 1 : m ? +m[1] : 0;
@@ -281,7 +343,7 @@
         return { view: "sort " + which + " checked" };
       }
       var r = D.rewrites[n - 4], all = LX.store.get("r1-rewrites", {}) || {}, e = r.example;
-      all[r.id] = { question: e.question, audience: e.audience, metric: e.metric, units: "", counterfactual: "" };
+      all[r.id] = { question: plainMarks(e.question), audience: plainMarks(e.audience), metric: plainMarks(e.metric), units: plainMarks(e.units), counterfactual: plainMarks(e.counterfactual) };
       LX.store.set("r1-rewrites", all);
       cardsUI.go(n - 1); clickText(/^Compare with an example$/);
       return { view: "rewrite " + (n - 3) + " compared" };
