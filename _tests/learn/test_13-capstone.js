@@ -239,6 +239,8 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   const strs = []; (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") Object.values(o).forEach(walk); })(cfg);
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to/gi, ""))) bad.push(x); }));
   ok(!bad.length, "no data sentence pairs nuclear with a risk term: " + bad.join(" | "));
+  // the data note labels the price-year mix (shared fix 9; converting to one price year is a W3 item)
+  onPage("<b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.", "the price years of the costs, added unconverted");
   // the data file's `about`: constant costs and the reader-set nuclear capital cost are separate sentences (shared fix 8)
   const aboutS = cfg.about.split(/(?<=[.!?])\s+/);
   ok(aboutS.indexOf("Technology costs are constant for the whole year modelled (no change over time).") >= 0 && aboutS.indexOf("The reader can change two inputs: the gas price and the nuclear capital cost.") >= 0 &&

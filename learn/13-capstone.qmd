@@ -56,7 +56,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 <p class="lx-hint">With JavaScript on, you choose the plants yourself, run the year in a solver and ask it for the cheapest plan under a CO₂ cap.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Prairie Town:</b> fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.<br><b>Prairie Town:</b> fictional.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 15 guided minutes. Practice, about 20 more: by hand, earn all nine stars with a plan under 100 kt, or try a gas price of $6/MMBtu.</p>
 ```
 :::

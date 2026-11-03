@@ -32,6 +32,7 @@ const page = fs.readFileSync(path.join(SITE, "learn/12-trade-offs.qmd"), "utf8")
 const JS = fs.readFileSync(L("12-trade-offs.js"), "utf8");
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
+ok(page.indexOf("<b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.") > 0, "data note: the price years of the costs, added unconverted (as lesson 13 and M3)");
 const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
 const musd = v => "$" + (v / 1e6).toFixed(1) + "M", kt = v => Math.round(v / 1e3).toLocaleString("en-US") + " kt";
 const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
