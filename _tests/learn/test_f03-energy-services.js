@@ -112,6 +112,10 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   ok(d5.Q === 65 && d15.Q === 165 && (d15.Q / d5.Q).toFixed(1) === "2.5" && (d15.el / d5.el).toFixed(1) === "3.8", `5 → −15 °C: heat ×${(d15.Q / d5.Q).toFixed(2)}, electricity ×${(d15.el / d5.el).toFixed(2)}`);
   ok(near(M.day(D, -10).gas, 175) && near(d15.el + d15.air, d15.Q), "furnace gas = heat ÷ 0.80; heat pump: electricity + outdoor heat = heat");
   ok(M.day(D, 25).Q === 0 && M.day(D, 25).el === 0, "no heat need above 18 °C");
+  // "a model that uses one average temperature underestimates the coldest days": E(T) is convex above the cut-out
+  // (E = 5 (18 − T)(45 − T) / 144, a parabola opening upward), so the average of two days' electricity exceeds the
+  // electricity at their average temperature
+  for (let a = h.cutoutC; a <= 16; a++) for (let b = a + 2; b <= 18; b += 2) { const m = (a + b) / 2; ok((M.day(D, a).el + M.day(D, b).el) / 2 > M.day(D, m).el, `convex: days at ${a} and ${b} °C use more on average than one day at ${m} °C`); }
   ok(D.apply.answer === 90 / 3.0 && /90 ÷ 3\.0 = 30 kWh/.test(D.apply.why) && /other 60 kWh/.test(D.apply.why), "apply: 90 ÷ 3.0 = 30 kWh, 60 kWh from the air");
   // the no-JS cold-day table
   const tb = QMD.match(/The heat pump on a cold day[\s\S]*?<\/table>/)[0];
@@ -127,9 +131,10 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
 {
   const P = M.primary(D, P4, P6);
   ok(P.heatRate === 7535 && P.lossPct === 5 && P.el === 5400, "primary: F4's combined-cycle heat rate 7,535 Btu/kWh and F6's 5% losses");
+  ok(Math.round(P.sent / 100) * 100 === 5700 && Math.round(5700 * 7535 / 3412 / 100) * 100 === 12600, "primary: 5,400 ÷ 0.95 = 5,700 kWh sent out; 5,700 × 7,535 ÷ 3,412 = 12,600 kWh of gas (both lines of the box)");
   ok(Math.round(P.gas / 100) * 100 === 12600 && Math.round(P.cut * 100) === 26 && P.furnaceGas === 16900, `primary: ${f(P.gas)} kWh of gas at the plant, ${Math.round(P.cut * 100)}% less than the furnace's 16,900`);
   const box = QMD.match(/Primary energy: count the power plant too[\s\S]*?<\/details>/)[0];
-  ["5{,}400", "1 - 0.05", "7{,}535", "3{,}412", "12{,}600", "about 12,600 kWh", "16,900 kWh", "about 26% less gas", "7,535 Btu of gas per kWh in 2025", "about 5%"].forEach(s => ok(box.indexOf(s) >= 0, `primary box states "${s}"`));
+  ["5{,}400", "1 - 0.05", "5{,}700", "7{,}535", "3{,}412", "12{,}600", "about 12,600 kWh", "16,900 kWh", "about 26% less gas", "7,535 Btu of gas per kWh in 2025", "about 5%"].forEach(s => ok(box.indexOf(s) >= 0, `primary box states "${s}"`));
   ok(/f04-power-plants\.html/.test(box) && /f06-grid-and-outages\.html/.test(box), "primary box links F4 and F6 (both live)");
   const md = QMD.match(/From services to demand[\s\S]*?<\/details>/)[0];
   ok(/318\.15 ÷ 60 = 5\.30/.test(md) && near(318.15 / 60, 5.3025) && /0\.4526 \\times 318\.15 = 144/.test(md) && near(0.4526 * 318.15, 144, 0.01) && /keeps 45%/.test(md), "Modeler box: Carnot 5.30, 45% of it, 144");
