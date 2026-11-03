@@ -1,0 +1,447 @@
+{
+ "about": "Engine E0 (the Site Bench, SB0; capstone C0; lesson A8 next): one site behind one meter, sized and run hour by hour as a linear program. Two fictional sites: a Prairie Town home and the ridge wind farm. Hourly shapes are Prairie Town's real 2025 shapes from the Southwest Power Pool grid (town_year.json, EIA-930). The home's household use, its heating need and its temperature are illustrative. Every cost is in 2025 dollars: a value from a source in another dollar year is converted with EIA's GDP price index (deflator below), and the engine does the conversion so that the test can check it. Costs are constant over the whole horizon (no change over time). No tax credits, incentives, taxes or financing charges are counted.",
+ "accessed": "2026-11-03",
+ "priceYear": 2025,
+ "deflator": {
+  "index": {
+   "2022": 118.035,
+   "2023": 122.389,
+   "2024": 125.43,
+   "2025": 128.989
+  },
+  "note": "GDP implicit price deflator (index, 2017 = 100), the mean of EIA's monthly values for each year. A 2022 dollar is 1.093 2025 dollars.",
+  "src": [
+   "eia-steo-9a"
+  ]
+ },
+ "finance": {
+  "rate": 4,
+  "note": "4% real discount rate, as in lessons 7 and 13 (a round value inside the 2025 ATB's financing range). Money is in real 2025 dollars, so the rate is a real rate.",
+  "src": [
+   "atb2025-fin"
+  ]
+ },
+ "home": {
+  "label": "Prairie Town home",
+  "short": "Home",
+  "use": {
+   "kWh": 9000,
+   "note": "Illustrative: 9,000 kWh a year of household use (lights, appliances, cooling), following Prairie Town's hourly demand shape (SPP 2025). A real home's use is spikier than a whole grid's."
+  },
+  "heat": {
+   "kWh": 14000,
+   "base": 16,
+   "mean": 13.5,
+   "season": 15,
+   "coldDay": 15,
+   "daily": 5,
+   "warmHour": 15,
+   "note": "Illustrative: 14,000 kWh of heat a year, in proportion to how far a smooth made-up temperature falls below 16 °C. The temperature is coldest on 15 January and at 03:00; real weather is lumpier, with cold snaps this year does not have."
+  },
+  "solar": {
+   "cf": 0.176,
+   "method": "scale",
+   "note": "Rooftop panels follow SPP's 2025 solar shape, month by month (EIA's 2025 monthly capacity factors), scaled to a 17.6% yearly capacity factor, EIA's figure for a typical home system.",
+   "src": [
+    "eia-dg-2024",
+    "eia-epm-cf"
+   ]
+  },
+  "tariff": {
+   "flat": 0.14,
+   "touRatio": 3,
+   "peak": [
+    16,
+    21
+   ],
+   "note": "Illustrative: a flat 14¢/kWh, close to what Kansas homes paid on average in January to August 2025 (14.27¢/kWh). The time-of-use tariff charges three times as much from 16:00 to 21:00 (standard time, every day), set so that the household's use alone costs the same on either tariff (as in lesson A4).",
+   "src": [
+    "eia-epm-5-6-b"
+   ]
+  },
+  "export": {
+   "def": 4,
+   "note": "Illustrative: the utility pays 4¢ for each kWh the panels send to the grid (net billing). Only the panels export; the battery does not."
+  },
+  "grid": {
+   "lbPerMWh": 680,
+   "note": "One yearly average for every hour: Kansas power plants emitted 680 lb of CO2 per MWh generated in 2024 (operating emissions; location-based). The bench counts the electricity bought minus the electricity sent back at this factor. An hourly or marginal factor would differ (case file CF6).",
+   "src": [
+    "eia-ks-profile"
+   ]
+  },
+  "gas": {
+   "pricePerMcf": 14.81,
+   "btuPerCf": 1036,
+   "afue": 0.8,
+   "co2PerMMBtu": 52.91,
+   "note": "The home's present gas furnace: 80% efficient (the minimum furnace in EIA's table). Gas at $14.81 per thousand cubic feet, what Kansas homes paid in 2025, with 1,036 Btu per cubic foot; 52.91 kg of CO2 per MMBtu burned.",
+   "src": [
+    "eia-ng-ks",
+    "eia-btu",
+    "eia-aeo2026-rdm",
+    "eia-co2"
+   ]
+  },
+  "pv": {
+   "capex": 4336,
+   "capexYear": 2022,
+   "fom": 20,
+   "life": 25,
+   "note": "Installed cost $4,336 per kW (DC) in 2022 dollars, EIA's residential system; 25-year life. Upkeep of $20 per kW a year is illustrative.",
+   "src": [
+    "eia-aeo2026-rdm"
+   ]
+  },
+  "battery": {
+   "capex": 1000,
+   "capexYear": 2025,
+   "hours": 2.5,
+   "rte": 0.85,
+   "fomShare": 0.04,
+   "life": 15,
+   "note": "Illustrative installed cost of $1,000 per kWh (a home battery costs far more per kWh than the utility-scale batteries of lesson 13). Power = energy ÷ 2.5 hours, 85% round trip, fixed upkeep 4% of the cost a year and a 15-year life, as in the 2025 ATB's residential battery.",
+   "src": [
+    "atb2025-resbat"
+   ]
+  },
+  "hp": {
+   "standard": {
+    "label": "standard heat pump",
+    "capex": 6730,
+    "hspf": 8.2
+   },
+   "high": {
+    "label": "high-efficiency heat pump",
+    "capex": 8620,
+    "hspf": 12.4
+   },
+   "capexYear": 2022,
+   "life": 15,
+   "slope": 0.03,
+   "note": "EIA's air-source heat pumps, installed cost in 2022 dollars: the minimum-efficiency unit (HSPF 8.2, about COP 2.4 over the season) and the most efficient (HSPF 12.4, about COP 3.6). COP = HSPF ÷ 3.412. Illustrative: the heat pump is big enough for the coldest hour, its efficiency falls 3% for each °C colder, scaled so the season's average matches the rating, and it lasts 15 years. It replaces the gas furnace; a furnace's own replacement cost is not counted.",
+   "src": [
+    "eia-aeo2026-rdm"
+   ]
+  },
+  "horizon": 25,
+  "horizonNote": "25 years, the panels' life. The battery and the heat pump are bought again in year 15; at year 25 the second one still has a third of its life, counted as a residual value (straight line)."
+ },
+ "farm": {
+  "label": "Ridge wind farm",
+  "short": "Wind farm",
+  "wind": {
+   "capex": 1712,
+   "capexYear": 2025,
+   "fom": 34.57,
+   "life": 30,
+   "cf": 0.338,
+   "method": "power",
+   "note": "Onshore wind: $1,712 per kW to build and $34.57 per kW a year to keep up (2025 dollars); 30 years. Output follows SPP's 2025 wind shape, month by month, with a 33.8% yearly capacity factor (the U.S. fleet in 2025); the best hours reach the farm's full size.",
+   "src": [
+    "eia-aeo2026-emm",
+    "eia-epm-cf",
+    "atb2025-fin"
+   ]
+  },
+  "sale": {
+   "flat": 50,
+   "tou": {
+    "off": 40,
+    "peak": 100,
+    "hours": [
+     16,
+     21
+    ]
+   },
+   "note": "Illustrative: a fixed contract at $50/MWh for every MWh sent to the grid (lesson A1's price), or a time-of-use contract at $40/MWh and $100/MWh from 16:00 to 21:00. The line to the grid carries at most its limit, and the farm only sells: it cannot buy power."
+  },
+  "battery": {
+   "capexPerkW": 1521,
+   "capexYear": 2025,
+   "hours": 4,
+   "fomPerkW": 41.84,
+   "rte": 0.85,
+   "life": 15,
+   "note": "EIA's four-hour lithium-ion battery: $1,521 per kW ($380 per kWh of storage) and $41.84 per kW a year (2025 dollars); 15% of the energy is lost in storage (85% round trip); 15-year life.",
+   "src": [
+    "eia-aeo2026-emm",
+    "nrel-battery-2025"
+   ]
+  },
+  "electrolyzer": {
+   "capex": 2000,
+   "capexYear": 2022,
+   "fomShare": 0.05,
+   "kWhPerKg": 57.5,
+   "stackShare": 0.11,
+   "stackHours": 40000,
+   "life": 30,
+   "note": "DOE's PEM electrolyzer: about $2,000 per kW installed (2022 dollars); fixed upkeep 5% of that a year; 57.5 kWh of electricity per kg of hydrogen; 11% of the cost again for each 40,000 hours at full power (counted per MWh used); 30-year life.",
+   "src": [
+    "doe-h2-24005"
+   ]
+  },
+  "tank": {
+   "capexPerKg": 800,
+   "capexYear": 2025,
+   "life": 30,
+   "note": "Illustrative: $800 per kg of hydrogen the tank can hold, 30-year life, no upkeep."
+  },
+  "h2": {
+   "def": 4,
+   "gasMMBtuPerKg": 0.18,
+   "co2PerMMBtu": 52.91,
+   "note": "Illustrative: hydrogen sold at a set price per kg to one buyer, who takes at most a set amount each hour. If it replaces hydrogen made from natural gas (0.18 MMBtu of gas per kg, feedstock and heat), each kg avoids 0.18 × 52.91 = 9.52 kg of CO2 at the plant.",
+   "src": [
+    "eia-aeo2026-hmm",
+    "eia-co2"
+   ]
+  },
+  "horizon": 30,
+  "horizonNote": "30 years, the wind farm's life. A battery is bought again in year 15."
+ },
+ "weeks": {
+  "home": {
+   "extremes": [
+    "peak",
+    "netpeak"
+   ],
+   "perSeason": 1,
+   "pvRef": 6
+  },
+  "farm": {
+   "extremes": [
+    "calm"
+   ],
+   "perSeason": 1
+  },
+  "note": "The engine runs representative weeks hour by hour, as lesson 13 and M3 do: for each season the week closest to all the others (a medoid), scaled to keep the season's energy, plus weeks kept as they are. Home: the week with the highest household use and the week with the highest need net of 6 kW of panels. Wind farm: the week with the least wind. Each week stands for its weeks of the year (weights). Batteries and the tank end each week where they started: storage from one week to the next is left out."
+ },
+ "tie": {
+  "home": 0.0002,
+  "farm": 0.02,
+  "note": "Tie rule: a wear charge of 0.02¢ per kWh (home) or 2¢ per MWh (wind farm) on the energy into and out of the battery, so the battery never cycles for nothing. It is left out of every reported number. Several schedules can still tie hour by hour; the totals the bench reports are shared by every least-cost schedule (checked in the test)."
+ },
+ "sources": {
+  "eia-aeo2026-emm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3, p. 5 (2025 dollars), and its note on storage losses",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, electricity assumptions, Table 3"
+  },
+  "eia-aeo2026-rdm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Residential Demand Module, Table 2, p. 4 (heat pumps, furnaces; 2022 dollars) and Table 3, p. 5 (rooftop solar; 2022 dollars, 25-year life)",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, residential assumptions, Tables 2-3"
+  },
+  "eia-aeo2026-hmm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Hydrogen Market Module, Table 2, p. 2 (natural gas per kg of hydrogen from steam methane reforming)",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/HMM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, hydrogen assumptions, Table 2"
+  },
+  "eia-dg-2024": {
+   "text": "EIA, Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors, Table 2-2, p. 12 (residential solar: 17.6% capacity factor in 2022)",
+   "url": "https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf",
+   "asOf": "March 2024; checked 3 Nov 2026",
+   "short": "EIA, distributed generation costs (2024), Table 2-2"
+  },
+  "eia-epm-cf": {
+   "text": "EIA, Electric Power Monthly, Table 6.07.B (capacity factors, 2025, annual and monthly): wind 33.8%, solar photovoltaic 24.0%",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+   "asOf": "issue of 23 Oct 2026",
+   "short": "EIA Electric Power Monthly, Table 6.07.B"
+  },
+  "eia-epm-5-6-b": {
+   "text": "EIA, Electric Power Monthly, Table 5.6.B: Kansas residential average price, 14.27¢/kWh, January to August 2025",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b",
+   "asOf": "issue of 23 Oct 2026",
+   "short": "EIA Electric Power Monthly, Table 5.6.B"
+  },
+  "eia-ks-profile": {
+   "text": "EIA, Kansas Electricity Profile 2024, Table 1: carbon dioxide 680 lb/MWh",
+   "url": "https://www.eia.gov/electricity/state/kansas/",
+   "asOf": "data year 2024; checked 3 Nov 2026",
+   "short": "EIA, Kansas Electricity Profile 2024"
+  },
+  "eia-ng-ks": {
+   "text": "EIA, Kansas Price of Natural Gas Delivered to Residential Consumers: $14.81 per thousand cubic feet in 2025",
+   "url": "https://www.eia.gov/dnav/ng/hist/n3010ks3a.htm",
+   "asOf": "released 30 Oct 2026",
+   "short": "EIA, Kansas residential gas price"
+  },
+  "eia-btu": {
+   "text": "EIA, Energy Explained, British thermal units: 1 cubic foot of natural gas = 1,036 Btu",
+   "url": "https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php",
+   "asOf": "checked 3 Nov 2026",
+   "short": "EIA, British thermal units"
+  },
+  "eia-co2": {
+   "text": "EIA, Carbon Dioxide Emissions Coefficients: natural gas 52.91 kg CO2 per MMBtu",
+   "url": "https://www.eia.gov/environment/emissions/co2_vol_mass.php",
+   "asOf": "released 18 Sep 2024; checked 2 Nov 2026",
+   "short": "EIA, CO₂ emissions coefficients"
+  },
+  "eia-steo-9a": {
+   "text": "EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2022 118.035, 2023 122.389, 2024 125.430, 2025 128.989",
+   "url": "https://www.eia.gov/outlooks/steo/",
+   "asOf": "October 2026 issue (1 Oct 2026)",
+   "short": "EIA STEO, Table 9a"
+  },
+  "doe-h2-24005": {
+   "text": "DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology, Table 1, p. 2, and p. 9 (fixed and replacement costs)",
+   "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf",
+   "asOf": "20 May 2024; checked 3 Nov 2026",
+   "short": "DOE Hydrogen Program Record 24005"
+  },
+  "nrel-battery-2025": {
+   "text": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281, section 3 (15-year life)",
+   "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+   "asOf": "June 2025",
+   "short": "NREL battery cost projections, 2025"
+  },
+  "atb2025-resbat": {
+   "text": "NLR, 2025 Electricity ATB, Residential Battery Storage (5 kW and 12.5 kWh reference system, 85% round trip, 15-year life, fixed upkeep 4% of the cost)",
+   "url": "https://atb.nlr.gov/electricity/2025/residential_battery_storage",
+   "asOf": "checked 3 Nov 2026",
+   "short": "NLR 2025 ATB, residential battery"
+  },
+  "atb2025-fin": {
+   "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+   "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+   "asOf": "checked 2 Nov 2026",
+   "short": "NLR 2025 ATB, financial cases"
+  },
+  "eia-930": {
+   "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "asOf": "accessed 2 Nov 2026",
+   "short": "EIA-930, SPP 2025"
+  }
+ },
+ "reference": {
+  "about": "Written by node _tests/learn/test_sb0-site-bench.js --write: the default plan's results (the no-JS blocks) and the check of the 52-week run against one full-year LP for each preset.",
+  "default": {
+   "date": "2026-11-03",
+   "state": {
+    "site": "home",
+    "pv": 6,
+    "hb": 0,
+    "hp": "none",
+    "tariff": "flat",
+    "xc": 4,
+    "wind": 150,
+    "line": 100,
+    "fb": 0,
+    "el": 0,
+    "tank": 0,
+    "take": 1000,
+    "h2": 4,
+    "sale": "flat",
+    "rate": 4,
+    "cost": 100
+   },
+   "readouts": [
+    {
+     "key": "npv",
+     "label": "Net present value, 25 years",
+     "value": "−$17,813",
+     "note": "against the same home with nothing new, at 4.0% real"
+    },
+    {
+     "key": "saving",
+     "label": "Saved on bills and gas, a year",
+     "value": "$800",
+     "note": "$2,114 a year before, $1,314 with the plan"
+    },
+    {
+     "key": "capex",
+     "label": "Equipment, up front",
+     "value": "$28,430",
+     "note": "upkeep $120 a year"
+    },
+    {
+     "key": "co2",
+     "label": "CO₂ a year",
+     "value": "3.1 t",
+     "note": "down 2.9 t from 5.9 t"
+    },
+    {
+     "key": "self",
+     "label": "Own solar and battery cover",
+     "value": "48%",
+     "note": "of the home's electricity use"
+    },
+    {
+     "key": "grid",
+     "label": "Hours that need the grid",
+     "value": "5,240 h",
+     "note": "of 8,760; the most it draws in one hour: 1.5 kWh"
+    }
+   ]
+  },
+  "check": {
+   "date": "2026-11-03",
+   "rows": [
+    {
+     "id": "solar",
+     "label": "Home: solar only",
+     "weeks": -17813,
+     "year": -17813,
+     "capex": 28430
+    },
+    {
+     "id": "solarbat",
+     "label": "Home: solar and a battery",
+     "weeks": -37790,
+     "year": -37789,
+     "capex": 40930
+    },
+    {
+     "id": "hp",
+     "label": "Home: heat pump only",
+     "weeks": -9924,
+     "year": -9924,
+     "capex": 7355
+    },
+    {
+     "id": "allin",
+     "label": "Home: all three",
+     "weeks": -51033,
+     "year": -51035,
+     "capex": 59827
+    },
+    {
+     "id": "farm",
+     "label": "Wind farm: wind farm alone",
+     "weeks": 27864228,
+     "year": 27864228,
+     "capex": 256800000
+    },
+    {
+     "id": "farmbat",
+     "label": "Wind farm: add a battery",
+     "weeks": -54058240,
+     "year": -54316538,
+     "capex": 332850000
+    },
+    {
+     "id": "farmel",
+     "label": "Wind farm: add an electrolyzer",
+     "weeks": -94118826,
+     "year": -94118826,
+     "capex": 366080298
+    },
+    {
+     "id": "farmtank",
+     "label": "Wind farm: electrolyzer and tank",
+     "weeks": -119397859,
+     "year": -119437661,
+     "capex": 374080298
+    }
+   ]
+  }
+ }
+}

@@ -921,6 +921,25 @@ rn.refresh();                 // after each run (and when the plan changes, so t
 - **Checks** (the deliverable's "done when"; they never block copying): a plan link, results from a finished run of this plan, each `need` field in the reader's words (at least `min` words, 5 by default, and no "[…]" placeholder), the assumptions, a sensitivity line, and one page (at most 550 words). A page can pass its own `{ id, label, test(note, words) }`.
 - **Pure:** `compose(note, words, fields, { format: "text" | "md", date, code })`, `html` (the preview, all text escaped; the link as text, not a link), `outlineHTML(fields)` (the no-JS fallback: the note's headings in order with what goes under each), `sensitivityLine`, `checks`, `headText`, `countWords`, `PAGE_WORDS`, `CLAIMS`, `FOOTER` (also on `LX.ReportNote`).
 
+**Engine E0** (`engine-e0.js`, `engine-e0.css`; `LX.E0`; data `data/e0.json`): one site behind one meter, sized and run hour by hour as a linear program (curriculum v2 §16.4). Used by the Site Bench (SB0) and capstone C0; lesson A8 can run the same model. Two fictional sites: the Prairie Town home (household use and a heating need, illustrative; rooftop solar, a battery, a heat pump, flat or time-of-use tariff, an export credit) and the ridge wind farm (wind, a sell-only line, a 4-hour battery, an electrolyzer, a hydrogen tank, a buyer with a set price and hourly take). Every cost is in 2025 dollars, converted in `costs()` with EIA's GDP price index.
+
+```js
+var P = LX.E0.prepare(D, town_year, cf_targets);          // once per page: the sites' 8,760 hours and representative weeks
+var s = LX.E0.withPreset(LX.E0.defaults(), LX.E0.presets[1]);  // a plan: the fields of LX.E0.schema (an LX.ShareState schema)
+LX.E0.solve(s, P, { signal: ac.signal, timeLimit: 10 })    // Promise, never rejects:
+  .then(function (r) { /* { status, ok, message, hint, results, raw, ms }; results = LX.E0.summarize(s, r.raw) */ });
+LX.E0.solve(s, P, { size: true })                          // "Size it for me": r.results.sizes, r.results.snapped (to the steps)
+LX.E0.sensitivity(s, P, r, { signal })                     // Promise of { base, rows } for LX.Tornado (the plan held fixed)
+LX.E0.note(s, r.results)                                   // the LX.ReportNote input (heading, plan, results, assumptions, limits)
+var B = LX.E0.ui.bench(live, { P: P, resultsHost: el, schema: LX.E0.schemaFor("c0"), onDone: fn, onDraw: fn });   // the page kit
+```
+
+- **Time.** A run is the 52 calendar weeks of 2025 and 31 December, one small LP each (53 solves through `LX.solver`), with storage cyclic inside each period: every hour of the year once. `{ full: true }` is one LP on all 8,760 hours with storage cyclic over the year (the test's check; too slow for phones); `{ size: true }` sizes on representative weeks (one medoid per season plus extremes), then the page runs the snapped plan through the 53 periods.
+- **Pure, for Node** (`require("components/engine-e0.js")`): `build(P, s, { periods | mode, size })` (the model for `LX.solver`), `read` / `start`, `add`, `finish` (a solved model's flows), `summarize` (every number a page shows: readouts, flows, money with the year-by-year cash flow, CO₂, the 52 weeks' series), `cashflow`, `costs`, `usd`, `crf`, `weeks`, `periods`, `snap`, `sensRows`, `recost`, `heading`, `planRows`, and the no-JS builders `fallback(D)` (from `D.reference`, written by the SB0 test), `resultsHTML`, `inputsHTML(D, P)`, `sourcesHTML(D)`, `checkHTML(check)`.
+- **Tie rule.** A wear charge on battery charge and discharge, and on the farm a hair's preference for selling earlier in the week; both are left out of the reported numbers. The SB0 test checks that each reported total is the same on the whole optimal face.
+- **Units inside the LP.** Home costs in cents, farm costs in thousands of dollars and hydrogen in tonnes (for HiGHS's speed); `read()` converts back.
+- **Tests and bench.** `_tests/learn/test_sb0-site-bench.js` (identities, closed forms, the 52-week run against one full-year LP, ties, sizing, failure states, the plan link) and `_tests/learn/test_c0-behind-one-meter.js`; `scripts/learn_solver_bench.mjs` times `e0wk*`, `e0size*` and whole runs `e0run-*` on the page path.
+
 **Form pieces** (`forms.css`, W3 part): `.lx-sb-brief`, `.lx-sb-facts`, `.lx-cap-brief`, the bench frame `.lx-sb` (`.lx-sb-controls`, `.lx-sb-group`, `.lx-sb-side`, `.lx-sb-presets`), the results `.lx-sb-results`, `.lx-sb-charts` (`.two` for two charts side by side from 960 px) and `.lx-sb-chart` (no overflow clipping, so chart tips and popovers stay visible), and `.lx-sb-static` for the no-JS tables.
 
 **Scope and QA** (ResearchPortfolio folder).

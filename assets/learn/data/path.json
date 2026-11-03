@@ -1482,6 +1482,30 @@
    "id": "cf1-supply-chain-microgrids",
    "minutes": 10,
    "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "SB0",
+   "title": "Site Bench",
+   "ready": true,
+   "href": "sb0-site-bench.html",
+   "scales": [],
+   "id": "sb0-site-bench",
+   "tier2": "modeler",
+   "minutes": 20,
+   "form": "sandbox"
+  },
+  {
+   "tier": "analyst",
+   "code": "C0",
+   "title": "Behind one meter: what should one home or one plant install?",
+   "ready": true,
+   "href": "c0-behind-one-meter.html",
+   "scales": [],
+   "id": "c0-behind-one-meter",
+   "tier2": "modeler",
+   "minutes": 60,
+   "form": "capstone"
   }
  ],
  "toolbox": [

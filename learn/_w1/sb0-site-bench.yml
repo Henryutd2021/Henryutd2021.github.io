@@ -1,0 +1,8 @@
+# Sidecar for SB0 (sb0-site-bench) and engine E0, builder learn-w3-g, 2026-11-03. Read by scripts/build_learn.py.
+id: sb0-site-bench
+lesson: SB0
+requests:
+  - "Engine E0 is a new shared component (assets/learn/components/engine-e0.js and engine-e0.css, LX.E0). It is bundled through W3_ENGINES in scripts/build_learn.py (index repo, uncommitted: engine-e0 added next to the E1 builder's engine-e1), and documented in assets/learn/README.md (Sandboxes and capstones, 'Engine E0')."
+  - "A8 (learn-w3-e) can move onto E0 at integration: LX.E0.build(P, s, { periods }) takes any list of periods, so a lesson can pass its own week; the farm site (wind, a 4-hour battery, an electrolyzer, a tank) is the closest match."
+  - "scripts/learn_solver_bench.mjs (index repo, uncommitted) gains E0 instances: e0wkfarm, e0wkhome, e0sizefarm, e0sizehome, and whole runs e0run-default, e0run-home, e0run-farm (53 LPs through LX.solver, timed as the page waits)."
+  - "Possible shared improvement: LX.solver could pass a HiGHS option such as solver or simplex_strategy; E0's 53 weekly LPs would gain most from it. Not needed for the budget now."
