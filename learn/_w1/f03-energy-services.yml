@@ -1,0 +1,30 @@
+# Sidecar for F3 (f03-energy-services), builder learn-w3-a, 2026-11-03. Read by scripts/build_learn.py.
+id: f03-energy-services
+lesson: F3
+glossary:
+  - id: energy-service
+    term: Energy service
+    def: "What people actually want from energy, such as a warm room, hot water, cold food, light or a trip; the energy is only the means."
+  - id: energy-carrier
+    term: Energy carrier
+    def: "A form in which energy is moved to where it is used, such as electricity, natural gas, gasoline or hydrogen."
+  - id: final-energy
+    term: Final energy
+    def: "The energy a home, business or vehicle buys and uses, as on its meters and receipts, such as kWh of electricity or gallons of gasoline."
+  - id: useful-energy
+    term: Useful energy
+    def: "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses."
+  - id: primary-energy
+    term: Primary energy
+    def: "Energy as found in nature before any conversion, such as the gas burned in a power plant to make the electricity a home later buys."
+  - id: coefficient-of-performance
+    term: Coefficient of performance (COP)
+    def: "Heat a heat pump delivers divided by the electricity it uses; a COP of 3 means 3 kWh of heat for each kWh of electricity."
+  - id: afue
+    term: AFUE (annual fuel utilization efficiency)
+    def: "The share of a furnace's fuel energy that ends up as heat in the home over a heating season, under a standard test."
+requests:
+  - "Promote LX.Sankey (i-sankey, e-sankey; curriculum §16: F3, F4, F9, F10) from assets/learn/f03-energy-services.js into components/sankey.js and sankey.css. It injects its own small stylesheet (id lx-sankey-css, tokens only) until then. Pure part: layout(spec, W, H, o), band(...), flows(spec) (Node: require('assets/learn/f03-energy-services.js').sankey). View: nodes are buttons (Tab, Enter, Space) that light their flows and say what flows in and out in an aria-live line; numbered badges and a key replace middle-column labels under 560 px; tween between specs (off under reduced motion); a text-version table. F4 loads f03-energy-services.js before its own script for it; drop that script tag from F4 once promoted."
+  - "Lesson-local, no promotion needed: HomeScene (the home cutaway with six service buttons) and ColdDay (the COP slider, bars and curve)."
+  - "Cross-lesson edits made on learn-w3-a outside F3's files, because the shared tests require them once F3-F6 are live: learn/f01-five-scales.qmd links F6 instead of 'F6 (upcoming)'; teaching.qmd counts 47 lessons live. Other W3 branches will change the same count; take the merged total."
+  - "When A15, F9, F10 and M12 go live, F3 names them in plain text as upcoming (Go deeper boxes); link them then."

@@ -11,6 +11,12 @@
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
  },
+ "afue": {
+  "term": "AFUE (annual fuel utilization efficiency)",
+  "short": "The share of a furnace's fuel energy that ends up as heat in the home over a heating season, under a standard test.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "annuity-factor": {
   "term": "Annuity factor",
   "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
@@ -262,6 +268,12 @@
   "short": "An electric utility owned by the members it serves, common in rural areas.",
   "lesson": "R1",
   "href": "r01-framing.html"
+ },
+ "coefficient-of-performance": {
+  "term": "Coefficient of performance (COP)",
+  "short": "Heat a heat pump delivers divided by the electricity it uses; a COP of 3 means 3 kWh of heat for each kWh of electricity.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
  },
  "combined-cycle": {
   "term": "Combined-cycle plant",
@@ -581,11 +593,23 @@
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "energy-carrier": {
+  "term": "Energy carrier",
+  "short": "A form in which energy is moved to where it is used, such as electricity, natural gas, gasoline or hydrogen.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "energy-security": {
   "term": "Energy security",
   "short": "Keeping energy flowing at bearable prices when a fuel, a supplier or a route is cut off.",
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
+ },
+ "energy-service": {
+  "term": "Energy service",
+  "short": "What people actually want from energy, such as a warm room, hot water, cold food, light or a trip; the energy is only the means.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
  },
  "energy-storage": {
   "term": "Energy storage",
@@ -688,6 +712,12 @@
   "short": "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "final-energy": {
+  "term": "Final energy",
+  "short": "The energy a home, business or vehicle buys and uses, as on its meters and receipts, such as kWh of electricity or gallons of gasoline.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
  },
  "firm-capacity": {
   "term": "Firm capacity",
@@ -1421,6 +1451,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "primary-energy": {
+  "term": "Primary energy",
+  "short": "Energy as found in nature before any conversion, such as the gas burned in a power plant to make the electricity a home later buys.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "primary-response": {
   "term": "Primary frequency response",
   "short": "Automatic extra output from power plants' governors within seconds of a frequency drop; it stops the fall but does not restore 60 Hz.",
@@ -1906,6 +1942,12 @@
   "short": "A payment outside the market price that covers costs a scheduled plant cannot recover at the price, such as start-up and no-load costs; also called a make-whole payment.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "useful-energy": {
+  "term": "Useful energy",
+  "short": "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
  },
  "utm": {
   "term": "UTM (Universal Transverse Mercator)",

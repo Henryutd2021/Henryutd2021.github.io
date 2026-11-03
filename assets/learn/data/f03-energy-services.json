@@ -1,0 +1,147 @@
+{
+ "meta": {
+  "title": "F3: a Prairie Town home's year of energy by service and carrier, its useful energy, and a heat pump on a cold day",
+  "note": "The Prairie Town home is illustrative: it is built from real survey averages (EIA RECS 2020, West North Central census division, which includes Kansas), one typical car (EPA, 2022 data) and illustrative equipment efficiencies. The cold-day heat need and the heat pump's COP curve are an illustrative model, set to pass through a published DOE target. Every sourced number below carries its table or page and the date it was read.",
+  "checked": "2026-11-03"
+ },
+ "sources": {
+  "recs_ce46": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "2020 Residential Energy Consumption Survey (RECS), Table CE4.6: Annual household site end-use consumption by fuel in the United States, averages, 2020",
+   "url": "https://www.eia.gov/consumption/residential/data/2020/index.php?view=consumption",
+   "where": "row West North Central; million Btu per household using the fuel and end use: natural gas space heating 57.6, water heating 17.4, other 3.8; electricity air conditioning 5.9, refrigerators 3.0, other 18.5",
+   "as_of": "2020 data; released June 2023, revised March 2024; read 3 November 2026"
+  },
+  "recs_ce31": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "2020 RECS, Table CE3.1: Annual household site end-use consumption in the U.S., totals and averages, 2020",
+   "url": "https://www.eia.gov/consumption/residential/data/2020/index.php?view=consumption",
+   "where": "row All homes: total site energy 9,481 trillion Btu, of which space heating 4,026 trillion Btu (42%); 123.53 million housing units",
+   "as_of": "2020 data; released June 2023, revised March 2024; read 3 November 2026"
+  },
+  "eia_btu": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Energy explained: British thermal units (Btu), Sample Btu conversion factors",
+   "url": "https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php",
+   "where": "1 kilowatthour = 3,412 Btu; 1 gallon of motor gasoline = 120,214 Btu",
+   "as_of": "read 3 November 2026"
+  },
+  "epa_vehicle": {
+   "publisher": "U.S. Environmental Protection Agency",
+   "title": "Greenhouse Gas Equivalencies Calculator: Calculations and References, Gasoline-powered passenger vehicles per year",
+   "url": "https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references",
+   "where": "In 2022, the weighted average combined fuel economy of cars and light trucks was 22.8 miles per gallon; the average vehicle miles traveled in 2022 was 10,917 miles per year (both from FHWA 2024)",
+   "as_of": "2022 data; page last updated 4 August 2026; read 3 November 2026"
+  },
+  "doe_fotw1360": {
+   "publisher": "U.S. Department of Energy, Vehicle Technologies (Fact of the Week #1360)",
+   "title": "A Typical EV is 87%–91% Efficient Compared to 30% for a Conventional Gasoline Vehicle",
+   "url": "https://www.energy.gov/cmei/vehicles/articles/fotw-1360-sept-16-2024-typical-ev-87-91-efficient-compared-30-conventional",
+   "where": "A typical EV is 87%–91% efficient (after taking regenerative braking into account) compared to about 30% for a conventional gasoline vehicle, depending on the drive cycle.",
+   "as_of": "16 September 2024; read 3 November 2026"
+  },
+  "doe_furnace": {
+   "publisher": "U.S. Department of Energy, Building America (L. Brand and W. Rose)",
+   "title": "Measure Guideline: High Efficiency Natural Gas Furnaces",
+   "url": "https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/highefficiency_gas_furnaces.pdf",
+   "where": "p. 3: mid-efficiency furnaces have an Annual Fuel Utilization Efficiency (AFUE) of 80%-83%, and high efficiency furnaces have an AFUE of 90%-98%",
+   "as_of": "October 2012; read 3 November 2026"
+  },
+  "doe_waterheater": {
+   "publisher": "U.S. Department of Energy, Building America (M. Hoeschele et al.)",
+   "title": "Strategy Guideline: Proper Water Heater Selection",
+   "url": "https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/strategy-guideline-water-heater-selection.pdf",
+   "where": "p. 6: gas storage units with Energy Factors of about 0.60; electric storage units about 0.90 (standby losses included)",
+   "as_of": "revised April 2015; read 3 November 2026"
+  },
+  "doe_cchp": {
+   "publisher": "U.S. Department of Energy",
+   "title": "Residential Cold-Climate Heat Pump Technology Challenge Specification, Version 1.2",
+   "url": "https://www.energy.gov/sites/default/files/2021-10/bto-cchp-tech-challenge-spec-102521.pdf",
+   "where": "Table II-2, p. 6: COP at 5°F (-15°C) of 2.4 for units from 24,000 to 48,000 Btu/h; compressor cut-out no higher than -10°F (-23°C), p. 5; seasonal HSPF2 of 8.5 (Region V), p. 3",
+   "as_of": "24 September 2021 (posted October 2021); read 3 November 2026"
+  }
+ },
+ "units": { "btuPerKWh": 3412, "btuPerGallon": 120214, "src": "eia_btu" },
+ "carriers": [
+  { "key": "gas", "label": "Natural gas", "short": "Gas", "color": "var(--lx-cc)" },
+  { "key": "el", "label": "Electricity", "short": "Electricity", "color": "var(--lx-bat)" },
+  { "key": "gasoline", "label": "Gasoline", "short": "Gasoline", "color": "var(--lx-pk)" },
+  { "key": "air", "label": "Heat from outdoor air", "short": "Outdoor air", "color": "var(--lx-wind)" }
+ ],
+ "services": [
+  { "key": "warmth", "label": "Warmth", "icon": "flame", "want": "A living room at about 20 °C on a winter evening.", "device": "Gas furnace", "mmbtu": { "gas": 57.6 }, "useful": "furnace", "zone": "living" },
+  { "key": "water", "label": "Hot water", "icon": "drop", "want": "A hot shower and clean dishes.", "device": "Gas water heater (a tank)", "mmbtu": { "gas": 17.4 }, "useful": "waterheater", "zone": "bath" },
+  { "key": "cool", "label": "Cooling", "icon": "dial", "want": "A bedroom cool enough to sleep in July.", "device": "Central air conditioner", "mmbtu": { "el": 5.9 }, "useful": null, "zone": "ac" },
+  { "key": "kitchen", "label": "Kitchen and laundry", "short": "Kitchen", "icon": "house", "want": "Cold milk, a cooked meal and dry clothes.", "device": "Fridge, gas stove, dryer", "mmbtu": { "el": 3.0, "gas": 3.8 }, "useful": null, "zone": "kitchen", "note": "Electricity here is the refrigerators; gas is RECS's other gas uses (mostly cooking and clothes drying)." },
+  { "key": "devices", "label": "Lights, screens and devices", "short": "Devices", "icon": "bulb", "want": "Light to read by, a laptop, a TV, the furnace's fan.", "device": "Lamps, electronics, fans, small appliances", "mmbtu": { "el": 18.5 }, "useful": null, "zone": "study", "note": "RECS's other electricity: everything not shown separately, such as lighting, TVs, computers, washers and furnace fans." },
+  { "key": "mobility", "label": "Getting around", "short": "Travel", "icon": "arrow", "want": "Getting to school, work and the shops.", "device": "Gasoline car", "car": true, "useful": "car", "zone": "car" }
+ ],
+ "car": { "mpg": 22.8, "miles": 10917, "kmPerMile": 1.609344, "src": "epa_vehicle" },
+ "efficiency": {
+  "furnace": { "value": 0.8, "label": "Gas furnace, 80% AFUE", "what": "share of the gas's energy that ends up as heat in the rooms over a season", "src": "doe_furnace", "kind": "illustrative, within DOE's 80% to 83% for mid-efficiency furnaces" },
+  "waterheater": { "value": 0.6, "label": "Gas water heater, about 60%", "what": "share of the gas's energy that ends up in the hot water, after flue and tank losses", "src": "doe_waterheater", "kind": "illustrative, DOE's typical Energy Factor of about 0.60 for gas storage units" },
+  "car": { "value": 0.3, "label": "Gasoline car, about 30%", "what": "share of the fuel's energy that moves the car", "src": "doe_fotw1360", "kind": "DOE's about 30%, depending on the drive cycle" }
+ },
+ "heatpump": {
+  "about": "Illustrative model of a cold-climate air-source heat pump. COP = k × T_supply ÷ (T_supply − T_outdoor), temperatures in kelvin, with warm air supplied at 45 °C; k is set so that COP = 2.4 at −15 °C, DOE's challenge target. Below the compressor cut-out (−23 °C, the challenge's highest allowed cut-out) a backup resistance heater runs at COP 1. The seasonal COP for the year is the challenge's HSPF2 of 8.5 Btu per Wh ÷ 3.412.",
+  "supplyC": 45,
+  "anchorC": -15,
+  "anchorCOP": 2.4,
+  "cutoutC": -23,
+  "hspf2": 8.5,
+  "src": "doe_cchp"
+ },
+ "day": {
+  "about": "Illustrative: on a day whose average outdoor temperature is T, the home needs 5 kWh of heat for each °C that T is below 18 °C.",
+  "kWhPerDegreeDay": 5,
+  "baseC": 18,
+  "min": -28,
+  "max": 15,
+  "step": 1,
+  "start": 5,
+  "goal": -10
+ },
+ "sort": {
+  "bins": [
+   { "id": "service", "label": "Service", "sub": "what people want" },
+   { "id": "carrier", "label": "Carrier", "sub": "what brings the energy" },
+   { "id": "device", "label": "Device", "sub": "what turns it into the service" }
+  ],
+  "cards": [
+   { "id": "warm", "text": "A warm room on a cold evening", "bin": "service", "why": "Nobody wants gas for its own sake: they want the warm room." },
+   { "id": "gas", "text": "Natural gas", "bin": "carrier", "why": "Gas carries chemical energy to the home through a pipe." },
+   { "id": "shower", "text": "A hot shower", "bin": "service", "why": "The service is hot water at the tap, whatever heats it." },
+   { "id": "el", "text": "Electricity", "bin": "carrier", "why": "Electricity carries energy from power plants through the wires." },
+   { "id": "furnace", "text": "A furnace", "bin": "device", "why": "It burns gas and turns its energy into heat for the rooms." },
+   { "id": "trip", "text": "A 15 km trip to school", "bin": "service", "why": "Travel is the service; a car, a bus or a bike can deliver it." },
+   { "id": "gasoline", "text": "Gasoline", "bin": "carrier", "why": "Gasoline carries chemical energy in the car's tank." },
+   { "id": "hp", "text": "A heat pump", "bin": "device", "why": "It uses electricity to move heat from outdoors into the house." },
+   { "id": "fridge", "text": "A fridge", "bin": "device", "why": "The fridge is the device; cold food is the service." }
+  ]
+ },
+ "predict": {
+  "id": "f3-biggest",
+  "q": "In this home, which service takes the most energy in a year?",
+  "options": [
+   { "value": "warmth", "label": "Warmth" },
+   { "value": "water", "label": "Hot water" },
+   { "value": "devices", "label": "Lights, screens and devices" },
+   { "value": "cool", "label": "Cooling" }
+  ],
+  "answer": "warmth"
+ },
+ "guess": {
+  "id": "f3-car",
+  "q": "Of the energy in the car's gasoline, what share actually moves the car?",
+  "ticks": [10, 30, 50, 70, 90],
+  "answer": 30
+ },
+ "apply": {
+  "q": "On a mild day a heat pump runs at a COP of 3.0 and delivers 90 kWh of heat. How many kWh of electricity did it use?",
+  "unit": "kWh",
+  "answer": 30,
+  "tol": 0.5,
+  "why": "Electricity = heat ÷ COP = 90 ÷ 3.0 = 30 kWh. The other 60 kWh came from the outdoor air."
+ }
+}
