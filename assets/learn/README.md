@@ -10,7 +10,7 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
 ## Start a new lesson
 
 1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for a capstone), `icon`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`. The lesson goes live (linked, with its generated header, next box and footer) when you set `status: active`; its page is then `learn/<id>.qmd` (or the file named by `path:`). Until then keep `status: upcoming`, or leave the status out: it shows as coming soon.
-   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources.
+   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources; `form: studio` and `form: case` are described under "Studios and case files".
    - New glossary terms and requests for shared files go in a sidecar, `learn/_w1/<id>.yml` (wave W1):
 
      ```yaml
@@ -22,7 +22,7 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
      ```
 
      `build_learn.py` merges the terms into `glossary.json` (if an id is already in `glossary.yml`, that definition wins and the clash is printed) and prints every request.
-2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`) to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
+2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`; for a research studio `_template-studio.qmd`, for a case file `_template-case.qmd`, see "Studios and case files") to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
 3. In the ResearchPortfolio folder, run `python3 scripts/build_learn.py --site <site>`. Add `_tests/learn/test_<id>.js`, which checks every number on the page against the model.
 
 Then render, take screenshots (`node scripts/learn_screenshots.mjs`), and check the result at 1280 px and 375 px, in day and night mode.
@@ -59,6 +59,38 @@ Then render, take screenshots (`node scripts/learn_screenshots.mjs`), and check 
 ```
 
 The section ids `play`/`steps`, `explain`, `check` and `sources` match the header's step links. `build_learn.py` writes the header, the next-lesson box and the footer between the `learn:meta`, `learn:next` and `learn:footer` markers.
+
+## Studios and case files (wave W2)
+
+Two more forms, each with a template. `form:` in `path.yml` sets the header's step links, and each step link is the id of a section on the page.
+
+| `form:` | Template | Sections (step links) | Header badge | For |
+|---|---|---|---|---|
+| `studio` | `learn/_template-studio.qmd` | `#task` Task · `#exemplars` Exemplars · `#selfcheck` Self-check · `#sources` Sources | Research studio | R1–R10 (curriculum v2 §11) |
+| `case` | `learn/_template-case.qmd` | `#case` The case · `#explain` Explain · `#check` Check · `#sources` Sources | Case file | CF1–CF8 (§13) |
+
+The older forms keep their sections: `cards` (`#steps`, `#explain`, `#check`, `#sources`), `play` (`#play`, ...) and `checkpoint` (`#task`, `#solution`, `#rubric`, `#sources`).
+
+**Research studio.**
+
+- **Order.** The task comes first: what to produce, from what, and when it is done. Then the exemplars: a good and a weak answer to the same task, side by side, with tap-to-reveal notes (`LX.Exemplars`). Then a self-check against the course rubric (`LX.Rubric`). R1 and R10 also give the reader a question card (`LX.QuestionCard`).
+- **Time.** Give `minutes` (the guided part) and `practice_minutes` (the independent work) in `path.yml`; the header then shows both. Be honest: R2's literature matrix is 240 minutes.
+- **Method-neutral.** Per §11.2, optimization is one method family among several. The rubric's words are the course's own (§3.4): pick the competences a studio builds and add a "look for" line, never reword the levels.
+- **Fallbacks.** The exemplars and rubric fallbacks are written from the data by the components' `staticHTML` (see the components below), between `<!-- <slug>-exemplars:start -->` and `:end` markers, by the test's `--write` mode. The test then checks that they are still the same.
+
+**Case file** (about 10 minutes; §13).
+
+- **Order.** The case comes first, as static parts in `.lx-case`: the puzzle; the question in one sentence; scale and boundary, with what was left out; decisions, goal and rules, in words; data and method; and what came out, with its boundary conditions. Then the study's dated steps (`LX.Timeline`, from the data file). Then the explain section (`LX.Boundary`, and an allow-listed explainer if there is one), the check with "Try it yourself" (toy variations with the allow-listed repository), and the sources. There is no list of open questions.
+- **Approved sources only (guard G-SRC).** Henry's research enters only through approved excerpts, allow-listed repositories, allow-listed explainers and citations (doi.org). Never link a project page or the Research page.
+  - Quote each excerpt as `<blockquote class="lx-excerpt" data-source="excerpt:<key>">`. Give every sentence, with its source, in `reports/learn/excerpts_for_approval.md`.
+  - The scope scan fails on a `data-source` key that is not in the curriculum's `ALLOWED_SOURCES`, and on a script from `assets/explainers/` other than `common.js` and the allow-listed explainers (`ghg`, `txh2`, `wind-hydrogen`, `uq-mfgpr`). It also scans the strings of every explainer a Learn page loads.
+- **Drafts.** Until Henry approves every excerpt sentence, the page lives in `learn/_drafts/<id>.qmd`, and its `path.yml` row stays `status: upcoming`.
+  - Quarto does not render `learn/_drafts/`: the render list names `learn/*.qmd` only, and `_` folders are never rendered.
+  - `build_learn.py` still fills the draft's three blocks exactly as they will read once the page is live, and checks its title, subtitle and glossary marks. `learn_scope_scan.py` scans the draft's source (front matter, text, Markdown and HTML links, scripts).
+  - `learn_qa.sh` renders a preview of a draft named on its command line (see Checks).
+  - Write links for the page's live place, `learn/<id>.html` (`../assets/...`, `index.html`).
+  - After approval: `git mv learn/_drafts/<id>.qmd learn/<id>.qmd` and set `status: active`. The build fails while a live page and a draft share an id.
+- **The `path.yml` row.** A case file is a `kind: lesson` row with `form: case`, its `code` and `id` from `reports/learn/learn_map_v2.yml` (for example `CF7`, `cf7-cost-of-waiting`), a `tier` (every lesson row needs one; the coordinator confirms which), `minutes: 10`, `after:` its prerequisites, and `status: upcoming`.
 
 ## Lesson JS skeleton
 
@@ -638,7 +670,7 @@ var P = LX.Practice(host, { id: "b1-practice", title: "Practice", lede: "One sen
 **Scope and QA** (ResearchPortfolio folder).
 
 - `python3 scripts/learn_scope_scan.py --site <worktree>` runs the curriculum v2 §20 scan on the rendered `_site/learn/` pages, the data files and the scripts. `build_learn.py --check` runs it whenever a rendered site exists, and fails on any violation.
-- `scripts/learn_qa.sh <worktree> [lesson ids]` runs the whole pipeline: build check, Node tests, render, link check, scope scan, and screenshots at 1280 and 375 px in light and dark.
+- `scripts/learn_qa.sh <worktree> [lesson ids]` runs the whole pipeline: build check, Node tests, render, link check, scope scan, and screenshots at 1280 and 375 px in light and dark. A case file that is still a draft is named by its id like any page: the script copies `learn/_drafts/<id>.qmd` to `learn/<id>.qmd`, renders that one page into `_site/`, and moves the copy out of the worktree into its output folder, so the link check, scope scan and screenshots see a preview while the worktree stays unchanged.
 - `scripts/learn_codex_review.sh <worktree> <lesson id>…` runs the read-only two-persona review.
 
 Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`.

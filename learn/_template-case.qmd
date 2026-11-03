@@ -1,0 +1,151 @@
+---
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/_drafts/<id>.qmd (held until Henry approves every excerpt
+# sentence), later `git mv` to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+title: "A case-file question a learner would type into a search box?"
+subtitle: "What the reader finds out in this case file"
+description: "Case file CF<n> of Energy Systems, Step by Step: one sentence on the puzzle and what a published study found, within its stated limits (for search and sharing)."
+page-layout: full
+toc: false
+title-block-banner: false
+css: ../assets/learn/learn.css
+body-classes: "page-learn page-lesson lx-form-case"
+---
+
+<!-- Case file (path.yml form: case; curriculum v2 §13 and §16.3), about 10 minutes. Guide: assets/learn/README.md,
+     "Studios and case files". Replace <slug> with the case file's JS name.
+     Henry's research enters ONLY through approved sources (§13, guard G-SRC): approved excerpts, allow-listed repositories
+     (github.com/Henryutd2021/<repo>), allow-listed explainers and citations (doi.org). Never a project page or the
+     Research page. Mark every excerpt with its source key, <blockquote class="lx-excerpt" data-source="excerpt:<key>">, and
+     list each sentence with its source in reports/learn/excerpts_for_approval.md; the scope scan fails on a key that is not
+     approved. No list of open questions.
+     Drafting: keep this page in learn/_drafts/ (Quarto does not render it; the build fills its blocks and checks it; the
+     scope scan reads its source) and its path.yml status `upcoming` until Henry approves. Write links for the page's live
+     place (learn/<id>.html): ../assets/..., index.html, 03-balancing.html.
+     Order: the case (static: the puzzle, the question in one sentence, scale and boundary, decisions, goal and rules in
+     words, data and method, what came out with its boundary conditions; then LX.Timeline for the dated steps, from the
+     data file, its no-JS list written by the test) -> explain (where the
+     result holds: LX.Boundary; an allow-listed explainer, if any) -> check (one or two questions; try it yourself with
+     the repository) -> sources. After editing path.yml, run in the ResearchPortfolio folder:
+     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+
+<!-- learn:meta:start -->
+<!-- learn:meta:end -->
+
+::: {#case .lx-sec}
+```{=html}
+<div class="lx-case">
+<div class="lx-case-part"><p class="lx-eyebrow">1 · The puzzle</p><p>One or two sentences: what looked odd, or what someone needed to decide.</p></div>
+<div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">The study's question, typed (§11.2), from the approved excerpt.</p></div>
+<div class="lx-case-part"><p class="lx-eyebrow">3 · Scale and boundary</p><ul><li><b>Inside:</b> one line.</li><li><b>Left out:</b> one line.</li></ul></div>
+<div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><ul><li><b>Decisions:</b> one line.</li><li><b>Goal:</b> one line.</li><li><b>Rules:</b> one line.</li></ul></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><p>One or two sentences, with the data's source and date.</p></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
+<blockquote class="lx-excerpt" data-source="excerpt:<key>"><p>The approved excerpt, word for word.</p><footer>Approved excerpt of: Author et al. (year), Journal.</footer></blockquote>
+<p class="lx-hint">Holds when: one line. Leaves out: one line.</p></div>
+</div>
+<div class="lx-interactive" data-learn="<slug>" data-src="../assets/learn/data/<id>.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">The study in time</p>
+<!-- <slug>-timeline:start (written from the data file by LX.Timeline's staticHTML in the test's --write mode; do not edit) -->
+<ol class="lx-tl-static"><li><b>Month Year</b> · One dated step. <span class="lx-hint">Source: <a href="https://doi.org/10.0000/example">Author et al. (year)</a></span></li></ol>
+<!-- <slug>-timeline:end -->
+</div>
+</div>
+<p class="lx-datanote"><span>Every result on this page is quoted from the approved excerpt of the published study named in the sources; the toy numbers in the check are illustrative.</span></p>
+```
+:::
+
+::: {#explain .lx-sec}
+::: {.lx-sec-h}
+## Where the result holds, as diagrams
+:::
+
+```{=html}
+<div id="<slug>-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>It holds when</dt><dd>One sentence.</dd>
+<dt>It leaves out</dt><dd>One sentence.</dd>
+</dl>
+</div>
+</div>
+```
+
+```{=html}
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The model behind the case, as a title</summary>
+<div class="lx-deeper-body">
+```
+
+The lesson that teaches the method (a link to its page, or "upcoming"), and one sentence on what the repository adds.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#check .lx-sec}
+::: {.lx-sec-h}
+## Check yourself, then try it
+:::
+
+```{=html}
+<div class="lx-myths" data-quiz="<slug>-myth">
+<div class="lx-qq" data-id="one" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A common belief about the case, in quotes.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. One or two sentences why, within the study's boundary.</p></details>
+</div>
+</div>
+<div class="lx-card lx-case-try">
+<p class="lx-eyebrow">Try it yourself</p>
+<ul>
+<li>One toy variation to run with the repository, and what to look at.</li>
+</ul>
+<p><a href="https://github.com/Henryutd2021/<allow-listed repo>">The repository</a> (an allow-listed public repository).</p>
+</div>
+```
+:::
+
+::: {#sources .lx-sec}
+::: {.lx-sec-h}
+## Numbers, sources and what's next
+:::
+
+::: {.lx-end}
+```{=html}
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td class="n">0 unit</td><td>One sentence, from the approved excerpt.</td><td class="s"><a href="https://doi.org/10.0000/example">Author et al. (year)</a> · published Month Year</td></tr>
+</tbody>
+</table>
+</div>
+```
+
+::: {.lx-stack}
+<!-- learn:next:start -->
+<!-- learn:next:end -->
+
+```{=html}
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul><li>Author et al. (year). <a href="https://doi.org/10.0000/example">Title as published</a>. Journal.</li></ul>
+</div>
+```
+:::
+:::
+
+<!-- learn:footer:start -->
+<!-- learn:footer:end -->
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/<slug>.js" defer></script>
+```
