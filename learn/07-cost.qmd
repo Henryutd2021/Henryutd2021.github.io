@@ -38,7 +38,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive lx-cards" data-learn="cost" data-src="../assets/learn/data/07-cost.json ../assets/learn/data/town.json ../assets/learn/data/town_days.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">What one MWh costs to make, at U.S. averages (real 2025 dollars, $/MWh)</p>
+<p class="lx-eyebrow">Illustrative LCOEs from EIA plant assumptions and U.S. fleet averages (real 2025 dollars, $/MWh)</p>
 <div class="lx-scroll-x">
 <table class="lx-mini-table" id="cost-fallback">
 <thead><tr><th scope="col">Plant</th><th scope="col">Building the plant</th><th scope="col">Fixed upkeep</th><th scope="col">Fuel</th><th scope="col">Upkeep per MWh</th><th scope="col">LCOE</th></tr></thead>
@@ -53,7 +53,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you work through this in eight steps: predict, split the cost, discount, blend a WACC, find the price that pays back, use the calculator, read a tornado chart, and see when the energy arrives.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Building cost, upkeep and heat rates: EIA's <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">AEO2026 assumptions</a> (April 2026, 2025 dollars). Capacity factors and the gas cost: EIA's Electric Power Annual, final 2025 data (October 2026). Rate and life: the <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">2025 ATB</a> (released September 2026), case without tax credits. No taxes, credits or grid costs, so these are not the agencies' own LCOE figures. Prairie Town's plants and running costs are illustrative; its hottest day follows the real Southwest Power Pool shapes of 29 July 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>EIA and ATB inputs in real 2025 dollars, with no taxes, credits or grid costs, so not the agencies' own LCOEs; Prairie Town's plants are illustrative. Sources and dates: <a href="#inputs">where the inputs come from</a>.</span></p>
 ```
 :::
 
@@ -72,7 +72,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Capital recovery factor</dt><dd>The share of the building cost to repay each year so that it is paid off, with interest, over the plant's life.</dd>
 <dt>LCOE</dt><dd>The steady price per MWh that repays every cost over the life: yearly costs divided by yearly MWh, plus fuel and upkeep per MWh.</dd>
 <dt>Tornado chart</dt><dd>Each input swung from low to high, one at a time, to rank what moves the result over the chosen ranges.</dd>
-<dt>LCOE's blind spot</dt><dd>It gives every MWh the same worth, whatever the hour; what a MWh saves depends on when it arrives.</dd>
+<dt>LCOE's blind spot</dt><dd>It gives every MWh the same worth, whatever the hour; what one more MWh saves depends on the hour it arrives.</dd>
 </dl>
 </div>
 </div>
@@ -91,15 +91,28 @@ $$C = \sum_{t=1}^{n} \frac{A}{(1+r)^t} = A\,\frac{1-(1+r)^{-n}}{r},$$
 
 $$\text{so}\quad A = \frac{r}{1-(1+r)^{-n}}\, C = \mathrm{CRF}\cdot C .$$
 
-When $r = 0$ the [capital recovery factor]{.lx-term term="capital-recovery-factor"} is simply $1/n$. The [LCOE]{.lx-term term="lcoe"} is the steady price $p$ at which the plant's discounted sales repay everything, so its net present value is zero. With $E = \mathrm{CF} \times 8{,}760 / 1{,}000$ MWh made per kW each year (the [capacity factor]{.lx-term term="capacity-factor"} from [lesson 5](05-capacity-factor.html)):
+When $r = 0$ the [capital recovery factor]{.lx-term term="capital-recovery-factor"} is simply $1/n$.
 
-$$\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{fuel} + \mathrm{VOM},$$
+The [LCOE]{.lx-term term="lcoe"} is the steady price at which the plant's discounted sales repay everything, so its net present value is zero.
 
-with fuel per MWh = heat rate × gas price.
+Each kW makes $E = \mathrm{CF} \times 8{,}760 / 1{,}000$ MWh a year, with the [capacity factor]{.lx-term term="capacity-factor"} ([lesson 5](05-capacity-factor.html)) as a fraction: 33.8% is 0.338.
 
-Check it on the wind farm: $\mathrm{CRF}(4\%, 30) = 0.05783$, so $0.05783 \times 1{,}712 + 34.57 = 133.58$ \$/kW each year; $E = 0.338 \times 8.76 = 2.961$ MWh per kW; $133.58 / 2.961 = \$45.11$ per MWh. The 2025 ATB writes the same equation with a fixed charge rate, $\mathrm{FCR} = \mathrm{CRF} \times$ a factor for taxes and depreciation; here that factor is 1.
+$$\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{fuel} + \mathrm{VOM}$$
 
-The WACC blends what lenders and owners are paid. With a share $d$ of loans at rate $r_d$, owners' money at $r_e$ and tax rate $\tau$, the usual after-tax form is $d\,r_d(1-\tau) + (1-d)\,r_e$; the step left the tax out. A nominal rate $n$ becomes real with $(1+n) = (1+r)(1+i)$ for inflation $i$.
+Here fuel per MWh = [heat rate]{.lx-term term="heat-rate"} (MMBtu per MWh) × gas price (\$ per MMBtu).
+
+Check it on the wind farm:
+
+- $\mathrm{CRF}(4\%, 30) = 0.05783$;
+- yearly cost: $0.05783 \times 1{,}712 + 34.57 = 133.58$ \$/kW;
+- yearly output: $E = 0.338 \times 8.76 = 2.961$ MWh per kW;
+- LCOE: $133.58 / 2.961 = \$45.11$ per MWh.
+
+The 2025 ATB writes the same equation with a fixed charge rate, $\mathrm{FCR} = \mathrm{CRF} \times$ a factor for taxes and depreciation; here that factor is 1.
+
+The WACC with taxes: loans' share $d$ at rate $r_d$, owners' money at $r_e$ and tax rate $\tau$ give $d\,r_d(1-\tau) + (1-d)\,r_e$. Step 4 left the tax out.
+
+A nominal rate $n$ becomes real with $(1+n) = (1+r)(1+i)$, for inflation $i$.
 
 ```{=html}
 </div>
@@ -109,7 +122,10 @@ The WACC blends what lenders and owners are paid. With a share $d$ of loans at r
 <div class="lx-deeper-body">
 ```
 
-A planning model does not compare LCOEs. It charges each MW it builds a yearly cost $\mathrm{CRF}\cdot C + \mathrm{FOM}$, charges every MWh its fuel and upkeep, and chooses how much to build and how to run it hour by hour in one optimization. Value and cost then meet inside the model, which is how the timing problem of step 8 is handled.
+A capacity-expansion model can account for these costs directly, instead of comparing LCOEs.
+
+- It charges each kW it builds a yearly $\mathrm{CRF}\cdot C + \mathrm{FOM}$, and every MWh its fuel and upkeep.
+- It chooses what to build and how to run it, hour by hour, in one optimization, so step 8's timing problem is inside the model.
 
 - Capacity expansion with representative days (M3, upcoming in the Modeler tier) uses exactly this yearly charge.
 - Techno-economic analysis inside an optimization model (M11, upcoming) adds taxes, credits and a boundary choice.
@@ -127,7 +143,9 @@ A planning model does not compare LCOEs. It charges each MW it builds a yearly c
 <li>Grid connection, new transmission, and the backup or balancing a variable plant may need.</li>
 <li>Output that falls as equipment ages, and costs that differ by region.</li>
 <li>Any change in costs over time: every input is one fixed number that you can move.</li>
-<li>Step 8 counts only running-cost savings; a plant's worth also includes the capacity it offers at the peak.</li>
+<li>Step 8 values each MWh at its hour's running cost of the last plant needed. A plant's worth also includes the capacity it offers at the peak.</li>
+<li>That hourly value is for one more MWh, not what a whole farm saves: growing solar from 200 to 400 MW cuts the day's running cost by $56,460, or $31.38 per added MWh.</li>
+<li>LCOE here is the cost per MWh a plant can make. When some of it is spilled, the cost per MWh actually used is higher.</li>
 </ul>
 </div>
 </details>
@@ -145,7 +163,7 @@ A planning model does not compare LCOEs. It charges each MW it builds a yearly c
 <div class="lx-qq" data-id="lowest" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The plant with the lowest LCOE is always the cheapest choice for the grid.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. LCOE leaves out when and where the MWh arrive; on Prairie Town's hottest day a wind MWh saved $56.35 and a solar MWh $50.27.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. LCOE leaves out when and where the MWh arrive: on Prairie Town's summer peak-demand day, a wind MWh was worth $56.35 on average and a solar MWh $50.27.</p></details>
 </div>
 <div class="lx-qq" data-id="rate" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The discount rate is a technical detail that barely changes the answer.”</p>
@@ -166,7 +184,7 @@ A planning model does not compare LCOEs. It charges each MW it builds a yearly c
 
 <div class="lx-quiz" data-quiz="c7">
 <div class="lx-qq" data-id="calc" data-answer="c">
-<p class="lx-qtext">A plant's yearly repayment plus fixed upkeep is $130 per kW. Each kW makes 2.628 MWh a year (a 30% capacity factor), and it burns no fuel. What is its LCOE?</p>
+<p class="lx-qtext">A plant's yearly repayment plus fixed upkeep is $130 per kW, and each kW makes 2.628 MWh a year (a 30% capacity factor). With no fuel and zero upkeep per MWh, what is its LCOE?</p>
 <ul class="lx-choices"><li data-value="a">$13.00/MWh</li><li data-value="b">$39.00/MWh</li><li data-value="c">$49.47/MWh</li><li data-value="d">$130.00/MWh</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>$49.47/MWh: 130 ÷ 2.628 = 49.47. Yearly cost per kW divided by yearly MWh per kW.</p></details>
 </div>
@@ -192,9 +210,9 @@ A planning model does not compare LCOEs. It charges each MW it builds a yearly c
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">$1,712/kW</td><td>Building cost of a new onshore wind farm, before interest during construction (2025 dollars).</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · April 2026</td></tr>
-<tr><td class="n">$1,032/kW</td><td>Building cost of a new gas combined-cycle plant, on the same basis.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · April 2026</td></tr>
+<tr><td class="n">$1,032/kW</td><td>Building cost of a new gas combined-cycle plant (multi-shaft design), on the same basis.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · April 2026</td></tr>
 <tr><td class="n">33.8% · 24.0%</td><td>Average capacity factors of U.S. wind and solar photovoltaic plants in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> · final 2025 data, October 2026</td></tr>
-<tr><td class="n">$3.85/MMBtu</td><td>Average cost of natural gas to U.S. power plants in 2025; it was $7.21 in 2022.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">EIA, Electric Power Annual, Table 7.4</a> · final 2025 data, October 2026</td></tr>
+<tr><td class="n">$3.85/MMBtu</td><td>Average cost of natural gas to U.S. power plants in 2025, per <span class="lx-term" data-term="mmbtu">MMBtu</span>; it was $7.21 in 2022 (in 2022 dollars).</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">EIA, Electric Power Annual, Table 7.4</a> · final 2025 data, October 2026</td></tr>
 <tr><td class="n">30 years</td><td>The cost recovery period behind both the 2025 ATB's and EIA's levelized costs.</td><td class="s"><a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">NLR, 2025 ATB</a> · September 2026; <a href="https://www.eia.gov/outlooks/aeo/electricity_generation/pdf/LCOE_report.pdf">EIA, AEO2026 levelized costs</a> (PDF) · April 2026</td></tr>
 </tbody>
 </table>
@@ -215,7 +233,23 @@ A planning model does not compare LCOEs. It charges each MW it builds a yearly c
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>A levelized cost and a system's cost can move in opposite directions. In my study of a wind farm with hydrogen equipment, a higher hydrogen price led the optimizer to build a larger electrolyzer: its cost per kilogram rose, while the whole system's net cost fell (<a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design, 2024</a>).</p>
+<p>A levelized cost and a system's cost can move in opposite directions. In my study of a wind farm with hydrogen equipment (<a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design, 2024</a>):</p>
+<p>→ a higher hydrogen price led the optimizer to build a larger electrolyzer;</p>
+<p>→ the hydrogen's cost per kilogram rose;</p>
+<p>→ while the whole system's net cost fell.</p>
+</div>
+<div class="lx-card" id="inputs">
+<p class="lx-eyebrow">Where the inputs come from</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Input</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>Building cost, upkeep, heat rates (2025 dollars)</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · April 2026</td></tr>
+<tr><td>Capacity factors, 2025</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_04_08_a.html">EIA, Electric Power Annual, Tables 4.08.A</a> and <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">4.08.B</a> · final 2025 data, October 2026</td></tr>
+<tr><td>Gas cost, 2025</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">EIA, Electric Power Annual, Table 7.4</a> · final 2025 data, October 2026</td></tr>
+<tr><td>Rate and 30-year life, case without tax credits</td><td class="s"><a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">NLR, 2025 ATB</a> · September 2026</td></tr>
+<tr><td>Prairie Town's summer peak-demand day, 29 July 2025</td><td class="s">Southwest Power Pool shapes, <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> (accessed 2 November 2026); the town's plants and running costs are illustrative</td></tr>
+</tbody>
+</table>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
