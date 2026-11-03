@@ -1,0 +1,191 @@
+---
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+title: "The sandbox's name, as in path.yml (for example: Site Bench)"
+subtitle: "What the reader can try here, in one line"
+description: "Sandbox SB<n> of Energy Systems, Step by Step: one sentence on the system, what the reader decides and what the engine works out (for search and sharing)."
+page-layout: full
+toc: false
+title-block-banner: false
+css: ../assets/learn/learn.css
+body-classes: "page-learn page-lesson lx-form-sandbox"
+---
+
+<!-- Sandbox (path.yml form: sandbox; curriculum v2 §16.3 and §16.4). Guide: assets/learn/README.md, "Sandboxes and
+     capstones". Replace <slug> with the sandbox's JS name and <id> with its path.yml id.
+     Order: the brief (the site or system, what the reader decides, what the engine works out, what it leaves out, and
+     presets to start from) -> the bench (controls; Run; the run's status; the plan link) -> the results (readouts, the
+     hourly year or the outage scenarios, a text version) -> explain (how the engine works; where it holds: LX.Boundary)
+     -> sources. The step links are #brief, #bench, #results, #explain and #sources (the build checks that each exists);
+     the screenshot tool reaches each one as sec-brief, sec-bench, sec-results and sec-sources, and `explain` shows
+     #explain.
+     The engine (E0 for SB0, E1 for SB1, ...) is a shared component the sandbox builder writes in
+     assets/learn/components/<engine>.js, so the capstones (and A8, M5) run the same model. The page expects:
+       engine.schema                      the plan as an LX.ShareState schema (fields, ranges, steps, defaults, version,
+                                          older versions with up()); one source for the controls, the link and the tests
+       engine.presets                     [{ id, label, state }] the brief's starting plans (each passes the schema)
+       engine.solve(state, data, { signal, timeLimit, attempt }) -> Promise of
+         { status, ok, message, hint, results, kind, mipGap, ms }   never rejects; status as LX.solver's (optimal,
+                                          infeasible, time-limit, objective-bound, error, cancelled, ...); ok only when
+                                          the status is optimal; `hint` says what to change after an infeasible plan
+                                          ("raise the battery or shed the offices"); `results` only when a plan exists
+       engine.summarize(state, r) -> results   pure: every number the page shows (readouts, chart series, text tables),
+                                          tested against the page and the no-JS block
+       engine.note(state, results) -> the LX.ReportNote input (heading, made, run, plan, results, assumptions,
+                                          sensitivity, limits); the capstone adds its own fields
+       engine.fallback(data) -> HTML      the default plan's inputs and results as plain tables (a precomputed run, with
+                                          its date), for the no-JS blocks below
+     Failure states (W2 review finding 1): run through LX.BenchRun. It shows a clear message and "Try again" after a
+     failure, a time limit or an infeasible plan, clears the busy state, keeps the results already drawn (marked as an
+     earlier plan's) and passes `attempt` so a retry can raise the time limit. Test it with a stubbed solve that fails.
+     Ties (finding 2): an LP or MILP with several optima of equal cost makes "the" dispatch arbitrary: state the tie rule
+     in the engine (a tiny cost on battery throughput, a fixed order) or show only what every optimum shares; prove it in
+     the test. No false certificates (finding 3): "optimal" only for status optimal; a MILP shows its gap; an early stop
+     never says best. A "jump", "always" or "never" in the text must hold in the model as built, shown by the test.
+     State (finding 8): controls continue from the reader's plan (presets fill the controls; they never reset hidden
+     parts), focus survives a re-render, results are announced (BenchRun's status line), and a busy run holds Next.
+     The plan link (LX.ShareState): numbers and choices only, no free text and no personal data; the schema's version
+     goes up whenever a field, a range, a step or a meaning changes, with an `old` entry so earlier links still open.
+     Prices in one dollar year, labelled; data scaled or invented is "illustrative" or "based on ...", never "real".
+     Scope (§20): Prairie Town, Prairie Campus and their sites are fictional; data centers appear only as loads; no
+     links to project pages or the Research page; Henry's research only through approved excerpts, allow-listed
+     repositories and citations (§13).
+     After editing path.yml, run in the ResearchPortfolio folder:
+     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+
+<!-- learn:meta:start -->
+<!-- learn:meta:end -->
+
+::: {#brief .lx-sec}
+```{=html}
+<!-- The brief sits above the interactive, outside its fallback, so readers see it with and without JavaScript. Keep
+     each cell to one line (the text budget). Styles: .lx-sb-brief and .lx-sb-facts in forms.css. -->
+<div class="lx-card lx-sb-brief">
+<p class="lx-eyebrow">The brief</p>
+<dl class="lx-sb-facts">
+<div><dt>The site</dt><dd>One line: the fictional site or system, its scale and its year of data.</dd></div>
+<div><dt>You decide</dt><dd>One line: the sizes and choices on the controls, with their units.</dd></div>
+<div><dt>The engine works out</dt><dd>One line: what the model chooses or runs (an hourly year, outage scenarios), and its goal.</dd></div>
+<div><dt>It leaves out</dt><dd>One line: what is outside the model's boundary.</dd></div>
+</dl>
+<p class="lx-hint">Open-ended: start from a preset, change one thing at a time, and copy the plan link to keep a plan.</p>
+</div>
+```
+:::
+
+::: {#bench .lx-sec}
+::: {.lx-sec-h}
+## The bench
+:::
+
+```{=html}
+<!-- The live bench: div.lx-sb with div.lx-sb-controls (a fieldset.lx-sb-group per group of controls: LX.Slider,
+     LX.Toggle, a div.lx-seg of buttons with aria-pressed) and div.lx-sb-side (the presets, LX.BenchRun, the readouts,
+     LX.ShareState). Build the controls from engine.schema, start them from ShareState's `state` (a link's plan, or the
+     defaults), and on every change call ss.set(plan) and run.changed(plan). Readouts beside the controls go in
+     BenchRun's `results` too, so they dim with the results when the plan changes. The fallback is complete: the
+     default plan and what each control can do. -->
+<div class="lx-interactive" data-learn="<slug>" data-src="../assets/learn/data/<id>.json ../assets/learn/data/path.json">
+<div class="lx-fallback lx-sb-static">
+<!-- <slug>-bench:start (written from engine.schema by LX.ShareState.staticHTML in the test's --write mode; do not edit) -->
+<table class="lx-facts"><thead><tr><th scope="col">Control</th><th scope="col">Default plan</th><th scope="col">Range</th></tr></thead>
+<tbody><tr><td>Solar PV</td><td class="n">6 kW</td><td>0 to 20 kW, in steps of 0.5 kW</td></tr></tbody></table>
+<!-- <slug>-bench:end -->
+<p class="lx-hint">With JavaScript on, you change these, run the year in your browser, and copy a link to your plan.</p>
+</div>
+</div>
+<p class="lx-datanote"><span>Where the inputs come from, with dates (or: the site and its loads are illustrative, based on ...). Prices in 20XX dollars.</span></p>
+```
+:::
+
+::: {#results .lx-sec}
+::: {.lx-sec-h}
+## Results
+:::
+
+```{=html}
+<!-- Filled by the page's JS after each run (BenchRun's render): a p.lx-br-stale slot (BenchRun's `stale`), then
+     div.lx-sb-results with the readouts (.lx-readouts), the charts (.lx-sb-charts, each .lx-sb-chart with its "Text
+     version"). The fallback shows the default plan's precomputed results, with the date of that run. -->
+<div id="<slug>-results" class="lx-xgrid">
+<div class="lx-fallback lx-sb-static">
+<!-- <slug>-results:start (written from the engine's precomputed default run by the test's --write mode; do not edit) -->
+<table class="lx-facts"><thead><tr><th scope="col">Result for the default plan</th><th scope="col">Value</th></tr></thead>
+<tbody><tr><td>One result, with its unit and boundary</td><td class="n">0 unit</td></tr></tbody></table>
+<!-- <slug>-results:end -->
+</div>
+</div>
+```
+:::
+
+::: {#explain .lx-sec}
+::: {.lx-sec-h}
+## How the engine works, as diagrams
+:::
+
+```{=html}
+<div id="<slug>-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Decisions, goal and rules</dt><dd>One sentence each, in words (the formulation lives in the Modeler lesson).</dd>
+<dt>It holds when</dt><dd>One sentence (LX.Boundary with JavaScript on).</dd>
+<dt>It leaves out</dt><dd>One sentence.</dd>
+</dl>
+</div>
+</div>
+```
+
+```{=html}
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The model behind the bench, as a title</summary>
+<div class="lx-deeper-body">
+```
+
+The Modeler lesson that formalises the engine (a link once it is live, else "upcoming"), and one sentence on what its notebook adds.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#sources .lx-sec}
+::: {.lx-sec-h}
+## Numbers, sources and what's next
+:::
+
+::: {.lx-end}
+```{=html}
+<div class="lx-card">
+<p class="lx-eyebrow">Inputs the engine uses</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>One input</td><td class="n">0 unit</td><td class="s"><a href="https://www.eia.gov/">Agency, table</a> · as of Month Year</td></tr>
+</tbody>
+</table>
+</div>
+```
+
+::: {.lx-stack}
+<!-- learn:next:start -->
+<!-- learn:next:end -->
+
+```{=html}
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul><li>Author (year). <a href="https://doi.org/10.0000/example">Title</a>. Journal.</li></ul>
+</div>
+```
+:::
+:::
+
+<!-- learn:footer:start -->
+<!-- learn:footer:end -->
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/<slug>.js" defer></script>
+```

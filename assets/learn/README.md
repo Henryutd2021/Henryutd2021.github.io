@@ -9,8 +9,8 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
 
 ## Start a new lesson
 
-1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for a capstone), `icon`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`. The lesson goes live (linked, with its generated header, next box and footer) when you set `status: active`; its page is then `learn/<id>.qmd` (or the file named by `path:`). Until then keep `status: upcoming`, or leave the status out: it shows as coming soon.
-   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources; `form: studio` and `form: case` are described under "Studios and case files".
+1. Add the lesson to `learn/path.yml`: `id`, `starter`, `tier`, `form: cards` (or `play` for lessons 0 and 13), `icon`, `title`, `subtitle`, `short`, `minutes`, `does`, `outcome`, `after`. The lesson goes live (linked, with its generated header, next box and footer) when you set `status: active`; its page is then `learn/<id>.qmd` (or the file named by `path:`). Until then keep `status: upcoming`, or leave the status out: it shows as coming soon.
+   - Lessons off the starter path (N1, B1–B3, M1, CK-F, toolbox K4 and K7) are already listed with their `code` and `id`. They take prerequisites as starter numbers or codes (`after: [10, K4]`) and name what follows (`next: B2`). `form: checkpoint` gives a checkpoint page the steps Task, Worked solution, Rubric and Sources; `form: studio` and `form: case` are described under "Studios and case files", `form: sandbox` and `form: capstone` under "Sandboxes and capstones".
    - New glossary terms and requests for shared files go in a sidecar, `learn/_w1/<id>.yml` (wave W1):
 
      ```yaml
@@ -22,7 +22,7 @@ Both are **generated**: `scripts/build_learn.py` joins `components/*.js` and `co
      ```
 
      `build_learn.py` merges the terms into `glossary.json` (if an id is already in `glossary.yml`, that definition wins and the clash is printed) and prints every request.
-2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`; for a research studio `_template-studio.qmd`, for a case file `_template-case.qmd`, see "Studios and case files") to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
+2. Copy `learn/_template-cards.qmd` (or `_template-play.qmd`; for a research studio `_template-studio.qmd`, for a case file `_template-case.qmd`, see "Studios and case files"; for a sandbox `_template-sandbox.qmd`, for a capstone `_template-capstone.qmd`, see "Sandboxes and capstones") to `learn/<id>.qmd`. Write `assets/learn/<id>.js` from the skeleton below, with a pure model exported for Node.
 3. In the ResearchPortfolio folder, run `python3 scripts/build_learn.py --site <site>`. Add `_tests/learn/test_<id>.js`, which checks every number on the page against the model.
 
 Then render, take screenshots (`node scripts/learn_screenshots.mjs`), and check the result at 1280 px and 375 px, in day and night mode.
@@ -95,6 +95,35 @@ The older forms keep their sections: `cards` (`#steps`, `#explain`, `#check`, `#
   - After approval: `git mv learn/_drafts/<id>.qmd learn/<id>.qmd` and set `status: active`. The build fails while a live page and a draft share an id.
 - **Screenshots.** `scripts/learn_screenshots.mjs --states top,explain,sec-selfcheck` works for both forms. On a studio, `explain` (and `open`) show `#exemplars`; `sec-<id>` scrolls to any section and clips the shot to it (`sec-task`, `sec-selfcheck`, `sec-case`, `sec-check`, `sec-sources`). A draft needs a rendered preview first: `learn_qa.sh` makes one.
 - **The `path.yml` row.** A case file is a `kind: lesson` row with `form: case`, its `code` and `id` from `reports/learn/learn_map_v2.yml` (for example `CF7`, `cf7-cost-of-waiting`), a `tier` (every lesson row needs one; the coordinator confirms which), `minutes: 10`, `after:` its prerequisites, and `status: upcoming`.
+
+## Sandboxes and capstones (wave W3)
+
+Two more forms (curriculum v2 §16.3, §16.4, §7.9), each with a template. `scripts/build_learn.py` gives them five step links each, and checks that the page (or its draft) has a section for every one of them.
+
+| `form:` | Template | Sections (step links) | Header badge | schema.org type | For |
+|---|---|---|---|---|---|
+| `sandbox` | `learn/_template-sandbox.qmd` | `#brief` Brief · `#bench` Bench · `#results` Results · `#explain` Explain · `#sources` Sources | Sandbox | Simulation | SB0–SB4 |
+| `capstone` | `learn/_template-capstone.qmd` | `#brief` Brief · `#plan` Plan · `#note` Note · `#selfcheck` Self-check · `#sources` Sources | Capstone | Capstone project | C0–C4 |
+
+**Sandbox** (an open-ended engine page).
+
+- **Order.** The brief comes first, in `div.lx-card.lx-sb-brief` above the interactive (seen with and without JavaScript): the site, what the reader decides, what the engine works out and what it leaves out, as `dl.lx-sb-facts`. Then the bench (`div.lx-sb`: groups of controls in `fieldset.lx-sb-group`, beside the run box `div.lx-sb-side` from 960 px: presets, `LX.BenchRun`, readouts, `LX.ShareState`). Then the results (`#<slug>-results`: BenchRun's stale line, the readouts and charts in `div.lx-sb-results`, each chart with its text version). Then how the engine works (`LX.Boundary` and a Modeler "Go deeper"), and the sources.
+- **The engine** is a shared component the sandbox builder writes (`components/<engine>.js`: E0 for SB0, E1 for SB1), so capstones and lessons run the same model. The page expects `engine.schema` (an `LX.ShareState` schema), `engine.presets`, `engine.solve(state, data, { signal, timeLimit, attempt })` (a Promise of `{ status, ok, message, hint, results }` that never rejects; LX.solver's statuses; `ok` only for optimal; `hint` after an infeasible plan), `engine.summarize` (pure: every number the page shows), `engine.note` (the `LX.ReportNote` input) and `engine.fallback` (the default plan's precomputed results for the no-JS block). The template's header comment has the full contract.
+- **The W2 review findings, built in.** Failure states go through `LX.BenchRun` (a message and "Try again", the busy state cleared, earlier results kept and marked). State a tie rule or report only what every optimum shares, and prove it in the test. "Optimal" only for status optimal; a MILP shows its gap; an early stop never says best. Presets fill the controls and never reset hidden parts.
+- **Fallbacks.** The bench's no-JS table comes from the schema (`LX.ShareState.staticHTML`), the results' from the engine's precomputed default run, each between `<!-- <slug>-bench:start -->`/`<!-- <slug>-results:start -->` markers written by the test's `--write` mode.
+
+**Capstone** (a brief, a deliverable and a self-check, built on a sandbox).
+
+- **Order.** The brief (`div.lx-card.lx-cap-brief`: the decision in one sentence, then Hand in, From and Done when as `ol.lx-studio-task`, and the time). Then the plan: the sandbox's engine with the capstone's choices (the same bench frame, BenchRun, ShareState) and its results and sensitivity chart in `#<slug>-results`. Then the note (`LX.ReportNote` in `#<slug>-note`): the reader's own words, the plan's numbers, the assumptions, the sensitivity line and the limits as a one-page note to copy; its checks are the deliverable's "done when". Then the self-check: `LX.Exemplars` (a weak and a strong note for the same brief, in `div#exemplars`, so the screenshot tool's `explain` and `open` states show it) and `LX.Rubric` (the competences the capstone builds: accounting, uncertainty, realism and communication for C0 and C1, each with a "look for" line). Then the sources.
+- **Built on a sandbox.** The `path.yml` row names it: `sandbox: SB0` (the build checks that it is the code of a `form: sandbox` row). Use the engine; never fork it.
+- **The deliverable** (§7.9): the plan link, the one-page note with its sensitivity line and table (the chart stays on the page), and for the Modeler version the notebook, in a Go deeper box under the note. Nothing is saved or sent: the reader copies the note and the link, and the page says so.
+- **Time.** `minutes` is the whole capstone (C0 60, C1 90); `lab_minutes` the Modeler notebook.
+
+**Both forms.**
+
+- **The `path.yml` row.** A `kind: lesson` row with `form: sandbox` or `form: capstone`, its `code` and `id` from `reports/learn/learn_map_v2.yml` (for example `C0`, `c0-behind-one-meter`), a `tier` (`tier2` when the curriculum gives two), `minutes`, `after:` its prerequisites, `sandbox:` for a capstone, and `status` (`upcoming` until the page is done). A capstone that quotes an excerpt waiting for Henry's approval is held in `learn/_drafts/` like a case file.
+- **Screenshots.** `--states top,mid,explain,sec-bench,sec-results` (sandbox) or `top,mid,explain,sec-plan,sec-note,sec-selfcheck` (capstone). A plan link works as a page: `--pages "learn/<id>.html#sb0-v2-..."` shows the link applied and announced; a damaged one shows the refusal.
+- **Phones.** Five step links fit at 375 px: on these forms each link stays on one line with narrower padding (`forms.css`).
 
 ## Lesson JS skeleton
 
@@ -817,6 +846,69 @@ LX.StakeholderMap(H("div", { class: "lx-xcard" }, x), { rings: [{ ring: "The stu
 - **Pure** (Node: `require("components/stakeholders.js")`; also on `LX.Stakeholders`): `WORD`, `cellText`, `staticHTML` (the role table as a plain table for a no-JS fallback), `mapItems`, `mapStaticHTML(o)` (the map as a plain table for a no-JS fallback: group, ring, what it is owed and where it appears; `staticTitle`, `owedHead` and `alsoHead` name its parts; R9's fallback is this table). Tests: `_tests/learn/test_components_w2_int.js`.
 
 **Form pieces** (`forms.css`, CSS only): `.lx-studio-brief` (the studio's task card, a `div.lx-card` above the interactive and outside its fallback; no page style needed) and `.lx-studio-task` (its task list; the myth cards under a studio's self-check are spaced too), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try` (the Try-it box: its code and text wrap on phones), and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`. Promoted from the three case files at the W2 integration (they keep no page style): `.cf-ctl` with its label `.cf-ctl-l` (a labelled control), `.cf-row` (a row of buttons), `.cf-selects` of `.cf-sel` (two selects side by side, stacked on phones) and `table.cf-two` (a comparison table, `th` per row and `td data-l="…"`, that becomes labelled lines below 560 px). An allow-listed explainer on a Learn page takes the Learn accent as its theme colour (`body.page-learn` sets `--t`, `.page-learn .explainer` the helpers `--t-ink`, `--t-soft`, `--t-line`), so a page needs no `theme-*` body class.
+
+### Added in wave W3 (2026-11-03): sandboxes and capstones
+
+The build bundles these after the W2 set (`W3_JS`, `W3_CSS` in `scripts/build_learn.py`; `sharestate` after `share`, which it uses). Node tests: `_tests/learn/test_components_w3.js` (it also checks the step ids against `STEPS` in `build_learn.py` when `LEARN_BUILD=<path>` is set, or when the script sits at `../scripts/` from the site folder).
+
+**Plan link** (`sharestate.js`, `sharestate.css`; i-share): a sandbox's or capstone's plan kept in the address, compact, versioned and checked on load, with a "Copy plan link" button.
+
+```js
+var S = { key: "sb0", version: 2, title: "Site Bench plan",
+  fields: [{ id: "site", short: "s", type: "enum", values: ["home", "farm"], names: { home: "Prairie Town home", farm: "Ridge wind farm" }, def: "home", label: "Site" },
+           { id: "pv", short: "pv", type: "num", min: 0, max: 20, step: 0.5, def: 6, label: "Solar PV", unit: "kW" },
+           { id: "bat", short: "b", type: "int", min: 0, max: 40, def: 10, label: "Battery", unit: "kWh" }],
+  check: function (s) { return null; },                                         // a rule across fields: null or a short phrase
+  old: [{ version: 1, fields: [/* v1's fields */], note: "Battery sizes are now in kWh.", up: function (s1) { return s2; } }] };
+var ss = LX.ShareState(side, { schema: S, onLoad: function (plan, result) { /* a link opened later: refill the controls */ } });
+var plan = ss.state;          // the link's plan (ss.result.status "ok" or "migrated") or the defaults
+ss.set(plan);                 // on every change: [] when valid (then the address follows, 250 ms later), else the problems
+ss.url(); ss.copy(); ss.reset(); side.insertBefore(ss.status, side.firstChild);   // the announcement can sit anywhere
+```
+
+- **The hash.** `#sb0-v2-s0-pv6d5-b10`: the key, the version, then each field's short name and value in the schema's order (`d` for a decimal point, a leading `_` for a minus; a choice by its index; a set as a bitmask; an order as its indexes). Letters, digits, `-` and `_` only, so `LX.Share` copies it unchanged. Any other hash (`#explain`, `#lx-demo-mid`) is left alone.
+- **No server, no personal data.** The link holds only the numbers and choices the schema declares; there is no free-text type, so nothing a reader types travels in it.
+- **Checked on load.** A damaged link, a value out of range or off its step, a part missing, unknown or twice, a bad choice, a link over 1,500 characters or one that breaks the schema's `check` is refused: the page starts from the defaults, says why in the status line (`role="status"`, filled just after mounting) and takes the hash out of the address. A link from a newer version of the page is refused too. A link from an older version with an `old` entry is decoded with that version's fields, brought up through each `up()` and announced with each step's `note`; without an entry it is "old" and refused. Bump `version` whenever a field, a range, a step or a meaning changes.
+- **Later links.** A plan link opened in the same tab (the address changes) is applied and passed to `onLoad`; a damaged one keeps the reader's plan and says so. The page's own hash is never applied again.
+- **Copy.** Through `LX.Share`: the clipboard, else the link in a field to select. `sync: false` writes the address only when the reader copies.
+- **Pure** (Node: `require("components/sharestate.js")`; also on `LX.ShareState`): `defaults`, `validate`, `encode`, `decode` (`status` none, ok, migrated, bad, newer or old, with `state`, `from`, `reason`, `notes`), `message`, `same`, `checkSchema` (a malformed schema throws: keys, short names, types, ranges, defaults, old versions), `fmtValue`, `staticHTML` (the bench's no-JS table: each control, its value and its range).
+
+**Run box** (`benchrun.js`, `benchrun.css`): the Run button, its status line and its failure states.
+
+```js
+var stale = H("p", null, resultsHost), res = H("div", { class: "lx-sb-results" }, resultsHost);
+var run = LX.BenchRun(side, { label: "Run the year", state: function () { return plan; },
+  solve: function (plan, ctx) { return engine.solve(plan, data, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },
+  render: function (results, plan, r) { /* draw into res and the readouts */ }, results: [res, readouts], stale: stale, busy: api && api.busy,
+  words: { ok: "Done: the cheapest way to run this plan over the year (the solver reports optimal)." } });
+run.changed(plan);            // on every change of the plan: the drawn results are marked as an earlier plan's
+run.run(plan);                // also from a preset or the demo hook; run.last(), run.cancel(), run.running()
+```
+
+- **One run at a time.** A new run aborts the one before (its `AbortSignal`) and a late answer from it is ignored.
+- **While it runs.** The button reads "Running…" and is `aria-disabled` (not `disabled`, which would drop the keyboard focus of a reader who pressed it; presses are ignored), every results area is `aria-busy`, and `busy(true)` is called (pass a step card's `api.busy` to hold Next).
+- **After it.** The status line says what happened, in words. "Optimal" appears only for status optimal, with a MILP's gap; a time limit or another early stop never says best (with `partial: true` a plan kept by an early stop is drawn as "the best found so far, not proven best"). An infeasible plan adds the engine's `hint`. A rejected or throwing solve, or a render that throws, is a failed run. Every outcome but a solved one offers "Try again", which re-runs the same plan with `attempt` 2, 3, ... so the engine can raise its time limit. The busy state is always released, and results already drawn stay, marked "for an earlier plan" (or "from your last run that finished") in the `stale` line, and dimmed in every `results` area (pass readouts beside the controls too).
+- **Pure:** `classify(r, words, partial)` → `{ kind, draw, retry, text }` (also on `LX.BenchRun`).
+
+**Report template** (`reportnote.js`, `reportnote.css`): the reader's plan and results as a one-page note, with the deliverable's checks.
+
+```js
+var rn = LX.ReportNote(H("div", { class: "lx-xcard" }, noteHost), { id: "c0-note", code: "C0", title: "Your one-page note",
+  fields: [{ key: "recommend", label: "Recommendation", hint: "Two sentences: what to install, and why.", rows: 3, need: true, at: "top", min: 8 },
+           { key: "alone", label: "What the site cannot do alone", rows: 2, need: true }],
+  get: function () { var last = run.last(); if (!last) return null;
+    var n = engine.note(last.state, last.r.results);                    // heading, made, plan, results, assumptions, sensitivity, limits
+    n.link = ss.url(); n.run = { ok: true, stale: !LX.ShareState.same(S, last.state, plan), text: "one year, hour by hour" };
+    return n; } });
+rn.refresh();                 // after each run (and when the plan changes, so the stale warning shows)
+```
+
+- **The note.** A title (code and heading), the plan link, "Made with … on <date>" and what the results cover; the reader's top fields; the plan and the results (tables in Markdown, lines in text); the assumptions, one sentence each; the sensitivity line (from `{ metric, input, held, base: { at, value }, cases: [...] }`, or a sentence), with its table in Markdown; the reader's other fields; the limits; a footer saying it is a teaching model with illustrative assumptions. When the results are stale or not from a finished run, the note carries a warning line.
+- **Copy.** "Copy as text" and "Copy as Markdown": the clipboard, else the text in a box to select, and the line says which. Nothing is saved or sent: the privacy line says the note is built in the page, the reader's words stay in this browser (under `id`) and are not part of the plan link. No string in the component claims otherwise (`CLAIMS`, tested).
+- **Checks** (the deliverable's "done when"; they never block copying): a plan link, results from a finished run of this plan, each `need` field in the reader's words (at least `min` words, 5 by default, and no "[…]" placeholder), the assumptions, a sensitivity line, and one page (at most 550 words). A page can pass its own `{ id, label, test(note, words) }`.
+- **Pure:** `compose(note, words, fields, { format: "text" | "md", date, code })`, `html` (the preview, all text escaped; the link as text, not a link), `outlineHTML(fields)` (the no-JS fallback: the note's headings in order with what goes under each), `sensitivityLine`, `checks`, `headText`, `countWords`, `PAGE_WORDS`, `CLAIMS`, `FOOTER` (also on `LX.ReportNote`).
+
+**Form pieces** (`forms.css`, W3 part): `.lx-sb-brief`, `.lx-sb-facts`, `.lx-cap-brief`, the bench frame `.lx-sb` (`.lx-sb-controls`, `.lx-sb-group`, `.lx-sb-side`, `.lx-sb-presets`), the results `.lx-sb-results`, `.lx-sb-charts` (`.two` for two charts side by side from 960 px) and `.lx-sb-chart` (no overflow clipping, so chart tips and popovers stay visible), and `.lx-sb-static` for the no-JS tables.
 
 **Scope and QA** (ResearchPortfolio folder).
 

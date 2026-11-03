@@ -1,9 +1,12 @@
-/* forms.css — page pieces of the two W2 forms (learn/_template-studio.qmd, learn/_template-case.qmd): the studio's task
+/* forms.css — page pieces of the W2 and W3 forms (learn/_template-studio.qmd, _template-case.qmd, _template-sandbox.qmd,
+   _template-capstone.qmd). W2: the studio's task
    card above the interactive (div.lx-card.lx-studio-brief, seen with and without JavaScript) and its task list; the
    case file's numbered parts, its question line and the approved-excerpt quote (blockquote.lx-excerpt with
    data-source="excerpt:<key>", checked by the scope scan); the static lists of the no-JS fallbacks (timeline, exemplar
    notes, rubric table); the case file's Try-it box, its toys' controls and comparison table (.cf-*), and the theme colour
-   of an allow-listed explainer on a Learn page. Colours from --lx-* tokens only. */
+   of an allow-listed explainer on a Learn page. W3: the sandbox's brief (its facts as labelled cells) and bench frame
+   (controls beside the run box from 960 px), the results' readouts and chart cards, the capstone's brief, and the
+   static tables of their no-JS fallbacks. Colours from --lx-* tokens only. */
 .lx-studio-brief { margin-bottom: 14px; display: grid; gap: 8px; }
 .lx-studio-task { margin: 0; padding-left: 1.3rem; display: grid; gap: 6px; font-size: 16px; color: var(--lx-ink-2); }
 .lx-studio-task b { color: var(--lx-ink); font-family: var(--lx-f-display); font-weight: 500; }
@@ -65,3 +68,43 @@ body.page-learn { --t: var(--lx-accent); }
   .lx-case-part { padding: 12px 14px; }
   .lx-rb-static th[scope="row"] { display: block; border: 0; padding: 6px 0 2px; }
 }
+
+/* ---------- sandbox and capstone pages (W3) */
+/* the brief: a card above the bench (seen with and without JavaScript); its facts as labelled cells, two columns
+   from 641 px; a capstone's brief reuses the studio's task list (.lx-studio-task) */
+.lx-sb-brief, .lx-cap-brief { margin-bottom: 14px; display: grid; gap: 10px; }
+.lx-sb-facts { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
+.lx-sb-facts > div { min-width: 0; }
+.lx-sb-facts dt { font-family: var(--lx-f-display); font-weight: 500; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--lx-ink-3); }
+.lx-sb-facts dd { margin: 2px 0 0; font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-sb-facts dd b { color: var(--lx-ink); font-weight: 600; }
+/* the bench: groups of controls (fieldsets) beside the run box (BenchRun, the readouts and the plan link); one column
+   below 960 px, with the run box after the controls */
+.lx-sb { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; background: var(--lx-surface); border: 1px solid var(--lx-line);
+  border-radius: var(--lx-r-lg); padding: 16px 18px; box-shadow: var(--lx-shadow); min-width: 0; }
+@media (min-width: 960px) { .lx-sb { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; } }
+.lx-sb-controls { display: grid; gap: 12px; min-width: 0; }
+.lx-sb-group { margin: 0; padding: 10px 14px 14px; border: 1px solid var(--lx-line); border-radius: 12px; display: grid; gap: 10px; min-width: 0; }
+.lx-sb-group legend { float: none; width: auto; margin: 0; padding: 0 6px; font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; color: var(--lx-ink); }
+.lx-sb-side { display: grid; gap: 12px; align-content: start; min-width: 0; }
+@media (min-width: 960px) { .lx-sb-side { position: sticky; top: 72px; } }
+.lx-sb-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+/* results: the readouts (.lx-readouts from plot.css), then chart cards (no overflow clipping: chart tips and popovers
+   must stay visible, W2 review finding 7; a wide table goes in its own .lx-scroll-x) */
+.lx-sb-results { display: grid; gap: 14px; min-width: 0; }
+.lx-sb-charts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+@media (min-width: 960px) { .lx-sb-charts.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lx-sb-chart { min-width: 0; }
+/* the no-JS fallbacks: the default plan and its results as plain tables, written from the engine by the test */
+.lx-sb-static { display: grid; gap: 10px; }
+.lx-sb-static table { width: 100%; }
+@media (max-width: 640px) {
+  .lx-sb-facts { grid-template-columns: minmax(0, 1fr); }
+  .lx-sb { padding: 12px 14px; }
+}
+/* five step links in the header (the older forms have four): on phones each stays on one line ("Self-check") */
+@media (max-width: 560px) {
+  :where(.lx-form-sandbox, .lx-form-capstone) .lx-steps a { padding: 0 6px; white-space: nowrap; }
+}
+/* a capstone's self-check holds the exemplars and the rubric, one after the other */
+:where(.lx-form-capstone) #selfcheck .lx-xgrid + .lx-xgrid { margin-top: 18px; }

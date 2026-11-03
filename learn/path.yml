@@ -9,13 +9,15 @@
 #                 lessons list theirs in `scales: [id, ...]`
 #   kind: lesson  starter: N puts the lesson on the starter path as stop N; tier is where it sits; tier2 marks a lesson that
 #                 bridges two tiers; path only for lessons that exist (others show as coming soon); after = starter lessons
-#                 it builds on; form: play (opens with the game: lesson 0, capstones) or cards (step cards; the default);
+#                 it builds on; form: play (opens with the game: lessons 0 and 13) or cards (step cards; the default);
 #                 icon for its map stop; code labels tier lessons that are not on the starter path (M1, ...)
 #   kind: tool    the just-in-time math toolbox (code K1-K8; a tool with id and path gets a page like a lesson)
 #   status        `status: active` makes a lesson or tool live: linked, with generated blocks, page learn/<id>.qmd (or
 #                 `path:`); `status: upcoming` or no page = coming soon. A tier with `status: upcoming` shows as later.
 #   off the path  lessons with a `code` (N1, B1, M1, CK-F, ...) may list prerequisites as starter numbers or codes
-#                 (`after: [10, K4]`) and the module that follows (`next: B2`); `form: checkpoint` for checkpoint pages
+#                 (`after: [10, K4]`) and the module that follows (`next: B2`); `form: checkpoint` for checkpoint pages,
+#                 `studio` and `case` (W2), `sandbox` and `capstone` (W3; a capstone names its sandbox: `sandbox: SB0`);
+#                 see assets/learn/README.md
 # (The name has no leading underscore because Quarto listings skip files that start with "_".)
 # Source: design report 09, sections 2 and 5 (revised 2026-11-02); course map form chosen by Henry on 2026-11-02 (metro).
 # Curriculum v2 (reports/learn/learn_map_v2.yml, approved 2026-11-02): fourth tier Researcher, the W1 modules

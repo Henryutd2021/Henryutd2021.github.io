@@ -1,0 +1,46 @@
+/* reportnote.css — LX.ReportNote (reportnote.js): the reader's fields and the deliverable's checks beside a preview of
+   the one-page note (two columns from 960 px, one below), the copy buttons, the status line and the select-and-copy box.
+   The preview reads as a page: a title, the plan link in mono (it wraps anywhere on a phone), small headings, compact
+   two-column tables, a warning line when the results are not from a finished run of the plan. Tokens only. */
+.lx-rn { display: grid; gap: 14px; min-width: 0; }
+.lx-rn-lede { font-size: 15.5px; color: var(--lx-ink-2); }
+.lx-rn-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 960px) { .lx-rn-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); } }
+.lx-rn-side { display: grid; gap: 14px; min-width: 0; }
+.lx-rn-form { display: grid; gap: 12px; }
+.lx-rn-field { display: grid; gap: 4px; min-width: 0; }
+.lx-rn-field label { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
+.lx-rn-field textarea { width: 100%; min-width: 0; font: inherit; font-size: 15px; line-height: 1.45; padding: 8px 10px; border: 1px solid var(--lx-line-2);
+  border-radius: 10px; background: var(--lx-surface); color: var(--lx-ink); resize: vertical; }
+.lx-rn-field textarea:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 1px; }
+.lx-rn-checks { display: grid; gap: 6px; border-top: 1px solid var(--lx-line); padding-top: 12px; }
+.lx-rn-checks-h { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
+.lx-rn-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.lx-rn-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 6px; align-items: start; font-size: 14.5px; color: var(--lx-ink); }
+.lx-rn-list li .lx-ic { width: 18px; height: 18px; margin-top: 2px; color: var(--lx-ink-3); }
+.lx-rn-list li.ok .lx-ic { color: var(--lx-good); }
+.lx-rn-page { background: var(--lx-surface); border: 1px solid var(--lx-line-2); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px;
+  min-width: 0; box-shadow: var(--lx-shadow); font-size: 14.5px; line-height: 1.45; color: var(--lx-ink-2); }
+.page-learn .lx-rn-page h4.lx-rn-title { margin: 0; font-size: 17px; color: var(--lx-ink); }
+.page-learn .lx-rn-page h5 { margin: 8px 0 0; font-family: var(--lx-f-display); font-weight: 600; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--lx-ink-3); }
+.lx-rn-page p, .lx-rn-page ul { margin: 0; }
+.lx-rn-page ul { padding-left: 1.1rem; display: grid; gap: 2px; }
+.lx-rn-meta { font-size: 13.5px; color: var(--lx-ink-3); }
+.lx-rn-meta code { font-family: var(--lx-f-mono); font-size: 12.5px; overflow-wrap: anywhere; word-break: break-all; }
+.lx-rn-meta.warn { color: var(--lx-ink); background: var(--lx-warn-soft); border-left: 3px solid var(--lx-warn); padding: 4px 8px; border-radius: 0 6px 6px 0; }
+.lx-rn-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lx-rn-table th, .lx-rn-table td { text-align: left; vertical-align: top; padding: 3px 8px 3px 0; border-bottom: 1px solid var(--lx-line); }
+.lx-rn-table th { font-weight: 400; color: var(--lx-ink-2); }
+.lx-rn-table td { font-family: var(--lx-f-mono); font-size: 13.5px; color: var(--lx-ink); }
+.lx-rn-empty { color: var(--lx-ink-3); font-style: italic; }
+.lx-rn-foot-line { margin-top: 6px !important; font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-rn-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lx-rn-msg:empty { display: none; }
+.lx-rn-copy { display: grid; gap: 4px; }
+.lx-rn-copy[hidden] { display: none; }
+.lx-rn-copy textarea { width: 100%; min-width: 0; font-family: var(--lx-f-mono); font-size: 13px; line-height: 1.45; padding: 8px 10px; border: 1px solid var(--lx-line-2);
+  border-radius: 10px; background: var(--lx-surface-2); color: var(--lx-ink); resize: vertical; }
+@media (max-width: 560px) { .lx-rn-page { padding: 12px 12px; } }
+.lx-rn-outline { margin: 0; padding-left: 1.3rem; display: grid; gap: 5px; font-size: 15px; color: var(--lx-ink-2); }
+.lx-rn-outline b { color: var(--lx-ink); font-weight: 600; }

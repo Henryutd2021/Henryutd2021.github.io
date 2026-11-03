@@ -1,0 +1,208 @@
+---
+# TEMPLATE (not rendered: the leading underscore). Copy to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
+title: "The capstone's question, as in path.yml (for example: Behind one meter: what should one home or one plant install?)"
+subtitle: "What the reader hands in, in one line"
+description: "Capstone C<n> of Energy Systems, Step by Step: the decision, the plan the reader builds on the sandbox's engine, and the one-page note they hand in (for search and sharing)."
+page-layout: full
+toc: false
+title-block-banner: false
+css: ../assets/learn/learn.css
+body-classes: "page-learn page-lesson lx-form-capstone"
+---
+
+<!-- Capstone (path.yml form: capstone, `sandbox: SB<n>`; curriculum v2 §7.9, §16.3 and §3.4). Guide:
+     assets/learn/README.md, "Sandboxes and capstones". Replace <slug> with the capstone's JS name and <id> with its
+     path.yml id.
+     Order: the brief (the decision, who it is for, the deliverable and when it is done, the time) -> the plan (the
+     sandbox's engine with the capstone's choices: LX.BenchRun to run it, LX.ShareState for the plan link; the
+     sensitivity chart, e.g. LX.Tornado, with the plan held fixed or re-sized, said in words) -> the note (LX.ReportNote:
+     the reader's words, the plan's numbers, the assumptions, the sensitivity line and the limits as a one-page note to
+     copy; its checks are the deliverable's "done when") -> the self-check (LX.Exemplars: a weak and a strong note for the
+     same brief, illustrative; LX.Rubric: the competences the capstone builds, the course's words, a "look for" line
+     each) -> sources. The step links are #brief, #plan, #note, #selfcheck and #sources (the build checks that each
+     exists); the screenshot tool reaches them as sec-brief, sec-plan, sec-note, sec-selfcheck and sec-sources, and
+     `explain` (and `open`) show #exemplars.
+     Built on a sandbox: load the sandbox's engine (assets/learn/components/<engine>.js, in the bundle) and use its
+     schema, presets, engine.solve (through LX.BenchRun), summarize and note (see _template-sandbox.qmd). Do not fork
+     the engine: a capstone narrows the controls (which site, which choices) and adds its brief, its note fields and its
+     rubric. The engine's failure states, tie rule and wording rules apply here unchanged.
+     The deliverable (curriculum §7.9): the plan link, the one-page note with a sensitivity chart (the note carries the
+     sensitivity line and table; the chart stays on the page), and for the Modeler version the notebook (a Go deeper box
+     in #note with the allow-listed repository's Colab link). Nothing is saved or sent anywhere: the reader copies the
+     note and the link, and the page says so (ReportNote's privacy line).
+     Rubric (§3.4): pick the competences (C0 and C1: accounting, uncertainty, realism, communication) and add a "look
+     for" line each; never reword the levels. The exemplars are illustrative and say so; they use the engine's real
+     numbers for the default plan, checked by the test.
+     Time: path.yml `minutes` is the whole capstone (60 for C0, 90 for C1); `lab_minutes` the Modeler notebook. Count the
+     runs and the writing honestly.
+     Scope (§20): the sites are fictional; data centers appear only as loads; Henry's research only through approved
+     excerpts (held in learn/_drafts/ until approved, like a case file), allow-listed repositories and citations.
+     After editing path.yml, run in the ResearchPortfolio folder:
+     python3 scripts/build_learn.py --site <site>   (fills the three marker blocks below; never edit them by hand) -->
+
+<!-- learn:meta:start -->
+<!-- learn:meta:end -->
+
+::: {#brief .lx-sec}
+```{=html}
+<!-- The brief sits above the interactive, outside every fallback, so readers see it with and without JavaScript.
+     Styles: .lx-cap-brief (forms.css) and the studio's .lx-studio-task list. -->
+<div class="lx-card lx-cap-brief">
+<p class="lx-eyebrow">The brief</p>
+<p class="lx-case-q">The decision, in one sentence, and who has to make it.</p>
+<ol class="lx-studio-task">
+<li><b>Hand in:</b> a plan link and a one-page note with a sensitivity line (Modeler version: the notebook too).</li>
+<li><b>From:</b> the sandbox's engine (a link to the sandbox page) and the site's data, with its year.</li>
+<li><b>Done when:</b> every check under the note is in place and the self-check reaches Proficient, in the rubric's words.</li>
+</ol>
+<p class="lx-hint">About N minutes: N to build and run the plan, N to write the note, N to check it.</p>
+</div>
+```
+:::
+
+::: {#plan .lx-sec}
+::: {.lx-sec-h}
+## Build and run your plan
+:::
+
+```{=html}
+<!-- The live plan: the sandbox's bench frame (div.lx-sb: controls, then the run box with LX.BenchRun and
+     LX.ShareState) in the interactive; its results (readouts, charts and the sensitivity chart, BenchRun's stale line
+     above them) in #<slug>-results below it. The fallbacks are complete: the default plan, its precomputed results with
+     the run's date, and how to do the task on paper. -->
+<div class="lx-interactive" data-learn="<slug>" data-src="../assets/learn/data/<id>.json ../assets/learn/data/path.json">
+<div class="lx-fallback lx-sb-static">
+<!-- <slug>-plan:start (written from engine.schema by LX.ShareState.staticHTML in the test's --write mode; do not edit) -->
+<table class="lx-facts"><thead><tr><th scope="col">Control</th><th scope="col">Default plan</th><th scope="col">Range</th></tr></thead>
+<tbody><tr><td>Solar PV</td><td class="n">6 kW</td><td>0 to 20 kW, in steps of 0.5 kW</td></tr></tbody></table>
+<!-- <slug>-plan:end -->
+<p class="lx-hint">With JavaScript on, you change the plan, run it in your browser and copy a link to it. Without it, use the default plan and its results below for the note.</p>
+</div>
+</div>
+<div id="<slug>-results" class="lx-xgrid">
+<div class="lx-fallback lx-sb-static">
+<!-- <slug>-results:start (written from the engine's precomputed default run, engine.fallback, by the test's --write mode; do not edit) -->
+<table class="lx-facts"><thead><tr><th scope="col">Result for the default plan</th><th scope="col">Value</th></tr></thead>
+<tbody><tr><td>One result, with its unit and boundary</td><td class="n">0 unit</td></tr></tbody></table>
+<!-- <slug>-results:end -->
+</div>
+</div>
+<p class="lx-datanote"><span>Where the inputs come from, with dates (or: the site is illustrative, based on ...). Prices in 20XX dollars.</span></p>
+```
+:::
+
+::: {#note .lx-sec}
+::: {.lx-sec-h}
+## Write your one-page note
+:::
+
+```{=html}
+<!-- LX.ReportNote fills this: the reader's fields, the deliverable's checks and the note's preview, with "Copy as text"
+     and "Copy as Markdown". get() returns engine.note(state, results) with the plan link (ss.url()) and the run's
+     state ({ ok, stale }) from LX.BenchRun. The fallback is the note's outline, from the same fields. -->
+<div id="<slug>-note" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- <slug>-note:start (written by LX.ReportNote.outlineHTML from the page's fields in the test's --write mode; do not edit) -->
+<ol class="lx-rn-outline"><li><b>Title and plan link:</b> the plan's link from the bench, and the date</li><li><b>Recommendation:</b> two sentences.</li></ol>
+<!-- <slug>-note:end -->
+</div>
+</div>
+```
+
+```{=html}
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The Modeler version: the notebook, as a title</summary>
+<div class="lx-deeper-body">
+```
+
+The Modeler lesson whose notebook this version adds (a link once it is live, else "upcoming"), the allow-listed repository's Colab link, and what to hand in from it.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#selfcheck .lx-sec}
+::: {.lx-sec-h}
+## Check your note
+:::
+
+```{=html}
+<div id="exemplars" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- <slug>-exemplars:start (written from the data file by LX.Exemplars' staticHTML in the test's --write mode; do not edit) -->
+<div class="lx-ex-cols">
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak note · Developing</p><p>The weak note, as written, with marks [1].</p><ol class="lx-ex-static"><li>Why that part falls short, in one sentence.</li></ol></div>
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong note · Proficient</p><p>The strong note, as written, with marks [1].</p><ol class="lx-ex-static"><li>Why that part works, in one sentence.</li></ol></div>
+</div>
+<!-- <slug>-exemplars:end -->
+</div>
+</div>
+<div id="<slug>-rubric" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- <slug>-rubric:start (written by LX.Rubric's staticHTML, from the course rubric, in the test's --write mode; do not edit) -->
+<div class="lx-scroll-x"><table class="lx-facts lx-rb-static"><thead><tr><th scope="col">Competence</th><th scope="col">Developing</th><th scope="col">Proficient (the bar)</th><th scope="col">Strong</th></tr></thead>
+<tbody><tr><th scope="row">Consistent accounting</th><td>The course rubric's words.</td><td>…</td><td>…</td></tr></tbody></table></div>
+<!-- <slug>-rubric:end -->
+</div>
+</div>
+```
+
+```{=html}
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Researcher</span>From this capstone to your own study, as a title</summary>
+<div class="lx-deeper-body">
+```
+
+One or two sentences on how the same plan, note and self-check grow into the research project (CR), with a link to the studio that formalises it.
+
+```{=html}
+</div>
+</details>
+</div>
+```
+:::
+
+::: {#sources .lx-sec}
+::: {.lx-sec-h}
+## Numbers, sources and what's next
+:::
+
+::: {.lx-end}
+```{=html}
+<div class="lx-card">
+<p class="lx-eyebrow">Inputs the plan uses</p>
+<table class="lx-facts">
+<thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
+<tbody>
+<tr><td>One input</td><td class="n">0 unit</td><td class="s"><a href="https://www.eia.gov/">Agency, table</a> · as of Month Year</td></tr>
+</tbody>
+</table>
+</div>
+```
+
+::: {.lx-stack}
+<!-- learn:next:start -->
+<!-- learn:next:end -->
+
+```{=html}
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul><li>Author (year). <a href="https://doi.org/10.0000/example">Title</a>. Journal.</li></ul>
+</div>
+```
+:::
+:::
+
+<!-- learn:footer:start -->
+<!-- learn:footer:end -->
+:::
+
+```{=html}
+<script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/<slug>.js" defer></script>
+```
