@@ -1,0 +1,160 @@
+// test_a16-hydrogen-ptx.js — Node tests for A16 (assets/learn/a16-hydrogen-ptx.js, its data file and the page).
+//   - the farm: 8,760 hours at EIA's 33.8%, the best hour at full size (method "power")
+//   - the chain: 1 MWh -> 17.5 kg -> 0.58 MWh held -> 0.35 MWh back
+//   - the hourly rules: energy balances (electrolyzer use = spare used + wind diverted + grid), part-load (never below the
+//     minimum load), curtailment never rises, the annual rule's matching holds at the page's 30 MW
+//   - claims (W3 brief §2.4): on spare wind utilization falls and the cost per kg rises with every size step (the myth), the
+//     owner's best size is at least the cheapest-kg size at every price on the slider; ties in the best size go to the
+//     smaller size (stated in the model) and none occurs on the slider
+//   - every number on the page (fallback, explain, myths, quiz, numbers to remember) against the model and the data
+//   - research wording (curriculum §13, guard G-SRC; CF2's pattern): every excerpt sentence and every sentence about the
+//     course author's studies is an approved sentence of reports/learn/excerpts_for_approval.md (E3, E4, E10, with the
+//     revisions after review), word for word; titles of cited papers as in inputs/publications.bib
+//   - scope: no nuclear term, no data centers, links only to allowed domains
+// Usage (from the site folder):  node _tests/learn/test_a16-hydrogen-ptx.js
+"use strict";
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const cp = require("child_process");
+const ID = "a16-hydrogen-ptx";
+const SITE = path.resolve(__dirname, "..", "..");
+const L = p => path.join(SITE, "assets/learn", p);
+const pctx = { window: { LX: {} }, module: { exports: {} } };
+vm.runInNewContext(fs.readFileSync(L("components/profiles.js"), "utf8"), pctx);
+const PR = pctx.module.exports;
+const M = require(L(ID + ".js"));
+const J = p => JSON.parse(fs.readFileSync(L("data/" + p), "utf8"));
+const D = J(ID + ".json"), JS = fs.readFileSync(L(ID + ".js"), "utf8");
+const PAGE = fs.readFileSync(path.join(SITE, "learn", ID + ".qmd"), "utf8"), SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
+let checks = 0, fails = 0;
+function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
+const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
+const PAGE0 = PAGE.replace(/ data-label="[^"]*"/g, "");
+const onPage = (s, what) => ok(PAGE0.includes(s), `page states ${what}: "${s}"`);
+const fm = M.fm;
+
+const Y = M.prepare(D, J("town_year.json"), J("cf_targets.json"), PR.townProfile);
+// ---------------- the farm and the chain
+ok(Y.wind.length === 8760 && near(M.sum(Y.wind) / 8760 / D.farm.windMW, 0.338, 1e-6) && near(Math.max(...Y.wind), D.farm.windMW, 1e-9), "farm: 8,760 hours, 33.8% capacity factor, best hour at 100 MW");
+const c = M.chain(D);
+ok(c.kg.toFixed(1) === "17.5" && c.lhv.toFixed(2) === "0.58" && c.back.toFixed(2) === "0.35", "chain: 17.5 kg, 0.58 MWh held, 0.35 MWh back");
+onPage("1 MWh of power makes 17.5 kg of hydrogen, which holds 0.58 MWh; a fuel cell turns that back into 0.35 MWh.", "the chain (fallback)");
+onPage("1 MWh makes 17.5 kg; it holds 0.58 MWh and gives back 0.35 MWh through a fuel cell.", "the chain (explain)");
+ok(near(10000 / D.electrolyzer.kWhPerKg, 175.4, 0.05), "quiz: 10 MWh makes 175.4 kg"); onPage("10,000 kWh ÷ 57 kWh per kg = 175.4", "the quiz");
+
+// ---------------- the hourly rules
+const rules = ["spare", "hourly", "annual"];
+[5, 20, 30, 60].forEach(X => ["pem", "alk"].forEach(t => rules.forEach(r => {
+  const o = M.run(Y, X, r, t), m = D.electrolyzer.minLoad[t];
+  ok(near(o.mwh, o.spareUsed + o.diverted + o.grid, 1e-6) && near(o.kg, o.mwh * 1000 / 57, 1e-6) && o.curtailed <= o.curtailed0 + 1e-9, `${r} ${t} ${X} MW: balance, yield and curtailment`);
+  const below = o.kgByHour.some(k => k > 0 && k * 57 / 1000 < m * X - 1e-9);
+  ok(!below, `${r} ${t} ${X} MW: never runs below its ${Math.round(m * 100)}% minimum load`);
+})));
+const R30 = rules.map(r => M.run(Y, 30, r, "pem"));
+ok(R30[2].matched && R30[2].mwh <= R30[2].windMWh, `annual rule at 30 MW: the year's use (${fm.gwh(R30[2].mwh)}) is matched by the farm's wind (${fm.gwh(R30[2].windMWh)})`);
+const rowTxt = ["Spare wind only", "Wind matched hour by hour", "Grid power matched over the year"];
+R30.forEach((o, i) => onPage(`<tr><td>${rowTxt[i]}</td><td>${fm.pct(o.util)}</td><td>${fm.kg2(o.lcoh)}</td><td>${fm.co2(o.gridCO2)}</td></tr>`, "the fallback row " + rowTxt[i]));
+ok(R30[2].lcoh < R30[1].lcoh && R30[1].lcoh < R30[0].lcoh && R30[2].gridCO2 > D.chps, "step 6: annual matching gives the cheapest kg, yet its grid hours carry more CO2 per kg than DOE's 4.0 target");
+onPage(`it carries about ${fm.co2(R30[2].gridCO2)} of CO₂ per kg, above DOE's 4.0 target`, "myth 2");
+
+// ---------------- claims about spare wind
+let prev = null, mono = true;
+for (let X = D.sizes.min; X <= D.sizes.max; X += D.sizes.step) { const o = M.run(Y, X, "spare", "pem"); if (prev && !(o.util < prev.util && o.lcoh > prev.lcoh)) mono = false; prev = o; }
+ok(mono, "on spare wind every size step lowers utilization and raises the cost per kg (myth 1, step 2)");
+const o10 = M.run(Y, 10, "spare", "pem"), o20 = M.run(Y, 20, "spare", "pem"), o30 = R30[0], a20 = M.run(Y, 20, "spare", "alk");
+onPage(`From 10 to 30 MW the unit runs at full size ${fm.pct(o10.util)} and then ${fm.pct(o30.util)} of the time, and the cost per kg rises from ${fm.kg2(o10.lcoh)} to ${fm.kg2(o30.lcoh)}.`, "myth 1");
+onPage(`a 20 MW electrolyzer runs at full size ${fm.pct(o20.util)} of the time, so each kg carries much capital: ${fm.kg2(o20.lcoh)} per kg.`, "explain: utilization");
+onPage(`At 20 MW an alkaline unit (15% minimum) loses ${Math.round(a20.lostMin)} MWh of spare wind a year below its minimum; a PEM unit (5%) loses ${Math.round(o20.lostMin)} MWh.`, "explain: part-load");
+ok(a20.hoursOn < o20.hoursOn && a20.lcoh > o20.lcoh, "the alkaline unit runs fewer hours and costs more per kg");
+for (let p = D.prices.min; p <= D.prices.max + 1e-9; p += D.prices.step) {
+  const b = M.best(Y, "spare", "pem", p), s = b.sweep, top = s.filter(r => Math.abs(r.net - b.net.net) < 1);
+  ok(b.net.X >= b.lcoh.X && b.lcoh.X === D.sizes.min && top.length === 1, `at $${p.toFixed(2)}/kg: best for the owner ${b.net.X} MW, cheapest kg ${b.lcoh.X} MW; the best size is unique (no tie within $1)`);
+}
+const b4 = M.best(Y, "spare", "pem", 4);
+onPage(`At $4 per kg the cheapest kg comes at ${b4.lcoh.X} MW, the owner's best size at ${b4.net.X} MW.`, "explain: cost per kg and the system");
+const tk = M.tank(o20);
+ok(near(M.sum(o20.kgByHour) - tk.q * 8760, 0, 1e-3) && Math.min(...tk.daily) >= -1e-6, "tank: delivery equals the year's output; the level never goes below zero");
+onPage(`needs an ${fm.t(tk.size)} tank: ${Math.round(tk.days)} days of delivery`, "explain: storage"); onPage(`needs an ${fm.t(tk.size)} tank, ${Math.round(tk.days)} days of its output`, "myth 3");
+ok(tk.size < D.cavernTonnes * 1000, "the tank is far smaller than one salt cavern (step 5)");
+
+// ---------------- data: sources, one price year
+const E = D.electrolyzer;
+ok(E.kWhPerKg === 57 && E.capexPerKW === 2000 && E.life === 30 && D.elecPrice === 30 && /2022 dollars/.test(E.source.label), "costs from DOE Record 24005 (2022 dollars): 57 kWh/kg, $2,000/kW, 30 years, $30/MWh");
+ok(!/20(19|20|21|23|24|25) dollars/.test(JSON.stringify(D) + PAGE), "one price year: no other dollar year on the page or in the data");
+ok(E.minLoad.pem === 0.05 && E.minLoad.alk === 0.15 && /5%–120%/.test(E.loadSource.label) && /15%–100%/.test(E.loadSource.label), "part-load ranges from IRENA (2020), Table 6");
+D.facts.forEach(f => { const row = PAGE.indexOf('<td class="n">' + f.n + "</td><td>" + f.what + "</td>"); ok(row >= 0 && PAGE.slice(row, row + 700).includes(f.url) && PAGE.slice(row, row + 700).includes(f.asof), "numbers to remember: '" + f.n + "' with source and date"); });
+ok(D.uses.cards.length === 8 && D.uses.cards.every(u => D.uses.bins.some(b => b.id === u.bin) && u.why.split(" ").length <= 25), "use sorter: eight cards, each in a bin with a short reason");
+ok(D.uses.cards.find(u => u.id === "cars").why.includes("about 1 mile per kWh") && near(60 / 57, 1.05, 0.01), "cars: about 60 miles per kg at 57 kWh/kg is about 1 mile per kWh");
+
+// ---------------- research wording (curriculum §13): approved sentences only
+const SNAP = {
+  "E3.14": "A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system's cost move in opposite directions.",
+  "E4.1": "Among the cases studied, concentrated solar power with thermal storage running a high-temperature electrolyzer at variable power gave the lowest levelized cost of hydrogen; constant-power operation was the most expensive.",
+  "E4.2": "Yardstick here: the cost per kilogram across designs. Holds for: one West Texas site, cost projections from NREL's Annual Technology Baseline, a conference-length study.",
+  "E10.2": "When gas-fired backup power became much more expensive, the model built fuel cells and turned stored green hydrogen back into electricity.",
+  "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
+  "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
+};
+function portfolio() {
+  const cands = [process.env.LEARN_PORTFOLIO, path.join(SITE, "..")];
+  try { cands.push(path.resolve(SITE, cp.execSync("git rev-parse --git-common-dir", { cwd: SITE, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(), "..", "..")); } catch (e) { /* not a checkout */ }
+  return cands.filter(Boolean).find(p => fs.existsSync(path.join(p, "reports/learn/excerpts_for_approval.md")));
+}
+const RP = portfolio();
+const norm = s => String(s).replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+let APPROVED = SNAP;
+if (RP) {
+  const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), reg = {}; let sec = null;
+  md.split("\n").forEach(line => {
+    if (/^## /.test(line)) { const h = line.match(/^## (E\d+)\.|^## (Revisions after review)/); sec = h ? (h[1] || "REV") : null; return; }
+    const m = line.match(/^\| (E(\d+)\.\d+) \| (.*) \|\s*$/); if (!m || !sec || ["E3", "E4", "E10"].indexOf("E" + m[2]) < 0) return;
+    const cells = m[3].split(" | "); if (sec === "REV") reg[m[1]] = norm(cells[1].replace(/^Timeline, [^:]+: /, "")); else if (sec === "E" + m[2]) reg[m[1]] = norm(cells[0].replace(/^Timeline, [^:]+: /, ""));
+  });
+  Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `register ${k} equals the snapshot`));
+  ok(/E10\.1–E10\.4/.test(md.split("## E8.")[0]), "the register records E10.1–E10.4 as approved");
+  APPROVED = reg;
+  const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8").toLowerCase();
+  [...PAGE.matchAll(/<li>Li et al\. \(\d{4}\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>/g)].forEach(m => {
+    const entry = bib.split("\n@").find(e => e.includes("title={" + m[2].toLowerCase() + "}")) || "", doi = (entry.match(/doi\s*=\s*\{([^}]+)\}/) || [])[1];
+    ok(entry && (!doi || doi === m[1].replace("https://doi.org/", "").toLowerCase()), "citation title (and DOI where the bib has one) as in publications.bib: " + m[2].slice(0, 50));
+  });
+} else console.log("note: excerpts_for_approval.md not found (set LEARN_PORTFOLIO); checked against the snapshot");
+const UNITS = Object.values(APPROVED).map(norm);
+const approved = s => { s = norm(s); return s.length > 0 && UNITS.some(u => u === s || u.split(/(?<=[.?!])\s+/).indexOf(s) >= 0); };
+const quotes = [...PAGE.matchAll(/<blockquote class="lx-excerpt" data-source="([^"]+)">([\s\S]*?)<footer>/g)];
+ok(quotes.length === 2 && quotes.map(q => q[1]).join(",") === "excerpt:txh2,excerpt:solar-hydrogen", "two excerpts: txh2 and solar-hydrogen");
+quotes.forEach(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].forEach(p => ok(approved(p[1]), `${q[1]}: approved sentence: ${norm(p[1]).slice(0, 60)}`)));
+ok(norm(quotes[0][2]).startsWith(SNAP["E10.2"]) && norm(quotes[0][2]).endsWith(SNAP["E10.3"]), "txh2: E10.2 then E10.3, word for word");
+onPage(`<p class="lx-hint">${SNAP["E10.4"]}</p>`, "E10.4 under the txh2 excerpt"); onPage(`<p class="lx-hint">${SNAP["E4.2"]}</p>`, "E4.2 under the solar excerpt");
+ok(/Approved excerpt of: Li et al\. \(2025\), <a href="https:\/\/doi\.org\/10\.1016\/j\.ijhydene\.2025\.02\.303">International Journal of Hydrogen Energy<\/a>\./.test(PAGE), "txh2 footer and DOI as the coordinator gave them");
+const exSteps = [...PAGE.matchAll(/<ol class="ex-fallback[^"]*">([\s\S]*?)<\/ol>/g)].flatMap(m => [...m[1].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(x => x[1]));
+ok(exSteps.length === 4 && exSteps.every(approved), "the explainer's no-JS steps are E3.14, sentence by sentence");
+// any element that names a study, a paper, its author or method must be approved, or one of these labels
+const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|West Texas|optimizer|stochastic|weather zones?)\b/i;
+const LABELS = [/^Approved excerpt of: Li et al\. \(20\d\d\), (International Journal of Hydrogen Energy|EEM 2023)\.$/, /^A separate example with stylized numbers, from the course author's open explainer: not the study's data or results\.$/,
+  /^Li et al\. \(20\d\d\)\. .+\.$/, /^Case file CF2: when the cost per kilogram and the cost of the system disagree\.$/, /^Case file CF2 tells a published study's version\.$/];
+const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
+const elems = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|ul|ol|dl|dt|dd|div|blockquote|footer|table|thead|tbody|tr|td|th|summary|details|h[1-6]|header|script)\b[^>]*>/i).map(norm).filter(s => /[A-Za-z]/.test(s));
+const strs = (JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || []).map(s => s.slice(1, -1));
+const fine = x => approved(x) || !RX.test(x) || LABELS.some(r => r.test(norm(x)));
+const bad = elems.concat(strs, JSON.stringify(D).match(/"[^"]{12,}"/g).map(s => s.slice(1, -1))).filter(s => RX.test(s) && !fine(s) && !norm(s).split(/(?<=[.?!])\s+/).every(fine));
+ok(bad.length === 0, "research wording: every sentence about the studies is approved:\n  " + bad.slice(0, 6).join("\n  "));
+ok(!/E10\.1|two-stage|nine scenarios/.test(PAGE), "E10.1 (the method sentence) is left out: the box has no room");
+ok(!/92\.[49]|(?<![\d.])3\.8%|131 t|1,300 t/.test(PAGE + JS), "no number from the txh2 paper");
+
+// ---------------- scope, links, text, sidecar
+const NUC = /nuclear|reactor|\bSMR\b|small modular|pink/i;
+ok(!NUC.test(OWN + JS + JSON.stringify(D)), "no nuclear term and no nuclear-to-hydrogen path anywhere (outside the generated header)");
+ok(!/\bAI\b|data cent/i.test(PAGE + JS), "no AI wording, no data centers");
+const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
+const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|www\.energy\.gov|www\.hydrogen\.energy\.gov|afdc\.energy\.gov|www\.iea\.org|www\.irena\.org|ergo-code\.github\.io)\/|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
+ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
+const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
+ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "seven step texts of 40 words at most");
+ok(!/\b(always|never)\b/i.test(strs.join(" ")), "no 'always' or 'never' in the page's strings");
+ok(!/txh2/.test(SIDE.split("requests:")[1] || "") || !/pending/i.test(SIDE), "sidecar: no pending-excerpt note (E10 approved)");
+["procurement-rule", "hourly-matching", "minimum-load"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
+
+console.log(`test_a16-hydrogen-ptx: ${checks - fails}/${checks} checks passed`);
+process.exit(fails ? 1 : 0);

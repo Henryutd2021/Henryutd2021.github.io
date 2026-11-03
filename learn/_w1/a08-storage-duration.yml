@@ -1,0 +1,15 @@
+# Sidecar for A8 (a08-storage-duration), builder learn-w3-e, 2026-11-03. Read by scripts/build_learn.py.
+id: a08-storage-duration
+lesson: A8
+glossary:
+  - id: standing-loss
+    term: Standing loss
+    def: "Energy a store loses while it waits, used or not, such as heat leaking from a hot tank; it grows with time, unlike the loss of each charge and discharge."
+  - id: long-duration-storage
+    term: Long-duration storage
+    def: "Storage that can give its full power for about 10 hours or more; DOE splits it into inter-day (10 to 36 hours) and multi-day or week-long (36 to 160 hours) stores."
+requests:
+  - "Engine E0 (SB0): A8's week LP is lesson-local in assets/learn/a08-storage-duration.js with a small interface (prepare(D, year, targets, profile) -> W; build(W, store, opts) -> LP; read(W, store, r) -> unserved, covered, schedule). When E0 exists, switch A8 to it: the page reads only build/read, and the test (_tests/learn/test_a08-storage-duration.js) re-solves every number, so a switch is checked."
+  - "Solver benchmark: A8's instances (one store through the 168-hour week, 1,008 columns x 336 rows) are added to scripts/learn_solver_bench.mjs as the W3 set (a8battery, a8hydrogen); please keep them when solver_models.js gets its W3 lessonSet."
+  - "Promote candidate: the lesson-local solve runner (a step's solve with a failure note, Try again, busy cleared and results kept) now exists in M3, A8 and M4; it could become a shared LX.solveStep."
+  - "Lesson 9 (09-storage.qmd, not this builder's file) names A8 as upcoming in two places ('A8 (how long should storage last?, upcoming)' and '(lesson A8, upcoming)'); CF2 names M4 as upcoming. Link them now that A8 and M4 are live."

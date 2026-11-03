@@ -452,6 +452,41 @@
   does: "Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer."
   after: [F2, 12]
   next: R1
+# ---------- wave W3 Analyst modules (curriculum v2 §18.4), builder learn-w3-e
+- kind: lesson
+  id: a08-storage-duration
+  code: A8
+  tier: analyst
+  form: cards
+  icon: stairs
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the practice questions in the Check section and the Go deeper boxes
+  title: "How long should storage last? From batteries to seasonal stores"
+  subtitle: "Put four stores through a calm winter week, then see what each MWh it delivers costs"
+  short: "Storage duration"
+  teaches: [storage duration, round-trip efficiency, standing losses, endurance against adequacy, cost per MWh delivered]
+  does: "Shelve stores on DOE's duration ladder; run a battery, pumped hydro, a heat store and hydrogen through a calm winter week on the Plains Grid; see power cap the worst hours; price each MWh delivered against how often a store cycles."
+  outcome: "Choose a store's duration for a stated job, and say what a one-week run shows (endurance) and what it cannot (adequacy, seasonal value)."
+  after: [9, 13]
+  next: A16
+- kind: lesson
+  id: a16-hydrogen-ptx
+  code: A16
+  tier: analyst
+  form: cards
+  icon: flask
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the practice questions in the Check section and the Go deeper boxes
+  title: "Where does hydrogen make sense? From renewables to electrolysis, storage and use"
+  subtitle: "Make hydrogen from a wind farm's spare power, store it, deliver it, and sort the uses worth it"
+  short: "Hydrogen and power-to-X"
+  teaches: [electrolysis energy balance, electrolyzer utilization and cost per kilogram, part-load limits, hydrogen storage for steady delivery, hourly matching as a procurement condition, ranking uses against alternatives]
+  does: "Follow 1 MWh of wind through an electrolyzer and back; size an electrolyzer on a wind farm's real 2025 hours with part-load limits; compare cost per kilogram with the system's net cost and curtailment; size the tank for steady delivery; apply hourly and annual matching; sort nine uses against their alternatives."
+  outcome: "Compute a hydrogen chain's energy and mass balance and cost per kilogram, tell it from the system's cost, and rank uses of hydrogen against their alternatives."
+  after: [9, 7, A8]
+  next: M4
 
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
@@ -511,7 +546,25 @@
   does: "Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive."
   after: [M1, 7, 13]
   next: CK-M
-- {kind: lesson, tier: modeler, code: M4, title: "Storage and coupled carriers: modelling power, hydrogen and heat together"}
+- kind: lesson
+  id: m04-storage-multienergy
+  code: M4
+  tier: modeler
+  form: cards
+  icon: blocks
+  status: active
+  minutes: 40
+  practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab
+  lab_minutes: 45   # the notebook lab: build_learn.py adds it to the header badge and timeRequired
+  title: "Storage and coupled carriers: modelling power, hydrogen and heat together"
+  subtitle: "Add a battery, an electrolyzer, a hydrogen tank and a heat store to one plant, and find where coupling pays"
+  short: "Storage and coupled carriers"
+  teaches: [state of charge in a linear program, conversion between carriers, part-load limits in an LP, tank and heat-network limits, value of coupling, duals of coupled balances]
+  lab: "a SciPy/HiGHS notebook that rebuilds the plant model and asserts the browser's numbers, about 45 minutes, then 90 minutes of practice."
+  does: "Write one LP for a wind plant with a grid limit: add a battery's state of charge, an electrolyzer with a part-load limit, a hydrogen tank with a minimum level and a heat store behind a heat-network limit; compare configurations and weeks to see where coupling earns value and where it does not; read each carrier's marginal value."
+  outcome: "Formulate a multi-carrier plant LP with storage, solve it, and show with stated comparisons where coupling carriers earns value."
+  after: [M1, A8]
+  next: M5
 - {kind: lesson, tier: modeler, code: M5, title: "Size and run a microgrid that survives an outage"}
 - {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
 - {kind: lesson, tier: modeler, code: M7, title: "What could happen? Scenarios, Monte Carlo and global sensitivity"}

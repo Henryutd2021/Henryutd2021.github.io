@@ -140,7 +140,7 @@ $$
 - **Losses.** Here the whole loss sits on charging; many models split it, $\sqrt{0.8}$ each way.
 - **Left out of the goal.** The nuclear plant's \$24,000 for the day is the same in every plan.
 - **Always an answer.** The page's code also allows unserved demand at \$3,000/MWh, so the model always has a solution; on this day none is needed.
-- **Next.** [Lesson 10](10-write-it-down.qmd) writes such a model down and [lesson 11](11-solver.qmd) checks a solver's answer. [M3](m03-capacity-expansion.qmd) (capacity expansion) chooses the battery's size too, and A8 (how long should storage last?, upcoming) will.
+- **Next.** [Lesson 10](10-write-it-down.qmd) writes such a model down and [lesson 11](11-solver.qmd) checks a solver's answer. [M3](m03-capacity-expansion.qmd) (capacity expansion) chooses the battery's size too, and [A8](a08-storage-duration.html) compares how long a store should last.
 
 ```{=html}
 </div>
@@ -149,7 +149,7 @@ $$
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>One day only. A battery's yearly value needs every day of the year, including days with no spilled sun (lesson A8, upcoming).</li>
+<li>One day only. A battery's yearly value needs every day of the year, including days with no spilled sun (<a href="m03-capacity-expansion.html">M3</a> checks a plan on every hour of a year).</li>
 <li>Perfect foresight: the solver knows the whole day in advance. Real operators schedule with forecasts that miss (lesson 4).</li>
 <li>The cost of building the battery and of its wear, which would set a minimum spread worth cycling for (lesson 7).</li>
 <li>The combined-cycle's ramp limit from lesson 0, and any limit on the wires.</li>

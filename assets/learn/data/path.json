@@ -996,6 +996,28 @@
    "form": "play"
   },
   {
+   "tier": "analyst",
+   "code": "A8",
+   "title": "How long should storage last? From batteries to seasonal stores",
+   "ready": true,
+   "href": "a08-storage-duration.html",
+   "scales": [],
+   "id": "a08-storage-duration",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "A16",
+   "title": "Where does hydrogen make sense? From renewables to electrolysis, storage and use",
+   "ready": true,
+   "href": "a16-hydrogen-ptx.html",
+   "scales": [],
+   "id": "a16-hydrogen-ptx",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
    "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
@@ -1165,9 +1187,12 @@
    "tier": "modeler",
    "code": "M4",
    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m04-storage-multienergy.html",
+   "scales": [],
+   "id": "m04-storage-multienergy",
+   "minutes": 40,
+   "form": "cards"
   },
   {
    "tier": "modeler",

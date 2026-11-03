@@ -1,0 +1,17 @@
+# Sidecar for A16 (a16-hydrogen-ptx), builder learn-w3-e, 2026-11-03. Read by scripts/build_learn.py.
+id: a16-hydrogen-ptx
+lesson: A16
+glossary:
+  - id: minimum-load
+    term: Minimum load
+    def: "The lowest output at which a machine can keep running; below it the machine must stop, such as an electrolyzer below a set share of its size."
+  - id: hourly-matching
+    term: Hourly matching
+    def: "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year."
+  - id: procurement-rule
+    term: Procurement rule
+    def: "A rule for which purchased electricity a buyer may count as clean, for example by region, by hour and by how new the plant is; it sets a claim, not the emissions the purchase causes."
+requests:
+  - "excerpt:txh2: Henry approved E10.1–E10.4 on 2026-11-03; A16 quotes E10.2–E10.3 with E10.4 as the note (E10.1 left out for room), and its test checks them against the register."
+  - "Review date: A16 carries 'review: yearly (hydrogen rules)' in learn_map_v2.yml; the Go deeper box on matching rules cites DOE's 45VH2-GREET guidelines (Rev. December 2025)."
+  - "Explainer: A16 embeds the allow-listed wind-hydrogen explainer exactly as CF2 does (E3.14 as its no-JS steps)."

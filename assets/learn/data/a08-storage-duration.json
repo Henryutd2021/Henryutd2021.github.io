@@ -1,0 +1,271 @@
+{
+ "about": "Data of Learn lesson A8, How long should storage last? (wave W3, 2026-11-03). The Plains Grid and its fleet are fictional and illustrative; demand, wind and solar follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json, EIA-930), scaled as stated below. Storage parameters and costs come from the primary sources listed with each item. The reference block is written by node _tests/learn/test_a08-storage-duration.js --write and re-solved by the same test on every run.",
+ "plains": {
+  "name": "Plains Grid",
+  "note": "Illustrative: a future Plains Grid with much wind and little firm power, so that a calm week leaves a gap. Not a forecast of any real grid.",
+  "demandPeakMW": 4000,
+  "windMW": 5000,
+  "solarMW": 2000,
+  "firmMW": 1000,
+  "profileMethod": "scale",
+  "monthlyCF": true,
+  "voll": 10000,
+  "tieStep": 0.01,
+  "wear": 0.001
+ },
+ "week": {
+  "date": "2025-01-02",
+  "utcOffsetHours": -6,
+  "days": 7,
+  "label": "2–8 January 2025",
+  "why": "Chosen on 2026-11-03 as the 2025 winter week (December to February) with the largest shortfall for this fleet: two windy days, then three calm, cold days."
+ },
+ "techs": [
+  {
+   "id": "battery",
+   "name": "Lithium-ion battery",
+   "short": "Battery",
+   "color": "var(--lx-bat)",
+   "icon": "battery",
+   "P": 1000,
+   "hours": 4,
+   "eta": 0.8259,
+   "lossPerDay": 0,
+   "limit": "State of charge between empty and full; most warranties allow about one full cycle a day.",
+   "source": {
+    "label": "DOE, 2022 Grid Energy Storage Technology Cost and Performance Assessment, Table 4.4 (LFP, AC round trip 82.59%, 2021)",
+    "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
+    "as_of": "2022-08"
+   }
+  },
+  {
+   "id": "psh",
+   "name": "Pumped storage hydro",
+   "short": "Pumped hydro",
+   "color": "var(--lx-hyd)",
+   "icon": "drop",
+   "P": 1000,
+   "hours": 10,
+   "eta": 0.8,
+   "lossPerDay": 0,
+   "limit": "Reservoir levels: the usable energy is the water between the upper reservoir's lowest and highest level.",
+   "source": {
+    "label": "DOE, 2022 Grid Energy Storage Technology Cost and Performance Assessment, Figure 4.16 (PSH, round trip 80%)",
+    "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
+    "as_of": "2022-08"
+   }
+  },
+  {
+   "id": "thermal",
+   "name": "Heat store (power to heat to power)",
+   "short": "Heat store",
+   "color": "var(--lx-pk)",
+   "icon": "flame",
+   "P": 1000,
+   "hours": 24,
+   "eta": 0.5,
+   "lossPerDay": 0.02,
+   "limit": "Heat losses: a hot store cools a little every hour, full or not; 2% a day here.",
+   "source": {
+    "label": "DOE, 2022 assessment, p. 85 (a particle thermal store's expected round trip, 50%); NREL/CP-5700-77910 (2020), a tank's design target of at most 2% heat loss in 24 hours",
+    "url": "https://docs.nlr.gov/docs/fy21osti/77910.pdf",
+    "as_of": "2020-11"
+   }
+  },
+  {
+   "id": "hydrogen",
+   "name": "Hydrogen in a salt cavern",
+   "short": "Hydrogen",
+   "color": "var(--lx-good)",
+   "icon": "flask",
+   "P": 1000,
+   "hours": 168,
+   "eta": 0.31,
+   "lossPerDay": 0,
+   "limit": "Conversion losses: electrolyzer in, fuel cell out; 31% of what goes in comes back.",
+   "source": {
+    "label": "DOE, 2022 Grid Energy Storage Technology Cost and Performance Assessment, Figure 4.27 (hydrogen: electrolyzer, cavern, fuel cell; round trip 31%)",
+    "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
+    "as_of": "2022-08"
+   }
+  }
+ ],
+ "ladder": {
+  "source": {
+   "label": "DOE Office of Technology Transitions, Pathways to Commercial Liftoff: Long Duration Energy Storage Opportunities (summit slides 13 and 14, 27 July 2023)",
+   "url": "https://www.energy.gov/sites/default/files/2023-08/Pathways%20to%20Commercial%20Liftoff%20Long%20Duration%20Energy%20Storage%20Opportunities.pdf",
+   "as_of": "2023-07-27"
+  },
+  "bins": [
+   {
+    "id": "min",
+    "label": "Seconds to minutes",
+    "sub": "fast bursts"
+   },
+   {
+    "id": "short",
+    "label": "Up to 10 hours",
+    "sub": "short duration"
+   },
+   {
+    "id": "inter",
+    "label": "10 to 36 hours",
+    "sub": "inter-day"
+   },
+   {
+    "id": "multi",
+    "label": "36 to 160 hours",
+    "sub": "multi-day, a week"
+   },
+   {
+    "id": "season",
+    "label": "160 hours and more",
+    "sub": "seasonal shifting"
+   }
+  ],
+  "cards": [
+   {
+    "id": "fly",
+    "text": "Flywheel",
+    "bin": "min",
+    "why": "DOE's chart puts flywheels at minutes: a spinning mass gives power fast but holds little energy."
+   },
+   {
+    "id": "liion",
+    "text": "Lithium-ion battery",
+    "bin": "short",
+    "why": "U.S. batteries built through 2020 averaged about 3 hours at full power (EIA, 2022)."
+   },
+   {
+    "id": "psh",
+    "text": "Pumped storage hydro",
+    "bin": "short",
+    "why": "DOE gives 0 to 15 hours for traditional pumped storage, most of it in this bin."
+   },
+   {
+    "id": "air",
+    "text": "Liquid air",
+    "bin": "inter",
+    "why": "DOE gives 10 to 25 hours: inter-day."
+   },
+   {
+    "id": "metal",
+    "text": "Metal-anode battery (iron-air type)",
+    "bin": "multi",
+    "why": "DOE gives 50 to 200 hours: mostly multi-day."
+   },
+   {
+    "id": "h2",
+    "text": "Hydrogen in a salt cavern",
+    "bin": "season",
+    "why": "DOE's seasonal bin is mainly chemical storage, a fuel that keeps: a cavern holds weeks of output."
+   }
+  ]
+ },
+ "costs": {
+  "about": "Total installed costs of 100 MW systems in the report's own sizes, from data gathered in 2021 (the report's 'current' year; it states no other dollar year). One source, one year. Fixed operation and maintenance, cycling wear and replacements are left out.",
+  "rate": 0.04,
+  "rateNote": "4% real, as in lesson 13.",
+  "maxPerDay": 1,
+  "items": [
+   {
+    "id": "battery",
+    "name": "Lithium-ion battery",
+    "hours": 4,
+    "eta": 0.8259,
+    "perKW": 1540,
+    "perKWh": 385,
+    "life": 16,
+    "fom": null,
+    "page": "p. vii; Figure 4.3, calendar life 16 years"
+   },
+   {
+    "id": "psh",
+    "name": "Pumped storage hydro",
+    "hours": 10,
+    "eta": 0.8,
+    "perKW": 2625,
+    "perKWh": 262.53,
+    "life": 60,
+    "fom": 28.19,
+    "page": "Figure 4.16, p. 68"
+   },
+   {
+    "id": "hydrogen",
+    "name": "Hydrogen in a salt cavern",
+    "hours": 24,
+    "eta": 0.31,
+    "perKW": 3033,
+    "perKWh": 126.39,
+    "life": 30,
+    "fom": 23.9,
+    "cavernPerKWh": 5.82,
+    "page": "Figure 4.27, p. 113"
+   }
+  ],
+  "source": {
+   "label": "DOE, Energy Storage Grand Challenge, 2022 Grid Energy Storage Technology Cost and Performance Assessment (PNNL-33283, August 2022)",
+   "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
+   "as_of": "2022-08"
+  },
+  "cycleRule": "A full cycle takes the duration to discharge plus the duration ÷ round trip to recharge at full power (the report's own example: a 2-hour store at 80% runs 4.5 hours a cycle); at most one cycle a day, as most battery warranties allow (the same report)."
+ },
+ "facts": [
+  {
+   "n": "82% and 79%",
+   "what": "Average monthly round-trip efficiency of U.S. utility-scale batteries and of pumped storage plants in 2019.",
+   "source": "EIA, Today in Energy",
+   "url": "https://www.eia.gov/todayinenergy/detail.php?id=46756",
+   "asof": "published 12 Feb 2021; data for 2019"
+  },
+  {
+   "n": "about 23,156 MW",
+   "what": "U.S. pumped storage hydro capacity in 2025, in 18 states.",
+   "source": "EIA, Energy Explained: where hydropower is generated",
+   "url": "https://www.eia.gov/energyexplained/hydropower/where-hydropower-is-generated.php",
+   "asof": "accessed 3 Nov 2026"
+  },
+  {
+   "n": "10 hours and more",
+   "what": "DOE's Long Duration Storage Shot (2021): 90% lower cost by 2030, against a 2020 lithium-ion baseline, for storage of 10 or more hours.",
+   "source": "DOE Office of Electricity, Achieving the Promise of Low-Cost Long Duration Energy Storage, p. iii",
+   "url": "https://www.energy.gov/sites/default/files/2024-08/Achieving%20the%20Promise%20of%20Low-Cost%20Long%20Duration%20Energy%20Storage_FINAL_08052024.pdf",
+   "asof": "August 2024"
+  },
+  {
+   "n": "less than one a day",
+   "what": "Full cycles of 24- and 100-hour stores: their yearly output, and so their cost per MWh, is limited by how often they can cycle.",
+   "source": "DOE, 2022 Grid Energy Storage Technology Cost and Performance Assessment, p. viii",
+   "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
+   "asof": "August 2022"
+  }
+ ],
+ "reference": {
+  "about": "Written by node _tests/learn/test_a08-storage-duration.js --write; re-solved by the same test on every run. Energy in MWh.",
+  "stores": {
+   "battery": {
+    "unserved": 37709.8,
+    "covered": 0.21
+   },
+   "psh": {
+    "unserved": 30495,
+    "covered": 0.3611
+   },
+   "thermal": {
+    "unserved": 17066.1,
+    "covered": 0.6425
+   },
+   "hydrogen": {
+    "unserved": 4009,
+    "covered": 0.916
+   }
+  },
+  "shortSum": 47733,
+  "peakGap": 1429,
+  "shortHours": 72,
+  "floor1000": 4009,
+  "hoursAbove": 23,
+  "cyclesShown": 250,
+  "priceShown": 20
+ }
+}
