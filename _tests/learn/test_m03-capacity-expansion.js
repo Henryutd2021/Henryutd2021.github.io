@@ -56,13 +56,13 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   if (WRITE) {
     const ref = { about: "Written by node _tests/learn/test_m03-capacity-expansion.js --write; re-solved by the same test on every run. Costs in $ a year, CO2 in t a year, energy in MWh, power in MW.", sets: {}, storage: {} };
     let t0 = Date.now();
-    const fm0 = M.fullModel(S.C, S.Y, cap), rf = solve(fm0), sf = TP.summarize(S.C, M.yearPeriods(S.Y), rf, { cap });
-    const fplan = keepPlan(sf.plan), f24 = M.readCheck(S.C, S.Y2, solve(M.checkModel(S.C, S.Y2, fplan)), fplan);
+    const fm0 = M.fullModel(S.C, S.Y, cap), rf = solve(fm0), sf = TP.summarize(S.C, TP.yearPeriods(S.Y), rf, { cap });
+    const fplan = keepPlan(sf.plan), f24 = TP.readCheck(S.C, S.Y2, solve(M.checkModel(S.C, S.Y2, fplan)), fplan);
     ref.full = { cols: fm0.variables.length, rows: fm0.constraints.length, plan: fplan, cost: r1(sf.cost, 0), co2: r1(sf.co2, 0), capDual: r1(sf.capDual, 2), y2024: keepCheck(f24) };
     console.log(`  wrote the full-year optimum (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
     D.sets.forEach(set => {
       const RW = S.weeks(set.id), m = M.planModel(S.C, RW, { cap }), r = solve(m), est = M.readPlan(S.C, RW, r, { cap }), plan = keepPlan(est.plan);
-      const c25 = M.readCheck(S.C, S.Y, solve(M.checkModel(S.C, S.Y, plan)), plan), c24 = M.readCheck(S.C, S.Y2, solve(M.checkModel(S.C, S.Y2, plan)), plan);
+      const c25 = TP.readCheck(S.C, S.Y, solve(M.checkModel(S.C, S.Y, plan)), plan), c24 = TP.readCheck(S.C, S.Y2, solve(M.checkModel(S.C, S.Y2, plan)), plan);
       ref.sets[set.id] = { weeks: RW.reps.length, hours: RW.reps.length * M.HPW, cols: m.variables.length, rows: m.constraints.length,
                            picks: RW.reps.map(r => ({ week: r.week, kind: r.kind, season: r.season, n: r.n })), plan, cost: r1(est.cost, 0), co2: r1(est.co2, 0),
                            y2025: keepCheck(c25), y2024: keepCheck(c24) };
@@ -70,7 +70,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
     const st = D.storage, RWs = S.weeks(st.set);
     st.modes.forEach(mode => {
       const r = solve(M.planModel(S.Cw, RWs, { cap: st.cap * 1e3, mode })), est = M.readPlan(S.Cw, RWs, r, { cap: st.cap * 1e3 }), plan = keepPlan(est.plan);
-      const c = M.readCheck(S.Cw, S.Y, solve(M.checkModel(S.Cw, S.Y, plan)), plan);
+      const c = TP.readCheck(S.Cw, S.Y, solve(M.checkModel(S.Cw, S.Y, plan)), plan);
       const rr = solve(M.planModel(S.C, RWs, { cap: st.cap * 1e3, mode }));
       ref.storage[mode] = { plan, cost: r1(est.cost, 0), full: keepCheck(c), fullCo2: r1(c.co2, 0), realCost: r1(rr.objective, 0) };
     });
@@ -81,6 +81,10 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   }
   const R = D.reference;
   ok(R && R.sets && R.full && R.storage, "the data file has a reference block (run with --write once)");
+
+  // ---------------- the promoted pieces: M3 calls the engine's link, readCheck and errors and the library's week strip
+  ok(M.link === TP.link && M.readCheck === TP.readCheck && M.errors === TP.errors && M.yearPeriods === TP.yearPeriods, "M3 lists the engine's link, readCheck, errors and yearPeriods (the same functions)");
+  ok(!/function (link|readCheck|errors|yearPeriods|WeekStrip|repColor|repLetter)\(/.test(JS) && /LX\.WeekStrip\(/.test(JS) && !/m3-(strip|grid|cell|keys)/.test(JS), "M3 keeps no copy of them or of the strip and its styles");
 
   // ---------------- inputs
   const Y = S.Y, Y2 = S.Y2, sum = a => a.reduce((s, v) => s + v, 0), mean = a => sum(a) / a.length;
@@ -130,11 +134,11 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   ok(M.planModel(S.Cw, RWs, { cap: scap, mode: "free" }).constraints.length === M.planModel(S.Cw, RWs, { cap: scap }).constraints.length - 52, "no link drops exactly the 52 chain rows");
 
   // ---------------- every reference number, re-solved
-  const t0 = Date.now(), fm0 = M.fullModel(C, Y, cap), rf = solve(fm0), sf = TP.summarize(C, M.yearPeriods(Y), rf, { cap }), fullSecs = (Date.now() - t0) / 1000;
+  const t0 = Date.now(), fm0 = M.fullModel(C, Y, cap), rf = solve(fm0), sf = TP.summarize(C, TP.yearPeriods(Y), rf, { cap }), fullSecs = (Date.now() - t0) / 1000;
   ok(rf.ok && rel(sf.cost, R.full.cost, 1e-6) && near(sf.co2, R.full.co2, 1) && rel(sf.capDual, R.full.capDual, 1e-3) && fm0.variables.length === R.full.cols && fm0.constraints.length === R.full.rows,
      `full-year optimum: ${fm.musd(sf.cost)}, ${fm.kt(sf.co2)}, last tonne $${sf.capDual.toFixed(0)} (${fullSecs.toFixed(1)} s here)`);
   ok(TP.KEYS.every(k => near(sf.plan[k], R.full.plan[k], 0.05)), "full-year optimum: the plan");
-  const chk = (Yx, plan) => M.readCheck(C, Yx, solve(M.checkModel(C, Yx, plan)), plan);
+  const chk = (Yx, plan) => TP.readCheck(C, Yx, solve(M.checkModel(C, Yx, plan)), plan);
   const same = (c, r, what) => ok(rel(c.cost, r.cost, 1e-6) && near(c.co2, r.co2, 1) && near(c.unserved, r.unserved, 0.1) && c.hours === r.hours && near(c.maxShort, r.maxShort, 0.1) &&
     JSON.stringify(c.byWeek.map((x, i) => (x > 0.05 ? i : -1)).filter(i => i >= 0)) === JSON.stringify(r.shortWeeks), `${what}: ${fm.musd(c.cost)}, ${fm.kt(c.co2)}, ${fm.mwh(c.unserved)} in ${c.hours} h`);
   same(chk(Y2, R.full.plan), R.full.y2024, "full-year optimum on 2024");
@@ -150,7 +154,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   st.modes.forEach(mode => {
     const e = M.readPlan(S.Cw, RWs, sol[mode], { cap: scap }), ref = R.storage[mode];
     ok(rel(e.cost, ref.cost, 1e-6) && TP.KEYS.every(k => near(e.plan[k], ref.plan[k], 0.01)), `storage ${mode}: ${batText(e.plan)} MW/MWh, ${fm.musd(e.cost)}`);
-    const c = M.readCheck(S.Cw, Y, solve(M.checkModel(S.Cw, Y, ref.plan)), ref.plan);
+    const c = TP.readCheck(S.Cw, Y, solve(M.checkModel(S.Cw, Y, ref.plan)), ref.plan);
     ok(near(c.co2, ref.full.co2, 1) && near(c.unserved, ref.full.unserved, 0.1) && c.hours === ref.full.hours, `storage ${mode} on the full year: ${fm.kt(c.co2)}, ${fm.mwh(c.unserved)}`);
     ok(rel(solve(M.planModel(C, RWs, { cap: scap, mode })).objective, ref.realCost, 1e-6), `storage ${mode} at the real cost: ${fm.musd(ref.realCost)}`);
   });
@@ -203,6 +207,15 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   onPage(`${fm.kt(S7.wk7.y2025.co2)} on 2025 and ${fm.kt(S7.wk7.y2024.co2)} on 2024`, "the 4 + 3 plan's CO2 (Go deeper)");
   onPage("$" + D.storage.energyCapex + " per kWh", "the what-if storage cost");
   onPage("keeps its demand energy, and its wind and solar energy to within 0.5%", "the scaling sentence (checked per set above)");
+  const ILL = "illustrative what-if", NOT = "not a forecast or a sourced cost";
+  ok(D.storage.energyCapexNote.includes("An " + ILL + ", " + NOT) && D.storage.energyCapexNote.includes("$" + D.storage.energyCapex + " per kWh") &&
+     D.storage.energyCapexNote.includes("$" + cfg.techs.battery.energyCapex + " per kWh"), "data file: the what-if storage cost carries its illustrative note");
+  onPage(`with storage energy at $${D.storage.energyCapex} per kWh: an ${ILL}, ${NOT}.`, "the no-JS fallback's what-if label");
+  onPage(`<b>Storage what-if (step 8):</b> battery energy at $${D.storage.energyCapex} per kWh instead of the sourced $${cfg.techs.battery.energyCapex} (lesson 13): an ${ILL}, ${NOT}.`, "the data note's what-if label");
+  onPage(`In an ${ILL} with storage energy at $${D.storage.energyCapex} per kWh (${NOT})`, "the myth answer's what-if label");
+  ok(JS.includes("**An " + ILL + ", " + NOT + ":** battery energy at $") && JS.includes("In this " + ILL + ", no link") && JS.includes("at the " + ILL + " storage cost"),
+     "step 8: the note, the result line and the table name label the what-if");
+  ok((PAGE.match(/\$20 per kWh/g) || []).length === 3 && (JS.match(/D\.storage\.energyCapex \+ " per kWh/g) || []).length === 1, "the what-if cost appears only where it is labelled (three page places, one step note)");
   onPage("0.05291", "the CO2 factor"); onPage(`${C.techs.cc.co2.toFixed(3)}\\, g`, "the combined-cycle CO2 rate in the algebra");
   onPage(`${peak24.toFixed(0)} MW`, "2024's peak at equal energy");
 

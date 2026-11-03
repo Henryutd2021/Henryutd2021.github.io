@@ -201,10 +201,46 @@
     });
     return { list: out, narrow: narrow };
   }
+  // ---- the re-solve behind the plan sliders: debounced, cancellable, newest result only (pure; the Node test drives it
+  // with fake timers). set(x, now) waits `delay` ms (none when now), then runs job(x, signal). A newer set() clears the
+  // wait and aborts a job already running through its AbortSignal (LX.solver stops a queued or a running solve; aborted()
+  // then lets the page restart the solver while the next wait runs). A result reaches done(result, x) only when it belongs
+  // to the newest set(), so a late or stale result never overwrites a newer plan. busy(on) turns on at the first set() and
+  // off just before the newest job's done() (or fail()), so Next stays shut while a change is waiting or solving.
+  // o = { delay (ms), job(x, signal) -> value or Promise, done(result, x), fail(err, x), busy(on), aborted(),
+  //       setTimeout, clearTimeout, AbortController }   (the last three default to the global ones)
+  function resolver(o) {
+    var st = o.setTimeout || setTimeout, ct = o.clearTimeout || clearTimeout;
+    var AC = o.AbortController || (typeof AbortController !== "undefined" ? AbortController : null);
+    var timer = null, ctl = null, running = false, seq = 0, busy = false;
+    function setBusy(on) { if (on !== busy) { busy = on; if (o.busy) o.busy(on); } }
+    function stop() {
+      if (timer !== null) { ct(timer); timer = null; }
+      if (ctl || running) { var c = ctl, was = running; ctl = null; running = false; if (c) c.abort(); if (was && o.aborted) o.aborted(); }
+    }
+    function set(x, now) {
+      var my = ++seq;
+      stop(); setBusy(true);
+      timer = st(function () {
+        timer = null; running = true;
+        var c = AC ? new AC() : null, p; ctl = c;
+        try { p = Promise.resolve(o.job(x, c ? c.signal : undefined)); } catch (e) { p = Promise.reject(e); }
+        p.then(function (r) { end(r, null); }, function (err) { end(null, err || new Error("re-solve failed")); });
+        function end(r, err) {
+          if (my !== seq) return;          // a newer change came: this result is stale
+          ctl = null; running = false; setBusy(false);
+          if (err) { if (o.fail) o.fail(err, x); } else o.done(r, x);
+        }
+      }, now ? 0 : o.delay);
+      return my;
+    }
+    function cancel() { seq++; stop(); setBusy(false); }
+    return { set: set, cancel: cancel, busy: function () { return busy; }, pending: function () { return timer !== null || running; } };
+  }
   var model = { AXES: AXES, blank: blank, capValues: capValues, reserveMargin: reserveMargin, fairShare: fairShare, measure: measure,
                 axisValue: axisValue, axisKey: axisKey, shown: shown, better: better, row: row, dominates: dominates, dominated: dominated,
                 unbeaten: unbeaten, score: score, scores: scores, total: total, pick: pick, limitModel: limitModel,
-                moves: moves, conflicts: conflicts, rescued: rescued };
+                moves: moves, conflicts: conflicts, rescued: rescued, resolver: resolver };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -414,7 +450,7 @@
     var SC = A.scales, LIB = A.plans.map(function (p) { return { id: p.id, label: p.label, short: p.short, note: p.note, plan: M.blank(p.plan), m: p.m }; });
     var BY = {}; LIB.forEach(function (p) { BY[p.id] = p; });
     var PRI = A.priorities;
-    var S_ = { plan: M.blank(BY[A.start].plan), m: BY[A.start].m, prev: null, cmp: null, cmpLabel: null, cmpM: null, defs: copy(DEFAULTS), seq: 0,
+    var S_ = { plan: M.blank(BY[A.start].plan), m: BY[A.start].m, prev: null, cmp: null, cmpLabel: null, cmpM: null, defs: copy(DEFAULTS),
                moves: [], opened: {}, mode: "compare", marks: {}, checked: false, seenPri: {}, priSel: null,
                myW: { cost: 5, co2: 5, rel: 5, fair: 5, sec: 5 }, tried: {}, steel: {}, lim: { inf: null, ok: null }, step1: false, solver: null };
     function copy(o) { var r = {}; for (var k in o) r[k] = o[k]; return r; }
@@ -553,27 +589,33 @@
     }
     function priById(id) { return PRI.filter(function (p) { return p.id === id; })[0]; }
 
-    // ---- running your plan through the year
-    var timer = null;
-    function setPlan(p, now) { S_.plan = M.blank(p); clearTimeout(timer); timer = setTimeout(run, now ? 0 : 260); }
-    function run() {
-      var plan = copy(S_.plan), my = ++S_.seq, lib = LIB.filter(function (p) { return samePlan(p.plan, plan); })[0];
-      if (lib) { done(lib.m, null); return Promise.resolve(lib.m); }
-      status.set(LX.solver.mode ? "solving" : "loading"); if (S_.busy) S_.busy(true);
-      return LX.solver.solve(TP.fullYearModel(C, Y, { plan: plan }), { key: "a22-plan", label: "a22-plan", timeLimit: 30 }).then(function (r) {
-        if (S_.busy) S_.busy(false);
-        if (my !== S_.seq) return null;
-        status.set(r); if (!r.ok) return null;
-        var m = M.measure(C, Y, r, plan, D); done(m, r); return m;
-      });
-      function done(m, r) {
-        if (my !== S_.seq) return;
-        if (!r) status.set("");
+    // ---- running your plan through the year: each slider change re-solves the full year after a 260 ms pause; a newer
+    // change cancels the wait or the solve already running, and only the newest plan's result is shown and announced
+    var said = H("p", { class: "lx-sr", "aria-live": "polite" }, rc);
+    var RS = M.resolver({
+      delay: 260,
+      busy: function (on) { if (S_.busy) S_.busy(on); },
+      aborted: function () { try { LX.solver.preload(); } catch (e) { /* the next solve loads it */ } },   // a stopped solve stops the worker: restart it during the wait
+      job: function (plan, signal) {
+        var lib = LIB.filter(function (p) { return samePlan(p.plan, plan); })[0];
+        if (lib) return { m: lib.m, r: null };
+        status.set(LX.solver.mode ? "solving" : "loading");
+        return LX.solver.solve(TP.fullYearModel(C, Y, { plan: plan }), { key: "a22-plan", label: "a22-plan", timeLimit: 30, signal: signal }).then(function (r) {
+          return { r: r, m: r.ok ? M.measure(C, Y, r, plan, D) : null };
+        });
+      },
+      done: function (x) {
+        status.set(x.r || "");
+        if (!x.m) return;                       // not solved (time limit, error): the status line says why
+        var m = x.m;
         if (S_.m && S_.m !== m) { S_.moves.push({ from: S_.m, to: m }); S_.prev = S_.m; }
         S_.m = m; draw(); LX.store.set("a22-you", { cost: m.cost, co2: m.co2, unserved: m.unserved, fair: m.fair.fixed, gas: m.gas });
+        said.textContent = "Your plan, run through 2025: " + M.AXES.map(function (a) { return LAB[a] + " " + val(m, a, S_.defs); }).join(", ") + ".";
         if (S_.onRun) S_.onRun(m);
-      }
-    }
+      },
+      fail: function () { status.set({ status: "error" }); }
+    });
+    function setPlan(p, now) { S_.plan = M.blank(p); RS.set(copy(S_.plan), now); }
     function planSliders(host, keys) {
       var out = {};
       [["Clean power", ["wind", "solar", "nuc"]], ["Gas", ["cc", "pk"]], ["Storage", ["bp", "be"]]].forEach(function (g) {
@@ -614,7 +656,7 @@
             H("p", { class: "lx-hint", text: "Raise the wind farm to 300 MW (or any size you like)." }, box);
           }
           if (pr.picked()) show();
-          S_.busy = api.busy;
+          S_.busy = api.busy; if (RS.busy()) api.busy(true);
           S_.onRun = function (m) {
             if (S_.plan.wind > 0 && pr.picked()) {
               S_.step1 = true; pr.reveal(diffList(BY.A.m, m)); api.done();
@@ -639,7 +681,7 @@
         } },
       { text: "Now plan freely: move any slider, and watch which goals pull against each other. Make at least three changes.",
         build: function (act, api) {
-          S_.mode = "compare"; S_.onOpen = null; S_.busy = api.busy; paintLib();
+          S_.mode = "compare"; S_.onOpen = null; S_.busy = api.busy; if (RS.busy()) api.busy(true); paintLib();
           var sl = planSliders(act, TP.KEYS);
           var row = H("div", { class: "a22-row" }, act);
           H("button", { class: "lx-link", type: "button", text: "Back to plan A", onclick: function () { TP.KEYS.forEach(function (k) { sl[k].set(BY.A.plan[k]); }); setPlan(BY.A.plan, true); } }, row);

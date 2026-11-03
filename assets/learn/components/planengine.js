@@ -30,11 +30,16 @@
      costs(cfg, scenario) -> C;  weekModel(C, RW, {cap, price, plan}) and fullYearModel(C, Y, opts) -> models for LX.solver;
      summarize(C, periods, result, opts) -> {cost, co2, plan, unserved, spilledShare, capDual, ...};  periodsOf(RW);
      encodePlan and decodePlan (#plan-... links), weekSeries, frontierAt, ceilPlan, stars, capReading, fullVerdict, crf,
-     fixedCost, build, KEYS, HPW, WEEKS, HOURS, weekMonth, weekStart.
+     fixedCost, build, KEYS, HPW, WEEKS, HOURS, weekMonth, weekStart;
+     from lesson M3 (W2 integration): link(model, RW, mode) (the battery between representative weeks: "linked",
+     "cyclic" or "free"), yearPeriods(Y), readCheck(C, Y, result, plan) (a fixed plan's full-year run: totals and MWh
+     unserved in each calendar week) and errors(est, full, cap, ref) (cost gap, CO2 over the cap, estimate error).
+     LX.WeekStrip (components/weekstrip.js) draws a set of weeks and readCheck's byWeek as a 52-week calendar.
    Page kit (browser only): LX.townPlan.ui = { TECH (names and colours), fm (number formats), Num (a numeric control in
      the slider look), TextTable (a comparison table of words; cards on phones), css (kept for callers; the styles are in
      planengine.css, bundled into learn.css) }.
-   Tests: _tests/learn/test_13-capstone.js (also with --full) and test_12-trade-offs.js. */
+   Tests: _tests/learn/test_13-capstone.js (also with --full), test_12-trade-offs.js, test_m03-capacity-expansion.js and
+   test_components_w2_plan.js (link, readCheck, errors, the week strip). */
 (function () {
   "use strict";
   var HPW = 168, WEEKS = 52, HOURS = 8760;
@@ -391,10 +396,57 @@
              over: full.co2 - target, overShare: full.co2 / target - 1, held: served && co2ok,
              changed: (week.unserved < 0.5) !== served || (week.co2 <= target + 0.5) !== co2ok };
   }
+
+  // ---------------------------------------------------------------- representative periods: the battery between them,
+  // the full-year check and its error measures (promoted from lesson M3 at the W2 integration, 2026-11-03; unchanged)
+  // link(m, RW, mode): a model from weekModel() (the linked chain) with another rule for the battery between weeks:
+  //   "linked" (or none)  the model as it is: one calendar chain of 52 start levels (Kotzur et al. 2018)
+  //   "cyclic"            each representative week ends where it starts (s<p>_167 = 0), so no energy moves between weeks
+  //   "free"              no rule between weeks: the 52 chain rows are dropped, so each week may start at any level and
+  //                       stored energy can appear from nothing
+  // Variable names are build()'s: s<p>_<h> is the level in representative week p after hour h, relative to the week's
+  // start; W<i> the level at the start of calendar week i; constraint W<i> is the chain W<i+1> = W<i> + s<rep(i)>_167.
+  function link(m, RW, mode) {
+    if (!mode || mode === "linked") return m;
+    if (mode !== "cyclic" && mode !== "free") throw new Error("link: mode must be linked, cyclic or free");
+    var cons = m.constraints;
+    if (mode === "free") cons = cons.filter(function (c) { return !/^W\d+$/.test(c.name); });
+    else {
+      cons = cons.slice();
+      RW.reps.forEach(function (r, p) { var t = {}; t["s" + p + "_" + (HPW - 1)] = 1; cons.push({ name: "cyc" + p, terms: t, eq: 0 }); });
+    }
+    return { sense: m.sense, variables: m.variables, constraints: cons };
+  }
+  // the whole year as one period, as fullYearModel() builds it (for summarize() of a full-year run)
+  function yearPeriods(Y) { return [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }]; }
+  // a solved full-year check (fullYearModel with the plan fixed): totals, plus where the shortfalls fall: MWh unserved in
+  // each calendar week (an hour counts when it is more than 0.05 MW short; the last 24 hours of the year, 31 December,
+  // count in week 52)
+  function readCheck(C, Y, r, plan) {
+    var s = summarize(C, yearPeriods(Y), r, { plan: plan }), v = r.values, byWeek = [], hours = 0;
+    for (var i = 0; i < WEEKS; i++) byWeek.push(0);
+    for (var h = 0; h < Y.demand.length; h++) {
+      var u = v["u0_" + h] || 0;
+      if (u > 0.05) { hours++; byWeek[Math.min(WEEKS - 1, Math.floor(h / HPW))] += u; }
+    }
+    return { cost: s.cost, co2: s.co2, unserved: s.unserved, unservedShare: s.unservedShare, hours: hours, maxShort: s.maxUnservedMW,
+             byWeek: byWeek, spilled: s.spilledShare, dis: s.energy.dis, demand: s.demand };
+  }
+  // the stated error measures. est: the planning run ({cost} at least, e.g. summarize() of weekModel); full: readCheck()
+  // of the same plan; cap in t; ref: the full-year optimum ({cost}), or null
+  //   costGap  (cost of the plan on the full year) / (cost the weeks estimated) - 1
+  //   co2Over  (CO2 of the plan on the full year) / cap - 1          (positive: over the cap)
+  //   estErr   (cost the weeks estimated) / (cost of the full-year optimum) - 1   (negative: the weeks were too optimistic)
+  //   served   no hour short by more than 0.05 MW (0.5 MWh in the year in all); co2ok: within the cap (0.5 t tolerance)
+  function errors(est, full, cap, ref) {
+    return { costGap: full.cost / est.cost - 1, co2Over: full.co2 / cap - 1, estErr: ref ? est.cost / ref.cost - 1 : null,
+             unserved: full.unserved, hours: full.hours, maxShort: full.maxShort, served: full.unserved < 0.5, co2ok: full.co2 <= cap + 0.5 };
+  }
   var model = { HPW: HPW, WEEKS: WEEKS, HOURS: HOURS, KEYS: KEYS, prepareYear: prepareYear, selectWeeks: selectWeeks, weekMonth: weekMonth, weekStart: weekStart,
                 crf: crf, costs: costs, build: build, weekModel: weekModel, fullYearModel: fullYearModel, periodsOf: periodsOf,
                 summarize: summarize, fixedCost: fixedCost, encodePlan: encodePlan, decodePlan: decodePlan, weekSeries: weekSeries,
-                frontierAt: frontierAt, ceilPlan: ceilPlan, stars: stars, capReading: capReading, fullVerdict: fullVerdict };
+                frontierAt: frontierAt, ceilPlan: ceilPlan, stars: stars, capReading: capReading, fullVerdict: fullVerdict,
+                link: link, yearPeriods: yearPeriods, readCheck: readCheck, errors: errors };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
   var LX = window.LX;
