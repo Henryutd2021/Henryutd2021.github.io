@@ -12,11 +12,11 @@
 // dispatch story: 19:00 on 3 September 2025, cut and scaled exactly as lesson 0 does), cf_targets.json (energy per MW in
 // the planning story), path.json (where the readiness check routes). Prices, costs and limits are illustrative.
 //
-// Pure model (exported for Node, no DOM): townDay, the two-variable rule algebra (le, holds, clip, region), optimum()
-// (best corner by vertex enumeration, with infeasible, unbounded and tie detection), compare() (is a learner's model the
-// story's model? same feasible region and the same goal direction, with per-rule diagnostics), dispatchStory(),
-// planningStory(), toArrays() (A x <= b form), readiness scoring. The rule helpers and the plane are lesson-local copies
-// shared with k04-linear-equations.js (promotion requested in the sidecar).
+// Pure model (exported for Node, no DOM): townDay, compare() (is a learner's model the story's model? same feasible
+// region and the same goal direction, with per-rule diagnostics), dispatchStory(), planningStory(), toArrays() (A x <= b
+// form), readiness scoring. The two-variable rule algebra (le, holds, clip, region) and optimum() (best corner by vertex
+// enumeration, with infeasible, unbounded and tie detection) are the shared LX.lp2, and the plane is LX.LPPlane
+// (components/lpplane.js); the model re-exports the algebra under its old names.
 (function () {
   "use strict";
 
@@ -34,57 +34,9 @@
     return { date: sc.date, dateLabel: sc.dateLabel, fleet: f, demand: demand, wind: wind, solar: solar, need: need };
   }
 
-  // ---------------------------------------------------------------- two-variable linear rules
-  function le(r) {
-    if (r.op === "<=") return [{ a: [r.a[0], r.a[1]], b: r.b }];
-    if (r.op === ">=") return [{ a: [-r.a[0], -r.a[1]], b: -r.b }];
-    return [{ a: [r.a[0], r.a[1]], b: r.b }, { a: [-r.a[0], -r.a[1]], b: -r.b }];
-  }
-  function lhs(r, p) { return r.a[0] * p[0] + r.a[1] * p[1]; }
-  function holds(r, p, tol) {
-    var v = lhs(r, p), e = tol == null ? 1e-7 * (1 + Math.abs(r.b)) : tol;
-    return r.op === "<=" ? v <= r.b + e : r.op === ">=" ? v >= r.b - e : Math.abs(v - r.b) <= e;
-  }
-  function dedupe(P) {
-    var out = [];
-    P.forEach(function (p) { var q = out[out.length - 1]; if (!q || Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]) > 1e-7) out.push(p); });
-    if (out.length > 1 && Math.abs(out[0][0] - out[out.length - 1][0]) + Math.abs(out[0][1] - out[out.length - 1][1]) <= 1e-7) out.pop();
-    return out;
-  }
-  function clip(poly, h) {
-    var out = [], n = poly.length, eps = 1e-9 * (1 + Math.abs(h.b));
-    var f = function (p) { return h.a[0] * p[0] + h.a[1] * p[1] - h.b; };
-    for (var i = 0; i < n; i++) {
-      var P = poly[i], Q = poly[(i + 1) % n], fp = f(P), fq = f(Q);
-      if (fp <= eps) out.push(P);
-      if ((fp < -eps && fq > eps) || (fp > eps && fq < -eps)) { var t = fp / (fp - fq); out.push([P[0] + t * (Q[0] - P[0]), P[1] + t * (Q[1] - P[1])]); }
-    }
-    return dedupe(out);
-  }
-  function region(rules, box) {
-    var poly = [[box[0], box[2]], [box[1], box[2]], [box[1], box[3]], [box[0], box[3]]];
-    for (var i = 0; i < rules.length && poly.length; i++) le(rules[i]).forEach(function (h) { if (poly.length) poly = clip(poly, h); });
-    return poly;
-  }
-  function bigBox(view) { var sx = view[1] - view[0], sy = view[3] - view[2]; return [view[0] - 20 * sx, view[1] + 20 * sx, view[2] - 20 * sy, view[3] + 20 * sy]; }
-  function r6(v) { return Math.round(v * 1e6) / 1e6 + 0; }
-
-  // best corner of max/min c·p over the rules: "optimal" (with ties), "infeasible" or "unbounded"
-  function optimum(m, view) {
-    var big = bigBox(view), P = region(m.rows, big);
-    if (!P.length) return { status: "infeasible" };
-    var sg = m.sense === "max" ? -1 : 1, best = Infinity, arg = [], scale = 1;
-    P.forEach(function (p) { scale = Math.max(scale, Math.abs(m.c[0] * p[0]) + Math.abs(m.c[1] * p[1])); });
-    P.forEach(function (p) {
-      var v = sg * (m.c[0] * p[0] + m.c[1] * p[1]), e = 1e-9 * scale;
-      if (v < best - e) { best = v; arg = [p]; } else if (Math.abs(v - best) <= e) arg.push(p);
-    });
-    var span = Math.max(big[1] - big[0], big[3] - big[2]) * 1e-9;
-    var far = arg.some(function (p) { return p[0] <= big[0] + span || p[0] >= big[1] - span || p[1] <= big[2] + span || p[1] >= big[3] - span; });
-    if (far) return { status: "unbounded" };
-    var x = arg.map(function (p) { return [r6(p[0]), r6(p[1])]; });
-    return { status: "optimal", x: x[0], ties: x, value: r6(sg * best) };
-  }
+  // ---------------------------------------------------------------- two-variable linear rules: LX.lp2 (components/lpplane.js)
+  var LP = (typeof window !== "undefined" && window.LX && window.LX.lp2) || require("./components/lpplane.js");
+  var le = LP.le, holds = LP.holds, region = LP.region, bigBox = LP.bigBox, optimum = LP.optimum;
 
   // is a learner's model {sense, c, rows} the story's model? Feasible regions are compared inside a large box, with a
   // tolerance of 0.5% of the view, so 0.333h <= 10 counts as h/3 <= 10; the goal must point the same way.
@@ -152,7 +104,7 @@
     return g;
   }
 
-  var model = { townDay: townDay, le: le, lhs: lhs, holds: holds, clip: clip, region: region, optimum: optimum, compare: compare,
+  var model = { townDay: townDay, le: le, lhs: LP.lhs, holds: holds, clip: LP.clip, region: region, optimum: optimum, compare: compare,
                 toArrays: toArrays, dispatchStory: dispatchStory, planningStory: planningStory, withKey: withKey, readiness: readiness,
                 HOUR: HOUR, PREV_CC: PREV_CC };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -179,93 +131,6 @@
     return /^[+-]?(\d+\.?\d*|\.\d+)$/.test(s) ? parseFloat(s) : NaN;
   }
 
-  // ---- the rule plane (lesson-local copy of K4's)
-  function Plane(host, o) {
-    var W = 440, Hh = 380, m = { l: 58, r: 14, t: 12, b: 56 }, box = o.view;
-    var wrap = H("div", { class: "w1h-plane" }, host);
-    var svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, role: "img", "aria-label": o.aria || "A plane of plans" }, wrap);
-    var sx = function (x) { return m.l + (x - box[0]) / (box[1] - box[0]) * (W - m.l - m.r); };
-    var sy = function (y) { return Hh - m.b - (y - box[2]) / (box[3] - box[2]) * (Hh - m.t - m.b); };
-    var gGrid = S("g", null, svg);
-    (o.ticks || []).forEach(function (v, i) {
-      var lab = (o.ticks.length > 6 && i % 2) ? null : v;
-      if (v >= box[0] && v <= box[1]) { S("line", { x1: sx(v), x2: sx(v), y1: sy(box[2]), y2: sy(box[3]), class: "w1h-grid" }, gGrid); if (lab != null) S("text", { x: sx(v), y: Hh - m.b + 22, "text-anchor": "middle", class: "w1h-tick" }, gGrid).textContent = v; }
-      if (v >= box[2] && v <= box[3]) { S("line", { x1: sx(box[0]), x2: sx(box[1]), y1: sy(v), y2: sy(v), class: "w1h-grid" }, gGrid); if (lab != null || box[3] - box[2] < 0.75 * (box[1] - box[0])) S("text", { x: m.l - 8, y: sy(v) + 4, "text-anchor": "end", class: "w1h-tick" }, gGrid).textContent = v; }
-    });
-    S("line", { x1: sx(box[0]), x2: sx(box[1]), y1: sy(box[2]), y2: sy(box[2]), class: "w1h-axis" }, gGrid);
-    S("line", { x1: sx(box[0]), x2: sx(box[0]), y1: sy(box[2]), y2: sy(box[3]), class: "w1h-axis" }, gGrid);
-    S("text", { x: (sx(box[0]) + sx(box[1])) / 2, y: Hh - 10, "text-anchor": "middle", class: "w1h-axlab" }, gGrid).textContent = o.xl;
-    var ym = (sy(box[2]) + sy(box[3])) / 2;
-    S("text", { x: 16, y: ym, "text-anchor": "middle", class: "w1h-axlab", transform: "rotate(-90 16 " + ym + ")" }, gGrid).textContent = o.yl;
-    var gReg = S("g", null, svg), gRule = S("g", null, svg), gIso = S("g", null, svg), gPt = S("g", null, svg);
-    function path(P) { return P.length ? "M" + P.map(function (p) { return sx(p[0]).toFixed(1) + " " + sy(p[1]).toFixed(1); }).join(" L") + " Z" : ""; }
-    function segment(r) {
-      var pts = [], a = r.a, b = r.b;
-      if (Math.abs(a[1]) > 1e-12) [box[0], box[1]].forEach(function (x) { var y = (b - a[0] * x) / a[1]; if (y >= box[2] - 1e-9 && y <= box[3] + 1e-9) pts.push([x, y]); });
-      if (Math.abs(a[0]) > 1e-12) [box[2], box[3]].forEach(function (y) { var x = (b - a[1] * y) / a[0]; if (x >= box[0] - 1e-9 && x <= box[1] + 1e-9) pts.push([x, y]); });
-      if (pts.length < 2) return null;
-      var best = [pts[0], pts[1]], d = -1;
-      pts.forEach(function (p) { pts.forEach(function (q) { var dd = (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); if (dd > d) { d = dd; best = [p, q]; } }); });
-      return best;
-    }
-    return {
-      svg: svg, box: box,
-      clear: function () { [gReg, gRule, gIso, gPt].forEach(function (g) { g.innerHTML = ""; }); },
-      region: function (rules, cls) { var P = region(rules, box); if (P.length > 2) S("path", { d: path(P), class: cls || "w1h-region" }, gReg); else if (P.length === 2) S("path", { d: path(P), class: "w1h-region-line" }, gReg); return P; },
-      rule: function (r, opt) {
-        opt = opt || {}; if (!r || !r.a || (!r.a[0] && !r.a[1])) return; var sg = segment(r); if (!sg) return;
-        var g = S("g", { class: "w1h-rule" + (opt.cls ? " " + opt.cls : "") }, gRule);
-        var A = [sx(sg[0][0]), sy(sg[0][1])], B = [sx(sg[1][0]), sy(sg[1][1])];
-        S("line", { x1: A[0], y1: A[1], x2: B[0], y2: B[1] }, g);
-        if (opt.label) {
-          if (A[1] > B[1] || (A[1] === B[1] && A[0] > B[0])) { var T = A; A = B; B = T; }
-          var diag = Math.abs(A[0] - B[0]) > 1 && Math.abs(A[1] - B[1]) > 1, f = opt.at != null ? opt.at : diag ? 0.5 : 0.1;
-          var kx = (W - m.l - m.r) / (box[1] - box[0]), ky = (Hh - m.t - m.b) / (box[3] - box[2]);
-          var n = [r.a[0] / kx, -r.a[1] / ky], len = Math.sqrt(n[0] * n[0] + n[1] * n[1]) || 1, sgn = r.op === ">=" ? -1 : 1;
-          n = [sgn * n[0] / len, sgn * n[1] / len];
-          var px = A[0] + f * (B[0] - A[0]) + 10 * n[0], py = A[1] + f * (B[1] - A[1]) + 10 * n[1];
-          var anchor = n[0] > 0.3 ? "start" : n[0] < -0.3 ? "end" : "middle";
-          if (n[1] > 0.3) py += 12; else if (Math.abs(n[1]) <= 0.3) py += 5;
-          if (anchor === "middle") px = Math.min(Math.max(px, m.l + 60), W - m.r - 60);
-          py = Math.min(Math.max(py, m.t + 14), Hh - m.b - 6);
-          if (anchor === "start") px = Math.min(px, W - m.r - 90); if (anchor === "end") px = Math.max(px, m.l + 90);
-          S("text", { x: px, y: py, "text-anchor": anchor, class: "w1h-rlab bg" }, g).textContent = opt.label;
-          S("text", { x: px, y: py, "text-anchor": anchor, class: "w1h-rlab" }, g).textContent = opt.label;
-        }
-        return g;
-      },
-      iso: function (c, v, label) {
-        var sg = segment({ a: c, b: v }); if (!sg) return;
-        S("line", { x1: sx(sg[0][0]), y1: sy(sg[0][1]), x2: sx(sg[1][0]), y2: sy(sg[1][1]), class: "w1h-iso" }, gIso);
-        if (label) { var lo = sg[0][1] <= sg[1][1] ? sg[0] : sg[1], X = sx(lo[0]), end = X > W - 160;
-          S("text", { x: end ? X - 6 : X + 6, y: sy(lo[1]) - 6, class: "w1h-isolab bg", "text-anchor": end ? "end" : "start" }, gIso).textContent = label;
-          S("text", { x: end ? X - 6 : X + 6, y: sy(lo[1]) - 6, class: "w1h-isolab", "text-anchor": end ? "end" : "start" }, gIso).textContent = label; }
-      },
-      point: function (p, opt) {
-        opt = opt || {};
-        var g = S("g", { class: "w1h-pt" + (opt.cls ? " " + opt.cls : "") }, gPt);
-        S("circle", { cx: sx(p[0]), cy: sy(p[1]), r: opt.r || 7 }, g);
-        if (opt.label) { var right = sx(p[0]) < W - 130, up = sy(p[1]) > m.t + 30, X = sx(p[0]) + (right ? 11 : -11), Y = up ? sy(p[1]) - 10 : sy(p[1]) + 22;
-          S("text", { x: X, y: Y, "text-anchor": right ? "start" : "end", class: "w1h-plab bg" }, g).textContent = opt.label;
-          S("text", { x: X, y: Y, "text-anchor": right ? "start" : "end", class: "w1h-plab" }, g).textContent = opt.label; }
-        return g;
-      },
-      onPick: function (fn, step) {
-        var down = false;
-        function at(ev) {
-          var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
-          var q = pt.matrixTransform(svg.getScreenCTM().inverse());
-          var x = box[0] + (q.x - m.l) / (W - m.l - m.r) * (box[1] - box[0]), y = box[2] + (Hh - m.b - q.y) / (Hh - m.t - m.b) * (box[3] - box[2]);
-          var s = step || 5; fn([LX.clamp(Math.round(x / s) * s, box[0], box[1]), LX.clamp(Math.round(y / s) * s, box[2], box[3])]);
-        }
-        svg.style.touchAction = "none"; svg.classList.add("pickable");
-        svg.addEventListener("pointerdown", function (ev) { down = true; try { svg.setPointerCapture(ev.pointerId); } catch (e) {} at(ev); });
-        svg.addEventListener("pointermove", function (ev) { if (down) at(ev); });
-        svg.addEventListener("pointerup", function () { down = false; });
-        svg.addEventListener("pointercancel", function () { down = false; });
-      }
-    };
-  }
   function seg(host, labels, sel, onPick, aria) {
     var g = H("div", { class: "lx-seg", role: "group", "aria-label": aria || "Choose" }, host), bs = [];
     labels.forEach(function (l, i) {
@@ -288,7 +153,7 @@
   }
   function planeFor(host, st, aria) {
     var v = st.vars;
-    return Plane(host, { view: st.view, ticks: st.ticks, xl: v[0].sym + ": " + v[0].name + ", " + v[0].unit, yl: v[1].sym + ": " + v[1].name + ", " + v[1].unit, aria: aria });
+    return LX.LPPlane(host, { view: st.view, ticks: st.ticks, xLabel: v[0].sym + ": " + v[0].name + ", " + v[0].unit, yLabel: v[1].sym + ": " + v[1].name + ", " + v[1].unit, aria: aria });
   }
 
   // ---- the model builder: the goal and the rules as editable rows, drawn live on a plane, checked against the story

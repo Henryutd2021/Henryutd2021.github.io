@@ -1,0 +1,41 @@
+/* lpplane.css — LX.LPPlane (lpplane.js): the fixed drawing (B1, K4; also the static fallback figures), the fluid drawing
+   (lessons 10 and 11) and the row of simplex-walk controls under a plane. */
+.lx-plane svg { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto; }
+.lx-plane svg.pickable { cursor: crosshair; }
+.lx-lp-grid { stroke: var(--lx-line); stroke-width: 1; }
+.lx-lp-axis { stroke: var(--lx-ink-3); stroke-width: 1.4; }
+.lx-lp-tick { font-family: var(--lx-f-mono); font-size: 14px; fill: var(--lx-ink-3); }
+.lx-lp-axlab { font-family: var(--lx-f-display); font-size: 15px; fill: var(--lx-ink-2); }
+.lx-lp-region { fill: color-mix(in srgb, var(--lx-accent) 20%, transparent); stroke: var(--lx-accent); stroke-width: 1.5; }
+.lx-lp-region.ghost { fill: color-mix(in srgb, var(--lx-ink-3) 14%, transparent); stroke: none; }
+.lx-lp-region.pick { fill: color-mix(in srgb, var(--lx-accent) 26%, transparent); stroke: var(--lx-accent); stroke-dasharray: 5 4; }
+.lx-lp-region.soft { fill: color-mix(in srgb, var(--lx-accent) 16%, transparent); stroke: none; }
+.lx-lp-region-line { fill: none; stroke: var(--lx-accent); stroke-width: 5; stroke-linecap: round; opacity: .75; }
+.lx-lp-hatch { stroke: var(--lx-ink-3); stroke-width: 1.2; opacity: .35; }
+.lx-lp-rule line { stroke: var(--lx-ink-3); stroke-width: 1.6; }
+.lx-lp-rule.on line { stroke: var(--lx-ink); stroke-width: 2; }
+.lx-lp-rule.hot line { stroke: var(--lx-accent); stroke-width: 3; }
+.lx-lp-rlab, .lx-lp-plab, .lx-lp-isolab { font-family: var(--lx-f-mono); font-size: 14px; fill: var(--lx-ink); }
+.lx-lp-plab { font-weight: 600; }
+.lx-lp-isolab { fill: var(--lx-ink-2); font-size: 13px; }
+.lx-lp-rlab.bg, .lx-lp-plab.bg, .lx-lp-isolab.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
+.lx-lp-iso { stroke: var(--lx-ink-2); stroke-width: 1.6; stroke-dasharray: 6 5; }
+.lx-lp-pt circle, .lx-lp-fbpt { fill: var(--lx-surface); stroke: var(--lx-ink); stroke-width: 2.6; }
+.lx-lp-pt.trail circle { fill: var(--lx-ink-3); stroke: none; }
+.lx-lp-pt.good circle { stroke: var(--lx-good); }
+.lx-lp-pt.bad circle { stroke: var(--lx-bad); }
+/* fluid drawing */
+.lx-plane.fluid { position: relative; touch-action: none; }
+.lx-plane.fluid svg { max-width: none; margin: 0; overflow: visible; }
+.lx-plane.fluid text { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
+.lx-plane.fluid .lbl { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; }
+.lx-plane .hit { stroke: transparent; stroke-width: 22; fill: none; cursor: grab; }
+.lx-plane .hit:focus { outline: none; }
+.lx-plane .hit:focus-visible { stroke: var(--lx-accent); stroke-opacity: .25; }
+.lx-plane .dot { cursor: grab; }
+.lx-plane .dot:focus { outline: none; }
+.lx-plane .dot:focus-visible circle.ring { stroke: var(--lx-accent); stroke-width: 3; }
+.lx-plane .hi { stroke-width: 5 !important; }
+/* simplex-walk controls under a plane */
+.lx-lp-walk { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lx-lp-walk-out { font-size: 14.5px; color: var(--lx-ink); }

@@ -3,8 +3,8 @@
 //   - the hour is lesson 0's 19:00 (grid-operator.js prepare()), and its gas need is the page's 145 MW
 //   - solve2() (exact two-variable LP) agrees with HiGHS on 3,000 random cases: status and best cost
 //   - the four outcomes appear where the page says (slack, binding, infeasible, tied, unbounded, lights out)
-//   - the simplex walk goes downhill corner by corner and ends at the best corner
-//   - the card sort's answer key; the page's numbers, Python snippet and fallback figure
+//   - the simplex walk (LX.lp2.simplexWalk on the hour's model) goes downhill corner by corner and ends at the best corner
+//   - the card sort's answer key (LX.CardSort.grade); the page's numbers, Python snippet and fallback figure
 // Usage (from the site folder):  node _tests/learn/test_10-write-it-down.js [--write]   (--write: the fallback figure)
 "use strict";
 const fs = require("fs");
@@ -18,6 +18,8 @@ vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), ctx);
 const { core, VERSION } = ctx.module.exports;
 const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
 const M = require(L("10-write-it-down.js"));
+const LP = require(L("components/lpplane.js"));
+const CS = require(L("components/cardsort.js"));
 const M0 = require(L("grid-operator.js"));
 const town = JSON.parse(fs.readFileSync(L("data/town.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
@@ -84,20 +86,20 @@ const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed
   ok(M.check(p, { x: D.dot[0], y: D.dot[1] }).ok === false, "the plan dot starts outside the region (so the reader moves it in)");
 
   // ---------------- simplex walk
-  const walk = M.simplexWalk(p);
-  ok(walk.length >= 2 && near(walk[walk.length - 1].cost, s.cost) && near(walk[walk.length - 1].x, 145), `walk: ends at the best corner (${walk.map(v => Math.round(v.cost)).join(" > ")})`);
-  ok(walk.every((v, i) => !i || v.cost < walk[i - 1].cost - 1e-9), "walk: every step is downhill");
+  const walk = LP.simplexWalk(M.problem(p));
+  ok(walk.length >= 2 && near(walk[walk.length - 1].value, s.cost) && near(walk[walk.length - 1].x, 145), `walk: ends at the best corner (${walk.map(v => Math.round(v.value)).join(" > ")})`);
+  ok(walk.every((v, i) => !i || v.value < walk[i - 1].value - 1e-9), "walk: every step is downhill");
   ok(walk.slice(1).every(v => v.along), "walk: every step follows an edge (a rule line)");
-  ok(near(walk[0].cost, Math.max(...s.corners.map(v => M.costOf(p, v)))), "walk: starts at the most expensive corner");
+  ok(near(walk[0].value, Math.max(...s.corners.map(v => M.costOf(p, v)))), "walk: starts at the most expensive corner");
 
   // ---------------- card sort
   const key = {}; D.cards.forEach(c => { key[c.id] = c.bin; });
-  const g = M.grade(D.cards, key);
+  const g = CS.grade(D.cards, key);
   ok(g.right === 10 && g.total === 10, "cards: the answer key grades 10 of 10");
   const byBin = {}; D.cards.forEach(c => { byBin[c.bin] = (byBin[c.bin] || 0) + 1; });
   ok(byBin.decision === 3 && byBin.goal === 1 && byBin.rule === 3 && byBin.given === 3, `cards: 3 decisions, 1 goal, 3 rules, 3 given (${JSON.stringify(byBin)})`);
   ok(D.bins.map(b => b.id).join() === "decision,goal,rule,given" && D.cards.every(c => c.why && c.why.length < 140), "cards: four bins and a short reason on every card");
-  ok(M.grade(D.cards, {}).placed === 0, "cards: grading an empty sort");
+  ok(CS.grade(D.cards, {}).placed === 0, "cards: grading an empty sort");
 
   // ---------------- the page
   if (fs.existsSync(QPATH)) {
@@ -126,11 +128,11 @@ function fallbackSVG(p, s) {
   for (let y = 0; y <= view.y[1]; y += 40) g += `<line x1="${sx(0)}" x2="${sx(view.x[1])}" y1="${sy(y)}" y2="${sy(y)}" stroke="var(--lx-line)"/><text x="${m.l - 6}" y="${(+sy(y) + 4).toFixed(1)}" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">${y}</text>`;
   g += `<text x="${sx(view.x[1])}" y="${Hh - 6}" text-anchor="end" font-size="13" fill="var(--lx-ink-2)">Combined-cycle x (MW)</text><text x="${m.l + 4}" y="${m.t + 12}" font-size="13" fill="var(--lx-ink-2)">Peaker y (MW)</text>`;
   out.push(g + "</g>");
-  const poly = M.clipPolygon(p, view);
+  const poly = LP.region(M.problem(p).rows, view);
   out.push(`<polygon points="${poly.map(v => sx(v[0]) + "," + sy(v[1])).join(" ")}" fill="color-mix(in srgb, var(--lx-accent) 16%, transparent)"/>`);
   const col = { demand: "var(--lx-ink)", cc: "var(--lx-cc)", pk: "var(--lx-pk)", co2: "var(--lx-warn)" }, lab = { demand: "Demand", cc: "Combined-cycle size", pk: "Peaker size", co2: "CO₂ cap" };
   M.rulesOf(p).forEach(r => {
-    const seg = M.clipLine(r.a, r.b, view); if (!seg) return;
+    const seg = LP.segment(r.a, r.b, view); if (!seg) return;
     out.push(`<line x1="${sx(seg[0][0])}" y1="${sy(seg[0][1])}" x2="${sx(seg[1][0])}" y2="${sy(seg[1][1])}" stroke="${col[r.id]}" stroke-width="2"${r.id === "cc" || r.id === "pk" ? ' stroke-dasharray="6 4"' : ""}/>`);
     const f = r.id === "demand" ? 0.82 : r.id === "co2" ? 0.2 : 0.5, lx = seg[0][0] + f * (seg[1][0] - seg[0][0]), ly = seg[0][1] + f * (seg[1][1] - seg[0][1]);
     out.push(`<text x="${(+sx(lx) + 6).toFixed(1)}" y="${(+sy(ly) - 6).toFixed(1)}" font-size="13" fill="${col[r.id]}">${lab[r.id]}</text>`);

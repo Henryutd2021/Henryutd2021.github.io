@@ -6,7 +6,8 @@
 //
 // No optimization model (model mode "none"). The pure functions below:
 //   score(marks, tech)   compares the reader's sort with the reference: a 'yes' or 'no' cell agrees or differs; a 'partly'
-//                        cell accepts either answer (it depends on the plant, the place or the rules)
+//                        cell accepts either answer (it depends on the plant, the place or the rules); the scoring is
+//                        LX.CardSort.score (components/cardsort.js), the job sorter's own
 //   lull(shape, thr)     the longest run of hours with the wind shape below thr (thousandths of its 2025 best hour)
 //   rank(tech, key)      table order by a key, missing values last
 // Two numbers per technology: the 2025 U.S. capacity factor (EIA, Electric Power Monthly, Tables 6.07.A/B) and the
@@ -14,29 +15,19 @@
 // the domain is approved for links). Neutral by design: the reference sort gives the evidence for every cell, and the
 // contested pairing (wind plus storage as firm capacity) gets both strongest cases.
 //
-// Lesson-local components (for the coordinator to promote): JobSorter (i-card-sort with several bins per card, as
-// toggles), Scatter (a two-measure dot chart with tappable points), Steelman (two strongest cases, opened in turn).
+// The job sorter is LX.CardSort in "toggles" mode (components/cardsort.js). Lesson-local components (for the coordinator
+// to promote): Scatter (a two-measure dot chart with tappable points), Steelman (two strongest cases, opened in turn).
 (function () {
   "use strict";
 
   // ---------------------------------------------------------------- pure model
   var JOBS = ["energy", "firm", "flex"];
-  function score(marks, tech) {
-    var res = { agree: 0, differ: 0, partly: 0, clear: 0, cells: {} };
-    tech.forEach(function (t) {
-      res.cells[t.key] = {};
-      JOBS.forEach(function (j) {
-        var ref = t.jobs[j], on = !!(marks[t.key] && marks[t.key][j]), c;
-        if (ref === "partly") { c = "partly"; res.partly++; }
-        else { res.clear++; c = (ref === "yes") === on ? "agree" : "differ"; res[c]++; }
-        res.cells[t.key][j] = c;
-      });
-    });
-    return res;
-  }
-  function referenceMarks(tech) {
-    var m = {}; tech.forEach(function (t) { m[t.key] = {}; JOBS.forEach(function (j) { m[t.key][j] = t.jobs[j] === "yes"; }); }); return m;
-  }
+  // the job sorter's scoring (components/cardsort.js): window.LX.CardSort in the browser, require() in Node
+  var CS = (typeof window !== "undefined" && window.LX && window.LX.CardSort) || require("./components/cardsort.js");
+  // the technologies as sorter items: one row each, the reference sort in `ref`
+  function sortItems(tech) { return tech.map(function (t) { return { key: t.key, label: t.label, color: t.color, ref: t.jobs, why: t.why }; }); }
+  function score(marks, tech) { return CS.score(marks, sortItems(tech), JOBS); }
+  function referenceMarks(tech) { return CS.reference(sortItems(tech), JOBS); }
   function lull(shape, thr) {
     var best = 0, cur = 0, end = -1;
     for (var i = 0; i < shape.length; i++) { cur = shape[i] < thr ? cur + 1 : 0; if (cur > best) { best = cur; end = i; } }
@@ -141,11 +132,13 @@
         } },
       { text: "Now sort. Mark the jobs each technology does well; some do more than one. Then check your sort against the evidence.",
         build: function (act, api) {
-          JobSorter(act, TECH, D.jobs, marks, function (m) { marks = m; keep("marks", m); }, function (res) {
-            checked = true; keep("score", { agree: res.agree, clear: res.clear, partly: res.partly });
-            api.done();
-            api.saw("You agree with the evidence on " + res.agree + " of " + res.clear + " clear cells. The other " + res.partly + " are “partly”: the answer depends on the plant, the place or the market's rules, so either is fair. Open “Why” on any row.", res.differ > 4);
-          }, checked);
+          LX.CardSort(act, { mode: "toggles", cls: "lx6-sorter", items: sortItems(TECH), bins: D.jobs, marks: marks, checked: checked, checkLabel: "Check my sort",
+            onChange: function (m) { marks = m; keep("marks", m); },
+            onCheck: function (res) {
+              checked = true; keep("score", { agree: res.agree, clear: res.clear, partly: res.partly });
+              api.done();
+              api.saw("You agree with the evidence on " + res.agree + " of " + res.clear + " clear cells. The other " + res.partly + " are “partly”: the answer depends on the plant, the place or the market's rules, so either is fair. Open “Why” on any row.", res.differ > 4);
+            } });
           if (checked) api.done();
         } },
       { text: "Some pairings are contested, and the evidence points both ways. Open the strongest case on each side before you make up your mind.",
@@ -238,49 +231,6 @@
     var ul = H("ul", null, alt);
     pts.forEach(function (t) { H("li", { text: t.label + ": capacity factor " + pct(t.cf) + "; firm share " + t.firmLabel + "." }, ul); });
     return { el: svg };
-  }
-
-  // ---- lesson-local: sort cards into several bins at once (toggles), then compare with the evidence
-  function JobSorter(host, tech, jobs, marks, onChange, onCheck, wasChecked) {
-    var box = H("div", { class: "lx6-sorter" }, host), rows = {}, res = null;
-    var head = H("div", { class: "lx6-srow head", "aria-hidden": "true" }, box); H("span", null, head);
-    jobs.forEach(function (j) { H("span", { class: "jh", html: LX.icon(j.icon) + LX.esc(j.short) }, head); });
-    tech.forEach(function (t) {
-      var r = H("div", { class: "lx6-srow", role: "group", "aria-label": t.label, style: "--c:" + t.color }, box);
-      var nm = H("div", { class: "nm" }, r), nl = H("span", { class: "nl" }, nm); H("i", null, nl); H("span", { text: t.label }, nl);
-      var wb = H("button", { type: "button", class: "lx-link lx6-whyb", "aria-expanded": "false", text: "Why" }, nm);
-      var cells = {};
-      jobs.forEach(function (j) {
-        var on = !!(marks[t.key] && marks[t.key][j.key]);
-        var b = H("button", { type: "button", class: "tg", "aria-pressed": on ? "true" : "false", "aria-label": t.label + ": " + j.label }, r);
-        b.innerHTML = LX.icon("check");
-        b.addEventListener("click", function () {
-          marks[t.key] = marks[t.key] || {}; marks[t.key][j.key] = !marks[t.key][j.key];
-          b.setAttribute("aria-pressed", marks[t.key][j.key] ? "true" : "false"); onChange(marks);
-          if (res) paint();
-        });
-        cells[j.key] = b;
-      });
-      var why = H("div", { class: "lx6-swhy", hidden: true }, r), ul = H("ul", null, why);
-      jobs.forEach(function (j) { H("li", { html: "<b>" + LX.esc(j.label) + ": " + t.jobs[j.key] + ".</b> " + LX.esc(t.why[j.key]) }, ul); });
-      wb.addEventListener("click", function () { why.hidden = !why.hidden; wb.setAttribute("aria-expanded", why.hidden ? "false" : "true"); LX.emit("layout"); });
-      rows[t.key] = { cells: cells, why: why };
-    });
-    var foot = H("div", { class: "lx-step-foot" }, box);
-    var chk = H("button", { class: "lx-btn small", type: "button", text: "Check my sort" }, foot);
-    var key = H("p", { class: "lx-hint lx6-key" }, foot);
-    key.innerHTML = '<span class="k agree"></span>agrees · <span class="k differ"></span>differs · <span class="k partly"></span>“partly”: either is fair';
-    function paint() {
-      res = score(marks, tech);
-      tech.forEach(function (t) {
-        jobs.forEach(function (j) { var c = rows[t.key].cells[j.key]; c.classList.remove("agree", "differ", "partly"); c.classList.add(res.cells[t.key][j.key]); });
-      });
-      box.classList.add("is-checked");
-      return res;
-    }
-    chk.addEventListener("click", function () { onCheck(paint()); });
-    if (wasChecked) paint();
-    return { check: function () { return paint(); } };
   }
 
   // ---- lesson-local: the Steelman card (both strongest cases of a contested point)

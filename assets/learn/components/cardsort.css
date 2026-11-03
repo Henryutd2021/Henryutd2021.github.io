@@ -1,0 +1,53 @@
+/* cardsort.css — LX.CardSort (cardsort.js): the "cards" mode (a pool of cards and a row of bins) and the "toggles" mode
+   (the job sorter: one row per item, one toggle per bin). */
+.lx-cs { display: grid; gap: 12px; }
+.lx-cs-pool { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; padding: 10px; border-radius: 12px; border: 1px dashed var(--lx-line-2); background: var(--lx-surface-2); }
+.lx-cs-pool:empty::before { content: attr(data-empty); font-size: 13.5px; color: var(--lx-ink-3); }
+.lx-cs-card { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--lx-line-2);
+  background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-body); font-size: 14.5px; line-height: 1.25; cursor: pointer; text-align: left; }
+.lx-cs-card[aria-pressed="true"] { border-color: var(--lx-accent); box-shadow: inset 0 0 0 2px var(--lx-accent); }
+.lx-cs-card.ok { border-color: var(--lx-good); }
+.lx-cs-card.no { border-color: var(--lx-bad); box-shadow: inset 0 0 0 1px var(--lx-bad); }
+.lx-cs-card .lx-ic { width: 15px; height: 15px; }
+.lx-cs-card.ok .lx-ic { color: var(--lx-good); }
+.lx-cs-card.no .lx-ic { color: var(--lx-bad); }
+.lx-cs-bins { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 10px; }
+.lx-cs-bin { display: grid; gap: 8px; align-content: start; padding: 10px; border-radius: 12px; border: 1px solid var(--lx-line); border-top: 4px solid var(--c);
+  background: var(--lx-surface); min-height: 120px; min-width: 0; }
+.lx-cs-bin > button.lx-cs-binbtn { display: grid; gap: 2px; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; color: var(--lx-ink); }
+.lx-cs-bin > button.lx-cs-binbtn b { font-family: var(--lx-f-display); font-weight: 600; font-size: 15px; }
+.lx-cs-bin > button.lx-cs-binbtn small { font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-cs-bin.armed { background: var(--lx-accent-soft); }
+.lx-cs-list { display: grid; gap: 6px; }
+.lx-cs-bin .lx-cs-card { width: 100%; font-size: 13.5px; }
+.lx-cs-why { font-size: 14px; color: var(--lx-ink-2); display: grid; gap: 4px; margin: 0; padding-left: 1.1rem; }
+@media (max-width: 700px) { .lx-cs-bins { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* toggles mode (the job sorter) */
+.lx-cs-grid { display: grid; gap: 2px; }
+.lx-cs-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(var(--n, 3), 60px); gap: 6px 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--lx-line); }
+.lx-cs-row.head { border: 0; padding: 0; font-family: var(--lx-f-display); font-size: 12px; color: var(--lx-ink-3); text-transform: uppercase; letter-spacing: .05em; }
+.lx-cs-row.head .jh { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.lx-cs-row .nm { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; min-width: 0; }
+.lx-cs-row .nl { display: flex; align-items: center; gap: 8px; font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; }
+.lx-cs-row .nl i { width: 11px; height: 11px; border-radius: 3px; background: var(--c); flex: none; }
+.lx-cs-whyb { font-size: 13px; padding: 2px 0; visibility: hidden; }
+.lx-cs-grid.is-checked .lx-cs-whyb { visibility: visible; }
+.lx-cs-row .tg { height: 38px; border-radius: 9px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink-3); cursor: pointer; display: grid; place-items: center; }
+.lx-cs-row .tg .lx-ic { width: 18px; height: 18px; opacity: 0; }
+.lx-cs-row .tg[aria-pressed="true"] { background: var(--lx-ink); color: var(--lx-bg); border-color: var(--lx-ink); }
+.lx-cs-row .tg[aria-pressed="true"] .lx-ic { opacity: 1; }
+.lx-cs-grid.is-checked .tg.agree { box-shadow: 0 0 0 3px var(--lx-good-soft), inset 0 0 0 2px var(--lx-good); }
+.lx-cs-grid.is-checked .tg.differ { box-shadow: 0 0 0 3px var(--lx-warn-soft), inset 0 0 0 2px var(--lx-warn); }
+.lx-cs-grid.is-checked .tg.partly { border-style: dashed; }
+.lx-cs-rwhy { grid-column: 1 / -1; font-size: 13.5px; color: var(--lx-ink-2); }
+.lx-cs-rwhy ul { margin: 2px 0 4px; padding-left: 1.1rem; }
+.lx-cs-key { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.lx-cs-key .k { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 2px solid var(--lx-good); vertical-align: middle; }
+.lx-cs-key .k.differ { border-color: var(--lx-warn); }
+.lx-cs-key .k.partly { border: 2px dashed var(--lx-line-2); }
+.lx-cs-grid .lx-step-foot { flex-wrap: wrap; }
+.lx-cs-grid .lx-step-foot .lx-btn { white-space: nowrap; }
+@media (max-width: 640px) {
+  .lx-cs-row { grid-template-columns: minmax(0, 1fr) repeat(var(--n, 3), 48px); gap: 6px; }
+  .lx-cs-row .nl { font-size: 14px; }
+}
