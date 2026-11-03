@@ -434,6 +434,75 @@
   outcome: "Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security."
   after: [F1, 6]
   next: A22
+# ---------- wave W3 Foundations (curriculum v2 §7.2): energy services, power plants, nuclear basics, the grid and outages,
+# builder learn-w3-a
+- kind: lesson
+  id: f03-energy-services
+  code: F3
+  tier: foundations
+  form: cards
+  icon: house
+  status: active
+  minutes: 20
+  practice_minutes: 10
+  title: "What do people actually want from energy?"
+  subtitle: "Walk through a home, sort its energy by service, and swap the furnace for a heat pump on a cold day"
+  short: "Energy services"
+  teaches: [energy services, energy carriers, final and useful energy, conversion efficiency, the heat pump's coefficient of performance]
+  does: "A Prairie Town home's year of energy by service and by carrier, the gap between energy bought and useful energy delivered, and a heat pump whose COP falls on a cold day."
+  outcome: "Tell a service from a carrier, estimate the useful energy a home gets from what it buys, and explain why a heat pump's COP changes with the weather."
+  after: [1]
+  next: F4
+- kind: lesson
+  id: f04-power-plants
+  code: F4
+  tier: foundations
+  form: cards
+  icon: plant
+  status: active
+  minutes: 20
+  practice_minutes: 10
+  title: "How do power plants turn heat, water, wind and sunlight into electricity?"
+  subtitle: "Open six plants, follow 100 units of energy to the wire, and watch a cloudy day on a solar farm"
+  short: "Power plants"
+  teaches: [heat engines and turbines, conversion efficiency and waste heat, hydro head and flow, solar and wind conversion, ramp and reservoir limits]
+  does: "Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; a real cloudy day on a solar farm; reservoir and ramp limits."
+  outcome: "Explain how each kind of plant turns its energy source into electricity, where the losses go, and what limits how fast it can change its output."
+  after: [5]
+  next: F5
+- kind: lesson
+  id: f05-nuclear-basics
+  code: F5
+  tier: foundations
+  form: cards
+  icon: atom
+  status: active
+  minutes: 15
+  practice_minutes: 5
+  title: "How does a nuclear reactor make electricity, and heat?"
+  subtitle: "Steady a chain reaction with control rods and a moderator, then follow the heat from fuel to steam"
+  short: "Nuclear basics"
+  teaches: [fission and the chain reaction, moderators and control rods, from fuel to steam, designs by size and outlet temperature, spent fuel and safety systems]
+  does: "A chain-reaction toy with control rods and a moderator, a plant from fuel to steam, designs compared by size, outlet temperature and uses, and myth-or-fact cards on spent fuel and safety systems."
+  outcome: "Explain how a reactor keeps its chain reaction steady, how its heat becomes electricity, and why outlet temperature sets which uses a design can serve."
+  after: [F4]
+  next: F6
+- kind: lesson
+  id: f06-grid-and-outages
+  code: F6
+  tier: foundations
+  form: cards
+  icon: tower
+  status: active
+  minutes: 20
+  practice_minutes: 10
+  title: "How does power reach your plug, and why does it sometimes fail?"
+  subtitle: "Follow power from plant to lamp through each voltage step, then send a storm through the wires"
+  short: "Grid and outages"
+  teaches: [transmission and distribution, voltage steps and transformers, substations and feeders, causes of outages, reliability measures SAIDI and SAIFI]
+  does: "Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires."
+  outcome: "Trace the path from a power plant to a socket, name the equipment at each voltage step, and explain what SAIDI and SAIFI measure."
+  after: [3]
 # ---------- wave W2 modules (curriculum v2 §18.4); live once a builder sets status: active
 - kind: lesson
   id: a22-tradeoff-explorer

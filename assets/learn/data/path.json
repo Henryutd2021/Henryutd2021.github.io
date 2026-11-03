@@ -985,6 +985,50 @@
    "form": "play"
   },
   {
+   "tier": "foundations",
+   "code": "F3",
+   "title": "What do people actually want from energy?",
+   "ready": true,
+   "href": "f03-energy-services.html",
+   "scales": [],
+   "id": "f03-energy-services",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "F4",
+   "title": "How do power plants turn heat, water, wind and sunlight into electricity?",
+   "ready": true,
+   "href": "f04-power-plants.html",
+   "scales": [],
+   "id": "f04-power-plants",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "F5",
+   "title": "How does a nuclear reactor make electricity, and heat?",
+   "ready": true,
+   "href": "f05-nuclear-basics.html",
+   "scales": [],
+   "id": "f05-nuclear-basics",
+   "minutes": 15,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "F6",
+   "title": "How does power reach your plug, and why does it sometimes fail?",
+   "ready": true,
+   "href": "f06-grid-and-outages.html",
+   "scales": [],
+   "id": "f06-grid-and-outages",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
    "tier": "analyst",
    "code": "A22",
    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
