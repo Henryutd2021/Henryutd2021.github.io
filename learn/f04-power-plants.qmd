@@ -12,8 +12,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- F4 (Foundations, W3) in the step-card form. Text budget: one idea and one action per card, about 35 words; depth
      lives in the Go deeper boxes. Model, steps and explain layer: assets/learn/f04-power-plants.js with
      assets/learn/data/f04-power-plants.json (every sourced number with its URL and date), town.json and town_year.json
-     (Prairie Town, illustrative; SPP 2025 shapes, EIA-930). The Sankey is LX.Sankey from assets/learn/f03-energy-services.js
-     (F3's lesson-local component, loaded first). Tests: node _tests/learn/test_f04-power-plants.js checks every number on
+     (Prairie Town, illustrative; SPP 2025 shapes, EIA-930). The Sankey is LX.Sankey, shared with F3
+     (assets/learn/components/sankey.js, in the bundle). Tests: node _tests/learn/test_f04-power-plants.js checks every number on
      this page against the model and the data file.
      Generated, do not edit by hand: the learn:meta, learn:next and learn:footer blocks (python3 scripts/build_learn.py).
      Lesson-local styles (class prefixes f4-, f4x- for the plant explorer and f4c- for the cutaways) are in the style block. -->
@@ -388,6 +388,5 @@ A dispatch model sees each plant as a few rules on its output $p_t$ (MW) in hour
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/f03-energy-services.js" defer></script>
 <script src="../assets/learn/f04-power-plants.js" defer></script>
 ```

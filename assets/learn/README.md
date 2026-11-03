@@ -989,6 +989,17 @@ LX.SolveStep.failNote(host, r, again, { cls, kept });   // the note alone (role=
 
 **Seeded generator** (`core.js`; from M7 and engine E1, which each had a copy): `LX.mulberry32(seed)` returns a function giving numbers in [0, 1); the same seed gives the same numbers on every page, in Node (`require("components/core.js").mulberry32`) and in the notebooks' Python ports (M5, M7). M7's `rng` and E1's seeded outages call it; their numbers are unchanged. `_tests/learn/stubdom.js` sets it on its stub `LX`.
 
+**Sankey** (`sankey.js`, `sankey.css`; i-sankey, e-sankey; from F3, whose script F4 loaded for it): `LX.Sankey`, energy flows as bands whose width keeps the value, one scale for the whole drawing. The code is F3's, unchanged; its styles, which F3 injected, are now `sankey.css`, and F4 no longer loads F3's script.
+
+```js
+var sk = LX.Sankey(host, { label: "A year of energy in the home, in kWh", unit: "kWh", fmt: fmtK, height: 300, heightN: 340, onPick: fn });
+sk.set({ nodes: [{ id: "gas", label: "Gas", col: 0 }, { id: "heat", label: "Space heat", col: 1 }, { id: "lost", label: "Lost", col: 2, kind: "loss" }],
+         links: [{ from: "gas", to: "heat", value: 9000 }, { from: "heat", to: "lost", value: 1500 }] });   // tweens from the last spec
+```
+
+- Nodes are buttons (Tab, Enter, Space): picking one dims the other flows and says what flows in and out (`aria-live`); a "loss" node is pale and hatched. Labels sit right of their bars, with a reserved right margin for the last column; under 560 px with three or more columns each node gets a numbered badge and a key. Redraws at its width on resize; no tween under reduced motion. A text version lists every flow.
+- **Pure** (Node: `require("assets/learn/components/sankey.js")`; also `LX.Sankey.layout`, `.band`, `.flows`): `layout(spec, W, H, { nodeW, gap })`, `band(x0, sy, x1, ty, w)`, `flows(spec)`. F3's model keeps them as `.sankey`. Tests: `_tests/learn/test_f03-energy-services.js` (layout), `test_f04-power-plants.js` (every plant's 100 units balance), `test_components_w3_int.js`. F9 and F10 can reuse it.
+
 **Kept lesson-local, and why** (promote when a second page needs the same thing):
 
 - M7's seeded Latin hypercube (strata, the repeat error and its tie rule) and its rank-correlation bars: only M7 samples or ranks inputs.
@@ -997,6 +1008,7 @@ LX.SolveStep.failNote(host, r, again, { cls, kept });   // the note alone (role=
 - F7's `CampusLine` and E1's `E1.Line`: the same campus, two jobs. F7's is an SVG explainer (the storm, the switch, which source forms the island, lit wires, numbered parts for the explain layer); `E1.Line` is an HTML control panel (the plan's sizes, a priority per load, the feeder's limits). They share the campus data (E1's data builder reads F7's), not code.
 - M5's `TreeView` and M2's: M2 draws its own engine's nodes (switches fixed, inherited bounds, a grid layout, marks for best and pruned); M5 draws `E1.bb`'s nodes (whole sets ≥ or ≤, a halving layout, a reading panel). A shared tree would take both node schemas and layouts.
 - A8's week LP stays off engine E0 (see Engine E0 above).
+- F4's `PlantExplorer` (six plant cutaways), F5's `PlantDiagram` (fuel to steam) and `HeatLadder` (outlet temperature against uses), F6's `GridNet` (the east side's one-line diagram with hazards) and `VoltPath` (the voltage staircase): each is drawn by one page only.
 
 **Scope and QA** (ResearchPortfolio folder).
 

@@ -7,6 +7,8 @@
 //     step's button released, the note's class and last sentence, "Try again"; the three pages call it and keep no copy
 //   - LX.mulberry32 (components/core.js; from M7 and engine E1): the same numbers as the copy the two files had, and
 //     both now call the shared one
+//   - LX.Sankey (components/sankey.js, sankey.css; from F3, whose script F4 loaded for it): the pure layout on a small
+//     spec, F3's model keeps it as .sankey, F3 keeps no copy, F4 no longer loads F3's script
 //   - the bundle: both components listed after the engines, each file names itself, tokens only
 //   - contrast (W3 layout audit): LX.BenchRun dims only graphics while stale or busy; LX.ReportNote's small headings
 //     use --lx-ink-2
@@ -26,14 +28,14 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
 (async () => {
   // ---------------------------------------------------------------- the files and the bundle
   const bundleJS = rd("learn.js"), bundleCSS = rd("learn.css");
-  ["ledger", "solvestep"].forEach(n => {
+  ["ledger", "solvestep", "sankey"].forEach(n => {
     const js = rd("components/" + n + ".js"), css = rd("components/" + n + ".css");
     ok(js.indexOf(n + ".js — LX.") === 3 && css.indexOf(n + ".css — LX.") === 3, `${n}: the files name themselves and their component`);
     ok(!/#[0-9a-fA-F]{3,6}\b/.test(code(css)) && /var\(--lx-/.test(css), `${n}.css: colours from --lx-* tokens only`);
     ok(bundleJS.indexOf(js.trim()) > 0 && bundleCSS.indexOf(css.trim()) > 0, `${n}: in learn.js and learn.css as written`);
   });
   const head = bundleJS.split("\n")[0];
-  ok(/engine-e1, ledger, solvestep\)/.test(head), "bundle order: ledger and solvestep after the engines (" + head.slice(-60) + ")");
+  ok(/engine-e1, ledger, solvestep, sankey\)/.test(head), "bundle order: ledger, solvestep and sankey after the engines (" + head.slice(-60) + ")");
 
   // ---------------------------------------------------------------- LX.Ledger
   {
@@ -129,6 +131,18 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(/LX\.mulberry32/.test(e1) && e1.indexOf("0x6D2B79F5") < 0 && m7.indexOf("0x6D2B79F5") < 0 && /LX\.mulberry32 = mulberry32;/.test(rd("components/core.js")),
        "engine E1 and M7 call the shared generator and keep no copy");
     ok(typeof E1.prepare === "function", "engine E1 still loads in Node");
+  }
+
+  // ---------------------------------------------------------------- LX.Sankey
+  {
+    const SK = require(L("components/sankey.js")), F3 = require(L("f03-energy-services.js"));
+    const spec = { nodes: [{ id: "a", col: 0 }, { id: "b", col: 1 }, { id: "c", col: 1, kind: "loss" }], links: [{ from: "a", to: "b", value: 30 }, { from: "a", to: "c", value: 10 }] };
+    const Ly = SK.layout(spec, 400, 200, { gap: 10 }), Fl = SK.flows(spec);
+    ok(Math.abs(Ly.nodes.a.h - (Ly.nodes.b.h + Ly.nodes.c.h)) < 1e-9 && Fl.a.vout === 40 && Fl.b.vin === 30 && /Z$/.test(SK.band(0, 0, 100, 50, 10)), "sankey: one scale for every column; flows in and out; a closed band");
+    ok(F3.sankey.layout === SK.layout && F3.sankey.flows === SK.flows && F3.sankey.band === SK.band, "F3's model keeps the shared layout as .sankey");
+    const f3 = rd("f03-energy-services.js"), f4q = fs.readFileSync(path.join(SITE, "learn/f04-power-plants.qmd"), "utf8");
+    ok(!/function sankeyLayout|LX\.Sankey = function|lx-sankey-css/.test(f3) && /LX\.Sankey = function/.test(rd("components/sankey.js")), "F3 keeps no copy of the Sankey (code or injected styles)");
+    ok(f4q.indexOf("f03-energy-services.js") < 0 && /LX\.Sankey\(/.test(rd("f04-power-plants.js")), "F4 draws LX.Sankey from the bundle and no longer loads F3's script");
   }
 
   // ---------------------------------------------------------------- contrast (W3 layout audit)

@@ -1,6 +1,6 @@
 // test_f04-power-plants.js — Node tests for F4 (assets/learn/f04-power-plants.js), its data
-// (assets/learn/data/f04-power-plants.json with town.json and town_year.json), the Sankey it borrows from F3
-// (assets/learn/f03-energy-services.js) and every number the page states.
+// (assets/learn/data/f04-power-plants.json with town.json and town_year.json), the Sankey it shares with F3
+// (assets/learn/components/sankey.js, promoted from F3 at the W3 integration) and every number the page states.
 // Usage (from the site folder):  node _tests/learn/test_f04-power-plants.js
 "use strict";
 const fs = require("fs");
@@ -9,7 +9,7 @@ const cp = require("child_process");
 const SITE = path.resolve(__dirname, "..", "..");
 const rd = p => fs.readFileSync(path.join(SITE, p), "utf8");
 const M = require(path.join(SITE, "assets/learn/f04-power-plants.js"));
-const SK = require(path.join(SITE, "assets/learn/f03-energy-services.js")).sankey;
+const SK = require(path.join(SITE, "assets/learn/components/sankey.js"));
 const G0 = require(path.join(SITE, "assets/learn/grid-operator.js"));
 const CS = require(path.join(SITE, "assets/learn/components/cardsort.js"));
 const D = JSON.parse(rd("assets/learn/data/f04-power-plants.json"));
@@ -225,7 +225,7 @@ const P = k => M.plantByKey(D, k);
   ok(sub && fm.indexOf('subtitle: "' + sub + '"') >= 0, "front-matter subtitle = path.yml subtitle");
   ok(/code: F4/.test(blk) && /minutes: 20/.test(blk) && /practice_minutes: 10/.test(blk) && /status: active/.test(blk) && /after: \[5\]/.test(blk) && /next: F5/.test(blk), "path.yml: F4, 20 + 10 min, active, after lesson 5, next F5");
   ok(/data-learn="power-plants"/.test(QMD) && /LX\.mount\("power-plants"/.test(JS) && /id="f4-explain"/.test(QMD), "mount points match");
-  ok(QMD.indexOf('f03-energy-services.js" defer') > 0 && QMD.indexOf('f03-energy-services.js" defer') < QMD.indexOf('f04-power-plants.js" defer'), "the page loads F3's Sankey before its own script");
+  ok(QMD.indexOf('f03-energy-services.js') < 0 && QMD.indexOf('learn.js" defer') > 0 && QMD.indexOf('learn.js" defer') < QMD.indexOf('f04-power-plants.js" defer'), "the page takes LX.Sankey from the bundle (learn.js, before its own script), not from F3's script");
   ok((QMD.match(/class="lx-qq"/g) || []).length === 8, "practice: four myths and four questions");
   const steps = [...JS.matchAll(/^      \{ text: "((?:[^"\\]|\\.)*)"/gm)].map(x => x[1]);
   ok(steps.length === 8, `${steps.length} step texts`);

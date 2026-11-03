@@ -3,8 +3,8 @@
 //
 // Data: assets/learn/data/f04-power-plants.json (sources, plants, scenes, toy settings; every real number with its source
 // and date), town.json (Prairie Town's fleet, illustrative), town_year.json (the Southwest Power Pool's 2025 hourly shapes,
-// EIA-930) and path.json (lesson links). The page loads assets/learn/f03-energy-services.js first: it holds LX.Sankey,
-// the lesson-local Sankey component F3 and F4 share (a candidate for promotion).
+// EIA-930) and path.json (lesson links). LX.Sankey, the Sankey F3 and F4 share, is in the bundle (components/sankey.js,
+// promoted from F3 at the W3 integration).
 //
 // Closed-form model (pure, exported for Node):
 //   share(p, btu)         the share of the energy going in that reaches the wire, per 100 units: thermal plants
@@ -27,7 +27,7 @@
 // its reservoir are illustrative; the solar shapes and the plant data are real (see the data file).
 //
 // Lesson-local component (a candidate for promotion): PlantExplorer (six cutaways, a keyboard rail, the energy chain,
-// a text version). Shared: LX.StepCards, LX.Predict, LX.Sankey (from F3), LX.NumAnswer, LX.Plot/LX.PlotCard, LX.Slider,
+// a text version). Shared: LX.StepCards, LX.Predict, LX.Sankey (components/sankey.js), LX.NumAnswer, LX.Plot/LX.PlotCard, LX.Slider,
 // LX.Toggle, LX.CardSort, LX.CompareTable.
 (function () {
   "use strict";
