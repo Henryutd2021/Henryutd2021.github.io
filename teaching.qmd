@@ -1,7 +1,7 @@
 ---
-description: "Teaching and mentoring of Honglin Li: ECE 685 Power Systems Design, teaching assistantships, student mentoring and interactive explainers for energy-systems modeling."
+description: "Teaching and mentoring of Honglin Li: a free interactive course on energy systems, ECE 685 Power Systems Design, teaching assistantships, student mentoring and interactive explainers for energy-systems modeling."
 title: "Teaching"
-subtitle: "How I teach, courses, mentoring and interactive teaching material"
+subtitle: "How I teach, an open course, courses, mentoring and interactive teaching material"
 title-block-banner: true
 page-layout: full
 toc: false
@@ -49,6 +49,41 @@ I teach the foundations explicitly, work an example, then ask for a related prob
 [Understanding over answers]{.pr-title}
 
 When explanations are a click away, I assess formulation and interpretation as well as accuracy, and students explain their work and check any generated code.
+:::
+:::
+:::
+
+::: {.fx-sec}
+::: {.fx-head}
+## Open course {#learn}
+:::
+
+::: {.learn-card}
+::: {.lc-body}
+[Free, interactive, no account]{.label}
+
+### Energy Systems, Step by Step
+
+A course for high-school and undergraduate students and curious adults. It starts with running a small town's power grid for one real day and builds up to writing, solving and questioning the optimization models that grid operators and planners use.
+
+::: {.lc-facts}
+[<i class="bi bi-collection" aria-hidden="true"></i> 22 lessons live; more coming]{.lc-fact}
+[<i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Four tiers: Foundations, Analyst, Modeler, Researcher]{.lc-fact}
+[<i class="bi bi-graph-up" aria-hidden="true"></i> Real 2025 hourly grid data (EIA-930)]{.lc-fact}
+[<i class="bi bi-cpu" aria-hidden="true"></i> An optimization solver that runs in the browser]{.lc-fact}
+:::
+
+::: {.lc-actions}
+[Start with lesson 0](learn/00-grid-operator.qmd){.btn-solid} [Course map](learn/index.qmd){.btn-outline}
+:::
+:::
+
+::: {.lc-principles}
+[The three principles in the lessons]{.label}
+
+1. **Concepts in context:** predict first, then try it in a live model.
+2. **Guided to independent:** practice sets go from worked, to partly worked, to from scratch.
+3. **Understanding over answers:** learners formulate models and read what the solution means.
 :::
 :::
 :::
@@ -192,5 +227,5 @@ Each explainer is a small interactive model on a project page that shows one mec
 [[Uncertainty quantification]{.exp-topic}[How a theoretical power curve and a few measurements narrow the uncertainty band]{.exp-title}[Wind power curves <i class="bi bi-arrow-right" aria-hidden="true"></i>]{.exp-go}](projects/uq-mfgpr.qmd#explainer){.exp .theme-wind}
 :::
 
-[Longer open teaching modules built on the [model frameworks](software-data.qmd) are in preparation.]{.exp-more}
+[For a full path from first principles to building models, see the open course [Energy Systems, Step by Step](learn/index.qmd).]{.exp-more}
 :::

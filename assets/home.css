@@ -94,6 +94,21 @@ main.home > #title-block-header { display: none; }   /* guard: Quarto inserts an
 .home .fw-link { display: inline-flex; align-items: center; gap: .4rem; margin-top: auto; padding-top: .35rem; font-size: .84rem; font-weight: 600; color: var(--accent); }
 .home a.fw:hover .fw-name { color: var(--accent); }
 
+/* ---------- 2b. start here: three doors by reader (Learn launch, 2026-11-02) ---------- */
+.home .home-doors { padding-block: 2.2rem 0; scroll-margin-top: calc(var(--nav-h) + 1rem); }
+.home .door-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.home .door { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: .85rem; row-gap: .2rem; height: 100%; padding: 1rem 1.15rem;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r); text-decoration: none !important;
+  transition: border-color .15s var(--ease), background .15s var(--ease); }
+.home .door:hover, .home .door:focus-visible { border-color: var(--accent-line); background: var(--accent-soft); }
+.home .door-icon { grid-row: span 2; display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 9px;
+  font-size: 1rem; color: var(--accent); background: var(--surface); border: 1px solid var(--accent-line); }
+.home .door-who { font-size: .98rem; font-weight: 700; color: var(--ink); }
+.home .door-who::after { content: " \2192"; color: var(--accent); }
+.home .door-what { font-size: .87rem; line-height: 1.5; color: var(--muted); }
+@media (max-width: 767.98px) { .home .door-grid { grid-template-columns: 1fr; gap: .6rem; } .home .home-doors { padding-top: 1.6rem; } }
+@media (prefers-reduced-motion: reduce) { .home .door { transition: none; } }
+
 /* ---------- 3a. what I bring: ability cards (website v2, 2026-11-02) ---------- */
 .home .ability-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .home .ability { display: flex; flex-direction: column; gap: .5rem; padding: 1.15rem 1.25rem 1.1rem; background: var(--surface); border: 1px solid var(--line);

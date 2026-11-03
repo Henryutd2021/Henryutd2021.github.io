@@ -18,7 +18,7 @@ project:
     - field-notes/data-tools.qmd
     - field-notes/perspectives.qmd
     - field-notes/perspectives/*.qmd
-    # Learn (pilot on branch learn-pilot; enters main only after Henry approves the format)
+    # Learn (public from wave W1, 2026-11-02; Henry spot-checks lessons 0, 5, 11 and 13 before deploying)
     - learn/index.qmd
     - learn/*.qmd
   resources:
