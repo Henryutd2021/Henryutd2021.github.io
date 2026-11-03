@@ -80,8 +80,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <div class="lx-deepers">
-<style>/* lesson-local: keep Go deeper text inside the card on phones; wide equations scroll on their own (requested for deeper.css) */
-.page-lesson .lx-deeper-body{grid-template-columns:minmax(0,1fr)}.page-lesson .lx-deeper-body .math.display{overflow-x:auto;overflow-y:hidden}</style>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>The LCOE formula and the capital recovery factor</summary>
 <div class="lx-deeper-body">
@@ -93,7 +91,7 @@ $$C = \sum_{t=1}^{n} \frac{A}{(1+r)^t} = A\,\frac{1-(1+r)^{-n}}{r},$$
 
 $$\text{so}\quad A = \frac{r}{1-(1+r)^{-n}}\, C = \mathrm{CRF}\cdot C .$$
 
-When $r = 0$ the [capital recovery factor]{.lx-term term="capital-recovery-factor"} is simply $1/n$. The [LCOE]{.lx-term term="lcoe"} is the steady price $p$ at which the plant's discounted sales repay everything, so its net present value is zero. With $E = \mathrm{CF} \times 8{,}760 / 1{,}000$ MWh made per kW each year (the [capacity factor]{.lx-term term="capacity-factor"} from [lesson 5](index.html#lesson-5)):
+When $r = 0$ the [capital recovery factor]{.lx-term term="capital-recovery-factor"} is simply $1/n$. The [LCOE]{.lx-term term="lcoe"} is the steady price $p$ at which the plant's discounted sales repay everything, so its net present value is zero. With $E = \mathrm{CF} \times 8{,}760 / 1{,}000$ MWh made per kW each year (the [capacity factor]{.lx-term term="capacity-factor"} from [lesson 5](05-capacity-factor.html)):
 
 $$\mathrm{LCOE} = \frac{\mathrm{CRF}\cdot C + \mathrm{FOM}}{E} + \text{fuel} + \mathrm{VOM},$$
 

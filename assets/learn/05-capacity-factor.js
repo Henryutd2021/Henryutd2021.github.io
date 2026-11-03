@@ -2,21 +2,20 @@
 //
 // Data: assets/learn/data/town_year.json (every hour of 2025 on the Southwest Power Pool grid, EIA-930, as shapes),
 // assets/learn/data/cf_targets.json (shared: EIA Electric Power Monthly, Table 6.07.B, 2025 annual capacity factors) and
-// assets/learn/data/05-capacity-factor.json (the 2025 monthly capacity factors, the solar day, the illustrative turbine).
+// assets/learn/data/05-capacity-factor.json (the solar day, the illustrative turbine; the 2025 monthly capacity factors are
+// in cf_targets.json, monthly).
 //
 // IMPORTANT data rule. The wind and solar shapes in town_year.json are each divided by their own 2025 maximum hour, so
-// their mean is not a capacity factor (wind 0.528, solar 0.238). profile() turns a shape into a plant's output with the
+// their mean is not a capacity factor (wind 0.528, solar 0.235). profile() turns a shape into a plant's output with the
 // shared helper (assets/learn/components/profiles.js: LX.cfScale, LX.townProfile), method "power": output = size x s^g,
 // so the best hours reach the plant's size and the year's capacity factor equals the 2025 U.S. average. "power" rather
 // than "scale" because this lesson shows output against nameplate: with "scale", the SPP wind shape scaled down to 33.8%
 // never passes 64% of the farm's size, which reads as "a 100 MW farm cannot make 100 MW", the opposite of the point
-// (it can; it rarely does). Two lesson-local steps come first (requested for the shared helper in the sidecar):
-//   (1) solar hours with the sun below the horizon across the SPP region are set to zero (sunUp): the shape reports
-//       night-time output from 18 February to 21 March 2025 and on a few other nights, which is telemetry error;
-//   (2) each month is brought to the U.S. monthly capacity factor (LX.cfScale, "power", per month), because the SPP
-//       shapes contain the fleets' growth during 2025 (solar's January maximum is 0.56 of its November maximum);
-// then LX.townProfile sets the annual capacity factor exactly. Nuclear has no shape: it runs at full size except for
-// one illustrative refuelling outage sized to the same target.
+// (it can; it rarely does). Each month is first brought to the U.S. monthly capacity factor (the helper's monthlyCF
+// option, EIA's 2025 monthly values in cf_targets.json), because the SPP shapes contain the fleets' growth during 2025
+// (solar's January maximum is 0.56 of its November maximum); then the annual capacity factor is set exactly. Night-time
+// solar telemetry is zero in town_year.json itself (scripts/build_learn_town_data.py). Nuclear has no shape: it runs at
+// full size except for one illustrative refuelling outage sized to the same target.
 //
 // Model (closed form):
 //   capacity factor  CF = E / (P x T)      E energy made (MWh), P size (MW), T hours in the period
@@ -37,40 +36,16 @@
     if (typeof window !== "undefined" && window.LX && window.LX.townProfile) return window.LX;
     return require("./components/profiles.js");
   }
-  // Is the sun above the horizon at some point of the hour, somewhere in the region (D.solarClean: a latitude and
-  // longitude box)? Hour index i: 00:00 Central standard time on 1 January 2025 + i hours. Simple solar geometry
-  // (declination from the day of the year, no equation of time; the box's corners cover the error).
-  function sunUp(i, box) {
-    var rad = Math.PI / 180, day = Math.floor(i / 24) + 1, h0 = i % 24, decl = 23.44 * Math.sin(2 * Math.PI * (284 + day) / 365) * rad, best = -90;
-    [h0, h0 + 1].forEach(function (h) {
-      [box.latS, box.latN].forEach(function (la) {
-        [box.lonW, box.lonE].forEach(function (lo) {
-          var H = 15 * (h + (lo + 90) / 15 - 12) * rad, phi = la * rad;
-          best = Math.max(best, Math.asin(Math.sin(phi) * Math.sin(decl) + Math.cos(phi) * Math.cos(decl) * Math.cos(H)) / rad);
-        });
-      });
-    });
-    return best > 0;
-  }
   // hourly output (MW) of a plant of size mw over the year, with annual capacity factor cf (see the header).
+  // monthlyCF: 12 monthly capacity factors (cf_targets.json monthly[tech]) or null for an annual-only scaling
   function profile(year, tech, mw, cf, D, monthlyCF) {
-    var out = new Array(HOURS), t, HP = helper();
+    var out = new Array(HOURS), t;
     if (tech === "nuclear") {
       var nu = D.nuclear, a = nu.outageStartDay * 24, b = a + nu.outageHours;
       for (t = 0; t < HOURS; t++) out[t] = t >= a && t < b ? 0 : mw;
       return out;
     }
-    var shape = year[tech].map(function (x, i) { return tech === "solar" && D.solarClean && !sunUp(i, D.solarClean) ? 0 : x; });
-    if (monthlyCF) {
-      var t0 = 0;
-      D.year.monthDays.forEach(function (d, m) {
-        var seg = shape.slice(t0, t0 + d * 24), g = HP.cfScale(seg, monthlyCF[m], "power");
-        for (var h = 0; h < seg.length; h++) shape[t0 + h] = seg[h] > 0 ? 1000 * Math.pow(Math.min(1, seg[h] / 1000), g) : 0;
-        t0 += d * 24;
-      });
-    }
-    var y = {}; y[tech] = shape;
-    return HP.townProfile(tech, mw, { year: y, annualCF: cf, method: "power" }).mw;
+    return helper().townProfile(tech, mw, { year: year, annualCF: cf, method: "power", monthlyCF: monthlyCF || null, monthDays: D.year.monthDays }).mw;
   }
   function sum(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s; }
   function capacityFactor(outputs, mw) { return sum(outputs) / (mw * outputs.length); }
@@ -112,7 +87,7 @@
   function world(year, D, CT) {
     var P = D.plantMW, T = targets(CT), w = { T: T };
     ["nuclear", "wind", "solar"].forEach(function (k) {
-      var out = profile(year, k, P, T[k], D, k === "nuclear" ? null : D.monthly_2025[k]), E = sum(out);
+      var out = profile(year, k, P, T[k], D, k === "nuclear" ? null : CT.monthly[k]), E = sum(out);
       w[k] = { out: out, energy: E, cf: E / (P * HOURS), max: Math.max.apply(null, out), monthly: monthly(out, P, D.year.monthDays),
                perMW: annualEnergy(1, T[k]), homesPerMW: homes(annualEnergy(1, T[k]), D.homes.kwhPerHomeYear) };
     });
@@ -123,7 +98,7 @@
     w.applyMWh = annualEnergy(D.apply.mw, T.wind);
     return w;
   }
-  var model = { HOURS: HOURS, sunUp: sunUp, profile: profile, capacityFactor: capacityFactor, annualEnergy: annualEnergy, monthly: monthly,
+  var model = { HOURS: HOURS, profile: profile, capacityFactor: capacityFactor, annualEnergy: annualEnergy, monthly: monthly,
                 dayIndex: dayIndex, day: day, levels: levels, levelled: levelled, power: power, windPower: windPower, homes: homes, targets: targets, world: world, sum: sum };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -429,10 +404,10 @@
       show();
     }
     var cards = LX.StepCards(live, { id: "t5-steps", steps: steps });
-    // screenshot and demo hook: #lx-demo-<n> opens step n (1-8) with its action done (scripts/learn_screenshots.mjs, state "mid";
-    // plain #lx-demo opens step 3). Readers never see it unless they type the hash.
-    root.lxDemo = function (n) {
-      var i = Math.max(0, Math.min(steps.length - 1, (n || 3) - 1)), el = function () { return cards.el; };
+    // demo states (core.js LX.demo): "step-N" opens step N (1-8) with its action done; "mid" = step 3
+    LX.demo(root, function (state) {
+      var n = state === "mid" ? 3 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
+      var i = Math.max(0, Math.min(steps.length - 1, n - 1)), el = function () { return cards.el; };
       var click = function (sel, k) { var b = el().querySelectorAll(sel)[k || 0]; if (b) b.click(); };
       pred = "nuclear"; KEYS.forEach(function (k) { seen[k] = true; }); level = Math.round(W.dayAvg);
       cards.go(i);
@@ -441,9 +416,8 @@
       if (i === 3 || i === 7) click(".lx-choice", 0);
       if (i === 4 || i === 5) click(".lx5-wrow .lx-btn");
       if (i === 6) { click(".lx-choice", 0); click(".lx-choice", 1); click(".lx-choice", 2); }
-    };
-    var dm = /^#lx-demo(?:-(\d+))?$/.exec(location.hash);
-    if (dm) setTimeout(function () { root.lxDemo(dm[1] ? +dm[1] : 3); }, 50);
+      return { view: "step " + (i + 1) };
+    }, cards);
     buildExplain(W, D);
   }
 

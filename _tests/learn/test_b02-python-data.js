@@ -82,8 +82,7 @@ ok(M.runs(R.cols.solar, 3).some(r => r.start === lr.start + lr.len), "plot: a se
 // ---------------- physics: solar at night
 const nbR = M.nightBad(R, R.cols.solar), nbC = M.nightBad(C, C.cols.solar), mR = M.mask(R.cols.solar, 3), cl = M.cluster(C, nbC);
 ok(nbR.length === 214 && nbR.filter(i => mR[i]).length === 198, "night: raw 214 hours, 198 already flagged as repeats (pandas: 214, 198)");
-ok(nbC.length === 64 && cl.from === "2025-02-20" && cl.to === "2025-03-14" && cl.hours === 54, "night: cleaned 64 hours, 54 of them 20 February to 14 March (pandas: 64)");
-ok(nbC.filter(i => !mR[i]).length === 15 && nbC.filter(i => mR[i]).length === 49, "night: of the cleaned 64, 15 kept from the raw data and 49 written by the fill (Go deeper text)");
+ok(nbC.length === 0 && cl === null, "night: the cleaned file has no failing hour (the data build's night rule; pandas: 0)");
 let wob = 0; for (let i = 0; i < 8760; i++) { const L = M.local(M.beginning(R, i)); if (((L.m === 2 && L.d >= 20) || (L.m === 3 && L.d <= 14)) && L.h === 12 && R.cols.solar[i] < 300) wob++; }
 ok(wob >= 20, "night: in that window raw solar at noon stays under 300 MW, barely different from night ('barely changed between day and night')");
 
@@ -100,22 +99,22 @@ const sd = M.sortedDesc(P.demand);
 ok(sd.every((v, i) => i === 0 || v <= sd[i - 1]) && sd[0] === 450, "duration: sorted from highest to lowest, starting at the 450 MW peak");
 ok(M.hoursAbove(P.demand, 0.9 * 450) === 180 && M.hoursAbove(P.demand, 0.95 * 450) === 54, "duration: 180 hours above 90% and 54 above 95% (pandas: 180)");
 const cfW = M.capacityFactor(P.wind, 150), cfS = M.capacityFactor(P.solar, 200);
-ok((cfW * 100).toFixed(1) === "52.8" && (cfS * 100).toFixed(1) === "23.8", "capacity factor: wind 52.8%, solar 23.8% (pandas: same)");
+ok((cfW * 100).toFixed(1) === "52.8" && (cfS * 100).toFixed(1) === "23.5", "capacity factor: wind 52.8%, solar 23.5% (pandas: same)");
 ok(near(cfW, YEAR.wind.reduce((s, v) => s + v, 0) / 8760 / 1000, 1e-12), "capacity factor: equals the mean shape (the farm is sized at SPP's best hour)");
 
 // ---------------- asserts on both files
 const kR = M.checks(R), kC = M.checks(C);
 ok(kR.map(c => c.ok).join() === "true,true,false,false,false", "asserts: raw fails spike, repeats and night (3 of 5)");
-ok(kC.map(c => c.ok).join() === "true,true,true,true,false", "asserts: cleaned fails only the night check (1 of 5)");
+ok(kC.every(c => c.ok), "asserts: the cleaned file passes all five");
 ok(M.ASSERTS.length === 5 && M.ASSERTS.every(a => NBSRC.indexOf(a.id === "rows" ? "len(d) == 8760" : a.id === "gaps" ? "notna().all().all()" : a.id === "spike" ? "0.5 * d[\"demand\"].median()" : a.id === "repeat" ? "longest_repeat(d).max() < 6" : "bad_night(d).sum() == 0") >= 0),
   "asserts: the five page asserts are the notebook's five rules");
 
 // ---------------- the page states the model's numbers
 [["1,505 MW", dD.min === 1505], ["8,760 rows", R.n === 8760], ["363 days of 24 hours", ls.hist[24] === 363], ["671 wind hours and 1,377 solar hours", true],
- ["155 hours", lr.len === 155], ["617 MW", lr.value === 617], ["214 hours in the raw file, 64 still in the cleaned file", nbR.length === 214 && nbC.length === 64],
- ["March (70.7 GWh)", true], ["September (45.1 GWh)", true], ["90% of its peak for 180 hours", true], ["52.8% (wind) and 23.8% (solar)", true],
- ["fails 3 of 5 asserts; the cleaned file fails 1", true], ["54.4 GW", true], ["29 July", pk.date === "2025-07-29"], ["1,377 h", true], ["180 h", true],
- ["15 kept from the raw data and 49 written by the fill", true], ["150 MW wind, 200 MW solar, 450 MW demand", true]].forEach(x =>
+ ["155 hours", lr.len === 155], ["617 MW", lr.value === 617], ["214 hours in the raw file, none in the cleaned file", nbR.length === 214 && nbC.length === 0],
+ ["March (70.7 GWh)", true], ["September (45.1 GWh)", true], ["90% of its peak for 180 hours", true], ["52.8% (wind) and 23.5% (solar)", true],
+ ["fails 3 of 5 asserts; the cleaned file passes all 5", kR.filter(c => !c.ok).length === 3 && kC.every(c => c.ok)], ["54.4 GW", true], ["29 July", pk.date === "2025-07-29"], ["1,377 h", true], ["180 h", true],
+ ["150 MW wind, 200 MW solar, 450 MW demand", true]].forEach(x =>
   ok(has(x[0]) && x[1], `page: states "${x[0]}" and the model agrees`));
 
 // ---------------- notebook: clean, runnable outside any repository, same checks
@@ -123,7 +122,7 @@ ok(NB.nbformat === 4 && NB.metadata.kernelspec.name === "python3", "notebook: nb
 ok(NB.cells.every(c => c.cell_type !== "code" || (c.outputs.length === 0 && c.execution_count === null)), "notebook: shipped without outputs");
 const asserts = NB.cells.filter(c => c.cell_type === "code" && /^# auto-check/.test(c.source.join("")));
 ok(asserts.length >= 9, `notebook: at least nine auto-check cells (${asserts.length})`);
-["671", "1377", "== 1505", "{24: 363, 23: 1, 25: 1}", "== 214", "== 198", "== 64", "== 180", "70.7", "45.1", "52.8", "23.8", "155"].forEach(s => ok(NBSRC.indexOf(s) >= 0, `notebook: checks ${s}`));
+["671", "1377", "== 1505", "{24: 363, 23: 1, 25: 1}", "== 214", "== 198", "int(bad.sum()) == 0", "== 180", "70.7", "45.1", "52.8", "23.5", "155"].forEach(s => ok(NBSRC.indexOf(s) >= 0, `notebook: checks ${s}`));
 ['tz_convert("America/Chicago")', "(s != s.shift()).cumsum()", 'resample("MS").sum() / 1000', 'resample("D").mean()', "sort_values(ascending=False)", "d.index.hour < 4", 'pd.Timedelta(hours=1)'].forEach(s =>
   ok(NBSRC.indexOf(s) >= 0 && JS.indexOf(s.replace("d.index", "df.index")) >= 0, `notebook and page show the same pandas step: ${s}`));
 ok(!/colab\.research\.google\.com|github\.com/.test(NBSRC + QMD), "notebook: no Colab or repository links yet (a labs repository comes later)");

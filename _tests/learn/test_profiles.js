@@ -45,12 +45,22 @@ ok(ws.k < 1 && ws.peakFrac < 0.7, `wind scale: the documented consequence holds 
 // a higher target forces clipping with "scale"
 const hi = P.townProfile("solar", 100, { year, annualCF: 0.3 });
 ok(hi.k > 1 && hi.clippedHours > 0 && near(mean(hi.mw) / 100, 0.3), `solar scale to 30%: clipped ${hi.clippedHours} hours, capacity factor exact`);
+// monthlyCF: each month first brought to EIA's monthly value, then the year to the annual target (both methods)
+["power", "scale"].forEach(method => ["wind", "solar"].forEach(tech => {
+  const mp = P.townProfile(tech, 100, { year, targets: T, method, monthlyCF: true });
+  ok(near(mean(mp.mw) / 100, T.targets[tech].cf) && mp.monthly.length === 12 && mp.monthlyTargets.join() === T.monthly[tech].join(),
+     `monthlyCF ${tech} (${method}): annual ${(100 * mean(mp.mw) / 100).toFixed(1)}% exact; 12 monthly values reported`);
+  const worst = Math.max(...mp.monthly.map((v, i) => Math.abs(v - T.monthly[tech][i])));
+  ok(worst < 0.01, `monthlyCF ${tech} (${method}): every month within 1 point of EIA's (worst ${(100 * worst).toFixed(2)})`);
+}));
+ok(P.monthDays({ start_utc: "2024-01-01T06:00:00" })[1] === 29 && P.monthDays(year)[1] === 28, "monthDays: leap years");
 // errors
 const bad = (f, rx, m) => { let e = null; try { f(); } catch (x) { e = x; } ok(e && rx.test(e.message), m); };
 bad(() => P.townProfile("solar", 100, { year, annualCF: 0.7 }), /out of reach/, "error: a solar target above the share of daylight hours");
 bad(() => P.townProfile("coal", 100, { year, annualCF: 0.3 }), /tech/, "error: unknown technology");
 bad(() => P.townProfile("wind", 100, { annualCF: 0.3 }), /opts\.year/, "error: no year data");
 bad(() => P.townProfile("wind", 100, { year }), /annualCF/, "error: no target");
+bad(() => P.townProfile("wind", 100, { year, annualCF: 0.3, monthlyCF: [0.3] }), /12 values/, "error: monthlyCF with the wrong length");
 console.log(`  wind scale k ${ws.k.toFixed(4)} (peak ${(100 * ws.peakFrac).toFixed(1)}%), wind power gamma ${P.townProfile("wind", 1, { year, targets: T, method: "power" }).gamma.toFixed(3)}, solar scale k ${P.townProfile("solar", 1, { year, targets: T }).k.toFixed(4)}`);
 console.log(`${checks} checks, ${fails} failed`);
 process.exit(fails ? 1 : 0);

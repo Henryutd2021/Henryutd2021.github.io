@@ -449,9 +449,11 @@
     }
 
     var cards = LX.StepCards(live, { steps: steps, onStep: function (i) { if (i === steps.length - 1) LX.progress.done(LESSON); } });
-    // screenshots and curious readers: "#lx-step-N" opens step N (1-based) with its action done
-    var m = /^#lx-step-(\d+)$/.exec(location.hash || "");
-    if (m) demo(+m[1] - 1);
+    // demo states (core.js LX.demo): "step-N" (or the address #lx-step-N) opens step N with its action done; "mid" = step 3
+    LX.demo(root, function (state) {
+      var n = state === "mid" ? 3 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
+      demo(Math.min(steps.length, n) - 1); return { view: "step " + n };
+    }, cards);
     function demo(i) {
       cards.go(i);
       var card = cards.el;

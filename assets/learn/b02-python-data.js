@@ -452,10 +452,12 @@
             H("p", { class: "b2-big", text: "Raw: " + nbR.length + " night hours fail" }, res);
             H("p", { class: "k", text: "The repeat rule (N = 3) had already flagged " + caughtR + " of them." }, res);
           } else {
-            H("p", { class: "b2-big", text: "Cleaned: " + nbC.length + " night hours still fail" }, res);
-            H("p", { class: "k", text: cl.hours + " of them fall between " + dayLabel(cl.from) + " and " + dayLabel(cl.to) + "." }, res);
+            H("p", { class: "b2-big", text: "Cleaned: " + nbC.length + " night hours " + (nbC.length ? "still fail" : "fail") }, res);
+            H("p", { class: "k", text: nbC.length ? cl.hours + " of them fall between " + dayLabel(cl.from) + " and " + dayLabel(cl.to) + "." :
+              "The data build adds a physics rule: solar is set to zero in night hours." }, res);
           }
-          if (done.raw && done.clean) { api.done(); api.saw("In those weeks raw solar barely changed between day and night yet never repeated exactly, so no repeat rule saw it, and the gap-filling copied it. No single rule catches everything: combine range, repeat and physics checks."); }
+          if (done.raw && done.clean) { api.done(); api.saw(nbC.length ? "In those weeks raw solar barely changed between day and night yet never repeated exactly, so no repeat rule saw it, and the gap-filling copied it. No single rule catches everything: combine range, repeat and physics checks." :
+            "In late winter raw solar barely changed between day and night yet never repeated exactly, so no repeat rule saw it; the cleaned file passes only because its build adds the physics rule. No single rule catches everything: combine range, repeat and physics checks."); }
         }
         bR.addEventListener("click", function () { show("raw"); }); bC.addEventListener("click", function () { show("clean"); });
         code(act, ["night = df.index.hour < 4  # hours starting 00:00 to 03:00, local time", 'bad = night & (df["solar"] > 0.05 * df["solar"].max())  # sun down, yet over 5% of the peak', "bad.sum()"]);
@@ -523,7 +525,7 @@
           (which === "raw" ? kR : kC).forEach(function (r, i) { var c = cells[i][which === "raw" ? 0 : 1]; c.className = r.ok ? "b2-ok" : "b2-bad"; c.textContent = (which === "raw" ? "raw: " : "cleaned: ") + (r.ok ? "pass" : "FAIL") + " · " + r.detail; });
           if (ran.raw && ran.clean) {
             var fR = kR.filter(function (r) { return !r.ok; }).length, fC = kC.filter(function (r) { return !r.ok; }).length;
-            api.done(); api.saw("The raw file fails " + fR + " of 5; the cleaned file fails " + fC + ", the night check. A failing assert is doing its job: it stops the run until someone decides what to do. The notebook shows one fix.");
+            api.done(); api.saw("The raw file fails " + fR + " of 5; the cleaned file " + (fC ? "fails " + fC + ", the night check" : "passes all five") + ". A failing assert is doing its job: it stops the run until someone decides what to do.");
           }
         }
         bR.addEventListener("click", function () { run("raw"); }); bC.addEventListener("click", function () { run("clean"); });
@@ -579,15 +581,16 @@
   LX.mount("python-data", function (live, data, root) {
     injectCSS();
     root.lxLesson = view(live, data);
-    // screenshot hook: learn/b02-python-data.html#lx-demo-N plays steps 1..N with their actions (#lx-demo = step 4 at N = 3)
-    var m = /^#lx-demo(?:-(\d))?$/.exec(location.hash);
-    if (m) setTimeout(function () {
-      var card = live.querySelector(".lx-stepcard"), upto = +(m[1] || 4);
+    // demo states (core.js LX.demo): "step-N" plays steps 1..N with their actions; "mid" = step 4 at N = 3
+    LX.demo(root, function (state) {
+      var upto = state === "mid" ? 4 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!upto) return null;
+      var card = live.querySelector(".lx-stepcard");
       var q = function (sel, i) { return card.querySelectorAll(sel)[i || 0]; }, click = function (el) { if (el) el.click(); };
       var acts = [function () { click(q(".lx-step-act .lx-btn")); }, function () { click(q(".b2-cell", 9)); }, function () { click(q(".lx-seg button", 2)); },
         function () { click(q(".lx-ctl-row button", 1)); }, function () { click(q(".lx-step-act > .lx-btn")); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); },
         function () { click(q(".lx-seg button", 1)); click(q(".lx-seg button", 2)); }, function () { click(q(".lx-step-act > .lx-btn")); }, function () { click(q(".b2-pills .lx-btn", 0)); click(q(".b2-pills .lx-btn", 1)); }];
       for (var k = 0; k < upto && k < acts.length; k++) { acts[k](); if (k < upto - 1) click(q(".lx-step-foot .lx-btn:not(.ghost)")); }
-    }, 60);
+      return { view: "step " + Math.min(upto, acts.length) };
+    });
   });
 })();

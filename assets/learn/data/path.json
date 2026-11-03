@@ -365,7 +365,7 @@
     "power and energy over a year",
     "the wind power curve and the cube law"
    ],
-   "lab": "compute capacity factors from a year of hourly data in Python (bridge B2, upcoming).",
+   "lab": "compute capacity factors from a year of hourly data in Python (bridge B2).",
    "href": "05-capacity-factor.html",
    "ready": true,
    "after": [

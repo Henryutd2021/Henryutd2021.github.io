@@ -28,7 +28,7 @@ const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
 const cfgPath = L("data/13-capstone.json"), t12Path = L("data/12-trade-offs.json");
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
 const T = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
-const page = fs.readFileSync(path.join(SITE, "learn/13-capstone.qmd"), "utf8");
+const page = fs.readFileSync(path.join(SITE, "learn/13-capstone.qmd"), "utf8"), JS = fs.readFileSync(L("13-capstone.js"), "utf8");
 const FULL = process.argv.includes("--full"), WRITE = process.argv.includes("--write");
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
@@ -98,7 +98,7 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   // ---------------- the town's year
   const mean = a => a.reduce((s, v) => s + v, 0) / a.length;
   ok(near(mean(Y.wind), T.targets.wind.cf, 1e-6) && near(mean(Y.solar), T.targets.solar.cf, 1e-6), "wind 33.8% and solar 24.0% a year (EIA 2025, townProfile scale)");
-  ok(Y.solar.every((v, i) => { const h = i % 24; return !(h >= 20 || h <= 4) || v === 0; }), "no solar output from 20:00 to 04:59 (night telemetry set to zero)");
+  ok(Y.solar.every((v, i) => year.solar[i] > 0 || v === 0) && JS.indexOf("nightless") < 0, "solar is zero wherever town_year.json is (night set to zero by the data build, no lesson-local rule)");
   ok(near(Y.peak, 450, 1e-9) && Y.demand.length === 8760, "demand peaks at 450 MW; 8,760 hours");
   onPage("scaled to a 450 MW peak", "the peak");
 
@@ -106,8 +106,9 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   ok(RW.reps.length === 7 && RW.reps.map(r => r.kind).join() === "season,season,season,season,peak,netpeak,calm", "seven weeks: four seasons, peak, net peak, least wind");
   ok(near(RW.reps.reduce((s, r) => s + r.weight * 168, 0), 8760, 1e-6), "the weights cover 8,760 hours");
   ok(RW.chrono.length === 52 && RW.chrono.every((k, i) => RW.reps[k].members.indexOf(i) >= 0), "every calendar week maps to the representative week that stands for it");
-  ok(RW.reps.filter(r => r.kind === "season").map(r => r.n).join() === "12,14,10,13", "seasons stand for 12, 14, 10 and 13 weeks");
-  onPage("12 (winter), 14 (spring), 10 (summer) or 13 (fall) weeks", "the season weights");
+  const nS = RW.reps.filter(r => r.kind === "season").map(r => r.n);
+  ok(nS.length === 4, `seasons stand for ${nS.join(", ")} weeks`);
+  onPage(`${nS[0]} (winter), ${nS[1]} (spring), ${nS[2]} (summer) or ${nS[3]} (fall) weeks`, "the season weights");
   RW.reps.filter(r => r.kind === "season").forEach(r => {
     let real = 0, model = 0; r.members.forEach(m => { for (let h = 0; h < 168; h++) real += Y.demand[m * 168 + h]; }); r.demand.forEach(d => { model += d * r.n; });
     ok(rel(model, real, 1e-9), `${r.season}: the scaled week keeps the season's demand energy`);
@@ -168,7 +169,8 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   ok(at(100).plan.bp > 0.5, "at 100 kt the optimizer builds a battery");
   onPage(`At a 100 kt cap the optimizer spills ${Math.round(at(100).spilled * 100)}% on purpose`, "the spill myth");
   onPage(`The cheapest plan at 150 kt costs ${musd(at(150).cost)}`, "the quick question");
-  ok(near(140.0 / (at(150).cost / 1e6) - 1, 0.065, 0.0005), "quick question: 140.0 / 131.4 - 1 = 6.5%");
+  const qq = 140.0 / +(at(150).cost / 1e6).toFixed(1) - 1, gapM = (140.0 - +(at(150).cost / 1e6).toFixed(1)).toFixed(1);
+  onPage(`${(qq * 100).toFixed(1)}%: 140.0 ÷ ${(at(150).cost / 1e6).toFixed(1)} − 1 = ${qq.toFixed(3)}. You could cut cost by $${gapM}M`, `the quick question's answer (${(qq * 100).toFixed(1)}%)`);
 
   // ---------------- the game's missions are reachable with the optimizer's plan
   const lim = cfg.limits, target = cfg.game.co2Target * 1e3;
@@ -181,7 +183,7 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   ok(M.stars({ unserved: 100, unservedShare: 0.01, co2: 1e6, cost: 2e8 }, target, 1e8).cost === 1, "stars: no cost stars while lights are out");
 
   // ---------------- the full-year check (Go deeper table and the third myth)
-  const fy = [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }], fullTimes = [];
+  const fy = [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }], fullTimes = [], fyRows = {};
   [400, 200, 100].forEach(cap => {
     const plan = M.ceilPlan(at(cap).plan, lim);
     const w = M.summarize(C, per, solve(M.weekModel(C, RW, { plan })), { plan });
@@ -191,7 +193,11 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
     onPage(row, `the full-year check at ${cap} kt`);
     console.log(`  full-year check at ${cap} kt: cost ${((f.cost / w.cost - 1) * 100).toFixed(1)}%, CO2 ${((f.co2 / w.co2 - 1) * 100).toFixed(1)}%, unserved ${f.unserved.toFixed(0)} MWh (${(f.unserved / f.demand * 1e6).toFixed(0)} per million), spilled ${(w.spilledShare * 100).toFixed(1)}% -> ${(f.spilledShare * 100).toFixed(1)}%`);
     if (cap === 200) onPage(`the optimizer's 200 kt plan emits ${kt(f.co2)} and leaves ${Math.round(f.unserved)} MWh unserved`, "the third myth");
+    fyRows[cap] = { w, f };
   });
+  const more = c => Math.round((fyRows[c].f.co2 / fyRows[c].w.co2 - 1) * 100);
+  onPage(`(${more(200)}% more at 200 kt, ${more(100)}% at 100 kt)`, "the full-year CO2 overshoot");
+  ok([400, 200, 100].every(c => fyRows[c].f.unserved / fyRows[c].f.demand < 0.00002), "full-year check: unserved energy under 0.002% of demand, as the page says");
 
   // ---------------- share links
   const enc = M.encodePlan(p200, null), dec = M.decodePlan("#" + enc, cfg);

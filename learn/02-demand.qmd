@@ -109,7 +109,7 @@ With a solar farm of $S$ MW whose output follows the shape $s_t$ (a share of its
 
 $$n_t = d_t - S\,s_t, \qquad \text{steepest climb} = \max_t \big(n_{t+3} - n_t\big).$$
 
-The load-duration curve throws the time order away. That is fine for asking how many hours each MW is needed, but not for anything with memory: a battery's charge, a plant's ramp limit and the duck's evening neck all depend on which hour follows which. Planning models therefore run full chronological years, or a few representative days chained in order with the extreme days kept. The Modeler tier (upcoming) states those rules, and [lesson 9](index.qmd#lesson-9) (upcoming) lets storage fill the duck's belly.
+The load-duration curve throws the time order away. That is fine for asking how many hours each MW is needed, but not for anything with memory: a battery's charge, a plant's ramp limit and the duck's evening neck all depend on which hour follows which. Planning models therefore run full chronological years, or a few representative days chained in order with the extreme days kept. The Modeler tier (upcoming) states those rules, and [lesson 9](09-storage.qmd) lets storage fill the duck's belly.
 
 ```{=html}
 </div>
@@ -252,13 +252,6 @@ The load-duration curve throws the time order away. That is fine for asking how 
 .t2-anno li b { display: block; font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
 .t2-anno li span { font-size: 14.5px; color: var(--lx-ink-2); }
 @media (max-width: 760px) { .t2-months { grid-template-columns: repeat(6, minmax(0, 1fr)); } .t2-anno { grid-template-columns: minmax(0, 1fr); } }
-/* text-heavy comparison table: on phones each row becomes a card with labelled lines (shared CompareTable assumes numbers) */
-@media (max-width: 640px) {
-  .t2-tt .lx-ctable tr { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .t2-tt .lx-ctable .rank { display: none; }
-  .t2-tt .lx-ctable td[data-label] { text-align: left; font-size: 14.5px; }
-  .t2-tt .lx-ctable td.ph { display: block; }
-}
 </style>
 <script src="../assets/learn/learn.js" defer></script>
 <script src="../assets/learn/02-demand.js" defer></script>

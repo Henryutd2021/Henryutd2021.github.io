@@ -407,12 +407,13 @@
     var cards = LX.StepCards(live, { id: "l3-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
     draw(false); store();
     // hooks for the screenshot script ("mid": one interaction done) and for curious readers in the console
-    root.lxDemo = function (state) {
+    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus agc and uri
       if (state === "mid") { S_.tripped = true; S_.gov = true; S_.reserve = 30; tryLow = true; cards.go(4); }
-      if (state === "agc") { S_.tripped = true; S_.gov = true; S_.agc = true; cards.go(5); }
-      if (state === "uri") { S_.tripped = true; S_.gov = true; cards.go(7); }
-      return S_;
-    };
+      else if (state === "agc") { S_.tripped = true; S_.gov = true; S_.agc = true; cards.go(5); }
+      else if (state === "uri") { S_.tripped = true; S_.gov = true; cards.go(7); }
+      else return null;
+      return { view: state };
+    }, cards);
     root.lxModel = { model: model, data: D, state: function () { return S_; } };
     buildExplain(D);
   }

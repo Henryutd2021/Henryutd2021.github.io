@@ -45,11 +45,11 @@ body-classes: "page-learn page-lesson lx-form-play"
 <thead><tr><th scope="col">CO₂ cap a year</th><th scope="col">Cost a year</th><th scope="col">Wind</th><th scope="col">Solar</th><th scope="col">Gas (CC + peaker)</th><th scope="col">Nuclear</th><th scope="col">Battery</th></tr></thead>
 <tbody>
 <tr><td>none (792 kt)</td><td>$102.9M</td><td>0 MW</td><td>33 MW</td><td>425 MW</td><td>0 MW</td><td>0 MW</td></tr>
-<tr><td>600 kt</td><td>$109.2M</td><td>169 MW</td><td>72 MW</td><td>369 MW</td><td>0 MW</td><td>0 MW</td></tr>
-<tr><td>400 kt</td><td>$117.0M</td><td>344 MW</td><td>115 MW</td><td>325 MW</td><td>0 MW</td><td>0 MW</td></tr>
-<tr><td>200 kt</td><td>$126.6M</td><td>530 MW</td><td>156 MW</td><td>281 MW</td><td>0 MW</td><td>2 MW</td></tr>
-<tr><td>100 kt</td><td>$140.2M</td><td>652 MW</td><td>215 MW</td><td>250 MW</td><td>0 MW</td><td>16 MW</td></tr>
-<tr><td>0 kt</td><td>$268.5M</td><td>220 MW</td><td>504 MW</td><td>0 MW</td><td>159 MW</td><td>202 MW</td></tr>
+<tr><td>600 kt</td><td>$108.8M</td><td>181 MW</td><td>55 MW</td><td>367 MW</td><td>0 MW</td><td>0 MW</td></tr>
+<tr><td>400 kt</td><td>$117.3M</td><td>389 MW</td><td>50 MW</td><td>341 MW</td><td>0 MW</td><td>0 MW</td></tr>
+<tr><td>200 kt</td><td>$129.3M</td><td>576 MW</td><td>100 MW</td><td>302 MW</td><td>0 MW</td><td>15 MW</td></tr>
+<tr><td>100 kt</td><td>$143.1M</td><td>649 MW</td><td>216 MW</td><td>280 MW</td><td>0 MW</td><td>28 MW</td></tr>
+<tr><td>0 kt</td><td>$288.5M</td><td>220 MW</td><td>59 MW</td><td>0 MW</td><td>330 MW</td><td>62 MW</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">With JavaScript on, you choose the plants yourself, run the year in a solver and ask it for the cheapest plan under a CO₂ cap.</p>
@@ -81,7 +81,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 
 ```{=html}
 <div class="lx-deepers">
-<style>/* lesson-local: keep Go deeper text inside the card on phones; wide equations and tables scroll on their own */.page-lesson .lx-deeper-body{grid-template-columns:minmax(0,1fr)}.page-lesson .lx-deeper-body .math.display{display:block;overflow-x:auto;overflow-y:hidden}.page-lesson .lx-deeper-body table{display:block;overflow-x:auto}.lx13-fallback td,.lx13-fallback th{font-size:13.5px}</style>
+<style>/* lesson-local */.lx13-fallback td,.lx13-fallback th{font-size:13.5px}</style>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>The capstone as a linear program</summary>
 <div class="lx-deeper-body">
@@ -120,7 +120,7 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 <div class="lx-deeper-body">
 ```
 
-Each season's [representative week]{.lx-term term="representative-period"} is its medoid: the real week closest, hour by hour, to all the season's other weeks, scaled so the season keeps its demand, wind and solar energy. It stands for 12 (winter), 14 (spring), 10 (summer) or 13 (fall) weeks. Three weeks are kept as they were: the year's peak demand, the peak of demand minus wind and sun, and the least wind.
+Each season's [representative week]{.lx-term term="representative-period"} is its medoid: the real week closest, hour by hour, to all the season's other weeks, scaled so the season keeps its demand, wind and solar energy. It stands for 11 (winter), 14 (spring), 11 (summer) or 13 (fall) weeks. Three weeks are kept as they were: the year's peak demand, the peak of demand minus wind and sun, and the least wind.
 
 The battery's level is linked across the calendar (after Kotzur and co-authors, 2018): week $i$ starts at $S_i$, and its representative week $k$ adds its net change $\Delta_k$, so $S_{i+1} = S_i + \Delta_k$; its lowest and highest swing, $\ell_k$ and $h_k$, must keep $0 \le S_i + \ell_k$ and $S_i + h_k \le K_\mathrm{be}$. The year ends where it began.
 
@@ -128,11 +128,11 @@ The check: the optimizer's plans, rounded up to the sliders' steps, re-run hour 
 
 | Plan | Cost, 7 weeks | Cost, full year | CO₂, 7 weeks | CO₂, full year | Unserved, full year |
 |---|---|---|---|---|---|
-| Optimizer at 400 kt | $118.8M | $118.9M | 390 kt | 391 kt | 0 MWh |
-| Optimizer at 200 kt | $128.6M | $130.1M | 189 kt | 208 kt | 67 MWh |
-| Optimizer at 100 kt | $142.4M | $145.2M | 95 kt | 128 kt | 101 MWh |
+| Optimizer at 400 kt | $118.6M | $118.7M | 392 kt | 393 kt | 43 MWh |
+| Optimizer at 200 kt | $130.5M | $132.0M | 197 kt | 215 kt | 34 MWh |
+| Optimizer at 100 kt | $144.3M | $147.1M | 98 kt | 131 kt | 0 MWh |
 
-Solving the optimizer itself on all 8,760 hours gives the same plan with no cap, but the cheapest 200 kt plan then costs $133.2M, 5% more, and its last tonne $139 instead of $73. Shallow cuts survive the check; deep cuts do not quite: seven weeks miss some still, hot evenings, so the plan emits more and goes short. Planners respond with more or longer periods, extreme weeks and adequacy tests over many weather years (A5, upcoming).
+Solving the optimizer itself on all 8,760 hours gives the same cost with no cap, but the cheapest 200 kt plan then costs $133.2M, 3% more, and its last tonne $139 instead of $85. Shallow cuts survive the check; deeper cuts do not quite: seven weeks miss some still, hot evenings, so the plan emits more than its cap (9% more at 200 kt, 34% at 100 kt). The unserved energy is tiny, under 0.002% of the year's demand. Planners respond with more or longer periods, extreme weeks and adequacy tests over many weather years (A5, upcoming).
 
 ```{=html}
 </div>
@@ -151,7 +151,7 @@ Solving the optimizer itself on all 8,760 hours gives the same plan with no cap,
 <div class="lx-qq" data-id="wind-alone" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If wind is the cheapest way to cut CO₂, the cheapest clean plan is all wind.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. On still evenings the town still needs firm plants or storage; at 100 kt the optimizer keeps 250 MW of gas and adds solar and a battery.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. On still evenings the town still needs firm plants or storage; at 100 kt the optimizer keeps 280 MW of gas and adds solar and a battery.</p></details>
 </div>
 <div class="lx-qq" data-id="spill" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The cheapest plan never spills any wind or sun.”</p>
@@ -161,15 +161,15 @@ Solving the optimizer itself on all 8,760 hours gives the same plan with no cap,
 <div class="lx-qq" data-id="weeks" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Seven well-chosen weeks give exactly the same answer as the whole year.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Re-run on all 8,760 hours, the optimizer's 200 kt plan emits 208 kt and leaves 67 MWh unserved.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Re-run on all 8,760 hours, the optimizer's 200 kt plan emits 215 kt and leaves 34 MWh unserved.</p></details>
 </div>
 </div>
 
 <div class="lx-quiz" data-quiz="t13">
 <div class="lx-qq" data-id="gap" data-answer="b">
-<p class="lx-qtext">Your plan costs $140.0M a year and emits 150 kt. The cheapest plan at 150 kt costs $131.4M. How far above the frontier are you?</p>
-<ul class="lx-choices"><li data-value="a">8.6%</li><li data-value="b">6.5%</li><li data-value="c">$8.6M</li><li data-value="d">150 kt</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>6.5%: 140.0 ÷ 131.4 − 1 = 0.065. You could cut cost by $8.6M a year with the same CO₂.</p></details>
+<p class="lx-qtext">Your plan costs $140.0M a year and emits 150 kt. The cheapest plan at 150 kt costs $134.5M. How far above the frontier are you?</p>
+<ul class="lx-choices"><li data-value="a">5.5%</li><li data-value="b">4.1%</li><li data-value="c">$5.5M</li><li data-value="d">150 kt</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>4.1%: 140.0 ÷ 134.5 − 1 = 0.041. You could cut cost by $5.5M a year with the same CO₂.</p></details>
 </div>
 </div>
 ```

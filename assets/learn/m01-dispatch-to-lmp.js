@@ -715,10 +715,16 @@
     ];
 
     var cardsHost = E("div", { class: "m1-cards" }, live);
-    LX.StepCards(cardsHost, { id: "m1-steps", steps: steps, onStep: function (i) {
+    var cards = LX.StepCards(cardsHost, { id: "m1-steps", steps: steps, onStep: function (i) {
       if (i === 0) { try { LX.solver.preload(); } catch (e) { /* the first solve loads it */ } }
       if (i === steps.length - 1) remember("reached", true);
     } });
+    // demo states (core.js LX.demo): "mid" = step 2 with the day solved; "step-N" opens card N
+    LX.demo(root, function (state) {
+      if (state !== "mid") return null;
+      cards.go(1); var b = cardsHost.querySelector(".lx-step-act .lx-btn"); if (b) b.click();
+      return { view: "solved" };
+    }, cards);
     explain();
   });
 

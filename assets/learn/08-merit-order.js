@@ -381,13 +381,16 @@
       node("w", "Wind farm", L.windAvail + " MW available", "price $0");
       var ln = H("div", { class: "lx8-wire", "aria-hidden": "true" }, tz); H("b", { text: "line full: " + L.windToTown + " MW" }, ln); H("i", null, ln); H("span", { text: L.stranded + " MW stuck at the farm" }, ln);
       node("t", "Prairie Town", "needs " + h.demand + " MW", "price " + usd(L.town.price));
-      H("p", { class: "lx-lede", text: "Only " + L.windToTown + " MW of wind reaches town, so the town's own plants fill the rest at " + usd(L.town.price) + "/MWh, while the wind farm's extra MWh are worth $0. M1 (upcoming, Modeler tier) adds the network and finds a price for each place." }, act);
+      H("p", { class: "lx-lede", text: "Only " + L.windToTown + " MW of wind reaches town, so the town's own plants fill the rest at " + usd(L.town.price) + "/MWh, while the wind farm's extra MWh are worth $0. M1 (Modeler tier) adds the network and finds a price for each place." }, act);
       H("a", { class: "lx-btn small", style: "justify-self:start", href: "#explain", html: "Formulate it, as diagrams" + LX.icon("arrow") }, act);
     }
 
     var cards = LX.StepCards(live, { steps: steps, onStep: function (i) { if (i === steps.length - 1) LX.progress.done(LESSON); } });
-    var mm = /^#lx-step-(\d+)$/.exec(location.hash || "");
-    if (mm) demo(+mm[1] - 1);
+    // demo states (core.js LX.demo): "step-N" (or the address #lx-step-N) opens step N with its action done; "mid" = step 2
+    LX.demo(root, function (state) {
+      var n = state === "mid" ? 2 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
+      demo(Math.min(steps.length, n) - 1); return { view: "step " + n };
+    }, cards);
     function demo(i) {   // screenshots: open step i with its action done
       cards.go(i);
       var c = cards.el, q = function (s) { return c.querySelectorAll(s); };

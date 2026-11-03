@@ -112,7 +112,7 @@ In an hourly model a plant's output $p_t$ is in MW and each step lasts $\Delta t
 
 $$E = \sum_t p_t\,\Delta t, \qquad C = \sum_t c\,p_t\,\Delta t .$$
 
-Storage needs both kinds of number: a power rating in MW (how fast it charges or discharges) and an energy rating in MWh (how much it holds). [Lesson 9](index.qmd#lesson-9) (upcoming) builds that model.
+Storage needs both kinds of number: a power rating in MW (how fast it charges or discharges) and an energy rating in MWh (how much it holds). [Lesson 9](09-storage.qmd) builds that model.
 
 ```{=html}
 </div>
@@ -322,13 +322,6 @@ Storage needs both kinds of number: a power rating in MW (how fast it charges or
   .t1-rung { grid-template-columns: 5.6em minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) { .t1-logbar i, .t1-tub i { transition: none; } }
-/* text-heavy comparison table: on phones each row becomes a card with labelled lines (shared CompareTable assumes numbers) */
-@media (max-width: 640px) {
-  .t1-tt .lx-ctable tr { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .t1-tt .lx-ctable .rank { display: none; }
-  .t1-tt .lx-ctable td[data-label] { text-align: left; font-size: 14.5px; }
-  .t1-tt .lx-ctable td.ph { display: block; }
-}
 </style>
 <script src="../assets/learn/learn.js" defer></script>
 <script src="../assets/learn/01-power-energy.js" defer></script>

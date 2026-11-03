@@ -722,7 +722,7 @@
     ];
     var cards = LX.StepCards(live, { steps: steps });
     // hooks for the screenshot script (lxDemo) and for curious readers in the console
-    root.lxDemo = function (state) {
+    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus corner, jump, tied, views and sort
       if (state === "mid") { cards.go(2); ctl.level.set(sol.cost + 2400); setLevel(sol.cost + 2400); return { view: "cost line" }; }
       if (state === "corner") { cards.go(2); ctl.level.set(0); setLevel(0); return { view: "best corner" }; }
       if (state === "jump") { cards.go(3); ctl.D.set(200); upd({ D: 200 }); return { view: "corner jumps" }; }
@@ -730,7 +730,7 @@
       if (state === "views") { cards.go(7); var b = live.querySelector(".w1f-vrow[data-k=co2]"); if (b) b.click(); return { view: "linked views" }; }
       if (state === "sort") { cards.go(0); return { view: "card sort" }; }
       return null;
-    };
+    }, cards);
     root.lxLesson = { model: model, params: function () { return p; }, sol: function () { return sol; }, cards: cards };
     buildExplain(town, day, D);
   }

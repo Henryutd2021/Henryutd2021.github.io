@@ -518,17 +518,19 @@
       { text: "Spot the units or scale error. Four of these six sentences break a unit or a sense of scale; two read right. Judge each one.", build: spotStep(D) },
       { text: "Write your take in three sentences: the claim you accept or reject, what would change your mind, and your confidence. Then compare with a researcher's take.", build: takeStep(D) }
     ];
-    LX.StepCards(live, { id: "n1-steps", steps: steps });
+    var cards = LX.StepCards(live, { id: "n1-steps", steps: steps });
     explain(D);
     root.lxLesson = { data: D, model: model };
-    // screenshot hook: learn/n01-news-lens.html#lx-demo opens story 1 with every phrase tagged and the comparison shown
-    if (location.hash === "#lx-demo") {
+    // demo states (core.js LX.demo): "mid" opens story 1 with every phrase tagged and the comparison shown
+    LX.demo(root, function (state) {
+      if (state !== "mid") return null;
       var pk = {}; model.phrases(A).forEach(function (ph, i) { pk[ph.p] = i % 3 === 2 ? "scale" : ph.tag; }); pk._missing = "pays";
       LX.store.set("n1-tags-a", pk);
       var card = live.querySelector(".lx-stepcard");
       var go = function () { var b = card.querySelectorAll(".n1-q"); [].forEach.call(b, function (x) { x.click(); }); card.querySelector(".lx-step-foot .lx-btn:not(.ghost)").click();
         var c = card.querySelector(".n1-row .lx-btn"); if (c) c.click(); };
       setTimeout(go, 50);
-    }
+      return { view: "story 1 tagged" };
+    }, cards);
   });
 })();

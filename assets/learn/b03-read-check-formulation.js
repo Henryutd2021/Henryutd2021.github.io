@@ -363,13 +363,13 @@
     });
 
     var cards = LX.StepCards(live, { id: "b3-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
-    root.lxDemo = function (state) {   // screenshots: mid = step 3 with both sums; bugs = step 6, first suspect found; check = step 7 solved
-      var k = { mid: 2, bugs: 5, check: 6, units: 3 }[state]; if (k == null) k = 2; cards.go(k);
-      if (state === "mid" || !state) { var ch = live.querySelectorAll(".b3-ch")[2], rh = live.querySelectorAll(".b3-rh")[3]; if (ch) ch.click(); if (rh) rh.click(); }
+    LX.demo(root, function (state) {   // core.js LX.demo: mid = step 3 with both sums; bugs = step 6, first suspect found; check = step 7 solved
+      var k = { mid: 2, bugs: 5, check: 6, units: 3 }[state]; if (k == null) return null; cards.go(k);
+      if (state === "mid") { var ch = live.querySelectorAll(".b3-ch")[2], rh = live.querySelectorAll(".b3-rh")[3]; if (ch) ch.click(); if (rh) rh.click(); }
       if (state === "bugs") { var l = live.querySelector(".b3-line[aria-label^='costs']"); if (l) l.click(); var r = [].filter.call(live.querySelectorAll(".b3-suspect .lx-btn"), function (b) { return /Run/.test(b.textContent); })[0]; if (r) r.click(); }
       if (state === "check") { var g = live.querySelector(".b3-check") && [].filter.call(live.querySelectorAll(".lx-btn"), function (b) { return /Solve the correct/.test(b.textContent); })[0]; if (g) g.click(); setTimeout(function () { live.querySelectorAll(".b3-cr:not(.head)").forEach(function (b) { b.click(); }); var p = live.querySelector(".b3-predseg button"); if (p) p.click(); }, 600); }
       return { view: "step " + (k + 1) };
-    };
+    }, cards);
     explain(J, inst, ref, N);
   }
 

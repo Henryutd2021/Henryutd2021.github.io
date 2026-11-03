@@ -384,7 +384,7 @@
               api.done();
               if (!act.querySelector(".t1-go")) H("a", { class: "lx-btn small t1-go", href: "#explain", html: "See it as diagrams" + LX.icon("arrow") }, act);
               api.saw("With EIA's averages, " + num(W.wind.cf * 100, 1) + "% and " + num(W.wind.homeW, 0) + " W, the farm's yearly energy matches about " + num(Math.round(W.wind.real / 100) * 100, 0) +
-                " homes. On calm hours it makes little, so those homes still need other plants: lesson 5 (upcoming) explains capacity factor.");
+                " homes. On calm hours it makes little, so those homes still need other plants: lesson 5 explains capacity factor.");
             }
           }
           upd();
@@ -428,9 +428,9 @@
       .forEach(function (r) { var li = H("li", null, ol); H("b", { text: r[0] }, li); H("span", { text: r[1] }, li); });
     H("p", { class: "lx-hint", text: "Close the tap: the flow stops at once, and the water stays. A home's meter works the same way." }, c1);
     // 2. comparison table
-    var c2 = H("div", { class: "lx-xcard t1-tt" }, host);
+    var c2 = H("div", { class: "lx-xcard" }, host);
     LX.CompareTable(c2, {
-      title: "Power and energy, side by side",
+      title: "Power and energy, side by side", text: true,
       columns: [{ key: "name", label: "Question", main: true }, { key: "power", label: "Power" }, { key: "energy", label: "Energy" }],
       rows: [
         { key: "what", name: "What it measures", power: "How fast energy flows, right now", energy: "How much has flowed over a stretch of time" },

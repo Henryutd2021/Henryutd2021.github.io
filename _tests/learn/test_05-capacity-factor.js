@@ -29,10 +29,10 @@ const KEYS = ["nuclear", "wind", "solar"];
   KEYS.forEach(k => ok(T[k] === EIA2025[k], `target ${k} (shared cf_targets.json) = EIA 2025 annual ${EIA2025[k]}`));
   ok(/6\.07\.B/.test(CT.source.short) && /released 23 October 2026/.test(CT.source.issue), "shared targets cite Table 6.07.B, released 23 October 2026");
   ok(QMD.indexOf("cf_targets.json") >= 0 && !D.targets_2025, "the page loads the shared cf_targets.json; no second copy of the targets");
-  KEYS.forEach(k => ok(D.monthly_2025[k].length === 12 && D.monthly_2025[k].every(v => v > 0 && v < 1), `monthly ${k}: 12 values`));
+  KEYS.forEach(k => ok(CT.monthly[k].length === 12 && CT.monthly[k].every(v => v > 0 && v < 1), `monthly ${k}: 12 values`));
   // the 2025 annual value is the hour-weighted mean of the monthly values, within EIA's rounding and capacity weighting
   KEYS.forEach(k => {
-    const m = D.monthly_2025[k].reduce((s, v, i) => s + v * D.year.monthDays[i] * 24, 0) / H;
+    const m = CT.monthly[k].reduce((s, v, i) => s + v * D.year.monthDays[i] * 24, 0) / H;
     ok(near(m, T[k], 0.003), `monthly ${k} average ${m.toFixed(4)} is close to the annual ${T[k]}`);
   });
   ok(D.year.monthDays.reduce((a, b) => a + b) * 24 === H && year.demand.length === H, "2025: 365 days, 8,760 hours in the year file");
@@ -54,21 +54,23 @@ const KEYS = ["nuclear", "wind", "solar"];
   });
   ok(near(W.wind.cf, T.wind, 1e-6) && near(W.solar.cf, T.solar, 1e-6), "wind and solar: annual capacity factor equals the target exactly (bisection)");
   ok(W.nuclear.energy === (H - D.nuclear.outageHours) * P && D.nuclear.outageHours / 24 === 32.5, "nuclear: full size except a 780-hour (32.5-day) outage");
-  ["wind", "solar"].forEach(k => W[k].monthly.forEach((v, i) => ok(near(v, D.monthly_2025[k][i], 0.0035), `${k} month ${i + 1}: ${pct(v)} close to EIA ${pct(D.monthly_2025[k][i])}`)));
+  ["wind", "solar"].forEach(k => W[k].monthly.forEach((v, i) => ok(near(v, CT.monthly[k][i], 0.0035), `${k} month ${i + 1}: ${pct(v)} close to EIA ${pct(CT.monthly[k][i])}`)));
   const a = D.nuclear.outageStartDay * 24, b = a + D.nuclear.outageHours, md = D.year.monthDays;
   ok(a >= (md[0] + md[1]) * 24 && b <= (md[0] + md[1] + md[2] + md[3]) * 24, "nuclear outage lies in March and April (spring)");
   // the shared helper does the scaling, method "power": the best hours reach the plant's size (why: see the JS header)
   ["wind", "solar"].forEach(k => ok(near(W[k].max, P, 1e-6), `${k}: the best hour reaches the full ${P} MW (power method)`));
   const plain = PR.townProfile("wind", P, { year: year, targets: CT, method: "scale" });
   ok(plain.peakFrac < 0.66 && near(plain.cf, T.wind, 1e-9), `the "scale" method would cap wind at ${Math.round(plain.peakFrac * 100)}% of its size, which this lesson avoids`);
-  ok(JS.indexOf('method: "power"') >= 0 && JS.indexOf("HP.cfScale(seg, monthlyCF[m], \"power\")") >= 0, "profile() calls the shared helper (cfScale per month, townProfile for the year)");
-  // the same result as calling the helper directly on the cleaned, month-adjusted shape
-  const again = M.profile(year, "wind", P, T.wind, D, D.monthly_2025.wind);
+  ok(JS.indexOf('method: "power", monthlyCF: monthlyCF') >= 0, "profile() calls the shared helper (townProfile with its monthlyCF option)");
+  ok(CT.monthly.year === 2025 && /6\.07\.B/.test(CT.monthly.source) && CT.monthly.accessed && CT.monthly.url === CT.source.url, "monthly capacity factors: the shared file names EIA's table, the year and the access date");
+  // the shared helper's monthly option on its own: each month at EIA's value, then the year at the annual target
+  const viaHelper = PR.townProfile("wind", P, { year: year, targets: CT, method: "power", monthlyCF: true });
+  ok(viaHelper.mw.every((x, i) => near(x, W.wind.out[i], 1e-9)) && viaHelper.monthly.length === 12, "townProfile(..., {monthlyCF: true}) gives the lesson's wind year");
+  const again = M.profile(year, "wind", P, T.wind, D, CT.monthly.wind);
   ok(again.every((x, i) => near(x, W.wind.out[i], 1e-9)), "profile() is deterministic");
-  // night-time telemetry removed from the solar shape before rescaling
-  const nights = year.solar.map((x, i) => (x > 0 && !M.sunUp(i, D.solarClean)) ? 1 : 0).reduce((p, q) => p + q);
-  ok(nights > 300 && W.solar.out.every((x, i) => M.sunUp(i, D.solarClean) || x === 0), `solar: ${nights} night-time hours of telemetry set to zero`);
-  ok(M.sunUp(12 + 24 * 171, D.solarClean) && !M.sunUp(0 + 24 * 171, D.solarClean), "sunUp: noon yes, midnight no (21 June)");
+  // night-time solar is zero in the data itself (scripts/build_learn_town_data.py); the lesson keeps zero hours at zero
+  ok(year.solar.every((x, i) => x > 0 || W.solar.out[i] === 0), "solar: hours that are zero in town_year.json stay zero");
+  ok(JS.indexOf("sunUp") < 0 && !D.solarClean, "no lesson-local night cleaning (the data build does it)");
   console.log(`year: nuclear ${int(W.nuclear.energy)} MWh (${pct(W.nuclear.cf)}), wind ${int(W.wind.energy)} MWh (${pct(W.wind.cf)}, best hour ${W.wind.max.toFixed(1)} MW), solar ${int(W.solar.energy)} MWh (${pct(W.solar.cf)})`);
 }
 
@@ -120,7 +122,7 @@ const KEYS = ["nuclear", "wind", "solar"];
     .replace(/<table class="lx-facts">[\s\S]*?<\/table>/, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "")
     .replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/https?:\/\/[^\s"')]+/g, " ");
   const prose = strip(QMD);
-  const m12 = k => D.monthly_2025[k].map(v => +(v * 100).toFixed(1));
+  const m12 = k => CT.monthly[k].map(v => +(v * 100).toFixed(1));
   const allowed = {
     "MWh": new Set([798000, 296088, 210240, 876000, 105120, 8760, 7980, 911, 91.1].map(Number)),
     "%": new Set([91.1, 33.8, 24.0, 100, 48.0, 12.0].concat(

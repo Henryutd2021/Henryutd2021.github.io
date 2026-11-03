@@ -40,8 +40,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-body.page-learn { --lx6-bat: #2C6FCB; --lx6-hyd: #3B4FA0; --lx6-geo: #9C5B2E; --lx6-dr: #2E8540; }
-body.page-learn.quarto-dark { --lx6-bat: #6E9DEC; --lx6-hyd: #8C98E6; --lx6-geo: #D08C5C; --lx6-dr: #57B67C; }
 .lx6-jobs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .lx6-job { display: grid; gap: 6px; align-content: start; text-align: left; padding: 12px 14px; min-height: 64px; border-radius: 12px; border: 1px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; font: inherit; }
@@ -196,7 +194,7 @@ Here $d_t$ is demand, $f_g$ the firm share, $m$ a planning margin, $D_\text{peak
 <ul>
 <li>Costs: what each job costs to buy is lesson 7.</li>
 <li>Wires: a firm plant behind a full power line cannot help the town that needs it.</li>
-<li>Rules: markets reward the three jobs in different ways (lesson 8 and Analyst lesson A3, upcoming).</li>
+<li>Rules: markets reward the three jobs in different ways (<a href="08-merit-order.html">lesson 8</a>, and Analyst lesson A3, upcoming).</li>
 <li>Averages: every number is a fleet average or one market's rating; single plants differ.</li>
 </ul>
 </div>

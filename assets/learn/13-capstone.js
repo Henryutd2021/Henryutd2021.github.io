@@ -13,7 +13,7 @@
 //               [+ a carbon price x CO2: lesson 12's weighted sum]. Nuclear runs flat, so its fuel is a fixed yearly cost.
 //   rules       every hour: wind + solar + nuclear + cc + peaker + discharge - charge + unserved >= demand (what is left
 //               over is spilled); wind and solar make capacity x the hour's availability (LX.townProfile, "scale" method,
-//               EIA 2025 targets; solar telemetry at night set to zero first); nuclear runs flat at 91.1% (EIA's 2025
+//               EIA 2025 targets; night-time solar is zero in the data itself); nuclear runs flat at 91.1% (EIA's 2025
 //               fleet capacity factor), as in lesson 0; gas output <= its capacity; charge + discharge <= battery MW;
 //               battery energy within [0, MWh], 85% round trip (losses on charging); optional: annual CO2 <= cap.
 //   time        seven weeks of 2025 (168 chronological hours each): one medoid week per season, scaled so the season's
@@ -32,17 +32,15 @@
   // ---------------------------------------------------------------- inputs: the town's year
   // Y = { demand[8760] MW, wind[8760], solar[8760] (MW per MW built), nucAvail, peak, energy }
   // Index i of town_year.json is the hour that starts i hours after 00:00 on 1 January, Central standard time (UTC-6).
-  // Solar telemetry reports small output at night on some days (an error in the source); hours starting 20:00 to 04:59
-  // are set to zero before the shape is scaled (the sun is down then everywhere on the SPP grid, all year).
-  function nightless(solar) { return solar.map(function (v, i) { var h = i % 24; return h >= 20 || h <= 4 ? 0 : v; }); }
+  // Night-time solar telemetry errors are set to zero by the data build (scripts/build_learn_town_data.py), so the shapes
+  // are used as they are.
   function prepareYear(year, targets, cfg, profile) {
     var tp = profile || (typeof window !== "undefined" && window.LX && window.LX.townProfile);
     if (!tp) throw new Error("prepareYear: the capacity-factor helper (LX.townProfile) is missing");
     var peakMW = cfg.town.demandPeakMW;
     var demand = year.demand.map(function (v) { return v / 1000 * peakMW; });
-    var clean = { start_utc: year.start_utc, demand: year.demand, wind: year.wind, solar: nightless(year.solar) };
-    var w = tp("wind", 1, { year: clean, targets: targets, method: cfg.town.profileMethod });
-    var s = tp("solar", 1, { year: clean, targets: targets, method: cfg.town.profileMethod });
+    var w = tp("wind", 1, { year: year, targets: targets, method: cfg.town.profileMethod });
+    var s = tp("solar", 1, { year: year, targets: targets, method: cfg.town.profileMethod });
     var e = 0, pk = 0;
     demand.forEach(function (d) { e += d; if (d > pk) pk = d; });
     return { demand: demand, wind: w.mw, solar: s.mw, windCF: w.cf, solarCF: s.cf, nucAvail: cfg.techs.nuc.avail,
@@ -365,7 +363,7 @@
     return { lights: lights, co2: co2, cost: cost, gap: gap };
   }
 
-  var model = { HPW: HPW, WEEKS: WEEKS, HOURS: HOURS, KEYS: KEYS, prepareYear: prepareYear, nightless: nightless, selectWeeks: selectWeeks, weekMonth: weekMonth, weekStart: weekStart,
+  var model = { HPW: HPW, WEEKS: WEEKS, HOURS: HOURS, KEYS: KEYS, prepareYear: prepareYear, selectWeeks: selectWeeks, weekMonth: weekMonth, weekStart: weekStart,
                 crf: crf, costs: costs, build: build, weekModel: weekModel, fullYearModel: fullYearModel, periodsOf: periodsOf,
                 summarize: summarize, fixedCost: fixedCost, encodePlan: encodePlan, decodePlan: decodePlan, weekSeries: weekSeries,
                 frontierAt: frontierAt, ceilPlan: ceilPlan, stars: stars };
@@ -958,19 +956,22 @@
     setPlan(S_.plan); gasN.set(S_.sc.gas); nucN.set(S_.sc.nucCapex);
     tCost.b.textContent = "…"; drawFrontier(); status.set("loading");
     var first = run();
-    if ("IntersectionObserver" in window && !/lx-demo/.test(location.hash)) {
+    if ("IntersectionObserver" in window && !LX.demoState()) {
       var io = new IntersectionObserver(function (es) {
         if (es.some(function (e) { return e.isIntersecting; })) {   // after the opening question, when there is one
           io.disconnect(); if (S_.pred && !S_.picked) { S_.tourWait = true; return; } setTimeout(function () { if (!S_.done) tour.start(0); }, 350); }
       }, { threshold: 0.95 });
       io.observe(sl.wind.el);
     }
-    // screenshot and demo states: #lx-demo-mid (the optimizer's plan at the target, loaded), #lx-demo-done (then scored)
-    var demo = /lx-demo-(mid|done)/.exec(location.hash);
-    if (demo) first.then(function () {
-      if (S_.pred) { S_.pred = null; evBox.querySelectorAll(".lx-ecard").forEach(function (n) { n.remove(); }); }
-      capSl.set(G.co2Target); ask();
-      LX.on("t13-asked", function () { setPlan(model.ceilPlan(S_.asked.sum.plan, lim)); S_.from = "optimizer"; run().then(function () { if (demo[1] === "done") finish(); }); });
+    // demo states (core.js LX.demo): "mid" = the optimizer's plan at the target, loaded into the sliders; "done" = then scored
+    LX.demo(root, function (state) {
+      if (state !== "mid" && state !== "done") return null;
+      first.then(function () {
+        if (S_.pred) { S_.pred = null; evBox.querySelectorAll(".lx-ecard").forEach(function (n) { n.remove(); }); }
+        capSl.set(G.co2Target); ask();
+        LX.on("t13-asked", function () { setPlan(model.ceilPlan(S_.asked.sum.plan, lim)); S_.from = "optimizer"; run().then(function () { if (state === "done") finish(); }); });
+      });
+      return { view: state };
     });
     root.lxGame = { model: model, state: function () { return S_; }, finish: finish, ask: ask, setPlan: function (p) { setPlan(p); return run(); }, tour: tour };
     buildExplain(cfg, Y, RW);

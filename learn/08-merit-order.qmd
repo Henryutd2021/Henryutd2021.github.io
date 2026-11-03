@@ -81,8 +81,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <div class="lx-deepers">
-<style>/* lesson-local: keep Go deeper text inside the card on phones; wide equations scroll on their own (requested for deeper.css) */
-.page-lesson .lx-deeper-body{grid-template-columns:minmax(0,1fr)}.page-lesson .lx-deeper-body .math.display{overflow-x:auto;overflow-y:hidden}</style>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>Economic dispatch as a linear program</summary>
 <div class="lx-deeper-body">
@@ -109,8 +107,8 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 <summary><span class="k">Go deeper · Modeler</span>Prices from a solver, and where this one-hour picture stops</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>M1 (upcoming in the Modeler tier) builds a 24-hour dispatch linear program with ramps, adds a three-bus network, fills a line and reads one price per bus from the solver.</li>
-<li>Lesson 11 (upcoming) hands a linear program to a real solver and reads its prices.</li>
+<li><a href="m01-dispatch-to-lmp.html">M1</a> (Modeler tier) builds a 24-hour dispatch linear program with ramps, adds a three-bus network, fills a line and reads one price per bus from the solver.</li>
+<li><a href="11-solver.html">Lesson 11</a> hands a linear program to a real solver and reads its prices.</li>
 <li>With on/off decisions and start-up costs (M2, upcoming), no single price covers every plant's costs; markets add side payments, called uplift.</li>
 </ul>
 </div>
@@ -123,7 +121,7 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 <li>Start-up costs, minimum outputs and ramp limits, which link one hour to the next.</li>
 <li>Reserves held back for surprises (lesson 3), and the network, which the last step only hints at.</li>
 <li>Many markets clear a day ahead and again in real time, and cap prices in shortages.</li>
-<li>Demand that answers the price, such as batteries and flexible users (lesson 9 and A3, upcoming).</li>
+<li>Demand that answers the price, such as batteries and flexible users (<a href="09-storage.html">lesson 9</a>, and A3, upcoming).</li>
 </ul>
 </div>
 </details>

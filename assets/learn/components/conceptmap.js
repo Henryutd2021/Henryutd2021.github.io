@@ -5,7 +5,8 @@
                game: "Where it appeared in the game.", at: [col, row], atN: [col, row], (on phones), later: "Lesson 10 ..." }],
      edges: [["supply", "balance", "must equal"], ...],
      cols: 4, rows: 4, colsN: 3, rowsN: 5,           grid positions may be fractional (1.5 = halfway between columns)
-     sel: "balance", moment: function (id) { return "Your shift: ..." | null; } });
+     sel: "balance", moment: function (id) { return "Your shift: ..." | null; },
+     gameLabel: "In the lesson" });                  heading of each node's `game` line (default: "In the game" on play-form pages, else "In this lesson")
    Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea and link for screen readers.
    Under 620 px the map switches to the phone grid (atN) and hides edge labels (they stay in the panel). */
 (function () {
@@ -80,7 +81,7 @@
       var n = byId[id]; det.innerHTML = "";
       H("p", { class: "lx-eyebrow", text: o.groups[n.g][0] }, det);
       H("h4", { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
-      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: "In the game" }, ig); H("span", { html: LX.rich(n.game) }, ig);
+      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: o.gameLabel || (LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson") }, ig); H("span", { html: LX.rich(n.game) }, ig);
         var gm = o.moment && o.moment(id); if (gm) H("div", { class: "you", text: gm }, ig); }
       var links = o.edges.filter(function (e) { return e[0] === id || e[1] === id; });
       if (links.length) {

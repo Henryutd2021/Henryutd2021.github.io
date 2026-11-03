@@ -459,5 +459,11 @@
       if (ob) ob.addEventListener("click", function () { var r = rec("est-buses"); if (r.first == null) r.solFirst = true; save(); openSolution(); });
     }
     if (st.finished && !location.hash) results(); else intro();
+    // demo states (core.js LX.demo): "mid" = the first task on screen; "done" = the results view
+    LX.demo(root, function (state) {
+      if (state === "mid") { show(0); return { view: "task 1" }; }
+      if (state === "done") { results(); return { view: "results" }; }
+      return null;
+    });
   });
 })();

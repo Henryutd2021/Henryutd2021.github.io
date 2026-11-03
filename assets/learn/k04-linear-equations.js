@@ -402,11 +402,12 @@
     });
 
     var cards = LX.StepCards(live, { id: "k4-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
-    root.lxDemo = function (state) {   // screenshots: "mid" = step 4 with a test plan, "region" = step 6
+    LX.demo(root, function (state) {   // core.js LX.demo: "mid" = step 4 with a test plan, "region" = step 6
+      if (state !== "mid" && state !== "region") return null;
       var k = state === "region" ? 5 : 3; cards.go(k);
       if (state === "region") live.querySelectorAll(".k4-chips .lx-chip").forEach(function (b) { b.click(); });
       return { view: "step " + (k + 1) };
-    };
+    }, cards);
 
     explain(s);
     drillView(D);

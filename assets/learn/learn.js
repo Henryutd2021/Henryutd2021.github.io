@@ -7,6 +7,7 @@
              LX.fmt.money/tonnes/mw/mwh/hh/int, LX.clamp, LX.lerp, LX.reduced() (prefers-reduced-motion)
    State:    LX.progress.done/isDone/guess/answer, LX.store.get/set   (this browser only; try/catch wrapped)
    Runtime:  LX.mount(slug, init)  load a lesson interactive's data-src JSON files, then init(liveRoot, data)
+             LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
              LX.anim({visible, step}) one shared animation loop; LX.onTheme(fn) when Quarto's day/night toggle flips
              LX.tokens(el, names)  read colour tokens (#rrggbb) as [r, g, b]
@@ -97,7 +98,13 @@
     map: '<path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><circle cx="12" cy="11" r="2.2"/>',
     question: '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 16.8v.2"/>',
     globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.6 5.4 3.6 8.5s-1.1 5.9-3.6 8.5c-2.5-2.6-3.6-5.4-3.6-8.5s1.1-5.9 3.6-8.5z"/>',
-    city: '<path d="M3 21V10l5-3v14M8 21V4h8v17M16 21v-9h5v9M3 21h18"/><path d="M11 8h2M11 12h2M11 16h2"/>'
+    city: '<path d="M3 21V10l5-3v14M8 21V4h8v17M16 21v-9h5v9M3 21h18"/><path d="M11 8h2M11 12h2M11 16h2"/>',
+    // technologies beyond lesson 0's fleet (first drawn in lesson 6): nuclear, gas, hydro, geothermal, demand response
+    atom: '<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>',
+    flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.4 3.6-8.3.6 1.6 1.4 2.6 2.6 3.2C12 6.7 13.6 4.4 15.4 3c-.2 3 1 4.8 2.2 6.6 1 1.4 1.4 2.9 1.4 4.9 0 3.7-2.7 6.5-7 6.5z"/>',
+    drop: '<path d="M12 3.5c3 4 6 7.4 6 10.8a6 6 0 0 1-12 0c0-3.4 3-6.8 6-10.8z"/><path d="M9 15a3 3 0 0 0 3 3"/>',
+    geo: '<path d="M3 15h18M5.5 19h13"/><path d="M12 15V5M9 8l3-3 3 3"/><path d="M7 12.5c0-1.5 1.5-1.5 1.5-3M17 12.5c0-1.5-1.5-1.5-1.5-3"/>',
+    dial: '<path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l-4-3"/><path d="M3 20h18"/>'
   };
   LX.icon = function (name, cls) {
     return '<svg class="lx-ic ' + (cls || "") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (LX.IC[name] || "") + "</svg>";
@@ -209,6 +216,35 @@
   LX.lesson = function () {
     var n = document.querySelector(".lx-lesson-data");
     try { return n ? JSON.parse(n.textContent) : null; } catch (e) { return null; }
+  };
+  // ---------------------------------------------------------------- demo states (screenshots and curious readers)
+  // LX.demo(root, fn, cards): register a lesson's demo hook. fn(state) puts the page into a named state and returns
+  // something truthy ({view: "..."}) when it handled the state, or null. Every lesson accepts the standard states
+  //   "mid"     one interaction done (the lesson picks which)
+  //   "step-N"  step card N open (1-based), with that card's action done where the lesson knows how; when fn returns
+  //             null for it and `cards` (an LX.StepCards) is given, the card is simply opened
+  // and may add its own names ("band", "milp", ...). window.lxDemo(state) and root.lxDemo(state) run it, and so does
+  // the address: ?demo=<state>, #lx-demo-<state>, #lx-demo-<N> or #lx-step-<N> (= "step-N"), #lx-demo (= "mid").
+  // scripts/learn_screenshots.mjs uses it for any state it does not know. Readers never see it unless they ask for it.
+  LX.demoState = function () {
+    var q = /[?&]demo=([\w-]+)/.exec(location.search), h = /^#lx-(demo|step)(?:-([\w-]+))?$/.exec(location.hash);
+    if (q) return q[1];
+    if (!h) return null;
+    return h[2] ? (/^\d+$/.test(h[2]) ? "step-" + h[2] : h[2]) : "mid";
+  };
+  LX.demo = function (root, fn, cards) {
+    function run(state) {
+      state = String(state == null ? "mid" : state);
+      var r = fn(state), m = /^step-(\d+)$/.exec(state);
+      if (!r && m && cards) { cards.go(Math.max(0, +m[1] - 1)); r = { view: state }; }
+      LX.emit("layout");
+      return r || null;
+    }
+    if (root) root.lxDemo = run;
+    window.lxDemo = run;
+    var st = LX.demoState();
+    if (st) setTimeout(function () { try { run(st); } catch (e) { console.error(e); } }, 60);
+    return run;
   };
   var readyQ = [], isReady = false;
   LX.ready = function (fn) { if (isReady) fn(); else readyQ.push(fn); };
@@ -621,37 +657,49 @@
 
 /* controls.js — LX.Slider: a big, keyboard-friendly slider with − / + buttons and a shaded "reachable now" band.
    const s = LX.Slider(host, { label: "Gas combined-cycle", color: "var(--lx-cc)", max: 150, step: 5, unit: "MW",
-                               hint: function (lo, hi, max) { return "..."; }, onChange: function (v) {} });
-   s.set(v) | s.range(lo, hi)  (values outside are clamped, and the hint nudges) | s.val() | s.disable(true) | s.input | s.el
+                               hint: function (lo, hi, max, val) { return "..."; }, onChange: function (v) {} });
+   Options:  min (default 0), max, step (default 1), value (start; default min), unit ("MW"; used when there is no fmt),
+             fmt: function (v) -> text   formats the output, the spoken value and the hint's numbers ("$1,230/kW", "7.5%")
+             downLabel / upLabel          spoken names of the − / + buttons (default "Turn down <label> by <step>")
+             id, cls (extra class on the control)
+   Decimal-safe: values snap to min + k × step and are rounded to the step's decimals, so a 0.1 or 0.05 step never shows
+   floating-point noise (0.30000000000000004).
+   s.set(v[, fire]) (fire: also call onChange) | s.range(lo, hi)  (values outside are clamped, and the hint nudges) |
+   s.val() | s.hint(text) (fixed hint; s.hint() repaints from o.hint) | s.disable(true) | s.input | s.el
    Arrow keys move one step (native range input); the − / + buttons have spoken labels. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, clamp = LX.clamp;
   LX.Slider = function (host, o) {
     var id = o.id || LX.uid("sl"), unit = o.unit || "MW", step = o.step || 1, max = o.max, min = o.min || 0;
+    var dec = Math.min(10, (String(step).split(".")[1] || "").length + (String(min).split(".")[1] || "").length);
+    var fmt = o.fmt || function (v) { return v + " " + unit; };
     var w = H("div", { class: "lx-ctl " + (o.cls || ""), style: "--c:" + (o.color || "var(--lx-ink)") }, host);
     var top = H("div", { class: "lx-ctl-top" }, w);
     var lab = H("label", { for: id }, top); H("i", null, lab); H("span", { text: o.label }, lab);
     var out = H("output", { for: id }, top);
     var row = H("div", { class: "lx-ctl-row" }, w);
-    var minus = H("button", { type: "button", "aria-label": "Turn down " + o.label + " by " + step + " " + unit, text: "−" }, row);
+    var downL = o.downLabel ? o.downLabel + " " + o.label : (o.fmt ? "Lower " + o.label : "Turn down " + o.label + " by " + step + " " + unit);
+    var upL = o.upLabel ? o.upLabel + " " + o.label : (o.fmt ? "Raise " + o.label : "Turn up " + o.label + " by " + step + " " + unit);
+    var minus = H("button", { type: "button", "aria-label": downL, text: "−" }, row);
     var tr = H("div", { class: "lx-ctl-track" }, row);
     H("div", { class: "lx-ctl-rail" }, tr);
     var band = H("div", { class: "lx-ctl-band" }, tr), fill = H("div", { class: "lx-ctl-fill" }, tr);
     var inp = H("input", { type: "range", id: id, min: min, max: max, step: step, value: min }, tr);
-    var plus = H("button", { type: "button", "aria-label": "Turn up " + o.label + " by " + step + " " + unit, text: "+" }, row);
+    var plus = H("button", { type: "button", "aria-label": upL, text: "+" }, row);
     var hint = H("p", { class: "lx-ctl-hint" }, w);
-    var lo = min, hi = max, val = min, fixedHint = null;
+    function snap(v) { return +((Math.round((v - min) / step) * step + min).toFixed(dec)); }
+    var lo = min, hi = max, val = o.value == null ? min : clamp(snap(o.value), min, max), fixedHint = null;
     function pos(v) { return (13 + ((v - min) / (max - min)) * (tr.clientWidth - 26)) / Math.max(1, tr.clientWidth) * 100; }
     function paint() {
-      inp.value = val; out.textContent = val + " " + unit;
-      inp.setAttribute("aria-valuetext", val + " " + unit + (lo > min || hi < max ? ", reachable now " + lo + " to " + hi : ""));
+      inp.value = val; out.textContent = fmt(val);
+      inp.setAttribute("aria-valuetext", fmt(val) + (lo > min || hi < max ? ", reachable now " + fmt(lo) + " to " + fmt(hi) : ""));
       band.style.left = "calc(" + pos(lo) + "% - 4px)"; band.style.width = "calc(" + (pos(hi) - pos(lo)) + "% + 8px)";
       fill.style.width = pos(val) + "%";
-      hint.innerHTML = fixedHint != null ? fixedHint : (o.hint ? LX.rich(o.hint(lo, hi, max)) : "");
+      hint.innerHTML = fixedHint != null ? fixedHint : (o.hint ? LX.rich(o.hint(lo, hi, max, val)) : "");
     }
     function setV(v, user) {
-      var want = Math.round(v / step) * step, c = clamp(want, lo, hi);
+      var want = snap(v), c = clamp(want, lo, hi);
       if (user && c !== want) { hint.classList.remove("bump"); void hint.offsetWidth; hint.classList.add("bump"); }
       var changed = c !== val; val = c; paint();
       if (user && changed && o.onChange) o.onChange(val);
@@ -663,10 +711,10 @@
     paint();
     return {
       el: w, input: inp,
-      set: function (v) { setV(v, false); },
+      set: function (v, fire) { setV(v, !!fire); },
       range: function (a, b) { lo = a; hi = b; setV(val, false); },
       val: function () { return val; },
-      hint: function (t) { fixedHint = t; paint(); },
+      hint: function (t) { fixedHint = t; paint(); },   // hint() with no text: back to the o.hint function
       disable: function (d) { inp.disabled = d; minus.disabled = d; plus.disabled = d; }
     };
   };
@@ -1090,8 +1138,12 @@
     }
     pop.innerHTML = "";
     H("b", { text: g.term }, pop); H("p", { text: g.short }, pop);
-    var here = LX.lesson();
-    if (g.lesson != null && !(here && here.starter === g.lesson)) H("a", { href: LX.base + "../../learn/index.html#lesson-" + g.lesson, text: "Taught in lesson " + g.lesson }, pop);
+    // "Taught in lesson 3" or "Taught in B2": glossary.json gives `lesson` (a starter number or a module code; older
+    // files may hold a number as text) and `href` (relative to learn/); no link on the page that teaches the term
+    var here = LX.lesson(), L = g.lesson, num = L != null && /^\d+$/.test(String(L));
+    var onIt = here && L != null && (String(here.starter) === String(L) || here.code === L || here.id === L);
+    if (L != null && !onIt) H("a", { href: LX.base + "../../learn/" + (g.href || (num ? "index.html#lesson-" + L : "index.html")),
+      text: "Taught in " + (num ? "lesson " + L : L) }, pop);
     pop.hidden = false; openBtn = btn;
     btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-describedby", "lx-pop");
     var r = btn.getBoundingClientRect(), pw = Math.min(300, window.innerWidth - 24);
@@ -1132,7 +1184,8 @@
                game: "Where it appeared in the game.", at: [col, row], atN: [col, row], (on phones), later: "Lesson 10 ..." }],
      edges: [["supply", "balance", "must equal"], ...],
      cols: 4, rows: 4, colsN: 3, rowsN: 5,           grid positions may be fractional (1.5 = halfway between columns)
-     sel: "balance", moment: function (id) { return "Your shift: ..." | null; } });
+     sel: "balance", moment: function (id) { return "Your shift: ..." | null; },
+     gameLabel: "In the lesson" });                  heading of each node's `game` line (default: "In the game" on play-form pages, else "In this lesson")
    Nodes are keyboard buttons; the panel is announced; a "Text version" lists every idea and link for screen readers.
    Under 620 px the map switches to the phone grid (atN) and hides edge labels (they stay in the panel). */
 (function () {
@@ -1207,7 +1260,7 @@
       var n = byId[id]; det.innerHTML = "";
       H("p", { class: "lx-eyebrow", text: o.groups[n.g][0] }, det);
       H("h4", { text: n.label }, det); H("p", { html: LX.rich(n.text) }, det);
-      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: "In the game" }, ig); H("span", { html: LX.rich(n.game) }, ig);
+      if (n.game) { var ig = H("div", { class: "ingame" }, det); H("b", { text: o.gameLabel || (LX.lesson() && LX.lesson().form === "play" ? "In the game" : "In this lesson") }, ig); H("span", { html: LX.rich(n.game) }, ig);
         var gm = o.moment && o.moment(id); if (gm) H("div", { class: "you", text: gm }, ig); }
       var links = o.edges.filter(function (e) { return e[0] === id || e[1] === id; });
       if (links.length) {
@@ -1357,7 +1410,9 @@
              cost: {text: "$10", unit: "/MWh", value: 10}}],
      sorts: [{label: "As built", order: ["nuclear", ...], note: "One sentence."},
              {label: "By running cost", order: [...], ranked: true, note: "<b>This order is the merit order.</b> ..."}] });
-   On phones the rows become small cards. The table is a real <table>, so it reads well without the diagram. */
+   On phones the rows become small cards. The table is a real <table>, so it reads well without the diagram.
+   text: true   for rows of words rather than numbers: on phones each row becomes a card of left-aligned labelled lines,
+                with no rank column, and phoneHide columns stay (long text in the number layout would overlap). */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
@@ -1366,7 +1421,7 @@
     H("h3", { text: o.title }, hd);
     var seg = o.sorts && o.sorts.length > 1 ? H("div", { class: "lx-seg", role: "group", "aria-label": "Order of the rows" }, hd) : null;
     var cap = H("p", { class: "lx-lede", "aria-live": "polite" }, host);
-    var sc = H("div", { class: "lx-tbl-scroll" }, host), tb = H("table", { class: "lx-ctable" }, sc);
+    var sc = H("div", { class: "lx-tbl-scroll" }, host), tb = H("table", { class: "lx-ctable" + (o.text ? " lx-ctable-text" : "") }, sc);
     var hr = H("tr", null, H("thead", null, tb));
     H("th", { class: "rank", "aria-label": "Rank" }, hr);
     o.columns.forEach(function (c) { H("th", { scope: "col", class: (c.num ? "n " : "") + (c.phoneHide ? "ph " : ""), text: c.label }, hr); });
@@ -2063,6 +2118,13 @@
                                      source }
        tech: "wind" | "solar";  opts.year: town_year.json (required); opts.annualCF: a target as a fraction, or
        opts.targets: cf_targets.json (its targets[tech].cf is used); opts.method: "scale" | "power"
+       opts.monthlyCF: true (use opts.targets.monthly[tech], EIA's 2025 monthly values) or an array of 12 fractions:
+                       each calendar month of the shape is first brought to that month's capacity factor with the same
+                       method, then the year is set to the annual target. Why: the SPP shapes carry the fleets' growth
+                       during 2025 (solar's January maximum is 0.56 of its November maximum), so an annual-only scaling
+                       gives December solar about 22% against EIA's 13.1%. Months follow the local calendar of the shape
+                       (index 0 = 00:00 on 1 January; opts.monthDays overrides the month lengths). The result's
+                       `monthly` holds the 12 monthly capacity factors.
    Methods, and what each does to the shape (say which one on the page):
      scale  output = capacity × min(1, k × s). If k > 1 (target above the shape's mean), the best hours are clipped at
             capacity, like a turbine or inverter limit; if k < 1, output never reaches capacity (peakFrac = k): for SPP
@@ -2103,6 +2165,22 @@
     }
     return (lo + hi) / 2;
   }
+  var MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  function monthDays(year) {
+    var y = +String(year.start_utc || "").slice(0, 4), d = MONTH_DAYS.slice();
+    if (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) d[1] = 29;
+    return d;
+  }
+  // bring each month of a shape (thousandths) to its own capacity factor; returns a new shape in thousandths
+  function byMonth(shape, cfs, method, days) {
+    var out = shape.slice(), t0 = 0;
+    days.forEach(function (d, m) {
+      var seg = shape.slice(t0, t0 + d * 24), x = cfScale(seg, cfs[m], method), s = unit(seg);
+      for (var h = 0; h < seg.length; h++) out[t0 + h] = 1000 * (method === "power" ? (s[h] > 0 ? Math.pow(Math.min(1, s[h]), x) : 0) : Math.min(1, x * s[h]));
+      t0 += d * 24;
+    });
+    return out;
+  }
   function townProfile(tech, capacityMW, opts) {
     opts = opts || {};
     if (tech !== "wind" && tech !== "solar") throw new Error("townProfile: tech must be wind or solar");
@@ -2111,7 +2189,15 @@
     if (!year || !year[tech] || year[tech].length < 24) throw new Error("townProfile: pass opts.year (town_year.json)");
     var T = opts.targets, target = opts.annualCF != null ? opts.annualCF : T && T.targets && T.targets[tech] && T.targets[tech].cf;
     if (target == null) throw new Error("townProfile: give opts.annualCF or opts.targets (cf_targets.json)");
-    var method = opts.method || "scale", x = cfScale(year[tech], target, method), s = unit(year[tech]);
+    var method = opts.method || "scale", shape = year[tech], mcf = opts.monthlyCF, days = null;
+    if (mcf) {
+      if (mcf === true) mcf = T && T.monthly && T.monthly[tech];
+      if (!mcf || mcf.length !== 12) throw new Error("townProfile: monthlyCF needs 12 values, or true with opts.targets.monthly (cf_targets.json)");
+      days = opts.monthDays || monthDays(year);
+      if (days.reduce(function (a, b) { return a + b; }, 0) * 24 !== shape.length) throw new Error("townProfile: monthlyCF needs a whole calendar year of hours");
+      shape = byMonth(shape, mcf, method, days);
+    }
+    var x = cfScale(shape, target, method), s = unit(shape);
     var f = method === "power" ? function (v) { return v > 0 ? Math.pow(Math.min(1, v), x) : 0; } : function (v) { return Math.min(1, x * v); };
     var mw = new Array(s.length), clipped = 0, peak = 0;
     for (var i = 0; i < s.length; i++) { var u = f(s[i]); if (method === "scale" && x * s[i] > 1) clipped++; if (u > peak) peak = u; mw[i] = capacityMW * u; }
@@ -2119,9 +2205,14 @@
       scaleDay: function (shape) { return unit(shape).map(function (v) { return capacityMW * f(v); }); },
       source: T && T.source ? T.source.publisher + ", " + T.source.short + " (" + T.targets[tech].year + ")" : null };
     out[method === "power" ? "gamma" : "k"] = x;
+    if (days) {   // the result's monthly capacity factors
+      out.monthly = []; var t0 = 0;
+      days.forEach(function (d) { var e = 0; for (var h = 0; h < d * 24; h++) e += mw[t0 + h]; out.monthly.push(capacityMW > 0 ? e / (capacityMW * d * 24) : 0); t0 += d * 24; });
+      out.monthlyTargets = mcf.slice();
+    }
     return out;
   }
-  var api = { cfScale: cfScale, townProfile: townProfile, cfOf: function (shape, x, method) { return cfOf(unit(shape), x, method || "scale"); } };
+  var api = { cfScale: cfScale, townProfile: townProfile, monthDays: monthDays, cfOf: function (shape, x, method) { return cfOf(unit(shape), x, method || "scale"); } };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window === "undefined" || !window.LX) return;
   window.LX.cfScale = cfScale;

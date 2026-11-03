@@ -6,6 +6,7 @@
              LX.fmt.money/tonnes/mw/mwh/hh/int, LX.clamp, LX.lerp, LX.reduced() (prefers-reduced-motion)
    State:    LX.progress.done/isDone/guess/answer, LX.store.get/set   (this browser only; try/catch wrapped)
    Runtime:  LX.mount(slug, init)  load a lesson interactive's data-src JSON files, then init(liveRoot, data)
+             LX.demo(root, fn, cards) a lesson's demo states ("mid", "step-N", ...) for screenshots: window.lxDemo, ?demo=
              LX.load(urls)         Promise of {basename: parsed JSON};  LX.base = URL of assets/learn/
              LX.anim({visible, step}) one shared animation loop; LX.onTheme(fn) when Quarto's day/night toggle flips
              LX.tokens(el, names)  read colour tokens (#rrggbb) as [r, g, b]
@@ -96,7 +97,13 @@
     map: '<path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><circle cx="12" cy="11" r="2.2"/>',
     question: '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7"/><path d="M12 16.8v.2"/>',
     globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.6 5.4 3.6 8.5s-1.1 5.9-3.6 8.5c-2.5-2.6-3.6-5.4-3.6-8.5s1.1-5.9 3.6-8.5z"/>',
-    city: '<path d="M3 21V10l5-3v14M8 21V4h8v17M16 21v-9h5v9M3 21h18"/><path d="M11 8h2M11 12h2M11 16h2"/>'
+    city: '<path d="M3 21V10l5-3v14M8 21V4h8v17M16 21v-9h5v9M3 21h18"/><path d="M11 8h2M11 12h2M11 16h2"/>',
+    // technologies beyond lesson 0's fleet (first drawn in lesson 6): nuclear, gas, hydro, geothermal, demand response
+    atom: '<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>',
+    flame: '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.4 3.6-8.3.6 1.6 1.4 2.6 2.6 3.2C12 6.7 13.6 4.4 15.4 3c-.2 3 1 4.8 2.2 6.6 1 1.4 1.4 2.9 1.4 4.9 0 3.7-2.7 6.5-7 6.5z"/>',
+    drop: '<path d="M12 3.5c3 4 6 7.4 6 10.8a6 6 0 0 1-12 0c0-3.4 3-6.8 6-10.8z"/><path d="M9 15a3 3 0 0 0 3 3"/>',
+    geo: '<path d="M3 15h18M5.5 19h13"/><path d="M12 15V5M9 8l3-3 3 3"/><path d="M7 12.5c0-1.5 1.5-1.5 1.5-3M17 12.5c0-1.5-1.5-1.5-1.5-3"/>',
+    dial: '<path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l-4-3"/><path d="M3 20h18"/>'
   };
   LX.icon = function (name, cls) {
     return '<svg class="lx-ic ' + (cls || "") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (LX.IC[name] || "") + "</svg>";
@@ -208,6 +215,35 @@
   LX.lesson = function () {
     var n = document.querySelector(".lx-lesson-data");
     try { return n ? JSON.parse(n.textContent) : null; } catch (e) { return null; }
+  };
+  // ---------------------------------------------------------------- demo states (screenshots and curious readers)
+  // LX.demo(root, fn, cards): register a lesson's demo hook. fn(state) puts the page into a named state and returns
+  // something truthy ({view: "..."}) when it handled the state, or null. Every lesson accepts the standard states
+  //   "mid"     one interaction done (the lesson picks which)
+  //   "step-N"  step card N open (1-based), with that card's action done where the lesson knows how; when fn returns
+  //             null for it and `cards` (an LX.StepCards) is given, the card is simply opened
+  // and may add its own names ("band", "milp", ...). window.lxDemo(state) and root.lxDemo(state) run it, and so does
+  // the address: ?demo=<state>, #lx-demo-<state>, #lx-demo-<N> or #lx-step-<N> (= "step-N"), #lx-demo (= "mid").
+  // scripts/learn_screenshots.mjs uses it for any state it does not know. Readers never see it unless they ask for it.
+  LX.demoState = function () {
+    var q = /[?&]demo=([\w-]+)/.exec(location.search), h = /^#lx-(demo|step)(?:-([\w-]+))?$/.exec(location.hash);
+    if (q) return q[1];
+    if (!h) return null;
+    return h[2] ? (/^\d+$/.test(h[2]) ? "step-" + h[2] : h[2]) : "mid";
+  };
+  LX.demo = function (root, fn, cards) {
+    function run(state) {
+      state = String(state == null ? "mid" : state);
+      var r = fn(state), m = /^step-(\d+)$/.exec(state);
+      if (!r && m && cards) { cards.go(Math.max(0, +m[1] - 1)); r = { view: state }; }
+      LX.emit("layout");
+      return r || null;
+    }
+    if (root) root.lxDemo = run;
+    window.lxDemo = run;
+    var st = LX.demoState();
+    if (st) setTimeout(function () { try { run(st); } catch (e) { console.error(e); } }, 60);
+    return run;
   };
   var readyQ = [], isReady = false;
   LX.ready = function (fn) { if (isReady) fn(); else readyQ.push(fn); };

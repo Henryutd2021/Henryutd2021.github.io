@@ -4,7 +4,8 @@
    Day values on body.page-learn; night values when Quarto's toggle sets body.quarto-dark.
    Type: Lexend (display), Atkinson Hyperlegible Next (text), Atkinson Hyperlegible Mono (numbers), imported here from Google
    Fonts, so only Learn pages (which link learn.css) load them.
-   Plant colours (same in every lesson): nuclear, solar, wind, gas combined-cycle (cc), gas peaker (pk), demand.
+   Plant colours (same in every lesson): nuclear, solar, wind, gas combined-cycle (cc), gas peaker (pk), demand; and
+   battery storage (bat), hydro (hyd), geothermal (geo) and demand response (dr), first used in lesson 6 (W1).
    Tier colours: slots 1-5 (--lx-tier-1 ...); path.yml gives each tier a slot. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&family=Lexend:wght@400;500;600&display=swap");
 body.page-learn {
@@ -14,6 +15,7 @@ body.page-learn {
   --lx-good: #1B8452; --lx-good-soft: #E1F3E9; --lx-warn: #A86400; --lx-warn-soft: #FBEFD9; --lx-bad: #C9302F; --lx-bad-soft: #FBE5E4;
   --lx-star: #D19A00;
   --lx-nuc: #7A5BB5; --lx-solar: #D9A60F; --lx-wind: #1E9BB0; --lx-cc: #DB5B2B; --lx-pk: #8E3B4F; --lx-demand: #2B394D;
+  --lx-bat: #2C6FCB; --lx-hyd: #3B4FA0; --lx-geo: #9C5B2E; --lx-dr: #2E8540;
   --lx-tier-1: #2B8250; --lx-tier-2: #2464C6; --lx-tier-3: #6A4CC2; --lx-tier-4: #B8572B; --lx-tier-5: #0F7C86;
   --lx-sky-day-top: #93C8E8; --lx-sky-day-bot: #DCEFF8; --lx-sky-night-top: #0E1630; --lx-sky-night-bot: #2B3760; --lx-sky-dusk: #F2B184;
   --lx-sun: #FFC53D; --lx-hill-far: #B4CFA0; --lx-ground: #CADDB0; --lx-ground-2: #B8D09C; --lx-road: #D9DED6;
@@ -33,6 +35,7 @@ body.page-learn.quarto-dark {
   --lx-good: #52C68B; --lx-good-soft: #15301F; --lx-warn: #E2A445; --lx-warn-soft: #33270F; --lx-bad: #F2706C; --lx-bad-soft: #3A1B1B;
   --lx-star: #F0C03C;
   --lx-nuc: #8E74CE; --lx-solar: #B38C14; --lx-wind: #2097AE; --lx-cc: #E0592F; --lx-pk: #A8548C; --lx-demand: #C9D3E0;
+  --lx-bat: #6E9DEC; --lx-hyd: #8C98E6; --lx-geo: #D08C5C; --lx-dr: #57B67C;
   --lx-tier-1: #57B67C; --lx-tier-2: #6E9DEC; --lx-tier-3: #A28DF0; --lx-tier-4: #E08A5C; --lx-tier-5: #4FB8C2;
   --lx-sky-day-top: #4F7FA6; --lx-sky-day-bot: #93B6CC; --lx-sky-night-top: #060A16; --lx-sky-night-bot: #182143; --lx-sky-dusk: #B9805E;
   --lx-sun: #F5BC3A; --lx-hill-far: #4E6A4A; --lx-ground: #3E5537; --lx-ground-2: #354A30; --lx-road: #4A5248;
@@ -423,14 +426,14 @@ dl.lx-ideas dd { margin: 0; color: var(--lx-ink-2); }
 .lx-cards { max-width: 780px; margin: 0 auto; display: grid; gap: 14px; }
 .lx-stepcard { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 18px 20px; display: grid; gap: 14px; box-shadow: var(--lx-shadow); }
 .lx-step-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.lx-dots { display: flex; gap: 6px; }
-.lx-dots i { width: 22px; height: 6px; border-radius: 3px; background: var(--lx-surface-3); transition: background .2s; }
+.lx-dots { display: flex; gap: 6px; flex: 0 1 auto; min-width: 0; }
+.lx-dots i { flex: 0 1 22px; min-width: 5px; height: 6px; border-radius: 3px; background: var(--lx-surface-3); transition: background .2s; }
 .lx-dots i.done { background: var(--lx-ink-3); } .lx-dots i.cur { background: var(--lx-ink); }
-.lx-step-n { font-family: var(--lx-f-mono); font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-step-n { font-family: var(--lx-f-mono); font-size: 12.5px; color: var(--lx-ink-3); white-space: nowrap; flex: none; }
 .lx-step-text { font-size: 19px; line-height: 1.45; max-width: 46ch; color: var(--lx-ink); }
 .lx-step-act { display: grid; gap: 12px; }
 .lx-step-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-@media (max-width: 560px) { .lx-stepcard { padding: 14px; } .lx-step-text { font-size: 18px; } .lx-dots i { width: 14px; } }
+@media (max-width: 560px) { .lx-stepcard { padding: 14px; } .lx-step-text { font-size: 18px; } .lx-dots { gap: 4px; } .lx-dots i { flex-basis: 14px; } }
 
 /* predict.css — predict buttons, the ordered-scale guess, and reveal lines (predict.js). */
 .lx-predictbox, .lx-guess { display: grid; gap: 10px; }
@@ -473,10 +476,14 @@ details.lx-deeper > summary::before { content: "+"; display: grid; place-items: 
   font-family: var(--lx-f-mono); font-size: 14px; color: var(--lx-ink-2); flex: none; }
 details.lx-deeper[open] > summary::before { content: "\2212"; }
 details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--lx-ink-3); font-weight: 500; }
-.lx-deeper-body { padding: 0 0 14px; font-size: 15.5px; color: var(--lx-ink-2); display: grid; gap: 10px; max-width: 75ch; overflow-x: auto; }
+/* one column that can shrink below its widest child (minmax(0, 1fr)), so text wraps at the card on a 375 px phone;
+   wide display equations, code and tables scroll on their own instead of pushing the column wider */
+.lx-deeper-body { padding: 0 0 14px; font-size: 15.5px; color: var(--lx-ink-2); display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; max-width: 75ch; }
 .lx-deeper-body p { margin: 0; }
 .lx-deeper-body ul { margin: 0; padding-left: 1.2rem; }
-.lx-deeper-body .math.display { overflow-x: auto; max-width: 100%; }
+.lx-deeper-body .math.display { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+.lx-deeper-body pre, .lx-deeper-body div.sourceCode { overflow-x: auto; max-width: 100%; }
+.lx-deeper-body table { display: block; overflow-x: auto; max-width: 100%; }
 
 /* glossary.css — tap-to-define terms and their popover (glossary.js). */
 .lx-term.on:not(.plain) { cursor: help; text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 3px;
@@ -580,6 +587,11 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
   .lx-ctable .pn { min-width: 0; }
   .lx-ctable td[data-label] { text-align: right; }
   .lx-ctable td[data-label]::before { content: attr(data-label); display: block; font-family: var(--lx-f-body); font-size: 10.5px; color: var(--lx-ink-3); white-space: nowrap; }
+  /* text: true (rows of words): one column of left-aligned labelled lines */
+  .lx-ctable-text tr { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .lx-ctable-text .rank { display: none; }
+  .lx-ctable-text td[data-label] { text-align: left; font-size: 14.5px; white-space: normal; }
+  .lx-ctable-text td.ph { display: block; }
 }
 
 /* chains.css — causal chain (causal.js) and energy chain (energychain.js). */

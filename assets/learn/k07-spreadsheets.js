@@ -308,11 +308,12 @@
       onSelect: function (n) { if (stepIdx === 0 && checks[0]) checks[0](n); },
       onChange: function (sheet, n, how) { if (checks[stepIdx]) checks[stepIdx](n, how); } });
     var cards = LX.StepCards(live, { id: "k7-steps", steps: steps, onStep: function (i) { stepIdx = i; LX.emit("layout"); } });
-    root.lxDemo = function (state) {   // screenshots: mid = step 3 after a fill-down with E1; fixed = step 5 with E fixed and F filled
+    LX.demo(root, function (state) {   // core.js LX.demo: mid = step 3 after a fill-down with E1; fixed = step 5 with E fixed and F filled
       if (state === "mid") { cards.go(2); sv.set("E5", "=B5-C5-D5-E1"); sv.select("E5"); sv.fill(); sv.select("E6"); return { view: "step 3" }; }
+      if (state !== "fixed") return null;
       cards.go(4); sv.set("E5", "=B5-C5-D5-$E$1"); sv.select("E5"); sv.fill(); sv.set("F5", "=E5*$E$2"); sv.select("F5"); sv.fill(); sv.select("F24");
       return { view: "step 5" };
-    };
+    }, cards);
     explain();
     practice(D);
   }

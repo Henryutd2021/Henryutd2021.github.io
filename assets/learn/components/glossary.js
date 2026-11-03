@@ -27,8 +27,12 @@
     }
     pop.innerHTML = "";
     H("b", { text: g.term }, pop); H("p", { text: g.short }, pop);
-    var here = LX.lesson();
-    if (g.lesson != null && !(here && here.starter === g.lesson)) H("a", { href: LX.base + "../../learn/index.html#lesson-" + g.lesson, text: "Taught in lesson " + g.lesson }, pop);
+    // "Taught in lesson 3" or "Taught in B2": glossary.json gives `lesson` (a starter number or a module code; older
+    // files may hold a number as text) and `href` (relative to learn/); no link on the page that teaches the term
+    var here = LX.lesson(), L = g.lesson, num = L != null && /^\d+$/.test(String(L));
+    var onIt = here && L != null && (String(here.starter) === String(L) || here.code === L || here.id === L);
+    if (L != null && !onIt) H("a", { href: LX.base + "../../learn/" + (g.href || (num ? "index.html#lesson-" + L : "index.html")),
+      text: "Taught in " + (num ? "lesson " + L : L) }, pop);
     pop.hidden = false; openBtn = btn;
     btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-describedby", "lx-pop");
     var r = btn.getBoundingClientRect(), pw = Math.min(300, window.innerWidth - 24);

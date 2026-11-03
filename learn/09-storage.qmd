@@ -211,7 +211,7 @@ Lesson 10 shows how to write such a model down, and lesson 11 how to check a sol
 <li>EIA (2022). <a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">Duration of utility-scale batteries depends on how they're used</a>. Today in Energy.</li>
 <li>EIA (2026). <a href="https://www.eia.gov/todayinenergy/detail.php?id=67925">Battery storage capacity averaged 70% growth over the last three years</a>. Today in Energy.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day.</li>
-<li>Earlier lessons: <a href="index.html#lesson-1">lesson 1</a> (power and energy), <a href="index.html#lesson-2">lesson 2</a> (the duck curve), <a href="index.html#lesson-8">lesson 8</a> (the price of one more MWh).</li>
+<li>Earlier lessons: <a href="01-power-energy.html">lesson 1</a> (power and energy), <a href="02-demand.html">lesson 2</a> (the duck curve), <a href="08-merit-order.html">lesson 8</a> (the price of one more MWh).</li>
 </ul>
 </div>
 ```

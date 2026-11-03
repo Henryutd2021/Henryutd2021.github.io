@@ -7,7 +7,9 @@
              cost: {text: "$10", unit: "/MWh", value: 10}}],
      sorts: [{label: "As built", order: ["nuclear", ...], note: "One sentence."},
              {label: "By running cost", order: [...], ranked: true, note: "<b>This order is the merit order.</b> ..."}] });
-   On phones the rows become small cards. The table is a real <table>, so it reads well without the diagram. */
+   On phones the rows become small cards. The table is a real <table>, so it reads well without the diagram.
+   text: true   for rows of words rather than numbers: on phones each row becomes a card of left-aligned labelled lines,
+                with no rank column, and phoneHide columns stay (long text in the number layout would overlap). */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
@@ -16,7 +18,7 @@
     H("h3", { text: o.title }, hd);
     var seg = o.sorts && o.sorts.length > 1 ? H("div", { class: "lx-seg", role: "group", "aria-label": "Order of the rows" }, hd) : null;
     var cap = H("p", { class: "lx-lede", "aria-live": "polite" }, host);
-    var sc = H("div", { class: "lx-tbl-scroll" }, host), tb = H("table", { class: "lx-ctable" }, sc);
+    var sc = H("div", { class: "lx-tbl-scroll" }, host), tb = H("table", { class: "lx-ctable" + (o.text ? " lx-ctable-text" : "") }, sc);
     var hr = H("tr", null, H("thead", null, tb));
     H("th", { class: "rank", "aria-label": "Rank" }, hr);
     o.columns.forEach(function (c) { H("th", { scope: "col", class: (c.num ? "n " : "") + (c.phoneHide ? "ph " : ""), text: c.label }, hr); });

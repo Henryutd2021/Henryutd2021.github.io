@@ -105,7 +105,7 @@ has("about $" + Math.round(C7.techs.cc.heatRate) + " or $" + Math.round(C7.techs
 
 // ---------------- sources, links, text budget, scope
 Object.keys(D.sources).forEach(s => ok(/^https:\/\/www\.eia\.gov\//.test(D.sources[s].url) && D.sources[s].asOf, `data: source ${s} has an EIA URL and an as-of date`));
-[...BODY.matchAll(/href="([^"]+)"/g)].forEach(m => ok(/^https:\/\/www\.eia\.gov\//.test(m[1]) || /^(00-grid-operator|07-cost|index)\.html/.test(m[1]), `page link ${m[1]} is allowed`));
+[...BODY.matchAll(/href="([^"]+)"/g)].forEach(m => ok(/^https:\/\/www\.eia\.gov\//.test(m[1]) || /^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/.test(m[1]), `page link ${m[1]} is allowed`));
 ok(BODY.indexOf('href="00-grid-operator.html"') >= 0 && BODY.indexOf('href="07-cost.html"') >= 0, "links back to lessons 0 and 7");
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*(?:free: true,\s*\n?\s*)?build/g)].map(m => m[1]);
 ok(stepTexts.length === 8, `eight step cards (${stepTexts.length})`);

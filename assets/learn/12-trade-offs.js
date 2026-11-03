@@ -264,8 +264,9 @@
     ];
     var cards = LX.StepCards(side, { id: "t12-steps", steps: steps });
     draw();
-    // screenshot and demo states: #lx-demo-<n> opens step n (1-5) with the earlier actions done
-    root.lxDemo = function (n) {
+    // demo states (core.js LX.demo): "step-N" opens step N (1-5) with the earlier actions done; "mid" = step 2
+    LX.demo(root, function (state) {
+      var n = state === "mid" ? 2 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
       S_.foundDom = true; S_.picked = DOM[0];
       if (n >= 2) { S_.price = 70; WIN.intervals.forEach(function (w) { S_.seen[w.id] = true; }); S_.seenAll = true; }
       var go = function () { cards.go(Math.max(0, Math.min(steps.length - 1, n - 1))); };
@@ -273,8 +274,8 @@
         var caps = n === 3 ? [400] : [700, 500, 400, 300, 200, 100];
         caps.reduce(function (p, c) { return p.then(function () { return solveCap(c); }); }, Promise.resolve()).then(function () { if (n >= 5) S_.steel = { price: true, cap: true }; go(); });
       } else go();
-    };
-    var dm = /lx-demo-(\d)/.exec(location.hash); if (dm) root.lxDemo(+dm[1]);
+      return { view: "step " + n };
+    }, cards);
     buildExplain(plans, DOM, WIN, cfg, fm);
   });
 

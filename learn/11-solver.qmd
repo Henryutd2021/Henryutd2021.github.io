@@ -104,7 +104,7 @@ At a 30 MW/h ramp limit the linear program costs \$106,300 and runs the peaker f
 
 At 07:00 one more MWh of demand costs \$100: raising the combined-cycle there would, through the ramp rule, push it up at 08:00 and 09:00 too, so the peaker is cheaper. One MWh *less* saves only \$80. The best cost has a kink at this demand, and any value between \$80 and \$100 is a valid shadow price; HiGHS reports \$80. At 09:00 the two sides are \$40 and \$20. Such optima are called degenerate; they are common in real models, so read a single reported price with care.
 
-Each price here is a marginal value under stated assumptions: fixed plant sizes, a linear model, and Prairie Town as an island. It is the merit-order price of [lesson 8](index.html#lesson-8), read from a solver, not a forecast of a market price.
+Each price here is a marginal value under stated assumptions: fixed plant sizes, a linear model, and Prairie Town as an island. It is the merit-order price of [lesson 8](08-merit-order.html), read from a solver, not a forecast of a market price.
 
 ```{=html}
 </div>
@@ -192,7 +192,7 @@ Each price here is a marginal value under stated assumptions: fixed plant sizes,
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Operators of the large U.S. markets solve dispatch models much like this one, with thousands of plants and lines, every few minutes (<a href="https://www.eia.gov/todayinenergy/detail.php?id=32052">EIA</a>). Their prices are shadow prices of balance rules, one for each location on the network, a step lesson M1 (upcoming) takes.</p>
+<p>Operators of the large U.S. markets solve dispatch models much like this one, with thousands of plants and lines, every few minutes (<a href="https://www.eia.gov/todayinenergy/detail.php?id=32052">EIA</a>). Their prices are shadow prices of balance rules, one for each location on the network, a step lesson <a href="m01-dispatch-to-lmp.html">M1</a> takes.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
@@ -201,7 +201,7 @@ Each price here is a marginal value under stated assumptions: fixed plant sizes,
 <li>EIA (2017). <a href="https://www.eia.gov/todayinenergy/detail.php?id=32052">The western U.S. sub-hourly wholesale electricity market is expanding</a>. Today in Energy.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day.</li>
 <li>JuMP. <a href="https://jump.dev/">Modelling language for mathematical optimization</a>, with HiGHS among its solvers.</li>
-<li>Earlier lessons: <a href="00-grid-operator.html">lesson 0</a> (the day by hand), <a href="10-write-it-down.html">lesson 10</a> (the model written down), <a href="index.html#lesson-8">lesson 8</a> (the merit-order price).</li>
+<li>Earlier lessons: <a href="00-grid-operator.html">lesson 0</a> (the day by hand), <a href="10-write-it-down.html">lesson 10</a> (the model written down), <a href="08-merit-order.html">lesson 8</a> (the merit-order price).</li>
 </ul>
 </div>
 ```

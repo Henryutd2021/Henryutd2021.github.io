@@ -170,7 +170,7 @@
   title: "Capacity factor: why is 1 MW not always 1 MW?"
   subtitle: "Run three 100 MW plants for a year and count what they make"
   teaches: [capacity factor, power and energy over a year, the wind power curve and the cube law]
-  lab: "compute capacity factors from a year of hourly data in Python (bridge B2, upcoming)."
+  lab: "compute capacity factors from a year of hourly data in Python (bridge B2)."
   short: "Capacity factor"
   does: "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power."
   outcome: "Turn a plant's size in MW into the energy it makes in a year."
@@ -310,6 +310,10 @@
   status: active
   minutes: 20
   title: "How do you read an energy headline like a researcher?"
+  subtitle: "Tag, check and weigh three real energy stories"
+  short: "Read a headline"
+  outcome: "Read an energy headline critically and spot a units or scale error."
+  teaches: [reading energy news critically, units and scale checks, counterfactuals and system boundaries, the evidence ladder]
   does: "Dissect a headline: tag phrases with the seven lens questions, run a back-of-envelope check, then write your take in three sentences (claim, what would change your mind, confidence)."
   after: [1]
   next: CK-F
@@ -334,6 +338,9 @@
   status: active
   minutes: 30
   title: "From algebra to a linear program: how do equations become a model?"
+  short: "Algebra to a linear program"
+  outcome: "Turn a word problem into a linear program, find its best corner on a graph and write it as Ax <= b."
+  teaches: [formulating a linear program, feasible region, Ax <= b form, solver use]
   does: "Start with a ten-question readiness check that routes you to the toolbox if needed; turn three word problems into equations and inequalities, then into a linear program; drag the constraints of a two-variable LP; write the same model as Ax <= b with a linked view."
   after: [10, K4]
   next: B2
@@ -347,6 +354,11 @@
   status: active
   minutes: 20
   title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
+  subtitle: "Find the bad hours in a real year of grid data"
+  short: "Python and data"
+  outcome: "Load, clean, plot and check a year of hourly grid data, and catch bad rows with assert checks."
+  teaches: [time stamps and daylight saving, data cleaning, duration curves, capacity factors from data, assert checks]
+  lab: "a notebook (about 60 minutes) that repeats every step in pandas, with auto-check cells."
   does: "In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows."
   after: [5, K7]
   next: B3
@@ -360,6 +372,9 @@
   status: active
   minutes: 30
   title: "How do you read a formulation, and check that a model is right?"
+  short: "Read and check a formulation"
+  outcome: "Read a published formulation line by line, find planted errors and check a solved model's balance and duals."
+  teaches: [reading a formulation, sets, parameters and variables, model verification, dual signs]
   does: "Read a published-style formulation (sets, indices, parameters, variables, constraints) and translate each line into words and units; find five planted errors (unit, sign, missing index, wrong sum, a free lunch); check a solved model's energy balance and the signs of its duals."
   after: [B1]
   next: M1
@@ -372,6 +387,10 @@
   status: active
   minutes: 40
   title: "From dispatch to locational prices: the linear program behind the market"
+  short: "Dispatch to locational prices"
+  outcome: "Formulate a dispatch LP, solve it, and explain each bus price as a dual in words."
+  teaches: [economic dispatch as a linear program, balance duals, DC power flow, transmission congestion, locational marginal prices]
+  lab: "a SciPy/HiGHS notebook that rebuilds the model and asserts the browser's prices, about 45 minutes."
   does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."
   after: [11, 8, B1, B2, B3]
 
@@ -428,6 +447,8 @@
   status: active
   minutes: 15
   title: "Linear equations and inequalities"
+  outcome: "Solve a balance for one unknown and read a set of inequalities as the region of plans that pass them."
+  teaches: [linear equations, inequalities, half-planes, systems of rules]
   next: B1
 - {kind: tool, code: K5, minutes: 25, title: "Probability and statistics"}
 - {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax <= b means"}
@@ -437,5 +458,7 @@
   status: active
   minutes: 20
   title: "Spreadsheets in practice"
+  outcome: "Build a small energy calculation in a spreadsheet with relative and absolute references and a check cell."
+  teaches: [cell references, fill-down, absolute references, SUM and MAX, check cells]
   next: B2
 - {kind: tool, code: K8, minutes: 20, title: "Git and reproducible notebooks"}

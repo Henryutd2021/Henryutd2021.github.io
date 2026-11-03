@@ -46,9 +46,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>A · Gas only</td><td>$103.9M</td><td>815 kt</td><td>cheapest at no carbon price</td></tr>
 <tr><td>B · Gas + 300 MW wind</td><td>$119.4M</td><td>521 kt</td><td>wins between $53 and $64 a tonne</td></tr>
 <tr><td>C · Gas + 500 MW solar</td><td>$131.4M</td><td>488 kt</td><td>not dominated, but no carbon price picks it</td></tr>
-<tr><td>D · Gas + 600 MW wind</td><td>$136.8M</td><td>248 kt</td><td>wins between $64 and $164 a tonne</td></tr>
-<tr><td>E · Gas + 800 MW solar</td><td>$159.6M</td><td>434 kt</td><td>dominated: D costs less and emits less</td></tr>
-<tr><td>F · Wind, solar and a battery</td><td>$158.6M</td><td>115 kt</td><td>wins above $164 a tonne</td></tr>
+<tr><td>D · Gas + 600 MW wind</td><td>$136.8M</td><td>249 kt</td><td>wins between $64 and $163 a tonne</td></tr>
+<tr><td>E · Gas + 800 MW solar</td><td>$159.6M</td><td>433 kt</td><td>dominated: D costs less and emits less</td></tr>
+<tr><td>F · Wind, solar and a battery</td><td>$158.6M</td><td>115 kt</td><td>wins above $163 a tonne</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">With JavaScript on, you pick the dominated plan, slide a carbon price and trace the frontier with a solver.</p>
@@ -79,14 +79,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <div class="lx-deepers">
-<style>/* lesson-local: keep Go deeper text inside the card on phones; wide equations scroll on their own */.page-lesson .lx-deeper-body{grid-template-columns:minmax(0,1fr)}.page-lesson .lx-deeper-body .math.display{display:block;overflow-x:auto;overflow-y:hidden}</style>
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Analyst</span>The limits of weighted sums</summary>
 <div class="lx-deeper-body">
 <ul>
 <li><b>Dents.</b> Plan C ($131.4M, 488 kt) lies above the straight line from B to D, so no carbon price picks it, though no plan beats it on both counts. Frontiers built from yes-or-no choices, such as building a plant or not, often have such dents.</li>
-<li><b>Straight pieces.</b> Between 500 and 400 kt the frontier's slope barely changes (about $40 a tonne): a price near $39.7 can land anywhere on that piece, and the solver reports one end.</li>
-<li><b>Uneven spacing.</b> Even steps in price give uneven steps along the frontier: up to $40 a tonne moves the plan from 792 kt to below 400 kt; from $40 to $220 it moves only to 100 kt.</li>
+<li><b>Straight pieces.</b> Between 500 and 400 kt the frontier's slope barely changes (about $44 a tonne): a price near $44 can land anywhere on that piece, and the solver reports one end.</li>
+<li><b>Uneven spacing.</b> Even steps in price give uneven steps along the frontier: up to $45 a tonne moves the plan from 792 kt to below 400 kt; from $45 to $220 it moves only to 100 kt.</li>
 <li><b>Weights carry units.</b> The weight in cost + <i>w</i> × CO₂ is a price in dollars per tonne; measure CO₂ in kilotonnes and the same number means something a thousand times larger.</li>
 </ul>
 <p>Das and Dennis (1997) showed these drawbacks for weighted sums in general. The epsilon-constraint method avoids the first two by fixing one goal and optimizing the other.</p>
@@ -101,7 +100,7 @@ With $c(x)$ the yearly cost of plan $x$ and $e(x)$ its CO₂, the [epsilon-const
 
 $$\min_x \; c(x) \quad \text{subject to} \quad e(x) \le \varepsilon \;\; (\lambda), \;\; x \in X.$$
 
-For a linear program, strong duality gives a multiplier $\lambda^* \ge 0$ such that the cap's best plan also minimizes the [weighted sum]{.lx-term term="weighted-sum"} $c(x) + \lambda^* e(x)$, and $\lambda^* = -\,\mathrm{d}c^*/\mathrm{d}\varepsilon$: the slope of the frontier. In this lesson's model, a 200 kt cap has $\lambda^* = \$72.8$ per tonne, and a \$72.8 price with no cap lands at 200 kt and \$126.6M.
+For a linear program, strong duality gives a multiplier $\lambda^* \ge 0$ such that the cap's best plan also minimizes the [weighted sum]{.lx-term term="weighted-sum"} $c(x) + \lambda^* e(x)$, and $\lambda^* = -\,\mathrm{d}c^*/\mathrm{d}\varepsilon$: the slope of the frontier. In this lesson's model, a 200 kt cap has $\lambda^* = \$85.2$ per tonne, and a \$85.2 price with no cap lands at 200 kt and \$129.3M.
 
 Where the frontier has a straight piece, $\lambda^*$ is the same along it and the weighted sum ties; with integer decisions there is no such guarantee at all. Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Upcoming: M6 (carbon in models) and A22 (five goals at once).
 
@@ -127,7 +126,7 @@ Where the frontier has a straight piece, $\lambda^*$ is the same along it and th
 <div class="lx-qq" data-id="same" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “A carbon price and a CO₂ cap can lead to the same plan.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. A 200 kt cap has a shadow price of $72.8 a tonne; that price, with no cap, lands at 200 kt.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. A 200 kt cap has a shadow price of $85.2 a tonne; that price, with no cap, lands at 200 kt.</p></details>
 </div>
 <div class="lx-qq" data-id="every" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Every plan that is not dominated can be picked by some carbon price.”</p>
@@ -138,7 +137,7 @@ Where the frontier has a straight piece, $\lambda^*$ is the same along it and th
 
 <div class="lx-quiz" data-quiz="t12">
 <div class="lx-qq" data-id="switch" data-answer="a">
-<p class="lx-qtext">Plan B costs $119.4M a year and emits 521 kt; plan D costs $136.8M and emits 248 kt. Above what carbon price does D score lower than B?</p>
+<p class="lx-qtext">Plan B costs $119.4M a year and emits 521 kt; plan D costs $136.8M and emits 249 kt. Above what carbon price does D score lower than B?</p>
 <ul class="lx-choices"><li data-value="a">About $64 a tonne</li><li data-value="b">About $17 a tonne</li><li data-value="c">About $273 a tonne</li><li data-value="d">D never scores lower</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>About $64: D costs $17.4M more and emits 272 kt less, and 17.4 million ÷ 272,000 tonnes ≈ $64 a tonne.</p></details>
 </div>

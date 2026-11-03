@@ -506,12 +506,12 @@
               { title: "Air conditioners work harder", text: "Millions of units run longer, at the same time." },
               { title: "Demand climbs", text: "Prairie Town, night low to peak.", value: num(s.min) + " → " + num(s.max) + " MW" },
               { title: "The rarest plants run", text: "The top 10% of the peak is needed only in the hottest hours.", value: num(h90) + " h a year" }],
-      note: "Prices tend to jump in these hours; lesson 8 (upcoming) shows why."
+      note: "Prices tend to jump in these hours; lesson 8 shows why."
     });
     // 3. comparison table
-    var c3 = H("div", { class: "lx-xcard t2-tt" }, host);
+    var c3 = H("div", { class: "lx-xcard" }, host);
     LX.CompareTable(c3, {
-      title: "What shapes demand at each time scale",
+      title: "What shapes demand at each time scale", text: true,
       columns: [{ key: "name", label: "Time scale", main: true }, { key: "drivers", label: "Main drivers" }, { key: "data", label: "In 2025's data" }, { key: "who", label: "Who plans for it", phoneHide: true }],
       rows: [
         { key: "day", name: "Day", color: "var(--lx-cc)", drivers: "Routines (sleep, work, school), sunlight, outdoor temperature", data: num(s.min) + " → " + num(s.max) + " MW on " + Wd.summer.label, who: "Operators, hour by hour (lesson 0)" },

@@ -434,13 +434,13 @@
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });
-    root.lxDemo = function (state) {
+    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus prices, error and milp
       if (state === "mid") { cards.go(0); var b = live.querySelector(".lx-step-act .lx-btn"); if (b) b.click(); return { view: "solved" }; }
       if (state === "prices") { cards.go(5); setTimeout(function () { var o = live.querySelector(".w11-p.odd"); if (o) o.click(); }, 400); return { view: "prices" }; }
       if (state === "error") { cards.go(3); var e = live.querySelectorAll(".lx-step-act .lx-btn"); if (e[0]) e[0].click(); setTimeout(function () { if (e[1]) e[1].click(); }, 600); return { view: "sign error" }; }
       if (state === "milp") { cards.go(7); setTimeout(function () { var m = live.querySelectorAll(".lx-step-act .lx-btn"); if (m[1]) m[1].click(); }, 500); return { view: "milp" }; }
       return null;
-    };
+    }, cards);
     root.lxLesson = { model: model, W: W, solve: solve, settings: function () { return set; }, cards: cards };
     LX.solver.preload();
     buildExplain(town, W, D, data["10_write_it_down"], data.town_year);

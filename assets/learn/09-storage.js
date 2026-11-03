@@ -342,12 +342,12 @@
     ];
     var cards = LX.StepCards(live, { steps: steps });
     live.insertBefore(stage, cards.el);
-    root.lxDemo = function (state) {
+    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus best and sizes
       if (state === "mid") { cards.go(3); [11, 12, 13, 14, 15].forEach(function (t) { plan[t] = -1; }); [17, 20, 21, 22].forEach(function (t) { plan[t] = 1; }); paint(); if (hook) hook({ plan: 0 }); return { view: "hand schedule" }; }
       if (state === "best") { cards.go(4); var b = live.querySelector(".lx-step-act .lx-btn"); if (b) b.click(); return { view: "best schedule" }; }
       if (state === "sizes") { cards.go(5); live.querySelectorAll(".lx-step-act .lx-btn").forEach(function (b, i) { setTimeout(function () { b.click(); }, 200 * i); }); return { view: "sizes" }; }
       return null;
-    };
+    }, cards);
     root.lxLesson = { model: model, W: W, plan: plan, cards: cards, best: function () { return best; } };
     buildExplain(town, W, D);
   }

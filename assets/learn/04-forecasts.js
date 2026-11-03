@@ -361,12 +361,13 @@
     ];
     var cards = LX.StepCards(live, { id: "l4-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
     draw(false); LX.onTheme(function () { draw(false); });   // the band's opacity depends on day or night
-    root.lxDemo = function (state) {
+    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus band and cost
       if (state === "mid") { S_.day = "miss"; cards.go(1); }
-      if (state === "band") { S_.day = "miss"; S_.level = "80"; cards.go(4); }
-      if (state === "cost") { S_.margin = BEST.r; cards.go(5); }
-      return S_;
-    };
+      else if (state === "band") { S_.day = "miss"; S_.level = "80"; cards.go(4); }
+      else if (state === "cost") { S_.margin = BEST.r; cards.go(5); }
+      else return null;
+      return { view: state };
+    }, cards);
     root.lxModel = { model: model, days: DAYS, best: BEST, state: function () { return S_; } };
     buildExplain(fc, DAYS, BEST);
   }

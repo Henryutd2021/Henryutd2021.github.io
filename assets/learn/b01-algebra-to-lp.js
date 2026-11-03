@@ -719,15 +719,15 @@
     });
 
     var cards = LX.StepCards(live, { id: "b1-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
-    root.lxDemo = function (state) {   // screenshots: mid = the cheapest corner (step 5), diy = step 8 filled, mx = step 9 flipped
-      var k = { mid: 4, diy: 7, mx: 8, signs: 5, ready: 0 }[state]; if (k == null) k = 4;
+    LX.demo(root, function (state) {   // core.js LX.demo: mid = the cheapest corner (step 5), diy = step 8 filled, mx = step 9 flipped
+      var k = { mid: 4, diy: 7, mx: 8, signs: 5, ready: 0 }[state]; if (k == null) return null;
       cards.go(k);
       var btn = function (re) { return [].filter.call(live.querySelectorAll(".b1-acts button"), function (b) { return re.test(b.textContent); })[0]; };
       if (state === "diy") { for (var h = 0; h < 3; h++) { var hb = btn(/^Hint/); if (hb) hb.click(); } var sa = btn(/Show the answer/); if (sa) sa.click(); }
       if (state === "mx") { var f = live.querySelector(".b1-flip"); if (f) f.click(); var r = live.querySelectorAll(".b1-mxr:not(.head)")[1]; if (r) r.click(); }
       if (state === "signs") live.querySelectorAll(".b1-signs .lx-seg")[0].querySelector("button").click();
       return { view: "step " + (k + 1) };
-    };
+    }, cards);
     explain(d1, planning, battery, best1, bestP, bestB);
     practice(J);
   }

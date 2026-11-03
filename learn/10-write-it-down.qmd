@@ -127,7 +127,7 @@ res = linprog(c=[40, 100],
 print(res.x, res.fun)   # [145.   0.] 5800.0
 ```
 
-The bridge lesson B1 (upcoming) turns word problems into this form step by step.
+The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form step by step.
 
 ```{=html}
 </div>
@@ -233,7 +233,7 @@ The bridge lesson B1 (upcoming) turns word problems into this form step by step.
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind Prairie Town's day.</li>
 <li>HiGHS. <a href="https://ergo-code.github.io/HiGHS/dev/">Documentation</a>: the open-source solver that lesson 11 runs in your browser.</li>
 <li>JuMP. <a href="https://jump.dev/">Modelling language for mathematical optimization</a> in Julia.</li>
-<li>Earlier lessons: <a href="00-grid-operator.html">lesson 0</a> (the day you ran by hand), <a href="index.html#lesson-8">lesson 8</a> (the merit order as an optimization).</li>
+<li>Earlier lessons: <a href="00-grid-operator.html">lesson 0</a> (the day you ran by hand), <a href="08-merit-order.html">lesson 8</a> (the merit order as an optimization).</li>
 </ul>
 </div>
 ```

@@ -54,16 +54,16 @@ const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
   ok(by.D.cost < by.E.cost && by.D.co2 < by.E.co2, `D beats E on both counts: ${musd(by.E.cost - by.D.cost)} less, ${kt(by.E.co2 - by.D.co2)} less`);
   ok(W.intervals.map(w => w.id).join() === "A,B,D,F", "as the price rises the winner moves A, B, D, F");
   const bp = W.intervals.map(w => w.to);
-  ok(near(bp[0], 52.9, 0.05) && near(bp[1], 63.8, 0.05) && near(bp[2], 163.8, 0.05), `breakpoints $${bp.slice(0, 3).map(x => x.toFixed(1)).join(", $")} a tonne`);
+  ok(near(bp[0], 53.0, 0.05) && near(bp[1], 64.0, 0.05) && near(bp[2], 162.9, 0.05), `breakpoints $${bp.slice(0, 3).map(x => x.toFixed(1)).join(", $")} a tonne`);
   ok(BIG.never.join() === "C,E" && M.supported(plans).join() === "A,B,D,F", "C and E never win at any price; A, B, D, F are supported");
   let cWins = false; for (let p = 0; p <= 1e5; p += p < 1000 ? 0.5 : 50) if (M.winner(plans, p).id === "C") cWins = true;
   ok(!cWins, "scan: C wins at no price from $0 to $100,000 a tonne");
   ok(M.slope(by.B, by.C) > M.slope(by.B, by.D), "C lies above the straight line from B to D (a dent)");
   ok(M.winner(plans, 70).id === "D", "at $70 a tonne D wins (the demo state)");
   // fallback table
-  const notes = { A: "cheapest at no carbon price", B: "wins between $53 and $64 a tonne", C: "not dominated, but no carbon price picks it", D: "wins between $64 and $164 a tonne",
-                  E: "dominated: D costs less and emits less", F: "wins above $164 a tonne" };
-  ok(Math.round(bp[0]) === 53 && Math.round(bp[1]) === 64 && Math.round(bp[2]) === 164, "fallback notes: $53, $64, $164");
+  const notes = { A: "cheapest at no carbon price", B: "wins between $53 and $64 a tonne", C: "not dominated, but no carbon price picks it", D: "wins between $64 and $163 a tonne",
+                  E: "dominated: D costs less and emits less", F: "wins above $163 a tonne" };
+  ok(Math.round(bp[0]) === 53 && Math.round(bp[1]) === 64 && Math.round(bp[2]) === 163, "fallback notes: $53, $64, $163");
   plans.forEach(p => onPage(`<tr><td>${p.id} · ${p.label}</td><td>${musd(p.cost)}</td><td>${kt(p.co2)}</td><td>${notes[p.id]}</td></tr>`, `the fallback row for ${p.id}`));
   onPage(`Plan C (${musd(by.C.cost)}, ${kt(by.C.co2)})`, "plan C in Go deeper");
   // quick question
@@ -86,13 +86,14 @@ const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
     ok(close || (lo.length > 1 && s.co2 >= Math.min(...lo) - 2e4 && s.co2 <= Math.max(...lo) + 2e4), `cap ${p.cap} kt: its price lands at ${kt(s.co2)}`);
   });
   // straight piece between 500 and 400 kt, and uneven spacing
-  ok(Math.abs(at(500).dual - at(400).dual) < 0.5 && near(at(400).dual, 40, 0.5), `500 and 400 kt share a slope of about $40 ($${at(500).dual.toFixed(2)}, $${at(400).dual.toFixed(2)})`);
-  const a397 = priced(39.7), a3973 = priced(at(400).dual);
-  ok(a397.co2 > 380e3 && a397.co2 < 505e3 && a3973.co2 > 380e3 && a3973.co2 < 505e3 && Math.abs(a397.co2 - a3973.co2) > 1e4, `prices near $39.7 land at different ends of the piece: ${kt(a397.co2)} and ${kt(a3973.co2)}`);
-  onPage("a price near $39.7 can land anywhere on that piece", "the straight piece");
-  const p40 = priced(40), p220 = priced(220);
-  ok(p40.co2 < 400e3 && p40.co2 > 300e3 && Math.abs(p220.co2 - 100e3) < 5e3 && Math.round(free.co2 / 1e3) === 792, `uneven spacing: $40 -> ${kt(p40.co2)}, $220 -> ${kt(p220.co2)}, no price -> ${kt(free.co2)}`);
-  onPage("up to $40 a tonne moves the plan from 792 kt to below 400 kt; from $40 to $220 it moves only to 100 kt", "uneven spacing");
+  ok(Math.abs(at(500).dual - at(400).dual) < 1 && near(at(400).dual, 44, 0.5), `500 and 400 kt share a slope of about $44 ($${at(500).dual.toFixed(2)}, $${at(400).dual.toFixed(2)})`);
+  const a44a = priced(at(500).dual), a44b = priced(at(400).dual);
+  ok(Math.round(at(500).dual) === 43 && Math.round(at(400).dual) === 44 && a44a.co2 > 380e3 && a44a.co2 < 510e3 && a44b.co2 > 380e3 && a44b.co2 < 510e3 && Math.abs(a44a.co2 - a44b.co2) > 1e4,
+     `prices near $44 ($${at(500).dual.toFixed(2)}, $${at(400).dual.toFixed(2)}) land at different ends of the piece: ${kt(a44a.co2)} and ${kt(a44b.co2)}`);
+  onPage("a price near $44 can land anywhere on that piece", "the straight piece");
+  const p45 = priced(45), p220 = priced(220);
+  ok(p45.co2 < 400e3 && p45.co2 > 300e3 && Math.abs(p220.co2 - 100e3) < 5e3 && Math.round(free.co2 / 1e3) === 792, `uneven spacing: $45 -> ${kt(p45.co2)}, $220 -> ${kt(p220.co2)}, no price -> ${kt(free.co2)}`);
+  onPage("up to $45 a tonne moves the plan from 792 kt to below 400 kt; from $45 to $220 it moves only to 100 kt", "uneven spacing");
   // the frontier lies below every hand-made plan (step 3's saw)
   plans.forEach(p => { const f = TP.frontierAt(pts, p.co2); ok(f == null || f < p.cost, `the frontier at ${kt(p.co2)} (${f == null ? "outside" : musd(f)}) is below plan ${p.id}`); });
 

@@ -57,12 +57,7 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, S = LX.S, LESSON = "06-three-jobs";
-  // lesson-local pictograms (24-unit strokes, like LX.IC)
-  LX.IC.atom = LX.IC.atom || '<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>';
-  LX.IC.flame = LX.IC.flame || '<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.4 3.6-8.3.6 1.6 1.4 2.6 2.6 3.2C12 6.7 13.6 4.4 15.4 3c-.2 3 1 4.8 2.2 6.6 1 1.4 1.4 2.9 1.4 4.9 0 3.7-2.7 6.5-7 6.5z"/>';
-  LX.IC.drop = LX.IC.drop || '<path d="M12 3.5c3 4 6 7.4 6 10.8a6 6 0 0 1-12 0c0-3.4 3-6.8 6-10.8z"/><path d="M9 15a3 3 0 0 0 3 3"/>';
-  LX.IC.geo = LX.IC.geo || '<path d="M3 15h18M5.5 19h13"/><path d="M12 15V5M9 8l3-3 3 3"/><path d="M7 12.5c0-1.5 1.5-1.5 1.5-3M17 12.5c0-1.5-1.5-1.5-1.5-3"/>';
-  LX.IC.dial = LX.IC.dial || '<path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l-4-3"/><path d="M3 20h18"/>';
+  // the pictograms atom, flame, drop, geo and dial are in the shared LX.IC (core.js) since the W1 merge
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function pct(x, d) { return (x * 100).toFixed(d === undefined ? 1 : d) + "%"; }
   function firmText(t) { return t.firm == null ? t.firmLabel : t.firmLabel + (t.firmNote ? " (" + t.firmNote + ")" : ""); }
@@ -188,10 +183,11 @@
         } }
     ];
     var cards = LX.StepCards(live, { id: "t6-steps", steps: steps });
-    // screenshot and demo hook: #lx-demo-<n> opens step n (1-7) with its action done (scripts/learn_screenshots.mjs, state "mid";
-    // plain #lx-demo opens the sorter, partly filled and checked). Readers never see it unless they type the hash.
-    root.lxDemo = function (n) {
-      var i = Math.max(0, Math.min(steps.length - 1, (n || 5) - 1));
+    // demo states (core.js LX.demo): "step-N" opens step N (1-7) with its action done; "mid" = the sorter, partly filled
+    // and checked (step 5)
+    LX.demo(root, function (state) {
+      var n = state === "mid" ? 5 : +((/^step-(\d+)$/.exec(state) || [])[1] || 0); if (!n) return null;
+      var i = Math.max(0, Math.min(steps.length - 1, n - 1));
       var click = function (sel, k) { var b = cards.el.querySelectorAll(sel)[k || 0]; if (b) b.click(); };
       pred = "battery"; TECH.forEach(function (t) { openedTech[t.key] = true; });
       if (i === 4) { marks = referenceMarks(TECH); marks.wind.flex = true; marks.battery.energy = true; checked = true; }
@@ -203,9 +199,8 @@
       if (i === 4) click(".lx6-sorter .lx-btn");
       if (i === 5) { click(".lx6-side .lx-btn", 0); click(".lx6-side .lx-btn", 1); }
       if (i === 6) click(".lx-choice", 1);
-    };
-    var dm = /^#lx-demo(?:-(\d+))?$/.exec(location.hash);
-    if (dm) setTimeout(function () { root.lxDemo(dm[1] ? +dm[1] : 5); }, 50);
+      return { view: "step " + (i + 1) };
+    }, cards);
     buildExplain(D, byKey, jobBy);
   }
 
