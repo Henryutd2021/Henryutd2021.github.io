@@ -22,7 +22,7 @@ glossary:
     lesson: 10
   - id: binding-constraint
     term: Binding constraint
-    def: "A rule that holds with no room to spare at the best plan, so loosening it would change the answer."
+    def: "A rule that the best plan meets exactly, with no slack left."
     lesson: 10
   - id: infeasible
     term: Infeasible
@@ -34,7 +34,7 @@ glossary:
     lesson: 10
   - id: simplex-method
     term: Simplex method
-    def: "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, always improving the goal, until no neighbour is better."
+    def: "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better."
     lesson: 11
   - id: mixed-integer-program
     term: Mixed-integer program

@@ -1,0 +1,6 @@
+# Sidecar for lesson 0 (00-grid-operator), W1 fix group A, 2026-11-02: new glossary terms.
+lesson: 0
+glossary:
+  - id: operating-emissions
+    term: Operating emissions
+    def: "The CO2 released where fuel is burned to make electricity, leaving out building the plant and producing and delivering its fuel."

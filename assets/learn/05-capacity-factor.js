@@ -22,7 +22,10 @@
 //   energy in a year E  = P x 8,760 h x CF  (2025 had 365 days)
 //   average output       = E / T, so CF = average output / P (the "flat line" of step 3)
 //   wind turbine (clean power curve, illustrative): P(v) = rated x (v / v_rated)^3 for cut-in <= v < v_rated; rated for
-//   v_rated <= v <= cut-out; 0 otherwise. Doubling v below the rated speed multiplies P by 2^3 = 8.
+//   v_rated <= v <= cut-out; 0 otherwise. Doubling v multiplies P by 2^3 = 8 only when both speeds lie between the
+//   cut-in and the rated speed; then output holds at rated power until the cut-out speed, where it drops to zero.
+//   measured(D): the Go deeper comparison with a measured power curve (NREL test of a 1.5 MW research turbine, bins
+//   from the report's Table 6 in the data file; the spread is one standard deviation, Category A uncertainty x sqrt(N)).
 //
 // The explain layer's equation card is the shared LX.EquationCard (components/equation.js). The pure model is exported
 // for Node.
@@ -72,7 +75,8 @@
     bars.forEach(function (b) { above += Math.max(0, b - L); below += Math.max(0, L - b); });
     return { above: above, below: below, total: sum(bars), line: L * bars.length };
   }
-  function levelled(bars, L) { return Math.abs(sum(bars) - L * bars.length) <= bars.length + 1e-9; }   // within 1 MW of the average
+  // level to the slider's step: within half a step of the average (1 MW steps: 670 MWh / 24 h = 27.9 MW, so only 28 MW passes)
+  function levelled(bars, L, step) { return Math.abs(sum(bars) - L * bars.length) <= bars.length * (step || 1) / 2 + 1e-9; }
   // clean power curve of the illustrative turbine (kW)
   function power(v, tb) {
     if (v < tb.cutIn || v > tb.cutOut) return 0;
@@ -82,6 +86,46 @@
   // power in the wind through the rotor (kW): 1/2 rho A v^3
   function windPower(v, tb) { var A = Math.PI * Math.pow(tb.rotorM / 2, 2); return 0.5 * tb.airDensity * A * Math.pow(v, 3) / 1000; }
   function homes(mwh, kwhPerHome) { return mwh * 1000 / kwhPerHome; }
+  // the measured power curve, bin by bin: wind speed, average kW, spread (one standard deviation of the 10-minute averages,
+  // = Category A uncertainty x sqrt(N)), and the clean curve for the same turbine (cube law at its best Cp, capped at rated)
+  function cleanMeasured(v, M) {
+    if (v < M.cutIn || v > M.cutOut) return 0;
+    var A = Math.PI * Math.pow(M.rotorM / 2, 2);
+    return Math.min(M.ratedKW, 0.5 * M.airDensity * A * Math.pow(v, 3) * M.cpBest / 1000);
+  }
+  function measured(D) {
+    var M = D.measured;
+    return M.bins.map(function (b) {
+      var sd = b[3] * Math.sqrt(b[2]);
+      return { v: b[0], kw: b[1], n: b[2], sd: sd, clean: cleanMeasured(b[0], M) };
+    });
+  }
+  // feedback after "Double the wind speed" (steps 5 and 6): {ok, text}; ok = the step's action is done
+  function windFeedback(mode, v0, v1, tb) {
+    var cutIn = "Below the [[cut-in-speed|cut-in speed]], " + tb.cutIn + " m/s, the turbine makes no electricity, so there is nothing to multiply. ";
+    if (mode === "cube") {
+      if (v0 >= tb.cutIn && v1 <= tb.ratedSpeed) return { ok: true, text: "Eight times as much power (2 × 2 × 2) for twice the wind speed. Small changes in the wind make big changes in output." };
+      if (v0 < tb.cutIn) return { ok: false, text: cutIn + "Start between 3 and 6 m/s." };
+      if (v1 > tb.cutOut) return { ok: false, text: "That double passed the cut-out speed, " + tb.cutOut + " m/s, so the turbine shut down. Start between 3 and 6 m/s to stay on the cube law." };
+      return { ok: false, text: "That double passed the rated speed, " + tb.ratedSpeed + " m/s, where output stops growing. Start between 3 and 6 m/s to stay on the cube law." };
+    }
+    if (v1 > tb.cutOut) return { ok: false, text: "Above " + tb.cutOut + " m/s the turbine stops to protect itself: zero output. Try 8 m/s." };
+    if (v0 < tb.cutIn) return { ok: false, text: cutIn + "Start at 8 m/s so the double passes " + tb.ratedSpeed + " m/s." };
+    if (v1 > tb.ratedSpeed) return { ok: true, text: "Only × " + (power(v1, tb) / power(v0, tb)).toFixed(1) + ": above " + tb.ratedSpeed + " m/s the blades turn out of the wind and hold " +
+      Math.round(tb.ratedKW).toLocaleString("en-US") + " kW. Above " + tb.cutOut + " m/s the turbine stops to protect itself." };
+    return { ok: false, text: "Both speeds are between cut-in and rated, so eight times again. Start at 8 m/s or more so the double passes " + tb.ratedSpeed + " m/s." };
+  }
+  // the explain layer's Python: the solar day's capacity factor, then the wind farm's year, in separate variables
+  function pyCode(W, D) {
+    var pad = function (s) { while (s.length < 44) s += " "; return s; };
+    return [pad("solar_day_mw = [" + W.dayBars.join(", ") + "]") + "  # step 3: 24 hourly outputs, MW",
+            pad("energy_mwh = sum(solar_day_mw)") + "  # each hour: MW x 1 h; " + Math.round(W.dayEnergy).toLocaleString("en-US") + " MWh",
+            pad("solar_day_cf = energy_mwh / (" + D.plantMW + " * 24)") + "  # size " + D.plantMW + " MW, 24 h: " + W.dayCF.toFixed(3),
+            "",
+            pad("wind_mw = " + D.apply.mw) + "  # Prairie Town's wind farm",
+            pad("wind_cf = " + W.T.wind) + "  # a fraction: " + (W.T.wind * 100).toFixed(1) + "% = " + W.T.wind,
+            pad("wind_year_mwh = wind_mw * 8760 * wind_cf") + "  # about " + Math.round(W.applyMWh).toLocaleString("en-US") + " MWh"].join("\n");
+  }
   // everything the page states, from one place (used by the view and by the Node test)
   function targets(CT) { return { nuclear: CT.reference.nuclear.cf, wind: CT.targets.wind.cf, solar: CT.targets.solar.cf }; }
   function world(year, D, CT) {
@@ -91,7 +135,10 @@
       w[k] = { out: out, energy: E, cf: E / (P * HOURS), max: Math.max.apply(null, out), monthly: monthly(out, P, D.year.monthDays),
                perMW: annualEnergy(1, T[k]), homesPerMW: homes(annualEnergy(1, T[k]), D.homes.kwhPerHomeYear) };
     });
-    w.dayBars = day(w[D.day.tech].out, year, D.day.date, D.day.utcOffsetHours);
+    // the solar day: stored in the data file (D.day.bars, see its note), so the static page and the steps state the same
+    // numbers; dayCut is the same day cut from the year profile (the test checks they agree within 1 MW an hour)
+    w.dayCut = day(w[D.day.tech].out, year, D.day.date, D.day.utcOffsetHours);
+    w.dayBars = (D.day.bars || w.dayCut).slice();
     w.dayEnergy = sum(w.dayBars); w.dayAvg = w.dayEnergy / 24; w.dayCF = w.dayAvg / P;
     var lit = w.dayBars.filter(function (b) { return b > 0; }).length;
     w.dayLit = lit; w.dayLitCF = w.dayEnergy / (P * lit); w.dayBest = Math.max.apply(null, w.dayBars);
@@ -99,7 +146,8 @@
     return w;
   }
   var model = { HOURS: HOURS, profile: profile, capacityFactor: capacityFactor, annualEnergy: annualEnergy, monthly: monthly,
-                dayIndex: dayIndex, day: day, levels: levels, levelled: levelled, power: power, windPower: windPower, homes: homes, targets: targets, world: world, sum: sum };
+                dayIndex: dayIndex, day: day, levels: levels, levelled: levelled, power: power, windPower: windPower, homes: homes, measured: measured, cleanMeasured: cleanMeasured,
+                targets: targets, world: world, sum: sum, windFeedback: windFeedback, pyCode: pyCode };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -272,7 +320,7 @@
           var trY = H("tr", null, bd); H("td", { text: "Year" }, trY); KEYS.forEach(function (k) { H("td", { text: pct(W[k].cf) }, trY); });
           tabs.pick(KEYS.filter(function (k) { return !seen[k]; })[0] || "nuclear");
         } },
-      { text: "Count one day. These are the solar farm's 24 hourly outputs on " + D.day.dateLabel + ", the day from lesson 0. Slide the flat line until it holds the same energy as the bars.",
+      { text: "Count one day: the solar farm's 24 hourly outputs on " + D.day.dateLabel + ", the lesson-0 day (SPP's shape, reshaped to U.S. averages). Slide the flat line until it holds the same energy as the bars.",
         build: function (act, api) {
           var chart = DayLevel(act, W.dayBars, D.day);
           var grid = H("ol", { class: "lx5-hours", "aria-label": "Hourly output, MW" }, act);
@@ -284,9 +332,10 @@
             level = L; chart.render(L);
             var z = levels(W.dayBars, L);
             read.innerHTML = "Sun above the line: <b>" + F.int(z.above) + " MWh</b> · dashed gaps below it: <b>" + F.int(z.below) + " MWh</b>";
-            if (levelled(W.dayBars, L)) {
+            if (levelled(W.dayBars, L, 1)) {
               api.done(); keep("level", L);
-              api.saw("Level. The bars hold " + F.int(W.dayEnergy) + " MWh; a flat " + W.dayAvg.toFixed(1) + " MW for 24 hours holds the same. That flat line is the day's average output.");
+              api.saw("Level to the nearest MW: " + L + " MW for 24 h holds " + F.int(L * 24) + " MWh, the bars " + F.int(W.dayEnergy) + " MWh. Exactly level is " +
+                F.int(W.dayEnergy) + " ÷ 24 = " + W.dayAvg.toFixed(1) + " MW: the day's average output.");
             }
           }
           sl.set(level); upd(level);
@@ -302,7 +351,7 @@
             keep("cfPick", v); api.saw(why[v], v !== "cf"); if (v === "cf") api.done();
           });
         } },
-      { text: "Why does wind swing so much? The power in the wind grows with the [[cube-law|cube of its speed]]. Set a speed between 3 and 6 m/s, then double it.",
+      { text: "Why does wind output swing so much? Between the [[cut-in-speed|cut-in]] and rated speeds, a turbine's output grows with the [[cube-law|cube of the wind speed]]. Set a speed between 3 and 6 m/s, then double it.",
         build: function (act, api) { return windStep(act, api, "cube"); } },
       { text: "Now start at 8 m/s and double again. Watch what the turbine does above its [[rated-speed|rated speed]] of " + tb.ratedSpeed + " m/s.",
         build: function (act, api) { return windStep(act, api, "rated"); } },
@@ -317,11 +366,12 @@
             seenMW[k] = true; bars.innerHTML = "";
             row("At full size all year", 8760, "var(--lx-ink-3)");
             KEYS.forEach(function (j) { if (seenMW[j]) row(TECH[j].label + " at " + pct(T[j]), W[j].perMW, TECH[j].col, j === k); });
-            out.innerHTML = "<b>1 MW of " + TECH[k].label.toLowerCase() + "</b>: 8,760 h × " + pct(T[k]) + " = <b>" + F.int(W[k].perMW) + " MWh</b> a year, enough for about " +
-              F.int(W[k].homesPerMW) + " average U.S. homes.";
+            out.innerHTML = "<b>1 MW of " + TECH[k].label.toLowerCase() + "</b>: 8,760 h × " + pct(T[k]) + " = <b>" + F.int(W[k].perMW) + " MWh</b> a year: the yearly electricity purchases of about " +
+              F.int(W[k].homesPerMW) + " U.S. homes.";
             if (KEYS.every(function (j) { return seenMW[j]; })) {
               api.done(); keep("permw", true);
-              api.saw("Same 1 MW: " + KEYS.map(function (j) { return TECH[j].label.toLowerCase() + " " + F.int(W[j].perMW) + " MWh (" + F.int(W[j].homesPerMW) + " homes)"; }).join(", ") + ".");
+              api.saw("Same 1 MW: " + KEYS.map(function (j) { return TECH[j].label.toLowerCase() + " " + F.int(W[j].perMW) + " MWh (" + F.int(W[j].homesPerMW) + " homes)"; }).join(", ") +
+                ". Homes here is a yearly energy match (2022 average), not supply in every hour.");
             }
           });
         } },
@@ -342,7 +392,7 @@
       var cv = Curve(act, tb), read = H("div", { class: "lx5-stats", "aria-live": "polite" }, act);
       var row = H("div", { class: "lx5-wrow" }, act);
       var sl = LX.Slider(row, { label: "Wind speed", color: "var(--lx-wind)", max: tb.maxSlider, step: 0.5, unit: "m/s", onChange: function (v) { speed = v; prevSpeed = null; show(); },
-        hint: function () { return "Cut-in " + tb.cutIn + " m/s, rated " + tb.ratedSpeed + " m/s, [[cut-out-speed|cut-out]] " + tb.cutOut + " m/s (illustrative 3 MW turbine)."; } });
+        hint: function () { return "[[cut-in-speed|Cut-in]] " + tb.cutIn + " m/s, rated " + tb.ratedSpeed + " m/s, [[cut-out-speed|cut-out]] " + tb.cutOut + " m/s (illustrative 3 MW turbine)."; } });
       var dbl = H("button", { class: "lx-btn small", type: "button", text: "Double the wind speed" }, row);
       var res = H("p", { class: "lx5-read", "aria-live": "polite" }, act);
       speed = mode === "cube" ? 5 : 8; prevSpeed = null; sl.set(speed);
@@ -357,15 +407,9 @@
         prevSpeed = v0; speed = v1; sl.set(v1); show();
         var ratio = p0 > 0 ? p1 / p0 : null;
         res.textContent = v0 + " → " + v1 + " m/s: " + kw(p0) + " → " + kw(p1) + (ratio != null ? " (× " + (Math.abs(ratio - 8) < 1e-9 ? "8" : ratio.toFixed(1)) + ")" : "") + ".";
-        var inCube = v0 >= tb.cutIn && v1 <= tb.ratedSpeed, over = v1 > tb.ratedSpeed && v0 >= tb.cutIn;
-        if (mode === "cube") {
-          if (inCube) { doubled.cube = true; keep("cube", [v0, v1]); api.done(); api.saw("Eight times as much power (2 × 2 × 2) for twice the wind speed. Small changes in the wind make big changes in output."); }
-          else api.saw(v0 < tb.cutIn ? "Below " + tb.cutIn + " m/s the blades do not turn: zero output. Try a start between 3 and 6 m/s." : "That double passed the rated speed. Start between 3 and 6 m/s to stay on the cube law.", true);
-        } else {
-          if (v1 > tb.cutOut) { api.saw("Above " + tb.cutOut + " m/s the turbine stops to protect itself: zero output. Try 8 m/s.", true); return; }
-          if (over) { doubled.rated = true; keep("rated", [v0, v1]); api.done(); api.saw("Only × " + (p1 / p0).toFixed(1) + ": above " + tb.ratedSpeed + " m/s the blades turn out of the wind and hold " + F.int(tb.ratedKW) + " kW. Above " + tb.cutOut + " m/s the turbine stops to protect itself."); }
-          else api.saw("Still below the rated speed: eight times again. Start at 8 m/s or more so the double passes " + tb.ratedSpeed + " m/s.", true);
-        }
+        var f = windFeedback(mode, v0, v1, tb);
+        if (f.ok) { doubled[mode] = true; keep(mode, [v0, v1]); api.done(); }
+        api.saw(f.text, !f.ok);
       });
       show();
     }
@@ -393,7 +437,7 @@
     host.innerHTML = ""; host.classList.add("is-live");
     var P = D.plantMW, T = W.T;
     var c1 = H("div", { class: "lx-xcard" }, host);
-    var reasons = { nuclear: "Off for refuelling about a month in spring", wind: "Wind speed varies; output follows its cube", solar: "Night, clouds and short winter days" };
+    var reasons = { nuclear: "Off for refuelling about a month in spring", wind: "Wind speed varies; below rated speed, output follows its cube", solar: "Night, clouds and short winter days" };
     LX.CompareTable(c1, {
       title: "Three plants, 100 MW each, one year",
       columns: [{ key: "name", label: "Plant and why it is below 100%", main: true }, { key: "e", label: "Energy in the year, MWh", phone: "MWh", num: true },
@@ -403,7 +447,7 @@
                  cf: { text: pct(W[k].cf), value: W[k].cf } };
       }).concat([{ key: "full", color: "var(--lx-ink-3)", name: "At full size", note: "Every hour of the year", e: { text: F.int(P * HOURS), value: P * HOURS }, cf: { text: "100%", value: 1 } }]),
       sorts: [{ label: "As built", order: ["nuclear", "wind", "solar", "full"], note: "The same 100 MW of nameplate makes very different energy." },
-              { label: "By capacity factor", order: ["full", "nuclear", "wind", "solar"], ranked: true, note: "<b>Capacity factor ranks the energy job.</b> It says nothing yet about when the energy comes (lesson 6)." }]
+              { label: "By capacity factor", order: ["full", "nuclear", "wind", "solar"], ranked: true, note: "<b>Capacity factor ranks energy made per MW of size.</b> It says nothing about cost (lesson 7) or about when the energy comes (lesson 6)." }]
     });
     var c2 = H("div", { class: "lx-xcard" }, host);
     var log = function () { return LX.store.get("t5-log", {}) || {}; };
@@ -411,9 +455,9 @@
       title: "The capacity-factor equation",
       lede: "Tap a symbol to see what it means and where it appeared in this lesson.",
       rows: [{ parts: [{ k: "cf" }, "=", { k: "E" }, "÷", "(", { k: "P" }, "×", { k: "T" }, ")"], say: "Capacity factor equals energy made divided by size times hours." },
-             { parts: [{ k: "E" }, "=", { k: "P" }, "×", { k: "T" }, "×", { k: "cf" }], say: "Turned around: energy made equals size times hours times capacity factor.", note: "the same, turned around" }],
+             { parts: [{ k: "E" }, "=", { k: "P" }, "×", { k: "T" }, "×", { k: "cf" }], say: "Turned around: energy made equals size times hours times capacity factor, as a fraction.", note: "the same, turned around; CF as a fraction: 24% = 0.24" }],
       symbols: {
-        cf: { sym: "CF", name: "Capacity factor", unit: "%", color: "var(--lx-tier-1)", text: "The share of the most energy the plant could have made that it actually made.",
+        cf: { sym: "CF", name: "Capacity factor", unit: "a fraction, often shown as %", color: "var(--lx-tier-1)", text: "The share of the most energy the plant could have made that it actually made. In the equation use the fraction: 24% = 0.24.",
               you: function () { return "Solar on " + D.day.dateLabel + ": " + pct(W.dayCF) + ". Over 2025: nuclear " + pct(W.nuclear.cf) + ", wind " + pct(W.wind.cf) + ", solar " + pct(W.solar.cf) + "."; } },
         E: { sym: "E", name: "Energy made", unit: "MWh", color: "var(--lx-solar)", text: "The sum of the hourly outputs: each hour's MW × 1 h.",
              you: function () { var L = log(); return "The solar day: " + F.int(W.dayEnergy) + " MWh" + (L.level != null ? "; your flat line, " + L.level + " MW × 24 h = " + F.int(L.level * 24) + " MWh" : "") + "."; } },
@@ -422,9 +466,41 @@
         T: { sym: "T", name: "Hours in the period", unit: "h", color: "var(--lx-ink-3)", text: "Every hour counts, including nights and calm days.", you: "24 h for one day; 8,760 h for 2025." }
       },
       sel: "cf", aside: true, eyebrow: "Symbol", fields: [{ key: "you", label: "In this lesson" }], codeLabel: "The same equation in code (Python)",
-      code: "energy_mwh = sum(hourly_mw)            # each hour: MW x 1 h\ncf = energy_mwh / (size_mw * hours)      # e.g. " + F.int(W.dayEnergy) + " / (100 * 24) = " + W.dayCF.toFixed(3) + "\nenergy_year = size_mw * 8760 * cf        # " + D.apply.mw + " * 8760 * " + T.wind + " = " + F.int(W.applyMWh)
+      code: pyCode(W, D)
     });
   }
 
-  LX.mount("capacity-factor", function (live, data, root) { view(live, data, root); });
+  // ---- Go deeper (Modeler): a measured power curve against a clean curve for the same turbine
+  function buildMeasured(D) {
+    var host = document.getElementById("t5-measured"); if (!host) return;
+    host.innerHTML = "";
+    var M = D.measured, rows = measured(D), C = "var(--lx-wind)";
+    var clean = []; for (var i = 0; i <= 220; i++) clean.push([i / 10, cleanMeasured(i / 10, M)]);
+    var near = function (x) { return rows.reduce(function (a, r) { return Math.abs(r.v - x) < Math.abs(a.v - x) ? r : a; }); };
+    var P = LX.Plot(host, { text: "Text version: every measured bin", box: true });
+    P.render({
+      x: { min: 0, max: 22, ticks: [[0, "0"], [5, "5"], [10, "10"], [15, "15"], [20, "20 m/s"]] },
+      y: { min: 0, max: 1700, ticks: [[0, "0"], [500, "500"], [1000, "1,000"], [1500, "1,500"]], unit: "kW" },
+      height: 260, heightN: 230,
+      bars: rows.map(function (r) { return { x0: r.v - 0.07, x1: r.v + 0.07, y0: r.kw - r.sd, y1: r.kw + r.sd, color: C, op: 0.35 }; }),
+      lines: [{ pts: clean, color: "var(--lx-ink-3)", width: 2, dash: "6 4" },
+              { pts: rows.map(function (r) { return [r.v, r.kw]; }), color: C, width: 1.6, dots: true }],
+      legend: [{ label: "Measured: average of each 0.5 m/s bin", color: C },
+               { label: "Bar: spread of the 10-minute averages (one standard deviation)", color: "color-mix(in srgb, var(--lx-wind) 40%, transparent)" },
+               { label: "Clean curve: cube law at Cp " + M.cpBest + ", capped at " + F.int(M.ratedKW) + " kW", color: "var(--lx-ink-3)", dash: true }],
+      tip: function (x) {
+        if (x < 0.75) return null;
+        var r = near(x);
+        return "<div><b>" + r.v.toFixed(2) + " m/s</b></div><div>Measured: " + F.int(r.kw) + " kW, spread ± " + F.int(r.sd) + " kW</div><div>Clean curve: " + F.int(r.clean) + " kW</div>";
+      },
+      tipStep: 0.5,
+      aria: "Measured power curve of a " + F.int(M.ratedKW) + " kW research turbine. From about 6 to 8 m/s the bin averages follow the clean cube-law curve; above that they bend over " +
+        "gradually and reach full power near " + M.ratedSpeed + " m/s, where the clean curve turns a sharp corner near 10 m/s. Bars show the spread of the 10-minute averages.",
+      text: { head: ["Wind speed, m/s", "Measured average, kW", "Spread (±1 SD), kW", "10-minute averages", "Clean curve, kW"],
+              rows: rows.map(function (r) { return [r.v.toFixed(2), F.int(r.kw), F.int(r.sd), r.n, F.int(r.clean)]; }),
+              note: "Bins below 3 m/s are slightly negative: the idle turbine draws about 5 kW for its controls." }
+    }, true);
+  }
+
+  LX.mount("capacity-factor", function (live, data, root) { view(live, data, root); buildMeasured(data["05_capacity_factor"]); });
 })();

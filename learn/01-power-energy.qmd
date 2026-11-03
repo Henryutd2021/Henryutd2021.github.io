@@ -77,7 +77,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Energy (kWh)</dt><dd>How much has flowed over a stretch of time: the water in the tub.</dd>
 <dt>Energy = power × time</dt><dd>1.5 kW for 10 minutes and 0.05 kW for 5 hours both give 0.25 kWh.</dd>
 <dt>A ladder of ×1,000</dt><dd>Wh, kWh, MWh, GWh, TWh: from a phone charge to a nation's year.</dd>
-<dt>Average and peak</dt><dd>The U.S. averaged about 479 GW in 2025; its record hour needed 759 GW.</dd>
+<dt>Average and peak</dt><dd>The U.S. averaged about 479 GW in 2025. In one grid, the Southwest Power Pool, the 2025 peak hour needed about 1.6 times its average.</dd>
 </dl>
 </div>
 </div>
@@ -96,7 +96,9 @@ $$E = \sum_i P_i\,\Delta t_i .$$
 
 The two jobs: $1.5\ \text{kW} \times \tfrac{10}{60}\ \text{h} = 0.25\ \text{kWh}$ and $0.05\ \text{kW} \times 5\ \text{h} = 0.25\ \text{kWh}$. Same area, very different shapes: a tall thin block and a long low one in the top panel of your chart.
 
-Going the other way, average power is energy divided by time, $\bar P = E / T$. For the U.S. in 2025, $4{,}200\ \text{TWh} \div 8{,}760\ \text{h} \approx 479\ \text{GW}$, against 759 GW in the record hour. The two figures count slightly different things (all U.S. use over a year; demand on the Lower 48 grids in one hour), so the ratio of about 1.6 is approximate. Lesson 2 reads peak and average from one consistent data set.
+Going the other way, average power is energy divided by time, $\bar P = E / T$. For the U.S. in 2025: $4{,}200\ \text{TWh} \div 8{,}760\ \text{h} \approx 479\ \text{GW}$.
+
+Peak against average needs one data set. The Southwest Power Pool used 298.6 TWh in 2025, an average of 34.1 GW; its peak hour needed 54.4 GW, about 1.6 times the average. [Lesson 2](02-demand.qmd) reads both from the hourly data.
 
 Physicists measure energy in joules: $1\ \text{kWh} = 1{,}000\ \text{W} \times 3{,}600\ \text{s} = 3.6\ \text{MJ}$.
 
@@ -108,11 +110,13 @@ Physicists measure energy in joules: $1\ \text{kWh} = 1{,}000\ \text{W} \times 3
 <div class="lx-deeper-body">
 ```
 
-In an hourly model a plant's output $p_t$ is in MW and each step lasts $\Delta t = 1$ h, so its energy in hour $t$ is $p_t\,\Delta t$ MWh: the same number, which hides the units. With 15-minute data $\Delta t = 0.25$ h, and leaving it out inflates every energy, cost and emission total fourfold:
+In an hourly model a plant's output $p_t$ is in MW and each time step lasts $\Delta t = 1$ h, so its energy in hour $t$ is $p_t\,\Delta t$ MWh: the same number, which hides the units.
 
-$$E = \sum_t p_t\,\Delta t, \qquad C = \sum_t c\,p_t\,\Delta t .$$
+$$E = \sum_t p_t\,\Delta t$$
 
-Storage needs both kinds of number: a power rating in MW (how fast it charges or discharges) and an energy rating in MWh (how much it holds). [Lesson 9](09-storage.qmd) builds that model.
+With 15-minute data $\Delta t = 0.25$ h. Leaving it out makes these energy-based terms four times too large.
+
+Storage needs both kinds of number: MW (how fast it charges) and MWh (how much it holds); [lesson 9](09-storage.qmd) shows it. [Lesson 10](10-write-it-down.qmd) writes a whole model down.
 
 ```{=html}
 </div>
@@ -152,7 +156,7 @@ Storage needs both kinds of number: a power rating in MW (how fast it charges or
 <div class="lx-qq" data-id="wind" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A 100 MW wind farm powers 100,000 homes.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, as stated. That divides 100 MW by 1 kW per home. U.S. wind ran at 33.8% of its capacity in 2025 and an average home draws about 1,232 W, so the farm's yearly energy matches about 27,400 homes, and on calm hours it makes little.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, as stated: it divides 100 MW by 1 kW per home.</p><p>U.S. wind ran at 33.8% of its capacity in 2025. An average home bought 10,791 kWh a year (about 1,232 W on average), so the farm's yearly energy matches what about 27,400 homes buy.</p><p>That is an illustrative equivalent: on calm hours the farm makes little.</p></details>
 </div>
 </div>
 
@@ -207,7 +211,9 @@ Storage needs both kinds of number: a power rating in MW (how fast it charges or
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Your bill counts kWh. EIA's own worked example: a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh. Many business tariffs also charge for the highest power drawn in a month, in $/kW; the Analyst tier (upcoming) covers tariffs.</p>
+<p>Your bill counts kWh.</p>
+<p>EIA's own worked example: a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh.</p>
+<p>Many business tariffs also charge for the month's highest power, in $/kW. The Analyst tier (upcoming) covers tariffs.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
@@ -262,6 +268,15 @@ Storage needs both kinds of number: a power rating in MW (how fast it charges or
 .t1-tub { position: relative; height: 34px; border: 2px solid var(--lx-ink-2); border-top: 0; border-radius: 0 0 12px 12px; overflow: hidden; }
 .t1-tub i { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: color-mix(in srgb, var(--lx-wind) 55%, transparent); transition: height .2s; }
 .t1-tublab { font-size: 12px; color: var(--lx-ink-3); }
+.t1-tublab.is-new { color: var(--lx-ink-2); }
+.t1-tub .t1-brim { position: absolute; left: 0; right: 0; height: 0; border-top: 2px dashed var(--lx-ink-2); }
+.t1-units { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; margin: 14px 0 0; padding: 10px 12px; border: 1px dashed var(--lx-line-2); border-radius: 10px; font-size: 14px; }
+.t1-units dt { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
+.t1-units dd { margin: 0; color: var(--lx-ink-2); }
+.t1-jobs { margin: 0; font-size: 14.5px; color: var(--lx-ink-2); }
+.t1-jobs:empty { display: none; }
+.t1-note { margin: 8px 0 0; font-size: 14.5px; color: var(--lx-ink-2); }
+.t1-gorow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 .t1-run { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .t1-clock { font-family: var(--lx-f-mono); font-size: 14px; color: var(--lx-ink-2); }
 .t1-by { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
@@ -296,6 +311,7 @@ Storage needs both kinds of number: a power rating in MW (how fast it charges or
 .t1-lchip b { font-family: var(--lx-f-mono); font-weight: 600; }
 .t1-wind { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 14px; align-items: center; }
 .t1-wind-ctl { display: grid; gap: 12px; }
+.t1-wind-ctl > .lx-btn { justify-self: start; }
 .t1-wind-out { border: 1px solid var(--lx-line); border-radius: 12px; padding: 14px; display: grid; gap: 6px; background: var(--lx-surface-2); }
 .t1-wind-out .v { font-size: 34px; }
 .t1-wind-out .sub { font-family: var(--lx-f-mono); font-size: 13px; color: var(--lx-ink-3); }
@@ -316,7 +332,8 @@ Storage needs both kinds of number: a power rating in MW (how fast it charges or
 @media (max-width: 860px) { .t1-strip { grid-template-columns: minmax(0, 1fr); } .t1-bath { grid-template-columns: minmax(0, 1fr); } .t1-bath svg { max-width: 300px; } }
 @media (max-width: 640px) {
   .t1-devs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .t1-meters, .t1-wind { grid-template-columns: minmax(0, 1fr); }
+  .t1-meters, .t1-wind, .t1-units { grid-template-columns: minmax(0, 1fr); }
+  .t1-units dd { margin-bottom: 4px; }
   .t1-kwh li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .t1-rungbtns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .t1-rung { grid-template-columns: 5.6em minmax(0, 1fr); }

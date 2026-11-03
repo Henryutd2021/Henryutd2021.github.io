@@ -21,4 +21,4 @@ glossary:
     def: "A power line carrying all it is allowed to, so cheaper power cannot reach where it is needed and prices can differ by location."
 requests:
   - "Promote lesson-local components from assets/learn/08-merit-order.js if A3 or M1 need them: the supply stack chart (i-supply-stack: blocks as wide as MW and as high as offers, demand line, clearing price, spilled part, negative offers, text version) and the Formulate-it box (e-formulate: decisions, goal, rules, what comes back, with an optional symbols view)."
-  - "Lesson 8 uses LX.solver (step 7, on request only) to show that the stack equals the LP solution and that the demand row's dual equals the clearing price; the Node test checks this with the vendored HiGHS on 200 random hours."
+  - "Lesson 8 uses LX.solver (on request only, in the Modeler box of the explain section since the W1 fixes; the core steps stay closed form) to show that the stack equals the LP solution and that the demand row's dual equals the clearing price; the Node test checks this with the vendored HiGHS on 200 random hours."

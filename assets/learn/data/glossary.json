@@ -55,7 +55,7 @@
  },
  "binding-constraint": {
   "term": "Binding constraint",
-  "short": "A rule that holds with no room to spare at the best plan, so loosening it would change the answer.",
+  "short": "A rule that the best plan meets exactly, with no slack left.",
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
@@ -151,7 +151,7 @@
  },
  "cube-law": {
   "term": "Cube law",
-  "short": "The power carried by the wind grows with the cube of its speed, so twice the speed carries eight times the power.",
+  "short": "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a turbine's output follows it only between its cut-in and rated speeds.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
@@ -160,6 +160,12 @@
   "short": "Turning a wind or solar farm below what the weather allows, usually because the grid has more power than it can use at that moment.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "cut-in-speed": {
+  "term": "Cut-in speed",
+  "short": "The lowest wind speed at which a turbine starts to make electricity.",
+  "lesson": 5,
+  "href": "05-capacity-factor.html"
  },
  "cut-out-speed": {
   "term": "Cut-out speed",
@@ -245,6 +251,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "electrification": {
+  "term": "Electrification",
+  "short": "Switching a use of energy, such as heating or driving, from burning fuel to using electricity.",
+  "lesson": 2,
+  "href": "02-demand.html"
+ },
  "emissions-cap": {
   "term": "Emissions cap",
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
@@ -301,7 +313,7 @@
  },
  "firm-share": {
   "term": "Firm share (ELCC)",
-  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC).",
+  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class.",
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
@@ -347,6 +359,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "heat-pump": {
+  "term": "Heat pump",
+  "short": "A device that uses electricity to move heat, into a building to warm it or out of it to cool it.",
+  "lesson": 2,
+  "href": "02-demand.html"
+ },
  "heat-rate": {
   "term": "Heat rate",
   "short": "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient.",
@@ -376,6 +394,12 @@
   "short": "Said of a model whose rules contradict each other, so that no plan meets them all.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "inverter": {
+  "term": "Inverter",
+  "short": "Power electronics that convert the direct current of solar panels and batteries, or a wind turbine's varying output, into the grid's alternating current.",
+  "lesson": 3,
+  "href": "03-balancing.html"
  },
  "kilowatt": {
   "term": "Kilowatt (kW)",
@@ -407,6 +431,12 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
+ "load-relief": {
+  "term": "Load relief",
+  "short": "The small drop in demand when the frequency falls, because many motors turn a little slower and draw less power.",
+  "lesson": 3,
+  "href": "03-balancing.html"
+ },
  "load-duration-curve": {
   "term": "Load-duration curve",
   "short": "A year's hourly demand sorted from highest to lowest, showing for how many hours each level of demand is needed.",
@@ -418,6 +448,12 @@
   "short": "The extra cost per megawatt-hour of serving a small increase in demand at one place on the grid in one interval, given the plants running and the limits of the lines.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "log-scale": {
+  "term": "Log scale",
+  "short": "A scale on which each equal step multiplies the value by the same factor, often 10, so tiny and huge values fit on one chart.",
+  "lesson": 1,
+  "href": "01-power-energy.html"
  },
  "marginal-cost": {
   "term": "Marginal cost",
@@ -473,6 +509,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "mmbtu": {
+  "term": "MMBtu",
+  "short": "One million British thermal units, a unit of fuel heat; about 0.29 MWh of heat, and gas is priced in dollars per MMBtu.",
+  "lesson": 7,
+  "href": "07-cost.html"
+ },
  "nadir": {
   "term": "Nadir",
   "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
@@ -497,6 +539,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "operating-emissions": {
+  "term": "Operating emissions",
+  "short": "The CO2 released where fuel is burned to make electricity, leaving out building the plant and producing and delivering its fuel.",
+  "lesson": 0,
+  "href": "00-grid-operator.html"
+ },
  "optimality-gap": {
   "term": "Optimality gap",
   "short": "For a mixed-integer program, the remaining distance between the best plan the solver has found and the bound it has proven, so 0% means proven best.",
@@ -508,6 +556,12 @@
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "overnight-cost": {
+  "term": "Overnight cost",
+  "short": "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt.",
+  "lesson": 7,
+  "href": "07-cost.html"
  },
  "parameter": {
   "term": "Parameter",
@@ -523,7 +577,7 @@
  },
  "peak-demand": {
   "term": "Peak demand",
-  "short": "The highest demand in a period, such as the busiest hour of a year, which sets how much capacity the grid needs.",
+  "short": "The highest demand in a period, such as the busiest hour of a year; the grid must be able to meet it, with a margin.",
   "lesson": 2,
   "href": "02-demand.html"
  },
@@ -544,6 +598,12 @@
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "power-coefficient": {
+  "term": "Power coefficient (Cp)",
+  "short": "The share of the wind's power that a turbine turns into electricity; no rotor can capture more than 16/27, about 59% (the Betz limit).",
+  "lesson": 5,
+  "href": "05-capacity-factor.html"
  },
  "power-curve": {
   "term": "Power curve",
@@ -667,7 +727,7 @@
  },
  "simplex-method": {
   "term": "Simplex method",
-  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, always improving the goal, until no neighbour is better.",
+  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
   "lesson": 11,
   "href": "11-solver.html"
  },

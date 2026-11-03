@@ -4,7 +4,7 @@
   "units": {
     "mw": "MW (plant size, or average output over an hour)",
     "cost": "$ per MWh (running cost: fuel and other costs that grow with output)",
-    "co2": "t CO2 per MWh",
+    "co2": "t CO2 per MWh (t = metric tonne, 1,000 kg); illustrative operating emissions only: fuel burned at the plant. Construction, fuel supply and upstream methane are outside the boundary",
     "ramp": "MW per hour"
   },
   "fleet": {

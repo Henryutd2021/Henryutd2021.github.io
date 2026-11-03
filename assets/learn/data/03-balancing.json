@@ -47,23 +47,24 @@
   "ercot_generator_relay": { "hz": 59.4, "minutes": 9 }
  },
  "uri": {
-  "source": "FERC, NERC and Regional Entity Staff (2021), The February 2021 Cold Weather Outages in Texas and the South Central United States, printed pp. 135–138 (ERCOT chronology, 15 February 2021); p. 9 (20,000 MW); EIA (2022) for customers",
+  "source": "FERC, NERC and Regional Entity Staff (2021), The February 2021 Cold Weather Outages in Texas and the South Central United States, printed pp. 135–138 (ERCOT chronology, 15 February 2021; about 276 MW tripped by under-frequency relays at 1:54 a.m., p. 137); p. 9 (20,000 MW); EIA (2022) for customers",
   "url": "https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf",
   "eia_url": "https://www.eia.gov/todayinenergy/detail.php?id=54639",
-  "note": "Points are the frequency readings the report's chronology gives, minute by minute; the measured trace moves between them.",
+  "note": "Points are the frequency readings the report's chronology gives, minute by minute; the measured trace moves between them. At 1:51 and 2:02 a.m. the report gives only a threshold crossing (below 59.4 Hz, above 60.0 Hz), not a reading.",
   "points": [
    ["1:18", 59.932], ["1:20", 59.944], ["1:26", 60.001], ["1:35", 59.978], ["1:44", 59.817], ["1:49", 59.504],
-   ["1:50", 59.496], ["1:54", 59.304], ["1:55", 59.401], ["1:57", 59.689], ["2:02", 60.0], ["2:09", 60.094], ["2:30", 60.062]
+   ["1:50", 59.496], ["1:54", 59.304], ["1:55", 59.401], ["1:57", 59.689], ["2:09", 60.094], ["2:30", 60.062]
   ],
   "events": [
    { "at": "1:20", "hz": 59.944, "shedMW": 1000, "title": "Highest emergency level", "text": "Responsive reserve had fallen below the 1,430 MW minimum. ERCOT declared its top energy emergency (EEA 3) and ordered 1,000 MW of customer demand cut." },
    { "at": "1:49", "hz": 59.504, "shedMW": 2000, "title": "Plants keep failing", "text": "From 1:44, five more generators tripped or ran down: 1,712 MW in five minutes. Frequency fell from 59.817 to 59.504 Hz." },
-   { "at": "1:51", "hz": 59.4, "shedMW": 5000, "title": "The nine-minute timer starts", "text": "Frequency dropped below 59.4 Hz. Generator protection allows nine minutes there; had it run out, about 17,000 MW more could have tripped." },
-   { "at": "1:54", "hz": 59.304, "shedMW": 5000, "title": "The lowest point", "text": "59.304 Hz, just above the 59.3 Hz line where automatic load shedding starts. Responsive reserve was down to 1,044 MW." },
+   { "at": "1:51", "hz": 59.4, "cross": "below", "shedMW": 5000, "title": "The nine-minute timer starts", "text": "Frequency dropped below 59.4 Hz. Generator protection allows nine minutes there; had it run out, about 17,000 MW more could have tripped." },
+   { "at": "1:54", "hz": 59.304, "shedMW": 5000, "title": "The lowest point", "text": "The lowest reading, 59.304 Hz. Relays set near 59.3 Hz still tripped about 276 MW of load automatically. Responsive reserve was down to 1,044 MW." },
    { "at": "1:55", "hz": 59.401, "shedMW": 8500, "title": "Back above 59.4 Hz", "text": "With 8,500 MW of customer demand ordered off, frequency climbed back above 59.4 Hz after 4 minutes 23 seconds below it." },
-   { "at": "2:02", "hz": 60.0, "shedMW": 10500, "title": "60 Hz again, at a price", "text": "Frequency passed 60 Hz with 10,500 MW ordered off. Later that day shedding peaked at 20,000 MW; about 4.5 million Texas customers lost power." }
+   { "at": "2:02", "hz": 60, "cross": "above", "shedMW": 10500, "title": "60 Hz again, at a price", "text": "Frequency rose above 60 Hz with 10,500 MW ordered off. Later that day shedding peaked at 20,000 MW; about 4.5 million Texas customers lost power." }
   ],
   "lowestHz": 59.304,
+  "uflsTripMW": 276,
   "below594": "4 min 23 s",
   "relayMinutes": 9,
   "couldTripMW": 17000,

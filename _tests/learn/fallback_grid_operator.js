@@ -1,5 +1,6 @@
-// fallback_grid_operator.js — writes the static fallback figure of Lesson 0 (the cheapest-first rule's day, as inline SVG)
-// into learn/00-grid-operator.qmd between the "fallback-svg" markers, so readers without JavaScript still see the day.
+// fallback_grid_operator.js — writes the static fallback figure of Lesson 0 (the cheapest-first rule's day, as inline SVG,
+// with a text-version table of every hour) into learn/00-grid-operator.qmd between the "fallback-svg" markers, so readers
+// without JavaScript, and screen-reader users, still get the day.
 // Colours are the Learn tokens (assets/learn/components/base.css), so the figure follows day and night mode.
 // Usage (from the site folder):  node _tests/learn/fallback_grid_operator.js          (rewrite)
 //                                node _tests/learn/fallback_grid_operator.js --check  (exit 1 if out of date)
@@ -43,7 +44,14 @@ function svg() {
   out.push("</svg>");
   const legend = ["nuclear", "solar", "wind", "cc", "pk"].map(k => `<span><i style="--c:var(${C[k]})"></i>${NAMES[k]}</span>`).join("") +
     '<span><i class="line"></i>Demand</span>';
-  return out.join("\n") + `\n<div class="lx-legend" aria-hidden="true">${legend}</div>`;
+  // text version: the same day as a table, one row per hour, in MW (the figure's title alone is not the data)
+  const hh = t => (t < 10 ? "0" : "") + t + ":00";
+  const rows = ex.hours.map(r => `<tr><td>${hh(r.t)}</td><td>${r.demand}</td>` +
+    ["nuclear", "wind", "solar", "cc", "pk"].map(k => `<td>${Math.round(r[k])}</td>`).join("") + `<td>${Math.round(r.curtailed)}</td></tr>`).join("");
+  const table = `<details class="lx-textalt"><summary>Text version: the day as a table, in MW</summary><div class="lx-scroll-x"><table class="lx-mini-table">` +
+    `<thead><tr><th scope="col">Hour</th><th scope="col">Demand</th><th scope="col">Nuclear</th><th scope="col">Wind</th><th scope="col">Solar</th>` +
+    `<th scope="col">Gas CC</th><th scope="col">Peaker</th><th scope="col">Spilled</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
+  return out.join("\n") + `\n<div class="lx-legend" aria-hidden="true">${legend}</div>\n${table}`;
 }
 
 const START = "<!-- fallback-svg:start -->", END = "<!-- fallback-svg:end -->";
