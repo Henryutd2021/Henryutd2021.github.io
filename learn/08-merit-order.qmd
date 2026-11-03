@@ -222,6 +222,7 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 <li>Curtailments and negative prices became less frequent.</li>
 </ol>
 <p>Builds on <a href="00-grid-operator.html">lesson 0</a> (cheapest first) and <a href="07-cost.html">lesson 7</a> (what a plant must earn back).</p>
+<p class="lx-hint">Case files <a href="cf6-shifting-load-to-clean-hours.html">CF6</a> (average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂) and <a href="cf7-cost-of-waiting.html">CF7</a> (what waiting for a grid connection costs, and who pays).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

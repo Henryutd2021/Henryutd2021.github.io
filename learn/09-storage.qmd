@@ -235,6 +235,7 @@ $$
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>U.S. utility-scale battery capacity reached 43.6 GW at the end of 2025. Batteries of four to eight hours typically cycle once a day, from low-demand to high-demand hours: the pattern the solver found here (<a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA</a>).</p>
+<p class="lx-hint">Case file <a href="cf6-shifting-load-to-clean-hours.html">CF6</a> (average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

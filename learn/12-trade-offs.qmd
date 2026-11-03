@@ -194,6 +194,7 @@ Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Next: [A22](a22-tr
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>Both routes exist: some places tax CO₂ (a price); others cap it and trade allowances, so the market finds the price. Planning studies trace frontiers like yours; <a href="13-capstone.html">lesson 13</a> lets you plan the town yourself.</p>
+<p class="lx-hint">Case file <a href="cf6-shifting-load-to-clean-hours.html">CF6</a> (average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

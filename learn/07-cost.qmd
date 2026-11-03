@@ -239,6 +239,7 @@ A capacity-expansion model can account for these costs directly, instead of comp
 <p>A levelized cost and a system's cost can move in opposite directions.</p>
 <blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen"><p>A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger <span class="lx-term" data-term="electrolyzer">electrolyzer</span> to capture more surplus wind.</p><p>The extra capacity runs fewer full-load hours, so the cost per kilogram, the <span class="lx-term" data-term="lcoh">levelized cost of hydrogen</span>, goes up.</p><p>Yet the added hydrogen revenue lowers the net cost of the whole system.</p><p>The cost per kilogram and the system's cost move in opposite directions.</p><footer>Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.</footer></blockquote>
 <p class="lx-hint">The full case: case file <a href="cf2-cost-per-kg-vs-system-cost.html">CF2</a> (when the cost per kilogram and the cost of the system disagree).</p>
+<p class="lx-hint">Case file <a href="cf7-cost-of-waiting.html">CF7</a> (what waiting for a grid connection costs, and who pays).</p>
 </div>
 <div class="lx-card" id="inputs">
 <p class="lx-eyebrow">Where the inputs come from</p>
