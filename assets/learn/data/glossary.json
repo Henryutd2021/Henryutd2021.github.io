@@ -209,6 +209,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "chance-constraint": {
+  "term": "Chance constraint",
+  "short": "A rule that must hold with a set probability, such as meeting store demand in 95 of every 100 weeks, rather than in every one.",
+  "lesson": "CF1",
+  "href": "index.html#analyst"
+ },
  "checksum": {
   "term": "Checksum",
   "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
@@ -316,6 +322,12 @@
   "short": "A standard list of 14 names for what each author did, such as conceptualization (shaping the question), data curation (cleaning and documenting data) and formal analysis.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "critical-load": {
+  "term": "Critical load",
+  "short": "The loads that must stay on in an outage, such as a hospital or a water plant; the rest can be switched off.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
  },
  "cube-law": {
   "term": "Cube law",
@@ -695,6 +707,18 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "grid-following": {
+  "term": "Grid-following",
+  "short": "Said of an inverter, such as an ordinary solar inverter, that follows a voltage something else sets and stops when there is none.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
+ "grid-forming": {
+  "term": "Grid-forming",
+  "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
  "git-head": {
   "term": "HEAD (Git)",
   "short": "Git's name for the commit you are on now; usually it points at a branch label, which points at that commit.",
@@ -977,6 +1001,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "mini-grid": {
+  "term": "Mini-grid",
+  "short": "A small local grid, with its own sources, storage and wires, that serves a village or a town that the main grid does not reach.",
+  "lesson": "A14",
+  "href": "a14-microgrid-value.html"
+ },
  "minimum-down-time": {
   "term": "Minimum down time",
   "short": "The hours a plant must stay off once stopped before it may start again.",
@@ -1193,6 +1223,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "point-of-common-coupling": {
+  "term": "Point of common coupling",
+  "short": "The one place where a microgrid meets the main grid, with the switch that opens to let it run on its own.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
  "power": {
   "term": "Power",
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
@@ -1234,6 +1270,12 @@
   "short": "A payment for each megawatt-hour a plant produces, set by a policy such as a tax credit.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "productive-use": {
+  "term": "Productive use",
+  "short": "Electricity used to earn a living, such as running a grain mill, a water pump or a cold store, rather than only for lights and phones at home.",
+  "lesson": "A14",
+  "href": "a14-microgrid-value.html"
  },
  "prognostics": {
   "term": "Prognostics",
@@ -1577,6 +1619,12 @@
   "lesson": "R3",
   "href": "r03-system-and-method.html"
  },
+ "time-of-use": {
+  "term": "Time-of-use tariff",
+  "short": "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak.",
+  "lesson": "CF1",
+  "href": "index.html#analyst"
+ },
  "time-of-use-tariff": {
   "term": "Time-of-use tariff",
   "short": "An electricity price that changes with the hour of the day, usually higher in the evening peak.",
@@ -1600,6 +1648,12 @@
   "short": "A file Git already knows, because it is in the last commit or the staging area; a new file stays untracked until git add.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "transactive-energy": {
+  "term": "Transactive energy",
+  "short": "Buying and selling electricity with the grid at prices that change over time, so a site that makes power can also earn from it.",
+  "lesson": "CF1",
+  "href": "index.html#analyst"
  },
  "unbounded": {
   "term": "Unbounded",
@@ -1642,6 +1696,12 @@
   "short": "Checking that a model represents the real system well enough for the question it is used to answer.",
   "lesson": "B3",
   "href": "b03-read-check-formulation.html"
+ },
+ "value-of-lost-load": {
+  "term": "Value of lost load",
+  "short": "What a customer loses when power is cut, per hour or per kWh not delivered; it differs by customer and by how long the outage lasts.",
+  "lesson": "A14",
+  "href": "a14-microgrid-value.html"
  },
  "variable-om": {
   "term": "Variable O&M",

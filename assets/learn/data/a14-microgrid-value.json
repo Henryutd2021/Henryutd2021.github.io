@@ -1,0 +1,174 @@
+{
+ "about": "Lesson A14 (a14-microgrid-value), 2026-11-03. One price year: 2025 dollars. Real: the outage costs of a 2025 survey of rural electric cooperative members (Berkeley Lab and partners, ICE Calculator 2 initiative, report dated November 2026: Tables 4-2, 4-4, 5-2 and 5-4, the point estimates; the executive summary's Tables ES-2 and ES-3 print the upper confidence bounds for non-residential members, so the body tables are used), EIA's 2025 average retail prices (Electric Power Monthly, Table 5.3) and FERC's 2024 Energy Primer (pp. 35, 36 and 130). Illustrative: Prairie Campus, its hospital's cost per hour, the outage pattern, every equipment cost, the borrowing rates and the village; they are round numbers in 2025 dollars, not quotes. The village's households, mill and sun are lesson F7's (assets/learn/data/f07-microgrids.json); the test checks they agree. Research text: the Real-world box quotes approved excerpts E8.4, E8.6 and E8.7 (reports/learn/excerpts_for_approval.md) on the page.",
+ "built": "2026-11-03",
+ "ice": {
+  "label": "Rural co-op members, 2025 survey",
+  "hours": [2, 8, 24],
+  "names": [
+   "2 hours",
+   "8 hours",
+   "24 hours"
+  ],
+  "household": {
+   "event": [7.08, 29.42, 53.68],
+   "kwh": [3.1, 3.22, 1.96]
+  },
+  "business": {
+   "event": [3772, 7898, 15106],
+   "kwh": [82, 41, 29]
+  },
+  "retailCents": {
+   "residential": 17.23,
+   "commercial": 13.37
+  },
+  "backupShare": 19.5,
+  "threeDay": {
+   "shut": 65,
+   "backup": 16
+  }
+ },
+ "hospital": {
+  "name": "County hospital",
+  "kw": 300,
+  "perHour": 9000,
+  "values": [3000, 9000, 27000]
+ },
+ "outages": {
+  "hours": [1, 4, 12, 36, 72],
+  "perYear": [0.8, 0.4, 0.15, 0.06, 0.02]
+ },
+ "finance": {
+  "years": 15,
+  "rate": 0.07
+ },
+ "costs": {
+  "controls": 150000,
+  "inverter": 150000,
+  "batteryPerKWh": 400,
+  "batteryOM": 0.015,
+  "generator": 200000,
+  "genUpkeep": 6000,
+  "tankPerHour": 120,
+  "fuelPerHour": 85,
+  "everyday": {
+   "kw": 300,
+   "perKWMonth": 15,
+   "minHours": 2
+  }
+ },
+ "designs": [
+  {
+   "key": "battery",
+   "label": "Battery, 2 hours",
+   "bat": 2,
+   "gen": 0
+  },
+  {
+   "key": "gen",
+   "label": "Generator, 72 hours",
+   "bat": 0,
+   "gen": 72
+  },
+  {
+   "key": "both",
+   "label": "Battery 2 hours and generator 72 hours",
+   "bat": 2,
+   "gen": 72
+  }
+ ],
+ "owners": [
+  {
+   "key": "utility",
+   "label": "The utility",
+   "rate": 0.07,
+   "pays": "All the utility's customers, through rates its state regulator approves",
+   "gains": "The hospital (backup); all customers (the everyday savings lower the utility's costs)",
+   "risk": "The customers, if the regulator lets the cost into rates; the utility's shareholders, if not",
+   "everydayTo": "all the utility's customers"
+  },
+  {
+   "key": "coop",
+   "label": "A rural co-op",
+   "rate": 0.05,
+   "pays": "The co-op's members, through their rates",
+   "gains": "The hospital, a member (backup); all members (everyday savings)",
+   "risk": "The members: the co-op borrows, and has no shares to sell",
+   "everydayTo": "all the co-op's members"
+  },
+  {
+   "key": "county",
+   "label": "The county",
+   "rate": 0.04,
+   "pays": "County taxpayers, from its budget",
+   "gains": "The county hospital (backup); the county (everyday savings)",
+   "risk": "The taxpayers",
+   "everydayTo": "the county"
+  },
+  {
+   "key": "private",
+   "label": "A private company",
+   "rate": 0.1,
+   "pays": "The campus: a fixed yearly fee in a long contract",
+   "gains": "The campus (backup and everyday savings, less the fee); the company (its return)",
+   "risk": "The company carries cost overruns and breakdowns; the campus pays the fee even in calm years",
+   "everydayTo": "the campus"
+  }
+ ],
+ "village": {
+  "households": 60,
+  "householdW": [15, 15, 15, 15, 15, 15, 40, 40, 25, 25, 25, 25, 25, 25, 25, 25, 25, 60, 110, 110, 110, 110, 40, 40],
+  "mill": {
+   "kw": 7.5,
+   "noon": [10, 11, 12, 13],
+   "evening": [18, 19, 20, 21]
+  },
+  "eff": 0.9,
+  "sun": [0, 0, 0, 0, 0, 0.004, 0.053, 0.224, 0.417, 0.55, 0.597, 0.611, 0.615, 0.615, 0.605, 0.576, 0.465, 0.288, 0.127, 0.014, 0, 0, 0, 0],
+  "cold": {
+   "kw": 1.5
+  },
+  "solarPerKW": 930,
+  "batteryPerKWh": 410,
+  "rate": 0.08,
+  "years": 15,
+  "om": 0.02,
+  "fixed": 3000,
+  "panelsMax": 60,
+  "batteryMax": 300,
+  "batteryStep": 5
+ },
+ "facts": [
+  {
+   "n": "$29.42 · $7,898",
+   "what": "What an 8-hour outage costs, on average, a household and a business on a rural co-op (2025 survey).",
+   "source": "Berkeley Lab and partners, ICE Calculator 2 co-op report, Tables 4-2 and 5-2",
+   "url": "https://eta-publications.lbl.gov/sites/default/files/2026-10/ice_2.0_nreca_final_report_28oct2026.pdf",
+   "asof": "November 2026"
+  },
+  {
+   "n": "$3.22 · 17.23¢",
+   "what": "A household's loss per kWh not delivered in an 8-hour outage, against the average U.S. residential price of a kWh in 2025.",
+   "source": "Berkeley Lab report, Table 4-4; EIA, Electric Power Monthly, Table 5.3",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_3",
+   "asof": "released 23 Oct 2026"
+  },
+  {
+   "n": "almost 900 · more than 1,700",
+   "what": "Electric cooperatives and municipal utilities in the United States.",
+   "source": "FERC, 2024 Energy Primer, p. 36",
+   "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf",
+   "asof": "December 2023"
+  },
+  {
+   "n": "19.5%",
+   "what": "Share of the surveyed co-ops' business members with backup generation on site.",
+   "source": "Berkeley Lab report, p. 59",
+   "url": "https://eta-publications.lbl.gov/sites/default/files/2026-10/ice_2.0_nreca_final_report_28oct2026.pdf",
+   "asof": "November 2026"
+  }
+ ],
+ "texts": {
+  "ownersNote": "Borrowing rates and deals are illustrative. FERC: state regulators approve a utility's rates and investments; co-ops are owned by their members and borrow, having no shares to sell.",
+  "tableCaption": "The deals and borrowing rates are illustrative round numbers. Facts behind them: FERC's 2024 Energy Primer, pp. 35, 36 and 130."
+ }
+}
