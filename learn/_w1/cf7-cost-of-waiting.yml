@@ -1,0 +1,25 @@
+# Sidecar for CF7 (cf7-cost-of-waiting), builder learn-w2-i, 2026-11-03. Read by scripts/build_learn.py.
+# The page is a draft (learn/_drafts/) until Henry approves its excerpt (reports/learn/excerpts_for_approval.md, E7).
+id: cf7-cost-of-waiting
+lesson: CF7
+glossary:
+  - id: mw-it
+    term: MW-IT
+    def: "Megawatts of a data center's computing equipment; the grid must supply more, for cooling and the rest of the building."
+  - id: latin-hypercube
+    term: Latin hypercube sampling
+    def: "A way to draw many sets of uncertain inputs so that the whole range of every input is covered evenly."
+  - id: carrying-cost
+    term: Carrying cost
+    def: "What money tied up in buildings or equipment costs while they earn nothing: the interest, or the return it could have earned elsewhere."
+  - id: ratepayer
+    term: Ratepayer
+    def: "A customer who pays a utility's regulated electricity rates; utility costs that nobody else covers end up in those rates."
+  - id: stranded-cost
+    term: Stranded cost
+    def: "Money already spent on equipment that is no longer used as planned, such as grid upgrades built for a load that never arrives."
+  - id: staged-energization
+    term: Staged energization
+    def: "Switching on part of a large load's grid service early and the rest later, as the grid becomes ready."
+requests:
+  - "CF7 cites the accepted NAPS 2026 paper without its title: the published title contains a word on the §20.4 deny-list (an abbreviation for machine intelligence), and §20.6 asks citations to keep titles exactly. Decision needed (excerpts_for_approval.md, E7): keep the description, or allow-list that title as a citation exception. When the DOI exists, add it to the citation, the timeline event and the numbers table."

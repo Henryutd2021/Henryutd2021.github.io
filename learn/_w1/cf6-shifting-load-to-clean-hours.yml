@@ -1,0 +1,13 @@
+# Sidecar for CF6 (cf6-shifting-load-to-clean-hours), builder learn-w2-i, 2026-11-03. Read by scripts/build_learn.py.
+# The page is a draft (learn/_drafts/) until Henry approves its excerpt (reports/learn/excerpts_for_approval.md, E6).
+id: cf6-shifting-load-to-clean-hours
+lesson: CF6
+glossary:
+  - id: average-emission-factor
+    term: Average emission factor
+    def: "An hour's CO₂ from all the plants that ran, divided by all the electricity used in that hour."
+  - id: marginal-emission-factor
+    term: Marginal emission factor
+    def: "The change in a grid's CO₂ when demand in one hour grows by one megawatt-hour: the CO₂ rate of the plant that serves it."
+requests:
+  - "The page sets body class theme-carbon so the allow-listed ghg explainer finds its theme colour (--t, assets/base.css); without it the explainer draws in grey. A Learn-wide rule (for example .page-learn .explainer { --t: var(--lx-accent); }) would remove the need."

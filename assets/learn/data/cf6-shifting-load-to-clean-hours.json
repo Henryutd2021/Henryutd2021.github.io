@@ -1,0 +1,51 @@
+{
+  "about": "Case file CF6 (cf6-shifting-load-to-clean-hours), wave W2 draft, 2026-11-03. 'timeline' and 'boundary' describe a published study by the course author (Li et al. 2025), drawn from approved excerpts (reports/learn/excerpts_for_approval.md, E6); the paper's date is the publisher's date on Crossref (accessed 3 Nov 2026). 'idea' uses Prairie Town (fictional; plants, sizes and CO2 rates illustrative, from town.json) on the real shapes of 9 June 2025 on the Southwest Power Pool grid (EIA-930, town_year.json), the day lesson 9 uses, scaled the same way. Each hour is dispatched cheapest first as in lesson 9 (no ramp limits, no minimum output): the town's 100 MW zero-carbon plant runs flat, then wind and sun, then the combined-cycle plant, then the peaker; a negative gap is spilled wind and sun.",
+  "built": "2026-11-03",
+  "timeline": {
+    "title": "The study in time",
+    "events": [
+      { "date": "2023", "label": "The data year", "kind": "data",
+        "text": "Hourly demand and generation by fuel for U.S. grid regions, from EIA's hourly grid data.",
+        "source": { "label": "EIA Hourly Electric Grid Monitor (EIA-930)", "url": "https://www.eia.gov/electricity/gridmonitor/", "as_of": "2026-11-03" } },
+      { "date": "2025-05", "label": "Paper published", "kind": "study", "key": true,
+        "text": "Load re-timed by hourly average emission intensity in U.S. grid regions, with windows of a month, a quarter or a year.",
+        "source": { "label": "Li et al. (2025), Cell Reports Sustainability 2, 100367", "url": "https://doi.org/10.1016/j.crsus.2025.100367" } },
+      { "date": "2026-10-30", "label": "Model framework released", "kind": "event",
+        "text": "A documented, open implementation of the load-regulation model, with synthetic example regions (version 1.0.0).",
+        "source": { "label": "ghg-load-regulation on GitHub", "url": "https://github.com/Henryutd2021/ghg-load-regulation", "as_of": "2026-11-03" } }
+    ],
+    "kinds": { "event": "Code" }
+  },
+  "boundary": {
+    "title": "Where the study's result holds",
+    "lede": "The reductions are an accounting result within the study's stated boundary:",
+    "holds": [
+      "emissions are counted at each hour's [[average-emission-factor|average]] intensity;",
+      "each window is known in advance (perfect foresight);",
+      "each window's total use does not fall;",
+      "hourly EIA data for U.S. grid regions in 2023."
+    ],
+    "leaves": [
+      "the grid's consequential response: which plants actually change output (the [[marginal-emission-factor|marginal]] view);",
+      "forecast errors;",
+      "the cost of moving load, apart from a penalty on each adjusted hour."
+    ],
+    "source": "From the approved excerpt of Li et al. (2025), Cell Reports Sustainability."
+  },
+  "idea": {
+    "title": "Move 10 MWh in Prairie Town's day",
+    "note": "Prairie Town is illustrative: its plants and CO₂ rates are invented; the hourly shapes are real (9 June 2025, Southwest Power Pool).",
+    "day": { "date": "2025-06-09", "dateLabel": "9 June 2025", "utcOffsetHours": -5, "demandPeakMW": 450 },
+    "q": 10,
+    "presets": [
+      { "id": "eve-mid", "label": "Evening → midday", "from": 20, "to": 14 },
+      { "id": "dawn-night", "label": "Dawn → small hours", "from": 6, "to": 3 },
+      { "id": "eve-morning", "label": "Evening → 08:00", "from": 20, "to": 8 }
+    ],
+    "start": "eve-mid"
+  },
+  "facts": [
+    { "n": "1.19% → 1.64%", "what": "Reduction in attributed emissions in grids with diverse generation when the adjustment range widened from ±5% to ±8% of each hour's load.", "source": "Li et al. (2025), Cell Reports Sustainability", "url": "https://doi.org/10.1016/j.crsus.2025.100367", "asof": "published May 2025; data for 2023" },
+    { "n": "one to two percent or less", "what": "The order of the reductions in the reported scenarios, as a share of regional totals.", "source": "Li et al. (2025), Cell Reports Sustainability", "url": "https://doi.org/10.1016/j.crsus.2025.100367", "asof": "published May 2025; data for 2023" }
+  ]
+}
