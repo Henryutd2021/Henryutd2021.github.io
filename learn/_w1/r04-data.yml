@@ -5,7 +5,11 @@ glossary:
   - {id: data-note, term: "Data note", def: "A short record of where a dataset came from, its licence, units and time base, and every cleaning step with its rule, count and effect."}
   - {id: coordinate-reference-system, term: "Coordinate reference system (CRS)", def: "The rule that ties map coordinates to places on Earth; some keep areas true, others keep distances, none keeps both everywhere."}
   - {id: provenance, term: "Provenance", def: "The documented origin and history of a piece of data: source, version, access date, checksums and every change made to it."}
+  - {id: epsg-code, term: "EPSG code", def: "A catalogue number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees."}
+  - {id: utm, term: "UTM (Universal Transverse Mercator)", def: "A set of 60 north-to-south zones, each a flat map in metres that keeps distances close to true inside the zone."}
+  - {id: web-mercator, term: "Web Mercator", def: "The projection most web maps use: good for viewing, but it stretches distances and areas more the farther a place is from the equator."}
+  - {id: buffer, term: "Buffer (GIS)", def: "The zone within a set distance of a map feature, such as everything within 1 km of a wind turbine."}
 requests:
   - "R4 reuses B2's raw file (assets/learn/data/b02-python-data.json) and town_days.json (the data build's counts); it adds no data file but its own text (r04-data.json). The Node test checks that its counts at a 3-hour run equal the build's (699, 671, 1,377) and that its local clock equals B2's model and the ICU database for all 8,760 hours."
-  - "Notebook: R4 links B2's notebook for practice instead of shipping its own, because pandas and Jupyter are not installed on the build machine to test a new one. A short R4 notebook (the four decisions as parameters, the sensitivity loop, the data-note writer) would fit the labs repository when it exists."
+  - "Notebook (W2 fix g, 2026-11-03): learn/notebooks/r04-data.ipynb is R4's starter notebook (the four decisions as parameters, the four numbers, the sensitivity table, the night check, the data-note writer, a QGIS practice for Ford County, Kansas). Its builder is in the fix agent's scratch folder (build_learn_r04_notebook.py); it ran clean with learn_nbtools.py run, and its asserts carry the page's numbers."
   - "Header badge: practice 120 minutes prints 'about 120 min practice'; see the R2 sidecar's suggestion to print hours."

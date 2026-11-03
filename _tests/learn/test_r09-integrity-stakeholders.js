@@ -4,7 +4,9 @@
 //     defensible option, a norm, a primary source and the stakeholders it involves
 //   - the stakeholder map and the statement builder; the scoring of first picks
 //   - every section cited exists in the sources (ALLEA 2023 §2.4–2.7, §3.1; DOE Order 443.1D §4.a); fictional cases only
-//   - the no-JS blocks equal the model's (--write rewrites them); text budget; links on the allow-list
+//   - the no-JS blocks equal the model's (--write rewrites them): the task, the fact sheet with both exemplars and the
+//     stakeholder table, the rubric; text budget (cases, reasons, exemplar lines and notes, fact sheet, hints, data note)
+//   - the flowchart declares funding and ties on every path; path.yml's practice count matches the data
 // Usage (from the site folder):  node _tests/learn/test_r09-integrity-stakeholders.js [--write]
 "use strict";
 const fs = require("fs");
@@ -22,7 +24,7 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 
 const BLOCKS = {
   "r09-task": () => M.staticTask(D),
-  "r09-exemplars": () => EX.staticHTML(M.exemplarsSpec(D)),
+  "r09-exemplars": () => M.factsHTML(D) + "\n" + EX.staticHTML(M.exemplarsSpec(D)) + "\n" + M.mapHTML(D),
   "r09-rubric": () => RB.staticHTML(D.rubric)
 };
 function between(text, key) {
@@ -36,6 +38,7 @@ if (process.argv.includes("--write")) {
   console.log("r09 fallback blocks written");
 }
 const PAGE = fs.readFileSync(QPATH, "utf8");
+const LXesc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
 // ---------------- the sort
 ok(D.norms.map(n => n.id).join() === "consent,credit,coi,licences,honest", "five norms: consent, credit, conflicts of interest, data licences, honest reporting");
@@ -53,7 +56,8 @@ D.dilemmas.forEach(d => {
   const secs = (d.source.match(/§\d+(\.\d+|\.[a-z])?/g) || []).concat(...d.options.map(o => o.why.match(/§\d+(\.\d+|\.[a-z])?/g) || []));
   ok(secs.every(s => ["§2.4", "§2.5", "§2.6", "§2.7", "§3.1", "§4.a"].indexOf(s) >= 0 || s === "§4"), d.id + ": sections cited exist (" + secs.join(", ") + ")");
 });
-ok(D.dilemmas.find(d => d.id === "survey").options.find(o => o.verdict === "good").why.indexOf("DOE Order 443.1D, §4.a") >= 0, "survey: the DOE order's section");
+{ const w = D.dilemmas.find(d => d.id === "survey").options.find(o => o.verdict === "good").why;
+  ok(/DOE Order 443\.1D/.test(w) && /§4\.a/.test(w), "survey: the DOE order and its section"); }
 ok(!/\b(Inc|LLC|Corp|University of|Co-op of)\b/.test(JSON.stringify(D.dilemmas)) && D.dilemmas.every(d => /Prairie Town|co-op|funder|scenario|survey|publication|co-author/i.test(d.case)), "cases are fictional and name no real organisation");
 ok(/illustrative/.test(D.dilemmas[0].case) && /illustrative/.test(D.dilemmas[3].case) && /illustrative/.test(D.dilemmas[5].case), "the cases with numbers or places say they are illustrative");
 
@@ -67,7 +71,23 @@ ok(s2.done === 3 && s2.right === 2, "score: three picks, two defensible");
 ok(D.stakeholders.length === 3 && people.length === 10 && people.every(p => p.owed), "map: three rings, ten groups, what each is owed");
 ok(people.filter(p => p.dilemmas.length).length === people.length, "every group on the map appears in at least one dilemma");
 const st = M.statement(D, { funding: "Funded by X.", credit: " " });
-ok(st.split("\n").length === 7 && /Funding and conflicts of interest: Funded by X\./.test(st) && /Contributions: \(to write\)/.test(st), "statement: six labelled lines; empty parts marked to write");
+ok(st.split("\n").length === 8 && /Funding and conflicts of interest: Funded by X\./.test(st) && /Contributions: \(to write\)/.test(st), "statement: a stage line and six labelled lines; empty parts marked to write");
+ok(/^Stage: planned study/m.test(st) && /^Stage: completed study/m.test(M.statement(D, { mode: "done" })), "statement: a planned study by default (pending lines are next actions), or a completed one");
+ok(D.statement.every(f => f.hint && f.planned && M.hint(f, "planned") === f.planned && M.hint(f, "done") === f.hint), "statement: every part has a hint for a planned and for a completed study");
+ok(/pending/.test(D.statement.find(f => f.id === "ethics").planned) && /not applicable/.test(D.statement.find(f => f.id === "ethics").hint), "statement: 'pending' and 'not applicable' are offered where they are honest answers");
+
+// ---------------- the flowchart: disclosure is unconditional
+const FL = M.FLOW;
+ok(FL.edges.filter(e => e[0] === "s").map(e => e[1]).join() === "f" && FL.edges.filter(e => e[1] === "q1").map(e => e[0]).join() === "f", "flowchart: every path goes through 'declare funding and ties' before the first question");
+ok(FL.traces.every(t => t.path[0] === "s" && t.path[1] === "f" && t.path[t.path.length - 1] === "e"), "flowchart: every trace declares funding and ends in the statement");
+ok(FL.traces.every(t => t.path.slice(1).every((n, i) => FL.edges.some(e => e[0] === t.path[i] && e[1] === n))), "flowchart: every trace follows the edges");
+ok(!/Review and consent first/.test(JSON.stringify(FL)) && /determination/.test(FL.nodes.a1.t), "flowchart: an ethics determination (review, waiver or reuse basis), not review and consent for every use of data");
+
+// ---------------- path.yml says what the data hold
+{ const P = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = P.slice(P.indexOf("id: r09-integrity-stakeholders"), P.indexOf("id: r10-question-studio"));
+  const W = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+  ok(new RegExp("Sort " + W[D.practices.length] + " practices").test(row), "path.yml: 'Sort " + W[D.practices.length] + " practices', as many as the data hold");
+  ok(new RegExp("Sort " + W[D.practices.length] + " everyday practices").test(JS), "step 1 names as many practices as the data hold"); }
 
 // ---------------- exemplars and the page
 const spec = M.exemplarsSpec(D);
@@ -81,8 +101,15 @@ Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(r && PAGE.slic
   ok(brief >= 0 && brief < inter && /<b>Produce:<\/b>[\s\S]*<b>From:<\/b>[\s\S]*<b>Done when:<\/b>[\s\S]*About 30 minutes guided here, then about 30 minutes on your own/.test(PAGE.slice(brief, inter)),
     "the task card (produce, from, done when, time) sits above the interactive, outside its fallback, so readers with JavaScript see it"); }
 const task = M.staticTask(D);
+ok(!/\[\[/.test(task + M.factsHTML(D) + M.mapHTML(D)), "no-JS blocks: glossary marks become term spans");
+ok(M.people(D).every(p => M.mapHTML(D).indexOf(LXesc(p.owed)) >= 0 && M.mapHTML(D).indexOf(LXesc(p.label)) >= 0), "no-JS stakeholder table: every group and what it is owed");
+ok(D.exemplars.facts.length >= 6 && ["Funding", "Ties", "Data", "Survey", "People", "Response"].every(k => D.exemplars.facts.some(f => f.k === k)), "fact sheet: the facts both answers draw on");
 ok(D.dilemmas.every(d => task.indexOf(d.title) >= 0) && D.dilemmas.every(d => d.options.every(o => task.indexOf(o.text.replace(/&/g, "&amp;")) >= 0)), "no-JS task: every dilemma and option");
 ok(/approved 5 August 2026/.test(PAGE) && /CC BY 4\.0/.test(PAGE) && /174–182/.test(PAGE) && /151–155/.test(PAGE), "sources: dates and pages as checked");
+ok(/https:\/\/doi\.org\/10\.3789\/ansi\.niso\.z39\.104-2022/.test(PAGE) && /ANSI\/NISO Z39\.104-2022/.test(PAGE), "sources: CRediT's 2022 standard cited by its own DOI");
+ok(/without justification/.test(PAGE) && /without justification/.test(JSON.stringify(D.practices)), "honest reporting: ALLEA's 'without justification' kept");
+ok(!/Report every scenario/.test(JSON.stringify(D) + JS) && /designee/.test(JSON.stringify(D)) && /DOE-supported/.test(D.dilemmas.find(d => d.id === "survey").case), "no 'report every scenario'; DOE's order applies to a DOE-supported study and names the designee");
+ok(/after seeing the results/i.test(D.dilemmas.find(d => d.id === "scenario").case) && !/outlier/.test(JSON.stringify(D.dilemmas)), "the convenient scenario: chosen after the results, not called an outlier by count");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const urls = (OWN + JSON.stringify(D)).match(/https?:\/\/[^\s"'<>)]+/g) || [];
 const allowed = /^https:\/\/([\w-]+\.)*(energy\.gov|eia\.gov|doi\.org)\//;
@@ -90,7 +117,15 @@ ok(urls.every(u => allowed.test(u)), "every link on an allow-listed host: " + ur
 ok(!/\bAI\b|artificial intelligence|nuclear|reactor|\bSMR\b|learning[- ](curve|rate)/i.test(JSON.stringify(D) + JS + OWN), "no deny-listed or out-of-scope words");
 
 // ---------------- text budget
-const words = t => t.trim().split(/\s+/).length;
+const words = t => M.plain(t).trim().split(/\s+/).length;
+EX.plain(spec.answers[1]).replace(/ \[\d+\]/g, "").split("\n").forEach((l, i) => ok(words(l) <= 35, "strong answer line " + (i + 1) + ": at most 35 words (" + words(l) + ")"));
+spec.answers.forEach(a => EX.marks(a).forEach(m => ok(words(m.note) <= 25, a.key + " note " + m.n + ": at most 25 words")));
+D.exemplars.facts.forEach(f => ok(words(f.v) <= 30, "fact " + f.k + ": at most 30 words (" + words(f.v) + ")"));
+D.statement.forEach(f => ok(words(f.hint) <= 30 && words(f.planned) <= 30, f.id + ": hints at most 30 words"));
+{ const dn = (PAGE.match(/<p class="lx-datanote">[\s\S]*?<\/p>/) || [""])[0].split(/<br>/).map(r => r.replace(/<[^>]+>/g, " "));
+  ok(dn.length >= 2, "data note in labelled rows");
+  dn.forEach((r, i) => ok(words(r) <= 35, "data note row " + (i + 1) + ": at most 35 words (" + words(r) + ")")); }
+FL.traces.forEach(t => ok(words(t.text) <= 35, "flowchart trace " + t.label + ": at most 35 words"));
 D.dilemmas.forEach(d => { ok(words(d.case) <= 40, d.id + ": case at most 40 words (" + words(d.case) + ")"); d.options.forEach(o => ok(words(o.why) <= 35, d.id + "/" + o.id + ": reason at most 35 words (" + words(o.why) + ")")); });
 D.practices.forEach(p => ok(words(p.text) <= 18, p.id + ": a short card"));
 const stepTexts = (JS.match(/text: "([^"]+)", build/g) || []).map(t => t.slice(7, -8));

@@ -89,6 +89,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "boolean-operators": {
+  "term": "Boolean operators",
+  "short": "AND, OR and NOT, the words that join search terms: AND narrows a search, OR widens it, NOT leaves terms out.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
  "branch": {
   "term": "Branch",
   "short": "A movable label on a line of commits, so a what-if can grow without changing the main line of work.",
@@ -100,6 +106,12 @@
   "short": "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "buffer": {
+  "term": "Buffer (GIS)",
+  "short": "The zone within a set distance of a map feature, such as everything within 1 km of a wind turbine.",
+  "lesson": "R4",
+  "href": "r04-data.html"
  },
  "bus": {
   "term": "Bus",
@@ -185,6 +197,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "clustering": {
+  "term": "Clustering",
+  "short": "Grouping similar items, such as days with similar demand and weather, so that one representative can stand for each group.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
@@ -250,6 +268,12 @@
   "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "credit-roles": {
+  "term": "CRediT contributor roles",
+  "short": "A standard list of 14 names for what each author did, such as conceptualization (shaping the question), data curation (cleaning and documenting data) and formal analysis.",
+  "lesson": "R9",
+  "href": "r09-integrity-stakeholders.html"
  },
  "cube-law": {
   "term": "Cube law",
@@ -424,6 +448,12 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "epsg-code": {
+  "term": "EPSG code",
+  "short": "A catalogue number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees.",
+  "lesson": "R4",
+  "href": "r04-data.html"
  },
  "epsilon-constraint": {
   "term": "Epsilon-constraint method",
@@ -1265,6 +1295,12 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "synthetic-sample": {
+  "term": "Synthetic sample",
+  "short": "A few invented records with the same columns and realistic values as data that cannot be shared, so others can run the code without the real data.",
+  "lesson": "R9",
+  "href": "r09-integrity-stakeholders.html"
+ },
  "system-boundary": {
   "term": "System boundary",
   "short": "The line that decides which parts, costs and emissions a study counts and which it leaves out.",
@@ -1288,6 +1324,12 @@
   "short": "The length of one step in a model or dataset, such as five minutes, an hour or a year.",
   "lesson": "R3",
   "href": "r03-system-and-method.html"
+ },
+ "time-series-aggregation": {
+  "term": "Time-series aggregation",
+  "short": "Shrinking a long series, such as a year of hours, to a few representative periods that a model can solve quickly.",
+  "lesson": "R2",
+  "href": "r02-literature.html"
  },
  "tornado-chart": {
   "term": "Tornado chart",
@@ -1324,6 +1366,12 @@
   "short": "A payment outside the market price that covers costs a scheduled plant cannot recover at the price, such as start-up and no-load costs; also called a make-whole payment.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "utm": {
+  "term": "UTM (Universal Transverse Mercator)",
+  "short": "A set of 60 north-to-south zones, each a flat map in metres that keeps distances close to true inside the zone.",
+  "lesson": "R4",
+  "href": "r04-data.html"
  },
  "validation": {
   "term": "Validation",
@@ -1366,6 +1414,12 @@
   "short": "A unit of energy: one watt kept up for one hour; 1,000 Wh make one kilowatt-hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "web-mercator": {
+  "term": "Web Mercator",
+  "short": "The projection most web maps use: good for viewing, but it stretches distances and areas more the farther a place is from the equator.",
+  "lesson": "R4",
+  "href": "r04-data.html"
  },
  "wacc": {
   "term": "Weighted average cost of capital (WACC)",
