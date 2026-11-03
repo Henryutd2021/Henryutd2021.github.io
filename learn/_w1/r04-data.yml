@@ -1,0 +1,11 @@
+# Sidecar of research studio R4 (builder g, W2, 2026-11-03): new glossary terms and requests for shared files.
+lesson: r04-data
+glossary:
+  - {id: data-licence, term: "Data licence", def: "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement."}
+  - {id: data-note, term: "Data note", def: "A short record of where a dataset came from, its licence, units and time base, and every cleaning step with its rule, count and effect."}
+  - {id: coordinate-reference-system, term: "Coordinate reference system (CRS)", def: "The rule that ties map coordinates to places on Earth; some keep areas true, others keep distances, none keeps both everywhere."}
+  - {id: provenance, term: "Provenance", def: "The documented origin and history of a piece of data: source, version, access date, checksums and every change made to it."}
+requests:
+  - "R4 reuses B2's raw file (assets/learn/data/b02-python-data.json) and town_days.json (the data build's counts); it adds no data file but its own text (r04-data.json). The Node test checks that its counts at a 3-hour run equal the build's (699, 671, 1,377) and that its local clock equals B2's model and the ICU database for all 8,760 hours."
+  - "Notebook: R4 links B2's notebook for practice instead of shipping its own, because pandas and Jupyter are not installed on the build machine to test a new one. A short R4 notebook (the four decisions as parameters, the sensitivity loop, the data-note writer) would fit the labs repository when it exists."
+  - "Header badge: practice 120 minutes prints 'about 120 min practice'; see the R2 sidecar's suggestion to print hours."

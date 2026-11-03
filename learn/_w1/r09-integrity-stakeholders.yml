@@ -1,0 +1,10 @@
+# Sidecar of research studio R9 (builder g, W2, 2026-11-03): new glossary terms and requests for shared files.
+lesson: r09-integrity-stakeholders
+glossary:
+  - {id: informed-consent, term: "Informed consent", def: "A person's agreement to take part in research, given freely after being told what will happen, the risks and how their data will be used."}
+  - {id: ethics-board, term: "Ethics board (IRB)", def: "The committee that reviews research with people before it starts; in the United States, an institutional review board."}
+  - {id: conflict-of-interest, term: "Conflict of interest", def: "A financial or other tie that could bias, or seem to bias, a researcher's work, and so must be declared."}
+  - {id: stakeholder, term: "Stakeholder", def: "A person or group affected by a study or the decision it informs, or able to affect it."}
+requests:
+  - "Shared component candidate: StakeholderMap in assets/learn/r09-integrity-stakeholders.js (e-stakeholders: rings of groups as buttons, what each is owed and the cases they appear in, with a text version). Other modules with e-stakeholders (curriculum §16.2) could reuse it."
+  - "Step text: the dilemma cards are built from one template ('Dilemma N of 6 · title. Read the case...'); the test checks it."

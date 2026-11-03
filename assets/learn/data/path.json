@@ -1263,14 +1263,6 @@
   },
   {
    "tier": "researcher",
-   "code": "R2",
-   "title": "How do you find out what is already known?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
-  },
-  {
-   "tier": "researcher",
    "code": "R3",
    "title": "Which system, which boundary, which method?",
    "ready": true,
@@ -1282,11 +1274,25 @@
   },
   {
    "tier": "researcher",
+   "code": "R2",
+   "title": "How do you find out what is already known?",
+   "ready": true,
+   "href": "r02-literature.html",
+   "scales": [],
+   "id": "r02-literature",
+   "minutes": 30,
+   "form": "studio"
+  },
+  {
+   "tier": "researcher",
    "code": "R4",
    "title": "Data you can defend: sources, cleaning, licences and provenance",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r04-data.html",
+   "scales": [],
+   "id": "r04-data",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
@@ -1322,14 +1328,6 @@
   },
   {
    "tier": "researcher",
-   "code": "R9",
-   "title": "Research integrity, and working with the people your study is about",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
-  },
-  {
-   "tier": "researcher",
    "code": "R10",
    "title": "What could you study? The question studio",
    "ready": true,
@@ -1337,6 +1335,17 @@
    "scales": [],
    "id": "r10-question-studio",
    "minutes": 40,
+   "form": "studio"
+  },
+  {
+   "tier": "researcher",
+   "code": "R9",
+   "title": "Research integrity, and working with the people your study is about",
+   "ready": true,
+   "href": "r09-integrity-stakeholders.html",
+   "scales": [],
+   "id": "r09-integrity-stakeholders",
+   "minutes": 30,
    "form": "studio"
   }
  ],
