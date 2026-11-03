@@ -123,6 +123,9 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(B.compare(bat, { sense: "max", c: [-30, 120], rows: bm.filter(r => r.b !== 120 && !(r.key === "sellHours")).filter(r => !(r.a[0] === 0 && r.a[1] === 1 && r.b === 80)) }, bat.view).ok, "compare: battery without its two redundant power rules is the same model");
     ok(!B.compare(bat, { sense: "max", c: [-30, 120], rows: bm.map(r => r.b === 0 && r.a[0] === -0.9 ? { a: [0, 1], op: "<=", b: 0.9 } : r) }, bat.view).ok, "compare: d ≤ 0.9 instead of d ≤ 0.9c is caught");
     ok(B.compare(bat, { sense: "max", c: [-30, 120], rows: bm.map(r => r.a[0] === -0.9 ? { a: [0.9, -1], op: ">=", b: 0 } : r) }, bat.view).ok, "compare: 0.9c − d ≥ 0 is the losses rule too");
+    // the allowance is for rounding, not for changed requirements (review 2026-11-02)
+    const r8 = eq(base.map(r => r.b === 40 ? { a: r.a, op: r.op, b: 39.5 } : r)); ok(!r8.ok && r8.missing.some(m => m.key === "heat"), "compare: 39.5 MWh of heat instead of 40 is rejected");
+    ok(!eq([{ a: [0.33, 0], op: "<=", b: 10 }].concat(base.filter(r => r.b !== 30))).ok, "compare: 0.33h ≤ 10 (1% off) is rejected; 0.333h passes above");
     const car = stories.carbon, cm = car.rows.map(r => ({ a: r.a.slice(), op: r.op, b: r.b }));
     ok(!B.compare(car, { sense: "min", c: [32, 40], rows: cm.map(r => r.op === "=" ? { a: r.a, op: ">=", b: r.b } : r) }, car.view).ok, "compare: “at least 150” is not “exactly 150”");
   }
@@ -133,10 +136,14 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(B.optimum({ sense: "max", c: [1, 1], rows: [{ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }] }, [0, 10, 0, 10]).status === "unbounded", "optimum: no upper limits is unbounded");
     const t = B.optimum({ sense: "min", c: [40, 40], rows: d1.rows }, d1.view);
     ok(t.status === "optimal" && t.ties.length === 2 && near(t.value, 40 * 145), "optimum: equal costs tie along an edge (two corners, " + JSON.stringify(t.ties) + ")");
+    ok(JSON.stringify(t.ties.slice().sort()) === JSON.stringify([[45, 100], [130, 15]].sort()) && t.value === 5800, "optimum: the tie runs from (45, 100) to (130, 15), $5,800 (the Analyst box's worked comparison)");
+    has("the corners $(45, 100)$ and $(130, 15)$ both cost \\$5,800", "the equal-cost worked comparison");
     const cov = B.optimum({ sense: "min", c: d1.c, rows: d1.rows.map(r => r.key === "cover" ? { a: r.a, op: "<=", b: r.b } : r) }, d1.view);
     ok(cov.status === "optimal" && cov.x[0] === 0 && cov.x[1] === 0 && cov.value === 0, "signs: cover as ≤ makes nothing for $0");
     const rmp = B.optimum({ sense: "min", c: d1.c, rows: d1.rows.map(r => r.key === "ramp" ? { a: r.a, op: ">=", b: r.b } : r) }, d1.view);
     ok(rmp.status === "optimal" && rmp.x[0] === 145 && rmp.x[1] === 0 && rmp.value === 5800, "signs: ramp as ≥ gives (145, 0) at $5,800");
+    const both = B.optimum({ sense: "min", c: d1.c, rows: d1.rows.map(r => r.key === "cover" ? { a: r.a, op: "<=", b: r.b } : r.key === "ramp" ? { a: r.a, op: ">=", b: r.b } : r) }, d1.view);
+    ok(both.x.join() === "130,0" && both.value === 5200 && /ORIG\[o\]/.test(JS), "signs: both flipped at once would give (130, 0), $5,200, so step 6 puts the other rule back (one experiment at a time)");
     const eqc = B.optimum({ sense: "min", c: d1.c, rows: d1.rows.map(r => r.key === "cover" ? { a: r.a, op: "=", b: r.b } : r) }, d1.view);
     ok(eqc.x[0] === 130 && eqc.x[1] === 15, "signs: cover as = gives the same best plan");
   }
@@ -176,6 +183,22 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(a > 0 && b > a && QMD.slice(a + "<!-- fallback-svg:start -->".length, b).trim() === fb.trim(), "page: the fallback figure is the generated one (run with --fallback and paste)");
     // the explain table and saw texts compute from the model; check the strings the JS writes around them
     ok(JS.indexOf("S + W ≤ 115") > 0 && JS.indexOf("d ≤ 0.9c") > 0, "js: the step texts name the rules");
+    ok(d1.rows.length === 6 && JS.indexOf('d1.rows.length + " rules.') > 0 && JS.indexOf("Six rules leave a triangle") > 0, "js: step 3 counts the rules from the model (6), as step 4 says");
+    has("Linear programs use ≤, ≥ and =", "the strict-inequality answer allows equalities");
+    has("can climb by at most 40 MW an hour", "the fallback: the ramp limits the climb");
+    ok(d1.rows[1].says.indexOf("can climb by at most 40 MW") > 0 && JS.indexOf("(the drop is left out)") > 0 && QMD.indexOf("limits only the climb") > 0, "ramp: upward only, said in the story, the worked line and the limits box");
+    // gas above the need is matched by spilling wind or sun: every plan in each dispatch region has enough to spill
+    [["dispatch", d1], ["d14", stories.d14], ["d18", stories.d18]].forEach(([k, st]) => {
+      const P = B.region(st.rows, st.view), most = Math.max(...P.map(p => p[0] + p[1])) - st.need;
+      ok(near(most, st.maxSurplus) && st.maxSurplus <= st.spillable && st.spillable === st.wind + st.solar, `${k}: the most surplus gas, ${most} MW, fits the ${st.spillable} MW of wind and sun that can be spilled`);
+    });
+    ok(d1.spillable === 86 && d1.maxSurplus === 85, "dispatch: 85 MW of surplus at most, 86 MW of wind and sun");
+    // story rows: one label per sentence
+    Object.keys(J.stories).forEach(k => { const s = J.stories[k]; ok(!s.labels || s.labels.length === s.text.length, `story ${k}: a label for every row`); });
+    ["c14", "c18"].forEach(k => ok(PI[k].labels.length === PI[k].text.length, `${k}: a label for every row`));
+    // the battery's conventions and the heat pump's energy, stated
+    { const t = J.stories.battery.text.join(" "); ok(/starts empty/.test(t) && /Charging loses nothing/.test(t) && /delivers 90% of the energy stored/.test(t) && stories.battery.rows.find(r => r.key === "store").b === 80, "battery: starts empty, lossless charging, 90% out on discharge; c ≤ 80 is the store"); }
+    { const t = J.stories.heat.text.join(" "); ok(/uses 1 MWh of electricity to move 2 MWh of heat/.test(t) && /delivering 3 MWh/.test(t) && 1 + 2 === 3 && 60 / 3 === 20 && near(27 / 0.9, 30) && !/feeder/.test(t), "heat: 1 MWh of electricity moves 2 MWh, delivers 3; $60/3 = $20, $27/0.9 = $30; no 'feeder'"); }
   }
 
   // ---------------- the practice set
@@ -212,6 +235,8 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(SP.aplan.check(0).ok && [1, 2, 3].every(i => !SP.aplan.check(i).ok) && SP.aplan.why.join("|") === [PI.aplan.why.energy, PI.aplan.why.connect].join("|"), "aplan: only choice 0 passes; each row's reason follows its rule");
     // abat: partly worked arrays
     ok(SP.abat.given.map(r => r.key).join() === "chargeHours,store,sellHours" && SP.abat.left.length === 1 && JSON.stringify(SP.abat.answer) === '{"c":[30,-120],"rows":[{"a":[-0.9,1],"b":0}]}', "abat: three rows given; c = (30, −120) and the losses row left");
+    ok(/\(80, 72\), \$6,240/.test(SP.abat.check(SP.abat.answer).why) && /\(1, 5\), \$170/.test(SP.abus.check({ c: [4.5, 2.5], rows: SP.abus.answer.rows }).why), "abat, abus: the accepted answer reports its own best plan, valued with the story's goal");
+    ok(!SP.abus.check({ c: [45, 25], rows: SP.abus.answer.rows.map(r => r.a[0] === -1 && r.a[1] === 0 ? { a: r.a, b: -0.95 } : r) }).ok, "abus: 0.95 MWh for the shuttle instead of 1 is rejected");
     ok(SP.abat.check(SP.abat.answer).ok && SP.abat.check({ c: [-30, 120], rows: SP.abat.answer.rows }).why === PJ.checks.reversed && /Row 4 rules out/.test(SP.abat.check({ c: [30, -120], rows: [{ a: [0, 1], b: 0.9 }] }).why) && SP.abat.check({ c: [30, NaN], rows: SP.abat.answer.rows }) === null, "abat: right passes; a max-form c, d ≤ 0.9 and a blank get their reasons");
     // abus: from scratch
     ok(SP.abus.check(SP.abus.answer).ok && SP.abus.check({ c: [45, 25], rows: [{ a: [1, 1], b: 6 }, { a: [1, 0], b: 4 }, { a: [0, 1], b: 12 }, { a: [-1, 0], b: -1 }] }).why === B.fill(PJ.checks.copied, { k: 1 }) &&
@@ -239,6 +264,14 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
       ok(R.early.b === 2 * 2 && R.late.b === 2 * 6 && t.indexOf("at least " + R.need.b + " MWh") > 0 && t.indexOf("$" + bs.c[0]) > 0 && t.indexOf("$" + bs.c[1]) > 0 && t.indexOf("at least " + R.shuttle.b + " MWh") > 0, "bus: text and rows agree"); }
     { const is = J.stories.imports, t = is.text.join(" ");
       ok(is.rows.every(r => isBoundLike(r) || t.indexOf(String(r.b)) >= 0) && t.indexOf("$" + is.c[0]) > 0 && t.indexOf("$" + is.c[1]) > 0 && t.indexOf(is.rows[1].a[0] + " t") > 0 && t.indexOf(is.rows[1].a[1] + " t") > 0, "imports: text and rows agree"); }
+    // text versions: the imports plane described without its answer; a builder's region in words
+    { const st = SP.imports.st, w = st.rows.filter(r => !(r.op === ">=" && r.b === 0)).map(r => B.ruleWords(r, ["x", "y"], st.view));
+      ok(w[0] === "The line x + y = 100 runs from (0, 100) to (100, 0); plans above it pass." && /0\.9x \+ 0\.4y = 64 runs from \(0, 160\) to \(71\.111, 0\); plans below it pass/.test(w[1]) && /x = 80 runs from \(80, 0\) to \(80, 180\); plans left of it pass/.test(w[2]), "imports: the text version names each line and its side: " + w.join(" | "));
+      ok(w.every(t => t.indexOf("48") < 0 && t.indexOf("52") < 0) && /ruleWords\(r, syms\(st\), st\.view\)/.test(JS), "imports: the text version does not give the answer away"); }
+    { const bt = stories.battery, d = B.describeModel({ sense: "max", c: bt.c, rows: bt.rows }, ["c", "d"], bt.view);
+      ok(/corners/.test(d[1]) && d[1].indexOf("(80, 72)") > 0 && d[2] === "Best plan for your goal: (80, 72).", "builder text: the battery's corners and best plan in words: " + d.join(" | "));
+      ok(B.describeModel({ sense: null, c: [NaN, NaN], rows: [] }, ["c", "d"], bt.view)[0] === "No rules yet: every plan passes." && /No plan passes/.test(B.describeModel({ rows: [{ a: [1, 0], op: "<=", b: 5 }, { a: [1, 0], op: ">=", b: 6 }] }, ["x", "y"], bt.view).join(" ")), "builder text: no rules, and contradictory rules"); }
+    ok(/Choose min or max for the goal first/.test(JS) && !/m\.sense = "min"/.test(JS), "builder: min or max must be chosen; nothing is filled in silently");
     // the page hosts the set; the view builds every exercise
     ok(QMD.indexOf('<div id="b1-practice"></div>') > 0, "page: the practice host in the Check section");
     ["c14", "c18", "imports", "aplan", "abat", "abus"].forEach(k => ok(JS.indexOf(k + ": function") > 0, `js: the view builds exercise ${k}`));

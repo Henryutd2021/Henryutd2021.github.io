@@ -5,6 +5,12 @@
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
  },
+ "array": {
+  "term": "Array",
+  "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
+  "lesson": "B1",
+  "href": "b01-algebra-to-lp.html"
+ },
  "assert": {
   "term": "Assert",
   "short": "A line of code that stops a program with a message when a stated condition is false.",

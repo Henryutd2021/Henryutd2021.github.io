@@ -3,11 +3,11 @@
   "title": "Bridge B3 (How do you read a formulation, and check that a model is right?): formulation, suspects and checks",
   "built_by": "by hand, 2026-11-02; the precomputed solution ('ref') was solved with HiGHS 1.15.4 and is re-checked by _tests/learn/test_b03-read-check-formulation.js",
   "license": "CC BY 4.0",
-  "notes": "Prairie Town's dispatch, 17:00-20:00 on 3 September 2025 (lesson 0's day, from EIA-930 shapes for the Southwest Power Pool, scaled). Fleet and prices from town.json; the 45 MW start of the combined-cycle plant is lesson 0's cheapest-first plan at 16:00; V = $10,000/MWh for unserved demand is illustrative."
+  "notes": "Prairie Town's dispatch, 17:00-20:00 on 3 September 2025 (lesson 0's day, from EIA-930 shapes for the Southwest Power Pool, scaled). Fleet and prices from town.json; the 45 MW start of the combined-cycle plant is lesson 0's cheapest-first plan at 16:00; V = $10,000/MWh for unserved demand is illustrative. The ramp line is written with R Δt so that every side is in MW. The signs of the balance duals are those of these inputs: the Node test also solves two counterexamples (17:00 demand of 105 MW gives a negative 17:00 dual; a 150 MW start gives a positive ramp dual)."
  },
  "blocks": [
-  {"key": "sets", "head": "Sets", "html": "<i>T</i> = {17, 18, 19, 20} · <i>G</i> = {nuc, wind, solar, cc, pk}", "words": "What the model counts over: four hours and five plants. Indices t and g run over them."},
-  {"key": "par", "head": "Parameters", "html": "<i>d<sub>t</sub></i>, <i>c<sub>g</sub></i>, <i>P̄<sub>g</sub></i>, <i>a<sub>g,t</sub></i>, <i>R</i>, <i>V</i>, Δ<i>t</i>", "words": "Given numbers: demand (MW), running costs ($/MWh), sizes (MW), weather limits (MW), the ramp (MW per hour), the unserved penalty ($/MWh), the step (1 h)."},
+  {"key": "sets", "head": "Sets", "html": "<i>T</i> = {17, 18, 19, 20} · <i>G</i> = {nuc, wind, solar, cc, pk}", "words": "Four hours and five plants: nuc (nuclear), wind, solar, cc (a [[combined-cycle|combined-cycle]] gas plant: cheaper, slow to change) and pk (a [[peaker|peaker]]: fast, dear). Indices t and g run over them."},
+  {"key": "par", "head": "Parameters", "html": "<i>d<sub>t</sub></i>, <i>c<sub>g</sub></i>, <i>P̄<sub>g</sub></i>, <i>a<sub>g,t</sub></i>, <i>R</i>, <i>V</i>, Δ<i>t</i>", "words": "Given numbers: demand (MW), running costs ($/MWh), sizes (MW), weather limits (MW), the [[ramp-rate|ramp]] limit (MW per hour), the unserved penalty ($/MWh), the step (1 h). The key below lists every value."},
   {"key": "vars", "head": "Variables", "html": "<i>p<sub>g,t</sub></i> ≥ 0, <i>u<sub>t</sub></i> ≥ 0", "words": "What the solver chooses: each plant's output in each hour, and any demand left unserved (MW)."},
   {"key": "obj", "head": "Objective", "html": "min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i>", "words": "The total running cost over the four hours, plus a heavy charge for every MWh not served."},
   {"key": "cons", "head": "Constraints", "html": "balance · sizes · weather · ramp · nuclear runs flat", "words": "The rules every plan must keep, each written once with “for all” (∀) and meaning one row per hour or per plant and hour."}
@@ -18,7 +18,7 @@
   "bal": "Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i>",
   "size": "<i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i>",
   "wx": "<i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i>",
-  "ramp": "−<i>R</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i>",
+  "ramp": "−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i>",
   "must": "<i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i>"
  },
  "lineNames": {"par": "costs", "obj": "objective", "bal": "balance", "size": "sizes", "wx": "weather", "ramp": "ramp", "must": "nuclear runs flat"},
@@ -33,8 +33,8 @@
   {"text": "The energy balance holds in every hour of the solution.", "answer": 0},
   {"text": "Every term of the objective comes out in dollars.", "answer": 0},
   {"text": "A two-hour version solved by hand gives the code's answer.", "answer": 0},
-  {"text": "The dispatch for 3 September is compared with the fuel mix SPP actually ran that day.", "answer": 1},
-  {"text": "The model's marginal costs are compared with last year's market prices.", "answer": 1},
+  {"text": "A model of SPP's own fleet, run for 3 September, is compared with the fuel mix SPP actually ran that day.", "answer": 1},
+  {"text": "A model of a past year, with that year's fleet and fuel prices, is compared with that year's market prices.", "answer": 1},
   {"text": "Grid operators review whether the plants and limits are realistic.", "answer": 1}
  ],
  "units": {"options": ["$/MWh", "MW", "h", "MWh", "$", "$/MW"], "factors": [{"sym": "c<sub>g</sub>", "answer": "$/MWh"}, {"sym": "p<sub>g,t</sub>", "answer": "MW"}, {"sym": "Δt", "answer": "h"}], "result": "$"},
@@ -75,7 +75,7 @@
     "minutes": 2,
     "title": "The ramp line, word by word",
     "line": "ramp",
-    "worked": [["In words", "From one hour to the next, the combined-cycle plant's output changes by at most R, up or down."], ["Units", "p is in MW; R = {ramp} MW per hour, over a one-hour step: MW on every side."], ["Rows", "Two limits per hour, one on each side: {nT} hours give {rows} rows."], ["First hour", "At t = {t0}, p(cc, {tPrev}) is not a variable but the start, {start} MW: a parameter."]],
+    "worked": [["In words", "From one hour to the next, the combined-cycle plant's output changes by at most R, up or down."], ["Units", "p is in MW; R = {ramp} MW per hour times Δt = 1 h is MW too: every side in MW."], ["Rows", "Two limits per hour, one on each side: {nT} hours give {rows} rows."], ["First hour", "At t = {t0}, p(cc, {tPrev}) is not a variable but the start, {start} MW: a parameter."]],
     "q": "How many rows would this line stand for over a whole day of {day} hours?",
     "hints": ["One line, two inequality signs: each hour gives two rows.", "Two rows for each of the {day} hours."],
     "right": "Right: two rows per hour, 2 × {day} = {rows24}.",
@@ -132,7 +132,7 @@
     "checks": ["Units of every parameter", "The balance, hour by hour", "Outputs against what each plant must do", "Counting rows"],
     "answer": 2,
     "hints": ["Nothing breaks the balance; look at what each plant does.", "Nuclear should run flat at {cap} MW. Which line says so?", "Line (5), “nuclear runs flat”, now reads ≤: the model turns nuclear down to save ${cNuc}/MWh instead of spilling free wind."],
-    "right": "Right: = became ≤ in line (5). The {t0}:00 balance dual moves from ${d0} to ${d1}: turning nuclear down, not spilling wind, now meets the last MWh.",
+    "right": "Right: = became ≤ in line (5). The {t0}:00 balance dual moves from ${d0} to ${d1}: one more MWh of demand now raises nuclear from {nuc0} to {nuc1} MW, at ${cNuc}.",
     "lineWrong": "That line is as in the right model; find the one that lets nuclear drop below {cap} MW.",
     "noLine": "Tap the changed line first.",
     "bad": ["Every unit is as in the right model; the plan breaks a plant's rule, not a unit.", "The balance holds in every hour here.", "", "Same number of rows: only a sign changed."]

@@ -337,6 +337,7 @@
   icon: pencil
   status: active
   minutes: 30
+  practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "From algebra to a linear program: how do equations become a model?"
   short: "Algebra to a linear program"
   outcome: "Turn a word problem into a linear program, find its best corner on a graph and write it as Ax <= b."
@@ -371,6 +372,7 @@
   icon: question
   status: active
   minutes: 30
+  practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "How do you read a formulation, and check that a model is right?"
   short: "Read and check a formulation"
   outcome: "Read a published formulation line by line, find planted errors and check a solved model's balance and duals."
@@ -446,6 +448,7 @@
   code: K4
   status: active
   minutes: 15
+  practice_minutes: 20   # the drill (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "Linear equations and inequalities"
   outcome: "Solve a balance for one unknown and read a set of inequalities as the region of plans that pass them."
   teaches: [linear equations, inequalities, half-planes, systems of rules]

@@ -3,7 +3,7 @@
   "title": "Bridge B1 (From algebra to a linear program): readiness check and word problems",
   "built_by": "by hand, 2026-11-02; every number is checked by _tests/learn/test_b01-algebra-to-lp.js",
   "license": "CC BY 4.0",
-  "notes": "The dispatch story is built in the page from town.json and town_year.json (19:00 on 3 September 2025, as in lesson 0). The planning story takes its energy per MW from cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 U.S. capacity factors: solar 24.0%, wind 33.8%), rounded to 2.1 and 3.0 GWh per MW-year. All prices, costs, sizes and limits in the stories are illustrative."
+  "notes": "The dispatch story is built in the page from town.json and town_year.json (19:00 on 3 September 2025, as in lesson 0). The planning story takes its energy per MW from cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 U.S. capacity factors: solar 24.0%, wind 33.8%), rounded to 2.1 and 3.0 GWh per MW-year. All prices, costs, sizes and limits in the stories are illustrative. The dispatch stories limit only how fast the combined-cycle plant climbs (the drop is left out), and gas above the need is matched by spilling wind or sun (checked by the test)."
  },
  "ready": {
   "groups": {
@@ -28,6 +28,7 @@
  "stories": {
   "planning": {
    "title": "New wind and solar for Prairie Town",
+   "labels": ["Need", "Output per MW", "Costs", "Limit", "Choose"],
    "text": ["Prairie Town wants at least 300 GWh a year from new solar and wind farms.", "Each MW of solar makes about {solarGWh} GWh a year and each MW of wind about {windGWh} GWh ({solarCF} and {windCF} capacity factors, U.S. 2025, rounded).", "Solar costs $120k and wind $180k per MW each year, building and upkeep together.", "The substation can connect at most 115 MW in total.", "Which mix is cheapest?"],
    "vars": [{"sym": "S", "name": "solar to build", "unit": "MW"}, {"sym": "W", "name": "wind to build", "unit": "MW"}],
    "sense": "min", "c": [120, 180], "goalUnit": "$k a year",
@@ -41,7 +42,8 @@
   },
   "battery": {
    "title": "Prairie Town's battery: buy tonight, sell tomorrow",
-   "text": ["Prairie Town's battery stores up to 80 MWh and charges or discharges at up to 40 MW.", "Tonight it can charge for three hours at $30 per MWh; tomorrow evening it can sell for two hours at $120 per MWh.", "Only 90% of the energy it takes in comes back out.", "Choose c, the MWh it buys tonight, and d, the MWh it sells tomorrow, to earn the most."],
+   "labels": ["Battery", "Prices", "Losses", "Choose"],
+   "text": ["Prairie Town's battery starts empty, stores up to 80 MWh, and charges or discharges at up to 40 MW.", "Tonight it can charge for three hours at $30 per MWh; tomorrow evening it can sell for two hours at $120 per MWh.", "Charging loses nothing; discharging delivers 90% of the energy stored.", "Choose c, the MWh it buys tonight, and d, the MWh it sells tomorrow, to earn the most."],
    "vars": [{"sym": "c", "name": "energy bought tonight", "unit": "MWh"}, {"sym": "d", "name": "energy sold tomorrow", "unit": "MWh"}],
    "sense": "max", "c": [-30, 120], "goalUnit": "$",
    "rows": [
@@ -56,19 +58,21 @@
   },
   "heat": {
    "title": "Heat for Prairie Campus tonight",
-   "text": ["Prairie Campus needs at least 40 MWh of heat tonight.", "Its heat pump turns 1 MWh of electricity into 3 MWh of heat; electricity costs $60 per MWh, so heat from it costs $20 per MWh.", "Its gas boiler turns fuel into heat at 90% efficiency; fuel costs $27 per MWh, so heat from it costs $30 per MWh.", "The campus feeder can supply at most 10 MWh of electricity for heating tonight.", "Choose h, the heat from the heat pump, and b, the heat from the boiler, both in MWh, at the lowest cost."],
+   "labels": ["Need", "Heat pump", "Boiler", "Limit", "Choose"],
+   "text": ["Prairie Campus needs at least 40 MWh of heat tonight.", "Its heat pump uses 1 MWh of electricity to move 2 MWh of heat in from the outside air, delivering 3 MWh; at $60 per MWh of electricity, its heat costs $20 per MWh.", "Its gas boiler turns fuel into heat at 90% efficiency; at $27 per MWh of fuel, its heat costs $30 per MWh.", "The campus's electricity supply line can carry at most 10 MWh for heating tonight.", "Choose h, the heat from the heat pump, and b, the heat from the boiler, both in MWh, at the lowest cost."],
    "vars": [{"sym": "h", "name": "heat from the heat pump", "unit": "MWh"}, {"sym": "b", "name": "heat from the boiler", "unit": "MWh"}],
    "sense": "min", "c": [20, 30], "goalUnit": "$",
    "rows": [
     {"a": [1, 1], "op": ">=", "b": 40, "key": "heat", "says": "at least 40 MWh of heat"},
-    {"a": [1, 0], "op": "<=", "b": 30, "key": "feeder", "says": "at most 10 MWh of electricity, which makes at most 30 MWh of heat (h/3 ≤ 10)"},
+    {"a": [1, 0], "op": "<=", "b": 30, "key": "feeder", "says": "at most 10 MWh of electricity, which delivers at most 30 MWh of heat (h/3 ≤ 10)"},
     {"a": [1, 0], "op": ">=", "b": 0, "key": "h0", "says": "no negative heat from the heat pump"},
     {"a": [0, 1], "op": ">=", "b": 0, "key": "b0", "says": "no negative heat from the boiler"}],
    "view": [0, 60, 0, 60], "ticks": [0, 10, 20, 30, 40, 50, 60],
-   "hints": ["The goal adds the cost of each MWh of heat: $20 from the heat pump, $30 from the boiler. Minimize it.", "Heat must reach 40 MWh in total. The feeder limits electricity, and the heat pump makes 3 MWh of heat per MWh of electricity.", "min 20h + 30b, subject to h + b ≥ 40, h ≤ 30 (the same as h/3 ≤ 10), h ≥ 0 and b ≥ 0."]
+   "hints": ["The goal adds the cost of each MWh of heat: $20 from the heat pump, $30 from the boiler. Minimize it.", "Heat must reach 40 MWh in total. The supply line limits electricity, and the heat pump delivers 3 MWh of heat per MWh of electricity.", "min 20h + 30b, subject to h + b ≥ 40, h ≤ 30 (the same as h/3 ≤ 10), h ≥ 0 and b ≥ 0."]
   },
   "carbon": {
    "title": "A carbon cap on the Plains Grid",
+   "labels": ["Need", "Steam unit", "Combined-cycle", "Cap", "Choose"],
    "text": ["A plant owner on the Plains Grid must deliver exactly 150 MW this hour from two units.", "An older steam unit costs $32 per MWh, emits 0.6 t CO₂ per MWh and makes up to 120 MW.", "A combined-cycle unit costs $40 per MWh, emits 0.4 t CO₂ per MWh and makes up to 100 MW.", "A permit caps this hour's emissions at 76 t CO₂.", "Choose s and c, the MW from each unit, at the lowest cost."],
    "vars": [{"sym": "s", "name": "steam unit output", "unit": "MW"}, {"sym": "c", "name": "combined-cycle output", "unit": "MW"}],
    "sense": "min", "c": [32, 40], "goalUnit": "$ this hour",
@@ -84,6 +88,7 @@
   },
   "imports": {
    "title": "Prairie Town's imports tonight",
+   "labels": ["Need", "Prices", "Limits", "Decisions"],
    "text": ["Tonight Prairie Town must import at least 100 MWh from two neighbours.", "The north sells at $30 per MWh and emits 0.9 t CO₂ per MWh; the south sells at $50 per MWh and emits 0.4 t.", "The north line carries at most 80 MWh tonight, and the town's permit caps tonight's emissions at 64 t.", "x is the energy from the north and y from the south, in MWh."],
    "vars": [
     {"sym": "x", "name": "energy from the north", "unit": "MWh"},
@@ -102,6 +107,7 @@
   },
   "bus": {
    "title": "Prairie Town's bus depot tonight",
+   "labels": ["Need", "Prices", "Connection", "Shuttle", "Choose"],
    "text": ["The depot must charge Prairie Town's electric buses with at least 6 MWh between 22:00 and 6:00.", "Power costs $45 per MWh before midnight and $25 per MWh after.", "Its 2 MW connection fits at most 4 MWh before midnight (2 MW × 2 h) and 12 MWh after (2 MW × 6 h).", "Two buses run a late shuttle, so at least 1 MWh must go in before midnight.", "x is the energy charged before midnight and y after, in MWh; the depot wants the cheapest plan."],
    "vars": [
     {"sym": "x", "name": "charged before midnight", "unit": "MWh"},
@@ -146,7 +152,8 @@
     "hour": 14,
     "prev": 45,
     "whatIfPK": 35,
-    "text": "At {hh} on {date}, in the midday solar dip, Prairie Town's gas plants must cover at least {need} MW. The combined-cycle plant (${costCC}/MWh) made {prev} MW at {hhPrev} and can change by at most {ramp} MW an hour; the peaker (${costPK}/MWh) makes at most {pkMax} MW.",
+    "labels": ["Need", "Combined-cycle", "Peaker"],
+    "text": ["At {hh} on {date}, in the midday solar dip, Prairie Town's gas plants must cover at least {need} MW.", "The combined-cycle plant (${costCC}/MWh) made {prev} MW at {hhPrev} and can climb by at most {ramp} MW an hour.", "The peaker (${costPK}/MWh) makes at most {pkMax} MW."],
     "worked": "The rules leave {nCorners} corners. Cost each one with {goal} dollars: the cheapest, {best}, is the best plan.",
     "q": "What if the peaker cost ${alt} per MWh, less than the combined-cycle plant? Tap the corner that would be cheapest.",
     "hints": ["The corners stay where they are; only their costs change. Recompute {costCC}x + {alt}y at each corner.", "Every MW from the peaker is now the cheaper MW, so use as little combined-cycle output as the rules allow."],
@@ -159,7 +166,8 @@
     "title": "One corner left at 18:00",
     "hour": 18,
     "prev": 65,
-    "text": "At {hh} the evening climb begins: the gas plants must cover at least {need} MW. The combined-cycle plant (${costCC}/MWh) made {prev} MW at {hhPrev} and can change by at most {ramp} MW an hour; the peaker (${costPK}/MWh) makes at most {pkMax} MW.",
+    "labels": ["Need", "Combined-cycle", "Peaker"],
+    "text": ["At {hh} the evening climb begins: the gas plants must cover at least {need} MW.", "The combined-cycle plant (${costCC}/MWh) made {prev} MW at {hhPrev} and can climb by at most {ramp} MW an hour.", "The peaker (${costPK}/MWh) makes at most {pkMax} MW."],
     "ask": "Two corners are costed for you. Find the third, where the cover line meets the ramp line, and its cost.",
     "hints": ["The corner lies on both lines: x + y = {need} and x = {reach}.", "Put x = {reach} into x + y = {need}: y = {need} − {reach}.", "Its cost is {costCC} × {reach} + {costPK} × y dollars; then compare it with the other two corners."],
     "right": "Right: ({bx}, {by}) at {bestCost}, the cheapest of the three corners, and the plan lesson 0's cheapest-first rule finds for {hh}.",
