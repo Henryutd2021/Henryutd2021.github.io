@@ -158,8 +158,8 @@ const usd = K.usd, f4 = K.f4;
   const items = K.drill(42, 600), counts = {};
   items.forEach((it, i) => {
     counts[it.kind] = (counts[it.kind] || 0) + 1;
-    if (it.kind === "grow") { const m = /^\$(\d+) grows at (\d+)% a year for (\d+) years/.exec(it.q); ok(m && it.answer === Math.round(+m[1] * Math.pow(1 + m[2] / 100, +m[3])), `drill ${i}: grow`); }
-    if (it.kind === "discount") { const m = /worth \$?/.test(it.q) && /^What is \$(\d+) paid in (\d+) years worth today at (\d+)%/.exec(it.q); ok(m && it.answer === Math.round(+m[1] / Math.pow(1 + m[3] / 100, +m[2])), `drill ${i}: discount`); }
+    if (it.kind === "grow") { const m = /^\$([\d,]+) grows at (\d+)% a year for (\d+) years/.exec(it.q); ok(m && it.answer === Math.round(+m[1].replace(/,/g, "") * Math.pow(1 + m[2] / 100, +m[3])), `drill ${i}: grow`); }
+    if (it.kind === "discount") { const m = /worth \$?/.test(it.q) && /^What is \$([\d,]+) paid in (\d+) years worth today at (\d+)%/.exec(it.q); ok(m && it.answer === Math.round(+m[1].replace(/,/g, "") / Math.pow(1 + m[3] / 100, +m[2])), `drill ${i}: discount`); }
     if (it.kind === "double") { const m = /^At ([\d.]+)% a year/.exec(it.q); ok(m && it.choices[it.answer] === "about " + Math.round(70 / +m[1]) + " years" && new Set(it.choices).size === it.choices.length && it.choices.length >= 3, `drill ${i}: double`); }
     if (it.kind === "crf") { const m = /at (\d+)% over (\d+) years/.exec(it.q), c = L7.crf(+m[1] / 100, +m[2]); ok(near(it.answer, c, 0.00005) && K.close(+c.toFixed(4), it.answer, it.tol), `drill ${i}: crf`); }
     if (it.kind === "yearly") { const m = /costs \$([\d,]+) per kW to build and \$(\d+) per kW a year to keep up\. With CRF = ([\d.]+)/.exec(it.q); ok(m && it.answer === Math.round(+m[3] * +m[1].replace(/,/g, "") + +m[2]), `drill ${i}: yearly`); }

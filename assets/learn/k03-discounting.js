@@ -102,12 +102,12 @@
     var kind = KINDS[k % KINDS.length], pick = function (a) { return a[Math.floor(r() * a.length)]; };
     if (kind === "grow" || kind === "discount") {
       var x = pick([100, 200, 500, 1000]), rate = pick([2, 3, 4, 5, 6, 7, 8, 10]), t = pick([5, 10, 15, 20, 25, 30]);
-      var ans = kind === "grow" ? fv(x, rate / 100, t) : pv(x, rate / 100, t);
+      var ans = kind === "grow" ? fv(x, rate / 100, t) : pv(x, rate / 100, t), xs = x.toLocaleString("en-US");
       return kind === "grow"
-        ? { kind: kind, q: "$" + x + " grows at " + rate + "% a year for " + t + " years, interest left in. What is it then, to the nearest dollar?", answer: Math.round(ans), tol: 1, unit: "$",
-            why: x + " × " + (1 + rate / 100).toFixed(2) + "^" + t + " = " + usd(ans) + "." }
-        : { kind: kind, q: "What is $" + x + " paid in " + t + " years worth today at " + rate + "% a year, to the nearest dollar?", answer: Math.round(ans), tol: 1, unit: "$",
-            why: x + " ÷ " + (1 + rate / 100).toFixed(2) + "^" + t + " = " + usd(ans) + "." };
+        ? { kind: kind, q: "$" + xs + " grows at " + rate + "% a year for " + t + " years, interest left in. What is it then, to the nearest dollar?", answer: Math.round(ans), tol: 1, unit: "$",
+            why: xs + " × " + (1 + rate / 100).toFixed(2) + "^" + t + " = " + usd(ans) + "." }
+        : { kind: kind, q: "What is $" + xs + " paid in " + t + " years worth today at " + rate + "% a year, to the nearest dollar?", answer: Math.round(ans), tol: 1, unit: "$",
+            why: xs + " ÷ " + (1 + rate / 100).toFixed(2) + "^" + t + " = " + usd(ans) + "." };
     }
     if (kind === "double") {
       var dr = pick(DOUBLE_RATES), right = Math.round(70 / dr), wrong = [Math.round(100 / dr), Math.round(140 / dr), Math.round(35 / dr)];
@@ -163,8 +163,8 @@
     var ul = H("ul", null, d); (items || []).forEach(function (t) { H("li", { html: LX.rich(t) }, ul); });
     return { el: d, ul: ul, set: function (list) { ul.innerHTML = ""; list.forEach(function (t) { H("li", { html: LX.rich(t) }, ul); }); } };
   }
-  function readouts(host, labels) {
-    var box = H("div", { class: "lx-readouts", "aria-live": "polite" }, host), out = {};
+  function readouts(host, labels, cls) {
+    var box = H("div", { class: "lx-readouts" + (cls ? " " + cls : ""), "aria-live": "polite" }, host), out = {};
     labels.forEach(function (l) { var d = H("div", { class: "lx-readout" }, box); H("span", { text: l[1] }, d); out[l[0]] = H("b", null, d); });
     return out;
   }
@@ -185,18 +185,18 @@
         function draw() {
           var y = sl.val(), c = fv(s.amount, s.rate, y), sm = simple(s.amount, s.rate, y);
           ro.c.textContent = usd(c); ro.s.textContent = usd(sm);
-          P.render({ x: { min: 0, max: 30, ticks: [[0, "0"], [10, "10"], [20, "20"], [30, "30 years"]] },
+          P.render({ x: { min: 0, max: 30, ticks: [[0, "0"], [10, "10"], [20, "20"], [30, "30 years"]], ticksN: [[0, "0"], [10, "10"], [20, "20"], [30, "30"]] },
             y: { min: 0, max: 800, step: 200, fmt: function (v) { return "$" + v; } }, height: 230, heightN: 200,
             lines: [{ values: yrs.map(function (t) { return fv(s.amount, s.rate, t); }), color: "var(--lx-tier-2)", area: 0.08 },
                     { values: yrs.map(function (t) { return simple(s.amount, s.rate, t); }), color: "var(--lx-ink-3)", dash: "5 4", width: 2 }],
-            refs: [{ y: 2 * s.amount, label: "Doubled: " + usd(2 * s.amount, 0), dash: "3 4" }],
+            refs: [{ y: 2 * s.amount, label: "Doubled: " + usd(2 * s.amount, 0), dash: "3 4", below: true }],
             marks: [{ x: y, y: c, label: usd(c, 0), kind: "dot", pos: "above" }],
             legend: [{ label: "Compound", color: "var(--lx-tier-2)" }, { label: "Simple", color: "var(--lx-ink-3)", dash: "5 4" }],
             aria: A + " at " + R + " a year: after " + y + " years, " + usd(c) + " with interest left in, " + usd(sm) + " with simple interest.",
             text: { head: ["Year", "Compound", "Simple"], rows: [0, 5, 10, 15, 20, 25, 30].map(function (t) { return [String(t), usd(fv(s.amount, s.rate, t)), usd(simple(s.amount, s.rate, t))]; }) } });
           if (c >= 2 * s.amount) {
             api.done();
-            api.saw("It first passes " + usd(2 * s.amount, 0) + " in year " + s.firstDouble + " (" + usd(s.atFirstDouble) + "). The rule of 70: doubling takes about 70 ÷ " + s.ratePct + " = " + s.rule70 + " years (exactly " + s.doubling.toFixed(1) + "). Simple interest needs " + s.simpleDouble + ".");
+            api.saw("It first passes " + usd(2 * s.amount, 0) + " in year " + s.firstDouble + " (" + usd(s.atFirstDouble) + "). The rule of 70: doubling takes about 70 ÷ " + s.ratePct + " = " + s.rule70 + " years (exactly " + s.doubling.toFixed(1) + "). Simple interest needs " + s.simpleDouble + " years.");
           }
         }
         autos[0] = function () { sl.set(s.firstDouble, true); };
@@ -221,7 +221,7 @@
 
     // ---- step 3: the rate matters most far ahead (lesson 7's step 3)
     steps.push({
-      text: "Lessons 7 and 13 discount a plant's money at " + R4 + " after inflation. Slide the [[discount-rate|discount rate]] from " + R + " down to " + R4 + " and watch which bar grows most.",
+      text: "Lessons 7 and 13 discount a plant's money at " + R4 + " after inflation. Slide the [[discount-rate|discount rate]] from " + R + " down to " + R4 + ". Which bar grows by the largest factor?",
       build: function (act, api) {
         var rows = H("div", { class: "k3-pv" }, act), bars = [];
         s.years.forEach(function (t) {
@@ -234,11 +234,11 @@
         var alt = textAlt(act, "Text version");
         function draw(user) {
           var r = sl.val() / 100, list = [];
-          bars.forEach(function (x) { var v = pv(s.amount, r, x.t); x.fill.style.width = v + "%"; x.b.textContent = usd(v); list.push(A + " " + (x.t === 0 ? "today" : "in " + x.t + " years") + " is worth " + usd(v) + " today at " + rateFmt(sl.val()) + "."); });
+          bars.forEach(function (x) { var v = pv(s.amount, r, x.t); x.fill.style.width = (v / s.amount * 100) + "%"; x.b.textContent = usd(v); list.push(A + " " + (x.t === 0 ? "today" : "in " + x.t + " years") + " is worth " + usd(v) + " today at " + rateFmt(sl.val()) + "."); });
           alt.set(list);
           if (user && Math.abs(r - s.plantRate) < 1e-9) {
             api.done();
-            api.saw("From " + R + " to " + R4 + ", " + A + " in 10 years rises from " + usd(s.pv7[1]) + " to " + usd(s.pv4[1]) + " (×" + (s.pv4[1] / s.pv7[1]).toFixed(2) + "); " + A + " in 30 years from " + usd(s.pv7[3]) + " to " + usd(s.pv4[3]) + " (×" + (s.pv4[3] / s.pv7[3]).toFixed(2) + "). Far-off money feels the rate most.");
+            api.saw("From " + R + " to " + R4 + ", the bars grow ×" + (s.pv4[1] / s.pv7[1]).toFixed(2) + " (10 years), ×" + (s.pv4[2] / s.pv7[2]).toFixed(2) + " (20) and ×" + (s.pv4[3] / s.pv7[3]).toFixed(2) + " (30): " + A + " in 30 years goes from " + usd(s.pv7[3]) + " to " + usd(s.pv4[3]) + ". The further off the money, the more the rate matters.");
           }
         }
         autos[2] = function () { sl.set(s.plantRate * 100, true); };
@@ -299,7 +299,7 @@
     steps.push({
       text: "Add the fixed upkeep, " + usd(s.fom) + " per kW a year: that is the yearly cost lessons 12 and 13 put in their planning model. Then check the factor: set the rate to 0%.",
       build: function (act, api) {
-        var ro = readouts(act, [["crf", "Capital recovery factor"], ["cap", "Repayment, $ per kW a year"], ["tot", "Plus upkeep: yearly cost, $ per kW"], ["mw", "Per MW a year"]]);
+        var ro = readouts(act, [["crf", "Recovery factor (CRF)"], ["cap", "Repayment per kW a year"], ["tot", "Plus upkeep, per kW a year"], ["mw", "Yearly cost per MW"]], "k3-ro");
         var slR = LX.Slider(act, { label: "Rate (real)", color: "var(--lx-tier-2)", min: 0, max: 10, step: 0.5, value: s.plantRate * 100, fmt: rateFmt, onChange: draw });
         var slN = LX.Slider(act, { label: "Years to pay it off", color: "var(--lx-tier-5)", min: 10, max: 40, step: 1, value: s.life, fmt: function (v) { return v + " years"; }, onChange: draw });
         var bat = H("button", { type: "button", class: "lx-btn ghost small", text: "Try " + s.batteryLife + " years, lesson 13's battery life" }, act);
@@ -312,7 +312,7 @@
           LX.store.set("k3-own", { rate: slR.val(), life: n });
           if (r === 0 && !zero) {
             zero = true; api.done();
-            api.saw("At 0%, CRF = 1 ÷ " + n + " = " + f4(1 / n) + ": the cost is simply split evenly. At " + R4 + " over " + s.life + " years it is " + f4(s.crf) + ", or " + usd(s.wind.perMW, 0) + " per MW a year with upkeep, the number lessons 12 and 13 use.");
+            api.saw("At 0%, CRF = 1 ÷ " + n + " = " + f4(1 / n) + ": the cost is simply split evenly. At " + R4 + " over " + s.life + " years it is " + f4(s.crf) + ": with upkeep, " + usd(s.wind.total) + " per kW a year (" + usd(s.wind.perMW, 0) + " per MW), the yearly cost lessons 12 and 13 use.");
           }
         }
         autos[5] = function () { slN.set(s.life); slR.set(0, true); };
@@ -347,10 +347,10 @@
         return null;
       };
     }
-    LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
+    LX.EquationCard(H("div", { class: "lx-xcard k3-eqcard" }, x), {
       title: "The capital recovery factor", lede: "Tap a symbol: its meaning, its unit and your own numbers from step 6.",
       rows: [
-        { parts: [{ k: "crf" }, "=", { frac: [[{ k: "r" }], ["1 − (1 + ", { k: "r" }, ")", { html: "<sup>−</sup>" }, { k: "n" }]] }],
+        { parts: [{ k: "crf" }, "=", { frac: [[{ k: "r" }], ["1 − (1 + ", { k: "r" }, ")", { k: "n", html: "−n" }]] }],
           say: "CRF equals r divided by one minus one plus r to the power minus n.", note: "the same as r(1 + r)ⁿ ÷ ((1 + r)ⁿ − 1); 1 ÷ n when r = 0" },
         { parts: [{ k: "A" }, "=", { k: "crf" }, "×", { k: "C" }, "+", { k: "fom" }], say: "Yearly cost equals CRF times the building cost, plus fixed upkeep.", tag: "yearly cost" }],
       symbols: {
@@ -363,12 +363,12 @@
       fields: [{ key: "you", label: "Your numbers" }, { key: "code", label: "In code", code: true }],
       sel: "crf", hint: "Lesson 7's LCOE divides A by the MWh each kW makes in a year."
     });
-    LX.CompareTable(H("div", { class: "lx-xcard k3-stack" }, x), {
+    LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
       title: "Four moves with money over time", text: true,
       columns: [{ key: "name", label: "Move", main: true }, { key: "rule", label: "Rule" }, { key: "ex", label: "On this page" }, { key: "used", label: "Used in", phoneHide: true }],
       rows: [
-        { key: "grow", color: "var(--lx-tier-2)", name: "Grow", note: "now → later", rule: "× (1 + r)<sup>t</sup>", ex: usd(s.amount, 0) + " at " + pct(s.rate) + ": " + usd(s.grow10) + " in 10 years", used: "returns, loans" },
-        { key: "disc", color: "var(--lx-tier-5)", name: "Discount", note: "later → now", rule: "÷ (1 + r)<sup>t</sup>", ex: usd(s.amount, 0) + " in 10 years: " + usd(s.pv7[1]) + " today", used: "lesson 7, step 3" },
+        { key: "grow", color: "var(--lx-tier-2)", name: "Grow", note: "now → later", rule: "× (1 + r)ᵗ", ex: usd(s.amount, 0) + " at " + pct(s.rate) + ": " + usd(s.grow10) + " in 10 years", used: "returns, loans" },
+        { key: "disc", color: "var(--lx-tier-5)", name: "Discount", note: "later → now", rule: "÷ (1 + r)ᵗ", ex: usd(s.amount, 0) + " in 10 years: " + usd(s.pv7[1]) + " today", used: "lesson 7, step 3" },
         { key: "stream", color: "var(--lx-tier-3)", name: "Add a stream", note: "yearly → now", rule: "× annuity factor", ex: "$1 a year for " + s.life + " years at " + pct(s.plantRate) + ": " + usd(s.af), used: "lesson 7, step 5" },
         { key: "spread", color: "var(--lx-tier-4)", name: "Spread", note: "now → yearly", rule: "× CRF", ex: usd(s.capex, 0) + " per kW: " + usd(s.payment) + " a year", used: "lessons 7, 12 and 13" }]
     });
@@ -407,7 +407,7 @@
         it.choices.forEach(function (c, i) { var b = H("button", { type: "button", class: "lx-choice", text: c }, row); b.addEventListener("click", function () { if (!answered) { b.classList.add(i === it.answer ? "right" : "wrong"); mark(i === it.answer); } }); });
         box.insertBefore(row, fb);
       } else {
-        var n = numInput(box, { label: "Answer", unit: it.unit === "$" ? "$" : "", onCheck: function (v) { if (v == null) { fb.textContent = "Type a number first."; return; } mark(close(v, it.answer, it.tol)); } });
+        var n = numInput(box, { label: "Answer", unit: it.unit === "$" ? "dollars" : "", onCheck: function (v) { if (v == null) { fb.textContent = "Type a number first."; return; } mark(close(v, it.answer, it.tol)); } });
         box.insertBefore(n.input.parentNode, fb);
       }
       if (focus) qp.focus();

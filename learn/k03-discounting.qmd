@@ -54,6 +54,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k3-sum b { font-family: var(--lx-f-mono); color: var(--lx-ink); }
 .k3-note { margin: 0; font-size: 14.5px; font-family: var(--lx-f-mono); color: var(--lx-ink-2); overflow-wrap: anywhere; }
 .k3-stream { display: grid; gap: 6px; }
+.k3-ro { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
+.k3-eqcard .den .lx-eq-sym[data-s="n"] { min-width: 34px; min-height: 34px; padding: 0 6px; font-size: 15px; align-self: flex-start; transform: translateY(-14px); }
 .k3-drill { display: grid; gap: 10px; }
 .k3-drill .lx-btn { justify-self: start; }
 .k3-drill-q { display: grid; gap: 10px; }
@@ -63,11 +65,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
 .page-learn .lx-datanote li { margin: 0; }
 @media (max-width: 560px) { .k3-pvrow { grid-template-columns: 4.6em minmax(0, 1fr) 4.8em; } }
-@media (max-width: 640px) {
-  .k3-stack .lx-ctable tr { grid-template-columns: 22px minmax(0, 1fr); row-gap: 4px; }
-  .k3-stack .lx-ctable td[data-label], .k3-stack .lx-ctable td.ph { display: block; grid-column: 2; text-align: left; font-size: 14px; }
-  .k3-stack .lx-ctable td[data-label]::before { display: inline; margin-right: 6px; font-size: 11.5px; }
-}
 </style>
 ```
 
