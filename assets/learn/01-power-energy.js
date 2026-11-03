@@ -454,7 +454,7 @@
           var cf = LX.Slider(ctl, { label: "Capacity factor", color: "var(--lx-wind)", min: D.wind.cf.min, max: D.wind.cf.max, step: D.wind.cf.step,
             fmt: function (v) { return num(v, 1) + "%"; },
             hint: function () { return "A year's energy as a share of running flat out. U.S. wind in 2025: " + num(W.wind.refCF, 1) + "% (EIA)."; }, onChange: upd });
-          var hw = LX.Slider(ctl, { label: "Average draw of a home", color: "var(--lx-demand)", min: D.wind.home_w.min, max: D.wind.home_w.max, step: D.wind.home_w.step,
+          var hw = LX.Slider(ctl, { label: "Average power a home buys", color: "var(--lx-demand)", min: D.wind.home_w.min, max: D.wind.home_w.max, step: D.wind.home_w.step,
             fmt: function (v) { return num(v, 0) + " W"; },
             hint: function () { return "EIA, 2022: an average U.S. home bought 10,791 kWh a year, an average of " + num(W.wind.refW, 0) + " W."; }, onChange: upd });
           var ref = H("button", { class: "lx-btn ghost small", type: "button", text: "Use EIA's averages" }, ctl);

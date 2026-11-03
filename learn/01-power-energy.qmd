@@ -57,7 +57,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Appliance powers are typical values, rounded and illustrative. Prairie Town's day is lesson 0's: the real Southwest Power Pool shape of 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to the town, with lesson 0's hourly MW, which add up to 6,957 MWh. Every other number has a source and a date below.</span></p>
-<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k01-units.html">K1</a> (units and prefixes, kW against kWh) and <a href="k02-rates-efficiencies.html">K2</a> (rates, such as a home's average draw).</p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k01-units.html">K1</a> (units and prefixes, kW against kWh) and <a href="k02-rates-efficiencies.html">K2</a> (rates, such as the average power a home buys).</p>
 ```
 :::
 
@@ -189,7 +189,7 @@ Storage needs both kinds of number: MW (how fast it charges) and MWh (how much i
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">19 Wh</td><td>Electricity to charge a smartphone once (0.019 kWh).</td><td class="s"><a href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references">EPA, Greenhouse Gas Equivalencies Calculator</a> · updated 4 Aug 2026</td></tr>
-<tr><td class="n">10,791 kWh</td><td>Electricity bought by an average U.S. home in a year: about 29.6 kWh a day, or an average draw of about 1,232 W.</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA, Frequently Asked Questions</a> · data for 2022</td></tr>
+<tr><td class="n">10,791 kWh</td><td>Electricity bought by an average U.S. home in a year: about 29.6 kWh a day, an average of about 1,232 W bought from the grid.</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA, Frequently Asked Questions</a> · data for 2022</td></tr>
 <tr><td class="n">4,200 TWh</td><td>U.S. electricity use in 2025 (4.20 trillion kWh), the highest on record.</td><td class="s"><a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained</a> · data for 2025</td></tr>
 <tr><td class="n">759 GW</td><td>Record peak demand of the Lower 48 states, 29 July 2025.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · as of August 2025</td></tr>
 <tr><td class="n">33.8%</td><td>Capacity factor of U.S. utility-scale wind in 2025: its energy as a share of running flat out all year.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · released 23 Oct 2026</td></tr>

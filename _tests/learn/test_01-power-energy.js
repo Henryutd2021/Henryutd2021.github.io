@@ -131,7 +131,8 @@ ok(int(W.wh.us / 1e9) === "4,200,000", "fermi: unit chain 4,200 TWh = 4,200,000 
 // ---------------- the wind-farm claim
 ok(W.wind.claim === 100000 && D.wind.cf.start === 100 && D.wind.home_w.start === 1000, "wind: slider start reproduces the claim, 100 MW / 1 kW = 100,000 homes");
 ok(Math.round(W.wind.homeW) === 1232 && int(Math.round(W.wind.real / 100) * 100) === "27,400", `wind: EIA averages give ${W.wind.real.toFixed(0)} homes (page: about 27,400)`);
-ok(has("An average home bought 10,791 kWh a year (about 1,232 W on average), so the farm's yearly energy matches what about 27,400 homes buy") && has("an average draw of about 1,232 W"), "page: wind myth numbers, as purchases");
+ok(has("An average home bought 10,791 kWh a year (about 1,232 W on average), so the farm's yearly energy matches what about 27,400 homes buy") && has("an average of about 1,232 W bought from the grid"), "page: wind myth numbers, as purchases");
+ok(!/average draw/i.test(QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "")) && !/Average draw/.test(JS), "page and script: EIA counts electricity bought, so no \"average draw\" (shared fix 10, after K2 #4)");
 ok(near(M.homes(100, 0.338, 10791 * 1000 / 8760), 100 * 8760 * 0.338 / 10.791, 1e-6), "wind: homes = MW x 8,760 h x CF / MWh per home");
 // step 8 (review point 3): EIA's averages are reachable on the sliders, and the on-screen result there is the stated one
 const onGrid = (v, o) => near((v - o.min) / o.step, Math.round((v - o.min) / o.step), 1e-6) && v >= o.min && v <= o.max;
