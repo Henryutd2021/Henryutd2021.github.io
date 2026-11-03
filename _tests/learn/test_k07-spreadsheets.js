@@ -1,7 +1,9 @@
 // test_k07-spreadsheets.js — Node tests for toolbox K7 (assets/learn/k07-spreadsheets.js): the day agrees with lesson 0;
 // the formula engine (arithmetic, precedence, ranges, functions, errors, cycles), fill-down with relative, absolute and
 // mixed addresses, the sheet the steps build, the practice answers, and every number the page states.
-// Usage (from the site folder):  node _tests/learn/test_k07-spreadsheets.js
+// Also: grading rejects typed constants (a formula must follow the inputs); the page's no-JS table and practice equal
+// staticSheet(); units on the total rows; no sentence pairs the nuclear input with a cost.
+// Usage (from the site folder):  node _tests/learn/test_k07-spreadsheets.js [--write]   (--write rewrites the no-JS blocks)
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -10,7 +12,20 @@ const K = require(path.join(SITE, "assets/learn/k07-spreadsheets.js"));
 const G0 = require(path.join(SITE, "assets/learn/grid-operator.js"));
 const town = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_year.json"), "utf8"));
-const QMD = fs.readFileSync(path.join(SITE, "learn/k07-spreadsheets.qmd"), "utf8");
+const QPATH = path.join(SITE, "learn/k07-spreadsheets.qmd");
+const BLOCKS = { "k7-table": "table", "k7-practice": "practice" };
+function blockRe(name) { return [new RegExp("<!-- " + name + ":start[^>]*-->\\n"), "<!-- " + name + ":end -->"]; }
+if (process.argv.includes("--write")) {
+  const S0 = K.staticSheet(K.townDay(JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8")), JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_year.json"), "utf8"))));
+  let q = fs.readFileSync(QPATH, "utf8");
+  Object.keys(BLOCKS).forEach(name => {
+    const [ra, end] = blockRe(name), a = q.match(ra), b = q.indexOf(end);
+    if (!a || b < a.index) throw new Error(name + " markers missing");
+    q = q.slice(0, a.index + a[0].length) + S0[BLOCKS[name]] + "\n" + q.slice(b);
+  });
+  fs.writeFileSync(QPATH, q); console.log("no-JS blocks written");
+}
+const QMD = fs.readFileSync(QPATH, "utf8");
 const JS = fs.readFileSync(path.join(SITE, "assets/learn/k07-spreadsheets.js"), "utf8");
 
 let checks = 0, fails = 0;
@@ -77,11 +92,40 @@ const D = K.townDay(town, year), sum = a => a.reduce((x, y) => x + y, 0), fmt = 
   T.forEach(t => ok(near(K.value(F, t.cell), t.answer, 1e-9), `practice ${t.cell}: the hint formula ${t.hint} gives ${t.answer}`));
   ok(T[0].answer === sum(D.demand) && T[3].answer === Math.max(...D.solar) && T[4].answer === 55 * 1965, "practice: answers from the day");
   ok(near(T[2].answer, (D.need[17] + D.need[18] + D.need[19] + D.need[20] + D.need[21]) / 5) && K.value(F, "A22") === "17:00" && K.value(F, "A26") === "21:00", "practice: E22:E26 is 17:00 to 21:00");
+  ok(/five hourly rows labelled 17:00 to 21:00/.test(T[2].ask), "practice: the evening average names its five hourly rows");
+  ok(K.graded(F, D).every(Boolean), "practice: the hint formulas pass, values and dependencies");
+  // typed constants, even after =, do not pass; alternative formulas that point at the cells do
+  const G = K.filled(D); G.rows = 37;
+  T.forEach(t => { G.cells[t.cell] = "=" + t.answer; }); K.changed(G);
+  ok(K.graded(G, D).every(g => !g), "practice: =<the number> fails every task (it does not follow the inputs)");
+  G.cells.E33 = "=SUM(B5:B28)"; G.cells.E34 = "=(SUM(C5:C28)+SUM(D5:D28))/E33*100"; G.cells.E35 = "=(E22+E23+E24+E25+E26)/5"; G.cells.E36 = "=MAX(D5:D28)+0*B5"; G.cells.E37 = "=F30/E2*55"; K.changed(G);
+  ok(K.graded(G, D).every(Boolean), "practice: equivalent formulas pass");
+  G.cells.E36 = "=161+0*D5"; G.cells.E33 = "=SUM(B5:B27)+B28*1"; K.changed(G);
+  const g2 = K.graded(G, D); ok(!g2[3] && g2[0], "practice: a constant hidden in a formula fails; a split range passes");
+}
+// ---------------- step 6: F30 must follow the inputs too; step 7: the nudge keeps the E column honest
+{
+  const F = K.filled(D), want = N => N.need.reduce((a, b) => a + b, 0) * N.price;
+  ok(K.follows(F, "F30", want, D), "step 6: =SUM(F5:F28) follows the inputs");
+  F.cells.F30 = "=E30*E2"; K.changed(F); ok(K.follows(F, "F30", want, D), "step 6: =E30*E2 also follows");
+  F.cells.F30 = "=78600"; K.changed(F); ok(!K.follows(F, "F30", want, D) && K.value(F, "F30") === 78600, "step 6: =78600 has the right value but does not follow");
+  const N = K.nudge(D); ok(N.need.every((v, t) => v === D.need[t] + 7 + (t % 3) - 2 - 3) && N.price !== 40, "nudge: demand, wind, solar and the gas cost all move");
 }
 
 // ---------------- the page
 {
-  has("1,965 <small>=SUM(E5:E28)</small>"); has("78,600 <small>=SUM(F5:F28)</small>"); has("120 <small>=B5-C5-D5-$E$1</small>"); has("4,800 <small>=E5*$E$2</small>");
+  has("1,965 MWh <small>=SUM(E5:E28)</small>"); has("$78,600 <small>=SUM(F5:F28)</small>"); has("145 MW <small>=MAX(E5:E28)</small>"); has("120 <small>=B5-C5-D5-$E$1</small>"); has("4,800 <small>=E5*$E$2</small>");
+  const S0 = K.staticSheet(D);
+  Object.keys(BLOCKS).forEach(name => { const [ra, end] = blockRe(name), a = QMD.match(ra), b = QMD.indexOf(end);
+    ok(a && b > a.index && QMD.slice(a.index + a[0].length, b) === S0[BLOCKS[name]] + "\n", "page: the no-JS " + name + " block equals staticSheet() (run with --write)"); });
+  ok((S0.table.match(/<tr><td>\d+<\/td><td>\d\d:00<\/td>/g) || []).length === 24, "page: all 24 hours in the no-JS table");
+  ["6,957 MWh", "37.3%", "112 MW", "161 MW", "$108,075"].forEach(s => ok(S0.practice.indexOf(s) >= 0, "page: practice answer " + s));
+  const L0 = K.layout(D);
+  ok(/MWh/.test(L0.cells.A30) && /\$/.test(L0.cells.A30) && /MW/.test(L0.cells.A31) && L0.cells.A2 === "Gas cost, $/MWh", "sheet: the total and peak rows carry their units; E2 is a cost");
+  ok(JS.indexOf('|| n === "E1"') > 0 && JS.indexOf("A cost below zero") > 0, "sheet: E1 is locked in the steps, and a negative gas cost is refused in step 7");
+  ok(JS.indexOf("a sheet you can trust.\")") < 0 && /consistent/.test(JS) && /not that its inputs are right/.test(QMD), "check cell: agreement is consistency, not correctness");
+  // no sentence (or code line) pairs the nuclear input with a cost or price
+  QMD.replace(/<[^>]+>/g, " ").split(/(?<=[.!?])\s+|\n/).concat(JS.split(/\n/)).forEach(s => { if (/nuclear/i.test(s) && /(cost|price|(^|[^A-Z])\$\d)/i.test(s) && !/^\s*(\/\/|var cells|A1:)/.test(s) && !/Nuclear output, MW", E1/.test(s)) ok(false, "scope: nuclear and cost in one sentence: " + s.trim().slice(0, 90)); });
   has("<td>24</td><td>19:00</td><td>331</td><td>72</td><td>14</td><td>145</td><td>5,800</td>");
   has("<td>6</td><td>01:00</td><td>243</td><td>28</td><td>0</td><td>115</td><td>4,600</td>");
   has("3 September 2025"); has("$40/MWh");

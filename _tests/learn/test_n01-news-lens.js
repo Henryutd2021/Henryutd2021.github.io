@@ -1,13 +1,23 @@
 // test_n01-news-lens.js — Node tests for lesson N1 (assets/learn/n01-news-lens.js), its data file
 // (assets/learn/data/n01-news-lens.json) and every number the page states.
 // Usage (from the site folder):  node _tests/learn/test_n01-news-lens.js
+//        node _tests/learn/test_n01-news-lens.js --write   first rewrites the page's no-JS checks block (between the
+//        fallback-checks markers) from staticChecks(); the stories' fallback comes from scripts/learn_n01_fallback.js
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const SITE = path.resolve(__dirname, "..", "..");
 const M = require(path.join(SITE, "assets/learn/n01-news-lens.js"));
 const D = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/n01-news-lens.json"), "utf8"));
-const QMD = fs.readFileSync(path.join(SITE, "learn/n01-news-lens.qmd"), "utf8");
+const QPATH = path.join(SITE, "learn/n01-news-lens.qmd");
+const MK = [/<!-- fallback-checks:start[^>]*-->\n/, "<!-- fallback-checks:end -->"];
+if (process.argv.includes("--write")) {
+  const q = fs.readFileSync(QPATH, "utf8"), a = q.match(MK[0]), b = q.indexOf(MK[1]);
+  if (!a || b < a.index) throw new Error("fallback-checks markers missing");
+  fs.writeFileSync(QPATH, q.slice(0, a.index + a[0].length) + M.staticChecks(D) + "\n" + q.slice(b));
+  console.log("fallback-checks block written");
+}
+const QMD = fs.readFileSync(QPATH, "utf8");
 const JS = fs.readFileSync(path.join(SITE, "assets/learn/n01-news-lens.js"), "utf8");
 
 let checks = 0, fails = 0;
@@ -38,6 +48,10 @@ D.stories.forEach((s, k) => {
   ok(ids.indexOf(s.missing.answer) >= 0 && words(s.missing.note) <= 50, `story ${s.id}: the unanswered question is a lens id; note under 50 words`);
   ok(has(esc(s.headline)) && has(esc(s.take)), `story ${s.id}: headline and model take are in the fallback`);
   ok(sentences(s.take) === 3, `story ${s.id}: the model take has three sentences`);
+  const tp = M.takeParts(s.take);
+  ok(tp.length === 3 && tp.every(x => x.v && words(x.v) <= 20) && !/^Confidence/.test(tp[2].v), `story ${s.id}: the take shows as three labelled lines of at most 20 words`);
+  const text = s.parts.map(p => typeof p === "string" ? p : p.text).join("");
+  text.split("\n").forEach((l, i) => ok(words(l) <= 20, `story ${s.id}: line ${i + 1} is at most 20 words (${words(l)})`));
   s.sources.forEach(src => {
     const host = new URL(src.url).hostname;
     ok(ALLOWED.some(h => host === h || host.endsWith("." + h)) && src.as_of, `story ${s.id}: source ${host} is a primary agency source with a date`);
@@ -79,6 +93,9 @@ const B = D.stories[1], eB = B.envelope;
 ok(M.storedGWh(15, 4) === 60 && Math.abs(M.minutesOfUse(60, eB.us_twh, eB.hours) - 7.5) < 0.05, "envelope B: 15 GW x 4 h = 60 GWh = 7.5 minutes of average U.S. use");
 ok(Math.round(M.averageGW(eB.us_twh, eB.hours) / 10) * 10 === 480, "story B: 4.20 trillion kWh is about 480 GW on average");
 ok(Math.round(eB.gw / eB.planned_gw * 100) === 82 && B.parts.some(p => p.note && p.note.indexOf("82%") >= 0), "story B: 15 / 18.2 = 82% of the plan");
+ok(Math.round(eB.gw / M.averageGW(eB.us_twh, eB.hours) * 100) === 3, "envelope B: 15 GW is about 3% of the 2025 average U.S. demand");
+ok(JS.indexOf("run the whole") < 0 && JS.indexOf("only about **") > 0 && JS.indexOf("cover hours, not seasons") > 0, "envelope B: energy equivalence is not read as deliverable power");
+ok(!/planned battery capacity arrived/.test(JSON.stringify(D) + JS) && /actual additions were about 82%/i.test(JSON.stringify(D)), "story B: 82% compares totals (actual additions against the amount first planned), not projects");
 ok(eB.options[eB.answer].indexOf("depends") >= 0, "envelope B: the right answer is that it depends on the duration");
 
 // ---------------- the evidence clock C
@@ -86,6 +103,9 @@ const C = D.stories[2], eC = C.envelope;
 ok(M.days(eC.event, eC.factual) === 158 && M.days(eC.event, eC.final) === 326, "story C: 158 and 326 days to the two reports");
 ok(eC.ticks[eC.answer] === Math.round(326 / 30.44) + " months", "story C: the answer tick is 11 months");
 ok(C.parts.some(p => p.note && p.note.indexOf("158 days") >= 0 && p.note.indexOf("326") >= 0), "story C: note states 158 and 326 days");
+ok(!/within a day|one-cause claim/i.test(JSON.stringify(D) + JS), "story C: the early claims are described, not dated or plotted");
+ok(C.parts[0].indexOf("12:33 CEST (11:33 in Portugal)") >= 0 && C.parts[1].text.indexOf("the continental power systems") === 0, "story C: time zone and the continental systems stated");
+ok(C.missing.q && /claim of a cause/.test(C.missing.q) && JS.indexOf("missingQ: story.missing.q") > 0, "story C: the unanswered-question prompt targets the causal claim");
 
 // ---------------- spotter
 ok(D.spotter.length === 6 && D.spotter.filter(s => s.answer === "error").length === 4, "spotter: six sentences, four errors (as the step says)");
@@ -100,6 +120,21 @@ D.spotter.forEach(s => ok(words(s.fix) <= 40, `spotter ${s.id}: fix under 40 wor
 D.ladder.items.forEach(it => ok(it.answer.every(a => a === "projection" || D.ladder.rungs.some(r => r.id === a)), `ladder ${it.id}: answers are rungs`));
 ok(M.ladderOK(D.ladder.items[0], "operating") && !M.ladderOK(D.ladder.items[0], "announced") && M.ladderOK(D.ladder.items[2], "projection"), "ladder: placements");
 ok(D.ladder.rungs.map(r => r.label).join(",") === "Announced,Funded,Permitted,Under construction,Operating,At design output", "ladder: the six rungs of curriculum §16");
+
+// ---------------- the Steelman box's sensitivity scenarios, the explain fallback and the citation
+const SN = D.sensitivity;
+SN.lower.concat(SN.higher).forEach(x => ok(has(`${x.what} (${x.twh} TWh`), `steelman: "${x.what}" at ${x.twh} TWh as in the data`));
+ok(SN.lower.every(x => x.twh < SN.reference_twh) && SN.higher.every(x => x.twh > SN.reference_twh) && has(`${SN.bounds[0]}–${SN.bounds[1]} TWh`) && has(SN.url), "steelman: lower below and higher above the 649 TWh Reference Case; bounds stated");
+ok(has("Multiply a year's TWh by 1,000 to get GWh, then divide by 8,760 hours"), "explain: TWh to average GW keeps the factor of 1,000");
+ok(has("Smith, S. J. et al. (2026)") && !has("Shehabi, A. et al."), "sources: the 2025 Update's first author");
+// ---------------- the no-JS checks, spotter and ladder: the page holds staticChecks() exactly
+{
+  const a = QMD.match(MK[0]), b = QMD.indexOf(MK[1]);
+  ok(a && b > a.index && QMD.slice(a.index + a[0].length, b) === M.staticChecks(D) + "\n", "fallback: the checks, spotter answers and ladder placements match the data (run with --write after a data edit)");
+  const st = M.staticChecks(D);
+  ok(st.indexOf("74.1 GW") > 0 && st.indexOf("148 GW") > 0 && st.indexOf("7.5 minutes") > 0 && st.indexOf("about 3%") > 0 && st.indexOf("82%") > 0 && st.indexOf("326 days") > 0, "fallback: the worked checks state 74.1 GW, 148 GW, 7.5 minutes, 3%, 82% and 326 days");
+  ok(D.spotter.every(s => st.indexOf(esc(s.fix)) > 0) && D.ladder.items.every(it => st.indexOf(esc(it.note)) > 0), "fallback: every spotter answer and ladder note");
+}
 
 // ---------------- the page's numbers table and quiz
 D.numbers.forEach(n => ok(has(`<td class="n">${n.n}</td><td>${esc(n.what)}</td>`) && (!n.url || has(n.url)), `numbers: "${n.n}" row matches the data file`));

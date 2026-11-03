@@ -50,6 +50,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k7-static th, .k7-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: right; }
 .k7-static th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-2); text-align: left; }
 .k7-staticwrap { overflow-x: auto; }
+.k7-static th[scope="row"] { text-align: left; }
+.k7-assume caption { caption-side: top; text-align: left; font-family: var(--lx-f-display); font-weight: 500; font-size: 13.5px; color: var(--lx-ink-3); padding-bottom: 4px; }
+.k7-assume td { font-size: 14.5px; vertical-align: top; }
 @media (max-width: 640px) {
   .w1h-stack .lx-ctable tr { grid-template-columns: 22px minmax(0, 1fr); row-gap: 4px; }
   .w1h-stack .lx-ctable td[data-label], .w1h-stack .lx-ctable td.ph { display: block; grid-column: 2; text-align: left; font-size: 14px; }
@@ -62,23 +65,59 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive lx-cards" data-learn="k07" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">Prairie Town's day in a sheet, first hours and the totals</p>
+<p class="lx-eyebrow">Prairie Town's day in a sheet, with the totals</p>
+<p class="lx-hint">One row per hour of 3 September 2025, so a row's MW for that hour is also its MWh.</p>
 <div class="k7-staticwrap">
-<table class="k7-static">
+<!-- k7-table:start (written by _tests/learn/test_k07-spreadsheets.js in its write mode; do not edit) -->
+<table class="k7-static" aria-label="Prairie Town's day, 3 September 2025, one row per hour">
 <thead><tr><th scope="col">Row</th><th scope="col">Hour</th><th scope="col">Demand, MW</th><th scope="col">Wind, MW</th><th scope="col">Solar, MW</th><th scope="col">Gas needed, MW</th><th scope="col">Gas cost, $</th></tr></thead>
 <tbody>
 <tr><td>5</td><td>00:00</td><td>250</td><td>30</td><td>0</td><td>120 <small>=B5-C5-D5-$E$1</small></td><td>4,800 <small>=E5*$E$2</small></td></tr>
 <tr><td>6</td><td>01:00</td><td>243</td><td>28</td><td>0</td><td>115</td><td>4,600</td></tr>
+<tr><td>7</td><td>02:00</td><td>238</td><td>28</td><td>0</td><td>110</td><td>4,400</td></tr>
+<tr><td>8</td><td>03:00</td><td>235</td><td>30</td><td>0</td><td>105</td><td>4,200</td></tr>
+<tr><td>9</td><td>04:00</td><td>236</td><td>36</td><td>0</td><td>100</td><td>4,000</td></tr>
+<tr><td>10</td><td>05:00</td><td>237</td><td>42</td><td>0</td><td>95</td><td>3,800</td></tr>
+<tr><td>11</td><td>06:00</td><td>253</td><td>43</td><td>0</td><td>110</td><td>4,400</td></tr>
+<tr><td>12</td><td>07:00</td><td>260</td><td>48</td><td>7</td><td>105</td><td>4,200</td></tr>
+<tr><td>13</td><td>08:00</td><td>266</td><td>46</td><td>70</td><td>50</td><td>2,000</td></tr>
+<tr><td>14</td><td>09:00</td><td>278</td><td>35</td><td>118</td><td>25</td><td>1,000</td></tr>
+<tr><td>15</td><td>10:00</td><td>286</td><td>36</td><td>130</td><td>20</td><td>800</td></tr>
+<tr><td>16</td><td>11:00</td><td>300</td><td>38</td><td>147</td><td>15</td><td>600</td></tr>
+<tr><td>17</td><td>12:00</td><td>311</td><td>35</td><td>156</td><td>20</td><td>800</td></tr>
+<tr><td>18</td><td>13:00</td><td>327</td><td>33</td><td>149</td><td>45</td><td>1,800</td></tr>
+<tr><td>19</td><td>14:00</td><td>340</td><td>33</td><td>112</td><td>95</td><td>3,800</td></tr>
+<tr><td>20</td><td>15:00</td><td>344</td><td>37</td><td>147</td><td>60</td><td>2,400</td></tr>
+<tr><td>21</td><td>16:00</td><td>353</td><td>47</td><td>161</td><td>45</td><td>1,800</td></tr>
+<tr><td>22</td><td>17:00</td><td>349</td><td>54</td><td>130</td><td>65</td><td>2,600</td></tr>
+<tr><td>23</td><td>18:00</td><td>344</td><td>59</td><td>70</td><td>115</td><td>4,600</td></tr>
 <tr><td>24</td><td>19:00</td><td>331</td><td>72</td><td>14</td><td>145</td><td>5,800</td></tr>
-<tr><td>30</td><td>Day total</td><td></td><td></td><td></td><td>1,965 <small>=SUM(E5:E28)</small></td><td>78,600 <small>=SUM(F5:F28)</small></td></tr>
-</tbody>
-</table>
+<tr><td>25</td><td>20:00</td><td>319</td><td>89</td><td>0</td><td>130</td><td>5,200</td></tr>
+<tr><td>26</td><td>21:00</td><td>303</td><td>98</td><td>0</td><td>105</td><td>4,200</td></tr>
+<tr><td>27</td><td>22:00</td><td>285</td><td>95</td><td>0</td><td>90</td><td>3,600</td></tr>
+<tr><td>28</td><td>23:00</td><td>269</td><td>89</td><td>0</td><td>80</td><td>3,200</td></tr>
+<tr><td>30</td><th scope="row" colspan="4">Day total: gas energy (MWh) and cost ($)</th><td>1,965 MWh <small>=SUM(E5:E28)</small></td><td>$78,600 <small>=SUM(F5:F28)</small></td></tr>
+<tr><td>31</td><th scope="row" colspan="4">Peak hour: gas output (MW)</th><td>145 MW <small>=MAX(E5:E28)</small></td><td></td></tr>
+</tbody></table>
+<!-- k7-table:end -->
 </div>
-<p>Inputs: nuclear output 100 MW in E1, gas price $40/MWh in E2.</p>
+<p>E1 holds the nuclear plant's steady output: 100 MW. E2 holds the gas cost: $40/MWh.</p>
 <p class="lx-hint">With JavaScript on, you build these formulas yourself in a working sheet.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to Prairie Town as in <a href="00-grid-operator.html">lesson 0</a>. The $40/MWh gas price is the combined-cycle plant's illustrative running cost; the sheet ignores its ramp limit.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to Prairie Town as in <a href="00-grid-operator.html">lesson 0</a>.</span></p>
+<div class="lx-scroll-x">
+<table class="lx-facts k7-assume">
+<caption>Units and assumptions (illustrative)</caption>
+<thead><tr><th scope="col">Item</th><th scope="col">Value</th><th scope="col">What it means</th></tr></thead>
+<tbody>
+<tr><td class="n">Units</td><td class="n">MW, MWh</td><td><span class="lx-term" data-term="megawatt">MW</span> is power, the average over each hour; <span class="lx-term" data-term="megawatt-hour">MWh</span> is energy, MW held for one hour.</td></tr>
+<tr><td class="n">E1</td><td class="n">100 MW</td><td>The nuclear plant's steady output, as in lesson 0. Fixed in this sheet.</td></tr>
+<tr><td class="n">E2</td><td class="n">$40/MWh</td><td>Running cost of the gas <span class="lx-term" data-term="combined-cycle">combined-cycle plant</span>. You change it in step 7.</td></tr>
+<tr><td class="n">Left out</td><td class="n">–</td><td>How fast the gas plant can change its output (its <span class="lx-term" data-term="ramp-rate">ramp rate</span>).</td></tr>
+</tbody>
+</table>
+</div>
 ```
 :::
 
@@ -95,7 +134,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Relative address</dt><dd>B5 becomes B6 when filled down one row: right for data that changes row by row.</dd>
 <dt>Absolute address</dt><dd>$E$1 never moves: right for one input, such as a price.</dd>
 <dt>Range and function</dt><dd>SUM(F5:F28) adds every cell from F5 to F28; MAX, MIN and AVERAGE work the same way.</dd>
-<dt>Check cell</dt><dd>A total computed two ways, which must agree: F30 against E30 × E2.</dd>
+<dt>Check cell</dt><dd>A total computed two ways, which must agree: F30 against E30 × E2. Agreement shows the sheet is consistent, not that its inputs are right.</dd>
 </dl>
 </div>
 </div>
@@ -111,9 +150,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 A spreadsheet column with one formula filled down is what a data table calls a vectorised operation: one line acts on every row at once. With the day in a pandas table `df` and the inputs as plain variables:
 
 ```python
-nuclear, price = 100, 40                                   # the inputs: E1 and E2
+nuclear = 100                                              # E1: MW, runs flat
+gas_cost = 40                                              # E2: $/MWh
 df["gas_mw"] = df["demand"] - df["wind"] - df["solar"] - nuclear
-df["gas_cost"] = df["gas_mw"] * 1 * price                  # MW × 1 h × $/MWh
+df["gas_cost"] = df["gas_mw"] * 1 * gas_cost               # MW × 1 h × $/MWh
 df["gas_cost"].sum(), df["gas_mw"].max()                   # F30 and E31
 ```
 
@@ -168,7 +208,18 @@ No addresses and no fill-down, so no sliding E1. Bridge B2 does this with a whol
 <details class="lx-answer"><summary>Answer</summary><p>MWh: each row's MW lasts one hour, so each adds MW × 1 h. With 15-minute rows you would multiply the sum by 0.25 h.</p></details>
 </div>
 </div>
-<div id="k7-practice"></div>
+<div id="k7-practice">
+<!-- k7-practice:start (written by _tests/learn/test_k07-spreadsheets.js in its write mode; do not edit) -->
+<div class="lx-card k7-practice"><div class="lx-x-head"><h3>Practice sheet</h3></div>
+<p class="lx-hint">Use the table of the day above. With JavaScript on, you type each answer as a formula in a working sheet (about 30 minutes).</p><ol class="k7-tasks">
+<li>Total demand energy over the day, in MWh (each row is one hour). <details class="k7-hint"><summary>Answer</summary><code>=SUM(B5:B28)</code> = 6,957 MWh</details></li>
+<li>Share of the day's demand met by wind and solar, in %. <details class="k7-hint"><summary>Answer</summary><code>=SUM(C5:D28)/SUM(B5:B28)*100</code> = 37.3%</details></li>
+<li>Average gas need over the five hourly rows labelled 17:00 to 21:00, in MW. <details class="k7-hint"><summary>Answer</summary><code>=AVERAGE(E22:E26)</code> = 112 MW</details></li>
+<li>The day's highest solar output, in MW. <details class="k7-hint"><summary>Answer</summary><code>=MAX(D5:D28)</code> = 161 MW</details></li>
+<li>The day's gas cost if gas cost $55 per MWh, without changing E2. <details class="k7-hint"><summary>Answer</summary><code>=E30*55</code> = $108,075</details></li>
+</ol></div>
+<!-- k7-practice:end -->
+</div>
 ```
 :::
 

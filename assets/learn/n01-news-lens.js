@@ -17,6 +17,9 @@
 //
 // The pure model is exported for Node (_tests/learn/test_n01-news-lens.js checks every number the page states); its
 // phrase scoring and ladder check are the shared components' own (window.LX in the page, the component files in Node).
+// No-JS fallback: the stories and notes are written into the page by scripts/learn_n01_fallback.js; the worked checks,
+// the spotter's answers and the ladder placements by staticChecks() below, through
+// `node _tests/learn/test_n01-news-lens.js --write` (the test checks that the page and this function agree).
 (function () {
   "use strict";
 
@@ -39,6 +42,40 @@
   function minutesOfUse(gwh, nationalTWh, hours) { return gwh / averageGW(nationalTWh, hours) * 60; }
   function days(a, b) { return Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 86400000); }
   function ladderOK(item, choice) { return shared("EvidenceLadder", "evidence.js").check(item, choice); }
+  // a three-sentence take as its three labelled parts (claim; what would change my mind; confidence). Sentences end at
+  // ". " before a capital letter, so "U.S. data" is not a break.
+  function takeParts(take) {
+    var s = take.split(/(?<=[.!?])\s+(?=[A-Z])/);
+    return [{ k: "Claim", v: s[0] }, { k: "What would change my mind", v: s[1] || "" }, { k: "Confidence", v: (s[2] || "").replace(/^Confidence:\s*(\w)/, function (m, c) { return c.toUpperCase(); }) }];
+  }
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var f0 = function (v) { return Math.round(v).toLocaleString("en-US"); };
+  var f1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
+  // the no-JS version of the three checks, the spotter and the ladder, as HTML (written into the page by the test's --write)
+  function staticChecks(D) {
+    var A = D.stories[0].envelope, B = D.stories[1].envelope, C = D.stories[2].envelope, h = [];
+    var gwh = storedGWh(B.gw, B.duration), us = averageGW(B.us_twh, B.hours);
+    h.push('<details class="lx-textalt"><summary>The three checks with units, worked</summary><ul>');
+    h.push("<li><strong>Story 1</strong>: " + f0(A.twh) + " TWh × 1,000 = " + f0(A.twh * 1000) + " GWh a year; ÷ " + f0(A.hours) + " h ≈ " + f1(averageGW(A.twh, A.hours)) +
+      " GW of average power. At " + A.util + "% average use of the connections (the report's assumption), that needs about " + f0(connectionGW(A.twh, A.util, A.hours)) + " GW of connections.</li>");
+    h.push("<li><strong>Story 2</strong>: " + B.gw + " GW × " + B.duration + " h (an illustrative duration) = " + f0(gwh) + " GWh. That energy equals about " + f1(minutesOfUse(gwh, B.us_twh, B.hours)) +
+      " minutes of U.S. use at the 2025 average of about " + f0(Math.round(us / 10) * 10) + " GW, but " + B.gw + " GW is only about " + Math.round(B.gw / us * 100) + "% of that average power. Actual additions were about " +
+      Math.round(B.gw / B.planned_gw * 100) + "% of the " + B.planned_gw + " GW first planned.</li>");
+    h.push("<li><strong>Story 3</strong>: the expert panel's factual report came " + days(C.event, C.factual) + " days after the blackout, and its final report " + days(C.event, C.final) +
+      " days after: about " + C.ticks[C.answer] + ".</li></ul></details>");
+    h.push('<details class="lx-textalt"><summary>Units or scale? Six sentences, with answers</summary><ul>');
+    D.spotter.forEach(function (s) {
+      h.push("<li>“" + esc(s.text) + "” <strong>" + (s.answer === "error" ? "A " + esc(s.kind) + " error." : "Reads right.") + "</strong> " + esc(s.fix) + "</li>");
+    });
+    h.push("</ul></details>");
+    h.push('<details class="lx-textalt"><summary>The evidence ladder, with the stories\' claims placed</summary><ol>');
+    D.ladder.rungs.forEach(function (r) { h.push("<li><strong>" + esc(r.label) + "</strong>: " + esc(r.text) + "</li>"); });
+    h.push("</ol><ul>");
+    // each claim's note states where it sits on the ladder
+    D.ladder.items.forEach(function (it) { h.push("<li><strong>“" + esc(it.text) + "”</strong>: " + esc(it.note) + "</li>"); });
+    h.push("</ul></details>");
+    return h.join("\n");
+  }
   // which phrases each lens question caught across the stories (for the explain checklist)
   function caught(data) {
     var by = {};
@@ -47,14 +84,13 @@
     return by;
   }
   var model = { HOURS_PER_YEAR: HOURS_PER_YEAR, phrases: phrases, judge: judge, score: score, averageGW: averageGW, connectionGW: connectionGW,
-                storedGWh: storedGWh, minutesOfUse: minutesOfUse, days: days, ladderOK: ladderOK, caught: caught };
+                storedGWh: storedGWh, minutesOfUse: minutesOfUse, days: days, ladderOK: ladderOK, caught: caught, takeParts: takeParts,
+                staticChecks: staticChecks };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view
-  var LX = window.LX, H = LX.H;
-  var fmt1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
-  var fmt0 = function (v) { return Math.round(v).toLocaleString("en-US"); };
+  var LX = window.LX, H = LX.H, fmt1 = f1, fmt0 = f0;
 
   function injectCSS() {
     if (document.getElementById("n1-css")) return;
@@ -77,7 +113,10 @@
       ".n1-take{display:grid;gap:10px}",
       ".n1-take label{display:grid;gap:4px;font-family:var(--lx-f-display);font-weight:500;font-size:14.5px;color:var(--lx-ink)}",
       ".n1-take textarea{font:inherit;font-size:15px;min-height:52px;padding:8px 10px;border-radius:10px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);resize:vertical;width:100%}",
-      ".n1-model{padding:10px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:15px;color:var(--lx-ink)}",
+      ".n1-model{display:grid;gap:4px;margin:0;padding:10px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:15px;color:var(--lx-ink)}",
+      ".n1-model dt{font-family:var(--lx-f-display);font-weight:500;font-size:13px;color:var(--lx-ink-3)}.n1-model dd{margin:0 0 4px}",
+      // the stories carry one sentence per line ("\n" in the data), so each reads as a short line
+      "[data-learn=news-lens] .lx-tagger-body{white-space:pre-line}",
       "@media (max-width:560px){.n1-lens{grid-template-columns:repeat(2,minmax(0,1fr))}.n1-q{min-height:0}}"
     ].join("\n");
     H("style", { id: "n1-css", text: css }, document.head);
@@ -111,7 +150,7 @@
     return function (act, api) {
       var compared = false;
       LX.PhraseTagger(act, { key: "n1-tags-" + story.id, tags: D.lens, kicker: "Story " + (idx + 1) + " of 3 · " + story.kicker,
-        title: story.headline, framing: story.framing, parts: story.parts, sources: story.sources, missing: story.missing,
+        title: story.headline, framing: story.framing, parts: story.parts, sources: story.sources, missing: story.missing, missingQ: story.missing.q,
         onCompare: function (sc) {
           if (!compared) { compared = true; api.done(); }
           api.saw("You matched the researcher on " + sc.same + " of " + sc.total + " phrases" + (sc.fair ? ", and " + sc.fair + " more are fair alternatives" : "") +
@@ -162,7 +201,7 @@
       var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Battery duration in hours" }, box);
       var uc = LX.UnitChain(H("div", null, box), { label: "Unit chain" }), out = H("p", { class: "lx-hint" }, box);
       var plan = H("p", { class: "lx-hint" }, box);
-      plan.innerHTML = LX.rich("Planned against built: " + e.gw + " ÷ " + e.planned_gw + " = **" + Math.round(e.gw / e.planned_gw * 100) + "%** of the planned battery capacity arrived in 2025.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+      plan.innerHTML = LX.rich("Planned against built: " + e.gw + " ÷ " + e.planned_gw + " = **" + Math.round(e.gw / e.planned_gw * 100) + "%**. Actual additions were about that share of the amount first planned.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
       var bs = e.durations.map(function (h) {
         var b = H("button", { type: "button", "aria-pressed": "false", text: h + " h" }, seg);
         b.addEventListener("click", function () { draw(h); });
@@ -172,7 +211,8 @@
         bs.forEach(function (x) { x.b.setAttribute("aria-pressed", x.h === h ? "true" : "false"); });
         var gwh = storedGWh(e.gw, h), min = minutesOfUse(gwh, e.us_twh, e.hours);
         uc.set([{ v: e.gw + " GW", u: "power" }, { op: "× " + h + " h =" }, { v: fmt0(gwh) + " GWh", u: "energy stored", out: true }]);
-        out.innerHTML = LX.rich("Enough to run the whole U.S. for about **" + fmt1(min) + " minutes** at its 2025 average of " + fmt0(averageGW(e.us_twh, e.hours)) + " GW. Batteries shift energy by hours; they do not store a season.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+        var us = averageGW(e.us_twh, e.hours);
+        out.innerHTML = LX.rich("Its energy equals about **" + fmt1(min) + " minutes** of U.S. use at the 2025 average of about " + fmt0(Math.round(us / 10) * 10) + " GW, but its [[power|power]] is only about **" + Math.round(e.gw / us * 100) + "%** of that average. These example durations cover hours, not seasons.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
       }
       draw(e.duration);
     };
@@ -183,11 +223,10 @@
       LX.Guess(act, { id: "n1-clock", q: e.q, ticks: e.ticks, answer: e.answer, start: 0, srLabel: e.q,
         onLock: function (g, out) {
           var ok = g === e.answer;
-          LX.EvidenceClock(out, { label: "Timeline: the blackout on 28 April 2025; a single-cause claim within a day; the factual report after " + dF + " days; the final report after " + dX + " days.",
-            marks: [{ d: 0, label: "Blackout", value: "28 Apr 2025" }, { d: 1, label: "One-cause claim", value: "within a day", warn: true, anchor: "start", dx: 4 },
-                    { d: dF, label: "Factual report", value: dF + " days" }, { d: dX, label: "Final report", value: dX + " days" }] });
+          LX.EvidenceClock(out, { label: "Timeline: the blackout on 28 April 2025; the factual report after " + dF + " days; the final report after " + dX + " days.",
+            marks: [{ d: 0, label: "Blackout", value: "28 Apr 2025" }, { d: dF, label: "Factual report", value: dF + " days" }, { d: dX, label: "Final report", value: dX + " days" }] });
           H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "You called it." : "Not quite.") + "</b> " +
-            "The factual report came " + dF + " days after the blackout and the final report " + dX + " days after: about 11 months. The one-cause claim came within a day.</div>" }, out);
+            "The factual report came " + dF + " days after the blackout and the final report " + dX + " days after: about 11 months. The early single-cause claims came long before either.</div>" }, out);
           api.done();
         } });
     };
@@ -239,7 +278,7 @@
       var row = H("div", { class: "n1-row" }, act);
       var show = H("button", { class: "lx-btn small ghost", type: "button", text: "Show a researcher's take" }, row);
       H("span", { class: "n1-count", text: "Your words stay in this browser." }, row);
-      var model = H("p", { class: "n1-model", hidden: true }, act);
+      var model = H("dl", { class: "n1-model", hidden: true }, act);
       show.addEventListener("click", function () { model.hidden = false; api.done(); api.saw("Compare the three parts, not the wording. A good take names what would change the author's mind; that line is what turns an opinion into a claim someone can check."); });
       function load() {
         var s = D.stories.filter(function (x) { return x.id === cur; })[0] || D.stories[1];
@@ -247,7 +286,8 @@
         head.textContent = "“" + s.headline + "”";
         var t = LX.store.get("n1-take-" + s.id, {}) || {};
         Object.keys(fields).forEach(function (k) { fields[k].value = t[k] || ""; });
-        model.textContent = s.take;
+        model.innerHTML = "";
+        takeParts(s.take).forEach(function (x) { H("dt", { text: x.k }, model); H("dd", { text: x.v }, model); });
       }
       load();
     };
@@ -280,8 +320,8 @@
       { text: "Tap each highlighted phrase and tag it with the question it raises. Then choose the question the story leaves unanswered, and compare with a researcher's notes.", build: tagStep(D, A, 0) },
       { text: "Now one check with units. The report gives [[energy|energy]] per year; grids are sized in [[power|power]]. Turn 649 TWh a year into average GW.", build: envelopeA(A) },
       { text: "Tag the second story. Watch for power against energy, and for plans against results. Then compare with a researcher's notes.", build: tagStep(D, B, 1) },
-      { text: "The story gives power, not energy. Choose a [[battery-duration|duration]] and see how much energy 15 GW could hold, and how long that would run the whole country.", build: envelopeB(B) },
-      { text: "The third story is a claim about a cause, made the day after a blackout. Tag its phrases, then choose the question the headline skips.", build: tagStep(D, C, 2) },
+      { text: "The story gives power, not energy. Choose a [[battery-duration|duration]] and see how much energy 15 GW could hold, and how it compares with the whole country's use.", build: envelopeB(B) },
+      { text: "Story 3 claims a cause for a blackout. Two terms first: [[voltage|voltage]] is the electrical push on the lines, held up locally by [[reactive-power|reactive power]]. Tag the phrases, then pick the question that would test the claim.", build: tagStep(D, C, 2) },
       { text: "Evidence takes time. Guess how long the formal investigation took before its final report, then lock in your guess.", build: clockStep(C) },
       { text: "Spot the units or scale error. Four of these six sentences break a unit or a sense of scale; two read right. Judge each one.", build: spotStep(D) },
       { text: "Write your take in three sentences: the claim you accept or reject, what would change your mind, and your confidence. Then compare with a researcher's take.", build: takeStep(D) }
@@ -289,8 +329,15 @@
     var cards = LX.StepCards(live, { id: "n1-steps", steps: steps });
     explain(D);
     root.lxLesson = { data: D, model: model };
-    // demo states (core.js LX.demo): "mid" opens story 1 with every phrase tagged and the comparison shown
+    // demo states (core.js LX.demo): "mid" opens story 1 with every phrase tagged and the comparison shown; "envelope"
+    // is step 5 answered (the battery check, 4 h); "take" is step 9 with the researcher's take shown
     LX.demo(root, function (state) {
+      if (state === "envelope" || state === "take") {
+        cards.go(state === "envelope" ? 4 : 8);
+        var want = state === "envelope" ? "It depends" : "Show a researcher";
+        setTimeout(function () { [].forEach.call(live.querySelectorAll("button"), function (b) { if (b.offsetParent && b.textContent.indexOf(want) === 0) b.click(); }); }, 50);
+        return { view: state === "envelope" ? "step 5" : "step 9" };
+      }
       if (state !== "mid") return null;
       var pk = {}; model.phrases(A).forEach(function (ph, i) { pk[ph.p] = i % 3 === 2 ? "scale" : ph.tag; }); pk._missing = "pays";
       LX.store.set("n1-tags-a", pk);

@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <table class="lx-facts"><thead><tr><th scope="col">Question</th><th scope="col">Ask</th><th scope="col">The trap it catches</th></tr></thead><tbody>
 <tr><td class="n">1. Scale</td><td>How big is it next to the whole?</td><td>A big-sounding number that is a small share, or a national figure read as a global one.</td></tr>
 <tr><td class="n">2. Time</td><td>Power or energy? Which hour, which year?</td><td>GW read as GWh, or a 2030 projection read as today's fact.</td></tr>
-<tr><td class="n">3. Physics</td><td>Do the units, losses and capacity factors make sense?</td><td>Nameplate treated as output, or a unit that cannot be right.</td></tr>
+<tr><td class="n">3. Physics</td><td>Do the units, losses and limits make sense?</td><td>Nameplate (the maximum rated power) treated as typical output, or a unit that cannot be right.</td></tr>
 <tr><td class="n">4. Who pays</td><td>Who pays, who benefits, who carries the risk?</td><td>Savings for one group that other customers end up paying for.</td></tr>
 <tr><td class="n">5. Boundary</td><td>What is counted, and what is left out?</td><td>A total that quietly leaves out part of the system.</td></tr>
 <tr><td class="n">6. Counterfactual</td><td>Compared with what?</td><td>A change measured against a baseline that would never have happened.</td></tr>
@@ -50,43 +50,78 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </tbody></table>
 <p class="lx-eyebrow">Story 1 · Data centers as a load · United States</p>
 <p><strong>“U.S. data centers could use nearly 12% of the nation's electricity by 2030”</strong> <span class="lx-hint">Our paraphrase of how such reports get headlined.</span></p>
-<p>A national-laboratory report estimates that data centers used <mark>192 TWh in 2024</mark>, or <mark>4.7% of U.S. electricity</mark>. Its Reference Case puts <mark>2030 use at 649 TWh</mark>, <mark>within a range of 521–843 TWh</mark>. Serving that load would take <mark>about 148 GW of grid connections</mark>. <mark>Cryptocurrency mining is not counted</mark>.</p>
+<p>A national-laboratory report estimates that data centers used <mark>192 TWh in 2024</mark>, or <mark>4.7% of U.S. electricity</mark>.
+Its Reference Case puts <mark>2030 use at 649 TWh</mark>, <mark>within a range of 521–843 TWh</mark>.
+Serving that load would take <mark>about 148 GW of grid connections</mark>.
+<mark>Cryptocurrency mining is not counted</mark>.</p>
 <details class="lx-textalt"><summary>A researcher's notes on story 1</summary><ul>
 <li><strong>192 TWh in 2024</strong> (Time): Energy over a whole year, not power. Spread over 8,760 hours it is about 22 GW of average demand.</li>
 <li><strong>4.7% of U.S. electricity</strong> (Scale): A share of one country's use. Read it next to the whole, and never mix it with a global share.</li>
 <li><strong>2030 use at 649 TWh</strong> (Time): A model's projection six years ahead, not a measurement: 2024 is the report's last historical year.</li>
-<li><strong>within a range of 521–843 TWh</strong> (Uncertainty): The authors' own range: its top is 1.6 times its bottom. The IEA's early-2025 projection for 2030, about 430 TWh, sits below it (report, p. 10).</li>
+<li><strong>within a range of 521–843 TWh</strong> (Uncertainty): The authors' own range: its top is 1.6 times its bottom. The IEA's early-2025 projection, about 430 TWh, sits below it, as the report notes (p. 11).</li>
 <li><strong>about 148 GW of grid connections</strong> (Physics): Capacity, not energy: the report turns 649 TWh into GW by assuming connections are used at 50% on average.</li>
 <li><strong>Cryptocurrency mining is not counted</strong> (Boundary): What counts as a data center is a choice; a study that includes mining reports a larger number.</li>
 <li><strong>Left unanswered</strong> (Who pays): Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Upcoming: lesson A4 on large-load tariffs.</li>
 <li><strong>A researcher's take</strong>: I accept the direction, strong growth in U.S. data-center use by 2030, but not the exact 11.8%. A new estimate built on lower chip shipments or lower server power would change my mind. Confidence: medium, since credible projections still differ by about 50%.</li></ul></details>
-<p class="lx-hint">Source: <a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">LBNL, United States Data Center Energy Usage Report: 2025 Update, pp. 5, 8–10 (PDF)</a> (published 18 June 2026)</p>
+<p class="lx-hint">Source: <a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">LBNL, United States Data Center Energy Usage Report: 2025 Update, pp. 5, 8–11 (PDF)</a> (published 18 June 2026)</p>
 <p class="lx-eyebrow">Story 2 · Storage · United States</p>
 <p><strong>“A record 15 GW of batteries joined the U.S. grid in 2025”</strong> <span class="lx-hint">Our paraphrase of how the data release was headlined.</span></p>
-<p>Developers added <mark>a record 15 GW of battery storage</mark> in 2025, <mark>according to preliminary data</mark>. At the start of the year, <mark>18.2 GW had been planned</mark>. <mark>Solar led with 27.2 GW</mark> of <mark>53 GW in total</mark>. <mark>The count covers utility-scale plants of 1 MW and up</mark>.</p>
+<p>Developers added <mark>a record 15 GW of battery storage</mark> in 2025, <mark>according to preliminary data</mark>.
+At the start of the year, <mark>18.2 GW had been planned</mark>.
+<mark>Solar led with 27.2 GW</mark> of <mark>53 GW in total</mark>.
+<mark>The count covers utility-scale plants of 1 MW and up</mark>.</p>
 <details class="lx-textalt"><summary>A researcher's notes on story 2</summary><ul>
 <li><strong>a record 15 GW of battery storage</strong> (Time): GW is power: how fast the batteries can deliver, not how much energy they hold. Energy in GWh needs the duration, which the story does not give.</li>
 <li><strong>according to preliminary data</strong> (Uncertainty): Preliminary counts come from a monthly inventory and are revised when the final annual data arrive.</li>
-<li><strong>18.2 GW had been planned</strong> (Uncertainty): Planned is not built: about 82% of the planned battery capacity arrived within the year (15 ÷ 18.2).</li>
-<li><strong>Solar led with 27.2 GW</strong> (Physics): A GW of solar makes less energy in a year than a GW of a plant that runs most hours: compare capacity factors, not GW.</li>
+<li><strong>18.2 GW had been planned</strong> (Uncertainty): Planned is not built: actual additions were about 82% of the amount first planned (15 ÷ 18.2).</li>
+<li><strong>Solar led with 27.2 GW</strong> (Physics): A GW of solar makes less energy in a year than a GW of a plant that runs most hours. Compare capacity factors (average output ÷ rated power), not GW.</li>
 <li><strong>53 GW in total</strong> (Scale): Big for one year. For scale, U.S. use averaged about 480 GW across 2025 (4.20 trillion kWh ÷ 8,760 h).</li>
 <li><strong>The count covers utility-scale plants of 1 MW and up</strong> (Boundary): Home batteries and rooftop solar sit outside this count.</li>
 <li><strong>Left unanswered</strong> (Who pays): Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Upcoming: lesson A2 on contracts and risk.</li>
 <li><strong>A researcher's take</strong>: I accept that a record amount of battery power, about 15 GW, came online in 2025, as a preliminary count. Final annual data showing a much lower figure would change my mind. Confidence: high for the power; the energy stored cannot be known from this story.</li></ul></details>
 <p class="lx-hint">Source: <a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">EIA, Today in Energy: 2025 additions, preliminary</a> (20 February 2026); <a href="https://www.eia.gov/todayinenergy/detail.php?id=64586">EIA, Today in Energy: additions planned for 2025</a> (24 February 2025); <a href="https://www.eia.gov/energyexplained/electricity/electricity-in-the-us-generation-capacity-and-sales.php">EIA, Energy Explained: utility-scale means 1 MW or more</a> (checked 2 November 2026); <a href="https://www.eia.gov/energyexplained/electricity/use-of-electricity.php">EIA, Energy Explained: U.S. use 4.20 trillion kWh in 2025</a> (data for 2025); <a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">EIA, Today in Energy: battery duration = MWh ÷ MW</a> (25 March 2022)</p>
 <p class="lx-eyebrow">Story 3 · Reliability · Spain and Portugal</p>
-<p><strong>“Renewables caused the Iberian blackout”</strong> <span class="lx-hint">Our paraphrase of a claim that circulated within a day; no single outlet is quoted.</span></p>
-<p>At 12:33 local time on 28 April 2025, <mark>the power systems of Spain and Portugal</mark> collapsed. <mark>Within a day, posts and headlines named one cause</mark>: <mark>renewables</mark>. The European grid operators' expert panel found <mark>many interacting factors</mark>, including <mark>gaps in voltage and reactive-power control</mark>, oscillations, and generators disconnecting in a cascade.</p>
+<p><strong>“Renewables caused the Iberian blackout”</strong> <span class="lx-hint">Our paraphrase of a claim that circulated soon after; no single outlet is quoted.</span></p>
+<p>At 12:33 CEST (11:33 in Portugal) on 28 April 2025, <mark>the continental power systems of Spain and Portugal</mark> collapsed.
+<mark>Early posts and headlines named one cause</mark>: <mark>renewables</mark>.
+The European grid operators' expert panel found <mark>many interacting factors</mark>.
+Among them: <mark>gaps in voltage and reactive-power control</mark>, power swings (oscillations), and generators tripping off one after another (a cascade).</p>
 <details class="lx-textalt"><summary>A researcher's notes on story 3</summary><ul>
-<li><strong>the power systems of Spain and Portugal</strong> (Scale): Two whole national systems went dark, not one plant or one city: that is why a formal investigation followed.</li>
-<li><strong>Within a day, posts and headlines named one cause</strong> (Time): The claim came before the evidence: the expert panel's factual report took 158 days, its final report 326.</li>
+<li><strong>the continental power systems of Spain and Portugal</strong> (Scale): The mainland grids of two countries went dark, not one plant or one city: that is why a formal investigation followed.</li>
+<li><strong>Early posts and headlines named one cause</strong> (Time): The claim came before the evidence: the expert panel's factual report took 158 days, its final report 326.</li>
 <li><strong>renewables</strong> (Uncertainty): A single cause from early, partial information. Ask who says it and what data they had.</li>
 <li><strong>many interacting factors</strong> (Boundary): Control rules, regulation practices and protection settings are part of the system, not only the power plants.</li>
-<li><strong>gaps in voltage and reactive-power control</strong> (Physics): Voltage is held locally with reactive power; frequency is the system-wide balance of lesson 0. A voltage problem is not a shortage of energy.</li>
+<li><strong>gaps in voltage and reactive-power control</strong> (Physics): Frequency responds to any gap between supply and demand (lesson 0). Voltage also depends on local network conditions and reactive-power control, so a yearly energy total cannot diagnose this blackout.</li>
 <li><strong>Left unanswered</strong> (Counterfactual): Compared with what? The headline skips the test: would the same plants with different control settings, or different plants with the same settings, have held? The panel's event-by-event analysis is how such questions get answered.</li>
 <li><strong>A researcher's take</strong>: I reject the claim that renewables alone caused the blackout. An investigation tracing the collapse to one cause would change my mind. Confidence: high that there was no single cause, because the expert panel found many interacting factors.</li></ul></details>
 <p class="lx-hint">Source: <a href="https://www.entsoe.eu/publications/blackout/28-april-2025-iberian-blackout/">ENTSO-E, 28 April 2025 Iberian blackout: expert panel reports</a> (factual report 3 October 2025; final report 20 March 2026)</p>
 <!-- fallback:end -->
+<!-- fallback-checks:start (written by _tests/learn/test_n01-news-lens.js in its write mode, from the data file; do not edit) -->
+<details class="lx-textalt"><summary>The three checks with units, worked</summary><ul>
+<li><strong>Story 1</strong>: 649 TWh × 1,000 = 649,000 GWh a year; ÷ 8,760 h ≈ 74.1 GW of average power. At 50% average use of the connections (the report's assumption), that needs about 148 GW of connections.</li>
+<li><strong>Story 2</strong>: 15 GW × 4 h (an illustrative duration) = 60 GWh. That energy equals about 7.5 minutes of U.S. use at the 2025 average of about 480 GW, but 15 GW is only about 3% of that average power. Actual additions were about 82% of the 18.2 GW first planned.</li>
+<li><strong>Story 3</strong>: the expert panel's factual report came 158 days after the blackout, and its final report 326 days after: about 11 months.</li></ul></details>
+<details class="lx-textalt"><summary>Units or scale? Six sentences, with answers</summary><ul>
+<li>“The new battery can store 100 MW.” <strong>A unit error.</strong> Stored energy is in MWh; 100 MW is how fast it charges or discharges. A 100 MW, four-hour battery stores 400 MWh.</li>
+<li>“U.S. data centers used about 192 TWh of electricity in 2024.” <strong>Reads right.</strong> TWh over a year is an amount of energy: LBNL's estimate for 2024.</li>
+<li>“A 13 kWh home battery can run an average U.S. home for a month.” <strong>A scale error.</strong> An average home bought about 899 kWh a month (EIA, 2022 data), so 13 kWh lasts about 10 hours.</li>
+<li>“The plant's two 500 MW units will generate 1,000 MW every hour of the year.” <strong>A physics error.</strong> Nameplate (the maximum rated power) is a ceiling, not an output: plants run below it and stop for maintenance. Average output ÷ nameplate is the capacity factor (lesson 5).</li>
+<li>“In 2025 the United States used about 4,200 TWh of electricity.” <strong>Reads right.</strong> 4.20 trillion kWh is 4,200 TWh (EIA, data for 2025).</li>
+<li>“A town of 10,000 homes needs about 10 GW of power.” <strong>A scale error.</strong> At EIA's 10,791 kWh a home a year (2022 data), 10,000 homes use about 108 GWh a year: about 12 MW on average. Even a peak a few times higher is far below 10 GW.</li>
+</ul></details>
+<details class="lx-textalt"><summary>The evidence ladder, with the stories' claims placed</summary><ol>
+<li><strong>Announced</strong>: Someone says it will happen.</li>
+<li><strong>Funded</strong>: The money is committed.</li>
+<li><strong>Permitted</strong>: Regulators have approved it.</li>
+<li><strong>Under construction</strong>: Work has started on site.</li>
+<li><strong>Operating</strong>: It runs and is counted as in service.</li>
+<li><strong>At design output</strong>: It delivers what it was built to deliver.</li>
+</ol><ul>
+<li><strong>“15 GW of batteries entered service in 2025 (preliminary count)”</strong>: Operating, as counted so far. Whether each battery delivers its rated hours is the next rung up.</li>
+<li><strong>“18.2 GW of batteries planned for 2025, as reported at the start of the year”</strong>: Below operating: plans in EIA's inventory sit on different rungs. Actual additions were about 82% of this planned total.</li>
+<li><strong>“649 TWh of U.S. data-center use in 2030”</strong>: Not on the ladder at all: a projection is a model's output, not a stage of anything being built.</li>
+</ul></details>
+<!-- fallback-checks:end -->
 <p class="lx-hint">With JavaScript on, you tag each story's phrases yourself, run a check with units, and compare with a researcher's notes.</p>
 </div>
 </div>
@@ -104,7 +139,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>The lens</dt><dd>Seven questions, always in the same order: scale, time, physics, who pays, boundary, counterfactual, uncertainty.</dd>
-<dt>Power or energy</dt><dd><span class="lx-term" data-term="gigawatt">GW</span> is a rate and GWh an amount; dividing a year's TWh by 8,760 hours gives average GW.</dd>
+<dt>Power or energy</dt><dd><span class="lx-term" data-term="gigawatt">GW</span> is a rate and GWh an amount. Multiply a year's TWh by 1,000 to get GWh, then divide by 8,760 hours to get average GW.</dd>
 <dt>The evidence ladder</dt><dd>Announced, funded, permitted, under construction, operating, at design output; a <span class="lx-term" data-term="projection">projection</span> is not on the ladder.</dd>
 <dt>Your take</dt><dd>The claim you accept or reject, what would change your mind, and your confidence.</dd>
 </dl>
@@ -240,12 +275,16 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Practise on real news</p>
-<p>Pick one item from this site's Field Notes briefings, or from today's news, run the seven questions on it, and write your three-sentence take. Concepts used here come from <a href="00-grid-operator.html">lesson 0</a> (power and energy, frequency) and lessons <a href="01-power-energy.html">1</a> and <a href="05-capacity-factor.html">5</a> (units, capacity factor). Upcoming: A2 and A4 (who pays), R2 (what is already known).</p>
+<p>Pick one item from this site's Field Notes briefings, or from today's news. Run the seven questions on it, then write your three-sentence take.</p>
+<ul>
+<li>Concepts from <a href="00-grid-operator.html">lesson 0</a> (power and energy, frequency) and lessons <a href="01-power-energy.html">1</a> and <a href="05-capacity-factor.html">5</a> (units, capacity factor).</li>
+<li>Upcoming: A2 and A4 (who pays), R2 (what is already known).</li>
+</ul>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>Shehabi, A. et al. (2026). <a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">United States Data Center Energy Usage Report: 2025 Update</a> (PDF). Lawrence Berkeley National Laboratory, published by the U.S. Department of Energy, 18 June 2026.</li>
+<li>Smith, S. J. et al. (2026). <a href="https://www.energy.gov/documents/united-states-data-center-energy-usage-report-2025-update">United States Data Center Energy Usage Report: 2025 Update</a> (PDF). Lawrence Berkeley National Laboratory, published by the U.S. Department of Energy, 18 June 2026.</li>
 <li>EIA (2026). <a href="https://www.eia.gov/todayinenergy/detail.php?id=67205">New U.S. electric generating capacity expected to reach a record high in 2026</a>. Today in Energy, 20 February 2026.</li>
 <li>EIA (2025). <a href="https://www.eia.gov/todayinenergy/detail.php?id=64586">Solar, battery storage to lead new U.S. generating capacity additions in 2025</a>. Today in Energy, 24 February 2025.</li>
 <li>EIA (2022). <a href="https://www.eia.gov/todayinenergy/detail.php?id=51798">Duration of utility-scale batteries depends on how they're used</a>. Today in Energy, 25 March 2022.</li>

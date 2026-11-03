@@ -5,7 +5,9 @@
 //   - the checks (choice, order, number with units, estimate) and the level rule, on made-up attempts
 //   - the worked solution's numbers (two routes, homes, share of the town, daily energy) as printed on the page
 //   - the copied summary carries the W1 measures (first try, tries, time to first answer, solution opened first)
-// Usage (from the site folder):  node _tests/learn/test_ck-f-estimate.js
+//   - the no-JS version of the nine tasks on the page equals staticTasks() (write it with --write after a data edit)
+//   - the always-visible rubric gives no numbers from the answer; task texts stay within the text budget
+// Usage (from the site folder):  node _tests/learn/test_ck-f-estimate.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -16,7 +18,16 @@ const D = JSON.parse(fs.readFileSync(L("data/ck-f-estimate.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
 const days = JSON.parse(fs.readFileSync(L("data/town_days.json"), "utf8"));
 const cf = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
-const PAGE = fs.readFileSync(path.join(SITE, "learn/ck-f-estimate.qmd"), "utf8");
+const QPATH = path.join(SITE, "learn/ck-f-estimate.qmd");
+const MK = [/<!-- ckf-fallback:start[^>]*-->\n/, "<!-- ckf-fallback:end -->"];
+if (process.argv.includes("--write")) {
+  const q = fs.readFileSync(QPATH, "utf8"), a = q.match(MK[0]), b = q.indexOf(MK[1]);
+  if (!a || b < a.index) throw new Error("ckf-fallback markers missing");
+  fs.writeFileSync(QPATH, q.slice(0, a.index + a[0].length) + C.staticTasks(D) + "\n" + q.slice(b));
+  console.log("ckf-fallback block written");
+}
+const PAGE = fs.readFileSync(QPATH, "utf8");
+const JS = fs.readFileSync(L("ck-f-estimate.js"), "utf8");
 let checks = 0, fails = 0;
 function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-9 : t);
@@ -51,7 +62,13 @@ ok(t5.cf === cf.targets.wind.cf && near(t5.answer.mwh, t5.mw * 8760 * t5.cf, 1e-
 ok(C.checkNumeric(t5, 148, "GWh").right && C.checkNumeric(t5, 150000, "MWh").right && !C.checkNumeric(t5, 438000, "MWh").right && C.checkNumeric(t5, 148, "MW").power, "task 6: GWh and MWh accepted within 10%, the nameplate answer and MW rejected");
 const n1 = T("n1-headline"), homes = n1.mw * 8760 * n1.cf * 1000 / n1.homeKWh;
 ok(n1.cf === cf.targets.solar.cf && Math.abs(num(opt(n1, n1.answer)) - homes) / homes < 0.05, "task 8: about 20,000 homes (" + Math.round(homes) + ")");
+ok(Math.round(n1.mw * 8760 / (n1.homeKWh / 1000) / 1000) === 81 && n1.why.c.indexOf("about 81,000") >= 0 && n1.solution.indexOf("about 81,000") >= 0 && n1.solution.indexOf("19,500") >= 0,
+  "task 8: the headline's 100,000 exceeds even full output (about 81,000 homes); 19,500 at the capacity factor");
 const t2 = T("t2-chart"), t4 = T("t4-forecast"), t6 = T("t6-jobs");
+ok(!/heating|morning rush/.test(t2.solution), "task 3: the chart's peak is stated, not explained by causes the data cannot show");
+const tEx = T("t0-explain");
+ok(/stored energy/.test(tEx.points[0]) && /controls/.test(tEx.points[1]) && !/runs ahead/.test(tEx.points.join(" ") + tEx.solution), "task 1: frequency shows a gap; inertia covers the first seconds; controls restore balance, then 60 Hz");
+ok(/available and has fuel/.test(t6.prompt) && /operating limits/.test(t6.why.b) && !/whatever the weather/.test(t6.why.b + t6.solution), "task 7: the scenario states availability and fuel; firm output still has limits");
 [t1, t2, t4, t6, n1].forEach(t => ok(C.checkChoice(t, t.answer).right && t.options.every(o => o[0] === t.answer || !C.checkChoice(t, o[0]).right) && t.options.every(o => t.why[o[0]]), t.id + ": one right option, feedback for each"));
 const t3 = T("t3-order");
 ok(!C.checkOrder(t3, t3.start).right && C.checkOrder(t3, t3.items.map(x => x[0])).right && C.checkOrder(t3, ["fall", "gov", "back", "agc"]).n === 2, "task 4: the shuffled start is wrong, the sequence right, partial credit shown");
@@ -72,6 +89,8 @@ e = C.checkEstimate(es, 3, 6, "GWh per year"); ok(e.unitsOk && !e.overlaps && /a
 e = C.checkEstimate(es, 20, 40, "MWh per year"); ok(!e.overlaps && /below/.test(e.rangeMsg), "estimate: 20-40 MWh lies below");
 e = C.checkEstimate(es, 50, 900, "MWh per year"); ok(e.overlaps && /ten times/.test(e.rangeMsg), "estimate: a very wide range is flagged");
 e = C.checkEstimate(es, 600, 300, "MWh per year"); ok(!e.ordered, "estimate: low above high is flagged");
+ok(PAGE.indexOf("440 MWh = 440,000 kWh; 440,000 ÷ 10,791") >= 0 && PAGE.indexOf("usable energy") >= 0 && PAGE.indexOf("on sale") < 0, "worked: the kWh conversion is shown; battery size is a plausibility check, not route feasibility");
+ok(PAGE.indexOf("so their overlap does not check it") >= 0 && PAGE.indexOf("Two independent routes") < 0, "worked: the two routes share energy per mile, and the page says so");
 ["234,000 to 414,000 kWh", "366,000 to 648,000 kWh", "281,680 miles", "180,000 miles", "230 to 650 MWh", "440 MWh", "41 average", "2,470 GWh", "0.02%", "115 kWh", "14,084", "10,791", "1.26–1.58", "2.3 kWh", "1.6 times"].forEach(s => ok(PAGE.indexOf(s) >= 0, "page states " + s));
 
 // ---------------- level rule and summary
@@ -98,6 +117,23 @@ ok(sum.split("\n").filter(l => /^\d \| /.test(l)).length === 9 && /\| 45 s \| 1 
 ok(/Estimate: 300 to 600 MWh per year · overlaps/.test(sum) && /Self-rating: units Proficient/.test(sum) && /Screen width 375 px/.test(sum), "summary: the estimate, the self-rating and the screen width");
 ok(C.fmtMs(45000) === "45 s" && C.fmtMs(125000) === "2 min 05 s" && C.fmtMs(null) === "–", "time format");
 ok(/version/.test(D.version) === false && /ck-f v1/.test(D.version), "results carry the checkpoint version");
+
+// ---------------- the rubric is answer-independent before submission; the no-JS tasks; text budget; the copied summary
+{
+  const rub = PAGE.slice(PAGE.indexOf('<table id="ckf-rubric"'), PAGE.indexOf("</table>", PAGE.indexOf('<table id="ckf-rubric"')));
+  ok(rub.length > 100 && !/\b(230|650|234|648|440)\b/.test(rub), "rubric: no numbers from the worked answer in the always-visible rubric");
+  const a = PAGE.match(MK[0]), b = PAGE.indexOf(MK[1]);
+  ok(a && b > a.index && PAGE.slice(a.index + a[0].length, b) === C.staticTasks(D) + "\n", "fallback: the page's no-JS tasks equal staticTasks() (run with --write after a data edit)");
+  const st = C.staticTasks(D);
+  ok(D.tasks.every(t => st.indexOf(t.prompt.replace(/&/g, "&amp;")) >= 0) && (st.match(/<summary>Worked solution, task/g) || []).length === 8 && (st.match(/<tr><td>\d\d:00<\/td>/g) || []).length === 48, "fallback: nine prompts, eight closed solutions, two 24-hour chart tables");
+  const words = s => s.trim().split(/\s+/).length, sents = s => (s.match(/[.!?](\s|$)/g) || []).length;
+  D.tasks.forEach(t => {
+    ok(words(t.prompt) <= 40, t.id + ": prompt at most 40 words (" + words(t.prompt) + ")");
+    if (t.solution) ok(words(t.solution) <= 40 && sents(t.solution) <= 2, t.id + ": solution at most two sentences and 40 words (" + words(t.solution) + ")");
+  });
+  ok(/includes what you typed/.test(JS) && /includes what you typed/.test(PAGE), "summary: the intro and the data note tell testers the copied summary includes what they typed");
+  ok(!/forms\.|docs\.google|typeform|<a [^>]*form/i.test(PAGE + JS), "summary: no form link on the page");
+}
 
 // ---------------- sources: every source URL is on the allow-list hosts used by Learn
 Object.values(D.sources).forEach(s => ok(/^https:\/\/(www\.)?(eia\.gov|afdc\.energy\.gov|epa\.gov)\//.test(s.url) && s.asOf, "source " + s.url));
