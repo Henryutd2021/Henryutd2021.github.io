@@ -130,6 +130,7 @@
   var CSS = [
     ".w9-stage{display:grid;gap:10px;background:var(--lx-surface);border:1px solid var(--lx-line);border-radius:var(--lx-r-lg);padding:14px 16px;box-shadow:var(--lx-shadow)}",
     ".w9-stage[hidden]{display:none}",
+    ".w9-stage>*{min-width:0}",   // an open text version's table scrolls in its box instead of widening the stage on phones
     ".w9-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}.page-learn .w9-head h3{font-size:16px;margin:0}",
     ".w9-chips{display:flex;flex-wrap:wrap;gap:8px}",
     ".w9-chip{display:grid;gap:1px;padding:5px 10px;border-radius:10px;background:var(--lx-surface-2)}",
