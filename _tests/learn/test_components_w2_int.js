@@ -82,15 +82,20 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
 {
   const P = JSON.parse(rd("assets/learn/data/path.json"));
   const all = [].concat(P.starter, P.more, P.toolbox).filter(l => l.ready && l.id);
-  let n = 0;
+  let n = 0; const labs = [];
   all.forEach(l => {
     const f = path.join(SITE, "learn", l.id + ".qmd"); if (!fs.existsSync(f)) return;
-    const q = fs.readFileSync(f, "utf8"), m = q.match(/<li>(\d+) min guided · about ([^<]+) practice<\/li>/); if (!m) return;
-    const data = JSON.parse(q.match(/<script type="application\/json" class="lx-lesson-data">([\s\S]*?)<\/script>/)[1]), pm = data.practice;
+    const q = fs.readFileSync(f, "utf8"), m = q.match(/<li>(\d+) min guided(?: · ([^<]+?) lab)? · about ([^<]+) practice<\/li>/); if (!m) return;
+    const data = JSON.parse(q.match(/<script type="application\/json" class="lx-lesson-data">([\s\S]*?)<\/script>/)[1]), pm = data.practice, lm = data.labMinutes;
     n++;
-    const want = pm ? (pm < 120 ? pm + " min" : (Math.round(pm / 30) / 2) + " h") : null;
-    ok(m[2] === want, `${l.id}: practice badge "${m[2]}" (${pm} min)`);
+    const hrs = x => x < 120 ? x + " min" : (Math.round(x / 30) / 2) + " h";
+    ok(m[3] === (pm ? hrs(pm) : null), `${l.id}: practice badge "${m[3]}" (${pm} min)`);
+    ok((m[2] || null) === (lm ? hrs(lm) : null), `${l.id}: lab in the badge "${m[2] || "none"}" (lab_minutes ${lm || "none"})`);
+    const ld = JSON.parse(q.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+    ok(ld.timeRequired === "PT" + (data.minutes + (lm || 0) + (pm || 0)) + "M", `${l.id}: timeRequired ${ld.timeRequired} = guided + lab + practice`);
+    if (lm) labs.push(l.id);
   });
+  ok(labs.join() === "m02-unit-commitment,m03-capacity-expansion", `the lab time shows on M2 and M3 (${labs.join(", ")})`);
   ok(n >= 20, `practice badges checked on ${n} pages; 120 minutes and more read in hours`);
   ok(rd("teaching.qmd").indexOf(all.length + " lessons live; more coming") > 0, `Teaching card: ${all.length} lessons live, as in path.json`);
 }
