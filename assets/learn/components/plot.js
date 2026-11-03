@@ -230,12 +230,14 @@
       if (!mk.label) return;
       var tx, ty, an;
       if (kind === "ring" && !mk.vline) {
-        var right = cx < m.l + g.iw * 0.62; tx = cx + (right ? 9 : -9); ty = cy + (mk.above ? -10 : 18); an = right ? "start" : "end";
+        // above: a point near the top of the plot keeps its label below it, out of the top margin (the y unit's row)
+        var up = !!mk.above && cy - 21 >= m.t;
+        var right = cx < m.l + g.iw * 0.62; tx = cx + (right ? 9 : -9); ty = cy + (up ? -10 : 18); an = right ? "start" : "end";
         var e = S("text", { x: tx, y: ty, "text-anchor": an, class: "mk" }, svg); e.textContent = mk.label;
         // keep the label inside the chart (narrow phones): switch sides when it would run off an edge; if neither side
         // fits, pin it to the edge on the other side of the line (above instead of below, or below instead of above)
         var len = e.getComputedTextLength ? e.getComputedTextLength() : 0, R = g.W - m.r, pin = function (x, a) {
-          e.setAttribute("x", x); e.setAttribute("text-anchor", a); e.setAttribute("y", cy + (mk.above ? 18 : -10)); };
+          e.setAttribute("x", x); e.setAttribute("text-anchor", a); e.setAttribute("y", cy + (up ? 18 : -10)); };
         if (len && right && cx + 9 + len > R) { if (cx - 9 - len >= m.l) { e.setAttribute("x", cx - 9); e.setAttribute("text-anchor", "end"); } else pin(R, "end"); }
         else if (len && !right && cx - 9 - len < m.l) { if (cx + 9 + len <= R) { e.setAttribute("x", cx + 9); e.setAttribute("text-anchor", "start"); } else pin(m.l, "start"); }
         return;

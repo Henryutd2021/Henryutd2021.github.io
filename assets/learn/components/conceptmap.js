@@ -53,11 +53,17 @@
         size[n.id] = [wd, 14 + lines.length * 17]; P[n.id] = pos(n, m);
       });
       function edgePt(p, q, s) { var dx = q[0] - p[0], dy = q[1] - p[1]; var tx = dx ? (s[0] / 2 + 4) / Math.abs(dx) : 1e9, ty = dy ? (s[1] / 2 + 4) / Math.abs(dy) : 1e9, t = Math.min(tx, ty); return [p[0] + dx * t, p[1] + dy * t]; }
+      // a link's label sits at the middle of its line; when two links cross there, the later label moves along its
+      // own line (40%, 60%, 30%, 70% of the way) to the first place where it meets no earlier label
+      var taken = [], meets = function (x, y, w) { return taken.some(function (t) { return Math.abs(t[0] - x) < (t[2] + w) / 2 + 4 && Math.abs(t[1] - y) < 15; }); };
       o.edges.forEach(function (e) {
         var a = P[e[0]], b = P[e[1]], g = S("g", { class: "cedge" }, eg);
         var p1 = edgePt(a, b, size[e[0]]), p2 = edgePt(b, a, size[e[1]]);
         S("path", { d: "M" + p1[0] + " " + p1[1] + " L" + p2[0] + " " + p2[1], "marker-end": "url(#" + mk + ")" }, g);
-        var mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2 + (Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4);
+        var lw = String(e[2]).length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
+        var spot = [0.5, 0.4, 0.6, 0.3, 0.7].map(at).filter(function (q) { return !meets(q[0], q[1], lw); })[0] || at(0.5);
+        taken.push([spot[0], spot[1], lw]);
+        var mx = spot[0], my = spot[1];
         S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = e[2];
         S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = e[2];
         edges.push({ g: g, a: e[0], b: e[1] });

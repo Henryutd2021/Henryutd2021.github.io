@@ -90,6 +90,7 @@
         var s2 = H("span", null, leg); H("i", { class: "line", style: "border-top-color:var(--lx-accent)" }, s2);
         H("span", { text: o.priceLabel ? o.priceLabel(st.price.p) : "Equal score at $" + Math.round(st.price.p) + "/t" }, s2);
       }
+      var labs = [];   // plan letters, placed after all dots (see below)
       st.plans.forEach(function (p) {
         var g = S("g", { class: "dot" + (st.onPick && p.kind === "plan" ? " pick" : ""), transform: "translate(" + X(p.co2).toFixed(1) + "," + Y(p.cost).toFixed(1) + ")" }, gP);
         var r = p.kind === "you" ? 9 : p.kind === "plan" ? 8 : 6.5;
@@ -97,7 +98,7 @@
         S("circle", { class: "c", r: r, fill: p.mark === "dominated" || p.mark === "never" ? "var(--lx-surface)" : p.color || "var(--lx-ink)",
                       stroke: p.color || "var(--lx-ink)", "stroke-width": 2.5, "stroke-dasharray": p.mark === "dominated" ? "3 2" : null }, g);
         if (p.kind === "you") S("circle", { r: 3, fill: "var(--lx-surface)" }, g);
-        if (p.id) S("text", { x: r + 4, y: -r + 2, class: "lab" }, g).textContent = p.id;
+        if (p.id) { var lb = S("text", { x: r + 4, y: -r + 2, class: "lab" }, g); lb.textContent = p.id; labs.push({ el: lb, r: r, x: X(p.co2), y: Y(p.cost) }); }
         if (st.onPick && p.kind === "plan") {
           g.setAttribute("tabindex", "0"); g.setAttribute("role", "button");
           g.setAttribute("aria-label", "Plan " + p.id + ", " + p.label + ": " + fmtY(p.cost) + " and " + fmtX(p.co2) + " of CO₂ a year");
@@ -105,6 +106,21 @@
           g.addEventListener("click", go);
           g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
         }
+      });
+      // a plan's letter goes up and right of its dot; when it would touch another letter or dot (two plans close
+      // together), it takes the first free corner of up-left, down-right and down-left
+      var taken = [], hit = function (a, b) { return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h; };
+      labs.forEach(function (L) {
+        var tries = [[L.r + 4, -L.r + 2, "start"], [-L.r - 4, -L.r + 2, "end"], [L.r + 4, L.r + 12, "start"], [-L.r - 4, L.r + 12, "end"]], pick = null;
+        for (var k = 0; k < tries.length && !pick; k++) {
+          L.el.setAttribute("x", tries[k][0]); L.el.setAttribute("y", tries[k][1]); L.el.setAttribute("text-anchor", tries[k][2]);
+          var b = L.el.getBBox && L.el.getBBox(); if (!b || !b.width) { pick = tries[k]; break; }
+          var bx = { x: L.x + b.x, y: L.y + b.y, w: b.width, h: b.height };
+          var clash = bx.x < ml || bx.x + bx.w > W - mr || taken.some(function (t) { return hit(bx, t); }) ||
+            labs.some(function (M) { return M !== L && hit(bx, { x: M.x - M.r - 2, y: M.y - M.r - 2, w: 2 * M.r + 4, h: 2 * M.r + 4 }); });
+          if (!clash) { pick = tries[k]; taken.push(bx); }
+        }
+        if (!pick) { L.el.setAttribute("x", tries[0][0]); L.el.setAttribute("y", tries[0][1]); L.el.setAttribute("text-anchor", "start"); }
       });
       var kinds = {};
       st.plans.forEach(function (p) { if (p.kind !== "plan" && !kinds[p.kind] && p.legend) { kinds[p.kind] = 1; var s = H("span", null, leg); H("i", { style: "--c:" + p.color + ";border-radius:50%" }, s); H("span", { text: p.legend }, s); } });
