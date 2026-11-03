@@ -287,6 +287,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "difference-in-differences": {
+  "term": "Difference-in-differences",
+  "short": "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
+ },
  "discount-rate": {
   "term": "Discount rate",
   "short": "The yearly rate used to turn money paid or received in the future into its value today.",
@@ -382,6 +388,12 @@
   "short": "The long-run average of an uncertain quantity: each possible outcome multiplied by its chance, then added up.",
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
+ },
+ "falsification-statement": {
+  "term": "Falsification statement",
+  "short": "A sentence naming the result that would show your expected answer wrong.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
  },
  "fast-frequency-response": {
   "term": "Fast frequency response",
@@ -502,6 +514,12 @@
   "short": "A chart that sorts values into bins of equal width and shows how many fall in each bin.",
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
+ },
+ "horizon": {
+  "term": "Horizon",
+  "short": "The span of time a study covers, from a day of operation to decades of planning.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "hour-ending": {
   "term": "Hour ending",
@@ -682,6 +700,12 @@
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "method-family": {
+  "term": "Method family",
+  "short": "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "microgrid": {
   "term": "Microgrid",
@@ -887,6 +911,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "question-type": {
+  "term": "Question type",
+  "short": "The kind of answer a research question asks for: descriptive, explanatory, evaluative, predictive or prescriptive.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
@@ -947,6 +977,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "relative-growth-index": {
+  "term": "Relative growth index (RGI)",
+  "short": "How fast a topic's paper count grew from 2016–18 to 2022–24, divided by the growth of energy-systems research as a whole.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
+ },
  "repository": {
   "term": "Repository",
   "short": "A project folder together with its full history of commits, as kept by a version-control tool such as Git.",
@@ -1006,6 +1042,12 @@
   "short": "A way to write a number as a value from 1 to 10 times a power of ten, so very large and very small numbers are easy to compare.",
   "lesson": "K1",
   "href": "k01-units.html"
+ },
+ "search-string": {
+  "term": "Search string",
+  "short": "The words and operators (AND, OR, quotation marks) typed into a literature database to find papers.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
  },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
@@ -1096,6 +1138,12 @@
   "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "time-step": {
+  "term": "Time step",
+  "short": "The length of one step in a model or dataset, such as five minutes, an hour or a year.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "tornado-chart": {
   "term": "Tornado chart",

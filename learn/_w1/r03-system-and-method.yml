@@ -1,0 +1,12 @@
+# Sidecar of research studio R3 (r03-system-and-method), builder learn-w2-f, 2026-11-03.
+lesson: R3
+glossary:
+  - {id: method-family, term: "Method family", def: "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics."}
+  - {id: time-step, term: "Time step", def: "The length of one step in a model or dataset, such as five minutes, an hour or a year."}
+  - {id: horizon, term: "Horizon", def: "The span of time a study covers, from a day of operation to decades of planning."}
+  - {id: monte-carlo, term: "Monte Carlo simulation", def: "Running a model many times with inputs drawn at random, to see the range of outcomes and how likely each is."}
+  - {id: difference-in-differences, term: "Difference-in-differences", def: "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not."}
+requests:
+  - "path.yml: R3's prerequisites are R1 and F1 (curriculum v2 §7.6). F1 is on learn-w2-a, not this branch, so R3 lists after: [R1]; add F1 at the merge."
+  - "e-scale-strip: R3 has a lesson-local scale strip (.r3-strip: the five scales with who decides, typical time step and horizon, and the reader's brief marked). Builder learn-w2-a's F1 has a ScaleStrip (sorts, signals down and needs up). Merge the two into one promoted component, with an option to mark one scale and show step and horizon."
+  - "The method-family comparison uses LX.CompareTable in text mode with one sort (the default order) to get its caption line; a CompareTable 'caption' option without sorts would be cleaner."
