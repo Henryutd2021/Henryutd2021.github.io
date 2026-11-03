@@ -1,0 +1,13 @@
+/* tornado.css — LX.Tornado (tornado.js): one row per input, its bar from the result at one end to the other, the base as a line. */
+.lx-torn { display: grid; gap: 6px; }
+.lx-torn-lede { font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-torn-row { display: grid; grid-template-columns: 8.6em minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px; }
+.lx-torn-row > span { font-family: var(--lx-f-display); font-weight: 500; }
+.lx-torn-row small { display: block; font-family: var(--lx-f-body); font-weight: 400; font-size: 12px; color: var(--lx-ink-3); }
+.lx-torn-bar { position: relative; height: 30px; border-radius: 6px; background: var(--lx-surface-2); }
+.lx-torn-bar i { position: absolute; top: 5px; bottom: 5px; border-radius: 4px; }
+.lx-torn-bar i.lo { background: color-mix(in srgb, var(--below, var(--lx-good)) 70%, var(--lx-surface)); }
+.lx-torn-bar i.hi { background: color-mix(in srgb, var(--above, var(--lx-bad)) 70%, var(--lx-surface)); }
+.lx-torn-bar em { position: absolute; top: 6px; font-style: normal; font-family: var(--lx-f-mono); font-size: 11.5px; color: var(--lx-ink); white-space: nowrap; }
+.lx-torn-bar .mid { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--lx-ink); }
+@media (max-width: 560px) { .lx-torn-row { grid-template-columns: minmax(0, 1fr); } }

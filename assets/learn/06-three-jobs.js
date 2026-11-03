@@ -157,13 +157,14 @@
       { text: "Some pairings are contested, and the evidence points both ways. Open the strongest case on each side before you make up your mind.",
         build: function (act, api) {
           var sr = D.steelman.storageRatings;
-          Steelman(act, {
-            title: D.steelman.title,
-            forTitle: "The strongest case for", againstTitle: "The strongest case against",
-            forPts: ["Longer storage counts for more: PJM counts " + pct(sr["4"], 0) + " of a 4-hour battery's MW, " + pct(sr["8"], 0) + " for 8 hours and " + pct(sr["10"], 0) + " for 10 hours.",
-                     "Steadier wind counts for more: PJM counts " + pct(D.steelman.offshoreWind, 0) + " for offshore wind, against " + byKey.wind.firmLabel + " onshore."],
-            againstPts: ["Calm spells outlast batteries: the Southwest Power Pool's whole wind fleet stayed below a quarter of its best 2025 hour for " + lullText + ".",
-                         "A battery must be recharged before the next calm spell, often by the same wind."],
+          LX.Steelman(act, {
+            title: D.steelman.title, heading: "h4", eyebrow: "Steelman card", frame: true, reveal: "button",
+            sides: [{ key: "for", title: "The strongest case for",
+                      points: ["Longer storage counts for more: PJM counts " + pct(sr["4"], 0) + " of a 4-hour battery's MW, " + pct(sr["8"], 0) + " for 8 hours and " + pct(sr["10"], 0) + " for 10 hours.",
+                               "Steadier wind counts for more: PJM counts " + pct(D.steelman.offshoreWind, 0) + " for offshore wind, against " + byKey.wind.firmLabel + " onshore."] },
+                    { key: "against", title: "The strongest case against",
+                      points: ["Calm spells outlast batteries: the Southwest Power Pool's whole wind fleet stayed below a quarter of its best 2025 hour for " + lullText + ".",
+                               "A battery must be recharged before the next calm spell, often by the same wind."] }],
             onOpen: function (side) {
               sides[side] = true;
               if (sides["for"] && sides.against) { api.done(); keep("steelman", true); api.saw("Both cases rest on real numbers. Settling it for one grid takes many weather years of hourly data and a reliability test: Analyst lesson A5 (upcoming)."); }
@@ -203,7 +204,7 @@
       if (i === 2) click(".lx6-chips .lx-chip", 2);
       if (i === 3) { var d = cards.el.querySelectorAll(".lx-scatter-dot"); if (d[2]) d[2].dispatchEvent(new MouseEvent("click", { bubbles: true })); }
       if (i === 4) click(".lx6-sorter .lx-btn");
-      if (i === 5) { click(".lx6-side .lx-btn", 0); click(".lx6-side .lx-btn", 1); }
+      if (i === 5) { click(".lx-steel-side .lx-btn", 0); click(".lx-steel-side .lx-btn", 1); }
       if (i === 6) click(".lx-choice", 1);
       return { view: "step " + (i + 1) };
     }, cards);
@@ -251,21 +252,6 @@
     chk.addEventListener("click", function () { onCheck(paint()); });
     if (wasChecked) paint();
     return { check: function () { return paint(); } };
-  }
-
-  // ---- lesson-local: the Steelman card (both strongest cases of a contested point)
-  function Steelman(host, o) {
-    var box = H("div", { class: "lx6-steel" }, host);
-    H("p", { class: "lx-eyebrow", text: "Steelman card" }, box); H("h4", { text: o.title }, box);
-    var cols = H("div", { class: "lx6-steel-cols" }, box);
-    [["for", o.forTitle, o.forPts], ["against", o.againstTitle, o.againstPts]].forEach(function (s) {
-      var c = H("div", { class: "lx6-side " + s[0] }, cols);
-      var b = H("button", { class: "lx-btn ghost small", type: "button", "aria-expanded": o.opened[s[0]] ? "true" : "false", text: s[1] }, c);
-      var ul = H("ul", { hidden: !o.opened[s[0]] }, c);
-      s[2].forEach(function (p) { H("li", { html: LX.rich(p) }, ul); });
-      b.addEventListener("click", function () { ul.hidden = false; b.setAttribute("aria-expanded", "true"); o.onOpen(s[0]); });
-    });
-    return { el: box };
   }
 
   // ---------------------------------------------------------------- the explain layer

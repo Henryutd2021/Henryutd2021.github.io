@@ -1,0 +1,8 @@
+/* supplystack.css — LX.SupplyStack (supplystack.js): the supply-stack chart, its legend and text version. */
+.lx-stack { position: relative; }
+.lx-stack svg { display: block; width: 100%; height: auto; }
+.lx-stack text { font-family: var(--lx-f-mono); font-size: 11px; fill: var(--lx-ink-3); }
+.lx-stack text.lab { font-family: var(--lx-f-display); font-size: 12px; font-weight: 500; fill: var(--lx-ink); }
+.lx-stack text.big { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; fill: var(--lx-ink); }
+.lx-stack text.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
+.lx-stack-tail { display: grid; gap: 6px; }

@@ -1,0 +1,11 @@
+/* frontier.css — LX.Frontier (frontier.js): cost against CO₂, the frontier, plan dots, the equal-score line. */
+.lx-frontier { min-width: 0; }
+.lx-frontier svg { display: block; width: 100%; height: auto; }
+.lx-frontier text { font-family: var(--lx-f-mono); font-size: 12px; fill: var(--lx-ink-3); }
+.lx-frontier text.lab { font-family: var(--lx-f-display); font-size: 13px; font-weight: 600; fill: var(--lx-ink); }
+.lx-frontier text.note { font-family: var(--lx-f-body); font-size: 12.5px; fill: var(--lx-ink-3); }
+.lx-frontier .dot.pick { cursor: pointer; }
+.lx-frontier .dot:focus { outline: none; }
+.lx-frontier .dot:focus-visible circle.c { stroke: var(--lx-accent); stroke-width: 4; }
+.lx-frontier-alt table { border-collapse: collapse; font-size: 13.5px; margin-top: 6px; }
+.lx-frontier-alt td, .lx-frontier-alt th { padding: 2px 8px 2px 0; text-align: left; }

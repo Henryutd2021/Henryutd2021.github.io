@@ -86,19 +86,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .lx6-key { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
 .lx6-key .k { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 2px solid var(--lx-good); vertical-align: middle; }
 .lx6-key .k.differ { border-color: var(--lx-warn); } .lx6-key .k.partly { border: 2px dashed var(--lx-line-2); }
-.lx6-steel { border: 1px solid var(--lx-line-2); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: var(--lx-surface-2); }
-.page-learn .lx6-steel h4 { font-size: 18px; margin: 0; }
-.lx6-steel-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.lx6-side { display: grid; gap: 8px; align-content: start; background: var(--lx-surface); border-radius: 10px; padding: 12px; border-top: 3px solid var(--lx-tier-2); }
-.lx6-side.against { border-top-color: var(--lx-tier-4); }
-.lx6-side .lx-btn { justify-self: start; }
-.lx6-side ul { margin: 0; padding-left: 1.1rem; font-size: 14.5px; color: var(--lx-ink-2); display: grid; gap: 6px; }
 .lx-step-act details.lx-textalt { margin: 0; }
 .lx6-sorter .lx-step-foot { flex-wrap: wrap; }
 .lx6-sorter .lx-step-foot .lx-btn { white-space: nowrap; }
 @media (max-width: 640px) {
   #t6-explain .lx-ctable td small { display: none; }
-  .lx6-jobs, .lx6-steel-cols { grid-template-columns: minmax(0, 1fr); }
+  .lx6-jobs { grid-template-columns: minmax(0, 1fr); }
   .lx6-srow { grid-template-columns: minmax(0, 1fr) repeat(3, 48px); gap: 6px; }
   .lx6-srow .nl { font-size: 14px; }
 }

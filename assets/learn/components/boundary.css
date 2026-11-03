@@ -1,0 +1,7 @@
+/* boundary.css — LX.Boundary (boundary.js): "It holds when" and "It leaves out", side by side, and the source line. */
+.lx-bound { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.lx-bound ul { margin: 0; padding-left: 1.1rem; font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-bound li { margin: 4px 0; }
+.page-learn .lx-bound h4 { font-size: 15px; margin: 0 0 4px; }
+.lx-bound-src { font-size: 13.5px; color: var(--lx-ink-3); }
+@media (max-width: 560px) { .lx-bound { grid-template-columns: minmax(0, 1fr); } }

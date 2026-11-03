@@ -90,30 +90,19 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, S = LX.S, LESSON = "07-cost";
-  var COMP = [["capital", "Building the plant", "var(--lx-tier-2)", "building the plant"], ["fom", "Fixed upkeep", "var(--lx-tier-5)", "fixed upkeep"],
-              ["fuel", "Fuel", "var(--lx-tier-4)", "fuel"], ["vom", "Upkeep per MWh", "var(--lx-ink-3)", "upkeep per MWh"]];
+  var PARTS = [{ key: "capital", label: "Building the plant", color: "var(--lx-tier-2)" }, { key: "fom", label: "Fixed upkeep", color: "var(--lx-tier-5)" },
+               { key: "fuel", label: "Fuel", color: "var(--lx-tier-4)" }, { key: "vom", label: "Upkeep per MWh", color: "var(--lx-ink-3)", words: "upkeep per MWh" }];
   function usd(v, d) { return (v < 0 ? "−\u2060$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }); }
   function pct(v, d) { return (v < 0 ? "−" : "") + Math.abs(v).toFixed(d == null ? 1 : d) + "%"; }
 
-  // lesson-local styles (tokens only, so day and night both work); promoted to the shared library later if reused
+  // lesson-local styles (tokens only, so day and night both work); the cost split, tornado and Steelman card are shared components
   function css() {
     if (document.getElementById("lx7-css")) return;
     H("style", { id: "lx7-css", text: [
-      ".lx7-split{display:grid;gap:8px}",
-      ".lx7-srow{display:grid;grid-template-columns:8.5em minmax(0,1fr) 5.2em;align-items:center;gap:10px;width:100%;padding:8px 10px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface);color:var(--lx-ink);cursor:pointer;text-align:left;font:inherit}",
-      ".lx7-srow[aria-pressed=true]{border-color:var(--lx-ink);box-shadow:inset 0 0 0 1px var(--lx-ink)}",
-      ".lx7-nm{display:flex;align-items:center;gap:8px;font-family:var(--lx-f-display);font-weight:500;font-size:14.5px}",
-      ".lx7-nm i,.lx7-key i{width:11px;height:11px;border-radius:3px;background:var(--c);flex:none}",
-      ".lx7-bar{display:flex;height:18px;border-radius:5px;overflow:hidden;background:var(--lx-surface-2)}",
-      ".lx7-bar i{display:block;height:100%;background:var(--c)}",
-      ".lx7-bar i+i{box-shadow:inset 1px 0 0 var(--lx-surface)}",
-      ".lx7-tot{font-family:var(--lx-f-mono);font-weight:600;font-size:15px;text-align:right}",
       ".lx7-detail{font-size:14.5px;color:var(--lx-ink-2)}",
-      ".lx7-key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;color:var(--lx-ink-2)}",
-      ".lx7-key span{display:inline-flex;align-items:center;gap:6px}",
       ".lx7-pv{display:grid;gap:6px}",
       ".lx7-pvrow{display:grid;grid-template-columns:6.2em minmax(0,1fr) 5.5em;gap:10px;align-items:center;font-size:14px}",
-      ".lx7-pvrow .lx7-bar{height:22px}",
+      ".lx7-pvrow .lx-split-bar{height:22px}",
       ".lx7-pvrow b{font-family:var(--lx-f-mono);font-weight:600;text-align:right}",
       ".lx7-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}",
       ".lx7-tile{border:1px solid var(--lx-line);border-radius:10px;padding:8px 12px;background:var(--lx-surface-2);display:grid;gap:2px}",
@@ -126,58 +115,16 @@
       ".lx7-chart{position:relative}.lx7-chart svg{display:block;width:100%;height:auto}",
       ".lx7-chart text{font-family:var(--lx-f-mono);font-size:11px;fill:var(--lx-ink-3)}",
       ".lx7-chart text.lab{font-family:var(--lx-f-body);font-size:12px;fill:var(--lx-ink-2)}",
-      ".lx7-torn{display:grid;gap:6px}",
-      ".lx7-trow{display:grid;grid-template-columns:8.6em minmax(0,1fr);gap:10px;align-items:center;font-size:14px}",
-      ".lx7-trow>span{font-family:var(--lx-f-display);font-weight:500}",
-      ".lx7-trow small{display:block;font-family:var(--lx-f-body);font-weight:400;font-size:12px;color:var(--lx-ink-3)}",
-      ".lx7-tbar{position:relative;height:30px;border-radius:6px;background:var(--lx-surface-2)}",
-      ".lx7-tbar i{position:absolute;top:5px;bottom:5px;border-radius:4px}",
-      ".lx7-tbar i.lo{background:color-mix(in srgb,var(--lx-good) 70%,var(--lx-surface))}",
-      ".lx7-tbar i.hi{background:color-mix(in srgb,var(--lx-bad) 70%,var(--lx-surface))}",
-      ".lx7-tbar em{position:absolute;top:6px;font-style:normal;font-family:var(--lx-f-mono);font-size:11.5px;color:var(--lx-ink);white-space:nowrap}",
-      ".lx7-tbar .mid{position:absolute;top:0;bottom:0;width:2px;background:var(--lx-ink)}",
       ".lx7-tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
       ".lx7-eq{font-family:var(--lx-f-mono);font-size:16px;line-height:2.1;color:var(--lx-ink);display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}",
       ".lx7-eq button{font:inherit;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);border-radius:8px;padding:0 8px;min-height:36px;cursor:pointer}",
       ".lx7-eq button[aria-pressed=true]{background:var(--lx-ink);color:var(--lx-bg);border-color:var(--lx-ink)}",
       ".lx7-frac{display:inline-grid;text-align:center;vertical-align:middle}",
       ".lx7-frac>span:first-child{border-bottom:2px solid var(--lx-ink);padding-bottom:2px}",
-      ".lx7-steel{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}",
-      ".lx7-steel>div{border:1px solid var(--lx-line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;background:var(--lx-surface-2)}",
-      ".lx7-steel h4{font-size:15.5px;margin:0}",
-      ".lx7-steel ul{margin:0;padding-left:1.1rem;font-size:14.5px;color:var(--lx-ink-2)}",
-      "@media (max-width:560px){.lx7-srow{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'n t' 'b b'}.lx7-srow .lx7-nm{grid-area:n}.lx7-srow .lx7-tot{grid-area:t}.lx7-srow .lx7-bar{grid-area:b}",
-      ".lx7-trow{grid-template-columns:minmax(0,1fr)}.lx7-pvrow{grid-template-columns:4.6em minmax(0,1fr) 4.8em}.lx7-big b{font-size:26px}}"
+      "@media (max-width:560px){.lx7-pvrow{grid-template-columns:4.6em minmax(0,1fr) 4.8em}.lx7-big b{font-size:26px}}"
     ].join("\n") }, document.head);
   }
 
-  // a slider with the library's look (controls.css) that keeps decimal steps exact and formats its own value
-  function Slider(host, o) {
-    var id = LX.uid("sl7"), dec = (String(o.step).split(".")[1] || "").length, val = o.value;
-    var w = H("div", { class: "lx-ctl", style: "--c:" + (o.color || "var(--lx-ink)") }, host);
-    var top = H("div", { class: "lx-ctl-top" }, w), lab = H("label", { for: id }, top); H("i", null, lab); H("span", { text: o.label }, lab);
-    var out = H("output", { for: id }, top), row = H("div", { class: "lx-ctl-row" }, w);
-    var minus = H("button", { type: "button", "aria-label": "Lower " + o.label, text: "−" }, row);
-    var tr = H("div", { class: "lx-ctl-track" }, row); H("div", { class: "lx-ctl-rail" }, tr);
-    var band = H("div", { class: "lx-ctl-band" }, tr), fill = H("div", { class: "lx-ctl-fill" }, tr);
-    var inp = H("input", { type: "range", id: id, min: o.min, max: o.max, step: o.step }, tr);
-    var plus = H("button", { type: "button", "aria-label": "Raise " + o.label, text: "+" }, row);
-    var hint = H("p", { class: "lx-ctl-hint" }, w);
-    function snap(v) { v = Math.min(o.max, Math.max(o.min, v)); return +((Math.round((v - o.min) / o.step) * o.step + o.min).toFixed(dec)); }
-    function pos(v) { var W = tr.clientWidth || 200; return (13 + (v - o.min) / (o.max - o.min) * (W - 26)) / W * 100; }
-    function paint() {
-      inp.value = val; out.textContent = o.fmt(val); inp.setAttribute("aria-valuetext", o.fmt(val));
-      band.style.left = "calc(" + pos(o.min) + "% - 4px)"; band.style.width = "calc(" + (pos(o.max) - pos(o.min)) + "% + 8px)";
-      fill.style.width = pos(val) + "%"; hint.innerHTML = o.hint ? LX.rich(o.hint(val)) : "";
-    }
-    function user(v) { var c = snap(v); if (c === val) return; val = c; paint(); if (o.onChange) o.onChange(val); }
-    inp.addEventListener("input", function () { user(+inp.value); });
-    minus.addEventListener("click", function () { user(val - o.step); });
-    plus.addEventListener("click", function () { user(val + o.step); });
-    if (window.ResizeObserver) new ResizeObserver(paint).observe(tr);
-    paint();
-    return { el: w, val: function () { return val; }, set: function (v) { val = v; paint(); }, hint: paint };
-  }
   function seg(host, label, opts, cur, on) {
     var g = H("div", { class: "lx-seg", role: "group", "aria-label": label }, host), bs = {};
     opts.forEach(function (op) {
@@ -187,13 +134,8 @@
     return g;
   }
   function textAlt(host, title) { var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: title || "Text version" }, d); var b = H("div", null, d); return b; }
-  function key(host) { var k = H("div", { class: "lx7-key", "aria-hidden": "true" }, host); COMP.forEach(function (c) { var s = H("span", null, k); H("i", { style: "--c:" + c[2] }, s); H("span", { text: c[1] }, s); }); return k; }
-  function bar(host, L, scale) {
-    var b = H("span", { class: "lx7-bar", "aria-hidden": "true" }, host);
-    COMP.forEach(function (c) { if (L[c[0]] > 0.005) H("i", { style: "--c:" + c[2] + ";width:" + (L[c[0]] / scale * 100) + "%" }, b); });
-    return b;
-  }
-  function splitText(L) { return COMP.filter(function (c) { return L[c[0]] > 0.005; }).map(function (c) { return c[3] + " " + usd(L[c[0]]); }).join(", "); }
+  function splitText(L) { return LX.CostSplit.text(PARTS, L, usd); }
+  function splitRow(k, L, T) { return { key: k, label: T[k].short, color: T[k].color, values: L, total: L.total, aria: T[k].label + ": " + usd(L.total) + " per MWh; " + splitText(L) }; }
 
   function view(live, data, root) {
     css();
@@ -217,25 +159,20 @@
       // 2 the four-part split
       { text: "Every MWh carries four costs: building the plant, fixed upkeep, fuel, and upkeep that grows with output. Tap each plant to see how its cost per MWh splits, at U.S. averages.",
         build: function (act, api) {
-          var box = H("div", { class: "lx7-split" }, act), det = H("p", { class: "lx7-detail", "aria-live": "polite" }, act), seen = {};
-          var scale = Math.max.apply(null, model.TECHS.map(function (k) { return base[k].total; })) * 1.04;
-          key(act);
-          var rows = {};
-          model.TECHS.forEach(function (k) {
-            var L = base[k], b = H("button", { type: "button", class: "lx7-srow", "aria-pressed": "false", "aria-label": T[k].label + ": " + usd(L.total) + " per MWh; " + splitText(L) }, box);
-            var nm = H("span", { class: "lx7-nm" }, b); H("i", { style: "--c:" + T[k].color }, nm); H("span", { text: T[k].short }, nm);
-            bar(b, L, scale); H("span", { class: "lx7-tot", text: usd(L.total, 0) }, b);
-            rows[k] = b;
-            b.addEventListener("click", function () {
-              Object.keys(rows).forEach(function (j) { rows[j].setAttribute("aria-pressed", j === k ? "true" : "false"); });
+          var seen = {}, det;
+          var split = LX.CostSplit(act, { parts: PARTS, key: false, fmt: function (v) { return usd(v, 0); },
+            rows: model.TECHS.map(function (k) { return splitRow(k, base[k], T); }),
+            onPick: function (k) {
+              var L = base[k];
               seen[k] = 1;
               det.innerHTML = LX.rich("**" + T[k].label + "**: " + usd(L.total) + "/MWh at a " + pct(T[k].cf) + " [[capacity-factor|capacity factor]]: " + splitText(L) + ".").replace(/\*\*(.+?)\*\*/, "<b>$1</b>");
               if (Object.keys(seen).length >= 3) {
                 api.done();
                 api.saw("Wind and solar are almost all building cost; the combined-cycle plant is mostly fuel. The peaker runs only " + pct(T.peaker.cf) + " of the year, so each of its MWh carries " + usd(base.peaker.capital) + " of building cost.");
               }
-            });
-          });
+            } });
+          det = H("p", { class: "lx7-detail", "aria-live": "polite" }, act);
+          split.key(act);
           var alt = textAlt(act);
           var ul = H("ul", null, alt);
           model.TECHS.forEach(function (k) { H("li", { text: T[k].label + ": " + usd(base[k].total) + " per MWh (" + splitText(base[k]) + ")." }, ul); });
@@ -244,7 +181,7 @@
       { text: "A dollar later is worth less than a dollar now: today's dollar could earn a return meanwhile. Slide the [[discount-rate|discount rate]] and see what $100 paid in 10, 20 or 30 years is worth today.",
         build: function (act, api) {
           var Dd = D.discount, rows = H("div", { class: "lx7-pv" }, act);
-          var sl = Slider(act, { label: "Discount rate", color: "var(--lx-tier-2)", min: 0, max: Dd.rateMax, step: 0.5, value: Dd.rate, fmt: function (v) { return v.toFixed(1) + "% a year"; }, onChange: function () { draw(true); } });
+          var sl = LX.Slider(act, { label: "Discount rate", color: "var(--lx-tier-2)", min: 0, max: Dd.rateMax, step: 0.5, value: Dd.rate, fmt: function (v) { return v.toFixed(1) + "% a year"; }, onChange: function () { draw(true); } });
           var alt = textAlt(act);
           function draw(user) {
             var r = sl.val() / 100; rows.innerHTML = ""; alt.innerHTML = "";
@@ -252,7 +189,7 @@
             Dd.years.forEach(function (y) {
               var v = pv(Dd.amount, r, y), rw = H("div", { class: "lx7-pvrow" }, rows);
               H("span", { text: y === 0 ? "Today" : "In " + y + " years" }, rw);
-              var b = H("span", { class: "lx7-bar", "aria-hidden": "true" }, rw); H("i", { style: "--c:var(--lx-tier-2);width:" + v + "%" }, b);
+              LX.CostSplit.bar(rw, [{ color: "var(--lx-tier-2)", value: v }], 100);
               H("b", { text: usd(v) }, rw);
               H("li", { text: "$100 " + (y === 0 ? "today" : "in " + y + " years") + " is worth " + usd(v) + " today at " + sl.val().toFixed(1) + "%." }, ul);
             });
@@ -266,15 +203,15 @@
       // 4 WACC
       { text: "Where does the rate come from? A plant is paid for with loans and with owners' money, and owners take more risk, so they want more. The blend is the [[wacc|WACC]]. Slide the loan share.",
         build: function (act, api) {
-          var tiles = H("div", { class: "lx7-grid" }, act), mix = H("span", { class: "lx7-bar", "aria-hidden": "true", style: "height:14px" }, act);
-          var sl = Slider(act, { label: "Share paid with loans", color: "var(--lx-tier-5)", min: 0, max: 80, step: 5, value: fin.debtShare, fmt: function (v) { return v + "%"; },
+          var tiles = H("div", { class: "lx7-grid" }, act), mix = LX.CostSplit.bar(act, [], 100, { height: 14 });
+          var sl = LX.Slider(act, { label: "Share paid with loans", color: "var(--lx-tier-5)", min: 0, max: 80, step: 5, value: fin.debtShare, fmt: function (v) { return v + "%"; },
             hint: function () { return "Loans at " + fin.debtRate + "%, owners at " + fin.equityRate + "% (illustrative); inflation " + fin.inflation + "%."; }, onChange: draw });
           var tW = tile("Blend (WACC)"), tR = tile("After inflation (real)"), tWi = tile("Wind LCOE"), tC = tile("Gas CC LCOE");
           function tile(l) { var t = H("div", { class: "lx7-tile", "aria-live": "polite" }, tiles); H("span", { text: l }, t); return { b: H("b", null, t), s: H("small", null, t) }; }
           var allEq = blend(fin, 0), wEq = lcoe(inputs(D, "wind", { wacc: allEq.real })).total, cEq = lcoe(inputs(D, "cc", { wacc: allEq.real })).total;
           function draw(user) {
             var b = blend(fin, sl.val()), w = lcoe(inputs(D, "wind", { wacc: b.real })).total, c = lcoe(inputs(D, "cc", { wacc: b.real })).total;
-            mix.innerHTML = ""; H("i", { style: "--c:var(--lx-tier-5);width:" + sl.val() + "%" }, mix); H("i", { style: "--c:var(--lx-tier-3);width:" + (100 - sl.val()) + "%" }, mix);
+            LX.CostSplit.fill(mix, [{ color: "var(--lx-tier-5)", value: sl.val() }, { color: "var(--lx-tier-3)", value: 100 - sl.val() }], 100);
             tW.b.textContent = pct(b.nominal, 2); tW.s.textContent = sl.val() + "% loans, " + (100 - sl.val()) + "% owners";
             tR.b.textContent = pct(b.real, 2); tR.s.textContent = "the rate LCOE uses here";
             tWi.b.textContent = usd(w); tWi.s.textContent = "all owners' money: " + usd(wEq);
@@ -292,7 +229,7 @@
           var p = inputs(D, "wind"), L = lcoe(p), chart = H("div", { class: "lx7-chart" }, act), tiles = H("div", { class: "lx7-grid" }, act);
           var tC = tile("Discounted costs, per kW"), tR = tile("Discounted sales, per kW"), tN = tile("Left at year " + p.life);
           function tile(l) { var t = H("div", { class: "lx7-tile", "aria-live": "polite" }, tiles); H("span", { text: l }, t); return H("b", null, t); }
-          var sl = Slider(act, { label: "Price the wind farm is paid", color: T.wind.color, min: 20, max: 80, step: 0.5, value: 30, fmt: function (v) { return "$" + v.toFixed(2) + "/MWh"; }, onChange: function () { draw(true); } });
+          var sl = LX.Slider(act, { label: "Price the wind farm is paid", color: T.wind.color, min: 20, max: 80, step: 0.5, value: 30, fmt: function (v) { return "$" + v.toFixed(2) + "/MWh"; }, onChange: function () { draw(true); } });
           var alt = textAlt(act), svg = null;
           function draw(user) {
             var price = sl.val(), N = npv(p, price), W = Math.max(280, chart.clientWidth || 600), Hh = W < 480 ? 180 : 210, m = { l: 62, r: 10, t: 12, b: 24 };
@@ -338,24 +275,11 @@
             } });
           var tabs = H("div", { class: "lx7-tabs" }, out);
           seg(tabs, "Plant", model.TECHS.map(function (k) { return [k, T[k].short]; }), "wind", function (k) { S_.torn = k; drawT(); });
-          var tb = H("div", { class: "lx7-torn" }, out), note = H("p", { class: "lx-hint" }, out), alt = textAlt(out);
+          var tc = LX.Tornado(out, { fmt: function (v) { return usd(v, 0); }, fmtAlt: function (v) { return usd(v); }, measure: "LCOE" });
           function drawT() {
-            var k = S_.torn, tw = tornado(D, k), lo = Math.min.apply(null, tw.rows.map(function (r) { return r.min; })), hi = Math.max.apply(null, tw.rows.map(function (r) { return r.max; }));
-            var pad = (hi - lo) * 0.28 + 1, a = lo - pad, b = hi + pad, X = function (v) { return (v - a) / (b - a) * 100; };
-            tb.innerHTML = ""; alt.innerHTML = "";
-            var ul = H("ul", null, alt);
-            H("p", { class: "lx7-detail", html: "<b>" + LX.esc(T[k].label) + "</b>: " + usd(tw.base) + "/MWh at the defaults (black line)." }, tb);
-            tw.rows.forEach(function (r) {
-              var rw = H("div", { class: "lx7-trow" }, tb), lab = H("span", { text: r.label }, rw); H("small", { text: r.loText + " to " + r.hiText }, lab);
-              var br = H("div", { class: "lx7-tbar", "aria-hidden": "true" }, rw);
-              H("i", { class: "lo", style: "left:" + X(r.min) + "%;width:" + (X(tw.base) - X(r.min)) + "%" }, br);
-              H("i", { class: "hi", style: "left:" + X(tw.base) + "%;width:" + (X(r.max) - X(tw.base)) + "%" }, br);
-              H("span", { class: "mid", style: "left:" + X(tw.base) + "%" }, br);
-              H("em", { text: usd(r.min, 0), style: "right:" + (100 - X(r.min) + 1) + "%" }, br);
-              H("em", { text: usd(r.max, 0), style: "left:" + (X(r.max) + 1) + "%" }, br);
-              H("li", { text: r.label + " from " + r.loText + " to " + r.hiText + ": LCOE " + usd(r.atLo) + " to " + usd(r.atHi) + "." }, ul);
-            });
-            note.textContent = T[k].cfNote + " " + D.tornadoRanges.note + (T[k].heatRate ? " " + D.fuel.gasNote : "");
+            var k = S_.torn, tw = tornado(D, k);
+            tc.draw({ base: tw.base, rows: tw.rows, lede: "**" + T[k].label + "**: " + usd(tw.base) + "/MWh at the defaults (black line).",
+                      note: T[k].cfNote + " " + D.tornadoRanges.note + (T[k].heatRate ? " " + D.fuel.gasNote : "") });
           }
         } },
       // 8 when the energy arrives
@@ -367,14 +291,20 @@
     function calculator(act, api) {
       var c = S_.calc, top = H("div", { class: "lx7-tabs" }, act), sliders = H("div", { style: "display:grid;gap:12px" }, act);
       seg(top, "Plant", model.TECHS.map(function (k) { return [k, T[k].short]; }), c.tech, function (k) { c.tech = k; build(); });
-      var big = H("div", { class: "lx7-big", "aria-live": "polite" }, act), sb = H("div", { class: "lx7-split" }, act); key(act);
+      var big = H("div", { class: "lx7-big", "aria-live": "polite" }, act), sb = LX.CostSplit(act, { parts: PARTS, fmt: function (v) { return usd(v, 0); } });
       var foot = H("p", { class: "lx-hint" }, act), reset = H("button", { class: "lx-link", type: "button", text: "Back to the defaults" }, act);
       var alt = textAlt(act), sl = {};
       reset.addEventListener("click", function () { S_.over[c.tech] = {}; build(); });
       function cur() { return inputs(D, c.tech, S_.over[c.tech]); }
       function build() {
         sliders.innerHTML = ""; var k = c.tech, t = T[k], p = cur();
-        function add(name, o) { sl[name] = Slider(sliders, Object.assign({ color: t.color, value: p[name], onChange: function (v) { S_.over[k][name] = v; draw(true); } }, o)); }
+        // EIA's default can sit between two steps of a slider (a capacity factor of 33.8% on a 0.5% grid): it is shown as it
+        // is until the reader moves the slider; LX.Slider itself keeps values on its grid
+        function add(name, o) {
+          var v0 = p[name], moved = false, f = o.fmt;
+          sl[name] = LX.Slider(sliders, Object.assign({ color: t.color, value: v0, onChange: function (v) { moved = true; S_.over[k][name] = v; draw(true); } }, o,
+            { fmt: function (v) { return f(!moved && Math.abs(v - v0) < o.step / 2 ? v0 : v); } }));
+        }
         add("capex", { label: "Building cost", min: Math.round(t.capex * 0.5 / 10) * 10, max: Math.round(t.capex * 1.5 / 10) * 10, step: 10, fmt: function (v) { return usd(v, 0) + "/kW"; },
           hint: function () { return "Default " + usd(t.capex, 0) + "/kW: EIA's AEO2026 overnight cost."; } });
         add("cf", { label: "Capacity factor", min: 5, max: 95, step: 0.5, fmt: function (v) { return pct(v); }, hint: function () { return t.cfNote; } });
@@ -385,9 +315,7 @@
       function draw(user) {
         var k = c.tech, p = cur(), L = lcoe(p), t = T[k];
         big.innerHTML = ""; H("b", { text: usd(L.total) }, big); H("span", { text: "per MWh · " + t.label }, big);
-        sb.innerHTML = "";
-        var row = H("div", { class: "lx7-srow", style: "cursor:default" }, sb), nm = H("span", { class: "lx7-nm" }, row); H("i", { style: "--c:" + t.color }, nm); H("span", { text: t.short }, nm);
-        bar(row, L, Math.max(L.total, 120)); H("span", { class: "lx7-tot", text: usd(L.total, 0) }, row);
+        sb.set([splitRow(k, L, T)], Math.max(L.total, 120));
         foot.textContent = "Capital recovery factor " + L.crf.toFixed(4) + " · " + L.E.toFixed(3) + " MWh per kW per year · " + fin.life + "-year life. No taxes, credits or grid costs.";
         alt.innerHTML = ""; H("p", { text: t.label + ": LCOE " + usd(L.total) + " per MWh = " + splitText(L) + "." }, alt);
         LX.store.set("c7-calc", { tech: k, inputs: p, L: L });
@@ -401,8 +329,8 @@
       var B = D.blindspot, chart = H("div", { class: "lx7-chart" }, act), tiles = H("div", { class: "lx7-grid" }, act);
       function tile(l, col) { var t = H("div", { class: "lx7-tile", "aria-live": "polite", style: "border-left:4px solid " + col }, tiles); H("span", { text: l }, t); return { b: H("b", null, t), s: H("small", null, t) }; }
       var tS = tile("A solar MWh saves", T.solar.color), tW = tile("A wind MWh saves", T.wind.color), tF = tile("A round-the-clock MWh saves", "var(--lx-ink-3)");
-      var sl = Slider(act, { label: "Solar farm size", color: T.solar.color, min: B.solarMW, max: B.solarMax, step: B.solarStep, value: B.solarMW, fmt: function (v) { return v + " MW"; },
-        hint: function (v) { return v === B.solarMW ? "Prairie Town's solar farm today." : "Its LCOE stays the same at every size: same panels, same sun."; }, onChange: function () { draw(true); } });
+      var sl = LX.Slider(act, { label: "Solar farm size", color: T.solar.color, min: B.solarMW, max: B.solarMax, step: B.solarStep, value: B.solarMW, fmt: function (v) { return v + " MW"; },
+        hint: function (lo, hi, max, v) { return v === B.solarMW ? "Prairie Town's solar farm today." : "Its LCOE stays the same at every size: same panels, same sun."; }, onChange: function () { draw(true); } });
       var legend = H("div", { class: "lx-legend", "aria-hidden": "true" }, act);
       [["Solar output", T.solar.color], ["Wind output", T.wind.color], ["Saves $40 (combined-cycle last)", "var(--lx-cc)"], ["Saves $100 (peaker last)", "var(--lx-pk)"], ["Saves $0 (sun or wind spilled)", "var(--lx-line-2)"]]
         .forEach(function (l) { var s = H("span", null, legend); H("i", { style: "--c:" + l[1] }, s); H("span", { text: l[0] }, s); });
@@ -458,7 +386,7 @@
       cards.go(i);
       var card = cards.el;
       if (i === 0) { var b = card.querySelector(".lx-choice"); if (b) b.click(); }
-      if (i === 1) card.querySelectorAll(".lx7-srow").forEach(function (b, j) { if (j < 3) b.click(); });
+      if (i === 1) card.querySelectorAll(".lx-split-row").forEach(function (b, j) { if (j < 3) b.click(); });
       if (i === 6) { var c = card.querySelectorAll(".lx-choice")[1]; if (c) c.click(); }
       if (i === 7) { var pl = card.querySelectorAll(".lx-ctl-row button")[1]; for (var k = 0; k < 4; k++) pl.click(); }
       if (i >= 2 && i <= 5) { var pls = card.querySelector(".lx-ctl-row button:last-child"); if (pls) for (var q = 0; q < (i === 4 ? 30 : 2); q++) pls.click(); }
@@ -532,13 +460,12 @@
       note: "Wind's LCOE rises " + pct((Lw.total / base.wind.total - 1) * 100) + ", the combined-cycle plant's " + pct((Lc.total / base.cc.total - 1) * 100) + ". Financing conditions can change which plant looks cheapest."
     });
     // 4 steelman: is LCOE a fair yardstick?
-    var c4 = H("div", { class: "lx-xcard" }, host), h4 = H("header", { class: "lx-x-head" }, c4);
-    H("h3", { text: "Is LCOE a fair yardstick? The strongest case on each side" }, h4);
-    var st = H("div", { class: "lx7-steel" }, c4);
-    function side(t, items) { var d = H("div", null, st); H("h4", { text: t }, d); var ul = H("ul", null, d); items.forEach(function (x) { H("li", { html: LX.rich(x) }, ul); }); }
-    side("For: a common, checkable yardstick", ["One number per plant, built from public inputs anyone can audit.", "Comparable across studies when the basis (dollars, rate, life) is stated.", "A good first screen of what a plant costs to make power."]);
-    side("Against: it misses what the grid buys", ["It ignores when and where the MWh arrive, and how firm they are.", "It leaves out grid, balancing and backup costs that a plant imposes on others.", "EIA warns that direct LCOE comparisons across technologies are misleading, and pairs LCOE with a value measure."]);
-    H("p", { class: "lx-hint", text: "Both are true at once: LCOE answers \"what does a MWh cost to make?\", not \"what is a MWh worth?\". Lesson 8 asks what it is worth, hour by hour." }, c4);
+    LX.Steelman(H("div", { class: "lx-xcard" }, host), {
+      title: "Is LCOE a fair yardstick? The strongest case on each side",
+      sides: [{ key: "for", title: "For: a common, checkable yardstick", points: ["One number per plant, built from public inputs anyone can audit.", "Comparable across studies when the basis (dollars, rate, life) is stated.", "A good first screen of what a plant costs to make power."] },
+              { key: "against", title: "Against: it misses what the grid buys", points: ["It ignores when and where the MWh arrive, and how firm they are.", "It leaves out grid, balancing and backup costs that a plant imposes on others.", "EIA warns that direct LCOE comparisons across technologies are misleading, and pairs LCOE with a value measure."] }],
+      note: "Both are true at once: LCOE answers \"what does a MWh cost to make?\", not \"what is a MWh worth?\". Lesson 8 asks what it is worth, hour by hour."
+    });
   }
 
   LX.mount("cost", function (live, data, root) { view(live, data, root); });
