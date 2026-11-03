@@ -11,6 +11,8 @@
 //     income-graduated charge or a 34.5% share; the solved plan meets its limits on the seven weeks
 //   - the fallback table, the Go deeper numbers, the myths, the quick question, the numbers to remember, the practice
 //   - wording: illustrative labels, sources with dates, the radar's text version
+//   - the re-solve behind the sliders (M.resolver, fake timers): 260 ms debounce, a newer change aborts a running solve,
+//     stale results are dropped, Next is held until the newest result, results are announced in a live region
 // Usage (from the site folder):  node _tests/learn/test_a22-tradeoff-explorer.js
 "use strict";
 const fs = require("fs");
@@ -198,6 +200,50 @@ function val(m, axis, defs) {
   ok(!/nuclear[^.]*\b(credit|screen|order|deliver|timing|buyer|siting|threshold|subsid|learning)/i.test(JSON.stringify(A) + JS.replace(/\/\/[^\n]*/g, "")), "no nuclear sentence with a deny-listed risk word");
   ok(page.includes("data-learn=\"tradeoff-explorer\"") && /LX\.mount\("tradeoff-explorer"/.test(JS), "the page and the script share a slug");
   ok(!/13-capstone\.js(?!on)/.test(page) && /<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>/.test(page), "the page uses the shared planning engine in learn.js, not lesson 13's script");
+
+  // ---------------- the re-solve behind the sliders: debounced, cancellable, newest result only (M.resolver, fake timers)
+  {
+    let now = 0, timers = [], tid = 0;
+    const clock = { setTimeout: (f, ms) => { timers.push({ id: ++tid, at: now + ms, f }); return tid; }, clearTimeout: id => { timers = timers.filter(t => t.id !== id); } };
+    const flush = () => new Promise(r => setImmediate(r));
+    async function advance(ms) {
+      now += ms;
+      for (;;) { const due = timers.filter(t => t.at <= now).sort((a, b) => a.at - b.at)[0]; if (!due) break; timers = timers.filter(t => t !== due); due.f(); await flush(); }
+      await flush();
+    }
+    const jobs = [], log = [], busy = [];
+    let aborted = 0;
+    const R = M.resolver(Object.assign({ delay: 260, AbortController,
+      job: (x, signal) => { let res; const pr = new Promise(r => { res = r; }); const j = { x, signal, res, aborts: 0 }; signal.addEventListener("abort", () => { j.aborts++; }); jobs.push(j); return pr; },
+      done: (r, x) => log.push([r, x]), busy: on => busy.push(on), aborted: () => { aborted++; } }, clock));
+    R.set("a"); await advance(100); R.set("b"); await advance(100); R.set("c");
+    ok(jobs.length === 0 && busy.join() === "true" && R.busy() && R.pending(), "re-solve: changes within 260 ms only restart the wait (no solve yet; Next held from the first change)");
+    await advance(259); ok(jobs.length === 0, "re-solve: nothing runs before 260 ms of quiet");
+    await advance(1); ok(jobs.length === 1 && jobs[0].x === "c", "re-solve: after the pause only the newest change is solved");
+    R.set("d");
+    ok(jobs[0].signal.aborted && jobs[0].aborts === 1 && aborted === 1, "re-solve: a newer change aborts the solve already running (its AbortSignal), and the page may restart the solver");
+    await advance(260); ok(jobs.length === 2 && jobs[1].x === "d" && !jobs[1].signal.aborted, "re-solve: the newer change is solved after its own pause");
+    jobs[0].res("late result for c"); await flush();
+    ok(log.length === 0 && busy.join() === "true", "re-solve: a stale result (the aborted solve answering late) is dropped and Next stays held");
+    jobs[1].res("result for d"); await flush();
+    ok(log.length === 1 && log[0][0] === "result for d" && log[0][1] === "d" && busy.join() === "true,false" && !R.busy() && !R.pending(), "re-solve: the newest result is delivered once, and Next is released just before it");
+    R.set("e", true); ok(jobs.length === 2, "re-solve: set(x, true) skips the pause but still runs from the timer queue");
+    await advance(0); ok(jobs.length === 3 && jobs[2].x === "e", "re-solve: a reset to a stored plan runs at once");
+    R.set("f"); ok(jobs[2].signal.aborted && aborted === 2, "re-solve: a change during that solve aborts it");
+    await advance(260); jobs[3].res("result for f"); await flush(); jobs[2].res("result for e"); await flush();
+    ok(log.length === 2 && log[1][1] === "f" && log.every(l => l[1] !== "e"), "re-solve: results that arrive out of order never overwrite a newer plan");
+    R.set("g"); R.cancel(); await advance(1000);
+    ok(jobs.length === 4 && !R.busy() && busy[busy.length - 1] === false && aborted === 2, "re-solve: cancel() drops a waiting change without a solve and releases Next");
+    const R2 = M.resolver(Object.assign({ delay: 260, AbortController, job: () => ({ m: "stored" }), done: (r, x) => log.push([r, x]), busy: on => busy.push(on), fail: () => log.push(["fail"]) }, clock));
+    R2.set("lib"); await advance(260);
+    ok(log[log.length - 1][0].m === "stored" && !R2.busy(), "re-solve: a job that answers at once (a stored plan) is delivered too");
+    const R3 = M.resolver(Object.assign({ delay: 260, AbortController, job: () => { throw new Error("bad"); }, done: () => log.push(["done"]), fail: (e, x) => log.push(["fail", x]) }, clock));
+    R3.set("boom"); await advance(260);
+    ok(log[log.length - 1][0] === "fail" && log[log.length - 1][1] === "boom" && !R3.busy(), "re-solve: a job that throws reaches fail() and releases Next");
+    ok(/M\.resolver\(\{\s*delay: 260/.test(JS) && /signal: signal \}\)/.test(JS) && /key: "a22-plan"/.test(JS) && /class: "lx-sr", "aria-live": "polite"/.test(JS) && /said\.textContent = "Your plan, run through 2025: "/.test(JS),
+       "the page re-solves through the resolver with the solver's AbortSignal, and announces each new result in a live region");
+    ok(!/S_\.seq/.test(JS) && !/timer = setTimeout\(run/.test(JS), "the page keeps no second re-solve path");
+  }
 
   console.log(`${checks - fails} of ${checks} checks passed`);
   process.exit(fails ? 1 : 0);
