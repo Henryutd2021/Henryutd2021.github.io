@@ -125,6 +125,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "capacity-credit": {
+  "term": "Capacity credit",
+  "short": "The share of a plant's size that planners count on to meet the year's peak, judged by how much it lowers the risk of a shortage.",
+  "lesson": "CK-M",
+  "href": "ck-m-unseen-problem.html"
+ },
  "capacity-expansion": {
   "term": "Capacity expansion model",
   "short": "An optimization model that decides what to build, as well as how to run it, at least cost.",

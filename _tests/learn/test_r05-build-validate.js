@@ -60,7 +60,7 @@ function put(text, name, body) {
   const D = M.days(town, year, J), sol = {}, raw = {};
   M.ORDER.forEach(k => {
     const R = M.RUNS[k], m = M.runModel(k, D, J, sol), r = core.solveWith(highs, m);
-    raw[k] = r; sol[k] = M.summarize(D[R.day], J, r, { battery: R.battery, bug: R.bug });
+    raw[k] = r; sol[k] = M.summarize(D[R.day], J, r, { battery: R.battery, bug: R.bug, tie: R.tie });
     ok(sol[k].ok, `run ${k}: solved to optimal (${r.status})`);
   });
   if (process.argv.includes("--ref")) {
@@ -68,7 +68,7 @@ function put(text, name, body) {
     const out = JSON.parse(fs.readFileSync(DATA, "utf8")); out.ref = J.ref;
     fs.writeFileSync(DATA, JSON.stringify(out, null, 2) + "\n"); console.log("wrote ref for", Object.keys(J.ref).length, "runs");
   }
-  const x = M.numbers(J, sol), v = M.vals(J, x);
+  const x = M.numbers(J, sol, D), v = M.vals(J, x);
   if (process.argv.includes("--write")) {
     let page = fs.readFileSync(PAGE, "utf8"); const B = blocks(v);
     Object.keys(B).forEach(k => { page = put(page, k, B[k]); });
@@ -128,8 +128,28 @@ function put(text, name, body) {
     ok(near(x.missing, x.ok) && x.missingRamp > 40 && x.rampRows === 24 && x.rampRowsMissing === 0, `missing: same saving ${v.missing}; gas plant climbs ${x.missingRamp} MW in an hour; ramp rows ${x.rampRows} → ${x.rampRowsMissing}`);
     ok(near(x.l0base, 104000) && near(x.l0missingBase, 102600) && near(x.l0ok, 1286.49, 0.006) && near(x.l0missing, 0), `missing on 3 September: ${v.l0missingBase} instead of ${v.l0base}; saving ${v.l0missing} instead of ${v.l0ok}`);
     ok(sol.l0missingBase.maxRamp > 40, "missing on 3 September: the plan without ramp rows climbs faster than 40 MW an hour");
-    ok(near(x.honest, 2100) && x.honest < x.ok && x.honestShare === 26, `leak: planned the day before ${v.honest}, ${x.honestShare}% of ${v.ok}`);
-    ok(near(sol.honest.unserved, 0) && sol.honest.rows.every((w, t) => near(w.c, sol.plan.rows[t].c) && near(w.dis, sol.plan.rows[t].dis)), "leak: the honest run follows the plan's schedule and serves all demand");
+    ok(near(x.honest, 3600) && x.honest < x.ok && x.honestShare === 44, `leak: planned the day before ${v.honest}, ${x.honestShare}% of ${v.ok}`);
+    ok(near(sol.honest.unserved, 0) && sol.honest.rows.every((w, t) => near(w.c, sol.planKeep.rows[t].c) && near(w.dis, sol.planKeep.rows[t].dis)), "leak: the honest run follows the tie rule's schedule and serves all demand");
+    // the tie rule: the day-before plan has many least-cost schedules; the rule's plan costs the same and is the only one
+    ok(near(x.planKeepCost, x.planCost, 0.006) && near(x.planEarlyCost, x.planCost, 0.006) && near(x.planCost, 218050), `tie: both rules' plans cost the same on 19 August (${v.planCost})`);
+    ok(near(x.honestEarly, 300) && x.honestEarly < x.honest, `tie: the plan that empties the battery first saves only ${v.honestEarly} on 20 August`);
+    {
+      const m2 = M.runModel("planKeep", D, J, sol), r2 = core.solveWith(highs, m2), c2 = {};
+      m2.variables.forEach(q => { if (q.cost) c2[q.name] = q.cost; });
+      const cap2 = { name: "cap2", terms: c2, le: r2.objective + Math.abs(r2.objective) * 1e-9 + 1e-7 };
+      let width = 0;
+      for (let t = 0; t < 24; t++) ["c_", "d_"].forEach(k => {
+        const mk = s2 => ({ sense: s2, variables: m2.variables.map(q => Object.assign({}, q, { cost: q.name === k + t ? 1 : 0 })), constraints: m2.constraints.concat([cap2]) });
+        width = Math.max(width, core.solveWith(highs, mk("max")).objective - core.solveWith(highs, mk("min")).objective);
+      });
+      ok(width < 1e-4, `tie: the rule's plan is unique (widest battery variable range ${width.toExponential(1)} MW), so the day-before saving is reproducible`);
+      // without the rule the day-before saving is not: equally cheap plans differ on 20 August
+      const mP = M.buildModel(D.forecast, J, {}), cP = {}; mP.variables.forEach(q => { if (q.cost) cP[q.name] = q.cost; });
+      const capP = { name: "capP", terms: cP, le: M.tieCap(sol.plan.cost) };
+      const d0 = { name: "d0" }; const mk0 = s2 => ({ sense: s2, variables: mP.variables.map(q => Object.assign({}, q, { cost: q.name === "d_0" ? 1 : 0 })), constraints: mP.constraints.concat([capP]) });
+      const r0 = [core.solveWith(highs, mk0("min")).objective, core.solveWith(highs, mk0("max")).objective];
+      ok(r0[1] - r0[0] > 10, `tie: without the rule, the plan's discharge at 00:00 can be anywhere from ${r0[0]} to ${r0[1]} MW`);
+    }
     ok(["unit", "sign", "lunch", "missing"].every(k => /optimal/.test(raw[k].status)), "all buggy versions solve to optimal (myth 1)");
   }
 
@@ -143,17 +163,29 @@ function put(text, name, body) {
     ok(near(x.benchMissing, x.benchHand, 0.006) && near(sol.benchMissingBase.cost, sol.benchBase.cost) && near(sol.benchMissing.cost, sol.benchOk.cost), "bench: version 4 passes, and its runs cost the same as the fixed ones (the ramp never binds)");
     const R = sol.benchOk.rows;
     ok(near(R[11].e, 200) && near(R[16].e, 0) && near(R.slice(12, 17).reduce((a, w) => a + w.dis, 0), 200) && R.slice(17).some(w => w.c > 0), "bench text: fills to 200 MWh by 12:00, empties in the five dear hours, refills afterwards");
+    // the three hand steps
+    ok(x.benchCC === 120 && x.benchPeak === 80 && x.benchRoom === 30 && sol.benchBase.rows.every(w => near(w.cc, w.d === 330 ? 150 : 120) && near(w.pk, w.d === 330 ? 80 : 0)), "bench steps: without the battery the gas plant runs 120 MW, flat out in the dear hours, and the peaker 80 MW");
+    ok(x.benchAvoided === 20000 && near(x.benchCharge, 235.29) && near(x.benchChargeCost, 9411.76) && near(x.benchAvoided - x.benchChargeCost, x.benchHand, 0.006), `bench steps: ${v.benchAvoided} − ${v.benchChargeCost} = ${v.benchHand}`);
+    ok(near(R.reduce((a, w) => a + w.c, 0), x.benchCharge, 0.006) && near(R.reduce((a, w) => a + w.dis, 0), 200) && R.every(w => w.c <= x.benchRoom + 1e-6), "bench steps: the model charges 235.29 MWh within the gas plant's 30 MW of room and discharges 200 MWh");
     ok(near(x.benchUnit, 250 * (100 - 40 / 0.85), 0.006) && near(x.benchLunch, 200 * 100 - 100 / 0.85 * 40, 0.006), "bench: version 1 discharges 250 MWh, version 3 refills nothing (both by hand)");
   }
 
-  // ---------------- validation run
-  ok(near(x.eta82, 7939.02, 0.006) && x.eta82Change === 3, `validation: 82% gives ${v.eta82} (${x.eta82Change}% less)`);
+  // ---------------- validation: the day-before forecast against the measured day; then the input check
+  {
+    const F = M.forecastCheck(D, J), netS = M.netLoad(D.study), netF = M.netLoad(D.forecast);
+    ok(F.err.every((e, t) => e === netF[t] - netS[t]) && J.validation.tol === J.study.battery.P, "validation: the miss is forecast minus measured net load; the tolerance is the battery's 50 MW");
+    ok(near(x.fcMAE, 22.1) && x.fcMax === 55 && x.fcMaxHour === 12 && x.fcOver === 1 && v.fcMaxHour === "12:00", `validation: misses ${x.fcMAE} MW on average, ${x.fcMax} MW at ${v.fcMaxHour}, beyond 50 MW in ${x.fcOver} hour`);
+    ok(x.fcOver > 0, "validation: the forecast fails its tolerance, so the page narrows the claim");
+  }
+  ok(near(x.eta82, 7939.02, 0.006) && x.eta82Change === 3, `input check: 82% gives ${v.eta82} (${x.eta82Change}% less)`);
+  ok(!/validat/i.test(J.inputCheck.saw.replace("not a validation", "")) && /input check/.test(J.inputCheck.saw) && /sensitivity/.test(J.inputCheck.saw), "input check: called an input check and a sensitivity run, not a validation");
+  ok(/[Ss]imulated/.test(J.reproSaw) && /simulated/.test(JS.slice(JS.indexOf("Show the rerun"), JS.indexOf("Show the rerun") + 60)) && JS.indexOf('"Rerun from a fresh clone"') < 0, "rerun: labelled simulated; the page runs no solve for it");
 
   // ---------------- texts: every placeholder filled, every number the page states from the model
   {
     const texts = [];
     J.bugs.forEach(b => { b.symptoms.forEach(s => texts.push(s[0], s[1])); texts.push(b.right, b.wrong, b.fixed); });
-    texts.push(J.benchSaw, J.validationSaw, J.reproSaw);
+    texts.push(J.benchSaw, J.validationSaw, J.reproSaw, J.inputCheck.saw, J.bench.intro, ...J.bench.steps, ...J.bugs.filter(b => b.tie).map(b => b.tie));
     texts.forEach(t => ok(!/\{\w+\}/.test(M.fill(t, v)), "filled: " + t.slice(0, 50)));
     const E = M.exemplars(J, v);
     ok(EX.validate(E).length === 0, "exemplars: valid pair");
@@ -163,6 +195,8 @@ function put(text, name, body) {
     // the page's blocks are the ones the model writes
     const BL = blocks(v);
     Object.keys(BL).forEach(k => ok(between(QMD, k) === BL[k], `page block ${k} is up to date (run --write)`));
+    Object.keys(BL).forEach(k => ok(!/\[\[|\]\]|\*\*/.test(BL[k]), `page block ${k}: no raw glossary or bold marks`));
+    ok(!/\[\[[a-z0-9-]+\|/.test(QMD), "page: no raw [[glossary|marks]] anywhere in the page source");
     ok(QMD.indexOf("About 35 minutes guided here, then about 2 hours on your own") > 0 && J.taskTime === "About 35 minutes guided here, then about 2 hours on your own: the notebook, Git and your log.", "task time on the page and in the data agree");
     ok(QMD.indexOf("19 and 20 August and 3 September 2025") > 0, "data note names the three real days");
     ok(/data-id="rerun" data-answer="fact"/.test(QMD) && /data-id="bench" data-answer="myth"/.test(QMD), "myth answers");
@@ -177,7 +211,11 @@ function put(text, name, body) {
     [["study", D.study], ["before", D.forecast], ["lesson0", D.lesson0]].forEach(([k, d]) => {
       ["demand", "wind", "solar"].forEach(s => ok(JSON.stringify(arr(s + "_" + k)) === JSON.stringify(d[s]), `notebook: ${s}_${k} equals the page's data`));
     });
-    [x.base, x.ok, x.unit, x.lunch, x.honest, x.benchHand, x.eta82, x.l0base, x.l0missingBase].forEach(n => ok(src.indexOf(String(n)) >= 0, `notebook asserts ${n}`));
+    [x.base, x.ok, x.unit, x.lunch, x.honest, x.honestEarly, x.benchHand, x.eta82, x.l0base, x.l0missingBase, x.fcMAE].forEach(n => ok(src.indexOf(String(n)) >= 0, `notebook asserts ${n}`));
+    ok(/open\("results\.json", "wb"\)/.test(src) && /hashlib\.sha256\(data\)/.test(src) && /shasum -a 256 results\.json > first-run\.sha256/.test(src) && /shasum -a 256 -c first-run\.sha256/.test(src), "notebook: writes results.json, hashes the same bytes, and the clean-clone commands compare the first run's checksum");
+    ok(/DECISION = dt\.datetime\(2025, 8, 20, 0, 0\)/.test(src) && /timedelta\(hours=24\)/.test(src), "notebook: the information check compares times with a stated cutoff, midnight as 20 August begins");
+    ok(/def town_day\(year, date\)/.test(src) && /2025-03-09/.test(src) && /town_day\(year, "2025-09-03"\) == DAYS\["2025-09-03"\]/.test(src), "notebook: a loader for other days, checked against lesson 0's day, clock-change days left out");
+    ok(/at least the check the page names/.test(src) && !/fail exactly the check/.test(src), "notebook: each bug fails at least its named check");
     ok(nb.cells.every(c => c.cell_type !== "code" || !c.outputs || c.outputs.every(o => o.output_type !== "error")), "notebook: no error outputs saved");
   } else ok(false, "notebook exists");
 

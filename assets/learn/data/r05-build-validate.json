@@ -1,6 +1,6 @@
 {
-  "about": "R5, research studio (curriculum v2 §11): verification, validation and reproducibility on one small study. Prairie Town is fictional; its plants, costs and battery are illustrative. Demand, wind and solar follow the real hourly shapes of 19 and 20 August and 3 September 2025 on the Southwest Power Pool grid (town_year.json, EIA-930), scaled to the town as in lesson 0. The benchmark day is made up. Every number the page states comes from the model in assets/learn/r05-build-validate.js; _tests/learn/test_r05-build-validate.js solves every run with the vendored HiGHS and writes `ref`, the precomputed results the page shows if the solver cannot load.",
-  "version": "r5 v1 (3 Nov 2026)",
+  "about": "R5, research studio (curriculum v2 §11): verification, validation and reproducibility on one small study. Prairie Town is fictional; its plants, costs and battery are illustrative. Demand, wind and solar follow the real hourly shapes of 19 and 20 August and 3 September 2025 on the Southwest Power Pool grid (town_year.json, EIA-930), scaled to the town as in lesson 0. The benchmark day is made up. The day-before plan has many least-cost schedules; a tie rule fixed in advance (keep the most energy in store) picks one. Every number the page states comes from the model in assets/learn/r05-build-validate.js; _tests/learn/test_r05-build-validate.js solves every run with the vendored HiGHS and writes `ref`, the precomputed results the page shows if the solver cannot load.",
+  "version": "r5 v2 (3 Nov 2026)",
   "task": [
     [
       "Produce",
@@ -48,7 +48,25 @@
       "eta": 0.85,
       "label": "50 MW, 200 MWh (4 hours)"
     },
-    "dataNote": "Demand, wind and solar: the real hourly shapes of 20 August 2025 on the Southwest Power Pool grid (EIA-930), scaled to Prairie Town as in lesson 0. The plants, costs and battery are illustrative."
+    "dataNote": "Demand, wind and solar: the real hourly shapes of 20 August 2025 on the Southwest Power Pool grid (EIA-930), scaled to Prairie Town as in lesson 0. The plants, costs and battery are illustrative.",
+    "symbols": [
+      [
+        "c[t], d[t]",
+        "the battery's charging and discharging power in hour t, MW"
+      ],
+      [
+        "e[t]",
+        "stored energy at the end of hour t, MWh (the [[state-of-charge|state of charge]])"
+      ],
+      [
+        "E, E0",
+        "the battery's energy size, 200 MWh, and what it holds at the start of the day, 100 MWh"
+      ],
+      [
+        "cc[t], cc_prev[t]",
+        "the gas [[combined-cycle|combined-cycle]] plant's output in hour t and in the hour before, MW (115 MW before the first hour)"
+      ]
+    ]
   },
   "bench": {
     "flat": 220,
@@ -57,7 +75,13 @@
       12,
       16
     ],
-    "label": "a made-up day: 220 MW in every hour except 330 MW from 12:00 to 17:00, no wind or solar"
+    "label": "a made-up day: 220 MW in every hour except 330 MW from 12:00 to 17:00, no wind or solar",
+    "intro": "Without the battery, the gas plant runs {benchCC} MW in the flat hours; in the five dear hours it runs flat out and the [[peaker|peaker]] adds {benchPeak} MW, at $100/MWh.",
+    "steps": [
+      "**Discharge.** The battery empties its 200 MWh into the five dear hours: 200 MWh × $100/MWh = {benchAvoided} of peaker output avoided.",
+      "**Recharge.** Over the day it puts 200 MWh into store (100 before noon, 100 after, so it ends as it began): 200 ÷ 0.85 = {benchCharge} MWh of charging, from the gas plant's {benchRoom} MW of spare room, at $40/MWh: {benchChargeCost}.",
+      "**Saving.** {benchAvoided} − {benchChargeCost} = {benchHand}."
+    ]
   },
   "checks": [
     {
@@ -90,19 +114,19 @@
     {
       "id": "bal",
       "name": "Balance",
-      "words": "Plants + battery discharge − battery charge + unserved = demand, every hour.",
+      "words": "Plants + battery discharge − battery charge + unserved = demand, every hour (MW).",
       "rows": "24 rows"
     },
     {
       "id": "soc",
       "name": "Stored energy",
-      "words": "Stored now = stored an hour ago + 0.85 × charge − discharge (MWh).",
+      "words": "Stored now = stored an hour ago + (0.85 × charging power − discharging power) × 1 hour, in MWh. All the round-trip loss is counted on charging.",
       "rows": "24 rows"
     },
     {
       "id": "ramp",
       "name": "Gas ramp",
-      "words": "The combined-cycle plant changes by at most 40 MW an hour, from 115 MW.",
+      "words": "The [[combined-cycle|combined-cycle]] plant changes by at most 40 MW an hour, from 115 MW.",
       "rows": "24 rows"
     },
     {
@@ -175,7 +199,7 @@
       },
       "right": "Right. Charging was counted as supply, so the battery fed the town while filling up: energy from nowhere.",
       "wrong": "That check passes here. Follow the battery through one hour: where does its energy go?",
-      "fixed": "Fixed: **{ok}**. The battery now charges when the gas plant has room and discharges in the hours the peaker would run."
+      "fixed": "Fixed: **{ok}**. The battery now charges when the gas plant has room and discharges in the hours the [[peaker|peaker]] would run."
     },
     {
       "id": "lunch",
@@ -250,11 +274,12 @@
       ],
       "line": {
         "before": "plan = solve(day='2025-08-20')            # the day itself",
-        "after": "plan = solve(day='2025-08-19')            # what was known the day before\nresult = run(day='2025-08-20', battery=plan)"
+        "after": "plan = solve(day='2025-08-19', tie='keep')  # the last full day measured at 00:00 on 20 August\nresult = run(day='2025-08-20', battery=plan)"
       },
-      "right": "Right. Planned the day before, the battery could not know 20 August's demand, wind and solar.",
-      "wrong": "That check passes here. Ask what the operator knew when the schedule was set.",
-      "fixed": "Planned on the day before (a persistence forecast) and then followed: **{honest}**, {honestShare}% of the {ok} that [[perfect-foresight|perfect foresight]] gives."
+      "right": "Right. The schedule is set at midnight, as 20 August begins: all 24 hours of 19 August are measured by then, and none of 20 August.",
+      "wrong": "That check passes here. Ask what had been measured when the schedule was set, at midnight.",
+      "fixed": "Planned on 19 August's measured day (a [[persistence-forecast|persistence forecast]]) and then followed: **{honest}**, {honestShare}% of the {ok} that [[perfect-foresight|perfect foresight]] gives.",
+      "tie": "Many schedules tie at {planCost} on 19 August. The rule, set in advance: keep the most energy in store. One that empties the battery first ties too, yet saves only {honestEarly} on 20 August."
     }
   ],
   "benchVersions": [
@@ -303,7 +328,7 @@
       ],
       [
         "measured",
-        "A modelled input or result agrees with data measured on real batteries"
+        "A model's prediction agrees with measurements of the real system, within a tolerance set in advance"
       ],
       [
         "clone",
@@ -314,12 +339,17 @@
     "why": {
       "balance": "That is verification: it checks the code against its own equations.",
       "bench": "That is verification too: the hand answer comes from the same equations.",
-      "measured": "Validation compares the model with the real system, here with measured data.",
+      "measured": "Validation compares what the model predicts with what was measured on the real system.",
       "clone": "That is reproducibility: the same numbers again, right or wrong."
-    }
+    },
+    "tol": 50
   },
-  "validationText": "The study assumed an 85% round trip, the value in NLR's 2025 ATB. Measured on the U.S. battery fleet, the average was 82% in 2019 (EIA). Run the study with the measured value.",
-  "validationSaw": "**{eta82}** instead of **{ok}**: {eta82Change}% less, so this input does not change the conclusion. Validating the claim itself would need data the model did not use, such as a real battery's metered schedule.",
+  "validationText": "The plan's prediction of 20 August is its forecast: 19 August's measured net load (demand minus wind and solar). Compare it with 20 August as measured. Tolerance, set first: the battery's 50 MW, in every hour.",
+  "validationSaw": "The forecast misses by **{fcMAE} MW** on average and **{fcMax} MW** at {fcMaxHour}: beyond the tolerance in {fcOver} of 24 hours. So the claim is narrowed: **{honest}** with this forecast; **{ok}** only as an upper bound.",
+  "inputCheck": {
+    "text": "One input can be checked against measured data: the [[round-trip-efficiency|round trip]]. The study assumed 85% (NLR's 2025 ATB); the U.S. battery fleet averaged 82% in 2019 (EIA). Does the saving hinge on it?",
+    "saw": "**{eta82}** instead of **{ok}**: {eta82Change}% less, so the conclusion does not hinge on this input. That is an input check and a [[sensitivity-analysis|sensitivity run]], not a validation of the saving."
+  },
   "repro": {
     "log": [
       "$ git clone <repository> fresh && cd fresh",
@@ -355,11 +385,18 @@
     "fixes": [
       "A download script with the source's address, access date and [[checksum|checksum]], so the data can be rebuilt",
       "Paths relative to the repository, never to one laptop",
-      "The environment pinned: Python, SciPy and its HiGHS version",
-      "A tag on the commit that made the reported numbers"
+      "The environment pinned: the exact versions of Python, SciPy and its HiGHS, written in a file such as environment.yml",
+      "A tag, a fixed name such as v1.0, on the [[commit|commit]] that made the reported numbers"
+    ],
+    "logAfter": [
+      "$ git clone <repository> fresh && cd fresh && git checkout v1.0",
+      "$ conda env create -f environment.yml    # the pinned versions",
+      "$ python get_data.py    # downloads the data, checks its SHA-256",
+      "$ python run.py && shasum -a 256 -c first-run.sha256",
+      "results.json: OK"
     ]
   },
-  "reproSaw": "The fresh clone now gives **{ok}**, the same as before. A rerun shows the number is reproducible; the checks above are what show it is right.",
+  "reproSaw": "**Simulated:** this page cannot clone anything. With the four fixes, a fresh clone would rebuild the data, print **{ok}** again and match the first run's checksum. Do the real rerun in the notebook's practice; log it once the checksums match.",
   "exemplars": {
     "title": "Two verification logs for the same battery study",
     "task": "Report whether the battery study can be trusted, and what it found.",
@@ -370,28 +407,29 @@
         "label": "Weak log",
         "level": "Developing",
         "parts": [
+          "Checks: ",
           {
             "text": "I checked the model and the results look reasonable",
             "note": "No check is named, so nobody can repeat it or see what it would have caught."
           },
-          ". The battery saves ",
+          ".\nBenchmark: none.\nValidation: ",
           {
-            "text": "{ok} on 20 August",
+            "text": "the model was validated",
+            "note": "Validated against what? A validation names its data, its tolerance and the outcome."
+          },
+          ".\nInput check: none.\nResult: ",
+          {
+            "text": "the battery saves {ok} on 20 August",
             "note": "This is the perfect-foresight saving, and the log does not say the plan knew the day in advance."
           },
-          ", so it would save ",
+          ", so ",
           {
             "text": "about {okYear} a year",
             "note": "One hot day times 365 is not a year: on 3 September the same battery saves {l0ok}."
           },
-          ". ",
+          ".\nRerun: ",
           {
-            "text": "The model was validated",
-            "note": "Validated against what? A validation names its data and the result of the comparison."
-          },
-          ". ",
-          {
-            "text": "The code is in a folder on my laptop",
+            "text": "the code is in a folder on my laptop",
             "note": "Nobody else can rerun a folder on one laptop."
           },
           "."
@@ -402,45 +440,50 @@
         "label": "Strong log",
         "level": "Proficient",
         "parts": [
-          "Checks, each with its result: ",
+          "Checks: ",
           {
             "text": "stored energy within 0–200 MWh in every hour",
             "note": "A size check with its range: it would have caught version 1."
           },
           "; ",
           {
-            "text": "each hour balances, with the battery feeding the town only as its stored energy falls",
+            "text": "every hour balances, and stored energy falls whenever the battery feeds the town",
             "note": "A balance check that also tests the sign convention: it would have caught version 2."
           },
           "; ",
           {
-            "text": "the day ends with the 100 MWh it started with",
+            "text": "the day ends with its starting 100 MWh",
             "note": "A closure check: it would have caught version 3."
           },
           "; ",
           {
-            "text": "{rampRows} ramp rows in the code, as in the formulation",
+            "text": "{rampRows} ramp rows in the code, as on paper",
             "note": "Paper against code: the only check here that catches version 4 on this day."
           },
-          ". Benchmark: ",
+          ".\nBenchmark: ",
           {
             "text": "a made-up two-level day, hand answer {benchHand}, model {benchOk}",
             "note": "A known case, worked by hand, matched to the cent."
           },
-          ". Validation: ",
+          ".\nValidation: ",
           {
-            "text": "with the U.S. fleet's measured 82% round trip, the saving is {eta82} instead of {ok}",
-            "note": "Validation against measured data, with the effect on the result."
+            "text": "the day-before forecast against 20 August as measured, off by up to {fcMax} MW, beyond the 50 MW tolerance set in advance, so the claim is narrowed",
+            "note": "A prediction against measured data, with the tolerance set first, and what the outcome changes."
           },
-          ". Saving on 20 August 2025: ",
+          ".\nInput check: ",
           {
-            "text": "{honest} with a plan made the day before, {ok} with perfect foresight",
+            "text": "the 85% round trip against the fleet's measured 82%: the saving moves {eta82Change}%",
+            "note": "An input checked against measured data, then a sensitivity run; the log does not call it validation."
+          },
+          ".\nResult: ",
+          {
+            "text": "{honest} with the plan made the day before, {ok} with perfect foresight, an upper bound",
             "note": "Both numbers, each labelled with what the plan knew."
           },
-          ". ",
+          ".\nRerun: ",
           {
-            "text": "Reruns from a clean clone at tag v1.0 with the pinned environment",
-            "note": "A tag and a pinned environment let anyone get the same numbers."
+            "text": "a clean clone at tag v1.0, with the pinned environment, matches the first run's checksum",
+            "note": "A tag, a pinned environment and a checksum let anyone get the same numbers."
           },
           "."
         ]
@@ -460,7 +503,7 @@
       {
         "label": "Validation",
         "weak": "Claimed",
-        "good": "Measured data, with the effect"
+        "good": "A forecast against measured data, tolerance first"
       },
       {
         "label": "Information",
@@ -470,12 +513,13 @@
       {
         "label": "Rerun",
         "weak": "One laptop",
-        "good": "A tagged clean clone"
+        "good": "A tagged clean clone, same checksum"
       }
-    ]
+    ],
+    "lines": true
   },
   "rubric": {
-    "look": "Your log names each check with its result, one benchmark with its hand answer, one validation with its data source, and the tag a clean clone reran."
+    "look": "Your log names each check with its result, one benchmark with its hand answer, one validation with its data and tolerance, and the tag a clean clone reran."
   },
   "sources": {
     "eia-930": {
@@ -533,12 +577,12 @@
     [
       "valid",
       "Validation",
-      "One comparison with measured data or an independent reference, with its source."
+      "One prediction compared with measured data or an independent reference, with its source and a tolerance set in advance."
     ],
     [
       "rerun",
       "Rerun",
-      "A clean clone at a tagged commit, a pinned environment, the same numbers."
+      "A clean clone at a tagged commit, a pinned environment, the same checksum."
     ]
   ],
   "ref": {
@@ -1995,24 +2039,196 @@
       }
     },
     "honest": {
-      "cost": 192400,
-      "maxRamp": 40,
-      "pk": 335,
+      "cost": 190900.00096,
+      "maxRamp": 35,
+      "pk": 310.000015,
       "unserved": 0,
-      "charged": 150,
-      "discharged": 127.5,
-      "maxE": 162.5,
-      "minE": 35,
+      "charged": 150.000015,
+      "discharged": 127.500012,
+      "maxE": 200,
+      "minE": 72.5,
       "endE": 100,
       "both": 0,
-      "fedAsModelled": -22.5,
+      "fedAsModelled": -22.500002,
+      "storedChange": 0,
+      "h": {
+        "cc": [
+          150,
+          150,
+          150,
+          145,
+          150,
+          150,
+          150,
+          132.499988,
+          150,
+          150,
+          130,
+          115,
+          95,
+          115,
+          145,
+          150,
+          150,
+          140,
+          150,
+          150,
+          150,
+          150,
+          145,
+          135
+        ],
+        "pk": [
+          15.000015,
+          15,
+          5,
+          0,
+          0,
+          0,
+          10,
+          0,
+          5,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          30,
+          80,
+          95,
+          45,
+          0,
+          0
+        ],
+        "u": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "c": [
+          0.000015,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          30,
+          50,
+          45,
+          25,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "dis": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          27.500012,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          25,
+          45,
+          30
+        ],
+        "e": [
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          72.5,
+          98,
+          140.5,
+          178.75,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          175,
+          130,
+          100
+        ]
+      }
+    },
+    "honestEarly": {
+      "cost": 194200.00096,
+      "maxRamp": 25,
+      "pk": 365.000015,
+      "unserved": 0,
+      "charged": 150.000015,
+      "discharged": 127.500012,
+      "maxE": 127.5,
+      "minE": 0,
+      "endE": 100,
+      "both": 0,
+      "fedAsModelled": -22.500002,
       "storedChange": 0,
       "h": {
         "cc": [
           125,
-          150,
-          150,
-          120,
+          140,
+          130,
+          135,
           150,
           150,
           150,
@@ -2023,8 +2239,8 @@
           115,
           95,
           105,
-          145,
-          147.5,
+          130,
+          147.499988,
           150,
           140,
           150,
@@ -2036,8 +2252,8 @@
         ],
         "pk": [
           0,
-          15,
-          5,
+          0,
+          0,
           0,
           0,
           0,
@@ -2055,10 +2271,10 @@
           0,
           30,
           80,
-          45,
+          95,
           70,
           40,
-          15
+          15.000015
         ],
         "u": [
           0,
@@ -2110,13 +2326,13 @@
           0,
           0,
           0,
-          0
+          0.000015
         ],
         "dis": [
           40,
-          0,
-          0,
           25,
+          25,
+          10,
           0,
           0,
           0,
@@ -2127,41 +2343,41 @@
           0,
           0,
           10,
-          0,
-          2.5,
-          0,
-          0,
+          15,
+          2.500012,
           0,
           0,
-          50,
+          0,
+          0,
+          0,
           0,
           0,
           0
         ],
         "e": [
           60,
-          60,
-          60,
           35,
-          35,
-          35,
-          35,
-          35,
-          60.5,
-          103,
-          141.25,
-          162.5,
-          162.5,
-          152.5,
-          152.5,
-          150,
-          150,
-          150,
-          150,
-          150,
-          100,
-          100,
-          100,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          25.5,
+          68,
+          106.25,
+          127.5,
+          127.5,
+          117.5,
+          102.5,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
           100
         ]
       }
@@ -3614,6 +3830,350 @@
           100,
           100,
           100,
+          100
+        ]
+      }
+    },
+    "planEarly": {
+      "cost": 218050.000218,
+      "maxRamp": 35,
+      "pk": 502.500002,
+      "unserved": 0,
+      "charged": 150.000015,
+      "discharged": 127.500012,
+      "maxE": 127.5,
+      "minE": 0,
+      "endE": 100,
+      "both": 0,
+      "fedAsModelled": -22.500002,
+      "storedChange": 0,
+      "h": {
+        "cc": [
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          145,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150
+        ],
+        "pk": [
+          0,
+          0,
+          0,
+          15,
+          25,
+          30,
+          40,
+          35,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          12.499988,
+          30,
+          15,
+          30,
+          55,
+          80,
+          60,
+          45,
+          30.000015
+        ],
+        "u": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "c": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          30,
+          50,
+          45,
+          25,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.000015
+        ],
+        "dis": [
+          40,
+          25,
+          25,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10,
+          15,
+          2.500012,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "e": [
+          60,
+          35,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          25.5,
+          68,
+          106.25,
+          127.5,
+          127.5,
+          117.5,
+          102.5,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          99.999988,
+          100
+        ]
+      }
+    },
+    "planKeep": {
+      "cost": 218050.000218,
+      "maxRamp": 35,
+      "pk": 502.500002,
+      "unserved": 0,
+      "charged": 150.000015,
+      "discharged": 127.500012,
+      "maxE": 200,
+      "minE": 72.5,
+      "endE": 100,
+      "both": 0,
+      "fedAsModelled": -22.500002,
+      "storedChange": 0,
+      "h": {
+        "cc": [
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          145,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150,
+          150
+        ],
+        "pk": [
+          40.000015,
+          25,
+          25,
+          25,
+          25,
+          30,
+          40,
+          7.499988,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10,
+          15,
+          15,
+          30,
+          15,
+          30,
+          55,
+          80,
+          35,
+          0,
+          0
+        ],
+        "u": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "c": [
+          0.000015,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          30,
+          50,
+          45,
+          25,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "dis": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          27.500012,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          25,
+          45,
+          30
+        ],
+        "e": [
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          100.000012,
+          72.5,
+          98,
+          140.5,
+          178.75,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          175,
+          130,
           100
         ]
       }
