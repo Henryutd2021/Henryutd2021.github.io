@@ -9,7 +9,13 @@
 //   assets/learn/data/r02-literature.json           the studio's own text: concept blocks, the ladder questions, one-line
 //                                                   summaries and the first-pass coding of the twelve papers, the
 //                                                   three-pass worked example, practice plan, exemplars, rubric line
-// No live API call: the page reads the snapshot and links the same searches on OpenAlex (W2 brief §3).
+// No live API call: the page reads the snapshot and links the same searches on OpenAlex's own search page (W2 brief
+// §3): openalex.org/works takes the API's filter, so the stored API addresses map one to one (checked in a browser on
+// 3 November 2026: the direct search's page shows the snapshot's 23 works).
+//
+// The coding is from abstracts only (first pass): a cell is "yes" (the abstract reports it), "partly" (it hints at it)
+// or "not stated" (the abstract does not say, which is not the same as no). Every claim about a paper stays within its
+// abstract; the worked second pass (Hilbers et al.) reads the open preprint.
 //
 // What the reader does (step cards): build two concept blocks into a search string; climb a ladder of five strings and
 // predict each count; log the searches; snowball backward and forward from one review and see which papers each route
@@ -26,6 +32,9 @@
 
   // ---------------------------------------------------------------- pure model
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  // glossary marks (double brackets around a slug, a bar and the words): as term spans for the no-JS blocks, or as words
+  function rich(s) { return esc(s).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return "<span class=\"lx-term\" data-" + "term=\"" + id + "\">" + w + "</span>"; }); }
+  function plain(s) { return String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"); }
   function f0(v) { return Math.round(v).toLocaleString("en-US"); }
   function dateText(iso) {
     var M = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], p = iso.split("-");
@@ -43,6 +52,10 @@
   function apiURL(q) {
     return "https://api.openalex.org/works?filter=title_and_abstract.search:" + encodeURIComponent(q).replace(/[!'()*]/g, function (c) { return "%" + c.charCodeAt(0).toString(16).toUpperCase(); });
   }
+  // the same search on OpenAlex's own search page (the web app takes the API's filter): for a string, and for a stored
+  // API address (the snapshot keeps the API form, which repeats the count exactly)
+  function searchURL(q) { return web(apiURL(q)); }
+  function web(u) { return String(u).replace(/^https:\/\/api\.openalex\.org\/works\?/, "https://openalex.org/works?"); }
   // the snapshot's count for a string, if the snapshot holds that exact string (ladder or follow-up)
   function knownCount(S, q) {
     var hit = S.ladder.concat([S.targeted]).filter(function (r) { return r.query === q || "(" + r.query + ")" === q; })[0];
@@ -68,6 +81,23 @@
     return c;
   }
   function emptyCells(c) { return Object.keys(c).filter(function (k) { return !c[k].length; }); }
+  // each cell of the two by two in words, so feedback names the cell the reader picked, whatever the coding
+  var CELL = { yy: "both a storage link between periods and extreme periods", yn: "a storage link without extreme periods",
+               ny: "extreme periods without a storage link", nn: "neither a storage link nor extreme periods" };
+  function cellPhrase(k) { return CELL[k]; }
+  // feedback for a tapped cell, from the counted marks: {empty, text, names}
+  function cellFeedback(D, c, k) {
+    var names = c[k].map(function (key) { return D.matrix.filter(function (p) { return p.key === key; })[0].name; });
+    if (!names.length) return { empty: true, names: names, text: "That cell is empty. In this coding, no abstract in your twelve reports " + CELL[k] + "." };
+    return { empty: false, names: names, text: "Not empty: " + names.length + " paper" + (names.length === 1 ? "" : "s") + " here (" + names.join("; ") + ")." };
+  }
+  // the follow-up question for the empty cell the reader picked
+  function gapQuestion(D, k) { return D.gap_q.q.replace("{cell}", CELL[k]); }
+  // rows whose storage or extremes marks differ from the course's coding
+  function differs(D, marks) {
+    var ref = refMarks(D);
+    return D.matrix.filter(function (p) { return ["storage", "extreme"].some(function (k) { return !!(marks[p.key] || {})[k] !== ref[p.key][k]; }); }).map(function (p) { return p.key; });
+  }
   // the snapshot paper for a DOI (matrix, fillers, top or review)
   function paper(S, doi) {
     var all = S.matrix.concat(S.fillers, S.top, [S.review]);
@@ -81,32 +111,46 @@
   // routes, the matrix and the follow-up search, as HTML
   function staticTask(D, S) {
     var h = [], date = dateText(S.meta.as_of), R = routes(S);
-    h.push('<p><b>The worked question:</b> ' + esc(D.question) + "</p>");
+    h.push('<p><b>The worked question:</b> ' + rich(D.question) + "</p>");
     h.push('<p class="lx-eyebrow">Five search strings, OpenAlex titles and abstracts, ' + date + "</p>");
     h.push('<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Change</th><th scope="col">String</th><th scope="col">Works</th></tr></thead><tbody>');
     S.ladder.concat([S.targeted]).forEach(function (r) {
-      h.push('<tr><td>' + esc(r.label) + '</td><td><code>' + esc(r.query) + '</code></td><td class="n"><a href="' + esc(r.url) + '">' + f0(r.count) + "</a></td></tr>");
+      h.push('<tr><td>' + esc((D.ladder_labels || {})[r.id] || r.label) + '</td><td><code>' + esc(r.query) + '</code></td><td class="n"><a href="' + esc(web(r.url)) + '">' + f0(r.count) + "</a></td></tr>");
     });
     h.push("</tbody></table></div>");
+    h.push('<p class="lx-hint">Each count links the same search on OpenAlex\'s search page; counts there may differ as OpenAlex updates its records.</p>');
     h.push("<p>Snowballing from " + esc(cite(S.review)) + ": " + f0(S.snowball.references) + " references (backward) and " + f0(S.snowball.cited_by) + " citing works (forward) on " + date +
       ". Of the 12 matrix papers, the AND-the-model string finds " + R.search.length + ", backward snowballing " + R.backward.length + " and forward snowballing " + R.forward.length +
       "; together, all " + R.union.length + ".</p>");
     h.push('<p class="lx-eyebrow">The concept matrix, coded from the abstracts (first pass)</p>');
+    h.push('<p class="lx-hint">' + esc(D.coding_rule) + " " + Object.keys(D.values).map(function (v) { return "<b>" + esc(v) + "</b>: " + esc(D.values[v]); }).join("; ") + ".</p>");
     h.push('<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Paper</th>' + D.bins.map(function (b) { return '<th scope="col">' + esc(b.label) + "</th>"; }).join("") + "</tr></thead><tbody>");
     D.matrix.forEach(function (p) {
-      h.push('<tr><td><a href="https://doi.org/' + esc(p.doi) + '">' + esc(p.name) + "</a><br><span class=\"lx-hint\">" + esc(p.summary) + "</span></td>" +
+      h.push('<tr><td><a href="https://doi.org/' + esc(p.doi) + '">' + esc(p.name) + "</a><br><span class=\"lx-hint\">" + rich(p.summary) + "</span></td>" +
         KEYS.map(function (k) { return "<td>" + esc(p.ref[k]) + "</td>"; }).join("") + "</tr>");
     });
     h.push("</tbody></table></div>");
     var c = cross(D, refMarks(D));
-    h.push("<p>Storage linked and extreme periods kept: " + c.yy.length + " papers (the empty cell). Storage only: " + c.yn.length + ". Extremes only: " + c.ny.length + ". Neither: " + c.nn.length + ".</p>");
+    h.push("<p>Abstracts reporting both a storage link and extreme periods: " + c.yy.length + " papers (the empty cell). Storage link only: " + c.yn.length + ". Extreme periods only: " + c.ny.length + ". Neither stated: " + c.nn.length + ".</p>");
     h.push("<p>Searching that cell directly (" + esc(S.targeted.label.toLowerCase()) + ") gave " + f0(S.targeted.count) + " works on " + date + "; at least " + S.fillers.length + " of them do both, by their abstracts: " +
       S.fillers.map(function (p) { return '<a href="https://doi.org/' + esc(p.doi) + '">' + esc(D.fillers.filter(function (f) { return f.doi === p.doi; })[0].name) + "</a>"; }).join("; ") +
       ". An empty cell is a lead, not a gap.</p>");
+    var hf = D.fillers[0];
+    h.push('<p class="lx-eyebrow">Reading the closest paper: ' + esc(hf.name) + "</p><ol>");
+    D.passes.forEach(function (p) { h.push("<li><b>" + esc(p.label) + "</b> (" + esc(p.time) + "): " + esc(p.read) + " Out: " + esc(p.out) + "</li>"); });
+    h.push("</ol><p>Its headings (open preprint, October 2022), for the first pass: " + esc(D.headings.join(" · ")) + ".</p>");
+    h.push('<details class="lx-textalt"><summary>The first pass, worked: the five Cs</summary><dl class="lx-ideas">' +
+      D.five_cs.map(function (c) { return "<dt>" + esc(c.c) + "</dt><dd>" + esc(c.q) + " " + rich(c.worked) + "</dd>"; }).join("") + "</dl></details>");
+    h.push('<details class="lx-textalt"><summary>The second pass, worked: the extraction sheet</summary><dl class="lx-ideas">' +
+      D.sheet.map(function (x) { return "<dt>" + esc(x.k) + "</dt><dd>" + rich(x.v) + "</dd>"; }).join("") + '</dl><p class="lx-hint">Worked from the open preprint (October 2022); the published version is at the DOI above.</p></details>');
+    h.push('<p class="lx-eyebrow">Write the gap statement</p><p>' + esc(D.write_prompt) + "</p>");
+    h.push('<p class="lx-eyebrow">Your own literature map: about ' + Math.round(D.practice.reduce(function (t, p) { return t + p.min; }, 0) / 60) + " hours</p><ol>" +
+      D.practice.map(function (p) { return "<li>" + esc(p.task) + " (" + p.min + " min)</li>"; }).join("") + '</ol><p class="lx-hint">' + esc(D.practice_optional) + "</p>");
     return h.join("\n");
   }
-  var model = { KEYS: KEYS, queryString: queryString, apiURL: apiURL, knownCount: knownCount, routes: routes, refMarks: refMarks, startMarks: startMarks,
-                cross: cross, emptyCells: emptyCells, paper: paper, cite: cite, dateText: dateText, staticTask: staticTask, f0: f0 };
+  var model = { KEYS: KEYS, queryString: queryString, apiURL: apiURL, searchURL: searchURL, web: web, knownCount: knownCount, routes: routes, refMarks: refMarks, startMarks: startMarks,
+                cross: cross, emptyCells: emptyCells, cellPhrase: cellPhrase, cellFeedback: cellFeedback, gapQuestion: gapQuestion, differs: differs,
+                paper: paper, cite: cite, dateText: dateText, staticTask: staticTask, f0: f0, rich: rich, plain: plain };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -166,7 +210,7 @@
     return function (act, api) {
       var picks = LX.store.get("r2-blocks", null) || {};
       D.blocks.forEach(function (b) { if (!picks[b.id]) picks[b.id] = b.start.slice(); });
-      H("p", { class: "r2-q", text: "“" + D.question + "”" }, act);
+      H("p", { class: "r2-q", html: "“" + LX.rich(D.question) + "”" }, act);
       D.blocks.forEach(function (b) {
         var box = H("div", { class: "r2-block" }, act);
         H("p", { class: "lx-eyebrow", text: "Block " + b.id + " · " + b.label + " (OR inside the block)" }, box);
@@ -184,13 +228,13 @@
       var out = H("div", { class: "r2-string" }, act);
       H("p", { class: "lx-eyebrow", text: "Your string (AND between the blocks)" }, out);
       var code = H("code", null, out), info = H("p", { class: "lx-hint", "aria-live": "polite" }, out), row = H("div", { class: "r2-row" }, out);
-      var copy = H("button", { class: "lx-btn small ghost", type: "button", text: "Copy the string" }, row), link = H("a", { class: "lx-btn small ghost", text: "Run it on OpenAlex (raw results)" }, row);
+      var copy = H("button", { class: "lx-btn small ghost", type: "button", text: "Copy the string" }, row), link = H("a", { class: "lx-btn small ghost", text: "Search it on OpenAlex" }, row);
       var st = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
       copy.addEventListener("click", function () { LX.copyText(code.textContent).then(function (ok) { st.textContent = ok ? "Copied." : "Select the string and copy it."; }); });
       function draw() {
         var q = queryString(D.blocks, picks), n = knownCount(S, q);
         code.textContent = q || "(pick at least one term in each block)";
-        link.setAttribute("href", q ? apiURL(q) : "https://openalex.org/");
+        link.setAttribute("href", q ? searchURL(q) : "https://openalex.org/");
         info.innerHTML = n != null ? "OpenAlex matched <b>" + f0(n) + "</b> works for this exact string on " + dateText(S.meta.as_of) + " (titles and abstracts)." :
           "No stored count for this string: run it yourself and write the date and the count in your log.";
         var ready = D.blocks.every(function (b) { return picks[b.id].length >= 2; });
@@ -206,7 +250,7 @@
       var ol = H("ol", { class: "r2-ladder" }, act), got = 0, right = 0, lis = [];
       S.ladder.forEach(function (r, i) {
         var li = H("li", { class: i ? "locked" : "" }, ol), top = H("div", { class: "top" }, li);
-        H("b", { text: (i + 1) + ". " + r.label }, top);
+        H("b", { text: (i + 1) + ". " + ((D.ladder_labels || {})[r.id] || r.label) }, top);
         var n = H("span", { class: "r2-n", text: i ? "?" : f0(r.count) }, top);
         H("code", { text: r.query }, li);
         var q = i ? D.ladder_q[i - 1] : null, fb;
@@ -225,15 +269,15 @@
               if (lis[i + 1]) [].forEach.call(lis[i + 1].querySelectorAll("button"), function (x) { x.disabled = false; });
               if (got === D.ladder_q.length) {
                 api.done();
-                api.saw("You called " + right + " of " + got + ". Counts are as of " + dateText(S.meta.as_of) + " and grow every day: log the date with every count.");
+                api.saw("You called " + right + " of " + got + ". Counts are as of " + dateText(S.meta.as_of) + " and can change as OpenAlex updates its records: log the date with every count, and keep the snapshot.");
               }
             });
           });
         }
         lis.push(li);
       });
-      H("p", { class: "lx-hint", html: "Counts: OpenAlex titles and abstracts, " + dateText(S.meta.as_of) + ". Each count links the same search: " +
-        S.ladder.map(function (r, i) { return '<a href="' + LX.esc(r.url) + '">' + (i + 1) + "</a>"; }).join(" · ") + " (raw results)." }, act);
+      H("p", { class: "lx-hint", html: "Counts: OpenAlex titles and abstracts, " + dateText(S.meta.as_of) + ". The same searches on OpenAlex's search page: " +
+        S.ladder.map(function (r, i) { return '<a href="' + LX.esc(web(r.url)) + '">' + (i + 1) + "</a>"; }).join(" · ") + "." }, act);
     };
   }
 
@@ -269,8 +313,8 @@
     return function (act, api) {
       var R = routes(S), rev = S.review;
       H("p", { html: "The review: " + '<a href="https://doi.org/' + rev.doi + '">' + LX.esc(rev.title) + "</a>, " + LX.esc(cite(rev)) + ", " + LX.esc(rev.venue) + " (open access). " + LX.esc(D.review_summary) }, act);
-      H("p", { class: "lx-hint", html: "On " + dateText(S.meta.as_of) + ": <b>" + f0(S.snowball.references) + "</b> references (backward: <a href=\"" + LX.esc(S.snowball.backward_url) + "\">list</a>) and <b>" +
-        f0(S.snowball.cited_by) + "</b> citing works (forward: <a href=\"" + LX.esc(S.snowball.forward_url) + "\">list</a>)." }, act);
+      H("p", { class: "lx-hint", html: "On " + dateText(S.meta.as_of) + ": <b>" + f0(S.snowball.references) + "</b> references (backward: <a href=\"" + LX.esc(web(S.snowball.backward_url)) + "\">list</a>) and <b>" +
+        f0(S.snowball.cited_by) + "</b> citing works (forward: <a href=\"" + LX.esc(web(S.snowball.forward_url)) + "\">list</a>); the live lists may differ." }, act);
       var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Which route found each paper" }, act), seen = {}, cur = null;
       var ul = H("ul", { class: "r2-list" }, act), out = H("p", { class: "lx-hint", "aria-live": "polite" }, act), rows = {};
       S.matrix.forEach(function (p) {
@@ -307,7 +351,7 @@
       var marks = LX.store.get("r2-marks", null) || startMarks(D);
       state.marks = marks;
       var toCode = D.matrix.filter(function (p) { return p.code; }).map(function (p) { return p.name; });
-      H("p", { class: "lx-hint", text: "Eight rows are coded for you; “Why” opens their reasons after a check. Code the four marked “to code”: tick a cell only when the summary says so (the coding rule)." }, act);
+      H("p", { class: "lx-hint", text: "Eight rows are coded for you; “Why” opens their reasons after a check. Code the four marked “to code”. The rule: " + D.coding_rule }, act);
       var cs = LX.CardSort(act, { mode: "toggles", bins: D.bins, checkLabel: "Check my coding", cls: "r2-matrix",
         items: D.matrix.map(function (p) { return { key: p.key, label: p.name + (p.code ? " · to code" : ""), color: p.code ? "var(--lx-accent)" : "var(--lx-ink-3)", ref: p.ref, why: p.why }; }),
         marks: marks, onChange: function (m) { LX.store.set("r2-marks", m); state.marks = m; },
@@ -315,48 +359,63 @@
           var mine = D.matrix.filter(function (p) { return p.code; }), agree = 0, total = 0;
           mine.forEach(function (p) { KEYS.forEach(function (k) { if (p.ref[k] !== "partly") { total++; if (res.cells[p.key][k] === "agree") agree++; } }); });
           api.done();
-          api.saw("Your four rows agree with the course's coding on **" + agree + " of " + total + "** clear cells. Open “Why” on any row: mentioning storage is not the same as linking it. Coding from abstracts is a first pass; a second pass can change a cell.", agree < total - 2);
+          api.saw("Your four rows agree with the course's coding on **" + agree + " of " + total + "** clear cells. Open “Why” on any row: mentioning storage is not the same as linking it, and “not stated” is not “no”.", agree < total - 2);
         } });
       // the one-line summary under each paper's name (the toggles list shows names only)
       var rowsEl = cs.el.querySelectorAll(".lx-cs-row:not(.head) .nm");
-      D.matrix.forEach(function (p, i) { if (rowsEl[i] && p.code) { var s = H("span", { class: "r2-sum" }, rowsEl[i]); s.appendChild(document.createTextNode(p.summary + " ")); doiLink(p.doi, "DOI", s); } });
+      D.matrix.forEach(function (p, i) { if (rowsEl[i] && p.code) { var s = H("span", { class: "r2-sum", html: LX.rich(p.summary) + " " }, rowsEl[i]); doiLink(p.doi, "DOI", s); } });
       H("p", { class: "lx-hint", text: D.toCodeNote || ("To code: " + toCode.join("; ") + ".") }, act);
     };
   }
 
-  // ---- step 6: the empty cell, and is it a gap?
+  // ---- step 6: the empty cell, and is it a gap? The table counts the reader's coding (or, on a switch, the course's);
+  // feedback names the cell tapped, and the follow-up asks about that cell only when it is empty
   function crossStep(D, S, state) {
     return function (act, api) {
-      var c = cross(D, state.marks || LX.store.get("r2-marks", null) || refMarks(D)), empty = emptyCells(c), picked = false;
-      var t = H("table", { class: "r2-x" }, H("div", { class: "lx-scroll-x" }, act)), hr = H("tr", null, H("thead", null, t));
-      H("th", { scope: "col", text: "" }, hr); H("th", { scope: "col", text: "Extremes kept" }, hr); H("th", { scope: "col", text: "No extremes" }, hr);
-      var tb = H("tbody", null, t), fb = H("div", { "aria-live": "polite" }, act), q = H("div", { hidden: true }, act);
-      [["y", "Storage linked"], ["n", "No storage link"]].forEach(function (r) {
-        var tr = H("tr", null, tb); H("th", { scope: "row", text: r[1] }, tr);
-        ["y", "n"].forEach(function (e) {
-          var k = r[0] + e, td = H("td", null, tr), names = c[k].map(function (key) { return D.matrix.filter(function (p) { return p.key === key; })[0].name; });
-          var b = H("button", { type: "button", html: "<b>" + c[k].length + "</b>", "aria-label": r[1] + ", " + (e === "y" ? "extremes kept" : "no extremes") + ": " + c[k].length + " papers" + (names.length ? " (" + names.join("; ") + ")" : "") }, td);
-          b.addEventListener("click", function () {
-            var ok = empty.indexOf(k) >= 0; b.classList.add(ok ? "right" : "wrong");
-            saw(fb, ok, ok ? "<b>That is the empty cell.</b> No paper in your twelve both links storage between periods and keeps extreme periods." :
-              "<b>Not that one.</b> " + c[k].length + " paper" + (c[k].length === 1 ? "" : "s") + " here: " + LX.esc(names.join("; ") || "none") + ".");
-            if (ok && !picked) { picked = true; q.hidden = false; }
-          });
-        });
+      var mine = state.marks || LX.store.get("r2-marks", null) || refMarks(D), ref = refMarks(D), diff = differs(D, mine), useRef = !diff.length;
+      var seg = diff.length ? H("div", { class: "lx-seg", role: "group", "aria-label": "Which coding to count" }, act) : null;
+      var note = H("p", { class: "lx-hint", "aria-live": "polite" }, act), wrap = H("div", { class: "lx-scroll-x" }, act);
+      var fb = H("div", { "aria-live": "polite" }, act), q = H("div", { hidden: true }, act);
+      var qt = H("p", { class: "r2-q" }, q), g = H("div", { class: "lx-qbtns", role: "group", "aria-label": "Is that a research gap?" }, q), qf = H("div", { "aria-live": "polite" }, q);
+      var segB = [];
+      if (seg) [["mine", "Your coding"], ["ref", "The course's coding"]].forEach(function (o) {
+        var b = H("button", { type: "button", "aria-pressed": o[0] === "mine" ? "true" : "false", text: o[1] }, seg);
+        b.addEventListener("click", function () { useRef = o[0] === "ref"; segB.forEach(function (x, i) { x.setAttribute("aria-pressed", (i === 1) === useRef ? "true" : "false"); }); draw(); });
+        segB.push(b);
       });
-      if (!empty.length) H("p", { class: "lx-hint", text: "Your coding leaves no cell empty: check the four rows you coded, or go on with the course's coding." }, act);
-      H("p", { class: "r2-q", text: D.gap_q.q }, q);
-      var g = H("div", { class: "lx-qbtns", role: "group", "aria-label": D.gap_q.q }, q), qf = H("div", { "aria-live": "polite" }, q);
-      D.gap_q.options.forEach(function (o) {
+      var qb = D.gap_q.options.map(function (o) {
         var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": "false", text: o[1] }, g);
         b.addEventListener("click", function () {
-          [].forEach.call(g.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); x.classList.remove("right", "wrong"); });
+          qb.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); x.classList.remove("right", "wrong"); });
           var ok = o[0] === D.gap_q.answer; b.classList.add(ok ? "right" : "wrong");
           saw(qf, ok, LX.esc(D.gap_q.feedback[o[0]]));
           if (ok) api.done();
         });
+        return b;
       });
-      if (!empty.length) { q.hidden = false; }
+      function draw() {
+        var c = cross(D, useRef ? ref : mine), empty = emptyCells(c);
+        wrap.innerHTML = ""; fb.innerHTML = ""; qf.innerHTML = ""; q.hidden = true;
+        qb.forEach(function (x) { x.setAttribute("aria-pressed", "false"); x.classList.remove("right", "wrong"); });
+        var t = H("table", { class: "r2-x" }, wrap), hr = H("tr", null, H("thead", null, t));
+        H("th", { scope: "col", text: "" }, hr); H("th", { scope: "col", text: "Extremes reported" }, hr); H("th", { scope: "col", text: "Extremes not stated" }, hr);
+        var tb = H("tbody", null, t);
+        [["y", "Storage link reported"], ["n", "Storage link not stated"]].forEach(function (r) {
+          var tr = H("tr", null, tb); H("th", { scope: "row", text: r[1] }, tr);
+          ["y", "n"].forEach(function (e) {
+            var k = r[0] + e, td = H("td", null, tr), f = cellFeedback(D, c, k);
+            var b = H("button", { type: "button", html: "<b>" + c[k].length + "</b>", "aria-label": r[1] + ", " + (e === "y" ? "extremes reported" : "extremes not stated") + ": " + c[k].length + " papers" + (f.names.length ? " (" + f.names.join("; ") + ")" : "") }, td);
+            b.addEventListener("click", function () {
+              b.classList.add(f.empty ? "right" : "wrong");
+              saw(fb, f.empty, "<b>" + LX.esc(f.text) + "</b>" + (f.empty && k !== "yy" ? " The next step searches the cell the course's coding leaves empty: " + LX.esc(cellPhrase("yy")) + "." : ""));
+              if (f.empty) { q.hidden = false; qt.textContent = gapQuestion(D, k); qf.innerHTML = ""; qb.forEach(function (x) { x.setAttribute("aria-pressed", "false"); x.classList.remove("right", "wrong"); }); }
+            });
+          });
+        });
+        note.textContent = (diff.length ? (useRef ? "Counting the course's coding." : "Counting your coding; it differs from the course's on " + diff.length + " row" + (diff.length === 1 ? "" : "s") + ".") + " " : "") +
+          (empty.length ? "Tap the empty cell." : "This coding leaves no cell empty: switch to the course's coding to go on.");
+      }
+      draw();
     };
   }
 
@@ -367,7 +426,7 @@
       var box = H("div", { class: "r2-string" }, act);
       H("p", { class: "lx-eyebrow", text: "String 6 · " + T.label }, box);
       H("code", { text: T.query }, box);
-      H("p", { class: "lx-hint", html: "<b>" + f0(T.count) + "</b> works on " + dateText(S.meta.as_of) + " (<a href=\"" + LX.esc(T.url) + "\">raw results</a>). Among them, at least three do both, by their abstracts:" }, box);
+      H("p", { class: "lx-hint", html: "<b>" + f0(T.count) + "</b> works on " + dateText(S.meta.as_of) + " (<a href=\"" + LX.esc(web(T.url)) + "\">the same search on OpenAlex</a>). Among them, at least three do both, by their abstracts:" }, box);
       var ul = H("ul", { class: "r2-list" }, act);
       D.fillers.forEach(function (f) { var li = H("li", null, ul); doiLink(f.doi, f.name, H("b", null, li)); H("span", { text: " · " + f.summary }, li); });
       var h = D.fillers[0], hs = S.snowball.fillers_citing_review.indexOf(h.doi) >= 0;
@@ -381,9 +440,9 @@
           var hit = picks.filter(function (k) { return want.indexOf(k) >= 0; }).length;
           if (hit === 2 || picks.length >= 4) {
             api.done();
-            saw(fb, hit === 2, "<b>" + (hit === 2 ? "Both." : "The two are:") + "</b> Kotzur et al. (2018) for linked storage and Teichgraeber, Küpper and Brandt (2021) for extreme periods: the two cells either side of your empty one. " +
+            saw(fb, hit === 2, "<b>" + (hit === 2 ? "Both." : "The two are:") + "</b> Kotzur et al. (2018) for linked storage and Teichgraeber, Küpper and Brandt (2021) for extreme periods: the storage-only and extremes-only cells of the course's coding. " +
               (hs ? "It also cites the review, so forward snowballing would have found it." : ""));
-            api.saw("The empty cell did not survive the search. That is a good result: you now know the closest prior work, and your question must say what it adds to these three.");
+            api.saw("The empty cell did not survive the search. That is a good result: you now know the closest prior work, and your question must say what it adds to these three, after reading them.");
           }
         });
       });
@@ -395,16 +454,16 @@
     return function (act, api) {
       var h = D.fillers[0];
       var grid = H("div", { class: "r2-passes" }, act);
-      D.passes.forEach(function (p) { var d = H("div", null, grid); H("b", { text: p.label + " · " + p.time }, d); H("span", { text: p.read }, d); H("span", { class: "lx-hint", text: "Out: " + p.out }, d); });
+      D.passes.forEach(function (p) { var d = H("div", null, grid); H("b", { text: p.label }, d); H("span", { class: "lx-hint", text: p.time }, d); H("span", { text: p.read }, d); H("span", { class: "lx-hint", text: "Out: " + p.out }, d); });
       H("p", { class: "lx-hint", text: "Its headings (open preprint, October 2022), for your first pass: " + D.headings.join(" · ") + "." }, act);
       var c0 = D.five_cs[0];
       H("p", { class: "r2-q", text: "First pass on " + h.name + ": " + c0.q }, act);
       var g = H("div", { class: "lx-qbtns", role: "group", "aria-label": c0.q }, act), fb = H("div", { "aria-live": "polite" }, act);
       var more = H("details", { class: "lx-textalt", hidden: true }, act); H("summary", { text: "The five Cs and the second-pass sheet, worked" }, more);
       var dl = H("dl", { class: "r2-sheet" }, more);
-      D.five_cs.forEach(function (c) { H("dt", { text: c.c }, dl); H("dd", { text: c.worked }, dl); });
+      D.five_cs.forEach(function (c) { H("dt", { text: c.c }, dl); H("dd", { html: LX.rich(c.worked) }, dl); });
       var dl2 = H("dl", { class: "r2-sheet" }, more); H("p", { class: "lx-hint", text: "Second pass: the extraction sheet" }, more); more.appendChild(dl2);
-      D.sheet.forEach(function (s) { H("dt", { text: s.k }, dl2); H("dd", { text: s.v }, dl2); });
+      D.sheet.forEach(function (s) { H("dt", { text: s.k }, dl2); H("dd", { html: LX.rich(s.v) }, dl2); });
       H("p", { class: "lx-hint", text: "Worked from the open preprint (October 2022); the published version is at the DOI above." }, more);
       c0.options.forEach(function (o) {
         var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": "false", text: o[1] }, g);
@@ -422,7 +481,7 @@
   // ---- step 9: the gap statement, and the plan for the practice
   function writeStep(D, S) {
     return function (act, api) {
-      var lab = H("label", { class: "r2-q", text: "Draft your gap statement: what you searched (where, when, strings), what the matrix shows, what the direct search found, and how your question differs." }, act);
+      var lab = H("label", { class: "r2-q", text: D.write_prompt }, act);
       var ta = H("textarea", { class: "r2-ta", rows: 4 }, act); ta.setAttribute("aria-label", "Your gap statement");
       ta.value = LX.store.get("r2-gap", "") || "";
       var row = H("div", { class: "r2-row" }, act), cmp = H("a", { class: "lx-btn small", href: "#exemplars", text: "Compare with two answers" }, row);
@@ -433,6 +492,7 @@
       var pl = H("details", { class: "lx-textalt" }, act); H("summary", { text: "Your own literature map: about 4 hours of practice" }, pl);
       var ol = H("ol", { class: "r2-plan" }, pl);
       D.practice.forEach(function (p) { H("li", { text: p.task + " (" + p.min + " min)" }, ol); });
+      H("p", { class: "lx-hint", text: D.practice_optional }, pl);
     };
   }
 
@@ -441,7 +501,7 @@
     var E = D.exemplars;
     return { title: "Two gap statements for the same question", task: E.task, id: "r2-ex",
       answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: E.weak }, { key: "good", label: "Strong answer", level: "Proficient", parts: E.good }],
-      diff: E.diff, note: E.note };
+      diff: E.diff, note: E.note, lines: true };
   }
   function explain(D, S) {
     var x = document.getElementById("r02-exemplars"); if (!x) return;
@@ -465,16 +525,16 @@
       colsN: 2, atN: { q: [0, 0], s: [0, 1], b: [1, 1], m: [0, 2], e: [0, 3], t: [1, 4], f: [1, 5], r: [0, 6], g: [1, 7] },
       edges: [["q", "s"], ["q", "b"], ["s", "m"], ["b", "m"], ["m", "e"], ["e", "t", "yes"], ["e", "r", "no"], ["t", "f"], ["f", "r", "no"], ["f", "g", "yes"], ["r", "g"]],
       traces: [
-        { label: "The worked question", path: ["q", "s", "b", "m", "e", "t", "f", "r", "g"], text: "Five logged strings and one review gave **" + R.union.length + "** papers; the storage-and-extremes cell held **" + c.yy.length +
-          "**; a direct search found at least **" + S.fillers.length + "** that do both. Read them, then state what your question adds." },
+        { label: "The worked question", path: ["q", "s", "b", "m", "e", "t", "f", "r", "g"], text: "Five logged strings and one review gave **" + R.union.length + "** papers; **" + c.yy.length +
+          "** abstracts reported both a storage link and extremes; a direct search found at least **" + S.fillers.length + "** that do both. Read them, then state what your question adds." },
         { label: "A cell that stays empty", path: ["q", "s", "m", "e", "t", "f", "g"], text: "If the direct search finds nothing, the gap is a candidate: state it with the strings, dates and counts, and still say why it matters. Scarcity alone is not evidence of importance." }
       ], sel: 0 });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), { title: "Search, snowball or both?", text: true,
       lede: "Each route finds papers the others miss. Log what you did with each.",
       columns: [{ key: "name", label: "Route", main: true }, { key: "finds", label: "Good at" }, { key: "misses", label: "Misses" }, { key: "log", label: "Log" }],
       rows: [
-        { key: "oa", name: "Open database search", note: "OpenAlex, Semantic Scholar", finds: "Broad, repeatable searches with exact strings and counts", misses: "Papers that use other words; the worked string 4 missed 3 of the 12", log: "String, field, date, count" },
-        { key: "gs", name: "Google Scholar", finds: "The widest coverage and a “cited by” list", misses: "No API and uneven metadata; hard to repeat exactly", log: "String, date, how many results you screened" },
+        { key: "oa", name: "Open database search", note: "OpenAlex, Semantic Scholar, Crossref", finds: "Broad, repeatable searches with exact strings and counts", misses: "Papers that use other words; the worked string 4 missed 3 of the 12", log: "String, field, date, count" },
+        { key: "gs", name: "Google Scholar", note: "free to search, not an open database", finds: "Wide coverage and a “cited by” list", misses: "No API and uneven metadata; hard to repeat exactly", log: "String, date, how many results you screened" },
         { key: "bw", name: "Backward snowballing", note: "a paper's references", finds: "The classics a field builds on", misses: "Anything newer than the paper", log: "Seed paper, how many references you screened" },
         { key: "fw", name: "Forward snowballing", note: "works that cite a paper", finds: "Newer work that engages the seed", misses: "Work that never cites the seed", log: "Seed, date (the list grows)" },
         { key: "lib", name: "Curated databases", note: "Scopus, Web of Science", finds: "Cleaner records and subject filters", misses: "Access depends on your library", log: "Database, string, date, count" }
@@ -489,10 +549,10 @@
       lede: "Tick each line for your own topic before you write the gap statement.", doneText: "Now write the gap statement.",
       items: [
         { id: "blocks", label: "Concept blocks", text: "Two or three blocks of synonyms, joined with AND." },
-        { id: "log", label: "Search log", text: "Database, field, string, date and count for every search, in two databases." },
+        { id: "log", label: "Search log", text: "Database, field, string, date and count for every search, in two open databases." },
         { id: "snow", label: "Snowballing", text: "Backward and forward from at least one review." },
         { id: "screen", label: "Screening", text: "Why each dropped paper was dropped, in a word or two." },
-        { id: "matrix", label: "Concept matrix", text: "At least 12 papers, coded by a written rule." },
+        { id: "matrix", label: "Concept matrix", text: "At least 12 papers, coded by a written rule; “not stated” kept apart from “no”." },
         { id: "cell", label: "Empty cell", text: "Searched directly, with the string and count logged." },
         { id: "closest", label: "Closest work", text: "Named, and read in a second pass with the extraction sheet." },
         { id: "claim", label: "No originality claim", text: "Say what your question adds; leave “first” and “novel” to the evidence." }
@@ -504,14 +564,14 @@
     var D = data["r02_literature"], S = data["r02_literature_openalex"], state = {};
     D.toCodeNote = "To code: " + D.matrix.filter(function (p) { return p.code; }).map(function (p) { return p.name; }).join("; ") + ". Years as OpenAlex lists them.";
     var steps = [
-      { text: "Start from the question below. Split it into concept blocks: pick at least two synonyms for each block and watch the search string build itself.", build: blocksStep(D, S) },
-      { text: "Five strings, each one change from the one before. Before each count appears, predict: more results, or fewer?", build: ladderStep(D, S) },
+      { text: "Start from the question below. Split it into concept blocks: pick at least two synonyms for each block and watch the [[search-string|search string]] build itself with [[boolean-operators|AND and OR]].", build: blocksStep(D, S) },
+      { text: "Five strings. The first step makes two changes at once; each later step makes one. Before each count appears, predict: more results, or fewer?", build: ladderStep(D, S) },
       { text: "Look at what string 5 returns, then put all five searches in a search log: where, what, when and how many.", build: hitsStep(D, S) },
       { text: "Now [[snowballing|snowball]] from one review: its references point backward, the works that cite it point forward. Switch between the three routes.", build: snowStep(D, S) },
       { text: "A [[concept-matrix|concept matrix]] puts papers in rows and ideas in columns. Code the four rows marked “to code”, then check.", build: matrixStep(D, S, state) },
-      { text: "Count your matrix in two by two: storage linked against extreme periods kept. Tap the empty cell, then decide what it means.", build: crossStep(D, S, state) },
-      { text: "Turn the empty cell into a search string of its own. Then look at what it finds, and which of your papers the closest one builds on.", build: targetedStep(D, S) },
-      { text: "Read the closest paper in three passes. A first pass takes 5 to 10 minutes: title, abstract, headings, conclusions. Start with the first C.", build: passStep(D, S) },
+      { text: "Count your matrix in a two by two: storage link against extreme periods, as the abstracts report them. Tap an empty cell, then decide what it means.", build: crossStep(D, S, state) },
+      { text: "The course's coding leaves one cell empty: both a storage link and extremes. Turn it into a search string of its own, then see what it finds.", build: targetedStep(D, S) },
+      { text: "Read the closest paper in passes. The first (5 to 10 minutes) decides whether to go on; the second fills the extraction sheet; the third is optional. Start with the first C.", build: passStep(D, S) },
       { text: "Write your [[research-gap|gap]] statement in your own words, from your log and matrix, then compare it with two answers below.", build: writeStep(D, S) }
     ];
     var cards = LX.StepCards(live, { id: "r2-steps", steps: steps });

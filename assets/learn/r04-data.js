@@ -23,6 +23,12 @@
 // LX.CompareTable, LX.Checklist, LX.Exemplars, LX.Rubric. Lesson-local: the decision buttons, the four-number readout,
 // the sensitivity table and the data-note form; CSS injected once with --lx-* tokens only.
 //
+// After the Codex review (W2 fix, 2026-11-03): flags are provisional (implausible, suspected), not proof; the same-hour
+// fill is the same UTC hour (rows 24 apart); a night check on solar runs after cleaning and its failures are logged as a
+// known limit; every log line carries its effect against the alternative; the spatial log records the coordinate systems
+// the reader chose as proposed, not as processing done; the starter notebook learn/notebooks/r04-data.ipynb repeats the
+// pipeline and asserts the same numbers.
+//
 // The pure model is exported for Node (_tests/learn/test_r04-data.js checks every number the page states).
 (function () {
   "use strict";
@@ -192,6 +198,54 @@
     });
     return out;
   }
+  // what each step changes, against the same pipeline with that step switched off (time in UTC, every value kept, the
+  // frozen rule off) or, for the fill, against the other two fills; the other choices stay as the reader set them
+  var FILLNAME = { drop: "left out", linear: "straight line", same: "same hour" }, effMemo = {};
+  function stepEffects(F, ch) {
+    ch = Object.assign({}, DEFAULT, ch || {});
+    var key = JSON.stringify(ch); if (effMemo[key]) return effMemo[key];
+    var rep = report(F, clean(F, ch)), alt = function (k, v) { var c = Object.assign({}, ch); c[k] = v; return report(F, clean(F, c)); }, e = {};
+    var u = alt("time", "utc");
+    e.time = ch.time === "utc" ? "peak hour " + rep.peakAt : "peak hour labelled " + rep.peakAt + " (" + u.peakAt + " in UTC)";
+    if (ch.time === "force") e.time += "; wind " + f2(rep.windTWh) + " TWh (" + f2(u.windTWh) + " with the rows kept)";
+    var k = alt("spike", "keep");
+    e.spike = ch.spike === "keep" ? "none (no rule): lowest hour " + f1(rep.minGW) + " GW" : "lowest hour " + f1(rep.minGW) + " GW (" + f1(k.minGW) + " GW with every value kept)";
+    var o = alt("frozen", 0);
+    e.frozen = !ch.frozen ? "none (rule off): demand " + f2(rep.demandTWh) + " TWh, wind " + f2(rep.windTWh) + " TWh" :
+      "demand " + f2(rep.demandTWh) + " TWh, wind " + f2(rep.windTWh) + " TWh (" + f2(o.demandTWh) + " and " + f2(o.windTWh) + " with the rule off)";
+    e.fill = "demand " + f2(rep.demandTWh) + " TWh (" + OPTIONS.fill.filter(function (x) { return x !== ch.fill; }).map(function (x) { return FILLNAME[x] + ": " + f2(alt("fill", x).demandTWh); }).join("; ") + ")";
+    effMemo[key] = e;
+    return e;
+  }
+  // a check the rules do not make: solar above 5% of its cleaned peak in hours starting 00:00 to 03:00 local time (lesson
+  // B2's physics check); filled = those hours that the fill wrote
+  function nightSolar(F, R) {
+    var s = R.cols.solar, mx = 0, n = 0, filled = 0, i;
+    for (i = 0; i < s.length; i++) if (s[i] != null && s[i] > mx) mx = s[i];
+    var row = function (j) { var f = R.forced; return !f ? j : j <= f.added ? j : j <= f.dropped ? j - 1 : j; };
+    for (i = 0; i < s.length; i++) if (s[i] != null && s[i] > 0.05 * mx && clock(F, row(i), "local").h < 4) { n++; if (R.flags.solar[row(i)]) filled++; }
+    return { hours: n, filled: filled, limitMW: 0.05 * mx };
+  }
+  // the three quantities against the raw file, in percent, and whether the peak's clock label moved (a relabelling)
+  var QTY = ["demandTWh", "minGW", "windTWh"];
+  function vsRaw(rep, raw) {
+    var pct = {};
+    QTY.forEach(function (k) { pct[k] = 100 * (rep[k] - raw[k]) / raw[k]; });
+    var most = QTY.slice().sort(function (a, b) { return Math.abs(pct[b]) - Math.abs(pct[a]); })[0];
+    return { pct: pct, most: Math.abs(pct[most]) < 0.005 ? null : most, peakMoved: rep.peakAt !== raw.peakAt };
+  }
+  // the year's demand with the flagged hours left out and with the same-hour fill, the reader's other choices kept
+  function fillContrast(F, ch) {
+    ch = Object.assign({}, DEFAULT, ch || {});
+    var d = report(F, clean(F, Object.assign({}, ch, { fill: "drop" }))).demandTWh, s = report(F, clean(F, Object.assign({}, ch, { fill: "same" }))).demandTWh;
+    return { drop: d, same: s, diff: s - d };
+  }
+  // the spatial log line from the reader's own picks: proposed coordinate systems, nothing processed yet
+  function spatialLine(D, picks) {
+    var Sp = D.spatial;
+    if (!picks || !Sp.questions.every(function (q) { return picks[q.id]; })) return "";
+    return Sp.log.replace("{buffer}", Sp.names[picks.buffer]).replace("{area}", Sp.names[picks.area]);
+  }
   // the cleaning log, one line per step, from the choices (D: the studio's text for each option)
   function f1(v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
   function f2(v) { return (Math.round(v * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -202,32 +256,36 @@
       var o = D.decisions[key].options.filter(function (x) { return String(x.id) === String(ch[key]); })[0];
       return { log: o.log.replace("{limit}", f0(spikeLimit(F.cols.demand, ch.spike))) };
     };
-    var lines = [];
+    var lines = [], e = stepEffects(F, ch), nt = nightSolar(F, R);
     lines.push({ key: "time", step: "Time base", what: opt("time").log, count: ch.time === "force" ? "1 hour copied (9 March), 1 hour dropped (2 November)" : "8,760 rows kept",
-                 why: w.time || "" });
+                 effect: e.time, why: w.time || "" });
     lines.push({ key: "spike", step: "Spike rule", what: opt("spike").log,
-                 count: ch.spike === "keep" ? "0 hours flagged" : c.demand.spike + " demand hour" + (c.demand.spike === 1 ? "" : "s") + " flagged", why: w.spike || "" });
+                 count: ch.spike === "keep" ? "0 hours flagged" : c.demand.spike + " demand hour" + (c.demand.spike === 1 ? "" : "s") + " flagged", effect: e.spike, why: w.spike || "" });
     lines.push({ key: "frozen", step: "Frozen-reading rule", what: opt("frozen").log,
-                 count: ch.frozen ? COLS.map(function (k) { return k + " " + f0(c[k].frozen) + " h"; }).join(", ") : "none flagged", why: w.frozen || "" });
+                 count: ch.frozen ? COLS.map(function (k) { return k + " " + f0(c[k].frozen) + " h"; }).join(", ") : "none flagged", effect: e.frozen, why: w.frozen || "" });
     lines.push({ key: "fill", step: "Fill method", what: opt("fill").log,
-                 count: f0(COLS.reduce(function (s, k) { return s + R.flags[k].filter(Boolean).length; }, 0)) + " flagged values " + (ch.fill === "drop" ? "left out" : "filled"), why: w.fill || "" });
-    lines.push({ key: "result", step: "Effect", what: "Demand " + f2(rep.demandTWh) + " TWh; lowest hour " + f1(rep.minGW) + " GW; peak hour " + rep.peakAt + "; wind " + f2(rep.windTWh) + " TWh",
-                 count: f0(rep.hours) + " of " + f0(rep.rows) + " demand rows with values", why: "" });
+                 count: f0(COLS.reduce(function (s, k) { return s + R.flags[k].filter(Boolean).length; }, 0)) + " flagged values " + (ch.fill === "drop" ? "left out" : "filled"), effect: e.fill, why: w.fill || "" });
+    lines.push({ key: "check", step: "Night check (after cleaning)", what: "Solar above 5% of its cleaned peak in hours starting 00:00 to 03:00 local time: not fixed by these rules (a night rule is the next step, B2)",
+                 count: nt.hours + " hours, " + nt.filled + " of them filled", effect: "", why: "" });
+    lines.push({ key: "result", step: "Result", what: "Demand " + f2(rep.demandTWh) + " TWh; lowest hour " + f1(rep.minGW) + " GW; peak hour " + rep.peakAt + "; wind " + f2(rep.windTWh) + " TWh",
+                 count: f0(rep.hours) + " of " + f0(rep.rows) + " demand rows with values", effect: "", why: "" });
     return lines;
   }
   // the data note as plain text: provenance from the data file's meta, the log, and the reader's own lines
-  function dataNote(meta, F, R, D, notes) {
-    var n = notes || {}, L = logLines(F, R, D, n.why), out = [];
+  function dataNote(meta, F, R, D, notes, spatial) {
+    var n = notes || {}, L = logLines(F, R, D, n.why), out = [], sp = spatialLine(D, spatial);
     out.push("DATA NOTE");
     out.push("Dataset: " + meta.title);
     out.push("Source: " + meta.source + " (" + meta.source_url + ")");
     out.push("Files and SHA-256: " + meta.files.map(function (f) { return f.name + " " + f.sha256; }).join("; "));
     out.push("Accessed: " + meta.accessed);
+    out.push("Extraction (before this note's cleaning): " + meta.not_cleaned);
     out.push("Licence: " + (n.licence || meta.license));
     out.push("Units: " + meta.units);
     out.push("Time: " + meta.time);
     out.push("Cleaning log:");
-    L.forEach(function (l, i) { out.push("  " + (i + 1) + ". " + l.step + ": " + l.what + " [" + l.count + "]" + (l.why ? " Why: " + l.why : "")); });
+    L.forEach(function (l, i) { out.push("  " + (i + 1) + ". " + l.step + ": " + l.what + " [" + l.count + "]" + (l.effect ? " Effect: " + l.effect + "." : "") + (l.why ? " Why: " + l.why : "")); });
+    if (sp) out.push(sp);
     out.push("Known limits: " + (n.limits || ""));
     out.push("Rerun: " + (n.rerun || ""));
     return out.join("\n");
@@ -237,6 +295,36 @@
     var i0 = -1, i1 = -1;
     for (var i = 0; i < F.n; i++) { var dt = clock(F, i, "local").date; if (dt >= from && i0 < 0) i0 = i; if (dt <= to) i1 = i; }
     return { i0: i0, i1: i1, raw: F.cols.wind.slice(i0, i1 + 1), clean: R.cols.wind.slice(i0, i1 + 1), flags: R.flags.wind.slice(i0, i1 + 1) };
+  }
+  // the chart's text version: each flagged run in the window, split where the raw value changes (first and last hour,
+  // length, the repeated raw value or "varies" for a spike, the mean after the fill) and a row per local day (raw mean,
+  // mean after the fill, hours flagged)
+  function weekText(F, W) {
+    var n = W.raw.length, runs = [], days = [], byDay = {}, i = 0;
+    var mean = function (a) { var v = a.filter(function (x) { return x != null; }); return v.length ? v.reduce(function (s, x) { return s + x; }, 0) / v.length : null; };
+    while (i < n) {
+      if (!W.flags[i]) { i++; continue; }
+      var j = i; while (j + 1 < n && W.flags[j + 1] && W.raw[j + 1] === W.raw[i]) j++;
+      var seg = W.raw.slice(i, j + 1);
+      runs.push({ first: hourLabel(clock(F, W.i0 + i, "local")), last: hourLabel(clock(F, W.i0 + j, "local")), hours: j - i + 1,
+                  value: seg.every(function (v) { return v === seg[0]; }) ? seg[0] : null, filled: mean(W.clean.slice(i, j + 1)) });
+      i = j + 1;
+    }
+    for (i = 0; i < n; i++) {
+      var c = clock(F, W.i0 + i, "local"), k = c.date;
+      if (!byDay[k]) { byDay[k] = { label: c.d + " " + MONTHS[c.m - 1], raw: [], clean: [], flagged: 0 }; days.push(byDay[k]); }
+      byDay[k].raw.push(W.raw[i]); byDay[k].clean.push(W.clean[i]); if (W.flags[i]) byDay[k].flagged++;
+    }
+    return { runs: runs, days: days.map(function (d) { return { label: d.label, raw: mean(d.raw), clean: mean(d.clean), flagged: d.flagged }; }) };
+  }
+  function weekHTML(F, W, fill) {
+    var T = weekText(F, W), v = function (x) { return x == null ? "left out" : f0(x); };
+    var said = { drop: "Left out: the flagged hours have no value, so they leave a hole in every total.", linear: "A straight line from the hour before each run to the hour after it.", same: "Each flagged hour takes the mean of the same UTC hour on nearby valid days." }[fill] || "";
+    return "<p>SPP wind output, 12 to 24 December 2025 (local dates), raw and after your fill. " + said + "</p>" +
+      '<table class="lx-facts"><caption>Flagged runs</caption><thead><tr><th scope="col">First hour</th><th scope="col">Last hour</th><th scope="col">Hours</th><th scope="col">Raw value, MW</th><th scope="col">After your fill, mean MW</th></tr></thead><tbody>' +
+      (T.runs.length ? T.runs.map(function (r) { return "<tr><td>" + r.first + "</td><td>" + r.last + "</td><td>" + r.hours + "</td><td>" + (r.value == null ? "varies" : f0(r.value) + ", repeated") + "</td><td>" + v(r.filled) + "</td></tr>"; }).join("") : '<tr><td colspan="5">No hour flagged with your rules.</td></tr>') +
+      '</tbody></table><table class="lx-facts"><caption>Each day</caption><thead><tr><th scope="col">Day</th><th scope="col">Raw mean, MW</th><th scope="col">After your fill, mean MW</th><th scope="col">Hours flagged</th></tr></thead><tbody>' +
+      T.days.map(function (d) { return "<tr><td>" + d.label + "</td><td>" + f0(d.raw) + "</td><td>" + v(d.clean) + "</td><td>" + d.flagged + "</td></tr>"; }).join("") + "</tbody></table>";
   }
   var RAW = { time: "utc", spike: "keep", frozen: 0, fill: "same" };
   // the two data-note excerpts of the exemplars, written from the model so every number is the page's own
@@ -248,29 +336,40 @@
       { text: "filled missing values", note: "EIA's adjusted file has no blanks: the gaps are the hours you flagged. Which method, and how many hours?" }, ", and ",
       { text: "converted times to local time", note: "Which zone, and what happened to the 23- and 25-hour days?" }, ". Annual demand was ",
       { text: "about " + f0(rb.demandTWh) + " TWh", note: "Raw or cleaned? Here both round to " + f0(rb.demandTWh) + " TWh (" + f2(raw.demandTWh) + " and " + f2(rb.demandTWh) + "), so only a log can say which." }, "."];
-    var good = ["Source: EIA Form EIA-930 six-month BALANCE files, balancing authority SWPP, 2025, ",
-      { text: "accessed " + dateText(meta.accessed) + ", SHA-256 " + meta.files.map(function (x) { return x.sha256.slice(0, 8); }).join("… and ") + "…", note: "Date and checksums let anyone confirm they hold the same file." }, "; ",
-      { text: "public domain, cited with the date", note: "The licence is checked and its request (an acknowledgment with a date) is met." }, ". Time: ",
-      { text: "rows kept in UTC, hour ending; results labelled in Central time with daylight saving", note: "No hour is lost or doubled, and every clock time on the page is named." }, ". Spikes: ",
-      { text: "demand under half the median (" + f0(spikeLimit(F.cols.demand, "half")) + " MW): " + c.demand.spike + " hour, " + when.d + " " + MONTHS[when.m - 1] + ", " + f0(F.cols.demand[sp]) + " MW", note: "Rule, threshold, count and the value itself." }, ". Frozen: ",
-      { text: "runs of 3 or more identical non-zero readings: demand " + f0(c.demand.frozen) + " h, wind " + f0(c.wind.frozen) + " h, solar " + f0(c.solar.frozen) + " h", note: "Counts per column, so the reader sees what each rule removed." }, ". Fill: the same hour on valid days within 7, 21 or 45 days. ",
-      { text: "Effect: annual demand " + f2(rb.demandTWh) + " TWh (raw " + f2(raw.demandTWh) + "); lowest hour " + f1(rb.minGW) + " GW (raw " + f1(raw.minGW) + ")", note: "Raw against cleaned: the reader sees what cleaning changed." }, "; ",
-      { text: "leaving the flagged hours out would give " + f2(drop.demandTWh) + " TWh", note: "The rejected alternative and its effect: the choice is defended, not just made." }, "."];
+    var nt = nightSolar(F, base);
+    var good = ["Source: ",
+      { text: "EIA Form EIA-930 six-month BALANCE files, balancing authority SWPP, 2025, accessed " + dateText(meta.accessed) + ", SHA-256 " + meta.files.map(function (x) { return x.sha256.slice(0, 8); }).join("… and ") + "…", note: "Date and checksums let anyone confirm they hold the same file." },
+      ".\nExtraction: ", { text: "EIA's adjusted columns; each fuel's columns summed, negative values set to 0", note: "Even an extract changes values: the clipping belongs in the audit trail." },
+      ".\nLicence: ", { text: "public domain, cited with the date", note: "The licence is checked and its request (an acknowledgment with a date) is met." },
+      ".\nTime: ", { text: "rows kept in UTC, hour ending; results labelled in Central time with daylight saving", note: "No hour is lost or doubled, and every clock time on the page is named." },
+      ".\nSpikes: ", { text: "demand under half the median (" + f0(spikeLimit(F.cols.demand, "half")) + " MW): " + c.demand.spike + " hour, " + when.d + " " + MONTHS[when.m - 1] + ", " + f0(F.cols.demand[sp]) + " MW", note: "Rule, threshold, count and the value itself." },
+      ", flagged as implausible; to check against SPP's records.\nFrozen: ",
+      { text: "runs of 3 or more identical non-zero readings: demand " + f0(c.demand.frozen) + " h, wind " + f0(c.wind.frozen) + " h, solar " + f0(c.solar.frozen) + " h", note: "Counts per column, so the reader sees what each rule flagged." },
+      "; suspected stuck feeds, as in the course's data build.\nFill: the same UTC hour on valid days within 7, 21 or 45 days, to keep the daily shape.\nEffect: ",
+      { text: "annual demand " + f2(rb.demandTWh) + " TWh (raw " + f2(raw.demandTWh) + "); lowest hour " + f1(rb.minGW) + " GW (raw " + f1(raw.minGW) + ")", note: "Raw against cleaned: the reader sees what cleaning changed." }, "; ",
+      { text: "leaving the flagged hours out would give " + f2(drop.demandTWh) + " TWh", note: "The rejected alternative and its effect: the choice is defended, not just made." },
+      ".\nKnown limits: ", { text: nt.hours + " night hours still show solar above 5% of its peak, " + nt.filled + " of them filled; a night rule comes next", note: "A check the rules fail, reported rather than hidden." },
+      ".\nRerun: ", { text: "the starter notebook r04-data.ipynb, with these four settings, prints the four numbers", note: "Anyone can rebuild the numbers from the note and one file." },
+      ".\nValidation: ", { text: "not yet; studio R5 adds the verification log and a check against an independent source", note: "Proficient for R4's part, the audit trail: the rubric's verification log and validation come in R5." }, "."];
     return { weak: weak, good: good };
   }
   function exemplarsSpec(F, meta) {
     var P = exemplarParts(F, meta);
     return { title: "Two data notes for the same file", task: "Write the data note for your cleaned SPP 2025 file.", id: "r4-ex",
-      answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: P.weak }, { key: "good", label: "Strong answer", level: "Proficient", parts: P.good }],
-      diff: [{ label: "Provenance", weak: "“EIA”", good: "Form, area, year, access date, checksums, licence" },
-             { label: "Each step", weak: "A verb", good: "Rule, threshold, count" },
-             { label: "Effect", weak: "One rounded number", good: "Raw against cleaned, and the rejected alternative" }],
+      answers: [{ key: "weak", label: "Weak answer", level: "Developing", parts: P.weak }, { key: "good", label: "Strong answer", level: "Proficient (audit trail)", parts: P.good }], lines: true,
+      diff: [{ label: "Provenance", weak: "“EIA”", good: "Form, area, year, access date, checksums, extraction, licence" },
+             { label: "Each step", weak: "A verb", good: "Rule, threshold, count, and a flag called provisional" },
+             { label: "Effect", weak: "One rounded number", good: "Raw against cleaned, and the rejected alternative" },
+             { label: "Limits and rerun", weak: "None", good: "A failed check reported; a notebook that rebuilds the numbers" }],
       note: "Both notes are illustrative; every number in them is computed on this page from the raw file." };
   }
   // the no-JS version of the task (what to produce is the page's task card, above the interactive): the four numbers raw
   // and with the course's choices, the one-choice-at-a-time table, the licence sort and the coordinate systems, as HTML
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  // glossary marks (double brackets around a slug, a bar and the words): as term spans for the no-JS blocks, or as words
+  function rich(s) { return esc(s).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return "<span class=\"lx-term\" data-" + "term=\"" + id + "\">" + w + "</span>"; }); }
+  function plain(s) { return String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"); }
   function staticTask(F, D, build) {
-    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
     var raw = report(F, clean(F, RAW)), S = sensitivity(F, DEFAULT), h = [];
     var v = function (rep, id) { return id === "peakAt" ? rep.peakAt : id === "minGW" ? f1(rep.minGW) + " GW" : f2(rep[id]) + " TWh"; };
     var lab = function (key, id) { return D.decisions[key].options.filter(function (o) { return String(o.id) === String(id); })[0].label; };
@@ -288,17 +387,21 @@
     h.push("<p>With the course's rules the counts match its data build: demand " + f0(c.demand.frozen + c.demand.spike) + " hours flagged (" + f0(build.demand_hours_flagged_as_implausible) +
       " in the build), wind " + f0(c.wind.frozen) + " (" + f0(build.frozen_hours_filled.wind) + "), solar " + f0(c.solar.frozen) + " (" + f0(build.frozen_hours_filled.solar) + ").</p>");
     h.push('<p class="lx-eyebrow">Licences: what each source asks of you</p><ul>');
-    D.licences.cards.forEach(function (k) { var b = D.licences.bins.filter(function (x) { return x.id === k.bin; })[0]; h.push("<li><b>" + esc(k.text) + "</b>: " + esc(b.label) + ". " + esc(k.why) + "</li>"); });
+    D.licences.cards.forEach(function (k) { var b = D.licences.bins.filter(function (x) { return x.id === k.bin; })[0]; h.push("<li><b>" + esc(k.text) + "</b>: " + esc(b.label) + ". " + rich(k.why) + "</li>"); });
     h.push("</ul>");
-    h.push('<p class="lx-eyebrow">A spatial layer</p><p>' + esc(D.spatial.context) + "</p><ul>");
-    D.spatial.questions.forEach(function (q) { h.push("<li>" + esc(q.q) + " " + esc(q.why[q.answer]) + "</li>"); });
+    var nt = nightSolar(F, clean(F, DEFAULT));
+    h.push("<p>A check the rules do not pass: with the course's choices, " + nt.hours + " night hours (starting 00:00 to 03:00 local time) still show solar above 5% of its peak, " + nt.filled +
+      " of them written by the same-hour fill. The log reports it as a known limit; a night rule is the next step (B2).</p>");
+    h.push('<p class="lx-eyebrow">A spatial layer</p><p>' + rich(D.spatial.context) + "</p><ul>");
+    D.spatial.questions.forEach(function (q) { h.push("<li>" + esc(q.q) + " " + rich(q.why[q.answer]) + "</li>"); });
     h.push("</ul>");
     return h.join("\n");
   }
   var model = { staticTask: staticTask, dateText: dateText, RAW: RAW, exemplarParts: exemplarParts, exemplarsSpec: exemplarsSpec, HOUR: HOUR, WINDOWS: WINDOWS, DEFAULT: DEFAULT, OPTIONS: OPTIONS, frame: frame, dstBounds: dstBounds, centralOffset: centralOffset,
     clock: clock, hourLabel: hourLabel, localDays: localDays, median: median, meanSd: meanSd, spikeFlags: spikeFlags, spikeLimit: spikeLimit, runs: runs, runFlags: runFlags,
     fill: fill, dstForce: dstForce, clean: clean, report: report, sensitivity: sensitivity, swings: swings, logLines: logLines, dataNote: dataNote, week: week,
-    f0: f0, f1: f1, f2: f2 };
+    stepEffects: stepEffects, nightSolar: nightSolar, vsRaw: vsRaw, fillContrast: fillContrast, spatialLine: spatialLine, weekText: weekText, weekHTML: weekHTML,
+    rich: rich, plain: plain, f0: f0, f1: f1, f2: f2 };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -386,7 +489,7 @@
             ro.set(rep, prev);
             saw(fb, o.verdict !== "bad", "<b>" + (o.verdict === "good" ? "Defensible." : o.verdict === "ok" ? "Defensible if you say so." : "Hard to defend.") + "</b> " + LX.rich(o.note));
             var line = logLines(F, R, D).filter(function (l) { return l.key === key; })[0];
-            logp.hidden = false; logp.textContent = "Log: " + line.step + ": " + line.what + " [" + line.count + "]";
+            logp.hidden = false; logp.textContent = "Log: " + line.step + ": " + line.what + " [" + line.count + "] Effect: " + line.effect + ".";
             if (extra) extra(more, o);
             api.done();
           });
@@ -397,12 +500,13 @@
     }
     // ---- step 1: predict
     function predictStep(act, api) {
-      var q = D.predict, pick = LX.store.get("r4-predict", null);
+      var q = D.predict, pick = LX.store.get("r4-predict", null), qty = D.numbers.filter(function (n) { return n.unit; });
+      if (!qty.some(function (n) { return n.id === pick; })) pick = null;
       H("p", { class: "lx-eyebrow", text: q.q }, act);
       var g = H("div", { class: "lx-qbtns", role: "group", "aria-label": q.q }, act);
       var ro = Readout(H("div", null, act), D, raw); ro.set(raw);
-      H("p", { class: "lx-hint", text: "The raw file: SPP 2025 from EIA-930, before any cleaning, with UTC clock times. The answer comes in step 6." }, act);
-      D.numbers.forEach(function (n) {
+      H("p", { class: "lx-hint", text: "The EIA-adjusted extract of SPP 2025, before this studio's cleaning, with UTC clock times. Step 6 compares your result with these raw values." }, act);
+      qty.forEach(function (n) {
         var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": pick === n.id ? "true" : "false", text: n.label }, g);
         b.addEventListener("click", function () {
           pick = n.id; LX.store.set("r4-predict", pick);
@@ -440,13 +544,14 @@
         lines: [{ values: W.raw, color: "var(--lx-ink-3)", width: 1.2, dash: "4 3" }, { values: W.clean, color: "var(--lx-wind)", width: 1.8 }],
         legend: [{ label: "Raw", color: "var(--lx-ink-3)", dash: "4 3" }, { label: "After your fill", color: "var(--lx-wind)" }],
         aria: "SPP wind output from 12 to 24 December 2025, raw and after your fill, with the " + flagged + " flagged hours shaded.",
-        text: { head: ["Rows", "Hours flagged", "Raw mean, MW", "Filled mean, MW"], rows: [[n, flagged, f0(W.raw.reduce(function (s, v) { return s + v; }, 0) / n),
-          (function () { var v = W.clean.filter(function (x) { return x != null; }); return v.length ? f0(v.reduce(function (s, x) { return s + x; }, 0) / v.length) : "–"; })()]] } }, true);
-      H("p", { class: "lx-hint", text: "Wind, 12 to 24 December (local dates). Shaded: hours your rules flagged. " + (ch.fill === "drop" ? "Left out, they leave a hole in every total." : ch.fill === "linear" ? "The straight line runs flat through the freeze." : "The fill borrows the same hour from nearby valid days.") }, host);
+        text: { html: weekHTML(F, W, ch.fill) } }, true);
+      H("p", { class: "lx-hint", text: "Wind, 12 to 24 December (local dates). Shaded: hours your rules flagged. " + (ch.fill === "drop" ? "Left out, they leave a hole in every total." : ch.fill === "linear" ? "The straight line runs flat through the freeze." : "The fill borrows the same UTC hour from nearby valid days.") }, host);
+      var nt = nightSolar(F, R);
+      H("p", { class: "lx-hint", text: "Check after cleaning: " + nt.hours + " night hours (starting 00:00 to 03:00 local) still show solar above 5% of its peak, " + nt.filled + " of them filled. Your log reports it as a known limit." }, host);
     }
     // ---- step 6: one choice at a time
     function sensStep(act, api) {
-      var S = sensitivity(F, ch), sw = swings(S), pick = LX.store.get("r4-predict", null);
+      var S = sensitivity(F, ch), pick = LX.store.get("r4-predict", null);
       var t = H("table", { class: "r4-tbl cards" }, H("div", { class: "lx-scroll-x" }, act)), hr = H("tr", null, H("thead", null, t));
       H("th", { scope: "col", class: "l", text: "Change one choice" }, hr);
       D.numbers.forEach(function (n) { H("th", { scope: "col", text: n.label }, hr); });
@@ -460,26 +565,26 @@
           var td = H("td", { class: big ? "big" : "", "data-l": n.label }, tr); if (big) H("span", { "aria-hidden": "true", text: "◆ " }, td); td.appendChild(document.createTextNode(v)); if (big) H("span", { class: "lx-sr", text: " (moved)" }, td);
         });
       });
-      var rel = { demandTWh: 0, minGW: 0, windTWh: 0 };
-      S.rows.forEach(function (r) { Object.keys(rel).forEach(function (k) { rel[k] = Math.max(rel[k], Math.abs(r.rep[k] - S.base[k]) / S.base[k]); }); });
-      var sv = S.rows.filter(function (r) { return r.key === "spike"; }).map(function (r) { return r.rep.minGW; }).concat([S.base.minGW]);
-      var spikeLo = Math.min.apply(null, sv), spikeHi = Math.max.apply(null, sv);
-      var most = Object.keys(rel).sort(function (a, b) { return rel[b] - rel[a]; })[0], name = D.numbers.filter(function (n) { return n.id === most; })[0].label;
       H("p", { class: "lx-hint", text: "Red with ◆: more than 1 TWh or 1 GW away from your choices, or a different clock time." }, act);
+      var fc = fillContrast(F, ch), rw = vsRaw(S.base, raw), name = function (id) { return D.numbers.filter(function (n) { return n.id === id; })[0].label.toLowerCase(); };
+      H("p", { class: "lx-hint", text: Math.abs(fc.diff) < 0.005 ? "Your rules flag nothing, so the fill changes nothing." :
+        "With your other choices, leaving the flagged hours out gives " + f2(fc.drop) + " TWh of demand and the same-hour fill " + f2(fc.same) + " TWh: " + f2(Math.abs(fc.diff)) + " TWh " + (fc.diff > 0 ? "more" : "less") + " with the fill." }, act);
+      var pc = function (v) { var a = Math.abs(v); return (v < 0 ? "−" : "+") + (a >= 100 ? f0(a) : f1(a)) + "%"; };
       api.done();
-      api.saw("**" + name + "** moved most: " + (most === "minGW" ? "the spike rule alone moves it between " + f1(spikeLo) + " and " + f1(spikeHi) + " GW" : "by up to " + Math.round(rel[most] * 100) + "%") +
-        ". Leaving flagged hours out cuts the year's demand by " + f2(sw.fill.demandTWh) + " TWh. " + (pick ? (pick === D.predict.answer ? "Your prediction was right." : "You predicted another number.") : ""));
+      api.saw((rw.most ? "Against the raw file, your choices move the **" + name(rw.most) + "** most: " + pc(rw.pct[rw.most]) + "." : "Against the raw file, your choices move none of the three quantities.") +
+        " The peak's clock label " + (rw.peakMoved ? "changed too: a relabelling, not a change in demand." : "did not change.") +
+        (pick ? (pick === rw.most ? " Your prediction was right." : " You predicted the " + name(pick) + ".") : ""));
     }
     // ---- step 7: licences
     function licenceStep(act, api) {
       var L = D.licences;
       LX.CardSort(act, { bins: L.bins, cards: L.cards, checkLabel: "Check my sort",
-        onCheck: function (g) { api.done(); api.saw("**" + g.right + " of " + g.total + "** right. Public domain still asks for a citation; share-alike and non-commercial terms travel with your derived data.", g.right < g.total - 2); } });
+        onCheck: function (g) { api.done(); api.saw("**" + g.right + " of " + g.total + "** right. Public domain still asks for a citation. For share-alike data, check whether your output is a derived database or a produced work, such as a map: the terms differ.", g.right < g.total - 2); } });
     }
     // ---- step 8: a spatial layer
     function spatialStep(act, api) {
       var Sp = D.spatial, answered = {};
-      H("p", { text: Sp.context }, act);
+      H("p", { html: LX.rich(Sp.context) }, act);
       Sp.questions.forEach(function (q) {
         H("p", { class: "lx-eyebrow", text: q.q }, act);
         var g = H("div", { class: "lx-qbtns", role: "group", "aria-label": q.q }, act), fb = H("div", { "aria-live": "polite" }, act);
@@ -487,9 +592,9 @@
           var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": "false", text: o[1] }, g);
           b.addEventListener("click", function () {
             [].forEach.call(g.children, function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); x.classList.remove("right", "wrong"); });
-            var ok = o[0] === q.answer; b.classList.add(ok ? "right" : "wrong"); answered[q.id] = true;
-            saw(fb, ok, LX.esc(q.why[o[0]]));
-            if (Object.keys(answered).length === Sp.questions.length) { LX.store.set("r4-spatial", true); api.done(); api.saw("Log line: " + Sp.log); }
+            var ok = o[0] === q.answer; b.classList.add(ok ? "right" : "wrong"); answered[q.id] = o[0];
+            saw(fb, ok, LX.rich(q.why[o[0]]));
+            if (Object.keys(answered).length === Sp.questions.length) { LX.store.set("r4-spatial", answered); api.done(); api.saw("Log line: " + spatialLine(D, answered)); }
           });
         });
       });
@@ -511,25 +616,26 @@
       var row = H("div", { class: "r4-row" }, act), cp = H("button", { class: "lx-btn small", type: "button", text: "Copy the data note" }, row), st = H("span", { class: "lx-hint", "aria-live": "polite", text: "Your note stays in this browser." }, row);
       cp.addEventListener("click", function () { LX.copyText(pre.textContent).then(function (ok) { st.textContent = ok ? "Copied." : "Select the note and copy it."; }); api.done(); });
       function save() { LX.store.set("r4-note", notes); draw(); }
-      function draw() { pre.textContent = dataNote(meta, F, R, D, notes) + (LX.store.get("r4-spatial", false) ? "\n" + D.spatial.log : ""); if (Object.keys(notes.why).filter(function (k) { return (notes.why[k] || "").trim(); }).length >= 2) api.done(); }
+      function draw() { var sp = LX.store.get("r4-spatial", null); pre.textContent = dataNote(meta, F, R, D, notes, sp && typeof sp === "object" ? sp : null); if (Object.keys(notes.why).filter(function (k) { return (notes.why[k] || "").trim(); }).length >= 2) api.done(); }
       draw();
       var pl = H("details", { class: "lx-textalt" }, act); H("summary", { text: "Your own practice: about 2 hours" }, pl);
       var ol = H("ol", { class: "r4-plan" }, pl);
       D.practice.forEach(function (p) { H("li", { text: p.task + " (" + p.min + " min)" }, ol); });
       var dl = H("p", { class: "r4-row" }, pl);
+      H("a", { class: "lx-btn small ghost", href: "notebooks/r04-data.ipynb", download: "", text: "Starter notebook (.ipynb)" }, dl);
       H("a", { class: "lx-btn small ghost", href: "../assets/learn/data/b02-python-data.json", download: "", text: "Raw SPP data (JSON)" }, dl);
-      H("a", { class: "lx-btn small ghost", href: "notebooks/b02-python-data.ipynb", download: "", text: "B2's notebook (.ipynb)" }, dl);
+      H("p", { class: "lx-hint", html: "The notebook needs only the raw file. Part 3 is the spatial layer in <a href=\"https://qgis.org/\">QGIS</a>, with turbines from the <a href=\"https://energy.usgs.gov/uswtdb/\">U.S. Wind Turbine Database</a>." }, pl);
     }
     var steps = [
       { text: "You will report four numbers from SPP's raw 2025 file. Before you clean anything, predict which one your cleaning will move most.", build: predictStep },
       { text: "EIA stamps each hour in [[utc|UTC]] at the hour's end (B2). Choose how your study keeps time; the clock time of the peak depends on it.", build: decision("time") },
-      { text: "One demand hour reads 1,505 MW on 21 June (B2). Choose a rule for impossible values and watch the lowest hour of demand.", build: decision("spike") },
-      { text: "A stuck feed repeats its last reading ([[frozen-telemetry|frozen telemetry]]). Choose how long a run must be before you flag it.", build: decision("frozen", frozenExtra) },
+      { text: "One demand hour reads 1,505 MW on 21 June (B2). Choose a rule for implausible values: one uses the [[median|median]], one the [[standard-deviation|standard deviation]]. Watch the lowest hour.", build: decision("spike") },
+      { text: "A stuck feed repeats its last reading ([[frozen-telemetry|frozen telemetry]]); a long repeat is a suspect, not proof. Choose how long a run must be before you flag it.", build: decision("frozen", frozenExtra) },
       { text: "Flagged hours are now gaps. Choose how to fill them, and watch the December freeze and the year's totals.", build: decision("fill", fillExtra) },
       { text: "Now vary one choice at a time from yours. Which choices move which numbers? This table is what defends your choices.", build: sensStep },
       { text: "Data come with a [[data-licence|licence]]. Sort eight sources by what their terms ask of you.", build: licenceStep },
-      { text: "A spatial layer needs its own decisions. Pick a [[coordinate-reference-system|coordinate system]] for each job.", build: spatialStep },
-      { text: "Write the [[data-note|data note]]: your log writes itself; add a reason for each choice, the known limits and how to rerun.", build: noteStep }
+      { text: "A spatial layer needs its own decisions. Pick a [[coordinate-reference-system|coordinate system]] for each job: 1 km [[buffer|buffers]], then an area. Your log records them as proposed.", build: spatialStep },
+      { text: "Write the [[data-note|data note]]: your log writes itself, with each step's effect; add a reason for each choice, the known limits and how to rerun.", build: noteStep }
     ];
     var cards = LX.StepCards(live, { id: "r4-steps", steps: steps });
     return { cards: cards, D: D, F: F, meta: meta, choose: function (c) { Object.keys(c).forEach(function (k) { setChoice(k, c[k]); }); } };
@@ -543,7 +649,7 @@
       title: "Defending one cleaning step", lede: "The same route for every suspect value. Trace three real cases from SPP's 2025 file.",
       nodes: {
         s: { t: "A suspect value", k: "end" },
-        q1: { t: "Physically possible?", tN: ["Physically", "possible?"], k: "q" },
+        q1: { t: "Plausible next to its neighbours?", tN: ["Plausible next", "to neighbours?"], k: "q" },
         q2: { t: "A real event?", tN: ["A real", "event?"], k: "q" },
         keep: { t: "Keep it, say why", tN: ["Keep it,", "say why"] },
         flag: { t: "Flag by a stated rule", tN: ["Flag by a", "stated rule"], s: "count the hours", sN: "count them" },
@@ -557,8 +663,8 @@
       colsN: 2, atN: { s: [0, 0], q1: [0, 1], q2: [1, 2], keep: [1, 3], flag: [0, 3], fill: [0, 4], rerun: [0, 5], q3: [0, 6], both: [0, 7], rob: [1, 7] },
       edges: [["s", "q1"], ["q1", "flag", "no"], ["q1", "q2", "yes"], ["q2", "keep", "yes"], ["q2", "flag", "no"], ["flag", "fill"], ["fill", "rerun"], ["rerun", "q3"], ["q3", "both", "yes"], ["q3", "rob", "no"]],
       traces: [
-        { label: "21 June · the spike", path: ["s", "q1", "flag", "fill", "rerun", "q3", "both"], text: "1,505 MW is not possible for this grid. Flag it; the lowest hour moves from **" + f1(raw.minGW) + "** to **" + f1(base.minGW) + " GW**. Two spike rules flag the same hour." },
-        { label: "December · the freeze", path: ["s", "q1", "q2", "flag", "fill", "rerun", "q3", "both"], text: "Each value is possible, but not for 155 hours in a row. Flag the run; the fill moves the year's demand: **" + f2(base.demandTWh) + " TWh** filled against **" + f2(drop.demandTWh) + "** with the hours left out." },
+        { label: "21 June · the spike", path: ["s", "q1", "flag", "fill", "rerun", "q3", "both"], text: "1,505 MW is implausible next to the hours around it: flag it provisionally and check the operator's records. The lowest hour moves from **" + f1(raw.minGW) + "** to **" + f1(base.minGW) + " GW**." },
+        { label: "December · the freeze", path: ["s", "q1", "q2", "flag", "fill", "rerun", "q3", "both"], text: "Each value is plausible, but 155 identical hours in a row point to a stuck feed: corroborate, then flag. Demand: **" + f2(base.demandTWh) + " TWh** filled against **" + f2(drop.demandTWh) + "** left out." },
         { label: "2 November · 25 hours", path: ["s", "q1", "q2", "keep"], text: "The clocks went back: a real 25-hour day. Keep every row; label it in local time." }
       ], sel: 0 });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), { title: "Ways to fill a gap, and when each is defensible", text: true,
@@ -567,7 +673,7 @@
       rows: [
         { key: "drop", name: "Leave out", shape: "Not needed", fits: "Statistics of real readings only", risk: "Totals add up fewer hours: energy is understated" },
         { key: "lin", name: "Straight line", shape: "Lost over long gaps", fits: "Gaps of an hour or two", risk: "Flattens a week-long freeze" },
-        { key: "same", name: "Same hour, nearby days", note: "the course's rule for wind and solar", shape: "Kept", fits: "Gaps of hours to weeks", risk: "Borrows other days' weather; log the hours filled" },
+        { key: "same", name: "Same hour, nearby days", note: "the course's rule for wind and solar", shape: "Kept", fits: "Gaps of hours to weeks", risk: "Borrows other days' weather and can copy bad night readings; log the hours filled and check solar at night" },
         { key: "fc", name: "Scaled day-ahead forecast", note: "the course's rule for demand", shape: "Kept", fits: "Demand, when a forecast column exists", risk: "Inherits errors in the forecast's daily shape; the course rescales it to the demand around each gap" },
         { key: "model", name: "A model of the series", note: "for example a regression on weather", shape: "Kept", fits: "Long gaps with good inputs", risk: "Needs its own validation, and more to explain" }
       ] });
