@@ -47,8 +47,16 @@ ok(P("450,000") === 450000 && P("0.45") === 0.45 && P(".5") === 0.5 && P("5.") =
 ok(near(P("6.96 × 10^9"), 6.96e9, 1) && near(P("6.96x10^9"), 6.96e9, 1) && near(P("6.96*10^9"), 6.96e9, 1) && near(P("2 × 10^-3"), 0.002, 1e-15), "parse: a × 10^n written three ways, negative exponents");
 ok(P("−3") === -3 && P("–2.5") === -2.5 && P("-0.25") === -0.25, "parse: minus, en dash and hyphen");
 ok(P("$78,600") === 78600 && P("$3.85") === 3.85 && P("33.8%") === 33.8 && P(" 145 ") === 145 && P("1 230") === 1230, "parse: dollars, percent and spaces dropped");
-ok(P("145 MW") === 145 && P("12.5kg") === 12.5, "parse: a trailing unit is ignored, as parseFloat does");
-ok(P("") === null && P("abc") === null && P("$") === null && P(null) === null && P(undefined) === null && P("-") === null, "parse: no number gives null");
+// shared fix 4 (K1 review #3): superscript exponents, no left-over text, and only the box's own unit after the number
+ok(near(P("6.96 × 10⁹"), 6.96e9, 1) && near(P("6.96×10⁹"), 6.96e9, 1) && near(P("2 × 10⁻³"), 0.002, 1e-15) && P("10⁹") === 1e9 && P("10^9") === 1e9 && near(P("1.9 × 10¹"), 19, 1e-12) && near(P("4.2 × 10¹⁵"), 4.2e15, 1),
+  "parse: superscript exponents as the page prints them (6.96 × 10⁹ is 6.96e9, not 6.96), and a bare power of ten");
+ok(P("145 MW") === null && P("12.5kg") === null && P("3 apples") === null && P("1.2.3") === null && P("6.96 × 10") === null && P("abc") === null, "parse: left-over text is refused (null), not cut off as parseFloat would");
+ok(P("450,000 MW", "kW") === null && P("450,000 kW", "kW") === 450000 && P("450,000 kw", "kW") === 450000 && P("450,000", "kW") === 450000, "parse: in a kW box, 450,000 MW is refused; 450,000 kW and 450,000 are read");
+ok(P("145 MW", ["MW", "megawatts"]) === 145 && P("145 megawatts", ["MW", "megawatts"]) === 145 && P("$120 per kW", "$ per kW") === 120 && P("120 $/kW", "$ per kW") === 120 && P("85%", "% (back ÷ in)") === 85,
+  "parse: the unit may be a list; case, spaces and $ and % are ignored, and / reads as per");
+ok(P("") === null && P("$") === null && P(null) === null && P(undefined) === null && P("-") === null && P("1e400") === null, "parse: no number gives null");
+ok(NA.read("").why === "empty" && NA.read(" $ ").why === "empty" && NA.read("450,000 MW", "kW").why === "text" && NA.read("abc").why === "text" && NA.read("6.96 × 10⁹").why === null && NA.read("6.96 × 10⁹").value === 6.96e9,
+  "read: why a text gives no number (empty, or text that is not just a number)");
 ok(NA.close(145, 145) && !NA.close(145.0001, 145) && !NA.close(null, 0) && !NA.close(NaN, NaN), "close: exact without a tolerance; null and NaN never");
 ok(NA.close(6.963, 6.957, 0.006) && !NA.close(6.95, 6.957, 0.006) && NA.close(1.5, 1, 0.5) && !NA.close(1.6, 1, 0.5), "close: within the tolerance (ends included)");
 
@@ -101,6 +109,7 @@ const s0 = DR.newSeed(); ok(Number.isInteger(s0) && s0 >= 1 && s0 <= 100000, "ne
   ok(lab.getAttribute("for") === inp.id && inp.id && lab.textContent === "g =", "NumAnswer view: the label names the box (for/id)");
   ok(inp.getAttribute("type") === "text" && inp.getAttribute("inputmode") === "decimal" && inp.getAttribute("autocomplete") === "off" && inp.classList.contains("lx-na-num"), "NumAnswer view: a text box with a number pad on phones");
   ok(unit.textContent === "MW" && btn.textContent === "Check" && btn.getAttribute("type") === "button" && btn.classList.contains("lx-btn"), "NumAnswer view: unit and Check button");
+  ok(unit.id && inp.getAttribute("aria-describedby") === unit.id, "NumAnswer view: the unit describes the box (aria-describedby)");
   ok(!a.row.getAttribute("style"), "NumAnswer view: no width set by default (7.5em from the CSS)");
   inp.value = "1,230"; btn.click();
   ok(got.length === 1 && got[0][0] === 1230 && got[0][1] === inp, "NumAnswer view: Check passes the parsed number and the box");
@@ -108,6 +117,20 @@ const s0 = DR.newSeed(); ok(Number.isInteger(s0) && s0 >= 1 && s0 <= 100000, "ne
   ok(got.length === 2 && got[1][0] === -3 && e.defaultPrevented, "NumAnswer view: Enter checks too");
   inp.fire("keydown", { key: "a" }); ok(got.length === 2, "NumAnswer view: other keys do nothing");
   inp.value = ""; a.go(); ok(got.length === 3 && got[2][0] === null, "NumAnswer view: an empty box gives null");
+  // a refused entry (another unit, or words): the box's own note says so, the check is not run (never graded)
+  const msg = host.querySelector(".lx-na-msg");
+  ok(msg && msg.hidden && msg.getAttribute("aria-live") === "polite", "NumAnswer view: a live note, hidden until needed");
+  inp.value = "145 kW"; a.go();
+  ok(got.length === 3 && !msg.hidden && msg.textContent === "Type just the number: the box is in MW." && inp.getAttribute("aria-invalid") === "true" && inp.getAttribute("aria-describedby") === unit.id + " " + msg.id,
+    "NumAnswer view: 145 kW in an MW box is refused, not graded; the note says why and describes the box");
+  inp.value = "145 MW"; a.go();
+  ok(got.length === 4 && got[3][0] === 145 && msg.hidden && !inp.getAttribute("aria-invalid") && inp.getAttribute("aria-describedby") === unit.id, "NumAnswer view: 145 MW in an MW box is checked as 145; the note clears");
+  inp.value = "6.96 × 10⁹"; a.go(); ok(got.length === 5 && got[4][0] === 6.96e9, "NumAnswer view: 6.96 × 10⁹ is checked as 6.96e9");
+  const k = E.LX.NumAnswer(host, { label: "In kW", unit: "kW", onCheck: v => got.push([v]) });
+  k.input.value = "450,000 MW"; k.go(); ok(got.length === 5 && k.msg.textContent === "Type just the number: the box is in kW.", "NumAnswer view: 450,000 MW in a kW box is refused");
+  const n = E.LX.NumAnswer(host, { label: "n =", onCheck: v => got.push([v]) });
+  n.input.value = "9 places"; n.go(); ok(got.length === 5 && n.msg.textContent === "Type just the number." && !n.input.getAttribute("aria-describedby") === false, "NumAnswer view: without a unit, any words are refused");
+  n.input.value = "9"; n.go(); ok(got.length === 6 && got[5][0] === 9 && !n.input.getAttribute("aria-describedby"), "NumAnswer view: without a unit, the box has no description until a note shows");
   const b = E.LX.NumAnswer(host, { label: "Answer", button: "Try", width: "8.5em", widthPhone: "6.5em", onCheck: () => {} });
   ok(b.row.getAttribute("style") === "--lx-na-w:8.5em;--lx-na-wp:6.5em" && b.button.textContent === "Try" && !b.row.querySelector(".lx-na-unit"), "NumAnswer view: widths as custom properties, button text, no unit");
   ok(E.LX.NumAnswer.parse === NA.parse || E.LX.NumAnswer.parse("6.96e9") === 6.96e9, "NumAnswer view: LX.NumAnswer.parse for pages");
@@ -166,6 +189,8 @@ function drillEnv(opts) {
   const box = t.host.querySelector(".lx-drill-q input"), fb = t.host.querySelector(".lx-drill-q").children[2];
   ok(t.host.querySelector(".lx-drill-q .lx-na-unit").textContent === "dollars" && t.host.querySelector(".lx-drill-q .lx-na").getAttribute("style") === "--lx-na-w:8em", "Drill view: unit() and width options");
   box.value = "x"; box.fire("keydown", { key: "Enter" });
+  ok(fb.textContent === "" && t.host.querySelector(".lx-drill-q .lx-na-msg").textContent === "Type just the number: the box is in dollars." && t.score() === "0 done", "Drill view: words are refused by the number box (its own note), not graded");
+  box.value = ""; box.fire("keydown", { key: "Enter" });
   ok(fb.textContent === "Type a number first." && t.score() === "0 done", "Drill view: empty: a message, and the item stays open");
   box.value = String(DR.series(ITEMS, 42, 3)[2].answer); box.fire("keydown", { key: "Enter" });
   ok(t.score() === "1 of 1 right", "Drill view: then a typed answer is checked");
