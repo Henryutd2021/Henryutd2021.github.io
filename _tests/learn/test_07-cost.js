@@ -59,6 +59,23 @@ for (let i = 0; i < 400; i++) {
   ok(L.total > 0 && isFinite(L.total), `random ${i}: LCOE positive and finite`);
 }
 
+// ---------------- the explain equation follows the calculator (regression: it read the store once, at mounting)
+ok(M.explainInputs(D, null).tech === "wind" && !M.explainInputs(D, null).own, "explain: wind defaults before the calculator is used");
+for (const [k, o] of [["wind", { cf: 40, capex: 1500 }], ["cc", { gas: 7.2, wacc: 6 }], ["solar", { cf: 28 }], ["peaker", { cf: 20, gas: 3 }]]) {
+  const p = M.inputs(D, k, o), stored = JSON.parse(JSON.stringify({ tech: k, inputs: p, L: M.lcoe(p) }));   // as LX.store keeps it
+  const X = M.explainInputs(D, stored), Lx = M.lcoe(X.p);
+  ok(X.own && X.tech === k && near(Lx.total, stored.L.total, 1e-9) && near(Lx.E, stored.L.E, 1e-12) && near(Lx.crf, stored.L.crf, 1e-12), `explain: after changing ${k}'s inputs the equation shows the calculator's LCOE`);
+}
+ok(/if \(user \|\| acted\) \{ LX\.store\.set\("c7-calc"[^\n]*refreshExplain\(\)/.test(JS) && /return drawEq;/.test(JS) && /refreshExplain = buildExplain\(/.test(JS), "explain: every calculator change redraws the equation card");
+
+// ---------------- the cash-flow chart's axis holds the whole path (no silent clipping)
+for (let price = 20; price <= 80; price += 0.5) {
+  const path = M.npv(M.inputs(D, "wind"), price).path, ax = M.cashAxis(path);
+  ok(ax.lo <= Math.min(...path) && ax.hi >= Math.max(...path), `cash axis at $${price}: holds the path`);
+  ok(ax.ticks.length >= 3 && ax.ticks.length <= 8 && ax.ticks.indexOf(0) >= 0, `cash axis at $${price}: 3-8 ticks including zero`);
+}
+ok(M.npv(M.inputs(D, "wind"), 80).path[30] > 1000, "cash axis: at $80/MWh the wind farm ends above $1,000 per kW (the old axis stopped there)");
+
 // ---------------- tornado
 for (const k of M.TECHS) {
   const t = M.tornado(D, k);
@@ -81,7 +98,13 @@ for (let s = B.solarMW; s <= B.solarMax; s += B.solarStep) {
   if (s > B.solarMW) ok(A.value.solar <= M.arrival(town, days, D, s - B.solarStep).value.solar + 1e-9, `arrival ${s} MW: a solar MWh is worth no more than with less solar`);
 }
 const A200 = M.arrival(town, days, D), A400 = M.arrival(town, days, D, 400);
-ok(Math.max(...A200.hours.map(h => h.demand)) === B.demandPeakMW, "arrival: the hottest day peaks at lesson 0's 450 MW scale");
+ok(Math.max(...A200.hours.map(h => h.demand)) === B.demandPeakMW, "arrival: the summer peak-demand day peaks at lesson 0's 450 MW scale");
+// the hourly value is a marginal value; what a whole farm saves is the change in the day's running cost (Go deeper states both)
+const cut = M.runCost(town, A200) - M.runCost(town, A400), added = A400.hours.reduce((a, h) => a + h.solar, 0) - A200.hours.reduce((a, h) => a + h.solar, 0);
+ok(cut > 0 && added > 0, "arrival: growing solar 200 -> 400 MW cuts the day's running cost");
+ok(M.runCost(town, A200) === A200.hours.reduce((a, h) => { const r = Math.max(0, h.residual), cc = Math.min(r, town.fleet.cc.mw); return a + cc * town.fleet.cc.cost + (r - cc) * town.fleet.peaker.cost; }, 0), "runCost: combined-cycle first, then the peaker");
+ok(A200.spilled === 0 && A400.spilled > 0, "arrival: nothing spilled at 200 MW; some sun spilled at 400 MW");
+ok(Math.abs(cut / added - A400.value.solar) > 1, "arrival: the average marginal value at 400 MW differs from the day's saving per added MWh (the page explains why)");
 
 // ---------------- every number the page states
 const L = k => M.lcoe(M.inputs(D, k));
@@ -91,7 +114,10 @@ rows.forEach((r, i) => {
   const x = L(M.TECHS[i]);
   ["capital", "fom", "fuel", "vom", "total"].forEach((c, j) => ok(r[j + 2] === x[c].toFixed(2), `fallback ${M.TECHS[i]} ${c}: ${r[j + 2]} = ${x[c].toFixed(2)}`));
 });
-has(money(A200.value.wind) + " and a solar MWh " + money(A200.value.solar), "myth: hottest-day values");
+has(money(A200.value.wind) + " on average and a solar MWh " + money(A200.value.solar), "myth: peak-demand-day values");
+has("growing solar from " + B.solarMW + " to 400 MW cuts the day's running cost by " + money(cut, 0) + ", or " + money(cut / added) + " per added MWh", "Go deeper: total saving against the hourly value");
+has("With no fuel and zero upkeep per MWh", "quiz: the calculation question fixes fuel and upkeep per MWh");
+ok(!/hottest/i.test(QMD + JS + JSON.stringify(D)), "the day is named by its demand (no temperature data): no 'hottest'");
 const w7 = M.lcoe(M.inputs(D, "wind", { wacc: 7 })).total;
 has(money(L("wind").total) + " to " + money(w7) + " per MWh, by " + ((w7 / L("wind").total - 1) * 100).toFixed(1) + "%", "myth: 4% -> 7%");
 has("at a 43% capacity factor instead of 33.8%, wind's LCOE falls from " + money(L("wind").total) + " to " + money(M.lcoe(M.inputs(D, "wind", { cf: 43 })).total), "myth: capacity factor");
@@ -119,10 +145,44 @@ Object.keys(D.techs).forEach(k => (D.techs[k].src || []).forEach(s => ok(SRC[s],
 Object.keys(SRC).forEach(s => ok(/^https:\/\/(www\.eia\.gov|atb\.nlr\.gov)\//.test(SRC[s].url) && SRC[s].asOf, `data: source ${s} has an allowed URL and an as-of date`));
 [...QMD.replace(/<!-- learn:(meta|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/href="(https?:[^"]+)"/g)].forEach(m => ok(/^https:\/\/(www\.eia\.gov|atb\.nlr\.gov|docs\.nlr\.gov|doi\.org)\//.test(m[1].replace(/&amp;/g, "&")), `page link ${m[1]} is on the allow-list`));
 
-// ---------------- text budget and scope (also enforced by scripts/learn_scope_scan.py)
+// ---------------- text budget: about 35 words per element (42 at most), one or two sentences; also enforced by review
+const plain = t => t.replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x")
+  .replace(/\[([^\]]+)\]\{[^}]*\}/g, "$1").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&amp;/g, "&").trim();
+const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
+const nSent = t => (plain(t).replace(/^(Myth|Fact)\.\s+/, "").replace(/\b(e\.g|i\.e|et al|U\.S)\./g, "$1").match(/[.?!](\s|$)/g) || []).length;
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*build/g)].map(m => m[1]);
 ok(stepTexts.length === 8, `eight step cards (${stepTexts.length})`);
-stepTexts.forEach((t, i) => { const n = t.split(/\s+/).length; ok(n >= 20 && n <= 42, `step ${i + 1}: ${n} words (about 35)`); });
+stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 20 && n <= 42, `step ${i + 1}: ${n} words (about 35)`); ok(nSent(t) <= 3, `step ${i + 1}: at most three short sentences`); });
+// the page: every paragraph, list item, definition, table cell and summary outside the generated blocks, and the Markdown
+// paragraphs and list items of the Go deeper boxes (display math does not count)
+const BODY = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "");
+const srcCard = (BODY.match(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/) || [""])[0];
+const htmlEls = [...BODY.matchAll(/<(p|li|dd|td|summary)\b[^>]*>([\s\S]*?)<\/\1>/g)].map(m => ({ t: m[2], cite: srcCard.indexOf(m[0]) >= 0 }));
+const mdEls = BODY.replace(/```\{=html\}[\s\S]*?```/g, "\n\n").split(/\n\s*\n/).map(x => x.trim()).filter(x => x && !/^(:::|\$\$)/.test(x))
+  .flatMap(x => x.split(/\n(?=- )/)).map(t => ({ t: t.replace(/^- /, ""), cite: false }));
+htmlEls.concat(mdEls).forEach(e => {
+  const n = nWords(e.t);
+  ok(n <= 42, `page element of ${n} words (about 35): "${plain(e.t).slice(0, 70)}..."`);
+  if (!e.cite) ok(nSent(e.t) <= 2, `page element in one or two sentences (${nSent(e.t)}): "${plain(e.t).slice(0, 70)}..."`);
+});
+ok(htmlEls.length > 40 && mdEls.length > 10, `budget check sees the page (${htmlEls.length} html elements, ${mdEls.length} Markdown)`);
+// the script: every learner-facing literal, and each composed sentence (a literal + value + literal line counts the values as one word each)
+const code = JS.slice(JS.indexOf("// ---------------------------------------------------------------- view")).replace(/^\s*\/\/.*$/gm, "");
+[...code.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map(m => m[1]).filter(t => / \S+ \S+ \S+ /.test(t) && !/[{};]|^\.|var\(/.test(t))
+  .forEach(t => { ok(nWords(t) <= 42, `script text of ${nWords(t)} words: "${t.slice(0, 70)}..."`); ok(nSent(t) <= 3, `script text in short sentences: "${t.slice(0, 70)}..."`); });
+let composed = 0;
+code.split("\n").filter(l => /api\.saw\(|\.reveal\(|hint: function|textContent = |note: "|lede: "/.test(l)).forEach(l => {
+  const lits = [...l.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map(m => m[1]).join(" "), vals = (l.match(/"\s*\+\s*[^"+]+?\s*\+\s*"/g) || []).length;
+  const n = nWords(lits) + vals;
+  if (/api\.saw\(|\.reveal\(/.test(l)) composed++, ok(n <= 42, `composed text of about ${n} words: ${l.trim().slice(0, 80)}...`);
+});
+ok(composed >= 8, `budget check sees the composed feedback (${composed} lines)`);
+// notes from the data file shown on the page (slider hints and the tornado note)
+Object.keys(D.techs).forEach(k => ok(nWords(D.techs[k].cfNote) <= 35, `${k} cfNote: ${nWords(D.techs[k].cfNote)} words`));
+[D.finance.waccNote, D.fuel.gasNote].forEach(t => ok(nWords(t) <= 35, `hint note: ${nWords(t)} words`));
+Object.keys(D.techs).forEach(k => { const t = D.techs[k].cfNote + " " + D.tornadoRanges.note + (D.techs[k].heatRate ? " " + D.tornadoRanges.gasNote : ""); ok(nWords(t) <= 42, `${k} tornado note: ${nWords(t)} words`); });
+ok(/illustrative bounds in 2025 dollars/.test(D.fuel.gasNote) && /illustrative bounds in 2025 dollars/.test(D.tornadoRanges.gasNote), "gas range: labelled illustrative 2025-dollar bounds (the 2020 and 2022 averages are in their own years' dollars)");
+Object.keys(D.techs).forEach(k => ok(D.techs[k].design, `${k}: the EIA design behind the inputs is named`));
 const all = (QMD + JS + JSON.stringify(D)).toLowerCase();
 ["learning curve", "learning rate", "foak", "noak", "first-of-a-kind", "subsidy-free", "break-even capital", "order book", "projects/", "research.html", "smr"]
   .forEach(w => ok(all.indexOf(w) < 0, `scope: no "${w}"`));
@@ -130,6 +190,6 @@ ok(!/\bai\b/i.test(QMD + JS), "scope: no AI wording");
 const strings = [...JS.replace(/^\s*\/\/.*$/gm, "").matchAll(/"((?:[^"\\]|\\.)*)"/g)].map(m => m[1]).join(" ");
 ok(!/nuclear|reactor/i.test(QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "") + strings), "scope: lesson 7's text names no nuclear technology (the calculator covers wind, solar and gas only)");
 
-console.log(`wind ${money(L("wind").total)}, solar ${money(L("solar").total)}, gas CC ${money(L("cc").total)}, peaker ${money(L("peaker").total)}; hottest day: solar ${money(A200.value.solar)} -> ${money(A400.value.solar)} at 400 MW`);
+console.log(`wind ${money(L("wind").total)}, solar ${money(L("solar").total)}, gas CC ${money(L("cc").total)}, peaker ${money(L("peaker").total)}; peak-demand day: solar ${money(A200.value.solar)} -> ${money(A400.value.solar)} at 400 MW`);
 console.log(`${checks} checks, ${fails} failed`);
 process.exit(fails ? 1 : 0);

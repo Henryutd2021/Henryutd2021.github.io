@@ -461,6 +461,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "mmbtu": {
+  "term": "MMBtu",
+  "short": "One million British thermal units, a unit of fuel heat; about 0.29 MWh of heat, and gas is priced in dollars per MMBtu.",
+  "lesson": 7,
+  "href": "07-cost.html"
+ },
  "nadir": {
   "term": "Nadir",
   "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
@@ -490,6 +496,12 @@
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "overnight-cost": {
+  "term": "Overnight cost",
+  "short": "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt.",
+  "lesson": 7,
+  "href": "07-cost.html"
  },
  "parameter": {
   "term": "Parameter",

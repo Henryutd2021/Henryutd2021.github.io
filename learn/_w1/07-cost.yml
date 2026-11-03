@@ -28,6 +28,12 @@ glossary:
   - id: heat-rate
     term: Heat rate
     def: "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient."
+  - id: overnight-cost
+    term: Overnight cost
+    def: "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt."
+  - id: mmbtu
+    term: MMBtu
+    def: "One million British thermal units, a unit of fuel heat; about 0.29 MWh of heat, and gas is priced in dollars per MMBtu."
 requests:
   - "Promote lesson-local components from assets/learn/07-cost.js if other lessons need them: a slider that keeps decimal steps exact and formats its own value (LX.Slider rounds to the step with binary floating point and prints val + unit, so 0.1 or 0.05 steps show long decimals and $ formats are not possible); a stacked cost-split bar (lx7-split); a tornado chart (i-tornado, rows sorted by swing); an equation card whose symbols open words, units and the reader's numbers (e-equation); a two-sided Steelman card."
   - "scripts/learn_screenshots.mjs drops the '#hash' from file names, so several steps of one page overwrite each other; please keep the hash in the name, and add a generic 'mid' state that calls root.lxLesson.demo(i) (both lessons 7 and 8 expose it; '#lx-step-N' opens step N with its action done)."
