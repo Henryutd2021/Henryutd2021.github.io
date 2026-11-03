@@ -2753,7 +2753,8 @@
                                     words: the part inside a sentence (text version, spoken labels; default: label in lower case)
      rows: [{ key: "wind", label: "Wind", color: "var(--lx-wind)", values: { capital: 31.2, fom: 9.8, fuel: 0, vom: 0 },
               total: 41.0, aria: "Wind farm: $41.00 per MWh; building the plant $31.20, ..." }],
-                                    label: the short name on the row; aria: the row's spoken label when it is a button
+                                    label: the short name on the row; aria: the row's spoken text (a button's label; on
+                                    a plain row a hidden sentence, default "Wind: $41; building the plant $31, ...")
      scale: 120,                    the value that fills a whole bar (default: the largest total × 1.04)
      fmt: function (v) { return "$" + Math.round(v); },   the total at the end of each row (default: v rounded)
      min: 0.005,                    parts at or below this are left out (bar and text)
@@ -2765,7 +2766,9 @@
      LX.CostSplit.fill(bar, [{ color, value }], scale)            repaint that bar
      LX.CostSplit.text(parts, values, fmt, min) -> "building the plant $31.20, fixed upkeep $9.80" (parts above min only)
    Keyboard: picked rows are real buttons (Tab, Enter, Space; the shared focus ring). The bars are decorative: give each
-   button row an aria label (row.aria) and the lesson a text version (LX.CostSplit.text writes its sentences).
+   button row an aria label (row.aria) and the lesson a text version (LX.CostSplit.text writes its sentences). A plain row
+   (no onPick) is read from a visually hidden sentence (.lx-sr): row.aria, else its name, total and parts; its drawn name
+   and total are hidden from screen readers, so nothing is read twice.
    On phones (≤ 560 px) the name and the total share a line and the bar runs full width below them.
    Node: module.exports = { segments, splitText } (pure). */
 (function () {
@@ -2800,15 +2803,19 @@
   }
   LX.CostSplit = function (host, o) {
     var fmt = o.fmt || function (v) { return String(Math.round(v)); }, min = o.min == null ? 0.005 : o.min;
+    function rowText(r) { var t = splitText(o.parts, r.values || {}, fmt, min); return r.aria || r.label + ": " + fmt(r.total) + (t ? "; " + t : "") + "."; }
     var box = H("div", { class: "lx-split" }, host), rows = {}, keyEl = null, out = { el: box, rows: rows };
     function draw(list, scale) {
       box.innerHTML = ""; Object.keys(rows).forEach(function (k) { delete rows[k]; });
       var sc = scale || o.scale || Math.max.apply(null, list.map(function (r) { return r.total; })) * 1.04;
       list.forEach(function (r) {
         var b = H(o.onPick ? "button" : "div", o.onPick ? { type: "button", class: "lx-split-row", "aria-pressed": "false", "aria-label": r.aria || null } : { class: "lx-split-row" }, box);
-        var nm = H("span", { class: "lx-split-nm" }, b); H("i", { style: "--c:" + (r.color || "var(--lx-ink-3)") }, nm); H("span", { text: r.label }, nm);
+        // a plain row is read from a hidden sentence (row.aria, else the name, total and parts), the drawn parts hidden
+        var hide = o.onPick ? null : "true";
+        var nm = H("span", { class: "lx-split-nm", "aria-hidden": hide }, b); H("i", { style: "--c:" + (r.color || "var(--lx-ink-3)") }, nm); H("span", { text: r.label }, nm);
         bar(b, segments(o.parts, r.values, 1, min).map(function (s) { return { color: s.color, value: s.value }; }), sc);
-        H("span", { class: "lx-split-tot", text: fmt(r.total) }, b);
+        H("span", { class: "lx-split-tot", "aria-hidden": hide, text: fmt(r.total) }, b);
+        if (!o.onPick) H("span", { class: "lx-sr", text: rowText(r) }, b);
         rows[r.key] = b;
         if (o.onPick) b.addEventListener("click", function () {
           Object.keys(rows).forEach(function (j) { rows[j].setAttribute("aria-pressed", j === r.key ? "true" : "false"); });

@@ -64,6 +64,28 @@ M7.TECHS.forEach(k => {
   ok(CS.splitText(PARTS, Lk, usd) === old.map(c => c[1] + " " + usd(Lk[c[0]])).join(", "), `${k} split: text as before ("${CS.splitText(PARTS, Lk, usd).slice(0, 40)}...")`);
 });
 ok(M7.lcoe(M7.inputs(D7, "wind")).fuel === 0 && CS.segments(PARTS, M7.lcoe(M7.inputs(D7, "wind")), 1).every(s => s.key !== "fuel"), "split: wind has no fuel segment");
+// the view on a stub document: a plain row (no onPick) is read from a hidden sentence, row.aria or the name, total and parts;
+// a button row keeps row.aria as its label (shared fix 19, after the CF7 review: plain rows used to drop row.aria)
+{
+  const { env, load } = require("./stubdom.js");
+  const E = env(); load("costsplit", E);
+  const rows = [{ key: "wind", label: "Wind", values: { capital: 31.2, fom: 9.8, fuel: 0, vom: 0 }, total: 41, aria: "Wind farm: $41.00 per MWh; building the plant $31.20, fixed upkeep $9.80" },
+                { key: "cc", label: "Gas CC", values: { capital: 12, fom: 2, fuel: 25, vom: 2 }, total: 41 }];
+  const host = E.LX.H("div", null, E.body), cs = E.LX.CostSplit(host, { parts: PARTS, rows: rows, fmt: usd, key: false });
+  const sr = host.querySelectorAll(".lx-split-row .lx-sr").map(e => e.textContent);
+  ok(sr.length === 2 && sr[0] === rows[0].aria, `cost split view: a plain row reads its row.aria ("${sr[0]}")`);
+  ok(sr[1] === "Gas CC: $41.00; building the plant $12.00, fixed upkeep $2.00, fuel $25.00, upkeep per MWh $2.00.", `cost split view: without row.aria, the name, total and parts ("${sr[1]}")`);
+  ok(host.querySelectorAll(".lx-split-row").every(r => r.querySelector(".lx-split-nm").getAttribute("aria-hidden") === "true" && r.querySelector(".lx-split-tot").getAttribute("aria-hidden") === "true" && r.querySelector(".lx-split-bar").getAttribute("aria-hidden") === "true"),
+    "cost split view: a plain row's drawn name, total and bar are hidden from screen readers (read once, from the sentence)");
+  ok(host.querySelectorAll(".lx-split-row").every(r => r.tagName === "DIV" && !r.getAttribute("aria-label")), "cost split view: plain rows are not buttons and carry no aria-label on a generic element");
+  cs.set([{ key: "pv", label: "Solar", values: { capital: 40, fom: 8, fuel: 0, vom: 0 }, total: 48 }]);
+  ok((host.querySelector(".lx-sr") || {}).textContent === "Solar: $48.00; building the plant $40.00, fixed upkeep $8.00.", "cost split view: set() rewrites the sentence");
+  const h2 = E.LX.H("div", null, E.body), picked = [], cb = E.LX.CostSplit(h2, { parts: PARTS, rows: rows, fmt: usd, key: false, onPick: k => picked.push(k) });
+  const b = h2.querySelectorAll("button.lx-split-row");
+  ok(b.length === 2 && b[0].getAttribute("aria-label") === rows[0].aria && !b[1].getAttribute("aria-label") && !h2.querySelector(".lx-sr"), "cost split view: button rows keep row.aria as their label, with no hidden sentence");
+  ok(!b[0].querySelector(".lx-split-nm").getAttribute("aria-hidden"), "cost split view: a button row without aria is named by its visible name and total");
+  b[1].click(); ok(picked.join() === "cc" && b[1].getAttribute("aria-pressed") === "true" && b[0].getAttribute("aria-pressed") === "false" && cb.rows.cc === b[1], "cost split view: picking still works");
+}
 
 // ---------------- supply stack: the default clearing equals lesson 8's model; the axes
 const SS = mod("supplystack"), M8 = require(L("08-merit-order.js"));

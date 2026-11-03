@@ -398,6 +398,7 @@ LX.CostSplit.bar(host, [{ color, value }], scale, { height: 14 });  LX.CostSplit
 ```
 
 - `onPick` makes the rows toggle buttons; without it they are plain rows (a calculator). `key: false` lets you place the key yourself.
+- Screen readers: a button row is named by `row.aria`. A plain row is read from a visually hidden sentence (`.lx-sr`): `row.aria`, or by default its name, total and parts ("Gas CC: $41.00; building the plant $12.00, fuel $25.00, …"); its drawn name and total are hidden, so nothing is read twice (`test_components_b.js`).
 - `LX.CostSplit.text` writes the parts as a sentence for text versions and spoken labels (`words` names a part inside a sentence).
 - Replaces lesson 7's `lx7-split` rows, `bar()`, `key()` and `splitText()` (steps 2 and 6), and its single bars (steps 3 and 4).
 
