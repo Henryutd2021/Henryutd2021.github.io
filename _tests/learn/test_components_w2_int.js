@@ -79,6 +79,11 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   const cc = rd("assets/learn/components/cards.css");
   ok(/\.lx-stepcard > \*, \.lx-step-act > \* \{ min-width: 0; max-width: 100%; \}/.test(cc) && rd("assets/learn/learn.css").indexOf(".lx-stepcard > *, .lx-step-act > * { min-width: 0; max-width: 100%; }") >= 0,
     "cards.css: a step card's children may shrink, so nothing in a step widens the card (shared fix 6, A22)");
+  const bc = rd("assets/learn/components/base.css");
+  ok(/:where\(\.page-learn :not\(pre\)\) > code \{ background-color: var\(--lx-surface-2\); color: var\(--lx-ink\); \}/.test(bc),
+    "base.css: inline code takes the Learn tokens day and night, at zero specificity (shared fix 7: light boxes in the night theme)");
+  ok(!/r10-str code\{background/.test(rd("assets/learn/r10-question-studio.js")) && /\.page-learn \.lx-eq-det code \{ background: var\(--lx-surface\)/.test(rd("assets/learn/components/equation.css")),
+    "R10 keeps no code override of its own; the equation card keeps its own (a lighter box than the shared one)");
 }
 
 // ---------------------------------------------------------------- the practice badge, and the Teaching card's count

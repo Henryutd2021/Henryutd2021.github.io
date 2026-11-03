@@ -66,6 +66,10 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
 .page-learn main a { color: var(--lx-accent); text-underline-offset: 3px; }
 .page-learn main a:hover { color: var(--lx-accent); text-decoration: underline; }
 .page-learn main strong { color: var(--lx-ink); }
+/* inline code in the Learn tokens, day and night: Bootstrap's plain `code` keeps a light background in the night theme
+   (only code inside p, li and td gets a dark one), which left light text on a light box. Zero specificity (:where), so
+   Bootstrap's p/li/td rule and every component's or lesson's own code rule still win; code inside pre is left alone. */
+:where(.page-learn :not(pre)) > code { background-color: var(--lx-surface-2); color: var(--lx-ink); }
 .page-learn :focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; border-radius: 6px; }
 .page-learn main section[id], .page-learn main [id].lx-sec { scroll-margin-top: calc(var(--nav-h, 60px) + 12px); }
 .lx-mono, .lx-num { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }

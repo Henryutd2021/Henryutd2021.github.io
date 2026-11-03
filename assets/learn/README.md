@@ -820,7 +820,7 @@ LX.StakeholderMap(H("div", { class: "lx-xcard" }, x), { rings: [{ ring: "The stu
 - `scripts/learn_qa.sh <worktree> [lesson ids]` runs the whole pipeline: build check, Node tests, render, link check, scope scan, and screenshots at 1280 and 375 px in light and dark. A case file that is still a draft is named by its id like any page: the script copies `learn/_drafts/<id>.qmd` to `learn/<id>.qmd`, renders that one page into `_site/`, and moves the copy out of the worktree into its output folder, so the link check, scope scan and screenshots see a preview while the worktree stays unchanged.
 - `scripts/learn_codex_review.sh <worktree> <lesson id>…` runs the read-only two-persona review.
 
-Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`.
+Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`. Inline `code` takes the tokens by itself (`base.css`, at zero specificity, so a page's own code rule still wins): a page needs no night-theme override for it.
 
 ## Checks before handing a lesson to Henry
 
