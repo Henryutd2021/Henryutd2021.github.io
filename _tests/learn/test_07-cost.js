@@ -145,6 +145,23 @@ Object.keys(D.techs).forEach(k => (D.techs[k].src || []).forEach(s => ok(SRC[s],
 Object.keys(SRC).forEach(s => ok(/^https:\/\/(www\.eia\.gov|atb\.nlr\.gov)\//.test(SRC[s].url) && SRC[s].asOf, `data: source ${s} has an allowed URL and an as-of date`));
 [...QMD.replace(/<!-- learn:(meta|footer):start[\s\S]*?learn:\1:end -->/g, "").matchAll(/href="(https?:[^"]+)"/g)].forEach(m => ok(/^https:\/\/(www\.eia\.gov|atb\.nlr\.gov|docs\.nlr\.gov|doi\.org)\//.test(m[1].replace(/&amp;/g, "&")), `page link ${m[1]} is on the allow-list`));
 
+// ---------------- the real-world box: the approved excerpt E3.14 (Henry, 2026-11-03; reports/learn/excerpts_for_approval.md),
+// word for word (glossary marks aside), with CF2's citation footer, and no other sentence about the study
+const E314 = "A higher hydrogen price makes each kilogram worth more, so the optimizer builds a larger electrolyzer to capture more surplus wind. The extra capacity runs fewer full-load hours, so the cost per kilogram, the levelized cost of hydrogen, goes up. Yet the added hydrogen revenue lowers the net cost of the whole system. The cost per kilogram and the system's cost move in opposite directions.";
+{
+  const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "");
+  const real = (own.match(/<div class="lx-card lx-real">([\s\S]*?)<\/div>/) || ["", ""])[1];
+  const bq = real.match(/<blockquote class="lx-excerpt" data-source="excerpt:wind-hydrogen">([\s\S]*?)<footer>([\s\S]*?)<\/footer><\/blockquote>/);
+  const words = h => h.replace(/<\/p><p>/g, " ").replace(/<[^>]+>/g, "").trim();
+  ok(bq && words(bq[1]) === E314, "real world: the approved excerpt E3.14, word for word");
+  ok(bq && bq[2] === 'Approved excerpt of: Li et al. (2024), <a href="https://doi.org/10.1115/1.4063971">Journal of Mechanical Design</a>.', "real world: the excerpt's citation footer is CF2's, with the DOI");
+  ok((own.match(/lx-excerpt/g) || []).length === 1, "page: one excerpt only");
+  const rest = real.replace(/<blockquote[\s\S]*?<\/blockquote>/, "");
+  ok(/<p>A levelized cost and a system's cost can move in opposite directions\.<\/p>/.test(rest), "real world: the box's own first sentence stays");
+  ok(/<a href="cf2-cost-per-kg-vs-system-cost\.html">CF2<\/a>/.test(rest), "real world: links case file CF2 for the full case");
+  ok(!/\b(my|our) study|In my|electrolyzer|optimizer|kilogram/i.test(rest.replace(/<a [^>]*>[^<]*<\/a> \([^)]*\)/g, "")), "real world: no wording about the study outside the excerpt");
+}
+
 // ---------------- text budget: about 35 words per element (42 at most), one or two sentences; also enforced by review
 const plain = t => t.replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x")
   .replace(/\[([^\]]+)\]\{[^}]*\}/g, "$1").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/&amp;/g, "&").trim();
