@@ -396,6 +396,25 @@
   does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."
   after: [11, 8, B1, B2, B3]
 
+# ---------- wave W2 modules (curriculum v2 §18.4); live once a builder sets status: active
+- kind: lesson
+  id: a22-tradeoff-explorer
+  code: A22
+  tier: analyst
+  form: play
+  icon: scale
+  status: active
+  minutes: 25
+  practice_minutes: 20   # the practice set (Check section)
+  title: "Cheap, clean, reliable, fair, secure: can you have them all?"
+  subtitle: "Watch five goals move at once, find the plans nothing beats, and see whose priorities choose"
+  short: "Five goals at once"
+  outcome: "Compare plans on five goals at once, find the ones no other plan beats, and show how weights, definitions and limits decide the rest."
+  teaches: [trade-offs between many goals, dominance with five goals, weighted sums and whose priorities, how indicators are built, limits on several goals]
+  does: "Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer."
+  after: [12]
+  next: R1
+
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
 - {kind: lesson, tier: foundations, title: "How a thermal power plant works"}

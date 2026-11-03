@@ -963,6 +963,17 @@
    "form": "cards"
   },
   {
+   "tier": "analyst",
+   "code": "A22",
+   "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
+   "ready": true,
+   "href": "a22-tradeoff-explorer.html",
+   "scales": [],
+   "id": "a22-tradeoff-explorer",
+   "minutes": 25,
+   "form": "play"
+  },
+  {
    "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
