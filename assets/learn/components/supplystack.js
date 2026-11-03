@@ -74,7 +74,7 @@
       for (var q = 0; q <= xMax; q += sc.xStep) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
       S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
       S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
-      var cum = 0;
+      var cum = 0, labs = [];   // block labels: [x centre, baseline, width], so the price label can keep clear of them
       blocks.forEach(function (b) {
         if (b.mw <= 0) return;
         var p = res.plants[b.key], x0 = x(cum), x1 = x(cum + b.mw), xr = x(cum + p.run), top = Math.abs(b.offer) < 2 ? y(0) - 4 : Math.min(y(b.offer), y(0)), bot = Math.abs(b.offer) < 2 ? y(0) : Math.max(y(b.offer), y(0));
@@ -85,6 +85,7 @@
           var ly = b.offer >= 0 ? Math.min(y(b.offer), y(0) - 4) - 6 : (y(0) + y(b.offer)) / 2 + 4;
           S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab bg" }, svg).textContent = sh(b.key);
           S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab" }, svg).textContent = sh(b.key);
+          labs.push([(x0 + x1) / 2, ly, sh(b.key).length * 7]);
         }
         cum += b.mw;
       });
@@ -94,7 +95,10 @@
         S("path", { d: "M" + xd + " " + (m.t - 6) + "V" + (Hh - m.b), stroke: "var(--lx-ink)", "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
         var anchor = xd > W - 120 ? "end" : "start", dx = anchor === "end" ? -6 : 6;
         ["big bg", "big"].forEach(function (c) { S("text", { x: xd + dx, y: 13, "text-anchor": anchor, class: c }, svg).textContent = "Demand " + Math.round(demand) + " MW"; });
-        ["big bg", "big"].forEach(function (c) { S("text", { x: m.l + 6, y: res.price < 0 ? m.t + 14 : yp - 6, class: c }, svg).textContent = "Price " + usd(res.price); });
+        var pt = "Price " + usd(res.price), py = res.price < 0 ? m.t + 14 : yp - 6, pw = pt.length * 7.6;
+        // a block's label at the same height (a $0 block next to the axis, on a phone) would sit under the price: lift the price a line
+        if (labs.some(function (l) { return Math.abs(l[1] - py) < 15 && l[0] + l[2] / 2 > m.l + 6 && l[0] - l[2] / 2 < m.l + 6 + pw; })) py -= 16;
+        ["big bg", "big"].forEach(function (c) { S("text", { x: m.l + 6, y: py, class: c }, svg).textContent = pt; });
       }
       alt.innerHTML = "";
       var ul = H("ul", null, alt);

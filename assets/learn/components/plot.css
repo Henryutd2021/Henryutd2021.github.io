@@ -9,6 +9,7 @@
 .lx-plot svg { display: block; width: 100%; height: auto; }
 .lx-plot svg text { font-variant-numeric: tabular-nums; }
 .lx-plot .ax { font-family: var(--lx-f-mono); font-size: 11px; fill: var(--lx-ink-3); }
+.lx-plot .ax.spanl { fill: var(--lx-ink-2); }   /* a span's label sits on the span's shading */
 .lx-plot .rl { font-family: var(--lx-f-body); font-size: 11px; }
 .lx-plot .ttl { font-family: var(--lx-f-display); font-size: 12px; fill: var(--lx-ink-2); }
 .lx-plot .mk, .lx-plot .mkd { fill: var(--lx-ink); paint-order: stroke; stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }

@@ -101,7 +101,7 @@
         // college
         '<rect class="wall" x="30" y="100" width="82" height="68"/><path class="roof" d="M24 102 L71 74 L118 102 Z"/>' +
         '<path class="col" d="M42 108 V164 M58 108 V164 M74 108 V164 M90 108 V164 M104 108 V164"/>' +
-        '<text x="44" y="96" class="mini">college</text>' +
+        '<text x="71" y="70" text-anchor="middle" class="mini">college</text>' +
         // hospital
         '<rect class="wall" x="126" y="84" width="74" height="84"/><path class="cross" d="M157 98 h12 v10 h10 v12 h-10 v10 h-12 v-10 h-10 v-12 h10 z"/>' +
         '<text x="138" y="80" class="mini">hospital</text>' +
@@ -120,7 +120,7 @@
         '<text x="316" y="200" class="mini">host feeder</text>' +
         // the S0 home next door
         '<rect class="wall" x="352" y="96" width="34" height="26"/><path class="roof" d="M348 98 L369 82 L390 98 Z"/>' +
-        '<rect class="mark" x="342" y="74" width="54" height="54" rx="6"/><text x="344" y="68" class="mini">the S0 home</text>';
+        '<rect class="mark" x="342" y="74" width="54" height="54" rx="6"/><text x="396" y="68" text-anchor="end" class="mini">the S0 home</text>';
     },
     S2: function (W) {
       return '<rect class="map" x="0" y="0" width="400" height="230"/>' +
@@ -171,7 +171,7 @@
         '<text class="lbl" x="150" y="62">North</text><text class="lbl" x="268" y="130">East</text><text class="lbl" x="150" y="194">South</text>' +
         '<text class="mini" x="196" y="110">capital</text><text class="mini" x="202" y="156">Prairie City</text><text class="mini" x="90" y="106">Prairie Town</text>' +
         '<text class="mini" x="40" y="204">Ridge County (coal)</text><text class="mini gridl" x="34" y="84">the Plains Grid</text>' +
-        '<text class="mini" x="296" y="226">the strait: oil imports</text>';
+        '<text class="mini" x="396" y="226" text-anchor="end">the strait: oil imports</text>';
     }
   };
   var SCENE_ALT = {

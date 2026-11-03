@@ -11,7 +11,7 @@ body.page-learn {
   --lx-bg: #F5F7FA; --lx-surface: #FFFFFF; --lx-surface-2: #EDF1F5; --lx-surface-3: #E3E9EF;
   --lx-ink: #142030; --lx-ink-2: #435064; --lx-ink-3: #5F6B7E; --lx-line: #D7DFE8; --lx-line-2: #BFCAD6;
   --lx-accent: #1F58C6; --lx-accent-soft: #E3ECFB; --lx-btn: #142030; --lx-btn-ink: #FFFFFF;
-  --lx-good: #1B8452; --lx-good-soft: #E1F3E9; --lx-warn: #A86400; --lx-warn-soft: #FBEFD9; --lx-bad: #C9302F; --lx-bad-soft: #FBE5E4;
+  --lx-good: #18784A; --lx-good-soft: #E1F3E9; --lx-warn: #965800; --lx-warn-soft: #FBEFD9; --lx-bad: #B82B2A; --lx-bad-soft: #FBE5E4;   /* text at 4.5:1 on white, surface-2 and its own soft fill */
   --lx-star: #D19A00;
   --lx-nuc: #7A5BB5; --lx-solar: #D9A60F; --lx-wind: #1E9BB0; --lx-cc: #DB5B2B; --lx-pk: #8E3B4F; --lx-demand: #2B394D;
   --lx-bat: #2C6FCB; --lx-hyd: #3B4FA0; --lx-geo: #9C5B2E; --lx-dr: #2E8540;
@@ -70,6 +70,8 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
    Bootstrap's p/li/td rule and every component's or lesson's own code rule still win; code inside pre is left alone. */
 :where(.page-learn :not(pre)) > code { background-color: var(--lx-surface-2); color: var(--lx-ink); }
 .page-learn :focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; border-radius: 6px; }
+/* captions: Quarto's caption grey is 4.1:1 on white; one class of specificity, so a lesson's own caption colour still wins */
+.page-learn :where(caption, figcaption, .figure-caption, .table-caption, .panel-caption) { color: var(--lx-ink-3); }
 .page-learn main section[id], .page-learn main [id].lx-sec { scroll-margin-top: calc(var(--nav-h, 60px) + 12px); }
 .lx-mono, .lx-num { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
 .lx-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -123,7 +125,7 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
 .lx-choices-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; }
 .lx-choice { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 14px; border-radius: 11px; border: 1px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; text-align: left; font-family: var(--lx-f-display); font-size: 15px; font-weight: 500;
-  line-height: 1.25; transition: border-color .15s, background .15s; }
+  line-height: 1.25; transition: border-color .15s, background .15s; hyphens: auto; }
 .lx-choice:hover { border-color: var(--lx-ink-3); }
 .lx-choice[aria-pressed="true"] { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); background: var(--lx-surface-2); }
 .lx-choice.right { border-color: var(--lx-good); box-shadow: inset 0 0 0 1px var(--lx-good); }
@@ -176,7 +178,7 @@ details.lx-textalt li { margin: 3px 0; }
 .lx-corrections, .lx-license { font-size: 13px; color: var(--lx-ink-3); margin-top: .5rem !important; }
 .lx-foot { margin-top: 2.4rem; padding-top: 1rem; border-top: 1px solid var(--lx-line); }
 
-/* the site's back-to-top button steps aside while it would cover lesson controls (core.js) */
+/* the site's back-to-top button steps aside while it would cover lesson controls or any text (core.js) */
 body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !important; }
 @media (max-width: 560px) {
   body.page-learn main.content { font-size: 16.5px; }

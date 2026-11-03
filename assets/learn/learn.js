@@ -15,7 +15,7 @@
                                    page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
              LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
                                    page's links appear by themselves when a lesson goes live
-   Also: the back-to-top guard (hides the site's button while it would cover lesson controls) and course ticks.
+   Also: the back-to-top guard (hides the site's button while it would cover lesson controls or any text) and course ticks.
    Node: module.exports = { lessonRef, lessonRefHTML } (pure; the rest needs a browser). */
 (function () {
   "use strict";
@@ -306,7 +306,35 @@
         var r = z.getBoundingClientRect();
         return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
       });
+      // any other text under the button (a landing note, the sources, the footer at the end of the page, where no
+      // scrolling can move it out from under the button): elements under nine points of the button, their own lines
+      if (!hit && !btn.hidden) {
+        var bb = btn.getBoundingClientRect(), box = { left: bb.left - 4, right: bb.right + 4, top: bb.top - 4, bottom: bb.bottom + 4 };
+        if (bb.width) hit = textUnder(btn, box);
+      }
       document.body.classList.toggle("lx-totop-off", hit);
+    }
+    function textUnder(btn, box) {
+      var seen = [], rg = document.createRange();
+      for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) {
+        var x = box.left + (box.right - box.left) * (0.15 + 0.35 * i), y = box.top + (box.bottom - box.top) * (0.15 + 0.35 * j);
+        var stack = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
+        for (var k = 0; k < stack.length; k++) {
+          var e = stack[k];
+          if (e === btn || btn.contains(e) || e === document.body || e === document.documentElement || seen.indexOf(e) >= 0) continue;
+          seen.push(e);
+          for (var n = e.firstChild; n; n = n.nextSibling) {
+            if (n.nodeType !== 3 || !/\S/.test(n.data)) continue;
+            rg.selectNodeContents(n);
+            var rs = rg.getClientRects();
+            for (var q = 0; q < rs.length; q++) {
+              var r = rs[q];
+              if (r.width && r.left < box.right && r.right > box.left && r.top < box.bottom && r.bottom > box.top) return true;
+            }
+          }
+        }
+      }
+      return false;
     }
     function request() { if (!pending) { pending = true; requestAnimationFrame(check); } }
     window.addEventListener("scroll", request, { passive: true });
@@ -1263,11 +1291,17 @@
         size[n.id] = [wd, 14 + lines.length * 17]; P[n.id] = pos(n, m);
       });
       function edgePt(p, q, s) { var dx = q[0] - p[0], dy = q[1] - p[1]; var tx = dx ? (s[0] / 2 + 4) / Math.abs(dx) : 1e9, ty = dy ? (s[1] / 2 + 4) / Math.abs(dy) : 1e9, t = Math.min(tx, ty); return [p[0] + dx * t, p[1] + dy * t]; }
+      // a link's label sits at the middle of its line; when two links cross there, the later label moves along its
+      // own line (40%, 60%, 30%, 70% of the way) to the first place where it meets no earlier label
+      var taken = [], meets = function (x, y, w) { return taken.some(function (t) { return Math.abs(t[0] - x) < (t[2] + w) / 2 + 4 && Math.abs(t[1] - y) < 15; }); };
       o.edges.forEach(function (e) {
         var a = P[e[0]], b = P[e[1]], g = S("g", { class: "cedge" }, eg);
         var p1 = edgePt(a, b, size[e[0]]), p2 = edgePt(b, a, size[e[1]]);
         S("path", { d: "M" + p1[0] + " " + p1[1] + " L" + p2[0] + " " + p2[1], "marker-end": "url(#" + mk + ")" }, g);
-        var mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2 + (Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4);
+        var lw = String(e[2]).length * 6.2, dy = Math.abs(p1[1] - p2[1]) < 2 ? -6 : 4, at = function (f) { return [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f + dy]; };
+        var spot = [0.5, 0.4, 0.6, 0.3, 0.7].map(at).filter(function (q) { return !meets(q[0], q[1], lw); })[0] || at(0.5);
+        taken.push([spot[0], spot[1], lw]);
+        var mx = spot[0], my = spot[1];
         S("text", { x: mx, y: my, "text-anchor": "middle", class: "bg" }, g).textContent = e[2];
         S("text", { x: mx, y: my, "text-anchor": "middle" }, g).textContent = e[2];
         edges.push({ g: g, a: e[0], b: e[1] });
@@ -2422,7 +2456,7 @@
       // shading under everything
       (s.spans || []).forEach(function (sp) {
         S("rect", { x: X(sp.x0), y: m.t, width: Math.max(2, X(sp.x1) - X(sp.x0)), height: ih, fill: sp.color || "var(--lx-surface-2)", opacity: sp.op == null ? 1 : sp.op }, svg);
-        if (sp.label) txt((X(sp.x0) + X(sp.x1)) / 2, m.t + 12, sp.label);
+        if (sp.label) txt((X(sp.x0) + X(sp.x1)) / 2, m.t + 12, sp.label, "middle", "ax spanl");   // on its own shading: a darker ink
       });
       (s.hbands || []).forEach(function (hb) {
         var a = Y(Math.max(hb.y0, hb.y1)), b = Y(Math.min(hb.y0, hb.y1));
@@ -2508,12 +2542,14 @@
       if (!mk.label) return;
       var tx, ty, an;
       if (kind === "ring" && !mk.vline) {
-        var right = cx < m.l + g.iw * 0.62; tx = cx + (right ? 9 : -9); ty = cy + (mk.above ? -10 : 18); an = right ? "start" : "end";
+        // above: a point near the top of the plot keeps its label below it, out of the top margin (the y unit's row)
+        var up = !!mk.above && cy - 21 >= m.t;
+        var right = cx < m.l + g.iw * 0.62; tx = cx + (right ? 9 : -9); ty = cy + (up ? -10 : 18); an = right ? "start" : "end";
         var e = S("text", { x: tx, y: ty, "text-anchor": an, class: "mk" }, svg); e.textContent = mk.label;
         // keep the label inside the chart (narrow phones): switch sides when it would run off an edge; if neither side
         // fits, pin it to the edge on the other side of the line (above instead of below, or below instead of above)
         var len = e.getComputedTextLength ? e.getComputedTextLength() : 0, R = g.W - m.r, pin = function (x, a) {
-          e.setAttribute("x", x); e.setAttribute("text-anchor", a); e.setAttribute("y", cy + (mk.above ? 18 : -10)); };
+          e.setAttribute("x", x); e.setAttribute("text-anchor", a); e.setAttribute("y", cy + (up ? 18 : -10)); };
         if (len && right && cx + 9 + len > R) { if (cx - 9 - len >= m.l) { e.setAttribute("x", cx - 9); e.setAttribute("text-anchor", "end"); } else pin(R, "end"); }
         else if (len && !right && cx - 9 - len < m.l) { if (cx + 9 + len <= R) { e.setAttribute("x", cx + 9); e.setAttribute("text-anchor", "start"); } else pin(m.l, "start"); }
         return;
@@ -2639,7 +2675,12 @@
       if (o.diagonal) {
         var a = Math.max(lo(xa), lo(ya)), b = Math.min(hi(xa), hi(ya)), at = L.phone && o.diagonal.atN ? o.diagonal.atN : o.diagonal.at;
         S("path", { d: "M" + x(a) + " " + y(a) + "L" + x(b) + " " + y(b), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 4" }, svg);
-        if (at) S("text", { x: x(at[0]), y: y(at[1]), "text-anchor": "start", class: "ax" }, svg).textContent = L.phone && o.diagonal.labelN ? o.diagonal.labelN : o.diagonal.label;
+        if (at) {   // the label starts at its data point; when it would run past the plot's right edge, it ends there instead
+          var dl = S("text", { x: x(at[0]), y: y(at[1]), "text-anchor": "start", class: "ax" }, svg);
+          dl.textContent = L.phone && o.diagonal.labelN ? o.diagonal.labelN : o.diagonal.label;
+          var dw = (dl.getComputedTextLength && dl.getComputedTextLength()) || dl.textContent.length * 7.4;
+          if (x(at[0]) + dw > Wd - m.r) { dl.setAttribute("x", Wd - m.r); dl.setAttribute("text-anchor", "end"); }
+        }
       }
       var xt = L.phone && xa.titleN ? xa.titleN : xa.title, yt = L.phone && ya.titleN ? ya.titleN : ya.title;
       if (xt) S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "axt" }, svg).textContent = xt;
@@ -2915,7 +2956,7 @@
       for (var q = 0; q <= xMax; q += sc.xStep) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
       S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
       S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
-      var cum = 0;
+      var cum = 0, labs = [];   // block labels: [x centre, baseline, width], so the price label can keep clear of them
       blocks.forEach(function (b) {
         if (b.mw <= 0) return;
         var p = res.plants[b.key], x0 = x(cum), x1 = x(cum + b.mw), xr = x(cum + p.run), top = Math.abs(b.offer) < 2 ? y(0) - 4 : Math.min(y(b.offer), y(0)), bot = Math.abs(b.offer) < 2 ? y(0) : Math.max(y(b.offer), y(0));
@@ -2926,6 +2967,7 @@
           var ly = b.offer >= 0 ? Math.min(y(b.offer), y(0) - 4) - 6 : (y(0) + y(b.offer)) / 2 + 4;
           S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab bg" }, svg).textContent = sh(b.key);
           S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab" }, svg).textContent = sh(b.key);
+          labs.push([(x0 + x1) / 2, ly, sh(b.key).length * 7]);
         }
         cum += b.mw;
       });
@@ -2935,7 +2977,10 @@
         S("path", { d: "M" + xd + " " + (m.t - 6) + "V" + (Hh - m.b), stroke: "var(--lx-ink)", "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
         var anchor = xd > W - 120 ? "end" : "start", dx = anchor === "end" ? -6 : 6;
         ["big bg", "big"].forEach(function (c) { S("text", { x: xd + dx, y: 13, "text-anchor": anchor, class: c }, svg).textContent = "Demand " + Math.round(demand) + " MW"; });
-        ["big bg", "big"].forEach(function (c) { S("text", { x: m.l + 6, y: res.price < 0 ? m.t + 14 : yp - 6, class: c }, svg).textContent = "Price " + usd(res.price); });
+        var pt = "Price " + usd(res.price), py = res.price < 0 ? m.t + 14 : yp - 6, pw = pt.length * 7.6;
+        // a block's label at the same height (a $0 block next to the axis, on a phone) would sit under the price: lift the price a line
+        if (labs.some(function (l) { return Math.abs(l[1] - py) < 15 && l[0] + l[2] / 2 > m.l + 6 && l[0] - l[2] / 2 < m.l + 6 + pw; })) py -= 16;
+        ["big bg", "big"].forEach(function (c) { S("text", { x: m.l + 6, y: py, class: c }, svg).textContent = pt; });
       }
       alt.innerHTML = "";
       var ul = H("ul", null, alt);
@@ -3030,7 +3075,10 @@
         S("path", { d: d + "L" + X(fr[fr.length - 1].co2).toFixed(1) + "," + (HH - mb) + "L" + X(fr[0].co2).toFixed(1) + "," + (HH - mb) + "Z", fill: "var(--lx-surface-3)", opacity: ".55" }, gF);
         S("path", { d: d, fill: "none", stroke: "var(--lx-ink)", "stroke-width": 2.2 }, gF);
         var mid = fr[Math.floor(fr.length * 0.55)];
-        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = o.shadeLabel || "out of reach (approximately)";   // straight lines join solved points: the true edge may sag below
+        var sh = S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF);
+        sh.textContent = o.shadeLabel || "out of reach (approximately)";   // straight lines join solved points: the true edge may sag below
+        var shw = (sh.getComputedTextLength && sh.getComputedTextLength()) || sh.textContent.length * 6.6;   // kept inside the plot on phones
+        sh.setAttribute("x", Math.max(ml + shw / 2 + 2, Math.min(W - mr - shw / 2 - 2, X(mid.co2))).toFixed(1));
         fr.forEach(function (p) { if (p.solved) S("circle", { cx: X(p.co2), cy: Y(p.cost), r: 3.5, fill: "var(--lx-ink)" }, gF); });
         var s1 = H("span", null, leg); H("i", { style: "--c:var(--lx-ink);height:3px" }, s1); H("span", { text: st.frLabel || o.frontierLabel || "Frontier: the cheapest plan at each CO₂" }, s1);
       }
@@ -3040,6 +3088,7 @@
         var s2 = H("span", null, leg); H("i", { class: "line", style: "border-top-color:var(--lx-accent)" }, s2);
         H("span", { text: o.priceLabel ? o.priceLabel(st.price.p) : "Equal score at $" + Math.round(st.price.p) + "/t" }, s2);
       }
+      var labs = [];   // plan letters, placed after all dots (see below)
       st.plans.forEach(function (p) {
         var g = S("g", { class: "dot" + (st.onPick && p.kind === "plan" ? " pick" : ""), transform: "translate(" + X(p.co2).toFixed(1) + "," + Y(p.cost).toFixed(1) + ")" }, gP);
         var r = p.kind === "you" ? 9 : p.kind === "plan" ? 8 : 6.5;
@@ -3047,7 +3096,7 @@
         S("circle", { class: "c", r: r, fill: p.mark === "dominated" || p.mark === "never" ? "var(--lx-surface)" : p.color || "var(--lx-ink)",
                       stroke: p.color || "var(--lx-ink)", "stroke-width": 2.5, "stroke-dasharray": p.mark === "dominated" ? "3 2" : null }, g);
         if (p.kind === "you") S("circle", { r: 3, fill: "var(--lx-surface)" }, g);
-        if (p.id) S("text", { x: r + 4, y: -r + 2, class: "lab" }, g).textContent = p.id;
+        if (p.id) { var lb = S("text", { x: r + 4, y: -r + 2, class: "lab" }, g); lb.textContent = p.id; labs.push({ el: lb, r: r, x: X(p.co2), y: Y(p.cost) }); }
         if (st.onPick && p.kind === "plan") {
           g.setAttribute("tabindex", "0"); g.setAttribute("role", "button");
           g.setAttribute("aria-label", "Plan " + p.id + ", " + p.label + ": " + fmtY(p.cost) + " and " + fmtX(p.co2) + " of CO₂ a year");
@@ -3055,6 +3104,21 @@
           g.addEventListener("click", go);
           g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
         }
+      });
+      // a plan's letter goes up and right of its dot; when it would touch another letter or dot (two plans close
+      // together), it takes the first free corner of up-left, down-right and down-left
+      var taken = [], hit = function (a, b) { return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h; };
+      labs.forEach(function (L) {
+        var tries = [[L.r + 4, -L.r + 2, "start"], [-L.r - 4, -L.r + 2, "end"], [L.r + 4, L.r + 12, "start"], [-L.r - 4, L.r + 12, "end"]], pick = null;
+        for (var k = 0; k < tries.length && !pick; k++) {
+          L.el.setAttribute("x", tries[k][0]); L.el.setAttribute("y", tries[k][1]); L.el.setAttribute("text-anchor", tries[k][2]);
+          var b = L.el.getBBox && L.el.getBBox(); if (!b || !b.width) { pick = tries[k]; break; }
+          var bx = { x: L.x + b.x, y: L.y + b.y, w: b.width, h: b.height };
+          var clash = bx.x < ml || bx.x + bx.w > W - mr || taken.some(function (t) { return hit(bx, t); }) ||
+            labs.some(function (M) { return M !== L && hit(bx, { x: M.x - M.r - 2, y: M.y - M.r - 2, w: 2 * M.r + 4, h: 2 * M.r + 4 }); });
+          if (!clash) { pick = tries[k]; taken.push(bx); }
+        }
+        if (!pick) { L.el.setAttribute("x", tries[0][0]); L.el.setAttribute("y", tries[0][1]); L.el.setAttribute("text-anchor", "start"); }
       });
       var kinds = {};
       st.plans.forEach(function (p) { if (p.kind !== "plan" && !kinds[p.kind] && p.legend) { kinds[p.kind] = 1; var s = H("span", null, leg); H("i", { style: "--c:" + p.color + ";border-radius:50%" }, s); H("span", { text: p.legend }, s); } });
@@ -3633,7 +3697,8 @@
         var label = W < 480 && stl.short ? stl.short : stl.label || "";
         if (anchor === "start" && W - m.r - lx < label.length * 7) { anchor = "end"; lx -= 12; }
         if (anchor === "end" && lx - m.l < label.length * 7) { anchor = "start"; lx = m.l + 4; }
-        S("text", { x: lx, y: ly, "text-anchor": anchor, class: "lbl", fill: stl.color, "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4, "stroke-linejoin": "round" }, gRule).textContent = label;
+        // the label in its line's colour taken toward the ink (darker by day, lighter by night): 4.5:1 on the surface
+        S("text", { x: lx, y: ly, "text-anchor": anchor, class: "lbl", fill: "color-mix(in srgb, " + stl.color + " 70%, var(--lx-ink))", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4, "stroke-linejoin": "round" }, gRule).textContent = label;
         if (o.onDrag && stl.drag) hit(r.a, r.b, id, { tabindex: "-1" }, gRule);
       });
       // the cost line
@@ -7491,7 +7556,7 @@
   var TP = typeof module !== "undefined" && module.exports && typeof require === "function" ? require("./planengine.js")
     : (typeof window !== "undefined" && window.LX && window.LX.townPlan);
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var SEASON = { winter: "var(--lx-hyd)", spring: "var(--lx-good)", summer: "var(--lx-solar)", fall: "var(--lx-pk)" };
+  var SEASON = { winter: "var(--lx-hyd)", spring: "var(--lx-good)", summer: "var(--lx-warn)", fall: "var(--lx-pk)" };   // summer: amber, not solar yellow (a letter on yellow reads at 2:1)
   var XCOL = { peak: "var(--lx-bad)", netpeak: "var(--lx-tier-4)", calm: "var(--lx-ink-3)", winter: "var(--lx-tier-2)" };
   var XLET = { peak: "P", netpeak: "N", calm: "C", winter: "X" };
   var SLET = { winter: "W", spring: "Sp", summer: "Su", fall: "F" };

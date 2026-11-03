@@ -55,7 +55,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .f1z-svg.z-in { transform: scale(.75); opacity: .2; transition: none; }
 .f1z-cap { display: grid; gap: 8px; align-content: start; color: var(--lx-ink); font-size: inherit; margin: 0; }
 .f1z-title { display: flex; align-items: baseline; gap: 8px; font-family: var(--lx-f-display); font-size: 19px; color: var(--lx-ink); }
-.f1z-title .c { font-family: var(--lx-f-mono); font-size: 13px; color: var(--c); font-weight: 600; }
+.f1z-title .c { font-family: var(--lx-f-mono); font-size: 13px; color: color-mix(in srgb, var(--c) 70%, var(--lx-ink)); font-weight: 600; }
 .f1z-title b { font-weight: 600; }
 .f1z-set { font-size: 15px; color: var(--lx-ink-2); }
 .f1z-power { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14.5px; color: var(--lx-ink-2); }
@@ -64,7 +64,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .f1z-q span { display: block; font-family: var(--lx-f-display); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--lx-ink-3); }
 .f1z-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 /* the scenes: every fill and stroke from the Learn tokens, so day and night both work */
-.f1z-svg text { font-family: var(--lx-f-body); font-size: 12px; fill: var(--lx-ink-2); }
+.f1z-svg text { font-family: var(--lx-f-body); font-size: 12px; fill: var(--lx-ink-2);
+  paint-order: stroke; stroke: var(--lx-surface); stroke-width: 3px; stroke-linejoin: round; }   /* a halo: labels read on sky, roofs and fields, day and night */
 .f1z-svg text.lbl { font-family: var(--lx-f-display); font-weight: 600; font-size: 13px; fill: var(--lx-ink); }
 .f1z-svg text.mini { font-size: 11.5px; }
 .f1z-svg .sky { fill: var(--lx-sky-day-bot); } .f1z-svg .ground { fill: var(--lx-ground); } .f1z-svg .hill { fill: var(--lx-hill-far); }
@@ -88,14 +89,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .f1z-svg .plantb { fill: var(--lx-cc); } .f1z-svg .stack { stroke: var(--lx-steel); stroke-width: 4; }
 .f1z-svg .node { fill: var(--lx-ink); stroke: var(--lx-surface); stroke-width: 2; }
 .f1z-svg .blk { fill: var(--lx-wall); stroke: var(--lx-wall-2); } .f1z-svg .heat { fill: none; stroke: var(--lx-cc); stroke-width: 2.5; stroke-dasharray: 2 0; opacity: .85; }
-.f1z-svg text.heatl { fill: var(--lx-cc); }
+.f1z-svg text.heatl { fill: color-mix(in srgb, var(--lx-cc) 70%, var(--lx-ink)); }
 .f1z-svg .transit { fill: none; stroke: var(--lx-scale-2); stroke-width: 3; stroke-dasharray: 9 4; } .f1z-svg .stop { fill: var(--lx-surface); stroke: var(--lx-scale-2); stroke-width: 2; }
 .f1z-svg .feeder { stroke: var(--lx-wire); stroke-width: 1.3; fill: none; } .f1z-svg .fact { fill: var(--lx-concrete-2); stroke: var(--lx-steel); }
 .f1z-svg .dc { fill: var(--lx-roof-2); stroke: var(--lx-steel); } .f1z-svg .field { fill: var(--lx-ground-2); } .f1z-svg .furrow { stroke: var(--lx-ground); stroke-width: 2; }
 .f1z-svg .reg { stroke: var(--lx-surface); stroke-width: 2; } .f1z-svg .r1 { fill: var(--lx-hill-far); } .f1z-svg .r2 { fill: var(--lx-ground-2); }
 .f1z-svg .r3 { fill: var(--lx-ground); } .f1z-svg .r4 { fill: var(--lx-hill-far); opacity: .8; } .f1z-svg .r5 { fill: var(--lx-ground-2); opacity: .85; }
 .f1z-svg .ridge { fill: color-mix(in srgb, var(--lx-ink) 22%, transparent); stroke: var(--lx-ink-3); stroke-dasharray: 3 2; }
-.f1z-svg .grid { fill: none; stroke: var(--lx-scale-2); stroke-width: 2; stroke-dasharray: 7 4; } .f1z-svg text.gridl { fill: var(--lx-scale-2); font-weight: 600; }
+.f1z-svg .grid { fill: none; stroke: var(--lx-scale-2); stroke-width: 2; stroke-dasharray: 7 4; } .f1z-svg text.gridl { fill: color-mix(in srgb, var(--lx-scale-2) 70%, var(--lx-ink)); font-weight: 600; }
 .f1z-svg .ship { fill: var(--lx-ink-2); } .f1z-svg .route { fill: none; stroke: var(--lx-ink-3); stroke-width: 1.4; stroke-dasharray: 3 3; }
 .f1z-svg .star { fill: var(--lx-star); stroke: var(--lx-ink); stroke-width: .6; }
 @media (max-width: 860px) {

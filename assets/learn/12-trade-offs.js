@@ -70,6 +70,7 @@
       ".lx12-plans button{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);font-family:var(--lx-f-display);font-size:14px;cursor:pointer}",
       ".lx12-plans button[aria-pressed=true]{background:var(--lx-ink);color:var(--lx-bg)}",
       ".lx12-plans button.dom{text-decoration:line-through;color:var(--lx-ink-3)}",
+      ".lx12-plans button.dom[aria-pressed=true]{color:var(--lx-bg)}",   // pressed: light text on the dark fill (ink-3 there is 2:1)
       ".lx12-out{font-size:15px;color:var(--lx-ink)}.lx12-out b{font-family:var(--lx-f-mono);font-weight:600}",
       ".lx12-tbl{width:100%;border-collapse:collapse;font-size:14px}.lx12-tbl td,.lx12-tbl th{padding:3px 4px;border-bottom:1px solid var(--lx-line);text-align:left;font-weight:400}",
       ".lx12-tbl .n{text-align:right;font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}.lx12-tbl th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}",
