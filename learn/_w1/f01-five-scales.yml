@@ -17,6 +17,15 @@ glossary:
   - id: local-optimum
     term: Local optimum
     def: "The best plan for one part of a system judged inside its own boundary, which need not be best for the system it sits in."
+  - id: tariff
+    term: Tariff
+    def: "The set of prices a utility charges its customers for electricity, such as a price per kWh, a fixed monthly charge or a different price at different hours."
+  - id: synchronous-grid
+    term: Synchronous grid
+    def: "A grid whose generators all turn in step at one shared frequency; the Lower 48 states have three main ones, called interconnections."
+  - id: building-code
+    term: Building code
+    def: "The rules a city, county or state sets for how new buildings must be built, such as insulation, wiring and safety."
 requests:
   - "Promote two lesson-local components if later lessons want them: ScaleZoom (assets/learn/f01-five-scales.js: a powers-of-ten zoom through five drawn scenes with a keyboard rail, Zoom in/out and a text version; the scenes use only --lx-* tokens) and ScaleStrip (e-scale-strip: five scales with the reader's sort ticks, signals passed down and needs passed up, lessons per scale). Lesson 1's t1-strip could then use ScaleStrip."
   - "Add a scale palette to base.css if the five-scale colours should be shared (F1 defines --f1-s0 ... --f1-s4 locally, day and night): T1, R3, the course map's scale filter and later scale routes could reuse it."

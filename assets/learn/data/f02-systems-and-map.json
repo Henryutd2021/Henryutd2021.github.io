@@ -3,12 +3,15 @@
   "title": "F2 numbers: the stock-and-flow presets, the two feedback loops and the whole-system map",
   "lesson": "learn/f02-systems-and-map.qmd (model and view: assets/learn/f02-systems-and-map.js; tests: _tests/learn/test_f02-systems-and-map.js)",
   "built": "2026-11-03",
-  "note": "Every number in the three stock-and-flow presets is illustrative and comes from the model in f02-systems-and-map.js with the parameters below. The battery is Prairie Town's battery from lesson 9 (25 MW, 100 MWh, 80% round trip, the whole loss taken on charging). The ripple map shows first-round directions of change, other things equal, for a grid like the Plains Grid; it is a thinking tool, not a model, and states no sizes. Real-world numbers carry their source and date under `sources`."
+  "note": "Every number in the three stock-and-flow presets is illustrative and comes from the model in f02-systems-and-map.js with the parameters below. The battery is Prairie Town's battery from lesson 9 (25 MW, 100 MWh, 80% round trip, the whole loss taken on charging). The ripple map shows first-round directions of change, other things equal, for a grid like the Plains Grid; it is a thinking tool, not a model, and states no sizes. Its waves are steps in tracing causes, not fixed delays: each wave's label says roughly when that step plays out, and effects that happen together share a wave. Where an outcome depends on a condition (what replaces gas, the tariff, what serves a new load), the reason says so. Each preset's `about` is a list of short labelled rows (setup, units, rule). Real-world numbers carry their source and date under `sources`."
  },
  "stockflow": {
   "reservoir": {
    "label": "Reservoir", "icon": "drop", "color": "var(--lx-hyd)",
-   "about": "Illustrative: a hydro reservoir upstream on the Plains Grid, fed by a river that swells with spring snowmelt. Water is counted as the electricity it can make (GWh). One step is one week (168 hours); flows are average MW over the week, so GWh per week = MW × 168 ÷ 1,000.",
+   "about": [
+    {"k": "Setup", "t": "Illustrative: a hydro reservoir upstream on the Plains Grid, fed by a river that swells with spring snowmelt."},
+    {"k": "Units", "t": "Water counts as the electricity it can make (GWh). Flows are average MW over one week of 168 hours."},
+    {"k": "Rule", "t": "Change in the stock each week, in GWh = (river in − release, in MW) × 168 ÷ 1,000."}],
    "steps": 52, "hours": 168, "stockUnit": "GWh", "flowUnit": "MW", "stepName": "week",
    "capacity": 350, "start": 150,
    "inflow": {"base": 60, "amp": 300, "peak": 19, "width": 4, "formula": "MW in week w (w = 0 … 51) = base + amp × exp(−((w − peak) ÷ width)²)"},
@@ -17,7 +20,9 @@
   },
   "battery": {
    "label": "Battery", "icon": "battery", "color": "var(--lx-bat)",
-   "about": "Prairie Town's battery from lesson 9 (illustrative): 25 MW, 100 MWh, 80% round trip with the whole loss taken on charging. It charges from 10:00 to 15:00 and discharges from 18:00 to 22:00; it starts the day empty.",
+   "about": [
+    {"k": "Setup", "t": "Prairie Town's battery from lesson 9 (illustrative): 25 MW, 100 MWh, 80% round trip."},
+    {"k": "Rule", "t": "The whole loss is taken on charging. It charges from 10:00 to 15:00, discharges from 18:00 to 22:00, and starts the day empty."}],
    "P": 25, "E": 100, "eta": 0.8, "start": 0,
    "charge": {"from": 10, "to": 15}, "discharge": {"from": 18, "to": 22},
    "chargeMW": {"min": 0, "max": 25, "step": 5, "start": 15},
@@ -26,7 +31,10 @@
   },
   "carbon": {
    "label": "Carbon budget", "icon": "cloud", "color": "var(--lx-ink-3)",
-   "about": "Illustrative: Prairieland emits 100 Mt of CO₂ in 2025 and allows itself a cumulative budget of 1,500 Mt from 2025 on (Mt = million tonnes). Emissions change in straight lines: from 2025 to the 2035 level, then from 2035 to zero in the net-zero year (or they stay at the 2035 level). The stock is the CO₂ emitted since the start of 2025.",
+   "about": [
+    {"k": "Setup", "t": "Illustrative: Prairieland emits 100 Mt of CO₂ in 2025 (Mt = million tonnes) and allows itself 1,500 Mt in all from 2025 on."},
+    {"k": "Rule", "t": "Emissions change in straight lines: to the 2035 level, then to zero in the net-zero year, or they stay at the 2035 level."},
+    {"k": "Stock", "t": "The counter adds up CO₂ emitted since the start of 2025. It does not model how much of it stays in the air."}],
    "e0": 100, "start_year": 2025, "end_year": 2070, "budget": 1500, "pivot_year": 2035,
    "l35": {"min": 0, "max": 100, "step": 10, "start": 100},
    "nz": {"min": 2040, "max": 2075, "step": 5, "start": 2075, "never": 2075},
@@ -95,20 +103,21 @@
    {"id": "sec", "label": "Security and reliability", "short": "Security"}
   ],
   "nodes": [
-   {"id": "dem", "dim": "tech", "label": "Electricity demand"},
-   {"id": "mix", "dim": "tech", "label": "Which plants run"},
-   {"id": "grid", "dim": "tech", "label": "Wires and connections"},
-   {"id": "build", "dim": "tech", "label": "What gets built"},
-   {"id": "whp", "dim": "cost", "label": "Wholesale price"},
-   {"id": "bill", "dim": "cost", "label": "Household bills"},
-   {"id": "upg", "dim": "cost", "label": "Grid upgrade costs"},
-   {"id": "co2", "dim": "env", "label": "CO₂ emissions"},
-   {"id": "local", "dim": "env", "label": "Local air and water"},
-   {"id": "burden", "dim": "people", "label": "Energy burden"},
-   {"id": "jobs", "dim": "people", "label": "Jobs and tax base"},
-   {"id": "health", "dim": "people", "label": "Health in extreme heat"},
-   {"id": "margin", "dim": "sec", "label": "Spare capacity"},
-   {"id": "imports", "dim": "sec", "label": "Import exposure"}
+   {"id": "dem", "dim": "tech", "label": "Electricity demand", "def": "How much power homes and businesses draw, hour by hour (MW)."},
+   {"id": "mix", "dim": "tech", "label": "Which plants run", "def": "The plants an operator calls on each hour, usually cheapest first: the [[merit-order|merit order]]."},
+   {"id": "grid", "dim": "tech", "label": "Wires and connections", "def": "The lines and substations that carry power, and the links that connect new loads and plants."},
+   {"id": "build", "dim": "tech", "label": "What gets built", "def": "New plants, storage, lines and efficiency that owners and planners choose to invest in."},
+   {"id": "whp", "dim": "cost", "label": "Wholesale price", "def": "The [[wholesale-price|wholesale price]]: what power plants are paid for each MWh in the market."},
+   {"id": "bill", "dim": "cost", "label": "Household bills", "def": "What homes pay for electricity and heat under their [[tariff|tariff]]."},
+   {"id": "impbill", "dim": "cost", "label": "Gas import bill", "def": "What a region pays others for the gas it buys from them."},
+   {"id": "upg", "dim": "cost", "label": "Grid upgrade costs", "def": "The cost of new lines and substations, which some group of customers or owners pays."},
+   {"id": "co2", "dim": "env", "label": "CO₂ emissions", "def": "CO₂ from burning fuels in power plants and homes, in tonnes a year."},
+   {"id": "local", "dim": "env", "label": "Local pollution and water use", "def": "Smoke and soot near plants, and the water that plants and cooling systems draw."},
+   {"id": "burden", "dim": "people", "label": "Energy burden", "def": "The [[energy-burden|energy burden]]: the share of a household's income spent on energy."},
+   {"id": "jobs", "dim": "people", "label": "Jobs and tax base", "def": "Work building and running energy plants, and the local taxes they pay."},
+   {"id": "health", "dim": "people", "label": "Heat-related health risk", "def": "The risk of illness or death from extreme heat, highest for people without cooling."},
+   {"id": "margin", "dim": "sec", "label": "Spare capacity", "def": "How much more the available plants and lines could supply than demand needs right now: the grid's cushion."},
+   {"id": "imports", "dim": "sec", "label": "Dependence on imported gas", "def": "How much of a region's energy relies on gas brought in from elsewhere."}
   ],
   "dirs": {
    "up": {"sym": "↑", "word": "rises"},
@@ -120,21 +129,22 @@
    {
     "id": "gas", "label": "Gas price doubles", "icon": "flame",
     "predict": {"node": "co2", "q": "Before the ripple: what happens to CO₂ emissions?", "answer": "mixed"},
-    "loop": {"type": "B", "text": "A balancing loop closes: a high gas price pushes the system away from gas, which shrinks the exposure that hurt it."},
+    "loop": null,
+    "note": "This is an adaptation chain, not a feedback loop: over time, switching away from gas can reduce exposure to future gas-price shocks.",
     "waves": [
      {"label": "Days to weeks", "effects": [
       {"node": "whp", "dir": "up", "from": "lever", "why": "Where gas plants set the price in many hours, the wholesale price climbs with their fuel cost (lesson 8)."},
-      {"node": "bill", "dir": "up", "from": "lever", "why": "Homes heated with gas pay more for heat right away."},
-      {"node": "imports", "dir": "up", "from": "lever", "why": "A region that imports gas pays more abroad for the same fuel."}
+      {"node": "bill", "dir": "up", "from": "lever", "why": "Homes heated with gas pay more for heat once their tariff passes the price on."},
+      {"node": "impbill", "dir": "up", "from": "lever", "why": "A region that imports gas pays more for the same fuel."}
      ]},
      {"label": "Weeks to months", "effects": [
       {"node": "mix", "dir": "shift", "from": "whp", "why": "Plants that burn other fuels, where they exist, run more; gas plants run less."},
       {"node": "co2", "dir": "mixed", "from": "mix", "why": "If coal plants fill in, CO₂ rises; if no other plant can take over, gas keeps running and little changes."},
-      {"node": "burden", "dir": "up", "from": "bill", "why": "Low-income homes spend a larger share of their income on energy."}
+      {"node": "burden", "dir": "up", "from": "bill", "why": "Low-income homes spend a larger share of their income on energy, so higher bills weigh on them most."}
      ]},
      {"label": "Years", "effects": [
       {"node": "build", "dir": "shift", "from": "whp", "why": "Efficiency, wind, solar, storage and other fuels become more attractive to build."},
-      {"node": "imports", "dir": "down", "from": "build", "why": "As the system switches away from gas, import exposure shrinks."}
+      {"node": "imports", "dir": "down", "from": "build", "why": "As the system switches away from gas, it depends less on imported gas."}
      ]}
     ]
    },
@@ -146,34 +156,34 @@
      {"label": "Hours", "effects": [
       {"node": "dem", "dir": "up", "from": "lever", "why": "Air conditioning pushes demand toward its peak."},
       {"node": "grid", "dir": "down", "from": "lever", "why": "Hot lines sag and can carry less: their ratings fall as the air warms (DOE)."},
+      {"node": "margin", "dir": "down", "from": "dem", "why": "Demand is up while hot lines and some thermal plants deliver less, so spare capacity shrinks from both sides (NERC)."},
       {"node": "health", "dir": "up", "from": "lever", "why": "People without cooling face more risk to their health."}
      ]},
      {"label": "Hours to days", "effects": [
-      {"node": "margin", "dir": "down", "from": "dem", "why": "Demand is up while hot lines and some thermal plants deliver less, so spare capacity shrinks from both sides (NERC)."},
-      {"node": "mix", "dir": "shift", "from": "dem", "why": "Peakers and power from neighbouring grids fill the gap."},
-      {"node": "whp", "dir": "up", "from": "margin", "why": "Tight hours bring scarcity prices."},
+      {"node": "mix", "dir": "shift", "from": "margin", "why": "Peakers and power from neighbouring grids fill the gap."},
+      {"node": "whp", "dir": "up", "from": "margin", "why": "Tight hours can bring [[scarcity-price|scarcity prices]]."},
       {"node": "co2", "dir": "up", "from": "mix", "why": "In a grid like Prairie Town's, the extra MWh come from gas peakers (lesson 0)."}
      ]},
      {"label": "Months to years", "effects": [
       {"node": "bill", "dir": "up", "from": "whp", "why": "Higher costs can reach bills later; how much depends on the tariff."},
       {"node": "burden", "dir": "up", "from": "bill", "why": "Low-income homes feel higher bills and cooling costs most."},
-      {"node": "build", "dir": "up", "from": "margin", "why": "Planners add capacity, demand response, storage and stronger lines before the next summer."}
+      {"node": "build", "dir": "up", "from": "margin", "why": "Repeated tight hours can encourage planners to add capacity, demand response, storage or stronger lines."}
      ]}
     ]
    },
    {
     "id": "carbon", "label": "A carbon price", "icon": "coin",
-    "predict": {"node": "co2", "q": "Before the ripple: what happens to CO₂ emissions?", "answer": "down"},
+    "predict": {"node": "co2", "q": "Before the ripple: what happens to CO₂ emissions?", "answer": "down", "cond": "if gas plants with spare capacity can replace coal"},
     "loop": null,
     "waves": [
      {"label": "Days to months", "effects": [
-      {"node": "mix", "dir": "shift", "from": "lever", "why": "Coal's running cost rises more than gas's, since it emits more CO₂ per MWh, so gas plants can move ahead of coal plants in the merit order."},
+      {"node": "mix", "dir": "shift", "from": "lever", "why": "Coal's running cost rises more than gas's, since it emits more CO₂ per MWh, so gas plants can move ahead of coal plants in the [[merit-order|merit order]]."},
       {"node": "whp", "dir": "up", "from": "lever", "why": "When a fossil plant sets the price, the price now includes its carbon cost."}
      ]},
      {"label": "Months", "effects": [
-      {"node": "co2", "dir": "down", "from": "mix", "why": "Running less coal and more gas cuts CO₂ per MWh."},
-      {"node": "local", "dir": "down", "from": "mix", "why": "Burning less coal also cuts local air pollution."},
-      {"node": "bill", "dir": "up", "from": "whp", "why": "Power bills rise with the wholesale price."},
+      {"node": "co2", "dir": "down", "from": "mix", "why": "If gas plants with spare capacity replace coal, CO₂ per MWh falls."},
+      {"node": "local", "dir": "down", "from": "mix", "why": "If less coal is burned, local air pollution falls too."},
+      {"node": "bill", "dir": "up", "from": "whp", "why": "If the tariff passes the higher wholesale price on, power bills rise."},
       {"node": "burden", "dir": "mixed", "from": "bill", "why": "It depends on the revenue: returned to households as rebates, it can offset the burden."}
      ]},
      {"label": "Years", "effects": [
@@ -189,22 +199,22 @@
     "loop": null,
     "about": "A 300 MW data-center campus, an illustrative large load that runs around the clock.",
     "waves": [
-     {"label": "Months", "effects": [
+     {"label": "When it connects", "effects": [
       {"node": "dem", "dir": "up", "from": "lever", "why": "A 300 MW load running around the clock adds demand in every hour."},
       {"node": "grid", "dir": "up", "from": "lever", "why": "It needs new lines or a substation before it can draw its full power."},
-      {"node": "jobs", "dir": "up", "from": "lever", "why": "Construction jobs, and a larger local tax base."},
+      {"node": "margin", "dir": "down", "from": "dem", "why": "With supply unchanged, the new load uses up spare capacity as soon as it connects."},
+      {"node": "jobs", "dir": "up", "from": "lever", "why": "Construction can bring jobs, and the site a larger local tax base."},
       {"node": "local", "dir": "mixed", "from": "lever", "why": "Cooling may draw water, depending on the cooling design."}
      ]},
-     {"label": "Years", "effects": [
-      {"node": "margin", "dir": "down", "from": "dem", "why": "Until new supply connects, spare capacity shrinks."},
+     {"label": "Months to years", "effects": [
       {"node": "mix", "dir": "shift", "from": "dem", "why": "Existing plants run more hours to serve the extra MWh."},
       {"node": "whp", "dir": "up", "from": "margin", "why": "Prices can rise in tight hours."},
       {"node": "co2", "dir": "mixed", "from": "mix", "why": "It depends on which plants serve the extra MWh: up if fossil plants fill in, less if new low-carbon supply is added."},
       {"node": "upg", "dir": "up", "from": "grid", "why": "Someone pays for the new lines and substations."}
      ]},
-     {"label": "Years later", "effects": [
+     {"label": "Years", "effects": [
       {"node": "bill", "dir": "mixed", "from": "upg", "why": "Whether other customers' bills rise depends on who pays for upgrades under the tariff: Analyst lesson A4 (upcoming)."},
-      {"node": "build", "dir": "up", "from": "margin", "why": "New supply and lines get built."}
+      {"node": "build", "dir": "up", "from": "margin", "why": "Developers and planners may add new supply and lines."}
      ]}
     ]
    }
@@ -213,11 +223,11 @@
  "sources": {
   "ipcc_tcre": {"what": "Each 1,000 Gt of cumulative CO₂ emissions is assessed to likely cause 0.27 °C to 0.63 °C of warming, best estimate 0.45 °C; reaching net zero CO₂ is required to stabilise human-induced warming.", "value": 0.45, "low": 0.27, "high": 0.63, "per_gt": 1000,
    "source": "IPCC (2021), Climate Change 2021: The Physical Science Basis, Summary for Policymakers, D.1.1, p. 28", "url": "https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WGI_SPM.pdf", "as_of": "published 2021; read 3 November 2026"},
-  "sorrell_rebound": {"what": "For household energy services in the OECD, the direct rebound effect should generally be less than 30%.", "value": 30,
+  "sorrell_rebound": {"what": "For household energy services in the OECD, the paper concludes that the direct rebound effect should generally be less than 30% (abstract; the full text is not openly readable).", "value": 30,
    "source": "Sorrell, Dimitropoulos and Sommerville (2009), Empirical estimates of the direct rebound effect: a review, Energy Policy 37(4), 1356-1371", "url": "https://doi.org/10.1016/j.enpol.2008.11.026", "as_of": "published 2009; abstract read 3 November 2026"},
-  "li_ev": {"what": "Quarterly EV sales and charging-station deployment in 353 U.S. metro areas, 2011-2013, show indirect network effects on both sides of the market: a feedback loop between cars and chargers.", "value": 353,
+  "li_ev": {"what": "From quarterly EV sales and charging-station deployment in 353 U.S. metro areas, 2011-2013, the empirical analysis finds indirect network effects on both sides of the market, stronger on the EV demand side; the paper's model shows such effects form feedback loops (abstract).", "value": 353,
    "source": "Li, Tong, Xing and Zhou (2017), The market for electric vehicles: indirect network effects and policy design, Journal of the Association of Environmental and Resource Economists 4(1), 89-133", "url": "https://doi.org/10.1086/689702", "as_of": "published 2017; abstract read 3 November 2026"},
-  "bathtub": {"what": "Business-school students with no prior exposure to system dynamics showed a poor understanding of stocks, flows and time delays.",
+  "bathtub": {"what": "Subjects from an elite business school with essentially no prior exposure to system dynamics showed a poor understanding of stock and flow relationships and time delays (abstract; the full text is not openly readable).",
    "source": "Booth Sweeney and Sterman (2000), Bathtub dynamics: initial results of a systems thinking inventory, System Dynamics Review 16(4), 249-286", "url": "https://doi.org/10.1002/sdr.198", "as_of": "published 2000; abstract read 3 November 2026"},
   "nerc_sra": {"what": "NERC's summer assessment counts derates of thermal plants in extreme heat among the risks to supply; in one U.S. region they could take about 3 GW from available supply.",
    "source": "NERC (May 2025), 2025 Summer Reliability Assessment, Table 3, p. 14", "url": "https://www.nerc.com/pa/RAPA/ra/Reliability%20Assessments%20DL/NERC_SRA_2025.pdf", "as_of": "May 2025; read 3 November 2026"},

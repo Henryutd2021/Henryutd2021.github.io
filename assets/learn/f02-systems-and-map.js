@@ -13,12 +13,20 @@
 //                        battery    hourly, one day; charge from 10:00 to 15:00, discharge from 18:00 to 22:00; the whole
 //                                   loss on charging (stored = 80% of bought), as in lesson 9's battery
 //                        carbon     yearly, 2025-2070; emissions in straight lines (2025 → the 2035 level → zero in the
-//                                   net-zero year, or held); the stock is cumulative CO₂ since the start of 2025; no outflow
+//                                   net-zero year, or held); the stock is cumulative CO₂ emitted since the start of 2025
+//                                   (not the CO₂ left in the air); no outflow; zero = the first year emissions reach zero,
+//                                   read from the path (so a 0% level in 2035 reaches zero in 2035 whatever the slider says)
+//                        carbonMessage(C, res, pred) is the sentence the carbon tank shows (exported for the tests)
 //   2 Feedback loops     a causal-loop diagram: the reader signs every link (+: more causes more, −: more causes less) and
 //                        names each loop. Loop polarity: an even number of − links makes a reinforcing loop, an odd
-//                        number a balancing one (loopType). Chargers and EVs (one R, one B loop); the rebound effect (B).
+//                        number a balancing one (loopType). Polarity says which way a loop pushes, not how it behaves over
+//                        time: a balancing loop opposes change, and with long delays it can overshoot. Naming opens only
+//                        once every sign is right, so the verdict and the reader's signs agree.
+//                        Chargers and EVs (one R, one B loop); the rebound effect (B).
 //   3 The system map     four levers; each ripples in three waves of first-round directions (rises, falls, shifts,
 //                        depends), other things equal, across five dimensions. Directions, not sizes: a thinking tool.
+//                        A wave is a step in tracing causes; its label says roughly when it plays out. A node's details
+//                        show only the waves the reader has opened.
 //
 // Lesson-local components (candidates for promotion): StockFlow (i-stockflow: tub, flow and stock charts, a time
 // scrubber), LoopBuilder (i-cld: sign the links, polarity check, name the loops; a static mode for e-loop) and
@@ -85,9 +93,18 @@
   function simCarbon(C, l35pct, nz) {
     var e = carbonPath(C, l35pct, nz), s = 0, stock = [0], over = null;
     e.forEach(function (v, i) { s = r6(s + v); stock.push(s); if (over == null && s > C.budget + 1e-9) over = C.start_year + i; });
-    var at = function (y) { return stock[y - C.start_year + 1]; };
-    return { e: e, stock: stock, end: s, over: over, at: at, l35: l35pct, nz: nz, never: nz >= C.nz.never,
+    var at = function (y) { return stock[y - C.start_year + 1]; }, zero = null;
+    for (var i = 0; i < e.length; i++) if (e[i] <= 1e-9) { zero = C.start_year + i; break; }
+    return { e: e, stock: stock, end: s, over: over, at: at, l35: l35pct, nz: nz, zero: zero, never: zero == null,
              won: s <= C.budget + 1e-9 };
+  }
+  function carbonMessage(C, res, pred) {
+    var f = function (v) { return Math.round(v).toLocaleString("en-US"); };
+    if (!pred) return "Make your prediction first.";
+    if (res.won) return "Within the [[carbon-budget|carbon budget]]: " + f(res.end) + " Mt by " + C.end_year + ". " +
+      (res.zero != null ? "The stock stops rising only in " + res.zero + ", when emissions reach [[net-zero|net zero]]; every year before adds to it." : "Every year of emissions adds to the stock.");
+    return "Over the budget from " + res.over + ": the stock keeps rising as long as emissions are above zero" +
+      (res.zero == null ? ", and on this path they never reach zero." : ". Cut sooner, or reach zero earlier.");
   }
   // causal loops: the links along a loop's path (closing back to its start), and the loop's polarity from a set of signs
   function loopLinks(L, loop) {
@@ -117,14 +134,20 @@
     var seen = {}; ripple(lever, lever.waves.length - 1).effects.forEach(function (e) { seen[dimOf[e.node]] = true; });
     return R.dims.map(function (d) { return d.id; }).filter(function (d) { return seen[d]; });
   }
+  // what one node has shown so far: per lever, the directions in the waves the reader opened (seen[lever] = waves opened)
+  function nodeSoFar(R, id, seen) {
+    var out = [];
+    R.levers.forEach(function (lv) { var k = (seen || {})[lv.id] || 0; if (k < 1) return; var by = ripple(lv, Math.min(k, lv.waves.length) - 1).by[id]; if (by) out.push({ lever: lv.id, label: lv.label, dirs: by }); });
+    return out;
+  }
   function hubs(R) {
     var count = {};
     R.levers.forEach(function (lv) { Object.keys(ripple(lv, lv.waves.length - 1).by).forEach(function (n) { count[n] = (count[n] || 0) + 1; }); });
     return count;
   }
   var model = { reservoirInflow: reservoirInflow, stepStock: stepStock, simReservoir: simReservoir, simBattery: simBattery, carbonPath: carbonPath,
-                simCarbon: simCarbon, loopLinks: loopLinks, loopType: loopType, gradeSigns: gradeSigns, reboundKept: reboundKept,
-                ripple: ripple, dimsReached: dimsReached, hubs: hubs };
+                simCarbon: simCarbon, carbonMessage: carbonMessage, loopLinks: loopLinks, loopType: loopType, gradeSigns: gradeSigns, reboundKept: reboundKept,
+                ripple: ripple, dimsReached: dimsReached, hubs: hubs, nodeSoFar: nodeSoFar };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -199,7 +222,7 @@
     void scrubL;
     var segBox = H("div", null, areaPanel), task = H("p", { class: "f2-task" }, areaPanel), predBox = H("div", null, areaPanel);
     var ctlBox = H("div", { class: "lx-gctl" }, areaPanel), chips = H("div", { class: "lx-tallies f2-chips" }, areaPanel);
-    var saw = H("div", { "aria-live": "polite" }, areaPanel), about = H("p", { class: "lx-hint f2-about" }, areaPanel);
+    var saw = H("div", { "aria-live": "polite" }, areaPanel), about = H("dl", { class: "lx-hint f2-about" }, areaPanel);
     var segC = null;
     function paintSeg() {
       segBox.innerHTML = "";
@@ -210,7 +233,8 @@
 
     function build() {
       stop(); paintSeg(); ctlBox.innerHTML = ""; predBox.innerHTML = ""; saw.innerHTML = ""; tubBox.innerHTML = ""; areaCharts.innerHTML = "";
-      var P = D[kind]; task.textContent = P.task; about.textContent = P.about;
+      var P = D[kind]; task.textContent = P.task; about.innerHTML = "";
+      P.about.forEach(function (r) { var row = H("div", null, about); H("dt", { text: r.k }, row); H("dd", { text: r.t }, row); });
       pFlow = LX.Plot(areaCharts, { caption: true, text: "Text version of the flow chart" });
       pStock = LX.Plot(areaCharts, { caption: true, text: "Text version of the stock chart" });
       var c = (st.ctl = st.ctl || {})[kind] = st.ctl[kind] || {};
@@ -339,9 +363,7 @@
         else msg = "No shortfall, but only " + fx(res.delivered) + " MWh delivered" + (res.left > 1e-9 ? " and " + fx(res.left) + " MWh left unused" : "") + ". The battery holds " + P.E + " MWh: can you deliver all of it?";
       } else {
         chip("Emitted " + P.start_year + "–" + P.end_year, fx(res.end) + " Mt", won ? null : "bad"); chip("Budget", fx(P.budget) + " Mt"); chip(P.end_year + " emissions", fx(res.e[res.e.length - 1], 1) + " Mt/yr");
-        if (!st.pred) { msg = "Make your prediction first."; bad = true; }
-        else if (won) msg = "Within the [[carbon-budget|carbon budget]]: " + fx(res.end) + " Mt by " + P.end_year + ". The stock stops rising only in " + res.nz + ", when emissions reach zero; every year before adds to it.";
-        else msg = "Over the budget from " + res.over + ": the stock keeps rising as long as emissions are above zero" + (res.never ? ", and with no net-zero year they never are." : ". Cut sooner, or reach zero earlier.");
+        msg = carbonMessage(P, res, st.pred); if (!st.pred) bad = true;
       }
       setSaw(msg, bad);
       if (won && (kind !== "carbon" || st.pred)) { (st.wonAt = st.wonAt || {})[kind] = JSON.parse(JSON.stringify(st.ctl[kind])); ctx.save(); }
@@ -401,10 +423,11 @@
     if (o.static) { var ref = {}; L.links.forEach(function (l) { ref[l.id] = l.sign; }); signs(ref); }
     return { svg: svg, signs: signs, loopLabel: loopLabel, light: light };
   }
-  // a behaviour-over-time sketch: R = growth that feeds itself (or decline); B = settles toward a level (illustrative shapes)
+  // a behaviour-over-time sketch: R = growth that feeds itself (or decline); B = one possible response without long delays,
+  // settling toward a level (with long delays a balancing loop can overshoot instead); illustrative shapes
   function sketch(host, type) {
     var d = type === "R" ? "M14 70 C60 68 92 60 116 46 C134 34 146 20 154 8" : "M14 70 C34 34 58 22 92 18 C118 16 136 15 154 15";
-    var svg = S("svg", { viewBox: "0 0 168 84", class: "f2-sketch " + type, role: "img", "aria-label": type === "R" ? "Typical behaviour of a reinforcing loop: growth that feeds itself" : "Typical behaviour of a balancing loop: it settles toward a level" }, host);
+    var svg = S("svg", { viewBox: "0 0 168 84", class: "f2-sketch " + type, role: "img", "aria-label": type === "R" ? "Typical behaviour of a reinforcing loop: growth that feeds itself" : "One possible response of a balancing loop without long delays: it settles toward a level" }, host);
     svg.innerHTML = '<path class="ax" d="M12 6 V74 H160"/>' + (type === "B" ? '<path class="goal" d="M12 15 H160"/>' : "") + '<path class="cv" d="' + d + '"/>' +
       '<text x="16" y="82">time</text>';
     return svg;
@@ -449,12 +472,12 @@
           r.why.textContent = S0.checked && v ? (v === l.sign ? "" : "Not quite. ") + l.why : "";
         });
         cld.signs(S0.signs, S0.checked);
-        score.textContent = S0.checked ? (g.set < g.total ? "Sign every arrow first: " + (g.total - g.set) + " to go." : g.right + " of " + g.total + " signs match.") : "";
+        score.textContent = S0.checked ? (g.set < g.total ? "Sign every arrow first: " + (g.total - g.set) + " to go." : g.right + " of " + g.total + " signs match." + (g.right < g.total ? " Fix the ones marked, then check again." : "")) : "";
         names(g);
       }
       function names(g) {
         nameBox.innerHTML = ""; saw.innerHTML = "";
-        if (!S0.checked || g.set < g.total) { cld.light(null); return; }
+        if (!S0.checked || g.right < g.total) { cld.light(null); bh.innerHTML = ""; extra.innerHTML = ""; return; }
         H("p", { class: "f2-sub", text: "Now name each loop. Follow its arrows round, and count the − links." }, nameBox);
         L.loops.forEach(function (lp) {
           var row = H("div", { class: "f2-loopq" }, nameBox), mine = loopType(L, lp, S0.signs);
@@ -477,11 +500,11 @@
         var all = g.right === g.total && L.loops.every(function (lp) { return S0.named[lp.id] === lp.type; });
         bh.innerHTML = "";
         if (all) {
-          L.loops.forEach(function (lp) { var f = H("figure", { class: "f2-fig" }, bh); sketch(f, lp.type); H("figcaption", { text: loopName(lp) + (lp.type === "R" ? ", reinforcing: growth or decline that feeds itself" : ", balancing: settles toward a level") }, f); });
+          L.loops.forEach(function (lp) { var f = H("figure", { class: "f2-fig" }, bh); sketch(f, lp.type); H("figcaption", { text: loopName(lp) + (lp.type === "R" ? ", reinforcing: growth or decline that feeds itself" : ", balancing: opposes the change; without long delays it settles, as here") }, f); });
           if (!S0.done) { var fk = focusKey(); S0.done = true; ctx.save(); ctx.note(); build(); refocus(el, fk); return; }
           var src = ctx.D.sources;
           H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich(which === "ev"
-            ? "Both [[feedback-loop|feedback loops]] closed. Which one wins depends on their strength and delays. Researchers have measured this loop: EV sales and chargers fed each other in " + src.li_ev.value + " U.S. metro areas, 2011 to 2013 (Li et al., 2017)."
+            ? "Both [[feedback-loop|feedback loops]] closed; which one wins depends on their strength and delays. A study of " + src.li_ev.value + " U.S. metro areas, 2011 to 2013, found effects running both ways between EV sales and chargers (Li et al., 2017)."
             : "Loop closed. The [[rebound-effect|rebound effect]] takes back part of the saving, not all of it: move the slider.") + "</div>" }, saw);
           if (which === "rebound") rebound(extra);
         } else extra.innerHTML = "";
@@ -494,7 +517,7 @@
       if (st.rb == null) st.rb = R.start;
       var bars = H("div", { class: "f2-rb-bars", "aria-live": "polite" }, box);
       LX.Slider(box, { label: "Rebound: share of the saving taken back", color: "var(--lx-warn)", min: R.min, max: R.max, step: R.step, value: st.rb,
-        fmt: function (v) { return v + "%"; }, hint: function () { return "Reviews put the direct rebound for most household energy services in OECD countries below " + src.value + "% (Sorrell et al., 2009)."; },
+        fmt: function (v) { return v + "%"; }, hint: function () { return "One review concludes that the direct rebound for household energy services in OECD countries should generally be less than " + src.value + "% (Sorrell et al., 2009)."; },
         onChange: function (v) { st.rb = v; ctx.save(); draw(); } });
       function draw() {
         var kept = reboundKept(R.engineering, st.rb);
@@ -583,7 +606,7 @@
         H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich("**Hubs.** " + cap(list(all)) + " moved under every one of the four levers. A study that changes any part of the system should check these first.") + "</div>" }, live);
         return;
       }
-      if (!lever) { H("p", { class: "lx-hint", text: "Pick a lever above. Each one starts a ripple that spreads in waves across the five lanes." }, pv); return; }
+      if (!lever) { H("p", { class: "lx-hint", text: "Pick a lever above. Each wave is one step in tracing causes; its label says roughly when that step plays out." }, pv); return; }
       if (wave < 0) {
         var pr = lever.predict, q = H("div", { class: "f2-pred" }, pv);
         H("p", { class: "lx-q", text: pr.q }, q);
@@ -610,21 +633,20 @@
       var pr2 = lever.predict, mine = st.preds[lever.id], reach = ripple(lever, wave).by[pr2.node];
       if (reach) {
         var ok = mine === pr2.answer;
-        H("p", { class: "f2-verdict " + (ok ? "ok" : "no"), html: (ok ? LX.icon("check") + "<b>Your prediction holds.</b> " : LX.icon("question") + "<b>Not what you predicted.</b> ") +
-          LX.esc(nodeBy[pr2.node].label) + ": " + dirs[pr2.answer].word + "." }, pv);
+        H("p", { class: "f2-verdict " + (ok ? "ok" : "no"), html: (ok ? LX.icon("check") + "<b>Your prediction matches the map.</b> " : LX.icon("question") + "<b>Not what the map shows.</b> ") +
+          LX.esc(nodeBy[pr2.node].label) + ": " + dirs[pr2.answer].word + (pr2.cond ? ", " + LX.esc(pr2.cond) : "") + "." }, pv);
       }
       if (wave === lever.waves.length - 1) {
         var dr = dimsReached(R, lever);
-        H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich("One lever reached **" + dr.length + " of " + R.dims.length + "** dimensions in " + lever.waves.length + " waves" + (lever.loop ? ". " + lever.loop.text : ".") +
+        H("div", { class: "lx-saw", html: LX.icon("check") + "<div>" + rich("One lever reached **" + dr.length + " of " + R.dims.length + "** dimensions in " + lever.waves.length + " waves" + (lever.note ? ". " + lever.note : ".") +
           (doneAll() ? " All four levers pulled: show the hubs." : " Pull another lever.")) + "</div>" }, live);
         if (doneAll()) { var hb = H("button", { type: "button", class: "lx-btn small ghost", text: "Show the hubs" }, live); hb.addEventListener("click", function () { showHubs = true; st.hubs = true; ctx.save(); ctx.note(); render(); var lb = levBtn[lever.id]; if (lb) lb.focus({ preventScroll: true }); }); }
       }
     }
     function info(id) {
-      var n = nodeBy[id], uses = [];
-      R.levers.forEach(function (lv) { var by = ripple(lv, lv.waves.length - 1).by[id]; if (by && (st.levers[lv.id] || 0) >= 1) uses.push(lv.label + ": " + by.map(function (d) { return dirs[d].word; }).join(", then ")); });
+      var n = nodeBy[id], uses = nodeSoFar(R, id, st.levers).map(function (u) { return u.label + ": " + u.dirs.map(function (d) { return dirs[d].word; }).join(", then "); });
       live.innerHTML = "";
-      H("p", { class: "f2-info", html: "<b>" + LX.esc(n.label) + "</b> (" + LX.esc(dimBy[n.dim].label) + "). " + (uses.length ? "So far: " + LX.esc(uses.join("; ")) + "." : "No lever you pulled has reached it yet.") }, live);
+      H("p", { class: "f2-info", html: "<b>" + LX.esc(n.label) + "</b> (" + LX.esc(dimBy[n.dim].label) + "): " + rich(n.def) + " " + (uses.length ? "In the waves you opened: " + LX.esc(uses.join("; ")) + "." : "No wave you opened has reached it yet.") }, live);
     }
     function focusWave() { var n = panel.querySelector('[data-fk="next"]'); if (n && !n.hidden) n.focus({ preventScroll: true }); else refocus(panel, "wavehead"); }
     function doneAll() { return R.levers.every(function (l) { return (st.levers[l.id] || 0) >= l.waves.length; }); }
@@ -674,8 +696,8 @@
         { icon: "battery", title: "Flow", got: !!won.battery, lock: "Meet the battery's goal.", text: "A rate that fills or drains a stock: MW into a battery, Mt of CO₂ a year. MW is a flow, MWh a stock." },
         { icon: "cloud", title: "Only zero stops the rise", got: !!won.carbon, lock: "Keep Prairieland within its budget.", text: "A smaller inflow still fills the tub. Cumulative CO₂ stops rising only when net emissions reach zero." },
         { icon: "wave", title: "Reinforcing loop", got: !!(lp.ev || {}).done, lock: "Close the chargers and EVs diagram.", text: "An even number of − links: change feeds itself, up or down." },
-        { icon: "scale", title: "Balancing loop", got: !!(lp.rebound || {}).done, lock: "Close the rebound diagram.", text: "An odd number of − links: change is pulled back toward a level, as the rebound takes back part of a saving." },
-        { icon: "map", title: "Ripple and hubs", got: c.map === 4, lock: "Follow all four levers.", text: "One change spreads in waves, with delays, across technology, cost, emissions, people and security; some parts move every time." }
+        { icon: "scale", title: "Balancing loop", got: !!(lp.rebound || {}).done, lock: "Close the rebound diagram.", text: "An odd number of − links: the loop opposes the change, as the rebound takes back part of a saving." },
+        { icon: "map", title: "Ripple and hubs", got: c.map === 4, lock: "Follow all four levers.", text: "One change spreads step by step across technology, cost, emissions, people and security; some parts move every time." }
       ];
     }
     function notes() { progress(); if (current === "debrief") open("debrief"); }
@@ -732,7 +754,7 @@
       var f = H("figure", { class: "f2-xfig" }, two), L = D.loops[x[0]];
       cldSVG(f, L, { static: true, aria: x[1] + ". Links: " + L.links.map(function (l) { var a = L.nodes.filter(function (n) { return n.id === l.from; })[0].label, b = L.nodes.filter(function (n) { return n.id === l.to; })[0].label; return a + " to " + b + " (" + (l.sign === "+" ? "plus" : "minus") + ")"; }).join("; ") + "." });
       var row = H("div", { class: "f2-sk" }, f);
-      L.loops.forEach(function (lp) { var s = H("div", null, row); sketch(s, lp.type); H("span", { text: loopName(lp) + " · " + (lp.type === "R" ? "reinforcing: feeds itself" : "balancing: settles") }, s); });
+      L.loops.forEach(function (lp) { var s = H("div", null, row); sketch(s, lp.type); H("span", { text: loopName(lp) + " · " + (lp.type === "R" ? "reinforcing: feeds itself" : "balancing: opposes change") }, s); });
       H("figcaption", { text: x[1] }, f);
     });
     // 2 e-concept-map: the vocabulary of systems thinking, with the reader's own moments
@@ -748,16 +770,16 @@
           game: "The battery took in MW and held MWh: lesson 1's power and energy." },
         { id: "limit", g: "parts", label: "Limits", at: [2, 0], atN: [2, 0], text: "A stock has a floor and a ceiling: a full reservoir spills, an empty battery delivers nothing, a budget can be overrun.",
           game: "Spill, run dry, or overrun the budget." },
-        { id: "delay", g: "parts", label: "Delay", at: [3, 0], atN: [0, 1], text: "Time between a cause and its effect: a stock fills slowly, a new line takes years.", game: "The waves on the system map: hours, months, years." },
+        { id: "delay", g: "parts", label: "Delay", at: [3, 0], atN: [0, 1], text: "Time between a cause and its effect: a stock fills slowly, a new line takes years.", game: "The time labels on the system map's waves: hours, months, years." },
         { id: "R", g: "loops", label: "Reinforcing loop", lines: ["Reinforcing", "loop"], at: [0.5, 1], atN: [1, 1], text: "An even number of − links: change feeds itself, growth or decline.", game: "More EVs, more chargers, more EVs." },
-        { id: "B", g: "loops", label: "Balancing loop", lines: ["Balancing", "loop"], at: [1.5, 1], atN: [2, 1], text: "An odd number of − links: change is pulled back toward a level.", game: "Queues at chargers; the rebound effect." },
+        { id: "B", g: "loops", label: "Balancing loop", lines: ["Balancing", "loop"], at: [1.5, 1], atN: [2, 1], text: "An odd number of − links: the loop opposes the change. With long delays it can overshoot.", game: "Queues at chargers; the rebound effect." },
         { id: "rebound", g: "loops", label: "Rebound", at: [2.5, 1], atN: [0, 2], text: "Efficiency makes a service cheaper, so people use more of it; part of the saving is taken back.",
           game: st.rb != null ? "Your rebound: " + st.rb + "%, so " + fx(reboundKept(100, st.rb)) + " of 100 units kept." : "The LED bulbs." },
         { id: "lever", g: "whole", label: "Lever", at: [0.5, 2], atN: [1, 2], text: "A change from outside the part you study: a price shock, the weather, a policy, a new load.", game: "Gas price, heat wave, carbon price, new data center." },
-        { id: "ripple", g: "whole", label: "Ripple", at: [1.5, 2], atN: [2, 2], text: "A lever's effects spread in waves across technology, cost, emissions, people and security.", game: "Every lever reached all five dimensions." },
+        { id: "ripple", g: "whole", label: "Ripple", at: [1.5, 2], atN: [2, 2], text: "A lever's effects spread step by step across technology, cost, emissions, people and security.", game: "Every lever reached all five dimensions." },
         { id: "hub", g: "whole", label: "Hub", at: [2.5, 2], atN: [1, 3], text: "A part that many levers move: watch it first in any study.", game: "The wholesale price, household bills, the plant mix, CO₂ and what gets built moved under all four levers." }
       ],
-      edges: [["flow", "stock", "changes"], ["limit", "stock", "bounds"], ["stock", "delay", "creates"], ["R", "stock", "grows or drains"], ["B", "stock", "steadies"],
+      edges: [["flow", "stock", "changes"], ["limit", "stock", "bounds"], ["stock", "delay", "creates"], ["R", "stock", "grows or drains"], ["B", "stock", "pushes back on"],
               ["rebound", "B", "is a"], ["lever", "ripple", "starts"], ["ripple", "hub", "meets"], ["delay", "ripple", "spaces"]]
     });
     // 3 e-table: the four levers across the five dimensions

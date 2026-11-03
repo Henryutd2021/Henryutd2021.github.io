@@ -61,7 +61,7 @@
  },
  "balancing-loop": {
   "term": "Balancing loop",
-  "short": "A feedback loop with an odd number of negative links, which pulls a change back toward a level.",
+  "short": "A feedback loop with an odd number of negative links, which tends to oppose the change that started it; with long delays it can overshoot or swing back and forth.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
@@ -100,6 +100,12 @@
   "short": "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "building-code": {
+  "term": "Building code",
+  "short": "The rules a city, county or state sets for how new buildings must be built, such as insulation, wiring and safety.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
  },
  "bus": {
   "term": "Bus",
@@ -857,6 +863,12 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
+ "net-zero": {
+  "term": "Net zero (CO₂)",
+  "short": "The point at which the CO₂ a country or the world adds to the air each year is balanced by the CO₂ it removes, so that cumulative emissions stop rising.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
+ },
  "no-load-cost": {
   "term": "No-load cost",
   "short": "What a plant costs for each hour it is on, before it makes any power.",
@@ -1157,6 +1169,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "scarcity-price": {
+  "term": "Scarcity price",
+  "short": "A very high wholesale price in hours when available supply barely covers demand.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
+ },
  "scientific-notation": {
   "term": "Scientific notation",
   "short": "A way to write a number as a value from 1 to 10 times a power of ten, so very large and very small numbers are easy to compare.",
@@ -1265,11 +1283,23 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "synchronous-grid": {
+  "term": "Synchronous grid",
+  "short": "A grid whose generators all turn in step at one shared frequency; the Lower 48 states have three main ones, called interconnections.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
+ },
  "system-boundary": {
   "term": "System boundary",
   "short": "The line that decides which parts, costs and emissions a study counts and which it leaves out.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "tariff": {
+  "term": "Tariff",
+  "short": "The set of prices a utility charges its customers for electricity, such as a price per kWh, a fixed monthly charge or a different price at different hours.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
  },
  "telemetry": {
   "term": "Telemetry",

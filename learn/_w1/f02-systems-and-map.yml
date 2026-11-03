@@ -16,7 +16,7 @@ glossary:
     def: "A feedback loop with an even number of negative links, in which a change feeds itself, as growth or as decline."
   - id: balancing-loop
     term: Balancing loop
-    def: "A feedback loop with an odd number of negative links, which pulls a change back toward a level."
+    def: "A feedback loop with an odd number of negative links, which tends to oppose the change that started it; with long delays it can overshoot or swing back and forth."
   - id: causal-loop-diagram
     term: Causal-loop diagram
     def: "A map of causes and effects in which every arrow carries a sign: plus if more of the cause brings more of the effect, minus if it brings less."
@@ -26,6 +26,12 @@ glossary:
   - id: carbon-budget
     term: Carbon budget
     def: "A cap on the total CO₂ emitted over many years, a limit on a stock rather than on one year's flow."
+  - id: net-zero
+    term: Net zero (CO₂)
+    def: "The point at which the CO₂ a country or the world adds to the air each year is balanced by the CO₂ it removes, so that cumulative emissions stop rising."
+  - id: scarcity-price
+    term: Scarcity price
+    def: "A very high wholesale price in hours when available supply barely covers demand."
 requests:
   - "Promote three lesson-local components if later lessons want them (all in assets/learn/f02-systems-and-map.js, styles in the page's style block with the f2- prefix): StockFlow (i-stockflow: a tub drawn from the stock and both flows, flow and stock charts on LX.Plot, a Play button and a time scrubber; pure steppers simReservoir, simBattery, simCarbon), LoopBuilder with cldSVG (i-cld: sign each link with + or −, check, polarity count, name each loop R or B, behaviour sketches; a static mode used by the explain layer's e-loop card) and RippleMap (i-ripple: five dimension lanes, levers, a prediction per lever, three waves with edges drawn between the cards, a hubs view). A22, A9, A21 and C2-C4 could reuse RippleMap; A8 and M13 StockFlow."
   - "Glossary ids added here (stock, flow, feedback-loop, reinforcing-loop, balancing-loop, causal-loop-diagram, rebound-effect, carbon-budget): check for clashes with other W2 sidecars at the merge."
