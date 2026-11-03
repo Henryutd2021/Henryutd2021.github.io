@@ -71,6 +71,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "benchmark": {
+  "term": "Benchmark",
+  "short": "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
+ },
  "forecast-bias": {
   "term": "Bias",
   "short": "The average signed miss of a forecast, showing whether it tends to run too high or too low.",
@@ -928,6 +934,12 @@
   "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
+ },
+ "perfect-foresight": {
+  "term": "Perfect foresight",
+  "short": "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on what flexibility can earn.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
  },
  "period-weight": {
   "term": "Period weight",

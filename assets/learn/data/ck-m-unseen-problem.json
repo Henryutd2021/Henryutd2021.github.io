@@ -1,0 +1,966 @@
+{
+ "about": "CK-M, the Modeler checkpoint (curriculum v2 §3.3): an unseen problem in two variants (a water utility's pumping LP, or an analysis of Prairie Town's 2025 year), a supplied model with one planted defect, and a validation against an independent reference. Every number and brief is illustrative except the 2025 SPP shapes (town_year.json, EIA-930) and EIA's 2025 capacity factors. _tests/learn/test_ck-m-unseen-problem.js solves every model with the vendored HiGHS and checks every answer below.",
+ "version": "ck-m v1 (3 Nov 2026)",
+ "accessed": "2026-11-03",
+ "rule": {
+  "autoProficient": 6,
+  "autoStrong": 8,
+  "autoDeveloping": 4,
+  "defect": "d-line",
+  "pointsA": 3,
+  "pointsC": 2,
+  "levels": [
+   "Not yet",
+   "Developing",
+   "Proficient",
+   "Strong"
+  ]
+ },
+ "intro": [
+  "Eleven tasks in three parts, about 240 minutes: A, the brief (about 120); B, the planted defect (about 60); C, a validation (about 45); then submit (about 15).",
+  "Work in the starter notebook and enter your results here. No hints: each task's worked solution opens after your first answer, or earlier on request, which is recorded.",
+  "The full worked solutions further down open when you submit task 11. Your answers stay in this browser; “Copy my results” gives a summary to share, including what you typed."
+ ],
+ "brief": {
+  "text": "Prairie Town's water utility pumps groundwater into a water tower, and the town draws its water from the tower. Tomorrow's hourly water use is forecast in the table. The pumps can lift up to 900 m³ an hour and use 0.5 kWh of electricity for each m³ pumped. The tower must hold between 800 and 4,000 m³; it starts the day with 2,000 m³ and must end it with at least as much. The rural electric co-op sells the utility electricity at a time-of-use price ($0.06 per kWh from 22:00 to 06:00, $0.20 from 16:00 to 21:00, $0.10 otherwise) plus a demand charge of $0.40 for each kW of the day's highest hourly draw. Find the pumping schedule that meets the town's water use at the least electricity cost for the day.",
+  "note": "All numbers in this brief are illustrative.",
+  "water": [
+   180,
+   160,
+   150,
+   150,
+   170,
+   250,
+   420,
+   610,
+   640,
+   560,
+   480,
+   450,
+   440,
+   430,
+   420,
+   430,
+   470,
+   560,
+   640,
+   650,
+   560,
+   430,
+   320,
+   230
+  ],
+  "price": [
+   0.06,
+   0.06,
+   0.06,
+   0.06,
+   0.06,
+   0.06,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.1,
+   0.2,
+   0.2,
+   0.2,
+   0.2,
+   0.2,
+   0.1,
+   0.06,
+   0.06
+  ],
+  "kWhPerM3": 0.5,
+  "pumpMax": 900,
+  "towerMin": 800,
+  "towerMax": 4000,
+  "towerStart": 2000,
+  "demandCharge": 0.4
+ },
+ "empirical": {
+  "text": "Prairie Town's planners want to know how much its wind and solar farms can be counted on when the town needs power most. The dataset is the course's year file, town_year.json: the real 2025 hourly demand, wind and solar of the Southwest Power Pool grid (EIA-930), each as a shape in thousandths of its own highest 2025 hour. Scale it as lesson 0 does: demand × 450 MW, the wind farm × 150 MW and the solar farm × 200 MW, so that SPP's highest hour means a farm at its full size. Compare each farm's output in the 100 hours of highest demand, and in the 100 hours of highest net load (demand minus wind and solar), with its average over the year; where hours tie, take the earlier one first. Report what the town can and cannot count on, and how far your results depend on the dataset's scaling.",
+  "demandPeakMW": 450,
+  "windMW": 150,
+  "solarMW": 200,
+  "topN": 100,
+  "eiaWind": 0.338,
+  "eiaSolar": 0.24
+ },
+ "defect": {
+  "about": "The supplied model: what should Prairie Town build (wind, solar, a gas combined-cycle plant, a gas peaker) to meet demand on three representative days of 2025, each weighted by the days of the year it stands for? One planted defect.",
+  "V": 10000,
+  "techs": {
+   "wind": {
+    "label": "Wind farm",
+    "capital": 100000,
+    "cost": 0
+   },
+   "solar": {
+    "label": "Solar farm",
+    "capital": 70000,
+    "cost": 0
+   },
+   "cc": {
+    "label": "Gas combined-cycle",
+    "capital": 80000,
+    "cost": 40
+   },
+   "pk": {
+    "label": "Gas peaker",
+    "capital": 50000,
+    "cost": 100
+   }
+  },
+  "note": "Costs are illustrative round numbers: capital already annualized ($ per MW of capacity per year) and running costs as in lesson 0. Demand follows the three real days' SPP shape × 450 MW; wind and solar give output per MW built, the SPP shapes scaled to EIA's 2025 U.S. capacity factors (33.8% and 24.0%) with the course's scale method.",
+  "paper": [
+   [
+    "Weights",
+    "w_d = the days of the year that day d stands for (121, 122, 122; they sum to 365)."
+   ],
+   [
+    "Goal",
+    "min Σ_g A_g K_g + Σ_d w_d Σ_t [ Σ_g c_g p_g,d,t + V u_d,t ]   ($ a year)"
+   ],
+   [
+    "Balance",
+    "Σ_g p_g,d,t + u_d,t = D_d,t   (MW, every day and hour)"
+   ],
+   [
+    "Wind and solar",
+    "p_g,d,t ≤ a_g,d,t K_g   (a: output per MW built, 0 to 1)"
+   ],
+   [
+    "Gas plants",
+    "p_g,d,t ≤ K_g"
+   ]
+  ],
+  "code": [
+   "DAYS = {\"winter\": 121, \"shoulder\": 122, \"summer\": 122}       # days of 2025 each day stands for",
+   "weight = {d: DAYS[d] / 365 for d in DAYS}                    # share of the year",
+   "cost = {\"wind\": 0, \"solar\": 0, \"cc\": 40, \"pk\": 100}           # running cost, $ per MWh",
+   "capital = {\"wind\": 100_000, \"solar\": 70_000, \"cc\": 80_000, \"pk\": 50_000}   # $ per MW-year, annualized",
+   "V = 10_000                                                    # $ per MWh of demand left unserved",
+   "minimize( sum(capital[g] * K[g] for g) + sum(weight[d] * (cost[g] * p[g,d,t] + V * u[d,t]) for g, d, t) )",
+   "for d, t: sum(p[g,d,t] for g) + u[d,t] == demand[d][t]                 # balance, MW",
+   "for g in (\"wind\", \"solar\"), d, t: p[g,d,t] <= avail[g][d][t] * K[g]   # output per MW built",
+   "for g in (\"cc\", \"pk\"), d, t: p[g,d,t] <= K[g]",
+   "report(K, annual_cost=objective, demand_in_year=sum(weight[d] * demand[d][t] for d, t))"
+  ],
+  "days": [
+   {
+    "id": "winter",
+    "date": "2025-01-16",
+    "weight": 121,
+    "demand": [
+     277.65,
+     275.85,
+     275.85,
+     277.2,
+     281.7,
+     292.5,
+     310.05,
+     319.95,
+     315.45,
+     302.85,
+     292.05,
+     283.95,
+     275.85,
+     269.1,
+     264.15,
+     261,
+     263.25,
+     274.05,
+     284.85,
+     287.55,
+     288,
+     284.85,
+     277.2,
+     270
+    ],
+    "wind": [
+     0.4741,
+     0.4722,
+     0.4645,
+     0.4677,
+     0.4645,
+     0.4459,
+     0.4248,
+     0.3646,
+     0.289,
+     0.1768,
+     0.0942,
+     0.075,
+     0.0871,
+     0.1205,
+     0.1768,
+     0.2345,
+     0.3024,
+     0.3851,
+     0.469,
+     0.5049,
+     0.5279,
+     0.5324,
+     0.5331,
+     0.5209
+    ],
+    "solar": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0.001,
+     0.1158,
+     0.3996,
+     0.4939,
+     0.4447,
+     0.3617,
+     0.3709,
+     0.3494,
+     0.4324,
+     0.3084,
+     0.0717,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "label": "Thursday 16 January 2025",
+    "stands": "December to March (121 days)"
+   },
+   {
+    "id": "shoulder",
+    "date": "2025-04-02",
+    "weight": 122,
+    "demand": [
+     231.3,
+     226.8,
+     223.65,
+     222.75,
+     224.55,
+     231.3,
+     244.8,
+     255.15,
+     257.85,
+     259.65,
+     261.45,
+     262.8,
+     261.9,
+     262.8,
+     262.8,
+     262.35,
+     263.7,
+     264.6,
+     263.25,
+     261,
+     263.25,
+     256.5,
+     244.8,
+     232.65
+    ],
+    "wind": [
+     0.4421,
+     0.4235,
+     0.4145,
+     0.4062,
+     0.3921,
+     0.3652,
+     0.3466,
+     0.3332,
+     0.3678,
+     0.4158,
+     0.4414,
+     0.4286,
+     0.3998,
+     0.3806,
+     0.3614,
+     0.3441,
+     0.3453,
+     0.3139,
+     0.2774,
+     0.2102,
+     0.2031,
+     0.2236,
+     0.2383,
+     0.2665
+    ],
+    "solar": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0.0102,
+     0.2203,
+     0.4488,
+     0.4509,
+     0.5472,
+     0.5226,
+     0.5769,
+     0.6292,
+     0.5697,
+     0.497,
+     0.4355,
+     0.333,
+     0.0615,
+     0,
+     0,
+     0,
+     0
+    ],
+    "label": "Wednesday 2 April 2025",
+    "stands": "April, May, October and November (122 days)"
+   },
+   {
+    "id": "summer",
+    "date": "2025-09-15",
+    "weight": 122,
+    "demand": [
+     257.85,
+     248.85,
+     242.55,
+     238.95,
+     239.85,
+     246.6,
+     261,
+     269.55,
+     278.1,
+     290.7,
+     308.7,
+     328.95,
+     348.75,
+     365.85,
+     377.1,
+     383.4,
+     386.55,
+     383.4,
+     373.5,
+     359.55,
+     347.85,
+     329.85,
+     308.7,
+     288.45
+    ],
+    "wind": [
+     0.3562,
+     0.3364,
+     0.3312,
+     0.3389,
+     0.3319,
+     0.3261,
+     0.3184,
+     0.2966,
+     0.2351,
+     0.1403,
+     0.1211,
+     0.1307,
+     0.1378,
+     0.1454,
+     0.1538,
+     0.1647,
+     0.1877,
+     0.2178,
+     0.2242,
+     0.2518,
+     0.3453,
+     0.4338,
+     0.4812,
+     0.4754
+    ],
+    "solar": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0.0236,
+     0.2285,
+     0.6486,
+     0.8249,
+     0.8474,
+     0.8136,
+     0.8074,
+     0.788,
+     0.8331,
+     0.789,
+     0.787,
+     0.4478,
+     0.0728,
+     0,
+     0,
+     0,
+     0
+    ],
+    "label": "Monday 15 September 2025",
+    "stands": "June to September (122 days)"
+   }
+  ]
+ },
+ "variants": {
+  "model": {
+   "label": "Model variant",
+   "short": "Formulate and solve the water brief",
+   "tasksA": [
+    {
+     "id": "m-form",
+     "part": "A",
+     "lesson": "M1, M3",
+     "title": "Your formulation",
+     "skill": "Formulate",
+     "kind": "open-short",
+     "prompt": "Write your formulation of the water brief: sets, parameters with units, decision variables, the objective and every rule. A short version here is enough; keep the full one in your notebook.",
+     "points": [
+      "Every parameter and variable has a unit: m³, m³ an hour, kWh per m³, $ per kWh, $ per kW.",
+      "The tower links the hours: the level at the end of an hour is the level an hour before, plus water pumped, minus water used.",
+      "The day's highest draw is a decision variable at least as large as every hour's pumping power, so the demand charge stays linear.",
+      "The day ends with at least the 2,000 m³ it started with, so the tower is not drained for free."
+     ],
+     "solution": "A [[linear-program|linear program]] with 49 variables: the water pumped and the tower's level in each hour, and the day's highest draw. The highest draw works like a capacity built in M3: one variable that every hour's draw must stay under."
+    },
+    {
+     "id": "m-cost",
+     "part": "A",
+     "lesson": "M1",
+     "title": "Least cost of the day",
+     "skill": "Solve",
+     "kind": "numeric",
+     "prompt": "Solve your model. What is the least electricity cost of the day, energy and demand charge together?",
+     "units": [
+      [
+       "$",
+       1
+      ],
+      [
+       "cents",
+       0.01
+      ],
+      [
+       "kWh",
+       null
+      ]
+     ],
+     "answer": {
+      "value": 526.9,
+      "tol": 0.005,
+      "show": "$526.90 for the day"
+     },
+     "solution": "$526.90: $424.90 for energy and $102.00 of demand charge on a 255 kW highest draw.",
+     "unitNote": {
+      "kWh": "kWh measures energy. The answer is a cost, in dollars."
+     }
+    },
+    {
+     "id": "m-peak",
+     "part": "A",
+     "lesson": "M3",
+     "title": "The highest draw",
+     "skill": "Read the solution",
+     "kind": "numeric",
+     "prompt": "In your least-cost schedule, what is the pumps' highest hourly draw of electricity?",
+     "units": [
+      [
+       "kW",
+       1
+      ],
+      [
+       "MW",
+       1000
+      ],
+      [
+       "kWh",
+       null
+      ],
+      [
+       "m³ an hour",
+       null
+      ]
+     ],
+     "answer": {
+      "value": 255,
+      "tol": 0.005,
+      "show": "255 kW"
+     },
+     "solution": "255 kW: the pumps run at 510 m³ an hour, well under their 900, because every kW of the day's highest draw costs $0.40.",
+     "unitNote": {
+      "kWh": "kWh measures energy. A draw is a rate of use: kW.",
+      "m³ an hour": "That is water. At 0.5 kWh per m³, convert the pumping rate to kW."
+     }
+    },
+    {
+     "id": "m-peakwater",
+     "part": "A",
+     "lesson": "M1",
+     "title": "Water pumped at the peak price",
+     "skill": "Read the solution",
+     "kind": "numeric",
+     "prompt": "How much water does your schedule pump in the five peak-price hours, 16:00 to 21:00?",
+     "units": [
+      [
+       "m³",
+       1
+      ],
+      [
+       "litres",
+       0.001
+      ]
+     ],
+     "answer": {
+      "value": 330,
+      "tol": 0.01,
+      "show": "330 m³"
+     },
+     "solution": "330 m³. To end the day at 2,000 m³ the tower must refill after the evening; pumping 330 m³ at the peak price costs less than raising the day's highest draw, which is charged once for every kW."
+    },
+    {
+     "id": "m-tower",
+     "part": "A",
+     "lesson": "M1, M3",
+     "title": "A larger tower",
+     "skill": "Marginal value",
+     "kind": "numeric",
+     "prompt": "Solve again with a tower 100 m³ larger (4,100 m³). By how much does the day's cost fall?",
+     "units": [
+      [
+       "$",
+       1
+      ],
+      [
+       "cents",
+       0.01
+      ]
+     ],
+     "answer": {
+      "value": 6.8333,
+      "tol": 0.02,
+      "show": "about $6.83"
+     },
+     "solution": "About $6.83, or 6.8 cents a day for each m³ of extra room. The duals of the tower's upper limits add up to the same $0.0683 per m³ over this step."
+    }
+   ],
+   "tasksC": [
+    {
+     "id": "m-ub",
+     "part": "C",
+     "lesson": "M1",
+     "title": "Upper bound by hand",
+     "skill": "Validate",
+     "kind": "numeric",
+     "prompt": "Without the solver: what would the day cost if the pumps simply matched each hour's water use (pump as you go)? That plan is feasible, so the optimum cannot cost more.",
+     "units": [
+      [
+       "$",
+       1
+      ],
+      [
+       "cents",
+       0.01
+      ],
+      [
+       "kWh",
+       null
+      ]
+     ],
+     "answer": {
+      "value": 731.8,
+      "tol": 0.005,
+      "show": "$731.80"
+     },
+     "solution": "Energy: 0.5 kWh per m³ × each hour's use × its price = $601.80. Demand charge: 0.5 × 650 m³ = 325 kW × $0.40 = $130.00.",
+     "unitNote": {
+      "kWh": "kWh measures energy. The answer is a cost, in dollars."
+     }
+    },
+    {
+     "id": "m-lb",
+     "part": "C",
+     "lesson": "M1",
+     "title": "Lower bound by hand",
+     "skill": "Validate",
+     "kind": "numeric",
+     "prompt": "Without the solver: a lower bound, if every m³ could be pumped at the cheapest price and the draw spread evenly over the 24 hours.",
+     "units": [
+      [
+       "$",
+       1
+      ],
+      [
+       "cents",
+       0.01
+      ],
+      [
+       "kWh",
+       null
+      ]
+     ],
+     "answer": {
+      "value": 375.6667,
+      "tol": 0.005,
+      "show": "$375.67"
+     },
+     "solution": "9,800 m³ × 0.5 kWh = 4,900 kWh at $0.06 = $294.00, plus an even draw of 4,900 ÷ 24 = 204.2 kW × $0.40 = $81.67.",
+     "unitNote": {
+      "kWh": "kWh measures energy. The answer is a cost, in dollars."
+     }
+    },
+    {
+     "id": "m-valid",
+     "part": "C",
+     "lesson": "R5",
+     "title": "Your validation statement",
+     "skill": "Validate and submit",
+     "kind": "open-short",
+     "prompt": "State whether your optimum lies between your two bounds, one special case your model reproduces exactly, and what these checks cannot show. Submitting opens the worked solutions below.",
+     "points": [
+      "The optimum, $526.90, lies between the hand bounds, $375.67 and $731.80.",
+      "With no demand charge and no limits on the tower or the pumps, the model gives exactly the night price times the day's energy: $294.00.",
+      "Bounds and a special case show the model is plausible, not that its schedule is the cheapest; that rests on a correct formulation and the solver's optimality."
+     ],
+     "solution": "A [[validation|validation]] against hand calculations: the bounds bracket the optimum, and a special case is matched exactly."
+    }
+   ]
+  },
+  "empirical": {
+   "label": "Empirical variant",
+   "short": "Analyse Prairie Town's 2025 year",
+   "tasksA": [
+    {
+     "id": "e-design",
+     "part": "A",
+     "lesson": "B2, R4",
+     "title": "Your analysis design",
+     "skill": "Design the analysis",
+     "kind": "open-short",
+     "prompt": "Write your design before computing: the question's type, the metrics with units, how you scale the data and pick the hours (with ties), and what the analysis leaves out.",
+     "points": [
+      "A descriptive question with metrics in units: average output in the chosen hours, as a share of each farm's size and in MW.",
+      "The scaling stated: demand × 450 MW, wind × 150 MW, solar × 200 MW, so 100% means SPP's highest 2025 hour, not the farms' installed capacity.",
+      "The hours defined: the 100 highest by demand and by net load, the earlier hour first where values tie.",
+      "What it leaves out: one weather year, no outages and no adequacy calculation; an average over top hours is a screen, not a capacity credit."
+     ],
+     "solution": "A descriptive screen: averages over the year and over two sets of 100 hours, each with its unit and its definition written down before computing."
+    },
+    {
+     "id": "e-cf",
+     "part": "A",
+     "lesson": "B2",
+     "title": "Wind's capacity factor in the dataset",
+     "skill": "Compute",
+     "kind": "numeric",
+     "prompt": "In the dataset as scaled, what is the wind farm's capacity factor for 2025 (average output ÷ 150 MW)?",
+     "units": [
+      [
+       "%",
+       1
+      ],
+      [
+       "fraction (0 to 1)",
+       100
+      ]
+     ],
+     "answer": {
+      "value": 52.7546,
+      "tol": 0.005,
+      "show": "52.8%"
+     },
+     "solution": "52.75%: the shape's mean over its maximum. It is a share of SPP's highest 2025 hour, not of installed capacity."
+    },
+    {
+     "id": "e-wind-peak",
+     "part": "A",
+     "lesson": "B2",
+     "title": "Wind in the highest-demand hours",
+     "skill": "Compute",
+     "kind": "numeric",
+     "prompt": "What is the wind farm's average output in the 100 hours of highest demand, as a share of its 150 MW?",
+     "units": [
+      [
+       "%",
+       1
+      ],
+      [
+       "fraction (0 to 1)",
+       100
+      ]
+     ],
+     "answer": {
+      "value": 58.112,
+      "tol": 0.02,
+      "show": "58.1%"
+     },
+     "solution": "58.1%, a little above its year average: in 2025 the summer peaks of SPP demand came with some wind."
+    },
+    {
+     "id": "e-solar-peak",
+     "part": "A",
+     "lesson": "B2",
+     "title": "Solar in the highest-demand hours",
+     "skill": "Compute",
+     "kind": "numeric",
+     "prompt": "And the solar farm's average output in the same 100 hours, as a share of its 200 MW?",
+     "units": [
+      [
+       "%",
+       1
+      ],
+      [
+       "fraction (0 to 1)",
+       100
+      ]
+     ],
+     "answer": {
+      "value": 68.969,
+      "tol": 0.02,
+      "show": "69.0%"
+     },
+     "solution": "69.0%: the highest-demand hours were summer afternoons and early evenings, between 12:00 and 21:00, while the sun was up."
+    },
+    {
+     "id": "e-net",
+     "part": "A",
+     "lesson": "B2, M3",
+     "title": "Both farms at net-load peaks",
+     "skill": "Compute",
+     "kind": "numeric",
+     "prompt": "In the 100 hours of highest net load (demand minus wind and solar), what do the two farms give together, on average?",
+     "units": [
+      [
+       "MW",
+       1
+      ],
+      [
+       "kW",
+       0.001
+      ],
+      [
+       "MWh",
+       null
+      ]
+     ],
+     "answer": {
+      "value": 52.8885,
+      "tol": 0.02,
+      "show": "52.9 MW"
+     },
+     "solution": "52.9 MW of their 350 MW: wind 29.6% and solar 4.3% of their sizes. The highest net-load hours are evenings, mostly 19:00 to 22:00, and winter nights and mornings: hours with little or no sun.",
+     "unitNote": {
+      "MWh": "MWh is energy. An average output is a power: MW."
+     }
+    }
+   ],
+   "tasksC": [
+    {
+     "id": "e-gap",
+     "part": "C",
+     "lesson": "R4, R5",
+     "title": "Against a published benchmark",
+     "skill": "Validate",
+     "kind": "numeric",
+     "prompt": "EIA reports a 2025 capacity factor of 33.8% for the U.S. utility-scale wind fleet. By how many percentage points does your dataset's figure exceed it?",
+     "units": [
+      [
+       "percentage points",
+       1
+      ]
+     ],
+     "answer": {
+      "value": 18.9546,
+      "tol": 0.02,
+      "show": "about 19.0 percentage points"
+     },
+     "solution": "52.75% − 33.8% = 18.95 percentage points."
+    },
+    {
+     "id": "e-why",
+     "part": "C",
+     "lesson": "R4, R5",
+     "title": "What the gap tells you",
+     "skill": "Validate",
+     "kind": "choice",
+     "prompt": "What does that gap tell you?",
+     "options": [
+      [
+       "a",
+       "The dataset is wrong and should not be used."
+      ],
+      [
+       "b",
+       "EIA's value is wrong."
+      ],
+      [
+       "c",
+       "The dataset's shares are of SPP's highest 2025 hour, not of capacity, and SPP's fleet and wind differ from the U.S. average; these data alone cannot split the gap between those causes."
+      ],
+      [
+       "d",
+       "Wind in 2025 was unusually strong everywhere."
+      ]
+     ],
+     "answer": "c",
+     "why": {
+      "a": "No: the shapes are real and documented; the gap comes from what 100% means in them.",
+      "b": "No: EIA's table is the primary national figure.",
+      "c": "The benchmark exposes a definition, not an error, and the analysis must say which results depend on it.",
+      "d": "Nothing in either source says so, and EIA's figure is the national average for 2025."
+     },
+     "solution": "The dataset is normalised to its own highest hour, as its metadata say. That makes its capacity factor a different quantity from EIA's, which divides by capacity."
+    },
+    {
+     "id": "e-valid",
+     "part": "C",
+     "lesson": "R5",
+     "title": "Your validation statement",
+     "skill": "Validate and submit",
+     "kind": "open-short",
+     "prompt": "Name the benchmark and its date, read the gap, and say which of your results survive a rescaling of wind to EIA's 33.8% and which do not. Submitting opens the worked solutions below.",
+     "points": [
+      "The benchmark named with its date: EIA, Electric Power Monthly, Table 6.07.B, 2025 annual: 33.8% for U.S. utility-scale wind.",
+      "The gap read as a definition difference (shares of the year's highest hour, not of capacity), plus a different fleet and region, without splitting it between them.",
+      "What survives: ratios to the farm's own average (wind gives about 0.56 of its average output in the net-load hours) survive a linear rescaling; the MW and the percentages do not."
+     ],
+     "solution": "A validation against a published benchmark, and an honest note on which results depend on the dataset's scaling."
+    }
+   ]
+  }
+ },
+ "tasksB": [
+  {
+   "id": "d-line",
+   "part": "B",
+   "lesson": "B3, R5",
+   "title": "The planted defect",
+   "skill": "Find a defect",
+   "kind": "choice",
+   "prompt": "Run the supplied model (the button above, or the starter notebook) and read its code. Which line holds the planted defect?",
+   "options": [
+    [
+     "a",
+     "Line 2: weight = DAYS[d] / 365"
+    ],
+    [
+     "b",
+     "Line 4: the annualized capital costs"
+    ],
+    [
+     "c",
+     "Line 6: the objective"
+    ],
+    [
+     "d",
+     "Line 8: the wind and solar limits"
+    ]
+   ],
+   "answer": "a",
+   "why": {
+    "a": "The paper says each day stands for its days of the year; the code turns them into shares that sum to 1.",
+    "b": "Those are annual costs per MW, in the same year as the objective. Look at what multiplies the running costs.",
+    "c": "The objective's form matches the paper. Look at the values that go into it.",
+    "d": "The limits match the paper: output per MW built times the capacity."
+   },
+   "solution": "Line 2. With weights that sum to 1, the running costs of one average day meet a whole year of capital costs, so fuel looks almost free."
+  },
+  {
+   "id": "d-check",
+   "part": "B",
+   "lesson": "B3, R5",
+   "title": "The check that shows it",
+   "skill": "Find a defect",
+   "kind": "choice",
+   "prompt": "Which line of the supplied model's report shows the defect most directly?",
+   "options": [
+    [
+     "a",
+     "Built: a gas peaker only"
+    ],
+    [
+     "b",
+     "Demand in the year: 6,757 MWh"
+    ],
+    [
+     "c",
+     "Every hour balances"
+    ],
+    [
+     "d",
+     "Annual cost: $18.1 million"
+    ]
+   ],
+   "answer": "b",
+   "why": {
+    "a": "Suspicious, but a plan without wind or solar can be right when fuel is cheap; it does not show why.",
+    "b": "Prairie Town uses about 2,470 GWh a year; the model's year holds 6,757 MWh, about one day.",
+    "c": "That check passes here: each modelled hour balances.",
+    "d": "Low or high compared with what? It needs a reference, such as the year's demand."
+   },
+   "solution": "The year's total against an independent reference. 6,757 MWh is one average day of the town's 2,466 GWh in the model, or 2,469 GWh in the full 2025 data."
+  },
+  {
+   "id": "d-fixed",
+   "part": "B",
+   "lesson": "M3",
+   "title": "The fixed model",
+   "skill": "Fix and re-solve",
+   "kind": "numeric",
+   "prompt": "Fix the defect and solve again. What is the plan's annual cost?",
+   "units": [
+    [
+     "$ million",
+     1000000
+    ],
+    [
+     "$ thousand",
+     1000
+    ],
+    [
+     "$",
+     1
+    ]
+   ],
+   "answer": {
+    "value": 106817573.92,
+    "tol": 0.005,
+    "show": "$106.8 million a year"
+   },
+   "solution": "$106.8 million a year, about $43 per MWh of the 2,466 GWh: wind 548 MW, solar 211 MW, a gas combined-cycle plant of 152 MW and a 54 MW peaker, with no demand left unserved."
+  }
+ ],
+ "rubricLook": "Your notebook reruns from top to bottom; your validation names its reference and its outcome; your defect report names the line, the check, the fix and the fixed number.",
+ "sources": {
+  "eia-930": {
+   "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "asOf": "accessed 2 Nov 2026"
+  },
+  "eia-cf": {
+   "text": "EIA, Electric Power Monthly, Table 6.07.B (capacity factors, U.S. utility-scale fleets)",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+   "asOf": "2025 annual values (wind 33.8%, solar 24.0%); issue of 23 October 2026, accessed 2 November 2026"
+  }
+ },
+ "ref": {
+  "supplied": {
+   "K": {
+    "wind": 0,
+    "solar": 0,
+    "cc": 0,
+    "pk": 308.7
+   },
+   "cost": 18123387.657534,
+   "demandYear": 6756.918904,
+   "unservedYear": 203.302603
+  }
+ }
+}

@@ -1295,12 +1295,26 @@
    "form": "studio"
   },
   {
+   "tier": "modeler",
+   "code": "CK-M",
+   "title": "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result",
+   "ready": true,
+   "href": "ck-m-unseen-problem.html",
+   "scales": [],
+   "id": "ck-m-unseen-problem",
+   "minutes": 240,
+   "form": "checkpoint"
+  },
+  {
    "tier": "researcher",
    "code": "R5",
    "title": "Can you trust your analysis? Verification, validation and reproducibility",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r05-build-validate.html",
+   "scales": [],
+   "id": "r05-build-validate",
+   "minutes": 35,
+   "form": "studio"
   },
   {
    "tier": "researcher",

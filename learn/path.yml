@@ -583,7 +583,34 @@
   does: "Clean SPP's raw 2025 hourly file by choosing a time base, a spike rule, a frozen-reading rule and a fill method; watch four reported numbers move with each choice; sort eight data sources by licence; pick coordinate systems for a spatial layer; write the data note."
   after: [R3, B2]
   next: R5
-- {kind: lesson, tier: researcher, code: R5, title: "Can you trust your analysis? Verification, validation and reproducibility"}
+- kind: lesson
+  id: ck-m-unseen-problem
+  code: CK-M
+  tier: modeler
+  form: checkpoint
+  icon: check
+  status: active
+  minutes: 240
+  title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
+  does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
+  after: [M1, M3, B3, R5]
+- kind: lesson
+  id: r05-build-validate
+  code: R5
+  tier: researcher
+  form: studio
+  icon: target
+  status: active
+  minutes: 35
+  practice_minutes: 120
+  title: "Can you trust your analysis? Verification, validation and reproducibility"
+  subtitle: "Find five planted bugs in a battery study, match a benchmark, validate it and rerun it from a clean clone"
+  short: "Verify, validate, rerun"
+  outcome: "Catch planted bugs with named checks, match a benchmark worked by hand, validate an input against measured data, and rerun a study from a clean clone."
+  teaches: [verification checks, benchmarks, validation, perfect foresight, reproducibility, verification logs]
+  lab: "a SciPy/HiGHS notebook with the study's five versions, the checks as functions, the benchmark as a test and a clean-clone rerun, about 2 hours."
+  does: "Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the round trip against measured data; rerun the study from a clean clone and write a verification log."
+  after: [R4, M1, K8]
 - {kind: lesson, tier: researcher, code: R6, title: "Uncertainty done properly: what to vary, how, and how to say it"}
 - {kind: lesson, tier: researcher, code: R7, title: "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual"}
 - {kind: lesson, tier: researcher, code: R8, title: "How do you show results so people understand their limits?"}
