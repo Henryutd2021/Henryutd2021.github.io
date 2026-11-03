@@ -434,6 +434,9 @@ dl.lx-ideas dd { margin: 0; color: var(--lx-ink-2); }
 .lx-step-text { font-size: 19px; line-height: 1.45; max-width: 46ch; color: var(--lx-ink); }
 .lx-step-act { display: grid; gap: 12px; }
 .lx-step-act > .lx-btn, .lx-step-act > a.lx-btn { justify-self: start; }   /* a lone button keeps its own width */
+/* nothing in a step card may widen it (a grid item's min-width is auto): wide tables and charts scroll or shrink in their own
+   box, as lesson 13's cards do (shared fix 6, after the A22 review; checked at 375 px on lessons 12, 13, A22 and M3) */
+.lx-stepcard > *, .lx-step-act > * { min-width: 0; max-width: 100%; }
 .lx-step-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 @media (max-width: 560px) { .lx-stepcard { padding: 14px; } .lx-step-text { font-size: 18px; } .lx-dots { gap: 4px; } .lx-dots i { flex-basis: 14px; } }
 

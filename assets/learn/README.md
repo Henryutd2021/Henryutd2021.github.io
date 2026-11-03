@@ -176,6 +176,8 @@ LX.StepCards(host, { steps: [{ text: "One or two sentences.", build: function (a
 `**bold**`. `api.busy(true)` holds Next shut while a solve runs (the card is `aria-busy`), even after `api.done()`;
 `api.busy(false)` releases it (M1 step 8). A late call from a card that is no longer shown changes nothing. The returned
 object has `go(i)` (clamped), `index()` and `count`. On phones the progress dots shrink so "Step 8 of 10" stays on one line.
+The card's children and the action area's children may shrink (`min-width: 0`), so a wide table or chart in a step scrolls
+or shrinks in its own box instead of widening the card (give a wide table its own `.lx-scroll-x`).
 
 **Coach tour** (`coach.js`)
 

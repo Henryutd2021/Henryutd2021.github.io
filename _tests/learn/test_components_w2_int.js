@@ -76,6 +76,9 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   const pe = rd("assets/learn/components/planengine.css"), dp = rd("assets/learn/components/deeper.css");
   ok(/\.lx13-card>\*,\.lx13-chart>\.lx-textalt\{min-width:0;max-width:100%\}/.test(pe), "planengine.css: nothing in a card widens it (lessons 12 and 13's text versions scroll in their own box)");
   ok(/\.lx-deeper-body :not\(pre\) > code \{ white-space: normal; overflow-wrap: anywhere; \}/.test(dp), "deeper.css: a long inline command in Go deeper wraps (K8)");
+  const cc = rd("assets/learn/components/cards.css");
+  ok(/\.lx-stepcard > \*, \.lx-step-act > \* \{ min-width: 0; max-width: 100%; \}/.test(cc) && rd("assets/learn/learn.css").indexOf(".lx-stepcard > *, .lx-step-act > * { min-width: 0; max-width: 100%; }") >= 0,
+    "cards.css: a step card's children may shrink, so nothing in a step widens the card (shared fix 6, A22)");
 }
 
 // ---------------------------------------------------------------- the practice badge, and the Teaching card's count
