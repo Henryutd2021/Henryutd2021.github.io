@@ -428,6 +428,17 @@
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 - {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
+- kind: lesson
+  id: ck-m-unseen-problem
+  code: CK-M
+  tier: modeler
+  form: checkpoint
+  icon: check
+  status: active
+  minutes: 240
+  title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
+  does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
+  after: [M1, M3, B3, R5]
 - {kind: lesson, tier: researcher, code: R1, title: "What makes a question worth researching?"}
 - {kind: lesson, tier: researcher, code: R2, title: "How do you find out what is already known?"}
 - {kind: lesson, tier: researcher, code: R3, title: "Which system, which boundary, which method?"}

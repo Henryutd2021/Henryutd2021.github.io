@@ -528,7 +528,7 @@
         nodes: {
           paper: { t: "Formulation on paper", tN: ["Formulation", "on paper"], k: "end" },
           code: { t: "Code and data", s: "the study as built" },
-          ver: { t: "Verification checks", tN: ["Verification", "checks"], s: "units, sizes, balance, closure, rows, information", sN: "five checks" },
+          ver: { t: "Verification checks", tN: ["Verification", "checks"], s: "the five checks above", sN: "five checks" },
           q1: { t: "All pass?", k: "q" },
           fix: { t: "Fix the code", s: "then run every check again", sN: "then recheck" },
           bench: { t: "Benchmark", s: "a case with a hand answer", sN: "a hand answer" },
