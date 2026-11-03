@@ -26,7 +26,8 @@
   // ---------------------------------------------------------------- pure part
   // the model variant's worked formulation, as an LX.solver model. o: { DC, Smax, Q } override the brief (validation runs)
   //   min  sum_t price_t k q_t + DC P
-  //   s_t = s_{t-1} + q_t - w_t (s_{-1} = S0);  Smin <= s_t <= Smax;  0 <= q_t <= Q;  k q_t <= P;  s_23 >= S0
+  //   s_t = s_{t-1} + q_t - w_t (s_{-1} = S0);  Smin <= s_t <= Smax;  0 <= q_t <= Q dt;  k q_t / dt <= P;  s_23 >= S0
+  //   (dt = 1 h, so the code's coefficients are the same numbers: q_t in m3 per hour, k q_t in kWh is the draw in kW)
   function waterModel(B, o) {
     o = o || {};
     var DC = o.DC != null ? o.DC : B.demandCharge, Smax = o.Smax != null ? o.Smax : B.towerMax, Q = o.Q != null ? o.Q : B.pumpMax;
@@ -125,12 +126,17 @@
     var mean = function (a, ix) { return (ix || a.map(function (v, i) { return i; })).reduce(function (q, i) { return q + a[i]; }, 0) / (ix ? ix.length : a.length); };
     var tD = topHours(d, E.topN), tN = topHours(net, E.topN);
     var tie = function (a, t) { return a[t[E.topN - 1]] === a[topHours(a, E.topN + 1)[E.topN]]; };
+    // wind rescaled linearly to EIA's figure: the ratio for the same hours, and with the net-load hours picked again
+    var k = E.eiaWind / (mean(w) / E.windMW), w2 = w.map(function (v) { return v * k; });
+    var tN2 = topHours(d.map(function (v, i) { return v - w2[i] - s[i]; }), E.topN), inN = {};
+    tN.forEach(function (i) { inN[i] = true; });
     return { hours: d.length, cfWind: mean(w) / E.windMW * 100, cfSolar: mean(s) / E.solarMW * 100, demandGWh: d.reduce(function (a, v) { return a + v; }, 0) / 1000,
       windTopD: mean(w, tD) / E.windMW * 100, solarTopD: mean(s, tD) / E.solarMW * 100,
       windTopN: mean(w, tN) / E.windMW * 100, solarTopN: mean(s, tN) / E.solarMW * 100,
       bothTopN: tN.reduce(function (a, i) { return a + w[i] + s[i]; }, 0) / tN.length, bothTopD: tD.reduce(function (a, i) { return a + w[i] + s[i]; }, 0) / tD.length,
       gap: mean(w) / E.windMW * 100 - E.eiaWind * 100, ratioTopN: mean(w, tN) / mean(w), ratioTopD: mean(w, tD) / mean(w),
-      tieD: tie(d, tD), tieN: tie(net, tN), topD: tD, topN: tN, minTopD: d[tD[E.topN - 1]], minTopN: net[tN[E.topN - 1]] };
+      tieD: tie(d, tD), tieN: tie(net, tN), topD: tD, topN: tN, minTopD: d[tD[E.topN - 1]], minTopN: net[tN[E.topN - 1]],
+      rescale: k, ratioTopNSame: mean(w2, tN) / mean(w2), ratioTopNPicked: mean(w2, tN2) / mean(w2), keptTopN: tN2.filter(function (i) { return inN[i]; }).length, topN2: tN2 };
   }
 
   // a number with any unit: the shared runner's check (components/checkpoint.js, promoted from this file at the W2
@@ -141,21 +147,39 @@
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
   // CK-M's published rule (the page's rubric section says it in words). Levels: 0 Not yet ... 3 Strong.
+  // Independent work only: a task whose worked solution was opened before its first answer (solFirst) counts as not
+  // right; and an attempt during which the page's full worked solutions had been open before its final task was
+  // submitted is practice, with no level: opened early by this attempt (solFirst on the final task), or opened earlier
+  // in this browser, by an earlier attempt or by the other variant. D.solOpen = {model, empirical}: the first time the
+  // page's worked solutions opened under each variant (ISO, kept by the page); the final task's `at` is when this
+  // attempt submitted it (the same instant as its own opening, so that one does not count).
+  function firstRight(st, t) { var r = st.tasks[t.id]; return !!(r && r.first === true && !r.solFirst); }
+  function assisted(D, st) {
+    var g = D.tasks[D.tasks.length - 1], r = st.tasks[g.id] || {};
+    if (r.solFirst) return "early";
+    var seen = [D.key, D.other].map(function (k) { return D.solOpen && k ? D.solOpen[k] : null; }).filter(Boolean);
+    if (seen.some(function (t) { return !r.at || t < r.at; })) return "seen";
+    return null;
+  }
   function level(D, st) {
     var R = D.rule, auto = D.tasks.filter(isAuto), opens = D.tasks.filter(function (t) { return t.kind === "open-short"; });
-    var k = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].first === true; }).length;
-    var defect = !!(st.tasks[R.defect] && st.tasks[R.defect].first === true);
+    var k = auto.filter(function (t) { return firstRight(st, t); }).length;
+    var defect = firstRight(st, { id: R.defect });
     var pa = points(st, opens[0]), pc = points(st, opens[1]), na = opens[0].points.length, nc = opens[1].points.length;
     var complete = auto.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].first != null; }) && opens.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].answer; });
+    var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst; }).length, help = assisted(D, st);
     var lv = R.levels[0];
-    if (k >= R.autoStrong && defect && pa === na && pc === nc) lv = R.levels[3];
+    if (help) lv = R.practice;
+    else if (k >= R.autoStrong && defect && pa === na && pc === nc) lv = R.levels[3];
     else if (k >= R.autoProficient && defect && pa >= R.pointsA && pc >= R.pointsC) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
     return { level: lv, auto: k, autoOf: auto.length, defect: defect, pointsA: pa, pointsAOf: na, pointsC: pc, pointsCOf: nc, complete: complete,
-      estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
+      early: early, assisted: help, estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
   }
   function describe(D, L) {
-    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + ". The defect's line on the first try: " + (L.defect ? "yes" : "no") +
+    if (L.assisted) return (L.assisted === "early" ? "The full worked solutions were opened before task 11 was submitted" : "The full worked solutions had already been open in this browser (an earlier attempt, or the other variant)") +
+      ", so this attempt is practice and gets no level. Your answers and their feedback stay. An independent attempt needs worked solutions you have not seen.";
+    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") + ". The defect's line on the first try: " + (L.defect ? "yes" : "no") +
       ". Points you ticked: " + L.pointsA + " of " + L.pointsAOf + " in part A, " + L.pointsC + " of " + L.pointsCOf + " in part C." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
@@ -196,28 +220,25 @@
   // one variant's runner data: its own tasks for parts A and C around the shared part B
   function variantData(J, key) {
     var V = J.variants[key];
-    return { version: J.version, variantLabel: V.label, rule: J.rule,
+    return { version: J.version, variantLabel: V.label, rule: J.rule, key: key, other: key === "model" ? "empirical" : "model",
       tasks: V.tasksA.concat(J.tasksB, V.tasksC).map(function (t) { var o = {}; for (var k in t) o[k] = t[k]; if (t.kind === "numeric" && t.unitNote) o.unitNote = t.unitNote; return o; }) };
   }
-  // the tasks for readers without JavaScript (written into the page by the test's --write mode)
+  // the tasks for readers without JavaScript (written into the page by the test's --write mode): the prompts only. The
+  // answers are in the page's worked solutions, which a reader without JavaScript can open; they are not in this list.
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function plain(t) { return esc(String(t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")); }
   function staticTasks(J) {
-    var h = [];
+    var h = ['<p class="lx-hint">Without JavaScript nothing here is locked: the worked solutions are further down the page. Do the tasks first, and keep your answers; the level rule is in the rubric section.</p>'];
     ["model", "empirical"].forEach(function (key) {
       var D = variantData(J, key);
       h.push('<p class="lx-eyebrow">' + esc(D.variantLabel) + ": the tasks</p>");
       h.push('<ol class="ckm-static">');
-      D.tasks.forEach(function (t, i) {
+      D.tasks.forEach(function (t) {
         var x = "<li><p><b>" + esc(t.title) + '</b> <span class="lx-hint">Part ' + esc(t.part) + " · " + esc(t.skill) + "</span></p><p>" + esc(t.prompt) + "</p>";
         if (t.kind === "choice") x += "<ul>" + t.options.map(function (o) { return "<li>" + o[0] + ". " + esc(o[1]) + "</li>"; }).join("") + "</ul>";
         if (t.kind === "numeric") x += "<p>Answer with a number and a unit.</p>";
-        x += '<details class="lx-textalt"><summary>Worked solution, task ' + (i + 1) + "</summary>";
-        if (t.kind === "choice") x += "<p><b>Answer: " + t.answer + ". " + esc(t.options.filter(function (o) { return o[0] === t.answer; })[0][1]) + "</b></p>";
-        if (t.kind === "numeric") x += "<p><b>Answer: " + esc(t.answer.show) + ".</b></p>";
-        x += "<p>" + plain(t.solution) + "</p>";
-        if (t.kind === "open-short") x += "<p>A full answer makes these points:</p><ul>" + t.points.map(function (p) { return "<li>" + plain(p) + "</li>"; }).join("") + "</ul>";
-        h.push(x + "</details></li>");
+        if (t.kind === "open-short") x += "<p>Self-rated against " + t.points.length + " points, shown after you submit.</p>";
+        h.push(x + "</li>");
       });
       h.push("</ol>");
     });
@@ -229,24 +250,31 @@
   function n1(v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
   function n0(v) { return Math.round(v).toLocaleString("en-US"); }
   function hh(t) { return (t < 10 ? "0" : "") + t + ":00"; }
+  function facts(list, link) {
+    return '<ul class="ckm-facts">' + list.map(function (f) { return "<li><b>" + esc(f[0]) + ":</b> " + (link ? link(esc(f[1])) : esc(f[1])) + "</li>"; }).join("") + "</ul>";
+  }
   function briefModelHTML(J) {
     var B = J.brief, h = ["<p>" + esc(B.text) + ' <span class="lx-hint">' + esc(B.note) + "</span></p>"];
-    h.push('<ul class="ckm-facts"><li>Pumps: up to ' + n0(B.pumpMax) + " m³ an hour, " + B.kWhPerM3 + " kWh per m³</li><li>Tower: " + n0(B.towerMin) + " to " + n0(B.towerMax) + " m³; " + n0(B.towerStart) +
-      " m³ at the start, at least as much at the end</li><li>Demand charge: $" + B.demandCharge.toFixed(2) + " per kW of the day's highest hourly draw</li></ul>");
+    h.push(facts(B.facts));
     h.push('<details class="lx-textalt"><summary>Hourly water use and price</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Hour</th><th scope="col">Water use (m³)</th><th scope="col">Price ($/kWh)</th></tr></thead><tbody>' +
       B.water.map(function (w, t) { return "<tr><td>" + hh(t) + "</td><td>" + w + "</td><td>" + B.price[t].toFixed(2) + "</td></tr>"; }).join("") + "</tbody></table></div></details>");
     return h.join("\n");
   }
   function briefEmpiricalHTML(J) {
     var E = J.empirical;
-    return "<p>" + esc(E.text) + "</p>\n" + '<ul class="ckm-facts"><li>File: <a href="../assets/learn/data/town_year.json" download>town_year.json</a>, 8,760 hours of 2025; its <code>meta</code> block gives the source, the time convention and how bad hours were filled</li>' +
-      "<li>Scaling: demand × " + E.demandPeakMW + " MW, wind × " + E.windMW + " MW, solar × " + E.solarMW + " MW</li><li>Hours: the " + E.topN + " highest by demand, and by net load; the earlier hour first where values tie</li></ul>";
+    return "<p>" + esc(E.text) + "</p>\n" + facts(E.facts, function (t) {
+      return t.replace(/^town_year\.json/, '<a href="../assets/learn/data/town_year.json" download>town_year.json</a> (8,760 hours of 2025)').replace("meta block", "<code>meta</code> block");
+    });
   }
   function suppliedHTML(J, R) {
     var M = J.defect, h = ["<p>" + esc(M.about) + "</p>"];
     h.push('<p class="lx-eyebrow">On paper</p><ul class="ckm-paper">' + M.paper.map(function (p) { return "<li><b>" + esc(p[0]) + ":</b> <code>" + esc(p[1]) + "</code></li>"; }).join("") + "</ul>");
+    h.push('<details class="lx-textalt ckm-sym"><summary>The symbols, with their units</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th></tr></thead><tbody>' +
+      M.symbols.map(function (r) { return "<tr><td><code>" + esc(r[0]) + "</code></td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td></tr>"; }).join("") +
+      '</tbody></table></div><p class="lx-hint">Units of the goal: MW held for one hour × $/MWh = $ for each hour; summed over a day\'s 24 hours and multiplied by w_d days, $ a year, like A_g K_g.</p></details>');
     h.push('<p class="lx-eyebrow">In code (the starter notebook runs it)</p><ol class="ckm-code">' + M.code.map(function (l) { return "<li><span>" + esc(l) + "</span></li>"; }).join("") + "</ol>");
-    h.push('<p class="lx-hint">' + esc(M.note) + " Days: " + M.days.map(function (d) { return esc(d.label) + " for " + esc(d.stands); }).join("; ") + ".</p>");
+    h.push('<ul class="ckm-facts ckm-notes">' + M.notes.map(function (n) { return "<li><b>" + esc(n[0]) + ":</b> " + esc(n[1]) + "</li>"; }).join("") +
+      "<li><b>Days:</b> " + M.days.map(function (d) { return esc(d.label) + " for " + esc(d.stands); }).join("; ") + "</li></ul>");
     h.push('<details class="lx-textalt"><summary>What the code prints when run</summary><table class="lx-facts ckm-report-t"><tbody>' +
       TECH.map(function (g) { return '<tr><th scope="row">Built: ' + esc(M.techs[g].label) + '</th><td class="n">' + n1(R.K[g]) + " MW</td></tr>"; }).join("") +
       '<tr><th scope="row">Annual cost</th><td class="n">$' + (R.cost / 1e6).toFixed(1) + " million</td></tr>" +
@@ -263,9 +291,12 @@
       row("Saving from a tower 100 m³ larger", usd(x.tower100) + " a day") +
       row("Lower bound by hand", usd(Bd.lb)) + row("Upper bound by hand (pump as you go)", usd(Bd.ub)) +
       row("Special case: no demand charge, no limits", usd(x.special) + " = " + n0(Bd.energy) + " kWh × $" + Math.min.apply(null, B.price).toFixed(2)) + "</tbody></table></div>"];
-    h.push('<ul class="ckm-list"><li><b>Reading it:</b> the pumps never draw more than ' + n0(W.peak) + " kW (" + n0(W.peak / B.kWhPerM3) + " m³ an hour). In the schedule below they fill the tower at night and by day and stop for most of the peak-price evening. Every least-cost schedule pumps exactly " + n0(W.peakWater) +
-      " m³ at the peak price, so the tower can end the day at " + n0(B.towerStart) + " m³; forbidding it costs more (" + usd(x.noPeakCost) + ") because the highest draw must rise to " + n0(x.noPeakP) + " kW.</li>" +
-      "<li><b>Validation:</b> " + usd(W.cost) + " lies between the hand bounds, " + usd(Bd.lb) + " and " + usd(Bd.ub) + ", and the special case is matched exactly. These checks show the model is plausible; that its schedule is the cheapest rests on the formulation and the solver.</li>" +
+    h.push('<ul class="ckm-list"><li><b>Highest draw:</b> never more than ' + n0(W.peak) + " kW (" + n0(W.peak / B.kWhPerM3) + " m³ an hour), well under the pumps' " + n0(B.pumpMax) + ".</li>" +
+      "<li><b>The schedule:</b> it fills the tower at night and by day, and stops for most of the peak-price evening.</li>" +
+      "<li><b>Peak-price pumping:</b> every least-cost schedule pumps exactly " + n0(W.peakWater) + " m³ at the peak price, so the tower can end the day at " + n0(B.towerStart) + " m³.</li>" +
+      "<li><b>Forbidding it costs more:</b> " + usd(x.noPeakCost) + ", because the highest draw must rise to " + n0(x.noPeakP) + " kW.</li>" +
+      "<li><b>Validation:</b> " + usd(W.cost) + " lies between the hand bounds, " + usd(Bd.lb) + " and " + usd(Bd.ub) + ", and the special case is matched exactly.</li>" +
+      "<li><b>What that cannot show:</b> the checks show the model is plausible; that its schedule is the cheapest rests on the formulation and the solver.</li>" +
       "<li><b>Not unique:</b> other schedules cost exactly the same (the tower level at 17:00 can be anywhere from " + n0(x.s16[0]) + " to " + n0(x.s16[1]) + " m³), so compare costs, not schedules.</li></ul>");
     h.push('<details class="lx-textalt"><summary>One least-cost schedule, hour by hour</summary><div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Hour</th><th scope="col">Use (m³)</th><th scope="col">Pumped (m³)</th><th scope="col">Tower at the end (m³)</th><th scope="col">Price ($/kWh)</th></tr></thead><tbody>' +
       B.water.map(function (w, t) { return "<tr><td>" + hh(t) + "</td><td>" + w + "</td><td>" + n0(W.q[t]) + "</td><td>" + n0(W.s[t]) + "</td><td>" + B.price[t].toFixed(2) + "</td></tr>"; }).join("") + "</tbody></table></div></details>");
@@ -274,17 +305,22 @@
   function pct(v) { return n1(v) + "%"; }
   function solEmpiricalHTML(J, S) {
     var E = J.empirical, row = function (a, b, c, d) { return "<tr><td>" + a + '</td><td class="n">' + b + '</td><td class="n">' + c + '</td><td class="n">' + d + "</td></tr>"; };
-    var h = ['<ol class="ckm-list"><li><b>Design first:</b> a descriptive screen; metrics in % of each farm\'s size and in MW; 100% means SPP\'s highest 2025 hour; the top hours sorted from the highest, the earlier hour first on ties.</li>' +
+    var h = ['<ol class="ckm-list"><li><b>Design first:</b> a descriptive screen; metrics in % of each farm\'s size and in MW; 100% means SPP\'s highest 2025 hour, so the year\'s mean is not a capacity factor; the top hours sorted from the highest, the earlier hour first on ties.</li>' +
       "<li><b>Load and check:</b> " + n0(S.hours) + " hours, no gaps; demand peaks at " + E.demandPeakMW + " MW and totals " + n0(S.demandGWh) + " GWh; wind and solar never above their sizes; the time index is hour-ending, from the file's <code>start_utc</code>.</li>" +
       "<li><b>Compute:</b> averages over the year and over the two sets of " + E.topN + " hours.</li></ol>"];
     h.push('<div class="lx-scroll-x"><table class="lx-facts ckm-sol"><thead><tr><th scope="col">Hours</th><th scope="col">Wind (% of 150 MW)</th><th scope="col">Solar (% of 200 MW)</th><th scope="col">Both (MW)</th></tr></thead><tbody>' +
       row("The whole year", pct(S.cfWind), pct(S.cfSolar), n1(S.cfWind * E.windMW / 100 + S.cfSolar * E.solarMW / 100)) +
       row(E.topN + " highest demand", pct(S.windTopD), pct(S.solarTopD), n1(S.bothTopD)) +
       row(E.topN + " highest net load", pct(S.windTopN), pct(S.solarTopN), n1(S.bothTopN)) + "</tbody></table></div>");
-    h.push('<ul class="ckm-list"><li><b>Reading it:</b> at the demand peaks (summer afternoons) both farms give more than their year averages; at the net-load peaks (evenings, winter nights and mornings) wind gives ' + (Math.round(S.ratioTopN * 100) / 100).toFixed(2) + " of its average and solar almost nothing. The net-load hours are the ones the rest of the fleet must cover.</li>" +
-      "<li><b>Validation:</b> the dataset's wind capacity factor, " + pct(S.cfWind) + ", is " + n1(S.gap) + " percentage points above EIA's 2025 U.S. value of 33.8%; solar's " + pct(S.cfSolar) + " is close to EIA's 24.0%. The shapes are shares of their own highest hour, not of capacity, and SPP's fleet and wind differ from the U.S. average; these data alone cannot split the gap.</li>" +
-      "<li><b>What survives:</b> rescaled linearly to 33.8% (each hour × 0.338 ÷ " + (S.cfWind / 100).toFixed(4) + "), wind's MW and percentages fall by the same factor, so the ratio to its own average, " + (Math.round(S.ratioTopN * 100) / 100).toFixed(2) + " at the net-load peaks, is unchanged.</li>" +
-      "<li><b>What it leaves out:</b> one weather year, outages, imports and an adequacy model; averages over top hours screen, they do not measure a capacity credit.</li></ul>");
+    var r2 = function (q) { return (Math.round(q * 100) / 100).toFixed(2); };
+    h.push('<ul class="ckm-list"><li><b>At the demand peaks</b> (summer afternoons): both farms give more than their year averages.</li>' +
+      "<li><b>At the net-load peaks</b> (evenings, winter nights and mornings): wind gives " + r2(S.ratioTopN) + " of its average, and solar almost nothing. These are the hours the rest of the fleet must cover.</li>" +
+      "<li><b>Against the benchmark:</b> the dataset's wind mean, " + pct(S.cfWind) + " of its highest hour, is " + n1(S.gap) + " percentage points above EIA's 2025 U.S. capacity factor of 33.8%; solar's " + pct(S.cfSolar) + " is close to EIA's 24.0%.</li>" +
+      "<li><b>What the gap shows:</b> a definition difference (shares of the highest hour, not of capacity), plus SPP's own fleet and wind. These data cannot split the two, so the comparison checks a definition; it does not validate the numbers.</li>" +
+      "<li><b>A like-for-like check</b> would divide SPP's 2025 wind output by its installed wind capacity: the same quantity, boundary and year as EIA's.</li>" +
+      "<li><b>What survives, for the same hours:</b> rescaled linearly to 33.8% (each hour × 0.338 ÷ " + (S.cfWind / 100).toFixed(4) + "), wind's MW and percentages fall by one factor, so its ratio to its own average in these " + E.topN + " net-load hours stays " + r2(S.ratioTopNSame) + ".</li>" +
+      "<li><b>If the hours are picked again</b> after rescaling, less wind raises net load in windy hours: " + S.keptTopN + " of the " + E.topN + " hours stay, and the ratio becomes " + r2(S.ratioTopNPicked) + ". Both are valid; say which you did.</li>" +
+      '<li><b>What it leaves out:</b> one weather year, outages, imports and an <span class="lx-term" data-term="resource-adequacy">adequacy</span> model; averages over top hours screen, they do not measure a <span class="lx-term" data-term="capacity-credit">capacity credit</span>.</li></ul>');
     return h.join("\n");
   }
   function solDefectHTML(J, Rd, Rf) {
@@ -355,20 +391,28 @@
       btns[k] = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false", html: "<span><b>" + LX.esc(V.label) + "</b><small>" + LX.esc(V.short) + "</small></span>",
         onclick: function () { choose(k, true); } }, prow);
     });
-    H("p", { class: "lx-hint", text: "Part B, the planted defect, is the same in both. Each variant keeps its own answers in this browser; you may do both." }, pk);
+    H("p", { class: "lx-hint", text: "Part B, the planted defect, is the same in both. Each variant keeps its own answers in this browser. You may do both, but once the worked solutions have opened, a second attempt is practice." }, pk);
     // one runner on screen at a time: changing variant removes the runner (destroy: its clock, listeners and markup) and
     // makes the chosen variant's, which resumes that variant's stored attempt. The runner opens the worked solutions when
     // the variant's final task is submitted, or on purpose (recorded on that task), and shuts them on "Start again".
     var host = H("div", { class: "ckm-runner" }, live), Ds = {};
+    // when the page's worked solutions first opened under each variant (kept in this browser; read by the level rule)
+    var solOpen = LX.store.get("ckm-sol-open", null) || {};
+    function onAnswer(id, rec) {
+      if (id !== finalId(J, cur) || !(rec.answer || rec.solFirst)) return;
+      var now = new Date().toISOString();
+      if (rec.answer && !rec.at) rec.at = now;     // this attempt's submission of its final task
+      if (!solOpen[cur]) { solOpen[cur] = rec.at || now; LX.store.set("ckm-sol-open", solOpen); }
+    }
     function choose(k, user) {
       if (cur === k && cp) return;
       if (cp) cp.destroy();
       cur = k; LX.store.set("ckm-variant", k);
       Object.keys(btns).forEach(function (b) { btns[b].setAttribute("aria-pressed", b === k ? "true" : "false"); });
       host.setAttribute("data-variant", k);
-      D = Ds[k] = Ds[k] || variantData(J, k);
+      D = Ds[k] = Ds[k] || variantData(J, k); D.solOpen = solOpen;
       cp = LX.Checkpoint(host, { data: D, key: KEYS[k], code: CODE, lessonId: "ck-m-unseen-problem", intro: J.intro,
-        lock: lock, solution: body, submitTask: finalId(J, k), level: level, describe: describe, summary: summary });
+        lock: lock, solution: body, submitTask: finalId(J, k), level: level, describe: describe, summary: summary, onAnswer: onAnswer });
       if (user) host.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
     }
     // the lock box's button before any variant is chosen: start the model variant and record the early opening there

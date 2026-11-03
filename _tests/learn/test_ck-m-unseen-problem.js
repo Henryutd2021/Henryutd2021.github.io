@@ -86,9 +86,28 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     });
     ok(C.checkNumeric(task("m-peak"), 0.255, "MW").right && C.checkNumeric(task("m-peak"), 255, "kWh").kind && /power|rate/i.test(C.checkNumeric(task("m-peak"), 255, "kWh").msg), "m-peak: MW converts; kWh is the wrong kind");
     ok(C.checkNumeric(task("m-cost"), 52690, "cents").right && C.checkNumeric(task("m-cost"), 526.9, "kWh").kind, "m-cost: cents convert; kWh is the wrong kind");
-    ok(task("m-cost").solution.indexOf(usd(W.energyCost)) >= 0 && task("m-cost").solution.indexOf("$102.00") >= 0, "m-cost solution: energy and demand-charge parts");
+    // the cost's tolerance tells the optimum from the schedule that never pumps at the peak price ($528.00)
+    ok(!C.checkNumeric(task("m-cost"), x.noPeakCost, "$").right && C.checkNumeric(task("m-cost"), 527, "$").right && C.checkNumeric(task("m-cost"), 526.9, "$").right, `m-cost: rejects the suboptimal $${x.noPeakCost}, accepts $527 (rounded)`);
+    // no task's own solution gives away a later task's answer (task 2 once named task 3's 255 kW)
+    ["model", "empirical"].forEach(k => {
+      const T = C.variantData(J, k).tasks;
+      T.forEach((t, i) => T.slice(i + 1).filter(u => u.kind === "numeric").forEach(u => {
+        const n = (/[\d,]+(\.\d+)?/.exec(u.answer.show) || [""])[0];
+        ok(!n || t.solution.indexOf(n) < 0, `${k}: task ${i + 1}'s solution does not give task ${T.indexOf(u) + 1}'s answer (${n})`);
+      }));
+      ok(T.indexOf(task("m-cost")) < 0 || !/255|\$102/.test(task("m-cost").solution), "m-cost solution: no demand-charge split (it gives the highest draw)");
+    });
+    ok(C.solModelHTML(J, W, Bd, x).indexOf(usd(W.energyCost) + " energy + $102.00 demand charge") > 0, "worked solution: the energy and demand-charge parts");
+    // every number task states its tolerance in its prompt, as the relative tolerance it is marked with
+    [].concat(J.variants.model.tasksA, J.variants.model.tasksC, J.variants.empirical.tasksA, J.variants.empirical.tasksC, J.tasksB).filter(t => t.kind === "numeric").forEach(t => {
+      ok(t.prompt.indexOf("Within " + (Math.round(t.answer.tol * 1000) / 10) + "%") >= 0 && /counts as right\.$/.test(t.prompt), `task ${t.id}: the prompt states its tolerance (${t.answer.tol * 100}%)`);
+    });
+    // another valid special case, as task 11's point allows: one flat price and no demand charge
+    const Bf = Object.assign({}, B, { price: B.price.map(() => 0.1) }), rF0 = solve(C.waterModel(Bf, { DC: 0 }));
+    ok(near(rF0.objective, 0.1 * Bd.energy) && near(rF0.objective, 490) && /flat price/.test(task("m-valid").points[1]) && /\$294\.00/.test(task("m-valid").points[1]), "special case: a flat $0.10/kWh with no demand charge gives $490.00 by hand and by the model; the point accepts any such case");
     ok(task("m-valid").points[0].indexOf("$526.90") >= 0 && task("m-valid").points[0].indexOf("$375.67") >= 0 && task("m-valid").points[0].indexOf("$731.80") >= 0 && task("m-valid").points[1].indexOf("$294.00") >= 0, "m-valid points: the numbers");
     ok(task("m-ub").solution.indexOf("$601.80") >= 0 && task("m-lb").solution.indexOf("$81.67") >= 0 && task("m-lb").solution.indexOf("204.2 kW") >= 0, "bound solutions: the parts");
+    ok(/650 m³ ÷ 1 h = 325 kW/.test(task("m-ub").solution) && /4,900 kWh ÷ 24 h = 204\.2 kW/.test(task("m-lb").solution) && /0\.5 kWh\/m³/.test(task("m-lb").solution), "bound solutions: units kept, energy divided by hours to give kW");
   }
 
   // ---------------- empirical variant
@@ -104,6 +123,10 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     ok(near(S.windTopN, 29.575, 1e-6) && near(S.solarTopN, 4.263, 1e-6) && near(S.ratioTopN, 0.5606, 1e-4), "empirical: net-load peaks: wind 29.6%, solar 4.3%, ratio 0.56");
     ok(S.windTopD > S.cfWind && S.solarTopD > S.cfSolar, "empirical: at the demand peaks both farms give more than their year averages");
     ok(task("e-net").solution.indexOf("29.6%") >= 0 && task("e-net").solution.indexOf("4.3%") >= 0 && task("e-valid").points[2].indexOf("0.56") >= 0, "empirical solutions: the numbers");
+    // rescaling wind: the ratio is unchanged for the same hours; picking the net-load hours again changes them and it
+    ok(near(S.ratioTopNSame, S.ratioTopN, 1e-12) && near(S.ratioTopNPicked, 0.7138, 1e-4) && S.keptTopN === 82, `rescaled: same hours ${S.ratioTopNSame.toFixed(4)}, picked again ${S.ratioTopNPicked.toFixed(4)} with ${S.keptTopN} of 100 hours kept`);
+    ok(/0\.71/.test(task("e-valid").points[2]) && /82 of 100/.test(task("e-valid").points[2]) && /same 100 net-load hours/.test(task("e-valid").points[2]), "e-valid: both rescaling routes stated, so either is accepted with its boundary");
+    ok(!/capacity factor/i.test(task("e-cf").title + task("e-cf").prompt) && /not a capacity factor/.test(task("e-cf").solution), "e-cf: the dataset's statistic is named a mean output as a share of the highest hour, not a capacity factor");
     // where the top hours fall (local Central time, hour beginning): the solution sentences
     const local = i => { const end = Date.parse(year.start_utc + "Z") + i * 3600000; const d = new Date(end - 3600000);
       const y = d.getUTCFullYear(), dst0 = Date.UTC(y, 2, 9, 8), dst1 = Date.UTC(y, 10, 2, 7); const off = (d.getTime() >= dst0 && d.getTime() < dst1) ? 5 : 6;
@@ -113,7 +136,7 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     ok(LN.every(q => (q.h >= 17 && q.h <= 23) || ((q.m <= 2 || q.m === 12) && q.h <= 10)), "e-net solution: the highest net-load hours are evenings, or winter nights and mornings");
     ok(LN.filter(q => q.h >= 19 && q.h <= 21).length > 50, "e-net solution: mostly 19:00 to 22:00");
     // the tie rule: stated in the brief, and it matters at the cut
-    ok(S.tieD && S.tieN && /earlier one first/.test(E.text), "empirical: hours tie at the 100th place, so the brief states the tie rule");
+    ok(S.tieD && S.tieN && E.facts.some(f => /earlier one first/.test(f[1])), "empirical: hours tie at the 100th place, so the brief states the tie rule");
     ok(C.topHours([3, 5, 5, 1], 2).join() === "1,2", "tie rule: the earlier hour first");
     // a linear rescaling keeps the ratio
     const k = 0.338 / (S.cfWind / 100), w = year.wind.map(v => v / 1000 * 150 * k), meanAll = w.reduce((a, b) => a + b, 0) / w.length;
@@ -136,6 +159,10 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     });
     ok(M.days.reduce((a, d) => a + d.weight, 0) === 365 && M.days.map(d => d.weight).join() === "121,122,122", "defect: weights 121, 122, 122 days (Dec-Mar, Apr-May and Oct-Nov, Jun-Sep)");
     ok(M.code[1].indexOf("/ 365") > 0 && task("d-line").answer === "a" && task("d-line").options[0][1].indexOf("Line 2") === 0, "defect: line 2 of the code holds it");
+    // line 6 (the objective) is as the paper and the executable model: the unserved-demand penalty once per day and hour
+    ok(/sum\(weight\[d\] \* \(sum\(cost\[g\] \* p\[g,d,t\] for g\) \+ V \* u\[d,t\]\) for d, t\)/.test(M.code[5]) && !/for g, d, t\) \)/.test(M.code[5]) && /\(Σ_g c_g p_g,d,t\) \+ V u_d,t/.test(M.paper[1][1]), "defect: the objective line charges unserved demand once, as the paper and the model do (the only defect is line 2)");
+    ok(M.paper.some(p => p[0] === "Domains" && /K_g ≥ 0/.test(p[1]) && /u_d,t ≥ 0/.test(p[1])), "defect: the paper states the variables' domains");
+    ["g", "w_d", "A_g", "K_g", "c_g", "p_g,d,t", "u_d,t", "V", "D_d,t", "a_g,d,t"].forEach(q => ok(M.symbols.some(r => r[0].split(", ").indexOf(q) >= 0 || r[0] === q) || (q === "g"), `defect: symbol ${q} in the key, with its unit`));
   }
   const mD = C.defectModel(M, { defect: true }), mF = C.defectModel(M, {});
   const rD = solve(mD), rF = solve(mF), Rd = C.defectReport(M, rD, { defect: true }), Rf = C.defectReport(M, rF, {});
@@ -170,6 +197,22 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
       ok(C.level(D, st(6, 3, 2, true)).level === "Proficient" && C.level(D, st(6, 2, 2, true)).level === "Developing", `${k} rule: Proficient needs 3 of 4 points in part A`);
       ok(C.level(D, st(8, 4, 3, false)).level === "Developing", `${k} rule: missing the defect's line on the first try caps at Developing`);
       ok(C.level(D, st(3, 4, 3, true)).level === "Not yet" && C.level(D, st(4, 0, 0, true)).level === "Developing", `${k} rule: 4 of 9 for Developing`);
+      // assisted work: a solution opened before answering does not count; the full solutions opened early make it practice
+      const last = D.tasks[D.tasks.length - 1].id;
+      const all = st(9, 4, 3, true); Object.keys(all.tasks).forEach(id => { all.tasks[id].solFirst = true; });
+      ok(C.level(D, all).level === J.rule.practice, `${k} rule: every solution opened first, then every answer right: practice, not Strong`);
+      const one = st(9, 4, 3, true); one.tasks["d-line"].solFirst = true;
+      ok(C.level(D, one).level === "Developing" && C.level(D, one).auto === 8, `${k} rule: the defect's solution opened first: that task is not right, so Developing`);
+      const two = st(9, 4, 3, true); two.tasks[D.tasks[1].id].solFirst = true;
+      ok(C.level(D, two).level === "Strong" && C.level(D, two).early === 1, `${k} rule: one other solution opened first: 8 of 9, still Strong`);
+      const gate = st(9, 4, 3, true); gate.tasks[last].solFirst = true;
+      ok(C.level(D, gate).level === J.rule.practice && C.level(D, gate).assisted === "early", `${k} rule: the full worked solutions opened before task 11: practice`);
+      const Dseen = Object.assign({}, D, { solOpen: {} }), late = st(9, 4, 3, true); late.tasks[last].at = "2026-11-03T12:00:00.000Z";
+      Dseen.solOpen[D.other] = "2026-11-03T11:00:00.000Z";
+      ok(C.level(Dseen, late).level === J.rule.practice && C.level(Dseen, late).assisted === "seen", `${k} rule: the other variant's solutions open before this one was submitted: practice`);
+      Dseen.solOpen = {}; Dseen.solOpen[D.other] = "2026-11-03T13:00:00.000Z"; Dseen.solOpen[D.key] = late.tasks[last].at;
+      ok(C.level(Dseen, late).level === "Strong", `${k} rule: solutions opened by this attempt's own submission, or by the other variant later, do not count`);
+      ok(/practice/.test(C.describe(D, C.level(D, all))), `${k} describe: says why an assisted attempt has no level`);
       const sm = C.summary(D, Object.assign(st(7, 3, 2, true), { finished: "2026-11-03 10:00" }), { width: 375 });
       ok(sm.split("\n")[0] === "Learn · CK-M results (" + J.version + ")" && sm.indexOf("Variant: " + J.variants[k].label) > 0 && /Level by the published rule: Proficient/.test(sm), `${k} summary: first line, variant, level`);
     });
@@ -196,6 +239,18 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     const QMD = fs.readFileSync(PAGE, "utf8"), J2 = JSON.parse(fs.readFileSync(DATA, "utf8"));
     Object.keys(blocks).forEach(k => ok(between(QMD, k) === blocks[k], `page block ${k} is up to date (run --write)`));
     ok(J2.ref && J2.ref.supplied && near(J2.ref.supplied.cost, Rd.cost, 1e-5) && near(J2.ref.supplied.K.pk, Rd.K.pk, 1e-5), "ref: the supplied model's report (run --ref)");
+    // the no-JS task list holds prompts only; the page's downloads hold no answers
+    const FB = between(QMD, "ckm-fallback");
+    [].concat(J.variants.model.tasksA, J.variants.model.tasksC, J.variants.empirical.tasksA, J.variants.empirical.tasksC, J.tasksB).forEach(t => {
+      if (t.kind === "numeric") ok(FB.indexOf(t.answer.show) < 0, `no-JS task list: no answer for ${t.id}`);
+      ok(FB.indexOf(t.solution.replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").slice(0, 40).replace(/&/g, "&amp;")) < 0, `no-JS task list: no worked solution for ${t.id}`);
+    });
+    ok(!/Worked solution, task/.test(FB) && /nothing here is locked/.test(FB), "no-JS task list: no worked solutions, and it says the solutions below are not locked");
+    const BR = L("data/ck-m-unseen-problem-briefs.json"), BJ = fs.existsSync(BR) ? JSON.parse(fs.readFileSync(BR, "utf8")) : null, BT = BJ ? JSON.stringify(BJ) : "";
+    ok(BJ && BJ.brief && BJ.empirical && BJ.defect && !BJ.variants && !BJ.tasksB && !BJ.ref && !/"(answer|solution|points|why)"/.test(BT) && !/526\.9|106817573|52\.75|18\.95|6,757/.test(BT), "briefs-only download: briefs and model data, no tasks, answers or report");
+    ok(QMD.indexOf('href="../assets/learn/data/ck-m-unseen-problem-briefs.json"') > 0 && QMD.indexOf('href="../assets/learn/data/ck-m-unseen-problem.json"') < 0, "page: the JSON download is the briefs-only file");
+    ok(/How it is marked, before you start/.test(QMD) && /counts as not right/.test(QMD) && /practice, with no level/.test(QMD), "page: the marking rule, tolerances and early-solution rule come before the tasks");
+    ok(J.intro.some(t => /tolerance/.test(t)) && J.intro.some(t => /practice/.test(t)), "runner intro: tolerances and the practice rule before Start");
     ok(/at least 6 of the 9 auto-marked tasks/.test(QMD) && /at least 8 of 9/.test(QMD) && /at least 4 of 9/.test(QMD) && /3 of the 4 points/.test(QMD) && /2 of the 3 points/.test(QMD), "page: the level rule in words matches the data");
     ok(/49 variables, 24 tower rows, 24 draw rows and one end-of-day row/.test(QMD), "page: the model's size");
     ok(QMD.indexOf('class="lx-ck-gated ckm-solution-body"') > 0 && QMD.indexOf('id="ckm-lock"') > 0, "page: the worked solutions are gated");
@@ -220,7 +275,9 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
       M.days.forEach(d => ok(st.indexOf(JSON.stringify(d.demand).replace(/,/g, ", ")) >= 0, `starter: day ${d.id} demand`));
     }
     if (sm) ["526.9", "255", "330", "6.8333", "731.8", "375.6667", "294"].forEach(n => ok(sm.indexOf(n) >= 0, "model solution asserts " + n));
-    if (se) ["52.75", "58.11", "68.97", "52.89", "18.95", "0.5606"].forEach(n => ok(se.indexOf(n) >= 0, "empirical solution asserts " + n));
+    if (se) ["52.75", "58.11", "68.97", "52.89", "18.95", "0.5606", "0.7138", "== 82"].forEach(n => ok(se.indexOf(n) >= 0, "empirical solution asserts " + n));
+    if (se) ok(/except Exception/.test(se) && /tzdata/.test(se) && /Python 3\.9/.test(se), "empirical solution: Python 3.9+, a time-zone-data fallback");
+    if (st) ok(/\| Domains \|/.test(st) && st.indexOf("\\big(\\sum_g c_g p_{g,d,t}\\big) + V u_{d,t}") >= 0 && /\| \$V\$ \|/.test(st), "starter: the objective with the penalty once, the variables' domains and a symbol key");
     if (sd) ["308.7", "6756.9", "106817573.9", "548.4", "210.7", "151.9", "54.3"].forEach(n => ok(sd.indexOf(n) >= 0, "defect solution asserts " + n));
   }
 
