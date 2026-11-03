@@ -505,6 +505,7 @@
   does: "Power followed from plant to lamp through each voltage step; then a storm: tap the failed parts, see which homes go dark, and why many outages start on local wires."
   outcome: "Trace the path from a power plant to a socket, name the equipment at each voltage step, and explain what SAIDI and SAIFI measure."
   after: [3]
+  next: F7
 # ---------- wave W2 modules (curriculum v2 §18.4); live once a builder sets status: active
 - kind: lesson
   id: a22-tradeoff-explorer
@@ -609,7 +610,7 @@
   teaches: [microgrids and islanding, the point of common coupling, grid-forming and grid-following sources, critical load, power and stored energy in an outage, village mini-grids]
   does: "Island Prairie Campus in a storm, choose which loads its battery and generator can carry and for how long, in July and in January; then size panels and a battery for a village that no grid reaches."
   outcome: "Say what makes a microgrid, why ordinary rooftop solar goes dark in an outage, and how power (kW) and stored energy (kWh) limit what an island carries and for how long."
-  after: [9]
+  after: [9, F6]
   next: A14
 - kind: lesson
   id: a14-microgrid-value
@@ -1022,7 +1023,7 @@
   outcome: "Recommend what one site should install and defend it with its net present value, its emissions, a sensitivity test and its limits."
   teaches: [a recommendation defended with NPV and CO₂, one-at-a-time sensitivity, stating a model's limits, what one site cannot do alone]
   lab: "the M4 notebook: power, hydrogen and heat in one linear program, about 45 minutes."
-  after: [9, A1, SB0]
+  after: [9, A1, F4, SB0]
 
 # ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3)
 - kind: lesson
