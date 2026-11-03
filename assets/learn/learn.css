@@ -486,6 +486,8 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-deeper-body .math.display { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
 .lx-deeper-body pre, .lx-deeper-body div.sourceCode { overflow-x: auto; max-width: 100%; }
 .lx-deeper-body table { display: block; overflow-x: auto; max-width: 100%; }
+/* a long inline command breaks on a phone instead of widening the page (K8's nbconvert line; W2 integration) */
+.lx-deeper-body :not(pre) > code { white-space: normal; overflow-wrap: anywhere; }
 
 /* glossary.css — tap-to-define terms and their popover (glossary.js). */
 .lx-term.on:not(.plain) { cursor: help; text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 3px;
@@ -1608,6 +1610,9 @@ body.page-learn { --t: var(--lx-accent); }
 .page-learn .lx13-card h3{font-size:17px}
 .lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
+/* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; W2 integration: at 375 px
+   an open text version pushed lesson 13's page 344 px wide, lesson 12's 117 px) */
+.lx13-card>*,.lx13-chart>.lx-textalt{min-width:0;max-width:100%}
 .lx13-chart svg{display:block;width:100%;height:auto}
 .lx13-chart text{font-family:var(--lx-f-mono);font-size:12px;fill:var(--lx-ink-3)}
 .lx13-chart text.lab{font-family:var(--lx-f-display);font-size:13px;font-weight:600;fill:var(--lx-ink)}

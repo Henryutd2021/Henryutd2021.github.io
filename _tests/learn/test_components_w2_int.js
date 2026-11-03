@@ -5,6 +5,7 @@
 //     allow-listed explainer on a Learn page; the three case-file drafts keep no page style and no theme-* body class
 //   - the header's practice badge in hours from 120 minutes (build_learn.py) on every page that has one
 //   - the Teaching card's lesson count equals the live lessons in data/path.json
+//   - two phone fixes found with every details box open at 375 px (planengine.css cards, deeper.css inline code)
 // Usage (from the site folder):  node _tests/learn/test_components_w2_int.js
 "use strict";
 const fs = require("fs");
@@ -67,6 +68,13 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
     ok(!/<style>/.test(q) && !/theme-[a-z]+/.test(q.split("\n---")[0]), f + ": no page style and no theme-* body class (forms.css holds them)");
   });
   ok(/<code>python run\.py --case toy<\/code>/.test(rd("learn/_template-case.qmd")), "case template: the Try-it example shows a command, which wraps");
+}
+
+// ---------------------------------------------------------------- phones with every details box open (375 px sweep, W2 integration)
+{
+  const pe = rd("assets/learn/components/planengine.css"), dp = rd("assets/learn/components/deeper.css");
+  ok(/\.lx13-card>\*,\.lx13-chart>\.lx-textalt\{min-width:0;max-width:100%\}/.test(pe), "planengine.css: nothing in a card widens it (lessons 12 and 13's text versions scroll in their own box)");
+  ok(/\.lx-deeper-body :not\(pre\) > code \{ white-space: normal; overflow-wrap: anywhere; \}/.test(dp), "deeper.css: a long inline command in Go deeper wraps (K8)");
 }
 
 // ---------------------------------------------------------------- the practice badge, and the Teaching card's count

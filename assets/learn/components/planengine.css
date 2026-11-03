@@ -7,6 +7,9 @@
 .page-learn .lx13-card h3{font-size:17px}
 .lx13-head{display:flex;justify-content:space-between;align-items:center;gap:6px 12px;flex-wrap:wrap}
 .lx13-sub{font-size:13.5px;color:var(--lx-ink-3)}
+/* nothing in a card may widen it: wide tables scroll in their own box (.lx13-hours, lesson 12's .lx12-scroll; W2 integration: at 375 px
+   an open text version pushed lesson 13's page 344 px wide, lesson 12's 117 px) */
+.lx13-card>*,.lx13-chart>.lx-textalt{min-width:0;max-width:100%}
 .lx13-chart svg{display:block;width:100%;height:auto}
 .lx13-chart text{font-family:var(--lx-f-mono);font-size:12px;fill:var(--lx-ink-3)}
 .lx13-chart text.lab{font-family:var(--lx-f-display);font-size:13px;font-weight:600;fill:var(--lx-ink)}
