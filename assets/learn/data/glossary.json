@@ -647,6 +647,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "order-of-magnitude": {
+  "term": "Order of magnitude",
+  "short": "The power of ten a quantity sits at; two quantities are an order of magnitude apart when one is about ten times the other.",
+  "lesson": "K1",
+  "href": "k01-units.html"
+ },
  "overnight-cost": {
   "term": "Overnight cost",
   "short": "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt.",
@@ -826,6 +832,12 @@
   "short": "What it costs a plant to make one more megawatt-hour, mostly fuel, leaving out the cost of building it.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "scientific-notation": {
+  "term": "Scientific notation",
+  "short": "A way to write a number as a value from 1 to 10 times a power of ten, so very large and very small numbers are easy to compare.",
+  "lesson": "K1",
+  "href": "k01-units.html"
  },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
