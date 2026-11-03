@@ -2,7 +2,9 @@
 // (assets/learn/data/b01-algebra-to-lp.json): the dispatch story agrees with lesson 0's day; every story's best corner
 // (vertex enumeration) agrees with HiGHS, the solver the page uses; compare() accepts equivalent models and rejects each
 // planted mistake with the right diagnosis; the A x <= b arrays reproduce the model; the readiness items are consistent;
-// and every number the page states matches the model. With --fallback it prints the static figure for the page.
+// and every number the page states matches the model. The practice set (Check section): the new stories and hours are
+// solved by HiGHS too; each exercise's answer, hints and check reasons come from the model, right answers pass and typical
+// wrong answers get the reason the data file names. With --fallback it prints the static figure for the page.
 // Usage (from the site folder):  node _tests/learn/test_b01-algebra-to-lp.js [--fallback]
 "use strict";
 const fs = require("fs");
@@ -23,11 +25,16 @@ let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
 const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
 const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.stringify(s)));
+const isBoundLike = r => r.op === ">=" && r.b === 0;
 
 const d1 = B.dispatchStory(town, year);
 const planning = B.planningStory(J.stories.planning, cf);
-const stories = { dispatch: d1, planning: planning, battery: B.withKey(J.stories.battery, "battery"), heat: B.withKey(J.stories.heat, "heat"), carbon: B.withKey(J.stories.carbon, "carbon") };
-const EXPECT = { dispatch: [[130, 15], 6700], planning: [[50, 65], 17700], battery: [[80, 72], 6240], heat: [[30, 10], 900], carbon: [[80, 70], 5360] };
+const PI = J.practice.items;
+const stories = { dispatch: d1, planning: planning, battery: B.withKey(J.stories.battery, "battery"), heat: B.withKey(J.stories.heat, "heat"), carbon: B.withKey(J.stories.carbon, "carbon"),
+  imports: B.withKey(J.stories.imports, "imports"), bus: B.withKey(J.stories.bus, "bus"),
+  d14: B.dispatchStory(town, year, PI.c14.hour, PI.c14.prev), d18: B.dispatchStory(town, year, PI.c18.hour, PI.c18.prev) };
+const EXPECT = { dispatch: [[130, 15], 6700], planning: [[50, 65], 17700], battery: [[80, 72], 6240], heat: [[30, 10], 900], carbon: [[80, 70], 5360],
+  imports: [[48, 52], 4040], bus: [[1, 5], 170], d14: [[85, 10], 4400], d18: [[105, 10], 5200] };
 
 function fallbackSVG() {
   const W = 440, Hh = 380, m = { l: 58, r: 14, t: 12, b: 56 }, box = d1.view;
@@ -169,6 +176,73 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG()); process.e
     ok(a > 0 && b > a && QMD.slice(a + "<!-- fallback-svg:start -->".length, b).trim() === fb.trim(), "page: the fallback figure is the generated one (run with --fallback and paste)");
     // the explain table and saw texts compute from the model; check the strings the JS writes around them
     ok(JS.indexOf("S + W ≤ 115") > 0 && JS.indexOf("d ≤ 0.9c") > 0, "js: the step texts name the rules");
+  }
+
+  // ---------------- the practice set
+  {
+    const PJ = J.practice, keys = Object.keys(PI), SP = B.practiceSpecs(J, town, year, cf);
+    ok(d1.rows[1].says.indexOf("made 90 MW at 18:00") >= 0, "dispatch: the default story still starts from 90 MW at 18:00");
+    // sets: Formulate (from scratch twice: steps 3, 7 and 8 did its fade), then two worked -> partly worked -> from scratch sets
+    ok(PJ.tracks.map(t => t.items.map(k => PI[k].kind).join()).join("|") === "scratch,scratch|worked,partly,scratch|worked,partly,scratch", "practice: Formulate from scratch; Best corner and A x ≤ b fade worked -> partly -> scratch");
+    ok(keys.length === 8 && /eight exercises in three sets/.test(PJ.title), "practice: eight exercises, as the title says");
+    const minutes = keys.reduce((a, k) => a + PI[k].minutes, 0);
+    ok(minutes === 43, `practice: the exercises take about ${minutes} min (report: 43 + 4 for the quick questions = 47, target 45)`);
+    keys.forEach(k => { const h = SP[k] ? SP[k].hints : J.stories[PI[k].story].hints; ok(h.length >= 2 && h.length <= 3, `practice ${k}: two or three staged hints`); });
+    // the hours come from lesson 0's day and its cheapest-first plan
+    const plan = G0.expertPlan(G0.prepare(town, year, "lesson0"));
+    ["c14", "c18"].forEach(k => ok(plan[PI[k].hour - 1].cc === PI[k].prev, `${k}: the combined-cycle plant made ${PI[k].prev} MW at ${PI[k].hour - 1}:00 in lesson 0's cheapest-first plan`));
+    ok(PJ.foot.indexOf(`the gas needs at ${PI.c14.hour}:00 and ${PI.c18.hour}:00 follow the real day of ${d1.D.dateLabel}`) > 0 && /illustrative/.test(PJ.foot), "practice foot: the real hours and the illustrative numbers");
+    ok(SP.c14.st.need === 95 && SP.c14.st.reach === 85 && SP.c18.st.need === 115 && SP.c18.st.reach === 105, "c14, c18: gas needs 95 and 115 MW (lesson 0's day), reach 85 and 105 MW");
+    ok(plan[18].cc === 105 && plan[18].pk === 10 && B.optimum(SP.c18.st, SP.c18.st.view).x.join() === "105,10", "c18: the best corner is lesson 0's cheapest-first plan for 18:00 (the right reason says so)");
+    // c14: the worked corner table and the what-if price
+    ok(JSON.stringify(SP.c14.table.map(r => [r.x, r.value])) === JSON.stringify([[[0, 95], 9500], [[0, 100], 10000], [[85, 10], 4400], [[85, 100], 13400]]), "c14: four corners and their costs");
+    ok(SP.c14.table.every(r => SP.c14.st.rows.every(q => B.holds(q, r.x, 1e-6))) && SP.c14.table.length === B.region(SP.c14.st.rows, SP.c14.st.view).length, "c14: every corner keeps every rule, and they are the region's corners");
+    ok(SP.c14.alt.best.x.join() === "0,95" && SP.c14.alt.best.value === 3325 && SP.c14.alt.best.ties.length === 1 && SP.c14.alt.index === 0, "c14: with the peaker at $35, (0, 95) at $3,325 wins alone");
+    ok(SP.c14.check(0).ok && [1, 2, 3].every(i => !SP.c14.check(i).ok && SP.c14.check(i).why.indexOf(B.money(SP.c14.alt.table[i].value)) > 0), "c14: the right corner passes; each other states its own cost");
+    // c18: the hidden corner
+    ok(SP.c18.hidden === 1 && SP.c18.table[1].x.join() === "105,10" && SP.c18.table[1].value === 5200 && SP.c18.table[1].keys.sort().join() === "cover,ramp", "c18: the hidden corner (105, 10), $5,200, on the cover and ramp lines");
+    ok(SP.c18.check({ x: 105, y: 10, cost: 5200 }).ok && SP.c18.check({ x: 100, y: 15, cost: 5500 }).why === B.fill(PI.c18.offLine, Object.assign({ x: "100", y: "15" }, SP.c18.vars)) &&
+       SP.c18.check({ x: 105, y: 10, cost: 5000 }).why === B.fill(PI.c18.badCost, SP.c18.vars) && SP.c18.check({ x: 105, y: NaN, cost: 5200 }) === null, "c18: right passes; off the lines and a wrong cost get their reasons; a blank waits");
+    // imports: from scratch
+    ok(JSON.stringify(SP.imports.table.map(r => r.x)) === "[[0,100],[0,160],[48,52]]" && SP.imports.vars.nAxis === 2 && SP.imports.vars.k === "0.5" && SP.imports.vars.rhs === "24", "imports: corners (0, 100), (0, 160), (48, 52); 0.5x = 24");
+    ok(SP.imports.table.every(r => r.keys.indexOf("north") < 0), "imports: the north line touches no corner (the right reason calls it redundant)");
+    ok(SP.imports.check({ x: 48, y: 52, cost: 4040 }).ok && /breaks a rule: “at most 64 t/.test(SP.imports.check({ x: 60, y: 40, cost: 3800 }).why) && /costs \$5,000/.test(SP.imports.check({ x: 0, y: 100, cost: 5000 }).why) && /recompute/.test(SP.imports.check({ x: 48, y: 52, cost: 4000 }).why), "imports: right passes; a plan over the cap, a dearer corner and a wrong cost get their reasons");
+    // aplan: worked arrays and the what-if goal
+    ok(JSON.stringify(SP.aplan.arrays.A) === "[[-2.1,-3],[1,1]]" && JSON.stringify(SP.aplan.arrays.b) === "[-300,115]" && JSON.stringify(SP.aplan.changed.b) === "[-330,115]" && JSON.stringify(SP.aplan.changed.A) === JSON.stringify(SP.aplan.arrays.A), "aplan: a 330 GWh goal changes only b₁, to −330");
+    ok(SP.aplan.check(0).ok && [1, 2, 3].every(i => !SP.aplan.check(i).ok) && SP.aplan.why.join("|") === [PI.aplan.why.energy, PI.aplan.why.connect].join("|"), "aplan: only choice 0 passes; each row's reason follows its rule");
+    // abat: partly worked arrays
+    ok(SP.abat.given.map(r => r.key).join() === "chargeHours,store,sellHours" && SP.abat.left.length === 1 && JSON.stringify(SP.abat.answer) === '{"c":[30,-120],"rows":[{"a":[-0.9,1],"b":0}]}', "abat: three rows given; c = (30, −120) and the losses row left");
+    ok(SP.abat.check(SP.abat.answer).ok && SP.abat.check({ c: [-30, 120], rows: SP.abat.answer.rows }).why === PJ.checks.reversed && /Row 4 rules out/.test(SP.abat.check({ c: [30, -120], rows: [{ a: [0, 1], b: 0.9 }] }).why) && SP.abat.check({ c: [30, NaN], rows: SP.abat.answer.rows }) === null, "abat: right passes; a max-form c, d ≤ 0.9 and a blank get their reasons");
+    // abus: from scratch
+    ok(SP.abus.check(SP.abus.answer).ok && SP.abus.check({ c: [45, 25], rows: [{ a: [1, 1], b: 6 }, { a: [1, 0], b: 4 }, { a: [0, 1], b: 12 }, { a: [-1, 0], b: -1 }] }).why === B.fill(PJ.checks.copied, { k: 1 }) &&
+       /“at least 1 MWh before midnight/.test(SP.abus.check({ c: [45, 25], rows: [{ a: [-1, -1], b: -6 }, { a: [1, 0], b: 4 }, { a: [0, 1], b: 12 }] }).why) && SP.abus.check({ c: [4.5, 2.5], rows: SP.abus.answer.rows }).ok, "abus: right (and a scaled c) passes; a copied ≥ row and a missing rule get their reasons");
+    ok(SP.abus.vars.rows === "(−1, −1) ≤ −6, (1, 0) ≤ 4, (0, 1) ≤ 12 and (−1, 0) ≤ −1", "abus: the last hint lists the rows: " + SP.abus.vars.rows);
+    // every number in an exercise's texts comes from its model (or the story it shows)
+    const nums = t => (String(t).match(/\d[\d,]*(\.\d+)?/g) || []).map(x => +x.replace(/,/g, ""));
+    Object.keys(SP).forEach(k => {
+      const it = PI[k], sp = SP[k], v = sp.vars, st = sp.st;
+      const tx = [].concat(sp.hints, sp.q || [], sp.worked || [], sp.ask || [], sp.choices || [], st.text || [], ["right", "wrong", "offLine", "badCost", "breaks", "notBest"].filter(x => it[x]).map(x => B.fill(it[x], v)), (it.reasons || []).map(r => B.fill(r, v)));
+      // placeholders filled at check time from the reader's answer: pick, pickCost, x, y, cost, says (tested with check() above)
+      ok(tx.every(t => !/\{(?!(pick|pickCost|x|y|cost|says)\})\w+\}/.test(t)), `practice ${k}: every placeholder filled`);
+      const A = new Set([0, 1, 2]);
+      Object.keys(v).forEach(x => nums(v[x]).forEach(n => A.add(n)));
+      st.rows.forEach(r => { [r.b, ...r.a].forEach(n => A.add(Math.abs(n))); nums(r.says || "").forEach(n => A.add(n)); }); st.c.forEach(n => A.add(Math.abs(n)));
+      if (k === "c14" || k === "c18") [2025, 3, ...SP[k].table.map(r => r.value)].forEach(n => A.add(n));
+      if (k === "aplan") A.add(cf.targets.solar.year);
+      if (k === "abus") [22, 6].forEach(n => A.add(n));   // the clock times of the night, 22:00 to 6:00
+      if (k === "aplan") [st.fill.solarCF, st.fill.windCF].forEach(x => A.add(parseFloat(x)));
+      const stray = [].concat(...tx.map(nums)).filter(n => !A.has(n));
+      ok(!stray.length, `practice ${k}: every number in its texts comes from the model (stray: ${stray.join(", ")})`);
+    });
+    // the bus story's text matches its rows (2 MW × 2 h and × 6 h)
+    { const bs = J.stories.bus, R = {}; bs.rows.forEach(r => { R[r.key] = r; }); const t = bs.text.join(" ");
+      ok(R.early.b === 2 * 2 && R.late.b === 2 * 6 && t.indexOf("at least " + R.need.b + " MWh") > 0 && t.indexOf("$" + bs.c[0]) > 0 && t.indexOf("$" + bs.c[1]) > 0 && t.indexOf("at least " + R.shuttle.b + " MWh") > 0, "bus: text and rows agree"); }
+    { const is = J.stories.imports, t = is.text.join(" ");
+      ok(is.rows.every(r => isBoundLike(r) || t.indexOf(String(r.b)) >= 0) && t.indexOf("$" + is.c[0]) > 0 && t.indexOf("$" + is.c[1]) > 0 && t.indexOf(is.rows[1].a[0] + " t") > 0 && t.indexOf(is.rows[1].a[1] + " t") > 0, "imports: text and rows agree"); }
+    // the page hosts the set; the view builds every exercise
+    ok(QMD.indexOf('<div id="b1-practice"></div>') > 0, "page: the practice host in the Check section");
+    ["c14", "c18", "imports", "aplan", "abat", "abus"].forEach(k => ok(JS.indexOf(k + ": function") > 0, `js: the view builds exercise ${k}`));
+    ok(/heat: formulate, carbon: formulate/.test(JS), "js: heat and carbon use the Builder");
   }
 
   console.log(`b01-algebra-to-lp: ${checks - fails} of ${checks} checks passed`);

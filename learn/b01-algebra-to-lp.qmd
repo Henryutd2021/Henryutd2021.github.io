@@ -9,8 +9,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- Bridge B1 in the step-card form (Learn W1, 2026-11-02). Ten cards of one idea and one action each; faded worked
-     examples (dispatch fully worked, planning with one rule left, battery from scratch, with staged hints); two practice
-     stories in the Check section. Model, view and builder: assets/learn/b01-algebra-to-lp.js with
+     examples (dispatch fully worked, planning with one rule left, battery from scratch, with staged hints). The Check
+     section ends with the practice set (#b1-practice): eight exercises in three sets (Formulate; Best corner and A x <= b,
+     each worked -> partly worked -> from scratch), about 43 minutes plus the quick questions. Model, view and builder: assets/learn/b01-algebra-to-lp.js with
      assets/learn/data/b01-algebra-to-lp.json, town.json, town_year.json, cf_targets.json and path.json. Every number below
      is checked by node _tests/learn/test_b01-algebra-to-lp.js (which also solves every story with the vendored HiGHS and
      writes the fallback figure with --fallback). The learn:meta, learn:next and learn:footer blocks are written by
@@ -106,7 +107,54 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .page-learn .b1-code { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--lx-surface-2); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 13px;
   line-height: 1.5; overflow-x: auto; white-space: pre; }
 .b1-cl.sel { background: var(--lx-accent-soft); }
-.b1-practice { display: grid; gap: 12px; }
+/* faded practice (Check section): sets of worked -> partly worked -> from-scratch exercises */
+.fp { display: grid; gap: 12px; min-width: 0; }
+.fp-lede { font-size: 15px; color: var(--lx-ink-2); max-width: 72ch; }
+.fp-intro { font-size: 14.5px; color: var(--lx-ink-2); }
+.fp-foot { font-size: 13px; color: var(--lx-ink-3); }
+.fp-fade { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(122px, 1fr)); gap: 6px; }
+@media (max-width: 560px) {
+  .fp-bar .lx-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .fp-bar .lx-seg button { padding: 6px; line-height: 1.25; }
+  .fp-fade { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
+  .fp .fp-k { font-size: 13px; align-items: flex-start; }
+  .fp .fp-m { font-size: 11.5px; }
+}
+.fp-step { width: 100%; display: grid; gap: 2px; text-align: left; min-height: 48px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--lx-line-2);
+  background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; font: inherit; }
+.fp-step[aria-pressed="true"] { border-color: var(--lx-accent); box-shadow: inset 0 0 0 1px var(--lx-accent); background: var(--lx-accent-soft); }
+.fp-k { display: inline-flex; align-items: center; gap: 6px; font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; }
+.fp-k b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--lx-surface-3); font-size: 12px; font-weight: 600; }
+.fp-k .lx-ic { width: 18px; height: 18px; color: var(--lx-good); }
+.fp-m { font-size: 12.5px; color: var(--lx-ink-3); font-family: var(--lx-f-mono); white-space: nowrap; }
+.fp-ex { display: grid; gap: 10px; border-top: 1px solid var(--lx-line); padding-top: 12px; min-width: 0; }
+.page-learn .fp-title { font-size: 18px; margin: 0; }
+.fp-title:focus { outline: none; }
+.fp-area { display: grid; gap: 10px; min-width: 0; }
+.fp-area > * { min-width: 0; }
+.fp-area > .lx-btn { justify-self: start; }
+.page-learn .fp-model { list-style: none; margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--lx-surface-2); font-family: var(--lx-f-mono); font-size: 14.5px;
+  display: flex; flex-wrap: wrap; gap: 2px 20px; }
+.fp-tabw { max-width: 100%; overflow-x: auto; }
+.page-learn .fp-tab { border-collapse: collapse; font-size: 14.5px; margin: 0; width: 100%; max-width: 640px; }
+.b1-in.sm { width: 3.4em; }
+@media (max-width: 560px) { .page-learn .fp-tab { font-size: 13.5px; } .fp-tab th, .fp-tab td { padding: 6px 5px; } .b1-in.sm { width: 2.9em; padding: 0 4px; } }
+.fp-tab th, .fp-tab td { padding: 6px 10px; border-bottom: 1px solid var(--lx-line); text-align: left; vertical-align: middle; background: transparent; color: var(--lx-ink); }
+.fp-tab th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12px; color: var(--lx-ink-3); text-transform: uppercase; letter-spacing: .04em; }
+.fp-tab td.n { font-family: var(--lx-f-mono); white-space: nowrap; }
+.fp-tab tr.best td { background: var(--lx-good-soft); font-weight: 600; }
+.fp-tab tr.ask td { background: var(--lx-accent-soft); }
+.fp-pt { display: inline-flex; align-items: center; gap: 4px; font-family: var(--lx-f-mono); flex-wrap: wrap; }
+.fp-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); }
+.fp-ask { font-size: 15px; color: var(--lx-ink); }
+.fp-worked { display: flex; gap: 8px; align-items: flex-start; font-size: 15px; }
+.fp-worked .lx-ic { color: var(--lx-good); flex: none; margin-top: 3px; }
+.fp-hints { display: grid; gap: 6px; }
+.fp-hint { font-size: 15px; color: var(--lx-ink-2); padding: 8px 10px; border-left: 3px solid var(--lx-warn); background: var(--lx-warn-soft); border-radius: 0 10px 10px 0; }
+.fp-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.page-learn .fp-why-rows { margin: 0; padding-left: 1.2rem; font-size: 14.5px; color: var(--lx-ink-2); }
+.fp-acts:empty, .fp-hints:empty, .fp-why:empty { display: none; }
+.fp-choices { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); }
 .b1-static-model { font-family: var(--lx-f-mono); font-size: 15px; margin: 0; padding-left: 1.2rem; }
 @media (max-width: 640px) {
   .w1h-stack .lx-ctable tr { grid-template-columns: 22px minmax(0, 1fr); row-gap: 4px; }
