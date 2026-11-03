@@ -215,6 +215,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "difference-in-differences": {
+  "term": "Difference-in-differences",
+  "short": "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
+ },
  "discount-rate": {
   "term": "Discount rate",
   "short": "The yearly rate used to turn money paid or received in the future into its value today.",
@@ -269,6 +275,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "energy-burden": {
+  "term": "Energy burden",
+  "short": "The share of a household's income spent on home energy bills.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
+ },
  "energy-storage": {
   "term": "Energy storage",
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
@@ -286,6 +298,12 @@
   "short": "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "falsification-statement": {
+  "term": "Falsification statement",
+  "short": "A sentence naming the result that would show your expected answer wrong.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
  },
  "fast-frequency-response": {
   "term": "Fast frequency response",
@@ -370,6 +388,12 @@
   "short": "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "horizon": {
+  "term": "Horizon",
+  "short": "The span of time a study covers, from a day of operation to decades of planning.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "hour-ending": {
   "term": "Hour ending",
@@ -503,6 +527,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "method-family": {
+  "term": "Method family",
+  "short": "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
+ },
  "mixed-integer-program": {
   "term": "Mixed-integer program",
   "short": "An optimization model in which some decisions must be whole numbers, such as a plant being on (1) or off (0).",
@@ -514,6 +544,12 @@
   "short": "One million British thermal units, a unit of fuel heat; about 0.29 MWh of heat, and gas is priced in dollars per MMBtu.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "monte-carlo": {
+  "term": "Monte Carlo simulation",
+  "short": "Running a model many times with inputs drawn at random, to see the range of outcomes and how likely each is.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "nadir": {
   "term": "Nadir",
@@ -647,6 +683,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "question-type": {
+  "term": "Question type",
+  "short": "The kind of answer a research question asks for: descriptive, explanatory, evaluative, predictive or prescriptive.",
+  "lesson": "R1",
+  "href": "r01-framing.html"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
@@ -683,6 +725,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "relative-growth-index": {
+  "term": "Relative growth index (RGI)",
+  "short": "How fast a topic's paper count grew from 2016–18 to 2022–24, divided by the growth of energy-systems research as a whole.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
+ },
  "representative-period": {
   "term": "Representative period",
   "short": "A real stretch of time, such as a week, chosen to stand for many similar ones so that a model can run faster.",
@@ -712,6 +760,12 @@
   "short": "What it costs a plant to make one more megawatt-hour, mostly fuel, leaving out the cost of building it.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "search-string": {
+  "term": "Search string",
+  "short": "The words and operators (AND, OR, quotation marks) typed into a literature database to find papers.",
+  "lesson": "R10",
+  "href": "r10-question-studio.html"
  },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
@@ -778,6 +832,12 @@
   "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "time-step": {
+  "term": "Time step",
+  "short": "The length of one step in a model or dataset, such as five minutes, an hour or a year.",
+  "lesson": "R3",
+  "href": "r03-system-and-method.html"
  },
  "tornado-chart": {
   "term": "Tornado chart",

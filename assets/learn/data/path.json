@@ -1214,9 +1214,12 @@
    "tier": "researcher",
    "code": "R1",
    "title": "What makes a question worth researching?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r01-framing.html",
+   "scales": [],
+   "id": "r01-framing",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
@@ -1230,9 +1233,12 @@
    "tier": "researcher",
    "code": "R3",
    "title": "Which system, which boundary, which method?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r03-system-and-method.html",
+   "scales": [],
+   "id": "r03-system-and-method",
+   "minutes": 30,
+   "form": "studio"
   },
   {
    "tier": "researcher",
@@ -1286,9 +1292,12 @@
    "tier": "researcher",
    "code": "R10",
    "title": "What could you study? The question studio",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r10-question-studio.html",
+   "scales": [],
+   "id": "r10-question-studio",
+   "minutes": 40,
+   "form": "studio"
   }
  ],
  "toolbox": [

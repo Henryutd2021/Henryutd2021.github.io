@@ -1,0 +1,13 @@
+# Sidecar of research studio R1 (r01-framing), builder learn-w2-f, 2026-11-03: new glossary terms and requests for shared files.
+lesson: R1
+glossary:
+  - {id: question-type, term: "Question type", def: "The kind of answer a research question asks for: descriptive, explanatory, evaluative, predictive or prescriptive."}
+  - {id: falsification-statement, term: "Falsification statement", def: "A sentence naming the result that would show your expected answer wrong."}
+  - {id: energy-burden, term: "Energy burden", def: "The share of a household's income spent on home energy bills."}
+requests:
+  - "path.yml: R1's prerequisites are T13 and A22 (curriculum v2 §7.6). A22 has no code on this branch, so R1 lists after: [13]; add A22 at the merge."
+  - "Researcher tier: path.yml still has status: upcoming on the tier. With R1, R3 and R10 (and the other W2 studios) live, set it active, or decide how live studios show in an upcoming tier."
+  - "Studio template: learn/_template-studio.qmd puts the task list (Produce, From, Done when) inside .lx-fallback, which is hidden once the interactive mounts, so readers with JavaScript never see the task. R1, R3 and R10 put it in a card above the interactive (div.lx-card.lx-studio-brief, spaced by a small page <style>). Suggest moving .lx-studio-brief into forms.css and the template."
+  - "LX.Exemplars: answers written as a card (one field per line) need white-space: pre-line on .lx-ex-text and on the static <p> of staticHTML. R1 and R10 set it with a page <style> and injected CSS; suggest an option (lines: true) and a forms.css rule."
+  - "Lesson links that follow readiness: R1, R3 and R10 each carry a small ref(P, code) helper that links a lesson when data/path.json marks it ready and names it 'upcoming' otherwise (so links to R2, R4, R6, R9, A4, K1 appear by themselves after the merge). Candidate for core.js (LX.lessonRef)."
+  - "Rubric competence picks are per studio (R1: framing). The rubric note on all three studios says a studio is practice, not a certificate (curriculum v2 §3.1)."

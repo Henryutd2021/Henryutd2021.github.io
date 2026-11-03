@@ -1,0 +1,11 @@
+# Sidecar of research studio R10 (r10-question-studio), builder learn-w2-f, 2026-11-03.
+lesson: R10
+glossary:
+  - {id: search-string, term: "Search string", def: "The words and operators (AND, OR, quotation marks) typed into a literature database to find papers."}
+  - {id: relative-growth-index, term: "Relative growth index (RGI)", def: "How fast a topic's paper count grew from 2016–18 to 2022–24, divided by the growth of energy-systems research as a whole."}
+requests:
+  - "path.yml: R10's prerequisites are R1 and F1 (curriculum v2 §7.6). F1 is on learn-w2-a, so R10 lists after: [R1]; add F1 at the merge."
+  - "OpenAlex search links: https://openalex.org/works?search=<string> (checked in a browser on 3 November 2026; Boolean AND/OR and quotes work). No API call is made from the page."
+  - "Scope: the pickers are exactly §11.3's lists; no element, lever, stakeholder or twist names nuclear technology, and data centers enter every draft as 'data-center loads'. _tests/learn/test_r10-question-studio.js checks that no data string names nuclear technology (so the nuclear-plus-risk rule cannot be met), and runs every slot value in all five types plus a seeded sample of 200,000 full combinations through the §20.4 deny-list; with LEARN_CURRICULUM set it also compares the picker lists, the 29 crowding counts and the seven example cards with curriculum_v2.md §11.3."
+  - "The QuestionCard's share link (#q-...) opens R10 on the card step."
+  - "LX.QuestionCard reads a #q- link every time it is created, and the link's card wins over the stored draft; a page that rebuilds the card (R10's step 3, after Back and Next) would show the link's card again over the reader's edits. R10 stores the linked card once and drops the hash; the component could do the same (apply a link once)."
