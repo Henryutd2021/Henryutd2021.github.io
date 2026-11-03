@@ -169,6 +169,7 @@
   var CSS = [
     ".w11-prices{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:3px}",
     "@media(max-width:700px){.w11-prices{grid-template-columns:repeat(12,minmax(0,1fr))}}",
+    "@media(max-width:440px){.w11-prices{grid-template-columns:repeat(8,minmax(0,1fr))}}",   // phones: three rows of eight, so a three-digit price fits its button
     ".w11-p{display:grid;gap:1px;justify-items:center;padding:4px 0;border-radius:8px;border:1px solid var(--lx-line);background:var(--lx-surface);color:var(--lx-ink);cursor:pointer;min-width:0;font:inherit}",
     ".w11-p small{font-family:var(--lx-f-mono);font-size:10.5px;color:var(--lx-ink-3)}",
     ".w11-p b{font-family:var(--lx-f-mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}",

@@ -77,7 +77,10 @@
         S("path", { d: d + "L" + X(fr[fr.length - 1].co2).toFixed(1) + "," + (HH - mb) + "L" + X(fr[0].co2).toFixed(1) + "," + (HH - mb) + "Z", fill: "var(--lx-surface-3)", opacity: ".55" }, gF);
         S("path", { d: d, fill: "none", stroke: "var(--lx-ink)", "stroke-width": 2.2 }, gF);
         var mid = fr[Math.floor(fr.length * 0.55)];
-        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = o.shadeLabel || "out of reach (approximately)";   // straight lines join solved points: the true edge may sag below
+        var sh = S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF);
+        sh.textContent = o.shadeLabel || "out of reach (approximately)";   // straight lines join solved points: the true edge may sag below
+        var shw = (sh.getComputedTextLength && sh.getComputedTextLength()) || sh.textContent.length * 6.6;   // kept inside the plot on phones
+        sh.setAttribute("x", Math.max(ml + shw / 2 + 2, Math.min(W - mr - shw / 2 - 2, X(mid.co2))).toFixed(1));
         fr.forEach(function (p) { if (p.solved) S("circle", { cx: X(p.co2), cy: Y(p.cost), r: 3.5, fill: "var(--lx-ink)" }, gF); });
         var s1 = H("span", null, leg); H("i", { style: "--c:var(--lx-ink);height:3px" }, s1); H("span", { text: st.frLabel || o.frontierLabel || "Frontier: the cheapest plan at each CO₂" }, s1);
       }

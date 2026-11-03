@@ -123,7 +123,7 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
 .lx-choices-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; }
 .lx-choice { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 14px; border-radius: 11px; border: 1px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; text-align: left; font-family: var(--lx-f-display); font-size: 15px; font-weight: 500;
-  line-height: 1.25; transition: border-color .15s, background .15s; }
+  line-height: 1.25; transition: border-color .15s, background .15s; hyphens: auto; }
 .lx-choice:hover { border-color: var(--lx-ink-3); }
 .lx-choice[aria-pressed="true"] { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); background: var(--lx-surface-2); }
 .lx-choice.right { border-color: var(--lx-good); box-shadow: inset 0 0 0 1px var(--lx-good); }
