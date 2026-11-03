@@ -914,14 +914,17 @@
    ], onStep: function (i) {} });
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
+   api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
+   restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
    Text budget: card text is one or two sentences; anything longer goes in a Go deeper box inside `act`. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
   LX.StepCards = function (host, o) {
-    var card = H("div", { class: "lx-stepcard lx-guard" }, host), N = o.steps.length, i = 0, unlocked = {};
+    var card = H("div", { class: "lx-stepcard lx-guard" }, host), N = o.steps.length, i = 0, unlocked = {}, shown = 0;
     function render(k) {
-      i = k; card.innerHTML = "";
+      i = k; card.innerHTML = ""; card.removeAttribute("aria-busy");
+      var gen = ++shown, busy = false;          // gen: this card's render; busy: a solve (or other wait) is running
       var top = H("div", { class: "lx-step-top" }, card);
       var dots = H("div", { class: "lx-dots", "aria-hidden": "true" }, top);
       for (var d = 0; d < N; d++) H("i", { class: d < i ? "done" : d === i ? "cur" : "" }, dots);
@@ -937,9 +940,14 @@
       var st = o.steps[i];
       if (st.free) unlocked[i] = true;
       nx.disabled = !unlocked[i]; nx.hidden = i === N - 1;
-      nx.addEventListener("click", function () { if (unlocked[i]) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
+      nx.addEventListener("click", function () { if (unlocked[i] && !busy) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
-        done: function () { unlocked[i] = true; nx.disabled = false; },
+        done: function () { unlocked[k] = true; nx.disabled = busy; },
+        busy: function (on) {
+          busy = !!on; nx.disabled = busy || !unlocked[k];
+          if (gen !== shown) return;              // a late call from a card no longer shown
+          if (busy) card.setAttribute("aria-busy", "true"); else card.removeAttribute("aria-busy");
+        },
         saw: function (t, bad) { sawBox.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") + "</div>" }, sawBox); },
         card: card, index: i
       };
@@ -1294,7 +1302,10 @@
      traces: [{label: "14:00 · the cloud", path: ["start", "q1", "a1", "q2", "a2", "end"], text: "What happened, with numbers."}],
      sel: 1 });
    The chosen trace lights up box by box (all at once under reduced motion); its text is announced. A "Text version"
-   spells out every branch. */
+   spells out every branch.
+   Returns { build(), run(i, quick), update(traces) }. update(traces) changes the traces without redrawing the chart (e.g.
+   a "Your settings" trace that follows the reader's numbers): the buttons take the new labels, and the selected trace
+   shows its new path and text at once. update() with no argument rereads the same list after an in-place change. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H, S = LX.S;
@@ -1391,14 +1402,22 @@
       }
       if (quick || LX.reduced()) { while (k < tr.path.length) stepOn(); } else { stepOn(); timer = setInterval(stepOn, 420); }
     }
-    var btns = o.traces.map(function (t, i) {
-      var b = H("button", { class: "lx-choice small", type: "button", "aria-pressed": "false", text: t.label }, trace);
+    function button(t, i) {
+      var b = H("button", { class: "lx-choice small", type: "button", "aria-pressed": i === cur ? "true" : "false", text: t.label }, trace);
       b.addEventListener("click", function () { build(); run(i); });
       return b;
-    });
+    }
+    var btns = o.traces.map(button);
+    function update(traces) {
+      if (traces) o.traces = traces;
+      cur = Math.max(0, Math.min(cur, o.traces.length - 1));
+      if (o.traces.length === btns.length) o.traces.forEach(function (t, i) { btns[i].textContent = t.label; });   // in place: focus stays
+      else { trace.innerHTML = ""; btns = o.traces.map(button); }
+      if (mode) run(cur, true); else btns.forEach(function (b, j) { b.setAttribute("aria-pressed", j === cur ? "true" : "false"); });
+    }
     if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(box)) build(); }).observe(box);
     setTimeout(build, 0);
-    return { build: build, run: run };
+    return { build: build, run: run, update: update };
   };
 })();
 
@@ -2890,13 +2909,13 @@
 })();
 
 /* frontier.js — LX.Frontier: cost against emissions. The frontier (the cheapest plan at each CO₂ level) as a line with the
-   region below it shaded "out of reach", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
+   region below it shaded "out of reach (approximately)", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
    line for a weighted sum (cost + price × CO₂); lessons 12 and 13.
    var fc = LX.Frontier(host, {
      label: "Cost per year against CO₂ per year",   the chart's spoken name
      xMax: 850,  yMin: 90,  yMax: 200,              CO₂ axis end (kt); cost axis start and its lowest top ($M; the top
                                                     grows to fit the points)
-     xLabel: "CO₂ per year, kt (thousand tonnes)", yLabel: "Cost per year", shadeLabel: "out of reach",
+     xLabel: "CO₂ per year, kt (thousand tonnes)", yLabel: "Cost per year", shadeLabel: "out of reach (approximately)",
      frontierLabel: "Frontier: the cheapest plan at each CO₂",     the legend's default name of the line
      priceLabel: function (p) { return "Equal score at $" + Math.round(p) + "/t"; },
      fmtX: function (t) { return "530 kt"; }, fmtY: function (usd) { return "$131.4M"; },   text version and spoken labels
@@ -2968,7 +2987,7 @@
         S("path", { d: d + "L" + X(fr[fr.length - 1].co2).toFixed(1) + "," + (HH - mb) + "L" + X(fr[0].co2).toFixed(1) + "," + (HH - mb) + "Z", fill: "var(--lx-surface-3)", opacity: ".55" }, gF);
         S("path", { d: d, fill: "none", stroke: "var(--lx-ink)", "stroke-width": 2.2 }, gF);
         var mid = fr[Math.floor(fr.length * 0.55)];
-        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = o.shadeLabel || "out of reach";
+        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = o.shadeLabel || "out of reach (approximately)";   // straight lines join solved points: the true edge may sag below
         fr.forEach(function (p) { if (p.solved) S("circle", { cx: X(p.co2), cy: Y(p.cost), r: 3.5, fill: "var(--lx-ink)" }, gF); });
         var s1 = H("span", null, leg); H("i", { style: "--c:var(--lx-ink);height:3px" }, s1); H("span", { text: st.frLabel || o.frontierLabel || "Frontier: the cheapest plan at each CO₂" }, s1);
       }
@@ -3935,7 +3954,8 @@
      symbols: { cf: { sym: "CF",                       the button's html (parts rows)
                       name: "Capacity factor",         the panel's heading and the button's spoken name
                       label: "C F",                    spoken name instead of `name` (optional)
-                      unit: "%",                       shown after the name: "Capacity factor (%)"
+                      unit: "%",                       shown after the name: "Capacity factor (%)", in the panel and
+                                                       in the text version
                       color: "var(--lx-tier-1)",       a colour bar under the button (optional)
                       words: "One or two sentences.",  what it means (alias: text)
                       you: "..." | function () {},     and any key named in `fields`: the lines under the words
@@ -4016,7 +4036,7 @@
         var v = val(s[f.key]); if (v == null || v === "") return;
         t += " " + LX.esc(f.alt === true ? f.label : f.alt) + ": " + LX.rich(stop(String(v)));
       });
-      H("li", { html: "<b>" + LX.esc(s.name) + "</b>: " + t }, ul);
+      H("li", { html: "<b>" + LX.esc(s.name) + (s.unit ? " (" + LX.esc(s.unit) + ")" : "") + "</b>: " + t }, ul);   // name (unit), as the panel
     });
 
     function select(k) {
@@ -4716,7 +4736,8 @@
        { op: "÷ 8,760 h =" }, { v: "74.1 GW", u: "average power", out: true }] });
    uc.set(steps)   redraws the chain (for a slider or a choice that changes a number)
    Steps: { v, u } a value and what it is (unit words); { op } the operation between two values; out: true marks the result.
-   Returns { el (the <ol>), set(steps) }. The chain is an ordered list, so it reads as text; it wraps on phones.
+   Returns { el (the <ol class="lx-uchain">), set(steps) }. The chain is an ordered list, so it reads as text; it wraps on
+   phones. (Not .lx-chain: that class is the causal chain's, causal.js.)
 
    var ck = LX.EvidenceClock(host, { label: "Timeline: ...", marks: [
        { d: 0, label: "Blackout", value: "28 Apr 2025" },
@@ -4734,7 +4755,7 @@
 
   LX.UnitChain = function (host, o) {
     o = o || {};
-    var ol = H("ol", { class: "lx-chain", "aria-label": o.label || "Unit chain" }, host);
+    var ol = H("ol", { class: "lx-uchain", "aria-label": o.label || "Unit chain" }, host);
     function set(steps) {
       ol.innerHTML = "";
       (steps || []).forEach(function (s) {
@@ -4781,11 +4802,12 @@
                rule: { auto: 7, autoProficient: 5, autoStrong: 6, autoDeveloping: 3 (default 3), criteria: ["units", ...],
                        levels: ["Not yet", "Developing", "Proficient", "Strong"] },
                tasks: [{ id, kind, title, lesson (draws on), skill, prompt, solution (one or two sentences), ... }] }
+               solution, points and choice feedback (why) take [[glossary-id|words]] marks; prompts stay plain (no hints)
      kinds   "choice"      options: [[value, text]], answer, why: {value: feedback}, chart (optional: drawn by o.chart)
              "order"       items: [[key, text]] in the right order; start: [keys], the shuffled start (↑ ↓ buttons)
              "numeric"     units: [[name, factor to MWh]] (0 or null: a unit of power, flagged as such); answer: {mwh, tol}
              "open-short"  points: [the sentences a full answer makes]; after submitting, the reader ticks the points made
-             "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high, unit and
+             "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high (above the low), unit and
                            three short texts (inputs and steps, the main uncertainty, a check); then a self-rating per rubric
                            criterion. The worked-solution section of the page opens on submit.
    Options:
@@ -4795,7 +4817,8 @@
      lessonId    marked complete (LX.progress.done) when the level is Proficient or Strong
      intro       the overview card's sentences (default: a generic three)
      rubric      selector of the rubric table: <tr data-c="criterion id"><th>name</th><td>Not yet</td>...<td>Strong</td></tr>
-     lock        selector of the box shown until the estimate is submitted; its <button> opens the solution early (recorded)
+     lock        selector of the box shown until the estimate is submitted; its <button> opens the solution early (recorded),
+                 as does the estimate task's own "Show the worked solution now"; "Start again" shuts it again
      solution    selector of the worked-solution block; give it class lx-ck-gated in the page, so it stays shut with
                  JavaScript until opened (without JavaScript it shows)
      chart       function (task, body): draws a chart task's chart (LX.Checkpoint.lineChart helps)
@@ -4831,9 +4854,10 @@
     return { right: rel <= a.tol, mwh: mwh, rel: rel,
       msg: rel <= a.tol ? "Right: about " + Math.round(a.mwh / 1000) + " GWh." : mwh > a.mwh * 2.5 ? "Too high. Did every hour count at full output?" : mwh < a.mwh / 2.5 ? "Too low. Check the hours in a year and the units." : "Close, but more than 10% off. Recheck the multiplication." };
   }
-  // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year)
+  // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year). A range needs
+  // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet.
   function checkEstimate(t, low, high, unit) {
-    var f = unitFactor(t, unit), out = { unitsOk: f > 0, ordered: low > 0 && high >= low };
+    var f = unitFactor(t, unit), out = { unitsOk: f > 0, ordered: low > 0 && high > low };
     if (f === null) out.unitMsg = unit + " is a unit of power. Electricity used over a year is energy: kWh, MWh or GWh per year.";
     else if (!(f > 0)) out.unitMsg = "Choose a unit.";
     else out.unitMsg = "Energy per year: the right kind of unit.";
@@ -4844,7 +4868,9 @@
       else if (hi < R[0]) out.rangeMsg = "Your range lies below the worked solution's, by about " + Math.round(R[0] / hi) + " times at its closest. Compare your inputs with its two routes.";
       else out.rangeMsg = "Your range lies above the worked solution's, by about " + Math.round(lo / R[1]) + " times at its closest. Compare your inputs with its two routes.";
       if (out.width > 10) out.rangeMsg += " Your high is more than ten times your low: narrow it with a stated input.";
-    } else if (!out.ordered) out.rangeMsg = "Give a low and a high value, with the low no larger than the high.";
+    } else if (!out.ordered) out.rangeMsg = low > 0 && high === low
+      ? "Your low and high are the same number, so they show no range. Give a high above your low that brackets your uncertainty."
+      : "Give a low and a high value, with the high above the low.";
     return out;
   }
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
@@ -4989,7 +5015,7 @@
     }
     function reset() {
       if (!window.confirm("Clear your " + code + " answers and times in this browser?")) return;
-      st = fresh(); save(); intro();
+      st = fresh(); save(); lockSolution(); intro();
     }
     function show(i) {
       st.cur = i; save(); wrap.innerHTML = "";
@@ -5005,7 +5031,7 @@
       E("summary", { text: "Worked solution" }, sol);
       solution(t, sol);
       var early = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
-        onclick: function () { rec(t.id).solFirst = true; save(); sol.hidden = false; sol.open = true; early.hidden = true; } }, c);
+        onclick: function () { rec(t.id).solFirst = true; save(); sol.hidden = false; sol.open = true; early.hidden = true; if (t === esT) openSolution(); } }, c);
       function unlock() { sol.hidden = false; early.hidden = true; }
       ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
       var foot = E("div", { class: "lx-ck-foot" }, c);
@@ -5020,8 +5046,8 @@
     function feedback(fb, ok, html) { fb.innerHTML = ""; E("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + html + "</div>" }, fb); }
     function solution(t, sol) {
       if (t.kind === "estimate") { E("p", { html: o.estimateNote || "The worked solution and the marking guide are in the <a href=\"#solution\">Worked solution</a> section below; it opens when you submit." }, sol); return; }
-      E("p", { text: t.solution }, sol);
-      if (t.kind === "open-short") { var ul = E("ul", { class: "lx-ck-solpts" }, sol); t.points.forEach(function (p) { E("li", { text: p }, ul); }); }
+      E("p", { html: LX.rich(t.solution) }, sol);   // [[glossary-id|words]] marks work here (shown only after answering or on request)
+      if (t.kind === "open-short") { var ul = E("ul", { class: "lx-ck-solpts" }, sol); t.points.forEach(function (p) { E("li", { html: LX.rich(p) }, ul); }); }
     }
     function choice(t, body, fb, unlock) {
       if (t.chart && o.chart) o.chart(t, body);
@@ -5031,7 +5057,7 @@
           var res = cChoice(t, op[0]);
           answered(t.id, res.right, op[0]);
           Object.keys(btns).forEach(function (k) { btns[k].setAttribute("aria-pressed", k === op[0] ? "true" : "false"); btns[k].classList.toggle("right", res.right && k === op[0]); btns[k].classList.toggle("wrong", !res.right && k === op[0]); });
-          feedback(fb, res.right, LX.esc(res.why) + (res.right ? "" : " Try again, or open the worked solution."));
+          feedback(fb, res.right, LX.rich(res.why) + (res.right ? "" : " Try again, or open the worked solution."));
           unlock();
         } }, box);
       });
@@ -5092,7 +5118,7 @@
       E("p", { class: "lx-hint", text: "Compare with the worked solution, then tick each point your answer makes." }, self);
       var ul = E("ul", { class: "lx-ck-points" }, self), boxes = t.points.map(function (p, k) {
         var lab = E("label", null, E("li", null, ul)), cb = E("input", { type: "checkbox" }, lab); cb.checked = !!(r.points && r.points[k]);
-        E("span", { text: p }, lab);
+        E("span", { html: LX.rich(p) }, lab);
         cb.addEventListener("change", function () { var rr = rec(t.id); rr.points = boxes.map(function (b) { return b.checked; }); rr.first = rr.points.every(Boolean); save(); });
         return cb;
       });
@@ -5124,6 +5150,8 @@
         if (!sel.value || !(lo > 0) || !(hi > 0)) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div>Give a low and a high value and choose a unit.</div>" }, fb); return; }
         var ans = { low: lo, high: hi, unit: sel.value, reasoning: F.reasoning.value.trim(), uncertainty: F.uncertainty.value.trim(), check: F.check.value.trim() };
         var chk = cEst(t, lo, hi, sel.value);
+        // a range needs its high above its low: say why and wait (not recorded as an answer, like an empty field)
+        if (!chk.ordered) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb); return; }
         answered(t.id, chk.unitsOk && chk.ordered && !!chk.overlaps, ans, { check: chk });
         fb.innerHTML = "";
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
@@ -5151,6 +5179,11 @@
     function openSolution() {
       var lock = q(o.lock), body = q(o.solution);
       if (lock) lock.hidden = true; if (body) body.classList.add("is-open");
+    }
+    // "Start again": the page's worked solution shuts again until the new attempt's estimate is submitted (or opened early)
+    function lockSolution() {
+      var lock = q(o.lock), body = q(o.solution);
+      if (lock && body) { lock.hidden = false; body.classList.remove("is-open"); }
     }
     function results() {
       stopClock();
@@ -5397,6 +5430,8 @@
         b.classList.toggle("err", !!isErr(v)); b.classList.toggle("sel", n === sel); b.classList.toggle("todo", !!todo[n]);
         b.setAttribute("aria-label", n + ": " + (txt || "empty") + (isF ? ", formula " + raw : ""));
       });
+      // a typed formula (Enter, or set()) can make the selected cell fillable: refresh the button with the grid
+      if (fill) fill.disabled = !canFill(sel);
     }
     function canFill(n) {
       if (!fr) return false;

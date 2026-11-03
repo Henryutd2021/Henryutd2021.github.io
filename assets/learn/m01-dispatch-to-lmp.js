@@ -505,20 +505,19 @@
           hp = HourPicker(right, { start: L.noon, onChange: function () { show(); } });
           // limits drawn from the accepted result (Bcur.limit), never from the slider, so flows and limits always match
           function show() { if (!Bcur) return; var t = hp.val(); net.set({ h: Bcur.hours[t], lim: limits(D, oB(Bcur.limit)) }); ch.set({ day: Bcur, sel: t }); }
-          // Next waits while a newer solve is running (the step cards' own lock opens it once the line has filled)
-          var nx = api.card.querySelector(".lx-step-foot .lx-btn:not(.ghost)"), unlocked = !!nx && !nx.disabled, req = 0;
-          function busy(on) { if (nx) nx.disabled = on || !unlocked; }
+          // Next waits while a newer solve is running (api.busy); the step cards' own lock opens it once the line has filled
+          var req = 0;
           function run(v) {
-            var my = ++req; bLimit = v; st.set("solving"); busy(true);
+            var my = ++req; bLimit = v; st.set("solving"); api.busy(true);
             solve(oB(v), "m1-limit").then(function (x) {
               if (my !== req) return;                    // an older request finished after a newer one began: drop it
               if (x.r.status === "superseded" || x.r.status === "cancelled") return;
-              st.set(x.r); busy(false); if (!x.day.ok) return;
+              st.set(x.r); api.busy(false); if (!x.day.ok) return;
               Bcur = x.day; Bcur._r = x.r; show();
               var nh = Bcur.hours[L.noon];
               if (nh.full[L.slider.line]) {
                 var fh = fullHours(Bcur, L.slider.line);
-                remember("limit", v); api.done(); unlocked = true; busy(false);
+                remember("limit", v); api.done();
                 api.saw("At " + v + " MW the line is full from " + hh(fh[0]) + " to " + hh(fh[fh.length - 1]) + ". At noon: Ridge " + money(nh.price.R) + ", Gas Hub " + money(nh.price.G) + ", Town " + money(nh.price.T) + " per MWh. One price has become three.");
               } else api.saw("At " + v + " MW the line still has room at noon (" + Math.round(nh.flow.RT) + " MW): one price, " + money(nh.price.T) + ". Keep lowering.", true);
             });

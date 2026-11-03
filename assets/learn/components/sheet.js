@@ -187,6 +187,8 @@
         b.classList.toggle("err", !!isErr(v)); b.classList.toggle("sel", n === sel); b.classList.toggle("todo", !!todo[n]);
         b.setAttribute("aria-label", n + ": " + (txt || "empty") + (isF ? ", formula " + raw : ""));
       });
+      // a typed formula (Enter, or set()) can make the selected cell fillable: refresh the button with the grid
+      if (fill) fill.disabled = !canFill(sel);
     }
     function canFill(n) {
       if (!fr) return false;

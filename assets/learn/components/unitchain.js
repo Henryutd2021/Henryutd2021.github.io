@@ -6,7 +6,8 @@
        { op: "÷ 8,760 h =" }, { v: "74.1 GW", u: "average power", out: true }] });
    uc.set(steps)   redraws the chain (for a slider or a choice that changes a number)
    Steps: { v, u } a value and what it is (unit words); { op } the operation between two values; out: true marks the result.
-   Returns { el (the <ol>), set(steps) }. The chain is an ordered list, so it reads as text; it wraps on phones.
+   Returns { el (the <ol class="lx-uchain">), set(steps) }. The chain is an ordered list, so it reads as text; it wraps on
+   phones. (Not .lx-chain: that class is the causal chain's, causal.js.)
 
    var ck = LX.EvidenceClock(host, { label: "Timeline: ...", marks: [
        { d: 0, label: "Blackout", value: "28 Apr 2025" },
@@ -24,7 +25,7 @@
 
   LX.UnitChain = function (host, o) {
     o = o || {};
-    var ol = H("ol", { class: "lx-chain", "aria-label": o.label || "Unit chain" }, host);
+    var ol = H("ol", { class: "lx-uchain", "aria-label": o.label || "Unit chain" }, host);
     function set(steps) {
       ol.innerHTML = "";
       (steps || []).forEach(function (s) {

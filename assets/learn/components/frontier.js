@@ -1,11 +1,11 @@
 /* frontier.js — LX.Frontier: cost against emissions. The frontier (the cheapest plan at each CO₂ level) as a line with the
-   region below it shaded "out of reach", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
+   region below it shaded "out of reach (approximately)", labelled plan dots that can be picked by mouse or keyboard, and an equal-score
    line for a weighted sum (cost + price × CO₂); lessons 12 and 13.
    var fc = LX.Frontier(host, {
      label: "Cost per year against CO₂ per year",   the chart's spoken name
      xMax: 850,  yMin: 90,  yMax: 200,              CO₂ axis end (kt); cost axis start and its lowest top ($M; the top
                                                     grows to fit the points)
-     xLabel: "CO₂ per year, kt (thousand tonnes)", yLabel: "Cost per year", shadeLabel: "out of reach",
+     xLabel: "CO₂ per year, kt (thousand tonnes)", yLabel: "Cost per year", shadeLabel: "out of reach (approximately)",
      frontierLabel: "Frontier: the cheapest plan at each CO₂",     the legend's default name of the line
      priceLabel: function (p) { return "Equal score at $" + Math.round(p) + "/t"; },
      fmtX: function (t) { return "530 kt"; }, fmtY: function (usd) { return "$131.4M"; },   text version and spoken labels
@@ -77,7 +77,7 @@
         S("path", { d: d + "L" + X(fr[fr.length - 1].co2).toFixed(1) + "," + (HH - mb) + "L" + X(fr[0].co2).toFixed(1) + "," + (HH - mb) + "Z", fill: "var(--lx-surface-3)", opacity: ".55" }, gF);
         S("path", { d: d, fill: "none", stroke: "var(--lx-ink)", "stroke-width": 2.2 }, gF);
         var mid = fr[Math.floor(fr.length * 0.55)];
-        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = o.shadeLabel || "out of reach";
+        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = o.shadeLabel || "out of reach (approximately)";   // straight lines join solved points: the true edge may sag below
         fr.forEach(function (p) { if (p.solved) S("circle", { cx: X(p.co2), cy: Y(p.cost), r: 3.5, fill: "var(--lx-ink)" }, gF); });
         var s1 = H("span", null, leg); H("i", { style: "--c:var(--lx-ink);height:3px" }, s1); H("span", { text: st.frLabel || o.frontierLabel || "Frontier: the cheapest plan at each CO₂" }, s1);
       }

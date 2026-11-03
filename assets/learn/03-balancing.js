@@ -395,7 +395,7 @@
       else p.push("q2", "ops", "agc", "end");
       return { path: p, st: st };
     }
-    // the "Your settings" trace follows the reader's case: rebuilt on every change (l3-change), replayed if it is selected
+    // the "Your settings" trace follows the reader's case: rebuilt on every change (l3-change), shown through fc.update
     var b = pathFor(G.inertia.start, 30), traces = [{ label: "Your settings", path: [], text: "" }];
     function mineTrace() {
       var mine = LX.store.get("l3-case", null) || { inertia: G.inertia.start, reserve: G.reserve.start }, a = pathFor(mine.inertia, mine.reserve);
@@ -426,11 +426,7 @@
               ["q2", "agc", "yes"], ["q2", "ops", "no"], ["ops", "agc", null, { v: true }], ["agc", "end"]],
       traces: traces, sel: 0
     });
-    LX.on("l3-change", function () {
-      mineTrace();
-      var first = c2.querySelector(".lx-ftrace button");
-      if (first && first.getAttribute("aria-pressed") === "true") fc.run(0, true);
-    });
+    LX.on("l3-change", function () { mineTrace(); fc.update(traces); });   // the selected trace shows its new path and text
     var L = D.layers;
     LX.CompareTable(c3, {
       title: "Four layers of defence",

@@ -11,11 +11,12 @@
                rule: { auto: 7, autoProficient: 5, autoStrong: 6, autoDeveloping: 3 (default 3), criteria: ["units", ...],
                        levels: ["Not yet", "Developing", "Proficient", "Strong"] },
                tasks: [{ id, kind, title, lesson (draws on), skill, prompt, solution (one or two sentences), ... }] }
+               solution, points and choice feedback (why) take [[glossary-id|words]] marks; prompts stay plain (no hints)
      kinds   "choice"      options: [[value, text]], answer, why: {value: feedback}, chart (optional: drawn by o.chart)
              "order"       items: [[key, text]] in the right order; start: [keys], the shuffled start (↑ ↓ buttons)
              "numeric"     units: [[name, factor to MWh]] (0 or null: a unit of power, flagged as such); answer: {mwh, tol}
              "open-short"  points: [the sentences a full answer makes]; after submitting, the reader ticks the points made
-             "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high, unit and
+             "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high (above the low), unit and
                            three short texts (inputs and steps, the main uncertainty, a check); then a self-rating per rubric
                            criterion. The worked-solution section of the page opens on submit.
    Options:
@@ -25,7 +26,8 @@
      lessonId    marked complete (LX.progress.done) when the level is Proficient or Strong
      intro       the overview card's sentences (default: a generic three)
      rubric      selector of the rubric table: <tr data-c="criterion id"><th>name</th><td>Not yet</td>...<td>Strong</td></tr>
-     lock        selector of the box shown until the estimate is submitted; its <button> opens the solution early (recorded)
+     lock        selector of the box shown until the estimate is submitted; its <button> opens the solution early (recorded),
+                 as does the estimate task's own "Show the worked solution now"; "Start again" shuts it again
      solution    selector of the worked-solution block; give it class lx-ck-gated in the page, so it stays shut with
                  JavaScript until opened (without JavaScript it shows)
      chart       function (task, body): draws a chart task's chart (LX.Checkpoint.lineChart helps)
@@ -61,9 +63,10 @@
     return { right: rel <= a.tol, mwh: mwh, rel: rel,
       msg: rel <= a.tol ? "Right: about " + Math.round(a.mwh / 1000) + " GWh." : mwh > a.mwh * 2.5 ? "Too high. Did every hour count at full output?" : mwh < a.mwh / 2.5 ? "Too low. Check the hours in a year and the units." : "Close, but more than 10% off. Recheck the multiplication." };
   }
-  // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year)
+  // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year). A range needs
+  // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet.
   function checkEstimate(t, low, high, unit) {
-    var f = unitFactor(t, unit), out = { unitsOk: f > 0, ordered: low > 0 && high >= low };
+    var f = unitFactor(t, unit), out = { unitsOk: f > 0, ordered: low > 0 && high > low };
     if (f === null) out.unitMsg = unit + " is a unit of power. Electricity used over a year is energy: kWh, MWh or GWh per year.";
     else if (!(f > 0)) out.unitMsg = "Choose a unit.";
     else out.unitMsg = "Energy per year: the right kind of unit.";
@@ -74,7 +77,9 @@
       else if (hi < R[0]) out.rangeMsg = "Your range lies below the worked solution's, by about " + Math.round(R[0] / hi) + " times at its closest. Compare your inputs with its two routes.";
       else out.rangeMsg = "Your range lies above the worked solution's, by about " + Math.round(lo / R[1]) + " times at its closest. Compare your inputs with its two routes.";
       if (out.width > 10) out.rangeMsg += " Your high is more than ten times your low: narrow it with a stated input.";
-    } else if (!out.ordered) out.rangeMsg = "Give a low and a high value, with the low no larger than the high.";
+    } else if (!out.ordered) out.rangeMsg = low > 0 && high === low
+      ? "Your low and high are the same number, so they show no range. Give a high above your low that brackets your uncertainty."
+      : "Give a low and a high value, with the high above the low.";
     return out;
   }
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
@@ -219,7 +224,7 @@
     }
     function reset() {
       if (!window.confirm("Clear your " + code + " answers and times in this browser?")) return;
-      st = fresh(); save(); intro();
+      st = fresh(); save(); lockSolution(); intro();
     }
     function show(i) {
       st.cur = i; save(); wrap.innerHTML = "";
@@ -235,7 +240,7 @@
       E("summary", { text: "Worked solution" }, sol);
       solution(t, sol);
       var early = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
-        onclick: function () { rec(t.id).solFirst = true; save(); sol.hidden = false; sol.open = true; early.hidden = true; } }, c);
+        onclick: function () { rec(t.id).solFirst = true; save(); sol.hidden = false; sol.open = true; early.hidden = true; if (t === esT) openSolution(); } }, c);
       function unlock() { sol.hidden = false; early.hidden = true; }
       ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
       var foot = E("div", { class: "lx-ck-foot" }, c);
@@ -250,8 +255,8 @@
     function feedback(fb, ok, html) { fb.innerHTML = ""; E("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Right." : "Not quite.") + "</b> " + html + "</div>" }, fb); }
     function solution(t, sol) {
       if (t.kind === "estimate") { E("p", { html: o.estimateNote || "The worked solution and the marking guide are in the <a href=\"#solution\">Worked solution</a> section below; it opens when you submit." }, sol); return; }
-      E("p", { text: t.solution }, sol);
-      if (t.kind === "open-short") { var ul = E("ul", { class: "lx-ck-solpts" }, sol); t.points.forEach(function (p) { E("li", { text: p }, ul); }); }
+      E("p", { html: LX.rich(t.solution) }, sol);   // [[glossary-id|words]] marks work here (shown only after answering or on request)
+      if (t.kind === "open-short") { var ul = E("ul", { class: "lx-ck-solpts" }, sol); t.points.forEach(function (p) { E("li", { html: LX.rich(p) }, ul); }); }
     }
     function choice(t, body, fb, unlock) {
       if (t.chart && o.chart) o.chart(t, body);
@@ -261,7 +266,7 @@
           var res = cChoice(t, op[0]);
           answered(t.id, res.right, op[0]);
           Object.keys(btns).forEach(function (k) { btns[k].setAttribute("aria-pressed", k === op[0] ? "true" : "false"); btns[k].classList.toggle("right", res.right && k === op[0]); btns[k].classList.toggle("wrong", !res.right && k === op[0]); });
-          feedback(fb, res.right, LX.esc(res.why) + (res.right ? "" : " Try again, or open the worked solution."));
+          feedback(fb, res.right, LX.rich(res.why) + (res.right ? "" : " Try again, or open the worked solution."));
           unlock();
         } }, box);
       });
@@ -322,7 +327,7 @@
       E("p", { class: "lx-hint", text: "Compare with the worked solution, then tick each point your answer makes." }, self);
       var ul = E("ul", { class: "lx-ck-points" }, self), boxes = t.points.map(function (p, k) {
         var lab = E("label", null, E("li", null, ul)), cb = E("input", { type: "checkbox" }, lab); cb.checked = !!(r.points && r.points[k]);
-        E("span", { text: p }, lab);
+        E("span", { html: LX.rich(p) }, lab);
         cb.addEventListener("change", function () { var rr = rec(t.id); rr.points = boxes.map(function (b) { return b.checked; }); rr.first = rr.points.every(Boolean); save(); });
         return cb;
       });
@@ -354,6 +359,8 @@
         if (!sel.value || !(lo > 0) || !(hi > 0)) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div>Give a low and a high value and choose a unit.</div>" }, fb); return; }
         var ans = { low: lo, high: hi, unit: sel.value, reasoning: F.reasoning.value.trim(), uncertainty: F.uncertainty.value.trim(), check: F.check.value.trim() };
         var chk = cEst(t, lo, hi, sel.value);
+        // a range needs its high above its low: say why and wait (not recorded as an answer, like an empty field)
+        if (!chk.ordered) { fb.innerHTML = ""; E("div", { class: "lx-saw no", html: LX.icon("question") + "<div><b>Range.</b> " + LX.esc(chk.rangeMsg) + "</div>" }, fb); return; }
         answered(t.id, chk.unitsOk && chk.ordered && !!chk.overlaps, ans, { check: chk });
         fb.innerHTML = "";
         E("div", { class: "lx-saw" + (chk.unitsOk ? "" : " no"), html: LX.icon(chk.unitsOk ? "check" : "question") + "<div><b>Units.</b> " + LX.esc(chk.unitMsg) + "</div>" }, fb);
@@ -381,6 +388,11 @@
     function openSolution() {
       var lock = q(o.lock), body = q(o.solution);
       if (lock) lock.hidden = true; if (body) body.classList.add("is-open");
+    }
+    // "Start again": the page's worked solution shuts again until the new attempt's estimate is submitted (or opened early)
+    function lockSolution() {
+      var lock = q(o.lock), body = q(o.solution);
+      if (lock && body) { lock.hidden = false; body.classList.remove("is-open"); }
     }
     function results() {
       stopClock();

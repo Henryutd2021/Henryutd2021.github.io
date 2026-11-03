@@ -19,7 +19,8 @@
      symbols: { cf: { sym: "CF",                       the button's html (parts rows)
                       name: "Capacity factor",         the panel's heading and the button's spoken name
                       label: "C F",                    spoken name instead of `name` (optional)
-                      unit: "%",                       shown after the name: "Capacity factor (%)"
+                      unit: "%",                       shown after the name: "Capacity factor (%)", in the panel and
+                                                       in the text version
                       color: "var(--lx-tier-1)",       a colour bar under the button (optional)
                       words: "One or two sentences.",  what it means (alias: text)
                       you: "..." | function () {},     and any key named in `fields`: the lines under the words
@@ -100,7 +101,7 @@
         var v = val(s[f.key]); if (v == null || v === "") return;
         t += " " + LX.esc(f.alt === true ? f.label : f.alt) + ": " + LX.rich(stop(String(v)));
       });
-      H("li", { html: "<b>" + LX.esc(s.name) + "</b>: " + t }, ul);
+      H("li", { html: "<b>" + LX.esc(s.name) + (s.unit ? " (" + LX.esc(s.unit) + ")" : "") + "</b>: " + t }, ul);   // name (unit), as the panel
     });
 
     function select(k) {

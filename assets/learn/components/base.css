@@ -166,8 +166,9 @@ details.lx-textalt li { margin: 3px 0; }
   .lx-facts tr { padding: 8px 0; border-bottom: 1px solid var(--lx-line); }
   .lx-facts td { border: 0; padding: 1px 0; }
 }
-.lx-sources ul { margin: 6px 0 0; padding-left: 1.1rem; font-size: 14px; color: var(--lx-ink-2); }
-.lx-sources li { margin: 4px 0; }
+/* a numbered list in an "In the real world" card (.lx-real ol) looks like the sources list */
+.lx-sources ul, .lx-real ol { margin: 6px 0 0; padding-left: 1.1rem; font-size: 14px; color: var(--lx-ink-2); }
+.lx-sources li, .lx-real ol > li { margin: 4px 0; }
 .lx-corrections, .lx-license { font-size: 13px; color: var(--lx-ink-3); margin-top: .5rem !important; }
 .lx-foot { margin-top: 2.4rem; padding-top: 1rem; border-top: 1px solid var(--lx-line); }
 
@@ -188,5 +189,5 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-intro p { margin: 0; }
 .lx-landing-note { margin-top: 1.6rem; font-size: 13.5px; color: var(--lx-ink-3); max-width: 80ch; }
 .lx-landing-note p { margin: 0; }
-.lx-real p:not(.lx-eyebrow), .lx-sources ul { font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-real p:not(.lx-eyebrow), .lx-sources ul, .lx-real ol { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-card > .lx-eyebrow { margin-bottom: 6px; }
