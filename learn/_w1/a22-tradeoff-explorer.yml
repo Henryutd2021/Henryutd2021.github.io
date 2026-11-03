@@ -20,6 +20,9 @@ glossary:
   - id: multi-objective
     term: Multi-objective problem
     def: "A choice with several goals that cannot all be at their best at once."
+  - id: tariff
+    term: Tariff
+    def: "The rule for calculating electricity bills: fixed charges, prices per kWh, or both."
 requests:
   - "path.yml: A22's prerequisites are F2 and T12 (curriculum). F2 has no path.yml entry on learn-w2 yet, so the entry says after: [12]; add F2 to `after` when F2's entry lands."
   - "A22 uses the shared planning engine (components/planengine.js, LX.townPlan: prepareYear, selectWeeks, costs, fullYearModel, weekModel, periodsOf, summarize, ceilPlan, KEYS, and ui.TECH for slider labels and colours); merged with learn-w2 at 7a00f41, no 13-capstone.js tag."

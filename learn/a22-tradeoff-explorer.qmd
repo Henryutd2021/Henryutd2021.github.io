@@ -57,12 +57,14 @@ body-classes: "page-learn page-lesson lx-form-play"
 <tr><td>I · Deep clean</td><td data-l="Cheap">$220.7M</td><td data-l="Clean">27 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.6%</td><td data-l="Secure">3%</td><td data-l="Verdict">unbeaten</td></tr>
 </tbody>
 </table>
+<p class="lx-hint">Verdicts compare values as shown: two values that round to the same number count as a tie.</p>
 <p class="lx-hint">Fair assumes a fixed charge per home: each home pays an equal share of the plants' fixed costs, and running costs per kWh. Secure assumes all gas is piped in and none is stored.</p>
 <p class="lx-hint">Five illustrative sets of priorities pick three plans: Bills first picks A, Climate first and Supply first pick I, Lights first and Equal weights pick D.</p>
-<p class="lx-hint">With JavaScript on, you change the plan yourself, find the unbeaten plans, weigh the goals, switch definitions and ask a solver for a plan that meets your limits.</p>
+<p class="lx-hint">Limits of 200 kt CO₂, 25% gas and a 33% low-income share: no plan meets them on seven weeks of 2025 under a fixed charge per home. With the income-graduated charge the seven weeks meet them, but the full year emits 215 kt and leaves 33 MWh unserved.</p>
+<p class="lx-hint">With JavaScript on, you change the plan yourself, find the unbeaten plans, weigh the goals, switch definitions and ask a solver for a plan that meets your limits, then check it on the full year.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s linear program, each plan run hour by hour through 2025; plants never break down.<br><b>Data:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>); costs from EIA and NREL, dated in <a href="13-capstone.html#sources">lesson 13's sources</a>.<br><b>Homes:</b> the U.S. split by income from <a href="https://www.eia.gov/consumption/residential/data/2020/c&amp;e/pdf/ce2.1.pdf">EIA RECS 2020</a> (PDF).<br><b>Illustrative:</b> the plans, tariffs, priority weights and radar scales; Prairie Town is fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s linear program, each plan run hour by hour through 2025; plants never break down.<br><b>Data:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>); costs from EIA and NREL, held fixed at the values dated in <a href="13-capstone.html#sources">lesson 13's sources</a>.<br><b>Homes:</b> the U.S. split by income from <a href="https://www.eia.gov/consumption/residential/data/2020/c&amp;e/pdf/ce2.1.pdf">EIA RECS 2020</a> (PDF).<br><b>Illustrative:</b> the plans, tariffs, priority weights and radar scales; Prairie Town is fictional.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes. Practice, about 20 more: the practice set under Check.</p>
 ```
 :::
@@ -78,9 +80,9 @@ body-classes: "page-learn page-lesson lx-form-play"
 <dl class="lx-ideas">
 <dt>Five measures</dt><dd>One number per goal: cost, CO₂, unserved energy, the low-income share of home bills, the gas share.</dd>
 <dt>Definitions</dt><dd>Each measure is a choice of unit, boundary and formula; Fair and Secure most of all.</dd>
-<dt>Unbeaten plans</dt><dd>No other plan is at least as good on all five goals and better on one: 8 of the 9 plans here.</dd>
+<dt>Unbeaten plans</dt><dd>No other plan is at least as good on all five goals and better on one: 8 of the 9 plans here, comparing values as shown.</dd>
 <dt>Weights</dt><dd>How much each goal counts; people set them, and different weights pick different plans.</dd>
-<dt>Limits</dt><dd>Caps on some goals; the solver finds the cheapest plan that meets them, or reports that none exists.</dd>
+<dt>Limits</dt><dd>Caps on some goals; the solver finds the cheapest plan that meets them on seven weeks, or reports that none exists. The full year then checks it.</dd>
 <dt>Who decides, who pays</dt><dd>Households and businesses pay through the tariff; a regulator or council approves; people downwind bear harm outside the cost.</dd>
 </dl>
 </div>
@@ -97,6 +99,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 <li><b>Equal weights carry a price.</b> One spoke of cost ($150M) counts as much as one spoke of CO₂ (850 kt): about $176 a tonne, set by the scales, not by anyone's judgement of harm (<a href="12-trade-offs.html">lesson 12</a>: weights carry units).</li>
 <li><b>Squeezed spokes.</b> Under a fixed charge per home, every plan's low-income share lies between 31.3% and 34.6%, so Fair scores span only 0.03 to 0.25: a weight on Fair barely moves a pick.</li>
 <li><b>Shape, not area.</b> Reordering the spokes changes a polygon's area; compare plans spoke by spoke.</li>
+<li><b>Ties as shown.</b> Verdicts treat values that round to the same shown number as equal. Under the income-graduated charge, C's share (21.61%) and D's (21.64%) both show 21.6%, so D beats C; at full precision, C is unbeaten.</li>
 </ul>
 </div>
 </details>
@@ -104,8 +107,11 @@ body-classes: "page-learn page-lesson lx-form-play"
 <summary><span class="k">Go deeper · Analyst</span>Other ways to measure fairness, security and reliability</summary>
 <div class="lx-deeper-body">
 <ul>
-<li><b>Fairness as burden.</b> <span class="lx-term" data-term="energy-burden">Energy burden</span> is the share of income spent on energy. DOE's LEAD tool puts it at about 6% for low-income U.S. households and 2% for others (2018–2022 data). It needs incomes and whole bills, which this town model does not have.</li>
-<li><b>Security as diversity.</b> Indices such as Shannon's or the Herfindahl index weigh every source's share, not only the largest; Stirling (2010) adds how different the sources are.</li>
+<li><b>Fairness as burden.</b> <span class="lx-term" data-term="energy-burden">Energy burden</span> is the share of income spent on home energy: electricity, gas and other fuels, not transport.</li>
+<li><b>DOE's numbers.</b> DOE's LEAD tool puts it at about 6% for low-income U.S. households and 2% for others (2018–2022 data). DOE uses a different definition here: income up to 80% of the local median.</li>
+<li><b>Not in this model.</b> Burden needs incomes and whole bills, which this town model does not have.</li>
+<li><b>Security as diversity.</b> A supply is concentrated when one source makes most of it, and diverse when many sources make similar shares.</li>
+<li><b>Diversity indices.</b> Shannon's and the Herfindahl index turn every source's share into one number; the Herfindahl index is the sum of the squared shares, 1 when one source makes everything. Stirling (2010) adds how different the sources are.</li>
 <li><b>Reliability over many years.</b> Loss-of-load expectation counts shortfall hours over many weather years with random plant failures (A5, upcoming).</li>
 </ul>
 <p>Reviews of energy decisions with several criteria (Wang and co-authors, 2009) find cost, emissions, reliability and social measures in most studies, each defined in many ways.</p>
@@ -116,21 +122,23 @@ body-classes: "page-learn page-lesson lx-form-play"
 <div class="lx-deeper-body">
 ```
 
-Write each goal as a number to make small, $f_k(x)$ for $k = 1, \dots, 5$ (a [reserve margin]{.lx-term term="reserve-margin"} enters as its negative).
+Write each goal as a number to make small, $f_k(x)$ for $k = 1, \dots, 5$. The lesson's tools, in words:
 
-- **Dominance.** Plan $x$ beats plan $y$ when $f_k(x) \le f_k(y)$ for every $k$ and $f_k(x) < f_k(y)$ for at least one. Adding a goal never takes a plan off the unbeaten list.
-- **Weighted sum.** Each score is $s_k(x) = (W_k - f_k(x)) / (W_k - B_k)$, clipped to $[0, 1]$, with $B_k$ and $W_k$ the rim and centre of the scale; the pick maximises $\sum_k w_k s_k(x)$. With every $w_k > 0$ the pick is unbeaten; not every unbeaten plan is picked by some weights (lesson 12's dents).
-- **Limits** (the [epsilon-constraint]{.lx-term term="epsilon-constraint"} method with three limits). Minimise cost $F(x) + V(x)$, fixed plus running, subject to CO₂ $\le \varepsilon_1$, gas $\le \varepsilon_2 \times$ the electricity used, and a low-income share $\le s$.
+- **Dominance.** Plan $x$ beats plan $y$ when $f_k(x) \le f_k(y)$ for every $k$ and $f_k(x) < f_k(y)$ for at least one.
+- **Adding a goal.** It can rescue a beaten plan. It can beat a plan that was unbeaten only if another plan tied that plan on every earlier goal.
+- **Weighted sum.** Each goal gets a score on its scale and a weight; the pick has the highest weighted total. With every weight above zero, the pick is unbeaten.
+- **Clipping.** A value beyond its scale's end scores the same as that end, which can hide a difference, so the page weighs only the unbeaten plans.
+- **Limits.** Step 7 asks for the cheapest plan with caps on CO₂, the gas share and the low-income share: the [epsilon-constraint]{.lx-term term="epsilon-constraint"} method, then a check on the full year.
 
-The share is a ratio, but its limit is linear. With $a$ the low-income homes' share of the fixed charges and $u = 29.6\%$ their share of use:
+The low-income share, worked out for a plan whose fixed costs are 95% of its cost:
 
-$$\frac{a\,F + u\,V}{F + V} \le s \quad\Longleftrightarrow\quad (a - s)\,F + (u - s)\,V \le 0.$$
-
-| Tariff | $a$ | Low-income share for a plan whose fixed costs are a fraction $\phi$ of its cost |
+| Tariff | Low-income homes pay | Their share of home bills |
 |---|---|---|
-| Fixed charge per home | 34.7% (their share of homes) | $34.7\%\,\phi + 29.6\%\,(1-\phi)$ |
-| Income-graduated (half the charge) | 21.0% | $21.0\%\,\phi + 29.6\%\,(1-\phi)$ |
-| Per kWh only | 29.6% | 29.6% for every plan |
+| Fixed charge per home | 34.7% of the fixed costs, 29.6% of the running costs | 34.7% × 0.95 + 29.6% × 0.05 = 34.4% |
+| Income-graduated (half the charge) | 21.0% of the fixed costs, 29.6% of the running costs | 21.0% × 0.95 + 29.6% × 0.05 = 21.4% |
+| Per kWh only | 29.6% of every cost | 29.6% |
+
+Same plan, same costs: the tariff alone moves the share by 13.0 points.
 
 Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) and M12 (a city model with screening fairness outputs).
 
@@ -153,10 +161,10 @@ Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) a
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Myth. Here the cheapest plan (A) emits the most, and the cleanest (I) costs more than twice as much; no plan is best on all five.</p></details>
 </div>
-<div class="lx-qq" data-id="knockout" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “Adding a goal can knock a plan off the unbeaten list.”</p>
+<div class="lx-qq" data-id="rescue" data-answer="fact">
+<p class="lx-qtext">Myth or fact? “Adding a goal can turn a beaten plan into an unbeaten one.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A new goal can only rescue plans: 4 plans beaten on cost and CO₂ alone are unbeaten on all five.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. Here 4 plans beaten on cost and CO₂ alone are unbeaten on all five. The reverse needs a tie: a new goal can beat an unbeaten plan only if another plan matched it on every earlier goal.</p></details>
 </div>
 <div class="lx-qq" data-id="measured" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A fairness score is measured, just as CO₂ is.”</p>
@@ -169,10 +177,23 @@ Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) a
 <div class="lx-qq" data-id="cd" data-answer="a">
 <p class="lx-qtext">Plans C and D differ only by 80 MW of gas peakers, which never ran in 2025. Which measure can tell them apart in C's favour?</p>
 <ul class="lx-choices"><li data-value="a">A reserve margin</li><li data-value="b">Unserved energy</li><li data-value="c">CO₂ a year</li><li data-value="d">The gas share</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>A reserve margin: it counts capacity at the peak, 88% for C against 70% for D. The other three see the same year for both.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>A <span class="lx-term" data-term="reserve-margin">reserve margin</span>: it counts capacity at the peak, 88% for C against 70% for D. The other three see the same year for both.</p></details>
 </div>
 </div>
-<div id="a22-practice"></div>
+<div id="a22-practice">
+<div class="lx-fallback">
+<p class="lx-eyebrow">Practice · about 20 minutes on your own</p>
+<p class="lx-hint">Use the nine plans' table at the top (a fixed charge per home; Reliable as unserved energy, Secure as the gas share).</p>
+<ol class="lx-fb-practice">
+<li><p><b>Is plan B beaten?</b> H costs less than B ($116.2M against $119.5M) and emits less (424 kt against 521 kt).</p><details class="lx-answer"><summary>Answer</summary><p>Unbeaten: H leaves 1,605 MWh unserved and B none, so no plan matches B on all five.</p></details></li>
+<li><p><b>Which plan beats plan C?</b></p><details class="lx-answer"><summary>Answer</summary><p>D: it costs $5.9M less and is the same on the other four goals.</p></details></li>
+<li><p><b>Measure Reliable by the reserve margin: is C still beaten?</b> C's margin is 88%, D's 70%.</p><details class="lx-answer"><summary>Answer</summary><p>No: C is now better on one goal, so D no longer beats it.</p></details></li>
+<li><p><b>Plan D's total under equal weights.</b> Its scores: Cheap 0.63, Clean 0.83, Reliable 1.00, Fair 0.05, Secure 0.82.</p><details class="lx-answer"><summary>Answer</summary><p>0.666, the average of the five: the highest of the nine, so Equal weights picks D.</p></details></li>
+<li><p><b>Give weights that pick plan D, not plan A.</b> Bills first (cost 40, clean 5, reliable 20, fair 30, secure 5) picks A.</p><details class="lx-answer"><summary>Answer</summary><p>For example cost 30, clean 30, reliable 20, fair 10, secure 10: D wins. Someone else's weights could still pick A.</p></details></li>
+<li><p><b>A plan's fixed costs are 60% of its cost.</b> What share of home bills do low-income homes pay with a fixed charge per home, and with the income-graduated charge (21.0% of the fixed charges)?</p><details class="lx-answer"><summary>Answer</summary><p>32.6% and 24.4%: the tariff alone moves the share by 8.2 points.</p></details></li>
+</ol>
+</div>
+</div>
 ```
 :::
 
@@ -189,7 +210,7 @@ Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) a
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">34.7% · 29.6%</td><td>U.S. homes with income under $40,000 in 2020: their share of homes, and of home electricity use.</td><td class="s"><a href="https://www.eia.gov/consumption/residential/data/2020/c&amp;e/pdf/ce2.1.pdf">EIA, RECS 2020, Table CE2.1</a> (PDF) · revised March 2024</td></tr>
-<tr><td class="n">6% · 2%</td><td>Average <span class="lx-term" data-term="energy-burden">energy burden</span> of low-income U.S. households, and of other households (2018–2022 data).</td><td class="s"><a href="https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool">U.S. DOE, LEAD tool</a> · checked 3 Nov 2026</td></tr>
+<tr><td class="n">6% · 2%</td><td>Average <span class="lx-term" data-term="energy-burden">energy burden</span> of low-income U.S. households, and of other households (2018–2022 data). Home energy only, not transport; DOE's low-income means income up to 80% of the local median.</td><td class="s"><a href="https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool">U.S. DOE, LEAD tool</a> · checked 3 Nov 2026</td></tr>
 <tr><td class="n">44.2% · 27.3%</td><td>Shares of plant outages, derates and failures to start in the February 2021 freeze in Texas and the South Central U.S. caused by freezing, and by gas fuel supply.</td><td class="s"><a href="https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf">FERC, NERC and Regional Entities staff report</a> (PDF), pp. 15–16 · November 2021</td></tr>
 </tbody>
 </table>
@@ -210,7 +231,11 @@ Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) a
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Every goal here has a real yardstick behind it: DOE's <a href="https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool">LEAD tool</a> maps energy burden, and the <a href="https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf">FERC–NERC report</a> on February 2021 traced outages to freezing and to fuel. Which yardstick to use, and how much each counts, is decided by people.</p>
+<ul>
+<li><b>Fairness:</b> DOE's <a href="https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool">LEAD tool</a> maps energy burden, with low income as up to 80% of the local median.</li>
+<li><b>Security:</b> the <a href="https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf">FERC–NERC report</a> on February 2021 traced plant outages to freezing and to gas supply.</li>
+<li><b>Choosing:</b> which yardstick to use, and how much each counts, is decided by people.</li>
+</ul>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

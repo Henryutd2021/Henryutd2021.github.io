@@ -1297,9 +1297,9 @@
  },
  "tariff": {
   "term": "Tariff",
-  "short": "The set of prices a utility charges its customers for electricity, such as a price per kWh, a fixed monthly charge or a different price at different hours.",
-  "lesson": "F1",
-  "href": "f01-five-scales.html"
+  "short": "The rule for calculating electricity bills: fixed charges, prices per kWh, or both.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
  },
  "telemetry": {
   "term": "Telemetry",
