@@ -57,7 +57,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Appliance powers are typical values, rounded and illustrative. Prairie Town's day is lesson 0's: the real Southwest Power Pool shape of 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>) scaled to the town, with lesson 0's hourly MW, which add up to 6,957 MWh. Every other number has a source and a date below.</span></p>
-<p class="lx-hint">Need a refresher? Toolbox <a href="k01-units.html">K1</a> (units and prefixes, kW against kWh) and <a href="k02-rates-efficiencies.html">K2</a> (rates, such as a home's average draw).</p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k01-units.html">K1</a> (units and prefixes, kW against kWh) and <a href="k02-rates-efficiencies.html">K2</a> (rates, such as a home's average draw).</p>
 ```
 :::
 

@@ -61,7 +61,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p>The notebook repeats every step in pandas, and an <code>assert</code> cell checks each result.</p>
 <p>Run it in Google Colab (upload it with the two data files), or locally with Python 3, pandas and matplotlib.</p>
 <p class="b2-dl" style="margin-top:.6rem"><a class="lx-btn small" href="notebooks/b02-python-data.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/b02-python-data.json" download>Raw SPP data (JSON)</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download>Cleaned shapes (JSON)</a></p>
-<p class="lx-hint">Need a refresher? Toolbox <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks).</p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k08-git-notebooks.html">K8</a> (Git and reproducible notebooks).</p>
 </div>
 ```
 :::

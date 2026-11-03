@@ -128,7 +128,7 @@ $$
 \end{aligned}
 $$
 
-<p class="lx-hint">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and the capital recovery factor).</p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and the capital recovery factor).</p>
 
 Every term is linear, so this is a [linear program]{.lx-term term="linear-program"}. Your plan fixes the $K_i$; the optimizer chooses them too, with $u_t = 0$. Upcoming: M3 (capacity expansion) writes the same model in code.
 

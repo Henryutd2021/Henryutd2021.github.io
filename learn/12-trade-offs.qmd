@@ -57,7 +57,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s; it estimates each plan's year from seven representative weeks, and a full-year check is separate.<br><b>Data:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>Costs:</b> EIA's and NREL's, dated in lesson 13's sources.<br><b>Plans:</b> illustrative, not recommendations; Prairie Town is fictional.</span></p>
-<p class="lx-hint">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (how a building cost becomes a cost a year).</p>
+<p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (how a building cost becomes a cost a year).</p>
 ```
 :::
 
