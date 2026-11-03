@@ -535,7 +535,7 @@
   code: K8
   form: cards
   path: k08-git-notebooks.qmd
-  status: upcoming
+  status: active
   minutes: 20
   practice_minutes: 30
   title: "Git and reproducible notebooks"
