@@ -1,6 +1,10 @@
 // test_08-merit-order.js — Node tests for Lesson 8 (assets/learn/08-merit-order.js): the hour cut from lesson 0's day,
-// the stack and clearing identities (balance, marginal plant, uniform price, shadow price), the wind and below-zero
-// cases, the line teaser, every number the page states, the text budget and the scope rules.
+// the stack and clearing identities (balance, marginal plant, uniform price, shadow price inside a block, the jump at a
+// block edge), the wind and below-zero cases, the line teaser, the numbers written in the page's markup (fallback table,
+// explain ideas, Go deeper, quiz answers), the gas presets against the slider's step, the word count of every text
+// element in the page body and of the lesson's longer JS strings, the scope rules (curriculum §20.4 verbatim), and a HiGHS
+// solve of the same LP. What it does not do: click through the rendered page (the screenshots cover that), or check the
+// EIA values against EIA: lesson 7's data file holds them with their sources, and this test checks agreement with it.
 // Usage (from the site folder):  node _tests/learn/test_08-merit-order.js
 "use strict";
 const fs = require("fs");
@@ -92,14 +96,34 @@ has("solar farm offers " + money(0) + " and is paid " + money(r0.price), "myth: 
 has("a 475 MW wind farm pushes the combined-cycle plant out of the stack, and the price falls from $40.00 to $10.00", "myth: wind");
 has("$c = (0, 0, 10, 40, 100)$, $\\bar P = (72, 14, 100, 150, 100)$ and $D = 331$", "Go deeper: data");
 has("$p = (72, 14, 100, 145, 0)$", "Go deeper: dispatch");
-has("$100 \\times 10 + 145 \\times 40 = \\$6{,}800$", "Go deeper: cost"); has("With $D = 332$ it is \\$6,840", "Go deeper: shadow price");
+has("$100 \\times 10 + 145 \\times 40 = \\$6{,}800$", "Go deeper: cost"); has("With $D = 332$ the cost is \\$6,840", "Go deeper: shadow price");
+// the block edge stated in Go deeper: at 336 MW the combined-cycle plant is full; the 337th MWh comes from the peaker
+const e336 = M.run(town, D, h, {}, 336), e337 = M.run(town, D, h, {}, 337);
+ok(e336.price === 40 && e336.plants.cc.run === F.cc.mw && e337.marginal === "peaker" && e337.cost - e336.cost === 100, "block edge: 336 -> 337 MW adds $100 (the peaker), not the $40 price");
+has("At $D = 336$ the combined-cycle plant is full, so the 337th MWh comes from the peaker and adds \\$100", "Go deeper: block edge");
+// the step-7 feedback says the extra cost equals the price "while the marginal plant has room": true at 331 MW at any gas price
+for (let g = D.gas.min; g <= D.gas.max + 1e-9; g += 0.5) {
+  const a = M.run(town, D, h, { gas: g }), b = M.run(town, D, h, { gas: g }, h.demand + 1);
+  ok(a.marginal === "cc" && near(b.cost - a.cost, a.price, 1e-9), `step 7 at gas $${g.toFixed(2)}: one more MWh costs the clearing price`);
+}
 // quick questions, recomputed independently
 const q = M.clear([{ key: "wind", mw: 80, offer: 0 }, { key: "solar", mw: 0, offer: 0 }, { key: "nuclear", mw: 100, offer: 10 }, { key: "cc", mw: 150, offer: 40 }, { key: "peaker", mw: 100, offer: 100 }], 250);
 ok(q.price === 40 && q.plants.cc.run === 70, "quiz 1: $40, the $40 plant serves 70 MW"); has("the first two offers cover 180 MW, so the $40 plant serves the last 70 MW");
 ok(6 * (8 - 6) === 12, "quiz 2: 6 MMBtu x $2 = $12"); has("$12 per MWh: 6 MMBtu × $2 more per MMBtu");
 // numbers to remember come from the data files
 has("$" + C7.fuel.gas.toFixed(2) + " · $" + C7.fuel.gasRange[1].toFixed(2), "numbers: gas costs");
-ok(D.gas.marks[0].value === C7.fuel.gas && D.gas.marks[1].value === C7.fuel.gasRange[1], "gas marks = lesson 7's EIA values");
+ok(D.gas.marks[0].value === C7.fuel.gas && D.gas.marks[1].value === C7.fuel.gasRange[1], "gas marks agree with lesson 7's sourced EIA values");
+// the presets go through LX.Slider, which snaps to min + k x step rounded to the step's decimals (components/controls.js snap())
+const CTL = fs.readFileSync(path.join(SITE, "assets/learn/components/controls.js"), "utf8");
+ok(/function snap\(v\) \{ return \+\(\(Math\.round\(\(v - min\) \/ step\) \* step \+ min\)\.toFixed\(dec\)\); \}/.test(CTL), "controls.js still snaps as this test assumes");
+const decOf = x => (String(x).split(".")[1] || "").length, sdec = Math.min(10, decOf(D.gas.step) + decOf(D.gas.min));
+const snapGas = v => +((Math.round((v - D.gas.min) / D.gas.step) * D.gas.step + D.gas.min).toFixed(sdec));
+D.gas.marks.concat([{ value: D.gas.ref }]).forEach(mk => {
+  ok(snapGas(mk.value) === mk.value, `gas preset $${mk.value.toFixed(2)} is reachable on the slider (snaps to $${snapGas(mk.value).toFixed(2)})`);
+  const r = M.run(town, D, h, { gas: snapGas(mk.value) });
+  ok(near(r.price, D.plants.cc.heatRate * mk.value + D.plants.cc.other, 1e-9), `gas preset $${mk.value.toFixed(2)}: the price is ${money(r.price)} (heat rate x gas + other)`);
+});
+ok(money(M.run(town, D, h, { gas: 7.21 }).price) === "$47.26", "gas $7.21 -> $47.26/MWh");
 has((C7.techs.cc.heatRate).toFixed(1) + " · " + (C7.techs.peaker.heatRate).toFixed(1), "numbers: heat rates 6.2 and 9.1");
 has("about $" + Math.round(C7.techs.cc.heatRate) + " or $" + Math.round(C7.techs.peaker.heatRate), "numbers: $ per MWh per $1 of gas");
 
@@ -110,6 +134,16 @@ ok(BODY.indexOf('href="00-grid-operator.html"') >= 0 && BODY.indexOf('href="07-c
 const stepTexts = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n?\s*(?:free: true,\s*\n?\s*)?build/g)].map(m => m[1]);
 ok(stepTexts.length === 8, `eight step cards (${stepTexts.length})`);
 stepTexts.forEach((t, i) => { const n = t.split(/\s+/).length; ok(n >= 20 && n <= 42, `step ${i + 1}: ${n} words (about 35)`); });
+// every text element in the page body (paragraphs, list items, definitions, table cells), outside display math: at most 45 words
+const plain = x => x.replace(/<[^>]+>/g, " ").replace(/\$[^$]*\$/g, "x").replace(/\s+/g, " ").trim();
+[...BODY.replace(/\$\$[\s\S]*?\$\$/g, "").matchAll(/<(p|li|dd|td)\b[^>]*>([\s\S]*?)<\/\1>/g)].map(m => plain(m[2])).concat(
+  BODY.split(/\n/).filter(l => /^- \*\*/.test(l)).map(plain)).forEach(t => {
+  const n = t.split(" ").length; ok(n <= 45, `page text element: ${n} words (at most 45): "${t.slice(0, 70)}"`);
+});
+// the lesson's longer JS strings (step texts, feedback pieces, notes) and the data notes: at most 45 words each
+[...JS.replace(/^\s*\/\/.*$/gm, "").matchAll(/"((?:[^"\\]|\\.)*)"/g)].map(m => m[1]).concat([D.credit.note, D.inflexible.note, D.gas.note]).forEach(t => {
+  const n = t.split(/\s+/).length; if (n > 12) ok(n <= 45, `JS/data text: ${n} words (at most 45): "${t.slice(0, 70)}"`);
+});
 const strings = [...JS.replace(/^\s*\/\/.*$/gm, "").matchAll(/"((?:[^"\\]|\\.)*)"/g)].map(m => m[1]);
 const texts = strings.concat(BODY.replace(/<[^>]+>/g, " ").split(/\n+/), Object.values(D).filter(v => typeof v === "string"), [D.credit.note, D.inflexible.note]);
 const NUC = /nuclear|reactor|\bSMR\b|small modular/i, RISK = /cost (trajector|decline|reduction|fall)|learning|commerciali|subsid|credit|threshold|break[- ]even|parity|siting|site selection|suitab|screen|deliver|timing|order|anchor|buyer|data[- ]cent/i;

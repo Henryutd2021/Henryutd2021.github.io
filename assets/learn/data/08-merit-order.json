@@ -4,7 +4,7 @@
   "hour": 19,
   "hourLabel": "19:00",
   "gas": {
-    "ref": 6.00, "min": 2.00, "max": 12.00, "step": 0.05,
+    "ref": 6.00, "min": 2.00, "max": 12.00, "step": 0.01,
     "marks": [{ "value": 3.85, "label": "2025 U.S. average for power plants" }, { "value": 7.21, "label": "2022 average" }],
     "note": "$6.00/MMBtu is Prairie Town's illustrative reference, the price behind lesson 0's costs. Marks: average cost of natural gas to U.S. power plants (EIA, Electric Power Annual, Table 7.4, final data)."
   },
@@ -14,7 +14,7 @@
   },
   "wind": { "min": 150, "max": 750, "step": 25, "big": 750 },
   "credit": { "value": 25, "note": "Illustrative: a payment per MWh produced, so the wind farm still earns at prices down to minus the credit." },
-  "inflexible": { "offer": -40, "note": "Illustrative: the price the plant would accept rather than stop and restart later." },
+  "inflexible": { "offer": -40, "note": "Illustrative: the offer the plant makes to avoid stopping and restarting later. The switch changes this offer only; restarts themselves are not modelled." },
   "teaser": { "lineMW": 200 },
   "sources": {
     "eia-2012-negative": { "text": "EIA, Today in Energy: Negative wholesale electricity prices occur in RTOs", "url": "https://www.eia.gov/todayinenergy/detail.php?id=6730", "asOf": "18 June 2012" },
