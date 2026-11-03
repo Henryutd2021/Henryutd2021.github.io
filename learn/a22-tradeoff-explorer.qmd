@@ -11,8 +11,9 @@ body-classes: "page-learn page-lesson lx-form-play"
 
 <!-- A22 (a22-tradeoff-explorer), play-first, W2. Game, model and explain layer: assets/learn/a22-tradeoff-explorer.js with
      data/a22-tradeoff-explorer.json (the nine plans and their precomputed full-year measures, the household groups from
-     EIA RECS 2020, the radar scales, the priority sets, sources); the planning engine is lesson 13's
-     (assets/learn/13-capstone.js, loaded first, with data/13-capstone.json, town_year.json and cf_targets.json).
+     EIA RECS 2020, the radar scales, the priority sets, sources); the planning engine is lesson 13's,
+     the shared component assets/learn/components/planengine.js (LX.townPlan, in learn.js), with data/13-capstone.json,
+     town_year.json and cf_targets.json.
      Tests: node _tests/learn/test_a22-tradeoff-explorer.js (every number below is checked against the model).
      Text budget: one or two sentences per element; depth in the Go deeper boxes. The learn:meta, learn:next and
      learn:footer blocks are written by scripts/build_learn.py. -->
@@ -240,6 +241,5 @@ Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) a
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/13-capstone.js" defer></script>
 <script src="../assets/learn/a22-tradeoff-explorer.js" defer></script>
 ```

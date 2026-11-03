@@ -1,6 +1,6 @@
 // test_a22-tradeoff-explorer.js — Node tests for A22 (assets/learn/a22-tradeoff-explorer.js, data/a22-tradeoff-explorer.json)
-// and every number that learn/a22-tradeoff-explorer.qmd states. The plans' years come from lesson 13's model
-// (assets/learn/13-capstone.js), solved here with the vendored HiGHS.
+// and every number that learn/a22-tradeoff-explorer.qmd states. The plans' years come from lesson 13's model, the shared
+// planning engine (assets/learn/components/planengine.js, LX.townPlan), solved here with the vendored HiGHS.
 //   - inputs: the RECS household shares, the reserve-margin capacity values, the 450 MW peak
 //   - the nine plans: each precomputed year matches a fresh full-year solve; C's peakers never run; H is the only plan short
 //   - measures: the low-income share formula for the three tariffs, the reserve margin rule, the gas and largest shares
@@ -23,7 +23,7 @@ vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), sctx);
 const { core, VERSION } = sctx.module.exports;
 const pctx = { window: { LX: {} }, module: { exports: {} } };
 vm.runInNewContext(fs.readFileSync(L("components/profiles.js"), "utf8"), pctx);
-const TP = require(L("13-capstone.js"));
+const TP = require(L("components/planengine.js"));
 const M = require(L("a22-tradeoff-explorer.js"));
 const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
 const cfg = JSON.parse(fs.readFileSync(L("data/13-capstone.json"), "utf8"));
@@ -197,6 +197,7 @@ function val(m, axis, defs) {
   ok(!/\bAI\b|Claude|ChatGPT/.test(page + JS), "no AI wording");
   ok(!/nuclear[^.]*\b(credit|screen|order|deliver|timing|buyer|siting|threshold|subsid|learning)/i.test(JSON.stringify(A) + JS.replace(/\/\/[^\n]*/g, "")), "no nuclear sentence with a deny-listed risk word");
   ok(page.includes("data-learn=\"tradeoff-explorer\"") && /LX\.mount\("tradeoff-explorer"/.test(JS), "the page and the script share a slug");
+  ok(!/13-capstone\.js(?!on)/.test(page) && /<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>/.test(page), "the page uses the shared planning engine in learn.js, not lesson 13's script");
 
   console.log(`${checks - fails} of ${checks} checks passed`);
   process.exit(fails ? 1 : 0);

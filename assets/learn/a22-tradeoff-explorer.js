@@ -2,8 +2,8 @@
 //
 // Data: assets/learn/data/a22-tradeoff-explorer.json (the five measures with their units, scales and alternative
 // definitions; the household groups from EIA RECS 2020; eight hand-made plans with their precomputed full-year results;
-// five illustrative priority sets) and lesson 13's planning model: assets/learn/13-capstone.js (LX.townPlan, loaded first)
-// with data/13-capstone.json (EIA and NREL costs, dated), town_year.json and cf_targets.json.
+// five illustrative priority sets) and lesson 13's planning model: the shared component assets/learn/components/planengine.js
+// (LX.townPlan, bundled in learn.js) with data/13-capstone.json (EIA and NREL costs, dated), town_year.json and cf_targets.json.
 //
 // Every plan is run hour by hour through all 8,760 hours of 2025 (lesson 13's fullYearModel with the plan fixed: a
 // linear program that runs the plants and the battery at least cost and leaves demand unserved only when it must). The
@@ -405,7 +405,7 @@
 
   // ---------------------------------------------------------------- the play
   LX.mount("tradeoff-explorer", function (live, data, root) {
-    var TP = LX.townPlan; if (!TP || !TP.ui) throw new Error("lesson 13's planning model (13-capstone.js) must load first");
+    var TP = LX.townPlan; if (!TP || !TP.ui) throw new Error("the planning engine (components/planengine.js, LX.townPlan) is missing from learn.js");
     css();
     var cfg = data["13_capstone"], A = data.a22_tradeoff_explorer, lim = cfg.limits, TECH = TP.ui.TECH;
     var Y = TP.prepareYear(data.town_year, data.cf_targets, cfg), C = TP.costs(cfg, {}), RW = TP.selectWeeks(Y, cfg.weeks), per = TP.periodsOf(RW);
