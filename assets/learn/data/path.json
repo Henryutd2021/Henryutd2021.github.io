@@ -95,7 +95,7 @@
     "dispatchable and variable generation",
     "merit order dispatch"
    ],
-   "lab": "download and plot a day of hourly U.S. grid data (upcoming).",
+   "lab": "load and plot a year of hourly U.S. grid data in Python (bridge B2).",
    "href": "00-grid-operator.html",
    "ready": true,
    "after": [],
