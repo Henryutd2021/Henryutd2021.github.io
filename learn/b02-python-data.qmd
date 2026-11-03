@@ -42,23 +42,24 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Step</th><th scope="col">What you find</th><th scope="col">In pandas</th></tr></thead>
 <tbody>
 <tr><td class="n">Load</td><td>8,760 rows: one per hour, in MW, stamped in UTC at the end of each hour.</td><td><code>df.shape</code></td></tr>
-<tr><td class="n">Inspect</td><td>Demand reads 1,505 MW for one hour on 21 June, under 5% of the median: a reporting error.</td><td><code>df.describe()</code></td></tr>
+<tr><td class="n">Inspect</td><td>Demand reads 1,505 MW for one hour on 21 June, under 5% of the median: almost certainly a reporting error.</td><td><code>df.describe()</code></td></tr>
 <tr><td class="n">Time</td><td>On local time, labelled by each hour's start: 363 days of 24 hours, 9 March with 23 and 2 November with 25.</td><td><code>tz_convert("America/Chicago")</code></td></tr>
 <tr><td class="n">Repeats</td><td>Runs of 3 or more identical non-zero readings: 671 wind hours and 1,377 solar hours, the counts the data build flagged.</td><td><code>(s != s.shift()).cumsum()</code></td></tr>
 <tr><td class="n">Plot</td><td>From 15 to 21 December every column stands still for 155 hours; solar holds 617 MW through the nights.</td><td><code>df.loc[...].plot()</code></td></tr>
 <tr><td class="n">Physics</td><td>Solar above 5% of its peak between midnight and 4 a.m.: 214 hours in the raw file, none in the cleaned file.</td><td><code>df.index.hour &lt; 4</code></td></tr>
 <tr><td class="n">Resample</td><td>Prairie Town's 150 MW wind farm makes the most energy in March (70.7 GWh) and the least in September (45.1 GWh).</td><td><code>resample("MS").sum()</code></td></tr>
-<tr><td class="n">Duration</td><td>Demand is above 90% of its peak for 180 hours; the farms' capacity factors are 52.8% (wind) and 23.5% (solar), illustrative.</td><td><code>sort_values()</code></td></tr>
+<tr><td class="n">Duration</td><td>Demand is above 90% of its peak for 180 hours; the farms' capacity factors are 52.8% (wind) and 23.4% (solar), illustrative.</td><td><code>sort_values()</code></td></tr>
 <tr><td class="n">Assert</td><td>The raw file fails 3 of 5 asserts; the cleaned file passes all 5.</td><td><code>assert ...</code></td></tr>
 </tbody>
 </table>
 <p class="lx-hint">With JavaScript on, you run each step yourself on the real data, with the pandas code beside it.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Real data: hourly demand, wind and solar of the Southwest Power Pool for 2025 from EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930, public domain), as published and as cleaned for Prairie Town; accessed 2 November 2026. Prairie Town's farm sizes and peak (150 MW wind, 200 MW solar, 450 MW demand) are illustrative, as in lesson 0. The cleaned file's 64 night hours of solar are a known limit of its data build.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Data:</b> hourly demand, wind and solar of the Southwest Power Pool, 2025, from EIA's <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930, public domain); accessed 2 November 2026.<br><b>Raw file:</b> EIA's adjusted values before this course's cleaning; each fuel's columns summed, negatives set to zero.<br><b>Cleaned file:</b> the shapes Prairie Town uses.<br><b>Illustrative:</b> 150 MW wind, 200 MW solar, 450 MW demand, as in lesson 0.</span></p>
 <div class="lx-card lx-notebook" style="margin-top:1.2rem">
 <p class="lx-eyebrow">Do it in pandas · notebook lab, about 60 minutes</p>
-<p>The notebook repeats every step with pandas and checks each result with an <code>assert</code> cell. It runs in Google Colab after you upload it together with the two data files, or locally with Python 3 and pandas (matplotlib for the plots).</p>
+<p>The notebook repeats every step in pandas, and an <code>assert</code> cell checks each result.</p>
+<p>Run it in Google Colab (upload it with the two data files), or locally with Python 3, pandas and matplotlib.</p>
 <p class="b2-dl" style="margin-top:.6rem"><a class="lx-btn small" href="notebooks/b02-python-data.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/b02-python-data.json" download>Raw SPP data (JSON)</a> <a class="lx-btn small ghost" href="../assets/learn/data/town_year.json" download>Cleaned shapes (JSON)</a></p>
 </div>
 ```
@@ -74,8 +75,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Time stamps</dt><dd>EIA-930 stamps each hour in <span class="lx-term" data-term="utc">UTC</span> at its end; label hours by their start and convert to local time before grouping by day.</dd>
-<dt>Range, repeats, physics</dt><dd>Three different checks catch three different faults: a spike, a stuck sensor, and sun at night.</dd>
-<dt>Mean or sum</dt><dd>Average power uses the mean; energy uses the sum of hourly MW values (each is that hour's MWh).</dd>
+<dt>Range, repeats, physics</dt><dd>Three checks flag three kinds of suspect data: a spike, a possibly stuck feed, and sun at night.</dd>
+<dt>Mean or sum</dt><dd>Average power uses the mean; energy uses the sum, since each hour's MW × 1 h is its MWh.</dd>
 <dt><span class="lx-term" data-term="duration-curve">Duration curve</span></dt><dd>The year's hours sorted from highest to lowest; for a plant, the area under it over the full box is the capacity factor.</dd>
 <dt>Assert</dt><dd>A check that stops the notebook with a message when the data break a rule.</dd>
 </dl>
@@ -88,7 +89,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>Why one hour of offset matters to a model</summary>
 <div class="lx-deeper-body">
-<p>An hourly model treats value <em>t</em> as the energy of hour <em>t</em>. Shift the stamps by one hour and the solar peak moves an hour, which changes when a battery should charge and what it earns. Days of 23 and 25 hours also break code that assumes 24 rows a day, so keep a time-zone-aware index and let pandas place each hour.</p>
+<ul>
+<li>An hourly model reads value <em>t</em> as the average power over hour <em>t</em>, the hour its time stamp labels; times one hour, that is its energy.</li>
+<li>Shift the stamps by one hour and the solar peak moves an hour, which changes when a battery should charge and what it earns.</li>
+<li>Days of 23 and 25 hours break code that assumes 24 rows a day: keep a time-zone-aware index and let pandas place each hour.</li>
+</ul>
 <p>Modeler's note: the lab's notebook is the template for every later lab; upcoming M10 (forecasting) and M14 (learning from data) start from a frame checked like this one.</p>
 </div>
 </details>
@@ -96,16 +101,25 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <summary><span class="k">Go deeper · Analyst</span>A capacity factor needs a capacity</summary>
 <div class="lx-deeper-body">
 <p>A capacity factor is energy divided by (nameplate capacity × hours). EIA-930 reports generation, not capacity, so a real fleet's capacity factor needs a second source, such as EIA's generator inventory (Form EIA-860).</p>
-<p>Dividing by the year's best hour instead gives a higher number, because no fleet runs all its turbines at nameplate at once. Prairie Town's farms are defined to reach full output in SPP's best hour, which is why their 52.8% and 23.5% are labelled illustrative. Lesson 5 on the <a href="05-capacity-factor.html">course map</a> builds capacity factors from scratch.</p>
+<p>Observed peak output is not a capacity measurement. If it is below nameplate capacity, using it as the denominator overstates the capacity factor.</p>
+<p>Prairie Town's farms are defined to reach full output in SPP's best hour, which is why their 52.8% and 23.4% are labelled illustrative. <a href="05-capacity-factor.html">Lesson 5</a> builds capacity factors from scratch.</p>
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper</span>How the data build filled the gaps, and what it missed</summary>
+<summary><span class="k">Go deeper</span>How the data build filled the gaps, and its night rule</summary>
 <div class="lx-deeper-body">
+<table class="lx-facts">
+<thead><tr><th scope="col">Problem</th><th scope="col">What the data build did</th></tr></thead>
+<tbody>
+<tr><td>Repeated wind or solar readings</td><td>Replaced by the mean of the same hour on up to seven valid days before and after.</td></tr>
+<tr><td>Implausible demand hours</td><td>Replaced by the day-ahead forecast, rescaled to the actual demand around the gap.</td></tr>
+<tr><td>Solar at night, 20 February to 14 March</td><td>Raw solar barely changed between day and night but never repeated exactly, so the repeat rule kept it. A night rule sets solar to zero.</td></tr>
+</tbody>
+</table>
 <ul>
-<li>Repeated wind and solar readings were replaced by the mean of the same hour on up to seven valid days before and after.</li>
-<li>Implausible demand hours were replaced by the day-ahead forecast, rescaled to the actual demand around the gap.</li>
-<li>From 20 February to 14 March raw solar barely changed between day and night but never repeated exactly, so the repeat rule kept it, and a same-hour fill could copy it. The build therefore adds a physics rule: an hour whose median solar output across its month is zero is night, as are 22:00 to 05:00 all year, and solar is set to zero then. The notebook applies the rule to the raw file.</li>
+<li><b>The night rule</b> is a documented heuristic for this SPP, Central-time example: hours whose monthly median solar is zero, 22:00 to 05:00 all year, and hours when the sun is below the horizon at SPP's centre.</li>
+<li><b>What it proves.</b> Hours set to zero pass a night check by construction; the check does not test the daytime values, so look at those too.</li>
+<li>The notebook applies the median and clock parts of the rule to the raw file.</li>
 </ul>
 <p>Upcoming: R4 (data you can defend) turns these choices into a written data note.</p>
 </div>
@@ -134,15 +148,15 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="cf" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Average wind output divided by the year's best hour is the wind fleet's capacity factor.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A <span class="lx-term" data-term="capacity-factor">capacity factor</span> divides by nameplate capacity, which is at least the best hour; that ratio overstates it.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A <span class="lx-term" data-term="capacity-factor">capacity factor</span> divides by nameplate capacity. The best hour is not a capacity measurement; if it is below nameplate, that ratio overstates the capacity factor.</p></details>
 </div>
 </div>
 
 <div class="lx-quiz" data-quiz="b2">
 <div class="lx-qq" data-id="mwh" data-answer="b">
-<p class="lx-qtext">A wind farm's hourly output is 100 MW in every hour of one day. How much <span class="lx-term" data-term="energy">energy</span> did it make that day?</p>
+<p class="lx-qtext">A wind farm's hourly output is 100 MW in every hour of one 24-hour day. How much <span class="lx-term" data-term="energy">energy</span> did it make that day?</p>
 <ul class="lx-choices"><li data-value="a">100 MWh</li><li data-value="b">2,400 MWh</li><li data-value="c">4.2 MW</li><li data-value="d">2,400 MW</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>2,400 MWh: each hourly value is also that hour's MWh, so the day's energy is the sum, 24 × 100.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>2,400 MWh: energy = power × time, 100 MW × 24 h. On a 23- or 25-hour day it would be 2,300 or 2,500 MWh.</p></details>
 </div>
 <div class="lx-qq" data-id="sum" data-answer="b">
 <p class="lx-qtext">You resample hourly MW values to months. Which gives each month's energy?</p>

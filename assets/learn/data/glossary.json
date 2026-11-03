@@ -437,6 +437,12 @@
   "lesson": 4,
   "href": "04-forecasts.html"
  },
+ "median": {
+  "term": "Median",
+  "short": "The middle value of a set sorted from lowest to highest: half the values lie below it, half above.",
+  "lesson": "B2",
+  "href": "b02-python-data.html"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -563,6 +569,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "quartile": {
+  "term": "Quartile",
+  "short": "The values that cut a sorted set into four equal parts: 25% of values lie below the first, 50% below the second (the median), 75% below the third.",
+  "lesson": "B2",
+  "href": "b02-python-data.html"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
@@ -658,6 +670,12 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "standard-deviation": {
+  "term": "Standard deviation",
+  "short": "A measure of spread: roughly, how far a typical value lies from the mean.",
+  "lesson": "B2",
+  "href": "b02-python-data.html"
  },
  "state-of-charge": {
   "term": "State of charge",

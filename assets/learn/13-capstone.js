@@ -14,7 +14,8 @@
 //   rules       every hour: wind + solar + nuclear + cc + peaker + discharge - charge + unserved >= demand (what is left
 //               over is spilled); wind and solar make capacity x the hour's availability (LX.townProfile, "scale" method,
 //               EIA 2025 targets; night-time solar is zero in the data itself); nuclear runs flat at 91.1% (EIA's 2025
-//               fleet capacity factor), as in lesson 0; gas output <= its capacity; charge + discharge <= battery MW;
+//               fleet capacity factor, a yearly average used as every hour's output: a simplification the page states),
+//               as in lesson 0; gas output <= its capacity; charge + discharge <= battery MW;
 //               battery energy within [0, MWh], 85% round trip (losses on charging); optional: annual CO2 <= cap.
 //   time        seven weeks of 2025 (168 chronological hours each): one medoid week per season, scaled so the season's
 //               demand, wind and solar energy are kept, plus three weeks kept as they are (the year's peak demand, the
@@ -337,7 +338,8 @@
     return o;
   }
   // the frontier's cost at a given CO2 (straight lines between solved points; the true frontier is convex, so this is a
-  // slight overestimate between points); null outside the solved range
+  // slight overestimate between points: the page calls it approximate, and scoring re-solves at the plan's own CO2);
+  // null outside the solved range
   function frontierAt(points, co2) {
     var pts = points.slice().sort(function (a, b) { return a.co2 - b.co2; });
     if (!pts.length || co2 < pts[0].co2 - 1e-6) return null;
@@ -363,10 +365,27 @@
     return { lights: lights, co2: co2, cost: cost, gap: gap };
   }
 
+  // what the optimizer's cap means for its plan (cap and co2 in tonnes; sum = summarize() of the capped solve):
+  //   "zero"  a zero cap: no gas may run; the cap binds, but its shadow price at that edge is not a useful carbon price
+  //   "binds" the plan sits on the cap and cutting one more tonne would cost capDual dollars
+  //   "free"  the cap is looser than the cheapest plan's own CO2, so it changes nothing
+  function capReading(cap, sum) {
+    if (cap <= 0) return { kind: "zero" };
+    if (sum.capDual != null && sum.capDual > 1e-6 && sum.co2 >= cap - 1) return { kind: "binds", dual: sum.capDual };
+    return { kind: "free" };
+  }
+  // the full-year verdict for a plan scored on the seven weeks: demand served and CO2 against the target, judged again on
+  // all 8,760 hours (week, full = summarize() of the seven-week run and of the full-year run; target in tonnes)
+  function fullVerdict(week, full, target) {
+    var served = full.unserved < 0.5, co2ok = full.co2 <= target + 0.5;
+    return { served: served, unserved: full.unserved, unservedShare: full.unservedShare, co2ok: co2ok, co2: full.co2,
+             over: full.co2 - target, overShare: full.co2 / target - 1, held: served && co2ok,
+             changed: (week.unserved < 0.5) !== served || (week.co2 <= target + 0.5) !== co2ok };
+  }
   var model = { HPW: HPW, WEEKS: WEEKS, HOURS: HOURS, KEYS: KEYS, prepareYear: prepareYear, selectWeeks: selectWeeks, weekMonth: weekMonth, weekStart: weekStart,
                 crf: crf, costs: costs, build: build, weekModel: weekModel, fullYearModel: fullYearModel, periodsOf: periodsOf,
                 summarize: summarize, fixedCost: fixedCost, encodePlan: encodePlan, decodePlan: decodePlan, weekSeries: weekSeries,
-                frontierAt: frontierAt, ceilPlan: ceilPlan, stars: stars };
+                frontierAt: frontierAt, ceilPlan: ceilPlan, stars: stars, capReading: capReading, fullVerdict: fullVerdict };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
   var LX = window.LX;
@@ -424,6 +443,10 @@
       ".lx13-week .lx-seg button{min-height:34px;padding:0 9px;font-size:13px}",
       ".lx13-cmp{width:100%;border-collapse:collapse;font-size:14px}.lx13-cmp th,.lx13-cmp td{padding:4px 6px;border-bottom:1px solid var(--lx-line);text-align:right}",
       ".lx13-cmp th:first-child,.lx13-cmp td:first-child{text-align:left}.lx13-cmp td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.lx13-cmp td:first-child{font-family:var(--lx-f-body)}",
+      ".lx13-hours{max-height:340px;overflow:auto;margin-top:6px}.lx13-hours table{font-size:12.5px;min-width:640px}.lx13-hours th,.lx13-hours td{padding:2px 5px;white-space:nowrap}",
+      ".lx13-hours thead th{position:sticky;top:0;background:var(--lx-surface)}",
+      ".lx13-verdict{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:14.5px}.lx13-verdict li{display:flex;gap:8px;align-items:flex-start}.lx13-verdict li b{font-family:var(--lx-f-mono);font-weight:600}",
+      ".lx13-verdict .ok{color:var(--lx-good)}.lx13-verdict .no{color:var(--lx-bad)}.lx13-verdict .lx-ic{flex:none;margin-top:2px}",
       "@media (max-width:560px){.lx13-card{padding:12px}}"
     ].join("") }, document.head);
   }
@@ -453,17 +476,36 @@
   var STACK = [["nuc", "Nuclear", "var(--lx-nuc)"], ["wind", "Wind", "var(--lx-wind)"], ["solar", "Solar", "var(--lx-solar)"],
                ["dis", "Battery out", "var(--lx-tier-2)"], ["cc", "Gas CC", "var(--lx-cc)"], ["pk", "Peaker", "var(--lx-pk)"]];
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  // The stack is what each source could give (wind, sun and nuclear at their hourly availability) plus what gas and the
+  // battery did; the hatched band on top is the part nobody could use (spilled), so the solid part is what served demand
+  // or charged the battery. Below zero: charging. Text version: every hour of the week in a table (built when opened).
+  var HATCH = "repeating-linear-gradient(135deg,var(--lx-ink-3) 0 1.5px,var(--lx-surface) 1.5px 5px)";
   function WeekChart(host) {
     var box = H("div", { class: "lx13-chart" }, host);
-    var W = 640, HH = 240, ml = 44, mr = 8, mt = 10, mb = 28, last = null;
+    var W = 640, HH = 240, ml = 44, mr = 8, mt = 10, mb = 28, last = null, pid = LX.uid("lx13-spill");
     var svg = S("svg", { viewBox: "0 0 " + W + " " + HH, role: "img" }, box);
     var leg = H("div", { class: "lx-legend", "aria-hidden": "true" }, box);
     STACK.forEach(function (s) { var x = H("span", null, leg); H("i", { style: "--c:" + s[2] }, x); H("span", { text: s[1] }, x); });
-    [["Unserved", "var(--lx-bad)"], ["Charging (below zero)", "color-mix(in srgb, var(--lx-tier-2) 45%, transparent)"]].forEach(function (s) { var x = H("span", null, leg); H("i", { style: "--c:" + s[1] }, x); H("span", { text: s[0] }, x); });
+    [["Spilled (hatched)", "var(--lx-surface)", HATCH], ["Unserved", "var(--lx-bad)"], ["Charging (below zero)", "color-mix(in srgb, var(--lx-tier-2) 45%, transparent)"]].forEach(function (s) {
+      var x = H("span", null, leg); H("i", { style: "--c:" + s[1] + (s[2] ? ";background-image:" + s[2] + ";outline:1px solid var(--lx-line-2)" : "") }, x); H("span", { text: s[0] }, x); });
     var dl = H("span", null, leg); H("i", { class: "line" }, dl); H("span", { text: "Demand" }, dl);
     var alt = H("p", { class: "lx-sr" }, box);
+    var tv = H("details", { class: "lx-textalt" }, box); H("summary", { text: "Text version: every hour of this week, in MW" }, tv);
+    var tvBody = H("div", { class: "lx13-hours", tabindex: "0", role: "region", "aria-label": "Every hour of this week, in MW" }, tv);
+    tv.addEventListener("toggle", function () { if (tv.open && last) table(last[0], last[1]); });
+    var COLS = [["demand", "Demand"], ["nuc", "Nuclear"], ["wind", "Wind"], ["solar", "Solar"], ["dis", "Battery out"], ["cc", "Gas CC"], ["pk", "Peaker"], ["ch", "Charging"], ["unserved", "Unserved"], ["spilled", "Spilled"]];
+    function table(ws, start) {
+      var d0 = new Date(start + "T00:00:00Z"), rows = [];
+      for (var h = 0; h < ws.demand.length; h++) {
+        var t = new Date(d0.getTime() + h * 36e5);
+        rows.push("<tr><th scope='row'>" + t.getUTCDate() + " " + MON[t.getUTCMonth()] + " " + (t.getUTCHours() < 10 ? "0" : "") + t.getUTCHours() + ":00</th>" +
+          COLS.map(function (c) { return "<td>" + Math.round(ws[c[0]][h]) + "</td>"; }).join("") + "</tr>");
+      }
+      tvBody.innerHTML = "<table class='lx13-cmp'><thead><tr><th scope='col'>Hour (standard time)</th>" + COLS.map(function (c) { return "<th scope='col'>" + c[1] + "</th>"; }).join("") + "</tr></thead><tbody>" + rows.join("") + "</tbody></table>";
+    }
     function draw(ws, start) {
       last = [ws, start];
+      if (tv.open) table(ws, start);
       W = Math.max(300, Math.round(box.clientWidth || 640)); HH = W < 520 ? 210 : 240; ml = W < 520 ? 38 : 44;
       svg.setAttribute("viewBox", "0 0 " + W + " " + HH); svg.innerHTML = "";
       var n = ws.demand.length, top = 0, bot = 0, i;
@@ -489,6 +531,16 @@
         S("path", { d: up + dn + "Z", fill: s[2] }, svg);
         for (i = 0; i < n; i++) base[i] += a[i];
       });
+      // the spilled part: the top of the stack in each hour where output exceeds what demand and charging take
+      if (ws.spilled.some(function (x) { return x > 0.05; })) {
+        var pat = S("pattern", { id: pid, patternUnits: "userSpaceOnUse", width: 6, height: 6, patternTransform: "rotate(45)" }, S("defs", null, svg));
+        S("rect", { width: 6, height: 6, fill: "var(--lx-surface)", opacity: ".7" }, pat);
+        S("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "var(--lx-ink-3)", "stroke-width": 1.4 }, pat);
+        var su = "", sd = "";
+        for (i = 0; i < n; i++) { var ty = Y(base[i]).toFixed(1); su += (i ? "L" : "M") + X(i).toFixed(1) + "," + ty + "L" + X(i + 1).toFixed(1) + "," + ty; }
+        for (i = n - 1; i >= 0; i--) { var lo = Y(base[i] - Math.min(base[i], ws.spilled[i])).toFixed(1); sd += "L" + X(i + 1).toFixed(1) + "," + lo + "L" + X(i).toFixed(1) + "," + lo; }
+        S("path", { d: su + sd + "Z", fill: "url(#" + pid + ")" }, svg);
+      }
       for (i = 0; i < n; i++) if (ws.unserved[i] > 0.05) S("rect", { x: X(i), y: Y(base[i] + ws.unserved[i]), width: X(1) - X(0) + 0.3, height: Y(base[i]) - Y(base[i] + ws.unserved[i]), fill: "var(--lx-bad)" }, svg);
       if (bot > 1) {
         var p = "M" + X(0) + "," + Y(0);
@@ -500,9 +552,9 @@
       S("text", { x: ml + 4, y: mt + 12, class: "note" }, svg).textContent = "MW";
       var sum = function (a) { return a.reduce(function (s, x) { return s + x; }, 0); };
       var un = sum(ws.unserved), hrs = ws.unserved.filter(function (x) { return x > 0.05; }).length;
-      var txt = "Hourly supply for the week starting " + d0.getUTCDate() + " " + MON[d0.getUTCMonth()] + ": peak demand " + Math.round(Math.max.apply(null, ws.demand)) + " MW; gas made " +
+      var txt = "Hourly output for the week starting " + d0.getUTCDate() + " " + MON[d0.getUTCMonth()] + ": peak demand " + Math.round(Math.max.apply(null, ws.demand)) + " MW; gas made " +
         Math.round(sum(ws.cc) + sum(ws.pk)).toLocaleString("en-US") + " MWh, the battery gave back " + Math.round(sum(ws.dis)).toLocaleString("en-US") + " MWh; " +
-        (hrs ? hrs + " hours short, " + Math.round(un).toLocaleString("en-US") + " MWh unserved; " : "every hour served; ") + Math.round(sum(ws.spilled)).toLocaleString("en-US") + " MWh spilled.";
+        (hrs ? hrs + " hours short, " + Math.round(un).toLocaleString("en-US") + " MWh unserved; " : "every hour served; ") + Math.round(sum(ws.spilled)).toLocaleString("en-US") + " MWh spilled (hatched).";
       svg.setAttribute("aria-label", txt); alt.textContent = txt;
     }
     if (window.ResizeObserver) new ResizeObserver(function () { if (last && Math.abs((box.clientWidth || 0) - W) > 8) draw(last[0], last[1]); }).observe(box);
@@ -549,8 +601,8 @@
 
     // ---- missions, the stage, the panel
     var ms = LX.Missions(live, [
-      { id: "lights", label: "Keep every light on, all year", short: "Lights on", main: true },
-      { id: "co2", label: "Emit under " + G.co2Target + " kt of CO₂ a year", short: "Under " + G.co2Target + " kt" },
+      { id: "lights", label: "Serve demand in every modelled hour", short: "Lights on", main: true },
+      { id: "co2", label: "Emit under " + G.co2Target + " kt (thousand tonnes) of CO₂ a year", short: "Under " + G.co2Target + " kt" },
       { id: "cost", label: "Cost within " + Math.round(G.costSlack * 100) + "% of the frontier", short: "Near the frontier" }
     ]);
     var lay = H("div", { class: "lx-play" }, live);
@@ -558,8 +610,8 @@
     var panel = H("div", { class: "lx-play-panel lx-stepcard" }, lay);
     var deb = H("div", { class: "lx-debrief lx-stepcard", hidden: true, tabindex: "-1" }, lay);
 
-    var c1 = H("section", { class: "lx13-card lx13-week", "aria-label": "Your plan, run for a year" }, stage);
-    var h1 = H("div", { class: "lx13-head" }, c1); H("h3", { text: "Your plan, run for a year" }, h1);
+    var c1 = H("section", { class: "lx13-card lx13-week", "aria-label": "Your plan's year, run on seven weeks" }, stage);
+    var h1 = H("div", { class: "lx13-head" }, c1); H("h3", { text: "Your plan's year, run on seven weeks" }, h1);
     var status = LX.SolverStatus(h1);
     var mix = H("div", { class: "lx13-mix", role: "img" }, c1), mixLeg = H("p", { class: "lx13-sub" }, c1);
     var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Week to show" }, c1);
@@ -573,8 +625,9 @@
 
     var c2 = H("section", { class: "lx13-card", "aria-label": "Your plan on the cost and CO₂ frontier" }, stage);
     var h2 = H("div", { class: "lx13-head" }, c2); H("h3", { text: "Your plan on the frontier" }, h2);
-    H("p", { class: "lx13-sub", html: LX.rich("The line is the cheapest possible plan at each CO₂ level ([[pareto-frontier|lesson 12]]). Below it is out of reach.") }, c2);
-    var fc = LX.Frontier(c2, { label: "Your plan and the optimizer's plan against the cost and CO₂ frontier" });
+    H("p", { class: "lx13-sub", html: LX.rich("The line joins the cheapest plans the solver found at a set of CO₂ caps ([[pareto-frontier|lesson 12]]). Well below it is out of reach; between solved points the true frontier sags slightly below the line.") }, c2);
+    var fc = LX.Frontier(c2, { label: "Your plan and the optimizer's plan against the cost and CO₂ frontier", shadeLabel: "out of reach (approximately)",
+      frontierLabel: "Frontier: cheapest plans at solved caps, joined by straight lines" });
     var frNote = H("p", { class: "lx13-sub", hidden: true }, c2);
     var frBtn = H("button", { class: "lx-link", type: "button", hidden: true, text: "Solve the frontier again for these costs" }, c2);
 
@@ -593,7 +646,7 @@
       var T = S_.C.techs, t = cfg.techs;
       if (k === "wind") return fm.k(T.wind.fixed) + " per MW-year; makes " + fm.pct(Y.windCF) + " of its size on average.";
       if (k === "solar") return fm.k(T.solar.fixed) + " per MW-year; makes " + fm.pct(Y.solarCF) + " of its size on average.";
-      if (k === "nuc") return fm.k(T.nuc.fixedTotal) + " per MW-year with fuel; runs flat at " + fm.pct(t.nuc.avail) + ".";
+      if (k === "nuc") return fm.k(T.nuc.fixedTotal) + " per MW-year with fuel; modelled as a constant " + fm.pct(t.nuc.avail) + " of its size every hour (a simplification).";
       if (k === "cc") return fm.k(T.cc.fixed) + " per MW-year + $" + T.cc.run.toFixed(0) + "/MWh to run; " + T.cc.co2.toFixed(2) + " t CO₂/MWh.";
       if (k === "pk") return fm.k(T.pk.fixed) + " per MW-year + $" + T.pk.run.toFixed(0) + "/MWh to run; " + T.pk.co2.toFixed(2) + " t CO₂/MWh.";
       if (k === "bp") return fm.k(T.bp.fixed) + " per MW-year: how fast it charges or discharges.";
@@ -606,7 +659,7 @@
     var ob = H("div", { class: "lx13-box" }, panel);
     H("p", { class: "lx-eyebrow", text: "Ask the optimizer" }, ob);
     var capSl = LX.Slider(ob, { label: "CO₂ cap", color: "var(--lx-ink-2)", max: G.capMax, step: G.capStep, unit: "kt",
-      hint: function () { return "The cheapest plan that emits at most this much in a year."; } });
+      hint: function () { return "kt = thousand tonnes. The cheapest plan that emits at most this much in a year."; } });
     capSl.set(G.capDefault);
     var askBtn = H("button", { class: "lx-btn small", type: "button", html: "Find the cheapest plan" + LX.icon("target") }, ob);
     var optOut = H("div", { "aria-live": "polite" }, ob);
@@ -620,7 +673,7 @@
     var scen = H("details", { class: "lx13-scen" }, panel);
     H("summary", { text: "Costs in this scenario: gas price, nuclear cost" }, scen);
     var gasN = Num(scen, { label: "Gas price", color: "var(--lx-cc)", min: lim.gas.min, max: lim.gas.max, step: 0.05, value: S_.sc.gas,
-      fmt: function (v) { return "$" + v.toFixed(2) + "/MMBtu"; }, hint: "2025 U.S. average for power plants: $" + DEF.gas.toFixed(2) + " (EIA).", onChange: scenChanged });
+      fmt: function (v) { return "$" + v.toFixed(2) + "/MMBtu"; }, hint: "MMBtu: a million Btu of fuel energy. 2025 U.S. average for power plants: $" + DEF.gas.toFixed(2) + " (EIA).", onChange: scenChanged });
     var nucN = Num(scen, { label: "Nuclear capital cost", color: "var(--lx-nuc)", min: lim.nucCapex.min, max: lim.nucCapex.max, step: 5, value: S_.sc.nucCapex,
       fmt: function (v) { return "$" + Math.round(v).toLocaleString("en-US") + "/kW"; }, hint: "EIA's overnight cost for a large light-water plant: $" + DEF.nucCapex.toLocaleString("en-US") + "/kW.", onChange: scenChanged });
     H("button", { class: "lx-link", type: "button", text: "Back to the EIA values", onclick: function () { gasN.set(DEF.gas); nucN.set(DEF.nucCapex); scenChanged(); } }, scen);
@@ -650,9 +703,14 @@
       S_.sc = { gas: gasN.val(), nucCapex: nucN.val() }; S_.C = model.costs(cfg, S_.sc);
       KEYS.forEach(function (k) { sl[k].range(0, lim[k].max); });
       if (isDefault()) { S_.frontier = cfg.frontier.points; S_.frontierLive = false; frBtn.hidden = true; frNote.hidden = true; }
-      else { S_.frontier = []; frBtn.hidden = false; frNote.hidden = false; frNote.textContent = "The frontier depends on the costs: solve it again for these settings (about 14 solves)."; }
+      else frontierStale();
       S_.asked = null; optOut.innerHTML = "";
       changed();
+    }
+    // the stored frontier holds only for EIA's costs: other costs (changed here, or arriving in a shared link) need a new one
+    function frontierStale() {
+      S_.frontier = []; S_.frontierLive = false; frBtn.hidden = false; frNote.hidden = false;
+      frNote.textContent = "The frontier depends on the costs: solve it again for these settings (about " + cfg.frontier.caps.length + " solves).";
     }
     frBtn.addEventListener("click", function () {
       var caps = cfg.frontier.caps, pts = [], i = 0, key = S_.sc.gas + "|" + S_.sc.nucCapex;
@@ -686,7 +744,9 @@
       H("th", { scope: "col", text: "Optimizer, cap " + Math.round(a.cap / 1e3) + " kt" }, hr); H("th", { scope: "col", class: "n", text: "Optimizer" }, hr); H("th", { scope: "col", class: "n", text: "You" }, hr);
       var b = H("tbody", null, t);
       KEYS.forEach(function (k) { var tr = H("tr", null, b); H("td", { text: TECH[k].label }, tr); H("td", { class: "n", text: Math.round(s.plan[k]) + (k === "be" ? " MWh" : " MW") }, tr); H("td", { class: "n", text: S_.plan[k] + (k === "be" ? " MWh" : " MW") }, tr); });
-      var line = "Cost " + fm.musd(s.cost) + " a year for " + fm.kt(s.co2) + " of CO₂." + (s.capDual > 0.5 && a.cap > 0 ? " Cutting one more tonne would cost $" + Math.round(s.capDual) + ": the cap's [[shadow-price|shadow price]]." : " The cap does not bind: this is the cheapest plan of all.");
+      var rd = model.capReading(a.cap, s);
+      var line = "Cost " + fm.musd(s.cost) + " a year for " + fm.kt(s.co2) + " of CO₂." + (rd.kind === "zero" ? " This plan meets a zero operational-CO₂ cap: no gas runs. At that edge the shadow price is no guide to a carbon price."
+        : rd.kind === "binds" ? " Cutting one more tonne would cost $" + (rd.dual < 1 ? rd.dual.toFixed(2) : Math.round(rd.dual)) + ": the cap's [[shadow-price|shadow price]]." : " The cap does not bind: the cheapest plan of all already emits less.");
       H("p", { class: "lx13-sub", html: LX.rich(line) }, optOut);
       H("button", { class: "lx-btn ghost small", type: "button", text: "Use this plan", title: "Rounded up to the sliders' steps", onclick: function () { setPlan(model.ceilPlan(s.plan, lim)); S_.from = "optimizer"; run(); } }, optOut);
     }
@@ -701,7 +761,7 @@
         "The week with the least wind of 2025, kept as it was") + ".";
       if (S_.raw) wc.draw(model.weekSeries(S_.C, per[S_.week], S_.raw, S_.week, S_.plan), r.start);
     }
-    function drawFrontier() {   // the 0 kt point ($268.5M at the default costs) is left off the chart: it would squash the curve
+    function drawFrontier() {   // the 0 kt point (about $288M at the default costs) is left off the chart: it would squash the curve
       fc.frontier(S_.frontier.filter(function (p) { return p.cap == null || p.cap >= 25; }), S_.frontierLive ? "Frontier for this scenario" : null);
       var pts = [];
       if (S_.asked) pts.push({ id: "", label: "Optimizer, cap " + Math.round(S_.asked.cap / 1e3) + " kt", co2: S_.asked.sum.co2, cost: S_.asked.sum.cost, color: "var(--lx-ink-2)", kind: "opt", legend: "The optimizer's plan" });
@@ -729,7 +789,7 @@
     }
     function missions() {
       var s = S_.sum, g = S_.exactGap != null ? S_.exactGap : gapNow(), lit = s.unserved < 0.5;
-      ms.set("lights", { frac: lit ? 1 : Math.max(0.05, 1 - s.unservedShare * 200), text: lit ? "Every hour served" : fm.mwh(s.unserved) + " unserved", fail: !lit, won: lit });
+      ms.set("lights", { frac: lit ? 1 : Math.max(0.05, 1 - s.unservedShare * 200), text: lit ? "Every modelled hour served" : fm.mwh(s.unserved) + " unserved", fail: !lit, won: lit });
       ms.set("co2", { frac: s.co2 / target, text: fm.kt(s.co2), fail: s.co2 > target + 0.5, won: s.co2 <= target + 0.5 });
       ms.set("cost", { frac: g == null ? 0 : Math.max(0.03, g / G.costSlack), text: g == null ? "frontier not solved" : (S_.exactGap != null ? "+" : "about +") + fm.pct(Math.max(0, g), 1) + " vs frontier", fail: g != null && g > G.costSlack, won: lit && g != null && g <= G.costSlack });
     }
@@ -740,9 +800,9 @@
       else if (s.unserved >= 0.5) {
         var worst = 0, wk = 0; per.forEach(function (P, p) { var ws = model.weekSeries(S_.C, P, S_.raw, p, S_.plan); ws.unserved.forEach(function (u) { if (u > worst) { worst = u; wk = p; } }); });
         icon = "question"; msg = "Lights out: up to " + Math.round(worst) + " MW short in the " + tabs[wk].textContent.toLowerCase() + " week. Add [[firm-capacity|firm]] plants or storage.";
-      } else if (s.spilledShare > 0.1) { icon = "question"; msg = fm.pct(s.spilledShare, 0) + " of the wind, sun and nuclear output is [[curtailment|spilled]]: more than the town and the battery can use."; }
-      else if (s.co2 > target + 0.5) msg = "Every hour served. Cut " + fm.kt(s.co2 - target) + " more CO₂ to reach the target.";
-      else { var g = gapNow(); msg = "Every hour served, under the CO₂ target" + (g != null ? ", " + fm.pct(Math.max(0, g), 1) + " above the frontier." : "."); }
+      } else if (s.spilledShare > 0.1) { icon = "question"; msg = fm.pct(s.spilledShare, 0) + " of what the wind, solar and nuclear plants could make is [[curtailment|spilled]]: more than the town and the battery can use."; }
+      else if (s.co2 > target + 0.5) msg = "Every modelled hour served. Cut " + fm.kt(s.co2 - target) + " more CO₂ to reach the target.";
+      else { var g = gapNow(); msg = "Every modelled hour served, under the CO₂ target" + (g != null ? ", about " + fm.pct(Math.max(0, g), 1) + " above the frontier." : "."); }
       var e = H("div", { class: "lx-event t13", html: LX.icon(icon) + "<div>" + LX.rich(msg) + "</div>" }, evBox);
       return e;
     }
@@ -759,17 +819,17 @@
       S_.pred = LX.Predict(q, { id: "t13-start", fresh: true, q: "Lesson 0's five plants must now serve a whole year, with a peak of " + Math.round(Y.peak) + " MW. Will every light stay on?",
         options: [{ value: "yes", label: "Yes, all year" }, { value: "no", label: "No, some hours go dark" }], answer: "no",
         feedback: { yes: "Not quite.", no: "Right." }, lockText: "Locked in.",
-        onPick: function () { S_.picked = true; setTimeout(function () { if (!S_.done && S_.tourWait) tour.start(0); }, 900); var go = function () { var s = S_.sum; S_.pred.reveal(s.unserved >= 0.5 ? "The year leaves " + fm.mwh(s.unserved) + " unserved. Gas and nuclear give at most " + Math.round(S_.plan.cc + S_.plan.pk + S_.plan.nuc * cfg.techs.nuc.avail) + " MW; on some hot, still evenings wind and sun cannot cover the rest." : "Every hour is served."); };
+        onPick: function () { S_.picked = true; setTimeout(function () { if (!S_.done && S_.tourWait) tour.start(0); }, 900); var go = function () { var s = S_.sum; S_.pred.reveal(s.unserved >= 0.5 ? "Run on the seven weeks, the year leaves " + fm.mwh(s.unserved) + " unserved. Gas and nuclear give at most " + Math.round(S_.plan.cc + S_.plan.pk + S_.plan.nuc * cfg.techs.nuc.avail) + " MW; on some hot, still evenings wind and sun cannot cover the rest." : "Every modelled hour is served."); };
           if (S_.sum) go(); else LX.on("t13-run", function once() { if (S_.pred) { go(); S_.pred = null; } }); } });
     }
 
     // ---- finishing: stars, notes, the full-year check
     finBtn.addEventListener("click", finish);
     function finish() {
-      if (!S_.sum) return;
+      if (!S_.sum) return Promise.resolve();
       var s = S_.sum, C = S_.C;
       finBtn.disabled = true; status.set("solving");
-      LX.solver.solve(model.weekModel(C, RW, { cap: s.co2 }), { key: "t13-opt", label: "t13-score", timeLimit: 15 }).then(function (r) {
+      return LX.solver.solve(model.weekModel(C, RW, { cap: s.co2 }), { key: "t13-opt", label: "t13-score", timeLimit: 15 }).then(function (r) {
         finBtn.disabled = false; status.set(r);
         var f = r.ok ? model.summarize(C, per, r, { cap: s.co2 }).cost : model.frontierAt(S_.frontier, s.co2);
         debrief(s, f);
@@ -782,9 +842,10 @@
       LX.store.set("t13-score", { stars: st, frontier: fCost, cost: s.cost, co2: s.co2, unserved: s.unserved });
       panel.hidden = true; links.hidden = true; deb.hidden = false; deb.innerHTML = "";
       var hd = H("div", { class: "lx-deb-head" }, deb);
-      H("h3", { text: s.unserved < 0.5 ? "Your plan keeps every light on." : "Your plan leaves " + fm.mwh(s.unserved) + " unserved." }, hd);
+      var hTitle = H("h3", { text: s.unserved < 0.5 ? "Your plan serves every modelled hour." : "Your plan leaves " + fm.mwh(s.unserved) + " unserved in the modelled year." }, hd);
       H("a", { class: "lx-btn small", href: "#explain", html: "See it as diagrams" + LX.icon("arrow") }, hd);
-      LX.Stars(deb, [{ label: "Lights on", n: st.lights, value: s.unserved < 0.5 ? "every hour" : fm.mwh(s.unserved) + " short" },
+      H("p", { class: "lx13-sub", text: "Scored on the seven weeks. The full-year check below can change the verdict." }, deb);
+      LX.Stars(deb, [{ label: "Lights on", n: st.lights, value: s.unserved < 0.5 ? "every modelled hour" : fm.mwh(s.unserved) + " short" },
                      { label: "CO₂", n: st.co2, value: fm.kt(s.co2) }, { label: "Cost", n: st.cost, value: st.gap == null ? fm.musd(s.cost) : "+" + fm.pct(Math.max(0, st.gap), 1) }]);
       if (fCost) H("p", { class: "lx-hint", text: "The cheapest plan with your CO₂ (" + fm.kt(s.co2) + ") costs " + fm.musd(fCost) + " a year; yours costs " + fm.musd(s.cost) + "." }, deb);
       // check on all 8,760 hours
@@ -792,20 +853,32 @@
       H("p", { class: "lx-eyebrow", text: "Check it on the full year" }, fb);
       H("p", { class: "lx13-sub", text: "Your plan was run on seven weeks. Real planners re-run a chosen plan hour by hour on the whole year." }, fb);
       var fbtn = H("button", { class: "lx-btn ghost small", type: "button", text: "Run all 8,760 hours (a few seconds)" }, fb), fout = H("div", { "aria-live": "polite" }, fb);
+      S_.fullCheck = function () { fbtn.click(); };
       fbtn.addEventListener("click", function () {
         fbtn.disabled = true; fout.textContent = "Solving the full year…";
         var plan = copy(S_.plan), C = S_.C, fy = [{ demand: Y.demand, wind: Y.wind, solar: Y.solar, weight: 1 }];
         LX.solver.solve(model.fullYearModel(C, Y, { plan: plan }), { key: "t13-full", label: "t13-full", timeLimit: 30 }).then(function (r) {
           fbtn.disabled = false; fout.innerHTML = "";
           if (!r.ok) { fout.textContent = LX.solver.describe(r); return; }
-          var f = model.summarize(C, fy, r, { plan: plan }); S_.full = f;
-          LX.store.set("t13-full", { cost: f.cost, co2: f.co2, unserved: f.unserved, spilled: f.spilledShare, wcost: s.cost, wco2: s.co2, wun: s.unserved });
+          var f = model.summarize(C, fy, r, { plan: plan }), v = model.fullVerdict(s, f, target); S_.full = f;
+          var hrsShort = Object.keys(r.values).filter(function (k) { return k.charAt(0) === "u" && r.values[k] > 0.05; }).length;
+          LX.store.set("t13-full", { cost: f.cost, co2: f.co2, unserved: f.unserved, spilled: f.spilledShare, wcost: s.cost, wco2: s.co2, wun: s.unserved, held: v.held });
           var t = H("table", { class: "lx13-cmp" }, fout), hr = H("tr", null, H("thead", null, t));
           ["", "Seven weeks", "All 8,760 hours"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
           var b = H("tbody", null, t);
           [["Cost a year", fm.musd(s.cost), fm.musd(f.cost)], ["CO₂ a year", fm.kt(s.co2), fm.kt(f.co2)], ["Unserved", fm.mwh(s.unserved), fm.mwh(f.unserved)], ["Spilled", fm.pct(s.spilledShare), fm.pct(f.spilledShare)]]
             .forEach(function (row) { var tr = H("tr", null, b); row.forEach(function (x) { H("td", { text: x }, tr); }); });
-          H("p", { class: "lx13-sub", text: "Solved in " + Math.max(1, Math.round(r.ms.roundTrip)) + " ms. " + (f.unserved > s.unserved + 0.5 ? "Some hours outside the seven weeks go short: a representative week cannot show every still, hot evening." : "The seven weeks held up for this plan.") }, fout);
+          // the verdict, judged again on the full year: demand served, and CO2 against the target
+          var ul = H("ul", { class: "lx13-verdict" }, fout);
+          var vline = function (good, html) { var li = H("li", null, ul); H("span", { class: good ? "ok" : "no", html: LX.icon(good ? "check" : "question") }, li); H("span", { html: html }, li); };
+          vline(v.served, v.served ? "Demand: every one of the 8,760 hours served." : "Demand: <b>" + fm.mwh(f.unserved) + "</b> unserved in " + hrsShort + " hours (" + (f.unservedShare * 100).toFixed(4) + "% of the year's demand).");
+          vline(v.co2ok, "CO₂: <b>" + fm.kt(f.co2) + "</b> against the " + G.co2Target + " kt target" + (v.co2ok ? ", under it." : ": " + fm.kt(v.over) + " (" + fm.pct(v.overShare, 1) + ") over."));
+          var why = !v.co2ok && !v.served ? "some hours go short and gas runs more than they predicted." : !v.co2ok ? "gas runs more than they predicted." : "some hours go short.";
+          H("p", { class: "lx13-sub", text: "Solved in " + Math.max(1, Math.round(r.ms.roundTrip)) + " ms. " + (v.held ? "The seven-week verdict holds for this plan on the full year." :
+            !v.changed ? "The full year confirms what the seven weeks showed." : "The full year changes the verdict: seven weeks cannot show every still, hot evening, so " + why) }, fout);
+          hTitle.textContent = "On the full year, your plan " + (v.served ? "serves every hour" : "leaves " + fm.mwh(f.unserved) + " unserved") + " and emits " + fm.kt(f.co2) + (v.co2ok ? ", under the target." : ", over the " + G.co2Target + " kt target.");
+          ms.set("lights", { frac: v.served ? 1 : Math.max(0.05, 1 - f.unservedShare * 200), text: v.served ? "Full year: every hour served" : "Full year: " + fm.mwh(f.unserved) + " unserved", fail: !v.served, won: v.served });
+          ms.set("co2", { frac: f.co2 / target, text: "Full year: " + fm.kt(f.co2), fail: !v.co2ok, won: v.co2ok });
           LX.emit("t13-run");
         });
       });
@@ -814,8 +887,8 @@
         { icon: "scale", title: "Firm capacity", text: "On a still, dark evening only [[firm-capacity|firm]] plants and storage serve the peak.", moment: "", got: S_.short, lock: "See a plan go short once to collect this." },
         { icon: "cloud", title: "Spilled energy", text: "Output beyond what the town and the battery can take is thrown away.", moment: "Your highest spill: " + fm.pct(S_.spill, 0) + ".", got: S_.spill >= 0.05, lock: "Build enough wind or sun to spill 5% to collect this." },
         { icon: "battery", title: "Storage", text: "A battery moves energy to the hours that need it and loses 15% on the way.", moment: "", got: S_.bat, lock: "Run a plan with a battery to collect this." },
-        { icon: "target", title: "Shadow price of the cap", text: "What one more tonne of allowed CO₂ would save the cheapest plan.", moment: S_.asked && S_.asked.sum.capDual ? "$" + Math.round(S_.asked.sum.capDual) + " per tonne at " + Math.round(S_.asked.cap / 1e3) + " kt." : "", got: !!S_.asked, lock: "Ask the optimizer to collect this." },
-        { icon: "frontier", title: "The frontier", text: "No plan is both cheaper and cleaner than a plan on the frontier.", moment: g != null ? "Your plan: " + fm.pct(Math.max(0, g), 1) + " above it." : "", got: g != null && g <= G.costSlack && s.unserved < 0.5, lock: "Get within " + Math.round(G.costSlack * 100) + "% of the frontier with every light on." }
+        { icon: "target", title: "Shadow price of the cap", text: "What one more tonne of allowed CO₂ would save the cheapest plan.", moment: S_.asked && model.capReading(S_.asked.cap, S_.asked.sum).kind === "binds" ? "$" + Math.round(S_.asked.sum.capDual) + " per tonne at " + Math.round(S_.asked.cap / 1e3) + " kt." : "", got: !!S_.asked, lock: "Ask the optimizer to collect this." },
+        { icon: "frontier", title: "The frontier", text: "No plan is both cheaper and cleaner than a plan on the frontier.", moment: g != null ? "Your plan: " + fm.pct(Math.max(0, g), 1) + " above it." : "", got: g != null && g <= G.costSlack && s.unserved < 0.5, lock: "Get within " + Math.round(G.costSlack * 100) + "% of the frontier with every modelled hour served." }
       ];
       H("h4", { class: "lx-deb-notes", text: "Notes collected: " + NOTES.filter(function (n) { return n.got; }).length + " of " + NOTES.length }, deb);
       LX.Notes(deb, NOTES.map(function (n) { n.link = { href: "#explain", text: "On the concept map" }; return n; }));
@@ -833,6 +906,7 @@
     ], { key: "t13-coach" });
     retour.addEventListener("click", function () { root.scrollIntoView({ block: "start" }); setTimeout(function () { tour.start(0, true); }, 60); });
     setPlan(S_.plan); gasN.set(S_.sc.gas); nucN.set(S_.sc.nucCapex);
+    if (!isDefault()) { frontierStale(); scen.open = true; }
     tCost.b.textContent = "…"; drawFrontier(); status.set("loading");
     var first = run();
     if ("IntersectionObserver" in window && !LX.demoState()) {
@@ -842,13 +916,14 @@
       }, { threshold: 0.95 });
       io.observe(sl.wind.el);
     }
-    // demo states (core.js LX.demo): "mid" = the optimizer's plan at the target, loaded into the sliders; "done" = then scored
+    // demo states (core.js LX.demo): "mid" = the optimizer's plan at the target, loaded into the sliders; "done" = then scored;
+    // "year" = scored, then checked on all 8,760 hours (the full-year verdict)
     LX.demo(root, function (state) {
-      if (state !== "mid" && state !== "done") return null;
+      if (state !== "mid" && state !== "done" && state !== "year") return null;
       first.then(function () {
         if (S_.pred) { S_.pred = null; evBox.querySelectorAll(".lx-ecard").forEach(function (n) { n.remove(); }); }
         capSl.set(G.co2Target); ask();
-        LX.on("t13-asked", function () { setPlan(model.ceilPlan(S_.asked.sum.plan, lim)); S_.from = "optimizer"; run().then(function () { if (state === "done") finish(); }); });
+        LX.on("t13-asked", function () { setPlan(model.ceilPlan(S_.asked.sum.plan, lim)); S_.from = "optimizer"; run().then(function () { if (state === "done" || state === "year") finish().then(function () { if (state === "year" && S_.fullCheck) S_.fullCheck(); }); }); });
       });
       return { view: state };
     });
@@ -900,6 +975,7 @@
         "the weather of 2025 is a fair guide: one year of real Southwest Power Pool shapes, scaled to the town;",
         "costs stay as entered: EIA's 2026 values in 2025 dollars, the battery in 2024 dollars, the same in every year;",
         "the town is an island: no imports, no transmission limits inside it;",
+        "nuclear output is a constant " + Math.round(cfg.techs.nuc.avail * 1000) / 10 + "% of its size every hour: a fleet's yearly average, which cannot show reliability;",
         "seven weeks stand in for the year (check it on all 8,760 hours in the debrief)." ],
       leaves: [
         "start-up costs, minimum output and ramp limits of gas plants (lesson 0 had a ramp limit);",

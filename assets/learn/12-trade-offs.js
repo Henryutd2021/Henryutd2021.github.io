@@ -12,8 +12,9 @@
 //   winners(plans, max)     the price intervals at which each plan wins (0..max $/t), and the plans that never win
 //   supported(plans)        non-dominated plans on the lower convex hull of (CO2, cost): only these can win a weighted sum
 // The solver runs lesson 13's LP in the browser: capped (epsilon-constraint: least cost with CO2 <= cap) and priced
-// (weighted sum: least cost + price x CO2, no cap). For an LP the cap's shadow price, used as a price, lands on the same
-// frontier point, or, where the frontier is a straight piece, at one end of that piece.
+// (weighted sum: least cost + price x CO2, no cap). For an LP the cap's best plan is also one of the cheapest plans at the
+// cap's shadow price; the solver may return another plan that ties, so the price lands near the cap's point or, where the
+// frontier is (nearly) straight, further along that piece. Every plan's year is estimated from seven representative weeks.
 // Every number the page states is checked by _tests/learn/test_12-trade-offs.js.
 (function () {
   "use strict";
@@ -54,7 +55,9 @@
   }
   // the frontier's slope between two plans, in $ per tonne
   function slope(a, b) { return (R(b).cost - R(a).cost) / (R(a).co2 - R(b).co2); }
-  var model = { dominated: dominated, winner: winner, winners: winners, supported: supported, slope: slope };
+  // the winners a reader should see on the price slider: every plan that wins some price from 0 to max, in order
+  function WINNERS_TO_SEE(plans, max) { return winners(plans, max).intervals.map(function (w) { return w.id; }); }
+  var model = { dominated: dominated, winner: winner, winners: winners, supported: supported, slope: slope, toSee: WINNERS_TO_SEE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -69,7 +72,8 @@
       ".lx12-plans button.dom{text-decoration:line-through;color:var(--lx-ink-3)}",
       ".lx12-out{font-size:15px;color:var(--lx-ink)}.lx12-out b{font-family:var(--lx-f-mono);font-weight:600}",
       ".lx12-tbl{width:100%;border-collapse:collapse;font-size:14px}.lx12-tbl td,.lx12-tbl th{padding:3px 4px;border-bottom:1px solid var(--lx-line);text-align:left;font-weight:400}",
-      ".lx12-tbl .n{text-align:right;font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.lx12-tbl th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}"
+      ".lx12-tbl .n{text-align:right;font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}.lx12-tbl th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}",
+      ".lx12-tbl td.w{font-size:13px;color:var(--lx-ink-2);min-width:12em}.lx12-scroll{overflow-x:auto;max-width:100%}"
     ].join("") }, document.head);
   }
   var COLORS = { A: "var(--lx-cc)", B: "var(--lx-wind)", C: "var(--lx-solar)", D: "var(--lx-tier-5)", E: "var(--lx-warn)", F: "var(--lx-tier-2)" };
@@ -80,6 +84,7 @@
     var cfg = data["13_capstone"], t = data["12_trade_offs"];
     var Y = TP.prepareYear(data.town_year, data.cf_targets, cfg), RW = TP.selectWeeks(Y, cfg.weeks), per = TP.periodsOf(RW), C = TP.costs(cfg, {});
     var plans = t.plans.map(function (p) { return { id: p.id, label: p.label, note: p.note, plan: p.plan, cost: p.result.cost, co2: p.result.co2, spilled: p.result.spilled }; });
+    var target = WINNERS_TO_SEE(plans, t.priceMax);
     var byId = {}; plans.forEach(function (p) { byId[p.id] = p; });
     var DOM = dominated(plans), WIN = winners(plans, t.priceMax);
     var S_ = { picked: null, foundDom: false, price: 0, seen: {}, solved: [], priced: null, steel: {}, step: 0 };
@@ -89,16 +94,17 @@
     var card = H("section", { class: "lx13-card", "aria-label": "Plans for Prairie Town, cost against CO₂" }, stage);
     var hd = H("div", { class: "lx13-head" }, card); H("h3", { text: "Prairie Town's plans: cost against CO₂" }, hd);
     var status = LX.SolverStatus(hd);
-    H("p", { class: "lx13-sub", text: "Each dot is one plan's year: cost on the left axis, CO₂ along the bottom. Down and left is better on both." }, card);
-    var fc = LX.Frontier(card, { label: "Six plans for Prairie Town and the frontier you trace, cost against CO₂" });
+    H("p", { class: "lx13-sub", text: "Each dot is one plan's year, estimated from seven representative weeks: cost up the side, CO₂ along the bottom. Down and left is better on both." }, card);
+    var fc = LX.Frontier(card, { label: "Six plans for Prairie Town and the frontier you trace, cost against CO₂", shadeLabel: "out of reach (approximately)" });
     var tdet = H("details", { class: "lx-textalt" }, card); H("summary", { text: "The six plans in numbers" }, tdet);
-    var tbl = H("table", { class: "lx12-tbl" }, tdet), hr = H("tr", null, H("thead", null, tbl));
-    [["Plan", ""], ["Cost a year", "n"], ["CO₂ a year", "n"], ["Spilled", "n"]].forEach(function (c) { H("th", { scope: "col", class: c[1], text: c[0] }, hr); });
+    var tsc = H("div", { class: "lx12-scroll" }, tdet), tbl = H("table", { class: "lx12-tbl" }, tsc), hr = H("tr", null, H("thead", null, tbl));
+    [["Plan", ""], ["What it builds", ""], ["Cost a year", "n"], ["CO₂ a year", "n"], ["Spilled", "n"]].forEach(function (c) { H("th", { scope: "col", class: c[1], text: c[0] }, hr); });
     var tb = H("tbody", null, tbl);
     plans.forEach(function (p) {
-      var tr = H("tr", null, tb); H("td", { html: "<b>" + p.id + "</b> " + LX.esc(p.label) }, tr);
+      var tr = H("tr", null, tb); H("td", { html: "<b>" + p.id + "</b> " + LX.esc(p.label) }, tr); H("td", { class: "w", text: p.note }, tr);
       H("td", { class: "n", text: fm.musd(p.cost) }, tr); H("td", { class: "n", text: fm.kt(p.co2) }, tr); H("td", { class: "n", text: fm.pct(p.spilled, 0) }, tr);
     });
+    H("p", { class: "lx-hint", text: "Spilled: the share of what the wind and solar farms could make that nobody used. Yearly figures are estimates from seven representative weeks of 2025; lesson 13 checks plans on all 8,760 hours." }, tdet);
 
     function draw() {
       var pts = plans.map(function (p) {
@@ -108,7 +114,7 @@
                  ring: (S_.step === 0 && S_.picked === p.id) || (S_.step === 1 && winner(plans, S_.price).id === p.id), note: mark === "dominated" ? "dominated" : mark === "never" ? "never wins a weighted sum" : "" };
       });
       if (S_.priced) pts.push({ id: "", label: "Priced at $" + S_.priced.price.toFixed(1) + "/t, no cap", co2: S_.priced.co2, cost: S_.priced.cost, color: "var(--lx-accent)", kind: "price", legend: "Solved with a carbon price" });
-      fc.frontier(S_.solved.map(function (s) { return { cap: s.cap, co2: s.co2, cost: s.cost, solved: true }; }), S_.solved.length ? "Frontier you traced (solver, CO₂ caps)" : null);
+      fc.frontier(S_.solved.map(function (s) { return { cap: s.cap, co2: s.co2, cost: s.cost, solved: true }; }), S_.solved.length ? "Frontier you traced: solved caps joined by straight lines" : null);
       fc.plans(pts);
       if (S_.step === 1) { var w = winner(plans, S_.price); fc.price(S_.price, byId[w.id]); } else fc.price(null);
     }
@@ -133,14 +139,14 @@
         S_.priced = { price: price, cost: s.cost, co2: s.co2 }; draw(); return S_.priced;
       });
     }
-    var planNote = function (rec) {
+    var planNote = function (rec) {   // the cost in one sentence, what the plan builds in the next
       var p = rec.plan, gas = Math.round(p.cc + p.pk);
-      return "Cap " + rec.cap + " kt: " + fm.musd(rec.cost) + " a year; wind " + Math.round(p.wind) + " MW, solar " + Math.round(p.solar) + " MW, gas " + gas + " MW" +
-        (p.nuc > 0.5 ? ", nuclear " + Math.round(p.nuc) + " MW" : "") + (p.bp > 0.5 ? ", battery " + Math.round(p.bp) + " MW" : "") + ".";
+      return "Cap " + rec.cap + " kt: " + fm.musd(rec.cost) + " a year. It builds wind " + Math.round(p.wind) + " MW, solar " + Math.round(p.solar) + " MW, gas " + gas + " MW" +
+        (p.nuc > 0.5 ? ", nuclear " + Math.round(p.nuc) + " MW" : "") + (p.bp > 0.5 ? " and a " + Math.round(p.bp) + " MW / " + Math.round(p.be) + " MWh battery" : "") + ".";
     };
 
     var steps = [
-      { text: "Six hand-made plans for Prairie Town, each run for a year by lesson 13's model. One plan is beaten on both counts: another costs less and emits less. Tap it.",
+      { text: "Six hand-made plans for Prairie Town, with yearly cost and CO₂ estimated from seven weeks of 2025 by lesson 13's model. Tap the plan that another beats on both counts.",
         build: function (act, api) {
           S_.step = 0; draw();
           var row = H("div", { class: "lx12-plans", role: "group", "aria-label": "Pick the plan that is beaten on both counts" }, act), btn = {};
@@ -149,36 +155,39 @@
             S_.picked = id; Object.keys(btn).forEach(function (k) { btn[k].setAttribute("aria-pressed", k === id ? "true" : "false"); });
             if (DOM.indexOf(id) >= 0) {
               S_.foundDom = true; btn[id].classList.add("dom");
-              var d = byId.D, e = byId[id];
-              api.saw("Right: plan D costs " + fm.musd(e.cost - d.cost) + " less a year and emits " + fm.kt(e.co2 - d.co2) + " less. " + id + " spills " + fm.pct(e.spilled, 0) + " of its output, mostly solar at midday. " + id + " is [[dominated-plan|dominated]].");
+              var d = byId.D, e = byId[id], farms = [e.plan.wind ? "wind" : "", e.plan.solar ? "solar" : ""].filter(Boolean);
+              api.saw("Right: plan D costs " + fm.musd(e.cost - d.cost) + " less a year and emits " + fm.kt(e.co2 - d.co2) + " less, so " + id + " is [[dominated-plan|dominated]]. " +
+                id + "'s " + farms.join(" and ") + (farms.length > 1 ? " farms spill " : " farm spills ") + fm.pct(e.spilled, 0) + " of what " + (farms.length > 1 ? "they" : "it") + " could make.");
               api.done();
             } else api.saw("Not this one: no plan both costs less and emits less than " + id + " (" + byId[id].label + ").", true);
             draw();
           };
           if (S_.foundDom) S_.onPick(DOM[0]);
         } },
-      { text: "Put a [[carbon-price|price on carbon]]. Each plan now scores its cost plus the price times its CO₂, and the lowest score wins. Slide the price and watch the winner move.",
+      { text: "Put a [[carbon-price|price on carbon]]: each plan scores its cost plus the price times its CO₂, and the lowest score wins. Slide the price until you have seen " + target.length + " different winners.",
         build: function (act, api) {
           S_.step = 1;
-          var out = H("p", { class: "lx12-out", "aria-live": "polite" }, act);
+          var out = H("p", { class: "lx12-out", "aria-live": "polite" }, act), prog = H("p", { class: "lx13-sub" }, act);
           var n = U.Num(act, { label: "Carbon price", color: "var(--lx-accent)", min: 0, max: t.priceMax, step: t.priceStep, value: S_.price,
             fmt: function (v) { return "$" + v + " per tonne"; }, hint: "Score = cost + price × CO₂. The dashed line joins equal scores.", onChange: upd });
           function upd(v) {
             S_.price = v; var w = winner(plans, v); S_.seen[w.id] = true;
             out.innerHTML = "At <b>$" + v + "</b> a tonne, plan <b>" + w.id + "</b> wins (" + LX.esc(byId[w.id].label) + "), score " + fm.musd(w.score) + ".";
-            var order = WIN.intervals.map(function (x) { return x.id; });
-            if (Object.keys(S_.seen).length >= 3 && !S_.seenAll) {
-              S_.seenAll = true;
-              api.saw("The winner moves " + order.join(" → ") + " as the price rises. Plan " + WIN.never.filter(function (id) { return DOM.indexOf(id) < 0; }).join(", ") +
-                " never wins at any price, though no plan beats it on both counts: it sits in a dent between B and D.");
-              api.done();
+            var got = target.filter(function (id) { return S_.seen[id]; });
+            prog.textContent = "Winners seen: " + got.join(", ") + " (" + got.length + " of " + target.length + ")" + (got.length < target.length ? ". Move the price in small steps." : ".");
+            if (got.length >= target.length && !S_.seenAll) {
+              S_.seenAll = true; sawWinners(); api.done();
             }
             draw();
           }
           upd(S_.price);
-          if (S_.seenAll) api.done();
+          function sawWinners() {
+            api.saw("The winner moves " + WIN.intervals.map(function (x) { return x.id; }).join(" → ") + " as the price rises. Plan " + WIN.never.filter(function (id) { return DOM.indexOf(id) < 0; }).join(", ") +
+              " never wins at any price, though no plan beats it on both counts: it sits in a dent between B and D.");
+          }
+          if (S_.seenAll) { sawWinners(); api.done(); }
         } },
-      { text: "Now let the solver design the plan. Set a [[emissions-cap|CO₂ cap]] and solve: it finds the cheapest plan for the town under that cap. Solve four caps to trace the [[pareto-frontier|frontier]].",
+      { text: "Now the solver designs the plan: set a [[emissions-cap|CO₂ cap]] and solve for the cheapest plan under it. Solve four caps to trace the [[pareto-frontier|frontier]].",
         build: function (act, api) {
           S_.step = 2; S_.priced = null; draw();
           var cap = LX.Slider(act, { label: "CO₂ cap", color: "var(--lx-ink-2)", max: t.caps.max, step: t.caps.step, unit: "kt", hint: function () { return "The year's CO₂ may not exceed this."; } });
@@ -190,7 +199,7 @@
           function check() {
             if (S_.solved.length < 4) return;
             var lo = S_.solved.filter(function (x) { return x.dual > 0.5 && x.cap > 0; }), a = lo[lo.length - 1], b = lo[0];
-            api.saw("Every solved plan lies below and left of the hand-made ones. The curve steepens" + (a && b && a !== b ? ": the last tonne costs $" + Math.round(a.dual) + " at " + a.cap + " kt and $" + Math.round(b.dual) + " at " + b.cap + " kt." : "."));
+            api.saw("At the CO₂ of each hand-made plan, the solver's cheapest plan costs less. The curve steepens" + (a && b && a !== b ? ": the last tonne costs $" + Math.round(a.dual) + " at " + a.cap + " kt and $" + Math.round(b.dual) + " at " + b.cap + " kt." : "."));
             api.done();
           }
           go.addEventListener("click", function () {
@@ -229,14 +238,14 @@
               go.disabled = false; if (!p) return;
               res.innerHTML = "The price lands at <b>" + fm.kt(p.co2) + "</b> and <b>" + fm.musd(p.cost) + "</b> a year; the cap's plan: " + fm.kt(x.co2) + ", " + fm.musd(x.cost) + ".";
               var near = Math.abs(p.co2 - x.co2) <= Math.max(5e3, 0.03 * x.co2);
-              api.saw(near ? "Same point, two routes: a cap of " + x.cap + " kt and a price of $" + x.dual.toFixed(1) + "/t meet on the frontier. A cap fixes the tonnes; a price fixes the cost of each tonne."
-                : "Near " + x.cap + " kt the frontier is a straight piece with a slope of $" + x.dual.toFixed(1) + "/t, so this price ties every plan on it and the solver returns one end. That is a limit of [[weighted-sum|weighted sums]].");
+              api.saw(near ? "Two routes, nearly the same point: the cap's plan is also one of the cheapest at that price. A cap fixes the tonnes; a price fixes the cost of each tonne."
+                : "Near " + x.cap + " kt the frontier is nearly straight, with a slope close to $" + x.dual.toFixed(1) + "/t: a tiny change in price moves the plan far along it. That is a limit of [[weighted-sum|weighted sums]].");
               api.done();
             });
           });
           if (S_.priced) api.done();
         } },
-      { text: "The model maps the trade-off; it cannot say which point to pick. That choice weighs today's bills against climate harm, and who pays. Open the strongest case for each route.",
+      { text: "The model maps the trade-off but cannot say which point to pick: that weighs today's bills against climate harm, and who pays. Open the strongest case for each route.",
         build: function (act, api) {
           S_.step = 4; draw();
           LX.Steelman(act, {
@@ -277,7 +286,7 @@
     var TT = LX.townPlan.ui.TextTable, never = WIN.never.filter(function (id) { return DOM.indexOf(id) < 0; }).join(", ");
     TT(c1, {
       title: "Three ways to weigh cost against CO₂",
-      lede: "A carbon tax works like the weighted sum; an emissions cap works like the epsilon-constraint.",
+      lede: "A carbon tax works like the [[weighted-sum|weighted sum]]; an emissions cap works like the [[epsilon-constraint|epsilon-constraint]] method.",
       columns: [{ key: "name", label: "Method" }, { key: "set", label: "You set" }, { key: "get", label: "You get" }, { key: "all", label: "Finds every frontier plan?" }],
       rows: [
         { color: "var(--lx-warn)", name: "Rule out dominated plans", note: "step 1", set: "Nothing", get: "The plans nobody should pick (here: plan " + DOM.join(", ") + ")", all: "No: it only removes plans" },

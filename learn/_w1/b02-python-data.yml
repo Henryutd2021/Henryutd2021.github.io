@@ -1,4 +1,5 @@
-# Sidecar of lesson B2 (builder e, W1, 2026-11-02): new glossary terms and requests for shared files.
+# Sidecar of lesson B2 (builder e, W1, 2026-11-02; updated by fix group D, 2026-11-02): new glossary terms and requests
+# for shared files.
 lesson: b02-python-data
 glossary:
   - {id: utc, term: "Coordinated Universal Time (UTC)", def: "The world reference clock, with no daylight saving; EIA stamps its hourly grid data in it."}
@@ -10,11 +11,11 @@ glossary:
   - {id: duration-curve, term: "Duration curve", def: "A year of hourly values sorted from highest to lowest, showing for how many hours each level is reached."}
   - {id: assert, term: "Assert", def: "A line of code that stops a program with a message when a stated condition is false."}
   - {id: dataframe, term: "DataFrame", def: "A pandas table with named columns and an index, such as one row per hour."}
+  - {id: median, term: "Median", def: "The middle value of a set sorted from lowest to highest: half the values lie below it, half above."}
+  - {id: quartile, term: "Quartile", def: "The values that cut a sorted set into four equal parts: 25% of values lie below the first, 50% below the second (the median), 75% below the third."}
+  - {id: standard-deviation, term: "Standard deviation", def: "A measure of spread: roughly, how far a typical value lies from the mean."}
 requests:
-  - "Scope scan: the page's two data downloads (../assets/learn/data/b02-python-data.json and ../assets/learn/data/town_year.json) are flagged as internal links outside learn/. The notebook needs them; please allow Learn's own assets/learn/data/ files as internal link targets, or say how the files should be offered. Not worked around."
-  - "Data build finding: the cleaned town_year.json still fails a night-time solar check in 64 hours (solar above 5% of its maximum, local hours starting 00:00-03:00): 54 between 20 February and 14 March, 15 kept from raw readings that barely changed between day and night, 49 written by the same-hour fill drawing on those days. Suggest adding this check to scripts/build_learn_town_data.py (flag such days, refill). The lesson computes every number live from the files; _tests/learn/test_b02-python-data.js pins 64 and would need updating, as would any lesson quoting solar shapes for those weeks."
-  - "Provenance: please add scripts/build_learn_b02_data.py (draft: scratchpad b02build/build_learn_b02_data.py). It writes assets/learn/data/b02-python-data.json from the same two EIA files (checksums recorded) with the town data build's own reader, without any cleaning."
-  - "Notebook: Quarto copies learn/notebooks/b02-python-data.ipynb into _site because the page links it; no _quarto.yml change was needed. When the labs repository exists, add its Colab link (and the allow-list entry). Verified: all 30 code cells run with pandas 2.3.3 + matplotlib 3.9.4 (full Jupyter execution, 3 plots) and with pandas 3.1.0; system python3 has no pandas."
-  - "Allow-list: pandas.pydata.org (documentation) for B2 and R4 is not on the curriculum allow-list, so the page does not link it."
-  - "path.yml v2 entry: no subtitle, short, outcome or lab. The page dropped its subtitle to match. Suggested: subtitle 'Find the bad hours in a real year of grid data'; short 'Python and data'; lab 'a notebook (about 60 minutes) that repeats every step in pandas, with auto-check cells'."
+  - "Scope scan: the page's two data downloads (../assets/learn/data/b02-python-data.json and ../assets/learn/data/town_year.json) are Learn's own data files; keep them allowed as internal link targets."
+  - "Provenance: scripts/build_learn_b02_data.py writes the meta of assets/learn/data/b02-python-data.json. Its lines 40, 47 and 50 still say 'as published (before cleaning)', 'so each value is also the MWh in that hour' and 'No value is changed'; the JSON now says 'EIA-adjusted extract, before this course's cleaning', 'times one hour, it is that hour's energy in MWh' and 'Extraction only: each fuel's adjusted generation columns are summed and negative values set to 0; no hour is repaired'. Please copy those strings into the script so a re-run keeps them."
+  - "Notebook: Quarto copies learn/notebooks/b02-python-data.ipynb into _site because the page links it. When the labs repository exists, add its Colab link. Re-run on 2026-11-02 with the refreshed town data (pandas 2.3.3, matplotlib 3.9.4): all 30 code cells pass; the solar capacity factor is now 23.4%."
   - "Screenshot tool: this page supports learn/b02-python-data.html#lx-demo (steps 1-3 done, step 4 at N = 3) for the mid state."

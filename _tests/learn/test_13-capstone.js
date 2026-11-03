@@ -5,8 +5,10 @@
 //   - the seven weeks: weights add up to 8,760 hours, every calendar week is mapped, season energy is kept
 //   - the LP: balance, battery limits and the calendar link of the battery's level; objective = reported cost
 //   - the precomputed frontier: every point re-solved; cost falls and the cap's shadow price rises as the cap loosens
-//   - the game: the starting plan goes short; the optimizer's 200 kt plan, rounded up, wins every mission
-//   - the full-year check (8,760 hours, fixed plans) behind the Go deeper table; share links; stars
+//   - the optimizer's cap read as zero, binding or loose (a zero cap is never called loose)
+//   - the game: the starting plan goes short; the optimizer's 200 kt plan, rounded up, wins every mission on seven weeks
+//   - the full-year check (8,760 hours, fixed plans) behind the Go deeper table and the debrief's full-year verdict
+//     (demand served and CO2 against the target, judged again); share links; stars
 //   - timings of the solves the page makes (Node, this machine)
 // Usage (from the site folder):  node _tests/learn/test_13-capstone.js [--full] [--write]
 //   --full   also solve the optimizer on all 8,760 hours (slow: about a minute) and print its error against seven weeks
@@ -159,11 +161,12 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   const at = cap => pts.find(p => p.cap === cap), free = pts.find(p => p.cap == null);
   ok(near(M.frontierAt(pts, at(200).co2), at(200).cost, 1e-6) && M.frontierAt(pts, (at(150).co2 + at(200).co2) / 2) >= (at(150).cost + at(200).cost) / 2 - 1, "frontierAt: exact at solved points, straight lines between");
   // the static fallback table
-  const gas = p => Math.round(p.plan.cc + p.plan.pk) + " MW", mw = v => Math.round(v) + " MW";
+  const gas = p => Math.round(p.plan.cc + p.plan.pk) + " MW", mw = v => Math.round(v) + " MW", bat = p => Math.round(p.plan.bp) + " / " + Math.round(p.plan.be);
   [[null, "none (" + kt(free.co2) + ")"], [600, "600 kt"], [400, "400 kt"], [200, "200 kt"], [100, "100 kt"], [0, "0 kt"]].forEach(([cap, lab]) => {
     const p = pts.find(q => q.cap === cap);
-    onPage(`<tr><td>${lab}</td><td>${musd(p.cost)}</td><td>${mw(p.plan.wind)}</td><td>${mw(p.plan.solar)}</td><td>${gas(p)}</td><td>${mw(p.plan.nuc)}</td><td>${mw(p.plan.bp)}</td></tr>`, `the fallback row for ${lab}`);
+    onPage(`<tr><td>${lab}</td><td>${musd(p.cost)}</td><td>${mw(p.plan.wind)}</td><td>${mw(p.plan.solar)}</td><td>${gas(p)}</td><td>${mw(p.plan.nuc)}</td><td>${bat(p)}</td></tr>`, `the fallback row for ${lab} (battery MW / MWh)`);
   });
+  onPage("Battery (MW / MWh)", "the battery column names both sizes");
   // myths and the quick question
   onPage(`at 100 kt the optimizer keeps ${gas(at(100))} of gas and adds solar and a battery`, "the first myth");
   ok(at(100).plan.bp > 0.5, "at 100 kt the optimizer builds a battery");
@@ -171,6 +174,15 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   onPage(`The cheapest plan at 150 kt costs ${musd(at(150).cost)}`, "the quick question");
   const qq = 140.0 / +(at(150).cost / 1e6).toFixed(1) - 1, gapM = (140.0 - +(at(150).cost / 1e6).toFixed(1)).toFixed(1);
   onPage(`${(qq * 100).toFixed(1)}%: 140.0 ÷ ${(at(150).cost / 1e6).toFixed(1)} − 1 = ${qq.toFixed(3)}. You could cut cost by $${gapM}M`, `the quick question's answer (${(qq * 100).toFixed(1)}%)`);
+
+  // ---------------- what the optimizer's cap means (the line under its plan): zero, binding, or loose
+  const capAt = cap => M.summarize(C, per, solve(M.weekModel(C, RW, { cap })), { cap });
+  const z0 = capAt(0), c900 = capAt(900e3);
+  ok(M.capReading(0, z0).kind === "zero" && z0.cost > 2 * free.cost, `a zero cap is read as "zero" (it binds: ${musd(z0.cost)} against ${musd(free.cost)} with no cap), never as "does not bind"`);
+  ok(M.capReading(200e3, sO).kind === "binds" && near(M.capReading(200e3, sO).dual, at(200).dual, 0.01), "a 200 kt cap binds, with its shadow price");
+  ok(M.capReading(900e3, c900).kind === "free" && c900.co2 < 900e3 - 1e3, `a 900 kt cap is looser than the cheapest plan's ${kt(c900.co2)}: "does not bind"`);
+  ok(JS.indexOf("This plan meets a zero operational-CO₂ cap") > 0 && JS.indexOf('rd.kind === "zero"') > 0 && JS.indexOf("this is the cheapest plan of all") < 0, "the page words the zero cap apart from a loose cap");
+  ok(!/every light on, all year/i.test(JS + page), "no 'every light on, all year' claim from seven weeks");
 
   // ---------------- the game's missions are reachable with the optimizer's plan
   const lim = cfg.limits, target = cfg.game.co2Target * 1e3;
@@ -193,11 +205,25 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
     onPage(row, `the full-year check at ${cap} kt`);
     console.log(`  full-year check at ${cap} kt: cost ${((f.cost / w.cost - 1) * 100).toFixed(1)}%, CO2 ${((f.co2 / w.co2 - 1) * 100).toFixed(1)}%, unserved ${f.unserved.toFixed(0)} MWh (${(f.unserved / f.demand * 1e6).toFixed(0)} per million), spilled ${(w.spilledShare * 100).toFixed(1)}% -> ${(f.spilledShare * 100).toFixed(1)}%`);
     if (cap === 200) onPage(`the optimizer's 200 kt plan emits ${kt(f.co2)} and leaves ${Math.round(f.unserved)} MWh unserved`, "the third myth");
-    fyRows[cap] = { w, f };
+    fyRows[cap] = { w, f, plan };
   });
-  const more = c => Math.round((fyRows[c].f.co2 / fyRows[c].w.co2 - 1) * 100);
-  onPage(`(${more(200)}% more at 200 kt, ${more(100)}% at 100 kt)`, "the full-year CO2 overshoot");
+  // the observations under the table: cost, CO2 against the cap (not against the seven-week estimate), unserved energy
+  const over = c => Math.round((fyRows[c].f.co2 / (c * 1e3) - 1) * 100);
+  ok(over(200) > 0 && over(100) > over(200), `deeper cuts overshoot their caps more: ${over(200)}% at 200 kt, ${over(100)}% at 100 kt`);
+  onPage(`Deeper cuts overshoot their caps: ${kt(fyRows[200].f.co2)} against 200 kt (${over(200)}% over) and ${kt(fyRows[100].f.co2)} against 100 kt (${over(100)}% over)`, "the full-year CO2 overshoot, against the caps");
+  ok([400, 200, 100].every(c => fyRows[c].f.cost / fyRows[c].w.cost - 1 <= 0.02), "full-year check: each plan costs at most 2% more");
+  onPage("Each plan costs at most 2% more on the full year", "the cost observation");
+  const maxU = Math.max(...[400, 200, 100].map(c => fyRows[c].f.unserved));
   ok([400, 200, 100].every(c => fyRows[c].f.unserved / fyRows[c].f.demand < 0.00002), "full-year check: unserved energy under 0.002% of demand, as the page says");
+  onPage(`at most ${Math.round(maxU)} MWh, under 0.002% of the year's demand`, "the unserved observation");
+  // the debrief's full-year verdict: the optimizer's 200 kt plan, rounded up, fails both missions on the full year
+  const v200 = M.fullVerdict(fyRows[200].w, fyRows[200].f, target);
+  ok(!v200.served && !v200.co2ok && !v200.held && v200.changed && near(v200.overShare, fyRows[200].f.co2 / target - 1, 1e-12),
+     `full-year verdict for the 200 kt plan: ${Math.round(v200.unserved)} MWh unserved, ${kt(v200.co2)}, ${(v200.overShare * 100).toFixed(1)}% over the target: both missions re-judged`);
+  const v400 = M.fullVerdict(fyRows[400].w, fyRows[400].f, 400e3);
+  ok(!v400.served && v400.co2ok, "full-year verdict judges demand and CO2 separately (400 kt plan: short, but under its cap)");
+  ok(M.fullVerdict({ unserved: 0, co2: 1 }, { unserved: 0, co2: 1, unservedShare: 0 }, 2).held, "full-year verdict: a plan that passes both stays held");
+  ok(JS.indexOf("model.fullVerdict(s, f, target)") > 0 && JS.indexOf('ms.set("co2", { frac: f.co2 / target, text: "Full year: "') > 0, "the debrief re-judges the missions with the full year");
 
   // ---------------- share links
   const enc = M.encodePlan(p200, null), dec = M.decodePlan("#" + enc, cfg);
@@ -212,6 +238,12 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   const strs = []; (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") Object.values(o).forEach(walk); })(cfg);
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to/gi, ""))) bad.push(x); }));
   ok(!bad.length, "no data sentence pairs nuclear with a risk term: " + bad.join(" | "));
+  // the constant nuclear output is labelled a simplification wherever it is used
+  onPage("a constant 91.1% of its size every hour", "the constant nuclear output, labelled");
+  ok(JS.indexOf("modelled as a constant ") > 0 && JS.indexOf("which cannot show reliability") > 0, "the slider hint and the boundary card call constant nuclear output a simplification");
+  const st9 = M.stars({ unserved: 0, unservedShare: 0, co2: 99e3, cost: 1.019e8 }, target, 1e8);
+  ok(st9.lights + st9.co2 + st9.cost === 9 && cfg.limits.gas.min <= 6 && cfg.limits.gas.max >= 6, "the practice task is reachable: nine stars under 100 kt within 2% of the frontier; $6/MMBtu is on the gas slider");
+  onPage("earn all nine stars with a plan under 100 kt", "the practice task");
 
   // ---------------- timings (Node; the page solves in a Web Worker with the same HiGHS build)
   const plTimes = []; for (let i = 0; i < 5; i++) plTimes.push(solve(M.weekModel(C, RW, { plan: p200 })).ms.solve);
@@ -227,7 +259,8 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
       ok(rf.ok, `full-year optimizer at ${cap == null ? "no cap" : cap + " kt"}: optimal`);
       const pl = k => `${k} ${Math.round(w.plan[k])}/${Math.round(f.plan[k])}`;
       if (cap === 200) {
-        onPage(`the cheapest 200 kt plan then costs ${musd(f.cost)}, ${Math.round((f.cost / w.cost - 1) * 100)}% more, and its last tonne $${Math.round(f.capDual)} instead of $${Math.round(w.dual)}`, "the full-year optimizer at 200 kt");
+        onPage(`The cheapest 200 kt plan costs ${musd(f.cost)}, ${Math.round((f.cost / w.cost - 1) * 100)}% more, and its last tonne $${Math.round(f.capDual)} instead of $${Math.round(w.dual)}`, "the full-year optimizer at 200 kt");
+        ok(f.cost > w.cost, "seven weeks underestimate the cost of a deep cut (the page's stated limitation)");
       }
       if (cap == null) ok(Math.abs(f.cost / w.cost - 1) < 0.002, "with no cap the full-year optimizer gives the same cost");
       console.log(`  full-year optimizer, ${cap == null ? "no cap" : cap + " kt"} (${((Date.now() - t0) / 1000).toFixed(1)} s): cost ${musd(w.cost)} on 7 weeks vs ${musd(f.cost)} on 8,760 h (${((w.cost / f.cost - 1) * 100).toFixed(1)}%); ` +

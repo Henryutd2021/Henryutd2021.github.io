@@ -99,8 +99,20 @@ const sd = M.sortedDesc(P.demand);
 ok(sd.every((v, i) => i === 0 || v <= sd[i - 1]) && sd[0] === 450, "duration: sorted from highest to lowest, starting at the 450 MW peak");
 ok(M.hoursAbove(P.demand, 0.9 * 450) === 180 && M.hoursAbove(P.demand, 0.95 * 450) === 54, "duration: 180 hours above 90% and 54 above 95% (pandas: 180)");
 const cfW = M.capacityFactor(P.wind, 150), cfS = M.capacityFactor(P.solar, 200);
-ok((cfW * 100).toFixed(1) === "52.8" && (cfS * 100).toFixed(1) === "23.5", "capacity factor: wind 52.8%, solar 23.5% (pandas: same)");
+ok((cfW * 100).toFixed(1) === "52.8" && (cfS * 100).toFixed(1) === "23.4", "capacity factor: wind 52.8%, solar 23.4% (pandas: same; was 23.5% before the data build's sun-position night rule)");
 ok(near(cfW, YEAR.wind.reduce((s, v) => s + v, 0) / 8760 / 1000, 1e-12), "capacity factor: equals the mean shape (the farm is sized at SPP's best hour)");
+
+// ---------------- flagged hours per local day (the repeats chart): days follow local dates, not blocks of 24 rows
+const pdS = M.perDay(R, M.mask(R.cols.solar, 3));
+ok(pdS.keys.length === 365 && pdS.n.reduce((s, x) => s + x, 0) === 1377, "per day: 365 local days, 1,377 flagged solar hours in all");
+ok(pdS.n[pdS.keys.indexOf("2025-03-09")] === 13 && pdS.keys[0] === "2025-01-01" && pdS.keys[364] === "2025-12-31", "per day: 9 March (23 hours) holds 13 flagged solar hours, as local dates say");
+let blocks = 0; for (let d = 0; d < 365; d++) { let b = 0; for (let h = d * 24; h < d * 24 + 24; h++) if (M.mask(R.cols.solar, 3)[h]) b++; if (b !== pdS.n[d]) blocks++; }
+ok(blocks > 0 && !/Math\.floor\(\(i\) \/ 24\)/.test(JS) && /perDay\(R, m\)/.test(JS), `per day: blocks of 24 rows would misplace ${blocks} days; the page uses local dates`);
+
+// ---------------- the row check sees a short column (malformed input)
+const bad = JSON.parse(JSON.stringify(RAWF)); bad.wind = bad.wind.slice(1);
+const kBad = M.checks(M.frame(bad));
+ok(!kBad[0].ok && !kBad[1].ok && /8760, 8759, 8760/.test(kBad[0].detail), "asserts: a column one value short fails the row check and the missing-value check");
 
 // ---------------- asserts on both files
 const kR = M.checks(R), kC = M.checks(C);
@@ -112,17 +124,28 @@ ok(M.ASSERTS.length === 5 && M.ASSERTS.every(a => NBSRC.indexOf(a.id === "rows" 
 // ---------------- the page states the model's numbers
 [["1,505 MW", dD.min === 1505], ["8,760 rows", R.n === 8760], ["363 days of 24 hours", ls.hist[24] === 363], ["671 wind hours and 1,377 solar hours", true],
  ["155 hours", lr.len === 155], ["617 MW", lr.value === 617], ["214 hours in the raw file, none in the cleaned file", nbR.length === 214 && nbC.length === 0],
- ["March (70.7 GWh)", true], ["September (45.1 GWh)", true], ["90% of its peak for 180 hours", true], ["52.8% (wind) and 23.5% (solar)", true],
+ ["March (70.7 GWh)", true], ["September (45.1 GWh)", true], ["90% of its peak for 180 hours", true], ["52.8% (wind) and 23.4% (solar)", true], ["52.8% and 23.4%", true],
  ["fails 3 of 5 asserts; the cleaned file passes all 5", kR.filter(c => !c.ok).length === 3 && kC.every(c => c.ok)], ["54.4 GW", true], ["29 July", pk.date === "2025-07-29"], ["1,377 h", true], ["180 h", true],
  ["150 MW wind, 200 MW solar, 450 MW demand", true]].forEach(x =>
   ok(has(x[0]) && x[1], `page: states "${x[0]}" and the model agrees`));
+
+// ---------------- wording the review asked for
+ok(!/64 night hours/.test(QMD) && !/64 night/.test(QMD), "page: no stale '64 night hours' claim (the cleaned file has none)");
+ok(has("one 24-hour day") && has("2,300 or 2,500 MWh"), "quiz: the day is 24 hours long, and transition days are named");
+ok(!/exactly as EIA publishes/.test(QMD + JS + NBSRC) && /EIA-adjusted extract, before this course's cleaning/.test(RAWF.meta.title) && !/No value is changed/.test(RAWF.meta.not_cleaned), "provenance: the raw file is an EIA-adjusted extract (summed, clipped), not 'as published'");
+ok(!/cannot be right/.test(JS) && !/A reporting error, not a real collapse/.test(JS) && /almost certainly/i.test(JS) && has("almost certainly a reporting error"), "screening: the spike is a suspected reporting error, not a proven one");
+ok(!/no fleet runs all its turbines/.test(QMD) && has("Observed peak output is not a capacity measurement"), "capacity factor: no universal claim about fleets");
+ok(!/is also that hour's MWh|is also the MWh/.test(QMD + JS + NBSRC) && /energy = power × time/.test(JS), "power and energy: energy = power × time, not 'MW is also MWh'");
+ok(has("documented heuristic") && has("by construction") && /sun is below the horizon/.test(QMD), "night rule: a heuristic, with the sun-position part, and its check passes by construction");
+ok(/the rescaled day-ahead forecast/.test(JS) && /zeroes solar in the hours its night rule marks/.test(JS), "flowchart traces: demand and wind/solar fills told apart; the night rule zeroes hours");
+ok((JS.match(/alt: /g) || []).length >= 6, "charts: every chart has a text version (repeats, December x 3, hourly, daily, monthly, duration)");
 
 // ---------------- notebook: clean, runnable outside any repository, same checks
 ok(NB.nbformat === 4 && NB.metadata.kernelspec.name === "python3", "notebook: nbformat 4, Python 3 kernel");
 ok(NB.cells.every(c => c.cell_type !== "code" || (c.outputs.length === 0 && c.execution_count === null)), "notebook: shipped without outputs");
 const asserts = NB.cells.filter(c => c.cell_type === "code" && /^# auto-check/.test(c.source.join("")));
 ok(asserts.length >= 9, `notebook: at least nine auto-check cells (${asserts.length})`);
-["671", "1377", "== 1505", "{24: 363, 23: 1, 25: 1}", "== 214", "== 198", "int(bad.sum()) == 0", "== 180", "70.7", "45.1", "52.8", "23.5", "155"].forEach(s => ok(NBSRC.indexOf(s) >= 0, `notebook: checks ${s}`));
+["671", "1377", "== 1505", "{24: 363, 23: 1, 25: 1}", "== 214", "== 198", "int(bad.sum()) == 0", "== 180", "70.7", "45.1", "52.8", "23.4", "155"].forEach(s => ok(NBSRC.indexOf(s) >= 0, `notebook: checks ${s}`));
 ['tz_convert("America/Chicago")', "(s != s.shift()).cumsum()", 'resample("MS").sum() / 1000', 'resample("D").mean()', "sort_values(ascending=False)", "d.index.hour < 4", 'pd.Timedelta(hours=1)'].forEach(s =>
   ok(NBSRC.indexOf(s) >= 0 && JS.indexOf(s.replace("d.index", "df.index")) >= 0, `notebook and page show the same pandas step: ${s}`));
 ok(!/colab\.research\.google\.com|github\.com/.test(NBSRC + QMD), "notebook: no Colab or repository links yet (a labs repository comes later)");
@@ -132,6 +155,19 @@ ok(/Google Colab/.test(QMD) && /locally/.test(QMD), "page: says the notebook run
 const stepTexts = [...JS.matchAll(/steps\.push\(\{ text: "([^"]+)"/g)].map(m => m[1]);
 ok(stepTexts.length === 9, `steps: nine step cards (${stepTexts.length})`);
 stepTexts.forEach((t, i) => ok(words(t) <= 40, `step ${i + 1}: about 35 words (${words(t)})`));
+// feedback (api.saw) and the page's notes: the static text of each stays short
+// each api.saw(...) call, read to its closing bracket (strings skipped), then its string literals joined
+const sawCalls = []; for (let k = JS.indexOf("api.saw("); k >= 0; k = JS.indexOf("api.saw(", k + 1)) {
+  let i = k + 8, depth = 1, q = null;
+  for (; i < JS.length && depth; i++) { const c = JS[i]; if (q) { if (c === "\\") i++; else if (c === q) q = null; } else if (c === '"' || c === "'") q = c; else if (c === "(") depth++; else if (c === ")") depth--; }
+  sawCalls.push(JS.slice(k + 8, i - 1));
+}
+const sawTexts = sawCalls.map(c => [...c.matchAll(/"([^"]*)"/g)].map(x => x[1]).join(" "));
+ok(sawTexts.length >= 8, `feedback: ${sawTexts.length} feedback messages found (steps 1 and 4-9)`);
+sawTexts.forEach((t, i) => ok(words(t) <= 45, `feedback ${i + 1}: at most two short sentences (${words(t)} words of fixed text)`));
+const note = (QMD.match(/<p class="lx-datanote">[\s\S]*?<\/p>/) || [""])[0].replace(/<svg[\s\S]*?<\/svg>/, "");
+note.split("<br>").forEach((r, i) => ok(words(r.replace(/<[^>]+>/g, " ")) <= 30, `data note row ${i + 1}: under 30 words`));
+[...QMD.matchAll(/<(?:li|p|dd|td)>([\s\S]*?)<\/(?:li|p|dd|td)>/g)].map(m => m[1].replace(/<[^>]+>/g, " ")).forEach(t => ok(words(t) <= 45, `page element under 45 words: "${t.trim().slice(0, 50)}…"`));
 // the generated header block repeats lesson 5's description (a nuclear, wind and solar comparison); it is the course's text, not this lesson's
 const OWN = QMD.replace(/<!-- learn:meta:start[\s\S]*?<!-- learn:meta:end -->/, "");
 const visible = OWN + JSON.stringify(RAWF.meta) + stepTexts.join(" ") + NBSRC;

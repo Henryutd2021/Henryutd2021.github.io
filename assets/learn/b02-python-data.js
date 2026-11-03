@@ -2,7 +2,9 @@
 // (bridge lesson, step cards; W1, 2026-11-02).
 //
 // Data (all real, Southwest Power Pool 2025, from EIA Form EIA-930):
-//   assets/learn/data/b02-python-data.json  demand, wind and solar in MW exactly as EIA publishes them, BEFORE cleaning;
+//   assets/learn/data/b02-python-data.json  demand, wind and solar in MW from EIA's adjusted columns, BEFORE this course's
+//                                           cleaning (extraction only sums each fuel's generation columns and sets
+//                                           negative values to zero);
 //                                           index i = the hour ENDING at start_utc + i hours, in UTC (EIA-930 convention)
 //   assets/learn/data/town_year.json        the cleaned shapes Prairie Town uses (thousandths of each series' 2025 maximum)
 //   assets/learn/data/town_days.json        the data build's counts of flagged hours (stats), to compare with the reader's
@@ -26,9 +28,11 @@
   var HOUR = 3600000, NIGHT_END = 4, NIGHT_FRAC = 0.05, SPIKE_FRAC = 0.5, MAX_REPEAT = 6;
 
   // ---------------------------------------------------------------- pure model
+  // a frame: the three columns side by side; lens keeps each column's length so that the row check can see a short one
+  // (n is the longest column; a missing entry in a shorter one counts as a missing value)
   function frame(file) {
-    var t0 = Date.parse(file.start_utc + "Z"), n = file.demand.length;
-    return { t0: t0, n: n, cols: { demand: file.demand, wind: file.wind, solar: file.solar } };
+    var t0 = Date.parse(file.start_utc + "Z"), lens = [file.demand.length, file.wind.length, file.solar.length];
+    return { t0: t0, n: Math.max.apply(null, lens), lens: lens, cols: { demand: file.demand, wind: file.wind, solar: file.solar } };
   }
   function ending(F, i) { return F.t0 + i * HOUR; }
   function beginning(F, i) { return F.t0 + (i - 1) * HOUR; }
@@ -108,13 +112,25 @@
     }
     return keys.map(function (k) { return { key: k, value: how === "sum" ? g[k].s : g[k].s / g[k].n, hours: g[k].n }; });
   }
+  // the local date (of each hour's start) of every row, and the list of dates: the day index for daily charts
+  function localDays(F) {
+    var keys = [], idx = [];
+    for (var i = 0; i < F.n; i++) { var d = local(beginning(F, i)).date; if (!keys.length || keys[keys.length - 1] !== d) keys.push(d); idx.push(keys.length - 1); }
+    return { keys: keys, idx: idx };
+  }
+  // flagged hours per local day (9 March has 23 hours and 2 November 25, so days are not blocks of 24 rows)
+  function perDay(F, flags) {
+    var D = localDays(F), n = D.keys.map(function () { return 0; });
+    flags.forEach(function (f, i) { if (f) n[D.idx[i]]++; });
+    return { keys: D.keys, n: n };
+  }
   function scale(a, size) { return a.map(function (v) { return v / 1000 * size; }); }
   function sortedDesc(a) { return a.slice().sort(function (x, y) { return y - x; }); }
   function hoursAbove(a, level) { return a.filter(function (v) { return v > level; }).length; }
   function capacityFactor(mw, size) { return mw.reduce(function (s, v) { return s + v; }, 0) / (size * mw.length); }
   // the five asserts of the last step, on any file with demand, wind and solar columns
   var ASSERTS = [
-    { id: "rows", code: 'assert len(df) == 8760, "not one row per hour of 2025"' },
+    { id: "rows", code: 'assert len(df) == 8760, "expected 8,760 rows"' },
     { id: "gaps", code: 'assert df.notna().all().all(), "missing values"' },
     { id: "spike", code: 'assert df["demand"].min() > 0.5 * df["demand"].median(), "a demand spike"' },
     { id: "repeat", code: 'assert longest_repeat(df).max() < 6, "a sensor stuck for 6+ hours"' },
@@ -122,9 +138,10 @@
   ];
   function checks(F) {
     var c = F.cols, d = describe(c.demand), lr = Math.max(longestRun(c.demand), longestRun(c.wind), longestRun(c.solar)), nb = nightBad(F, c.solar).length;
-    var gaps = ["demand", "wind", "solar"].reduce(function (s, k) { return s + c[k].filter(function (v) { return v == null || !isFinite(v); }).length; }, 0);
+    var gaps = ["demand", "wind", "solar"].reduce(function (s, k) { var m = 0; for (var i = 0; i < F.n; i++) if (c[k][i] == null || !isFinite(c[k][i])) m++; return s + m; }, 0);
+    var rowsOK = F.lens ? F.lens.every(function (l) { return l === 8760; }) : F.n === 8760;
     return [
-      { id: "rows", ok: F.n === 8760, detail: F.n + " rows" },
+      { id: "rows", ok: rowsOK, detail: rowsOK ? "8,760 rows" : "rows per column: " + (F.lens || [F.n]).join(", ") },
       { id: "gaps", ok: gaps === 0, detail: gaps + " missing" },
       { id: "spike", ok: d.min > SPIKE_FRAC * d.q50, detail: "min " + Math.round(d.min).toLocaleString("en-US") + " vs half the median " + Math.round(SPIKE_FRAC * d.q50).toLocaleString("en-US") },
       { id: "repeat", ok: lr < MAX_REPEAT, detail: "longest repeat " + lr + " h" },
@@ -138,7 +155,7 @@
   }
   var model = { HOUR: HOUR, NIGHT_END: NIGHT_END, NIGHT_FRAC: NIGHT_FRAC, SPIKE_FRAC: SPIKE_FRAC, MAX_REPEAT: MAX_REPEAT, ASSERTS: ASSERTS,
     frame: frame, ending: ending, beginning: beginning, dstBounds: dstBounds, centralOffset: centralOffset, local: local, hoursPerDay: hoursPerDay,
-    describe: describe, runs: runs, flagged: flagged, longestRun: longestRun, mask: mask, nightBad: nightBad, cluster: cluster, resample: resample,
+    describe: describe, runs: runs, flagged: flagged, longestRun: longestRun, mask: mask, nightBad: nightBad, cluster: cluster, resample: resample, localDays: localDays, perDay: perDay,
     scale: scale, sortedDesc: sortedDesc, hoursAbove: hoursAbove, capacityFactor: capacityFactor, checks: checks, prairie: prairie };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -186,7 +203,7 @@
   // ---- the same step in pandas: comments after "#" are the readable pseudo-code
   function code(host, lines) {
     var fig = H("figure", { class: "b2-code" }, host);
-    H("p", { text: "The same step in pandas" }, fig);
+    H("p", { text: "The same step in pandas, Python's table library" }, fig);
     var pre = H("pre", null, fig), c = H("code", null, pre);
     c.innerHTML = lines.map(function (l) {
       var k = l.indexOf("  #"); if (k < 0 && l.trim().charAt(0) === "#") k = 0;
@@ -234,14 +251,21 @@
     for (var i = 0; i < steps.length; i++) { var st = steps[i] * p; if (Math.ceil(mx / st - 1e-9) <= 5) return { max: Math.ceil(mx / st - 1e-9) * st, step: st }; }
     return { max: mx, step: mx / 4 };
   }
+  // quarter ticks (Jan, Apr, Jul, Oct): at the row of each month's first hour, or at its first local day
   function monthTicks(F, n, by) {
-    var out = [], seen = {};
+    var out = [], seen = {}, D = by === "day" ? localDays(F) : null;
     for (var i = 0; i < F.n; i++) {
       var L = local(beginning(F, i)); if (seen[L.m]) continue; seen[L.m] = true;
-      if ((L.m - 1) % 3 === 0) out.push([by === "day" ? Math.floor(i / 24) : i, MON[L.m - 1], L.m === 1 ? "start" : "middle"]);
+      if ((L.m - 1) % 3 === 0) out.push([D ? D.idx[i] : i, MON[L.m - 1], L.m === 1 ? "start" : "middle"]);
     }
     return out;
   }
+  // a small HTML table for a chart's text version: head [labels], rows [[cells]]
+  function htable(head, rows) {
+    return "<table class='b2-tbl'><thead><tr>" + head.map(function (h, i) { return "<th scope='col'" + (i ? "" : " class='l'") + ">" + LX.esc(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return "<td" + (i ? "" : " class='l'") + ">" + LX.esc(String(c)) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
+  }
+  function when(F, i) { var L = local(beginning(F, i)); return L.d + " " + MON[L.m - 1] + " " + pad(L.h) + ":00"; }
 
   // ---------------------------------------------------------------- the steps
   function view(live, data) {
@@ -250,12 +274,12 @@
     var steps = [];
 
     // 1 load
-    steps.push({ text: "A year of hourly grid data has 8,760 rows, one per hour. Load the Southwest Power Pool's 2025 file, exactly as EIA publishes it, and look at the first rows.",
+    steps.push({ text: "A year of hourly data has 8,760 rows. Load SPP's 2025 file (EIA's adjusted values, before any cleaning) into a pandas [[dataframe|DataFrame]]: a table with one row per hour.",
       build: function (act, api) {
         var b = H("button", { class: "lx-btn small", type: "button", html: LX.icon("arrow") + "Load the file" }, act), out = H("div", { "aria-live": "polite" }, act);
-        code(act, ['raw = json.load(open("b02-python-data.json"))',
-          'ends = pd.date_range(raw["start_utc"], periods=8760, freq="h", tz="UTC")',
-          'df = pd.DataFrame({c: raw[c] for c in ["demand", "wind", "solar"]}, index=ends)',
+        code(act, ['raw = json.load(open("b02-python-data.json"))  # JSON: a plain-text data file',
+          'ends = pd.date_range(raw["start_utc"], periods=8760, freq="h", tz="UTC")  # the index: one time stamp per row',
+          'df = pd.DataFrame({c: raw[c] for c in ["demand", "wind", "solar"]}, index=ends)  # the table below',
           "df.shape  # rows, columns", "df.head()  # the first five rows"]);
         b.addEventListener("click", function () {
           out.innerHTML = ""; b.disabled = true;
@@ -268,13 +292,13 @@
             H("th", { scope: "row", text: e }, tr);
             ["demand", "wind", "solar"].forEach(function (k) { H("td", { text: int(R.cols[k][i]) }, tr); });
           }
-          api.done(); api.saw("Each value is MW averaged over one hour, so it is also the MWh of that hour. The stamps are in UTC and mark the end of each hour (EIA-930's rule): keep that in mind.");
+          api.done(); api.saw("Each value is average power over one hour; energy = power × time, so 100 MW for one hour is 100 MWh. The stamps are in UTC and mark each hour's end (EIA-930's rule).");
         });
       } });
 
     // 2 inspect
     var dR = { demand: describe(R.cols.demand), wind: describe(R.cols.wind), solar: describe(R.cols.solar) };
-    steps.push({ text: "Summary statistics are the first check. One number in this table cannot be right for a grid that serves millions of people. Find it and tap it.",
+    steps.push({ text: "Summary statistics are the first check. One number in this table is almost certainly wrong for a grid that serves millions of people: find it and tap it.",
       build: function (act, api) {
         var sc = H("div", { class: "b2-scroll" }, act), t = H("table", { class: "b2-tbl" }, sc), hr = H("tr", null, H("thead", null, t));
         H("th", { scope: "col", text: "MW" }, hr); ["demand", "wind", "solar"].forEach(function (k) { H("th", { scope: "col", text: k }, hr); });
@@ -293,14 +317,15 @@
             b.addEventListener("click", function () {
               cells.forEach(function (c) { c.classList.remove("right", "wrong"); });
               var ok = k === "demand" && r[0] === "min"; b.classList.add(ok ? "right" : "wrong"); fb.innerHTML = "";
-              var msg = ok ? "Demand read " + int(spike) + " MW for one hour on " + when.d + " " + MONTHS[when.m - 1] + ", under 5% of the median (" + int(dR.demand.q50) + " MW), between hours of " + int(before) + " and " + int(after) + " MW. A reporting error, not a real collapse."
+              var msg = ok ? "Demand read " + int(spike) + " MW for one hour on " + when.d + " " + MONTHS[when.m - 1] + ", under 5% of the median (" + int(dR.demand.q50) + " MW), between hours of " + int(before) + " and " + int(after) + " MW. Almost certainly a reporting error; the operator's own records would confirm it."
                 : HINT[r[0] === "count" ? "count" : k + "." + r[0]] || HINT.other;
               H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div><b>" + (ok ? "Found it." : "Not this one.") + "</b> " + LX.esc(msg) + "</div>" }, fb);
               if (ok) api.done();
             });
           });
         });
-        code(act, ["df.describe()  # count, mean, spread, quartiles, min and max of each column", 'df["demand"].idxmin()  # when was demand lowest?']);
+        H("p", { class: "lx-hint", html: LX.rich("std: [[standard-deviation|standard deviation]], the typical distance from the mean. 25%, 50%, 75%: [[quartile|quartiles]]; 50% is the [[median|median]].") }, act);
+        code(act, ["df.describe()  # count, mean, std, min, quartiles and max of each column", 'df["demand"].idxmin()  # when was demand lowest?']);
       } });
 
     // 3 time stamps
@@ -329,26 +354,27 @@
 
     // 4 repeats
     var BUILD = { wind: stats.frozen_hours_filled.wind, solar: stats.frozen_hours_filled.solar, demand: stats.demand_hours_flagged_as_implausible };
-    steps.push({ text: "A [[frozen-telemetry|stuck sensor]] repeats its last reading. Flag runs of the same non-zero value that last at least N hours. Find the N the data build used: your count will match its count.",
+    steps.push({ text: "A [[frozen-telemetry|stuck sensor or feed]] repeats its last reading, so flag runs of one non-zero value lasting at least N hours. Find the N the data build used: your count will match its count.",
       build: function (act, api) {
-        var col = "solar", minRun = 2, dayTicks = monthTicks(R, Math.ceil(R.n / 24), "day");
+        var col = "solar", minRun = 2, dayTicks = monthTicks(R, 0, "day");
         var sg = seg(act, "Column", [["wind", "Wind"], ["solar", "Solar"], ["demand", "Demand"]], function (k) { col = k; draw(); });
         var sl = LX.Slider(act, { label: "Shortest run to flag (N)", color: "var(--lx-bad)", min: 2, max: 24, step: 1, unit: "h", onChange: function (v) { minRun = v; draw(); },
           hint: function () { return "Shorter runs flag more hours, some by chance; longer runs miss short freezes."; } });
         var res = H("div", { class: "b2-res", "aria-live": "polite" }, act);
         var strip = null, stripHost = H("div", null, act);
         function draw() {
-          var a = R.cols[col], rs = runs(a, minRun), n = rs.reduce(function (s, r) { return s + r.len; }, 0), m = mask(a, minRun), per = [];
-          for (var i = 0; i < R.n; i++) { var dd = Math.floor((i) / 24); per[dd] = (per[dd] || 0) + (m[i] ? 1 : 0); }
+          var a = R.cols[col], rs = runs(a, minRun), n = rs.reduce(function (s, r) { return s + r.len; }, 0), m = mask(a, minRun), pd = perDay(R, m), per = pd.n;
+          var byMonth = MONTHS.map(function (name, k) { var h = 0, d = 0; pd.keys.forEach(function (key, j) { if (+key.slice(5, 7) === k + 1 && per[j]) { h += per[j]; d++; } }); return [name, h, d]; });
           res.innerHTML = "";
           H("p", { class: "b2-big", text: int(n) + " hours flagged in " + rs.length + " runs" }, res);
           var match = n === BUILD[col] || (col === "demand" && n + 1 === BUILD[col]);
           H("p", { class: "k", text: "The data build flagged " + int(BUILD[col]) + (col === "demand" ? " demand hours: its repeats plus the one spike." : " hours.") + (match ? " Your count matches." : "") }, res);
-          var opts = { n: per.length, bars: true, yMax: 24, yStep: 6, height: 120, series: [{ values: per, color: "var(--lx-bad)" }], ticks: dayTicks,
-            label: "Flagged hours per day of 2025 for " + col + ": " + int(n) + " hours in " + rs.length + " runs.", yFmt: function (v) { return v + " h"; },
-            title: "Flagged hours per day, " + COLS[col].label.toLowerCase() };
+          var opts = { n: per.length, bars: true, yMax: 25, yStep: 5, height: 120, series: [{ values: per, color: "var(--lx-bad)" }], ticks: dayTicks,
+            label: "Flagged hours per local day of 2025 for " + col + ": " + int(n) + " hours in " + rs.length + " runs.", yFmt: function (v) { return v + " h"; },
+            title: "Flagged hours per day, " + COLS[col].label.toLowerCase(),
+            alt: htable(["Month", "Flagged hours", "Days with a flag"], byMonth) };
           if (strip) strip.set(opts); else strip = chart(stripHost, opts);
-          if (match && minRun === 3) { api.done(); api.saw("N = 3: three or more identical non-zero readings in a row. Your " + int(n) + " " + col + " hours match the data build. The rule is a choice; the next step shows what it catches."); }
+          if (match && minRun === 3) { api.done(); api.saw("N = 3: three or more identical non-zero readings in a row, a sign of a possibly stuck feed. Your " + int(n) + " " + col + " hours match the data build; the rule is a choice."); }
         }
         sg.set(col); sl.set(minRun); draw();
         code(act, ["def repeats(s, min_run=3):", "    run = (s != s.shift()).cumsum()  # a new id each time the value changes",
@@ -371,8 +397,11 @@
             .map(function (r) { return [Math.max(0, r.start - i0), Math.min(i1 - i0 - 1, r.start - i0 + r.len - 1)]; });
           ["demand", "wind", "solar"].forEach(function (k) {
             var v = R.cols[k].slice(i0, i1), ny = nice(Math.max.apply(null, v));
+            var rk = runs(R.cols[k], 3).filter(function (r) { return r.start < i1 && r.start + r.len > i0; });
             chart(out, { n: v.length, yMax: ny.max, yStep: ny.step, height: 120, series: [{ values: v, color: COLS[k].color, width: 1.8 }], shade: spans, ticks: ticks,
-              title: COLS[k].label + ", MW", label: COLS[k].label + " from 12 to 24 December 2025, with the hours flagged as repeats shaded." });
+              title: COLS[k].label + ", MW", label: COLS[k].label + " from 12 to 24 December 2025, with the hours flagged as repeats shaded.",
+              alt: "<p>" + COLS[k].label + " ranges from " + int(Math.min.apply(null, v)) + " to " + int(Math.max.apply(null, v)) + " MW. Runs of 3 or more identical readings (local time):</p>" +
+                htable(["From", "To", "Hours", "Value, MW"], rk.map(function (r) { return [when(R, r.start), when(R, r.start + r.len - 1), r.len, int(r.value)]; })) });
           });
           H("p", { class: "lx-hint", text: "Shaded: solar hours flagged as repeats. The longest run lasts " + lr.len + " hours, from " + lrA.d + " December " + pad(lrA.h) + ":00 to " + lrB.d + " December " + pad(lrB.h) + ":00 (local); a second run at another value follows straight after." }, out);
           api.done(); api.saw("Solar holds " + int(lr.value) + " MW through six nights, while demand and wind also stand still. When every column freezes at once, suspect the data feed, not the weather.");
@@ -383,7 +412,7 @@
     // 6 night check
     var nbR = nightBad(R, R.cols.solar), nbC = nightBad(C, C.cols.solar), mR = mask(R.cols.solar, 3);
     var caughtR = nbR.filter(function (i) { return mR[i]; }).length, cl = cluster(C, nbC);
-    steps.push({ text: "Repeats are one symptom; physics gives another. Between midnight and 4 a.m. solar output must be near zero. Run this night check on the raw file and on the cleaned one.",
+    steps.push({ text: "Physics gives another check: between midnight and 4 a.m. local time, solar output must be near zero. Run this night check on the raw file and on the cleaned one.",
       build: function (act, api) {
         var row = H("div", { class: "b2-pills" }, act), done = {};
         var bR = H("button", { class: "lx-btn small ghost", type: "button", text: "Check the raw file" }, row), bC = H("button", { class: "lx-btn small ghost", type: "button", text: "Check the cleaned file" }, row);
@@ -397,10 +426,13 @@
           } else {
             H("p", { class: "b2-big", text: "Cleaned: " + nbC.length + " night hours " + (nbC.length ? "still fail" : "fail") }, res);
             H("p", { class: "k", text: nbC.length ? cl.hours + " of them fall between " + dayLabel(cl.from) + " and " + dayLabel(cl.to) + "." :
-              "The data build adds a physics rule: solar is set to zero in night hours." }, res);
+              "Its data build sets solar to zero in night hours, so this pass is by construction." }, res);
           }
-          if (done.raw && done.clean) { api.done(); api.saw(nbC.length ? "In those weeks raw solar barely changed between day and night yet never repeated exactly, so no repeat rule saw it, and the gap-filling copied it. No single rule catches everything: combine range, repeat and physics checks." :
-            "In late winter raw solar barely changed between day and night yet never repeated exactly, so no repeat rule saw it; the cleaned file passes only because its build adds the physics rule. No single rule catches everything: combine range, repeat and physics checks."); }
+          if (done.raw && done.clean) {
+            api.done();
+            if (nbC.length) api.saw("In those weeks raw solar barely changed between day and night and never repeated exactly, so no repeat rule saw it. Combine range, repeat and physics checks.");
+            else api.saw("Late-winter raw solar barely changed between day and night and never repeated exactly, so no repeat rule saw it. The cleaned file passes by construction, since its build zeroes night hours: no single check proves a file right.");
+          }
         }
         bR.addEventListener("click", function () { show("raw"); }); bC.addEventListener("click", function () { show("clean"); });
         code(act, ["night = df.index.hour < 4  # hours starting 00:00 to 03:00, local time", 'bad = night & (df["solar"] > 0.05 * df["solar"].max())  # sun down, yet over 5% of the peak', "bad.sum()"]);
@@ -409,6 +441,10 @@
     // 7 resample
     var ticksH = monthTicks(C, C.n, "hour"), dWind = resample(C, P.wind, "day", "mean"), mWind = resample(C, P.wind, "month", "sum");
     var best = mWind.reduce(function (b, x) { return !b || x.value > b.value ? x : b; }, null), worst = mWind.reduce(function (b, x) { return !b || x.value < b.value ? x : b; }, null);
+    var hRange = MONTHS.map(function () { return [Infinity, -Infinity]; }), dRange = MONTHS.map(function () { return [Infinity, -Infinity]; });
+    P.wind.forEach(function (v, i) { var r = hRange[local(beginning(C, i)).m - 1]; r[0] = Math.min(r[0], v); r[1] = Math.max(r[1], v); });
+    dWind.forEach(function (x) { var r = dRange[+x.key.slice(5, 7) - 1]; r[0] = Math.min(r[0], x.value); r[1] = Math.max(r[1], x.value); });
+    hRange = hRange.map(function (r, k) { return [MONTHS[k], int(r[0]), int(r[1])]; }); dRange = dRange.map(function (r, k) { return [MONTHS[k], int(r[0]), int(r[1])]; });
     steps.push({ text: "Switch to the cleaned file, scaled to Prairie Town's " + P.sizes.wind + " MW wind farm. 8,760 points are too many to read: [[resample|resample]] to daily averages, then to monthly energy.",
       build: function (act, api) {
         var seen = {}, host = H("div", null, act);
@@ -416,12 +452,14 @@
         act.insertBefore(act.lastChild, host);
         function show(k) {
           host.innerHTML = ""; seen[k] = true;
-          if (k === "h") chart(host, { n: C.n, yMax: nice(P.sizes.wind).max, yStep: nice(P.sizes.wind).step, series: [{ values: P.wind, color: "var(--lx-wind)", width: 0.6 }], ticks: ticksH, title: "Wind farm output, every hour (MW)", label: "Prairie Town's wind farm, 8,760 hourly values: a dense band." });
-          else if (k === "d") chart(host, { n: dWind.length, yMax: nice(P.sizes.wind).max, yStep: nice(P.sizes.wind).step, series: [{ values: dWind.map(function (x) { return x.value; }), color: "var(--lx-wind)", width: 1.4 }], ticks: monthTicks(C, dWind.length, "day"), title: "Daily mean output (MW)", label: "Daily mean output of Prairie Town's wind farm, 365 values." });
+          if (k === "h") chart(host, { n: C.n, yMax: nice(P.sizes.wind).max, yStep: nice(P.sizes.wind).step, series: [{ values: P.wind, color: "var(--lx-wind)", width: 0.6 }], ticks: ticksH, title: "Wind farm output, every hour (MW)", label: "Prairie Town's wind farm, 8,760 hourly values: a dense band.",
+            alt: "<p>8,760 values, too many to list: the hourly range in each month, in MW.</p>" + htable(["Month", "Lowest hour", "Highest hour"], hRange) });
+          else if (k === "d") chart(host, { n: dWind.length, yMax: nice(P.sizes.wind).max, yStep: nice(P.sizes.wind).step, series: [{ values: dWind.map(function (x) { return x.value; }), color: "var(--lx-wind)", width: 1.4 }], ticks: monthTicks(C, dWind.length, "day"), title: "Daily mean output (MW)", label: "Daily mean output of Prairie Town's wind farm, 365 values.",
+            alt: "<p>365 daily means: the lowest and highest day in each month, in MW.</p>" + htable(["Month", "Lowest day", "Highest day"], dRange) });
           else chart(host, { n: 12, bars: true, yMax: nice(best.value / 1000).max, yStep: nice(best.value / 1000).step, yFmt: function (v) { return int(v); }, series: [{ values: mWind.map(function (x) { return x.value / 1000; }), color: "var(--lx-wind)" }],
             ticks: MON.map(function (m, i) { return [i, m.charAt(0)]; }), title: "Energy each month (GWh)", label: "Monthly wind energy of Prairie Town's farm, in GWh.",
             alt: "<table class='b2-tbl'><thead><tr><th scope='col'>Month</th><th scope='col'>GWh</th><th scope='col'>Hours</th></tr></thead><tbody>" + mWind.map(function (x, i) { return "<tr><td class='l'>" + MONTHS[i] + "</td><td>" + (x.value / 1000).toFixed(1) + "</td><td>" + x.hours + "</td></tr>"; }).join("") + "</tbody></table>" });
-          if (seen.h && seen.d && seen.m) { api.done(); api.saw("Average power uses the mean; energy uses the sum, because each hourly MW value is also that hour's MWh. Most wind energy: " + MONTHS[+best.key.slice(5) - 1] + " (" + (best.value / 1000).toFixed(1) + " GWh); least: " + MONTHS[+worst.key.slice(5) - 1] + " (" + (worst.value / 1000).toFixed(1) + " GWh)."); }
+          if (seen.h && seen.d && seen.m) { api.done(); api.saw("Average power uses the mean; energy uses the sum, since each hour's MW × 1 h is its MWh. Most wind energy: " + MONTHS[+best.key.slice(5) - 1] + " (" + (best.value / 1000).toFixed(1) + " GWh); least: " + MONTHS[+worst.key.slice(5) - 1] + " (" + (worst.value / 1000).toFixed(1) + " GWh)."); }
         }
         sg.set("h"); show("h");
         code(act, ['wind = town["wind"] * ' + P.sizes.wind + "  # MW: the cleaned shape × the farm's size", 'wind.resample("D").mean()  # MW: average power each day', 'wind.resample("MS").sum() / 1000  # GWh: energy each month']);
@@ -439,7 +477,9 @@
         function draw() {
           var size = P.sizes[col], v = sorted ? sortedDesc(P[col]) : P[col];
           host.innerHTML = "";
+          var sv = sortedDesc(P[col]), ranks = [1, 100, 500, 1000, 2000, 4380, 6000, 8000, 8760];
           chart(host, { n: v.length, yMax: nice(size).max, yStep: nice(size).step, series: [{ values: v, color: COLS[col].color, area: col !== "demand" && sorted, width: sorted ? 2 : 0.6 }],
+            alt: "<p>" + COLS[col].label + " of Prairie Town, MW: the level reached in at least this many hours of 2025.</p>" + htable(["Hours", "MW"], ranks.map(function (r) { return [int(r), int(sv[r - 1])]; })),
             ticks: sorted ? function (W) { return W < 480 ? [[0, "1", "start"], [4380, "4,380"], [8759, "8,760 h", "end"]] : [[0, "1", "start"], [2190, "2,190"], [4380, "4,380"], [6570, "6,570"], [8759, "8,760 h", "end"]]; } : ticksH,
             level: col === "demand" ? 0.9 * size : null, levelLabel: col === "demand" ? "90% of peak" : null,
             title: (sorted ? "Hours sorted from highest to lowest" : "Calendar order") + " (MW)", label: COLS[col].label + " of Prairie Town, " + (sorted ? "as a duration curve." : "in calendar order.") });
@@ -472,7 +512,8 @@
           }
         }
         bR.addEventListener("click", function () { run("raw"); }); bC.addEventListener("click", function () { run("clean"); });
-        code(act, ["# the helpers longest_repeat and bad_night are defined in the notebook", "# an assert is silent when true and stops with its message when false"]);
+        code(act, ["# the helpers longest_repeat and bad_night are defined in the notebook", "# an assert is silent when true and stops with its message when false",
+          "# len(df) only counts rows: missing or repeated time stamps need a check of their own"]);
       } });
 
     LX.StepCards(live, { id: "b2-steps", steps: steps });
@@ -500,10 +541,10 @@
       colsN: 2, atN: { load: [0, 0], time: [0, 1], q1: [0, 2], q2: [0, 3], q3: [0, 4], flag: [1, 3], fill: [1, 5], end: [0, 6] },
       edges: [["load", "time"], ["time", "q1"], ["q1", "flag", "yes"], ["q1", "q2", "no"], ["q2", "flag", "yes"], ["q2", "q3", "no"], ["q3", "flag", "yes"], ["q3", "end", "no"], ["flag", "fill"], ["fill", "end"]],
       traces: [
-        { label: "21 June · the spike", path: ["load", "time", "q1", "flag", "fill", "end"], text: "Demand read **1,505 MW** for one hour, under 5% of the median: out of range, flagged, and filled by the data build from the day-ahead forecast." },
-        { label: "December · the freeze", path: ["load", "time", "q1", "q2", "flag", "fill", "end"], text: "Every column stood still for **155 hours**: flagged as repeats and filled with the same hour on nearby valid days." },
+        { label: "21 June · the spike", path: ["load", "time", "q1", "flag", "fill", "end"], text: "Demand read **1,505 MW** for one hour, under 5% of the median: a suspected reporting error, flagged, and filled by the data build from the day-ahead forecast." },
+        { label: "December · the freeze", path: ["load", "time", "q1", "q2", "flag", "fill", "end"], text: "Every column stood still for **155 hours**, so all were flagged as repeats. The data build filled wind and solar from the same hour on nearby valid days, and demand from the rescaled day-ahead forecast." },
         { label: "9 March · 23 hours", path: ["load", "time", "q1", "q2", "q3", "end"], text: "A **23-hour** day when the clocks go forward: nothing is wrong, so nothing is flagged; the checks must allow it." },
-        { label: "Late-winter nights", path: ["load", "time", "q1", "q2", "q3", "flag", "fill", "end"], text: "Solar above zero at **2 a.m.**, never repeating exactly: only the physics check sees it. The notebook flags those days and refills them." }
+        { label: "Late-winter nights", path: ["load", "time", "q1", "q2", "q3", "flag", "fill", "end"], text: "Solar above zero at **2 a.m.**, never repeating exactly: only the physics check sees it. The data build zeroes solar in the hours its night rule marks; the notebook applies that rule to the raw file." }
       ], sel: 1
     });
     LX.Checklist(c2, { id: "b2-checklist", title: "A data check you can reuse", lede: "Before any analysis, tick each line for your file. The pandas line under each is where to start.",
@@ -512,9 +553,9 @@
         { id: "rows", label: "Rows and span", text: "One row per hour: 8,760 for 2025, 8,784 in a leap year.", note: "len(df), df.index.min(), df.index.max()" },
         { id: "stamps", label: "Time stamps", text: "Which time zone, and does each stamp mark the hour's start or its end?", note: "df.index.tz" },
         { id: "dst", label: "Daylight saving", text: "Local days of 23 and 25 hours are real, not errors.", note: "df.groupby(df.index.date).size()" },
-        { id: "units", label: "Units", text: "[[power|MW]] is a rate, [[energy|MWh]] an amount; hourly data hide the difference, so name it.", note: "" },
+        { id: "units", label: "Units", text: "[[power|MW]] is a rate, [[energy|MWh]] an amount: energy = power × hours. Name which one each column holds.", note: "" },
         { id: "range", label: "Range and spikes", text: "Minimum, maximum, and anything under half the median.", note: "df.describe()" },
-        { id: "repeat", label: "Repeats", text: "Runs of the same non-zero value: a stuck sensor.", note: "repeats(df[col]).sum()" },
+        { id: "repeat", label: "Repeats", text: "Runs of the same non-zero value: a sign of a stuck sensor or feed.", note: "repeats(df[col]).sum()" },
         { id: "physics", label: "Physics", text: "Sun at night, negative demand, output above [[capacity|capacity]].", note: "bad_night(df).sum()" },
         { id: "gaps", label: "Gaps and fills", text: "Count missing values, and record how each was filled.", note: "df.isna().sum()" },
         { id: "source", label: "Provenance", text: "Source, file names, download date, checksums and licence.", note: "" }
