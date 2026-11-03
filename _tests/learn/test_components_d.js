@@ -167,8 +167,15 @@ ok(NP.describe(netO, {}).lines.every(s => /no flow shown$/.test(s)), "network: n
   card.select("vom"); ok(det.querySelectorAll(".ingame").length === 0, "equation: empty fields are left out");
   card.select("nope"); ok(card.current() === "vom", "equation: an unknown id changes nothing");
   const items = host.querySelectorAll("li").map(li => li.innerHTML);
-  ok(items[0] === "LCOE equals ..." && items[1] === "<b>LCOE</b>: Levelized <span class=\"lx-term\" data-term=\"lcoe\">cost</span>." && items[2] === "<b>CRF</b>: Capital recovery. Here: 0.0806." && items.length === 6,
-     "equation: text version = rows read aloud, then each symbol with its words and the alt fields");
+  ok(items[0] === "LCOE equals ..." && items[1] === "<b>LCOE ($/MWh)</b>: Levelized <span class=\"lx-term\" data-term=\"lcoe\">cost</span>." && items[2] === "<b>CRF</b>: Capital recovery. Here: 0.0806." && items.length === 6,
+     "equation: text version = rows read aloud, then each symbol (with its unit, when it has one) with its words and the alt fields");
+  ok(items.slice(1).every(li => /^<b>[^<]+<\/b>: /.test(li)) && items.filter(li => /\(\$\/MWh\)/.test(li)).length === 1, "equation: only symbols with a unit show one in the text version");
+  (function () {
+    const h3 = new El("div");
+    LX.EquationCard(h3, { title: "Units", rows: [{ parts: [{ k: "p" }] }], symbols: { p: { sym: "p", name: "Output", unit: "MW <per> h", words: "Power." } } });
+    ok(h3.querySelectorAll("li")[0].innerHTML === "<b>Output (MW &lt;per&gt; h)</b>: Power." && h3.querySelector("h4").textContent === "Output (MW <per> h)",
+       "equation: the unit after the name in the text version (escaped) and in the panel");
+  })();
   const ops = host.querySelectorAll(".lx-eq-row")[0].querySelectorAll("span.op");
   ok(ops.length >= 3 && ops.every(o => o.getAttribute("aria-hidden") === "true"), "equation: a row with `say` hides its operators from screen readers");
   ok(host.querySelectorAll(".lx-eq-row")[1].querySelector("span.op").getAttribute("aria-hidden") === null, "equation: rows without `say` keep their words readable");

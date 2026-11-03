@@ -6,14 +6,17 @@
    ], onStep: function (i) {} });
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
+   api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
+   restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
    Text budget: card text is one or two sentences; anything longer goes in a Go deeper box inside `act`. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
   LX.StepCards = function (host, o) {
-    var card = H("div", { class: "lx-stepcard lx-guard" }, host), N = o.steps.length, i = 0, unlocked = {};
+    var card = H("div", { class: "lx-stepcard lx-guard" }, host), N = o.steps.length, i = 0, unlocked = {}, shown = 0;
     function render(k) {
-      i = k; card.innerHTML = "";
+      i = k; card.innerHTML = ""; card.removeAttribute("aria-busy");
+      var gen = ++shown, busy = false;          // gen: this card's render; busy: a solve (or other wait) is running
       var top = H("div", { class: "lx-step-top" }, card);
       var dots = H("div", { class: "lx-dots", "aria-hidden": "true" }, top);
       for (var d = 0; d < N; d++) H("i", { class: d < i ? "done" : d === i ? "cur" : "" }, dots);
@@ -29,9 +32,14 @@
       var st = o.steps[i];
       if (st.free) unlocked[i] = true;
       nx.disabled = !unlocked[i]; nx.hidden = i === N - 1;
-      nx.addEventListener("click", function () { if (unlocked[i]) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
+      nx.addEventListener("click", function () { if (unlocked[i] && !busy) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
-        done: function () { unlocked[i] = true; nx.disabled = false; },
+        done: function () { unlocked[k] = true; nx.disabled = busy; },
+        busy: function (on) {
+          busy = !!on; nx.disabled = busy || !unlocked[k];
+          if (gen !== shown) return;              // a late call from a card no longer shown
+          if (busy) card.setAttribute("aria-busy", "true"); else card.removeAttribute("aria-busy");
+        },
         saw: function (t, bad) { sawBox.innerHTML = ""; H("div", { class: "lx-saw" + (bad ? " no" : ""), html: LX.icon(bad ? "question" : "check") + "<div>" + LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") + "</div>" }, sawBox); },
         card: card, index: i
       };

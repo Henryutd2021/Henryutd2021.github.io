@@ -766,7 +766,8 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
 
 /* the model-lab stage (markup only): <div class="lx-stage"><div class="lx-stage-head"><h3>…</h3><div class="lx-readouts">…</div></div>
    <div class="lx-ctls">sliders</div><p class="lx-stage-status">…</p><ul class="lx-goals"><li class="lx-goal won">…</li></ul></div> */
-.lx-stage { display: grid; gap: 10px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 14px 16px; box-shadow: var(--lx-shadow); min-width: 0; }
+/* minmax(0, 1fr): a wide child (a chart's text-version table) scrolls inside its own box instead of widening the stage */
+.lx-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 14px 16px; box-shadow: var(--lx-shadow); min-width: 0; }
 .lx-stage[hidden] { display: none; }
 .lx-stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
 .page-learn .lx-stage-head h3 { font-size: 16px; margin: 0; }
@@ -1044,6 +1045,8 @@ button.lx-split-row { cursor: pointer; }
 /* dense: a whole model in a formula box */
 .lx-eq.dense { gap: 6px; padding: 12px; border-radius: 12px; background: var(--lx-surface-2); overflow-x: auto; }
 .lx-eq.dense .lx-eq-row { display: block; white-space: nowrap; font-family: var(--lx-f-body); font-size: 16px; line-height: 1.7; }
+/* a dense row's note goes on its own line under the formula and wraps (the row itself stays on one line) */
+.lx-eq.dense .lx-eq-row .note { display: block; white-space: normal; line-height: 1.4; margin-top: 1px; }
 .lx-eq.dense .lx-eq-sym { min-width: 0; min-height: 0; margin: 0; padding: 0 1px; border: 0; border-bottom: 2px dotted var(--lx-ink-3); border-radius: 0;
   background: none; color: inherit; font: inherit; line-height: 1.2; }
 .lx-eq.dense .lx-eq-sym[aria-pressed="true"] { background: var(--lx-accent-soft); border-bottom-color: var(--lx-accent); border-radius: 4px 4px 0 0; color: inherit; }

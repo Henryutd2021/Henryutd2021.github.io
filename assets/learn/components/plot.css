@@ -34,7 +34,8 @@
 
 /* the model-lab stage (markup only): <div class="lx-stage"><div class="lx-stage-head"><h3>…</h3><div class="lx-readouts">…</div></div>
    <div class="lx-ctls">sliders</div><p class="lx-stage-status">…</p><ul class="lx-goals"><li class="lx-goal won">…</li></ul></div> */
-.lx-stage { display: grid; gap: 10px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 14px 16px; box-shadow: var(--lx-shadow); min-width: 0; }
+/* minmax(0, 1fr): a wide child (a chart's text-version table) scrolls inside its own box instead of widening the stage */
+.lx-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 14px 16px; box-shadow: var(--lx-shadow); min-width: 0; }
 .lx-stage[hidden] { display: none; }
 .lx-stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
 .page-learn .lx-stage-head h3 { font-size: 16px; margin: 0; }
