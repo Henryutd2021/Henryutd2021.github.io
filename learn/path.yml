@@ -487,7 +487,23 @@
   lab: "a SciPy/HiGHS notebook that rebuilds the model, grows the same tree and asserts the browser's numbers, about 45 minutes."
   does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program has no shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
   after: [M1]
-- {kind: lesson, tier: modeler, code: M3, title: "What should be built? Capacity expansion with representative periods, validated"}
+- kind: lesson
+  id: m03-capacity-expansion
+  code: M3
+  tier: modeler
+  form: cards
+  icon: blueprint
+  status: active
+  minutes: 45
+  practice_minutes: 120
+  title: "What should be built? Capacity expansion with representative periods, validated"
+  subtitle: "Plan on a few weeks, then test the plan on every hour of two weather years"
+  short: "Capacity expansion, validated"
+  outcome: "Formulate a capacity-expansion LP on weighted representative weeks with a linked battery, and validate its plan on full years with stated error measures."
+  teaches: [capacity expansion as a linear program, representative periods and weights, storage linked across periods, validation on full weather years, error measures]
+  lab: "a SciPy/HiGHS notebook that rebuilds the model and asserts the reference results, about 60 minutes, then 120 minutes of practice."
+  does: "Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive."
+  after: [M1, 7, 13]
 - {kind: lesson, tier: modeler, code: M4, title: "Storage and coupled carriers: modelling power, hydrogen and heat together"}
 - {kind: lesson, tier: modeler, code: M5, title: "Size and run a microgrid that survives an outage"}
 - {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}

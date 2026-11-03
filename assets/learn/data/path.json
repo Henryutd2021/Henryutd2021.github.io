@@ -1155,9 +1155,12 @@
    "tier": "modeler",
    "code": "M3",
    "title": "What should be built? Capacity expansion with representative periods, validated",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m03-capacity-expansion.html",
+   "scales": [],
+   "id": "m03-capacity-expansion",
+   "minutes": 45,
+   "form": "cards"
   },
   {
    "tier": "modeler",

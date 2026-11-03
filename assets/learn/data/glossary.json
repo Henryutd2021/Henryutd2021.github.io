@@ -575,6 +575,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "medoid": {
+  "term": "Medoid",
+  "short": "The member of a group whose total distance to the other members is smallest; unlike an average, it is a real member.",
+  "lesson": "M3",
+  "href": "m03-capacity-expansion.html"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -707,6 +713,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "period-weight": {
+  "term": "Period weight",
+  "short": "How many hours of the year one modelled hour of a representative period stands for; a model multiplies that hour's running cost and emissions by it.",
+  "lesson": "M3",
+  "href": "m03-capacity-expansion.html"
+ },
  "persistence-forecast": {
   "term": "Persistence forecast",
   "short": "The simplest forecast: the next value will be the same as the last one seen, or as the same hour a day or a week before.",
@@ -838,6 +850,12 @@
   "short": "Spare capacity that operators keep ready to cover the sudden loss of a plant or a forecast that misses.",
   "lesson": 3,
   "href": "03-balancing.html"
+ },
+ "resource-adequacy": {
+  "term": "Resource adequacy",
+  "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a standard such as one day of shortage in ten years.",
+  "lesson": "M3",
+  "href": "m03-capacity-expansion.html"
  },
  "round-trip-efficiency": {
   "term": "Round-trip efficiency",
