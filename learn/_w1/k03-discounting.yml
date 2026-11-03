@@ -1,0 +1,10 @@
+# Sidecar for toolbox K3 (k03-discounting), builder learn-w2-e (K3 fork), 2026-11-03. Read by scripts/build_learn.py.
+id: k03-discounting
+lesson: K3
+glossary:
+  - id: annuity-factor
+    term: Annuity factor
+    def: "What one dollar paid every year for a number of years is worth today, once each dollar is discounted."
+  - id: real-rate
+    term: Real rate
+    def: "An interest or discount rate with inflation taken out, used with costs stated in one year's dollars."
