@@ -72,7 +72,7 @@ ok(res && res.status !== "upcoming" && layout(pathJson, "h").ext[resK].none && !
    layout(pathJson, "h").ext[resK].label === resLive + " Researcher lessons open" + (resMore.length > resLive ? ", " + (resMore.length - resLive) + " in preparation" : ""),
    "course: the Researcher line has no starter stops, is live, and counts its open lessons (" + layout(pathJson, "h").ext[resK].label + ")");
 const soonT = JSON.parse(JSON.stringify(pathJson)); soonT.tiers[resK].status = "upcoming"; soonT.more.forEach(m => { if (m.tier === "researcher") m.ready = false; });
-ok(/^10 Researcher lessons, coming later$/.test(layout(soonT, "h").ext[resK].label) && layout(soonT, "h").ext[resK].upcoming, "course: an upcoming tier with no open lesson still says it is coming later");
+ok(new RegExp("^" + resMore.length + " Researcher lessons, coming later$").test(layout(soonT, "h").ext[resK].label) && layout(soonT, "h").ext[resK].upcoming, "course: an upcoming tier with no open lesson still says it is coming later");
 const extra = JSON.parse(JSON.stringify(pathJson));
 extra.tiers.push({ id: "extra", title: "Extra", level: "L5", slot: 5, icon: "flask", door: "A fifth line" });
 extra.more.push({ tier: "extra", title: "From a question to a paper" }, { tier: "extra", title: "Peer review" });

@@ -27,7 +27,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">M3</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-3)"><span class="lx-dot" aria-hidden="true"></span>Modeler · L3</li>
-<li>45 min guided · 60 min lab · about 2 h practice</li>
+<li><span class="lx-nw">45 min guided</span> · <span class="lx-nw">60 min lab</span> · <span class="lx-nw">about 2 h practice</span></li>
 <li>After <a href="m01-dispatch-to-lmp.html">M1</a> and <a href="07-cost.html">lesson 7</a> and <a href="13-capstone.html">lesson 13</a></li>
 <li class="lx-done-tag" data-lesson-id="m03-capacity-expansion" hidden>Completed</li>
 </ul>

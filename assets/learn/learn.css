@@ -57,7 +57,7 @@ body.page-learn #title-block-header .quarto-title-meta, body.page-learn #title-b
 body.page-learn .quarto-title h1.title { margin: 0; font-family: var(--lx-f-display); font-weight: 600; font-size: clamp(26px, 1.2rem + 1.6vw, 36px);
   line-height: 1.15; letter-spacing: -.015em; color: var(--lx-ink); text-wrap: balance; }
 body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(--lx-f-display); font-weight: 400; font-size: clamp(16px, .9rem + .4vw, 19px);
-  color: var(--lx-ink-2); opacity: 1; }
+  color: var(--lx-ink-2); opacity: 1; text-wrap: pretty; }   /* pretty: no single word left alone on the last line */
 .page-learn main h2, .page-learn main h3, .page-learn main h4 { font-family: var(--lx-f-display); font-weight: 600; color: var(--lx-ink); letter-spacing: -.01em;
   line-height: 1.2; border: 0; padding: 0; text-wrap: balance; }
 .page-learn main h2 { font-size: 24px; margin: 0 0 .35rem; }
@@ -86,11 +86,13 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
 .lx-crumbs a { color: var(--lx-ink-2) !important; }
 .lx-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .lx-badge, .lx-badges li { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; border-radius: 999px; font-size: 13.5px;
+  flex-wrap: wrap; column-gap: .3em; row-gap: 0; max-width: 100%;   /* a long badge ("After lesson 11 and B1 ...") wraps between its parts */
   color: var(--lx-ink-2); background: var(--lx-surface); border: 1px solid var(--lx-line); }
+.lx-badges li a, .lx-badges .lx-nw { white-space: nowrap; }   /* "lesson 11", "about 90 min practice" never split */
 .lx-badges .lx-dot, .lx-badge .lx-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--lx-tier-1)); }
 .lx-badges .lx-done-tag { color: var(--lx-good); border-color: color-mix(in srgb, var(--lx-good) 45%, var(--lx-line)); }
 .lx-steps ol { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 3px; list-style: none; background: var(--lx-surface-2); border-radius: 11px; }
-.lx-steps a { display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; font-family: var(--lx-f-display); font-size: 14px;
+.lx-steps a { white-space: nowrap; display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; font-family: var(--lx-f-display); font-size: 14px;
   font-weight: 500; color: var(--lx-ink-2) !important; text-decoration: none !important; }
 .lx-steps a:hover { background: var(--lx-surface); color: var(--lx-ink) !important; }
 .lx-steps .lx-n { font-family: var(--lx-f-mono); font-size: 11px; color: var(--lx-ink-3); margin-right: 6px; }
@@ -187,6 +189,7 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
   .lx-head { margin-bottom: 1rem; }
   .lx-steps { width: 100%; }
   .lx-steps ol { flex-wrap: nowrap; justify-content: space-between; }
+
   .lx-steps a { padding: 0 9px; font-size: 13.5px; }
   .lx-steps .lx-n { display: none; }
 }
@@ -198,6 +201,9 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-landing-note p { margin: 0; }
 .lx-real p:not(.lx-eyebrow), .lx-sources ul, .lx-real ol { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-card > .lx-eyebrow { margin-bottom: 6px; }
+
+/* narrow phones (under 360 px): the four section tabs no longer fit one row, so they wrap as whole labels */
+@media (max-width: 359.98px) { .lx-steps ol { flex-wrap: wrap; justify-content: flex-start; } }
 
 /* scene.css — the Prairie Town picture (scene.js): callouts on wide scenes, numbered legend on narrow ones. */
 .lx-scene { position: relative; border-radius: var(--lx-r); overflow: hidden; border: 1px solid var(--lx-line); background: var(--lx-sky-day-bot); }

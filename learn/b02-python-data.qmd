@@ -23,7 +23,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">B2</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst to Modeler · L2–L3</li>
-<li>20 min guided · 60 min lab</li>
+<li><span class="lx-nw">20 min guided</span> · <span class="lx-nw">60 min lab</span></li>
 <li>After <a href="05-capacity-factor.html">lesson 5</a> and <a href="k07-spreadsheets.html">K7</a></li>
 <li class="lx-done-tag" data-lesson-id="b02-python-data" hidden>Completed</li>
 </ul>
