@@ -1,10 +1,10 @@
-// cf7-cost-of-waiting.js — Case file CF7, "What does waiting for the grid cost, and who pays?" (case form, wave W2 draft,
+// cf7-cost-of-waiting.js — Case file CF7, "What does waiting for the grid cost, and who pays?" (case form, wave W2,
 // 2026-11-03). Delay economics only; data centers appear only as loads.
 //
 // Data: assets/learn/data/cf7-cost-of-waiting.json: the question's dated steps (LX.Timeline: two public events with
 // their primary sources, then the study), where the study's result holds (LX.Boundary), the illustrative toy ("idea")
-// and the numbers to remember. Every sentence about the course author's study comes from the approved excerpt
-// (reports/learn/excerpts_for_approval.md, E7).
+// and the numbers to remember. The research text in the data file is approved excerpt wording
+// (reports/learn/excerpts_for_approval.md, E7, and its revisions); this script adds none of its own.
 //
 // The idea (illustrative; invented round numbers, not the study's inputs, equations or results): a P MW load waits tau
 // months for its grid connection. Money is discounted monthly at i = (1 + r)^(1/12) - 1; a cost c every month of the
@@ -15,7 +15,8 @@
 //   other customers       the rest, (1 - s), of the utility's costs: carrying cost U x i a month on the upgrades U built
 //   (ratepayers)          for the load, and the expected stranded cost q(tau) x U at the end of the wait, where
 //                         q(tau) = min(cap, 0.5% x tau) is the chance that the load never arrives
-//   society               with bridge power, its extra CO2 (b x P x 730 h x e a month) valued at a social cost per tonne
+//   society               with bridge power, its CO2 above what grid power would have emitted had the load been connected on
+//                         time (b x P x 730 h x e a month), valued at a social cost per tonne; no CO2 change while it sits idle
 // The three accounts are reported separately and never simply added (the study's rule); the toy shows the total only
 // to make the point that a tariff moves cost between accounts without changing it.
 // Every number on the page is checked by _tests/learn/test_cf7-cost-of-waiting.js.
@@ -52,11 +53,45 @@
       return "<tr><td>" + t + " months</td><td class=\"n\">" + musd(L.developer) + "</td><td class=\"n\">" + musd(L.ratepayers) + "</td><td class=\"n\">" + musd(L.society) + "</td><td class=\"n\">" + kusd(L.dci) + "</td></tr>";
     }).join("");
     var t0 = I.delays.start, base = ledgers(I, t0, 0, false), tar = ledgers(I, t0, 1, false), br = ledgers(I, t0, 0, true);
-    return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p>" +
+    return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p>" + staticAssume(I) +
       "<table class=\"lx-facts\"><caption class=\"lx-hint\">Present values of a " + I.loadMW + " MW load's wait, other customers paying the utility's costs, no bridge power.</caption>" +
       "<thead><tr><th scope=\"col\">Wait</th><th scope=\"col\">Developer</th><th scope=\"col\">Other customers</th><th scope=\"col\">Society</th><th scope=\"col\">Developer per MW-month</th></tr></thead><tbody>" + rows + "</tbody></table>" +
       "<ul><li>At " + t0 + " months, a tariff that makes the waiting load pay all of the utility's costs moves " + musd(base.ratepayers) + " from other customers to the developer; the total stays " + musd(tar.total) + ".</li>" +
-      "<li>Bridge power for half the load saves the developer " + musd(base.developer - br.developer) + " and adds " + musd(br.society) + " of CO₂ damage for society.</li></ul>";
+      "<li>Bridge power for half the load saves the developer " + musd(base.developer - br.developer) + " and adds " + musd(br.society) + " of CO₂ damage above grid power, for society.</li></ul>";
+  }
+  var PARTS = [
+    { key: "margin", label: "Lost margin", color: "var(--lx-accent)" },
+    { key: "capital", label: "Carrying cost of idle capital", color: "var(--lx-tier-5)" },
+    { key: "tariff", label: "Utility costs it is charged", color: "var(--lx-tier-4)" },
+    { key: "bridge", label: "Bridge power premium", color: "var(--lx-pk)" },
+    { key: "carry", label: "Carrying cost of the upgrades", color: "var(--lx-tier-3)" },
+    { key: "strand", label: "Expected stranded upgrades", color: "var(--lx-bad)" },
+    { key: "co2", label: "CO₂ damage above grid power", color: "var(--lx-warn)" }
+  ];
+  // the toy's assumptions and one worked month (shown live and in the no-JS version)
+  function staticAssume(I) {
+    var L = ledgers(I, I.delays.start, 0, false), m = I.marginPerMWMonth * I.loadMW;
+    var rows = I.assumptions.map(function (a) { return "<tr><th scope=\"row\">" + a[0] + "</th><td>" + a[1] + "</td></tr>"; }).join("");
+    return "<table class=\"lx-facts cf7-assume\"><caption class=\"lx-hint\">The toy's assumptions (illustrative)</caption><tbody>" + rows + "</tbody></table>" +
+      "<p class=\"lx-hint\">Worked month: the lost margin is $" + I.marginPerMWMonth.toLocaleString("en-US") + " × " + I.loadMW + " MW = " + musd(m) + " a month. Over " + I.delays.start +
+      " months, discounted month by month, that is " + musd(m) + " × " + L.A.toFixed(2) + " = " + musd(L.dev.margin) + " today.</p>";
+  }
+  // each account and its parts, as text (the bars' text version)
+  function accountLines(L) {
+    var f = function (o) { return PARTS.filter(function (p) { return o[p.key] > 5e3; }).map(function (p) { return (/^CO₂/.test(p.label) ? p.label : p.label.charAt(0).toLowerCase() + p.label.slice(1)) + " " + musd(o[p.key]); }).join(", "); };
+    return [["Developer", L.developer, f(L.dev)], ["Other customers", L.ratepayers, f(L.rate)], ["Society", L.society, f(L.soc)]].map(function (r) {
+      return r[0] + ": " + musd(r[1]) + (r[2] ? " (" + r[2] + ")" : "");
+    });
+  }
+  // the live status, one idea per line: the three accounts, then what the tariff and bridge power change
+  function statusLines(I, tau, s, bridge) {
+    if (!tau) return ["No wait, no delay cost in any account. <b>Slide the wait up.</b>"];
+    var L = ledgers(I, tau, s, bridge), base = ledgers(I, tau, 0, false), out = [];
+    out.push("A " + tau + "-month wait, in present value: developer <b>" + musd(L.developer) + "</b>, other customers <b>" + musd(L.ratepayers) + "</b>, society <b>" + musd(L.society) + "</b>.");
+    if (s > 0) out.push("The tariff moves " + musd(s * base.ratepayers) + " from other customers to the developer; it does not shrink the cost.");
+    if (bridge) out.push("Bridge power saves the developer " + musd(ledgers(I, tau, s, false).developer - L.developer) + " and adds " + musd(L.society) + " of CO₂ damage above grid power.");
+    if (!s && !bridge) out.push("Try the tariff, then bridge power: watch which account each one changes.");
+    return out;
   }
   function rich(t) {
     // glossary marks to spans (the attribute is built in pieces so the build's term scanner does not read "$1" as an id)
@@ -69,8 +104,8 @@
     return "<p class=\"lx-eyebrow\">" + rich(b.title) + "</p><dl class=\"lx-ideas\"><dt>It holds when</dt><dd>" + ul(b.holds) + "</dd><dt>It leaves out</dt><dd>" + ul(b.leaves) + "</dd></dl>" +
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
-  var model = { monthly: monthly, annuity: annuity, ledgers: ledgers, musd: musd, kusd: kusd, pct: pct, SHARE_LABEL: SHARE_LABEL,
-                staticIdea: staticIdea, staticBoundary: staticBoundary };
+  var model = { monthly: monthly, annuity: annuity, ledgers: ledgers, musd: musd, kusd: kusd, pct: pct, SHARE_LABEL: SHARE_LABEL, PARTS: PARTS,
+                staticAssume: staticAssume, accountLines: accountLines, statusLines: statusLines, staticIdea: staticIdea, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -108,17 +143,15 @@
     H("p", { class: "cf-ctl-l", text: "While it waits: on-site generators?" }, bc);
     var tg = LX.Toggle(bc, { label: "Bridge power for half the load", on: S.bridge, onChange: function (on) { S.bridge = on; paint(true); } });
     var chips = H("div", { class: "lx-readouts" }, stage);
-    var PARTS = [
-      { key: "margin", label: "Lost margin", color: "var(--lx-accent)" },
-      { key: "capital", label: "Carrying cost of idle capital", color: "var(--lx-tier-5)" },
-      { key: "tariff", label: "Utility costs it is charged", color: "var(--lx-tier-4)" },
-      { key: "bridge", label: "Bridge power premium", color: "var(--lx-pk)" },
-      { key: "carry", label: "Carrying cost of the upgrades", color: "var(--lx-tier-3)" },
-      { key: "strand", label: "Expected stranded upgrades", color: "var(--lx-bad)" },
-      { key: "co2", label: "CO₂ damage of bridge power", color: "var(--lx-warn)" }
-    ];
     var cs = LX.CostSplit(stage, { parts: PARTS, rows: [], fmt: musd, key: true });
-    var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
+    // the bars' text version: each account and its parts, kept up to date (the bars themselves are decorative)
+    var alt = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "Text version of the bars" }, alt);
+    var altList = H("ul", null, alt);
+    // one idea per line, read out together when the state changes
+    var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
+    // the numbers behind the accounts, after the interaction (the no-JS version shows them in full)
+    var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions and one worked month" }, why);
+    H("div", { html: staticAssume(I) }, why);
 
     function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function rowsOf(L) {
@@ -138,17 +171,9 @@
       chip("Society", musd(L.society));
       chip("Developer per MW-month", L.dci == null ? "none" : kusd(L.dci));
       cs.set(rowsOf(L), max * 1.04);
-      status.innerHTML = say(L);
+      altList.innerHTML = ""; accountLines(L).forEach(function (t) { H("li", { text: t }, altList); });
+      status.innerHTML = statusLines(I, S.tau, S.s, S.bridge).map(function (t) { return "<p>" + t + "</p>"; }).join("");
       if (acted) LX.store.set("cf7-idea", { tau: S.tau, s: S.s, bridge: S.bridge });
-    }
-    function say(L) {
-      if (!S.tau) return "No wait, no delay cost in any account. <b>Slide the wait up.</b>";
-      var base = ledgers(I, S.tau, 0, false);
-      var t = "A " + S.tau + "-month wait, in present value: developer <b>" + musd(L.developer) + "</b>, other customers <b>" + musd(L.ratepayers) + "</b>, society <b>" + musd(L.society) + "</b>. ";
-      if (S.s > 0) t += "The tariff moves " + musd(S.s * (base.ratepayers)) + " from other customers to the developer; it does not shrink the cost. ";
-      if (S.bridge) t += "Bridge power saves the developer " + musd(ledgers(I, S.tau, S.s, false).developer - L.developer) + " and adds " + musd(L.society) + " of CO₂ damage for society.";
-      else if (!S.s) t += "Try the tariff, then bridge power: watch which account each one changes.";
-      return t;
     }
     paint(false);
     // demo states (core.js LX.demo): "mid" = the waiting load pays all; "bridge" = bridge power on as well
