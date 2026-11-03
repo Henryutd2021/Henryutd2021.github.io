@@ -128,7 +128,6 @@
     var stage = H("div", { class: "lx-stage" }, live);
     H("h3", { text: I.title + " (" + I.loadMW + " MW)" }, H("div", { class: "lx-stage-head" }, stage));
     H("p", { class: "lx-hint", text: I.note }, stage);
-    H("div", { class: "cf7-assume-box", html: staticAssume(I) }, stage);
     var ctl = H("div", { class: "lx-ctls" }, stage);
     var sl = LX.Slider(H("div", null, ctl), { label: "Months of waiting", color: "var(--lx-accent)", min: I.delays.min, max: I.delays.max, step: I.delays.step, value: S.tau,
       fmt: function (v) { return v + " months"; }, onChange: function (v) { S.tau = v; paint(true); } });
@@ -150,6 +149,9 @@
     var altList = H("ul", null, alt);
     // one idea per line, read out together when the state changes
     var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
+    // the numbers behind the accounts, after the interaction (the no-JS version shows them in full)
+    var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions and one worked month" }, why);
+    H("div", { html: staticAssume(I) }, why);
 
     function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function rowsOf(L) {

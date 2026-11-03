@@ -166,8 +166,8 @@
     }
     var selA = select("cf6-from", "Move 10 MWh out of", "a"), selB = select("cf6-to", "into", "b");
     var chips = H("div", { class: "lx-readouts" }, stage);
-    var P = LX.Plot(stage, { text: "Text version of the chart" });
     H("p", { class: "lx-hint", text: I.how[0] }, stage);
+    var P = LX.Plot(stage, { text: "Text version of the chart" });
     // one idea per line, read out together when the state changes
     var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
 
@@ -187,7 +187,7 @@
         x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h"]] },
         y: { min: 0, max: 0.6, step: 0.1, fmt: function (v) { return v.toFixed(1); }, unit: "t CO₂ per MWh" },
         height: 250, heightN: 220,
-        spans: spill.length ? [{ x0: spill[0], x1: spill[spill.length - 1] + 1, color: "var(--lx-solar)", op: 0.14, label: "Spare sun" }] : [],
+        spans: spill.length ? [{ x0: spill[0], x1: spill[spill.length - 1] + 1, color: "var(--lx-solar)", op: 0.14, label: "Spare wind and sun" }] : [],
         lines: [{ values: W.marg, step: 1, color: "var(--lx-warn)", width: 2.2, dash: "6 4" }, { values: W.avg, step: 1, color: "var(--lx-accent)", width: 2.6 }],
         marks: [{ x: S.a + 0.5, y: W.marg[S.a], label: "Out", kind: "dot", pos: "above", vline: true }, { x: S.b + 0.5, y: W.marg[S.b], label: "In", kind: "dot", pos: "above", vline: true }],
         legend: [{ label: "Average factor (the hour's CO₂ ÷ its use)", color: "var(--lx-accent)" }, { label: "Marginal factor (the plant serving one more MWh)", color: "var(--lx-warn)", dash: "6 4" }],

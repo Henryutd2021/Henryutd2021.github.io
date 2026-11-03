@@ -135,7 +135,6 @@
     var head = H("div", { class: "lx-stage-head" }, stage);
     H("h3", { text: I.title }, head);
     H("p", { class: "lx-hint", text: I.note }, stage);
-    H("div", { class: "cf2-assume-box", html: staticAssume(I) }, stage);
     var ctl = H("div", { class: "lx-ctls" }, stage);
     var pr = H("div", { class: "cf-ctl" }, ctl);
     H("p", { class: "cf-ctl-l", id: "cf2-price-l", text: "Hydrogen selling price" }, pr);
@@ -157,6 +156,9 @@
     var P = LX.Plot(stage, { text: "Text version of the chart" });
     // one idea per line, read out together when the state changes
     var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
+    // the numbers behind the blocks, after the interaction (the no-JS version shows them in full)
+    var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions and one worked block" }, why);
+    H("div", { html: staticAssume(I) }, why);
 
     function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function paint(acted) {
