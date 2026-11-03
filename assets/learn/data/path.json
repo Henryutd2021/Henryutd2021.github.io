@@ -1069,19 +1069,25 @@
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Money over time: discounting and net present value",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "code": "A1",
+   "title": "Is this project worth building? Cash flows, discounting and the cost of capital",
+   "ready": true,
+   "href": "a01-project-tea.html",
+   "scales": [],
+   "id": "a01-project-tea",
+   "minutes": 30,
+   "form": "cards"
   },
   {
    "tier": "analyst",
-   "code": null,
-   "title": "Techno-economic analysis of a project: cash flows, returns, sensitivity",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "code": "A2",
+   "title": "Who carries the risk? Power purchase agreements and risk allocation",
+   "ready": true,
+   "href": "a02-contracts-risk.html",
+   "scales": [],
+   "id": "a02-contracts-risk",
+   "minutes": 25,
+   "form": "cards"
   },
   {
    "tier": "analyst",
@@ -1438,7 +1444,10 @@
   },
   {
    "title": "Vectors and matrices: what Ax <= b means",
+   "ready": true,
+   "href": "k06-vectors-matrices.html",
    "code": "K6",
+   "id": "k06-vectors-matrices",
    "minutes": 25
   },
   {

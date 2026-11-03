@@ -1,0 +1,37 @@
+{
+  "about": "Analyst lesson A1 (Is this project worth building?): the project and the settings of its cash-flow model. The wind farm's building cost, upkeep, capacity factor, rate, life and the illustrative loan and owner rates come from lesson 7's data file (07-cost.json), so they stay the same as in lessons 7, 12, 13 and toolbox K3. All money is in real 2025 dollars (one price year for the whole lesson), so every rate is a real rate. The cash flows leave out taxes, tax credits, depreciation, interest during construction, degradation, inflation and the project's financing schedule; they are the project's pre-tax cash flows before any debt payments.",
+  "accessed": "2026-11-03",
+  "priceYear": 2025,
+  "farm": {
+    "mw": 150,
+    "mwNote": "150 MW: the size of Prairie Town's wind farm (town.json, illustrative)."
+  },
+  "price": 50,
+  "priceRange": [30, 70],
+  "priceStep": 1,
+  "priceNote": "$50/MWh: an illustrative fixed sale price for every MWh, in 2025 dollars, as if the farm had a fixed-price contract for its whole life (lesson A2 asks who carries the risk when it does not). Range $30-$70: illustrative.",
+  "rateRange": [0, 10],
+  "rateStep": 0.1,
+  "debtShareRange": [0, 80],
+  "debtShareStep": 5,
+  "tornado": {
+    "price": [40, 60],
+    "priceNote": "Sale price $40-$60/MWh (plus or minus 20%): illustrative. The other ranges are lesson 7's: building cost and fixed upkeep plus or minus 25% (illustrative), capacity factor 25-43%, rate 2-7% real, life 20-40 years."
+  },
+  "schedule": {
+    "buildYear": 2026,
+    "note": "An illustrative calendar for the timeline: the farm is built in 2026 (year 0) and sells power from 2027 (year 1). The dollars stay real 2025 dollars."
+  },
+  "compare": {
+    "mw": 20,
+    "cf": 43,
+    "note": "A smaller farm at a windier site, for the myth card on IRR: 20 MW at a 43% capacity factor (lesson 7's upper end: the 2023 market-average new turbine in the 2025 ATB), same building cost per kW, upkeep, price and rate."
+  },
+  "sources": {
+    "short1995": {
+      "text": "Short, W., Packey, D. J. and Holt, T. (1995), A Manual for the Economic Evaluation of Energy Efficiency and Renewable Energy Technologies, NREL/TP-462-5173: net present value p. 39, internal rate of return p. 52, simple payback p. 56, discounted payback p. 57",
+      "url": "https://docs.nlr.gov/docs/legosti/old/5173.pdf",
+      "asOf": "March 1995, accessed 3 November 2026"
+    }
+  }
+}

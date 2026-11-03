@@ -1,0 +1,19 @@
+# Sidecar for Analyst lesson A1 (a01-project-tea), builder learn-w3-c, 2026-11-03. Read by scripts/build_learn.py.
+id: a01-project-tea
+lesson: A1
+glossary:
+  - id: internal-rate-of-return
+    term: Internal rate of return (IRR)
+    def: "The discount rate at which a project's net present value is exactly zero: the return the project itself earns."
+  - id: payback-period
+    term: Payback period
+    def: "The number of years until the running sum of a project's cash first gets back to zero, with or without discounting."
+  - id: break-even-price
+    term: Break-even price
+    def: "The sale price at which a project's net present value is exactly zero; for one plant it equals its levelized cost."
+  - id: inflation
+    term: Inflation
+    def: "The rise in prices in general over time, so that a dollar buys less each year."
+requests:
+  - "Candidate shared component: the cash-flow chart of steps 1, 2 and 5 (year-by-year bars, their present values and running sums on LX.Plot) is the curriculum's i-cashflow; M11 and T7 could reuse it. It is lesson-local in assets/learn/a01-project-tea.js for now."
+  - "path.yml: A1 and A2 replace the two pre-v2 Analyst placeholders 'Money over time: discounting and net present value' and 'Techno-economic analysis of a project: cash flows, returns, sensitivity', which K3, A1 and A2 now cover."

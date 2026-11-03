@@ -1,0 +1,16 @@
+# Sidecar for toolbox K6 (k06-vectors-matrices), builder learn-w3-c, 2026-11-03. Read by scripts/build_learn.py.
+id: k06-vectors-matrices
+lesson: K6
+glossary:
+  - id: vector
+    term: Vector
+    def: "An ordered list of numbers, such as a plan's outputs, in which the position of each number carries its meaning."
+  - id: dot-product
+    term: Dot product
+    def: "The sum of the products of two vectors' matching entries, such as costs times outputs, added up."
+  - id: matrix
+    term: Matrix
+    def: "A table of numbers in rows and columns; in a model, one row per rule and one column per decision."
+requests:
+  - "K6 reuses lesson 10's data (10-write-it-down.json, town.json, town_year.json) and keeps a copy of lesson 10's dayOf(); the test checks it against assets/learn/10-write-it-down.js. Any change to lesson 0's day should rerun node _tests/learn/test_k06-vectors-matrices.js --write."
+  - "Lesson 10's and B1's own pages could link back to K6 (for example next to their A x ≤ b steps); not done here, as both are shared pages."

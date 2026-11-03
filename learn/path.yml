@@ -465,8 +465,39 @@
 - {kind: lesson, tier: foundations, title: "Batteries and hydrogen basics"}
 - {kind: lesson, tier: foundations, title: "Transmission and distribution"}
 - {kind: lesson, tier: foundations, title: "Large loads and data centers"}
-- {kind: lesson, tier: analyst, title: "Money over time: discounting and net present value"}
-- {kind: lesson, tier: analyst, title: "Techno-economic analysis of a project: cash flows, returns, sensitivity"}
+- kind: lesson
+  id: a01-project-tea
+  code: A1
+  tier: analyst
+  form: cards
+  icon: coin
+  status: active
+  minutes: 30
+  practice_minutes: 45   # the drill (about 25 minutes) and the spreadsheet task (about 20)
+  title: "Is this project worth building? Cash flows, discounting and the cost of capital"
+  subtitle: "Lay out a wind farm's cash year by year, discount it, and read NPV, IRR and payback"
+  short: "Is it worth building?"
+  teaches: [cash flows, net present value, WACC as the discount rate, internal rate of return, simple and discounted payback, break-even price, tornado charts]
+  does: "Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters."
+  outcome: "Lay out a project's yearly cash flows and judge it by NPV at its cost of capital, with its IRR, payback and break-even price, and say what each yardstick misses."
+  after: [7, K3]
+  next: A2
+- kind: lesson
+  id: a02-contracts-risk
+  code: A2
+  tier: analyst
+  form: cards
+  icon: scale
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the questions and the drill (Check section)
+  title: "Who carries the risk? Power purchase agreements and risk allocation"
+  subtitle: "Sign four contracts for a solar-plus-storage plant, run 200 price years, and see where the risk lands"
+  short: "Who carries the risk?"
+  teaches: [power purchase agreements, as-generated and shaped contracts, node and hub settlement, basis risk, tolling agreements, reading a simulated distribution]
+  does: "Draw price years for a solar-plus-storage plant; sign a fixed price settled at the node, one settled at the hub, a flat block and a battery toll; run 200 seeded price years and see the seller's and the buyer's ranges move."
+  outcome: "Say which party carries price, shape, output, basis and battery-margin risk under each contract, and read the risk as a stated statistic of a simulated distribution."
+  after: [A1]
 - {kind: lesson, tier: analyst, title: "Markets and institutions: grid operators, FERC and state commissions"}
 - {kind: lesson, tier: analyst, title: "Capacity, reserves and resource adequacy"}
 - {kind: lesson, tier: analyst, title: "Policy instruments: tax credits, carbon prices, large-load tariffs"}
@@ -789,7 +820,22 @@
   after: []
   next: 4
 
-- {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax <= b means"}
+- kind: tool
+  id: k06-vectors-matrices
+  code: K6
+  form: cards
+  path: k06-vectors-matrices.qmd
+  status: active
+  minutes: 25
+  practice_minutes: 30
+  title: "Vectors and matrices: what Ax <= b means"
+  subtitle: "Write a plan as a vector and the rules as a matrix, then check every rule at once"
+  short: "Vectors and matrices"
+  does: "On lesson 10's hour, write a plan as a vector and its cost as a dot product, stack the rules into a matrix, compute A x, flip a ≥ row to ≤, check every rule at once, and size the matrix of lesson 11's day."
+  outcome: "Read and compute a dot product and a matrix-vector product, and read A x ≤ b as one row per rule checked at once."
+  teaches: [vectors, the dot product, matrices, matrix-vector products, the form A x ≤ b, sparse matrices]
+  after: [K4]
+  next: B1
 
 - kind: tool
   id: k07-spreadsheets
