@@ -91,7 +91,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k8-fixes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .k8-fix { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); }
 .k8-fix .lx-btn { justify-self: start; }
-.k8-ffile { margin: 0; font-family: var(--lx-f-mono); font-size: 12.5px; color: var(--lx-ink-3); }
+.k8-ftitle { margin: 0; font-family: var(--lx-f-display); font-size: 15px; font-weight: 600; color: var(--lx-ink); }
+.k8-ffile { margin: 0; font-family: var(--lx-f-mono); font-size: 12.5px; color: var(--lx-ink-3); overflow-wrap: anywhere; }
 .k8-why { margin: 0; font-size: 14px; color: var(--lx-ink-2); }
 .k8-why:empty { display: none; }
 .k8-static { border-collapse: collapse; font-size: 14px; width: 100%; }
@@ -99,6 +100,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k8-static th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-2); }
 .k8-staticwrap { overflow-x: auto; display: grid; gap: 10px; }
 .k8-static-drill { margin: 0; padding-left: 1.2rem; display: grid; gap: 8px; font-size: 14.5px; color: var(--lx-ink-2); }
+.k8-static-drill p { margin: 0; }
 .page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
 .page-learn .lx-datanote li { margin: 0; }
 .page-learn .k8-cmdtab td.n { font-family: var(--lx-f-mono); white-space: normal; overflow-wrap: anywhere; }
@@ -119,7 +121,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-interactive lx-cards" data-learn="k08" data-src="../assets/learn/data/town.json ../assets/learn/data/town_year.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">A small model project's history, in nine steps</p>
-<p class="lx-hint">The project computes Prairie Town's gas for one day: 1,965 MWh, at $40/MWh $78,600. A <span class="lx-term" data-term="commit">commit</span> is a saved snapshot of every file.</p>
+<p class="lx-hint">The project computes the electricity Prairie Town's gas plants make in one day, 1,965 MWh: what demand leaves after wind, solar and a 100 MW plant that runs flat. At $40/MWh it costs $78,600; a balance check asserts that supply equals demand.</p>
+<p class="lx-hint">A <span class="lx-term" data-term="commit">commit</span> records the staged versions of the project's <span class="lx-term" data-term="tracked-file">tracked files</span>, with a message and a link to the commit before it.</p>
 <div class="k8-staticwrap">
 <!-- k8-steps:start (written by _tests/learn/test_k08-git-notebooks.js in its write mode; do not edit) -->
 <table class="k8-static" aria-label="The steps of this page: command and what it shows">
@@ -129,11 +132,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td data-label="Step">2</td><td class="k8-mono">git status, git diff</td><td>After gas_cost 40 → 55 in params.yml: one modified file, the line “−gas_cost: 40” and “+gas_cost: 55”; the day's cost goes from $78,600 to $108,075.</td></tr>
 <tr><td data-label="Step">3</td><td class="k8-mono">git switch -c high-gas, git add params.yml, git commit -m</td><td>A new branch, the change staged, then recorded as a commit on high-gas only.</td></tr>
 <tr><td data-label="Step">4</td><td class="k8-mono">git switch main</td><td>params.yml says 40 again and the result is $78,600; git switch high-gas brings back 55.</td></tr>
-<tr><td data-label="Step">5</td><td class="k8-mono">git pull, then git switch --detach &lt;id&gt; and python check.py</td><td>A teammate's three commits arrive; the balance check fails by 2,822 MWh. Halving the history: commit 3 passes, commit 4 fails, so commit 4 (2b77767) is the first bad one, found in 2 checks.</td></tr>
+<tr><td data-label="Step">5</td><td class="k8-mono">git pull, then git switch --detach &lt;id&gt; and python check.py</td><td>A teammate's three commits arrive; the balance check fails by 2,822 MWh. Halving the history (once a commit fails, every later one fails too): commit 3 passes, commit 4 fails, so commit 4 (2b77767) is the first bad one, found in 2 checks.</td></tr>
 <tr><td data-label="Step">6</td><td class="k8-mono">git diff 7a83e3d 2b77767, git revert 2b77767</td><td>The line became −(wind − solar): solar is added, not subtracted, so gas is 4,787 MWh instead of 1,965 (2 × 1,411 MWh too much). The revert commit brings back 1,965 MWh.</td></tr>
 <tr><td data-label="Step">7</td><td class="k8-mono">a notebook: edit cell 2, run only cell 4</td><td>Cell 4 still shows 78600 (memory holds gas_cost = 40) under a cell that says 55; Restart and run all gives 108075.</td></tr>
-<tr><td data-label="Step">8</td><td class="k8-mono">five fixes</td><td>Before sharing: exact versions (pandas==2.2.3, an illustrative version); a path inside the project; the raw data's source, download date and checksum; a fixed random seed; .env and data/raw/ in .gitignore.</td></tr>
-<tr><td data-label="Step">9</td><td class="k8-mono">git clone, pip install -r requirements.txt, run all</td><td>The fresh copy has no .env and no raw data, yet gives 1,965 MWh, $78,600 and “balance OK”, as the README says.</td></tr>
+<tr><td data-label="Step">8</td><td class="k8-mono">five fixes</td><td>Before sharing: exact versions (pandas==2.2.3, an illustrative version); a path inside the project; the raw data's source, download date and checksum; a fixed random seed; .env, data/raw/ and charts in .gitignore before anything is staged.</td></tr>
+<tr><td data-label="Step">9</td><td class="k8-mono">git clone, pip install -r requirements.txt, jupyter nbconvert --to notebook --execute day.ipynb</td><td>The fresh copy has no .env and no raw data. Its notebook runs top to bottom: cell 3 gives 1,965 MWh, cell 4 shows 78600 (dollars), and cell 6's balance assert prints “balance OK”, as the README says.</td></tr>
 </tbody></table>
 <!-- k8-steps:end -->
 <!-- k8-history:start (written by _tests/learn/test_k08-git-notebooks.js in its write mode; do not edit) -->
@@ -153,7 +156,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
-<li>Demand, wind and solar: the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>. The 100 MW plant that runs flat all day and the $40/MWh gas cost are illustrative, as in <a href="k07-spreadsheets.html">K7</a>.</li>
+<li>Source: demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
+<li>Illustrative: the 100 MW plant that runs flat all day and the $40/MWh gas cost, as in <a href="k07-spreadsheets.html">K7</a>.</li>
 <li>The project, its files, its messages and the teammate are illustrative. Nothing on this page creates or touches a real repository; commands are shown as text.</li>
 <li>Commit ids here are 7-character fingerprints this page computes. Git's own ids are 40-character SHA-1 hashes. The version numbers in requirements.txt (pandas==2.2.3 and the others) are illustrative: they show what an exact pin looks like and are not a recommendation.</li>
 </ul></div>
@@ -169,10 +173,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="k8-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Commit</dt><dd>The unit of <span class="lx-term" data-term="version-control">version control</span>: a saved snapshot of every file, with a message, a parent and an id; git add picks what goes in, git commit records it.</dd>
+<dt>Commit</dt><dd>The unit of <span class="lx-term" data-term="version-control">version control</span>: the staged versions of the tracked files, with a message, a parent and an id; git add picks what goes in, git commit records it.</dd>
 <dt>Three places</dt><dd>A change sits in the working folder, then the staging area, then the history.</dd>
 <dt>Branch</dt><dd>A movable label on a line of commits: a what-if lives on its own branch while main stays as it was.</dd>
-<dt>Halving the history</dt><dd>With one good and one bad commit, check the middle each time: 1,000 commits need at most 10 checks.</dd>
+<dt>Halving the history</dt><dd>With one good and one bad commit, check the middle each time: 1,000 commits need at most 10 checks, if every commit after the first bad one also fails.</dd>
 <dt><span class="lx-term" data-term="hidden-state">Hidden state</span></dt><dd>A notebook's memory can be older than its code; only Restart and run all shows the outputs come from the cells as written.</dd>
 <dt>Clean rerun</dt><dd>A fresh clone and a pinned install give the same numbers: the code and inputs reproduce the result, which is not the same as the result being right.</dd>
 </dl>
@@ -187,10 +191,18 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **A snapshot, not a list of edits.** A commit stores every file as it was, plus the author, the time, the message and its parent's id. Files that did not change are shared with the parent, not copied.
+- **A snapshot, not a list of edits.** A commit stores every tracked file as staged, plus the author, the time, the message and its parent's id. Untracked files and unstaged edits are not in it; unchanged files are shared with the parent.
 - **The id is a fingerprint.** Git computes it with SHA-1 over all of that (a SHA-256 format also exists). Change one byte, the message or the parent, and the id changes.
 - **Branches are labels.** `main` and `high-gas` each point at one commit; a new commit moves the current label forward. Creating a branch copies no files.
-- **Merging.** `git merge high-gas` [joins]{.lx-term term="merge"} two lines of work. If main has not moved, its label just moves forward (a fast-forward). If both changed, Git combines them line by line and stops with a conflict where both edited the same lines (this page's model compares whole files).
+- **Merging.** `git merge high-gas` [joins]{.lx-term term="merge"} two lines of work:
+
+  | Before the merge | What Git does |
+  |---|---|
+  | main has not moved | moves main's label forward (a fast-forward) |
+  | both lines changed | combines them line by line |
+  | both edited the same lines | stops with a conflict for you to resolve |
+
+  This page's simulation compares whole files, not lines.
 
 ```{=html}
 </div>
@@ -228,7 +240,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="cells" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If every cell of a notebook ran without an error, its outputs match the code on the page.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. On this page cell 4 showed 78600 under a cell that says 55, with no error; only Restart and run all shows the outputs come from the cells as written.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. In step 7, cell 4 showed 78600 under a cell that says 55, with no error; only Restart and run all shows the outputs come from the cells as written.</p></details>
 </div>
 <div class="lx-qq" data-id="clone" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If a fresh clone reruns and gives the same numbers, the model's answer is right.”</p>
@@ -244,7 +256,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <details class="lx-answer"><summary>Answer</summary><p>Only the first edit: git add staged that version. The second edit waits in the working folder until you add it too.</p></details>
 </div>
 <div class="lx-qq" data-id="halve" data-answer="b">
-<p class="lx-qtext">Commit 1 of 9 passes the balance check and commit 9 fails it. Checking the middle each time, at most how many commits must you check?</p>
+<p class="lx-qtext">Commit 1 of 9 passes the balance check and commit 9 fails it; once the bug appears, every later commit fails. Checking the middle each time, at most how many commits must you check?</p>
 <ul class="lx-choices"><li data-value="a">2</li><li data-value="b">3</li><li data-value="c">4</li><li data-value="d">8</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>3: eight suspects (commits 2 to 9), halved three times, leave one. Checking one by one can take 7.</p></details>
 </div>
@@ -254,9 +266,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, a drill of seven kinds of item, about two minutes each (fifteen items take about 30 minutes). Three worked items:</p>
 <!-- k8-drill:start (written by _tests/learn/test_k08-git-notebooks.js in its write mode; do not edit) -->
 <ol class="k8-static-drill">
-<li>A commit's diff shows “- gas_cost: 40” and “+ gas_cost: 30” in params.yml. The model makes 1,965 MWh of gas. What is the day's gas cost after this commit, in $? <b>Answer: $58,950.</b> 1,965 MWh × $30/MWh = $58,950 (it was $78,600).</li>
-<li>Commit 1 of 64 passes the check; commit 64 fails it. Checking the middle commit each time, at most how many commits must you check to find the first bad one? <b>Answer: 6.</b> 63 suspects; each check halves them: 2^6 = 64 ≥ 63 &gt; 2^5 = 32, so 6 checks.</li>
-<li>Fresh kernel. Cells: (1) load the day, (2) gas_cost = 40, (3) gas_mwh = … (1,965), (4) gas_mwh * gas_cost. You: run cell 3, run cell 1, run cell 2, run cell 4. What does cell 4 show? <b>Answer: an error: a name is not defined.</b> NameError: name 'gas_mwh' is not defined: a cell it needs has not run yet.</li>
+<li><p>A commit's diff shows “- gas_cost: 40” and “+ gas_cost: 30” in params.yml. The model makes 1,965 MWh of electricity from gas. What is the day's gas cost after this commit, in $?</p><p><b>Answer: $58,950.</b></p><p>Why: 1,965 MWh × $30/MWh = $58,950 (it was $78,600).</p></li>
+<li><p>Commit 1 of 64 passes the check; commit 64 fails it, and once the bug appears every later commit fails. Checking the middle commit each time, at most how many commits must you check to find the first bad one?</p><p><b>Answer: 6.</b></p><p>Why: 63 suspects; each check halves them: 2^6 = 64 ≥ 63 &gt; 2^5 = 32, so 6 checks.</p></li>
+<li><p>Fresh kernel. Cells: (1) load the day, (2) gas_cost = 40, (3) gas_mwh = … (1,965), (4) gas_mwh * gas_cost. You: run cell 3, run cell 1, run cell 2, run cell 4. What does cell 4 show?</p><p><b>Answer: an error: a name is not defined.</b></p><p>Why: NameError: name 'gas_mwh' is not defined: a cell it needs has not run yet.</p></li>
 </ol>
 <!-- k8-drill:end -->
 </div>

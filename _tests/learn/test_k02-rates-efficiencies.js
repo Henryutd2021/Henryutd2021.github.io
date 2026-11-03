@@ -46,6 +46,9 @@ const { num, usd, pct } = K;
   ok(D13.fuel.co2PerMMBtu === 52.91 && D13.techs.battery.rte === 0.85, "inputs: 52.91 kg CO2 per MMBtu and an 85% round trip (lesson 13)");
   ok(town.fleet.wind.mw === 150 && cft.targets.wind.cf === 0.338 && cft.targets.wind.year === 2025, "inputs: the 150 MW wind farm and U.S. wind 33.8% in 2025");
   ok(DK.btuPerKWh.value === 3412 && /eia\.gov\/tools\/faqs\/faq\.php\?id=107/.test(DK.btuPerKWh.url) && /checked 3 November 2026/.test(DK.btuPerKWh.as_of), "inputs: 3,412 Btu per kWh with its EIA source and date");
+  const BB = DK.batteryBenchmark;
+  ok(BB && BB.value === 0.82 && BB.data_year === 2019 && BB.url === "https://www.eia.gov/todayinenergy/detail.php?id=46756" && /checked 3 November 2026/.test(BB.as_of) && /12 February 2021/.test(BB.source)
+     && /82% EIA measured for U\.S\. utility-scale batteries in 2019 \(batteryBenchmark\)/.test(DK.batteryNote), "inputs: the battery note's 82% (EIA, 2019 data) carries a structured, dated citation");
   ok(/data-src="\.\.\/assets\/learn\/data\/01-power-energy\.json \.\.\/assets\/learn\/data\/07-cost\.json \.\.\/assets\/learn\/data\/13-capstone\.json \.\.\/assets\/learn\/data\/town\.json \.\.\/assets\/learn\/data\/cf_targets\.json \.\.\/assets\/learn\/data\/k02-rates-efficiencies\.json"/.test(QMD)
      && ["01_power_energy", "07_cost", "13_capstone"].every(k => JS.indexOf('data["' + k + '"]') >= 0) && /data\.town, data\.cf_targets, data\.k02_rates_efficiencies/.test(JS), "inputs: the page reads every data file");
 }
@@ -86,21 +89,32 @@ const { num, usd, pct } = K;
 // ---------------- the page: statements one by one
 {
   has('subtitle: "Chain per-unit numbers, turn a heat rate into an efficiency, and follow the losses"');
-  has("10,791 kWh a year ÷ 8,760 h = 1.232 kW, an average draw of 1,232 W");
+  has("10,791 kWh bought in a year ÷ 8,760 h = 1.232 kW, an average of 1,232 W bought from the grid");
+  ok(!/average draw/i.test(QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "")) && !/average draw/i.test(JS), "the EIA home figure is electricity bought, so the page says average power bought from the grid, never average draw");
+  ok(/buys " \+ num\(s\.homeKWh\) \+ " \[\[kilowatt-hour\|kWh\]\] from the grid/.test(JS) && /label: "Average power bought:"/.test(JS) && /W bought from the grid on average/.test(JS) && K.rateRows(s)[0].name === "Average power bought from the grid", "step 1, its answer and the comparison table keep the grid-purchase label");
   has("6.226 MMBtu per MWh × $3.85 per MMBtu = $23.97 per MWh, and × 52.91 kg CO₂ per MMBtu = 329 kg per MWh");
   has("Efficiency = 3.412 MMBtu per MWh ÷ heat rate: 54.8% for the combined-cycle plant, 37.3% for the peaker (heat rate 9.142)");
   has("an 85% battery gives back 85 of 100 MWh; 100 MWh back needs 100 ÷ 0.85 = 117.6 MWh in, not 115");
-  has("150 MW × 8,760 h × 33.8% = 444,132 MWh in a year");
+  has("A capacity factor is energy made ÷ the most possible over the same period; for a year, 150 MW × 8,760 h × 33.8% = 444,132 MWh");
+  ok(/capacity factor\]\] is energy made ÷ energy at full output over the same period; here, one year\./.test(JS), "step 5 defines a capacity factor for any period, then uses one year");
   has("Stage efficiencies multiply: 54.8% × 85% = 46.6%");
   has("$\\eta = 3{,}412 \\div 6{,}226 = 54.8\\%$");
   has("From the peaker's 37.3% to the combined-cycle plant's 54.8% is 17.5 percentage points");
   has("the peaker burns $9.142 \\div 6.226 = 1.47$ times the gas: 47% more");
-  has("$e_{t+1} = e_t + 0.85\\, \\text{charge}_t - \\text{discharge}_t$");
+  // the Modeler box is a short preview (curriculum 4.6): words, one symbolic line with every symbol and unit defined, forward links
+  const mod = QMD.slice(QMD.indexOf("Go deeper · Modeler"), QMD.indexOf("</details>", QMD.indexOf("Go deeper · Modeler")));
+  const maths = mod.replace(/\\\$/g, "USD").match(/\$[^$]*?\$/g) || [], lines = maths.filter(m => /=/.test(m));
+  ok(lines.length === 1 && lines[0] === "$\\text{cost in the hour} = (\\mathrm{HR} \\times p + \\mathrm{VOM}) \\times g$" && !/\\sum|e_\{t|_t/.test(mod), "Modeler preview: one symbolic line, no sums or time indices: " + lines.join(" | "));
+  ok(/A simplified example\.\*\* One gas plant and one battery, in one-hour steps, so every flow is in MWh per hour/.test(mod) && /with HR the heat rate \(MMBtu per MWh\) and \$p\$ the gas price \(\\\$ per MMBtu\)/.test(mod)
+     && /\$g\$, the MWh the gas plant makes in an hour/.test(mod) && /VOM: variable operation and maintenance, in \\\$ per MWh/.test(mod), "Modeler preview: a single-plant example with every symbol and unit defined");
+  ok(/\[Lesson 13\]\(13-capstone\.html\) writes the full model: two gas plants, CO₂ in tonnes, each modelled hour weighted/.test(mod) && /\[M3\]\(m03-capacity-expansion\.html\)/.test(mod), "Modeler preview: forward links to lesson 13's full formulation and M3");
+  ["decision-variable", "variable-om", "linear-program"].forEach(t => ok(mod.indexOf('term="' + t + '"') >= 0, "Modeler preview: glossary term " + t));
+  ok(num(s.co2CC / 1000, 3) === "0.329" && /The CO₂, 0\.329 t per MWh made, adds up under a yearly cap/.test(mod) && /6\.226 × \\\$3\.85 = \\\$23\.97/.test(mod), "Modeler preview: its numbers are the page's (0.329 t, $23.97)");
   has("9.142 gives 37.3%, 6.226 gives 54.8%");
   has("115 × 0.85 = 97.75 MWh. Divide instead: 100 ÷ 0.85 = 117.6 MWh.");
   has("$35.20: 9.142 × 3.85, and MMBtu cancels. $2.37 divides instead; $12.99 adds numbers with different units.");
   has("50%: 438,000 ÷ (100 × 8,760) = 438,000 ÷ 876,000. Dividing by 365 days instead of 8,760 hours gives 1,200%");
-  has("lesson 0's town uses a rounded, illustrative 0.37 t (metric tonnes) per MWh instead", "which CO2 rate the page uses, against lesson 0's");
+  has("Lesson 0's town uses a rounded, illustrative 0.37 t (metric tonnes) of CO₂ per MWh instead.", "which CO2 rate the page uses, against lesson 0's");
   ok(town.fleet.cc.co2 === 0.37, "lesson 0's illustrative 0.37 t per MWh is what town.json holds");
   ok(near(9.142 / 3.85, 2.3745, 1e-4) && usd(9.142 / 3.85) === "$2.37" && usd(9.142 + 3.85) === "$12.99" && usd(3.85 / 9.142) === "$0.42", "quiz: the distractors are the stated mistakes");
   ok(/data-id="fuel" data-answer="b"[\s\S]{0,300}<li data-value="b">\$35\.20<\/li>/.test(QMD), "quiz: fuel's answer b is $35.20");
@@ -115,7 +129,10 @@ const { num, usd, pct } = K;
   // sources: primary, dated
   ok(/faq\.php\?id=107&amp;t=3">EIA FAQ on plant efficiency<\/a> \(checked 3 November 2026\)/.test(QMD), "source: EIA FAQ, 3,412 Btu per kWh, dated");
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(April 2026\)/.test(QMD) && /co2_vol_mass\.php">EIA<\/a> \(checked 2 November 2026\)/.test(QMD) && /93281\.pdf">NREL's 2025 battery cost study<\/a> \(June 2025\)/.test(QMD) && /Table 6\.07\.B<\/a> \(released 23 October 2026\)/.test(QMD), "sources: EIA, NREL with their dates");
-  ok(/150 MW wind farm is illustrative/.test(QMD) && /CO₂ is counted at the plant only/.test(QMD), "the illustrative farm and the CO2 boundary are stated");
+  ok(/150 MW wind farm is illustrative/.test(QMD) && /<li>CO₂ boundary: gas burned at the plant only\. Producing and delivering the gas, and building the plant, are outside it\.<\/li>/.test(QMD), "the illustrative farm and the CO2 boundary are stated");
+  // text budget: each data-note entry is one idea of at most about 35 words (links and tags dropped)
+  const note = QMD.slice(QMD.indexOf('<div class="lx-datanote">'), QMD.indexOf("</ul></div>", QMD.indexOf('<div class="lx-datanote">')));
+  (note.match(/<li>[\s\S]*?<\/li>/g) || []).forEach((li, i) => { const w = li.replace(/<[^>]+>/g, " ").trim().split(/\s+/).length; ok(w <= 36, `data note ${i + 1}: ${w} words (at most 36)`); });
   const scope = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "") + JS.replace(/\/\/.*$/gm, "");
   ok(!/nuclear|reactor|\bSMR\b|learning|data cent|\bAI\b/i.test(scope), "scope: no nuclear, no learning wording, no data centers, no AI");
 }
@@ -142,6 +159,10 @@ const { num, usd, pct } = K;
 // ---------------- the interactive: the actions Next waits for, the live regions, the demo hook
 {
   ok(/close\(v, s\.homeW, 1\)/.test(JS) && /right\.gas && right\.co2/.test(JS) && /var ok = c\[0\] === "less"/.test(JS) && /close\(v, s\.need, 0\.06\)/.test(JS) && /close\(v, s\.windE, 1000\)/.test(JS), "steps: each card's action is checked before Next opens");
+  // one idea per card: step 3's prompt is two sentences; step 4's feedback checks the division only (chained losses are the energy chain)
+  ok(/text: "One MWh of electricity holds " \+ KK \+ " MMBtu, so \[\[efficiency\|efficiency\]\] = " \+ KK \+ " ÷ heat rate: " \+ pct\(s\.effCC\) \+ " for the combined-cycle plant\. Is the \[\[peaker\|peaker\]\], with a heat rate of " \+ HRP \+ ", more or less efficient\?"/.test(JS), "step 3: a two-sentence prompt");
+  ok(/" MWh\. Going forward through a loss, multiply; going backwards, divide\."\);/.test(JS) && !/Losses also multiply/.test(JS), "step 4: the feedback teaches one move (divide going backwards)");
+  ok(/LX\.EnergyChain\(/.test(JS) && /Losses multiply along a chain/.test(JS), "chained losses keep their own explain diagram");
   ok(/close\(v, s\.naive, 0\.5\)/.test(JS) && /close\(v, s\.homeKW, 0\.002\)/.test(JS) && /close\(v, s\.windE \/ 1000, 1\)/.test(JS), "steps: the common slips (115, kW, GWh) get their own hint");
   ok((JS.match(/"aria-live": "polite"/g) || []).length >= 2, "steps: results are announced in live regions (the drill's are LX.Drill's)");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 1/.test(JS) && /state === "done"/.test(JS) && /autos\[4\]/.test(JS), "demo: mid, step-N and done states");

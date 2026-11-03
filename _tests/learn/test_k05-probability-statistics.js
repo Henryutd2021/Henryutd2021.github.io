@@ -29,16 +29,16 @@ function fallback() {
   const facts = [
     `A histogram counts hours per bin: with 1-point bins, ${share(S.mid, 0)} of the ${int(S.n)} hours lie from −2% up to +3%; the errors run from ${pct(S.min)} to ${pct(S.max)}.`,
     `Centre: mean ${pct(S.mean)}, median ${pct(S.median)}. Demand came in above the forecast in ${share(S.pos, 0)} of hours.`,
-    `Spread: standard deviation ${S.sd.toFixed(1)} points; from ${pct(S.lo1sd)} to ${pct(S.hi1sd)} (mean ± 1 SD) holds ${share(S.in1sd, 0)} of hours; the quartiles are ${pct(S.q25)} and ${pct(S.q75)}.`,
+    `Spread: standard deviation ${S.sd.toFixed(2)} points; mean ± 1 SD, from ${pct(S.lo1sd, 2)} to ${pct(S.hi1sd, 2)}, holds ${share(S.in1sd, 0)} of hours; the quartiles are ${pct(S.q25)} and ${pct(S.q75)}.`,
     `Chance by counting: ${int(S.above)} of ${int(S.n)} hours, ${share(S.aboveShare)}, had demand more than 5% above the forecast.`,
-    `Intervals from percentiles: 50% from ${pct(L["50"].lo)} to ${pct(L["50"].hi)}; 80% from ${pct(L["80"].lo)} to ${pct(L["80"].hi)} (lesson 4's band); 95% from ${pct(L["95"].lo)} to ${pct(L["95"].hi)}.`,
+    `Nominal intervals from percentiles: 50% from ${pct(L["50"].lo)} to ${pct(L["50"].hi)}; 80% from ${pct(L["80"].lo)} to ${pct(L["80"].hi)} (lesson 4's band); 95% from ${pct(L["95"].lo)} to ${pct(L["95"].hi)}. Hours tied at the ends make them hold ${share(L["50"].n / S.n)}, ${share(L["80"].n / S.n)} and ${share(L["95"].n / S.n)}.`,
     `Samples scatter: the standard error of that share is ${(100 * S.se[0]).toFixed(1)} points for 10 random hours, ${(100 * S.se[1]).toFixed(1)} for 100 and ${(100 * S.se[2]).toFixed(1)} for 1,000.`,
-    `Independence (illustrative): two plants each out in ${share(S.plants.p, 0)} of hours are both out in ${share(S.plants.both, 2)} of hours, about ${Math.round(S.plants.hoursYear)} a year, only if their outages are independent.`,
-    `Expected value: with ${S.plants.cc} MW and ${S.plants.pk} MW plants each out ${share(S.plants.p, 0)} of the time, ${S.plants.ev} MW are out on average.`];
+    `Independence (illustrative): gas plants A and B, each out in ${share(S.plants.p, 0)} of hours, are both out in ${share(S.plants.both, 2)} of hours, about ${Math.round(S.plants.hoursYear)} a year, only if their outages are independent.`,
+    `Expected value: with plants A (${S.plants.cc} MW) and B (${S.plants.pk} MW) each out ${share(S.plants.p, 0)} of the time, ${S.plants.ev} MW are out on average.`];
   let h = `<p class="lx-eyebrow">${int(S.n)} hourly forecast errors, January–April 2025</p>\n<div class="k5-fbfig">\n${o}\n</div>\n<ol>\n` + facts.map(t => `<li>${t}</li>`).join("\n") + `\n</ol>\n`;
   h += `<p class="lx-eyebrow">The summaries on this page</p>\n<div class="lx-scroll-x"><table class="lx-facts k5-fbtab">\n<thead><tr><th scope="col">Summary</th><th scope="col">Value</th></tr></thead>\n<tbody>\n`;
-  [["Hours", int(S.n)], ["Mean", pct(S.mean)], ["Median", pct(S.median)], ["Standard deviation", S.sd.toFixed(1) + " points"], ["Quartiles", pct(S.q25) + " and " + pct(S.q75)],
-   ["Share above +5%", share(S.aboveShare) + " (" + int(S.above) + " hours)"], ["80% interval", pct(L["80"].lo) + " to " + pct(L["80"].hi)], ["95% interval", pct(L["95"].lo) + " to " + pct(L["95"].hi)]]
+  [["Hours", int(S.n)], ["Mean", pct(S.mean)], ["Median", pct(S.median)], ["Standard deviation", S.sd.toFixed(2) + " points"], ["Quartiles", pct(S.q25) + " and " + pct(S.q75)],
+   ["Share above +5%", share(S.aboveShare) + " (" + int(S.above) + " hours)"], ["80% interval (nominal)", pct(L["80"].lo) + " to " + pct(L["80"].hi)], ["95% interval (nominal)", pct(L["95"].lo) + " to " + pct(L["95"].hi)]]
     .forEach(r => { h += `<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>\n`; });
   h += `</tbody></table></div>\n<details class="lx-textalt"><summary>Text version of the histogram</summary>\n<div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">Error, from</th><th scope="col">up to</th><th scope="col">Hours</th></tr></thead><tbody>\n`;
   bins.forEach(b => { h += `<tr><td>${pct(b.lo)}</td><td>${pct(b.hi)}</td><td>${int(b.n)}</td></tr>\n`; });
@@ -125,26 +125,63 @@ function sgn2(v) { return K.sgn(v, 2); }
 {
   const L = S.levels;
   ok(near(S.mean, 0.8, 0.005) && pct(S.mean) === "+0.8%" && pct(S.median) === "+0.7%", "centre: mean +0.8%, median +0.7%");
-  ok(S.sd.toFixed(1) === "2.5" && pct(S.lo1sd) === "−1.7%" && pct(S.hi1sd) === "+3.3%" && share(S.in1sd, 0) === "72%", "spread: SD 2.5, −1.7% to +3.3% holds 72%");
+  ok(S.sd.toFixed(2) === "2.45" && pct(S.lo1sd, 2) === "−1.65%" && pct(S.hi1sd, 2) === "+3.25%" && share(S.in1sd, 0) === "72%", "spread: SD 2.45, mean ± 1 SD from −1.65% to +3.25% holds 72%");
+  {
+    const x = K.errors(fc);
+    // the 72% counts the unrounded ends; on the 0.1 grid that is the hours from −1.6% to +3.2%. The page shows the ends to
+    // two decimals because ends rounded to one decimal (−1.7%, +3.3%) would hold more (ties at those values)
+    ok(K.countIn(x, -1.6, 3.2) === K.countIn(x, S.lo1sd, S.hi1sd) && share(K.countIn(x, -1.7, 3.3) / S.n, 0) === "74%", "spread: the 72% is the hours from −1.6% to +3.2%; the one-decimal ends would hold 74%");
+    // the percentile intervals: nominal shares, and what they hold with ties at the ends, as the page says
+    ok(share(S.levels["50"].n / S.n) === "51.3%" && share(S.levels["80"].n / S.n) === "81.1%" && share(S.levels["95"].n / S.n) === "95.0%", "intervals: the nominal 50, 80 and 95% hold 51.3%, 81.1% and 95.0%");
+    Object.keys(K.LEVELS).forEach(k => { const L = S.levels[k]; ok(K.countIn(x, +pct(L.lo).replace("−", "-").replace("%", ""), +pct(L.hi).replace("−", "-").replace("%", "")) === L.n, `interval ${k}%: the displayed ends hold the same hours as the unrounded ones`); });
+    // the median task: a marker is a median when at least half the hours are at or below it and at least half at or above
+    const M = S.med;
+    ok(M.ok && M.below === 1332 && M.at === 51 && M.above === 1333, "median task: at +0.7%, 1,332 below, 51 at, 1,333 above: a median");
+    let meds = []; for (let v = -30; v <= 30; v++) if (K.medianCheck(x, v / 10).ok) meds.push(v / 10);
+    ok(meds.join() === "0.7", "median task: on the slider (−3% to +3%, steps of 0.1) only +0.7% passes: " + meds.join());
+    ok(K.medianCheck([1, 2, 3, 4], 2.5).ok && K.medianCheck([1, 2, 3, 4], 2).ok && !K.medianCheck([1, 2, 3, 4], 1).ok && K.medianCheck([5, 5, 5], 5).ok, "median check: even counts, ties");
+    // chart limits: the histogram's axis holds every bin; the sampling axis holds every estimate
+    K.WIDTHS.forEach(w => { const B = K.histogram(K.tenths(fc), w), R = K.histRange(B); ok(R.min <= B[0].lo && R.max >= B[B.length - 1].hi && R.min <= -10 && R.max >= 10, `chart: ${w / 10}-point bins fit the axis ${R.min}..${R.max}`); });
+    ok(K.histRange(K.histogram(K.tenths(fc), 40)).min === -12 && K.histRange(K.histogram(K.tenths(fc), 40)).max === 12, "chart: 4-point bins widen the axis to −12%..+12%");
+    ok(K.sampleMax([]) === 30 && K.sampleMax([0.2, 0.28]) === 30 && K.sampleMax([0.3]) === 40 && K.sampleMax([0.4]) === 50, "chart: the sampling axis widens past the largest estimate");
+    // 50 rounds of the 10-hour button from the page's seed: every estimate stays inside the axis drawn for it
+    const r = K.rng(20250101); let all = [], worst = 0;
+    for (let i = 0; i < 50; i++) { all = all.concat(K.sampleShares(x, 10, K.REPS, r, K.THRESH)); worst = Math.max(worst, ...all); }
+    ok(100 * worst + 0.28 < K.sampleMax(all) && worst >= 0.4, `chart: after 50 rounds of 10-hour samples the largest estimate (${share(worst, 0)}) sits inside the axis (${K.sampleMax(all)}%)`);
+  }
   ok(pct(S.q25) === "−0.8%" && pct(S.q75) === "+2.2%" && (S.q75 - S.q25).toFixed(1) === "3.0", "spread: quartiles −0.8% and +2.2%, 3.0 points apart");
   ok(S.above === 134 && share(S.aboveShare) === "4.9%", "chance: 134 hours, 4.9%");
   ok(pct(L["50"].lo) === "−0.8%" && pct(L["50"].hi) === "+2.2%" && pct(L["80"].lo) === "−2.1%" && pct(L["80"].hi) === "+3.8%" && pct(L["95"].lo) === "−3.5%" && pct(L["95"].hi) === "+6.2%", "intervals: 50, 80, 95%");
   ok(share(S.mid, 0) === "74%" && pct(S.min) === "−8.3%" && pct(S.max) === "+9.8%" && share(S.pos, 0) === "61%", "shape: 74% from −2% up to +3%; −8.3% to +9.8%; 61% above");
   ok(S.se.map(v => (100 * v).toFixed(1)).join() === "6.8,2.2,0.7", "standard errors 6.8, 2.2, 0.7 points");
   // the page (fallback, datanote, explain, Go deeper, check, numbers to remember)
-  ["+0.8%", "+0.7%", "2.5 points", "−1.7%", "+3.3%", "72%", "−0.8%", "+2.2%", "4.9%", "134", "−2.1%", "+3.8%", "−3.5%", "+6.2%", "74%", "61%", "−8.3%", "+9.8%",
+  ["+0.8%", "+0.7%", "2.45 points", "−1.65%", "+3.25%", "72%", "51.3%", "81.1%", "95.0%", "−0.8%", "+2.2%", "4.9%", "134", "−2.1%", "+3.8%", "−3.5%", "+6.2%", "74%", "61%", "−8.3%", "+9.8%",
    "6.8", "2.2 for 100", "0.7 for 1,000", "0.25%", "about 22", "12.5 MW", "2,716"].forEach(s => has(s));
   has("8–15%", "the May–December gap"); has("cause unverified", "the gap's cause is unverified");
   has('href="04-forecasts.html"', "the link back to lesson 4");
   has("are illustrative", "the plants' outage chances are labelled illustrative");
   // Go deeper: the formulas use the model's numbers
   has("$n = 2716$"); has("gives " + S.sdSample.toFixed(4) + " points against " + S.sd.toFixed(4), "sd n − 1 against n");
-  has("4.9% + 2 × 2.2 = 9.2%", "the quick question's two-standard-error reach (100 hours)");
-  ok(near(100 * S.aboveShare + 2 * 100 * S.se[1], 9.26, 0.01), "two standard errors above 4.9% at 100 hours: 9.3 (rounded parts give 9.2)");
+  has("4.9% + 2 × 2.2 ≈ 9.3%", "the quick question's two-standard-error reach (100 hours)");
+  ok((100 * S.aboveShare + 2 * 100 * S.se[1]).toFixed(1) === "9.3" && (4.9 + 2 * 2.2).toFixed(1) === "9.3", "two standard errors above 4.9% at 100 hours: 9.3 from the unrounded parts and from the rounded ones");
+  has("($p = 0.9$ for the 90th percentile). The percentile sits at position $(n - 1)\\,p$", "the percentile rank uses p as a fraction");
+  ok(K.quantile(K.errors(fc), 0.9) === S.levels["80"].hi, "the percentile rule with p = 0.9 gives the 80% interval's upper end");
+  inJS("Each draw picks one of the \" + N + \" hours at random, so an hour can repeat. This shows how samples scatter, not how next winter will differ.", "the sampling card says draws repeat and what the scatter is not");
+  has("A stochastic program is an optimization model"); has("A surrogate is a fast stand-in"); has("where p and q are their separate chances");
   // the view's strings
   inJS("Mean ± 1 SD"); inJS("Find the threshold that only 1 hour in 20 (5%) exceeds"); inJS("Draw 20 random samples of 10, 100 and 1,000 hours");
   ok(K.SIZES.join() === "10,100,1000" && K.REPS === 20 && K.THRESH === 5 && K.PLANT_P === 0.05 && K.WILD === 100, "view constants: sample sizes, 20 samples, +5%, 5%, +100%");
-  inJS("A bell-shaped curve would put 68% of values within 1 SD");
+  inJS("[[normal-distribution|normal (Gaussian) distribution]] puts about 68% of values within 1 SD");
+  ok(!/bell-shaped curve would/.test(JS), "the 68% rule names the normal distribution");
+  // point 9, 10, 14: the event node is generic, the plants are A and B, the expected-value claims carry their condition
+  inJS('event: { t: "Name the event", s: "error above a threshold"'); inJS('"Illustrative: gas plants A (" + PL.cc + " [[megawatt|MW]]) and B (" + PL.pk + " MW)'); 
+  inJS("Only plant A out"); inJS("Only plant B out"); inJS("[[megawatt|MW]]");
+  ok(!/combined-cycle|peaker/i.test(JS.replace(/^\s*\/\/.*$/gm, "").replace(/town\.fleet\.(cc|peaker)/g, "")) && !/combined-cycle|peaker/i.test(QMD.replace(/<!--[\s\S]*?-->/g, "")), "plants: named A and B, not by technology");
+  inJS("Holding each plant's outage chance at"); inJS("While each plant stays out");
+  inJS("Only if independent: a shared cause");
+  // point 7: every chart has a text version (the histogram's bins plus what is marked; all 20 estimates per sample size)
+  ok((JS.match(/LX\.Plot\(act, \{ text: "Text version of the chart" \}\)/g) || []).length === 6, "charts: all six step charts carry a text version");
+  ok(/text: \{ head: \["Error, from", "up to", "Hours"\], rows: bins\.map/.test(JS) && /"The 20 estimates, sorted"/.test(JS), "charts: histogram bins and every sample estimate in the text versions");
   inJS("is lesson 4's band");
   // the quick questions
   ok(K.mean([-1, 0, 1, 2, 8]) === 2 && K.median([-1, 0, 1, 2, 8]) === 1, "quiz: mean 2%, median 1%");
@@ -164,7 +201,7 @@ function sgn2(v) { return K.sgn(v, 2); }
 // ---------------- the explain layer's traces
 {
   const T = K.traces(fc, {});
-  ok(T.length === 2 && T[0].text.indexOf("134 of 2,716 hours, 4.9%") > 0 && T[1].text.indexOf("6.8 points") > 0, "traces: all hours and a sample of 10");
+  ok(T.length === 2 && T[0].text.indexOf("134 of 2,716 hours above +5%, 4.9%") > 0 && T[1].text.indexOf("above +5% from 10 hours") > 0 && T[1].text.indexOf("6.8 points") > 0, "traces: all hours and a sample of 10, each naming its threshold");
   const T2 = K.traces(fc, { t: 3 });
   ok(T2.length === 3 && T2[2].text.indexOf("418 of 2,716 hours above +3.0%, 15.4%") > 0, "traces: the reader's threshold");
   ok(K.traces(fc, { t: 5 }).length === 2, "traces: the reader's threshold at +5% adds nothing new");
@@ -191,7 +228,12 @@ function sgn2(v) { return K.sgn(v, 2); }
       const m = /is (\d+) MW with chance (\d+)%, (\d+) MW with chance (\d+)%, or (\d+) MW with chance (\d+)%/.exec(it.q), v = m.slice(1).map(Number);
       ok(v[1] + v[3] + v[5] === 100 && v[1] > 0 && v[3] > 0 && v[5] > 0 && near(it.answer, (v[0] * v[1] + v[2] * v[3] + v[4] * v[5]) / 100, 1e-9) && it.why.indexOf(String(it.answer) + " MW") >= 0, `drill ${seed}/${i}: ev ${it.q} -> ${it.answer}`);
     }
-    if (it.kind === "sample") { const m = /Sample 1: ([\d,]+) hours.*Sample 2: ([\d,]+) hours/.exec(it.q), n1 = +m[1].replace(/,/g, ""), n2 = +m[2].replace(/,/g, ""); ok(it.answer === (n1 > n2 ? 0 : 1), `drill ${seed}/${i}: the bigger sample`); }
+    if (it.kind === "sample") {
+      const m = /Sample 1: ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)\. Sample 2: ([\d,]+) hours, ([\d,]+) of them above \(([\d.]+)%\)/.exec(it.q);
+      const v = m ? m.slice(1).map(t => +t.replace(/,/g, "")) : [];
+      ok(m && it.answer === (v[0] > v[3] ? 0 : 1), `drill ${seed}/${i}: the bigger sample`);
+      ok(m && [0, 3].every(j => Number.isInteger(v[j + 1]) && v[j + 1] >= 0 && v[j + 1] <= v[j] && near(100 * v[j + 1] / v[j], v[j + 2], 1e-9)), `drill ${seed}/${i}: each share is a whole number of hours out of its sample: ${it.q}`);
+    }
     ok(it.choices || (typeof it.answer === "number" && isFinite(it.answer) && it.tol > 0), `drill ${seed}/${i}: a numeric answer with a tolerance`);
   }));
   ok(kinds.size === 7, "drill: all seven kinds appear");

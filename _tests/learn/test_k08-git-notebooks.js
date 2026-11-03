@@ -158,6 +158,79 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
   ok(K.nbSrc(K.nbEdit(K.nbNew(), 55), 1).indexOf("gas_cost = 55") === 0, "notebook: the cell shows what is written");
 }
 
+// ---------------- what the Git stage calls each file: staged is not committed
+{
+  const r0 = S.base, st = r => K.status(r);
+  ok(K.fileState(st(r0), "params.yml") === "matches the last commit", "labels: a clean file matches the last commit");
+  const e = K.edit(r0, "params.yml", K.params(55)), a = K.add(e, "params.yml"), e2 = K.edit(a, "params.yml", K.params(60));
+  ok(K.fileState(st(e), "params.yml") === "edited", "labels: an unstaged edit is edited");
+  ok(K.fileState(st(a), "params.yml") === "staged, not committed", "labels: after git add the file is staged, not committed");
+  ok(K.fileState(st(e2), "params.yml") === "edited after staging", "labels: an edit after git add is edited after staging");
+  ok(K.fileState(st(K.commit(a, "m").repo), "params.yml") === "matches the last commit", "labels: after the commit it matches the last commit");
+  const F = K.finalRepo(S);
+  ok(K.fileState(st(K.edit(r0, "notes.txt", "n")), "notes.txt") === "new, untracked" && K.fileState(st(F), ".env") === "ignored", "labels: untracked and ignored files");
+  ok(!/"as committed"/.test(JS) && /fileState\(st, k\)/.test(JS), "labels: the view uses fileState, and nothing staged is called committed");
+}
+
+// ---------------- the shared project (steps 8 and 9): the fixes are in its files, and step 9 runs its notebook
+{
+  const all = K.allFixed(), F = K.finalRepo(S), C = K.cloneRepo(F), inst = K.installFrom(C.work), X = K.nbExecute(C.work, inst, 1);
+  const nb = JSON.parse(C.work["day.ipynb"]);
+  ok(nb.nbformat === 4 && nb.nbformat_minor === 4 && nb.metadata.kernelspec.name === "python3" && nb.cells.length === 6 && nb.cells.every(c => c.cell_type === "code" && Array.isArray(c.source) && Array.isArray(c.outputs) && c.execution_count === null && typeof c.metadata === "object"),
+     "notebook file: valid nbformat 4 JSON, six code cells, a Python 3 kernel");
+  ok(nb.cells.map(c => c.source.join("")).join("\n--\n") === K.shareCells(all).join("\n--\n"), "notebook file: its cells are shareCells()");
+  ok(K.shareCells(all).slice(1, 4).join("|") === [K.nbSrc(K.nbNew(), 1), K.nbSrc(K.nbNew(), 2), K.nbSrc(K.nbNew(), 3)].join("|") && K.nbSrc(K.nbNew(), 0).replace(K.PATH_LAPTOP, K.PATH_PROJECT) === K.shareCells(all)[0], "notebook file: cells 1 to 4 are step 7's cells (cell 1 with the fixed path)");
+  ok(/assert day\.demand_mw\.sum\(\) == supply/.test(K.shareCells(all)[5]) && /random_state=1/.test(K.shareCells(all)[4]), "notebook file: cell 5 is the seeded draw, cell 6 the balance assert");
+  ok(["pandas", "yaml", "matplotlib", "nbconvert", "ipykernel"].every(m => inst[m] && inst[m] !== "newest") && K.REQS.split("\n").every(l => /^[a-z]+==\d+\.\d+\.\d+$/.test(l)), "install: every package pinned, with nbconvert and its Python kernel (ipykernel)");
+  ok(X.ok && !X.error && X.cells.length === 6 && X.mem.gas_mwh === 1965 && X.cells[3].out === 78600 && X.cells[5].stdout.join() === "balance OK", "execute: the clone's notebook runs top to bottom: 1,965 MWh, 78600, balance OK");
+  const Rc = K.run(C.work);
+  ok(Rc.gasMWh === X.mem.gas_mwh && Rc.cost === X.cells[3].out && Rc.ok, "execute: the notebook and model.py agree");
+  let nb7 = K.nbNew(); [0, 1, 2, 3].forEach(i => { nb7 = K.nbRun(nb7, D, i); }); ok(nb7.cells[3].out === X.cells[3].out, "execute: step 7's kernel model and the executed file agree");
+  ok(/nbconvert/.test(K.nbExecute(C.work, {}, 1).error) && /No such kernel/.test(K.nbExecute(C.work, Object.assign({}, inst, { ipykernel: undefined }), 1).error) && /ModuleNotFoundError: No module named 'pandas'/.test(K.nbExecute(C.work, Object.assign({}, inst, { pandas: undefined }), 1).error), "execute: needs nbconvert, a kernel and pandas");
+  ok(/NotJSONError/.test(K.nbExecute(Object.assign({}, C.work, { "day.ipynb": "cell 1: import pandas" }), inst, 1).error), "execute: a plain-text day.ipynb is not a notebook");
+  const bugNb = K.notebookJSON(K.shareCells(all).map((c, i) => i === 2 ? c.replace("- day.solar_mw", "+ day.solar_mw") : c));
+  const XB = K.nbExecute(Object.assign({}, C.work, { "day.ipynb": bugNb }), inst, 1);
+  ok(!XB.ok && /CellExecutionError in cell 6: AssertionError: energy balance is off/.test(XB.error) && XB.cells[3].out === 4787 * 40, "execute: a sign error in cell 3 stops at cell 6's assert");
+  ok(K.nbEval("2 + 3 * 4 - (1 - 2)", {}) === 15 && K.nbEval("-(2) * 3", {}) === -6, "nbEval: precedence and parentheses");
+  // each fix matters, and the shown before/after texts are the files' own
+  const without = k => { const f = Object.assign({}, all); delete f[k]; return f; };
+  const P = K.shareFiles(S, undefined, {}).work, Q = K.shareFiles(S, undefined, all).work;
+  const fx = k => K.FIXES.find(f => f.key === k);
+  ok(P["requirements.txt"] === fx("pin").before && Q["requirements.txt"] === K.fixAfter(S, fx("pin")), "fix pin: requirements.txt before and after");
+  ok(JSON.parse(P["day.ipynb"]).cells[0].source.join("").indexOf(fx("path").before) >= 0 && JSON.parse(Q["day.ipynb"]).cells[0].source.join("").indexOf(K.fixAfter(S, fx("path"))) >= 0, "fix path: cell 1 before and after");
+  ok(P["README.md"].indexOf(fx("data").before) >= 0 && Q["README.md"].indexOf(K.fixAfter(S, fx("data"))) >= 0 && /downloaded 2 Nov 2026, SHA-256 fac4bb99… and 1146158b…/.test(Q["README.md"]), "fix data: the README's source, date and checksums (from the data's metadata)");
+  ok(year.meta.accessed === "2026-11-02" && year.meta.files[0].sha256.indexOf("fac4bb99") === 0 && year.meta.files[1].sha256.indexOf("1146158b") === 0, "fix data: date and checksums are town_year.json's");
+  ok(JSON.parse(P["day.ipynb"]).cells[4].source.join("") === fx("seed").before && JSON.parse(Q["day.ipynb"]).cells[4].source.join("") === K.fixAfter(S, fx("seed")), "fix seed: cell 5 before and after");
+  ok(P[".gitignore"] == null && Q[".gitignore"] === K.fixAfter(S, fx("secret")), "fix secret: no .gitignore before; the shown one after");
+  const CP = K.cloneRepo(K.shareRepo(S, undefined, without("path")));
+  ok(/FileNotFoundError: \[Errno 2\] No such file or directory: '\/Users\/me\/Desktop\/town_day\.csv'/.test(K.nbExecute(CP.work, K.installFrom(CP.work), 1).error), "fix path matters: without it the clone stops at cell 1");
+  const CS = K.cloneRepo(K.shareRepo(S, undefined, without("secret")));
+  ok(CS.work[".env"] === K.ENV && CS.work[K.RAW] != null && C.work[".env"] == null && C.work[K.RAW] == null, "fix secret matters: without .gitignore, git add . commits .env and the raw data into every clone");
+  const CN = K.cloneRepo(K.shareRepo(S, undefined, without("seed")));
+  const s1 = K.nbExecute(CN.work, K.installFrom(CN.work), 1).sample, s2 = K.nbExecute(CN.work, K.installFrom(CN.work), 2).sample;
+  const f1 = K.nbExecute(C.work, inst, 1).sample, f2 = K.nbExecute(C.work, inst, 2).sample;
+  ok(s1.sample.join() !== s2.sample.join() && !s1.seeded && f1.sample.join() === f2.sample.join() && f1.seeded && f1.sample.length === 6 && new Set(f1.sample).size === 6, "fix seed matters: unseeded draws change between runs; seeded ones do not");
+  const CU = K.cloneRepo(K.shareRepo(S, undefined, without("pin")));
+  ok(Object.values(K.installFrom(CU.work)).every(v => v === "newest"), "fix pin matters: without pins pip installs whatever is newest");
+  ok(K.cloneRepo(K.shareRepo(S, undefined, without("data"))).work["README.md"].indexOf("SHA-256") < 0, "fix data matters: without it the README has no checksum");
+  // ignore rules do not untrack a file already committed
+  let g = K.commit(K.add(K.edit(S.base, ".env", K.ENV), ".env"), "oops").repo;
+  g = K.commit(K.add(K.edit(g, ".gitignore", K.IGNORE), "."), "ignore").repo;
+  ok(K.ignored(g, ".env") && K.treeOf(g)[".env"] === K.ENV && K.cloneRepo(g).work[".env"] === K.ENV, "gitignore: a file committed before the rule stays tracked and in every clone");
+  ok(/do not remove a file already committed/.test(K.FIXES.find(f => f.key === "secret").why) && /does not remove files already committed/.test(fs.readFileSync(path.join(SITE, "learn/_w1/k08-git-notebooks.yml"), "utf8")) && /ignoring does not remove a file already committed/.test(JS), "gitignore: step 8, the glossary and the checklist say so");
+  // the view: step 8 feeds step 9, which runs the notebook file and reports its outputs
+  ok(/finalRepo\(S, chosen\.msg, fixedKeys \|\| allFixed\(\)\)/.test(JS) && /X = nbExecute\(C\.work, inst, 1\)/.test(JS) && /JSON\.parse\(C\.work\["day\.ipynb"\]\)/.test(JS), "view: step 9 clones step 8's project and executes its notebook file");
+  ok(/if \(n < FIXES\.length\) show\(\)/.test(JS), "view: step 8 shows its fixes one at a time");
+  ok(/Installing " \+ reqs\.join\(", "\) \+ \(reqs\.every\(function \(l\) \{ return \/==\/\.test\(l\); \}\) \? " \(version numbers illustrative\)"/.test(JS) && /illustrative/.test(K.FIXES[0].file), "pins: the install output and step 8's file label say the versions are illustrative");
+}
+
+// ---------------- step 7's feedback comes from what the reader did; the flowchart loops back after each repair
+{
+  ok(/if \(i === 3 && nbStale\(nb, D\)\) saw = \{ out: nb\.cells\[3\]\.out, v: nb\.v/.test(JS) && /"Cell 4 showed " \+ saw\.out \+ " under a cell that says " \+ saw\.v/.test(JS) && !/sawOdd/.test(JS), "step 7: completion needs a stale cell 4 and quotes the reader's own numbers (an error alone does not count)");
+  ok(/\["a1", "q1", "fixed"/.test(JS) && /\["a2", "q2", "fixed"/.test(JS) && !/\["a1", "q2"/.test(JS) && !/\["a2", "end"/.test(JS), "flowchart: each repair returns to its own check; sharing only after both pass");
+  ok(/path: \["start", "q1", "a1", "q1", "q2", "end"\]/.test(JS) && /path: \["start", "q1", "q2", "a2", "q2", "end"\]/.test(JS), "flowchart: the traces go back through the check after a repair");
+}
+
 // ---------------- drill items, re-derived independently
 {
   // a tiny independent model of the three places, for one file
@@ -203,7 +276,7 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
     ok(a && b > a.index && QMD.slice(a.index + a[0].length, b) === BLOCKS[name](), `page: the ${name} block is the generated one (run with --write)`);
   });
   const R = S.R1;
-  has("1,965 MWh, at $40/MWh $78,600", "the result in the fallback lede");
+  has("make in one day, 1,965 MWh: what demand leaves after wind, solar and a 100 MW plant that runs flat. At $40/MWh it costs $78,600", "the result in the fallback lede");
   ok(R.gasMWh === 1965 && R.cost === 78600, "page: the lede's numbers from the model");
   has("1,000 commits need at most 10 checks"); ok(K.maxChecks(1000) === 10, "page: 10 checks for 1,000 commits");
   has("cell 4 showed 78600 under a cell that says 55"); ok(K.nbStale(K.nbRun(K.nbEdit(K.nbRestartRunAll(K.nbNew(), D), 55), D, 3), D), "page: the stale 78600");
@@ -213,6 +286,13 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
   has("40-character SHA-1"); has("7-character fingerprints");
   has("3 September 2025");
   has("[R5](r05-build-validate.html) puts a whole model through planted bugs");
+  // a commit holds the staged versions of tracked files, not every file; halving assumes the bug stays
+  ok(!/snapshot of every file/.test(QMD + JS + fs.readFileSync(path.join(SITE, "learn/_w1/k08-git-notebooks.yml"), "utf8")) && /records the staged versions of the project's/.test(QMD) && /records the staged versions of its \[\[tracked-file\|tracked files\]\]/.test(JS), "commit: defined as the staged versions of tracked files");
+  has("once the bug appears, every later commit fails. Checking the middle each time");
+  has("if every commit after the first bad one also fails");
+  ok(/once a commit fails, every later one fails too/.test(JS) && /and once the bug appears every later commit fails/.test(JS) && /Once the bug appears it stays/.test(JS), "halving: the assumption is stated in step 5, the drill and the causal chain");
+  ["tracked-file", "git-head", "notebook", "api-key", "assert", "megawatt"].forEach(t => ok(new RegExp("\\[\\[" + t + "\\|").test(JS) || new RegExp('data-term="' + t + '"').test(QMD), "glossary: " + t + " is marked"));
+  ["tracked-file", "git-head", "notebook", "api-key"].forEach(t => ok(new RegExp("- id: " + t + "\\n").test(fs.readFileSync(path.join(SITE, "learn/_w1/k08-git-notebooks.yml"), "utf8")), "glossary: " + t + " is defined in the sidecar"));
   // the version pins are illustrative wherever they show: step 8's fix, step 9's install, the drill item, the fallback, the data note
   ok(K.FIXES[0].key === "pin" && /illustrative/.test(K.FIXES[0].label) && /illustrative/.test(K.FIXES[0].why), "pins: step 8's fix and the fallback row say the version is illustrative");
   ok(/install the pinned versions \(illustrative numbers\)/.test(JS), "pins: step 9 says the installed versions are illustrative");
@@ -226,7 +306,7 @@ const sum = a => a.reduce((x, y) => x + y, 0), int = v => Math.round(v).toLocale
   ok(/Still to do: /.test(JS) && /Checks used: /.test(JS) && /aria-live/.test(JS) && /role: "log"/.test(JS), "view: progress is said and announced; the terminal is a live log");
   ok(/data-k/.test(JS) && /f\.focus\(\)/.test(JS), "view: the notebook keeps keyboard focus when it redraws");
   ok(/LX\.demo\(root/.test(JS) && /finish\[k\]/.test(JS), "view: demo hook for mid and step-N");
-  ok(/not that the result is right/.test(JS), "view: a clean rerun is not called proof of correctness");
+  ok(/Reproduced is not the same as right/.test(JS), "view: a clean rerun is not called proof of correctness");
   // scope: no repository or notebook-host links, no excluded wording, links only to learn pages, eia.gov and doi.org
   const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");   // the generated blocks carry the step links, licences and mailto
   const hrefs = [...own.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...own.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));

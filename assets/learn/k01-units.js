@@ -1,7 +1,7 @@
 // k01-units.js — Toolbox K1, "Units and orders of magnitude" (step cards, Learn W2, 2026-11-03).
 //
 // Just-in-time math for lesson 1 (power against energy, kWh), lesson 5 (MW held for the hours of a year) and lesson 7
-// ($ per kW against $ per MWh). Five step cards, an explain layer and a practice drill.
+// ($ per kW against $ per MWh). Six step cards, an explain layer and a practice drill.
 //
 // Data (read through data-src, so the numbers stay in step with the lessons that use them):
 //   assets/learn/data/town.json, town_year.json  Prairie Town's day, 3 September 2025: the real SPP shape (EIA-930) cut
@@ -41,6 +41,10 @@
   function mant(x) { return x / Math.pow(10, expOf(x)); }
   function sig(v, d) { return String(+v.toPrecision(d)); }
   function sci(x, d) { return sig(mant(x), d || 3) + " × 10" + sup(expOf(x)); }
+  // "=" when the shown form is exact, "≈" when it is rounded (the page never puts "=" across a rounding)
+  function isExact(shown, x) { return Math.abs(shown - x) <= Math.abs(x) * 1e-12; }
+  function eqSci(x, d) { return (isExact(+sig(mant(x), d || 3) * Math.pow(10, expOf(x)), x) ? "= " : "≈ ") + sci(x, d); }
+  function eqNum(x, d) { var t = num(x, d); return (isExact(+t.replace(/,/g, ""), x) ? "= " : "≈ ") + t; }
   function convert(v, fromExp, toExp) { return +(v * Math.pow(10, fromExp - toExp)).toPrecision(12); }
   function powersApart(a, b) { return Math.round(Math.log10(Math.max(a, b) / Math.min(a, b))); }
   function ratio(a, b) { return Math.max(a, b) / Math.min(a, b); }
@@ -69,8 +73,11 @@
     s.hiMW = Math.max.apply(null, D.demand); s.loMW = Math.min.apply(null, D.demand);
     s.hiAt = D.demand.indexOf(s.hiMW); s.loAt = D.demand.indexOf(s.loMW);
     s.hiBound = s.hiMW * 24; s.loBound = s.loMW * 24; s.avgMW = s.dayMWh / 24;
+    // a flat-price product, not a schedule: every MWh of the day's gas need priced at the combined-cycle plant's $40/MWh
     s.gasMWh = sum(D.need); s.gasCost = D.fleet.cc.cost; s.gasDollars = s.gasMWh * s.gasCost;
-    s.h19 = 19; s.need19 = D.need[19]; s.ramp = D.fleet.cc.ramp;
+    s.h19 = 19; s.need19 = D.need[19]; s.ramp = D.fleet.cc.ramp; s.pkCost = D.fleet.peaker.cost;
+    // step 4: the worked example of scientific notation is the town's day in Wh
+    s.dayWh = s.dayMWh * 1e6;
     s.items = [
       { id: "phone", label: "Charging a smartphone once", short: "Phone charge", given: num(A.phone_charge.value, 3) + " kWh", wh: A.phone_charge.value * 1000, src: "EPA", url: A.phone_charge.url, asOf: "checked 2 Nov 2026" },
       { id: "home", label: "An average U.S. home's year", short: "Home's year", given: num(A.home_year.value) + " kWh", wh: A.home_year.value * 1000, src: "EIA", url: A.home_year.url, asOf: "2022 data" },
@@ -93,12 +100,20 @@
     return s;
   }
 
-  // one pair of items: the ratio worked as (a1 / a2) x 10^(n1 - n2)
+  // one pair of items: the ratio worked as (a1 / a2) x 10^(n1 - n2). The ratio is then a x 10^k (1 <= a < 10); its
+  // nearest power of ten is 10^k when a < 3.16 (half a power of ten: sqrt 10) and 10^(k+1) from 3.16 up, which is
+  // round(log10 ratio), the same rule as powersApart
+  var HALF = Math.sqrt(10);
   function pairText(s, a, b) {
     var A = s.byId[a], B = s.byId[b]; if (!A || !B || a === b) return null;
     var big = A.wh >= B.wh ? A : B, small = big === A ? B : A, r = big.wh / small.wh, m = big.mant / small.mant, dn = big.exp - small.exp;
     return { big: big, small: small, ratio: r, mratio: m, dexp: dn, apart: powersApart(big.wh, small.wh),
+             rexp: expOf(r), rmant: mant(r), up: mant(r) >= HALF,
              ratioText: r >= 1e6 ? sci(r, 2) : num(r) };
+  }
+  // the reader-facing reason for the nearest power, e.g. "6.45 is above 3.16 (half a power of ten), so 10³"
+  function nearestWhy(p) {
+    return sig(p.rmant, p.ratio >= 1e6 ? 2 : 3) + (p.up ? " is above" : " is below") + " 3.16, half a power of ten, so the nearest power is 10" + sup(p.apart) + ".";
   }
 
   // ---------------------------------------------------------------- the no-JS table (written into the page by the test)
@@ -107,7 +122,7 @@
       return "<tr><td>" + it.label + "</td><td>" + it.given + '</td><td class="k1-wh">' + plain(it.wh) + "</td><td>" + it.sci + "</td></tr>";
     }).join("\n");
     return '<table class="k1-static" aria-label="Five amounts of energy in watt-hours and in scientific notation">\n' +
-      '<thead><tr><th scope="col">Amount of energy</th><th scope="col">As published</th><th scope="col" class="k1-wh">In Wh</th><th scope="col">Scientific notation</th></tr></thead>\n<tbody>\n' + rows + "\n</tbody></table>";
+      '<thead><tr><th scope="col">Amount of energy</th><th scope="col">As published</th><th scope="col" class="k1-wh">In Wh</th><th scope="col">Scientific notation (3 figures)</th></tr></thead>\n<tbody>\n' + rows + "\n</tbody></table>";
   }
 
   // ---------------------------------------------------------------- practice drill items (seeded by LX.Drill, so tests can replay them)
@@ -149,13 +164,13 @@
     }
     if (kind === "sci") {
       var a = pick([1.2, 2.5, 3.6, 4.2, 6.96, 8.76, 1.08, 2.99]), e = 2 + Math.floor(r() * 14), x = a * Math.pow(10, e);
-      return { kind: kind, q: "Written as a × 10ⁿ with a between 1 and 10, " + plain(x) + " Wh has n = ?", answer: e,
+      return { kind: kind, q: "Written as a × 10ⁿ (a at least 1 and less than 10), " + plain(x) + " Wh has n = ?", answer: e,
                why: plain(x) + " = " + sig(a, 3) + " × 10" + sup(e) + ": move the decimal point " + e + " places." };
     }
     if (kind === "average") {
       var len = 3 + Math.floor(r() * 4), t0 = Math.floor(r() * (24 - len)), e2 = sum(D.demand.slice(t0, t0 + len)), avg = e2 / len;
       return { kind: kind, q: "From " + hh(t0) + " to " + hh(t0 + len) + " on " + D.dateLabel + ", Prairie Town used " + num(e2) + " MWh. Its average power over those " + len + " hours, to the nearest MW?",
-               answer: Math.round(avg), tol: 0.5, unit: "MW", why: num(e2) + " MWh ÷ " + len + " h = " + num(avg, 1) + " MW: MWh ÷ h leaves MW." };
+               answer: Math.round(avg), tol: 0.5, unit: "MW", why: num(e2) + " MWh ÷ " + len + " h " + eqNum(avg, 1) + " MW: MWh ÷ h leaves MW." };
     }
     // apart: two numbers in scientific notation; how many powers of ten apart (mantissas close, so the count is clear)
     var m1 = pick([1.5, 2, 3, 4.5, 6]), m2 = +(m1 * pick([0.8, 1, 1.25])).toPrecision(3), n1 = 1 + Math.floor(r() * 7), gap = 2 + Math.floor(r() * 9), n2 = n1 + gap;
@@ -167,6 +182,7 @@
   var parseNum = NA.parse;   // "450,000", "0.45", "6.96e9", "6.96 × 10^9", "6.96x10^9", "−3" (LX.NumAnswer's parser)
 
   var model = { PREFIX: PREFIX, sup: sup, num: num, plain: plain, expOf: expOf, mant: mant, sci: sci, sig: sig, convert: convert,
+                isExact: isExact, eqSci: eqSci, eqNum: eqNum, nearestWhy: nearestWhy, HALF: HALF,
                 powersApart: powersApart, ratio: ratio, townDay: townDay, story: story, pairText: pairText, staticTable: staticTable,
                 drill: drill, drillItem: drillItem, rng: DR.rng, close: close, parseNum: parseNum, KINDS: KINDS, UNITS: UNITS, hh: hh, sum: sum };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -198,7 +214,7 @@
 
     // ---- step 1: the prefix ladder
     steps.push({
-      text: "Each prefix is 1,000 times the one below: kilo (k), mega (M), giga (G), tera (T). Prairie Town's busiest hour of 2025 drew " + s.peak + " [[megawatt|MW]]. Write it in [[kilowatt|kW]] and in [[gigawatt|GW]].",
+      text: "Each prefix is 1,000 times the one below: kilo (k), mega (M), giga (G), tera (T). Write Prairie Town's busiest hour of 2025, " + s.peak + " [[megawatt|MW]], in [[kilowatt|kW]] and in [[gigawatt|GW]].",
       build: function (act, api) {
         var lad = H("ol", { class: "k1-ladder", "aria-label": "The prefix ladder for " + s.peak + " MW" }, act), cells = {};
         var vals = [s.peakW, s.peakKW, s.peak, s.peakGW, s.peakTW];
@@ -225,7 +241,7 @@
 
     // ---- step 2: power x time = energy
     steps.push({
-      text: "[[energy|Energy]] is power held over time: 1 MW for one hour is 1 [[megawatt-hour|MWh]]. Slide through " + D.dateLabel + ": each hour adds its MW × 1 h. Then write the day's total in GWh.",
+      text: "[[energy|Energy]] is power held over time: 1 MW for one hour is 1 [[megawatt-hour|MWh]]. Slide through " + D.dateLabel + " to add each hour's MW × 1 h, then write the day's total in GWh.",
       build: function (act, api) {
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
         var sl = LX.Slider(act, { label: "Hours added", color: "var(--lx-tier-2)", min: 0, max: 24, step: 1, value: 0, fmt: function (v) { return v + (v === 1 ? " hour" : " hours"); }, onChange: draw });
@@ -240,7 +256,7 @@
         }
         draw();
         var tries = 0;
-        var n = numBox(act, { label: "The day:", unit: "GWh", onCheck: function (v) {
+        var n = numBox(act, { label: "Day's energy in GWh:", unit: "GWh", onCheck: function (v) {
           tries++;
           if (close(v, s.dayGWh, 0.006)) { LX.store.set("k1-day", { gwh: s.dayGWh }); api.done(); api.saw(num(s.dayMWh) + " MWh ÷ 1,000 = " + plain(s.dayGWh) + " GWh. One hour at 1 MW is 1 MWh, so a day of hourly MW adds straight up to MWh."); }
           else api.saw(tries < 2 ? "Not yet. Add all 24 hours (slide to the end), then step up one rung: ÷ 1,000." : num(s.dayMWh) + " MWh ÷ 1,000 = " + plain(s.dayGWh) + " GWh (" + sig(s.dayGWh, 3) + " is fine).", true);
@@ -252,7 +268,7 @@
     // ---- step 3: units cancel like numbers
     var CHAINS = [
       { eq: s.need19 + " MW × 1 h", note: "gas at " + hh(s.h19) + ", for one hour", ans: "MWh", res: s.need19 + " MWh" },
-      { eq: num(s.gasMWh) + " MWh × $" + s.gasCost + "/MWh", note: "the day's gas at its running cost", ans: "$", res: "$" + num(s.gasDollars) },
+      { eq: num(s.gasMWh) + " MWh × $" + s.gasCost + "/MWh", note: "the day's gas need, all at one flat price", ans: "$", res: "$" + num(s.gasDollars) },
       { eq: num(s.dayMWh) + " MWh ÷ 24 h", note: "the day's energy over its hours", ans: "MW", res: "about " + Math.round(s.avgMW) + " MW" }];
     var CH = ["MW", "MWh", "$", "h"];
     steps.push({
@@ -265,16 +281,37 @@
           var mark = H("span", { class: "k1-mark", "aria-live": "polite" }, row);
           seg(row, CH, function (k) {
             right[i] = CH[k] === c.ans; mark.textContent = right[i] ? "Right: " + c.res : "Not quite"; mark.className = "k1-mark " + (right[i] ? "good" : "bad");
-            if (CHAINS.every(function (q, j) { return right[j]; })) { api.done(); api.saw("MW × h makes MWh; MWh cancels MWh; h cancels h. " + num(s.gasMWh) + " MWh × $" + s.gasCost + "/MWh = $" + num(s.gasDollars) + "; " + num(s.dayMWh) + " MWh ÷ 24 h = " + num(s.avgMW, 1) + " MW, the day's [[average-power|average power]]."); }
+            if (CHAINS.every(function (q, j) { return right[j]; })) { api.done(); api.saw("MW × h makes MWh; MWh cancels MWh; h cancels h. " + num(s.dayMWh) + " MWh ÷ 24 h " + eqNum(s.avgMW, 1) + " MW, the day's [[average-power|average power]]."); }
           }, "Unit of " + c.eq);
         });
         autos[2] = function () { list.querySelectorAll(".k1-row").forEach(function (row, i) { row.querySelectorAll(".lx-seg button")[CH.indexOf(CHAINS[i].ans)].click(); }); };
       }
     });
 
-    // ---- step 4: powers of ten
+    // ---- step 4: scientific notation, worked before it is used (1,000 = 10^3; 19 Wh; then the reader's own: the town's day)
+    var WORKED = [
+      { x: 1000, text: "1,000 Wh = 1 × 10³ Wh", note: "the point moves 3 places" },
+      { x: s.byId.phone.wh, text: plain(s.byId.phone.wh) + " Wh = " + sci(s.byId.phone.wh) + " Wh", note: "a phone charge: 1 place" }];
     steps.push({
-      text: "Write each amount in Wh, in [[scientific-notation|scientific notation]]: a number from 1 to 10 times a power of ten. On a [[log-scale|log scale]] each power adds one step. How many powers of ten from a phone charge to the U.S. year?",
+      text: "[[scientific-notation|Scientific notation]] writes a number as a × 10ⁿ, with a at least 1 and less than 10: n counts the places the decimal point moves. Find n for the town's day in Wh.",
+      build: function (act, api) {
+        var list = H("div", { class: "k1-rows" }, act);
+        WORKED.forEach(function (w) { var row = H("div", { class: "k1-row" }, list); H("p", { html: "<b>" + LX.esc(w.text) + "</b> <span>" + LX.esc(w.note) + "</span>" }, row); });
+        var row = H("div", { class: "k1-row" }, list);
+        H("p", { html: "<b>" + plain(s.dayWh) + " Wh ≈ " + sig(mant(s.dayWh), 3) + " × 10ⁿ Wh</b> <span>the town's day: n = ?</span>" }, row);
+        var tries = 0;
+        var n = numBox(act, { label: "Exponent n for the day in Wh:", onCheck: function (v) {
+          tries++;
+          if (v === s.byId.town.exp) { api.done(); api.saw(plain(s.dayWh) + " Wh " + eqSci(s.dayWh) + " Wh: the point moves " + s.byId.town.exp + " places. The leading number is rounded to 3 figures, so the sign is ≈."); }
+          else api.saw(tries < 2 ? "Not yet. Count the digits after the first one, 6: each is one place." : "n = " + s.byId.town.exp + ": " + plain(s.dayWh) + " has " + s.byId.town.exp + " digits after its first.", true);
+        } });
+        autos[3] = function () { n.input.value = String(s.byId.town.exp); n.go(); };
+      }
+    });
+
+    // ---- step 5: powers of ten apart, on a log scale
+    steps.push({
+      text: "On a [[log-scale|log scale]] each power of ten is one equal step, so a phone and a nation fit on one chart. How many powers of ten from a phone charge to the U.S. year?",
       build: function (act, api) {
         var rows = H("div", { class: "k1-mag" }, act), bars = {};
         s.items.forEach(function (it) {
@@ -283,7 +320,7 @@
           var tr = H("span", { class: "k1-bar", "aria-hidden": "true" }, rw), fill = H("i", { style: "width:" + (it.exp + Math.log10(it.mant)) / 16 * 100 + "%" }, tr);
           H("b", { text: sci(it.wh) }, rw); bars[it.id] = { rw: rw, fill: fill };
         });
-        H("p", { class: "k1-scale", text: "All in Wh. Bar length: the power of ten, from 10⁰ = 1 Wh to 10¹⁶ Wh." }, act);
+        H("p", { class: "k1-scale", text: "All in Wh, leading numbers to 3 figures; ratios use the unrounded amounts. Bar length: the power of ten, from 10⁰ = 1 Wh to 10¹⁶ Wh." }, act);
         var pk = H("div", { class: "k1-pick" }, act), selA = sel("Compare", "home"), selB = sel("with", "town");
         function sel(lab, v0) {
           var id = LX.uid("sel"), w = H("span", { class: "k1-selw" }, pk); H("label", { for: id, text: lab }, w);
@@ -297,22 +334,22 @@
           Object.keys(bars).forEach(function (k) { bars[k].rw.classList.toggle("on", k === selA.value || k === selB.value); });
           if (!p) { out.textContent = "Pick two different amounts."; return; }
           if (user) LX.store.set("k1-pair", { a: p.big.id, b: p.small.id });
-          out.innerHTML = LX.esc(p.big.short) + " ÷ " + LX.esc(p.small.short) + " = (" + sig(p.big.mant, 3) + " ÷ " + sig(p.small.mant, 3) + ") × 10<sup>" + p.big.exp + " − " + p.small.exp + "</sup> = <b>" + p.ratioText + "</b>: the nearest power of ten is 10<sup>" + p.apart + "</sup>.";
+          out.innerHTML = LX.esc(p.big.short) + " ÷ " + LX.esc(p.small.short) + " ≈ (" + sig(p.big.mant, 3) + " ÷ " + sig(p.small.mant, 3) + ") × 10<sup>" + p.big.exp + " − " + p.small.exp + "</sup> ≈ <b>" + p.ratioText + "</b>. " + LX.esc(nearestWhy(p));
         }
         pair();
-        var tries = 0;
-        var n = numBox(act, { label: "Phone to U.S. year:", unit: "powers of ten", onCheck: function (v) {
+        var tries = 0, PU = pairText(s, "phone", "us");
+        var n = numBox(act, { label: "Powers of ten, phone to U.S. year:", onCheck: function (v) {
           tries++;
-          if (v === s.span) { api.done(); api.saw("10" + sup(s.byId.us.exp) + " ÷ 10" + sup(s.byId.phone.exp) + " = 10" + sup(s.span) + ": " + s.span + " powers of ten. The U.S. year is about " + sci(s.spanRatio, 2) + " phone charges. Subtract the exponents to divide."); }
-          else api.saw(tries < 2 ? "Not yet. Compare the exponents of the two: " + s.byId.phone.sci + " and " + s.byId.us.sci + "." : s.byId.us.exp + " − " + s.byId.phone.exp + " = " + s.span + ".", true);
+          if (v === s.span) { api.done(); api.saw("10" + sup(s.byId.us.exp) + " ÷ 10" + sup(s.byId.phone.exp) + " = 10" + sup(s.span) + ": the U.S. year is about " + sci(s.spanRatio, 2) + " phone charges. " + nearestWhy(PU)); }
+          else api.saw(tries < 2 ? "Not yet. Subtract the exponents: " + s.byId.phone.sci + " and " + s.byId.us.sci + "." : s.byId.us.exp + " − " + s.byId.phone.exp + " = " + s.span + ".", true);
         } });
-        autos[3] = function () { n.input.value = String(s.span); n.go(); };
+        autos[4] = function () { n.input.value = String(s.span); n.go(); };
       }
     });
 
-    // ---- step 5: check a number by its order of magnitude
+    // ---- step 6: check a number by its order of magnitude
     steps.push({
-      text: "A slipped prefix moves a number by 1,000. Bound the day: its lowest hour, " + s.loMW + " MW, and its highest, " + s.hiMW + " MW, held for 24 h. Which reports of the day's energy fit?",
+      text: "Bound the day by its lowest hour (" + s.loMW + " MW) and its highest (" + s.hiMW + " MW), each held for 24 h. Which reports of its energy fit, and which slipped a prefix, a factor of 1,000?",
       build: function (act, api) {
         H("p", { class: "k1-eq", text: s.loMW + " MW × 24 h = " + num(s.loBound) + " MWh  ≤  the day  ≤  " + s.hiMW + " MW × 24 h = " + num(s.hiBound) + " MWh" }, act);
         var right = {}, list = H("div", { class: "k1-rows" }, act);
@@ -327,12 +364,12 @@
             if (s.claims.every(function (q, j) { return right[j]; })) { api.done(); api.saw("Only about " + Math.round(s.dayGWh) + " GWh lies between " + num(s.loBound) + " and " + num(s.hiBound) + " MWh. Fitting the bounds makes a number plausible, not proven; missing them by an [[order-of-magnitude|order of magnitude]] points to a slip."); }
           }, "Does " + c.text + " fit?");
         });
-        autos[4] = function () { list.querySelectorAll(".k1-row").forEach(function (row, i) { row.querySelectorAll(".lx-seg button")[s.claims[i].ok ? 0 : 1].click(); }); };
+        autos[5] = function () { list.querySelectorAll(".k1-row").forEach(function (row, i) { row.querySelectorAll(".lx-seg button")[s.claims[i].ok ? 0 : 1].click(); }); };
       }
     });
 
     var cards = LX.StepCards(live, { id: "k1-steps", steps: steps, onStep: function () { LX.emit("layout"); } });
-    LX.demo(root, function (state) {   // "mid" = step 3 done; "step-N" = card N with its action done; "done" = the last card done
+    LX.demo(root, function (state) {   // "mid" = step 3 done; "step-N" = card N with its action done; "done" = the last card (6) done
       var k = state === "mid" ? 2 : state === "done" ? steps.length - 1 : /^step-(\d+)$/.test(state) ? Math.max(0, Math.min(steps.length - 1, +state.slice(5) - 1)) : -1;
       if (k < 0) return null;
       cards.go(k); if (autos[k]) autos[k]();
@@ -352,26 +389,26 @@
       rows: [
         { key: "k", color: "var(--lx-tier-1)", name: "k, kilo", note: "10³", times: "1,000", ex: s.peak + " MW = " + num(s.peakKW) + " kW" },
         { key: "M", color: "var(--lx-tier-2)", name: "M, mega", note: "10⁶", times: "1,000,000", ex: s.hiMW + " MW: the busiest hour of " + s.D.dateLabel },
-        { key: "G", color: "var(--lx-tier-3)", name: "G, giga", note: "10⁹", times: "1,000,000,000", ex: sig(s.dayGWh, 3) + " GWh: Prairie Town's day" },
+        { key: "G", color: "var(--lx-tier-3)", name: "G, giga", note: "10⁹", times: "1,000,000,000", ex: plain(s.dayGWh) + " GWh: Prairie Town's day" },
         { key: "T", color: "var(--lx-tier-4)", name: "T, tera", note: "10¹²", times: "1,000,000,000,000", ex: s.byId.spp.given + ": the Southwest Power Pool's year" }]
     });
-    // the reader's own pair from step 4 (else a home's year against the town's day)
+    // the reader's own pair from step 5 (else a home's year against the town's day); "≈" because the leading numbers are rounded
     var card = H("div", { class: "lx-xcard" }, x), hd = H("header", { class: "lx-x-head" }, card);
     H("h3", { text: "Divide by subtracting exponents" }, hd);
     var lede = H("p", { class: "lx-lede" }, card), uc = LX.UnitChain(H("div", null, card), { label: "Unit chain: one amount divided by another" });
     function drawPair() {
       var o = LX.store.get("k1-pair"), p = o && pairText(s, o.a, o.b), own = !!p;
       if (!p) p = pairText(s, "town", "home");
-      lede.textContent = (own ? "Your pair from step 4: " : "Prairie Town's day against an average U.S. home's year: ") + "divide the leading numbers, subtract the exponents.";
-      uc.set([{ v: p.big.sci, u: p.big.short }, { op: "÷" }, { v: p.small.sci, u: p.small.short }, { op: "=" },
-              { v: "(" + sig(p.big.mant, 3) + " ÷ " + sig(p.small.mant, 3) + ") × 10" + sup(p.dexp), u: "leading numbers, exponents" }, { op: "=" },
+      lede.textContent = (own ? "Your pair from step 5: " : "Prairie Town's day against an average U.S. home's year: ") + "divide the leading numbers, subtract the exponents. " + nearestWhy(p);
+      uc.set([{ v: p.big.sci, u: p.big.short }, { op: "÷" }, { v: p.small.sci, u: p.small.short }, { op: "≈" },
+              { v: "(" + sig(p.big.mant, 3) + " ÷ " + sig(p.small.mant, 3) + ") × 10" + sup(p.dexp), u: "leading numbers, exponents" }, { op: "≈" },
               { v: p.ratioText, u: "nearest power of ten: 10" + sup(p.apart), out: true }]);
     }
     drawPair();
     var sec = document.getElementById("explain");
     if (sec && "IntersectionObserver" in window) new IntersectionObserver(function (es) { if (es[0].isIntersecting) drawPair(); }).observe(sec);
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "Check a number in four moves", lede: "Two of step 5's reports, traced.",
+      title: "Check a number in four moves", lede: "Two of step 6's reports, traced.",
       nodes: {
         start: { t: "A number with a unit", tN: ["A number", "with a unit"], k: "end" },
         one: { t: "Put it in one unit", s: "climb the ladder: × or ÷ 1,000", sN: "× or ÷ 1,000" },
@@ -384,8 +421,8 @@
       colsN: 2, atN: { start: [0.5, 0], one: [0.5, 1], sci: [0.5, 2], q: [0.5, 3], fits: [0, 4], slip: [1, 4] },
       edges: [["start", "one"], ["one", "sci"], ["sci", "q"], ["q", "fits", "yes"], ["q", "slip", "no"]],
       traces: [
-        { label: s.claims[0].text, path: ["start", "one", "sci", "q", "slip"], text: "**" + s.claims[0].text + " = " + num(s.claims[0].mwh) + " MWh = " + sci(s.claims[0].mwh * 1e6) + " Wh.** The bounds are " + num(s.loBound) + "–" + num(s.hiBound) + " MWh: 1,000 times too big. GWh was written for MWh." },
-        { label: s.claims[2].text, path: ["start", "one", "sci", "q", "fits"], text: "**" + s.claims[2].text + " = " + num(s.claims[2].mwh) + " MWh = " + sci(s.claims[2].mwh * 1e6) + " Wh.** Inside " + num(s.loBound) + "–" + num(s.hiBound) + " MWh: plausible. The sum of the hours gives " + num(s.dayMWh) + " MWh." }],
+        { label: s.claims[0].text, path: ["start", "one", "sci", "q", "slip"], text: "**" + s.claims[0].text + " = " + num(s.claims[0].mwh) + " MWh " + eqSci(s.claims[0].mwh * 1e6) + " Wh.** The bounds are " + num(s.loBound) + "–" + num(s.hiBound) + " MWh: 1,000 times too big. GWh was written for MWh." },
+        { label: s.claims[2].text, path: ["start", "one", "sci", "q", "fits"], text: "**" + s.claims[2].text + " = " + num(s.claims[2].mwh) + " MWh " + eqSci(s.claims[2].mwh * 1e6) + " Wh.** Inside " + num(s.loBound) + "–" + num(s.hiBound) + " MWh: plausible. The sum of the hours gives " + num(s.dayMWh) + " MWh." }],
       sel: 0
     });
   }

@@ -1,5 +1,5 @@
 {
-  "about": "Toolbox K2 (Rates and efficiencies): the one constant this page adds. Every other input is read from the data files of the lessons that use it (01-power-energy.json, 07-cost.json, 13-capstone.json, town.json, cf_targets.json), so the numbers stay the same as there.",
+  "about": "Toolbox K2 (Rates and efficiencies): the one constant this page adds, and the one benchmark its battery note cites. Every other input is read from the data files of the lessons that use it (01-power-energy.json, 07-cost.json, 13-capstone.json, town.json, cf_targets.json), so the numbers stay the same as there.",
   "built": "2026-11-03",
   "btuPerKWh": {
     "value": 3412,
@@ -9,6 +9,15 @@
     "url": "https://www.eia.gov/tools/faqs/faq.php?id=107&t=3",
     "as_of": "page undated; checked 3 November 2026"
   },
-  "batteryNote": "The 85% round trip is lesson 13's battery (NREL's 2025 battery cost study, in 13-capstone.json). Lesson 9's illustrative battery uses 80%, near the 82% EIA measured for U.S. utility-scale batteries in 2019.",
+  "batteryBenchmark": {
+    "value": 0.82,
+    "unit": "round-trip efficiency (energy back ÷ energy in)",
+    "what": "The average monthly round-trip efficiency of the U.S. utility-scale battery fleet in 2019 (pumped storage: 79%).",
+    "source": "EIA, Today in Energy: Utility-scale batteries and pumped storage return about 80% of the electricity they store (12 February 2021)",
+    "url": "https://www.eia.gov/todayinenergy/detail.php?id=46756",
+    "data_year": 2019,
+    "as_of": "checked 3 November 2026"
+  },
+  "batteryNote": "The 85% round trip is lesson 13's battery (NREL's 2025 battery cost study, in 13-capstone.json). Lesson 9's illustrative battery uses 80%, near the 82% EIA measured for U.S. utility-scale batteries in 2019 (batteryBenchmark).",
   "co2Note": "CO2 per MWh is heat rate x EIA's 52.91 kg CO2 per MMBtu of natural gas, as lessons 12 and 13 compute it: operating emissions at the plant only. Lesson 0's Prairie Town fleet uses a rounded illustrative 0.37 t per MWh for its combined-cycle plant."
 }
