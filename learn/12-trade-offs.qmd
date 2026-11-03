@@ -39,7 +39,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive" data-learn="trade-offs" data-src="../assets/learn/data/12-trade-offs.json ../assets/learn/data/13-capstone.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">Six plans for Prairie Town, each run for a year</p>
+<p class="lx-eyebrow">Six plans for Prairie Town: yearly estimates from seven representative weeks of 2025</p>
 <table class="lx-facts">
 <thead><tr><th scope="col">Plan</th><th scope="col">Cost a year</th><th scope="col">CO₂ a year</th><th scope="col">Note</th></tr></thead>
 <tbody>
@@ -48,13 +48,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>C · Gas + 500 MW solar</td><td>$131.4M</td><td>488 kt</td><td>not dominated, but no carbon price picks it</td></tr>
 <tr><td>D · Gas + 600 MW wind</td><td>$136.8M</td><td>249 kt</td><td>wins between $64 and $163 a tonne</td></tr>
 <tr><td>E · Gas + 800 MW solar</td><td>$159.6M</td><td>433 kt</td><td>dominated: D costs less and emits less</td></tr>
-<tr><td>F · Wind, solar and a battery</td><td>$158.6M</td><td>115 kt</td><td>wins above $163 a tonne</td></tr>
+<tr><td>F · Wind, solar, battery and gas backup</td><td>$158.6M</td><td>115 kt</td><td>wins above $163 a tonne</td></tr>
 </tbody>
 </table>
+<p class="lx-hint">Plan F: 600 MW wind, 200 MW solar, a 100 MW / 400 MWh battery, and 300 MW of combined-cycle gas plus 80 MW of peakers as backup.</p>
 <p class="lx-hint">With JavaScript on, you pick the dominated plan, slide a carbon price and trace the frontier with a solver.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Each plan's year is run by <a href="13-capstone.html">lesson 13</a>'s model: real 2025 hourly shapes from the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), with EIA's and NREL's costs, dated in lesson 13's sources. The six plans are illustrative choices, not recommendations; Prairie Town is fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s; it estimates each plan's year from seven representative weeks, and a full-year check is separate.<br><b>Data:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>Costs:</b> EIA's and NREL's, dated in lesson 13's sources.<br><b>Plans:</b> illustrative, not recommendations; Prairie Town is fictional.</span></p>
 ```
 :::
 
@@ -71,7 +72,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Weighted sum</dt><dd>Score each plan by cost plus a carbon price times its CO₂; the lowest score wins.</dd>
 <dt>Epsilon-constraint</dt><dd>Cap the CO₂ and find the cheapest plan under the cap; sweep the cap to trace the frontier.</dd>
 <dt>Frontier</dt><dd>The plans that cannot get cheaper without getting dirtier, or cleaner without getting dearer.</dd>
-<dt>Shadow price</dt><dd>The cap's shadow price is the carbon price that picks the same plan.</dd>
+<dt>Shadow price</dt><dd>Used as a carbon price, the cap's shadow price makes the cap's plan one of the cheapest choices.</dd>
 </dl>
 </div>
 </div>
@@ -84,7 +85,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 <ul>
 <li><b>Dents.</b> Plan C ($131.4M, 488 kt) lies above the straight line from B to D, so no carbon price picks it, though no plan beats it on both counts. Frontiers built from yes-or-no choices, such as building a plant or not, often have such dents.</li>
-<li><b>Straight pieces.</b> Between 500 and 400 kt the frontier's slope barely changes (about $44 a tonne): a price near $44 can land anywhere on that piece, and the solver reports one end.</li>
+<li><b>Nearly straight pieces.</b> Between 500 and 400 kt the slope barely changes ($43.4 to $44.0 a tonne), so prices from $43 to $45 move the plan from 541 kt to 389 kt.</li>
 <li><b>Uneven spacing.</b> Even steps in price give uneven steps along the frontier: up to $45 a tonne moves the plan from 792 kt to below 400 kt; from $45 to $220 it moves only to 100 kt.</li>
 <li><b>Weights carry units.</b> The weight in cost + <i>w</i> × CO₂ is a price in dollars per tonne; measure CO₂ in kilotonnes and the same number means something a thousand times larger.</li>
 </ul>
@@ -92,17 +93,28 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The cap's dual is the carbon price</summary>
+<summary><span class="k">Go deeper · Modeler</span>The cap's dual as a carbon price</summary>
 <div class="lx-deeper-body">
 ```
 
-With $c(x)$ the yearly cost of plan $x$ and $e(x)$ its CO₂, the [epsilon-constraint]{.lx-term term="epsilon-constraint"} problem is
+The [epsilon-constraint]{.lx-term term="epsilon-constraint"} problem: the cheapest plan under a CO₂ cap.
 
 $$\min_x \; c(x) \quad \text{subject to} \quad e(x) \le \varepsilon \;\; (\lambda), \;\; x \in X.$$
 
-For a linear program, strong duality gives a multiplier $\lambda^* \ge 0$ such that the cap's best plan also minimizes the [weighted sum]{.lx-term term="weighted-sum"} $c(x) + \lambda^* e(x)$, and $\lambda^* = -\,\mathrm{d}c^*/\mathrm{d}\varepsilon$: the slope of the frontier. In this lesson's model, a 200 kt cap has $\lambda^* = \$85.2$ per tonne, and a \$85.2 price with no cap lands at 200 kt and \$129.3M.
+| Symbol | Meaning |
+|---|---|
+| $x$, $X$ | a plan (what to build and how to run it), and every plan that meets the other rules |
+| $c(x)$, $e(x)$ | its yearly cost (\$) and its CO₂ (tonnes) |
+| $\varepsilon$ | the cap, in tonnes a year |
+| $\lambda$ | the cap's multiplier, or dual: its shadow price, in \$ per tonne |
+| $\lambda^*$, $c^*(\varepsilon)$ | that multiplier at the best plan, and the best cost for cap $\varepsilon$ |
 
-Where the frontier has a straight piece, $\lambda^*$ is the same along it and the weighted sum ties; with integer decisions there is no such guarantee at all. Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Upcoming: M6 (carbon in models) and A22 (five goals at once).
+- **Duality.** For a linear program, strong duality (a theorem that pairs every LP with a "dual" LP of prices) guarantees a $\lambda^* \ge 0$ for which the cap's best plan also minimizes the [weighted sum]{.lx-term term="weighted-sum"} $c(x) + \lambda^* e(x)$. Other plans may tie with it, and a solver may return one of them.
+- **Slope.** Where the frontier is smooth, $\lambda^* = -\,\mathrm{d}c^*/\mathrm{d}\varepsilon$; at a kink, $\lambda^*$ lies between the slopes on either side.
+- **Here.** A 200 kt cap has $\lambda^* = \$85.2$ per tonne; a \$85.2 price with no cap lands at 199 kt and \$129.3M.
+- **Ties.** On an exactly straight piece every plan ties at its slope; with integer decisions there is no such guarantee at all.
+
+Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Upcoming: M6 (carbon in models) and A22 (five goals at once).
 
 ```{=html}
 </div>
@@ -121,12 +133,12 @@ Where the frontier has a straight piece, $\lambda^*$ is the same along it and th
 <div class="lx-qq" data-id="cheapest" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The cheapest plan is always the right choice.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. It is right only if CO₂ counts for nothing; the frontier shows what each tonne avoided costs, and people decide what that is worth.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Here plan A stays the pick only while CO₂ is priced below $53 a tonne. The frontier shows what each tonne avoided costs; people decide what that is worth.</p></details>
 </div>
 <div class="lx-qq" data-id="same" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “A carbon price and a CO₂ cap can lead to the same plan.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. A 200 kt cap has a shadow price of $85.2 a tonne; that price, with no cap, lands at 200 kt.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. A 200 kt cap has a shadow price of $85.2 a tonne; that price, with no cap, lands at 199 kt, next to the cap's plan.</p></details>
 </div>
 <div class="lx-qq" data-id="every" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Every plan that is not dominated can be picked by some carbon price.”</p>
@@ -179,7 +191,7 @@ Where the frontier has a straight piece, $\lambda^*$ is the same along it and th
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Both routes exist: some jurisdictions tax CO₂ (a price), others cap it and trade allowances (a cap whose price the market finds). Planning studies trace frontiers like yours to show decision makers what each tonne avoided costs; <a href="13-capstone.html">lesson 13</a> lets you plan the town yourself.</p>
+<p>Both routes exist: some places tax CO₂ (a price); others cap it and trade allowances, so the market finds the price. Planning studies trace frontiers like yours; <a href="13-capstone.html">lesson 13</a> lets you plan the town yourself.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

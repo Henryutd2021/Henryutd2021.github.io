@@ -290,7 +290,7 @@
   tier2: analyst
   status: active
   path: 13-capstone.qmd
-  minutes: 20
+  minutes: 15
   title: "What should Prairie Town build? Plan its power system"
   subtitle: "Choose what to build, run a year of real weather, and ask the optimizer"
   short: "Capstone: plan the town"

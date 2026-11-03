@@ -849,7 +849,7 @@
    "level": "L3",
    "slot": 3,
    "slot2": 2,
-   "minutes": 20,
+   "minutes": 15,
    "does": "Choose how much wind, solar, gas, nuclear and battery to build, then ask the optimizer for the cheapest plan under a CO₂ cap.",
    "outcome": "Reason about planning trade-offs and know what real planning models do.",
    "icon": "blueprint",
@@ -1339,5 +1339,5 @@
    "minutes": 20
   }
  ],
- "minutes": 215
+ "minutes": 210
 }
