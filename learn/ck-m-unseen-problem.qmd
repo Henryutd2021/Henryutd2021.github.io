@@ -173,8 +173,8 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 
 ```{=html}
 <div id="ckm-lock" class="lx-ck-lock" hidden>
-<p><b>Opens when you submit task 11.</b> The checkpoint asks for your own formulation, analysis and checks first, so the worked solutions wait for them.</p>
-<p><button type="button" class="lx-btn ghost small">Open them anyway (recorded)</button></p>
+<p><b>Opens when you submit task 11.</b> The checkpoint asks for your own formulation, analysis and checks first, so the worked solutions wait for them. Opening them now makes this attempt practice, with no level.</p>
+<p><button type="button" class="lx-btn ghost small">Open them anyway (recorded: practice)</button></p>
 </div>
 <div id="ckm-solution-body" class="lx-ck-gated ckm-solution-body">
 <div class="lx-xcard">

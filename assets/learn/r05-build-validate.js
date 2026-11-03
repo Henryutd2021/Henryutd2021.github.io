@@ -298,8 +298,8 @@
     var h = ['<p class="lx-eyebrow">The study, its five buggy versions and the checks that catch them</p>',
       "<p><b>" + esc(J.study.question) + "</b> One day of dispatch as a linear program; " + esc(J.study.battery.label) + " battery, 85% " + rich("[[round-trip-efficiency|round trip]]") + "; data: " + esc(J.study.dateLabel) + ".</p>",
       '<ul class="r5-static-rules">' + J.rules.map(function (r) { return "<li><b>" + esc(r.name) + ":</b> " + rich(r.words) + " <span class=\"lx-hint\">(" + esc(r.rows) + ")</span></li>"; }).join("") + "</ul>",
-      '<div class="lx-scroll-x"><table class="lx-facts r5-fleet"><caption>Prairie Town\'s plants (lesson 0)</caption><thead><tr>' + FLEET_HEAD.map(function (x) { return '<th scope="col">' + esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>"
-        + fleetRows(J).map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + '</th><td class="n">' + r[1] + '</td><td class="n">' + r[2] + "</td><td>" + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table></div>",
+      '<p class="r5-sym-k">Prairie Town\'s plants (lesson 0):</p><div class="lx-scroll-x"><table class="lx-facts r5-fleet" aria-label="Prairie Town\'s plants"><thead><tr>' + FLEET_HEAD.map(function (x) { return '<th scope="col">' + esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>"
+        + fleetRows(J).map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + '</th><td class="n" data-l="' + FLEET_HEAD[1] + '">' + r[1] + '</td><td class="n" data-l="' + esc(FLEET_HEAD[2]) + '">' + r[2] + '</td><td data-l="' + FLEET_HEAD[3] + '">' + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table></div>",
       '<p class="r5-sym-k">In the code:</p><ul class="r5-sym">' + J.study.symbols.map(function (s) { return "<li><code>" + esc(s[0]) + "</code>: " + rich(s[1]) + "</li>"; }).join("") + "</ul>",
       '<ol class="r5-static">'];
     J.bugs.forEach(function (b) {
@@ -329,6 +329,8 @@
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H;
+  // glossary marks (LX.rich) and **bold** in the page's own texts
+  function rb(t) { return LX.rich(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
   var HOURS_X = { min: 0, max: 24, ticks: [[0, "00:00", "start"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00", "end"]],
     ticksN: [[0, "00:00", "start"], [12, "12:00"], [24, "24:00", "end"]] };
 
@@ -481,7 +483,7 @@
               else if (b.id === "leak") { card.chip("Perfect foresight", v.ok, "warn"); card.chip("Planned the day before", v.honest, "good"); }
               else { card.chip("Fixed: saving", v.ok, "good"); card.chip("Most energy stored", v.okMaxE + " MWh", "good"); }
               api.saw(fill(b.fixed, v));
-              if (b.tie) H("p", { class: "lx-hint", html: LX.rich(fill(b.tie, v)) }, after);
+              if (b.tie) H("p", { class: "lx-hint", html: rb(fill(b.tie, v)) }, after);
               api.done();
             });
           }
@@ -497,11 +499,11 @@
           var bd = H("tbody", null, tb);
           J.rules.forEach(function (r) { var tr = H("tr", null, bd); H("th", { scope: "row", text: r.name }, tr); H("td", { html: LX.rich(r.words) }, tr); H("td", { text: r.rows }, tr); });
           // the plants (lesson 0's fleet): the sizes and running costs the benchmark below is worked from
-          var ft = H("table", { class: "lx-facts r5-fleet" }, H("div", { class: "lx-scroll-x" }, act));
-          H("caption", { text: "Prairie Town's plants (lesson 0)" }, ft);
+          H("p", { class: "r5-sym-k", text: "Prairie Town's plants (lesson 0):" }, act);
+          var ft = H("table", { class: "lx-facts r5-fleet", "aria-label": "Prairie Town's plants" }, H("div", { class: "lx-scroll-x" }, act));
           var fh = H("tr", null, H("thead", null, ft)); FLEET_HEAD.forEach(function (h0) { H("th", { scope: "col", text: h0 }, fh); });
           var fb0 = H("tbody", null, ft);
-          fleetRows(J).forEach(function (r) { var tr = H("tr", null, fb0); H("th", { scope: "row", text: r[0] }, tr); H("td", { class: "n", text: r[1] }, tr); H("td", { class: "n", text: r[2] }, tr); H("td", { text: r[3] }, tr); });
+          fleetRows(J).forEach(function (r) { var tr = H("tr", null, fb0); H("th", { scope: "row", text: r[0] }, tr); H("td", { class: "n", "data-l": FLEET_HEAD[1], text: r[1] }, tr); H("td", { class: "n", "data-l": FLEET_HEAD[2], text: r[2] }, tr); H("td", { "data-l": FLEET_HEAD[3], text: r[3] }, tr); });
           // the code's symbols, before the first code comparison
           H("p", { class: "r5-sym-k", text: "In the code:" }, act);
           var sy = H("ul", { class: "r5-sym" }, act);
@@ -513,10 +515,10 @@
     ].concat(J.bugs.map(bugStep)).concat([
       { text: "A [[benchmark|benchmark]] is a case with a known answer. Work this made-up day out by hand in three steps, then run every version on it.",
         build: function (act, api) {
-          H("p", { class: "lx-hint", text: "The day: " + J.bench.label + "." }, act);
-          H("p", { html: LX.rich(fill(J.bench.intro, v0)) }, act);
+          H("p", { class: "lx-hint", text: J.bench.label.charAt(0).toUpperCase() + J.bench.label.slice(1) + "." }, act);
+          H("p", { html: rb(fill(J.bench.intro, v0)) }, act);
           var hs = H("ol", { class: "r5-steps" }, act);
-          J.bench.steps.forEach(function (s0) { H("li", { html: LX.rich(fill(s0, v0)) }, hs); });
+          J.bench.steps.forEach(function (s0) { H("li", { html: rb(fill(s0, v0)) }, hs); });
           var row = H("div", { class: "r5-run" }, act), go = H("button", { type: "button", class: "lx-btn small", html: "Run all five versions on the benchmark" + LX.icon("arrow") }, row), st = LX.SolverStatus(row);
           var out = H("div", { class: "lx-scroll-x" }, act);
           go.addEventListener("click", function () {
@@ -546,7 +548,7 @@
               more.hidden = false;
             } }, g);
           });
-          H("p", { html: LX.rich(J.validationText) }, more);
+          H("p", { html: rb(J.validationText) }, more);
           var row = H("div", { class: "r5-run" }, more), go = H("button", { type: "button", class: "lx-btn small", html: "Compare the forecast with 20 August" + LX.icon("arrow") }, row);
           var card = chartCard(more); card.title.textContent = "Net load, 20 August 2025: forecast and measured"; card.el.hidden = true;
           go.addEventListener("click", function () {
