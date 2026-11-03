@@ -526,10 +526,58 @@
 - {kind: lesson, tier: researcher, code: R9, title: "Research integrity, and working with the people your study is about"}
 - {kind: lesson, tier: researcher, code: R10, title: "What could you study? The question studio"}
 
-# ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 are built in wave W1)
-- {kind: tool, code: K1, minutes: 10, title: "Units and orders of magnitude"}
-- {kind: tool, code: K2, minutes: 10, title: "Rates and efficiencies"}
-- {kind: tool, code: K3, minutes: 15, title: "Exponentials and discounting"}
+# ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
+- kind: tool
+  id: k01-units
+  code: K1
+  form: cards
+  path: k01-units.qmd
+  status: active
+  minutes: 10
+  practice_minutes: 10
+  title: "Units and orders of magnitude"
+  subtitle: "Climb the prefix ladder, let units cancel, and size any number by its power of ten"
+  short: "Units and magnitudes"
+  does: "Convert between kW, MW and GW and between power and energy, carry units through a calculation so they cancel, and place a phone charge, a town's day and a nation's year on one powers-of-ten scale."
+  outcome: "Convert power and energy units with prefixes, check a result by its units, and estimate a quantity to the nearest power of ten."
+  teaches: [SI prefixes, power and energy units, unit cancelling, scientific notation, orders of magnitude]
+  after: []
+  next: K2
+
+- kind: tool
+  id: k02-rates-efficiencies
+  code: K2
+  form: cards
+  path: k02-rates-efficiencies.qmd
+  status: active
+  minutes: 10
+  practice_minutes: 10
+  title: "Rates and efficiencies"
+  subtitle: "Chain per-unit numbers, turn a heat rate into an efficiency, and follow the losses"
+  short: "Rates and efficiencies"
+  does: "Multiply rates through a chain (MMBtu per MWh times dollars per MMBtu), turn a gas plant's heat rate into an efficiency, follow energy through a battery's round trip, and get a capacity factor from a year's output."
+  outcome: "Use rates and efficiencies with their units: fuel cost and CO₂ per MWh from a heat rate, losses through a chain, and capacity factors."
+  teaches: [rates and per-unit numbers, heat rate and efficiency, chained efficiencies, round-trip efficiency, capacity factor as a ratio]
+  after: [K1]
+  next: K3
+
+- kind: tool
+  id: k03-discounting
+  code: K3
+  form: cards
+  path: k03-discounting.qmd
+  status: active
+  minutes: 15
+  practice_minutes: 15
+  title: "Exponentials and discounting"
+  subtitle: "Grow money forward, discount it back, and spread a building cost into equal yearly payments"
+  short: "Exponentials and discounting"
+  does: "Watch growth compound, discount future dollars to today, add up a stream of equal payments, and build the capital recovery factor that lessons 7, 12 and 13 use to turn a building cost into a yearly cost."
+  outcome: "Compute present values and the capital recovery factor, and turn a building cost into an annualised cost."
+  teaches: [compound growth, present value, discount rate, annuities, capital recovery factor]
+  after: []
+  next: 7
+
 - kind: tool
   id: k04-linear-equations
   code: K4
@@ -540,7 +588,24 @@
   outcome: "Solve a balance for one unknown and read a set of inequalities as the region of plans that pass them."
   teaches: [linear equations, inequalities, half-planes, systems of rules]
   next: B1
-- {kind: tool, code: K5, minutes: 25, title: "Probability and statistics"}
+
+- kind: tool
+  id: k05-probability-statistics
+  code: K5
+  form: cards
+  path: k05-probability-statistics.qmd
+  status: active
+  minutes: 25
+  practice_minutes: 30
+  title: "Probability and statistics"
+  subtitle: "Read four months of real forecast errors as a distribution: centre, spread, tails and chance"
+  short: "Probability and statistics"
+  does: "With a grid operator's real day-ahead forecast errors, build a histogram, compare mean and median, measure spread, read percentiles and intervals, and estimate a chance by counting and by sampling; then combine two plants' outages into a joint chance and an expected value."
+  outcome: "Describe a distribution by its centre, spread and quantiles, estimate a probability from data, and say when probabilities multiply."
+  teaches: [histograms, mean and median, standard deviation and percentiles, probability as frequency, sampling and Monte Carlo, independence and expected value]
+  after: []
+  next: 4
+
 - {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax <= b means"}
 - kind: tool
   id: k07-spreadsheets
@@ -551,4 +616,20 @@
   outcome: "Build a small energy calculation in a spreadsheet with relative and absolute references and a check cell."
   teaches: [cell references, fill-down, absolute references, SUM and MAX, check cells]
   next: B2
-- {kind: tool, code: K8, minutes: 20, title: "Git and reproducible notebooks"}
+
+- kind: tool
+  id: k08-git-notebooks
+  code: K8
+  form: cards
+  path: k08-git-notebooks.qmd
+  status: active
+  minutes: 20
+  practice_minutes: 30
+  title: "Git and reproducible notebooks"
+  subtitle: "Commit, compare and rewind a small model project, then make its notebook rerun cleanly"
+  short: "Git and notebooks"
+  does: "In a simulated project, stage and commit changes, read a diff, go back to find the commit that broke a result, try an idea on a branch, and make a notebook rerun cleanly from top to bottom with pinned inputs."
+  outcome: "Explain commits, diffs, branches and clean reruns, and apply a reproducibility checklist to a model project."
+  teaches: [version control, commits and diffs, branches, notebook hidden state, reproducible environments]
+  after: []
+  next: M1

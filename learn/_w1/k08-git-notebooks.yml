@@ -1,0 +1,45 @@
+# Sidecar for toolbox K8 (k08-git-notebooks), builder learn-w2-e (fork for K8), 2026-11-03. Read by scripts/build_learn.py.
+id: k08-git-notebooks
+lesson: K8
+glossary:
+  - id: version-control
+    term: Version control
+    def: "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back."
+  - id: repository
+    term: Repository
+    def: "A project folder together with its full history of commits, as kept by a version-control tool such as Git."
+  - id: commit
+    term: Commit
+    def: "A saved snapshot of every file in a project, with a message, its author and time, and a link to the commit before it."
+  - id: staging-area
+    term: Staging area
+    def: "Git's list of changes picked for the next commit: git add puts a file's current version there."
+  - id: branch
+    term: Branch
+    def: "A movable label on a line of commits, so a what-if can grow without changing the main line of work."
+  - id: diff
+    term: Diff
+    def: "A line-by-line list of what changed between two versions of a file, with removed lines marked minus and added lines plus."
+  - id: merge
+    term: Merge
+    def: "Joining two lines of commits into one, keeping the changes made on both."
+  - id: clone
+    term: Clone
+    def: "A complete new copy of a repository, with its files and its whole history."
+  - id: notebook-kernel
+    term: Notebook kernel
+    def: "The running program behind a notebook that holds its variables in memory between cells, whatever order the cells were run in."
+  - id: hidden-state
+    term: Hidden state
+    def: "Values in a notebook's memory that no longer match the code on the page, for example after a cell was edited but not rerun."
+  - id: gitignore
+    term: .gitignore
+    def: "A file listing names and folders that Git leaves out of the repository, such as keys and large raw data."
+  - id: checksum
+    term: Checksum
+    def: "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes."
+  - id: random-seed
+    term: Random seed
+    def: "A fixed starting number for a random-number generator, so a random draw comes out the same on every run."
+requests:
+  - "K7's Go deeper 'When to leave the spreadsheet' still says 'toolbox K8, upcoming': now that K8 is live, link it (k08-git-notebooks.html) and drop 'upcoming'."

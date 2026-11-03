@@ -1,9 +1,21 @@
 {
+ "gitignore": {
+  "term": ".gitignore",
+  "short": "A file listing names and folders that Git leaves out of the repository, such as keys and large raw data.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "absolute-reference": {
   "term": "Absolute reference",
   "short": "A spreadsheet address with $ signs, such as $E$1, that stays the same when a formula is copied to other cells.",
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
+ },
+ "annuity-factor": {
+  "term": "Annuity factor",
+  "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
+  "lesson": "K3",
+  "href": "k03-discounting.html"
  },
  "array": {
   "term": "Array",
@@ -64,6 +76,12 @@
   "short": "A rule that holds exactly at the selected plan, with no room to spare; loosening it may or may not improve the best cost.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "branch": {
+  "term": "Branch",
+  "short": "A movable label on a line of commits, so a what-if can grow without changing the main line of work.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "branch-and-bound": {
   "term": "Branch and bound",
@@ -131,17 +149,35 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "checksum": {
+  "term": "Checksum",
+  "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "clearing-price": {
   "term": "Clearing price",
   "short": "The price at which supply meets demand in a market, paid to every seller that runs in that hour.",
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "clone": {
+  "term": "Clone",
+  "short": "A complete new copy of a repository, with its files and its whole history.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "commit": {
+  "term": "Commit",
+  "short": "A saved snapshot of every file in a project, with a message, its author and time, and a link to the commit before it.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "conditional-price": {
   "term": "Conditional price",
@@ -245,6 +281,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "diff": {
+  "term": "Diff",
+  "short": "A line-by-line list of what changed between two versions of a file, with removed lines marked minus and added lines plus.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "discount-rate": {
   "term": "Discount rate",
   "short": "The yearly rate used to turn money paid or received in the future into its value today.",
@@ -280,6 +322,12 @@
   "short": "A year of hourly values sorted from highest to lowest, showing for how many hours each level is reached.",
   "lesson": "B2",
   "href": "b02-python-data.html"
+ },
+ "efficiency": {
+  "term": "Efficiency",
+  "short": "The share of the energy put into a plant or device that comes out in the useful form, such as electricity.",
+  "lesson": "K2",
+  "href": "k02-rates-efficiencies.html"
  },
  "electrification": {
   "term": "Electrification",
@@ -328,6 +376,12 @@
   "short": "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "expected-value": {
+  "term": "Expected value",
+  "short": "The long-run average of an uncertain quantity: each possible outcome multiplied by its chance, then added up.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
  },
  "fast-frequency-response": {
   "term": "Fast frequency response",
@@ -437,11 +491,29 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "hidden-state": {
+  "term": "Hidden state",
+  "short": "Values in a notebook's memory that no longer match the code on the page, for example after a cell was edited but not rerun.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
+ "histogram": {
+  "term": "Histogram",
+  "short": "A chart that sorts values into bins of equal width and shows how many fall in each bin.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "hour-ending": {
   "term": "Hour ending",
   "short": "A time stamp that labels each hour by its last moment, so 01:00 means the hour from midnight to 01:00.",
   "lesson": "B2",
   "href": "b02-python-data.html"
+ },
+ "independent-events": {
+  "term": "Independent events",
+  "short": "Events where knowing that one happened says nothing about whether the other did, so the chance of both is the product of their chances.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
  },
  "inequality": {
   "term": "Inequality",
@@ -557,6 +629,12 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "mean": {
+  "term": "Mean",
+  "short": "The average of a set of values: their sum divided by how many there are.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "mae": {
   "term": "Mean absolute error (MAE)",
   "short": "The average size of a forecast's misses, in the units of what is forecast, ignoring whether they were too high or too low.",
@@ -592,6 +670,12 @@
   "short": "A unit of energy: one megawatt kept up for one hour, or a thousand kilowatt-hours.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "merge": {
+  "term": "Merge",
+  "short": "Joining two lines of commits into one, keeping the changes made on both.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "merit-order": {
   "term": "Merit order",
@@ -629,6 +713,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "monte-carlo": {
+  "term": "Monte Carlo",
+  "short": "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
+ },
  "multi-objective": {
   "term": "Multi-objective problem",
   "short": "A choice with several goals that cannot all be at their best at once.",
@@ -659,6 +749,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "notebook-kernel": {
+  "term": "Notebook kernel",
+  "short": "The running program behind a notebook that holds its variables in memory between cells, whatever order the cells were run in.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "objective": {
   "term": "Objective",
   "short": "What an optimization tries to make as small or as large as possible, such as the total cost.",
@@ -682,6 +778,12 @@
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "order-of-magnitude": {
+  "term": "Order of magnitude",
+  "short": "The power of ten a quantity sits at; two quantities are an order of magnitude apart when one is about ten times the other.",
+  "lesson": "K1",
+  "href": "k01-units.html"
  },
  "overnight-cost": {
   "term": "Overnight cost",
@@ -712,6 +814,12 @@
   "short": "A power plant that runs only in the hours of highest demand, because it starts quickly but is expensive to run.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "percentile": {
+  "term": "Percentile",
+  "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
+  "lesson": "K5",
+  "href": "k05-probability-statistics.html"
  },
  "period-weight": {
   "term": "Period weight",
@@ -785,6 +893,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "random-seed": {
+  "term": "Random seed",
+  "short": "A fixed starting number for a random-number generator, so a random draw comes out the same on every run.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "rocof": {
   "term": "Rate of change of frequency",
   "short": "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second.",
@@ -809,6 +923,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "real-rate": {
+  "term": "Real rate",
+  "short": "An interest or discount rate with inflation taken out, used with costs stated in one year's dollars.",
+  "lesson": "K3",
+  "href": "k03-discounting.html"
+ },
  "rebound-effect": {
   "term": "Rebound effect",
   "short": "Part of an efficiency saving taken back because the cheaper service gets used more.",
@@ -826,6 +946,12 @@
   "short": "A feedback loop with an even number of negative links, in which a change feeds itself, as growth or as decline.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "repository": {
+  "term": "Repository",
+  "short": "A project folder together with its full history of commits, as kept by a version-control tool such as Git.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "representative-period": {
   "term": "Representative period",
@@ -875,6 +1001,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "scientific-notation": {
+  "term": "Scientific notation",
+  "short": "A way to write a number as a value from 1 to 10 times a power of ten, so very large and very small numbers are easy to compare.",
+  "lesson": "K1",
+  "href": "k01-units.html"
+ },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
   "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
@@ -904,6 +1036,12 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "staging-area": {
+  "term": "Staging area",
+  "short": "Git's list of changes picked for the next commit: git add puts a file's current version there.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "standard-deviation": {
   "term": "Standard deviation",
@@ -1018,6 +1156,12 @@
   "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
   "lesson": "B3",
   "href": "b03-read-check-formulation.html"
+ },
+ "version-control": {
+  "term": "Version control",
+  "short": "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "voltage": {
   "term": "Voltage",

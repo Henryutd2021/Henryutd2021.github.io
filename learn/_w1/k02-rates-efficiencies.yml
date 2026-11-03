@@ -1,0 +1,9 @@
+# Sidecar for toolbox K2 (k02-rates-efficiencies), builder learn-w2-e (fork K2), 2026-11-03. Read by scripts/build_learn.py.
+id: k02-rates-efficiencies
+lesson: K2
+glossary:
+  - id: efficiency
+    term: Efficiency
+    def: "The share of the energy put into a plant or device that comes out in the useful form, such as electricity."
+requests:
+  - "K2 keeps a numeric answer box (numInput, with a tolerance) and the seeded practice drill view that K3 and K4 also copy; a shared LX.NumAnswer and LX.Drill would remove the copies."

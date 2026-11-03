@@ -1334,17 +1334,26 @@
  "toolbox": [
   {
    "title": "Units and orders of magnitude",
+   "ready": true,
+   "href": "k01-units.html",
    "code": "K1",
+   "id": "k01-units",
    "minutes": 10
   },
   {
    "title": "Rates and efficiencies",
+   "ready": true,
+   "href": "k02-rates-efficiencies.html",
    "code": "K2",
+   "id": "k02-rates-efficiencies",
    "minutes": 10
   },
   {
    "title": "Exponentials and discounting",
+   "ready": true,
+   "href": "k03-discounting.html",
    "code": "K3",
+   "id": "k03-discounting",
    "minutes": 15
   },
   {
@@ -1357,7 +1366,10 @@
   },
   {
    "title": "Probability and statistics",
+   "ready": true,
+   "href": "k05-probability-statistics.html",
    "code": "K5",
+   "id": "k05-probability-statistics",
    "minutes": 25
   },
   {
@@ -1375,7 +1387,10 @@
   },
   {
    "title": "Git and reproducible notebooks",
+   "ready": true,
+   "href": "k08-git-notebooks.html",
    "code": "K8",
+   "id": "k08-git-notebooks",
    "minutes": 20
   }
  ],
