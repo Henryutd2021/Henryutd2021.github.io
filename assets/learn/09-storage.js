@@ -6,8 +6,8 @@
 //
 // The day: 9 June 2025, cut from the year by local date (Central daylight time, UTC-5) as lesson 0 does, and scaled the
 // same way: demand = shape x 450 MW, wind = shape x 150 MW, solar = shape x 200 MW, each rounded to whole MW. Chosen on
-// 2026-11-02 as the 2025 day (no filled or frozen hours) with the longest midday surplus of sun (9 hours) and an evening
-// that needs the peaker (3 hours) under these rules.
+// 2026-11-02 as the 2025 day (no filled or frozen hours) with the longest midday surplus of sun (9 hours, 08:00-17:00) and an
+// evening that needs the peaker (3 hours, 20:00-23:00) under these rules. Hour t runs from t:00 to (t+1):00.
 // The town without a battery (closed form, one hour at a time; no ramp limit in this lesson): the nuclear plant runs
 // flat at 100 MW (lesson 0); gap = demand - nuclear - wind - sun. A gap below zero is spilled wind and sun; otherwise
 // the combined-cycle ($40/MWh, up to 150 MW) fills it, then the peaker ($100/MWh, up to 100 MW).
@@ -95,7 +95,33 @@
   }
   // a battery's state of charge at the end of each hour, for drawing: [0 at the start, then 24 values]
   function socLine(soc) { return [0].concat(soc); }
-  var model = { HOURS: HOURS, TIE: TIE, prepare: prepare, hour: hour, cost: cost, simulate: simulate, buildLP: buildLP, parseLP: parseLP, socLine: socLine };
+  // clock times: hour t runs from hm(t) to hm(t + 1); hm(24) = "24:00"
+  function hm(t) { return (t < 10 ? "0" : "") + t + ":00"; }
+  // the day's windows as clock intervals: the spilled-sun hours (midday), the hours before them (overnight) and the
+  // evening from the hour before the first peaker hour to the end of the last one
+  function windows(W) {
+    var sp = [], pk = [];
+    W.marginal.forEach(function (m, t) { if (m === "spill") sp.push(t); if (m === "pk") pk.push(t); });
+    var s0 = sp[0], s1 = sp[sp.length - 1], p0 = pk[0], p1 = pk[pk.length - 1];
+    return { night: [0, s0], mid: [s0, s1 + 1], eve: [p0 - 1, p1 + 1], spill: [s0, s1 + 1], peak: [p0, p1 + 1],
+             label: function (w) { return hm(w[0]) + "–" + hm(w[1]); } };
+  }
+  // the first clock time at which a schedule's state of charge reaches E (the end of that hour)
+  function fullAt(soc, E) { for (var t = 0; t < soc.length; t++) if (soc[t] >= E - 1e-6) return hm(t + 1); return null; }
+  // step 1's question: how long can P MW drain E MWh? Options and the feedback for each (numbers from the ratings)
+  function hoursQuiz(B) {
+    var h = B.E / B.P, q = B.E / 0.25;
+    return {
+      options: [{ value: "a", label: "15 minutes" }, { value: "b", label: h + " hours" }, { value: "c", label: B.P + " hours" }, { value: "d", label: B.E + " hours" }], answer: "b",
+      feedback: { b: h + " hours: " + B.E + " MWh ÷ " + B.P + " MW. Energy = power × time, as in lesson 1.",
+                  a: "Emptying " + B.E + " MWh in 15 minutes would take " + q + " MW, " + (q / B.P) + " times this battery's " + B.P + " MW. " + B.E + " MWh ÷ " + B.P + " MW = " + h + " hours.",
+                  c: "The MW and MWh got swapped. " + B.E + " MWh ÷ " + B.P + " MW = " + h + " hours.",
+                  d: "Only at 1 MW. At " + B.P + " MW: " + B.E + " ÷ " + B.P + " = " + h + " hours." },
+      fast: q
+    };
+  }
+  var model = { HOURS: HOURS, TIE: TIE, prepare: prepare, hour: hour, cost: cost, simulate: simulate, buildLP: buildLP, parseLP: parseLP, socLine: socLine,
+                hm: hm, windows: windows, fullAt: fullAt, hoursQuiz: hoursQuiz };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -136,7 +162,9 @@
     "@media(max-width:560px){.w9-size{font-size:12.5px}}",
     ".w9-size b{font-family:var(--lx-f-mono)}.w9-size .bar{height:16px;border-radius:5px;background:var(--lx-surface-3);position:relative}",
     ".w9-size .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--lx-accent)}",
-    ".w9-size span{font-family:var(--lx-f-mono);color:var(--lx-ink-2);text-align:right;white-space:nowrap}"
+    ".w9-size span{font-family:var(--lx-f-mono);color:var(--lx-ink-2);text-align:right;white-space:nowrap}",
+    ".w9-rules{margin-top:10px}.w9-rules td.k{font-weight:600;color:var(--lx-ink);white-space:nowrap}",
+    ".w9-legtab{margin-top:10px;line-height:1.4}.w9-legtab td,.w9-legtab th{padding:3px 8px;text-align:left;vertical-align:top}.w9-legtab td:nth-child(2){font-family:var(--lx-f-body)}"
   ].join("\n");
   var COL = { spill: "var(--lx-solar)", cc: "var(--lx-cc)", pk: "var(--lx-pk)", short: "var(--lx-bad)" };
   var WHY = { spill: "sun is being spilled", cc: "the combined-cycle is the last plant needed", pk: "the peaker is the last plant needed", short: "demand is not met" };
@@ -158,6 +186,7 @@
     var tiles = H("div", { class: "w9-tiles", role: "group", "aria-label": "The day's 24 hours: price and the battery's action" }, stage);
     var lg = H("div", { class: "w9-legend", "aria-hidden": "true" }, stage);
     [["One more MWh costs, $: 0 (sun spilled)", COL.spill], [f.cc.cost + " (combined-cycle)", COL.cc], [f.peaker.cost + " (peaker)", COL.pk]].forEach(function (x) { var s = H("span", null, lg); H("i", { style: "--c:" + x[1] }, s); H("span", { text: x[0] }, s); });
+    H("span", { text: "Each tile is the hour that starts at its label." }, lg);
     var socBox = H("div", { class: "w9-soc" }, stage);
     var lg2 = H("div", { class: "w9-legend", "aria-hidden": "true" }, stage);
     var alt = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "Text version of the day" }, alt); var altBody = H("div", { class: "lx-scroll-x" }, alt);
@@ -201,8 +230,8 @@
         if (a < 0) b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 4v14M6 12l6 6 6-6"/></svg>';
         if (a > 0) b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 20V6M6 12l6-6 6 6"/></svg>';
         b.disabled = mode === "off";
-        b.setAttribute("aria-label", hh(t) + ": one more MWh costs $" + W.price[t] + " (" + WHY[W.marginal[t]] + (W.marginal[t] === "spill" ? ", " + Math.round(-W.gap[t]) + " MW" : "") + "). " +
-          (mode === "plan" ? "Battery: " + (a < 0 ? "charging " + f1(r.ch) + " MW" : a > 0 ? "discharging " + f1(r.dis) + " MW" : "idle") + ". Press to change." : "Press for details."));
+        b.setAttribute("aria-label", hm(t) + " to " + hm(t + 1) + ": one more MWh costs $" + W.price[t] + " (" + WHY[W.marginal[t]] + (W.marginal[t] === "spill" ? ", " + Math.round(-W.gap[t]) + " MW" : "") + "). " +
+          (mode === "look" ? "Press for details." : "Your battery: " + (a < 0 ? "charging " + f1(r.ch) + " MW" : a > 0 ? "discharging " + f1(r.dis) + " MW" : "idle") + ". Press to change your schedule."));
       });
       chips.innerHTML = "";
       if (mode === "plan" || mode === "best") {
@@ -220,12 +249,13 @@
       // text version
       altBody.innerHTML = "";
       var tb = H("table", { class: "lx-mini-table" }, altBody), tr = H("tr", null, H("thead", null, tb));
-      ["Hour", "Demand", "Wind", "Sun", "Price $/MWh", "Your battery", "Stored MWh"].concat(best ? ["Best: charge", "Best: discharge"] : []).forEach(function (x) { H("th", { scope: "col", text: x }, tr); });
+      ["Hour", "Demand, MW", "Wind, MW", "Sun, MW", "Price, $/MWh", "Your battery, MW", "Your stored, MWh"].concat(best ? ["Best: charge, MW", "Best: discharge, MW", "Best: stored, MWh"] : []).forEach(function (x) { H("th", { scope: "col", text: x }, tr); });
       var bd = H("tbody", null, tb);
       you.hours.forEach(function (r, t) {
         var row = H("tr", null, bd);
-        [hh(t), W.demand[t], W.wind[t], W.solar[t], W.price[t], r.act < 0 ? "charge " + f1(r.ch) : r.act > 0 ? "discharge " + f1(r.dis) : "idle", f1(r.soc)].concat(best ? [f1(best.ch[t]), f1(best.dis[t])] : []).forEach(function (x) { H("td", { text: String(x) }, row); });
+        [hm(t) + "–" + hm(t + 1), W.demand[t], W.wind[t], W.solar[t], W.price[t], r.act < 0 ? "charge " + f1(r.ch) : r.act > 0 ? "discharge " + f1(r.dis) : "idle", f1(r.soc)].concat(best ? [f1(best.ch[t]), f1(best.dis[t]), f1(best.soc[t])] : []).forEach(function (x) { H("td", { text: String(x) }, row); });
       });
+      H("p", { class: "lx-hint", text: "Each row is one hour, so a battery running at " + B.P + " MW for the hour moves " + B.P + " MWh. Stored energy is at the end of the hour." }, altBody);
       return you;
     }
     if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(socBox)) paint(); }).observe(socBox);
@@ -247,9 +277,8 @@
       { text: "Prairie Town is adding a battery rated " + B.P + " MW and " + B.E + " MWh. The MW say how fast it charges or discharges; the MWh say how much it holds. Flat out, how long can it discharge?",
         build: function (act, api) {
           mode = "look"; hook = null; stage.hidden = true;
-          var pr = LX.Predict(act, { id: "w9-hours", q: "", title: false, fresh: true,
-            options: [{ value: "a", label: "15 minutes" }, { value: "b", label: (B.E / B.P) + " hours" }, { value: "c", label: (B.P) + " hours" }, { value: "d", label: B.E + " hours" }], answer: "b",
-            feedback: { b: (B.E / B.P) + " hours: " + B.E + " MWh ÷ " + B.P + " MW. Energy = power × time, as in lesson 1.", a: "That would need four times the power. " + B.E + " MWh ÷ " + B.P + " MW = " + (B.E / B.P) + " hours.", c: "The MW and MWh got swapped. " + B.E + " MWh ÷ " + B.P + " MW = " + (B.E / B.P) + " hours.", d: "Only at 1 MW. At " + B.P + " MW: " + B.E + " ÷ " + B.P + " = " + (B.E / B.P) + " hours." },
+          var hq = hoursQuiz(B);
+          var pr = LX.Predict(act, { id: "w9-hours", q: "", title: false, fresh: true, options: hq.options, answer: hq.answer, feedback: hq.feedback,
             onPick: function () { pr.reveal("That ratio is the battery's duration: a " + (B.E / B.P) + "-hour battery."); api.done(); } });
         } },
       { text: "Batteries lose some energy as heat. This one returns " + Math.round(B.eta * 100) + "% of what goes in: its [[round-trip-efficiency|round-trip efficiency]]. Charge it for one hour at full power.",
@@ -268,11 +297,12 @@
         } },
       { text: "Here is " + W.dateLabel + " (real Southwest Power Pool shapes, scaled to the town). Each hour shows what one more MWh costs: the last plant needed, as in lesson 8. When should the battery charge?",
         build: function (act, api) {
-          mode = "look"; stage.hidden = false; hook = function (e) { if (e.look != null) sawB(api, hh(e.look) + ": one more MWh costs **$" + W.price[e.look] + "** because " + WHY[W.marginal[e.look]] + (W.marginal[e.look] === "spill" ? " (" + (-W.gap[e.look]) + " MW)." : ".")); };
+          mode = "look"; stage.hidden = false; hook = function (e) { if (e.look != null) sawB(api, hm(e.look) + " to " + hm(e.look + 1) + ": one more MWh costs **$" + W.price[e.look] + "** because " + WHY[W.marginal[e.look]] + (W.marginal[e.look] === "spill" ? " (" + (-W.gap[e.look]) + " MW)." : ".")); };
           paint();
+          var win = windows(W);
           var pr = LX.Predict(act, { id: "w9-when", q: "", title: false, fresh: true,
-            options: [{ value: "night", label: "Overnight (00–07)" }, { value: "mid", label: "Midday (08–16)" }, { value: "eve", label: "Evening (19–22)" }], answer: "mid",
-            feedback: { mid: "Midday: the sun gives more than the town needs, so charging uses power that would be spilled. It costs $0.", night: "At night the combined-cycle makes every extra MWh, at $" + f.cc.cost + ". Midday sun that would be spilled costs $0.", eve: "The evening is when the battery should give power back: the peaker is running." },
+            options: [{ value: "night", label: "Overnight (" + win.label(win.night) + ")" }, { value: "mid", label: "Midday (" + win.label(win.mid) + ")" }, { value: "eve", label: "Evening (" + win.label(win.eve) + ")" }], answer: "mid",
+            feedback: { mid: "Midday: the sun gives more than the town needs. Storing that spare sun costs $0; charging faster than the sun spills takes gas at $" + f.cc.cost + ".", night: "At night the combined-cycle makes every extra MWh, at $" + f.cc.cost + ". Midday sun that would be spilled costs $0.", eve: "The evening is when the battery should give power back: the peaker is running." },
             onPick: function () { pr.reveal("Tap any hour on the strip to see why its price is what it is."); api.done(); } });
         } },
       { text: "Your turn. Tap an hour to cycle Charge, Discharge, Idle; each runs at the full " + B.P + " MW. The battery starts empty. Make the town's day as cheap as you can.",
@@ -292,7 +322,14 @@
         } },
       { text: "Now ask a [[solver|solver]] for the best schedule. It plans all 24 hours at once as a [[linear-program|linear program]] (lesson 10 writes one down) and may charge at part power.",
         build: function (act, api) {
-          mode = "best"; hook = null; stage.hidden = false;
+          mode = "best"; stage.hidden = false;
+          // the comparison, refreshed when the reader changes their schedule after the solve
+          var compare = function () {
+            if (!best) return;
+            var you = simulate(W, B, plan, V), pct = best.save > 0 ? Math.round(you.totals.save / best.save * 100) : 0, w = windows(W);
+            sawB(api, "Best: **" + usd(best.save) + "**; yours: " + usd(you.totals.save) + " (" + pct + "%). The solver stores only spilled sun, at part power where the spill is small, then discharges from " + hm(w.eve[0]) + " to " + hm(w.eve[1]) + ".");
+          };
+          hook = function (e) { if (e.plan != null) compare(); };
           var stl = LX.SolverStatus(act);
           var b = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Find the best schedule" }, act);
           b.addEventListener("click", function () {
@@ -300,9 +337,7 @@
             solveBest(B.E).then(function (o) {
               b.disabled = false; if (!o) { stl.set({ status: "error" }); return; }
               stl.set(o.precomputed ? "" : o); if (o.precomputed) stl.el.textContent = "The solver could not load here; showing the precomputed best schedule.";
-              best = o; var you = paint(); api.done();
-              var pct = o.save > 0 ? Math.round(you.totals.save / o.save * 100) : 0;
-              sawB(api, "Best: **" + usd(o.save) + "**; yours: " + usd(you.totals.save) + " (" + pct + "%). The solver charges only from spilled sun, matching each hour's spill at part power, then discharges into the peaker's hours.");
+              best = o; paint(); api.done(); compare();
             });
           });
           paint();
@@ -318,7 +353,9 @@
                 if (!o) return; tried[h] = o; b.setAttribute("aria-pressed", "true"); draw();
                 var n = Object.keys(tried).length; if (n >= 3) api.done();
                 var hs = Object.keys(tried).map(Number).sort(function (a, c) { return a - c; }), lo = hs[0], hi = hs[hs.length - 1];
-                if (n >= 2) sawB(api, "From " + lo + " to " + hi + " hours the saving goes from " + usd(tried[lo].save) + " to " + usd(tried[hi].save) + ", but per MWh of storage it falls from " + usd(tried[lo].save / (B.P * lo)) + " to " + usd(tried[hi].save / (B.P * hi)) + ". On this day there is only so much spilled sun and so many peaker hours.");
+                var pl = tried[lo].save / (B.P * lo), ph = tried[hi].save / (B.P * hi);
+                if (n >= 2) sawB(api, "From " + lo + " to " + hi + " hours the saving goes from " + usd(tried[lo].save) + " to " + usd(tried[hi].save) + (ph > pl - 0.5 ? ", still " + usd(ph) + " per MWh of storage: every stored MWh replaces peaker output." :
+                  ", but per MWh of storage it falls from " + usd(pl) + " to " + usd(ph) + ". Spilled sun runs out, and " + B.P + " MW caps how much peaker it can replace."));
               });
             });
           });
@@ -358,21 +395,39 @@
     var f = town.fleet, B = D.battery, P = D.precomputed, best = P[String(B.E)];
     // 1 formulate it (LX.FormulateBox, components/formulate.js)
     var tag = function (t) { return ' &nbsp;<span class="tag">' + t + "</span>"; };
-    LX.FormulateBox(H("div", { class: "lx-xcard" }, host), {
+    var fcard = H("div", { class: "lx-xcard" }, host);
+    LX.FormulateBox(fcard, {
       title: "Formulate it: the battery's day in words",
       lede: "The same three parts as every optimization model, plus the data it is given.",
       parts: [
         { k: "Decisions", color: "var(--lx-tier-2)", text: "For each hour: how much the battery charges and discharges, and how much it then holds; plus the gas plants and spilled sun, as in lesson 0." },
         { k: "Goal", color: "var(--lx-good)", text: "Make the town's running cost for the day as small as possible. The saving against no battery is the battery's value: " + usd(best.save) + " on " + W.dateLabel + "." },
-        { k: "Rules", color: "var(--lx-warn)", text: "Charge and discharge at most " + B.P + " MW. Hold between 0 and " + B.E + " MWh. Stored energy grows by " + Math.round(B.eta * 100) + "% of what goes in. Supply equals demand every hour." },
+        { k: "Rules", color: "var(--lx-warn)", text: "Five rules hold in every hour, one per row of the table below." },
         { k: "Given", color: "var(--lx-ink-3)", text: "Demand, wind and sun for each hour; plant sizes and costs; the battery's ratings. It starts the day empty." }
       ],
       symbols: "min Σ<sub>t</sub> ( " + f.cc.cost + " cc<sub>t</sub> + " + f.peaker.cost + " pk<sub>t</sub> )<br>" +
         "cc<sub>t</sub> + pk<sub>t</sub> − sp<sub>t</sub> + dis<sub>t</sub> − ch<sub>t</sub> = gap<sub>t</sub>" + tag("balance") + "<br>" +
-        "soc<sub>t</sub> = soc<sub>t−1</sub> + " + B.eta + " ch<sub>t</sub> − dis<sub>t</sub>, &nbsp;soc<sub>−1</sub> = 0" + tag("state of charge") + "<br>" +
-        "0 ≤ ch<sub>t</sub>, dis<sub>t</sub> ≤ " + B.P + ", &nbsp;0 ≤ soc<sub>t</sub> ≤ " + B.E + tag("power and energy") + "<br>" +
-        "0 ≤ cc<sub>t</sub> ≤ " + f.cc.mw + ", 0 ≤ pk<sub>t</sub> ≤ " + f.peaker.mw + ", 0 ≤ sp<sub>t</sub> ≤ wind<sub>t</sub> + sun<sub>t</sub>"
+        "soc<sub>t</sub> = soc<sub>t−1</sub> + " + B.eta + " ch<sub>t</sub> − dis<sub>t</sub>, &nbsp;soc<sub>−1</sub> = 0" + tag("losses") + "<br>" +
+        "0 ≤ ch<sub>t</sub>, dis<sub>t</sub> ≤ " + B.P + tag("power") + "<br>" +
+        "0 ≤ soc<sub>t</sub> ≤ " + B.E + tag("energy") + "<br>" +
+        "0 ≤ cc<sub>t</sub> ≤ " + f.cc.mw + ", 0 ≤ pk<sub>t</sub> ≤ " + f.peaker.mw + tag("plants") + "<br>" +
+        "0 ≤ sp<sub>t</sub> ≤ wind<sub>t</sub> + sun<sub>t</sub>" + tag("spill") +
+        '<table class="lx-mini-table w9-legtab"><thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th></tr></thead><tbody>' +
+        [["t", "the hour, 0 to 23 (1 MW for one hour = 1 MWh)", "–"], ["cc<sub>t</sub>, pk<sub>t</sub>", "combined-cycle and peaker output", "MW"],
+         ["sp<sub>t</sub>", "spilled wind and sun", "MW"], ["ch<sub>t</sub>, dis<sub>t</sub>", "battery charging and discharging", "MW"],
+         ["soc<sub>t</sub>", "energy stored at the end of hour t", "MWh"], ["gap<sub>t</sub>", "demand minus nuclear, wind and sun", "MW"]]
+          .map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td></tr>"; }).join("") + "</tbody></table>"
     });
+    // the rules, one per row (before the symbols box)
+    var rt = H("table", { class: "lx-facts w9-rules" }), rh = H("tr", null, H("thead", null, rt)), rb = H("tbody", null, rt);
+    ["Rule", "In words"].forEach(function (x) { H("th", { scope: "col", text: x }, rh); });
+    [["Power", "Charge or discharge at most " + B.P + " MW."], ["Energy", "Hold between 0 and " + B.E + " MWh; start the day empty."],
+     ["Losses", "Stored energy grows by " + Math.round(B.eta * 100) + "% of what goes in."], ["Balance", "Supply equals demand; spare wind and sun may be spilled."],
+     ["Plants", "Gas output stays within each plant's size: " + f.cc.mw + " and " + f.peaker.mw + " MW."]].forEach(function (r) {
+      var tr = H("tr", null, rb); H("td", { class: "k", text: r[0] }, tr); H("td", { text: r[1] }, tr);
+    });
+    var symBox = fcard.querySelector(".lx-form-symbols");
+    fcard.insertBefore(rt, symBox);
     // 2 comparison table: four batteries on the same day
     var rows = D.durations.map(function (h) {
       var o = P[String(B.P * h)];
@@ -387,7 +442,7 @@
       rows: rows,
       sorts: [{ label: "By size", order: rows.map(function (r) { return r.key; }), note: "Each battery is solved for its best schedule. Doubling from " + D.durations[2] + " to " + D.durations[3] + " hours adds only " + usd(P[String(B.P * D.durations[3])].save - P[String(B.P * D.durations[2])].save) + "." },
               { label: "By value per MWh", order: rows.slice().sort(function (a, b) { return b.per.value - a.per.value; }).map(function (r) { return r.key; }), ranked: true,
-                note: "<b>The first hours of storage earn the most.</b> Later ones find no spilled sun left to store and no peaker left to replace." }]
+                note: "<b>The first hours of storage earn the most.</b> Later ones find little spilled sun left to store, and the " + B.P + " MW limit caps how much peaker output they can replace." }]
     });
     // 3 causal chain with the best schedule's numbers
     var sp = W.gap.filter(function (x) { return x < 0; }).reduce(function (a, x) { return a - x; }, 0), pkMWh = W.gap.reduce(function (a, x) { return a + Math.max(0, Math.min(f.peaker.mw, x - f.cc.mw)); }, 0);
