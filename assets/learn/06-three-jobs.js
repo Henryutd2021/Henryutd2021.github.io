@@ -15,7 +15,7 @@
 // contested pairing (wind plus storage as firm capacity) gets both strongest cases.
 //
 // Lesson-local components (for the coordinator to promote): JobSorter (i-card-sort with several bins per card, as
-// toggles), Scatter (a two-measure dot chart with tappable points), Steelman (two strongest cases, opened in turn).
+// toggles), Steelman (two strongest cases, opened in turn). The dot chart is the shared LX.Scatter (components/scatter.js).
 (function () {
   "use strict";
 
@@ -130,13 +130,19 @@
       { text: "Each dot is a plant: capacity factor across, firm share up. Tap the plant that runs the least of the year but counts the most at the peak.",
         build: function (act, api) {
           var pts = TECH.filter(function (t) { return t.cf != null && t.firm != null && t.key !== "hydro"; });
-          var sc = Scatter(act, pts, function (k) {
+          var sc = LX.Scatter(act, { points: pts.map(function (t) {
+              return { key: t.key, label: t.label, x: t.cf, y: t.firm, color: t.color,
+                       aria: t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel, text: t.label + ": capacity factor " + pct(t.cf) + "; firm share " + t.firmLabel + "." }; }),
+            x: { ticks: [0, 0.25, 0.5, 0.75, 1], fmt: function (v) { return v * 100 + "%"; }, title: "Capacity factor, U.S. 2025 (how much of the year it runs)", titleN: "Capacity factor, U.S. 2025" },
+            y: { ticks: [0, 0.25, 0.5, 0.75, 1], fmt: function (v) { return v * 100 + "%"; }, title: "Firm share, PJM 2028/29" },
+            diagonal: { label: "firm share = capacity factor", labelN: "firm share = CF", at: [0.7, 0.58], atN: [0.55, 0.19] },
+            aria: "Capacity factor (across) against firm share (up) for five technologies", onPick: function (k) {
             var t = byKey[k], ok = k === "pk";
             keep("scatter", k);
             var pr = !pred ? "" : pred === D.predict.answer ? " Your prediction was right too." : " Your prediction, " + byKey[pred].label.toLowerCase() + ", counts " + byKey[pred].firmLabel + ".";
             if (ok) { api.done(); api.saw("Right: the gas peaker ran only " + pct(t.cf) + " of 2025, yet PJM counts " + t.firmLabel + " of its MW. Solar is the opposite: " + pct(byKey.solar.cf) + " against " + byKey.solar.firmLabel + ". Capacity factor and firm share measure different jobs." + pr); }
             else api.saw(t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel + ". Look further left, near the top.", true);
-          });
+          } });
           void sc;
         } },
       { text: "Now sort. Mark the jobs each technology does well; some do more than one. Then check your sort against the evidence.",
@@ -195,49 +201,13 @@
       if (i === 0) { click(".lx6-job", 0); click(".lx6-job", 1); click(".lx6-job", 2); }
       if (i === 1) click(".lx-choice", 2);
       if (i === 2) click(".lx6-chips .lx-chip", 2);
-      if (i === 3) { var d = cards.el.querySelectorAll(".lx6-dot"); if (d[2]) d[2].dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+      if (i === 3) { var d = cards.el.querySelectorAll(".lx-scatter-dot"); if (d[2]) d[2].dispatchEvent(new MouseEvent("click", { bubbles: true })); }
       if (i === 4) click(".lx6-sorter .lx-btn");
       if (i === 5) { click(".lx6-side .lx-btn", 0); click(".lx6-side .lx-btn", 1); }
       if (i === 6) click(".lx-choice", 1);
       return { view: "step " + (i + 1) };
     }, cards);
     buildExplain(D, byKey, jobBy);
-  }
-
-  // ---- lesson-local: a dot chart of two measures with tappable points
-  function Scatter(host, pts, onPick) {
-    var cw = host.clientWidth || 560, phone = cw < 520;   // on phones the drawing is laid out at its real width, so labels stay legible
-    var Wd = phone ? Math.max(300, cw) : 560, Hh = phone ? 300 : 330, m = { l: 46, r: 16, t: 14, b: 40 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b;
-    var svg = S("svg", { viewBox: "0 0 " + Wd + " " + Hh, class: "lx6-scatter", role: "group", "aria-label": "Capacity factor (across) against firm share (up) for five technologies" }, host);
-    var x = function (v) { return m.l + v * iw; }, y = function (v) { return m.t + ih - v * ih; };
-    [0, 0.25, 0.5, 0.75, 1].forEach(function (v) {
-      S("path", { d: "M" + m.l + " " + y(v) + "H" + (Wd - m.r), stroke: "var(--lx-line)" }, svg);
-      S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end", class: "lx6-ax" }, svg).textContent = v * 100 + "%";
-      S("text", { x: x(v), y: m.t + ih + 16, "text-anchor": "middle", class: "lx6-ax" }, svg).textContent = v * 100 + "%";
-    });
-    S("path", { d: "M" + x(0) + " " + y(0) + "L" + x(1) + " " + y(1), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 4" }, svg);
-    S("text", { x: phone ? x(0.55) : x(0.7), y: phone ? y(0.19) : y(0.58), "text-anchor": "start", class: "lx6-ax" }, svg).textContent = phone ? "firm share = CF" : "firm share = capacity factor";
-    S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "lx6-axt" }, svg).textContent = phone ? "Capacity factor, U.S. 2025" : "Capacity factor, U.S. 2025 (how much of the year it runs)";
-    S("text", { x: 12, y: m.t + ih / 2, "text-anchor": "middle", class: "lx6-axt", transform: "rotate(-90 12 " + (m.t + ih / 2) + ")" }, svg).textContent = "Firm share, PJM 2028/29";
-    var dots = {};
-    pts.forEach(function (t) {
-      var g = S("g", { class: "lx6-dot", tabindex: 0, role: "button", "aria-label": t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel, "aria-pressed": "false" }, svg);
-      S("circle", { cx: x(t.cf), cy: y(t.firm), r: 11, fill: t.color, stroke: "var(--lx-surface)", "stroke-width": 2 }, g);
-      // label to the right of the dot if it fits, else to the left, else above it (centred and kept inside the chart)
-      var tw = t.label.length * 7.4, px = x(t.cf), py = y(t.firm), lx, ly = py + 5, an;
-      if (px + 16 + tw <= Wd - m.r) { lx = px + 16; an = "start"; }
-      else if (px - 16 - tw >= m.l) { lx = px - 16; an = "end"; }
-      else { lx = Math.max(m.l + tw / 2, Math.min(Wd - m.r - tw / 2, px)); ly = py - 17; an = "middle"; }
-      S("text", { x: lx, y: ly, "text-anchor": an, class: "lx6-dl" }, g).textContent = t.label;
-      function pick() { Object.keys(dots).forEach(function (k) { dots[k].setAttribute("aria-pressed", k === t.key ? "true" : "false"); }); onPick(t.key); }
-      g.addEventListener("click", pick);
-      g.addEventListener("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pick(); } });
-      dots[t.key] = g;
-    });
-    var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version" }, alt);
-    var ul = H("ul", null, alt);
-    pts.forEach(function (t) { H("li", { text: t.label + ": capacity factor " + pct(t.cf) + "; firm share " + t.firmLabel + "." }, ul); });
-    return { el: svg };
   }
 
   // ---- lesson-local: sort cards into several bins at once (toggles), then compare with the evidence

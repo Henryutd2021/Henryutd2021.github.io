@@ -20,9 +20,9 @@
 // Every number the page states comes from this model or from the sourced anchors; _tests/learn/test_02-demand.js checks
 // them against the .qmd, and checks the clock against the separately stored days of town_days.json.
 //
-// Lesson-local components (candidates for the shared library, see learn/_w1/02-demand.yml): LineChart (an hourly line
-// and area chart with shading, marks, a tooltip and a text version; the "i-curve-viewer" of the curriculum) and YearDots
-// (8,760 hours as dots on a canvas that re-sort into a load-duration curve, with a month highlight and a threshold line).
+// The hourly line and area charts (the curriculum's "i-curve-viewer") are drawn by the shared LX.Plot (components/plot.js,
+// W1 integration); hourly() below only turns this lesson's series into its spec. Lesson-local: YearDots (8,760 hours as
+// dots on a canvas that re-sort into a load-duration curve, with a month highlight and a threshold line).
 (function () {
   "use strict";
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -133,91 +133,42 @@
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view
-  var LX = window.LX, H = LX.H, S = LX.S, LESSON = "02-demand";
+  var LX = window.LX, H = LX.H, LESSON = "02-demand";
   var pct = function (f, d) { return num(f * 100, d == null ? 0 : d) + "%"; };
 
-  // ---- LineChart: hourly lines and areas, shading, marks, hover, a text version (lesson-local "i-curve-viewer")
-  function LineChart(host, o) {
-    var box = H("div", { class: "t2-cv" }, host);
-    if (o.title) var ttl = H("p", { class: "t2-cv-t" }, box);
-    var wrap = H("div", { class: "t2-chart" }, box), tip = H("div", { class: "lx-chart-tip", hidden: true, "aria-hidden": "true" }, wrap);
-    var legend = H("div", { class: "lx-legend" }, box);
-    var alt = H("details", { class: "lx-textalt" }, box); H("summary", { text: "Text version of the chart" }, alt);
-    var altBox = H("div", null, alt), svg = null;
-    function render() {
-      var series = o.series().filter(function (s) { return !s.hidden; }), n = o.n();
-      if (ttl) ttl.innerHTML = LX.rich(o.title());
-      var W = Math.max(280, wrap.clientWidth || 640), Hh = W < 480 ? 220 : 260, all = [];
+  // ---- hourly charts on the shared LX.Plot: one value per hour (drawn mid-hour), a MW axis from zero (or below it,
+  //      shaded), hour shading, marks, a readout and the text version as a table (a day's chart marks every 12 hours on
+  //      phones). o: n(), title(), label(), series()
+  //      [{label, color, values, hidden, area, dash, width}], shade() [[from, to, label]], xticks() [{at | i, label}],
+  //      marks() [{i, v, label, color, pos, vline, n}], tipHead(i), altHead, yMax, yMin
+  function hourly(host, o) {
+    var P = LX.Plot(host, { caption: !!o.title, box: true, text: "Text version of the chart" });
+    function spec() {
+      var series = o.series().filter(function (s) { return !s.hidden; }), n = o.n(), all = [];
       series.forEach(function (s) { all = all.concat(s.values); });
       var yMax = o.yMax || niceUp(Math.max.apply(null, all)), lo = Math.min.apply(null, all.concat([o.yMin || 0]));
       var step = (yMax - lo) <= 300 ? 50 : (yMax - lo) <= 800 ? 100 : 200, yMin = lo < 0 ? -Math.ceil(-lo / step - 1e-9) * step : 0;
-      var m = { l: 44, r: 10, t: 22, b: 26 }, iw = W - m.l - m.r, ih = Hh - m.t - m.b;
-      var x = function (i) { return m.l + (i + 0.5) / n * iw; }, xb = function (i) { return m.l + i / n * iw; }, y = function (v) { return m.t + (yMax - v) / (yMax - yMin) * ih; };
-      if (svg) svg.remove();
-      svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, width: W, height: Hh, role: "img", "aria-label": o.label() }); wrap.insertBefore(svg, tip);
-      (o.shade ? o.shade() : []).forEach(function (sh) {
-        S("rect", { x: xb(sh[0]), y: m.t, width: xb(sh[1]) - xb(sh[0]), height: ih, fill: "var(--lx-surface-2)" }, svg);
-        if (sh[2]) S("text", { x: (xb(sh[0]) + xb(sh[1])) / 2, y: m.t + 12, "text-anchor": "middle", class: "t2-ax" }, svg).textContent = sh[2];
-      });
-      if (yMin < 0) {
-        S("rect", { x: m.l, y: y(0), width: iw, height: y(yMin) - y(0), fill: "var(--lx-bad-soft)", opacity: 0.6 }, svg);
-        S("text", { x: m.l + 6, y: y(yMin) - 6, class: "t2-ax" }, svg).textContent = "Below zero: more solar than demand";
-      }
-      for (var v = yMin; v <= yMax + 1e-9; v += step) {
-        S("path", { d: "M" + m.l + " " + y(v) + "H" + (W - m.r), stroke: v === 0 ? "var(--lx-ink-3)" : "var(--lx-line)", "stroke-width": 1 }, svg);
-        S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end", class: "t2-ax" }, svg).textContent = num(v);
-      }
-      S("text", { x: m.l - 6, y: 10, "text-anchor": "end", class: "t2-ax" }, svg).textContent = "MW";
-      o.xticks().forEach(function (tk) {
-        var xx = tk.at != null ? xb(tk.at) : x(tk.i), anchor = tk.at === 0 ? "start" : tk.at === n ? "end" : "middle";
-        S("text", { x: xx, y: Hh - 7, "text-anchor": anchor, class: "t2-ax" }, svg).textContent = tk.label;
-      });
-      series.forEach(function (s) {
-        var pts = s.values.map(function (v, i) { return x(i) + " " + y(v); });
-        if (s.area) S("path", { d: "M" + x(0) + " " + y(0) + " L" + pts.join(" L") + " L" + x(s.values.length - 1) + " " + y(0) + "Z", fill: s.color, opacity: s.area }, svg);
-        if (s.width !== 0) S("path", { d: "M" + pts.join(" L"), fill: "none", stroke: s.color, "stroke-width": s.width || 2.5, "stroke-dasharray": s.dash || null, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
-      });
-      (o.marks ? o.marks() : []).forEach(function (mk) {
-        var mx = x(mk.i), my = y(mk.v);
-        if (mk.vline) { S("path", { d: "M" + mx + " " + m.t + "V" + (m.t + ih), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 3", "stroke-width": 1.5 }, svg); }
-        if (mk.n) {
-          S("circle", { cx: mx, cy: my, r: 11, fill: "var(--lx-ink)" }, svg);
-          S("text", { x: mx, y: my + 4.5, "text-anchor": "middle", class: "t2-num" }, svg).textContent = mk.n;
-        } else if (!mk.vline || mk.dot) S("circle", { cx: mx, cy: my, r: 4.5, fill: mk.color || "var(--lx-ink)", stroke: "var(--lx-surface)", "stroke-width": 2 }, svg);
-        if (mk.label) {
-          var pos = mk.pos || (mk.vline ? "bottom" : "above"), ty = pos === "bottom" ? m.t + ih - 8 : pos === "below" ? my + 22 : my - 13, anchor, tx;
-          if (ty > m.t + ih - 4) ty = my - 13;
-          if (ty < 12) ty = my + 22;
-          if (mk.vline) { var rt = mx < m.l + iw * 0.7; anchor = rt ? "start" : "end"; tx = mx + (rt ? 6 : -6); }
-          else { anchor = mx < m.l + 70 ? "start" : mx > m.l + iw - 70 ? "end" : "middle"; tx = mx + (anchor === "start" ? -4 : anchor === "end" ? 4 : 0); }
-          S("text", { x: tx, y: ty, "text-anchor": anchor, class: "t2-mk" }, svg).textContent = mk.label;
-        }
-      });
-      var hit = S("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" }, svg);
-      function show(ev) {
-        var rr = svg.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.floor(((ev.clientX - rr.left) / rr.width * W - m.l) / iw * n)));
-        var html = "<div><b>" + LX.esc(o.tipHead(i)) + "</b></div>";
-        series.forEach(function (s) { if (s.values[i] != null) html += "<div><span>" + LX.esc(s.label) + "</span><b>" + num(s.values[i]) + " MW</b></div>"; });
-        tip.innerHTML = html; tip.hidden = false;
-        tip.style.left = Math.max(0, Math.min(rr.width - 170, x(i) / W * rr.width + 12)) + "px"; tip.style.top = "6px";
-      }
-      hit.addEventListener("pointermove", show); hit.addEventListener("pointerdown", show);
-      hit.addEventListener("pointerleave", function () { tip.hidden = true; });
-      legend.innerHTML = "";
-      series.forEach(function (s) { var sp = H("span", null, legend); H("i", { class: s.dash ? "line" : "", style: "--c:" + s.color + (s.dash ? ";border-top-color:" + s.color : "") }, sp); H("span", { text: s.label }, sp); });
-      altBox.innerHTML = "";
-      var tb = H("table", { class: "lx-mini-table" }, H("div", { class: "lx-scroll-x" }, altBox)), hr = H("tr", null, H("thead", null, tb));
-      H("th", { scope: "col", text: o.altHead || "Hour" }, hr);
-      series.forEach(function (s) { H("th", { scope: "col", text: s.label + " (MW)" }, hr); });
-      var body = H("tbody", null, tb), every = n > 48 ? 6 : 1;
-      for (var i = 0; i < n; i += every) {
-        var tr = H("tr", null, body); H("td", { text: o.tipHead(i) }, tr);
-        series.forEach(function (s) { H("td", { text: s.values[i] == null ? "" : num(s.values[i]) }, tr); });
-      }
-      if (every > 1) H("p", { class: "lx-hint", text: "Every " + every + "th hour shown." }, altBox);
+      var rows = [], every = n > 48 ? 6 : 1, xt = o.xticks().map(function (t) { return [t.at != null ? t.at : t.i + 0.5, t.label]; });
+      for (var i = 0; i < n; i += every) rows.push([o.tipHead(i)].concat(series.map(function (s) { return s.values[i] == null ? "" : num(s.values[i]); })));
+      return {
+        caption: o.title ? o.title() : "", aria: o.label(),
+        x: { min: 0, max: n, ticks: xt, ticksN: n === 24 ? xt.filter(function (t) { return t[0] % 12 === 0; }) : xt },
+        y: { min: yMin, max: yMax, step: step, fmt: function (v) { return num(v); }, unit: "MW", zero: true },
+        margin: { l: 44, r: 10, t: 22, b: 26 },
+        spans: (o.shade ? o.shade() : []).map(function (sh) { return { x0: sh[0], x1: sh[1], label: sh[2] }; }),
+        hbands: yMin < 0 ? [{ y0: yMin, y1: 0, color: "var(--lx-bad-soft)", op: 0.6, label: "Below zero: more solar than demand" }] : [],
+        lines: series.map(function (s) { return { values: s.values, x0: 0.5, color: s.color, width: s.width == null ? 2.5 : s.width, dash: s.dash, area: s.area }; }),
+        marks: (o.marks ? o.marks() : []).map(function (mk) { return { x: mk.i + 0.5, y: mk.v, label: mk.label, color: mk.color, kind: "dot", n: mk.n, pos: mk.pos, vline: mk.vline, dot: mk.dot }; }),
+        legend: series.map(function (s) { return { label: s.label, color: s.color, dash: !!s.dash }; }),
+        tip: function (x) {
+          var i = Math.max(0, Math.min(n - 1, Math.floor(x)));
+          return "<div><b>" + LX.esc(o.tipHead(i)) + "</b></div>" + series.map(function (s) { return s.values[i] == null ? "" : "<div><span>" + LX.esc(s.label) + "</span><b>" + num(s.values[i]) + " MW</b></div>"; }).join("");
+        },
+        tipStep: 1,
+        text: { head: [o.altHead || "Hour"].concat(series.map(function (s) { return s.label + " (MW)"; })), rows: rows, note: every > 1 ? "Every " + every + "th hour shown." : null }
+      };
     }
-    if (window.ResizeObserver) new ResizeObserver(function () { if (LX.visible(wrap)) render(); }).observe(wrap);
-    return { el: box, render: render };
+    return { el: P.box, render: function () { P.render(spec()); } };
   }
 
   // ---- YearDots: 8,760 hours as dots that re-sort into a load-duration curve (canvas; text version alongside)
@@ -308,7 +259,7 @@
     var guess = LX.progress.guess("t2-peak"), showWinter = false, wk = D.week.start - 1, solarMW = D.solar.start;
     var townSolar = data.town.fleet.solar.mw;
     // the charts, built once and moved into each step that needs them
-    var dayChart = LineChart(H("div"), {
+    var dayChart = hourly(H("div"), {
       n: function () { return 24; }, yMax: niceUp(Wd.PK),
       title: function () { return "Prairie Town's demand, hour by hour"; },
       label: function () { return "Prairie Town's demand on " + Wd.summer.label + (showWinter ? " and " + Wd.winter.label : "") + "; peak " + num(Wd.s.max) + " MW at " + hh(Wd.s.tmax) + "."; },
@@ -322,7 +273,7 @@
       },
       tipHead: function (i) { return hh(i) + "–" + hh(i + 1); }
     });
-    var weekChart = LineChart(H("div"), {
+    var weekChart = hourly(H("div"), {
       n: function () { return Wd.weeks[wk].idx.length; }, yMax: niceUp(Wd.PK),
       title: function () { return "Week " + (wk + 1) + " of " + Wd.weeks.length + ": " + weekLabel(Wd, wk) + " 2025"; },
       label: function () { var s = weekStats(Wd, wk); return "Prairie Town's demand, week of " + weekLabel(Wd, wk) + " 2025: from " + num(s.min) + " to " + num(s.max) + " MW; the weekend is shaded."; },
@@ -337,7 +288,7 @@
       altHead: "Hour"
     });
     var year = YearDots(H("div"), Wd);
-    var duckChart = LineChart(H("div"), {
+    var duckChart = hourly(H("div"), {
       n: function () { return 24; }, yMax: niceUp(Wd.PK),
       title: function () { return Wd.duckDay.label + ": demand, solar and net demand"; },
       label: function () { var k = duck(Wd, solarMW); return "With " + solarMW + " MW of solar on " + Wd.duckDay.label + ", net demand falls to " + num(k.min) + " MW at " + hh(k.tmin) + " and climbs " + num(k.ramp) + " MW from " + hh(k.rampFrom) + " to " + hh(k.rampTo) + "."; },
@@ -465,7 +416,15 @@
           sl.set(solarMW); upd();
         } }
     ];
-    LX.StepCards(live, { id: "t2-steps", steps: steps });
+    var cards = LX.StepCards(live, { id: "t2-steps", steps: steps });
+    // demo states (core.js LX.demo): "step-N" opens card N (1-7); "mid" = step 2 with the winter day added
+    LX.demo(root, function (state) {
+      var n = /^step-(\d+)$/.exec(state);
+      if (n) { cards.go(Math.max(0, Math.min(steps.length - 1, +n[1] - 1))); return { view: "step " + Math.min(steps.length, Math.max(1, +n[1])) }; }
+      if (state !== "mid") return null;
+      showWinter = true; cards.go(1);
+      return { view: "winter day" };
+    }, cards);
     root.lxLesson = { world: Wd, model: model, year: year };
     buildExplain(Wd, D, P, s0, s200);
     LX.on("t2-log", debounce(function () { buildExplain(Wd, D, P, s0, s200); }, 500));
@@ -483,7 +442,7 @@
     var c1 = H("div", { class: "lx-xcard" }, host);
     var hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "Anatomy of a hot day" }, hd); H("span", { class: "lx-hint", text: Wd.summer.label + ", real SPP shape" }, hd);
     var morn = 9, eve = 21;
-    var an = LineChart(c1, {
+    var an = hourly(c1, {
       n: function () { return 24; }, yMax: niceUp(Wd.PK),
       label: function () { return "Prairie Town's demand on " + Wd.summer.label + " with four numbered points, explained in the list below the chart."; },
       series: function () { return [{ label: "Demand", color: "var(--lx-cc)", values: Wd.summer.demand, area: 0.12 }]; },
