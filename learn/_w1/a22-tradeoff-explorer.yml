@@ -1,0 +1,27 @@
+# Sidecar for A22 (a22-tradeoff-explorer), builder learn-w2-b, 2026-11-03. Read by scripts/build_learn.py.
+id: a22-tradeoff-explorer
+lesson: A22
+glossary:
+  - id: reserve-margin
+    term: Reserve margin
+    def: "The capacity counted as available at the peak, above the year's peak demand, as a percentage of that peak."
+  - id: fixed-charge
+    term: Fixed charge
+    def: "A part of a power bill that is the same each month however much electricity the home uses."
+  - id: energy-burden
+    term: Energy burden
+    def: "The share of a household's income spent on energy bills."
+  - id: energy-security
+    term: Energy security
+    def: "Keeping energy flowing at bearable prices when a fuel, a supplier or a route is cut off."
+  - id: supply-diversity
+    term: Supply diversity
+    def: "How evenly the energy supply is spread over different sources, so that losing one does not lose most of it."
+  - id: multi-objective
+    term: Multi-objective problem
+    def: "A choice with several goals that cannot all be at their best at once."
+requests:
+  - "path.yml: A22's prerequisites are F2 and T12 (curriculum). F2 has no path.yml entry on learn-w2 yet, so the entry says after: [12]; add F2 to `after` when F2's entry lands."
+  - "A22 uses the shared planning engine (components/planengine.js, LX.townPlan: prepareYear, selectWeeks, costs, fullYearModel, weekModel, periodsOf, summarize, ceilPlan, KEYS, and ui.TECH for slider labels and colours); merged with learn-w2 at 7a00f41, no 13-capstone.js tag."
+  - "Promote: i-radar (Radar and Radar.glyph in assets/learn/a22-tradeoff-explorer.js: five-score radar with up to three series, tweened, a text-version table, small glyphs for cards) and e-stakeholders (Stakeholders: who decides, pays, benefits, as a table that becomes cards on phones)."
+  - "practice_minutes: 20 for A22 (the practice set in Check); the header badge shows it once build_learn.py prints practice minutes for every lesson."

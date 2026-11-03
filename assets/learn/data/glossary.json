@@ -299,6 +299,18 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "energy-burden": {
+  "term": "Energy burden",
+  "short": "The share of a household's income spent on energy bills.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
+ },
+ "energy-security": {
+  "term": "Energy security",
+  "short": "Keeping energy flowing at bearable prices when a fuel, a supplier or a route is cut off.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
+ },
  "energy-storage": {
   "term": "Energy storage",
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
@@ -358,6 +370,12 @@
   "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "fixed-charge": {
+  "term": "Fixed charge",
+  "short": "A part of a power bill that is the same each month however much electricity the home uses.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
  },
  "fixed-om": {
   "term": "Fixed O&M",
@@ -605,6 +623,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "multi-objective": {
+  "term": "Multi-objective problem",
+  "short": "A choice with several goals that cannot all be at their best at once.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
+ },
  "nadir": {
   "term": "Nadir",
   "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
@@ -803,6 +827,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "reserve-margin": {
+  "term": "Reserve margin",
+  "short": "The capacity counted as available at the peak, above the year's peak demand, as a percentage of that peak.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
+ },
  "reserves": {
   "term": "Reserves",
   "short": "Spare capacity that operators keep ready to cover the sudden loss of a plant or a forecast that misses.",
@@ -880,6 +910,12 @@
   "short": "An amount that builds up or drains over time, such as water in a reservoir, energy in a battery or CO₂ emitted so far.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "supply-diversity": {
+  "term": "Supply diversity",
+  "short": "How evenly the energy supply is spread over different sources, so that losing one does not lose most of it.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
  },
  "supply-stack": {
   "term": "Supply stack",
