@@ -4,3 +4,4 @@ id: 10-write-it-down
 lesson: 10
 requests:
   - "The card sort uses a fourth bin, Given (data), next to Decisions, Goal and Rules: telling parameters from decisions is the most common formulation error. The curriculum's i-formulation names three bins; keep the fourth when promoting."
+  - "Glossary (shared fix, Codex review of lesson 10, point 5): binding-constraint's definition in learn/_w1/09-storage.yml (line 25) says loosening a binding rule 'would change the answer'; in lesson 10 the CO2 cap binds at 53.65 t and raising it changes nothing. Proposed: 'A rule that holds exactly at the selected plan, with no room to spare. Loosening it may or may not improve the best cost.'"

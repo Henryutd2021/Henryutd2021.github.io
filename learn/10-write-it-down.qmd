@@ -43,7 +43,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-eyebrow">19:00 on 3 September 2025: every plan for the two gas plants, and the best one</p>
 <!-- fallback-svg:start -->
 <svg viewBox="0 0 720 400" role="img" aria-labelledby="w10-static-title">
-<title id="w10-static-title">Plans for the two gas plants at 19:00: combined-cycle output across, peaker output up. The shaded region meets every rule; the best plan is the corner x = 145 MW, y = 0 MW, costing $5,800.</title>
+<title id="w10-static-title">Plans for the two gas plants at 19:00: combined-cycle output across, peaker output up. The shaded region meets every rule; the best plan is the corner x = 145 MW, y = 0 MW, with a gas cost of $5,800.</title>
 <g><line x1="50.0" x2="50.0" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="50.0" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">0</text><line x1="159.7" x2="159.7" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="159.7" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">40</text><line x1="269.3" x2="269.3" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="269.3" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">80</text><line x1="379.0" x2="379.0" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="379.0" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">120</text><line x1="488.7" x2="488.7" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="488.7" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">160</text><line x1="598.3" x2="598.3" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="598.3" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">200</text><line x1="708.0" x2="708.0" y1="356.0" y2="14.0" stroke="var(--lx-line)"/><text x="708.0" y="376" text-anchor="middle" font-size="13" fill="var(--lx-ink-3)">240</text><line x1="50.0" x2="708.0" y1="356.0" y2="356.0" stroke="var(--lx-line)"/><text x="44" y="360.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">0</text><line x1="50.0" x2="708.0" y1="270.5" y2="270.5" stroke="var(--lx-line)"/><text x="44" y="274.5" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">40</text><line x1="50.0" x2="708.0" y1="185.0" y2="185.0" stroke="var(--lx-line)"/><text x="44" y="189.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">80</text><line x1="50.0" x2="708.0" y1="99.5" y2="99.5" stroke="var(--lx-line)"/><text x="44" y="103.5" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">120</text><line x1="50.0" x2="708.0" y1="14.0" y2="14.0" stroke="var(--lx-line)"/><text x="44" y="18.0" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">160</text><text x="708.0" y="394" text-anchor="end" font-size="13" fill="var(--lx-ink-2)">Combined-cycle x (MW)</text><text x="54" y="26" font-size="13" fill="var(--lx-ink-2)">Peaker y (MW)</text></g>
 <polygon points="447.5,356.0 461.3,356.0 461.3,183.1 383.4,142.3 173.4,142.3" fill="color-mix(in srgb, var(--lx-accent) 16%, transparent)"/>
 <line x1="50.0" y1="46.1" x2="447.5" y2="356.0" stroke="var(--lx-ink)" stroke-width="2"/>
@@ -61,7 +61,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you sort the model's parts, then move the rules and the cost line yourself.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>The hour is 19:00 of <a href="00-grid-operator.html">lesson 0</a>'s day: demand, wind and solar follow the real shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, costs, CO₂ rates and the CO₂ cap are illustrative.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Data: 19:00 of <a href="00-grid-operator.html">lesson 0</a>'s day. Demand, wind and solar follow the real Southwest Power Pool shapes of 3 September 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Illustrative: Prairie Town, its plants, running costs, CO₂ rates and the CO₂ cap.</span></p>
 ```
 :::
 
@@ -91,43 +92,42 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-The cost line $40x + 100y = C$ keeps its slope as $C$ changes, so lowering the cost slides it in parallel. The last point it touches before leaving the shaded [feasible region]{.lx-term term="feasible-region"} is a corner, or a whole edge when the line runs parallel to that edge (a tie). So whenever a [linear program]{.lx-term term="linear-program"} has a best plan, at least one best plan is a corner.
+1. The cost line $40x + 100y = C$ keeps its slope as $C$ changes: lowering $C$ slides it in parallel.
+2. The last point it touches in the shaded [feasible region]{.lx-term term="feasible-region"} is a corner, or a whole edge that lies along the line (a tie).
+3. So for this two-plant model, where neither output can go below zero, whenever a best plan exists at least one best plan sits at a corner.
 
-At 19:00 the best corner is $x = 145$, $y = 0$: \$5,800 for the hour and 53.7 t of CO₂. Push demand to 200 MW and the corner jumps to $x = 150$, $y = 50$: \$11,000. Lesson 11's solver walks from corner to corner in the same way (the simplex method).
+| Case | Best corner | Gas cost for the hour |
+|---|---|---|
+| 19:00 as given (145 MW of gas) | $x = 145$, $y = 0$ (53.65 t of CO₂) | \$5,800 |
+| 200 MW of gas | $x = 150$, $y = 50$ | \$11,000 |
+
+The fixed-output plant adds a constant \$1,000 for the hour (100 MW × \$10/MWh), so 19:00 costs \$6,800 in all. A constant cannot move the best plan, so the chart leaves it out.
+
+[Lesson 11](11-solver.html)'s solver walks from corner to corner in the same way (the [simplex method]{.lx-term term="simplex-method"}).
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The same model as a matrix, and as code</summary>
+<summary><span class="k">Go deeper · Modeler</span>The hour as a solver reads it</summary>
 <div class="lx-deeper-body">
 ```
 
-Write every rule as a row of $A\,\mathbf{x} \le \mathbf{b}$ with $\mathbf{x} = (x, y)$; a "≥" rule flips its signs:
+A solver reads the same four parts, written as numbers. For 19:00, in one line:
 
 $$
-\min\ \begin{pmatrix}40 & 100\end{pmatrix}\mathbf{x}
-\quad\text{s.t.}\quad
-\begin{pmatrix}-1 & -1\\ 0.37 & 0.55\end{pmatrix}\mathbf{x} \le \begin{pmatrix}-145\\ 100\end{pmatrix},
-\qquad
-\begin{pmatrix}0\\0\end{pmatrix} \le \mathbf{x} \le \begin{pmatrix}150\\100\end{pmatrix}.
+\min\ 40x + 100y \quad \text{subject to} \quad x + y \ge 145,\ \ x \le 150,\ \ y \le 100,\ \ 0.37x + 0.55y \le 100,\ \ x, y \ge 0.
 $$
 
-The same model in Python, with SciPy calling HiGHS (the solver of lesson 11):
+- **Decisions:** $x$ and $y$, in MW for the hour.
+- **Goal:** the gas cost in dollars, one coefficient per decision.
+- **Rules:** one row each, with a limit on the right.
 
-```python
-from scipy.optimize import linprog
-# x = combined-cycle MW, y = peaker MW; every rule as a row of A_ub @ [x, y] <= b_ub
-res = linprog(c=[40, 100],
-              A_ub=[[-1, -1],        # demand: x + y >= 145, written as -x - y <= -145
-                    [0.37, 0.55]],   # CO2 cap: 0.37x + 0.55y <= 100
-              b_ub=[-145, 100],
-              bounds=[(0, 150), (0, 100)],   # the sizes, and x, y >= 0
-              method="highs")
-print(res.x, res.fun)   # [145.   0.] 5800.0
-```
+Where it goes next:
 
-The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form step by step.
+- [Lesson 11](11-solver.html): the whole day, 96 decisions, handed to the HiGHS solver in your browser.
+- [B1](b01-algebra-to-lp.html): rules written as rows of a matrix, step by step.
+- [M1](m01-dispatch-to-lmp.html): the same kind of model in Python, in a notebook.
 
 ```{=html}
 </div>
@@ -136,7 +136,7 @@ The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form
 <summary><span class="k">Go deeper</span>What one hour leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>The ramp limit: it links each hour to the one before, so it needs all 24 hours at once (lesson 11).</li>
+<li>The ramp limit: it couples neighbouring hours. This chart leaves out the previous hour's output; <a href="11-solver.html">lesson 11</a> solves all 24 hours together.</li>
 <li>Extra gas above 145 MW would be spilled as wind and sun; at 19:00 only 86 MW of them can be, a limit the chart leaves out.</li>
 <li>Real costs are rarely exactly equal, but near-ties are common: then small data changes swing the plan between the tied plants.</li>
 </ul>
@@ -164,9 +164,9 @@ The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form
 <details class="lx-answer"><summary>Answer</summary><p>Myth. Demand is given; the model decides how the plants meet it.</p></details>
 </div>
 <div class="lx-qq" data-id="corner" data-answer="fact">
-<p class="lx-qtext">Myth or fact? “When a linear program has a best plan, at least one best plan sits at a corner of the region.”</p>
+<p class="lx-qtext">Myth or fact? “When this lesson's two-plant model has a best plan, at least one best plan sits at a corner of the region.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. The cost line slides in parallel and last touches a corner, or a whole edge with corners at both ends.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact, for this model: with both outputs at least zero, its region has corners. The cost line slides in parallel and last touches a corner, or a whole edge that ends at one.</p></details>
 </div>
 <div class="lx-qq" data-id="infeas" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “‘Infeasible’ means the solver failed.”</p>
@@ -182,7 +182,7 @@ The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form
 <details class="lx-answer"><summary>Answer</summary><p>The peaker's output: the operator chooses it. The other three are given.</p></details>
 </div>
 <div class="lx-qq" data-id="c200" data-answer="b">
-<p class="lx-qtext">Gas must supply 200 MW: the combined-cycle costs $40/MWh up to 150 MW, the peaker $100/MWh. What does the cheapest plan cost for the hour?</p>
+<p class="lx-qtext">Gas must supply 200 MW: the combined-cycle costs $40/MWh up to 150 MW, the peaker $100/MWh. What does the cheapest gas plan cost for the hour?</p>
 <ul class="lx-choices"><li data-value="a">$8,000</li><li data-value="b">$11,000</li><li data-value="c">$20,000</li><li data-value="d">$6,000</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>$11,000: 150 MW × $40 + 50 MW × $100. The best corner sits where the combined-cycle's size meets the demand line.</p></details>
 </div>
@@ -205,7 +205,7 @@ The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form
 <tr><td class="n">4 parts</td><td>Decisions, a goal, rules, and the data the model is given: every optimization model has them.</td><td class="s">This lesson</td></tr>
 <tr><td class="n">4 outcomes</td><td>One best corner, a tie, infeasible or unbounded: every linear program ends in one of them.</td><td class="s">This lesson</td></tr>
 <tr><td class="n">145 MW</td><td>The gas Prairie Town needs at 19:00 on 3 September 2025, after nuclear, wind and sun.</td><td class="s">Lesson 0's day; EIA-930 shapes, scaled (illustrative)</td></tr>
-<tr><td class="n">$5,800</td><td>The cheapest plan for that hour: 145 MW from the combined-cycle, none from the peaker.</td><td class="s">This lesson's model (illustrative)</td></tr>
+<tr><td class="n">$5,800</td><td>The cheapest gas plan for that hour: 145 MW from the combined-cycle, none from the peaker. The fixed-output plant's constant $1,000 makes $6,800 in all.</td><td class="s">This lesson's model (illustrative)</td></tr>
 </tbody>
 </table>
 </div>
@@ -225,7 +225,8 @@ The bridge lesson [B1](b01-algebra-to-lp.qmd) turns word problems into this form
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Grid operators' dispatch models have the same four parts, with many more decisions: every plant, every line, every interval. Open modelling tools such as <a href="https://docs.pypsa.org/">PyPSA</a> and <a href="https://jump.dev/">JuMP</a> let you write them in code, just as the Go deeper box above does for one hour.</p>
+<p>Grid operators' dispatch models have the same four parts, with many more decisions: every plant, every line, every interval.</p>
+<p>Open modelling tools such as <a href="https://docs.pypsa.org/">PyPSA</a> and <a href="https://jump.dev/">JuMP</a> write them in code.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

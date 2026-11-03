@@ -1,7 +1,19 @@
-# Sidecar for lesson 11 (T11, 11-solver), builder learn-w1-f, 2026-11-02. Glossary terms for lessons 9-11 are in
-# learn/_w1/09-storage.yml.
+# Sidecar for lesson 11 (T11, 11-solver), builder learn-w1-f, 2026-11-02; review fixes (branch learn-w1-fix-c1) the
+# same day. Glossary terms for lessons 9-11 are in learn/_w1/09-storage.yml; the two below are new with the fixes.
+# Numerical note (checked by _tests/learn/test_11-solver.js): in this LP with ramp limits the demand rule's shadow price
+# equals the marginal plant's cost in 18 of 24 hours ($40); three hours are $0 and three $80 where a ramp rule is at its
+# limit. At 07:00 and 09:00 the best cost has a kink and the price is not unique: at 07:00 one more MWh costs $100 and
+# one less saves $80 (HiGHS reports $80); at 09:00 one more costs $40 and one less saves $20 (HiGHS reports $40).
 id: 11-solver
 lesson: 11
+glossary:
+  - id: optimality-gap
+    term: Optimality gap
+    def: "For a mixed-integer program, the remaining distance between the best plan the solver has found and the bound it has proven, so 0% means proven best."
+    lesson: 11
+  - id: unit-commitment
+    term: Unit commitment
+    def: "Deciding which plants are on in each hour, before deciding how much each one produces."
+    lesson: 11
 requests:
-  - "Curriculum wording: in this LP with ramp limits the demand rule's shadow price equals the marginal plant's cost in 18 of 24 hours ($40); three hours are $0 and three $80 where a ramp rule binds, and at 07:00 and 09:00 the price is not unique (one-sided prices $80/$100 and $0/$40). The page says so instead of claiming equality in every hour; consider the same nuance in learn_map_v2.yml's T11 play line."
   - "LX.SolverStatus could take a 'quiet' option: lesson 11 re-solves +1/-1 MWh on each price tap and keeps the status pill unchanged for those probe solves (done lesson-locally)."

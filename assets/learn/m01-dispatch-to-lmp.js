@@ -16,11 +16,14 @@
 //               ramp          -40 <= p[cc,t] - p[cc,t-1] <= 40, with p[cc,-1] = 115 (lesson 0's start)
 //               DC flow       f[l,t] = b[l] (th[from,t] - th[to,t])                              (network only)
 //               line limits   -F[l] <= f[l,t] <= F[l]                                          dual -> congestion value mu
-// Duals follow LX.solver's convention: d(optimal cost)/d(right-hand side). A balance dual is the cost of one more MWh of
-// demand at that bus and hour: a marginal value under stated assumptions (fixed plants, costs as offers, a lossless DC
-// network, the modelled day), not a market settlement. recipe() checks a dual by a finite difference (solve again with
-// eps more demand) and lists how the cheapest plan would serve the extra MWh, which is how the page explains a price in
-// words. ptdf() and decompose() give the textbook split LMP_n = LMP_ref - sum_l PTDF[l][n] mu_l (Go deeper).
+// Duals follow LX.solver's convention: d(optimal cost)/d(right-hand side). A balance dual is a local marginal value: the
+// extra cost per MWh of a small change in demand at that bus and hour, away from a corner of the model (at a corner the
+// step up and the step down differ, and the dual is one value between them). It holds under stated assumptions (fixed
+// plants, costs as offers, a lossless DC network, the modelled day) and is not a market settlement. recipe() checks a
+// dual by a finite difference (solve again with eps more demand) and lists how the cheapest plan would serve the extra
+// MWh, which is how the page explains a price in words; the page also solves with eps less and shows both sides.
+// ptdf() and decompose() give the textbook split LMP_n = LMP_ref - sum_l PTDF[l][n] mu_l (Go deeper). rent() is what
+// loads pay minus what generators are paid; in this DC model it equals sum_l mu_l x flow_l (not a price gap x a flow).
 //
 // Every number the page states is produced by this model and checked by _tests/learn/test_m01-dispatch-to-lmp.js.
 // The view uses the component library (assets/learn/learn.js): LX.Formulation for the model in full and LX.Network for
@@ -179,16 +182,17 @@
     });
     return out;
   }
-  // congestion rent in one hour: what loads pay minus what generators are paid = sum_l mu_l x flow_l
+  // congestion rent in one hour: what loads pay (load) minus what generators are paid (gen), each at its own bus's price;
+  // in this lossless DC model it also equals sum_l mu_l x flow_l (viaMu). It is not a price gap times one line's flow.
   function rent(D, h) {
-    var paid = 0, f = D.fleet;
+    var load = 0, gen = 0, f = D.fleet;
     D.buses.forEach(function (b) {
       var inj = 0; PLANTS.forEach(function (k) { if (f[k].bus === b.id) inj += h.gen[k]; });
       var wd = b.reference ? D.day.demand[h.t] : 0;
-      paid += h.price[b.id] * (wd - inj);
+      load += h.price[b.id] * wd; gen += h.price[b.id] * inj;
     });
     var viaMu = 0; D.lines.forEach(function (l) { viaMu += (h.mu[l.id] || 0) * (h.flow[l.id] || 0); });
-    return { rent: r6(paid), viaMu: r6(viaMu) };
+    return { rent: r6(load - gen), load: r6(load), gen: r6(gen), viaMu: r6(viaMu) };
   }
   function fullHours(day, line) { var a = []; day.hours.forEach(function (h) { if (h.full[line]) a.push(h.t); }); return a; }
 
@@ -263,7 +267,7 @@
       sym1: "&sum;" + SUB("<i>g</i>") + "&nbsp;<i>p</i>" + SUB("<i>g,t</i>") + "&nbsp;=&nbsp;<i>d</i>" + SUB("<i>t</i>"),
       sym: "&sum;" + SUB("<i>g</i>&isin;<i>n</i>") + "&nbsp;<i>p</i>" + SUB("<i>g,t</i>") + "&nbsp;+&nbsp;inflow" + SUB("<i>n,t</i>") + "&nbsp;&minus;&nbsp;outflow" + SUB("<i>n,t</i>") + "&nbsp;=&nbsp;<i>d</i>" + SUB("<i>n,t</i>"),
       rows: function (net, n) { return net ? "3 buses × " + n + " hours = " + 3 * n : n + " (one per hour)"; },
-      dual: "the price: $ per MWh, at that bus and hour" },
+      dual: "the price: $ per MWh for a small change, at that bus and hour (one value of a range at a corner)" },
     { id: "size", name: "Plant sizes", words: "No plant makes more than its size, or less than zero.",
       sym: "0&nbsp;&le;&nbsp;<i>p</i>" + SUB("<i>g,t</i>") + "&nbsp;&le;&nbsp;<i>P&#772;</i>" + SUB("<i>g</i>"),
       rows: function (net, n) { return "bounds on 5 × " + n + " outputs"; }, dual: "reduced cost of each output" },
@@ -273,7 +277,7 @@
     { id: "flat", name: "Nuclear runs flat", words: "The nuclear plant makes 100 MW every hour, as in lesson 0.",
       sym: "<i>p</i>" + SUB("nuc,<i>t</i>") + "&nbsp;=&nbsp;100", rows: function (net, n) { return "bounds, " + n; }, dual: "–" },
     { id: "ramp", name: "Ramp", words: "The gas combined-cycle plant changes its output by at most 40 MW from one hour to the next; it starts the day from 115 MW.",
-      sym: "&minus;40&nbsp;&le;&nbsp;<i>p</i>" + SUB("cc,<i>t</i>") + "&nbsp;&minus;&nbsp;<i>p</i>" + SUB("cc,<i>t</i>&minus;1") + "&nbsp;&le;&nbsp;40",
+      sym: "&minus;40&nbsp;&le;&nbsp;<i>p</i>" + SUB("cc,<i>t</i>") + "&nbsp;&minus;&nbsp;<i>p</i>" + SUB("cc,<i>t</i>&minus;1") + "&nbsp;&le;&nbsp;40,&nbsp;&nbsp;<i>p</i>" + SUB("cc,&minus;1") + "&nbsp;=&nbsp;115",
       rows: function (net, n) { return n + " (one per hour)"; }, dual: "the value of 1 MW more ramp" },
     { id: "flow", name: "DC power flow", net: true, words: "Each line's flow is set by the angle difference between its two ends: power splits over every path, by the lines' reactance.",
       sym: "<i>f</i>" + SUB("<i>ℓ,t</i>") + "&nbsp;=&nbsp;<i>b</i>" + SUB("<i>ℓ</i>") + "&thinsp;(<i>θ</i>" + SUB("<i>i,t</i>") + "&nbsp;&minus;&nbsp;<i>θ</i>" + SUB("<i>j,t</i>") + "),&nbsp;&nbsp;<i>θ</i>" + SUB("Town,<i>t</i>") + "&nbsp;=&nbsp;0",
@@ -287,7 +291,9 @@
     ["n, ℓ", "bus (Town, Ridge, Gas Hub) and line (three of them)"], ["p_g,t", "output of plant g in hour t, MW (decision)"],
     ["f_ℓ,t, θ_n,t", "line flow, MW, and voltage angle, radians (decisions)"], ["c_g", "running cost, $/MWh: 10, 0, 0, 40, 100"],
     ["d_n,t", "demand, MW (all of it in town)"], ["A_g,t", "wind or solar the weather gives, MW"],
-    ["b_ℓ", "line susceptance, 1,000 MW per radian, equal on all lines"], ["F_ℓ", "line limit, MW (you set Ridge–Town)"]
+    ["P̄_g", "size of plant g, MW"], ["p_cc,−1", "the gas combined-cycle plant's output before the day starts: 115 MW"],
+    ["i, j", "the two end buses of line ℓ (flow is positive from i to j)"],
+    ["b_ℓ", "line susceptance: it turns an angle difference into flow, 1,000 MW per radian, equal on all lines"], ["F_ℓ", "line limit, MW (you set Ridge–Town)"]
   ];
 
   // ---- 24-hour price chart and hour picker: the shared LX.PriceChart and LX.HourPicker (pricechart.js). This adapter turns
@@ -328,7 +334,11 @@
       var ul = E("ul", null, w);
       recipeWords(D, rc).forEach(function (s) { E("li", { text: s }, ul); });
       E("p", { class: "sum", text: "Cost of one more MWh: " + recipeSum(rc) }, w);
-      if (Math.abs(rc.fd - dual) > 0.01) E("p", { class: "note", text: "Here the dual and a small step differ: this hour sits on a corner of the model, where a price is not unique (Go deeper)." }, w);
+      // both sides of the dual: a small step up and a small step down (rc.down, when the page solved it)
+      if (rc.down != null) E("p", { class: "sum", text: "Step up: costs " + money(rc.fd) + " per MWh · step down: saves " + money(rc.down) + " per MWh" }, w);
+      var corner = Math.abs(rc.fd - dual) > 0.01 || (rc.down != null && Math.abs(rc.down - dual) > 0.01);
+      if (corner) E("p", { class: "note", text: "The sides differ: this hour sits on a corner of the model, where a price is not unique (Go deeper)." }, w);
+      else if (rc.down != null) E("p", { class: "note", text: "Both sides agree with the dual, so here it is the extra cost of a small change." }, w);
     }, hide: function () { w.hidden = true; } };
   }
 
@@ -342,9 +352,16 @@
     function solve(o, key) {
       return LX.solver.solve(build(D, o), { timeLimit: 3, key: key, label: "m1" }).then(function (r) { return { r: r, day: read(D, o, r) }; });
     }
+    // a small step up (eps more demand) and down (eps less) at (bus, hour): the recipe of the step up, with the step
+    // down's saving per MWh as rc.down (null if that solve failed)
     function bumpAt(o, base, bus, hour) {
-      var ob = {}; for (var k in o) ob[k] = o[k]; ob.add = { bus: bus, hour: hour, mw: L.eps };
-      return LX.solver.solve(build(D, ob), { timeLimit: 3, label: "m1" }).then(function (r2) { return recipe(D, base, r2, L.eps); });
+      var up = {}, dn = {}; for (var k in o) { up[k] = o[k]; dn[k] = o[k]; }
+      up.add = { bus: bus, hour: hour, mw: L.eps }; dn.add = { bus: bus, hour: hour, mw: -L.eps };
+      return Promise.all([LX.solver.solve(build(D, up), { timeLimit: 3, label: "m1" }), LX.solver.solve(build(D, dn), { timeLimit: 3, label: "m1" })]).then(function (rs) {
+        var rc = recipe(D, base, rs[0], L.eps);
+        rc.down = rs[1] && rs[1].ok ? r6((base.objective - rs[1].objective) / L.eps) : null;
+        return rc;
+      });
     }
     function status(host) { return LX.SolverStatus(host); }
     function kpi(host, label, value) { var k = E("div", { class: "m1-kpi" }, host); E("small", { text: label }, k); var b = E("b", { text: value }, k); return b; }
@@ -354,7 +371,7 @@
 
     var steps = [
       // 1 the formulation
-      { text: "Lesson 0's day becomes a [[linear-program|linear program]]: 24 hours, five plants, one balance rule per hour. Which rule below ties each hour to the next?",
+      { text: "Lesson 0's day becomes a [[linear-program|linear program]]: 24 hours, five plants, all at one [[bus|bus]]. Which rule below ties each hour to the next?",
         build: function (act, api) {
           var box = E("div", { class: "m1-rules", role: "group", "aria-label": "The rules of the one-bus model" }, act);
           var picked = null;
@@ -370,6 +387,7 @@
               else api.saw("That rule acts on one hour at a time. Look for one that names two hours.", true);
             });
           });
+          E("p", { class: "m1-tag", html: "Symbols: <i>t</i> hour · <i>g</i> plant · <i>p</i> output, MW · <i>d</i> demand, MW · <i>P&#772;</i> plant size, MW · <i>A</i> what the weather gives, MW · <i>p</i>" + SUB("cc,&minus;1") + " output before the day starts" }, act);
         } },
       // 2 solve
       { text: "Hand the model to [[solver|HiGHS]], an open-source solver running in your browser. It chooses 120 outputs that obey all 48 rules at the lowest running cost.",
@@ -390,7 +408,7 @@
           });
         } },
       // 3 read one price, check it
-      { text: "A balance row's dual is the change in total cost if its demand grows by 1 MWh. At 19:00 the solver reports $40. Check it: add 1 MWh at 19:00 and solve again.",
+      { text: "A balance row's dual is the extra cost per MWh of a small rise in its demand, away from a corner of the model. At 19:00 the solver reports $40. Add 1 MWh and solve again.",
         build: function (act, api) {
           var row = E("div", { class: "m1-row" }, act);
           var go = E("button", { type: "button", class: "lx-btn small", text: "+1 MWh at 19:00, solve again" }, row), st = status(row), rcp = Recipe(act);
@@ -418,7 +436,7 @@
               if (!A) return;
               bumpAt(oA, A._r, "T", L.rampHour).then(function (rc) {
                 rcp.show(D, "14:00", A.hours[L.rampHour].price.T, rc); api.done();
-                api.saw("One more MWh at 14:00 needs the gas plant 1 MWh higher at 14:00 and at 13:00, since it climbs at most 40 MW an hour. At 13:00 that MWh only pushes out free wind and solar, so 13:00 is priced at " + money(A.hours[L.rampHour - 1].price.T) + ".");
+                api.saw("**14:00:** the gas plant climbs at most 40 MW an hour, so one more MWh needs it 1 MWh higher at 13:00 too. **13:00:** that MWh only pushes out free wind and solar, so 13:00 is priced at " + money(A.hours[L.rampHour - 1].price.T) + ".");
               });
             } });
           rcp = Recipe(act);
@@ -442,7 +460,7 @@
           });
         } },
       // 6 the map and DC power flow
-      { text: "Now the plants get places: wind and solar on Wind Ridge, both gas plants at the Gas Hub, the nuclear plant in town. Three equal lines join them. Ridge sends 90 MW to town: how much takes the direct line?",
+      { text: "The map shows where each plant sits; three equal lines join the buses. Ridge sends 90 MW to town: how much takes the direct line?",
         build: function (act, api) {
           var net = Network(E("div", null, act), { D: D });
           var sp = L.split, tr = transfer(D, sp.from, sp.to, sp.mw), direct = Math.round(Math.abs(tr.RT));
@@ -452,11 +470,11 @@
             onPick: function () {
               pr.reveal();
               net.set({ transfer: tr }); api.done();
-              api.saw(direct + " MW: power splits over both paths by their [[reactance|reactance]]. The path through the Gas Hub has two lines, twice the reactance of the direct line, so it carries a third: " + Math.round(Math.abs(tr.RG)) + " MW.");
+              api.saw(direct + " MW. In [[dc-power-flow|DC power flow]], power splits over both paths by their [[reactance|reactance]]: the path through the Gas Hub has twice the reactance, so it carries a third, " + Math.round(Math.abs(tr.RG)) + " MW.");
             } });
         } },
       // 7 solve the network with roomy lines
-      { text: "Solve the same day on this network, every line 200 MW. Each bus now has its own balance row, so each has its own dual: a [[locational-marginal-price|locational marginal price]].",
+      { text: "Solve the same day on this network, every line 200 MW. Each [[bus|bus]] now has its own balance row, so each has its own dual: a [[locational-marginal-price|locational marginal price]].",
         build: function (act, api) {
           var row = E("div", { class: "m1-row" }, act);
           var go = E("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the network day" }, row), st = status(row);
@@ -485,17 +503,22 @@
           var st = status(act), sp = E("div", { class: "m1-split" }, act), net = Network(E("div", null, sp), { D: D }), right = E("div", null, sp);
           var hp, ch = PriceChart(right, { D: D, onPick: function (t) { hp.set(t); show(); }, label: "Price at each bus in each hour, dollars per MWh." });
           hp = HourPicker(right, { start: L.noon, onChange: function () { show(); } });
-          function show() { if (!Bcur) return; var t = hp.val(); net.set({ h: Bcur.hours[t], lim: limits(D, oB(bLimit)) }); ch.set({ day: Bcur, sel: t }); }
+          // limits drawn from the accepted result (Bcur.limit), never from the slider, so flows and limits always match
+          function show() { if (!Bcur) return; var t = hp.val(); net.set({ h: Bcur.hours[t], lim: limits(D, oB(Bcur.limit)) }); ch.set({ day: Bcur, sel: t }); }
+          // Next waits while a newer solve is running (the step cards' own lock opens it once the line has filled)
+          var nx = api.card.querySelector(".lx-step-foot .lx-btn:not(.ghost)"), unlocked = !!nx && !nx.disabled, req = 0;
+          function busy(on) { if (nx) nx.disabled = on || !unlocked; }
           function run(v) {
-            bLimit = v; st.set("solving");
+            var my = ++req; bLimit = v; st.set("solving"); busy(true);
             solve(oB(v), "m1-limit").then(function (x) {
+              if (my !== req) return;                    // an older request finished after a newer one began: drop it
               if (x.r.status === "superseded" || x.r.status === "cancelled") return;
-              st.set(x.r); if (!x.day.ok) return;
+              st.set(x.r); busy(false); if (!x.day.ok) return;
               Bcur = x.day; Bcur._r = x.r; show();
               var nh = Bcur.hours[L.noon];
               if (nh.full[L.slider.line]) {
                 var fh = fullHours(Bcur, L.slider.line);
-                remember("limit", v); api.done();
+                remember("limit", v); api.done(); unlocked = true; busy(false);
                 api.saw("At " + v + " MW the line is full from " + hh(fh[0]) + " to " + hh(fh[fh.length - 1]) + ". At noon: Ridge " + money(nh.price.R) + ", Gas Hub " + money(nh.price.G) + ", Town " + money(nh.price.T) + " per MWh. One price has become three.");
               } else api.saw("At " + v + " MW the line still has room at noon (" + Math.round(nh.flow.RT) + " MW): one price, " + money(nh.price.T) + ". Keep lowering.", true);
             });
@@ -510,11 +533,14 @@
           var seg = E("div", { class: "lx-seg", role: "group", "aria-label": "Explain the price at" }, right);
           var bb = D.buses.map(function (b) { return E("button", { type: "button", "aria-pressed": "false", text: b.short, onclick: function () { pick(b.id); } }, seg); });
           right.appendChild(rcp.el);
-          if (Bcur) net.set({ h: Bcur.hours[L.noon], lim: limits(D, oB(bLimit)) });
+          if (Bcur) net.set({ h: Bcur.hours[L.noon], lim: limits(D, oB(Bcur.limit)) });
+          var tap = 0;   // only the latest tap's check is shown (rapid taps on different buses)
           function pick(id) {
             if (!Bcur) return;
+            var my = ++tap;
             sel = id; net.set({ sel: id }); bb.forEach(function (b, i) { b.setAttribute("aria-pressed", D.buses[i].id === id ? "true" : "false"); });
-            bumpAt(oB(bLimit), Bcur._r, id, L.noon).then(function (rc) {
+            bumpAt(oB(Bcur.limit), Bcur._r, id, L.noon).then(function (rc) {
+              if (my !== tap) return;
               var h = Bcur.hours[L.noon];
               rcp.show(D, busOf(D, id).name + " at 12:00", h.price[id], rc);
               if (id === "T") {
@@ -532,15 +558,15 @@
           var kp = E("div", { class: "m1-kpis" }, right);
           function show(t) {
             if (!Bcur) return;
-            var h = Bcur.hours[t], lim = limits(D, oB(bLimit));
+            var h = Bcur.hours[t], lim = limits(D, oB(Bcur.limit));
             net.set({ h: h, lim: lim });
             kp.innerHTML = ""; var rr = rent(D, h);
-            kpi(kp, "Prices", D.buses.map(function (b) { return money(h.price[b.id]); }).join(" · ")); kpi(kp, "Congestion rent", money(rr.rent) + "/h");
+            kpi(kp, "Prices", D.buses.map(function (b) { return money(h.price[b.id]); }).join(" · ")); kpi(kp, "Congestion rent", money(rr.rent) + " in the hour");
             if (t === L.t8Hour) {
               var nh = Bcur.hours[L.noon], rn = rent(D, nh);
               api.done();
               api.saw(h.full.RT ? "At 19:00 the line is full too, at this limit: try a higher limit in step 8 to see lesson 8's single price return." :
-                "At 19:00 the line carries " + Math.round(h.flow.RT) + " of its " + lim.RT + " MW: one price, " + money(h.price.T) + ", as in lesson 8. At noon the town pays " + money(nh.price.T) + " while the Ridge is paid " + money(nh.price.R) + "; the gap, the [[congestion-rent|congestion rent]], is " + money(rn.rent) + " that hour.");
+                "**19:00:** the line carries " + Math.round(h.flow.RT) + " of its " + lim.RT + " MW, so one price, " + money(h.price.T) + ", as in lesson 8. **Noon:** loads pay " + money(rn.load) + ", generators are paid " + money(rn.gen) + "; the difference, " + money(rn.rent) + ", is that hour's [[congestion-rent|congestion rent]].");
             }
           }
           show(L.noon);
@@ -583,11 +609,13 @@
       var h = { t: R.hour, price: R.price, flow: R.flow, full: { RT: true, RG: false, GT: false }, mu: { RT: R.mu, RG: 0, GT: 0 } };
       net.set({ h: h, lim: limits(D, { limit: R.limit }), sel: "T" });
       var ol = E("ol", null, E("div", null, an));
-      [["A full line.", "Ridge–Town carries its " + R.limit + " MW limit. Its dual: 1 MW more limit would save " + money(R.mu) + " that hour."],
+      // what loads pay and generators are paid at noon, each at its own bus's price (the rent is the difference)
+      var loadPay = R.price.T * D.day.demand[R.hour], genPay = R.price.T * D.fleet.nuclear.mw + R.price.G * R.cc + R.price.R * R.ridge;
+      [["A full line.", "Ridge–Town carries its " + R.limit + " MW limit. Its dual: 1 MW more limit, in this hour only, would save " + money(R.mu) + "."],
        ["Ridge: " + money(R.price.R) + ".", "Wind and solar spill " + (R.ridgeAvail - R.ridge) + " MW of " + R.ridgeAvail + " MW; one more MWh there is free."],
        ["Gas Hub: " + money(R.price.G) + ".", "The combined-cycle plant runs at " + R.cc + " MW with room to spare; it serves one more MWh at its own cost."],
        ["Town: " + money(R.price.T) + ".", "2 MWh more gas and 1 MWh less from the Ridge keep the full line's flow fixed: 2 × $40 − 1 × $0."],
-       ["Rent.", "Town pays " + money(R.price.T) + ", generators earn less; the difference, " + money(R.rent) + " an hour, equals μ × limit."]].forEach(function (a) {
+       ["Rent.", "Loads pay " + money(loadPay) + " and generators are paid " + money(genPay) + ". The difference, " + money(R.rent) + " for the hour, is the congestion rent: here the full line's μ × its flow."]].forEach(function (a) {
         var li = E("li", null, ol); E("b", { text: a[0] + " " }, li); li.appendChild(document.createTextNode(a[1]));
       });
       // 3 one price or three

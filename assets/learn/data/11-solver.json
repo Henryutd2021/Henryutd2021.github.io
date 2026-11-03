@@ -41,7 +41,7 @@
     },
     {
       "n": "5 minutes",
-      "what": "How often the western Energy Imbalance Market dispatches generating units: real operators re-solve dispatch problems like this one every few minutes.",
+      "what": "How often the western Energy Imbalance Market dispatched generating units, as EIA reported in July 2017: real operators re-solve dispatch problems like this one every few minutes.",
       "source": "EIA, Today in Energy",
       "url": "https://www.eia.gov/todayinenergy/detail.php?id=32052",
       "asof": "published 14 Jul 2017"

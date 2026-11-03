@@ -7,7 +7,8 @@
 // The day is lesson 0's (3 September 2025), cut and rounded exactly as grid-operator.js prepare() does. The lesson's
 // two-variable linear program is one hour of it, 19:00, when gas must supply the gap left by nuclear, wind and sun:
 //   decisions  x = combined-cycle output (MW), y = peaker output (MW), for one hour
-//   goal       minimise cx*x + cy*y  (running cost in $, one hour: MW x 1 h x $/MWh)
+//   goal       minimise cx*x + cy*y  (gas running cost in $, one hour: MW x 1 h x $/MWh; the fixed-output plant's
+//              100 MW x $10/MWh = $1,000 is a constant that never moves the best plan, so the chart leaves it out)
 //   rules      demand   x + y >= D        (gas covers the gap; any extra would be spilled)
 //              cc size  x <= 150,  peaker size  y <= 100
 //              CO2 cap  0.37 x + 0.55 y <= cap   (t of CO2 in the hour)
@@ -81,14 +82,24 @@
     return { ok: !broken.length, broken: broken, cost: costOf(p, v), co2: co2Of(p, v) };
   }
 
+  // the cap at which the CO2 rule just touches the best plan: that plan's CO2 with the cap switched off (step 5's
+  // "binding" button; the cap slider's 0.05 t step reaches it too)
+  function bindingCap(p) {
+    var q = {}, k; for (k in p) q[k] = p[k]; q.on = {}; for (k in p.on) q.on[k] = p.on[k]; q.on.co2 = false;
+    var s = solve2(q); return s.best.length ? Math.round(co2Of(p, s.best[0]) * 1e6) / 1e6 : null;
+  }
+  // the fixed-output plant's constant running cost for n hours: in the goal it is a constant, so it never moves the
+  // best plan, and the one-hour chart leaves it out (the chart's costs are gas costs)
+  function fixedCost(town, n) { var g = town.fleet.nuclear; return g.mw * g.cost * (n || 1); }
+
   var model = { HOURS: HOURS, dayOf: dayOf, params: params, RULES: RULES, rulesOf: rulesOf, problem: problem, solve2: solve2, check: check,
-    costOf: costOf, co2Of: co2Of };
+    costOf: costOf, co2Of: co2Of, bindingCap: bindingCap, fixedCost: fixedCost };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
   var LX = window.LX, H = LX.H, S = LX.S;
   // ================================================================ the lesson
-  var fmt1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }); };
+  var fmt1 = function (v) { return (Math.round(v * 10) / 10 + 0).toLocaleString("en-US", { maximumFractionDigits: 1 }); };   // + 0 turns -0 into 0
   var MW = function (v) { return fmt1(v) + " MW"; };
   var usd = function (v) { return (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US"); };
   var saw = function (api, t, bad) { api.saw(t, bad); };   // step cards turn **bold** marks into <b> (cards.js)
@@ -102,7 +113,7 @@
 
   function view(live, data, root) {
     var town = data.town, D = data["10_write_it_down"], day = dayOf(town, data.town_year), h = D.hour;
-    var base = params(town, day, D), p = params(town, day, D), level = null, dot = null, hi = null, hook = null, onDotMove = null, ctl = {};
+    var base = params(town, day, D), p = params(town, day, D), level = null, dot = null, hi = null, hook = null, onDotMove = null, ctl = {}, follow = false;
     var hh = LX.fmt.hh(h), sol = solve2(p);
     var NAME = { demand: "demand rule", cc: "combined-cycle size", pk: "peaker size", co2: "CO₂ cap", x0: "x = 0", y0: "y = 0" };
 
@@ -127,8 +138,9 @@
     function describe() {
       var s = sol, t = "Plans as points: combined-cycle output x across, peaker output y up. The region of plans that meet every rule " +
         (s.status === "infeasible" ? "is empty. " : "has corners at " + s.corners.map(function (v) { return "(" + fmt1(v.x) + ", " + fmt1(v.y) + ")"; }).join(", ") + ". ");
-      if (s.status === "optimal") t += "The best plan is the corner x = " + fmt1(s.x) + " MW, y = " + fmt1(s.y) + " MW, costing " + usd(s.cost) + ".";
-      if (s.status === "tied") t += "Several plans tie for best at " + usd(s.cost) + ".";
+      if (s.status === "optimal") t += "The best plan is the corner x = " + fmt1(s.x) + " MW, y = " + fmt1(s.y) + " MW, with a gas cost of " + usd(s.cost) + ".";
+      if (s.status === "tied") t += "Every plan on the edge from (" + fmt1(s.best[0].x) + ", " + fmt1(s.best[0].y) + ") to (" + fmt1(s.best[s.best.length - 1].x) + ", " + fmt1(s.best[s.best.length - 1].y) + ") ties for best at " + usd(s.cost) + ".";
+      if (level != null && (s.status === "optimal" || s.status === "tied")) t += " The dashed cost line marks plans costing " + usd(level) + ".";
       if (s.status === "unbounded") t += "The cost falls without limit.";
       if (dot) t += " Your plan: x = " + dot.x + ", y = " + dot.y + ".";
       return t;
@@ -136,6 +148,7 @@
     function chip(label, value, cls) { var c = H("div", { class: "lx-readout" + (cls ? " " + cls : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function paint() {
       sol = solve2(p);
+      if (follow) level = sol.status === "optimal" || sol.status === "tied" ? sol.cost : null;   // the tie step: the cost line through the best plan
       plot.render({ rows: problem(p).rows, c: [p.cx, p.cy], sol: sol, level: level, dot: dot, hi: hi, showBest: level == null || level <= sol.cost + 1 });
       chips.innerHTML = "";
       if (dot) {
@@ -146,8 +159,8 @@
       } else {
         chip("Gas needed", p.D + " MW");
         if (sol.status === "optimal" || sol.status === "tied") {
-          if (level == null || level <= sol.cost + 1) { chip("Best cost", usd(sol.cost), "good"); chip("Best plan", "x " + fmt1(sol.x) + ", y " + fmt1(sol.y)); }
-          if (level == null || level <= sol.cost + 1) chip("CO₂ at best", fmt1(sol.co2) + " t");
+          if (level == null || level <= sol.cost + 1) { chip("Best gas cost", usd(sol.cost), "good"); chip("Best plan", "x " + fmt1(sol.x) + ", y " + fmt1(sol.y)); }
+          if (level == null || level <= sol.cost + 1) chip("CO₂ at best", (Math.round(sol.co2 * 100) / 100 + 0).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " t");
         } else chip("Outcome", sol.status, "bad");
       }
       status.innerHTML = statusText();
@@ -163,9 +176,10 @@
     }
     function upd(o) { for (var k in o) p[k] = o[k]; paint(); if (hook) hook(); }
     function setLevel(v) { level = v; paint(); if (hook) hook(); }
-    function reset(o) { p = params(town, day, D, o); level = null; dot = null; hi = null; onDotMove = null; hook = null; ctl = {}; stage.hidden = false; }
-    function costCtl(host, key, label, color) {
-      return LX.Slider(host, { label: label, color: color, min: D.ranges.cost[0], max: D.ranges.cost[1], step: 5, value: p[key], fmt: function (v) { return usd(v) + "/MWh"; },
+    function reset(o) { p = params(town, day, D, o); level = null; dot = null; hi = null; onDotMove = null; hook = null; ctl = {}; follow = false; stage.hidden = false; }
+    function costCtl(host, key, label, color, range) {
+      range = range || D.ranges.cost;
+      return LX.Slider(host, { label: label, color: color, min: range[0], max: range[1], step: 5, value: p[key], fmt: function (v) { return usd(v) + "/MWh"; },
         onChange: function (v) { var o = {}; o[key] = v; upd(o); } });
     }
 
@@ -202,7 +216,7 @@
           hook = function () {
             if (level != null && level <= sol.cost + 50) {
               if (level !== sol.cost) { level = sol.cost; ctl.level.set(sol.cost); paint(); }
-              api.done(); saw(api, "It last touches a **corner**: " + fmt1(sol.x) + " MW from the combined-cycle, " + fmt1(sol.y) + " from the peaker, " + usd(sol.cost) + ". Any lower, and no plan on the line meets every rule.");
+              api.done(); saw(api, "It last touches a **corner**: " + fmt1(sol.x) + " MW from the combined-cycle, " + fmt1(sol.y) + " from the peaker, " + usd(sol.cost) + " of gas. Any lower, and no plan on the line meets every rule.");
             }
           };
           paint();
@@ -223,21 +237,25 @@
       { text: "Now tighten the CO₂ cap. First it changes nothing (slack), then it touches the best plan ([[binding-constraint|binding]]), then no plan is left ([[infeasible|infeasible]]).",
         build: function (act, api) {
           reset();
-          ctl.cap = LX.Slider(act, { label: "CO₂ cap this hour", color: "var(--lx-warn)", min: D.ranges.cap[0], max: D.ranges.cap[1], step: 1, value: p.cap, fmt: function (v) { return v + " t"; },
+          var bc = bindingCap(p), t2 = function (v) { return (Math.round(v * 100) / 100).toLocaleString("en-US") + " t"; };
+          ctl.cap = LX.Slider(act, { label: "CO₂ cap this hour", color: "var(--lx-warn)", min: D.ranges.cap[0], max: D.ranges.cap[1], step: D.ranges.capStep, value: p.cap, fmt: t2,
             onChange: function (v) { upd({ cap: v }); } });
+          var bb = H("button", { type: "button", class: "lx-btn ghost small", text: "Set the cap to the best plan's CO₂, " + t2(bc) }, act);
+          bb.addEventListener("click", function () { ctl.cap.set(bc, true); });
+          H("p", { class: "lx-hint", text: "The − and + buttons and the arrow keys move the cap 0.05 t at a time." }, act);
           hook = function () {
-            if (sol.status === "infeasible") { api.done(); saw(api, "**Infeasible.** Even the cleanest plan emits " + fmt1(base.ex * base.D) + " t, so a lower cap leaves no plan. A solver reports this; it cannot repair the rules."); }
-            else if (sol.binding.co2) saw(api, "**Binding:** the cap now passes through the best plan. Any tighter and the region vanishes.");
-            else saw(api, "**Slack:** the best plan emits " + fmt1(sol.co2) + " t, under the " + p.cap + " t cap, so the cap changes nothing yet.");
+            if (sol.status === "infeasible") { api.done(); saw(api, "**Infeasible.** Even the cleanest plan emits " + t2(bc) + ", so a lower cap leaves no plan. A solver reports this; it cannot repair the rules."); }
+            else if (sol.binding.co2) saw(api, "**Binding:** the cap passes through the best plan, with no room to spare. Loosening it changes nothing here; any tighter and the region vanishes.");
+            else saw(api, "**Slack:** the best plan emits " + t2(sol.co2) + ", under the " + t2(p.cap) + " cap, so the cap changes nothing yet.");
           };
           paint(); hook();
         } },
-      { text: "Make it tied: give both plants the same running cost. The cost line turns parallel to the demand line. What happens to the best plan?",
+      { text: "Make it tied: give both plants the same positive running cost. Watch the dashed cost line through the best plan turn parallel to the demand line.",
         build: function (act, api) {
-          reset();
+          reset(); follow = true;
           var c = H("div", { class: "lx-ctls" }, act);
-          ctl.cy = costCtl(c, "cy", "Peaker running cost", "var(--lx-pk)");
-          ctl.cx = costCtl(c, "cx", "Combined-cycle running cost", "var(--lx-cc)");
+          ctl.cy = costCtl(c, "cy", "Peaker running cost", "var(--lx-pk)", D.ranges.costTie);
+          ctl.cx = costCtl(c, "cx", "Combined-cycle running cost", "var(--lx-cc)", D.ranges.costTie);
           hook = function () {
             if (sol.status === "tied") { api.done(); saw(api, "**Tied.** Any split along the green edge costs " + usd(sol.cost) + ": not two best plans but infinitely many. A solver returns one of them."); }
             else if (sol.status === "optimal") saw(api, "Still one best corner, at x = " + fmt1(sol.x) + ", y = " + fmt1(sol.y) + ".");
@@ -266,17 +284,18 @@
           var vc = viewsOf(p, sol);
           vc.onPick = function (k) {
             hi = k === "goal" ? null : k; level = k === "goal" ? sol.cost : null; paint(); api.done();
-            saw(api, k === "goal" ? "The goal is the cost line; here it passes through the best corner at " + usd(sol.cost) + "." : "The " + NAME[k] + ": " + (sol.binding[k] ? "**binding** at the best plan (the corner sits on its line)." : "**slack** at the best plan (room to spare)."));
+            saw(api, k === "goal" ? "The goal is the cost line; here it passes through the best corner at " + usd(sol.cost) + " of gas." : "The " + NAME[k] + ": " + (sol.binding[k] ? "**binding** at the best plan (the corner sits on its line)." : "**slack** at the best plan (room to spare)."));
           };
           LX.LinkedViews(act, vc);
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });
     // hooks for the screenshot script (lxDemo) and for curious readers in the console
-    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus corner, jump, tied, views and sort
+    LX.demo(root, function (state) {   // standard states (core.js LX.demo) plus corner, jump, binding, tied, views and sort
       if (state === "mid") { cards.go(2); ctl.level.set(sol.cost + 2400); setLevel(sol.cost + 2400); return { view: "cost line" }; }
       if (state === "corner") { cards.go(2); ctl.level.set(0); setLevel(0); return { view: "best corner" }; }
       if (state === "jump") { cards.go(3); ctl.D.set(200); upd({ D: 200 }); return { view: "corner jumps" }; }
+      if (state === "binding") { cards.go(4); var bb = live.querySelector(".lx-step-act .lx-btn"); if (bb) bb.click(); return { view: "binding cap" }; }
       if (state === "tied") { cards.go(5); ctl.cy.set(p.cx); upd({ cy: p.cx }); return { view: "tied" }; }
       if (state === "views") { cards.go(7); var b = live.querySelector(".lx-lv-row[data-k=co2]"); if (b) b.click(); return { view: "linked views" }; }
       if (state === "sort") { cards.go(0); return { view: "card sort" }; }
@@ -293,7 +312,7 @@
     return {
       panels: [
         { title: "In words", items: [
-          { key: "goal", html: "<b>Goal:</b> make the hour's running cost as small as possible: " + usd(p.cx) + " per MWh from the combined-cycle, " + usd(p.cy) + " from the peaker." },
+          { key: "goal", html: "<b>Goal:</b> make the hour's gas running cost as small as possible: " + usd(p.cx) + " per MWh from the combined-cycle, " + usd(p.cy) + " from the peaker." },
           { key: "demand", html: "<b>Demand:</b> together they supply at least " + p.D + " MW." },
           { key: "cc", html: "<b>Combined-cycle size:</b> at most " + p.X + " MW." },
           { key: "pk", html: "<b>Peaker size:</b> at most " + p.Y + " MW." },
@@ -307,7 +326,7 @@
           { key: "co2", html: sym(p.ex + "<var>x</var> + " + p.ey + "<var>y</var> ≤ " + p.cap) },
           { html: sym("<var>x</var>, <var>y</var> ≥ 0") }] }],
       table: { title: "As a table", head: ["Rule", "x", "y", "Limit", "At the best plan"], rows: [
-        { key: "goal", cells: ["Cost", p.cx, p.cy, "min", usd(sol.cost)] },
+        { key: "goal", cells: ["Gas cost", p.cx, p.cy, "min", usd(sol.cost)] },
         { key: "demand", cells: ["Demand", 1, 1, "≥ " + p.D, at([1, 1]) + bind("demand")] },
         { key: "cc", cells: ["Combined-cycle size", 1, 0, "≤ " + p.X, at([1, 0]) + bind("cc")] },
         { key: "pk", cells: ["Peaker size", 0, 1, "≤ " + p.Y, at([0, 1]) + bind("pk")] },
@@ -320,44 +339,58 @@
   function buildExplain(town, day, D) {
     var host = document.getElementById("w10-explain"); if (!host) return;
     host.innerHTML = ""; host.classList.add("is-live");
-    var f = town.fleet, nPk = f.peaker.mw;
+    var f = town.fleet, nPk = f.peaker.mw, fixDay = fixedCost(town, HOURS), c0 = day.startCC;
+    if (!document.getElementById("w10-css")) H("style", { id: "w10-css", text: ".w10-rules{margin:0;padding-left:1.1em;font-size:14.5px;color:var(--lx-ink-2);display:grid;gap:3px}" }, document.head);
     // 1 formulate it
-    LX.FormulateBox(H("div", { class: "lx-xcard" }, host), {
+    var fb = LX.FormulateBox(H("div", { class: "lx-xcard" }, host), {
       title: "Formulate it: lesson 0's day in words",
       lede: "The ten cards, put together. This is the whole model a solver needs; lesson 11 hands it to one.",
       parts: [
         { k: "Decisions", color: "var(--lx-tier-2)", text: "For each of the 24 hours: the combined-cycle's and the peaker's output, spilled wind and sun, and any unserved demand. 96 numbers." },
-        { k: "Goal", color: "var(--lx-good)", text: "Make the day's running cost as small as possible: $" + f.cc.cost + " per MWh from the combined-cycle, $" + f.peaker.cost + " from the peaker, a large penalty per MWh unserved." },
-        { k: "Rules", color: "var(--lx-warn)", text: "Every hour, supply equals demand. Each plant between 0 and its size. The combined-cycle changes at most " + f.cc.ramp + " MW an hour. Spill no more than the wind and sun there is." },
+        { k: "Goal", color: "var(--lx-good)", text: "Make the day's gas cost as small as possible ($" + f.cc.cost + " and $" + f.peaker.cost + " per MWh), with a large penalty per MWh unserved. The fixed-output plant adds a constant " + usd(fixDay) + ", which cannot change the plan." },
+        { k: "Rules", color: "var(--lx-warn)", text: "Every hour:" },
         { k: "Given", color: "var(--lx-ink-3)", text: "Demand, wind and sun for each hour of " + day.dateLabel + "; plant sizes, running costs and the ramp limit. The model takes these as they are ([[parameter|parameters]])." }
       ]
     });
+    // the rules as one short row each
+    var ul = H("ul", { class: "w10-rules" }, fb.parts[2]);
+    ["Supply equals demand.", "Each plant between 0 and its size.", "The combined-cycle changes at most " + f.cc.ramp + " MW from the hour before (" + c0 + " MW before midnight).",
+     "Spill no more than the wind and sun there is."].forEach(function (t) { H("li", { text: t }, ul); });
     // 2 equation card
-    var sym = LX.EquationCard.sym;
+    var sym = LX.EquationCard.sym, pcc = "<var>p</var><sub>cc</sub>(<var>t</var>)", ppk = "<var>p</var><sub>pk</sub>(<var>t</var>)";
     LX.EquationCard(H("div", { class: "lx-xcard" }, host), {
       title: "The same model in symbols",
       lede: "Tap a symbol to see what it means and how it looks in code (the model format this site's solver reads).",
-      dense: true, label: "The model; each symbol is a button", textLabel: "Text version: every symbol", fields: [{ key: "code", label: "In code", code: true }],
+      dense: true, label: "The model; each symbol is a button", textLabel: "Text version: every row and symbol", fields: [{ key: "code", label: "In code", code: true }],
       rows: [
-        { html: "min&nbsp; Σ<sub><var>t</var></sub> ( " + sym("c", "40") + " " + sym("pcc", "<var>p</var><sub>cc</sub>(<var>t</var>)") + " + " + sym("cpk", f.peaker.cost) + " " + sym("ppk", "<var>p</var><sub>pk</sub>(<var>t</var>)") + " + " + sym("V", "<var>V</var>") + " " + sym("u", "<var>u</var>(<var>t</var>)") + " )", tag: "goal" },
-        { html: sym("n", "100") + " + " + sym("wv", "<var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>)") + " + <var>p</var><sub>cc</sub>(<var>t</var>) + <var>p</var><sub>pk</sub>(<var>t</var>) + <var>u</var>(<var>t</var>) − " + sym("s", "<var>s</var>(<var>t</var>)") + " = " + sym("d", "<var>d</var>(<var>t</var>)"), tag: "balance, every hour" },
-        { html: "0 ≤ <var>p</var><sub>cc</sub>(<var>t</var>) ≤ 150, &nbsp;0 ≤ <var>p</var><sub>pk</sub>(<var>t</var>) ≤ " + nPk, tag: "sizes" },
-        { html: "−" + sym("R", "40") + " ≤ <var>p</var><sub>cc</sub>(<var>t</var>) − <var>p</var><sub>cc</sub>(<var>t</var>−1) ≤ 40", tag: "ramp limit" },
-        { html: "0 ≤ <var>s</var>(<var>t</var>) ≤ <var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>), &nbsp;<var>u</var>(<var>t</var>) ≥ 0", tag: "spill and unserved" }
+        { html: "min&nbsp; " + sym("sum", "Σ<sub><var>t</var></sub>") + " ( " + sym("c", String(f.cc.cost)) + " " + sym("pcc", pcc) + " + " + sym("cpk", f.peaker.cost) + " " + sym("ppk", ppk) + " + " + sym("V", "<var>V</var>") + " " + sym("u", "<var>u</var>(<var>t</var>)") + " )", tag: "goal",
+          say: "Goal: make as small as possible the sum over the 24 hours of " + f.cc.cost + " dollars per MWh times the combined-cycle's output, plus " + f.peaker.cost + " dollars per MWh times the peaker's output, plus the penalty V times unserved demand." },
+        { html: sym("n", String(f.nuclear.mw)) + " + " + sym("wv", "<var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>)") + " + " + pcc + " + " + ppk + " + <var>u</var>(<var>t</var>) − " + sym("s", "<var>s</var>(<var>t</var>)") + " = " + sym("d", "<var>d</var>(<var>t</var>)"), tag: "balance, every hour",
+          say: "Balance, every hour: " + f.nuclear.mw + " MW from the fixed-output plant, plus the wind and sun available, plus both gas outputs, plus unserved demand, minus the wind and sun spilled, equals demand." },
+        { html: "0 ≤ " + pcc + " ≤ " + f.cc.mw + ", &nbsp;0 ≤ " + ppk + " ≤ " + nPk, tag: "sizes",
+          say: "Sizes, every hour: the combined-cycle between 0 and " + f.cc.mw + " MW, the peaker between 0 and " + nPk + " MW." },
+        { html: "−" + sym("R", String(f.cc.ramp)) + " ≤ " + pcc + " − <var>p</var><sub>cc</sub>(<var>t</var>−1) ≤ " + f.cc.ramp + ", &nbsp;" + sym("p0", "<var>p</var><sub>cc</sub>(−1) = " + c0), tag: "ramp limit",
+          say: "Ramp limit, every hour: the combined-cycle's output differs from the hour before by at most " + f.cc.ramp + " MW, up or down. In the hour before midnight it ran at " + c0 + " MW." },
+        { html: "0 ≤ <var>s</var>(<var>t</var>) ≤ <var>w</var>(<var>t</var>) + <var>v</var>(<var>t</var>), &nbsp;<var>u</var>(<var>t</var>) ≥ 0", tag: "spill and unserved",
+          say: "Spill and unserved, every hour: the wind and sun spilled is between zero and what is available; unserved demand is zero or more." }
       ],
       symbols: {
-        pcc: { name: "p_cc(t)", label: "p cc of t", words: "The combined-cycle's output in hour t, in MW: a [[decision-variable|decision]], one for each of the 24 hours.", code: '{ name: "cc_19", lb: 0, ub: 150, cost: 40 }' },
+        sum: { name: "Σ_t", label: "sum over t", words: "Add across all 24 hours. t names an hour: t = 0 is midnight to 01:00, t = 23 is 23:00 to midnight.", code: "for (let t = 0; t < 24; t++) { … }   // one copy of each row per hour" },
+        pcc: { name: "p_cc(t)", label: "p cc of t", words: "The combined-cycle's output in hour t, in MW: a [[decision-variable|decision]], one for each of the 24 hours.", code: '{ name: "cc_19", lb: 0, ub: ' + f.cc.mw + ", cost: " + f.cc.cost + " }" },
         ppk: { name: "p_pk(t)", label: "p pk of t", words: "The peaker's output in hour t, in MW: a decision.", code: '{ name: "pk_19", lb: 0, ub: ' + nPk + ", cost: " + f.peaker.cost + " }" },
-        c: { name: "40", label: "40 dollars per MWh", words: "The combined-cycle's running cost in $/MWh: given. Times MW for one hour, it gives dollars.", code: "cost: 40   // in the variable's entry" },
+        c: { name: String(f.cc.cost), label: f.cc.cost + " dollars per MWh", words: "The combined-cycle's running cost in $/MWh: given. Times MW for one hour, it gives dollars.", code: "cost: " + f.cc.cost + "   // in the variable's entry" },
         cpk: { name: String(f.peaker.cost), label: f.peaker.cost + " dollars per MWh", words: "The peaker's running cost in $/MWh: given.", code: "cost: " + f.peaker.cost },
         V: { name: "V", label: "V, the unserved penalty", words: "A large penalty per MWh of unserved demand, so the solver keeps the lights on whenever it can. Illustrative.", code: '{ name: "un_19", lb: 0, cost: 3000 }' },
         u: { name: "u(t)", label: "u of t", words: "Unserved demand in hour t, in MW: a decision the solver avoids because of its penalty.", code: '"un_19"' },
-        n: { name: "100", label: "100 megawatts of nuclear", words: "The nuclear plant runs flat at 100 MW: given, so it moves to the right-hand side.", code: "eq: d - 100 - w - v   // the balance row's right-hand side" },
+        n: { name: String(f.nuclear.mw), label: f.nuclear.mw + " megawatts of fixed output", words: "The fixed-output plant runs flat at " + f.nuclear.mw + " MW: given, so it moves to the right-hand side.", code: "eq: d - " + f.nuclear.mw + " - w - v   // the balance row's right-hand side" },
         wv: { name: "w(t) + v(t)", label: "w of t plus v of t", words: "The wind and sun available in hour t, from the real shapes of " + day.dateLabel + ": given.", code: "ub: w + v   // the spill variable's upper bound" },
         s: { name: "s(t)", label: "s of t", words: "Spilled wind and sun in hour t: a decision. It enters the balance with a minus sign.", code: '{ name: "sp_19", lb: 0, ub: ' + (day.wind[D.hour] + day.solar[D.hour]) + " }" },
         d: { name: "d(t)", label: "d of t", words: "Demand in hour t, in MW: given. At " + LX.fmt.hh(D.hour) + " it is " + day.demand[D.hour] + " MW.", code: '{ name: "balance_19", terms: { cc_19: 1, pk_19: 1, sp_19: -1, un_19: 1 }, eq: ' + day.need[D.hour] + " }" },
-        R: { name: "40 (ramp)", label: "40 megawatts per hour ramp limit", words: "The combined-cycle's ramp limit, MW per hour: given. Two rules per hour, one up and one down.", code: '{ name: "ramp_up_19", terms: { cc_19: 1, cc_18: -1 }, le: 40 }' }
+        R: { name: f.cc.ramp + " (ramp)", label: f.cc.ramp + " megawatts per hour ramp limit", words: "The combined-cycle's ramp limit, MW per hour: given. Two rules per hour, one up and one down.", code: '{ name: "ramp_up_19", terms: { cc_19: 1, cc_18: -1 }, le: ' + f.cc.ramp + " }" },
+        p0: { name: "p_cc(−1) = " + c0, label: "p cc of minus 1 equals " + c0, words: "The combined-cycle's output in the hour before midnight, " + c0 + " MW: given (lesson 0's start). It gives the first hour, t = 0, an hour before it.", code: '{ name: "ramp_up_0", terms: { cc_0: 1 }, le: ' + f.cc.ramp + " + " + c0 + " }" }
       },
+      // the goal's units and its left-out constant, under the panel (a dense row keeps its note on the formula's line)
+      hint: "The goal is in dollars for the day: each hour's MW × 1 h gives MWh. The fixed-output plant's constant " + usd(fixDay) + " is left out; it cannot change the plan.",
       sel: "pcc"
     });
     // 3 flowchart: the four outcomes
@@ -372,7 +405,7 @@
         inf: { t: "Infeasible", s: "fix a rule or the data", sN: "fix a rule", k: "end" },
         q2: { t: "Goal improves for ever?", tN: ["Goal improves", "for ever?"], k: "q" },
         unb: { t: "Unbounded", s: "a rule is missing", k: "end" },
-        q3: { t: "Cost line parallel to an edge?", tN: ["Cost line", "parallel to edge?"], k: "q" },
+        q3: { t: "Lowest cost line lies along an edge?", tN: ["Lowest cost line", "along an edge?"], k: "q" },
         tie: { t: "Tied", s: "a whole edge is best", k: "end" },
         one: { t: "One best corner", s: "the usual answer", k: "end" }
       },
@@ -380,7 +413,7 @@
       colsN: 2, atN: { start: [0, 0], q1: [0, 1], inf: [1, 1.9], q2: [0, 2.4], unb: [1, 3.3], q3: [0, 3.8], tie: [1, 4.7], one: [0, 5.2] },
       edges: [["start", "q1"], ["q1", "inf", "no"], ["q1", "q2", "yes"], ["q2", "unb", "yes"], ["q2", "q3", "no"], ["q3", "tie", "yes"], ["q3", "one", "no"]],
       traces: [
-        { label: LX.fmt.hh(D.hour) + " as given", path: ["start", "q1", "q2", "q3", "one"], text: "One best corner: x = " + fmt1(s0.x) + ", y = " + fmt1(s0.y) + ", " + usd(s0.cost) + "." },
+        { label: LX.fmt.hh(D.hour) + " as given", path: ["start", "q1", "q2", "q3", "one"], text: "One best corner: x = " + fmt1(s0.x) + ", y = " + fmt1(s0.y) + ", " + usd(s0.cost) + " of gas." },
         { label: "CO₂ cap " + pInf.cap + " t", path: ["start", "q1", "inf"], text: "Even the cleanest plan emits " + fmt1(p0.ex * p0.D) + " t: " + solve2(pInf).status + "." },
         { label: "Equal costs", path: ["start", "q1", "q2", "q3", "tie"], text: "Both at $" + p0.cx + "/MWh: every split of " + p0.D + " MW costs " + usd(solve2(pTie).cost) + " (" + solve2(pTie).status + ")." },
         { label: "Paid to run, no size", path: ["start", "q1", "q2", "unb"], text: "At −$10/MWh with no size rule and no CO₂ cap: " + solve2(pUnb).status + "." }

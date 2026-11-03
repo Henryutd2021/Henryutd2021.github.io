@@ -7,16 +7,19 @@
 //
 // Model: lesson 0's day (3 September 2025, cut and rounded as grid-operator.js prepare() does) as one linear program,
 // solved in the browser by HiGHS (LX.solver):
-//   decisions  for each hour t: cc_t (combined-cycle, 0..150 MW), pk_t (peaker, 0..100), sp_t (spilled wind and sun,
-//              0..w_t + v_t), un_t (unserved demand, >= 0)
-//   goal       min sum_t (40 cc_t + 100 pk_t + V un_t) + 24 x 100 x $10 (the nuclear plant's flat running cost)
+//   decisions  for each hour t: cc_t (combined-cycle, 0..150 MW), pk_t (peaker, 0..100), sp_t (curtailed wind and solar,
+//              0..w_t + v_t; one variable for both, split in proportion only for the chart), un_t (unserved demand, >= 0)
+//   goal       min sum_t (40 cc_t + 100 pk_t + V un_t) x 1 h + 24 x 100 x $10 (the fixed-output plant's constant)
 //   rules      balance_t:  cc_t + pk_t - sp_t + un_t = need_t  (need = demand - nuclear - wind - sun; MW for one hour)
 //              ramp_up_t / ramp_down_t:  -R <= cc_t - cc_{t-1} <= R, with cc_{-1} = 115 MW (lesson 0's start)
 // The dual of balance_t is the shadow price of the demand rule: d(best cost)/d(demand at t), in $/MWh (LX.solver's
-// convention). Sliders change R, the peaker's cost, demand (all hours, in %) and the wind farm's size (wind = shape x
+// convention), for a small change away from a kink; at a kink (07:00 and 09:00 here) the cost of one more MWh and the
+// saving from one less differ, and HiGHS reports one value between them. Sliders change R, the peaker's cost, demand (all hours, in %) and the wind farm's size (wind = shape x
 // size, rounded). Two variants: a planted sign error (sp_t enters the balance with + instead of -) and an on-or-off
-// peaker (binary on_t; pk_t between pkMin x on_t and 100 x on_t), a mixed-integer program that has no duals.
-// The checks always use the true physics: nuclear + wind + sun + cc + pk + un - sp = demand, the sizes and the ramps.
+// peaker (binary on_t; pk_t between pkMin x on_t and 100 x on_t), a mixed-integer program: its solve returns no duals
+// (prices would need an LP with the on/off choices fixed, lesson M2).
+// The checks always use the true physics: nuclear + wind + sun + cc + pk - sp + un = demand, the sizes (and, with the
+// on-or-off peaker, its minimum) and the ramps; whether all demand is served is reported apart from the checks.
 // Every number on the page is checked against this model with the vendored HiGHS by _tests/learn/test_11-solver.js.
 (function () {
   "use strict";
@@ -80,9 +83,11 @@
     o.hours = hs;
     return o;
   }
-  // the reader's edit of a plan: set cc at any hours; the peaker fills what is missing, then sun and wind are spilled
+  // the reader's edit of a plan: set cc at any hours; the peaker fills what is missing, then wind and solar are curtailed.
+  // A plan is ok only if every rule holds: ramps, the combined-cycle's size, and balance in every hour (no surplus left
+  // after all wind and solar there is curtailed, no demand left unserved with the peaker at full output).
   function evalPlan(W, s, cc) {
-    var f = W.fleet, hs = hours(W, s), res = { cc: [], pk: [], sp: [], over: [], un: [], rampBreaks: [], cost: HOURS * f.nuclear.mw * f.nuclear.cost };
+    var f = W.fleet, hs = hours(W, s), res = { cc: [], pk: [], sp: [], over: [], un: [], rampBreaks: [], overHours: [], shortHours: [], limitBreaks: [], cost: HOURS * f.nuclear.mw * f.nuclear.cost };
     hs.forEach(function (x, t) {
       var c = cc[t], pk = Math.min(f.peaker.mw, Math.max(0, x.need - c)), sur = c + pk - x.need, sp = Math.max(0, Math.min(sur, x.wind + x.solar));
       var over = Math.max(0, sur - sp), un = Math.max(0, x.need - c - pk);
@@ -90,39 +95,51 @@
       res.cost += f.cc.cost * c + s.pkCost * pk;
       var prev = t ? cc[t - 1] : W.startCC;
       if (Math.abs(c - prev) > s.ramp + 1e-9) res.rampBreaks.push(t);
+      if (c < -1e-9 || c > f.cc.mw + 1e-9) res.limitBreaks.push(t);
+      if (over > 1e-9) res.overHours.push(t);
+      if (un > 1e-9) res.shortHours.push(t);
     });
-    res.ok = !res.rampBreaks.length && res.un.every(function (u) { return u < 1e-9; });
+    res.ok = !res.rampBreaks.length && !res.limitBreaks.length && !res.overHours.length && !res.shortHours.length;
     return res;
   }
-  // the four checks, with the true physics (never the model's own balance row)
+  // the four checks, with the true physics (never the model's own balance row). "limits" includes the on-or-off
+  // peaker's minimum (off, or at least pkMin) when s.onoff. "totals" is accounting: generation after curtailment plus
+  // unserved energy equals demand; whether all demand is served is a separate result, served().
   function checks(W, s, sol) {
-    var f = W.fleet, hs = hours(W, s), maxBal = 0, lim = 0, maxRamp = 0, supply = 0, spill = 0, demand = 0, cost = HOURS * f.nuclear.mw * f.nuclear.cost;
+    var f = W.fleet, hs = hours(W, s), maxBal = 0, lim = 0, maxRamp = 0, gen = 0, spill = 0, unserved = 0, demand = 0, cost = HOURS * f.nuclear.mw * f.nuclear.cost;
+    var M0 = function (v) { return Math.round(v).toLocaleString("en-US"); };
     hs.forEach(function (x, t) {
       var cc = sol.cc[t], pk = sol.pk[t], sp = sol.sp[t], un = sol.un[t];
-      maxBal = Math.max(maxBal, Math.abs(x.nuclear + x.wind + x.solar + cc + pk + un - sp - x.demand));
+      maxBal = Math.max(maxBal, Math.abs(x.nuclear + x.wind + x.solar + cc + pk - sp + un - x.demand));
       [[cc, 0, f.cc.mw], [pk, 0, f.peaker.mw], [sp, 0, x.wind + x.solar], [un, 0, Infinity]].forEach(function (b) { if (b[0] < b[1] - 1e-6 || b[0] > b[2] + 1e-6) lim++; });
+      if (s.onoff && pk > 1e-6 && pk < s.pkMin - 1e-6) lim++;
       maxRamp = Math.max(maxRamp, Math.abs(cc - (t ? sol.cc[t - 1] : W.startCC)));
-      supply += x.nuclear + x.wind + x.solar + cc + pk + un; spill += sp; demand += x.demand;
+      gen += x.nuclear + x.wind + x.solar + cc + pk; spill += sp; unserved += un; demand += x.demand;
       cost += f.cc.cost * cc + s.pkCost * pk;
     });
-    var obj = sol.objective - (sol.penalty || 0);
+    var obj = sol.objective - (sol.penalty || 0), gap = gen - spill + unserved - demand;
     return [
       { id: "balance", ok: maxBal < 1e-6, value: maxBal, title: "Balance every hour", text: "largest gap between supply and demand: " + maxBal.toFixed(3) + " MW" },
-      { id: "limits", ok: lim === 0, value: lim, title: "Plants within their limits", text: lim + " of " + (HOURS * 4) + " decisions outside their limits" },
+      { id: "limits", ok: lim === 0, value: lim, title: "Plants within their limits", text: lim + " of " + (HOURS * 4) + " decisions outside their limits" + (s.onoff ? " (peaker off, or at least " + s.pkMin + " MW)" : "") },
       { id: "ramps", ok: maxRamp <= s.ramp + 1e-6, value: maxRamp, title: "Ramps within " + s.ramp + " MW an hour", text: "largest hour-to-hour change: " + (Math.round(maxRamp * 10) / 10) + " MW" },
-      { id: "totals", ok: Math.abs(supply - spill - demand) < 1e-4 && Math.abs(cost - obj) < 1e-3, value: supply - spill - demand, cost: cost,
-        title: "Energy and money add up", text: "supply minus spill " + Math.round(supply - spill).toLocaleString("en-US") + " MWh against demand " + Math.round(demand).toLocaleString("en-US") +
-          " MWh; cost from MWh × $/MWh " + "$" + Math.round(cost).toLocaleString("en-US") + " against the solver's " + "$" + Math.round(obj).toLocaleString("en-US") }
+      { id: "totals", ok: Math.abs(gap) < 1e-4 && Math.abs(cost - obj) < 1e-3, value: gap, cost: cost,
+        title: "Energy and money add up", text: "generation after curtailment " + M0(gen - spill) + " + unserved " + M0(unserved) + " = " + M0(gen - spill + unserved) + " MWh, against demand " + M0(demand) +
+          " MWh; cost from MWh × $/MWh $" + M0(cost) + " against the solver's $" + M0(obj) }
     ];
   }
+  // a result, not a check: is all demand served? (a plan can pass every check and still leave demand unserved)
+  function served(W, s, sol) {
+    var un = sol.un.reduce(function (a, b) { return a + b; }, 0), hrs = sol.un.filter(function (u) { return u > 1e-6; }).length;
+    return { ok: un < 1e-6, un: un, hours: hrs };
+  }
   // why the demand rule's shadow price at hour t is what it is (LP results only). fd (optional): {up, down}, the cost
-  // of one more MWh and the saving from one less, from two re-solves; when they differ the shadow price is not unique
-  // (a degenerate optimum) and the solver reports one value between them.
+  // of one more MWh and the saving from one less, from two re-solves; when they differ the best cost has a kink there,
+  // the shadow price is not unique (a degenerate optimum) and the solver reports one value in that range.
   function why(W, s, sol, t, fd) {
     var w = why0(W, s, sol, t), y = sol.duals[t];
     if (fd && (Math.abs(fd.up - y) > 0.01 || Math.abs(fd.down - y) > 0.01)) {
       w.degenerate = true;
-      w.text += " Up and down differ here: one more MWh costs $" + Math.round(fd.up) + ", one less saves $" + Math.round(fd.down) + "; the solver reports one value in between.";
+      w.text += " A kink: one more MWh costs $" + Math.round(fd.up) + ", one less saves $" + Math.round(fd.down) + "; the solver reports one value in that range.";
     }
     return w;
   }
@@ -133,17 +150,17 @@
     if (sol.un[t] > 1e-6) return { kind: "short", text: hh + ": " + money(y) + ". Demand is not fully met, so one more MWh costs the unserved penalty." };
     if (near(y, f.cc.cost) && sol.cc[t] > 1e-6 && sol.cc[t] < f.cc.mw - 1e-6) return { kind: "marginal", text: hh + ": " + money(y) + ". The combined-cycle is the marginal plant: one more MWh comes from it at $" + f.cc.cost + "." };
     if (near(y, s.pkCost) && sol.pk[t] > 1e-6) return { kind: "marginal", text: hh + ": " + money(y) + ". The peaker is the marginal plant: one more MWh comes from it at $" + s.pkCost + "." };
-    if (near(y, 0) && sol.sp[t] > 1e-6) return { kind: "ramp", text: hh + ": $0. The solver spills " + Math.round(sol.sp[t]) + " MW of sun here because a ramp rule holds the combined-cycle above this hour's need. One more MWh is served by spilling less: free." };
+    if (near(y, 0) && sol.sp[t] > 1e-6) return { kind: "ramp", text: hh + ": $0. A ramp rule holds the combined-cycle above this hour's need, so the solver curtails " + Math.round(sol.sp[t]) + " MW of wind and solar. One more MWh is served by curtailing less: free." };
     // a ramp rule links t to a neighbour: which one, and is the extra spilled there?
     var link = null;
     if (t > 0 && near(sol.cc[t] - sol.cc[t - 1], s.ramp)) link = t - 1;
     else if (t < HOURS - 1 && near(sol.cc[t] - sol.cc[t + 1], s.ramp)) link = t + 1;
     if (link !== null && y > f.cc.cost && near(y, 2 * f.cc.cost) && sol.sp[link] > 1e-6)
-      return { kind: "ramp", link: link, text: hh + ": " + money(y) + ". A ramp rule ties " + hh + " to " + nb(link) + ", where the difference is spilled: $" + f.cc.cost + " + $" + f.cc.cost + "." };
+      return { kind: "ramp", link: link, text: hh + ": " + money(y) + ". A ramp rule ties " + hh + " to " + nb(link) + ": the combined-cycle moves by the same MWh in both hours, and curtailment at " + nb(link) + " absorbs the change: $" + f.cc.cost + " + $" + f.cc.cost + "." };
     if (link !== null) return { kind: "ramp", link: link, text: hh + ": " + money(y) + ". A ramp rule ties " + hh + " to " + nb(link) + ", so one more MWh here changes the plan in both hours: " + money(y) + " in all." };
-    return { kind: "other", text: hh + ": " + money(y) + ". The rules that bind around " + hh + " together set the cost of one more MWh." };
+    return { kind: "other", text: hh + ": " + money(y) + ". The rules at their limits around " + hh + " together set the cost of one more MWh." };
   }
-  var model = { HOURS: HOURS, dayOf: dayOf, DEFAULTS: DEFAULTS, settings: settings, hours: hours, buildLP: buildLP, parse: parse, evalPlan: evalPlan, checks: checks, why: why };
+  var model = { HOURS: HOURS, dayOf: dayOf, DEFAULTS: DEFAULTS, settings: settings, hours: hours, buildLP: buildLP, parse: parse, evalPlan: evalPlan, checks: checks, served: served, why: why };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -164,10 +181,12 @@
     ".w11-checks b{font-family:var(--lx-f-display);font-weight:500}.w11-checks span{display:block;font-size:13.5px;color:var(--lx-ink-2);font-family:var(--lx-f-mono)}",
     ".w11-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
     ".w11-pricehead{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}",
-    ".w11-pricehead p{font-size:13.5px;color:var(--lx-ink-3);margin:0}"
+    ".w11-pricehead p{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+    ".w11-served{margin:2px 0 0;padding:8px 10px;border-radius:10px;border:1px dashed var(--lx-line);font-size:14px;color:var(--lx-ink-2)}",
+    ".w11-served.no{border-color:var(--lx-warn);background:var(--lx-warn-soft);color:var(--lx-ink)}"
   ].join("\n");
 
-  var fmt1 = function (v) { return (Math.round(v * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }); };
+  var fmt1 = function (v) { return (Math.round(v * 10) / 10 + 0).toLocaleString("en-US", { maximumFractionDigits: 1 }); };   // + 0 turns -0 into 0
   var usd = function (v) { return (v < 0 ? "−$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US"); };
   var saw = function (api, t, bad) { api.saw(t, bad); };   // step cards turn **bold** marks into <b> (cards.js)
 
@@ -209,19 +228,23 @@
       var hs = hours(W, s); hs.forEach(function (x, t) { chartDemand[t] = x.demand; });
       if (LX.visible(chartHost)) chart.render();
       chips.innerHTML = "";
-      if (!sol) { chip("Gas to schedule", Math.round(hs.reduce(function (a, x) { return a + Math.max(0, x.need); }, 0)).toLocaleString("en-US") + " MWh"); chip("Decisions", "96"); chip("Rules", "72 + limits"); return; }
+      if (!sol) { chip("Gas to schedule", Math.round(hs.reduce(function (a, x) { return a + Math.max(0, x.need); }, 0)).toLocaleString("en-US") + " MWh"); chip("Decisions", "96 (4 an hour)"); chip("Rules", "72 (3 an hour) + limits"); return; }
       chip(label || "Running cost", usd(sol.totals.cost), "good");
       chip("Peaker", fmt1(sol.totals.pk) + " MWh");
-      chip("Spilled sun", fmt1(sol.totals.sp) + " MWh");
+      chip("Wind and solar curtailed", fmt1(sol.totals.sp) + " MWh");
       if (sol.totals.un > 1e-6) chip("Unserved", fmt1(sol.totals.un) + " MWh", "bad");
       if (sol.kind === "edit") st.el.textContent = "Your edit: evaluated by hand, not solved.";
       else if (sol.status && !sol.precomputed) st.set({ status: sol.status, ms: sol.ms });
       paintPrices();
     }
+    // the 24 price buttons are rebuilt only when the solution changes (show); a tap moves aria-pressed and keeps the
+    // keyboard focus on the button that was pressed
+    var priceBtns = [];
+    function markPick() { priceBtns.forEach(function (b, i) { b.setAttribute("aria-pressed", pricePick === i ? "true" : "false"); }); }
     function paintPrices() {
-      prices.innerHTML = "";
+      prices.innerHTML = ""; priceBtns = [];
       var sol = shown;
-      if (!sol || !sol.duals) { pnote.textContent = sol && sol.kind === "milp" ? "None: a mixed-integer program has no shadow prices." : ""; }
+      if (!sol || !sol.duals) { pnote.textContent = sol && sol.kind === "milp" ? "None from this solve: a mixed-integer solve returns no shadow prices." : ""; }
       else pnote.textContent = "Tap an hour.";
       for (var t = 0; t < HOURS; t++) (function (t) {
         var y = sol && sol.duals ? sol.duals[t] : null, odd = y != null && Math.abs(y - f.cc.cost) > 0.01;
@@ -229,8 +252,9 @@
         H("small", { text: (t < 10 ? "0" : "") + t }, b); H("b", { text: y == null ? "–" : String(Math.round(y)) }, b);
         b.setAttribute("aria-label", hh(t) + ": " + (y == null ? "no shadow price" : "$" + Math.round(y) + " per MWh"));
         if (y == null) b.disabled = true;
+        priceBtns.push(b);
         b.addEventListener("click", function () {
-          pricePick = t; paintPrices(); var w = why(W, set, sol, t); pout.textContent = w.text;
+          pricePick = t; markPick(); var w = why(W, set, sol, t); pout.textContent = w.text;
           fdAt(t, sol).then(function (fd) { if (pricePick !== t) return; if (fd) { w = why(W, set, sol, t, fd); pout.textContent = w.text; } if (hook) hook({ price: t, why: w }); });
         });
       })(t);
@@ -268,18 +292,20 @@
     }
     function solveBase() { return base ? Promise.resolve(base) : solve(settings()).then(function (s) { base = s; return s; }); }
     function checksUI(host) {
-      var ul = H("ul", { class: "w11-checks" }, host);
+      var ul = H("ul", { class: "w11-checks" }, host), sv = H("p", { class: "w11-served", hidden: true }, host);
       return function (sol, s) {
         ul.innerHTML = "";
-        var cs = checks(W, s, sol);
+        var cs = checks(W, s, sol), r = served(W, s, sol);
         cs.forEach(function (c) { var li = H("li", { class: c.ok ? "ok" : "no" }, ul); li.innerHTML = LX.icon(c.ok ? "check" : "cross"); var d = H("div", null, li); H("b", { text: c.title + (c.ok ? ": passed" : ": FAILED") }, d); H("span", { text: c.text }, d); });
+        sv.hidden = false; sv.className = "w11-served" + (r.ok ? "" : " no");
+        sv.textContent = r.ok ? "Apart from the checks: all demand is served." : "Apart from the checks: " + fmt1(r.un) + " MWh of demand is unserved in " + r.hours + " hours. The checks can pass while the lights go out.";
         return cs;
       };
     }
 
     // ---------- step cards
     var steps = [
-      { text: "Lesson 0's day as a [[linear-program|linear program]]: for each hour, two gas outputs, spilled sun and unserved demand. That is 96 decisions and 72 rules. Press Solve to hand it to HiGHS, a [[solver|solver]] running in your browser.",
+      { text: "Lesson 0's day as one [[linear-program|linear program]], sized in the readouts above. Press Solve to hand it to HiGHS, a [[solver|solver]] running in your browser.",
         build: function (act, api) {
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = true; show(base, set);
@@ -290,12 +316,12 @@
             solveBase().then(function (sol) {
               b.disabled = false; if (!sol) return;
               show(sol, set); api.done();
-              saw(api, "**Optimal**: " + usd(sol.totals.cost) + " for the day, " + usd(D.rule.cost - sol.totals.cost) + " below lesson 0's cheapest-first rule. The solver warms the combined-cycle early, spilling " + fmt1(sol.totals.sp) + " MWh of sun, and never needs the peaker.");
+              saw(api, "**Optimal**: " + usd(sol.totals.cost) + " for the day, " + usd(D.rule.cost - sol.totals.cost) + " below lesson 0's cheapest-first rule. The solver keeps the combined-cycle within its ramp limit, [[curtailment|curtails]] " + fmt1(sol.totals.sp) + " MWh of wind and solar, and never needs the peaker.");
             });
           });
           if (base) { api.done(); }
         } },
-      { text: "Try to beat it. Pick an hour and move the combined-cycle up or down; the peaker and spilled sun follow, so every hour still balances. Can you find a cheaper day?",
+      { text: "Try to beat it. Pick an hour and move the combined-cycle; the peaker and curtailment adjust where they can. Can you find a cheaper day that keeps every rule?",
         build: function (act, api) {
           hook = null; pricePick = null;
           set = settings(); priceBox.hidden = true;
@@ -310,14 +336,19 @@
             rs.addEventListener("click", function () { editPlan = sol.cc.map(function (v) { return Math.round(v); }); cc.set(editPlan[hour]); paintEdit(); });
             function paintEdit() {
               var e = evalPlan(W, set, editPlan), d = e.cost - sol.totals.cost;
-              var fake = { cc: e.cc, pk: e.pk, sp: e.sp, un: e.un, totals: { cost: e.cost, pk: e.pk.reduce(function (a, b) { return a + b; }, 0), sp: e.sp.reduce(function (a, b) { return a + b; }, 0), un: 0 }, duals: null, kind: "edit" };
+              var sum0 = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
+              var fake = { cc: e.cc, pk: e.pk, sp: e.sp, un: e.un, totals: { cost: e.cost, pk: sum0(e.pk), sp: sum0(e.sp), un: sum0(e.un) }, duals: null, kind: "edit" };
               show(fake, set, "Your day");
+              var off = e.overHours.concat(e.shortHours).sort(function (a, b) { return a - b; });
               chip("Against the solver", (d >= 0 ? "+" : "−") + usd(Math.abs(d)).replace("−", ""), d < -1e-6 && e.ok ? "good" : d > 1e-6 ? "warn" : "");
               chip("Ramp rule", e.rampBreaks.length ? "broken at " + e.rampBreaks.map(hh).join(", ") : "kept", e.rampBreaks.length ? "bad" : "good");
+              chip("Balance", off.length ? "off at " + off.map(hh).join(", ") : "every hour", off.length ? "bad" : "good");
               if (moves >= 3) api.done();
               if (!moves) return;
-              var b0 = e.rampBreaks[0];
-              if (e.rampBreaks.length) saw(api, (d < 0 ? "Cheaper by " + usd(-d) + ", but " : "") + "the ramp rule breaks: the combined-cycle would change by more than " + set.ramp + " MW between " + (b0 ? hh(b0 - 1) : "the start") + " and " + hh(b0) + ".", true);
+              var b0 = e.rampBreaks[0], o0 = e.overHours[0], s0 = e.shortHours[0], but = d < -1e-6 ? "Cheaper by " + usd(-d) + ", but " : "";
+              if (e.rampBreaks.length) saw(api, but + "the ramp rule breaks: the combined-cycle would change by more than " + set.ramp + " MW between " + (b0 ? hh(b0 - 1) : "the start") + " and " + hh(b0) + ".", true);
+              else if (o0 != null) saw(api, but + "the hour does not balance: at " + hh(o0) + " supply exceeds demand by " + fmt1(e.over[o0]) + " MW even with all wind and solar there curtailed.", true);
+              else if (s0 != null) saw(api, but + "the hour does not balance: at " + hh(s0) + " " + fmt1(e.un[s0]) + " MW of demand is unserved even with the peaker at full output.", true);
               else if (d > 1e-6) saw(api, "Every rule holds, but the day costs " + usd(d) + " more. " + (moves >= 3 ? "In a linear program a plan that no small change can improve is the best plan overall." : "Try another hour."));
               else saw(api, "Same cost as the solver: a tie, not a win.");
             }
@@ -335,11 +366,11 @@
             solveBase().then(function (sol) {
               if (!sol) return;
               var cs = run(sol, set); api.done();
-              saw(api, cs.every(function (c) { return c.ok; }) ? "All four pass: the balance holds to the last MW, ramps peak at exactly " + set.ramp + " MW, and " + usd(cs[3].cost) + " recomputed by hand matches the solver." : "A check failed.", !cs.every(function (c) { return c.ok; }));
+              saw(api, cs.every(function (c) { return c.ok; }) ? "All four pass: the balance holds to the last MW, ramps peak at exactly " + set.ramp + " MW, and " + usd(cs[3].cost) + " recomputed by hand matches the solver. All demand is served." : "A check failed.", !cs.every(function (c) { return c.ok; }));
             });
           });
         } },
-      { text: "Why check at all? Plant a sign error: spilled sun now adds to supply instead of taking away. Re-solve, then run the checks again.",
+      { text: "Why check at all? Plant a sign error: curtailed wind and solar now adds to supply instead of taking away. Re-solve, then run the checks again.",
         build: function (act, api) {
           hook = null; pricePick = null;
           set = settings({ signError: false }); priceBox.hidden = true;
@@ -388,7 +419,7 @@
           set = settings(); priceBox.hidden = false; pricePick = null; pout.textContent = "";
           solveBase().then(function (sol) { if (sol) show(sol, set); });
           hook = function (e) {
-            if (e.why.kind === "ramp") { api.done(); saw(api, "A ramp rule bends this price. A shadow price is the cost of one more MWh, wherever in the plan it has to come from."); }
+            if (e.why.kind === "ramp") { api.done(); saw(api, "A ramp rule bends this price: one MWh more or less here moves the plan in a neighbouring hour too, and the price counts both."); }
             else saw(api, "That hour's price is set by one plant. Now tap a highlighted hour.");
           };
           H("p", { class: "lx-hint", text: "The prices are under the chart." }, act);
@@ -407,7 +438,7 @@
             if (sol.totals.pk > 1e-6) {
               api.done();
               var only = set.ramp === DEFAULTS.ramp && set.demandPct === 0 && set.windMW === DEFAULTS.windMW;
-              saw(api, "The peaker runs " + fmt1(sol.totals.pk) + " MWh." + (only ? " It starts below **$" + D.threshold + "/MWh**, the shadow price of the ramp hours: until then, spilling sun to keep the combined-cycle warm costs less." : " Other rules changed too; try the peaker's cost alone, with the rest as given."));
+              saw(api, "The peaker runs " + fmt1(sol.totals.pk) + " MWh." + (only ? " It starts below **$" + D.threshold + "/MWh**, the shadow price of the ramp hours: until then, curtailing wind and solar to keep the combined-cycle within its ramp costs less." : " Other rules changed too; try the peaker's cost alone, with the rest as given."));
             } else saw(api, "Still no peaker: " + usd(sol.totals.cost) + " for the day.");
           }
           solveBase().then(function (sol) { if (sol) show(sol, set); });
@@ -426,7 +457,7 @@
               if (!on) { lpSol = sol; saw(api, "As a linear program: " + usd(sol.totals.cost) + ", the peaker runs " + fmt1(sol.totals.pk) + " MWh, and every hour has a price. Now make the peaker on-or-off."); return; }
               api.done();
               chip("Optimality gap", ((sol.mipGap || 0) * 100).toFixed(2) + "%");
-              saw(api, "Optimal at " + usd(sol.totals.cost) + (lpSol ? " (" + usd(sol.totals.cost - lpSol.totals.cost) + " more than the linear program)" : "") + ": the peaker " + (sol.totals.pk > 1e-6 ? "runs " + fmt1(sol.totals.pk) + " MWh" : "stays off and more sun is spilled") + ". **No shadow prices**: with an on-or-off choice the cost no longer changes smoothly with demand (Go deeper, below).");
+              saw(api, "Optimal at " + usd(sol.totals.cost) + (lpSol ? " (" + usd(sol.totals.cost - lpSol.totals.cost) + " more than the linear program)" : "") + ": the peaker " + (sol.totals.pk > 1e-6 ? "runs " + fmt1(sol.totals.pk) + " MWh" : "stays off and more wind and solar is curtailed") + ". [[optimality-gap|Optimality gap]] " + ((sol.mipGap || 0) * 100).toFixed(0) + "%: proven best. **No shadow prices** from this solve (Go deeper, below).");
             });
           }
           bLP.addEventListener("click", function () { run(false); });
@@ -454,23 +485,44 @@
     if (host) {
       host.innerHTML = ""; host.classList.add("is-live");
       var P = D.precomputed, sym = LX.EquationCard.sym;
+      // the price equation and the model's goal: every symbol is a button with its words and unit, and every row has a
+      // spoken version (the text version reads the rows, then every symbol)
+      var pkc = f.peaker.cost, nucDay = HOURS * f.nuclear.mw * f.nuclear.cost, k$ = function (v) { return v.toLocaleString("en-US"); };
       LX.EquationCard(H("div", { class: "lx-xcard" }, host), {
         title: "The price, as an equation",
         lede: "Tap a symbol. Each one links what the solver returns to what it means.",
-        dense: true, label: "The model; each symbol is a button", textLabel: "Text version: every symbol", fields: [{ key: "code", label: "In code", code: true }],
+        dense: true, label: "The price and the model's goal; each symbol is a button", textLabel: "Text version: the rows read aloud, then every symbol",
+        fields: [{ key: "code", label: "In code", code: true }],
         rows: [
-          { html: sym("lam", "λ(<var>t</var>)") + " = " + sym("dC", "Δ<var>C</var>*") + " / " + sym("dd", "Δ<var>d</var>(<var>t</var>)"), tag: "shadow price of the demand rule" },
-          { html: sym("C", "<var>C</var>*") + " = min Σ<sub><var>t</var></sub> ( 40 <var>p</var><sub>cc</sub>(<var>t</var>) + " + f.peaker.cost + " <var>p</var><sub>pk</sub>(<var>t</var>) + <var>V</var> <var>u</var>(<var>t</var>) ) + 24,000", tag: "best running cost" },
-          { html: "λ(19) = " + sym("c", "$" + f.cc.cost + "/MWh") + " = " + sym("cc", "<var>c</var><sub>cc</sub>"), tag: "no ramp rule binds at 19:00" }
+          { html: sym("lam", "λ(<var>t</var>)") + " = " + sym("dC", "Δ<var>C</var>*") + " / " + sym("dd", "Δ<var>d</var>(<var>t</var>)"), tag: "small change, away from a kink",
+            say: "Lambda of t, the shadow price of hour t's demand rule, equals the change in the best cost divided by a small change in hour t's demand. This holds away from a kink; at a kink, the cost of one more MWh and the saving from one less MWh differ, so compare them separately." },
+          { html: sym("C", "<var>C</var>*") + " = " + sym("min", "min") + " " + sym("sum", "Σ<sub><var>t</var></sub>") + " ( " + sym("cc", String(f.cc.cost)) + " " + sym("pcc", "<var>p</var><sub>cc</sub>(<var>t</var>)") + " + " +
+              sym("cpk", String(pkc)) + " " + sym("ppk", "<var>p</var><sub>pk</sub>(<var>t</var>)") + " + " + sym("V", "<var>V</var>") + " " + sym("u", "<var>u</var>(<var>t</var>)") + " ) × " + sym("hr", "1 h") + " + " + sym("K", k$(nucDay)),
+            tag: "best total model cost",
+            say: "C star, the best total model cost, is the minimum, over all the decisions, of the sum over the 24 hours of: " + f.cc.cost + " dollars per MWh times the combined-cycle's output, plus " + pkc + " dollars per MWh times the peaker's output, plus V times the unserved demand, each times one hour; plus a constant " + k$(nucDay) + " dollars." },
+          { html: "subject to: balance, sizes, ramps", tag: "every hour, lesson 10's rules",
+            say: "Subject to the rules, in every hour: supply balances demand, each plant stays within its size, and the combined-cycle ramps at most " + DEFAULTS.ramp + " MW an hour." },
+          { html: "λ(19) = " + sym("c", "$" + f.cc.cost + "/MWh") + " = " + sym("cc", "<var>c</var><sub>cc</sub>"), tag: "no ramp rule at its limit at 19:00",
+            say: "Lambda at 19:00 equals " + f.cc.cost + " dollars per MWh, which is c c c, the combined-cycle's running cost." }
         ],
         symbols: {
-          lam: { name: "λ(t)", label: "lambda of t", words: "The [[shadow-price|shadow price]] of hour t's demand rule: how much the best cost rises per extra MWh of demand in that hour, in $/MWh. HiGHS returns it with the answer, for every rule.", code: 'r.duals["balance_19"]   // ' + P.duals[19] },
-          dC: { name: "ΔC*", label: "change in best cost", words: "The change in the best total cost when demand changes, with every decision free to adjust.", code: "probe.objective - r.objective   // re-solve with d(t) + 1" },
-          dd: { name: "Δd(t)", label: "change in demand at t", words: "One more MWh of demand in hour t, nothing else changed.", code: "eq: need[t] + 1   // the balance row's right-hand side" },
-          C: { name: "C*", label: "C star, the best cost", words: "The lowest running cost that meets every rule: " + usd(P.cost) + " for lesson 0's day. The 24,000 is the nuclear plant's flat 100 MW at $10/MWh.", code: "r.objective   // " + P.cost },
-          c: { name: "$" + f.cc.cost + "/MWh", label: f.cc.cost + " dollars per MWh", words: "The answer the solver gives at 19:00.", code: "r.duals[\"balance_19\"] === 40" },
-          cc: { name: "c_cc", label: "c cc, the combined-cycle cost", words: "The combined-cycle's running cost. Where no ramp rule binds it is the marginal plant, so the price equals its cost: the merit-order price of lesson 8, now read from a solver.", code: '{ name: "cc_19", ub: 150, cost: 40 }' }
+          lam: { name: "λ(t)", label: "lambda of t", unit: "$/MWh", words: "The [[shadow-price|shadow price]] of hour t's demand rule: for a small change away from a kink, how much the best cost rises per extra MWh of demand in that hour. HiGHS returns one for every rule.", code: 'r.duals["balance_19"]   // ' + P.duals[19] },
+          dC: { name: "ΔC*", label: "change in best cost", unit: "$", words: "The change in the best total model cost when demand changes, with every decision free to adjust.", code: "probe.objective - r.objective   // re-solve with d(t) + 1" },
+          dd: { name: "Δd(t)", label: "change in demand at t", unit: "MWh", words: "A small change of demand in hour t, here one MWh up or down, with nothing else changed.", code: "eq: need[t] + 1   // the balance row's right-hand side" },
+          C: { name: "C*", label: "C star, the best total model cost", unit: "$", words: "The lowest total model cost that meets every rule: running cost plus the unserved penalty. For lesson 0's day nothing is unserved, so it equals the running cost, " + usd(P.cost) + ".", code: "r.objective   // " + P.cost },
+          min: { name: "min", label: "minimum", words: "Choose the decisions (every hour's two gas outputs, curtailment and unserved demand) that make what follows as small as the rules allow.", code: 'sense: "min"' },
+          sum: { name: "Σ_t", label: "sum over t", words: "Add up over the 24 hours: t is the hour, from 0 (00:00) to 23 (23:00).", code: "for (let t = 0; t < 24; t++) …" },
+          pcc: { name: "p_cc(t)", label: "p c c of t, combined-cycle output", unit: "MW", words: "The combined-cycle's output in hour t: a decision, from 0 to " + f.cc.mw + " MW.", code: '{ name: "cc_" + t, ub: ' + f.cc.mw + ", cost: " + f.cc.cost + " }" },
+          ppk: { name: "p_pk(t)", label: "p p k of t, peaker output", unit: "MW", words: "The peaker's output in hour t: a decision, from 0 to " + f.peaker.mw + " MW.", code: '{ name: "pk_" + t, ub: ' + f.peaker.mw + ", cost: " + pkc + " }" },
+          cpk: { name: "c_pk", label: "c p k, the peaker's running cost", unit: "$/MWh", words: "The peaker's running cost: $" + pkc + "/MWh as given (step 7's slider changes it).", code: "cost: " + pkc },
+          V: { name: "V", label: "V, the unserved-energy penalty", unit: "$/MWh", words: "The penalty per MWh of [[unserved-energy|unserved demand]]: $" + k$(D.penalty) + ", illustrative and high, so the solver keeps the lights on whenever the rules allow.", code: '{ name: "un_" + t, cost: ' + D.penalty + " }" },
+          u: { name: "u(t)", label: "u of t, unserved demand", unit: "MW", words: "Demand the plan leaves unmet in hour t: a decision, at least 0. It is 0 in every hour of the best plan for the day as given.", code: '{ name: "un_" + t }   // lb 0, no upper bound' },
+          hr: { name: "1 h", label: "times one hour", unit: "h", words: "Each output is held for one hour, so MW × 1 h = MWh, and $/MWh × MWh = dollars.", code: "// one-hour steps: MW and MWh are the same number" },
+          K: { name: k$(nucDay), label: k$(nucDay) + " dollars, a constant", unit: "$", words: "The fixed-output plant contributes a constant $" + k$(nucDay) + " to the daily objective: " + f.nuclear.mw + " MW × 24 h × $" + f.nuclear.cost + "/MWh. A constant changes no decision and no price.", code: "objective: { constant: " + nucDay + " }" },
+          c: { name: "$" + f.cc.cost + "/MWh", label: f.cc.cost + " dollars per MWh", unit: "$/MWh", words: "The shadow price the solver gives at 19:00.", code: "r.duals[\"balance_19\"] === " + P.duals[19] },
+          cc: { name: "c_cc", label: "c c c, the combined-cycle's running cost", unit: "$/MWh", words: "The combined-cycle's running cost, $" + f.cc.cost + "/MWh. Where no ramp rule is at its limit it is the [[marginal-plant|marginal plant]], so the price equals its cost: the merit-order price of lesson 8, now read from a solver.", code: '{ name: "cc_19", ub: ' + f.cc.mw + ", cost: " + f.cc.cost + " }" }
         },
+        hint: "At a kink (07:00 and 09:00 here) the cost of one more MWh and the saving from one less differ: compare them separately (Go deeper, below).",
         sel: "lam"
       });
       LX.Flowchart(H("div", { class: "lx-xcard" }, host), {
@@ -492,7 +544,7 @@
         traces: [
           { label: "The day as given", path: ["start", "q1", "q2", "q3", "lp"], text: "Optimal, every check passes, and the price at 19:00 is $40/MWh." },
           { label: "The sign error", path: ["start", "q1", "q2", "bug"], text: "Optimal at " + usd(D.signError.cost) + ", yet the balance check fails: the model, not the plan, is wrong." },
-          { label: "On-or-off peaker", path: ["start", "q1", "q2", "q3", "mi"], text: "Optimal, checks pass, but a mixed-integer program reports no shadow prices." }
+          { label: "On-or-off peaker", path: ["start", "q1", "q2", "q3", "mi"], text: "Optimal, checks pass, but a mixed-integer solve returns no shadow prices." }
         ],
         sel: 0
       });
@@ -505,9 +557,9 @@
       LX.CompareTable(H("div", { class: "lx-xcard" }, host), {
         title: "Lesson 0's rule against the solver",
         columns: [{ key: "name", label: "Plan", main: true }, { key: "cost", label: "Running cost", num: true, bar: { max: 110000 } }, { key: "pk", label: "Peaker", num: true },
-          { key: "sp", label: "Spilled sun", num: true, phoneHide: true }, { key: "co2", label: "CO₂", num: true }],
+          { key: "sp", label: "Wind and solar curtailed", num: true, phoneHide: true }, { key: "co2", label: "CO₂", num: true }],
         rows: rows,
-        sorts: [{ label: "As listed", order: ["rule", "lp", "bad"], note: "The solver saves " + usd(R.cost - P.cost) + " but emits " + fmt1(f.cc.co2 * P.cc.reduce(function (a, b) { return a + b; }, 0) - R.co2) + " t more CO₂: it burns gas early and spills sun to dodge the peaker. Cheaper is not cleaner (lesson 12)." },
+        sorts: [{ label: "As listed", order: ["rule", "lp", "bad"], note: "The solver saves " + usd(R.cost - P.cost) + " but emits " + fmt1(f.cc.co2 * P.cc.reduce(function (a, b) { return a + b; }, 0) - R.co2) + " t more CO₂: it burns gas early and curtails wind and solar to avoid the peaker. Cheaper is not cleaner (lesson 12)." },
                 { label: "By cost", order: ["bad", "lp", "rule"], ranked: true, note: "The cheapest answer is the wrong one: always run the checks." }]
       });
     }
