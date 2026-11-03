@@ -996,6 +996,28 @@
    "form": "play"
   },
   {
+   "tier": "analyst",
+   "code": "A4",
+   "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+   "ready": true,
+   "href": "a04-retail-tariffs.html",
+   "scales": [],
+   "id": "a04-retail-tariffs",
+   "minutes": 25,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "A7",
+   "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+   "ready": true,
+   "href": "a07-flexible-demand.html",
+   "scales": [],
+   "id": "a07-flexible-demand",
+   "minutes": 30,
+   "form": "cards"
+  },
+  {
    "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",

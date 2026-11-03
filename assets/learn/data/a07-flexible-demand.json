@@ -1,0 +1,145 @@
+{
+ "about": "Lesson A7 (a07-flexible-demand), wave W3, 2026-11-03. Prairie Town is fictional: the flexible share, the losses, the users' cost, the devices, their counts and ratings, the values, the coordination cost, Feeder 7 and the neighbours are illustrative. The day is 9 June 2025 on real Southwest Power Pool shapes (EIA-930 in town_year.json), cut and scaled as lesson 9, CF6 and A4 do; each hour is dispatched cheapest first (the town's 100 MW always-on plant, wind and sun, the combined-cycle plant at $40/MWh and 0.37 t CO2/MWh, the peaker at $100/MWh and 0.55 t CO2/MWh; CO2 at the plant only). The research text (the real-world box) is approved excerpt wording (reports/learn/excerpts_for_approval.md, E6 and E8), checked word for word by _tests/learn/test_a07-flexible-demand.js, which also checks every number on the page.",
+ "built": "2026-11-03",
+ "day": {
+  "date": "2025-06-09",
+  "dateLabel": "9 June 2025",
+  "utcOffsetHours": -5,
+  "demandPeakMW": 450
+ },
+ "hook": {
+  "q": 10,
+  "from": 20,
+  "to": 14
+ },
+ "shift": {
+  "shares": [
+   0,
+   10,
+   1
+  ],
+  "start": 0,
+  "try": 5,
+  "loss": 0.1,
+  "userCost": [
+   0,
+   54,
+   6
+  ],
+  "userStart": 0,
+  "note": "Illustrative: each hour's use may move up or down by at most the flexible share of that hour's demand; the day's total stays the same, plus the losses when they are on (each MWh moved needs 1.1 MWh at its new hour, as when a home is pre-cooled). The users' cost moves in steps of $6 a MWh, so no setting makes a move save exactly nothing (at $40, $56 or $60 a move would tie, and the plants' CO2 would no longer be the same in every least-cost shift)."
+ },
+ "vpp": {
+  "event": [
+   20,
+   23
+  ],
+  "eventLabel": "20:00 to 23:00",
+  "days": 30,
+  "capacityValue": 50,
+  "aggregatorShare": 0.2,
+  "coordination": [
+   0,
+   60,
+   5
+  ],
+  "coordinationStart": 30,
+  "devices": [
+   {
+    "key": "battery",
+    "name": "Home batteries",
+    "one": "home battery",
+    "count": 1500,
+    "kw": 3.6,
+    "avail": 0.95,
+    "ret": 0,
+    "back": 0,
+    "color": "var(--lx-bat)",
+    "note": "13.5 kWh each, keeping 20% for a power cut: 3.6 kW for three hours; refilled from the next day's spare sun.",
+    "refill": "sun"
+   },
+   {
+    "key": "thermostat",
+    "name": "Smart thermostats",
+    "one": "thermostat",
+    "count": 8000,
+    "kw": 1.2,
+    "avail": 0.7,
+    "ret": 0.8,
+    "back": 1,
+    "color": "var(--lx-dr)",
+    "note": "Air conditioning set a few degrees warmer: 1.2 kW less; 70% of homes take part; 80% of the skipped energy comes back as the homes cool down."
+   },
+   {
+    "key": "ev",
+    "name": "EV chargers",
+    "one": "EV charger",
+    "count": 3000,
+    "kw": 7,
+    "avail": 0.4,
+    "ret": 1,
+    "back": 3,
+    "color": "var(--lx-tier-3)",
+    "note": "7 kW each; 40% are plugged in and charging during the event; all the skipped charging comes back."
+   },
+   {
+    "key": "dairy",
+    "name": "Dairies' pumps",
+    "one": "dairy",
+    "count": 4,
+    "kw": 300,
+    "avail": 0.9,
+    "ret": 1,
+    "back": 3,
+    "color": "var(--lx-tier-2)",
+    "note": "Irrigation and milk-cooling pumps, 300 kW a farm; the milk is chilled ahead and the fields watered later."
+   }
+  ],
+  "staggerHours": 6,
+  "note": "Illustrative: the aggregator is paid $50 per kW a year for being ready, plus the running cost its devices save the town on 30 event days a year like 9 June 2025; it keeps 20% and pays a coordination cost for each device or farm (meters, software, customer service)."
+ },
+ "feeder": {
+  "name": "Feeder 7",
+  "homes": 1000,
+  "limitMW": 3.0,
+  "peakMW": 3.0,
+  "enrolled": {
+   "thermostat": 300,
+   "ev": 120
+  },
+  "note": "Illustrative: a feeder for 1,000 homes rated 3.0 MW, its load following the town's shape with its own peak of 3.0 MW at 17:00."
+ },
+ "trade": {
+  "price": [
+   0,
+   9.5,
+   0.5
+  ],
+  "start": 5,
+  "note": "Illustrative: under net billing the solar home's midday kWh earn the hour's running cost, $0 on 9 June; its neighbour, the renter, buys at A4's flat price, 14.7¢, of which 9.5¢ pays for plants and wires (A4's real-time wires charge).",
+  "wires": 0.095185
+ },
+ "facts": [
+  {
+   "n": "33,272 MW · 6.5%",
+   "what": "Demand response enrolled in the seven U.S. wholesale markets in 2024, and the share of their peak demand it could meet.",
+   "source": "FERC staff, 2025 Assessment of Demand Response and Advanced Metering, pp. 2, 14–15",
+   "url": "https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf",
+   "asof": "December 2025; data for 2024"
+  },
+  {
+   "n": "968 MW · 1.8%",
+   "what": "Demand response in the Southwest Power Pool market, Prairie Town's real-data home, in 2024, and its share of SPP's peak demand.",
+   "source": "FERC staff, 2025 Assessment of Demand Response and Advanced Metering, pp. 15–16",
+   "url": "https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf",
+   "asof": "December 2025; data for 2024"
+  },
+  {
+   "n": "100 kW",
+   "what": "FERC Order No. 2222 requires the regional grid operators it regulates to let aggregations of small resources into their markets, with a minimum size of no more than 100 kW.",
+   "source": "FERC, Order No. 2222, p. 138",
+   "url": "https://www.ferc.gov/sites/default/files/2020-09/E-1_0.pdf",
+   "asof": "issued 17 September 2020"
+  }
+ ]
+}
