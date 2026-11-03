@@ -638,9 +638,10 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
   .lx-estop:nth-child(2n)::after { display: none; }
 }
 
-/* metro.css — course map: doors, progress, transit map, legend, preview card (metro.js).
+/* metro.css — course map: doors, progress, transit map, toolbox shelf, legend, preview card (metro.js).
+   The map is drawn 1:1 (an SVG unit is a CSS pixel), so every label keeps the size set here (11.5 px and up).
    The card never leaves the map box: metro.js caps its height to the box and the window, and its body (.bd) scrolls
-   under a fixed header, with a "More below" cue (.cue) while more is hidden. The phone map is drawn at most 450 px wide. */
+   under a fixed header, with a "More below" cue (.cue) while more is hidden. The phone map is drawn at most 560 px wide. */
 .lx-doors { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
 .lx-door { position: relative; display: grid; justify-items: center; gap: 6px; padding: 14px 12px 12px; border-radius: 60px 60px 14px 14px; border: 1.5px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; text-align: center; font-family: var(--lx-f-display); transition: border-color .2s, transform .15s; min-width: 0; }
@@ -660,15 +661,18 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-mapwrap { position: relative; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 10px;
   overflow: hidden; overflow: clip; }   /* clip: not a scroll container, so scrolling a card into view never shifts the map */
 .lx-mapwrap svg { display: block; width: 100%; height: auto; }
-.lx-mapwrap[data-mode="v"] svg { max-width: 450px; margin-inline: auto; }   /* 720-770 px windows: not a 2,000 px tall map */
+.lx-mapwrap[data-mode="v"] svg { max-width: 100%; margin-inline: auto; }   /* metro.js sets its width: at most 560 px */
 .lx-mlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--lx-ink-2); margin-top: 10px; }
-.lx-mlegend span { display: inline-flex; align-items: center; gap: 6px; }
+.lx-mlegend.kinds { margin-top: 6px; }
+.lx-mlegend > span { display: inline-flex; align-items: center; gap: 6px; }
 .lx-mlegend i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
-.lx-mlegend i.o { width: 12px; height: 12px; border-radius: 50%; background: var(--lx-surface); border: 2.5px solid var(--lx-ink-3); }
-.lx-mlegend i.o.dash { border-style: dashed; }
-.lx-mlegend i.o.fill { background: var(--lx-tier-1); border-color: var(--lx-tier-1); }
+.lx-mlegend i.route { width: 22px; height: 7px; border-radius: 4px; background: linear-gradient(90deg, var(--lx-tier-1) 0 33%, var(--lx-tier-2) 33% 66%, var(--lx-tier-3) 66%); }
+.lx-mlegend .sw svg { display: block; fill: var(--lx-ink-2); stroke: var(--lx-ink-2); stroke-width: 1.5; }
+.lx-mlegend > span.st:first-of-type, .lx-mlegend > span.k + span.st { margin-left: 8px; }
+.lx-mlegend i.o { width: 13px; height: 13px; border-radius: 50%; background: var(--lx-surface); border: 2px solid var(--lx-ink-2); }
+.lx-mlegend i.o.fill { background: var(--lx-ink-2); }
 .lx-mlegend i.o.done { background: var(--lx-good); border-color: var(--lx-good); position: relative; }
-.lx-mlegend i.o.done::after { content: ""; position: absolute; left: 2px; top: 0; width: 3px; height: 6px; border: solid var(--lx-surface); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.lx-mlegend i.o.done::after { content: ""; position: absolute; left: 3px; top: 0.5px; width: 3px; height: 6px; border: solid var(--lx-surface); border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .stn { cursor: pointer; }
 .stn:focus { outline: none; }
 .stn:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 4; }
@@ -680,13 +684,41 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .stn .icon { color: var(--c); }
 .stn .ring { fill: none; stroke: transparent; stroke-width: 3; }
 .stn.sel .ring { stroke: var(--lx-ink); }
+/* stations off the starter path: a shape per kind, filled when open, hollow when coming soon */
+.stn.own .hit { fill: transparent; stroke: none; }
+.stn.own .face { fill: var(--c); stroke: var(--c); stroke-width: 2; }
+.stn.own.up .face { fill: var(--lx-surface); stroke-width: 1.8; stroke-dasharray: none; opacity: .8; }
+.stn.own .ring { stroke-width: 2.5; }
+.stn.own:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 3; }
+.mown { stroke-width: 4; opacity: .5; }
+.mown.soon { stroke-dasharray: 2 7; opacity: .45; }
+.mcol { stroke-width: 4; opacity: .28; stroke-dasharray: 1 9; }
+.mhit { fill: transparent; cursor: pointer; }
+.mown-st text { cursor: pointer; }
 .stn .pulse { fill: none; stroke: var(--c); stroke-width: 2; opacity: .6; transform-box: fill-box; transform-origin: center; animation: lx-pulse 2s ease-out infinite; }
 @keyframes lx-pulse { from { transform: scale(1); opacity: .6; } to { transform: scale(1.7); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .stn .pulse { animation: none; opacity: .35; transform: scale(1.3); } .lx-door { transition: none; } }
-.seg-dim { opacity: .25; }
+@media (prefers-reduced-motion: reduce) { /* stations off the starter path: a shape per kind, filled when open, hollow when coming soon */
+.stn.own .hit { fill: transparent; stroke: none; }
+.stn.own .face { fill: var(--c); stroke: var(--c); stroke-width: 2; }
+.stn.own.up .face { fill: var(--lx-surface); stroke-width: 1.8; stroke-dasharray: none; opacity: .8; }
+.stn.own .ring { stroke-width: 2.5; }
+.stn.own:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 3; }
+.mown { stroke-width: 4; opacity: .5; }
+.mown.soon { stroke-dasharray: 2 7; opacity: .45; }
+.mcol { stroke-width: 4; opacity: .28; stroke-dasharray: 1 9; }
+.mhit { fill: transparent; cursor: pointer; }
+.mown-st text { cursor: pointer; }
+.stn .pulse { animation: none; opacity: .35; transform: scale(1.3); } .lx-door { transition: none; } }
+/* a door picks a tier: the other tiers' lines and shapes fade, their text turns to a token grey that keeps 4.5:1 */
+.seg-dim path, .seg-dim circle, .seg-dim rect, .seg-dim .icon, path.seg-dim { opacity: .25; }
+.seg-dim text, .seg-dim tspan { fill: var(--lx-ink-3); }
+/* label fonts: metro.js measures text in the same fonts and sizes (measurer) */
 .mlabel { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; fill: var(--lx-ink); }
-.mlabel.sub { font-family: var(--lx-f-mono); font-size: 11px; font-weight: 400; fill: var(--lx-ink-3); }
-.mlabel.up { fill: var(--lx-ink-2); }
+.mlabel.sub { font-family: var(--lx-f-mono); font-size: 11.5px; font-weight: 400; fill: var(--lx-ink-3); }
+.mlabel.up { fill: var(--lx-ink-3); }
+.mlabel.code { font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; fill: var(--lx-ink); }
+.mlabel.code.up { font-weight: 400; fill: var(--lx-ink-3); }
+.mlabel .mcode { font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; }
 .mtext { font-family: var(--lx-f-body); font-size: 12px; fill: var(--lx-ink-3); }
 .mtier { font-family: var(--lx-f-display); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 .lx-preview { position: absolute; z-index: 6; box-sizing: border-box; width: min(290px, calc(100% - 20px)); background: var(--lx-surface); border: 1px solid var(--lx-ink);
@@ -711,8 +743,26 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-preview-list .lx-code { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); margin-right: 6px; }
 .mext { cursor: pointer; }
 .mext:focus { outline: none; }
-.mext:focus-visible text { fill: var(--lx-accent); text-decoration: underline; }
-.mext:hover text { fill: var(--lx-ink); }
+.mext:focus-visible .mhit { stroke: var(--lx-accent); stroke-width: 2.5; }
+.mext:hover .mtext { fill: var(--lx-ink); text-decoration: underline; }
+/* the math toolbox: a shelf of chips under the lines (inside the map box, so cards can open from it) */
+.lx-toolshelf { border-top: 1px dashed var(--lx-line-2); margin: 6px 6px 2px; padding: 10px 0 4px; }
+.lx-toolshelf .hd { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 8px; }
+.lx-toolshelf .tt { font-family: var(--lx-f-display); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--lx-ink-2); }
+.lx-toolshelf .lx-hint { font-size: 13px; }
+.lx-toolshelf .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.lx-tool { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 5px 12px 5px 9px; border: 1.5px solid var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-body); font-size: 13.5px; line-height: 1.25; text-align: left; cursor: pointer; max-width: 100%; }
+.lx-tool b { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; }
+.lx-tool .sh { flex: none; width: 11px; height: 11px; border-radius: 3px; background: var(--lx-ink-2); border: 2px solid var(--lx-ink-2); }
+.lx-tool.up { border-style: dashed; color: var(--lx-ink-3); }
+.lx-tool.up b { font-weight: 400; }
+.lx-tool.up .sh { background: var(--lx-surface); border-color: var(--lx-ink-3); }
+.lx-tool.done .sh { background: var(--lx-good); border-color: var(--lx-good); }
+.lx-tool:hover { border-color: var(--lx-ink-2); }
+.lx-tool.sel { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); }
+.lx-tool:focus { outline: none; }
+.lx-tool:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
 .lx-preview .x { position: absolute; right: 6px; top: 6px; width: 34px; height: 34px; border: 0; background: none; cursor: pointer; font-size: 20px; color: var(--lx-ink-3); border-radius: 8px; }
 @media (max-width: 640px) {
   .lx-doors { gap: 8px; }
@@ -723,6 +773,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
   .lx-door small { font-size: 10.5px; letter-spacing: .02em; }
   .lx-door .knob { display: none; }
   .lx-mapwrap { padding: 6px; }
+  .lx-tool { font-size: 13px; }
 }
 /* the list view: the course as plain lists (also what readers without JavaScript see) */
 details.lx-listview { margin-top: 14px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r); padding: 0 16px; }
