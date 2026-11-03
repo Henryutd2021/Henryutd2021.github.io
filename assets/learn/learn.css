@@ -1825,7 +1825,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 
 /* benchrun.css — LX.BenchRun (benchrun.js): the Run and Try again buttons, the status line (its left rule coloured by
    the run's kind: done, a refused or failed run, a stop) and the "results are for an earlier plan" line above the
-   results, whose area dims while it is stale. Colours from --lx-* tokens only; the words carry the meaning too. */
+   results, whose charts dim while they are stale or a run is on. Only graphics dim (svg, canvas): text keeps its 4.5:1
+   contrast (W3 layout audit), and the stale line says in words why the charts are faded. Colours from --lx-* tokens
+   only; the words carry the meaning too. */
 .lx-br { display: grid; gap: 8px; min-width: 0; }
 .lx-br-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .lx-br-row .lx-btn[aria-disabled="true"] { opacity: .55; cursor: progress; transform: none; }
@@ -1838,9 +1840,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-br-status[data-kind="early"], .lx-br-status[data-kind="cancelled"] { border-left-color: var(--lx-warn); background: var(--lx-warn-soft); color: var(--lx-ink); }
 .lx-br-stale { margin: 0 0 8px; padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--lx-warn); font-size: 14px; color: var(--lx-ink); background: var(--lx-warn-soft); }
 .lx-br-stale[hidden] { display: none; }
-.lx-br-results[data-stale="true"] > :not(.lx-br-stale) { opacity: .62; }
-.lx-br-results[aria-busy="true"] > :not(.lx-br-stale) { opacity: .5; transition: opacity .2s; }
-@media (prefers-reduced-motion: reduce) { .lx-br-results[aria-busy="true"] > :not(.lx-br-stale) { transition: none; } }
+.lx-br-results[data-stale="true"] svg, .lx-br-results[data-stale="true"] canvas { opacity: .62; }
+.lx-br-results[aria-busy="true"] svg, .lx-br-results[aria-busy="true"] canvas { opacity: .5; transition: opacity .2s; }
+@media (prefers-reduced-motion: reduce) { .lx-br-results[aria-busy="true"] svg, .lx-br-results[aria-busy="true"] canvas { transition: none; } }
 
 /* reportnote.css — LX.ReportNote (reportnote.js): the reader's fields and the deliverable's checks beside a preview of
    the one-page note (two columns from 960 px, one below), the copy buttons, the status line and the select-and-copy box.
@@ -1867,7 +1869,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
   min-width: 0; box-shadow: var(--lx-shadow); font-size: 14.5px; line-height: 1.45; color: var(--lx-ink-2); }
 .page-learn .lx-rn-page h4.lx-rn-title { margin: 0; font-size: 17px; color: var(--lx-ink); }
 .page-learn .lx-rn-page h5 { margin: 8px 0 0; font-family: var(--lx-f-display); font-weight: 600; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--lx-ink-3); }
+  color: var(--lx-ink-2); }   /* small uppercase headings: ink-2 for 4.5:1 on the page's surface (ink-3 gave 4.35:1, W3 layout audit) */
 .lx-rn-page p, .lx-rn-page ul { margin: 0; }
 .lx-rn-page ul { padding-left: 1.1rem; display: grid; gap: 2px; }
 .lx-rn-meta { font-size: 13.5px; color: var(--lx-ink-3); }

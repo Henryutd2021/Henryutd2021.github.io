@@ -1,6 +1,8 @@
 /* benchrun.css — LX.BenchRun (benchrun.js): the Run and Try again buttons, the status line (its left rule coloured by
    the run's kind: done, a refused or failed run, a stop) and the "results are for an earlier plan" line above the
-   results, whose area dims while it is stale. Colours from --lx-* tokens only; the words carry the meaning too. */
+   results, whose charts dim while they are stale or a run is on. Only graphics dim (svg, canvas): text keeps its 4.5:1
+   contrast (W3 layout audit), and the stale line says in words why the charts are faded. Colours from --lx-* tokens
+   only; the words carry the meaning too. */
 .lx-br { display: grid; gap: 8px; min-width: 0; }
 .lx-br-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .lx-br-row .lx-btn[aria-disabled="true"] { opacity: .55; cursor: progress; transform: none; }
@@ -13,6 +15,6 @@
 .lx-br-status[data-kind="early"], .lx-br-status[data-kind="cancelled"] { border-left-color: var(--lx-warn); background: var(--lx-warn-soft); color: var(--lx-ink); }
 .lx-br-stale { margin: 0 0 8px; padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--lx-warn); font-size: 14px; color: var(--lx-ink); background: var(--lx-warn-soft); }
 .lx-br-stale[hidden] { display: none; }
-.lx-br-results[data-stale="true"] > :not(.lx-br-stale) { opacity: .62; }
-.lx-br-results[aria-busy="true"] > :not(.lx-br-stale) { opacity: .5; transition: opacity .2s; }
-@media (prefers-reduced-motion: reduce) { .lx-br-results[aria-busy="true"] > :not(.lx-br-stale) { transition: none; } }
+.lx-br-results[data-stale="true"] svg, .lx-br-results[data-stale="true"] canvas { opacity: .62; }
+.lx-br-results[aria-busy="true"] svg, .lx-br-results[aria-busy="true"] canvas { opacity: .5; transition: opacity .2s; }
+@media (prefers-reduced-motion: reduce) { .lx-br-results[aria-busy="true"] svg, .lx-br-results[aria-busy="true"] canvas { transition: none; } }

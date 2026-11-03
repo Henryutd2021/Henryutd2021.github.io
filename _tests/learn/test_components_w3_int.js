@@ -8,6 +8,8 @@
 //   - LX.mulberry32 (components/core.js; from M7 and engine E1): the same numbers as the copy the two files had, and
 //     both now call the shared one
 //   - the bundle: both components listed after the engines, each file names itself, tokens only
+//   - contrast (W3 layout audit): LX.BenchRun dims only graphics while stale or busy; LX.ReportNote's small headings
+//     use --lx-ink-2
 // Usage (from the site folder):  node _tests/learn/test_components_w3_int.js
 "use strict";
 const fs = require("fs");
@@ -127,6 +129,15 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(/LX\.mulberry32/.test(e1) && e1.indexOf("0x6D2B79F5") < 0 && m7.indexOf("0x6D2B79F5") < 0 && /LX\.mulberry32 = mulberry32;/.test(rd("components/core.js")),
        "engine E1 and M7 call the shared generator and keep no copy");
     ok(typeof E1.prepare === "function", "engine E1 still loads in Node");
+  }
+
+  // ---------------------------------------------------------------- contrast (W3 layout audit)
+  {
+    const br = code(rd("components/benchrun.css")), rn = code(rd("components/reportnote.css"));
+    ok(/\.lx-br-results\[data-stale="true"\] svg, \.lx-br-results\[data-stale="true"\] canvas \{ opacity: \.62; \}/.test(br) &&
+       /\.lx-br-results\[aria-busy="true"\] svg, \.lx-br-results\[aria-busy="true"\] canvas \{ opacity: \.5;/.test(br) && !/:not\(\.lx-br-stale\) \{ opacity/.test(br),
+       "BenchRun: only graphics (svg, canvas) dim while stale or busy; text keeps its contrast");
+    ok(/\.lx-rn-page h5 \{[^}]*color: var\(--lx-ink-2\); \}/.test(rn), "ReportNote: the small headings use --lx-ink-2");
   }
 
   console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w3_int)` : `ok ${checks}/${checks} checks (test_components_w3_int)`);
