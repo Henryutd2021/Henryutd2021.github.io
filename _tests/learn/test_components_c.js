@@ -169,6 +169,10 @@ function hour(o) {
     const half = {}; D10.cards.slice(0, 4).forEach(c => { half[c.id] = c.bin === "rule" ? "goal" : c.bin; });
     const h = CS.grade(D10.cards, half); ok(h.placed === 4 && h.right === D10.cards.slice(0, 4).filter(c => c.bin !== "rule").length, "grade: a half-done sort counts placed and right cards");
     ok(CS.grade(D10.cards, {}).placed === 0, "grade: an empty sort");
+    // any reference value other than "yes" and "partly" is a clear "off" cell (R2 uses "not stated"; shared fix 22 documents it)
+    const ns = [{ key: "p", ref: { a: "not stated", b: "yes", c: "partly" } }], nsr = CS.reference(ns, ["a", "b", "c"]);
+    ok(nsr.p.a === false && nsr.p.b === true && CS.score({ p: { a: false, b: true } }, ns, ["a", "b", "c"]).agree === 2 && CS.score({ p: { a: true, b: true } }, ns, ["a", "b", "c"]).cells.p.a === "differ" &&
+       CS.score({ p: {} }, ns, ["a", "b", "c"]).clear === 2, "score: \"not stated\" is a clear off cell, \"partly\" accepts either answer");
     const D6 = JSON.parse(fs.readFileSync(L("data/06-three-jobs.json"), "utf8")), J = ["energy", "firm", "flex"];
     const items = D6.tech.map(t => ({ key: t.key, ref: t.jobs }));
     const ref = CS.reference(items, J), r0 = CS.score(ref, items, J);

@@ -502,7 +502,7 @@ LX.CardSort(host, { mode: "toggles", bins: [{key, label, short, icon}], items: [
 LX.CardSort.grade(cards, placed);  LX.CardSort.score(marks, items, binKeys);  LX.CardSort.reference(items, binKeys)   // pure, also in Node
 ```
 
-- A "partly" cell accepts either answer. Keep a fourth bin, Given (data), next to Decisions, Goal and Rules.
+- A "partly" cell accepts either answer. Any other reference value than "yes" and "partly" is a clear "off" cell: "no", or a word such as "not stated" (R2), which the "Why" list shows as written. Keep a fourth bin, Given (data), next to Decisions, Goal and Rules.
 - Replaces: `W1F.CardSort` (lesson 10) and `JobSorter` (lesson 6, whose `score()` now calls `LX.CardSort.score`).
 
 **Linked views** (`linkedviews.js`): one model in words, in symbols and as a table; tap a line and the same part lights up everywhere.

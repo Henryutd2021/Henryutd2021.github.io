@@ -3805,10 +3805,12 @@
      formulation error (lesson 10's sidecar, learn/_w1/10-write-it-down.yml).
 
    "toggles" (the job sorter, lesson 6): one row per item, one toggle per bin, any number of bins per item. Check compares
-   every cell with a reference: "yes" and "no" cells agree or differ; a "partly" cell accepts either answer. Each row has a
-   "Why" button that opens the reference's reasons (shown after the first check).
+   every cell with a reference: a "yes" cell agrees when the toggle is on; any other value except "partly" is a clear
+   "off" cell, which agrees when the toggle is off ("no", or a word such as "not stated", R2: the value is shown as
+   written in the "Why" list); a "partly" cell accepts either answer. Each row has a "Why" button that opens the
+   reference's reasons (shown after the first check).
      LX.CardSort(host, { mode: "toggles", bins: [{key, label, short, icon}], items: [{key, label, color, ref: {binKey: "yes" |
-                         "no" | "partly"}, why: {binKey: "One sentence."}}], marks: {itemKey: {binKey: true}},
+                         "no" | "partly" | another "off" word}, why: {binKey: "One sentence."}}], marks: {itemKey: {binKey: true}},
                          onChange: function (marks) {}, onCheck: function (res) {}, checked (show the last check again),
                          checkLabel (default "Check"), legend (HTML; default: agrees · differs · "partly": either is fair),
                          cls (extra class on the root) })
@@ -3817,7 +3819,7 @@
    Pure (no DOM; Node: require("assets/learn/components/cardsort.js") = { grade, score, reference }):
      grade(cards, placed)            -> {items: [{id, placed, ok}], right, placed, total}
      score(marks, items, binKeys)    -> {agree, differ, partly, clear, cells: {itemKey: {binKey: "agree" | "differ" | "partly"}}}
-     reference(items, binKeys)       -> the marks that agree with every clear cell ("yes" on, everything else off)
+     reference(items, binKeys)       -> the marks that agree with every clear cell ("yes" on, every other value off)
    Bins and items take `id` or `key`. Keyboard: cards, bins and toggles are buttons (Tab, Enter or Space); the score and the
    reasons are announced (aria-live). No chart, so no text version is needed. */
 (function () {
