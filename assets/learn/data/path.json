@@ -1347,8 +1347,8 @@
   },
   {
    "title": "Git and reproducible notebooks",
-   "ready": false,
-   "href": "index.html#toolbox",
+   "ready": true,
+   "href": "k08-git-notebooks.html",
    "code": "K8",
    "id": "k08-git-notebooks",
    "minutes": 20

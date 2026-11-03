@@ -1,4 +1,10 @@
 {
+ "gitignore": {
+  "term": ".gitignore",
+  "short": "A file listing names and folders that Git leaves out of the repository, such as keys and large raw data.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "absolute-reference": {
   "term": "Absolute reference",
   "short": "A spreadsheet address with $ signs, such as $E$1, that stays the same when a formula is copied to other cells.",
@@ -59,6 +65,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "branch": {
+  "term": "Branch",
+  "short": "A movable label on a line of commits, so a what-if can grow without changing the main line of work.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "bus": {
   "term": "Bus",
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
@@ -107,17 +119,35 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "checksum": {
+  "term": "Checksum",
+  "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "clearing-price": {
   "term": "Clearing price",
   "short": "The price at which supply meets demand in a market, paid to every seller that runs in that hour.",
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "clone": {
+  "term": "Clone",
+  "short": "A complete new copy of a repository, with its files and its whole history.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "commit": {
+  "term": "Commit",
+  "short": "A saved snapshot of every file in a project, with a message, its author and time, and a link to the commit before it.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "congestion": {
   "term": "Congestion",
@@ -214,6 +244,12 @@
   "short": "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "diff": {
+  "term": "Diff",
+  "short": "A line-by-line list of what changed between two versions of a file, with removed lines marked minus and added lines plus.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "discount-rate": {
   "term": "Discount rate",
@@ -371,6 +407,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "hidden-state": {
+  "term": "Hidden state",
+  "short": "Values in a notebook's memory that no longer match the code on the page, for example after a cell was edited but not rerun.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "hour-ending": {
   "term": "Hour ending",
   "short": "A time stamp that labels each hour by its last moment, so 01:00 means the hour from midnight to 01:00.",
@@ -497,6 +539,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "merge": {
+  "term": "Merge",
+  "short": "Joining two lines of commits into one, keeping the changes made on both.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "merit-order": {
   "term": "Merit order",
   "short": "Running power plants in order of their running cost, cheapest first.",
@@ -532,6 +580,12 @@
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "notebook-kernel": {
+  "term": "Notebook kernel",
+  "short": "The running program behind a notebook that holds its variables in memory between cells, whatever order the cells were run in.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "objective": {
   "term": "Objective",
@@ -653,6 +707,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "random-seed": {
+  "term": "Random seed",
+  "short": "A fixed starting number for a random-number generator, so a random draw comes out the same on every run.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
+ },
  "rocof": {
   "term": "Rate of change of frequency",
   "short": "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second.",
@@ -682,6 +742,12 @@
   "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "repository": {
+  "term": "Repository",
+  "short": "A project folder together with its full history of commits, as kept by a version-control tool such as Git.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "representative-period": {
   "term": "Representative period",
@@ -742,6 +808,12 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "staging-area": {
+  "term": "Staging area",
+  "short": "Git's list of changes picked for the next commit: git add puts a file's current version there.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "standard-deviation": {
   "term": "Standard deviation",
@@ -832,6 +904,12 @@
   "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
   "lesson": "B3",
   "href": "b03-read-check-formulation.html"
+ },
+ "version-control": {
+  "term": "Version control",
+  "short": "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back.",
+  "lesson": "K8",
+  "href": "k08-git-notebooks.html"
  },
  "voltage": {
   "term": "Voltage",
