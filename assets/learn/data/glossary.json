@@ -293,6 +293,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "efficiency": {
+  "term": "Efficiency",
+  "short": "The share of the energy put into a plant or device that comes out in the useful form, such as electricity.",
+  "lesson": "K2",
+  "href": "k02-rates-efficiencies.html"
+ },
  "electrification": {
   "term": "Electrification",
   "short": "Switching a use of energy, such as heating or driving, from burning fuel to using electricity.",
