@@ -1,0 +1,7 @@
+# Sidecar for C0 (c0-behind-one-meter), builder learn-w3-g, 2026-11-03. Read by scripts/build_learn.py.
+id: c0-behind-one-meter
+lesson: C0
+requests:
+  - "path.yml: add A1 and F4 to C0's `after` (curriculum §7.9 prerequisites T9, A1, F4) once their rows from learn-w3-c and learn-w3-a are merged; it is [9, SB0] for now."
+  - "The Modeler version links to M4 as upcoming; once M4's notebook is live (learn-w3-e), link it from C0's 'Go deeper · Modeler' box and from SB0's."
+  - "Excerpts used: E3.2, E3.3 (excerpt:wind-hydrogen) and E4.1, E4.2 (excerpt:solar-hydrogen), word for word; no new excerpts."

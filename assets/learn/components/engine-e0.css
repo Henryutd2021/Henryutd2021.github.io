@@ -1,0 +1,39 @@
+/* engine-e0.css — the page kit of engine E0 (engine-e0.js, LX.E0.ui): the Site Bench's choice rows, presets, results
+   tiles, the 52-week strip, the week navigation and the extra cards a capstone adds (sensitivity). Colours from --lx-*
+   tokens only; no overflow clipping, so chart tips stay visible. */
+.e0-choice { display: grid; gap: 6px; }
+.e0-choice-l { font-family: var(--lx-f-display); font-size: 14px; font-weight: 500; color: var(--lx-ink); }
+.e0-choice .lx-seg { justify-self: start; max-width: 100%; }
+.e0-choice .lx-seg button { min-height: 40px; }
+.e0-presets { display: grid; gap: 6px; }
+.e0-presets-l { margin: 0; font-family: var(--lx-f-display); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--lx-ink-3); }
+.e0-ro { min-height: 52px; }
+.e0-size { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid var(--lx-line); }
+.e0-size .lx-hint { margin: 0; }
+.e0-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; }
+.e0-tile { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--lx-surface); border: 1px solid var(--lx-line); min-width: 0; }
+.e0-tile .l { font-family: var(--lx-f-display); font-size: 12.5px; color: var(--lx-ink-3); }
+.e0-tile b { font-family: var(--lx-f-mono); font-size: 20px; font-weight: 600; color: var(--lx-ink); font-variant-numeric: tabular-nums; }
+.e0-tile .n { font-size: 13px; line-height: 1.35; color: var(--lx-ink-2); }
+.e0-strip-l { margin: 0 0 6px; }
+.e0-strip { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 3px; margin-bottom: 8px; }
+.e0-cell { height: 26px; border: 1px solid var(--lx-line-2); border-radius: 4px; padding: 0; cursor: pointer;
+  background: color-mix(in srgb, var(--lx-accent) var(--v, 0%), var(--lx-surface-2)); }
+.e0-cell.on, .e0-cell[aria-pressed="true"] { outline: 2px solid var(--lx-ink); outline-offset: 1px; }
+.e0-cell:focus-visible { outline: 2px solid var(--lx-accent); outline-offset: 2px; }
+.e0-wknav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; }
+.e0-wkname { font-family: var(--lx-f-display); font-size: 14px; color: var(--lx-ink); }
+.e0-extra:empty { display: none; }
+/* the result cards' single column may shrink below its content, so a wide text-version table scrolls inside its
+   .lx-scroll-x instead of widening the card (and the page) */
+.e0-results .lx-xcard { grid-template-columns: minmax(0, 1fr); }
+/* a capstone's card of excerpts before its note (C0): space between the quotes */
+.c0-yard .lx-excerpt + .lx-excerpt { margin-top: 12px; }
+.c0-tornado { min-width: 0; }
+.e0-extra { display: grid; gap: 14px; }
+@media (max-width: 560px) {
+  /* 13 squares a row stay at least 24 px wide on a 375 px phone: the strip uses the card's padding */
+  .e0-strip { gap: 1px; margin: 0 -10px 8px; }
+  .e0-cell { height: 26px; }
+  .e0-tile b { font-size: 18px; }
+}

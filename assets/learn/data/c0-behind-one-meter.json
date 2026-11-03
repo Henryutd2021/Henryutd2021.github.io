@@ -1,0 +1,49 @@
+{
+ "about": "Capstone C0, Behind one meter (wave W3, 2026-11-03): the note's fields, the exemplars and the rubric's look-for lines. The plan runs on engine E0 (assets/learn/components/engine-e0.js, data e0.json), the Site Bench's engine. The exemplars are illustrative notes about the default plan (the Prairie Town home with 6 kW of rooftop solar); every number in them is the engine's, checked by _tests/learn/test_c0-behind-one-meter.js.",
+ "note": {
+  "title": "Your one-page note",
+  "lede": "Write three short parts in your own words; the plan, its results, the assumptions, the sensitivity line and the limits fill in from your last run.",
+  "fields": [
+   { "key": "recommend", "label": "Recommendation", "hint": "Two sentences: what this site should install, or not, and the number that decides it.", "rows": 3, "need": true, "at": "top", "min": 12 },
+   { "key": "alone", "label": "What the site cannot do alone", "hint": "One or two sentences: what it still needs from the grid or a buyer, and when.", "rows": 2, "need": true, "min": 8 },
+   { "key": "change", "label": "What would change the answer", "hint": "One sentence from your sensitivity chart: which input, and how far it would have to move.", "rows": 2, "need": true, "min": 8 }
+  ]
+ },
+ "exemplars": {
+  "title": "Two notes on the same plan",
+  "lede": "Both recommend about the default plan: the Prairie Town home with 6 kW of rooftop solar. Tap a numbered phrase.",
+  "task": "Should the Prairie Town home install 6 kW of rooftop solar?",
+  "answers": [
+   { "key": "weak", "label": "Weak note", "level": "Developing",
+     "parts": ["Install 6 kW of solar. ", { "n": 1, "text": "It saves $800 a year", "note": "A saving without its cost: the panels cost $28,430 up front, and the [[net-present-value|NPV]] over 25 years is −$17,813." },
+       " and ", { "n": 2, "text": "solar is clean, so the home goes green", "note": "No number and no boundary: operating CO₂ falls from 5.9 t to 3.1 t a year, with grid power at one average factor." },
+       ". ", { "n": 3, "text": "With a battery it could leave the grid.", "note": "A claim the bench never tested: the home still buys from the grid in 5,240 hours a year." }] },
+   { "key": "good", "label": "Strong note", "level": "Proficient",
+     "parts": [{ "n": 1, "text": "Do not buy 6 kW of solar at the sourced costs: its NPV over 25 years is −$17,813 at 4% real", "note": "The decision first, with the number that decides it, its horizon and its rate." },
+       ", though it saves $800 a year. ", { "n": 2, "text": "It cuts the home's operating CO₂ from 5.9 t to 3.1 t a year (Kansas's average grid factor).", "note": "CO₂ with its size and its boundary." },
+       " ", { "n": 3, "text": "The home still needs the grid in 5,240 hours a year, every night.", "note": "What the site cannot do alone, in the bench's own numbers." },
+       " ", { "n": 4, "text": "At 75% of the equipment cost the NPV is still −$10,237; an 8¢ export credit gives −$14,717.", "note": "The sensitivity test that could have changed the answer, and did not." }] }
+  ],
+  "diff": [
+   { "label": "Decision", "weak": "Install, because it saves money", "good": "Do not install yet, because the NPV is negative" },
+   { "label": "Numbers", "weak": "A yearly saving alone", "good": "NPV, saving, CO₂ and grid hours, each with its unit" },
+   { "label": "Sensitivity", "weak": "None", "good": "The two inputs most likely to flip the answer" }
+  ],
+  "note": "Both notes are illustrative; their numbers are the bench's for the default plan."
+ },
+ "rubric": {
+  "title": "Rate your note against the course rubric",
+  "lede": "Pick the level your note reaches on each of the four competences this capstone builds.",
+  "competences": [
+   { "id": "accounting", "look": "NPV and CO₂ for the same plan, against the same site with nothing new, in one dollar year, with the CO₂ boundary said." },
+   { "id": "uncertainty", "look": "A sensitivity chart of the NPV with the plan held fixed, and the input that matters most named with its range." },
+   { "id": "realism", "look": "What the site still needs from outside (the grid, a buyer) and what the bench leaves out (outages, storage across weeks)." },
+   { "id": "communication", "look": "A page an owner can act on: the recommendation first, then the numbers that back it." }
+  ],
+  "note": "Proficient on all four is the bar for this capstone."
+ },
+ "sensitivity": {
+  "title": "Test the plan: what moves its NPV?",
+  "lede": "Each bar swings one input while the plan stays fixed. Equipment cost and the rate need no new run; a price is run again through all 52 weeks."
+ }
+}

@@ -709,6 +709,46 @@
   teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
   after: [8]
 
+# ---------- sandboxes and capstones (curriculum v2 §16.3, §16.4, §7.9; wave W3). SB0 runs engine E0
+# (assets/learn/components/engine-e0.js); C0 is built on it. Prerequisites A1 and F4 (curriculum §7.9) join C0's `after`
+# once their rows exist (other W3 branches).
+- kind: lesson
+  id: sb0-site-bench
+  code: SB0
+  tier: analyst
+  tier2: modeler
+  form: sandbox
+  icon: house
+  status: active
+  minutes: 20
+  title: "Site Bench"
+  subtitle: "Size a home's or a wind farm's equipment, run every hour of 2025, and see the cash flow"
+  short: "Site Bench"
+  does: "One site, one meter: a Prairie Town home or the ridge wind farm. Size the equipment, run all 8,760 hours of 2025 as a linear program, and read the bills, the CO₂ and the cash flow."
+  outcome: "Size equipment behind one meter, run it hour by hour, and read what a plan saves, costs and emits over its life."
+  teaches: [sizing equipment behind one meter, hourly operation as a linear program, net present value of a plan, what one site cannot do alone]
+  after: [9]
+  next: C0
+- kind: lesson
+  id: c0-behind-one-meter
+  code: C0
+  tier: analyst
+  tier2: modeler
+  form: capstone
+  sandbox: SB0
+  icon: target
+  status: active
+  minutes: 60
+  lab_minutes: 45   # the Modeler version's M4 notebook (learn_map_v2.yml: M4 lab_minutes)
+  title: "Behind one meter: what should one home or one plant install?"
+  subtitle: "Build a plan on the Site Bench, test what could change it, and defend it in a one-page note"
+  short: "Capstone: behind one meter"
+  does: "Pick the Prairie Town home or the ridge wind farm; size solar, a battery and a heat pump, or an electrolyzer and a hydrogen tank; run every hour of 2025; defend the plan with its NPV, its CO₂ and what the site cannot do alone."
+  outcome: "Recommend what one site should install and defend it with its net present value, its emissions, a sensitivity test and its limits."
+  teaches: [a recommendation defended with NPV and CO₂, one-at-a-time sensitivity, stating a model's limits, what one site cannot do alone]
+  lab: "the M4 notebook: power, hydrogen and heat in one linear program, about 45 minutes."
+  after: [9, SB0]
+
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
   id: k01-units
