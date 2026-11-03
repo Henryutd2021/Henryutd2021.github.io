@@ -86,7 +86,8 @@ const F1 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")), R3 = JSON.p
   const les2 = lis[2].querySelector(".lx-ss-les"), links2 = les2.querySelectorAll("a");
   ok(links2.map(a => a.getAttribute("href")).join() === "00-grid-operator.html,03-balancing.html,08-merit-order.html,m01-dispatch-to-lmp.html,m02-unit-commitment.html" &&
      /; upcoming: C2 \(the Plains Grid in a hard year\)$/.test(les2.textContent), "view (F1): S2's lessons, M2 linked now that it is live, C2 still upcoming");
-  ok(lis[1].querySelector(".lx-ss-les").textContent === "Go further: upcoming: F7 (microgrids), M5 (size and run a microgrid), C1 (keep the campus running)", "view (F1): a scale with no live lesson yet");
+  ok(lis[1].querySelector(".lx-ss-les").textContent === "Go further: F7; upcoming: M5 (size and run a microgrid), C1 (keep the campus running)" && lis[1].querySelector(".lx-ss-les a").getAttribute("href") === "f07-microgrids.html",
+     "view (F1): S1 links F7 now that it is live (W3), M5 and C1 still upcoming");
   ok(!host.querySelector(".is-marked") && !host.querySelector(".lx-ss-line"), "view (F1): no mark, no step lines unless asked");
   ss.update({ ticks: { S0: { who: false } } });
   ok(host.querySelectorAll("ol.lx-ss-strip li").length === 5 && host.querySelectorAll(".lx-ss-tick.no").length === 1 && /S0 who elsewhere/.test(host.querySelector("p.lx-sr").textContent), "view: update() redraws with new ticks");

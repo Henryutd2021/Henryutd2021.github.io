@@ -523,6 +523,41 @@
   outcome: "Compute a hydrogen chain's energy and mass balance and cost per kilogram, tell it from the system's cost, and rank uses of hydrogen against their alternatives."
   after: [9, 7, A8]
   next: M4
+# ---------- wave W3 microgrid line (curriculum v2 §7.2, §7.3): F7 and A14, builder learn-w3-b. F7's prerequisites in
+# the curriculum are T9 and F6, A14's F7, A1 and A4: F6, A1 and A4 are added to `after` when their rows exist (coordinator).
+- kind: lesson
+  id: f07-microgrids
+  code: F7
+  tier: foundations
+  form: cards
+  icon: lamp
+  status: active
+  minutes: 20
+  practice_minutes: 10   # the practice set (Check section)
+  title: "What is a microgrid? From a hospital that keeps its lights on to a village with no grid"
+  subtitle: "Island a campus to keep its hospital lit, then power a village that no grid reaches"
+  short: "Microgrids"
+  teaches: [microgrids and islanding, the point of common coupling, grid-forming and grid-following sources, critical load, power and stored energy in an outage, village mini-grids]
+  does: "Island Prairie Campus in a storm, choose which loads its battery and generator can carry and for how long, in July and in January; then size panels and a battery for a village that no grid reaches."
+  outcome: "Say what makes a microgrid, why ordinary rooftop solar goes dark in an outage, and how power (kW) and stored energy (kWh) limit what an island carries and for how long."
+  after: [9]
+  next: A14
+- kind: lesson
+  id: a14-microgrid-value
+  code: A14
+  tier: analyst
+  form: cards
+  icon: coin
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the practice set (Check section)
+  title: "Does a microgrid pay off, and for whom?"
+  subtitle: "Price an outage, size a campus microgrid against it, then see who pays, who gains and who carries the risk"
+  short: "Microgrid value"
+  teaches: [value of lost load, expected outage cost, the marginal hour of endurance, value stacking, ownership and risk, productive use in mini-grids]
+  does: "Price an outage for a household, a dairy and a hospital; size Prairie Campus's microgrid against a year of outages; add everyday savings; compare a utility, a co-op, the county and a private company as owners; then lower a village mini-grid's cost per kWh with a mill and a cold store."
+  outcome: "Estimate a year's expected outage cost, find the size where one more hour of backup stops paying, and say who pays, who gains and who carries the risk under each owner."
+  after: [F7]
 
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
@@ -845,6 +880,23 @@
   outcome: "Price a delay in present value for each party, and tell a transfer between accounts from a real saving."
   teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
   after: [8]
+# CF1, builder learn-w3-b (wave W3): a draft in learn/_drafts/ until its review fixes are done (Henry approved E8 on
+# 2026-11-03); tier to be confirmed by the coordinator
+- kind: lesson
+  id: cf1-supply-chain-microgrids
+  code: CF1
+  tier: analyst
+  form: case
+  icon: map
+  status: upcoming
+  minutes: 10
+  title: "Where should a factory go when sun and wind are part of the decision?"
+  subtitle: "When a factory can make and sell its own energy, its wind and sun become part of choosing where to build it"
+  short: "Factories with their own energy"
+  does: "A case file in six parts and a timeline; then choose between two factory sites and see when on-site wind and sun, and selling energy to the grid, change the choice."
+  outcome: "Say how on-site energy and an hourly energy balance enter a location decision, and why a site with stronger wind and sun can win despite higher shipping costs."
+  teaches: [facility location with on-site energy, hourly energy balance and grid trade, reading a published optimization model]
+  after: [10]
 
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool

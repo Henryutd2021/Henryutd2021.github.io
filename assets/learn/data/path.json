@@ -1041,6 +1041,28 @@
   },
   {
    "tier": "foundations",
+   "code": "F7",
+   "title": "What is a microgrid? From a hospital that keeps its lights on to a village with no grid",
+   "ready": true,
+   "href": "f07-microgrids.html",
+   "scales": [],
+   "id": "f07-microgrids",
+   "minutes": 20,
+   "form": "cards"
+  },
+  {
+   "tier": "analyst",
+   "code": "A14",
+   "title": "Does a microgrid pay off, and for whom?",
+   "ready": true,
+   "href": "a14-microgrid-value.html",
+   "scales": [],
+   "id": "a14-microgrid-value",
+   "minutes": 25,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
    "ready": false,
@@ -1447,6 +1469,17 @@
    "href": "cf7-cost-of-waiting.html",
    "scales": [],
    "id": "cf7-cost-of-waiting",
+   "minutes": 10,
+   "form": "case"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF1",
+   "title": "Where should a factory go when sun and wind are part of the decision?",
+   "ready": false,
+   "href": "index.html#analyst",
+   "scales": [],
+   "id": "cf1-supply-chain-microgrids",
    "minutes": 10,
    "form": "case"
   }

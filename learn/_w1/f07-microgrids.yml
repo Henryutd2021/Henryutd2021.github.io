@@ -1,0 +1,27 @@
+# Sidecar for F7 (f07-microgrids), builder learn-w3-b, 2026-11-03. Read by scripts/build_learn.py.
+id: f07-microgrids
+lesson: F7
+glossary:
+  - id: point-of-common-coupling
+    term: Point of common coupling
+    def: "The one place where a microgrid meets the main grid, with the switch that opens to let it run on its own."
+  - id: grid-forming
+    term: Grid-forming
+    def: "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it."
+  - id: grid-following
+    term: Grid-following
+    def: "Said of an inverter, such as an ordinary solar inverter, that follows a voltage something else sets and stops when there is none."
+  - id: critical-load
+    term: Critical load
+    def: "The loads that must stay on in an outage, such as a hospital or a water plant; the rest can be switched off."
+  - id: mini-grid
+    term: Mini-grid
+    def: "A small local grid, with its own sources, storage and wires, that serves a village or a town that the main grid does not reach."
+requests:
+  - "path.yml: F7's prerequisites in the curriculum are T9 and F6. F6 has no row on this branch (learn-w3-a adds it), so F7 has `after: [9]`; please make it `after: [9, F6]` at the merge."
+  - "glossary: F1's sidecar defines microgrid and islanding with lesson F1; F7 is the lesson that teaches them. Please consider pointing their 'Taught in' link to F7."
+  - "Component for promotion: CampusLine (assets/learn/f07-microgrids.js), a one-line diagram of a microgrid (feeder, switch, controller, sources, loads) whose parts are buttons, with a phone layout, a numbered annotated mode and a text version. M5, SB1 and C1 could reuse it."
+  - "Excerpts: the Real-world box quotes E8.2 (with the E8.7 note under it) and E9.1-E9.3 word for word, as approved on 2026-11-03; the test checks them against the register. E9 has no citation and no link. The register's row for E9.1 places it at 'the islanding step'; it sits in the Real-world box at the end, as the other W1-W3 lessons place theirs."
+  - "When CF1 goes live, the Real-world box line 'case file CF1 (upcoming)' should become a link to cf1-supply-chain-microgrids.html."
+  - "Shared CSS: the layout audit measured .lx-readout.good at 4.13:1 (#1b8452 on #edf1f5, light); F7 and A14 no longer use the good tone on chips. A darker good tone in plot.css would let lessons use it again."
+  - "Screenshots: learn_screenshots.mjs cannot show an open glossary popover (captureBeyondViewport resizes the window, and glossary.js closes the popover on resize). A viewport-only helper used for F7, A14 and CF1 is in the builder's scratchpad: w3b_tools/popshot.mjs."

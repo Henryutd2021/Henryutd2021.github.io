@@ -1,0 +1,21 @@
+# Sidecar for A14 (a14-microgrid-value), builder learn-w3-b, 2026-11-03. Read by scripts/build_learn.py.
+id: a14-microgrid-value
+lesson: A14
+glossary:
+  - id: value-of-lost-load
+    term: Value of lost load
+    def: "What a customer loses when power is cut, per hour or per kWh not delivered; it differs by customer and by how long the outage lasts."
+  - id: productive-use
+    term: Productive use
+    def: "Electricity used to earn a living, such as running a grain mill, a water pump or a cold store, rather than only for lights and phones at home."
+  - id: mini-grid
+    term: Mini-grid
+    def: "A small local grid, with its own sources, storage and wires, that serves a village or a town that the main grid does not reach."
+requests:
+  - "path.yml: A14's prerequisites in the curriculum are F7, A1 and A4. A1 and A4 have no rows on this branch (learn-w3-c and learn-w3-d add them), so A14 has `after: [F7]`; please make it `after: [F7, A1, A4]` at the merge. The Go deeper box names 'Analyst lesson A1 (upcoming)' in plain text; link it when A1 is live."
+  - "Glossary: mini-grid is defined in F7's sidecar and here with the same sentence; keep one."
+  - "Excerpts: the Real-world box quotes E8.4 and E8.6 word for word (approved 2026-11-03), with E8.7 under them, the footer 'Approved excerpt of: Li et al. (2023), Applied Mathematical Modelling' and a doi.org link. The test checks them against the register."
+  - "Source note: the Berkeley Lab co-op report's executive-summary Tables ES-2 and ES-3 print the upper 90% confidence bounds for non-residential members (for example $144 per kW momentary, against $62 in Table 5-3). A14 uses the body tables (point estimates) and says so in the data file."
+  - "One price year: every dollar on the page is 2025 dollars (the 2025 survey, EIA's 2025 prices, illustrative toy costs stated in 2025 dollars)."
+  - "Lesson-local pieces: the who-pays ledger (explain layer) and the outage pricing cards (step 1). The ledger could become a shared e-ledger component (A13, A6 and C1 list one)."
+  - "When CF1 goes live, the Real-world box line 'case file CF1 (upcoming)' should become a link to cf1-supply-chain-microgrids.html."
