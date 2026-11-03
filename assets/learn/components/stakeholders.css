@@ -1,0 +1,31 @@
+/* stakeholders.css — LX.Stakeholders (the role table: cards of labelled lines on phones) and LX.StakeholderMap (rings of
+   groups as buttons), promoted from A22 and R9 at the W2 integration. Colours from --lx-* tokens only, day and night. */
+.lx-stake { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lx-stake th, .lx-stake td { padding: 7px 8px; border-bottom: 1px solid var(--lx-line); text-align: left; vertical-align: top; font-weight: 400; }
+.lx-stake thead th { font-family: var(--lx-f-display); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--lx-ink-3); }
+.lx-stake tbody th b { display: block; font-family: var(--lx-f-display); font-weight: 600; }
+.lx-stake tbody th small { color: var(--lx-ink-3); font-size: 12.5px; }
+.lx-stake .mk { display: inline-flex; align-items: center; gap: 5px; }
+.lx-stake .mk i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--lx-ink-2); flex: none; }
+.lx-stake .mk.yes i { background: var(--lx-ink-2); }
+.lx-stake .mk.part i { background: linear-gradient(90deg, var(--lx-ink-2) 50%, transparent 50%); }
+.lx-stake td small { display: block; color: var(--lx-ink-3); font-size: 12.5px; }
+@media (max-width: 640px) {
+  .lx-stake thead { display: none; }
+  .lx-stake, .lx-stake tbody, .lx-stake tr, .lx-stake th, .lx-stake td { display: block; width: 100%; }
+  .lx-stake tr { border: 1px solid var(--lx-line); border-radius: 12px; padding: 6px 10px; margin-bottom: 10px; }
+  .lx-stake th, .lx-stake td { border: 0; padding: 3px 0; }
+  .lx-stake td::before { content: attr(data-label); display: block; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--lx-ink-3); }
+}
+.lx-stake-static { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lx-stake-static th, .lx-stake-static td { padding: 6px 8px; border-bottom: 1px solid var(--lx-line); text-align: left; vertical-align: top; }
+.lx-smap { display: grid; gap: 10px; }
+.lx-smap-ring { display: grid; gap: 8px; padding: 12px; border-radius: 16px; border: 1px dashed var(--lx-line-2); background: var(--lx-surface); }
+.lx-smap-ring.r0 { border-style: solid; }
+.lx-smap-ring.r1 { background: var(--lx-surface-2); }
+.lx-smap-ring > .lx-eyebrow { margin: 0; }
+.lx-smap-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lx-smap-chip { font: inherit; font-size: 14px; min-height: 38px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--lx-line-2);
+  background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; }
+.lx-smap-chip[aria-pressed="true"] { background: var(--lx-ink); color: var(--lx-bg); border-color: var(--lx-ink); }
+.page-learn .lx-smap-owed { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--lx-surface-2); font-size: 14.5px; color: var(--lx-ink); }

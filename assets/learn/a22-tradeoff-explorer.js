@@ -335,15 +335,6 @@
       ".a22-tbl th:first-child,.a22-tbl td:first-child{text-align:left;white-space:normal}.a22-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.a22-tbl td:first-child{font-family:var(--lx-f-body)}",
       ".a22-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3)}.a22-scroll{overflow-x:auto;max-width:100%}",
       ".a22-tbl td:first-child{min-width:10em}.a22-tbl td small{font-size:12px;color:var(--lx-ink-3)}",
-      ".a22-stake{width:100%;border-collapse:collapse;font-size:14px}.a22-stake th,.a22-stake td{padding:7px 8px;border-bottom:1px solid var(--lx-line);text-align:left;vertical-align:top;font-weight:400}",
-      ".a22-stake thead th{font-family:var(--lx-f-display);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--lx-ink-3)}",
-      ".a22-stake tbody th b{display:block;font-family:var(--lx-f-display);font-weight:600}.a22-stake tbody th small{color:var(--lx-ink-3);font-size:12.5px}",
-      ".a22-stake .mk{display:inline-flex;align-items:center;gap:5px}.a22-stake .mk i{width:10px;height:10px;border-radius:50%;border:2px solid var(--lx-ink-2);flex:none}",
-      ".a22-stake .mk.yes i{background:var(--lx-ink-2)}.a22-stake .mk.part i{background:linear-gradient(90deg,var(--lx-ink-2) 50%,transparent 50%)}",
-      ".a22-stake td small{display:block;color:var(--lx-ink-3);font-size:12.5px}",
-      "@media (max-width:640px){.a22-stake thead{display:none}.a22-stake,.a22-stake tbody,.a22-stake tr,.a22-stake th,.a22-stake td{display:block;width:100%}",
-      ".a22-stake tr{border:1px solid var(--lx-line);border-radius:12px;padding:6px 10px;margin-bottom:10px}.a22-stake th,.a22-stake td{border:0;padding:3px 0}",
-      ".a22-stake td::before{content:attr(data-label);display:block;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--lx-ink-3)}}",
       ".a22-conn{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0;padding:0;list-style:none}",
       ".a22-conn li{border:1px solid var(--lx-line);border-radius:10px;padding:8px 10px;font-size:13.5px;display:grid;gap:2px}.a22-conn li b{font-family:var(--lx-f-display)}"
     ].join("") }, document.head);
@@ -416,28 +407,8 @@
     S("polygon", { points: axes.map(function (a, i) { return P(i, 0.04 + 0.96 * sc[a.key]); }).join(" "), fill: color, "fill-opacity": 0.22, stroke: color, "stroke-width": 1.6, "stroke-linejoin": "round" }, svg);
   };
 
-  // ---------------------------------------------------------------- who decides, who pays, who benefits (e-stakeholders,
-  // lesson-local): a table on wide screens, one card per role on phones. rows: [{name, note, cells: {key: {v: "yes" | "part" | "no", t}}}]
-  function Stakeholders(host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var t = H("table", { class: "a22-stake" }, host), hr = H("tr", null, H("thead", null, t));
-    H("th", { scope: "col", text: "Who" }, hr);
-    o.cols.forEach(function (c) { H("th", { scope: "col", text: c.label }, hr); });
-    var b = H("tbody", null, t), cells = {};
-    var WORD = { yes: "Yes", part: "Partly", no: "No" };
-    o.rows.forEach(function (r) {
-      var tr = H("tr", null, b), th = H("th", { scope: "row" }, tr); H("b", { text: r.name }, th); if (r.note) H("small", { text: r.note }, th);
-      o.cols.forEach(function (c) {
-        var x = r.cells[c.key] || {}, td = H("td", { "data-label": c.label }, tr);
-        if (x.v) { var mk = H("span", { class: "mk " + x.v }, td); H("i", { "aria-hidden": "true" }, mk); H("span", { text: WORD[x.v] }, mk); }
-        var sm = H(x.v ? "small" : "span", { html: LX.rich(x.t || "") }, td);
-        cells[r.key + "|" + c.key] = sm;
-      });
-    });
-    if (o.note) H("p", { class: "lx-hint", text: o.note }, host);
-    return { set: function (rowKey, colKey, text) { var c = cells[rowKey + "|" + colKey]; if (c) c.innerHTML = LX.rich(text); } };
-  }
+  // who decides, who pays, who benefits: LX.Stakeholders (components/stakeholders.js, e-stakeholders; promoted from this
+  // file at the W2 integration)
 
   // ---------------------------------------------------------------- the play
   LX.mount("tradeoff-explorer", function (live, data, root) {
@@ -1033,7 +1004,7 @@
         }
       });
       LX.on("a22-done", function () { cm.select && cm.select("choice"); });
-      var st = Stakeholders(H("div", { class: "lx-xcard" }, host), {
+      var st = LX.Stakeholders(H("div", { class: "lx-xcard" }, host), {
         title: "Who decides, who pays, who benefits",
         lede: "Prairie Town's roles (illustrative). The priority sets of step 5 speak for some of them.",
         cols: [{ key: "dec", label: "Decides" }, { key: "pay", label: "Pays" }, { key: "ben", label: "Benefits" }, { key: "w", label: "Weighs most" }],

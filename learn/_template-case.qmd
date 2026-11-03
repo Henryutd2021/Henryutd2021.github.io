@@ -103,7 +103,7 @@ The lesson that teaches the method (a link to its page, or "upcoming"), and one 
 <div class="lx-card lx-case-try">
 <p class="lx-eyebrow">Try it yourself</p>
 <ul>
-<li>One toy variation to run with the repository, and what to look at.</li>
+<li>One toy variation to run with the repository, and what to look at (a command such as <code>python run.py --case toy</code> wraps on phones).</li>
 </ul>
 <p><a href="https://github.com/Henryutd2021/<allow-listed repo>">The repository</a> (an allow-listed public repository).</p>
 </div>

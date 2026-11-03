@@ -637,8 +637,14 @@ cp.show(0); cp.results();   // for the lesson's LX.demo states
 - In the page, mark the worked-solution block `class="lx-ck-gated"` (shut with JavaScript until the estimate is submitted or opened early, open without it; "Start again" shuts it again) and the lock box `class="lx-ck-lock"`; rubric rows are `<tr data-c="criterion">`.
 - An estimate needs a high above its low (one number is not submitted, and the reader is told why). Solutions, points and choice feedback take `[[glossary-id|words]]` marks.
 - Keep `key` and the summary format fixed once testers use a checkpoint: summaries are compared across versions. The summary's first line is "Learn · <code> results (<version>)".
-- Pure (Node: `require("components/checkpoint.js")`): `task`, `checkChoice`, `checkOrder`, `checkNumeric`, `checkEstimate`, `level`, `summary(D, st, env, {code})`, `fmtMs`, `firstWord`. `checks`, `level` and `summary` options replace them for a checkpoint with other units or another rule.
-- Replaces the runner in `ck-f-estimate.js`, which now holds only CK-F's configuration, its two charts, `worked()` and the mount.
+- Pure (Node: `require("components/checkpoint.js")`): `task`, `checkChoice`, `checkOrder`, `checkNumeric`, `checkEstimate`, `level`, `describe`, `summary(D, st, env, {code})`, `fmtMs`, `firstWord`. `checks`, `level` and `summary` options replace them for a checkpoint with other units or another rule.
+- **Options added for CK-M (W2 integration).**
+  - `describe(D, L)` writes the results view's sentence under the level (default: CK-F's parts).
+  - `submitTask: id` names the task whose answer opens the page's worked solution (default: the estimate); its own early button, and the lock box's button, open it early, recorded on that task.
+  - `onAnswer(taskId, record, state)` runs after each answer and each early opening.
+  - A numeric task with `answer: { value, tol, show }` takes any unit (`units: [[name, factor to the answer's unit]]`, `null` for the wrong kind, with `unitNote`; `checkValue`); `answer: { mwh, tol }` keeps CK-F's MWh check (`checkMWh`). `checkNumeric` picks by the answer's form.
+  - `destroy()` stops the clock, saves the attempt and removes the runner's listeners and markup, so a page can swap runners (CK-M changes variant this way). `solutionNow()` opens the worked solution early, recorded.
+- Replaces the runner in `ck-f-estimate.js`, which now holds only CK-F's configuration, its two charts, `worked()` and the mount. CK-M (`ck-m-unseen-problem.js`) holds its two variants' tasks, its level rule, `describe` and summary, and the supplied model.
 
 **Spreadsheet** (`sheet.js`): a small working spreadsheet: a formula engine and a view with a formula bar, a grid that moves with the arrow keys, and fill-down.
 
@@ -784,7 +790,22 @@ ws.draw(RW, TP.readCheck(C, Y, r, plan).byWeek);     // after a check: a dot on 
 - **Text.** The grid is `role="img"` with a sentence naming each representative week and the weeks it stands for (and, after a check, how many weeks are short). "Text version" holds a table of the 52 weeks: start date, the week standing in, and unserved MWh after a check.
 - **Pure** (Node: `require("assets/learn/components/weekstrip.js")`; also on `LX.WeekStrip`): `weekName`, `letter`, `color`, `number`, `dateOf`, `yearOf`, `label`, `rows`. Tests: `_tests/learn/test_components_w2_plan.js`. M3 uses it; M13 and C2 can reuse it.
 
-**Form pieces** (`forms.css`, CSS only): `.lx-studio-brief` (the studio's task card, a `div.lx-card` above the interactive and outside its fallback; no page style needed) and `.lx-studio-task` (its task list; the myth cards under a studio's self-check are spaced too), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try`, and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`.
+**Stakeholders** (`stakeholders.js`, `stakeholders.css`; e-stakeholders, promoted from A22 and R9 at the W2 integration; F8, F9, F11 and A13 can reuse them): who decides, who pays, who benefits.
+
+```js
+var t = LX.Stakeholders(H("div", { class: "lx-xcard" }, x), { title: "Who decides, who pays, who benefits", lede: "One sentence.",
+  cols: [{ key: "dec", label: "Decides" }, { key: "pay", label: "Pays" }],
+  rows: [{ key: "homes", name: "Households", note: "including low-income homes", cells: { dec: { v: "part", t: "comment at hearings" }, pay: { v: "yes", t: "through bills" } } }],
+  note: "Illustrative roles." });              // -> { el, set(rowKey, colKey, text) }   (A22)
+LX.StakeholderMap(H("div", { class: "lx-xcard" }, x), { rings: [{ ring: "The study team", items: [{ id: "coauthors", label: "Co-authors", owed: "credit and a say", also: ["A co-author's data"] }] }],
+  prompt: "Tap a group to see what your study owes it.", onOpen: function (ringsSeen) {} });   // -> { el, open(id) }   (R9)
+```
+
+- **Role table.** A cell's `v` (`yes`, `part`, `no`) draws a filled, half or empty dot beside the word Yes, Partly or No, so colour is never the only cue; `t` adds a line with glossary marks. On phones (640 px) each role becomes a card of labelled lines.
+- **Map.** Rings of groups, the first drawn solid; each group is a button (`aria-pressed`) that opens what the study owes it, and where it appears (`also`), in an `aria-live` line. "Text version of the map" lists every group.
+- **Pure** (Node: `require("components/stakeholders.js")`; also on `LX.Stakeholders`): `WORD`, `cellText`, `staticHTML` (the role table as a plain table for a no-JS fallback), `mapItems`. Tests: `_tests/learn/test_components_w2_int.js`.
+
+**Form pieces** (`forms.css`, CSS only): `.lx-studio-brief` (the studio's task card, a `div.lx-card` above the interactive and outside its fallback; no page style needed) and `.lx-studio-task` (its task list; the myth cards under a studio's self-check are spaced too), `.lx-case` and `.lx-case-part` (`.wide`) (the case file's numbered parts), `.lx-case-q`, `blockquote.lx-excerpt` with `data-source="excerpt:<key>"` (an approved excerpt, checked by the scope scan), `.lx-case-try` (the Try-it box: its code and text wrap on phones), and the fallback lists `.lx-tl-static`, `.lx-ex-static` and `.lx-rb-static`. Promoted from the three case files at the W2 integration (they keep no page style): `.cf-ctl` with its label `.cf-ctl-l` (a labelled control), `.cf-row` (a row of buttons), `.cf-selects` of `.cf-sel` (two selects side by side, stacked on phones) and `table.cf-two` (a comparison table, `th` per row and `td data-l="…"`, that becomes labelled lines below 560 px). An allow-listed explainer on a Learn page takes the Learn accent as its theme colour (`body.page-learn` sets `--t`, `.page-learn .explainer` the helpers `--t-ink`, `--t-soft`, `--t-line`), so a page needs no `theme-*` body class.
 
 **Scope and QA** (ResearchPortfolio folder).
 

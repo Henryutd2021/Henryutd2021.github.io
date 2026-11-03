@@ -30,11 +30,13 @@ ok(depth === 0, "learn.css: braces balance");
  "Boundary", "Share", "copyText", "LPPlane", "lp2", "CardSort", "LinkedViews", "Toggle", "EquationCard", "FormulateBox", "Formulation",
  "Network", "Checklist", "EvidenceLadder", "PhraseTagger", "UnitChain", "EvidenceClock", "Checkpoint", "Sheet", "Practice",
  // added in wave W2 (2026-11-03)
- "Exemplars", "Rubric", "QuestionCard", "Timeline", "townPlan"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
+ "Exemplars", "Rubric", "QuestionCard", "Timeline", "townPlan",
+ // promoted at the W2 integration (2026-11-03)
+ "lessonRef", "lessonRefHTML", "ScaleStrip", "Stakeholders", "StakeholderMap", "WeekStrip"].forEach(n => ok(js.indexOf("LX." + n + " = ") >= 0, `bundle defines LX.${n}`));
 
 // ---------------- no lesson defines its own copy of a shared component (W1 merge)
 const lessonJs = fs.readdirSync(L(".")).filter(f => /^[0-9a-z-]+\.js$/.test(f) && f !== "learn.js");
-const copies = /\bfunction (plot|LineChart|Scatter|StackChart|FrontierChart|Steelman|Boundary|JobSorter|Plane|EquationCard|Formulation|Network|PriceChart|HourPicker|Practice|Slider)\s*\(|W1F\.(LPPlot|Views|CardSort|Ctl|Toggle|EquationCard|FormulateBox)\s*=|LX\.Checklist\s*=/;
+const copies = /\bfunction (plot|LineChart|Scatter|StackChart|FrontierChart|Steelman|Boundary|JobSorter|Plane|EquationCard|Formulation|Network|PriceChart|HourPicker|Practice|Slider|Stakeholders|StakeholderMap|ScaleStrip|WeekStrip|readCheck|refHTML)\s*\(|W1F\.(LPPlot|Views|CardSort|Ctl|Toggle|EquationCard|FormulateBox)\s*=|LX\.Checklist\s*=/;
 lessonJs.forEach(f => {
   const src = fs.readFileSync(L(f), "utf8"), rx = new RegExp(copies.source, "g"), bad = [];
   let m; while ((m = rx.exec(src))) { const name = m[1] || m[2] || "Checklist", body = src.slice(m.index, m.index + 500);

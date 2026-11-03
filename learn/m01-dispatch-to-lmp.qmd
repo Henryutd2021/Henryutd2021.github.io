@@ -135,7 +135,7 @@ A dual is a slope. At a corner of the model the slope differs on each side, so c
 | Step down: one MWh less | saves only \$80 |
 | The solver's dual | \$80, one end of that range |
 
-If the two sides differ, say which side your question is about. A mixed-integer solve (M2, upcoming) does not provide these LP shadow prices; after fixing its on/off decisions, a dispatch LP gives prices conditional on them.
+If the two sides differ, say which side your question is about. A mixed-integer solve ([M2](m02-unit-commitment.html)) does not provide these LP shadow prices; after fixing its on/off decisions, a dispatch LP gives prices conditional on them.
 
 ```{=html}
 </div>
@@ -146,11 +146,11 @@ If the two sides differ, say which side your question is about. A mixed-integer 
 <ul>
 <li>Losses, voltage magnitudes and reactive power: a DC model uses only voltage-angle differences, holds voltage magnitudes fixed and is lossless. A17 (upcoming) runs a small AC power flow to show when that matters.</li>
 <li>Outages: real dispatch keeps flows safe if any one line or plant fails (the N-1 rule).</li>
-<li>Start-ups and minimum run times: those need on/off decisions, a mixed-integer program (M2, upcoming).</li>
+<li>Start-ups and minimum run times: those need on/off decisions, a mixed-integer program (<a href="m02-unit-commitment.html">M2</a>).</li>
 <li>Offers and price-responsive demand: here costs stand in for offers, and demand is fixed.</li>
 <li>Size: real markets price thousands of locations; the algebra is the same.</li>
 </ul>
-<p>Modeler's note: M3 (upcoming) adds investment decisions to this model, and the Modeler checkpoint CK-M (upcoming) asks you to formulate, solve and verify a model you have not seen.</p>
+<p>Modeler's note: <a href="m03-capacity-expansion.html">M3</a> adds investment decisions to this model, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen. The Researcher studio <a href="r05-build-validate.html">R5</a> makes verification and validation a routine.</p>
 </div>
 </details>
 </div>

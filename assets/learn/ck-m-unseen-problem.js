@@ -10,13 +10,15 @@
 // Learners work in the starter notebook (learn/notebooks/ck-m-start.ipynb) and enter their results in the shared
 // checkpoint runner (LX.Checkpoint, components/checkpoint.js): one task at a time, first-try recording, the visibility-
 // aware clock, a results view and a plain-text summary. This file holds CK-M's configuration: the two variants' task
-// lists, a numeric check for any unit, CK-M's level rule and summary, the supplied model run in the browser, and the
-// worked solutions' gate (they open when the final task is submitted, or on purpose, which is recorded).
+// lists, CK-M's level rule, its results sentence and summary, and the supplied model run in the browser. The runner's
+// options do the rest (W2 integration): its numeric check takes any unit (answer.value), `describe` writes the results
+// sentence, `submitTask` opens the worked solutions when the final task is submitted (or on purpose, which is recorded),
+// and `destroy()` swaps the runner when the reader changes variant.
 //
 // Pure part (exported for _tests/learn/test_ck-m-unseen-problem.js, which solves every model with the vendored HiGHS):
 // waterModel (the worked formulation of the model variant), waterBounds, defectModel and defectReport (the supplied
-// model, with and without its defect), empStats (the empirical variant's numbers from town_year.json), checkNumeric,
-// level, summary, variantData, staticTasks.
+// model, with and without its defect), empStats (the empirical variant's numbers from town_year.json), checkNumeric
+// (the shared runner's, components/checkpoint.js), level, describe, summary, variantData, staticTasks.
 (function () {
   "use strict";
   var CODE = "CK-M";
@@ -131,17 +133,11 @@
       tieD: tie(d, tD), tieN: tie(net, tN), topD: tD, topN: tN, minTopD: d[tD[E.topN - 1]], minTopN: net[tN[E.topN - 1]] };
   }
 
-  // a number with any unit: units [[name, factor to the answer's unit]] (null: a unit of the wrong kind, with kind[name]
-  // saying why); answer {value, tol (relative), show}
-  function checkNumeric(t, value, unit) {
-    var f; t.units.forEach(function (u) { if (u[0] === unit) f = u[1]; });
-    if (!(value > 0)) return { right: false, msg: "Enter a positive number." };
-    if (f === null) return { right: false, kind: true, msg: (t.unitNote || {})[unit] || unit + " is the wrong kind of unit for this answer." };
-    if (f === undefined) return { right: false, msg: "Choose a unit." };
-    var v = value * f, a = t.answer, rel = Math.abs(v - a.value) / a.value;
-    return { right: rel <= a.tol, value: v, rel: rel,
-      msg: rel <= a.tol ? a.show.charAt(0).toUpperCase() + a.show.slice(1) + "." : v > a.value * 1.5 ? "Too high. Recheck your model and its units." : v < a.value / 1.5 ? "Too low. Recheck your model and its units." : "Close, but outside the tolerance (" + Math.round(a.tol * 1000) / 10 + "%). Recheck your numbers." };
-  }
+  // a number with any unit: the shared runner's check (components/checkpoint.js, promoted from this file at the W2
+  // integration): units [[name, factor to the answer's unit]] (null: the wrong kind, unitNote[name] says why); answer
+  // {value, tol (relative), show}
+  var CPK = (typeof window !== "undefined" && window.LX && window.LX.Checkpoint) || require("./components/checkpoint.js");
+  var checkNumeric = CPK.checkNumeric;
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
   // CK-M's published rule (the page's rubric section says it in words). Levels: 0 Not yet ... 3 Strong.
@@ -156,8 +152,7 @@
     else if (k >= R.autoProficient && defect && pa >= R.pointsA && pc >= R.pointsC) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
     return { level: lv, auto: k, autoOf: auto.length, defect: defect, pointsA: pa, pointsAOf: na, pointsC: pc, pointsCOf: nc, complete: complete,
-      // fields the shared results view reads (its sentence is replaced by describe() on this page)
-      estMin: -1, explainOk: pa === na };
+      estMin: -1, explainOk: pa === na };   // the shared rule's field names, for code that reads either rule
   }
   function describe(D, L) {
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + ". The defect's line on the first try: " + (L.defect ? "yes" : "no") +
@@ -361,52 +356,29 @@
         onclick: function () { choose(k, true); } }, prow);
     });
     H("p", { class: "lx-hint", text: "Part B, the planted defect, is the same in both. Each variant keeps its own answers in this browser; you may do both." }, pk);
-    // one runner per variant, made when first chosen and kept (so each attempt has exactly one runner writing it)
-    var hosts = {}, cps = {}, Ds = {};
-    // the worked solutions open when either variant's final task is submitted, or on purpose (recorded on that task)
-    function gate() {
-      var open = ["model", "empirical"].some(function (k) {
-        var st = cps[k] ? cps[k].state() : LX.store.get(KEYS[k], null);
-        if (!st || st.version !== J.version || !st.tasks) return false;
-        var r = st.tasks[finalId(J, k)]; return !!(r && (r.answer || r.solFirst));
-      });
-      if (lock) lock.hidden = open;
-      if (body) body.classList.toggle("is-open", open);
-    }
-    // the shared results view says what CK-F's rule counts; on this page the sentence says what CK-M's rule counts
-    function fixResults(k) {
-      var lv = hosts[k] && hosts[k].querySelector(".lx-ck-level"); if (!lv || !cps[k]) return;
-      var p = lv.nextElementSibling, text = describe(Ds[k], level(Ds[k], cps[k].state()));
-      if (p && p.tagName === "P" && p.textContent !== text) p.textContent = text;
-    }
+    // one runner on screen at a time: changing variant removes the runner (destroy: its clock, listeners and markup) and
+    // makes the chosen variant's, which resumes that variant's stored attempt. The runner opens the worked solutions when
+    // the variant's final task is submitted, or on purpose (recorded on that task), and shuts them on "Start again".
+    var host = H("div", { class: "ckm-runner" }, live), Ds = {};
     function choose(k, user) {
-      if (cur && cur !== k && cps[cur]) { cps[cur].intro(); hosts[cur].hidden = true; }   // intro() stops the other runner's clock
+      if (cur === k && cp) return;
+      if (cp) cp.destroy();
       cur = k; LX.store.set("ckm-variant", k);
       Object.keys(btns).forEach(function (b) { btns[b].setAttribute("aria-pressed", b === k ? "true" : "false"); });
-      if (!cps[k]) {
-        var h = hosts[k] = H("div", { class: "ckm-runner", "data-variant": k }, live);
-        Ds[k] = variantData(J, k);
-        cps[k] = LX.Checkpoint(h, { data: Ds[k], key: KEYS[k], code: CODE, lessonId: "ck-m-unseen-problem", intro: J.intro,
-          checks: { numeric: checkNumeric }, level: level, summary: summary });
-        if (window.MutationObserver) new MutationObserver(function () { fixResults(k); }).observe(h, { childList: true, subtree: true });
-        h.addEventListener("click", function () { setTimeout(gate, 0); });
-      }
-      hosts[k].hidden = false; cp = cps[k]; D = Ds[k];
-      fixResults(k); gate();
-      if (user) hosts[k].scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
+      host.setAttribute("data-variant", k);
+      D = Ds[k] = Ds[k] || variantData(J, k);
+      cp = LX.Checkpoint(host, { data: D, key: KEYS[k], code: CODE, lessonId: "ck-m-unseen-problem", intro: J.intro,
+        lock: lock, solution: body, submitTask: finalId(J, k), level: level, describe: describe, summary: summary });
+      if (user) host.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" });
     }
+    // the lock box's button before any variant is chosen: start the model variant and record the early opening there
+    // (once a runner exists, its own listener handles the button)
     if (lock) {
       var ob = lock.querySelector("button");
-      if (ob) ob.addEventListener("click", function () {
-        if (!cp) choose("model");
-        var st = cp.state(), id = finalId(J, cur), r = st.tasks[id] || (st.tasks[id] = { ms: 0, msFirst: null, tries: 0, first: null, solFirst: false });
-        if (!r.answer) r.solFirst = true;
-        LX.store.set(KEYS[cur], st);
-        if (lock) lock.hidden = true; if (body) body.classList.add("is-open");
-      });
+      if (ob) ob.addEventListener("click", function () { if (!cp) { choose("model"); cp.solutionNow(); } });
     }
     var saved = LX.store.get("ckm-variant", null);
-    if (saved === "model" || saved === "empirical") choose(saved); else gate();
+    if (saved === "model" || saved === "empirical") choose(saved); else if (lock) lock.hidden = false;   // no variant yet: the solutions stay shut
     supplied(J);
     var cr = document.getElementById("ckm-course-rubric");
     if (cr && LX.Rubric) {

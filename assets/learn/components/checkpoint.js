@@ -14,7 +14,9 @@
                solution, points and choice feedback (why) take [[glossary-id|words]] marks; prompts stay plain (no hints)
      kinds   "choice"      options: [[value, text]], answer, why: {value: feedback}, chart (optional: drawn by o.chart)
              "order"       items: [[key, text]] in the right order; start: [keys], the shuffled start (↑ ↓ buttons)
-             "numeric"     units: [[name, factor to MWh]] (0 or null: a unit of power, flagged as such); answer: {mwh, tol}
+             "numeric"     answer: {mwh, tol} with units: [[name, factor to MWh]] (0 or null: a unit of power, flagged as
+                           such; CK-F); or, for any unit, answer: {value, tol (relative), show} with units: [[name, factor to
+                           the answer's unit]] (null: a unit of the wrong kind; unitNote: {name: why}; CK-M)
              "open-short"  points: [the sentences a full answer makes]; after submitting, the reader ticks the points made
              "estimate"    units (as numeric), range: [lo, hi] MWh a year, show: [lo, hi] as printed; low, high (above the low), unit and
                            three short texts (inputs and steps, the main uncertainty, a check); then a self-rating per rubric
@@ -26,22 +28,34 @@
      lessonId    marked complete (LX.progress.done) when the level is Proficient or Strong
      intro       the overview card's sentences (default: a generic three)
      rubric      selector of the rubric table: <tr data-c="criterion id"><th>name</th><td>Not yet</td>...<td>Strong</td></tr>
-     lock        selector of the box shown until the estimate is submitted; its <button> opens the solution early (recorded),
-                 as does the estimate task's own "Show the worked solution now"; "Start again" shuts it again
+     lock        selector of the box shown until the submit task (below; CK-F: the estimate) is answered; its <button> opens
+                 the solution early (recorded), as does that task's own "Show the worked solution now"; "Start again" shuts
+                 it again
      solution    selector of the worked-solution block; give it class lx-ck-gated in the page, so it stays shut with
                  JavaScript until opened (without JavaScript it shows)
      chart       function (task, body): draws a chart task's chart (LX.Checkpoint.lineChart helps)
      estimateNote  HTML for the estimate's in-task solution box (default: a pointer to the Worked solution section)
      checks      { choice, order, numeric, estimate }: replace a pure check (same arguments and result fields)
      level, summary  replace the pure level rule or the summary text (same arguments)
-   Returns { show(i), results(), intro(), state() }. A stored, finished attempt opens on the results (unless the address
-   has a #hash); otherwise the overview.
+     describe    function (D, L): the results view's sentence under the level (L = the level rule's result); default
+                 describe(), which names CK-F's parts (auto-marked tasks, the estimate's lowest self-rating, the explanation)
+     submitTask  the id of the task whose answer opens the page's worked solution (lock and solution above), or whose own
+                 "Show the worked solution now" opens it early (recorded); default: the first estimate task (CK-F). CK-M
+                 names its final open-short task
+     onAnswer    function (taskId, record, state): called after each recorded answer, and when a solution is opened before
+                 answering (record.solFirst), for pages that keep their own state beside the runner's
+   Returns { show(i), results(), intro(), state(), solutionNow(), destroy() }. solutionNow() opens the page's worked
+   solution early, recorded on the submit task as above. destroy() stops the clock, saves, removes the runner's document,
+   window and lock-button listeners and its markup, so a page can swap runners (CK-M keeps one per variant on screen); the
+   page's worked-solution block stays as it is. A stored, finished attempt opens on the results (unless the address has a
+   #hash); otherwise the overview.
    Measures, per task (stored under data.tasks ids): ms (active time), msFirst (time to the first answer), tries, first
    (first answer right; for open-short, all points ticked), solFirst (solution opened before answering), skipped, answer.
    Keyboard: every control is a native button, input, select or radio; the task's prompt takes focus on each new task; the
    order task's ↑ ↓ buttons keep focus on the moved item. The results table becomes labelled lines on phones.
    Text version: LX.Checkpoint.lineChart adds a table of the hourly values.
-   Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric, checkEstimate, level, summary, fmtMs, firstWord.
+   Pure (Node: module.exports): task, checkChoice, checkOrder, checkNumeric (either answer form), checkMWh, checkValue,
+   checkEstimate, level, describe, summary, fmtMs, firstWord.
    level and summary find the explanation and the estimate as the first "open-short" and the first "estimate" task. */
 (function () {
   "use strict";
@@ -55,13 +69,26 @@
     return { right: at.every(Boolean), places: at, n: at.filter(Boolean).length };
   }
   function unitFactor(t, u) { for (var i = 0; i < t.units.length; i++) if (t.units[i][0] === u) return t.units[i][1]; return undefined; }
-  function checkNumeric(t, value, unit) {
+  // a numeric task: answer {value, tol, show} for any unit (checkValue), else answer {mwh, tol} in MWh (checkMWh, CK-F)
+  function checkNumeric(t, value, unit) { return t.answer && t.answer.value != null ? checkValue(t, value, unit) : checkMWh(t, value, unit); }
+  function checkMWh(t, value, unit) {
     var f = unitFactor(t, unit);
     if (!(value > 0)) return { right: false, msg: "Enter a positive number." };
     if (f === 0 || f === null) return { right: false, power: true, msg: unit + " measures power, a rate. Energy over a year needs MWh or GWh." };
     var mwh = value * f, a = t.answer, rel = Math.abs(mwh - a.mwh) / a.mwh;
     return { right: rel <= a.tol, mwh: mwh, rel: rel,
       msg: rel <= a.tol ? "Right: about " + Math.round(a.mwh / 1000) + " GWh." : mwh > a.mwh * 2.5 ? "Too high. Did every hour count at full output?" : mwh < a.mwh / 2.5 ? "Too low. Check the hours in a year and the units." : "Close, but more than 10% off. Recheck the multiplication." };
+  }
+  // a number with any unit (promoted from CK-M, W2): units [[name, factor to the answer's unit]] (null: a unit of the wrong
+  // kind, unitNote[name] saying why; result kind: true); answer {value, tol (relative), show}
+  function checkValue(t, value, unit) {
+    var f = unitFactor(t, unit);
+    if (!(value > 0)) return { right: false, msg: "Enter a positive number." };
+    if (f === null) return { right: false, kind: true, msg: (t.unitNote || {})[unit] || unit + " is the wrong kind of unit for this answer." };
+    if (f === undefined) return { right: false, msg: "Choose a unit." };
+    var v = value * f, a = t.answer, rel = Math.abs(v - a.value) / a.value;
+    return { right: rel <= a.tol, value: v, rel: rel,
+      msg: rel <= a.tol ? a.show.charAt(0).toUpperCase() + a.show.slice(1) + "." : v > a.value * 1.5 ? "Too high. Recheck your model and its units." : v < a.value / 1.5 ? "Too low. Recheck your model and its units." : "Close, but outside the tolerance (" + Math.round(a.tol * 1000) / 10 + "%). Recheck your numbers." };
   }
   // the estimate: units, order, and how the range sits against the worked solution's range (MWh a year). A range needs
   // a high above its low: one number (low = high) shows no uncertainty, which the rubric marks Not yet.
@@ -99,6 +126,11 @@
     else if (k >= R.autoProficient && estMin >= 2 && explainOk) lv = R.levels[2];
     else if (k >= (R.autoDeveloping != null ? R.autoDeveloping : 3) && estMin >= 1) lv = R.levels[1];
     return { level: lv, auto: k, autoOf: autoIds.length, estMin: estMin, explainOk: explainOk, complete: complete };
+  }
+  // the results view's sentence under the level (CK-F's parts; a checkpoint with another rule passes its own describe)
+  function describe(D, L) {
+    return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") +
+      ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function fmtMs(ms) {
     if (ms == null) return "–";
@@ -141,8 +173,8 @@
     return lines.join("\n");
   }
 
-  var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkEstimate: checkEstimate,
-    level: level, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
+  var pure = { task: task, checkChoice: checkChoice, checkOrder: checkOrder, checkNumeric: checkNumeric, checkMWh: checkMWh, checkValue: checkValue,
+    checkEstimate: checkEstimate, level: level, describe: describe, summary: summary, fmtMs: fmtMs, firstWord: firstWord };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -189,7 +221,7 @@
     var D = o.data, KEY = o.key, N = D.tasks.length, code = o.code || "Checkpoint";
     var CK = o.checks || {}, cChoice = CK.choice || checkChoice, cOrder = CK.order || checkOrder, cNum = CK.numeric || checkNumeric, cEst = CK.estimate || checkEstimate;
     var levelOf = o.level || level, summaryOf = o.summary || function (D, st, env) { return summary(D, st, env, { code: code, level: o.level }); };
-    var esT = ofKind(D, "estimate");
+    var esT = ofKind(D, "estimate"), gateT = o.submitTask ? task(D, o.submitTask) : esT, describeOf = o.describe || describe;
     function fresh() { return { version: D.version, started: null, finished: null, cur: 0, tasks: {} }; }
     var st = LX.store.get(KEY, null);
     if (!st || st.version !== D.version) st = fresh();
@@ -200,14 +232,24 @@
     function tick() { if (clock.id && clock.t0 != null) { var r = rec(clock.id), t = now(); r.ms += t - clock.t0; clock.t0 = t; } }
     function startClock(id) { tick(); clock.id = id; clock.t0 = document.visibilityState === "hidden" ? null : now(); }
     function stopClock() { tick(); clock.id = null; clock.t0 = null; save(); }
-    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { tick(); clock.t0 = null; save(); } else if (clock.id) clock.t0 = now(); });
-    window.addEventListener("pagehide", function () { tick(); save(); });
+    function onVis() { if (document.visibilityState === "hidden") { tick(); clock.t0 = null; save(); } else if (clock.id) clock.t0 = now(); }
+    function onHide() { tick(); save(); }
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("pagehide", onHide);
     function answered(id, right, answer, extra) {
       tick(); var r = rec(id); r.tries += 1;
       if (r.first == null) { r.first = right; r.msFirst = r.ms; }
       if (answer !== undefined) r.answer = answer;
       if (extra) for (var k in extra) r[k] = extra[k];
-      save(); return r;
+      save();
+      if (gateT && id === gateT.id && gateT !== esT) openSolution();   // the estimate opens it itself, after its range check
+      if (o.onAnswer) o.onAnswer(id, r, st);
+      return r;
+    }
+    // the page's worked solution opened before the submit task is answered: recorded on that task
+    function early() {
+      if (gateT) { var r = rec(gateT.id); if (r.first == null && !r.answer) r.solFirst = true; save(); if (o.onAnswer) o.onAnswer(gateT.id, r, st); }
+      openSolution();
     }
 
     // ---- views: intro, a task, results
@@ -239,9 +281,10 @@
       var sol = E("details", { class: "lx-ck-sol", hidden: r.first == null && !r.solFirst }, c);
       E("summary", { text: "Worked solution" }, sol);
       solution(t, sol);
-      var early = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
-        onclick: function () { rec(t.id).solFirst = true; save(); sol.hidden = false; sol.open = true; early.hidden = true; if (t === esT) openSolution(); } }, c);
-      function unlock() { sol.hidden = false; early.hidden = true; }
+      var earlyBtn = E("button", { type: "button", class: "lx-link", text: "Show the worked solution now (recorded as opened before answering)", hidden: r.first != null || r.solFirst,
+        onclick: function () { var rr = rec(t.id); rr.solFirst = true; save(); sol.hidden = false; sol.open = true; earlyBtn.hidden = true;
+          if (t === gateT) openSolution(); if (o.onAnswer) o.onAnswer(t.id, rr, st); } }, c);
+      function unlock() { sol.hidden = false; earlyBtn.hidden = true; }
       ({ "choice": choice, "order": order, "numeric": numeric, "open-short": openShort, "estimate": estimate })[t.kind](t, body, fb, unlock);
       var foot = E("div", { class: "lx-ck-foot" }, c);
       E("button", { type: "button", class: "lx-btn ghost small", text: i ? "Back" : "Overview", onclick: function () { if (i) show(i - 1); else intro(); } }, foot);
@@ -389,7 +432,7 @@
       var lock = q(o.lock), body = q(o.solution);
       if (lock) lock.hidden = true; if (body) body.classList.add("is-open");
     }
-    // "Start again": the page's worked solution shuts again until the new attempt's estimate is submitted (or opened early)
+    // "Start again": the page's worked solution shuts again until the new attempt's submit task is answered (or opened early)
     function lockSolution() {
       var lock = q(o.lock), body = q(o.solution);
       if (lock && body) { lock.hidden = false; body.classList.remove("is-open"); }
@@ -402,7 +445,7 @@
       var L = levelOf(D, st), c = E("div", { class: "lx-ck-card" }, wrap);
       E("p", { class: "lx-eyebrow", text: "Your results (this browser only)" }, c);
       E("p", { class: "lx-ck-level", tabindex: "-1", text: "Level: " + L.level }, c).focus({ preventScroll: true });
-      E("p", { text: "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + ". Estimate: lowest self-rating " + (L.estMin >= 0 ? D.rule.levels[L.estMin] : "not rated yet") + ". Explanation: " + (L.explainOk ? "both points." : "not both points ticked.") + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.") }, c);
+      E("p", { class: "lx-ck-describe", text: describeOf(D, L) }, c);
       var sc = E("div", { class: "lx-scroll-x" }, c), tb = E("table", { class: "lx-ck-res" }, sc), hr = E("tr", null, E("thead", null, tb));
       ["Task", "First answer", "Tries", "Time to first answer", "Solution first"].forEach(function (h) { E("th", { scope: "col", text: h }, hr); });
       var bd = E("tbody", null, tb);
@@ -436,15 +479,23 @@
       RUBRIC.push({ id: tr.getAttribute("data-c"), name: cells[0].textContent.trim(), levels: [1, 2, 3, 4].map(function (k) { return cells[k] ? cells[k].textContent.trim() : ""; }) });
     });
     // the worked-solution section: shut until the estimate is submitted (or opened on purpose, which is recorded)
-    var lock = q(o.lock), solBody = q(o.solution);
+    var lock = q(o.lock), solBody = q(o.solution), ob = null;
     if (lock && solBody) {
-      var er = esT && st.tasks[esT.id], done = er && (er.first != null || er.solFirst);
-      lock.hidden = !!done; if (done) solBody.classList.add("is-open");
-      var ob = lock.querySelector("button");
-      if (ob) ob.addEventListener("click", function () { if (esT) { var r = rec(esT.id); if (r.first == null) r.solFirst = true; save(); } openSolution(); });
+      var er = gateT && st.tasks[gateT.id], done = !!(er && (er.first != null || er.answer || er.solFirst));
+      lock.hidden = done; solBody.classList.toggle("is-open", done);
+      ob = lock.querySelector("button");
+      if (ob) ob.addEventListener("click", early);
+    }
+    // clean removal, so a page can swap runners: the clock stops and the attempt is saved; listeners and markup go
+    function destroy() {
+      stopClock();
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("pagehide", onHide);
+      if (ob) ob.removeEventListener("click", early);
+      wrap.remove();
     }
     if (st.finished && !location.hash) results(); else intro();
-    return { show: show, results: results, intro: intro, state: function () { return st; } };
+    return { show: show, results: results, intro: intro, state: function () { return st; }, solutionNow: early, destroy: destroy };
   };
   Object.keys(pure).forEach(function (k) { LX.Checkpoint[k] = pure[k]; });
   LX.Checkpoint.lineChart = lineChart;

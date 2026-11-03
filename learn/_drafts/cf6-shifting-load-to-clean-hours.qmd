@@ -6,14 +6,14 @@ page-layout: full
 toc: false
 title-block-banner: false
 css: ../assets/learn/learn.css
-body-classes: "page-learn page-lesson lx-form-case theme-carbon"
+body-classes: "page-learn page-lesson lx-form-case"
 ---
 
 <!-- Case file CF6 (path.yml form: case; curriculum v2 §13 and §16.3), about 10 minutes. DRAFT: held in learn/_drafts/
      until Henry approves every excerpt sentence (reports/learn/excerpts_for_approval.md, E6); path.yml status upcoming.
      Henry's research enters only through the approved excerpt (excerpt:ghg), the allow-listed explainer (explainer:ghg),
      the allow-listed repository (repo:ghg-load-regulation) and a doi.org citation. No project page, no Research page.
-     theme-carbon (assets/base.css) gives the explainer its theme colour (--t); nothing else on the page uses it.
+     The explainer takes the Learn accent as its theme colour (forms.css: .page-learn .explainer, body.page-learn --t).
      JS: assets/learn/cf6-shifting-load-to-clean-hours.js with its data file, town.json and town_year.json.
      Tests: node _tests/learn/test_cf6-shifting-load-to-clean-hours.js [--write]. -->
 
@@ -37,32 +37,6 @@ body-classes: "page-learn page-lesson lx-form-case theme-carbon"
 ```
 <!-- learn:meta:end -->
 
-```{=html}
-<style>
-.lx-case-try code { white-space: normal; overflow-wrap: anywhere; }
-.lx-case-try p:not(.lx-eyebrow) { font-size: 15.5px; color: var(--lx-ink-2); }
-.cf-ctl .lx-seg, .cf-ctl .lx-toggle { justify-self: start; }
-.cf-ctl { display: grid; gap: 6px; align-content: start; min-width: 0; }
-.cf-ctl-l { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
-.cf-selects { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
-.cf-sel { display: grid; gap: 4px; min-width: 0; }
-.cf-sel select { min-height: 38px; border-radius: 9px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); padding: 0 8px;
-  font-size: 14px; width: 100%; max-width: 100%; }
-.cf-two { width: 100%; border-collapse: collapse; font-size: 14.5px; }
-.cf-two th, .cf-two td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid var(--lx-line); }
-.cf-two thead th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-3); }
-.cf-two tbody th { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
-.cf-two td { color: var(--lx-ink-2); }
-.page-learn .explainer { margin: 0; }
-@media (max-width: 560px) {
-  .cf-selects { grid-template-columns: minmax(0, 1fr); }
-  .cf-two thead { display: none; }
-  .cf-two tr { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--lx-line); }
-  .cf-two th, .cf-two td { border: 0; padding: 2px 0; }
-  .cf-two td::before { content: attr(data-l) ": "; font-family: var(--lx-f-display); color: var(--lx-ink-3); }
-}
-</style>
-```
 
 ::: {#case .lx-sec}
 ```{=html}

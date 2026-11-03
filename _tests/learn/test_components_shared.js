@@ -1,6 +1,7 @@
 // test_components_shared.js — Node tests for the shared-component fixes collected after the W1 per-lesson reviews
 // (2026-11-02; reports/learn/w1_shared_fixes.md), run on a small stub document:
-//   - checkpoint.js (LX.Checkpoint): the estimate task's early "Show the worked solution now" opens the page's worked
+//   - checkpoint.js (LX.Checkpoint): its W2 options (describe, submitTask, onAnswer, numeric check with any unit,
+//     destroy) on a CK-M-like checkpoint; the estimate task's early "Show the worked solution now" opens the page's worked
 //     solution as well; "Start again" shuts it again; a range needs a high above its low (pure check and view: one
 //     number is not submitted, and says why); solutions, points and choice feedback take [[glossary|marks]]
 //   - sheet.js (LX.Sheet): "Fill down" follows the selected cell after Enter and after set(), not only after a move
@@ -56,6 +57,7 @@ class El {
   set innerHTML(v) { this.children = []; this._text = ""; this._html = v ? String(v) : null; }
   get innerHTML() { return this._html != null ? this._html : this._text + this.children.map(c => "<" + c.tagName.toLowerCase() + ">" + c.innerHTML + "</" + c.tagName.toLowerCase() + ">").join(""); }
   addEventListener(ev, fn) { (this.listeners[ev] = this.listeners[ev] || []).push(fn); }
+  removeEventListener(ev, fn) { if (this.listeners[ev]) this.listeners[ev] = this.listeners[ev].filter(f => f !== fn); }
   fire(ev, extra) { (this.listeners[ev] || []).forEach(f => f(Object.assign({ target: this, preventDefault() {}, stopPropagation() {} }, extra))); }
   click() { if (!this.disabled) this.fire("click"); }
   focus() { ACTIVE = this; } select() {} scrollIntoView() {}
@@ -86,7 +88,9 @@ class El {
 function env() {
   const body = new El("body"), store = {};
   const document = { body, visibilityState: "visible", createElement: t => new El(t), createElementNS: (ns, t) => new El(t),
-    querySelector: s => body.querySelector(s), querySelectorAll: s => body.querySelectorAll(s), addEventListener() {} };
+    querySelector: s => body.querySelector(s), querySelectorAll: s => body.querySelectorAll(s), listeners: {},
+    addEventListener(ev, fn) { (this.listeners[ev] = this.listeners[ev] || []).push(fn); },
+    removeEventListener(ev, fn) { if (this.listeners[ev]) this.listeners[ev] = this.listeners[ev].filter(f => f !== fn); } };
   const LX = {};
   LX.H = (tag, attrs, parent) => {   // as core.js LX.H
     const e = document.createElement(tag);
@@ -104,7 +108,9 @@ function env() {
   LX.clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   LX.store = { get: (k, d) => (k in store ? JSON.parse(store[k]) : d), set: (k, v) => { store[k] = JSON.stringify(v); } };
   LX.progress = { done() {} };
-  const window = { LX, addEventListener() {}, confirm: () => true, innerWidth: 390, performance: { now: () => Date.now() } };
+  const window = { LX, listeners: {}, addEventListener(ev, fn) { (this.listeners[ev] = this.listeners[ev] || []).push(fn); },
+    removeEventListener(ev, fn) { if (this.listeners[ev]) this.listeners[ev] = this.listeners[ev].filter(f => f !== fn); },
+    confirm: () => true, innerWidth: 390, performance: { now: () => Date.now() } };
   return { LX, document, window, body, store };
 }
 function load(name, E) {
@@ -181,6 +187,53 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
   const r1 = cp.state().tasks.e1;
   ok(r1.tries === 1 && r1.first === true && r1.answer.low === 440 && r1.answer.high === 600 && opened() && host.querySelectorAll(".lx-ck-rating fieldset").length === 4,
      "checkpoint view: a range is recorded, opens the worked solution and the four-criterion rating");
+})();
+
+// ---------------------------------------------------------------- checkpoint: the runner's options (W2 integration, for CK-M)
+// describe (the results sentence), submitTask (the final open-short task opens the page's solution), onAnswer, the numeric
+// check with any unit (answer.value), destroy() (clock, listeners and markup gone; the attempt saved)
+(function () {
+  const E = env(); load("checkpoint", E);
+  const page = E.body, LX = E.LX, H = LX.H;
+  const lock = H("div", { id: "ck-lock", class: "lx-ck-lock" }, page), lb = H("button", { type: "button", text: "Open the worked solution now" }, lock);
+  const solBody = H("div", { id: "ck-sol", class: "lx-ck-gated" }, page);
+  const D = { version: "ck-u v1", rule: { autoProficient: 1, autoStrong: 2, autoDeveloping: 1, criteria: [], levels: ["Not yet", "Developing", "Proficient", "Strong"] }, tasks: [
+    { id: "n1", kind: "numeric", title: "Peak", lesson: "M1", skill: "solve", prompt: "The peak draw?", solution: "255 kW.",
+      units: [["kW", 1], ["MW", 1000], ["kWh", null]], unitNote: { kWh: "kWh measures energy; the peak draw is a rate." }, answer: { value: 255, tol: 0.01, show: "about 255 kW" } },
+    { id: "f1", kind: "open-short", title: "Validate", lesson: "R5", skill: "validate", prompt: "Does it hold?", solution: "Two points.", points: ["One.", "Two."] }] };
+  const seen = [], host = H("div", null, page), lbBefore = (lb.listeners.click || []).length;
+  const cp = LX.Checkpoint(host, { data: D, key: "cku", code: "CK-U", lock: "#ck-lock", solution: "#ck-sol", submitTask: "f1",
+    describe: (DD, L) => "Custom sentence: " + L.auto + " of " + L.autoOf + ".", onAnswer: (id, r) => seen.push(id + (r.solFirst ? "*" : "")) });
+  const shut = () => !lock.hidden && !solBody.classList.contains("is-open"), opened = () => lock.hidden && solBody.classList.contains("is-open");
+  ok(shut() && (E.document.listeners.visibilitychange || []).length === 1 && (E.window.listeners.pagehide || []).length === 1 && lb.listeners.click.length === lbBefore + 1,
+     "checkpoint options: shut at start; one visibility, one pagehide and one lock-button listener");
+  // numeric with any unit: the shared default check reads answer.value
+  ok(CP.checkNumeric(D.tasks[0], 0.255, "MW").right && CP.checkNumeric(D.tasks[0], 255, "kWh").kind && /rate/.test(CP.checkNumeric(D.tasks[0], 255, "kWh").msg) &&
+     /Choose a unit/.test(CP.checkNumeric(D.tasks[0], 255, "GW").msg) && CP.checkNumeric(D.tasks[0], 255, "kW").msg === "About 255 kW.", "checkpoint options: numeric check with any unit (factor, wrong kind, unknown unit)");
+  ok(CP.checkNumeric(est.units ? { units: [["MWh", 1], ["MW", 0]], answer: { mwh: 1000, tol: 0.1 } } : null, 1000, "MWh").right, "checkpoint options: the MWh form still works (CK-F)");
+  cp.show(0);
+  const inp = host.querySelector(".lx-ck-grid2 input"), sel = host.querySelector(".lx-ck-grid2 select");
+  inp.value = "0.255"; sel.value = "MW"; buttons(host, /^Check$/)[0].click();
+  ok(cp.state().tasks.n1.first === true && /About 255 kW/.test(host.textContent) && shut(), "checkpoint options: the view checks a number in another unit; an earlier task opens no solution");
+  cp.show(1);
+  host.querySelector("textarea").value = "It holds within 2%."; buttons(host, /^Submit my explanation/)[0].click();
+  ok(opened() && seen.join() === "n1,f1", "checkpoint options: submitting the submit task opens the page's worked solution; onAnswer sees each answer");
+  cp.results();
+  ok(host.querySelector(".lx-ck-describe").textContent === "Custom sentence: 1 of 1.", "checkpoint options: describe writes the results sentence");
+  ok(CP.describe(ckf, CP.level(ckf, { tasks: {} })).indexOf("Auto-marked tasks right on the first try: 0 of ") === 0, "checkpoint options: the default sentence is CK-F's");
+  // Start again re-locks; the lock box's button then records the early opening on the submit task
+  buttons(host, /^Start again/)[0].click();
+  ok(shut(), "checkpoint options: Start again shuts the worked solution");
+  lb.click();
+  ok(opened() && cp.state().tasks.f1.solFirst === true && seen[seen.length - 1] === "f1*", "checkpoint options: the lock button opens it early, recorded on the submit task");
+  // destroy: listeners and markup gone, the attempt saved; a new runner resumes it
+  cp.show(0);
+  cp.destroy();
+  ok((E.document.listeners.visibilitychange || []).length === 0 && (E.window.listeners.pagehide || []).length === 0 && lb.listeners.click.length === lbBefore && host.children.length === 0,
+     "checkpoint options: destroy() removes the listeners and the markup");
+  ok(E.LX.store.get("cku", null).tasks.f1.solFirst === true && E.LX.store.get("cku", null).cur === 0, "checkpoint options: destroy() leaves the attempt saved");
+  const cp2 = LX.Checkpoint(host, { data: D, key: "cku", code: "CK-U", lock: "#ck-lock", solution: "#ck-sol", submitTask: "f1" });
+  ok(opened() && /How this checkpoint works/.test(host.textContent) && cp2.state().tasks.f1.solFirst, "checkpoint options: a new runner reads the saved attempt (solution still open, recorded)");
 })();
 
 // ---------------------------------------------------------------- sheet: the Fill-down button follows the selected cell

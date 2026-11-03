@@ -985,6 +985,8 @@
           say: "Output is between the minimum and the size when the switch is on, and zero when it is off." },
         { html: sym("v", "<var>v</var><sub><var>g,t</var></sub>") + " − " + sym("w", "<var>w</var><sub><var>g,t</var></sub>") + " = " + sym("u", "<var>u</var><sub><var>g,t</var></sub>") + " − " + sym("u", "<var>u</var><sub><var>g,t</var>−1</sub>"), tag: "start and stop",
           say: "A start-up minus a shut-down equals the change of the switch from the hour before." },
+        { html: sym("u", "<var>u</var><sub>cc,−1</sub>") + " = " + sym("u", "<var>u</var><sub>cc,23</sub>") + " = 1,  " + sym("u", "<var>u</var><sub>pk,−1</sub>") + " = 0", tag: "the day's ends",
+          say: "The end condition: the combined-cycle plant is on before the day and must be on in the last hour, 23:00, so the day ends as it began. The peaker starts the day off and may end it either way." },
         { html: "Σ<sub>τ=<var>t</var>−" + sym("UT", "<var>UT</var><sub><var>g</var></sub>") + "+1</sub><sup><var>t</var></sup> " + sym("v", "<var>v</var><sub><var>g</var>,τ</sub>") + " ≤ " + sym("u", "<var>u</var><sub><var>g,t</var></sub>"), tag: "minimum run",
           say: "A plant started in the last UT hours must still be on. The minimum down time is the same rule for shut-downs: the shut-downs of the last DT hours are at most one minus the switch." },
         { html: sym("u", "<var>u</var><sub><var>g,t</var></sub>") + " ∈ {0, 1}", tag: "the switch", note: "the relaxation: 0 ≤ u ≤ 1",

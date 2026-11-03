@@ -10,8 +10,8 @@
 // (a funder wants a headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent,
 // an error found after publication), each time picking an action and reading the norm behind it; write an integrity
 // statement for their own study and copy it. The explain layer: the exemplars (LX.Exemplars), a flowchart for any new
-// dilemma (LX.Flowchart), the stakeholder map (lesson-local StakeholderMap: three rings of people and what each is owed;
-// a candidate for the shared library) and a Steelman card (LX.Steelman); then the rubric (integrity) and a checklist.
+// dilemma (LX.Flowchart), the stakeholder map (LX.StakeholderMap, components/stakeholders.js: three rings of people and
+// what each is owed) and a Steelman card (LX.Steelman); then the rubric (integrity) and a checklist.
 //
 // The pure model is exported for Node: _tests/learn/test_r09-integrity-stakeholders.js checks the data, the scoring and the
 // fallbacks, and writes the no-JS blocks (task, exemplars, rubric) in its --write mode.
@@ -79,14 +79,6 @@
       ".r9-opts .lx-choice{text-align:left;justify-content:flex-start;font:inherit;font-size:15px;color:var(--lx-ink);background:var(--lx-surface)}",
       ".r9-norm{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13.5px;color:var(--lx-ink-2)}",
       ".r9-pill{display:inline-flex;align-items:center;min-height:26px;padding:2px 10px;border-radius:999px;border:1px solid var(--lx-line-2);font-family:var(--lx-f-display);font-weight:500;font-size:13px;color:var(--lx-ink)}",
-      ".r9-map{display:grid;gap:10px}",
-      ".r9-ring{display:grid;gap:8px;padding:12px;border-radius:16px;border:1px dashed var(--lx-line-2);background:var(--lx-surface)}",
-      ".r9-ring.r1{background:var(--lx-surface-2)} .r9-ring.r0{border-style:solid}",
-      ".r9-ring>.lx-eyebrow{margin:0}",
-      ".r9-chips{display:flex;flex-wrap:wrap;gap:6px}",
-      ".r9-chip{font:inherit;font-size:14px;min-height:38px;padding:4px 12px;border-radius:999px;border:1px solid var(--lx-line-2);background:var(--lx-surface);color:var(--lx-ink);cursor:pointer}",
-      ".r9-chip[aria-pressed=true]{background:var(--lx-ink);color:var(--lx-bg);border-color:var(--lx-ink)}",
-      ".r9-owed{margin:0;padding:10px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:14.5px;color:var(--lx-ink)}",
       ".r9-form{display:grid;gap:10px}",
       ".r9-form label{display:grid;gap:4px;font-family:var(--lx-f-display);font-weight:500;font-size:14px;color:var(--lx-ink)}",
       ".r9-form .lx-hint{font-family:var(--lx-f-body,inherit);font-weight:400}",
@@ -100,29 +92,11 @@
     host.innerHTML = "";
     H("div", { class: "lx-saw" + (kind === "good" ? "" : " no"), html: LX.icon(kind === "good" ? "check" : "question") + "<div>" + html + "</div>" }, host);
   }
-  // the stakeholder map: three rings, a chip per group; a chip opens what the group is owed and where it appeared
-  function StakeholderMap(host, D, o) {
-    o = o || {};
-    var P = people(D), box = H("div", { class: "r9-map" }, host), owed = H("p", { class: "r9-owed", "aria-live": "polite", text: "Tap a group to see what your study owes it." }, host), seen = {}, chips = [];
-    D.stakeholders.forEach(function (r, k) {
-      var ring = H("div", { class: "r9-ring r" + k, role: "group", "aria-label": r.ring }, box);
-      H("p", { class: "lx-eyebrow", text: (k + 1) + " · " + r.ring }, ring);
-      var row = H("div", { class: "r9-chips" }, ring);
-      r.items.forEach(function (s) {
-        var p = P.filter(function (x) { return x.id === s.id; })[0];
-        var c = H("button", { type: "button", class: "r9-chip", "aria-pressed": "false", text: s.label }, row);
-        c.addEventListener("click", function () {
-          chips.forEach(function (x) { x.setAttribute("aria-pressed", x === c ? "true" : "false"); });
-          owed.innerHTML = "<b>" + LX.esc(s.label) + "</b>: " + LX.esc(s.owed) + (p.dilemmas.length ? ' <span class="lx-hint">In: ' + LX.esc(p.dilemmas.join("; ")) + ".</span>" : "");
-          seen[r.ring] = true; if (o.onOpen) o.onOpen(Object.keys(seen).length);
-        });
-        chips.push(c);
-      });
-    });
-    var alt = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version of the map" }, alt);
-    var ul = H("ul", null, alt);
-    P.forEach(function (p) { H("li", { text: p.ring + " · " + p.label + ": " + p.owed }, ul); });
-    return { el: box };
+  // the stakeholder map: three rings, a chip per group; a chip opens what the group is owed and the dilemmas it appears in
+  // (LX.StakeholderMap, components/stakeholders.js; promoted from this file at the W2 integration)
+  function mapRings(D) {
+    var P = people(D);
+    return D.stakeholders.map(function (r) { return { ring: r.ring, items: r.items.map(function (s) { var p = P.filter(function (x) { return x.id === s.id; })[0]; return { id: s.id, label: s.label, owed: s.owed, also: p.dilemmas }; }) }; });
   }
 
   function view(live, data, root) {
@@ -200,7 +174,7 @@
     var sm = H("div", { class: "lx-xcard" }, x), hd = H("header", { class: "lx-x-head" }, sm);
     H("h3", { text: "Who your study owes what" }, hd);
     H("p", { class: "lx-lede", html: LX.rich("Three rings of [[stakeholder|stakeholders]] around a Prairie Town study. The fairness questions are who pays and who benefits, who decides, and whose concerns are recognised.") }, sm);
-    StakeholderMap(sm, D);
+    LX.StakeholderMap(sm, { rings: mapRings(D) });
     LX.Steelman(H("div", { class: "lx-xcard" }, x), D.steelman);
   }
   function selfcheck(D) {

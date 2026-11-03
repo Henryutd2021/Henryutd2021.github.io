@@ -71,7 +71,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Solver</dt><dd>Software that finds the best plan of a model, or proves that none exists; here HiGHS, in well under a second once it has loaded.</dd>
 <dt>Checks</dt><dd>Balance, limits, ramps, energy and money: a solver answers the model you wrote, so check it against the world.</dd>
 <dt>Shadow price</dt><dd>How much the best cost rises per small extra MWh of demand, away from a kink; $40 in 18 of 24 hours, where the combined-cycle is the marginal plant.</dd>
-<dt>Mixed-integer programs</dt><dd>Their solve returns no ordinary shadow prices; prices come from a linear program with the on-or-off choices fixed (lesson M2).</dd>
+<dt>Mixed-integer programs</dt><dd>Their solve returns no ordinary shadow prices; prices come from a linear program with the on-or-off choices fixed (lesson <a href="m02-unit-commitment.html">M2</a>).</dd>
 </dl>
 </div>
 </div>
@@ -100,7 +100,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 | Peaker | 35 MWh, some hours below 30 MW | off all day; more wind and solar curtailed |
 | Shadow prices from the solve | one per hour | none |
 
-To price a mixed-integer plan, fix its [unit commitment]{.lx-term term="unit-commitment"} (which plants are on), re-solve the linear program, and read prices *conditional on that commitment*. Lesson M2 (upcoming) builds that model.
+To price a mixed-integer plan, fix its [unit commitment]{.lx-term term="unit-commitment"} (which plants are on), re-solve the linear program, and read prices *conditional on that commitment*. Lesson [M2](m02-unit-commitment.html) builds that model.
 
 ```{=html}
 </div>

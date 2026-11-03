@@ -37,26 +37,6 @@ body-classes: "page-learn page-lesson lx-form-case"
 ```
 <!-- learn:meta:end -->
 
-```{=html}
-<style>
-.lx-case-try code { white-space: normal; overflow-wrap: anywhere; }
-.lx-case-try p:not(.lx-eyebrow) { font-size: 15.5px; color: var(--lx-ink-2); }
-.cf-ctl .lx-seg, .cf-ctl .lx-toggle { justify-self: start; }
-.cf-ctl { display: grid; gap: 6px; align-content: start; min-width: 0; }
-.cf-ctl-l { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
-.cf-two { width: 100%; border-collapse: collapse; font-size: 14.5px; }
-.cf-two th, .cf-two td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid var(--lx-line); }
-.cf-two thead th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-3); }
-.cf-two tbody th { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
-.cf-two td { color: var(--lx-ink-2); }
-@media (max-width: 560px) {
-  .cf-two thead { display: none; }
-  .cf-two tr { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--lx-line); }
-  .cf-two th, .cf-two td { border: 0; padding: 2px 0; }
-  .cf-two td::before { content: attr(data-l) ": "; font-family: var(--lx-f-display); color: var(--lx-ink-3); }
-}
-</style>
-```
 
 ::: {#case .lx-sec}
 ```{=html}

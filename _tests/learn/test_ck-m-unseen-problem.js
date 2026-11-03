@@ -197,6 +197,11 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     ok(/49 variables, 24 tower rows, 24 draw rows and one end-of-day row/.test(QMD), "page: the model's size");
     ok(QMD.indexOf('class="lx-ck-gated ckm-solution-body"') > 0 && QMD.indexOf('id="ckm-lock"') > 0, "page: the worked solutions are gated");
     ok(J.intro[0].indexOf("about 240 minutes") > 0 && /120[\s\S]*60[\s\S]*45[\s\S]*15/.test(J.intro[0]), "intro: 120 + 60 + 45 + 15 = 240 minutes");
+    // the shared runner's options do what CK-M once did by hand (W2 integration): no observer, no own numeric check or gate
+    const SRC = fs.readFileSync(L("ck-m-unseen-problem.js"), "utf8");
+    ok(!/MutationObserver|function checkNumeric|function gate\(|fixResults/.test(SRC) && /describe: describe/.test(SRC) && /submitTask: finalId\(J, k\)/.test(SRC) && /cp\.destroy\(\)/.test(SRC),
+       "page code: the runner's describe, submitTask and destroy options; the numeric check is the shared one");
+    ok(C.checkNumeric === require(L("components/checkpoint.js")).checkNumeric, "checkNumeric is the shared runner's (any unit)");
   }
 
   // ---------------- notebooks: the starter holds the data and the defect; the solutions assert the numbers

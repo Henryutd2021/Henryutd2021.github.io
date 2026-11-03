@@ -262,7 +262,7 @@ Validating an optimization model is hard: it describes what would be cheapest, n
 | Look back | For the UK's electricity transition from 1990 to 2014, the cumulative cost of the real path deviated by 9 to 23% from the cost-optimal paths of a model, under the study's alternative assumptions ([Trutnevyte, 2016](https://doi.org/10.1016/j.energy.2016.03.038)). | One country and one model; the real path was never meant to be cost-optimal. |
 | Good practice | Guidance for energy-system optimization studies asks for documented, verifiable models and for uncertainty to be explored, not hidden ([DeCarolis et al., 2017](https://doi.org/10.1016/j.apenergy.2017.03.001)). | A standard to meet, not a test that passes or fails. |
 
-The Researcher lesson R5 (upcoming) turns both into a routine.
+The Researcher studio [R5](r05-build-validate.html) turns both into a routine.
 
 ```{=html}
 </div>
