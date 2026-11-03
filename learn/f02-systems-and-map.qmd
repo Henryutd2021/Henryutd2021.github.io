@@ -39,7 +39,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 
 ```{=html}
 <style>
-body.page-learn { --f2-tech: #2E66B5; --f2-cost: #9A6400; --f2-env: #1B8452; --f2-people: #B8572B; --f2-sec: #6A3F9E; }
+body.page-learn { --f2-tech: #2E66B5; --f2-cost: #8F5D00; --f2-env: #18784A; --f2-people: #A64E27; --f2-sec: #6A3F9E; }   /* lane colours are also text on surface-2: 4.5:1 */
 body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: #52C68B; --f2-people: #E08A5C; --f2-sec: #B496E6; }
 .f2-tabs { margin: 14px 0 12px; }
 .f2-seg { display: flex; flex-wrap: wrap; }

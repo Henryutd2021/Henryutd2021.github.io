@@ -346,7 +346,7 @@
     var row = H("div", { class: "lx-row2" }, host), c2 = H("div", { class: "lx-xcard" }, row), c3 = H("div", { class: "lx-xcard" }, row);
     var typ = DAYS.typical, PM = Q.persistence_mae_mw;
     LX.CompareTable(c2, {
-      title: "Four ways to score a forecast",
+      title: "Four ways to score a forecast", text: true,   // "Misleads when" is words: on phones each score is a card of labelled lines
       columns: [{ key: "name", label: "Score", main: true }, { key: "spp", label: "SPP, Jan–Apr 2025", num: true }, { key: "trap", label: "Misleads when" }],
       rows: [
         { key: "mae", color: "var(--lx-accent)", name: "MAE", note: "average miss, in GW", spp: { text: gw2(Q.mae_mw) }, trap: "comparing grids of different sizes" },

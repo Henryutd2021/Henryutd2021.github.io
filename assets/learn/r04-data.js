@@ -422,7 +422,7 @@
       ".r4-log{margin:0;padding:8px 10px;border-radius:10px;background:var(--lx-surface-2);border:1px solid var(--lx-line);font-family:var(--lx-f-mono);font-size:12.5px;line-height:1.5;color:var(--lx-ink);white-space:pre-wrap;word-break:break-word}",
       ".r4-tbl{border-collapse:collapse;font-size:13.5px;width:100%}",
       ".page-learn .r4-tbl>:not(caption)>*>*{background:transparent!important;color:inherit;box-shadow:none!important}",
-      ".r4-tbl th,.r4-tbl td{padding:5px 8px;border-bottom:1px solid var(--lx-line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}",
+      ".r4-tbl th,.r4-tbl td{position:relative;padding:5px 8px;border-bottom:1px solid var(--lx-line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}",   // relative: a cell's hidden screen-reader text stays inside the scrolling box
       ".r4-tbl th{font-family:var(--lx-f-display);font-weight:500;font-size:12px;color:var(--lx-ink-3)}",
       ".r4-tbl th[scope=row],.r4-tbl td.l{text-align:left;white-space:normal}",
       ".r4-tbl tr.base td,.r4-tbl tr.base th{font-weight:600;background:var(--lx-surface-2)!important}",

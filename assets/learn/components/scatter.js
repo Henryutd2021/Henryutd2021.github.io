@@ -61,7 +61,12 @@
       if (o.diagonal) {
         var a = Math.max(lo(xa), lo(ya)), b = Math.min(hi(xa), hi(ya)), at = L.phone && o.diagonal.atN ? o.diagonal.atN : o.diagonal.at;
         S("path", { d: "M" + x(a) + " " + y(a) + "L" + x(b) + " " + y(b), stroke: "var(--lx-ink-3)", "stroke-dasharray": "4 4" }, svg);
-        if (at) S("text", { x: x(at[0]), y: y(at[1]), "text-anchor": "start", class: "ax" }, svg).textContent = L.phone && o.diagonal.labelN ? o.diagonal.labelN : o.diagonal.label;
+        if (at) {   // the label starts at its data point; when it would run past the plot's right edge, it ends there instead
+          var dl = S("text", { x: x(at[0]), y: y(at[1]), "text-anchor": "start", class: "ax" }, svg);
+          dl.textContent = L.phone && o.diagonal.labelN ? o.diagonal.labelN : o.diagonal.label;
+          var dw = (dl.getComputedTextLength && dl.getComputedTextLength()) || dl.textContent.length * 7.4;
+          if (x(at[0]) + dw > Wd - m.r) { dl.setAttribute("x", Wd - m.r); dl.setAttribute("text-anchor", "end"); }
+        }
       }
       var xt = L.phone && xa.titleN ? xa.titleN : xa.title, yt = L.phone && ya.titleN ? ya.titleN : ya.title;
       if (xt) S("text", { x: m.l + iw / 2, y: Hh - 4, "text-anchor": "middle", class: "axt" }, svg).textContent = xt;

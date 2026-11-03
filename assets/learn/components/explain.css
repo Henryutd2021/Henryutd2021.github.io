@@ -20,13 +20,13 @@
 .cnode:focus-visible rect { stroke: var(--lx-accent); stroke-width: 3; }
 .cnode.sel rect { fill: var(--lx-ink); stroke: var(--lx-ink); }
 .cnode.sel text { fill: var(--lx-bg); }
-.cnode.dim { opacity: .38; }
+.cnode.dim rect, .cnode.dim .grp { opacity: .38; } .cnode.dim text { fill: var(--lx-ink-3); }   /* faded shapes, readable words */
 .cedge path { fill: none; stroke: var(--lx-line-2); stroke-width: 1.5; }
 .cedge text { font-family: var(--lx-f-body); font-size: 11.5px; fill: var(--lx-ink-3); }
 .cedge text.bg { stroke: var(--lx-surface); stroke-width: 4px; stroke-linejoin: round; }
 .cedge.on path { stroke: var(--lx-ink); stroke-width: 2; }
 .cedge.on text { fill: var(--lx-ink); }
-.cedge.dim { opacity: .35; }
+.cedge.dim path { opacity: .35; }   /* the label keeps its colour (ink-3, 4.5:1) */
 .lx-cmap.narrow .cedge text { display: none; }
 .lx-cdetail { border: 1px solid var(--lx-line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; background: var(--lx-surface-2); align-content: start; }
 .page-learn .lx-cdetail h4 { font-size: 18px; margin: 0; }

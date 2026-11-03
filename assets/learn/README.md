@@ -130,6 +130,7 @@ The header comment of each file in `components/` gives the full options.
 - `LX.progress.done(id)`, `.guess`, `.answer`, and `LX.store.get/set`: this browser only.
 - `LX.mount(slug, init)`, `LX.json(url)`, `LX.onTheme(fn)`, `LX.reduced()`.
 - `LX.lessonRef(P, code)` → `{ href, ready, label }` and `LX.lessonRefHTML(P, code)`: a lesson by starter number (`3`, "lesson 3") or code (`"R2"`), from `data/path.json` (`P`, loaded with the page's `data-src`). The HTML is a link when the lesson is live and "R2 (upcoming)" otherwise, so links appear by themselves when a lesson goes live. Node: `require("components/core.js")` gives both (pure).
+- The back-to-top guard: the site's button (`.to-top`) steps aside (`body.lx-totop-off`) while it would cover lesson controls, or any text under it (the footer and the last notes at the end of a page, where no scrolling uncovers them).
 - `LX.demo(root, fn, cards)`: the lesson's demo states, for screenshots and curious readers. `fn(state)` puts the page into a
   state and returns `{view}` when it handled it, or `null`. Every lesson accepts `"mid"` (one interaction done) and
   `"step-N"` (step card N open, its action done where the lesson knows how; with `cards`, an unhandled `step-N` simply
@@ -138,6 +139,13 @@ The header comment of each file in `components/` gives the full options.
   `scripts/learn_screenshots.mjs --states mid,step-3,band` uses it for any lesson.
 - Technology colours beyond lesson 0's fleet: `--lx-bat` (battery storage), `--lx-hyd` (hydro), `--lx-geo` (geothermal),
   `--lx-dr` (demand response), day and night; icons `atom`, `flame`, `drop`, `geo`, `dial` in `LX.IC`.
+- **Colour as text** (layout audit, W3). The day values of `--lx-good`, `--lx-warn` and `--lx-bad` (#18784A, #965800,
+  #B82B2A) read at 4.5:1 on white, on `--lx-surface-2` and on their own `-soft` fills. A technology or tier colour used for
+  text is taken toward the ink, `color-mix(in srgb, <colour> 70%, var(--lx-ink))`: darker by day, lighter by night, at
+  least 4.5:1 for every token except solar (use the ink for text on solar). Captions (`caption`, `figcaption`) take
+  `--lx-ink-3` (Quarto's caption grey is 4.1:1). `scripts/learn_layout_audit.mjs` checks contrast, clipping, overlap and
+  tap targets on every page in every state.
+- `.lx-choice` hyphenates (`hyphens: auto`): a long single word ("Counterfactual") breaks inside a narrow button instead of running out of it.
 
 **Scene** (`scene.js`): the Prairie Town picture.
 
@@ -246,6 +254,7 @@ LX.ConceptMap(host, {title, lede, groups: {k: [name, color]}, nodes: [{id, g, la
 ```
 
 `gameLabel` heads each node's `game` line; the default is "In the game" on play-form pages and "In this lesson" elsewhere.
+Nodes and links away from the selection fade their shapes only; their words stay readable (`--lx-ink-3`, 4.5:1). A link's label sits at the middle of its line, or, where two links cross, at 40, 60, 30 or 70% of the way, whichever first meets no other label.
 
 **Flowchart** (`flowchart.js`)
 
@@ -282,7 +291,7 @@ LX.EnergyChain(host, {title, aside, lede, stops: [{icon, title, text, value}]});
 **Course map** (`metro.js`): `<div data-lx-metro>` on `learn/index.qmd` draws from `data/path.json`.
 
 - Use `LX.metroLayout(path, "h"|"v")` for tests.
-- It supports any number of tiers: give each tier a colour `slot` 1–5. Four tiers now; Researcher has `status: upcoming` (a dashed door and line, "coming later").
+- It supports any number of tiers: give each tier a colour `slot` 1–5. Four tiers, all live (the Researcher tier since W2); a tier with `status: upcoming` gets a dashed door and line ("coming later").
 - Each line's "+N more" label opens the tier card, which links the tier's live lessons off the starter path.
 
 **Solver** (`solver.js`): linear and mixed-integer programs in the browser with HiGHS.
@@ -351,7 +360,7 @@ P.render({ x: {min: 0, max: 24, ticks: [[0, "00:00"], [12, "12:00"], [24, "24:00
 ```
 
 - A spec also takes `spans` (full-height shading), `hbands` (below zero), `bars`, `pick: {n, sel, onPick}` (clickable columns), `title`, `height`/`heightN`, `margin`/`ml`. Lines take `pts` or `values`, `step` (each value holds for an hour), `offset` (px, to show equal lines side by side), `dash`, `width`, `dots`, `cap`.
-- Marks: `kind: "ring"` (default: hollow, bold label beside), `"dot"` (filled, centred label; `pos`), `n: "1"` (a numbered disc), `vline: true`.
+- Marks: `kind: "ring"` (default: hollow, bold label beside), `"dot"` (filled, centred label; `pos`), `n: "1"` (a numbered disc), `vline: true`. A ring's `above` label goes below the point when the point is within 21 px of the plot's top, so it stays out of the y unit's row. A span's label is drawn in `--lx-ink-2` (it sits on the span's shading).
 - It draws once visible, redraws on resize and on the day/night toggle; `anim` lines draw on (not under reduced motion).
 - Keyboard: a chart with a `tip` or `pick` takes focus; ← → Home End move the readout or the picked column.
 - `LX.PlotCard(host, {text})` is the chart card with value chips: `c.title`, `c.chip(label, value, "good"|"bad"|"warn")`, `c.clear()`, `c.plot`, `c.text`.
@@ -365,6 +374,7 @@ LX.Scatter(host, { points: [{key, label, x, y, color, aria, text}], x: {ticks, f
 ```
 
 - Dots are in the tab order (Enter or Space picks; an accent ring shows focus). On phones the drawing is laid out at its real width; labels go right, left or above a dot.
+- The diagonal's label starts at `at`; when it would run past the plot's right edge it ends there instead (lesson 6's label was cut off on desktop).
 - Replaces: lesson 6's `Scatter` (capacity factor against firm share) and its `.lx6-scatter`/`.lx6-dot` styles.
 
 **Hourly prices** (`pricechart.js`, on `LX.Plot`): step lines per bus, an earlier run dashed, the picked hour shaded; and an hour picker.
@@ -414,6 +424,7 @@ var res = ch.draw(blocks /* [{key, mw, offer}], cheapest first */, demandMW, { x
 
 - `clear` is the lesson's market clearing; the default (`LX.SupplyStack.clear`) is uniform price, cheapest first, the lower block marginal at an edge.
 - The legend and text version follow the step's controls (`later: false` puts them right under the chart); `noLegend: true` hides the legend.
+- The price label sits just above the price line; when a block's label is at the same height there (a $0 block next to the axis, on phones), it moves up a line.
 - Replaces lesson 8's `StackChart` (steps 1 to 7). Candidates: A3, M1.
 
 **Cost and CO₂ frontier** (`frontier.js`): the cheapest plan at each CO₂ level as a line over an "out of reach (approximately)" shade (straight lines join the solved points), labelled plan dots, and an equal-score line for a carbon price.
@@ -426,6 +437,7 @@ fc.price(44, { co2, cost });   fc.pick(function (id) {});   fc.focusDot("A");
 ```
 
 - `pick` makes the plan dots buttons (Tab, Enter, Space). Axis texts, scales and labels have options (`xMax`, `yMin`, `xLabel`, `fmtX`, ...).
+- Layout: the shade's label is kept inside the plot (phones); a plan's letter goes up and right of its dot, or to the first free corner (up-left, down-right, down-left) when it would touch another letter or dot.
 - Replaces lesson 13's `FrontierChart`, which lesson 12 read as `LX.townPlan.ui.FrontierChart` (gone from `ui`). With the planning engine (`planengine.js`, W2), it is the i-pareto pair: `LX.townPlan` solves, `LX.Frontier` draws.
 
 #### Cards for the explain layer and contested points
@@ -488,7 +500,7 @@ LX.lp2.region(rules, view); LX.lp2.segment(a, b, view); LX.lp2.holds(r, p); LX.l
 ```
 
 - `solve()` needs a region with a corner when it is not empty (true with x ≥ 0 and y ≥ 0); `optimum()` works for any rules.
-- A rule without a style shapes the region and draws no line (x ≥ 0, y ≥ 0). Rule labels in `render()`: `place` "start", "top", "end" or "foot".
+- A rule without a style shapes the region and draws no line (x ≥ 0, y ≥ 0). Rule labels in `render()`: `place` "start", "top", "end" or "foot"; a label takes its line's colour toward the ink (4.5:1, see "Colour as text").
 - Keyboard: the plan dot is a slider (arrow keys); every dragged line also has a slider in the lesson. Text version: `describe` (fluid), or the lesson's own list.
 - `.lx-lp-walk` and `.lx-lp-walk-out` style a row of walk controls under a plane. Static fallback figures use the classes `lx-lp-grid`, `-tick`, `-axlab`, `-region`, `-rule on`, `-iso`, `-fbpt`, `-plab`.
 - Replaces: `Plane()` and the rule algebra in B1 and K4 (`w1h-*` styles), `W1F.LPPlot`, the exact solver and the simplex walk in lesson 10 (lesson 11's "peek inside the solver" uses it too).
@@ -613,7 +625,7 @@ LX.PhraseTagger(act, { key: "n1-tags-a", tags: D.lens,                    // [{i
 ```
 
 - Verdicts per phrase: same, fair (in `also`), other, none. Picks stay in this browser under `key`.
-- Phrases are inline spans with button semantics (Tab, Enter, Space), so long phrases wrap with their sentence; chips carry a number badge, so colour is never the only cue.
+- Phrases are inline spans with button semantics (Tab, Enter, Space), so long phrases wrap with their sentence; chips carry a number badge, so colour is never the only cue. The badge's fill is its colour 86% toward the ink, so the number reads at 4.5:1 day and night.
 - Returns `{ el, picks(), select(id), tag(id, tagId), miss(tagId), compare() }`; pure `phrases`, `judge`, `score`, `badge` (also on `LX.PhraseTagger`).
 - Replaces N1's three story steps.
 
@@ -767,7 +779,7 @@ var r3 = LX.ScaleStrip(card, { title: "...", scales: D.scales, decides: true, st
 
 - **Scales.** `{ id: "S0", name, power, who, decides, step, horizon }`, in order. Each card's top edge takes its scale's colour, `--lx-scale-0` ... `--lx-scale-4` (day and night, defined in `scalestrip.css`: use these tokens wherever a page colours a scale), or one `color` for all.
 - **Parts on request.** `power` (top right), `decides` ("Decides …; who."), `steps` (time step and horizon), `flow` (chips for what passes down and up; `{ down, up }` changes the words), `ticks` (the reader's sorts, right, elsewhere or not sorted, in words and icons, summed up in one sentence for screen readers; `tickKeys` names them), `lessons` with `path` ("Go further:", through `LX.lessonRef`; an `{ href, label }` item is always linked), `mark` and `markText` (one scale outlined, with a line of text).
-- **Layout.** Five columns from 861 px, one card per row below. The list is its own text version. `update(patch)` redraws the cards (R3 moves the mark when the reader picks a brief).
+- **Layout.** Five columns from 861 px, one card per row below. The list is its own text version. A scale's code (S0 ... S4) is in its colour toward the ink (4.5:1). `update(patch)` redraws the cards (R3 moves the mark when the reader picks a brief).
 - **Pure.** `scaleIndex`, `colorOf`, `lessonParts`, `tickSummary`, `TICKS` (Node: `require("components/scalestrip.js")`; also on `LX.ScaleStrip`).
 
 **Planning engine** (`planengine.js`, `planengine.css`; a one-region capacity-expansion LP): `LX.townPlan`, Prairie Town's capacity plan as a linear program, promoted unchanged from lesson 13. Lessons 12, 13, M3 and A22 use this shared copy; lesson 12 no longer loads `13-capstone.js`. At the W2 integration, M3's rules for storage between representative weeks, its full-year check and its error measures moved in too (`link`, `readCheck`, `errors`).
@@ -799,6 +811,7 @@ ws.draw(RW, TP.readCheck(C, Y, r, plan).byWeek);     // after a check: a dot on 
 
 - **Colours and letters.** A typical week takes its season's colour (W, Sp, Su, F; numbered, and mixed toward the ink, when a season has several); extremes are outlined in their own colour (P peak demand, N peak net load, C least wind, X cold, still winter). Tokens only; the letters keep colour from being the only cue.
 - **Text.** The grid is `role="img"` with a sentence naming each representative week and the weeks it stands for (and, after a check, how many weeks are short). "Text version" holds a table of the 52 weeks: start date, the week standing in, and unserved MWh after a check.
+- **Contrast.** Summer is amber (`--lx-warn`), not solar yellow; cells and keys take their colour 86% toward the ink, so each letter in the page colour reads at 4.5:1 day and night (`color()` still returns the token).
 - **Pure** (Node: `require("assets/learn/components/weekstrip.js")`; also on `LX.WeekStrip`): `weekName`, `letter`, `color`, `number`, `dateOf`, `yearOf`, `label`, `rows`. Tests: `_tests/learn/test_components_w2_plan.js`. M3 uses it; M13 and C2 can reuse it.
 
 **Stakeholders** (`stakeholders.js`, `stakeholders.css`; e-stakeholders, promoted from A22 and R9 at the W2 integration; F8, F9, F11 and A13 can reuse them): who decides, who pays, who benefits.
