@@ -18,8 +18,10 @@
    Returns { el, get(), set(values), text(), checks() }.
    Fields: native, labelled controls with a one-line hint; the type is a set of five radio buttons (§11.2) that shows the
    chosen type's template and typical methods (one method family among several). Checks: eight lines (the question
-   written, then the seven rigour checks of §11.3), each "pass" or "warn" in words and with an icon, never colour alone;
-   they never block (a learner may type any question) and never judge originality, importance or novelty.
+   written, with no bracketed placeholder such as "[…]" left from a draft, then the seven parts that §11.3's rigour
+   checks need), each "filled in" or "to do" in words and with an icon, never colour alone. The head counts "N of 8
+   parts filled in": the checks see only whether a part is there, not how rigorous it is (the rubric does that); they
+   never block (a learner may type any question) and never judge originality, importance or novelty.
    Node: module.exports = { TYPES, SCALES, FIELDS, CHECKS, check, text, encode, decode, clean } (pure). */
 (function () {
   "use strict";
@@ -35,7 +37,7 @@
   var FIELDS = [
     { key: "question", short: "q", label: "The question, in one sentence", hint: "End it with a question mark.", rows: 2 },
     { key: "type", short: "t", label: "Type of question" },
-    { key: "audience", short: "a", label: "Audience or decision-maker", hint: "Who would use the answer: a co-op board, a regulator, a city council…" },
+    { key: "audience", short: "a", label: "Audience or decision-maker", hint: "Who would use the answer, and who it affects: a co-op board, a regulator or a city council; low-income renters, farmers…" },
     { key: "metric", short: "m", label: "Metric", hint: "What you would measure or compute." },
     { key: "units", short: "u", label: "Units", hint: "MWh, $/MWh, t CO₂ a year, hours without heat…" },
     { key: "counterfactual", short: "c", label: "Compared with (the counterfactual)", hint: "What happens otherwise: the baseline you compare against." },
@@ -57,6 +59,7 @@
   ];
   var WARN = {
     question: "Write the question as one sentence that ends with a question mark.",
+    brackets: "Replace the parts in brackets, such as […], with your own words.",
     type: "Name the type: descriptive, explanatory, evaluative, predictive or prescriptive.",
     audience: "Name who would use the answer.",
     metric: "Name what you would measure.",
@@ -85,7 +88,9 @@
     var v = clean(values);
     function line(id, ok, why) { var c = CHECKS.filter(function (x) { return x.id === id; })[0]; return { id: id, label: c.label, ok: ok, why: ok ? "" : why }; }
     var out = [
-      line("question", /\?\s*$/.test(v.question) && v.question.split(/\s+/).length >= 4, WARN.question),
+      // a draft with a bracketed placeholder ("compared with […]", "[decision-maker]") is not yet written
+      line("question", /\?\s*$/.test(v.question) && v.question.split(/\s+/).length >= 4 && !/\[[^\]]*\]/.test(v.question),
+        /\[[^\]]*\]/.test(v.question) ? WARN.brackets : WARN.question),
       line("type", !!v.type, WARN.type),
       line("audience", !!v.audience, WARN.audience),
       line("metric", !!(v.metric && v.units), !v.metric ? WARN.metric + " " + WARN.units : WARN.units),
@@ -112,7 +117,7 @@
       "Scale: " + (scaleOf(v.scale) || dash) + "; boundary: " + (v.boundary || dash),
       "I would be wrong if: " + (v.wrong || dash),
       "Main uncertainty: " + (v.uncertainty || dash),
-      "Checks: " + c.pass + " of " + c.total + " pass" + (c.all ? "." : "; to do: " + c.items.filter(function (x) { return !x.ok; }).map(function (x) { return x.label.charAt(0).toLowerCase() + x.label.slice(1); }).join("; ") + ".")
+      "Parts filled in: " + c.pass + " of " + c.total + (c.all ? "." : "; to do: " + c.items.filter(function (x) { return !x.ok; }).map(function (x) { return x.label.charAt(0).toLowerCase() + x.label.slice(1); }).join("; ") + ".")
     ];
     return lines.join("\n");
   }
@@ -228,7 +233,7 @@
     var ck = H("div", { class: "lx-qc-checks" }, box);
     var ckHead = H("p", { class: "lx-qc-ckhead", "aria-live": "polite" }, ck);
     var ckList = H("ul", { class: "lx-qc-cklist" }, ck);
-    H("p", { class: "lx-hint", text: "The checks look at rigour only. They do not judge whether a question is new or important: few papers on a topic is no evidence of either." }, ck);
+    H("p", { class: "lx-hint", text: "The checks only see which parts are filled in, not how good they are: rate that against the rubric. They never judge whether a question is new or important." }, ck);
     var bar = H("div", { class: "lx-qc-foot" }, box);
     var copyBtn = H("button", { class: "lx-btn ghost small", type: "button", text: "Copy as text" }, bar);
     var sh = null;
@@ -253,11 +258,11 @@
     }
     function paintChecks() {
       var c = check(v);
-      ckHead.textContent = c.pass + " of " + c.total + " checks pass" + (c.all ? "." : ": the rest are marked to do.");
+      ckHead.textContent = c.pass + " of " + c.total + " parts filled in" + (c.all ? "." : ": the rest are marked to do.");
       ckList.innerHTML = "";
       c.items.forEach(function (it) {
         var li = H("li", { class: it.ok ? "ok" : "warn" }, ckList);
-        li.innerHTML = LX.icon(it.ok ? "check" : "question") + '<span><span class="lx-sr">' + (it.ok ? "Passes: " : "To do: ") + "</span>" + LX.esc(it.label)
+        li.innerHTML = LX.icon(it.ok ? "check" : "question") + '<span><span class="lx-sr">' + (it.ok ? "Filled in: " : "To do: ") + "</span>" + LX.esc(it.label)
           + (it.ok ? "" : '<span class="why">' + LX.esc(it.why)
             + (o.fix && o.fix[it.id] ? ' <a href="' + LX.esc(o.fix[it.id].href) + '">See ' + LX.esc(o.fix[it.id].label) + ".</a>" : "") + "</span>") + "</span>";
       });

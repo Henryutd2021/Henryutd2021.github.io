@@ -184,13 +184,18 @@ async function questioncard() {
   const noUnits = QC.check(Object.assign({}, full, { units: " " }));
   ok(!noUnits.items[3].ok && noUnits.items[3].why === "Give the metric's units." && noUnits.pass === 7, "question card: a metric without units warns about the units");
   ok(!QC.check(Object.assign({}, full, { question: "Community solar and renters." })).items[0].ok && !QC.check(Object.assign({}, full, { question: "Why?" })).items[0].ok, "question card: a question needs a question mark and a few words");
+  // shared fix 5 (R10 review #2): a draft that still holds a bracketed placeholder is not a written question
+  const br = QC.check(Object.assign({}, full, { question: "Did community solar lower the energy burden for renters, compared with […]?" }));
+  ok(!br.items[0].ok && br.items[0].why === "Replace the parts in brackets, such as […], with your own words." && br.pass === 7, "question card: a draft with […] fails the question check, and says why");
+  ok(!QC.check(Object.assign({}, full, { question: "What should [decision-maker] do about heat pumps in the city?" })).items[0].ok, "question card: any bracketed placeholder fails, such as [decision-maker]");
+  ok(QC.FIELDS.filter(f => f.key === "audience")[0].hint === "Who would use the answer, and who it affects: a co-op board, a regulator or a city council; low-income renters, farmers…", "question card: the audience hint names users and an affected group");
   ok(QC.check(Object.assign({}, full, { scale: "S9" })).items[5].why === "Pick a scale." && QC.check(Object.assign({}, full, { boundary: "" })).items[5].why === "Say what is inside the study and what is left out.", "question card: scale and boundary warn separately");
   const cl = QC.clean({ type: "novel", scale: "S7", question: "x".repeat(700), extra: "dropped" });
   ok(cl.type === "" && cl.scale === "" && cl.question.length === 600 && !("extra" in cl), "question card: clean() keeps known fields, list values and a length cap");
   const tx = QC.text(full, { code: "R10" }).split("\n");
   ok(tx[0] === "Learn · R10 question card" && tx[2] === "Type: Evaluative (Did … achieve …, compared with …?)" && tx[4] === "Metric: renters' energy burden (units: % of household income)" &&
-     tx[6] === "Scale: S1 microgrid and community; boundary: the co-op's service area, 2019-2025; owners excluded" && tx[9] === "Checks: 8 of 8 pass.", "question card: the card as text");
-  ok(QC.text({}).split("\n")[1] === "Question: (not yet)" && /^Checks: 0 of 8 pass; to do: the question is written/.test(QC.text({}).split("\n")[9]), "question card: an empty card as text lists what is to do");
+     tx[6] === "Scale: S1 microgrid and community; boundary: the co-op's service area, 2019-2025; owners excluded" && tx[9] === "Parts filled in: 8 of 8.", "question card: the card as text");
+  ok(QC.text({}).split("\n")[1] === "Question: (not yet)" && /^Parts filled in: 0 of 8; to do: the question is written/.test(QC.text({}).split("\n")[9]), "question card: an empty card as text lists what is to do");
   const uni = Object.assign({}, full, { wrong: "CO₂ fell “anyway” — café émissions 中文" }), h = QC.encode(uni);
   ok(/^q-[A-Za-z0-9_-]+$/.test(h) && JSON.stringify(QC.decode("#" + h)) === JSON.stringify(QC.clean(uni)) && JSON.stringify(QC.decode(h)) === JSON.stringify(QC.clean(uni)), "question card: a name-safe link round trip, with non-ASCII text");
   ok(QC.decode("#q-%%%") === null && QC.decode("#plan-w1") === null && QC.decode("q-" + Buffer.from("[1,2]").toString("base64url")) !== null && QC.decode("q-" + Buffer.from("{oops").toString("base64url")) === null,
@@ -210,7 +215,8 @@ async function questioncard() {
   ok(host.querySelectorAll("input[type=\"radio\"]").length === 5 && host.querySelector("fieldset.lx-qc-types legend").textContent === "Type of question", "question card view: the type is a labelled radio group of five");
   ok(host.querySelector("select").querySelectorAll("option").length === 6, "question card view: the scale picker");
   const q = host.querySelector("textarea");
-  ok(q.value === "Is solar good for renters?" && host.querySelector(".lx-qc-ckhead").textContent === "1 of 8 checks pass: the rest are marked to do.", "question card view: starts from the given values, with its checks");
+  ok(q.value === "Is solar good for renters?" && host.querySelector(".lx-qc-ckhead").textContent === "1 of 8 parts filled in: the rest are marked to do.", "question card view: starts from the given values, with its checks");
+  ok(host.querySelector(".lx-qc-checks .lx-hint").textContent === "The checks only see which parts are filled in, not how good they are: rate that against the rubric. They never judge whether a question is new or important." && !/rigour only/.test(fs.readFileSync(path.join(SITE, "assets/learn/components/questioncard.js"), "utf8")), "question card view: the note says the checks see only which parts are filled in");
   const warnMetric = host.querySelectorAll(".lx-qc-cklist li")[3];
   ok(warnMetric.classList.contains("warn") && /To do: /.test(warnMetric.innerHTML) && warnMetric.innerHTML.indexOf('<a href="a01-cost-benefit.html">See A1.</a>') > 0 && warnMetric.innerHTML.indexOf('data-icon="question"') >= 0,
      "question card view: a warning in words, with an icon and its fix link");
