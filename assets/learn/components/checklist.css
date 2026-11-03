@@ -1,0 +1,21 @@
+/* checklist.css — tick-box lists the reader keeps (checklist.js): bordered rows (N1, B2) or soft rows (B3, K7). */
+.lx-checklist { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.lx-checklist li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; padding: 8px 10px; border-radius: 10px;
+  border: 1px solid var(--lx-line); background: var(--lx-surface); }
+.lx-checklist input { width: 20px; height: 20px; accent-color: var(--lx-good); }
+.lx-checklist:not(.lx-ck-soft) input { margin: 3px 0 0; }
+.lx-checklist input:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+.lx-checklist label { display: grid; gap: 2px; cursor: pointer; margin: 0; }
+.lx-checklist label b { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; color: var(--lx-ink); }
+.lx-checklist label span { font-size: 14px; color: var(--lx-ink-2); }
+.lx-checklist label small { font-size: 12.5px; color: var(--lx-ink-3); overflow-wrap: anywhere; }
+.lx-checklist.lx-ck-code label small { font-family: var(--lx-f-mono); }
+.lx-checklist li.on { border-color: color-mix(in srgb, var(--lx-good) 45%, var(--lx-line)); }
+.lx-checklist-foot { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13.5px; color: var(--lx-ink-3); }
+@media (min-width: 861px) { .lx-checklist.lx-ck-2col { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* soft: rows on the soft surface, accent ticks (B3, K7) */
+.lx-checklist.lx-ck-soft li { border: 0; background: var(--lx-surface-2); font-size: 15px; color: var(--lx-ink-2); }
+.lx-checklist.lx-ck-soft input { margin-top: 2px; accent-color: var(--lx-accent); }
+/* inline: the bold label and its text on one line */
+.lx-checklist.lx-ck-inline label { display: block; }
+.lx-checklist.lx-ck-inline label b { font-size: inherit; }

@@ -9,7 +9,8 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 ---
 
 <!-- CK-F in the checkpoint form (curriculum v2 §3.3 and §16.3: task page, worked solution revealed after submission,
-     rubric), wave W1, 2026-11-02. Tasks, checks, timer and results: assets/learn/ck-f-estimate.js with
+     rubric), wave W1, 2026-11-02. Tasks, checks, timer and results: the shared checkpoint runner (LX.Checkpoint,
+     assets/learn/components/checkpoint.js), configured by assets/learn/ck-f-estimate.js with
      assets/learn/data/ck-f-estimate.json. Tests: node _tests/learn/test_ck-f-estimate.js checks every answer and every
      number in the worked solution. Generated, do not edit by hand: the learn:meta, learn:next and learn:footer blocks
      (python3 scripts/build_learn.py, in the ResearchPortfolio folder). -->
@@ -53,11 +54,11 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 :::
 
 ```{=html}
-<div id="ckf-lock" class="ckf-lock" hidden>
+<div id="ckf-lock" class="lx-ck-lock" hidden>
 <p><b>Opens when you submit task 9.</b> The checkpoint asks for an estimate without hints, so the worked solution waits for your own numbers.</p>
 <p><button type="button" class="lx-btn ghost small">Open it anyway (recorded)</button></p>
 </div>
-<div id="ckf-solution-body" class="lx-xgrid">
+<div id="ckf-solution-body" class="lx-xgrid lx-ck-gated">
 <div class="lx-xcard">
 <header class="lx-x-head"><h3>Two routes to the same quantity</h3></header>
 <table class="lx-facts ckf-routes">
@@ -91,8 +92,8 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 </ul>
 </div>
 </div>
-<style>/* lesson-local: with JavaScript the worked solution stays shut until task 9 is submitted (or opened on purpose) */
-.lx-js #ckf-solution-body:not(.ckf-open) { display: none; }
+<style>/* lesson-local. With JavaScript the worked solution (.lx-ck-gated, checkpoint.css) stays shut until task 9 is
+   submitted, or opened on purpose (recorded) */
 .ckf-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 6px; font-size: 15.5px; }
 .ckf-routes td { font-size: 14.5px; } .ckf-routes td.n { font-family: var(--lx-f-mono); white-space: normal; }
 #ckf-rubric td, #ckf-rubric th { font-size: 14px; vertical-align: top; }

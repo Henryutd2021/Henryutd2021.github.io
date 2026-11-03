@@ -1,0 +1,34 @@
+/* sheet.css — the working spreadsheet (sheet.js): formula bar, tools, a scrolling grid with sticky headers. */
+.lx-sheet { display: grid; gap: 8px; min-width: 0; }
+.lx-sheet-bar { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.lx-sheet-name { font-family: var(--lx-f-mono); font-size: 15px; font-weight: 600; text-align: center; padding: 8px 0; border-radius: 8px; background: var(--lx-surface-2); }
+.lx-sheet-fx { min-height: 42px; min-width: 0; padding: 0 10px; border-radius: 8px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink);
+  font-family: var(--lx-f-mono); font-size: 16px; }
+.lx-sheet-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.lx-sheet-msg { font-size: 13.5px; color: var(--lx-ink-3); }
+.lx-sheet-scroll { position: relative; max-height: 380px; overflow: auto; border: 1px solid var(--lx-line); border-radius: 10px; }
+.lx-sheet-grid { border-collapse: separate; border-spacing: 0; font-family: var(--lx-f-mono); font-size: 14px; min-width: 100%; }
+.lx-sheet-grid th { position: sticky; top: 0; z-index: 1; background: var(--lx-surface-2); color: var(--lx-ink-3); font-weight: 400; font-size: 12px; padding: 4px 6px;
+  border-bottom: 1px solid var(--lx-line); border-right: 1px solid var(--lx-line); }
+.lx-sheet-grid tbody th { position: sticky; left: 0; z-index: 0; text-align: right; width: 2.4em; }
+.lx-sheet-grid .lx-sheet-corner { left: 0; z-index: 2; }
+.lx-sheet-grid td { padding: 0; min-width: 4.6em; border-bottom: 1px solid var(--lx-line); border-right: 1px solid var(--lx-line); background: var(--lx-surface); }
+.lx-sheet-grid td.first { min-width: 3.6em; }
+.lx-sheet-grid td.w { min-width: 6em; }
+.lx-sheet-grid td button { display: block; width: 100%; min-height: 32px; padding: 0 6px; border: 0; background: transparent; color: var(--lx-ink); font: inherit; text-align: right;
+  cursor: cell; white-space: nowrap; }
+.lx-sheet-grid td.first button, .lx-sheet-grid td.lab button, .lx-sheet-grid td.head button { text-align: left; }
+.lx-sheet-grid td.head button { font-family: var(--lx-f-display); font-size: 12.5px; color: var(--lx-ink-2); white-space: normal; line-height: 1.2; padding: 4px 6px; }
+.lx-sheet-grid td.lab button { font-family: var(--lx-f-display); font-size: 13px; color: var(--lx-ink-2); }
+.lx-sheet-grid td button.f { background: color-mix(in srgb, var(--lx-accent) 7%, transparent); }
+.lx-sheet-grid td button.todo { background: var(--lx-warn-soft); }
+.lx-sheet-grid td button.err { color: var(--lx-bad); font-weight: 600; }
+.lx-sheet-grid td button.sel { outline: 2px solid var(--lx-accent); outline-offset: -2px; }
+.lx-sheet-grid td button:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: -3px; border-radius: 0; }
+@media (max-width: 560px) {
+  .lx-sheet-grid { font-size: 13px; }
+  .lx-sheet-grid td { min-width: 3.8em; } .lx-sheet-grid td.first { min-width: 3.6em; } .lx-sheet-grid td.w { min-width: 5em; }
+  .lx-sheet-grid td button { min-height: 30px; padding: 0 4px; }
+  .lx-sheet-grid td.head button { font-size: 11.5px; }
+  .lx-sheet-fx { font-size: 15px; }
+}

@@ -1,0 +1,19 @@
+/* evidence.css — the evidence ladder (evidence.js): rungs highest first, an off-ladder box, and claims to place. */
+.lx-ladder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: start; max-width: 900px; }
+.lx-rungs { display: grid; gap: 4px; margin: 0; padding: 0 0 0 18px; list-style: none; border-left: 3px solid var(--lx-line-2); position: relative; }
+.lx-rungs li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 10px; border-radius: 10px;
+  border: 1px solid var(--lx-line); background: var(--lx-surface); position: relative; }
+.lx-rungs li::before { content: ""; position: absolute; left: -21px; top: 50%; width: 18px; border-top: 3px solid var(--lx-line-2); }
+.lx-rungs li b { font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; }
+.lx-rungs li small { display: block; font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-rungs li .k { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
+.lx-rungs li.hit { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); background: var(--lx-surface-2); }
+.lx-ladder-off { margin-top: 8px; padding: 7px 10px; border-radius: 10px; border: 1px dashed var(--lx-line-2); font-size: 14px; color: var(--lx-ink-2); }
+.lx-ladder-off.hit { border-style: solid; border-color: var(--lx-ink); }
+.lx-ladder-place { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.lx-ladder-place li { display: grid; gap: 6px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--lx-line); background: var(--lx-surface); }
+.lx-ladder-place label { font-family: var(--lx-f-display); font-weight: 500; font-size: 15px; margin: 0; }
+.lx-ladder-place select { font: inherit; font-size: 15px; min-height: 42px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--lx-line-2);
+  background: var(--lx-surface); color: var(--lx-ink); max-width: 100%; }
+.lx-ladder-place select:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
+@media (max-width: 760px) { .lx-ladder { grid-template-columns: minmax(0, 1fr); } }

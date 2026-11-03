@@ -107,10 +107,6 @@ button.b3-line { cursor: pointer; min-height: 44px; }
 .b1-eqtok[aria-pressed="true"] { background: var(--lx-ink); color: var(--lx-bg); border-color: var(--lx-ink); }
 .b1-eqtxt { padding: 0 4px; color: var(--lx-ink-2); }
 .page-learn .lx-cdetail code { font-family: var(--lx-f-mono); font-size: 13.5px; display: block; margin-top: 4px; padding: 4px 8px; border-radius: 6px; background: var(--lx-surface) !important; color: var(--lx-ink) !important; white-space: pre-wrap; }
-.b3-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; counter-reset: ck; }
-.b3-list li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); font-size: 15px; color: var(--lx-ink-2); }
-.b3-list input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--lx-accent); }
-.b3-list b { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
 .b3-static { font-family: var(--lx-f-mono); font-size: 14.5px; display: grid; gap: 4px; margin: 0; padding-left: 1.4rem; }
 </style>
 ```

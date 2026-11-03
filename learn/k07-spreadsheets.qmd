@@ -35,33 +35,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <style>
-.k7-sheet { display: grid; gap: 8px; min-width: 0; }
-.k7-bar { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 6px; align-items: center; }
-.k7-name { font-family: var(--lx-f-mono); font-size: 15px; font-weight: 600; text-align: center; padding: 8px 0; border-radius: 8px; background: var(--lx-surface-2); }
-.k7-fx { min-height: 42px; min-width: 0; padding: 0 10px; border-radius: 8px; border: 1px solid var(--lx-line-2); background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-size: 16px; }
-.k7-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.k7-msg { font-size: 13.5px; color: var(--lx-ink-3); }
-.k7-scroll { position: relative; max-height: 380px; overflow: auto; border: 1px solid var(--lx-line); border-radius: 10px; }
-.k7-grid { border-collapse: separate; border-spacing: 0; font-family: var(--lx-f-mono); font-size: 14px; min-width: 100%; }
-.k7-grid th { position: sticky; top: 0; z-index: 1; background: var(--lx-surface-2); color: var(--lx-ink-3); font-weight: 400; font-size: 12px; padding: 4px 6px;
-  border-bottom: 1px solid var(--lx-line); border-right: 1px solid var(--lx-line); }
-.k7-grid tbody th { position: sticky; left: 0; z-index: 0; text-align: right; width: 2.4em; }
-.k7-grid .k7-corner { left: 0; z-index: 2; }
-.k7-grid td { padding: 0; border-bottom: 1px solid var(--lx-line); border-right: 1px solid var(--lx-line); background: var(--lx-surface); }
-.k7-grid td button { display: block; width: 100%; min-height: 32px; padding: 0 6px; border: 0; background: transparent; color: var(--lx-ink); font: inherit; text-align: right;
-  cursor: cell; white-space: nowrap; }
-.k7-grid td.cA button, .k7-grid td.lab button, .k7-grid td.head button { text-align: left; }
-.k7-grid td.head button { font-family: var(--lx-f-display); font-size: 12.5px; color: var(--lx-ink-2); white-space: normal; line-height: 1.2; padding: 4px 6px; }
-.k7-grid td.lab button { font-family: var(--lx-f-display); font-size: 13px; color: var(--lx-ink-2); }
-.k7-grid td.cA { min-width: 3.6em; } .k7-grid td.cB, .k7-grid td.cC, .k7-grid td.cD, .k7-grid td.cE { min-width: 4.6em; } .k7-grid td.cF { min-width: 6em; }
-.k7-grid td button.f { background: color-mix(in srgb, var(--lx-accent) 7%, transparent); }
-.k7-grid td button.todo { background: var(--lx-warn-soft); }
-.k7-grid td button.err { color: var(--lx-bad); font-weight: 600; }
-.k7-grid td button.sel { outline: 2px solid var(--lx-accent); outline-offset: -2px; }
-.k7-grid td button:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: -3px; border-radius: 0; }
 .k7-q { display: grid; gap: 8px; }
-@media (max-width: 560px) { .k7-grid { font-size: 13px; } .k7-grid td.cB, .k7-grid td.cC, .k7-grid td.cD, .k7-grid td.cE { min-width: 3.8em; } .k7-grid td.cF { min-width: 5em; }
-  .k7-grid td button { min-height: 30px; padding: 0 4px; } .k7-grid td.head button { font-size: 11.5px; } .k7-fx { font-size: 15px; } }
 .k7-check { font-size: 15px; color: var(--lx-ink-2); }
 .k7-check b { font-family: var(--lx-f-mono); color: var(--lx-ink); }
 .k7-practice { display: grid; gap: 10px; }
@@ -72,10 +46,6 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k7-hint { display: inline-block; margin-left: 6px; font-size: 13.5px; }
 .k7-hint summary { cursor: pointer; color: var(--lx-ink-3); }
 .page-learn .k7-hint code { font-family: var(--lx-f-mono); background: var(--lx-surface-2) !important; color: var(--lx-ink) !important; padding: 1px 6px; border-radius: 5px; }
-.b3-list { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
-.b3-list li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); font-size: 15px; color: var(--lx-ink-2); }
-.b3-list input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--lx-accent); }
-.b3-list b { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
 .k7-static { border-collapse: collapse; font-family: var(--lx-f-mono); font-size: 13.5px; }
 .k7-static th, .k7-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: right; }
 .k7-static th { font-family: var(--lx-f-display); font-weight: 500; font-size: 12.5px; color: var(--lx-ink-2); text-align: left; }
