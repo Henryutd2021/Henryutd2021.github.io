@@ -419,18 +419,12 @@
       ".lx13-tt th,.lx13-tt td{border:0;padding:4px 0}.lx13-tt td::before{content:attr(data-label);display:block;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--lx-ink-3)}}",
       ".lx13-plan th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}",
       ".lx13-rowb{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
-      ".lx13-share input{width:100%;font-family:var(--lx-f-mono);font-size:12.5px;padding:7px 8px;border:1px solid var(--lx-line-2);border-radius:8px;background:var(--lx-surface);color:var(--lx-ink)}",
       ".lx13-scen>summary{cursor:pointer;font-family:var(--lx-f-display);font-weight:500;font-size:14.5px;color:var(--lx-ink-2);min-height:40px;display:flex;align-items:center}",
       ".lx13-scen[open]{display:grid;gap:12px}",
-      ".lx13-bound{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}",
-      ".lx13-bound ul{margin:0;padding-left:1.1rem;font-size:14.5px;color:var(--lx-ink-2)}.lx13-bound li{margin:4px 0}",
-      ".page-learn .lx13-bound h4{font-size:15px;margin:0 0 4px}",
-      ".lx13-fc .dot.pick{cursor:pointer}.lx13-fc .dot:focus{outline:none}.lx13-fc .dot:focus-visible circle.c{stroke:var(--lx-accent);stroke-width:4}",
       ".lx13-week .lx-seg button{min-height:34px;padding:0 9px;font-size:13px}",
-      ".lx13-alt table{border-collapse:collapse;font-size:13.5px;margin-top:6px}.lx13-alt td,.lx13-alt th{padding:2px 8px 2px 0;text-align:left}",
       ".lx13-cmp{width:100%;border-collapse:collapse;font-size:14px}.lx13-cmp th,.lx13-cmp td{padding:4px 6px;border-bottom:1px solid var(--lx-line);text-align:right}",
       ".lx13-cmp th:first-child,.lx13-cmp td:first-child{text-align:left}.lx13-cmp td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.lx13-cmp td:first-child{font-family:var(--lx-f-body)}",
-      "@media (max-width:560px){.lx13-bound{grid-template-columns:minmax(0,1fr)}.lx13-card{padding:12px}}"
+      "@media (max-width:560px){.lx13-card{padding:12px}}"
     ].join("") }, document.head);
   }
 
@@ -453,99 +447,6 @@
     if (window.ResizeObserver) new ResizeObserver(paint).observe(tr);
     paint();
     return { el: w, val: function () { return val; }, set: function (v) { set(v, false); }, hint: hint };
-  }
-
-  // ---------------------------------------------------------------- cost against CO2 (also lesson 12's chart)
-  // FrontierChart(host, {label, yMin, xMax}) -> { frontier(points, label), plans([{id, label, co2 t, cost $, color, kind,
-  //   mark, note}]), price(p $/t, through {co2, cost} | null), pick(fn), el }
-  function FrontierChart(host, o) {
-    o = o || {};
-    var box = H("div", { class: "lx13-chart lx13-fc" }, host);
-    var W = 640, HH = 310, ml = 64, mr = 14, mt = 26, mb = 44, lastW = 0;   // drawn at the box's own width: text stays 12 px
-    var svg = S("svg", { viewBox: "0 0 " + W + " " + HH, role: "group", "aria-label": o.label || "Cost per year against CO₂ per year" }, box);
-    var gA = S("g", null, svg), gF = S("g", null, svg), gL = S("g", null, svg), gP = S("g", null, svg);
-    var leg = H("div", { class: "lx-legend", "aria-hidden": "true" }, box);
-    var alt = H("details", { class: "lx-textalt lx13-alt" }, box); H("summary", { text: "Text version of the chart" }, alt);
-    var altB = H("div", null, alt);
-    var st = { fr: [], frLabel: "", plans: [], price: null, onPick: null, xMax: o.xMax || 850, yMin: o.yMin || 90, yMax: 280 };
-    function X(t) { return ml + Math.min(st.xMax, t / 1e3) / st.xMax * (W - ml - mr); }
-    function Y(c) { return mt + (1 - (Math.min(st.yMax, c / 1e6) - st.yMin) / (st.yMax - st.yMin)) * (HH - mt - mb); }
-    function scale() {
-      var mx = 0; st.fr.concat(st.plans).forEach(function (p) { if (p.cost > mx) mx = p.cost; });
-      st.yMax = Math.max(o.yMax || 200, Math.ceil(mx / 1e6 / 40) * 40 + 10);
-    }
-    function axes() {
-      gA.innerHTML = "";
-      var span = st.yMax - st.yMin, stp = span > 250 ? 50 : span > 120 ? 25 : 20;
-      for (var y = Math.ceil(st.yMin / stp) * stp; y <= st.yMax; y += stp) {
-        S("line", { x1: ml, x2: W - mr, y1: Y(y * 1e6), y2: Y(y * 1e6), stroke: "var(--lx-line)" }, gA);
-        S("text", { x: ml - 6, y: Y(y * 1e6) + 4, "text-anchor": "end" }, gA).textContent = "$" + y + "M";
-      }
-      for (var x = 0; x <= st.xMax; x += 200) {
-        S("line", { x1: X(x * 1e3), x2: X(x * 1e3), y1: mt, y2: HH - mb, stroke: "var(--lx-line)", "stroke-dasharray": "2 4" }, gA);
-        S("text", { x: X(x * 1e3), y: HH - mb + 17, "text-anchor": "middle" }, gA).textContent = x;
-      }
-      S("text", { x: (ml + W - mr) / 2, y: HH - 6, "text-anchor": "middle", class: "note" }, gA).textContent = "CO₂ per year, kt (thousand tonnes)";
-      S("text", { x: 4, y: 12, class: "note" }, gA).textContent = "Cost per year";
-    }
-    function size() { W = Math.max(300, Math.round(box.clientWidth || 640)); HH = W < 520 ? 270 : 310; ml = W < 520 ? 52 : 64; svg.setAttribute("viewBox", "0 0 " + W + " " + HH); lastW = W; }
-    function draw() {
-      size(); scale(); axes(); gF.innerHTML = ""; gL.innerHTML = ""; gP.innerHTML = ""; leg.innerHTML = "";
-      var fr = st.fr.slice().sort(function (a, b) { return a.co2 - b.co2; });
-      if (fr.length > 1) {
-        var d = fr.map(function (p, i) { return (i ? "L" : "M") + X(p.co2).toFixed(1) + "," + Y(p.cost).toFixed(1); }).join("");
-        S("path", { d: d + "L" + X(fr[fr.length - 1].co2).toFixed(1) + "," + (HH - mb) + "L" + X(fr[0].co2).toFixed(1) + "," + (HH - mb) + "Z", fill: "var(--lx-surface-3)", opacity: ".55" }, gF);
-        S("path", { d: d, fill: "none", stroke: "var(--lx-ink)", "stroke-width": 2.2 }, gF);
-        var mid = fr[Math.floor(fr.length * 0.55)];
-        S("text", { x: X(mid.co2), y: HH - mb - 8, "text-anchor": "middle", class: "note" }, gF).textContent = "out of reach";
-        fr.forEach(function (p) { if (p.solved) S("circle", { cx: X(p.co2), cy: Y(p.cost), r: 3.5, fill: "var(--lx-ink)" }, gF); });
-        var s1 = H("span", null, leg); H("i", { style: "--c:var(--lx-ink);height:3px" }, s1); H("span", { text: st.frLabel || "Frontier: the cheapest plan at each CO₂" }, s1);
-      }
-      if (st.price && st.price.through) {
-        var p0 = st.price.through, slope = st.price.p;   // cost($) = c0 + p * (co2_0 - co2)
-        var xa = 0, xb = st.xMax * 1e3, ya = p0.cost + slope * (p0.co2 - xa), yb = p0.cost + slope * (p0.co2 - xb);
-        S("line", { x1: X(xa), y1: Y(ya), x2: X(xb), y2: Y(yb), stroke: "var(--lx-accent)", "stroke-width": 2, "stroke-dasharray": "6 4" }, gL);
-        var s2 = H("span", null, leg); H("i", { class: "line", style: "border-top-color:var(--lx-accent)" }, s2); H("span", { text: "Equal score at $" + Math.round(slope) + "/t" }, s2);
-      }
-      st.plans.forEach(function (p) {
-        var g = S("g", { class: "dot" + (st.onPick && p.kind === "plan" ? " pick" : ""), transform: "translate(" + X(p.co2).toFixed(1) + "," + Y(p.cost).toFixed(1) + ")" }, gP);
-        var r = p.kind === "you" ? 9 : p.kind === "plan" ? 8 : 6.5;
-        if (p.ring) S("circle", { r: r + 5, fill: "none", stroke: "var(--lx-accent)", "stroke-width": 2.5 }, g);
-        S("circle", { class: "c", r: r, fill: p.mark === "dominated" || p.mark === "never" ? "var(--lx-surface)" : p.color || "var(--lx-ink)",
-                      stroke: p.color || "var(--lx-ink)", "stroke-width": 2.5, "stroke-dasharray": p.mark === "dominated" ? "3 2" : null }, g);
-        if (p.kind === "you") S("circle", { r: 3, fill: "var(--lx-surface)" }, g);
-        if (p.id) S("text", { x: r + 4, y: -r + 2, class: "lab" }, g).textContent = p.id;
-        if (st.onPick && p.kind === "plan") {
-          g.setAttribute("tabindex", "0"); g.setAttribute("role", "button");
-          g.setAttribute("aria-label", "Plan " + p.id + ", " + p.label + ": " + fm.musd(p.cost) + " and " + fm.kt(p.co2) + " of CO₂ a year");
-          var go = function () { st.onPick(p.id); };
-          g.addEventListener("click", go);
-          g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-        }
-      });
-      var kinds = {};
-      st.plans.forEach(function (p) { if (p.kind !== "plan" && !kinds[p.kind] && p.legend) { kinds[p.kind] = 1; var s = H("span", null, leg); H("i", { style: "--c:" + p.color + ";border-radius:50%" }, s); H("span", { text: p.legend }, s); } });
-      // text version
-      altB.innerHTML = "";
-      var tb = H("table", null, altB), hr = H("tr", null, H("thead", null, tb));
-      ["Point", "CO₂ a year", "Cost a year", "Note"].forEach(function (t) { H("th", { scope: "col", text: t }, hr); });
-      var bd = H("tbody", null, tb);
-      st.plans.concat(fr.map(function (p) { return { id: "Frontier", label: p.cap == null ? "no cap" : "cap " + p.cap + " kt", co2: p.co2, cost: p.cost }; })).forEach(function (p) {
-        var tr = H("tr", null, bd);
-        [(p.id ? p.id + ": " : "") + (p.label || ""), fm.kt(p.co2), fm.musd(p.cost), p.note || (p.mark === "dominated" ? "dominated" : "")].forEach(function (t) { H("td", { text: t }, tr); });
-      });
-    }
-    LX.onTheme(draw);
-    if (window.ResizeObserver) new ResizeObserver(function () { if (Math.abs((box.clientWidth || 0) - lastW) > 8) draw(); }).observe(box);
-    draw();
-    return {
-      el: box,
-      frontier: function (pts, label) { st.fr = pts || []; st.frLabel = label || ""; draw(); },
-      plans: function (pl) { st.plans = pl || []; draw(); },
-      price: function (p, through) { st.price = p == null ? null : { p: p, through: through }; draw(); },
-      pick: function (fn) { st.onPick = fn; draw(); },
-      focusDot: function (id) { var n = [].filter.call(gP.querySelectorAll(".dot"), function (g) { return g.textContent === id; })[0]; if (n) n.focus(); }
-    };
   }
 
   // ---------------------------------------------------------------- one modelled week as a stacked chart
@@ -609,15 +510,6 @@
     return { el: box, draw: draw };
   }
 
-  // ---------------------------------------------------------------- "this holds when" (the e-boundary explain component, lesson-local)
-  function Boundary(host, o) {
-    var hd = H("header", { class: "lx-x-head" }, host); H("h3", { text: o.title }, hd);
-    if (o.lede) H("p", { class: "lx-lede", html: LX.rich(o.lede) }, host);
-    var g = H("div", { class: "lx13-bound" }, host);
-    o.cols.forEach(function (c) { var d = H("div", null, g); H("h4", { text: c.title }, d); var ul = H("ul", null, d); c.items.forEach(function (t) { H("li", { html: LX.rich(t) }, ul); }); });
-    if (o.foot) H("p", { class: "lx13-sub", html: LX.rich(o.foot) }, host);
-  }
-
   // ---------------------------------------------------------------- a comparison table for words (the e-table explain
   // component, lesson-local): a real table on wide screens, one card per row on phones
   function TextTable(host, o) {
@@ -635,7 +527,7 @@
     return t;
   }
 
-  LX.townPlan.ui = { FrontierChart: FrontierChart, TextTable: TextTable, Num: Num, css: css, fm: fm, TECH: TECH };
+  LX.townPlan.ui = { TextTable: TextTable, Num: Num, css: css, fm: fm, TECH: TECH };
 
   // ---------------------------------------------------------------- the game
   function view(live, data, root) {
@@ -682,7 +574,7 @@
     var c2 = H("section", { class: "lx13-card", "aria-label": "Your plan on the cost and CO₂ frontier" }, stage);
     var h2 = H("div", { class: "lx13-head" }, c2); H("h3", { text: "Your plan on the frontier" }, h2);
     H("p", { class: "lx13-sub", html: LX.rich("The line is the cheapest possible plan at each CO₂ level ([[pareto-frontier|lesson 12]]). Below it is out of reach.") }, c2);
-    var fc = FrontierChart(c2, { label: "Your plan and the optimizer's plan against the cost and CO₂ frontier" });
+    var fc = LX.Frontier(c2, { label: "Your plan and the optimizer's plan against the cost and CO₂ frontier" });
     var frNote = H("p", { class: "lx13-sub", hidden: true }, c2);
     var frBtn = H("button", { class: "lx-link", type: "button", hidden: true, text: "Solve the frontier again for these costs" }, c2);
 
@@ -721,8 +613,10 @@
 
     var acts = H("div", { class: "lx13-rowb" }, panel);
     var finBtn = H("button", { class: "lx-btn", type: "button", html: "Score my plan" + LX.icon("star") }, acts);
-    var shareBtn = H("button", { class: "lx-btn ghost small", type: "button", html: "Share this plan" }, acts);
-    var shareBox = H("div", { class: "lx13-share", hidden: true }, panel);
+    // sharing (LX.Share): the plan in the address, as #plan-w530-s160-..., plus the scenario when it is not EIA's
+    var sharer = LX.Share(panel, { button: acts, buttonText: "Share this plan", id: "t13-link",
+      note: "Anyone who opens this link sees your plan and runs its year themselves.",
+      hash: function () { return model.encodePlan(S_.plan, isDefault() ? null : S_.sc); } });
     var scen = H("details", { class: "lx13-scen" }, panel);
     H("summary", { text: "Costs in this scenario: gas price, nuclear cost" }, scen);
     var gasN = Num(scen, { label: "Gas price", color: "var(--lx-cc)", min: lim.gas.min, max: lim.gas.max, step: 0.05, value: S_.sc.gas,
@@ -927,24 +821,9 @@
       LX.Notes(deb, NOTES.map(function (n) { n.link = { href: "#explain", text: "On the concept map" }; return n; }));
       var row = H("div", { class: "lx13-rowb" }, deb);
       H("button", { class: "lx-btn ghost small", type: "button", text: "Back to my plan", onclick: function () { deb.hidden = true; panel.hidden = false; links.hidden = false; panel.scrollIntoView({ block: "nearest" }); } }, row);
-      H("button", { class: "lx-btn ghost small", type: "button", text: "Share this plan", onclick: function () { deb.hidden = true; panel.hidden = false; links.hidden = false; share(); } }, row);
+      H("button", { class: "lx-btn ghost small", type: "button", text: "Share this plan", onclick: function () { deb.hidden = true; panel.hidden = false; links.hidden = false; sharer.share(); } }, row);
       deb.focus({ preventScroll: true }); LX.emit("t13-done"); LX.emit("layout");
     }
-
-    // ---- sharing: the plan in the address, as #plan-w530-s160-...
-    function share() {
-      var hash = model.encodePlan(S_.plan, isDefault() ? null : S_.sc), url = location.href.split("#")[0] + "#" + hash;
-      try { history.replaceState(null, "", "#" + hash); } catch (e) { /* not allowed here */ }
-      shareBox.hidden = false; shareBox.innerHTML = "";
-      H("label", { class: "lx13-sub", for: "t13-link", text: "Anyone who opens this link sees your plan and runs its year themselves." }, shareBox);
-      var inp = H("input", { id: "t13-link", type: "text", readonly: true, value: url }, shareBox);
-      var msg = H("p", { class: "lx13-sub", "aria-live": "polite" }, shareBox);
-      inp.addEventListener("focus", function () { inp.select(); });
-      try { navigator.clipboard.writeText(url).then(function () { msg.textContent = "Copied to the clipboard."; }, function () { msg.textContent = "Select the link and copy it."; }); }
-      catch (e) { msg.textContent = "Select the link and copy it."; }
-      shareBox.scrollIntoView({ block: "nearest" });
-    }
-    shareBtn.addEventListener("click", share);
 
     // ---- the coach tour and start
     var tour = LX.Coach(root, [
@@ -1014,22 +893,20 @@
       }
     });
     LX.on("t13-done", function () { cm.select("front"); });
-    Boundary(H("div", { class: "lx-xcard" }, host), {
+    LX.Boundary(H("div", { class: "lx-xcard" }, host), {
       title: "Where this answer holds",
       lede: "A model's plan is only as good as what it includes. This one is built to teach; read its answers with these limits.",
-      cols: [
-        { title: "It holds when", items: [
-          "the weather of 2025 is a fair guide: one year of real Southwest Power Pool shapes, scaled to the town;",
-          "costs stay as entered: EIA's 2026 values in 2025 dollars, the battery in 2024 dollars, the same in every year;",
-          "the town is an island: no imports, no transmission limits inside it;",
-          "seven weeks stand in for the year (check it on all 8,760 hours in the debrief)." ] },
-        { title: "It leaves out", items: [
-          "start-up costs, minimum output and ramp limits of gas plants (lesson 0 had a ramp limit);",
-          "plant outages and a reserve margin: adequacy needs many weather years (A5, upcoming);",
-          "taxes, tax credits and financing beyond a 4% real cost of capital;",
-          "who pays, jobs, land and local air quality: costs here are the system's, not any one household's." ] }
-      ],
-      foot: "Data: EIA-930 hourly data for 2025; costs from EIA's Annual Energy Outlook 2026 and an NREL battery study, listed under Sources."
+      holds: [
+        "the weather of 2025 is a fair guide: one year of real Southwest Power Pool shapes, scaled to the town;",
+        "costs stay as entered: EIA's 2026 values in 2025 dollars, the battery in 2024 dollars, the same in every year;",
+        "the town is an island: no imports, no transmission limits inside it;",
+        "seven weeks stand in for the year (check it on all 8,760 hours in the debrief)." ],
+      leaves: [
+        "start-up costs, minimum output and ramp limits of gas plants (lesson 0 had a ramp limit);",
+        "plant outages and a reserve margin: adequacy needs many weather years (A5, upcoming);",
+        "taxes, tax credits and financing beyond a 4% real cost of capital;",
+        "who pays, jobs, land and local air quality: costs here are the system's, not any one household's." ],
+      source: "Data: EIA-930 hourly data for 2025; costs from EIA's Annual Energy Outlook 2026 and an NREL battery study, listed under Sources."
     });
     var tcard = H("div", { class: "lx-xcard" }, host);
     TextTable(tcard, {

@@ -371,6 +371,7 @@
           var cf = LX.Slider(ctl, { label: "Capacity factor", color: "var(--lx-wind)", min: D.wind.cf.min, max: D.wind.cf.max, step: D.wind.cf.step, unit: "%",
             hint: function () { return "Share of full output, over a year. U.S. wind in 2025: " + num(W.wind.cf * 100, 1) + "% (EIA)."; }, onChange: upd });
           var hw = LX.Slider(ctl, { label: "Average draw of a home", color: "var(--lx-demand)", min: D.wind.home_w.min, max: D.wind.home_w.max, step: D.wind.home_w.step, unit: "W",
+            fmt: function (v) { return num(v, 0) + " W"; },
             hint: function () { return "Average U.S. home: " + num(W.wind.homeW, 0) + " W (10,791 kWh a year ÷ 8,760 h; EIA)."; }, onChange: upd });
           cf.set(D.wind.cf.start); hw.set(D.wind.home_w.start);
           H("span", { class: "k", text: "Homes whose yearly use it matches" }, out);

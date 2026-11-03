@@ -1,0 +1,24 @@
+/* steelman.css — LX.Steelman (steelman.js): two sides of a contested point; open, behind buttons, or as <details>. */
+.lx-steel { display: grid; gap: 12px; min-width: 0; }
+.lx-steel-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.lx-steel-side { border: 1px solid var(--lx-line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; background: var(--lx-surface-2); min-width: 0; }
+.page-learn .lx-steel-side h4 { font-size: 15.5px; margin: 0; }
+.lx-steel-side ul { margin: 0; padding-left: 1.1rem; font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-steel-side p { font-size: 14.5px; color: var(--lx-ink-2); }
+.lx-steel-side.wide { grid-column: 1 / -1; }
+/* frame: true (a card inside a step card) */
+.lx-steel.framed { border: 1px solid var(--lx-line-2); border-radius: 12px; padding: 14px; gap: 10px; background: var(--lx-surface-2); }
+.page-learn .lx-steel-title { font-size: 18px; margin: 0; }
+.lx-steel.framed .lx-steel-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lx-steel.framed .lx-steel-side { border: 0; border-top: 3px solid var(--lx-tier-2); border-radius: 10px; padding: 12px; gap: 8px; background: var(--lx-surface); }
+.lx-steel.framed .lx-steel-side:nth-child(2) { border-top-color: var(--lx-tier-4); }
+.lx-steel.framed ul { display: grid; gap: 6px; }
+.lx-steel-side > .lx-btn { justify-self: start; }
+.lx-steel-body { display: grid; gap: 6px; }
+/* reveal: "details" */
+.lx-steel.details .lx-steel-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.lx-steel.details .lx-steel-side { display: block; border-color: var(--lx-line-2); padding: 8px 12px; }
+.lx-steel.details summary { cursor: pointer; font-family: var(--lx-f-display); font-weight: 500; min-height: 36px; display: flex; align-items: center; color: var(--lx-ink); }
+.lx-steel.details .lx-steel-side p { margin: 4px 0 0; }
+@media (max-width: 640px) { .lx-steel.framed .lx-steel-cols { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .lx-steel.details .lx-steel-cols { grid-template-columns: minmax(0, 1fr); } }

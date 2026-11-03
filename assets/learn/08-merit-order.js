@@ -84,11 +84,6 @@
   function css() {
     if (document.getElementById("lx8-css")) return;
     H("style", { id: "lx8-css", text: [
-      ".lx8-chart{position:relative}.lx8-chart svg{display:block;width:100%;height:auto}",
-      ".lx8-chart text{font-family:var(--lx-f-mono);font-size:11px;fill:var(--lx-ink-3)}",
-      ".lx8-chart text.lab{font-family:var(--lx-f-display);font-size:12px;font-weight:500;fill:var(--lx-ink)}",
-      ".lx8-chart text.big{font-family:var(--lx-f-mono);font-size:12.5px;font-weight:600;fill:var(--lx-ink)}",
-      ".lx8-chart text.bg{stroke:var(--lx-surface);stroke-width:4px;stroke-linejoin:round}",
       ".lx8-plants{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}",
       ".lx8-plants .lx-choice{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center}",
       ".lx8-plants .lx-choice small{grid-column:2;font-family:var(--lx-f-mono);font-size:12.5px;font-weight:400;color:var(--lx-ink-3)}",
@@ -108,10 +103,6 @@
       ".lx8-form h4{font-size:13px;margin:0;letter-spacing:.06em;text-transform:uppercase;color:var(--lx-ink-3)}",
       ".lx8-form p{font-size:15px;color:var(--lx-ink)}",
       ".lx8-sym{font-family:var(--lx-f-mono);font-size:14.5px;line-height:1.8;color:var(--lx-ink);background:var(--lx-surface-2);border-radius:10px;padding:10px 14px;overflow-x:auto}",
-      ".lx8-steel{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}",
-      ".lx8-steel>div{border:1px solid var(--lx-line);border-radius:12px;padding:12px 14px;display:grid;gap:6px;background:var(--lx-surface-2)}",
-      ".lx8-steel h4{font-size:15.5px;margin:0}",
-      ".lx8-steel ul{margin:0;padding-left:1.1rem;font-size:14.5px;color:var(--lx-ink-2)}",
       ".lx8-tz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr);align-items:center;gap:0;margin:6px 0}",
       ".lx8-node{border:2px solid var(--c);border-radius:12px;padding:10px 12px;display:grid;gap:2px;text-align:center;background:var(--lx-surface-2)}",
       ".lx8-node.w{--c:var(--lx-wind)}.lx8-node.t{--c:var(--lx-ink-3)}",
@@ -124,97 +115,15 @@
     ].join("\n") }, document.head);
   }
 
-  function Slider(host, o) {   // the library's slider look (controls.css), with exact decimal steps and its own format
-    var id = LX.uid("sl8"), dec = (String(o.step).split(".")[1] || "").length, val = o.value;
-    var w = H("div", { class: "lx-ctl", style: "--c:" + (o.color || "var(--lx-ink)") }, host);
-    var top = H("div", { class: "lx-ctl-top" }, w), lab = H("label", { for: id }, top); H("i", null, lab); H("span", { text: o.label }, lab);
-    var out = H("output", { for: id }, top), row = H("div", { class: "lx-ctl-row" }, w);
-    var minus = H("button", { type: "button", "aria-label": "Lower " + o.label, text: "−" }, row);
-    var tr = H("div", { class: "lx-ctl-track" }, row); H("div", { class: "lx-ctl-rail" }, tr);
-    var band = H("div", { class: "lx-ctl-band" }, tr), fill = H("div", { class: "lx-ctl-fill" }, tr);
-    var inp = H("input", { type: "range", id: id, min: o.min, max: o.max, step: o.step }, tr);
-    var plus = H("button", { type: "button", "aria-label": "Raise " + o.label, text: "+" }, row);
-    var hint = H("p", { class: "lx-ctl-hint" }, w);
-    function snap(v) { v = Math.min(o.max, Math.max(o.min, v)); return +((Math.round((v - o.min) / o.step) * o.step + o.min).toFixed(dec)); }
-    function pos(v) { var W = tr.clientWidth || 200; return (13 + (v - o.min) / (o.max - o.min) * (W - 26)) / W * 100; }
-    function paint() {
-      inp.value = val; out.textContent = o.fmt(val); inp.setAttribute("aria-valuetext", o.fmt(val));
-      band.style.left = "calc(" + pos(o.min) + "% - 4px)"; band.style.width = "calc(" + (pos(o.max) - pos(o.min)) + "% + 8px)";
-      fill.style.width = pos(val) + "%"; hint.innerHTML = o.hint ? LX.rich(o.hint(val)) : "";
-    }
-    function user(v) { var c = snap(v); if (c === val) return; val = c; paint(); if (o.onChange) o.onChange(val); }
-    inp.addEventListener("input", function () { user(+inp.value); });
-    minus.addEventListener("click", function () { user(val - o.step); });
-    plus.addEventListener("click", function () { user(val + o.step); });
-    if (window.ResizeObserver) new ResizeObserver(paint).observe(tr);
-    paint();
-    return { el: w, val: function () { return val; }, set: function (v, fire) { val = snap(v); paint(); if (fire && o.onChange) o.onChange(val); } };
-  }
   function tiles(host, labels) {
     var g = H("div", { class: "lx8-grid" }, host), out = {};
     labels.forEach(function (l) { var t = H("div", { class: "lx8-tile", "aria-live": "polite" }, g); H("span", { text: l[1] }, t); out[l[0]] = { b: H("b", null, t), s: H("small", null, t) }; });
     return out;
   }
-  function textAlt(host) { var d = H("details", { class: "lx-textalt" }, host); H("summary", { text: "Text version" }, d); return H("div", null, d); }
 
-  // the supply stack: blocks of width MW and height offer, the demand line and the clearing price
-  function StackChart(host, o) {
-    // the chart goes in now; its legend and text version follow the step's controls (appended once the step is built)
-    var w = H("div", { class: "lx8-chart" }, host), tail = H("div", { style: "display:grid;gap:6px" }), svg = null, last = null;
-    var legend = H("div", { class: "lx-legend", "aria-hidden": "true", hidden: !!o.noLegend }, tail), alt = textAlt(tail);
-    Promise.resolve().then(function () { host.appendChild(tail); });
-    [["Running", "var(--lx-ink-2)"], ["Not needed or spilled", "var(--lx-line-2)"]].forEach(function (l, j) { var s = H("span", null, legend); H("i", { style: "--c:" + l[1] + (j ? ";opacity:.5" : "") }, s); H("span", { text: l[0] }, s); });
-    var dl = H("span", null, legend); H("i", { class: "line" }, dl); H("span", { text: "Demand" }, dl);
-    function draw(blocks, demand, opt) {
-      last = [blocks, demand, opt]; opt = opt || {};
-      var res = clear(blocks, demand), W = Math.max(280, w.clientWidth || 640), Hh = W < 480 ? 230 : 250, m = { l: 46, r: 12, t: 26, b: 34 };
-      var xMax = opt.xMax || 450, offers = blocks.map(function (b) { return b.offer; });
-      var yMax = Math.max(120, Math.ceil((Math.max.apply(null, offers) + 15) / 40) * 40), lowest = Math.min.apply(null, offers), yMin = lowest < 0 ? Math.floor((lowest - 10) / 20) * 20 : 0;
-      var iw = W - m.l - m.r, ih = Hh - m.t - m.b, x = function (v) { return m.l + v / xMax * iw; }, y = function (v) { return m.t + (yMax - v) / (yMax - yMin) * ih; };
-      if (svg) svg.remove();
-      var show = opt.hideDemand ? null : res;
-      svg = S("svg", { viewBox: "0 0 " + W + " " + Hh, width: W, height: Hh, role: "img", "aria-label": "Supply stack: " + blocks.map(function (b) { return NAME[b.key] + " " + b.mw + " MW at " + usd(b.offer) + " per MWh"; }).join("; ") +
-        (show ? ". Demand " + demand + " MW; clearing price " + usd(res.price) + " per MWh, set by the " + NAME[res.marginal].toLowerCase() + "." : ".") }, w);
-      var step = yMax - yMin > 200 ? 40 : 20;
-      for (var v = yMin; v <= yMax; v += step) {
-        S("path", { d: "M" + m.l + " " + y(v) + "H" + (W - m.r), stroke: v === 0 ? "var(--lx-ink-3)" : "var(--lx-line)", "stroke-width": v === 0 ? 1.3 : 1 }, svg);
-        S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }, svg).textContent = usd(v, 0);
-      }
-      for (var q = 0; q <= xMax; q += xMax > 500 ? 150 : 100) S("text", { x: x(q), y: Hh - 16, "text-anchor": q === 0 ? "start" : "middle" }, svg).textContent = q;
-      S("text", { x: W - m.r, y: Hh - 3, "text-anchor": "end" }, svg).textContent = "MW, cheapest first →";
-      S("text", { x: 2, y: 13 }, svg).textContent = "$/MWh";
-      var cum = 0;
-      blocks.forEach(function (b) {
-        if (b.mw <= 0) return;
-        var p = res.plants[b.key], x0 = x(cum), x1 = x(cum + b.mw), xr = x(cum + p.run), top = Math.abs(b.offer) < 2 ? y(0) - 4 : Math.min(y(b.offer), y(0)), bot = Math.abs(b.offer) < 2 ? y(0) : Math.max(y(b.offer), y(0));
-        if (p.run > 0 && show) S("rect", { x: x0, y: top, width: Math.max(0, xr - x0), height: Math.max(2, bot - top), fill: COL[b.key] }, svg);
-        if (!show || p.run < b.mw) S("rect", { x: show ? xr : x0, y: top, width: Math.max(0, x1 - (show ? xr : x0)), height: Math.max(2, bot - top), fill: COL[b.key], "fill-opacity": show ? 0.28 : 0.9 }, svg);
-        S("rect", { x: x0, y: top, width: Math.max(0, x1 - x0), height: Math.max(2, bot - top), fill: "none", stroke: show && res.marginal === b.key ? "var(--lx-ink)" : "var(--lx-surface)", "stroke-width": show && res.marginal === b.key ? 2 : 1 }, svg);
-        if (x1 - x0 > 34) {
-          var ly = b.offer >= 0 ? Math.min(y(b.offer), y(0) - 4) - 6 : (y(0) + y(b.offer)) / 2 + 4;
-          var t1 = S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab bg" }, svg); t1.textContent = SHORT[b.key];
-          var t2 = S("text", { x: (x0 + x1) / 2, y: ly, "text-anchor": "middle", class: "lab" }, svg); t2.textContent = SHORT[b.key];
-        }
-        cum += b.mw;
-      });
-      if (show) {
-        var xd = x(demand), yp = y(res.price);
-        S("path", { d: "M" + m.l + " " + yp + "H" + xd, stroke: "var(--lx-ink)", "stroke-width": 1.6, "stroke-dasharray": "2 3" }, svg);
-        S("path", { d: "M" + xd + " " + (m.t - 6) + "V" + (Hh - m.b), stroke: "var(--lx-ink)", "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
-        var anchor = xd > W - 120 ? "end" : "start", dx = anchor === "end" ? -6 : 6;
-        [["bg", 0], ["", 0]].forEach(function (c) { S("text", { x: xd + dx, y: 13, "text-anchor": anchor, class: "big " + c[0] }, svg).textContent = "Demand " + Math.round(demand) + " MW"; });
-        [["bg", 0], ["", 0]].forEach(function (c) { S("text", { x: m.l + 6, y: res.price < 0 ? m.t + 14 : yp - 6, class: "big " + c[0] }, svg).textContent = "Price " + usd(res.price); });
-      }
-      alt.innerHTML = "";
-      var ul = H("ul", null, alt);
-      blocks.forEach(function (b) { var p = res.plants[b.key]; H("li", { text: NAME[b.key] + ": offers " + b.mw + " MW at " + usd(b.offer) + "/MWh" + (show ? "; runs " + Math.round(p.run) + " MW" : "") + "." }, ul); });
-      if (show) H("li", { text: "Demand " + Math.round(demand) + " MW. Clearing price " + usd(res.price) + "/MWh, set by the " + NAME[res.marginal].toLowerCase() + "." + (res.spilled > 0 ? " Spilled wind and sun: " + Math.round(res.spilled) + " MW." : "") }, ul);
-      return res;
-    }
-    if (window.ResizeObserver) new ResizeObserver(function () { if (last && LX.visible(w)) draw(last[0], last[1], last[2]); }).observe(w);
-    LX.onTheme(function () { if (last && LX.visible(w)) draw(last[0], last[1], last[2]); });
-    return { draw: draw, el: w };
-  }
+  // the supply stack (LX.SupplyStack): blocks as wide as MW and as high as offers, cleared by this lesson's model
+  var SERIES = {}; ORDER.forEach(function (k) { SERIES[k] = { name: NAME[k], short: SHORT[k], color: COL[k] }; });
+  function stackChart(host, o) { return LX.SupplyStack(host, { series: SERIES, clear: clear, noLegend: !!(o && o.noLegend) }); }
 
   function view(live, data, root) {
     css();
@@ -227,7 +136,7 @@
       // 1 build the stack
       { text: "Each plant offers its power at its running cost. The operator lines the offers up, cheapest first: the [[supply-stack|supply stack]]. Build it: tap Prairie Town's plants from cheapest to dearest.",
         build: function (act, api) {
-          var box = H("div", { class: "lx8-plants" }, act), chart = StackChart(act, { noLegend: true }), blocks = stack(town, D, h, base), built = [];
+          var box = H("div", { class: "lx8-plants" }, act), chart = stackChart(act, { noLegend: true }), blocks = stack(town, D, h, base), built = [];
           var shuffled = ["peaker", "wind", "cc", "nuclear", "solar"], btn = {};
           function drawBuilt() { chart.draw(built.length ? built : [{ key: "wind", mw: 0, offer: 0 }], 0, { hideDemand: true }); }
           shuffled.forEach(function (k) {
@@ -249,10 +158,10 @@
       // 2 move the demand line
       { text: "Demand is a vertical line: this hour the town needs that many MW, whatever the price. Slide it. The last plant needed is the [[marginal-plant|marginal plant]], and its offer sets the [[clearing-price|clearing price]].",
         build: function (act, api) {
-          var chart = StackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["c", "Running cost this hour"]]), seen = {};
+          var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["c", "Running cost this hour"]]), seen = {};
           var res0 = run(town, D, h, base);
-          var sl = Slider(act, { label: "Demand", color: "var(--lx-ink)", min: 20, max: res0.total, step: 1, value: S_.demand, fmt: function (v) { return v + " MW"; },
-            hint: function (v) { return v === h.demand ? "The real demand shape at " + at + ", scaled as in lesson 0." : ""; }, onChange: function (v) { S_.demand = v; draw(true); } });
+          var sl = LX.Slider(act, { label: "Demand", color: "var(--lx-ink)", min: 20, max: res0.total, step: 1, value: S_.demand, fmt: function (v) { return v + " MW"; },
+            hint: function (lo, hi, max, v) { return v === h.demand ? "The real demand shape at " + at + ", scaled as in lesson 0." : ""; }, onChange: function (v) { S_.demand = v; draw(true); } });
           function draw(user) {
             var r = chart.draw(stack(town, D, h, base), sl.val());
             tl.p.b.textContent = usd(r.price) + "/MWh"; tl.m.b.textContent = SHORT[r.marginal]; tl.m.s.textContent = "the marginal plant";
@@ -266,7 +175,7 @@
       { text: "Every plant that runs is paid the same clearing price, not its own offer. Tap a plant to see what it keeps per MWh toward its building cost from lesson 7.",
         build: function (act, api) {
           S_.demand = h.demand;
-          var chart = StackChart(act, {}), r = chart.draw(stack(town, D, h, base), h.demand), box = H("div", { class: "lx8-plants" }, act), out = H("p", { class: "lx-lede", "aria-live": "polite" }, act);
+          var chart = stackChart(act, {}), r = chart.draw(stack(town, D, h, base), h.demand), box = H("div", { class: "lx8-plants" }, act), out = H("p", { class: "lx-lede", "aria-live": "polite" }, act);
           ORDER.forEach(function (k) {
             var p = r.plants[k], bt = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false" }, box);
             H("span", { class: "sw", style: "--c:" + COL[k] }, bt); H("span", { text: NAME[k] }, bt); H("small", { text: p.run > 0 ? "runs " + Math.round(p.run) + " MW" : "not needed" }, bt);
@@ -283,9 +192,9 @@
       // 4 gas price
       { text: "Gas plants' running cost is mostly fuel. Slide the gas price: when a gas plant is marginal, the gas price passes straight into the price of every MWh this hour.",
         build: function (act, api) {
-          var chart = StackChart(act, {}), tl = tiles(act, [["cc", "Gas CC offers"], ["pk", "Peaker offers"], ["p", "Clearing price"]]);
-          var sl = Slider(act, { label: "Gas price", color: "var(--lx-cc)", min: D.gas.min, max: D.gas.max, step: D.gas.step, value: S_.st.gas, fmt: function (v) { return "$" + v.toFixed(2) + "/MMBtu"; },
-            hint: function (v) { return v === D.gas.ref ? "Prairie Town's reference, behind lesson 0's $40 and $100 (illustrative)." : "Combined-cycle: " + D.plants.cc.heatRate + " MMBtu per MWh × gas + $" + D.plants.cc.other + "."; },
+          var chart = stackChart(act, {}), tl = tiles(act, [["cc", "Gas CC offers"], ["pk", "Peaker offers"], ["p", "Clearing price"]]);
+          var sl = LX.Slider(act, { label: "Gas price", color: "var(--lx-cc)", min: D.gas.min, max: D.gas.max, step: D.gas.step, value: S_.st.gas, fmt: function (v) { return "$" + v.toFixed(2) + "/MMBtu"; },
+            hint: function (lo, hi, max, v) { return v === D.gas.ref ? "Prairie Town's reference, behind lesson 0's $40 and $100 (illustrative)." : "Combined-cycle: " + D.plants.cc.heatRate + " MMBtu per MWh × gas + $" + D.plants.cc.other + "."; },
             onChange: function (v) { S_.st.gas = v; draw(true); } });
           var marks = H("div", { class: "lx8-marks" }, act);
           D.gas.marks.forEach(function (mk) { H("button", { type: "button", class: "lx-btn ghost small", text: "$" + mk.value.toFixed(2) + ": " + mk.label, onclick: function () { sl.set(mk.value, true); } }, marks); });
@@ -300,9 +209,9 @@
       // 5 add wind
       { text: "Wind's running cost is about zero, so new wind joins the bottom of the stack and pushes everything else to the right. Make the wind farm bigger and watch the clearing price.",
         build: function (act, api) {
-          var chart = StackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Wind and sun spilled"]]);
-          var sl = Slider(act, { label: "Wind farm size", color: "var(--lx-wind)", min: D.wind.min, max: D.wind.max, step: D.wind.step, value: S_.st.windMW, fmt: function (v) { return v + " MW"; },
-            hint: function (v) { return "At " + D.hourLabel + " it makes " + Math.round(h.windShape * v) + " MW (the real wind of that hour)."; }, onChange: function (v) { S_.st.windMW = v; draw(true); } });
+          var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Wind and sun spilled"]]);
+          var sl = LX.Slider(act, { label: "Wind farm size", color: "var(--lx-wind)", min: D.wind.min, max: D.wind.max, step: D.wind.step, value: S_.st.windMW, fmt: function (v) { return v + " MW"; },
+            hint: function (lo, hi, max, v) { return "At " + D.hourLabel + " it makes " + Math.round(h.windShape * v) + " MW (the real wind of that hour)."; }, onChange: function (v) { S_.st.windMW = v; draw(true); } });
           function draw(user) {
             var st = Object.assign({}, base, { windMW: sl.val() }), r = chart.draw(stack(town, D, h, st), h.demand, { xMax: 750 });
             tl.p.b.textContent = usd(r.price); tl.m.b.textContent = SHORT[r.marginal]; tl.s.b.textContent = Math.round(r.spilled) + " MW";
@@ -318,7 +227,7 @@
       { text: "Can the price fall below zero? Only if the last plant needed would pay to keep running. Flip each switch, alone and together, and watch who sets the price.",
         build: function (act, api) {
           S_.st.windMW = Math.max(S_.st.windMW, D.wind.big);
-          var chart = StackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Spilled"], ["n", "Nuclear runs"]]);
+          var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Spilled"], ["n", "Nuclear runs"]]);
           var sw = H("div", { class: "lx8-sw" }, act), st = Object.assign({}, base, { windMW: S_.st.windMW });
           var a = toggle("Wind farm earns a production credit", "$" + D.credit.value + "/MWh", "credit"), b = toggle("Nuclear plant: costly to stop and restart", "offers " + usd(D.inflexible.offer, 0), "inflexible");
           var note = H("p", { class: "lx-hint" }, act);
@@ -341,7 +250,7 @@
       // 7 it is an optimization
       { text: "The stack is the cheapest way to meet demand: the answer to a small dispatch [[optimization|optimization]]. Check it two ways: add 1 MW of demand, or hand the problem to a real solver.",
         build: function (act, api) {
-          var st = Object.assign({}, base, { gas: S_.st.gas }), chart = StackChart(act, {}), d = h.demand, blocks = stack(town, D, h, st);
+          var st = Object.assign({}, base, { gas: S_.st.gas }), chart = stackChart(act, {}), d = h.demand, blocks = stack(town, D, h, st);
           var tl = tiles(act, [["c0", "Running cost at " + d + " MW"], ["c1", "Running cost at " + (d + 1) + " MW"], ["dc", "Extra cost"], ["p", "Clearing price"]]);
           var r0 = chart.draw(blocks, d), r1 = run(town, D, h, st, d + 1);
           tl.c0.b.textContent = usd(r0.cost); tl.p.b.textContent = usd(r0.price);
@@ -450,13 +359,12 @@
       note: "A negative price says this place has more power than it can use right now. Storage, flexible demand or a bigger line would all soak it up."
     });
     // 4 steelman
-    var c4 = H("div", { class: "lx-xcard" }, host), h4 = H("header", { class: "lx-x-head" }, c4);
-    H("h3", { text: "Negative prices: a problem or a signal? The strongest case on each side" }, h4);
-    var st = H("div", { class: "lx8-steel" }, c4);
-    function side(t, items) { var d = H("div", null, st); H("h4", { text: t }, d); var ul = H("ul", null, d); items.forEach(function (x) { H("li", { html: LX.rich(x) }, ul); }); }
-    side("A useful signal", ["They tell batteries and flexible users exactly when power is plentiful.", "They reward plants that can turn down quickly.", "They show where wires are missing: in Texas, negative prices fell after a major grid expansion (EIA, 2014)."]);
-    side("A sign of a problem", ["Payments per MWh produced can keep plants running when the grid has no use for the power.", "Low and negative hours cut the income of every plant, including those needed in calm, dark hours.", "Spilled wind and sun are investment that produces nothing useful in those hours."]);
-    H("p", { class: "lx-hint", text: "The evidence on how much each effect matters depends on the market, the year and the policy; lesson A3 (upcoming) compares market designs." }, c4);
+    LX.Steelman(H("div", { class: "lx-xcard" }, host), {
+      title: "Negative prices: a problem or a signal? The strongest case on each side",
+      sides: [{ key: "for", title: "A useful signal", points: ["They tell batteries and flexible users exactly when power is plentiful.", "They reward plants that can turn down quickly.", "They show where wires are missing: in Texas, negative prices fell after a major grid expansion (EIA, 2014)."] },
+              { key: "against", title: "A sign of a problem", points: ["Payments per MWh produced can keep plants running when the grid has no use for the power.", "Low and negative hours cut the income of every plant, including those needed in calm, dark hours.", "Spilled wind and sun are investment that produces nothing useful in those hours."] }],
+      note: "The evidence on how much each effect matters depends on the market, the year and the policy; lesson A3 (upcoming) compares market designs."
+    });
   }
 
   LX.mount("merit-order", function (live, data, root) { view(live, data, root); });

@@ -68,14 +68,8 @@
       ".lx12-plans button[aria-pressed=true]{background:var(--lx-ink);color:var(--lx-bg)}",
       ".lx12-plans button.dom{text-decoration:line-through;color:var(--lx-ink-3)}",
       ".lx12-out{font-size:15px;color:var(--lx-ink)}.lx12-out b{font-family:var(--lx-f-mono);font-weight:600}",
-      ".lx12-steel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}",
-      ".lx12-steel details{border:1px solid var(--lx-line-2);border-radius:12px;padding:8px 12px;background:var(--lx-surface-2)}",
-      ".lx12-steel summary{cursor:pointer;font-family:var(--lx-f-display);font-weight:500;min-height:36px;display:flex;align-items:center}",
-      ".lx12-steel p{font-size:14.5px;color:var(--lx-ink-2);margin:4px 0 0}",
-      ".lx12-steel .both{grid-column:1/-1}",
       ".lx12-tbl{width:100%;border-collapse:collapse;font-size:14px}.lx12-tbl td,.lx12-tbl th{padding:3px 4px;border-bottom:1px solid var(--lx-line);text-align:left;font-weight:400}",
-      ".lx12-tbl .n{text-align:right;font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.lx12-tbl th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}",
-      "@media (max-width:560px){.lx12-steel{grid-template-columns:minmax(0,1fr)}}"
+      ".lx12-tbl .n{text-align:right;font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.lx12-tbl th{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3)}"
     ].join("") }, document.head);
   }
   var COLORS = { A: "var(--lx-cc)", B: "var(--lx-wind)", C: "var(--lx-solar)", D: "var(--lx-tier-5)", E: "var(--lx-warn)", F: "var(--lx-tier-2)" };
@@ -96,7 +90,7 @@
     var hd = H("div", { class: "lx13-head" }, card); H("h3", { text: "Prairie Town's plans: cost against CO₂" }, hd);
     var status = LX.SolverStatus(hd);
     H("p", { class: "lx13-sub", text: "Each dot is one plan's year: cost on the left axis, CO₂ along the bottom. Down and left is better on both." }, card);
-    var fc = U.FrontierChart(card, { label: "Six plans for Prairie Town and the frontier you trace, cost against CO₂" });
+    var fc = LX.Frontier(card, { label: "Six plans for Prairie Town and the frontier you trace, cost against CO₂" });
     var tdet = H("details", { class: "lx-textalt" }, card); H("summary", { text: "The six plans in numbers" }, tdet);
     var tbl = H("table", { class: "lx12-tbl" }, tdet), hr = H("tr", null, H("thead", null, tbl));
     [["Plan", ""], ["Cost a year", "n"], ["CO₂ a year", "n"], ["Spilled", "n"]].forEach(function (c) { H("th", { scope: "col", class: c[1], text: c[0] }, hr); });
@@ -245,19 +239,13 @@
       { text: "The model maps the trade-off; it cannot say which point to pick. That choice weighs today's bills against climate harm, and who pays. Open the strongest case for each route.",
         build: function (act, api) {
           S_.step = 4; draw();
-          H("p", { class: "lx-eyebrow", text: "Steelman: the strongest case for each route" }, act);
-          var g = H("div", { class: "lx12-steel" }, act);
-          var CASES = [
-            ["price", "The case for a carbon price", "A price charges every tonne the same, so the cheapest cuts happen first, wherever they are. Set to an estimate of the harm a tonne does, it puts climate damage into the bill.", "<b>Strongest objection:</b> the harm per tonne is uncertain, so the tonnes cut are uncertain too."],
-            ["cap", "The case for a CO₂ cap", "A cap fixes the tonnes, which is what the climate responds to, and can follow a budget set by law or by a climate target.", "<b>Strongest objection:</b> the cost of meeting a cap is unknown in advance and can jump, as the frontier's steep end shows."]
-          ];
-          CASES.forEach(function (c) {
-            var d = H("details", null, g); H("summary", { text: c[1] }, d); H("p", { text: c[2] }, d); H("p", { html: c[3] }, d);
-            if (S_.steel[c[0]]) d.open = true;
-            d.addEventListener("toggle", function () { if (d.open) { S_.steel[c[0]] = true; if (S_.steel.price && S_.steel.cap) finish(); } });
+          LX.Steelman(act, {
+            eyebrow: "Steelman: the strongest case for each route", reveal: "details", opened: S_.steel,
+            sides: [{ key: "price", title: "The case for a carbon price", text: ["A price charges every tonne the same, so the cheapest cuts happen first, wherever they are. Set to an estimate of the harm a tonne does, it puts climate damage into the bill.", "**Strongest objection:** the harm per tonne is uncertain, so the tonnes cut are uncertain too."] },
+                    { key: "cap", title: "The case for a CO₂ cap", text: ["A cap fixes the tonnes, which is what the climate responds to, and can follow a budget set by law or by a climate target.", "**Strongest objection:** the cost of meeting a cap is unknown in advance and can jump, as the frontier's steep end shows."] },
+                    { key: "both", title: "What both leave open", wide: true, text: ["Who pays: households, firms or taxpayers, and how costs or revenues are shared. Regulators and elected officials answer for that choice; the model shows each option's cost and CO₂."] }],
+            onOpen: function (k) { if (k === "both") return; S_.steel[k] = true; if (S_.steel.price && S_.steel.cap) finish(); }
           });
-          var both = H("details", { class: "both" }, g); H("summary", { text: "What both leave open" }, both);
-          H("p", { text: "Who pays: households, firms or taxpayers, and how costs or revenues are shared. Regulators and elected officials answer for that choice; the model shows each option's cost and CO₂." }, both);
           function finish() { api.saw("Neither route is settled by the model. It shows what each point costs; people with the authority to choose, and answer for it, decide which point is right."); api.done(); LX.progress.done(LESSON); LX.emit("t12-done"); }
           if (S_.steel.price && S_.steel.cap) finish();
         } }
