@@ -55,7 +55,7 @@
  },
  "binding-constraint": {
   "term": "Binding constraint",
-  "short": "A rule that holds with no room to spare at the best plan, so loosening it would change the answer.",
+  "short": "A rule that the best plan meets exactly, with no slack left.",
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
@@ -151,7 +151,7 @@
  },
  "cube-law": {
   "term": "Cube law",
-  "short": "The power carried by the wind grows with the cube of its speed, so twice the speed carries eight times the power.",
+  "short": "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a turbine's output follows it only between its cut-in and rated speeds.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
@@ -160,6 +160,12 @@
   "short": "Turning a wind or solar farm below what the weather allows, usually because the grid has more power than it can use at that moment.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "cut-in-speed": {
+  "term": "Cut-in speed",
+  "short": "The lowest wind speed at which a turbine starts to make electricity.",
+  "lesson": 5,
+  "href": "05-capacity-factor.html"
  },
  "cut-out-speed": {
   "term": "Cut-out speed",
@@ -307,7 +313,7 @@
  },
  "firm-share": {
   "term": "Firm share (ELCC)",
-  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC).",
+  "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class.",
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
@@ -503,6 +509,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "mmbtu": {
+  "term": "MMBtu",
+  "short": "One million British thermal units, a unit of fuel heat; about 0.29 MWh of heat, and gas is priced in dollars per MMBtu.",
+  "lesson": 7,
+  "href": "07-cost.html"
+ },
  "nadir": {
   "term": "Nadir",
   "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
@@ -545,6 +557,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "overnight-cost": {
+  "term": "Overnight cost",
+  "short": "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt.",
+  "lesson": 7,
+  "href": "07-cost.html"
+ },
  "parameter": {
   "term": "Parameter",
   "short": "A number a model is given and takes as it is, such as demand or a plant's running cost, as opposed to a decision it makes.",
@@ -580,6 +598,12 @@
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "power-coefficient": {
+  "term": "Power coefficient (Cp)",
+  "short": "The share of the wind's power that a turbine turns into electricity; no rotor can capture more than 16/27, about 59% (the Betz limit).",
+  "lesson": 5,
+  "href": "05-capacity-factor.html"
  },
  "power-curve": {
   "term": "Power curve",
@@ -703,7 +727,7 @@
  },
  "simplex-method": {
   "term": "Simplex method",
-  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, always improving the goal, until no neighbour is better.",
+  "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
   "lesson": 11,
   "href": "11-solver.html"
  },

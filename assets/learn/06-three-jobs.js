@@ -10,10 +10,12 @@
 //                        LX.CardSort.score (components/cardsort.js), the job sorter's own
 //   lull(shape, thr)     the longest run of hours with the wind shape below thr (thousandths of its 2025 best hour)
 //   rank(tech, key)      table order by a key, missing values last
-// Two numbers per technology: the 2025 U.S. capacity factor (EIA, Electric Power Monthly, Tables 6.07.A/B) and the
-// firm share, PJM's ELCC class rating for its 2028/2029 auction (one market, one auction; pjm.com is cited as text until
-// the domain is approved for links). Neutral by design: the reference sort gives the evidence for every cell, and the
-// contested pairing (wind plus storage as firm capacity) gets both strongest cases.
+// Two numbers per technology: the 2025 U.S. capacity factor (EIA, Electric Power Monthly, Tables 6.07.A/B: average output
+// as a share of rated capacity, not the share of hours a plant runs) and the firm share, PJM's ELCC class rating for a
+// technology class in its 2028/2029 auction (one market, one auction; a single plant's accredited capacity can differ).
+// Neutral by design: the reference sort gives the evidence for every cell, and the contested pairing (wind plus storage
+// as firm capacity) gets both strongest cases. claims(text, tech) attributes every percentage in a text to the nearest
+// technology named beside it (Node test: each displayed claim belongs to its technology).
 //
 // Shared components: the dot chart is LX.Scatter (components/scatter.js), the job sorter LX.CardSort in "toggles"
 // mode (cardsort.js) and the Steelman card LX.Steelman (steelman.js).
@@ -42,7 +44,33 @@
       return y - x;
     }).map(function (t) { return t.key; });
   }
-  var model = { JOBS: JOBS, score: score, referenceMarks: referenceMarks, lull: lull, localDate: localDate, rank: rank };
+  // every percentage in a text with the technology it describes: the nearest technology word before it in the same text,
+  // else the first one after it; the allowed values are that technology's capacity factor, class ratings and notes
+  var WORDS = [["nuclear", /nuclear/i], ["cc", /combined[- ]cycle/i], ["pk", /peaker|combustion turbine|gas turbine/i], ["wind", /wind/i], ["solar", /solar|panels/i],
+               ["battery", /batter|storage|\d+-hour/i], ["hydro", /hydro|reservoir|river plant/i], ["geo", /geothermal/i], ["dr", /demand response|demand resource/i]];
+  function claims(text, tech) {
+    var byKey = {}; tech.forEach(function (t) { byKey[t.key] = t; });
+    var hits = [];
+    WORDS.forEach(function (w) { var rx = new RegExp(w[1].source, "gi"), m; while ((m = rx.exec(text))) hits.push({ key: w[0], at: m.index }); });
+    hits.sort(function (a, b) { return a.at - b.at; });
+    var out = [], rx = /(\d+(?:\.\d+)?)%/g, m;
+    while ((m = rx.exec(text))) {
+      var before = hits.filter(function (h) { return h.at < m.index; }), after = hits.filter(function (h) { return h.at > m.index; });
+      var h = before.length ? before[before.length - 1] : after[0], t = h && byKey[h.key];
+      var vals = [];
+      if (t) {
+        if (t.cf != null) vals.push(+(t.cf * 100).toFixed(1));
+        if (t.firm != null) vals.push(Math.round(t.firm * 100));
+        if (t.rte) vals.push(Math.round(t.rte * 100));
+        if (t.drShare) vals.push(+(t.drShare * 100).toFixed(1));
+        ((t.firmNote || "").match(/\d+(?:\.\d+)?(?=%)/g) || []).forEach(function (v) { vals.push(+v); });
+        if (t.key === "battery" && t.ratings) Object.keys(t.ratings).forEach(function (k) { vals.push(Math.round(t.ratings[k] * 100)); });
+      }
+      out.push({ value: +m[1], key: t ? t.key : null, ok: vals.indexOf(+m[1]) >= 0, text: text.slice(Math.max(0, m.index - 60), m.index + 4) });
+    }
+    return out;
+  }
+  var model = { JOBS: JOBS, score: score, referenceMarks: referenceMarks, lull: lull, localDate: localDate, rank: rank, claims: claims };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -76,7 +104,7 @@
           var row = H("div", { class: "lx6-jobs" }, act);
           D.jobs.forEach(function (j) {
             var b = H("button", { class: "lx6-job", type: "button", "aria-expanded": openedJobs[j.key] ? "true" : "false" }, row);
-            b.innerHTML = LX.icon(j.icon) + "<b>" + LX.esc(j.label) + "</b><span class='q'>" + LX.esc(j.question) + "</span><span class='m'>Measured by: " + LX.esc(j.measure) + "</span>";
+            b.innerHTML = LX.icon(j.icon) + "<b>" + LX.esc(j.label) + "</b><span class='q'>" + LX.esc(j.question) + "</span><span class='m'>Measured by: " + LX.rich(j.measure) + "</span>";
             b.addEventListener("click", function () {
               openedJobs[j.key] = true; b.setAttribute("aria-expanded", "true");
               if (D.jobs.every(function (x) { return openedJobs[x.key]; })) { api.done(); api.saw("Three jobs, three different measures. A plant can be good at one and poor at another."); }
@@ -87,11 +115,11 @@
       { text: "Before the cards, a prediction. The riskiest hours are the few each year when demand is high and supply is tight. Pick the plant you think a grid trusts most then.",
         build: function (act, api) {
           LX.Predict(act, { id: "t6-firm", q: D.predict.q, answer: D.predict.answer, fresh: true, lockText: "Locked in. Step 4 shows the numbers.",
-            options: D.predict.options.map(function (k) { return { value: k, label: byKey[k].label + (k === "battery" ? " (4-hour)" : ""), color: byKey[k].color }; }),
+            options: D.predict.options.map(function (k) { return { value: k, label: byKey[k].label + (k === "battery" ? " (4 hours at full power)" : ""), color: byKey[k].color }; }),
             onPick: function (p) { pred = p; keep("pred", p); api.done(); } });
           if (pred) api.done();
         } },
-      { text: "Meet nine technologies. Each card gives two key numbers: its capacity factor (lesson 5) and its [[firm-share|firm share]], the part of its MW that one large U.S. grid counts at the peak. Open every card.",
+      { text: "Meet nine technologies, each with two numbers: capacity factor (lesson 5) and [[firm-share|firm share]], the part of its MW one large U.S. grid counts at the peak, rated per technology class. Open every card.",
         build: function (act, api) {
           var chips = H("div", { class: "lx6-chips", role: "group", "aria-label": "Technologies" }, act), card = H("div", { class: "lx6-card", "aria-live": "polite" }, act);
           var count = H("p", { class: "lx-hint" }, act), btns = {};
@@ -109,29 +137,40 @@
             H("p", { class: "lx6-how", text: t.how }, card);
             var nums = H("div", { class: "lx6-nums" }, card);
             var f1 = first(t), n1 = H("div", null, nums); H("span", { text: f1[0] }, n1); H("b", { text: f1[1] }, n1);
-            var n2 = H("div", null, nums); H("span", { text: "Firm share, PJM 2028/29" }, n2); H("b", { text: firmText(t) }, n2);
-            var jb = H("ul", { class: "lx6-why" }, card);
-            JOBS.forEach(function (j) { var li = H("li", { class: "j-" + t.jobs[j] }, jb); H("b", { text: jobBy[j].label + ": " + t.jobs[j] }, li); H("span", { text: " " + t.why[j] }, li); });
+            var n2 = H("div", null, nums); H("span", { text: "Firm share, PJM class rating 2028/29" }, n2); H("b", { text: firmText(t) }, n2);
+            // the three jobs as buttons; one job's evidence at a time
+            var jb = H("ul", { class: "lx6-why", "aria-label": "Jobs: tap one to see the evidence" }, card), wid = LX.uid("t6why");
+            var whyP = H("p", { class: "lx6-whyp", id: wid, "aria-live": "polite" }, card);
+            whyP.textContent = "Tap a job to see the evidence.";
+            JOBS.forEach(function (j) {
+              var li = H("li", { class: "j-" + t.jobs[j] }, jb);
+              var b = H("button", { type: "button", class: "lx6-jb", "aria-expanded": "false", "aria-controls": wid }, li);
+              b.innerHTML = "<b>" + LX.esc(jobBy[j].label) + ":</b> " + LX.esc(t.jobs[j]);
+              b.addEventListener("click", function () {
+                jb.querySelectorAll(".lx6-jb").forEach(function (x) { x.setAttribute("aria-expanded", x === b ? "true" : "false"); });
+                whyP.innerHTML = "<b>" + LX.esc(jobBy[j].label) + ".</b> " + LX.rich(t.why[j]);
+              });
+            });
             var n = Object.keys(openedTech).length;
             count.textContent = n < TECH.length ? "Cards opened: " + n + " of " + TECH.length + "." : "All " + TECH.length + " cards opened.";
             if (n === TECH.length) { api.done(); api.saw("No card says yes to every job. The next step puts the two numbers side by side."); }
           }
           show(TECH.filter(function (t) { return !openedTech[t.key]; }).concat(TECH)[0].key);
         } },
-      { text: "Each dot is a plant: capacity factor across, firm share up. Tap the plant that runs the least of the year but counts the most at the peak.",
+      { text: "Each dot is a technology class: capacity factor across, firm share up. Tap the one with the lowest capacity factor whose firm share is still above half.",
         build: function (act, api) {
           var pts = TECH.filter(function (t) { return t.cf != null && t.firm != null && t.key !== "hydro"; });
           var sc = LX.Scatter(act, { points: pts.map(function (t) {
               return { key: t.key, label: t.label, x: t.cf, y: t.firm, color: t.color,
                        aria: t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel, text: t.label + ": capacity factor " + pct(t.cf) + "; firm share " + t.firmLabel + "." }; }),
-            x: { ticks: [0, 0.25, 0.5, 0.75, 1], fmt: function (v) { return v * 100 + "%"; }, title: "Capacity factor, U.S. 2025 (how much of the year it runs)", titleN: "Capacity factor, U.S. 2025" },
-            y: { ticks: [0, 0.25, 0.5, 0.75, 1], fmt: function (v) { return v * 100 + "%"; }, title: "Firm share, PJM 2028/29" },
+            x: { ticks: [0, 0.25, 0.5, 0.75, 1], fmt: function (v) { return v * 100 + "%"; }, title: "Capacity factor, U.S. 2025 (average output ÷ size)", titleN: "Capacity factor, U.S. 2025" },
+            y: { ticks: [0, 0.25, 0.5, 0.75, 1], fmt: function (v) { return v * 100 + "%"; }, title: "Firm share, PJM class rating 2028/29", titleN: "Firm share, PJM 2028/29" },
             diagonal: { label: "firm share = capacity factor", labelN: "firm share = CF", at: [0.7, 0.58], atN: [0.55, 0.19] },
-            aria: "Capacity factor (across) against firm share (up) for five technologies", onPick: function (k) {
+            aria: "Capacity factor (across) against firm share (up) for five technology classes", onPick: function (k) {
             var t = byKey[k], ok = k === "pk";
             keep("scatter", k);
             var pr = !pred ? "" : pred === D.predict.answer ? " Your prediction was right too." : " Your prediction, " + byKey[pred].label.toLowerCase() + ", counts " + byKey[pred].firmLabel + ".";
-            if (ok) { api.done(); api.saw("Right: the gas peaker ran only " + pct(t.cf) + " of 2025, yet PJM counts " + t.firmLabel + " of its MW. Solar is the opposite: " + pct(byKey.solar.cf) + " against " + byKey.solar.firmLabel + ". Capacity factor and firm share measure different jobs." + pr); }
+            if (ok) { api.done(); api.saw("Right: gas peakers averaged " + pct(t.cf) + " of their size in 2025, yet PJM counts " + t.firmLabel + " of their MW. Solar is the opposite: " + pct(byKey.solar.cf) + " against " + byKey.solar.firmLabel + "." + pr); }
             else api.saw(t.label + ": capacity factor " + pct(t.cf) + ", firm share " + t.firmLabel + ". Look further left, near the top.", true);
           } });
           void sc;
@@ -143,7 +182,7 @@
             onCheck: function (res) {
               checked = true; keep("score", { agree: res.agree, clear: res.clear, partly: res.partly });
               api.done();
-              api.saw("You agree with the evidence on " + res.agree + " of " + res.clear + " clear cells. The other " + res.partly + " are “partly”: the answer depends on the plant, the place or the market's rules, so either is fair. Open “Why” on any row.", res.differ > 4);
+              api.saw("You match the evidence on " + res.agree + " of " + res.clear + " clear cells. The " + res.partly + " “partly” cells accept either answer; open “Why” on any row.", res.differ > 4);
             } });
           if (checked) api.done();
         } },
@@ -156,11 +195,11 @@
                       points: ["Longer storage counts for more: PJM counts " + pct(sr["4"], 0) + " of a 4-hour battery's MW, " + pct(sr["8"], 0) + " for 8 hours and " + pct(sr["10"], 0) + " for 10 hours.",
                                "Steadier wind counts for more: PJM counts " + pct(D.steelman.offshoreWind, 0) + " for offshore wind, against " + byKey.wind.firmLabel + " onshore."] },
                     { key: "against", title: "The strongest case against",
-                      points: ["Calm spells outlast batteries: the Southwest Power Pool's whole wind fleet stayed below a quarter of its best 2025 hour for " + lullText + ".",
-                               "A battery must be recharged before the next calm spell, often by the same wind."] }],
+                      points: ["Long calm spells are the stress test: the Southwest Power Pool's whole wind fleet stayed below a quarter of its best 2025 hour for " + lullText + ".",
+                               "Stored energy must cover what other supplies leave unmet for that long, and be recharged before the next calm spell, often by the same wind."] }],
             onOpen: function (side) {
               sides[side] = true;
-              if (sides["for"] && sides.against) { api.done(); keep("steelman", true); api.saw("Both cases rest on real numbers. Settling it for one grid takes many weather years of hourly data and a reliability test: Analyst lesson A5 (upcoming)."); }
+              if (sides["for"] && sides.against) { api.done(); keep("steelman", true); api.saw("Both cases rest on real numbers. Rating wind and storage as a pair, for one grid, takes many weather years and a reliability test: Analyst lesson A5 (upcoming)."); }
             }, opened: sides
           });
           if (sides["for"] && sides.against) api.done();
@@ -190,7 +229,7 @@
       var i = Math.max(0, Math.min(steps.length - 1, n - 1));
       var click = function (sel, k) { var b = cards.el.querySelectorAll(sel)[k || 0]; if (b) b.click(); };
       pred = "battery"; TECH.forEach(function (t) { openedTech[t.key] = true; });
-      if (i === 4) { marks = referenceMarks(TECH); marks.wind.flex = true; marks.battery.energy = true; checked = true; }
+      if (i === 4) { marks = referenceMarks(TECH); marks.solar.firm = true; marks.battery.energy = true; checked = true; }
       cards.go(i);
       if (i === 0) { click(".lx6-job", 0); click(".lx6-job", 1); click(".lx6-job", 2); }
       if (i === 1) click(".lx-choice", 2);
@@ -215,14 +254,14 @@
     LX.CompareTable(c1, {
       title: "Nine technologies, two numbers, three jobs",
       columns: [{ key: "name", label: "Technology and the jobs it does well", main: true }, { key: "cf", label: "Capacity factor, U.S. 2025", phone: "CF", num: true, bar: { max: 1 } },
-                { key: "firm", label: "Firm share, PJM 2028/29", phone: "Firm", num: true, bar: { max: 1, color: "var(--lx-tier-2)" } }],
+                { key: "firm", label: "Firm share, PJM class rating 2028/29", phone: "Firm", num: true, bar: { max: 1, color: "var(--lx-tier-2)" } }],
       rows: TECH.map(function (t) {
         return { key: t.key, color: t.color, name: t.label, note: jobsNote(t), cf: t.cf != null ? { text: pct(t.cf), value: t.cf } : { text: "–" },
                  firm: t.firm != null ? { text: t.firmLabel, unit: t.firmUnit ? " " + t.firmUnit : "", value: t.firm } : { text: "–" } };
       }),
       sorts: [{ label: "As listed", order: TECH.map(function (t) { return t.key; }), note: "Two numbers per technology; “–” means the number does not apply or is not rated." },
-              { label: "By capacity factor", order: rank(TECH, "cf"), ranked: true, note: "<b>Capacity factor ranks the energy job.</b> Batteries and demand response make no energy of their own." },
-              { label: "By firm share", order: rank(TECH, "firm"), ranked: true, note: "<b>Firm share ranks the peak job.</b> The order changes: the peaker climbs, solar falls." }]
+              { label: "By capacity factor", order: rank(TECH, "cf"), ranked: true, note: "<b>Capacity factor compares energy per MW.</b> Running cost is a separate question (lesson 7); batteries and demand response make no energy." },
+              { label: "By firm share", order: rank(TECH, "firm"), ranked: true, note: "<b>Firm share ranks the peak job.</b> The order changes: the peaker climbs, solar falls. These are class ratings; single plants can differ." }]
     });
     var c2 = H("div", { class: "lx-xcard" }, host);
     var G = { tech: ["Technologies", "var(--lx-ink-3)"], job: ["Jobs", "var(--lx-tier-1)"], measure: ["Measures", "var(--lx-tier-2)"] };
@@ -231,14 +270,14 @@
       cols: 4, rows: 3, colsN: 3, rowsN: 4, sel: "firm",
       nodes: [
         { id: "vre", g: "tech", label: "Wind and solar", lines: ["Wind and", "solar"], at: [0, 0], atN: [0, 0], text: "No fuel, but the weather sets their output. Capacity factor " + pct(byKey.wind.cf) + " and " + pct(byKey.solar.cf) + "; firm share " + byKey.wind.firmLabel + " and " + byKey.solar.firmLabel + "." },
-        { id: "steady", g: "tech", label: "Nuclear, geothermal", lines: ["Nuclear,", "geothermal"], at: [0.95, 0], atN: [2, 0], text: "Steady plants that run most of the year: capacity factor " + pct(byKey.nuclear.cf) + " and " + pct(byKey.geo.cf) + " in 2025." },
+        { id: "steady", g: "tech", label: "Nuclear, geothermal", lines: ["Nuclear,", "geothermal"], at: [0.95, 0], atN: [2, 0], text: "Steady plants with high output most of the year: capacity factor " + pct(byKey.nuclear.cf) + " and " + pct(byKey.geo.cf) + " in 2025." },
         { id: "gas", g: "tech", label: "Gas and hydro", lines: ["Gas and", "hydro"], at: [1.9, 0], atN: [0, 1], text: "Fuel or water on hand, so they can follow orders within limits. Firm share " + byKey.cc.firmLabel + " (combined-cycle) and " + byKey.pk.firmLabel + " (peaker)." },
         { id: "shift", g: "tech", label: "Batteries, demand response", lines: ["Batteries,", "demand", "response"], at: [2.85, 0], atN: [2, 1], text: "They make no energy; they move or trim demand in time. Firm share " + byKey.battery.firmLabel + " (4-hour battery) and " + byKey.dr.firmLabel + " (demand response)." },
         { id: "energy", g: "job", label: "Cheap energy", at: [0.45, 1], atN: [0, 2], text: jobBy.energy.question },
         { id: "firm", g: "job", label: "Firm capacity", at: [1.4, 1], atN: [1, 2], text: jobBy.firm.question },
         { id: "flex", g: "job", label: "Flexibility", at: [2.35, 1], atN: [2, 2], text: jobBy.flex.question },
         { id: "cf", g: "measure", label: "Capacity factor", lines: ["Capacity", "factor"], at: [0.45, 2], atN: [0, 3], text: "Energy made ÷ (size × hours): lesson 5." },
-        { id: "fs", g: "measure", label: "Firm share", lines: ["Firm", "share"], at: [1.4, 2], atN: [1, 3], text: "The part of a plant's MW a grid counts in its riskiest hours; PJM calls it an ELCC class rating.", later: "Later: Analyst lesson A5 (upcoming) estimates it with many weather years." },
+        { id: "fs", g: "measure", label: "Firm share", lines: ["Firm", "share"], at: [1.4, 2], atN: [1, 3], text: "The part of a plant's MW a grid counts in its riskiest hours. PJM rates each technology class (ELCC); a single plant can differ.", later: "Later: Analyst lesson A5 (upcoming) estimates it with many weather years." },
         { id: "ramp", g: "measure", label: "Ramp and start", lines: ["Ramp and", "start"], at: [2.35, 2], atN: [2, 3], text: "How fast a plant changes output, and how quickly it starts: the [[ramp-rate|ramp limit]] of lesson 0." }
       ],
       edges: [["vre", "energy", "mainly"], ["steady", "energy", "mainly"], ["steady", "firm", "also"], ["gas", "firm", "mainly"], ["gas", "flex", "also"],

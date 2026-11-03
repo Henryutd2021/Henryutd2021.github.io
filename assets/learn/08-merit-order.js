@@ -14,7 +14,9 @@
 //   cost             total running cost = sum of offer x MW; within a block, cost(D + 1) - cost(D) = the price
 //                    (the clearing price is the shadow price of "supply = demand" in the dispatch linear program)
 //   teaser           a line of limited size between the wind farm and town: the wind that reaches town is capped
-// Every number the page states is checked against this model by _tests/learn/test_08-merit-order.js.
+// Offers start equal to running costs; the step-6 switches change offers only (a credit, a stop-and-restart offer), not
+// the plants' physics. _tests/learn/test_08-merit-order.js checks the model's identities, the numbers written on the page
+// and in the explain layer, the gas presets against the slider's step, and a HiGHS solve of the same LP.
 (function () {
   "use strict";
 
@@ -129,7 +131,7 @@
 
     var steps = [
       // 1 build the stack
-      { text: "Each plant offers its power at its running cost. The operator lines the offers up, cheapest first: the [[supply-stack|supply stack]]. Build it: tap Prairie Town's plants from cheapest to dearest.",
+      { text: "Each plant offers its power at a price per MWh; here each offer equals its running cost. The operator lines the offers up, cheapest first: the [[supply-stack|supply stack]]. Build it, cheapest to dearest.",
         build: function (act, api) {
           var box = H("div", { class: "lx8-plants" }, act), chart = stackChart(act, { noLegend: true }), blocks = stack(town, D, h, base), built = [];
           var shuffled = ["peaker", "wind", "cc", "nuclear", "solar"], btn = {};
@@ -160,7 +162,7 @@
           function draw(user) {
             var r = chart.draw(stack(town, D, h, base), sl.val());
             tl.p.b.textContent = usd(r.price) + "/MWh"; tl.m.b.textContent = SHORT[r.marginal]; tl.m.s.textContent = "the marginal plant";
-            tl.c.b.textContent = usd(r.cost, 0); tl.c.s.textContent = "offers × MW, added up";
+            tl.c.b.textContent = usd(r.cost, 0); tl.c.s.textContent = "offer × MW × 1 hour, added up";
             seen[r.price] = 1;
             if (user && Object.keys(seen).length >= 2) { api.done(); api.saw("The price jumps in steps: it changes only when the demand line crosses into the next plant. At " + sl.val() + " MW the " + NAME[r.marginal].toLowerCase() + " is marginal: " + usd(r.price) + "/MWh."); }
           }
@@ -185,7 +187,7 @@
           });
         } },
       // 4 gas price
-      { text: "Gas plants' running cost is mostly fuel. Slide the gas price: when a gas plant is marginal, the gas price passes straight into the price of every MWh this hour.",
+      { text: "Gas plants' running cost is mostly fuel, bought by the [[mmbtu|MMBtu]] (million British thermal units). Slide the gas price: when a gas plant is marginal, its fuel cost passes straight into every MWh's price this hour.",
         build: function (act, api) {
           var chart = stackChart(act, {}), tl = tiles(act, [["cc", "Gas CC offers"], ["pk", "Peaker offers"], ["p", "Clearing price"]]);
           var sl = LX.Slider(act, { label: "Gas price", color: "var(--lx-cc)", min: D.gas.min, max: D.gas.max, step: D.gas.step, value: S_.st.gas, fmt: function (v) { return "$" + v.toFixed(2) + "/MMBtu"; },
@@ -197,7 +199,7 @@
             var st = Object.assign({}, base, { gas: sl.val() }), r = chart.draw(stack(town, D, h, st), h.demand);
             tl.cc.b.textContent = usd(gasOffer(D, "cc", sl.val())); tl.pk.b.textContent = usd(gasOffer(D, "peaker", sl.val()));
             tl.p.b.textContent = usd(r.price); tl.p.s.textContent = "set by the " + SHORT[r.marginal];
-            if (user) { api.done(); api.saw("At $" + sl.val().toFixed(2) + "/MMBtu the price is " + usd(r.price) + "/MWh. Each $1 on gas adds $" + D.plants.cc.heatRate.toFixed(2) + " to every MWh this hour, because the combined-cycle plant burns " + D.plants.cc.heatRate + " MMBtu per MWh."); }
+            if (user) { api.done(); api.saw("At $" + sl.val().toFixed(2) + "/MMBtu the price is " + usd(r.price) + "/MWh. Each $1 on gas adds $" + D.plants.cc.heatRate.toFixed(2) + " to every MWh, because the marginal combined-cycle plant's [[heat-rate|heat rate]] is " + D.plants.cc.heatRate + " MMBtu per MWh."); }
           }
           draw(false);
         } },
@@ -219,12 +221,12 @@
           draw(false);
         } },
       // 6 below zero
-      { text: "Can the price fall below zero? Only if the last plant needed would pay to keep running. Flip each switch, alone and together, and watch who sets the price.",
+      { text: "Can the price fall below zero? Only if the last plant needed offers below $0, paying to keep running. Flip each switch, alone and together, and watch who sets the price.",
         build: function (act, api) {
           S_.st.windMW = Math.max(S_.st.windMW, D.wind.big);
           var chart = stackChart(act, {}), tl = tiles(act, [["p", "Clearing price"], ["m", "Set by"], ["s", "Spilled"], ["n", "Nuclear runs"]]);
           var sw = H("div", { class: "lx8-sw" }, act), st = Object.assign({}, base, { windMW: S_.st.windMW });
-          var a = toggle("Wind farm earns a production credit", "$" + D.credit.value + "/MWh", "credit"), b = toggle("Nuclear plant: costly to stop and restart", "offers " + usd(D.inflexible.offer, 0), "inflexible");
+          var a = toggle("Wind farm earns a production credit", "$" + D.credit.value + "/MWh", "credit"), b = toggle("Nuclear plant: slow to stop and restart", "offers " + usd(D.inflexible.offer, 0), "inflexible");
           var note = H("p", { class: "lx-hint" }, act);
           function toggle(label, sub, k) {
             var bt = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false" }, sw); H("span", { text: label }, bt); H("span", { class: "st", text: sub }, bt);
@@ -236,40 +238,27 @@
             tl.p.b.textContent = usd(r.price); tl.m.b.textContent = SHORT[r.marginal]; tl.s.b.textContent = Math.round(r.spilled) + " MW"; tl.n.b.textContent = Math.round(r.plants.nuclear.run) + " MW";
             note.textContent = k === "credit" ? D.credit.note : k === "inflexible" ? D.inflexible.note : "A " + S_.st.windMW + " MW wind farm at " + D.hourLabel + ": wind alone could cover demand.";
             if (!user) return;
-            if (k === "credit") api.saw(st.credit ? "With the credit, the wind farm offers down to " + usd(-D.credit.value, 0) + ". It is the last plant needed, so the price is " + usd(r.price) + "/MWh." : "Credit off: the wind farm offers $0 again.", !st.credit);
-            if (k === "inflexible") api.saw(st.inflexible ? "The nuclear plant now offers " + usd(D.inflexible.offer, 0) + " rather than stop, so it runs first at " + Math.round(r.plants.nuclear.run) + " MW. The last plant needed is the " + NAME[r.marginal].toLowerCase() + ", so the price is " + usd(r.price) + "/MWh." : "Back to a flexible plant.", !st.inflexible);
+            if (k === "credit") api.saw(st.credit ? "With a [[production-credit|production credit]], the wind farm offers down to " + usd(-D.credit.value, 0) + ". It is the last plant needed, so the price is " + usd(r.price) + "/MWh." : "Credit off: the wind farm offers $0 again.", !st.credit);
+            if (k === "inflexible") api.saw(st.inflexible ? "The nuclear plant now offers " + usd(D.inflexible.offer, 0) + " rather than stop, so it runs first at " + Math.round(r.plants.nuclear.run) + " MW. The last plant needed is the " + NAME[r.marginal].toLowerCase() + ", so the price is " + usd(r.price) + "/MWh." : "Switch off: the nuclear plant offers its running cost, " + usd(f.nuclear.cost) + "/MWh, again.", !st.inflexible);
             if (r.price < 0) api.done();
           }
           draw(false);
         } },
-      // 7 it is an optimization
-      { text: "The stack is the cheapest way to meet demand: the answer to a small dispatch [[optimization|optimization]]. Check it two ways: add 1 MW of demand, or hand the problem to a real solver.",
+      // 7 it is an optimization (the extra-demand arithmetic; the solver check is in the Modeler box of the explain section)
+      { text: "The stack is the cheapest way to meet demand: the answer to a small dispatch [[optimization|optimization]]. Check it: add 1 MW of demand and compare the extra running cost with the clearing price.",
         build: function (act, api) {
           var st = Object.assign({}, base, { gas: S_.st.gas }), chart = stackChart(act, {}), d = h.demand, blocks = stack(town, D, h, st);
           var tl = tiles(act, [["c0", "Running cost at " + d + " MW"], ["c1", "Running cost at " + (d + 1) + " MW"], ["dc", "Extra cost"], ["p", "Clearing price"]]);
           var r0 = chart.draw(blocks, d), r1 = run(town, D, h, st, d + 1);
           tl.c0.b.textContent = usd(r0.cost); tl.p.b.textContent = usd(r0.price);
           tl.c1.b.textContent = "?"; tl.dc.b.textContent = "?";
-          var row = H("div", { class: "lx8-sw" }, act), out = H("div", { "aria-live": "polite" }, act), said = [];
-          function saw(t) { if (said.indexOf(t) < 0) said.push(t); api.done(); api.saw(said.join(" ")); }
+          var row = H("div", { class: "lx8-sw" }, act);
           H("button", { type: "button", class: "lx-btn small", text: "Add 1 MW of demand", onclick: function () {
             chart.draw(blocks, d + 1);
             tl.c1.b.textContent = usd(r1.cost); tl.dc.b.textContent = usd(r1.cost - r0.cost);
-            saw("The cost rose by " + usd(r1.cost - r0.cost) + ", exactly the clearing price: the price is the cost of one more MWh, the [[shadow-price|shadow price]] of \u201csupply equals demand\u201d.");
+            api.done();
+            api.saw("The cost rose by " + usd(r1.cost - r0.cost) + ", the clearing price: while the marginal plant has room, one more MWh costs its offer. That is the [[shadow-price|shadow price]] of \u201csupply equals demand\u201d.");
           } }, row);
-          var sb = H("button", { type: "button", class: "lx-btn ghost small", text: "Solve it with HiGHS" }, row);
-          sb.addEventListener("click", function () {
-            if (!LX.solver) { out.textContent = "The solver is not available in this browser."; return; }
-            out.innerHTML = ""; var stat = LX.SolverStatus(out); stat.set("loading"); sb.disabled = true;
-            LX.solver.solve(lp(blocks, d), { timeLimit: 5, key: "m8" }).then(function (r) {
-              stat.set(r); sb.disabled = false;
-              if (!r.ok) return;
-              var ul = H("ul", { class: "lx-hint", style: "margin:4px 0 0;padding-left:1.1rem" }, out);
-              H("li", { text: "Outputs: " + ORDER.map(function (k) { return SHORT[k] + " " + Math.round(r.values[k]) + " MW"; }).join(", ") + ", the same as the stack." }, ul);
-              H("li", { text: "Running cost " + usd(r.objective) + "; the demand row's dual is " + usd(r.duals.demand) + " per MWh." }, ul);
-              saw("HiGHS finds the same outputs, and its dual for the demand rule is " + usd(r.duals.demand) + "/MWh: a marginal value with this hour's plants fixed.");
-            });
-          });
         } },
       // 8 teaser: a full line
       { text: "One question is left. What if the wind farm sits far away and the line into town is full? Then one price splits into two. Formulate it below, then meet M1.",
@@ -285,7 +274,8 @@
       node("w", "Wind farm", L.windAvail + " MW available", "price $0");
       var ln = H("div", { class: "lx8-wire", "aria-hidden": "true" }, tz); H("b", { text: "line full: " + L.windToTown + " MW" }, ln); H("i", null, ln); H("span", { text: L.stranded + " MW stuck at the farm" }, ln);
       node("t", "Prairie Town", "needs " + h.demand + " MW", "price " + usd(L.town.price));
-      H("p", { class: "lx-lede", text: "Only " + L.windToTown + " MW of wind reaches town, so the town's own plants fill the rest at " + usd(L.town.price) + "/MWh, while the wind farm's extra MWh are worth $0. M1 (Modeler tier) adds the network and finds a price for each place." }, act);
+      H("p", { class: "lx-lede", text: "The line is full, so the town's own plants fill the rest at " + usd(L.town.price) + "/MWh, while the extra wind at the farm is worth $0." }, act);
+      H("p", { class: "lx-hint", html: "<a href=\"m01-dispatch-to-lmp.html\">M1</a> (Modeler tier) adds the network and finds a price for each place." }, act);
       H("a", { class: "lx-btn small", style: "justify-self:start", href: "#explain", html: "Formulate it, as diagrams" + LX.icon("arrow") }, act);
     }
 
@@ -308,6 +298,29 @@
     }
     root.lxLesson = { model: model, data: D, hour: h, demo: demo, cards: cards };
     buildExplain(D, town, h);
+    solverCheck(D, town, h);
+  }
+
+  // ---------------------------------------------------------------- the optional solver check (Go deeper · Modeler)
+  // A next-tier preview (curriculum §4.6): the same hour handed to HiGHS; the core path stays closed form.
+  function solverCheck(D, town, h) {
+    var host = document.getElementById("merit-solver"); if (!host) return;
+    host.innerHTML = "";
+    var blocks = stack(town, D, h, { gas: D.gas.ref }), r = clear(blocks, h.demand);
+    var sb = H("button", { type: "button", class: "lx-btn ghost small", text: "Solve this hour with HiGHS" }, host), out = H("div", { "aria-live": "polite" }, host);
+    sb.addEventListener("click", function () {
+      if (!LX.solver) { out.textContent = "The solver is not available in this browser."; return; }
+      out.innerHTML = ""; var stat = LX.SolverStatus(out); stat.set("loading"); sb.disabled = true;
+      LX.solver.solve(lp(blocks, h.demand), { timeLimit: 5, key: "m8" }).then(function (x) {
+        stat.set(x); sb.disabled = false;
+        if (!x.ok) return;
+        var ul = H("ul", { class: "lx-hint", style: "margin:4px 0 0;padding-left:1.1rem" }, out);
+        H("li", { text: "Outputs: " + ORDER.map(function (k) { return SHORT[k] + " " + Math.round(x.values[k]) + " MW"; }).join(", ") + ", the same as the stack." }, ul);
+        H("li", { text: "Running cost " + usd(x.objective) + " at " + h.demand + " MW; the stack gives " + usd(r.cost) + "." }, ul);
+        H("li", { html: LX.rich("The [[shadow-price|shadow price]] of the demand rule, which solvers call its dual: " + usd(x.duals.demand) + "/MWh, the clearing price.") }, ul);
+      });
+    });
+    H("p", { class: "lx-hint", html: "<a href=\"11-solver.html\">Lesson 11</a> hands a linear program to a solver step by step." }, host);
   }
 
   // ---------------------------------------------------------------- the explain layer
@@ -325,7 +338,12 @@
         { k: "Rules", color: "var(--lx-warn)", text: "Supply equals demand: the five outputs add up to " + h.demand + " MW. Each plant runs between 0 and what it can make now: wind " + h.wind + " MW and solar " + h.solar + " MW (the weather's limit), the others their size ([[constraint|constraints]])." },
         { k: "What comes back", color: "var(--lx-accent)", text: "Who runs (the stack) and the price: how much the best cost rises for one more MWh of demand, " + usd(r.price) + " here." }
       ],
-      symbols: "minimize &nbsp;Σ<sub>g</sub> c<sub>g</sub> p<sub>g</sub><br>subject to &nbsp;Σ<sub>g</sub> p<sub>g</sub> = D &nbsp;&nbsp;(its shadow price λ is the clearing price)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 ≤ p<sub>g</sub> ≤ P<sub>g</sub> &nbsp;for each plant g"
+      symbols: "minimize &nbsp;Σ<sub>g</sub> c<sub>g</sub> p<sub>g</sub><br>subject to &nbsp;Σ<sub>g</sub> p<sub>g</sub> = D &nbsp;&nbsp;(its shadow price λ is the clearing price)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 ≤ p<sub>g</sub> ≤ P<sub>g</sub> &nbsp;for each plant g<br><br>" +
+        "<span class=\"tag\">p<sub>g</sub>: output of plant g this hour, MW (1 MW for one hour = 1 MWh)</span><br>" +
+        "<span class=\"tag\">c<sub>g</sub>: its offer, $/MWh</span><br>" +
+        "<span class=\"tag\">P<sub>g</sub>: what it can make this hour, MW</span><br>" +
+        "<span class=\"tag\">D: demand this hour, MW</span><br>" +
+        "<span class=\"tag\">λ: the shadow price of supply = demand, $/MWh</span>"
     });
     // 2 who runs and who is paid what
     var c2 = H("div", { class: "lx-xcard" }, host), c3 = H("div", { class: "lx-xcard" }, host);

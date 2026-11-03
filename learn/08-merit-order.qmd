@@ -55,7 +55,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you build this stack yourself, move the demand line, change the gas price and add wind, in eight steps.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar at 19:00 on 3 September 2025 follow the real Southwest Power Pool shapes (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled exactly as in lesson 0. Prairie Town's plants, offers, gas price, heat rates, credit and stop-and-restart offer are illustrative. Real gas costs for power plants: EIA's <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4</a> (final 2025 data, October 2026).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real shapes:</b> demand, wind and solar at 19:00 on 3 September 2025 follow Southwest Power Pool data (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled exactly as in lesson 0.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative:</b> Prairie Town's plants, offers, gas price, heat rates, credit and stop-and-restart offer. Real gas costs for power plants: EIA, <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4</a> (final 2025 data, October 2026).</span></p>
 ```
 :::
 
@@ -68,12 +69,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="merit-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Supply stack</dt><dd>All offers lined up from cheapest to dearest, each as wide as its MW and as high as its offer.</dd>
+<dt>Supply stack</dt><dd>All offers lined up from cheapest to dearest, each as wide as its MW and as high as its offer. Here each offer starts equal to the plant's running cost.</dd>
 <dt>Clearing price</dt><dd>The offer of the marginal plant, the one that serves the last MW of demand; every running plant is paid it.</dd>
-<dt>Gas sets the price, often</dt><dd>When a gas plant is marginal, each $1 per MMBtu on gas adds its heat rate in dollars to every MWh that hour.</dd>
-<dt>More wind, lower prices</dt><dd>Wind's offer is about $0, so new wind pushes dearer plants out of the stack and lowers the price for everyone.</dd>
-<dt>Below zero</dt><dd>The price turns negative only when the last plant needed would pay to keep running: a credit per MWh, or high costs to stop and restart.</dd>
-<dt>An optimization in disguise</dt><dd>The stack is the cheapest way to meet demand; the price is the cost of one more MWh, the shadow price of supply equals demand.</dd>
+<dt>Gas sets the price, often</dt><dd>When a gas plant is marginal, each $1 per MMBtu (million British thermal units) of gas adds its <span class="lx-term" data-term="heat-rate">heat rate</span> in dollars to every MWh that hour.</dd>
+<dt>More wind, lower prices</dt><dd>Wind offers about $0, so more wind cuts the output needed from dearer plants. The price falls when a cheaper offer becomes the marginal one.</dd>
+<dt>Below zero</dt><dd>The price turns negative only when the last plant needed offers below $0: it earns a credit per MWh, or would rather pay than stop and restart.</dd>
+<dt>An optimization in disguise</dt><dd>The stack is the cheapest way to meet demand. While the marginal plant has room, the price is the cost of one more MWh: the shadow price of supply equals demand.</dd>
 </dl>
 </div>
 </div>
@@ -82,7 +83,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-deepers">
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Analyst</span>Economic dispatch as a linear program</summary>
+<summary><span class="k">Go deeper · Modeler</span>Economic dispatch as a linear program</summary>
 <div class="lx-deeper-body">
 ```
 
@@ -96,20 +97,27 @@ $$
 \end{aligned}
 $$
 
-Every term is linear, so this is a [linear program]{.lx-term term="linear-program"}. At 19:00, with $c = (0, 0, 10, 40, 100)$, $\bar P = (72, 14, 100, 150, 100)$ and $D = 331$, the answer is $p = (72, 14, 100, 145, 0)$ and a running cost of $100 \times 10 + 145 \times 40 = \$6{,}800$. With $D = 332$ it is \$6,840: the [shadow price]{.lx-term term="shadow-price"} $\lambda$ of the balance rule is \$40 per MWh, the clearing price.
+Every term is linear, so this is a [linear program]{.lx-term term="linear-program"}. For one hour, 1 MW of output makes 1 MWh, so offer × MW is dollars.
 
-[Lesson 0](00-grid-operator.html) wrote the same problem over 24 hours with a ramp limit. The ramp limit ties the hours together, which is why the peaker ran there at moments when a single hour's stack would not call it.
+- **The data at 19:00.** $c = (0, 0, 10, 40, 100)$, $\bar P = (72, 14, 100, 150, 100)$ and $D = 331$.
+- **The answer.** $p = (72, 14, 100, 145, 0)$, at a running cost of $100 \times 10 + 145 \times 40 = \$6{,}800$.
+- **One more MWh.** With $D = 332$ the cost is \$6,840. The [shadow price]{.lx-term term="shadow-price"} $\lambda$ of the balance rule is \$40 per MWh, the clearing price.
+- **At a block edge.** At $D = 336$ the combined-cycle plant is full, so the 337th MWh comes from the peaker and adds \$100.
+- **Over a day.** [Lesson 0](00-grid-operator.html) wrote the same problem over 24 hours with a ramp limit, which ties the hours together.
+
+```{=html}
+<div id="merit-solver" class="lx-merit-solver"><p class="lx-hint">With JavaScript on, a button here hands this hour to the HiGHS solver in your browser.</p></div>
+```
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>Prices from a solver, and where this one-hour picture stops</summary>
+<summary><span class="k">Go deeper · Modeler</span>Prices over a day and a network, and where this one-hour picture stops</summary>
 <div class="lx-deeper-body">
 <ul>
 <li><a href="m01-dispatch-to-lmp.html">M1</a> (Modeler tier) builds a 24-hour dispatch linear program with ramps, adds a three-bus network, fills a line and reads one price per bus from the solver.</li>
-<li><a href="11-solver.html">Lesson 11</a> hands a linear program to a real solver and reads its prices.</li>
-<li>With on/off decisions and start-up costs (M2, upcoming), no single price covers every plant's costs; markets add side payments, called uplift.</li>
+<li>With on/off decisions and start-up costs (M2, upcoming), the energy price may not cover a running plant's start-up costs; some markets then add side payments, called uplift.</li>
 </ul>
 </div>
 </details>
@@ -160,9 +168,9 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 
 <div class="lx-quiz" data-quiz="m8">
 <div class="lx-qq" data-id="stack" data-answer="c">
-<p class="lx-qtext">Offers: wind 80 MW at $0, a 100 MW plant at $10, a 150 MW plant at $40 and a 100 MW plant at $100. Demand is 250 MW. What is the clearing price?</p>
-<ul class="lx-choices"><li data-value="a">$0</li><li data-value="b">$10</li><li data-value="c">$40</li><li data-value="d">$100</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>$40: the first two offers cover 180 MW, so the $40 plant serves the last 70 MW and sets the price.</p></details>
+<p class="lx-qtext">Offers, in $/MWh: wind 80 MW at $0, a 100 MW plant at $10, a 150 MW plant at $40 and a 100 MW plant at $100. Demand is 250 MW. What is the clearing price?</p>
+<ul class="lx-choices"><li data-value="a">$0/MWh</li><li data-value="b">$10/MWh</li><li data-value="c">$40/MWh</li><li data-value="d">$100/MWh</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>$40/MWh: the first two offers cover 180 MW, so the $40 plant serves the last 70 MW and sets the price.</p></details>
 </div>
 <div class="lx-qq" data-id="gas" data-answer="c">
 <p class="lx-qtext">A combined-cycle plant that burns 6 MMBtu per MWh is marginal. Gas rises from $6 to $8 per MMBtu. How much does the price rise?</p>
@@ -206,7 +214,14 @@ Every term is linear, so this is a [linear program]{.lx-term term="linear-progra
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>In West Texas, wind farms far from the cities pushed local prices below zero when the lines out were full. After a major grid expansion, EIA reported fewer wind curtailments and fewer negative prices there (<a href="https://www.eia.gov/todayinenergy/detail.php?id=16831">EIA, June 2014</a>). Builds on <a href="00-grid-operator.html">lesson 0</a> (cheapest first) and <a href="07-cost.html">lesson 7</a> (what a plant must earn back).</p>
+<p>West Texas, as EIA reported it (<a href="https://www.eia.gov/todayinenergy/detail.php?id=16831">June 2014</a>):</p>
+<ol style="font-size:14.5px;color:var(--lx-ink-2);margin:0 0 8px;padding-left:1.3rem">
+<li>Wind farms far from the cities filled the lines out of the region: the grid was <span class="lx-term" data-term="congestion">congested</span>.</li>
+<li>Local prices fell below zero, and wind was curtailed.</li>
+<li>A major grid expansion added more than 3,500 miles of lines by the end of 2013.</li>
+<li>Curtailments and negative prices became less frequent.</li>
+</ol>
+<p>Builds on <a href="00-grid-operator.html">lesson 0</a> (cheapest first) and <a href="07-cost.html">lesson 7</a> (what a plant must earn back).</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

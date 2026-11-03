@@ -18,9 +18,10 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
 
 // ---------------- data: transcribed values, checked a second time by hand from the primary sources (read 2026-11-02)
 {
-  Object.keys(D.sources).forEach(k => ok((/^https:\/\//.test(D.sources[k].url) || (k === "pjm_elcc" && D.sources[k].url === null)) && D.sources[k].as_of, `source ${k} has a URL (PJM: held in the sidecar) and an as-of date`));
-  const side = fs.readFileSync(path.join(SITE, "learn/_w1/06-three-jobs.yml"), "utf8");
-  ok(side.indexOf("28-29-bra-elcc-class-ratings.pdf") >= 0, "sidecar holds the PJM URL and the allow-list request");
+  Object.keys(D.sources).forEach(k => ok(/^https:\/\//.test(D.sources[k].url) && D.sources[k].as_of, `source ${k} has a URL and an as-of date`));
+  // pjm.com joined the allow-list on 2026-11-02; the values were re-checked against the one-page PDF that day
+  ok(D.sources.pjm_elcc.url === "https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf" && D.sources.pjm_elcc.accessed === "2026-11-02", "PJM class ratings: URL in the data file, read 2026-11-02");
+  ok(/class/i.test(D.sources.pjm_elcc.note) && /can differ/.test(D.meta.about), "data file: class ratings, a single plant's accredited capacity can differ");
   // EIA Electric Power Monthly, Tables 6.07.A and 6.07.B, 2025 (final)
   const CF = { nuclear: 0.911, cc: 0.587, pk: 0.136, wind: 0.338, solar: 0.240, hydro: 0.344, geo: 0.659 };
   // PJM, ELCC Class Ratings for the 2028/2029 BRA
@@ -106,9 +107,55 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   ok(seen >= 15, `page: ${seen} numbers with units checked`);
   const facts = (QMD.match(/<table class="lx-facts">[\s\S]*?<\/table>/) || [""])[0];
   [pct(T.cc.cf), pct(T.pk.cf), T.solar.firmLabel, T.pk.firmLabel, T.battery.firmLabel, pct(T.battery.rte, 0), "33,272 MW", pct(T.dr.drShare)].forEach(s => ok(facts.indexOf(s) >= 0, `facts table: ${s}`));
-  const rowsN = (facts.match(/<tr>/g) || []).length - 1, linked = (facts.match(/<td class="s"><a href="https:\/\/www\.(eia|ferc)\.gov/g) || []).length;
-  ok(rowsN === 5 && linked === 4 && /PJM, ELCC Class Ratings for the 2028\/2029 Base Residual Auction/.test(facts), "facts table: four linked EIA/FERC rows and the PJM row cited as text");
-  ok(QMD.indexOf("pjm.com/") < 0, "no link to pjm.com (not on the allow-list yet)");
+  const rowsN = (facts.match(/<tr>/g) || []).length - 1, linked = (facts.match(/<td class="s"><a href="https:\/\/www\.(eia\.gov|ferc\.gov|pjm\.com)\//g) || []).length;
+  ok(rowsN === 5 && linked === 5 && /PJM, ELCC Class Ratings for the 2028\/2029 Base Residual Auction/.test(facts), "facts table: every row links its source (EIA, FERC, PJM)");
+  ok((QMD.split(D.sources.pjm_elcc.url).length - 1) === 3, "PJM PDF linked in the data note, the facts table and the sources");
+}
+
+// ---------------- every percentage the reader sees belongs to the technology it is written about (review finding 12)
+{
+  const tech = JSON.parse(JSON.stringify(D.tech));
+  tech.find(t => t.key === "battery").ratings = D.steelman.storageRatings;
+  // the texts a reader sees: the page's elements (one per block tag), every string literal of the lesson JS, every string in the data file
+  // (the sources list keeps publication titles exactly as published, so it is left out; a table row is one element)
+  const page = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<style>[\s\S]*?<\/style>/, "").replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/https?:\/\/[^\s"')]+/g, " ");
+  const elems = page.split(/<\/?(?:p|li|dd|dt|tr|summary|h\d)\b[^>]*>|\n\s*\n/).map(x => x.replace(/<[^>]+>/g, " ")).filter(x => /\d%/.test(x));
+  const lits = [...JS.matchAll(/"((?:[^"\\\n]|\\.)*)"/g)].map(x => x[1]).filter(x => /\d%/.test(x));
+  // data strings belong to their own technology: each is read after the technology's name, as the card shows it
+  const vals = []; D.tech.forEach(t => (function walk(o) { if (typeof o === "string") { if (/\d%/.test(o)) vals.push(t.label + ": " + o); } else if (o && typeof o === "object") Object.values(o).forEach(walk); })(t));
+  let n = 0;
+  elems.concat(lits, vals).forEach(txt => M.claims(txt, tech).forEach(c => { n++; ok(c.ok, `claim ${c.value}% belongs to ${c.key || "no technology"}: "…${c.text.trim()}"`); }));
+  ok(n >= 40, `${n} percentage claims attributed to their technology`);
+  // regression: swapping solar's capacity factor with combined-cycle's is caught
+  const bad = M.claims("Solar's capacity factor was 58.7% in 2025.", tech);
+  ok(bad.length === 1 && bad[0].key === "solar" && !bad[0].ok, "regression: 'Solar ... 58.7%' is rejected");
+  const good = M.claims("Solar's capacity factor was 24.0% in 2025.", tech);
+  ok(good.length === 1 && good[0].ok, "control: 'Solar ... 24.0%' is accepted");
+  // the rendered page, when present, carries the same claims
+  const html = path.join(SITE, "_site/learn/06-three-jobs.html");
+  if (fs.existsSync(html)) {
+    const R = fs.readFileSync(html, "utf8").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ");
+    const main = (R.match(/<main[\s\S]*<\/main>/) || [R])[0];
+    const rel = main.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").split(/<\/?(?:p|li|dd|dt|tr|summary|h\d)\b[^>]*>/).map(x => x.replace(/<[^>]+>/g, " ")).filter(x => /\d%/.test(x));
+    let nr = 0; rel.forEach(txt => M.claims(txt, tech).forEach(c => { nr++; ok(c.ok, `rendered claim ${c.value}% belongs to ${c.key || "no technology"}: "…${c.text.trim()}"`); }));
+    ok(nr >= 15, `rendered page: ${nr} percentage claims attributed`);
+  }
+  // capacity factor is average output over size, not time running; it does not rank cheapness
+  const all = QMD + JS + JSON.stringify(D);
+  ok(!/ran (only )?\d+(\.\d+)?% of (the year|2025)|runs? (only )?\d+(\.\d+)?% of the year|how much of the year it runs/i.test(all), "no 'ran X% of the year' wording (finding 2)");
+  ok(!/ranks the energy job/.test(all), "capacity factor does not 'rank the energy job' (finding 3)");
+  ok(/below rated speed, output rises roughly with the cube/.test(T.wind.how), "wind: cube law only below rated speed (finding 4)");
+  ok(T.wind.jobs.flex === "partly" && T.solar.jobs.flex === "partly" && T.wind.flexSrc === "nrel_agc" && /headroom/.test(D.sources.nrel_agc.as_of), "wind and solar: flexibility 'partly', sourced (finding 5)");
+  ok(/technology class/.test(JS) && /single plant/.test(QMD) && JS.indexOf("Each dot is a plant") < 0, "class ratings, not single plants (finding 6)");
+  const sc = D.tech.filter(t => t.cf != null && t.firm != null && t.key !== "hydro"), low = sc.filter(t => t.firm > 0.5).sort((a, b) => a.cf - b.cf)[0];
+  ok(low.key === "pk" && JS.indexOf("lowest capacity factor whose firm share is still above half") >= 0, "scatter question has one answer, the gas peaker (finding 7)");
+  ok(JS.indexOf("stress test") >= 0 && JS.indexOf("outlast batteries") < 0 && /stress case/.test(D.steelman.about), "the calm spell is a stress case, not a battery size (finding 8)");
+  const modeler = (QMD.match(/Go deeper · Modeler[\s\S]*?<\/details>/) || [""])[0];
+  ok((modeler.match(/\$\$/g) || []).length === 2 && !/p_\{g,t\}|R_g/.test(modeler) && /\*\*Decisions\.\*\*/.test(modeler) && /10-write-it-down\.qmd/.test(modeler), "Modeler box: a preview in words, one symbolic line, a link to lesson 10 (finding 9)");
+  ok(/4 hours at full power/.test(JS) && /4-hour battery runs at full power for four hours/.test(T.battery.how), "4-hour battery explained (finding 11)");
+  ok(/\[\[ramp-rate\|/.test(JSON.stringify(D.jobs)) && /data-term="ramp-rate"/.test(QMD), "ramp rate marked as a glossary term (finding 11)");
+  ok(/Regions reward these services differently/.test(QMD), "real-world card: regions reward the services differently (finding 13)");
 }
 
 // ---------------- scope: deny-list, the nuclear-plus-risk combination (sentence level), links on the allow-list
@@ -123,8 +170,13 @@ const pct = (x, d) => (x * 100).toFixed(d === undefined ? 1 : d) + "%";
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
   const RISK = /cost (trajector|decline|reduction|fall)|learning|commerciali|subsid|credit|threshold|break[- ]even|parity|siting|site selection|suitab|screen|deliver|timing|order|anchor|buyer|data[- ]cent/i;
   visible.split(/(?<=[.!?])\s+|\n+/).forEach(s => ok(!(NUC.test(s) && RISK.test(s)), `scope: nuclear term with a risk term in "${s.slice(0, 90)}"`));
-  const ALLOW = /^(https:\/\/(www\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|doi\.org|creativecommons\.org|opensource\.org)\/|mailto:|#|\.\.\/assets\/|[0-9a-z-]+\.(qmd|html)(#[a-z0-9-]*)?$)/;
-  for (const h of QMD.matchAll(/href="([^"]+)"|\]\(([^)]+)\)/g)) { const u = h[1] || h[2]; ok(ALLOW.test(u), `link on the allow-list: ${u}`); }
+  // the lesson's own links (curriculum §20.3); the generated meta, next and footer blocks are build_learn.py's (its licence
+  // links are a documented scanner allowance) and learn_scope_scan.py checks the rendered page as a whole
+  const own = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "");
+  const ALLOW = /^(https:\/\/(www\.|docs\.)?(eia\.gov|energy\.gov|ferc\.gov|nerc\.com|nlr\.gov|nrel\.gov|pjm\.com|doi\.org)\/|#|\.\.\/assets\/|[0-9a-z-]+\.(qmd|html)(#[a-z0-9-]*)?$)/;
+  let nl = 0;
+  for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)/g)) { const u = h[1] || h[2]; nl++; ok(ALLOW.test(u), `link on the allow-list: ${u}`); }
+  ok(nl >= 10 && !/creativecommons|opensource/.test(own), `${nl} lesson links checked; no licence domains in the lesson's own content`);
 }
 
 console.log(`${checks} checks, ${fails} failed`);
