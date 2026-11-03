@@ -505,7 +505,7 @@
   short: "Capacity expansion, validated"
   outcome: "Formulate a capacity-expansion LP on weighted representative weeks with a linked battery, and validate its plan on full years with stated error measures."
   teaches: [capacity expansion as a linear program, representative periods and weights, storage linked across periods, validation on full weather years, error measures]
-  lab: "a SciPy/HiGHS notebook that rebuilds the model and asserts the reference results, about 60 minutes, then 120 minutes of practice."
+  lab: "a SciPy/HiGHS notebook that rebuilds the model and checks its own plans against the reference results, about 60 minutes, then 120 minutes of practice."
   does: "Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive."
   after: [M1, 7, 13]
   next: CK-M

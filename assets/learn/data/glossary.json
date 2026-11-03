@@ -701,6 +701,12 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "lole": {
+  "term": "Loss-of-load expectation (LOLE)",
+  "short": "The expected number of days a year on which supply falls short of demand at least once, of any size or length, averaged over many simulated years; an expectation, not a count of real outages.",
+  "lesson": "M3",
+  "href": "m03-capacity-expansion.html"
+ },
  "lower-bound": {
   "term": "Lower bound",
   "short": "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one.",
@@ -1135,7 +1141,7 @@
  },
  "resource-adequacy": {
   "term": "Resource adequacy",
-  "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a standard such as one day of shortage in ten years.",
+  "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation.",
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },

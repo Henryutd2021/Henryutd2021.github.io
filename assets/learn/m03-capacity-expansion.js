@@ -63,7 +63,8 @@
   // "cyclic" (each representative week ends where it starts) or "free" (no rule between weeks)
   // the planning LP on representative weeks: o = {cap (t CO2 a year), mode}
   function planModel(C, RW, o) { return TP.link(TP.weekModel(C, RW, { cap: o.cap }), RW, o.mode); }
-  // the checks: a fixed plan run hour by hour on a whole year (unserved demand allowed, at the penalty)
+  // the checks: a fixed plan run hour by hour on a whole year. Unserved demand is allowed at the penalty, which the
+  // reported cost (TP.summarize) leaves out, and no CO2 cap is enforced: the check measures the plan's own CO2
   function checkModel(C, Y, plan) { return TP.fullYearModel(C, Y, { plan: plan }); }
   // the reference: the same LP with every one of the 8,760 hours (heavy: precomputed for the page)
   function fullModel(C, Y, cap) { return TP.fullYearModel(C, Y, { cap: cap }); }
@@ -87,6 +88,14 @@
   }
   // which representative week stands for each calendar week (the strip)
   function calendar(RW) { return RW.chrono.slice(); }
+  // the battery's net change over each representative week (MWh: its level after hour 168, relative to the week's start;
+  // the engine's variable s<p>_167). Linked can carry energy from week to week; cyclic forces every one to zero
+  function netChanges(r, RW) { return RW.reps.map(function (rep, p) { return (r.values && r.values["s" + p + "_" + (HPW - 1)]) || 0; }); }
+  function largest(a) { return a.reduce(function (m, v) { return Math.max(m, Math.abs(v)); }, 0); }
+  // two plans rounded by roundPlan() are the same plan (step 8 then shows the stored full-year run of that plan)
+  function samePlan(a, b) { return !!a && !!b && TP.KEYS.every(function (k) { return Math.abs(a[k] - b[k]) < 5e-4; }); }
+  // the shortage penalty a full-year run leaves out of its reported cost ($ a year): unserved MWh x the penalty per MWh
+  function penalty(C, c) { return c.unserved * C.voll; }
 
   // ---------------------------------------------------------------- words and numbers the page states (pure, for the test)
   var fm = {
@@ -103,7 +112,8 @@
   // link, yearPeriods, readCheck and errors are the engine's own functions (TP.*), listed here for the lesson's callers
   var model = { HPW: HPW, WEEKS: WEEKS, TP: TP, prepare: prepare, prepareYear2: prepareYear2, costsWith: costsWith, weeksOf: weeksOf, setOf: setOf,
                 link: TP.link, roundPlan: roundPlan, planModel: planModel, checkModel: checkModel, fullModel: fullModel, yearPeriods: TP.yearPeriods,
-                readPlan: readPlan, readCheck: TP.readCheck, errors: TP.errors, weekList: weekList, calendar: calendar, fm: fm };
+                readPlan: readPlan, readCheck: TP.readCheck, errors: TP.errors, weekList: weekList, calendar: calendar,
+                netChanges: netChanges, largest: largest, samePlan: samePlan, penalty: penalty, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -138,6 +148,12 @@
       ".m3-bars .bar{height:12px;border-radius:6px;background:var(--lx-surface-3);overflow:hidden}.m3-bars .bar i{display:block;height:100%;background:var(--lx-accent)}",
       ".m3-bars b{font-family:var(--lx-f-mono);font-weight:600;text-align:right}",
       ".m3-note{font-size:13.5px;color:var(--lx-ink-3)}",
+      ".m3-key,.m3-info{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:14px;color:var(--lx-ink-2)}",
+      ".m3-key var{font-family:var(--lx-f-body);font-style:italic}.m3-key b,.m3-info b{color:var(--lx-ink);font-weight:600}",
+      ".m3-rules{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 12px;font-size:15px}",
+      ".m3-rules dt{font-weight:600;color:var(--lx-ink)}.m3-rules dd{margin:0;color:var(--lx-ink-2)}",
+      ".m3-fail{display:grid;gap:8px;justify-items:start;padding:10px 12px;border:1px solid var(--lx-bad);border-radius:10px;background:var(--lx-surface-2)}",
+      ".m3-fail p{margin:0;font-size:14.5px}",
       "@media (max-width:560px){.m3-tbl table{font-size:13px}.m3-tbl th,.m3-tbl td{white-space:normal;padding:4px 3px}.m3-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
   }
@@ -205,37 +221,89 @@
         });
       });
     }
+    // what a full-year run's cost counts (W2 review, finding 2): plants and fuel only
+    var SPEND = "Spending: building and running the plants. The re-run enforces no CO₂ cap and does not price unserved demand.";
     function verdict(host, x, k, year) {
       var c = x[k], e = TP.errors(x.est, c, cap, null), ul = H("ul", { class: "m3-verdict" }, host);
       function line(good, html) { var li = H("li", null, ul); H("span", { class: good ? "ok" : "no", html: LX.icon(good ? "check" : "question") }, li); H("span", { html: html }, li); }
-      line(Math.abs(e.costGap) <= 0.02, "Cost: <b>" + fm.musd(c.cost) + "</b> a year on all of " + year + ", " + fm.spct(e.costGap) + " on the estimate.");
+      line(Math.abs(e.costGap) <= 0.02, "Spending: <b>" + fm.musd(c.cost) + "</b> a year on all of " + year + ", " + fm.spct(e.costGap) + " on the estimate.");
       line(e.co2ok, "CO₂: <b>" + fm.kt(c.co2) + "</b> against the " + D.cap + " kt cap (" + fm.spct(e.co2Over) + ").");
       line(e.served, e.served ? "Demand: every hour served." : "Demand: <b>" + fm.mwh(c.unserved) + "</b> unserved in " + fm.hours(c.hours) + ", up to " + fm.mw(c.maxShort) + " short.");
+      H("p", { class: "m3-note", text: SPEND + (e.served ? "" : " At the $" + S.C.voll.toLocaleString("en-US") + " per MWh shortage penalty it would add " + fm.musd(penalty(S.C, c)) + ".") }, host);
       return e;
     }
     var SETROWS = ["typ4", "wk7", "typ8", "wk11", "wk15"];
     function resultsTable(host, ids) {
       host.innerHTML = "";
-      return table(host, ["Weeks", "~Modelled hours", "~LP columns", "Estimate", "~Full year: cost", "Full year: CO₂", "Full year: unserved"], ids.filter(function (id) { return res[id] && res[id].y25; }).map(function (id) {
+      var t = table(host, ["Weeks", "~Modelled hours", "~LP columns", "Estimate", "~Full year: spending", "Full year: CO₂", "Full year: unserved"], ids.filter(function (id) { return res[id] && res[id].y25; }).map(function (id) {
         var x = res[id], c = x.y25, set = setOf(D, id);
         return { cls: x.pre ? "pre" : "", cells: [set.label, String(x.est.hours.toLocaleString("en-US")), x.size.cols.toLocaleString("en-US"), fm.musd(x.est.cost), fm.musd(c.cost),
           { text: fm.kt(c.co2), cls: c.co2 > cap + 0.5 ? "bad" : "ok" }, { text: c.unserved < 0.5 ? "0" : fm.mwh(c.unserved) + " · " + c.hours + " h", cls: c.unserved < 0.5 ? "ok" : "bad" }] };
       }), "Each way of choosing the weeks: its estimate and its full-year check");
+      H("p", { class: "m3-note", text: SPEND }, host);
+      return t;
+    }
+
+    // ---------------------------------------------------------------- solves that fail (W2 review, finding 3)
+    // A solve can stop at its time limit on a slow phone, or the solver can fail to load. The step then says so in plain
+    // words, clears its busy state (Next and the step's button work again) and offers "Try again"; results already
+    // solved are kept, so a retry solves only what is missing.
+    // the first failed solve among the results a step needs (need: [[set id, "est" | "y25" | "y24"]]), or null
+    function firstFail(need) {
+      for (var i = 0; i < need.length; i++) {
+        var x = res[need[i][0]];
+        if (!x || !x[need[i][1]]) return (x && x.fail) || { status: "error", ok: false, message: "no result" };
+      }
+      return null;
+    }
+    function failNote(host, r, again) {
+      var why = r.status === "time-limit" ? "The solver stopped at its time limit before it finished."
+        : r.status === "cancelled" || r.status === "superseded" ? "The run was stopped before it finished."
+        : (LX.solver.describe(r) || "The solver did not finish.") + (r.message && r.status === "error" ? " (" + r.message + ")" : "");
+      var box = H("div", { class: "m3-fail", role: "alert" }, host);
+      H("p", { html: "<b>No result to show.</b> " + LX.esc(why) + " What you did before is kept; on a slow device, close other tabs first." }, box);
+      H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Try again", onclick: function () { again(); } }, box);
+      return box;
+    }
+    // one solver action of a step. o: { api, st (an LX.SolverStatus), host, go (the step's own button, or null), job () ->
+    // Promise, failed () -> the first failed solve or null, show () -> the results }. Returns the action, for the step's
+    // button or prediction and for "Try again".
+    function action(o) {
+      var note = null;
+      function end(r) {
+        o.api.busy(false); if (o.go) o.go.disabled = false;
+        if (r) { o.st.set(""); if (note) note.remove(); note = failNote(o.host, r, attempt); }
+      }
+      function attempt() {
+        if (note) { note.remove(); note = null; }
+        if (o.go) o.go.disabled = true;
+        o.st.set(LX.solver.mode ? "solving" : "loading"); o.api.busy(true);
+        return Promise.resolve().then(o.job).then(function () {
+          var f = o.failed(); end(f); if (!f) o.show();
+        }).catch(function (e) { end({ status: "error", ok: false, message: String((e && e.message) || e) }); });
+      }
+      return attempt;
     }
 
     var steps = [
       // 1 weights
-      { text: "M1 ran plants that were already built. Here the solver also chooses what to build: seven sizes, paid every year. Yet it sees only a few weeks of operation. How do weeks become a year?",
+      { text: "The solver now chooses what to build (seven sizes, paid every year) and how to run it, but it sees only a few weeks. How do a few weeks stand for a year?",
         build: function (act, api) {
-          var f, pr = LX.Predict(act, { id: "m3-weights", fresh: true, q: "How does the goal turn a few weeks of running costs into a year's?", answer: "weight",
+          var f, key, pr = LX.Predict(act, { id: "m3-weights", fresh: true, q: "How does the goal turn a few weeks of running costs into a year's?", answer: "weight",
             options: [{ value: "weight", label: "Weight each modelled hour by the hours of the year it stands for" }, { value: "52", label: "Multiply every week's cost by 52" }, { value: "none", label: "Leave it: a few weeks are close enough" }],
             feedback: { weight: "Each modelled hour counts as many hours of the year as it stands for.", "52": "A typical winter week does not stand for all 52 weeks.", none: "A year of building costs against a few weeks of fuel would make plants that are cheap to run look far too good." },
             onPick: function () {
-              pr.reveal(); f.hidden = false; api.done();
+              pr.reveal(); f.hidden = false; key.hidden = false; api.done();
               api.saw("Build costs count once a year. Each modelled hour's running cost counts **w** times: its [[period-weight|weight]], the hours of 2025 it stands for.");
             } });
           f = H("div", { class: "m3-formula", hidden: true, role: "math", "aria-label": "minimise, over the sizes K, the sum of yearly cost f times size K, plus the sum over modelled weeks p of the weight w p times the running cost of every hour of that week" }, act);
           f.innerHTML = "min &nbsp;Σ<sub><var>i</var></sub> <var>f</var><sub><var>i</var></sub> <var>K</var><sub><var>i</var></sub> &nbsp;+&nbsp; Σ<sub><var>p</var></sub> <span class='w'><var>w</var><sub><var>p</var></sub></span> Σ<sub><var>h</var></sub> (running cost in hour <var>h</var> of week <var>p</var>)";
+          // the symbol key beside the first formula (W2 review, finding 10)
+          key = H("ul", { class: "m3-key", hidden: true, "aria-label": "The symbols in the formula" }, act);
+          [["<var>K</var><sub><var>i</var></sub>", "size built of plant <var>i</var>: MW (battery energy: MWh)"],
+           ["<var>f</var><sub><var>i</var></sub>", "its yearly cost: $ per MW-year (battery energy: per MWh-year)"],
+           ["<var>p</var>, <var>h</var>", "a representative week, and an hour of it"],
+           ["<var>w</var><sub><var>p</var></sub>", "the week's weight: hours of the year per modelled hour"]].forEach(function (s) { H("li", { html: "<b>" + s[0] + "</b> " + s[1] }, key); });
         } },
       // 2 the weeks and their weights
       { text: "Each [[representative-period|representative week]] stands for several calendar weeks; its weight says how many. Pick two of the five ways of choosing them and compare the calendars.",
@@ -267,17 +335,14 @@
             planTable(H("div", { style: "flex:1 1 260px;min-width:0" }, out), x.est.plan);
           }
           if (res.typ4 && res.typ4.est) { show(res.typ4); api.done(); }
-          go.addEventListener("click", function () {
-            st.set(LX.solver.mode ? "solving" : "loading"); api.busy(true); go.disabled = true;
-            plan("typ4").then(function (x) {
-              api.busy(false); go.disabled = false;
-              if (!x.est) { st.set(x.fail); return; }
-              st.set(x.r); show(x); api.done();
+          go.addEventListener("click", action({ api: api, st: st, host: act, go: go, job: function () { return plan("typ4"); },
+            failed: function () { return firstFail([["typ4", "est"]]); },
+            show: function () {
+              var x = res.typ4; st.set(x.r); show(x); api.done();
               remember("typ4", { cost: x.est.cost });
-              api.saw("Optimal: " + fm.musd(x.est.cost) + " a year at the cap, with " + fm.mw(x.est.plan.wind) + " of wind. " + x.size.cols.toLocaleString("en-US") + " decisions, " + x.size.rows.toLocaleString("en-US") +
+              api.saw("The four weeks' optimum: " + fm.musd(x.est.cost) + " a year at the cap, with " + fm.mw(x.est.plan.wind) + " of wind. " + x.size.cols.toLocaleString("en-US") + " decisions, " + x.size.rows.toLocaleString("en-US") +
                 " rules. It is an **estimate**: the solver saw " + x.est.hours + " of 8,760 hours.");
-            });
-          });
+            } }));
         } },
       // 4 check it on the full year
       { text: "Now the check. Keep the sizes fixed and run the plan hour by hour on all 8,760 hours of 2025. Demand the plants cannot meet counts as [[unserved-energy|unserved]].",
@@ -287,16 +352,13 @@
           strip.draw(S.weeks("typ4"), null);
           function show(x) { out.innerHTML = ""; verdict(out, x, "y25", 2025); strip.draw(S.weeks("typ4"), x.y25.byWeek); }
           if (res.typ4 && res.typ4.y25) { show(res.typ4); api.done(); }
-          go.addEventListener("click", function () {
-            st.set("solving"); api.busy(true); go.disabled = true;
-            check("typ4", 2025).then(function (x) {
-              api.busy(false); go.disabled = false;
-              if (!x.y25) { st.set(x.fail); return; }
-              st.set(x.ry25); show(x); api.done();
+          go.addEventListener("click", action({ api: api, st: st, host: act, go: go, job: function () { return check("typ4", 2025); },
+            failed: function () { return firstFail([["typ4", "y25"]]); },
+            show: function () {
+              var x = res.typ4; st.set(x.ry25); show(x); api.done();
               var e = TP.errors(x.est, x.y25, cap, null);
-              api.saw("The cost holds within " + fm.pct(Math.abs(e.costGap)) + ". But " + fm.mwh(x.y25.unserved) + " go unserved in " + fm.hours(x.y25.hours) + ", spread over " + x.y25.byWeek.filter(function (v) { return v > 0.05; }).length + " weeks (red dots), and CO₂ is " + fm.kt(x.y25.co2) + " against " + D.cap + ".");
-            });
-          });
+              api.saw("Spending holds within " + fm.pct(Math.abs(e.costGap)) + ". But " + fm.mwh(x.y25.unserved) + " go unserved in " + fm.hours(x.y25.hours) + ", spread over " + x.y25.byWeek.filter(function (v) { return v > 0.05; }).length + " weeks (red dots), and CO₂ is " + fm.kt(x.y25.co2) + " against " + D.cap + ".");
+            } }));
         } },
       // 5 keep the extremes
       { text: "Keep the extremes: add the weeks of peak demand, of peak [[net-demand|net load]] (demand minus wind and sun) and of least wind, each standing only for itself. Solve and check again.",
@@ -306,32 +368,34 @@
           strip.draw(S.weeks("wk7"), null);
           function show() { resultsTable(tb, ["typ4", "wk7"]); strip.draw(S.weeks("wk7"), res.wk7.y25.byWeek); }
           if (res.wk7 && res.wk7.y25 && res.typ4 && res.typ4.y25) { show(); api.done(); }
-          go.addEventListener("click", function () {
-            st.set("solving"); api.busy(true); go.disabled = true;
-            check("typ4", 2025).then(function () { return check("wk7", 2025); }).then(function (x) {
-              api.busy(false); go.disabled = false;
-              if (!x.y25) { st.set(x.fail); return; }
-              st.set(x.ry25 || x.r); show(); api.done();
+          go.addEventListener("click", action({ api: api, st: st, host: act, go: go,
+            job: function () { return check("typ4", 2025).then(function () { return check("wk7", 2025); }); },
+            failed: function () { return firstFail([["typ4", "y25"], ["wk7", "y25"]]); },
+            show: function () {
+              var x = res.wk7; st.set(x.ry25 || x.r); show(); api.done();
               api.saw("Unserved energy falls from " + fm.mwh(res.typ4.y25.unserved) + " to " + fm.mwh(x.y25.unserved) + " (" + fm.hours(x.y25.hours) + "). CO₂ hardly moves: " + fm.kt(x.y25.co2) + ". Extremes guard the peak hours; they do not fix the CO₂ estimate.");
-            });
-          });
+            } }));
         } },
       // 6 more weeks
       { text: "More weeks make a larger LP. Predict first: on the full year, which leaves less demand unserved?",
         build: function (act, api) {
-          var tb, note, pr = LX.Predict(act, { id: "m3-more", fresh: true, q: "Which leaves less unserved energy on the full year?", answer: "x",
+          var tb, note, st, run;
+          var pr = LX.Predict(act, { id: "m3-more", fresh: true, q: "Which leaves less unserved energy on the full year?", answer: "x",
             options: [{ value: "t8", label: "8 typical weeks" }, { value: "x", label: "4 typical + 3 extreme weeks" }, { value: "same", label: "About the same" }],
-            feedback: { t8: "More typical weeks still average the hardest weeks away.", x: "Keeping three extreme weeks beats doubling the typical ones.", same: "They differ several times over." },
-            onPick: function () {
-              api.busy(true);
-              Promise.all(SETROWS.map(function (id) { return check(id, 2025); })).then(function () {
-                api.busy(false); pr.reveal(); resultsTable(tb, SETROWS); note.hidden = false; api.done();
-                var a = res.typ8.y25, b = res.wk7.y25, c = res.wk15.y25;
-                api.saw("8 typical weeks: " + fm.mwh(a.unserved) + " short; 4 + 3 extreme: " + fm.mwh(b.unserved) + ". With 12 + 3 weeks " + (c.unserved < 0.5 ? "every hour of 2025 is served" : fm.mwh(c.unserved) + " remain") +
-                  ", yet CO₂ is " + fm.kt(c.co2) + ", and its LP has " + (res.wk15.size.cols / res.typ4.size.cols).toFixed(1) + " times the columns of the four-week one.");
-              });
-            } });
+            feedback: { t8: "More typical weeks still average the hardest weeks away.", x: "On the full year of 2025, keeping three extreme weeks beats doubling the typical ones.", same: "They differ several times over." },
+            onPick: function () { run(); } });
+          st = LX.SolverStatus(H("div", { class: "m3-row" }, act));
           tb = H("div", null, act); note = H("p", { class: "m3-note", hidden: true, text: "Precomputed rows: their LPs are too large to solve quickly on a phone. The Node test and the notebook solve them again." }, act);
+          // every set's plan run on all of 2025; a failed solve leaves a message and "Try again" (finding 3)
+          run = action({ api: api, st: st, host: act, go: null,
+            job: function () { return Promise.all(SETROWS.map(function (id) { return check(id, 2025); })); },
+            failed: function () { return firstFail(SETROWS.map(function (id) { return [id, "y25"]; })); },
+            show: function () {
+              st.set(res.typ8.ry25 || res.typ8.r); pr.reveal(); resultsTable(tb, SETROWS); note.hidden = false; api.done();
+              var a = res.typ8.y25, b = res.wk7.y25, c = res.wk15.y25;
+              api.saw("8 typical weeks: " + fm.mwh(a.unserved) + " short; 4 + 3 extreme: " + fm.mwh(b.unserved) + ". With 12 + 3 weeks " + (c.unserved < 0.5 ? "every hour of 2025 is served" : fm.mwh(c.unserved) + " remain") +
+                ", yet CO₂ is " + fm.kt(c.co2) + ", and its LP has " + (res.wk15.size.cols / res.typ4.size.cols).toFixed(1) + " times the columns of the four-week one.");
+            } });
           if (res.wk15 && res.wk15.y25 && res.typ8 && res.typ8.y25) { resultsTable(tb, SETROWS); note.hidden = false; }
         } },
       // 7 the estimate against the full-year optimum
@@ -351,86 +415,101 @@
           H("p", { class: "m3-note", html: LX.rich("Estimate error = (the weeks' optimal cost) ÷ (the full-year optimal cost) − 1, both at " + D.cap + " kt; reference numbers, the same on every device.") }, act);
         } },
       // 8 storage between weeks
-      { text: "A battery needs a rule between weeks. Linked: one calendar chain of 52 start levels. Cyclic: each week ends where it starts. No link: each week may start at any level. Which plan looks cheapest?",
+      { text: "A battery needs a rule for its charge from one week to the next. Read the three rules, then predict.",
         build: function (act, api) {
-          H("p", { class: "m3-note", html: LX.rich("**An illustrative what-if, not a forecast or a sourced cost:** battery energy at $" + D.storage.energyCapex + " per kWh instead of the sourced $" + cfg.techs.battery.energyCapex + " (lesson 13), so the solver builds more storage. Six solves: a few seconds on a laptop, longer on a phone.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, act);
-          var tb, row, st, out = {};
-          var NAMES = { linked: "Linked across the calendar", cyclic: "Cyclic within each week", free: "No link between weeks" };
+          var rules = H("dl", { class: "m3-rules", "aria-label": "Three rules for the battery between weeks" }, act);
+          [["Linked", "one calendar chain of 52 start levels: energy carried into a week was stored before."], ["Cyclic", "each representative week ends where it starts."],
+           ["No link", "each week may start at any level."]].forEach(function (r) { H("dt", { text: r[0] }, rules); H("dd", { text: r[1] }, rules); });
+          // the what-if, as short labelled lines (W2 review, finding 11)
+          var info = H("ul", { class: "m3-info" }, act);
+          [["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + cfg.techs.battery.energyCapex + " (lesson 13). An illustrative what-if, not a forecast or a sourced cost."],
+           ["Why", "so the solver builds a battery large enough for the rules to differ."],
+           ["Runs", "three solves, a few seconds on a laptop. Each plan's full-year run was solved in advance; a plan that differs is run here."]]
+            .forEach(function (r) { H("li", { html: "<b>" + r[0] + ":</b> " + LX.esc(r[1]) }, info); });
+          var tb, st, run, out = {}, fail = null;
+          var NAMES = { linked: "Linked", cyclic: "Cyclic", free: "No link" };   // short, so the table fits a phone (the rules list above explains them)
           function show() {
             tb.innerHTML = "";
-            table(tb, ["Rule between weeks", "Battery MW / MWh", "Estimate", "Full year: CO₂", "Full year: unserved"], D.storage.modes.map(function (m) {
+            table(tb, ["Rule between weeks", "~Battery MW / MWh", "Estimate", "Full year: CO₂", "Full year: unserved"], D.storage.modes.map(function (m) {
               var o = out[m]; return { cells: [NAMES[m], batText(o.est.plan), fm.musd(o.est.cost), { text: fm.kt(o.full.co2), cls: o.full.co2 > cap + 0.5 ? "bad" : "ok" }, { text: o.full.unserved < 0.5 ? "0" : fm.mwh(o.full.unserved), cls: o.full.unserved < 0.5 ? "ok" : "bad" }] };
             }), "Three rules for the battery between weeks, at the illustrative what-if storage cost");
+            // the battery column is hidden on phones (the result line names the no-link battery); the mechanism (W2 review,
+            // finding 1): what each rule lets the battery carry from one week to the next
+            H("p", { class: "m3-note", text: "Largest net change of the battery over one representative week: " + D.storage.modes.map(function (m) { return NAMES[m].toLowerCase() + " " + fm.mwh(largest(out[m].net)); }).join(", ") + "." }, tb);
           }
+          // the three planning LPs, solved here; each plan's full-year run is the stored one when the plan is the reference
+          // plan (it never depends on the reader's input), else solved here. Results already solved are kept for a retry.
           function solveAll() {
-            var RW = S.weeks(D.storage.set), modes = D.storage.modes, i = 0, scap = D.storage.cap * 1e3;
-            api.busy(true);
-            return modes.reduce(function (p, m) {
+            var RW = S.weeks(D.storage.set), scap = D.storage.cap * 1e3; fail = null;
+            return D.storage.modes.reduce(function (p, m) {
               return p.then(function () {
-                st.set("solving"); i++;
+                if (fail || out[m]) return;
+                st.set("solving");
                 return LX.solver.solve(planModel(S.Cw, RW, { cap: scap, mode: m }), { timeLimit: 20, label: "m3-storage" }).then(function (r) {
-                  if (!r.ok) throw r;
-                  var est = readPlan(S.Cw, RW, r, { cap: scap });
-                  return LX.solver.solve(checkModel(S.Cw, S.Y, est.plan), { timeLimit: 20, label: "m3-storage-check" }).then(function (rc) {
-                    if (!rc.ok) throw rc;
-                    out[m] = { est: est, full: TP.readCheck(S.Cw, S.Y, rc, est.plan) }; st.set(rc);
+                  if (!r.ok) { fail = r; return; }
+                  var o = { est: readPlan(S.Cw, RW, r, { cap: scap }), net: netChanges(r, RW), r: r }, ref = R.storage[m];
+                  if (samePlan(o.est.plan, ref.plan)) { o.full = ref.full; o.stored = true; out[m] = o; return; }
+                  return LX.solver.solve(checkModel(S.Cw, S.Y, o.est.plan), { timeLimit: 20, label: "m3-storage-check" }).then(function (rc) {
+                    if (!rc.ok) { fail = rc; return; }
+                    o.full = TP.readCheck(S.Cw, S.Y, rc, o.est.plan); out[m] = o;
                   });
                 });
               });
-            }, Promise.resolve()).then(function () { api.busy(false); return true; }, function (r) { api.busy(false); st.set(r); return false; });
+            }, Promise.resolve());
           }
           var pr = LX.Predict(act, { id: "m3-link", fresh: true, q: "Which rule gives the cheapest-looking plan?", answer: "free",
             options: [{ value: "linked", label: "Linked" }, { value: "cyclic", label: "Cyclic" }, { value: "free", label: "No link" }],
-            feedback: { linked: "Linked is the strict rule: energy carried into a week must have been stored before.", cyclic: "Cyclic forbids carrying energy between weeks, so it cannot look cheaper than no rule at all.", free: "With no link, each week may start charged, for free." },
-            onPick: function () {
-              pr.reveal();
-              solveAll().then(function (okk) {
-                if (!okk) return; show(); api.done();
-                var L = out.linked, F = out.free, Cy = out.cyclic;
-                var same = Math.abs(L.est.cost - Cy.est.cost) < 0.005 * L.est.cost;
-                api.saw("In this illustrative what-if, no link: " + fm.mwh(F.est.plan.be) + " of battery and a plan " + fm.musd(L.est.cost - F.est.cost) + " cheaper on paper; on the full year it emits " + fm.kt(F.full.co2) + ". Each week could start charged, for free. " +
-                  (same ? "Linked and cyclic agree here: this battery empties and refills within a week." : "Cyclic differs from linked by " + fm.musd(Math.abs(Cy.est.cost - L.est.cost)) + "."));
-              });
+            feedback: { linked: "Linked keeps the books: energy carried into a week must have been stored before.", cyclic: "Cyclic forbids carrying energy between weeks, so it cannot look cheaper than no rule at all.", free: "With no link, each week may start charged, for free." },
+            onPick: function () { pr.reveal(); run(); } });
+          st = LX.SolverStatus(H("div", { class: "m3-row" }, act)); tb = H("div", null, act);
+          H("p", { class: "m3-note", html: LX.rich("At the sourced $" + cfg.techs.battery.energyCapex + "/kWh the three rules' estimates agree within $0.1M: the battery built holds about an hour, so it has little to carry from one week to the next.") }, act);
+          run = action({ api: api, st: st, host: act, go: null, job: solveAll,
+            failed: function () { return D.storage.modes.every(function (m) { return out[m]; }) ? null : fail || { status: "error", ok: false, message: "no result" }; },
+            show: function () {
+              st.set(out.free.r); show(); api.done();
+              var L = out.linked, F = out.free, Cy = out.cyclic, gap = (Cy.est.cost - L.est.cost) / L.est.cost, moved = largest(L.net);
+              api.saw("In this illustrative what-if, no link builds " + fm.mwh(F.est.plan.be) + " of battery and looks " + fm.musd(L.est.cost - F.est.cost) + " cheaper, yet emits " + fm.kt(F.full.co2) + " on the full year: each week could start charged, for free. " +
+                "Linked and cyclic estimates differ by " + (gap < 0.001 ? "less than 0.1%" : fm.pct(gap)) + (moved > 0.5 ? ", though the linked battery still moves energy between weeks: up to " + fm.mwh(moved) + " over one representative week." : "; here the linked battery moves almost nothing between weeks."));
             } });
-          row = H("div", { class: "m3-row" }, act); st = LX.SolverStatus(row); tb = H("div", null, act);
-          H("p", { class: "m3-note", html: LX.rich("At the real cost of $" + cfg.techs.battery.energyCapex + "/kWh the three rules give the same plan within $0.1M: a battery that holds about an hour has little to carry from one week to the next.") }, act);
         } },
       // 9 another weather year
-      { text: "Weather differs from year to year. Run the 4 + 3 plan on 2024's demand, wind and sun, scaled to the same yearly demand and capacity factors as 2025.",
+      { text: "Weather differs from year to year. Run the 4 + 3 plan on 2024's demand, wind and sun, scaled to the same yearly demand and [[capacity-factor|capacity factors]] as 2025.",
         build: function (act, api) {
           var row = H("div", { class: "m3-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Run on 2024" }, row);
           var st = LX.SolverStatus(row), tb = H("div", null, act);
           function show() {
             var x = res.wk7, F = R.full;
             tb.innerHTML = "";
-            table(tb, ["Plan, year run", "~Cost", "CO₂", "Unserved"], [
+            // the last row is the plan optimized on all 8,760 hours of 2025, run on 2024: no optimum of 2024 is computed (finding 14)
+            table(tb, ["Plan, year run", "~Spending", "CO₂", "Unserved"], [
               { cells: ["4 + 3 plan, 2025", fm.musd(x.y25.cost), { text: fm.kt(x.y25.co2), cls: "bad" }, { text: fm.mwh(x.y25.unserved) + " · " + x.y25.hours + " h", cls: x.y25.unserved < 0.5 ? "ok" : "bad" }] },
               { cells: ["4 + 3 plan, 2024", fm.musd(x.y24.cost), { text: fm.kt(x.y24.co2), cls: x.y24.co2 > cap + 0.5 ? "bad" : "ok" }, { text: fm.mwh(x.y24.unserved) + " · " + x.y24.hours + " h", cls: x.y24.unserved < 0.5 ? "ok" : "bad" }] },
-              { cls: "pre", cells: ["Full-year optimum, 2024", fm.musd(F.y2024.cost), { text: fm.kt(F.y2024.co2), cls: F.y2024.co2 > cap + 0.5 ? "bad" : "ok" }, { text: fm.mwh(F.y2024.unserved) + " · " + F.y2024.hours + " h", cls: F.y2024.unserved < 0.5 ? "ok" : "bad" }] }
-            ], "The seven-week plan on 2025 and 2024, and the full-year optimum on 2024");
+              { cls: "pre", cells: ["2025 full-year-optimal plan, run on 2024", fm.musd(F.y2024.cost), { text: fm.kt(F.y2024.co2), cls: F.y2024.co2 > cap + 0.5 ? "bad" : "ok" }, { text: fm.mwh(F.y2024.unserved) + " · " + F.y2024.hours + " h", cls: F.y2024.unserved < 0.5 ? "ok" : "bad" }] }
+            ], "The seven-week plan on 2025 and 2024, and the plan optimal on all of 2025, run on 2024");
+            H("p", { class: "m3-note", text: SPEND }, tb);
           }
           if (res.wk7 && res.wk7.y24 && res.wk7.y25) { show(); api.done(); }
-          go.addEventListener("click", function () {
-            st.set("solving"); api.busy(true); go.disabled = true;
-            check("wk7", 2025).then(function () { return check("wk7", 2024); }).then(function (x) {
-              api.busy(false); go.disabled = false;
-              if (!x.y24) { st.set(x.fail); return; }
-              st.set(x.ry24); show(); api.done();
+          go.addEventListener("click", action({ api: api, st: st, host: act, go: go,
+            job: function () { return check("wk7", 2025).then(function () { return check("wk7", 2024); }); },
+            failed: function () { return firstFail([["wk7", "y25"], ["wk7", "y24"]]); },
+            show: function () {
+              var x = res.wk7; st.set(x.ry24); show(); api.done();
               api.saw("On 2024: " + fm.mwh(x.y24.unserved) + " unserved in " + fm.hours(x.y24.hours) + ", " + fm.kt(x.y24.co2) + ". Even the plan optimized on every hour of 2025 is short in " + fm.hours(R.full.y2024.hours) + " of 2024: one weather year cannot show [[resource-adequacy|adequacy]].");
-            });
-          });
+            } }));
         } },
       // 10 which conclusions survive
       { text: "Sort six conclusions drawn from the seven weeks. Which survive the checks you ran?",
         build: function (act, api) {
           var x = R.sets.wk7, F = R.full;
+          // the spending cards state their boundary (finding 2): plants and fuel, no shortage penalty, no cap in the re-runs
           var cards = [
-            { id: "cost", text: "The plan's yearly cost is within 2% of the weeks' estimate.", bin: "holds", why: "On 2025 " + fm.spct(x.y2025.cost / x.cost - 1) + ", on 2024 " + fm.spct(x.y2024.cost / x.cost - 1) + "." },
-            { id: "years", text: "Running the plan costs about the same in 2024 as in 2025 (within 1%).", bin: "holds", why: fm.musd(x.y2025.cost) + " and " + fm.musd(x.y2024.cost) + "." },
+            { id: "cost", text: "The plan's yearly spending on plants and fuel is within 2% of the weeks' estimate.", bin: "holds",
+              why: "On 2025 " + fm.spct(x.y2025.cost / x.cost - 1) + ", on 2024 " + fm.spct(x.y2024.cost / x.cost - 1) + ": spending only. The $" + S.C.voll.toLocaleString("en-US") + " per MWh shortage penalty would add " + fm.musd(penalty(S.C, x.y2025)) + " and " + fm.musd(penalty(S.C, x.y2024)) + ", and the re-runs enforce no cap." },
+            { id: "years", text: "Its spending on plants and fuel is about the same in 2024 as in 2025 (within 1%).", bin: "holds", why: fm.musd(x.y2025.cost) + " and " + fm.musd(x.y2024.cost) + ", with no shortage penalty." },
             { id: "served", text: "The plan serves every hour.", bin: "fails", why: fm.mwh(x.y2025.unserved) + " unserved in 2025, " + fm.mwh(x.y2024.unserved) + " in 2024." },
             { id: "cap", text: "The plan meets the " + D.cap + " kt cap.", bin: "fails", why: fm.kt(x.y2025.co2) + " in 2025, " + fm.kt(x.y2024.co2) + " in 2024." },
-            { id: "price", text: "Meeting " + D.cap + " kt costs about " + fm.musd(x.cost) + " a year.", bin: "fails", why: "The full-year optimum costs " + fm.musd(F.cost) + ", " + fm.pct(F.cost / x.cost - 1) + " more." },
-            { id: "lole", text: "With this plan the town meets a one-day-in-ten-years reliability standard.", bin: "untested", why: "That needs plant outages and many weather years, which no run here includes." }
+            { id: "price", text: "Meeting " + D.cap + " kt costs about " + fm.musd(x.cost) + " a year.", bin: "fails", why: "The full-year optimum, planned on every hour of 2025, costs " + fm.musd(F.cost) + ", " + fm.pct(F.cost / x.cost - 1) + " more." },
+            { id: "lole", text: "With this plan the town meets a loss-of-load expectation of 0.1 days a year (“1 day in 10 years”).", bin: "untested", why: "That is an expected number of shortage days over many weather years with plant outages; no run here includes them." }
           ];
           LX.CardSort(act, { bins: [{ id: "holds", label: "Holds", sub: "on both full years" }, { id: "fails", label: "Fails", sub: "a check you ran" }, { id: "untested", label: "Not tested", sub: "by these runs" }],
             cards: cards, onCheck: function (g) {
@@ -485,17 +564,17 @@
           say: "The weighted sum of CO2, the emission rate e times gas output, stays within the cap." }
       ],
       symbols: {
-        f: { name: "f_i", label: "f i, yearly cost of one unit built", unit: "$ per MW-year", words: "Capital cost spread over the plant's life at a 4% real cost of capital, plus fixed upkeep: what one MW costs every year, used or not.", you: "Wind: $" + (C.techs.wind.fixed / 1e3).toFixed(1) + "k per MW-year; gas combined-cycle: $" + (C.techs.cc.fixed / 1e3).toFixed(1) + "k.", code: "C.techs.wind.fixed   // LX.townPlan.costs()" },
+        f: { name: "f_i", label: "f i, yearly cost of one unit built", unit: "$ per MW-year", words: "[[capital-cost|Capital cost]] spread over the plant's life ([[capital-recovery-factor|capital recovery]] at a 4% real cost of capital), plus [[fixed-om|fixed O&M]]: what one MW costs every year, used or not.", you: "Wind: $" + (C.techs.wind.fixed / 1e3).toFixed(1) + "k per MW-year; gas combined-cycle: $" + (C.techs.cc.fixed / 1e3).toFixed(1) + "k.", code: "C.techs.wind.fixed   // LX.townPlan.costs()" },
         K: { name: "K_i", label: "K i, size built", unit: "MW (battery energy: MWh)", words: "The investment decisions: one number per technology, the same in every hour of the year.", you: "The 4 + 3 plan: " + fm.mw(w7.plan.wind) + " of wind, " + fm.mw(w7.plan.cc) + " of gas combined-cycle.", code: '"K_wind", "K_cc", ... "K_be"' },
         w: { name: "w_p", label: "w p, the weight of representative week p", unit: "h per modelled hour", words: "How many hours of the year each modelled hour stands for: the number of calendar weeks the week represents, times 8,760 ÷ 8,736.", you: "A typical week standing for 13 weeks: " + (13 * 8760 / 8736).toFixed(2) + "; an extreme week: " + (8760 / 8736).toFixed(3) + ".", code: "RW.reps[p].weight" },
         r: { name: "r", label: "r, running cost", unit: "$/MWh", words: "Fuel and variable upkeep per MWh of gas output.", you: "Combined-cycle $" + C.techs.cc.run.toFixed(2) + "/MWh, peaker $" + C.techs.pk.run.toFixed(2) + "/MWh.", code: "C.techs.cc.run" },
         g: { name: "g_p,h", label: "g, gas output in hour h of week p", unit: "MW", words: "An operating decision: one per plant and modelled hour. Each lasts an hour, so MW over the hour is MWh.", you: "4 typical weeks: 672 hours; 4 + 3: 1,176.", code: '"g" + p + "_" + h' },
-        a: { name: "a_p,h", label: "a, output per MW built", unit: "MW per MW", words: "What one MW of wind or solar can make in that hour (from real 2025 shapes, scaled to EIA capacity factors); nuclear's is a flat 0.911.", you: "Wind averages " + (S.Y.windCF * 100).toFixed(1) + "% over the year, solar " + (S.Y.solarCF * 100).toFixed(1) + "%.", code: "P.wind[h], P.solar[h]" },
+        a: { name: "a_p,h", label: "a, output per MW built", unit: "MW per MW", words: "What one MW of wind or solar can make in that hour (from real 2025 shapes, scaled to EIA [[capacity-factor|capacity factors]]); nuclear's is a flat 0.911.", you: "Wind averages " + (S.Y.windCF * 100).toFixed(1) + "% over the year, solar " + (S.Y.solarCF * 100).toFixed(1) + "%.", code: "P.wind[h], P.solar[h]" },
         Dm: { name: "D_p,h", label: "D, demand", unit: "MW", words: "Prairie Town's demand in that hour: the real 2025 shape scaled to a 450 MW peak; a typical week is scaled to keep its season's energy.", you: "Peak " + Math.round(S.Y.peak) + " MW.", code: "P.demand[h]" },
         s: { name: "s_p,h", label: "s, battery level within week p", unit: "MWh", words: "The level relative to the week's start; the 85% round trip loses 15% on charging.", you: "4 + 3 plan: " + batText(w7.plan) + " MW / MWh of battery.", code: '"s" + p + "_" + h' },
         S: { name: "S_i", label: "S i, level at the start of calendar week i", unit: "MWh", words: "One per calendar week, 52 in all; the chain runs through the year in calendar order and closes on itself (after Kotzur and co-authors, 2018).", you: "Without it (no link), each week may start full for free.", code: '"W" + i' },
         dl: { name: "Δ_k(i)", label: "delta, net change of the representative week that stands for week i", unit: "MWh", words: "What the battery gained or lost over the representative week k; ℓ and u are its lowest and highest swing within the week.", you: "Cyclic storage forces every Δ to zero.", code: '"s" + k + "_167", "lo" + k, "hi" + k' },
-        e: { name: "e", label: "e, CO2 per MWh of gas output", unit: "t/MWh", words: "Heat rate times 0.05291 t of CO₂ per MMBtu of gas burned: operating CO₂ only, not the life cycle.", you: "Combined-cycle " + C.techs.cc.co2.toFixed(3) + ", peaker " + C.techs.pk.co2.toFixed(3) + ".", code: "C.techs.cc.co2" },
+        e: { name: "e", label: "e, CO2 per MWh of gas output", unit: "t/MWh", words: "[[heat-rate|Heat rate]] (gas burned per MWh made, in [[mmbtu|MMBtu]]) times 0.05291 t of CO₂ per MMBtu: operating CO₂ only, not the life cycle.", you: "Combined-cycle " + C.techs.cc.co2.toFixed(3) + ", peaker " + C.techs.pk.co2.toFixed(3) + ".", code: "C.techs.cc.co2" },
         cap: { name: "cap", label: "the CO2 cap", unit: "t a year", words: "The most CO₂ the plan may emit in a year, as estimated from the weeks.", you: D.cap + " kt; on the full year the 4 + 3 plan emits " + fm.kt(w7.y2025.co2) + ".", code: "{ cap: " + D.cap * 1e3 + " }" }
       }
     });
@@ -521,7 +600,7 @@
         { label: "4 typical weeks", path: ["pick", "solve", "full", "q1", "more"], text: fm.mwh(R.sets.typ4.y2025.unserved) + " unserved in " + fm.hours(R.sets.typ4.y2025.hours) + " of 2025: keep the extreme weeks." },
         { label: "4 + 3 extreme", path: ["pick", "solve", "full", "q1", "more"], text: "Still " + fm.mwh(w7.y2025.unserved) + " unserved in " + fm.hours(w7.y2025.hours) + ": better, not yet good." },
         { label: "12 + 3 weeks", path: ["pick", "solve", "full", "q1", "q2", "tight"], text: "Every hour of 2025 served, but " + fm.kt(R.sets.wk15.y2025.co2) + " against " + D.cap + " kt: tighten the cap in the planning LP, or report the overshoot." },
-        { label: "All 8,760 hours", path: ["pick", "solve", "full", "q1", "q2", "y2", "ad", "rep"], text: "The full-year optimum passes 2025 by construction, yet is short in " + fm.hours(F0.y2024.hours) + " of 2024: only an adequacy study can judge it." }
+        { label: "All 8,760 hours", path: ["pick", "solve", "full", "q1", "q2", "y2", "ad", "rep"], text: "The plan optimal on all of 2025 serves 2025 by construction, yet is short in " + fm.hours(F0.y2024.hours) + " of 2024: only an adequacy study can judge it." }
       ], sel: 1
     });
     var ref = R.full.cost;
@@ -536,7 +615,7 @@
                  cols: { text: r.cols.toLocaleString("en-US"), value: r.cols }, err: { text: fm.spct(r.cost / ref - 1), value: Math.abs(r.cost / ref - 1) },
                  u25: { text: fm.mwh(r.y2025.unserved), value: r.y2025.unserved }, u24: { text: fm.mwh(r.y2024.unserved), value: r.y2024.unserved }, co2: { text: fm.kt(r.y2025.co2), value: r.y2025.co2 } };
       }),
-      sorts: [{ label: "By size", order: ["typ4", "wk7", "typ8", "wk11", "wk15"], note: "Bigger LPs estimate better, but extremes matter more than count: 8 typical weeks do worse than 4 + 3." },
+      sorts: [{ label: "By size", order: ["typ4", "wk7", "typ8", "wk11", "wk15"], note: "These results depend on which weeks are kept; a larger LP alone does not guarantee a better estimate: 8 typical weeks do worse than 4 + 3." },
               { label: "By 2025 shortfall", order: ["wk15", "wk11", "wk7", "typ8", "typ4"], ranked: true, note: "Even the 12 + 3 plan, short in no hour of 2025, is short in " + fm.hours(R.sets.wk15.y2024.hours) + " of 2024." }]
     });
   }

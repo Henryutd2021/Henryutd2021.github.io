@@ -9,7 +9,13 @@
 //   - the reference block of data/m03-capacity-expansion.json: every number re-solved (plans, estimates, the full-year
 //     checks on 2025 and 2024, the full-year optimum, the storage what-if, the real-cost storage agreement)
 //   - every number the page states: the fallback table, Go deeper, myths and quiz, the step cards' fixed text, the
-//     notebook's reference to the same data, the sidecar's glossary terms; scope of the data and script strings
+//     notebook's reference to the same data, the sidecar's glossary terms; scope of the data and script strings, and the
+//     stricter nuclear-and-cost sentence check over the page, steps, sidecar and notebook
+//   - the W2 review's points as fixed (2026-11-03): storage net changes, the spending boundary and the penalty it leaves
+//     out, the quiz's reversed comparison, CO2 against the cap, the notebook's units and own-plan checks, domains, the
+//     symbol key and glossary marks, step text length, LOLE and its source, price years, labels
+//   - the page itself on a stub document (stubdom.js) with a solver that fails, then works: steps 3, 6, 8 and 9 show a
+//     message, clear their busy state, offer "Try again", keep what is solved, and work on the retry
 // Usage (from the site folder):  node _tests/learn/test_m03-capacity-expansion.js [--write]
 //   --write  re-solve and rewrite the reference block first (the full-year optimum takes seconds to a minute)
 "use strict";
@@ -200,11 +206,9 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   onPage(`| ${fm.spct(S7.wk7.y2025.cost / S7.wk7.cost - 1)} on 2025 |`, "the cost gap in the Go deeper table");
   onPage(`| ${fm.mwh(S7.wk7.y2025.unserved)} in ${S7.wk7.y2025.hours} hours |`, "the 4 + 3 shortfall in the Go deeper table");
   onPage(`cut the full-year shortfall from ${fm.mwh(S7.typ4.y2025.unserved).replace(" MWh", "")} to ${fm.mwh(S7.wk7.y2025.unserved)}`, "the explain fallback");
-  onPage(`gives +${((F.cost / S7.wk7.cost - 1) * 100).toFixed(1)}%`, "the quiz's wrong denominator");
   onPage(`−$${((F.cost - S7.wk7.cost) / 1e6).toFixed(2)}M is the gap in dollars`, "the quiz's dollar gap");
   onPage(`<td class="n">${fm.spct(E("wk7"))}</td>`, "numbers to remember: the seven weeks' error");
   onPage(`an LP with ${F.cols.toLocaleString("en-US")} columns solved on all 8,760 hours`, "the full-year LP in the fallback hint");
-  onPage(`${fm.kt(S7.wk7.y2025.co2)} on 2025 and ${fm.kt(S7.wk7.y2024.co2)} on 2024`, "the 4 + 3 plan's CO2 (Go deeper)");
   onPage("$" + D.storage.energyCapex + " per kWh", "the what-if storage cost");
   onPage("keeps its demand energy, and its wind and solar energy to within 0.5%", "the scaling sentence (checked per set above)");
   const ILL = "illustrative what-if", NOT = "not a forecast or a sourced cost";
@@ -213,8 +217,9 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   onPage(`with storage energy at $${D.storage.energyCapex} per kWh: an ${ILL}, ${NOT}.`, "the no-JS fallback's what-if label");
   onPage(`<b>Storage what-if (step 8):</b> battery energy at $${D.storage.energyCapex} per kWh instead of the sourced $${cfg.techs.battery.energyCapex} (lesson 13): an ${ILL}, ${NOT}.`, "the data note's what-if label");
   onPage(`In an ${ILL} with storage energy at $${D.storage.energyCapex} per kWh (${NOT})`, "the myth answer's what-if label");
-  ok(JS.includes("**An " + ILL + ", " + NOT + ":** battery energy at $") && JS.includes("In this " + ILL + ", no link") && JS.includes("at the " + ILL + " storage cost"),
-     "step 8: the note, the result line and the table name label the what-if");
+  ok(JS.includes('["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $"') && JS.includes(" (lesson 13). An " + ILL + ", " + NOT + ".") &&
+     JS.includes("In this " + ILL + ", no link") && JS.includes("at the " + ILL + " storage cost"),
+     "step 8: the what-if line, the result line and the table name label the what-if");
   ok((PAGE.match(/\$20 per kWh/g) || []).length === 3 && (JS.match(/D\.storage\.energyCapex \+ " per kWh/g) || []).length === 1, "the what-if cost appears only where it is labelled (three page places, one step note)");
   onPage("0.05291", "the CO2 factor"); onPage(`${C.techs.cc.co2.toFixed(3)}\\, g`, "the combined-cycle CO2 rate in the algebra");
   onPage(`${peak24.toFixed(0)} MW`, "2024's peak at equal energy");
@@ -233,7 +238,125 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   PAGE.split(/\n/).forEach(s => strs.push(s));
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to|orders? of magnitude/gi, ""))) bad.push(x.slice(0, 120)); }));
   ok(!bad.length, "no sentence pairs nuclear with a risk term: " + bad.join(" | "));
+  // the review's stricter check (finding 4): no prose sentence pairs a nuclear term with plain cost words, in the page
+  // (outside its generated blocks), the step strings, the sidecar and the notebook too
+  const COSTW = /\bcosts?\b|\$|\bprices?\b|cheap|expensive|O&M|\bfuel\b|capital/i;
+  const prose = [PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, ""), SIDE,
+                 ...(JS.match(/"[^"\n]*"/g) || []), ...JSON.parse(NB).cells.map(c => c.source.join(""))];
+  const strict = []; prose.forEach(s => s.split(/(?<=[.;:!?|])\s+|\n/).forEach(x => { if (NUC.test(x) && COSTW.test(x)) strict.push(x.slice(0, 120)); }));
+  ok(!strict.length, "no prose sentence pairs nuclear with a cost word (page, steps, sidecar, notebook): " + strict.join(" | "));
+
+  // ---------------- the review's other points, as fixed (W2 fix, 2026-11-03)
+  const NBtext = JSON.parse(NB).cells.map(c => c.source.join("")).join("\n");
+  // 1: linked and cyclic estimates are close, yet the linked battery moves energy between weeks (the page says so and shows it)
+  const netL = M.netChanges(sol.linked, RWs), netC = M.netChanges(sol.cyclic, RWs), gapLC = (SR.cyclic.cost - SR.linked.cost) / SR.linked.cost;
+  ok(gapLC >= -1e-9 && gapLC < 0.001 && M.largest(netL) > 100 && M.largest(netC) < 1e-6,
+     `step 8: linked and cyclic within 0.1% (${(gapLC * 100).toFixed(4)}%), yet linked moves up to ${Math.round(M.largest(netL))} MWh over one week; cyclic none`);
+  ok(SR.linked.cost < SR.cyclic.cost, "linked is strictly cheaper than cyclic, so its battery must carry energy between some weeks");
+  ok(!/empties and refills/.test(JS) && JS.includes("though the linked battery still moves energy between weeks") && JS.includes("Largest net change of the battery over one representative week"),
+     "step 8 no longer infers storage behaviour from the costs; it states and shows the net changes");
+  ok(/largest net change in one week/.test(NBtext) && /week_net < 1e-6/.test(NBtext), "notebook: prints the largest weekly net change and asserts cyclic's is zero");
+  // speed: step 8 shows each plan's stored full-year run when the plan is the reference plan (it never depends on input)
+  st.modes.forEach(mode => ok(M.samePlan(M.readPlan(S.Cw, RWs, sol[mode], { cap: scap }).plan, SR[mode].plan), `step 8, ${mode}: the solved plan is the reference plan, so the page uses its stored full-year run`));
+  // 2: the spending boundary, and the penalty it leaves out
+  ok(S.C.voll === cfg.unservedPenalty && near(M.penalty(S.C, S7.wk7.y2024), S7.wk7.y2024.unserved * 10000, 1e-6) && fm.musd(M.penalty(S.C, S7.wk7.y2024)) === "$5.9M" && fm.musd(M.penalty(S.C, S7.wk7.y2025)) === "$1.1M",
+     "the shortage penalty left out of the 4 + 3 plan's spending: $1.1M (2025), $5.9M (2024)");
+  ok(JS.includes("Spending: building and running the plants. The re-run enforces no CO₂ cap and does not price unserved demand.") && JS.includes("yearly spending on plants and fuel is within 2%") && !/"Cost: <b>/.test(JS),
+     "the full-year cost is labelled spending, with its boundary, on the verdicts, tables and conclusion cards");
+  onPage("Spending: plants and fuel; no shortage penalty, no cap in the re-run", "the cost gap's boundary (Go deeper)");
+  // 5, 6: the quiz's reversed comparison and the CO2 measure as defined
+  onPage(`+${((F.cost / S7.wk7.cost - 1) * 100).toFixed(1)}% reverses the comparison: the full-year optimum is ${((F.cost / S7.wk7.cost - 1) * 100).toFixed(1)}% above the estimate (${b} ÷ ${a} − 1)`, "the quiz's reversed comparison");
+  onPage(`| ${fm.spct(S7.wk7.y2025.co2 / cap - 1)} on 2025 (${fm.kt(S7.wk7.y2025.co2)}), ${fm.spct(S7.wk7.y2024.co2 / cap - 1)} on 2024 (${fm.kt(S7.wk7.y2024.co2)}) |`, "CO2 against the cap as defined (Go deeper)");
+  // 7, 8: the notebook's units and what it asserts
+  ok(/"MWh" if k == "be" else "MW"/.test(NBtext) && /\(power\) and \{dmwh:\.3f\} MWh \(battery energy\)/.test(NBtext), "notebook: battery energy in MWh-year and MWh, power and energy differences apart");
+  ok(/same_plan\(est\["plan"\], ref\["plan"\]/.test(NBtext) && /read_check\(C, YY, est\["plan"\]/.test(NBtext) && !/read_check\(C, YY, ref\["plan"\]/.test(NBtext) && /same_plan\(fplan, F\["plan"\]/.test(NBtext),
+     "notebook: validates its own plans (sizes asserted against the browser's, then re-run)");
+  ok(!PAGE.includes("check every reference number") && PAGE.includes("Hours short and the largest shortfall are printed, not asserted") && /Printed, not asserted/.test(NBtext), "page and notebook state what is asserted and what is printed");
+  // 9: variable domains
+  onPage("\\text{(domains)}", "the variable domains in the algebra"); onPage("Each step $h$ lasts one hour", "the one-hour step");
+  ok(/\| Domains \|/.test(NBtext), "notebook: the domains row");
+  // 10: the symbol key and the glossary marks
+  ok(JS.includes('"The symbols in the formula"') && ["capacity-factor", "capital-recovery-factor", "fixed-om", "heat-rate", "mmbtu", "capital-cost"].every(t => JS.includes("[[" + t + "|") || PAGE.includes('term="' + t + '"')),
+     "step 1's symbol key; capacity factors, capital recovery, fixed O&M, heat rate and MMBtu marked as glossary terms");
+  // 11: step text budget (one or two sentences, about 35 words) for steps 1 and 8
+  const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
+  ok(stepTexts.length >= 8 && stepTexts.every(t => t.split(/\s+/).length <= 40 && (t.match(/[.?!](\s|$)/g) || []).length <= 3), "step texts: at most three sentences and 40 words each");
+  // 12: LOLE defined, with a dated primary source
+  onPage("https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf", "the PJM Manual 20A link"); onPage("§1.2–1.3 (rev. 3, effective 24 June 2026)", "the LOLE source's sections and date");
+  ok(!/one day of (outage|shortage) in ten years|one-day-in-ten-years/.test(PAGE + JS + SIDE + NBtext) && /id: lole\b/.test(SIDE), "no undefined one-day-in-ten shorthand; the sidecar defines LOLE");
+  // 13: price years stated
+  const batShare = (C.techs.bp.fixed * S7.wk7.plan.bp + C.techs.be.fixed * S7.wk7.plan.be) / S7.wk7.cost;
+  ok(batShare < 0.01, `the battery is under 1% of the seven-week plan's yearly cost (${(batShare * 100).toFixed(2)}%)`);
+  onPage("plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion. The battery is under 1% of the seven-week plan's yearly cost.", "the price years (data note)");
+  // 14, 15: labels
+  ok(JS.includes('"2025 full-year-optimal plan, run on 2024"') && !JS.includes('"Full-year optimum, 2024"') && !JS.includes("Bigger LPs estimate better"), "step 9's label names the plan; the size caption no longer claims bigger is better");
+
+  // ---------------- the page on a stub document: solves that fail (finding 3)
+  // The lesson's own page code runs against _tests/learn/stubdom.js with the real step cards, prediction, status line and
+  // week strip, and a solver that first fails (a time limit) and then solves with the vendored HiGHS. Each step must say
+  // so, clear its busy state, offer "Try again", keep what is solved, and work on the retry.
+  {
+    const { env, load } = require("./stubdom.js");
+    const E = env();
+    E.LX.ready = () => {}; E.LX.progress.guess = () => null;
+    ["solver", "cards", "predict", "cardsort", "weekstrip", "planengine", "profiles"].forEach(n => load(n, E));
+    let failIf = () => true, calls = 0;
+    const slv = E.LX.solver;
+    slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
+    slv.solve = m => { calls++; if (failIf(m)) return Promise.resolve({ status: "time-limit", ok: false, kind: "lp", values: null, ms: { roundTrip: 20000 } });
+                       const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms); return Promise.resolve(r); };
+    let init = null, demo = null;
+    E.LX.mount = (slug, f) => { if (slug === "m03-capacity-expansion") init = f; };
+    E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+    const mctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance,
+                   setTimeout: () => 0, clearTimeout: () => {} };
+    vm.runInNewContext(fs.readFileSync(L("m03-capacity-expansion.js"), "utf8"), mctx);
+    const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "m03-capacity-expansion" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+    const unhandled = []; const onUn = e => unhandled.push(String(e && e.message || e)); process.on("unhandledRejection", onUn);
+    let threw = null;
+    try { init(live, { "13_capstone": cfg, m03_capacity_expansion: D, town_year: year, cf_targets: T, m03_capacity_expansion_2024: Y2raw }, root); } catch (e) { threw = e.message; }
+    ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
+    const flush = () => new Promise(r => setImmediate(r));
+    const card = () => demo.cards.el;
+    const btn = re => card().querySelectorAll("button").filter(b => re.test(b.textContent))[0];
+    const next = () => card().querySelectorAll(".lx-step-foot button").filter(b => /Next/.test(b.textContent))[0];
+    const failBox = () => card().querySelector(".m3-fail");
+    async function failsThenWorks(n, label, start, failWhen, expectRetryCalls, after) {
+      demo.cards.go(n - 1); failIf = failWhen; calls = 0;
+      start(); await flush();
+      const fb = failBox();
+      ok(fb && fb.getAttribute("role") === "alert" && /time limit/.test(fb.textContent) && /Try again/.test(fb.textContent), `${label}: a failed solve shows a plain message and "Try again"`);
+      ok(card().getAttribute("aria-busy") == null && next().disabled, `${label}: the busy state is cleared (Next waits for a result, Back works)`);
+      failIf = () => false; calls = 0;
+      const again = btn(/Try again/);
+      if (!again) { ok(false, `${label}: no "Try again" button, so the retry cannot run`); return; }
+      again.click(); await flush();
+      ok(!failBox() && !next().disabled && (expectRetryCalls == null || calls === expectRetryCalls), `${label}: "Try again" solves${expectRetryCalls != null ? " only what was missing (" + calls + " solves)" : ""} and unlocks Next`);
+      if (after) after();
+    }
+    try {
+    await failsThenWorks(3, "step 3", () => btn(/Solve on 4 typical weeks/).click(), () => true, 1, () => {
+      ok(btn(/Solve on 4 typical weeks/).disabled === false && card().querySelectorAll(".m3-kpi").length === 3, "step 3: the button works again and the result shows");
+    });
+    // step 6: only the 8-week plan fails (6,795 columns); the others are kept, so the retry solves its plan and its check
+    const cols8 = R.sets.typ8.cols;
+    await failsThenWorks(6, "step 6", () => card().querySelectorAll(".lx-choice")[1].click(), m => m.variables.length === cols8, 2, () => {
+      ok(card().querySelectorAll(".m3-tbl tbody tr").length === 5, "step 6: the five sets' table after the retry");
+    });
+    await failsThenWorks(8, "step 8", () => card().querySelectorAll(".lx-choice")[2].click(), () => true, 3, () => {
+      const t = card().textContent;
+      ok(/Largest net change of the battery over one representative week: linked [\d,]+ MWh, cyclic 0 MWh, no link [\d,]+ MWh\./.test(t), "step 8: the net-change line");
+      ok(t.includes("differ by less than 0.1%, though the linked battery still moves energy between weeks: up to " + fm.mwh(M.largest(netL))), "step 8: the result sentence, with the linked net change");
+    });
+    await failsThenWorks(9, "step 9", () => btn(/Run on 2024/).click(), () => true, 1, () => {
+      ok(card().textContent.includes("2025 full-year-optimal plan, run on 2024"), "step 9: the table names the 2025 plan run on 2024");
+    });
+    await flush();
+    } catch (e) { ok(false, "the stub page test threw: " + (e && e.message || e)); }
+    process.removeListener("unhandledRejection", onUn);
+    ok(!unhandled.length, "no unhandled promise rejection on the page: " + unhandled.join(" | "));
+  }
 
   console.log(`test_m03-capacity-expansion: ${checks - fails}/${checks} checks passed`);
   process.exit(fails ? 1 : 0);
-})();
+})().catch(e => { console.log("FAIL: the test threw:", e && e.stack || e); process.exit(1); });

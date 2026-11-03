@@ -7,7 +7,10 @@ glossary:
     def: "How many hours of the year one modelled hour of a representative period stands for; a model multiplies that hour's running cost and emissions by it."
   - id: resource-adequacy
     term: Resource adequacy
-    def: "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a standard such as one day of shortage in ten years."
+    def: "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation."
+  - id: lole
+    term: Loss-of-load expectation (LOLE)
+    def: "The expected number of days a year on which supply falls short of demand at least once, of any size or length, averaged over many simulated years; an expectation, not a count of real outages."
   - id: medoid
     term: Medoid
     def: "The member of a group whose total distance to the other members is smallest; unlike an average, it is a real member."
@@ -16,3 +19,5 @@ requests:
   - "Promote candidates: (1) link(model, RW, mode) in m03-capacity-expansion.js (linked / cyclic / no link between representative periods) and readCheck/errors (full-year re-dispatch and error measures) belong in the planning engine; (2) WeekStrip, a 52-week calendar strip coloured by representative period with shortfall marks and a text version (M13 and C2 can reuse it)."
   - "Solver benchmark: add the M3 instances to lessonSet in _tests/learn/solver_models.js (the snippet used for the W2 benchmark is in the builder report): m3typ4, m3typ8, m3wk11, m3link, m3cyc, m3free, m3y24."
   - "New data builder in the ResearchPortfolio folder: scripts/build_learn_m03_weather_year.py (imports the cleaning rules of build_learn_town_data.py) wrote assets/learn/data/m03-capacity-expansion-2024.json from EIA-930's 2024 six-month files; please commit it with the W2 merge."
+  - "W2 fix (2026-11-03), for the coordinator: 13-capstone.json mixes price years (plant costs and gas in 2025 dollars, battery in 2024 dollars, added unconverted). M3 now labels this; converting to one year changes lessons 12, 13 and M3 (re-run test_13-capstone.js --write, then node _tests/learn/test_m03-capacity-expansion.js --write)."
+  - "W2 fix (2026-11-03), for the coordinator: 13-capstone.json line 2 ('about'): the M3 review (finding 4) asks to split its last sentence, which names a technology together with cost words."
