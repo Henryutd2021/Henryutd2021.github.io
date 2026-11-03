@@ -1,9 +1,15 @@
 # Sidecar of research studio R1 (r01-framing), builder learn-w2-f, 2026-11-03: new glossary terms and requests for shared files.
+# Provenance of assets/learn/data/r01-framing.json (kept here, out of the public data file since the 2026-11-03 review):
+# written by hand for curriculum v2 §11 (R1); question types and templates from §11.2; rubric from §3.4
+# (assets/learn/components/rubric.js).
 lesson: R1
 glossary:
   - {id: question-type, term: "Question type", def: "The kind of answer a research question asks for: descriptive, explanatory, evaluative, predictive or prescriptive."}
   - {id: falsification-statement, term: "Falsification statement", def: "A sentence naming the result that would show your expected answer wrong."}
   - {id: energy-burden, term: "Energy burden", def: "The share of a household's income spent on home energy bills."}
+  - {id: co-op, term: "Co-op (electric cooperative)", def: "An electric utility owned by the members it serves, common in rural areas."}
+  - {id: time-of-use-tariff, term: "Time-of-use tariff", def: "An electricity price that changes with the hour of the day, usually higher in the evening peak."}
+  - {id: substation, term: "Substation", def: "A site where transformers lower the voltage from transmission lines for the feeders that serve customers."}
 requests:
   - "path.yml: R1's prerequisites are T13 and A22 (curriculum v2 §7.6). A22 has no code on this branch, so R1 lists after: [13]; add A22 at the merge."
   - "Researcher tier: path.yml still has status: upcoming on the tier. With R1, R3 and R10 (and the other W2 studios) live, set it active, or decide how live studios show in an upcoming tier."

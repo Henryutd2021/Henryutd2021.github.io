@@ -649,7 +649,7 @@
   minutes: 40
   practice_minutes: 60
   title: "What could you study? The question studio"
-  subtitle: "Pick or spin a scale, a system element, a lever and the people involved, then write a question that passes the checks"
+  subtitle: "Pick or spin a scale, a system element, a lever and the people involved, then write a question and put it through the checks"
   short: "The question studio"
   teaches: [generating research questions, question types, rigour checks, realism checks, search strings for open databases]
   does: "Pick or spin scale, dimension, system element, stakeholder and lever (plus an optional twist); choose a question type; write the question; run rigour and realism checks and a literature-search prompt; save a question card."

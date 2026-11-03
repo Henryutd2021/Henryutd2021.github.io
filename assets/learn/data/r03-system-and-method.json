@@ -3,7 +3,6 @@
     "title": "R3 research studio: which system, which boundary, which method? Briefs, method families, scales and exemplars",
     "version": "r3-v1",
     "as_of": "2026-11-03",
-    "built_by": "by hand for curriculum v2 §11 (R3), §5.3 (what a scale is) and §11.2 (question types and typical methods); rubric from §3.4 (assets/learn/components/rubric.js)",
     "note": "The three briefs, Prairie Campus, Prairie City, the Plains Grid and the exemplars are illustrative. The fit notes are judgements for teaching, not rules: several families can answer one question.",
     "license": "CC BY 4.0"
   },
@@ -11,8 +10,8 @@
     { "id": "opt", "label": "Optimization", "types": ["prescriptive"],
       "answers": "What is the best choice under stated rules and goals?",
       "needs": "Decisions, a goal, rules (constraints) and their data.",
-      "tools": "LP and MILP solvers such as HiGHS, with Pyomo, JuMP or PyPSA",
-      "limit": "Best only inside the model: it takes the stated goal and, usually, perfect foresight." },
+      "tools": "Solvers for linear programs (LP) and mixed-integer programs (MILP), such as HiGHS, with Pyomo, JuMP or PyPSA",
+      "limit": "Best only inside the model, for its stated goal; a full-horizon run also assumes [[perfect-foresight|perfect foresight]], unless built to decide step by step (a rolling horizon)." },
     { "id": "sim", "label": "Simulation", "types": ["predictive", "explanatory"],
       "answers": "What happens when the system runs by given rules, under given conditions?",
       "needs": "Operating rules, inputs over time and the designs to test.",
@@ -27,7 +26,7 @@
       "answers": "What will the next value be, or which pattern is this?",
       "needs": "Many examples, honest baselines and data held back for testing.",
       "tools": "scikit-learn, PyTorch",
-      "limit": "It predicts within the range of its training data and explains little about why." },
+      "limit": "Least reliable outside the range of its training data, and it explains little about why." },
     { "id": "sd", "label": "System dynamics", "types": ["explanatory", "predictive"],
       "answers": "How do stocks, flows and feedback shape a trend over years?",
       "needs": "A causal-loop structure and parameters for each flow.",
@@ -42,7 +41,7 @@
       "answers": "Where do prices and quantities settle when many markets or players interact?",
       "needs": "Supply and demand, market rules and how players respond to prices.",
       "tools": "Complementarity models in Pyomo or GAMS",
-      "limit": "It describes a settled state, not the path to it, and simplifies how players behave." },
+      "limit": "Static versions describe a settled state, not the path to it; most simplify how players behave." },
     { "id": "qual", "label": "Qualitative methods", "types": ["explanatory", "evaluative"],
       "answers": "How and why do people and institutions decide as they do?",
       "needs": "Interviews, documents or cases, with consent and a plan for the analysis.",
@@ -63,14 +62,15 @@
     { "id": "S4", "name": "Nation", "decides": "targets, policy instruments, infrastructure, security stocks, trade", "who": "national governments and regulators", "step": "representative hours to a year", "horizon": "decades" }
   ],
   "bins": [
-    { "id": "inside", "label": "Inside", "sub": "the study decides or computes it", "color": "var(--lx-good)" },
-    { "id": "given", "label": "Given", "sub": "a fixed input from outside", "color": "var(--lx-tier-2)" },
-    { "id": "out", "label": "Left out", "sub": "stated as a limit", "color": "var(--lx-warn)" }
+    { "id": "inside", "label": "Decided or computed", "sub": "in the study: it decides or computes these", "color": "var(--lx-good)" },
+    { "id": "given", "label": "Fixed inputs", "sub": "in the study: used, but not changed by it", "color": "var(--lx-tier-2)" },
+    { "id": "out", "label": "Left out", "sub": "outside the study: stated as a limit", "color": "var(--lx-warn)" }
   ],
   "briefs": [
     { "id": "hospital", "short": "Keep the hospital running", "scale": "S1", "type": "prescriptive",
       "question": "What sizes of solar, battery and backup generator keep Prairie Campus's hospital supplied through a three-day winter outage at the lowest 20-year cost, compared with today's diesel generator alone?",
       "scaleWhy": "S1: one campus that can run on its own, sized by its owner under the utility's rules. The tariff and the feeder's limits come from the regional grid above.",
+      "assume": "Assumed: the switch to running alone ([[islanding|islanding]]) works. The study checks whether there is enough energy, not the switch itself.",
       "boundary": [
         { "id": "a1", "text": "Sizes of solar, battery and generator", "bin": "inside", "why": "These are the decisions the study makes." },
         { "id": "a2", "text": "The hospital's critical load, hour by hour", "bin": "given", "why": "A measured or estimated input; the study does not change it." },
@@ -82,8 +82,8 @@
         { "id": "a8", "text": "Who owns the system and who pays for it", "bin": "out", "why": "A separate question about ownership, noted as a limit of the cost result." }
       ],
       "steps": [
-        { "id": "1s", "label": "1 second", "fit": "poor", "why": "Seconds matter for protection and stability: a different study." },
-        { "id": "5m", "label": "5 minutes", "fit": "part", "why": "Finer than sizing needs; useful later to check the switch to running alone." },
+        { "id": "1s", "label": "1 second", "fit": "poor", "why": "Seconds matter for switching, protection and stability: a separate study, which this one assumes succeeds." },
+        { "id": "5m", "label": "5 minutes", "fit": "part", "why": "Useful for checking short-term operating schedules; switching and stability need a separate, faster study." },
         { "id": "1h", "label": "1 hour", "fit": "good", "why": "Hourly steps follow solar's daily cycle and the battery's charge." },
         { "id": "1d", "label": "1 day", "fit": "poor", "why": "A daily step hides the night, when the battery must carry the load." },
         { "id": "1y", "label": "1 year", "fit": "poor", "why": "A yearly total cannot show whether the lights stay on in hour 40." }
@@ -95,7 +95,7 @@
         { "id": "life", "label": "20 years, hour by hour", "fit": "part", "why": "Complete, but much larger than needed if the years repeat." }
       ],
       "fits": {
-        "opt": ["good", "A sizing model (LP or MILP) finds the cheapest mix that keeps the critical load served."],
+        "opt": ["good", "A sizing model (a [[linear-program|linear]] or [[mixed-integer-program|mixed-integer]] program) finds the cheapest mix that keeps the critical load served."],
         "sim": ["good", "Simulate candidate designs hour by hour through the outage; it compares the designs you supply."],
         "stat": ["part", "Past outage records can set the outage cases, but cannot choose the sizes."],
         "ml": ["poor", "Nothing here needs a pattern learned from many examples."],
@@ -105,8 +105,13 @@
         "qual": ["part", "Interviews with hospital staff can set which loads are critical."],
         "mixed": ["good", "A sizing model plus interviews that define the critical load."]
       },
-      "defence": { "method": "opt", "same": "an LP with continuous sizes", "other": "sim",
-        "text": "I chose a sizing MILP with hourly steps, a typical year plus a three-day outage, over an LP with continuous sizes, because the generator has a minimum load and comes in whole units. I chose it over a simulation of candidate designs, because the question asks for the cheapest mix, not a ranking of mixes I already have. Its main limit is perfect foresight during the outage; I test the chosen design afterwards in a rule-based simulation that does not know the future." } },
+      "defence": { "method": "opt", "same": "a [[linear-program|linear program]] (LP) with continuous sizes", "other": "sim",
+        "choice": "A sizing [[mixed-integer-program|mixed-integer program]] (MILP) that picks the cheapest sizes keeping the critical load served.",
+        "resolution": "Hourly steps over a typical year, plus a three-day winter outage.",
+        "alt1": "The generator has a minimum load and comes in whole units, which only whole-number decisions capture.",
+        "alt2": "The question asks for the cheapest mix, not a ranking of mixes I already have; a simulation still checks the chosen design.",
+        "limit": "[[perfect-foresight|Perfect foresight]] during the outage: the model knows the coming weather.",
+        "check": "Test the chosen design in a rule-based simulation that does not know the future." } },
     { "id": "rebate", "short": "Did the rebate reach low-income homes?", "scale": "S3", "type": "evaluative",
       "question": "Did Prairie City's 2023 heat-pump rebate raise installations in its low-income neighbourhoods, compared with similar neighbourhoods in cities without a rebate?",
       "scaleWhy": "S3: a city programme, set by the council with local money and rules. Federal incentives come from the nation above; the homes below act on them.",
@@ -115,7 +120,7 @@
         { "id": "b2", "text": "The choice of comparison neighbourhoods", "bin": "inside", "why": "A design decision of the study, and the one that matters most." },
         { "id": "b3", "text": "The rebate's rules, amount and start date", "bin": "given", "why": "Fixed facts of the programme." },
         { "id": "b4", "text": "Neighbourhood income and housing data from the census", "bin": "given", "why": "Input data, used to match similar neighbourhoods." },
-        { "id": "b5", "text": "Federal tax credits available everywhere", "bin": "given", "why": "The same in every city, so the comparison removes them." },
+        { "id": "b5", "text": "Federal tax credits available everywhere", "bin": "given", "why": "Assumed to affect both groups alike; check eligibility and other policies that could shift their trends differently." },
         { "id": "b6", "text": "Whether the heat pumps lowered bills", "bin": "out", "why": "A different question, for a later study." },
         { "id": "b7", "text": "Installers' waiting lists", "bin": "out", "why": "Left out and stated: they may have limited uptake." },
         { "id": "b8", "text": "Grid upgrades for the new heating load", "bin": "out", "why": "Outside a question about uptake." }
@@ -144,10 +149,16 @@
         "mixed": ["good", "The comparison says how much; interviews say why."]
       },
       "defence": { "method": "stat", "same": "a before-and-after count in Prairie City alone", "other": "abm",
-        "text": "I chose a difference-in-differences comparison, with monthly installations by neighbourhood from 2019 to 2025, over a before-and-after count in Prairie City alone, because prices and federal credits changed everywhere at once. I chose it over an agent-based adoption model, because that model would assume how households respond, which is what this study must measure. Its main limit is the assumption that both groups would have moved in parallel without the rebate; I check their trends before 2023 and repeat the comparison with a second group." } },
+        "choice": "A [[difference-in-differences|difference-in-differences]] comparison of installations in low-income neighbourhoods.",
+        "resolution": "Monthly installations by neighbourhood, 2019 to 2025.",
+        "alt1": "Prices and federal credits changed everywhere at once, so a before-and-after count mixes them with the rebate.",
+        "alt2": "It would assume how households respond, which is what this study must measure.",
+        "limit": "It assumes both groups would have moved in parallel without the rebate.",
+        "check": "Compare their trends before 2023, and repeat with a second comparison group." } },
     { "id": "flexload", "short": "A large load that can pause", "scale": "S2", "type": "predictive",
-      "question": "How would a 300 MW load that can pause for up to four hours during scarcity change the Plains Grid's expected unserved energy in a heat-wave year, compared with the same load running flat?",
-      "scaleWhy": "S2: adequacy belongs to the whole synchronous grid and its operator. The load itself, at the device and plant scale, only decides when it pauses.",
+      "question": "How would a 300 MW load that can pause for up to four hours during scarcity change the Plains Grid's [[expected-unserved-energy|expected unserved energy]] in a heat-wave year, compared with the same load running flat?",
+      "scaleWhy": "S2: [[resource-adequacy|adequacy]] is planned for a region, such as a market operator's or a utility's planning area, with its transfer limits and assumptions about its neighbours. The load only decides when it pauses.",
+      "assume": "Pausing rule (illustrative): up to four hours in a row per event, at most ten events a year, and paused work is not made up later. Paused energy is counted apart from unserved energy.",
       "boundary": [
         { "id": "c1", "text": "When the load pauses, hour by hour", "bin": "inside", "why": "Set inside the study by a pausing rule." },
         { "id": "c2", "text": "Random generator outages", "bin": "inside", "why": "Drawn many times by the study, to give a range." },
@@ -182,7 +193,12 @@
         "mixed": ["part", "A simulation, with operator interviews to set the pausing rules."]
       },
       "defence": { "method": "sim", "same": "a check of the single worst hour", "other": "opt",
-        "text": "I chose a Monte Carlo adequacy simulation, a heat-wave year with hourly steps run many times, over a check of the single worst hour, because the question asks how often and how much, not only whether. I chose it over a capacity-expansion optimization, because the question keeps today's plants and asks for a risk, not a plan. Its main limit is that outages are drawn independently, while a heat wave can cause several at once; I add a run with linked outages as a sensitivity." } }
+        "choice": "A [[monte-carlo|Monte Carlo]] adequacy simulation that runs the heat-wave year many times with random outages.",
+        "resolution": "Hourly steps; one year, run many times.",
+        "alt1": "The question asks how often and how much, not only whether.",
+        "alt2": "The question keeps today's plants and asks for a risk, not a plan.",
+        "limit": "Outages are drawn independently, while a heat wave can cause several at once.",
+        "check": "Add a run with linked outages as a sensitivity." } }
   ],
   "rubric": {
     "id": "r3-rubric",
@@ -192,7 +208,7 @@
     "competences": [
       {
         "id": "framing",
-        "look": "the scale and the boundary are stated, including what is left out."
+        "look": "the scale and the three boundary lists are stated; the rest of Framing (audience, metric with units, counterfactual, falsification) comes from your R1 card."
       },
       {
         "id": "method",
@@ -205,40 +221,46 @@
     "id": "r3-ex",
     "title": "Two method defences for the same question",
     "task": "Defend a method for: “How sensitive is a national storage build-out to a one-year disruption of one mineral, and which design choices reduce the risk?”",
+    "lines": true,
     "answers": [
       { "key": "weak", "label": "Weak answer", "level": "Developing",
         "parts": [
-          "I will use ",
+          "Method: ",
           { "text": "capacity-expansion optimization", "note": "A family is named, but nothing says why it fits a question about sensitivity and risk." },
-          " because it is ",
-          { "text": "the standard tool for national planning", "note": "Chosen by habit: the rubric's Developing anchor for method fit." },
-          " and it ",
-          { "text": "gives the optimal answer", "note": "Optimal only inside the model's assumptions, and one run gives no range." },
-          ". It will cover ",
-          { "text": "the whole country", "note": "A scale, but no boundary, time step or horizon." },
-          "."
+          "\nWhy: ",
+          { "text": "it is the standard tool for national planning", "note": "Chosen by habit: the rubric's Developing anchor for method fit." },
+          "\nResult: ",
+          { "text": "it gives the optimal answer", "note": "Optimal only inside the model's assumptions, and one run gives no range." },
+          "\nCovers: ",
+          { "text": "the whole country", "note": "A scale, but no boundary, time step or horizon." }
         ] },
-      { "key": "good", "label": "Strong answer", "level": "Strong",
+      { "key": "good", "label": "Strong answer", "level": "Strong on method fit",
         "parts": [
-          "A predictive question at the national scale. I will run a capacity-expansion model (optimization) ",
-          { "text": "under many disruption cases drawn at random", "note": "Matches the question: “how sensitive” needs a range, not one plan." },
-          ", with ",
-          { "text": "yearly steps to 2040 and representative hours inside each year", "note": "Time step and horizon stated, matched to a build-out over years." },
-          ". I chose it over ",
-          { "text": "a single run with expected prices", "note": "Alternative one: a simpler version of the same family, rejected for a reason." },
-          ", which hides the risk the question asks about, and over ",
-          { "text": "a system-dynamics model of mineral supply", "note": "Alternative two, from another family: what the Proficient anchor asks for." },
-          ", which would capture market feedback but not the grid's hourly needs. ",
-          { "text": "Its main limit is perfect foresight inside each case", "note": "The limit stated and partly mitigated: the Strong anchor." },
-          "; I reduce it by fixing early builds before the disruption is known."
+          "Reading: ",
+          { "text": "a conditional planning study: how do model-optimal storage plans change across disruption cases?", "note": "Says what an optimization can answer here: the best plan under each case, not a forecast of what will be built." },
+          "\nScale and boundary: S4; ",
+          { "text": "the national power system's builds and hourly operation; mineral supply enters as given disruption cases; recycling left out", "note": "The three boundary lists: what is decided or computed, what is fixed and what is left out." },
+          "\nMethod: a capacity-expansion model (optimization), ",
+          { "text": "run under many disruption cases drawn at random", "note": "Matches the question: “how sensitive” needs a range, not one plan." },
+          "\nTime step and horizon: ",
+          { "text": "yearly steps to 2040, representative hours inside each year", "note": "Time step and horizon stated, matched to a build-out over years." },
+          "\nAlternative 1: ",
+          { "text": "a single run with expected prices", "note": "A simpler version of the same family, rejected for a reason." },
+          "; it hides the risk the question asks about\nAlternative 2: ",
+          { "text": "a system-dynamics model of mineral supply", "note": "Another family, rejected for a reason: what the Proficient anchor asks for." },
+          "; it captures market feedback, not the grid's hourly needs\nMain limit: ",
+          { "text": "perfect foresight inside each case; the results are model-optimal plans, not predicted deployment", "note": "The limit stated, with what the results do and do not mean." },
+          "\nReduced by: ",
+          { "text": "fixing early builds before the disruption is known", "note": "The limit partly mitigated: the Strong anchor for method fit." }
         ] }
     ],
     "diff": [
-      { "label": "Why this family", "weak": "Habit", "good": "Tied to the question type" },
+      { "label": "Why this family", "weak": "Habit", "good": "Tied to what the question asks" },
+      { "label": "Boundary", "weak": "“The whole country”", "good": "Decided, fixed and left out" },
       { "label": "Time step and horizon", "weak": "Not stated", "good": "Yearly to 2040, representative hours" },
       { "label": "Alternatives", "weak": "None", "good": "One in the family, one from another" },
-      { "label": "Limit", "weak": "None", "good": "Stated, with a way to reduce it" }
+      { "label": "Limit", "weak": "None", "good": "Stated, what results mean, partly reduced" }
     ],
-    "note": "Both defences are illustrative. Either family could have been defended well; what moves the level is the reasoning, not the family."
+    "note": "Both defences are illustrative, and “Strong” rates method fit only. Either family could be defended well: the reasoning moves the level, not the family."
   }
 }
