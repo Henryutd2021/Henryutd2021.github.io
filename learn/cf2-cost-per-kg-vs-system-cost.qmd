@@ -126,7 +126,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 
 - In a sizing model, each size is a [decision variable]{.lx-term term="decision-variable"}; each hour adds an energy balance and limits. [Lesson 10](10-write-it-down.html) writes a small model like this down.
 - Yes-or-no choices, such as whether to build a unit at all, make it a [mixed-integer program]{.lx-term term="mixed-integer-program"}, solved as in [lesson 11](11-solver.html).
-- Storage and coupled carriers, modelling power, hydrogen and heat together (M4, upcoming in the Modeler tier), builds such a model step by step.
+- [M4](m04-storage-multienergy.html) (storage and coupled carriers, in the Modeler tier) builds such a model step by step.
 
 ```{=html}
 </div>

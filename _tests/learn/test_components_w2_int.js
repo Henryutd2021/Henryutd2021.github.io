@@ -116,7 +116,7 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
     ok(ld.timeRequired === "PT" + (data.minutes + (lm || 0) + (pm || 0)) + "M", `${l.id}: timeRequired ${ld.timeRequired} = guided + lab + practice`);
     if (lm) labs.push(l.id);
   });
-  ok(labs.join() === "m02-unit-commitment,m03-capacity-expansion", `the lab time shows on M2 and M3 (${labs.join(", ")})`);
+  ok(labs.join() === "m02-unit-commitment,m03-capacity-expansion,m04-storage-multienergy", `the lab time shows on M2, M3 and M4 (${labs.join(", ")})`);
   ok(n >= 20, `practice badges checked on ${n} pages; 120 minutes and more read in hours`);
   ok(rd("teaching.qmd").indexOf(all.length + " lessons live; more coming") > 0, `Teaching card: ${all.length} lessons live, as in path.json`);
 }
