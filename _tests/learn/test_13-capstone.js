@@ -239,6 +239,10 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   const strs = []; (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") Object.values(o).forEach(walk); })(cfg);
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to/gi, ""))) bad.push(x); }));
   ok(!bad.length, "no data sentence pairs nuclear with a risk term: " + bad.join(" | "));
+  // the data file's `about`: constant costs and the reader-set nuclear capital cost are separate sentences (shared fix 8)
+  const aboutS = cfg.about.split(/(?<=[.!?])\s+/);
+  ok(aboutS.indexOf("Technology costs are constant for the whole year modelled (no change over time).") >= 0 && aboutS.indexOf("The reader can change two inputs: the gas price and the nuclear capital cost.") >= 0 &&
+     !aboutS.some(x => NUC.test(x) && /constant|over time/i.test(x)), "about: constant costs and the reader's nuclear capital cost in separate sentences");
   // the constant nuclear output is labelled a simplification wherever it is used
   onPage("a constant 91.1% of its size every hour", "the constant nuclear output, labelled");
   ok(JS.indexOf("modelled as a constant ") > 0 && JS.indexOf("which cannot show reliability") > 0, "the slider hint and the boundary card call constant nuclear output a simplification");

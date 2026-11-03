@@ -1,5 +1,5 @@
 {
- "about": "Lesson 13 (What should Prairie Town build?) and lesson 12 (Cheap or clean?): the planning model's inputs. Prairie Town is fictional; its demand, wind and solar follow the real 2025 hourly shapes of the Southwest Power Pool grid (town_year.json, EIA-930). Demand = shape x 450 MW (lesson 0's scale). Wind and solar output per MW built = LX.townProfile('scale') scaled to EIA's 2025 U.S. capacity factors (cf_targets.json). Technology costs are constant for the whole year modelled (no change over time); only the gas price and the nuclear capital cost can be changed by the reader.",
+ "about": "Lesson 13 (What should Prairie Town build?) and lesson 12 (Cheap or clean?): the planning model's inputs. Prairie Town is fictional; its demand, wind and solar follow the real 2025 hourly shapes of the Southwest Power Pool grid (town_year.json, EIA-930). Demand = shape x 450 MW (lesson 0's scale). Wind and solar output per MW built = LX.townProfile('scale') scaled to EIA's 2025 U.S. capacity factors (cf_targets.json). Technology costs are constant for the whole year modelled (no change over time). The reader can change two inputs: the gas price and the nuclear capital cost.",
  "accessed": "2026-11-02",
  "town": {
   "demandPeakMW": 450,
