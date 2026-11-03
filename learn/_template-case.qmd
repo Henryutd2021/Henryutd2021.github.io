@@ -3,7 +3,7 @@
 # sentence), later `git mv` to learn/<id>.qmd; title and subtitle must equal learn/path.yml.
 title: "A case-file question a learner would type into a search box?"
 subtitle: "What the reader finds out in this case file"
-description: "Case file CF<n> of Energy Systems, Step by Step: one sentence on the puzzle and what a published study found, within its stated limits (for search and sharing)."
+description: "Case file CF<n> of Energy Systems, Step by Step: the puzzle and what the reader finds out, in one sentence (for search and sharing). Any wording about the study is approved excerpt wording, word for word."
 page-layout: full
 toc: false
 title-block-banner: false
@@ -18,6 +18,9 @@ body-classes: "page-learn page-lesson lx-form-case"
      Research page. Mark every excerpt with its source key, <blockquote class="lx-excerpt" data-source="excerpt:<key>">, and
      list each sentence with its source in reports/learn/excerpts_for_approval.md; the scope scan fails on a key that is not
      approved. No list of open questions.
+     Wording: every sentence about the study, the front matter's description included, is approved excerpt wording, word
+     for word; anything else describes the course's own content (the puzzle, the toy), never the study. "Allow-listed" is
+     the course's internal term: on the page a repository is "open code".
      Drafting: keep this page in learn/_drafts/ (Quarto does not render it; the build fills its blocks and checks it; the
      scope scan reads its source) and its path.yml status `upcoming` until Henry approves. Write links for the page's live
      place (learn/<id>.html): ../assets/..., index.html, 03-balancing.html.
@@ -103,9 +106,9 @@ The lesson that teaches the method (a link to its page, or "upcoming"), and one 
 <div class="lx-card lx-case-try">
 <p class="lx-eyebrow">Try it yourself</p>
 <ul>
-<li>One toy variation to run with the repository, and what to look at (a command such as <code>python run.py --case toy</code> wraps on phones).</li>
+<li>One toy variation to run with the open code, and what to look at (a command such as <code>python run.py --case toy</code> wraps on phones).</li>
 </ul>
-<p><a href="https://github.com/Henryutd2021/<allow-listed repo>">The repository</a> (an allow-listed public repository).</p>
+<p><a href="https://github.com/Henryutd2021/<repo>">&lt;repo&gt;</a>: open code · its licence · synthetic or illustrative data.</p>
 </div>
 ```
 :::
