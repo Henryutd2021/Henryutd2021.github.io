@@ -1595,6 +1595,12 @@
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },
+ "rolling-horizon": {
+  "term": "Rolling horizon",
+  "short": "Planning over a window ahead on a forecast, carrying out only the first hours of the plan, then planning again as the real values arrive.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
+ },
  "round-trip-efficiency": {
   "term": "Round-trip efficiency",
   "short": "The share of the energy put into storage that comes back out.",

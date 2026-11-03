@@ -160,7 +160,22 @@ function lessonSet(site) {
     ["m3y24", "M3 check on 2024, 7-week plan", M13.fullYearModel(S3.C, S3.Y2, { plan: R3.sets.wk7.plan })],
     ["a22plan", "A22 slider re-solve, full year", M13.fullYearModel(C, Y, { plan: a22p })],
     ["a22lim", "A22 limits LP, seven weeks", A22.limitModel(M13, C, null, RW, { co2: DA.limits.co2.start * 1e3, gas: DA.limits.gas.start / 100, fair: DA.limits.fair.start / 100, tariff: "graded" }, DD)],
-  ];
+  ].concat(e1Set(A, J));
+}
+// engine E1 (SB1, C1, M5; W3): the sizing MILP for the storm and for three outages, the year LP, and the outage check
+// MILP (whole sets, 30% minimum) for the sized plan and for F7's campus; absent on branches without the engine
+function e1Set(A, J) {
+  const fs = require("fs");
+  if (!fs.existsSync(A("components/engine-e1.js")) || !fs.existsSync(A("data/e1-prairie-campus.json"))) return [];
+  const E1 = require(A("components/engine-e1.js")), P = E1.prepare(J("e1-prairie-campus.json"));
+  const def = { pv: 600, bat: 2000, gen: 2, fuel: 675, ph: "must", pw: "must", pd: "keep", pl: "shed", out: ["jan3"], exp: 500, imp: 2000, tar: "tou", own: "community", allow: ["pv", "bat", "gen"] };
+  const sized = Object.assign({}, def, { pv: 2625, bat: 3650, gen: 1 }), three = ["jan3", "eve1", "jul3"].map(i => P.scen[i]);
+  return [
+    ["e1size", "E1 sizing MILP, the storm", E1.sizeModel(def, P, [P.scen.jan3])],
+    ["e1size3", "E1 sizing MILP, 3 outages, 650 kW", E1.sizeModel(Object.assign({}, def, { pd: "must" }), P, three)],
+    ["e1year", "E1 year LP, 12 average days", E1.yearModel(sized, P)],
+    ["e1out", "E1 outage check MILP, sized plan", E1.outageModel(sized, P, P.scen.jan3)],
+    ["e1outf7", "E1 outage check MILP, F7's campus", E1.outageModel(def, P, P.scen.jan3)]];
 }
 
 module.exports = { dispatch3, dispatch24, storage168, uc24, lessonSet };

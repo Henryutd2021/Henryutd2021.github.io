@@ -35,7 +35,7 @@ const CORE = require(L("components/core.js"));
   ok(JSON.stringify(CORE.lessonRef(P, 3)) === JSON.stringify({ href: "03-balancing.html", ready: true, label: "lesson 3" }), "lessonRef: a starter lesson by number");
   ok(live.every(l => { const r = CORE.lessonRef(P, l.code); return r.ready && r.href === l.href && r.label === l.code; }), `lessonRef: every live code (${live.length}) links to its page`);
   ok(soon.length > 0 && soon.every(l => !CORE.lessonRef(P, l.code).ready), `lessonRef: every upcoming code (${soon.length}) is not ready`);
-  ok(CORE.lessonRefHTML(P, "R2") === '<a href="r02-literature.html">R2</a>' && CORE.lessonRefHTML(P, "M5") === "M5 (upcoming)" && CORE.lessonRefHTML(P, 0) === '<a href="00-grid-operator.html">lesson 0</a>',
+  ok(CORE.lessonRefHTML(P, "R2") === '<a href="r02-literature.html">R2</a>' && CORE.lessonRefHTML(P, "M8") === "M8 (upcoming)" && CORE.lessonRefHTML(P, 0) === '<a href="00-grid-operator.html">lesson 0</a>',
     "lessonRefHTML: a link when live, the label and (upcoming) otherwise");
   ok(JSON.stringify(CORE.lessonRef(null, "R2")) === JSON.stringify({ href: null, ready: false, label: "R2" }) && CORE.lessonRef(P, "Z9").ready === false && CORE.lessonRefHTML(undefined, 7) === "lesson 7 (upcoming)",
     "lessonRef: without path.json, or for an unknown code, nothing is linked");
@@ -55,9 +55,9 @@ const F1 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")), R3 = JSON.p
 {
   ok(["S0", "S1", "S2", "S3", "S4"].map(SS.scaleIndex).join() === "0,1,2,3,4" && SS.scaleIndex("S5") === -1 && SS.scaleIndex("x") === -1, "scaleIndex: S0 to S4");
   ok(SS.colorOf({ id: "S3" }) === "var(--lx-scale-3)" && SS.colorOf({ id: "S3" }, "var(--lx-tier-4)") === "var(--lx-tier-4)" && SS.colorOf({ id: "Q" }) === "var(--lx-ink-3)", "colorOf: the scale's token, or one colour for all");
-  const lp = SS.lessonParts([{ code: 1 }, { code: "M2", note: "unit commitment" }, { code: "M5", note: "a microgrid" }, { code: "C4" }, { href: "x.html", label: "X" }], P, CORE.lessonRef);
+  const lp = SS.lessonParts([{ code: 1 }, { code: "M2", note: "unit commitment" }, { code: "M8", note: "decisions under uncertainty" }, { code: "C4" }, { href: "x.html", label: "X" }], P, CORE.lessonRef);
   ok(JSON.stringify(lp.live) === JSON.stringify([{ href: "01-power-energy.html", label: "lesson 1" }, { href: "m02-unit-commitment.html", label: "M2" }, { href: "x.html", label: "X" }]) &&
-     lp.upcoming.join("|") === "M5 (a microgrid)|C4", "lessonParts: live lessons linked (their note dropped), the rest named with their note, explicit links kept");
+     lp.upcoming.join("|") === "M8 (decisions under uncertainty)|C4", "lessonParts: live lessons linked (their note dropped), the rest named with their note, explicit links kept");
   ok(SS.lessonParts([{ code: "R2", note: "n" }]).upcoming[0] === "R2 (n)" && SS.lessonParts(undefined, P, CORE.lessonRef).live.length === 0, "lessonParts: without lessonRef nothing is linked; no list, no parts");
   ok(SS.tickSummary(F1.scales.slice(0, 2), { S0: { who: true, what: false } }) === "Your sorts, scale by scale: S0 who right, what elsewhere, physics not sorted; S1 who not sorted, what not sorted, physics not sorted.", "tickSummary: one sentence for screen readers");
   ok(SS.TICKS.map(t => t[0]).join() === "who,what,physics", "ticks: who, what, physics by default");
@@ -86,8 +86,9 @@ const F1 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")), R3 = JSON.p
   const les2 = lis[2].querySelector(".lx-ss-les"), links2 = les2.querySelectorAll("a");
   ok(links2.map(a => a.getAttribute("href")).join() === "00-grid-operator.html,03-balancing.html,08-merit-order.html,m01-dispatch-to-lmp.html,m02-unit-commitment.html" &&
      /; upcoming: C2 \(the Plains Grid in a hard year\)$/.test(les2.textContent), "view (F1): S2's lessons, M2 linked now that it is live, C2 still upcoming");
-  ok(lis[1].querySelector(".lx-ss-les").textContent === "Go further: F7; upcoming: M5 (size and run a microgrid), C1 (keep the campus running)" && lis[1].querySelector(".lx-ss-les a").getAttribute("href") === "f07-microgrids.html",
-     "view (F1): S1 links F7 now that it is live (W3), M5 and C1 still upcoming");
+  const les1 = lis[1].querySelector(".lx-ss-les");
+  ok(les1.textContent === "Go further: F7, M5, C1" && les1.querySelectorAll("a").map(a => a.getAttribute("href")).join() === "f07-microgrids.html,m05-microgrid-size-and-run.html,c1-keep-the-campus-running.html",
+     "view (F1): S1 links F7, M5 and C1 now that all three are live (W3)");
   ok(!host.querySelector(".is-marked") && !host.querySelector(".lx-ss-line"), "view (F1): no mark, no step lines unless asked");
   ss.update({ ticks: { S0: { who: false } } });
   ok(host.querySelectorAll("ol.lx-ss-strip li").length === 5 && host.querySelectorAll(".lx-ss-tick.no").length === 1 && /S0 who elsewhere/.test(host.querySelector("p.lx-sr").textContent), "view: update() redraws with new ticks");
@@ -231,7 +232,7 @@ function rest() {
       }
     });
     ok(n >= 8, `${n} "upcoming" mentions checked on ${pages.length} pages`);
-    ok(/<a href="k08-git-notebooks\.html">K8<\/a> \(Git and reproducible notebooks\)/.test(rd("learn/r05-build-validate.qmd")) && /M5, upcoming in the Modeler tier/.test(rd("learn/r05-build-validate.qmd")), "R5: K8 linked, M5 still named as upcoming");
+    ok(/<a href="k08-git-notebooks\.html">K8<\/a> \(Git and reproducible notebooks\)/.test(rd("learn/r05-build-validate.qmd")) && /\[M5\]\(m05-microgrid-size-and-run\.html\), in the Modeler tier/.test(rd("learn/r05-build-validate.qmd")), "R5: K8 linked, M5 linked now that it is live");
   }
 
   // ---------------------------------------------------------------- README

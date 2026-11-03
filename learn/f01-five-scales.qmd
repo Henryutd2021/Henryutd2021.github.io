@@ -185,7 +185,7 @@ A model of one scale takes the arrows from other scales as **given data**, not a
 - **Goal:** the cheapest campus plan.
 - **Rule passed down from the grid:** in every hour, export (MW) ≤ the feeder's export limit (MW).
 
-When two scales' models pass numbers back and forth, a modeler must check whether their answers settle; they may not. Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capstone C1 (upcoming) asks who pays.
+When two scales' models pass numbers back and forth, a modeler must check whether their answers settle; they may not. Modeler lesson [M5](m05-microgrid-size-and-run.html) adds the feeder's limit to a campus design; capstone [C1](c1-keep-the-campus-running.html) asks who pays.
 
 ```{=html}
 </div>
