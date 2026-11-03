@@ -62,10 +62,9 @@
    "assumes": "The Modeler core.",
    "goal": "Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.",
    "door": "Ready for research",
-   "doord": "Coming later: frame a question, find what is known, choose a method and defend a study.",
-   "doorcta": "See what is coming",
-   "doorlink": "#researcher",
-   "status": "upcoming"
+   "doord": "Frame a question, find what is known, choose a method, check your model and defend a study.",
+   "doorcta": "Go to the Researcher tier",
+   "doorlink": "#researcher"
   }
  ],
  "scales": [],
@@ -1251,6 +1250,17 @@
    "scales": []
   },
   {
+   "tier": "modeler",
+   "code": "CK-M",
+   "title": "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result",
+   "ready": true,
+   "href": "ck-m-unseen-problem.html",
+   "scales": [],
+   "id": "ck-m-unseen-problem",
+   "minutes": 240,
+   "form": "checkpoint"
+  },
+  {
    "tier": "researcher",
    "code": "R1",
    "title": "What makes a question worth researching?",
@@ -1258,17 +1268,6 @@
    "href": "r01-framing.html",
    "scales": [],
    "id": "r01-framing",
-   "minutes": 30,
-   "form": "studio"
-  },
-  {
-   "tier": "researcher",
-   "code": "R3",
-   "title": "Which system, which boundary, which method?",
-   "ready": true,
-   "href": "r03-system-and-method.html",
-   "scales": [],
-   "id": "r03-system-and-method",
    "minutes": 30,
    "form": "studio"
   },
@@ -1285,6 +1284,17 @@
   },
   {
    "tier": "researcher",
+   "code": "R3",
+   "title": "Which system, which boundary, which method?",
+   "ready": true,
+   "href": "r03-system-and-method.html",
+   "scales": [],
+   "id": "r03-system-and-method",
+   "minutes": 30,
+   "form": "studio"
+  },
+  {
+   "tier": "researcher",
    "code": "R4",
    "title": "Data you can defend: sources, cleaning, licences and provenance",
    "ready": true,
@@ -1293,17 +1303,6 @@
    "id": "r04-data",
    "minutes": 30,
    "form": "studio"
-  },
-  {
-   "tier": "modeler",
-   "code": "CK-M",
-   "title": "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result",
-   "ready": true,
-   "href": "ck-m-unseen-problem.html",
-   "scales": [],
-   "id": "ck-m-unseen-problem",
-   "minutes": 240,
-   "form": "checkpoint"
   },
   {
    "tier": "researcher",
@@ -1342,17 +1341,6 @@
   },
   {
    "tier": "researcher",
-   "code": "R10",
-   "title": "What could you study? The question studio",
-   "ready": true,
-   "href": "r10-question-studio.html",
-   "scales": [],
-   "id": "r10-question-studio",
-   "minutes": 40,
-   "form": "studio"
-  },
-  {
-   "tier": "researcher",
    "code": "R9",
    "title": "Research integrity, and working with the people your study is about",
    "ready": true,
@@ -1360,6 +1348,17 @@
    "scales": [],
    "id": "r09-integrity-stakeholders",
    "minutes": 30,
+   "form": "studio"
+  },
+  {
+   "tier": "researcher",
+   "code": "R10",
+   "title": "What could you study? The question studio",
+   "ready": true,
+   "href": "r10-question-studio.html",
+   "scales": [],
+   "id": "r10-question-studio",
+   "minutes": 40,
    "form": "studio"
   },
   {

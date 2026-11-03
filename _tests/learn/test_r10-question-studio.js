@@ -148,8 +148,15 @@ const R = M.realism(D, { data: 0, physics: 1, institutions: 2 });
 ok(R.map(r => r.state).join() === "pass,warn,block,," && M.realismCount(R).open === 2 && R[2].text === D.realism[2].block, "realism: pass, warn, block and two open");
 ok(D.realism.length === 5 && D.realism.map(r => r.label).join() === "Data exist,Physics sanity,Institutions,Scope fits the time,People and ethics", "realism: the five checks of §11.3");
 ok(D.realism.every(r => r.fix.every(c => typeof c === "number" || /^[A-Z]+\d*$/.test(c))), "realism: every fix names a lesson by number or code");
-ok(M.ref(P, "B2").ready && M.ref(P, 1).ready && M.ref(P, "N1").ready && M.ref(P, "R3").ready && !M.ref(P, "R9").ready, "fix links: B2, lesson 1, N1 and R3 are live on this branch; R9 is named as upcoming");
-ok(M.refHTML(P, "R9") === "R9 (upcoming)" && M.refHTML(P, "R3") === '<a href="r03-system-and-method.html">R3</a>', "fix links: live ones link, upcoming ones do not");
+// the fix links follow path.json's live status (read here, not assumed): every code a realism fix names, plus one upcoming module
+const PALL = [].concat(P.starter || [], P.more || [], P.toolbox || []);
+const pentry = c => PALL.filter(l => (typeof c === "number" ? l.starter === c : l.code === c))[0];
+const fixCodes = [...new Set([].concat(...D.realism.map(r => r.fix)))];
+ok(fixCodes.every(c => M.ref(P, c).ready === !!(pentry(c) || {}).ready), "fix links: ref() reads the live status of every code a realism fix names, from path.json (" + fixCodes.join(", ") + "; live: " + fixCodes.filter(c => M.ref(P, c).ready).join(", ") + ")");
+const upc = PALL.filter(l => l.code && !l.ready)[0], liveR = PALL.filter(l => l.code && l.ready && l.href)[0];
+ok(upc && M.refHTML(P, upc.code) === upc.code + " (upcoming)", "fix links: an upcoming module (" + (upc && upc.code) + ") is named, not linked");
+ok(liveR && M.refHTML(P, liveR.code) === '<a href="' + liveR.href + '">' + liveR.code + "</a>", "fix links: a live module (" + (liveR && liveR.code) + ") links to its page");
+ok(M.ref(P, "R9").ready === !!(pentry("R9") || {}).ready && M.ref(P, "R3").ready === !!(pentry("R3") || {}).ready, "fix links: R3 and R9 follow path.yml (live on this branch: " + ["R3", "R9"].filter(c => M.ref(P, c).ready).join(", ") + ")");
 const sum = M.summary(D, { picks: base, realism: { data: 0 }, papers: [{ t: "A paper", d: "other city" }, {}, {}] }, "CARD").split("\n");
 ok(sum[0] === "CARD" && sum[1] === "Combination: S3 · Society and livelihoods · heat pumps · new technology · low-income renters · a heat wave" && /^Realism: data exist pass; physics sanity not answered/.test(sum[2]) && sum.indexOf("Close paper 1: A paper (differs: other city)") > 0, "the copied summary");
 

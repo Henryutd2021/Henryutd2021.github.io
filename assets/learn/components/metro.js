@@ -4,7 +4,8 @@
                                    the starter path runs across the lines; a lesson with tier2 bridges two lines.
    Tier fields used: id, title, slot (colour --lx-tier-<slot>), icon, door, goal, status ("upcoming": a dashed door and line,
    "coming later"). Lesson fields: starter, short, title, tier, tier2, minutes, href, ready, icon, does. "more" adds
-   "+N more" to each line; that label opens the tier's card, which links the open lessons off the starter path (code,
+   "+N more" to each line (a line without starter stops says how many of its lessons are open: "7 Researcher lessons
+   open, 3 in preparation"); that label opens the tier's card, which links the open lessons off the starter path (code,
    title, href, ready). Progress ticks come from this browser only.
    Wide (≥ 720 px): lines run left to right, first tier at the bottom. Phones: lines run top to bottom, names on the right. */
 (function () {
@@ -15,8 +16,9 @@
 
   LX.metroLayout = function (path, mode) {
     var tiers = path.tiers, nT = tiers.length, st = path.starter, n = st.length, ti = {}, more = {};
-    tiers.forEach(function (t, k) { ti[t.id] = k; more[t.id] = 0; });
-    (path.more || []).forEach(function (m) { if (more[m.tier] != null) more[m.tier]++; });
+    var live = {};
+    tiers.forEach(function (t, k) { ti[t.id] = k; more[t.id] = 0; live[t.id] = 0; });
+    (path.more || []).forEach(function (m) { if (more[m.tier] != null) { more[m.tier]++; if (m.ready) live[m.tier]++; } });
     var L = { mode: mode, tiers: [], stations: [], segs: [], ext: [], caps: [] };
     // the line each stop sits on: a bridge lesson stays on the previous stop's line when that is one of its two tiers
     var row = [];
@@ -38,7 +40,9 @@
         var mine = L.stations.filter(function (s) { return s.row === k; }), last = mine.length ? mine[mine.length - 1].x + 24 : x0 - 20;
         var later = t.status === "upcoming" ? ", coming later" : "";
         L.ext.push({ tier: t.id, k: k, color: slot(t, k), x0: last, y0: ty(k), x1: L.W - 20, y1: ty(k), more: more[t.id], none: !mine.length, upcoming: !!later,
-          label: mine.length ? "+" + more[t.id] + " more " + t.title + " lessons" : (more[t.id] ? more[t.id] + " " + t.title + " lessons" + (later || " in preparation") : t.title + ": in preparation"),
+          label: mine.length ? "+" + more[t.id] + " more " + t.title + " lessons"
+            : live[t.id] ? live[t.id] + " " + t.title + " lessons open" + (more[t.id] > live[t.id] ? ", " + (more[t.id] - live[t.id]) + " in preparation" : "")
+            : (more[t.id] ? more[t.id] + " " + t.title + " lessons" + (later || " in preparation") : t.title + ": in preparation"),
           lx: L.W - 20, ly: ty(k) + 22, anchor: "end" });
       });
     } else {

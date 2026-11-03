@@ -67,7 +67,6 @@
   id: researcher
   slot: 4
   icon: flask
-  status: upcoming
   title: Researcher
   level: L4
   reader: "Learners who have finished the Modeler core, or graduate students starting a project"
@@ -75,8 +74,8 @@
   assumes: "The Modeler core."
   goal: "Prepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views."
   door: "Ready for research"
-  doord: "Coming later: frame a question, find what is known, choose a method and defend a study."
-  doorcta: "See what is coming"
+  doord: "Frame a question, find what is known, choose a method, check your model and defend a study."
+  doorcta: "Go to the Researcher tier"
   doorlink: "#researcher"
 
 # ---------- the starter path: 14 lessons, the guided tour across the tiers
@@ -395,6 +394,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds the model and asserts the browser's prices, about 45 minutes."
   does: "Build a 24-hour dispatch LP with ramps and read its balance duals as marginal values under stated assumptions; add a three-bus DC power-flow network, congest a line and watch one price split into three."
   after: [11, 8, B1, B2, B3]
+  next: M2
 
 # ---------- wave W2 hubs (curriculum v2 §8): the five scales (F1) and the whole system (F2), builder learn-w2-a
 - kind: lesson
@@ -431,6 +431,7 @@
   does: "A stock-and-flow simulator (a reservoir, a battery, a carbon budget), a causal-loop builder (chargers and EVs, the rebound effect) and a whole-system map: pull one lever and watch the ripples."
   outcome: "Tell a stock from a flow, name a feedback loop as reinforcing or balancing, and trace how one change ripples across technology, cost, emissions, people and security."
   after: [F1, 6]
+  next: A22
 # ---------- wave W2 modules (curriculum v2 §18.4); live once a builder sets status: active
 - kind: lesson
   id: a22-tradeoff-explorer
@@ -487,6 +488,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds the model, grows the same tree and asserts the browser's numbers, about 45 minutes."
   does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program has no shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
   after: [M1]
+  next: M3
 - kind: lesson
   id: m03-capacity-expansion
   code: M3
@@ -504,6 +506,7 @@
   lab: "a SciPy/HiGHS notebook that rebuilds the model and asserts the reference results, about 60 minutes, then 120 minutes of practice."
   does: "Co-optimize what to build and how to run it on weighted representative weeks, with the battery linked across them and the extreme weeks kept; then re-run the plan on every hour of 2025 and of 2024 and see which conclusions survive."
   after: [M1, 7, 13]
+  next: CK-M
 - {kind: lesson, tier: modeler, code: M4, title: "Storage and coupled carriers: modelling power, hydrogen and heat together"}
 - {kind: lesson, tier: modeler, code: M5, title: "Size and run a microgrid that survives an outage"}
 - {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
@@ -515,7 +518,21 @@
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 - {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
-- kind: lesson   # research studio R1, builder learn-w2-f (2026-11-03); after: A22 to be added at the merge (sidecar)
+# ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
+- kind: lesson
+  id: ck-m-unseen-problem
+  code: CK-M
+  tier: modeler
+  form: checkpoint
+  icon: check
+  status: active
+  minutes: 240
+  title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
+  does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
+  after: [M1, M3, B3, R5]
+
+# ---------- research studios (curriculum v2 §11; R1-R5, R9 and R10 in wave W2)
+- kind: lesson
   id: r01-framing
   code: R1
   tier: researcher
@@ -530,25 +547,8 @@
   teaches: [researchable questions, the five question types, audience and decision-maker, metrics with units, counterfactuals, falsification statements]
   does: "Sort twenty questions into researchable, too vague, already answered and not answerable with the data at hand; name each one's type; rewrite three with an audience, a metric and a counterfactual."
   outcome: "Turn a vague concern into a typed question with an audience, a metric with units, a counterfactual, a scale and boundary, and a falsification statement."
-  after: [13]
+  after: [13, A22]
   next: R10
-- kind: lesson   # research studio R3, builder learn-w2-f (2026-11-03); after: F1 to be added at the merge (sidecar)
-  id: r03-system-and-method
-  code: R3
-  tier: researcher
-  form: studio
-  icon: blocks
-  status: active
-  minutes: 30
-  practice_minutes: 60
-  title: "Which system, which boundary, which method?"
-  subtitle: "Place a question on the scale ladder, draw its boundary, and defend a method against two alternatives"
-  short: "System, boundary, method"
-  teaches: [system scales, system boundaries, time step and horizon, method families, defending a method against alternatives]
-  does: "Place a question on the scale ladder, draw its boundary, pick its time step and horizon, then choose a method family and defend it against two alternatives."
-  outcome: "Choose the scale, boundary, time step, horizon and method family for a question, and defend the method against two alternatives, one from another family."
-  after: [R1]
-  next: R4
 - kind: lesson
   id: r02-literature
   code: R2
@@ -567,6 +567,23 @@
   after: [R1, N1]
   next: R3
 - kind: lesson
+  id: r03-system-and-method
+  code: R3
+  tier: researcher
+  form: studio
+  icon: blocks
+  status: active
+  minutes: 30
+  practice_minutes: 60
+  title: "Which system, which boundary, which method?"
+  subtitle: "Place a question on the scale ladder, draw its boundary, and defend a method against two alternatives"
+  short: "System, boundary, method"
+  teaches: [system scales, system boundaries, time step and horizon, method families, defending a method against alternatives]
+  does: "Place a question on the scale ladder, draw its boundary, pick its time step and horizon, then choose a method family and defend it against two alternatives."
+  outcome: "Choose the scale, boundary, time step, horizon and method family for a question, and defend the method against two alternatives, one from another family."
+  after: [R1, F1]
+  next: R4
+- kind: lesson
   id: r04-data
   code: R4
   tier: researcher
@@ -584,17 +601,6 @@
   after: [R3, B2]
   next: R5
 - kind: lesson
-  id: ck-m-unseen-problem
-  code: CK-M
-  tier: modeler
-  form: checkpoint
-  icon: check
-  status: active
-  minutes: 240
-  title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
-  does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
-  after: [M1, M3, B3, R5]
-- kind: lesson
   id: r05-build-validate
   code: R5
   tier: researcher
@@ -611,10 +617,27 @@
   lab: "a SciPy/HiGHS notebook with the study's five versions, the checks as functions, the benchmark as a test and a clean-clone rerun, about 2 hours."
   does: "Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the round trip against measured data; rerun the study from a clean clone and write a verification log."
   after: [R4, M1, K8]
+  next: R9
 - {kind: lesson, tier: researcher, code: R6, title: "Uncertainty done properly: what to vary, how, and how to say it"}
 - {kind: lesson, tier: researcher, code: R7, title: "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual"}
 - {kind: lesson, tier: researcher, code: R8, title: "How do you show results so people understand their limits?"}
-- kind: lesson   # research studio R10, builder learn-w2-f (2026-11-03); after: F1 to be added at the merge (sidecar)
+- kind: lesson
+  id: r09-integrity-stakeholders
+  code: R9
+  tier: researcher
+  form: studio
+  icon: scale
+  status: active
+  minutes: 30
+  practice_minutes: 30
+  title: "Research integrity, and working with the people your study is about"
+  subtitle: "Six dilemmas, the norms behind them, and your own statement"
+  short: "Integrity and stakeholders"
+  outcome: "Name the norm behind an integrity dilemma (consent, credit, conflicts of interest, data licences, corrections), choose a defensible action, and write an integrity statement for your own study."
+  teaches: [informed consent, ethics review, authorship and credit, conflicts of interest, data licences, corrections, stakeholders]
+  does: "Sort eight practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
+  after: [R1]
+- kind: lesson
   id: r10-question-studio
   code: R10
   tier: researcher
@@ -629,8 +652,56 @@
   teaches: [generating research questions, question types, rigour checks, realism checks, search strings for open databases]
   does: "Pick or spin scale, dimension, system element, stakeholder and lever (plus an optional twist); choose a question type; write the question; run rigour and realism checks and a literature-search prompt; save a question card."
   outcome: "Generate a research question of your own and test it for rigour and realism before you take it to a mentor."
-  after: [R1]
+  after: [R1, F1]
   next: R2
+
+# ---------- research case files (curriculum v2 §13; W2 drafts in learn/_drafts/, upcoming until Henry approves every
+# excerpt sentence in reports/learn/excerpts_for_approval.md; tier confirmed by the coordinator)
+- kind: lesson
+  id: cf2-cost-per-kg-vs-system-cost
+  code: CF2
+  tier: analyst
+  form: case
+  icon: coin
+  status: upcoming
+  minutes: 10
+  title: "When the cost per kilogram and the cost of the system disagree"
+  subtitle: "Why a costlier kilogram of hydrogen can come with a cheaper system, and which number answers which question"
+  short: "Cost per kg against system cost"
+  does: "A published wind-and-hydrogen study in six parts and a timeline; then build an electrolyzer block by block and watch the cost per kilogram rise while the system's net cost falls."
+  outcome: "Say which question a levelized cost answers and which a system's net cost answers, and find where they disagree."
+  teaches: [levelized cost against system cost, average and marginal tests, reading a published optimization study]
+  after: [7]
+- kind: lesson
+  id: cf6-shifting-load-to-clean-hours
+  code: CF6
+  tier: analyst
+  form: case
+  icon: clock
+  status: upcoming
+  minutes: 10
+  title: "How much can shifting load to cleaner hours cut emissions, and when?"
+  subtitle: "Average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂"
+  short: "Shifting load to clean hours"
+  does: "A published load-shifting study in six parts and a timeline; then move 10 MWh between hours of Prairie Town's real-shaped day and compare average-factor accounting with what the plants emit."
+  outcome: "Tell an average emission factor from a marginal one, and say when moving use to another hour lowers what the plants emit."
+  teaches: [average and marginal emission factors, load shifting, attributional and consequential accounting]
+  after: [12]
+- kind: lesson
+  id: cf7-cost-of-waiting
+  code: CF7
+  tier: analyst
+  form: case
+  icon: scale
+  status: upcoming
+  minutes: 10
+  title: "What does waiting for the grid cost, and who pays?"
+  subtitle: "A large load waits for its grid connection: what the wait costs the developer, other electricity customers and society"
+  short: "The cost of waiting"
+  does: "A published study of delayed grid service in six parts and a timeline; then price a large load's wait in three accounts and see what a tariff and bridge power change."
+  outcome: "Price a delay in present value for each party, and tell a transfer between accounts from a real saving."
+  teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
+  after: [8]
 
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
@@ -683,73 +754,7 @@
   teaches: [compound growth, present value, discount rate, annuities, capital recovery factor]
   after: []
   next: 7
-- kind: lesson
-  id: r09-integrity-stakeholders
-  code: R9
-  tier: researcher
-  form: studio
-  icon: scale
-  status: active
-  minutes: 30
-  practice_minutes: 30
-  title: "Research integrity, and working with the people your study is about"
-  subtitle: "Six dilemmas, the norms behind them, and your own statement"
-  short: "Integrity and stakeholders"
-  outcome: "Name the norm behind an integrity dilemma (consent, credit, conflicts of interest, data licences, corrections), choose a defensible action, and write an integrity statement for your own study."
-  teaches: [informed consent, ethics review, authorship and credit, conflicts of interest, data licences, corrections, stakeholders]
-  does: "Sort eight practices by the norm they serve; work through six dilemmas (a funder's headline, a convenient scenario, a co-author's data, a community meeting, a survey without consent, an error after publication); map who the study affects; write an integrity statement."
-  after: [R1]
-  next: R10
 
-# ---------- research case files (curriculum v2 §13; W2 drafts in learn/_drafts/, upcoming until Henry approves every
-# excerpt sentence in reports/learn/excerpts_for_approval.md; tier confirmed by the coordinator)
-- kind: lesson
-  id: cf2-cost-per-kg-vs-system-cost
-  code: CF2
-  tier: analyst
-  form: case
-  icon: coin
-  status: upcoming
-  minutes: 10
-  title: "When the cost per kilogram and the cost of the system disagree"
-  subtitle: "Why a costlier kilogram of hydrogen can come with a cheaper system, and which number answers which question"
-  short: "Cost per kg against system cost"
-  does: "A published wind-and-hydrogen study in six parts and a timeline; then build an electrolyzer block by block and watch the cost per kilogram rise while the system's net cost falls."
-  outcome: "Say which question a levelized cost answers and which a system's net cost answers, and find where they disagree."
-  teaches: [levelized cost against system cost, average and marginal tests, reading a published optimization study]
-  after: [7]
-- kind: lesson
-  id: cf6-shifting-load-to-clean-hours
-  code: CF6
-  tier: analyst
-  form: case
-  icon: clock
-  status: upcoming
-  minutes: 10
-  title: "How much can shifting load to cleaner hours cut emissions, and when?"
-  subtitle: "Average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂"
-  short: "Shifting load to clean hours"
-  does: "A published load-shifting study in six parts and a timeline; then move 10 MWh between hours of Prairie Town's real-shaped day and compare average-factor accounting with what the plants emit."
-  outcome: "Tell an average emission factor from a marginal one, and say when moving use to another hour lowers what the plants emit."
-  teaches: [average and marginal emission factors, load shifting, attributional and consequential accounting]
-  after: [12]
-- kind: lesson
-  id: cf7-cost-of-waiting
-  code: CF7
-  tier: analyst
-  form: case
-  icon: scale
-  status: upcoming
-  minutes: 10
-  title: "What does waiting for the grid cost, and who pays?"
-  subtitle: "A large load waits for its grid connection: what the wait costs the developer, other electricity customers and society"
-  short: "The cost of waiting"
-  does: "A published study of delayed grid service in six parts and a timeline; then price a large load's wait in three accounts and see what a tariff and bridge power change."
-  outcome: "Price a delay in present value for each party, and tell a transfer between accounts from a real saving."
-  teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
-  after: [8]
-
-# ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 are built in wave W1)
 - kind: tool
   id: k04-linear-equations
   code: K4
@@ -779,6 +784,7 @@
   next: 4
 
 - {kind: tool, code: K6, minutes: 25, title: "Vectors and matrices: what Ax <= b means"}
+
 - kind: tool
   id: k07-spreadsheets
   code: K7
