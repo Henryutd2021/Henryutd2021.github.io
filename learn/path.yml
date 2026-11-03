@@ -454,6 +454,40 @@
   does: "Change one plan and watch cost, CO₂, reliability, a fairness measure and a security measure move together on a radar; find the plans no other beats on all five; see whose priorities pick which plan, and how a different definition changes the answer."
   after: [F2, 12]
   next: R1
+# ---------- wave W3 Analyst modules A4 and A7 (curriculum v2 §18.4; builder learn-w3-d)
+- kind: lesson
+  id: a04-retail-tariffs
+  code: A4
+  tier: analyst
+  form: cards
+  icon: house
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the practice set (Check section)
+  title: "How should an electricity bill be designed? Retail, dynamic and large-load tariffs"
+  subtitle: "Bill a renter, a solar and EV home and a factory under four tariffs, see who pays for whom, then set a large load's minimum bill"
+  short: "Designing a bill"
+  outcome: "Bill customers under flat, time-of-use, demand-charge and real-time tariffs, find who pays above or below the cost of serving them, say what each tariff rewards, and show how a large-load tariff's minimum bill keeps cost off other customers."
+  teaches: [cost of service, tariff design, net metering and net billing, cross-subsidies, time-of-use and real-time pricing, demand charges, large-load tariffs]
+  does: "Bill a renter, a home with solar and an EV, and a factory under flat, time-of-use, demand-charge and real-time tariffs; see who pays more and what behaviour each tariff rewards; then set a large load's minimum bill."
+  after: [8]
+  next: A7
+- kind: lesson
+  id: a07-flexible-demand
+  code: A7
+  tier: analyst
+  form: cards
+  icon: dial
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the practice set (Check section)
+  title: "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading"
+  subtitle: "Shift a town's load, pool small devices into a virtual power plant, and let neighbours trade"
+  short: "Flexible demand"
+  outcome: "Tell energy shifted from energy saved and attributed emissions from what the plants emit, price what a virtual power plant earns each owner, and find where coordination costs and a feeder's limit stop it."
+  teaches: [load shifting, energy shifted against energy saved, demand response, virtual power plants and aggregators, rebound after an event, local energy trading]
+  does: "Shift Prairie Town's load toward cheap or clean hours within limits and see what the shift costs users; pool batteries, thermostats, EV chargers and a dairy's pumps in an aggregator and see what each owner earns, where coordination costs bite and where a feeder's limit stops it; then let neighbours trade."
+  after: [9, A4]
 
 # ---------- the rest of each tier (in preparation)
 - {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}

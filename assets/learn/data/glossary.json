@@ -11,6 +11,12 @@
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
  },
+ "aggregator": {
+  "term": "Aggregator",
+  "short": "A company that enrols many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
  "annuity-factor": {
   "term": "Annuity factor",
   "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
@@ -76,6 +82,12 @@
   "short": "A feedback loop with an odd number of negative links, which tends to oppose the change that started it; with long delays it can overshoot or swing back and forth.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "baseline": {
+  "term": "Baseline",
+  "short": "An estimate of what a customer would have used without a demand-response event, against which the cut is measured.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
  },
  "basis-risk": {
   "term": "Basis risk",
@@ -323,6 +335,18 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "coordination-cost": {
+  "term": "Coordination cost",
+  "short": "What it costs to enrol, meter, control and pay each device or customer in a program, whatever the device's size.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
+ "cost-of-service": {
+  "term": "Cost of service",
+  "short": "What it costs a utility to serve a customer or a class of customers: energy, plants, wires, meters and billing.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "counterfactual": {
   "term": "Counterfactual",
   "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
@@ -334,6 +358,12 @@
   "short": "A standard list of 14 names for what each author did, such as conceptualization (shaping the question), data curation (cleaning and documenting data) and formal analysis.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "cross-subsidy": {
+  "term": "Cross-subsidy",
+  "short": "When some customers pay more than the cost of serving them so that others can pay less.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
  },
  "cube-law": {
   "term": "Cube law",
@@ -418,6 +448,12 @@
   "short": "The total power that all users on a grid draw at a given moment.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "demand-charge": {
+  "term": "Demand charge",
+  "short": "A part of a power bill charged per kW of the customer's busiest hour (or interval) in the month, not per kWh.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
  },
  "demand-response": {
   "term": "Demand response",
@@ -833,6 +869,12 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "large-load-tariff": {
+  "term": "Large-load tariff",
+  "short": "A tariff for very large new customers, such as data centers or factories, with terms that protect other customers if the load uses less than it promised.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "latin-hypercube": {
   "term": "Latin hypercube sampling",
   "short": "A way to draw many sets of uncertain inputs so that the whole range of every input is covered evenly.",
@@ -1019,6 +1061,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "minimum-billing-demand": {
+  "term": "Minimum billing demand",
+  "short": "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however little it uses.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "minimum-down-time": {
   "term": "Minimum down time",
   "short": "The hours a plant must stay off once stopped before it may start again.",
@@ -1079,11 +1127,23 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "net-billing": {
+  "term": "Net billing",
+  "short": "A billing rule under which kWh sent back to the grid earn a credit set separately from the retail price, often the value of energy in that hour.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "net-demand": {
   "term": "Net demand (net load)",
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-metering": {
+  "term": "Net metering",
+  "short": "A billing rule under which each kWh a customer sends back to the grid earns the same price as a kWh it buys.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
  },
  "net-present-value": {
   "term": "Net present value",
@@ -1366,6 +1426,12 @@
   "short": "An interest or discount rate with inflation taken out, used with costs stated in one year's dollars.",
   "lesson": "K3",
   "href": "k03-discounting.html"
+ },
+ "real-time-pricing": {
+  "term": "Real-time pricing",
+  "short": "A tariff whose price per kWh follows the wholesale or system price hour by hour, so the bill moves with it.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
  },
  "rebound-effect": {
   "term": "Rebound effect",
@@ -1667,6 +1733,12 @@
   "lesson": "A2",
   "href": "a02-contracts-risk.html"
  },
+ "transactive-energy": {
+  "term": "Transactive energy",
+  "short": "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
  "unbounded": {
   "term": "Unbounded",
   "short": "Said of a model whose goal can improve without limit, which usually means a rule is missing.",
@@ -1738,6 +1810,12 @@
   "short": "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "virtual-power-plant": {
+  "term": "Virtual power plant",
+  "short": "Many small devices, such as batteries, thermostats and chargers, controlled together and offered to the grid as one resource.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
  },
  "voltage": {
   "term": "Voltage",
