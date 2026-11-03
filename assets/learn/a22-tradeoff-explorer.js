@@ -17,8 +17,9 @@
 //   gas       % of the electricity used that was made from gas (all gas piped in from outside, none stored)
 // Alternatives: rm (reserve margin, % above the year's peak, with stated capacity values) for reliability; largest (the
 // largest single source's share of the electricity used, %) for security.
-// Dominance, weighted sums and the limits model (the cheapest plan that meets limits on CO2, gas and the low-income
-// share: an epsilon-constraint with three limits, on lesson 13's seven representative weeks) are pure functions below.
+// Dominance (values compared as shown, or at full precision), weighted sums (over the unbeaten plans) and the limits model
+// (the cheapest plan that meets limits on CO2, gas and the low-income share: an epsilon-constraint with three limits, on
+// lesson 13's seven representative weeks, then checked on all 8,760 hours) are pure functions below.
 // Every number the page states is checked by _tests/learn/test_a22-tradeoff-explorer.js.
 (function () {
   "use strict";
@@ -83,35 +84,53 @@
     return defs.sec === "largest" ? m.largest : m.gas;
   }
   function axisKey(axis, defs) { return axis === "rel" ? defs.rel : axis === "fair" ? "fair" : axis === "sec" ? defs.sec : axis; }
-  // rounded as the page shows it: dominance and weighted sums use these values, so a reader can check them by eye
+  // rounded as the page shows it: dominance and weighted sums use these values, so a reader can check them by eye. Two
+  // values that round to the same shown number count as a tie; exact = true compares the stored values instead, within
+  // the solver's noise (EXACT: $1, 1 t, 0.01 MWh, 0.001 point), and step 6 reports where the two views differ
   var PREC = { cost: 1e5, co2: 1e3, unserved: 1, rm: 0.01, fair: 0.001, gas: 0.01, largest: 0.01 };
+  var EXACT = { cost: 1, co2: 1, unserved: 0.01, rm: 1e-5, fair: 1e-5, gas: 1e-5, largest: 1e-5 };
   function shown(v, key) { var p = PREC[key]; return Math.round(v / p) * p; }
   // higher is better only for the reserve margin
   function better(key) { return key === "rm" ? 1 : -1; }
-  function row(m, defs) {
-    var o = {}; AXES.forEach(function (a) { var k = axisKey(a, defs); o[a] = { key: k, v: shown(axisValue(m, a, defs), k) }; }); return o;
+  function row(m, defs, exact) {
+    var o = {}; AXES.forEach(function (a) { var k = axisKey(a, defs), v = axisValue(m, a, defs); o[a] = { key: k, v: exact ? v : shown(v, k) }; }); return o;
   }
-  // p dominates q: at least as good on every axis and strictly better on one (values as shown)
-  function dominates(p, q, defs, axes) {
-    var rp = row(p, defs), rq = row(q, defs), strict = false;
+  // p dominates q: at least as good on every axis and strictly better on one (values as shown, or exact)
+  function dominates(p, q, defs, axes, exact) {
+    var rp = row(p, defs, exact), rq = row(q, defs, exact), strict = false;
     for (var i = 0; i < (axes || AXES).length; i++) {
-      var a = (axes || AXES)[i], s = better(rp[a].key), d = s * (rp[a].v - rq[a].v);
-      if (d < -1e-9) return false;
-      if (d > 1e-9) strict = true;
+      var a = (axes || AXES)[i], s = better(rp[a].key), d = s * (rp[a].v - rq[a].v), tol = exact ? EXACT[rp[a].key] : 1e-9;
+      if (d < -tol) return false;
+      if (d > tol) strict = true;
     }
     return strict;
   }
   // plans = [{id, m}]; returns {id: [ids that dominate it]} for the dominated ones
-  function dominated(plans, defs, axes) {
+  function dominated(plans, defs, axes, exact) {
     var out = {};
     plans.forEach(function (q) {
-      var by = plans.filter(function (p) { return p !== q && dominates(p.m, q.m, defs, axes); }).map(function (p) { return p.id; });
+      var by = plans.filter(function (p) { return p !== q && dominates(p.m, q.m, defs, axes, exact); }).map(function (p) { return p.id; });
       if (by.length) out[q.id] = by;
     });
     return out;
   }
-  function unbeaten(plans, defs, axes) { var d = dominated(plans, defs, axes); return plans.filter(function (p) { return !d[p.id]; }).map(function (p) { return p.id; }); }
-  // a score from 0 (the centre of the radar: the scale's worst end) to 1 (the rim: its best end), on the stated fixed scale
+  function unbeaten(plans, defs, axes, exact) { var d = dominated(plans, defs, axes, exact); return plans.filter(function (p) { return !d[p.id]; }).map(function (p) { return p.id; }); }
+  // plans unbeaten at full precision but beaten as shown: [{id, by, axis, key, v, vs}] with the measure on which the plan
+  // is better than its first shown dominator by less than the shown step
+  function hiddenByRounding(plans, defs) {
+    var dS = dominated(plans, defs), dE = dominated(plans, defs, null, true), out = [];
+    plans.forEach(function (q) {
+      if (!dS[q.id] || dE[q.id]) return;
+      var p = plans.filter(function (x) { return x.id === dS[q.id][0]; })[0], rq = row(q.m, defs, true), rp = row(p.m, defs, true), f = null;
+      AXES.forEach(function (a) {
+        if (!f && better(rq[a].key) * (rq[a].v - rp[a].v) > EXACT[rq[a].key]) f = { id: q.id, by: p.id, axis: a, key: rq[a].key, v: rq[a].v, vs: rp[a].v };
+      });
+      if (f) out.push(f);
+    });
+    return out;
+  }
+  // a score from 0 (the centre of the radar: the scale's worst end) to 1 (the rim: its best end), on the stated fixed scale.
+  // Clipped at the ends, so two values beyond an end score the same: pick() therefore weighs only the unbeaten plans
   function score(v, sc) { var t = (sc.worst - v) / (sc.worst - sc.best); return Math.max(0, Math.min(1, t)); }
   function scores(m, defs, scales) { var o = {}; AXES.forEach(function (a) { var k = axisKey(a, defs); o[a] = score(shown(axisValue(m, a, defs), k), scales[k]); }); return o; }
   // weighted sum of the scores (weights in any units; normalised by their total); the highest total wins, ties to the lower cost
@@ -120,9 +139,10 @@
     AXES.forEach(function (a) { t += (w[a] || 0) * s[a]; W += (w[a] || 0); });
     return W > 0 ? t / W : 0;
   }
+  // the pick among the unbeaten plans (as shown): with clipped scores a beaten plan could otherwise tie or win
   function pick(plans, w, defs, scales) {
-    var best = null;
-    plans.forEach(function (p) {
+    var best = null, un = unbeaten(plans, defs);
+    plans.filter(function (p) { return un.indexOf(p.id) >= 0; }).forEach(function (p) {
       var t = total(p.m, w, defs, scales);
       if (!best || t > best.t + 1e-9 || (Math.abs(t - best.t) <= 1e-9 && p.m.cost < best.p.m.cost)) best = { p: p, t: t };
     });
@@ -160,6 +180,24 @@
       m.constraints.push({ name: "fairShare", terms: ft, le: 0 });
     }
     return m;
+  }
+  // ---- the two checks behind step 7. The seven weeks: what the optimizer's plan does on lesson 13's seven weeks (r = the
+  // limits model's result). The full year: the plan, sizes rounded up, run on all 8,760 hours (m = measure()). Both give
+  // {cost, co2 (t), gas (share of the electricity used), fair (low-income share under the tariff), unserved (MWh)}
+  function weekVals(TP, C, per, r, tariff, D) {
+    var s = TP.summarize(C, per, r, {}), used = s.demand - s.unserved + s.energy.ch - s.energy.dis;
+    return { plan: s.plan, cost: s.cost, co2: s.co2, gas: used > 0 ? (s.energy.cc + s.energy.pk) / used : 0,
+             fair: fairShare(s.cost > 0 ? s.fixed / s.cost : 0, D.groups, tariff, D.graded), unserved: s.unserved };
+  }
+  function yearVals(m, tariff) { return { cost: m.cost, co2: m.co2, gas: m.gas, fair: m.fair[tariff], unserved: m.unserved }; }
+  // each limit judged at the precision the check table shows (CO2 to 1 kt, the shares to 0.1 point, unserved to 1 MWh):
+  // L = {co2 (t), gas, fair (fractions)}; returns {co2, gas, fair, served: true when met, pass: all four}
+  var CHK = { co2: 1e3, gas: 0.001, fair: 0.001, unserved: 1 };
+  function checkLimits(v, L) {
+    function r(x, k) { return Math.round(x / CHK[k]) * CHK[k]; }
+    var o = { co2: r(v.co2, "co2") <= L.co2 + 1e-6, gas: r(v.gas, "gas") <= L.gas + 1e-9, fair: r(v.fair, "fair") <= L.fair + 1e-9, served: r(v.unserved, "unserved") < 0.5 };
+    o.pass = o.co2 && o.gas && o.fair && o.served;
+    return o;
   }
   // how each measure moved from m0 to m1 (values as shown): +1 better, -1 worse, 0 the same
   function moves(m0, m1, defs) {
@@ -239,7 +277,8 @@
   }
   var model = { AXES: AXES, blank: blank, capValues: capValues, reserveMargin: reserveMargin, fairShare: fairShare, measure: measure,
                 axisValue: axisValue, axisKey: axisKey, shown: shown, better: better, row: row, dominates: dominates, dominated: dominated,
-                unbeaten: unbeaten, score: score, scores: scores, total: total, pick: pick, limitModel: limitModel,
+                unbeaten: unbeaten, hiddenByRounding: hiddenByRounding, score: score, scores: scores, total: total, pick: pick, limitModel: limitModel,
+                weekVals: weekVals, yearVals: yearVals, checkLimits: checkLimits,
                 moves: moves, conflicts: conflicts, rescued: rescued, resolver: resolver };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
@@ -307,6 +346,10 @@
       ".a22-def[hidden]{display:none}.page-learn .a22-def h4{font-size:14.5px;margin:0}.a22-def p{margin:0}",
       ".a22-def .kind{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--lx-ink-3)}.a22-def .kind.choice{color:var(--lx-warn)}",
       ".a22-cmp{font-size:13.5px;color:var(--lx-ink-2);margin:0}.a22-cmp b{font-family:var(--lx-f-mono);font-weight:600}",
+      ".a22-fields{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 10px;margin:0}.a22-fields dt{font-family:var(--lx-f-display);font-size:12.5px;color:var(--lx-ink-3);padding-top:1px}",
+      ".a22-fields dd{margin:0}@media (max-width:480px){.a22-fields{grid-template-columns:minmax(0,1fr)}.a22-fields dd{margin-bottom:4px}}",
+      ".a22-chk th{white-space:normal;vertical-align:top}.a22-chk th[scope=row]{font-family:var(--lx-f-body);font-weight:400;text-align:left}.a22-chk th small{font-size:12px;color:var(--lx-ink-3)}",
+      ".a22-fit{width:0;min-width:100%}.a22-chk td{white-space:normal;vertical-align:top}.a22-chk .ok{color:var(--lx-good)}.a22-chk .no{color:var(--lx-bad);font-weight:600}.a22-list.a22-task{list-style:none;padding:0}.a22-task b{font-family:var(--lx-f-display);font-weight:500}",
       ".a22-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}",
       ".a22-plan{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:2px 8px;align-items:center;text-align:left;padding:8px;border-radius:12px;border:1px solid var(--lx-line);background:var(--lx-surface);color:var(--lx-ink);cursor:pointer;font:inherit;min-width:0}",
       ".a22-plan:hover{border-color:var(--lx-line-2)}.a22-plan[aria-pressed=true]{border-color:var(--lx-accent);box-shadow:inset 0 0 0 1.5px var(--lx-accent);background:var(--lx-accent-soft)}",
@@ -423,36 +466,45 @@
     var PRI = A.priorities;
     var S_ = { plan: M.blank(BY[A.start].plan), m: BY[A.start].m, prev: null, cmp: null, cmpLabel: null, cmpM: null, defs: copy(DEFAULTS),
                moves: [], opened: {}, mode: "compare", marks: {}, checked: false, seenPri: {}, priSel: null,
-               myW: { cost: 5, co2: 5, rel: 5, fair: 5, sec: 5 }, tried: {}, steel: {}, lim: { inf: null, ok: null }, step1: false, solver: null };
+               myW: { cost: 5, co2: 5, rel: 5, fair: 5, sec: 5 }, tried: {}, steel: {}, lim: { inf: null, weeks: null }, step1: false, solver: null };
     function copy(o) { var r = {}; for (var k in o) r[k] = o[k]; return r; }
     function samePlan(a, b) { return TP.KEYS.every(function (k) { return Math.abs((a[k] || 0) - (b[k] || 0)) < 1e-9; }); }
     var AXES_UI = M.AXES.map(function (k) { return { key: k, label: LAB[k], name: function () { return DEFN[M.axisKey(k, S_.defs)].name; } }; });
     var cv = D.cv, T = C.techs;
 
-    // the definitions (units, formula in words, what each leaves out); numbers come from the model and data
+    // the definitions as labelled fields (what is measured, the assumption, what it leaves out, how to read it); numbers come
+    // from the model and data
     var DEFN = {
       cost: { name: "Cost", unit: "$M a year", kind: "Accounts, with a stated boundary",
-        text: "What the town pays each year for its plants: building costs spread over their lives at " + cfg.finance.wacc + "% a year, plus upkeep, fuel and running costs.",
-        leaves: "Leaves out grid wires, retail costs and harm from pollution." },
+        measure: "What the town pays each year for its plants.",
+        assume: "Building costs spread over their lives at " + cfg.finance.wacc + "% a year, plus upkeep, fuel and running costs.",
+        leaves: "Grid wires, retail costs and harm from pollution." },
       co2: { name: "CO₂", unit: "kt a year (thousand tonnes)", kind: "Physical, operating emissions only",
-        text: "Gas burned in the town's plants, times " + T.cc.co2.toFixed(2) + " t of CO₂ per MWh in the combined-cycle plant and " + T.pk.co2.toFixed(2) + " in the peaker.",
-        leaves: "Leaves out emissions from building the plants and from producing and piping the gas." },
+        measure: "CO₂ from the gas burned in the town's plants.",
+        assume: T.cc.co2.toFixed(2) + " t of CO₂ per MWh in the combined-cycle plant and " + T.pk.co2.toFixed(2) + " in the peaker.",
+        leaves: "Emissions from building the plants and from producing and piping the gas." },
       unserved: { name: "Unserved energy", unit: "MWh a year", kind: "Model output on one weather year",
-        text: "Demand left unserved when the plan runs through all 8,760 hours of 2025, plants and battery run at least cost.",
-        leaves: "Leaves out breakdowns and other weather years: plants never fail here, so this is a floor, not an adequacy test." },
+        measure: "Demand left unserved when the plan runs through all 8,760 hours of 2025.",
+        assume: "Plants and battery run at least cost, and plants never fail.",
+        leaves: "Breakdowns and other weather years, so this is a floor, not an adequacy test." },
       rm: { name: "Reserve margin", unit: "% above the " + Math.round(D.peak) + " MW peak", kind: "A planning convention: one choice among several", choice: true,
-        text: "Capacity counted at the peak, above the year's peak demand. Gas and nuclear count at full size, wind at " + F.pct(cv.wind) + " and solar at " + F.pct(cv.solar) +
-          " of size (their average in 2025's " + A.reserve.hours + " highest-demand hours), a battery at its MW if it lasts " + A.reserve.batteryHours + " hours.",
-        leaves: "Higher is better. It ignores how often each plant fails; grid operators use more detailed methods (lesson 6)." },
+        measure: "Capacity counted at the peak, above the year's peak demand.",
+        assume: "Gas and nuclear count at full size; wind at " + F.pct(cv.wind) + " and solar at " + F.pct(cv.solar) + " (their average in 2025's " + A.reserve.hours +
+          " highest-demand hours); a battery at its MW if it lasts " + A.reserve.batteryHours + " hours.",
+        leaves: "How often each plant fails; grid operators use more detailed methods (lesson 6).", read: "Higher is better." },
       fair: { name: "Low-income share of home bills", unit: "% of what all homes pay", kind: "A constructed measure: one choice among several", choice: true,
-        text: "Homes with income under $40,000 are " + F.pct(D.groups.homes, 1) + " of homes and use " + F.pct(D.groups.use, 1) + " of home electricity (U.S., 2020). The tariff, such as a [[fixed-charge|fixed charge]] per home, sets their share of the bills.",
-        leaves: "Lower means less of the bill falls on low-income homes; whether that is fairer is a judgement about values." },
+        measure: "The share of all home power bills paid by homes with income under $40,000.",
+        assume: "They are " + F.pct(D.groups.homes, 1) + " of homes and use " + F.pct(D.groups.use, 1) + " of home electricity (U.S., 2020). The [[tariff|tariff]], such as a [[fixed-charge|fixed charge]] per home, sets their share.",
+        leaves: "Incomes and other energy bills, so it is not an [[energy-burden|energy burden]].",
+        read: "Lower means less of the bill falls on low-income homes; whether that is fairer is a judgement about values." },
       gas: { name: "Gas share", unit: "% of the electricity used", kind: "A constructed measure: one choice among several", choice: true,
-        text: "One view of [[energy-security|energy security]]: the share of the electricity used that was made from gas. All gas is piped in from outside the town and none is stored, so a supply cut or price spike reaches every MWh from gas.",
-        leaves: "Leaves out weather risks to every plant: in the February 2021 freeze in Texas and nearby states, freezing caused 44.2% of plant outages and gas supply 27.3%." },
+        measure: "The share of the electricity used that was made from gas: one view of [[energy-security|energy security]].",
+        assume: "All gas is piped in from outside the town and none is stored, so a supply cut or price spike reaches every MWh from gas.",
+        leaves: "Weather risks to every plant: in the February 2021 freeze in Texas and nearby states, freezing caused 44.2% of plant outages and gas supply 27.3%." },
       largest: { name: "Largest source", unit: "% of the electricity used", kind: "A constructed measure: one choice among several", choice: true,
-        text: "The share of the electricity used that came from the biggest of four sources: wind, sun, nuclear and gas. Lower means more [[supply-diversity|supply diversity]].",
-        leaves: "It counts every source as equally risky, which none is." }
+        measure: "The share of the electricity used that came from the biggest of four sources: wind, sun, nuclear and gas.",
+        assume: "Every source counts as equally risky, which none is.",
+        leaves: "How many sources there are beyond the largest, and how different their risks are.", read: "Lower means more [[supply-diversity|supply diversity]]." }
     };
 
     // ---- layout: the radar card, the step cards, the nine plans
@@ -487,9 +539,11 @@
       var k = M.axisKey(defSel, S_.defs), d = DEFN[k];
       H("p", { class: "kind" + (d.choice ? " choice" : ""), text: LAB[defSel] + " · " + d.kind }, defBox);
       H("h4", { text: d.name + " (" + d.unit + ")" }, defBox);
-      H("p", { html: LX.rich(d.text) }, defBox);
-      if (k === "fair") H("p", { html: "<b>Tariff now:</b> " + LX.esc(TARIFF[S_.defs.fair].label.toLowerCase()) + ": " + LX.esc(TARIFF[S_.defs.fair].text) + "." }, defBox);
-      H("p", { class: "a22-sub", text: d.leaves }, defBox);
+      var dl = H("dl", { class: "a22-fields" }, defBox);
+      [["Measure", d.measure], ["Assumption", d.assume], k === "fair" ? ["Tariff now", TARIFF[S_.defs.fair].label + ": " + TARIFF[S_.defs.fair].text + "."] : null,
+       ["Leaves out", d.leaves], d.read ? ["Reading it", d.read] : null].forEach(function (f) {
+        if (!f) return; H("dt", { text: f[0] }, dl); H("dd", { html: LX.rich(f[1]) }, dl);
+      });
     }
 
     var lh = H("div", { class: "a22-head" }, lc); H("h3", { text: "Nine plans for Prairie Town" }, lh);
@@ -617,8 +671,8 @@
           var pr = LX.Predict(act, { id: "a22-wind", q: "Add 300 MW of wind to plan A. What happens to the five goals?", answer: "mixed",
             options: [{ value: "mixed", label: "Clean and Secure improve; Cheap and Fair get worse" }, { value: "all", label: "All five improve" },
                       { value: "clean", label: "Only Clean changes" }, { value: "none", label: "Clean improves; the other four stay the same" }],
-            feedback: { mixed: "Wind cuts gas burned, but its building costs are fixed costs.", all: "Wind costs more than the gas it saves, and the tariff spreads that cost.",
-                        clean: "Burning less gas also cuts the gas share, and the cost moves too.", none: "Cost, the gas share and the bill split all move." },
+            feedback: { mixed: "Wind cuts gas burned, but its building costs are fixed costs.", all: "Wind costs more than the gas it saves, and the [[tariff|tariff]], the rule for calculating bills, spreads that cost.",
+                        clean: "Burning less gas also cuts the gas share, and the cost moves too.", none: "Cost, the gas share and the split of the bills all move." },
             onPick: function () { show(); } });
           var box = H("div", null, act), sl = null;
           function show() {
@@ -674,6 +728,7 @@
           var chk = H("button", { class: "lx-btn small", type: "button", html: "Check my picks" + LX.icon("check") }, row);
           var out = H("div", { "aria-live": "polite" }, act), fr = H("div", null, act);
           H("p", { class: "lx-hint", text: "The table under the nine plans now shows all five numbers. Tip: look for two plans that are equal on several goals." }, act);
+          H("p", { class: "lx-hint", text: "Values count as equal when they look equal: rounded to $0.1M, 1 kt, 1 MWh, 0.1 point of the low-income share and 1 point of the gas share." }, act);
           function check() {
             S_.checked = true; paintLib();
             var un = M.unbeaten(LIB, S_.defs), right = 0, wrong = [];
@@ -687,10 +742,11 @@
             fc.frontier([], null);
             fc.plans(LIB.map(function (p) { return { id: p.id, label: p.short, co2: p.m.co2, cost: p.m.cost, color: "var(--lx-tier-5)", kind: "plan", mark: d2[p.id] ? "dominated" : null,
               note: d2[p.id] ? "beaten on cost and CO₂ by " + d2[p.id].join(", ") : "unbeaten on cost and CO₂" }; }));
-            var n2 = Object.keys(d2).length, nar = rs.narrow;
-            api.saw("On cost and CO₂ alone, **" + n2 + " of 9** plans are beaten; on all five goals, **" + (9 - un.length) + "**. More goals rescue plans: " +
-              rs.list.map(function (r) { return r.id + " (" + r.axes.map(function (a) { return LAB[a]; }).join(", ") + ")"; }).join(", ") + "." +
-              (nar ? " Plan " + nar.id + " escapes plan " + nar.by + " by just " + fmtGap(nar) + ": dominance counts any difference, however small." : ""));
+            var n2 = Object.keys(d2).length, nar = rs.narrow, ul = H("ul", { class: "a22-list" }, out);
+            H("li", { html: "Beaten on cost and CO₂ alone: <b>" + n2 + " of 9</b>. Beaten on all five goals: <b>" + (9 - un.length) + " of 9</b>." }, ul);
+            H("li", { text: "Rescued by the other three goals: " + rs.list.map(function (r) { return r.id + " (" + r.axes.map(function (a) { return LAB[a]; }).join(", ") + ")"; }).join(", ") + "." }, ul);
+            if (nar) H("li", { text: "Narrowest escape: plan " + nar.id + " escapes plan " + nar.by + " by just " + fmtGap(nar) + "." }, ul);
+            api.saw("More goals rescued **" + rs.list.length + "** plans here. Dominance counts any difference that shows, however small.");
             api.done();
           }
           chk.addEventListener("click", check);
@@ -741,7 +797,7 @@
           myPick();
           if (S_.priSel) sel(S_.priSel);
         } },
-      { text: "Fair, Secure and a reserve margin are constructions: each is one choice among several. Switch a definition and watch the unbeaten plans and the picks change.",
+      { text: "Fair, Secure and a reserve margin are constructions: each is one choice among several. Switch the definitions of two goals and watch the unbeaten plans and the picks change.",
         build: function (act, api) {
           S_.mode = "compare"; paintLib();
           var box = H("div", { class: "a22-defs" }, act), segs = {};
@@ -754,6 +810,7 @@
           seg("rel", "Reliable: measured by", REL);
           seg("fair", "Fair: the tariff", { fixed: TARIFF.fixed.short, graded: TARIFF.graded.short, flat: TARIFF.flat.short });
           seg("sec", "Secure: measured by", SEC);
+          var prog = H("p", { class: "a22-sub" }, act);
           var out = H("div", { class: "a22-out", "aria-live": "polite" }, act);
           var sm = H("div", null, act);
           function summary(defs) {
@@ -763,9 +820,12 @@
           var base = summary(DEFAULTS);
           function paint() {
             Object.keys(segs).forEach(function (k) { Object.keys(segs[k]).forEach(function (v) { segs[k][v].setAttribute("aria-pressed", S_.defs[k] === v ? "true" : "false"); }); });
-            var now = summary(S_.defs);
+            var now = summary(S_.defs), n = Object.keys(S_.tried).length, hid = M.hiddenByRounding(LIB, S_.defs);
+            prog.textContent = "Goals with a switched definition: " + Math.min(n, 2) + " of 2.";
             out.innerHTML = "<p class='a22-out'>Unbeaten: <b>" + now.un.join(", ") + "</b> (" + now.un.length + " of 9)" + (now.un.join() !== base.un.join() ? "; with the first definitions: " + base.un.join(", ") : "") + ".</p>" +
-              "<ul class='a22-list'>" + now.picks.map(function (p, i) { var was = base.picks[i].pick; return "<li>" + LX.esc(p.label) + " picks <b>" + p.pick + "</b>" + (was !== p.pick ? " (was " + was + ")" : "") + "</li>"; }).join("") + "</ul>";
+              "<ul class='a22-list'>" + now.picks.map(function (p, i) { var was = base.picks[i].pick; return "<li>" + LX.esc(p.label) + " picks <b>" + p.pick + "</b>" + (was !== p.pick ? " (was " + was + ")" : "") + "</li>"; }).join("") + "</ul>" +
+              hid.map(function (x) { return "<p class='a22-sub'>Ties are judged as shown. At full precision, " + x.id + " is unbeaten too: its " + LX.esc(DEFN[x.key].name.toLowerCase()) + ", " + fine(x.key, x.v) +
+                ", beats " + x.by + "'s " + fine(x.key, x.vs) + " by less than the " + STEPW[x.key] + " the page shows.</p>"; }).join("");
             return now;
           }
           function change(key, v) {
@@ -784,13 +844,17 @@
             }
           }
           LX.Steelman(sm, { eyebrow: "Steelman: should every home pay an equal share of the fixed costs?", heading: "h4", frame: true, reveal: "details", opened: S_.steel,
-            sides: [{ key: "for", title: "For a fixed charge per home", text: ["Building costs do not grow with each kWh used, so charging them per home follows what causes them, and keeps the price of one more kWh near its running cost, which helps heat pumps and electric cars.", "**Strongest objection:** homes that use little, often lower-income ones, pay more per kWh."] },
-                    { key: "against", title: "For charging per kWh, or by income", text: ["Spreading fixed costs per kWh charges more to homes that use more, which on average are better off; an income-graduated charge protects ability to pay.", "**Strongest objection:** a high price per kWh discourages switching to electric heat and cars, and income checks add cost and shift bills to other homes."] },
-                    { key: "both", title: "What both leave open", wide: true, text: ["Who sets the tariff, and how much weight ability to pay should get. The model shows each tariff's split; regulators and elected officials decide, and answer for it."] }],
+            sides: [{ key: "for", title: "For a fixed charge per home", text: ["**Claim:** building costs do not grow with each kWh used, so charging them per home follows what causes them.",
+                      "**Claim:** the price of one more kWh stays near its running cost, which helps heat pumps and electric cars.",
+                      "**Strongest objection:** homes that use little, often lower-income ones, pay more per kWh."] },
+                    { key: "against", title: "For charging per kWh, or by income", text: ["**Claim:** per kWh, homes that use more pay more, and on average they are better off.",
+                      "**Claim:** an income-graduated charge protects ability to pay.",
+                      "**Strongest objection:** a high price per kWh discourages electric heat and cars, and income checks cost money and shift bills to other homes."] },
+                    { key: "both", title: "What both leave open", wide: true, text: ["Who sets the tariff, and how much weight ability to pay should get.", "The model shows each tariff's split; regulators and elected officials decide, and answer for it."] }],
             onOpen: function (k) { S_.steel[k] = true; } });
           report(paint());
         } },
-      { text: "Can you have them all? Set limits on CO₂, the gas share and the low-income share; the solver looks for the cheapest plan that meets every limit.",
+      { text: "Can you have them all? Set limits on CO₂, the gas share and the low-income share. The solver finds the cheapest plan that meets them on lesson 13's seven weeks, then checks it on all 8,760 hours.",
         build: function (act, api) {
           S_.mode = "compare"; S_.busy = null; paintLib();
           var L = A.limits, ls = {};
@@ -804,6 +868,13 @@
           Object.keys(TARIFF).forEach(function (v) { tb[v] = H("button", { type: "button", text: TARIFF[v].short, onclick: function () { S_.defs.fair = v; paintT(); draw(); paintLib(); } }, tg); });
           function paintT() { Object.keys(tb).forEach(function (v) { tb[v].setAttribute("aria-pressed", S_.defs.fair === v ? "true" : "false"); }); }
           paintT();
+          // the task, in two parts, with its progress
+          var task = H("ul", { class: "a22-list a22-task", "aria-label": "Your task" }, act), tInf = H("li", null, task), tWk = H("li", null, task);
+          function paintProg() {
+            tInf.innerHTML = "Find limits that no plan can meet: <b>" + (S_.lim.inf ? "found" : "not yet") + "</b>";
+            tWk.innerHTML = "Find limits the solver can meet on the seven weeks: <b>" + (S_.lim.weeks ? "found" : "not yet") + "</b>";
+          }
+          paintProg();
           var row = H("div", { class: "a22-row" }, act);
           var go = H("button", { class: "lx-btn small", type: "button", html: "Find the cheapest plan" + LX.icon("target") }, row);
           var out = H("div", { "aria-live": "polite" }, act), logBox = H("ul", { class: "a22-list a22-sub", "aria-label": "Your attempts" }, act);
@@ -816,33 +887,58 @@
             go.disabled = true; api.busy(true); out.innerHTML = ""; status.set(LX.solver.mode ? "solving" : "loading");
             function free() { go.disabled = false; api.busy(false); }
             function tag() { return lv2.co2 + " kt · " + lv2.gas + "% gas · " + lv2.fair.toFixed(1) + "% share · " + TARIFF[Lm.tariff].short.toLowerCase(); }
+            function att(extra) { var o = { co2: lv2.co2, gas: lv2.gas, fair: lv2.fair, tariff: Lm.tariff }; for (var k in extra) o[k] = extra[k]; return o; }
             return LX.solver.solve(M.limitModel(TP, C, null, RW, Lm, D), { key: "a22-lim", label: "a22-lim", timeLimit: 30 }).then(function (r) {
               status.set(r);
               if (r.status === "infeasible") {
-                free(); S_.lim.inf = { co2: lv2.co2, gas: lv2.gas, fair: lv2.fair, tariff: Lm.tariff };
+                free(); S_.lim.inf = att({});
                 logLine(tag() + ": no plan");
-                H("p", { class: "a22-out", html: "<b>No plan meets all three limits</b> and serves every modelled hour. Something has to give: loosen a limit, or change the tariff." }, out);
+                H("p", { class: "a22-out", html: "<b>No plan meets all three limits</b> on the seven weeks while serving every modelled hour. Something has to give: loosen a limit, or change the tariff." }, out);
                 fin(); return null;
               }
               if (!r.ok) { free(); H("p", { class: "a22-sub", text: LX.solver.describe(r) }, out); return null; }
-              var s = TP.summarize(C, per, r, {}), plan = TP.ceilPlan(s.plan, lim);
-              logLine(tag() + ": " + F.musd(s.cost) + " a year");
-              H("p", { class: "a22-out", html: "Cheapest plan that meets them: <b>" + F.musd(s.cost) + "</b> a year on the seven weeks. It builds " + builds(s.plan) + "." }, out);
+              var wv = M.weekVals(TP, C, per, r, Lm.tariff, D), plan = TP.ceilPlan(wv.plan, lim);
+              H("p", { class: "a22-out", html: "Met on the seven weeks: <b>" + F.musd(wv.cost) + "</b> a year. It builds " + builds(wv.plan) + "." }, out);
               var chk = H("p", { class: "a22-sub", text: "Checking it on all 8,760 hours…" }, out);
               return LX.solver.solve(TP.fullYearModel(C, Y, { plan: plan }), { key: "a22-limchk", label: "a22-limchk", timeLimit: 30 }).then(function (rf) {
                 free(); status.set(rf);
-                if (!rf.ok) { chk.textContent = LX.solver.describe(rf); return null; }
-                var m = M.measure(C, Y, rf, plan, D), over = [];
-                if (m.co2 > Lm.co2 + 500) over.push("CO₂ " + F.kt(m.co2));
-                if (m.gas > Lm.gas + 0.005) over.push("gas share " + F.pct(m.gas));
-                if (m.fair[Lm.tariff] > Lm.fair + 0.0005) over.push("low-income share " + F.pct(m.fair[Lm.tariff], 1));
-                chk.textContent = "On all 8,760 hours (sizes rounded up): " + M.AXES.map(function (a) { return LAB[a] + " " + val(m, a, S_.defs); }).join(" · ") + "." +
-                  (over.length ? " Over a limit on the full year: " + over.join(", ") + ": seven weeks miss some hours (lesson 13)." : "");
-                S_.lim.ok = { co2: lv2.co2, gas: lv2.gas, fair: lv2.fair, tariff: Lm.tariff }; S_.solver = m;
-                setCmp("solver", "Solver's plan", m);
+                if (!rf.ok) {
+                  chk.textContent = LX.solver.describe(rf) + " Without the full-year check, this stays a seven-week result.";
+                  S_.lim.weeks = att({ pass: null, bad: [] }); logLine(tag() + ": met on the seven weeks; full year not checked"); fin(); return null;
+                }
+                var m = M.measure(C, Y, rf, plan, D), yv = M.yearVals(m, Lm.tariff), wc = M.checkLimits(wv, Lm), yc = M.checkLimits(yv, Lm), bad = misses(yv, yc, lv2);
+                chk.remove();
+                checkTable(out, wv, yv, wc, yc, lv2, Lm.tariff);
+                H("p", { class: "a22-out", html: yc.pass ? "<b>Passes the full-year check:</b> every limit met and every hour served." :
+                  "<b>Fails the full-year check:</b> " + LX.esc(bad.join("; ")) + ". Seven weeks cannot show every hour of the year, so a plan found on them needs this check (lesson 13)." }, out);
+                logLine(tag() + ": met on the seven weeks at " + F.musd(wv.cost) + " a year; full year " + (yc.pass ? "passes" : "fails (" + bad.join(", ") + ")"));
+                S_.lim.weeks = att({ pass: yc.pass, bad: bad });
+                setCmp("solver", "Solver's plan (full year)", m);
                 fin(); return m;
               });
             });
+          }
+          // the limits the full year misses, in words
+          function misses(v, c, l) {
+            var o = [];
+            if (!c.co2) o.push("CO₂ " + F.kt(v.co2) + ", over " + l.co2 + " kt");
+            if (!c.gas) o.push("gas share " + F.pct(v.gas, 1) + ", over " + l.gas + "%");
+            if (!c.fair) o.push("low-income share " + F.pct(v.fair, 1) + ", over " + l.fair.toFixed(1) + "%");
+            if (!c.served) o.push(F.mwh(v.unserved) + " unserved");
+            return o;
+          }
+          // the check table: every limit against the seven weeks and the full year, whatever the radar's definitions
+          function checkTable(host, wv, yv, wc, yc, l, tariff) {
+            function cell(t, okv, word) { return "<td>" + t + "<br><span class='" + (okv ? "ok" : "no") + "'>" + (okv ? "met" : word || "over") + "</span></td>"; }
+            function lim(name, at) { return "<th scope='row'>" + name + "<br><small>" + at + "</small></th>"; }
+            H("p", { class: "a22-sub", text: "Each limit, checked on the seven weeks and on all 8,760 hours (sizes rounded up):" }, host);
+            var h = "<table class='a22-tbl a22-chk'><thead><tr><th scope='col'>Limit</th><th scope='col'>Seven weeks</th><th scope='col'>All 8,760 hours</th></tr></thead><tbody>" +
+              "<tr>" + lim("CO₂", "at most " + l.co2 + " kt") + cell(F.kt(wv.co2), wc.co2) + cell(F.kt(yv.co2), yc.co2) + "</tr>" +
+              "<tr>" + lim("Gas share", "at most " + l.gas + "%") + cell(F.pct(wv.gas, 1), wc.gas) + cell(F.pct(yv.gas, 1), yc.gas) + "</tr>" +
+              "<tr>" + lim("Low-income share", "at most " + l.fair.toFixed(1) + "%, " + LX.esc(TARIFF[tariff].short.toLowerCase())) + cell(F.pct(wv.fair, 1), wc.fair) + cell(F.pct(yv.fair, 1), yc.fair) + "</tr>" +
+              "<tr>" + lim("Unserved energy", "none") + cell(F.mwh(wv.unserved), wc.served, "short") + cell(F.mwh(yv.unserved), yc.served, "short") + "</tr>" +
+              "<tr>" + lim("Cost a year", "no limit") + "<td>" + F.musd(wv.cost) + "</td><td>" + F.musd(yv.cost) + "</td></tr></tbody></table>";
+            H("div", { class: "a22-scroll a22-fit", html: h }, host);
           }
           // demo "done": the starting limits under a fixed charge per home, then the same limits with the income-graduated charge
           if (S_.autoLimits) {
@@ -850,10 +946,12 @@
             solveNow().then(function () { S_.defs.fair = "graded"; paintT(); draw(); paintLib(); return solveNow(); });
           }
           function fin() {
-            if (!S_.lim.inf || !S_.lim.ok) return;
-            var i = S_.lim.inf, o = S_.lim.ok, tariffFixed = o.tariff !== i.tariff && o.co2 === i.co2 && o.gas === i.gas && o.fair === i.fair;
-            api.saw("Under these limits " + (tariffFixed ? "the conflict came from the tariff: with " + TARIFF[S_.lim.ok.tariff].art + ", the same limits can all be met on the seven weeks. Cost against CO₂ is a trade-off of technology and prices; this one was a rule people chose." :
-              "you found where these goals stop fitting together: tighten one, and another has to give. That edge is the trade-off, and choosing a point on it is a judgement about values."));
+            paintProg();
+            if (!S_.lim.inf || !S_.lim.weeks) return;
+            var i = S_.lim.inf, o = S_.lim.weeks, tariffFixed = o.tariff !== i.tariff && o.co2 === i.co2 && o.gas === i.gas && o.fair === i.fair;
+            api.saw((tariffFixed ? "These limits clashed because of the tariff: with " + TARIFF[o.tariff].art + ", the seven weeks meet them all. That rule was chosen by people." :
+              "You found where these goals stop fitting together: tighten one, and another has to give. Choosing a point on that edge is a judgement about values.") +
+              (o.pass === true ? " The full-year check confirms your plan." : " The full-year check " + (o.pass === false ? "fails" : "did not run") + ", so your plan stays a seven-week result."));
             api.done(); LX.progress.done(LESSON); LX.emit("a22-done");
           }
           function builds(p) {
@@ -864,6 +962,9 @@
           }
         } }
     ];
+    // a value to more places than the page shows, and the step the page shows (the rounding note of step 6)
+    var STEPW = { cost: "$0.1M", co2: "1 kt", unserved: "1 MWh", fair: "0.1 point", gas: "1 point", largest: "1 point", rm: "1 point" };
+    function fine(k, v) { return k === "cost" ? "$" + (v / 1e6).toFixed(2) + "M" : k === "co2" ? (v / 1e3).toFixed(1) + " kt" : k === "unserved" ? v.toFixed(1) + " MWh" : (v * 100).toFixed(2) + "%"; }
     function fmtGap(n) { return n.key === "fair" ? (n.g * 100).toFixed(1) + " points of the low-income share (" + F.pct(n.v, 1) + " against " + F.pct(n.vs, 1) + ")" : fmtKey(n.key, n.g) + " of " + DEFN[n.key].name.toLowerCase(); }
     var cardsUI = LX.StepCards(panel, { id: "a22-steps", steps: steps });
     draw(); paintLib();
@@ -890,6 +991,7 @@
     // ---------------------------------------------------------------- practice (Check section): three faded sets
     function buildPractice() {
       var host = document.getElementById("a22-practice"); if (!host || !LX.Practice) return;
+      host.innerHTML = "";                       // the static exercises (no JavaScript) give way to the interactive set
       var DF = DEFAULTS;
       function choices(area, opts, label) {
         var row = H("div", { class: "lx-fp-choices a22-row", role: "group", "aria-label": label }, area), cur = { v: null }, bs = {};
@@ -990,9 +1092,9 @@
           { id: "run", g: "mod", label: "The year's run", lines: ["The year's", "run"], at: [1, 0], atN: [1, 0], text: "The plan runs hour by hour through all 8,760 hours of 2025 in a linear program.", game: "The solver status above the radar." },
           { id: "five", g: "mea", label: "Five measures", lines: ["Five", "measures"], at: [2, 0], atN: [0, 1], text: "Cost, CO₂, unserved energy, the low-income share of bills and the gas share: one number per goal.", game: "The five tiles and the radar." },
           { id: "defs", g: "val", label: "Definitions", at: [3, 0], atN: [1, 1], text: "Each measure is a choice of unit, boundary and formula; Fair and Secure most of all.", game: "Step 6: three tariffs, two security measures, two reliability measures." },
-          { id: "unbeaten", g: "mod", label: "Unbeaten plans", lines: ["Unbeaten", "plans"], at: [2, 1], atN: [0, 2], text: "Plans no other plan matches or beats on all five and beats on one. The model can find them; it cannot choose among them.", game: un.length + " of 9 unbeaten on five goals; " + (9 - Object.keys(d2).length) + " of 9 on cost and CO₂ alone." },
+          { id: "unbeaten", g: "mod", label: "Unbeaten plans", lines: ["Unbeaten", "plans"], at: [2, 1], atN: [0, 2], text: "Plans that no other plan matches or beats on all five goals, comparing values as shown. The model can find them; it cannot choose among them.", game: un.length + " of 9 unbeaten on five goals; " + (9 - Object.keys(d2).length) + " of 9 on cost and CO₂ alone." },
           { id: "weights", g: "val", label: "Weights", at: [1, 1], atN: [1, 2], text: "How much each goal counts in one score. People set them; the model cannot.", game: "Five sets of priorities picked " + Object.keys(PRI.reduce(function (o, p) { o[picks[p.id]] = 1; return o; }, {})).length + " different plans." },
-          { id: "limits", g: "val", label: "Limits", at: [3, 1], atN: [0, 3], text: "Caps on some goals; the solver finds the cheapest plan that meets them, or says none exists.", game: "Step 7: the epsilon-constraint method with three limits." },
+          { id: "limits", g: "val", label: "Limits", at: [3, 1], atN: [0, 3], text: "Caps on some goals; the solver finds the cheapest plan that meets them on seven weeks, or says none exists. The full year then checks it.", game: "Step 7: the [[epsilon-constraint|epsilon-constraint method]] with three limits, then a full-year check." },
           { id: "choice", g: "dec", label: "A choice", lines: ["A", "choice"], at: [1, 2], atN: [1, 3], text: "Someone picks a plan and answers for it: who decides, who pays and who benefits (next card).", game: "" }
         ],
         edges: [["build", "run", "runs in"], ["run", "five", "gives"], ["defs", "five", "shape"], ["five", "unbeaten", "filter"], ["unbeaten", "weights", "still many: need"],

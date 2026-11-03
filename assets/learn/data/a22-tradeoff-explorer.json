@@ -50,7 +50,7 @@
    "best": 0.25,
    "worst": 1
   },
-  "note": "Fixed scales chosen for this lesson: the rim of the radar is the 'best' end, the centre the 'worst'; values beyond an end are drawn at that end. Scores (0 at the centre, 1 at the rim) feed the weighted sums."
+  "note": "Fixed scales chosen for this lesson: the rim of the radar is the 'best' end, the centre the 'worst'; values beyond an end are drawn at that end. Scores (0 at the centre, 1 at the rim) feed the weighted sums. A value beyond an end scores the same as that end, so the weighted sums weigh only the plans that are unbeaten as shown."
  },
  "start": "A",
  "plans": [
@@ -244,7 +244,7 @@
    "id": "F",
    "label": "Nuclear and gas",
    "short": "Nuclear + gas",
-   "note": "a generic 300 MW nuclear plant at lesson 13's fixed cost, 100 MW combined-cycle gas and 80 MW of peakers",
+   "note": "a generic 300 MW nuclear plant, 100 MW combined-cycle gas and 80 MW of peakers",
    "plan": {
     "nuc": 300,
     "cc": 100,

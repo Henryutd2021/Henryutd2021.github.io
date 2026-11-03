@@ -1271,6 +1271,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "tariff": {
+  "term": "Tariff",
+  "short": "The rule for calculating electricity bills: fixed charges, prices per kWh, or both.",
+  "lesson": "A22",
+  "href": "a22-tradeoff-explorer.html"
+ },
  "telemetry": {
   "term": "Telemetry",
   "short": "Measurements sent automatically from plants and substations to the grid operator.",

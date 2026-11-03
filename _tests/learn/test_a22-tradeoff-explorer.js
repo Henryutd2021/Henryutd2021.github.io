@@ -5,11 +5,15 @@
 //   - the nine plans: each precomputed year matches a fresh full-year solve; C's peakers never run; H is the only plan short
 //   - measures: the low-income share formula for the three tariffs, the reserve margin rule, the gas and largest shares
 //   - dominance: only C is beaten (by D) with the first definitions; five of nine on cost and CO2 alone; the rescues and
-//     the narrowest escape; how the unbeaten set changes with each alternative definition
+//     the narrowest escape; how the unbeaten set changes with each alternative definition; values compared as shown (ties
+//     within the shown step) against full precision (only C under the income-graduated charge differs); a tie lets a new
+//     goal beat a plan that was unbeaten; clipped scores could hide a difference, so picks weigh only unbeaten plans
 //   - picks of the five priority sets under each definition; the step 1 prediction; step 3's conflict counter
 //   - the limits model: infeasible at 200 kt, 25% gas and a 33% share under a fixed charge per home, feasible with the
-//     income-graduated charge or a 34.5% share; the solved plan meets its limits on the seven weeks
+//     income-graduated charge or a 34.5% share; the solved plan meets its limits on the seven weeks; the full-year check
+//     (sizes rounded up) fails on CO2, the gas share and unserved energy at 200 kt, and passes at loose limits
 //   - the fallback table, the Go deeper numbers, the myths, the quick question, the numbers to remember, the practice
+//     (interactive and static)
 //   - wording: illustrative labels, sources with dates, the radar's text version
 //   - the re-solve behind the sliders (M.resolver, fake timers): 260 ms debounce, a newer change aborts a running solve,
 //     stale results are dropped, Next is held until the newest result, results are announced in a live region
@@ -103,8 +107,29 @@ function val(m, axis, defs) {
   ok(musd(M.shown(BY.C.m.cost, "cost") - M.shown(BY.D.m.cost, "cost")) === "$5.9M", "the cost gap as shown: $5.9M");
   const exp = { graded: { C: ["D"], E: ["C", "D"], F: ["I"], G: ["C", "D"] }, flat: { C: ["D"], E: ["C", "D"], F: ["I"], G: ["C", "D"] }, largest: { C: ["D"] }, rm: {} };
   Object.keys(ALT).forEach(k => ok(JSON.stringify(M.dominated(LIB, ALT[k])) === JSON.stringify(exp[k]), `${k}: beaten ${JSON.stringify(exp[k])}`));
-  // adding a goal never knocks a plan out: unbeaten on two goals implies unbeaten on five, for every definition
-  [DEF].concat(Object.values(ALT)).forEach(df => { const u2 = M.unbeaten(LIB, df, ["cost", "co2"]), u5 = M.unbeaten(LIB, df); ok(u2.every(id => u5.includes(id)), "more goals only rescue plans"); });
+  // in this library no plan unbeaten on cost and CO2 is beaten on five (no two plans tie on both), for every definition
+  [DEF].concat(Object.values(ALT)).forEach(df => { const u2 = M.unbeaten(LIB, df, ["cost", "co2"]), u5 = M.unbeaten(LIB, df); ok(u2.every(id => u5.includes(id)), "this library: the three extra goals only rescue plans"); });
+  // ...but with a tie on the earlier goals a new goal can beat an unbeaten plan (the page's claim: "The reverse needs a tie")
+  {
+    const base = BY.D.m, tieA = { id: "X", m: Object.assign({}, base, { unserved: 0 }) }, tieB = { id: "Y", m: Object.assign({}, base, { unserved: 10 }) };
+    const u2 = M.unbeaten([tieA, tieB], DEF, ["cost", "co2"]), u5 = M.unbeaten([tieA, tieB], DEF);
+    ok(u2.join() === "X,Y" && u5.join() === "X", "a tie on cost and CO₂: both unbeaten on two goals, Y beaten once Reliable is added");
+  }
+  onPage("The reverse needs a tie: a new goal can beat an unbeaten plan only if another plan matched it on every earlier goal.", "myth 2's tie rule");
+  onPage("It can beat a plan that was unbeaten only if another plan tied that plan on every earlier goal.", "the Modeler box's tie rule");
+  // values as shown against full precision
+  const exact = df => M.unbeaten(LIB, df, null, true).join();
+  ok(exact(DEF) === un.join() && exact(ALT.flat) === M.unbeaten(LIB, ALT.flat).join() && exact(ALT.largest) === M.unbeaten(LIB, ALT.largest).join() && exact(ALT.rm) === M.unbeaten(LIB, ALT.rm).join(),
+     "full precision gives the same unbeaten plans as the shown values, except under the income-graduated charge");
+  ok(exact(ALT.graded) === "A,B,C,D,H,I" && M.unbeaten(LIB, ALT.graded).join() === "A,B,D,H,I", "income-graduated: C unbeaten at full precision, beaten by D as shown");
+  const hid = M.hiddenByRounding(LIB, ALT.graded);
+  ok(hid.length === 1 && hid[0].id === "C" && hid[0].by === "D" && hid[0].key === "fair" && (hid[0].v * 100).toFixed(2) === "21.61" && (hid[0].vs * 100).toFixed(2) === "21.64" && pct(hid[0].v, 1) === pct(hid[0].vs, 1),
+     "the rounding note: C's 21.61% against D's 21.64%, both shown as 21.6%");
+  ok([DEF, ALT.flat, ALT.largest, ALT.rm].every(df => M.hiddenByRounding(LIB, df).length === 0), "no rounding note under the other definitions");
+  onPage("Under the income-graduated charge, C's share (21.61%) and D's (21.64%) both show 21.6%, so D beats C; at full precision, C is unbeaten.", "the ties-as-shown bullet");
+  onPage("Verdicts compare values as shown: two values that round to the same number count as a tie.", "the fallback's tie rule");
+  onJS("Values count as equal when they look equal: rounded to $0.1M, 1 kt, 1 MWh, 0.1 point of the low-income share and 1 point of the gas share.", "step 4's tie rule");
+  ok(M.shown(0.0005, "fair") === 0.001 && M.shown(1e5 * 0.49, "cost") === 0 && M.shown(499, "co2") === 0 && M.shown(0.49, "unserved") === 0 && M.shown(0.0049, "gas") === 0, "the stated steps match PREC");
 
   // ---------------- picks
   const pk = (df) => A.priorities.map(p => p.id + ":" + M.pick(LIB, p.w, df, A.scales).id).join();
@@ -114,6 +139,17 @@ function val(m, axis, defs) {
   ok(pk(ALT.rm) === "bills:C,climate:I,lights:I,supply:I,equal:C", "reserve margin: Bills and Equal pick C, Lights picks I");
   A.priorities.forEach(p => ok(near(Object.values(p.w).reduce((s, x) => s + x, 0), 100, 1e-9), `${p.label}: weights sum to 100`));
   [DEF].concat(Object.values(ALT)).forEach(df => A.priorities.forEach(p => ok(M.unbeaten(LIB, df).includes(M.pick(LIB, p.w, df, A.scales).id), "every positive-weight pick is unbeaten")));
+  // out of range: two CO2 values beyond the 850 kt end both score 0, so the clipped totals tie and a beaten plan could win
+  // on the order; pick() weighs only unbeaten plans
+  {
+    const hi = { id: "P", m: Object.assign({}, BY.A.m, { co2: 950e3 }) }, lo = { id: "Q", m: Object.assign({}, BY.A.m, { co2: 900e3 }) };
+    ok(M.scores(hi.m, DEF, A.scales).co2 === 0 && M.scores(lo.m, DEF, A.scales).co2 === 0 && M.total(hi.m, A.priorities[0].w, DEF, A.scales) === M.total(lo.m, A.priorities[0].w, DEF, A.scales), "out of range: 950 kt and 900 kt both score 0 and tie");
+    ok(JSON.stringify(M.dominated([hi, lo], DEF)) === JSON.stringify({ P: ["Q"] }) && M.pick([hi, lo], A.priorities[0].w, DEF, A.scales).id === "Q", "out of range: the pick is the unbeaten Q, not the beaten P listed first");
+    const rmClip = LIB.filter(p => M.reserveMargin(p.plan, D.cv, D.peak, 4) > 1).map(p => p.id).join();
+    ok(rmClip === "E,I", "reserve margins above the 100% rim: E and I (drawn at the rim)");
+  }
+  onPage("A value beyond its scale's end scores the same as that end, which can hide a difference, so the page weighs only the unbeaten plans.", "the clipping rule");
+  ok(/weigh only the plans that are unbeaten as shown/.test(A.scales.note), "the data's scale note says picks weigh only unbeaten plans");
 
   // ---------------- step 1: adding 300 MW of wind to plan A (plan B)
   const mv = M.moves(BY.A.m, BY.B.m, DEF);
@@ -132,10 +168,17 @@ function val(m, axis, defs) {
   const fairs = LIB.map(p => p.m.fair.fixed), fs_ = LIB.map(p => M.scores(p.m, DEF, sc).fair);
   ok(pct(Math.min(...fairs), 1) === "31.3%" && pct(Math.max(...fairs), 1) === "34.6%" && Math.min(...fs_).toFixed(2) === "0.03" && Math.max(...fs_).toFixed(2) === "0.25", "fixed charge per home: shares 31.3% to 34.6%, Fair scores 0.03 to 0.25");
   onPage("every plan's low-income share lies between 31.3% and 34.6%, so Fair scores span only 0.03 to 0.25", "the squeezed spoke");
-  onPage("| Fixed charge per home | 34.7% (their share of homes) | $34.7\\%\\,\\phi + 29.6\\%\\,(1-\\phi)$ |", "the tariff table, fixed");
-  onPage("| Income-graduated (half the charge) | 21.0% | $21.0\\%\\,\\phi + 29.6\\%\\,(1-\\phi)$ |", "the tariff table, graduated");
-  onPage("their share of use:", "the linearised share");
-  onPage("$u = 29.6\\%$", "u in the Modeler box");
+  // the worked tariff table (a plan with 95% fixed costs): the shown arithmetic and the model agree to 0.1 point
+  {
+    const f = 0.95, fx = M.fairShare(f, D.groups, "fixed", D.graded), gr = M.fairShare(f, D.groups, "graded", D.graded), fl = M.fairShare(f, D.groups, "flat", D.graded);
+    ok(pct(fx, 1) === "34.4%" && (34.7 * 0.95 + 29.6 * 0.05).toFixed(1) === "34.4", "worked table, fixed charge: 34.4% (model and shown arithmetic)");
+    ok(pct(gr, 1) === "21.4%" && (21.0 * 0.95 + 29.6 * 0.05).toFixed(1) === "21.4", "worked table, income-graduated: 21.4%");
+    ok(pct(fl, 1) === "29.6%" && ((fx - gr) * 100).toFixed(1) === "13.0", "worked table: per kWh 29.6%; the tariff moves the share by 13.0 points");
+    onPage("| Fixed charge per home | 34.7% of the fixed costs, 29.6% of the running costs | 34.7% × 0.95 + 29.6% × 0.05 = 34.4% |", "the worked table, fixed");
+    onPage("| Income-graduated (half the charge) | 21.0% of the fixed costs, 29.6% of the running costs | 21.0% × 0.95 + 29.6% × 0.05 = 21.4% |", "the worked table, graduated");
+    onPage("the tariff alone moves the share by 13.0 points", "the worked table's gap");
+    ok(!/Longleftrightarrow|\\phi/.test(page), "the Modeler box no longer derives the linear form of the share limit (depth D2)");
+  }
 
   // ---------------- the limits model ("can you have them all?")
   const lim = (co2, gas, fair, tariff) => solve(M.limitModel(TP, C, null, RW, { co2: co2 * 1e3, gas: gas / 100, fair: fair / 100, tariff }, D));
@@ -153,6 +196,32 @@ function val(m, axis, defs) {
   checkSol(lim(200, 25, 33, "flat"), 200, 25, 33, "flat", "the same limits per kWh only");
   checkSol(lim(200, 25, 34.5, "fixed"), 200, 25, 34.5, "fixed", "a 34.5% share with a fixed charge per home");
   ok(lim(800, 100, 29.5, "flat").status === "infeasible", "per kWh only, a share below 29.6% cannot be met");
+  // the full-year check of step 7: the optimizer's plan, sizes rounded up, run on all 8,760 hours
+  const yearCheck = (co2, gas, fair, tariff) => {
+    const Lm = { co2: co2 * 1e3, gas: gas / 100, fair: fair / 100, tariff }, r = solve(M.limitModel(TP, C, null, RW, Lm, D));
+    const wv = M.weekVals(TP, C, per, r, tariff, D), plan = TP.ceilPlan(wv.plan, cfg.limits), rf = solve(TP.fullYearModel(C, Y, { plan }));
+    const yv = M.yearVals(M.measure(C, Y, rf, plan, D), tariff);
+    return { wv, yv, wc: M.checkLimits(wv, Lm), yc: M.checkLimits(yv, Lm) };
+  };
+  {
+    const g1 = yearCheck(200, 25, 33, "graded");
+    ok(g1.wc.pass, "200 kt, 25% gas, 33% share, income-graduated: met on the seven weeks");
+    ok(!g1.yc.pass && !g1.yc.co2 && !g1.yc.gas && g1.yc.fair && !g1.yc.served, "...but the full-year check fails on CO₂, the gas share and unserved energy (the share is met)");
+    ok(kt(g1.yv.co2) === "215 kt" && Math.round(g1.yv.unserved) === 33 && pct(g1.yv.gas, 1) === "26.3%" && musd(g1.yv.cost) === "$132.0M", `full year: ${kt(g1.yv.co2)}, ${Math.round(g1.yv.unserved)} MWh unserved, gas ${pct(g1.yv.gas, 1)}, ${musd(g1.yv.cost)} (lesson 13 states 215 kt and 33 MWh)`);
+    onPage("With the income-graduated charge the seven weeks meet them, but the full year emits 215 kt and leaves 33 MWh unserved.", "the fallback's full-year check");
+    const g2 = yearCheck(800, 100, 35, "fixed");
+    ok(g2.wc.pass && g2.yc.pass && g2.yv.unserved < 0.5, `loose limits (800 kt, 100% gas, 35%): the full-year check passes (${kt(g2.yv.co2)}, gas ${pct(g2.yv.gas, 1)})`);
+    ok(M.checkLimits({ co2: 200.4e3, gas: 0.2504, fair: 0.3304, unserved: 0.4 }, { co2: 200e3, gas: 0.25, fair: 0.33 }).pass && !M.checkLimits({ co2: 200.6e3, gas: 0.25, fair: 0.33, unserved: 0 }, { co2: 200e3, gas: 0.25, fair: 0.33 }).co2 &&
+       !M.checkLimits({ co2: 0, gas: 0.2506, fair: 0, unserved: 0 }, { co2: 1, gas: 0.25, fair: 1 }).gas && !M.checkLimits({ co2: 0, gas: 0, fair: 0, unserved: 0.6 }, { co2: 1, gas: 1, fair: 1 }).served,
+       "limits are judged at the table's precision: 1 kt, 0.1 point, 1 MWh");
+  }
+  onJS('Find limits that no plan can meet: <b>', "step 7's first task");
+  onJS('Find limits the solver can meet on the seven weeks: <b>', "step 7's second task");
+  onJS("<b>Fails the full-year check:</b> ", "a failed full-year check is reported as a failure");
+  onJS('" The full-year check " + (o.pass === false ? "fails" : "did not run") + ", so your plan stays a seven-week result."', "the step's conclusion keeps a failed check");
+  ok(/S_\.lim\.weeks = att\(\{ pass: yc\.pass/.test(JS) && !/S_\.lim\.ok/.test(JS), "the seven-week result and the full-year verdict are stored apart");
+  onJS("Switch the definitions of two goals", "step 6 says how many definitions to switch");
+  onJS('"Goals with a switched definition: " + Math.min(n, 2) + " of 2."', "step 6 shows its progress");
 
   // ---------------- the fallback table and the page's numbers
   const LAB = { A: "A · Gas only", B: "B · Gas + wind", C: "C · Wind, sun and battery, full gas backup", D: "D · Wind, sun and battery, lean gas backup", E: "E · Sun and battery, gas backup", F: "F · Nuclear and gas", G: "G · Even mix", H: "H · Wind with thin gas backup", I: "I · Deep clean" };
@@ -163,9 +232,10 @@ function val(m, axis, defs) {
     onPage(`<tr><td>${LAB[p.id]}</td>` + cells.map((c, i) => `<td data-l="${lab[i]}">${c}</td>`).join("") + `<td data-l="Verdict">${verdict}</td></tr>`, `fallback row ${p.id}`);
   });
   onPage("Five illustrative sets of priorities pick three plans: Bills first picks A, Climate first and Supply first pick I, Lights first and Equal weights pick D.", "the fallback picks");
-  onPage("No other plan is at least as good on all five goals and better on one: 8 of the 9 plans here.", "the no-JS idea list");
+  onPage("No other plan is at least as good on all five goals and better on one: 8 of the 9 plans here, comparing values as shown.", "the no-JS idea list");
   // myths and quick question
-  onPage("A new goal can only rescue plans: 4 plans beaten on cost and CO₂ alone are unbeaten on all five.", "myth 2");
+  onPage("Fact. Here 4 plans beaten on cost and CO₂ alone are unbeaten on all five.", "myth 2");
+  ok(/data-id="rescue" data-answer="fact"/.test(page) && !/data-id="knockout"/.test(page), "myth 2 is a fact, with a new id (no stale stored answer)");
   onPage("and E, F and G become beaten", "myth 3");
   ok(BY.A.m.cost === Math.min(...LIB.map(p => p.m.cost)) && BY.A.m.co2 === Math.max(...LIB.map(p => p.m.co2)) && BY.I.m.co2 === Math.min(...LIB.map(p => p.m.co2)), "A is the cheapest and dirtiest; I the cleanest");
   ok(BY.I.m.cost > 2 * BY.A.m.cost, "I costs more than twice as much as A");
@@ -186,6 +256,27 @@ function val(m, axis, defs) {
   ok(near(eqD, 0.666, 1e-9) && Math.abs(M.total(BY.D.m, { cost: 1, co2: 1, rel: 1, fair: 1, sec: 1 }, DEF, sc) - eqD) < 0.01, "practice: D's equal-weight total ≈ 0.666");
   ok(M.pick(LIB, { cost: 30, co2: 30, rel: 20, fair: 10, sec: 10 }, DEF, sc).id === "D", "practice: the shown weights pick D");
   ok(pct(M.fairShare(0.6, D.groups, "fixed", D.graded), 1) === "32.6%" && pct(M.fairShare(0.6, D.groups, "graded", D.graded), 1) === "24.4%", "practice: 60% fixed costs give 32.6% and 24.4%");
+  // the static practice (no JavaScript): the same six exercises with their answers
+  {
+    ok(musd(BY.H.m.cost) === "$116.2M" && musd(BY.B.m.cost) === "$119.5M" && kt(BY.H.m.co2) === "424 kt" && kt(BY.B.m.co2) === "521 kt", "static practice: H and B's cost and CO₂");
+    onPage("H costs less than B ($116.2M against $119.5M) and emits less (424 kt against 521 kt).", "static practice 1");
+    onPage("Unbeaten: H leaves " + val(BY.H.m, "rel", DEF) + " unserved and B none", "static practice 1's answer");
+    onPage("D: it costs $5.9M less and is the same on the other four goals.", "static practice 2's answer");
+    ok(dom.C[0] === "D" && !M.dominated(LIB, ALT.rm).C, "static practice 2 and 3: D beats C; with the reserve margin C is unbeaten");
+    onPage("C's margin is 88%, D's 70%.", "static practice 3");
+    const sc5 = ["cost", "co2", "rel", "fair", "sec"].map(a => sD[a].toFixed(2));
+    ok(sc5.join() === "0.63,0.83,1.00,0.05,0.82", `static practice 4: D's scores ${sc5.join(", ")}`);
+    onPage("Its scores: Cheap 0.63, Clean 0.83, Reliable 1.00, Fair 0.05, Secure 0.82.", "static practice 4");
+    onPage("0.666, the average of the five: the highest of the nine, so Equal weights picks D.", "static practice 4's answer");
+    ok(LIB.every(p => p.id === "D" || M.total(p.m, { cost: 1, co2: 1, rel: 1, fair: 1, sec: 1 }, DEF, sc) < M.total(BY.D.m, { cost: 1, co2: 1, rel: 1, fair: 1, sec: 1 }, DEF, sc)), "D has the highest equal-weight total of the nine");
+    onPage("Bills first (cost 40, clean 5, reliable 20, fair 30, secure 5) picks A.", "static practice 5");
+    ok(JSON.stringify(A.priorities[0].w) === JSON.stringify({ cost: 40, co2: 5, rel: 20, fair: 30, sec: 5 }), "static practice 5: Bills first's weights");
+    onPage("For example cost 30, clean 30, reliable 20, fair 10, secure 10: D wins.", "static practice 5's answer");
+    const f6 = M.fairShare(0.6, D.groups, "fixed", D.graded), g6 = M.fairShare(0.6, D.groups, "graded", D.graded);
+    ok(((f6 - g6) * 100).toFixed(1) === "8.2", "static practice 6: the tariff moves the share by 8.2 points");
+    onPage("32.6% and 24.4%: the tariff alone moves the share by 8.2 points.", "static practice 6's answer");
+    ok(/host\.innerHTML = "";\s+\/\/ the static exercises/.test(JS), "the interactive practice replaces the static one");
+  }
   const pm = (JS.match(/minutes: (\d+), title:/g) || []).map(s => +s.match(/\d+/)[0]);
   ok(pm.reduce((s, x) => s + x, 0) === 20, `practice minutes add to 20 (${pm.join(" + ")})`);
 
@@ -197,6 +288,13 @@ function val(m, axis, defs) {
   ok(/api\.busy\(true\)/.test(JS) && /aria-live/.test(JS), "busy solves hold Next; results are announced");
   ok(/Steelman/.test(JS) && /reveal: "details"/.test(JS), "a Steelman card on the tariff");
   ok(!/\bAI\b|Claude|ChatGPT/.test(page + JS), "no AI wording");
+  ok(A.plans.every(p => !/nuclear/i.test(p.note) || !/cost/i.test(p.note)), "no plan note pairs nuclear with cost");
+  onPage("DOE uses a different definition here: income up to 80% of the local median.", "DOE's low-income definition");
+  onPage("Home energy only, not transport; DOE's low-income means income up to 80% of the local median.", "DOE's definition in the numbers to remember");
+  ok(/0-80% of area median income/.test(A.sources["doe-lead"].text), "the data file keeps DOE's definition");
+  onJS("[[tariff|tariff]], the rule for calculating bills", "step 1 glosses the tariff");
+  onJS("[[epsilon-constraint|epsilon-constraint method]]", "the concept map marks the epsilon-constraint term");
+  onPage("A supply is concentrated when one source makes most of it, and diverse when many sources make similar shares.", "concentration in plain words before the indices");
   ok(!/nuclear[^.]*\b(credit|screen|order|deliver|timing|buyer|siting|threshold|subsid|learning)/i.test(JSON.stringify(A) + JS.replace(/\/\/[^\n]*/g, "")), "no nuclear sentence with a deny-listed risk word");
   ok(page.includes("data-learn=\"tradeoff-explorer\"") && /LX\.mount\("tradeoff-explorer"/.test(JS), "the page and the script share a slug");
   ok(!/13-capstone\.js(?!on)/.test(page) && /<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>/.test(page), "the page uses the shared planning engine in learn.js, not lesson 13's script");
