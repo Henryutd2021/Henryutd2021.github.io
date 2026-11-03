@@ -8,7 +8,9 @@
 // exactly as lesson 0's prepare() does (grid-operator.js; the Node test checks they agree), so 19:00 on 3 September 2025
 // reads demand 331 MW, wind 72 MW, solar 14 MW and a gas need of 145 MW. Plant limits in the rules are Prairie Town's
 // (combined-cycle 150 MW, ramp 40 MW/h; peaker 100 MW); the 90 MW the combined-cycle made at 18:00 is a stated
-// assumption of the story (illustrative), so this hour it can reach at most 130 MW.
+// assumption of the story (illustrative), so this hour it can reach at most 130 MW. The ramp limits only the climb (the
+// drop is left out, and the page says so); gas above the 145 MW need is matched by spilling wind or sun, and the test
+// checks that the 86 MW of wind and sun at 19:00 cover the most surplus any plan in the region makes (85 MW).
 //
 // Pure model (exported for Node): townDay, story(), drill items, and the rule algebra (le, holds, clip, region,
 // verticesOf) re-exported from the shared LX.lp2; the plane is LX.LPPlane (both in components/lpplane.js).
@@ -41,6 +43,7 @@
     var s = { D: D, t: t, demand: D.demand[t], nuclear: f.nuclear.mw, wind: D.wind[t], solar: D.solar[t], need: D.need[t],
               ccMax: f.cc.mw, ramp: f.cc.ramp, prevCC: PREV_CC, pkMax: f.peaker.mw };
     s.reach = Math.min(f.cc.mw, PREV_CC + f.cc.ramp);
+    s.spillable = s.wind + s.solar; s.maxSurplus = s.reach + s.pkMax - s.need;
     s.cover = { a: [1, 1], op: ">=", b: s.need, key: "cover" };
     s.limits = [
       { a: [1, 0], op: "<=", b: s.reach, key: "ramp", words: "x ≤ " + s.reach },
@@ -84,8 +87,24 @@
   }
   function drill(D, seed, n) { var r = rng(seed), out = []; for (var k = 0; k < n; k++) out.push(drillItem(D, k, r)); return out; }
 
+  // ---------------------------------------------------------------- the explain layer's two worked inequalities
+  // a·x + m <= n with a != 0: x <= (n − m)/a for a > 0; divide by a negative a and the sign flips. spot: a value to
+  // spot-check (one value only checks the arithmetic, not the whole solution set)
+  var EXAMPLES = [{ a: 2, m: 10, n: 50, spot: 10 }, { a: -2, m: 0, n: 6, spot: 0 }];
+  function sgn(v) { return (v < 0 ? "−" : "") + Math.abs(v); }
+  function solveLe(e) { return { op: e.a < 0 ? ">=" : "<=", bound: (e.n - e.m) / e.a }; }
+  function traces() {
+    return EXAMPLES.map(function (e) {
+      var s = solveLe(e), sym = s.op === "<=" ? "≤" : "≥", ax = (e.a < 0 ? "−" : "") + Math.abs(e.a) + "x", lhs = e.a * e.spot + e.m;
+      var label = ax + (e.m ? " + " + e.m : "") + " ≤ " + e.n;
+      var first = e.m ? ax + " ≤ " + (e.n - e.m) + ", so x " + sym + " " + sgn(s.bound) + "." : "Divide by " + sgn(e.a) + " and flip: x " + sym + " " + sgn(s.bound) + ".";
+      var spot = "Spot-check x = " + e.spot + ": " + sgn(e.a) + " × " + e.spot + (e.m ? " + " + e.m : "") + " = " + sgn(lhs) + " ≤ " + e.n + ".";
+      return { e: e, op: s.op, bound: s.bound, spotValue: lhs, label: label, path: ["start", "move", "q", e.a < 0 ? "flip" : "keep", "end"], text: "**" + first + "** " + spot };
+    });
+  }
+
   var model = { townDay: townDay, le: LP.le, lhs: LP.lhs, holds: holds, clip: LP.clip, region: region, verticesOf: verticesOf, story: story,
-                drill: drill, drillItem: drillItem, rng: rng, HOUR: HOUR, PREV_CC: PREV_CC };
+                drill: drill, drillItem: drillItem, rng: rng, traces: traces, solveLe: solveLe, EXAMPLES: EXAMPLES, HOUR: HOUR, PREV_CC: PREV_CC };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -138,7 +157,7 @@
 
     // ---- step 1: an equation is a balance
     steps.push({
-      text: "Prairie Town at " + hh + " on " + D.dateLabel + ": demand " + s.demand + " MW. Nuclear makes " + s.nuclear + " MW, wind " + s.wind + " and solar " + s.solar + ". Gas covers the rest. Solve for g.",
+      text: "Prairie Town at " + hh + " on " + D.dateLabel + ": demand " + s.demand + " [[megawatt|MW]]. Nuclear makes " + s.nuclear + " MW, wind " + s.wind + " and solar " + s.solar + ". Gas covers the rest. Solve for g.",
       build: function (act, api) {
         H("p", { class: "k4-eq", html: s.nuclear + " + " + s.wind + " + " + s.solar + " + <i>g</i> = " + s.demand }, act);
         var tries = 0;
@@ -152,14 +171,18 @@
 
     // ---- step 2: two unknowns, a line of answers
     steps.push({
-      text: "Gas comes from two plants: x MW from the combined-cycle plant and y MW from the peaker, with x + y = " + s.need + ". Slide x and watch y follow.",
+      text: "Gas comes from two plants: x MW from the [[combined-cycle|combined-cycle plant]] and y MW from the [[peaker|peaker]], with x + y = " + s.need + ". Slide x to four positions and watch y follow.",
       build: function (act, api) {
         var pl = LX.LPPlane(act, { view: s.view, ticks: [0, 40, 80, 120, 160], xLabel: "x: combined-cycle plant, MW", yLabel: "y: peaker, MW",
                               aria: "Plans x and y with x + y = " + s.need + ": every answer lies on one straight line." });
         var seen = {}, sl = LX.Slider(act, { label: "x, combined-cycle", color: "var(--lx-cc)", max: s.need, step: 5, onChange: draw });
+        var now = H("p", { class: "k4-test", "aria-live": "polite" }, act), prog = H("p", { class: "k4-prog" }, act);
         sl.set(60);
         function draw(x) {
           x = x == null ? sl.val() : x; var y = s.need - x; seen[x] = 1;
+          var n = Object.keys(seen).length;
+          now.innerHTML = "x = <b>" + x + " MW</b>, so y = " + s.need + " − " + x + " = <b>" + y + " MW</b>.";
+          prog.textContent = n >= 4 ? "Four positions tried: Next is open." : "Positions tried: " + n + " of 4.";
           pl.clear(); pl.rule({ a: [1, 1], op: "=", b: s.need }, { label: "x + y = " + s.need, cls: "on" });
           Object.keys(seen).forEach(function (k) { pl.point([+k, s.need - k], { r: 4, cls: "trail" }); });
           pl.point([x, y], { label: "x = " + x + ", y = " + y });
@@ -194,15 +217,15 @@
 
     // ---- step 4: an inequality is a half-plane
     steps.push({
-      text: "An [[inequality|inequality]] keeps a whole side of its line. Switch the sign of the " + s.need + " MW rule, then move the test plan across the line.",
+      text: "An [[inequality|inequality]] keeps a whole side of its line. Switch the " + s.need + " MW rule from ≥ to ≤, then move the test plan across the line.",
       build: function (act, api) {
-        var op = ">=", tried = {}, moved = 0;
+        var op = ">=", tried = { ">=": 1 }, moved = 0;
         var top = H("div", { class: "k4-ctl" }, act);
         H("span", { class: "k4-lab", text: "x + y" }, top);
         seg(top, ["≤", "=", "≥"], 2, function (i) { op = ["<=", "=", ">="][i]; tried[op] = 1; draw(); }, "Sign of the rule");
         H("span", { class: "k4-lab", text: String(s.need) }, top);
         var pl = LX.LPPlane(act, { view: s.view, ticks: [0, 40, 80, 120, 160], xLabel: "x: combined-cycle plant, MW", yLabel: "y: peaker, MW", aria: "The rule x + y and a test plan." });
-        var out = H("p", { class: "k4-test", "aria-live": "polite" }, act);
+        var out = H("p", { class: "k4-test", "aria-live": "polite" }, act), prog = H("p", { class: "k4-prog" }, act);
         var p = [40, 40];
         var sx = LX.Slider(act, { label: "Test plan x", color: "var(--lx-cc)", max: 160, step: 5, onChange: function (v) { p[0] = v; moved++; draw(); } });
         var sy = LX.Slider(act, { label: "Test plan y", color: "var(--lx-pk)", max: 160, step: 5, onChange: function (v) { p[1] = v; moved++; draw(); } });
@@ -213,10 +236,12 @@
           pl.clear(); pl.region([r, { a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }]); pl.rule(r, { label: fmtRule(r), cls: "on" });
           pl.point(p, { cls: ok ? "good" : "bad", label: ok ? "passes" : "fails" });
           out.innerHTML = "Test plan: x + y = " + p[0] + " + " + p[1] + " = <b>" + (p[0] + p[1]) + "</b>. Is that " + OPS[op] + " " + s.need + "? <b>" + (ok ? "Yes: it passes." : "No: it fails.") + "</b>";
-          if (tried["<="] && tried[">="] && moved >= 1) { api.done(); api.saw("With ≥ the plans on the far side of the line pass; with ≤ the near side; with = only the line itself. The line always belongs to ≤ and ≥."); }
+          var left = [tried["<="] ? null : "switch the sign to ≤", moved >= 1 ? null : "move the test plan"].filter(Boolean);
+          prog.textContent = left.length ? "Still to do: " + left.join("; ") + "." : "Both done: Next is open.";
+          if (!left.length) { api.done(); api.saw("With ≥ the plans on the far side of the line pass; with ≤ the near side; with = only the line itself. The line always belongs to ≤ and ≥."); }
         }
         draw();
-        textAlt(act, "Text version", ["The line x + y = " + s.need + " splits the plane in two.", "x + y ≥ " + s.need + " keeps the side away from the origin, x + y ≤ " + s.need + " the side with the origin, and = keeps only the line."]);
+        textAlt(act, "Text version", ["The line x + y = " + s.need + " splits the plane in two.", "x + y ≥ " + s.need + " keeps the side away from the origin, the point (0, 0); x + y ≤ " + s.need + " keeps the side with the origin, and = keeps only the line."]);
       }
     });
 
@@ -227,20 +252,21 @@
       { r: { a: [1, 1], op: "<=", b: s.need }, ok: false, why: "Only the sign changed: this is the opposite rule." },
       { r: { a: [-1, -1], op: "<=", b: s.need }, ok: false, why: "The right-hand side must be multiplied by −1 too." }];
     steps.push({
-      text: "Solvers store every rule one way round, as ≤. Multiplying both sides by a negative number flips the sign. Which line is the same rule as x + y ≥ " + s.need + "?",
+      text: "One common solver form writes every inequality one way round, as ≤ (B1 uses it). Multiplying both sides by a negative number flips the sign. Which line is the same rule as x + y ≥ " + s.need + "?",
       build: function (act, api) {
         var pl = null, row = H("div", { class: "lx-choices-row k4-forms", role: "group", "aria-label": "Candidate forms" }, act), btns = [];
         FORMS.forEach(function (F, i) {
           var b = H("button", { type: "button", class: "lx-choice", "aria-pressed": "false", text: fmtRule(F.r) }, row);
           b.addEventListener("click", function () {
             btns.forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); x.classList.toggle("right", j === i && F.ok); x.classList.toggle("wrong", j === i && !F.ok); });
-            draw(F.r);
+            draw(F.r); said.textContent = fmtRule(F.r) + " keeps the side " + (holds(F.r, [0, 0]) ? "with" : "away from") + " the origin: " + (F.ok ? "the same plans as x + y ≥ " + s.need + "." : "not the plans x + y ≥ " + s.need + " keeps.");
             if (F.ok) { api.done(); api.saw("−x − y ≤ −" + s.need + " keeps exactly the same side. Multiply by −1 again and you are back at x + y ≥ " + s.need + "."); }
             else api.saw(F.why, true);
           });
           btns.push(b);
         });
         pl = LX.LPPlane(act, { view: s.view, ticks: [0, 40, 80, 120, 160], xLabel: "x: combined-cycle plant, MW", yLabel: "y: peaker, MW", aria: "The original rule and the chosen form, shaded." });
+        var said = H("p", { class: "k4-test", "aria-live": "polite", text: "Light shading: x + y ≥ " + s.need + " keeps the side away from the origin. Pick a line to shade its side." }, act);
         function draw(r) {
           pl.clear();
           var nn = [{ a: [1, 0], op: ">=", b: 0 }, { a: [0, 1], op: ">=", b: 0 }];
@@ -253,15 +279,17 @@
 
     // ---- step 6: several rules at once
     steps.push({
-      text: "A model's rules all hold at once. Switch on the plant limits: the plans that pass every rule form the [[feasible-region|feasible region]].",
+      text: "A model's rules all hold at once. Switch on the peaker's size and the [[ramp-rate|ramp]] limit; x ≥ 0 and y ≥ 0 are always on. The plans that pass every rule form the [[feasible-region|feasible region]].",
       build: function (act, api) {
-        var on = { cover: true };
+        var on = { cover: true, x0: true, y0: true };
         var chips = H("div", { class: "k4-chips", role: "group", "aria-label": "Rules" }, act);
-        var LIM = [[lim[0], "x ≤ " + s.reach + " (ramp: " + s.prevCC + " + " + s.ramp + ")"], [lim[1], "y ≤ " + s.pkMax + " (peaker size)"], [lim[2], "x ≥ 0"], [lim[3], "y ≥ 0"]];
+        var LIM = [[lim[0], "x ≤ " + s.reach + " (ramp limit)"], [lim[1], "y ≤ " + s.pkMax + " (peaker size)"]];
         LIM.forEach(function (L) {
           var b = H("button", { type: "button", class: "lx-chip", "aria-pressed": "false" }, chips); H("i", { style: "--c:var(--lx-accent)" }, b); H("span", { text: L[1] }, b);
           b.addEventListener("click", function () { on[L[0].key] = !on[L[0].key]; b.setAttribute("aria-pressed", on[L[0].key] ? "true" : "false"); draw(); });
         });
+        H("span", { class: "k4-fixed", text: "Always on: x ≥ 0, y ≥ 0 (the plane starts at 0)" }, chips);
+        H("p", { class: "k4-prog", text: "Ramp: " + s.prevCC + " MW + " + s.ramp + " MW/h × 1 h = " + s.reach + " MW, the most x can reach this hour." }, act);
         var pl = LX.LPPlane(act, { view: s.view, ticks: [0, 40, 80, 120, 160], xLabel: "x: combined-cycle plant, MW", yLabel: "y: peaker, MW", aria: "Rules switched on and the region that passes them all." });
         var out = H("p", { class: "k4-test", "aria-live": "polite" }, act);
         function draw() {
@@ -269,15 +297,17 @@
           pl.clear(); var P = pl.region(rules);
           rules.forEach(function (r) { pl.rule(r, { label: r.b === 0 ? null : fmtRule(r), cls: "on" }); });
           var all = lim.every(function (r) { return on[r.key]; });
-          out.textContent = all ? "Every rule is on: the feasible region is a triangle." : (rules.length - 1) + " of " + lim.length + " limits on.";
+          out.textContent = all ? "Every rule is on: the feasible region is a triangle." : (rules.length - 3) + " of " + LIM.length + " plant limits on.";
           if (all) {
             s.triangle.forEach(function (v) { pl.point(v, { r: 5, label: "(" + v[0] + ", " + v[1] + ")" }); });
-            api.done(); api.saw("The plans that pass every rule form a triangle with corners " + s.triangle.map(function (v) { return "(" + v[0] + ", " + v[1] + ")"; }).join(", ") + ". In B1 you find its cheapest corner.");
+            api.done(); api.saw("The plans that pass every rule form a triangle with corners " + s.triangle.map(function (v) { return "(" + v[0] + ", " + v[1] + ")"; }).join(", ") + ". Above the line, gas makes more than " + s.need + " MW; the extra is matched by spilling wind or sun.");
           }
           return P;
         }
         draw();
-        textAlt(act, "Text version", ["Rules: x + y ≥ " + s.need + ", x ≤ " + s.reach + ", y ≤ " + s.pkMax + ", x ≥ 0, y ≥ 0.", "With all of them on, the plans that pass form a triangle with corners " + s.triangle.map(function (v) { return "(" + v[0] + ", " + v[1] + ")"; }).join(", ") + "."]);
+        textAlt(act, "Text version", ["Rules: x + y ≥ " + s.need + ", x ≤ " + s.reach + ", y ≤ " + s.pkMax + ", x ≥ 0, y ≥ 0.", "With all of them on, the plans that pass form a triangle with corners " + s.triangle.map(function (v) { return "(" + v[0] + ", " + v[1] + ")"; }).join(", ") + ".",
+          "The ramp rule limits only the climb from " + s.prevCC + " MW; how fast the plant can drop is left out here.",
+          "Wind (" + s.wind + " MW) and sun (" + s.solar + " MW) are what the weather allows. A plan above the line makes up to " + s.maxSurplus + " MW more gas than needed, matched by spilling some of them."]);
       }
     });
 
@@ -304,20 +334,19 @@
         { key: "lt", color: "var(--lx-ink-3)", name: "< or >", note: "strict", words: "less than, more than", pic: "one side, without the line", model: "avoided: a best plan may not exist" }]
     });
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "Solve a linear inequality", lede: "The same moves as an equation, with one extra question. Trace two examples.",
+      title: "Solve a linear inequality", lede: "a, m and n stand for known numbers, and a is not 0. The same moves as an equation, with one extra question. Trace two examples.",
       nodes: {
-        start: { t: "a·x + m ≤ n", s: "one unknown", k: "end" },
+        start: { t: "a·x + m ≤ n", s: "a ≠ 0", k: "end" },
         move: { t: "Move m across", s: "a·x ≤ n − m" },
         q: { t: "Is a negative?", tN: ["Is a", "negative?"], k: "q" },
         flip: { t: "Divide by a, flip", s: "x ≥ (n − m) / a", sN: "x ≥ (n − m)/a" },
         keep: { t: "Divide by a", s: "x ≤ (n − m) / a", sN: "x ≤ (n − m)/a" },
-        end: { t: "Check one value", k: "end" }
+        end: { t: "Spot-check one value", tN: ["Spot-check", "one value"], k: "end" }
       },
       cols: 3, at: { start: [1, 0], move: [1, 1], q: [1, 2], flip: [0, 3], keep: [2, 3], end: [1, 4] },
       colsN: 2, atN: { start: [0.5, 0], move: [0.5, 1], q: [0.5, 2], flip: [0, 3], keep: [1, 3], end: [0.5, 4] },
       edges: [["start", "move"], ["move", "q"], ["q", "flip", "yes"], ["q", "keep", "no"], ["flip", "end", null, { v: true }], ["keep", "end", null, { v: true }]],
-      traces: [{ label: "2x + 10 ≤ 50", path: ["start", "move", "q", "keep", "end"], text: "**2x ≤ 40, so x ≤ 20.** Check x = 10: 2 × 10 + 10 = 30 ≤ 50." },
-               { label: "−2x ≤ 6", path: ["start", "move", "q", "flip", "end"], text: "**Divide by −2 and flip: x ≥ −3.** Check x = 0: −2 × 0 = 0 ≤ 6." }],
+      traces: traces().map(function (t) { return { label: t.label, path: t.path, text: t.text }; }),
       sel: 1
     });
   }

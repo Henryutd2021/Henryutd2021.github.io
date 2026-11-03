@@ -59,6 +59,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k4-drill { display: grid; gap: 10px; }
 .k4-drill .lx-btn { justify-self: start; }
 .k4-drill-q { display: grid; gap: 10px; }
+.k4-prog { font-size: 13.5px; color: var(--lx-ink-3); }
+.k4-fixed { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: 999px; border: 1px dashed var(--lx-line-2); font-size: 13.5px; color: var(--lx-ink-2); }
+.page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+.page-learn .lx-datanote li { margin: 0; }
 @media (max-width: 640px) {
   .w1h-stack .lx-ctable tr { grid-template-columns: 22px minmax(0, 1fr); row-gap: 4px; }
   .w1h-stack .lx-ctable td[data-label], .w1h-stack .lx-ctable td.ph { display: block; grid-column: 2; text-align: left; font-size: 14px; }
@@ -84,14 +88,18 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ol>
 <li>An equation is a balance: 100 + 72 + 14 + g = 331 gives g = 145 MW.</li>
 <li>One equation with two unknowns, x + y = 145, has a whole line of answers.</li>
-<li>An inequality keeps the line and one side of it: x + y ≥ 145 keeps the side away from the origin.</li>
+<li>An inequality keeps the line and one side of it: x + y ≥ 145 keeps the side away from the origin, the point (0, 0).</li>
 <li>Multiplying by −1 flips the sign: x + y ≥ 145 is the same rule as −x − y ≤ −145.</li>
 <li>Rules hold together: with x ≤ 130, y ≤ 100, x ≥ 0 and y ≥ 0, the plans that pass form a triangle.</li>
+<li>Above the line, gas makes more than 145 MW; the extra is matched by spilling wind or sun. The ramp rule limits only the climb from 90 MW.</li>
 </ol>
 <p class="lx-hint">With JavaScript on, you work through this step by step on a live plane.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar at 19:00 follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to Prairie Town as in <a href="00-grid-operator.html">lesson 0</a>. The plant limits and the 90 MW the combined-cycle plant made at 18:00 are illustrative.</span></p>
+<div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
+<li>Demand, wind and solar at 19:00: the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
+<li>The plant limits and the 90 MW the combined-cycle plant made at 18:00 are illustrative.</li>
+</ul></div>
 ```
 :::
 
@@ -121,25 +129,24 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-Rearrange $x + y = 145$ as $y = 145 - x$: each extra MW from the combined-cycle plant means one MW less from the peaker, so the line falls one step for each step right (slope $-1$) and crosses the $y$ axis at 145. Any rule $a_1 x + a_2 y = b$ with $a_2 \neq 0$ rearranges the same way, to $y = (b - a_1 x)/a_2$: a straight line with slope $-a_1/a_2$. A rule with $a_2 = 0$, such as $x \le 130$, is a vertical line.
+- **Rearrange.** $x + y = 145$ becomes $y = 145 - x$.
+- **Slope.** Each extra MW from the combined-cycle plant means one MW less from the peaker: the line falls one step for each step right, slope $-1$.
+- **Intercept.** At $x = 0$ the line crosses the $y$ axis at 145.
+- **Any rule.** $a_1 x + a_2 y = b$, with $a_1$ and $a_2$ not both 0. If $a_2 \neq 0$ it becomes $y = (b - a_1 x)/a_2$: a straight line with slope $-a_1/a_2$.
+- **Vertical boundaries.** If $a_2 = 0$, the boundary is vertical: $x \le 130$ keeps the line $x = 130$ and everything to its left.
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>Many rules at once: the rows of A x ≤ b</summary>
+<summary><span class="k">Go deeper · Modeler</span>Many rules at once, as one table (a preview)</summary>
 <div class="lx-deeper-body">
 ```
 
-Write every rule as $a_{i1} x + a_{i2} y \le b_i$ (flip the $\ge$ rules) and stack the coefficients: row $i$ of a matrix $A$ holds $(a_{i1}, a_{i2})$ and entry $i$ of a vector $b$ holds $b_i$. The five rules of step 6 become
-
-$$
-\begin{pmatrix} -1 & -1 \\ 1 & 0 \\ 0 & 1 \\ -1 & 0 \\ 0 & -1 \end{pmatrix}
-\begin{pmatrix} x \\ y \end{pmatrix} \le
-\begin{pmatrix} -145 \\ 130 \\ 100 \\ 0 \\ 0 \end{pmatrix}.
-$$
-
-Solvers read rules in this form. Bridge B1 builds it from a word problem and hands it to a real solver; toolbox K6 (upcoming) covers vectors and matrices.
+- **Decisions:** the two outputs, $x$ and $y$.
+- **Rules:** each of step 6's five inequalities becomes one row of a table, all written as ≤ (the ≥ rules flipped).
+- **In one line:** the rows stack into $A x \le b$, with $A$ holding the numbers in front of $x$ and $y$, and $b$ the limits.
+- **Where next:** [Bridge B1](b01-algebra-to-lp.html) builds this table from a word problem and hands it to a real solver; toolbox K6 (upcoming) covers vectors and matrices.
 
 ```{=html}
 </div>

@@ -98,6 +98,30 @@ body-classes: "page-learn page-lesson lx-form-cards"
 /* faded practice (Check section), the same frame as B1's: sets of worked -> partly worked -> from-scratch exercises */
   .lx-fp-tab.b3-ptab th, .lx-fp-tab.b3-ptab td { padding: 5px 4px; font-size: 13px; }
 .lx-fp-wl { display: grid; gap: 4px; }
+/* the symbol key (steps 1 and 5, and the fallback) and the practice set without JavaScript */
+.page-learn .b3-keytab td, .page-learn .b3-keytab th[scope="row"] { font-size: 14px; vertical-align: top; }
+.page-learn .b3-keytab th[scope="row"] { font-family: var(--lx-f-mono); text-transform: none; letter-spacing: 0; color: var(--lx-ink); white-space: nowrap; }
+@media (max-width: 560px) {
+  .page-learn .b3-keytab thead { display: none; }
+  .page-learn .b3-keytab tr { display: grid; grid-template-columns: 6.2em minmax(0, 1fr); gap: 2px 10px; padding: 7px 0; border-bottom: 1px solid var(--lx-line); }
+  .page-learn .b3-keytab th[scope="row"], .page-learn .b3-keytab td { border: 0; padding: 0; white-space: normal; }
+  .page-learn .b3-keytab th[scope="row"] { grid-row: span 3; }
+  .page-learn .b3-keytab td { grid-column: 2; }
+  .page-learn .b3-keytab td:nth-of-type(2) { color: var(--lx-ink-3); font-size: 13px; }
+  .page-learn .b3-keytab td:empty { display: none; }
+}
+.b3-pstatic { display: grid; gap: 10px; }
+.page-learn .b3-pstatic h3 { margin: 6px 0 0; font-size: 18px; }
+.page-learn .b3-ps { margin: 0; padding-left: 1.3rem; display: grid; gap: 14px; }
+.page-learn .b3-ps > li { display: grid; gap: 6px; }
+.page-learn .b3-ps p, .page-learn .b3-ps li li { font-size: 15px; margin: 0; }
+.page-learn .b3-static-line { font-family: var(--lx-f-mono); }
+.page-learn .b3-static-worked, .page-learn .b3-static-ch { margin: 0; padding-left: 1.2rem; display: grid; gap: 3px; }
+.b3-static-n { color: var(--lx-ink-3); font-size: 13px; }
+.page-learn .b3-why { margin: 8px 0 0; padding-left: 1.2rem; display: grid; gap: 6px; font-size: 14.5px; color: var(--lx-ink-2); }
+.page-learn .b3-why li { margin: 0; }
+.page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+.page-learn .lx-datanote li { margin: 0; }
 .lx-fp-wrow { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 4px 12px; align-items: baseline; padding: 7px 10px; border-radius: 10px; background: var(--lx-surface-2); }
 .lx-fp-wk { font-family: var(--lx-f-display); font-weight: 500; font-size: 14px; color: var(--lx-ink-2); }
 .lx-fp-wv { font-size: 15px; color: var(--lx-ink); }
@@ -118,20 +142,42 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```{=html}
 <div class="lx-interactive lx-cards" data-learn="b03" data-src="../assets/learn/data/b03-read-check-formulation.json ../assets/learn/data/town.json ../assets/learn/data/town_year.json">
 <div class="lx-fallback">
-<p class="lx-eyebrow">Prairie Town's dispatch, 17:00 to 20:00 on 3 September 2025, as a published model would write it</p>
+<p class="lx-eyebrow">Prairie Town's <span class="lx-term" data-term="dispatch">dispatch</span>, 17:00 to 20:00 on 3 September 2025, as a published model would write it</p>
 <ol class="b3-static">
 <li>min Σ<sub>t∈T</sub> Σ<sub>g∈G</sub> c<sub>g</sub> p<sub>g,t</sub> Δt + Σ<sub>t∈T</sub> V u<sub>t</sub> Δt</li>
 <li>Σ<sub>g∈G</sub> p<sub>g,t</sub> + u<sub>t</sub> = d<sub>t</sub> ∀ t ∈ T (balance)</li>
 <li>p<sub>g,t</sub> ≤ P̄<sub>g</sub> ∀ g ∈ G, t ∈ T (sizes)</li>
 <li>p<sub>g,t</sub> ≤ a<sub>g,t</sub> ∀ g ∈ {wind, solar}, t ∈ T (weather)</li>
-<li>−R ≤ p<sub>cc,t</sub> − p<sub>cc,t−1</sub> ≤ R ∀ t ∈ T (ramp)</li>
+<li>−R Δt ≤ p<sub>cc,t</sub> − p<sub>cc,t−1</sub> ≤ R Δt ∀ t ∈ T (ramp; the start p<sub>cc,16</sub> = 45 MW is given)</li>
 <li>p<sub>nuc,t</sub> = P̄<sub>nuc</sub> ∀ t ∈ T (nuclear runs flat); p, u ≥ 0</li>
 </ol>
+<!-- b3-static-key:start -->
+<details class="lx-textalt b3-key"><summary>Symbol key and input values</summary>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-keytab">
+<thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th><th scope="col">Value</th></tr></thead>
+<tbody>
+<tr><th scope="row">nuc, wind, solar, cc, pk</th><td>the plants in G: nuclear, wind farm, solar farm, combined-cycle gas plant, peaker</td><td></td><td></td></tr>
+<tr><th scope="row"><i>d<sub>t</sub></i></th><td>demand in hour t</td><td>MW</td><td>17:00 349, 18:00 344, 19:00 331, 20:00 319</td></tr>
+<tr><th scope="row"><i>a</i><sub>wind,<i>t</i></sub></th><td>wind the weather allows</td><td>MW</td><td>17:00 54, 18:00 59, 19:00 72, 20:00 89</td></tr>
+<tr><th scope="row"><i>a</i><sub>solar,<i>t</i></sub></th><td>sun the weather allows</td><td>MW</td><td>17:00 130, 18:00 70, 19:00 14, 20:00 0</td></tr>
+<tr><th scope="row"><i>c<sub>g</sub></i></th><td>running cost of plant g</td><td>$/MWh</td><td>nuc 10, wind 0, solar 0, cc 40, pk 100</td></tr>
+<tr><th scope="row"><i>P̄<sub>g</sub></i></th><td>size of plant g</td><td>MW</td><td>nuc 100, wind 150, solar 200, cc 150, pk 100</td></tr>
+<tr><th scope="row"><i>R</i></th><td>how far the cc plant can move in an hour</td><td>MW per hour</td><td>40</td></tr>
+<tr><th scope="row"><i>p</i><sub>cc,16</sub></th><td>cc output at 16:00, the start: given, not chosen</td><td>MW</td><td>45</td></tr>
+<tr><th scope="row"><i>V</i></th><td>charge for each MWh of unserved demand</td><td>$/MWh</td><td>10,000</td></tr>
+<tr><th scope="row">Δ<i>t</i></th><td>length of one step</td><td>h</td><td>1</td></tr>
+</tbody></table></div></details>
+<!-- b3-static-key:end -->
 <p>Its solution costs $22,600: the combined-cycle plant makes 75, 115, 145 and 130 MW, the peaker nothing, and the balance holds in all four hours.</p>
 <p class="lx-hint">With JavaScript on, you read it line by line, hunt five planted bugs and check the solution with a real solver.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to Prairie Town as in <a href="00-grid-operator.html">lesson 0</a>; the combined-cycle plant starts at 16:00 from the 45 MW of lesson 0's cheapest-first plan. Plant sizes and costs are Prairie Town's; the $10,000/MWh charge for unserved demand is illustrative. The models are solved by HiGHS 1.15 in your browser.</span></p>
+<div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
+<li>Demand, wind and solar: the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
+<li>Start: the combined-cycle plant's 45 MW at 16:00, from lesson 0's cheapest-first plan.</li>
+<li>Plant sizes and costs are Prairie Town's; the $10,000/MWh charge for unserved demand is illustrative.</li>
+<li>Solver: HiGHS 1.15, in your browser.</li>
+</ul></div>
 ```
 :::
 
@@ -162,21 +208,22 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-A [balance dual]{.lx-term term="shadow-price"} is the change in the cheapest total cost when one hour's demand rises by 1 MWh. At 19:00 and 20:00 the combined-cycle plant simply makes 1 MW more: \$40.
+A [balance dual]{.lx-term term="shadow-price"} is the change in the cheapest total cost when one hour's demand rises by 1 MWh.
 
-At 18:00 it cannot. It already climbs its full 40 MW from 17:00 to 18:00, so one more MW at 18:00 means one more MW at 17:00 too, where nobody needs it and it pushes out free wind: \$40 + \$40 = \$80, still cheaper than the \$100 peaker.
-
-At 17:00 the plan already spills 10 MW of wind and sun to warm the combined-cycle plant up for the evening. One more MWh of demand there just spills less: \$0. The hours are linked through the ramp, so the prices are too; the Modeler lesson M1 reads such duals as marginal values for a whole day.
+- **19:00 and 20:00: \$40.** The combined-cycle plant simply makes 1 MW more.
+- **18:00: \$80.** The plant already climbs its full 40 MW from 17:00, so 1 MW more at 18:00 needs 1 MW more at 17:00 too, where it pushes out free wind: \$40 + \$40 = \$80, still below the \$100 peaker.
+- **17:00: \$0.** The plan already spills 10 MW of wind and sun to warm the plant up for the evening; one more MWh there just spills less.
+- **Linked hours.** The ramp links the hours, so it links their prices. The Modeler lesson M1 reads such duals as marginal values for a whole day.
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The same model in Pyomo</summary>
+<summary><span class="k">Go deeper · Modeler</span>The objective and the balance in Pyomo</summary>
 <div class="lx-deeper-body">
 ```
 
-Each line of the formulation becomes one line of code, with the sets doing the copying. In [Pyomo](https://www.pyomo.org/), with `c`, `d`, `V` and `dt` holding the parameters:
+Each line of the formulation becomes one line of code, with the sets doing the copying. Here are the objective and the balance in [Pyomo](https://www.pyomo.org/), with `c`, `d`, `V` and `dt` holding the parameters; the sizes, weather, ramp and nuclear lines are left out:
 
 ```python
 from pyomo.environ import *
@@ -191,7 +238,14 @@ m.balance = Constraint(m.T, rule=lambda m, t:
     sum(m.p[g, t] for g in m.G) + m.u[t] == d[t])
 ```
 
-Delete `m.T` from the balance and you have suspect 3; drop `* dt` and the objective is right only at one-hour steps. Reading code against the formulation, line by line, is the same skill as this lesson.
+Suspect 3 in code is a single balance row for hour 17, in place of the indexed one:
+
+```python
+m.balance = Constraint(expr=sum(m.p[g, 17] for g in m.G) + m.u[17] == d[17])
+```
+
+- **Drop `* dt`:** the objective is then right only at one-hour steps.
+- **The skill:** reading code against the formulation, line by line, as in this lesson.
 
 ```{=html}
 </div>
@@ -201,7 +255,14 @@ Delete `m.T` from the balance and you have suspect 3; drop `* dt` and the object
 <div class="lx-deeper-body">
 ```
 
-Validating an optimization model is hard because it describes what would be cheapest, not what will happen. One test is to look back: for the UK's electricity transition from 1990 to 2014, the cumulative cost of the real path deviated by 9 to 23% from the cost-optimal paths of a model, under the study's alternative assumptions ([Trutnevyte, 2016](https://doi.org/10.1016/j.energy.2016.03.038)). Published guidance on good practice for energy-system optimization studies ([DeCarolis et al., 2017](https://doi.org/10.1016/j.apenergy.2017.03.001)) asks for documented, verifiable models and for uncertainty to be explored rather than hidden. The Researcher lesson R5 (upcoming) turns both into a routine.
+Validating an optimization model is hard: it describes what would be cheapest, not what will happen.
+
+| Approach | Evidence | Limit |
+|---|---|---|
+| Look back | For the UK's electricity transition from 1990 to 2014, the cumulative cost of the real path deviated by 9 to 23% from the cost-optimal paths of a model, under the study's alternative assumptions ([Trutnevyte, 2016](https://doi.org/10.1016/j.energy.2016.03.038)). | One country and one model; the real path was never meant to be cost-optimal. |
+| Good practice | Guidance for energy-system optimization studies asks for documented, verifiable models and for uncertainty to be explored, not hidden ([DeCarolis et al., 2017](https://doi.org/10.1016/j.apenergy.2017.03.001)). | A standard to meet, not a test that passes or fails. |
+
+The Researcher lesson R5 (upcoming) turns both into a routine.
 
 ```{=html}
 </div>
@@ -222,10 +283,10 @@ Validating an optimization model is hard because it describes what would be chea
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Myth. All five suspects solved to optimal. The solver checks the mathematics, not whether it says what you meant.</p></details>
 </div>
-<div class="lx-qq" data-id="neg" data-answer="fact">
-<p class="lx-qtext">Myth or fact? “In this model, a negative balance dual would be a warning sign.”</p>
+<div class="lx-qq" data-id="neg2" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A balance dual can never be negative.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. With spilling free, more demand can never make the cheapest plan cheaper. Real markets do see negative prices when output cannot be cut cheaply, so the expected sign depends on the model.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Here all four are ≥ 0, but when output is forced above demand, more demand saves money: cut 17:00 demand to 105 MW and its dual becomes −$140. Real markets see <span class="lx-term" data-term="negative-price">negative prices</span> for the same reason.</p></details>
 </div>
 <div class="lx-qq" data-id="dt" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Adding up p in MW over the hours gives energy in MWh.”</p>
@@ -246,7 +307,81 @@ Validating an optimization model is hard because it describes what would be chea
 <details class="lx-answer"><summary>Answer</summary><p>120: one row for each plant in each hour, 5 × 24.</p></details>
 </div>
 </div>
-<div id="b3-practice"></div>
+<div id="b3-practice">
+<!-- b3-static-practice:start -->
+<div class="lx-card b3-pstatic">
+<p class="lx-eyebrow">Practice: nine exercises in three sets · about 39 min</p>
+<p class="lx-hint">With JavaScript on, each exercise runs the solver, gives hints one at a time and checks your answer.</p>
+<h3>Read a line</h3>
+<p>Say what a line means, the unit of every symbol, and how many rows it stands for.</p>
+<ol class="b3-ps">
+<li><p><b>The ramp line, word by word</b> (worked example, about 2 min)</p>
+<p class="b3-static-line">−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i></p>
+<ul class="b3-static-worked"><li><b>In words.</b> From one hour to the next, the combined-cycle plant's output changes by at most R, up or down.</li><li><b>Units.</b> p is in MW; R = 40 MW per hour times Δt = 1 h is MW too: every side in MW.</li><li><b>Rows.</b> Two limits per hour, one on each side: 4 hours give 8 rows.</li><li><b>First hour.</b> At t = 17, p(cc, 16) is not a variable but the start, 45 MW: a parameter.</li></ul>
+<p>How many rows would this line stand for over a whole day of 24 hours?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Two rows per hour, 2 × 24 = 48.</p></details></li>
+<li><p><b>A storage line: the units</b> (partly worked, about 3 min)</p>
+<p class="b3-static-line"><i>e<sub>t</sub></i> = <i>e</i><sub><i>t</i>−1</sub> + η <i>q<sub>t</sub></i> Δ<i>t</i> − <i>w<sub>t</sub></i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i></p>
+<p>The energy in a battery at the end of hour t is what it held an hour before, plus what charging adds after losses, minus what it discharges.</p>
+<ul class="b3-static-worked"><li><i>e<sub>t</sub></i>, energy stored: <b>MWh</b> (given)</li><li>Δ<i>t</i>, the step: <b>h</b> (given)</li></ul>
+<p>Give the unit of each: <i>q<sub>t</sub></i>, charging power, η, the share kept, <i>w<sub>t</sub></i>, discharging power. Rows for the 4 hours of T?</p>
+<details class="lx-answer"><summary>Answer</summary><p>q(t): MW; η: no unit; w(t): MW. MWh = MWh + (no unit × MW × h) − (MW × h), and 4 rows, one per hour.</p></details></li>
+<li><p><b>A reserve line, from scratch</b> (from scratch, about 5 min)</p>
+<p class="b3-static-line">Σ<sub><i>g</i>∈{cc, pk}</sub> (<i>P̄<sub>g</sub></i> − <i>p<sub>g,t</sub></i>) ≥ <i>r<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i></p>
+<p>What does this line ask for?</p>
+<ol class="b3-static-ch" type="a"><li>Every hour, the two gas plants keep at least r(t) of unused capacity in hand.</li><li>Every hour, the two gas plants make at least r(t).</li><li>Over the whole day, the gas plants' unused capacity adds up to at least r.</li><li>Every hour, each gas plant keeps r(t) unused.</li></ol>
+<p>The unit of r(t)? Its rows over a day of 24 hours? Rows of the 24-hour model with this line added?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Every hour, the two gas plants keep at least r(t) of unused capacity in hand. Unused gas capacity in MW, one row per hour; 264 rows for the day plus 24 reserve rows: 288.</p></details></li>
+</ol>
+<h3>Hunt the bug</h3>
+<p>Three more colleagues, three more planted errors: run each model and let its numbers point to the line.</p>
+<ol class="b3-ps">
+<li><p><b>The penalty in the wrong unit</b> (worked example, about 3 min)</p>
+<ol class="b3-static"><li><i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk); <i>V</i> = 10 $/kWh <span class="b3-static-n">(costs)</span></li><li>min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i> <span class="b3-static-n">(objective)</span></li><li>Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(balance)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(sizes)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(weather)</span></li><li>−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(ramp)</span></li><li><i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(nuclear runs flat)</span></li></ol>
+<p>The solved plan:</p>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th><th scope="col">17:00</th><th scope="col">18:00</th><th scope="col">19:00</th><th scope="col">20:00</th></tr></thead><tbody><tr><th scope="row">nuclear</th><td class="n">100</td><td class="n">100</td><td class="n">100</td><td class="n">100</td></tr><tr><th scope="row">wind</th><td class="n">54</td><td class="n">59</td><td class="n">72</td><td class="n">89</td></tr><tr><th scope="row">solar</th><td class="n">130</td><td class="n">70</td><td class="n">14</td><td class="n">0</td></tr><tr><th scope="row">combined-cycle</th><td class="n">5</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">peaker</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">unserved</th><td class="n">60</td><td class="n">115</td><td class="n">145</td><td class="n">130</td></tr><tr><th scope="row">demand</th><td class="n">349</td><td class="n">344</td><td class="n">331</td><td class="n">319</td></tr></tbody></table></div>
+<ul class="b3-static-worked"><li><b>Symptom.</b> Optimal at $8,700. 60–145 MW unserved every hour, while the combined-cycle plant makes at most 5 MW.</li><li><b>Caught by.</b> The units of every parameter: V = 10 $/kWh is $10,000/MWh, yet the model used 10.</li><li><b>Also caught by.</b> The duals: every balance dual is $10/MWh, below the $40 of the cheapest gas plant. Unserved demand became the cheapest “plant”.</li><li><b>Fix.</b> Convert first: 10 $/kWh × 1,000 kWh per MWh = $10,000/MWh.</li></ul>
+<p>Which number in the solution gives the bug away first?</p>
+<ol class="b3-static-ch" type="a"><li>60–145 MW unserved while a gas plant idles</li><li>Nuclear at 100 MW every hour</li><li>Wind at 89 MW at 20:00</li><li>No output from the peaker</li></ol>
+<details class="lx-answer"><summary>Answer</summary><p>60–145 MW unserved while a gas plant idles. Demand left unserved while a cheaper plant could run is the first thing to explain.</p></details></li>
+<li><p><b>Nuclear no longer flat</b> (partly worked, about 5 min)</p>
+<p>Optimal at $22,500: $100 less than the right model's $22,600. Nuclear makes 90 MW at 17:00.</p>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th><th scope="col">17:00</th><th scope="col">18:00</th><th scope="col">19:00</th><th scope="col">20:00</th></tr></thead><tbody><tr><th scope="row">nuclear</th><td class="n">90</td><td class="n">100</td><td class="n">100</td><td class="n">100</td></tr><tr><th scope="row">wind</th><td class="n">54</td><td class="n">59</td><td class="n">72</td><td class="n">89</td></tr><tr><th scope="row">solar</th><td class="n">130</td><td class="n">70</td><td class="n">14</td><td class="n">0</td></tr><tr><th scope="row">combined-cycle</th><td class="n">75</td><td class="n">115</td><td class="n">145</td><td class="n">130</td></tr><tr><th scope="row">peaker</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">unserved</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">demand</th><td class="n">349</td><td class="n">344</td><td class="n">331</td><td class="n">319</td></tr></tbody></table></div>
+<ol class="b3-static"><li><i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk) <span class="b3-static-n">(costs)</span></li><li>min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i> <span class="b3-static-n">(objective)</span></li><li>Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(balance)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(sizes)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(weather)</span></li><li>−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(ramp)</span></li><li><i>p</i><sub>nuc,<i>t</i></sub> ≤ <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(nuclear runs flat)</span></li></ol>
+<p>Which line was changed, and which check catches it: Units of every parameter; The balance, hour by hour; Outputs against what each plant must do; Counting rows?</p>
+<details class="lx-answer"><summary>Answer</summary><p>= became ≤ in line (5). The 17:00 balance dual moves from $0 to $10: one more MWh of demand now raises nuclear from 90 to 91 MW, at $10. Caught by: outputs against what each plant must do.</p></details></li>
+<li><p><b>A plant counted twice</b> (from scratch, about 7 min)</p>
+<ol class="b3-static"><li><i>c</i> = (10, 0, 0, 40, 100) $/MWh for (nuc, wind, solar, cc, pk) <span class="b3-static-n">(costs)</span></li><li>min Σ<sub><i>t</i>∈<i>T</i></sub> Σ<sub><i>g</i>∈<i>G</i></sub> <i>c<sub>g</sub> p<sub>g,t</sub></i> Δ<i>t</i> + Σ<sub><i>t</i>∈<i>T</i></sub> <i>V u<sub>t</sub></i> Δ<i>t</i> <span class="b3-static-n">(objective)</span></li><li>Σ<sub><i>g</i>∈<i>G</i></sub> <i>p<sub>g,t</sub></i> + <i>p</i><sub>wind,<i>t</i></sub> + <i>u<sub>t</sub></i> = <i>d<sub>t</sub></i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(balance)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>P̄<sub>g</sub></i> &nbsp; ∀ <i>g</i> ∈ <i>G</i>, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(sizes)</span></li><li><i>p<sub>g,t</sub></i> ≤ <i>a<sub>g,t</sub></i> &nbsp; ∀ <i>g</i> ∈ {wind, solar}, <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(weather)</span></li><li>−<i>R</i> Δ<i>t</i> ≤ <i>p</i><sub>cc,<i>t</i></sub> − <i>p</i><sub>cc,<i>t</i>−1</sub> ≤ <i>R</i> Δ<i>t</i> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(ramp)</span></li><li><i>p</i><sub>nuc,<i>t</i></sub> = <i>P̄</i><sub>nuc</sub> &nbsp; ∀ <i>t</i> ∈ <i>T</i> <span class="b3-static-n">(nuclear runs flat)</span></li></ol>
+<p>The solved plan:</p>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th><th scope="col">17:00</th><th scope="col">18:00</th><th scope="col">19:00</th><th scope="col">20:00</th></tr></thead><tbody><tr><th scope="row">nuclear</th><td class="n">100</td><td class="n">100</td><td class="n">100</td><td class="n">100</td></tr><tr><th scope="row">wind</th><td class="n">51.5</td><td class="n">59</td><td class="n">72</td><td class="n">89</td></tr><tr><th scope="row">solar</th><td class="n">130</td><td class="n">70</td><td class="n">14</td><td class="n">0</td></tr><tr><th scope="row">combined-cycle</th><td class="n">16</td><td class="n">56</td><td class="n">73</td><td class="n">41</td></tr><tr><th scope="row">peaker</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">unserved</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">demand</th><td class="n">349</td><td class="n">344</td><td class="n">331</td><td class="n">319</td></tr></tbody></table></div>
+<p>Supply at 19:00, all five plants? Shortfall at 19:00? Which line causes it?</p>
+<details class="lx-answer"><summary>Answer</summary><p>259 MW against 331: 72 MW short, exactly the wind output. The balance line counts wind twice, so the model believes it is balanced.</p></details></li>
+</ol>
+<h3>Check a solution</h3>
+<p>Before you trust a solution: the balance in an hour, the cost by hand, and the signs and sizes of the duals.</p>
+<ol class="b3-ps">
+<li><p><b>Three checks on the right solution</b> (worked example, about 3 min)</p>
+<p>The solved plan:</p>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th><th scope="col">17:00</th><th scope="col">18:00</th><th scope="col">19:00</th><th scope="col">20:00</th></tr></thead><tbody><tr><th scope="row">nuclear</th><td class="n">100</td><td class="n">100</td><td class="n">100</td><td class="n">100</td></tr><tr><th scope="row">wind</th><td class="n">44</td><td class="n">59</td><td class="n">72</td><td class="n">89</td></tr><tr><th scope="row">solar</th><td class="n">130</td><td class="n">70</td><td class="n">14</td><td class="n">0</td></tr><tr><th scope="row">combined-cycle</th><td class="n">75</td><td class="n">115</td><td class="n">145</td><td class="n">130</td></tr><tr><th scope="row">peaker</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">unserved</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">supply</th><td class="n">349</td><td class="n">344</td><td class="n">331</td><td class="n">319</td></tr><tr><th scope="row">demand</th><td class="n">349</td><td class="n">344</td><td class="n">331</td><td class="n">319</td></tr></tbody></table></div>
+<ul class="b3-static-worked"><li><b>Balance at 19:00.</b> 100 + 72 + 14 + 145 + 0 = 331 MW, the demand ✓</li><li><b>Cost by hand.</b> nuclear 400 MWh × $10 = $4,000; combined-cycle 465 MWh × $40 = $18,600; total $22,600, the solver's objective ✓</li><li><b>Duals.</b> $0, $80, $40 and $40 per MWh: all ≥ 0 ✓</li></ul>
+<p>If the peaker made 10 MW at 19:00 in place of 10 MW of combined-cycle output, how much would the cost rise?</p>
+<details class="lx-answer"><summary>Answer</summary><p>10 × ($100 − $40) = $600, which is why the solver leaves the peaker off.</p></details></li>
+<li><p><b>Check the evening, 18:00 to 21:00</b> (partly worked, about 4 min)</p>
+<p>The combined-cycle plant starts from 65 MW at 17:00, lesson 0's cheapest-first plan.</p>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th><th scope="col">18:00</th><th scope="col">19:00</th><th scope="col">20:00</th><th scope="col">21:00</th></tr></thead><tbody><tr><th scope="row">nuclear</th><td class="n">100</td><td class="n">100</td><td class="n">100</td><td class="n">100</td></tr><tr><th scope="row">wind</th><td class="n">59</td><td class="n">72</td><td class="n">89</td><td class="n">98</td></tr><tr><th scope="row">solar</th><td class="n">70</td><td class="n">14</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">combined-cycle</th><td class="n">105</td><td class="n">145</td><td class="n">130</td><td class="n">105</td></tr><tr><th scope="row">peaker</th><td class="n">10</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">unserved</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">demand</th><td class="n">344</td><td class="n">331</td><td class="n">319</td><td class="n">303</td></tr></tbody></table></div>
+<ul class="b3-static-worked"><li><b>Balance at 18:00.</b> 100 + 59 + 70 + 105 + 10 = 344 MW, the demand ✓</li><li><b>Nuclear.</b> 400 MWh × $10 = $4,000</li><li><b>Combined-cycle.</b> 485 MWh × $40 = $19,400</li></ul>
+<p>Peaker cost? Total, by hand?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Peaker $1,000. $24,400, the solver's objective too: the model's cost and a hand count agree.</p></details></li>
+<li><p><b>Check the solar dip, 14:00 to 17:00</b> (from scratch, about 7 min)</p>
+<p>The combined-cycle plant starts from 45 MW at 13:00, lesson 0's cheapest-first plan.</p>
+<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th><th scope="col">14:00</th><th scope="col">15:00</th><th scope="col">16:00</th><th scope="col">17:00</th></tr></thead><tbody><tr><th scope="row">nuclear</th><td class="n">100</td><td class="n">100</td><td class="n">100</td><td class="n">100</td></tr><tr><th scope="row">wind</th><td class="n">33</td><td class="n">37</td><td class="n">47</td><td class="n">54</td></tr><tr><th scope="row">solar</th><td class="n">112</td><td class="n">147</td><td class="n">161</td><td class="n">130</td></tr><tr><th scope="row">combined-cycle</th><td class="n">85</td><td class="n">60</td><td class="n">45</td><td class="n">65</td></tr><tr><th scope="row">peaker</th><td class="n">10</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">unserved</th><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><th scope="row">demand</th><td class="n">340</td><td class="n">344</td><td class="n">353</td><td class="n">349</td></tr></tbody></table></div>
+<p>Supply at 14:00? Cost by hand, all four hours? Your guess for the 14:00 balance dual?</p>
+<details class="lx-answer"><summary>Answer</summary><p>Balanced (340 MW), $15,200 by hand, the solver's objective, and a $100 dual: the peaker is the marginal plant at 14:00. The solver's balance duals: 14:00 $100, 15:00 $40, 16:00 $40 and 17:00 $40 per MWh.</p></details></li>
+</ol>
+<p class="lx-fp-foot">The models are this lesson's dispatch of 3 September 2025, solved by HiGHS in your browser (a precomputed answer if it cannot load). The 65 MW and 45 MW starts are lesson 0's cheapest-first plan at 17:00 and 13:00; the storage and reserve lines are illustrative.</p>
+</div>
+<!-- b3-static-practice:end -->
+</div>
 ```
 :::
 

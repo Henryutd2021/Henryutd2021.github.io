@@ -5,8 +5,11 @@
 // page states matches the model. The practice set (Check section): every model it runs is solved with HiGHS and matches the
 // precomputed answer the page falls back to (data file practice.ref); each exercise's answer, hints and check reasons come
 // from the model, right answers pass, and typical wrong answers get the reason the data file names.
-// Usage (from the site folder):  node _tests/learn/test_b03-read-check-formulation.js [--ref]
-//   --ref  print the practice.ref block (HiGHS solutions of the practice models) for the data file, and stop
+// Usage (from the site folder):  node _tests/learn/test_b03-read-check-formulation.js [--ref | --static]
+//   --ref     print the practice.ref block (HiGHS solutions of the practice models) for the data file, and stop
+//   --static  print the page's two static blocks (the symbol key of the fallback, and the practice set without
+//             JavaScript), built from the model and the precomputed answers, and stop; without it the test checks that
+//             the page holds exactly these blocks
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -20,6 +23,64 @@ const town = JSON.parse(fs.readFileSync(L("data/town.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
 const QMD = fs.readFileSync(path.join(SITE, "learn/b03-read-check-formulation.qmd"), "utf8");
 const JS = fs.readFileSync(L("b03-read-check-formulation.js"), "utf8");
+
+// ---------------- the static blocks of the page (readers without JavaScript), from the model
+const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const KIND = { worked: "worked example", partly: "partly worked", scratch: "from scratch" };
+function staticKey(inst) {
+  return '<details class="lx-textalt b3-key"><summary>Symbol key and input values</summary>\n<div class="lx-fp-tabw"><table class="lx-fp-tab b3-keytab">\n' +
+    '<thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Unit</th><th scope="col">Value</th></tr></thead>\n<tbody>\n' +
+    M.inputs(inst).map(r => `<tr><th scope="row">${r.sym}</th><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.value)}</td></tr>`).join("\n") + "\n</tbody></table></div></details>";
+}
+function staticPractice() {
+  const PJ = J.practice, sol = {};
+  Object.keys(M.PRACTICE_RUN).forEach(k => { sol[k] = M.fromRef(M.practiceInst(town, year, J, k), k === "ok" ? J.ref : PJ.ref[k]); });
+  const SP = {}; Object.keys(PJ.items).forEach(k => { SP[k] = M.practiceSpec(k, J, town, year, sol); });
+  const r6 = v => String(Math.round(v * 1e6) / 1e6);
+  const strip = t => { const u = String(t).replace(/^Right[:.]\s*/, ""); return u.charAt(0).toUpperCase() + u.slice(1); };
+  const p = t => `<p>${esc(t)}</p>`, line = h => `<p class="b3-static-line">${h}</p>`;
+  const lines = bug => '<ol class="b3-static">' + ["par", "obj", "bal", "size", "wx", "ramp", "must"].map(k => `<li>${(bug && PJ.bugs[bug].line === k ? PJ.bugs[bug].html : J.lines[k])} <span class="b3-static-n">(${esc(J.lineNames[k])})</span></li>`).join("") + "</ol>";
+  const worked = w => '<ul class="b3-static-worked">' + w.map(x => `<li><b>${esc(x[0])}.</b> ${esc(x[1])}</li>`).join("") + "</ul>";
+  const table = (key, sum) => {
+    const i = M.practiceInst(town, year, J, key), S = sol[key];
+    const rows = M.G.map(g => [M.GNAME[g], x => x[g]]).concat([["unserved", x => x.u]], sum ? [["supply", x => M.G.reduce((a, g) => a + x[g], 0) + x.u]] : [], [["demand", x => x.d]]);
+    return '<div class="lx-fp-tabw"><table class="lx-fp-tab b3-ptab"><caption class="lx-sr">The solved plan, MW, by plant and hour</caption><thead><tr><th scope="col">MW</th>' + i.T.map(t => `<th scope="col">${t}:00</th>`).join("") + "</tr></thead><tbody>" +
+      rows.map(r => `<tr><th scope="row">${r[0]}</th>` + S.rows.map(x => `<td class="n">${r6(r[1](x))}</td>`).join("") + "</tr>").join("") + "</tbody></table></div>";
+  };
+  const body = {
+    r1: (it, s) => [line(J.lines.ramp), worked(s.worked), p(s.q)],
+    r2: (it, s) => [line(PJ.lines.store), p(it.words), '<ul class="b3-static-worked">' + it.given.map(x => `<li>${x[0]}: <b>${esc(x[1])}</b> (given)</li>`).join("") + "</ul>",
+                    `<p>Give the unit of each: ${it.ask.map(x => x[1]).join(", ")}. ${esc(s.rowsQ)}?</p>`],
+    r3: (it, s) => [line(PJ.lines.reserve), p(it.q), '<ol class="b3-static-ch" type="a">' + it.choices.map(c => `<li>${esc(c)}</li>`).join("") + "</ol>", p(s.unitQ + "? " + s.rowsQ + "? " + s.totalQ + "?")],
+    g1: (it, s) => [lines("vkwh"), "<p>The solved plan:</p>", table("vkwh"), worked(s.worked), p(it.q), '<ol class="b3-static-ch" type="a">' + s.choices.map(c => `<li>${esc(c)}</li>`).join("") + "</ol>"],
+    g2: (it, s) => [p(s.symptom), table("flat"), lines("flat"), p("Which line was changed, and which check catches it: " + it.checks.join("; ") + "?")],
+    g3: (it, s) => [lines("twice"), "<p>The solved plan:</p>", table("twice"), p(s.supplyQ + "? " + s.shortQ + "? Which line causes it?")],
+    k1: (it, s) => ["<p>The solved plan:</p>", table("ok", true), worked(s.worked), p(s.q)],
+    k2: (it, s) => [p(s.note), table("eve"), worked(s.worked), p(it.pkQ + " cost? " + it.totalQ + "?")],
+    k3: (it, s) => [p(s.note), table("dip"), p(s.supplyQ + "? " + s.totalQ + "? " + s.dualQ + "?")]
+  };
+  const answer = {
+    r1: (it, s) => strip(M.fill(it.right, s.vars)),
+    r2: (it, s) => it.ask.map(x => ({ q: "q(t)", eta: "η", w: "w(t)" })[x[0]] + ": " + x[2]).join("; ") + ". " + strip(M.fill(it.right, s.vars)),
+    r3: (it, s) => it.choices[it.answer] + " " + strip(M.fill(it.right, s.vars)),
+    g1: (it, s) => s.choices[it.answer] + ". " + strip(M.fill(it.reasons[it.answer], s.vars)),
+    g2: (it, s) => strip(M.fill(it.right, s.vars)) + " Caught by: " + it.checks[it.answer].toLowerCase() + ".",
+    g3: (it, s) => strip(M.fill(it.right, s.vars)),
+    k1: (it, s) => strip(M.fill(it.right, s.vars)),
+    k2: (it, s) => "Peaker " + s.vars.pkCost + ". " + strip(M.fill(it.right, s.vars)),
+    k3: (it, s) => strip(M.fill(it.right, s.vars)) + " " + M.fill(it.duals, s.vars)
+  };
+  const minutes = Object.keys(PJ.items).reduce((a, k) => a + PJ.items[k].minutes, 0);
+  return `<div class="lx-card b3-pstatic">\n<p class="lx-eyebrow">${esc(PJ.title)} · about ${minutes} min</p>\n<p class="lx-hint">With JavaScript on, each exercise runs the solver, gives hints one at a time and checks your answer.</p>\n` +
+    PJ.tracks.map(t => `<h3>${esc(t.label)}</h3>\n<p>${esc(t.intro)}</p>\n<ol class="b3-ps">\n` + t.items.map(k => {
+      const it = PJ.items[k], s = SP[k];
+      return `<li><p><b>${esc(s.title || it.title)}</b> (${KIND[it.kind]}, about ${it.minutes} min)</p>\n${body[k](it, s).join("\n")}\n<details class="lx-answer"><summary>Answer</summary><p>${esc(answer[k](it, s))}</p></details></li>`;
+    }).join("\n") + "\n</ol>").join("\n") + `\n<p class="lx-fp-foot">${esc(PJ.foot)}</p>\n</div>`;
+}
+const between = (a, b) => { const i = QMD.indexOf(a), j = QMD.indexOf(b); return i > 0 && j > i ? QMD.slice(i + a.length, j).trim() : null; };
+if (process.argv.includes("--static")) {
+  console.log("<!-- b3-static-key -->\n" + staticKey(M.instance(town, year)) + "\n<!-- b3-static-practice -->\n" + staticPractice()); process.exit(0);
+}
 
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
@@ -77,6 +138,15 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     ok(near(S2.objective - S.objective, 80), `correct: +1 MWh at 18:00 adds $${S2.objective - S.objective}`);
     const inst3 = M.instance(town, year); inst3.d[17] += 1;
     ok(near(M.summarize(inst3, core.solveWith(highs, M.buildModel(inst3, null))).objective - S.objective, 0), "correct: +1 MWh at 17:00 adds $0 (spills less)");
+    // the signs are these inputs' signs, not a law (review 2026-11-02): two counterexamples with the same model
+    { const a = M.instance(town, year); a.d[17] = 105; const b = M.instance(town, year); b.d[17] = 106;
+      const Sa = M.summarize(a, core.solveWith(highs, M.buildModel(a, null))), Sb = M.summarize(b, core.solveWith(highs, M.buildModel(b, null)));
+      ok(near(Sa.objective, 27900) && near(Sb.objective, 27760) && near(Sa.rows[0].dual, -140) && near(Sa.rows[0].nuc + Sa.rows[0].cc, 105), `counterexample: 17:00 demand of 105 MW (nuclear 100 + the plant's 5 MW floor): one more MWh saves $140, dual ${Sa.rows[0].dual}`); }
+    { const c = M.instance(town, year, { start: 150 }), r = core.solveWith(highs, M.buildModel(c, null));
+      ok(near(r.duals.ramp_17, 40) && near(M.summarize(c, r).rows[0].cc, 110), `counterexample: a 150 MW start forces the plant down only to 110 MW at 17:00; that ramp row's dual is +$40 (${r.duals.ramp_17})`); }
+    ok(near(D.ramp_18, -40) && T.every(t => D["wx_wind_" + t] <= 1e-9) && /Upper limits, such as the weather limits and the ramp's climb, have duals ≤ 0/.test(JS) && /all ≥ 0 for these inputs/.test(JS), "step 7: upper limits ≤ 0, balance duals ≥ 0 for these inputs (said so)");
+    ok(!/more demand can never make the cheapest plan cheaper/.test(JS + QMD), "no universal claim about dual signs");
+    has("“A balance dual can never be negative.”", "the myth on dual signs"); has("its dual becomes −$140", "the counterexample in the myth answer"); ok(/data-id="neg2" data-answer="myth"/.test(QMD), "the dual-sign myth is a myth");
   }
 
   // ---------------- the five suspects
@@ -125,6 +195,13 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     has("9 to 23%");
     ok(J.vv.filter(v => v.answer === 0).length === 3 && J.vv.length === 6, "vv: three verification, three validation");
     ok(J.blocks.map(b => b.key).join() === "sets,par,vars,obj,cons", "blocks: the reading sequence");
+    ok(/−<i>R<\/i> Δ<i>t<\/i> ≤ .* ≤ <i>R<\/i> Δ<i>t<\/i>/.test(J.lines.ramp) && QMD.indexOf("−R Δt ≤ p<sub>cc,t</sub> − p<sub>cc,t−1</sub> ≤ R Δt") > 0, "ramp line: R Δt, so every side is in MW (data and fallback)");
+    { const K = M.inputs(inst), s16 = K.find(r => /cc,16/.test(r.sym));
+      ok(s16 && s16.value === "45" && s16.unit === "MW" && /given, not chosen/.test(s16.name), "key: p(cc,16) = 45 MW, a given start");
+      ok(K.find(r => r.sym === "<i>d<sub>t</sub></i>").value === "17:00 349, 18:00 344, 19:00 331, 20:00 319" && K.find(r => r.sym === "<i>V</i>").value === "10,000", "key: demand by hour and V from the model"); }
+    ok(between("<!-- b3-static-key:start -->", "<!-- b3-static-key:end -->") === staticKey(inst), "page: the fallback's symbol key is the generated one (node ... --static)");
+    ok(between("<!-- b3-static-practice:start -->", "<!-- b3-static-practice:end -->") === staticPractice(), "page: the static practice set is the generated one (node ... --static)");
+    ok(J.vv.slice(3, 5).every(v => /SPP's own fleet|that year's fleet and fuel prices/.test(v.text)), "vv: the validation examples compare like with like");
   }
 
   // ---------------- the practice set
@@ -199,6 +276,8 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     ok(SP.g2.vars.obj === "$22,500" && SP.g2.vars.diff === "$100" && SP.g2.vars.nuc0 === 90 && SP.g2.vars.d0 === 0 && SP.g2.vars.d1 === 10, "g2: $22,500, $100 less, nuclear 90 MW, dual $0 -> $10");
     ok(SP.g2.check({ line: "must", choice: 2 }).ok && SP.g2.check({}).why === PJ.items.g2.noLine && /drop below 100 MW/.test(SP.g2.check({ line: "bal", choice: 2 }).why) && SP.g2.check({ line: "must", choice: 1 }).why === PJ.items.g2.bad[1] && SP.g2.check({ line: "must" }) === null, "g2: line (5) and the outputs check pass; others get reasons");
     ok(PR.flat.balanced && PR.flat.rows.length === 4, "g2: the balance does hold (the reason for choice 2)");
+    { const f = M.instance(town, year); f.d[17] += 1; const Sf = M.summarize(f, core.solveWith(highs, M.buildModel(f, "flat")));
+      ok(near(Sf.rows[0].nuc, 91) && near(Sf.objective - PR.flat.objective, 10) && SP.g2.vars.nuc1 === 91 && /raises nuclear from 90 to 91 MW, at \$10/.test(M.fill(PJ.items.g2.right, SP.g2.vars)), "g2: one more MWh at 17:00 raises nuclear from 90 to 91 MW and costs $10, as the reason says"); }
     // g3: wind counted twice
     ok(SP.g3.vars.supply === 259 && SP.g3.vars.short === 72 && SP.g3.vars.wind === 72 && SP.g3.vars.d === 331 && SP.g3.vars.u === 0, "g3: 259 MW against 331 at 19:00, 72 short = the wind");
     ok(SP.g3.check({ ran: false }).why === PJ.items.g3.run && SP.g3.check({ ran: true, supply: 259, short: 72, line: "bal" }).ok && !SP.g3.check({ ran: true, supply: 331, short: 0, line: "bal" }).ok &&
@@ -217,7 +296,7 @@ const has = (s, msg) => ok(QMD.indexOf(s) >= 0, "page states " + (msg || JSON.st
     { const i3 = M.practiceInst(town, year, J, "dip"); i3.d[14] += 1;
       ok(near(M.summarize(i3, core.solveWith(highs, M.buildModel(i3, null))).objective - PR.dip.objective, 100), "k3: one more MWh at 14:00 costs HiGHS exactly $100 (the dual)"); }
     // the page hosts the set; the JS builds every exercise
-    ok(QMD.indexOf('<div id="b3-practice"></div>') > 0, "page: the practice host in the Check section");
+    ok(QMD.indexOf('<div id="b3-practice">\n<!-- b3-static-practice:start -->') > 0 && /host\.innerHTML = ""/.test(JS), "page: the practice host in the Check section holds the static set, which the runner replaces");
     items.forEach(k => ok(JS.indexOf(k + ": function") > 0, `js: the view builds exercise ${k}`));
   }
 

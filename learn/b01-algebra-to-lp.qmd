@@ -49,6 +49,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k4-chips .lx-chip[aria-pressed="true"] { border-color: var(--lx-accent); box-shadow: inset 0 0 0 1px var(--lx-accent); }
 .b1-story { border-left: 3px solid var(--lx-accent); padding: 4px 0 4px 12px; display: grid; gap: 4px; }
 .b1-story p:not(.lx-eyebrow) { font-size: 15.5px; color: var(--lx-ink); max-width: 68ch; }
+.page-learn .b1-story-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-width: 72ch; }
+.page-learn .b1-story-rows li { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 2px 10px; align-items: baseline; font-size: 15.5px; color: var(--lx-ink); margin: 0; }
+.b1-story-k { font-family: var(--lx-f-display); font-weight: 500; font-size: 13.5px; color: var(--lx-ink-2); }
+@media (max-width: 560px) { .page-learn .b1-story-rows li { grid-template-columns: minmax(0, 1fr); } }
+.page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+.page-learn .lx-datanote li { margin: 0; }
 .b1-tags { display: grid; gap: 8px; }
 .b1-tagrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--lx-surface-2); }
 .b1-tagrow p { grid-column: 1 / -1; font-size: 15px; }
@@ -125,7 +131,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-interactive lx-cards" data-learn="b01" data-src="../assets/learn/data/b01-algebra-to-lp.json ../assets/learn/data/town.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">A word problem, its model, and the best corner</p>
-<p>At 19:00 on 3 September 2025 Prairie Town's gas plants must cover at least 145 MW. The combined-cycle plant ($40/MWh) made 90 MW at 18:00 and can change by at most 40 MW an hour; the peaker ($100/MWh) makes at most 100 MW.</p>
+<ul class="b1-story-rows">
+<li><span class="b1-story-k">Need</span><span>At 19:00 on 3 September 2025 Prairie Town's gas plants must cover at least 145 MW.</span></li>
+<li><span class="b1-story-k">Combined-cycle</span><span>$40/MWh; it made 90 MW at 18:00 and can climb by at most 40 MW an hour.</span></li>
+<li><span class="b1-story-k">Peaker</span><span>$100/MWh; it makes at most 100 MW.</span></li>
+</ul>
 <ol class="b1-static-model">
 <li>minimize 40x + 100y</li>
 <li>x + y ≥ 145 (cover the gap)</li>
@@ -144,7 +154,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-hint">With JavaScript on, you build this model yourself, then two more, and hand one to a real solver.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>The dispatch story's 145 MW follows the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to Prairie Town as in <a href="00-grid-operator.html">lesson 0</a>. The planning story's 2.1 and 3.0 GWh per MW-year come from U.S. capacity factors for 2025 (solar 24.0%, wind 33.8%; <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a>, rounded). All prices, costs, sizes and limits are illustrative. The solver is HiGHS 1.15, running in your browser.</span></p>
+<div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
+<li>Dispatch: the 145 MW follows the real hourly shapes of 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled as in <a href="00-grid-operator.html">lesson 0</a>.</li>
+<li>Planning: 2.1 and 3.0 GWh per MW-year are U.S. 2025 capacity factors, solar 24.0% and wind 33.8% (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a>), rounded.</li>
+<li>All prices, costs, sizes and limits are illustrative.</li>
+<li>Solver: HiGHS 1.15, running in your browser.</li>
+</ul></div>
 ```
 :::
 
@@ -161,7 +176,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Feasible region</dt><dd>The plans that keep every rule; with two decisions it is a shape on a plane.</dd>
 <dt>Best corner</dt><dd>When a linear program has a best plan, one sits at a corner of the region.</dd>
 <dt>Signs matter</dt><dd>≤ where the story says ≥ lets the model skip its job, and the answer still looks optimal.</dd>
-<dt>A x ≤ b</dt><dd>Solvers read the costs c, a rule table A and limits b, with every rule written as ≤: x + y ≥ 145 enters as −x − y ≤ −145.</dd>
+<dt>A x ≤ b</dt><dd>One common solver form: the costs c, a rule table A and limits b, with every rule written as ≤. x + y ≥ 145 enters as −x − y ≤ −145.</dd>
 </dl>
 </div>
 </div>
@@ -174,9 +189,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-All plans with the same cost $C$ lie on one straight line, $40x + 100y = C$: the dashed line of step 5. Lowering $C$ slides the line towards the origin without turning it. The cheapest allowed plan is the last point of the region the line touches as it slides, and a straight line leaving a region bounded by straight edges leaves it at a corner, here $(130, 15)$ at \$6,700.
-
-Two footnotes. If the cost line is parallel to an edge, it leaves along the whole edge: both corners, and every plan between them, are equally good (try costs of \$40 and \$40). And if the region is open in the direction the goal pulls, there is no best plan: the solver reports the model as unbounded.
+- **Same cost, same line.** All plans with the same cost $C$ lie on one straight line, $40x + 100y = C$: the dashed line of step 5.
+- **Slide it.** Lowering $C$ slides the line towards the origin without turning it.
+- **The last touch.** The cheapest allowed plan is the last point of the region the line touches. A straight line leaves a region with straight edges at a corner: here $(130, 15)$, at \$6,700.
+- **A tie.** If the cost line is parallel to an edge, it leaves along the whole edge. With equal costs of \$40 and \$40, the corners $(45, 100)$ and $(130, 15)$ both cost \$5,800, and so does every plan on the edge between them.
+- **No best plan.** If the region is open in the direction the goal pulls, the solver reports the model as unbounded.
 
 ```{=html}
 </div>
@@ -209,7 +226,9 @@ In Python, [Pyomo](https://www.pyomo.org/) and linopy (the layer under [PyPSA](h
 <summary><span class="k">Go deeper</span>What these small models leave out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>One hour at a time: a real dispatch plans all 24 hours together, so the ramp links each hour to the next (B3, M1).</li>
+<li>One hour at a time: multi-period models link adjacent hours through ramp limits (B3, M1). Day-ahead models often cover a whole day; real-time dispatch updates the plan many times an hour.</li>
+<li>The ramp here limits only the climb; a real ramp limit also slows the drop, and B3 writes both sides.</li>
+<li>Gas above the need is matched by spilling wind or sun; a model with exports or storage would track where it goes.</li>
 <li>Plants are always available and can run at any level; real units have minimum outputs and start-up costs, which need on-off decisions (M2, upcoming).</li>
 <li>Prices and capacity factors are fixed numbers; real studies vary them (lesson 12 and the Modeler tier).</li>
 <li>Two decisions fit on a graph; real models have thousands to millions, which is why solvers exist.</li>
@@ -230,7 +249,7 @@ In Python, [Pyomo](https://www.pyomo.org/) and linopy (the layer under [PyPSA](h
 <div class="lx-qq" data-id="strict" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A solver handles x &lt; 130 just as well as x ≤ 130.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. With a strict &lt; there may be no best plan: 129.9, 129.99 and so on are each better than the last. Linear programs use ≤ and ≥ only.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. With a strict &lt; there may be no best plan: 129.9, 129.99 and so on are each better than the last. Linear programs use ≤, ≥ and =, never a strict &lt; or &gt;.</p></details>
 </div>
 <div class="lx-qq" data-id="corner" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “If a linear program has a best plan, one of its corners is a best plan.”</p>

@@ -179,7 +179,7 @@
         check: function (i) { if (i == null) return null; return { ok: i === it.answer, why: fill(it.reasons[i], v) }; } };
     } else if (key === "g2") {
       var S2 = sol.flat, S0 = sol.ok;
-      v = { obj: money(S2.objective), diff: money(S0.objective - S2.objective), ref: money(S0.objective), nuc0: round(S2.rows[0].nuc), t0: inst.T[0],
+      v = { obj: money(S2.objective), diff: money(S0.objective - S2.objective), ref: money(S0.objective), nuc0: round(S2.rows[0].nuc), nuc1: round(S2.rows[0].nuc) + 1, t0: inst.T[0],
             cap: inst.cap.nuc, cNuc: cst.cNuc, d0: round(S0.rows[0].dual), d1: round(S2.rows[0].dual) };
       var line = J.practice.bugs.flat.line;
       out = { symptom: fill(it.symptom, v), line: line,
@@ -249,7 +249,24 @@
     return out;
   }
 
-  var model = { townDay: townDay, instance: instance, buildModel: buildModel, summarize: summarize, counts: counts, symptom: symptom, money: money, G: G, GNAME: GNAME,
+  // the formulation's symbols with their meaning, unit and value, including the start p(cc, first hour − 1), a given number
+  function inputs(inst) {
+    var hrs = function (o) { return inst.T.map(function (t) { return t + ":00 " + o[t]; }).join(", "); };
+    var per = function (o) { return G.map(function (g) { return g + " " + o[g].toLocaleString("en-US"); }).join(", "); };
+    return [
+      { sym: "nuc, wind, solar, cc, pk", name: "the plants in G: nuclear, wind farm, solar farm, combined-cycle gas plant, peaker", unit: "", value: "" },
+      { sym: "<i>d<sub>t</sub></i>", name: "demand in hour t", unit: "MW", value: hrs(inst.d) },
+      { sym: "<i>a</i><sub>wind,<i>t</i></sub>", name: "wind the weather allows", unit: "MW", value: hrs(inst.a.wind) },
+      { sym: "<i>a</i><sub>solar,<i>t</i></sub>", name: "sun the weather allows", unit: "MW", value: hrs(inst.a.solar) },
+      { sym: "<i>c<sub>g</sub></i>", name: "running cost of plant g", unit: "$/MWh", value: per(inst.c) },
+      { sym: "<i>P̄<sub>g</sub></i>", name: "size of plant g", unit: "MW", value: per(inst.cap) },
+      { sym: "<i>R</i>", name: "how far the cc plant can move in an hour", unit: "MW per hour", value: String(inst.ramp) },
+      { sym: "<i>p</i><sub>cc," + (inst.T[0] - 1) + "</sub>", name: "cc output at " + (inst.T[0] - 1) + ":00, the start: given, not chosen", unit: "MW", value: String(inst.start) },
+      { sym: "<i>V</i>", name: "charge for each MWh of unserved demand", unit: "$/MWh", value: inst.V.toLocaleString("en-US") },
+      { sym: "Δ<i>t</i>", name: "length of one step", unit: "h", value: String(inst.dt) }];
+  }
+
+  var model = { townDay: townDay, instance: instance, buildModel: buildModel, summarize: summarize, counts: counts, symptom: symptom, money: money, G: G, GNAME: GNAME, inputs: inputs,
                 fromRef: fromRef, toRef: toRef, PRACTICE_RUN: PRACTICE_RUN, practiceInst: practiceInst, practiceSpec: practiceSpec, fill: fill };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -274,6 +291,14 @@
     btn.addEventListener("click", go);
     inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
     return { input: inp, button: btn };
+  }
+  function inputKey(host, inst) {
+    var d = H("details", { class: "lx-textalt b3-key" }, host); H("summary", { text: "Symbol key and input values" }, d);
+    var t = H("table", { class: "lx-fp-tab b3-keytab" }, H("div", { class: "lx-fp-tabw" }, d));
+    var hr = H("tr", null, H("thead", null, t)); ["Symbol", "Meaning", "Unit", "Value"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
+    var tb = H("tbody", null, t);
+    inputs(inst).forEach(function (r) { var tr = H("tr", null, tb); H("th", { scope: "row", html: r.sym }, tr); H("td", { text: r.name }, tr); H("td", { text: r.unit }, tr); H("td", { text: r.value }, tr); });
+    return d;
   }
   function saw(host, ok, html) { host.innerHTML = ""; H("div", { class: "lx-saw" + (ok ? "" : " no"), html: LX.icon(ok ? "check" : "question") + "<div>" + html + "</div>" }, host); }
   var HTMLSYM = { nuc: "nuc", wind: "wind", solar: "solar", cc: "cc", pk: "pk" };
@@ -320,15 +345,16 @@
 
     // 1 reading order
     steps.push({
-      text: "A published model reads in a fixed sequence: sets, [[parameter|parameters]], variables, objective, constraints. Open each block to see it in plain words.",
+      text: "This is Prairie Town's [[dispatch|dispatch]] for four hours, as a paper would write it. Read it in a fixed sequence: sets, [[parameter|parameters]], variables, objective, constraints. Open each block.",
       build: function (act, api) {
         var seen = {}, box = H("div", { class: "b3-blocks" }, act);
         J.blocks.forEach(function (b, i) {
           var d = H("details", { class: "b3-block" }, box), s = H("summary", null, d);
           H("span", { class: "b3-bn", text: String(i + 1) }, s); H("b", { text: b.head }, s); H("span", { class: "b3-bh", html: b.html }, s);
-          H("p", { text: b.words }, d);
+          H("p", { html: LX.rich(b.words) }, d);
           d.addEventListener("toggle", function () { if (d.open) seen[b.key] = 1; if (Object.keys(seen).length === J.blocks.length) { api.done(); api.saw("Sets say what to count over, parameters are given, variables are chosen, the objective scores a plan, the constraints rule plans out. Read every model in this sequence."); } });
         });
+        inputKey(act, inst);
       }
     });
 
@@ -397,7 +423,7 @@
     steps.push({
       text: "“∀ t ∈ T” means one row for each hour. With four hours and five plants, how many rows does the balance stand for, and how many the size rule?",
       build: function (act, api) {
-        readLines(act, J, {});
+        readLines(act, J, {}); inputKey(act, inst);
         var got = {}, out = H("div", { "aria-live": "polite" }, act);
         numInput(act, { label: "Balance (1):", unit: "rows", onCheck: function (v) { if (v === N.balance) { got.b = 1; fin(); } else saw(out, false, "∀ t ∈ T: one balance row per hour. How many hours are in T?"); } });
         numInput(act, { label: "Sizes (2):", unit: "rows", onCheck: function (v) { if (v === N.size) { got.s = 1; fin(); } else saw(out, false, "∀ g ∈ G, t ∈ T: one row per plant and hour."); } });
@@ -450,7 +476,7 @@
       build: function (act, api) {
         var go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the correct model" }, act);
         var stHost = H("div", null, act), status = LX.SolverStatus ? LX.SolverStatus(stHost) : null;
-        var tbl = H("div", { class: "b3-check" }, act), pred = H("div", { class: "b3-pred" }, act), out = H("div", { "aria-live": "polite" }, act);
+        var tbl = H("div", { class: "b3-check" }, act), said = H("p", { class: "b3-note", "aria-live": "polite" }, act), pred = H("div", { class: "b3-pred" }, act), out = H("div", { "aria-live": "polite" }, act);
         var checked = {}, predicted = false;
         go.addEventListener("click", function () {
           if (status) status.set("solving");
@@ -465,12 +491,13 @@
           var hd = H("div", { class: "b3-cr head" }, tbl); ["Hour", "Plants", "Unmet", "Sum", "Demand"].forEach(function (t) { H("span", { text: t }, hd); });
           T.forEach(function (t, k) {
             var x = s ? s.rows[k] : null, P = G.map(function (g) { return x ? x[g] : ref.p[g][k]; }), u = x ? x.u : ref.u[k];
-            var b = H("button", { type: "button", class: "b3-cr", "aria-label": "Check the balance at " + t + ":00" }, tbl);
+            var b = H("button", { type: "button", class: "b3-cr", "aria-label": "Check the balance at " + t + ":00: plants " + P.map(Math.round).join(" + ") + " MW, unmet " + Math.round(u) + " MW, demand " + inst.d[t] + " MW" }, tbl);
             H("span", { text: t + ":00" }, b); H("span", { class: "pl", text: P.map(Math.round).join(" + ") }, b); H("span", { text: String(Math.round(u)) }, b);
             var sumEl = H("span", { class: "sum", text: "?" }, b); H("span", { text: String(inst.d[t]) }, b);
             b.addEventListener("click", function () {
               var sum = P.reduce(function (a, v) { return a + v; }, 0) + u; sumEl.textContent = Math.round(sum) + (Math.abs(sum - inst.d[t]) < 1e-6 ? " ✓" : " ✗");
-              b.classList.add(Math.abs(sum - inst.d[t]) < 1e-6 ? "ok" : "bad"); checked[t] = 1; fin();
+              b.classList.add(Math.abs(sum - inst.d[t]) < 1e-6 ? "ok" : "bad"); checked[t] = 1;
+              said.textContent = t + ":00: the plants and unmet demand add up to " + Math.round(sum) + " MW against " + inst.d[t] + " MW of demand: " + (Math.abs(sum - inst.d[t]) < 1e-6 ? "balanced." : "not balanced."); fin();
             });
           });
           H("p", { class: "b3-note", text: "Plants, left to right: nuclear + wind + solar + combined-cycle + peaker, in MW. Wind and sun not used are spilled for free." }, tbl);
@@ -481,11 +508,15 @@
         }
         function reveal(right) {
           var d = (refSum && refSum.rows.map(function (x) { return x.dual; })) || ref.balanceDuals;
-          saw(out, right, (right ? "Right. " : "Not here. ") + "Balance duals: " + T.map(function (t, k) { return t + ":00 $" + Math.round(d[k]); }).join(", ") + " per MWh, all ≥ 0: more demand can never make the cheapest plan cheaper while spilling is free. The weather and ramp limits have duals ≤ 0, as limits should.");
+          saw(out, right, (right ? "Right. " : "Not here. ") + "Balance duals: " + T.map(function (t, k) { return t + ":00 $" + Math.round(d[k]); }).join(", ") + " per MWh, all ≥ 0 for these inputs.");
+          var why = H("ul", { class: "b3-why" }, out);
+          H("li", { text: "Why ≥ 0 here: nothing in this plan is forced to run above what demand needs, so extra demand adds cost, or none where spilled wind and sun cover it." }, why);
+          H("li", { text: "If output were forced above demand (nuclear held flat, a plant unable to ramp down), more demand could save money: a negative dual." }, why);
+          H("li", { text: "Upper limits, such as the weather limits and the ramp's climb, have duals ≤ 0: loosening a cap never raises the cheapest cost." }, why);
           fin();
         }
         function fin() {
-          if (Object.keys(checked).length === T.length && predicted) { api.done(); api.saw("Balanced in all four hours, duals with the right signs: two checks passed. Why $0 at 17:00 and $80 at 18:00? Go deeper below."); }
+          if (Object.keys(checked).length === T.length && predicted) { api.done(); api.saw("Balanced in all four hours, duals with the signs these inputs imply: two checks passed. Why $0 at 17:00 and $80 at 18:00? Go deeper below."); }
         }
       }
     });
@@ -500,7 +531,7 @@
           var mark = H("span", { class: "k4-mark", "aria-live": "polite" }, row);
           seg(row, ["Verification", "Validation"], -1, function (k) {
             right[i] = k === v.answer; mark.textContent = right[i] ? "Right" : "Not quite"; mark.className = "k4-mark " + (right[i] ? "good" : "bad");
-            if (J.vv.every(function (x, j) { return right[j]; })) { api.done(); api.saw("Three checks look inside the model: verification. Three compare it with the world or with experts: validation. A model needs both, and only the first can be fully automated."); }
+            if (J.vv.every(function (x, j) { return right[j]; })) { api.done(); api.saw("Three checks look inside the model: verification. Three compare it with the world or with experts: validation, which needs the same fleet, demand, dates and boundary. Prairie Town is fictional: experts can judge only its plausibility."); }
           }, "Verification or validation: " + v.text);
         });
       }
@@ -516,6 +547,7 @@
         if (!m[2]) { var c = PR.cur(); for (var h = 0; h < 3; h++) c.hint(); setTimeout(function () { c.show(); }, 400); }
         return { view: "practice " + m[1] };
       }
+      if (state === "key") { cards.go(0); var kd = live.querySelector(".b3-key"); if (kd) kd.open = true; return { view: "step 1, the symbol key open" }; }
       var k = { mid: 2, bugs: 5, check: 6, units: 3 }[state]; if (k == null) return null; cards.go(k);
       if (state === "mid") { var ch = live.querySelectorAll(".b3-ch")[2], rh = live.querySelectorAll(".b3-rh")[3]; if (ch) ch.click(); if (rh) rh.click(); }
       if (state === "bugs") { var l = live.querySelector(".lx-fline[aria-label^='costs']"); if (l) l.click(); var r = [].filter.call(live.querySelectorAll(".b3-suspect .lx-btn"), function (b) { return /Run/.test(b.textContent); })[0]; if (r) r.click(); }

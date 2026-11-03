@@ -12,6 +12,7 @@ const G0 = require(path.join(SITE, "assets/learn/grid-operator.js"));
 const town = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town.json"), "utf8"));
 const year = JSON.parse(fs.readFileSync(path.join(SITE, "assets/learn/data/town_year.json"), "utf8"));
 const QMD = fs.readFileSync(path.join(SITE, "learn/k04-linear-equations.qmd"), "utf8");
+const JS = fs.readFileSync(path.join(SITE, "assets/learn/k04-linear-equations.js"), "utf8");
 
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
@@ -92,15 +93,41 @@ if (process.argv.includes("--fallback")) { console.log(fallbackSVG(s)); process.
   has("x ≤ 130: the ramp limit", "the ramp row");
   has("90 MW the combined-cycle plant made at 18:00 are illustrative", "the illustrative label on the 18:00 assumption");
   has("3 September 2025", "the named day");
-  // Go deeper matrix
-  has("-1 & -1 \\\\ 1 & 0 \\\\ 0 & 1 \\\\ -1 & 0 \\\\ 0 & -1", "the A matrix of step 6");
-  has("-145 \\\\ 130 \\\\ 100 \\\\ 0 \\\\ 0", "the b vector of step 6");
+  // Go deeper: A x <= b is a short preview with one symbolic line and a link to B1 (curriculum 4.6); K6 is upcoming
+  has("the rows stack into $A x \\le b$", "the one symbolic line of the preview"); has("[Bridge B1](b01-algebra-to-lp.html)", "the forward link to B1");
+  ok(QMD.indexOf("pmatrix") < 0, "the preview shows no full matrix");
+  has("keeps the line $x = 130$ and everything to its left", "an inequality is not a line: its boundary is");
+  has("with $a_1$ and $a_2$ not both 0", "the general rule excludes both coefficients zero");
+  // the surplus: every plan in the triangle has its extra gas matched by spilling wind or sun
+  { const P = K.region([s.cover].concat(s.limits), s.view), most = Math.max(...P.map(p => p[0] + p[1])) - s.need;
+    ok(most === 85 && s.maxSurplus === 85 && s.spillable === 86 && s.maxSurplus <= s.spillable, `surplus: at most ${most} MW of extra gas, ${s.spillable} MW of wind and sun to spill`); }
+  has("the extra is matched by spilling wind or sun", "the fallback states the spill");
+  ok(JS.indexOf("how fast the plant can drop is left out here") > 0 && QMD.indexOf("The ramp rule limits only the climb from 90 MW") > 0, "ramp: upward only, said in the text version and the fallback");
+  // interaction: the displayed sign counts, the counts are shown, x >= 0 and y >= 0 are fixed
+  ok(/tried = \{ ">=": 1 \}/.test(JS) && /Still to do: /.test(JS) && /Positions tried: /.test(JS) && /Slide x to four positions/.test(JS), "steps 2 and 4: what Next waits for is said and counted");
+  ok(/Always on: x ≥ 0, y ≥ 0/.test(JS) && !/\[lim\[2\], "x ≥ 0"\]/.test(JS), "step 6: x ≥ 0 and y ≥ 0 are fixed, not switches");
+  ok(/start: \{ t: "a·x \+ m ≤ n", s: "a ≠ 0"/.test(JS) && /Spot-check one value/.test(JS) && /a is not 0/.test(JS), "flowchart: a ≠ 0, and one value is a spot-check");
+  ok(/One common solver form writes every inequality one way round/.test(JS) && !/Solvers store every rule/.test(JS), "step 5: ≤ is one convention, not how every solver stores rules");
   // quick questions
   const pass = (x, y) => x <= 130 && x + y >= 145;
   ok(!pass(120, 20) && pass(130, 15) && !pass(140, 10) && !pass(100, 40), "quiz: only (130, 15) passes both rules");
   ok(3 * 20 - 20 >= 40 && !(3 * 19.9 - 20 >= 40), "quiz: 3x − 20 ≥ 40 means x ≥ 20");
   const fb = fallbackSVG(s), a = QMD.indexOf("<!-- fallback-svg:start -->"), b = QMD.indexOf("<!-- fallback-svg:end -->");
   ok(a > 0 && b > a && QMD.slice(a + "<!-- fallback-svg:start -->".length, b).trim() === fb.trim(), "page: the fallback figure is the generated one (run with --fallback and paste)");
+}
+
+// ---------------- the explain layer's worked inequalities (flowchart traces), from the model
+{
+  const T = K.traces();
+  ok(T.length === 2 && T[0].text === "**2x ≤ 40, so x ≤ 20.** Spot-check x = 10: 2 × 10 + 10 = 30 ≤ 50." && T[1].text === "**Divide by −2 and flip: x ≥ −3.** Spot-check x = 0: −2 × 0 = 0 ≤ 6.", "traces: the two worked examples: " + T.map(t => t.text).join(" | "));
+  T.forEach(t => {
+    const e = t.e, f = x => e.a * x + e.m <= e.n, inSet = x => t.op === "<=" ? x <= t.bound : x >= t.bound;
+    ok(e.a !== 0 && near(e.a * t.bound + e.m, e.n), `trace ${t.label}: the boundary ${t.bound} meets the rule with equality`);
+    ok([-50, -10, -3.5, -3, -2.5, 0, 10, 19.5, 20, 20.5, 50].every(x => f(x) === inSet(x)), `trace ${t.label}: x ${t.op} ${t.bound} is exactly the solution set`);
+    ok(t.spotValue === e.a * e.spot + e.m && t.spotValue <= e.n && inSet(e.spot), `trace ${t.label}: the spot-check value ${e.spot} gives ${t.spotValue} ≤ ${e.n}`);
+    ok(t.path[3] === (e.a < 0 ? "flip" : "keep"), `trace ${t.label}: the flowchart path flips only for a negative a`);
+  });
+  ok(/traces\(\)\.map/.test(JS), "explain: the flowchart's traces come from traces()");
 }
 
 // ---------------- drill items
