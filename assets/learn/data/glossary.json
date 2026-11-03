@@ -47,6 +47,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "benchmark": {
+  "term": "Benchmark",
+  "short": "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
+ },
  "forecast-bias": {
   "term": "Bias",
   "short": "The average signed miss of a forecast, showing whether it tends to run too high or too low.",
@@ -107,11 +113,23 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "checksum": {
+  "term": "Checksum",
+  "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
+ },
  "clearing-price": {
   "term": "Clearing price",
   "short": "The price at which supply meets demand in a market, paid to every seller that runs in that hour.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "clone": {
+  "term": "Clone",
+  "short": "A complete new copy of a repository, with its files and its whole history.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
  },
  "combined-cycle": {
   "term": "Combined-cycle plant",
@@ -587,6 +605,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "perfect-foresight": {
+  "term": "Perfect foresight",
+  "short": "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on what flexibility can earn.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
+ },
  "persistence-forecast": {
   "term": "Persistence forecast",
   "short": "The simplest forecast: the next value will be the same as the last one seen, or as the same hour a day or a week before.",
@@ -682,6 +706,12 @@
   "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "repository": {
+  "term": "Repository",
+  "short": "A project folder together with its full history of commits, as kept by a version-control tool such as Git.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
  },
  "representative-period": {
   "term": "Representative period",
@@ -832,6 +862,12 @@
   "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
   "lesson": "B3",
   "href": "b03-read-check-formulation.html"
+ },
+ "version-control": {
+  "term": "Version control",
+  "short": "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back.",
+  "lesson": "R5",
+  "href": "r05-build-validate.html"
  },
  "voltage": {
   "term": "Voltage",

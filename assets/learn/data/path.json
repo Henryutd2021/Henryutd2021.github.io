@@ -1246,9 +1246,12 @@
    "tier": "researcher",
    "code": "R5",
    "title": "Can you trust your analysis? Verification, validation and reproducibility",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r05-build-validate.html",
+   "scales": [],
+   "id": "r05-build-validate",
+   "minutes": 35,
+   "form": "studio"
   },
   {
    "tier": "researcher",

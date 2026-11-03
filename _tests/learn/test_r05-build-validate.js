@@ -1,0 +1,185 @@
+// test_r05-build-validate.js — Node tests for research studio R5 (assets/learn/r05-build-validate.js) and its data
+// (assets/learn/data/r05-build-validate.json). Every run the page solves (the study, its five buggy versions, the day
+// before, lesson 0's day, the benchmark day, the validation run) is solved with the vendored HiGHS; the test checks the
+// study's physics, each bug's symptom as the page states it, the benchmark against its hand answer, the precomputed
+// results the page falls back to (data file `ref`), every number the page and its exemplars state, the page's no-JS
+// blocks, and the notebook's data and asserted numbers.
+// Usage (from the site folder):  node _tests/learn/test_r05-build-validate.js [--ref | --write]
+//   --ref    rewrite the data file's `ref` block from the HiGHS solutions, then run the checks
+//   --write  rewrite the page's blocks between the r5-* markers from the model, then run the checks
+"use strict";
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const SITE = path.resolve(__dirname, "..", "..");
+const L = p => path.join(SITE, "assets/learn", p);
+const M = require(L("r05-build-validate.js"));
+const G0 = require(L("grid-operator.js"));
+const EX = require(L("components/exemplars.js"));
+const RB = require(L("components/rubric.js"));
+const DATA = L("data/r05-build-validate.json"), PAGE = path.join(SITE, "learn/r05-build-validate.qmd");
+const NB = path.join(SITE, "learn/notebooks/r05-build-validate.ipynb");
+const town = JSON.parse(fs.readFileSync(L("data/town.json"), "utf8"));
+const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
+let J = JSON.parse(fs.readFileSync(DATA, "utf8"));
+J.fleet = town.fleet;
+
+let checks = 0, fails = 0;
+function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
+const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
+const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// the page's static blocks
+function blocks(v) {
+  const E = M.exemplars(J, v);
+  const list = '<div class="lx-xcard"><p class="lx-eyebrow">A verification log in nine lines</p><ol class="r5-static-rules">' +
+    J.checklist.map(c => `<li><b>${esc(c[1])}:</b> ${esc(c[2])}</li>`).join("") + "</ol></div>";
+  return {
+    "r5-study": M.staticStudy(J, v),
+    "r5-exemplars": EX.staticHTML(E),
+    "r5-rubric": list + "\n" + RB.staticHTML([{ id: "trust", look: J.rubric.look }]),
+    "r5-myth-bench": v.benchMissing
+  };
+}
+function between(text, name) {
+  const re = new RegExp("<!-- " + name + ":start[^>]*-->([\\s\\S]*?)<!-- " + name + ":end -->");
+  const m = re.exec(text); return m ? m[1].replace(/^\n/, "").replace(/\n$/, "") : null;
+}
+function put(text, name, body) {
+  const re = new RegExp("(<!-- " + name + ":start[^>]*-->)([\\s\\S]*?)(<!-- " + name + ":end -->)");
+  if (!re.test(text)) throw new Error("marker " + name + " not found");
+  const inline = name === "r5-myth-bench";
+  return text.replace(re, (m, a, b, c) => a + (inline ? body : "\n" + body + "\n") + c);
+}
+
+(async () => {
+  const ctx = { window: { LX: {} }, module: { exports: {} }, performance };
+  vm.runInNewContext(fs.readFileSync(L("components/solver.js"), "utf8"), ctx);
+  const { core, VERSION } = ctx.module.exports, highs = await require(L(`vendor/highs-${VERSION}/highs.js`))();
+  const D = M.days(town, year, J), sol = {}, raw = {};
+  M.ORDER.forEach(k => {
+    const R = M.RUNS[k], m = M.runModel(k, D, J, sol), r = core.solveWith(highs, m);
+    raw[k] = r; sol[k] = M.summarize(D[R.day], J, r, { battery: R.battery, bug: R.bug });
+    ok(sol[k].ok, `run ${k}: solved to optimal (${r.status})`);
+  });
+  if (process.argv.includes("--ref")) {
+    J.ref = {}; M.ORDER.slice().sort().forEach(k => { J.ref[k] = M.toRef(sol[k]); });
+    const out = JSON.parse(fs.readFileSync(DATA, "utf8")); out.ref = J.ref;
+    fs.writeFileSync(DATA, JSON.stringify(out, null, 2) + "\n"); console.log("wrote ref for", Object.keys(J.ref).length, "runs");
+  }
+  const x = M.numbers(J, sol), v = M.vals(J, x);
+  if (process.argv.includes("--write")) {
+    let page = fs.readFileSync(PAGE, "utf8"); const B = blocks(v);
+    Object.keys(B).forEach(k => { page = put(page, k, B[k]); });
+    fs.writeFileSync(PAGE, page); console.log("wrote the page's blocks");
+  }
+  const QMD = fs.readFileSync(PAGE, "utf8"), JS = fs.readFileSync(L("r05-build-validate.js"), "utf8");
+
+  // ---------------- data: the three real days, scaled as lesson 0
+  {
+    const W = G0.prepare(town, year, "lesson0");
+    ok(JSON.stringify(D.lesson0.demand) === JSON.stringify(W.demand) && JSON.stringify(D.lesson0.wind) === JSON.stringify(W.wind) && JSON.stringify(D.lesson0.solar) === JSON.stringify(W.solar), "data: lesson 0's day equals grid-operator.js prepare()");
+    ok(D.study.date === "2025-08-20" && D.forecast.date === "2025-08-19", "data: 20 August, planned on 19 August");
+    [D.study, D.forecast].forEach(d => ok(d.demand.length === 24 && d.demand.every((q, t) => (q - 100 - d.wind[t] - d.solar[t]) % 5 === 0), `data ${d.date}: 24 hours, gas need a multiple of 5 MW (as lesson 0)`));
+    ok(Math.max(...D.study.demand) === 425 && Math.max(...D.study.demand) <= 450, "data: 20 August peaks at 425 MW (the year's peak hour is 450 MW)");
+    ok(J.study.battery.P === 50 && J.study.battery.E === 200 && J.study.battery.E0 === 100 && J.study.battery.eta === 0.85, "data: the battery is 50 MW, 200 MWh, starts at 100 MWh, 85% round trip");
+    ok(town.fleet.cc.cost === 40 && town.fleet.peaker.cost === 100 && town.fleet.cc.ramp === 40 && J.study.startCC === town.scenarios.lesson0.startCC, "data: lesson 0's fleet, costs, ramp and start");
+  }
+
+  // ---------------- precomputed results (the page's fallback) equal the solves
+  {
+    const keys = Object.keys(M.RUNS);
+    ok(J.ref && keys.every(k => J.ref[k]), "ref: every run precomputed (run with --ref after a model change)");
+    keys.forEach(k => {
+      const R = J.ref[k]; if (!R) return; const S = M.toRef(sol[k]);
+      ok(JSON.stringify(R) === JSON.stringify(S), `ref ${k}: equals the HiGHS solve`);
+    });
+  }
+
+  // ---------------- the fixed study: balance, sizes, ramp, end state, convention
+  const B = J.study.battery, S = sol.ok;
+  {
+    S.rows.forEach(w => {
+      const sup = w.nuc + w.wind + w.solar + w.cc + w.pk + w.dis - w.c + w.u;
+      ok(near(sup, w.d), `study ${w.t}: balance (${sup} = ${w.d})`);
+      ok(w.e >= -1e-9 && w.e <= B.E + 1e-9 && w.c <= B.P + 1e-9 && w.dis <= B.P + 1e-9, `study ${w.t}: battery within its sizes`);
+      ok(!(w.c > 1e-6 && w.dis > 1e-6), `study ${w.t}: never charges and discharges at once`);
+      ok(w.wind <= D.study.wind[w.t] + 1e-9 && w.solar <= D.study.solar[w.t] + 1e-9, `study ${w.t}: within the weather`);
+    });
+    ok(near(S.endE, B.E0) && S.maxRamp <= 40 + 1e-9 && near(S.unserved, 0), "study: ends with 100 MWh, ramp within 40 MW/h, no unserved energy");
+    ok(near(S.minE, Math.min(...S.rows.map(w => w.e))) && S.minE >= -1e-9 && near(S.maxE, 200), "good exemplar: stored energy within 0–200 MWh");
+    S.rows.forEach((w, t) => { const prev = t ? S.rows[t - 1].e : B.E0; if (w.dis > 1e-6) ok(w.e < prev - 1e-9, `good exemplar ${t}: stored energy falls when the battery feeds the town`); });
+    const base = sol.base;
+    S.rows.forEach((w, t) => { if (w.dis > 1e-6) ok(base.rows[t].pk > 1e-6, `sign fixed text ${t}: discharges only in hours the peaker runs without a battery`); if (w.c > 1e-6) ok(base.rows[t].cc < town.fleet.cc.mw - 1e-6, `sign fixed text ${t}: charges only when the gas plant has room`); });
+    ok(near(x.base, 194500) && near(x.ok, 8205.88), `study: day without a battery ${v.base}, saving ${v.ok}`);
+    // the saving is the cost difference; the objective is unique, so the notebook's SciPy HiGHS must give the same
+    ok(near(sol.base.cost - S.cost, x.ok, 0.006), "study: saving = cost without − cost with the battery");
+  }
+
+  // ---------------- the five planted bugs and their symptoms
+  {
+    ok(x.unit > x.ok && x.unitMaxE > B.E && near(x.unitMaxE, 279.5), `unit: saving ${v.unit} above ${v.ok}; stores ${x.unitMaxE} MWh in a 200 MWh battery`);
+    ok(sol.sign.both > 0 && x.signBoth === sol.sign.both && x.signFed > 0 && near(sol.sign.storedChange, 0), `sign: charges and discharges at once in ${x.signBoth} hours; ${x.signFed} MWh fed with stored energy back to 100 MWh`);
+    ok(sol.sign.rows.some((w, t) => w.c > w.dis + 1e-6 && w.e > (t ? sol.sign.rows[t - 1].e : B.E0) + 1e-9), "sign: in some hour the model counts the battery as feeding the town while its stored energy rises");
+    ok(near(sol.sign.fedAsModelled, 0.15 * sol.sign.charged, 1e-5), "sign: the energy from nowhere is 15% of what it charged (the round-trip loss, turned into a gain)");
+    ok(x.sign > x.ok, "sign: the saving is inflated");
+    ok(near(sol.lunch.endE, 0) && near(x.lunchGain, 10000) && near(x.lunchGain, B.E0 * town.fleet.peaker.cost), `lunch: ends at 0 MWh; gap ${v.lunchGain} = 100 MWh × $100`);
+    ok(near(x.missing, x.ok) && x.missingRamp > 40 && x.rampRows === 24 && x.rampRowsMissing === 0, `missing: same saving ${v.missing}; gas plant climbs ${x.missingRamp} MW in an hour; ramp rows ${x.rampRows} → ${x.rampRowsMissing}`);
+    ok(near(x.l0base, 104000) && near(x.l0missingBase, 102600) && near(x.l0ok, 1286.49, 0.006) && near(x.l0missing, 0), `missing on 3 September: ${v.l0missingBase} instead of ${v.l0base}; saving ${v.l0missing} instead of ${v.l0ok}`);
+    ok(sol.l0missingBase.maxRamp > 40, "missing on 3 September: the plan without ramp rows climbs faster than 40 MW an hour");
+    ok(near(x.honest, 2100) && x.honest < x.ok && x.honestShare === 26, `leak: planned the day before ${v.honest}, ${x.honestShare}% of ${v.ok}`);
+    ok(near(sol.honest.unserved, 0) && sol.honest.rows.every((w, t) => near(w.c, sol.plan.rows[t].c) && near(w.dis, sol.plan.rows[t].dis)), "leak: the honest run follows the plan's schedule and serves all demand");
+    ok(["unit", "sign", "lunch", "missing"].every(k => /optimal/.test(raw[k].status)), "all buggy versions solve to optimal (myth 1)");
+  }
+
+  // ---------------- benchmark: the hand answer, and which versions it catches
+  {
+    const bd = D.bench;
+    ok(bd.demand.filter(q => q === 330).length === 5 && bd.demand.filter(q => q === 220).length === 19 && bd.wind.every(q => q === 0), "bench: 220 MW, 330 MW from 12:00 to 17:00, no wind or solar");
+    ok(near(sol.benchBase.cost, 100 * 24 * 10 + (120 * 19 + 150 * 5) * 40 + 80 * 5 * 100), "bench: the day without a battery costs $185,200 by hand");
+    ok(near(x.benchHand, 200 * (100 - 40 / 0.85), 0.005) && near(x.benchOk, x.benchHand, 0.006), `bench: hand ${v.benchHand} = model ${v.benchOk}`);
+    ok(!near(x.benchUnit, x.benchHand, 1) && !near(x.benchSign, x.benchHand, 1) && !near(x.benchLunch, x.benchHand, 1), "bench: versions 1, 2 and 3 miss the hand answer");
+    ok(near(x.benchMissing, x.benchHand, 0.006) && near(sol.benchMissingBase.cost, sol.benchBase.cost) && near(sol.benchMissing.cost, sol.benchOk.cost), "bench: version 4 passes, and its runs cost the same as the fixed ones (the ramp never binds)");
+    const R = sol.benchOk.rows;
+    ok(near(R[11].e, 200) && near(R[16].e, 0) && near(R.slice(12, 17).reduce((a, w) => a + w.dis, 0), 200) && R.slice(17).some(w => w.c > 0), "bench text: fills to 200 MWh by 12:00, empties in the five dear hours, refills afterwards");
+    ok(near(x.benchUnit, 250 * (100 - 40 / 0.85), 0.006) && near(x.benchLunch, 200 * 100 - 100 / 0.85 * 40, 0.006), "bench: version 1 discharges 250 MWh, version 3 refills nothing (both by hand)");
+  }
+
+  // ---------------- validation run
+  ok(near(x.eta82, 7939.02, 0.006) && x.eta82Change === 3, `validation: 82% gives ${v.eta82} (${x.eta82Change}% less)`);
+
+  // ---------------- texts: every placeholder filled, every number the page states from the model
+  {
+    const texts = [];
+    J.bugs.forEach(b => { b.symptoms.forEach(s => texts.push(s[0], s[1])); texts.push(b.right, b.wrong, b.fixed); });
+    texts.push(J.benchSaw, J.validationSaw, J.reproSaw);
+    texts.forEach(t => ok(!/\{\w+\}/.test(M.fill(t, v)), "filled: " + t.slice(0, 50)));
+    const E = M.exemplars(J, v);
+    ok(EX.validate(E).length === 0, "exemplars: valid pair");
+    ok(!/\{\w+\}/.test(JSON.stringify(E)), "exemplars: every placeholder filled");
+    ok(v.okYear === "$3.0 million" && near(x.ok * 365, 2995146.2, 0.5), "weak exemplar: 365 × the day's saving ≈ $3.0 million");
+    ok(v.ok === "$8,205.88" && v.unit === "$12,150" && M.money(-5.5) === "−$5.50", "money format");
+    // the page's blocks are the ones the model writes
+    const BL = blocks(v);
+    Object.keys(BL).forEach(k => ok(between(QMD, k) === BL[k], `page block ${k} is up to date (run --write)`));
+    ok(QMD.indexOf("About 35 minutes guided here, then about 2 hours on your own") > 0 && J.taskTime === "About 35 minutes guided here, then about 2 hours on your own: the notebook, Git and your log.", "task time on the page and in the data agree");
+    ok(QMD.indexOf("19 and 20 August and 3 September 2025") > 0, "data note names the three real days");
+    ok(/data-id="rerun" data-answer="fact"/.test(QMD) && /data-id="bench" data-answer="myth"/.test(QMD), "myth answers");
+    ok(!/\b(always|never)\b/i.test(J.benchSaw.replace("never binds", "")), "no overclaim in the benchmark text");
+    ok(JS.indexOf("Fix it and run again") > 0, "fix button");
+  }
+
+  // ---------------- the notebook: same data, same asserted numbers
+  if (fs.existsSync(NB)) {
+    const nb = JSON.parse(fs.readFileSync(NB, "utf8")), src = nb.cells.map(c => (Array.isArray(c.source) ? c.source.join("") : c.source)).join("\n");
+    const arr = name => { const m = new RegExp("^" + name + "\\s*=\\s*\\[([^\\]]*)\\]", "m").exec(src); return m ? m[1].split(",").map(Number) : null; };
+    [["study", D.study], ["before", D.forecast], ["lesson0", D.lesson0]].forEach(([k, d]) => {
+      ["demand", "wind", "solar"].forEach(s => ok(JSON.stringify(arr(s + "_" + k)) === JSON.stringify(d[s]), `notebook: ${s}_${k} equals the page's data`));
+    });
+    [x.base, x.ok, x.unit, x.lunch, x.honest, x.benchHand, x.eta82, x.l0base, x.l0missingBase].forEach(n => ok(src.indexOf(String(n)) >= 0, `notebook asserts ${n}`));
+    ok(nb.cells.every(c => c.cell_type !== "code" || !c.outputs || c.outputs.every(o => o.output_type !== "error")), "notebook: no error outputs saved");
+  } else ok(false, "notebook exists");
+
+  console.log(`${checks - fails}/${checks} checks passed`);
+  process.exit(fails ? 1 : 0);
+})();

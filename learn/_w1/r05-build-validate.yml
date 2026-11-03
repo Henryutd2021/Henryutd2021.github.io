@@ -1,0 +1,27 @@
+# Sidecar for R5 (r05-build-validate), builder learn-w2-h, 2026-11-03. Read by scripts/build_learn.py (which reads
+# learn/_w1/ only, so the W2 sidecar lives here too). clone, repository, version-control and checksum repeat the
+# definitions of the K8 builder (learn-w2-e) word for word, so the merge keeps one definition without a conflict.
+id: r05-build-validate
+lesson: R5
+glossary:
+  - id: benchmark
+    term: Benchmark
+    def: "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model."
+  - id: perfect-foresight
+    term: Perfect foresight
+    def: "A model assumption that every future value in the horizon, such as tomorrow's demand and weather, is known when decisions are made; it gives an upper bound on what flexibility can earn."
+  - id: clone
+    term: Clone
+    def: "A complete new copy of a repository, with its files and its whole history."
+  - id: repository
+    term: Repository
+    def: "A project folder together with its full history of commits, as kept by a version-control tool such as Git."
+  - id: version-control
+    term: Version control
+    def: "Keeping every saved state of a project's files, with who changed what and why, so any earlier state can be compared or brought back."
+  - id: checksum
+    term: Checksum
+    def: "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes."
+requests:
+  - "R5 is live: link it from B3 (learn/b03-read-check-formulation.qmd, its verification-versus-validation card and Go deeper) and from M1's 'What this model leaves out', where they point to verification in the Researcher tier. In R5's text, K8 (Git and reproducible notebooks) and M5 are named in plain text; link them once they are live."
+  - "Promote, if wanted: none needed. R5 uses StepCards, PlotCard, SolverStatus, Flowchart, Exemplars, Checklist, Rubric and copyText; its bug card (run, symptom chips, check picker, code diff, fix and rerun) is lesson-local in assets/learn/r05-build-validate.js and could become a shared i-bughunt if another studio needs it."
