@@ -107,21 +107,21 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <p>Turn “Is community solar good for low-income families?” into a question card.</p>
 <!-- r01-exemplars:start (written from the data file by LX.Exemplars' staticHTML in the test's --write mode; do not edit) -->
 <div class="lx-ex-cols">
-<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Question: Is community solar good for low-income families [1]?
-Type: not named [2]
-Audience: low-income families [3]
-Metric: savings [4]
-Compared with: (blank) [5]
-Scale and boundary: rural areas [6]
-I would be wrong if: (left blank) [7]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> “Good” is not a metric: any result could be read as success.</li><li value="2"><b>Falls short:</b> Without a type, a survey, a model and a regression could all claim to answer it.</li><li value="3"><b>Falls short:</b> A broad group, with no use for the answer stated: who would do what with it?</li><li value="4"><b>Falls short:</b> No units and no period: dollars a month, or a share of income, over which years?</li><li value="5"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: savings compared with what?</li><li value="6"><b>Falls short:</b> A place, not a <span class="lx-term" data-term="system-boundary">boundary</span>: which programme, which members, which years, and what is left out?</li><li value="7"><b>Falls short:</b> No falsification statement: no result could show the expectation wrong.</li></ol></div>
-<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines">Question: Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?
-Type: evaluative [1]
-Audience: the co-op's board, deciding whether to keep the programme [2]
-Metric: energy burden, yearly energy bills as % of household income [3]
-Compared with: bill credits of the same total cost, paid by the co-op over the same years [4]
-Scale and boundary: S1 community; the co-op's renter members, 2022–2025; landlords' costs left out [5]
-I would be wrong if: participants' burden fell no more than that of renters given credits, matched on income and housing type [6]
-Main uncertainty: renters who moved away during the four years</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> Names the type: a past programme judged against a comparison.</li><li value="2"><b>Works:</b> A specific audience and its use. Renters could be the audience of a question that serves their own choices.</li><li value="3"><b>Works:</b> A metric with units that bills and income data can compute.</li><li value="4"><b>Works:</b> Same budget, same payer, same years. Other differences between the groups that affect bills or income still need checking.</li><li value="5"><b>Works:</b> Says who and which years are counted, and what is left out.</li><li value="6"><b>Works:</b> Names the result that would show the expectation false, and how the two groups are made comparable.</li></ol></div>
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines"><b>Question:</b> Is community solar good for low-income families [1]?
+<b>Type:</b> not named [2]
+<b>Audience:</b> low-income families [3]
+<b>Metric:</b> savings [4]
+<b>Compared with:</b> (blank) [5]
+<b>Scale and boundary:</b> rural areas [6]
+<b>I would be wrong if:</b> (left blank) [7]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> “Good” is not a metric: any result could be read as success.</li><li value="2"><b>Falls short:</b> Without a type, a survey, a model and a regression could all claim to answer it.</li><li value="3"><b>Falls short:</b> A broad group, with no use for the answer stated: who would do what with it?</li><li value="4"><b>Falls short:</b> No units and no period: dollars a month, or a share of income, over which years?</li><li value="5"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: savings compared with what?</li><li value="6"><b>Falls short:</b> A place, not a <span class="lx-term" data-term="system-boundary">boundary</span>: which programme, which members, which years, and what is left out?</li><li value="7"><b>Falls short:</b> No falsification statement: no result could show the expectation wrong.</li></ol></div>
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient</p><p class="lx-ex-lines"><b>Question:</b> Did a rural co-op's community-solar programme lower renters' energy burden more than bill credits of the same cost would have?
+<b>Type:</b> evaluative [1]
+<b>Audience:</b> the co-op's board, deciding whether to keep the programme [2]
+<b>Metric:</b> energy burden, yearly energy bills as % of household income [3]
+<b>Compared with:</b> bill credits of the same total cost, paid by the co-op over the same years [4]
+<b>Scale and boundary:</b> S1 community; the co-op's renter members, 2022–2025; landlords' costs left out [5]
+<b>I would be wrong if:</b> participants' burden fell no more than that of renters given credits, matched on income and housing type [6]
+<b>Main uncertainty:</b> renters who moved away during the four years</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> Names the type: a past programme judged against a comparison.</li><li value="2"><b>Works:</b> A specific audience and its use. Renters could be the audience of a question that serves their own choices.</li><li value="3"><b>Works:</b> A metric with units that bills and income data can compute.</li><li value="4"><b>Works:</b> Same budget, same payer, same years. Other differences between the groups that affect bills or income still need checking.</li><li value="5"><b>Works:</b> Says who and which years are counted, and what is left out.</li><li value="6"><b>Works:</b> Names the result that would show the expectation false, and how the two groups are made comparable.</li></ol></div>
 </div>
 <table class="lx-facts lx-ex-diff"><thead><tr><th scope="col"></th><th scope="col">Weak answer</th><th scope="col">Strong answer</th></tr></thead><tbody><tr><th scope="row">Type</th><td>Not named</td><td>Evaluative</td></tr><tr><th scope="row">Audience</th><td>A broad group, no use stated</td><td>A specific audience and its use</td></tr><tr><th scope="row">Metric and units</th><td>“Savings”, no units</td><td>Bills as % of income</td></tr><tr><th scope="row">Counterfactual</th><td>None</td><td>Credits: same cost, payer and years</td></tr><tr><th scope="row">Boundary</th><td>“Rural areas”</td><td>Members, years, what is left out</td></tr><tr><th scope="row">Falsification</th><td>None</td><td>A result that would show it wrong</td></tr></tbody></table>
 <!-- r01-exemplars:end -->

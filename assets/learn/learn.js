@@ -5729,8 +5729,9 @@
                      (default "Falls short" for weak, "Works" for good)
      diff: [{ label: "Framing", weak: "No audience", good: "A co-op board" }],   optional table "What made the difference"
      diffTitle: "What made the difference",
-     lines: true,                keep the answers' line breaks (an answer written as a card, one field per line); the
-                                 no-JS version from staticHTML keeps them too
+     lines: true,                keep the answers' line breaks (an answer written as a card, one field per line), with
+                                 each line's leading field label ("Funding:") in bold; the no-JS version from staticHTML
+                                 does the same
      id: "r1-ex",                which notes the reader opened, kept in this browser (optional)
      onOpen: function (key, n) {},   a note opened by the reader
      note: "Both answers are illustrative." });   a hint under the card
@@ -5742,7 +5743,8 @@
    Node: module.exports = { marks, plain, validate, staticHTML } (pure): marks(answer) the numbered marks [{n, text, note}];
    plain(answer) the text with [n] after each marked phrase; validate(o) a list of problems (empty when fine);
    staticHTML(o) the no-JS version for the page's fallback (each answer, its level, its text with [n], its notes; with
-   o.lines the text's <p> has class lx-ex-lines, which keeps line breaks). */
+   o.lines the text's <p> has class lx-ex-lines, which keeps line breaks, and each line's leading "Label:" is bold, as in
+   the live card); linesHTML(answer) that text alone. */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
@@ -5766,6 +5768,21 @@
       if (!p || typeof p !== "object") return words(p == null ? "" : p);
       k = p.n != null ? p.n : k + 1;
       return words(p.text) + " [" + k + "]";
+    }).join("");
+  }
+  // lines mode (an answer written as a card, one field per line): a line's leading "Label:" in bold. t is escaped text;
+  // atStart says whether t begins a line (the answer's start, or after a line break)
+  var LABEL = /^([A-Z][^:\n<]{0,40}):(?=\s|$)/;
+  function boldLabels(t, atStart) {
+    return t.split("\n").map(function (line, i) { return i > 0 || atStart ? line.replace(LABEL, "<b>$1:</b>") : line; }).join("\n");
+  }
+  // an answer's text in lines mode, as HTML: the plain text with [n] after each marked phrase, field labels in bold
+  function linesHTML(a) {
+    var k = 0, at = true;
+    return (a.parts || []).map(function (p) {
+      if (!p || typeof p !== "object") { var t = words(p == null ? "" : p), h = boldLabels(esc(t), at); if (t) at = /\n$/.test(t); return h; }
+      k = p.n != null ? p.n : k + 1; at = false;
+      return esc(words(p.text) + " [" + k + "]");
     }).join("");
   }
   function validate(o) {
@@ -5793,7 +5810,7 @@
     var h = ['<div class="lx-ex-cols">'];
     o.answers.forEach(function (a) {
       h.push('<div class="lx-ex-ans ' + esc(a.key || "") + '"><p class="lx-eyebrow">' + esc(a.label) + (a.level ? " · " + esc(a.level) : "") + "</p>"
-        + (o.lines ? '<p class="lx-ex-lines">' : "<p>") + esc(plain(a)) + "</p>"
+        + (o.lines ? '<p class="lx-ex-lines">' + linesHTML(a) : "<p>" + esc(plain(a))) + "</p>"
         + '<ol class="lx-ex-static">' + marks(a).map(function (x) {
           return '<li value="' + x.n + '">' + (lead(a) ? "<b>" + esc(lead(a)) + ":</b> " : "") + rich(x.note) + "</li>";
         }).join("") + "</ol></div>");
@@ -5808,7 +5825,7 @@
     }
     return h.join("\n");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { marks: marks, plain: plain, validate: validate, staticHTML: staticHTML };
+  if (typeof module !== "undefined" && module.exports) module.exports = { marks: marks, plain: plain, linesHTML: linesHTML, validate: validate, staticHTML: staticHTML };
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view
@@ -5828,10 +5845,15 @@
       var head = H("div", { class: "lx-ex-head" }, col);
       H("h4", { text: a.label }, head);
       if (a.level) H("span", { class: "lx-ex-level", text: a.level }, head);
-      var text = H("p", { class: "lx-ex-text" + (o.lines ? " lx-ex-lines" : "") }, col), list = H("ol", { class: "lx-ex-notes" }, col), k = 0;
+      var text = H("p", { class: "lx-ex-text" + (o.lines ? " lx-ex-lines" : "") }, col), list = H("ol", { class: "lx-ex-notes" }, col), k = 0, at = true;
       (a.parts || []).forEach(function (p) {
-        if (!p || typeof p !== "object") { text.appendChild(document.createTextNode(words(p == null ? "" : p))); return; }
-        k = p.n != null ? p.n : k + 1;
+        if (!p || typeof p !== "object") {
+          var t = words(p == null ? "" : p);
+          if (o.lines && t) { H("span", { html: boldLabels(esc(t), at) }, text); at = /\n$/.test(t); }   // field labels in bold
+          else text.appendChild(document.createTextNode(t));
+          return;
+        }
+        k = p.n != null ? p.n : k + 1; at = false;
         var n = k, id = LX.uid("exn");
         var m = H("span", { class: "lx-ex-mark", role: "button", tabindex: "0", "aria-expanded": "false", "aria-controls": id,
           "aria-label": words(p.text) + ", note " + n }, text);

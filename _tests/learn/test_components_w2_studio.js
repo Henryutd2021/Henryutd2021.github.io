@@ -127,11 +127,15 @@ const F1 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")), R3 = JSON.p
 {
   const EX = require(L("components/exemplars.js"));
   const ex = { answers: [{ key: "weak", label: "Weak", parts: ["Question: x?\nType: ", { text: "none", note: "No type." }] }, { key: "good", label: "Strong", parts: ["Question: y?\nType: ", { text: "evaluative", note: "Typed." }] }] };
-  ok(EX.staticHTML(Object.assign({ lines: true }, ex)).indexOf('<p class="lx-ex-lines">Question: x?\nType: none [1]</p>') > 0 && EX.staticHTML(ex).indexOf("<p>Question: x?\nType: none [1]</p>") > 0, "exemplars: staticHTML keeps line breaks with lines: true, plain <p> without");
+  ok(EX.staticHTML(Object.assign({ lines: true }, ex)).indexOf('<p class="lx-ex-lines"><b>Question:</b> x?\n<b>Type:</b> none [1]</p>') > 0 && EX.staticHTML(ex).indexOf("<p>Question: x?\nType: none [1]</p>") > 0, "exemplars: staticHTML keeps line breaks with lines: true, with each field label in bold (shared fix 24); plain <p> without");
+  // a label only at a line's start, and only in plain text (not inside a marked phrase); a long lead-in is not a label
+  const ex2 = { answers: [{ key: "weak", label: "W", parts: ["Note: a, b: c\n", { text: "Marked: phrase", note: "n." }, " then\nA sentence that runs for well over forty letters before it: no label"] }, ex.answers[1]] };
+  ok(EX.linesHTML(ex2.answers[0]) === "<b>Note:</b> a, b: c\nMarked: phrase [1] then\nA sentence that runs for well over forty letters before it: no label", "exemplars: linesHTML bolds a short label at a line's start only");
   const E = env(); load("exemplars", E);
   const h = E.LX.H("div", null, E.body); E.LX.Exemplars(h, Object.assign({ lines: true }, ex));
   const h2 = E.LX.H("div", null, E.body); E.LX.Exemplars(h2, ex);
   ok(h.querySelectorAll("p.lx-ex-text").every(p => p.classList.contains("lx-ex-lines")) && h2.querySelectorAll("p.lx-ex-text").every(p => !p.classList.contains("lx-ex-lines")), "exemplars view: the answer's text keeps line breaks only with lines: true");
+  ok(h.querySelectorAll("p.lx-ex-text span").map(x => x.innerHTML).join("|").indexOf("<b>Question:</b> x?\n<b>Type:</b> ") === 0 && !h2.querySelector("p.lx-ex-text b"), "exemplars view: with lines: true each field label is bold (shared fix 24); without, plain text");
   ok(/\.lx-ex-lines \{ white-space: pre-line; \}/.test(rd("assets/learn/components/exemplars.css")) && bundleCSS.indexOf(".lx-ex-lines { white-space: pre-line; }") >= 0, "exemplars.css: .lx-ex-lines keeps line breaks (bundled)");
   [["r01-framing", "r01-exemplars"], ["r10-question-studio", "r10-exemplars"]].forEach(([f, id]) => {
     const D = JSON.parse(rd("assets/learn/data/" + f + ".json")), js = rd("assets/learn/" + f + ".js"), q = rd("learn/" + f + ".qmd");

@@ -95,23 +95,23 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <p>Spin: S3 city and region · society and livelihoods · heat pumps · low-income renters · a heat wave. Write a question card.</p>
 <!-- r10-exemplars:start (written from the data file by LX.Exemplars' staticHTML, and the example cards from the data file, in the test's --write mode; do not edit) -->
 <div class="lx-ex-cols">
-<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines">Question: How will heat pumps help [1] low-income renters in heat waves?
-Type: predictive
-Audience: low-income renters [2]
-Metric: comfort [3]
-Compared with: (blank) [4]
-I would be wrong if: (left blank) [5]
-Realism and papers: (not done) [6]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> Help with what? The word hides the metric.</li><li value="2"><b>Falls short:</b> A group, but no use for the answer is stated. Renters could use it; say for what, or name who controls the change.</li><li value="3"><b>Falls short:</b> No units: hours above a safe indoor temperature could be counted.</li><li value="4"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: help compared with what?</li><li value="5"><b>Falls short:</b> No falsification statement, so no result could count against it.</li><li value="6"><b>Falls short:</b> No realism review and no closest papers: nobody yet knows whether data exist or what is already known.</li></ol></div>
-<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient on framing and realism</p><p class="lx-ex-lines">Question: During a week-long heat wave, how many hours above the city's indoor-heat safety threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?
-Type: predictive
-Audience: the city's housing office, which sets rental standards [1]
-Metric: hours above the indoor-heat threshold, per household per heat wave [2]
-Compared with: window air conditioners in the same homes [3]
-Scale and boundary: S3; renter households in Prairie City; landlords' installation costs left out, and said so [4]
-I would be wrong if: heat-pump homes saw no fewer hot hours than homes with window units [5]
-Main uncertainty: whether renters can afford to run the cooling during the heat wave [6]
-Realism: data warn (few homes have indoor sensors); physics pass; rules pass (the city's 2026 rental code); time pass; people warn (consent for sensors in homes) [7]
-Closest papers: three found, each differing (owner-occupied homes; a cooler city; cooling bills, not hot hours) [8]</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> A user and the use: the office sets the standards the answer informs. Landlords control the installation; that is a separate line.</li><li value="2"><b>Works:</b> A metric with units, from indoor sensors or a building model.</li><li value="3"><b>Works:</b> A realistic alternative, not “no cooling at all”.</li><li value="4"><b>Works:</b> The boundary names what it leaves out.</li><li value="5"><b>Works:</b> A result that would show the expectation false.</li><li value="6"><b>Works:</b> The uncertainty that could change the answer most, and it comes from the spin's society dimension.</li><li value="7"><b>Works:</b> The five realism checks answered, with the evidence or the reason for each warning.</li><li value="8"><b>Works:</b> How the card differs from each closest paper. The line shows the form of the notes; the papers come from your own searches.</li></ol></div>
+<div class="lx-ex-ans weak"><p class="lx-eyebrow">Weak answer · Developing</p><p class="lx-ex-lines"><b>Question:</b> How will heat pumps help [1] low-income renters in heat waves?
+<b>Type:</b> predictive
+<b>Audience:</b> low-income renters [2]
+<b>Metric:</b> comfort [3]
+<b>Compared with:</b> (blank) [4]
+<b>I would be wrong if:</b> (left blank) [5]
+<b>Realism and papers:</b> (not done) [6]</p><ol class="lx-ex-static"><li value="1"><b>Falls short:</b> Help with what? The word hides the metric.</li><li value="2"><b>Falls short:</b> A group, but no use for the answer is stated. Renters could use it; say for what, or name who controls the change.</li><li value="3"><b>Falls short:</b> No units: hours above a safe indoor temperature could be counted.</li><li value="4"><b>Falls short:</b> No <span class="lx-term" data-term="counterfactual">counterfactual</span>: help compared with what?</li><li value="5"><b>Falls short:</b> No falsification statement, so no result could count against it.</li><li value="6"><b>Falls short:</b> No realism review and no closest papers: nobody yet knows whether data exist or what is already known.</li></ol></div>
+<div class="lx-ex-ans good"><p class="lx-eyebrow">Strong answer · Proficient on framing and realism</p><p class="lx-ex-lines"><b>Question:</b> During a week-long heat wave, how many hours above the city's indoor-heat safety threshold would Prairie City's low-income renters avoid if landlords installed heat pumps instead of window air conditioners?
+<b>Type:</b> predictive
+<b>Audience:</b> the city's housing office, which sets rental standards [1]
+<b>Metric:</b> hours above the indoor-heat threshold, per household per heat wave [2]
+<b>Compared with:</b> window air conditioners in the same homes [3]
+<b>Scale and boundary:</b> S3; renter households in Prairie City; landlords' installation costs left out, and said so [4]
+<b>I would be wrong if:</b> heat-pump homes saw no fewer hot hours than homes with window units [5]
+<b>Main uncertainty:</b> whether renters can afford to run the cooling during the heat wave [6]
+<b>Realism:</b> data warn (few homes have indoor sensors); physics pass; rules pass (the city's 2026 rental code); time pass; people warn (consent for sensors in homes) [7]
+<b>Closest papers:</b> three found, each differing (owner-occupied homes; a cooler city; cooling bills, not hot hours) [8]</p><ol class="lx-ex-static"><li value="1"><b>Works:</b> A user and the use: the office sets the standards the answer informs. Landlords control the installation; that is a separate line.</li><li value="2"><b>Works:</b> A metric with units, from indoor sensors or a building model.</li><li value="3"><b>Works:</b> A realistic alternative, not “no cooling at all”.</li><li value="4"><b>Works:</b> The boundary names what it leaves out.</li><li value="5"><b>Works:</b> A result that would show the expectation false.</li><li value="6"><b>Works:</b> The uncertainty that could change the answer most, and it comes from the spin's society dimension.</li><li value="7"><b>Works:</b> The five realism checks answered, with the evidence or the reason for each warning.</li><li value="8"><b>Works:</b> How the card differs from each closest paper. The line shows the form of the notes; the papers come from your own searches.</li></ol></div>
 </div>
 <table class="lx-facts lx-ex-diff"><thead><tr><th scope="col"></th><th scope="col">Weak answer</th><th scope="col">Strong answer</th></tr></thead><tbody><tr><th scope="row">Metric and units</th><td>“Comfort”</td><td>Hours above a threshold</td></tr><tr><th scope="row">Audience</th><td>A group, no use stated</td><td>A user, and what they decide</td></tr><tr><th scope="row">Counterfactual</th><td>None</td><td>Window units in the same homes</td></tr><tr><th scope="row">Boundary</th><td>Not stated</td><td>Who is counted, what is left out</td></tr><tr><th scope="row">Falsification</th><td>None</td><td>A result that would show it wrong</td></tr><tr><th scope="row">Realism and papers</th><td>Not done</td><td>Five checks; how it differs from three papers</td></tr></tbody></table>
 <p class="lx-eyebrow">Seven example cards</p>

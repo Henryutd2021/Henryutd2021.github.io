@@ -706,7 +706,7 @@ LX.Exemplars(H("div", { class: "lx-xcard" }, x), { title: "Two answers to the sa
 - Each marked phrase is a button (`role="button"`, Tab, Enter, Space) with a number badge. It opens or shuts its note under the answer (`aria-expanded`, `aria-controls`), and the note is read out.
 - "Show all notes" opens every note. Notes start with "Falls short:" (weak) or "Works:" (good); `lead` changes the word.
 - With `id`, the open notes are remembered in this browser.
-- `lines: true` keeps an answer's line breaks (an answer written as a card, one field per line: R1, R10), in the view and in `staticHTML`'s `<p class="lx-ex-lines">`. No page style is needed.
+- `lines: true` keeps an answer's line breaks (an answer written as a card, one field per line: R1, R3, R4, R5, R9, R10), in the view and in `staticHTML`'s `<p class="lx-ex-lines">`, and sets each line's leading field label ("Funding:", up to 40 characters, in plain text) in bold (`linesHTML`). No page style is needed.
 - Two columns from 700 px. The "What made the difference" table becomes labelled lines on phones.
 - Pure (Node: `require("components/exemplars.js")`): `marks`, `plain` (text with `[n]`), `validate` (the view throws on a malformed pair), `staticHTML`.
 
