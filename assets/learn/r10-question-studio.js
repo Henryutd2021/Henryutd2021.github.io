@@ -80,6 +80,9 @@
     return { card: out, put: now };
   }
   function example(D, id) { return D.examples.filter(function (e) { return e.id === id; })[0] || null; }
+  // an example's type as the tables show it: typeLabel when the question has a second part of another type (example 5,
+  // "predictive, with a prescriptive follow-up"); the card itself takes the main type, e.type
+  function typeLabel(e) { return e.typeLabel || e.type; }
   // an example's picks (with its extras) and its own card: the question, type and scale, and the audience, metric and
   // units written for that question; every other part starts empty
   function examplePicks(D, e) { var p = {}; Object.keys(e.picks).forEach(function (k) { p[k] = e.picks[k]; }); p.extra = e.extra; return clean(D, p); }
@@ -199,7 +202,7 @@
   }
   function staticExamples(D) {
     var h = ['<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Combination</th><th scope="col">Type</th><th scope="col">Question</th></tr></thead><tbody>'];
-    D.examples.forEach(function (e) { h.push("<tr><td>" + esc(e.combo) + "</td><td>" + esc(e.type) + "</td><td>" + esc(e.question) + "</td></tr>"); });
+    D.examples.forEach(function (e) { h.push("<tr><td>" + esc(e.combo) + "</td><td>" + esc(typeLabel(e)) + "</td><td>" + esc(e.question) + "</td></tr>"); });
     h.push("</tbody></table></div>");
     return h.join("\n");
   }
@@ -228,7 +231,7 @@
     };
   }
   var model = { KEYS: KEYS, REQUIRED: REQUIRED, item: item, slot: slot, clean: clean, complete: complete, combo: combo, draft: draft, autoCard: autoCard, sync: sync,
-                example: example, examplePicks: examplePicks, exampleCard: exampleCard, methodsMarked: methodsMarked,
+                example: example, typeLabel: typeLabel, examplePicks: examplePicks, exampleCard: exampleCard, methodsMarked: methodsMarked,
                 searchStrings: searchStrings, searchURL: searchURL, operators: operators, crowd: crowd, crowdText: crowdText, cluster: cluster,
                 weights: weights, spin: spin, realism: realism, realismCount: realismCount, summary: summary,
                 check: check, staticTask: staticTask, staticExamples: staticExamples, staticCrowding: staticCrowding, staticBlocks: staticBlocks, rich: rich, fmtInt: fmtInt };
@@ -485,12 +488,12 @@
       var c2 = H("div", { class: "lx-xcard" }, ex);
       LX.CompareTable(c2, { title: "Seven example cards", text: true,
         columns: [{ key: "name", label: "Combination", main: true }, { key: "type", label: "Type" }, { key: "question", label: "Question" }],
-        rows: D.examples.map(function (e, i) { return { key: e.id, name: (i + 1) + ". " + e.combo, type: e.type, question: e.question }; }),
+        rows: D.examples.map(function (e, i) { return { key: e.id, name: (i + 1) + ". " + e.combo, type: typeLabel(e), question: e.question }; }),
         caption: "Illustrative cards, one per row. Load one to see how the studio fills a card, then make it your own." });
       var load = H("div", { class: "r10-load" }, c2), lid = LX.uid("r10l");
       H("label", { for: lid, text: "Example" }, load);
       var sel = H("select", { id: lid }, load);
-      D.examples.forEach(function (e, i) { H("option", { value: e.id, text: "Example " + (i + 1) + " (" + e.type + ")" }, sel); });
+      D.examples.forEach(function (e, i) { H("option", { value: e.id, text: "Example " + (i + 1) + " (" + typeLabel(e) + ")" }, sel); });
       var lb = H("button", { class: "lx-btn ghost small", type: "button", text: "Load into the studio" }, load);
       var rb = H("button", { class: "lx-btn ghost small", type: "button", text: "Restore my previous card", hidden: true }, load);
       var lm = H("span", { class: "lx-hint", "aria-live": "polite" }, load);

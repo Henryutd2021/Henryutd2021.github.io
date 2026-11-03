@@ -79,14 +79,16 @@ if (fs.existsSync(CUR)) {
   const rows = [...tab.matchAll(/^\| ([a-zA-Z][^|]+?) \| (C\d\d) \| ([\d,]+) \| ([\d.]+|–) \|$/gm)];
   ok(rows.length === 29 && rows.every((m, i) => D.clusters[i] && D.clusters[i].name === m[1].trim() && D.clusters[i].id === m[2] && D.clusters[i].papers === +m[3].replace(/,/g, "") && (m[4] === "–" ? D.clusters[i].rgi === null : D.clusters[i].rgi === +m[4])),
     "curriculum: the 29 crowding counts, names and RGIs, in order");
-  [...sec.matchAll(/^\| (\d) \| (.+?) \| (\w+) \| (.+) \|$/gm)].forEach(m => { EXAMPLES_REF[m[1]] = { combo: m[2], type: m[3], question: m[4] }; });
+  [...sec.matchAll(/^\| (\d) \| (.+?) \| (\w+(?:, [^|]+?)?) \| (.+) \|$/gm)].forEach(m => { EXAMPLES_REF[m[1]] = { combo: m[2], type: m[3], question: m[4] }; });
   ok(Object.keys(EXAMPLES_REF).length === 7, "curriculum: seven example cards found");
 } else console.log("note: curriculum_v2.md not found (set LEARN_CURRICULUM); the lists were checked against the copy in this test only");
 D.examples.forEach((e, i) => {
   const r = EXAMPLES_REF[String(i + 1)];
-  if (r) ok(r.combo === e.combo && r.type === e.type && r.question === e.question, "example " + (i + 1) + " is §11.3's card, word for word");
+  if (r) ok(r.combo === e.combo && r.type === M.typeLabel(e) && r.question === e.question, "example " + (i + 1) + " is §11.3's card, word for word");
+  ok(["descriptive", "explanatory", "predictive", "prescriptive", "evaluative"].indexOf(e.type) >= 0 && M.typeLabel(e).indexOf(e.type) === 0, "example " + (i + 1) + ": its card takes one of the five types (" + e.type + "), which its table label starts with");
   Object.keys(e.picks).forEach(k => ok(!!M.item(D, k, e.picks[k]), "example " + e.id + ": pick " + k + " exists"));
 });
+ok(M.typeLabel(M.example(D, "e5")) === "predictive, with a prescriptive follow-up" && M.example(D, "e5").type === "predictive", "example 5: predictive, with a prescriptive follow-up (R3 reads its second half as conditional planning); its card stays predictive");
 ok(M.check(D).length === 0, "data checks pass: " + M.check(D).join("; "));
 const dc = M.item(D, "element", "datacenters");
 ok(dc.note === "as a load" && /load/.test(dc.phrase), "data centers: labelled and phrased as a load (G-DC)");

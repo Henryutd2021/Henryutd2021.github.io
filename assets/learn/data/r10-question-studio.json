@@ -215,7 +215,7 @@
       "picks": { "scale": "S2", "element": "datacenters", "lever": "tech", "stakeholder": "communities", "twist": "drought" },
       "extra": { "dimension": { "label": "water use and summer peak", "metric": "cooling water use", "units": "million litres a year", "goal": "less cooling water use", "terms": ["\"water use\"", "\"peak demand\""] } },
       "card": { "audience": "the region's water utility and grid planner", "metric": "cooling water withdrawn, and the data-center load's summer peak", "units": "million litres a year; MW" } },
-    { "id": "e5", "combo": "S4 · security · batteries · regulators · mineral disruption", "type": "predictive",
+    { "id": "e5", "combo": "S4 · security · batteries · regulators · mineral disruption", "type": "predictive", "typeLabel": "predictive, with a prescriptive follow-up",
       "question": "How sensitive is a national storage build-out to a one-year disruption of one mineral, and which design choices reduce the risk?",
       "picks": { "scale": "S4", "dimension": "SEC", "element": "batteries", "lever": "tech", "stakeholder": "regulators", "twist": "mineral" },
       "card": { "audience": "national energy regulators, who set storage targets", "metric": "storage built by 2040, and total system cost, across disruption cases", "units": "GWh; $ billion" } },

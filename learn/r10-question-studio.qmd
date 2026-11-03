@@ -120,7 +120,7 @@ Closest papers: three found, each differing (owner-occupied homes; a cooler city
 <tr><td>S0 · operations · irrigation pumps · farmers</td><td>prescriptive</td><td>How much irrigation pumping on a Plains farm could move to windy night hours without lowering yield, and what is that worth under the co-op's tariff?</td></tr>
 <tr><td>S3 · security · heat pumps · elderly households · cold snap</td><td>predictive</td><td>During a week-long cold snap, how would all-electric heating change the risk of losing heat for elderly households, with and without backup?</td></tr>
 <tr><td>S2 · environment · data-center cooling · nearby communities · drought</td><td>descriptive</td><td>How do the cooling choices of large data centers shift water use and summer peak demand in a water-stressed region?</td></tr>
-<tr><td>S4 · security · batteries · regulators · mineral disruption</td><td>predictive</td><td>How sensitive is a national storage build-out to a one-year disruption of one mineral, and which design choices reduce the risk?</td></tr>
+<tr><td>S4 · security · batteries · regulators · mineral disruption</td><td>predictive, with a prescriptive follow-up</td><td>How sensitive is a national storage build-out to a one-year disruption of one mineral, and which design choices reduce the risk?</td></tr>
 <tr><td>S1 · TEA · mini-grids · farmers</td><td>prescriptive</td><td>Which productive uses make a solar mini-grid viable without lowering household access?</td></tr>
 <tr><td>S3 · sufficiency · building retrofits · city council</td><td>explanatory</td><td>Why did some neighbourhoods' heating demand fall more than others after a retrofit programme?</td></tr>
 </tbody></table></div>
