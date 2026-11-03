@@ -87,15 +87,50 @@ has(`$q_{0.1} = ${(100 * q["0.1"]).toFixed(1)}\\%$ and $q_{0.9} = +${(100 * q["0
 const W = fc.wind_persistence;
 has(`<td class="n">${Math.round(W.mae_pct_of_max[0])}% → ${Math.round(W.mae_pct_of_max[W.lead_hours.indexOf(24)])}%</td>`);
 has(`(${(W.max_wind_mw / 1000).toFixed(1)} GW)`);
-has(`\\frac{${C.under}}{${C.under} + ${C.over}} \\approx ${crit.toFixed(2)}`); has(`$r^* = ${sp(BEST.r).replace("%", "\\%")}$`);
-ok(sp(BEST.r) === "+6.0%", "the cheapest margin on the page is +6.0%");
+has(`\\frac{${C.under}}{${C.under} + ${C.over}} \\approx ${crit.toFixed(2)}`);
+ok(sp(BEST.r) === "+6.0%", "the cheapest slider setting on the page is +6.0%"); has("the cheapest available slider setting is " + sp(BEST.r));
+// review 2026-11-02 #10: the exact rule on the errors' own 0.1-point grid gives +5.9%; +6.0% is the slider's cheapest 0.5-point step
+const FINE = M.bestMargin(fc, errs, M.marginGrid(0, 0.10, 0.001));
+ok(sp(FINE.r) === "+5.9%", "exact cheapest cushion (0.1-point grid) is +5.9%: " + sp(FINE.r));
+ok(M.marginCost(fc, 0.059, errs).total < M.marginCost(fc, 0.058, errs).total && M.marginCost(fc, 0.059, errs).total < M.marginCost(fc, 0.060, errs).total, "+5.9% is cheaper than its neighbours +5.8% and +6.0%");
+ok(errs.filter(e => e <= FINE.r + 1e-12).length / n >= crit && errs.filter(e => e < FINE.r - 1e-12).length / n <= crit, "+5.9% is the empirical quantile at the critical ratio");
+has("the rule gives a cushion of " + sp(FINE.r));
 has(`on 4 February 2025, ${M.outside(X.A, M.band(fc, X.F, "80"))} of 24 hours fell outside the 80% band`);
-has("January " + r[0].toFixed(3) + ", February " + r[1].toFixed(3) + ", March " + r[2].toFixed(3) + ", April " + r[3].toFixed(3) + "; May to December " + Math.min(...r.slice(4)).toFixed(2) + " to " + Math.max(...r.slice(4)).toFixed(2));
-has(`in ${pct(fc.may_dec_share_of_hours_forecast_above_demand, 0)} of those hours`);
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+MONTHS.forEach((mo, i) => has(`<td>${mo}</td><td>${r[i].toFixed(3)}</td>`, "monthly ratio table: " + mo + " " + r[i].toFixed(3)));
+has(`ran above demand in ${pct(fc.may_dec_share_of_hours_forecast_above_demand, 0)} of hours`);
 has("runs 8–15% above"); ok(Math.round(100 * (Math.min(...r.slice(4)) - 1)) === 8 && Math.round(100 * (Math.max(...r.slice(4)) - 1)) === 15, "8-15% matches the monthly ratios");
 ok(((1 + 1 + 3) / 3).toFixed(2) === "1.67", "quiz: MAE of 1, 1, 3 = 1.67"); has("(1 + 1 + 3) ÷ 3 ≈ 1.67");
 ok(Math.round(100 * crit) === 97, "quiz: 300/(300+10) = 97%"); has("300 ÷ (300 + 10) ≈ 0.97");
 ok(T.label.long === "10 February 2025" && X.label.long === "4 February 2025", "page dates match the data");
+
+// ---------------- review fixes, 2026-11-02
+const code = JS.replace(/\/\/.*$/gm, "");
+ok(!/59\.3/.test(code) && !/59\.3/.test(QMD), "#1: no unsupported 59.3 Hz threshold on the page or in the script");
+ok(/cannot restore balance/.test(code), "#1: the last-resort link says customers are cut only if response cannot restore balance");
+ok(/used to build it; how well it covers future days is untested/.test(code), "#2: the in-sample note sits beside the band selector");
+has("not each day", "#2: the band myth says the 80% counts the construction hours, not each day");
+ok(/does not mean a blackout/.test(code) && /illustrative scheduling cushion/.test(code) && /under these assumed prices/.test(code), "#3: the cushion is illustrative, short is not a blackout, the optimum holds under assumed prices");
+ok(!/why reserves exist/i.test(code) && !/caught short/i.test(code), "#3: no reserve-requirement framing in the game");
+has("so its answer is not a reserve requirement", "#3: the limits list says the game is not a reserve requirement");
+const L0 = M.scoreLabels(false), L1 = M.scoreLabels(true);
+ok(!/MAE|MAPE/.test(L0.pct + L0.abs) && /MAPE/.test(L1.pct) && /MAE/.test(L1.abs), "#4: chips use plain words until MAE and MAPE are defined");
+const stepSrc = code.slice(code.indexOf("var steps = ["), code.indexOf("LX.StepCards(")).split(/\{ text: "/).slice(1);   // the seven step cards
+ok(stepSrc.length === 7, "seven step cards");
+const defIdx = stepSrc.findIndex(t => /\[\[mae\|/.test(t));
+ok(defIdx === 3 && /named: true/.test(stepSrc[defIdx]) && stepSrc.slice(0, defIdx).every(t => !/named: true/.test(t)) && /named: false/.test(stepSrc[1]), "#4: step 4 defines and names the scores; earlier steps do not");
+ok((code.match(/Signed error, % of forecast/g) || []).length === 2, "#5: the tooltip and the table label the signed error as % of forecast");
+ok(/percentage of the forecast/.test(stepSrc[4]) && /in percent of actual/.test(stepSrc[3]), "#5: the band step names its denominator (forecast), MAPE names its own (actual)");
+has("MAPE divides each miss by the actual value", "#5: the Analyst box contrasts the two denominators");
+ok(!/newsvendor|pinball|P\(e \\le/i.test(QMD), "#7: the Modeler box is a preview without the newsvendor formulation or pinball loss");
+has("Lesson M10 (upcoming)", "#7: forward pointer to M10 (upcoming, plain text)");
+ok(!/Wind is harder/.test(code) && /later lessons compare forecasting methods/.test(code), "#8: no unsupported 'wind is harder' claim");
+ok(/cause is unverified/.test(fc.meta.method) && !/rather than a measure of forecast skill/.test(fc.meta.method), "#9: the data file calls the May-December gap unverified");
+has("the cause is unverified", "#9: the data note calls the May-December gap unverified"); has("an editorial choice, pending validation");
+const rows = M.costRows(fc, errs, GRID, 0.055);
+ok(rows.length === GRID.length && GRID.length === 21, "#11: the cost table lists all 21 slider settings");
+ok(rows.filter(x => /\(yours\)/.test(x[0])).length === 1 && rows[GRID.indexOf(0.055)][0] === "+5.5% (yours)", "#11: the reader's half-step setting is marked in the table");
+ok(rows.every((x, i) => x[3] === "$" + Math.round(M.marginCost(fc, GRID[i], errs).total).toLocaleString("en-US")), "#11: table totals match the model");
 
 // ---------------- scope and wording
 const DENY = [/\bFOAK\b/, /\bNOAK\b/, /first[- ]of[- ]a[- ]kind/i, /learning[- ](curve|rate)/i, /order[- ]book/i, /anchor[- ](customer|buyer)/i, /subsidy[- ]free/i,

@@ -112,6 +112,21 @@
     return a.getUTCDate() + (a.getUTCMonth() === b.getUTCMonth() ? "" : " " + MONTH[a.getUTCMonth()]) + "–" + b.getUTCDate() + " " + MONTH[b.getUTCMonth()];
   }
   function weekStats(Wd, k) { var v = Wd.weeks[k].idx.map(function (i) { return Wd.dem[i]; }); return { min: Math.min.apply(null, v), max: Math.max.apply(null, v) }; }
+  // the week chart's day labels: one at each day's 12:00 (a daylight-saving day still has exactly one 12:00)
+  function weekTicks(Wd, k) {
+    var out = [];
+    Wd.weeks[k].idx.forEach(function (i, j) { if (Wd.C.hour[i] === 12) out.push({ i: j, label: DOW[Wd.C.dow[i]] }); });
+    return out;
+  }
+  // step 6's readout for a line at f x peak: hours above it, their share of the year, the extra energy above the line
+  // (the shaded sliver) and, kept apart, the energy used in those hours (not shown as "energy above the line")
+  function lineReadout(Wd, f) {
+    var thr = Wd.peak * f, hrs = hoursAbove(Wd, thr), during = 0;
+    for (var i = 0; i < Wd.n; i++) if (Wd.dem[i] > thr + 1e-9) during += Wd.dem[i];
+    return { thr: thr, hrs: hrs, yearShare: hrs / Wd.n, extraShare: energyAbove(Wd, thr), duringShare: during / Wd.totalMWh,
+             line1: num(hrs) + " hours above " + num(thr) + " MW: " + num(hrs / Wd.n * 100, 1) + "% of the year.",
+             line2: "Energy above the line (the shaded sliver): " + num(energyAbove(Wd, thr) * 100, 2) + "% of the year's energy." };
+  }
   // the static figure readers without JavaScript see (the .qmd holds exactly this string; the test regenerates it)
   function fallbackSVG(Wd) {
     var W = 720, Hh = 270, l = 46, r = 12, t = 14, b = 30, iw = W - l - r, ih = Hh - t - b, yMax = 500;
@@ -128,7 +143,8 @@
     return s + "</svg>";
   }
   var model = { MON: MON, MONTH: MONTH, num: num, hh: hh, clock: clock, prepare: prepare, hoursAbove: hoursAbove, energyAbove: energyAbove, duck: duck,
-                predictAnswer: predictAnswer, weekLabel: weekLabel, weekStats: weekStats, fallbackSVG: fallbackSVG, niceUp: niceUp, argmax: argmax, argmin: argmin };
+                predictAnswer: predictAnswer, weekLabel: weekLabel, weekStats: weekStats, weekTicks: weekTicks, lineReadout: lineReadout, fallbackSVG: fallbackSVG,
+                niceUp: niceUp, argmax: argmax, argmin: argmin };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -201,6 +217,14 @@
       for (var i = 0; i < n; i++) { if (Wd.C.month[i] === st.month || (st.thr != null && Wd.dem[i] > st.thr)) continue; g.fillRect(px(i) - r / 2, y(Wd.dem[i]) - r / 2, r, r); }
       if (st.thr != null) { g.fillStyle = col(T.pk, 0.95); for (i = 0; i < n; i++) if (Wd.dem[i] > st.thr && Wd.C.month[i] !== st.month) g.fillRect(px(i) - r, y(Wd.dem[i]) - r, 2 * r, 2 * r); }
       if (st.month >= 0) { g.fillStyle = col(T.cc, 0.95); for (i = 0; i < n; i++) if (Wd.C.month[i] === st.month) g.fillRect(px(i) - r, y(Wd.dem[i]) - r, 2 * r, 2 * r); }
+      if (st.thr != null && st.p >= 1) {   // sorted: shade the extra energy above the line (demand minus the line, in those hours)
+        var kAbove = hoursAbove(Wd, st.thr);
+        if (kAbove) {
+          g.fillStyle = col(T.pk, 0.3); g.beginPath(); g.moveTo(m.l, y(st.thr));
+          for (var q = 0; q < kAbove; q++) g.lineTo(m.l + (q + 0.5) / n * iw, y(Wd.sorted[q]));
+          g.lineTo(m.l + kAbove / n * iw, y(st.thr)); g.closePath(); g.fill();
+        }
+      }
       if (st.thr != null) {
         g.strokeStyle = col(T.ink, 1); g.setLineDash([5, 4]); g.lineWidth = 1.5; g.beginPath(); g.moveTo(m.l, y(st.thr)); g.lineTo(m.l + iw, y(st.thr)); g.stroke(); g.setLineDash([]);
         g.font = "600 12px " + font; g.textAlign = "right"; g.fillStyle = col(T.ink, 1); g.fillText(num(st.thr) + " MW", m.l + iw - 4, y(st.thr) - 6);
@@ -211,7 +235,7 @@
       var s = st.p >= 1 ? "Load-duration curve: the 8,760 hours of 2025 sorted from " + num(Wd.peak) + " MW down to " + num(Wd.sorted[Wd.n - 1]) + " MW." :
         "Prairie Town's demand in every hour of 2025, one dot per hour, by date: highest in July and August, a second winter season, lowest in spring and autumn.";
       if (st.month >= 0) s += " " + MONTH[st.month] + " highlighted.";
-      if (st.thr != null) s += " " + num(hoursAbove(Wd, st.thr)) + " hours above " + num(st.thr) + " MW.";
+      if (st.thr != null) s += " " + num(hoursAbove(Wd, st.thr)) + " hours above " + num(st.thr) + " MW" + (st.p >= 1 ? "; the energy above the line is shaded." : ".");
       return s;
     }
     function legendPaint() {
@@ -219,7 +243,7 @@
       var add = function (c, t) { var sp = H("span", null, legend); H("i", { style: "--c:" + c }, sp); H("span", { text: t }, sp); };
       add("var(--lx-ink-3)", "One hour of 2025");
       if (st.month >= 0) add("var(--lx-cc)", MONTH[st.month]);
-      if (st.thr != null) add("var(--lx-pk)", "Above the line");
+      if (st.thr != null) add("var(--lx-pk)", st.p >= 1 ? "Hours above the line; shaded: the energy above it" : "Above the line");
       cap.textContent = st.p >= 1 ? "The same 8,760 hours, sorted from highest to lowest demand" : "Every hour of 2025, in date order";
     }
     function paintAlt() {
@@ -279,11 +303,7 @@
       label: function () { var s = weekStats(Wd, wk); return "Prairie Town's demand, week of " + weekLabel(Wd, wk) + " 2025: from " + num(s.min) + " to " + num(s.max) + " MW; the weekend is shaded."; },
       series: function () { return [{ label: "Demand", color: "var(--lx-demand)", values: Wd.weeks[wk].idx.map(function (i) { return Wd.dem[i]; }), area: 0.1 }]; },
       shade: function () { var ix = Wd.weeks[wk].idx, a = ix.findIndex(function (i) { return Wd.C.dow[i] === 5; }); return [[a, ix.length, "Weekend"]]; },
-      xticks: function () {
-        var ix = Wd.weeks[wk].idx, out = [];
-        ix.forEach(function (i, k) { if (Wd.C.hour[i] === 12 && (k === 0 || Wd.C.date[i] !== Wd.C.date[ix[k - 1]])) out.push({ i: k, label: DOW[Wd.C.dow[i]] }); });
-        return out;
-      },
+      xticks: function () { return weekTicks(Wd, wk); },
       tipHead: function (k) { var i = Wd.weeks[wk].idx[k]; return DOW[Wd.C.dow[i]] + " " + +Wd.C.date[i].slice(8) + " " + MON[Wd.C.month[i]] + ", " + hh(Wd.C.hour[i]); },
       altHead: "Hour"
     });
@@ -319,15 +339,15 @@
           var rv = H("div", null, act);
           H("div", { class: "lx-saw" + (guess && +guess !== ans ? " no" : ""), html: LX.icon(guess && +guess === ans ? "check" : "question") + "<div><b>" +
             (guess ? (+guess === ans ? "You called it." : "You guessed " + (+guess === 12 ? "noon" : hh(+guess)) + ".") : "The answer.") + "</b> The peak, " + num(Wd.s.max) + " MW, came in the hour from " + hh(Wd.s.tmax) + " to " + hh(Wd.s.tmax + 1) +
-            ": buildings had soaked up heat all day.</div>" }, rv);
+            ". Hot-day peaks often come late in the afternoon, once buildings have stored the day's heat.</div>" }, rv);
           var b = H("button", { class: "lx-btn ghost small", type: "button", "aria-pressed": showWinter ? "true" : "false", html: LX.icon("cloud") + "Add " + Wd.winter.label }, act);
           attach(act, dayChart);
           function upd() {
             b.setAttribute("aria-pressed", showWinter ? "true" : "false"); b.innerHTML = LX.icon("cloud") + (showWinter ? "Hide " : "Add ") + Wd.winter.label; dayChart.render();
             if (showWinter) {
               api.done(); keep("winter", true);
-              api.saw("Summer: one hump, from " + num(Wd.s.min) + " MW at " + hh(Wd.s.tmin) + " to " + num(Wd.s.max) + " MW at " + hh(Wd.s.tmax) + " (cooling). Winter: two humps, " +
-                num(Wd.w.am) + " MW at " + hh(Wd.w.tam) + " and " + num(Wd.w.pm) + " MW at " + hh(Wd.w.tpm) + " (heating and lights when people are home).");
+              api.saw("Summer: one hump, from " + num(Wd.s.min) + " MW at " + hh(Wd.s.tmin) + " to " + num(Wd.s.max) + " MW at " + hh(Wd.s.tmax) + ", likely cooling. Winter: two humps, " +
+                num(Wd.w.am) + " MW at " + hh(Wd.w.tam) + " and " + num(Wd.w.pm) + " MW at " + hh(Wd.w.tpm) + ", likely heating and lights while people are home.");
             }
           }
           b.addEventListener("click", function () { showWinter = !showWinter; upd(); });
@@ -385,15 +405,16 @@
           var sl = LX.Slider(act, { label: "Line at", min: D.threshold.min, max: D.threshold.max, step: D.threshold.step, unit: "% of peak", color: "var(--lx-pk)",
             hint: function () { return "= " + num(Wd.peak * sl0() / 100) + " MW"; }, onChange: upd });
           function sl0() { return sl ? sl.val() : D.threshold.start; }
-          var out = H("p", { class: "t2-read", "aria-live": "polite" }, act);
+          var out = H("div", { class: "t2-read", "aria-live": "polite" }, act);
           attach(act, year);
           function upd() {
-            var f = sl.val() / 100, thr = Wd.peak * f, hrs = hoursAbove(Wd, thr), e = energyAbove(Wd, thr);
-            year.thr(thr); keep("thr", sl.val());
-            out.innerHTML = "<b>" + num(hrs) + " hours</b> above " + num(thr) + " MW: " + pct(hrs / Wd.n, 1) + " of the year, " + pct(e, 2) + " of its energy.";
+            var r = lineReadout(Wd, sl.val() / 100);
+            year.thr(r.thr); keep("thr", sl.val());
+            out.innerHTML = "";
+            H("p", { html: r.line1.replace(/^([\d,]+ hours)/, "<b>$1</b>") }, out); H("p", { text: r.line2 }, out);
             if (sl.val() <= D.threshold.target) {
               api.done();
-              api.saw("The top " + num(Wd.peak - thr) + " MW of capacity is needed in only " + num(hrs) + " hours. Plants built for those hours sit idle most of the year: the job of [[peaker|peakers]], as in lesson 0.");
+              api.saw("Demand exceeds " + num(r.thr) + " MW in only " + num(r.hrs) + " hours. That helps explain why some resources, such as lesson 0's [[peaker|peaker]], are needed only rarely; how often each runs depends on the rest of the system.");
             }
           }
           sl.set(P.thr || D.threshold.start); upd();
@@ -402,14 +423,15 @@
         build: function (act, api) {
           year.thr(null);
           var sl = LX.Slider(act, { label: "Solar farm", min: D.solar.min, max: D.solar.max, step: D.solar.step, unit: "MW", color: "var(--lx-solar)",
-            hint: function () { return "Lesson 0's farm: " + townSolar + " MW."; }, onChange: function (v) { solarMW = v; upd(); } });
+            hint: function () { return "Illustrative: the farm's output in SPP's top solar hour of 2025, not a nameplate rating. Lesson 0's farm: " + townSolar + " MW."; },
+            onChange: function (v) { solarMW = v; upd(); } });
           attach(act, duckChart);
           function upd() {
             duckChart.render(); keep("solar", solarMW);
             var k = duck(Wd, solarMW);
             if (solarMW >= D.solar.target) {
               api.done(); LX.progress.done(LESSON); toExplain(act);
-              api.saw("With " + solarMW + " MW of solar, net demand falls to " + num(k.min) + " MW at " + hh(k.tmin) + ", then climbs " + num(k.ramp) + " MW in three hours, " + hh(k.rampFrom) + " to " + hh(k.rampTo) +
+              api.saw("With " + solarMW + " MW of solar, net demand falls to " + num(k.min) + " MW at " + hh(k.tmin) + ". Its steepest three-hour climb after noon is " + num(k.ramp) + " MW, " + hh(k.rampFrom) + " to " + hh(k.rampTo) +
                 ": the [[duck-curve|duck curve]]'s belly and neck." + (k.neg ? " For " + k.neg + " hours solar alone exceeds demand: the surplus must be spilled, stored or exported." : ""));
             }
           }
@@ -440,7 +462,7 @@
     var s = Wd.s, thr90 = Wd.peak * 0.9, h90 = hoursAbove(Wd, thr90);
     // 1. annotated diagram: the summer peak day
     var c1 = H("div", { class: "lx-xcard" }, host);
-    var hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "Anatomy of a hot day" }, hd); H("span", { class: "lx-hint", text: Wd.summer.label + ", real SPP shape" }, hd);
+    var hd = H("header", { class: "lx-x-head" }, c1); H("h3", { text: "Anatomy of a hot day" }, hd); H("span", { class: "lx-hint", text: Wd.summer.label + ", real SPP shape; the numbers are measured, the causes typical" }, hd);
     var morn = 9, eve = 21;
     var an = hourly(c1, {
       n: function () { return 24; }, yMax: niceUp(Wd.PK),
@@ -452,20 +474,20 @@
     });
     an.render();
     var ol = H("ol", { class: "t2-anno" }, c1);
-    [["Night low: " + num(s.min) + " MW at " + hh(s.tmin), "Most people asleep, the air at its coolest; factories and data centers still run."],
-     ["Morning climb: " + num(Wd.summer.demand[morn]) + " MW at " + hh(morn), "Homes wake, shops and offices open, and the day heats up."],
-     ["Peak: " + num(s.max) + " MW at " + hh(s.tmax), "Buildings have soaked up heat all day, so air conditioning works hardest in the late afternoon."],
-     ["Evening fall: " + num(Wd.summer.demand[eve]) + " MW at " + hh(eve), "The sun sets and businesses close; homes stay busy, so demand eases slowly."]]
+    [["Night low: " + num(s.min) + " MW at " + hh(s.tmin), "Typically the coolest hours, with most people asleep; factories and data centers keep running."],
+     ["Morning climb: " + num(Wd.summer.demand[morn]) + " MW at " + hh(morn), "Typically homes wake, shops and offices open, and the day heats up."],
+     ["Peak: " + num(s.max) + " MW at " + hh(s.tmax), "Hot-day peaks often come late in the afternoon: buildings have stored heat, so cooling keeps working hard."],
+     ["Evening fall: " + num(Wd.summer.demand[eve]) + " MW at " + hh(eve), "Typically businesses close as the sun sets while homes stay busy, so demand eases slowly."]]
       .forEach(function (r) { var li = H("li", null, ol); H("b", { text: r[0] }, li); H("span", { text: r[1] }, li); });
     // 2. causal chain
     LX.CausalChain(H("div", { class: "lx-xcard" }, host), {
-      title: "Cause and effect: a heat wave",
+      title: "Cause and effect: how a heat wave typically raises demand",
       links: [{ title: "Hot weather", text: "EIA: hot weather raises demand for cooling.", value: Wd.summer.label },
-              { title: "Buildings soak up heat", text: "Walls and roofs warm all day, so cooling needs keep rising after noon." },
+              { title: "Buildings soak up heat", text: "Walls and roofs warm all day, so cooling needs often keep rising after noon." },
               { title: "Air conditioners work harder", text: "Millions of units run longer, at the same time." },
               { title: "Demand climbs", text: "Prairie Town, night low to peak.", value: num(s.min) + " → " + num(s.max) + " MW" },
-              { title: "The rarest plants run", text: "The top 10% of the peak is needed only in the hottest hours.", value: num(h90) + " h a year" }],
-      note: "Prices tend to jump in these hours; lesson 8 shows why."
+              { title: "Rarely needed resources are called on", text: "Demand above 90% of the peak comes only in the hottest hours.", value: num(h90) + " h a year" }],
+      note: "A typical chain: the data show the demand, not its causes. Prices tend to jump in these hours; lesson 8 shows why."
     });
     // 3. comparison table
     var c3 = H("div", { class: "lx-xcard" }, host);
@@ -476,7 +498,7 @@
         { key: "day", name: "Day", color: "var(--lx-cc)", drivers: "Routines (sleep, work, school), sunlight, outdoor temperature", data: num(s.min) + " → " + num(s.max) + " MW on " + Wd.summer.label, who: "Operators, hour by hour (lesson 0)" },
         { key: "week", name: "Week", color: "var(--lx-demand)", drivers: "Work and school calendars", data: "Weekends " + pct(Wd.week.gapMean) + " lower on average; up to " + pct(Wd.week.gapMax) + " at " + hh(Wd.week.gapH), who: "Operators and forecasters (lesson 4)" },
         { key: "season", name: "Season", color: "var(--lx-wind)", drivers: "Cooling in summer, heating in winter", data: "Monthly peaks from " + num(Wd.months.max[Wd.months.quiet]) + " MW (" + MONTH[Wd.months.quiet] + ") to " + num(Wd.months.max[Wd.months.peak]) + " MW (" + MONTH[Wd.months.peak] + ")", who: "Planners, months ahead (lesson 6)" },
-        { key: "years", name: "Years", color: "var(--lx-tier-3)", drivers: "Population, the economy, efficiency, electrification, new large loads such as data centers and factories", data: "U.S. use hit a record " + num(D.anchors.us_year.value / 1e12, 2) + " trillion kWh in 2025", who: "Planners, years ahead (lesson 13)" }
+        { key: "years", name: "Years", color: "var(--lx-tier-3)", drivers: "Population, the economy, efficiency, [[electrification|electrification]], new large loads such as data centers and factories", data: "U.S. use hit a record " + num(D.anchors.us_year.value / 1e12, 2) + " trillion kWh in 2025", who: "Planners, years ahead (lesson 13)" }
       ]
     });
     // 4. concept map
@@ -496,7 +518,7 @@
         { id: "weather", g: "drv", label: "Weather", at: [0, 0], atN: [0, 0], text: "Heat and cold drive cooling and heating; sunlight and clouds change lighting needs.", game: "Step 2: the hot July day and the cold January day." },
         { id: "routine", g: "drv", label: "Daily routines", lines: ["Daily", "routines"], at: [1, 0], atN: [1, 0], text: "Sleep, work, school and cooking set the daily rhythm.", game: "Step 2: the night low and the morning climb." },
         { id: "calendar", g: "drv", label: "Weeks and seasons", lines: ["Weeks and", "seasons"], at: [2, 0], atN: [2, 0], text: "Weekends run a little lower; summer and winter run higher than spring and autumn.", game: "Step 3: the week slider." },
-        { id: "growth", g: "drv", label: "Long-term growth", lines: ["Long-term", "growth"], at: [3, 0], atN: [1, 1], text: "Population, the economy, efficiency, electrification and new large loads move demand year by year.", game: "Not in this lesson's single year of data." },
+        { id: "growth", g: "drv", label: "Long-term growth", lines: ["Long-term", "growth"], at: [3, 0], atN: [1, 1], text: "Population, the economy, efficiency, [[electrification|electrification]] and new large loads move demand year by year.", game: "Not in this lesson's single year of data." },
         { id: "demand", g: "dem", label: "Demand (MW)", lines: ["Demand", "(MW)"], at: [1.5, 1], atN: [1, 2], text: "The total power all users draw at a moment. Prairie Town peaks at " + num(Wd.peak) + " MW and averages " + num(Wd.mean) + " MW.", game: "Every curve in the steps." },
         { id: "daily", g: "read", label: "Daily shape", lines: ["Daily", "shape"], at: [0, 2], atN: [0, 3], text: "Demand hour by hour through one day: one hump in summer, two in winter.", game: "Step 2." },
         { id: "ldc", g: "read", label: "Load-duration curve", lines: ["Load-duration", "curve"], at: [1.5, 2], atN: [1, 3], text: "The year's hours sorted from highest to lowest demand; it shows how many hours each level is needed.", game: "Steps 5 and 6." },
@@ -504,7 +526,7 @@
         { id: "solar", g: "drv", label: "Solar output", lines: ["Solar", "output"], at: [0, 3], atN: [0, 4], text: "Solar panels make power only in daylight, most at midday.", game: "Step 7, the slider." },
         { id: "net", g: "read", label: "Net demand", lines: ["Net", "demand"], at: [1, 3], atN: [1, 4], text: "Demand minus solar (and, in real grids, wind): what other plants must still supply.", game: "Step 7, the dark line." },
         { id: "duck", g: "read", label: "Duck curve", lines: ["Duck", "curve"], at: [2, 3], atN: [2, 4], text: "Net demand on a sunny day: a midday belly and a steep evening neck.", game: "Step 7." },
-        { id: "plants", g: "grid", label: "Plants and wires", lines: ["Plants and", "wires"], at: [3, 3], atN: [1, 5], text: "Built to cover the peak hour, and flexible enough to climb the evening ramp.", game: "Step 6: the top 10% of the peak is needed in only " + num(h90) + " hours.", later: "Later: lesson 6 sorts plants by job; lesson 9 shows storage filling the duck's belly." }
+        { id: "plants", g: "grid", label: "Plants and wires", lines: ["Plants and", "wires"], at: [3, 3], atN: [1, 5], text: "Together they must meet the peak hour, with a margin, and climb the evening ramp.", game: "Step 6: demand above 90% of the peak comes in only " + num(h90) + " hours.", later: "Later: lesson 6 sorts plants by job; lesson 9 shows storage filling the duck's belly." }
       ],
       edges: [["weather", "demand", "heats, cools"], ["routine", "demand", "sets rhythm"], ["calendar", "demand", "shifts level"], ["growth", "demand", "year by year"],
               ["demand", "daily", "hour by hour"], ["demand", "ldc", "sorted"], ["demand", "peak", "highest hour"], ["peak", "plants", "sizes"],

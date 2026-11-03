@@ -156,10 +156,10 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
   const prose = strip(QMD.split("<!-- learn:meta:start")[0] + QMD.split("<!-- learn:meta:end -->")[1]);
   const q = M.facts(W, 21), need21 = q.demand - q.nuclear - q.wind - q.solar;
   const allowed = {
-    MW: new Set([F.nuclear.mw, F.wind.mw, F.solar.mw, F.cc.mw, F.peaker.mw, F.cc.ramp, q.demand, q.nuclear, q.wind, need21,
+    MW: new Set([F.nuclear.mw, F.wind.mw, F.solar.mw, F.cc.mw, F.peaker.mw, F.cc.ramp, G.startCC /* Modeler preview */, q.demand, q.nuclear, q.wind, need21,
                  50, /* quiz 2 */ q.demand - q.nuclear, need21 + 100 /* quiz 1 distractors */]),
     MWh: new Set([T.nuclear, T.cc, T.pk, opt.totals.pk, 150, 50, 53 /* quiz 2 answer and distractors */]),
-    "$": new Set([T.cost, save]), t: new Set([+T.co2.toFixed(1)]), Hz: new Set([60, 0.01]), "%": new Set([+pct.toFixed(1)])
+    "$": new Set([T.cost, opt.totals.cost, save]), t: new Set([+T.co2.toFixed(1)]), Hz: new Set([60, G.hzPerMW, G.hzLimit]), "%": new Set([+pct.toFixed(1)])
   };
   const rx = /(\$?)(\d[\d,]*(?:\.\d+)?)(?:\\?\{,\}\d+)?\s*(MWh|MW|Hz|%|t\b)?/g;
   let m, seen = 0;
@@ -174,10 +174,14 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
   // the worked equations use the model's numbers
   ok(QMD.indexOf(`${T.nuclear} \\times ${F.nuclear.cost} + ${T.cc} \\times ${F.cc.cost} + ${T.pk} \\times ${F.peaker.cost} = \\$${fmtInt(T.cost).replace(",", "{,}")}`) >= 0, "page: cost sum written with the model's numbers");
   ok(QMD.indexOf(`${T.cc} \\times ${F.cc.co2} + ${T.pk} \\times ${F.peaker.co2} = ${T.co2.toFixed(1)}`) >= 0, "page: CO2 sum written with the model's numbers");
-  ok(QMD.indexOf(`\\$${fmtInt(save)}, about ${pct.toFixed(1)}% of the running cost, and cuts the peaker's energy from ${T.pk} to ${opt.totals.pk} MWh`) >= 0, "page: full-day planning saving stated from the model");
+  ok(QMD.indexOf(`| Running cost | \\$${fmtInt(T.cost)} | \\$${fmtInt(opt.totals.cost)} |`) >= 0 && QMD.indexOf(`| Peaker energy | ${T.pk} MWh | ${opt.totals.pk} MWh |`) >= 0 &&
+     QMD.indexOf(`Planning saves \\$${fmtInt(save)}, about ${pct.toFixed(1)}%`) >= 0, "page: Modeler preview's rule-versus-plan rows and saving stated from the model");
   ok(QMD.indexOf(`At 21:00 demand is ${q.demand} MW. Nuclear makes ${q.nuclear} MW, wind ${q.wind} MW, and the sun is down`) >= 0 && q.solar === 0, "page: quiz 1 states hour 21's numbers");
   ok(QMD.indexOf(`${q.demand} − ${q.nuclear} − ${q.wind} = ${need21}`) >= 0 && QMD.indexOf(`data-answer="c"`) >= 0 && QMD.indexOf(`<li data-value="c">${need21} MW</li>`) >= 0, `page: quiz 1 answer is ${need21} MW`);
-  ok(QMD.indexOf(`0 \\le p_\\mathrm{cc}(t) \\le ${F.cc.mw}`) >= 0 && QMD.indexOf(`-${F.cc.ramp} \\le p_\\mathrm{cc}(t)`) >= 0 && QMD.indexOf(`${F.cc.cost}\\,p_\\mathrm{cc}(t) + ${F.peaker.cost}\\,p_\\mathrm{pk}(t)`) >= 0, "page: the LP uses the fleet's sizes, ramp and costs");
+  // the Modeler box is a preview (curriculum §4.6): words for decisions, goal and rules, one symbolic line, links to lessons 10 and 11
+  ok(QMD.indexOf(`${F.cc.cost}\\,p_\\mathrm{cc}(t) + ${F.peaker.cost}\\,p_\\mathrm{pk}(t)`) >= 0, "page: the preview's goal line uses the gas running costs");
+  ok(QMD.indexOf(`at most ${F.cc.ramp} MW an hour, starting from ${G.startCC} MW at midnight`) >= 0, "page: the preview states the ramp limit and the start (initial condition)");
+  ok(QMD.indexOf("\\begin{aligned}") < 0 && QMD.indexOf("(10-write-it-down.qmd)") >= 0 && QMD.indexOf("(11-solver.qmd)") >= 0, "page: no full formulation in lesson 0; it links lessons 10 and 11");
   ok(QMD.indexOf(`change its output by only ${F.cc.ramp} MW`) >= 0, "page: no-JS explain list states the ramp limit");
   // sourced facts keep their source and date
   const facts = (QMD.match(/<table class="lx-facts">[\s\S]*?<\/table>/) || [""])[0];
@@ -186,6 +190,55 @@ const save = T.cost - opt.totals.cost, pct = 100 * save / T.cost;
   const r = require("child_process").spawnSync(process.execPath, [path.join(__dirname, "fallback_grid_operator.js"), "--check"], { encoding: "utf8" });
   ok(r.status === 0, "static fallback figure is up to date (" + (r.stdout || r.stderr).trim() + ")");
   void t1;
+}
+
+// ---------------- review fixes (W1 fix brief, 2026-11-02)
+{
+  const JS = fs.readFileSync(path.join(SITE, "assets/learn/grid-operator.js"), "utf8");
+  // auto-finish continues from the reader's own last hour (the review's reproduction: 75/45 MW at 00:00, 35/80 MW at 01:00)
+  const mine = [{ cc: 75, pk: 45 }, { cc: 35, pk: 80 }], done = M.simulate(W, M.finishPlan(W, mine));
+  ok(done.rampOK && done.totals.unserved === 0 && done.totals.hoursOff === 0, "auto-finish: from 75/45 and 35/80 MW every later hour is balanced and ramp-feasible");
+  // the old button: the precomputed schedule's set-points, the combined-cycle clamped to its reach (the slider's range)
+  let pv = mine[1].cc; const oldPlan = mine.slice();
+  for (let t = 2; t < H; t++) { const r = M.ccRange(W, pv), cc = Math.min(r.hi, Math.max(r.lo, plan[t].cc)); oldPlan.push({ cc: cc, pk: plan[t].pk }); pv = cc; }
+  const oldSim = M.simulate(W, oldPlan);
+  ok(oldSim.hours[2].unserved === 35, `auto-finish: the old precomputed schedule left ${oldSim.hours[2].unserved} MW unserved at 02:00 (the reported bug)`);
+  ok(M.finishPlan(W, []).every((p, t) => p.cc === plan[t].cc && p.pk === plan[t].pk), "auto-finish: from a fresh start it is the cheapest-first rule's own day");
+  for (let k = 0; k < 400; k++) {
+    const n = 1 + Math.floor(rnd() * 22), pre = []; let prev = G.startCC;
+    for (let t = 0; t < n; t++) { const r = M.ccRange(W, prev), cc = pickStep(r.lo, r.hi); pre.push({ cc: cc, pk: pickStep(0, F.peaker.mw) }); prev = cc; }
+    const fin = M.finishPlan(W, pre), sim = M.simulate(W, fin);
+    ok(fin.length === H && sim.rampOK, `auto-finish: after ${n} random hours the finished day keeps every ramp`);
+    pv = pre[n - 1].cc;
+    for (let t = n; t < H; t++) { const g = M.greedyStep(W, pv, t); ok(fin[t].cc === g.cc && fin[t].pk === g.pk, `auto-finish: hour ${t} is the rule's step from the hour before`); pv = fin[t].cc; }
+    // whenever the rule's range can cover the need, the hour is balanced
+    pv = pre[n - 1].cc;
+    for (let t = n; t < H; t++) { const r = M.ccRange(W, pv), need = W.need[t]; if (r.lo <= need && need <= r.hi + F.peaker.mw) ok(sim.hours[t].unserved === 0, `auto-finish: hour ${t} served when reachable`); pv = fin[t].cc; }
+  }
+  ok(/greedyStep\(W, S_\.prev, S_\.t\)/.test(JS) && JS.indexOf("cc.set(EXP[") < 0, "view: the finish button uses greedyStep from the reader's state, not the precomputed plan");
+  // 08:00: the spilled 15 MW is wind and solar, split in proportion
+  const h8 = ex.hours[8];
+  ok(h8.curtailed > 0 && h8.windAvail - h8.wind > 0 && h8.solarAvail - h8.solar > 0, `08:00: both wind (${(h8.windAvail - h8.wind).toFixed(2)}) and solar (${(h8.solarAvail - h8.solar).toFixed(2)}) are spilled`);
+  ok(JS.indexOf("MW of wind and solar spilled") >= 0 && JS.indexOf("of sun spilled") < 0, "view: the flowchart trace says wind and solar, not sun alone");
+  // the real-world card: gas output and CO2 per MWh peak at different hours
+  const gas = ex.hours.map(r => r.cc + r.pk), inten = ex.hours.map(r => r.co2 / r.demand);
+  const gMax = gas.indexOf(Math.max(...gas)), iMax = inten.indexOf(Math.max(...inten));
+  ok(gMax === 19 && iMax === 0, `real-world card: gas output peaks at ${gMax}:00 and CO2 per MWh at ${iMax}:00`);
+  ok(QMD.indexOf("gas output peaks at 19:00, but CO₂ per MWh peaks at 00:00") >= 0 && QMD.indexOf("were the dirtiest") < 0, "page: the real-world card separates emissions from emissions per MWh");
+  // 06:00: the demand-change prediction (HOOK = 6 in the view); its answer comes from the data
+  ok(W.demand[6] > W.demand[5] && /HOOK = 6/.test(JS) && JS.indexOf('"g0-morning"') >= 0 && JS.indexOf('q: "Demand climbs from "') >= 0,
+     `06:00: the question says demand climbs, and it does (${W.demand[5]} -> ${W.demand[6]} MW)`);
+  ok(JS.indexOf("Under a second") < 0 && JS.indexOf("under a second") < 0 && QMD.indexOf("stores almost nothing") < 0, "no 'under a second old' or 'stores almost nothing' claims");
+  // wording: frequency, weather causes, the dial, the emissions boundary, units
+  ok(QMD.indexOf("cycles per second") < 0 && /60 cycles each second/.test(QMD) && /60 cycles each second/.test(JS), "frequency: 60 electrical cycles each second, generators turn in step");
+  ok(JS.indexOf("Clouds drift") < 0 && JS.indexOf("air conditioning") < 0 && JS.indexOf("one possible cause") >= 0, "solar dip: observed in the data; clouds are one possible cause; no unverified demand cause");
+  ok(JS.indexOf("Illustrative indicator of imbalance") >= 0 && QMD.indexOf(`capped at ${G.hzLimit} Hz`) >= 0, "dial: labelled illustrative; the clip is disclosed");
+  ok(JS.indexOf("Operating CO₂") >= 0 && /fuel burned at the plants only/.test(QMD) && /methane leaks/.test(QMD), "emissions boundary: operating CO2 only, stated on the page and in the table");
+  ok(/metric tonnes/.test(JS) && /\[\[megawatt\|MW\]\]/.test(JS) && /\[\[frequency\|Hz\]\]/.test(JS), "unit key at first use: MW, MWh, Hz, t");
+  ok(JS.indexOf('class: "lx-sr" }, left)') >= 0, "accessibility: a current-hour table for screen readers");
+  const fb = (QMD.match(/<!-- fallback-svg:start -->[\s\S]*?<!-- fallback-svg:end -->/) || [""])[0];
+  ok((fb.match(/<tr><td>/g) || []).length === H && fb.indexOf("lx-textalt") >= 0, "accessibility: the static fallback carries a 24-hour text table");
+  ok(QMD.indexOf("ANSI") < 0 && QMD.indexOf("p. A-6") >= 0 && JS.indexOf("DOE, July 2015, p. 12") >= 0, "voltages: DOE sources with date and page; no undated ANSI reference");
 }
 
 // ---------------- stars and share links

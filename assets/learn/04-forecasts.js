@@ -9,15 +9,19 @@
 //                                      January-April error statistics, the monthly forecast/demand ratio, and the wind
 //                                      persistence error by lead time
 // Only January-April forecasts are used: from May 2025 the forecast SPP reports to EIA averages 8-15% above its reported
-// demand every month (04-forecasts.json monthly_forecast_ratio), a gap between two reported series, not forecast skill.
+// demand every month (04-forecasts.json monthly_forecast_ratio). The cause is unverified (possibly a reporting or definition
+// mismatch between the two series); leaving those months out is an editorial choice pending validation.
 //
 // Model (statistical, no solver). Hours are labelled by their start (index t covers t:00 to t+1:00), as in lesson 0.
 //   MAE  = mean |A - P| (MW);  MAPE = mean |A - P| / A over hours with A > 0 (night hours of solar are skipped)
 //   bias = mean (A - P);  skill against a baseline B = 1 - MAE(P) / MAE(B)
 //   band = forecast x (1 + q_lo) to forecast x (1 + q_hi), with q the January-April quantiles of e = (A - F) / F
-//   margin game: schedule F x (1 + r); per hour, unused capacity F(r - e)+ costs cOver $/MWh and missing energy F(e - r)+
-//   costs cUnder $/MWh (both illustrative), with F the January-April mean forecast; the cheapest r is where
-//   P(e <= r) reaches cUnder / (cUnder + cOver).
+//   cushion game (an illustrative scheduling cushion, not a reserve requirement): schedule F x (1 + r); per hour, unused
+//   capacity F(r - e)+ costs cOver $/MWh and missing energy F(e - r)+ costs cUnder $/MWh (both illustrative), with F the
+//   January-April mean forecast; the cheapest r is where P(e <= r) reaches cUnder / (cUnder + cOver): +5.9% on the
+//   errors' 0.1-point grid, +6.0% on the slider's 0.5-point grid.
+//   Two percentages: MAPE divides by the actual value; the signed error in the tooltip, table and band divides by the
+//   forecast (the page labels both).
 // Every number the page states comes from these functions or the data files and is checked in
 // _tests/learn/test_04_forecasts.js. The pure model is exported for Node; the view uses the component library.
 // The chart card is the shared LX.PlotCard and its chart LX.Plot (components/plot.js, W1 integration).
@@ -70,9 +74,22 @@
   function bestMargin(fc, errs, grid, costs) {
     var best = null; grid.forEach(function (r) { var m = marginCost(fc, r, errs, costs); if (!best || m.total < best.total - 1e-9) best = m; }); return best;
   }
+  // chip labels for the two scores: plain words until step 4 names them (MAE and MAPE appear only after their definition)
+  function scoreLabels(named) {
+    return named ? { pct: "MAPE, % of actual", abs: "MAE, GW" } : { pct: "Average miss, % of actual", abs: "Average miss, GW" };
+  }
+  // the cost chart's text version: every slider setting (0.5-point steps), the reader's own marked
+  function costRows(fc, errs, grid, cur, costs) {
+    return grid.map(function (r) {
+      var m = marginCost(fc, r, errs, costs), s = (r >= 0 ? "+" : "−") + Math.abs(100 * r).toFixed(1) + "%";
+      return [s + (Math.abs(r - cur) < 1e-9 ? " (yours)" : ""), "$" + Math.round(m.overCost).toLocaleString("en-US"), "$" + Math.round(m.underCost).toLocaleString("en-US"),
+              "$" + Math.round(m.total).toLocaleString("en-US"), (100 * m.shortShare).toFixed(0) + "%"];
+    });
+  }
   function marginGrid(lo, hi, step) { var g = []; for (var k = Math.round(lo / step); k <= Math.round(hi / step); k++) g.push(Math.round(k * step * 1e6) / 1e6); return g; }
   var model = { COSTS: COSTS, BANDS: BANDS, prepare: prepare, mae: mae, mape: mape, bias: bias, worst: worst, band: band, outside: outside,
-                errors: errors, marginCost: marginCost, bestMargin: bestMargin, marginGrid: marginGrid, shift: shift, label: label };
+                errors: errors, marginCost: marginCost, bestMargin: bestMargin, marginGrid: marginGrid, shift: shift, label: label,
+                scoreLabels: scoreLabels, costRows: costRows };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -83,6 +100,8 @@
   var mwf = function (v) { return Math.round(v).toLocaleString("en-US") + " MW"; }, money = function (v) { return "$" + Math.round(v).toLocaleString("en-US"); };
 
   // ---------------------------------------------------------------- the lesson
+  var SHORT_NOTE = "“Short” means demand came in above this first schedule and costlier power filled the gap; it does not mean a blackout.";
+  function inSample(level) { return "This band holds about " + level + "% of the January–April hours used to build it; how well it covers future days is untested."; }
   var COL = { actual: "var(--lx-ink)", spp: "var(--lx-accent)", base: "var(--lx-tier-4)", under: "var(--lx-warn)", over: "var(--lx-tier-3)", band: "var(--lx-accent)", solar: "var(--lx-solar)", wind: "var(--lx-wind)" };
   var PRED = {
     q: "On an ordinary winter day, how far off is that forecast, on average, hour by hour?",
@@ -92,7 +111,7 @@
   function view(live, data, root) {
     var fc = data["04_forecasts"], DAYS = { typical: prepare(data.town_days, data.town_year, fc, "typical_forecast"), miss: prepare(data.town_days, data.town_year, fc, "big_forecast_miss") };
     var ERR = errors(fc), GRID = marginGrid(0, 0.10, 0.005), BEST = bestMargin(fc, ERR, GRID), NEAR = 1.05;
-    var S_ = { day: "typical", show: "actual", base: "yesterday", series: "demand", level: "80", margin: 0, lead: 24, pick: null, chart: "day" };
+    var S_ = { day: "typical", show: "actual", base: "yesterday", series: "demand", level: "80", margin: 0, lead: 24, pick: null, chart: "day", named: false };
     // the chart card (plot.js): title, value chips, the chart and its text version
     var card = LX.PlotCard(live, { text: "Text version of the chart" }), ttl = card.title, chips = card.chips, P = card.plot, altBody = card.text;
     function chip(l, v, tone) { card.chip(l, v, tone); }
@@ -123,7 +142,7 @@
         var ymax = Math.ceil(Math.max(Math.max.apply(null, d.S), Math.max.apply(null, d.Sy)) / 100) * 100 + 100;
         P.render({ x: { min: 0, max: 24, ticks: hourTicks(), ticksN: hourTicksN() }, y: { min: 0, max: ymax, unit: "MW", ticks: [0, ymax / 4, ymax / 2, 3 * ymax / 4, ymax].map(function (v) { return [v, Math.round(v) + ""]; }) },
           lines: lines, bars: bars, legend: legend, ml: 44, aria: "Hourly solar output in MW for the day and the day before. The text version below gives the numbers.",
-          tip: function (x) { var t = Math.min(23, Math.floor(x)), e = d.S[t] > 0 ? " (" + pct(Math.abs(d.S[t] - d.Sy[t]) / d.S[t], 0) + ")" : " (no sun: MAPE skips it)"; return "<div><b>" + LX.fmt.hh(t) + "</b></div><div><span>Actual</span><b>" + Math.round(d.S[t]) + " MW</b></div><div><span>Day before</span><b>" + Math.round(d.Sy[t]) + " MW</b></div><div><span>Miss</span><b>" + Math.round(Math.abs(d.S[t] - d.Sy[t])) + " MW" + e + "</b></div>"; } }, animate);
+          tip: function (x) { var t = Math.min(23, Math.floor(x)), e = d.S[t] > 0 ? " (" + pct(Math.abs(d.S[t] - d.Sy[t]) / d.S[t], 0) + ")" : " (no sun: MAPE skips it)"; return "<div><b>" + LX.fmt.hh(t) + "</b></div><div><span>Actual</span><b>" + Math.round(d.S[t]) + " MW</b></div><div><span>Day before</span><b>" + Math.round(d.Sy[t]) + " MW</b></div><div><span>Miss (% of actual)</span><b>" + Math.round(Math.abs(d.S[t] - d.Sy[t])) + " MW" + e + "</b></div>"; } }, animate);
         table(["Hour", "Actual MW", "Day before MW", "Miss as % of actual"], d.S.map(function (v, t) { return [LX.fmt.hh(t), Math.round(v), Math.round(d.Sy[t]), v > 0 ? pct(Math.abs(v - d.Sy[t]) / v, 0) : "no sun"]; }));
         return;
       }
@@ -145,18 +164,18 @@
       var w = worst(A, d.F), ma = mae(A, d.F), mp = mape(A, d.F);
       if (!showF) { chip("Lowest hour", gw(Math.min.apply(null, A))); chip("Highest hour", gw(Math.max.apply(null, A))); }
       else if (bd) { var out = outside(A, bd); chip("Band", spct(bd.qlo) + " to " + spct(bd.qhi)); chip("Hours outside the band", out + " of 24", out > 24 * (1 - bd.level / 100) * 2 ? "bad" : out ? "warn" : "good"); }
-      else if (showB) { var mb = mae(A, B); chip("SPP forecast MAE", gw2(ma), ma < mb ? "good" : "warn"); chip("Baseline MAE", gw2(mb), mb < ma ? "good" : "warn"); }
-      else { chip("Average miss (MAPE)", pct(mp.value)); chip("Average miss (MAE)", gw2(ma)); chip("Worst hour", LX.fmt.hh(w.t) + ", " + (w.mw > 0 ? "+" : "−") + gw(Math.abs(w.mw)), Math.abs(w.pct) > 0.05 ? "bad" : ""); }
+      else if (showB) { var mb = mae(A, B); chip("SPP forecast, average miss", gw2(ma), ma < mb ? "good" : "warn"); chip("Baseline, average miss", gw2(mb), mb < ma ? "good" : "warn"); }
+      else { var SL = scoreLabels(S_.named); chip(SL.pct, pct(mp.value)); chip(SL.abs, gw2(ma)); chip("Worst hour", LX.fmt.hh(w.t) + ", " + (w.mw > 0 ? "+" : "−") + gw(Math.abs(w.mw)), Math.abs(w.pct) > 0.05 ? "bad" : ""); }
       P.render({ x: { min: 0, max: 24, ticks: hourTicks(), ticksN: hourTicksN() }, y: { min: lo * 1000, max: hi * 1000, ticks: gwTicks(lo, hi), unit: "GW" }, lines: lines, bars: bars, legend: legend, ml: 40,
         aria: "Hourly SPP demand in GW for " + name + (showF ? ", with the day-ahead forecast" : "") + ". The text version below gives the numbers.",
         tip: function (x) {
           var t = Math.min(23, Math.floor(x)), h = "<div><b>" + LX.fmt.hh(t) + "</b></div><div><span>Actual</span><b>" + gw(A[t]) + "</b></div>";
-          if (showF) h += "<div><span>Forecast</span><b>" + gw(d.F[t]) + "</b></div><div><span>Miss</span><b>" + spct((A[t] - d.F[t]) / d.F[t]) + "</b></div>";
+          if (showF) h += "<div><span>Forecast</span><b>" + gw(d.F[t]) + "</b></div><div><span>Signed error, % of forecast</span><b>" + spct((A[t] - d.F[t]) / d.F[t]) + "</b></div>";
           if (showB) h += "<div><span>Baseline</span><b>" + gw(B[t]) + "</b></div>";
           if (bd) h += "<div><span>Band</span><b>" + (bd.lo[t] / 1000).toFixed(1) + "–" + gw(bd.hi[t]) + "</b></div>";
           return h;
         } }, animate);
-      var head = ["Hour", "Actual GW"].concat(showF ? ["Forecast GW", "Miss"] : []).concat(showB ? ["Baseline GW"] : []).concat(bd ? ["Band GW"] : []);
+      var head = ["Hour", "Actual GW"].concat(showF ? ["Forecast GW", "Signed error, % of forecast"] : []).concat(showB ? ["Baseline GW"] : []).concat(bd ? ["Band GW"] : []);
       table(head, A.map(function (v, t) {
         var r = [LX.fmt.hh(t), (v / 1000).toFixed(1)];
         if (showF) r.push((d.F[t] / 1000).toFixed(1), spct((v - d.F[t]) / d.F[t]));
@@ -170,7 +189,7 @@
       var pts = function (k) { return all.map(function (m) { return [100 * m.r, m[k]]; }); };
       var ymax = Math.ceil(all[0].total / 20000) * 20000;
       ttl.textContent = "Extra cost of forecast misses, average per hour, January–April 2025 (costs illustrative)";
-      chip("Margin above forecast", spct(S_.margin) + " ≈ " + gw(cur.marginMW)); chip("Hours caught short", pct(cur.shortShare, 0), cur.shortShare > 0.2 ? "bad" : cur.shortShare > 0.06 ? "warn" : "good");
+      chip("Cushion above forecast", spct(S_.margin) + " ≈ " + gw(cur.marginMW)); chip("Hours short of the schedule", pct(cur.shortShare, 0), cur.shortShare > 0.2 ? "bad" : cur.shortShare > 0.06 ? "warn" : "good");
       chip("Cost per hour", money(cur.total), cur.total <= NEAR * BEST.total ? "good" : "");
       P.render({ x: { min: 0, max: 10, ticks: [[0, "0"], [2, "+2%"], [4, "+4%"], [6, "+6%"], [8, "+8%"], [10, "+10%"]] },
         y: { min: 0, max: ymax, unit: "$ per hour", ticks: [0, ymax / 4, ymax / 2, 3 * ymax / 4, ymax].map(function (v) { return [v, "$" + Math.round(v / 1000) + "k"]; }) },
@@ -178,9 +197,9 @@
         bars: [{ x0: 100 * S_.margin - 0.06, x1: 100 * S_.margin + 0.06, y0: 0, y1: cur.total, color: "var(--lx-ink-3)", op: 0.5 }],
         marks: (Math.abs(S_.margin - BEST.r) < 1e-9 ? [] : [{ x: 100 * S_.margin, y: cur.total, label: "You: " + money(cur.total) + "/h", color: COL.actual, above: true }]).concat([{ x: 100 * BEST.r, y: BEST.total, label: "Cheapest " + spct(BEST.r), color: "var(--lx-good)", above: true }]),
         legend: [{ label: "Total", color: COL.spp }, { label: "Emergency power", color: COL.under, dash: true }, { label: "Unused capacity", color: COL.over, dash: true }],
-        aria: "Average hourly cost of forecast misses against the margin scheduled above the forecast. The text version below gives the numbers.",
-        tip: function (x) { var r = Math.round(x * 2) / 200, m = marginCost(fc, r, ERR); return "<div><b>Margin " + spct(r) + "</b></div><div><span>Unused capacity</span><b>" + money(m.overCost) + "</b></div><div><span>Emergency power</span><b>" + money(m.underCost) + "</b></div><div><span>Short</span><b>" + pct(m.shortShare, 0) + " of hours</b></div>"; } });
-      table(["Margin", "Unused capacity $/h", "Emergency power $/h", "Total $/h", "Hours short"], GRID.filter(function (r, i) { return i % 2 === 0; }).map(function (r) { var m = marginCost(fc, r, ERR); return [spct(r), money(m.overCost), money(m.underCost), money(m.total), pct(m.shortShare, 0)]; }));
+        aria: "Average hourly cost of forecast misses against the cushion scheduled above the forecast. The text version below gives the numbers.",
+        tip: function (x) { var r = Math.round(x * 2) / 200, m = marginCost(fc, r, ERR); return "<div><b>Cushion " + spct(r) + "</b></div><div><span>Unused capacity</span><b>" + money(m.overCost) + "</b></div><div><span>Emergency power</span><b>" + money(m.underCost) + "</b></div><div><span>Short of the schedule</span><b>" + pct(m.shortShare, 0) + " of hours</b></div>"; } });
+      table(["Cushion", "Unused capacity $/h", "Emergency power $/h", "Total $/h", "Hours short"], costRows(fc, ERR, GRID, S_.margin));
     }
     function drawWind() {
       var W = fc.wind_persistence, k = W.lead_hours.indexOf(S_.lead);
@@ -211,7 +230,7 @@
         } },
       { text: "Here is SPP's [[day-ahead-forecast|day-ahead forecast]]. Each shaded bar is one hour's [[forecast-error|forecast error]]. Now switch to the worst day of January to April 2025.",
         build: function (act, api) {
-          enter({ chart: "day", show: "forecast", series: "demand" }); draw(true);
+          enter({ chart: "day", show: "forecast", series: "demand", named: false }); draw(true);
           var mpT = mape(typ.A, typ.F).value, ok = S_.pick === "2";
           var said = function () {
             var d = DAYS[S_.day], w = worst(d.A, d.F);
@@ -227,56 +246,62 @@
           enter({ chart: "day", show: "base", series: "demand" });
           var said = function () {
             var d = DAYS[S_.day], B = S_.base === "week" ? d.Wk : d.Y, ms = mae(d.A, d.F), mb = mae(d.A, B), J = S_.base === "week" ? [PM.spp_same_hours_last_week, PM.last_week] : [PM.spp_same_hours_yesterday, PM.yesterday];
-            api.saw("On " + d.label.short + ": SPP " + gw2(ms) + " against " + gw2(mb) + " for the baseline. Over January–April SPP's average miss was " + pct(1 - J[0] / J[1], 0) + " smaller than this baseline's: real skill.");
+            api.saw("On " + d.label.short + ", SPP's average miss was " + gw2(ms) + " against " + gw2(mb) + " for the baseline. Over January–April it was " + pct(1 - J[0] / J[1], 0) + " smaller than this baseline's: real skill.");
           };
           seg(act, "Baseline", [["yesterday", "Yesterday"], ["week", "Last week"]], S_.base, function (v) { S_.base = v; draw(false); said(); remember(); api.done(); });
           seg(act, "Day", [["typical", dayName("typical")], ["miss", dayName("miss")]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
           said();
         } },
-      { text: "Two common scores: [[mae|mean absolute error (MAE)]], in MW, and [[mape|mean absolute percentage error (MAPE)]], in percent. Switch from demand to solar and watch what MAPE does.",
+      { text: "The two average misses have names: [[mae|mean absolute error (MAE)]], in MW, and [[mape|mean absolute percentage error (MAPE)]], in percent of actual. Switch from demand to solar and watch what MAPE does.",
         build: function (act, api) {
-          enter({ chart: "day", show: "forecast", series: "demand" });
+          enter({ chart: "day", show: "forecast", series: "demand", named: true });
+          var take;
           var said = function () {
-            var d = DAYS[S_.day];
+            var d = DAYS[S_.day]; take.hidden = S_.series !== "solar";
             if (S_.series === "demand") { api.saw("Demand never gets near zero, so MAPE (" + pct(mape(d.A, d.F).value) + ") and MAE (" + gw2(mae(d.A, d.F)) + ") tell the same story."); return; }
-            var m = mape(d.S, d.Sy), t0 = d.S.findIndex(function (v) { return v > 0; });
-            api.saw("Solar against the day before: MAPE " + pct(m.value, 0) + ". At " + LX.fmt.hh(t0) + " a miss of " + Math.round(Math.abs(d.S[t0] - d.Sy[t0])) + " MW counts as " + pct(Math.abs(d.S[t0] - d.Sy[t0]) / d.S[t0], 0) + "; night hours cannot be scored at all. Use MAE when output can be near zero.", true);
+            var t0 = d.S.findIndex(function (v) { return v > 0; });
+            api.saw("Solar at " + LX.fmt.hh(t0) + ": a miss of only " + Math.round(Math.abs(d.S[t0] - d.Sy[t0])) + " MW counts as " + pct(Math.abs(d.S[t0] - d.Sy[t0]) / d.S[t0], 0) + " of actual output.", true);
             api.done();
           };
           seg(act, "Series", [["demand", "Demand"], ["solar", "Solar"]], S_.series, function (v) { S_.series = v; draw(false); said(); });
+          take = H("p", { class: "lx-hint", text: "Takeaway: when output can be near zero, score with MAE or a skill score, not MAPE." }, act);
           said(); if (S_.series === "solar") api.done();
         } },
-      { text: "One line hides how unsure a forecast is. Draw a [[prediction-interval|band]] from four months of SPP's past misses instead. Choose how often actual demand should land inside it.",
+      { text: "One line hides how unsure a forecast is. Draw a [[prediction-interval|band]] from four months of SPP's past misses, each as a percentage of the forecast. Choose how often actual demand should land inside it.",
         build: function (act, api) {
           enter({ chart: "day", show: "band", series: "demand" });
+          var note;
           var said = function () {
             var d = DAYS[S_.day], b = band(fc, d.F, S_.level), o = outside(d.A, b);
+            note.textContent = inSample(S_.level);
             api.saw(S_.level + "% band: " + spct(b.qlo) + " to " + spct(b.qhi) + " around the forecast. On " + d.label.short + ", " + o + " of 24 hours fell outside" + (o > 24 * (1 - b.level / 100) * 2 ? ": misses come in runs, and when a day goes wrong most of its hours do." : "."), o > 24 * (1 - b.level / 100) * 2);
           };
           seg(act, "Band", [["50", "50% band"], ["80", "80% band"], ["95", "95% band"]], S_.level, function (v) { S_.level = v; draw(false); said(); remember(); api.done(); });
+          note = H("p", { class: "lx-hint" }, act);
           seg(act, "Day", [["typical", dayName("typical")], ["miss", dayName("miss")]], S_.day, function (v) { S_.day = v; draw(false); said(); remember(); });
           said();
         } },
-      { text: "Misses are lopsided in cost. Schedule too little and you buy emergency power; too much and capacity sits unused. Slide the margin you schedule above the forecast to find the cheapest.",
+      { text: "Misses are lopsided in cost. Schedule too little and you buy emergency power; too much and capacity sits unused. Slide an illustrative scheduling cushion above the forecast to find the cheapest.",
         build: function (act, api) {
           enter({ chart: "cost" });
-          var s = LX.Slider(act, { label: "Margin above the forecast", color: COL.spp, min: 0, max: 10, step: 0.5, unit: "%",
+          var s = LX.Slider(act, { label: "Cushion above the forecast", color: COL.spp, min: 0, max: 10, step: 0.5, unit: "%",
             hint: function () { return "Unused capacity $" + COSTS.over + "/MWh, emergency power $" + COSTS.under + "/MWh: illustrative prices."; },
             onChange: function (v) {
               S_.margin = Math.round(v * 10) / 1000; draw(false); remember(); var m = marginCost(fc, S_.margin, ERR);
-              if (m.total <= NEAR * BEST.total) { api.saw((Math.abs(S_.margin - BEST.r) < 1e-9 ? "The cheapest margin: " : "Within 5% of the cheapest, " + spct(BEST.r) + ": ") + spct(S_.margin) + ", about " + gw(m.marginMW) + ". Short in only " + pct(m.shortShare, 0) + " of hours, because a short MWh costs " + COSTS.under / COSTS.over + " times an unused one."); api.done(); }
-              else api.saw("At " + spct(S_.margin) + ": " + money(m.total) + " per hour, short in " + pct(m.shortShare, 0) + " of hours. " + (S_.margin < BEST.r ? "Try a wider margin." : "Try a narrower margin."), true);
+              if (m.total <= NEAR * BEST.total) { api.saw((Math.abs(S_.margin - BEST.r) < 1e-9 ? "The cheapest cushion under these assumed prices: " : "Within 5% of the cheapest, " + spct(BEST.r) + ": ") + spct(S_.margin) + ", about " + gw(m.marginMW) + ". Short of the schedule in only " + pct(m.shortShare, 0) + " of hours, because a short MWh costs " + COSTS.under / COSTS.over + " times an unused one."); api.done(); }
+              else api.saw("At " + spct(S_.margin) + ": " + money(m.total) + " per hour, short of the schedule in " + pct(m.shortShare, 0) + " of hours. " + (S_.margin < BEST.r ? "Try a wider cushion." : "Try a narrower cushion."), true);
             } });
+          H("p", { class: "lx-hint", text: SHORT_NOTE }, act);
           s.set(Math.round(S_.margin * 1000) / 10);
           if (marginCost(fc, S_.margin, ERR).total <= NEAR * BEST.total) api.done();
         } },
-      { text: "Wind is harder. Persistence for wind means “it keeps blowing as it is now”. Slide how far ahead you look and watch the average miss grow.",
+      { text: "Now wind. Persistence for wind means “it keeps blowing as it is now”. Pick how far ahead you look and watch the average miss grow.",
         build: function (act, api) {
           enter({ chart: "wind" });
           var W = fc.wind_persistence;
           seg(act, "Hours ahead", W.lead_hours.map(function (L) { return [L, L + " h"]; }), S_.lead, function (v) {
             S_.lead = v; draw(false); remember(); var k = W.lead_hours.indexOf(v);
-            api.saw(v + (v === 1 ? " hour" : " hours") + " ahead, “same as now” misses by " + W.mae_pct_of_max[k] + "% of SPP's largest wind hour on average. Beyond a few hours operators use weather-model forecasts instead; the forecasting lessons (upcoming) build them.");
+            api.saw(v + (v === 1 ? " hour" : " hours") + " ahead, “same as now” misses by " + W.mae_pct_of_max[k] + "% of SPP's largest wind hour on average. Operators also use weather forecasts as inputs; later lessons compare forecasting methods.");
             if (v >= 12) { api.done(); LX.progress.done(LESSON); }
           });
           if (S_.lead >= 12) api.done();
@@ -306,15 +331,15 @@
       var c = LX.store.get("l4-case", null), m = c && c.margin != null ? c.margin : null;
       chainBox.innerHTML = "";
       LX.CausalChain(chainBox, {
-        title: "Cause and effect: why reserves exist",
+        title: "Cause and effect: when demand beats the forecast",
         links: [
           { title: "Forecast made a day ahead", text: "Plants are scheduled to meet it.", value: "SPP, " + mis.label.short },
           { title: "Demand comes in higher", text: "The forecast ran low all day.", value: "+" + gw(w.mw) + " at " + LX.fmt.hh(w.t) },
-          { title: "Scheduled plants fall short", text: "Unless a margin was scheduled above the forecast.", value: m != null ? "your margin " + spct(m) : "a margin above it" },
+          { title: "Scheduled plants fall short", text: "Unless a cushion was scheduled above the forecast.", value: m != null ? "your cushion " + spct(m) : "a cushion above it" },
           { title: "Reserves and fast plants fill in", text: "Costly per MWh, but cheaper than the alternative.", value: "$" + COSTS.under + "/MWh, illustrative" },
-          { title: "Last resort: cut customers", text: "If reserves run out (lesson 3).", value: "59.3 Hz" }
+          { title: "Last resort: disconnect some customers", text: "Only if available response cannot restore balance.", value: "see lesson 3" }
         ],
-        note: "Being short costs far more than holding spare capacity, so operators lean their margin to the high side: the cheapest margin on the page is " + spct(BEST.r) + "."
+        note: "Under these illustrative prices a short MWh costs " + COSTS.under / COSTS.over + " times an unused one, so the cheapest cushion leans high: " + spct(BEST.r) + ". Real reserve rules also weigh plant trips, outages and response speed."
       });
     }
     chain(); LX.on("l4-change", chain);
@@ -324,7 +349,7 @@
       title: "Four ways to score a forecast",
       columns: [{ key: "name", label: "Score", main: true }, { key: "spp", label: "SPP, Jan–Apr 2025", num: true }, { key: "trap", label: "Misleads when" }],
       rows: [
-        { key: "mae", color: "var(--lx-accent)", name: "MAE", note: "average miss, in MW", spp: { text: gw2(Q.mae_mw) }, trap: "comparing grids of different sizes" },
+        { key: "mae", color: "var(--lx-accent)", name: "MAE", note: "average miss, in GW", spp: { text: gw2(Q.mae_mw) }, trap: "comparing grids of different sizes" },
         { key: "mape", color: "var(--lx-warn)", name: "MAPE", note: "average miss, in % of actual", spp: { text: pct(Q.mape) }, trap: "actual values get near zero (solar, wind)" },
         { key: "bias", color: "var(--lx-tier-4)", name: "[[forecast-bias|Bias]]", note: "average signed miss", spp: { text: "+" + gw2(Q.mean_error_mw) }, trap: "big misses in both directions cancel out" },
         { key: "skill", color: "var(--lx-good)", name: "[[skill-score|Skill]]", note: "MAE against persistence", spp: { text: pct(1 - PM.spp_same_hours_yesterday / PM.yesterday, 0) + " better" }, trap: "the baseline is too easy to beat" }

@@ -46,11 +46,50 @@ for (let trial = 0; trial < 400; trial++) {
   ok(near(a.wh, 250, 1e-9) && a.log.length === 1 && near(a.t, 10, 1e-9), "board: 12 animation slices = one 10-minute run");
 }
 
+// ---------------- the bathtub (review 2026-11-02, point 11): it never shrinks during an experiment; growth is announced
+{
+  let cap = M.KWH_STEPS[0], m = M.newMeter(), lastFill = 0, grew = 0;
+  const on = { ev: true, hairdryer: true };
+  for (let k = 0; k < 60; k++) {
+    m = M.run(m, W.devs, on, 10 / 12);
+    const ts = M.tubScale(cap, m.wh);
+    ok(ts.cap >= cap, `tub: size never shrinks (slice ${k})`);
+    ok(near(ts.fill, Math.min(1, m.wh / 1000 / ts.cap), 1e-12), `tub: fill = energy / size (slice ${k})`);
+    if (ts.cap > cap) { grew++; ok(ts.changed && ts.was === cap && ts.was / ts.cap < 1, `tub: growth ${cap} -> ${ts.cap} kWh is announced with the old brim`); }
+    else { ok(!ts.changed, `tub: no announcement without growth (slice ${k})`); ok(ts.fill >= lastFill - 1e-12, `tub: water never drops without an announced bigger tub (slice ${k})`); }
+    lastFill = ts.fill; cap = ts.cap;
+  }
+  ok(grew >= 3, "tub: a long run grows the tub several times, each announced");
+  ok(M.tubScale(0.1, 0).cap === 0.1 && !M.tubScale(0.1, 0).changed && M.tubScale(0.1, 0).fill === 0, "tub: after a reset it holds 0.1 kWh, empty");
+  ok(M.tubScale(0.1, 110).cap === 0.2 && M.tubScale(0.1, 110).changed, "tub: 0.11 kWh grows the 0.1 kWh tub to 0.2 kWh, announced (the review's case)");
+  ok(/Bigger tub: it now holds/.test(JS) && /t1-brim/.test(JS), "tub: the view writes the announcement and draws the old brim");
+}
+
 // ---------------- the prediction (step 1, step 4, Go deeper, myth)
 ok(W.predict.whA === 250 && W.predict.whB === 250 && W.predict.answer === "same", "predict: hair dryer 10 min = laptop 5 h = 250 Wh");
 ok(W.byId.hairdryer.watts === 1500 && W.byId.laptop.watts === 50 && D.predict.a.minutes === 10 && D.predict.b.minutes === 300, "predict: the job sizes the page states");
 ok(has("1.5 kW hair dryer for 10 minutes and a 0.05 kW laptop for 5 hours both use 0.25 kWh") && has("$1.5\\ \\text{kW} \\times \\tfrac{10}{60}\\ \\text{h} = 0.25\\ \\text{kWh}$"), "page: the two jobs, 0.25 kWh each");
 ok(has("a 50 W laptop for 5 hours uses as much as a 1,500 W hair dryer for 10 minutes"), "page: myth card restates the same jobs");
+// step 4 grading (review point 2): exactly the two jobs, each alone, nothing else
+{
+  const a = D.predict.a, b = D.predict.b, J = (steps) => {
+    let m = M.newMeter(); steps.forEach(([on, min]) => { m = M.run(m, W.devs, on, min); }); return M.checkJobs(m, a, b);
+  };
+  const slices = n => Array.from({ length: 12 }, () => [{ hairdryer: true }, n / 12]);   // the animated run
+  ok(J([[{ hairdryer: true }, 10], [{ laptop: true }, 60], [{ laptop: true }, 60], [{ laptop: true }, 60], [{ laptop: true }, 60], [{ laptop: true }, 60]]).ok, "jobs: hair dryer 10 min then laptop 5 x 1 h passes");
+  ok(J(slices(10).concat([[{ laptop: true }, 300]])).ok, "jobs: the animated 12-slice run counts as 10 minutes");
+  ok(J([[{ laptop: true }, 300], [{}, 60], [{ hairdryer: true }, 10]]).ok, "jobs: either order, idle time allowed");
+  const both = J([[{ hairdryer: true, laptop: true }, 300]]);
+  ok(!both.ok && both.state === "over" && both.mixed && near(both.aWh, 7500) && near(both.bWh, 250), "jobs: both together for 5 h (7.5 kWh and 0.25 kWh) is rejected, the review's case");
+  const long = J([[{ hairdryer: true }, 60], [{ laptop: true }, 300]]);
+  ok(!long.ok && long.state === "over" && near(long.aWh, 1500), "jobs: a 1-hour hair-dryer run is rejected as more than the job");
+  const extra = J([[{ hairdryer: true }, 10], [{ laptop: true }, 300], [{ tv: true }, 10]]);
+  ok(!extra.ok && extra.state === "over" && extra.otherWh > 0, "jobs: another appliance's energy is rejected");
+  const half = J([[{ hairdryer: true }, 10], [{ laptop: true }, 120]]);
+  ok(!half.ok && half.state === "partial" && near(half.bMin, 120), "jobs: part-way is 'partial', with the reader's own totals");
+  ok(J([]).state === "empty" && J([[{}, 60]]).state === "empty", "jobs: an empty meter is 'empty'");
+  ok(/checkJobs\(s\.meter/.test(JS) && !/a >= W\.predict\.whA/.test(JS), "jobs: the view grades with checkJobs, not 'at least 250 Wh'");
+}
 
 // ---------------- time to use 1 kWh
 const T1 = { led: "100 h", laptop: "20 h", tv: "10 h", microwave: "1 h", hairdryer: "40 min", ev: "8 min 20 s" };
@@ -68,7 +107,8 @@ W.items.forEach(it => {
   ok(it.text === want[0] && M.RUNGS[it.rung] === want[1], `ladder: ${it.label} = ${want[0]} on the ${want[1]} rung (got ${it.text}, ${M.RUNGS[it.rung]})`);
   ok(has(`<tr><td class="n">${want[0]}</td><td>${want[1]}</td><td>${it.label}</td></tr>`), `page: fallback table row for ${it.label}`);
 });
-ok(Math.round(W.span / 1e14) * 100 === 200, "ladder: phone charge to U.S. year is about 200 trillion times");
+ok(W.spanText === "220 trillion" && near(W.span, 4.2e15 / 19, 1e3), "ladder: phone charge to U.S. year is about 220 trillion times (4,200 TWh / 19 Wh)");
+ok(/four steps of ×1,000 from Wh to TWh/.test(JS) && !/five rungs of ×1,000/.test(JS), "ladder: five units are four steps of x1,000 (review point 6)");
 // Prairie Town's day: the same slice and scale as lesson 0
 const W0 = G0.prepare(town, year, "lesson0"), game = W0.demand.reduce((a, b) => a + b, 0);
 ok(Math.abs(W.town.mwh - game) <= 24 * W0.game.step / 2 && near(W.town.mwh, W0.rawDemand.reduce((a, b) => a + b, 0), 1e-6), `town day: ${W.town.mwh.toFixed(1)} MWh matches lesson 0 (${game} MWh after its 5 MW rounding)`);
@@ -79,15 +119,22 @@ ok(near(W.spp.twh, 298.6) && near(W.spp.peakGW, 54.4), "SPP totals read from tow
 // ---------------- Fermi: average and peak power of the U.S.
 ok(W.fermi.answer === 2 && D.fermi.ticks_gw[2] === 500, "fermi: the right tick is 500 GW");
 ok(Math.round(W.fermi.avgGW) === 479 && has("$4{,}200\\ \\text{TWh} \\div 8{,}760\\ \\text{h} \\approx 479\\ \\text{GW}$") && has("The U.S. averaged about 479 GW in 2025"), "fermi: 4,200 TWh / 8,760 h = 479 GW, as the page says");
-ok(Math.round(W.fermi.peakGW) === 759 && W.fermi.ratio.toFixed(1) === "1.6" && has("ratio of about 1.6"), "fermi: 759 GW record is about 1.6 times the average");
-ok(near(W.fermi.sppPeakGW / W.fermi.sppAvgGW, 1.6, 0.01), "fermi: SPP's own peak/average from one data set is also about 1.6");
+ok(Math.round(W.fermi.peakGW) === 759 && W.fermi.ratio === undefined, "fermi: 759 GW record kept as a number; no ratio against the U.S. year (review point 4)");
+ok(W.fermi.sppRatio.toFixed(1) === "1.6" && W.fermi.sppAvgGW.toFixed(1) === "34.1" && W.fermi.sppPeakGW.toFixed(1) === "54.4", "fermi: SPP's peak/average from one data set: 54.4 / 34.1 GW = 1.6");
+ok(has("its peak hour needed 54.4 GW, about 1.6 times the average") && has("an average of 34.1 GW") && has("used 298.6 TWh in 2025"), "page: Go deeper states SPP's 298.6 TWh, 34.1 GW and 54.4 GW");
+ok(has("the 2025 peak hour needed about 1.6 times its average") && !has("The grid is built for that peak") && !/The grid is built for that peak/.test(JS), "page and view: peak/average from SPP; no 'built for that peak'");
+ok(int(W.wh.us / 1e9) === "4,200,000", "fermi: unit chain 4,200 TWh = 4,200,000 GWh");
 
 // ---------------- the wind-farm claim
 ok(W.wind.claim === 100000 && D.wind.cf.start === 100 && D.wind.home_w.start === 1000, "wind: slider start reproduces the claim, 100 MW / 1 kW = 100,000 homes");
 ok(Math.round(W.wind.homeW) === 1232 && int(Math.round(W.wind.real / 100) * 100) === "27,400", `wind: EIA averages give ${W.wind.real.toFixed(0)} homes (page: about 27,400)`);
-ok(has("an average home draws about 1,232 W, so the farm's yearly energy matches about 27,400 homes") && has("an average draw of about 1,232 W"), "page: wind myth numbers");
+ok(has("An average home bought 10,791 kWh a year (about 1,232 W on average), so the farm's yearly energy matches what about 27,400 homes buy") && has("an average draw of about 1,232 W"), "page: wind myth numbers, as purchases");
 ok(near(M.homes(100, 0.338, 10791 * 1000 / 8760), 100 * 8760 * 0.338 / 10.791, 1e-6), "wind: homes = MW x 8,760 h x CF / MWh per home");
-ok(M.homes(100, D.wind.cf.min / 100, D.wind.home_w.max) <= 50000 && M.homes(100, 1, 1000) > 50000, "wind: step 8 can be completed and starts above the threshold");
+// step 8 (review point 3): EIA's averages are reachable on the sliders, and the on-screen result there is the stated one
+const onGrid = (v, o) => near((v - o.min) / o.step, Math.round((v - o.min) / o.step), 1e-6) && v >= o.min && v <= o.max;
+ok(W.wind.refCF === 33.8 && W.wind.refW === 1232 && onGrid(W.wind.refCF, D.wind.cf) && onGrid(W.wind.refW, D.wind.home_w), "wind: 33.8% and 1,232 W sit on the slider steps");
+ok(int(Math.round(M.homes(100, W.wind.refCF / 100, W.wind.refW) / 100) * 100) === "27,400", "wind: the sliders at EIA's averages show 27,400, as the feedback says");
+ok(/Use EIA's averages/.test(JS) && /Math\.abs\(cf\.val\(\) - W\.wind\.refCF\) < 0\.05/.test(JS) && !/n <= 50000/.test(JS), "wind: a reference-values button; done only at EIA's averages");
 
 // ---------------- sourced numbers on the page match the data file
 const A = D.anchors;
@@ -97,6 +144,16 @@ ok(has(">4,200 TWh<") && A.us_year.value === 4.2e12 && has("(4.20 trillion kWh)"
 ok(has(">759 GW<") && A.us_peak.value === 759180, "page: 759 GW record");
 ok(has(">33.8%<") && A.wind_cf.value === 0.338 && has("U.S. wind ran at 33.8% of its capacity in 2025"), "page: wind capacity factor 33.8%");
 ok(has("a 40 W bulb used for five hours uses 200 Wh, or 0.2 kWh") && A.bulb_example.watts * A.bulb_example.hours === 200, "page: EIA bulb example");
+
+// ---------------- review fixes in words (2026-11-02)
+ok(!/it only adds up/.test(JS) && /running total of energy used/.test(JS) && /Stored energy, as in a battery, can fall/.test(JS), "running total: the energy meter never falls; stored energy can (point 5)");
+ok(has("Leaving it out makes these energy-based terms four times too large") && !has("every energy, cost and emission total") && !has("C = \\sum"), "Modeler preview: energy-based terms only; no undefined C or c (point 9)");
+ok((QMD.match(/\$\$/g) || []).length === 4, "Go deeper: two display equations in all (one per box), the Modeler box a one-line preview");
+ok(has("[Lesson 10](10-write-it-down.qmd)") && has("[lesson 9](09-storage.qmd)") && /05-capacity-factor\.html/.test(JS), "forward links: lessons 5, 9 and 10 (live)");
+ok(/\[\[log-scale\|log scale\]\]/.test(JS) && /unitKey\(act\)/.test(JS) && /\[\[kilowatt\|kW\]\]/.test(JS), "units: unit key with the power and energy ladders; log scale glossed (point 7)");
+ok(/Stretch, optional: a \[\[fermi-estimate/.test(JS) && /Stretch, optional: claims often say/.test(JS) && (JS.match(/free: true/g) || []).length === 2, "depth: the national estimate and the wind claim are optional stretch steps (point 8)");
+ok(/if \(moveFocus\) qp\.focus\(\)/.test(JS) && /tabindex: "-1"/.test(JS), "ladder: focus moves to the next question (point 13)");
+ok(/homes whose yearly purchases it matches/.test(JS) && /illustrative equivalent/.test(JS) && has("illustrative equivalent"), "wind: purchases benchmark, an illustrative equivalent (point 12)");
 Object.keys(A).forEach(k => ok(/^https:\/\/www\.(eia|epa)\.gov\//.test(A[k].url) && A[k].as_of && QMD.indexOf(A[k].url.replace(/&/g, "&amp;")) >= 0, `anchor ${k}: allow-listed URL, an as-of date, and cited on the page`));
 
 // ---------------- scope: links and words (curriculum section 20)
