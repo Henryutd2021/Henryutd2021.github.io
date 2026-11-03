@@ -394,7 +394,12 @@
         var cl = segment(c, st.level, bx);
         if (cl) {
           S("line", { x1: sx(cl[0][0]), y1: sy(cl[0][1]), x2: sx(cl[1][0]), y2: sy(cl[1][1]), stroke: "var(--lx-accent)", "stroke-width": 2.5, "stroke-dasharray": "8 5" }, gIso);
-          S("text", { x: sx(cl[1][0]) - 4, y: sy(cl[1][1]) + 16, "text-anchor": "end", class: "lbl", fill: "var(--lx-accent)", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4 }, gIso)
+          // the label goes below the line's right end; when that end sits on the x-axis (the label would cover its tick
+          // numbers), it goes above the line's left end instead
+          var onAxis = Math.abs(cl[1][1] - bx[2]) < 1e-9 * Math.max(1, bx[3] - bx[2]) + (bx[3] - bx[2]) * 0.02;
+          var lab = onAxis ? { x: sx(cl[0][0]) + 6, y: sy(cl[0][1]) - 8, "text-anchor": "start" } : { x: sx(cl[1][0]) - 4, y: sy(cl[1][1]) + 16, "text-anchor": "end" };
+          if (onAxis && sy(cl[0][1]) - 8 < m.t + 12) lab.y = sy(cl[0][1]) + 18;
+          S("text", ext(lab, { class: "lbl", fill: "var(--lx-accent)", "paint-order": "stroke", stroke: "var(--lx-surface)", "stroke-width": 4 }), gIso)
             .textContent = o.levelLabel ? o.levelLabel(st.level) : "Cost " + LX.fmt.money(st.level);
           if (o.onDrag) hit(c, st.level, "cost", null, gIso);
         }

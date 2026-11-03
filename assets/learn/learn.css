@@ -588,11 +588,13 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
   .lx-ctable .pn { min-width: 0; }
   .lx-ctable td[data-label] { text-align: right; }
   .lx-ctable td[data-label]::before { content: attr(data-label); display: block; font-family: var(--lx-f-body); font-size: 10.5px; color: var(--lx-ink-3); white-space: nowrap; }
-  /* text: true (rows of words): one column of left-aligned labelled lines */
+  /* text: true (rows of words): one column of left-aligned lines, each with its label on the left */
   .lx-ctable-text tr { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .lx-ctable-text .rank { display: none; }
-  .lx-ctable-text td[data-label] { text-align: left; font-size: 14.5px; white-space: normal; }
-  .lx-ctable-text td.ph { display: block; }
+  .lx-ctable-text td[data-label] { display: grid; grid-template-columns: minmax(5.5em, 32%) minmax(0, 1fr); gap: 2px 10px; align-items: baseline;
+    text-align: left; font-size: 14.5px; white-space: normal; }
+  .lx-ctable-text td[data-label]::before { white-space: normal; font-size: 11.5px; }
+  .lx-ctable-text td.ph { display: none; }
 }
 
 /* chains.css — causal chain (causal.js) and energy chain (energychain.js). */

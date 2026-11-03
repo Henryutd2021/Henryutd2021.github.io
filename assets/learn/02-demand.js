@@ -471,7 +471,7 @@
     var c3 = H("div", { class: "lx-xcard" }, host);
     LX.CompareTable(c3, {
       title: "What shapes demand at each time scale", text: true,
-      columns: [{ key: "name", label: "Time scale", main: true }, { key: "drivers", label: "Main drivers" }, { key: "data", label: "In 2025's data" }, { key: "who", label: "Who plans for it", phoneHide: true }],
+      columns: [{ key: "name", label: "Time scale", main: true }, { key: "drivers", label: "Main drivers" }, { key: "data", label: "In 2025's data" }, { key: "who", label: "Who plans for it" }],
       rows: [
         { key: "day", name: "Day", color: "var(--lx-cc)", drivers: "Routines (sleep, work, school), sunlight, outdoor temperature", data: num(s.min) + " → " + num(s.max) + " MW on " + Wd.summer.label, who: "Operators, hour by hour (lesson 0)" },
         { key: "week", name: "Week", color: "var(--lx-demand)", drivers: "Work and school calendars", data: "Weekends " + pct(Wd.week.gapMean) + " lower on average; up to " + pct(Wd.week.gapMax) + " at " + hh(Wd.week.gapH), who: "Operators and forecasters (lesson 4)" },

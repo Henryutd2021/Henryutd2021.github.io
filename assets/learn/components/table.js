@@ -8,8 +8,9 @@
      sorts: [{label: "As built", order: ["nuclear", ...], note: "One sentence."},
              {label: "By running cost", order: [...], ranked: true, note: "<b>This order is the merit order.</b> ..."}] });
    On phones the rows become small cards. The table is a real <table>, so it reads well without the diagram.
-   text: true   for rows of words rather than numbers: on phones each row becomes a card of left-aligned labelled lines,
-                with no rank column, and phoneHide columns stay (long text in the number layout would overlap). */
+   text: true   for rows of words rather than numbers: on phones each row becomes a card of left-aligned lines, each with
+                its column label on the left, and no rank column (long text in the number layout would overlap);
+                phoneHide columns stay hidden. */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;

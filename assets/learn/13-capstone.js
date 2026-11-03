@@ -920,7 +920,7 @@
         { color: "var(--lx-tier-5)", name: "PyPSA", note: "Python", plans: "Investment and operation of power and energy networks", time: "Any set of time steps with weights: full years or reduced ones", open: "Open source (MIT)" }
       ]
     });
-    H("p", { class: "lx13-sub", html: 'Official pages: <a href="https://www.nlr.gov/analysis/reeds/">ReEDS (NLR)</a> and its <a href="https://docs.nlr.gov/docs/fy26osti/93617.pdf">2025 documentation</a> (PDF); <a href="https://docs.pypsa.org/">PyPSA documentation</a>. GenX publishes its code and documentation openly.' }, tcard);
+    H("p", { class: "lx13-sub", html: 'Official pages: <a href="https://www.nlr.gov/analysis/reeds/">ReEDS (NLR)</a> and its <a href="https://docs.nlr.gov/docs/fy26osti/93617.pdf">2025 documentation</a> (PDF); <a href="https://docs.pypsa.org/">PyPSA documentation</a>; <a href="https://genxproject.github.io/GenX.jl/">GenX documentation</a>.' }, tcard);
   }
 
   LX.mount("town-plan", function (live, data, root) { view(live, data, root); });

@@ -95,4 +95,30 @@ function uc24(town, days, which) {
   return { sense: "min", variables: vars, constraints: cons };
 }
 
-module.exports = { dispatch3, dispatch24, storage168, uc24 };
+// The lesson instances of the W1 benchmark (curriculum v2 §18.3: T11, T13 and M1; plus B3's small solves), built by the
+// lessons' own pure models exactly as the pages build them:
+//   t11       lesson 11's day as one LP (lesson 0's day, ramp limits, unserved penalty; default settings)
+//   m1net     M1 part B: 24 hours on the three-bus DC network, Ridge-Town line limited to 110 MW (congested)
+//   t13week   lesson 13's planning LP on seven representative weeks with a 200 kt CO2 cap (the "Ask the optimizer" solve)
+//   t13full   lesson 13's full-year check: the optimizer's 200 kt plan, fixed, on all 8,760 hours (the debrief's check)
+//   b3        B3's correct four-hour dispatch (the page solves it and five planted bugs)
+function lessonSet(site) {
+  const path = require("path"), fs = require("fs");
+  const A = p => path.join(site, "assets/learn", p), J = p => JSON.parse(fs.readFileSync(A("data/" + p), "utf8"));
+  const town = J("town.json"), year = J("town_year.json"), targets = J("cf_targets.json");
+  const M11 = require(A("11-solver.js")), M1 = require(A("m01-dispatch-to-lmp.js")), M13 = require(A("13-capstone.js")), B3 = require(A("b03-read-check-formulation.js"));
+  const D11 = J("11-solver.json"), W11 = M11.dayOf(town, year);
+  const D1 = J("m01-dispatch-to-lmp.json");
+  const cfg = J("13-capstone.json"), Y = M13.prepareYear(year, targets, cfg, require(A("components/profiles.js")).townProfile);
+  const RW = M13.selectWeeks(Y, cfg.weeks), C = M13.costs(cfg, {});
+  const p200 = cfg.frontier.points.find(p => p.cap === 200), plan = M13.ceilPlan(p200.plan, cfg.limits);
+  return [
+    ["t11", "T11 day LP (lesson 11)", M11.buildLP(W11, M11.settings(), D11.penalty)],
+    ["m1net", "M1 three-bus day LP, congested", M1.build(D1, { network: true, limit: 110 })],
+    ["t13week", "T13 seven-week plan LP, 200 kt", M13.weekModel(C, RW, { cap: 200e3 })],
+    ["t13full", "T13 full-year check, fixed plan", M13.fullYearModel(C, Y, { plan })],
+    ["b3", "B3 four-hour dispatch LP", B3.buildModel(B3.instance(town, year))],
+  ];
+}
+
+module.exports = { dispatch3, dispatch24, storage168, uc24, lessonSet };
