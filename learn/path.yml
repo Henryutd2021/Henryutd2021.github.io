@@ -445,7 +445,7 @@
   code: K1
   form: cards
   path: k01-units.qmd
-  status: upcoming
+  status: active
   minutes: 10
   practice_minutes: 10
   title: "Units and orders of magnitude"
