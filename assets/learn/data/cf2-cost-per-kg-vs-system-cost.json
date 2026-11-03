@@ -1,0 +1,59 @@
+{
+  "about": "Case file CF2 (cf2-cost-per-kg-vs-system-cost), wave W2 draft, 2026-11-03. 'timeline' and 'boundary' describe published studies by the course author (Li et al.), drawn from approved excerpts (reports/learn/excerpts_for_approval.md, E3-E5); every study date is the publisher's date on Crossref (accessed 3 Nov 2026). 'idea' is an illustrative toy with invented round numbers (not the studies' inputs or results): an electrolyzer built in 10 MW blocks next to a wind farm, each added block running fewer full-load hours on the wind the grid cannot take. The annual cost per MW, kilograms per MWh and the variable cost are the same stylized values as the allow-listed wind-hydrogen explainer (assets/explainers/wind-hydrogen.js).",
+  "built": "2026-11-03",
+  "timeline": {
+    "title": "The studies in time",
+    "lede": "Four published studies used one plant-scale optimization model; this case file follows the 2024 journal article.",
+    "events": [
+      { "date": "2022-05", "label": "First wind-hydrogen case", "kind": "study",
+        "text": "A grid-connected wind farm gets electrolyzers, a hydrogen tank and fuel cells, sized by an extended REopt model.",
+        "source": { "label": "Li et al. (2022), J. Phys.: Conf. Ser. 2265, 042063", "url": "https://doi.org/10.1088/1742-6596/2265/4/042063" } },
+      { "date": "2023-06", "label": "Solar-hydrogen designs compared", "kind": "study",
+        "text": "Concentrated solar and photovoltaic designs for making hydrogen are compared by their [[lcoh|cost per kilogram]].",
+        "source": { "label": "Li et al. (2023), EEM 2023", "url": "https://doi.org/10.1109/EEM58374.2023.10161786" } },
+      { "date": "2023-12", "label": "The journal article this case follows", "kind": "study", "key": true,
+        "text": "Four system configurations, wind profiles from four regions and a hydrogen-price sensitivity; published online in December 2023, in the February 2024 issue.",
+        "source": { "label": "Li et al. (2024), Journal of Mechanical Design 146, 020903", "url": "https://doi.org/10.1115/1.4063971" } },
+      { "date": "2024-06", "label": "Maintenance traced to the cost per kilogram", "kind": "study",
+        "text": "An offshore wind farm supplying hydrogen: a maintenance simulation feeds the same kind of plant optimization.",
+        "source": { "label": "Li et al. (2024), J. Phys.: Conf. Ser. 2767, 062016", "url": "https://doi.org/10.1088/1742-6596/2767/6/062016" } },
+      { "date": "2026-10-30", "label": "Model framework released", "kind": "event",
+        "text": "A documented, open implementation of the model, with synthetic examples (version 1.0.0).",
+        "source": { "label": "reopt-hydrogen-framework on GitHub", "url": "https://github.com/Henryutd2021/reopt-hydrogen-framework", "as_of": "2026-11-03" } }
+    ],
+    "kinds": { "event": "Code" }
+  },
+  "boundary": {
+    "title": "Where the journal article's result holds",
+    "lede": "The two measures moved apart inside the study's stated boundary:",
+    "holds": [
+      "one planned 253 MW wind farm in West Texas, with ERCOT wholesale prices;",
+      "hydrogen sold at a set price per kilogram;",
+      "cost assumptions dated 2020 to 2023."
+    ],
+    "leaves": [
+      "final federal hydrogen credit rules, which came later;",
+      "the rest of the grid, which enters only through wholesale prices;",
+      "where the hydrogen goes after it is sold."
+    ],
+    "source": "From the approved excerpt of Li et al. (2024), Journal of Mechanical Design."
+  },
+  "idea": {
+    "title": "Your electrolyzer, one 10 MW block at a time",
+    "note": "Illustrative numbers, not the studies' inputs or results.",
+    "blockMW": 10,
+    "hours": [5000, 4200, 3500, 2900, 2400, 2000, 1600, 1300],
+    "annualCostPerMW": 140000,
+    "kgPerMWh": 18,
+    "variableCostPerKg": 0.2,
+    "prices": [3, 4, 5],
+    "startPrice": 4,
+    "startBlocks": 2,
+    "why": "Block hours fall because each added block runs only when the surplus wind exceeds the blocks below it. $140,000 per MW-year stands for the electrolyzer's annualized building cost plus fixed upkeep; 18 kg per MWh is about 55 kWh per kg; $0.20 per kg covers water and stack wear. The surplus wind is free because it would otherwise be curtailed."
+  },
+  "facts": [
+    { "n": "about 7%", "what": "Lower total system cost when an electrolyzer was added, compared with wind and a battery alone (journal case study).", "source": "Li et al. (2024), Journal of Mechanical Design", "url": "https://doi.org/10.1115/1.4063971", "asof": "published online December 2023" },
+    { "n": "about 26%", "what": "Lower total system cost with hydrogen storage and fuel cells, in the same comparison.", "source": "Li et al. (2024), Journal of Mechanical Design", "url": "https://doi.org/10.1115/1.4063971", "asof": "published online December 2023" },
+    { "n": "about 2%", "what": "Fall in the cost per kilogram of hydrogen when maintenance cut the turbines' upkeep cost by about 10% (offshore case).", "source": "Li et al. (2024), J. Phys.: Conf. Ser. 2767", "url": "https://doi.org/10.1088/1742-6596/2767/6/062016", "asof": "published June 2024" }
+  ]
+}

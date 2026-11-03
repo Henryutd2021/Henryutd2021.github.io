@@ -35,6 +35,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "average-emission-factor": {
+  "term": "Average emission factor",
+  "short": "An hour's CO₂ from all the plants that ran, divided by all the electricity used in that hour.",
+  "lesson": "CF6",
+  "href": "index.html#analyst"
+ },
  "average-power": {
   "term": "Average power",
   "short": "The energy used over a period divided by the length of that period.",
@@ -142,6 +148,12 @@
   "short": "A charge per tonne of CO2 emitted, added to costs so that cleaner choices become relatively cheaper.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "carrying-cost": {
+  "term": "Carrying cost",
+  "short": "What money tied up in buildings or equipment costs while they earn nothing: the interest, or the return it could have earned elsewhere.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
  },
  "causal-loop-diagram": {
   "term": "Causal-loop diagram",
@@ -370,6 +382,12 @@
   "short": "Switching a use of energy, such as heating or driving, from burning fuel to using electricity.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "electrolyzer": {
+  "term": "Electrolyzer",
+  "short": "A machine that uses electricity to split water into hydrogen and oxygen.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
  },
  "emissions-cap": {
   "term": "Emissions cap",
@@ -617,11 +635,23 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "latin-hypercube": {
+  "term": "Latin hypercube sampling",
+  "short": "A way to draw many sets of uncertain inputs so that the whole range of every input is covered evenly.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "lcoe": {
   "term": "Levelized cost of electricity (LCOE)",
   "short": "A plant's lifetime costs divided by the electricity it makes over its life, both discounted to today's money, giving an average cost per megawatt-hour.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "lcoh": {
+  "term": "Levelized cost of hydrogen (LCOH)",
+  "short": "The cost of making one kilogram of hydrogen over a plant's life: all its costs divided by all the kilograms it makes, with future money discounted.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
  },
  "linear-program": {
   "term": "Linear program",
@@ -682,6 +712,12 @@
   "short": "What one more unit costs, here the extra running cost of one more megawatt-hour of demand.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "marginal-emission-factor": {
+  "term": "Marginal emission factor",
+  "short": "The change in a grid's CO₂ when demand in one hour grows by one megawatt-hour: the CO₂ rate of the plant that serves it.",
+  "lesson": "CF6",
+  "href": "index.html#analyst"
  },
  "marginal-plant": {
   "term": "Marginal plant",
@@ -790,6 +826,12 @@
   "short": "A choice with several goals that cannot all be at their best at once.",
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
+ },
+ "mw-it": {
+  "term": "MW-IT",
+  "short": "Megawatts of a data center's computing equipment; the grid must supply more, for cooling and the rest of the building.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
  },
  "nadir": {
   "term": "Nadir",
@@ -941,6 +983,12 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "prognostics": {
+  "term": "Prognostics",
+  "short": "Predicting when a machine part is likely to fail, from data on its condition, so that repairs can be planned before it does.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
+ },
  "projection": {
   "term": "Projection",
   "short": "A model's estimate of a future quantity under stated assumptions, not a measurement or a promise.",
@@ -988,6 +1036,12 @@
   "short": "The wind speed at which a turbine first reaches its full rated power; above it, the blades turn to spill the extra wind.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "ratepayer": {
+  "term": "Ratepayer",
+  "short": "A customer who pays a utility's regulated electricity rates; utility costs that nobody else covers end up in those rates.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
  },
  "reactance": {
   "term": "Reactance",
@@ -1139,6 +1193,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "staged-energization": {
+  "term": "Staged energization",
+  "short": "Switching on part of a large load's grid service early and the rest later, as the grid becomes ready.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "staging-area": {
   "term": "Staging area",
   "short": "Git's list of changes picked for the next commit: git add puts a file's current version there.",
@@ -1174,6 +1234,12 @@
   "short": "An amount that builds up or drains over time, such as water in a reservoir, energy in a battery or CO₂ emitted so far.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "stranded-cost": {
+  "term": "Stranded cost",
+  "short": "Money already spent on equipment that is no longer used as planned, such as grid upgrades built for a load that never arrives.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
  },
  "supply-diversity": {
   "term": "Supply diversity",

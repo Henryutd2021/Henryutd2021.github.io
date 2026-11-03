@@ -1,0 +1,17 @@
+# Sidecar for CF2 (cf2-cost-per-kg-vs-system-cost), builder learn-w2-i, 2026-11-03. Read by scripts/build_learn.py.
+# The page is a draft (learn/_drafts/) until Henry approves its excerpts (reports/learn/excerpts_for_approval.md, E3-E5).
+id: cf2-cost-per-kg-vs-system-cost
+lesson: CF2
+glossary:
+  - id: electrolyzer
+    term: Electrolyzer
+    def: "A machine that uses electricity to split water into hydrogen and oxygen."
+  - id: lcoh
+    term: Levelized cost of hydrogen (LCOH)
+    def: "The cost of making one kilogram of hydrogen over a plant's life: all its costs divided by all the kilograms it makes, with future money discounted."
+  - id: prognostics
+    term: Prognostics
+    def: "Predicting when a machine part is likely to fail, from data on its condition, so that repairs can be planned before it does."
+requests:
+  - "Case-file control row: CF2, CF6 and CF7 each carry the same small page-level style block (.cf-ctl, .cf-ctl-l, .cf-row, .cf-selects, .cf-sel, and .cf-two, a comparison table that becomes labelled lines on phones), plus two fixes to the template pieces: .lx-case-try code wraps on phones (a long command overflowed 375 px) and .lx-case-try p takes the list size (the repository line was larger than the list). Candidates for forms.css when the case files go live."
+  - "Allow-listed explainers on Learn pages: explainers.css is site-wide, but the theme helpers --t-ink, --t-soft and --t-line are defined only on .project-page (pubs.css), so on a Learn page the explainer falls back to the accent colour and --line. Defining them for .page-learn .explainer too would match the project pages."
