@@ -41,6 +41,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "balancing-loop": {
+  "term": "Balancing loop",
+  "short": "A feedback loop with an odd number of negative links, which pulls a change back toward a level.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
+ },
  "battery-duration": {
   "term": "Battery duration",
   "short": "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW.",
@@ -95,6 +101,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "carbon-budget": {
+  "term": "Carbon budget",
+  "short": "A cap on the total CO₂ emitted over many years, a limit on a stock rather than on one year's flow.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
+ },
  "carbon-intensity": {
   "term": "Carbon intensity",
   "short": "The CO2 emitted for each unit of electricity, for example in tonnes per megawatt-hour.",
@@ -106,6 +118,12 @@
   "short": "A charge per tonne of CO2 emitted, added to costs so that cleaner choices become relatively cheaper.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "causal-loop-diagram": {
+  "term": "Causal-loop diagram",
+  "short": "A map of causes and effects in which every arrow carries a sign: plus if more of the cause brings more of the effect, minus if it brings less.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
  },
  "clearing-price": {
   "term": "Clearing price",
@@ -299,6 +317,18 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "feedback-loop": {
+  "term": "Feedback loop",
+  "short": "A chain of causes that leads back to where it started, so a change comes back to push on itself.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
+ },
+ "feeder": {
+  "term": "Feeder",
+  "short": "A distribution line that carries power from a substation to the homes and businesses along it.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
+ },
  "fermi-estimate": {
   "term": "Fermi estimate",
   "short": "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right.",
@@ -328,6 +358,12 @@
   "short": "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "flow": {
+  "term": "Flow",
+  "short": "A rate that fills or drains a stock, such as megawatts into a battery or tonnes of CO₂ a year; only flows change a stock.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
  },
  "forecast-error": {
   "term": "Forecast error",
@@ -401,6 +437,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "islanding": {
+  "term": "Islanding",
+  "short": "A microgrid or part of a grid disconnecting from the main grid and keeping its own loads supplied.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
+ },
  "kilowatt": {
   "term": "Kilowatt (kW)",
   "short": "A unit of power equal to 1,000 watts.",
@@ -442,6 +484,12 @@
   "short": "A year's hourly demand sorted from highest to lowest, showing for how many hours each level of demand is needed.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "local-optimum": {
+  "term": "Local optimum",
+  "short": "The best plan for one part of a system judged inside its own boundary, which need not be best for the system it sits in.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
  },
  "locational-marginal-price": {
   "term": "Locational marginal price (LMP)",
@@ -502,6 +550,12 @@
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "microgrid": {
+  "term": "Microgrid",
+  "short": "A local group of loads and sources, such as a campus or a village, that is managed as one system and can disconnect from the main grid and run on its own.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
  },
  "mixed-integer-program": {
   "term": "Mixed-integer program",
@@ -677,11 +731,23 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "rebound-effect": {
+  "term": "Rebound effect",
+  "short": "Part of an efficiency saving taken back because the cheaper service gets used more.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
+ },
  "refuelling-outage": {
   "term": "Refuelling outage",
   "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "reinforcing-loop": {
+  "term": "Reinforcing loop",
+  "short": "A feedback loop with an even number of negative links, in which a change feeds itself, as growth or as decline.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
  },
  "representative-period": {
   "term": "Representative period",
@@ -712,6 +778,12 @@
   "short": "What it costs a plant to make one more megawatt-hour, mostly fuel, leaving out the cost of building it.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "system-scale": {
+  "term": "Scale (of an energy system)",
+  "short": "A level of an energy system, from one device or plant to a whole nation, set apart by who decides what and by the physics a model of it needs.",
+  "lesson": "F1",
+  "href": "f01-five-scales.html"
  },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
@@ -754,6 +826,12 @@
   "short": "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "stock": {
+  "term": "Stock",
+  "short": "An amount that builds up or drains over time, such as water in a reservoir, energy in a battery or CO₂ emitted so far.",
+  "lesson": "F2",
+  "href": "f02-systems-and-map.html"
  },
  "supply-stack": {
   "term": "Supply stack",

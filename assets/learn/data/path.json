@@ -964,6 +964,29 @@
   },
   {
    "tier": "foundations",
+   "code": "F1",
+   "title": "Who decides what, from a light switch to a nation?",
+   "ready": true,
+   "href": "f01-five-scales.html",
+   "scales": [],
+   "id": "f01-five-scales",
+   "minutes": 15,
+   "form": "cards"
+  },
+  {
+   "tier": "foundations",
+   "code": "F2",
+   "title": "How does everything connect? Stocks, flows, feedback and the whole-system map",
+   "ready": true,
+   "href": "f02-systems-and-map.html",
+   "scales": [],
+   "id": "f02-systems-and-map",
+   "tier2": "analyst",
+   "minutes": 25,
+   "form": "play"
+  },
+  {
+   "tier": "foundations",
    "code": null,
    "title": "The energy system map: from primary energy to the uses we pay for",
    "ready": false,
