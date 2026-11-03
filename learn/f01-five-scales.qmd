@@ -14,7 +14,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
      assets/learn/data/f01-five-scales.json (the five scales after curriculum v2 §5.3), 01-power-energy.json (sourced
      anchors), town_days.json (SPP 2025 statistics, EIA-930) and town.json (Prairie Town, illustrative).
      Tests: node _tests/learn/test_f01-five-scales.js checks every number on this page against those files.
-     Neutral by design: scales are a lens, not an org chart (Go deeper). Data centers appear only as loads.
+     Neutral by design: scales are overlapping views, not an org chart (Go deeper). Data centers appear only as loads.
      Generated, do not edit by hand: the learn:meta, learn:next and learn:footer blocks (python3 scripts/build_learn.py).
      Lesson-local styles (class prefix f1z-, the zoom) are in the style block; the five scale colours are the shared
      --lx-scale-0 ... 4 (components/scalestrip.css), and the explain layer's scale strip is LX.ScaleStrip. -->
@@ -60,6 +60,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .f1z-set { font-size: 15px; color: var(--lx-ink-2); }
 .f1z-power { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14.5px; color: var(--lx-ink-2); }
 .f1z-q { font-size: 15px; color: var(--lx-ink); border-left: 3px solid var(--lx-line-2); padding-left: 10px; }
+.f1z-gloss { font-size: 14px; color: var(--lx-ink-2); margin: 0; }
 .f1z-q span { display: block; font-family: var(--lx-f-display); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--lx-ink-3); }
 .f1z-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 /* the scenes: every fill and stroke from the Learn tokens, so day and night both work */
@@ -118,16 +119,22 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tbody>
 <tr><td>S0 Device and plant</td><td>The owner of a home or plant</td><td>What to install at one site, and how to run it hour by hour</td><td>Device ratings, efficiencies, one meter</td></tr>
 <tr><td>S1 Microgrid and community</td><td>A campus owner or a rural co-op</td><td>Size, and which loads stay on when it islands</td><td>A small network that can run alone</td></tr>
-<tr><td>S2 Regional bulk grid</td><td>A grid operator, overseen by regulators</td><td>Which plants run, reserves, lines, connections</td><td>Power flow, frequency, inertia</td></tr>
-<tr><td>S3 City and region</td><td>A city or county</td><td>Codes, heat, transit, land, feeder upgrades</td><td>Feeders, heat networks, links between sectors</td></tr>
+<tr><td>S2 Regional bulk grid</td><td>A grid operator, overseen by regulators</td><td>Which plants run in its region, reserves, lines, connections</td><td>Power flow on lines; frequency and inertia for fast events</td></tr>
+<tr><td>S3 City and region</td><td>A city or county</td><td>Building codes, heat, transit, land, feeder upgrades</td><td>Feeders, heat networks, links between sectors</td></tr>
 <tr><td>S4 Nation</td><td>A national government and regulators</td><td>Targets, instruments, infrastructure, trade</td><td>Regional energy balances, main corridors</td></tr>
 </tbody>
 </table></div>
-<p>A U.S. home draws about 1.2 kW on average; the Southwest Power Pool peaked at 54.4 GW in 2025; the Lower 48 states' record hour needed 759 GW (29 July 2025). Signals and limits pass down the scales; profiles and needs pass up.</p>
+<ul>
+<li>Electricity a U.S. home buys from its utility, as average power: about 1.2 kW (2022).</li>
+<li>The Southwest Power Pool's highest hour of 2025: 54.4 GW.</li>
+<li>The Lower 48 states' record hour: 759 GW (29 July 2025).</li>
+<li>Units: 1 kW = 1,000 W (watts); 1 MW = 1,000 kW; 1 GW = 1,000 MW.</li>
+</ul>
+<p>The scales overlap. Signals and limits usually pass down, such as a utility's tariff to a home; profiles and needs pass up, such as a home's load to the grid operator.</p>
 <p class="lx-hint">With JavaScript on, you work through this step by step: a zoom through five scenes, five sorts and one question about a campus.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real numbers:</b> a U.S. home's average draw is EIA's 10,791 kWh a year (<a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">2022 data</a>) ÷ 8,760 hours; the Southwest Power Pool's 2025 peak is from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>; the Lower 48 record is EIA's <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">preliminary figure</a>.<br><b>Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland</b> are fictional; their sizes are illustrative.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Home:</b> EIA's 10,791 kWh a year bought per residential customer (<a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">2022 data</a>) ÷ 8,760 hours.<br><b>Southwest Power Pool:</b> its 2025 peak, from <a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>.<br><b>Lower 48:</b> EIA's <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">preliminary record</a>.<br><b>Fictional:</b> Prairie Town, Prairie Campus, the Plains Grid, Prairie City and Prairieland; their sizes are illustrative. Prairie Town's 450 MW is the highest hour of its illustrative year.</span></p>
 ```
 :::
 
@@ -140,9 +147,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="f1-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>A scale</dt><dd>A level of the system with its own decision makers, decisions and physics; not just a size on the map. A <span class="lx-term" data-term="microgrid">microgrid</span> (S1) can even <span class="lx-term" data-term="islanding">island</span>.</dd>
+<dt>A scale</dt><dd>A view of the system with its own decision makers, decisions and physics, not just a size on the map. A <span class="lx-term" data-term="microgrid">microgrid</span> (S1) can even <span class="lx-term" data-term="islanding">island</span>.</dd>
 <dt>Who decides</dt><dd>An owner (S0), a campus or co-op (S1), a grid operator (S2), a city (S3), a nation (S4).</dd>
-<dt>Between scales</dt><dd>Prices, tariffs, limits and targets pass down; load profiles, flexibility and needs pass up.</dd>
+<dt>Between scales</dt><dd>Prices, tariffs, limits and targets usually pass down, such as a utility's tariff to a home; load profiles, flexibility and needs pass up.</dd>
 <dt>Local optimum</dt><dd>The best plan for one scale, a <span class="lx-term" data-term="local-optimum">local optimum</span>, holds only inside its boundary; a limit from the scale above can change it.</dd>
 </dl>
 </div>
@@ -167,23 +174,17 @@ The five scales are a lens for questions, not an organisation chart.
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>Linking models across scales</summary>
+<summary><span class="k">Go deeper · Modeler</span>Linking models across scales: a preview</summary>
 <div class="lx-deeper-body">
 ```
 
-A model of one scale takes the arrows from other scales as **parameters**: given data, not decisions. For example, a campus model keeps its export to the feeder under the limit passed down from the grid:
+A model of one scale takes the arrows from other scales as **given data**, not as its own decisions: the Given bin of [lesson 10](10-write-it-down.html). The campus question, in words:
 
-$$
-x_t \;\le\; \bar{X} \quad \text{for every hour } t
-$$
+- **Decision:** how much the campus exports in each hour.
+- **Goal:** the cheapest campus plan.
+- **Rule passed down from the grid:** in every hour, export (MW) ≤ the feeder's export limit (MW).
 
-with $x_t$ the campus's export in hour $t$ (MW) and $\bar{X}$ the feeder's export limit (MW). Three ways to link scales:
-
-- **One way.** Fix the other scale's numbers as data. Simple, but blind to feedback.
-- **Back and forth.** Run two models in turn, passing results until they agree (soft-linking).
-- **One model.** Put both scales in one optimization. Consistent, but larger and slower.
-
-Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capstone C1 (upcoming) asks who pays.
+When two scales' models pass numbers back and forth, a modeler must check whether their answers settle; they may not. Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capstone C1 (upcoming) asks who pays.
 
 ```{=html}
 </div>
@@ -214,7 +215,7 @@ Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capston
 <div class="lx-qq" data-id="size" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A scale is just a size on the map.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A scale is set by who decides what and which physics a model needs: Prairie City and the Plains Grid cover the same land.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A scale is set by who decides what and which physics a model needs. Prairie City lies inside the Plains Grid's area, yet the city and the grid operator decide different things.</p></details>
 </div>
 <div class="lx-qq" data-id="local" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The cheapest plan for one campus is also the best plan for the grid it sits on.”</p>
@@ -237,12 +238,12 @@ Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capston
 <div class="lx-qq" data-id="reserve" data-answer="c">
 <p class="lx-qtext">An operator calls on reserves after a large plant trips. Which scale?</p>
 <ul class="lx-choices"><li data-value="a">S0 Device and plant</li><li data-value="b">S1 Microgrid and community</li><li data-value="c">S2 Regional grid</li><li data-value="d">S4 Nation</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>S2: reserves keep a whole synchronous grid in balance (lesson 3).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>S2: the regional operator holds reserves to keep supply and demand balanced in its area (lesson 3).</p></details>
 </div>
 <div class="lx-qq" data-id="code" data-answer="d">
 <p class="lx-qtext">A county requires new homes to be wired for heat pumps and EV chargers. Which scale?</p>
 <ul class="lx-choices"><li data-value="a">S0 Device and plant</li><li data-value="b">S2 Regional grid</li><li data-value="c">S4 Nation</li><li data-value="d">S3 City and region</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>S3: building codes are a city or county decision, and they shape demand for years.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>S3: here the county sets the building code, and that shapes demand for years.</p></details>
 </div>
 <div class="lx-qq" data-id="stocks" data-answer="a">
 <p class="lx-qtext">A ministry decides how many days of oil imports to keep in emergency storage. Which scale?</p>
@@ -250,14 +251,14 @@ Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capston
 <details class="lx-answer"><summary>Answer</summary><p>S4: emergency fuel stocks are a national security decision.</p></details>
 </div>
 <div class="lx-qq" data-id="physics" data-answer="b">
-<p class="lx-qtext">Which physics does a regional grid model need that a one-home model does not?</p>
+<p class="lx-qtext">Which physics might a regional grid model need that a one-home scheduling model usually leaves out?</p>
 <ul class="lx-choices"><li data-value="a">A battery's state of charge</li><li data-value="b">Power flow on lines and the grid's frequency</li><li data-value="c">The efficiency of a heat pump</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Power flow and frequency: a regional grid is one synchronous network. A home model needs its devices, not the network.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Power flow on lines, and the grid's frequency when a study looks at fast disturbances. A home scheduling model needs its devices, not the network.</p></details>
 </div>
 <div class="lx-qq" data-id="arrow" data-answer="c">
-<p class="lx-qtext">Which of these travels down the ladder, from a larger scale to a smaller one?</p>
-<ul class="lx-choices"><li data-value="a">A home's hourly load</li><li data-value="b">A city's demand forecast</li><li data-value="c">A tariff</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>A tariff: prices, tariffs, limits and targets pass down; loads, forecasts and needs pass up.</p></details>
+<p class="lx-qtext">Which of these is usually sent down, from a larger scale to a smaller one?</p>
+<ul class="lx-choices"><li data-value="a">A home's hourly load, sent to the grid operator</li><li data-value="b">A city's demand forecast, sent to regional planners</li><li data-value="c">A utility's tariff, sent to its customers</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>The tariff: prices, limits and targets usually pass down; loads, forecasts and needs pass up.</p></details>
 </div>
 </div>
 ```
@@ -275,7 +276,7 @@ Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capston
 <table class="lx-facts">
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><td class="n">1.2 kW</td><td>A U.S. home's average draw: 10,791 kWh a year ÷ 8,760 hours (S0).</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA, FAQ: How much electricity does an American home use?</a> · 2022 data</td></tr>
+<tr><td class="n">1.2 kW</td><td>Electricity bought per U.S. residential customer, as average power: 10,791 kWh a year ÷ 8,760 hours (S0). Power made on site, such as rooftop solar, is not counted.</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">EIA, FAQ: How much electricity does an American home use?</a> · 2022 data, read 3 November 2026</td></tr>
 <tr><td class="n">54.4 GW</td><td>The Southwest Power Pool's highest hour of demand in 2025 (S2).</td><td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA, Hourly Electric Grid Monitor (Form EIA-930)</a> · 2025 data, read November 2026</td></tr>
 <tr><td class="n">759,180 MW</td><td>The Lower 48 states' record hour of demand, 29 July 2025 (S4).</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · 5 August 2025, preliminary data</td></tr>
 </tbody>
@@ -297,13 +298,17 @@ Modeler lesson M5 (upcoming) adds the feeder's limit to a campus design; capston
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>In the United States, the day-to-day balance of each region's grid is run by a balancing authority, usually a utility or a regional transmission organization; cities and states shape demand and siting, and national rules set the frame.</p>
+<ol>
+<li><b>Grids:</b> the Lower 48 states have three main interconnections, which rarely trade power with each other.</li>
+<li><b>Operators:</b> within them, balancing authorities, mostly utilities, run the day-to-day balance of their own regions.</li>
+<li><b>Cities, states, nation:</b> cities and states shape demand and siting; national rules set the frame.</li>
+</ol>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
-<li>EIA. <a href="https://www.eia.gov/energyexplained/electricity/delivery-to-consumers.php">Electricity explained: How electricity is delivered to consumers</a>: balancing authorities manage the day-to-day operation of the grid in their regions. Read 3 November 2026.</li>
-<li>EIA. <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">Frequently Asked Questions: How much electricity does an American home use?</a> 2022 data.</li>
+<li>EIA. <a href="https://www.eia.gov/energyexplained/electricity/delivery-to-consumers.php">Electricity explained: How electricity is delivered to consumers</a>: the Lower 48's three main interconnections; balancing authorities, mostly utilities, manage the day-to-day operation of the grid in their regions. Read 3 November 2026.</li>
+<li>EIA. <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">Frequently Asked Questions: How much electricity does an American home use?</a> Electricity sold to (purchased by) a residential utility customer, 2022 data.</li>
 <li>EIA (2025). <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">U.S. electricity peak demand set new records twice in July</a>. Today in Energy, 5 August 2025.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool's 2025 demand.</li>
 </ul>

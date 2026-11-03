@@ -50,7 +50,9 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 .f2-stage { background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 16px; }
 .f2-task { font-family: var(--lx-f-display); font-size: 16px; font-weight: 500; color: var(--lx-ink); }
 .f2-sub { font-family: var(--lx-f-display); font-weight: 500; color: var(--lx-ink); }
-.f2-about { font-size: 13.5px; }
+.f2-about { font-size: 13.5px; display: grid; gap: 3px; margin: 0; }
+.f2-about > div { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 8px; }
+.f2-about dt { font-weight: 600; color: var(--lx-ink-2); } .f2-about dd { margin: 0; }
 /* station 1: stocks and flows */
 .f2-sf { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr); grid-template-areas: "tub panel" "charts panel"; gap: 14px 22px; align-items: start; }
 .f2-sf-tub { grid-area: tub; display: grid; gap: 8px; } .f2-sf-panel { grid-area: panel; } .f2-sf-charts { grid-area: charts; display: grid; gap: 8px; min-width: 0; }
@@ -178,23 +180,25 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 <div class="lx-fallback">
 <p class="lx-eyebrow">The lab's three stations, in brief</p>
 <dl class="lx-ideas">
-<dt>Stocks and flows</dt><dd>A reservoir holding up to 350 GWh, fed by a river averaging 101 MW, gets through the year without spilling or running dry only with a steady release from 100 to 115 MW (the slider moves in 5 MW steps). A 25 MW, 100 MWh battery that loses 20% on charging must buy 125 MWh to deliver 100. If Prairieland halves its 100 Mt a year by 2035 and holds there, its cumulative CO₂ still rises, from 825 Mt to 2,575 Mt by 2070, past a 1,500 Mt budget.</dd>
+<dt>A reservoir</dt><dd>Holding up to 350 GWh and fed by a river averaging 101 MW, it gets through the year without spilling or running dry only with a steady release from 100 to 115 MW (the slider moves in 5 MW steps).</dd>
+<dt>A battery</dt><dd>A 25 MW, 100 MWh battery that loses 20% on charging must buy 125 MWh to deliver 100.</dd>
+<dt>A carbon budget</dt><dd>If Prairieland halves its 100 Mt a year by 2035 and holds there, its cumulative emissions still rise, from 825 Mt to 2,575 Mt by 2070, past a 1,500 Mt budget.</dd>
 <dt>Feedback loops</dt><dd>More EVs bring more chargers, which bring more EVs: a reinforcing loop. Longer queues at chargers slow the growth, and the rebound effect takes back part of an efficiency saving: balancing loops.</dd>
 <dt>The system map</dt><dd>Each of four levers reaches technology, cost, emissions, people and security within three waves.</dd>
 </dl>
 <div class="lx-scroll-x"><table class="lx-mini-table f2-fbt">
 <thead><tr><th scope="col">Lever</th><th scope="col">First wave</th><th scope="col">Later waves</th></tr></thead>
 <tbody>
-<tr><td>Gas price doubles</td><td>Wholesale price rises; gas heating costs more; import bill rises</td><td>Plant mix shifts; CO₂ depends on what replaces gas; energy burden rises; investment shifts and import exposure falls</td></tr>
-<tr><td>A heat wave</td><td>Demand rises; lines carry less; heat health risk rises</td><td>Spare capacity falls; prices and CO₂ rise; bills and burden rise later; more capacity gets built</td></tr>
-<tr><td>A carbon price</td><td>Gas plants can move ahead of coal plants; wholesale price rises</td><td>CO₂ and local pollution fall; bills rise; the burden depends on the revenue; jobs shift</td></tr>
-<tr><td>A new data center</td><td>Demand rises; it needs new connections; jobs and tax base rise; cooling water depends on the design</td><td>Spare capacity falls until new supply connects; CO₂ depends on what serves it; who pays for upgrades depends on the tariff</td></tr>
+<tr><td>Gas price doubles</td><td>Wholesale price rises; gas heating costs more; the gas import bill rises</td><td>Plant mix shifts; CO₂ depends on what replaces gas; energy burden rises; investment shifts and dependence on imported gas falls</td></tr>
+<tr><td>A heat wave</td><td>Demand rises; lines carry less; spare capacity falls; heat-related health risk rises</td><td>Prices and CO₂ can rise; bills and burden can rise later; tight hours can encourage new capacity</td></tr>
+<tr><td>A carbon price</td><td>Gas plants can move ahead of coal plants; wholesale price rises</td><td>If gas replaces coal, CO₂ and local pollution fall; bills rise if the tariff passes the price on; the burden depends on the revenue; jobs shift</td></tr>
+<tr><td>A new data center</td><td>Demand rises; it needs new connections; spare capacity falls when it connects; jobs and tax base can rise; cooling water depends on the design</td><td>CO₂ depends on what serves it; who pays for upgrades depends on the tariff; new supply may follow</td></tr>
 </tbody>
 </table></div>
 <p class="lx-hint">With JavaScript on, you run these yourself: three tanks, two loops and four levers.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Tanks:</b> the reservoir, the battery (lesson 9's, illustrative) and Prairieland's budget are illustrative; Mt = million tonnes, GWh = a thousand MWh.<br><b>Map:</b> first-round directions of change, other things equal, for a grid like the Plains Grid; a thinking tool that states no sizes. The data center is an illustrative 300 MW load.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Tanks:</b> the reservoir, lesson 9's battery and Prairieland's budget are illustrative.<br><b>Units:</b> Mt = million tonnes; GWh = a thousand MWh.<br><b>Map:</b> first-round directions of change, other things equal, for a grid like the Plains Grid; it states no sizes.<br><b>Waves:</b> steps in tracing causes; each label says roughly when a step plays out.<br><b>Data center:</b> an illustrative 300 MW load.</span></p>
 ```
 :::
 
@@ -210,8 +214,8 @@ body.page-learn.quarto-dark { --f2-tech: #7CA6EE; --f2-cost: #E2A445; --f2-env: 
 <dt>Stock</dt><dd>A <span class="lx-term" data-term="stock">stock</span> is an amount that builds up or drains: water, stored energy, cumulative CO₂, cars on the road.</dd>
 <dt>Flow</dt><dd>A <span class="lx-term" data-term="flow">flow</span> is a rate that fills or drains a stock; only flows change a stock.</dd>
 <dt>Reinforcing loop</dt><dd>An even number of − links round a <span class="lx-term" data-term="feedback-loop">feedback loop</span>: change feeds itself (<span class="lx-term" data-term="reinforcing-loop">reinforcing</span>).</dd>
-<dt>Balancing loop</dt><dd>An odd number of − links: change is pulled back toward a level (<span class="lx-term" data-term="balancing-loop">balancing</span>).</dd>
-<dt>Ripple</dt><dd>One change spreads in waves, with delays, across technology, cost, emissions, people and security.</dd>
+<dt>Balancing loop</dt><dd>An odd number of − links: the loop opposes the change that started it (<span class="lx-term" data-term="balancing-loop">balancing</span>); with long delays it can overshoot.</dd>
+<dt>Ripple</dt><dd>One change spreads step by step across technology, cost, emissions, people and security: some effects at once, some years later.</dd>
 </dl>
 </div>
 </div>
@@ -229,7 +233,8 @@ Many slow, hard questions are questions about stocks.
 - **Equipment.** Power plants, buildings, cars and boilers last for decades, so today's choices stay in the stock long after: new purchases are the inflow, retirements the outflow. National pathways track this (Analyst lesson A20, Modeler lesson M13, upcoming).
 - **Fuel.** Gas in storage and emergency oil stocks buffer a supply shock (Analyst lesson A21, upcoming).
 - **Stored energy.** Reservoirs and batteries move energy in time ([lesson 9](09-storage.html); Analyst lesson A8, upcoming).
-- **CO₂ in the air.** Warming tracks cumulative CO₂: the IPCC's best estimate is 0.45 °C for each 1,000 Gt of CO₂ (likely 0.27 to 0.63 °C), and stabilising human-induced warming requires net zero CO₂.
+- **Cumulative CO₂ emissions.** Warming tracks them: the IPCC's best estimate is 0.45 °C for each 1,000 Gt of CO₂ (Gt = billion tonnes; likely 0.27 to 0.63 °C).
+- **Net zero.** Stabilising human-induced warming requires [net zero]{.lx-term term="net-zero"} CO₂. The lab's counter records emissions only; land and oceans absorb part, so the CO₂ left in the air is a different stock.
 
 ```{=html}
 </div>
@@ -242,16 +247,20 @@ Many slow, hard questions are questions about stocks.
 A stock is a state variable that carries over from one step to the next:
 
 $$
-S_{t+1} = S_t + \Delta t \,\big(\mathit{in}_t - \mathit{out}_t\big), \qquad 0 \le S_t \le \bar{S}
+S_{t+1} = S_t + \big(\mathit{in}_t - \mathit{out}_t\big)\,\Delta t, \qquad 0 \le S_t \le \bar{S}
 $$
 
-with $S_t$ the stock (GWh, MWh or Mt), $\mathit{in}_t$ and $\mathit{out}_t$ the flows (MW or Mt a year), $\Delta t$ the step (hours or years) and $\bar{S}$ the ceiling. The battery's rule in [lesson 9](09-storage.html) is the same equation with an efficiency on the inflow.
+with $S_t$ the stock, $\mathit{in}_t$ and $\mathit{out}_t$ the flows, $\Delta t$ the step and $\bar{S}$ the ceiling. Flow × time must come out in the stock's unit:
 
-Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{dx}{dt} = r\,x$ (growth or decline at rate $r$, per year); a balancing loop like $\tfrac{dx}{dt} = (x^{*} - x)/\tau$ (pulled toward a level $x^{*}$ with a time constant $\tau$, in years).
+- **Reservoir:** change in GWh = (river in − release, in MW) × 168 hours ÷ 1,000, since 1 GWh = 1,000 MWh.
+- **Carbon:** change in Mt = emissions in Mt a year × 1 year.
+- **Battery:** the rule of [lesson 9](09-storage.html), with an efficiency on the inflow.
 
-- **Simulation** steps such equations forward from given decisions: system dynamics.
+A loop appears when a flow depends on a stock, such as sales that depend on the EVs already on the road.
+
+- **Simulation** steps such rules forward from given decisions; system dynamics, one method family in [R3](r03-system-and-method.html), writes the loops as equations.
 - **Optimization** chooses the decisions ([lessons 10 to 13](10-write-it-down.html)).
-- Which one a study needs is Researcher lesson [R3](r03-system-and-method.html).
+- Which one a study needs is Researcher lesson R3.
 
 ```{=html}
 </div>
@@ -262,7 +271,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <ul>
 <li>Sizes: the map shows directions, not how much. Sizes need a model with data, prices and rules (Analyst and Modeler tiers).</li>
 <li>Place and time: the same lever plays out differently in another region, market or year.</li>
-<li>Many more links: a real system has far more parts and loops than fourteen cards and two diagrams.</li>
+<li>Many more links: a real system has far more parts and loops than fifteen cards and two diagrams.</li>
 <li>Who decides: each ripple crosses the scales of <a href="f01-five-scales.html">F1</a>, and trade-offs between goals are Analyst lesson <a href="a22-tradeoff-explorer.html">A22</a>.</li>
 </ul>
 </div>
@@ -282,12 +291,12 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <div class="lx-qq" data-id="inflow" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If the inflow to a stock is falling, the stock is falling.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. A stock falls only when its outflow exceeds its inflow. Tests of this idea trip up many well-educated adults (Booth Sweeney and Sterman, 2000).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. A stock falls only when its outflow exceeds its inflow. In one test, business-school students new to these ideas showed a poor grasp of stocks and flows (Booth Sweeney and Sterman, 2000).</p></details>
 </div>
 <div class="lx-qq" data-id="steady" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Holding CO₂ emissions steady holds the warming they cause steady.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Warming tracks cumulative CO₂, a stock: steady emissions keep adding to it. The IPCC finds net zero CO₂ is required to stabilise human-induced warming.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Warming tracks cumulative CO₂ emissions, a stock: steady emissions keep adding to it. The IPCC finds net zero CO₂ is required to stabilise human-induced warming.</p></details>
 </div>
 <div class="lx-qq" data-id="growth" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A reinforcing loop always means growth.”</p>
@@ -297,7 +306,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <div class="lx-qq" data-id="rebound" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If people use a more efficient appliance more, the efficiency gain is wasted.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, for most household uses: reviews put the direct rebound for household energy services in OECD countries below 30%, so most of the saving is kept (Sorrell et al., 2009).</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth: one review concludes that the direct rebound for household energy services in OECD (mostly high-income) countries should generally be less than 30%, so most of the saving is kept (Sorrell et al., 2009).</p></details>
 </div>
 </div>
 
@@ -310,7 +319,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <div class="lx-qq" data-id="solarloop" data-answer="b">
 <p class="lx-qtext">More rooftop solar → lower midday prices → less income per new panel → less new rooftop solar. Which kind of loop?</p>
 <ul class="lx-choices"><li data-value="a">Reinforcing</li><li data-value="b">Balancing</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Balancing: one − link (more solar, lower prices), so the loop pulls back on its own growth.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Balancing: one − link (more solar, lower prices), so the loop pushes back on its own growth.</p></details>
 </div>
 <div class="lx-qq" data-id="heat" data-answer="a">
 <p class="lx-qtext">Why does a heat wave squeeze spare capacity from both sides?</p>
@@ -318,9 +327,9 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <details class="lx-answer"><summary>Answer</summary><p>Demand rises for cooling while hot lines sag and carry less and some thermal plants lose output: both sides of the balance move against the grid.</p></details>
 </div>
 <div class="lx-qq" data-id="wave2" data-answer="b">
-<p class="lx-qtext">A 300 MW data center connects. Which is a second-wave effect rather than a first?</p>
-<ul class="lx-choices"><li data-value="a">Demand rises in every hour</li><li data-value="b">Spare capacity shrinks until new supply connects</li><li data-value="c">It needs a new connection</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Spare capacity shrinks because demand rose first: a ripple travels from one card to the next.</p></details>
+<p class="lx-qtext">A 300 MW data center connects, and no new supply comes with it. When does spare capacity shrink?</p>
+<ul class="lx-choices"><li data-value="a">Years later, after a second event</li><li data-value="b">At once, as soon as the load connects</li><li data-value="c">Never: demand and supply are separate</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>At once: the extra demand uses up spare capacity when it connects. The map's waves trace causes in order; they are not always apart in time.</p></details>
 </div>
 <div class="lx-qq" data-id="sizes" data-answer="c">
 <p class="lx-qtext">The map says bills “rise” after a carbon price. What would you need to say by how much?</p>
@@ -344,7 +353,7 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">0.45 °C</td><td>Best estimate of the warming caused by each 1,000 Gt of cumulative CO₂ (likely 0.27 to 0.63 °C): warming follows the stock.</td><td class="s"><a href="https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WGI_SPM.pdf">IPCC AR6 WG I, Summary for Policymakers, D.1.1, p. 28</a> · 2021</td></tr>
-<tr><td class="n">30%</td><td>Upper end of most estimates of the direct rebound for household energy services in OECD countries.</td><td class="s"><a href="https://doi.org/10.1016/j.enpol.2008.11.026">Sorrell, Dimitropoulos and Sommerville, Energy Policy</a> · 2009</td></tr>
+<tr><td class="n">30%</td><td>One review's conclusion: the direct rebound for household energy services in OECD countries should generally be less than this.</td><td class="s"><a href="https://doi.org/10.1016/j.enpol.2008.11.026">Sorrell, Dimitropoulos and Sommerville, Energy Policy</a> · 2009, abstract</td></tr>
 <tr><td class="n">759,180 MW</td><td>The Lower 48 states' record hour of demand, on 29 July 2025, in hot weather.</td><td class="s"><a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">EIA, Today in Energy</a> · 5 August 2025, preliminary data</td></tr>
 <tr><td class="n">4.4%</td><td>Share of U.S. electricity used by data centers in 2023: a load the system map treats like any other.</td><td class="s"><a href="https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers">U.S. DOE, on a Lawrence Berkeley National Laboratory report</a> · 20 December 2024</td></tr>
 </tbody>
@@ -366,20 +375,23 @@ Loops become feedback in the equations. A reinforcing loop behaves like $\tfrac{
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Feedback between cars and chargers has been measured: in 353 U.S. metro areas from 2011 to 2013, EV sales and charging stations each raised the other (Li et al., 2017). Real studies size such loops with data; the lab only shows their shape.</p>
+<ol>
+<li><b>Measured:</b> a study of 353 U.S. metro areas, 2011 to 2013, found effects running both ways, stronger on the car-buying side: chargers drew EV buyers, and EVs drew chargers (Li et al., 2017, abstract).</li>
+<li><b>Sized with data:</b> real studies measure how strong such loops are; the lab only shows their shape.</li>
+</ol>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
 <ul>
 <li>IPCC (2021). <a href="https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WGI_SPM.pdf">Summary for Policymakers</a>. In Climate Change 2021: The Physical Science Basis, paragraph D.1.1, p. 28.</li>
-<li>Booth Sweeney, L. and Sterman, J. D. (2000). <a href="https://doi.org/10.1002/sdr.198">Bathtub dynamics: initial results of a systems thinking inventory</a>. System Dynamics Review 16(4), 249–286.</li>
-<li>Sorrell, S., Dimitropoulos, J. and Sommerville, M. (2009). <a href="https://doi.org/10.1016/j.enpol.2008.11.026">Empirical estimates of the direct rebound effect: A review</a>. Energy Policy 37(4), 1356–1371.</li>
-<li>Li, S., Tong, L., Xing, J. and Zhou, Y. (2017). <a href="https://doi.org/10.1086/689702">The Market for Electric Vehicles: Indirect Network Effects and Policy Design</a>. Journal of the Association of Environmental and Resource Economists 4(1), 89–133.</li>
+<li>Booth Sweeney, L. and Sterman, J. D. (2000). <a href="https://doi.org/10.1002/sdr.198">Bathtub dynamics: initial results of a systems thinking inventory</a>. System Dynamics Review 16(4), 249–286. Abstract read; the full text is not openly readable.</li>
+<li>Sorrell, S., Dimitropoulos, J. and Sommerville, M. (2009). <a href="https://doi.org/10.1016/j.enpol.2008.11.026">Empirical estimates of the direct rebound effect: A review</a>. Energy Policy 37(4), 1356–1371. Abstract read; the full text is not openly readable.</li>
+<li>Li, S., Tong, L., Xing, J. and Zhou, Y. (2017). <a href="https://doi.org/10.1086/689702">The Market for Electric Vehicles: Indirect Network Effects and Policy Design</a>. Journal of the Association of Environmental and Resource Economists 4(1), 89–133. Abstract read.</li>
 <li>NERC (2025). <a href="https://www.nerc.com/pa/RAPA/ra/Reliability%20Assessments%20DL/NERC_SRA_2025.pdf">2025 Summer Reliability Assessment</a> (PDF), Table 3, p. 14: derates of thermal plants in extreme heat reduce available supply.</li>
 <li>U.S. DOE (2019). <a href="https://www.energy.gov/sites/prod/files/2019/08/f66/Congressional_DLR_Report_June2019_final_508_0.pdf">Dynamic Line Rating: Report to Congress</a> (PDF), p. 11: a line's thermal limit depends on air temperature, wind and sunshine.</li>
 <li>EIA (2025). <a href="https://www.eia.gov/todayinenergy/detail.php?id=65864">U.S. electricity peak demand set new records twice in July</a>. Today in Energy, 5 August 2025.</li>
 <li>U.S. DOE (2024). <a href="https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers">DOE Releases New Report Evaluating Increase in Electricity Demand from Data Centers</a>. 20 December 2024.</li>
-<li>Further reading (books): Meadows, D. H. (2008). Thinking in Systems: A Primer. Chelsea Green. Sterman, J. D. (2000). Business Dynamics: Systems Thinking and Modeling for a Complex World. Irwin/McGraw-Hill.</li>
+<li>Further reading (books): Meadows, D. H. (2008). Thinking in Systems: A Primer. Chelsea Green. Sterman, J. D. (2000). Business Dynamics: Systems Thinking and Modeling for a Complex World. Irwin/McGraw-Hill: how loops with delays can overshoot and oscillate.</li>
 </ul>
 </div>
 ```
