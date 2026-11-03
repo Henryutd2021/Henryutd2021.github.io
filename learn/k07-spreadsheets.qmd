@@ -44,7 +44,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .k7-tasks li.done { color: var(--lx-good); }
 .k7-tasks li.done::marker { content: "✓ "; }
 .k7-hint { display: inline-block; margin-left: 6px; font-size: 13.5px; }
-.k7-hint summary { cursor: pointer; color: var(--lx-ink-3); }
+.k7-hint summary { cursor: pointer; color: var(--lx-ink-3); padding: 4px 0; }   /* 28 px high: a phone-sized tap target */
 .page-learn .k7-hint code { font-family: var(--lx-f-mono); background: var(--lx-surface-2) !important; color: var(--lx-ink) !important; padding: 1px 6px; border-radius: 5px; }
 .k7-static { border-collapse: collapse; font-family: var(--lx-f-mono); font-size: 13.5px; }
 .k7-static th, .k7-static td { border: 1px solid var(--lx-line); padding: 4px 8px; text-align: right; }
