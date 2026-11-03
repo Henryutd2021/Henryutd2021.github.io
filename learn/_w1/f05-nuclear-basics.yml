@@ -1,0 +1,57 @@
+# Sidecar for F5 (f05-nuclear-basics), builder learn-w3-a (F5 fork), 2026-11-03. Read by scripts/build_learn.py.
+id: f05-nuclear-basics
+lesson: F5
+glossary:
+  - id: fission
+    term: Fission
+    def: "The splitting of a heavy atom, such as uranium-235, into two smaller atoms when it absorbs a neutron, which releases heat and a few new neutrons."
+  - id: neutron
+    term: Neutron
+    def: "A particle with no electric charge in the nucleus of an atom; in a reactor, the neutrons from one fission go on to split more atoms."
+  - id: chain-reaction
+    term: Chain reaction
+    def: "A run of fissions in which the neutrons from each split go on to split more atoms; a reactor holds it steady, each generation as large as the last."
+  - id: multiplication-factor
+    term: Multiplication factor (k)
+    def: "In a chain reaction, the number of new fissions each fission leads to on average: below 1 the chain dies out, at 1 it holds steady, above 1 it grows."
+  - id: criticality
+    term: Critical (of a reactor)
+    def: "The steady state of a chain reaction, with a multiplication factor of exactly 1; it is a reactor's normal operating state, not an emergency."
+  - id: moderator
+    term: Moderator
+    def: "A material, such as ordinary water or graphite, that slows the fast neutrons from fission so that uranium-235 captures them more easily."
+  - id: control-rod
+    term: Control rod
+    def: "A rod of neutron-absorbing material that is pushed into a reactor core to slow the chain reaction, or pulled out to speed it up."
+  - id: coolant
+    term: Coolant
+    def: "The fluid, such as water, helium, liquid sodium or molten salt, that carries heat away from a reactor core."
+  - id: fuel-assembly
+    term: Fuel assembly
+    def: "A bundle of fuel rods, each a sealed metal tube of stacked uranium pellets, loaded into a reactor core as one unit."
+  - id: enrichment
+    term: Enrichment (of uranium)
+    def: "Raising the share of uranium-235 in uranium: natural uranium has just over 0.7%, and power-plant fuel in the United States 3% to 5%."
+  - id: steam-generator
+    term: Steam generator
+    def: "A heat exchanger in which hot water from a reactor's sealed loop boils the water of a second, separate loop into steam."
+  - id: outlet-temperature
+    term: Outlet temperature
+    def: "The temperature of the coolant as it leaves a reactor core; it sets how hot the heat is that a plant can supply."
+  - id: decay-heat
+    term: Decay heat
+    def: "Heat that the radioactive fission products in used fuel keep giving off after the chain reaction has stopped."
+  - id: spent-fuel
+    term: Spent fuel
+    def: "Fuel that has been used in a reactor and taken out; it is solid, highly radioactive and still warm, and is kept first in water pools, later in dry casks."
+  - id: passive-safety
+    term: Passive safety
+    def: "Safety features that rely on natural effects, such as hot fluid rising and cool fluid sinking, instead of pumps, outside power or operators."
+  - id: mwt-mwe
+    term: MWt and MWe
+    def: "Megawatts of heat (thermal) and megawatts of electricity (electric); a plant's MWe is its MWt times its efficiency."
+requests:
+  - "Allow-list request (curriculum §20.3): please add nrc.gov and iaea.org (primary nuclear regulator and agency sources; the W3 builder brief names NRC and IAEA as F5 sources). F5 uses only energy.gov and eia.gov links now; the DOE Fundamentals Handbook (DOE-HDBK-1019/1-93, on osti.gov, also not allow-listed) is cited in plain text without a link, for a sentence with no number."
+  - "Promote if later lessons want them (all lesson-local in assets/learn/f05-nuclear-basics.js, tokens only, with text versions): PlantDiagram (an annotated plant drawing with tappable parts, numbered markers mirrored by keyboard chips, a type toggle and an aria-live note: e-annotated, candidates F4, X1); HeatLadder (rows on a temperature axis against bands, rows as buttons: candidates A15 process heat by temperature, A16); ChainToy and FissionScene stay F5-only."
+  - "Scope: F5 cites no study of Henry's, links no repository, names no vendor or project, and mentions no costs, deployment, siting or data centers. Its Node test runs the nuclear-plus-risk sentence rule over every page sentence, JS string, JSON value and this sidecar's definitions, and fails on any data-center mention."
+  - "DOE's '3 Advanced Reactor Systems to Watch by 2030' (DOE NE, 2021) was read but not cited: its title names a year, which reads as deployment timing next to reactor terms. The same facts come from DOE's 2015 Quadrennial Technology Review assessments."

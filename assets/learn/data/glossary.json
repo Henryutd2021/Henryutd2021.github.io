@@ -209,6 +209,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "chain-reaction": {
+  "term": "Chain reaction",
+  "short": "A run of fissions in which the neutrons from each split go on to split more atoms; a reactor holds it steady, each generation as large as the last.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "checksum": {
   "term": "Checksum",
   "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
@@ -293,6 +299,18 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "control-rod": {
+  "term": "Control rod",
+  "short": "A rod of neutron-absorbing material that is pushed into a reactor core to slow the chain reaction, or pulled out to speed it up.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "coolant": {
+  "term": "Coolant",
+  "short": "The fluid, such as water, helium, liquid sodium or molten salt, that carries heat away from a reactor core.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "coordinate-reference-system": {
   "term": "Coordinate reference system (CRS)",
   "short": "The rule that ties map coordinates to places on Earth; some keep areas true, others keep distances, none keeps both everywhere.",
@@ -316,6 +334,12 @@
   "short": "A standard list of 14 names for what each author did, such as conceptualization (shaping the question), data curation (cleaning and documenting data) and formal analysis.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "criticality": {
+  "term": "Critical (of a reactor)",
+  "short": "The steady state of a chain reaction, with a multiplication factor of exactly 1; it is a reactor's normal operating state, not an emergency.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "cube-law": {
   "term": "Cube law",
@@ -382,6 +406,12 @@
   "short": "A linear approximation of real-power flows that sets each line's flow from the voltage-angle difference across it, holds voltage magnitudes fixed, assumes small angles, and leaves out losses and reactive power.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "decay-heat": {
+  "term": "Decay heat",
+  "short": "Heat that the radioactive fission products in used fuel keep giving off after the chain reaction has stopped.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "decision-analysis": {
   "term": "Decision analysis",
@@ -521,6 +551,12 @@
   "lesson": 9,
   "href": "09-storage.html"
  },
+ "enrichment": {
+  "term": "Enrichment (of uranium)",
+  "short": "Raising the share of uranium-235 in uranium: natural uranium has just over 0.7%, and power-plant fuel in the United States 3% to 5%.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "epsg-code": {
   "term": "EPSG code",
   "short": "A catalogue number that names one coordinate system exactly, such as EPSG:4326 for latitude and longitude in degrees.",
@@ -629,6 +665,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "fission": {
+  "term": "Fission",
+  "short": "The splitting of a heavy atom, such as uranium-235, into two smaller atoms when it absorbs a neutron, which releases heat and a few new neutrons.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "fixed-charge": {
   "term": "Fixed charge",
   "short": "A part of a power bill that is the same each month however much electricity the home uses.",
@@ -664,6 +706,12 @@
   "short": "A measurement feed stuck on its last value, which shows up as the same reading hour after hour.",
   "lesson": "B2",
   "href": "b02-python-data.html"
+ },
+ "fuel-assembly": {
+  "term": "Fuel assembly",
+  "short": "A bundle of fuel rods, each a sealed metal tube of stacked uranium pellets, loaded into a reactor core as one unit.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "fuel-cell": {
   "term": "Fuel cell",
@@ -1007,6 +1055,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "moderator": {
+  "term": "Moderator",
+  "short": "A material, such as ordinary water or graphite, that slows the fast neutrons from fission so that uranium-235 captures them more easily.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "monte-carlo": {
   "term": "Monte Carlo",
   "short": "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results.",
@@ -1019,11 +1073,23 @@
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "multiplication-factor": {
+  "term": "Multiplication factor (k)",
+  "short": "In a chain reaction, the number of new fissions each fission leads to on average: below 1 the chain dies out, at 1 it holds steady, above 1 it grows.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "mw-it": {
   "term": "MW-IT",
   "short": "Megawatts of a data center's computing equipment; the grid must supply more, for cooling and the rest of the building.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "mwt-mwe": {
+  "term": "MWt and MWe",
+  "short": "Megawatts of heat (thermal) and megawatts of electricity (electric); a plant's MWe is its MWt times its efficiency.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "nadir": {
   "term": "Nadir",
@@ -1060,6 +1126,12 @@
   "short": "A check that an option's total benefits across all affected parties exceed its total costs, each counted once.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "neutron": {
+  "term": "Neutron",
+  "short": "A particle with no electric charge in the nucleus of an atom; in a reactor, the neutrons from one fission go on to split more atoms.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "no-load-cost": {
   "term": "No-load cost",
@@ -1127,6 +1199,12 @@
   "lesson": "K1",
   "href": "k01-units.html"
  },
+ "outlet-temperature": {
+  "term": "Outlet temperature",
+  "short": "The temperature of the coolant as it leaves a reactor core; it sets how hot the heat is that a plant can supply.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "overnight-cost": {
   "term": "Overnight cost",
   "short": "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt.",
@@ -1144,6 +1222,12 @@
   "short": "The set of plans that cannot be made cheaper without becoming dirtier, or cleaner without becoming more expensive.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "passive-safety": {
+  "term": "Passive safety",
+  "short": "Safety features that rely on natural effects, such as hot fluid rising and cool fluid sinking, instead of pumps, outside power or operators.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "peak-demand": {
   "term": "Peak demand",
@@ -1451,6 +1535,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "spent-fuel": {
+  "term": "Spent fuel",
+  "short": "Fuel that has been used in a reactor and taken out; it is solid, highly radioactive and still warm, and is kept first in water pools, later in dry casks.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "staged-energization": {
   "term": "Staged energization",
   "short": "Switching on part of a large load's grid service early and the rest later, as the grid becomes ready.",
@@ -1492,6 +1582,12 @@
   "short": "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "steam-generator": {
+  "term": "Steam generator",
+  "short": "A heat exchanger in which hot water from a reactor's sealed loop boils the water of a second, separate loop into steam.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "stock": {
   "term": "Stock",
