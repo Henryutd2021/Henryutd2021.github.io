@@ -797,6 +797,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "minimum-down-time": {
+  "term": "Minimum down time",
+  "short": "The hours a plant must stay off once stopped before it may start again.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
  "minimum-run-time": {
   "term": "Minimum run time",
   "short": "The hours a plant must stay on once started; the minimum down time is the hours it must stay off once stopped.",
