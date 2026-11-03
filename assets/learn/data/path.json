@@ -335,7 +335,7 @@
     "starter": 5,
     "title": "Capacity factor: why is 1 MW not always 1 MW?",
     "short": "Capacity factor",
-    "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
+    "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
     "href": "05-capacity-factor.html",
     "ready": true
    }
@@ -355,7 +355,7 @@
    "slot": 1,
    "slot2": null,
    "minutes": 15,
-   "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
+   "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
    "outcome": "Turn a plant's size in MW into the energy it makes in a year.",
    "icon": "turbine",
    "form": "cards",
@@ -441,7 +441,7 @@
      "starter": 5,
      "title": "Capacity factor: why is 1 MW not always 1 MW?",
      "short": "Capacity factor",
-     "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
+     "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
      "href": "05-capacity-factor.html",
      "ready": true
     }
@@ -451,7 +451,7 @@
     "starter": 5,
     "title": "Capacity factor: why is 1 MW not always 1 MW?",
     "short": "Capacity factor",
-    "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
+    "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
     "href": "05-capacity-factor.html",
     "ready": true
    },
@@ -495,7 +495,7 @@
      "starter": 5,
      "title": "Capacity factor: why is 1 MW not always 1 MW?",
      "short": "Capacity factor",
-     "does": "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power.",
+     "does": "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power.",
      "href": "05-capacity-factor.html",
      "ready": true
     }

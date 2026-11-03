@@ -172,7 +172,7 @@
   teaches: [capacity factor, power and energy over a year, the wind power curve and the cube law]
   lab: "compute capacity factors from a year of hourly data in Python (bridge B2)."
   short: "Capacity factor"
-  does: "A year of output from nuclear, wind and solar plants of equal size; double the wind speed and get eight times the power."
+  does: "A year of output from nuclear, wind and solar plants of equal size; double a light wind's speed and get eight times the power."
   outcome: "Turn a plant's size in MW into the energy it makes in a year."
   after: [1]
 - kind: lesson
