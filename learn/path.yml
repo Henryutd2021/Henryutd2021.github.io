@@ -415,7 +415,24 @@
 - {kind: lesson, tier: analyst, title: "Reading energy data from EIA"}
 - {kind: lesson, tier: analyst, title: "Scenarios and sensitivity in a spreadsheet"}
 - {kind: lesson, tier: analyst, title: "How to read an energy study critically"}
-- {kind: lesson, tier: modeler, code: M2, title: "On or off? Unit commitment as a mixed-integer program"}
+- kind: lesson
+  id: m02-unit-commitment
+  path: m02-unit-commitment.qmd
+  code: M2
+  tier: modeler
+  form: cards
+  icon: lamp
+  status: active
+  minutes: 40
+  practice_minutes: 90   # the notebook's practice questions, after its 45-minute lab
+  title: "On or off? Unit commitment as a mixed-integer program"
+  subtitle: "Switch the gas plants on and off, grow a branch-and-bound tree, and see what the prices leave unpaid"
+  short: "Unit commitment"
+  outcome: "Formulate a unit commitment with start-up costs and minimum run times, solve it by branch and bound, and price it with the switches fixed, stating what the prices leave unpaid."
+  teaches: [unit commitment, mixed-integer programming, LP relaxation, branch and bound, conditional prices, uplift payments]
+  lab: "a SciPy/HiGHS notebook that rebuilds the model, grows the same tree and asserts the browser's numbers, about 45 minutes."
+  does: "Add start-up costs and minimum run times; watch the LP schedule become impossible to operate; grow a small branch-and-bound tree; see why a mixed-integer program has no shadow prices; fix the commitments and re-solve the dispatch LP for conditional prices, then count the uplift payments that start-up costs need."
+  after: [M1]
 - {kind: lesson, tier: modeler, code: M3, title: "What should be built? Capacity expansion with representative periods, validated"}
 - {kind: lesson, tier: modeler, code: M4, title: "Storage and coupled carriers: modelling power, hydrogen and heat together"}
 - {kind: lesson, tier: modeler, code: M5, title: "Size and run a microgrid that survives an outage"}

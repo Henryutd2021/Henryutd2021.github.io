@@ -102,6 +102,10 @@ function uc24(town, days, which) {
 //   t13week   lesson 13's planning LP on seven representative weeks with a 200 kt CO2 cap (the "Ask the optimizer" solve)
 //   t13full   lesson 13's full-year check: the optimizer's 200 kt plan, fixed, on all 8,760 hours (the debrief's check)
 //   b3        B3's correct four-hour dispatch (the page solves it and five planted bugs)
+//   m2milp    M2's unit commitment on the summer peak: 264 columns, 48 of them binary switches (step 5 and each of the
+//             step-6 staircase solves)
+//   m2relax   M2's root relaxation (the LP behind step 2 and the first node of the step-4 tree; the tree solves 11 like it)
+//   m2fixed   M2's dispatch LP with the switches fixed at the MILP's plan (step 7's conditional prices)
 function lessonSet(site) {
   const path = require("path"), fs = require("fs");
   const A = p => path.join(site, "assets/learn", p), J = p => JSON.parse(fs.readFileSync(A("data/" + p), "utf8"));
@@ -111,6 +115,8 @@ function lessonSet(site) {
   const D1 = J("m01-dispatch-to-lmp.json");
   const cfg = J("13-capstone.json"), Y = M13.prepareYear(year, targets, cfg, require(A("components/profiles.js")).townProfile);
   const RW = M13.selectWeeks(Y, cfg.weeks), C = M13.costs(cfg, {});
+  const M2 = require(A("m02-unit-commitment.js")), D2 = J("m02-unit-commitment.json");
+  const on2 = D2.day.demand.map((_, t) => (t >= 17 && t <= 22 ? 1 : 0));   // the MILP's plan: the peaker on 17:00-22:00
   const p200 = cfg.frontier.points.find(p => p.cap === 200), plan = M13.ceilPlan(p200.plan, cfg.limits);
   return [
     ["t11", "T11 day LP (lesson 11)", M11.buildLP(W11, M11.settings(), D11.penalty)],
@@ -118,6 +124,9 @@ function lessonSet(site) {
     ["t13week", "T13 seven-week plan LP, 200 kt", M13.weekModel(C, RW, { cap: 200e3 })],
     ["t13full", "T13 full-year check, fixed plan", M13.fullYearModel(C, Y, { plan })],
     ["b3", "B3 four-hour dispatch LP", B3.buildModel(B3.instance(town, year))],
+    ["m2milp", "M2 unit commitment MILP", M2.build(D2, { onoff: true })],
+    ["m2relax", "M2 root relaxation LP", M2.build(D2, { onoff: true, relax: true })],
+    ["m2fixed", "M2 LP with switches fixed", M2.build(D2, { onoff: true, relax: true, fix: M2.planFix(D2, on2) })],
   ];
 }
 

@@ -1,0 +1,36 @@
+# Sidecar for M2 (m02-unit-commitment), builder learn-w2-c, 2026-11-03. Read by scripts/build_learn.py (which reads
+# learn/_w1/ only, so the W2 sidecar lives here too).
+id: m02-unit-commitment
+lesson: M2
+glossary:
+  - id: lp-relaxation
+    term: LP relaxation
+    def: "The same model with every whole-number decision allowed to take any value in between, such as a switch anywhere from 0 to 1; its best cost is a lower bound for the real model."
+  - id: lower-bound
+    term: Lower bound
+    def: "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one."
+  - id: branch-and-bound
+    term: Branch and bound
+    def: "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found."
+  - id: minimum-stable-output
+    term: Minimum stable output
+    def: "The lowest output at which a running plant can operate steadily; below it the plant must switch off."
+  - id: start-up-cost
+    term: Start-up cost
+    def: "The fuel and wear spent to bring a plant from off to on, paid once per start."
+  - id: no-load-cost
+    term: No-load cost
+    def: "What a plant costs for each hour it is on, before it makes any power."
+  - id: minimum-run-time
+    term: Minimum run time
+    def: "The hours a plant must stay on once started; the minimum down time is the hours it must stay off once stopped."
+  - id: conditional-price
+    term: Conditional price
+    def: "A price read from a linear program in which the on/off decisions are held fixed; it holds only for that commitment."
+  - id: uplift
+    term: Uplift payment
+    def: "A payment outside the market price that covers costs a scheduled plant cannot recover at the price, such as start-up and no-load costs; also called a make-whole payment."
+requests:
+  - "M2 is live: link it where earlier pages still say upcoming. M1 (learn/m01-dispatch-to-lmp.qmd) Go deeper 'When a price is not unique' and 'What this model leaves out' say 'M2, upcoming'; lesson 11 (learn/11-solver.qmd, Go deeper on mixed-integer solves, and the flowchart node 'see lesson M2' in assets/learn/11-solver.js) says 'Lesson M2 (upcoming)'. Also add `next: M2` to M1's path.yml entry (its next box now says 'Back to the course map')."
+  - "Promote, if wanted: SwitchBoard (on/off switches of several units over 24 hours, fractional switches hatched, an hour picker and a text table) and TreeView with the pure tree engine (tree, treePending, treeAccept, treeBranch, treeBound, treeGap, treeRun, treeLayout) from assets/learn/m02-unit-commitment.js, as the curriculum's i-tree (M8 needs a scenario tree)."
+  - "scripts/learn_solver_bench.mjs: its usage line lists the --only ids; this branch adds m2milp, m2relax and m2fixed to lessonSet in _tests/learn/solver_models.js."

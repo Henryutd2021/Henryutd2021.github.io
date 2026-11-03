@@ -59,6 +59,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "branch-and-bound": {
+  "term": "Branch and bound",
+  "short": "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
  "bus": {
   "term": "Bus",
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
@@ -118,6 +124,12 @@
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "conditional-price": {
+  "term": "Conditional price",
+  "short": "A price read from a linear program in which the on/off decisions are held fixed; it holds only for that commitment.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
  },
  "congestion": {
   "term": "Congestion",
@@ -455,6 +467,18 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "lower-bound": {
+  "term": "Lower bound",
+  "short": "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
+ "lp-relaxation": {
+  "term": "LP relaxation",
+  "short": "The same model with every whole-number decision allowed to take any value in between, such as a switch anywhere from 0 to 1; its best cost is a lower bound for the real model.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
  "marginal-cost": {
   "term": "Marginal cost",
   "short": "What one more unit costs, here the extra running cost of one more megawatt-hour of demand.",
@@ -503,6 +527,18 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "minimum-run-time": {
+  "term": "Minimum run time",
+  "short": "The hours a plant must stay on once started; the minimum down time is the hours it must stay off once stopped.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
+ "minimum-stable-output": {
+  "term": "Minimum stable output",
+  "short": "The lowest output at which a running plant can operate steadily; below it the plant must switch off.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
  "mixed-integer-program": {
   "term": "Mixed-integer program",
   "short": "An optimization model in which some decisions must be whole numbers, such as a plant being on (1) or off (0).",
@@ -532,6 +568,12 @@
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "no-load-cost": {
+  "term": "No-load cost",
+  "short": "What a plant costs for each hour it is on, before it makes any power.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
  },
  "objective": {
   "term": "Objective",
@@ -749,6 +791,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "start-up-cost": {
+  "term": "Start-up cost",
+  "short": "The fuel and wear spent to bring a plant from off to on, paid once per start.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
+ },
  "state-of-charge": {
   "term": "State of charge",
   "short": "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next.",
@@ -808,6 +856,12 @@
   "short": "Demand that could not be met, so some customers lost power.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "uplift": {
+  "term": "Uplift payment",
+  "short": "A payment outside the market price that covers costs a scheduled plant cannot recover at the price, such as start-up and no-load costs; also called a make-whole payment.",
+  "lesson": "M2",
+  "href": "m02-unit-commitment.html"
  },
  "validation": {
   "term": "Validation",
