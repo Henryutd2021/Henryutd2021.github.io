@@ -191,7 +191,7 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null;
     E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
-    ["solver", "cards", "predict", "cardsort", "controls", "plot", "profiles"].forEach(n => load(n, E));
+    ["solver", "cards", "predict", "cardsort", "controls", "plot", "profiles", "solvestep"].forEach(n => load(n, E));
     let failing = true, calls = 0;
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
     slv.solve = m => { calls++; if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms); return Promise.resolve(r); };

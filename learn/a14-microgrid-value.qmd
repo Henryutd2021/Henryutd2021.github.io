@@ -48,11 +48,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a14-card b { font-family: var(--lx-f-mono); font-size: 20px; color: var(--lx-ink); }
 .a14-card .lx-hint { margin: 0; font-size: 12.5px; }
 .a14-tab th, .a14-tab td { text-align: left; vertical-align: top; font-size: 14px; padding: 4px 12px 4px 0; }
-.a14-tab td.n, .a14-ledger td.n { text-align: right; font-family: var(--lx-f-mono); white-space: nowrap; }
+.a14-tab td.n { text-align: right; font-family: var(--lx-f-mono); white-space: nowrap; }
 .a14-tab tr.best th, .a14-tab tr.best td { background: var(--lx-good-soft); }
-.a14-tab tr.tot th, .a14-tab tr.tot td, .a14-ledger tr.tot th, .a14-ledger tr.tot td { border-top: 1px solid var(--lx-line-2); font-weight: 600; }
-.a14-ledger th, .a14-ledger td { text-align: left; font-size: 14px; padding: 4px 10px 4px 0; }
-.a14-ledger td { font-family: var(--lx-f-body); }
+.a14-tab tr.tot th, .a14-tab tr.tot td { border-top: 1px solid var(--lx-line-2); font-weight: 600; }
+.a14-ledger td.who { font-family: var(--lx-f-body); }   /* the ledger (LX.Ledger): who gains or pays, in words */
 .a14-owner { display: grid; gap: 4px; margin: 6px 0; }
 .a14-owner p { margin: 0; font-size: 14.5px; }
 @media (max-width: 560px) { .a14-who { grid-template-columns: minmax(0, 1fr); } }

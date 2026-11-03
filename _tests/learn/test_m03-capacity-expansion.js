@@ -299,7 +299,7 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
     const { env, load } = require("./stubdom.js");
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null;
-    ["solver", "cards", "predict", "cardsort", "weekstrip", "planengine", "profiles"].forEach(n => load(n, E));
+    ["solver", "cards", "predict", "cardsort", "weekstrip", "planengine", "profiles", "solvestep"].forEach(n => load(n, E));
     let failIf = () => true, calls = 0;
     const slv = E.LX.solver;
     slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";

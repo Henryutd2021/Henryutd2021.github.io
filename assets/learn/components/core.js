@@ -14,8 +14,11 @@
                                    page's data-src): { href, ready, label } ("lesson 3" or "R2"; href null when unknown)
              LX.lessonRefHTML(P, code)  a link when path.json marks the lesson ready, else its label and "(upcoming)", so a
                                    page's links appear by themselves when a lesson goes live
+   Random:   LX.mulberry32(seed)    a small seeded generator (mulberry32, 32-bit): a function returning numbers in [0, 1);
+                                   the same seed gives the same numbers on every page, in Node and in the notebooks' Python
+                                   ports (promoted at the W3 integration from M7 and engine E1, which each had a copy)
    Also: the back-to-top guard (hides the site's button while it would cover lesson controls or any text) and course ticks.
-   Node: module.exports = { lessonRef, lessonRefHTML } (pure; the rest needs a browser). */
+   Node: module.exports = { lessonRef, lessonRefHTML, mulberry32 } (pure; the rest needs a browser). */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
@@ -30,12 +33,23 @@
     var r = lessonRef(P, code);
     return r.ready ? '<a href="' + escHTML(r.href) + '">' + escHTML(r.label) + "</a>" : escHTML(r.label) + " (upcoming)";
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { lessonRef: lessonRef, lessonRefHTML: lessonRefHTML };
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  if (typeof module !== "undefined" && module.exports) module.exports = { lessonRef: lessonRef, lessonRefHTML: lessonRefHTML, mulberry32: mulberry32 };
   if (typeof window === "undefined") return;
 
   var LX = window.LX = window.LX || {};
   LX.lessonRef = lessonRef;
   LX.lessonRefHTML = lessonRefHTML;
+  LX.mulberry32 = mulberry32;
   var NS = "http://www.w3.org/2000/svg";
   var me = document.currentScript && document.currentScript.src;
   LX.base = me ? me.replace(/[^/]*$/, "") : "../assets/learn/";

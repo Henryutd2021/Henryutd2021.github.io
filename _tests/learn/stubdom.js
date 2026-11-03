@@ -97,6 +97,7 @@ function env(opt) {
   LX.rich = t => LX.esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, (m, id, w) => '<span class="lx-term" data-term="' + id + '">' + w + "</span>");
   LX.icon = name => "<svg data-icon=\"" + name + "\"></svg>"; LX.emit = () => {}; LX.on = () => {}; LX.reduced = () => true; LX.onTheme = () => {};
   LX.clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  LX.mulberry32 = require(path.join(SITE, "assets/learn/components/core.js")).mulberry32;   // as core.js (W3: M7, engine E1)
   LX.store = { get: (k, d) => (k in store ? JSON.parse(store[k]) : d), set: (k, v) => { store[k] = JSON.stringify(v); } };
   LX.progress = { done() {} };
   LX.copyText = () => Promise.resolve(false);

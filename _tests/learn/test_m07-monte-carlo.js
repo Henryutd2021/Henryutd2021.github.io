@@ -182,7 +182,8 @@ ok((D.budget.start - D.budget.min) % D.budget.step === 0 && (D.marginWidth.start
   ok(NB.length > 0, "the lab notebook exists (learn/notebooks/" + ID + ".ipynb; written by scripts/build_learn_m07_notebook.py)");
   const nb = NB ? JSON.parse(NB) : { cells: [] }, src = nb.cells.map(c => c.source.join("")).join("\n");
   ok(nb.cells.every(c => c.cell_type === "markdown" || (c.outputs.length === 0 && c.execution_count === null)), "the notebook is stored without outputs");
-  ok(/0x6D2B79F5/.test(src) && /0x6D2B79F5/.test(JS) && /t \| 61/.test(src) && /t \| 61/.test(JS), "the notebook ports the page's generator (mulberry32's constants)");
+  { const CORE = fs.readFileSync(L("components/core.js"), "utf8");   // the generator is shared (LX.mulberry32, core.js) since the W3 integration
+    ok(/0x6D2B79F5/.test(src) && /0x6D2B79F5/.test(CORE) && /t \| 61/.test(src) && /t \| 61/.test(CORE) && /LX\.mulberry32/.test(JS), "the notebook ports the page's generator (mulberry32's constants, LX.mulberry32 in core.js)"); }
   ok(/m07-monte-carlo\.json/.test(src) && /REF\["firstRuns"\]/.test(src) && /REF\["flip"\]/.test(src) && /REF\["p90se"\]/.test(src) && /REF\["budget"\]/.test(src), "the notebook asserts the reference block: first runs, percentiles, errors, chances and step 10");
   ok(/about 45 minutes, plus 60 minutes of practice/.test(src) && /15 minutes[\s\S]*10 minutes[\s\S]*15 minutes[\s\S]*10 minutes[\s\S]*10 minutes/.test(src), "the notebook's times: a 45-minute lab and five practice tasks adding up to 60 minutes");
 }

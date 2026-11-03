@@ -304,8 +304,6 @@
   var LX = window.LX, H = LX.H, KEY = "a04_retail_tariffs";
   var CSS = [
     ".a4-ctlrow{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end}",
-    ".a4-led td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}",
-    ".a4-led tbody th small{display:block;font-family:var(--lx-f-body);font-weight:400;font-size:12.5px;color:var(--lx-ink-3)}",
     ".a4-rates{margin:0;padding-left:1.1em;font-size:14px;color:var(--lx-ink-2)}"
   ].join("\n");
   function sawB(api, t, bad) { api.saw(t, bad); }
@@ -531,18 +529,15 @@
     live.insertBefore(stage, cards.el);
 
     // ---------- the ledger: bill minus cost for every customer under every tariff, in the reader's state
-    function ledger(host) {
-      var E = evaluate(D, W, T, S), tb = H("table", { class: "cf-two a4-led" }, H("div", { class: "lx-scroll-x" }, host));
-      H("caption", { class: "lx-hint", text: "Bill minus the cost of serving each customer, a month" + (S.ev === "night" ? "; the car charges at 01:00" : "") + (S.batch === "night" ? "; the batch runs at midnight" : "") + (S.scarce ? "; scarcity week on" : "") + ". Above zero: pays more than its cost." }, tb);
-      var hr = H("tr", null, H("thead", null, tb)); H("th", { scope: "col", text: "Customer" }, hr);
-      D.tariffs.forEach(function (x) { H("th", { scope: "col", text: x.name }, hr); });
-      var bd = H("tbody", null, tb);
-      D.customers.forEach(function (c) {
-        var tr = H("tr", null, bd), th = H("th", { scope: "row", text: c.short }, tr);
-        H("small", { text: "cost " + usd(E[c.key].cost.total) }, th);
-        D.tariffs.forEach(function (x) { var g = Math.round(E[c.key].gap[x.key]); H("td", { "data-l": x.name, class: g > 0 ? "up" : g < 0 ? "down" : "", text: dusd(g) + (g > 0 ? " above" : g < 0 ? " below" : "") }, tr); });
-      });
-      return tb;
+    function ledger(host) {   // LX.Ledger (components/ledger.js)
+      var E = evaluate(D, W, T, S);
+      return LX.Ledger(host, { cls: "a4-led",
+        caption: "Bill minus the cost of serving each customer, a month" + (S.ev === "night" ? "; the car charges at 01:00" : "") + (S.batch === "night" ? "; the batch runs at midnight" : "") + (S.scarce ? "; scarcity week on" : "") + ". Above zero: pays more than its cost.",
+        columns: ["Customer"].concat(D.tariffs.map(function (x) { return x.name; })),
+        rows: D.customers.map(function (c) {
+          return { head: c.short, sub: "cost " + usd(E[c.key].cost.total),
+                   cells: D.tariffs.map(function (x) { var g = Math.round(E[c.key].gap[x.key]); return { cls: g > 0 ? "up" : g < 0 ? "down" : "", text: dusd(g) + (g > 0 ? " above" : g < 0 ? " below" : "") }; }) };
+        }) });
     }
 
     // ---------- the explain layer, with the reader's numbers

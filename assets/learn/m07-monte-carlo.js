@@ -34,16 +34,8 @@
   "use strict";
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
-  function rng(seed) {
-    var a = seed >>> 0;
-    return function () {
-      a = (a + 0x6D2B79F5) >>> 0;
-      var t = a;
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
+  // the seeded generator: mulberry32, shared with engine E1 (LX.mulberry32, components/core.js)
+  var rng = (typeof window !== "undefined" && window.LX && window.LX.mulberry32) || require("./components/core.js").mulberry32;
   function monthly(r) { return Math.pow(1 + r, 1 / 12) - 1; }
   function annuity(i, tau) { return tau > 0 ? (1 - Math.pow(1 + i, -tau)) / i : 0; }
   // the two accounts (present values, $) for inputs x at a wait of tau months

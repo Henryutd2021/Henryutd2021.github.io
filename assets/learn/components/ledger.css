@@ -1,0 +1,9 @@
+/* ledger.css — LX.Ledger (ledger.js): a cf-two table (forms.css) of amounts. Numbers in tabular figures, the row
+   header's second line small and muted, a total row set off by a rule; on a phone an empty cell (a total row's blank
+   column) is dropped from the card. Promoted at the W3 integration from A4, A7 and A14. */
+.lx-ledger td { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
+.lx-ledger tbody th small { display: block; font-family: var(--lx-f-body); font-weight: 400; font-size: 12.5px; color: var(--lx-ink-3); }
+.lx-ledger tr.tot th, .lx-ledger tr.tot td { border-top: 1px solid var(--lx-line-2); font-weight: 600; }
+@media (max-width: 560px) {
+  .lx-ledger td:empty { display: none; }
+}

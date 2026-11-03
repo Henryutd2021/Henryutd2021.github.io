@@ -960,6 +960,44 @@ LX.E1.Results(host, R, { P, sizeNote });  LX.E1.HourChart(host, P, R, outage);  
 - **Also pure:** `bb` (branch and bound on the sizing model's whole numbers, M2's rules: a node whose LP fails stays unresolved and the tree is then not proven), `roll` (the rolling horizon: re-plan every 6 hours on a forecast, balance each real hour with `realTime`), `forecast`, `seeded` (mulberry32, seed 7), `lengths` (one storm cut or stretched), `costs`, `crf`, `note`, `fallback(P, "sb1" | "c1")`.
 - **Bench** (`node scripts/learn_solver_bench.mjs --site <wt> --set lessons --only e1size,e1size3,e1year,e1out,e1outf7,e1run-default,e1run-size`; Apple M5, 3 Nov 2026, 20 runs, p95 at 1×, 4× and 6× CPU slowdown, in ms): sizing MILP for the storm (2,163 × 2,233, one integer) 142, 378, 572; for three outages with 650 kW that must stay on (2,739 × 2,907) 138, 499, 767; the year LP 10, 25, 47; the outage check MILP (720 × 289, 72 integers) 10 to 37, 37 to 100, 55 to 152. Whole page runs (10 runs; several solves each): Run the outages with three outages 111, 306, 499; Size it 139, 376, 584. All within the 3 s phone budget; each solve has a 3 s time limit (10 s on Try again).
 
+### Promoted at the W3 integration (2026-11-03)
+
+Promoted only where two pages or more had the same thing; each page keeps its own class on what it draws, so its tests and the layout audit find it as before.
+
+**Ledger** (`ledger.js`, `ledger.css`; from A4's tariff ledger, A7's earnings and trade ledgers and A14's microgrid ledger): `LX.Ledger`, a "who pays, who earns" table. One row per customer, party, device or line, a column per amount; the row header can carry a small second line; numbers in tabular figures; an optional total row. It is the two-sided table of `forms.css` (`table.cf-two`), so on a phone each row becomes a card and each cell is labelled by its column (`data-l`).
+
+```js
+LX.Ledger(host, { caption: "Bill minus the cost of serving each customer, a month.", columns: ["Customer", "Flat", "Time-of-use"],
+  rows: [{ head: "Renter", sub: "cost $61.20", cells: ["+$4.10 above", { text: "−$2.00 below", cls: "down" }] },
+         { head: "= Net", cells: ["", "+$2.10"], total: true }], cls: "a4-led" });   // returns the table (in a div.lx-scroll-x)
+```
+
+- Every text is set as text. A cell is a string or `{ text, cls, l }` (`l`: its own phone label). On a phone an empty cell (a total row's blank column) is left out of the card.
+- A4 (`a4-led`), A7 (`a7-led`, two tables) and A14 (`a14-ledger`, a total row; its "Who" column in body type, `td.who`) use it. Tests: `_tests/learn/test_components_w3_int.js`.
+
+**Solver step** (`solvestep.js`, `solvestep.css`; from M3, A8 and M4, which had the same code): `LX.SolveStep`, a step card's solver action and its failure note (W2 review finding 3). The step disables its own button, shows its `LX.SolverStatus` and holds the page's busy state (so Next waits); a failed solve, a time limit or a solver that would not load gets a plain message with "Try again", the busy state cleared and the results already solved kept.
+
+```js
+var go = LX.SolveStep.action({ api: api, st: LX.SolverStatus(row), host: act, go: button, job: function () { return solveAll(); },   // job may resolve to the failed result
+  failed: function () { return firstFail(); },   // optional (M3's form): the first failed result, read after job()
+  show: function () { draw(); }, cls: "a8-fail", kept: " Results already solved are kept." });
+button.addEventListener("click", go);           // "Try again" calls the same function
+LX.SolveStep.failNote(host, r, again, { cls, kept });   // the note alone (role="alert")
+```
+
+- Not `LX.BenchRun`: a sandbox's run box owns its Run button and status line, never disables them, and marks drawn results stale when the plan changes; a step card keeps its own button, its SolverStatus and Next. The note keeps each page's class (`m3-fail`, `a8-fail`, `m4-fail`) and M3 its own last sentence.
+
+**Seeded generator** (`core.js`; from M7 and engine E1, which each had a copy): `LX.mulberry32(seed)` returns a function giving numbers in [0, 1); the same seed gives the same numbers on every page, in Node (`require("components/core.js").mulberry32`) and in the notebooks' Python ports (M5, M7). M7's `rng` and E1's seeded outages call it; their numbers are unchanged. `_tests/learn/stubdom.js` sets it on its stub `LX`.
+
+**Kept lesson-local, and why** (promote when a second page needs the same thing):
+
+- M7's seeded Latin hypercube (strata, the repeat error and its tie rule) and its rank-correlation bars: only M7 samples or ranks inputs.
+- A1's cash-flow steps (i-cashflow): they build one project's flows by hand, step by step, on `LX.Plot`. Engine E0 (SB0, C0) has its own cash flow (replacements, residual value, a discounted running total) and chart; the two models differ.
+- A2's Monte Carlo histogram (i-montecarlo) and M7's: both on `LX.Plot`, but A2 clamps 200 price years into $0.25M bins with P10, median and P90 readouts and a no-contract band, and M7 counts in-range runs in $5M bins with a shaded tail and a static SVG. One component would have to carry both; the shared part is the type-7 percentile (also K5's), three lines each.
+- F7's `CampusLine` and E1's `E1.Line`: the same campus, two jobs. F7's is an SVG explainer (the storm, the switch, which source forms the island, lit wires, numbered parts for the explain layer); `E1.Line` is an HTML control panel (the plan's sizes, a priority per load, the feeder's limits). They share the campus data (E1's data builder reads F7's), not code.
+- M5's `TreeView` and M2's: M2 draws its own engine's nodes (switches fixed, inherited bounds, a grid layout, marks for best and pruned); M5 draws `E1.bb`'s nodes (whole sets ≥ or ≤, a halving layout, a reading panel). A shared tree would take both node schemas and layouts.
+- A8's week LP stays off engine E0 (see Engine E0 above).
+
 **Scope and QA** (ResearchPortfolio folder).
 
 - `python3 scripts/learn_scope_scan.py --site <worktree>` runs the curriculum v2 §20 scan on the rendered `_site/learn/` pages, the data files and the scripts. `build_learn.py --check` runs it whenever a rendered site exists, and fails on any violation.

@@ -290,9 +290,7 @@
   // ================================================================ the page
   var LX = window.LX, H = LX.H, KEY = "a07_flexible_demand";
   var CSS = [
-    ".a7-ctlrow{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end}",
-    ".a7-led td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}",
-    ".a7-led tbody th small{display:block;font-family:var(--lx-f-body);font-weight:400;font-size:12.5px;color:var(--lx-ink-3)}"
+    ".a7-ctlrow{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end}"
   ].join("\n");
 
   LX.mount("flex", function (live, data, root) {
@@ -468,28 +466,24 @@
     var cards = LX.StepCards(live, { steps: steps });
     live.insertBefore(stage, cards.el);
 
-    // ---------- the ledgers
+    // ---------- the ledgers (LX.Ledger, components/ledger.js)
     function earnTable(host) {
-      var E = earnings(W, D, S.coord), tb = H("table", { class: "cf-two a7-led" }, H("div", { class: "lx-scroll-x" }, host));
-      H("caption", { class: "lx-hint", text: "A year, per device or farm, with all four kinds in the pool and a coordination cost of $" + S.coord + "." }, tb);
-      var hr = H("tr", null, H("thead", null, tb));
-      ["Device", "Value", "Aggregator, 20%", "Coordination", "Owner earns"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
-      var bd = H("tbody", null, tb);
-      D.vpp.devices.forEach(function (x) {
-        var e = E[x.key], tr = H("tr", null, bd), th = H("th", { scope: "row", text: x.name }, tr);
-        H("small", { text: "per " + x.one + ", " + (Math.round(x.kw * x.avail * 100) / 100) + " kW on average" }, th);
-        H("td", { "data-l": "Value", text: usd(e.value) }, tr); H("td", { "data-l": "Aggregator, 20%", text: "−" + usd(e.aggregator) }, tr);
-        H("td", { "data-l": "Coordination", text: "−" + usd(e.coordination) }, tr); H("td", { "data-l": "Owner earns", text: usd(e.owner) }, tr);
-      });
+      var E = earnings(W, D, S.coord);
+      LX.Ledger(host, { cls: "a7-led", caption: "A year, per device or farm, with all four kinds in the pool and a coordination cost of $" + S.coord + ".",
+        columns: ["Device", "Value", "Aggregator, 20%", "Coordination", "Owner earns"],
+        rows: D.vpp.devices.map(function (x) {
+          var e = E[x.key];
+          return { head: x.name, sub: "per " + x.one + ", " + (Math.round(x.kw * x.avail * 100) / 100) + " kW on average",
+                   cells: [usd(e.value), "−" + usd(e.aggregator), "−" + usd(e.coordination), usd(e.owner)] };
+        }) });
     }
     function tradeTable(host) {
-      var r = trade(A4, W, wires, S.pl, S.pay), tb = H("table", { class: "cf-two a7-led" }, H("div", { class: "lx-scroll-x" }, host));
-      H("caption", { class: "lx-hint", text: Math.round(r.kwh) + " kWh a month traded at " + cents(S.pl) + (S.pay ? ", wires charge paid" : ", wires charge skipped") + "; change against no trade." }, tb);
-      var hr = H("tr", null, H("thead", null, tb)); ["Party", "A month"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
-      var bd = H("tbody", null, tb);
-      [["The solar home (seller)", r.seller], ["The renter (buyer)", r.buyer], ["Other customers (the wires)", r.others], ["The plants: energy and CO₂", r.plants]].forEach(function (x) {
-        var tr = H("tr", null, bd); H("th", { scope: "row", text: x[0] }, tr); H("td", { "data-l": "A month", text: x[0].indexOf("plants") >= 0 ? "no change" : dusd(x[1]) }, tr);
-      });
+      var r = trade(A4, W, wires, S.pl, S.pay);
+      LX.Ledger(host, { cls: "a7-led", caption: Math.round(r.kwh) + " kWh a month traded at " + cents(S.pl) + (S.pay ? ", wires charge paid" : ", wires charge skipped") + "; change against no trade.",
+        columns: ["Party", "A month"],
+        rows: [["The solar home (seller)", r.seller], ["The renter (buyer)", r.buyer], ["Other customers (the wires)", r.others], ["The plants: energy and CO₂", r.plants]].map(function (x) {
+          return { head: x[0], cells: [x[0].indexOf("plants") >= 0 ? "no change" : dusd(x[1])] };
+        }) });
     }
 
     // ---------- the explain layer, with the reader's numbers

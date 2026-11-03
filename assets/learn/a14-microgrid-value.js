@@ -408,10 +408,10 @@
     var o = D.owners.filter(function (q) { return q.key === St.owner; })[0] || D.owners[0], d = design(D, D.designs[2], Ho.perHour, { everyday: true, rate: o.rate });
     H("header", { class: "lx-x-head", html: "<h3>The ledger, a year</h3>" }, c2);
     H("p", { class: "lx-hint", text: "Battery 2 hours and generator 72 hours, owned by " + o.label.toLowerCase() + " (" + (o.rate * 100).toFixed(0) + "%); 2025 dollars, illustrative." }, c2);
-    var t = H("table", { class: "lx-mini-table a14-ledger" }, c2);
-    t.innerHTML = "<tbody>" + [["+ Outage cost avoided", "the hospital", d.avoided], ["+ Everyday savings", o.everydayTo, d.everyday], ["− Capital, spread over " + D.finance.years + " years", "the owner", -d.capitalYear], ["− Upkeep, tank and fuel", "the owner", -(d.upkeep + d.fuel)]]
-      .map(function (r) { return "<tr><th scope=\"row\">" + r[0] + "</th><td>" + r[1] + "</td><td class=\"n\">" + signed(r[2]) + "</td></tr>"; }).join("") +
-      "<tr class=\"tot\"><th scope=\"row\">= Net for everyone</th><td></td><td class=\"n\">" + signed(d.net) + "</td></tr></tbody>";
+    LX.Ledger(c2, { cls: "a14-ledger", columns: ["A year", "Who", "Amount"],   // LX.Ledger (components/ledger.js)
+      rows: [["+ Outage cost avoided", "the hospital", d.avoided], ["+ Everyday savings", o.everydayTo, d.everyday], ["− Capital, spread over " + D.finance.years + " years", "the owner", -d.capitalYear], ["− Upkeep, tank and fuel", "the owner", -(d.upkeep + d.fuel)]]
+        .map(function (r) { return { head: r[0], cells: [{ text: r[1], cls: "who" }, signed(r[2])] }; })
+        .concat([{ head: "= Net for everyone", cells: [{ text: "", cls: "who" }, signed(d.net)], total: true }]) });
     H("p", { class: "lx-hint", text: "The net is the same whoever is named; the owner's own ledger is not. An owner who pays the capital but gets neither the avoided cost nor the savings needs a fee or rates to come out even." }, c2);
     // 3 the causal chain (e-chain)
     var c3 = H("div", { class: "lx-xcard" }, x), b9 = best(D, "battery", Ho.perHour, 12), g9 = best(D, "gen", Ho.perHour, 72);

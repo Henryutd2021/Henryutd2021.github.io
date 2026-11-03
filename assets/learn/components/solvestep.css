@@ -1,0 +1,4 @@
+/* solvestep.css — LX.SolveStep (solvestep.js): the note a step card shows when a solve fails, with its "Try again"
+   button. Promoted at the W3 integration from M3, A8 and M4 (their .m3-fail, .a8-fail and .m4-fail rules, the same). */
+.lx-solve-fail { display: grid; gap: 8px; justify-items: start; padding: 10px 12px; border: 1px solid var(--lx-bad); border-radius: 10px; background: var(--lx-surface-2); }
+.lx-solve-fail p { margin: 0; font-size: 14.5px; }

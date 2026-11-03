@@ -76,11 +76,9 @@
     P.seeded = seeded(cfg);
     return P;
   }
-  // a small seeded generator (mulberry32), so the drawn outages are the same on every page and in the notebook
-  function rng(seed) {
-    var a = seed >>> 0;
-    return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-  }
+  // a small seeded generator (mulberry32, LX.mulberry32 in core.js), so the drawn outages are the same on every page and in
+  // the notebook
+  var rng = (typeof window !== "undefined" && window.LX && window.LX.mulberry32) || require("./core.js").mulberry32;
   function seeded(cfg) {
     var S = cfg.seeded, w = cfg.sun[S.window], r = rng(S.seed), out = [];
     var firstHour = S.firstDay * 24, lastHour = S.lastStartDay * 24 + 23;

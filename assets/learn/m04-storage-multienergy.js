@@ -131,7 +131,6 @@
       ".m4-tbl th,.m4-tbl td{padding:5px 6px;border-bottom:1px solid var(--lx-line);text-align:right;font-weight:400}.m4-tbl th:first-child,.m4-tbl td:first-child{text-align:left}",
       ".m4-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3);vertical-align:bottom}.m4-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.m4-tbl td:first-child{font-family:var(--lx-f-body)}",
       ".m4-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
-      ".m4-fail{display:grid;gap:8px;justify-items:start;padding:10px 12px;border:1px solid var(--lx-bad);border-radius:10px;background:var(--lx-surface-2)}.m4-fail p{margin:0;font-size:14.5px}",
       "@media (max-width:560px){.m4-tbl table{font-size:12.5px}.m4-tbl th,.m4-tbl td{padding:4px 3px}.m4-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
   }
@@ -159,28 +158,10 @@
       });
     }
     function all(list) { return list.reduce(function (p, a) { return p.then(function (bad) { return bad || solve.apply(null, a).then(function (o) { return o.ok ? null : o; }); }); }, Promise.resolve(null)); }
-    function failNote(host, r, again) {
-      var why = r.status === "time-limit" ? "The solver stopped at its time limit before it finished." : r.status === "cancelled" || r.status === "superseded" ? "The run was stopped before it finished."
-        : ((LX.solver.describe ? LX.solver.describe(r) : "") || "The solver did not finish.") + (r.message && r.status === "error" ? " (" + r.message + ")" : "");
-      var box = H("div", { class: "m4-fail", role: "alert" }, host);
-      H("p", { html: "<b>No result to show.</b> " + LX.esc(why) + " Results already solved are kept." }, box);
-      H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Try again", onclick: function () { again(); } }, box);
-      return box;
-    }
-    // one solver action of a step: job() -> Promise of null (all solved) or the failed result
-    function action(o) {
-      var note = null;
-      function attempt() {
-        if (note) { note.remove(); note = null; }
-        if (o.go) o.go.disabled = true; o.st.set(LX.solver.mode ? "solving" : "loading"); o.api.busy(true);
-        return Promise.resolve().then(o.job).then(function (bad) {
-          o.api.busy(false); if (o.go) o.go.disabled = false;
-          if (bad) { o.st.set(""); note = failNote(o.host, bad.r || bad, attempt); return; }
-          o.show();
-        }).catch(function (e) { o.api.busy(false); if (o.go) o.go.disabled = false; o.st.set(""); note = failNote(o.host, { status: "error", message: String(e && e.message || e) }, attempt); });
-      }
-      return attempt;
-    }
+    // a failed solve's note and one solver action of a step (job() -> Promise of null (all solved) or the failed result):
+    // LX.SolveStep (components/solvestep.js); the note keeps the class m4-fail
+    function failNote(host, r, again) { return LX.SolveStep.failNote(host, r, again, { cls: "m4-fail" }); }
+    function action(o) { o.cls = "m4-fail"; return LX.SolveStep.action(o); }
     function solveStep(act, api, label, list, show) {
       var row = H("div", { class: "m4-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + label }, row), st = LX.SolverStatus(row), out = H("div", { "aria-live": "polite" }, act);
       go.addEventListener("click", action({ api: api, st: st, host: act, go: go, job: function () { return all(list()); }, show: function () { var x = res[keyOf.apply(null, list()[list().length - 1])]; st.set(x.r); show(out); } }));

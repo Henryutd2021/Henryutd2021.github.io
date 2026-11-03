@@ -125,7 +125,6 @@
       ".a8-bars .bar{height:14px;border-radius:6px;background:var(--lx-surface-3);overflow:hidden;display:flex}",
       ".a8-bars .bar i{display:block;height:100%}.a8-bars b{font-family:var(--lx-f-mono);font-weight:600;text-align:right}",
       ".a8-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
-      ".a8-fail{display:grid;gap:8px;justify-items:start;padding:10px 12px;border:1px solid var(--lx-bad);border-radius:10px;background:var(--lx-surface-2)}.a8-fail p{margin:0;font-size:14.5px}",
       "@media (max-width:560px){.a8-tbl table{font-size:12.5px}.a8-tbl th,.a8-tbl td{padding:4px 3px}.a8-tbl .ph{display:none}.a8-bars li{grid-template-columns:minmax(5.5em,7em) minmax(0,1fr) 5em;font-size:13px}}"
     ].join("\n") }, document.head);
   }
@@ -154,28 +153,9 @@
         var o = r.ok ? read(W, s, r) : { ok: false, status: r.status, message: r.message, r: r }; o.r = r; o.store = s; res[key] = o; return o;
       });
     }
-    // solves that fail (W2 review): a message, "Try again", the busy state cleared, results kept
-    function failNote(host, r, again) {
-      var why = r.status === "time-limit" ? "The solver stopped at its time limit before it finished." : r.status === "cancelled" || r.status === "superseded" ? "The run was stopped before it finished."
-        : ((LX.solver.describe ? LX.solver.describe(r) : "") || "The solver did not finish.") + (r.message && r.status === "error" ? " (" + r.message + ")" : "");
-      var box = H("div", { class: "a8-fail", role: "alert" }, host);
-      H("p", { html: "<b>No result to show.</b> " + LX.esc(why) + " Results already solved are kept." }, box);
-      H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Try again", onclick: function () { again(); } }, box);
-      return box;
-    }
-    function action(o) {
-      var note = null;
-      function attempt() {
-        if (note) { note.remove(); note = null; }
-        if (o.go) o.go.disabled = true; o.st.set(LX.solver.mode ? "solving" : "loading"); o.api.busy(true);
-        return Promise.resolve().then(o.job).then(function (bad) {
-          o.api.busy(false); if (o.go) o.go.disabled = false;
-          if (bad) { o.st.set(""); note = failNote(o.host, bad.r || bad, attempt); return; }
-          o.show();
-        }).catch(function (e) { o.api.busy(false); if (o.go) o.go.disabled = false; o.st.set(""); note = failNote(o.host, { status: "error", message: String(e && e.message || e) }, attempt); });
-      }
-      return attempt;
-    }
+    // solves that fail (W2 review): a message, "Try again", the busy state cleared, results kept (LX.SolveStep,
+    // components/solvestep.js; the note keeps the class a8-fail)
+    function action(o) { o.cls = "a8-fail"; return LX.SolveStep.action(o); }
     function weekPlot(host, sol, label) {
       var P = LX.Plot(host, { box: true, text: "Text version of the week" }), narrow = (host.clientWidth || 600) < 480;
       var supply = W.wind.map(function (w, t) { return w + W.solar[t] + W.firm; });
