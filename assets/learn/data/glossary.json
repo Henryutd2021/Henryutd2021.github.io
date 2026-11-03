@@ -143,6 +143,12 @@
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
+ "caidi": {
+  "term": "CAIDI",
+  "short": "Customer Average Interruption Duration Index: the average minutes to restore one interruption, SAIDI divided by SAIFI.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "capacity": {
   "term": "Capacity",
   "short": "The most power a plant can produce at once, often called its nameplate size.",
@@ -214,6 +220,12 @@
   "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "circuit-breaker": {
+  "term": "Circuit breaker",
+  "short": "A switch that opens by itself when it senses a fault, cutting the power to everything beyond it, and can be closed again.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "clearing-price": {
   "term": "Clearing price",
@@ -335,6 +347,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "customer-minutes": {
+  "term": "Customer-minutes",
+  "short": "The number of customers without power times the minutes they wait: 10 homes dark for an hour is 600 customer-minutes.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "cut-in-speed": {
   "term": "Cut-in speed",
   "short": "The lowest wind speed at which a turbine starts to make electricity.",
@@ -443,6 +461,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "distribution": {
+  "term": "Distribution",
+  "short": "The lower-voltage part of the grid, from substations along feeders and laterals to homes and businesses.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "dominated-plan": {
   "term": "Dominated plan",
   "short": "A plan that another plan beats on every count: no more cost, no more emissions, and better on at least one.",
@@ -472,6 +496,12 @@
   "short": "The share of the energy put into a plant or device that comes out in the useful form, such as electricity.",
   "lesson": "K2",
   "href": "k02-rates-efficiencies.html"
+ },
+ "electric-current": {
+  "term": "Electric current",
+  "short": "The flow of electric charge through a wire, measured in amperes (A); for the same power, a higher voltage needs less current.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "electrification": {
   "term": "Electrification",
@@ -671,6 +701,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "fuse": {
+  "term": "Fuse",
+  "short": "A wire that melts on a fault and cuts the power beyond it; a crew must replace it.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "gigawatt": {
   "term": "Gigawatt (GW)",
   "short": "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand.",
@@ -797,6 +833,12 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "lateral": {
+  "term": "Lateral",
+  "short": "A side branch of a distribution feeder that serves one street or block, often protected by its own fuse.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "latin-hypercube": {
   "term": "Latin hypercube sampling",
   "short": "A way to draw many sets of uncertain inputs so that the whole range of every input is covered evenly.",
@@ -881,6 +923,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "major-event-day": {
+  "term": "Major event day",
+  "short": "A day with so many outage minutes, usually from a big storm, that it passes a threshold set from a utility's past five years (IEEE 1366); reports give reliability with and without them.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "margin": {
   "term": "Margin",
   "short": "What a business earns from its output after paying its operating costs: revenue minus operating costs.",
@@ -964,6 +1012,12 @@
   "short": "Running power plants in order of their running cost, cheapest first.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "meshed-network": {
+  "term": "Meshed network",
+  "short": "A network with loops, so power can reach a place by more than one path, as transmission networks do.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "method-family": {
   "term": "Method family",
@@ -1090,6 +1144,12 @@
   "short": "The running program behind a notebook that holds its variables in memory between cells, whatever order the cells were run in.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "n-minus-one": {
+  "term": "N−1",
+  "short": "A planning rule: the system keeps serving its customers after any one element, such as a line, fails.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "objective": {
   "term": "Objective",
@@ -1265,6 +1325,12 @@
   "lesson": "R1",
   "href": "r01-framing.html"
  },
+ "radial-network": {
+  "term": "Radial network",
+  "short": "A network shaped like a tree, with one path from the source to each customer, as most distribution feeders are.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
@@ -1318,6 +1384,12 @@
   "short": "Part of an efficiency saving taken back because the cheaper service gets used more.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "recloser": {
+  "term": "Recloser",
+  "short": "A breaker on a feeder that opens on a fault and tries closing again in seconds, so a passing fault, such as a brushing branch, causes only a blink.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "refuelling-outage": {
   "term": "Refuelling outage",
@@ -1390,6 +1462,18 @@
   "short": "What it costs a plant to make one more megawatt-hour, mostly fuel, leaving out the cost of building it.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "saidi": {
+  "term": "SAIDI",
+  "short": "System Average Interruption Duration Index: the minutes without power the average customer has in a year, customer-minutes divided by customers served.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "saifi": {
+  "term": "SAIFI",
+  "short": "System Average Interruption Frequency Index: the number of interruptions the average customer has in a year, customers interrupted divided by customers served.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "system-scale": {
   "term": "Scale (of an energy system)",
@@ -1507,9 +1591,9 @@
  },
  "substation": {
   "term": "Substation",
-  "short": "A site where transformers lower the voltage from transmission lines for the feeders that serve customers.",
-  "lesson": "R1",
-  "href": "r01-framing.html"
+  "short": "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "supply-diversity": {
   "term": "Supply diversity",
@@ -1601,6 +1685,18 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "transformer": {
+  "term": "Transformer",
+  "short": "A device with two coils that raises or lowers an alternating voltage, such as from 18 kV to 345 kV at a plant or from 12.47 kV to 240/120 V near a home.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "transmission": {
+  "term": "Transmission",
+  "short": "The high-voltage part of the grid (115 to 765 kV in the U.S.) that carries power over long distances between plants, regions and substations.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "unbounded": {
   "term": "Unbounded",
   "short": "Said of a model whose goal can improve without limit, which usually means a rule is missing.",
@@ -1669,9 +1765,9 @@
  },
  "voltage": {
   "term": "Voltage",
-  "short": "The electrical pressure that pushes current along a line; grids hold it within a narrow band at every point.",
-  "lesson": "N1",
-  "href": "n01-news-lens.html"
+  "short": "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "watt-hour": {
   "term": "Watt-hour (Wh)",
