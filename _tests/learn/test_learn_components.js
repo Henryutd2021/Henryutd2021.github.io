@@ -36,7 +36,7 @@ ok(depth === 0, "learn.css: braces balance");
 
 // ---------------- no lesson defines its own copy of a shared component (W1 merge)
 const lessonJs = fs.readdirSync(L(".")).filter(f => /^[0-9a-z-]+\.js$/.test(f) && f !== "learn.js");
-const copies = /\bfunction (plot|LineChart|Scatter|StackChart|FrontierChart|Steelman|Boundary|JobSorter|Plane|EquationCard|Formulation|Network|PriceChart|HourPicker|Practice|Slider|Stakeholders|StakeholderMap|ScaleStrip|WeekStrip|readCheck|refHTML|numInput)\s*\(|W1F\.(LPPlot|Views|CardSort|Ctl|Toggle|EquationCard|FormulateBox)\s*=|LX\.Checklist\s*=/;
+const copies = /\bfunction (plot|LineChart|Scatter|StackChart|FrontierChart|Steelman|Boundary|JobSorter|Plane|EquationCard|Formulation|Network|PriceChart|HourPicker|Practice|Slider|Stakeholders|StakeholderMap|ScaleStrip|WeekStrip|readCheck|refHTML)\s*\(|W1F\.(LPPlot|Views|CardSort|Ctl|Toggle|EquationCard|FormulateBox)\s*=|LX\.Checklist\s*=/;
 lessonJs.forEach(f => {
   const src = fs.readFileSync(L(f), "utf8"), rx = new RegExp(copies.source, "g"), bad = [];
   let m; while ((m = rx.exec(src))) { const name = m[1] || m[2] || "Checklist", body = src.slice(m.index, m.index + 500);
