@@ -77,6 +77,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "basis-risk": {
+  "term": "Basis risk",
+  "short": "The risk that the price where a plant sells differs from the price at which its contract settles, such as its node against a trading hub.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "battery-duration": {
   "term": "Battery duration",
   "short": "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW.",
@@ -118,6 +124,12 @@
   "short": "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "break-even-price": {
+  "term": "Break-even price",
+  "short": "The sale price at which a project's net present value is exactly zero; for one plant it equals its levelized cost.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
  },
  "bridge-power": {
   "term": "Bridge power",
@@ -178,6 +190,12 @@
   "short": "The share of a building cost that must be repaid each year, with interest, to pay it off over a given number of years.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "capture-ratio": {
+  "term": "Capture ratio",
+  "short": "The average price over the hours a plant produces, as a share of the average price over all hours.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
  },
  "carbon-budget": {
   "term": "Carbon budget",
@@ -448,6 +466,12 @@
   "short": "A plan that another plan beats on every count: no more cost, no more emissions, and better on at least one.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "dot-product": {
+  "term": "Dot product",
+  "short": "The sum of the products of two vectors' matching entries, such as costs times outputs, added up.",
+  "lesson": "K6",
+  "href": "k06-vectors-matrices.html"
  },
  "duck-curve": {
   "term": "Duck curve",
@@ -767,11 +791,23 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "inflation": {
+  "term": "Inflation",
+  "short": "The rise in prices in general over time, so that a dollar buys less each year.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
+ },
  "informed-consent": {
   "term": "Informed consent",
   "short": "A person's agreement to take part in research, given freely after being told what will happen, the risks and how their data will be used.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "internal-rate-of-return": {
+  "term": "Internal rate of return (IRR)",
+  "short": "The discount rate at which a project's net present value is exactly zero: the return the project itself earns.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
  },
  "inverter": {
   "term": "Inverter",
@@ -904,6 +940,12 @@
   "short": "The plant that serves the last megawatt of demand, whose offer sets the clearing price.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "matrix": {
+  "term": "Matrix",
+  "short": "A table of numbers in rows and columns; in a model, one row per rule and one column per decision.",
+  "lesson": "K6",
+  "href": "k06-vectors-matrices.html"
  },
  "mcda": {
   "term": "MCDA (multi-criteria decision analysis)",
@@ -1145,6 +1187,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "payback-period": {
+  "term": "Payback period",
+  "short": "The number of years until the running sum of a project's cash first gets back to zero, with or without discounting.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
+ },
  "peak-demand": {
   "term": "Peak demand",
   "short": "The highest demand in a period, such as the busiest hour of a year; the grid must be able to meet it, with a margin.",
@@ -1210,6 +1258,12 @@
   "short": "A chart of how much power a wind turbine makes at each wind speed.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "power-purchase-agreement": {
+  "term": "Power purchase agreement (PPA)",
+  "short": "A long contract between a power plant's seller and a buyer that sets the price paid for the plant's power, or for its market value.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
  },
  "prediction-interval": {
   "term": "Prediction interval",
@@ -1589,6 +1643,12 @@
   "lesson": "R2",
   "href": "r02-literature.html"
  },
+ "tolling-agreement": {
+  "term": "Tolling agreement",
+  "short": "A contract in which the buyer pays the owner of a plant a fixed fee for the right to run it, and keeps what it earns.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "tornado-chart": {
   "term": "Tornado chart",
   "short": "A chart that ranks inputs by how far a result moves when each input is swung from a low to a high value, one at a time.",
@@ -1600,6 +1660,12 @@
   "short": "A file Git already knows, because it is in the last commit or the staging area; a new file stays untracked until git add.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "trading-hub": {
+  "term": "Trading hub",
+  "short": "A pricing point where many contracts are settled, priced as an average over many nodes of the grid.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
  },
  "unbounded": {
   "term": "Unbounded",
@@ -1654,6 +1720,12 @@
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "vector": {
+  "term": "Vector",
+  "short": "An ordered list of numbers, such as a plan's outputs, in which the position of each number carries its meaning.",
+  "lesson": "K6",
+  "href": "k06-vectors-matrices.html"
  },
  "verification": {
   "term": "Verification",

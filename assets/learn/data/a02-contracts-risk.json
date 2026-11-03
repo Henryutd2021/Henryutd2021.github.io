@@ -1,0 +1,34 @@
+{
+  "about": "Analyst lesson A2 (Who carries the risk?): a solar-plus-storage plant, a buyer, four contracts for the solar output and two ways to run the battery, and a seeded simulation of 200 price years. All money is in real 2025 dollars (one price year for the whole lesson). The distributions of the five yearly drivers are illustrative, chosen to be plausible in size, not fitted to any market; the five are drawn independently of each other. A price year is one simulated year of market conditions, not a calendar year and not a forecast. Left out: taxes, credit risk (a party failing to pay), curtailment, capacity payments, renewable certificates, the battery's own breakdowns and wear, and hour-by-hour detail inside a year.",
+  "accessed": "2026-11-03",
+  "priceYear": 2025,
+  "plant": {
+    "solarMW": 100,
+    "batteryMW": 50,
+    "batteryHours": 4,
+    "cyclesPerYear": 365,
+    "note": "100 MW of solar (capacity factor from lesson 7's data file: 24.0%, EIA, U.S. solar PV, 2025) and a 50 MW, 4-hour battery (200 MWh) that discharges once a day: 73,000 MWh a year. Sizes illustrative."
+  },
+  "buyer": {
+    "note": "The buyer, a utility or a large electricity user, buys a flat amount all year equal to the plant's typical solar output (210,240 MWh, a flat 24 MW), priced at the hub's yearly average price when it buys without a contract."
+  },
+  "sim": {
+    "years": 200,
+    "seed": 2025,
+    "hub": { "median": 35, "sigma": 0.25, "note": "Hub price: the yearly average price at the trading hub, $/MWh. Lognormal: median $35, log standard deviation 0.25. Illustrative." },
+    "capture": { "mean": 0.85, "sd": 0.05, "min": 0.65, "max": 1.05, "note": "Solar capture ratio: the average hub price over the hours the solar farm produces, as a share of the hub's yearly average (below 1 because solar hours are often cheaper). Normal, mean 0.85, standard deviation 0.05, cut at 0.65 and 1.05. Illustrative." },
+    "volume": { "mean": 1, "sd": 0.04, "min": 0.88, "max": 1.12, "note": "Output: this year's solar output as a share of a typical year's. Normal, mean 1, standard deviation 0.04, cut at 0.88 and 1.12. Illustrative." },
+    "basis": { "mean": -2, "sd": 2.5, "note": "Basis: the plant's node price minus the hub price, averaged over the hours it produces, $/MWh. Normal, mean −$2, standard deviation $2.50. Illustrative." },
+    "spread": { "median": 40, "sigma": 0.35, "note": "Battery margin: what the battery earns per MWh it discharges, after paying for its charging and losses, $/MWh. Lognormal: median $40, log standard deviation 0.35. Illustrative." }
+  },
+  "priceOffsets": [-5, 5],
+  "priceStep": 0.5,
+  "sources": {
+    "schwabe2017": { "text": "Schwabe, P., Feldman, D., Fields, J. and Settle, E. (2017), Wind Energy Finance in the United States: Current Practice and Opportunities, NREL/TP-6A20-68227, pp. 27-28: virtual PPAs as contracts for differences, settled at the hub or at the busbar, and basis risk", "url": "https://docs.nlr.gov/docs/fy17osti/68227.pdf", "asOf": "August 2017, accessed 3 November 2026" },
+    "epa-physical": { "text": "EPA Green Power Partnership, Physical PPA", "url": "https://www.epa.gov/green-power-markets/physical-ppa", "asOf": "last updated 10 July 2026, accessed 3 November 2026" },
+    "epa-financial": { "text": "EPA Green Power Partnership, Financial PPA", "url": "https://www.epa.gov/green-power-markets/financial-ppa", "asOf": "last updated 14 July 2026, accessed 3 November 2026" },
+    "ferc2024": { "text": "FERC staff (2024), Energy Primer: A Handbook of Energy Market Basics: locational marginal prices p. 70; contract quantity, location (nodes, zones, hubs), fixed and floating prices, forwards and swaps pp. 121-122", "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf", "asOf": "January 2024, accessed 3 November 2026" },
+    "kahrl2021": { "text": "Kahrl, F. (2021), All-Source Competitive Solicitations: State and Electric Utility Practices, Lawrence Berkeley National Laboratory: tolling agreements p. 5 (Table 1 note) and p. 34", "url": "https://eta-publications.lbl.gov/sites/default/files/all_source_competitive_solutions_20210217_gmlc_format.pdf", "asOf": "March 2021, accessed 3 November 2026" },
+    "millstein2021": { "text": "Millstein, D., Wiser, R., Mills, A. D., Bolinger, M., Seel, J. and Jeong, S. (2021), Solar and wind grid system value in the United States: The effect of transmission congestion, generation profiles, and curtailment, Joule 5(7), 1749-1775 (abstract)", "url": "https://doi.org/10.1016/j.joule.2021.05.009", "asOf": "June 2021, accessed 3 November 2026" }
+  }
+}
