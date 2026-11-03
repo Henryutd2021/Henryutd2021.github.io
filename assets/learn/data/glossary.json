@@ -461,6 +461,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "mmbtu": {
+  "term": "MMBtu",
+  "short": "One million British thermal units, a unit of fuel energy used to price natural gas; about 293 kWh of heat.",
+  "lesson": 8,
+  "href": "08-merit-order.html"
+ },
  "nadir": {
   "term": "Nadir",
   "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
