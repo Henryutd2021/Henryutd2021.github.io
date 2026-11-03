@@ -203,6 +203,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "carnot-limit": {
+  "term": "Carnot limit",
+  "short": "The largest share of heat any heat engine can turn into work: 1 minus the cold temperature over the hot temperature, both in kelvin.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "carrying-cost": {
   "term": "Carrying cost",
   "short": "What money tied up in buildings or equipment costs while they earn nothing: the interest, or the return it could have earned elsewhere.",
@@ -280,6 +286,12 @@
   "short": "A table with papers in rows and ideas in columns, coded by a stated rule, that shows what a literature covers and what it leaves out.",
   "lesson": "R2",
   "href": "r02-literature.html"
+ },
+ "condenser": {
+  "term": "Condenser",
+  "short": "The part of a steam plant that cools the used steam back into water, so it can be pumped back to the boiler; most of the plant's waste heat leaves here.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "conditional-price": {
   "term": "Conditional price",
@@ -755,6 +767,24 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "gas-turbine": {
+  "term": "Gas turbine",
+  "short": "An engine that compresses air, burns fuel in it and lets the hot gas spin a turbine, as a jet engine does; alone it is a simple-cycle plant, such as a peaker.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "generator": {
+  "term": "Generator",
+  "short": "A machine that turns the spin of a shaft into electricity, by turning magnets past coils of wire.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "geothermal": {
+  "term": "Geothermal power",
+  "short": "Electricity made from the earth's heat, using hot water or steam brought up from wells.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "gigawatt": {
   "term": "Gigawatt (GW)",
   "short": "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand.",
@@ -785,6 +815,18 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "hydraulic-head": {
+  "term": "Head (hydropower)",
+  "short": "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "heat-engine": {
+  "term": "Heat engine",
+  "short": "A machine that turns part of a flow of heat into motion, such as a steam or gas turbine; the hotter its heat source, the larger the part it can turn.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "heat-pump": {
   "term": "Heat pump",
   "short": "A device that uses electricity to move heat, into a building to warm it or out of it to cool it.",
@@ -796,6 +838,12 @@
   "short": "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "hrsg": {
+  "term": "Heat recovery steam generator (HRSG)",
+  "short": "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "hidden-state": {
   "term": "Hidden state",
@@ -1307,6 +1355,12 @@
   "lesson": "CF6",
   "href": "cf6-shifting-load-to-clean-hours.html"
  },
+ "penstock": {
+  "term": "Penstock",
+  "short": "The large pipe that carries water down from a reservoir to a hydro plant's turbine.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "percentile": {
   "term": "Percentile",
   "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
@@ -1529,6 +1583,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "reservoir": {
+  "term": "Reservoir",
+  "short": "The lake a dam holds back; its water is energy stored for later, up to what it holds.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "resource-adequacy": {
   "term": "Resource adequacy",
   "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation.",
@@ -1540,6 +1600,12 @@
   "short": "The share of the energy put into storage that comes back out.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "run-of-river": {
+  "term": "Run-of-river plant",
+  "short": "A hydro plant with little or no reservoir, so it makes what the river's flow brings at the time.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "running-cost": {
   "term": "Running cost",
@@ -1661,6 +1727,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "start-up-time": {
+  "term": "Start-up time",
+  "short": "How long a plant takes to go from shut down to full output; the ramp rate is how fast it changes output once running.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "state-of-charge": {
   "term": "State of charge",
   "short": "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next.",
@@ -1672,6 +1744,12 @@
   "short": "A heat exchanger in which hot water from a reactor's sealed loop boils the water of a second, separate loop into steam.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "steam-turbine": {
+  "term": "Steam turbine",
+  "short": "A turbine spun by high-pressure steam from a boiler or another heat source.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "stock": {
   "term": "Stock",
@@ -1793,6 +1871,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "turbine": {
+  "term": "Turbine",
+  "short": "A machine whose blades are pushed round by moving gas, steam, water or wind, turning a shaft.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "unbounded": {
   "term": "Unbounded",
   "short": "Said of a model whose goal can improve without limit, which usually means a rule is missing.",
@@ -1864,6 +1948,12 @@
   "short": "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "waste-heat": {
+  "term": "Waste heat",
+  "short": "Heat a power plant cannot turn into electricity and releases to the air or to cooling water.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "watt-hour": {
   "term": "Watt-hour (Wh)",

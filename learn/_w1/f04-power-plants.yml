@@ -1,0 +1,54 @@
+# Sidecar for F4 (f04-power-plants), builder learn-w3-a (fork f04), 2026-11-03. Read by scripts/build_learn.py.
+id: f04-power-plants
+lesson: F4
+glossary:
+  - id: turbine
+    term: Turbine
+    def: "A machine whose blades are pushed round by moving gas, steam, water or wind, turning a shaft."
+  - id: generator
+    term: Generator
+    def: "A machine that turns the spin of a shaft into electricity, by turning magnets past coils of wire."
+  - id: heat-engine
+    term: Heat engine
+    def: "A machine that turns part of a flow of heat into motion, such as a steam or gas turbine; the hotter its heat source, the larger the part it can turn."
+  - id: waste-heat
+    term: Waste heat
+    def: "Heat a power plant cannot turn into electricity and releases to the air or to cooling water."
+  - id: gas-turbine
+    term: Gas turbine
+    def: "An engine that compresses air, burns fuel in it and lets the hot gas spin a turbine, as a jet engine does; alone it is a simple-cycle plant, such as a peaker."
+  - id: steam-turbine
+    term: Steam turbine
+    def: "A turbine spun by high-pressure steam from a boiler or another heat source."
+  - id: condenser
+    term: Condenser
+    def: "The part of a steam plant that cools the used steam back into water, so it can be pumped back to the boiler; most of the plant's waste heat leaves here."
+  - id: hydraulic-head
+    term: Head (hydropower)
+    def: "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres."
+  - id: reservoir
+    term: Reservoir
+    def: "The lake a dam holds back; its water is energy stored for later, up to what it holds."
+  - id: penstock
+    term: Penstock
+    def: "The large pipe that carries water down from a reservoir to a hydro plant's turbine."
+  - id: geothermal
+    term: Geothermal power
+    def: "Electricity made from the earth's heat, using hot water or steam brought up from wells."
+  - id: run-of-river
+    term: Run-of-river plant
+    def: "A hydro plant with little or no reservoir, so it makes what the river's flow brings at the time."
+  - id: start-up-time
+    term: Start-up time
+    def: "How long a plant takes to go from shut down to full output; the ramp rate is how fast it changes output once running."
+  - id: carnot-limit
+    term: Carnot limit
+    def: "The largest share of heat any heat engine can turn into work: 1 minus the cold temperature over the hot temperature, both in kelvin."
+  - id: hrsg
+    term: Heat recovery steam generator (HRSG)
+    def: "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame."
+requests:
+  - "F4 loads assets/learn/f03-energy-services.js before its own script, for LX.Sankey (F3's lesson-local Sankey). When the Sankey is promoted to components/sankey.js, drop that script tag from learn/f04-power-plants.qmd and the f03 require in _tests/learn/test_f04-power-plants.js."
+  - "Promote, if wanted: PlantExplorer (assets/learn/f04-power-plants.js: a rail of plants, a cutaway each from tokens only, energy in, what spins, the energy chain and a text version). Its six cutaway drawings (SCENE: gas, steam, hydro, geothermal, wind, PV) could serve T6, A15, F10 and X1."
+  - "Sources: the renewable shares (geothermal 16%, hydro 90%, wind 26% at rated speed) are EIA's notional equipment efficiencies from the Annual Energy Review 2010, Appendix F, Table F1 (p. 358), the only EIA table that gives all three; EIA says they are notional, not measured operating efficiencies, and the page says so. A newer primary source for hydro and geothermal efficiencies would be welcome (usgs.gov and ferc.gov pages blocked the fetch tool on 3 November 2026)."
+  - "The SPP solar shape on 12 September 2025 holds near full output through the last daylight hour and then drops to zero (881 thousandths of its 2025 maximum in the hour from 19:00 local, then zero): a likely telemetry error that scripts/build_learn_town_data.py does not flag (its frozen-value rule needs three identical values). F4 does not use that day; the data builder may want a rule for solar that stays high into the last daylight hour."
