@@ -670,7 +670,7 @@
   title: "When the cost per kilogram and the cost of the system disagree"
   subtitle: "Why a costlier kilogram of hydrogen can come with a cheaper system, and which number answers which question"
   short: "Cost per kg against system cost"
-  does: "A published wind-and-hydrogen study in six parts and a timeline; then build an electrolyzer block by block and watch the cost per kilogram rise while the system's net cost falls."
+  does: "A case file in six parts and a timeline; then build an electrolyzer block by block and watch the cost per kilogram rise while the system's net cost falls."
   outcome: "Say which question a levelized cost answers and which a system's net cost answers, and find where they disagree."
   teaches: [levelized cost against system cost, average and marginal tests, reading a published optimization study]
   after: [7]
@@ -685,7 +685,7 @@
   title: "How much can shifting load to cleaner hours cut emissions, and when?"
   subtitle: "Average and marginal emission factors, and when moving electricity use to cleaner hours lowers CO₂"
   short: "Shifting load to clean hours"
-  does: "A published load-shifting study in six parts and a timeline; then move 10 MWh between hours of Prairie Town's real-shaped day and compare average-factor accounting with what the plants emit."
+  does: "A case file in six parts and a timeline; then move 10 MWh between hours of Prairie Town's real-shaped day and compare average-factor accounting with what the plants emit."
   outcome: "Tell an average emission factor from a marginal one, and say when moving use to another hour lowers what the plants emit."
   teaches: [average and marginal emission factors, load shifting, attributional and consequential accounting]
   after: [12]
@@ -700,7 +700,7 @@
   title: "What does waiting for the grid cost, and who pays?"
   subtitle: "A large load waits for its grid connection: what the wait costs the developer, other electricity customers and society"
   short: "The cost of waiting"
-  does: "A published study of delayed grid service in six parts and a timeline; then price a large load's wait in three accounts and see what a tariff and bridge power change."
+  does: "A case file in six parts and a timeline; then price a large load's wait in three accounts and see what a tariff and bridge power change."
   outcome: "Price a delay in present value for each party, and tell a transfer between accounts from a real saving."
   teaches: [present value of a delay, private ratepayer and social accounts, large-load tariffs]
   after: [8]

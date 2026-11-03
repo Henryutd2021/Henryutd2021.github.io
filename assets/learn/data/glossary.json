@@ -29,6 +29,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "attributed-emissions": {
+  "term": "Attributed emissions",
+  "short": "The share of a grid's CO₂ assigned to one user, for example each MWh it uses times that hour's average emission factor.",
+  "lesson": "CF6",
+  "href": "index.html#analyst"
+ },
  "agc": {
   "term": "Automatic generation control (AGC)",
   "short": "The grid operator's computer system that raises or lowers plants over minutes to bring frequency back to 60 Hz.",
@@ -100,6 +106,12 @@
   "short": "A search for the best whole-number plan that solves relaxations, splits on a fractional decision (off or on), and drops every branch whose bound cannot beat the best plan found.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "bridge-power": {
+  "term": "Bridge power",
+  "short": "Temporary on-site generation that serves part of a load until its grid connection is ready.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
  },
  "bus": {
   "term": "Bus",
@@ -196,6 +208,12 @@
   "short": "A saved snapshot of every file in a project, with a message, its author and time, and a link to the commit before it.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "concentrated-solar": {
+  "term": "Concentrated solar power",
+  "short": "Mirrors focus sunlight to heat a fluid; the heat runs a turbine or a process, and it can be stored for hours in tanks.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
  },
  "concept-matrix": {
   "term": "Concept matrix",
@@ -329,6 +347,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "developer": {
+  "term": "Developer",
+  "short": "The company that plans, builds and owns a new facility, such as a factory or a data center.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "diff": {
   "term": "Diff",
   "short": "A line-by-line list of what changed between two versions of a file, with removed lines marked minus and added lines plus.",
@@ -401,6 +425,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "energization": {
+  "term": "Energization",
+  "short": "Switching on a customer's grid service, so that power can flow to it.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "energy": {
   "term": "Energy",
   "short": "An amount of electricity made or used over a stretch of time, equal to power multiplied by time and measured in kilowatt-hours (kWh) or megawatt-hours (MWh).",
@@ -431,6 +461,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "ercot": {
+  "term": "ERCOT",
+  "short": "The Electric Reliability Council of Texas: the grid operator, and its wholesale market, for most of Texas.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
+ },
  "ethics-board": {
   "term": "Ethics board (IRB)",
   "short": "The committee that reviews research with people before it starts; in the United States, an institutional review board.",
@@ -443,11 +479,23 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "exogenous": {
+  "term": "Exogenous",
+  "short": "Set from outside a model as an input, rather than worked out by the model.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "expected-value": {
   "term": "Expected value",
   "short": "The long-run average of an uncertain quantity: each possible outcome multiplied by its chance, then added up.",
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
+ },
+ "external-cost": {
+  "term": "External cost",
+  "short": "A cost that falls on people outside a deal, such as the damage from CO₂, which neither the buyer nor the seller pays.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
  },
  "falsification-statement": {
   "term": "Falsification statement",
@@ -491,6 +539,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "firm-output": {
+  "term": "Firm output",
+  "short": "Power a plant can be counted on to deliver steadily, such as the same output in every hour.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
+ },
  "firm-share": {
   "term": "Firm share (ELCC)",
   "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class.",
@@ -533,6 +587,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "fuel-cell": {
+  "term": "Fuel cell",
+  "short": "A device that turns hydrogen (and oxygen from the air) into electricity, with water as the by-product: an electrolyzer run backwards.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
+ },
  "gigawatt": {
   "term": "Gigawatt (GW)",
   "short": "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand.",
@@ -568,6 +628,12 @@
   "short": "Values in a notebook's memory that no longer match the code on the page, for example after a cell was edited but not rerun.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "high-temperature-electrolyzer": {
+  "term": "High-temperature electrolyzer",
+  "short": "An electrolyzer that splits steam at several hundred degrees Celsius; part of the energy comes as heat, so it needs less electricity per kilogram.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
  },
  "histogram": {
   "term": "Histogram",
@@ -655,7 +721,7 @@
  },
  "lcoh": {
   "term": "Levelized cost of hydrogen (LCOH)",
-  "short": "The cost of making one kilogram of hydrogen over a plant's life: all its costs divided by all the kilograms it makes, with future money discounted.",
+  "short": "The cost of making one kilogram of hydrogen over a plant's life: discounted lifetime costs divided by discounted lifetime kilograms (with the same cost and output every year, one year's annualized cost divided by one year's kilograms, as in CF2's toy).",
   "lesson": "CF2",
   "href": "index.html#analyst"
  },
@@ -713,6 +779,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "margin": {
+  "term": "Margin",
+  "short": "What a business earns from its output after paying its operating costs: revenue minus operating costs.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "marginal-cost": {
   "term": "Marginal cost",
   "short": "What one more unit costs, here the extra running cost of one more megawatt-hour of demand.",
@@ -721,7 +793,7 @@
  },
  "marginal-emission-factor": {
   "term": "Marginal emission factor",
-  "short": "The change in a grid's CO₂ when demand in one hour grows by one megawatt-hour: the CO₂ rate of the plant that serves it.",
+  "short": "The change in a grid's total CO₂ caused by a small change in electricity demand; in Prairie Town, the CO₂ rate of the next plant that responds.",
   "lesson": "CF6",
   "href": "index.html#analyst"
  },
@@ -857,6 +929,12 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
+ "net-benefit-test": {
+  "term": "Net-benefit test",
+  "short": "A check that an option's total benefits across all affected parties exceed its total costs, each counted once.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "no-load-cost": {
   "term": "No-load cost",
   "short": "What a plant costs for each hour it is on, before it makes any power.",
@@ -892,6 +970,12 @@
   "short": "Finding the best choice among many, given a goal and the rules the choice must obey.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "optimization-window": {
+  "term": "Optimization window",
+  "short": "The stretch of time, such as a month, within which a model may move electricity use between hours while keeping the total over that stretch.",
+  "lesson": "CF6",
+  "href": "index.html#analyst"
  },
  "order-of-magnitude": {
   "term": "Order of magnitude",
@@ -929,6 +1013,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "penalty": {
+  "term": "Penalty",
+  "short": "An extra cost added to a model's objective for an action it should not take too freely, such as adjusting an hour's load.",
+  "lesson": "CF6",
+  "href": "index.html#analyst"
+ },
  "percentile": {
   "term": "Percentile",
   "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
@@ -952,6 +1042,12 @@
   "short": "The simplest forecast: the next value will be the same as the last one seen, or as the same hour a day or a week before.",
   "lesson": 4,
   "href": "04-forecasts.html"
+ },
+ "photovoltaic": {
+  "term": "Photovoltaic (PV)",
+  "short": "Solar panels that turn sunlight directly into electricity.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
  },
  "power": {
   "term": "Power",
@@ -1271,6 +1367,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "tariff": {
+  "term": "Tariff",
+  "short": "A utility's approved rules and prices for what a customer pays; a large-load tariff adds rules for very large customers, such as a minimum bill or collateral.",
+  "lesson": "CF7",
+  "href": "index.html#analyst"
+ },
  "telemetry": {
   "term": "Telemetry",
   "short": "Measurements sent automatically from plants and substations to the grid operator.",
@@ -1282,6 +1384,12 @@
   "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "thermal-storage": {
+  "term": "Thermal storage",
+  "short": "Storing energy as heat, for example in tanks of hot molten salt, to use it hours later.",
+  "lesson": "CF2",
+  "href": "index.html#analyst"
  },
  "time-step": {
   "term": "Time step",

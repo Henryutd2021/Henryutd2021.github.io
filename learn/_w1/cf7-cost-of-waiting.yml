@@ -1,5 +1,5 @@
-# Sidecar for CF7 (cf7-cost-of-waiting), builder learn-w2-i, 2026-11-03. Read by scripts/build_learn.py.
-# The page is a draft (learn/_drafts/) until Henry approves its excerpt (reports/learn/excerpts_for_approval.md, E7).
+# Sidecar for CF7 (cf7-cost-of-waiting), builder learn-w2-i, 2026-11-03; fixes learn-w2-fix-i. Read by
+# scripts/build_learn.py. Henry approved the page's excerpt on 2026-11-03 (reports/learn/excerpts_for_approval.md, E7).
 id: cf7-cost-of-waiting
 lesson: CF7
 glossary:
@@ -21,5 +21,27 @@ glossary:
   - id: staged-energization
     term: Staged energization
     def: "Switching on part of a large load's grid service early and the rest later, as the grid becomes ready."
-requests:
-  - "CF7 cites the accepted NAPS 2026 paper without its title: the published title contains a word on the §20.4 deny-list (an abbreviation for machine intelligence), and §20.6 asks citations to keep titles exactly. Decision needed (excerpts_for_approval.md, E7): keep the description, or allow-list that title as a citation exception. When the DOI exists, add it to the citation, the timeline event and the numbers table."
+  - id: energization
+    term: Energization
+    def: "Switching on a customer's grid service, so that power can flow to it."
+  - id: developer
+    term: Developer
+    def: "The company that plans, builds and owns a new facility, such as a factory or a data center."
+  - id: margin
+    term: Margin
+    def: "What a business earns from its output after paying its operating costs: revenue minus operating costs."
+  - id: tariff
+    term: Tariff
+    def: "A utility's approved rules and prices for what a customer pays; a large-load tariff adds rules for very large customers, such as a minimum bill or collateral."
+  - id: exogenous
+    term: Exogenous
+    def: "Set from outside a model as an input, rather than worked out by the model."
+  - id: external-cost
+    term: External cost
+    def: "A cost that falls on people outside a deal, such as the damage from CO₂, which neither the buyer nor the seller pays."
+  - id: bridge-power
+    term: Bridge power
+    def: "Temporary on-site generation that serves part of a load until its grid connection is ready."
+  - id: net-benefit-test
+    term: Net-benefit test
+    def: "A check that an option's total benefits across all affected parties exceed its total costs, each counted once."
