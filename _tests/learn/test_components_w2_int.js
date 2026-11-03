@@ -63,10 +63,11 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   ["\\.cf-ctl \\{", "\\.cf-ctl-l \\{", "\\.cf-row \\{", "\\.cf-selects \\{", "\\.cf-sel select \\{", "\\.cf-two \\{", "\\.cf-two td::before \\{ content: attr\\(data-l\\)",
    "\\.lx-case-try code \\{ white-space: normal; overflow-wrap: anywhere; \\}", "body\\.page-learn \\{ --t: var\\(--lx-accent\\); \\}", "\\.page-learn \\.explainer \\{ --t-ink: "].forEach(r =>
     ok(new RegExp(r).test(forms), "forms.css has " + r.replace(/\\/g, "")));
-  fs.readdirSync(path.join(SITE, "learn/_drafts")).filter(f => /^cf\d/.test(f)).forEach(f => {
-    const q = rd("learn/_drafts/" + f);
-    ok(!/<style>/.test(q) && !/theme-[a-z]+/.test(q.split("\n---")[0]), f + ": no page style and no theme-* body class (forms.css holds them)");
-  });
+  // the case files, live in learn/ or still drafts in learn/_drafts/ (CF2, CF6 and CF7 went live in W2)
+  ["learn", "learn/_drafts"].filter(d => fs.existsSync(path.join(SITE, d))).forEach(d => fs.readdirSync(path.join(SITE, d)).filter(f => /^cf\d.*\.qmd$/.test(f)).forEach(f => {
+    const q = rd(d + "/" + f);
+    ok(!/<style>/.test(q) && !/theme-[a-z]+/.test(q.split("\n---")[0]), d + "/" + f + ": no page style and no theme-* body class (forms.css holds them)");
+  }));
   ok(/<code>python run\.py --case toy<\/code>/.test(rd("learn/_template-case.qmd")), "case template: the Try-it example shows a command, which wraps");
 }
 
