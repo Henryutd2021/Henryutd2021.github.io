@@ -121,7 +121,7 @@
  },
  "congestion-rent": {
   "term": "Congestion rent",
-  "short": "What loads pay at their locational prices minus what generators are paid at theirs, equal to each full line's shadow price times its flow.",
+  "short": "What loads pay at their locational prices minus what generators are paid at theirs; in a DC model it equals the sum, over the full lines, of each line's shadow price times its flow.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
@@ -181,7 +181,7 @@
  },
  "dc-power-flow": {
   "term": "DC power flow",
-  "short": "A linear approximation of how power splits over the lines of a network, which ignores losses and voltage and sets each line's flow from voltage angles and the line's reactance.",
+  "short": "A linear approximation of real-power flows that sets each line's flow from the voltage-angle difference across it, holds voltage magnitudes fixed, assumes small angles, and leaves out losses and reactive power.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
@@ -409,7 +409,7 @@
  },
  "locational-marginal-price": {
   "term": "Locational marginal price (LMP)",
-  "short": "The cost of serving one more megawatt-hour at one place on the grid in one interval, given the plants running and the limits of the lines.",
+  "short": "The extra cost per megawatt-hour of serving a small increase in demand at one place on the grid in one interval, given the plants running and the limits of the lines.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
@@ -484,6 +484,12 @@
   "short": "What an optimization tries to make as small or as large as possible, such as the total cost.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "optimality-gap": {
+  "term": "Optimality gap",
+  "short": "For a mixed-integer program, the remaining distance between the best plan the solver has found and the bound it has proven, so 0% means proven best.",
+  "lesson": 11,
+  "href": "11-solver.html"
  },
  "optimization": {
   "term": "Optimization",
@@ -706,6 +712,12 @@
   "short": "Relays that automatically disconnect blocks of customers when the frequency falls to a set level, to save the rest of the grid.",
   "lesson": 3,
   "href": "03-balancing.html"
+ },
+ "unit-commitment": {
+  "term": "Unit commitment",
+  "short": "Deciding which plants are on in each hour, before deciding how much each one produces.",
+  "lesson": 11,
+  "href": "11-solver.html"
  },
  "unserved-energy": {
   "term": "Unserved energy",

@@ -7,7 +7,8 @@
   "view": { "x": [0, 240], "y": [0, 160] },
   "dot": [60, 40],
   "level0": 12000,
-  "ranges": { "D": [60, 240], "cap": [0, 150], "cost": [-20, 150], "level": [0, 16000] },
+  "ranges": { "D": [60, 240], "cap": [0, 150], "capStep": 0.05, "cost": [-20, 150], "costTie": [5, 150], "level": [0, 16000] },
+  "rangesNote": "capStep: the CO2 cap slider moves in 0.05 t steps (its − / + buttons and arrow keys), so the binding cap (the best plan's 53.65 t) is a reachable value. costTie: the tie step's cost sliders stay positive; at a zero cost every plan in the region ties, and at equal negative costs the best plan is a single corner.",
   "bins": [
     { "id": "decision", "label": "Decisions", "sub": "what the model chooses", "color": "var(--lx-tier-2)" },
     { "id": "goal", "label": "Goal", "sub": "what it makes smallest", "color": "var(--lx-good)" },

@@ -1,10 +1,19 @@
-// test_11-solver.js — Node tests for Lesson 11 (assets/learn/11-solver.js), its data (assets/learn/data/11-solver.json)
-// and every number the page (learn/11-solver.qmd) states. Solves with the vendored HiGHS, the same core as the page.
-//   - the day equals lesson 0's (grid-operator.js prepare()); the LP's optimum equals lesson 0's full-day optimum
-//   - every hourly shadow price equals the finite difference of the best cost (one more MWh), and why() explains it
-//   - the solver's plan cannot be beaten by any one-hour edit that keeps the ramp rule; its checks pass
-//   - the planted sign error solves "optimal" at a lower cost and fails the balance and totals checks
-//   - the peaker starts below the threshold price; the MILP has no duals and respects the on-or-off minimum
+// test_11-solver.js — Node tests for Lesson 11 (assets/learn/11-solver.js), its data (assets/learn/data/11-solver.json),
+// its page (learn/11-solver.qmd) and its sidecar (learn/_w1/11-solver.yml). Solves with the vendored HiGHS, the same
+// core as the page. What it covers, and what it does not:
+//   - model: the day equals lesson 0's (grid-operator.js prepare()); the LP's optimum and $400 saving; every hourly
+//     shadow price lies between the one-sided finite differences, equals them where they agree, and why() explains it;
+//     the redispatch behind the two kinks (07:00 and 09:00); the 5 MWh quiz; the sign error; the peaker threshold;
+//     the sliders' corners; the MILP (no duals, the on-or-off minimum)
+//   - the editor (evalPlan): no one-hour edit that keeps every rule beats the solver; plans that break a ramp, leave a
+//     surplus after all curtailment, or leave demand unserved are rejected (each with a reproducible case)
+//   - the checks: they pass on the solver's plans, fail on the sign error, catch a peaker below its on-or-off minimum,
+//     and keep "all demand served" apart from the accounting identity (a reproducible unserved case)
+//   - text: the numbers stated in the .qmd (string matches against the model, not their meaning), the data file's
+//     computed blocks, the sidecar's one-sided prices, curtailment named as wind and solar (not "sun") in the .qmd and
+//     the .js, the MILP wording, every equation-card symbol defined, and the price buttons kept on tap (a source guard)
+//   - not covered: the numbers composed at run time in the .js (they come from the model), layout and the browser
+//     interaction itself (screenshots), and the rendered HTML unless _site/learn/11-solver.html is newer than the .qmd
 // Usage (from the site folder):  node _tests/learn/test_11-solver.js            run the checks
 //                                node _tests/learn/test_11-solver.js --write    rewrite the data file's computed blocks and
 //                                                                               the page's static fallback figure
@@ -74,6 +83,19 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   ok(counts[40] === 18 && counts[0] === 3 && counts[80] === 3, `duals: 18 hours at $40, 3 at $0, 3 at $80 (${JSON.stringify(counts)})`);
   ok(degenerate.join() === D.degenerateHours.join(), `duals: the hours with a non-unique price are ${D.degenerateHours} (${degenerate})`);
   ok(near(B.duals[D.probe.hour], D.probe.answer), `probe: the shadow price at ${D.probe.hour}:00 is the predicted answer $${D.probe.answer}`);
+  // what the solver changes at the two kinks (the page's table)
+  const diff = (o, k) => o[k].map((v, h) => Math.abs(v - B[k][h]) > 1e-6 ? h + ":" + Math.round(v - B[k][h]) : "").filter(Boolean).join(" ");
+  const dOne = (t, d) => { const a = {}; a[t] = d; return run(M.settings({ add: a })).o; };
+  const u7 = dOne(7, 1), d7 = dOne(7, -1), u9 = dOne(9, 1), d9 = dOne(9, -1);
+  ok(diff(u7, "pk") === "7:1" && diff(u7, "cc") === "", `kink 07:00 up: the peaker makes the MWh (cc ${diff(u7, "cc")}, pk ${diff(u7, "pk")})`);
+  ok(diff(d7, "cc") === "7:-1 8:-1" && diff(d7, "pk") === "", `kink 07:00 down: 07:00 and 08:00 each fall by 1 MWh (cc ${diff(d7, "cc")})`);
+  ok(diff(u9, "cc") === "9:1" && diff(u9, "pk") === "", `kink 09:00 up: the combined-cycle (cc ${diff(u9, "cc")})`);
+  ok(diff(d9, "cc") === "7:-1 8:-1 9:-1" && diff(d9, "pk") === "7:1", `kink 09:00 down: 07:00-09:00 fall by 1 MWh and the peaker covers 07:00 (cc ${diff(d9, "cc")}, pk ${diff(d9, "pk")})`);
+  const five = run(M.settings({ add: { 19: 5 } })).o;
+  ok(near(five.totals.cost - B.totals.cost, 5 * B.duals[19]) && near(B.duals[19], 40), `quiz: 5 MWh more at 19:00 costs $${five.totals.cost - B.totals.cost} = 5 × $${B.duals[19]}`);
+  // the curtailment variable holds both wind and solar (so the page names both)
+  let cw = 0, cs = 0; B.sp.forEach((v, t) => { const vr = W.wind[t] + W.solar[t]; if (vr > 0) { cw += v * W.wind[t] / vr; cs += v * W.solar[t] / vr; } });
+  ok(cw > 1 && cs > 1, `curtailment: ${B.totals.sp} MWh, about ${cw.toFixed(1)} of wind and ${cs.toFixed(1)} of solar in the chart's split`);
   const oddHours = B.duals.map((y, t) => near(y, 40) ? -1 : t).filter(t => t >= 0);
   console.log(`  shadow prices: ${B.duals.join(" ")}; odd hours ${oddHours.join(", ")}`);
 
@@ -90,6 +112,12 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   ok(wins === 0 && rampOK > 24, `editor: no one-hour edit that keeps the rules beats the solver (${tried} tried, ${rampOK} keep the rules)`);
   const p13 = plan0.slice(); p13[D.editHour] -= 5; const e13 = M.evalPlan(W, M.settings(), p13);
   ok(e13.cost < B.totals.cost && e13.rampBreaks.length > 0, `editor: lowering ${D.editHour}:00 by 5 MW looks cheaper (${e13.cost}) but breaks a ramp at ${e13.rampBreaks}`);
+  // review case: 01:00 at 150 MW keeps the ramps but leaves 7 MW of surplus after all wind and solar there is curtailed
+  const p1 = plan0.slice(); p1[1] = 150; const e1 = M.evalPlan(W, M.settings(), p1);
+  ok(!e1.ok && e1.rampBreaks.length === 0 && e1.overHours.join() === "1" && near(e1.over[1], 7), `editor: 01:00 at 150 MW is rejected for a ${e1.over[1]} MW surplus, not for a ramp`);
+  // and a plan that leaves demand unserved (19:00 at 30 MW: the peaker's 100 MW cannot fill the 115 MW gap) is rejected too
+  const p19 = plan0.slice(); p19[19] = 30; const e19 = M.evalPlan(W, M.settings(), p19);
+  ok(!e19.ok && e19.shortHours.includes(19) && e19.un[19] > 0, `editor: 19:00 at 30 MW leaves ${e19.un[19]} MW unserved and is rejected`);
 
   // ---------------- the planted sign error
   const bad = run(M.settings({ signError: true })).o, cb = M.checks(W, M.settings({ signError: true }), bad);
@@ -104,6 +132,12 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   [[{ ramp: 30 }, "ramp 30"], [{ demandPct: 10 }, "demand +10%"], [{ windMW: 0 }, "no wind"], [{ ramp: D.ranges.ramp[0] }, "ramp min"], [{ demandPct: D.ranges.demandPct[1], windMW: 0, ramp: D.ranges.ramp[0] }, "worst corner of the sliders"]].forEach(([s, lab]) => {
     const x = run(M.settings(s)); ok(x.r.status === "optimal" && M.checks(W, M.settings(s), x.o).every(c => c.ok), `sliders: ${lab} solves and passes the checks (${x.o.totals.cost}, unserved ${x.o.totals.un})`);
   });
+  // review case: demand +20%, no wind, 10 MW/h ramps leaves 79.6 MWh unserved; the accounting check passes and says so,
+  // and served() reports it apart from the checks
+  const sU = M.settings({ demandPct: 20, windMW: 0, ramp: 10 }), xU = run(sU).o, cU = M.checks(W, sU, xU), vU = M.served(W, sU, xU);
+  ok(near(xU.totals.un, 79.6, 1e-6) && cU[3].ok && /\+ unserved 80 = /.test(cU[3].text) && !/supply minus spill/.test(cU[3].text), `checks: the totals line reads generation after curtailment + unserved = demand (${cU[3].text})`);
+  ok(!vU.ok && near(vU.un, xU.totals.un) && vU.hours > 0, `served: ${vU.un} MWh unserved in ${vU.hours} hours, reported apart from the checks`);
+  ok(M.served(W, M.settings(), B).ok, "served: the day as given serves all demand");
 
   // ---------------- the on-or-off peaker (MILP)
   const sL = M.settings({ ramp: D.milpRamp }), sM = M.settings({ ramp: D.milpRamp, onoff: true });
@@ -113,6 +147,13 @@ const sum = a => a.reduce((x, y) => x + y, 0);
   ok(mi30.o.pk.every(v => v < 1e-6 || v >= sM.pkMin - 1e-6), "milp: the peaker is off or at least its minimum every hour");
   ok(lp30.o.totals.pk > 0 && lp30.o.pk.some(v => v > 1e-6 && v < sM.pkMin - 1e-6), "milp: the LP at this ramp runs the peaker below its minimum somewhere (so the on-or-off rule bites)");
   ok(M.checks(W, sM, mi30.o).every(c => c.ok), "milp: its plan passes the checks");
+  // review case: a peaker at 10 MW, matched by extra curtailment and a recomputed cost, passes every check but the
+  // limits check, and only because of the on-or-off minimum
+  const h10 = mi30.o.sp.findIndex((v, t) => W.wind[t] + W.solar[t] - v >= 10 && mi30.o.pk[t] < 1e-6);
+  const p10 = JSON.parse(JSON.stringify(mi30.o)); p10.pk[h10] = 10; p10.sp[h10] += 10; p10.objective += 10 * sM.pkCost;
+  const c10 = M.checks(W, sM, p10), c10lp = M.checks(W, sL, Object.assign({}, p10, { objective: p10.objective - mi30.o.totals.cost + lp30.o.totals.cost }));
+  ok(h10 >= 0 && !c10[1].ok && c10[0].ok && c10[2].ok && c10[3].ok, `checks: a 10 MW peaker at ${h10}:00 fails the limits check of the on-or-off model (${c10[1].text})`);
+  ok(c10lp[1].ok, "checks: the same 10 MW is within the limits of the linear program (no minimum there)");
   console.log(`  ramp ${D.milpRamp}: LP ${lp30.o.totals.cost} (peaker ${lp30.o.totals.pk} MWh), MILP ${mi30.o.totals.cost} (peaker ${mi30.o.totals.pk} MWh)`);
 
   // ---------------- the data file's computed blocks
@@ -136,8 +177,27 @@ const sum = a => a.reduce((x, y) => x + y, 0);
       `${counts[40]} of 24`, money(lp30.o.totals.cost), money(mi30.o.totals.cost)];
     must.forEach(s => ok(Q.includes(s), `page: states ${s}`));
     const [h1, h2] = D.degenerateHours, o1 = oneSided[h1], o2 = oneSided[h2];
-    ok(Q.includes(`At 0${h1}:00 one more MWh of demand costs \\$${o1[0]}`) && Q.includes(`One MWh *less* saves only \\$${o1[1]}`) && Q.includes(`HiGHS reports \\$${B.duals[h1]}`) &&
-       Q.includes(`At 0${h2}:00 the two sides are \\$${o2[0]} and \\$${o2[1]}`), `page: the non-unique prices at ${h1}:00 (${o1}) and ${h2}:00 (${o2}) as computed`);
+    const kinkRow = h => `| ${String(h).padStart(2, "0")}:00 | \\$${oneSided[h][0]} | \\$${oneSided[h][1]} | \\$${B.duals[h]} |`;
+    ok(Q.includes(kinkRow(h1)) && Q.includes(kinkRow(h2)), `page: the kink table rows for ${h1}:00 (${o1}, reports ${B.duals[h1]}) and ${h2}:00 (${o2}, reports ${B.duals[h2]}) as computed`);
+    ok(Q.includes("(\\$" + 3 * f.cc.cost + ")") && Q.includes("(−\\$" + f.peaker.cost + ")") && near(3 * f.cc.cost - f.peaker.cost, o2[1]), `page: the 09:00 saving is 3 × $40 − $100 = $${o2[1]}`);
+    // curtailment is wind and solar, never "sun" alone; the MILP wording follows curriculum §9.2
+    const JS = fs.readFileSync(L("11-solver.js"), "utf8");
+    [["page", Q], ["js", JS]].forEach(([k, txt]) => ok(!/spill(ed|s|ing)? (sun|solar)|of sun|sun is spilled|Spilled sun/i.test(txt), `${k}: curtailment is named as wind and solar, never spilled sun`));
+    ok(!/no (single )?slope/i.test(Q + JS) && /conditional on that commitment/.test(Q) && /returns no (ordinary )?(LP )?shadow prices/.test(Q), "page: a mixed-integer solve returns no shadow prices; prices conditional on the commitment");
+    ok(/July 2017/.test(Q), "page: the 5-minute dispatch fact is dated (EIA, July 2017)");
+    // every symbol button of the equation card has its words (a source check of the explain layer)
+    const symIds = [...JS.matchAll(/sym\("(\w+)"/g)].map(m => m[1]), defs = new Set([...JS.matchAll(/^ {10}(\w+): \{ name: /gm)].map(m => m[1]));
+    ok(symIds.length >= 15 && symIds.every(k => defs.has(k)), `equation card: all ${new Set(symIds).size} symbols have words (${symIds.filter(k => !defs.has(k))})`);
+    ok(!/pricePick = t; paintPrices\(\)/.test(JS) && /pricePick = t; markPick\(\)/.test(JS), "prices: a tap marks the pressed button instead of rebuilding the buttons (keyboard focus stays)");
+    // the sidecar's numerical note matches the one-sided prices
+    const SC = fs.readFileSync(path.join(SITE, "learn/_w1/11-solver.yml"), "utf8");
+    ok(SC.includes(`at 0${h1}:00 one more MWh costs $${o1[0]} and\n# one less saves $${o1[1]}`) && SC.includes(`at 0${h2}:00 one more costs $${o2[0]} and one less saves $${o2[1]}`) && !/\$0\/\$40/.test(SC), "sidecar: the one-sided prices at the kinks as computed");
+    // the rendered page, when it is newer than the source
+    const HP = path.join(SITE, "_site/learn/11-solver.html");
+    if (fs.existsSync(HP) && fs.statSync(HP).mtimeMs >= fs.statSync(QPATH).mtimeMs) {
+      const HT = fs.readFileSync(HP, "utf8");
+      [money(B.totals.cost), money(ex.cost), money(bad.totals.cost), money(lp30.o.totals.cost), money(mi30.o.totals.cost), "18 of 24", "July 2017"].forEach(x => ok(HT.includes(x), `html: the rendered page states ${x}`));
+    } else console.log("  (rendered page absent or older than the .qmd: html checks skipped)");
     ok(!/learning[- ]curve|FOAK|NOAK/i.test(Q), "page: no excluded terms");
     D.facts.forEach(fc => ok(Q.includes(fc.url) && Q.includes(fc.n), `page: number to remember ${fc.n} with its source`));
   } else ok(false, "page: learn/11-solver.qmd missing");
@@ -151,7 +211,7 @@ function fallbackSVG(W, B) {
   const Wd = 720, Hh = 280, m = { l: 46, r: 8, t: 14, b: 28 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b, ymax = 400;
   const y = v => (m.t + ih - v / ymax * ih).toFixed(1), bw = iw / 24, out = [];
   out.push(`<svg viewBox="0 0 ${Wd} ${Hh}" role="img" aria-labelledby="w11-static-title">`);
-  out.push(`<title id="w11-static-title">The solver's plan for lesson 0's day: hourly supply stacked by plant, with demand as a dashed line. The combined-cycle plant covers every gap; the peaker never runs; ${fmt(B.totals.sp)} MWh of sun is spilled to keep the combined-cycle warm.</title>`);
+  out.push(`<title id="w11-static-title">The solver's plan for lesson 0's day: hourly supply stacked by plant, with demand as a dashed line. The combined-cycle plant covers every gap; the peaker never runs; ${fmt(B.totals.sp)} MWh of wind and solar is curtailed to keep the combined-cycle within its ramp limit.</title>`);
   let g = "<g>";
   for (let v = 0; v <= ymax; v += 100) g += `<line x1="${m.l}" x2="${Wd - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--lx-line)"/><text x="${m.l - 6}" y="${(+y(v) + 4).toFixed(1)}" text-anchor="end" font-size="13" fill="var(--lx-ink-3)">${v}</text>`;
   [0, 6, 12, 18, 24].forEach(h => { g += `<text x="${(m.l + h * bw).toFixed(1)}" y="${Hh - 8}" text-anchor="${h === 0 ? "start" : h === 24 ? "end" : "middle"}" font-size="13" fill="var(--lx-ink-3)">${String(h).padStart(2, "0")}:00</text>`; });

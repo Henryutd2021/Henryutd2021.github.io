@@ -51,17 +51,24 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <g transform="translate(216,28)"><rect width="132" height="68" rx="12" fill="var(--lx-surface)" stroke="var(--lx-cc)" stroke-width="2"/><text x="10" y="20" font-size="14" fill="var(--lx-ink)">Gas Hub</text><text x="10" y="38" font-size="11.5" fill="var(--lx-ink-3)">gas plants</text><text x="10" y="59" font-size="16" fill="var(--lx-ink)">$40/MWh</text></g>
 <g transform="translate(114,204)"><rect width="132" height="68" rx="12" fill="var(--lx-surface)" stroke="var(--lx-demand)" stroke-width="2"/><text x="10" y="20" font-size="14" fill="var(--lx-ink)">Prairie Town</text><text x="10" y="38" font-size="11.5" fill="var(--lx-ink-3)">load + nuclear</text><text x="10" y="59" font-size="16" fill="var(--lx-ink)">$80/MWh</text></g>
 </svg>
-<p class="lx-hint">With JavaScript on, you build this model step by step and solve it with a real solver in your browser: first a day on one bus, then the same day on this network.</p>
+<p class="lx-hint">With JavaScript on, you build this model step by step and solve it with a real solver in your browser: first a day with every plant in one place, then the same day on this network.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span>Demand, wind and solar follow lesson 0's real day, 3 September 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to the town. Prairie Town, its plants, costs, network and line limits are illustrative. The solver is <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</span></p>
 <div class="lx-card lx-notebook m1-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 90 minutes of practice</p>
-<p>The notebook writes the same linear program with <code>scipy.optimize.linprog(method="highs")</code>, reads the prices from its duals and checks every browser number with an <code>assert</code> cell. It runs in Google Colab after you upload it (<em>File → Upload notebook</em>), or locally with Python 3, NumPy and SciPy 1.9 or later. The data are inside the notebook.</p>
+<p>The same linear program in <code>scipy.optimize.linprog(method="highs")</code>; <code>assert</code> cells check every browser number.</p>
+<ol class="m1-nb-steps">
+<li>Download the notebook; the data are inside it.</li>
+<li>Upload it to Google Colab (<em>File → Upload notebook</em>), or open it locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Run all cells, then try the practice questions at the end.</li>
+</ol>
 <p class="m1-dl"><a class="lx-btn small" href="notebooks/m01-dispatch-to-lmp.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m01-dispatch-to-lmp.json" download>Lesson data (JSON)</a></p>
 </div>
 <style>/* lesson-local */
 .m1-nb { margin-top: 1.2rem; max-width: 980px; } .m1-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
+.m1-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
+.m1-links { margin: .4rem 0 0; padding-left: 1.1rem; display: grid; gap: 4px; }
 </style>
 ```
 :::
@@ -76,10 +83,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Linear program</dt><dd>Decisions (outputs, flows), a goal (lowest running cost) and rules (balance, sizes, ramp, network), all linear.</dd>
-<dt>Dual of a balance row</dt><dd>The change in the day's cost if that row's demand grows by 1 MWh: the price at that bus and hour.</dd>
-<dt>Ramp prices</dt><dd>A slow plant links hours, so an hour's price can be $0 or $80 although no plant offers either.</dd>
+<dt>Dual of a balance row</dt><dd>The extra cost per MWh of a small change in that row's demand: the price at that bus and hour. At a corner of the model the step up and the step down differ.</dd>
+<dt>Ramp prices</dt><dd>A slow plant links hours and produces $0 and $80 prices; the $80 matches no plant's offer.</dd>
 <dt>DC power flow</dt><dd>Power splits over every path by the lines' reactance: two thirds on the direct line of an equal triangle.</dd>
-<dt>Congestion</dt><dd>A full line splits one price into locational prices; the gap times the flow is the congestion rent.</dd>
+<dt>Congestion</dt><dd>A full line splits one price into locational prices. Loads then pay more than generators are paid; the difference is the congestion rent, $13,200 at noon with the line at 110 MW.</dd>
 </dl>
 </div>
 </div>
@@ -92,13 +99,25 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-Take Prairie Town as the reference bus. A power transfer distribution factor $\text{PTDF}_{\ell n}$ is the share of 1 MW injected at bus $n$, and taken out in town, that flows on line $\ell$. In an equal triangle, an injection at the Ridge puts $2/3$ on Ridge–Town and $1/3$ on the path through the Gas Hub. In a lossless DC model, with $\mu_\ell$ the value of 1 MW more limit on line $\ell$:
+Take Prairie Town as the reference bus. A power transfer distribution factor $\text{PTDF}_{\ell n}$ is the share of 1 MW injected at bus $n$, and taken out in town, that flows on line $\ell$. In an equal triangle, an injection at the Ridge puts $2/3$ on Ridge–Town and $1/3$ on the path through the Gas Hub. In a lossless DC model, with $\mu_\ell$ the value of 1 MW more limit on line $\ell$ in that hour:
 
 $$\text{LMP}_n = \text{LMP}_\text{Town} - \sum_\ell \text{PTDF}_{\ell n}\,\mu_\ell .$$
 
 At noon with the line at 110 MW, $\mu = \$120$: the Ridge gets $80 - \tfrac{2}{3} \times 120 = \$0$ and the Gas Hub $80 - \tfrac{1}{3} \times 120 = \$40$.
 
-The town takes 211 MWh net (311 MWh of demand less 100 from its nuclear plant) at \$80, which is \$16,880. The Gas Hub is paid $92 \times \$40 = \$3{,}680$, and the Ridge's 119 MWh earn \$0. The difference, \$13,200, equals $\mu \times 110$ MW: the congestion rent. Real markets pass it to holders of financial transmission rights, and their prices add a third part for losses, which a DC model leaves out ([FERC Energy Primer](https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf), p. 64).
+Congestion rent is what loads pay minus what generators are paid, each at its own bus's price:
+
+| Noon, line at 110 MW | \$ in the hour |
+|---|---|
+| Loads pay: 311 MWh × \$80 | \$24,880 |
+| Nuclear plant, in town: 100 MWh × \$80 | \$8,000 |
+| Gas Hub: 92 MWh × \$40 | \$3,680 |
+| Wind Ridge: 119 MWh × \$0 | \$0 |
+| Congestion rent: loads minus generators | \$13,200 for the hour |
+
+In this DC model the rent also equals each full line's $\mu$ times its flow, $120 \times 110$ MW. It is not the price gap between the line's two ends times its flow ($80 \times 110 = \$8{,}800$).
+
+Many organized markets use congestion revenue to fund financial transmission rights, under their own settlement and funding rules. Their prices also add a third part for losses, which a DC model leaves out ([FERC Energy Primer](https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf), p. 64).
 
 ```{=html}
 </div>
@@ -108,9 +127,15 @@ The town takes 211 MWh net (311 MWh of demand less 100 from its nuclear plant) a
 <div class="lx-deeper-body">
 ```
 
-A dual is a slope, and at a corner of the model the slope differs on each side. At 14:00 with the line at 110 MW, the gas combined-cycle plant runs at exactly its size, 150 MW. One more MWh in town needs the peaker and costs \$200; one MWh less saves only \$80. The solver reports \$80, one end of that range.
+A dual is a slope. At a corner of the model the slope differs on each side, so check both sides. At 14:00 with the line at 110 MW, the gas combined-cycle plant runs at exactly its size, 150 MW:
 
-Check a dual with a small step up and a small step down. If they differ, say so, and say which side your question is about. Markets settle such hours with extra rules, and a mixed-integer model (M2, upcoming) has no duals at all.
+| In town at 14:00 | Per MWh |
+|---|---|
+| Step up: one more MWh needs the peaker | costs \$200 |
+| Step down: one MWh less | saves only \$80 |
+| The solver's dual | \$80, one end of that range |
+
+If the two sides differ, say which side your question is about. A mixed-integer solve (M2, upcoming) does not provide these LP shadow prices; after fixing its on/off decisions, a dispatch LP gives prices conditional on them.
 
 ```{=html}
 </div>
@@ -119,7 +144,7 @@ Check a dual with a small step up and a small step down. If they differ, say so,
 <summary><span class="k">Go deeper</span>What this model leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Losses, voltage and reactive power: a DC model is linear and lossless. A17 (upcoming) runs a small AC power flow to show when that matters.</li>
+<li>Losses, voltage magnitudes and reactive power: a DC model uses only voltage-angle differences, holds voltage magnitudes fixed and is lossless. A17 (upcoming) runs a small AC power flow to show when that matters.</li>
 <li>Outages: real dispatch keeps flows safe if any one line or plant fails (the N-1 rule).</li>
 <li>Start-ups and minimum run times: those need on/off decisions, a mixed-integer program (M2, upcoming).</li>
 <li>Offers and price-responsive demand: here costs stand in for offers, and demand is fixed.</li>
@@ -158,9 +183,9 @@ Check a dual with a small step up and a small step down. If they differ, say so,
 
 <div class="lx-quiz" data-quiz="m1">
 <div class="lx-qq" data-id="mu" data-answer="a">
-<p class="lx-qtext">At noon the full Ridge–Town line (110 MW) has μ = $120. If its limit were 111 MW, noon's running cost would…</p>
+<p class="lx-qtext">At noon the full Ridge–Town line (110 MW) has μ = $120. If its limit rose to 111 MW for the noon interval only, the day's running cost would…</p>
 <ul class="lx-choices"><li data-value="a">fall by $120</li><li data-value="b">fall by $80</li><li data-value="c">fall by $40</li><li data-value="d">not change</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fall by $120. Only two thirds of the Ridge's power uses that line, so 1 MW more limit lets the Ridge send 3 MW more, replacing 3 MWh of $40 gas.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fall by $120. Swapping 1 MW of Gas Hub output for Ridge output adds only 2/3 − 1/3 = 1/3 MW to this line, so 1 MW more room lets 3 MW of free Ridge power replace 3 MW of $40 gas.</p></details>
 </div>
 <div class="lx-qq" data-id="back" data-answer="b">
 <p class="lx-qtext">Which change brings the three noon prices back together?</p>
@@ -184,7 +209,7 @@ Check a dual with a small step up and a small step down. If they differ, say so,
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">3 parts</td><td>A locational marginal price is an energy charge, a congestion charge and a charge for losses.</td><td class="s"><a href="https://www.ferc.gov/sites/default/files/2020-06/energy-primer-2020_0.pdf">FERC Energy Primer</a> (PDF), p. 64 · April 2020 edition</td></tr>
-<tr><td class="n">about 2/3</td><td>Share of U.S. electricity load served in regions with an organized market (RTO or ISO), which use such prices.</td><td class="s"><a href="https://www.ferc.gov/electric-power-markets">FERC, Electric Power Markets</a> · page accessed 2 Nov 2026</td></tr>
+<tr><td class="n">about 2/3</td><td>Share of U.S. electricity load served in regions whose grid operator runs an organized market with such prices.</td><td class="s"><a href="https://www.ferc.gov/electric-power-markets">FERC, Electric Power Markets</a> · page accessed 2 Nov 2026</td></tr>
 <tr><td class="n">2/3 and 1/3</td><td>How an equal triangle of lines splits power sent from one corner to another: direct line, and the path around.</td><td class="s">DC power flow; this lesson's network (illustrative)</td></tr>
 <tr><td class="n">$80 = 2 × $40 − 1 × $0</td><td>The town's noon price with the line full: two gas MWh in, one Ridge MWh out.</td><td class="s">This lesson's model (illustrative)</td></tr>
 </tbody>
@@ -207,7 +232,12 @@ Check a dual with a small step up and a small step down. If they differ, say so,
 ```{=html}
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
-<p>Grid operators that run markets compute a price at each location from the same kind of model, with losses, security rules and many more locations. Builds on <a href="00-grid-operator.html">lesson 0</a> (the day and the plants), lessons <a href="08-merit-order.html">8</a> (one price), <a href="10-write-it-down.html">10</a> and <a href="11-solver.html">11</a> (writing and solving a linear program), and the bridges <a href="b01-algebra-to-lp.html">B1</a>, <a href="b02-python-data.html">B2</a> and <a href="b03-read-check-formulation.html">B3</a>. Open tools that build such models at scale: <a href="https://docs.pypsa.org/">PyPSA</a>, <a href="https://www.pyomo.org/">Pyomo</a> and <a href="https://jump.dev/">JuMP</a>.</p>
+<p>Grid operators that run markets compute a price at each location from the same kind of model, with losses, security rules and many more locations.</p>
+<ul class="m1-links">
+<li>Builds on: <a href="00-grid-operator.html">lesson 0</a> (the day and the plants), <a href="08-merit-order.html">8</a> (one price), <a href="10-write-it-down.html">10</a> and <a href="11-solver.html">11</a> (writing and solving a linear program).</li>
+<li>Bridges: <a href="b01-algebra-to-lp.html">B1</a>, <a href="b02-python-data.html">B2</a> and <a href="b03-read-check-formulation.html">B3</a>.</li>
+<li>Open tools for such models at scale: <a href="https://docs.pypsa.org/">PyPSA</a>, <a href="https://www.pyomo.org/">Pyomo</a> and <a href="https://jump.dev/">JuMP</a>.</li>
+</ul>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>
