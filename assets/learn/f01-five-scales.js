@@ -304,7 +304,7 @@
         build: function (act, api) {
           var p = LX.Predict(act, { id: D.apply.id, answer: D.apply.answer, fresh: true, options: D.apply.options, feedback: D.apply.feedback,
             onPick: function (v) {
-              apply = v; keep("apply", v); p.reveal(v === D.apply.answer ? "Modeler lesson M5 (upcoming) solves exactly this campus." : "");
+              apply = v; keep("apply", v); p.reveal(v === D.apply.answer ? "Modeler lesson M5 solves exactly this campus." : "");
               if (v === D.apply.answer) { api.done(); LX.progress.done(LESSON); }
             }, once: false });
         } }
