@@ -3,9 +3,12 @@
 //   - the chain: 1 MWh -> 17.5 kg -> 0.58 MWh held -> 0.35 MWh back
 //   - the hourly rules: energy balances (electrolyzer use = spare used + wind diverted + grid), part-load (never below the
 //     minimum load), curtailment never rises, the annual rule's matching holds at the page's 30 MW
-//   - claims (W3 brief §2.4): on spare wind utilization falls and the cost per kg rises with every size step (the myth), the
-//     owner's best size is at least the cheapest-kg size at every price on the slider; ties in the best size go to the
-//     smaller size (stated in the model) and none occurs on the slider
+//   - claims (W3 brief §2.4): on spare wind utilization falls and the cost per kg rises with every size step (the myth);
+//     average utilization is energy / (size x 8,760), and the hours running and at full size are counted apart (review 1);
+//     the owner may build none: at low prices every size loses money and none is chosen, otherwise the owner's best size
+//     is at least the cheapest-kg size (review 2); ties go to the smaller size (stated in the model), none on the slider
+//   - the tank: the least working storage for 2025, with its start fill shown (review 7)
+//   - the decision flowchart agrees with the use sorter: every bin has an end box (review 4)
 //   - every number on the page (fallback, explain, myths, quiz, numbers to remember) against the model and the data
 //   - research wording (curriculum §13, guard G-SRC; CF2's pattern): every excerpt sentence and every sentence about the
 //     course author's studies is an approved sentence of reports/learn/excerpts_for_approval.md (E3, E4, E10, with the
@@ -54,7 +57,12 @@ const rules = ["spare", "hourly", "annual"];
 const R30 = rules.map(r => M.run(Y, 30, r, "pem"));
 ok(R30[2].matched && R30[2].mwh <= R30[2].windMWh, `annual rule at 30 MW: the year's use (${fm.gwh(R30[2].mwh)}) is matched by the farm's wind (${fm.gwh(R30[2].windMWh)})`);
 const rowTxt = ["Spare wind only", "Wind matched hour by hour", "Grid power matched over the year"];
-R30.forEach((o, i) => onPage(`<tr><td>${rowTxt[i]}</td><td>${fm.pct(o.util)}</td><td>${fm.kg2(o.lcoh)}</td><td>${fm.co2(o.gridCO2)}</td></tr>`, "the fallback row " + rowTxt[i]));
+R30.forEach((o, i) => onPage(`<tr><td>${rowTxt[i]}</td><td>${fm.pct(o.util)}</td><td>${o.hoursOn.toLocaleString("en-US")}</td><td>${fm.kg2(o.lcoh)}</td><td>${fm.co2(o.gridCO2)}</td></tr>`, "the fallback row " + rowTxt[i]));
+// average utilization is not time at full output (review 1)
+R30.forEach(o => ok(near(o.util, o.mwh / (30 * 8760)) && near(o.eflh, o.mwh / 30) && o.hoursFull <= o.hoursOn, `${o.rule} at 30 MW: average utilization = MWh / (30 MW x 8,760 h); full-load hours ${Math.round(o.eflh)}; full-size hours ${o.hoursFull} <= hours running ${o.hoursOn}`));
+ok(R30[0].hoursFull / 8760 < R30[0].util / 4 && R30[0].hoursOn / 8760 > R30[0].util, "spare wind at 30 MW: full-size hours are far below the average utilization, hours running far above it");
+onPage(`On spare wind the unit runs in ${R30[0].hoursOn.toLocaleString("en-US")} hours but at full size in only ${R30[0].hoursFull}.`, "the fallback's utilization hint");
+ok(!/[Rr]uns at full size/.test(PAGE + JS), "no 'runs at full size' label for average utilization");
 ok(R30[2].lcoh < R30[1].lcoh && R30[1].lcoh < R30[0].lcoh && R30[2].gridCO2 > D.chps, "step 6: annual matching gives the cheapest kg, yet its grid hours carry more CO2 per kg than DOE's 4.0 target");
 onPage(`it carries about ${fm.co2(R30[2].gridCO2)} of CO₂ per kg, above DOE's 4.0 target`, "myth 2");
 
@@ -63,19 +71,30 @@ let prev = null, mono = true;
 for (let X = D.sizes.min; X <= D.sizes.max; X += D.sizes.step) { const o = M.run(Y, X, "spare", "pem"); if (prev && !(o.util < prev.util && o.lcoh > prev.lcoh)) mono = false; prev = o; }
 ok(mono, "on spare wind every size step lowers utilization and raises the cost per kg (myth 1, step 2)");
 const o10 = M.run(Y, 10, "spare", "pem"), o20 = M.run(Y, 20, "spare", "pem"), o30 = R30[0], a20 = M.run(Y, 20, "spare", "alk");
-onPage(`From 10 to 30 MW the unit runs at full size ${fm.pct(o10.util)} and then ${fm.pct(o30.util)} of the time, and the cost per kg rises from ${fm.kg2(o10.lcoh)} to ${fm.kg2(o30.lcoh)}.`, "myth 1");
-onPage(`a 20 MW electrolyzer runs at full size ${fm.pct(o20.util)} of the time, so each kg carries much capital: ${fm.kg2(o20.lcoh)} per kg.`, "explain: utilization");
+onPage(`From 10 to 30 MW its average utilization falls from ${fm.pct(o10.util)} to ${fm.pct(o30.util)}, and the cost per kg rises from ${fm.kg2(o10.lcoh)} to ${fm.kg2(o30.lcoh)}.`, "myth 1");
+onPage(`a 20 MW electrolyzer's average utilization is ${fm.pct(o20.util)}: it runs in ${o20.hoursOn.toLocaleString("en-US")} hours, at full size in ${o20.hoursFull}. Each kg carries much capital: ${fm.kg2(o20.lcoh)} per kg.`, "explain: utilization");
 onPage(`At 20 MW an alkaline unit (15% minimum) loses ${Math.round(a20.lostMin)} MWh of spare wind a year below its minimum; a PEM unit (5%) loses ${Math.round(o20.lostMin)} MWh.`, "explain: part-load");
 ok(a20.hoursOn < o20.hoursOn && a20.lcoh > o20.lcoh, "the alkaline unit runs fewer hours and costs more per kg");
-for (let p = D.prices.min; p <= D.prices.max + 1e-9; p += D.prices.step) {
-  const b = M.best(Y, "spare", "pem", p), s = b.sweep, top = s.filter(r => Math.abs(r.net - b.net.net) < 1);
-  ok(b.net.X >= b.lcoh.X && b.lcoh.X === D.sizes.min && top.length === 1, `at $${p.toFixed(2)}/kg: best for the owner ${b.net.X} MW, cheapest kg ${b.lcoh.X} MW; the best size is unique (no tie within $1)`);
-}
+let nNone = 0;
+["pem", "alk"].forEach(tech => { for (let p = D.prices.min; p <= D.prices.max + 1e-9; p += D.prices.step) {
+  const b = M.best(Y, "spare", tech, p), s = b.sweep, all = [{ X: 0, net: 0 }].concat(s), top = all.filter(r => Math.abs(r.net - b.net.net) < 1);
+  const losing = s.every(r => r.net < 0);
+  ok(b.none === losing && (b.none ? b.net.X === 0 && b.net.net === 0 : b.net.X >= b.lcoh.X && b.net.net > 0) && b.lcoh.X === D.sizes.min && top.length === 1,
+     `${tech} at $${p.toFixed(2)}/kg: best for the owner ${b.none ? "none (every size loses money)" : b.net.X + " MW"}, cheapest kg ${b.lcoh.X} MW; the choice is unique (no tie within $1)`);
+  if (b.none && tech === "pem") nNone++;
+} });
+ok(nNone >= 1 && M.best(Y, "spare", "pem", D.prices.min).none && near(M.net(M.run(Y, 5, "spare", "pem"), 2), -180970, 1), "at the lowest price on the slider every size loses money (5 MW: about -$181,000 a year) and the owner builds none (review 2)");
+ok(M.lossPrice(Y, "pem", D) === 2.5 && !M.best(Y, "spare", "pem", 3).none, "PEM: at $2.50 or less every size loses money; at $3.00 the 5 MW unit earns (step 4's sentence)");
+ok(/at \$" \+ LOSS\.toFixed\(2\) \+ " or less every size loses money, so none is built/.test(JS) && /"0 \(none\)"/.test(JS), "step 4: the sentence reads the loss price from the model; the chart's text version lists 'none'");
 const b4 = M.best(Y, "spare", "pem", 4);
 onPage(`At $4 per kg the cheapest kg comes at ${b4.lcoh.X} MW, the owner's best size at ${b4.net.X} MW.`, "explain: cost per kg and the system");
 const tk = M.tank(o20);
 ok(near(M.sum(o20.kgByHour) - tk.q * 8760, 0, 1e-3) && Math.min(...tk.daily) >= -1e-6, "tank: delivery equals the year's output; the level never goes below zero");
-onPage(`needs an ${fm.t(tk.size)} tank: ${Math.round(tk.days)} days of delivery`, "explain: storage"); onPage(`needs an ${fm.t(tk.size)} tank, ${Math.round(tk.days)} days of its output`, "myth 3");
+{ let lv = tk.start, lo = Infinity, hi = -Infinity; o20.kgByHour.forEach(k => { lv += k - tk.q; lo = Math.min(lo, lv); hi = Math.max(hi, lv); });
+  ok(near(lo, 0, 1e-6) && near(Math.max(hi, tk.start), tk.size, 1e-6) && near(lv, tk.start, 1e-3) && tk.start > 0, `tank: starting at ${fm.t(tk.start)} it never runs dry, never exceeds ${fm.t(tk.size)} and ends the year where it started`); }
+onPage(`needs at least ${fm.t(tk.size)} of working storage, ${Math.round(tk.days)} days of delivery, with ${fm.t(tk.start)} in the tank on 1 January and no losses.`, "explain: storage");
+onPage(`needs at least ${fm.t(tk.size)} of working storage, ${Math.round(tk.days)} days of its output`, "myth 3"); onPage(`That is with ${fm.t(tk.start)} in the tank on 1 January and no losses`, "myth 3: the start fill");
+ok(/"In the tank on 1 January", fm\.t\(tk\.start\)/.test(JS) && /Another weather year needs its own check/.test(JS), "step 5 shows the start fill and says the result holds for 2025's known hours");
 ok(tk.size < D.cavernTonnes * 1000, "the tank is far smaller than one salt cavern (step 5)");
 
 // ---------------- data: sources, one price year
@@ -85,7 +104,26 @@ ok(!/20(19|20|21|23|24|25) dollars/.test(JSON.stringify(D) + PAGE), "one price y
 ok(E.minLoad.pem === 0.05 && E.minLoad.alk === 0.15 && /5%–120%/.test(E.loadSource.label) && /15%–100%/.test(E.loadSource.label), "part-load ranges from IRENA (2020), Table 6");
 D.facts.forEach(f => { const row = PAGE.indexOf('<td class="n">' + f.n + "</td><td>" + f.what + "</td>"); ok(row >= 0 && PAGE.slice(row, row + 700).includes(f.url) && PAGE.slice(row, row + 700).includes(f.asof), "numbers to remember: '" + f.n + "' with source and date"); });
 ok(D.uses.cards.length === 8 && D.uses.cards.every(u => D.uses.bins.some(b => b.id === u.bin) && u.why.split(" ").length <= 25), "use sorter: eight cards, each in a bin with a short reason");
-ok(D.uses.cards.find(u => u.id === "cars").why.includes("about 1 mile per kWh") && near(60 / 57, 1.05, 0.01), "cars: about 60 miles per kg at 57 kWh/kg is about 1 mile per kWh");
+ok(D.uses.cards.find(u => u.id === "cars").why.includes("about 60 miles per kg, made with 57 kWh: about 1 mile per kWh") && near(60 / 57, 1.05, 0.01), "cars: about 60 miles per kg at 57 kWh/kg is about 1 mile per kWh, input shown");
+ok(D.uses.sources.some(x => x.url === "https://afdc.energy.gov/files/u/publication/hydrogen_fuel_cell_electric_vehicles.pdf" && /60 miles/.test(x.label)) && PAGE.includes("https://afdc.energy.gov/files/u/publication/hydrogen_fuel_cell_electric_vehicles.pdf"), "the 60 miles per kg has its own source, the AFDC fuel cell vehicle fact sheet (January 2025)");
+ok(D.uses.sources.every(x => /^https:\/\//.test(x.url) && x.date) && /<a href=\\"" \+ LX\.esc\(s\.url\)/.test(JS) && /LX\.esc\(s\.date\)/.test(JS), "the sorter's sources render with links and dates (review 13)");
+// the no-JavaScript sorter table (review 12): every card, its bin and its reason
+{ const bin = id => D.uses.bins.find(b => b.id === id).label;
+  D.uses.cards.forEach(u => onPage(`<tr><td>${u.text}</td><td>${bin(u.bin)}</td><td>${u.why}</td></tr>`, "the no-JS sorter row " + u.id)); }
+// the metadata counts the cards (review 14)
+{ const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: a16-hydrogen-ptx"), PY.indexOf("id: a16-hydrogen-ptx") + 2000), W = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  ok(row.includes(`sort ${W[D.uses.cards.length]} uses`) && PAGE.includes(`sort ${W[D.uses.cards.length]} uses`) && JS.includes(`Sort ${W[D.uses.cards.length]} uses`), `path.yml, the page's metadata and step 7 say ${W[D.uses.cards.length]} uses, as many as the sorter's cards`); }
+// the flowchart agrees with the sorter (review 4): feedstock -> hydrogen, else electricity only if it does the job, else compare
+ok(/\["use", "direct", "no"\], \["direct", "elec", "yes"\], \["direct", "both", "not yet"\]/.test(JS) && /label: "Ocean shipping", path: \["wind", "ez", "store", "use", "direct", "both"\]/.test(JS) && D.uses.bins.map(b => b.id).join() === "feed,both,elec",
+   "flowchart: a non-feedstock use goes to electricity only when electricity can do the job, else to a comparison, as the sorter's three bins");
+// the DOE comparison's boundary (review 3) and the controlled technology comparison (review 8)
+ok(!/full estimate|full analysis counts/.test(PAGE + JS) && PAGE.includes("Compression, storage and delivery are outside both.") && /compression, storage and delivery out/.test(PAGE) && /leaves out compression, storage, distribution and dispensing/.test(D.electrolyzer.doeBoundary),
+   "DOE's $5-7/kg is named a production cost with upkeep and stack replacement, without compression, storage or delivery");
+ok(JS.includes("Only the minimum load changes here; capital cost and electricity use are held equal.") && E.minLoad.pem !== E.minLoad.alk, "step 3 says only the minimum load differs between PEM and alkaline");
+// matching and accounting kept apart (review 6); the capture example keeps its conditions (review 5)
+ok(PAGE.includes("Matching sets which power may count. Separately, from 2030 DOE's 45VH2-GREET manual (December 2025) lets a producer opt to count its electricity's emissions hour by hour") && !/in place of annual accounting/.test(PAGE), "Go deeper: hourly emissions accounting from 2030 is an option, separate from matching");
+ok(PAGE.includes("could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%"), "Go deeper: the 95% capture example keeps DOE's conditions");
+ok(/12 September 2025/.test(PAGE) && D.facts[0].asof.startsWith("published 12 September 2025"), "IEA: the publication date, 12 September 2025 (revised October 2025)");
 
 // ---------------- research wording (curriculum §13): approved sentences only
 const SNAP = {
@@ -152,9 +190,49 @@ const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|www\.energy\.gov|www\.hydroge
 ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
 const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
 ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "seven step texts of 40 words at most");
+// review 11: every element of the page's own text stays within budget; the data note is three entries (farm, costs, boundary)
+{ const O2 = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "").replace(/<blockquote[\s\S]*?<\/blockquote>/g, "");
+  const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
+  const long = els.filter(x => x.split(" ").length > 40);
+  ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | "));
+  ok((PAGE.match(/<p class="lx-datanote">/g) || []).length === 3 && /<b>Illustrative farm\.<\/b>/.test(PAGE) && /<b>Costs, one price year\.<\/b>/.test(PAGE) && /<b>Partial cost\.<\/b>/.test(PAGE), "the data note is three labelled entries"); }
 ok(!/\b(always|never)\b/i.test(strs.join(" ")), "no 'always' or 'never' in the page's strings");
 ok(!/txh2/.test(SIDE.split("requests:")[1] || "") || !/pending/i.test(SIDE), "sidecar: no pending-excerpt note (E10 approved)");
-["procurement-rule", "hourly-matching", "minimum-load"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
+["procurement-rule", "hourly-matching", "minimum-load", "full-load-hours", "pem-electrolyzer", "alkaline-electrolyzer", "lower-heating-value", "feedstock", "co2e", "well-to-gate", "additionality", "deliverability"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE), "sidecar defines " + id));
+["pem-electrolyzer", "alkaline-electrolyzer", "lower-heating-value", "feedstock", "co2e", "well-to-gate", "additionality", "deliverability", "full-load-hours"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"|data-term=\"" + id + "\"").test(JS + PAGE), "the page marks " + id + " for the glossary"));
+
+// ---------------- the page on a stub document (review 9 and 2): no silent switch of type; the owner may build none
+{
+  const { env, load } = require("./stubdom.js");
+  const E = env();
+  E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
+  ["cards", "predict", "cardsort", "controls", "plot", "profiles", "energychain"].forEach(n => load(n, E));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === ID) init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {} });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": ID }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  let threw = null;
+  try { init(live, { a16_hydrogen_ptx: D, town_year: J("town_year.json"), cf_targets: J("cf_targets.json") }, root); } catch (e) { threw = e.message; }
+  ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
+  try {
+    const card = () => demo.cards.el, btns = re => card().querySelectorAll("button").filter(b => re.test(b.textContent) || re.test(b.getAttribute("aria-label") || ""));
+    const pressed = () => card().querySelectorAll(".lx-seg button").filter(b => b.getAttribute("aria-pressed") === "true").map(b => b.textContent).join();
+    const pem20 = M.run(Y, 20, "spare", "pem"), alk20 = M.run(Y, 20, "spare", "alk");
+    demo.cards.go(2);
+    ok(/^PEM/.test(pressed()), "step 3 opens on the type in use (PEM), not on alkaline: " + pressed());
+    btns(/^Alkaline/)[0].click();
+    ok(/^Alkaline/.test(pressed()) && card().textContent.includes(alk20.hoursOn.toLocaleString("en-US")), "step 3: the reader's pick shows alkaline's hours");
+    demo.cards.go(1);
+    ok(card().textContent.includes(fm.h(pem20.hoursOn)) && !card().textContent.includes(fm.h(alk20.hoursOn)), "step 2 stays PEM, as its text says, after alkaline was picked in step 3");
+    demo.cards.go(4);
+    ok(/20 MW alkaline electrolyzer/.test(card().textContent), "step 5 names the type and size it uses (alkaline, chosen in step 3)");
+    demo.cards.go(2); btns(/^PEM/)[0].click(); demo.cards.go(3);
+    ok(/PEM electrolyzer/.test(card().textContent) && /best for the owner at/.test(card().textContent), "step 4 names the type; at $4.00 the owner builds");
+    for (let i = 0; i < 4; i++) btns(/^Lower Hydrogen price/)[0].click();
+    ok(/\$2\.00\/kg/.test(card().textContent) && /the owner's best choice is to build none/.test(card().textContent), "step 4 at $2.00: every size loses money and the owner builds none");
+  } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
+}
 
 console.log(`test_a16-hydrogen-ptx: ${checks - fails}/${checks} checks passed`);
 process.exit(fails ? 1 : 0);

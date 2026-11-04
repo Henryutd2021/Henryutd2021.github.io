@@ -3,6 +3,7 @@
  "farm": { "windMW": 100, "exportMW": 50, "profileMethod": "power", "note": "Illustrative: a 100 MW wind farm whose grid connection takes at most 50 MW." },
  "electrolyzer": {
   "kWhPerKg": 57, "capexPerKW": 2000, "life": 30, "rate": 0.04, "rateNote": "4% real, as in lesson 13.",
+  "doeBoundary": "DOE's $5-7/kg (Record 24005, pp. 1-2 and the appendix) counts fixed upkeep (5% of the installed cost a year) and stack replacement (11% of it every 40,000 operating hours); it leaves out compression, storage, distribution and dispensing, and assumes 50-75% capacity factors and about 10% nominal cost of capital. The lesson counts capital and power only, at 4% real.",
   "minLoad": { "pem": 0.05, "alk": 0.15 },
   "source": { "label": "DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology, Table 1 and p. 1 (2022 dollars)", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf", "as_of": "2024-05-20" },
   "loadSource": { "label": "IRENA, Green Hydrogen Cost Reduction (2020), Table 6: load range of PEM 5%–120%, of alkaline 15%–100%", "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf", "as_of": "2020-12" }
@@ -16,7 +17,7 @@
  "gridCO2": 0.37,
  "gridCO2Note": "Illustrative: in the hours the farm's wind falls short, the extra grid power is assumed to come from a gas combined-cycle plant like Prairie Town's (0.37 t CO2 per MWh, operating emissions only).",
  "chps": 4.0,
- "chpsSource": { "label": "DOE, Clean Hydrogen Production Standard Guidance (June 2023), p. 2: a target of at most 4.0 kg CO2e per kg of hydrogen, well-to-gate", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/clean-hydrogen-production-standard-guidance.pdf", "as_of": "2023-06" },
+ "chpsSource": { "label": "DOE, Clean Hydrogen Production Standard Guidance (June 2023), p. 2: a target of at most 4.0 kg CO2e per kg of hydrogen, well-to-gate; pp. 2-3: the example of a gas reformer with about 95% capture, on the average U.S. grid mix and with upstream methane emissions of at most 1%", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/clean-hydrogen-production-standard-guidance.pdf", "as_of": "2023-06" },
  "cavernTonnes": 5000,
  "cavernSource": { "label": "DOE Loan Programs Office, Advanced Clean Energy Storage environmental assessment (DOE/EA-2182, April 2022), §2.2: each salt cavern about 5,000 t of hydrogen", "url": "https://www.energy.gov/sites/default/files/2022-04/LPO_ACES_EA_executed_FONSI_April2022.pdf", "as_of": "2022-04" },
  "sizes": { "min": 5, "max": 60, "step": 5, "start": 20 },
@@ -34,18 +35,19 @@
    { "id": "ships", "text": "Fuel for ocean shipping", "bin": "both", "why": "Long voyages need dense fuels; ammonia and methanol made from hydrogen compete with others." },
    { "id": "storage", "text": "Power storage for weeks", "bin": "both", "why": "Salt caverns hold weeks of energy cheaply, but only about 31% comes back (A8)." },
    { "id": "trucks", "text": "Long-haul trucks", "bin": "both", "why": "Fuel cells and batteries are both tried; a battery truck uses far less electricity per mile." },
-   { "id": "cars", "text": "Passenger cars", "bin": "elec", "why": "An electric car drives 100 miles on 25–40 kWh; on hydrogen at 57 kWh/kg, about 1 mile per kWh." },
+   { "id": "cars", "text": "Passenger cars", "bin": "elec", "why": "Electric car: 100 miles on 25–40 kWh. Fuel cell car: about 60 miles per kg, made with 57 kWh: about 1 mile per kWh." },
    { "id": "homes", "text": "Heating homes", "bin": "elec", "why": "A heat pump gives up to three times the heat of the power it uses; hydrogen loses about 40% before any heat is made." }
   ],
   "sources": [
-   { "label": "IEA, Global Hydrogen Review 2025, pp. 41 and 48", "url": "https://www.iea.org/reports/global-hydrogen-review-2025", "as_of": "2025-10" },
-   { "label": "DOE AFDC, benefits of electric vehicles (25–40 kWh per 100 miles) and the fuel cell vehicle fact sheet (about 60 miles per kg)", "url": "https://afdc.energy.gov/fuels/electricity-benefits", "as_of": "accessed 3 Nov 2026" },
-   { "label": "DOE, Energy Saver Guide (2022), p. 16: heat pumps provide up to three times more heat than the energy they use", "url": "https://www.energy.gov/sites/default/files/2022-08/energy-saver-guide-2022.pdf", "as_of": "2022-07" }
+   { "label": "IEA, Global Hydrogen Review 2025, pp. 41 and 48", "url": "https://www.iea.org/reports/global-hydrogen-review-2025", "as_of": "2025-09-12", "date": "12 September 2025, revised October 2025" },
+   { "label": "DOE AFDC, benefits of electric vehicles: 25–40 kWh per 100 miles", "url": "https://afdc.energy.gov/fuels/electricity-benefits", "as_of": "accessed 3 Nov 2026", "date": "accessed 3 November 2026" },
+   { "label": "DOE AFDC, Hydrogen Fuel Cell Electric Vehicles fact sheet, p. 5: about 60 miles on 1 kg", "url": "https://afdc.energy.gov/files/u/publication/hydrogen_fuel_cell_electric_vehicles.pdf", "as_of": "2025-01", "date": "January 2025" },
+   { "label": "DOE, Energy Saver Guide, p. 16: heat pumps give up to three times more heat than the energy they use", "url": "https://www.energy.gov/sites/default/files/2022-08/energy-saver-guide-2022.pdf", "as_of": "2022-07", "date": "July 2022" }
   ]
  },
  "facts": [
-  { "n": "almost 100 Mt", "what": "Global hydrogen demand in 2024; low-emissions production was less than 1% of global production.", "source": "IEA, Global Hydrogen Review 2025, executive summary", "url": "https://www.iea.org/reports/global-hydrogen-review-2025", "asof": "October 2025; data for 2024" },
-  { "n": "$5 to $7 per kg", "what": "DOE's modelled cost of hydrogen from PEM electrolysis on renewable power, without subsidies, in 2022 dollars.", "source": "DOE Hydrogen Program Record 24005", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf", "asof": "20 May 2024" },
+  { "n": "almost 100 Mt", "what": "Global hydrogen demand in 2024; low-emissions production was less than 1% of global production.", "source": "IEA, Global Hydrogen Review 2025, executive summary", "url": "https://www.iea.org/reports/global-hydrogen-review-2025", "asof": "published 12 September 2025, revised October 2025; data for 2024" },
+  { "n": "$5 to $7 per kg", "what": "DOE's modelled production cost of hydrogen from PEM electrolysis on renewable power, without subsidies, in 2022 dollars: upkeep and stack replacement in, compression, storage and delivery out.", "source": "DOE Hydrogen Program Record 24005", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf", "asof": "20 May 2024" },
   { "n": "4.0 kg CO₂e per kg", "what": "DOE's target for clean hydrogen: well-to-gate life-cycle emissions per kg of hydrogen.", "source": "DOE, Clean Hydrogen Production Standard Guidance", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/clean-hydrogen-production-standard-guidance.pdf", "asof": "June 2023" },
   { "n": "33 kWh per kg", "what": "The energy in 1 kg of hydrogen, at its lower heating value.", "source": "DOE Hydrogen Program Plan, p. 24", "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/hydrogen-program-plan-2024.pdf", "asof": "December 2024" }
  ]
