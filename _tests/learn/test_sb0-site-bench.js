@@ -254,7 +254,12 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const r = await E0.solve(st({}), P, { solver: slow, signal: ac });
     ok(r.status === "cancelled" && n === 3, "a cancelled run stops between weeks (" + n + " weeks solved)");
     const ok1 = await run(st({}));
-    ok(BR.classify(ok1).kind === "ok" && /optimal/.test(BR.classify(ok1, { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks (the solver reports each one optimal)." }).text), "a finished run says optimal, from the solver's status");
+    // the run's status words, as the bench passes them, and the note's run line name 31 December, as the model box does
+    const E0SRC = fs.readFileSync(L("components/engine-e0.js"), "utf8"), okWords = (/words: \{ ok: "([^"]+)" \}/.exec(E0SRC) || [])[1] || "";
+    ok(BR.classify(ok1).kind === "ok" && /optimal/.test(BR.classify(ok1, { ok: okWords }).text), "a finished run says optimal, from the solver's status");
+    const boxTime = (/<dt>Time<\/dt><dd>([^<]*)/.exec(fs.readFileSync(path.join(SITE, "learn/sb0-site-bench.qmd"), "utf8")) || [])[1] || "";
+    ok(/as 52 weeks and 31 December/.test(boxTime) && /every hour of 2025, as 52 weeks and 31 December \(/.test(okWords) && E0.note(st({}), ok1.results).run.text === "every hour of 2025, as 52 weeks and 31 December",
+       "the run's status words and the note's run line say 52 weeks and 31 December, as the model box does (" + okWords + ")");
     const mid = await E0.solve(st({}), P, { solver: (() => { let k = 0; return m => (++k === 10 ? { status: "time-limit", ok: false } : solver(m)); })() });
     ok(mid.status === "time-limit" && mid.message.indexOf("week of " + E0.periods(P, st({}), "week")[9].start) >= 0, "a stop in week 10 says which week (" + mid.message + ")");
     const said = BR.classify(mid).text;

@@ -716,7 +716,7 @@
   function note(s, res) {
     var home = s.site === "home", M = res.money, n = {
       heading: heading(s), made: "the Site Bench (engine E0, a linear program)",
-      run: { ok: true, stale: false, text: "every hour of 2025, as 52 weeks" },
+      run: { ok: true, stale: false, text: "every hour of 2025, as 52 weeks and 31 December" },
       plan: planRows(s),
       // every readout with its note: the boundaries (CO₂, the wind-only comparison, what the cost per kg leaves out) travel
       results: res.readouts.map(function (r) { return { label: r.label, value: r.value, note: r.note }; }),
@@ -1050,7 +1050,7 @@
       solve: function (st, ctx) { return solve(st, P, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },
       render: function (r, st, full) { res.draw(r, st); chips(r); if (o.onRun) o.onRun(r, st, full); },
       results: [res.el, roBox], stale: staleP, busy: o.api && o.api.busy, onDone: function (r, st) { if (o.onDone) o.onDone(r, st); },
-      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks (the solver reports each one optimal)." } });
+      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks and 31 December (the solver reports each one optimal)." } });
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);

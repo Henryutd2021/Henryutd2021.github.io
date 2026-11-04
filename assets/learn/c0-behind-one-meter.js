@@ -91,7 +91,7 @@
         var l = B.run.last(); if (!l) return null;
         var n = E0.note(l.state, l.r.results);
         n.link = B.ss.url();
-        n.run = { ok: true, stale: !LX.ShareState.same(S, l.state, B.plan()), text: "every hour of 2025, as 52 weeks" };
+        n.run = { ok: true, stale: !LX.ShareState.same(S, l.state, B.plan()), text: "every hour of 2025, as 52 weeks and 31 December" };
         n.sensitivity = sens && sensKey === key(l.state) ? sensLine(l.state, sens, E0) : null;
         return n;
       } });
