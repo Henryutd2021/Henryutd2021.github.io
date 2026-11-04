@@ -305,6 +305,11 @@ LX.CompareTable(host, {title, columns: [{key, label, main, num, bar, phoneHide}]
 `text: true` for rows of words rather than numbers: on phones each row becomes a card of left-aligned labelled lines
 (lessons 1, 2 and M1).
 
+`table.css` also styles the segmented control, `.lx-seg` (a `role="group"` of buttons with `aria-pressed`), used by many
+components and pages. A choice that does not apply right now gets `aria-disabled="true"` (it stays focusable and is
+announced as disabled; its click handler must do nothing) and is drawn faded with a not-allowed cursor, as CF1's
+selling-price buttons are while on-site energy is off (W3).
+
 **Causal chain** (`causal.js`)
 
 ```js

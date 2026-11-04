@@ -7,6 +7,8 @@
 //     so text drawn by components links a live lesson: N1's two notes (A4, A2; and its no-JS fallback), F2's effect
 //     note (A4), K5's feedback (M7), F1's reveal (M5); every lesson-link mark in the Learn scripts and data names a
 //     live page
+//   6 a disabled segmented button looks disabled (table.css: .lx-seg button[aria-disabled="true"] and :disabled), as
+//     CF1's selling-price buttons are while on-site energy is off
 // Usage (from the site folder):  node _tests/learn/test_components_w3_shared.js
 "use strict";
 const fs = require("fs");
@@ -83,6 +85,15 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     let marks = 0, bad = [];
     files.forEach(f => { for (const m of fs.readFileSync(f, "utf8").matchAll(/\[\[lesson:([a-z0-9-]+)\|[^\]]+\]\]/g)) { marks++; if (!live.has(m[1])) bad.push(path.basename(f) + ": " + m[1]); } });
     ok(marks >= 5 && !bad.length, `lesson-link marks name live pages (${marks} marks${bad.length ? "; not live: " + bad.join(", ") : ""})`);
+  }
+
+  // ---------------------------------------------------------------- 6 disabled segmented buttons
+  {
+    const css = rd("components/table.css").replace(/\/\*[\s\S]*?\*\//g, "");
+    const rule = /\.lx-seg button\[aria-disabled="true"\], \.lx-seg button:disabled \{ opacity: \.5; cursor: not-allowed; \}/;
+    ok(rule.test(css) && rule.test(rd("learn.css")), "table.css: a disabled segmented button is faded with a not-allowed cursor (and in the bundle)");
+    ok(css.indexOf('.lx-seg button[aria-disabled="true"]') > css.indexOf('.lx-seg button[aria-pressed="true"]'), "the disabled look comes after the pressed look, so a pressed and disabled button is faded too");
+    ok(/b\.setAttribute\("aria-disabled", String\(!St\.onsite\)\)/.test(rd("cf1-supply-chain-microgrids.js")), "CF1's selling-price buttons are aria-disabled while on-site energy is off");
   }
 
   console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w3_shared)` : `ok ${checks}/${checks} checks (test_components_w3_shared)`);
