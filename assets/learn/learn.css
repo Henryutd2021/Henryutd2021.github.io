@@ -692,6 +692,22 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .stn.own:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 3; }
 .mown { stroke-width: 4; opacity: .5; }
 .mown.soon { stroke-dasharray: 2 7; opacity: .45; }
+.mchev { stroke-width: 2.5; opacity: .8; }
+/* the phone map's fold of a tier's upcoming lessons: a hollow station and a real button that opens them in place */
+.mfold-mk { cursor: pointer; }
+.mfold-mk .face { fill: var(--lx-surface); stroke: var(--c); stroke-width: 2; stroke-dasharray: 3 2.5; }
+.mfold-mk .chev { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lx-fold { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 12px; border: 1.5px dashed var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); color: var(--lx-ink-2); font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; cursor: pointer;
+  max-width: 100%; white-space: nowrap; }
+.lx-fold:hover { border-color: var(--lx-ink-3); color: var(--lx-ink); }
+.lx-fold:focus { outline: none; }
+.lx-fold:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 1px; }
+.page-learn .lx-fold .lx-ic { width: 13px; height: 13px; transform: rotate(90deg); transition: transform .2s; }
+.lx-fold[aria-expanded="true"] .lx-ic { transform: rotate(-90deg); }
+.fold-in { animation: lx-fold-in .25s ease-out both; }
+@keyframes lx-fold-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fold-in { animation: none; } .page-learn .lx-fold .lx-ic { transition: none; } }
 .mcol { stroke-width: 4; opacity: .28; stroke-dasharray: 1 9; }
 .mhit { fill: transparent; cursor: pointer; }
 .mown-st text { cursor: pointer; }
@@ -705,6 +721,22 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .stn.own:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 3; }
 .mown { stroke-width: 4; opacity: .5; }
 .mown.soon { stroke-dasharray: 2 7; opacity: .45; }
+.mchev { stroke-width: 2.5; opacity: .8; }
+/* the phone map's fold of a tier's upcoming lessons: a hollow station and a real button that opens them in place */
+.mfold-mk { cursor: pointer; }
+.mfold-mk .face { fill: var(--lx-surface); stroke: var(--c); stroke-width: 2; stroke-dasharray: 3 2.5; }
+.mfold-mk .chev { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lx-fold { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 12px; border: 1.5px dashed var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); color: var(--lx-ink-2); font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; cursor: pointer;
+  max-width: 100%; white-space: nowrap; }
+.lx-fold:hover { border-color: var(--lx-ink-3); color: var(--lx-ink); }
+.lx-fold:focus { outline: none; }
+.lx-fold:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 1px; }
+.page-learn .lx-fold .lx-ic { width: 13px; height: 13px; transform: rotate(90deg); transition: transform .2s; }
+.lx-fold[aria-expanded="true"] .lx-ic { transform: rotate(-90deg); }
+.fold-in { animation: lx-fold-in .25s ease-out both; }
+@keyframes lx-fold-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fold-in { animation: none; } .page-learn .lx-fold .lx-ic { transition: none; } }
 .mcol { stroke-width: 4; opacity: .28; stroke-dasharray: 1 9; }
 .mhit { fill: transparent; cursor: pointer; }
 .mown-st text { cursor: pointer; }

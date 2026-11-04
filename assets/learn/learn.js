@@ -1574,7 +1574,8 @@
                                         and a card for every station, line label and tool
    LX.metroLayout(path, "h"|"v", opts)  pure layout (also used by the Node tests); opts.W the drawing width in px (the SVG is
                                         drawn 1:1, so text keeps its CSS size), opts.measure(text, font) a text measurer
-                                        (fonts "label", "code", "tier", "text", "sub"; default: an estimate)
+                                        (fonts "label", "code", "tier", "text", "sub"; default: an estimate), opts.open
+                                        {tier id: true} the narrow layout's folds that are open
    What is drawn (map v2, 2026-11-03): every lesson in path.json is one station.
      - The starter path (path.starter) is the named route across the tier lines, as before: large stations with icons
        and names, the route drawn thick; a lesson with tier2 bridges two lines (a capsule "to A").
@@ -1591,11 +1592,12 @@
      - The math toolbox (path.toolbox, K1-K8) is a shelf of chips under the lines, inside the map's box.
    Wide (drawing width >= 720 px and every starter name fits its slot): lines run left to right, first tier at the
    bottom. A tier's line starts at its first starter stop (a tier without one: at the left) and goes on after its last
-   starter stop; when the row is full it turns at the map's edge onto a further row and runs back, and so on (rows on
-   the side of the route that the route crosses least: Foundations and Analyst below, Modeler above). Stations step
-   around the places where the route crosses a row; codes take a second row under a station when they are close.
+   starter stop; every row reads left to right. A full row wraps like text: the line turns down at the right edge, runs
+   back under the row (a chevron marks the way) and turns down into the next row at the left. Stations step around the
+   places where the starter route crosses a row; codes take a second row under a station when they are close.
    Narrower: the starter path runs top to bottom on one column per tier, then each tier's line continues down its
-   column, one station per row with code and title on the right (drawn at most 560 px wide).
+   column, one station per row with its code and short name (or its title over two lines) on the right; a tier's
+   upcoming lessons fold into one row, "12 coming soon", a button that opens them in place (drawn at most 560 px wide).
    Keyboard: the starter path's stations 0-13 in order, then each tier line (its label, then its stations), then the
    toolbox; arrow keys also step along a line. Every station, label and tool is a named button; its card is a dialog
    named by its heading. A card stays inside the map's box and the window below the site's sticky navbar (its body
@@ -1690,8 +1692,8 @@
 
   // ---------------------------------------------------------------- wide layout: lines left to right
   // Each tier is one line: from its first starter stop (or from the left, for a tier without any) its starter stops,
-  // then its other lessons after the last one; a line that runs out of room turns at the map's edge onto the next row
-  // (a row on the side of the route that the route crosses least) and runs back, and so on.
+  // then its other lessons after the last one, every row read left to right; a full row wraps like text: the line
+  // turns down at the map's right edge, runs back under the row and turns down again into the next row at the left.
   function layoutH(path, o) {
     var tiers = path.tiers, nT = tiers.length, st = path.starter, n = st.length, W = o.W, meas = o.measure;
     var ti = {}; tiers.forEach(function (t, k) { ti[t.id] = k; });
@@ -1713,16 +1715,10 @@
         if ((meas(a.lines[q], "label") + meas(b.lines[q], "label")) / 2 + 4 > b.x - a.x) { L.fits = false; L.why.push("names of stops " + a.i + " and " + b.i); }
     }
     var caps = bridges(L.stops, tiers, ti);
-    // the side of its route row where a tier's further rows go: the one the route crosses less (ties: below)
-    var cross = tiers.map(function () { return { above: 0, below: 0 }; });
-    function link(p, p2) { var lo = Math.min(p, p2), hi = Math.max(p, p2); cross[lo].above++; cross[hi].below++; for (var k2 = lo + 1; k2 < hi; k2++) { cross[k2].above++; cross[k2].below++; } }
-    for (i = 0; i + 1 < n; i++) if (row[i] !== row[i + 1]) link(row[i], row[i + 1]);
-    caps.forEach(function (c) { link(c.s.row, c.other); });
     // per tier: its stops, its other lessons, how many fit on the route row after its last stop, the rows for the rest
     var plan = tiers.map(function (t, k) {
-      var own = ordered(path.more, t.id), mine = L.stops.filter(function (s) { return s.row === k; }), P = { k: k, own: own, mine: mine, side: "below" };
+      var own = ordered(path.more, t.id), mine = L.stops.filter(function (s) { return s.row === k; }), P = { k: k, own: own, mine: mine };
       if (mine.length) {
-        P.side = cross[k].above < cross[k].below ? "above" : "below";
         var last = mine[mine.length - 1], start = last.x + Math.max(21 + 22, last.half + 16);
         // a route run that leaves this row to the right (level to its turn, then the climb or drop) keeps the row clear
         for (var j = 0; j + 1 < n; j++) {
@@ -1746,20 +1742,15 @@
       P.tw = meas(t.title, "tier"); P.summary = summary(t, own); P.sw = meas(P.summary, "text");
       return P;
     });
-    // stack the rows from the top, last tier first; the tier's label sits above its top row, at the left
+    // stack the rows from the top, last tier first; a tier's rows go down, each further row after a return run (yr)
+    // under the row before; the tier's label sits at the left above its first row
     var GAP = 10, BAND = 14, y = 4, lastRoute = null;
     for (var k = nT - 1; k >= 0; k--) {
-      var P = plan[k], rows = P.rows.map(function (lst, r) { return { r: r, list: lst, route: r === 0 && P.mine.length > 0 }; });
-      var order = P.mine.length && P.side === "above" ? rows.slice(1).reverse().concat([rows[0]]) : rows, hw = P.tw + 10 + P.sw;
-      // the label goes above the first row (from the top) whose line reaches the left side, where the label sits
-      var reach = function (R) {
-        if (R.route) return P.mine[0].x - 21;
-        if (R.r === 0) return P.start - 14;
-        return R.r % 2 ? Math.max(XA, XBT - (R.list.length - 1) * PMAX) - 14 : XAT - 14;
-      };
-      var hq = 0; for (q = 0; q < order.length; q++) if (reach(order[q]) < PADX + hw + 40) { hq = q; break; }
-      order.forEach(function (R, qq) {
-        var top, bot;
+      var P = plan[k], rows = P.rows.map(function (lst, r) { return { r: r, list: lst, route: r === 0 && P.mine.length > 0 }; }), hw = P.tw + 10 + P.sw;
+      var hq = 0;
+      var prevBot = null;
+      rows.forEach(function (R, qq) {
+        var top, bot, yl;
         if (R.route) {
           var ml = Math.max.apply(null, P.mine.map(function (s) { return s.lines.length; }));
           var up = caps.filter(function (c) { return c.s.row === k && c.up; }), down = caps.some(function (c) { return c.s.row === k && !c.up; });
@@ -1771,25 +1762,28 @@
           }
           bot = Math.max(36 + (down ? 34 : 0) + 15 + 14 * (ml - 1) + 6, R.list.length ? 44 : 0);
           R.lab0 = 36 + (down ? 34 : 0);
-        } else { top = qq === hq ? 36 : 16; bot = 44; R.hy = -22; }
-        var yl = y + top;
-        // a route row right under another one: as close as the names above and the rings, capsules and label below allow
-        if (R.route && lastRoute) {
-          var dy = 108;
-          lastRoute.mine.forEach(function (p) {
-            var pa = p.x - Math.max(21, p.half), pb = p.x + Math.max(21, p.half), pbot = p.lab0 + 15 + 14 * (p.lines.length - 1) + 6;
-            var items = P.mine.map(function (s) { return [s.x - 21, s.x + 21, 21]; })
-              .concat(caps.filter(function (c) { return c.s.row === k && c.up; }).map(function (c) { return [c.s.x - 21, c.s.x + 21, 55]; }))
-              .concat(qq === hq ? [[PADX, PADX + hw, -R.hy + 10]] : []);
-            items.forEach(function (it) { if (it[0] < pb + 6 && it[1] > pa - 6) dy = Math.max(dy, pbot + it[2] + 8); });
-          });
-          yl = lastRoute.y + dy;
+          yl = y + top;
+          // a route row right under another one: as close as the names above and the rings, capsules and label below allow
+          if (lastRoute) {
+            var dy = 108;
+            lastRoute.mine.forEach(function (p) {
+              var pa = p.x - Math.max(21, p.half), pb = p.x + Math.max(21, p.half), pbot = p.lab0 + 15 + 14 * (p.lines.length - 1) + 6;
+              var items = P.mine.map(function (s) { return [s.x - 21, s.x + 21, 21]; })
+                .concat(up.map(function (c) { return [c.s.x - 21, c.s.x + 21, 55]; }))
+                .concat(qq === hq ? [[PADX, PADX + hw, -R.hy + 10]] : []);
+              items.forEach(function (it) { if (it[0] < pb + 6 && it[1] > pa - 6) dy = Math.max(dy, pbot + it[2] + 8); });
+            });
+            yl = lastRoute.y + dy;
+          }
+          P.mine.forEach(function (s) { s.y = yl; s.lab0 = R.lab0; });
+        } else if (qq === 0) { top = 36; bot = 44; R.hy = -22; yl = y + top; }
+        else {   // a further row: its return run 6 px under the row before, the row 30 px under the run
+          R.yr = prevBot + 6; yl = R.yr + 30; bot = 44; R.hy = R.yr - yl - 9;
         }
-        if (R.route) { P.mine.forEach(function (s) { s.y = yl; s.lab0 = R.lab0; }); }
-        R.y = yl; y = Math.max(y, yl + bot + GAP);
-        lastRoute = R.route ? { y: yl, mine: P.mine } : null;
+        R.y = yl; prevBot = yl + bot; y = Math.max(y, yl + bot + GAP);
+        lastRoute = R.route && rows.length === 1 ? { y: yl, mine: P.mine } : null;
       });
-      P.rowsY = rows; P.top = order[hq];
+      P.rowsY = rows; P.top = rows[hq];
       y += BAND;
     }
     L.H = Math.round(y - BAND - GAP + 6);
@@ -1838,26 +1832,24 @@
       return best;
     }
     plan.forEach(function (P, k) {
-      var t = tiers[k], rows = P.rowsY, nr = rows.length, T = { k: k, id: t.id, title: t.title, color: slot(t, k), side: P.mine.length ? P.side : "none",
-        upcoming: t.status === "upcoming", summary: P.summary, n: P.own.length, live: P.own.filter(function (x) { return x.m.ready; }).length, tw: P.tw, sw: P.sw, rows: [] };
+      var t = tiers[k], rows = P.rowsY, nr = rows.length, T = { k: k, id: t.id, title: t.title, color: slot(t, k), side: P.mine.length ? "below" : "none",
+        upcoming: t.status === "upcoming", summary: P.summary, n: P.own.length, live: P.own.filter(function (x) { return x.m.ready; }).length, tw: P.tw, sw: P.sw, rows: [], returns: [] };
       rows.forEach(function (R, r) {
-        var dir = r % 2 ? -1 : 1, right = (r < nr - 1 && dir > 0) || (r > 0 && dir < 0), left = (r < nr - 1 && dir < 0) || (r > 0 && dir > 0);
-        var lo0 = r === 0 ? P.start : left ? XAT : XA, hi0 = right ? XBT : XB;
-        var bl = blocked(R.y - (R.route ? 21 : 16), R.y + 44, 22), xs = place(R.list.length, dir, lo0, hi0, bl);
-        if (R.list.length && !(dir > 0 ? xs[xs.length - 1] <= hi0 + 0.5 : xs[xs.length - 1] >= lo0 - 0.5)) { L.fits = false; L.why.push(t.title + " line row " + r + " overflows"); }
+        var lo0 = r === 0 ? P.start : XAT, hi0 = r < nr - 1 ? XBT : XB;
+        var bl = blocked(R.y - (R.route ? 21 : 16), R.y + 44, 22), xs = place(R.list.length, 1, lo0, hi0, bl);
+        if (R.list.length && xs[xs.length - 1] > hi0 + 0.5) { L.fits = false; L.why.push(t.title + " line row " + r + " overflows"); }
         R.list.forEach(function (x, q2) {
           var m = x.m;
           L.own.push({ key: "m" + x.j, j: x.j, m: m, lesson: m, kind: kindOf(m), tier: k, row: r, x: xs[q2], y: R.y, r: 8.5, color: T.color,
             code: m.code || "", cw: m.code ? meas(m.code, "code") : 0 });
         });
-        var ends = R.list.length ? [Math.min(xs[0], xs[xs.length - 1]), Math.max(xs[0], xs[xs.length - 1])] : null;
-        T.rows.push({ y: R.y, dir: dir, route: R.route, a: ends ? ends[0] : null, b: ends ? ends[1] : null, turnR: right, turnL: left });
+        T.rows.push({ y: R.y, yr: R.yr, route: R.route, a: R.list.length ? xs[0] : null, b: R.list.length ? xs[xs.length - 1] : null });
       });
       // codes: under their station, on a second row when they would touch the one before
       var mine = L.own.filter(function (s) { return s.tier === k; });
       rows.forEach(function (R, r) {
         var endN = -1e9, endF = -1e9;
-        mine.filter(function (s) { return s.row === r; }).sort(function (p, p2) { return p.x - p2.x; }).forEach(function (s) {
+        mine.filter(function (s) { return s.row === r; }).forEach(function (s) {
           s.ly = s.y + 24;
           if (!s.code) return;
           var l0 = s.x - s.cw / 2;
@@ -1865,18 +1857,20 @@
           else { if (l0 < endF + 6) { L.fits = false; L.why.push("codes near " + s.code); } s.far = true; endF = s.x + s.cw / 2; s.ly = s.y + 39; }
         });
       });
-      // the line: row by row, with rounded turns at the map's edge
-      var d2 = "", first = P.mine.length ? P.mine[0].x : (T.rows[0].a != null ? T.rows[0].a - 14 : XA - 14);
+      // the line: row by row; between rows the return run, with rounded turns at both edges and a chevron on the run
+      var first = P.mine.length ? P.mine[0].x : (T.rows[0].a != null ? T.rows[0].a - 14 : XA - 14), d2 = "M" + first + " " + T.rows[0].y, L0 = 9;
       T.rows.forEach(function (rw, r) {
-        if (r === 0) d2 += "M" + first + " " + rw.y;
-        else {
-          var pv = T.rows[r - 1], xT = pv.dir > 0 ? EDGE : 9, sg = rw.y > pv.y ? 1 : -1, ins = pv.dir > 0 ? -RC : RC;
-          d2 += " H" + (xT + ins) + " Q" + xT + " " + pv.y + " " + xT + " " + (pv.y + sg * RC) + " V" + (rw.y - sg * RC) + " Q" + xT + " " + rw.y + " " + (xT + ins) + " " + rw.y;
-        }
-        if (r === nr - 1) {
-          var endX = rw.a == null ? (rw.route ? P.mine[P.mine.length - 1].x : XA + 120) : rw.dir > 0 ? rw.b + 14 : rw.a - 14;
-          d2 += " H" + endX;
-        }
+        if (r < nr - 1) {
+          var nx = T.rows[r + 1], yr = nx.yr;
+          d2 += " H" + (EDGE - RC) + " Q" + EDGE + " " + rw.y + " " + EDGE + " " + (rw.y + RC) + " V" + (yr - RC) + " Q" + EDGE + " " + yr + " " + (EDGE - RC) + " " + yr +
+            " H" + (L0 + RC) + " Q" + L0 + " " + yr + " " + L0 + " " + (yr + RC) + " V" + (nx.y - RC) + " Q" + L0 + " " + nx.y + " " + (L0 + RC) + " " + nx.y;
+          // the chevron goes in the middle of the longest stretch of the run that the starter route does not cross
+          var free = [], at = 60;
+          blocked(yr - 8, yr + 8, 16).forEach(function (bb) { if (bb[0] > at) free.push([at, bb[0]]); at = Math.max(at, bb[1]); });
+          if (at < W - 60) free.push([at, W - 60]);
+          free.sort(function (p, p2) { return (p2[1] - p2[0]) - (p[1] - p[0]); });
+          T.returns.push({ y: yr, x: Math.round(free.length ? (free[0][0] + free[0][1]) / 2 : W / 2) });
+        } else d2 += " H" + (rw.b != null ? rw.b + 14 : rw.route ? P.mine[P.mine.length - 1].x : XA + 120);
       });
       T.path = d2; T.empty = !P.own.length;
       T.hx = PADX; T.hy = P.top.y + P.top.hy;
@@ -1911,15 +1905,23 @@
       T.hx = textX; T.hy = y + 22; T.sum = wrap(T.summary, avail, meas, "text", 2);
       T.head = meas(t.title + " line", "tier") <= avail ? t.title + " line" : shorten(t.title, avail, meas, "tier");
       T.y0 = T.hy - 15; y = T.hy + 16 + 14 * (T.sum.length - 1) + 10;
-      own.forEach(function (x) {
-        // the code first (in the code font), then the title, wrapped beside and under it
-        var m = x.m, cwd = m.code ? meas(m.code, "code") + 7 : 0, lines = wrap(m.title, avail, meas, "label", m.ready ? 2 : 1, cwd), sy = y + 14;
+      // a station's row: the code first (in the code font), then its short name, or its title over two lines at most
+      function stationRow(x, folded) {
+        var m = x.m, cwd = m.code ? meas(m.code, "code") + 7 : 0, lines = wrap(m.short || m.title, avail, meas, "label", 2, cwd), sy = y + 14;
         L.own.push({ key: "m" + x.j, j: x.j, m: m, lesson: m, kind: kindOf(m), tier: k, x: tx(k), y: sy, r: 8, color: T.color, code: m.code || "",
-          cwd: cwd, lines: lines, ty: sy + 4.5, textX: textX, top: y, h: 30 + 15 * (lines.length - 1) });
+          cwd: cwd, lines: lines, ty: sy + 4.5, textX: textX, top: y, h: 30 + 15 * (lines.length - 1), folded: folded });
         y += 30 + 15 * (lines.length - 1);
-      });
+      }
+      // the open lessons, then the upcoming ones folded into one row ("12 coming soon") that opens in place (opts.open)
+      var live = own.filter(function (x) { return x.m.ready; }), up = own.filter(function (x) { return !x.m.ready; });
+      live.forEach(function (x) { stationRow(x, false); });
+      if (up.length) {
+        T.fold = { k: k, id: t.id, n: up.length, open: !!(o.open && o.open[t.id]), x: tx(k), top: y, y: y + 17, h: 34, textX: textX };
+        y += 34;
+        if (T.fold.open) up.forEach(function (x) { stationRow(x, true); });
+      }
       var last = L.own.filter(function (s) { return s.tier === k; }).pop();
-      T.y1 = last ? last.y : T.hy + 12;
+      T.y1 = Math.max(last ? last.y : T.hy + 12, T.fold && !T.fold.open ? T.fold.y : -1);
       y += 12;
       L.tiers.push(T);
     });
@@ -1929,7 +1931,7 @@
 
   LX.metroLayout = function (path, mode, opts) {
     opts = opts || {};
-    var o = { W: opts.W || (mode === "h" ? 1100 : 330), measure: opts.measure || estimate };
+    var o = { W: opts.W || (mode === "h" ? 1100 : 330), measure: opts.measure || estimate, open: opts.open || {} };
     var L = mode === "h" ? layoutH(path, o) : layoutV(path, o);
     L.stations = L.stops.concat(L.own);
     L.tools = (path.toolbox || []).map(function (t, j) { return { key: "k" + j, j: j, lesson: t, kind: "tool" }; });
@@ -1986,7 +1988,7 @@
   }
 
   LX.Metro = function (host, path) {
-    var tiers = path.tiers, st = path.starter, more = path.more || [], tools = path.toolbox || [], M = { tier: null, sel: null }, hid = "lx-metro-" + (++uid) + "-h";
+    var tiers = path.tiers, st = path.starter, more = path.more || [], tools = path.toolbox || [], M = { tier: null, sel: null, open: {}, justOpened: null }, hid = "lx-metro-" + (++uid) + "-h";
     var tIdx = {}; tiers.forEach(function (t, k) { tIdx[t.id] = k; });
     var doors = H("div", { class: "lx-doors", role: "group", "aria-label": "Where do you start?", style: "--n:" + tiers.length }, host);
     var bar = H("div", { class: "lx-mapbar" }, host);
@@ -2148,7 +2150,7 @@
     function render() {
       var cs = getComputedStyle(wrap), avail = Math.floor(wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)), L = null;
       if (avail >= HMIN) { L = LX.metroLayout(path, "h", { W: avail, measure: meas }); if (!L.fits) L = null; }
-      if (!L) L = LX.metroLayout(path, "v", { W: Math.min(avail, VMAX), measure: meas });
+      if (!L) L = LX.metroLayout(path, "v", { W: Math.min(avail, VMAX), measure: meas, open: M.open });
       Lc = L; var mode = L.mode;
       var done = st.filter(function (l) { return state(l) === "done"; }).length;
       pt.textContent = done + " of " + st.length + " done"; pf.style.width = (done / Math.max(1, st.length) * 100) + "%";
@@ -2161,6 +2163,9 @@
       var lines = S("g", { fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }, svg);
       if (mode === "h") L.tiers.forEach(function (t) {
         S("path", { d: t.path, class: "mown" + (t.upcoming || t.empty ? " soon" : "") + (dim(t.id) ? " seg-dim" : ""), stroke: t.color }, lines);
+        t.returns.forEach(function (rv) {   // the way back to the next row's start
+          S("path", { d: "M" + (rv.x + 4) + " " + (rv.y - 6) + " L" + (rv.x - 3) + " " + rv.y + " L" + (rv.x + 4) + " " + (rv.y + 6), class: "mchev" + (dim(t.id) ? " seg-dim" : ""), stroke: t.color }, lines);
+        });
       });
       else {
         L.tiers.forEach(function (t) { S("text", { x: t.x, y: L.top, class: "mtier", fill: t.color, "text-anchor": "middle", "aria-hidden": "true" }, svg).textContent = t.title.charAt(0); });
@@ -2219,8 +2224,10 @@
           t.sum.forEach(function (ln, j) { S("text", { x: t.hx, y: t.hy + 16 + 14 * j, class: "mtext" }, hd).textContent = ln; });
         }
         onActivate(hd, function () { openTier(t.k, true); });
-        L.own.filter(function (o) { return o.tier === t.k; }).forEach(function (o) {
-          var l = o.m, s = state(l), g = S("g", { class: "mown-st" + (dim(l.tier, l.tier2) ? " seg-dim" : "") }, gl);
+        var mineO = L.own.filter(function (o) { return o.tier === t.k; });
+        mineO.filter(function (o) { return !o.folded; }).concat(t.fold ? [t.fold] : [], mineO.filter(function (o) { return o.folded; })).forEach(function (o) {
+          if (o === t.fold) { drawFold(gl, t, o); return; }
+          var l = o.m, s = state(l), g = S("g", { class: "mown-st" + (dim(l.tier, l.tier2) ? " seg-dim" : "") + (o.folded && M.justOpened === t.id ? " fold-in" : "") }, gl);
           var stn = S("g", { class: "stn own " + s + " k-" + o.kind + (M.sel === o.key ? " sel" : ""), tabindex: 0, role: "button", "aria-haspopup": "dialog", "data-key": o.key,
             "data-line": t.id, style: "--c:" + o.color, "aria-label": ariaOwn(l, s) }, g);
           S("circle", { cx: o.x, cy: o.y, r: 15, class: "hit" }, stn);
@@ -2254,6 +2261,25 @@
           b.addEventListener("click", function () { open(key); });
         });
       }
+    }
+    // the phone map's fold: a hollow station on the line and a real button ("12 coming soon") that opens the tier's
+    // upcoming stations in place; focus stays on the button, which the map redraws
+    function drawFold(gl, t, f) {
+      var T = tiers[t.k], gf = S("g", { class: "mfold" + (f.open ? " open" : ""), style: "--c:" + t.color }, gl);
+      var mk = S("g", { class: "mfold-mk", "aria-hidden": "true" }, gf);
+      S("circle", { cx: f.x, cy: f.y, r: 9, class: "face" }, mk);
+      S("path", { d: f.open ? "M" + (f.x - 4) + " " + (f.y + 2) + " l4 -4 l4 4" : "M" + (f.x - 4) + " " + (f.y - 2) + " l4 4 l4 -4", class: "chev" }, mk);
+      mk.addEventListener("click", function () { fold(t.id); });
+      var fo = S("foreignObject", { x: f.textX - 8, y: f.top + 3, width: Lc.W - f.textX + 6, height: f.h - 6 }, gf);
+      var b = H("button", { type: "button", class: "lx-fold", "aria-expanded": f.open ? "true" : "false", "data-fold": t.id, "data-line": t.id,
+        "aria-label": T.title + ": " + f.n + " coming soon" + (f.open ? ", shown" : "") }, fo);
+      H("span", { text: f.n + " coming soon" }, b); H("span", { class: "ch", "aria-hidden": "true", html: LX.icon("arrow") }, b);
+      b.addEventListener("click", function () { fold(t.id); });
+    }
+    function fold(id) {
+      M.open[id] = !M.open[id]; M.justOpened = M.open[id] ? id : null;
+      close(); render(); M.justOpened = null;
+      var b = host.querySelector('.lx-fold[data-fold="' + id + '"]'); if (b) b.focus({ preventScroll: true });
     }
     var lastW = 0;
     if (window.ResizeObserver) new ResizeObserver(function () { var w = wrap.clientWidth; if (LX.visible(wrap) && Math.abs(w - lastW) > 4) { lastW = w; close(); render(); } }).observe(wrap);

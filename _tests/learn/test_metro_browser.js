@@ -2,11 +2,14 @@
 // every lesson a station). At desktop, tablet and phone sizes, and in two short windows (a laptop's, a phone held
 // sideways):
 //   Stations
+//     - narrow layout: each tier's upcoming lessons are folded into one button ("N coming soon", aria-expanded) that
+//       opens them in place and keeps focus; the test opens every fold (and closes and reopens one) before the rest;
 //     - every path.json lesson has exactly one station (starter path and tier lines) or toolbox chip, named after it,
 //       whose card shows its title and, when it is live, a Start link to its page (else "Coming soon");
 //     - live and upcoming states match path.json (open or up; nothing is done in a fresh browser);
 //     - keyboard order: the doors, the starter path 0-13, then each tier line (its label, then its stations in
-//       curriculum order), then the toolbox; an arrow key steps along a line.
+//       curriculum order; narrow: the open ones, the fold, the upcoming ones), then the toolbox; an arrow key steps
+//       along a line.
 //   Labels
 //     - no two labels overlap, and no label covers another station or the route (bounding boxes in the window);
 //     - every label is drawn at 11 px or more; when a door dims the other tiers, no text is faded.
@@ -163,6 +166,31 @@ async function pageChecks(P) {
   [...host.querySelectorAll(".lx-mlegend > span, .lx-mapbar > *, .lx-tool")].forEach(e => { const r = e.getBoundingClientRect(); ok(r.right <= hr.right + E && r.left >= hr.left - E, `"${e.textContent.trim()}" fits the column`); });
   ok(document.documentElement.scrollWidth <= vw, `no sideways scroll (${document.documentElement.scrollWidth - vw} px)`);
 
+  // ---- the narrow layout's folds: one per tier with upcoming lessons, closed at first; open them all (keeping focus)
+  const upOf = t => D.more.map((m, j) => ({ m, j })).filter(x => x.m.tier === t.id && !x.m.ready);
+  const foldB = id => host.querySelector(`.lx-fold[data-fold="${id}"]`);
+  if (mode === "v") {
+    for (const t of D.tiers) {
+      const up = upOf(t), b = foldB(t.id);
+      if (!up.length) { ok(!b, `${t.title}: no fold without upcoming lessons`); continue; }
+      ok(b && b.tagName === "BUTTON" && b.getAttribute("aria-expanded") === "false" && b.textContent.indexOf(up.length + " coming soon") >= 0,
+        `${t.title}: a closed fold button "${b && b.textContent}" for its ${up.length} upcoming lessons`);
+      ok(up.every(x => !byKey("m" + x.j).length), `${t.title}: its upcoming stations are folded away`);
+      b.focus(); b.click(); await settle();
+      const b2 = foldB(t.id);
+      ok(b2 && b2.getAttribute("aria-expanded") === "true" && document.activeElement === b2, `${t.title}: the fold opens in place and keeps focus`);
+      ok(up.every(x => byKey("m" + x.j).length === 1), `${t.title}: its ${up.length} upcoming stations show once opened`);
+      const fresh = [...svg().querySelectorAll(".fold-in")];
+      ok(!P.smooth ? fresh.every(g => getComputedStyle(g).animationName === "none") : true, "reduced motion: opened stations appear without animation");
+    }
+    const t0 = D.tiers.find(t => upOf(t).length);
+    if (t0) {
+      foldB(t0.id).click(); await settle();
+      ok(foldB(t0.id).getAttribute("aria-expanded") === "false" && upOf(t0).every(x => !byKey("m" + x.j).length) && document.activeElement === foldB(t0.id), `${t0.title}: the fold closes again, focus kept`);
+      foldB(t0.id).click(); await settle();
+    }
+  } else ok(!host.querySelector(".lx-fold"), "the wide layout folds nothing");
+
   // ---- every lesson: exactly one station or chip, named after it, in the state path.json gives
   const rank = m => { const c = m.code || ""; if (!c) return [1, 0]; if (/^CK-/.test(c)) return [7, 0]; if (c === "CR") return [8, 99];
     const g = /^([A-Z]+)(\d+)$/.exec(c); if (!g) return [4.5, 0]; const f = { F: 0, A: 0, M: 0, R: 0, B: 2, N: 3, X: 4, CF: 5, SB: 6, C: 8 }[g[1]]; return [f == null ? 4.5 : f, +g[2]]; };
@@ -183,12 +211,15 @@ async function pageChecks(P) {
   const want = [...host.querySelectorAll(".lx-door")].map((d, k) => "door" + k).concat(D.starter.map((l, i) => "s" + i));
   D.tiers.forEach((t, k) => {
     want.push("tier" + k);
-    D.more.map((m, j) => ({ m, j })).filter(x => x.m.tier === t.id).sort((a, b) => rank(a.m)[0] - rank(b.m)[0] || rank(a.m)[1] - rank(b.m)[1] || a.j - b.j).forEach(x => want.push("m" + x.j));
+    const seq = D.more.map((m, j) => ({ m, j })).filter(x => x.m.tier === t.id).sort((a, b) => rank(a.m)[0] - rank(b.m)[0] || rank(a.m)[1] - rank(b.m)[1] || a.j - b.j);
+    if (mode === "h") seq.forEach(x => want.push("m" + x.j));
+    else { seq.filter(x => x.m.ready).forEach(x => want.push("m" + x.j)); if (seq.some(x => !x.m.ready)) want.push("fold" + k); seq.filter(x => !x.m.ready).forEach(x => want.push("m" + x.j)); }
   });
   (D.toolbox || []).forEach((t, j) => want.push("k" + j));
   const doorsL = [...host.querySelectorAll(".lx-door")];
   const got = [...host.querySelectorAll("button, a[href], [tabindex]")].filter(e => e.tabIndex >= 0 && !e.closest(".lx-preview"))
-    .map(e => e.classList.contains("lx-door") ? "door" + doorsL.indexOf(e) : e.classList.contains("mext") ? "tier" + e.getAttribute("data-k") : e.getAttribute("data-key"));
+    .map(e => e.classList.contains("lx-door") ? "door" + doorsL.indexOf(e) : e.classList.contains("mext") ? "tier" + e.getAttribute("data-k")
+      : e.classList.contains("lx-fold") ? "fold" + D.tiers.findIndex(t => t.id === e.getAttribute("data-fold")) : e.getAttribute("data-key"));
   const firstBad = got.findIndex((g, i) => g !== want[i]);
   ok(got.length === want.length && firstBad < 0, `keyboard order: doors, starter path, each line, toolbox (${got.length} of ${want.length}; first difference at ${firstBad}: ${got[firstBad]} for ${want[firstBad]})`);
   const lineOf = D.tiers[0].id, onLine = [...host.querySelectorAll(`[data-line="${lineOf}"]`)];
@@ -205,6 +236,9 @@ async function pageChecks(P) {
   const clash = [];
   tr.forEach((a, i) => tr.forEach((b, j) => { if (i < j && meet(a.r, b.r, 0.5)) clash.push(`"${a.what}" / "${b.what}"`); }));
   ok(!clash.length, `no two labels overlap (${texts.length} labels${clash.length ? "; " + clash.slice(0, 5).join(", ") : ""})`);
+  const folds = [...host.querySelectorAll(".lx-fold")].map(b => ({ r: b.getBoundingClientRect(), what: b.textContent })), fc = [];
+  folds.forEach(f => tr.forEach(a => { if (meet(a.r, f.r, 0.5)) fc.push(`"${a.what}" / fold "${f.what}"`); }));
+  ok(!fc.length && folds.every(f => f.r.right <= sr.right + E), `no label overlaps a fold button, which fits the map${fc.length ? " (" + fc.slice(0, 3).join(", ") + ")" : ""}`);
   const chips = [...host.querySelectorAll(".lx-tool")].map(c => c.getBoundingClientRect()), cc = [];
   chips.forEach((a, i) => chips.forEach((b, j) => { if (i < j && meet(a, b, 0.5)) cc.push(i + "/" + j); }));
   ok(!cc.length, `no two toolbox chips overlap${cc.length ? " (" + cc.join(", ") + ")" : ""}`);

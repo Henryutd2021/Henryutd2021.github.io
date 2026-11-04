@@ -279,11 +279,15 @@ LX.CausalChain(host, {title, links: [{title, text, value}], note});
 LX.EnergyChain(host, {title, aside, lede, stops: [{icon, title, text, value}]});
 ```
 
-**Course map** (`metro.js`): `<div data-lx-metro>` on `learn/index.qmd` draws from `data/path.json`.
+**Course map** (`metro.js`): `<div data-lx-metro>` on `learn/index.qmd` draws from `data/path.json`. Every lesson is one station.
 
-- Use `LX.metroLayout(path, "h"|"v")` for tests.
-- It supports any number of tiers: give each tier a colour `slot` 1–5. Four tiers now; Researcher has `status: upcoming` (a dashed door and line, "coming later").
-- Each line's "+N more" label opens the tier card, which links the tier's live lessons off the starter path.
+- The starter path is the named route across the tier lines. Each tier is one line: its starter stops, then its other lessons in curriculum order (modules by number, bridges, news lens, side topics, case files, sandboxes, checkpoint, capstones).
+- Rows read left to right. A full row wraps like text: a return run under it leads to the next row's start at the left.
+- Live stations are filled, upcoming ones hollow; each shows its code. Shapes tell the kinds apart (lesson, studio, case file, checkpoint, sandbox, capstone), from `form` or the code; the legend lists the kinds on the map.
+- Each line's label counts what is drawn on it ("7 open · 3 coming soon") and opens the tier card. The toolbox K1–K8 is a shelf of chips under the lines.
+- On phones (a drawing under 720 px) each line runs down its column, one station per row with its code and short name (or title over two lines). A tier's upcoming lessons fold into one "N coming soon" button that opens them in place.
+- It supports any number of tiers: give each tier a colour `slot` 1–5; a tier with `status: upcoming` gets a dashed door and line, "coming later".
+- `LX.metroLayout(path, "h"|"v", {W, measure, open})` is the pure layout. Tests: `_tests/learn/test_metro_layout.js` (Node) and `_tests/learn/test_metro_browser.js` (Chrome; `--path` serves another `path.json`).
 
 **Solver** (`solver.js`): linear and mixed-integer programs in the browser with HiGHS.
 
