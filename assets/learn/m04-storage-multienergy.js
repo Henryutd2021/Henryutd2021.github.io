@@ -136,6 +136,7 @@
       ".m4-tbl th,.m4-tbl td{padding:5px 6px;border-bottom:1px solid var(--lx-line);text-align:right;font-weight:400}.m4-tbl th:first-child,.m4-tbl td:first-child{text-align:left}",
       ".m4-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3);vertical-align:bottom}.m4-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.m4-tbl td:first-child{font-family:var(--lx-f-body)}",
       ".m4-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+      ".m4-dev th,.m4-dev td{text-align:left;font-family:var(--lx-f-body)}",
       ".m4-key{margin:0;padding-left:1.1rem;display:grid;gap:2px;font-size:13.5px;color:var(--lx-ink-2)}.m4-key var{font-style:italic}",
       "@media (max-width:560px){.m4-tbl table{font-size:12.5px}.m4-tbl th,.m4-tbl td{padding:4px 3px}.m4-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
@@ -241,7 +242,7 @@
       // 5 heat
       { text: "Add a third carrier, heat: a [[heat-pump|heat pump]] and a heat store feed the town's heat network, and a gas boiler covers the rest.",
         build: function (act, api) {
-          table(act, ["Device", "Size", "Conversion or limit"], [["Heat pump", D.heat.pumpMW + " MW of power", D.heat.cop + " MWh of heat per MWh (DOE)"], ["Heat store", D.heat.storeMWh + " MWh of heat", "loses " + Math.round(D.heat.lossPerDay * 100) + "% a day"], ["Heat network", D.heat.networkMW + " MW of heat", "the most it takes from the plant"], ["Gas boiler", "as needed", "$" + D.heat.boilerPerMWh + " per MWh of heat"]], "The heat devices");
+          table(act, ["Device", "Size", "Conversion or limit"], [["Heat pump", D.heat.pumpMW + " MW of power", D.heat.cop + " MWh of heat per MWh (DOE)"], ["Heat store", D.heat.storeMWh + " MWh of heat", "loses " + Math.round(D.heat.lossPerDay * 100) + "% a day"], ["Heat network", D.heat.networkMW + " MW of heat", "the most it takes from the plant"], ["Gas boiler", "as needed", "$" + D.heat.boilerPerMWh + " per MWh of heat"]], "The heat devices").classList.add("m4-dev");
           var plotHost = H("div", null, act);
           solveStep(act, api, "Solve with heat", function () { return [["winter", "h2"], ["winter", "heat"]]; }, function (out) {
             var a = res[keyOf("winter", "h2")], b = res[keyOf("winter", "heat")]; out.innerHTML = ""; var k = H("div", { class: "m4-kpis" }, out);
