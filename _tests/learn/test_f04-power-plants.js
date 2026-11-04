@@ -66,11 +66,17 @@ const P = k => M.plantByKey(D, k);
   ok(least === D.predict.answer && least === "geo", "the predict question's answer (geothermal) has the smallest share of its options");
   ok(D.facts.cpBest.value === L5.measured.cpBest && L5.measured.cpBest === 0.52, "NREL test turbine's best power coefficient 0.52 (lesson 5's data)");
   ok(near(16 / 27 * 100, 59.26, 0.01), "Betz limit 16/27 = 59.3%");
-  // Carnot ceilings in the Analyst box (cooling at 25 °C)
-  const K = f => (f - 32) * 5 / 9 + 273.15, car = f => Math.round((1 - 298.15 / K(f)) * 100);
-  ok(Math.round(K(300)) === 422 && Math.round(K(700)) === 644 && Math.round(K(2300)) === 1533, "300, 700 and 2,300 °F = 422, 644 and 1,533 K");
-  ok(car(300) === 29 && car(700) === 54 && car(2300) === 81, `Carnot ceilings 29%, 54%, 81% (${car(300)}, ${car(700)}, ${car(2300)})`);
-  ok(/\| Geothermal water, 300 °F \| 422 K \| 29% \|/.test(QMD) && /\| Geothermal water, 700 °F \| 644 K \| 54% \|/.test(QMD) && /\| Gas in a turbine, 2,300 °F \| 1,533 K \| 81% \|/.test(QMD), "the Carnot table on the page matches");
+  // Go deeper stays at the next tier's view (curriculum §4.6): no device thermodynamics (Carnot, kelvin) in F4, and the
+  // Analyst box's plain table reads its numbers from the data file
+  ok(!/carnot|kelvin|T_\\text\{(hot|cold)\}/i.test(QMD.replace(/<!--[\s\S]*?-->/g, "")), "no Carnot formula or kelvin table on the page (review F4 #5)");
+  const F = D.facts;
+  ok(QMD.indexOf(`| Geothermal water | ${F.geoTempF.lo} to ${F.geoTempF.hi} °F (EIA) | about ${M.shareText(P("geo"), BTU)} (EIA, typical) |`) >= 0, "Analyst table: geothermal 300 to 700 °F, about 16");
+  ok(QMD.indexOf(`| Gas in a gas turbine | above ${fmt(F.gasTempF.value)} °F (DOE) | ${F.simpleCycle.lo} to ${F.simpleCycle.hi} alone (DOE) |`) >= 0, "Analyst table: gas above 2,000 °F, 20 to 35 alone");
+  // the Modeler box's one symbolic line is dimensionally right: Btu = 1,000 kW/MW x Btu/kWh x MW x h (review F4 #1)
+  ok(M.fuelBtu(7535, 150, 1) === 1130250000 && near(M.fuelBtu(7535, 150, 0.5), M.fuelBtu(7535, 150, 1) / 2), "fuel: 150 MW for an hour at 7,535 Btu/kWh = 1,130,250,000 Btu; half the hour, half the fuel");
+  ok(QMD.indexOf(`about ${(M.fuelBtu(P("cc").heatRate, TOWN.fleet.cc.mw, 1) / 1e9).toFixed(2)} billion Btu`) >= 0 && /F_t = 1\{,\}000 \\cdot HR \\cdot p_t\\,\\Delta t/.test(QMD), "the Modeler box's line has the 1,000 and the duration, and its example matches");
+  ok((QMD.match(/\$\$/g) || []).length === 4, "two displayed equations in the Go deeper boxes, no more (§4.6: at most one symbolic line per preview)");
+  ok(/m01-dispatch-to-lmp\.html/.test(QMD) && !/\\sum_t|\\le R|E\^\\text\{water\}/.test(QMD), "the Modeler box links M1 and gives the rules in words, not a formulation");
 }
 
 // ---------------- the Sankey: every plant's 100 units balance, laid out by F3's component
@@ -121,6 +127,9 @@ const P = k => M.plantByKey(D, k);
   ok(M.hydroMW(h.head.start, h.flow.start, h) < h.goalMW && M.hydroMW(h.head.max, h.flow.max, h) >= h.goalMW, "the start is below 100 MW and the sliders can reach it");
   ok(near(M.hydroMW(80, 100, h), 2 * M.hydroMW(40, 100, h)) && near(M.hydroMW(40, 200, h), 2 * M.hydroMW(40, 100, h)), "twice the head or twice the flow doubles the power");
   ok(h.volumeM3 === 20e6, "reservoir 20 million m³ (illustrative)");
+  [20, 100, 300].forEach(Q => ok(near(M.reservoirMWh(h.volumeM3, 120, h), M.hydroMW(120, Q, h) * M.reservoirHours(h.volumeM3, Q), 1e-6), `reservoir energy (no inflow, constant head) is the same at ${Q} m³/s`));
+  ok(Math.round(M.reservoirMWh(h.volumeM3, 120, h)) === 5886, "120 m, 20 million m³: about 5,886 MWh");
+  ok(/no inflow, all the water usable, head and efficiency held constant/.test(JS) && /no water flowing in/.test(h.about), "the toy reservoir's assumptions are stated (review F4 #7)");
 }
 
 // ---------------- the evening ramp: lesson 0's day and the greedy follow
@@ -138,7 +147,24 @@ const P = k => M.plantByKey(D, k);
     x.cc.forEach((c, i) => { if (i) ok(Math.abs(c - x.cc[i - 1]) <= r && c <= base.ccMax && c >= 0, `ramp ${r}: hour ${R.from + i} within the ramp and size`); });
   }
   const pk40 = M.rampRun(need, Object.assign({ ramp: 40, peaker: true }, base));
-  ok(pk40.tot.pk === 10, "with the peaker at 40 MW/h it fills 10 MWh");
+  ok(pk40.tot.pk === 10 && pk40.tot.balanced, "with the peaker at 40 MW/h it fills 10 MWh and every hour balances");
+  // surplus (review F4 #3): at 10 MW/h the plant cannot turn down as fast as the need falls into 16:00
+  const r10p = M.rampRun(need, Object.assign({ ramp: 10, peaker: true }, base)), r10 = M.rampRun(need, Object.assign({ ramp: 10, peaker: false }, base));
+  ok(r10p.tot.short === 0 && r10p.tot.over === 5 && r10p.tot.firstOver === 16 && r10p.over.filter(v => v > 0).length === 1 && !r10p.tot.balanced, "10 MW/h with the peaker: nothing short, 5 MWh over at 16:00, not balanced");
+  ok(r10.tot.short === 160 && r10.tot.over === 5 && !r10.tot.balanced, "10 MW/h alone: 160 MWh short and 5 MWh over");
+  for (let r = R.rampMin; r <= R.rampMax; r += R.rampStep) {
+    const x = M.rampRun(need, Object.assign({ ramp: r, peaker: true }, base)), y = M.rampRun(need, Object.assign({ ramp: r, peaker: false }, base));
+    ok(x.tot.balanced === (r >= 20) && y.tot.balanced === (r >= 50), `ramp ${r}: balanced with the peaker from 20 MW/h, alone from 50 MW/h`);
+    x.need.forEach((v, i) => ok(x.cc[i] + x.pk[i] + x.short[i] - x.over[i] === v, `ramp ${r}, hour ${x.hours[i]}: made + short - over = need`));
+    const fb = x.tot.balanced ? M.rampText({ r, pk: true }, x, D, TOWN) : M.rampFeedback({ r, pk: true }, x), fb2 = y.tot.balanced ? M.rampText({ r, pk: false }, y, D, TOWN) : M.rampFeedback({ r, pk: false }, y);
+    [fb, fb2].forEach(t => ok(words(t) <= 40 && sentences(t) <= 2, `ramp ${r} feedback within budget (${words(t)} words): ${t.slice(0, 60)}…`));
+  }
+  ok(M.rampFeedback({ r: 10, pk: true }, r10p) === "Nothing short, but **5 MWh** too much, first at 16:00: at 10 MW per hour the combined-cycle plant cannot turn down as fast as the need falls. Raise the ramp limit.", "feedback names the 5 MWh surplus at 16:00");
+  ok(/^Short by \*\*10 MWh\*\*, first at 18:00/.test(M.rampFeedback({ r: 40, pk: false }, r40)), "feedback at 40 MW/h alone: 10 MWh short, first at 18:00");
+  ok(/^Short by \*\*160 MWh\*\* \(first at 17:00\) and \*\*5 MWh\*\* too much \(first at 16:00\)/.test(M.rampFeedback({ r: 10, pk: false }, r10)), "feedback at 10 MW/h alone names both");
+  ok(/the peaker filled \*\*10 MWh\*\*/.test(M.rampText({ r: 40, pk: true }, pk40, D, TOWN)) && /about 46% more gas per kWh/.test(M.rampText({ r: 40, pk: true }, pk40, D, TOWN)), "balanced feedback with the peaker: 10 MWh, 46% more gas");
+  ok(/"Energy short", int\(x\.tot\.short\) \+ " MWh"/.test(JS) && /"Energy over", int\(x\.tot\.over\) \+ " MWh"/.test(JS) && !/"MW short"/.test(JS), "chips say energy short and energy over, in MWh (review F4 #12)");
+  ok(/"Short, MW", "Over, MW"\]/.test(JS) && /if \(x\.tot\.balanced\) \{ api\.done\(\)/.test(JS), "the text table shows the surplus, and the step completes only when every hour balances");
 }
 
 // ---------------- the card sort and the explorer data
@@ -152,6 +178,9 @@ const P = k => M.plantByKey(D, k);
   D.scenes.forEach(s => { ok(s.chain.length === 4 && s.chain[3] === "Electricity", `${s.key}: a four-stop energy chain to electricity`); ok(words(s.text) <= 40 && sentences(s.text) <= 2, `${s.key}: text within budget`); });
   ok(/2,000 °F/.test(D.scenes[0].chain[1]) && D.facts.gasTempF.value === 2000, "gas: burned above 2,000 °F (DOE)");
   ok(/300 to 700 °F/.test(D.scenes[3].energy) && D.facts.geoTempF.lo === 300 && D.facts.geoTempF.hi === 700, "geothermal: 300 to 700 °F (EIA)");
+  ok(/^Flash-steam/.test(D.scenes[3].name) && /binary/.test(D.scenes[3].text) && /flash steam \(the most common\)/.test(D.sources.eia_geo.where), "geothermal: named as the flash-steam example, binary plants noted (review F4 #8)");
+  ok(/exhaust-heated boiler \(\[\[hrsg\|HRSG\]\]\)/.test(D.scenes[0].text) && /exhaust-heated<\/text>/.test(JS) && /\[\[nacelle\|nacelle\]\], the equipment housing/.test(D.scenes[4].text) && /direct current \(DC\), which flows one way/.test(D.scenes[5].text) && /alternating current \(AC\), which reverses/.test(D.scenes[5].text), "HRSG, nacelle, DC and AC are explained where they first appear (review F4 #9)");
+  ok(P("pv").outLabel && /DC electricity at the module/.test(M.sankeySpec(P("pv"), D).nodes[1].label) && M.sankeySpec(P("cc"), D).nodes[1].label === "Electricity to the wire", "solar's 25 is DC at the module; the other plants reach the wire (review F4 #6)");
 }
 
 // ---------------- every number with a unit on the page, against the model and the data
@@ -162,14 +191,14 @@ const P = k => M.plantByKey(D, k);
   const days = M.solarDays(Y, D), sh = k => M.fmtShare(M.share(P(k), BTU));
   const allowed = new Set([
     // shares and heat rates
-    "45.3%", "34.0%", "31.1%", "68.9%", "54.7%", "321.7%", "16%", "29%", "54%", "81%", "59.3%", "25%", "10%", "20 to 35 percent", "60 percent", "90%",
+    "45.3%", "34.0%", "31.1%", "68.9%", "54.7%", "321.7%", "16%", "59.3%", "25%", "10%", "20 to 35 percent", "60 percent", "90%",
     "7,535 Btu", "10,975 Btu", "10,040 Btu", "3,412 Btu",
     // solar
     "200 MW", "1,666 MWh", "1,411 MWh", "776 MWh", "34.7%", "29.4%", "16.2%", "173 MW", "161 MW", "93 MW", "37 MW", "388%", "32.3%", "47%", "12 daylight hours",
     // hydro and ramp
     "105.9 MW", "55.6 hours", "100 m", "150 MW", "40 MW", "10 MWh", "50 MW", "100 MW", "120 m", "100 m³/s", "20 million m³",
     // temperatures and shares of generation
-    "300 °F", "700 °F", "2,300 °F", "25 °C", "422 K", "644 K", "1,533 K", "298 K", "42%", "34%", "6%", "3%", "10 minutes", "12 hours"
+    "300 °F", "700 °F", "2,000 °F", "42%", "34%", "6%", "3%", "10 minutes", "12 hours"
   ]);
   ok(sh("cc") === "45.3" && sh("geo") === "16" && sh("pv") === "25", "share strings");
   ok((P("ct").heatRate / BTU * 100).toFixed(1) === "321.7", "the quiz distractor 321.7% is the heat rate divided the wrong way");
@@ -229,12 +258,13 @@ const P = k => M.plantByKey(D, k);
   ok((QMD.match(/class="lx-qq"/g) || []).length === 8, "practice: four myths and four questions");
   const steps = [...JS.matchAll(/^      \{ text: "((?:[^"\\]|\\.)*)"/gm)].map(x => x[1]);
   ok(steps.length === 8, `${steps.length} step texts`);
-  steps.forEach(t => { ok(words(t) <= 40 && sentences(t) <= 2, `step text within budget (${words(t)} words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
-  ok(/3,412 Btu/.test(steps[3]) && /10,040 Btu/.test(steps[3]) && P("coal").heatRate === 10040, "step 4 states the coal heat rate from the data");
+  steps.forEach(t => { ok(words(t) <= 35 && sentences(t) <= 2, `step text within budget (${words(t)} words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
+  ok(/10,040 Btu/.test(steps[3]) && /full-load/.test(steps[3]) && P("coal").heatRate === 10040, "step 4 states the coal heat rate from the data, as a full-load test value");
+  ok(/"1 kWh of electricity = " \+ int\(btu\) \+ " Btu \(British thermal units/.test(JS), "step 4's unit fact stands apart from its question (review F4 #10)");
   ok(/200 MW/.test(steps[4]) && D.solar.farmMW === 200 && TOWN.fleet.solar.mw === 200, "step 5: the 200 MW farm (town.json)");
   ok(/100 MW/.test(steps[5]) && D.hydro.goalMW === 100, "step 6: the 100 MW goal");
   const gl = (SIDE.match(/  - id: ([a-z0-9-]+)/g) || []).map(x => x.slice(8));
-  ["turbine", "generator", "heat-engine", "waste-heat", "gas-turbine", "steam-turbine", "condenser", "hydraulic-head", "reservoir", "geothermal", "run-of-river", "carnot-limit"].forEach(id => ok(gl.indexOf(id) >= 0, `sidecar defines ${id}`));
+  ["turbine", "generator", "heat-engine", "waste-heat", "gas-turbine", "steam-turbine", "condenser", "hydraulic-head", "reservoir", "geothermal", "run-of-river", "hrsg", "nacelle"].forEach(id => ok(gl.indexOf(id) >= 0, `sidecar defines ${id}`));
 }
 
 // ---------------- scope: deny-list, nuclear-plus-risk sentences, data centers, links
@@ -260,6 +290,55 @@ const P = k => M.plantByKey(D, k);
   ok(nl >= 25, `${nl} links checked`);
   ok(/LX\.lessonRefHTML\(data\.path, "F5"\)/.test(JS) && /data\/path\.json/.test((QMD.match(/data-learn="power-plants"[^>]*/) || [""])[0]), "F5 is linked through path.json (LX.lessonRefHTML)");
   ok(!/\bF3\b/.test(own.replace(/<!--[\s\S]*?-->/g, "")), "the page makes no static claim about F3's status");
+}
+
+// ---------------- each stated number with its claim, against the model (review F4 #11)
+{
+  const strip = h => h.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  const fb = (QMD.match(/<div class="lx-fallback">[\s\S]*?lx-hint/) || [""])[0];
+  ["cc", "ct", "coal"].forEach(k => ok(fb.indexOf(`<td>${M.shareText(P(k), BTU)} (heat rate ${fmt(P(k).heatRate)} Btu per kWh)</td>`) >= 0, `fallback: ${k}'s share and heat rate in one cell`));
+  const days = M.solarDays(Y, D), dm = d => +d.date.slice(8) + " September 2025";
+  days.forEach(d => ok(new RegExp(`<tr><td>${d.label}, ${dm(d)}</td><td>${fmt(d.energy)} MWh</td><td>${M.fmt1(d.cf * 100)}%</td><td>${d.peak} MW`).test(fb), `fallback row ${d.key}: label, energy, capacity factor and peak`));
+  ok(fb.indexOf(`(it fell ${days[1].drop.mw} MW into ${M.hh(days[1].drop.hour)})`) >= 0, "fallback: the afternoon dip's fall and hour");
+  ok(days.map(d => d.label).join() === "High output,Afternoon dip,Low output" && !/cloud|overcast|clear/i.test(days.map(d => d.label + d.note).join()), "the days are named by their output, not a weather cause (review F4 #4)");
+  const h = D.hydro, need = M.gasNeed(TOWN, Y), R = D.ramp, base = { from: R.from, to: R.to, ccStart: R.ccStart, ccMax: TOWN.fleet.cc.mw, pkMax: TOWN.fleet.peaker.mw };
+  const r40 = M.rampRun(need, Object.assign({ ramp: TOWN.fleet.cc.ramp, peaker: false }, base));
+  ok(fb.indexOf(`head of 120 m and a flow of 100 m³/s: ${M.hydroMW(120, 100, h).toFixed(1)} MW`) >= 0 && fb.indexOf(`lasts ${M.reservoirHours(h.volumeM3, 100).toFixed(1)} hours at that flow`) >= 0, "fallback hydro: power and hours from the model");
+  ok(fb.indexOf(`can add ${TOWN.fleet.cc.ramp} MW per hour falls ${r40.tot.short} MWh short at ${M.hh(r40.tot.firstShort)}`) >= 0 && fb.indexOf(`or ${M.rampNeeded(need, Object.assign({ rampMin: R.rampMin, rampMax: R.rampMax, rampStep: R.rampStep }, base))} MW per hour, closes the gap`) >= 0, "fallback ramp: 10 MWh short at 18:00, 50 MW per hour closes it");
+  const ans = id => strip((QMD.match(new RegExp(`data-id="${id}"[\\s\\S]*?<details class="lx-answer"><summary>Answer</summary><p>([\\s\\S]*?)</p>`)) || [])[1] || "");
+  ok(ans("all").indexOf(`about ${M.shareText(P("cc"), BTU)}% for U.S. combined-cycle gas plants and ${M.shareText(P("coal"), BTU)}% for coal`) >= 0 && /full-load/.test(ans("all")), "myth 1: full-load shares from the model");
+  ok(ans("peaker").indexOf(`about ${M.shareText(P("ct"), BTU)}% of its fuel energy to the wire and a combined cycle about ${M.shareText(P("cc"), BTU)}%`) >= 0 && /At full load/.test(ans("peaker")), "myth 4: peaker and combined cycle at full load");
+  ok(ans("dam").indexOf(`with no inflow, the lesson's 20 million m³ last ${M.reservoirHours(h.volumeM3, 100).toFixed(1)} hours at 100 m³/s`) >= 0, "myth 3: hours from the model, with no inflow");
+  ok(ans("hr").indexOf(`${M.shareText(P("ct"), BTU)}%: 3,412 ÷ ${fmt(P("ct").heatRate)} = ${(BTU / P("ct").heatRate).toFixed(3)}. The other ${M.fmt1(M.lost(P("ct"), BTU))}%`) >= 0, "quiz 1: the peaker's share and loss");
+  ok(ans("cf").indexOf(`${M.fmt1(days[2].cf * 100)}%: ${days[2].energy} ÷ (${D.solar.farmMW} × 24)`) >= 0 && ans("cf").indexOf(`reached ${M.fmt1(days[0].cf * 100)}%`) >= 0, "quiz 3: the low-output day's capacity factor, and the high-output day's");
+  const dd = (QMD.match(/<dl class="lx-ideas">[\s\S]*?<\/dl>/) || [""])[0];
+  ok(strip(dd).indexOf(`send about ${M.shareText(P("cc"), BTU)} of every 100 units of fuel energy to the wire, coal steam plants ${M.shareText(P("coal"), BTU)}`) >= 0 && strip(dd).indexOf(`made ${fmt(days[2].energy)} MWh on 5 September 2025 and ${fmt(days[0].energy)} MWh on 11 September`) >= 0, "explain fallback: shares and the two days from the model");
+  ok(!/(sent|averaged) 45\.3|in 2025, U\.S\. combined/.test(QMD), "no annual-operation wording for a full-load test value (review F4 #2)");
+  // the feedback sentences carry the model's numbers
+  D.plants.forEach(p => ok(M.plantNote(p, D).indexOf(M.shareText(p, BTU) + " of 100 units") >= 0, `plant note ${p.key} states its share`));
+  ok(/leave the module as direct current/.test(M.plantNote(P("pv"), D)) && !/reach the wire/.test(M.plantNote(P("pv"), D)), "solar's note: DC at the module, not the wire");
+  ok(/At some lower speeds, NREL's test turbine converted a larger share, up to 52%, while making less power/.test(M.plantNote(P("wind"), D)) && D.facts.cpBest.value === 0.52, "wind's note: a larger share at some lower speeds, less power (review F4 #13)");
+  ok(M.dayText(days).indexOf(`**${fmt(days[2].energy)} MWh**, ${Math.round(days[2].energy / days[0].energy * 100)}% of the high-output day's ${fmt(days[0].energy)} MWh`) >= 0 && /cannot show the cause/.test(M.dayText(days)) && !/Clouds, not the panels/.test(JS), "day feedback: 776 MWh, 47%, no causal claim");
+}
+
+// ---------------- the text budget of every text element, not only the step prompts (review F4 #10)
+{
+  const strip = h => h.replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  // a data note's bold label ("Real data, solar days.") and an answer's "Myth." or "Fact." are labels, not sentences
+  const notes = [...QMD.matchAll(/<p class="lx-datanote">([\s\S]*?)<\/p>/g)].map(m => strip(m[1].replace(/<b>[^<]*<\/b>/, "")));
+  ok(notes.length === 4, `${notes.length} data notes (thermal and solar provenance apart)`);
+  notes.forEach(n => ok(words(n) <= 35 && sentences(n) <= 2, `data note within budget (${words(n)} words): ${n.slice(0, 50)}…`));
+  const hint = strip((QMD.match(/<p class="lx-hint">With JavaScript on[\s\S]*?<\/p>/) || [""])[0]);
+  ok(hint && words(hint) <= 20, `fallback hint is one short instruction (${words(hint)} words)`);
+  [...QMD.matchAll(/<details class="lx-answer"><summary>Answer<\/summary><p>([\s\S]*?)<\/p>/g)].map(m => strip(m[1]).replace(/^(Myth|Fact)\. /, "")).forEach(a => ok(words(a) <= 40 && sentences(a) <= 2, `answer within budget (${words(a)} words): ${a.slice(0, 50)}…`));
+  [...QMD.matchAll(/<dd>([\s\S]*?)<\/dd>/g)].map(m => strip(m[1])).forEach(a => ok(words(a) <= 40 && sentences(a) <= 2, `explain idea within budget (${words(a)} words): ${a.slice(0, 50)}…`));
+  const fbx = [];
+  D.plants.forEach(p => fbx.push(strip(M.plantNote(p, D))));
+  D.predict.options.forEach(o => fbx.push(M.predictText(o.value, D)));
+  fbx.push(M.compareText(["cc", "geo", "pv"], D), M.dayText(M.solarDays(Y, D)));
+  [...JS.matchAll(/api\.saw\("((?:[^"\\]|\\.)*)"/g)].forEach(m => fbx.push(m[1]));
+  fbx.forEach(t => ok(words(t) <= 40 && sentences(t) <= 2, `feedback within budget (${words(t)} words): ${t.slice(0, 60)}…`));
+  ok(fbx.length >= 15, `${fbx.length} feedback texts checked`);
 }
 
 // ---------------- the rendered page (only when _site holds a render newer than the source; run after quarto render)

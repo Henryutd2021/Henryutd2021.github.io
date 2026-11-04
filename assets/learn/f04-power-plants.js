@@ -22,9 +22,16 @@
 //   rampRun(need, o)      the combined-cycle plant follows the need hour by hour within its ramp limit and size (greedy,
 //                         from its start level); the peaker fills what is missing up to its size; what is still missing
 //                         is short (MW, = MWh in one hour); a fall faster than the ramp leaves the plant above the need
-//                         (over, MW)
+//                         (over, MW). The hour balances only with nothing short and nothing over (tot.balanced): nothing
+//                         else in the toy can take the extra, so the step asks for both
+//   fuelBtu(hr, mw, dt)   fuel burned in a time step: 1,000 kW per MW x heat rate (Btu/kWh) x output (MW) x dt (h)
+//   reservoirMWh(V, H, h) electricity in the toy reservoir's water: rho x g x H x V x eta / 3.6e9 (no inflow, constant
+//                         head and efficiency) = hydroMW x reservoirHours at any flow
+//   plantNote, predictText, compareText, dayText, rampText, rampFeedback   the feedback sentences, pure so the test can
+//                         read each one's numbers against the model and its length against the text budget
 // Units: one hour per step, so MW held for an hour = MWh. Prairie Town, its plants' sizes and ramp, the hydro plant and
-// its reservoir are illustrative; the solar shapes and the plant data are real (see the data file).
+// its reservoir are illustrative; the solar shapes and the plant data are real (see the data file). Thermal shares are
+// full-load test values (EIA Table 8.2), not a year's measured fuel use; the solar share is DC at the module.
 //
 // Lesson-local component (a candidate for promotion): PlantExplorer (six cutaways, a keyboard rail, the energy chain,
 // a text version). Shared: LX.StepCards, LX.Predict, LX.Sankey (components/sankey.js), LX.NumAnswer, LX.Plot/LX.PlotCard, LX.Slider,
@@ -44,7 +51,7 @@
     return {
       nodes: [
         { id: "in", label: p.inLabel, short: "Energy in", col: 0, color: p.color },
-        { id: "elec", label: "Electricity to the wire", short: "Electricity", col: 1, color: "var(--lx-good)" },
+        { id: "elec", label: p.outLabel || "Electricity to the wire", short: p.outShort || "Electricity", col: 1, color: "var(--lx-good)" },
         { id: "loss", label: p.lossLabel, short: p.lossShort, col: 1, kind: "loss", color: "var(--lx-ink-3)" }
       ],
       links: [{ from: "in", to: "elec", value: s, color: "var(--lx-good)" }, { from: "in", to: "loss", value: l }]
@@ -77,7 +84,7 @@
     return raw.map(function (v, t) { return Math.round((v - f.nuclear.mw - wind[t] - solar[t]) / step) * step; });
   }
   function rampRun(need, o) {
-    var cc = [], pk = [], short = [], over = [], prev = o.ccStart, tot = { short: 0, pk: 0, over: 0, firstShort: null };
+    var cc = [], pk = [], short = [], over = [], prev = o.ccStart, tot = { short: 0, pk: 0, over: 0, firstShort: null, firstOver: null };
     for (var t = o.from; t <= o.to; t++) {
       var lo = Math.max(0, prev - o.ramp), hi = Math.min(o.ccMax, prev + o.ramp);
       var c = t === o.from ? Math.min(o.ccMax, Math.max(0, o.ccStart)) : Math.max(lo, Math.min(hi, need[t]));
@@ -85,26 +92,71 @@
       cc.push(c); pk.push(p); short.push(s); over.push(ov);
       tot.short += s; tot.pk += p; tot.over += ov;
       if (s > 0 && tot.firstShort === null) tot.firstShort = t;
+      if (ov > 0 && tot.firstOver === null) tot.firstOver = t;
       prev = c;
     }
+    tot.balanced = tot.short === 0 && tot.over === 0;
     return { hours: need.slice(o.from, o.to + 1).map(function (v, i) { return o.from + i; }), need: need.slice(o.from, o.to + 1), cc: cc, pk: pk, short: short, over: over, tot: tot };
   }
-  // the smallest ramp limit on the slider that leaves no MW short without the peaker (null if none)
+  // the smallest ramp limit on the slider that balances every hour without the peaker (null if none)
   function rampNeeded(need, o) {
     for (var r = o.rampMin; r <= o.rampMax; r += o.rampStep) {
       var x = rampRun(need, { from: o.from, to: o.to, ccStart: o.ccStart, ccMax: o.ccMax, pkMax: o.pkMax, ramp: r, peaker: false });
-      if (x.tot.short === 0) return r;
+      if (x.tot.balanced) return r;
     }
     return null;
   }
+  function fuelBtu(hr, mw, dt) { return 1000 * hr * mw * dt; }
+  function reservoirMWh(V, Hm, h) { return h.rho * h.g * Hm * V * h.eta / 3.6e9; }
   function fmt1(v) { return (Math.round(v * 10) / 10).toFixed(1); }
   function fmtShare(v) { return v % 1 === 0 ? String(v) : fmt1(v); }
   // a share as the page prints it: thermal plants to one decimal (34.0), typical values as whole numbers (16)
   function shareText(p, btu) { return p.kind === "thermal" ? fmt1(share(p, btu)) : String(share(p, btu)); }
   function unitsFmt(p) { return function (v) { return v === 100 ? "100" : p.kind === "thermal" ? fmt1(v) : String(Math.round(v)); }; }
+
+  // ---- the feedback sentences (pure: the test reads their numbers and their length). "**" marks bold, double brackets a
+  // glossary term (LX.rich renders both); plantNote returns HTML.
+  function intS(v) { return Math.round(v).toLocaleString("en-US"); }
+  function hh(t) { return (t < 10 ? "0" : "") + t + ":00"; }
+  function escT(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function plantNote(p, D) {
+    var btu = D.meta.btuPerKWh, s = share(p, btu), name = "<b>" + escT(p.name) + "</b>: ";
+    if (p.kind === "thermal") return name + shareText(p, btu) + " of 100 units reach the wire at full load: " + intS(btu) + " ÷ " + intS(p.heatRate) + " Btu per kWh (EIA's 2025 tested heat rate).";
+    if (p.key === "pv") return name + p.shareWord + " " + s + " of 100 units leave the module as direct current (EIA: the best modules approach " + s + "%); the inverter and wiring lose some more. Missed sunlight costs nothing to buy.";
+    var base = name + (p.shareWord ? p.shareWord + " " : "about ") + s + " of 100 units reach the wire";
+    if (p.key === "wind") return base + " (EIA's typical value). At some lower speeds, NREL's test turbine converted a larger share, up to " + Math.round(D.facts.cpBest.value * 100) + "%, while making less power; no rotor beats " + D.facts.betz.value + "%.";
+    if (p.key === "hydro") return base + " (EIA's typical value): water turbines lose little.";
+    return base + " (EIA's typical value): its heat is cooler than a boiler's, so less of it becomes electricity.";
+  }
+  function predictText(v, D) {
+    var btu = D.meta.btuPerKWh, p = plantByKey(D, v), g = plantByKey(D, "geo");
+    return (v === D.predict.answer ? "Right: " : "Not quite: ") + "the geothermal plant sends about " + shareText(g, btu) + " of 100 to the wire" + (v !== "geo" ? "; your " + p.short.toLowerCase() + " sends " + shareText(p, btu) : "") + ". Its heat is only " + D.facts.geoTempF.lo + " to " + D.facts.geoTempF.hi + " °F, and cooler heat turns into less electricity.";
+  }
+  function compareText(viewed, D) {
+    var btu = D.meta.btuPerKWh, sh = function (k) { return share(plantByKey(D, k), btu); };
+    var best = viewed.slice().sort(function (a, b) { return sh(b) - sh(a); })[0], worst = viewed.slice().sort(function (a, b) { return sh(a) - sh(b); })[0];
+    return "Of the plants you opened, **" + plantByKey(D, best).short + "** sends the most to the wire (" + shareText(plantByKey(D, best), btu) + " of 100) and **" + plantByKey(D, worst).short + "** the least (" + shareText(plantByKey(D, worst), btu) + "). Heat plants lose most as [[waste-heat|waste heat]].";
+  }
+  function dayText(days) {
+    var c = days[0], o = days[2];
+    return "The low-output day made **" + intS(o.energy) + " MWh**, " + Math.round(o.energy / c.energy * 100) + "% of the high-output day's " + intS(c.energy) + " MWh six days later. Same panels: clouds or haze could explain the gap, but output alone cannot show the cause.";
+  }
+  function rampText(st, x, D, town) {
+    var ct = plantByKey(D, "ct"), cc = plantByKey(D, "cc"), more = Math.round((ct.heatRate / cc.heatRate - 1) * 100);
+    if (st.pk && x.tot.pk > 0) return "Every hour matched: the peaker filled **" + x.tot.pk + " MWh**. Fast but thirsty: at full load it burns about " + more + "% more gas per kWh than the combined cycle (EIA's tested heat rates).";
+    return "Every hour matched: at " + st.r + " MW per hour the combined-cycle plant keeps up on its own. Prairie Town's own plant manages " + town.fleet.cc.ramp + " MW per hour (illustrative).";
+  }
+  function rampFeedback(st, x) {
+    var t = x.tot;
+    if (t.short > 0 && t.over > 0) return "Short by **" + t.short + " MWh** (first at " + hh(t.firstShort) + ") and **" + t.over + " MWh** too much (first at " + hh(t.firstOver) + "): at " + st.r + " MW per hour the combined-cycle plant can neither climb nor turn down fast enough.";
+    if (t.short > 0) return "Short by **" + t.short + " MWh**, first at " + hh(t.firstShort) + ": climbing at most " + st.r + " MW per hour, the combined-cycle plant falls behind the need.";
+    return "Nothing short, but **" + t.over + " MWh** too much, first at " + hh(t.firstOver) + ": at " + st.r + " MW per hour the combined-cycle plant cannot turn down as fast as the need falls. Raise the ramp limit.";
+  }
   var model = { share: share, lost: lost, sankeySpec: sankeySpec, effFromHeatRate: effFromHeatRate, daySlice: daySlice,
-                solarDays: solarDays, hydroMW: hydroMW, reservoirHours: reservoirHours, gasNeed: gasNeed, rampRun: rampRun,
-                rampNeeded: rampNeeded, plantByKey: plantByKey, fmt1: fmt1, fmtShare: fmtShare, shareText: shareText, unitsFmt: unitsFmt, round1: round1 };
+                solarDays: solarDays, hydroMW: hydroMW, reservoirHours: reservoirHours, reservoirMWh: reservoirMWh, fuelBtu: fuelBtu,
+                gasNeed: gasNeed, rampRun: rampRun, rampNeeded: rampNeeded, plantByKey: plantByKey, fmt1: fmt1, fmtShare: fmtShare,
+                shareText: shareText, unitsFmt: unitsFmt, round1: round1, hh: hh,
+                plantNote: plantNote, predictText: predictText, compareText: compareText, dayText: dayText, rampText: rampText, rampFeedback: rampFeedback };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -136,7 +188,7 @@
         '<path class="f4c-shaft" d="M326 112H340"/>' + genBox(340, 95, "generator") +
         '<rect class="f4c-cond" x="282" y="146" width="48" height="22" rx="4"/><path class="f4c-pipe water" d="M306 168V182H228V166"/>' +
         '<text class="f4c-t b" x="82" y="160">gas turbine</text><text class="f4c-t" x="82" y="174">(a peaker alone)</text>' +
-        '<text class="f4c-t" x="228" y="184" text-anchor="middle">HRSG</text><text class="f4c-t b" x="306" y="74" text-anchor="middle">steam turbine</text>' +
+        '<text class="f4c-t" x="228" y="184" text-anchor="middle">exhaust-heated</text><text class="f4c-t" x="228" y="198" text-anchor="middle">boiler (HRSG)</text><text class="f4c-t b" x="306" y="74" text-anchor="middle">steam turbine</text>' +
         '<text class="f4c-t" x="306" y="216" text-anchor="middle">condenser</text>';
     },
     steam: function (bare) {
@@ -206,12 +258,12 @@
     }
   };
   var SCENE_ALT = {
-    gas: "A combined-cycle plant: air and gas enter a gas turbine (compressor, combustor with a flame, turbine) that turns a generator; its hot exhaust passes through a heat recovery steam generator (HRSG) with a stack, whose steam drives a steam turbine and a second generator; a condenser returns the water. The gas turbine alone is a peaker.",
+    gas: "A combined-cycle plant: air and gas enter a gas turbine (compressor, combustor with a flame, turbine) that turns a generator; its hot exhaust passes through an exhaust-heated boiler, the heat recovery steam generator (HRSG), with a stack, whose steam drives a steam turbine and a second generator; a condenser returns the water. The gas turbine alone is a peaker.",
     steam: "A steam plant: fuel burns under a boiler of water tubes with a stack on top; steam drives a steam turbine and a generator; a condenser below the turbine turns steam back to water, cooled by a loop to a cooling tower, and a pump returns the water to the boiler.",
     hydro: "A hydro dam: a reservoir behind a concrete dam; water falls through a penstock to a powerhouse, where a turbine turns a generator; the water leaves into the river; an arrow marks the head, the height from the reservoir surface down to the river.",
-    geo: "A geothermal plant: a well brings hot water up from hot rock at 300 to 700 °F; part of it flashes to steam that drives a turbine and a generator; the cooled water flows to a second well and back down; a cooling tower stands by.",
-    wind: "A wind turbine: wind arrows meet three blades on a rotor hub; inside the nacelle on top of the tower a shaft turns a gearbox and a generator.",
-    pv: "A solar photovoltaic farm: the sun shines on three rows of tilted panels that make direct current; a wire runs to an inverter that makes alternating current, then to a transformer and the grid; nothing moves."
+    geo: "A flash-steam geothermal plant, one of several kinds: a well brings hot water up from hot rock at 300 to 700 °F; as its pressure drops, part of it boils into steam that drives a turbine and a generator; the cooled water flows to a second well and back down; a cooling tower stands by.",
+    wind: "A wind turbine: wind arrows meet three blades on a rotor hub; inside the nacelle, the equipment housing on top of the tower, a shaft turns a gearbox and a generator.",
+    pv: "A solar photovoltaic farm: the sun shines on three rows of tilted panels that make direct current (DC, flowing one way); a wire runs to an inverter that makes alternating current (AC, reversing direction many times a second), then to a transformer and the grid; nothing moves."
   };
 
   // ---- PlantExplorer: a rail of six plants, a cutaway each, the energy chain and a text version (lesson-local)
@@ -269,7 +321,6 @@
     function keep(k, v) { log[k] = v; LX.store.set("f4-log", log); }
     var days = solarDays(Y, D), need = gasNeed(town, Y), R = D.ramp, Hy = D.hydro;
     var rampBase = { from: R.from, to: R.to, ccStart: R.ccStart, ccMax: town.fleet.cc.mw, pkMax: town.fleet.peaker.mw };
-    var shares = {}, shareTx = {}; D.plants.forEach(function (p) { shares[p.key] = share(p, btu); shareTx[p.key] = shareText(p, btu); });
     var lastPlant = log.plant || "cc", hooks = {};
 
     var steps = [
@@ -286,7 +337,7 @@
         build: function (act, api) {
           var Q = D.predict;
           var p = LX.Predict(act, { id: Q.id, q: Q.q, answer: Q.answer, options: Q.options, fresh: !log.pred, lockText: "Locked in. The next step shows every plant's 100 units.",
-            onPick: function (v) { keep("pred", v); api.done(); api.saw(predictText(v)); } });
+            onPick: function (v) { keep("pred", v); api.done(); api.saw(predictText(v, D)); } });
           if (log.pred) { api.done(); }
         } },
       { text: "Follow 100 units of energy into each plant: the green band reaches the wire, the pale one is lost. Compare at least three plants.",
@@ -301,26 +352,27 @@
           function show(k) {
             lastPlant = k; keep("plant", k); var p = plantByKey(D, k); curP = p;
             sk.set(sankeySpec(p, D));
-            note.innerHTML = plantNote(p);
+            note.innerHTML = plantNote(p, D);
             if (viewed.indexOf(k) < 0) { viewed.push(k); keep("viewed", viewed); }
-            if (viewed.length >= 3) { api.done(); api.saw(compareText(viewed)); }
+            if (viewed.length >= 3) { api.done(); api.saw(compareText(viewed, D)); }
             buildExplain(D, data);
           }
           seg.set(lastPlant); show(lastPlant);
         } },
-      { text: "A [[heat-rate|heat rate]] is the fuel energy burned per kWh of electricity, in Btu (British thermal units; one kWh is 3,412 Btu). U.S. coal steam plants tested at 10,040 Btu per kWh in 2025: what share reached the wire?",
+      { text: "A [[heat-rate|heat rate]] is the fuel energy burned per kWh sent out. In EIA's 2025 full-load tests, U.S. coal steam plants burned 10,040 Btu per kWh: what share reaches the wire?",
         build: function (act, api) {
           var coal = plantByKey(D, "coal"), ans = share(coal, btu);
-          var na = LX.NumAnswer(act, { label: "Share of the fuel's energy that became electricity", unit: "%", width: "6em", onCheck: function (v) {
+          H("p", { class: "lx-hint", text: "1 kWh of electricity = " + int(btu) + " Btu (British thermal units, a unit of heat energy)." }, act);
+          var na = LX.NumAnswer(act, { label: "Share of the fuel's energy that becomes electricity", unit: "%", width: "6em", onCheck: function (v) {
             if (v === null) { api.saw("Type a percentage first, such as 30.", true); return; }
             var okv = Math.abs(v - ans) <= 0.6;
-            api.saw(okv ? "**" + fmt1(ans) + "%**: 3,412 ÷ " + int(coal.heatRate) + " = " + (ans / 100).toFixed(3) + ". The other " + fmt1(lost(coal, btu)) + "% left as waste heat, mostly through the condenser."
+            api.saw(okv ? "**" + fmt1(ans) + "%**: 3,412 ÷ " + int(coal.heatRate) + " = " + (ans / 100).toFixed(3) + ". The other " + fmt1(lost(coal, btu)) + "% leaves as waste heat, mostly through the condenser."
                         : "Not quite: divide the energy in one kWh by the heat rate, 3,412 ÷ " + int(coal.heatRate) + ", then turn it into a percentage.", !okv);
             if (okv) { keep("hr", true); api.done(); }
           } });
           hooks.na = na; if (log.hr) api.done();
         } },
-      { text: "Prairie Town's 200 MW solar farm follows the sun and the clouds. Compare three real days of September 2025, and open the overcast one.",
+      { text: "Prairie Town's 200 MW solar farm follows the sun and the weather. Compare three real days of September 2025, and open the low-output one.",
         build: function (act, api) {
           var sel = log.day || "clear", seenD = log.days || [];
           var seg = Seg(act, days.map(function (d) { return { key: d.key, label: d.label }; }), "Day", function (k) { draw(k); }, sel);
@@ -336,16 +388,16 @@
             card.chip("Largest midday fall", d.drop.mw > 0 ? int(d.drop.mw) + " MW, into " + LX.fmt.hh(d.drop.hour) : "none", d.drop.mw >= 20 ? "bad" : null);
             var lines = [{ values: d.mw, x0: 0, color: "var(--lx-solar)", area: 0.18, width: 2.4, step: 1 }];
             var legend = [{ label: d.label + " (" + d.date + ")", color: "var(--lx-solar)" }];
-            if (k !== "clear") { lines.unshift({ values: clear.mw, x0: 0, color: "var(--lx-ink-3)", dash: "5 4", width: 1.6, step: 1 }); legend.push({ label: "Clear day (" + clear.date + ")", color: "var(--lx-ink-3)", dash: "5 4" }); }
+            if (k !== "clear") { lines.unshift({ values: clear.mw, x0: 0, color: "var(--lx-ink-3)", dash: "5 4", width: 1.6, step: 1 }); legend.push({ label: clear.label + " (" + clear.date + ")", color: "var(--lx-ink-3)", dash: "5 4" }); }
             card.plot.render({
               x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [12, "12"], [24, "24"]] },
               y: { min: 0, max: 200, step: 50, fmt: LX.fmt.int, unit: "MW" }, lines: lines, legend: legend,
               refs: [{ y: D.solar.farmMW, label: "Farm size, 200 MW", labelN: "200 MW", dash: "3 3" }],
-              tip: function (x) { var t = Math.floor(x); if (t < 0 || t > 23) return ""; return "<div><b>" + LX.fmt.hh(t) + "</b> " + d.mw[t] + " MW" + (k !== "clear" ? " · clear day " + clear.mw[t] + " MW" : "") + "</div>"; },
+              tip: function (x) { var t = Math.floor(x); if (t < 0 || t > 23) return ""; return "<div><b>" + LX.fmt.hh(t) + "</b> " + d.mw[t] + " MW" + (k !== "clear" ? " · " + clear.label.toLowerCase() + " day " + clear.mw[t] + " MW" : "") + "</div>"; },
               aria: "Hourly output of the 200 MW solar farm on " + d.long + ": " + int(d.energy) + " MWh in the day, peak " + d.peak + " MW.",
-              text: { head: ["Hour from", d.label + ", MW"].concat(k !== "clear" ? ["Clear day, MW"] : []), rows: d.mw.map(function (v, t) { return [LX.fmt.hh(t), String(v)].concat(k !== "clear" ? [String(clear.mw[t])] : []); }) }
+              text: { head: ["Hour from", d.label + ", MW"].concat(k !== "clear" ? [clear.label + " day, MW"] : []), rows: d.mw.map(function (v, t) { return [LX.fmt.hh(t), String(v)].concat(k !== "clear" ? [String(clear.mw[t])] : []); }) }
             }, true);
-            if (k === "overcast") { api.done(); api.saw(dayText()); }
+            if (k === "overcast") { api.done(); api.saw(dayText(days)); }
           }
           draw(sel); if (seenD.indexOf("overcast") >= 0) api.done();
         } },
@@ -356,17 +408,18 @@
           var sH = LX.Slider(ctl, { label: "Head", color: "var(--lx-hyd)", min: Hy.head.min, max: Hy.head.max, step: Hy.head.step, value: st.H, unit: "m", fmt: function (v) { return v + " m"; }, onChange: function (v) { st.H = v; upd(); } });
           var sQ = LX.Slider(ctl, { label: "Flow", color: "var(--lx-wind)", min: Hy.flow.min, max: Hy.flow.max, step: Hy.flow.step, value: st.Q, unit: "m³/s", fmt: function (v) { return v + " m³/s"; }, onChange: function (v) { st.Q = v; upd(); } });
           var out = H("div", { class: "f4-hyd", "aria-live": "polite" }, act);
+          H("p", { class: "lx-hint", text: "Toy reservoir: no inflow, all the water usable, head and efficiency held constant. In a real one the head falls as the lake drains, and release rules can limit the flow." }, act);
           function upd() {
             keep("hydro", st);
             var mw = hydroMW(st.H, st.Q, Hy), hrs = reservoirHours(Hy.volumeM3, st.Q), okv = mw >= Hy.goalMW;
             out.innerHTML = '<div class="f4-meter" aria-hidden="true"><i style="width:' + Math.min(100, mw / 150 * 100).toFixed(1) + '%"></i><b class="goal" style="left:' + (Hy.goalMW / 150 * 100).toFixed(1) + '%"></b></div>' +
               "<p><b>" + fmt1(mw) + " MW</b> = 1,000 kg/m³ × 9.81 m/s² × " + st.Q + " m³/s × " + st.H + " m × 0.9 ÷ 1,000,000" + (okv ? ' <span class="f4-goal">' + LX.icon("check") + "100 MW or more</span>" : "") + "</p>" +
-              "<p>At " + st.Q + " m³/s, the reservoir's 20 million m³ last <b>" + fmt1(hrs) + " hours</b>: " + int(mw * hrs) + " MWh before it is empty.</p>";
+              "<p>With no water flowing in, the reservoir's 20 million m³ last <b>" + fmt1(hrs) + " hours</b> at " + st.Q + " m³/s: about " + int(mw * hrs) + " MWh.</p>";
             if (okv) { api.done(); api.saw("Head and flow trade off: twice the head or twice the flow doubles the power. A [[run-of-river|run-of-river]] plant has almost no reservoir, so it makes what the river brings today."); }
           }
           upd();
         } },
-      { text: "Evening on lesson 0's day: the gas plants must climb as the sun sets. Leave no MW short, with a quicker [[ramp-rate|ramp]] or with the peaker.",
+      { text: "Evening on lesson 0's day: the gas plants must climb as the sun sets. Match the gas needed in every hour, with a quicker [[ramp-rate|ramp]] or with the peaker.",
         build: function (act, api) {
           var st = log.ramp || { r: town.fleet.cc.ramp, pk: false };
           var ctl = H("div", { class: "f4-ctls" }, act);
@@ -379,12 +432,14 @@
             var x = rampRun(need, Object.assign({ ramp: st.r, peaker: st.pk }, rampBase)), hh = x.hours;
             card.title.textContent = "Gas needed and gas made, 3 September 2025 (Prairie Town, illustrative)";
             card.clear();
-            card.chip("MW short", int(x.tot.short) + " MWh", x.tot.short > 0 ? "bad" : null);
+            card.chip("Energy short", int(x.tot.short) + " MWh", x.tot.short > 0 ? "bad" : null);
+            card.chip("Energy over", int(x.tot.over) + " MWh", x.tot.over > 0 ? "warn" : null);
             if (st.pk) card.chip("From the peaker", int(x.tot.pk) + " MWh");
             var bars = [];
             hh.forEach(function (t, i) {
               if (x.pk[i] > 0) bars.push({ x0: t, x1: t + 1, y0: x.cc[i], y1: x.cc[i] + x.pk[i], color: "var(--lx-pk)", op: 0.85 });
               if (x.short[i] > 0) bars.push({ x0: t, x1: t + 1, y0: x.cc[i] + x.pk[i], y1: x.need[i], color: "var(--lx-bad)", op: 0.45 });
+              if (x.over[i] > 0) bars.push({ x0: t, x1: t + 1, y0: x.need[i], y1: x.cc[i], color: "var(--lx-warn)", op: 0.55 });
             });
             card.plot.render({
               x: { min: R.from, max: R.to + 1, ticks: [[R.from, LX.fmt.hh(R.from)], [18, "18:00"], [R.to + 1, LX.fmt.hh(R.to + 1)]] },
@@ -392,13 +447,13 @@
               bars: bars,
               lines: [{ values: x.cc, x0: R.from, color: "var(--lx-cc)", area: 0.22, width: 2, step: 1 },
                       { values: x.need, x0: R.from, color: "var(--lx-demand)", width: 2.4, step: 1, dash: "6 3" }],
-              legend: [{ label: "Gas needed", color: "var(--lx-demand)", dash: "6 3" }, { label: "Combined cycle", color: "var(--lx-cc)" }].concat(st.pk ? [{ label: "Peaker", color: "var(--lx-pk)" }] : []).concat(x.tot.short ? [{ label: "Short", color: "var(--lx-bad)" }] : []),
-              tip: function (xx) { var t = Math.floor(xx), i = t - R.from; if (i < 0 || i >= hh.length) return ""; return "<div><b>" + LX.fmt.hh(t) + "</b> need " + x.need[i] + " MW · combined cycle " + x.cc[i] + " MW" + (st.pk ? " · peaker " + x.pk[i] + " MW" : "") + (x.short[i] ? " · short " + x.short[i] + " MW" : "") + "</div>"; },
-              aria: "Gas needed against gas made from 15:00 to 22:00: " + (x.tot.short ? x.tot.short + " MWh short." : "nothing short."),
-              text: { head: ["Hour from", "Needed, MW", "Combined cycle, MW", "Peaker, MW", "Short, MW"], rows: hh.map(function (t, i) { return [LX.fmt.hh(t), String(x.need[i]), String(x.cc[i]), String(x.pk[i]), String(x.short[i])]; }) }
+              legend: [{ label: "Gas needed", color: "var(--lx-demand)", dash: "6 3" }, { label: "Combined cycle", color: "var(--lx-cc)" }].concat(st.pk ? [{ label: "Peaker", color: "var(--lx-pk)" }] : []).concat(x.tot.short ? [{ label: "Short", color: "var(--lx-bad)" }] : []).concat(x.tot.over ? [{ label: "Over", color: "var(--lx-warn)" }] : []),
+              tip: function (xx) { var t = Math.floor(xx), i = t - R.from; if (i < 0 || i >= hh.length) return ""; return "<div><b>" + LX.fmt.hh(t) + "</b> need " + x.need[i] + " MW · combined cycle " + x.cc[i] + " MW" + (st.pk ? " · peaker " + x.pk[i] + " MW" : "") + (x.short[i] ? " · short " + x.short[i] + " MW" : "") + (x.over[i] ? " · over " + x.over[i] + " MW" : "") + "</div>"; },
+              aria: "Gas needed against gas made from " + LX.fmt.hh(R.from) + " to " + LX.fmt.hh(R.to + 1) + ": " + x.tot.short + " MWh short, " + x.tot.over + " MWh over.",
+              text: { head: ["Hour from", "Needed, MW", "Combined cycle, MW", "Peaker, MW", "Short, MW", "Over, MW"], rows: hh.map(function (t, i) { return [LX.fmt.hh(t), String(x.need[i]), String(x.cc[i]), String(x.pk[i]), String(x.short[i]), String(x.over[i])]; }) }
             }, true);
-            if (x.tot.short === 0) { api.done(); api.saw(rampText(st, x)); }
-            else api.saw("Short by **" + x.tot.short + " MWh**, first at " + LX.fmt.hh(x.tot.firstShort) + ": the combined-cycle plant cannot climb " + st.r + " MW per hour fast enough.", true);
+            if (x.tot.balanced) { api.done(); api.saw(rampText(st, x, D, town)); }
+            else api.saw(rampFeedback(st, x), true);
           }
           upd();
         } },
@@ -416,32 +471,6 @@
           hooks.cs = cs; if (log.limits) cs.place(log.limits);
         } }
     ];
-    function predictText(v) {
-      var p = plantByKey(D, v), g = plantByKey(D, "geo");
-      return (v === D.predict.answer ? "Right: " : "Not quite: ") + "the geothermal plant sends about " + shareTx.geo + " of 100 to the wire" + (v !== "geo" ? "; your " + p.short.toLowerCase() + " sends " + shareTx[v] : "") + ". Its heat is only " + D.facts.geoTempF.lo + " to " + D.facts.geoTempF.hi + " °F, and cooler heat turns into less electricity.";
-    }
-    function plantNote(p) {
-      var s = share(p, btu);
-      if (p.kind === "thermal") return "<b>" + LX.esc(p.name) + "</b>: " + shareText(p, btu) + " of 100 units reach the wire: 3,412 ÷ " + int(p.heatRate) + " Btu per kWh (EIA, 2025 tested heat rate).";
-      var base = "<b>" + LX.esc(p.name) + "</b>: " + (p.shareWord ? p.shareWord + " " : "about ") + s + " of 100 units reach the wire";
-      if (p.key === "pv") return base + " (EIA: today's best modules approach 25%). Sunlight is not bought fuel, so what the panel misses costs nothing to buy.";
-      if (p.key === "wind") return base + " (EIA's typical value at rated wind speed). In lighter winds a turbine catches more, up to 52% on NREL's test turbine; no rotor beats 59.3%.";
-      if (p.key === "hydro") return base + " (EIA's typical value for large plants): water turbines lose little.";
-      return base + " (EIA's typical value): its heat is cooler than a boiler's, so less of it becomes electricity.";
-    }
-    function compareText(viewed) {
-      var best = viewed.slice().sort(function (a, b) { return shares[b] - shares[a]; })[0], worst = viewed.slice().sort(function (a, b) { return shares[a] - shares[b]; })[0];
-      return "Of the plants you opened, **" + plantByKey(D, best).short + "** sends the most to the wire (" + shareTx[best] + " of 100) and **" + plantByKey(D, worst).short + "** the least (" + shareTx[worst] + "). Heat plants lose most as [[waste-heat|waste heat]].";
-    }
-    function dayText() {
-      var c = days[0], o = days[2];
-      return "The overcast day made **" + int(o.energy) + " MWh**, " + Math.round(o.energy / c.energy * 100) + "% of the clear day's " + int(c.energy) + " MWh six days later. Clouds, not the panels, set the gap.";
-    }
-    function rampText(st, x) {
-      var ct = plantByKey(D, "ct"), cc = plantByKey(D, "cc"), more = Math.round((ct.heatRate / cc.heatRate - 1) * 100);
-      if (st.pk && x.tot.pk > 0) return "No MW short: the peaker filled **" + x.tot.pk + " MWh**. Fast but thirsty: per kWh it burns about " + more + "% more gas than the combined cycle (EIA heat rates).";
-      return "No MW short: at " + st.r + " MW per hour the combined-cycle plant keeps up on its own. Prairie Town's real one manages " + town.fleet.cc.ramp + " MW per hour (illustrative).";
-    }
     var cards = LX.StepCards(live, { id: "f4-steps", steps: steps });
 
     // demo states: "step-N" opens step N with its action done; "mid" = step 3, the Sankey with three plants compared
@@ -473,7 +502,7 @@
     // 1. annotated cutaway: the heat engine that coal, gas-steam, geothermal and fission plants share
     var c1 = H("div", { class: "lx-xcard" }, host), h1 = H("header", { class: "lx-x-head" }, c1);
     H("h3", { text: "One heat engine, many fuels" }, h1); H("span", { class: "lx-hint", text: "Annotated cutaway" }, h1);
-    H("p", { class: "lx-lede", html: "Coal, gas boilers, geothermal wells and fission (" + LX.lessonRefHTML(data.path, "F5") + ") all make steam for the same loop. Each number marks one part." }, c1);
+    H("p", { class: "lx-lede", html: "Coal and gas boilers make steam for a loop like this one, and so does fission (" + LX.lessonRefHTML(data.path, "F5") + "). Geothermal plants turn turbines with the earth's heat in several ways; each number marks one part." }, c1);
     var fig = H("div", { class: "f4-annot" }, c1);
     var marks = [[59, 120, "1"], [163, 104, "2"], [224, 104, "3"], [166, 154, "4"], [323, 160, "5"], [131, 182, "6"]];
     fig.innerHTML = '<svg class="f4c" viewBox="0 0 400 230" role="img" aria-label="' + LX.esc(SCENE_ALT.steam) + '">' + SCENE.steam(true) +
@@ -495,7 +524,7 @@
       cc: { spins: "gas turbine, then steam turbine", start: "1 to 12 hours, most plants", limit: "fuel; how fast it ramps" },
       ct: { spins: "gas turbine", start: "relatively fast", limit: "fuel" },
       coal: { spins: "steam turbine", start: "more than half a day", limit: "fuel; slow to start" },
-      geo: { spins: "steam turbine", start: "not in the EIA article", limit: "the heat in its wells" },
+      geo: { spins: "turbine (steam, or a second fluid)", start: "not in the EIA article", limit: "the heat in its wells" },
       hydro: { spins: "water turbine", start: "under 10 minutes, most", limit: "water in the reservoir" },
       wind: { spins: "rotor and generator", start: "follows the wind", limit: "weather" },
       pv: { spins: "nothing", start: "follows the sun", limit: "weather and daylight" }
@@ -504,8 +533,8 @@
       title: "The plants side by side", text: true,
       columns: [{ key: "name", label: "Plant", main: true }, { key: "share", label: "To the wire, of 100" }, { key: "spins", label: "What spins" },
                 { key: "start", label: "Start-up, cold to full" }, { key: "limit", label: "What limits it" }],
-      rows: D.plants.map(function (q) { var r = rowsInfo[q.key]; return { key: q.key, color: q.color, name: q.short, note: q.kind === "thermal" ? "heat rate " + int(q.heatRate) + " Btu/kWh" : "typical value", share: (q.shareWord ? q.shareWord + " " : q.kind === "thermal" ? "" : "about ") + shareText(q, btu), spins: r.spins, start: r.start, limit: r.limit }; }),
-      caption: "Shares: EIA's 2025 heat rates for gas and coal; EIA's typical equipment values for the rest. Start-up: EIA, November 2020."
+      rows: D.plants.map(function (q) { var r = rowsInfo[q.key]; return { key: q.key, color: q.color, name: q.short, note: q.kind === "thermal" ? "full-load heat rate " + int(q.heatRate) + " Btu/kWh" : q.key === "pv" ? "typical value; DC at the module" : "typical value", share: (q.shareWord ? q.shareWord + " " : q.kind === "thermal" ? "" : "about ") + shareText(q, btu), spins: r.spins, start: r.start, limit: r.limit }; }),
+      caption: "Shares: EIA's 2025 full-load tested heat rates for gas and coal; EIA's typical equipment values for the rest (solar: DC at the module, before inverter losses). Start-up: EIA, November 2020."
     });
   }
 

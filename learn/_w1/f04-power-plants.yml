@@ -47,6 +47,9 @@ glossary:
   - id: hrsg
     term: Heat recovery steam generator (HRSG)
     def: "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame."
+  - id: nacelle
+    term: Nacelle
+    def: "The equipment housing on top of a wind turbine's tower, holding the gearbox and generator that the rotor turns."
 requests:
   - "F4 loads assets/learn/f03-energy-services.js before its own script, for LX.Sankey (F3's lesson-local Sankey). When the Sankey is promoted to components/sankey.js, drop that script tag from learn/f04-power-plants.qmd and the f03 require in _tests/learn/test_f04-power-plants.js."
   - "Promote, if wanted: PlantExplorer (assets/learn/f04-power-plants.js: a rail of plants, a cutaway each from tokens only, energy in, what spins, the energy chain and a text version). Its six cutaway drawings (SCENE: gas, steam, hydro, geothermal, wind, PV) could serve T6, A15, F10 and X1."
