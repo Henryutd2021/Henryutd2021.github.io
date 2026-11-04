@@ -4,7 +4,7 @@ lesson: M7
 glossary:
   - id: scenario
     term: Scenario
-    def: "A coherent what-if set of a model's inputs, such as a 36-month wait, studied without a probability attached."
+    def: "A coherent what-if set of a model's inputs, such as a 36-month wait; a scenario may be given a probability, though this lesson gives none."
   - id: probability-distribution
     term: Probability distribution
     def: "A rule that says how likely each value of an uncertain input is; a uniform distribution makes every value in its range equally likely."

@@ -9,10 +9,12 @@
 //   other customers   R = U x i x A(tau) + min(cap, h x tau) x U x (1 + i)^-tau   carrying cost of the upgrades, and their
 //                                                                          expected stranding at the end of the wait
 // with m the margin per MW a month, P = 100 MW, K the idle capital, r the yearly discount rate, U the upgrade cost and h
-// the added chance per month that the load never arrives (cap 50%). Each run discounts at its own r.
+// the chance that the load never arrives, in percentage points added per month of waiting (simple, not compounded:
+// h tau, at most 50%). Each run discounts at its own r. The developer's cost depends on m, K and r only.
 //
-// Uncertainty (data/m07-monte-carlo.json): the wait is a scenario (12, 24 or 36 months, no chance attached); the five
-// inputs are uniform on invented ranges around CF7's values (base = the midpoint = CF7's value), drawn independently.
+// Uncertainty (data/m07-monte-carlo.json): the wait is a scenario (12, 24 or 36 months; this lesson gives it no
+// probabilities, a modelling choice); the five inputs are uniform on invented ranges around CF7's values (base = the
+// midpoint = CF7's value), drawn independently.
 //
 // Methods (every number the page states comes from these functions; _tests/learn/test_m07-monte-carlo.js checks them):
 //   generator   mulberry32 (a 32-bit generator; seed shown on the page): the same seed gives the same runs, here and in
@@ -28,7 +30,10 @@
 //   Monte Carlo error  the same study repeated with seeds 1..20 (seed 7 is the page's run); the standard error of one
 //               run's estimate is the standard deviation (n - 1) of the 20 estimates; the page shows +/- 2 standard
 //               errors. With 20 repeats this error is itself rough (about +/- 16%).
-//   corners     every one of the 2^5 combinations of range ends; the lowest and highest result
+//   corners     every one of the 2^5 combinations of range ends; the lowest and highest result. An exact corner has
+//               zero probability under continuous inputs, so rarity is read from a stated neighbourhood: "near a corner"
+//               = the three inputs of the developer's cost (m, K, r) all in the outer tenth of their ranges at the same
+//               end, a chance of 0.1^3 per corner under independent uniform inputs (also per run of a Latin hypercube)
 // Probabilities are shares of runs: statements about the model under its assumed inputs, not about the world.
 (function () {
   "use strict";
@@ -149,6 +154,42 @@
     }
     return { lo: lo, hi: hi, loX: loX, hiX: hiX };
   }
+  // the inputs each account depends on (the toy's equations); an input outside an account leaves it flat
+  var ENTERS = { dev: ["margin", "capital", "rate"], rate: ["rate", "upgrade", "strand"] };
+  // runs near a corner of an account: every input it depends on in the outer share f of its range, all at the low or all
+  // at the high end (the developer's cost rises with each of its three inputs, so these are its low- and high-cost
+  // corners); the chance of each, under independent uniform inputs, is f^k
+  function nearCorner(st, out, f) {
+    var ks = ENTERS[out], byK = {}, lo = 0, hi = 0;
+    st.ins.forEach(function (q) { byK[q.key] = q; });
+    for (var a = 0; a < st.n; a++) {
+      var u = ks.map(function (k) { var q = byK[k]; return (st.X[k][a] - q.lo) / (q.hi - q.lo); });
+      if (u.every(function (v) { return v >= 1 - f; })) hi++;
+      if (u.every(function (v) { return v < f; })) lo++;
+    }
+    var p = Math.pow(f, ks.length);
+    return { lo: lo, hi: hi, n: lo + hi, share: f, chance: p, expect: Math.round(2 * p * st.n * 1e6) / 1e6, inputs: ks.length };
+  }
+  // the cloud of runs of one input against one account (step 9's scatter, for its text version): the runs in k equal
+  // slices of the input's range with their P10, median and P90; the trend is "flat" when the input does not enter the
+  // account, "weak" when the medians move by less than a quarter of the typical P10-P90 width within a slice
+  function cloud(st, key, out, k) {
+    k = k || 10;
+    var q = st.ins.filter(function (z) { return z.key === key; })[0], S = [], a, j;
+    for (j = 0; j < k; j++) S.push([]);
+    for (a = 0; a < st.n; a++) S[Math.min(k - 1, Math.floor((st.X[key][a] - q.lo) / (q.hi - q.lo) * k))].push(st[out][a]);
+    var slices = S.map(function (v, b) { var s = sorted(v); return { lo: q.lo + b * (q.hi - q.lo) / k, hi: q.lo + (b + 1) * (q.hi - q.lo) / k, n: v.length, p10: quantile(s, 0.1), p50: quantile(s, 0.5), p90: quantile(s, 0.9) }; });
+    var width = mean(slices.map(function (x) { return x.p90 - x.p10; })), change = slices[k - 1].p50 - slices[0].p50, enters = ENTERS[out].indexOf(key) >= 0;
+    var meds = slices.map(function (x) { return x.p50; });
+    return { slices: slices, enters: enters, change: change, width: width, medLo: Math.min.apply(null, meds), medHi: Math.max.apply(null, meds),
+             trend: !enters ? "flat" : Math.abs(change) < width / 4 ? "weak" : change > 0 ? "rises" : "falls" };
+  }
+  // every run of a study as CSV: the five inputs and both accounts (step 9's download)
+  function csvRuns(st) {
+    var L = ["run,margin_usd_per_mw_month,capital_usd,discount_rate_per_year,upgrades_usd,never_arrives_points_per_month,developer_cost_usd,other_customers_cost_usd"];
+    for (var a = 0; a < st.n; a++) L.push([a + 1, st.X.margin[a].toFixed(2), st.X.capital[a].toFixed(0), st.X.rate[a].toFixed(6), st.X.upgrade[a].toFixed(0), (100 * st.X.strand[a]).toFixed(6), st.dev[a].toFixed(0), st.rate[a].toFixed(0)].join(","));
+    return L.join("\n") + "\n";
+  }
   // empty slices: how many of the n equal slices of input j hold no draw
   function empty(U, j, n) { var seen = {}; U[j].forEach(function (u) { seen[Math.floor(u * n)] = 1; }); return n - Object.keys(seen).length; }
   function seeds(D) { var s = []; for (var k = D.repeats.first; k <= D.repeats.last; k++) s.push(k); return s; }
@@ -185,9 +226,14 @@
     if (q.key === "margin") return "$" + int(v);
     if (q.key === "capital" || q.key === "upgrade") return "$" + int(v / 1e6) + "M";
     if (q.key === "rate") return (100 * v).toFixed(v * 100 % 1 ? 1 : 0) + "%";
-    return (100 * v).toFixed(2) + "%";
+    return (100 * v).toFixed(2) + " points";          // the never-arrives chance: percentage points added a month
   }
-  function range(q) { return val(q, q.lo) + " to " + val(q, q.hi); }
+  // "Near a corner (...): 2 runs; a chance of 0.1³ per corner predicts 2" (the outer share is a tenth: data, near)
+  function cube(n) { return { 2: "²", 3: "³" }[n] || "^" + n; }
+  function nearText(N) {
+    return "Near a corner (margin, capital and discount rate all in the same outer tenth of their ranges): " + int(N.n) + (N.n === 1 ? " run" : " runs") + "; a chance of " + N.share + cube(N.inputs) + " per corner predicts " + int(N.expect);
+  }
+  function range(q) { return q.key === "strand" ? (100 * q.lo).toFixed(2) + " to " + val(q, q.hi) : val(q, q.lo) + " to " + val(q, q.hi); }
 
   // ---------------------------------------------------------------- every number the page states, in one place
   function facts(D) {
@@ -198,6 +244,7 @@
     var main = study(D, { seed: D.seed, tau: T });
     F.main = { dev: summary(main.dev), rate: summary(main.rate), rho: { dev: rhos(main, "dev"), rate: rhos(main, "rate") } };
     F.main.beyond = countAbove(main.dev, F.corners.dev.hi) + main.dev.filter(function (y) { return y < F.corners.dev.lo; }).length;
+    F.near = nearCorner(main, "dev", D.near);
     var pv = { lhs: study(D, { n: D.preview, seed: D.seed, tau: T }), random: study(D, { n: D.preview, seed: D.seed, tau: T, method: "random" }) };
     F.preview = {}; Object.keys(pv).forEach(function (m) { F.preview[m] = { margin: empty(pv[m].U, 0, D.preview), rate: empty(pv[m].U, 2, D.preview) }; });
     var B = D.budget.start * 1e6;
@@ -260,7 +307,8 @@
       budget: D.waits.reduce(function (o, t) { o[t] = { n: F.budget.wait[t].n, se: +F.budget.wait[t].se.toPrecision(6) }; return o; }, {}),
       p90se: { "100": +F.err.p90["100lhs"].se.toPrecision(6), "1000": +F.err.p90["1000lhs"].se.toPrecision(6), "1000random": +F.err.p90["1000random"].se.toPrecision(6) },
       meanse: { lhs: +F.err.mean["1000lhs"].toPrecision(6), random: +F.err.mean["1000random"].toPrecision(6) },
-      flip: F.narrow.flip ? { half: F.narrow.flip.half, top: F.narrow.flip.top, rho: cut(F.narrow.flip.rho) } : null
+      flip: F.narrow.flip ? { half: F.narrow.flip.half, top: F.narrow.flip.top, rho: cut(F.narrow.flip.rho) } : null,
+      near: { share: D.near, lo: F.near.lo, hi: F.near.hi }
     };
   }
 
@@ -291,7 +339,8 @@
       "One at a time: the margin swings the developer's cost most, from " + musd(swing[0].atLo) + " to " + musd(swing[0].atHi) + "; capital and the discount rate swing it by " + musd(Math.abs(swing[1].atHi - swing[1].atLo)) + " and " + musd(Math.abs(swing[2].atHi - swing[2].atLo)) + ".",
       "Stacked corners: every input at its low-cost end gives " + musd(c.lo) + "; at its high-cost end, " + musd(c.hi) + ".",
       "Sampling 10 runs with seed " + D.seed + ": plain random leaves " + F.preview.random.margin + " of 10 margin slices and " + F.preview.random.rate + " of 10 discount-rate slices empty; a Latin hypercube leaves none.",
-      "1,000 Latin hypercube runs: median " + musd(F.main.dev.p50) + "; 80% of runs from " + musd(F.main.dev.p10) + " to " + musd(F.main.dev.p90) + "; the runs span " + musd(F.main.dev.min) + " to " + musd(F.main.dev.max) + ", so none reaches either corner.",
+      "1,000 Latin hypercube runs: median " + musd(F.main.dev.p50) + "; 80% of runs from " + musd(F.main.dev.p10) + " to " + musd(F.main.dev.p90) + "; the runs span " + musd(F.main.dev.min) + " to " + musd(F.main.dev.max) + ".",
+      nearText(F.near) + ".",
       "Monte Carlo error over 20 seeds: P90 " + musd(F.main.dev.p90) + " " + pm(2 * e.p90["1000lhs"].se) + " (two standard errors) with 1,000 runs, " + pm(2 * e.p90["100lhs"].se) + " with 100.",
       "A chance under these inputs: above " + Bs + ", " + shr(bw[12].share) + " of runs at 12 months, " + shr(bw[24].share) + " at 24 and " + shr(bw[36].share) + " at 36.",
       "Spearman's rank correlation with the developer's cost: " + G.dev.groups.slice(0, 2).map(grp).join("; then ") + "; with other customers' cost: " + G.rate.groups.slice(0, 2).map(grp).join("; then ") + ".",
@@ -311,9 +360,9 @@
 
   var model = { rng: rng, monthly: monthly, annuity: annuity, outputs: outputs, inputsOf: inputsOf, baseX: baseX, units: units, study: study,
                 sorted: sorted, quantile: quantile, mean: mean, sd: sd, ranks: ranks, pearson: pearson, spearman: spearman, countAbove: countAbove,
-                summary: summary, rhos: rhos, order: order, tornado: tornado, corners: corners, empty: empty, seeds: seeds, repeats: repeats,
+                summary: summary, rhos: rhos, order: order, tornado: tornado, corners: corners, nearCorner: nearCorner, ENTERS: ENTERS, cloud: cloud, csvRuns: csvRuns, empty: empty, seeds: seeds, repeats: repeats,
                 shareSorted: shareSorted, se: se, rankGroups: rankGroups, hist: hist, facts: facts, narrowAt: narrowAt, narrowing: narrowing, reference: reference,
-                staticFallback: staticFallback, musd: musd, pm: pm, shr: shr, pts: pts, r2: r2, int: int, val: val, range: range, OUTS: OUTS };
+                staticFallback: staticFallback, nearText: nearText, musd: musd, pm: pm, shr: shr, pts: pts, r2: r2, int: int, val: val, range: range, OUTS: OUTS };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -322,6 +371,8 @@
   var COL = { dev: "var(--lx-accent)", rate: "var(--lx-tier-3)", mid: "var(--lx-ink)", corner: "var(--lx-bad)", tail: "var(--lx-warn)", empty: "var(--lx-warn)", line: "var(--lx-line)", dot: "var(--lx-accent)" };
   var INCOL = { margin: "var(--lx-accent)", capital: "var(--lx-tier-5)", rate: "var(--lx-tier-4)", upgrade: "var(--lx-tier-3)", strand: "var(--lx-warn)" };
   var ACC = { dev: "developer", rate: "other customers" }, ACCN = { dev: "The developer", rate: "Other customers" };
+  var COST = { dev: "the developer's cost", rate: "other customers' cost" };   // the possessive, right for both accounts
+  var NOUN = { margin: "the margin", capital: "the idle capital", rate: "the discount rate", upgrade: "the upgrades", strand: "the never-arrives chance" };
 
   function seg(host, labels, sel, onPick, aria) {
     var g = H("div", { class: "lx-seg", role: "group", "aria-label": aria || "Choose" }, host), bs = [];
@@ -371,25 +422,29 @@
     };
   }
 
-  // ---- rank-correlation bars (lesson-local i-montecarlo piece): one button per input, rho from -1 to 1 with a +/- 2 SE
-  // whisker and its rank by the tie rule; tapping a row picks the input for the scatter below
+  // ---- rank-correlation bars (lesson-local i-montecarlo piece): one row per input, rho from -1 to 1 with a +/- 2 SE
+  // whisker and its rank by the tie rule; with onPick (step 9) each row is a button that picks the input for the scatter
+  // below, without it (step 10) the rows are a plain list
   function RhoBars(host, o) {
-    var w = H("div", { class: "m7-rho" }, host), rows = {}, sel = null;
+    var w = H("div", { class: "m7-rho" }, host), rows = {}, sel = null, pickable = !!o.onPick;
     var head = H("div", { class: "m7-rho-axis", "aria-hidden": "true" }, w);
     H("span", null, head); var ax = H("span", { class: "m7-rho-ax" }, head);
     ["−1", "0", "+1"].forEach(function (t) { H("span", { text: t }, ax); });
-    var list = H("div", { class: "m7-rho-list", role: "group", "aria-label": o.aria || "Rank correlation of each input with the cost" }, w);
+    var list = H("div", { class: "m7-rho-list", role: pickable ? "group" : "list", "aria-label": o.aria || "Rank correlation of each input with the cost" }, w);
     o.inputs.forEach(function (q) {
-      var b = H("button", { type: "button", class: "m7-rho-row", "aria-pressed": "false", style: "--c:" + INCOL[q.key] }, list);
-      var lab = H("span", { class: "m7-rho-l" }, b); H("i", null, lab); H("span", { text: q.short }, lab);
+      var b = pickable ? H("button", { type: "button", class: "m7-rho-row", "aria-pressed": "false", style: "--c:" + INCOL[q.key] }, list)
+                       : H("div", { class: "m7-rho-row m7-rho-static", role: "listitem", style: "--c:" + INCOL[q.key] }, list);
+      var hid = pickable ? {} : { "aria-hidden": "true" };   // a plain row is read from its sentence (sr), not its parts
+      var lab = H("span", Object.assign({ class: "m7-rho-l" }, hid), b); H("i", null, lab); H("span", { text: q.short }, lab);
       var tr = H("span", { class: "m7-rho-t", "aria-hidden": "true" }, b), bar = H("span", { class: "m7-rho-b" }, tr), wh = H("span", { class: "m7-rho-w" }, tr);
-      var v = H("span", { class: "m7-rho-v" }, b), rk = H("span", { class: "m7-rho-k" }, b);
-      b.addEventListener("click", function () { pick(q.key); if (o.onPick) o.onPick(q.key); });
-      rows[q.key] = { b: b, bar: bar, wh: wh, v: v, rk: rk, q: q };
+      var v = H("span", Object.assign({ class: "m7-rho-v" }, hid), b), rk = H("span", Object.assign({ class: "m7-rho-k" }, hid), b);
+      var sr = pickable ? null : H("span", { class: "lx-sr" }, b);
+      if (pickable) b.addEventListener("click", function () { pick(q.key); o.onPick(q.key); });
+      rows[q.key] = { b: b, bar: bar, wh: wh, v: v, rk: rk, sr: sr, q: q };
     });
     var alt = H("details", { class: "lx-textalt" }, w); H("summary", { text: "Text version of the bars" }, alt);
     var altBody = H("div", null, alt);
-    function pick(k) { sel = k; Object.keys(rows).forEach(function (j) { rows[j].b.setAttribute("aria-pressed", j === k ? "true" : "false"); }); }
+    function pick(k) { if (!pickable) return; sel = k; Object.keys(rows).forEach(function (j) { rows[j].b.setAttribute("aria-pressed", j === k ? "true" : "false"); }); }
     var x = function (r) { return (r + 1) / 2 * 100; };
     return {
       el: w, pick: pick,
@@ -401,7 +456,8 @@
           R.bar.style.left = Math.min(x(0), x(r)) + "%"; R.bar.style.width = Math.abs(x(r) - x(0)) + "%";
           R.wh.style.left = x(Math.max(-1, r - e)) + "%"; R.wh.style.width = (x(Math.min(1, r + e)) - x(Math.max(-1, r - e))) + "%";
           R.v.textContent = "ρ " + r2(r); R.rk.textContent = "rank " + d.ranks[q.key];
-          R.b.setAttribute("aria-label", q.short + ": rho " + r2(r) + ", plus or minus " + r2(e) + ", rank " + d.ranks[q.key].replace("–", " to ") + ". Show its cloud of runs.");
+          var said = q.short + ": rho " + r2(r) + ", plus or minus " + r2(e) + ", rank " + d.ranks[q.key].replace("–", " to ") + ".";
+          if (pickable) R.b.setAttribute("aria-label", said + " Show its cloud of runs."); else R.sr.textContent = said;
           lines.push(q.label + ": ρ = " + r2(r) + " ± " + r2(e) + " (2 standard errors), rank " + d.ranks[q.key] + ".");
         });
         altBody.innerHTML = ""; var ul = H("ul", null, altBody); lines.forEach(function (t) { H("li", { text: t }, ul); });
@@ -427,12 +483,17 @@
 
     // ---- 1 one number, five guesses
     steps.push({
-      text: "A 100 [[megawatt|MW]] load, a factory or a data center, waits " + T + " months for the grid (case file CF7's toy). At CF7's values the wait costs its [[developer|developer]] " + money(base[T].dev) + " in [[present-value|present value]]. Yet each input is a guess.",
+      text: "A 100 [[megawatt|MW]] load, a factory or a data center, waits " + T + " months for the grid (CF7's toy). At CF7's values the wait costs its [[developer|developer]] " + money(base[T].dev) + " in [[present-value|present value]]; each input is a guess.",
       build: function (act, api) {
         var sc = H("div", { class: "lx-scroll-x" }, act), tb = H("table", { class: "lx-mini-table m7-ins" }, sc), hr = H("tr", null, H("thead", null, tb));
         ["Input", "CF7's value", "Range here"].forEach(function (h) { H("th", { scope: "col", text: h }, hr); });
         var bd = H("tbody", null, tb);
-        D.inputs.forEach(function (q) { var tr = H("tr", null, bd); H("td", { text: q.label + " (" + q.unit + ")" }, tr); H("td", { text: val(q, q.base) }, tr); H("td", { text: range(q) }, tr); });
+        // each input with its unit and a one-line definition (data: why, with glossary marks)
+        D.inputs.forEach(function (q) {
+          var tr = H("tr", null, bd), c = H("td", null, tr);
+          H("span", { class: "m7-in-l", text: q.label + " (" + q.unit + ")" }, c); H("span", { class: "m7-in-d", html: LX.rich(q.why) }, c);
+          H("td", { text: val(q, q.base) }, tr); H("td", { text: range(q) }, tr);
+        });
         LX.Predict(act, { id: "m7-p90", q: "Let all five vary within their ranges. 9 runs in 10 will cost less than…", answer: "200", fresh: true,
           options: D.guess.map(function (g) { return { value: g.value, label: g.label }; }),
           lockText: "Locked in. Step 6 runs the model 1,000 times and checks your guess.",
@@ -442,7 +503,7 @@
 
     // ---- 2 scenarios: the wait, with no chance attached
     steps.push({
-      text: "Queues and decisions set the wait, not chance, so treat it as a [[scenario|scenario]]: a what-if with no probability attached. Compare three waits, every input at CF7's value.",
+      text: "This lesson gives the wait no probabilities: treat " + D.waits.join(", ").replace(/, ([^,]*)$/, " and $1") + " months as separate what-if [[scenario|scenarios]]. Compare them, every input at CF7's value.",
       build: function (act, api) {
         var seen = {}, top = base[D.waits[D.waits.length - 1]].dev;
         seg(row(act), D.waits.map(function (t) { return t + " months"; }), -1, function (i) { show(D.waits[i]); }, "Wait scenario");
@@ -452,7 +513,7 @@
           var cells = ["dev", "rate"].map(function (k) { var c = H("span", { class: "m7-scen-c" }, r); var tr = H("span", { class: "m7-scen-tr", "aria-hidden": "true" }, c); var b = H("span", { class: "m7-scen-b", style: "--c:" + COL[k] }, tr); var v = H("span", { class: "m7-scen-v", text: "?" }, c); return { b: b, v: v, k: k }; });
           return { t: t, cells: cells, el: r };
         });
-        H("p", { class: "lx-hint", html: '<span class="m7-key" style="--c:' + COL.dev + '"></span> The developer <span class="m7-key" style="--c:' + COL.rate + '"></span> Other customers (the utility\'s carrying cost of the upgrades and their expected stranding)' }, act);
+        H("p", { class: "lx-hint", html: '<span class="m7-key" style="--c:' + COL.dev + '"></span> The developer <span class="m7-key" style="--c:' + COL.rate + '"></span> Other customers: the utility\'s ' + LX.rich("[[carrying-cost|carrying cost]] of the upgrades, and the expected [[stranded-cost|stranded cost]] if the load never arrives") }, act);
         function show(t) {
           seen[t] = 1;
           rowsEl.forEach(function (r) {
@@ -461,7 +522,7 @@
           });
           out.innerHTML = "A " + t + "-month wait: developer <b>" + money(base[t].dev) + "</b>, other customers <b>" + money(base[t].rate) + "</b>.";
           var k = Object.keys(seen).length;
-          if (k >= D.waits.length) { api.done(); api.saw("Developer: " + D.waits.map(function (w) { return money(base[w].dev); }).join(", ") + " for " + D.waits.join(", ") + " months. A scenario says what happens if; it never says how likely."); }
+          if (k >= D.waits.length) { api.done(); api.saw("Developer: " + D.waits.map(function (w) { return money(base[w].dev); }).join(", ") + " for " + D.waits.join(", ") + " months. With no probabilities attached, a scenario says what happens if, not how likely."); }
           else api.saw("Scenarios seen: " + k + " of " + D.waits.length + ".", true);
         }
         out.textContent = "Pick a wait.";
@@ -471,7 +532,7 @@
     // ---- 3 one at a time (tornado)
     var swing = tor.rows.slice().sort(function (a, b) { return Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo); });
     steps.push({
-      text: "Back to " + T + " months. Swing each input from the low to the high end of its range, the others at CF7's values: a [[tornado-chart|tornado chart]], one input at a time (lesson 7). Which swings the developer's cost most?",
+      text: "Back at " + T + " months, swing one input at a time across its range, the others at CF7's values: a [[tornado-chart|tornado chart]] (lesson 7). Which swings the developer's cost most?",
       build: function (act, api) {
         var host = H("div", null, act);
         var pr = LX.Predict(act, { id: "m7-oat", q: "Your pick:", answer: swing[0].key, fresh: true, title: false,
@@ -511,7 +572,7 @@
                      aria: "The developer's cost at CF7's values and at the corners of the five ranges.",
                      text: { head: ["Case", "Developer's cost"], rows: [["CF7's values", money(tor.base)], ["The margin alone, low to high", money(sw.atLo) + " to " + money(sw.atHi)]].concat(got.lo ? [["Every input at its low-cost end", money(cor.lo)]] : [], got.hi ? [["Every input at its high-cost end", money(cor.hi)]] : []) } });
           out.innerHTML = got.lo && got.hi ? "Corners: <b>" + money(cor.lo) + "</b> and <b>" + money(cor.hi) + "</b>." : "Corners tried: " + Object.keys(got).length + " of 2.";
-          if (got.lo && got.hi) { api.done(); api.saw("Each corner needs all five guesses to land at one end together. How likely is that? Only chances can say."); }
+          if (got.lo && got.hi) { api.done(); api.saw("Only the margin, capital and discount rate enter the developer's cost, so a corner needs all three at one end together. Only chances can say how likely that is."); }
         }
         draw();
       }
@@ -573,14 +634,15 @@
         var P = LX.Plot(act, { text: "Text version of the chart" }), out = readout(act);
         P.render({ x: { min: 100, max: 250, ticks: [[100, "$100M", "start"], [150, "$150M"], [200, "$200M"], [250, "$250M", "end"]] }, y: { min: 0, max: 100, step: 20, fmt: function (n) { return String(n); }, unit: "runs" }, height: 230, heightN: 200, aria: "Empty histogram: press Run.", text: { head: ["Cost, from", "up to", "Runs"], rows: [] } });
         b.addEventListener("click", function () {
-          var st = M0(), sm = summary(st.dev), g = own.guess || LX.progress.guess("m7-p90"), beyond = st.dev.filter(function (y) { return y > cor.hi || y < cor.lo; }).length;
+          var st = M0(), sm = summary(st.dev), g = own.guess || LX.progress.guess("m7-p90"), N = nearCorner(st, "dev", D.near);
           P.render(mainSpec(st));
-          out.innerHTML = "Median <b>" + money(sm.p50) + "</b> · 80% of runs from <b>" + money(sm.p10) + "</b> to <b>" + money(sm.p90) + "</b> · runs from " + money(sm.min) + " to " + money(sm.max) + ".";
           var gl = D.guess.filter(function (x) { return x.value === g; })[0], right = gl && Math.abs(+g * 1e6 - sm.p90) === Math.min.apply(null, D.guess.map(function (x) { return Math.abs(+x.value * 1e6 - sm.p90); }));
+          out.innerHTML = "Median <b>" + money(sm.p50) + "</b> · 80% of runs from <b>" + money(sm.p10) + "</b> to <b>" + money(sm.p90) + "</b> · runs from " + money(sm.min) + " to " + money(sm.max) + "." +
+                          (gl ? (right ? " Your guess, about $" + g + "M, was the closest." : " You guessed about $" + g + "M.") : "");
           keep("run", true);
           api.done();
-          api.saw("P90, the 90th [[percentile|percentile]], is **" + money(sm.p90) + "**: 9 runs in 10 cost less. " + (gl ? (right ? "Your guess, about $" + g + "M, was the closest. " : "You guessed about $" + g + "M. ") : "") +
-                  (beyond ? beyond + " runs reach beyond a corner." : "No run reaches either corner."));
+          // an exact corner has zero chance under continuous inputs: count runs in a stated neighbourhood instead
+          api.saw("P90, the 90th [[percentile|percentile]], is **" + money(sm.p90) + "**: 9 runs in 10 cost less. " + nearText(N) + ".");
         });
       }
     });
@@ -621,7 +683,7 @@
 
     // ---- 8 a chance under the model's inputs, by scenario
     steps.push({
-      text: "Pick a budget. The share of runs above it is a chance under the model's inputs (these ranges, uniform shapes, drawn independently), not a forecast. Compare the three wait scenarios.",
+      text: "The share of runs above a budget is a chance under the model's inputs (these ranges, uniform shapes, independent draws), not a forecast. Pick a budget and compare the three wait scenarios.",
       build: function (act, api) {
         var seen = {}, tau = T, Bd = D.budget;
         seg(row(act), D.waits.map(function (t) { return t + " months"; }), D.waits.indexOf(T), function (i) { tau = D.waits[i]; draw(true); }, "Wait scenario");
@@ -651,14 +713,27 @@
       var q = D.inputs.filter(function (z) { return z.key === key; })[0], sc = q.key === "rate" || q.key === "strand" ? 100 : q.key === "margin" ? 1e-3 : 1e-6;
       var ys = st[out], ya = niceAxis(Math.max.apply(null, ys) / 1e6, Math.min.apply(null, ys) / 1e6), bars = [], dxs = (q.hi - q.lo) * sc / (window.innerWidth < 560 ? 130 : 280), dys = (ya.max - ya.min) / 90;   // about 5 px either way
       for (var a = 0; a < st.n; a++) { var xv = st.X[key][a] * sc, yv = ys[a] / 1e6; bars.push({ x0: xv - dxs, x1: xv + dxs, y0: yv - dys, y1: yv + dys, color: INCOL[key], op: 0.45, rx: 2 }); }
-      var ft = function (v) { return q.key === "margin" ? "$" + Math.round(v) + "k" : q.key === "rate" ? Math.round(v) + "%" : q.key === "strand" ? v.toFixed(2) + "%" : "$" + Math.round(v) + "M"; };
+      var ft = function (v) { return q.key === "margin" ? "$" + Math.round(v) + "k" : q.key === "rate" ? Math.round(v) + "%" : q.key === "strand" ? v.toFixed(2) + " pts" : "$" + Math.round(v) + "M"; };
       var lo = q.lo * sc, hi = q.hi * sc, mid = (lo + hi) / 2;
-      return { x: { min: lo, max: hi, ticks: [[lo, ft(lo), "start"], [mid, ft(mid)], [hi, ft(hi), "end"]] }, y: { min: ya.min, max: ya.max, step: ya.step, fmt: function (v) { return "$" + v + "M"; }, unit: ACC[out] + "'s cost" }, height: 210, heightN: 190, ml: 56,
-               bars: bars, aria: "1,000 runs: " + q.label + " across, the " + ACC[out] + "'s cost up.",
-               text: { head: ["Input", "Runs", "Rank correlation"], rows: [[q.label, "1,000", r2(rhos(st, out)[key])]], note: "Each dot is one run; the full list of runs is in the lab notebook." } };
+      return { x: { min: lo, max: hi, ticks: [[lo, ft(lo), "start"], [mid, ft(mid)], [hi, ft(hi), "end"]] }, y: { min: ya.min, max: ya.max, step: ya.step, fmt: function (v) { return "$" + v + "M"; }, unit: COST[out].replace(/^the /, "") }, height: 210, heightN: 190, ml: 56,
+               bars: bars, aria: "1,000 runs: " + q.label + " across, " + COST[out] + " up. " + cloudSentence(st, key, out),
+               text: { html: cloudHTML(st, key, out) } };
+    }
+    // the text version of the scatter: its shape in one sentence, then the runs in ten slices of the input's range
+    function cloudSentence(st, key, out) {
+      var c = cloud(st, key, out), nm = NOUN[key], acc = COST[out].charAt(0).toUpperCase() + COST[out].slice(1);
+      if (c.trend === "flat") return "Flat: " + COST[out] + " does not depend on " + nm + ", so the median run stays between " + money(c.medLo) + " and " + money(c.medHi) + " in every tenth of its range.";
+      return acc + " " + (c.trend === "weak" ? "barely moves" : c.trend) + " with " + nm + ": the median run goes from " + money(c.slices[0].p50) + " in the lowest tenth of its range to " + money(c.slices[c.slices.length - 1].p50) + " in the highest; within a tenth, the middle 80% of runs spans about " + money(c.width) + ".";
+    }
+    function cloudHTML(st, key, out) {
+      var c = cloud(st, key, out), q = byKey(key), esc = LX.esc;
+      var h = '<p class="lx-hint">' + esc(cloudSentence(st, key, out)) + " ρ = " + r2(rhos(st, out)[key]) + " over 1,000 runs.</p>";
+      h += '<div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr><th scope="col">' + esc(q.short) + ' from</th><th scope="col">up to</th><th scope="col">Runs</th><th scope="col">Median cost</th><th scope="col">Middle 80% of runs</th></tr></thead><tbody>';
+      c.slices.forEach(function (x) { h += "<tr><td>" + esc(val(q, x.lo)) + "</td><td>" + esc(val(q, x.hi)) + "</td><td>" + x.n + "</td><td>" + money(x.p50) + "</td><td>" + money(x.p10) + " to " + money(x.p90) + "</td></tr>"; });
+      return h + '</tbody></table></div><p class="lx-hint">Every run, with all five inputs and both costs: the CSV download under the chart.</p>';
     }
     steps.push({
-      text: "Which input matters most when all five vary together? Correlate each input's ranks with the cost's ranks over the 1,000 runs: [[rank-correlation|Spearman's rank correlation]] ρ, from −1 to 1. Switch the account.",
+      text: "Which input matters most when all five vary together? Correlate each input's ranks with the cost's ranks over the 1,000 runs, for both accounts: [[rank-correlation|Spearman's rank correlation]] ρ, from −1 to 1.",
       build: function (act, api) {
         var seen = {}, out = "dev", pick = "margin", st = M0();
         var ctl = row(act); seg(ctl, ["The developer", "Other customers"], -1, function (i) { out = i ? "rate" : "dev"; seen[out] = 1; draw(true); }, "Account");
@@ -666,6 +741,9 @@
         var bars = RhoBars(act, { inputs: D.inputs, onPick: function (k) { pick = k; drawCloud(); } });
         H("p", { class: "lx-hint", text: "Whiskers: ± 2 standard errors over 20 seeds. Tie rule: two inputs share a rank when their gap is within two standard errors of that gap." }, act);
         var P = LX.Plot(act, { text: "Text version of the chart" }), res = readout(act);
+        var csv = csvRuns(st), W = window, dl = H("p", { class: "m7-dl" }, act);
+        H("a", { class: "lx-btn small ghost", download: "m7-runs-seed" + D.seed + "-" + T + "-months.csv", text: "Download the 1,000 runs (CSV)",
+                 href: W.Blob && W.URL && W.URL.createObjectURL ? W.URL.createObjectURL(new W.Blob([csv], { type: "text/csv" })) : "data:text/csv;charset=utf-8," + encodeURIComponent(csv) }, dl);
         function drawCloud() { P.render(scatterSpec(st, pick, out)); }
         function draw(user) {
           var reps = lab.reps(D.runs, T), rh = rhos(st, out), G = rankGroups(rh, reps, out, D.inputs);
@@ -673,7 +751,7 @@
           res.innerHTML = ACCN[out] + ": " + G.groups.slice(0, 2).map(function (g) { return g.map(function (x) { return short(x.key).toLowerCase() + " " + r2(x.rho); }).join(" and ") + (g.length > 1 ? " (tied, rank " + g[0].rank + ")" : " (rank " + g[0].rank + ")"); }).join("; then ") + ".";
           if (seen.dev && seen.rate) {
             var Gd = rankGroups(rhos(st, "dev"), reps, "dev", D.inputs), Gr = rankGroups(rhos(st, "rate"), reps, "rate", D.inputs), w = function (x) { return short(x.key).toLowerCase() + " (" + r2(x.rho) + ")"; };
-            api.done(); api.saw("Developer: " + w(Gd.groups[0][0]) + " first; " + Gd.groups[1].map(w).join(" and ") + " tied next. Other customers: " + w(Gr.groups[0][0]) + ", then " + w(Gr.groups[1][0]) + ". Influence depends on the output.");
+            api.done(); api.saw("Developer: " + w(Gd.groups[0][0]) + " first; " + Gd.groups[1].map(w).join(" and ") + " tied next. Other customers: " + w(Gr.groups[0][0]) + ", then " + w(Gr.groups[1][0]) + ", so influence depends on the output.");
           } else if (user) api.saw("Accounts seen: " + Object.keys(seen).length + " of 2. Tap an input to see its cloud of runs.", true);
         }
         status.textContent = "";
@@ -738,15 +816,16 @@
   });
 
   // ---------------------------------------------------------------- explain layer: the study as a flowchart, four ways
-  // of asking "what could happen?" as a table, and where the numbers hold
+  // of asking "what could happen?" as a table, and where the numbers hold. It always shows the reference case (the
+  // original ranges, seed 7, a 24-month wait, a $200M budget), whatever the reader set in the steps, and says so
   function explain(D, lab) {
     var x = document.getElementById("m7-explain"); if (!x) return;
     x.innerHTML = "";
     var T = D.wait, st = lab.main(T), sm = summary(st.dev), reps = lab.reps(D.runs, T), r100 = lab.reps(100, T);
     var e1 = se(reps, function (r) { return r.p90; }), e0 = se(r100, function (r) { return r.p90; }), rh = rhos(st, "dev");
-    var B = D.budget.start * 1e6, s36 = countAbove(lab.main(36).dev, B) / D.runs;
+    var B = D.budget.start * 1e6, s36 = countAbove(lab.main(36).dev, B) / D.runs, near = nearCorner(st, "dev", D.near);
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "A Monte Carlo study, move by move", lede: "Scenarios first, then chances within each; trace three cases.",
+      title: "A Monte Carlo study, move by move", lede: "Reference case, whatever you set above: the original ranges, seed " + D.seed + ", a " + T + "-month wait and a $" + D.budget.start + "M budget. Trace three cases.",
       nodes: {
         q: { t: "Question and output", tN: ["Question", "and output"], s: "the developer's cost", sN: "developer's cost", k: "end" },
         sc: { t: "Fix a scenario", tN: ["Fix a", "scenario"], s: "a " + T + "-month wait", sN: T + " months" },
@@ -763,7 +842,7 @@
       colsN: 2, atN: { q: [0, 0], sc: [0, 1], inp: [0, 2], smp: [0, 3], run: [0, 4], err: [0, 5], more: [1, 5], read: [0, 6], rank: [0, 7], rep: [0, 8] },
       edges: [["q", "sc"], ["sc", "inp"], ["inp", "smp"], ["smp", "run"], ["run", "err"], ["err", "more", "no"], ["err", "read", "yes"], ["read", "rank"], ["rank", "rep"]],
       traces: [
-        { label: "This lesson", path: ["q", "sc", "inp", "smp", "run", "err", "read", "rank", "rep"], text: "1,000 runs: P90 " + money(sm.p90) + " " + pm(2 * e1) + "; the margin ranks first (ρ = " + r2(rh.margin) + ")." },
+        { label: "Reference case", path: ["q", "sc", "inp", "smp", "run", "err", "read", "rank", "rep"], text: "1,000 runs: P90 " + money(sm.p90) + " " + pm(2 * e1) + "; the margin ranks first (ρ = " + r2(rh.margin) + ")." },
         { label: "Only 100 runs", path: ["q", "sc", "inp", "smp", "run", "err", "more"], text: "P90 " + pm(2 * e0) + ": if a decision turns on the P90, run more." },
         { label: "A 36-month wait", path: ["q", "sc", "inp", "smp", "run", "err", "read", "rank", "rep"], text: shr(s36) + " of runs exceed $" + D.budget.start + "M at 36 months: a chance holds within its scenario." }
       ], sel: 0
@@ -774,7 +853,7 @@
       rows: [
         { key: "scen", color: "var(--lx-ink-3)", name: "Scenarios", note: "the wait: " + D.waits.join(", ") + " months", asks: "What if?", runs: String(D.waits.length), chance: "No", misses: "how likely each scenario is" },
         { key: "oat", color: "var(--lx-tier-2)", name: "One at a time", note: "the tornado chart", asks: "Which input moves the result on its own?", runs: String(1 + 2 * D.inputs.length), chance: "No", misses: "inputs moving together" },
-        { key: "corner", color: COL.corner, name: "Stacked corners", note: "every end of every range", asks: "How far can it go inside the ranges?", runs: String(Math.pow(2, D.inputs.length)), chance: "No", misses: "how rare a corner is: no run of 1,000 reached one" },
+        { key: "corner", color: COL.corner, name: "Stacked corners", note: "every end of every range", asks: "How far can it go inside the ranges?", runs: String(Math.pow(2, D.inputs.length)), chance: "No", misses: "how rare a corner is: " + int(near.n) + " of 1,000 runs came near one (step 6)" },
         { key: "mc", color: COL.dev, name: "Monte Carlo and rank correlation", note: "Latin hypercube, seed " + D.seed + "; 20 repeats for the error", asks: "How likely is each result, and which inputs drive its spread?", runs: "1,000 a scenario", chance: "Yes, under the assumed inputs", misses: "links between inputs; wrong ranges" }
       ],
       sorts: [{ label: "As built", order: ["scen", "oat", "corner", "mc"], note: "Only the last gives chances, and only under its inputs." }]

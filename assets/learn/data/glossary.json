@@ -1897,7 +1897,7 @@
  },
  "scenario": {
   "term": "Scenario",
-  "short": "A coherent what-if set of a model's inputs, such as a 36-month wait, studied without a probability attached.",
+  "short": "A coherent what-if set of a model's inputs, such as a 36-month wait; a scenario may be given a probability, though this lesson gives none.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
