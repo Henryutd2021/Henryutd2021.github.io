@@ -1,6 +1,8 @@
 // test_components_w3_shared.js — Node tests for the W3 shared fixes (reports/learn/w3_shared_fixes.md, 2026-11-03):
 //   1 LX.Drill writes its question and its hint through LX.rich, so drill items carry glossary marks (A1's CRF); text
 //     is never read as HTML
+//   2 (lesson 7's own test: the EIA population of the solar capacity factor)
+//   4 M5 and C1 link the live case file CF1 once each, in their real-world boxes, with no new sentence about the study
 // Usage (from the site folder):  node _tests/learn/test_components_w3_shared.js
 "use strict";
 const fs = require("fs");
@@ -32,6 +34,20 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
     const be = A.drill(42, 60).filter(it => it.kind === "breakeven");
     ok(be.length > 0 && be.every(it => it.q.indexOf("[[capital-recovery-factor|capital recovery factor]] (CRF) ") > 0), "A1: the drill's break-even items mark the capital recovery factor");
     ok(a1.indexOf("a1-drill-terms") < 0, "A1: no separate line under the drill for the term");
+  }
+
+  // ---------------------------------------------------------------- 4 CF1 linked from M5 and C1
+  {
+    const Q = id => fs.readFileSync(path.join(SITE, "learn", id + ".qmd"), "utf8");
+    const line = '<a href="cf1-supply-chain-microgrids.html">case file CF1</a>';
+    const m5 = Q("m05-microgrid-size-and-run"), c1 = Q("c1-keep-the-campus-running");
+    const m5real = (m5.match(/<div class="lx-card lx-real">[\s\S]*?\n<\/div>\n<div class="lx-card lx-sources">/) || [""])[0];
+    const c1real = (c1.match(/<div class="lx-card lx-real c1-realworld">[\s\S]*?\n<\/div>\n<\/div>/) || [""])[0];
+    ok(fs.existsSync(path.join(SITE, "learn/cf1-supply-chain-microgrids.qmd")), "CF1 is a live page");
+    ok(m5real.split(line).length === 2 && m5real.indexOf("<li>The full case: " + line + ".</li>") > 0 && m5.split("cf1-supply-chain-microgrids.html").length === 2,
+       "M5: one link to CF1, a list line in the real-world box");
+    ok(c1real.split(line).length === 2 && c1real.indexOf('<p class="lx-hint">The full case: ' + line + ".</p>") > 0 && c1.split("cf1-supply-chain-microgrids.html").length === 2,
+       "C1: one link to CF1, a hint line in the real-world box");
   }
 
   console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w3_shared)` : `ok ${checks}/${checks} checks (test_components_w3_shared)`);
