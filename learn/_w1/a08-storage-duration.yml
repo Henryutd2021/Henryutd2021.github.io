@@ -8,6 +8,9 @@ glossary:
   - id: long-duration-storage
     term: Long-duration storage
     def: "Storage that can give its full power for about 10 hours or more; DOE splits it into inter-day (10 to 36 hours) and multi-day or week-long (36 to 160 hours) stores."
+  - id: full-cycle
+    term: Full cycle
+    def: "Charging a store's usable energy once and discharging it once; two half charges and discharges count as one full cycle."
 requests:
   - "Engine E0 (SB0): A8's week LP is lesson-local in assets/learn/a08-storage-duration.js with a small interface (prepare(D, year, targets, profile) -> W; build(W, store, opts) -> LP; read(W, store, r) -> unserved, covered, schedule). When E0 exists, switch A8 to it: the page reads only build/read, and the test (_tests/learn/test_a08-storage-duration.js) re-solves every number, so a switch is checked."
   - "Solver benchmark: A8's instances (one store through the 168-hour week, 1,008 columns x 336 rows) are added to scripts/learn_solver_bench.mjs as the W3 set (a8battery, a8hydrogen); please keep them when solver_models.js gets its W3 lessonSet."
