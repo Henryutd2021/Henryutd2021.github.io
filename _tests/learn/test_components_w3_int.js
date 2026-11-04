@@ -148,9 +148,10 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
   // ---------------------------------------------------------------- contrast (W3 layout audit)
   {
     const br = code(rd("components/benchrun.css")), rn = code(rd("components/reportnote.css"));
-    ok(/\.lx-br-results\[data-stale="true"\] svg, \.lx-br-results\[data-stale="true"\] canvas \{ opacity: \.62; \}/.test(br) &&
-       /\.lx-br-results\[aria-busy="true"\] svg, \.lx-br-results\[aria-busy="true"\] canvas \{ opacity: \.5;/.test(br) && !/:not\(\.lx-br-stale\) \{ opacity/.test(br),
-       "BenchRun: only graphics (svg, canvas) dim while stale or busy; text keeps its contrast");
+    const G = ":is(path, rect, circle, ellipse, line, polyline, polygon, image, use)";
+    ok(br.indexOf('.lx-br-results[data-stale="true"] svg ' + G + ', .lx-br-results[data-stale="true"] canvas { opacity: .62; }') >= 0 &&
+       br.indexOf('.lx-br-results[aria-busy="true"] svg ' + G + ', .lx-br-results[aria-busy="true"] canvas { opacity: .5;') >= 0 && !/:not\(\.lx-br-stale\) \{ opacity/.test(br) &&
+       !/svg(, | \{)/.test(br.replace(/svg :is\([^)]*\)/g, "")), "BenchRun: only graphics (an SVG's shapes, canvas) dim while stale or busy; text, chart labels included, keeps its contrast");
     ok(/\.lx-rn-page h5 \{[^}]*color: var\(--lx-ink-2\); \}/.test(rn), "ReportNote: the small headings use --lx-ink-2");
   }
 

@@ -746,7 +746,7 @@ details.lx-listview > summary { cursor: pointer; min-height: 48px; display: flex
    value chips (readouts) above the chart; also the model-lab stage (.lx-stage: a card with a head, readouts, sliders,
    a status line and goals; markup only, used by lessons 10 and 11). The readout tooltip (.lx-chart-tip), the legend (.lx-legend) and the text-version
    table (.lx-mini-table) are shared with daychart.css. Promoted from lessons 2, 3 and 4 and B2 (W1 integration). */
-.lx-plotbox { display: grid; gap: 4px; min-width: 0; }
+.lx-plotbox { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }   /* the column never grows past the box: a wide text-version table scrolls in its own box (SB1, C1 at 375 px) */
 .lx-plot-cap { font-family: var(--lx-f-display); font-weight: 500; font-size: 14.5px; color: var(--lx-ink-2); margin: 0; }
 .lx-plot-cap:empty { display: none; }
 .lx-plot { position: relative; min-width: 0; }
@@ -1825,8 +1825,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 
 /* benchrun.css — LX.BenchRun (benchrun.js): the Run and Try again buttons, the status line (its left rule coloured by
    the run's kind: done, a refused or failed run, a stop) and the "results are for an earlier plan" line above the
-   results, whose charts dim while they are stale or a run is on. Only graphics dim (svg, canvas): text keeps its 4.5:1
-   contrast (W3 layout audit), and the stale line says in words why the charts are faded. Colours from --lx-* tokens
+   results, whose charts dim while they are stale or a run is on. Only graphics dim (an SVG's shapes, canvas); text,
+   chart labels included, keeps its 4.5:1 contrast (W3 layout audit), and the stale line says in words why the charts
+   are faded. Colours from --lx-* tokens
    only; the words carry the meaning too. */
 .lx-br { display: grid; gap: 8px; min-width: 0; }
 .lx-br-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -1840,9 +1841,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .lx-br-status[data-kind="early"], .lx-br-status[data-kind="cancelled"] { border-left-color: var(--lx-warn); background: var(--lx-warn-soft); color: var(--lx-ink); }
 .lx-br-stale { margin: 0 0 8px; padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--lx-warn); font-size: 14px; color: var(--lx-ink); background: var(--lx-warn-soft); }
 .lx-br-stale[hidden] { display: none; }
-.lx-br-results[data-stale="true"] svg, .lx-br-results[data-stale="true"] canvas { opacity: .62; }
-.lx-br-results[aria-busy="true"] svg, .lx-br-results[aria-busy="true"] canvas { opacity: .5; transition: opacity .2s; }
-@media (prefers-reduced-motion: reduce) { .lx-br-results[aria-busy="true"] svg, .lx-br-results[aria-busy="true"] canvas { transition: none; } }
+.lx-br-results[data-stale="true"] svg :is(path, rect, circle, ellipse, line, polyline, polygon, image, use), .lx-br-results[data-stale="true"] canvas { opacity: .62; }
+.lx-br-results[aria-busy="true"] svg :is(path, rect, circle, ellipse, line, polyline, polygon, image, use), .lx-br-results[aria-busy="true"] canvas { opacity: .5; transition: opacity .2s; }
+@media (prefers-reduced-motion: reduce) { .lx-br-results[aria-busy="true"] svg :is(path, rect, circle, ellipse, line, polyline, polygon, image, use), .lx-br-results[aria-busy="true"] canvas { transition: none; } }
 
 /* reportnote.css — LX.ReportNote (reportnote.js): the reader's fields and the deliverable's checks beside a preview of
    the one-page note (two columns from 960 px, one below), the copy buttons, the status line and the select-and-copy box.

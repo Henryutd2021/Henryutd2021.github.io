@@ -69,6 +69,7 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 <p class="lx-datanote"><span>Prairie Campus and its loads are fictional (F7's); equipment costs, the generator's fuel use, the export credit and the owners' costs of capital are illustrative, in 2025 dollars. The sun is real: SPP's hourly solar in 2025 (EIA-930), per kW of panels as in F7. The tariff's level, the diesel price and both CO₂ factors are EIA's (sources below).</span></p>
 <style>/* lesson-local */
 .sb1-res { display: grid; gap: 14px; min-width: 0; }
+@media (max-width: 640px) { .sb1-inputs td.n { white-space: normal; } }   /* a row of four costs wraps on phones */
 .sb1-seeded { margin-top: 14px; }
 .sb1-seeded h3 { margin: 0; font-size: 16px; }
 .sb1-seeded-sum { margin: 0; font-size: 14.5px; }
@@ -151,7 +152,7 @@ The three named outages are real 2025 stretches of sun with the grid assumed dow
 ```{=html}
 <div class="lx-card">
 <p class="lx-eyebrow">Inputs the engine uses</p>
-<div class="lx-scroll-x"><table class="lx-facts">
+<div class="lx-scroll-x"><table class="lx-facts sb1-inputs">
 <thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td>Campus loads (flat, every hour)</td><td class="n">300 · 100 · 250 · 550 kW</td><td class="s">F7's Prairie Campus: hospital, water and heating plant, dorms, labs (illustrative)</td></tr>

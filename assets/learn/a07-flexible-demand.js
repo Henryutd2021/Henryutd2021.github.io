@@ -345,7 +345,7 @@
         chip("Pool", mw(v.mw)); chip("Peaker", dmwh(v.peakerMWh)); chip("Use that comes back", mwh(v.backMWh)); chip("Running cost that day", dusd(v.cost)); chip("Plants' CO₂", dt(v.co2));
         var g0 = W.h.map(function (x) { return x.cc + x.pk; }), g1 = v.h.map(function (x) { return x.cc + x.pk; });
         P.render({ x: X, y: { min: 0, max: 200, step: 50, fmt: function (v) { return String(v); }, unit: "MW" }, height: 240, heightN: 210, spans: spans(),
-          refs: [{ y: W.plants.cc.mw, label: "Combined-cycle full", labelN: "150 MW", dash: "4 3" }],
+          refs: [{ y: W.plants.cc.mw, label: "Combined-cycle full", labelN: "150 MW", dash: "4 3", labelColor: "var(--lx-ink-2)" }],   // ink-2: the label sits on the shaded area
           lines: [{ values: g0, step: 1, color: "var(--lx-ink-3)", width: 2, dash: "5 4" }, { values: g1, step: 1, color: "var(--lx-pk)", width: 2.6, area: 0.12 }],
           legend: [{ label: "Gas output without the pool", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "With the pool", color: "var(--lx-pk)" }],
           aria: "Gas output on " + W.dateLabel + " with and without the pool; above 150 MW the peaker runs.",
