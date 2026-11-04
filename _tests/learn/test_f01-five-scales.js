@@ -71,7 +71,7 @@ const words = s => s.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g
   // the equipment may (review F1 #2)
   const ans = D.apply.options.find(o => o.value === "changes").label;
   ok(/below what that plan sends out/.test(D.apply.q) && /operation must change/.test(ans) && /may change/.test(ans) && /takes a new run/.test(D.apply.feedback.changes), "apply: the limit binds; operation must change, the cheapest equipment may");
-  ok(/Modeler lesson M5 solves exactly this campus/.test(JS) && !/M5 \(upcoming\)/.test(JS) && D.lessons.S1.some(x => x.code === "M5" && x.note === "size and run a microgrid") && CORE.lessonRef(PJ, "M5").ready, "the campus question points at M5, now live");
+  ok(/Modeler lesson \[\[lesson:m05-microgrid-size-and-run\|M5\]\] solves exactly this campus/.test(JS) && !/M5 \(upcoming\)/.test(JS) && D.lessons.S1.some(x => x.code === "M5" && x.note === "size and run a microgrid") && CORE.lessonRef(PJ, "M5").ready, "the campus question links M5, now live");
 }
 
 // ---------------- model validation: the real anchors of the zoom, recomputed

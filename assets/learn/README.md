@@ -154,7 +154,7 @@ The header comment of each file in `components/` gives the full options.
 **Core** (`core.js`)
 - `LX.H(tag, attrs, parent)` and `LX.S(...)`: HTML and SVG elements.
 - `LX.icon(name)` and `LX.IC`: the icon names.
-- `LX.rich(text)`: glossary marks.
+- `LX.rich(text)`: glossary marks, `[[id|words]]`, and lesson links, `[[lesson:<id>|words]]` → `<a href="<id>.html">words</a>` (W3), so text that a component draws (a card's feedback, a reveal, a tagger note, a drill item) can link a live lesson. Use a lesson link only for a live page: `_tests/learn/test_components_w3_shared.js` checks every mark in the lesson scripts and data files against `data/path.json`; for a lesson that may still be upcoming, use `LX.lessonRefHTML` with `path.json` instead. A no-JS writer that prints such text runs it through the same function (`require("components/core.js").rich`, as `scripts/learn_n01_fallback.js` does). Node: `require("components/core.js").rich` (pure).
 - `LX.fmt.money`, `.tonnes`, `.mw`, `.mwh`, `.hh`.
 - `LX.progress.done(id)`, `.guess`, `.answer`, and `LX.store.get/set`: this browser only.
 - `LX.mount(slug, init)`, `LX.json(url)`, `LX.onTheme(fn)`, `LX.reduced()`.

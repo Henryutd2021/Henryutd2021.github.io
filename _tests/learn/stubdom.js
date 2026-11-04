@@ -7,7 +7,8 @@
 //   el.click(); el.fire("keydown", { key: "Enter" }); el.querySelectorAll(".lx-ex-mark")
 // Elements keep attributes, children in order, listeners, and the reflected properties components use (hidden, disabled,
 // open, value, checked). Selectors: tag, #id, .class, [attr], [attr="v"], :not(.class), descendant chains and comma
-// lists, matched in document order. LX holds the core helpers as core.js defines them (H, S, uid, esc, rich, store, ...);
+// lists, matched in document order. LX holds the core helpers as core.js defines them (H, S, uid, esc, rich, store, ...;
+// rich and mulberry32 are core.js's own exports);
 // LX.copyText resolves false (no clipboard), so components show their select-and-copy box.
 "use strict";
 const fs = require("fs");
@@ -94,7 +95,7 @@ function env(opt) {
   LX.S = LX.H;
   let uid = 0; LX.uid = p => (p || "lx") + "-" + (++uid);
   LX.esc = escH;
-  LX.rich = t => LX.esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, (m, id, w) => '<span class="lx-term" data-term="' + id + '">' + w + "</span>");
+  LX.rich = require(path.join(SITE, "assets/learn/components/core.js")).rich;   // core.js's own (W3: lesson links too)
   LX.icon = name => "<svg data-icon=\"" + name + "\"></svg>"; LX.emit = () => {}; LX.on = () => {}; LX.reduced = () => true; LX.onTheme = () => {};
   LX.clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   LX.mulberry32 = require(path.join(SITE, "assets/learn/components/core.js")).mulberry32;   // as core.js (W3: M7, engine E1)

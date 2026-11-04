@@ -399,7 +399,7 @@
           out.textContent = rowsT.length ? rowsT.map(function (t) { return t[0] + ": " + t[2]; }).join(" · ") : "Draw some samples.";
           if (user && Object.keys(got).length >= 3) {
             keep("samples", SIZES.map(function (k) { return [Math.min.apply(null, got[k]), Math.max.apply(null, got[k])]; }));
-            api.done(); api.saw("Bigger samples scatter less: the typical scatter shrinks with the square root of the sample size. Running a model on many random draws is a [[monte-carlo|Monte Carlo]] study, as Modeler lesson M7 runs.");
+            api.done(); api.saw("Bigger samples scatter less: the typical scatter shrinks with the square root of the sample size. Running a model on many random draws is a [[monte-carlo|Monte Carlo]] study, as Modeler lesson [[lesson:m07-monte-carlo|M7]] runs.");
           } else if (user) api.saw("Sample sizes drawn: " + Object.keys(got).length + " of 3.", true);
         }
         drawIt(false);

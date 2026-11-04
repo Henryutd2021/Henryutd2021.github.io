@@ -2,7 +2,10 @@
    Helpers:  LX.H(tag, attrs, parent)   HTML element; attrs: text, html, class, on<event>, any attribute
              LX.S(tag, attrs, parent)   SVG element
              LX.icon(name, cls)         24-unit stroke pictogram as an SVG string (names in LX.IC)
-             LX.rich(text)              text with [[glossary-id|shown words]] marks -> HTML with tap-to-define terms
+             LX.rich(text)              text with [[glossary-id|shown words]] marks -> HTML with tap-to-define terms, and
+                                        [[lesson:<id>|shown words]] -> a link to learn/<id>.html (W3: text a component
+                                        draws can link a live lesson; _tests/learn/test_components_w3_shared.js checks
+                                        that every such mark names a live page)
              LX.fmt.money/tonnes/mw/mwh/hh/int, LX.clamp, LX.lerp, LX.reduced() (prefers-reduced-motion)
    State:    LX.progress.done/isDone/guess/answer, LX.store.get/set   (this browser only; try/catch wrapped)
    Runtime:  LX.mount(slug, init)  load a lesson interactive's data-src JSON files, then init(liveRoot, data)
@@ -18,7 +21,7 @@
                                    the same seed gives the same numbers on every page, in Node and in the notebooks' Python
                                    ports (promoted at the W3 integration from M7 and engine E1, which each had a copy)
    Also: the back-to-top guard (hides the site's button while it would cover lesson controls or any text) and course ticks.
-   Node: module.exports = { lessonRef, lessonRefHTML, mulberry32 } (pure; the rest needs a browser). */
+   Node: module.exports = { lessonRef, lessonRefHTML, mulberry32, rich } (pure; the rest needs a browser). */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
@@ -33,6 +36,13 @@
     var r = lessonRef(P, code);
     return r.ready ? '<a href="' + escHTML(r.href) + '">' + escHTML(r.label) + "</a>" : escHTML(r.label) + " (upcoming)";
   }
+  // text with marks -> safe HTML: [[lesson:<id>|words]] a link to the lesson page (relative to learn/, where every Learn
+  // page lives), [[<glossary-id>|words]] a term span that glossary.js upgrades into a tap-to-define button
+  function rich(text) {
+    return escHTML(text)
+      .replace(/\[\[lesson:([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, words) { return '<a href="' + id + '.html">' + words + "</a>"; })
+      .replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, words) { return '<span class="lx-term" data-term="' + id + '">' + words + "</span>"; });
+  }
   function mulberry32(seed) {
     var a = seed >>> 0;
     return function () {
@@ -43,7 +53,7 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { lessonRef: lessonRef, lessonRefHTML: lessonRefHTML, mulberry32: mulberry32 };
+  if (typeof module !== "undefined" && module.exports) module.exports = { lessonRef: lessonRef, lessonRefHTML: lessonRefHTML, mulberry32: mulberry32, rich: rich };
   if (typeof window === "undefined") return;
 
   var LX = window.LX = window.LX || {};
@@ -152,12 +162,9 @@
   };
   LX.STAR = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="' + "M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1-5.4-3-5.4 3 1.1-6.1-4.5-4.2 6.1-.8z" + '"/></svg>';
 
-  // text with [[id|words]] glossary marks -> safe HTML; glossary.js upgrades the spans into tap-to-define buttons
-  LX.rich = function (text) {
-    return LX.esc(text).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, words) {
-      return '<span class="lx-term" data-term="' + id + '">' + words + "</span>";
-    });
-  };
+  // text with [[id|words]] glossary marks and [[lesson:<id>|words]] lesson links -> safe HTML (rich, above); glossary.js
+  // upgrades the term spans into tap-to-define buttons
+  LX.rich = rich;
 
   // ---------------------------------------------------------------- browser storage (never required)
   var KEY = "learn.v1";
