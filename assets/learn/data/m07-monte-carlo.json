@@ -17,7 +17,7 @@
    "lo": 30000,
    "hi": 60000,
    "base": 45000,
-   "why": "revenue minus operating costs, which the developer loses each month it waits"
+   "why": "[[margin|Margin]] = revenue minus operating costs, lost for every month of waiting."
   },
   {
    "key": "capital",
@@ -27,7 +27,7 @@
    "lo": 400000000,
    "hi": 600000000,
    "base": 500000000,
-   "why": "buildings and equipment that sit idle, carried at the discount rate"
+   "why": "Buildings and equipment that sit idle; their [[carrying-cost|carrying cost]] is what the tied-up money would earn at the discount rate."
   },
   {
    "key": "rate",
@@ -37,7 +37,7 @@
    "lo": 0.06,
    "hi": 0.1,
    "base": 0.08,
-   "why": "the yearly rate that sets both the carrying cost and the present value"
+   "why": "The yearly rate that turns future money into [[present-value|present value]]; it also sets the carrying cost."
   },
   {
    "key": "upgrade",
@@ -47,17 +47,17 @@
    "lo": 40000000,
    "hi": 80000000,
    "base": 60000000,
-   "why": "paid by other customers while the load waits, and stranded if it never arrives"
+   "why": "Paid by other customers while the load waits; [[stranded-cost|stranded]] (left without the expected customer) if it never arrives."
   },
   {
    "key": "strand",
    "label": "Chance it never arrives",
    "short": "Never arrives",
-   "unit": "more each month of waiting",
+   "unit": "percentage points a month",
    "lo": 0.0025,
    "hi": 0.0075,
    "base": 0.005,
-   "why": "added for each month of waiting, at most 50%; then the upgrades are stranded"
+   "why": "Added each month of waiting, not compounded: 24 months × 0.5 points = 12%, at most 50%."
   }
  ],
  "waits": [
@@ -69,6 +69,7 @@
  "runs": 1000,
  "seed": 7,
  "preview": 10,
+ "near": 0.1,
  "repeats": {
   "first": 1,
   "last": 20,
@@ -232,6 +233,11 @@
     "upgrade": 0.00621870621871,
     "strand": 0.011901995902
    }
+  },
+  "near": {
+   "share": 0.1,
+   "lo": 0,
+   "hi": 2
   }
  }
 }
