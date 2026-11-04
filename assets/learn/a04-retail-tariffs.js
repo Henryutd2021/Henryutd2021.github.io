@@ -424,8 +424,10 @@
                                        { x0: pkh[0], x1: pkh[pkh.length - 1] + 1, color: "var(--lx-pk)", op: 0.13, label: "$100" }];
       var bars = [], tou = mode !== "look" && tk === "tou";
       if (tou) bars.push({ x0: T.home.tou.from, x1: T.home.tou.to, y0: y.min, y1: y.min + (y.max - y.min) * 0.06, color: "var(--lx-accent)", op: 0.8, rx: 3 });
-      // the scarcity week: a band along the top of its hours (on 5 of the 30 days those hours cost $2,000/MWh)
-      if (sc) bars.push({ x0: SC.hours[0], x1: SC.hours[SC.hours.length - 1] + 1, y0: y.max - (y.max - y.min) * 0.06, y1: y.max, color: "var(--lx-warn)", op: 0.85, rx: 3 });
+      // the scarcity week: a band along the bottom of its hours, above the time-of-use bar when that shows (the top holds
+      // the price labels); on 5 of the 30 days those hours cost $2,000/MWh
+      var lo = tou ? 0.08 : 0;
+      if (sc) bars.push({ x0: SC.hours[0], x1: SC.hours[SC.hours.length - 1] + 1, y0: y.min + (y.max - y.min) * lo, y1: y.min + (y.max - y.min) * (lo + 0.06), color: "var(--lx-warn)", op: 0.85, rx: 3 });
       var scarceAt = function (t) { return SC.hours.indexOf(t) >= 0 ? SC.price : Math.round(W.price[t] * 1000); };
       P.render({
         x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h"]] },
@@ -645,6 +647,8 @@
       if (state === "mid") { cards.go(4); var b = live.querySelectorAll(".lx-step-act .lx-seg button")[1]; if (b) b.click(); return { view: "EV at 01:00 under time-of-use" }; }
       if (state === "scarce") { cards.go(6); var t = live.querySelector(".lx-step-act .lx-toggle"); if (t && t.getAttribute("aria-pressed") !== "true") t.click(); return { view: "scarcity week" }; }
       if (state === "large") { cards.go(8); return { view: "large load" }; }
+      if (state === "revisit") { S.ev = "night"; S.scarce = true; cards.go(2); var c = live.querySelectorAll(".lx-step-act .lx-choice")[1]; if (c) c.click();
+        return { view: "step 3 revisited after the car's move and a scarcity week: the start is shown" }; }
       if (state === "pop") { cards.go(8); setTimeout(function () { var t = live.querySelector('.lx-step-text .lx-term[data-term="minimum-billing-demand"]'); if (!t) return;
         t.scrollIntoView({ block: "center" }); setTimeout(function () { t.click(); }, 300); }, 600); return { view: "a glossary popover" }; }
       return null;

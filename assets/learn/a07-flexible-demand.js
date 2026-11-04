@@ -245,7 +245,7 @@
   function settingsNote(o) {
     var a = [];
     if (o.loss) a.push("10% extra energy for each MWh moved");
-    if (o.user) a.push("users' cost $" + o.user + " a MWh (cheapest goal only)");
+    if (o.user) a.push("users' cost $" + o.user + " a MWh (only the cheapest goal weighs it)");
     return a.length ? "Kept from step 4: " + a.join("; ") + "." : "";
   }
   function costsLine(W, D, o) {
@@ -450,7 +450,7 @@
           part = "hook"; hookShown = false; showStage(true); paint();
           var pr = LX.Predict(act, { id: "a7-hook", q: "", title: false, fresh: true, answer: "none",
             options: [{ value: "ten", label: D.hook.q + " MWh" }, { value: "none", label: "None" }, { value: "some", label: "Some: the peaker's losses" }],
-            feedback: { none: "None.", ten: "Not saved: moved.", some: "No: the same MWh are still used." },
+            feedback: { none: "Moved, not saved.", ten: "Not saved: moved.", some: "No: the same MWh are still used." },
             onPick: function () { hookShown = true; paint(); pr.reveal(hookReveal(W, D)); api.done(); } });
         } },
       { text: "Now let part of every hour's use move within the day, up to a [[flexibility|flexible]] share of that hour's demand. The town moves use from its dearest hours to its cheapest. Raise the share.",
@@ -551,8 +551,8 @@
       var r = trade(A4, W, wires, S.pl, S.pay);
       LX.Ledger(host, { cls: "a7-led", caption: Math.round(r.kwh) + " kWh a month traded at " + cents(S.pl) + (S.pay ? ", plant-and-wire charge paid" : ", plant-and-wire charge skipped") + "; change against no trade.",
         columns: ["Party", "A month"],
-        rows: [["The solar home (seller)", r.seller], ["The renter (buyer)", r.buyer], ["Other customers (plants and wires)", r.others], ["The plants: energy and CO₂", r.plants]].map(function (x) {
-          return { head: x[0], cells: [x[0].indexOf("plants") >= 0 ? "no change" : dusd(x[1])] };
+        rows: [["The solar home (seller)", r.seller], ["The renter (buyer)", r.buyer], ["Other customers (plants and wires)", r.others], ["The plants: energy and CO₂", r.plants, true]].map(function (x) {
+          return { head: x[0], cells: [x[2] ? "no change" : dusd(x[1])] };   // x[2]: the plants' row, which never changes
         }) });
     }
 
@@ -585,7 +585,7 @@
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this toy holds",
         holds: ["one real-shaped day, repeated: the small hours stand for the next night;", "the plants run cheapest first, with no ramp limits;", "every device answers as forecast, and the counts and values are illustrative."],
         leaves: ["forecast errors and owners who opt out at the last minute;", "how a baseline is estimated, and its errors;", "the other feeders, and the wires' own losses."],
-        source: "Prairie Town is fictional; its day follows real Southwest Power Pool shapes (EIA-930)." });
+        source: "Prairie Town is fictional; its day follows real Southwest Power Pool hourly patterns (EIA-930)." });
     }
 
     paint();
@@ -593,6 +593,8 @@
       if (state === "mid") { cards.go(1); S.share = D.shift.try / 100; paint(); return { view: "5% shift" }; }
       if (state === "pool") { D.vpp.devices.forEach(function (x) { S.kinds[x.key] = true; }); cards.go(4); paint(); return { view: "all four kinds" }; }
       if (state === "feeder") { cards.go(6); return { view: "feeder" }; }
+      if (state === "hook") { cards.go(0); var c = live.querySelectorAll(".lx-step-act .lx-choice")[1]; if (c) c.click(); return { view: "step 1 answered: the hook's move drawn" }; }
+      if (state === "kept") { S.share = D.shift.try / 100; S.loss = true; S.user = 12; S.goal = "attr"; cards.go(2); return { view: "step 3 with the settings kept from step 4" }; }
       if (state === "trade") { cards.go(7); return { view: "trade" }; }
       if (state === "pop") { cards.go(4); setTimeout(function () { var t = live.querySelector('.lx-step-text .lx-term[data-term="aggregator"]'); if (!t) return;
         t.scrollIntoView({ block: "center" }); setTimeout(function () { t.click(); }, 300); }, 600); return { view: "a glossary popover" }; }

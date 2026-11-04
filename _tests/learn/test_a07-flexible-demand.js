@@ -231,6 +231,11 @@ const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "' on the p
     ok(cell.indexOf(fc.url) >= 0 && cell.indexOf(fc.asof) >= 0 && cell.indexOf(fc.source) >= 0, "numbers to remember: '" + fc.n + "' carries its source and date");
   });
 
+  // the trade ledger: only the plants' row reads "no change"; other customers' row shows what they pay (a renamed row once
+  // matched a test on the word "plants" and lost its number)
+  ok(/\["Other customers \(plants and wires\)", r\.others\], \["The plants: energy and CO₂", r\.plants, true\]\]/.test(JS) && /cells: \[x\[2\] \? "no change" : dusd\(x\[1\]\)\]/.test(JS) && !/indexOf\("plants"\)/.test(JS),
+    "trade ledger: other customers show their −$16; only the plants' row says no change");
+
   // ---------------- wording the W3 review corrected
   { const code = JS.replace(/\/\/[^\n]*/g, " "), txt = T_PAGE + " " + RAW + " " + code;
     ok(!/10% loss|with losses|Losses:|"Losses\."/i.test(txt), "\"10% extra energy\" (1.1 MWh in per MWh moved), never \"10% losses\"");
