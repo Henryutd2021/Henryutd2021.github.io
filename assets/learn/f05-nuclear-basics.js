@@ -9,14 +9,19 @@
 // Closed-form model (pure, exported for Node):
 //   kOf(T, rods, mod)   the toy's multiplication factor: kFull(mod) x (1 - rodAbsorb x rods/100), where kFull rises in a
 //                       straight line from kMin (no moderator) to kMax (all of it). Illustrative, not reactor data.
-//   stateOf(k, band)    "dying" (k < 1 - band), "steady" (within the band: critical) or "growing"
+//   stateOf(k, band)    "dying" (k < 1 - band), "steady" (k = 1, within a floating-point band: critical) or "growing"
 //   series(k, n0, G)    neutrons in each generation, N(g+1) = k x N(g)
-//   steadyGrid(T)       every slider setting the toy calls steady
-//   plant(F, mw)        heat, efficiency and low-temperature heat of a plant sending out mw at EIA's 2025 heat rate
+//   steadyGrid(T)       every slider setting the toy calls steady (only k = 1 exactly: rods 40%, moderator 100%)
+//   step3Start(T, S)    the state step 3 always starts from: the rods as the reader left them, the moderator refilled
+//   plant(F, mw)        heat, efficiency, and rejected heat plus other losses of a plant sending out mw, at the efficiency
+//                       implied by EIA's 2025 weighted average tested heat rate for nuclear units
 //   atm(mpa, F)         a pressure as a multiple of sea-level air pressure, rounded to the nearest ten
-//   reaches(d, u)       true when a design's top outlet temperature reaches a heat use's lower bound (or the use is
-//                       open to every design: electricity)
-//   reached(D, key)     the heat uses a design reaches, in data order
+//   overlap(d, u)       how a design's outlet range sits against a heat use's band, temperatures only: "all" (electricity,
+//                       every design), "qual" (a use with no band drawn), "na" (outlet depends on the design), "below"
+//                       (top outlet at or below the band's bottom: heat flows only from hotter to cooler), "part" (the
+//                       hottest designs run above part of the band) or "whole" (the hottest run above all of it).
+//                       Overlap is not capability: the chosen design and its heat exchangers decide.
+//   reached(D, key)     the heat uses whose band a design's outlet overlaps (or electricity), in data order
 // Lesson-local components (candidates for promotion if later lessons want them): FissionScene (tap to fire one
 // neutron), ChainToy (rods and moderator sliders, a core picture and neutrons per generation, with a text version),
 // PlantDiagram (PWR or BWR, tappable parts with numbered markers and chips, an aria-live note), HeatLadder (designs on
@@ -31,6 +36,9 @@
     return kFull * (1 - T.rodAbsorb * rods / 100);
   }
   function stateOf(k, band) { return k < 1 - band ? "dying" : k > 1 + band ? "growing" : "steady"; }
+  // step 3 always starts with the moderator full, so its promise (rods out: k = kMax) and its goal (k = 1) hold even
+  // after the reader drained the water in step 4 and came back
+  function step3Start(T, S) { return { rods: S.rods, mod: T.moderator.max, refilled: S.mod !== T.moderator.max }; }
   function series(k, n0, G) { var a = [n0]; for (var g = 1; g <= G; g++) a.push(a[g - 1] * k); return a; }
   function grid(c) { var a = []; for (var v = c.min; v <= c.max + 1e-9; v += c.step) a.push(Math.round(v)); return a; }
   function steadyGrid(T) {
@@ -43,9 +51,23 @@
     return { mw: mw, eff: btu / hr, heat: heat, waste: heat - mw };
   }
   function atm(mpa, F) { return Math.round(mpa / F.atm_mpa.value / 10) * 10; }
-  function reaches(d, u) { return !!u.all || (d.hi != null && u.lo != null && d.hi >= u.lo); }
-  function reached(D, key) { var d = D.designs.filter(function (x) { return x.key === key; })[0]; return D.uses.filter(function (u) { return reaches(d, u); }); }
+  function overlap(d, u) {
+    if (u.all) return "all";
+    if (u.lo == null) return "qual";
+    if (d.hi == null) return "na";
+    if (d.hi <= u.lo) return "below";
+    return d.hi > u.hi ? "whole" : "part";
+  }
+  function reached(D, key) { var d = D.designs.filter(function (x) { return x.key === key; })[0]; return D.uses.filter(function (u) { var o = overlap(d, u); return o === "all" || o === "part" || o === "whole"; }); }
+  // what the heat ladder says for each use, by overlap (step 8)
+  var OVER = { all: "every design here.", qual: "no band drawn; water-cooled plants supply it in some places.", na: "depends on the design.",
+               below: "outlet below this band.", part: "outlet overlaps part of this band.", whole: "the hottest designs run above all of this band." };
   var STATE = { dying: "Dying out", steady: "Steady: critical", growing: "Growing" };
+  // what step 9 says once the reader predicts: the chain stops, decay heat goes on (storage and passive cooling are their
+  // own myth cards in the practice)
+  var DECAY = { no: "The [[fission|fission]] products keep decaying and give off [[decay-heat|decay heat]], so cooling must go on.",
+                yes: "The fission products keep decaying and give off decay heat, so cooling must go on.",
+                reveal: "Fission stops but decay does not; the myth cards below cover used fuel and passive cooling." };
   // what a step says after the toy's goal is met, or missed (steps 3 and 4)
   var SAW = {
     critical: "**Critical**: the rods absorb just enough neutrons. Critical is a reactor's normal, steady state, not an alarm.",
@@ -53,7 +75,7 @@
     drained: "Without slowing, few neutrons split uranium-235 in this fuel. In water-cooled plants the water is the moderator, so less water means less slowing.",
     notDrained: "Drain more of the moderator and watch k fall below 1."
   };
-  function fmtK(k) { return k.toFixed(2); }
+  function fmtK(k) { return Math.abs(k - 1) < 0.005 && Math.abs(k - 1) > 1e-9 ? k.toFixed(3) : k.toFixed(2); }
   function fmtN(v) { return Math.round(v).toLocaleString("en-US"); }
   function pct1(x) { return (x * 100).toFixed(1) + "%"; }
   function count(v) { return v < 1 ? "under one" : fmtN(v); }
@@ -64,8 +86,8 @@
     if (s === "steady") return head + "**steady**, each generation as large as the last.";
     return head + "**" + (s === "growing" ? "growing" : "dying out") + "**, from " + fmtN(T.n0) + " neutrons to " + count(last) + " in " + T.generations + " generations.";
   }
-  var model = { kOf: kOf, stateOf: stateOf, series: series, steadyGrid: steadyGrid, plant: plant, atm: atm, reaches: reaches, reached: reached,
-                fmtK: fmtK, fmtN: fmtN, pct1: pct1, count: count, toyText: toyText, STATE: STATE, SAW: SAW, grid: grid };
+  var model = { kOf: kOf, stateOf: stateOf, series: series, steadyGrid: steadyGrid, step3Start: step3Start, plant: plant, atm: atm, overlap: overlap, reached: reached,
+                OVER: OVER, DECAY: DECAY, fmtK: fmtK, fmtN: fmtN, pct1: pct1, count: count, toyText: toyText, STATE: STATE, SAW: SAW, grid: grid };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -108,7 +130,7 @@
       glow.setAttribute("r", 10 + 30 * b); glow.setAttribute("opacity", b > 0 ? 0.5 * (1 - 0.3 * b) : 0);
       lab.setAttribute("opacity", b >= 1 ? 1 : 0);
     }
-    var raf = null, fired = false;
+    var raf = null, fired = false, focusReset = false;
     function go() {
       if (raf) cancelAnimationFrame(raf);
       if (LX.reduced()) { draw(1); finish(); return; }
@@ -116,8 +138,12 @@
       function step(ts) { if (t0 == null) t0 = ts; var t = Math.min(1, (ts - t0) / 1100); draw(t); if (t < 1) raf = requestAnimationFrame(step); else { raf = null; finish(); } }
       raf = requestAnimationFrame(step);
     }
-    function finish() { fire.hidden = true; again.hidden = false; if (!fired) { fired = true; if (o.onFire) o.onFire(); } else if (o.onFire) o.onFire(true); }
-    fire.addEventListener("click", function () { go(); again.focus({ preventScroll: true }); });
+    function finish() {
+      fire.hidden = true; again.hidden = false;
+      if (focusReset) { focusReset = false; again.focus({ preventScroll: true }); }   // Fire is hidden now: keep the reader's place
+      if (!fired) { fired = true; if (o.onFire) o.onFire(); } else if (o.onFire) o.onFire(true);
+    }
+    fire.addEventListener("click", function () { focusReset = true; go(); });
     again.addEventListener("click", function () { draw(0); fire.hidden = false; again.hidden = true; fire.focus({ preventScroll: true }); });
     s.addEventListener("click", function () { if (!fire.hidden) go(); });
     draw(o.done ? 1 : 0); if (o.done) { fire.hidden = true; again.hidden = false; fired = true; }
@@ -197,13 +223,13 @@
       containment: "**Containment**: a strong structure, often a large concrete dome, built to hold in radioactive material in an accident.",
       core: "**Core**: " + F.assemblies_per_core.text + " [[fuel-assembly|fuel assemblies]], each of " + F.rods_per_assembly.text + " rods about 1 cm wide, filled with uranium pellets. [[fission|Fission]] heats the water around them.",
       rods: "**Control rods**: pushed into the core to slow the chain reaction, pulled out to speed it up.",
-      vessel: pwr ? "**Vessel**: water at about " + F.pwr_mpa.value + " MPa, about " + atm(F.pwr_mpa.value, F) + " times the air pressure at sea level, so it stays liquid at about " + F.pwr_c.value + " °C."
-                  : "**Vessel**: water at about " + F.bwr_mpa.value + " MPa, about " + atm(F.bwr_mpa.value, F) + " times the air pressure at sea level. It boils right here, at about " + F.bwr_c.value + " °C.",
+      vessel: pwr ? "**Vessel**: water at about " + F.pwr_mpa.value + " MPa ([[megapascal|megapascals]]), about " + atm(F.pwr_mpa.value, F) + " times the air pressure at sea level, so it stays liquid at about " + F.pwr_c.value + " °C."
+                  : "**Vessel**: water at about " + F.bwr_mpa.value + " MPa ([[megapascal|megapascals]]), about " + atm(F.bwr_mpa.value, F) + " times the air pressure at sea level. It boils right here, at about " + F.bwr_c.value + " °C.",
       sg: pwr ? "**[[steam-generator|Steam generator]]**: the core's water flows through its tubes and boils a separate, clean loop into steam. The core's water stays in its own loop."
               : "**No steam generator** in this design: the vessel's own steam goes straight to the turbine.",
       turbine: pwr ? "**Turbine**: steam from the second loop spins it." : "**Turbine**: steam straight from the vessel spins it.",
       generator: "**Generator**: the turbine turns it, and it makes electricity: " + W.mw + " MW from Prairie Town's plant.",
-      condenser: "**Condenser**: cold water turns the used steam back into water, which goes back to be heated again. Most of the plant's heat leaves here: " + fmtN(W.waste) + " MW of it.",
+      condenser: "**Condenser**: cold water turns the used steam back into water, which goes back to be heated again. Most of the " + fmtN(W.waste) + " MW of rejected heat and losses leaves here.",
       tower: "**Cooling tower**: sheds the condenser's heat into the air. Not every plant has one: some cool with water from a lake, river or ocean."
     };
     return n[p];
@@ -303,7 +329,7 @@
     H("p", { class: "f5-lad-h", text: "Heat a use needs" }, plot);
     D.uses.filter(function (u) { return u.hi != null; }).forEach(function (u) {
       var r = H("div", { class: "f5-lad-row use" }, plot);
-      H("span", { class: "nm", text: u.name }, r);
+      H("span", { class: "nm", html: LX.rich(u.mark || u.name) }, r);
       var tr = H("span", { class: "tr" }, r); H("i", { style: span(u.lo, u.hi) }, tr);
       H("span", { class: "lx-sr", text: ": " + u.lo + " to " + u.hi + " °C" }, r);
     });
@@ -320,7 +346,7 @@
       rb[d.key] = b;
     });
     var out = H("div", { class: "f5-lad-out", "aria-live": "polite" }, w);
-    H("p", { class: "lx-hint", text: "Only the bands DOE gives are drawn; many industrial uses need heat in between. Water-cooled plants already supply district heat and desalination in some places." }, w);
+    H("p", { class: "lx-hint", html: LX.rich("Overlap is not capability: heat flows only from hotter to cooler, through [[heat-exchanger|heat exchangers]], so a plant must run hotter than its process. The design decides.") }, w);
     function pick(key, user) {
       var d = D.designs.filter(function (x) { return x.key === key; })[0]; o.state.design = key;
       Object.keys(rb).forEach(function (k) { rb[k].setAttribute("aria-pressed", k === key ? "true" : "false"); });
@@ -329,9 +355,9 @@
       H("p", { html: "<b>" + LX.esc(d.name) + "</b> · " + LX.esc(d.size) + " · coolant: " + LX.esc(d.coolant) + " · outlet " + LX.esc(d.outlet) + "." }, out);
       var ul = H("ul", { class: "f5-lad-uses" }, out);
       D.uses.forEach(function (u) {
-        var ok = r.indexOf(u) >= 0, na = !ok && d.hi == null;
-        H("li", { class: ok ? "ok" : na ? "na" : "no", html: LX.icon(ok ? "check" : na ? "question" : "cross") + "<span><b>" + LX.esc(u.name) + "</b>" +
-          (u.hi != null ? " (" + u.lo + " to " + u.hi + " °C)" : "") + ": " + (ok ? "within reach." : na ? "depends on the design's coolant." : "out of reach at this outlet temperature.") + "</span>" }, ul);
+        var v = overlap(d, u), cls = v === "below" ? "no" : v === "na" || v === "qual" ? "na" : "ok";
+        H("li", { class: cls, html: LX.icon(cls === "ok" ? "check" : cls === "na" ? "question" : "cross") + "<span><b>" + LX.rich(u.mark || u.name) + "</b>" +
+          (u.hi != null ? " (" + u.lo + " to " + u.hi + " °C)" : "") + ": " + OVER[v] + "</span>" }, ul);
       });
       if (o.onPick) o.onPick(key, r, user);
     }
@@ -378,8 +404,10 @@
             onPick: function (v) { log.pred = v; keep(); p.reveal("A reactor keeps it steady instead: on average, each split leads to exactly one more."); api.done(); } });
           if (log.pred) api.done();
         } },
-      { text: "With the rods out, each split here leads to " + fmtK(kOf(T, 0, 100)) + " more. Push the [[control-rod|control rods]] in until the bars stay level: steady, or [[criticality|critical]].",
+      { text: "With the rods out and the [[moderator|moderator]] (water) full, each split leads to " + fmtK(kOf(T, 0, T.moderator.max)) + " more. Push the [[control-rod|control rods]] in until the bars stay level: steady, or [[criticality|critical]].",
         build: function (act, api) {
+          var st3 = step3Start(T, S); S.mod = st3.mod; log.mod = S.mod; keep();
+          if (st3.refilled) H("p", { class: "lx-hint", text: "The moderator is back at 100% for this step." }, act);
           ChainToy(act, { toy: T, state: S, onChange: function (k, s, user) {
             log.rods = S.rods; log.mod = S.mod; keep();
             if (s === "steady") { seen.steady = log.steady = true; keep(); api.done(); }
@@ -429,26 +457,26 @@
             onLock: function (g, out) {
               seen.guess = log.guess = g; keep(); api.done();
               energyBars(out, W);
-              api.saw("About **" + fmtN(W.heat) + " MW** of heat for " + W.mw + " MW of electricity: the U.S. fleet's 2025 [[heat-rate|heat rate]] means " + pct1(W.eff) + " [[efficiency|efficiency]]. The other " + fmtN(W.waste) + " MW leaves through the condenser.", g !== ans);
+              api.saw("About **" + fmtN(W.heat) + " MW** of heat for " + W.mw + " MW of electricity, at the " + pct1(W.eff) + " [[efficiency|efficiency]] implied by EIA's 2025 tested [[heat-rate|heat rate]]. The other " + fmtN(W.waste) + " MW is rejected heat and losses, mostly through the condenser.", g !== ans);
             } });
           if (seen.guess != null) { api.done(); energyBars(act, W); }
         } },
-      { text: "Designs differ in size, [[coolant|coolant]] and [[outlet-temperature|outlet temperature]]. Pick a design: which heat uses can its temperature reach?",
+      { text: "Designs differ in size, [[coolant|coolant]] and [[outlet-temperature|outlet temperature]]. Pick two designs: which heat-use bands does each outlet temperature overlap?",
         build: function (act, api) {
           HeatLadder(act, { D: D, state: S, onPick: function (key, r, user) {
             log.design = key; if (seen.designs.indexOf(key) < 0) seen.designs.push(key); log.designs = seen.designs; keep();
             if (seen.designs.length >= 2) api.done();
-            if (user) api.saw(seen.designs.length < 2 ? "Now pick a second design and compare." : "Hotter coolant reaches more uses: only the designs at **" + F.htr_lo_c.value + " to " + F.htr_hi_c.value + " °C** reach the " + F.proc_lo_c.value + " to " + F.proc_hi_c.value + " °C industrial band.");
+            if (user) api.saw(seen.designs.length < 2 ? "Now pick a second design and compare." : "Hotter outlets overlap more uses: only the designs at **" + F.htr_lo_c.value + " to " + F.htr_hi_c.value + " °C** overlap the " + F.proc_lo_c.value + " to " + F.proc_hi_c.value + " °C industrial band. Overlap is a start; the design and its heat exchangers decide.");
           } });
           if (seen.designs.length >= 2) api.done();
         } },
       { text: "The control rods drop in and the chain reaction stops. Predict: does the fuel stop making heat?",
         build: function (act, api) {
           var p = LX.Predict(act, { id: "f5-decay", answer: "no", fresh: true, options: [{ value: "yes", label: "Yes, at once" }, { value: "no", label: "No, it keeps making some heat" }],
-            feedback: { no: "The [[fission|fission]] products keep decaying and give off [[decay-heat|decay heat]], so cooling must go on.", yes: "The fission products keep decaying and give off decay heat, so cooling must go on." },
+            feedback: { no: DECAY.no, yes: DECAY.yes },
             onPick: function (v) {
               log.decay = v; keep();
-              p.reveal("Spent fuel first sits in pools of water that cool it. Some newer designs remove this heat by [[passive-safety|passive]] means, such as natural circulation, with no pumps.");
+              p.reveal(DECAY.reveal);
               api.done(); LX.progress.done(LESSON); buildExplain(D, W, S, data);
             } });
           if (log.decay) api.done();
@@ -457,7 +485,7 @@
     function energyBars(host, W) {
       var old = host.querySelector(".f5-ebars"); if (old) old.parentNode.removeChild(old);
       var b = H("div", { class: "f5-ebars" }, host);
-      [["Heat from the core", W.heat, "var(--lx-nuc)"], ["Electricity to the grid", W.mw, "var(--lx-accent)"], ["Heat that leaves through the condenser", W.waste, "var(--lx-wind)"]].forEach(function (r) {
+      [["Heat from the core", W.heat, "var(--lx-nuc)"], ["Electricity to the grid", W.mw, "var(--lx-accent)"], ["Rejected heat and losses, mostly at the condenser", W.waste, "var(--lx-wind)"]].forEach(function (r) {
         var row = H("div", { class: "f5-ebar" }, b);
         H("span", { class: "l", text: r[0] }, row);
         var tr = H("span", { class: "t" }, row); H("i", { style: "width:" + (100 * r[1] / W.heat).toFixed(1) + "%;background:" + r[2] }, tr);
@@ -499,22 +527,22 @@
     // 1 the annotated plant (e-annotated), on the reader's last design
     var c1 = H("div", { class: "lx-xcard" }, host), h1 = H("header", { class: "lx-x-head" }, c1);
     H("h3", { text: "The plant from fuel to the grid" }, h1); H("span", { class: "lx-hint", text: "Tap a part or a number" }, h1);
-    H("p", { class: "lx-lede", html: LX.rich("Two loops of water in a pressurized-water plant, one in a boiling-water plant. Prairie Town's " + W.mw + " MW plant is illustrative.") }, c1);
+    H("p", { class: "lx-lede", html: LX.rich("From reactor to turbine: two separate water loops in a pressurized-water plant, one in a boiling-water plant. Both also have a separate condenser-cooling loop.") }, c1);
     PlantDiagram(c1, { D: D, W: W, state: { type: S.type, part: S.part } });
     // 2 the energy chain, with the reader's design
     var c2 = H("div", { class: "lx-xcard" }, host), pwr = S.type !== "bwr";
-    LX.EnergyChain(c2, { title: "Where the core's heat goes", aside: "Prairie Town's plant at the U.S. 2025 average",
+    LX.EnergyChain(c2, { title: "Where the core's heat goes", aside: "Prairie Town's plant (illustrative), at EIA's 2025 tested heat rate",
       lede: "A reactor is a heat source: about a third of its heat becomes electricity.",
       stops: [
         { icon: "atom", title: "Fission in the fuel", text: "heat in the core", value: fmtN(W.heat) + " MW of heat" },
-        { icon: "flame", title: pwr ? "Hot water, then steam" : "Steam in the vessel", text: pwr ? "about " + F.pwr_c.value + " °C at " + F.pwr_mpa.value + " MPa" : "about " + F.bwr_c.value + " °C at " + F.bwr_mpa.value + " MPa", value: pwr ? "two loops" : "one loop" },
+        { icon: "flame", title: pwr ? "Hot water, then steam" : "Steam in the vessel", text: pwr ? "about " + F.pwr_c.value + " °C at " + F.pwr_mpa.value + " MPa" : "about " + F.bwr_c.value + " °C at " + F.bwr_mpa.value + " MPa", value: pwr ? "two loops to the turbine" : "one loop to the turbine" },
         { icon: "turbine", title: "Turbine and generator", text: pct1(W.eff) + " of the heat", value: W.mw + " MW to the grid" },
-        { icon: "drop", title: "Condenser and tower", text: "low-temperature heat", value: fmtN(W.waste) + " MW" }
+        { icon: "drop", title: "Condenser and tower", text: "rejected heat and other losses", value: fmtN(W.waste) + " MW" }
       ] });
     // 3 the designs compared (e-table)
     var c3 = H("div", { class: "lx-xcard" }, host);
     LX.CompareTable(c3, { title: "Designs compared by size, outlet temperature and uses", text: true,
-      caption: "Generic designs from DOE's descriptions; MWe counts electricity, MWt heat.",
+      caption: "Generic designs and one concept, as DOE described them (2015, 2021); MWe counts electricity, MWt heat.",
       columns: [{ key: "name", label: "Design", main: true }, { key: "size", label: "Size" }, { key: "coolant", label: "Coolant" }, { key: "moderator", label: "Moderator" },
                 { key: "outlet", label: "Outlet temperature" }, { key: "uses", label: "Uses" }],
       rows: D.designs.map(function (d, i) { return { key: d.key, color: "var(--lx-tier-" + (1 + i % 5) + ")", name: d.name, size: d.size, coolant: d.coolant, moderator: d.moderator, outlet: d.outlet, uses: d.uses }; }) });
