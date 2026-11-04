@@ -455,6 +455,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "customer-class": {
+  "term": "Customer class",
+  "short": "A group of customers, such as homes or businesses, that a utility bills under the same tariffs.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "customer-hours": {
   "term": "Customer-hours",
   "short": "Customers without power times the hours they are out: 100 customers out for 3 hours is 300 customer-hours.",
@@ -1309,7 +1315,7 @@
  },
  "minimum-billing-demand": {
   "term": "Minimum billing demand",
-  "short": "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however little it uses.",
+  "short": "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however low its demand.",
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },

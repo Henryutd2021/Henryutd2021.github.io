@@ -8,8 +8,13 @@
 //   - the two no-JS blocks (fallback, practice) equal what the model writes (--write rewrites them)
 //   - research wording (curriculum §13, guard G-SRC): the real-world box quotes E7.6 of
 //     reports/learn/excerpts_for_approval.md word for word, with CF7's footer; no other sentence describes the study
+//   - state (W3 review, 2026-11-03): steps 2-4 show the start whatever the reader chose later (revisiting step 3 or 4 keeps
+//     the answer and says so); step 8's lines and steps 5-6's reveals follow the reader's state, as the ledger does
+//   - wording (W3 review): "the model's cost of serving ... falls", never "saves"; recovery from other customers is an
+//     assumption; the real-time adder is a plant-and-wire charge; the large load's share is its highest hourly demand;
+//     the meter statistic is dated December 2023
 //   - scope: data centers only as loads; no nuclear terms anywhere in the page, the data or the script; no "AI"; links on
-//     the allow-list; text budget of the step cards and the page's own prose
+//     the allow-list; text budget of the step cards, the reveals, the no-JS blocks and the page's own prose
 // Usage (from the site folder):  node _tests/learn/test_a04-retail-tariffs.js [--write]
 "use strict";
 const fs = require("fs");
@@ -64,6 +69,7 @@ ok(near(s.kwh, 381.24, 1e-6) && near(s.peak, 9.252) && M.busiest(s.net) === 20 &
 ok(f.kwh === 170400 && f.peak === 500 && M.busiest(f.net) === 13 && f.atTight === 300, "factory: 170,400 kWh, 500 kW at 13:00, 300 kW at 20:00");
 D.customers.forEach(c => { const k = E0[c.key].cost; ok(near(k.total, k.energy + k.capacity + k.wires + k.meter, 1e-9), c.key + ": cost parts add up"); });
 ok(M.usd(s.cost.capacity) === "$139" && M.usd(s.cost.energy) === "$58" && M.usd(s.cost.total) === "$262", "solar and EV home: plants $139, energy $58, total $262");
+ok(s.cost.capacity > s.cost.energy && s.cost.energy > s.cost.wires && s.cost.wires > s.cost.meter, "at the start the home's costs rank plants > energy > local wires > meter");
 ok(s.net.slice(8, 17).every(v => v < 0) && W.price.slice(8, 17).every(p => p === 0), "its midday kWh sent back fall in hours priced $0");
 ok(M.usd(f.cost.total) === "$11,984", "factory costs $11,984 a month");
 
@@ -115,18 +121,62 @@ ok(D.large.lbnlMedian === 80 && D.facts[2].what.indexOf("median minimum billing 
 // ---------------- the page's sentences (from the model) and numbers in the prose
 const S = {
   costReveal: "Plants: $139 a month, for its 9.25 kW at 20:00 while the car charges. Its energy costs $58; the kWh it sends back at midday are worth $0, because the town is already spilling sun.",
-  flatReveal: "At 14.7¢ per kWh the renter pays $92 for a cost of $71; the solar and EV home pays $66 for a cost of $262. Nine renters' $22 each cover that home's $196.",
-  tou: "Charging at 01:00 cuts the time-of-use bill by $68 a month, while serving the home costs $126 less. Under the flat price the bill would not move at all.",
-  demand: "At midnight the demand-charge bill falls $3,000 a month, but serving the factory costs only $720 less: the batch's energy now costs $480 more. Under real-time pricing the bill rises $480.",
-  scarce: "Real-time: the renter's bill jumps from $88 to $132 this month. Flat: it stays $92 while serving the renter costs $114, so the utility pays now and recovers it from everyone later."
+  flatReveal: "At 14.7¢ per kWh the renter pays $92 for a cost of $71; the solar and EV home pays $66 for a cost of $262. Nine renters, about $22 each above their cost, cover that home's $196.",
+  tou: "Charging at 01:00 cuts the time-of-use bill by $68 a month, while the model's cost of serving the home falls $126. Under the flat price the bill would not move at all.",
+  demand: "At midnight the demand-charge bill falls $3,000 a month, but the model's cost of serving the factory falls only $720: the batch's energy now costs $480 more. Under real-time pricing the bill rises $480.",
+  scarce: "Real-time: the renter's bill jumps from $88 to $132 this month. Flat: it stays $92 while serving the renter costs $114. Here we assume the utility pays the gap now and recovers it from all customers later."
 };
+ok(Math.round(9 * r.gap.flat) === 196 && Math.round(r.gap.flat) === 22 && 9 * Math.round(r.gap.flat) !== 196, "nine renters' gaps add to $196, about $22 each (9 × $22 would be $198, so the page never writes it)");
 ok(M.costReveal(D, W, E0) === S.costReveal, "step 3 reveal");
 ok(M.flatReveal(D, T, E0) === S.flatReveal, "step 4 reveal");
 ok(M.touReveal(D, W, T, "night") === S.tou, "step 5 reveal");
 ok(M.demandReveal(D, W, T, "night") === S.demand, "step 6 reveal");
 ok(M.scarcityReveal(D, W, T, true) === S.scarce, "step 7 reveal");
-ok(/\$4 above, home \$38 below\)\. After the move the home's busiest hour is 01:00, so it pays \$58 above/.test(M.pickLine(D, W, T, "demand")) && /\(\$44 more for the renter that month\)/.test(M.pickLine(D, W, T, "rtp")),
-  "step 8 lines carry the model's numbers");
+// steps 5-7 in the reader's state: with the scarcity week on, the car's move lowers the model's cost of serving the home more
+ok(M.touReveal(D, W, T, { ev: "night", scarce: true }) === "Charging at 01:00 cuts the time-of-use bill by $68 a month, while the model's cost of serving the home falls $193 (scarcity week on). Under the flat price the bill would not move at all.",
+  "step 5 reveal with the scarcity week on (revisited)");
+ok(M.demandReveal(D, W, T, { batch: "night", scarce: true }) === S.demand, "step 6 reveal is the same with the scarcity week on (the batch's hours are not scarce)");
+
+// ---------------- revisiting steps 2-4: they show the start, whatever the reader chose later (review A4 #1)
+const STATES = [];
+["evening", "night"].forEach(ev => ["day", "night"].forEach(batch => [false, true].forEach(scarce => STATES.push({ ev, batch, scarce }))));
+STATES.forEach(st => {
+  const cs = M.costStep(D, W, T, st), fs = M.flatStep(D, W, T, st), tag = JSON.stringify(st);
+  ok(cs.answer === "capacity" && cs.reveal === S.costReveal, "step 3 revisited " + tag + ": the answer stays plants, from the start");
+  ok(fs.answer === "renter" && fs.reveal === S.flatReveal, "step 4 revisited " + tag + ": the answer stays the renter, from the start");
+  ok(!!cs.note === !M.atStart(st) && (!cs.note || /^Shown as at the start: the car charges at 19:00, the batch runs at 13:00, no scarcity week\./.test(cs.note)), "step 3 revisited " + tag + ": a note says the start is shown when the state differs");
+  // the answer really is the largest part at the start, and each wrong pick's feedback is only "Not ..."
+  const c = M.evaluate(D, W, T, M.START).solarev.cost, top = D.parts.map(p => p.key).sort((a, b) => c[b] - c[a])[0];
+  ok(top === cs.answer && Object.keys(cs.feedback).every(k => k === top || /^Not (the meter|energy|local wires|plants)\.$/.test(cs.feedback[k])), "step 3 " + tag + ": the answer is the largest part; wrong picks get no ranking claim");
+});
+// in the reader's own state the ranking changes (why steps 3-4 pin the start): wires lead after the move, energy with scarcity
+{ const n = M.evaluate(D, W, T, { ev: "night" }).solarev.cost, sc = M.evaluate(D, W, T, { scarce: true }).solarev.cost;
+  ok(n.wires > n.energy && n.energy > n.capacity && sc.energy > sc.capacity, "after the move wires lead ($47 > $45 > $34); with scarcity energy leads"); }
+ok(/pin = true; stage\.hidden = false; var seen/.test(JS) && /pin = true; stage\.hidden = false; S\.cust = "solarev"/.test(JS) && /pin = true; stage\.hidden = false; S\.tariff = "flat"/.test(JS) && (JS.match(/pin = true/g) || []).length === 3,
+  "steps 2, 3 and 4 pin the start; no other step does");
+ok(/costStep\(D, W, T, S\)/.test(JS) && /flatStep\(D, W, T, S\)/.test(JS), "steps 3 and 4 take their answer from costStep and flatStep");
+
+// ---------------- step 8 in the reader's state, the same as the ledger beside it (review A4 #2)
+STATES.forEach(st => {
+  const E = M.evaluate(D, W, T, st), tag = JSON.stringify(st), b = M.busiest(E.solarev.net);
+  const ch = M.change(D, W, T, "solarev", { ev: "evening", batch: st.batch, scarce: st.scarce }, { ev: "night", batch: st.batch, scarce: st.scarce });
+  const fl = M.pickLine(D, W, T, "flat", st), tu = M.pickLine(D, W, T, "tou", st), dm = M.pickLine(D, W, T, "demand", st), rt = M.pickLine(D, W, T, "rtp", st);
+  ok(fl.indexOf("the renter pays " + M.gapWords(E.renter.gap.flat) + " and the solar and EV home " + M.gapShort(E.solarev.gap.flat) + ",") >= 0 && ch.bill.flat === 0, "step 8 flat " + tag + ": the ledger's gaps; the move saves nothing");
+  ok(tu.indexOf("saves its owner " + M.usd(-ch.bill.tou) + ", while the model's cost of serving the home falls " + M.usd(-ch.cost) + "; the renter pays " + M.gapWords(E.renter.gap.tou) + ".") >= 0, "step 8 time-of-use " + tag);
+  ok(dm.indexOf("the renter pays " + M.gapWords(E.renter.gap.demand) + " and the home " + M.gapShort(E.solarev.gap.demand) + ". It bills the home's own busiest hour, " + M.hm(b)) >= 0 &&
+     (b === W.tight) === /also the town's tightest hour/.test(dm), "step 8 demand charge " + tag);
+  ok(rt.indexOf("saves its owner " + M.usd(-ch.bill.rtp) + ", while the model's cost of serving the home falls " + M.usd(-ch.cost) + ".") >= 0 && /a scarcity week adds \$44 to the renter's bill/.test(rt), "step 8 real-time " + tag);
+});
+ok(/the renter pays \$22 below its cost and the solar and EV home \$322 below/.test(M.pickLine(D, W, T, "flat", { scarce: true })) &&
+   /the home \$2 below/.test(M.pickLine(D, W, T, "demand", { ev: "night", scarce: true })) && /the home \$58 above/.test(M.pickLine(D, W, T, "demand", { ev: "night" })),
+  "step 8: with the scarcity week the renter pays $22 below under Flat; the moved home $2 below (scarcity) or $58 above under the demand charge");
+// the closing note: for every tariff some customer, in some habit, is nearer to cost under another tariff
+D.tariffs.forEach(x => {
+  let beaten = false;
+  STATES.filter(st => !st.scarce).forEach(st => { const E = M.evaluate(D, W, T, st);
+    D.customers.forEach(c => { const g = k => Math.abs(Math.round(E[c.key].gap[k])); if (D.tariffs.some(y => g(y.key) < g(x.key))) beaten = true; }); });
+  ok(beaten, "\"" + M.PICK_NOTE + "\": " + x.key + " is beaten for some customer and habit");
+});
 // Go deeper, myths, quick question
 has("Serving them costs $897.58 a month, and they use 5,416.7 kWh net.", "Go deeper: the class's cost and kWh");
 ok(near(T.home.cost, 897.5776, 1e-9) && near(T.home.kwh, 5416.74, 1e-9), "class cost $897.58 and 5,416.7 kWh");
@@ -139,10 +189,15 @@ ok(near(T.home.cost, 897.5776, 1e-9) && near(T.home.kwh, 5416.74, 1e-9), "class 
 has("it falls to 13.5¢", "Go deeper: net billing price");
 has("The renter's bill falls from $92 to $86; the solar and EV home's rises from $66 to $127, still below its $262 cost.", "Go deeper: net billing bills");
 has("In the toy the renter pays $22 above its cost and the solar and EV home $196 below", "myth 1");
-has("Moving the factory's batch saves $3,000 on its bill but only $720 in cost", "myth 2");
-has("A scarcity week raises the renter's real-time bill from $88 to $132", "myth 3");
-has("At half its contract, other customers pay $7.5M a year of the upgrades with no minimum, and $3.0M with a minimum of 80%.", "myth 4");
-has("Time-of-use: $68 a month, against $30 under the demand charge, $13 under real-time pricing and nothing under the flat price. Serving the home costs $126 less.", "quick question");
+has("Moving the factory's batch saves $3,000 on its bill, but the model's cost of serving it falls only $720", "myth 2");
+has("A scarcity week raises the renter's real-time bill from $88 to $132. Under the other tariffs the utility pays first; here we assume it recovers that from all customers later.", "myth 3");
+has("With its highest demand at half its contract, other customers pay $7.5M a year of the upgrades with no minimum, and $3.0M with a minimum of 80% (if they cover what it does not pay).", "myth 4");
+has("Time-of-use: $68 a month, against $30 under the demand charge, $13 under real-time pricing and nothing under the flat price. The model's cost of serving the home falls $126.", "quick question");
+// the Modeler box: the demand charge falls only when every tied peak falls (the factory's 13:00 and 14:00)
+ok(f.net[13] === f.peak && f.net[14] === f.peak && f.net.filter(v => v === f.peak).length === 2, "the factory's busiest hours, 13:00 and 14:00, are tied at 500 kW");
+{ const one = f.net.slice(); one[13] -= 100; ok(near(M.bill(T.business.demand, "demand", W, one, W.price).demand, M.bill(T.business.demand, "demand", W, f.net, W.price).demand), "lowering only one tied peak leaves the demand charge unchanged"); }
+has("The demand charge falls only when the highest remaining hourly demand falls: all tied peaks must come down", "Modeler box: tied peaks");
+has("sends the right signals for the costs this model represents", "Modeler box: limited to the model's costs");
 // numbers to remember: each row = the data file, with its source and date
 D.facts.forEach(fc => {
   const row = PAGE.indexOf('<td class="n">' + fc.n + "</td><td>" + fc.what + "</td>");
@@ -150,6 +205,21 @@ D.facts.forEach(fc => {
   const cell = row >= 0 ? PAGE.slice(row, row + 900) : "";
   ok(cell.indexOf(fc.url) >= 0 && cell.indexOf(fc.asof) >= 0 && cell.indexOf(fc.source) >= 0, "numbers to remember: '" + fc.n + "' carries its source and date");
 });
+
+ok(/in December 2023 \(128\.4 of 167\.2 million\)/.test(D.facts[1].what) && D.facts[1].asof === "December 2025; data for December 2023" && !/2024/.test(D.facts[1].what + D.facts[1].asof),
+  "the meter statistic is dated December 2023 (FERC 2025 Assessment, Table 2-1), not 2024");
+ok(/Time-of-use needs use split by price period; real-time pricing needs hourly readings\./.test(D.facts[1].what), "time-of-use needs use by price period, not hourly records");
+
+// ---------------- wording that the W3 review corrected
+const ALLTXT = T_PAGE + " " + RAW + " " + JS.replace(/\/\/[^\n]*/g, "");
+ok(!/saves the utility|it saves the utility|costs \$[\d,]+ less|really save|what does the utility save/i.test(ALLTXT), "no allocated cost presented as a saving (\"the model's cost of serving ... falls\")");
+ok(JS.indexOf('H("p", { class: "lx-hint", text: ALLOC }, act)') >= 0 && /may avoid future upgrades, which this model does not compute/.test(M.ALLOC), "step 5 says what the cost of serving is, and what the model does not compute");
+ok(!/recovers it from everyone|then everyone|and everyone later/.test(ALLTXT) && /assume/.test(M.scarcityReveal(D, W, T, true)), "recovery from all customers is stated as an assumption");
+ok(!/wires charge|for the wires/.test(ALLTXT) && /per kWh for plants and wires/.test(M.rateLines(T.home, "rtp")) && /plant-and-wire charge/.test(D.tariffs[3].pays), "the real-time adder is a plant-and-wire charge everywhere");
+ok(/Its highest hourly demand each month, share of the/.test(JS) && /Demand in MW, not energy in MWh/.test(JS) && !/it does not use|uses only part|Its use, share/.test(ALLTXT), "the large load's slider is its highest hourly demand, not its energy");
+ok(/Assumed here: whatever the data center does not pay/.test(JS), "the large load's residual allocation is labelled an assumption");
+ok(/\[\[tariff\|tariff\]\]/.test(JS) && /\[\[customer-class\|class\]\]/.test(JS) && /tightest hour \(most gas needed\)/.test(JS) && !/Power Pool shapes/.test(JS), "tariff, class and the tightest hour are defined at first use; no unexplained 'shapes'");
+{ const side = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8"); ok(/id: customer-class/.test(side), "the sidecar defines customer-class for the glossary"); }
 
 // ---------------- research wording: E7.6, word for word (curriculum §13, guard G-SRC)
 const E76 = "Ratepayer exposure depends strongly on large-load tariff design.";
@@ -196,14 +266,18 @@ ok(stepTexts.length === 10, "ten step cards (" + stepTexts.length + ")");
 // evaluate each step's text expression with the page's values in scope
 const stepVals = stepTexts.map(src => Function("W", "D", "hm", "return " + src)(W, D, M.hm));
 stepVals.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 42, "step " + (i + 1) + ": " + n + " words (about 35)"); });
-[M.costReveal(D, W, E0), M.flatReveal(D, T, E0), M.touReveal(D, W, T, "night"), M.demandReveal(D, W, T, "night"), M.scarcityReveal(D, W, T, true)]
-  .concat(D.tariffs.map(x => M.pickLine(D, W, T, x.key))).concat(D.customers.map(c => M.summary(D, W, E0, c.key)))
-  .forEach(t => ok(nWords(t) <= 42, "a reveal of " + nWords(t) + " words: " + t.slice(0, 60)));
-// the page's own prose: paragraphs, list items, definitions, table cells (the no-JS blocks are checked above)
-const PROSE = OWN.replace(/<!-- (a04-[a-z]+):start[\s\S]*?<!-- \1:end -->/g, " ").replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
+const nSent = t => plain(t).split(/(?<=[.?!])\s+(?=[A-Z“])/).filter(x => /[A-Za-z]/.test(x)).length;
+stepVals.forEach((t, i) => ok(nSent(t) <= 3, "step " + (i + 1) + ": " + nSent(t) + " sentences (at most three)"));
+const lines = [M.costReveal(D, W, E0), M.flatReveal(D, T, E0), M.scarcityReveal(D, W, T, true), M.PICK_NOTE, M.ALLOC]
+  .concat(STATES.map(st => M.touReveal(D, W, T, st))).concat(STATES.map(st => M.demandReveal(D, W, T, st)))
+  .concat([].concat(...STATES.map(st => D.tariffs.map(x => M.pickLine(D, W, T, x.key, st))))).concat(D.customers.map(c => M.summary(D, W, E0, c.key)))
+  .concat([M.startNote({ scarce: true })]).concat([25, 50, 75, 100].map(u => [0, 50, 80, 100].map(m => M.largeLine(D.large, u, m))).flat());
+lines.forEach(t => { ok(nWords(t) <= 42, "a reveal of " + nWords(t) + " words: " + t.slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + t.slice(0, 60)); });
+// the page's own prose, the no-JS blocks included (review A4 #13): paragraphs, list items, definitions, table cells, captions
+const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>");
-PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|br)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); });
+PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
+  const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
 // ---------------- the step-card controls the page relies on
 ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a04"/.test(JS), "live status region; the reader's choices persist in this browser");

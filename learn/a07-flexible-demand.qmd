@@ -41,12 +41,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <style>/* lesson-local: the fallback table labels each value on phones */@media (max-width:600px){.a7-fb td[data-l]::before{content:attr(data-l) ": ";color:var(--lx-ink-3);font-size:12.5px}}</style>
 <!-- a07-fallback:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">Prairie Town's flexible demand on 9 June 2025 (illustrative)</p><ul><li>None: the town still uses the same 10 MWh, at 14:00 instead of 20:00. Spare sun replaces the peaker, so the running cost falls $1,000 and the plants' CO₂ 5.5 t.</li><li>At 5%, 99 MWh move from gas hours into spare-sun hours: the running cost falls $5,995 and the plants' CO₂ 42.8 t. Energy saved: 0 MWh.</li><li>The attributed goal moves 161 MWh, 62 MWh more, and books 22.0 t less attributed CO₂, against 17.5 t. The plants emit the same 42.8 t less: the extra moves swap hours with the same plant on the margin.</li><li>21.3 MW for three hours: the peaker runs 43 MWh less, but 45 MWh of use comes back after 23:00. The town saves $3,360 that day.</li><li>All at once: Feeder 7 carries 3.25 MW at 23:00, over its 3.0 MW rating by 0.25 MW. Staggered: Feeder 7 peaks at 2.58 MW after the event, under its 3.0 MW. The town saves more too, $3,576 instead of $3,360, as the peaker stays off at 23:00.</li><li>At 5.0¢, the seller gains $8 a month and the buyer $8, while other customers pay $16 more for the wires. The plants run exactly as before.</li></ul><div class="lx-scroll-x"><table class="lx-facts a7-fb"><caption class="lx-hint">The virtual power plant from 20:00 to 23:00, with a coordination cost of $30 per device or farm.</caption><thead><tr><th scope="col">Device</th><th scope="col">In the pool</th><th scope="col">Owner earns a year</th></tr></thead><tbody><tr><td>Home batteries</td><td data-l="In the pool">5.1 MW</td><td data-l="Owner earns a year">$127 per home battery</td></tr><tr><td>Smart thermostats</td><td data-l="In the pool">6.7 MW</td><td data-l="Owner earns a year">$6 per thermostat</td></tr><tr><td>EV chargers</td><td data-l="In the pool">8.4 MW</td><td data-l="Owner earns a year">$90 per EV charger</td></tr><tr><td>Dairies' pumps</td><td data-l="In the pool">1.1 MW</td><td data-l="Owner earns a year">$11,566 per dairy</td></tr></tbody></table></div>
+<p class="lx-eyebrow">Prairie Town's flexible demand on 9 June 2025 (illustrative)</p><ul><li>None: the town still uses the same 10 MWh, at 14:00 instead of 20:00. Spare sun replaces the peaker, so the running cost falls $1,000 and the plants' CO₂ 5.5 t (metric tonnes).</li><li>At 5%, 99 MWh move from gas hours into spare-sun hours: the running cost falls $5,995 and the plants' CO₂ falls 42.8 t. Energy saved: 0 MWh.</li><li>The attributed goal moves 161 MWh, 62 MWh more, and books 22.0 t less attributed CO₂, against 17.5 t. The plants emit the same 42.8 t less: the extra moves swap hours with the same plant <span class="lx-term" data-term="marginal-plant">on the margin</span>.</li><li>21.3 MW for three hours: the peaker runs 43 MWh less, but 45 MWh of use comes back after 23:00. The town saves $3,360 that day.</li><li>All at once: Feeder 7 carries 3.25 MW at 23:00, over its 3.0 MW rating by 0.25 MW.</li><li>Staggered: Feeder 7 peaks at 2.58 MW after the event, under its 3.0 MW. The town saves more too, $3,576 instead of $3,360, as the peaker stays off at 23:00.</li><li>At 5.0¢, the seller gains $8 a month and the buyer $8, while other customers pay $16 more for plants and wires. The plants run exactly as before.</li></ul><div class="lx-scroll-x"><table class="lx-facts a7-fb"><caption class="lx-hint">The virtual power plant from 20:00 to 23:00, with everyone back at once at 23:00 and a coordination cost of $30 per device or farm.</caption><thead><tr><th scope="col">Device</th><th scope="col">In the pool</th><th scope="col">Owner earns a year</th></tr></thead><tbody><tr><td>Home batteries</td><td data-l="In the pool">5.1 MW</td><td data-l="Owner earns a year">$127 per home battery</td></tr><tr><td>Smart thermostats</td><td data-l="In the pool">6.7 MW</td><td data-l="Owner earns a year">$6 per thermostat</td></tr><tr><td>EV chargers</td><td data-l="In the pool">8.4 MW</td><td data-l="Owner earns a year">$90 per EV charger</td></tr><tr><td>Dairies' pumps</td><td data-l="In the pool">1.1 MW</td><td data-l="Owner earns a year">$11,566 per dairy</td></tr></tbody></table></div>
 <!-- a07-fallback:end -->
 <p class="lx-hint">With JavaScript on, you move the town's use yourself, enrol devices in the pool, set its coordination cost, restart a feeder and set the neighbours' price.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative:</b> Prairie Town is fictional; its flexible share, devices, values, coordination cost, Feeder 7 and neighbours are invented.<br><b>Real shapes:</b> demand, wind and sun follow 9 June 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, accessed 2 November 2026), the day of <a href="09-storage.html">lesson 9</a> and <a href="a04-retail-tariffs.html">A4</a>.<br><b>Boundary:</b> CO₂ is counted at the plants only; the plants run cheapest first, with no ramp limits.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative:</b> Prairie Town is fictional; its flexible share, devices, values, coordination cost, Feeder 7 and neighbours are invented.<br><b>Real hourly patterns:</b> demand, wind and sun follow 9 June 2025 on the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, accessed 2 November 2026), the day of <a href="09-storage.html">lesson 9</a> and <a href="a04-retail-tariffs.html">A4</a>.<br><b>Boundary:</b> CO₂ is in metric tonnes (t), counted at the plants only; the plants run cheapest first, with no ramp limits.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes. Practice, about 30 more: the practice set under Check.</p>
 ```
 :::
@@ -60,12 +60,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="a07-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Shifted, not saved</dt><dd>Moving use to another hour keeps the energy; with losses it takes more.</dd>
+<dt>Shifted, not saved</dt><dd>Moving use to another hour keeps the energy; with extra energy needed it takes more.</dd>
 <dt>Why it still pays</dt><dd>The moved MWh are made by cheaper, cleaner plants: spare sun instead of the peaker.</dd>
 <dt>Attributed against emitted</dt><dd>Average factors can book a cut that the plants never make; marginal ones follow the plants.</dd>
 <dt>A virtual power plant</dt><dd>An aggregator pools many small devices and offers their cut as one resource.</dd>
 <dt>Who earns</dt><dd>Value per kW is similar; a fixed cost per device eats small devices' share.</dd>
-<dt>The wires</dt><dd>Use that all comes back at once can overload a feeder; a staggered restart fits.</dd>
+<dt>The wires</dt><dd>Use that all comes back at once can overload a feeder, a local distribution line; a staggered restart fits.</dd>
 <dt>Local trade</dt><dd>It moves money, not electricity: the kWh flow the same way either way.</dd>
 </dl>
 </div>
@@ -79,7 +79,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-A 5% flexible share in Prairie Town on 9 June 2025:
+A 5% flexible share in Prairie Town on 9 June 2025 (CO₂ in metric tonnes, t):
 
 | Without losses | Cheapest | Lowest attributed CO₂ |
 |---|---|---|
@@ -89,7 +89,7 @@ A 5% flexible share in Prairie Town on 9 June 2025:
 | Plants' CO₂ | −42.8 t | −42.8 t |
 | Attributed CO₂ | −17.5 t | −22.0 t |
 
-| With 10% losses | Cheapest | Lowest attributed CO₂ |
+| With 10% extra energy | Cheapest | Lowest attributed CO₂ |
 |---|---|---|
 | Moved out | 90 MWh | 150 MWh |
 | Energy saved | −9 MWh | −15 MWh |
@@ -122,7 +122,7 @@ A 5% flexible share in Prairie Town on 9 June 2025:
 <div class="lx-deeper-body">
 ```
 
-Let $d_t$ be the use in hour $t$ (MWh), $s$ the flexible share, $\ell$ the loss and $u$ the users' cost per MWh moved. Decide $x_t \ge 0$ (moved out) and $y_t \ge 0$ (added), with the gas plants $c_t$ and $p_t$ (MWh):
+Take use $d_t$ in hour $t$ (MWh), flexible share $s$, extra energy $\ell$ and users' cost $u$ per MWh moved. Decide $x_t \ge 0$ (moved out) and $y_t \ge 0$ (added), with the gas plants $c_t$ and $p_t$ (MWh):
 
 $$\min \sum_t \left(40\, c_t + 100\, p_t\right) + u \sum_t x_t$$
 
@@ -146,9 +146,9 @@ $$\min \sum_t \left(40\, c_t + 100\, p_t\right) + u \sum_t x_t$$
 ```{=html}
 <div class="lx-myths" data-quiz="a07-myth">
 <div class="lx-qq" data-id="saves" data-answer="myth">
-<p class="lx-qtext">Myth or fact? “Demand response saves energy.”</p>
+<p class="lx-qtext">Myth or fact? “Moving electricity use to another hour reduces the total electricity used.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, for shifting. The 5% cheapest shift moves 99 MWh and saves 0 MWh; with losses the town uses 9 MWh more. It saves money and CO₂ by changing which plants run.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. The 5% cheapest shift moves 99 MWh and saves 0 MWh; with 10% extra energy the town uses 9 MWh more. Using less is a different response: the pool's warmer homes skip 4 MWh an event.</p></details>
 </div>
 <div class="lx-qq" data-id="average" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Moving use to hours with a lower average CO₂ factor always cuts what the plants emit.”</p>
@@ -158,7 +158,7 @@ $$\min \sum_t \left(40\, c_t + 100\, p_t\right) + u \sum_t x_t$$
 <div class="lx-qq" data-id="small" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Every small device is worth enrolling.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. At $30 a device for coordination, a thermostat earns its owner $6 a year and a dairy $11,566.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At $40 a device for coordination, a thermostat's owner loses $4 a year, while a dairy still earns $11,556.</p></details>
 </div>
 <div class="lx-qq" data-id="feeder" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “A virtual power plant can overload a feeder after the event is over.”</p>
@@ -169,14 +169,14 @@ $$\min \sum_t \left(40\, c_t + 100\, p_t\right) + u \sum_t x_t$$
 
 <div class="lx-quiz" data-quiz="a07">
 <div class="lx-qq" data-id="baseline" data-answer="a">
-<p class="lx-qtext">An event is called on the hottest day of the month. The baseline is the average of the last ten weekdays at the same hours. How does the measured cut compare with the real one?</p>
+<p class="lx-qtext">Air-conditioned homes are called on the month's hottest evening. Their <span class="lx-term" data-term="baseline">baseline</span>, an estimate of what they would have used, averages ten cooler, otherwise similar weekdays at the same hours. How does the measured cut compare with the real one?</p>
 <ul class="lx-choices"><li data-value="a">Smaller</li><li data-value="b">Larger</li><li data-value="c">The same</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Smaller: on the hottest day the homes would have used more than on an average day, so the baseline is too low. Programs adjust it to the morning of the event.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Smaller: in the hotter event hours the homes would have used more than on the cooler days, so the baseline is too low. Programs may adjust it for weather or for the same day's earlier use.</p></details>
 </div>
 </div>
 <div class="lx-card a7-practice">
 <!-- a07-practice:start (written from the model by the test's --write mode; do not edit) -->
-<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>Shifted or saved?</b> A program moves 10 MWh from 20:00 to 03:00, when the combined-cycle plant is on the margin. What does the town save in energy, money and CO₂?</p><details class="lx-answer"><summary>Answer</summary><p>Energy: none. Money: $600 (the peaker's $100 for the combined-cycle plant's $40, per MWh). CO₂: 1.8 t (0.55 − 0.37 t per MWh).</p></details></li><li><p><b>Losses.</b> With 10% losses, the 5% cheapest shift moves 90 MWh. How much more energy does the town use, and why does it still save money?</p><details class="lx-answer"><summary>Answer</summary><p>9 MWh more (99 MWh in for 90 MWh out). Each MWh leaves a $40 or $100 hour and arrives in a $0 one, so the running cost still falls $5,634.</p></details></li><li><p><b>The thermostat's year.</b> One thermostat cuts 1.2 kW and 70% of homes take part. At $50 per kW a year for being ready, what is that part of its value?</p><details class="lx-answer"><summary>Answer</summary><p>1.2 × 0.7 = 0.84 kW × $50 = $42. With the energy it saves, $45 a year.</p></details></li><li><p><b>Where coordination bites.</b> At what coordination cost per device does a thermostat's owner earn nothing?</p><details class="lx-answer"><summary>Answer</summary><p>At $36 a year: 80% of its $45 value. A dairy earns $11,566 at $30.</p></details></li><li><p><b>The feeder.</b> Feeder 7 is rated 3.0 MW. Released at once, its load reaches 3.25 MW at 23:00. Name two fixes.</p><details class="lx-answer"><summary>Answer</summary><p>Stagger the restart over several hours, or enrol fewer chargers on this feeder; a feeder-aware aggregator plans with the limit.</p></details></li><li><p><b>The neighbours' trade.</b> At 5¢ a kWh, 168 kWh a month change hands. Who gains and who pays?</p><details class="lx-answer"><summary>Answer</summary><p>The seller $8, the buyer $8; other customers pay $16 for the wires the trade skips. The kWh and the plants do not change.</p></details></li></ol>
+<p class="lx-eyebrow">Practice · about 30 minutes on your own</p><ol class="lx-fb-practice"><li><p><b>Shifted or saved?</b> A program moves 10 MWh from 20:00 to 03:00, when the combined-cycle plant is on the margin. What does the town save in energy, money and CO₂?</p><details class="lx-answer"><summary>Answer</summary><p>Energy: none. Money: $600 (the peaker's $100 for the combined-cycle plant's $40, per MWh). CO₂: 1.8 t (0.55 − 0.37 t per MWh).</p></details></li><li><p><b>Extra energy.</b> With 10% extra energy needed, the 5% cheapest shift moves 90 MWh. How much more energy does the town use, and why does it still save money?</p><details class="lx-answer"><summary>Answer</summary><p>9 MWh more (99 MWh in for 90 MWh out). Each MWh leaves a $40 or $100 hour and arrives in a $0 one, so the running cost still falls $5,634.</p></details></li><li><p><b>The thermostat's year.</b> One thermostat cuts 1.2 kW and 70% of homes take part. At $50 per kW a year for being ready, what is that part of its value?</p><details class="lx-answer"><summary>Answer</summary><p>1.2 × 0.7 = 0.84 kW × $50 = $42. With the energy it saves, $45 a year.</p></details></li><li><p><b>Where coordination bites.</b> At what coordination cost per device does a thermostat's owner earn nothing?</p><details class="lx-answer"><summary>Answer</summary><p>At $36 a year: 80% of its $45 value. A dairy earns $11,566 at $30.</p></details></li><li><p><b>The feeder.</b> Feeder 7 is rated 3.0 MW; released at once, its load reaches 3.25 MW at 23:00. Name two fixes.</p><details class="lx-answer"><summary>Answer</summary><p>Stagger the restart over several hours, or enrol fewer chargers on this feeder; a feeder-aware aggregator plans with the limit.</p></details></li><li><p><b>The neighbours' trade.</b> At 5¢ a kWh, 168 kWh a month change hands. Who gains and who pays?</p><details class="lx-answer"><summary>Answer</summary><p>The seller $8, the buyer $8; other customers pay the $16 of plant-and-wire charge the trade skips. The kWh and the plants do not change.</p></details></li></ol>
 <!-- a07-practice:end -->
 </div>
 ```
