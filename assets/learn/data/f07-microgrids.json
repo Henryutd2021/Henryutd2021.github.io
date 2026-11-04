@@ -115,7 +115,7 @@
   {
    "key": "solar",
    "name": "Solar panels, 600 kW",
-   "note": "Their inverters are [[grid-following|grid-following]]: they follow a voltage that something else sets, so they cannot start an island alone."
+   "note": "Their [[inverter|inverters]] are [[grid-following|grid-following]]: they follow a voltage that something else sets, so they cannot start an island alone."
   },
   {
    "key": "battery",
@@ -149,11 +149,12 @@
   }
  ],
  "texts": {
-  "solarOff": "Ordinary grid-connected solar inverters must stop when their grid section is cut off, so a downed line stays safe for repair crews.",
+  "solarOff": "Ordinary grid-connected solar [[inverter|inverters]] must stop feeding a grid section that has been cut off, so a downed line stays safe for repair crews.",
   "formSolar": "Solar inverters are [[grid-following|grid-following]]: they need a voltage to follow. Pick something that can form the island.",
   "formBattery": "The battery's [[grid-forming|grid-forming]] inverter sets the island's voltage and frequency, and the solar inverters follow it. The controller picks up the hospital and the water plant first.",
   "formGen": "Once it has started, the generator sets the island's voltage and frequency, and the solar inverters follow it. The controller picks up the hospital and the water plant first.",
-  "keepHospital": "The hospital must stay on: switch it back on."
+  "keepCritical": "The hospital and the water plant are critical: the hospital needs water and heat. Switch both back on.",
+  "villageToy": "Toy check: one average day; the battery can give any power the village needs, so only stored energy is tested, not cloudy days."
  },
  "flow": {
   "title": "When the grid goes down",
@@ -447,9 +448,9 @@
    },
    {
     "id": "standby",
-    "text": "One building's standby generator that starts after the grid fails",
+    "text": "A standby generator on its own, with no controller, that starts after the grid fails",
     "bin": "no",
-    "why": "A backup for one building, with no controller running several loads and sources as one unit."
+    "why": "Backup, not a microgrid: no controller runs sources and loads as one unit. A microgrid can still serve a single building."
    },
    {
     "id": "windfarm",
@@ -468,8 +469,8 @@
  "facts": [
   {
    "n": "4.5 h · 11.0 h",
-   "what": "Average time a U.S. electricity customer was without power, major storms included: 269.2 minutes in 2025 and 662.6 minutes in 2024.",
-   "source": "EIA, Electric Power Annual, Table 11.1",
+   "what": "Average time a U.S. customer was without power, major events included, at utilities that report by the IEEE method: 269.2 minutes in 2025 and 662.6 minutes in 2024.",
+   "source": "EIA, Electric Power Annual, Table 11.1 (IEEE method, all events)",
    "url": "https://www.eia.gov/electricity/annual/html/epa_11_01.html",
    "asof": "accessed 3 Nov 2026"
   },
@@ -489,7 +490,7 @@
   },
   {
    "n": "2 s",
-   "what": "How fast an ordinary grid-connected inverter must detect that its grid section is cut off and stop feeding it.",
+   "what": "How fast an ordinary grid-connected inverter must normally detect an unintentional island and stop feeding it; up to 5 s by agreement with the utility.",
    "source": "IEEE Std 1547-2018",
    "url": "https://doi.org/10.1109/IEEESTD.2018.8332112",
    "asof": "published April 2018"

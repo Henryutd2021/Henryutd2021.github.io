@@ -17,7 +17,9 @@
 // and a year costs site + shipping + W × wind cost + P × solar cost + price × Σ bought − sale price × Σ sold. Each site
 // takes its cheapest (W, P) (ties: fewer MW; none occurs, tested); the cheaper site wins. With nothing to sell the near
 // site wins; when spare energy earns enough, the windy site's lower energy bill outweighs its higher site and shipping
-// costs. No storage, no outages, one weather year.
+// costs. No storage, no outages, one weather year; the grid takes every spare unit at the chosen price, with no
+// connection limit or extra charge (the page says so). energy() is a site's energy cost net of sales: on-site plants +
+// energy bought − energy sold; the windy site's is lower in every setting with on-site energy (tested).
 // Every number on the page is checked by _tests/learn/test_cf1-supply-chain-microgrids.js.
 (function () {
   "use strict";
@@ -33,6 +35,7 @@
     var parts = { site: site.site, shipping: site.shipping, onsite: W * I.windPerMW + P * I.solarPerMW, bought: bought * I.buyPrice, sold: -sold * sell };
     return { W: W, P: P, bought: bought, sold: sold, made: made, parts: parts, total: parts.site + parts.shipping + parts.onsite + parts.bought + parts.sold };
   }
+  function energy(x) { return x.parts.onsite + x.parts.bought + x.parts.sold; }
   function bestSite(I, site, shp, onsite, sell) {
     var b = null, R = onsite ? I.roomMW : 0;
     for (var W = 0; W <= R; W++) for (var P = 0; P <= R; P++) {
@@ -73,15 +76,15 @@
     var a = "<table class=\"lx-facts cf1-assume\"><caption class=\"lx-hint\">The toy's two sites (illustrative, 2025 dollars)</caption><thead><tr><th scope=\"col\"></th>" +
       I.sites.map(function (s) { return "<th scope=\"col\">" + s.name + "</th>"; }).join("") + "</tr></thead><tbody>" +
       [["Site and building, a year", function (s) { return usdM(s.site); }], ["Shipping to the stores, a year", function (s) { return usdM(s.shipping); }],
-       ["Wind capacity factor", function (s) { return Math.round(s.windCF * 100) + "%"; }], ["Solar capacity factor", function (s) { return Math.round(s.solarCF * 100) + "%"; }]]
+       ["Wind " + rich("[[capacity-factor|capacity factor]]"), function (s) { return Math.round(s.windCF * 100) + "%"; }], ["Solar capacity factor", function (s) { return Math.round(s.solarCF * 100) + "%"; }]]
         .map(function (r) { return "<tr><th scope=\"row\">" + r[0] + "</th>" + I.sites.map(function (s) { return "<td class=\"n\">" + r[1](s) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>";
-    var b = "<p class=\"lx-hint\">Both: a flat " + I.loadMW + " MW factory load; grid power bought at $" + I.buyPrice + "/MWh; wind $" + int(I.windPerMW) + " and solar $" + int(I.solarPerMW) + " per MW a year; room for up to " + I.roomMW + " MW of each.</p>";
+    var b = "<p class=\"lx-hint\">Both: a flat " + I.loadMW + " " + rich("[[megawatt|MW]]") + " factory load; grid power bought at $" + I.buyPrice + "/" + rich("[[megawatt-hour|MWh]]") + "; wind $" + int(I.windPerMW) + " and solar $" + int(I.solarPerMW) + " per MW a year; room for up to " + I.roomMW + " MW of each.</p>";
     var rows = settings(I).map(function (st) {
-      var r = R[st.key], w = I.sites[r.winner];
-      return "<li>" + (st.onsite ? "On-site wind and solar, spare energy sold for " + sellLabel(st.sell) : "No on-site energy") + ": <b>" + w.name + "</b> wins by " + usdK(r.gap) + " a year" +
-        (st.onsite ? " (" + I.sites.map(function (s, i) { return s.name + " builds " + r.sites[i].W + " MW of wind and " + r.sites[i].P + " MW of solar"; }).join("; ") + ")" : "") + ".</li>";
+      var r = R[st.key], w = I.sites[r.winner], built = function (i) { return st.onsite ? r.sites[i].W + " MW wind · " + r.sites[i].P + " MW solar" : "–"; };
+      return "<tr><th scope=\"row\">" + (st.onsite ? "Spare energy sold for " + sellLabel(st.sell) : "No on-site energy") + "</th><td>" + w.name + ", by " + usdK(r.gap) + " a year</td><td>" + built(0) + "</td><td>" + built(1) + "</td></tr>";
     }).join("");
-    return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p>" + a + b + "<ul>" + rows + "</ul>";
+    return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p>" + a + b +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf1-res\"><caption class=\"lx-hint\">Which site wins, and what each builds (the toy, a year)</caption><thead><tr><th scope=\"col\">Setting</th><th scope=\"col\">Cheaper site</th><th scope=\"col\">" + I.sites[0].name + " builds</th><th scope=\"col\">" + I.sites[1].name + " builds</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
   function rich(t) {
     // glossary marks to spans (the attribute is built in pieces so the build's term scanner does not read "$1" as an id)
@@ -104,7 +107,7 @@
     return [one, two];
   }
 
-  var model = { siteYear: siteYear, bestSite: bestSite, settings: settings, solve: solve, shapesFrom: shapesFrom, staticIdea: staticIdea, staticBoundary: staticBoundary,
+  var model = { siteYear: siteYear, energy: energy, bestSite: bestSite, settings: settings, solve: solve, shapesFrom: shapesFrom, staticIdea: staticIdea, staticBoundary: staticBoundary,
                 status: statusLines, usdM: usdM, usdK: usdK, int: int, sellLabel: sellLabel };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -134,13 +137,13 @@
     var seg = H("div", { class: "lx-seg", role: "group", "aria-labelledby": "cf1-sell-l" }, sc);
     var sb = I.sell.map(function (s) {
       var b = H("button", { type: "button", text: sellLabel(s), "aria-pressed": String(s === St.sell) }, seg);
-      b.addEventListener("click", function () { St.sell = s; acted++; paint(true); });
+      b.addEventListener("click", function () { if (!St.onsite) return; St.sell = s; acted++; paint(true); });   // aria-disabled while there is no on-site energy
       return b;
     });
     var tbl = H("div", { class: "lx-scroll-x" }, stage);
     var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
     var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions" }, why);
-    H("div", { html: staticIdea(I, R).replace(/<ul>[\s\S]*<\/ul>$/, "") }, why);
+    H("div", { html: staticIdea(I, R).replace(/<div class="lx-scroll-x"><table class="lx-mini-table cf1-res">[\s\S]*$/, "") }, why);
     function key() { return St.onsite ? "sell" + St.sell : "none"; }
     function paint(save) {
       var r = R[key()];

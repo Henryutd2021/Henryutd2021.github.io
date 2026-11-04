@@ -265,9 +265,9 @@
  },
  "chance-constraint": {
   "term": "Chance constraint",
-  "short": "A rule that must hold with a set probability, such as meeting store demand in 95 of every 100 weeks, rather than in every one.",
+  "short": "A rule required to hold with a chosen probability, for example at least a 95% chance of meeting a week's demand, rather than with certainty.",
   "lesson": "CF1",
-  "href": "index.html#analyst"
+  "href": "cf1-supply-chain-microgrids.html"
  },
  "checksum": {
   "term": "Checksum",
@@ -544,6 +544,12 @@
   "short": "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "deterministic-equivalent": {
+  "term": "Deterministic equivalent",
+  "short": "A chance constraint rewritten as an ordinary rule with a safety margin, for example planning for the demand level that is exceeded with only the allowed probability.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
  },
  "developer": {
   "term": "Developer",
@@ -1144,6 +1150,12 @@
   "short": "A scale on which each equal step multiplies the value by the same factor, often 10, so tiny and huge values fit on one chart.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "logistics-cost": {
+  "term": "Logistics cost",
+  "short": "The cost of moving and storing goods between factories, warehouses and stores: shipping, warehousing and handling.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
  },
  "long-duration-storage": {
   "term": "Long-duration storage",
@@ -2039,6 +2051,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "stylized-network": {
+  "term": "Stylized network",
+  "short": "A simplified, made-up network built to show how a model behaves, with invented distances and costs rather than a real company's map.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
+ },
  "substation": {
   "term": "Substation",
   "short": "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start.",
@@ -2087,6 +2105,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "techno-economic-optimization": {
+  "term": "Techno-economic optimization",
+  "short": "A model that compares equipment sizes and ways of running them by both their performance and their cost, and picks the best for a stated goal.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
  "telemetry": {
   "term": "Telemetry",
   "short": "Measurements sent automatically from plants and substations to the grid operator.",
@@ -2115,7 +2139,7 @@
   "term": "Time-of-use tariff",
   "short": "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak.",
   "lesson": "CF1",
-  "href": "index.html#analyst"
+  "href": "cf1-supply-chain-microgrids.html"
  },
  "time-of-use-tariff": {
   "term": "Time-of-use tariff",

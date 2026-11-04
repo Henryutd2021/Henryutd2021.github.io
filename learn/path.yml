@@ -1003,7 +1003,7 @@
   tier: analyst
   form: case
   icon: map
-  status: upcoming
+  status: active
   minutes: 10
   title: "Where should a factory go when sun and wind are part of the decision?"
   subtitle: "When a factory can make and sell its own energy, its wind and sun become part of choosing where to build it"

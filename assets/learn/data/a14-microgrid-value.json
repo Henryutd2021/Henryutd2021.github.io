@@ -82,34 +82,34 @@
    "label": "The utility",
    "rate": 0.07,
    "pays": "All the utility's customers, through rates its state regulator approves",
-   "gains": "The hospital (backup); all customers (the everyday savings lower the utility's costs)",
+   "gains": "The hospital (backup); the campus (a lower bill, which the utility no longer collects)",
    "risk": "The customers, if the regulator lets the cost into rates; the utility's shareholders, if not",
-   "everydayTo": "all the utility's customers"
+   "everydayTo": "the campus"
   },
   {
    "key": "coop",
    "label": "A rural co-op",
    "rate": 0.05,
    "pays": "The co-op's members, through their rates",
-   "gains": "The hospital, a member (backup); all members (everyday savings)",
+   "gains": "The hospital, a member (backup); the campus (a lower bill, which the co-op no longer collects)",
    "risk": "The members: the co-op borrows, and has no shares to sell",
-   "everydayTo": "all the co-op's members"
+   "everydayTo": "the campus"
   },
   {
    "key": "county",
    "label": "The county",
    "rate": 0.04,
    "pays": "County taxpayers, from its budget",
-   "gains": "The county hospital (backup); the county (everyday savings)",
+   "gains": "The county hospital (backup); the campus (a lower bill)",
    "risk": "The taxpayers",
-   "everydayTo": "the county"
+   "everydayTo": "the campus"
   },
   {
    "key": "private",
    "label": "A private company",
    "rate": 0.1,
    "pays": "The campus: a fixed yearly fee in a long contract",
-   "gains": "The campus (backup and everyday savings, less the fee); the company (its return)",
+   "gains": "The campus (backup and a lower bill, less the fee); the company (its return)",
    "risk": "The company carries cost overruns and breakdowns; the campus pays the fee even in calm years",
    "everydayTo": "the campus"
   }
@@ -169,6 +169,10 @@
  ],
  "texts": {
   "ownersNote": "Borrowing rates and deals are illustrative. FERC: state regulators approve a utility's rates and investments; co-ops are owned by their members and borrow, having no shares to sell.",
-  "tableCaption": "The deals and borrowing rates are illustrative round numbers. Facts behind them: FERC's 2024 Energy Primer, pp. 35, 36 and 130."
+  "tableCaption": "The deals and borrowing rates are illustrative round numbers. Facts behind them: FERC's 2024 Energy Primer, pp. 35, 36 and 130.",
+  "billNote": "Campus view: the bill saving is revenue the utility no longer collects. It saves the whole system money only if the smaller peak also cuts the utility's own costs.",
+  "stackAssume": "Assumed: a two-hour monthly peak, time to recharge before every outage, and no extra charging or wear costs. A battery drained by peak trimming would give less backup.",
+  "villageToy": "A toy comparison: the same average day repeats all year; cloudy spells, seasons and battery power limits are left out.",
+  "ledgerNotes": ["Each owner borrows at its own rate, so the net moves with the owner.", "An owner that pays the capital but keeps neither saving needs a fee or rates to come out even."]
  }
 }

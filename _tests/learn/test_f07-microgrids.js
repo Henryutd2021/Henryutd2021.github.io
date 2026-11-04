@@ -84,16 +84,41 @@ X.forEach(x => ["jul", "jan"].forEach(s => {
 const H = { jul650: X[0].jul.lasts, jan650: X[0].jan.lasts, jul400: X[1].jul.lasts, jan400: X[1].jan.lasts, double: X[1].jul2.lasts };
 ok(H.jul650 === 20 && H.jan650 === 8 && H.jul400 === 51 && H.jan400 === 40 && H.double === 67, "stated hours: 650 kW lasts 20 h (July) and 8 h (January); 400 kW lasts 51 h and 40 h; 400 kW with 4,000 kWh lasts 67 h in July (" + JSON.stringify(H) + ")");
 ok(X.every(x => x.jan.lasts < x.jul.lasts), "January is shorter than July for both stated cases (step 6, explain)");
+// the seasons idea (explain) and the January step's words follow the runs: no "refill" where no run charges the battery
+const charges = r => r.rows.some(h => h.charge > 0.5);
+ok(!charges(X[0].jul) && !charges(X[0].jan) && !/refill|recharg/i.test(M.staticExplain(D)) && /weaker sun leaves more of the load to the generator and battery/.test(M.staticExplain(D)),
+  "650 kW: spare sun never charges the battery in either season, so the seasons idea names less sun for the load, not refilling (review F7 #3)");
+ok(charges(X[1].jul) && !charges(X[1].jan) && /Only July had spare sun to recharge the battery/.test(M.winter(C, X[1].keep).line), "400 kW: July recharges, January does not, and the result line says so");
 ok(H.double > H.jul400 && H.double < 2 * H.jul400, "doubling the battery lengthens the island but does not double it (myth 3)");
 ok(X[0].jul.lasts < X[1].jul.lasts && X[0].jan.lasts < X[1].jan.lasts, "shedding the dorms lengthens the island");
-// more load never lasts longer (every subset that keeps the hospital and fits the night)
-const subsets = [];
-for (let m = 0; m < 16; m++) { const k = {}; C.loads.forEach((l, i) => { k[l.key] = !!(m & (1 << i)); }); if (k.hospital && M.keptKW(C, k) <= M.nightKW(C)) subsets.push(k); }
+// every one of the 16 sets of loads: the rule of step 4 (both critical loads on, within the night's power), the January
+// step's answer and words (review F7 #1, #4), and more load never lasting longer
+const every = [], subsets = [];
+for (let m = 0; m < 16; m++) { const k = {}; C.loads.forEach((l, i) => { k[l.key] = !!(m & (1 << i)); }); every.push(k); if (M.keepStatus(C, k) === "ok") subsets.push(k); }
+ok(M.criticalKeys(C).join() === "hospital,water", "the critical loads: the hospital and the water plant");
+every.forEach(k => {
+  const st = M.keepStatus(C, k), name = Object.keys(k).filter(x => k[x]).join("+") || "none";
+  ok(st === (!k.hospital || !k.water ? "critical" : M.keptKW(C, k) > M.nightKW(C) ? "over" : "ok"), "keepStatus(" + name + ") = " + st);
+  const w = M.winter(C, k), want = w.jan.lasts < w.jul.lasts ? "short" : w.jan.lasts > w.jul.lasts ? "long" : "same";
+  ok(w.answer === want, name + ": the January step's answer is the runs' comparison (" + want + ")");
+  ok(/^Yes/.test(w.feedback[want]) && Object.keys(w.feedback).filter(o => o !== want).every(o => !/^Yes/.test(w.feedback[o])), name + ": only the right choice's feedback says yes");
+  ok((want === "short") === /weaker in winter/.test(w.line) && (want === "same") === /ran out before the sun could make a difference/.test(w.line), name + ": the result line follows the comparison");
+  ok(!/recharg|refill/i.test(w.line) || w.charged.jul || w.charged.jan, name + ": the result line names recharging only when a run charges");
+  [w.line].concat(Object.values(w.feedback)).forEach(t => ok(text(t).replace(/\*\*/g, "").split(" ").length <= 40, name + ": a January text stays short"));
+});
+ok(["hospital", "water"].every(c => { const k = Object.assign({}, subsets[0]); k[c] = false; return M.keepStatus(C, k) === "critical"; }), "removing either critical load fails step 4's rule (it cannot be completed)");
 subsets.forEach(a => subsets.forEach(b => {
   const sub = C.loads.every(l => !a[l.key] || b[l.key]);
   if (sub) ["jul", "jan"].forEach(s => { if (M.island(C, b, s).lasts > M.island(C, a, s).lasts) ok(false, "a larger set of loads lasted longer (" + s + ")"); });
 }));
-ok(subsets.length === 5 && !subsets.some(k => k.labs && (k.water || k.dorms)), "five sets keep the hospital and fit the night's 900 kW; the labs fit only with the hospital alone: " + subsets.length);
+ok(subsets.length === 2 && subsets.every(k => !k.labs) && subsets.some(k => k.dorms), "two sets pass step 4: the critical loads, with or without the dorms (the labs never fit with both): " + subsets.length);
+ok(subsets.every(k => { const w = M.winter(C, k); return w.answer === "short"; }), "every set that passes step 4 lasts less long in January");
+// the diagram's words (review F7 #6): connected is not supplied; solar only in sunshine; both sources run in an island
+const dstate = (keep, former) => ({ grid: false, sw: "open", former: former || "battery", keep: keep });
+const allOn = every[15];
+ok(M.partWords(C, dstate(allOn), "hospital") === "connected, but the island cannot carry every connected load" && !M.loadLit(C, dstate(allOn), "hospital"), "1,200 kW connected in an island: no load is drawn as supplied");
+ok(M.partWords(C, dstate(subsets[0]), "hospital") === "connected and supplied" && M.loadLit(C, dstate(subsets[0]), "hospital") && M.partWords(C, dstate(subsets[0]), "labs") === "shed", "a set within the night's power: kept loads supplied, the rest shed");
+ok(/when the sun shines/.test(M.partWords(C, dstate(subsets[0]), "solar")) && M.partWords(C, dstate(subsets[0]), "gen") === "running" && M.partWords(C, dstate(subsets[0], "gen"), "battery") === "running", "solar makes power only in sunshine; the generator and battery both run in the island");
 // the diagram's state rule
 ok(M.liveState({ grid: false, sw: "closed" }).live === false && M.liveState({ grid: true, sw: "closed" }).live === true, "grid down with the switch closed: dark; grid up: live");
 ok(M.liveState({ grid: false, sw: "open", former: "solar" }).live === false && M.liveState({ grid: false, sw: "open", former: "battery" }).island && M.liveState({ grid: false, sw: "open", former: "gen" }).island,
@@ -114,27 +139,44 @@ const hh = h => (h < 10 ? "0" : "") + h + ":00", span = a => hh(a[0]) + " to " +
 ok(span(V.mill.noon) === "10:00 to 14:00" && span(V.mill.evening) === "18:00 to 22:00" && JS.indexOf("runs from " + span(V.mill.noon)) >= 0 && JS.indexOf("grind from " + span(V.mill.evening)) >= 0 &&
    JS.indexOf('"10:00–14:00"') >= 0 && JS.indexOf('"18:00–22:00"') >= 0, "the mill's hours in the step texts and labels equal the data (10:00 to 14:00; 18:00 to 22:00)");
 ok(V.panels.start === 10 && M.minBattery(V, 10, "noon") === null, "the village starts short (10 kW of panels serves no hour plan): the reader must act");
+// step 8 asks about the smallest design (review F7 #5): the answer comes from the model, whatever the reader's sliders show
+const mv = M.millMove(V);
+ok(mv.answer === "battery" && mv.noon.kw === mv.evening.kw && mv.evening.kwh > mv.noon.kwh, "moving the mill to the evening grows the smallest design's battery only (" + mv.answer + ")");
+ok(/^Yes/.test(mv.feedback[mv.answer]) && Object.keys(mv.feedback).every(k => k === mv.answer || !/^Yes/.test(mv.feedback[k])) && Object.values(mv.feedback).every(t => t.split(" ").length <= 40), "step 8's feedback: yes only for the model's answer; each short");
+ok(M.panelChoices(V).some(p => M.batteryChoices(V).some(b => M.villageDay(V, p, b, "evening").ok && b > mv.evening.kwh)), "a reader's larger design may already serve the evening: so the question asks about the smallest design");
+// the village's flowchart trace follows the design (review F7 #2)
+const vt0 = M.villageTrace(V, 10, 20, "noon", true), vt1 = M.villageTrace(V, 20, 40, "noon", true), vt2 = M.villageTrace(V, null, null, null, false);
+ok(vt0.path[3] === "lasts" && /short in \d+ hours/.test(vt0.text) && vt1.path[3] === "ok" && /every hour of an average day served/.test(vt1.text) && vt2.path[3] === "ok" && /^The smallest design, 20 kW/.test(vt2.text),
+  "the village trace: short designs end at 'lasts', serving ones at 'ok'; before the reader designs, the smallest design stands in");
+[vt0, vt1, vt2].forEach(t => ok(t.text.split(" ").length <= 40 && /stored energy only/.test(t.text), "the village trace states the toy's boundary and stays short"));
+ok(/only stored energy is tested, not cloudy days/.test(D.texts.villageToy) && JS.indexOf("D.texts.villageToy") >= 0 && /only stored energy is tested, not cloudy days/.test(T), "the village's toy boundary is on the page and in the step (review F7 #7)");
+// the explain layer is refreshed from the reader's state (review F7 #2)
+ok(/function setKeep[\s\S]*?X\.refresh\(S0\)/.test(JS) && /S0\.vseen = true; if \(X\) X\.refresh\(S0\)/.test(JS) && /fc\.update\(traces\)/.test(JS), "kept loads and village changes refresh the explain layer");
 
 // ---------------- numbers on the page
 ok(/5 hours: 2,000 kWh ÷ 400 kW/.test(T) && C.battery.kwh / X[1].kw === 5 && X[1].kw <= C.battery.kw, "quiz 1: 2,000 kWh ÷ 400 kW = 5 hours, within the battery's 500 kW");
 const lab = C.loads.find(l => l.key === "labs");
 ok(/the labs stay on too: 950 kW/.test(T) && X[1].kw + lab.kw === 950 && 950 > C.battery.kw && /more than the battery's 500 kW/.test(T), "quiz 2: hospital + water + labs = 950 kW, above the battery's 500 kW");
-ok(/must stop within 2 seconds/.test(T) && D.facts.some(f => f.n === "2 s"), "myth 1 and the facts agree on 2 seconds");
+ok(/stops feeding an unintentional island, normally within 2 seconds/.test(T) && D.facts.some(f => f.n === "2 s" && /unintentional island/.test(f.what) && /up to 5 s by agreement/.test(f.what)), "myth 1 and the facts agree: an unintentional island, normally 2 seconds, up to 5 by agreement");
 const P = {}; D.parts.forEach(p => { P[p.key] = p; });
 ok(P.solar.name === "Solar panels, " + M.kw(C.solarKW) && P.battery.name === "Battery, " + M.kw(C.battery.kw) + " and " + M.kwh(C.battery.kwh) && P.gen.name === "Diesel generator, " + M.kw(C.gen.kw) &&
    /Fuel for 24 hours/.test(P.gen.note) && C.gen.fuelHours === 24, "the parts' sizes equal the data");
 C.loads.forEach(l => ok(P[l.key] && P[l.key].name === l.label + ", " + M.kw(l.kw), "part " + l.key + ": its name carries its kW"));
-ok(/2025: 269\.2 minutes|269\.2 minutes in 2025/.test(D.facts[0].what) && D.facts[0].n === "4.5 h · 11.0 h" && near(269.2 / 60, 4.49, 0.01) && near(662.6 / 60, 11.04, 0.01), "fact 1: 269.2 and 662.6 minutes are 4.5 and 11.0 hours");
+ok(/269\.2 minutes in 2025/.test(D.facts[0].what) && /IEEE method/.test(D.facts[0].what) && D.facts[0].n === "4.5 h · 11.0 h" && near(269.2 / 60, 4.49, 0.01) && near(662.6 / 60, 11.04, 0.01), "fact 1: 269.2 and 662.6 minutes are 4.5 and 11.0 hours");
 D.facts.forEach(f => ok(PAGE.indexOf('<td class="n">' + f.n + "</td><td>" + f.what + "</td>") >= 0 && PAGE.indexOf(f.url) >= 0, "numbers to remember: '" + f.n + "' row on the page with its source"));
 ok(/the generator runs first, the battery gives the rest, spare sun recharges it/.test(T), "the data note states the island's rule");
 
 // ---------------- links
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]));
-const OKH = /^(https:\/\/doi\.org\/10\.|https:\/\/www\.eia\.gov\/|https:\/\/www\.energy\.gov\/|https:\/\/www\.nerc\.com\/|https:\/\/www\.worldbank\.org\/|[0-9a-z-]+\.html$|\.\.\/assets\/|#)/;
-ok(hrefs.length > 0 && hrefs.every(h => OKH.test(h)), "links: doi.org, EIA, DOE, NERC, the World Bank and learn pages only: " + hrefs.filter(h => !OKH.test(h)).join(", "));
+const OKH = /^(https:\/\/doi\.org\/10\.|https:\/\/www\.eia\.gov\/|https:\/\/www\.energy\.gov\/|https:\/\/www\.nerc\.com\/|https:\/\/www\.worldbank\.org\/|https:\/\/connectedcommunities\.lbl\.gov\/|[0-9a-z-]+\.html$|\.\.\/assets\/|#)/;
+ok(hrefs.length > 0 && hrefs.every(h => OKH.test(h)), "links: doi.org, EIA, DOE, NERC, the World Bank, Berkeley Lab and learn pages only: " + hrefs.filter(h => !OKH.test(h)).join(", "));
 ok(!/projects\/|research\.html/.test(PAGE + JSON.stringify(D)), "no project page and no Research page");
-ok(/case file CF1 \(upcoming\)/.test(T) && !/cf1-supply-chain-microgrids\.html/.test(PAGE), "CF1 is named, not linked, while it is a draft");
+// CF1's link follows its status in path.yml (review F7 #14): linked once live, named only while it is a draft
+const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), cf1 = (PY.split(/\n- kind: /).find(e => /\n  id: cf1-supply-chain-microgrids\n/.test(e)) || "");
+const cf1Live = /\n  status: active\n/.test(cf1) && fs.existsSync(path.join(SITE, "learn/cf1-supply-chain-microgrids.qmd"));
+ok(cf1Live ? /<a href="cf1-supply-chain-microgrids\.html">case file CF1<\/a>/.test(PAGE) && !/upcoming/.test(T) : /case file CF1 \(upcoming\)/.test(T) && !/cf1-supply-chain-microgrids\.html/.test(PAGE),
+  "CF1 is " + (cf1Live ? "live: the Real-world box links it" : "a draft: named, not linked"));
 
 // ---------------- research wording (curriculum §13, guard G-SRC)
 // Every sentence about the course author's work is an approved sentence of the register (sections E8 and E9), word for
@@ -153,7 +195,7 @@ const RX = /\b(course author|research|stud(y|ies)|paper|article|Li et al|excerpt
 const NOT_RESEARCH = [
   [/^Approved excerpt of: Li et al\. \(2023\), Applied Mathematical Modelling\.$/, "provenance label"],
   [/^In the real world$/, "heading"],
-  [/^The full case: case file CF1 \(upcoming\)\.$/, "pointer to the case file"],
+  [/^The full case: case file CF1( \(upcoming\))?\.$/, "pointer to the case file"],
   [/^In Puerto Rico, a small microgrid that serves a community organization kept the power on for nine days during Hurricane Fiona, while other parts of the island were dark \(U\.S\. DOE, 8 November 2023\)\.$/, "a public case, sourced, not the course author's work"],
   [/^Li et al\. \(2023\)\. Facility and microgrid location-allocation for integrated supply chain and transactive energy operations\. Applied Mathematical Modelling 119, 119–136\.$/, "citation (checked against publications.bib below)"],
   [/^(The research text \(realWorld\)|Lesson F7 \(f07-microgrids\), 2026-11-03\.)/, "the data file's provenance note"],
@@ -241,7 +283,8 @@ const sents = quotes.flatMap(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(
 ok(sents.length === 4 && sents.every(s => UNITS.indexOf(s) >= 0), "four excerpt sentences, each a whole approved row (E9.1-E9.3, E8.2)");
 const e9 = quotes.find(q => q[1] === "excerpt:campus-resilience-question");
 ok(e9 && !/<footer|href=/.test(e9[2]), "the E9 excerpt has no citation and no link");
-ok(PAGE.indexOf(APPROVED_SNAPSHOT["E8.7"]) >= 0, "E8.7 sits under E8.2, word for word");
+const E87 = APPROVED_SNAPSHOT["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
+ok(E87.length === 2 && norm(PAGE).indexOf(norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under E8.2, word for word, as two lines (holds when; leaves out)");
 // citations: titles as in inputs/publications.bib
 if (RP) {
   const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
@@ -251,9 +294,9 @@ if (RP) {
   cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase()) >= 0, "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib"));
 }
 
-// ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words)
-const GENERATED = /<!-- (f7-[a-z]+):start[\s\S]*?<!-- \1:end -->/g;
-const prose = elements(OWN.replace(GENERATED, " ").replace(/<table class="lx-facts">[\s\S]*?<\/table>/g, " ").replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
+// ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words),
+// the generated no-JS blocks and the facts table included (review F7 #12)
+const prose = elements(OWN.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
 prose.forEach(s => { const w = s.split(" ").length; ok(w <= 40 || approved(s), "text element of " + w + " words (40 at most unless one approved sentence): " + s.slice(0, 70)); });
 // the step texts and their seen-lines, as the script writes them: no more than about 45 words each
 const stepSrc = [...JS.matchAll(/\n      \{ text: ([\s\S]*?),\n        build:/g)].map(m => m[1]);

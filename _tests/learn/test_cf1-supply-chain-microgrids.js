@@ -37,7 +37,7 @@ function staticMyths() {
   const n = R.none, s = R["sell" + I.sell[I.sell.length - 1]], w = s.sites[s.winner];
   const qq = (id, q, a) => '<div class="lx-qq" data-id="' + id + '" data-answer="myth">\n<p class="lx-qtext">Myth or fact? “' + q + '”</p>\n<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>\n<details class="lx-answer"><summary>Answer</summary><p>' + a + "</p></details>\n</div>";
   return [qq("nearest", "The site nearest the customers is always the cheapest place for a factory.", "Myth. In the toy, once spare energy earns $" + s.st.sell + "/MWh, the " + I.sites[s.winner].name.toLowerCase() + " wins by " + M.usdK(s.gap) + " a year, though its site and shipping cost " + M.usdK(I.sites[1].site + I.sites[1].shipping - I.sites[0].site - I.sites[0].shipping) + " more."),
-          qq("offgrid", "A factory with its own wind and solar no longer needs the grid.", "Myth. Even with " + w.W + " MW of wind and " + w.P + " MW of solar, the " + I.sites[s.winner].name.toLowerCase() + " still buys " + M.int(w.bought) + " MWh a year in calm, dark hours, and sells " + M.int(w.sold) + " MWh when it makes more than it needs.")].join("\n");
+          qq("offgrid", "A factory with its own wind and solar no longer needs the grid.", "Myth. Even with " + w.W + " MW of wind and " + w.P + " MW of solar, the " + I.sites[s.winner].name.toLowerCase() + " still buys " + M.int(w.bought) + " MWh a year in hours when its wind and solar together fall short of the load, and sells " + M.int(w.sold) + " MWh.")].join("\n");
 }
 // ---------------- the no-JS blocks: write (--write) or check
 const BLOCKS = {
@@ -92,8 +92,30 @@ ok(/room for up to 8 MW of each/.test(M.staticIdea(I, R)) && I.roomMW === 8, "th
 ok(M.status(I, R, "sell40").length === 2 && M.status(I, R, "none").length === 1 && Object.keys(R).every(k => M.status(I, R, k).every(t => text(t).split(" ").length <= 25)), "status lines: one idea each, short");
 // the page's comparison card and myths agree with the toy
 const PT = text(PAGE);
-ok(/the windy site, once spare energy earns enough/.test(PT) && R.sell40.winner === 1 && R.sell0.winner === 0, "the comparison card: the windy site wins only once spare energy earns enough");
+ok(/the windy site, once each site can build wind and solar; selling spare energy can make this saving outweigh its higher site and shipping costs/.test(PT) && R.sell40.winner === 1 && R.sell0.winner === 0, "the comparison card: energy favours the windy site; selling makes it win overall");
+// the energy row's claim (review CF1 #1), tested on the energy subtotal itself, not on the winner
+Object.keys(R).forEach(k => {
+  const e = R[k].sites.map(M.energy);
+  ok(R[k].st.onsite ? e[1] < e[0] - 1e5 : near(e[0], e[1], 1e-6), k + ": energy net of sales " + (R[k].st.onsite ? "is lower at the windy site" : "is the same at both sites (grid power only)") + " ($" + e.map(v => (v / 1e6).toFixed(3) + "M").join(" vs $") + ")");
+});
+ok(near(M.energy(R.sell0.sites[0]) / 1e6, 1.907, 0.001) && near(M.energy(R.sell0.sites[1]) / 1e6, 1.440, 0.001), "selling nothing: energy $1.907M (near) against $1.440M (windy); the site and shipping gap ($550k) still wins");
 ok(/It has no storage and no outages\./.test(PT) && !/battery|storage/i.test(JSON.stringify(I)), "the toy has no storage (and says so)");
+ok(/It assumes the grid takes every spare unit at the chosen price, with no connection limit or extra charge\./.test(PT) && R.sell40.sites[1].sold > 19000, "the toy's export assumption is stated (review CF1 #5): the windy site's $40 win rests on 19,576 MWh of sales");
+// imports are not only in dark hours (review CF1 #8)
+{ const w = R.sell40.sites[1], sh = SH.windy; let sunny = 0; for (let t = 0; t < 8760; t++) { const m = w.W * sh.wind[t] + w.P * sh.solar[t]; if (m < I.loadMW && sh.solar[t] > 0) sunny += I.loadMW - m; }
+  ok(sunny > 100 && /fall short of the load/.test(staticMyths()) && !/calm, dark hours/.test(PAGE), "the windy site also buys in sunny hours (" + Math.round(sunny) + " MWh), so the myth does not say 'dark hours'"); }
+// the one-hour example adds up (review CF1 #4)
+ok(/a 3 MW load with 2 MW made on site buys 1 MW for that hour, which is 1 MWh; with 5 MW made, it sells 2 MWh/.test(PT) && I.loadMW === 3, "the one-hour example: 3 − 2 = 1 MW bought, 1 MWh; 5 − 3 = 2 MWh sold");
+// the selling-price buttons do nothing while there is no on-site energy (review CF1 #7)
+ok(/b\.addEventListener\("click", function \(\) \{ if \(!St\.onsite\) return;/.test(JS) && /aria-disabled", String\(!St\.onsite\)/.test(JS), "the selling-price buttons are guarded while aria-disabled");
+// the toy's results are a table in the no-JS version (review CF1 #3)
+ok(/<table class="lx-mini-table cf1-res">/.test(M.staticIdea(I, R)) && !/<li>/.test(M.staticIdea(I, R)), "the toy's settings are table rows, not long list items");
+// vocabulary (review CF1 #4): capacity factor, MW and MWh, deterministic equivalent marked; PV spelt out
+ok(/data-term="capacity-factor"/.test(M.staticIdea(I, R)) && /data-term="megawatt"/.test(M.staticIdea(I, R)) && /data-term="megawatt-hour"/.test(M.staticIdea(I, R)) && /data-term="deterministic-equivalent">deterministic equivalent</.test(PAGE) && /solar photovoltaic \(PV\)/.test(PAGE),
+  "capacity factor, MW, MWh and deterministic equivalent are glossary terms; PV is spelt out");
+const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/cf1-supply-chain-microgrids.yml"), "utf8");
+ok(/chosen probability, for example at least a 95% chance of meeting a week's demand/.test(SIDE) && !/95 of every 100 weeks/.test(SIDE), "the chance-constraint definition is a probability, not a frequency (review CF1 #2)");
+ok(/\[lesson 10\]\(10-write-it-down\.html\) introduces decisions, a goal and rules, and \[lesson 11\]\(11-solver\.html\) solves a mixed-integer program/.test(PAGE), "lesson 10 is not called a mixed-integer example (review CF1 #9)");
 
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "").replace(/<style>[\s\S]*?<\/style>/g, " ");
 // ---------------- research wording (curriculum §13, guard G-SRC)
@@ -144,17 +166,17 @@ const NOT_RESEARCH = [
   [/^(Conference paper|Journal article \(this case\)|Code released)$/, "timeline step label: the kind of output"],
   [/^(A factory usually goes where land is cheap and its customers are close\.|If it can make its own power and sell what it does not use, does a windy, sunny site far away start to look better\?)$/, "the puzzle: a general idea, true of the toy; no study claim"],
   [/^(When a factory can make and sell its own energy, its wind and sun become part of choosing where to build it\.?|Case file CF1 of Energy Systems, Step by Step: when a factory can make and sell its own energy, its wind and sun become part of choosing where to build it\.|Factories with their own energy|A case file in six parts and a timeline; then choose between two factory sites and see when on-site wind and sun, and selling energy to the grid, change the choice\.|Say how on-site energy and an hourly energy balance enter a location decision, and why a site with stronger wind and sun can win despite higher shipping costs\.|Where should a factory go when sun and wind are part of the decision\?)$/, "title, subtitle and path.yml text: the general idea of the toy, no study claim"],
-  [/^(Run examples\/sensitivity\.py\.|It solves a synthetic supply chain in several cases: compare the benchmark row with "grid supply only"\.|Do the open factories or warehouses change\?|Predict first, then read the "purchase price \+25%" row: does on-site wind and PV capacity grow or shrink\?)$/, "repository exercise on its synthetic examples, not the study"],
+  [/^(Run examples\/sensitivity\.py\.|It solves a synthetic supply chain in several cases: compare the benchmark row with "grid supply only"\.|Do the open factories or warehouses change\?|Predict first, then read the "purchase price \+25%" row: does on-site wind and solar photovoltaic \(PV\) capacity grow or shrink\?)$/, "repository exercise on its synthetic examples, not the study"],
   [/^supply-chain-microgrid-models: public example repository · MIT licence · synthetic data\.$/, "repository label"],
   [/^supply-chain-microgrid-models on GitHub$/, "citation label (repository)"],
   [/^Lesson F7 islanded a campus, and A14 asked whether its microgrid pays\.$|^This case puts on-site energy inside a larger choice: where to build\.$/, "course pointer: lessons, not the study"],
-  [/^(Opening a site is a yes-or-no choice, so a location model is a mixed-integer program: lesson 10 writes such a model down and lesson 11 solves one\.|The toy above tries every pair of whole-MW sizes at two sites; a solver searches far larger networks without listing every choice\.)$/, "Go deeper: modelling method in general, not the study"],
+  [/^(Opening a site is a yes-or-no choice, so a location model is a mixed-integer program: lesson 10 introduces decisions, a goal and rules, and lesson 11 solves a mixed-integer program\.|The toy above tries every pair of whole-MW sizes at two sites; a solver searches far larger networks without listing every choice\.)$/, "Go deeper: modelling method in general, not the study"],
   [/^(One factory, two sites|One factory, two sites \(illustrative\))$/, "toy title"],
   [/^(Both: a flat 3 MW factory load; .*|The toy's two sites \(illustrative, 2025 dollars\)|No on-site energy: .*|On-site wind and solar, spare energy sold for .*)$/, "the toy's no-JS lines (checked against the model)"],
   [/^Myth, unless .*$/, "general idea"],
   [/^EIA\. Hourly Electric Grid Monitor \(Form EIA-930\), SPP wind and solar, 2025: the toy's hourly shapes\.$/, "data source of the toy"],
   [/^Every hour counts on its own: energy made when the factory needs none is worth only what the grid pays for it\.$/, "the toy's general idea"],
-  [/^MW factory load; grid power bought at \$$/, "a fragment of the toy's no-JS line, written by the script"]
+  [/^(MW )?factory load; grid power bought at \$$/, "a fragment of the toy's no-JS line, written by the script"]
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
   .replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").replace(/ ([.,;:?!)])/g, "$1").replace(/\( /g, "(").trim();
@@ -248,6 +270,8 @@ const sentences = [...PAGE.matchAll(/<blockquote class="lx-excerpt"[^>]*>([\s\S]
 ok(sentences.length === CF.excerpts && sentences.every(s => UNITS.indexOf(s) >= 0), CF.excerpts + " excerpt sentences, each a whole approved row (" + sentences.length + ")");
 ok(sentences.join(" ") === ["E8.3", "E8.4", "E8.5", "E8.6"].map(k => norm(APPROVED[k])).join(" "), "the excerpt quotes E8.3, E8.4, E8.5 and E8.6, in that order");
 ok(norm((PAGE.match(/<p class="lx-case-q">([\s\S]*?)<\/p>/) || [])[1] || "") === APPROVED[CF.question], "the question is " + CF.question + ", word for word");
+const E87 = APPROVED["E8.7"].split(/(?<=\.) (?=Leaves out:)/);
+ok(E87.length === 2 && norm(PAGE).indexOf(norm("<li>" + E87[0] + "</li><li>" + E87[1] + "</li>")) >= 0, "E8.7 sits under the excerpt, word for word, as two lines (holds when; leaves out)");
 // citations: titles as in inputs/publications.bib
 if (RP) {
   const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8");
@@ -269,9 +293,12 @@ ok(!/JORS|Operational Research Society|01605682/.test(PAGE + RAW + JS), "the JOR
 const keys = [...PAGE.matchAll(/data-source="([^"]+)"/g)].map(m => m[1]);
 ok(keys.length === 1 && keys[0] === "excerpt:supply-chain-mg", "the excerpt uses CF1's approved source key");
 
-// ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words)
-const prose = elements(OWN2.replace(GENERATED, " ").replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
-prose.forEach(s => { const w = s.split(" ").length; ok(w <= 40 || approved(s), "text element of " + w + " words (40 at most unless one approved sentence): " + s.slice(0, 70)); });
+// ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words),
+// the generated no-JS blocks included (review CF1 #3)
+const prose = elements(OWN2.replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
+// approved sentences inside an element (a timeline step, an excerpt) do not count; the element's other words must stay short
+const own = s => UNITS.reduce((t, u) => t.split(u).join(" "), norm(s)).trim();
+prose.forEach(s => { const w = own(s) ? own(s).split(/\s+/).length : 0; ok(w <= 40 || approved(s), "text element of " + w + " words besides approved sentences (40 at most): " + s.slice(0, 70)); });
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

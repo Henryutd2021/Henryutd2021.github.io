@@ -18,4 +18,5 @@ requests:
   - "Source note: the Berkeley Lab co-op report's executive-summary Tables ES-2 and ES-3 print the upper 90% confidence bounds for non-residential members (for example $144 per kW momentary, against $62 in Table 5-3). A14 uses the body tables (point estimates) and says so in the data file."
   - "One price year: every dollar on the page is 2025 dollars (the 2025 survey, EIA's 2025 prices, illustrative toy costs stated in 2025 dollars)."
   - "Lesson-local pieces: the who-pays ledger (explain layer) and the outage pricing cards (step 1). The ledger could become a shared e-ledger component (A13, A6 and C1 list one)."
-  - "When CF1 goes live, the Real-world box line 'case file CF1 (upcoming)' should become a link to cf1-supply-chain-microgrids.html."
+  - "CF1 went live in learn-w3-fix-b (2026-11-03); the Real-world box now links it, with a one-line bridge before the excerpt and glossary marks inside it (words unchanged)."
+  - "Boundary (Codex review A14 #1): the $54,000 everyday saving is the campus's bill savings (a demand charge). For the utility it is lost revenue, so the page says it is a saving for the whole system only if the smaller peak cuts the utility's costs. Avoided system costs are not modelled."
