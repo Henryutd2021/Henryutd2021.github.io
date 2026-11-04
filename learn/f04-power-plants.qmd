@@ -27,7 +27,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F4</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-1)"><span class="lx-dot" aria-hidden="true"></span>Foundations · L1</li>
-<li>20 min guided · about 10 min practice</li>
+<li><span class="lx-nw">20 min guided</span> · <span class="lx-nw">about 10 min practice</span></li>
 <li>After <a href="05-capacity-factor.html">lesson 5</a></li>
 <li class="lx-done-tag" data-lesson-id="f04-power-plants" hidden>Completed</li>
 </ul>

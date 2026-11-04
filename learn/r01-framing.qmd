@@ -25,7 +25,7 @@ body-classes: "page-learn page-lesson lx-form-studio"
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-4)"><span class="lx-dot" aria-hidden="true"></span>Researcher · L4</li>
 <li>Research studio</li>
-<li>30 min guided · about 60 min practice</li>
+<li><span class="lx-nw">30 min guided</span> · <span class="lx-nw">about 60 min practice</span></li>
 <li>After <a href="13-capstone.html">lesson 13</a> and <a href="a22-tradeoff-explorer.html">A22</a></li>
 <li class="lx-done-tag" data-lesson-id="r01-framing" hidden>Completed</li>
 </ul>

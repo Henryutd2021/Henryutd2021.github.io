@@ -112,6 +112,12 @@
     Object.keys(g).forEach(function (k) { var x = g[k]; x.ok = k === "linear" ? x.right >= x.n - 1 : x.right === x.n; });
     return g;
   }
+  // a group's advice: `advice` once its toolbox page is live in path.json (P), `soon` (when the data gives one) while it is
+  // not, so the text is right before and after the page goes live; ref is LX.lessonRef (core.js)
+  function adviceFor(G, P, ref) {
+    var p = String(G.route).split(":");
+    return G.soon && p[0] === "tool" && !ref(P, p[1]).ready ? G.soon : G.advice;
+  }
 
   // ---------------------------------------------------------------- numbers and rules as text (pure; the page and the test share them)
   var OPS = { "<=": "≤", ">=": "≥", "=": "=" }, OPLIST = ["<=", "=", ">="];
@@ -297,7 +303,7 @@
   }
 
   var model = { townDay: townDay, le: le, lhs: LP.lhs, holds: holds, clip: LP.clip, region: region, optimum: optimum, compare: compare,
-                toArrays: toArrays, dispatchStory: dispatchStory, planningStory: planningStory, withKey: withKey, readiness: readiness,
+                toArrays: toArrays, dispatchStory: dispatchStory, planningStory: planningStory, withKey: withKey, readiness: readiness, adviceFor: adviceFor,
                 cornerTable: cornerTable, checkArrays: checkArrays, practiceSpecs: practiceSpecs, fill: fill, num: num, money: money, pt: pt,
                 fmtRule: fmtRule, ruleWords: ruleWords, describeModel: describeModel, tolAt: tolAt, HOUR: HOUR, PREV_CC: PREV_CC };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -468,7 +474,7 @@
       Object.keys(R.groups).forEach(function (key) {
         var G = R.groups[key], x = g[key] || { right: 0, n: 0, ok: true }, li = H("li", { class: x.ok ? "ok" : "go" }, ul);
         H("span", { class: "b1-route-k", html: LX.icon(x.ok ? "check" : "arrow") + LX.esc(G.label) + " · " + x.right + "/" + x.n }, li);
-        if (!x.ok) { var t = H("span", null, li); t.appendChild(document.createTextNode(G.advice + " ")); H("a", { href: href(G.route), text: "Go there" }, t); }
+        if (!x.ok) { var t = H("span", null, li); t.appendChild(document.createTextNode(adviceFor(G, P, LX.lessonRef) + " ")); H("a", { href: href(G.route), text: "Go there" }, t); }
       });
       var lin = g.linear || { ok: true };
       H("p", { class: "lx-hint", text: lin.ok ? "You are ready for this lesson. Press Next." : "You can still go on: the toolbox page will be one tap away in every step." }, body);

@@ -28,7 +28,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F6</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-1)"><span class="lx-dot" aria-hidden="true"></span>Foundations · L1</li>
-<li>20 min guided · about 10 min practice</li>
+<li><span class="lx-nw">20 min guided</span> · <span class="lx-nw">about 10 min practice</span></li>
 <li>After <a href="03-balancing.html">lesson 3</a></li>
 <li class="lx-done-tag" data-lesson-id="f06-grid-and-outages" hidden>Completed</li>
 </ul>

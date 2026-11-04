@@ -2,8 +2,11 @@
 <%
 /* map.ejs — the course as plain lists, rendered from learn/path.yml (Quarto listing). It is the text version of the
    metro map (metro.js draws the map above it and closes this box) and what readers without JavaScript see.
-   One block per tier (any number of tiers): its starter-path lessons (ids lesson-N, ticked when done), then the rest of
-   the tier, then the math toolbox. Progress ticks: elements with data-lesson-id get .is-done from learn.js.
+   The starter path (ids lesson-N), then one block per tier (any number of tiers) listing every lesson of the tier in
+   the map's order: its starter-path lessons, then the rest in curriculum order (modules by number, unnumbered ones,
+   bridges, the news lens, side topics, case files, sandboxes, the checkpoint, capstones; as metro.js draws its line),
+   each with its status (open or coming soon); then the math toolbox. Progress ticks: elements with data-lesson-id get
+   .is-done from learn.js.
    A lesson or tool links to its page only when it is live: `path`, or `status: active` (page <id>.qmd), and not
    status: upcoming (path.yml; the same rule as scripts/build_learn.py). */
 const has = v => v !== undefined && v !== null && v !== "";
@@ -15,6 +18,17 @@ const link = p => String(p).replace(/\.qmd($|#)/, ".html$1");
 const page = l => has(l.path) ? l.path : (l.status === "active" && has(l.id) ? l.id + ".qmd" : "");
 const live = l => has(page(l)) && l.status !== "upcoming";
 const name = {}; tiers.forEach(t => { name[t.id] = t.title; });
+// a bridge lesson's two tiers in reading order, lower tier first ("Analyst to Modeler" for lesson 13), as on the map
+const at = {}; tiers.forEach((t, k) => { at[t.id] = k; });
+const span = l => !has(l.tier2) || at[l.tier2] == null ? name[l.tier] : at[l.tier] <= at[l.tier2] ? name[l.tier] + " to " + name[l.tier2] : name[l.tier2] + " to " + name[l.tier];
+// curriculum order on a tier's line (the same rule as metro.js ordered()), and the kind a station's shape shows
+const fam = { F: 0, A: 0, M: 0, R: 0, B: 2, N: 3, X: 4, CF: 5, SB: 6, C: 8 };
+const rank = l => { const c = has(l.code) ? String(l.code) : ""; if (!c) return [1, 0]; if (/^CK-/.test(c)) return [7, 0]; if (c === "CR") return [8, 99];
+  const g = /^([A-Z]+)(\d+)$/.exec(c); return g ? [fam[g[1]] != null ? fam[g[1]] : 4.5, Number(g[2])] : [4.5, 0]; };
+const kinds = { studio: "studio", case: "case file", checkpoint: "checkpoint", sandbox: "sandbox", capstone: "capstone" };
+const kind = l => { const c = has(l.code) ? String(l.code) : "";
+  return kinds[l.form] || (/^CK-/.test(c) ? "checkpoint" : /^CF\d/.test(c) ? "case file" : /^SB\d/.test(c) ? "sandbox" : /^(C\d+|CR)$/.test(c) ? "capstone" : /^R\d/.test(c) ? "studio" : ""); };
+const status = l => live(l) ? "open" : "coming soon";
 %>
 <details class="lx-listview" id="lx-list" open>
 <summary>All lessons as a list</summary>
@@ -23,26 +37,31 @@ const name = {}; tiers.forEach(t => { name[t.id] = t.title; });
 <h3 id="h-path"><i style="--c:var(--lx-ink-3)"></i>The starter path: <%= starter.length %> lessons across the tiers</h3>
 <ol start="0">
 <% for (const l of starter) { %>
-<li id="lesson-<%= l.starter %>" data-lesson-id="<%= l.id %>"><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· <%= name[l.tier] %><%= has(l.tier2) ? " to " + name[l.tier2] : "" %> · <%= l.minutes %> min<%= live(l) ? "" : " · coming soon" %></span></li>
+<li id="lesson-<%= l.starter %>" data-lesson-id="<%= l.id %>"><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· <%= span(l) %> · <%= l.minutes %> min · <%= status(l) %></span></li>
 <% } %>
 </ol>
 </section>
 <% for (const t of tiers) {
-     const more = lessons.filter(l => l.tier === t.id && !has(l.starter)); %>
+     const tour = starter.filter(l => l.tier === t.id);
+     const more = lessons.map((l, j) => ({ l, j })).filter(x => x.l.tier === t.id && !has(x.l.starter))
+       .sort((a, b) => rank(a.l)[0] - rank(b.l)[0] || rank(a.l)[1] - rank(b.l)[1] || a.j - b.j).map(x => x.l); %>
 <section id="<%= t.id %>" aria-labelledby="h-<%= t.id %>">
 <h3 id="h-<%= t.id %>"><i style="--c:var(--lx-tier-<%= t.slot || (tiers.indexOf(t) + 1) %>)"></i><%= t.title %><%= has(t.level) ? " · " + t.level : "" %><%= t.status === "upcoming" ? " · coming later" : "" %></h3>
 <p class="lx-hint"><%= t.goal %></p>
-<% if (more.length) { %>
+<% if (tour.length || more.length) { %>
 <ul>
-<% for (const l of more) { %><li<% if (has(l.id)) { %> data-lesson-id="<%= l.id %>"<% } %>><% if (has(l.code)) { %><span class="lx-code"><%= l.code %></span><% } %><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %><% if (has(l.minutes)) { %> <span class="lx-code">· <%= l.minutes %> min<%= live(l) ? "" : " · coming soon" %></span><% } %></li><% } %>
+<% for (const l of tour) { %><li data-lesson-id="<%= l.id %>"><span class="lx-code">Lesson <%= l.starter %></span><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· starter path · <%= l.minutes %> min · <%= status(l) %></span></li><% } %>
+<% for (const l of more) { %><li<% if (has(l.id)) { %> data-lesson-id="<%= l.id %>"<% } %>><% if (has(l.code)) { %><span class="lx-code"><%= l.code %></span><% } %><% if (live(l)) { %><a href="<%- link(page(l)) %>"><%= l.title %></a><% } else { %><%= l.title %><% } %> <span class="lx-code">· <%= kind(l) ? kind(l) + " · " : "" %><%= has(l.minutes) ? l.minutes + " min · " : "" %><%= status(l) %></span></li><% } %>
 </ul>
+<% } else { %>
+<p class="lx-hint"><%= t.status === "upcoming" ? "Coming later." : "In preparation." %></p>
 <% } %>
 </section>
 <% } %>
 <% if (tools.length) { %>
 <section id="toolbox" aria-labelledby="h-toolbox">
 <h3 id="h-toolbox"><i style="--c:var(--lx-ink-3)"></i>The math toolbox</h3>
-<ul><% for (const t of tools) { %><li<% if (has(t.id)) { %> data-lesson-id="<%= t.id %>"<% } %>><% if (has(t.code)) { %><span class="lx-code"><%= t.code %></span><% } %><% if (live(t)) { %><a href="<%- link(page(t)) %>"><%= t.title %></a><% } else { %><%= t.title %><% } %><% if (has(t.minutes)) { %> <span class="lx-code">· <%= t.minutes %> min<%= live(t) ? "" : (has(t.id) ? " · coming soon" : "") %></span><% } %></li><% } %></ul>
+<ul><% for (const t of tools) { %><li<% if (has(t.id)) { %> data-lesson-id="<%= t.id %>"<% } %>><% if (has(t.code)) { %><span class="lx-code"><%= t.code %></span><% } %><% if (live(t)) { %><a href="<%- link(page(t)) %>"><%= t.title %></a><% } else { %><%= t.title %><% } %> <span class="lx-code">· <%= has(t.minutes) ? t.minutes + " min · " : "" %><%= status(t) %></span></li><% } %></ul>
 </section>
 <% } %>
 </div>
