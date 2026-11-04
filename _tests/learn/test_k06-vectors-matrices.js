@@ -194,5 +194,36 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
 }
 
+// ---------------- the page on a stub document: it mounts, with its explain layer; the matrix rows carry their spoken names
+{
+  const vm = require("vm");
+  const { env, load, El } = require("./stubdom.js");
+  if (!El.prototype.contains) El.prototype.contains = function (n) { while (n) { if (n === this) return true; n = n.parentNode; } return false; };   // the stub has no contains()
+  const E = env();
+  E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null;
+  E.LX.lessonRefHTML = (p, c) => "<a>" + c + "</a>";
+  ["numanswer", "drill", "cards", "controls", "lpplane", "equation", "linkedviews", "table"].forEach(n => load(n, E));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "k06") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  const mctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {}, IntersectionObserver: undefined };
+  let threw = null;
+  const xp = E.LX.H("div", { id: "k6-explain" }, E.body);
+  try {
+    vm.runInNewContext(JS, mctx);
+    const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "k06" }, E.body), live = E.LX.H("div", null, root);
+    init(live, { town: TOWN, town_year: YEAR, "10_write_it_down": D10, path: {} }, root);
+  } catch (e) { threw = e.stack || e.message; }
+  ok(!threw && demo && demo.cards, "stub: the page mounts with its explain layer" + (threw ? ": " + threw : ""));
+  if (!threw && demo) try {
+    ok(/Outputs cannot be negative/.test(xp.textContent) && !/np\./.test(xp.textContent), "stub: the explain layer states nonnegativity and shows no NumPy");
+    const card = () => demo.cards.el;
+    [0, 1, 2, 3, 4, 5, 6].forEach(k => { demo.cards.go(k); ok(card().textContent.length > 0, "stub: step " + (k + 1) + " builds"); });
+    demo.cards.go(3);
+    const rows = card().querySelectorAll("button").filter(b => /k6-row/.test(b.getAttribute("class") || ""));
+    ok(rows.length === 4 && rows[3].getAttribute("aria-label") === "CO₂ cap row: 0.37 times x₁ plus 0.55 times x₂, not worked out yet, at most 100 t of CO₂.", "stub: step 4's matrix rows carry their spoken names (" + (rows[3] && rows[3].getAttribute("aria-label")) + ")");
+  } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
+}
+
 console.log(`k06-vectors-matrices: ${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

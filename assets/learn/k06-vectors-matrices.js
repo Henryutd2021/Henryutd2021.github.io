@@ -389,7 +389,7 @@
   // ---------------------------------------------------------------- explain layer
   function explain(s) {
     var x = document.getElementById("k6-explain"); if (!x) return null; x.innerHTML = "";
-    var M = s.M;
+    var M = s.M, T = texts(s);
     function own() { var o = LX.store.get("k6-own"); return o && typeof o.x === "number" ? [o.x, o.y] : null; }
     // every value in the ≤ form the equation shows (explainVals); the original signs are named apart
     function you(kind) { return function () { var o = own(); return explainVals(s, o || s.plan, !!o)[kind] || null; }; }
