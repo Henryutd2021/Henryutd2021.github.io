@@ -79,12 +79,12 @@
  ],
  "car": { "mpg": 22.8, "miles": 10917, "kmPerMile": 1.609344, "src": "epa_vehicle" },
  "efficiency": {
-  "furnace": { "value": 0.8, "label": "Gas furnace, 80% AFUE", "what": "share of the gas's energy that ends up as heat in the rooms over a season", "src": "doe_furnace", "kind": "illustrative, within DOE's 80% to 83% for mid-efficiency furnaces" },
-  "waterheater": { "value": 0.6, "label": "Gas water heater, about 60%", "what": "share of the gas's energy that ends up in the hot water, after flue and tank losses", "src": "doe_waterheater", "kind": "illustrative, DOE's typical Energy Factor of about 0.60 for gas storage units" },
+  "furnace": { "value": 0.8, "label": "Gas furnace, 80% AFUE", "what": "share of the gas's energy that leaves the furnace as heat over a season, under DOE's test (duct losses and the fan's electricity are not counted; this home assumes no duct losses)", "src": "doe_furnace", "kind": "illustrative, within DOE's 80% to 83% for mid-efficiency furnaces" },
+  "waterheater": { "value": 0.6, "label": "Gas water heater, about 60%", "what": "share of the gas's energy that ends up in the hot water, after exhaust-vent and tank losses", "src": "doe_waterheater", "kind": "illustrative, DOE's typical Energy Factor of about 0.60 for gas storage units" },
   "car": { "value": 0.3, "label": "Gasoline car, about 30%", "what": "share of the fuel's energy that moves the car", "src": "doe_fotw1360", "kind": "DOE's about 30%, depending on the drive cycle" }
  },
  "heatpump": {
-  "about": "Illustrative model of a cold-climate air-source heat pump. COP = k × T_supply ÷ (T_supply − T_outdoor), temperatures in kelvin, with warm air supplied at 45 °C; k is set so that COP = 2.4 at −15 °C, DOE's challenge target. Below the compressor cut-out (−23 °C, the challenge's highest allowed cut-out) a backup resistance heater runs at COP 1. The seasonal COP for the year is the challenge's HSPF2 of 8.5 Btu per Wh ÷ 3.412.",
+  "about": "Illustrative model of a cold-climate air-source heat pump, not a device calculation: at or above the compressor cut-out, COP = 144 ÷ (45 − T) with T the day's outdoor average in °C, a curve chosen to give COP 2.4 at −15 °C, DOE's challenge target (2.4 × 60 = 144). Below the cut-out (−23 °C, the challenge's highest allowed cut-out) the compressor stops and a backup resistance heater runs at COP 1. The seasonal COP for the year is the challenge's HSPF2 of 8.5 Btu of heat per Wh of electricity ÷ 3.412.",
   "supplyC": 45,
   "anchorC": -15,
   "anchorCOP": 2.4,

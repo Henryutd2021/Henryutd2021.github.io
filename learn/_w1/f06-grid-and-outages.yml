@@ -40,7 +40,10 @@ glossary:
     def: "A network with loops, so power can reach a place by more than one path, as transmission networks do."
   - id: n-minus-one
     term: N−1
-    def: "A planning rule: the system keeps serving its customers after any one element, such as a line, fails."
+    def: "A planning rule: after any one element, such as a line, fails, the system keeps serving its customers with every remaining part within its limits."
+  - id: fault
+    term: Fault
+    def: "An unintended electrical path, such as a fallen branch joining a wire to the ground, through which a large current rushes until a protective device opens."
   - id: customer-minutes
     term: Customer-minutes
     def: "The number of customers without power times the minutes they wait: 10 homes dark for an hour is 600 customer-minutes."
@@ -49,7 +52,7 @@ glossary:
     def: "System Average Interruption Duration Index: the minutes without power the average customer has in a year, customer-minutes divided by customers served."
   - id: saifi
     term: SAIFI
-    def: "System Average Interruption Frequency Index: the number of interruptions the average customer has in a year, customers interrupted divided by customers served."
+    def: "System Average Interruption Frequency Index: the number of sustained interruptions the average customer has in a year, total customer interruptions divided by customers served, so a customer interrupted twice counts twice."
   - id: caidi
     term: CAIDI
     def: "Customer Average Interruption Duration Index: the average minutes to restore one interruption, SAIDI divided by SAIFI."

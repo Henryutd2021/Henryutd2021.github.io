@@ -13,7 +13,7 @@
  },
  "afue": {
   "term": "AFUE (annual fuel utilization efficiency)",
-  "short": "The share of a furnace's fuel energy that ends up as heat in the home over a heating season, under a standard test.",
+  "short": "The share of a furnace's fuel energy that leaves the furnace as heat over a heating season, under a standard test that leaves out duct losses and the fan's electricity.",
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
@@ -161,6 +161,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "btu": {
+  "term": "Btu (British thermal unit)",
+  "short": "A unit of heat, the energy that warms one pound of water by one degree Fahrenheit; one kilowatt-hour equals 3,412 Btu.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "buffer": {
   "term": "Buffer (GIS)",
   "short": "The zone within a set distance of a map feature, such as everything within 1 km of a wind turbine.",
@@ -265,7 +271,7 @@
  },
  "chain-reaction": {
   "term": "Chain reaction",
-  "short": "A run of fissions in which the neutrons from each split go on to split more atoms; a reactor holds it steady, each generation as large as the last.",
+  "short": "A run of fissions in which the neutrons from each split go on to split more atoms; a reactor holds it steady, with each generation as large as the last.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
  },
@@ -491,6 +497,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "heat-pump-cut-out": {
+  "term": "Cut-out temperature (heat pump)",
+  "short": "The outdoor temperature below which a heat pump's compressor, the pump that moves its heat, switches off, so a backup heater must take over.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "data-licence": {
   "term": "Data licence",
   "short": "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement.",
@@ -563,6 +575,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "desalination": {
+  "term": "Desalination",
+  "short": "Removing salt from seawater or salty groundwater to make fresh water, with heat or with electricity.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "deterministic-equivalent": {
   "term": "Deterministic equivalent",
   "short": "A chance constraint rewritten as an ordinary rule with a safety margin, for example planning for the demand level that is exceeded with only the allowed probability.",
@@ -610,6 +628,12 @@
   "short": "The lower-voltage part of the grid, from substations along feeders and laterals to homes and businesses.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "district-heating": {
+  "term": "District heating",
+  "short": "Heat made in one place and piped as hot water or steam to warm many buildings.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "dominated-plan": {
   "term": "Dominated plan",
@@ -784,6 +808,12 @@
   "short": "Power from batteries or other inverter-based resources delivered within a fraction of a second of a frequency drop.",
   "lesson": 3,
   "href": "03-balancing.html"
+ },
+ "fault": {
+  "term": "Fault",
+  "short": "An unintended electrical path, such as a fallen branch joining a wire to the ground, through which a large current rushes until a protective device opens.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "feasible-region": {
   "term": "Feasible region",
@@ -970,6 +1000,12 @@
   "short": "A machine that turns part of a flow of heat into motion, such as a steam or gas turbine; the hotter its heat source, the larger the part it can turn.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "heat-exchanger": {
+  "term": "Heat exchanger",
+  "short": "A device that passes heat from one fluid to another through a wall, without mixing them; heat flows only from the hotter fluid to the cooler one.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "heat-pump": {
   "term": "Heat pump",
@@ -1271,6 +1307,12 @@
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },
+ "megapascal": {
+  "term": "Megapascal (MPa)",
+  "short": "A unit of pressure, one million pascals; the air pressure at sea level is about 0.1 MPa.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -1403,6 +1445,12 @@
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
  },
+ "nacelle": {
+  "term": "Nacelle",
+  "short": "The equipment housing on top of a wind turbine's tower, holding the gearbox and generator that the rotor turns.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "nadir": {
   "term": "Nadir",
   "short": "The lowest point the frequency reaches after a power plant trips, before it starts to recover.",
@@ -1489,7 +1537,7 @@
  },
  "n-minus-one": {
   "term": "N−1",
-  "short": "A planning rule: the system keeps serving its customers after any one element, such as a line, fails.",
+  "short": "A planning rule: after any one element, such as a line, fails, the system keeps serving its customers with every remaining part within its limits.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
@@ -1915,7 +1963,7 @@
  },
  "saifi": {
   "term": "SAIFI",
-  "short": "System Average Interruption Frequency Index: the number of interruptions the average customer has in a year, customers interrupted divided by customers served.",
+  "short": "System Average Interruption Frequency Index: the number of sustained interruptions the average customer has in a year, total customer interruptions divided by customers served, so a customer interrupted twice counts twice.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },

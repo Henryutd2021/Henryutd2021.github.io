@@ -21,11 +21,14 @@
   //                        the DOE challenge's seasonal COP; the same useful heat, bought as electricity plus outdoor heat)
   //   totals(D, o)         by carrier, bought, useful, lost, not split (cooling, kitchen, devices), outdoor heat
   //   spec(D, o)           the Sankey: o.view "bought" (carriers -> services) or "useful" (-> useful, lost, not split)
-  //   cop(D, T), day(D, T) the cold-day model: COP = 144 ÷ (45 − T) (2.4 × 60, so COP = 2.4 at −15 °C), backup heat at
-  //                        COP 1 below the −23 °C cut-out; a day needs 5 kWh of heat per °C below 18 °C (illustrative)
+  //   cop(D, T), day(D, T) the cold-day model: COP = 144 ÷ (45 − T) at or above the −23 °C cut-out (an illustrative
+  //                        curve chosen to give COP 2.4 at −15 °C: 2.4 × 60 = 144), backup heat at COP 1 below it; a day
+  //                        needs 5 kWh of heat per °C below 18 °C (illustrative)
   //   seasonCOP(D)         HSPF2 8.5 Btu per Wh ÷ 3.412 = 2.49
-  //   primary(D, P4, P6)   Go deeper: gas burned at a combined-cycle plant (F4's heat rate) for the heat pump's year,
-  //                        through grid losses (F6's about 5%), against the furnace's gas
+  //   primary(D, P4, P6)   Go deeper: gas burned at a combined-cycle plant (F4's full-load test heat rate) for the heat
+  //                        pump's year, through grid losses (F6's EIA average of about 5%), against the furnace's gas
+  //   say                  the feedback each step shows, assembled from the model (pure, so the test checks every
+  //                        variant against the text budget)
   function r100(x) { return Math.round(x / 100) * 100; }
   function kwhOf(D, mmbtu) { return mmbtu * 1e6 / D.units.btuPerKWh; }
   function car(D) {
@@ -119,8 +122,40 @@
     return { el: hp.bought.el, lossPct: lossPct, sent: sent, heatRate: cc.heatRate, gas: gasKWh, furnaceGas: furnace.bought.gas, cut: 1 - gasKWh / furnace.bought.gas };
   }
   function fmtK(v) { return Math.round(v).toLocaleString("en-US"); }
+  function kwh(v) { return fmtK(v) + " kWh"; }
+  function pct(v) { return Math.round(v * 100) + "%"; }
+  function degC(t) { return (t < 0 ? "−" : "") + Math.abs(t) + " °C"; }
+  // feedback texts: about 35 words and at most two sentences each, after a one-word verdict ("Right." or "Not quite.")
+  var say = {
+    tour: function () { return "Six services, three [[energy-carrier|carriers]]: natural gas, electricity and gasoline. A carrier only brings the energy; a device turns it into the service."; },
+    place: function (left) { return "Place every card first: " + left + " still in the pool."; },
+    sort: function (right, total) { return "**" + right + " of " + total + "** right" + (right < total ? "; the reasons are under the boxes." : ".") + " One service can have several devices: a furnace or a heat pump can deliver the same warm room."; },
+    year: function (D, pred) {
+      var Sp = split(D, {}), T0 = totals(D, {}), right = pred === D.predict.answer;
+      return (pred ? (right ? "Your guess was right: " : "Not quite: ") : "") + "**warmth** takes " + kwh(Sp.warmth.total) + " of the home's " + kwh(T0.home) + " (" + pct(Sp.warmth.total / T0.home) + "). The car adds " + kwh(Sp.mobility.total) + " of gasoline, about as much as the furnace.";
+    },
+    guess: function (D, right) { return (right ? "Right: " : "Not quite: ") + "about " + D.guess.answer + "% of the fuel's energy moves a typical gasoline car (DOE). The rest leaves as [[waste-heat|waste heat]]."; },
+    useful: function (D) {
+      var T1 = totals(D, { car: true });
+      return "Of " + kwh(T1.bought) + " bought, **" + kwh(T1.useful) + "** becomes [[useful-energy|useful]] heat and motion and " + kwh(T1.lost) + " is lost. Cooling, the kitchen and devices (" + kwh(T1.notSplit) + ") are not split here.";
+    },
+    heatPump: function (D) {
+      var Sh = split(D, { heatPump: true }), T1 = totals(D, { car: true }), T2 = totals(D, { car: true, heatPump: true });
+      return "Same useful heat, " + kwh(Sh.warmth.useful) + ", now from " + kwh(Sh.warmth.bought.el) + " of electricity plus " + kwh(Sh.warmth.air) + " of outdoor heat: a seasonal [[coefficient-of-performance|COP]] of " + seasonCOP(D).toFixed(1) + ". Home and car now buy " + kwh(T2.bought) + ", not " + kwh(T1.bought) + ".";
+    },
+    furnace: function (D) {
+      var Sp = split(D, {});
+      return "The furnace: " + kwh(Sp.warmth.total) + " of gas for " + kwh(Sp.warmth.useful) + " of useful heat (" + pct(D.efficiency.furnace.value) + " [[afue|AFUE]], with no duct losses assumed).";
+    },
+    cold: function (D, T) {
+      var r = day(D, T), a = day(D, D.day.start);
+      if (r.backup) return "Below the " + degC(D.heatpump.cutoutC) + " [[heat-pump-cut-out|cut-out]] the heat pump stops pumping heat, and a backup heater runs at COP 1: " + kwh(r.el) + " of electricity for " + kwh(r.Q) + " of heat.";
+      return "At " + degC(T) + " the home needs " + (r.Q / a.Q).toFixed(1) + " times the heat of a " + degC(D.day.start) + " day, but the heat pump uses " + (r.el / a.el).toFixed(1) + " times the electricity: COP " + r.cop.toFixed(2) + ".";
+    },
+    apply: function (D, right) { return (right ? "Right. " : "Not quite. ") + D.apply.why; }
+  };
   var model = { sankey: sankey, r100: r100, kwhOf: kwhOf, car: car, bought: bought, split: split, totals: totals, spec: spec,
-    cop: cop, day: day, seasonCOP: seasonCOP, primary: primary, fmtK: fmtK };
+    cop: cop, day: day, seasonCOP: seasonCOP, primary: primary, fmtK: fmtK, say: say };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -129,10 +164,7 @@
   // Lesson-local: HomeScene (a cutaway of the home with six service buttons, the rooms each one uses lit, a text version).
   // Shared: LX.StepCards, LX.CardSort, LX.Predict, LX.Guess, LX.Slider, LX.Plot, LX.NumAnswer, LX.CompareTable,
   // LX.CausalChain, LX.demo, LX.Sankey (components/sankey.js).
-  var LESSON = "f03-energy-services";
-  function kwh(v) { return fmtK(v) + " kWh"; }
-  function pct(v) { return Math.round(v * 100) + "%"; }
-  function degC(t) { return (t < 0 ? "−" : "") + Math.abs(t) + " °C"; }
+  var LESSON = "f03-energy-services";   // kwh, pct, degC and the feedback texts (say) are in the model above
 
   // ---- the home cutaway (viewBox 420 × 250); class names style it from the page's tokens (f3h- in the page's style block)
   var ZONES = {   // the rooms and equipment each service lights up
@@ -235,7 +267,7 @@
     for (var T = d.min; T <= d.max; T += 1) { var c = cop(D, T); pts.push([T, c]); if (T % 5 === 0 || T === D.heatpump.cutoutC) rows.push([degC(T), c.toFixed(2)]); }
     function draw(T, fire) {
       var r = day(D, T), maxQ = day(D, d.min).gas;
-      out.innerHTML = "<b>COP " + r.cop.toFixed(2) + "</b>" + (r.backup ? " (below the cut-out: the backup heater)" : "") + " · heat needed <b>" + kwh(r.Q) + "</b> · heat pump electricity <b>" + kwh(r.el) + "</b>";
+      out.innerHTML = "<b>COP " + r.cop.toFixed(2) + "</b>" + (r.backup ? " (below the cut-out: the heat pump stops, a backup heater runs)" : "") + " · heat needed <b>" + kwh(r.Q) + "</b> · heat pump electricity <b>" + kwh(r.el) + "</b>";
       bars.innerHTML = "";
       [["Heat the home needs", r.Q, "var(--lx-good)"], ["Heat pump: electricity", r.el, "var(--lx-bat)"], ["Heat pump: from outdoor air", r.air, "var(--lx-wind)"], ["Furnace instead: gas", r.gas, "var(--lx-cc)"]].forEach(function (b) {
         var row = H("div", { class: "f3d-row" }, bars);
@@ -261,7 +293,6 @@
     var log = LX.store.get("f3-log", {}) || {};
     function keep(k, v) { log[k] = v; LX.store.set("f3-log", log); }
     var state = { car: !!log.car, heatPump: !!log.hp, temp: log.temp == null ? D.day.start : log.temp };
-    var T0 = totals(D, {}), T1 = totals(D, { car: true }), T2 = totals(D, { car: true, heatPump: true }), Sp = split(D, {}), Sh = split(D, { heatPump: true });
     function sk(host, o) {
       return LX.Sankey(host, { label: "A year of energy in the Prairie Town home, in kWh", unit: "kWh", fmt: fmtK, height: 300, heightN: 340,
         textHead: ["From", "To", "kWh in a year"], caption: o && o.caption, colNames: ["Bought", "Services", "Becomes"] });
@@ -271,7 +302,7 @@
         build: function (act, api) {
           HomeScene(act, { D: D, seen: log.seen || [], onGo: function (k, n) {
             var s = log.seen || []; if (s.indexOf(k) < 0) { s.push(k); keep("seen", s); }
-            if (n === D.services.length) { api.done(); api.saw("Six services, three [[energy-carrier|carriers]]: natural gas, electricity and gasoline. A carrier only brings the energy; a device turns it into the service."); }
+            if (n === D.services.length) { api.done(); api.saw(say.tour()); }
           } });
           if ((log.seen || []).length >= D.services.length) api.done();
         } },
@@ -281,8 +312,8 @@
             cards: D.sort.cards, checkLabel: "Check my sort", maxWhy: 4, hint: "Tap a card, then tap the box it belongs in. Tap a placed card to move it.",
             onCheck: function (g) {
               keep("sort", JSON.parse(JSON.stringify(cs.placed())));
-              if (g.placed < g.total) { api.saw("Place every card first: " + (g.total - g.placed) + " still in the pool.", true); return; }
-              api.done(); api.saw("**" + g.right + " of " + g.total + "** right" + (g.right < g.total ? "; the reasons are under the boxes." : ".") + " One service can have several devices: a furnace or a heat pump can deliver the same warm room.", g.right < 6);
+              if (g.placed < g.total) { api.saw(say.place(g.total - g.placed), true); return; }
+              api.done(); api.saw(say.sort(g.right, g.total), g.right < 6);
             } });
           if (log.sort) cs.place(JSON.parse(JSON.stringify(log.sort)));
         } },
@@ -298,10 +329,7 @@
           var s = sk(act);
           var b = H("button", { type: "button", class: "lx-btn small f3-add", "aria-pressed": state.car ? "true" : "false", text: state.car ? "Car added" : "Add the family car" }, row);
           function show() { s.set(spec(D, { car: state.car })); }
-          function reveal() {
-            var right = log.pred === "warmth", share = Sp.warmth.total / T0.home;
-            api.saw((log.pred ? (right ? "Your guess was right: " : "Not quite: ") : "") + "**warmth** takes " + kwh(Sp.warmth.total) + " of the home's " + kwh(T0.home) + " (" + pct(share) + "). The car adds " + kwh(Sp.mobility.total) + " of gasoline, about as much as the furnace.", log.pred && !right);
-          }
+          function reveal() { api.saw(say.year(D, log.pred), log.pred && log.pred !== D.predict.answer); }
           b.addEventListener("click", function () {
             state.car = true; keep("car", true); b.setAttribute("aria-pressed", "true"); b.textContent = "Car added"; b.disabled = true;
             show(); api.done(); reveal();
@@ -309,18 +337,18 @@
           if (state.car) { b.disabled = true; api.done(); reveal(); }
           show();
         } },
-      { text: "Energy bought is not energy used: a furnace loses heat up the flue, a car's engine warms the air. Guess first, then see the useful share.",
+      { text: "Not all the energy bought becomes useful heat or motion: a furnace loses some up its exhaust vent, and a car's engine warms the air. Guess first, then see the useful share.",
         build: function (act, api) {
           var s = null;
           LX.Guess(act, { id: D.guess.id, q: D.guess.q, ticks: D.guess.ticks.map(function (t) { return t + "%"; }), answer: D.guess.ticks.indexOf(D.guess.answer), start: 2,
             onLock: function (g, out) {
               keep("guess", g);
               var right = D.guess.ticks[g] === D.guess.answer;
-              out.innerHTML = "<p>" + LX.rich((right ? "Right: " : "Not quite: ") + "about " + D.guess.answer + "% of the fuel's energy moves a typical gasoline car (DOE). The rest leaves as [[waste-heat|waste heat]].") + "</p>";
+              out.innerHTML = "<p>" + LX.rich(say.guess(D, right)) + "</p>";
               state.car = true; keep("car", true);
               s = sk(act); s.set(spec(D, { car: true, view: "useful" }));
               api.done();
-              api.saw("Of " + kwh(T1.bought) + " bought, **" + kwh(T1.useful) + "** becomes [[useful-energy|useful]] heat and motion and " + kwh(T1.lost) + " is lost. Cooling, the kitchen and devices (" + kwh(T1.notSplit) + ") are not split here.");
+              api.saw(say.useful(D));
             } });
           if (log.guess != null) { s = sk(act); s.set(spec(D, { car: true, view: "useful" })); api.done(); }
         } },
@@ -337,8 +365,8 @@
             s.set(spec(D, { car: true, heatPump: hp, view: "useful" }));
             if (hp) {
               api.done();
-              api.saw("Same useful heat, " + kwh(Sh.warmth.useful) + ", now from " + kwh(Sh.warmth.bought.el) + " of electricity plus " + kwh(Sh.warmth.air) + " of outdoor heat: a seasonal [[coefficient-of-performance|COP]] of " + seasonCOP(D).toFixed(1) + ". Home and car now buy " + kwh(T2.bought) + ", not " + kwh(T1.bought) + ".");
-            } else if (fire) api.saw("The furnace: " + kwh(Sp.warmth.total) + " of gas for " + kwh(Sp.warmth.useful) + " of useful heat (" + pct(D.efficiency.furnace.value) + " [[afue|AFUE]]).");
+              api.saw(say.heatPump(D));
+            } else if (fire) api.saw(say.furnace(D));
           }
           set(state.heatPump, false);
           if (state.heatPump) api.done();
@@ -349,10 +377,8 @@
           ColdDay(act, D, { start: state.temp, onChange: function (T, r, fire) {
             state.temp = T; if (fire) keep("temp", T);
             if (T <= D.day.goal) {
-              var a = day(D, D.day.start);
               if (!done) { done = true; api.done(); }
-              api.saw(r.backup ? "Below " + degC(D.heatpump.cutoutC) + " the compressor stops and a backup heater runs at COP 1: " + kwh(r.el) + " of electricity for " + kwh(r.Q) + " of heat." :
-                "At " + degC(T) + " the home needs " + (r.Q / a.Q).toFixed(1) + " times the heat of a " + degC(D.day.start) + " day, but the heat pump uses " + (r.el / a.el).toFixed(1) + " times the electricity: COP " + r.cop.toFixed(2) + ".");
+              api.saw(say.cold(D, T));
             }
           } });
           if (state.temp <= D.day.goal) { done = true; api.done(); }
@@ -363,7 +389,7 @@
             if (v == null) { fb.textContent = "Type a number first."; return; }
             var okv = Math.abs(v - D.apply.answer) <= D.apply.tol;
             input.classList.toggle("right", okv); input.classList.toggle("wrong", !okv);
-            fb.innerHTML = "<span>" + LX.rich((okv ? "Right. " : "Not quite. ") + D.apply.why) + "</span>";
+            fb.innerHTML = "<span>" + LX.rich(say.apply(D, okv)) + "</span>";
             if (okv) { api.done(); LX.progress.done(LESSON); }
           } });
           var fb = H("p", { class: "lx-predict-out", "aria-live": "polite" }, act);
@@ -418,7 +444,7 @@
         return { key: sv.key, color: "var(--lx-ink-2)", name: sv.label, want: sv.want, dev: dev,
           car: Object.keys(r.bought).map(function (k) { return kwh(r.bought[k]) + " " + names[k]; }).join(" + "), use: use };
       }),
-      caption: "Carriers are what you pay for; services are what you get. A better device changes the carrier you buy, not the service."
+      caption: "Carriers are what you pay for; services are what you get. A different device can change how much energy you buy, which carrier you use, or both."
     });
 
     var a = day(D, D.day.start), b = day(D, D.heatpump.anchorC);
@@ -429,7 +455,7 @@
         { title: "The home needs more heat", text: "Heat leaks out faster when the gap to 18 °C is bigger (illustrative home).", value: kwh(a.Q) + " → " + kwh(b.Q) },
         { title: "The COP falls", text: "Pulling heat from colder air is harder work.", value: a.cop.toFixed(2) + " → " + b.cop.toFixed(2) },
         { title: "Electricity climbs faster than heat", text: "More heat at a lower COP multiplies.", value: kwh(a.el) + " → " + kwh(b.el) },
-        { title: "Cold evenings set the peak", text: "When many homes do this at once, the grid's winter peak grows (lesson 2).", value: "×" + (b.el / a.el).toFixed(1) + " electricity" }
+        { title: "Cold days raise electricity demand", text: "This example uses " + (b.el / a.el).toFixed(1) + " times as much electricity per day; finding the grid's peak hour needs hourly data (lesson 2).", value: "×" + (b.el / a.el).toFixed(1) + " electricity" }
       ],
       note: "Heat need ×" + (b.Q / a.Q).toFixed(1) + ", electricity ×" + (b.el / a.el).toFixed(1) + ": numbers from this lesson's illustrative cold-day model." });
   }

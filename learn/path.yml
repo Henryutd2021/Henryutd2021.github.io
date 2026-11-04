@@ -473,10 +473,10 @@
   minutes: 20
   practice_minutes: 10
   title: "How do power plants turn heat, water, wind and sunlight into electricity?"
-  subtitle: "Open six plants, follow 100 units of energy to the wire, and watch a cloudy day on a solar farm"
+  subtitle: "Open six plants, follow 100 units of energy to the wire, and compare three real days on a solar farm"
   short: "Power plants"
   teaches: [heat engines and turbines, conversion efficiency and waste heat, hydro head and flow, solar and wind conversion, ramp and reservoir limits]
-  does: "Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; a real cloudy day on a solar farm; reservoir and ramp limits."
+  does: "Cutaways of gas, steam, hydro, geothermal, wind and solar plants; 100 units of energy followed to the wire and to waste heat; three real days of output on a solar farm; reservoir and ramp limits."
   outcome: "Explain how each kind of plant turns its energy source into electricity, where the losses go, and what limits how fast it can change its output."
   after: [5]
   next: F5
@@ -494,7 +494,7 @@
   short: "Nuclear basics"
   teaches: [fission and the chain reaction, moderators and control rods, from fuel to steam, designs by size and outlet temperature, spent fuel and safety systems]
   does: "A chain-reaction toy with control rods and a moderator, a plant from fuel to steam, designs compared by size, outlet temperature and uses, and myth-or-fact cards on spent fuel and safety systems."
-  outcome: "Explain how a reactor keeps its chain reaction steady, how its heat becomes electricity, and why outlet temperature sets which uses a design can serve."
+  outcome: "Explain how a reactor keeps its chain reaction steady, how its heat becomes electricity, and why outlet temperature limits which heat uses a design could serve."
   after: [F4]
   next: F6
 - kind: lesson
