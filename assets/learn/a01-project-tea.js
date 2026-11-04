@@ -233,7 +233,7 @@
     if (kind === "breakeven") {
       var cap = pick([1200, 1500, 1712, 2000]), fom = pick([20, 30, 34.57]), cfp = pick([25, 30, 33.8, 40]), cr = +crf(pick([4, 5, 6]) / 100, 30).toFixed(4);
       var Ekw = cfp / 100 * 8.76, be = (cr * cap + fom) / Ekw;
-      return { kind: kind, q: "Building cost $" + cap.toLocaleString("en-US") + "/kW, upkeep $" + fom + "/kW-yr, capacity factor " + cfp + "%, capital recovery factor (CRF) " + cr.toFixed(4) + ". The break-even price, in $/MWh to the cent?", answer: Math.round(be * 100) / 100, tol: 0.06, unit: "$/MWh",
+      return { kind: kind, q: "Building cost $" + cap.toLocaleString("en-US") + "/kW, upkeep $" + fom + "/kW-yr, capacity factor " + cfp + "%, [[capital-recovery-factor|capital recovery factor]] (CRF) " + cr.toFixed(4) + ". The break-even price, in $/MWh to the cent?", answer: Math.round(be * 100) / 100, tol: 0.06, unit: "$/MWh",
                why: "(" + cr.toFixed(4) + " × " + cap + " + " + fom + ") ÷ (" + (cfp / 100).toFixed(3) + " × 8.76) = " + be.toFixed(2) + " $/MWh." };
     }
     // pick: two mutually exclusive projects; which adds more value?
@@ -551,8 +551,6 @@
     var host = document.getElementById("a1-drill"); if (!host) return; host.innerHTML = "";
     LX.Drill(host, { hint: "Six kinds of item in rotation: NPV, payback, IRR, WACC, break-even price and choosing between projects. A calculator helps; aim for twelve, about 25 minutes.",
                      empty: "Type a number first.", item: drillItem, unit: function (it) { return it.unit || ""; } });
-    // the drill writes its items as plain text, so the one term it needs is marked here, under the card
-    H("p", { class: "lx-hint a1-drill-terms", html: LX.rich("The break-even items give the [[capital-recovery-factor|capital recovery factor]] (CRF) of lesson 7 and K3: the share of the building cost repaid each year, with interest.") }, host);
   }
 
   LX.mount("a01", function (live, data, root) { view(live, data, root); });

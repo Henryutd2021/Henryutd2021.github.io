@@ -7965,8 +7965,9 @@
    LX.Drill(host, { item, hint, title, seed, unit, check, empty, focus, width, widthPhone, cls, choicesClass })
      item(k, r)    the page's item maker: item k (0, 1, 2, ...) drawn with the seeded random source r (r() in [0, 1));
                    returns { q, why, choices?, answer, unit?, tol? }: with choices, answer is the index of the right one;
-                   without, answer is a number and the reader types it
-     hint          one line under the title (the kinds of item and an honest time)
+                   without, answer is a number and the reader types it; q is text and may carry [[id|words]] glossary
+                   marks (LX.rich; W3 shared fix 1)
+     hint          one line under the title (the kinds of item and an honest time); may carry [[id|words]] glossary marks
      title         the card's heading (default "Practice drill")
      seed          the seed (default: a new one per visit, (Date.now() % 100000) + 1); the same seed gives the same items
      unit(it)      the unit shown after a numeric item's box (default it.unit or none)
@@ -8006,12 +8007,12 @@
     var card = H("div", { class: "lx-card lx-drill" + (o.cls ? " " + o.cls : "") }, host);
     var top = H("div", { class: "lx-x-head" }, card); H("h3", { text: o.title || "Practice drill" }, top);
     var score = H("span", { class: "lx-step-n", "aria-live": "polite", text: "0 done" }, top);
-    if (o.hint) H("p", { class: "lx-hint", text: o.hint }, card);
+    if (o.hint) H("p", { class: "lx-hint", html: LX.rich(o.hint) }, card);
     var box = H("div", { class: "lx-drill-q" }, card);
     var next = H("button", { type: "button", class: "lx-btn ghost small", html: "Next item" + LX.icon("arrow") }, card);
     function show(focus) {
       var it = o.item(k, r); k++; box.innerHTML = ""; cur = it;
-      var qp = H("p", { class: "lx-qtext", tabindex: focusMode === "question" ? "-1" : null, text: it.q }, box);
+      var qp = H("p", { class: "lx-qtext", tabindex: focusMode === "question" ? "-1" : null, html: LX.rich(it.q) }, box);
       var fb = null, answered = false;
       function mark(ok) {
         if (answered) return; answered = true; done++; if (ok) right++;

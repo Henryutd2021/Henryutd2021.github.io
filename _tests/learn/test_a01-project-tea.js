@@ -255,7 +255,7 @@ function calcCheck(label, str, skips) {
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
   ["internal-rate-of-return", "payback-period", "break-even-price", "inflation"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
   [["nominal-rate", "k03-discounting"], ["capital-recovery-factor", "07-cost"]].forEach(([id, l]) => ok(new RegExp("id: " + id + "\\n").test(fs.readFileSync(path.join(SITE, "learn/_w1/" + l + ".yml"), "utf8")) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " (defined in " + l + ") marked at its first use"));
-  ok(/\[\[nominal-rate\|nominal\]\]/.test(Q[2]) && /capital recovery factor \(CRF\) " \+ cr\.toFixed\(4\)/.test(JS), "terms: 'nominal' marked in step 3; the drill spells out CRF");
+  ok(/\[\[nominal-rate\|nominal\]\]/.test(Q[2]) && /\[\[capital-recovery-factor\|capital recovery factor\]\] \(CRF\) " \+ cr\.toFixed\(4\)/.test(JS), "terms: 'nominal' marked in step 3; the drill spells out CRF and marks it (LX.Drill writes marks since the W3 shared fix)");
   ok(/when electricity is its only revenue, with the same costs, output and discounting, it equals the plant's levelized cost\./.test(SIDE) && !/for one plant it equals/.test(SIDE), "glossary: break-even price equals the levelized cost only under stated conditions");
 }
 
@@ -279,7 +279,7 @@ function calcCheck(label, str, skips) {
     if (it.kind === "payback") { const mm = /costs \$(\d+)M and nets \$(\d+)M a year/.exec(it.q); let c = -mm[1], t = 0; while (c < -1e-9) { c += +mm[2]; t++; } ok(it.answer === t, `drill ${i}: payback year ${t}`); }
     if (it.kind === "irr") { const mm = /nets \$([\d.]+)M a year for (\d+) years/.exec(it.q), ex = A.irrOf(100, +mm[1], +mm[2]); ok(+it.choices[it.answer].replace("%", "") === Math.round(ex) && Math.abs(ex - Math.round(ex)) < 0.02 && new Set(it.choices).size === 4, `drill ${i}: irr (${ex.toFixed(3)})`); }
     if (it.kind === "wacc") { const mm = /Loans pay (\d+)% and owners ask (\d+)%.*loans are (\d+)% of the money; inflation is ([\d.]+)%/.exec(it.q); const nom = mm[3] / 100 * mm[1] + (1 - mm[3] / 100) * mm[2]; ok(near(it.answer, Math.round(((1 + nom / 100) / (1 + mm[4] / 100) - 1) * 1e4) / 100), `drill ${i}: wacc`); }
-    if (it.kind === "breakeven") { const mm = /Building cost \$([\d,]+)\/kW, upkeep \$([\d.]+)\/kW-yr, capacity factor ([\d.]+)%, capital recovery factor \(CRF\) ([\d.]*\d)/.exec(it.q); ok(near(it.answer, Math.round((+mm[4] * +mm[1].replace(/,/g, "") + +mm[2]) / (mm[3] / 100 * 8.76) * 100) / 100), `drill ${i}: breakeven`); }
+    if (it.kind === "breakeven") { const mm = /Building cost \$([\d,]+)\/kW, upkeep \$([\d.]+)\/kW-yr, capacity factor ([\d.]+)%, \[\[capital-recovery-factor\|capital recovery factor\]\] \(CRF\) ([\d.]*\d)/.exec(it.q); ok(near(it.answer, Math.round((+mm[4] * +mm[1].replace(/,/g, "") + +mm[2]) / (mm[3] / 100 * 8.76) * 100) / 100), `drill ${i}: breakeven`); }
     if (it.kind === "pick") { const mm = /A: NPV \$(\d+)M, IRR (\d+)%\. B: NPV \$(-?\d+)M, IRR (\d+)%/.exec(it.q); ok(mm && (it.answer === 1) === (+mm[3] > +mm[1]) && +mm[4] > +mm[2], `drill ${i}: pick by NPV, not IRR`); }
     if (!it.choices) ok(A.close(it.answer, it.answer, it.tol), `drill ${i}: its own answer passes`);
   });
