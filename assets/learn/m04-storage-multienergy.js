@@ -26,6 +26,11 @@
 // A configuration switches devices off (their upper bounds 0). With the electrolyzer off, all hydrogen is trucked.
 // Exact on/off for the minimum load needs a binary per hour (a mixed-integer program): build(..., {minLoad: "binary"});
 // the page shows its cost only, from the reference block, with no prices (curriculum §9.2).
+// The configurations' costs, savings, flows and prices come from this LP with mode "stop": the electrolyzer may run at any
+// load from 0 to 20 MW (the LP relaxation of its 15% minimum). The page labels them so (M4 review, finding 3); the exact
+// on/off cost is shown only where the test proves it (winter, hydrogen configuration).
+// Coefficients are named with their exact values: k = 1,000 / 57 kg per MWh (about 17.54), eta = 0.8259 (DOE's 82.59%),
+// COP = 3, lambda = 1 - 0.98^(1/24) (M4 review, finding 2).
 // Every number on the page is checked by _tests/learn/test_m04-storage-multienergy.js, which also proves that the hourly
 // marginal values the page shows are unique (both one-sided changes of the cost agree).
 (function () {
@@ -49,7 +54,7 @@
       W.demand.push(d); W.wind.push(Math.round(pw.mw[i0 + t] * 10) / 10);
       W.heat.push(Math.round(wk.heatPeakMW * year.demand[i0 + t] / dmax * 100) / 100);
     }
-    W.windMWh = sum(W.wind); W.heatMWh = sum(W.heat); W.spare = sum(W.wind.map(function (x) { return Math.max(0, x - D.plant.exportMW); }));
+    W.windMWh = sum(W.wind); W.heatMWh = sum(W.heat); W.spare = sum(W.wind.map(function (x) { return Math.max(0, x - D.plant.exportMW); }));   // wind above the connection: without storage it must be curtailed
     return W;
   }
   function sum(a) { return a.reduce(function (s, v) { return s + v; }, 0); }
@@ -131,6 +136,7 @@
       ".m4-tbl th,.m4-tbl td{padding:5px 6px;border-bottom:1px solid var(--lx-line);text-align:right;font-weight:400}.m4-tbl th:first-child,.m4-tbl td:first-child{text-align:left}",
       ".m4-tbl thead th{font-family:var(--lx-f-display);font-size:12px;color:var(--lx-ink-3);vertical-align:bottom}.m4-tbl td{font-family:var(--lx-f-mono);font-variant-numeric:tabular-nums}.m4-tbl td:first-child{font-family:var(--lx-f-body)}",
       ".m4-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+      ".m4-key{margin:0;padding-left:1.1rem;display:grid;gap:2px;font-size:13.5px;color:var(--lx-ink-2)}.m4-key var{font-style:italic}",
       "@media (max-width:560px){.m4-tbl table{font-size:12.5px}.m4-tbl th,.m4-tbl td{padding:4px 3px}.m4-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
   }
@@ -158,9 +164,8 @@
       });
     }
     function all(list) { return list.reduce(function (p, a) { return p.then(function (bad) { return bad || solve.apply(null, a).then(function (o) { return o.ok ? null : o; }); }); }, Promise.resolve(null)); }
-    // a failed solve's note and one solver action of a step (job() -> Promise of null (all solved) or the failed result):
+    // one solver action of a step (job() -> Promise of null (all solved) or the failed result):
     // LX.SolveStep (components/solvestep.js); the note keeps the class m4-fail
-    function failNote(host, r, again) { return LX.SolveStep.failNote(host, r, again, { cls: "m4-fail" }); }
     function action(o) { o.cls = "m4-fail"; return LX.SolveStep.action(o); }
     function solveStep(act, api, label, list, show) {
       var row = H("div", { class: "m4-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + label }, row), st = LX.SolverStatus(row), out = H("div", { "aria-live": "polite" }, act);
@@ -168,12 +173,21 @@
       return go;
     }
     var W = Wk.winter, shown = D.configs.filter(function (c) { return !c.hidden; });
+    var RELAX = "LP relaxation: here the electrolyzer may run below its 15% minimum load.";
+    // a store's text version: every hour's level at its end and the change in the hour, with the lowest and highest
+    // level and when (M4 review, finding 7)
+    function levelText(values, unit) {
+      var n = function (v) { return Math.round(v).toLocaleString("en-US"); }, lab = function (t) { return dayTicks(D.weeks[0].date, 1)[Math.floor(t / DAY)][1] + " " + (t % DAY < 10 ? "0" : "") + (t % DAY) + ":00"; };
+      var lo = 0, hi = 0; values.forEach(function (v, t) { if (v < values[lo]) lo = t; if (v > values[hi]) hi = t; });
+      return { head: ["Hour starting", unit + " at the hour's end", "Change in the hour"], note: "Lowest " + n(values[lo]) + " (" + lab(lo) + "), highest " + n(values[hi]) + " (" + lab(hi) + "). One best plan: other plans of the same cost can run the store differently.",
+        rows: values.map(function (v, t) { var d = v - values[(t + values.length - 1) % values.length]; return [lab(t), n(v), (d > 0.5 ? "+" : d < -0.5 ? "−" : "") + n(Math.abs(d))]; }) };
+    }
     function v(w, c) { return res[keyOf(w, "power")].cost - res[keyOf(w, c)].cost; }
     function levelPlot(host, values, max, unit, color, label) {
       var P = LX.Plot(host, { box: true, text: "Text version of the chart" });
       P.render({ x: { min: 0, max: W.T, ticks: dayTicks(D.weeks[0].date, 1), ticksN: dayTicks(D.weeks[0].date, 2) }, y: { min: 0, max: max, step: max / 4, fmt: function (v) { return v.toLocaleString("en-US"); }, unit: unit },
         lines: [{ values: values, x0: 0.5, color: color, area: 0.14 }], aria: label,
-        text: { head: ["Day", unit + " at the end of the day"], rows: [23, 47, 71, 95, 119, 143, 167].map(function (t, i) { return [dayTicks(D.weeks[0].date, 1)[i][1], Math.round(values[t]).toLocaleString("en-US")]; }) } });
+        text: levelText(values, unit) });
       return P;
     }
 
@@ -183,18 +197,22 @@
         build: function (act, api) {
           solveStep(act, api, "Solve: power only, no battery", function () { return [["winter", "nobat"]]; }, function (out) {
             var x = res[keyOf("winter", "nobat")]; out.innerHTML = ""; var k = H("div", { class: "m4-kpis" }, out);
-            kpi(k, "Power earnings", fm.k(-x.power)); kpi(k, "Curtailed", fm.mwh(x.cur), "bad"); kpi(k, "Sold", fm.mwh(x.exp));
-            api.done(); api.saw("The plant earns " + fm.k(-x.power) + " from power this week, yet curtails " + fm.mwh(x.cur) + ": the connection is full when the wind is strong.");
+            kpi(k, "Power earnings", fm.k(-x.power)); kpi(k, "Above the connection", fm.mwh(W.spare), "bad"); kpi(k, "Curtailed (one best plan)", fm.mwh(x.cur));
+            // finding 1: the curtailment the connection forces (the same in every best plan) apart from optional $0 curtailment
+            api.done(); api.saw("The plant earns " + fm.k(-x.power) + " from power this week. It must curtail " + fm.mwh(W.spare) + ", the wind above its 50 MW connection; this plan curtails " + fm.mwh(x.cur - W.spare) + " more in $0 hours, when selling earns nothing.");
           });
         } },
       // 2 state of charge
       { text: "Add a 20 MW, 80 MWh battery. Its [[state-of-charge|state of charge]] links each hour to the next, and the week ends where it starts.",
         build: function (act, api) {
-          H("div", { class: "m4-formula", role: "math", "aria-label": "s t equals s of t minus 1 plus 0.83 times charge minus discharge", html: "<var>s</var><sub><var>t</var></sub> = <var>s</var><sub><var>t</var>−1</sub> + 0.83 <var>bc</var><sub><var>t</var></sub> − <var>bd</var><sub><var>t</var></sub>, &nbsp; <var>s</var><sub>−1</sub> = <var>s</var><sub>167</sub>" }, act);
+          H("div", { class: "m4-formula", role: "math", "aria-label": "s t equals s of t minus 1 plus eta times b c t minus b d t; s of minus 1 equals s of 167; eta equals 0.8259", html: "<var>s</var><sub><var>t</var></sub> = <var>s</var><sub><var>t</var>−1</sub> + <var>η</var> <var>bc</var><sub><var>t</var></sub> − <var>bd</var><sub><var>t</var></sub>, &nbsp; <var>s</var><sub>−1</sub> = <var>s</var><sub>167</sub>, &nbsp; <var>η</var> = " + D.battery.eta }, act);
+          // every symbol beside the equation (finding 6)
+          var key = H("ul", { class: "m4-key" }, act);
+          [["s", "state of charge at the end of hour t, MWh (at most 80)"], ["bc, bd", "charging and discharging in hour t, MW (each at most 20)"], ["η", "round trip, " + D.battery.eta + " (DOE's 82.59%); the loss is taken on charging"], ["s−1 = s167", "hour 0 starts where hour 167 ends: the week ends where it starts"]].forEach(function (r) { H("li", { html: "<var>" + LX.esc(r[0]) + "</var>: " + LX.esc(r[1]) }, key); });
           solveStep(act, api, "Solve with the battery", function () { return [["winter", "nobat"], ["winter", "power"]]; }, function (out) {
             var a = res[keyOf("winter", "nobat")], b = res[keyOf("winter", "power")]; out.innerHTML = ""; var k = H("div", { class: "m4-kpis" }, out);
-            kpi(k, "Power earnings", fm.k(-b.power)); kpi(k, "Curtailed", fm.mwh(b.cur)); kpi(k, "Battery's value", fm.k(a.cost - b.cost), "good");
-            api.done(); remember("bat", a.cost - b.cost); api.saw("The battery moves wind from full-connection hours to dearer ones: worth " + fm.k(a.cost - b.cost) + " this week. 80 MWh is small against " + fm.mwh(a.cur) + " curtailed.");
+            kpi(k, "Power earnings", fm.k(-b.power)); kpi(k, "Curtailed (one best plan)", fm.mwh(b.cur)); kpi(k, "Battery's value", fm.k(a.cost - b.cost), "good");
+            api.done(); remember("bat", a.cost - b.cost); api.saw("The battery moves energy from cheap hours to dearer ones, spare wind or power bought from the grid: worth " + fm.k(a.cost - b.cost) + " this week. 80 MWh is small against the " + fm.mwh(W.spare) + " above the connection.");
           });
         } },
       // 3 electrolyzer and tank
@@ -204,12 +222,13 @@
           solveStep(act, api, "Solve with hydrogen", function () { return [["winter", "power"], ["winter", "h2"]]; }, function (out) {
             var a = res[keyOf("winter", "power")], b = res[keyOf("winter", "h2")], base = a.cost; out.innerHTML = ""; var k = H("div", { class: "m4-kpis" }, out);
             kpi(k, "Made on site", fm.t(b.kg)); kpi(k, "Trucked in", fm.t(b.tr)); kpi(k, "Value of coupling", fm.k(base - b.cost), "good");
+            H("p", { class: "m4-note", text: RELAX + " Step 4 looks at that limit." }, out);
             plotHost.innerHTML = ""; levelPlot(plotHost, b.L, D.tank.kg, "kg in the tank", "var(--lx-good)", "Hydrogen in the tank through the week (one best plan)");
             api.done(); remember("h2", base - b.cost); api.saw("Against power only with every kg trucked (" + fm.k(base) + " for the week), coupling saves " + fm.k(base - b.cost) + ". The tank rides between its 400 kg floor and its top: a [[reservoir-limit|reservoir limit]] in hydrogen.");
           });
         } },
       // 4 part-load limit
-      { text: "The electrolyzer is alkaline: below 15% of its size it must stop. An LP cannot say on or off. Compare two LP stand-ins: it may run at any load, or it must stay on above 15%.",
+      { text: "This [[alkaline-electrolyzer|alkaline]] electrolyzer must stop below 15% of its size, an on-or-off choice an LP cannot make. Compare two LP stand-ins: any load allowed, or on all week above 15%.",
         build: function (act, api) {
           solveStep(act, api, "Solve both", function () { return [["winter", "h2"], ["winter", "h2", "on"]]; }, function (out) {
             var a = res[keyOf("winter", "h2")], b = res[keyOf("winter", "h2", "on")]; out.innerHTML = "";
@@ -220,12 +239,14 @@
           });
         } },
       // 5 heat
-      { text: "A third carrier: a 5 MW heat pump (3 MWh of heat per MWh, DOE) and a 60 MWh heat store feed the town's heat network, which takes at most 12 MW. A gas boiler covers the rest.",
+      { text: "Add a third carrier, heat: a [[heat-pump|heat pump]] and a heat store feed the town's heat network, and a gas boiler covers the rest.",
         build: function (act, api) {
+          table(act, ["Device", "Size", "Conversion or limit"], [["Heat pump", D.heat.pumpMW + " MW of power", D.heat.cop + " MWh of heat per MWh (DOE)"], ["Heat store", D.heat.storeMWh + " MWh of heat", "loses " + Math.round(D.heat.lossPerDay * 100) + "% a day"], ["Heat network", D.heat.networkMW + " MW of heat", "the most it takes from the plant"], ["Gas boiler", "as needed", "$" + D.heat.boilerPerMWh + " per MWh of heat"]], "The heat devices");
           var plotHost = H("div", null, act);
           solveStep(act, api, "Solve with heat", function () { return [["winter", "h2"], ["winter", "heat"]]; }, function (out) {
             var a = res[keyOf("winter", "h2")], b = res[keyOf("winter", "heat")]; out.innerHTML = ""; var k = H("div", { class: "m4-kpis" }, out);
             kpi(k, "Heat from the pump", fm.mwh(b.hpHeat)); kpi(k, "Boiler", fm.mwh(b.boil)); kpi(k, "Value of heat coupling", fm.k(a.cost - b.cost), "good");
+            H("p", { class: "m4-note", text: RELAX }, out);
             plotHost.innerHTML = ""; levelPlot(plotHost, b.Q, D.heat.storeMWh, "MWh of heat stored", "var(--lx-pk)", "Heat in the store through the week (one best plan)");
             api.done(); remember("heat", a.cost - b.cost); api.saw("The heat pump turns spare and cheap power into heat: " + fm.k(a.cost - b.cost) + " saved this week. The 12 MW network caps it at the town's coldest hours.");
           });
@@ -243,25 +264,31 @@
             var rows = shown.filter(function (c) { return c.id !== "power"; }).map(function (c) { return [c.label].concat(D.weeks.map(function (w) { return fm.k(v(w.id, c.id)); })); });
             table(tb, ["Configuration: saving against separate systems", "Winter week", "Summer week"], rows, "The value of each step of coupling in two weeks");
             H("p", { class: "m4-note", text: "Separate systems: the plant with its battery, every kg trucked, all heat from the boiler. Each saving is a difference of optimal costs, the same for every best plan." }, tb);
+            H("p", { class: "m4-note", text: RELAX }, tb);
             api.done(); remember("where", 1);
-            api.saw("Heat adds " + fm.k(v("winter", "heat") - v("winter", "h2")) + " in winter, " + fm.k(v("summer", "heat") - v("summer", "h2")) + " in summer; waste heat adds " + fm.k(v("winter", "all") - v("winter", "heat")) + " and " + fm.k(v("summer", "all") - v("summer", "heat")) + ". **Coupling pays where one carrier has spare supply and another has demand at the same time.**");
+            api.saw("Heat adds " + fm.k(v("winter", "heat") - v("winter", "h2")) + " in winter, " + fm.k(v("summer", "heat") - v("summer", "h2")) + " in summer; waste heat adds " + fm.k(v("winter", "all") - v("winter", "heat")) + " and " + fm.k(v("summer", "all") - v("summer", "heat")) + ". **Coupling saves operating cost when conversion and storage connect cheap supply with useful demand, within the devices' limits.**");
           });
           tb = H("div", null, act);
         } },
       // 7 prices of coupled carriers
       { text: "Each balance row has a [[shadow-price|dual]]: that carrier's marginal value in that hour, under this model's assumptions. Pick an hour and see how one carrier's price sets another's.",
         build: function (act, api) {
-          var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Hours to read" }, act), out = H("div", { "aria-live": "polite" }, act), seen = {}, st = LX.SolverStatus(act), bs = [];
+          // prices are drawn only after a solve that worked; a failed solve keeps the chosen hour, and "Try again" solves
+          // and then shows that hour, removing the note (LX.SolveStep; M4 review, finding 5)
+          var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Hours to read" }, act), out = H("div", { "aria-live": "polite" }, act), seen = {}, st = LX.SolverStatus(act), bs = [], sel = null, pending = null;
           function show(i) {
-            var hr = R.hours[i], x = res[keyOf("winter", "all")], p = prices(x.r, hr.t); out.innerHTML = ""; seen[i] = 1;
+            var hr = R.hours[i], x = res[keyOf("winter", "all")], p = x && x.ok ? prices(x.r, hr.t) : null; if (!p) return;
+            out.innerHTML = ""; seen[i] = 1;
             bs.forEach(function (b, j) { b.setAttribute("aria-pressed", String(j === i)); });
             var k = H("div", { class: "m4-kpis" }, out);
             kpi(k, "Power", fm.p(p.power) + "/MWh"); kpi(k, "Hydrogen", fm.p(p.h2) + "/kg"); kpi(k, "Heat", fm.p(p.heat) + "/MWh");
             H("p", { class: "m4-note", html: LX.esc(hr.why) }, out);
+            H("p", { class: "m4-note", text: RELAX + " Prices of the exact on/off model are not shown." }, out);
             if (Object.keys(seen).length >= 2) { api.done(); api.saw("When the heat pump is the unit that moves, heat is worth power's price ÷ 3; free power makes hydrogen and heat free. **Coupling ties the carriers' prices together.**"); }
           }
-          R.hours.forEach(function (h, i) { bs.push(H("button", { type: "button", "aria-pressed": "false", text: h.label, onclick: function () { run().then(function () { show(i); }); } }, seg)); });
-          var run = function () { return all([["winter", "all"]]).then(function (bad) { if (bad) { st.set(bad.r || bad); throw new Error("solve failed"); } st.set(res[keyOf("winter", "all")].r); }).catch(function () { failNote(act, { status: "error", message: "the winter week did not solve" }, function () { run(); }); }); };
+          var run = action({ api: api, st: st, host: act, go: null, job: function () { return all([["winter", "all"]]); },
+            show: function () { st.set(res[keyOf("winter", "all")].r); if (sel != null) show(sel); } });
+          R.hours.forEach(function (h, i) { bs.push(H("button", { type: "button", "aria-pressed": "false", text: h.label, onclick: function () { sel = i; if (!pending) pending = run().then(function () { pending = null; }); } }, seg)); });
           H("p", { class: "m4-note", text: "Hours offered are ones where each price is unique: raising or lowering that hour's demand a little changes the cost at the same rate. In some other hours several prices fit." }, act);
         } },
       // 8 formulate it
@@ -282,22 +309,22 @@
       return { view: state };
     }, cards);
     root.lxLesson = { model: model, Wk: Wk, res: res, cards: cards };
-    explain(D, Wk);
+    explain(D, Wk, data.cf_targets);
   });
 
   // ---------------------------------------------------------------- explain layer: annotated diagram, equation card, table
-  function explain(D, Wk) {
+  function explain(D, Wk, CFT) {
     var x = document.getElementById("m4-explain"); if (!x) return;
     x.innerHTML = ""; x.classList.add("is-live");
-    var R = D.reference, F = R.flows;
+    var R = D.reference, F = R.flows, CF = CFT.targets.wind, CFsrc = CFT.source;   // the 33.8% benchmark with its source (M4 review, finding 10)
     LX.ConceptMap(H("div", { class: "lx-xcard" }, x), {
-      title: "The plant, annotated", lede: "Winter week, all devices on (one best plan). Tap a part: what it does and what flowed through it.",
+      title: "The plant, annotated", lede: "Winter week, all devices available; LP relaxation (the electrolyzer may run below its 15% minimum), one best plan. Tap a part: what it does and what flowed through it.",
       groups: { p: ["Power", "var(--lx-wind)"], h: ["Hydrogen", "var(--lx-good)"], q: ["Heat", "var(--lx-pk)"] },
       nodes: [
-        { id: "wind", g: "p", label: "Wind", text: "100 MW; real SPP shape, 33.8% over the year. This week: " + fm.mwh(F.wind) + ".", at: [1, 0] },
+        { id: "wind", g: "p", label: "Wind", text: "100 MW; real SPP shape, scaled to " + (CF.cf * 100).toFixed(1) + "%, EIA's " + CF.year + " capacity factor of the U.S. utility-scale wind fleet (" + CFsrc.short + ", accessed " + new Date(CFsrc.accessed + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }) + "). This week: " + fm.mwh(F.wind) + ".", at: [1, 0] },
         { id: "grid", g: "p", label: "Grid", text: "50 MW each way. Sold " + fm.mwh(F.exp) + ", bought " + fm.mwh(F.imp) + " at the town's price.", at: [0, 0] },
-        { id: "bat", g: "p", label: "Battery", text: "20 MW, 80 MWh. State of charge links the hours; 83% round trip.", at: [2, 0] },
-        { id: "ez", g: "h", label: "Electrolyzer", text: "20 MW; 57 kWh per kg; " + fm.t(F.kg) + " made this week.", at: [0, 1] },
+        { id: "bat", g: "p", label: "Battery", text: "20 MW, 80 MWh. State of charge links the hours; round trip 0.8259 (DOE).", at: [2, 0] },
+        { id: "ez", g: "h", label: "Electrolyzer", text: "20 MW, alkaline; 57 kWh per kg (illustrative); " + fm.t(F.kg) + " made this week.", at: [0, 1] },
         { id: "tank", g: "h", label: "Tank", text: "Kept between 400 and 4,000 kg; " + fm.t(F.tr) + " trucked in.", at: [0, 2] },
         { id: "hp", g: "q", label: "Heat pump", text: "5 MW; 3 MWh of heat per MWh; " + fm.mwh(F.hp) + " of heat.", at: [2, 1] },
         { id: "store", g: "q", label: "Heat store", text: "60 MWh; loses 2% a day; the network takes at most 12 MW.", at: [2, 2] },
@@ -310,26 +337,43 @@
     LX.EquationCard(H("div", { class: "lx-xcard" }, x), {
       title: "The coupled LP, symbol by symbol", lede: "Tap a symbol: what it means, its unit and its value in this lesson.", dense: true, label: "The plant's linear program; each symbol is a button",
       fields: [{ key: "you", label: "In this lesson" }, { key: "code", label: "In code", code: true }],
+      // every symbol is a button, in the notation of the code, the algebra and the notebook (M4 review, finding 6)
       rows: [
-        { html: "min Σ<sub><var>t</var></sub> " + sym("p", "<var>p</var><sub><var>t</var></sub>") + " (imp − exp) + 2.50 " + sym("tr", "<var>tr</var>") + " + 15 " + sym("boil", "<var>boil</var>"), tag: "goal: the week's cost", say: "Minimise the week's cost: grid purchases minus sales at the hourly price p, plus trucked hydrogen and boiler heat." },
-        { html: "exp + bc + " + sym("ez", "<var>ez</var>") + " + hp + cur − imp − bd = wind<sub><var>t</var></sub>", tag: "power", say: "Every MWh of wind is sold, stored, turned into hydrogen or heat, or curtailed." },
-        { html: sym("k", "17.5") + " <var>ez</var> + tr + " + sym("L", "<var>L</var><sub><var>t</var>−1</sub>") + " − <var>L</var><sub><var>t</var></sub> = 150", tag: "hydrogen", say: "Hydrogen made plus trucked plus the tank's drop meets the plant's 150 kilograms an hour." },
-        { html: sym("cop", "3") + " hp + rec − hin + hout + boil = " + sym("H", "<var>H</var><sub><var>t</var></sub>") + ", &nbsp; 3 hp + rec − hin + hout ≤ 12", tag: "heat, network", say: "Heat from the pump, waste heat, the store and the boiler meets the town's heat; what passes through the network is at most 12 megawatts." },
-        { html: "400 ≤ <var>L</var> ≤ 4,000, &nbsp; 0.15 · 20 ≤ <var>ez</var> ≤ 20 (stays on)", tag: "limits", say: "The tank stays between 400 and 4,000 kilograms; when the unit must stay on, its power is between 3 and 20 megawatts." }
+        { html: "min Σ<sub><var>t</var></sub> " + sym("p", "<var>p</var><sub><var>t</var></sub>") + " (" + sym("imp", "<var>imp</var>") + " − " + sym("exp", "<var>exp</var>") + ") + 2.50 " + sym("tr", "<var>tr</var>") + " + 15 " + sym("boil", "<var>boil</var>"), tag: "goal: the week's cost", say: "Minimise the week's cost: grid purchases minus sales at the hourly price p, plus trucked hydrogen and boiler heat." },
+        { html: "<var>exp</var> + " + sym("bc", "<var>bc</var>") + " + " + sym("ez", "<var>ez</var>") + " + " + sym("hp", "<var>hp</var>") + " + " + sym("cur", "<var>cur</var>") + " − <var>imp</var> − " + sym("bd", "<var>bd</var>") + " = " + sym("w", "<var>w</var><sub><var>t</var></sub>"), tag: "power", say: "Every MWh of wind is sold, stored, turned into hydrogen or heat, or curtailed; power bought adds to it." },
+        { html: sym("k", "<var>k</var>") + " <var>ez</var> + <var>tr</var> + " + sym("L", "<var>L</var><sub><var>t</var>−1</sub>") + " − <var>L</var><sub><var>t</var></sub> = 150", tag: "hydrogen", say: "Hydrogen made plus trucked plus the tank's drop meets the plant's 150 kilograms an hour." },
+        { html: sym("cop", "<var>COP</var>") + " <var>hp</var> + " + sym("rec", "<var>rec</var>") + " − " + sym("hin", "<var>hin</var>") + " + " + sym("hout", "<var>hout</var>") + " + <var>boil</var> = " + sym("H", "<var>H</var><sub><var>t</var></sub>"), tag: "heat", say: "Heat from the pump, waste heat, the store and the boiler meets the town's heat." },
+        { html: "<var>COP</var> <var>hp</var> + <var>rec</var> − <var>hin</var> + <var>hout</var> ≤ 12", tag: "network", say: "What passes through the heat network is at most 12 megawatts of heat." },
+        { html: sym("s", "<var>s</var><sub><var>t</var></sub>") + " = <var>s</var><sub><var>t</var>−1</sub> + " + sym("eta", "<var>η</var>") + " <var>bc</var> − <var>bd</var>, &nbsp; " + sym("Q", "<var>Q</var><sub><var>t</var></sub>") + " = (1 − " + sym("lam", "<var>λ</var>") + ") <var>Q</var><sub><var>t</var>−1</sub> + <var>hin</var> − <var>hout</var>", tag: "levels", say: "The battery's and the heat store's levels carry each hour into the next; every level ends the week where it starts." },
+        { html: "400 ≤ <var>L</var> ≤ 4,000, &nbsp; <var>rec</var> ≤ 0.2 <var>ez</var>, &nbsp; 0 ≤ <var>ez</var> ≤ 20", tag: "limits", say: "The tank stays between 400 and 4,000 kilograms; recovered heat is at most a fifth of the electrolyzer's power; the electrolyzer runs between 0 and 20 megawatts (the LP relaxation; 3 to 20 when it must stay on)." }
       ],
       symbols: {
         p: { name: "p_t", label: "p t, the grid price", unit: "$/MWh", words: "Prairie Town's cost of one more MWh in hour t (lesson 8): $0, $40 or $100.", you: "Winter week: " + R.priceHours.zero + " hours at $0, " + R.priceHours.cc + " at $40, " + R.priceHours.pk + " at $100.", code: "W.price[t]" },
-        tr: { name: "tr_t", label: "tr t, hydrogen trucked in", unit: "kg", words: "The fallback supply: hydrogen from a gas reformer at an illustrative $2.50 per kg.", you: fm.t(R.flows.tr) + " this winter week, all devices on.", code: '"tr" + t' },
+        exp: { name: "exp_t", label: "exp t, power sold", unit: "MW", words: "Power sold to the grid in hour t, through the 50 MW connection.", you: fm.mwh(R.flows.exp) + " this winter week (one best plan).", code: '"exp" + t' },
+        imp: { name: "imp_t", label: "imp t, power bought", unit: "MW", words: "Power bought from the grid in hour t, at most 50 MW.", you: fm.mwh(R.flows.imp) + " this winter week (one best plan).", code: '"imp" + t' },
+        cur: { name: "cur_t", label: "cur t, wind curtailed", unit: "MW", words: "Wind the plant lets go in hour t.", you: "At most the hour's wind.", code: '"cur" + t' },
+        bc: { name: "bc_t", label: "b c t, battery charging", unit: "MW", words: "Power into the battery in hour t, at most 20 MW.", you: "Multiplied by η on the way in.", code: '"bc" + t' },
+        bd: { name: "bd_t", label: "b d t, battery discharging", unit: "MW", words: "Power out of the battery in hour t, at most 20 MW.", you: "It lowers the state of charge one for one.", code: '"bd" + t' },
+        hp: { name: "hp_t", label: "h p t, heat pump power", unit: "MW", words: "Power into the heat pump in hour t, at most 5 MW.", you: "It gives COP × hp of heat.", code: '"hp" + t' },
+        w: { name: "w_t", label: "w t, the plant's wind", unit: "MW", words: "The 100 MW plant's output in hour t, from SPP's real 2025 shape (EIA-930).", you: fm.mwh(R.flows.wind) + " this winter week.", code: "W.wind[t]" },
+        rec: { name: "rec_t", label: "rec t, heat recovered", unit: "MW of heat", words: "Low-temperature heat taken from the electrolyzer, at most 20% of its power (illustrative).", you: fm.mwh(R.flows.rec) + " this winter week.", code: '"rec" + t' },
+        hin: { name: "hin_t", label: "h in t, heat store charging", unit: "MW of heat", words: "Heat put into the heat store in hour t.", you: "It raises Q one for one.", code: '"hin" + t' },
+        hout: { name: "hout_t", label: "h out t, heat store discharging", unit: "MW of heat", words: "Heat taken from the heat store in hour t.", you: "It lowers Q one for one.", code: '"hout" + t' },
+        s: { name: "s_t", label: "s t, the battery's state of charge", unit: "MWh", words: "Energy in the battery at the end of hour t, at most 80 MWh.", you: "Hour 0 starts from hour 167's level.", code: '"s" + t' },
+        Q: { name: "Q_t", label: "Q t, heat in the store", unit: "MWh of heat", words: "Heat in the store at the end of hour t, at most 60 MWh.", you: "Hour 0 starts from hour 167's level.", code: '"Q" + t' },
+        eta: { name: "η", label: "eta, the battery's round trip", unit: "share", words: "Of each MWh charged, " + D.battery.eta + " MWh can come back (DOE's 82.59%, about 83%).", you: "Taken on charging: s rises by η × bc.", code: "D.battery.eta" },
+        lam: { name: "λ", label: "lambda, the heat store's hourly loss", unit: "share per hour", words: "1 − 0.98^(1/24), about 0.084% an hour: 2% a day.", you: "Q keeps (1 − λ) of last hour's heat.", code: "1 - Math.pow(0.98, 1 / 24)" },
+        tr: { name: "tr_t", label: "tr t, hydrogen trucked in", unit: "kg", words: "The fallback supply: hydrogen from a gas reformer at an illustrative $2.50 per kg.", you: fm.t(R.flows.tr) + " this winter week, all devices available.", code: '"tr" + t' },
         boil: { name: "boil_t", label: "boil t, boiler heat", unit: "MWh of heat", words: "The town's gas boiler, at an illustrative $15 per MWh of heat.", you: fm.mwh(R.flows.boil) + " this winter week.", code: '"boil" + t' },
         ez: { name: "ez_t", label: "ez t, electrolyzer power", unit: "MW", words: "Power into the electrolyzer; it links the power and hydrogen balances.", you: "Up to 20 MW.", code: '"ez" + t' },
-        k: { name: "1000/57", label: "17.5, kilograms per MWh", unit: "kg/MWh", words: "1,000 kWh ÷ 57 kWh per kg (DOE Record 24005).", you: "This conversion makes a kg's price track power's: × 0.057 MWh.", code: "1000 / E.kWhPerKg" },
+        k: { name: "k = 1000/57", label: "k, kilograms per MWh", unit: "kg/MWh", words: "1,000 kWh ÷ 57 kWh per kg, about 17.54: DOE Record 24005's PEM figure, illustrative for this alkaline unit (IRENA's alkaline systems: 50–78).", you: "This conversion makes a kg's price track power's: × 0.057 MWh.", code: "1000 / E.kWhPerKg" },
         L: { name: "L_t", label: "L t, hydrogen in the tank", unit: "kg", words: "The tank's level at the end of hour t; the week ends where it starts.", you: "Between 400 and 4,000 kg.", code: '"L" + t' },
-        cop: { name: "COP", label: "3, the heat pump's coefficient of performance", unit: "MWh of heat per MWh", words: "Heat pumps give up to three times more heat than the energy they use (DOE).", you: "Heat's price is power's ÷ 3 when the pump sets it.", code: "D.heat.cop" },
+        cop: { name: "COP = 3", label: "COP, the heat pump's coefficient of performance", unit: "MWh of heat per MWh", words: "Heat pumps give up to three times more heat than the energy they use (DOE).", you: "Heat's price is power's ÷ 3 when the pump sets it.", code: "D.heat.cop" },
         H: { name: "H_t", label: "H t, the town's heat demand", unit: "MW of heat", words: "Shaped like the town's demand, scaled to a 15 MW winter peak (illustrative).", you: fm.mwh(Wk.winter.heatMWh) + " this winter week.", code: "W.heat[t]" }
       }
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
-      title: "Where coupling earns value", lede: "Saving against separate systems (the plant with its battery, hydrogen trucked, heat from the boiler), per week.",
+      title: "Where coupling earns value", lede: "Saving against separate systems (the plant with its battery, hydrogen trucked, heat from the boiler), per week. LP relaxation: the electrolyzer may run below its 15% minimum.",
       columns: [{ key: "name", label: "Configuration", main: true }, { key: "win", label: "Winter week", phone: "Winter", num: true }, { key: "sum", label: "Summer week", phone: "Summer", num: true }],
       rows: D.configs.filter(function (c) { return c.id !== "power" && !c.hidden; }).map(function (c) { var v = R.value[c.id]; return { key: c.id, color: "var(--lx-good)", name: c.label, win: { text: fm.k(v.winter), value: v.winter }, sum: { text: fm.k(v.summer), value: v.summer } }; }),
       sorts: [{ label: "As added", order: ["h2", "heat", "all"], note: "Each row adds a device to the row above." },
