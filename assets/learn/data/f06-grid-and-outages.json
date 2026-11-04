@@ -25,23 +25,23 @@
   "genKV": 18, "txKV": 345, "distKV": 12.47, "serviceV": 240, "socketV": 120, "plant": "the gas combined-cycle plant"
  },
  "stops": [
-  { "key": "gen", "n": 1, "name": "Generator", "cls": "gen", "kv": "18 kV", "range": "5–34.5 kV", "src": "ceser", "what": "The plant's turbine spins a generator, which makes alternating current at a modest [[voltage|voltage]]." },
+  { "key": "gen", "n": 1, "name": "Generator", "cls": "gen", "kv": "18 kV", "range": "5–34.5 kV", "src": "ceser", "what": "The plant's turbine spins a generator, which makes alternating current, current that reverses direction many times a second, at a modest [[voltage|voltage]]." },
   { "key": "up", "n": 2, "name": "Step-up transformer", "cls": "tx", "kv": "18 → 345 kV", "range": "up to 115–765 kV", "src": "ceser", "what": "A [[transformer|transformer]] at the plant raises the voltage, so the same power needs far less [[electric-current|current]]." },
   { "key": "line", "n": 3, "name": "Transmission line", "cls": "tx", "kv": "345 kV", "range": "115–765 kV", "src": "ceser", "what": "Tall towers carry [[transmission|transmission]] lines over long distances, joined into loops so power has more than one path." },
   { "key": "sub", "n": 4, "name": "Substation", "cls": "dist", "kv": "345 → 12.47 kV", "range": "down to below 34 kV", "src": "ceser", "what": "A [[substation|substation]] steps the voltage down and holds the [[circuit-breaker|circuit breakers]] that protect each feeder." },
   { "key": "feeder", "n": 5, "name": "Distribution feeder", "cls": "dist", "kv": "12.47 kV", "range": "4.8–34.5 kV", "src": "pnnl", "what": "A [[feeder|feeder]] on wooden poles runs through the streets; side branches, called [[lateral|laterals]], reach each block." },
-  { "key": "service", "n": 6, "name": "Service transformer", "cls": "low", "kv": "12.47 kV → 240/120 V", "range": "240/120 V", "src": "pnnl", "what": "A small transformer on a pole, or in a green box on the ground, steps down to 240/120 V for a few homes." },
+  { "key": "service", "n": 6, "name": "Service transformer", "cls": "low", "kv": "12.47 kV → 240/120 V", "range": "240/120 V", "src": "pnnl", "what": "A small transformer on a pole, or in a green box on the ground, steps down for a few homes: two live wires and a neutral, read as 240/120 V." },
   { "key": "meter", "n": 7, "name": "Service drop and meter", "cls": "low", "kv": "240/120 V", "range": "240/120 V", "src": "pnnl", "what": "A short cable, the service drop, enters the home through the meter, which counts the [[kilowatt-hour|kWh]] the home buys." },
-  { "key": "socket", "n": 8, "name": "Socket", "cls": "low", "kv": "120 V", "range": "120 V (240 V for big appliances)", "src": "pnnl", "what": "Most sockets give 120 V; a dryer or an oven uses both 120 V legs together, 240 V." }
+  { "key": "socket", "n": 8, "name": "Socket", "cls": "low", "kv": "120 V", "range": "120 V (240 V for big appliances)", "src": "pnnl", "what": "Most sockets give 120 V, between one live wire and the neutral; a dryer or an oven uses 240 V, between the two live wires." }
  ],
  "losses": {
-  "about": "Illustrative: 100 MW sent through one line of 5 ohms at each transmission voltage, as one wire with no reactive power (real lines have three phases). Current I = P / V; heat lost in the wire = I² × R.",
+  "about": "Illustrative: 100 MW sent through a balanced three-phase line with 5 ohms in each of its three wires, at each voltage class, with no reactive power (unity power factor). V is the voltage between two wires; current in each wire I = P / (√3 × V); heat lost in the three wires = 3 × I² × R, which equals P² × R / V².",
   "P_MW": 100, "R_ohm": 5, "classes_kV": [69, 115, 138, 230, 345, 500, 765], "start": 4,
   "real_pct": 5, "real_years": "2018 through 2022", "real_src": "losses",
   "real_quote": "EIA estimates that annual electricity transmission and distribution (T&D) losses averaged about 5% of the electricity transmitted and distributed in the United States in 2018 through 2022."
  },
  "net": {
-  "about": "Illustrative: Prairie Town's east-side substation on a high-voltage loop, with two radial feeders and 30 homes. Protection opens the closest device upstream of a fault (a fuse, a recloser or a breaker). The loop is checked for connection only: the rest of the Plains Grid and the plant are assumed to have enough power (balancing is lesson 3).",
+  "about": "Illustrative: Prairie Town's east-side substation on a high-voltage loop, with two radial feeders and 30 homes. Protection is assumed coordinated, so the closest device upstream of a fault (a fuse, a recloser or a breaker) opens first. The loop is checked for connection only: its remaining lines are assumed able to carry the load (no loading or operating limits are checked), and the rest of the Plains Grid and the plant are assumed to have enough power (balancing is lesson 3).",
   "sources": [ { "id": "G", "name": "Prairie Town's gas plant" }, { "id": "N", "name": "Rest of the Plains Grid" } ],
   "lines": [
    { "id": "GS", "name": "The plant–substation line", "short": "Plant–substation line", "from": "G", "to": "S" },
@@ -80,7 +80,7 @@
  },
  "reliability": {
   "src": "epa",
-  "note": "Utilities using the IEEE 1366 method; minutes per customer per year (SAIDI) and interruptions per customer per year (SAIFI), non-momentary interruptions only. 'All events' includes major event days; 'Without MED' leaves them out; 'Loss of supply removed' leaves out outages caused by loss of supply from the high-voltage bulk power system (all events).",
+  "note": "Utilities using the IEEE 1366 method; minutes per customer per year (SAIDI) and customer interruptions per customer served per year (SAIFI: a customer interrupted twice counts twice), non-momentary interruptions only. 'All events' includes major event days; 'Without MED' leaves them out; 'Loss of supply removed' leaves out outages caused by loss of supply from the high-voltage bulk power system (all events); its reporting group can differ from the all-events column (its 2020 value is higher), so the difference between the two is not the upstream share.",
   "med_quote": "For utilities using the IEEE method, a Major Event Day is any day that exceeds a daily SAIDI threshold called Tmed. Tmed is a duration statistic calculated from daily SAIDI values from the past five years.",
   "rows": [
    { "year": 2015, "saidi": 209, "saifi": 1.275, "saidi_nomed": 117, "saifi_nomed": 1.073, "saidi_nolos": 198.2 },

@@ -6,16 +6,24 @@
 // FERC-NERC and EIA) and path.json (lesson links that appear once a lesson is live).
 //
 // No optimization model (model mode "none"). The pure functions below:
-//   loss(P, kV, R)         one wire, no reactive power: current I = P / V (A), heat lost I² R (MW) and its share of P
+//   loss(P, kV, R)         a balanced three-phase line at unity power factor (no reactive power): V is the voltage between
+//                          two of its wires (line to line), R the resistance of each wire; current in each wire
+//                          I = P / (√3 V) (A), heat lost in the three wires 3 I² R (MW, equal to P² R / V²) and its share of P
 //   outage(net, failed)    which homes go dark, and why: the high-voltage loop feeds the substation while any working
 //                          path joins it to the plant or the rest of the grid; below it the feeders are radial trees, and a
 //                          fault opens the closest protective device upstream of it (the section's own fuse, recloser or
 //                          breaker), darkening every section below that device
 //   restore(net, faults, order)  one crew repairs the distribution faults in the reader's order (a transmission crew
-//                          works in parallel); returns the timeline of homes dark and the customer-minutes it adds up to
+//                          works in parallel); returns the timeline of homes dark, the customer-minutes it adds up to, the
+//                          homes interrupted and the customer interruptions (a home counts once each time it goes dark;
+//                          every fault strikes at hour 0 and repairs only restore, so here the two are equal)
 //   bestOrders(net, faults) every order, and the orders that reach the least customer-minutes (ties listed, not hidden)
-//   reliability(cm, interrupted, served)  SAIDI = customer-minutes / customers served; SAIFI = customers interrupted /
-//                          customers served (one storm; EIA's measures count non-momentary interruptions over a year)
+//   reliability(cm, interruptions, served)  SAIDI = customer-minutes / customers served; SAIFI = customer interruptions /
+//                          customers served, counting a customer again for each sustained interruption (one storm; EIA's
+//                          measures count non-momentary interruptions over a year)
+//   faster(faults, k)      the same storm with every repair time divided by k (step 7: a faster crew changes SAIDI, not SAIFI)
+//   netRows(net, failed)   the network's text version: each part, its state, the homes it serves and how many of those are
+//                          dark now, counted the same way for every part
 //   medShare(row), losShare(row)  shares of a year's SAIDI from major event days, and from loss of supply on the bulk
 //                          system (EIA Table 11.1)
 // Prairie Town's network, homes and repair hours are illustrative; the voltage classes and reliability numbers are real.
@@ -23,14 +31,14 @@
 // Lesson-local components (candidates for promotion): VoltPath (a plant-to-socket path with eight stops, two layouts,
 // and a voltage staircase of buttons), GridNet (i-network for distribution: a one-line diagram whose parts are buttons
 // that fail and repair, with protection logic, dark homes and a text version; i-hazard: a preset storm to inspect).
-// Shared components: LX.StepCards, LX.Slider, LX.Predict, LX.NumAnswer, LX.Plot, LX.EnergyChain, LX.CausalChain,
+// Shared components: LX.StepCards, LX.Slider, LX.Predict, LX.Plot, LX.EnergyChain, LX.CausalChain,
 // LX.ConceptMap, LX.CompareTable.
 (function () {
   "use strict";
 
   // ---------------------------------------------------------------- pure model
   function loss(P_MW, kV, R) {
-    var I = P_MW * 1e6 / (kV * 1e3), lossMW = I * I * R / 1e6;
+    var I = P_MW * 1e6 / (Math.sqrt(3) * kV * 1e3), lossMW = 3 * I * I * R / 1e6;
     return { I: I, lossMW: lossMW, pct: 100 * lossMW / P_MW };
   }
   function byId(list) { var o = {}; list.forEach(function (x) { o[x.id] = x; }); return o; }
@@ -95,16 +103,33 @@
     faults.forEach(function (f) { if (f.crew === "transmission") done[f.id] = f.repair_h; });
     var times = Object.keys(done).map(function (k) { return done[k]; }).concat([0]).sort(function (a, b) { return a - b; })
       .filter(function (v, i, a) { return i === 0 || v !== a[i - 1]; });
-    var steps = [], cm = 0, hit = {};
+    var steps = [], cm = 0, hit = {}, prev = {}, interruptions = 0;   // before the storm every home has power
     for (var i = 0; i < times.length; i++) {
       var failed = {}; faults.forEach(function (f) { if (done[f.id] > times[i]) failed[f.id] = true; });
       var o = outage(net, failed);
-      net.sections.forEach(function (s) { if (o.dark[s.id]) hit[s.id] = true; });
+      net.sections.forEach(function (s) { if (o.dark[s.id]) { hit[s.id] = true; if (!prev[s.id]) interruptions += s.homes; } });
+      prev = o.dark;
       steps.push({ t: times[i], homes: o.homesDark });
       if (i + 1 < times.length) cm += o.homesDark * (times[i + 1] - times[i]) * 60;
     }
     var interrupted = 0; net.sections.forEach(function (s) { if (hit[s.id]) interrupted += s.homes; });
-    return { order: order.slice(), done: done, steps: steps, end: t, customerMinutes: cm, interrupted: interrupted };
+    return { order: order.slice(), done: done, steps: steps, end: t, customerMinutes: cm, interrupted: interrupted, interruptions: interruptions };
+  }
+  // the words GridNet shows: a part's name, the reason a tapped part is or is not darkening homes, and each group's cause
+  function partName(net, id) { var L = byId(net.lines), S = byId(net.sections); return id === "XF" ? net.xf.name : L[id] ? L[id].name : S[id].name; }
+  function devWord(net, d) { var k = net.devices[d].kind; return k === "fuse" ? "the fuse on " + d.replace("FU", "L") : "the " + (k === "recloser" ? "[[recloser|recloser]]" : "[[circuit-breaker|breaker]]") + " " + d; }
+  function why(net, failed, id) {
+    var out = outage(net, failed), L = byId(net.lines), S = byId(net.sections), nm = partName(net, id);
+    if (!failed[id]) return nm + ": working.";
+    if (L[id]) return nm + " is down. " + (out.upstream === "loop" ? "With no working line left into the substation, all " + out.homesTotal + " homes are dark." : "Power takes another way round the loop, which we assume can carry it: no home loses power.");
+    if (id === "XF") return net.xf.name + " failed: every feeder loses power, all " + out.homesTotal + " homes.";
+    var n = 0; below(net, id).forEach(function (x) { n += S[x].homes; });
+    if (out.upstream) return nm + " is down, but the substation is already dark.";
+    return nm + " is down. Protection here is set so the closest device upstream opens first: " + devWord(net, S[id].dev) + " opened, and the " + n + " home" + (n === 1 ? "" : "s") + " below it went dark.";
+  }
+  function causeText(net, g) {
+    var c = g.cause, what = c === "loop" ? "No working line reaches the substation" : c === "XF" ? "The substation transformer failed" : net.devices[c].name.split(",")[0] + " opened";
+    return what + ": " + g.homes + " home" + (g.homes === 1 ? "" : "s") + " dark.";
   }
   function perms(a) { if (a.length < 2) return [a.slice()]; var out = []; a.forEach(function (x, i) { perms(a.slice(0, i).concat(a.slice(i + 1))).forEach(function (p) { out.push([x].concat(p)); }); }); return out; }
   function crewFaults(faults) { return faults.filter(function (f) { return f.crew !== "transmission"; }).map(function (f) { return f.id; }); }
@@ -113,7 +138,19 @@
     var min = Math.min.apply(null, all.map(function (r) { return r.customerMinutes; }));
     return { all: all, min: min, best: all.filter(function (r) { return r.customerMinutes === min; }) };
   }
-  function reliability(cm, interrupted, served) { var saidi = cm / served, saifi = interrupted / served; return { saidi: saidi, saifi: saifi, caidi: saifi ? saidi / saifi : 0 }; }
+  function reliability(cm, interruptions, served) { var saidi = cm / served, saifi = interruptions / served; return { saidi: saidi, saifi: saifi, caidi: saifi ? saidi / saifi : 0 }; }
+  function faster(faults, k) { return faults.map(function (f) { var g = {}; Object.keys(f).forEach(function (x) { g[x] = f[x]; }); g.repair_h = f.repair_h / k; return g; }); }
+  // the text version of the network: every part, its state, the homes it serves (all of them for the loop's lines and the
+  // substation transformer) and how many of those homes are dark now, whatever the cause
+  function netRows(net, failed) {
+    var out = outage(net, failed), S = byId(net.sections), all = homesTotal(net);
+    return net.lines.concat([net.xf]).concat(net.sections).map(function (p) {
+      var n = 0, dk = 0;
+      if (S[p.id]) below(net, p.id).forEach(function (x) { n += S[x].homes; if (out.dark[x]) dk += S[x].homes; });
+      else { n = all; dk = out.homesDark; }
+      return { id: p.id, name: p.name, failed: !!(failed && failed[p.id]), serves: n, all: !S[p.id], dark: dk };
+    });
+  }
   function medShare(r) { return (r.saidi - r.saidi_nomed) / r.saidi; }
   function losShare(r) { return (r.saidi - r.saidi_nolos) / r.saidi; }
   // the years, ending with the latest, in which major event days gave more than half of SAIDI; and the year before them
@@ -128,7 +165,7 @@
   }
   function fmtN(v, d) { return v.toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
   function kvText(v) { return (v < 10 ? fmtN(v, 2).replace(/0$/, "") : fmtN(v, v % 1 ? 2 : 0)) + " kV"; }
-  var model = { loss: loss, outage: outage, groups: groups, restore: restore, bestOrders: bestOrders, perms: perms, reliability: reliability,
+  var model = { loss: loss, outage: outage, groups: groups, restore: restore, bestOrders: bestOrders, perms: perms, reliability: reliability, faster: faster, netRows: netRows, partName: partName, why: why, causeText: causeText,
     medShare: medShare, losShare: losShare, medRun: medRun, medRunText: medRunText, fed: fed, below: below, chainUp: chainUp, homesTotal: homesTotal, crewFaults: crewFaults, fmtN: fmtN, kvText: kvText };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -223,7 +260,7 @@
       if (had === bNext && bNext.disabled) bPrev.focus({ preventScroll: true });
       if (had === bPrev && bPrev.disabled) bNext.focus({ preventScroll: true });
       var n = Object.keys(seen).length;
-      count.textContent = n < stops.length ? "Stops visited: " + n + " of " + stops.length + "." : "All eight stops visited.";
+      count.textContent = n < stops.length ? "Stops visited: " + n + " of " + stops.length + "." : "All " + stops.length + " stops visited.";
       if (!quiet && o.onGo) o.onGo(i, n);
       LX.emit("layout");
     }
@@ -259,19 +296,9 @@
     var tools = H("div", { class: "f6n-tools" }, side);
     var alt = H("details", { class: "lx-textalt" }, w); H("summary", { text: "Text version of the network" }, alt);
     var altBody = H("div", null, alt);
-    var SEC = byId(net.sections), LIN = byId(net.lines);
-    function elName(id) { return id === "XF" ? net.xf.name : LIN[id] ? LIN[id].name : SEC[id].name; }
+    function elName(id) { return MODEL.partName(net, id); }
     function canPick(id) { return mode === "free" || (mode === "storm" && failed[id]); }
-    function devWord(d) { var k = net.devices[d].kind; return k === "fuse" ? "the fuse on " + d.replace("FU", "L") : "the " + (k === "recloser" ? "[[recloser|recloser]]" : "[[circuit-breaker|breaker]]") + " " + d; }
-    function devName(d) { return d === "loop" ? "No working line reaches the substation" : d === "XF" ? "The substation transformer failed" : net.devices[d].name; }
-    function explain(id, out) {
-      if (!failed[id]) return elName(id) + ": working.";
-      if (LIN[id]) return elName(id) + " is down. " + (out.upstream === "loop" ? "With no working line left into the substation, all " + out.homesTotal + " homes are dark." : "Power takes another way round the loop: no home loses power.");
-      if (id === "XF") return net.xf.name + " failed: every feeder loses power, all " + out.homesTotal + " homes.";
-      var d = SEC[id].dev, n = 0; MODEL.below(net, id).forEach(function (x) { n += SEC[x].homes; });
-      if (out.upstream) return elName(id) + " is down, but the substation is already dark.";
-      return elName(id) + " is down. The closest device upstream, " + devWord(d) + ", opened: the " + n + " home" + (n === 1 ? "" : "s") + " below it went dark.";
-    }
+    function explain(id) { return MODEL.why(net, failed, id); }
     function draw() {
       var out = MODEL.outage(net, failed), svg = "";
       svg += '<rect class="bg" x="0" y="0" width="400" height="384" rx="10"/>';
@@ -323,21 +350,26 @@
       status.innerHTML = "";
       var head = H("p", { class: "f6n-count" }, status);
       H("b", { text: out.homesDark + " of " + out.homesTotal }, head); H("span", { text: " homes without power" }, head);
-      var line = inspect ? explain(inspect, out) : (Object.keys(failed).length ? "Tap a failed part for the reason." : o.hint);
+      var line = inspect ? explain(inspect) : (Object.keys(failed).length ? "Tap a failed part for the reason." : o.hint);
       H("p", { class: "f6n-why", html: LX.rich(line) }, status);
     }
     function paintAlt(out) {
       altBody.innerHTML = "";
-      var tb = H("table", { class: "lx-mini-table" }, altBody), th = H("tr", null, H("thead", null, tb));
-      ["Part", "State", "Homes it serves", "Without power now"].forEach(function (h) { H("th", { scope: "col", text: h }, th); });
+      var tb = H("table", { class: "lx-mini-table f6n-alt" }, altBody), th = H("tr", null, H("thead", null, tb));
+      ["Part", "State", "Homes it serves", "Of those, without power"].forEach(function (h) { H("th", { scope: "col", text: h }, th); });
       var bd = H("tbody", null, tb);
-      net.lines.concat([net.xf]).concat(net.sections).forEach(function (p) {
-        var r = H("tr", null, bd), n = 0, dk = 0;
-        if (SEC[p.id]) MODEL.below(net, p.id).forEach(function (x) { n += SEC[x].homes; if (out.dark[x]) dk += SEC[x].homes; });
-        H("td", { text: elName(p.id) }, r); H("td", { text: failed[p.id] ? "failed" : "working" }, r);
-        H("td", { text: SEC[p.id] ? String(n) : "all " + out.homesTotal }, r); H("td", { text: SEC[p.id] ? String(dk) : (out.upstream ? "all" : "0") }, r);
+      MODEL.netRows(net, failed).forEach(function (p) {
+        var r = H("tr", null, bd);
+        H("td", { text: elName(p.id) }, r); H("td", { text: p.failed ? "failed" : "working" }, r);
+        H("td", { text: (p.all ? "all " : "") + p.serves }, r); H("td", { text: String(p.dark) }, r);
       });
-      H("p", { class: "lx-hint", text: "Protection opens the closest fuse, recloser or breaker upstream of a fault. The loop has three lines, so power can take another path." }, altBody);
+      var gs = MODEL.groups(net, out);
+      if (gs.length) {
+        H("p", { class: "lx-hint", text: "Why homes are dark:" }, altBody);
+        var ul = H("ul", { class: "f6n-why-list" }, altBody);
+        gs.forEach(function (g) { H("li", { text: MODEL.causeText(net, g) }, ul); });
+      }
+      H("p", { class: "lx-hint", text: "In this drawing, the closest device upstream of a fault opens first, and the loop's other lines are assumed able to carry the load." }, altBody);
     }
     function pick(id, user) {
       if (mode === "free") { if (failed[id]) delete failed[id]; else failed[id] = true; }
@@ -368,7 +400,7 @@
     function faultName(id) { var s = byId(net.sections)[id]; return s ? s.short : byId(net.lines)[id].short; }
 
     var steps = [
-      { text: "Power from Prairie Town's gas plant passes eight stops on its way to a lamp. Tap each stop, or use Next stop, to see its [[voltage|voltage]] and what it does.",
+      { text: "Power from Prairie Town's gas plant passes stop after stop on its way to a lamp. Tap each stop, or use Next stop, to see its [[voltage|voltage]] and what it does.",
         build: function (act, api) {
           var seen0 = log.path || [];
           VoltPath(act, { stops: D.stops, seen: seen0, aria: "The path from Prairie Town's plant to a lamp: generator, step-up transformer, transmission tower, substation, feeder pole, service transformer, a home's meter and a socket.",
@@ -395,8 +427,9 @@
               if (!id) return;
               if (byId(net.lines)[id]) tried.tx = true; else if (id !== "XF") tried.dist = true;
               keep("tried", tried);
-              if (tried.tx && tried.dist) { api.done(); api.saw("One loop line down: power goes round the other way, the **[[n-minus-one|N−1]]** idea. A feeder fault: the closest device opens and every home below it goes dark, because a radial feeder has one path."); }
+              if (tried.tx && tried.dist) { api.done(); api.saw("One loop line down: power goes round the other way, the **[[n-minus-one|N−1]]** idea. A feeder [[fault|fault]]: the closest device opens and every home below it goes dark, because a radial feeder has one path."); }
             } });
+          H("p", { class: "lx-hint", text: "In this drawing, the loop's remaining lines are assumed able to carry the load. Real grids also check each line's loading and operating limits." }, act);
           if (tried.tx && tried.dist) api.done();
         } },
       { text: "A storm hits overnight: four parts fail. Tap each failed part to see which device opened, and how many homes it darkened.",
@@ -413,9 +446,9 @@
         } },
       { text: "One crew repairs the three local faults, one after another. Choose the order: every hour a home waits adds 60 [[customer-minutes|customer-minutes]].",
         build: function (act, api) { restoreStep(act, api); } },
-      { text: "Reliability has two yardsticks: [[saidi|SAIDI]] (minutes without power per customer) and [[saifi|SAIFI]] (interruptions per customer). Work out your storm's SAIFI.",
+      { text: "Reliability has two yardsticks: [[saidi|SAIDI]] counts minutes without power per customer, [[saifi|SAIFI]] counts interruptions per customer. If the crew worked twice as fast, which would fall?",
         build: function (act, api) { measureStep(act, api); } },
-      { text: "Now the real U.S. numbers. Pick a year to see how much of the average customer's outage time came on a few stormy days.", free: true,
+      { text: "Now the real U.S. numbers, from utilities using the IEEE method. Pick a year to see how much outage time came on a few stormy days.", free: true,
         build: function (act, api) { realStep(act, api); } }
     ];
 
@@ -426,13 +459,13 @@
       var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, row);
       var sl = LX.Slider(row, { label: "Line voltage", color: "var(--lx-pk)", min: 0, max: L.classes_kV.length - 1, step: 1, value: log.kvi != null ? log.kvi : L.start,
         fmt: function (v) { return fmtN(L.classes_kV[v]) + " kV"; }, onChange: paint });
-      H("p", { class: "lx-hint", html: LX.rich("Illustrative: one line of " + L.R_ohm + " ohms (Ω), the resistance of the wire, carrying " + L.P_MW + " MW. Real lines carry three phases.") }, row);
+      H("p", { class: "lx-hint", html: LX.rich("Illustrative: a line of three wires (three phases, as real lines have), each with " + L.R_ohm + " ohms (Ω) of resistance, carrying " + L.P_MW + " MW.") }, row);
       function paint(v) {
         var kv = L.classes_kV[v], r = loss(L.P_MW, kv, L.R_ohm), wpx = 2 + 10 * Math.sqrt(r.I / loss(L.P_MW, L.classes_kV[0], L.R_ohm).I), heat = Math.min(1, r.pct / 10);
         fig.innerHTML = '<svg viewBox="0 0 320 72"><rect class="pl" x="4" y="18" width="40" height="34" rx="3"/><path class="town" d="M282 52 V34 L296 22 L310 34 V52 Z"/><text x="24" y="66">Plant</text><text x="296" y="66">Town</text>' +
           '<path class="glow" d="M46 35 H280" style="stroke-width:' + (wpx + 14) + "px;opacity:" + heat.toFixed(2) + '"/><path class="cur" d="M46 35 H280" style="stroke-width:' + wpx.toFixed(1) + 'px"/></svg>';
         ro.innerHTML = "";
-        [["Voltage", fmtN(kv) + " kV"], ["Current", fmtN(r.I) + " A"], ["Heat lost", fmtN(r.lossMW, r.lossMW < 1 ? 2 : 1) + " MW"], ["Share lost", fmtN(r.pct, r.pct < 1 ? 2 : 1) + "%"]].forEach(function (x, i) {
+        [["Voltage", fmtN(kv) + " kV"], ["Current in each wire", fmtN(r.I) + " A"], ["Heat lost", fmtN(r.lossMW, r.lossMW < 1 ? 2 : 1) + " MW"], ["Share lost", fmtN(r.pct, r.pct < 1 ? 2 : 1) + "%"]].forEach(function (x, i) {
           var c = H("div", { class: "lx-readout" + (i === 3 ? (r.pct > 5 ? " bad" : r.pct < 1 ? " good" : "") : "") }, ro); H("span", { text: x[0] }, c); H("b", { text: x[1] }, c);
         });
         tried[v] = true; keep("kvi", v);
@@ -440,7 +473,7 @@
         if (n >= 2) {
           var lo = loss(L.P_MW, L.classes_kV[0], L.R_ohm), hi = loss(L.P_MW, L.classes_kV[4], L.R_ohm);
           api.done();
-          api.saw("At " + L.classes_kV[0] + " kV the wire loses **" + fmtN(lo.pct, 1) + "%**; at " + L.classes_kV[4] + " kV, five times higher, only **" + fmtN(hi.pct, 2) + "%**, one twenty-fifth. All U.S. lines and wires together lose about " + L.real_pct + "% (EIA, " + L.real_years + ").");
+          api.saw("At " + L.classes_kV[0] + " kV the line loses **" + fmtN(lo.pct, 1) + "%**; at " + L.classes_kV[4] + " kV, five times higher, only **" + fmtN(hi.pct, 2) + "%**, one twenty-fifth. All U.S. lines and wires together lose about " + L.real_pct + "% (EIA, " + L.real_years + ").");
         }
       }
       paint(sl.val());
@@ -497,9 +530,11 @@
       act.lxRestore = { set: function (o2) { order = o2.slice(); paint(false); } };
     }
 
-    // ---- step 7: SAIDI and SAIFI of the storm
+    // ---- step 7: SAIDI and SAIFI of the storm, worked; then duration against frequency (a crew twice as fast)
     function measureStep(act, api) {
-      var r = restore(net, faults, log.order && log.order.length === 3 ? log.order : best.best[0].order), m = reliability(r.customerMinutes, r.interrupted, served);
+      var order = log.order && log.order.length === 3 ? log.order : best.best[0].order;
+      var r = restore(net, faults, order), m = reliability(r.customerMinutes, r.interruptions, served);
+      var rf = restore(net, faster(faults, 2), order), mf = reliability(rf.customerMinutes, rf.interruptions, served);
       var box = H("div", { class: "f6m" }, act);
       var eq = H("div", { class: "f6m-eqs" }, box);
       var e1 = H("div", { class: "f6m-eq" }, eq);
@@ -507,18 +542,14 @@
       H("p", { html: fmtN(r.customerMinutes) + " customer-minutes ÷ " + served + " customers = <b>" + fmtN(m.saidi) + " minutes</b>" }, e1);
       var e2 = H("div", { class: "f6m-eq" }, eq);
       H("span", { class: "k", html: LX.rich("[[saifi|SAIFI]] of your storm") }, e2);
-      H("p", { html: r.interrupted + " customers interrupted ÷ " + served + " customers = <b>?</b>" }, e2);
-      var na = LX.NumAnswer(box, { label: "SAIFI, interruptions per customer", unit: "", width: "6em", onCheck: function (v, inp) {
-        if (v == null) { api.saw("Type a number first: customers interrupted ÷ customers served.", true); return; }
-        var ok = Math.abs(v - m.saifi) <= 0.01;
-        inp.classList.toggle("right", ok); inp.classList.toggle("wrong", !ok);
-        e2.querySelector("p").innerHTML = r.interrupted + " customers interrupted ÷ " + served + " customers = <b>" + fmtN(m.saifi, 2) + "</b>";
-        api.done();
-        api.saw((ok ? "Right: " : "It is ") + "**" + fmtN(m.saifi, 2) + "** interruptions per customer. In 2025 the average U.S. customer had " + last.saifi + " interruptions and " + fmtN(last.saidi, 1) + " minutes without power, over a whole year (EIA).", !ok);
-      } });
-      if (log.saifi) { na.input.value = fmtN(m.saifi, 2); na.go(); }
-      na.input.addEventListener("change", function () { keep("saifi", true); });
-      na.button.addEventListener("click", function () { keep("saifi", true); });
+      H("p", { html: r.interruptions + " interruptions ÷ " + served + " customers = <b>" + fmtN(m.saifi, 2) + "</b>" }, e2);
+      H("p", { class: "lx-hint", text: "A home that loses power twice counts twice in SAIFI. In this storm, each of the " + r.interrupted + " homes went dark once." }, box);
+      var p = LX.Predict(box, { id: "f6-faster", answer: "saidi",
+        options: [{ value: "saidi", label: "SAIDI only" }, { value: "saifi", label: "SAIFI only" }, { value: "both", label: "Both" }, { value: "neither", label: "Neither" }],
+        feedback: { saidi: "A faster crew shortens each wait, not the number of homes that lost power: SAIDI falls from " + fmtN(m.saidi) + " to " + fmtN(mf.saidi) + " minutes, SAIFI stays " + fmtN(mf.saifi, 2) + "." },
+        onPick: function (v) { keep("faster", v); show(); } });
+      function show() { p.reveal(); api.done(); }
+      if (p.picked()) show();
     }
 
     // ---- step 8: EIA's table, and the prediction revealed
@@ -526,7 +557,8 @@
       var rows = D.reliability.rows, sel = rows.length - 1, box = H("div", { class: "f6y" }, act);
       var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, box), ch = H("div", null, box);
       var Pl = LX.Plot(ch, { text: "Text version of the chart", legend: true });
-      H("p", { class: "lx-hint", html: LX.rich(medRunText(rows) + " Data: EIA, Electric Power Annual, Table 11.1; utilities using the IEEE method.") }, box);
+      H("p", { class: "lx-hint", html: LX.rich(medRunText(rows)) }, box);
+      H("p", { class: "lx-hint", text: "Data: EIA, Electric Power Annual, Table 11.1; utilities using the IEEE method." }, box);
       var rev = H("div", { class: "f6y-rev" }, box);
       function paint(i, user) {
         sel = i; var r = rows[i];
@@ -547,7 +579,8 @@
       paint(sel);
       var pred = log.pred, right = pred === "dist";
       H("p", { class: "f6y-p", html: LX.rich("**Your prediction: " + (pred ? (right ? "right." : "not quite.") : "none.") + "** DOE found in 2017 that over " + D.distribution_share.pct + "% of U.S. power interruptions start on the [[distribution|distribution]] system, mostly in bad weather.").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }, rev);
-      H("p", { class: "f6y-p", html: LX.rich("In " + last.year + ", leaving out outages caused by losing supply from the high-voltage system lowers the average from " + fmtN(last.saidi, 1) + " to " + fmtN(last.saidi_nolos, 1) + " minutes. Failures upstream, such as the plant outages in Texas in 2021 (") + LX.lessonRefHTML(P, 3) + LX.rich(": " + fmtN(U.peakShedMW) + " MW of demand ordered off), are rarer but can darken millions at once.") }, rev);
+      H("p", { class: "f6y-p", text: "EIA's " + last.year + " columns: " + fmtN(last.saidi, 1) + " minutes for all events, " + fmtN(last.saidi_nolos, 1) + " with outages from lost high-voltage supply removed. The two columns can cover different utilities, so the gap does not measure upstream failures." }, rev);
+      H("p", { class: "f6y-p", html: LX.rich("Failures upstream are rarer but can darken millions at once: in Texas in 2021, plant outages forced " + fmtN(U.peakShedMW) + " MW of demand off (") + LX.lessonRefHTML(P, 3) + ")." }, rev);
       yearPick = paint;
     }
 
@@ -578,7 +611,7 @@
       if (i === 1) { var plus = q(".lx-ctl-row button")[0]; if (plus) { plus.click(); plus.click(); plus.click(); plus.click(); } }
       if (i === 3) { ["GN", "F1B"].forEach(function (id) { var g = live.querySelector('g.el[data-id="' + id + '"]'); if (g) g.dispatchEvent(new MouseEvent("click", { bubbles: true })); }); }
       if (i === 4) faults.forEach(function (f) { var g = live.querySelector('g.el[data-id="' + f.id + '"]'); if (g) g.dispatchEvent(new MouseEvent("click", { bubbles: true })); });
-      if (i === 6) { var inp = live.querySelector(".lx-na-num"); if (inp) { inp.value = "0.87"; var b2 = live.querySelector(".lx-na .lx-btn"); if (b2) b2.click(); } }
+      if (i === 6) { var b2 = live.querySelectorAll(".f6m .lx-choice")[0]; if (b2) b2.click(); }
       if (i === 7 && yearPick) yearPick(9);   // the 2024 column
       return { view: "step " + (i + 1) };
     }, cards);
@@ -594,12 +627,12 @@
                 { icon: "tower", title: "Transmission", text: "carries it far", value: v.transmission.list[0] + "–" + v.transmission.list[v.transmission.list.length - 1] + " kV" },
                 { icon: "sub", title: "Substation and feeder", text: "spreads it locally", value: v.distribution.list[0] + "–" + v.distribution.list[v.distribution.list.length - 1] + " kV" },
                 { icon: "house", title: "Home", text: "uses it", value: v.service.text } ] });
-      var mine = !!(log.order && log.order.length === 3), order = mine ? log.order : best.best[0].order, r = restore(net, faults, order), m = reliability(r.customerMinutes, r.interrupted, served);
+      var mine = !!(log.order && log.order.length === 3), order = mine ? log.order : best.best[0].order, r = restore(net, faults, order), m = reliability(r.customerMinutes, r.interruptions, served);
       var l2h = r.done.L2, l2n = byId(net.sections).L2.homes, c2 = H("div", { class: "lx-xcard" }, host);
       LX.CausalChain(c2, { title: "Cause and effect: one branch on Oak Street",
         links: [{ title: "Wind breaks a branch", text: "It falls across lateral L2's wires.", value: "storm" },
                 { title: "A fault", text: "Current rushes through the branch to the ground.", value: "short circuit" },
-                { title: "The closest device opens", text: "L2's [[fuse|fuse]] blows; the rest of the feeder stays on.", value: "1 fuse" },
+                { title: "The closest device opens", text: "Protection is set so L2's [[fuse|fuse]] blows first; the rest of the feeder stays on.", value: "1 fuse" },
                 { title: "Homes go dark", text: "Every home beyond the fuse loses power.", value: l2n + " homes" },
                 { title: "Minutes add up", text: (mine ? "In your repair order" : "In the best repair order") + ", L2 is fixed after " + l2h + " h.", value: fmtN(l2n * l2h * 60) + " customer-minutes" },
                 { title: "SAIDI grows", text: "Divided over all " + served + " customers.", value: "+" + fmtN(l2n * l2h * 60 / served) + " min" }],
@@ -609,9 +642,9 @@
         groups: { path: ["The path", "var(--lx-tier-2)"], prot: ["Protection", "var(--lx-warn)"], rel: ["Reliability", "var(--lx-cc)"] },
         nodes: [
           { id: "gen", g: "path", label: "Generation", text: "Plants make electricity at " + v.generator.lo + "–" + v.generator.hi + " kV.", game: "Stop 1: the gas plant at " + D.town.genKV + " kV.", at: [0, 0], atN: [0, 0] },
-          { id: "tx", g: "path", label: "Transmission", lines: ["Transmission"], text: "High-voltage lines joined in loops ([[meshed-network|meshed]]): one line can fail and power goes round.", game: "The loop of three lines.", at: [1, 0], atN: [1, 0] },
+          { id: "tx", g: "path", label: "Transmission", lines: ["Transmission"], text: "High-voltage lines joined in loops ([[meshed-network|meshed]]): if one fails, power can take another path when the others have room.", game: "The loop of three lines.", at: [1, 0], atN: [1, 0] },
           { id: "dist", g: "path", label: "Distribution", lines: ["Distribution"], text: "Substations, feeders and laterals: mostly [[radial-network|radial]], one path to each home.", game: "Two feeders, six laterals, " + served + " homes.", at: [2, 0], atN: [2, 0] },
-          { id: "prot", g: "prot", label: "Protection", text: "Breakers, [[recloser|reclosers]] and fuses open the smallest section they can around a fault.", game: "B1, B2, R1 and six fuses.", at: [2, 1], atN: [2, 1] },
+          { id: "prot", g: "prot", label: "Protection", text: "Breakers, [[recloser|reclosers]] and fuses, set to work together, open the smallest section they can around a fault.", game: "B1, B2, R1 and six fuses.", at: [2, 1], atN: [2, 1] },
           { id: "out", g: "rel", label: "Outage", text: "Homes beyond an opened device lose power until the crew repairs the fault.", game: stormOut.homesDark + " of " + served + " homes after the storm.", at: [1, 1], atN: [1, 1] },
           { id: "cm", g: "rel", label: "Customer-minutes", lines: ["Customer-", "minutes"], text: "Homes without power times minutes without it; the repair order changes the total.", game: "Your order: " + fmtN(r.customerMinutes) + ".", at: [0, 1], atN: [0, 1] },
           { id: "idx", g: "rel", label: "SAIDI and SAIFI", lines: ["SAIDI and", "SAIFI"], text: "Minutes and interruptions per customer, the yardsticks utilities report to EIA every year.", game: "SAIDI " + fmtN(m.saidi) + " min, SAIFI " + fmtN(m.saifi, 2) + ".", at: [0, 2], atN: [0, 2] },
@@ -621,8 +654,8 @@
       var c4 = H("div", { class: "lx-xcard" }, host);
       LX.CompareTable(c4, { title: "Transmission and distribution side by side", text: true,
         columns: [{ key: "name", label: "Part of the grid", main: true }, { key: "v", label: "Voltage (U.S.)" }, { key: "shape", label: "Shape" }, { key: "prot", label: "When a part fails" }, { key: "share", label: "Share of interruptions" }],
-        rows: [{ key: "tx", color: "var(--lx-pk)", name: "Transmission", v: v.transmission.list[0] + "–" + v.transmission.list[v.transmission.list.length - 1] + " kV", shape: "Meshed: loops between regions", prot: "Power usually takes another path; a rare wide failure darkens many", share: "Under " + (100 - D.distribution_share.pct) + "%, with power plants (DOE, 2017)" },
-               { key: "dist", color: "var(--lx-tier-2)", name: "Distribution", v: v.distribution.list[0] + "–" + v.distribution.list[v.distribution.list.length - 1] + " kV, then " + v.service.text, shape: "Radial: one path from the substation", prot: "The closest fuse or recloser opens; the homes below it go dark", share: "Over " + D.distribution_share.pct + "% (DOE, 2017)" }],
+        rows: [{ key: "tx", color: "var(--lx-pk)", name: "Transmission", v: v.transmission.list[0] + "–" + v.transmission.list[v.transmission.list.length - 1] + " kV", shape: "Meshed: loops between regions", prot: "Power usually takes another path, if the other lines have room; a rare wide failure darkens many", share: "Under " + (100 - D.distribution_share.pct) + "%, with power plants (DOE, 2017)" },
+               { key: "dist", color: "var(--lx-tier-2)", name: "Distribution", v: v.distribution.list[0] + "–" + v.distribution.list[v.distribution.list.length - 1] + " kV, then " + v.service.text, shape: "Radial: one path from the substation", prot: "Protection, set to work together, opens the closest fuse or recloser; the homes below it go dark", share: "Over " + D.distribution_share.pct + "% (DOE, 2017)" }],
         caption: "Read across for one part of the grid; read down to compare." });
     }
     buildExplain();

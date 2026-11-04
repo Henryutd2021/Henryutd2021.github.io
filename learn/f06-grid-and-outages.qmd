@@ -28,7 +28,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">F6</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-1)"><span class="lx-dot" aria-hidden="true"></span>Foundations · L1</li>
-<li>20 min guided · about 10 min practice</li>
+<li><span class="lx-nw">20 min guided</span> · <span class="lx-nw">about 10 min practice</span></li>
 <li>After <a href="03-balancing.html">lesson 3</a></li>
 <li class="lx-done-tag" data-lesson-id="f06-grid-and-outages" hidden>Completed</li>
 </ul>
@@ -141,6 +141,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .f6m-eq p { margin: 2px 0 0; font-family: var(--lx-f-mono); font-size: 14.5px; color: var(--lx-ink); }
 .f6y { display: grid; gap: 10px; } .f6y-rev { display: grid; gap: 6px; padding-left: 10px; border-left: 3px solid var(--lx-accent); }
 .f6y-p { margin: 0; font-size: 15px; color: var(--lx-ink); }
+.page-learn .f6-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; } .page-learn .f6-note li { margin: 0; }
+.f6n-why-list { margin: 0 0 6px; padding-left: 1.1rem; font-size: 14px; color: var(--lx-ink); }
 .f6-fbt th, .f6-fbt td { text-align: left; vertical-align: top; font-family: var(--lx-f-body); font-size: 13.5px; padding: 4px 10px 4px 0; }
 @media (max-width: 760px) { .f6n { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) {
@@ -159,14 +161,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-scroll-x"><table class="lx-mini-table f6-fbt">
 <thead><tr><th scope="col">Stop</th><th scope="col">Prairie Town (illustrative)</th><th scope="col">Typical in the U.S.</th><th scope="col">What it does</th></tr></thead>
 <tbody>
-<tr><td>1 Generator</td><td>18 kV</td><td>5–34.5 kV</td><td>Makes alternating current</td></tr>
+<tr><td>1 Generator</td><td>18 kV</td><td>5–34.5 kV</td><td>Makes alternating current, which reverses direction many times a second</td></tr>
 <tr><td>2 Step-up transformer</td><td>18 → 345 kV</td><td>up to 115–765 kV</td><td>Raises the voltage for the long trip</td></tr>
 <tr><td>3 Transmission line</td><td>345 kV</td><td>115–765 kV</td><td>Carries power far, in loops</td></tr>
 <tr><td>4 Substation</td><td>345 → 12.47 kV</td><td>down to below 34 kV</td><td>Steps down; breakers protect each feeder</td></tr>
 <tr><td>5 Distribution feeder</td><td>12.47 kV</td><td>4.8–34.5 kV</td><td>Runs through the streets; laterals reach each block</td></tr>
-<tr><td>6 Service transformer</td><td>12.47 kV → 240/120 V</td><td>240/120 V</td><td>Steps down for a few homes</td></tr>
+<tr><td>6 Service transformer</td><td>12.47 kV → 240/120 V</td><td>240/120 V</td><td>Steps down for a few homes: two live wires and a neutral</td></tr>
 <tr><td>7 Service drop and meter</td><td>240/120 V</td><td>240/120 V</td><td>Brings power into the home and counts the kWh</td></tr>
-<tr><td>8 Socket</td><td>120 V</td><td>120 V (240 V for big appliances)</td><td>Powers the lamp</td></tr>
+<tr><td>8 Socket</td><td>120 V</td><td>120 V (240 V for big appliances)</td><td>Powers the lamp: 120 V between a live wire and the neutral, 240 V between the two live wires</td></tr>
 </tbody>
 </table></div>
 <p class="lx-eyebrow">Then a storm on Prairie Town's east side (30 homes, illustrative)</p>
@@ -176,19 +178,24 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>A branch on Oak Street's lateral</td><td>Its fuse</td><td>6</td><td>2 h</td></tr>
 <tr><td>A limb on the north feeder's far half</td><td>Recloser R1</td><td>10</td><td>3 h</td></tr>
 <tr><td>A snapped pole on the south feeder</td><td>The south feeder's breaker</td><td>10</td><td>6 h</td></tr>
-<tr><td>A toppled tower on one line of the high-voltage loop</td><td>None: power goes round the loop</td><td>0</td><td>12 h, by a separate crew</td></tr>
+<tr><td>A toppled tower on one line of the high-voltage loop</td><td>None: in this drawing, power goes round the loop</td><td>0</td><td>12 h, by a separate crew</td></tr>
 </tbody>
 </table></div>
 <ul>
-<li><b>Losses.</b> Sending 100 MW through a 5-ohm line loses 10.5% at 69 kV but 0.42% at 345 kV: five times the voltage, one twenty-fifth of the loss. All U.S. lines and wires together lose about 5% (2018 through 2022).</li>
+<li><b>Losses.</b> Sending 100 MW through a three-phase line with 5 ohms in each wire loses 10.5% at 69 kV but 0.42% at 345 kV: five times the voltage, one twenty-fifth of the loss. All U.S. lines and wires together lose about 5% (2018 through 2022).</li>
 <li><b>Repairs.</b> One crew, best order: north feeder's far half, then Oak Street, then the south feeder, for 10,200 customer-minutes.</li>
-<li><b>Measures.</b> The storm's SAIDI is 10,200 ÷ 30 = 340 minutes; its SAIFI is 26 ÷ 30 = 0.87 interruptions per customer.</li>
-<li><b>The real U.S.</b> In 2025 the average customer had 269.2 minutes without power and 1.34 interruptions, or 125.3 minutes without major event days. Over 90% of interruptions start on the distribution system.</li>
+<li><b>Measures.</b> The storm's SAIDI is 10,200 ÷ 30 = 340 minutes; its SAIFI is 26 ÷ 30 = 0.87 interruptions per customer (each dark home lost power once). A crew twice as fast halves SAIDI; SAIFI stays the same.</li>
+<li><b>The real U.S.</b> Among customers of utilities using the IEEE method, 2025 averaged 269.2 minutes without power and 1.34 interruptions, or 125.3 minutes without major event days. Over 90% of interruptions start on the distribution system.</li>
 </ul>
 <p class="lx-hint">With JavaScript on, you work through this step by step: the path, a voltage slider, a network you can break, a storm, a repair order and the real U.S. numbers.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real data.</b> Voltage classes from DOE's <a href="https://www.energy.gov/sites/default/files/2023-11/FINAL_CESER%20Electricity%20Grid%20Backgrounder_508.pdf">grid backgrounder</a> (November 2023, p. 2) and <a href="https://www.energy.gov/sites/prod/files/2017/01/f34/Electricity%20Distribution%20System%20Baseline%20Report.pdf">distribution baseline report</a> (2016, pp. 27, 38). Losses: <a href="https://www.eia.gov/tools/faqs/faq.php?id=105&amp;t=3">EIA</a> (updated 7 November 2023). Reliability: <a href="https://www.eia.gov/electricity/annual/html/epa_11_01.html">EIA, Electric Power Annual, Table 11.1</a> (released 21 October 2026), utilities using the IEEE 1366 method.<br><b>Illustrative.</b> Prairie Town's voltages within those ranges, its east-side network and 30 homes, the 5-ohm line, the storm and its repair hours.</span></p>
+<div class="lx-datanote f6-note"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
+<li><b>Voltages (real).</b> DOE's <a href="https://www.energy.gov/sites/default/files/2023-11/FINAL_CESER%20Electricity%20Grid%20Backgrounder_508.pdf">grid backgrounder</a> (November 2023, p. 2) and <a href="https://www.energy.gov/sites/prod/files/2017/01/f34/Electricity%20Distribution%20System%20Baseline%20Report.pdf">distribution baseline report</a> (2016, pp. 27, 38).</li>
+<li><b>Losses (real).</b> <a href="https://www.eia.gov/tools/faqs/faq.php?id=105&amp;t=3">EIA</a>, updated 7 November 2023.</li>
+<li><b>Reliability (real).</b> <a href="https://www.eia.gov/electricity/annual/html/epa_11_01.html">EIA, Electric Power Annual, Table 11.1</a>, released 21 October 2026: utilities using the IEEE 1366 method.</li>
+<li><b>Illustrative.</b> Prairie Town's voltages within those ranges, its east-side network and 30 homes, the line's 5 ohms per wire, the storm and its repair hours.</li>
+</ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="03-balancing.html">Lesson 3</a> keeps the grid balanced second by second; <a href="f01-five-scales.html">F1</a> places feeders and microgrids on the five scales.</p>
 ```
 :::
@@ -204,9 +211,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dl class="lx-ideas">
 <dt>Voltage steps</dt><dd><span class="lx-term" data-term="transformer">Transformers</span> raise the voltage from 5–34.5 kV at the plant to 115–765 kV for <span class="lx-term" data-term="transmission">transmission</span>, then lower it in steps to 240/120 V at the home.</dd>
 <dt>Why high voltage</dt><dd>The same power at a higher voltage needs less current, and the heat lost in a wire grows with current squared.</dd>
-<dt>Meshed and radial</dt><dd>Transmission lines form loops, so one can fail and power goes round; most feeders are radial, with one path to each home.</dd>
-<dt>Protection</dt><dd>A fault opens the closest fuse, <span class="lx-term" data-term="recloser">recloser</span> or breaker upstream of it, darkening only the section below it.</dd>
-<dt>SAIDI and SAIFI</dt><dd><span class="lx-term" data-term="saidi">SAIDI</span> is customer-minutes without power ÷ customers served; <span class="lx-term" data-term="saifi">SAIFI</span> is customers interrupted ÷ customers served.</dd>
+<dt>Meshed and radial</dt><dd>Transmission lines form loops, so if one fails, power can take another path when the others have room; most feeders are radial, with one path to each home.</dd>
+<dt>Protection</dt><dd>In this example, protection is set so the closest fuse, <span class="lx-term" data-term="recloser">recloser</span> or breaker upstream of a <span class="lx-term" data-term="fault">fault</span> opens first, darkening only the section below it.</dd>
+<dt>SAIDI and SAIFI</dt><dd><span class="lx-term" data-term="saidi">SAIDI</span> is customer-minutes without power ÷ customers served; <span class="lx-term" data-term="saifi">SAIFI</span> is customer interruptions ÷ customers served, and a customer interrupted twice counts twice.</dd>
 <dt>Where outages start</dt><dd>Over 90% of U.S. interruptions start on the <span class="lx-term" data-term="distribution">distribution</span> system, mostly in bad weather (DOE, 2017).</dd>
 </dl>
 </div>
@@ -225,7 +232,7 @@ Utilities report three yardsticks to EIA each year (Form EIA-861). All three cou
 | Yardstick | What it measures | Unit |
 |---|---|---|
 | [SAIDI]{.lx-term term="saidi"} | Minutes without power, per customer, in a year | minutes |
-| [SAIFI]{.lx-term term="saifi"} | Interruptions per customer in a year | interruptions |
+| [SAIFI]{.lx-term term="saifi"} | Interruptions per customer in a year; a customer interrupted twice counts twice | interruptions |
 | [CAIDI]{.lx-term term="caidi"} | Average minutes to restore one interruption: SAIDI ÷ SAIFI | minutes |
 
 A [major event day]{.lx-term term="major-event-day"} (IEEE 1366) is a day whose SAIDI exceeds a threshold set from the past five years of daily values. Reports give the yardsticks with and without them:
@@ -242,22 +249,20 @@ Source: [EIA, Electric Power Annual 2025, Table 11.1](https://www.eia.gov/electr
 
 - **Try it.** CAIDI for 2025: 269.2 ÷ 1.34 = 201 minutes per interruption.
 - **Read with care.** Utilities that do not use the IEEE method decide their own major events, so EIA gives the IEEE group on its own and all utilities together ("any method").
+- **Loss of supply.** That column can cover a different group of utilities (its 2020 value is above all events), so its gap from all events is not the share caused upstream.
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>N−1 as a rule in a network model</summary>
+<summary><span class="k">Go deeper · Analyst</span>N−1 is more than a second path</summary>
 <div class="lx-deeper-body">
 ```
 
-The loop survives any one failed line: the [N−1]{.lx-term term="n-minus-one"} idea. A planning or operating model writes it as a rule for each possible outage.
+The loop in this lesson only checks that a path is left. Planners check more for [N−1]{.lx-term term="n-minus-one"}: after any one line fails, can the remaining lines carry the power within their limits?
 
-- **Decisions.** Which plants run, and how much power each line carries.
-- **Rules.** For each line $k$ that might fail, the flows that remain must still fit every other line's limit: one copy of the network rules per outage.
-- **What it costs.** With $L$ lines, the model grows from one network to $L + 1$ networks.
-
-[M1](m01-dispatch-to-lmp.html) builds the network rules for one case; Analyst lesson A17 (upcoming) checks a plan against grid physics, and A9 (upcoming) plans for hazards.
+- **Read next.** Analyst lesson A17 (upcoming) checks a plan against grid physics; A9 (upcoming) plans for hazards.
+- **Later.** [M1](m01-dispatch-to-lmp.html) writes a small network's rules for one case.
 
 ```{=html}
 </div>
@@ -266,12 +271,12 @@ The loop survives any one failed line: the [N−1]{.lx-term term="n-minus-one"} 
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Three phases and alternating current: real power flow also needs voltage and reactive power (Analyst lesson A17, upcoming).</li>
-<li>Protection settings: how fast each fuse, recloser and breaker acts, so the closest one opens first.</li>
+<li>Reactive power and voltage: the slider's three-phase line carries real power only; real power flow also needs voltage and reactive power (Analyst lesson A17, upcoming).</li>
+<li>Protection settings: how fast each fuse, recloser and breaker acts. This lesson assumes they are coordinated, so the closest one opens first.</li>
 <li>Momentary interruptions: a recloser that trips and closes again within seconds, which SAIDI does not count.</li>
 <li>Underground cables, rooftop solar pushing power back up a feeder, and switches that reroute feeders.</li>
 <li>Crews, travel time, parts and priority loads such as hospitals: this lesson's crew weighs only the number of homes.</li>
-<li>Supply: the network checks only connection; keeping supply equal to demand is <a href="03-balancing.html">lesson 3</a>.</li>
+<li>Supply and line limits: the network checks only connection, not how much each line can carry; keeping supply equal to demand is <a href="03-balancing.html">lesson 3</a>.</li>
 </ul>
 </div>
 </details>
@@ -313,7 +318,7 @@ The loop survives any one failed line: the [N−1]{.lx-term term="n-minus-one"} 
 <div class="lx-qq" data-id="fuse" data-answer="b">
 <p class="lx-qtext">A branch falls on a lateral that has its own fuse. What opens?</p>
 <ul class="lx-choices"><li data-value="a">The substation transformer</li><li data-value="b">The lateral's fuse</li><li data-value="c">The feeder's breaker at the substation</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>The lateral's fuse: the closest device upstream of the fault opens, so only the homes on that lateral go dark.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>The lateral's fuse. When protection is coordinated, as here, the closest device upstream of the fault opens first, so only the homes on that lateral go dark.</p></details>
 </div>
 <div class="lx-qq" data-id="double" data-answer="c">
 <p class="lx-qtext">Double the line's voltage and send the same power. What happens to the heat lost in the wire?</p>
@@ -328,10 +333,10 @@ The loop survives any one failed line: the [N−1]{.lx-term term="n-minus-one"} 
 <div class="lx-qq" data-id="loop" data-answer="d">
 <p class="lx-qtext">In the lesson's high-voltage loop, one of the three lines falls. How many homes go dark?</p>
 <ul class="lx-choices"><li data-value="a">All 30</li><li data-value="b">10</li><li data-value="c">6</li><li data-value="d">None</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>None: power takes the other way round the loop. Only when both lines into the substation fall do all 30 homes go dark.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>None: power takes the other way round the loop, which the lesson assumes can carry it. Only when both lines into the substation fall do all 30 homes go dark.</p></details>
 </div>
 <div class="lx-qq" data-id="med" data-answer="b">
-<p class="lx-qtext">In 2025, U.S. SAIDI was 269.2 minutes with major event days and 125.3 minutes without them. About what share came on major event days?</p>
+<p class="lx-qtext">In 2025, SAIDI for U.S. utilities using the IEEE method was 269.2 minutes with major event days and 125.3 minutes without them. About what share came on major event days?</p>
 <ul class="lx-choices"><li data-value="a">About 47%</li><li data-value="b">About 53%</li><li data-value="c">About 27%</li><li data-value="d">About 215%</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>About 53%: (269.2 − 125.3) ÷ 269.2 = 0.53. In 2024, a year of hurricanes, it was about 80%.</p></details>
 </div>
@@ -355,8 +360,8 @@ The loop survives any one failed line: the [N−1]{.lx-term term="n-minus-one"} 
 <tr><td class="n">4.8–34.5 kV</td><td>The four common U.S. distribution circuit voltages: 4.8, 12.47, 22.9 and 34.5 kV.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/Electricity%20Distribution%20System%20Baseline%20Report.pdf">PNNL for DOE, distribution baseline report</a>, p. 27 · July 2016</td></tr>
 <tr><td class="n">240/120 V</td><td>The service a typical U.S. home gets from its local feeder.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/01/f34/Electricity%20Distribution%20System%20Baseline%20Report.pdf">PNNL for DOE, distribution baseline report</a>, p. 38 · July 2016</td></tr>
 <tr><td class="n">about 5%</td><td>Electricity lost in U.S. transmission and distribution, average of 2018 through 2022.</td><td class="s"><a href="https://www.eia.gov/tools/faqs/faq.php?id=105&amp;t=3">EIA, Frequently Asked Questions</a> · updated 7 November 2023</td></tr>
-<tr><td class="n">269.2 min</td><td>U.S. SAIDI in 2025: minutes without power per customer, all events (1.34 interruptions per customer, SAIFI).</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_11_01.html">EIA, Electric Power Annual, Table 11.1</a>, IEEE method · released 21 October 2026</td></tr>
-<tr><td class="n">125.3 min</td><td>U.S. SAIDI in 2025 without major event days.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_11_01.html">EIA, Electric Power Annual, Table 11.1</a>, IEEE method · released 21 October 2026</td></tr>
+<tr><td class="n">269.2 min</td><td>U.S. SAIDI in 2025, utilities using the IEEE method: minutes without power per customer, all events (1.34 interruptions per customer, SAIFI).</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_11_01.html">EIA, Electric Power Annual, Table 11.1</a>, IEEE method · released 21 October 2026</td></tr>
+<tr><td class="n">125.3 min</td><td>U.S. SAIDI in 2025 without major event days, utilities using the IEEE method.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_11_01.html">EIA, Electric Power Annual, Table 11.1</a>, IEEE method · released 21 October 2026</td></tr>
 <tr><td class="n">over 90%</td><td>Share of U.S. power interruptions that start on the distribution system, mostly in bad weather.</td><td class="s"><a href="https://www.energy.gov/sites/prod/files/2017/02/f34/Chapter%20IV--Ensuring%20Electricity%20System%20Reliability,%20Security,%20and%20Resilience.pdf">DOE, Quadrennial Energy Review, Chapter IV</a>, p. 4-2 · January 2017</td></tr>
 </tbody>
 </table>
