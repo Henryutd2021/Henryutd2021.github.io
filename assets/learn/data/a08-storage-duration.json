@@ -31,7 +31,7 @@
    "hours": 4,
    "eta": 0.8259,
    "lossPerDay": 0,
-   "limit": "State of charge between empty and full; most warranties allow about one full cycle a day.",
+   "limit": "State of charge between empty and full; most warranties allow about one [[full-cycle|full cycle]] a day.",
    "source": {
     "label": "DOE, 2022 Grid Energy Storage Technology Cost and Performance Assessment, Table 4.4 (LFP, AC round trip 82.59%, 2021)",
     "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
@@ -65,9 +65,14 @@
    "hours": 24,
    "eta": 0.5,
    "lossPerDay": 0.02,
-   "limit": "Heat losses: a hot store cools a little every hour, full or not; 2% a day here.",
+   "limit": "[[standing-loss|Standing loss]]: a hot store cools a little every hour, full or not; 2% a day here (an illustrative assumption).",
    "source": {
-    "label": "DOE, 2022 assessment, p. 85 (a particle thermal store's expected round trip, 50%); NREL/CP-5700-77910 (2020), a tank's design target of at most 2% heat loss in 24 hours",
+    "label": "DOE, 2022 assessment, p. 85 (a particle thermal store's expected round trip, 50%)",
+    "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
+    "as_of": "2022-08"
+   },
+   "lossSource": {
+    "label": "Illustrative, borrowed from a design target: NREL/CP-5700-77910 (2020), a molten-salt tank's insulation designed for at most 2% heat loss in 24 hours",
     "url": "https://docs.nlr.gov/docs/fy21osti/77910.pdf",
     "as_of": "2020-11"
    }
@@ -82,7 +87,7 @@
    "hours": 168,
    "eta": 0.31,
    "lossPerDay": 0,
-   "limit": "Conversion losses: electrolyzer in, fuel cell out; 31% of what goes in comes back.",
+   "limit": "Conversion losses: [[electrolyzer|electrolyzer]] in, [[fuel-cell|fuel cell]] out; 31% of what goes in comes back.",
    "source": {
     "label": "DOE, 2022 Grid Energy Storage Technology Cost and Performance Assessment, Figure 4.27 (hydrogen: electrolyzer, cavern, fuel cell; round trip 31%)",
     "url": "https://www.energy.gov/sites/default/files/2022-09/2022%20Grid%20Energy%20Storage%20Technology%20Cost%20and%20Performance%20Assessment.pdf",
@@ -126,7 +131,7 @@
   "cards": [
    {
     "id": "fly",
-    "text": "Flywheel",
+    "text": "Flywheel (a spinning mass)",
     "bin": "min",
     "why": "DOE's chart puts flywheels at minutes: a spinning mass gives power fast but holds little energy."
    },
@@ -138,29 +143,30 @@
    },
    {
     "id": "psh",
-    "text": "Pumped storage hydro",
+    "text": "Pumped storage hydro, an 8-hour plant",
     "bin": "short",
-    "why": "DOE gives 0 to 15 hours for traditional pumped storage, most of it in this bin."
+    "why": "DOE gives 0 to 15 hours for traditional pumped storage; an 8-hour plant sits in the short-duration bin."
    },
    {
     "id": "air",
-    "text": "Liquid air",
+    "text": "Liquid air (air chilled to a liquid, later warmed to drive a turbine)",
     "bin": "inter",
     "why": "DOE gives 10 to 25 hours: inter-day."
    },
    {
     "id": "metal",
-    "text": "Metal-anode battery (iron-air type)",
+    "text": "Iron-air battery (metal-anode), 100 hours",
     "bin": "multi",
-    "why": "DOE gives 50 to 200 hours: mostly multi-day."
+    "why": "Iron rusts as it discharges and is restored as it charges. DOE gives metal-anode batteries 50 to 200 hours; 100 hours is multi-day."
    },
    {
     "id": "h2",
-    "text": "Hydrogen in a salt cavern",
+    "text": "Hydrogen in a salt cavern, weeks of output",
     "bin": "season",
-    "why": "DOE's seasonal bin is mainly chemical storage, a fuel that keeps: a cavern holds weeks of output."
+    "why": "Weeks are more than 160 hours; DOE's seasonal bin is mainly chemical storage, a fuel that keeps."
    }
-  ]
+  ],
+  "note": "Cards with a range that spans two bins carry one example rating (an 8-hour pumped storage plant, a 100-hour iron-air battery), so each has one right bin (A8 review, finding 7)."
  },
  "costs": {
   "about": "Total installed costs of 100 MW systems in the report's own sizes, from data gathered in 2021 (the report's 'current' year; it states no other dollar year). One source, one year. Fixed operation and maintenance, cycling wear and replacements are left out.",

@@ -45,7 +45,7 @@
   "minLoad": 0.15,
   "heatShare": 0.2,
   "source": {
-   "label": "DOE Hydrogen Program Record 24005, Table 1: about 57 kWh per kg",
+   "label": "DOE Hydrogen Program Record 24005, Table 1: about 57 kWh per kg, a PEM system figure, used here as an illustrative value for the alkaline unit",
    "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf",
    "as_of": "2024-05-20"
   },
@@ -54,7 +54,12 @@
    "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf",
    "as_of": "2020-12"
   },
-  "heatNote": "Illustrative: 20% of the electrolyzer's power input recovered as low-temperature heat."
+  "heatNote": "Illustrative: 20% of the electrolyzer's power input recovered as low-temperature heat.",
+  "rangeSource": {
+   "label": "IRENA, Green Hydrogen Cost Reduction (2020), Table 6: alkaline electrolyser systems use 50-78 kWh per kg (2020), so 57 kWh per kg lies inside the alkaline range",
+   "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf",
+   "as_of": "2020-12"
+  }
  },
  "tank": {
   "kg": 4000,

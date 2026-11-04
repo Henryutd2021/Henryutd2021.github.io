@@ -73,8 +73,8 @@
   }
   function read(W, s, r) {
     if (!r || !r.values) return { ok: false, status: r ? r.status : "error" };
-    var v = function (k) { var x = r.values[k]; return Math.abs(x) < 1e-7 ? 0 : x; }, o = { ok: !!r.ok, status: r.status, unserved: 0, level: [s.E], ch: [], dis: [], firm: [] };
-    for (var t = 0; t < W.T; t++) { o.unserved += v("u" + t); o.level.push(v("e" + t)); o.ch.push(v("c" + t)); o.dis.push(v("d" + t)); o.firm.push(v("g" + t)); }
+    var v = function (k) { var x = r.values[k]; return Math.abs(x) < 1e-7 ? 0 : x; }, o = { ok: !!r.ok, status: r.status, unserved: 0, level: [s.E], ch: [], dis: [], firm: [], uns: [] };
+    for (var t = 0; t < W.T; t++) { o.unserved += v("u" + t); o.uns.push(v("u" + t)); o.level.push(v("e" + t)); o.ch.push(v("c" + t)); o.dis.push(v("d" + t)); o.firm.push(v("g" + t)); }
     o.covered = W.shortSum > 0 ? 1 - o.unserved / W.shortSum : 1;
     return o;
   }
@@ -85,8 +85,10 @@
   // ---------------------------------------------------------------- costs (closed form)
   function crf(r, n) { return r / (1 - Math.pow(1 + r, -n)); }
   function maxCycles(it, perDay) { return Math.min(365 * (perDay || 1), Math.floor(8760 / (it.hours * (1 + 1 / it.eta)))); }
-  // $ per MWh delivered: yearly capital (capital recovery x installed cost) over the MWh delivered a year, plus the energy
-  // bought to charge (price / round trip). cycles above the store's limit are capped (capped: true)
+  // $ per MWh delivered: yearly capital (capital recovery x installed cost in $/kW x 1,000 kW per MW) over the MWh delivered
+  // a year (cycles x duration in hours, per MW), plus the energy bought to charge (price / round trip). Cycles above the
+  // store's limit are capped (capped: true). The costed store is DOE's cost case (it.hours), which for hydrogen is 24 hours,
+  // not the week-long store of the LP: the explain layer shows the two in separate tables (A8 review, finding 1).
   function perMWh(it, cycles, price, rate, perDay) {
     var n = Math.min(cycles, maxCycles(it, perDay)), yearly = crf(rate, it.life) * it.perKW * 1000, mwh = n * it.hours;
     return { cycles: n, capped: n < cycles, capital: yearly / mwh, charging: price / it.eta, total: yearly / mwh + price / it.eta, yearly: yearly };
@@ -98,8 +100,17 @@
     usd: function (v) { return "$" + Math.round(v).toLocaleString("en-US"); },
     hm: function (t) { return (t % DAY < 10 ? "0" : "") + (t % DAY) + ":00"; }
   };
+  // the cost table of the explain layer: DOE's cost cases, each named with its own size (A8 review, finding 1)
+  function costRows(D) {
+    var R = D.reference, C = D.costs;
+    return C.items.map(function (it) {
+      var t = D.techs.filter(function (q) { return q.id === it.id; })[0], c = perMWh(it, R.cyclesShown, R.priceShown, C.rate);
+      return { key: it.id, color: t.color, name: t.short, note: "100 MW, " + it.hours + " h (DOE's cost case)", hours: it.hours, kwh: { text: fm.usd(it.perKWh), value: it.perKWh },
+               cyc: { text: String(c.cycles), value: c.cycles }, cost: { text: fm.usd(c.total), value: c.total } };
+    });
+  }
   var model = { DAY: DAY, weekStart: weekStart, prepare: prepare, store: store, lossPerHour: lossPerHour, build: build, read: read, powerFloor: powerFloor,
-                idle: idle, crf: crf, maxCycles: maxCycles, perMWh: perMWh, sum: sum, fm: fm };
+                idle: idle, crf: crf, maxCycles: maxCycles, perMWh: perMWh, costRows: costRows, sum: sum, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -125,6 +136,7 @@
       ".a8-bars .bar{height:14px;border-radius:6px;background:var(--lx-surface-3);overflow:hidden;display:flex}",
       ".a8-bars .bar i{display:block;height:100%}.a8-bars b{font-family:var(--lx-f-mono);font-weight:600;text-align:right}",
       ".a8-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+      ".a8-stale{opacity:.5}",
       "@media (max-width:560px){.a8-tbl table{font-size:12.5px}.a8-tbl th,.a8-tbl td{padding:4px 3px}.a8-tbl .ph{display:none}.a8-bars li{grid-template-columns:minmax(5.5em,7em) minmax(0,1fr) 5em;font-size:13px}}"
     ].join("\n") }, document.head);
   }
@@ -163,9 +175,16 @@
       var legend = [{ label: "Demand", color: "var(--lx-ink)" }, { label: "Wind + sun + firm", color: "var(--lx-wind)" }];
       if (sol) { lines.push({ values: supply.map(function (x, t) { return x + sol.dis[t] - sol.ch[t]; }), x0: 0.5, color: sol.store.color, dash: "5 3", width: 2 }); legend.push({ label: "With " + sol.store.short.toLowerCase() + " (one best schedule)", color: sol.store.color, dash: "5 3" }); }
       P.render({ x: { min: 0, max: W.T, ticks: dayTicks(W, false), ticksN: dayTicks(W, true) }, y: { min: 0, max: 5000, step: 1000, fmt: function (v) { return v.toLocaleString("en-US"); }, unit: "MW" },
-        lines: lines, legend: legend, aria: label,
-        text: { head: ["Day", "Wind (share of " + fm.mw(G.windMW) + ")", "Shortfall without storage, MWh"], rows: W.daily.map(function (d, k) { return [dayTicks(W, false)[k][1], fm.pct(d.wind), Math.round(d.short).toLocaleString("en-US")]; }) } });
+        lines: lines, legend: legend, aria: label, text: weekText(sol) });
       return P;
+    }
+    // the week's text version: every hour (CST, the hour that starts then), the plotted series and, with a store, its
+    // output (+) or charging (−) and the demand left unserved, all in MW (= MWh over the hour) (A8 review, finding 8)
+    function weekText(sol) {
+      var n = function (v) { return Math.round(v).toLocaleString("en-US"); }, head = ["Hour starting", "Demand", "Wind + sun + firm", "Short without storage"];
+      if (sol) head = head.concat([sol.store.short + " out (+) or in (−)", "Unserved with it"]);
+      return { head: head, note: "All in MW, the same as MWh over the hour. " + (sol ? "The store's schedule is one of the best schedules; the unserved total is the same for all of them." : "Run a store in step 5 to add its schedule."),
+        rows: W.demand.map(function (d, t) { var r = [dayTicks(W, false)[Math.floor(t / DAY)][1] + " " + fm.hm(t), n(d), n(W.wind[t] + W.solar[t] + W.firm), n(W.short0[t])]; return sol ? r.concat([n(sol.dis[t] - sol.ch[t]), n(sol.uns[t])]) : r; }) };
     }
     var TECHS = D.techs.map(function (t) { return store(D, t.id); });
 
@@ -179,11 +198,11 @@
             onPick: function () { pr.reveal("Duration = energy ÷ power. It says how long a store can keep giving full power."); api.done(); } });
         } },
       // 2 the ladder
-      { text: "Stores sit on a ladder of durations, from seconds to seasons. Place six of them on DOE's ladder, then check.",
+      { text: "Stores sit on a ladder of durations, from seconds to seasons. Place six of them, each at one example rating, on DOE's ladder, then check.",
         build: function (act, api) {
           LX.CardSort(act, { bins: D.ladder.bins, cards: D.ladder.cards, onCheck: function (g) {
             if (g.placed < g.total) return; api.done(); remember("ladder", g.right);
-            api.saw(g.right + " of " + g.total + " as DOE places them. [[long-duration-storage|Long-duration storage]] starts at about 10 hours; the ranges overlap.");
+            api.saw(g.right + " of " + g.total + " as DOE places them. [[long-duration-storage|Long-duration storage]] starts at about 10 hours; a technology's range can span two bins.");
           } });
           H("p", { class: "a8-note", html: "Ladder: " + LX.esc(D.ladder.source.label) + "." }, act);
         } },
@@ -192,7 +211,7 @@
         build: function (act, api) {
           var out = H("ul", { class: "a8-bars", "aria-live": "polite" }, act), moved = 0;
           var lim = H("ul", { class: "a8-note", style: "padding-left:1.1rem;display:grid;gap:2px" }, act);
-          TECHS.forEach(function (s) { H("li", { html: "<b>" + LX.esc(s.short) + ":</b> " + LX.esc(s.limit) }, lim); });
+          TECHS.forEach(function (s) { H("li", { html: "<b>" + LX.esc(s.short) + ":</b> " + LX.rich(s.limit) }, lim); });
           function draw(days) {
             out.innerHTML = "";
             TECHS.forEach(function (s) { var back = idle(s, days), li = H("li", null, out); H("span", { text: s.short }, li); var b = H("span", { class: "bar", role: "img", "aria-label": s.short + ": " + back.toFixed(2) + " MWh back" }, li); H("i", { style: "width:" + (back * 100).toFixed(1) + "%;background:" + s.color }, b); H("b", { text: back.toFixed(2) + " MWh" }, li); });
@@ -234,36 +253,48 @@
       // 6 power still matters
       { text: function () { return "The hydrogen store holds " + fm.mwh(store(D, "hydrogen").E) + ", far more than the week's shortfall. Why does some remain? Change its power and solve again."; },
         build: function (act, api) {
-          var st = LX.SolverStatus(act), out = H("div", { class: "a8-kpis", "aria-live": "polite" }, act), P = 1000, run;
+          // the power solved travels with its result (sent); the slider is off while a solve runs, and a result for another
+          // power is marked stale (A8 review, finding 2)
+          var st = LX.SolverStatus(act), out = H("div", { class: "a8-kpis", "aria-live": "polite" }, act), P = 1000, sent = null, shownP = null, run, sl;
           var go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve" }, H("div", { class: "a8-row" }, act));
-          LX.Slider(act, { label: "Hydrogen store's power (fuel cell)", min: 500, max: 2000, step: 100, value: P, fmt: function (v) { return v.toLocaleString("en-US") + " MW"; }, onChange: function (v) { P = v; } });
-          function show() {
-            var o = res["h2-" + P]; out.innerHTML = "";
-            kpi(out, "Power", fm.mw(P)); kpi(out, "Unserved left", fm.mwh(o.unserved), o.unserved > 0.5 ? "bad" : "good"); kpi(out, "Hours when the gap tops firm + power", String(W.short0.filter(function (x) { return x > P; }).length));
-            api.done(); remember("h2P", P);
-            api.saw(o.unserved > 0.5 ? "At " + fm.mw(P) + " the store still leaves " + fm.mwh(o.unserved) + ": exactly the MWh by which the gap tops firm output plus " + fm.mw(P) + " in its worst hours. **Power, not energy, limits it.**"
-              : "At " + fm.mw(P) + " every hour is served: the largest gap above firm output is " + fm.mw(W.peakGap) + ". Energy and power both have to be enough.");
+          sl = LX.Slider(act, { label: "Hydrogen store's power (fuel cell)", min: 500, max: 2000, step: 100, value: P, fmt: function (v) { return v.toLocaleString("en-US") + " MW"; }, onChange: function (v) { P = v; stale(); } });
+          var staleNote = H("p", { class: "a8-note", hidden: true, "aria-live": "polite" }, act);
+          function stale() {
+            var old = shownP != null && shownP !== P; out.classList.toggle("a8-stale", old); staleNote.hidden = !old;
+            staleNote.textContent = old ? "These results are for " + fm.mw(shownP) + ". Solve again for " + fm.mw(P) + "." : "";
           }
-          run = action({ api: api, st: st, host: act, go: go, job: function () { var s = store(D, "hydrogen", { P: P }); s.E = store(D, "hydrogen").E; return solveStore("h2-" + P, s).then(function (o) { return o.ok ? null : o; }); },
-            show: function () { st.set(res["h2-" + P].r); show(); } });
+          function show(Pj) {
+            var o = res["h2-" + Pj]; out.innerHTML = ""; shownP = Pj;
+            kpi(out, "Power", fm.mw(Pj)); kpi(out, "Unserved left", fm.mwh(o.unserved), o.unserved > 0.5 ? "bad" : "good"); kpi(out, "Hours when the gap tops firm + power", String(W.short0.filter(function (x) { return x > Pj; }).length));
+            stale(); api.done(); remember("h2P", Pj);
+            api.saw(o.unserved > 0.5 ? "At " + fm.mw(Pj) + " the store still leaves " + fm.mwh(o.unserved) + ": exactly the MWh by which the gap tops firm output plus " + fm.mw(Pj) + " in its worst hours. **Power, not energy, limits it.**"
+              : "At " + fm.mw(Pj) + " every hour is served: the largest gap above firm output is " + fm.mw(W.peakGap) + ". Energy and power both have to be enough.");
+          }
+          run = action({ api: api, st: st, host: act, go: go,
+            job: function () {
+              var Pj = P, s = store(D, "hydrogen", { P: Pj }); sent = Pj; s.E = store(D, "hydrogen").E; sl.disable(true);
+              return solveStore("h2-" + Pj, s).then(function (o) { sl.disable(false); return o.ok ? null : o; }, function (e) { sl.disable(false); throw e; });
+            },
+            show: function () { st.set(res["h2-" + sent].r); show(sent); } });
           go.addEventListener("click", run);
         } },
       // 7 cost per MWh delivered
-      { text: "A store earns its cost back only on the energy it delivers. Set how often it cycles a year, and the price of the power that charges it.",
+      { text: "Here a store's yearly cost is spread over the electricity it delivers. Set how many [[full-cycle|full cycles]] it makes a year, and the price of the power that charges it.",
         build: function (act, api) {
-          var C = D.costs, cyc = 250, price = 20, moved = {}, ctl = H("div", null, act), out = H("ul", { class: "a8-bars", "aria-live": "polite" }, act), note = H("p", { class: "a8-note" }, act);
+          var C = D.costs, cyc = 250, price = 20, moved = {}, ctl = H("div", null, act), out = H("ul", { class: "a8-bars", "aria-live": "polite" }, act), note = H("p", { class: "a8-note" }, act), note2 = H("p", { class: "a8-note" }, act);
           var mx = function () { return 600; };
           function draw() {
             out.innerHTML = "";
             C.items.forEach(function (it) {
-              var c = perMWh(it, cyc, price, C.rate), li = H("li", null, out), s = store(D, it.id);
+              var c = perMWh(it, cyc, price, C.rate), li = H("li", null, out), s = store(D, it.id);   // it.hours: DOE's cost case
               H("span", { text: s.short + " · " + it.hours + " h" }, li);
               var b = H("span", { class: "bar", role: "img", "aria-label": s.short + ": " + fm.usd(c.total) + " per MWh delivered, " + fm.usd(c.capital) + " capital and " + fm.usd(c.charging) + " charging" + (c.capped ? ", at its limit of " + c.cycles + " cycles a year" : "") }, li);
               H("i", { style: "width:" + Math.min(100, c.capital / mx() * 100).toFixed(1) + "%;background:" + s.color }, b); H("i", { style: "width:" + Math.min(100, c.charging / mx() * 100).toFixed(1) + "%;background:var(--lx-ink-3)" }, b);
               H("b", { text: (c.total > mx() ? "> " : "") + fm.usd(c.total) }, li);
             });
             var h = C.items.filter(function (i) { return i.id === "hydrogen"; })[0];
-            note.textContent = "Coloured: building it (capital recovery at " + Math.round(C.rate * 100) + "% real). Grey: charging, price ÷ round trip. The hydrogen store can cycle at most " + maxCycles(h) + " times a year; bars stop at $600.";
+            note.innerHTML = LX.rich("Coloured: building it, the yearly [[capital-recovery-factor|capital recovery]] at " + Math.round(C.rate * 100) + "% [[real-rate|real]] (inflation taken out). Grey: charging, price ÷ round trip.");
+            note2.textContent = "DOE's cost cases: the hydrogen store here holds 24 hours, so it can cycle at most " + maxCycles(h) + " times a year. Bars stop at $600.";
           }
           LX.Slider(ctl, { label: "Full cycles a year", min: 2, max: 365, step: 1, value: cyc, fmt: function (v) { return v + " a year"; }, onChange: function (v) { cyc = v; moved.c = 1; draw(); check(); } });
           LX.Slider(ctl, { label: "Price of charging power", min: 0, max: 60, step: 5, value: price, fmt: function (v) { return "$" + v + "/MWh"; }, onChange: function (v) { price = v; moved.p = 1; draw(); check(); } });
@@ -278,10 +309,10 @@
       // 8 what a week can and cannot show
       { text: "One week tests endurance. Sort five claims: which does this week show, and which need a full year or many years?",
         build: function (act, api) {
-          var h = res.hydrogen, b = res.battery;
+          var b = res.battery, ref = D.reference.stores.battery;
           LX.CardSort(act, { bins: [{ id: "shown", label: "Shown", sub: "by this week" }, { id: "untested", label: "Not tested", sub: "needs more than a week" }],
             cards: [
-              { id: "battery", text: "A 4-hour battery alone cannot carry the grid through these calm days.", bin: "shown", why: "It covers " + (b ? fm.pct(b.covered) : "a quarter") + " of the shortfall in this run." },
+              { id: "battery", text: "A 4-hour battery alone cannot carry the grid through these calm days.", bin: "shown", why: "It covers " + (b && b.ok ? fm.pct(b.covered) + " of the shortfall in your run." : fm.pct(ref.covered) + " of the shortfall in the lesson's reference run (step 5).") },
               { id: "power", text: "A store's power limits it in the worst hours, however much energy it holds.", bin: "shown", why: "The hydrogen store's leftover shortfall equals the MWh above firm output plus its power." },
               { id: "adequate", text: "With the hydrogen store, the grid is adequate.", bin: "untested", why: "Adequacy needs many weather years and plant outages (A5, upcoming), not one week." },
               { id: "refill", text: "The store can refill before the next calm spell.", bin: "untested", why: "That needs the whole year in order, as M3's linked weeks keep it." },
@@ -304,30 +335,42 @@
     explain(W, D);
   });
 
-  // ---------------------------------------------------------------- explain layer: comparison table, causal chain
+  // ---------------------------------------------------------------- explain layer: two comparison tables, causal chain
+  // The week (the LP's stores) and the costs (DOE's cost cases) are separate tables, each naming its own store sizes: the
+  // hydrogen store of the week holds 168 hours, DOE's hydrogen cost case 24 hours (A8 review, finding 1).
   function explain(W, D) {
     var x = document.getElementById("a8-explain"); if (!x) return;
     x.innerHTML = ""; x.classList.add("is-live");
-    var R = D.reference, C = D.costs;
+    var R = D.reference;
     var rows = D.techs.map(function (t) {
-      var s = store(D, t.id), r = R.stores[t.id], it = C.items.filter(function (i) { return i.id === t.id; })[0], c = it ? perMWh(it, R.cyclesShown, R.priceShown, C.rate) : null;
+      var s = store(D, t.id), r = R.stores[t.id];
       return { key: t.id, color: t.color, name: t.short, note: s.P.toLocaleString("en-US") + " MW, " + s.hours + " h", eta: { text: fm.pct(t.eta), value: t.eta }, loss: t.lossPerDay ? fm.pct(t.lossPerDay) + " a day" : "none modelled",
-               cov: { text: fm.pct(r.covered), value: r.covered }, cost: c ? { text: fm.usd(c.total), value: c.total } : { text: "–", value: 0 } };
+               cov: { text: fm.pct(r.covered), value: r.covered } };
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
       title: "Four stores, one calm week",
-      lede: "Each store 1,000 MW and full at the start. Cost per MWh delivered at " + R.cyclesShown + " cycles a year (or a store's limit) and $" + R.priceShown + "/MWh charging power.",
+      lede: "Each store 1,000 MW and full at the start: what it covers of the week's shortfall.",
       columns: [{ key: "name", label: "Store", main: true }, { key: "eta", label: "Round trip", num: true, phoneHide: true }, { key: "loss", label: "Heat loss", phoneHide: true },
-                { key: "cov", label: "Shortfall covered", phone: "Covered", num: true, bar: { max: 1 } }, { key: "cost", label: "$ per MWh delivered", phone: "$/MWh", num: true }],
+                { key: "cov", label: "Shortfall covered", phone: "Covered", num: true, bar: { max: 1 } }],
       rows: rows,
       sorts: [{ label: "By duration", order: rows.map(function (r) { return r.key; }), note: "Longer stores cover more of the week; the heat store and hydrogen lose much of what they take in." },
               { label: "By shortfall covered", order: rows.slice().sort(function (a, b) { return b.cov.value - a.cov.value; }).map(function (r) { return r.key; }), ranked: true, note: "No 1,000 MW store covers it all: in " + R.hoursAbove + " hours the gap tops firm output plus 1,000 MW." }]
+    });
+    var cr = costRows(D);
+    LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
+      title: "What a MWh delivered costs: DOE's cost cases",
+      lede: "Other sizes than the week's stores: DOE's 100 MW systems, at " + R.cyclesShown + " full cycles a year (or a store's limit) and $" + R.priceShown + "/MWh charging power. The hydrogen case holds 24 hours, not a week.",
+      columns: [{ key: "name", label: "Store", main: true }, { key: "kwh", label: "Installed $ per kWh", phone: "$/kWh", num: true }, { key: "cyc", label: "Cycles a year", phone: "Cycles", num: true },
+                { key: "cost", label: "$ per MWh delivered", phone: "$/MWh", num: true }],
+      rows: cr,
+      sorts: [{ label: "By installed $ per kWh", order: cr.slice().sort(function (a, b) { return a.kwh.value - b.kwh.value; }).map(function (r) { return r.key; }), ranked: true, note: "Hydrogen's energy capacity is the cheapest per kWh." },
+              { label: "By $ per MWh delivered", order: cr.slice().sort(function (a, b) { return a.cost.value - b.cost.value; }).map(function (r) { return r.key; }), ranked: true, note: "Capped at 86 cycles and losing 69% on the way, hydrogen's MWh is not the cheapest." }]
     });
     LX.CausalChain(H("div", { class: "lx-xcard" }, x), {
       title: "Cause and effect: a calm week drains short stores",
       links: [{ title: "Wind drops for three days", text: "Demand stays high.", value: fm.pct(W.daily[5].wind) + " of wind's size" },
               { title: "Firm output runs flat out", text: "It cannot cover the gap.", value: fm.mw(W.firm) },
-              { title: "Short stores empty in hours", text: "They refill only if wind returns.", value: "battery: " + fm.pct(R.stores.battery.covered) + " covered" },
+              { title: "Short stores empty in hours", text: "They refill when supply tops demand, within their charging power and losses.", value: "battery: " + fm.pct(R.stores.battery.covered) + " covered" },
               { title: "Long stores keep going", text: "Losses eat into what they hold.", value: "hydrogen: " + fm.pct(R.stores.hydrogen.covered) },
               { title: "Power caps the worst hours", text: "However much energy is stored.", value: fm.mwh(R.floor1000) + " left" }],
       note: "A week shows endurance. Adequacy needs many weather years; seasonal value needs the full year in order."

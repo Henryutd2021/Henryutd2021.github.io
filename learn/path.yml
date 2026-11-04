@@ -597,7 +597,7 @@
   subtitle: "Make hydrogen from a wind farm's spare power, store it, deliver it, and sort the uses worth it"
   short: "Hydrogen and power-to-X"
   teaches: [electrolysis energy balance, electrolyzer utilization and cost per kilogram, part-load limits, hydrogen storage for steady delivery, hourly matching as a procurement condition, ranking uses against alternatives]
-  does: "Follow 1 MWh of wind through an electrolyzer and back; size an electrolyzer on a wind farm's real 2025 hours with part-load limits; compare cost per kilogram with the system's net cost and curtailment; size the tank for steady delivery; apply hourly and annual matching; sort nine uses against their alternatives."
+  does: "Follow 1 MWh of wind through an electrolyzer and back; size an electrolyzer on a wind farm's real 2025 hours with part-load limits; compare cost per kilogram with the system's net cost and curtailment; size the tank for steady delivery; apply hourly and annual matching; sort eight uses against their alternatives."
   outcome: "Compute a hydrogen chain's energy and mass balance and cost per kilogram, tell it from the system's cost, and rank uses of hydrogen against their alternatives."
   after: [9, 7, A8]
   next: M4

@@ -141,9 +141,18 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   onPage(`the battery covers ${fm.pct(out.battery.covered)} of the shortfall, the hydrogen store ${fm.pct(out.hydrogen.covered)}`, "explain: endurance");
   onPage(`In ${R.hoursAbove} hours the gap tops firm output plus 1,000 MW`, "explain: power still matters");
   onPage(`holds 168,000 MWh against a ${fm.mwh(W.shortSum)} shortfall, yet leaves ${fm.mwh(out.hydrogen.unserved)} unserved: in ${R.hoursAbove} hours`, "myth 1");
-  onPage("\\$132 of capital and \\$24 of charging: \\$156 per MWh", "Go deeper: the battery's cost");
+  onPage("\\$132 of capital, plus \\$24 of charging: \\$156 per MWh", "Go deeper: the battery's cost");
   onPage("so at most 86 cycles a year: \\$149 per MWh at best, \\$65 of it charging", "Go deeper: hydrogen's cost");
-  onPage("($126, against $263 for pumped hydro and $385 for the battery). At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, capped at 86 cycles, $149.", "myth 3");
+  onPage("($126, against $263 for pumped hydro and $385 for the battery).</p><p>At 250 cycles a year pumped hydro delivers the cheapest MWh, $71; hydrogen, capped at 86 cycles, $149 (DOE's 24-hour cost case).", "myth 3");
+  // the cost table names the store it costs (review 1): each row's duration is the costed duration, and the week's table
+  // (1,000 MW stores, the hydrogen one 168 hours) carries no cost column
+  { const cr = M.costRows(D);
+    ok(cr.length === 3 && cr.every(r => { const it2 = C.items.find(i => i.id === r.key); return r.hours === it2.hours && r.note.startsWith("100 MW, " + it2.hours + " h") && r.cost.text === fm.usd(M.perMWh(it2, R.cyclesShown, R.priceShown, C.rate).total); }), "explain: the cost table's durations are the costed durations (hydrogen 24 h), with the costs the model gives");
+    ok(cr.find(r => r.key === "hydrogen").hours === 24 && M.store(D, "hydrogen").hours === 168 && /The hydrogen case holds 24 hours, not a week\./.test(JS), "explain: the week's hydrogen store (168 h) and DOE's hydrogen cost case (24 h) are named apart");
+    const weekTable = JS.slice(JS.indexOf('title: "Four stores, one calm week"'), JS.indexOf("var cr = costRows(D);"));
+    ok(weekTable.length > 0 && !/cost|\$ per MWh/.test(weekTable.replace(/costRows/g, "")), "explain: the week's table has no cost column"); }
+  // the formula with its units (review 4): 1,000 x CRF x $/kW / (cycles x hours) reproduces the battery's $132
+  ok(near(1000 * M.crf(0.04, 16) * 1540 / (250 * 4), c("battery").capital, 1e-9) && PAGE.includes("1,000 × 0.0858 × 1,540 ÷ (250 × 4) = \\$132") && PAGE.includes("= 1,000 × capital recovery × installed cost (\\$ per kW) ÷ (cycles a year × duration in hours)"), "Go deeper: the formula carries the 1,000 (kW to MW) and its units");
   onPage("(\\$28.19 and \\$23.90 per kW-year)", "fixed upkeep from the report"); onPage("at \\$5.82 per kWh", "the cavern cost");
   ok(it("psh").fom === 28.19 && it("hydrogen").fom === 23.90 && it("hydrogen").cavernPerKWh === 5.82, "the data file holds the report's upkeep and cavern costs");
   onPage("10 × 0.50 × 0.98<sup>5</sup> = 4.52", "quiz 2"); ok(near(10 * M.idle(th, 5), 4.52, 0.005), "quiz 2 = the model");
@@ -152,6 +161,22 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   D.facts.forEach(f => { const row = PAGE.indexOf('<td class="n">' + f.n + "</td><td>" + f.what + "</td>"); ok(row >= 0 && PAGE.slice(row, row + 700).includes(f.url) && PAGE.slice(row, row + 700).includes(f.asof.replace("published ", "published ")), "numbers to remember: '" + f.n + "' with its source and date"); });
   ok(D.techs.every(t => t.source && /^https:\/\//.test(t.source.url) && t.source.as_of), "every store's parameters carry a source and a date");
   ok(D.ladder.cards.every(cc => D.ladder.bins.some(b => b.id === cc.bin) && cc.why.split(" ").length <= 25), "ladder: every card has a bin and a short reason");
+  // review 7: a card whose DOE range spans two bins carries one example rating inside its bin
+  { const rate = id => { const t = D.ladder.cards.find(x => x.id === id).text, m = t.match(/(\d+)[- ]hour/); return m ? +m[1] : null; };
+    ok(rate("psh") === 8 && D.ladder.cards.find(x => x.id === "psh").bin === "short" && rate("metal") === 100 && D.ladder.cards.find(x => x.id === "metal").bin === "multi", "ladder: pumped hydro at 8 hours (up to 10 h), iron-air at 100 hours (36 to 160 h), one right bin each");
+    ok(/0 to 15 hours/.test(D.ladder.cards.find(x => x.id === "psh").why) && /50 to 200 hours/.test(D.ladder.cards.find(x => x.id === "metal").why), "ladder: the reasons still give DOE's full ranges"); }
+  // review 9 and 12: terms marked; the heat store's loss is an illustrative assumption with its own source
+  ok(/\[\[standing-loss\|/.test(JSON.stringify(D)) && /\[\[electrolyzer\|/.test(JSON.stringify(D)) && /\[\[fuel-cell\|/.test(JSON.stringify(D)) && /LX\.rich\(s\.limit\)/.test(JS), "step 3's limits mark standing loss, electrolyzer and fuel cell for the glossary");
+  ok(/\[\[full-cycle\|full cycles\]\]/.test(JS) && /\[\[capital-recovery-factor\|capital recovery\]\]/.test(JS) && /\[\[real-rate\|real\]\] \(inflation taken out\)/.test(JS) && /id: full-cycle\b/.test(SIDE), "step 7 defines full cycles, capital recovery and a real rate");
+  ok(D.ladder.cards.find(x => x.id === "air").text.includes("(air chilled to a liquid") && /Iron rusts as it discharges/.test(D.ladder.cards.find(x => x.id === "metal").why), "ladder: liquid air and the metal-anode battery are explained");
+  { const th2 = D.techs.find(t => t.id === "thermal");
+    ok(/Illustrative/.test(th2.lossSource.label) && /77910/.test(th2.lossSource.url) && !/77910/.test(th2.source.url) && PAGE.includes("The heat store's 2% a day is an illustrative assumption, borrowed from a 2020 NREL tank design target.") && !/one source and one year/.test(PAGE), "data note: the 2% a day is attributed to its own source, as an illustrative assumption"); }
+  // review 11: every symbol of the LP has a row
+  ["$g_t$", "$w_t$, $\\sigma_t$", "$f_t$", "$u_t$, $s_t$", "$c_t$, $d_t$", "$e_t$", "$P$, $E$", "$\\eta$", "$\\lambda$", "$V$", "$\\tau$", "$\\delta$"].forEach(x => ok(PAGE.includes("| " + x + " |"), "symbol table row " + x));
+  ok(PAGE.includes("\\$/MWh per hour"), "the tie rule's tau carries its own unit");
+  // review 6: refilling is not tied to wind returning
+  ok(!/refill only if wind returns/.test(JS) && JS.includes("They refill when supply tops demand, within their charging power and losses."), "causal chain: stores refill when supply tops demand");
+  ok(!/earns its cost back only/.test(JS), "step 7 spreads a cost; it does not claim how a store earns");
 
   // ---------------- the excerpt (curriculum §13): approved sentences, word for word
   const SNAP = {
@@ -179,6 +204,11 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
   // ---------------- text, scope, sidecar
   const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
   ok(stepTexts.length >= 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "step texts: 40 words at most");
+  // review 10: every element of the page's own text (data notes, explain, Go deeper, answers, numbers) stays within budget
+  { const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "");
+    const els = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>").split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
+    const long = els.filter(x => x.split(" ").length > 40);
+    ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
   const NUC = /nuclear|reactor|\bSMR\b|small modular/i;
   ok(!NUC.test(PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "") + JS + JSON.stringify(D)), "no nuclear term anywhere in the lesson (outside the generated header, which names other lessons)");
   ok(!/\bAI\b|data cent/i.test(PAGE + JS), "no AI wording, no data centers");
@@ -192,9 +222,12 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
     E.LX.ready = () => {}; E.LX.progress.guess = () => null;
     E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
     ["solver", "cards", "predict", "cardsort", "controls", "plot", "profiles", "solvestep"].forEach(n => load(n, E));
-    let failing = true, calls = 0;
+    const specs = [], P0 = E.LX.Plot;   // the stub never shows a chart, so the specs passed to LX.Plot are read directly
+    E.LX.Plot = (h, o) => { const p = P0(h, o), r0 = p.render; p.render = (sp, a) => { specs.push(sp); return r0(sp, a); }; return p; };
+    let failing = true, calls = 0, hold = null;
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
-    slv.solve = m => { calls++; if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms); return Promise.resolve(r); };
+    slv.solve = m => { calls++; if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms);
+      if (hold) return new Promise(res => { hold.release = () => res(r); }); return Promise.resolve(r); };
     let init = null, demo = null;
     E.LX.mount = (slug, f) => { if (slug === ID) init = f; };
     E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
@@ -223,9 +256,49 @@ const fm = M.fm, r1 = v => Math.round(v * 10) / 10;
       ok(failBox() && next().disabled, "step 6: a failed solve shows the message; Next waits");
       failing = false; btns(/Try again/)[0].click(); await flush();
       ok(!failBox() && card().textContent.includes(fm.mwh(R.floor1000)) && !next().disabled, "step 6: the retry shows the power floor and unlocks Next");
+      // review 2: the slider is off while a solve runs; the result belongs to the power that was solved; a moved slider marks it stale
+      const raise = () => card().querySelectorAll("button").filter(b => /^Raise Hydrogen store's power/.test(b.getAttribute("aria-label") || ""))[0];
+      const staleTxt = () => (card().querySelectorAll(".a8-note").filter(n => /These results are for/.test(n.textContent) && !n.hidden)[0] || { textContent: "" }).textContent;
+      raise().click();
+      ok(/These results are for 1,000 MW\. Solve again for 1,100 MW\./.test(staleTxt()) && card().querySelector(".a8-kpis").classList.contains("a8-stale"), "step 6: moving the slider after a solve marks the result stale: " + staleTxt());
+      hold = {}; btns(/^Solve$/)[0].click(); await flush();
+      const inp = card().querySelector("input");
+      ok(inp.disabled && raise().disabled, "step 6: the power slider is off while the solve runs");
+      inp.value = 1500; inp.fire("input");   // a change that slips through while solving: the result must stay the solved power's
+      hold.release(); hold = null; await flush(); await flush();
+      const fl11 = M.powerFloor(W, 1100);
+      ok(!inp.disabled && card().textContent.includes(fm.mwh(fl11)) && /These results are for 1,100 MW\. Solve again for 1,500 MW\./.test(staleTxt()), "step 6: the result shown is the submitted 1,100 MW's (" + fm.mwh(fl11) + "), marked stale against the slider's 1,500 MW; the slider is back on");
+      inp.value = 1100; inp.fire("input");
+      ok(staleTxt() === "" && !card().querySelector(".a8-kpis").classList.contains("a8-stale"), "step 6: back at the solved power, the stale mark goes");
+      // review 8: the week's text version lists every hour, with the store's schedule once a store is shown
+      demo.cards.go(4); await flush();
+      const tx = specs[specs.length - 1].text, bat = M.read(W, M.store(D, "battery"), solve(M.build(W, M.store(D, "battery"), { plains: G })));
+      ok(tx.rows.length === 168 && tx.head.join("|") === "Hour starting|Demand|Wind + sun + firm|Short without storage|Battery out (+) or in (−)|Unserved with it" && tx.rows[0][0] === "2 Jan 00:00" && tx.rows[167][0] === "8 Jan 23:00",
+         "step 5: the week's text version has a row for each of the 168 hours, with the store's output and the unserved demand (" + tx.rows.length + " rows: " + tx.head.join(", ") + ")");
+      ok(near(tx.rows.reduce((a, r) => a + +r[5].replace(/,/g, ""), 0), R.stores.battery.unserved, 168) && near(tx.rows.reduce((a, r) => a + +r[3].replace(/,/g, ""), 0), W.shortSum, 168), "step 5: the hourly text sums to the week's shortfall and the battery's unserved energy (rounding aside)");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection: " + unhandled.join(" | "));
+  }
+  // review 5: step 8 without a battery run states the reference run's share, labelled as such
+  {
+    const { env, load } = require("./stubdom.js");
+    const E = env();
+    E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
+    ["solver", "cards", "predict", "cardsort", "controls", "plot", "profiles", "solvestep"].forEach(n => load(n, E));
+    const sorts = [], CS0 = E.LX.CardSort; E.LX.CardSort = (h, o) => { sorts.push(o); return CS0(h, o); };
+    let init = null, demo = null;
+    E.LX.mount = (slug, f) => { if (slug === ID) init = f; };
+    E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+    vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {} });
+    const root = E.LX.H("div", { class: "lx-interactive", "data-learn": ID }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+    try {
+      init(live, { a08_storage_duration: D, town_year: year, cf_targets: T }, root);
+      demo.cards.go(7);
+      const card = demo.cards.el, b = re => card.querySelectorAll("button").filter(x => re.test(x.textContent) || re.test(x.getAttribute("aria-label") || ""))[0];
+      const why = sorts[sorts.length - 1].cards.find(c => c.id === "battery").why;
+      ok(why.includes(fm.pct(R.stores.battery.covered) + " of the shortfall in the lesson's reference run (step 5)") && !/a quarter/.test(JS), "step 8 without a battery run: " + why.slice(0, 120));
+    } catch (e) { ok(false, "the step 8 stub test threw: " + (e && e.stack || e)); }
   }
 
   console.log(`test_a08-storage-duration: ${checks - fails}/${checks} checks passed`);

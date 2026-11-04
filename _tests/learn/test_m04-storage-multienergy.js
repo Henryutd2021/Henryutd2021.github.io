@@ -133,6 +133,34 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
   ok(near(run("winter", "h2", { minLoad: "on" }).o.cost, R.on.cost, 0.06), "forced on re-solves to the reference");
   ok(Math.abs(R.binary.cost - relaxed) < 1 ? JS.includes(": the same as the relaxed LP, so here the low-load hours can be avoided at no cost.") : true, "step 4 says the MILP equals the relaxed LP only when it does");
   ok(sol.winterh2.o.below > 0, "the solved relaxed plan runs the electrolyzer below 15% in some hours (the page names it 'this relaxed plan')");
+  // review 3: every result of the relaxed LP after step 3 says so; "all devices available", not "on"
+  ok((JS.match(/text: RELAX/g) || []).length >= 4 && /RELAX \+ " Prices of the exact on\/off model are not shown\."/.test(JS) && /all devices available; LP relaxation/.test(JS) && !/all devices on/.test(JS) && /Saving against separate systems[^"]*LP relaxation/.test(JS),
+     "steps 3, 5, 6 and 7, the diagram and the comparison table label the LP relaxation");
+  ok(PAGE.includes("LP relaxation: in these runs the electrolyzer may run below its 15% minimum load.") && /<dt>LP relaxation<\/dt>/.test(PAGE), "the fallback and the explain fallback label the LP relaxation");
+  { const hb = solve(M.build(Wk.winter, D, cfg("heat"), { minLoad: "binary" })).objective;
+    ok(Math.abs(hb - R.costs.winter.heat) > 0.5 && /the exact on\/off cost is shown only for the winter hydrogen case/.test(PAGE), `the exact model equals the relaxed one only for winter hydrogen (winter heat: relaxed ${fm.k(R.costs.winter.heat)}, exact ${hb.toFixed(1)}); the page claims no more`); }
+  // review 1: the curtailment the connection forces (the same in every best plan) and optional $0 curtailment
+  { const nb = sol.winternobat, Wn = Wk.winter; let extraPaid = 0;
+    for (let t = 0; t < 168; t++) { const f = Math.max(0, Wn.wind[t] - D.plant.exportMW); if (nb.r.values["cur" + t] > f + 1e-6 && Wn.price[t] > 0) extraPaid += nb.r.values["cur" + t] - f; }
+    ok(nb.o.cur >= Wn.spare - 1e-6 && extraPaid < 1e-6, `step 1: ${fm.mwh(Wn.spare)} must be curtailed (wind above the connection); the plan's ${fm.mwh(nb.o.cur - Wn.spare)} more falls only in $0 hours`);
+    ok(/It must curtail " \+ fm\.mwh\(W\.spare\) \+ ", the wind above its 50 MW connection; this plan curtails " \+ fm\.mwh\(x\.cur - W\.spare\) \+ " more in \$0 hours, when selling earns nothing\./.test(JS) && !/the connection is full when the wind is strong/.test(JS), "step 1 tells forced from optional curtailment");
+    ok(sol.winterpower.o.imp > 0 && /spare wind or power bought from the grid/.test(JS) && /"Curtailed \(one best plan\)"/.test(JS), "step 2: the battery shifts wind and bought power (this plan buys " + fm.mwh(sol.winterpower.o.imp) + "); curtailment is labelled as one best plan"); }
+  // review 4: storage links hours, so coupling needs no simultaneity
+  ok(!/at the same time/.test(PAGE + JS) && JS.includes("**Coupling saves operating cost when conversion and storage connect cheap supply with useful demand, within the devices' limits.**"), "step 6's conclusion lets storage connect different hours");
+  // review 2: exact coefficients in every equation the reader sees
+  ok(!/0\.83 <var>|0\.83\\,c|17\.5\\,y|\b0\.83 \+|"17\.5"\)/.test(PAGE + JS + NB) && JS.includes("<var>η</var> = \" + D.battery.eta") && PAGE.includes("| $\\eta$ | the battery's round trip, 0.8259 (DOE's 82.59%) | share |") && PAGE.includes("| $k$ | $1000 / 57$, about 17.54: kg of hydrogen per MWh | kg/MWh |"),
+     "the equations use eta = 0.8259 and k = 1000/57, named, with rounded values marked as such");
+  ok(NB.includes("$k = 1000/57 \\\\approx 17.54$") && NB.includes("$\\\\eta = 0.8259$") && !/\$17\.5\\\\,y|0\.83\\\\,c/.test(NB), "the notebook names k and eta with their exact values (as JSON text)");
+  { const D2 = JSON.parse(JSON.stringify(D)); D2.battery.eta = 0.83;
+    ok(Math.abs(solve(M.build(Wk.winter, D2, cfg("h2"))).objective - R.costs.winter.h2) > 1, "a rounded 0.83 would change the winter hydrogen cost: the exact value matters"); }
+  // review 6: one notation; every symbol of the equation card is a button with a meaning and a unit
+  { const syms = ["p", "exp", "imp", "cur", "bc", "bd", "hp", "w", "rec", "hin", "hout", "s", "Q", "eta", "lam", "tr", "boil", "ez", "k", "L", "cop", "H"];
+    ok(syms.every(k => new RegExp("sym\\(\"" + k + "\"").test(JS) && new RegExp("\\b" + k + ": \\{ name: [^}]*unit: ").test(JS)), "equation card: every symbol is a button with a name and a unit: " + syms.filter(k => !new RegExp("\\b" + k + ": \\{ name: [^}]*unit: ").test(JS)).join(","));
+    ["exp", "imp", "cur", "bc", "bd", "ez", "tr", "hp", "rec", "hin", "hout", "boil"].forEach(n => ok(PAGE.includes("\\mathit{" + n + "}") && NB.includes("\\\\mathit{" + n + "}"), "the algebra and the notebook use the code's name " + n)); }
+  ok(/\["s", "state of charge at the end of hour t, MWh/.test(JS) && /\["bc, bd", "charging and discharging/.test(JS), "step 2 defines every symbol beside its equation");
+  // review 9 and 10: the efficiency is an illustrative value inside the alkaline range; the 33.8% names its source
+  ok(/illustrative value for the alkaline unit/.test(D.electrolyzer.source.label) && /50-78 kWh per kg/.test(D.electrolyzer.rangeSource.label) && 57 >= 50 && 57 <= 78 && PAGE.includes("PEM figure, illustrative here, inside IRENA's 50–78 for alkaline systems"), "57 kWh per kg is labelled illustrative for the alkaline unit, inside IRENA's alkaline range");
+  ok(/EIA's " \+ CF\.year \+ " capacity factor of the U\.S\. utility-scale wind fleet \(" \+ CFsrc\.short/.test(JS) && T.targets.wind.cf === 0.338 && T.source.accessed && PAGE.includes("33.8%, the U.S. wind fleet's 2025 capacity factor"), "the diagram and the data note give the 33.8% benchmark its geography, year and source");
 
   // ---------------- prices: unique in every offered hour, and the sentence holds
   ok(R.hours.length === 3 && R.hours.map(h => h.id).join() === "free,pump,dear", "three hours offered: free power, heat pump sets heat, dear power");
@@ -160,7 +188,13 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
   onPage("1,000 ÷ 57 = 17.5", "the quiz"); ok(near(1000 / 57, 17.54, 0.005), "17.5 kg per MWh");
   ok(!/always|never/i.test((JS.replace(/\/\/.*$/gm, "").match(/"[^"\n]*"/g) || []).join(" ").replace(/whenever/g, "")), "no 'always' or 'never' in the page's strings");
   const stepTexts = (JS.match(/\{ text: "([^"]+)"/g) || []).map(s => s.slice(9, -1));
-  ok(stepTexts.length === 8 && stepTexts.every(t => t.split(/\s+/).length <= 40), "eight step texts of 40 words at most");
+  ok(stepTexts.length === 8 && stepTexts.every(t => t.split(/\s+/).length <= 40 && t.split(/[.?!](?:\s|$)/).filter(x => x.trim()).length <= 2), "eight step texts of 40 words and two sentences at most (review 8): " + stepTexts.filter(t => t.split(/[.?!](?:\s|$)/).filter(x => x.trim()).length > 2).map(t => t.slice(0, 40)).join(" | "));
+  // review 8: every element of the page's own text stays within budget; the data note is three entries
+  { const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "");
+    const els = OWN.replace(/^- (.*)$/gm, "<li>$1</li>").replace(/^\|(.*)\|$/gm, "<td>$1</td>").split(/<\/?(?:p|li|dd|dt|td|th|summary|blockquote|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
+    const long = els.filter(x => x.split(" ").length > 40);
+    ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | "));
+    ok((PAGE.match(/<p class="lx-datanote">/g) || []).length === 3 && /<b>Illustrative plant and prices\.<\/b>/.test(PAGE) && /<b>Real shapes\.<\/b>/.test(PAGE) && /<b>Efficiencies\.<\/b>/.test(PAGE), "the data note is three labelled entries"); }
 
   // ---------------- sources, scope, notebook, sidecar
   ok(D.battery.source.url && D.electrolyzer.source.url && D.electrolyzer.loadSource.url && D.heat.copSource.url, "efficiencies carry sources");
@@ -182,6 +216,8 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
     ["solver", "cards", "predict", "controls", "plot", "profiles", "solvestep"].forEach(n => load(n, E));
+    const specs = [], P0 = E.LX.Plot;   // the stub never shows a chart, so the specs passed to LX.Plot are read directly
+    E.LX.Plot = (h, o) => { const p = P0(h, o), r0 = p.render; p.render = (sp, a) => { specs.push(sp); return r0(sp, a); }; return p; };
     let failing = true, calls = 0;
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
     slv.solve = m => { calls++; if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms); return Promise.resolve(r); };
@@ -206,6 +242,20 @@ const DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan", "F
       ok(!failBox() && /Value of coupling/.test(card().textContent) && !next().disabled && calls === 2, "step 3: Try again solves both configurations and unlocks Next (" + calls + " solves)");
       demo.cards.go(5); failing = false; calls = 0; card().querySelectorAll(".lx-choice")[0].click(); await flush();
       ok(card().querySelectorAll(".m4-tbl tbody tr").length === 3 && !next().disabled && calls === 6, "step 6: the eight cases solve (one already solved) and the table has three rows (" + calls + " solves)");
+      // review 7: the tank's chart has an hourly text version, with its lowest and highest level
+      const tankTxt = specs.find(sp => /kg in the tank/.test(sp.text.head[1])).text;
+      ok(tankTxt.rows.length === 168 && tankTxt.rows[0][0] === "9 Dec 00:00" && /^Lowest [\d,]+ \(\d+ Dec \d\d:00\), highest [\d,]+ \(\d+ Dec \d\d:00\)/.test(tankTxt.note), "step 3: the tank's text version lists all 168 hours, with the lowest and highest level and when (" + tankTxt.rows.length + " rows)");
+      // review 5: step 7 fails, keeps the chosen hour, and "Try again" shows its prices and removes the note
+      demo.cards.go(6); failing = true; calls = 0;
+      const hr = R.hours[1], hb = () => card().querySelectorAll(".lx-seg button");
+      delete root.lxLesson.res["winter|all|stop|50"];
+      hb()[1].click(); await flush();
+      ok(failBox() && /Try again/.test(failBox().textContent) && !/\/kg/.test(card().textContent) && card().getAttribute("aria-busy") == null, "step 7: a failed solve shows the note and no prices");
+      failing = false; btns(/Try again/)[0].click(); await flush();
+      const p7 = M.prices(root.lxLesson.res["winter|all|stop|50"].r, hr.t);
+      ok(!failBox() && card().textContent.includes(fm.p(p7.heat) + "/MWh") && hb()[1].getAttribute("aria-pressed") === "true", "step 7: Try again solves, shows the chosen hour's prices (" + hr.label + ") and removes the note");
+      hb()[0].click(); await flush();
+      ok(!next().disabled && /Coupling ties the carriers' prices together/.test(card().textContent), "step 7: a second hour unlocks Next");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection: " + unhandled.join(" | "));

@@ -11,6 +11,33 @@ glossary:
   - id: procurement-rule
     term: Procurement rule
     def: "A rule for which purchased electricity a buyer may count as clean, for example by region, by hour and by how new the plant is; it sets a claim, not the emissions the purchase causes."
+  - id: full-load-hours
+    term: Full-load hours
+    def: "A year's output divided by a machine's size: the hours it would need at full size to make the same amount; divided by 8,760, it is the average utilization."
+  - id: pem-electrolyzer
+    term: PEM electrolyzer
+    def: "An electrolyzer named for the thin polymer membrane in its cells (proton exchange membrane); it follows changing power well and can run down to about 5% of its size."
+  - id: alkaline-electrolyzer
+    term: Alkaline electrolyzer
+    def: "The older, widely used electrolyzer type, whose cells sit in an alkaline liquid; the units in IRENA's 2020 table must stay above about 15% of their size."
+  - id: lower-heating-value
+    term: Lower heating value
+    def: "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapour it makes; for hydrogen, about 33 kWh per kg."
+  - id: feedstock
+    term: Feedstock
+    def: "A material a process consumes to make its product, as an ammonia plant consumes hydrogen."
+  - id: co2e
+    term: CO₂e (carbon dioxide equivalent)
+    def: "Greenhouse gases such as methane counted as the mass of CO₂ that would warm the climate as much over a set period, so they can be added up."
+  - id: well-to-gate
+    term: Well-to-gate
+    def: "An emissions boundary from producing the inputs, such as gas or electricity, to hydrogen leaving the plant; delivery and use are outside it."
+  - id: additionality
+    term: Additionality
+    def: "Whether a purchase brings new clean generation that would not have been built otherwise, rather than claiming output that existed anyway."
+  - id: deliverability
+    term: Deliverability
+    def: "Whether power from a plant can actually reach the buyer over the grid, usually judged by both being in the same region."
 requests:
   - "excerpt:txh2: Henry approved E10.1–E10.4 on 2026-11-03; A16 quotes E10.2–E10.3 with E10.4 as the note (E10.1 left out for room), and its test checks them against the register."
   - "Review date: A16 carries 'review: yearly (hydrogen rules)' in learn_map_v2.yml; the Go deeper box on matching rules cites DOE's 45VH2-GREET guidelines (Rev. December 2025)."

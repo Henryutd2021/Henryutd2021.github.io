@@ -50,10 +50,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </tbody>
 </table>
 <p class="lx-hint">Separate systems: the plant with its battery, every kg of hydrogen trucked in, all heat from a gas boiler. Each saving is a difference of optimal weekly costs, the same for every best plan.</p>
+<p class="lx-hint">LP relaxation: in these runs the electrolyzer may run below its 15% minimum load.</p>
 <p class="lx-hint">With JavaScript on, you add each device yourself and solve the plant's linear program in the browser.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative plant and prices.</b> 100 MW of wind behind a 50 MW connection, selling and buying at Prairie Town's cost of one more MWh ($0, $40 or $100, <a href="09-storage.html">lesson 9</a>); hydrogen trucked at $2.50 per kg; boiler heat at $15 per MWh. Not a forecast.<br><b>Real shapes.</b> Wind and the town's demand follow the Southwest Power Pool's 2025 hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>); heat demand follows the town's shape to a 15 MW winter peak.<br><b>Sourced efficiencies.</b> Battery 83% round trip (DOE 2022 assessment), electrolyzer 57 kWh per kg (<a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Record 24005</a>), alkaline minimum load 15% (IRENA 2020), heat pump 3 MWh of heat per MWh (DOE).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative plant and prices.</b> 100 MW of wind behind a 50 MW connection, trading at Prairie Town's cost of one more MWh ($0, $40 or $100, <a href="09-storage.html">lesson 9</a>). Trucked hydrogen $2.50 per kg; boiler heat $15 per MWh.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real shapes.</b> Wind and the town's demand follow the Southwest Power Pool's 2025 hours (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>); wind is scaled to 33.8%, the U.S. wind fleet's 2025 capacity factor (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA</a>). Heat demand follows the town's shape to a 15 MW winter peak.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Efficiencies.</b> Battery round trip 0.8259 (DOE 2022 assessment); alkaline minimum load 15% (IRENA 2020); heat pump 3 MWh of heat per MWh (DOE). Electrolyzer 57 kWh per kg: <a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE's</a> PEM figure, illustrative here, inside IRENA's 50–78 for alkaline systems.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 40 guided minutes in eight steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m4-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 90 minutes of practice</p>
@@ -85,9 +88,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dl class="lx-ideas">
 <dt>One LP, three carriers</dt><dd>A balance row each hour for power, hydrogen and heat: 2,520 columns and 1,176 rows for a week.</dd>
 <dt>Storage links the hours</dt><dd>Battery, tank and heat store each carry a level from hour to hour and end the week where they start.</dd>
-<dt>Conversion couples the balances</dt><dd><span class="lx-term" data-term="sector-coupling">Coupling</span>: the electrolyzer turns 1 MWh into 17.5 kg; the heat pump turns it into 3 MWh of heat.</dd>
-<dt>Where coupling pays</dt><dd>The <span class="lx-term" data-term="value-of-coupling">value of coupling</span>: heat coupling saves $21.0k in the winter week, $2.7k in summer: it needs heat demand at the same time as spare or cheap power.</dd>
+<dt>Conversion couples the balances</dt><dd><span class="lx-term" data-term="sector-coupling">Coupling</span>: the electrolyzer turns 1 MWh into about 17.5 kg (1,000 ÷ 57); the heat pump turns it into 3 MWh of heat.</dd>
+<dt>Where coupling pays</dt><dd>The <span class="lx-term" data-term="value-of-coupling">value of coupling</span>: heat coupling saves $21.0k in the winter week, $2.7k in summer. Conversion and storage need cheap power and heat demand to connect; summer has little heat demand.</dd>
 <dt>Coupled prices</dt><dd>When the heat pump sets heat's price, heat is worth power's price ÷ 3: $40 ÷ 3 = $13.33 per MWh of heat.</dd>
+<dt>LP relaxation</dt><dd>These costs, savings and prices let the electrolyzer run below its 15% minimum; the exact on/off cost is shown only for the winter hydrogen case.</dd>
 </dl>
 </div>
 </div>
@@ -100,33 +104,39 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-For each hour $t = 0 \dots 167$ (one hour each, so MW over the hour is MWh), with $t-1$ read cyclically so every level ends the week where it starts:
+For each hour $t = 0 \dots 167$ (MW over the hour is MWh), with $t-1$ read cyclically so every level ends the week where it starts. Names as in the code and the notebook:
 
-$$\min \sum_t \Big( p_t\,(m_t - x_t) + 2.50\,r_t + 15\,b_t \Big)$$
+$$\min \sum_t \Big( p_t\,(\mathit{imp}_t - \mathit{exp}_t) + 2.50\,\mathit{tr}_t + 15\,\mathit{boil}_t \Big)$$
 
 $$
 \begin{aligned}
-x_t + c_t + y_t + h_t + u_t - m_t - d_t &= w_t && \text{(power)}\\
-\tfrac{1000}{57}\,y_t + r_t + L_{t-1} - L_t &= 150 && \text{(hydrogen)}\\
-3\,h_t + v_t - i_t + o_t + b_t = H_t, \quad 3\,h_t + v_t - i_t + o_t &\le 12 && \text{(heat; network)}\\
-s_t = s_{t-1} + 0.83\,c_t - d_t, \quad Q_t &= (1-\lambda)\,Q_{t-1} + i_t - o_t && \text{(levels)}\\
-400 \le L_t \le 4{,}000, \quad v_t \le 0.2\,y_t, \quad 0 \le y_t &\le 20 && \text{(limits)}
+\mathit{exp}_t + \mathit{bc}_t + \mathit{ez}_t + \mathit{hp}_t + \mathit{cur}_t - \mathit{imp}_t - \mathit{bd}_t &= w_t && \text{(power)}\\
+k\,\mathit{ez}_t + \mathit{tr}_t + L_{t-1} - L_t &= 150 && \text{(hydrogen)}\\
+\mathit{COP}\,\mathit{hp}_t + \mathit{rec}_t - \mathit{hin}_t + \mathit{hout}_t + \mathit{boil}_t &= H_t && \text{(heat)}\\
+\mathit{COP}\,\mathit{hp}_t + \mathit{rec}_t - \mathit{hin}_t + \mathit{hout}_t &\le 12 && \text{(network)}\\
+s_t = s_{t-1} + \eta\,\mathit{bc}_t - \mathit{bd}_t, \quad Q_t &= (1-\lambda)\,Q_{t-1} + \mathit{hin}_t - \mathit{hout}_t && \text{(levels)}\\
+400 \le L_t \le 4{,}000, \quad \mathit{rec}_t \le 0.2\,\mathit{ez}_t, \quad 0 \le \mathit{ez}_t &\le 20 && \text{(limits)}
 \end{aligned}
 $$
 
 | Symbol | Meaning | Unit |
 |---|---|---|
-| $x_t$, $m_t$ | sold to and bought from the grid, each at most 50 | MW |
+| $\mathit{exp}_t$, $\mathit{imp}_t$ | sold to and bought from the grid, each at most 50 | MW |
 | $p_t$ | Prairie Town's price | \$/MWh |
-| $w_t$, $u_t$ | wind, and wind curtailed | MW |
-| $c_t$, $d_t$, $s_t$ | battery charge, discharge (at most 20) and state of charge (at most 80) | MW, MWh |
-| $y_t$ | electrolyzer power | MW |
-| $L_t$, $r_t$ | hydrogen in the tank, hydrogen trucked in | kg |
-| $h_t$ | heat pump power (at most 5) | MW |
-| $v_t$, $b_t$, $H_t$ | heat recovered from the electrolyzer, from the boiler, and demanded | MW of heat |
-| $i_t$, $o_t$, $Q_t$ | heat store charge, discharge and level (at most 60); $\lambda = 1 - 0.98^{1/24}$ | MW, MWh |
+| $w_t$, $\mathit{cur}_t$ | wind, and wind curtailed | MW |
+| $\mathit{bc}_t$, $\mathit{bd}_t$, $s_t$ | battery charge, discharge (at most 20) and state of charge (at most 80) | MW, MWh |
+| $\mathit{ez}_t$ | electrolyzer power | MW |
+| $L_t$, $\mathit{tr}_t$ | hydrogen in the tank, hydrogen trucked in | kg |
+| $\mathit{hp}_t$ | heat pump power (at most 5) | MW |
+| $\mathit{rec}_t$, $\mathit{boil}_t$, $H_t$ | heat recovered from the electrolyzer, from the boiler, and demanded | MW of heat |
+| $\mathit{hin}_t$, $\mathit{hout}_t$, $Q_t$ | heat store charge, discharge and level (at most 60) | MW, MWh |
+| $k$ | $1000 / 57$, about 17.54: kg of hydrogen per MWh | kg/MWh |
+| $\eta$ | the battery's round trip, 0.8259 (DOE's 82.59%) | share |
+| $\mathit{COP}$ | the heat pump's coefficient of performance, 3 | MWh of heat per MWh |
+| $\lambda$ | the heat store's loss, $1 - 0.98^{1/24}$ (2% a day) | per hour |
 
-- **Duals.** The power row's dual, with its sign flipped, is power's marginal value in that hour; the hydrogen and heat rows' duals are the marginal costs of one more kg and one more MWh of heat, under this model's assumptions (fixed sizes, the modelled prices).
+- **Duals.** The power row's dual, with its sign flipped, is power's marginal value in that hour; the hydrogen and heat rows' duals are the marginal costs of one more kg and one more MWh of heat.
+- **Under this model's assumptions:** fixed sizes, the modelled prices, and the LP relaxation of the minimum load.
 - **Unique or not.** Step 7 offers only hours where each dual is unique; the test checks that raising and lowering the hour's demand by 0.01 changes the cost at the same rate.
 - **Size.** 2,520 columns and 1,176 rows; HiGHS solves it in tens of milliseconds.
 
@@ -138,7 +148,7 @@ $$
 <div class="lx-deeper-body">
 ```
 
-- **The exact rule.** Each hour the electrolyzer is on, between 15% and 100% of its size, or off: $3\,z_t \le y_t \le 20\,z_t$ with $z_t \in \{0, 1\}$, a [mixed-integer program]{.lx-term term="mixed-integer-program"} ([M2](m02-unit-commitment.html)).
+- **The exact rule.** Each hour the electrolyzer is on, between 15% and 100% of its size, or off: $3\,z_t \le \mathit{ez}_t \le 20\,z_t$ with $z_t \in \{0, 1\}$, a [mixed-integer program]{.lx-term term="mixed-integer-program"} ([M2](m02-unit-commitment.html)).
 - **Two LP stand-ins.** Drop the binary and allow any load (a relaxation, never dearer), or force $z_t = 1$ (always on, never cheaper).
 - **This winter week:** relaxed −\$178.6k, exact −\$178.6k, forced on −\$172.7k. The exact cost lies between the two, as it must.
 - **No prices from the MILP.** Its duals do not exist in the ordinary sense (§9.2); prices come from an LP with the on/off choices fixed.
@@ -172,7 +182,7 @@ $$
 <div class="lx-qq" data-id="heat" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A heat pump on a wind plant saves about the same in every season.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Here heat coupling saves $21.0k in the winter week and $2.7k in the summer week: in summer there is little heat to make.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Here heat coupling saves $21.0k in the winter week and $2.7k in the summer week: in summer there is little heat to make.</p><p>Both runs are LP relaxations that let the electrolyzer run below its 15% minimum.</p></details>
 </div>
 <div class="lx-qq" data-id="load" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Forcing an electrolyzer to stay on above its minimum load is the safe way to write the limit in an LP, and it costs nothing.”</p>
@@ -185,7 +195,7 @@ $$
 <div class="lx-qq" data-id="kg" data-answer="b">
 <p class="lx-qtext">The electrolyzer uses 57 kWh per kg. What coefficient links the power and hydrogen balances, in kg per MWh?</p>
 <ul class="lx-choices"><li data-value="a">57</li><li data-value="b">17.5</li><li data-value="c">0.057</li><li data-value="d">1.75</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>17.5: 1,000 ÷ 57 = 17.5 kg per MWh. 57 is kWh per kg, 0.057 is MWh per kg (the inverse), and 1.75 drops a factor of ten.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>17.5: 1,000 ÷ 57 = 17.54 kg per MWh, about 17.5.</p><p>57 is kWh per kg, 0.057 is MWh per kg (the inverse), and 1.75 drops a factor of ten.</p></details>
 </div>
 </div>
 ```
@@ -203,7 +213,7 @@ $$
 <table class="lx-facts">
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
-<tr><td class="n">17.5 kg per MWh</td><td>Hydrogen from 1 MWh at 57 kWh per kg: the coefficient that couples the two balances.</td><td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Hydrogen Program Record 24005</a> · 20 May 2024</td></tr>
+<tr><td class="n">17.5 kg per MWh</td><td>Hydrogen from 1 MWh at 57 kWh per kg (1,000 ÷ 57 = 17.54, rounded): the coefficient that couples the two balances.</td><td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Hydrogen Program Record 24005</a> · 20 May 2024</td></tr>
 <tr><td class="n">15% to 100%</td><td>The load range of an alkaline electrolyzer; PEM units go down to 5%.</td><td class="s"><a href="https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2020/Dec/IRENA_Green_hydrogen_cost_2020.pdf">IRENA, Green Hydrogen Cost Reduction, Table 6</a> · December 2020</td></tr>
 <tr><td class="n">up to 3 times</td><td>The heat a heat pump gives against the electricity it uses.</td><td class="s"><a href="https://www.energy.gov/sites/default/files/2022-08/energy-saver-guide-2022.pdf">DOE, Energy Saver Guide, p. 16</a> · July 2022</td></tr>
 </tbody>
