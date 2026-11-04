@@ -31,22 +31,36 @@
                 the same LP on all 8,760 hours with storage cyclic over the year: the check used by the tests.
      tie rule   a wear charge (e0.json tie: $0.0002/kWh home, $0.02/MWh farm) on battery charge and discharge, and on the
                 farm a hair's preference (TIME, one part in a million at most) for selling power and hydrogen earlier in the
-                week; both are left out of every reported number (read() prices the flows itself). Hour-by-hour schedules can still tie; the totals summarize() reports are shared
-                by every least-cost schedule (_tests/learn/test_sb0-site-bench.js pushes each one up and down on the
-                optimal face).
+                week; both are left out of every reported number (read() prices the flows itself). Hour-by-hour schedules
+                can still tie. Shared by every least-cost schedule (_tests/learn/test_sb0-site-bench.js pushes each one up
+                and down on the optimal face): every yearly and weekly total, so the money, the CO2, own solar's share and
+                the spilled share. Not shared once the plan stores energy: the hours at the grid, the line or the buyer's
+                limit, the busiest grid hour and the hourly chart; summarize() then says they belong to the schedule shown
+                (SCHED), and the test finds two least-cost schedules whose busiest hours differ.
+     own solar  each hour's energy is followed by one stated rule (split()): solar serves the home first, then the
+                battery, then the grid; the battery serves the home; the grid serves the rest of the home, then the
+                battery. Own solar's share = (solar used at once + 85% of the solar stored) / the home's use: in a period
+                whose storage ends where it starts, all that goes in comes out, less the loss on charging. Never negative
+                (the old 1 − bought / use was −4% for a battery charged from the grid).
      money      NPV over the site's horizon (home 25 years, farm 30) at the plan's real rate: year 0 the equipment,
                 then each year the saving (home: the bill and gas against the same home with nothing new) or the net
                 revenue (farm), less fixed upkeep; replacements when a life ends; a straight-line residual value at the
                 end. One weather year (2025) is repeated; prices and costs stay the same in real terms.
-     CO2        operating CO2 only. Home: (bought − sent back) × Kansas's 2024 average factor, plus gas burned. Farm: no
-                operating CO2; CO2 avoided if its hydrogen replaces hydrogen made from natural gas.
+     CO2        operating CO2 only. Home: bought power × Kansas's 2024 average factor, plus gas burned (never negative);
+                power sent back is a separate credit at the same factor, and the net of the two is labelled as a net.
+                Farm: no operating CO2; the CO2 a gas reformer would emit for the hydrogen sold, a potential saving only
+                if that hydrogen replaces it (it leaves out the grid power the electrolyzer's MWh no longer replace).
+     wear       the electrolyzer's stack wear is an illustrative throughput allowance: DOE's replacement (11% of the cost
+                after 40,000 operating hours) charged per MWh used, as if every hour ran at full power.
    Pure API (Node: require("assets/learn/components/engine-e0.js"); browser: LX.E0):
      schema, presets, SITES, defaults(), prepare(D, year, targets[, townProfile]) -> P, costs(D, s), periods(P, s, full),
      build(P, s, opts) -> model, read(P, s, solverResult, opts) -> raw, summarize(s, raw) -> results (every number a page
      shows), solve(s, P, { signal, timeLimit, attempt, size, full, solver }) -> Promise of { status, ok, message, hint,
      results, kind, ms } (never rejects; solver defaults to LX.solver.solve; Node tests pass core.solveWith), snap(s,
-     sizes), sensitivity(s, P, base, opts) -> Promise of tornado rows, note(s, results), fallback(D) (no-JS tables from
-     D.reference), resultsHTML(results), crf, usd, cashflow, HOURS, HPW, WEEKS.
+     sizes), sensitivity(s, P, base, opts) -> Promise of tornado rows, sensWords(s, sens) (the rows as one sentence and
+     the chart's note), note(s, results), fallback(D) (no-JS tables from D.reference), resultsHTML(results), split(site,
+     S, h, rte) (one hour followed by the rule above), captions(s, results) (every sentence the results draw, for the
+     text budget), crf, usd, cashflow, HOURS, HPW, WEEKS.
    Page kit (browser): LX.E0.ui (components/engine-e0.js, view part below): bench(host, opts) builds the controls,
    presets, run box (LX.BenchRun), plan link (LX.ShareState), readouts and results. Styles: engine-e0.css. */
 (function () {
@@ -350,6 +364,19 @@
   }
 
   // ---------------------------------------------------------------- reading solved periods
+  // one hour of a period's series S (as add() keeps them), followed by one stated rule, so that the chart and own solar's
+  // share say where each kWh went. Home: solar serves the home first, then the battery, then the grid (sent back); the
+  // battery serves the home; the grid serves the rest of the home, then the battery. Farm: the wind is sold, sent to the
+  // electrolyzer, stored or spilled; the battery's output is sold first, then sent to the electrolyzer.
+  function split(site, S, h) {
+    if (site === "home") {
+      var need = S.need[h], pv = S.pv[h], ch = S.ch[h], dis = S.dis[h];
+      var sh = Math.min(pv, need), sb = Math.min(Math.max(0, pv - sh), ch), bh = Math.min(dis, Math.max(0, need - sh));
+      return { solarHome: sh, solarBat: sb, batHome: bh, gridHome: Math.max(0, need - sh - bh), gridBat: Math.max(0, ch - sb), toBat: ch, sentBack: S.exp[h] };
+    }
+    var sell = S.sell[h], el = S.el[h], d = S.dis[h], ds = Math.min(d, sell), de = Math.min(d - ds, el);
+    return { windSell: sell - ds, windEl: el - de, windBat: S.ch[h], spill: S.spill[h], batSell: ds, batEl: de, batOut: d };
+  }
   // acc = start(P, s[, sizes]); add(acc, P, s, periods, solverResult) for each solved model; finish(acc) -> raw
   function start(P, s, z) {
     var Z = sizes(s);
@@ -364,18 +391,21 @@
       var w = p.w, S, wk = {};
       function tw(key, x) { wk[key] = (wk[key] || 0) + x; }
       if (s.site === "home") {
-        var xc = s.xc / 100, hrs = homeHours(P, s, p);
+        var xc = s.xc / 100, hrs = homeHours(P, s, p), rte = D.home.battery.rte;
         S = { need: [], pv: [], imp: [], exp: [], ch: [], dis: [], soc: [], buy: [] };
         hrs.forEach(function (x, h) {
           var id = k + "_" + h, imp = g("i" + id), exp = g("x" + id), ch = g("c" + id), dis = g("d" + id), pv = x.pv * Z.pv;
           S.need.push(x.need); S.pv.push(pv); S.imp.push(imp); S.exp.push(exp); S.ch.push(ch); S.dis.push(dis); S.soc.push(g("s" + id)); S.buy.push(x.buy);
+          var q = split("home", S, h);
           t("need", w * x.need); t("use", w * x.use); t("heat", w * x.heat); t("pv", w * pv); t("imp", w * imp); t("exp", w * exp);
           t("ch", w * ch); t("dis", w * dis); t("buyCost", w * imp * x.buy); t("credit", w * exp * xc); t("baseBill", w * x.use * x.buy);
+          t("solarHome", w * q.solarHome); t("solarBat", w * q.solarBat); t("gridBat", w * q.gridBat);
           if (imp > 1e-3) t("gridHours", w);
           if (imp > (T.peakImp || 0)) T.peakImp = imp;
-          tw("need", x.need); tw("imp", imp);
+          tw("need", x.need); tw("own", q.solarHome + rte * q.solarBat);
         });
-        wk.share = wk.need > 0 ? wk.imp / wk.need : 0;
+        // the week's share of the home's use not met by its own solar (at once or through the battery)
+        wk.share = wk.need > 0 ? Math.max(0, 1 - wk.own / wk.need) : 0;
       } else {
         var hrs2 = farmHours(P, s, p);
         S = { wind: [], sell: [], spill: [], ch: [], dis: [], soc: [], el: [], h2: [], tank: [], price: [] };
@@ -396,16 +426,19 @@
   }
   function finish(acc) {
     var P = acc.P, s = acc.s, D = P.D, T = acc.T, Z = acc.Z, z = function (k) { return T[k] || 0; };
-    ["need", "use", "heat", "pv", "imp", "exp", "ch", "dis", "buyCost", "credit", "baseBill", "gridHours", "peakImp", "wind", "sell", "spill", "el", "h2", "sales", "h2Rev", "wear", "lineHours", "fullTake", "aloneSell", "aloneSales"].forEach(function (k) { T[k] = z(k); });
+    ["need", "use", "heat", "pv", "imp", "exp", "ch", "dis", "buyCost", "credit", "baseBill", "gridHours", "peakImp", "solarHome", "solarBat", "gridBat", "wind", "sell", "spill", "el", "h2", "sales", "h2Rev", "wear", "lineHours", "fullTake", "aloneSell", "aloneSales"].forEach(function (k) { T[k] = z(k); });
     if (s.site === "home") {
       var gas = D.home.gas, perKWhGas = gas.pricePerMcf / (gas.btuPerCf / 1000) / 293.071, ef = D.home.grid.lbPerMWh * 0.45359237 / 1000;   // $ per kWh of gas; kg CO2 per kWh
       T.gasKWh = s.hp === "none" ? T.heat / gas.afue : 0;
       T.gasCost = T.gasKWh * perKWhGas; T.baseGasCost = T.heat / gas.afue * perKWhGas;
       T.gasCO2 = T.gasKWh / 293.071 * gas.co2PerMMBtu / 1000; T.baseGasCO2 = T.heat / gas.afue / 293.071 * gas.co2PerMMBtu / 1000;   // t
-      T.gridCO2 = (T.imp - T.exp) * ef / 1000; T.baseGridCO2 = T.use * ef / 1000;                                                     // t
+      // operating CO2: bought power and gas burned (never negative); power sent back is a separate credit at the same
+      // average factor, and co2Net (which can fall below zero) is labelled as a net balance, not as what the home emits
+      T.gridCO2 = T.imp * ef / 1000; T.exportCO2 = T.exp * ef / 1000; T.baseGridCO2 = T.use * ef / 1000;                         // t
       T.bill = T.buyCost - T.credit; T.cost = T.bill + T.gasCost; T.baseCost = T.baseBill + T.baseGasCost;
-      T.co2 = T.gridCO2 + T.gasCO2; T.baseCO2 = T.baseGridCO2 + T.baseGasCO2;
-      T.selfShare = T.need > 0 ? 1 - T.imp / T.need : 0; T.pvUsed = T.pv - T.exp; T.ef = ef;
+      T.co2 = T.gridCO2 + T.gasCO2; T.co2Net = T.co2 - T.exportCO2; T.baseCO2 = T.baseGridCO2 + T.baseGasCO2;
+      // own solar's share of the home's use: used at once, plus what the battery gives back of the solar stored (split())
+      T.selfShare = T.need > 0 ? (T.solarHome + D.home.battery.rte * T.solarBat) / T.need : 0; T.pvUsed = T.pv - T.exp; T.ef = ef;
     } else {
       var kg = 1000 / D.farm.electrolyzer.kWhPerKg, gasCO2 = D.farm.h2.gasMMBtuPerKg * D.farm.h2.co2PerMMBtu;   // kg CO2 per kg of hydrogen made from gas
       T.revenue = T.sales + T.h2Rev - T.wear; T.aloneRevenue = T.aloneSales;
@@ -462,26 +495,37 @@
     if (a >= 1e6) return neg + "$" + (a / 1e6).toFixed(a >= 1e8 ? 0 : 1) + "M";
     return neg + "$" + Math.round(a).toLocaleString("en-US");
   }
-  function num(v, d) { return (+v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function num(v, d) {   // a minus sign, not a hyphen; a value that rounds to zero has no sign
+    var t = Math.abs(+v).toLocaleString("en-US", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+    return +v < 0 && /[1-9]/.test(t) ? "−" + t : t;
+  }
   function pct(v, d) { return num(v * 100, d == null ? 0 : d) + "%"; }
+  // does the plan store energy? Then hour-by-hour schedules can tie, and the counts of hours (at the grid, the line or the
+  // buyer's limit) and the busiest hour belong to the schedule shown (the test finds two least-cost schedules that differ)
+  function stores(s) { return s.site === "home" ? s.hb > 0 : s.fb > 0 || (s.el > 0 && s.tank > 0); }
+  var SCHED = "on the schedule shown: with storage, least-cost schedules can differ hour by hour";
   function summarize(s, raw) {
     var T = raw.tot, Z = raw.sized, N = raw.horizon, r = s.rate / 100, out = { site: s.site, full: raw.full, sized: Z, tot: T, periods: raw.periods };
     var it = items(s, raw), capex = it.reduce(function (a, x) { return a + x.capex; }, 0), fom = it.reduce(function (a, x) { return a + x.fom; }, 0);
+    var sched = stores(s) ? " (" + SCHED + ")" : "";
+    out.stores = stores(s); out.cf = { pv: raw._D.home.solar.cf, wind: raw._D.farm.wind.cf };
     if (s.site === "home") {
-      var saving = T.baseCost - T.cost, cf = cashflow(it, saving, N, r);
+      var saving = T.baseCost - T.cost, cf = cashflow(it, saving, N, r), cut = T.baseCO2 - T.co2;
       out.money = { annualCost: T.cost, baseCost: T.baseCost, saving: saving, capex: capex, fom: fom, npv: cf.npv, payback: cf.payback, cash: cf.rows, items: it, horizon: N };
-      out.co2 = { plan: T.co2, base: T.baseCO2, cut: T.baseCO2 - T.co2 };
+      out.co2 = { plan: T.co2, base: T.baseCO2, cut: cut, credit: T.exportCO2, net: T.co2Net };
       out.readouts = [
         { key: "npv", label: "Net present value, " + N + " years", value: money(cf.npv), note: "against the same home with nothing new, at " + num(s.rate, 1) + "% real" },
         { key: "saving", label: "Saved on bills and gas, a year", value: money(saving), note: money(T.baseCost) + " a year before, " + money(T.cost) + " with the plan" },
         { key: "capex", label: "Equipment, up front", value: money(capex), note: capex > 0 ? "upkeep " + money(fom) + " a year" : "nothing to buy" },
-        { key: "co2", label: "CO₂ a year", value: num(T.co2, 1) + " t", note: (T.baseCO2 - T.co2 >= 0 ? "down " : "up ") + num(Math.abs(T.baseCO2 - T.co2), 1) + " t from " + num(T.baseCO2, 1) + " t" },
-        { key: "self", label: "Own solar and battery cover", value: pct(T.selfShare), note: "of the home's electricity use" },
-        { key: "grid", label: "Hours that need the grid", value: num(T.gridHours) + " h", note: "of 8,760; the most it draws in one hour: " + num(T.peakImp, 1) + " kWh" }];
+        { key: "co2", label: "CO₂ a year, bought power and gas", value: num(T.co2, 1) + " t", note: (cut >= 0 ? "down " : "up ") + num(Math.abs(cut), 1) + " t from " + num(T.baseCO2, 1) + " t" +
+          (T.exp > 0 ? "; net of power sent back, credited at the same factor: " + num(T.co2Net, 1) + " t" : "") },
+        { key: "self", label: "Own solar covers", value: pct(T.selfShare), note: "of the home's electricity use, at once or through the battery" },
+        { key: "grid", label: "Hours that need the grid", value: num(T.gridHours) + " h", note: "of 8,760; the busiest hour draws " + num(T.peakImp, 1) + " kWh" + sched }];
       out.flows = [
         { label: "Household use", value: T.use, unit: "kWh" }, { label: "Heat pump electricity", value: T.need - T.use, unit: "kWh" },
         { label: "Solar made", value: T.pv, unit: "kWh" }, { label: "Bought from the grid", value: T.imp, unit: "kWh" },
         { label: "Sent back to the grid", value: T.exp, unit: "kWh" }, { label: "Through the battery (out)", value: T.dis, unit: "kWh" },
+        { label: "Into the battery from the grid", value: T.gridBat, unit: "kWh" },
         { label: "Battery losses", value: T.ch - T.dis, unit: "kWh" }, { label: "Gas burned", value: T.gasKWh, unit: "kWh" }];
     } else {
       var C = raw.costs, cfP = cashflow(it, T.revenue, N, r);
@@ -493,10 +537,12 @@
       out.readouts = [
         { key: "npv", label: "Net present value, " + N + " years", value: money(cfP.npv), note: "the whole plant, at " + num(s.rate, 1) + "% real" },
         { key: "added", label: "What the extra equipment adds", value: money(cfP.npv - cfA.npv), note: "against the same wind farm alone (" + money(cfA.npv) + ")" },
-        { key: "revenue", label: "Net revenue a year", value: money(T.revenue), note: "power " + money(T.sales) + (T.h2 > 0 ? ", hydrogen " + money(T.h2Rev) : "") },
-        { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" },
-        { key: "h2", label: "Hydrogen sold a year", value: num(T.h2 / 1000) + " t", note: T.h2 > 0 ? "buyer's full take in " + num(T.fullTake || 0) + " h; " + num(T.co2Avoided) + " t CO₂ avoided" : "no electrolyzer" },
-        { key: "lcoh", label: "Cost per kg of hydrogen", value: lcoh === null ? "–" : "$" + num(lcoh, 2), note: lcoh === null ? "no hydrogen" : "electrolyzer and tank only; the wind is counted as free" }];
+        { key: "revenue", label: "Net revenue a year", value: money(T.revenue), note: "power " + money(T.sales) + (T.h2 > 0 ? ", hydrogen " + money(T.h2Rev) + ", less stack wear" : "") },
+        { key: "spill", label: "Wind spilled", value: pct(T.spillShare, 1), note: "alone: " + pct(T.aloneSpillShare, 1) + "; the line is full " + num(T.lineHours || 0) + " h a year" + sched },
+        { key: "h2", label: "Hydrogen sold a year", value: num(T.h2 / 1000) + " t", note: T.h2 > 0 ? "the buyer's full take in " + num(T.fullTake || 0) + " h" + sched : "no electrolyzer" },
+        { key: "co2", label: "Potential CO₂ avoided, a year", value: T.h2 > 0 ? num(T.co2Avoided) + " t" : "–",
+          note: T.h2 > 0 ? "if this hydrogen replaces hydrogen made from gas; leaves out the grid power these MWh no longer replace" : "no hydrogen; running the farm emits no CO₂" },
+        { key: "lcoh", label: "Cost per kg of hydrogen", value: lcoh === null ? "–" : "$" + num(lcoh, 2), note: lcoh === null ? "no hydrogen" : "electrolyzer, tank and wear only; the wind is counted as free" }];
       out.flows = [
         { label: "Wind made", value: T.wind, unit: "MWh" }, { label: "Sold to the grid", value: T.sell, unit: "MWh" },
         { label: "Spilled", value: T.spill, unit: "MWh" }, { label: "Into the electrolyzer", value: T.el, unit: "MWh" },
@@ -520,6 +566,16 @@
   // o.mode "reps": the representative weeks; o.size: sizing on the representative weeks (results.sizes, .snapped).
   // Never rejects: { status, ok, message, hint, results, raw, kind, ms }; ok only when every model is optimal.
   function fail(status, message) { return { status: status, ok: false, message: message, hint: status === "infeasible" ? HINT : null, results: null }; }
+  // what a stop in one week says (the reason first, then the week; LX.BenchRun shows the engine's message as it is)
+  var EARLY = ["time-limit", "iteration-limit", "objective-bound", "objective-target", "interrupted"];
+  function stopWords(r, start) {
+    var wk = "the week of " + start, st = r.status;
+    if (EARLY.indexOf(st) >= 0) return (st === "time-limit" ? "The run reached its time limit" : "The run stopped early (" + st + ")") + " in " + wk + ", before that week was solved, so no new result is shown.";
+    if (st === "infeasible" || st === "infeasible-or-unbounded") return "No way to run this plan meets every rule in " + wk + ", so no new result is shown.";
+    if (st === "unbounded") return "The model of " + wk + " has no limit on its objective, so a rule is missing: a fault in the bench.";
+    if (st === "cancelled") return null;
+    return (r.message || "The run failed before it gave an answer.") + " (It stopped in " + wk + ".)";
+  }
   function solve(s, P, o) {
     o = o || {};
     var solver = o.solver || (typeof window !== "undefined" && window.LX && window.LX.solver && function (m, q) { return window.LX.solver.solve(m, q); });
@@ -534,7 +590,7 @@
       ms.models++; if (r.ms) { ms.solve += r.ms.solve || 0; ms.total += r.ms.total || 0; ms.roundTrip += r.ms.roundTrip || r.ms.total || 0; }
       if (r.status !== "optimal" || !r.ok) {
         var f = fail(r.status || "error", r.status === "error" ? (r.message || null) : null);
-        if (mode === "week") f.message = (f.message ? f.message + " " : "") + "(It stopped in the week of " + g[0].start + ".)";
+        if (mode === "week") f.message = stopWords(r, g[0].start);
         f.kind = r.kind || "lp"; return f;
       }
       if (!acc) {
@@ -564,20 +620,23 @@
           var f;
           try { f = one(r, g); } catch (e) { f = fail("error", "The bench could not read the solver's answer (" + e.message + ")."); }
           if (f) { f.ms = ms; resolve(f); } else next();
-        }, function (e) { resolve(fail("error", "The run failed (" + (e && e.message || e) + ").")); });
+        }, function (e) { var f = fail("error", "The run failed (" + (e && e.message || e) + ")" + (mode === "week" ? " in the week of " + g[0].start : "") + "."); f.ms = ms; resolve(f); });
       }
       next();
     });
   }
-  // one-at-a-time sensitivity of the NPV, the plan held fixed. Equipment cost and the rate need no new run (operation
-  // does not depend on them); the prices are re-run. Returns rows for LX.Tornado, or null if a run fails.
+  // one-at-a-time sensitivity of the NPV, the equipment held fixed. The rate never changes the operation, and the
+  // equipment cost does not either, except on a farm with an electrolyzer: its stack wear is a share of its cost per MWh
+  // used, so cheaper equipment runs it more; that case is run again, as the prices are. The farm's line is a
+  // connection-limit scenario (limit: its own cost is not counted). Returns rows for LX.Tornado, or null if a run fails.
   function sensRows(s) {
-    var rows = [{ key: "cost", label: "Equipment cost", lo: { cost: Math.max(50, s.cost - 25) }, hi: { cost: Math.min(150, s.cost + 25) }, run: false },
+    var wear = s.site === "farm" && s.el > 0;
+    var rows = [{ key: "cost", label: "Equipment cost", lo: { cost: Math.max(50, s.cost - 25) }, hi: { cost: Math.min(150, s.cost + 25) }, run: wear, why: wear ? "wear" : null },
       { key: "rate", label: "Discount rate (real)", lo: { rate: 2 }, hi: { rate: 7 }, run: false }];
     if (s.site === "home") rows.push({ key: "xc", label: "Export credit", lo: { xc: 0 }, hi: { xc: 8 }, run: true });
     else {
       if (s.el > 0) rows.push({ key: "h2", label: "Hydrogen price", lo: { h2: Math.max(1, s.h2 - 1) }, hi: { h2: Math.min(8, s.h2 + 1) }, run: true });
-      rows.push({ key: "line", label: "Line to the grid", lo: { line: Math.max(10, s.line - 20) }, hi: { line: Math.min(300, s.line + 20) }, run: true });
+      rows.push({ key: "line", label: "Line limit (cost not counted)", lo: { line: Math.max(10, s.line - 20) }, hi: { line: Math.min(300, s.line + 20) }, run: true, limit: true });
     }
     return rows;
   }
@@ -597,15 +656,34 @@
         : Promise.resolve([summarize(lo, recost(base.raw, lo)).money.npv, summarize(hi, recost(base.raw, hi)).money.npv]);
       return p.then(function (ab) {
         if (ab[0] === null || ab[1] === null) return null;
-        outRows.push({ key: k, label: R.label, loText: text(k, lo[k]), hiText: text(k, hi[k]), atLo: ab[0], atHi: ab[1], rerun: R.run });
+        outRows.push({ key: k, label: R.label, loText: text(k, lo[k]), hiText: text(k, hi[k]), atLo: ab[0], atHi: ab[1], rerun: R.run, limit: !!R.limit, why: R.why || null });
         if (o.progress) o.progress(i, rows.length);
         return next();
       });
     }
     return next();
   }
-  // the same operation with other unit costs (equipment cost or rate changed): only the money changes
-  function recost(raw, s) { var o = {}, k; for (k in raw) o[k] = raw[k]; o.costs = costs(raw._D, s); return o; }
+  // the same operation with other unit costs (equipment cost or rate changed): the money changes, and on the farm the
+  // stack wear and the net revenue are priced again at the new cost (the operation held; sensitivity() re-runs the
+  // farm's cost case when an electrolyzer makes the operation depend on it)
+  function recost(raw, s) {
+    var o = {}, k; for (k in raw) o[k] = raw[k];
+    o.costs = costs(raw._D, s);
+    if (raw.site === "farm") { var T = {}; for (k in raw.tot) T[k] = raw.tot[k]; T.wear = T.el * o.costs.elWear; T.revenue = T.sales + T.h2Rev - T.wear; o.tot = T; }
+    return o;
+  }
+  // the sensitivity rows in words: the note's line (every bar of the chart, widest swing first) and the chart's note
+  function sensWords(s, sens) {
+    if (!sens || !sens.rows || !sens.rows.length) return null;
+    var rows = sens.rows.slice().sort(function (a, b) { return Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo); });
+    var parts = rows.map(function (r) { return r.label + " at " + r.loText + ": " + money(r.atLo) + "; at " + r.hiText + ": " + money(r.atHi); });
+    var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" };
+    var rerun = rows.filter(function (r) { return r.rerun; }).map(function (r) { return NAME[r.key] || r.label.toLowerCase(); });
+    var lim = rows.some(function (r) { return r.limit; });
+    var held = "The equipment is held fixed." + (rerun.length ? " Re-run over all 52 weeks: " + joinAnd(rerun) + "." : "");
+    return { line: "The NPV is " + money(sens.base) + " at this plan. " + parts.join(". ") + ". " + held + (lim ? " The line's cases change the connection limit; its cost is not counted." : ""),
+      note: "Green: above your NPV; red: below. " + held, widest: rows[0] };
+  }
 
   // ---------------------------------------------------------------- words: the plan, the note, the no-JS tables
   function fmtField(f, v) {
@@ -640,12 +718,15 @@
       heading: heading(s), made: "the Site Bench (engine E0, a linear program)",
       run: { ok: true, stale: false, text: "every hour of 2025, as 52 weeks" },
       plan: planRows(s),
-      results: res.readouts.map(function (r) { return { label: r.label, value: r.value }; }),
+      // every readout with its note: the boundaries (CO₂, the wind-only comparison, what the cost per kg leaves out) travel
+      results: res.readouts.map(function (r) { return { label: r.label, value: r.value, note: r.note }; }),
       assumptions: [
         "All money is in 2025 dollars at a " + num(s.rate, 1) + "% real discount rate, over " + M.horizon + " years.",
         "The weather and prices of 2025 repeat every year, and costs stay the same.",
-        home ? "The household use and the heating need are illustrative; the solar shape is SPP's for 2025." : "The wind follows SPP's 2025 shape at a 33.8% capacity factor; the prices are illustrative.",
-        home ? "CO₂ counts operating emissions only: grid power at Kansas's 2024 average, and gas burned." : "CO₂ avoided assumes each kg of hydrogen replaces one made from natural gas.",
+        home ? "The household use and the heating need are illustrative; the solar follows SPP's 2025 hourly pattern, scaled month by month to EIA's capacity factors and a " + pct(res.cf.pv, 1) + " year."
+          : "The wind follows SPP's 2025 hourly pattern, reshaped month by month to EIA's 2025 capacity factors (" + pct(res.cf.wind, 1) + " for the year); the prices are illustrative.",
+        home ? "CO₂ counts operating emissions only: bought power at Kansas's 2024 average factor, and gas burned; power sent back is a separate credit."
+          : "CO₂ avoided is a potential saving: it assumes each kg of hydrogen replaces one made from natural gas.",
         "Equipment costs are " + s.cost + "% of the sourced values, with no tax credits or incentives."],
       sensitivity: null,
       limits: [
@@ -682,18 +763,21 @@
       ["Discount rate", num(D.finance.rate) + "% real (you can change it)", ["atb2025-fin"]],
       ["Home: household use", num(H.use.kWh) + " kWh a year, the town's 2025 demand shape (illustrative)", ["eia-930"]],
       ["Home: heating need", num(H.heat.kWh) + " kWh of heat a year, from a smooth made-up temperature (illustrative)", []],
-      ["Home: rooftop solar", "$" + num(H.pv.capex) + "/kW in 2022 dollars = " + d(H.pv.capex, H.pv.capexYear) + "/kW; " + pct(P.home.pvCF, 1) + " capacity factor; " + H.pv.life + " years; upkeep $" + H.pv.fom + "/kW a year (illustrative)", ["eia-aeo2026-rdm", "eia-dg-2024"]],
+      ["Home: rooftop solar", "$" + num(H.pv.capex) + "/kW in 2022 dollars = " + d(H.pv.capex, H.pv.capexYear) + "/kW; " + H.pv.life + " years; upkeep $" + H.pv.fom + "/kW a year (illustrative). Output: SPP's 2025 hourly solar pattern, scaled month by month to EIA's 2025 capacity factors and to a " + pct(P.home.pvCF, 1) + " year", ["eia-aeo2026-rdm", "eia-dg-2024", "eia-epm-cf"]],
       ["Home: battery", "$" + num(H.battery.capex) + "/kWh (illustrative); 2.5 hours; " + pct(H.battery.rte) + " round trip; " + H.battery.life + " years; upkeep " + pct(H.battery.fomShare) + " a year", ["atb2025-resbat"]],
-      ["Home: heat pumps", "$" + num(H.hp.standard.capex) + " (HSPF " + H.hp.standard.hspf + ") and $" + num(H.hp.high.capex) + " (HSPF " + H.hp.high.hspf + ") in 2022 dollars = " + d(H.hp.standard.capex, 2022) + " and " + d(H.hp.high.capex, 2022), ["eia-aeo2026-rdm"]],
-      ["Home: gas furnace and gas", pct(H.gas.afue) + " efficient; $" + num(H.gas.pricePerMcf, 2) + " per thousand cubic feet = $" + num(gasMM, 2) + "/MMBtu; " + H.gas.co2PerMMBtu + " kg CO₂/MMBtu", ["eia-ng-ks", "eia-btu", "eia-co2"]],
+      ["Home: heat pumps", "standard: about " + num(P.home.cop.standard, 1) + " kWh of heat for each kWh of electricity over a season (HSPF " + H.hp.standard.hspf + ", the heating seasonal performance factor), $" + num(H.hp.standard.capex) + " in 2022 dollars = " + d(H.hp.standard.capex, 2022) +
+        "; high efficiency: about " + num(P.home.cop.high, 1) + " (HSPF " + H.hp.high.hspf + "), $" + num(H.hp.high.capex) + " = " + d(H.hp.high.capex, 2022) + ". HSPF ÷ 3.412 = the season's heat over electricity", ["eia-aeo2026-rdm"]],
+      ["Home: gas furnace and gas", pct(H.gas.afue) + " efficient; $" + num(H.gas.pricePerMcf, 2) + " per thousand cubic feet = $" + num(gasMM, 2) + " per MMBtu (a million British thermal units, about 293 kWh of heat); " + H.gas.co2PerMMBtu + " kg CO₂ per MMBtu burned", ["eia-ng-ks", "eia-btu", "eia-co2"]],
       ["Home: tariffs", num(H.tariff.flat * 100) + "¢/kWh flat; time-of-use " + num(P.home.touOff * 100, 2) + "¢ and " + num(P.home.touPeak * 100, 2) + "¢ (16:00–21:00), illustrative", ["eia-epm-5-6-b"]],
+      ["Home: export credit", "what the utility pays for each kWh the panels send to the grid (net billing): " + num(H["export"].def) + "¢ by default, 0 to 8¢ on the bench (illustrative)", []],
       ["Home: grid CO₂", num(H.grid.lbPerMWh) + " lb/MWh = " + num(ef, 3) + " kg CO₂/kWh (Kansas, 2024)", ["eia-ks-profile"]],
-      ["Farm: wind", "$" + num(F.wind.capex) + "/kW and $" + num(F.wind.fom, 2) + "/kW a year (2025 dollars); " + pct(P.farm.windCF, 1) + " capacity factor; " + F.wind.life + " years: $" + num(C.wind.eac) + " a year per MW at " + D.finance.rate + "%", ["eia-aeo2026-emm", "eia-epm-cf"]],
+      ["Farm: wind", "$" + num(F.wind.capex) + "/kW and $" + num(F.wind.fom, 2) + "/kW a year (2025 dollars); " + F.wind.life + " years: $" + num(C.wind.eac) + " a year per MW at " + D.finance.rate + "%. Output: SPP's 2025 hourly wind pattern, reshaped month by month to EIA's 2025 capacity factors and to a " + pct(P.farm.windCF, 1) + " year, the best hours at full size", ["eia-aeo2026-emm", "eia-epm-cf"]],
       ["Farm: battery", "$" + num(F.battery.capexPerkW) + "/kW for 4 hours = $" + num(F.battery.capexPerkW / 4, 2) + "/kWh; $" + num(F.battery.fomPerkW, 2) + "/kW a year; " + pct(F.battery.rte) + " round trip; " + F.battery.life + " years", ["eia-aeo2026-emm", "nrel-battery-2025"]],
-      ["Farm: electrolyzer", "$" + num(F.electrolyzer.capex) + "/kW in 2022 dollars = " + d(F.electrolyzer.capex, F.electrolyzer.capexYear) + "/kW; upkeep " + pct(F.electrolyzer.fomShare) + " a year; " + F.electrolyzer.kWhPerKg + " kWh/kg; stack wear $" + num(C.elWear, 2) + "/MWh", ["doe-h2-24005"]],
+      ["Farm: electrolyzer", "$" + num(F.electrolyzer.capex) + "/kW in 2022 dollars = " + d(F.electrolyzer.capex, F.electrolyzer.capexYear) + "/kW; upkeep " + pct(F.electrolyzer.fomShare) + " a year; " + F.electrolyzer.kWhPerKg + " kWh/kg. Stack wear $" + num(C.elWear, 2) +
+        "/MWh used: an illustrative allowance per MWh, based on DOE's stack replacement (" + pct(F.electrolyzer.stackShare) + " of the cost after " + num(F.electrolyzer.stackHours) + " operating hours) as if every hour ran at full power", ["doe-h2-24005"]],
       ["Farm: hydrogen tank", "$" + num(F.tank.capexPerKg) + " per kg held (illustrative); " + F.tank.life + " years", []],
       ["Farm: prices", "power $" + F.sale.flat + "/MWh fixed, or $" + F.sale.tou.off + " and $" + F.sale.tou.peak + "/MWh (16:00–21:00); hydrogen $" + num(F.h2.def, 2) + "/kg by default (all illustrative)", []],
-      ["Farm: CO₂ avoided", num(F.h2.gasMMBtuPerKg, 2) + " MMBtu of gas per kg of hydrogen from natural gas × " + F.h2.co2PerMMBtu + " = " + num(F.h2.gasMMBtuPerKg * F.h2.co2PerMMBtu, 2) + " kg CO₂ per kg", ["eia-aeo2026-hmm", "eia-co2"]]];
+      ["Farm: potential CO₂ avoided", num(F.h2.gasMMBtuPerKg, 2) + " MMBtu of gas per kg of hydrogen made from natural gas × " + F.h2.co2PerMMBtu + " kg CO₂ per MMBtu = " + num(F.h2.gasMMBtuPerKg * F.h2.co2PerMMBtu, 2) + " kg CO₂ per kg, if the farm's hydrogen replaces it", ["eia-aeo2026-hmm", "eia-co2"]]];
   }
   function inputsHTML(D, P) {
     return '<table class="lx-facts"><thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead><tbody>' +
@@ -715,10 +799,26 @@
       (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + ' with HiGHS by the bench\'s test.</p>' : "");
   }
 
+  // every sentence the results draw for a run (the page's text budget is checked on these by the test): the week strip's
+  // key, the week chart's note and schedule line, the cash flow's keys
+  function captions(s, res) {
+    var home = s.site === "home", sh = res.periods.filter(function (p) { return p.kind === "week"; }).map(function (p) { return p.sums.share; });
+    var lo = Math.min.apply(null, sh), hi = Math.max.apply(null, sh);
+    return {
+      strip: (home ? "Each square is a week: the stronger its colour, the more of the home's use came from the grid, not its own solar ("
+        : "Each square is a week: the stronger its colour, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
+      week: home ? "Hours from 00:00, Central standard time. Under the line, the home's use by source: solar first, then the battery, then the grid. Above it: charging and power sent back."
+        : "Hours from 00:00, Central standard time. Under the line, where the wind went: sold, to the electrolyzer, into the battery or spilled. Above it: the battery's output.",
+      sched: res.stores ? "With storage, this is one least-cost schedule: others can move charging to other hours at the same cost." : null,
+      cash: ["Year 0: the equipment.", "Each year after: " + (home ? "the saving on bills and gas" : "the net revenue") + ", less upkeep.", "When a part's life ends: its replacement.",
+        "At the end: what the newest parts are still worth (residual value).", "The line: the running total, discounted. It ends at the NPV, " + money(res.money.npv) + "."]
+    };
+  }
+
   var api = { HOURS: HOURS, HPW: HPW, WEEKS: WEEKS, SITES: SITES, schema: schema, schemaFor: schemaFor, presets: presets, defaults: defaults, withPreset: withPreset,
     field: field, crf: crf, usd: usd, costs: costs, temperature: temperature, prepare: prepare, weeks: weeks, periods: periods, build: build,
     read: read, start: start, add: add, finish: finish, summarize: summarize, cashflow: cashflow, items: items, solve: solve, snap: snap, sensitivity: sensitivity, sensRows: sensRows,
-    recost: recost, HINT: HINT, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
+    recost: recost, sensWords: sensWords, split: split, stores: stores, captions: captions, SCHED: SCHED, HINT: HINT, fmt: { money: money, num: num, pct: pct, field: fmtField }, note: note, heading: heading, planRows: planRows,
     resultsHTML: resultsHTML, fallback: fallback, inputRows: inputRows, inputsHTML: inputsHTML, sourcesHTML: sourcesHTML, checkRows: checkRows, checkHTML: checkHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window === "undefined" || !window.LX) return;
@@ -743,14 +843,24 @@
     if (f.id === "el") return function (lo, hi, mx, v) { return v > 0 ? "Makes up to " + num(v * 1000 / D.farm.electrolyzer.kWhPerKg) + " kg of hydrogen an hour." : "No electrolyzer."; };
     if (f.id === "tank") return function (lo, hi, mx, v) { return v > 0 ? "Holds " + num(v * 1000) + " kg of hydrogen." : "No tank: hydrogen is sold as it is made."; };
     if (f.id === "line") return function () { return "Sell only: the farm cannot buy power."; };
+    if (f.id === "xc") return function () { return "What the utility pays for each kWh the panels send to the grid ([[net-billing|net billing]])."; };
+    if (f.id === "rate") return function () { return "A [[real-rate|real rate]]: inflation is taken out, as every cost here is in 2025 dollars."; };
     if (f.id === "cost") return function () { return "100% = the sourced costs (2025 dollars)."; };
     return null;
   }
+  // the line under a choice: what its options mean, in plain words (the ratings stay in the inputs table)
+  function segHint(P, f) {
+    if (f.id === "hp") return "Standard: about " + num(P.home.cop.standard, 1) + " kWh of heat for each kWh of electricity over the heating season; high efficiency: about " + num(P.home.cop.high, 1) + " ([[coefficient-of-performance|COP]]).";
+    if (f.id === "tariff") return "How the utility prices each kWh ([[tariff|tariff]]): " + num(P.D.home.tariff.flat * 100) + "¢ all day, or " + num(P.home.touOff * 100, 2) + "¢ and " + num(P.home.touPeak * 100, 2) + "¢ from 16:00 to 21:00.";
+    if (f.id === "sale") return "Fixed: $" + P.D.farm.sale.flat + "/MWh every hour; time-of-use: $" + P.D.farm.sale.tou.off + ", and $" + P.D.farm.sale.tou.peak + " from 16:00 to 21:00.";
+    return null;
+  }
   // a row of buttons for a choice (aria-pressed); returns { el, set(v) }
-  function Seg(host, f, value, onPick, hide) {
+  function Seg(host, f, value, onPick, hide, hint) {
     var w = H("div", { class: "lx-ctl e0-choice" }, host);
     H("span", { class: hide ? "lx-sr" : "e0-choice-l", text: f.label, id: LX.uid("e0c") }, w);
     var g = H("div", { class: "lx-seg", role: "group", "aria-label": f.label }, w), bs = {};
+    if (hint) { var hid = LX.uid("e0h"); H("p", { class: "lx-ctl-hint", id: hid, html: LX.rich(hint) }, w); g.setAttribute("aria-describedby", hid); }
     f.values.forEach(function (x) {
       var b = H("button", { type: "button", text: f.names ? f.names[x] : x, "aria-pressed": x === value ? "true" : "false" }, g);
       b.addEventListener("click", function () { set(x); onPick(x); });
@@ -773,10 +883,11 @@
     var prev = H("button", { type: "button", class: "lx-btn ghost small", text: "← Week before" }, wkNav);
     var wkName = H("span", { class: "e0-wkname", "aria-live": "polite" }, wkNav);
     var next = H("button", { type: "button", class: "lx-btn ghost small", text: "Week after →" }, wkNav);
+    var schedP = H("p", { class: "lx-hint e0-sched", hidden: true }, wkCard);
     var plot = LX.Plot(wkCard, { text: "Text version: this week, day by day", legend: true });
     var cfCard = H("div", { class: "lx-xcard lx-sb-chart" }, charts);
     var cfHead = H("header", { class: "lx-x-head" }, cfCard); H("h3", { text: "Cash flow, year by year" }, cfHead);
-    var cfLede = H("p", { class: "lx-hint" }, cfCard);
+    var cfLede = H("ul", { class: "e0-keys" }, cfCard);
     var cfPlot = LX.Plot(cfCard, { text: "Text version: the cash flow", legend: true });
     var extra = H("div", { class: "e0-extra" }, wrap);
     var flowCard = H("div", { class: "lx-xcard" }, wrap);
@@ -790,54 +901,61 @@
     prev.addEventListener("click", function () { if (last) pickWeek(last.s.site, sel[last.s.site] - 1); });
     next.addEventListener("click", function () { if (last) pickWeek(last.s.site, sel[last.s.site] + 1); });
     function dayLabel(iso, d) { var t = new Date(Date.parse(iso + "T00:00:00Z") + d * 86400000); return t.getUTCDate() + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][t.getUTCMonth()]; }
-    function drawStrip(res, s) {
+    function drawStrip(res, s, cap) {
       strip.innerHTML = "";
       var ps = res.periods.filter(function (p) { return p.kind === "week"; }), home = s.site === "home";
       var lo = Math.min.apply(null, ps.map(function (p) { return p.sums.share; })), hi = Math.max.apply(null, ps.map(function (p) { return p.sums.share; }));
-      stripL.textContent = (home ? "Each square is a week: the stronger its colour, the larger the share of the home's electricity bought from the grid (" : "Each square is a week: the stronger its colour, the more of the wind is spilled (") +
-        pct(lo) + " to " + pct(hi) + "). Pick one.";
+      stripL.textContent = cap.strip;
       ps.forEach(function (p, i) {
         var v = p.sums.share, k = hi > lo ? (v - lo) / (hi - lo) : 0, b = H("button", { type: "button", class: "e0-cell" + (i === sel[s.site] ? " on" : ""), style: "--v:" + Math.round(8 + 82 * k) + "%",
-          "aria-pressed": i === sel[s.site] ? "true" : "false", "aria-label": "Week of " + dayLabel(p.start, 0) + ": " + pct(v) + (home ? " from the grid" : " spilled") }, strip);
+          "aria-pressed": i === sel[s.site] ? "true" : "false", "aria-label": "Week of " + dayLabel(p.start, 0) + ": " + pct(v, home ? 0 : 1) + (home ? " not from its own solar" : " spilled") }, strip);
         b.addEventListener("click", function () { pickWeek(s.site, i, true); });
       });
     }
+    // the week's hours: under the line, the home's use by source (or where the wind went); above it, what else the hour
+    // moved (charging and power sent back; or the battery's output). split() follows each hour by the stated rule, so the
+    // bars under the line add up to the line and the whole bar to every source (or every use) of the hour.
+    var SOFT = function (c) { return "color-mix(in srgb, " + c + " 45%, var(--lx-surface))"; };
     function drawWeek(res, s) {
       var ps = res.periods.filter(function (p) { return p.kind === "week"; }), i = sel[s.site], p = ps[i], S = p.series, home = s.site === "home", bars = [], u = home ? "kWh" : "MWh";
-      drawStrip(res, s);
+      var cap = captions(s, res);
+      drawStrip(res, s, cap);
       wkName.textContent = "Week of " + dayLabel(p.start, 0) + " to " + dayLabel(p.start, 6) + " (" + (i + 1) + " of 52)";
       prev.disabled = i === 0; next.disabled = i === WEEKS - 1;
-      var ymax = 0, ymin = 0, h;
+      schedP.hidden = !cap.sched; schedP.textContent = cap.sched || "";
+      var ymax = 0, h;
       for (h = 0; h < HPW; h++) {
-        var stack = home ? [[S.pv[h] - S.exp[h] - S.ch[h], "var(--lx-solar)"], [S.dis[h], "var(--lx-bat)"], [S.imp[h], "var(--lx-ink-3)"]]
-          : [[S.sell[h], "var(--lx-wind)"], [S.el[h], "var(--lx-hyd)"], [S.ch[h], "var(--lx-bat)"], [S.spill[h], "var(--lx-bad)"]];
+        var q = split(s.site, S, h);
+        var stack = home ? [[q.solarHome, "var(--lx-solar)"], [q.batHome, "var(--lx-bat)"], [q.gridHome, "var(--lx-ink-3)"], [q.toBat, SOFT("var(--lx-bat)")], [q.sentBack, SOFT("var(--lx-solar)")]]
+          : [[q.windSell, "var(--lx-wind)"], [q.windEl, "var(--lx-hyd)"], [q.windBat, "var(--lx-bat)"], [q.spill, "var(--lx-bad)"], [q.batOut, SOFT("var(--lx-bat)")]];
         var y = 0;
-        stack.forEach(function (q) { var v = Math.max(0, q[0]); if (v > 1e-6) bars.push({ x0: h, x1: h + 0.92, y0: y, y1: y + v, color: q[1] }); y += v; });
-        if (home && S.exp[h] > 1e-6) { bars.push({ x0: h, x1: h + 0.92, y0: -S.exp[h], y1: 0, color: "var(--lx-solar)", op: 0.45 }); ymin = Math.min(ymin, -S.exp[h]); }
-        if (home && S.ch[h] > 1e-6) { bars.push({ x0: h, x1: h + 0.92, y0: -S.exp[h] - S.ch[h], y1: -S.exp[h], color: "var(--lx-bat)", op: 0.45 }); ymin = Math.min(ymin, -S.exp[h] - S.ch[h]); }
-        ymax = Math.max(ymax, y, home ? S.need[h] : S.wind[h] + S.dis[h]);
+        stack.forEach(function (x) { var v = Math.max(0, x[0]); if (v > 1e-6) bars.push({ x0: h, x1: h + 0.92, y0: y, y1: y + v, color: x[1] }); y += v; });
+        ymax = Math.max(ymax, y, home ? S.need[h] : S.wind[h]);
       }
-      var ax = axis(ymin, ymax), top = ax.top, bot = ax.bot;
+      var ax = axis(0, ymax), top = ax.top, bot = ax.bot;
       var xt = []; for (var d = 0; d < 7; d++) xt.push([d * 24 + 12, dayLabel(p.start, d)]);
-      var spec = { x: { min: 0, max: HPW, ticks: xt, ticksN: xt.filter(function (_, k) { return k % 2 === 0; }) }, y: { min: bot, max: top, step: ax.step, fmt: function (v) { return (v < 0 ? "−" : "") + num(Math.abs(v), ax.step < 1 ? 1 : 0); }, unit: u, zero: true },
-        bars: bars, height: 240, heightN: 210, aria: "The week's hourly energy, as stacked bars",
+      var spec = { x: { min: 0, max: HPW, ticks: xt, ticksN: xt.filter(function (_, k) { return k % 2 === 0; }) }, y: { min: bot, max: top, step: ax.step, fmt: function (v) { return num(v, Math.abs(ax.step - Math.round(ax.step)) > 1e-9 ? 1 : 0); }, unit: u, zero: true },
+        bars: bars, height: 240, heightN: 210, aria: home ? "The week's hours as stacked bars: the home's use by source, then charging and power sent back" : "The week's hours as stacked bars: where the wind went, then the battery's output",
         lines: [{ values: home ? S.need : S.wind, color: "var(--lx-ink)", width: 1.6, step: 1 }],
         refs: home ? [] : [{ y: res.sized.line, label: "line " + num(res.sized.line) + " MW", color: "var(--lx-ink-2)", dash: "4 3" }],
-        legend: home ? [{ label: "solar used at home", color: "var(--lx-solar)" }, { label: "from the battery", color: "var(--lx-bat)" }, { label: "from the grid", color: "var(--lx-ink-3)" }, { label: "below zero: sent back or into the battery", color: "var(--lx-solar)", dash: "2 2" }, { label: "the home's need", color: "var(--lx-ink)" }]
-          : [{ label: "sold", color: "var(--lx-wind)" }, { label: "into the electrolyzer", color: "var(--lx-hyd)" }, { label: "into the battery", color: "var(--lx-bat)" }, { label: "spilled", color: "var(--lx-bad)" }, { label: "wind made", color: "var(--lx-ink)" }],
+        legend: home ? [{ label: "solar used at home", color: "var(--lx-solar)" }, { label: "battery to home", color: "var(--lx-bat)" }, { label: "grid to home", color: "var(--lx-ink-3)" },
+            { label: "into the battery", color: SOFT("var(--lx-bat)") }, { label: "sent back", color: SOFT("var(--lx-solar)") }, { label: "the home's use", color: "var(--lx-ink)", dash: true }]
+          : [{ label: "sold", color: "var(--lx-wind)" }, { label: "into the electrolyzer", color: "var(--lx-hyd)" }, { label: "into the battery", color: "var(--lx-bat)" }, { label: "spilled", color: "var(--lx-bad)" },
+            { label: "battery output", color: SOFT("var(--lx-bat)") }, { label: "wind made", color: "var(--lx-ink)", dash: true }],
         tip: function (x) {
           var k = Math.max(0, Math.min(HPW - 1, Math.floor(x))), dd = Math.floor(k / 24), hh = k % 24, t = dayLabel(p.start, dd) + ", " + (hh < 10 ? "0" : "") + hh + ":00";
-          return home ? "<b>" + t + "</b><br>need " + num(S.need[k], 2) + " kWh · solar " + num(S.pv[k], 2) + " · grid " + num(S.imp[k], 2) + " · battery " + num(S.dis[k] - S.ch[k], 2) + " · sent back " + num(S.exp[k], 2)
-            : "<b>" + t + "</b><br>wind " + num(S.wind[k]) + " MW · sold " + num(S.sell[k]) + " · electrolyzer " + num(S.el[k]) + " · battery " + num(S.dis[k] - S.ch[k]) + " · spilled " + num(S.spill[k]);
+          return home ? "<b>" + t + "</b><br>use " + num(S.need[k], 2) + " kWh · solar " + num(S.pv[k], 2) + " · bought " + num(S.imp[k], 2) + " · battery in " + num(S.ch[k], 2) + ", out " + num(S.dis[k], 2) + " · sent back " + num(S.exp[k], 2)
+            : "<b>" + t + "</b><br>wind " + num(S.wind[k]) + " MW · sold " + num(S.sell[k]) + " · electrolyzer " + num(S.el[k]) + " · battery in " + num(S.ch[k]) + ", out " + num(S.dis[k]) + " · spilled " + num(S.spill[k]);
         }, tipStep: 1 };
       var rows = [];
       for (d = 0; d < 7; d++) {
         var a = d * 24, z = function (k) { var t = 0; for (var q = a; q < a + 24; q++) t += S[k][q]; return t; };
-        rows.push(home ? [dayLabel(p.start, d), num(z("need"), 1), num(z("pv"), 1), num(z("imp"), 1), num(z("exp"), 1), num(z("dis"), 1)]
-          : [dayLabel(p.start, d), num(z("wind")), num(z("sell")), num(z("el")), num(z("spill")), num(z("h2") / 1000, 1)]);
+        rows.push(home ? [dayLabel(p.start, d), num(z("need"), 1), num(z("pv"), 1), num(z("imp"), 1), num(z("ch"), 1), num(z("dis"), 1), num(z("exp"), 1)]
+          : [dayLabel(p.start, d), num(z("wind")), num(z("sell")), num(z("el")), num(z("ch")), num(z("dis")), num(z("spill")), num(z("h2") / 1000, 1)]);
       }
-      spec.text = { head: home ? ["Day", "Need, kWh", "Solar, kWh", "Bought, kWh", "Sent back, kWh", "From the battery, kWh"] : ["Day", "Wind, MWh", "Sold, MWh", "Electrolyzer, MWh", "Spilled, MWh", "Hydrogen sold, t"], rows: rows,
-        note: "Hours run from 00:00, Central standard time. The bars show where each hour's energy went; the line is " + (home ? "the home's need." : "what the wind made.") };
+      spec.text = { head: home ? ["Day", "Use, kWh", "Solar, kWh", "Bought, kWh", "Into the battery, kWh", "From the battery, kWh", "Sent back, kWh"]
+          : ["Day", "Wind, MWh", "Sold, MWh", "Electrolyzer, MWh", "Into the battery, MWh", "From the battery, MWh", "Spilled, MWh", "Hydrogen sold, t"], rows: rows,
+        note: cap.week };
       plot.render(spec);
     }
     function niceTop(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e; }
@@ -851,7 +969,7 @@
       cum.forEach(function (c) { mx = Math.max(mx, c[1]); mn = Math.min(mn, c[1]); });
       var ax = axis(mn, mx), top = ax.top, bot = ax.bot;
       var xt = []; for (var y = 0; y <= M.horizon; y += 5) xt.push([y + 0.5, String(y)]);
-      cfLede.textContent = "Year 0: the equipment. Then each year " + (s.site === "home" ? "the saving" : "the net revenue") + " less upkeep; replacements when a life ends. The line adds them up, discounted: where it ends is the NPV, " + money(M.npv) + ".";
+      cfLede.innerHTML = ""; captions(s, res).cash.forEach(function (t) { H("li", { text: t }, cfLede); });
       cfPlot.render({ x: { min: 0, max: M.horizon + 1, ticks: xt }, y: { min: bot, max: top, step: ax.step, fmt: function (v) { var sg = v < -1e-9 ? "−" : "", a = Math.abs(v); return sg + (k === 1 ? "$" + num(a / 1000, ax.step < 1000 ? 1 : 0) + "k" : "$" + num(a, ax.step < 1 ? 1 : 0) + "M"); }, zero: true },
         bars: bars, lines: [{ pts: cum, color: "var(--lx-ink)", width: 2, dots: false }], height: 220, heightN: 200, aria: "Cash flow bars by year and the discounted running total",
         legend: [{ label: "net cash in the year", color: "var(--lx-good)" }, { label: "money out", color: "var(--lx-bad)" }, { label: "running total, discounted", color: "var(--lx-ink)" }],
@@ -898,7 +1016,7 @@
       groupEls.push({ el: fs, site: g.site });
       g.ids.forEach(function (id) {
         var f = F[id]; if (!f) return;
-        if (f.type === "enum") ctrls[id] = Seg(fs, f, plan[id], function (v) { plan[id] = v; changed(); });
+        if (f.type === "enum") ctrls[id] = Seg(fs, f, plan[id], function (v) { plan[id] = v; changed(); }, false, segHint(P, f));
         else {
           var sl = LX.Slider(fs, { label: f.label, min: f.min, max: f.max, step: f.step || 1, value: plan[id], color: COLOR[id] || "var(--lx-ink-2)", unit: f.unit,
             fmt: function (v) { return id === "cost" ? v + "%" : fmtField(f, v); }, hint: hintOf(P, f), onChange: function (v) { plan[id] = v; changed(); } });
@@ -936,13 +1054,23 @@
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);
+      // sizes belong to the plan they were found for: a change to the plan while sizing runs stops it (changed()), "Try
+      // again" on a plan that is no longer on the controls stops at once, and the sizes are written onto the submitted
+      // plan's own site only if that plan is still the one on the controls
       sizer = LX.BenchRun(sizeBox, { label: "Size it for me", state: function () { return plan; },
-        solve: function (st, ctx) { return solve(st, P, { size: true, signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },
-        render: function (r) { var sn = r.snapped; SIZE_KEYS[plan.site].forEach(function (k) { plan[k] = sn[k]; }); refill(); changed(); setTimeout(function () { run.run(plan); }, 0); },
+        solve: function (st, ctx) {
+          if (!LX.ShareState.same(S, st, plan)) return Promise.resolve({ status: "cancelled", ok: false, results: null });
+          return solve(st, P, { size: true, signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 });
+        },
+        render: function (r, st) {
+          if (!LX.ShareState.same(S, st, plan)) throw new Error("the plan changed while it was being sized");
+          var sn = r.snapped; SIZE_KEYS[st.site].forEach(function (k) { plan[k] = sn[k]; }); refill(); changed(); setTimeout(function () { run.run(plan); }, 0);
+        },
         busy: o.api && o.api.busy,
-        words: { ok: "Sized: the engine's least-cost sizes, rounded to the controls' steps, are on the controls, and the year is running with them." } });
+        words: { ok: "Sized: the engine's least-cost sizes, rounded to the controls' steps, are on the controls, and the year is running with them.",
+          cancelled: "Sizing stopped: the plan on the controls changed. Press Size it for me to size the plan you see." } });
     }
-    function changed() { ss.set(plan); run.changed(plan); if (o.onChange) o.onChange(plan); }
+    function changed() { if (sizer && sizer.running()) sizer.cancel(); ss.set(plan); run.changed(plan); if (o.onChange) o.onChange(plan); }
     refill();
     return { ss: ss, run: run, sizer: sizer, results: res, plan: function () { return JSON.parse(JSON.stringify(plan)); },
       set: function (st, go) { plan = withPreset(plan, { state: st }); refill(); changed(); if (go) return run.run(plan); },

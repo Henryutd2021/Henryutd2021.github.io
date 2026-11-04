@@ -2020,6 +2020,9 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e0-wknav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; }
 .e0-wkname { font-family: var(--lx-f-display); font-size: 14px; color: var(--lx-ink); }
 .e0-extra:empty { display: none; }
+/* the cash flow's key (one short line each) and the week chart's line on schedules that tie */
+.e0-keys { margin: 0; padding-left: 18px; display: grid; gap: 2px; font-size: 13.5px; line-height: 1.4; color: var(--lx-ink-2); }
+.e0-sched { margin: 4px 0 0; }
 /* the result cards' single column may shrink below its content, so a wide text-version table scrolls inside its
    .lx-scroll-x instead of widening the card (and the page) */
 .e0-results .lx-xcard { grid-template-columns: minmax(0, 1fr); }

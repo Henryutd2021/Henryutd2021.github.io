@@ -2,28 +2,44 @@
 // 2026-11-03). Page: learn/c0-behind-one-meter.qmd (capstone form: Brief, Plan, Note, Self-check, Sources).
 // Built on the Site Bench (SB0): the plan runs on engine E0 (assets/learn/components/engine-e0.js, LX.E0, in the bundle)
 // through the same bench kit (LX.E0.ui.bench), under its own plan-link key (#c0-v1-...). This file adds the sensitivity
-// chart (LX.Tornado over LX.E0.sensitivity, the plan held fixed), the one-page note (LX.ReportNote: the reader's three
-// fields plus LX.E0.note), the exemplars (LX.Exemplars) and the self-check (LX.Rubric).
+// chart (LX.Tornado over LX.E0.sensitivity, the equipment held fixed), the one-page note (LX.ReportNote: the reader's
+// three fields plus LX.E0.note, with every bar of the chart in numbers, LX.E0.sensWords), the exemplars (LX.Exemplars)
+// and the self-check (LX.Rubric). The no-JS route gets the default plan's link and sensitivity (data file, reference).
 // Data: e0.json, town_year.json, cf_targets.json (the engine's), c0-behind-one-meter.json (note fields, exemplars,
 // rubric), path.json (links to other lessons).
-// The no-JS blocks (the plan's controls, the default plan's results, the note's outline, the exemplars, the rubric, the
-// inputs and the sources) are written by _tests/learn/test_c0-behind-one-meter.js --write (staticBlocks below).
+// The no-JS blocks (the plan's controls, the default plan's link, sensitivity and results, the note's outline, the
+// exemplars, the rubric, the inputs) are written by _tests/learn/test_c0-behind-one-meter.js --write (staticBlocks).
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
-  // the note's sensitivity line from tornado rows: the input with the widest swing ({ metric, input, held, base, cases })
-  function sensLine(s, sens, E0) {
-    if (!sens || !sens.rows || !sens.rows.length) return null;
-    var r = sens.rows.slice().sort(function (a, b) { return Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo); })[0], m = E0.fmt.money, f = E0.field(r.key);
-    var at = r.key === "cost" ? s.cost + "% of the sourced costs" : E0.fmt.field(f, s[r.key]);
-    return { metric: "The NPV", input: "the " + r.label.toLowerCase(), inputLabel: r.label, held: "the plan held fixed" + (r.rerun ? " and each case run again hour by hour" : ""),
-      base: { at: at, value: m(sens.base) }, cases: [{ at: r.loText, value: m(r.atLo) }, { at: r.hiText, value: m(r.atHi) }] };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  // the note's sensitivity part: every bar of the chart in numbers, widest swing first, and what was held or re-run
+  function sensLine(s, sens, E0) { var w = E0.sensWords(s, sens); return w ? w.line : null; }
+  // the plan link's end (after this page's address) for a plan on this page
+  function hashOf(SS, E0, s) { return "#" + SS.encode(E0.schemaFor("c0"), s); }
+  // the no-JS route: the default plan's link, and its sensitivity (C.reference, written by the test) as a table
+  function nojsHTML(C, E0, SS) {
+    var R = C.reference, m = E0.fmt.money;
+    var h = '<p class="lx-eyebrow">The default plan, without JavaScript</p><p class="lx-hint">Its plan link, for your note: this page\'s address followed by <code>' + esc(hashOf(SS, E0, E0.defaults())) + "</code></p>";
+    if (!R || !R.sens) return h;
+    var w = E0.sensWords(E0.defaults(), R.sens);
+    return h + '<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Input (the equipment held fixed)</th><th scope="col">Low case</th><th scope="col">NPV</th><th scope="col">High case</th><th scope="col">NPV</th></tr></thead><tbody>' +
+      R.sens.rows.map(function (r) { return "<tr><td>" + esc(r.label) + "</td><td>" + esc(r.loText) + '</td><td class="n">' + esc(m(r.atLo)) + "</td><td>" + esc(r.hiText) + '</td><td class="n">' + esc(m(r.atHi)) + "</td></tr>"; }).join("") +
+      '</tbody></table></div><p class="lx-hint">The NPV at the default plan is ' + esc(m(R.sens.base)) + ". " + esc(w.note.replace(/^Green: above your NPV; red: below\. /, "")) + " Computed on " + esc(R.date) + ".</p>";
   }
   function staticBlocks(D, C, P, E0, SS, RN, EX, RB) {
-    return { plan: SS.staticHTML(E0.schemaFor("c0"), E0.defaults()), results: E0.fallback(D), note: RN.outlineHTML(C.note.fields),
+    return { plan: SS.staticHTML(E0.schemaFor("c0"), E0.defaults()), nojs: nojsHTML(C, E0, SS), results: E0.fallback(D),
+      note: RN.outlineHTML(C.note.fields, { sensitivity: "Sensitivity: every bar of the sensitivity chart in numbers, and what was held fixed" }),
       exemplars: EX.staticHTML(C.exemplars), rubric: RB.staticHTML(C.rubric.competences), inputs: E0.inputsHTML(D, P) };
   }
-  var model = { sensLine: sensLine, staticBlocks: staticBlocks };
+  // the strong exemplar's lines as the note's three fields (the screenshot's "done" state and the test)
+  function exemplarWords(C) {
+    var g = C.exemplars.answers.filter(function (a) { return a.key === "good"; })[0];
+    var t = g.parts.map(function (q) { return typeof q === "string" ? q : q.text; }).join(""), L = {};
+    t.split("\n").forEach(function (line) { var m = /^([A-Z][^:]{0,40}):\s*(.*)$/.exec(line); if (m) L[m[1]] = m[2]; });
+    return { recommend: L.Recommendation + " " + L["CO₂"], alone: L.Alone, change: L.Sensitivity };
+  }
+  var model = { sensLine: sensLine, staticBlocks: staticBlocks, nojsHTML: nojsHTML, hashOf: hashOf, exemplarWords: exemplarWords };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -54,7 +70,7 @@
           render: function (x, st) { sens = x; sensKey = key(st); drawSens(st); },
           onDone: function () { if (rn) rn.refresh(); },
           results: [chart], busy: null,
-          words: { ok: "Done: each bar is the NPV with one input at its low or high value, the plan held fixed." } });
+          words: { ok: "Done: each bar is the NPV with one input at its low or high value, the equipment held fixed." } });
       }
       if (sens && sensKey !== key(s)) { sens = null; sensKey = null; }
       drawSens(s);
@@ -64,7 +80,7 @@
       if (!tornado) return;
       if (!sens) { tornado.draw({ base: 0, rows: [], lede: "Run the sensitivity to see which input moves the NPV most." }); return; }
       tornado.draw({ base: sens.base, rows: sens.rows, lede: "**NPV of this plan**: " + E0.fmt.money(sens.base) + " at your settings (black line).",
-        note: "Green: higher than your NPV; red: lower. A price case was run again through all 52 weeks." });
+        note: E0.sensWords(s, sens).note });
     }
     var B = E0.ui.bench(live, { P: P, schema: S, resultsHost: rh, id: "c0", onDraw: onDraw, onDone: function () { if (rn) rn.refresh(); }, onChange: function () { if (rn) rn.refresh(); } });
     // the note
@@ -91,9 +107,7 @@
       if (state !== "mid" && state !== "done") return null;
       return first.then(function () { return sensRun ? sensRun.run(B.run.last().state) : null; }).then(function () {
         if (state === "done") {
-          var g = C.exemplars.answers.filter(function (a) { return a.key === "good"; })[0], t = g.parts.map(function (q) { return typeof q === "string" ? q : q.text; }).join("");
-          var parts = t.split(/(?<=\.)\s+/);
-          rn.set({ recommend: parts[0] + " " + parts[1], alone: parts[2], change: parts[3] });
+          rn.set(exemplarWords(C));
         }
         return { view: state === "done" ? "note filled" : "sensitivity run" };
       });

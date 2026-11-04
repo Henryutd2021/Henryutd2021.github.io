@@ -1045,7 +1045,7 @@
   minutes: 60
   lab_minutes: 45   # the Modeler version's M4 notebook (learn_map_v2.yml: M4 lab_minutes)
   title: "Behind one meter: what should one home or one plant install?"
-  subtitle: "Build a plan on the Site Bench, test what could change it, and defend it in a one-page note"
+  subtitle: "Build a plan, test what could change it, and defend it in a one-page note"
   short: "Capstone: behind one meter"
   does: "Pick the Prairie Town home or the ridge wind farm; size solar, a battery and a heat pump, or an electrolyzer and a hydrogen tank; run every hour of 2025; defend the plan with its NPV, its CO₂ and what the site cannot do alone."
   outcome: "Recommend what one site should install and defend it with its net present value, its emissions, a sensitivity test and its limits."

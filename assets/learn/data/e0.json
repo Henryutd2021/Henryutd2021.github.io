@@ -41,7 +41,7 @@
   "solar": {
    "cf": 0.176,
    "method": "scale",
-   "note": "Rooftop panels follow SPP's 2025 solar shape, month by month (EIA's 2025 monthly capacity factors), scaled to a 17.6% yearly capacity factor, EIA's figure for a typical home system.",
+   "note": "Rooftop panels follow SPP's 2025 hourly solar pattern, reshaped month by month to EIA's 2025 monthly capacity factors and scaled to a 17.6% yearly capacity factor, EIA's figure for a typical home system: a modelled profile, not a measured home's output.",
    "src": [
     "eia-dg-2024",
     "eia-epm-cf"
@@ -65,7 +65,7 @@
   },
   "grid": {
    "lbPerMWh": 680,
-   "note": "One yearly average for every hour: Kansas power plants emitted 680 lb of CO2 per MWh generated in 2024 (operating emissions; location-based). The bench counts the electricity bought minus the electricity sent back at this factor. An hourly or marginal factor would differ (case file CF6).",
+   "note": "One yearly average for every hour: Kansas power plants emitted 680 lb of CO2 per MWh generated in 2024 (operating emissions; location-based). The bench counts the electricity bought at this factor, plus gas burned, as the home's CO2; power sent back is shown separately as a credit at the same factor, and the net of the two is labelled as a net (it can fall below zero, an accounting balance, not CO2 taken out of the air). An hourly or marginal factor would differ (case file CF6).",
    "src": [
     "eia-ks-profile"
    ]
@@ -137,7 +137,7 @@
    "life": 30,
    "cf": 0.338,
    "method": "power",
-   "note": "Onshore wind: $1,712 per kW to build and $34.57 per kW a year to keep up (2025 dollars); 30 years. Output follows SPP's 2025 wind shape, month by month, with a 33.8% yearly capacity factor (the U.S. fleet in 2025); the best hours reach the farm's full size.",
+   "note": "Onshore wind: $1,712 per kW to build and $34.57 per kW a year to keep up (2025 dollars); 30 years. Output follows SPP's 2025 hourly wind pattern, reshaped month by month (a power of the shape) to EIA's 2025 monthly capacity factors and a 33.8% year (the U.S. fleet in 2025); the best hours reach the farm's full size: a modelled profile, not a measured farm's output.",
    "src": [
     "eia-aeo2026-emm",
     "eia-epm-cf",
@@ -177,7 +177,7 @@
    "stackShare": 0.11,
    "stackHours": 40000,
    "life": 30,
-   "note": "DOE's PEM electrolyzer: about $2,000 per kW installed (2022 dollars); fixed upkeep 5% of that a year; 57.5 kWh of electricity per kg of hydrogen; 11% of the cost again for each 40,000 hours at full power (counted per MWh used); 30-year life.",
+   "note": "DOE's PEM electrolyzer: about $2,000 per kW installed (2022 dollars); fixed upkeep 5% of that a year; 57.5 kWh of electricity per kg of hydrogen; 30-year life. Stack wear is an illustrative throughput allowance based on DOE's replacement assumption (11% of the cost again after 40,000 operating hours): the bench charges it per MWh used, as if every operating hour ran at full power, so a unit that often runs part-loaded is charged less wear than DOE's hours-based rule would give.",
    "src": [
     "doe-h2-24005"
    ]
@@ -192,7 +192,7 @@
    "def": 4,
    "gasMMBtuPerKg": 0.18,
    "co2PerMMBtu": 52.91,
-   "note": "Illustrative: hydrogen sold at a set price per kg to one buyer, who takes at most a set amount each hour. If it replaces hydrogen made from natural gas (0.18 MMBtu of gas per kg, feedstock and heat), each kg avoids 0.18 × 52.91 = 9.52 kg of CO2 at the plant.",
+   "note": "Illustrative: hydrogen sold at a set price per kg to one buyer, who takes at most a set amount each hour. If it replaces hydrogen made from natural gas (0.18 MMBtu of gas per kg, feedstock and heat), each kg avoids 0.18 × 52.91 = 9.52 kg of CO2 at the gas plant: a potential saving, which leaves out the grid power the electrolyzer's MWh no longer replace.",
    "src": [
     "eia-aeo2026-hmm",
     "eia-co2"
@@ -221,7 +221,7 @@
  "tie": {
   "home": 0.0002,
   "farm": 0.02,
-  "note": "Tie rule: a wear charge of 0.02¢ per kWh (home) or 2¢ per MWh (wind farm) on the energy into and out of the battery, so the battery never cycles for nothing. It is left out of every reported number. Several schedules can still tie hour by hour; the totals the bench reports are shared by every least-cost schedule (checked in the test)."
+  "note": "Tie rule: a wear charge of 0.02¢ per kWh (home) or 2¢ per MWh (wind farm) on the energy into and out of the battery, so the battery never cycles for nothing; on the wind farm, also a preference of at most one part in a million for selling power and hydrogen earlier in each week. Both are left out of every reported number. Several schedules can still tie hour by hour: every yearly and weekly total the bench reports (money, CO2, own solar's share, the spilled share) is shared by every least-cost schedule (checked in the test); with storage, the counts of hours at the grid, the line or the buyer's limit, the busiest grid hour and the hourly chart belong to the schedule shown, and the bench says so."
  },
  "sources": {
   "eia-aeo2026-emm": {
@@ -364,21 +364,21 @@
     },
     {
      "key": "co2",
-     "label": "CO₂ a year",
-     "value": "3.1 t",
-     "note": "down 2.9 t from 5.9 t"
+     "label": "CO₂ a year, bought power and gas",
+     "value": "4.6 t",
+     "note": "down 1.3 t from 5.9 t; net of power sent back, credited at the same factor: 3.1 t"
     },
     {
      "key": "self",
-     "label": "Own solar and battery cover",
+     "label": "Own solar covers",
      "value": "48%",
-     "note": "of the home's electricity use"
+     "note": "of the home's electricity use, at once or through the battery"
     },
     {
      "key": "grid",
      "label": "Hours that need the grid",
      "value": "5,240 h",
-     "note": "of 8,760; the most it draws in one hour: 1.5 kWh"
+     "note": "of 8,760; the busiest hour draws 1.5 kWh"
     }
    ]
   },
