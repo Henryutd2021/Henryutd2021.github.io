@@ -124,8 +124,8 @@
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
-
   // ================================================================ F3: view
+  var LX = window.LX, H = LX.H, S = LX.S;   // (declared with the Sankey's view until it moved to components/sankey.js)
   // Lesson-local: HomeScene (a cutaway of the home with six service buttons, the rooms each one uses lit, a text version).
   // Shared: LX.StepCards, LX.CardSort, LX.Predict, LX.Guess, LX.Slider, LX.Plot, LX.NumAnswer, LX.CompareTable,
   // LX.CausalChain, LX.demo, LX.Sankey (components/sankey.js).
