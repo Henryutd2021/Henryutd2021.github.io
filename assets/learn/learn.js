@@ -9988,7 +9988,9 @@
 
    Data: assets/learn/data/e1-prairie-campus.json (scripts/build_learn_e1_data.mjs): lesson F7's Prairie Campus (fictional;
    flat loads: hospital 300 kW, water and heating plant 100 kW, dorms 250 kW, labs 550 kW), illustrative costs in 2025
-   dollars, real 2025 solar shapes per kW of panels, EIA's tariff level, diesel price and CO2 factors, the outage scenarios.
+   dollars, a teaching solar profile per kW of panels (SPP's observed 2025 hourly shape scaled to EIA's monthly capacity
+   factors; not measured campus output), EIA's tariff level, diesel price and CO2 factors, the outage scenarios (the grid
+   assumed down in those weather windows: hypothetical outages, not outage records).
 
    The plan (the schema, LX.ShareState): solar kW (pv), battery kWh (bat; a 4-hour battery, so its kW is kWh / 4), whole
    200 kW generator sets (gen), diesel kept on site in gallons (fuel), each load's priority (must stay on, keep if
@@ -9998,8 +10000,13 @@
    Two models (every power in kW over one hour = kWh):
    1. The check of a plan ("run", sizes fixed): an LP for the grid-connected year, 12 average days (one per month,
       weighted by its days): solar used s <= pv x sun, battery charge c and discharge d <= bat / 4, stored q <= bat with
-      q_h = q_(h-1) + 0.9 c_h - d_h around the day, import i <= imp, export e <= exp, s + d + i = 1,200 + c + e;
-      cost = sum of weight x (tariff_h x i - credit x e). The generator runs only in outages (illustrative rule).
+      q_h = q_(h-1) + 0.9 c_h - d_h around the day (each average day ends where it began: the battery cycles daily and
+      carries nothing from one day to the next), import i <= imp, export e <= exp, s + d + i + x = 1,200 + c + e;
+      cost = sum of weight x (tariff_h x i - credit x e), plus $10 per kWh x left unserved (the year may fall short only
+      when the import limit is below 1,200 kW and the plan cannot make up the rest; the page then says so, shows the
+      kWh and does not compare the cost with the grid-only bill: W3 review SB1 1, C1 3). The generator runs only in
+      outages (illustrative rule). The 12 average days smooth the weather: the test checks four plans against a
+      chronological 8,760-hour year (F7's campus: the same bill; larger solar-and-battery plans: a bill 4% to 7% higher).
       Then one MILP per outage scenario (islanded; the battery and the tank start full): s + d + g - c = loads served;
       g <= 200 u, g >= 60 u (a set that is on runs at 30% or more), u = sets on, a whole number from 0 to gen;
       fuel: sum 0.07 g <= the gallons on site; each load may be partly served. The objective is a priority order, not
@@ -10008,14 +10015,20 @@
       over its life at the owner's cost of capital, plus upkeep, the tank and the year's grid bill), with every
       must-stay-on load served in every hour of every chosen outage. To keep it small it leaves out the 30% minimum
       (g <= 200 x gen only); the check above then runs the plan with it. The chosen sizes are rounded up to the bench's
-      steps (25 kW, 50 kWh) and checked.
+      steps (25 kW, 50 kWh) and checked: a safe candidate (more equipment never makes the check worse), not proven the
+      cheapest plan on the steps (W3 review SB1 6: a nearby plan on the steps can cost a few dollars less).
+   Annual cost (summarize, note): equipment paid over its life plus upkeep and the tank, plus the normal-year grid bill.
+   It leaves out the diesel burned in an outage and refilling the tank: each outage reports its gallons and their cost
+   at EIA's diesel price on its own, with no outage frequency assumed (W3 review SB1 8, C1 6, M5 5).
 
-   Tie rule (W2 review finding 2): the check's objective adds, in this order, a 1% weight step between loads of one
-   priority (the list order: hospital, water and heat, dorms, labs), up to 0.1% for serving earlier hours before later
-   ones, 0.01 per gallon of fuel and 0.0001 per kWh through the battery; the year LP adds $0.0001 per kWh through the
-   battery. Totals the page reports (unserved kWh per load, gallons, the bill) are what these rules fix; the hourly
-   schedule drawn is one of possibly several with those totals. The test re-solves with other tie weights and checks
-   that the totals stay the same.
+   Tie rule (W2 review finding 2; weights restated, W3 review SB1 7): the check's objective is weighted, not a strict
+   order. Unserved kWh of must stay on weigh 1,000, keep if possible 10, shed first 1; within a priority each step up the
+   list (hospital, water and heat, dorms, labs) adds 0.5% and each hour earlier in the outage up to 2% in all, so an
+   earlier hour can outweigh the list order; then 0.01 per gallon of fuel and 0.0001 per kWh through the battery. The
+   year LP adds $0.0001 per kWh through the battery; the sizing $0.001 per gallon and $0.000001 per kWh through the
+   battery in an outage (a few dollars at most). Totals the page reports (unserved kWh per load, gallons, the bill) are
+   what these rules fix; the hourly schedule drawn is one of possibly several with those totals. The test re-solves with
+   other tie weights and checks that the totals stay the same.
    Every MILP here stops only within 0.0001% of its best bound (mip_rel_gap 1e-6, not HiGHS's default 0.01%), so the
    reported totals are the optimum's, not a near-optimum's.
    No false certificates (finding 3): "optimal" only when every solve of a run is optimal; a time limit returns the best
@@ -10028,11 +10041,20 @@
        { status, ok, kind: "milp", message, hint, results, mipGap, ms }   never rejects; `solver(model, opts)` replaces
        LX.solver.solve (tests stub it); `scenarios` (ids or scenario objects) replaces the plan's outages
      E1.summarize(state, raw), E1.note(state, results, P), E1.fallback(P, page key: "sb1" or "c1")
+       results: { plan, owner, rate, equipment, year (bill, imports, exports, unserved, co2, ...), base, total, saving,
+       short (the normal year leaves load unserved), comparable (!short: only then is the saving a like-for-like
+       comparison), outages [{ must, keep, shed, perLoad, fuel, fuelCost, co2, lasts, hours, ... }], cls, mustKW, ... }
      Models (pure): yearModel, outageModel, sizeModel, read*, costs, roundUp, hint, seeded, forecast, realTime, roll
      Branch and bound on the sizing model's whole numbers (M5): E1.bb.{tree, pending, accept, branch, bound, gap, done,
        proven, retry, verdict, run, layout}
    Node: module.exports = E1 (no DOM). In a page: LX.E1, with the shared view pieces LX.E1.Line (the one-line diagram),
-   LX.E1.Bench (the controls, presets, run box and plan link), LX.E1.Results (readouts, tables, charts). */
+   LX.E1.Bench (the controls, presets, run box with a Stop button and plan link), LX.E1.Results (readouts, tables,
+   charts), LX.E1.ui.stopper() (a Stop button for any LX.BenchRun: { busy, attach(run) }; shown while it runs, cancels it).
+   Changes after the W3 reviews (2026-11-03; assets/learn/README.md lists them): normal-year unserved load reported and
+   the saving withheld when service differs; outage diesel shown with its cost and kept out of the annual cost; the
+   sizing's plan adopted from the plan it was given (a change while it runs stops it) and the other results told; a
+   Stop button; the tie weights stated; end-of-hour labels in the battery table; realTime brings must-stay-on loads
+   back before it charges the battery. */
 (function () {
   "use strict";
   var MD = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -10081,6 +10103,8 @@
     return d.getUTCDate() + " " + MON[d.getUTCMonth()] + " " + hh(h % 24);
   }
   function hh(h) { return (h < 10 ? "0" : "") + h + ":00"; }
+  // the end of hour t (the battery's charge and the diesel left are states at the end of the hour: W3 review SB1 13, M5 11)
+  function hourEnd(sc, t) { return when(sc, t + 1); }
 
   // ---------------------------------------------------------------- the plan
   function makeSchema(o) {
@@ -10372,13 +10396,19 @@
   // ---------------------------------------------------------------- what the page shows (pure)
   function summarize(state, ctx) {
     var P = ctx.P, raw = ctx.raw, y = readYear(state, P, raw.year), cs = costs(state, P);
-    var res = { plan: { pv: state.pv, bat: state.bat, gen: state.gen, fuel: state.fuel }, owner: owner(P, state), task: ctx.task,
+    var res = { plan: { pv: state.pv, bat: state.bat, gen: state.gen, fuel: state.fuel, imp: state.imp, exp: state.exp }, owner: owner(P, state), task: ctx.task,
       equipment: cs.annual, rate: cs.rate, year: y, base: baseBill(state, P), outages: [], sized: raw.sized || null };
     res.total = cs.annual.equipment + y.bill;
     res.saving = res.base - res.total;
+    // a plan that leaves load unserved in a normal year buys less service than the grid-only bill: the saving is then
+    // not a like-for-like comparison, and the pages say so instead of showing it as a saving
+    res.short = y.unserved > 0.5;
+    res.comparable = !res.short;
+    res.fuelPrice = P.cfg.fuel.price;
     (raw.outages || []).forEach(function (o) {
       var r = readOutage(state, P, o.sc, o.r);
       r.label = o.sc.label; r.short = o.sc.short; r.status = o.r.status; r.gap = o.r.mipGap; r.sc = o.sc;
+      r.fuelCost = r.fuel * P.cfg.fuel.price;   // this outage's diesel at EIA's 2025 price: not in the annual cost
       res.outages.push(r);
     });
     res.cls = classes(state, P);
@@ -10388,6 +10418,12 @@
   }
   function money(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   function kilo(v) { return Math.round(v).toLocaleString("en-US"); }
+  // the annual cost's boundary, in one line (the pages and the note say the same)
+  var COST_NOTE = "equipment and upkeep plus the normal-year grid bill (12 average days), 2025 dollars; outage diesel not included";
+  // an outage's diesel bill, to the nearest $10 (so 675 gallons at $3.66 reads $2,470 whether 674.9 or 675.1 burned)
+  function fuelMoney(v) { return money(Math.round(v / 10) * 10); }
+  // "675 gallons of diesel burned ($2,470 at $3.66 a gallon, not in the annual cost)"
+  function fuelWords(o, R) { return kilo(o.fuel) + " gallons of diesel burned (" + fuelMoney(o.fuelCost) + " at $" + R.fuelPrice.toFixed(2) + " a gallon, not in the annual cost)"; }
   function note(state, R, P) {
     var p = R.plan, cls = R.cls;
     var names = function (ks) { return ks.map(function (k) { return P ? P.loads[k].short.toLowerCase() : k; }).join(", ") || "none"; };
@@ -10397,16 +10433,19 @@
       plan: [{ label: "Solar panels", value: kilo(p.pv) + " kW" }, { label: "Battery", value: kilo(p.bat) + " kWh (" + kilo(p.bat / 4) + " kW)" },
         { label: "Generator sets", value: p.gen + " × 200 kW" }, { label: "Diesel on site", value: kilo(p.fuel) + " gallons" },
         { label: "Must stay on", value: names(cls.must) }, { label: "Owner", value: R.owner.label + " (" + Math.round(R.rate * 100) + "% real cost of capital)" }],
-      results: [{ label: "Annual cost", value: money(R.total), note: "equipment paid over its life plus the year's grid bill, 2025 dollars" },
-        { label: "The year's bill with nothing built", value: money(R.base) }].concat(R.outages.map(function (o) {
-          return { label: "Unserved must-stay-on load, " + o.short.toLowerCase(), value: kilo(o.must) + " kWh", note: kilo(o.fuel) + " gallons burned, " + (o.co2 / 1000).toFixed(1) + " t CO2" };
-        })).concat([{ label: "CO2 from grid electricity in a normal year", value: kilo(R.year.co2) + " t", note: "average factor, operating only" }]),
+      results: [{ label: "Annual cost", value: money(R.total), note: COST_NOTE }]
+        .concat(R.short ? [{ label: "Unserved in a normal year on the grid", value: kilo(R.year.unserved) + " kWh", note: "the feeder's import limit and this plan cannot carry the whole campus, so the cost is not comparable with the grid-only bill" }] : [])
+        .concat([{ label: "The year's bill with nothing built", value: money(R.base) }]).concat(R.outages.map(function (o) {
+          return { label: "Unserved must-stay-on load, " + o.short.toLowerCase(), value: kilo(o.must) + " kWh", note: fuelWords(o, R) + ", " + (o.co2 / 1000).toFixed(1) + " t CO2" };
+        })).concat([{ label: "CO2 from grid electricity in a normal year", value: kilo(R.year.co2) + " t", note: "U.S. average CO2 per kWh, from operation only" }]),
       assumptions: ["Prairie Campus and its loads are fictional (lesson F7's), each load flat in every hour",
         "Costs are illustrative 2025 dollars; the tariff is set to EIA's 2025 U.S. commercial average",
+        "The annual cost leaves out the diesel burned in an outage and refilling the tank; no outage frequency is assumed",
         "The battery and the diesel tank are full when an outage starts; no fuel arrives during it",
-        "The model knows the coming sun (perfect foresight); the solar shapes are SPP's in 2025"],
+        "The model knows the coming sun (perfect foresight); the sun is a teaching profile from SPP's 2025 hourly solar, not measured campus output"],
       sensitivity: null,
       limits: ["It checks only the outages chosen: a different start, a longer storm or a broken set can turn out worse",
+        "Its year is 12 average days: over a full 8,760-hour year, a large solar-and-battery plan's grid bill comes out up to 7% higher",
         "It leaves out the network inside the campus, the generator's part-load fuel use and battery wear"]
     };
   }
@@ -10435,9 +10474,11 @@
   }
   // one real hour, following the plan: the planned sets stay on (or off) and the plan's loads are the targets. The real
   // sun all goes in first, then the plan's generator output. Short: the battery, then the sets up to full, then loads
-  // shed in reverse priority (shed first, keep if possible, must stay on; the list's last load first). Spare: the sets
-  // down to their minimum, then the battery charges, then shed loads come back in priority order, then the panels are
-  // curtailed. Returns the hour and the new state { soc, fuel }.
+  // shed in reverse priority (shed first, keep if possible, must stay on; the list's last load first). Spare: first the
+  // must-stay-on loads the plan shed come back (the forecast was gloomier than the sun; W3 review M5 1: before, the
+  // battery charged first and left them short), then the sets go down to their minimum, then the battery charges, then
+  // the other shed loads come back in priority order, then the panels are curtailed. Returns the hour and the new
+  // state { soc, fuel }.
   function realTime(state, P, h, st) {
     var T = P.T, U = T.gen.unitKW, eta = T.bat.eff, gpk = T.gen.galPerKWh;
     var u = Math.max(0, Math.min(state.gen, Math.round(h.u || 0)));
@@ -10455,10 +10496,11 @@
       var up = Math.min(net, gmax - g); g += up; net -= up;
       for (i = 0; i < order.length && net > 1e-9; i++) { k = order[i]; var cut = Math.min(serve[k], net); serve[k] -= cut; net -= cut; }
     } else if (net < -1e-9) {
-      var spare = -net;
+      var spare = -net, add;
+      for (i = order.length - 1; i >= 0 && spare > 1e-9; i--) { k = order[i]; if (prio(state, P.loads[k].key) !== "must") continue; add = Math.min(P.loads[k].kw - serve[k], spare); serve[k] += add; spare -= add; }
       var down = Math.min(spare, g - gmin); g -= down; spare -= down;
       c = Math.min(spare, cMax); spare -= c;
-      for (i = order.length - 1; i >= 0 && spare > 1e-9; i--) { k = order[i]; var add = Math.min(P.loads[k].kw - serve[k], spare); serve[k] += add; spare -= add; }
+      for (i = order.length - 1; i >= 0 && spare > 1e-9; i--) { k = order[i]; add = Math.min(P.loads[k].kw - serve[k], spare); serve[k] += add; spare -= add; }
       s -= Math.min(spare, s);
     }
     var soc = Math.min(state.bat, Math.max(0, st.soc + eta * c - d)), fuel = Math.max(0, st.fuel - gpk * g);
@@ -10600,7 +10642,7 @@
       return o;
     });
   }
-  var E1 = { VERSION: 1, lengths: lengths, MD: MD, PRIO: PRIO, PRIO_NAMES: PRIO_NAMES, PRIO_W: PRIO_W, TIE: TIE, FKEYS: FKEYS, prepare: prepare, seeded: seeded, rng: rng, when: when, hh: hh,
+  var E1 = { VERSION: 1, lengths: lengths, MD: MD, PRIO: PRIO, PRIO_NAMES: PRIO_NAMES, PRIO_W: PRIO_W, TIE: TIE, FKEYS: FKEYS, prepare: prepare, seeded: seeded, rng: rng, when: when, hh: hh, hourEnd: hourEnd, costNote: COST_NOTE, fuelWords: fuelWords, fuelMoney: fuelMoney,
     makeSchema: makeSchema, schema: schema, presets: presets, classes: classes, kwOf: kwOf, rate: rate, crf: crf, owner: owner, costs: costs, baseBill: baseBill,
     yearModel: yearModel, readYear: readYear, outageModel: outageModel, readOutage: readOutage, sizeModel: sizeModel, readSize: readSize, roundUp: roundUp,
     hint: hint, solve: solve, worst: worst, summarize: summarize, note: note, fallback: fallback, forecast: forecast, realTime: realTime, roll: roll, bb: bb,
@@ -10647,6 +10689,22 @@
     if (hint) H("p", { class: "lx-hint e1-ghint", html: LX.rich(hint).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, f);
     return f;
   }
+  // a Stop button for an LX.BenchRun (W3 review SB1 9): pass s.busy as the run box's busy callback, then s.attach(run).
+  // It sits after Run, shows only while a run is on, and cancels it (run.cancel()); focus then goes to Run, since Stop
+  // hides itself (a keyboard reader would otherwise lose their place)
+  function stopper() {
+    var b = null, run = null;
+    return {
+      busy: function (on) { if (b) b.hidden = !on; },
+      attach: function (r) {
+        run = r;
+        b = H("button", { class: "lx-btn ghost small e1-stop", type: "button", text: "Stop", hidden: true });
+        r.button.parentNode.insertBefore(b, r.again);
+        b.addEventListener("click", function () { if (!run.running()) return; run.cancel(); run.button.focus(); });
+        return b;
+      }
+    };
+  }
 
   // ---- the one-line diagram: the feeder, the switch to the grid, the campus bus, the sources and the loads, each load
   //      with its priority (three buttons) when editable. Real buttons, a phone layout (one column) and a text version.
@@ -10654,11 +10712,13 @@
     var P = o.P, plan = o.plan, el = H("div", { class: "e1-line" + (o.island ? " island" : "") }, host);
     var top = H("div", { class: "e1-top" }, el);
     var fd = H("div", { class: "e1-node e1-feeder" }, top);
-    fd.innerHTML = ic("tower") + '<span class="e1-nt"><b>Host feeder</b><small class="e1-fl"></small></span>';
+    fd.innerHTML = ic("tower") + '<span class="e1-nt"><b>Host <span class="lx-term" data-term="feeder">feeder</span></b><small class="e1-fl"></small></span>';
     H("span", { class: "e1-wire", "aria-hidden": "true" }, top);
     var sw = H("div", { class: "e1-node e1-switch" }, top);
     sw.innerHTML = '<span class="e1-sym" aria-hidden="true"><i></i></span><span class="e1-nt"><b>Switch to the grid</b><small class="e1-ss"></small></span>';
-    H("div", { class: "e1-bus", "aria-hidden": "true" }, el).appendChild(H("span", { text: "Campus bus" }));
+    // the bus, named and defined (W3 review C1 8); on phones the label keeps only its name, which fits on one line (the
+    // text version below says what it is)
+    H("div", { class: "e1-bus", "aria-hidden": "true" }, el).appendChild(H("span", { html: 'Campus bus<span class="e1-busdef">: the shared connection</span>' }));
     var cols = H("div", { class: "e1-cols" }, el);
     var sc = H("div", { class: "e1-col" }, cols), lc = H("div", { class: "e1-col" }, cols);
     H("p", { class: "e1-colh", text: "Sources" }, sc); H("p", { class: "e1-colh", text: "Loads, and what stays on in an outage" }, lc);
@@ -10695,7 +10755,7 @@
       altList.innerHTML = "";
       ["Host feeder: imports up to " + kilo(p.imp) + " kW, exports up to " + kilo(p.exp) + " kW.",
         "Switch to the grid (the point of common coupling): " + (o.island ? "open, so the campus runs as an island." : "closed."),
-        "Sources on the campus bus: " + kilo(p.pv) + " kW of solar panels, a " + kilo(p.bat) + " kWh battery (" + kilo(p.bat / 4) + " kW), " + p.gen + " generator set" + (p.gen === 1 ? "" : "s") + " of 200 kW with " + kilo(p.fuel) + " gallons of diesel."]
+        "Sources on the campus bus (the shared electrical connection every source and load meets at): " + kilo(p.pv) + " kW of solar panels, a " + kilo(p.bat) + " kWh battery (" + kilo(p.bat / 4) + " kW), " + p.gen + " generator set" + (p.gen === 1 ? "" : "s") + " of 200 kW with " + kilo(p.fuel) + " gallons of diesel."]
         .concat(P.loads.map(function (l) { return l.label + ", " + l.kw + " kW: " + PRIO_NAMES[prio(p, l.key)].toLowerCase() + "."; }))
         .forEach(function (t) { H("li", { text: t }, altList); });
     }
@@ -10712,8 +10772,8 @@
     var P = o.P, S = o.schema || schema, L = P.cfg.limits;
     var wrap = H("div", { class: "lx-sb e1-sb" }, live);
     var ctr = H("div", { class: "lx-sb-controls" }, wrap), side = H("div", { class: "lx-sb-side" }, wrap);
-    var plan = null, ctl = {}, task = "run", sizeNote = null, lastRun = null;
-    var ss = LX.ShareState(side, { schema: S, id: o.slug + "-link", onLoad: function (s) { plan = s; paint(); run.changed(plan); if (o.onChange) o.onChange(plan); } });
+    var plan = null, ctl = {}, task = "run", sizeNote = null, lastRun = null, adopted = false;
+    var ss = LX.ShareState(side, { schema: S, id: o.slug + "-link", onLoad: function (s) { stopSizing(); plan = s; paint(); run.changed(plan); if (o.onChange) o.onChange(plan); } });
     plan = ss.state;
     var g0 = fieldset(ctr, "The campus", "Set what must stay on in an outage: **Must** stay on, **Keep** if possible, **Shed** first.");
     var line = E1.Line(g0, { P: P, plan: plan, editable: true, onPrio: function (k, v) { var p = copy(plan); p[FKEYS[k]] = v; change(p); } });
@@ -10736,7 +10796,7 @@
       });
     }
     if (!(o.hide && o.hide.out)) {
-      var g2 = fieldset(ctr, "Outages to plan for", "Each is a real 2025 stretch of sun with the grid down; the battery and the tank start full.");
+      var g2 = fieldset(ctr, "Outages to plan for", "Hypothetical: the grid assumed down during a stretch of 2025 sun; the battery and the tank start full.");
       var tg2 = H("div", { class: "lx-toggles", role: "group", "aria-label": "Outages to plan for" }, g2);
       ctl.out = {};
       P.list.forEach(function (id) {
@@ -10745,13 +10805,13 @@
           p.out = P.list.filter(function (y) { return a.indexOf(y) >= 0; }); change(p); } });
       });
     }
-    var g3 = fieldset(ctr, "Host feeder and tariff", "The feeder carries at most these kW; the tariff sets what each kWh bought costs.");
+    var g3 = fieldset(ctr, "Host feeder and tariff", "The [[feeder|feeder]] carries at most these kW; the [[tariff|tariff]] sets what each kWh bought costs.");
     ctl.exp = LX.Slider(g3, { label: "Export limit", color: COL.grid, min: L.exp[0], max: L.exp[1], step: L.exp[2], value: plan.exp, fmt: function (v) { return kilo(v) + " kW"; }, onChange: function (v) { var p = copy(plan); p.exp = v; change(p); } });
     ctl.imp = LX.Slider(g3, { label: "Import limit", color: COL.grid, min: L.imp[0], max: L.imp[1], step: L.imp[2], value: plan.imp, fmt: function (v) { return kilo(v) + " kW"; }, onChange: function (v) { var p = copy(plan); p.imp = v; change(p); } });
     var tr = H("div", { class: "e1-segrow" }, g3); H("span", { class: "e1-segl", text: "Tariff" }, tr);
     ctl.tar = seg(tr, "Tariff", ["tou", "flat"], { tou: "Time-of-use", flat: "Flat" }, plan.tar, function (v) { var p = copy(plan); p.tar = v; change(p); });
     if (!(o.hide && o.hide.owner)) {
-      var g4 = fieldset(ctr, "Owner", "Who pays for the equipment sets the cost of capital (illustrative): utility 6%, co-op 4%, community 5%.");
+      var g4 = fieldset(ctr, "Owner", "Who pays for the equipment sets the [[cost-of-capital|real cost of capital]] (illustrative): utility 6%, co-op 4%, community 5%.");
       ctl.own = seg(g4, "Owner", ["utility", "coop", "community"], { utility: "Utility", coop: "Co-op", community: "Community" }, plan.own, function (v) { var p = copy(plan); p.own = v; change(p); });
     }
     // side: presets, the run box, readouts, the plan link
@@ -10760,25 +10820,33 @@
       H("button", { class: "lx-btn ghost small", type: "button", text: pr.label, title: pr.note, onclick: function () { var p = copy(plan); for (var k in pr.state) p[k] = pr.state[k]; change(p); } }, pre);
     });
     var stale = H("p", null, o.resultsHost), res = H("div", { class: "lx-sb-results" }, o.resultsHost);
-    var ro = H("div", { class: "lx-readouts e1-ro" });
-    var run = LX.BenchRun(side, { label: o.runLabel || "Run the outages", state: function () { return plan; }, partial: true, busy: o.busy, results: [res, ro], stale: stale,
+    var ro = H("div", { class: "lx-readouts e1-ro" }), stopB = stopper();
+    var run = LX.BenchRun(side, { label: o.runLabel || "Run the outages", state: function () { return plan; }, partial: true, results: [res, ro], stale: stale,
+      busy: function (on) { stopB.busy(on); if (o.busy) o.busy(on); },
       solve: function (st, ctx) { var t = task; return E1.solve(st, P, { task: t, check: t === "size" ? false : undefined, signal: ctx.signal, attempt: ctx.attempt, scenarios: o.scenarios ? o.scenarios(st, t) : null, solver: o.solver ? o.solver(t) : null }).then(function (r) { r.task = t; return r; }); },
       render: function (R, st, r) {
-        if (r.task === "size") {   // adopt the sizes (rounded up to the bench's steps), then check them hour by hour
-          var p = copy(plan); p.pv = R.plan.pv; p.bat = R.plan.bat; p.gen = R.plan.gen;
+        if (r.task === "size") {
+          // adopt the sizes (rounded up to the bench's steps) onto the plan the sizing was given (st), never onto
+          // choices made while it ran (a change stops a sizing: change() below; W3 review SB1 3); then tell every
+          // results panel that the plan changed (SB1 2) and check the sizes hour by hour (onDone)
+          adopted = LX.ShareState.same(S, st, plan);
+          if (!adopted) { sizeNote = null; return; }
+          var p = copy(st); p.pv = R.plan.pv; p.bat = R.plan.bat; p.gen = R.plan.gen;
           sizeNote = { plan: copy(p), sized: R.sized, proven: r.status === "optimal", gap: r.mipGap };
-          plan = p; ss.set(plan); paint();
+          plan = p; ss.set(plan); paint(); run.changed(plan);
+          if (o.onChange) o.onChange(plan);
           return;
         }
         lastRun = { plan: copy(st), R: R, r: r };
         readouts(R); if (o.draw) o.draw(res, R, st, r, noteFor(st)); if (o.onRun) o.onRun(R, st, r);
       },
-      onDone: function (r) { if (r && r.task === "size" && r.results) setTimeout(function () { task = "run"; run.run(plan); }, 0); }
+      onDone: function (r) { if (r && r.task === "size" && r.results && adopted) { adopted = false; setTimeout(function () { task = "run"; run.run(plan); }, 0); } }
     });
+    stopB.attach(run);
     var sizeB = H("button", { class: "lx-btn ghost small", type: "button", text: "Size it for me" }, run.button.parentNode);
     sizeB.addEventListener("click", function () { if (run.running()) return; task = "size"; run.run(plan); });
     run.button.parentNode.addEventListener("click", function (e) { if (e.target === run.button || run.button.contains(e.target)) task = "run"; }, true);
-    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages, then runs them.") }, side);
+    H("p", { class: "lx-hint e1-sizehint", html: "<b>Size it for me</b> " + LX.rich("asks the [[mixed-integer-program|mixed-integer program]] for the cheapest sizes that keep every must-stay-on load on through the chosen outages, rounds them up to the bench's steps and runs them: a safe plan, not proven the cheapest on the steps.") }, side);
     side.appendChild(ro);
     side.insertBefore(ss.status, pre);
     side.appendChild(ss.el);
@@ -10788,11 +10856,21 @@
       ro.innerHTML = "";
       var outs = o.main ? R.outages.slice(0, o.main) : R.outages;   // a capstone's extra runs (C1: other storm lengths) stay out
       var worstMust = outs.reduce(function (m, x) { return Math.max(m, x.must); }, 0);
-      [["Annual cost", money(R.total), ""], ["Saving on the grid-only bill", money(R.saving), R.saving >= 0 ? "good" : "bad"],
+      // a plan that leaves load unserved in a normal year gets that kWh in place of a saving (SB1 1, C1 3)
+      [["Annual cost (12 average days)", money(R.total), ""], R.comparable ? ["Saving on the grid-only bill", money(R.saving), R.saving >= 0 ? "good" : "bad"] : ["Unserved in a normal year", kwh(R.year.unserved), "bad"],
         [outs.length > 1 ? "Must-stay-on unserved, worst outage" : "Must-stay-on load unserved", outs.length ? kwh(worstMust) : "no outage chosen", worstMust > 0.5 ? "bad" : "good"],
         ["CO₂ in a normal year", kilo(R.year.co2) + " t", ""]].forEach(function (x) {
         var d = H("div", { class: "lx-readout " + x[2] }, ro); H("span", { text: x[0] }, d); H("b", { text: x[1] }, d);
       });
+    }
+    // a sizing still running when the plan changes is stopped: its sizes would belong to the earlier choices (SB1 3).
+    // BenchRun's "Try again" would size that earlier plan, so it stays hidden and the status says what to do
+    function stopSizing() {
+      if (task !== "size" || !run || !run.running()) return;
+      run.cancel(); task = "run";
+      run.again.hidden = true;
+      run.status.setAttribute("data-kind", "cancelled");
+      run.status.textContent = "Size it for me stopped: the plan changed while it ran, so its sizes would be for the earlier choices. Press it again to size this plan.";
     }
     function paint() {
       line.set(plan);
@@ -10802,6 +10880,7 @@
       if (ctl.out) P.list.forEach(function (id) { ctl.out[id].set(plan.out.indexOf(id) >= 0); });
     }
     function change(p) {
+      stopSizing();
       plan = p; paint(); ss.set(plan); run.changed(plan);
       if (o.onChange) o.onChange(plan);
     }
@@ -10817,8 +10896,11 @@
     var P = o.P;
     host.innerHTML = "";
     if (o.sizeNote) H("p", { class: "e1-sized", html: (o.sizeNote.proven ? "<b>Sized by the mixed-integer program</b> " : "<b>Sized by a run stopped at its time limit</b>: ") + LX.esc(o.sizeNote.proven
-      ? "for the chosen outages: " + kilo(o.sizeNote.sized.exact.pv) + " kW, " + kilo(o.sizeNote.sized.exact.bat) + " kWh and " + o.sizeNote.sized.exact.gen + " set" + (o.sizeNote.sized.exact.gen === 1 ? "" : "s") + ", optimal; rounded up to the bench's steps and checked below with whole sets and their 30% minimum."
+      ? "for the chosen outages: " + kilo(o.sizeNote.sized.exact.pv) + " kW, " + kilo(o.sizeNote.sized.exact.bat) + " kWh and " + o.sizeNote.sized.exact.gen + " set" + (o.sizeNote.sized.exact.gen === 1 ? "" : "s") + ", optimal (" + money(o.sizeNote.sized.total) + " a year). Rounded up to the bench's steps, a safe plan but not proven the cheapest on them, and checked below with whole sets and their 30% minimum."
       : "the best plan found so far (gap " + (o.sizeNote.gap != null ? (o.sizeNote.gap * 100).toFixed(2) + "%" : "unknown") + "), not proven the cheapest; checked below.") }, host);
+    // a plan that cannot carry the campus in a normal year (the import limit below 1,200 kW): said first (SB1 1, C1 3)
+    if (R.short) H("p", { class: "e1-short", role: "note", html: "<b>This plan leaves " + kwh(R.year.unserved) + " unserved in a normal year on the grid.</b> " +
+      LX.esc("The feeder's import limit (" + kilo(R.plan.imp) + " kW) is below the campus's " + kilo(P.total) + " kW and the plan cannot make up the rest, so its cost buys less service than the grid-only bill: no saving is shown.") }, host);
     var grid = H("div", { class: "lx-sb-charts" }, host);
     // the annual cost
     var c1 = H("div", { class: "lx-xcard lx-sb-chart" }, grid); H("h3", { text: "Where the annual cost goes" }, c1);
@@ -10834,18 +10916,24 @@
       var bar = H("td", { class: "e1-barcell", "aria-hidden": "true" }, tr); H("span", { class: "e1-bar", style: "--c:" + x[2] + ";width:" + Math.max(0, x[1] / top * 100).toFixed(1) + "%" }, bar);
     });
     var tf = H("tfoot", null, tb);
-    [["Annual cost of this plan", R.total], ["The bill with nothing built", R.base]].forEach(function (x, i) {
+    [["Annual cost of this plan", R.total], [R.comparable ? "The bill with nothing built" : "The bill with nothing built (serves every load)", R.base]].forEach(function (x, i) {
       var tr = H("tr", { class: i ? "e1-base" : "e1-total" }, tf); H("td", { text: x[0] }, tr); H("td", { class: "n", text: money(x[1]) }, tr);
       var bar = H("td", { class: "e1-barcell", "aria-hidden": "true" }, tr); H("span", { class: "e1-bar " + (i ? "base" : "tot"), style: "width:" + (x[1] / top * 100).toFixed(1) + "%" }, bar);
     });
-    H("p", { class: "lx-hint", html: LX.rich("Equipment paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[capital-recovery-factor|cost of capital]], plus upkeep; 2025 dollars, illustrative. Grid electricity: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (average factor, operating only).") }, c1);
+    // the cost's boundary, one idea a line (SB1 5, 8 and 10)
+    var cn = H("ul", { class: "lx-hint e1-cost-notes" }, c1);
+    ["**Equipment**: paid over its life at the " + R.owner.label.toLowerCase().replace("-owned", "") + " owner's " + Math.round(R.rate * 100) + "% real [[cost-of-capital|cost of capital]] (through the [[capital-recovery-factor|capital recovery factor]]), plus upkeep.",
+      "**Grid bill**: estimated on 12 average days; a full 8,760-hour year comes out up to 7% higher for large solar-and-battery plans.",
+      "**Not included**: the diesel burned in outages (its cost is under each outage). 2025 dollars, illustrative.",
+      "**Grid electricity**: " + kilo(R.year.imports / 1000) + " MWh bought, " + kilo(R.year.exports / 1000) + " MWh exported, " + kilo(R.year.co2) + " t CO₂ (U.S. [[average-emission-factor|average factor]], [[operating-emissions|operating only]])."]
+      .forEach(function (t) { H("li", { html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, cn); });
     // the outages
     var c2 = H("div", { class: "lx-xcard lx-sb-chart" }, grid); H("h3", { text: R.outages.length ? "The outages, with this plan" : "No outage chosen" }, c2);
     var sel = o.sel != null ? Math.min(o.sel, R.outages.length - 1) : 0, chartHost = null;
     if (R.outages.length) {
       var sx = H("div", { class: "lx-scroll-x" }, c2), t2 = H("table", { class: "lx-facts e1-outs" }, sx);
       var hr = H("tr", null, H("thead", null, t2));
-      ["Outage", "Must stay on, unserved", "Keep if possible, unserved", "Shed first, unserved", "Must-stay-on carried for", "Diesel burned"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
+      ["Outage", "Must stay on, unserved", "Keep if possible, unserved", "Shed first, unserved", "Must-stay-on carried for", "Diesel burned (cost)"].forEach(function (x) { H("th", { scope: "col", text: x }, hr); });
       var b2 = H("tbody", null, t2), btns = [];
       R.outages.forEach(function (x, i) {
         var tr = H("tr", { class: i === sel ? "sel" : "" }, b2), td = H("th", { scope: "row" }, tr);
@@ -10855,10 +10943,15 @@
         H("td", { class: "n" + (x.must > 0.5 ? " bad" : " good"), text: kwh(x.must) }, tr);
         H("td", { class: "n", text: kwh(x.keep) }, tr); H("td", { class: "n", text: kwh(x.shed) }, tr);
         H("td", { class: "n", text: x.lasts >= x.hours.length ? "all " + x.hours.length + " h" : x.lasts + " of " + x.hours.length + " h" }, tr);
-        H("td", { class: "n", text: gal(x.fuel) + " · " + tons(x.co2) + " CO₂" }, tr);
+        H("td", { class: "n", text: gal(x.fuel) + " (" + fuelMoney(x.fuelCost != null ? x.fuelCost : x.fuel * P.cfg.fuel.price) + ") · " + tons(x.co2) + " CO₂" }, tr);
       });
       label(t2);
-      H("p", { class: "lx-hint", text: "Per outage only: these are the stretches the plan was run on, not a reliability figure. Must stay on comes first; within one priority the list order decides (hospital, water and heat, dorms, labs)." }, c2);
+      // what the outage model weighs, as it is built (SB1 7): weights, not a strict order
+      var on = H("ul", { class: "lx-hint e1-cost-notes" }, c2);
+      ["Per outage only: the stretches the plan was run on, not a reliability figure. Diesel at $" + P.cfg.fuel.price.toFixed(2) + " a gallon, not in the annual cost.",
+        "Who goes short: a kWh of must stay on weighs 100 times one of keep if possible, which weighs 10 times one of shed first.",
+        "Within a priority, each step up the list (hospital, water and heat, dorms, labs) counts 0.5% more and an earlier hour up to 2% more: a preference, not a strict order."]
+        .forEach(function (t) { H("li", { text: t }, on); });
       chartHost = H("div", { class: "lx-xcard lx-sb-chart e1-hourcard" }, host);
       draw();
     }
@@ -10892,7 +10985,7 @@
       legend: [{ label: "Solar used", color: COL.pv }, { label: "Battery", color: COL.bat }, { label: "Generator sets", color: COL.gen }, { label: "Loads served", color: "var(--lx-ink)" }, { label: "Must-stay-on load short", color: COL.short }],
       aria: "Outage " + x.label + ": supply by hour against the loads served; " + kwh(x.must) + " of must-stay-on load unserved.",
       tip: function (t) { var i = Math.max(0, Math.min(H0 - 1, Math.floor(t))), r = rowsT[i]; return "<div><b>" + r[0] + "</b></div><div>Solar " + r[1] + " · battery " + r[2] + " · sets " + r[3] + " kW</div><div>Served " + r[4] + " kW" + (+r[5].replace(/,/g, "") > 0 ? " · must-stay-on short " + r[5] + " kW" : "") + "</div>"; },
-      text: { head: ["Hour", "Solar used, kW", "Battery out, kW", "Generator sets, kW", "Loads served, kW", "Must-stay-on short, kW", "Battery stored, kWh"], rows: rowsT } });
+      text: { head: ["Hour from", "Solar used, kW", "Battery out, kW", "Generator sets, kW", "Loads served, kW", "Must-stay-on short, kW", "Battery stored at the hour's end, kWh"], rows: rowsT } });
     var soc = x.hours.map(function (h) { return plan.bat > 0 ? h.q / plan.bat * 100 : 0; }), fuelLeft = [], f = plan.fuel;
     x.hours.forEach(function (h) { f -= P.T.gen.galPerKWh * h.g; fuelLeft.push(plan.fuel > 0 ? Math.max(0, f) / plan.fuel * 100 : 0); });
     var p2 = LX.Plot(host, { caption: true, text: "Text version: battery and diesel", box: true });
@@ -10901,11 +10994,11 @@
       lines: [{ values: soc, x0: 1, color: COL.bat, width: 2.2 }, { values: fuelLeft, x0: 1, color: COL.gen, width: 2.2, dash: "5 3" }],
       legend: [{ label: "Battery charge", color: COL.bat }, { label: "Diesel left", color: COL.gen, dash: "5 3" }],
       aria: "Battery charge and diesel left over the outage, as a share of full.",
-      text: { head: ["Hour (end)", "Battery charge", "Diesel left"], rows: x.hours.map(function (h, i) { return [E1.when(x.sc, h.t), Math.round(soc[i]) + "%", Math.round(fuelLeft[i]) + "%"]; }) } });
+      text: { head: ["Hour ending", "Battery charge", "Diesel left"], rows: x.hours.map(function (h, i) { return [hourEnd(x.sc, h.t), Math.round(soc[i]) + "%", Math.round(fuelLeft[i]) + "%"]; }) } });
     return { p1: p1, p2: p2 };
   };
   E1.fmt = { kwh: kwh, gal: gal, tons: tons, hours: hours, money: money, kilo: kilo };
-  E1.ui = { seg: seg, fieldset: fieldset, ic: ic, COL: COL, copy: copy, label: label };
+  E1.ui = { seg: seg, fieldset: fieldset, ic: ic, COL: COL, copy: copy, label: label, stopper: stopper };
 })();
 
 /* ledger.js — LX.Ledger: a "who pays, who earns" table (promoted at the W3 integration, 2026-11-03, from A4's tariff

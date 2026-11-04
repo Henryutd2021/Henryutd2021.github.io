@@ -771,7 +771,7 @@
   short: "Microgrid: size and run"
   outcome: "Formulate a microgrid sizing MILP with outage scenarios and whole generator sets, prove it with branch and bound, check the plan hour by hour, and measure what forecast errors cost a plan sized with perfect foresight."
   teaches: [microgrid sizing as a mixed-integer program, outage scenarios, host-feeder limits, cost of resilience from two solved plans, rolling-horizon dispatch, forecast error]
-  lab: "a SciPy/HiGHS notebook that rebuilds engine E1's sizing and outage models, runs the seeded winter outages and the rolling horizon, and asserts the browser's numbers, about 60 minutes."
+  lab: "a SciPy/HiGHS notebook that rebuilds engine E1's sizing and outage models, asserts the browser's sizing, check and drawn-outage numbers, and runs the rolling horizon beside the browser's, about 60 minutes."
   does: "A MILP sizes solar, a battery and generator sets for Prairie Campus under outage scenarios; add the host feeder's export limit and the utility's tariff and watch the campus optimum change; then run the storm with rolling-horizon dispatch on forecasts and see what forecast error costs."
   after: [M2, A14]
 - {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
@@ -1064,7 +1064,7 @@
   status: active
   minutes: 30
   title: "Microgrid Workbench"
-  subtitle: "Island Prairie Campus: set what must stay on, size solar, a battery and diesel, and run real outages within the feeder's limits"
+  subtitle: "Island a fictional campus: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits"
   short: "Microgrid Workbench"
   outcome: "Build a campus microgrid plan, run it through outage scenarios within the host feeder's limits, and read its cost, unserved load and emissions per scenario."
   teaches: [one-line diagram, islanding, load priorities in an outage, outage scenarios, host-feeder limits, ownership and cost of capital]
@@ -1082,11 +1082,11 @@
   minutes: 90
   lab_minutes: 60   # the Modeler version adds the M5 notebook
   title: "Keep the campus running: a microgrid for a three-day winter outage"
-  subtitle: "Plan the microgrid that keeps the hospital and the dorms heated through a winter storm, compare three owners, and hand in a one-page note"
+  subtitle: "Plan the microgrid that keeps power to the hospital, its water and heating plant and the dorms through a winter storm, compare three owners, and hand in a one-page note"
   short: "Keep the campus running"
   outcome: "Recommend a campus microgrid for a three-day winter outage, within the feeder's limits, with its cost, unserved critical load and emissions, a comparison of owners and a sensitivity to the outage's length."
   teaches: [capstone plan and note, cost and unserved critical load on one boundary, ownership and cost of capital, sensitivity to outage length]
-  does: "Size Prairie Campus's microgrid (solar, battery, generator, load priorities) to keep the hospital and the dormitories heated through a three-day outage; respect the host feeder's limits; compare utility, co-op and community ownership; report cost, unserved critical load and emissions."
+  does: "Size Prairie Campus's microgrid (solar, battery, generator, load priorities) to keep power to the hospital, its water and heating plant and the dormitories through a three-day outage; respect the host feeder's limits; compare utility, co-op and community ownership; report cost, unserved critical load and emissions."
   after: [SB1, F7, A14, A4]
 
 - {kind: lesson, tier: analyst, code: CF3, form: case, title: "Where should hydrogen go when nobody knows how much wind will be built?"}

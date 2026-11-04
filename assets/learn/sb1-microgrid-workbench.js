@@ -47,10 +47,11 @@
     var tc = H("div", { class: "lx-xcard sb1-seeded" }, rh);
     H("h3", { text: "Test the plan on " + P.seeded.length + " drawn winter outages" }, tc);
     H("p", { class: "lx-hint", text: P.cfg.seeded.note }, tc);
-    var tRow = H("div", null, tc), tStale = H("p", null, tc), tRes = H("div", { class: "sb1-seeded-res" }, tc);
-    var T = LX.BenchRun(tRow, { label: "Run the " + P.seeded.length + " outages", state: function () { return B.plan(); }, partial: true, results: [tRes], stale: tStale,
+    var tRow = H("div", null, tc), tStale = H("p", null, tc), tRes = H("div", { class: "sb1-seeded-res" }, tc), tStop = E1.ui.stopper();
+    var T = LX.BenchRun(tRow, { label: "Run the " + P.seeded.length + " outages", state: function () { return B.plan(); }, partial: true, results: [tRes], stale: tStale, busy: tStop.busy,
       solve: function (st, ctx) { return E1.solve(st, P, { task: "run", scenarios: P.seeded, signal: ctx.signal, attempt: ctx.attempt }); },
       render: function (R) { drawSeeded(R); } });
+    tStop.attach(T);   // a Stop button while the ten outages run (W3 review SB1 9)
     function drawSeeded(R) {
       tRes.innerHTML = "";
       var w = seededWords(R);
@@ -72,19 +73,19 @@
     var flow = H("div", { class: "lx-xcard" }, x);
     H("h3", { text: "Two ways to use the engine" }, flow);
     var fl = H("div", { class: "sb1-flow" }, flow);
-    [["Run the outages", "Your sizes stay fixed.", ["A normal year on the grid: a linear program on 12 average days, one per month.",
+    [["Run the outages", "Your sizes stay fixed.", ["A normal year on the grid: a [[linear-program|linear program]] on 12 average days, one per month; each day's battery ends where it began.",
       "Each outage as an island: a mixed-integer program with whole generator sets that run at 30% or more.",
       "Out: the annual cost, and each outage's unserved load by priority, diesel and CO₂."]],
      ["Size it for me", "Your other choices stay fixed.", ["One mixed-integer program picks solar, battery and whole sets for the cheapest year that keeps every must-stay-on load on in every chosen outage.",
-      "The sizes are rounded up to the bench's steps.", "Run the outages then checks them, with the sets' 30% minimum the sizing left out."]]].forEach(function (c) {
+      "The sizes are rounded up to the bench's steps: a safe plan, not proven the cheapest on the steps.", "Run the outages then checks them, with the sets' 30% minimum the sizing left out."]]].forEach(function (c) {
       var col = H("div", { class: "sb1-fcol" }, fl);
       H("p", { class: "sb1-fh", html: "<b>" + c[0] + "</b> · " + c[1] }, col);
       var ol = H("ol", null, col); c[2].forEach(function (t) { H("li", { html: LX.rich(t) }, ol); });
     });
-    H("p", { class: "lx-hint", html: LX.rich("No prices: a [[mixed-integer-program|mixed-integer program]] gives none, so the bench shows none. What a resource is worth here is the difference between two solved plans: size with and without an outage, and subtract.") }, flow);
+    H("p", { class: "lx-hint", html: LX.rich("The engine does not calculate marginal electricity prices: a [[mixed-integer-program|mixed-integer program]] gives none. What a resource is worth here is the difference between two solved plans: size with and without it, and subtract.") }, flow);
     LX.Boundary(H("div", { class: "lx-xcard" }, x), { title: "Where the engine's answer holds",
-      holds: ["the outages you choose are the ones that matter", "each load is flat and can be partly served", "the coming sun is known (perfect foresight), and the battery and the tank start full"],
-      leaves: ["prices of any kind from the model", "the wiring and protection inside the campus", "part-load fuel use, battery wear and fuel deliveries during an outage", "outages you do not choose, and how often any outage happens"],
+      holds: ["the outages you choose are the ones that matter", "each load is flat and can be partly served", "12 average days stand in for the year (a full year's bill: up to 7% higher for large solar-and-battery plans)", "the coming sun is known (perfect foresight), and the battery and the tank start full"],
+      leaves: ["marginal prices of any kind from the model", "the wiring and protection inside the campus", "part-load fuel use, battery wear and fuel deliveries during an outage", "outage diesel in the annual cost (shown per outage)", "outages you do not choose, and how often any outage happens"],
       source: "Prairie Campus is lesson F7's and fictional; costs illustrative, 2025 dollars." });
 
     // ---- the first run, once the bench is in view (the solver loads then: about 3.5 MB, once)

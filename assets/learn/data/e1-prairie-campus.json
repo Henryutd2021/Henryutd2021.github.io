@@ -2145,7 +2145,7 @@
      "600 kW of solar · 2,000 kWh battery · 2 sets of 200 kW · 675 gallons"
     ],
     [
-     "Annual cost (2025 dollars, illustrative)",
+     "Annual cost: equipment and upkeep plus the normal-year grid bill on 12 average days (2025 dollars, illustrative; outage diesel not included)",
      "$1,341,327"
     ],
     [
@@ -2158,20 +2158,20 @@
     ],
     [
      "Must-stay-on load unserved: winter storm, 3 days",
-     "10,070 kWh (675 gal of diesel)"
+     "10,070 kWh (675 gal of diesel, $2,470)"
     ]
    ],
    "note": "Precomputed with HiGHS on 3 November 2026 for the default plan above; with JavaScript on, the bench runs your own plan."
   },
   "c1": {
-   "head": "Result for the default plan (F7's campus as built)",
+   "head": "Results for the default plan (F7's campus as built) and the sized plan",
    "rows": [
     [
      "Plan",
      "600 kW of solar · 2,000 kWh battery · 2 sets of 200 kW · 675 gallons; hospital, water and heat, dorms must stay on"
     ],
     [
-     "Annual cost (2025 dollars, illustrative)",
+     "Annual cost: equipment and upkeep plus the normal-year grid bill on 12 average days (2025 dollars, illustrative; outage diesel not included)",
      "$1,341,327"
     ],
     [
@@ -2179,8 +2179,8 @@
      "$1,405,586"
     ],
     [
-     "Must-stay-on load unserved in the 72-hour storm",
-     "28,070 kWh (675 gal of diesel, 6.9 t CO₂)"
+     "Critical load unserved in the 72-hour storm (hospital, water and heat, dorms)",
+     "28,070 kWh (675 gal of diesel, $2,470; 6.9 t CO₂)"
     ],
     [
      "The same plan if the storm lasts 1, 2, 3 or 4 days",
@@ -2189,9 +2189,21 @@
     [
      "CO₂ from grid electricity in a normal year",
      "3,425 t"
+    ],
+    [
+     "The plan Size it for me gives from the default",
+     "3,225 kW of solar · 5,050 kWh battery · 2 sets · 675 gallons: $1,181,114 a year, community-owned"
+    ],
+    [
+     "That plan in the storm, and on a fourth day",
+     "0 kWh of critical load unserved (675 gal of diesel, $2,470); 4,508 kWh if the storm lasts 4 days"
+    ],
+    [
+     "That plan, paid by each owner (each owner's cheapest, rounded up)",
+     "Utility $1,240,076 · Co-op $1,124,657 · Community $1,181,114"
     ]
    ],
-   "note": "Precomputed with HiGHS on 3 November 2026; with JavaScript on, you run your own plan, compare the owners and size it with the solver."
+   "note": "Precomputed with HiGHS on 3 November 2026. Without JavaScript, write the note on the sized plan from these numbers, naming the plan in words in place of a link; with JavaScript on, you run your own plan, compare the owners and size it with the solver."
   }
  },
  "reference": {
@@ -2302,13 +2314,13 @@
     },
     {
      "key": "persist",
-     "must": 2801.246,
+     "must": 2745.446,
      "keep": 8068.65,
      "fuel": 675
     },
     {
      "key": "sunny",
-     "must": 5594.116,
+     "must": 5586.395,
      "keep": 9406.7,
      "fuel": 675
     },
