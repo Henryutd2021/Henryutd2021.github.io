@@ -7,7 +7,8 @@
    { "k": "Goal", "v": "The lowest yearly cost for the home, or the highest yearly revenue for the farm, with the sizes you set." },
    { "k": "Rules", "v": "Each hour balances; nothing runs above its size; the battery loses 15% of what it stores; the line and the buyer's take are limits." },
    { "k": "Time", "v": "All 8,760 hours of 2025, as 52 weeks and 31 December, one small [[linear-program|linear program]] each." },
-   { "k": "Tie rule", "v": "A tiny wear charge on the battery stops cycling for nothing; it is left out of every number shown." }
+   { "k": "Tie rule", "v": "A tiny wear charge on battery use and, on the farm, a hair's preference for selling earlier in the week. Both are left out of every number shown." },
+   { "k": "Ties", "v": "Every total shown is the same on every least-cost schedule. With storage, the hour-by-hour schedule, and the hour counts read from it, can differ." }
   ]
  },
  "bound": {
@@ -22,7 +23,7 @@
    "outages, taxes, tax credits, incentives and financing;",
    "how other plants respond to the site: the CO₂ uses one average factor (CF6 explains the difference)."
   ],
-  "source": "Shapes: EIA-930 for SPP, 2025. Costs and factors: EIA, DOE and NLR, with dates, in the sources below."
+  "source": "Hourly patterns: EIA-930 for SPP, 2025, reshaped to EIA's capacity factors. Costs and factors: EIA, DOE and NLR, with dates, in the sources below."
  },
  "check": {
   "title": "Checked on one full-year LP",

@@ -1,11 +1,16 @@
 // test_c0-behind-one-meter.js — Node tests for capstone C0 (learn/c0-behind-one-meter.qmd, assets/learn/c0-behind-one-
 // meter.js, data/c0-behind-one-meter.json), built on engine E0 (assets/learn/components/engine-e0.js):
-//   - the six generated blocks (the plan's controls, the default plan's results, the note's outline, the exemplars, the
-//     rubric, the inputs) equal the components' own output (write them with --write)
-//   - every number in the exemplars is the engine's for the default plan: its NPV, saving, cost, CO₂, grid hours and two
-//     sensitivity cases (re-solved here with HiGHS)
-//   - the sensitivity line the note carries (the widest swing), and the note's checks: a full note passes every one and
-//     fits on a page; an empty one fails the reader's fields; a stale run is flagged
+//   - the seven generated blocks (the plan's controls, the default plan's link and sensitivity for the no-JS route, its
+//     results, the note's outline, the exemplars, the rubric, the inputs) equal the components' own output (write them
+//     with --write, which also writes the data file's reference: the default plan's sensitivity)
+//   - every number in the exemplars is the engine's for the default plan: its NPV, saving, cost, CO₂ (bought power and
+//     gas, and the net of power sent back), grid hours and two sensitivity cases (re-solved here with HiGHS)
+//   - the sensitivity the note carries (every bar of the chart in numbers), and the note's checks: a full note passes
+//     every one and fits on a page; an empty one fails the reader's fields; a stale run is flagged; a farm's note keeps
+//     each result's boundary (CO₂, the wind-only comparison, what the cost per kg leaves out)
+//   - the review's fixes (2026-11-03): the farm's equipment-cost case at 125% equals a fresh solve; the brief, the
+//     rubric's note and the exemplars agree on the bar (the "Look for" lines); the owner's goal is stated; the Modeler
+//     task asks only for what the M4 notebook computes
 //   - Henry's research (curriculum §13): every excerpt sentence is an approved sentence of
 //     reports/learn/excerpts_for_approval.md (E3, E4, with the revisions after review), word for word, with an allowed
 //     data-source key; every other sentence that names a study, author or site is approved or listed below; the cited
@@ -37,9 +42,23 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   const solver = m => core.solveWith(highs, m, { timeLimit: 60 });
   const P = E0.prepare(D, year, T, prof.townProfile), D0 = E0.defaults();
 
+  // ---------------- the default plan's sensitivity (the no-JS route's table; written into the data file by --write)
+  const r = await E0.solve(D0, P, { solver });
+  ok(r.ok, "the default plan runs");
+  const sens = await E0.sensitivity(D0, P, r, { solver });
+  if (WRITE) {
+    C.reference = { about: "Written by node _tests/learn/test_c0-behind-one-meter.js --write: the default plan's sensitivity, for the page's no-JS route.", date: new Date().toLocaleDateString("en-CA"), sens: sens };
+    let txt = fs.readFileSync(L("data/c0-behind-one-meter.json"), "utf8"), at = txt.lastIndexOf(',\n "reference"');
+    if (at < 0) at = txt.lastIndexOf("\n}");
+    fs.writeFileSync(L("data/c0-behind-one-meter.json"), txt.slice(0, at) + ',\n "reference": ' + JSON.stringify(C.reference) + "\n}\n");
+  }
+  const CR = J("c0-behind-one-meter.json");
+  ok(CR.reference && JSON.stringify(CR.reference.sens.rows.map(x => [x.key, Math.round(x.atLo), Math.round(x.atHi)])) === JSON.stringify(sens.rows.map(x => [x.key, Math.round(x.atLo), Math.round(x.atHi)])) && Math.round(CR.reference.sens.base) === Math.round(sens.base),
+    "the stored no-JS sensitivity equals a fresh one (run --write)");
+
   // ---------------- blocks
-  const BLOCKS = C0.staticBlocks(D, C, P, E0, SS, RN, EX, RB);
-  const MARK = { plan: "c0-plan", results: "c0-results", note: "c0-note", exemplars: "c0-exemplars", rubric: "c0-rubric", inputs: "c0-inputs" };
+  const BLOCKS = C0.staticBlocks(D, CR, P, E0, SS, RN, EX, RB);
+  const MARK = { plan: "c0-plan", nojs: "c0-nojs", results: "c0-results", note: "c0-note", exemplars: "c0-exemplars", rubric: "c0-rubric", inputs: "c0-inputs" };
   function between(q, name) { const a = q.indexOf("<!-- " + name + ":start"), b = q.indexOf("<!-- " + name + ":end -->"); if (a < 0 || b < 0) return null; return { a: q.indexOf("\n", a) + 1, b: b }; }
   let Q = fs.readFileSync(QPATH, "utf8");
   if (WRITE) { Object.keys(MARK).forEach(k => { const r = between(Q, MARK[k]); if (!r) throw new Error(MARK[k] + " markers missing"); Q = Q.slice(0, r.a) + BLOCKS[k] + "\n" + Q.slice(r.b); }); fs.writeFileSync(QPATH, Q); }
@@ -48,11 +67,8 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(C.rubric.competences.map(c => c.id).join() === "accounting,uncertainty,realism,communication" && C.rubric.competences.every(c => RB.COMPETENCES.some(x => x.id === c.id) && c.look), "rubric: C0's four competences (§7.9 template), each with a look-for line");
 
   // ---------------- the exemplars' numbers are the engine's for the default plan
-  const r = await E0.solve(D0, P, { solver });
-  ok(r.ok, "the default plan runs");
-  const sens = await E0.sensitivity(D0, P, r, { solver });
   const m = E0.fmt.money, R = r.results, M = R.money, row = k => sens.rows.find(x => x.key === k);
-  const NUMS = { "$800": m(M.saving), "$28,430": m(M.capex), "−$17,813": m(M.npv), "5.9 t": E0.fmt.num(R.co2.base, 1) + " t", "3.1 t": E0.fmt.num(R.co2.plan, 1) + " t",
+  const NUMS = { "$800": m(M.saving), "$28,430": m(M.capex), "−$17,813": m(M.npv), "5.9 t": E0.fmt.num(R.co2.base, 1) + " t", "4.6 t": E0.fmt.num(R.co2.plan, 1) + " t", "3.1 t": E0.fmt.num(R.co2.net, 1) + " t",
     "5,240 hours": E0.fmt.num(R.tot.gridHours) + " hours", "−$10,237": m(row("cost").atLo), "−$14,717": m(row("xc").atHi), "25 years": M.horizon + " years", "4% real": D0.rate + "% real", "75%": row("cost").loText.replace(" of sourced", ""), "8¢": "8¢" };
   ok(row("xc").hiText === "8.0¢/kWh" && row("cost").loText === "75% of sourced", "sensitivity cases: equipment cost 75% and an 8¢ export credit");
   const EXT = JSON.stringify(C.exemplars);
@@ -62,14 +78,14 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(figs.every(x => x === "6 kW" || Object.keys(NUMS).some(k => k.indexOf(x) >= 0)), "the exemplars hold no other figures: " + figs.filter(x => x !== "6 kW" && !Object.keys(NUMS).some(k => k.indexOf(x) >= 0)).join(", "));
   ok(E0.heading(D0) === "The Prairie Town home: 6 kW of rooftop solar" && /6 kW of rooftop solar/.test(C.exemplars.lede), "the exemplars are about the default plan");
 
-  // ---------------- the sensitivity line and the note's checks
+  // ---------------- the sensitivity the note carries and the note's checks
   const sl = C0.sensLine(D0, sens, E0);
   const widest = sens.rows.slice().sort((a, b) => Math.abs(b.atHi - b.atLo) - Math.abs(a.atHi - a.atLo))[0];
-  ok(sl && sl.inputLabel === widest.label && sl.cases.length === 2 && sl.base.value === m(sens.base), "the note's sensitivity line is the widest swing: " + RN.sensitivityLine(sl));
+  ok(typeof sl === "string" && sl.indexOf("The NPV is " + m(sens.base)) === 0 && sl.indexOf(widest.label) < Math.min(...sens.rows.filter(x => x !== widest).map(x => sl.indexOf(x.label))) &&
+    sens.rows.every(x => sl.indexOf(m(x.atLo)) > 0 && sl.indexOf(m(x.atHi)) > 0) && /held fixed/.test(sl), "the note's sensitivity is every bar of the chart, widest first: " + sl);
   ok(widest.key === "cost", "for the default plan, the equipment cost moves the NPV most");
-  const note = E0.note(D0, R); note.link = "https://henryutd2021.github.io/learn/c0-behind-one-meter.html#" + SS.encode(E0.schemaFor("c0"), D0); note.sensitivity = sl;
-  const good = C.exemplars.answers.find(a => a.key === "good"), text = good.parts.map(p => typeof p === "string" ? p : p.text).join(""), sent = text.split(/(?<=\.)\s+/);
-  const words = { recommend: sent[0] + " " + sent[1], alone: sent[2], change: sent[3] };
+  const note = E0.note(D0, R); note.link = C0.linkOf(SS, E0, D0); note.sensitivity = sl;
+  const words = C0.exemplarWords(C);
   const all = RN.checks(note, words, C.note.fields);
   ok(all.all, "a note in the strong exemplar's words passes every check (" + all.items.filter(i => !i.ok).map(i => i.label).join(", ") + ")");
   ok(RN.countWords(RN.compose(note, words, C.note.fields, { format: "md" })) <= RN.PAGE_WORDS, "the note fits on one page (" + RN.countWords(RN.compose(note, words, C.note.fields, { format: "text" })) + " words)");
@@ -80,8 +96,34 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   const nos = Object.assign({}, note, { sensitivity: null });
   ok(!RN.checks(nos, words, C.note.fields).items.find(i => i.id === "sensitivity").ok, "no sensitivity run: the check says so");
   ok(!RN.CLAIMS.test(JSON.stringify(C)) && !RN.CLAIMS.test(fs.readFileSync(L("c0-behind-one-meter.js"), "utf8").replace(/\/\/[^\n]*/g, "")), "no claim of saving or sending the note");
-  const farm = await E0.solve(Object.assign({}, D0, { site: "farm", el: 50 }), P, { solver });
-  ok(E0.note(Object.assign({}, D0, { site: "farm", el: 50 }), farm.results).heading === "The ridge wind farm: 150 MW of wind and a 50 MW electrolyzer", "the note names the wind farm's plan");
+  const FS = Object.assign({}, D0, { site: "farm", el: 50 }), farm = await E0.solve(FS, P, { solver }), fn = E0.note(FS, farm.results);
+  ok(fn.heading === "The ridge wind farm: 150 MW of wind and a 50 MW electrolyzer", "the note names the wind farm's plan");
+  const fres = k => fn.results.find(x => x.label === farm.results.readouts.find(y => y.key === k).label);
+  ok(fres("co2") && /^\d/.test(fres("co2").value) && /replaces hydrogen made from gas/.test(fres("co2").note) && /alone/.test(fres("added").note) && /counted as free/.test(fres("lcoh").note),
+    "a farm's note keeps the CO₂ row and each result's boundary: " + RN.compose(fn, {}, C.note.fields, { format: "text" }).split("\n").filter(l => /CO₂|alone|free/.test(l)).join(" | "));
+  ok(fn.results.every(x => x.note) && /potential saving/.test(fn.assumptions.join(" ")), "every result in the note carries its note; the CO₂ assumption says potential");
+  // the farm's equipment-cost case (the review's: 50 MW at $3.25/kg, 125%) equals a fresh solve
+  {
+    const s3 = Object.assign({}, D0, { site: "farm", el: 50, h2: 3.25 }), b3 = await E0.solve(s3, P, { solver }), sn3 = await E0.sensitivity(s3, P, b3, { solver });
+    const hi = await E0.solve(Object.assign({}, s3, { cost: 125 }), P, { solver }), cr = sn3.rows.find(x => x.key === "cost");
+    ok(Math.abs(cr.atHi - hi.results.money.npv) < 1 && cr.rerun && Math.round(cr.atHi / 1e4) === Math.round(-303.98e6 / 1e4), "farm at $3.25/kg, equipment cost 125%: " + m(cr.atHi) + " = a fresh solve (it read −$301.07M before the review)");
+  }
+  // the no-JS route: the default plan's link opens the default plan; the table is the fresh sensitivity
+  {
+    const lk = C0.linkOf(SS, E0, D0), d = SS.decode(E0.schemaFor("c0"), lk.slice(lk.indexOf("#")));
+    ok(d.status === "ok" && SS.same(E0.schemaFor("c0"), d.state, D0) && BLOCKS.nojs.indexOf(lk) > 0, "no-JS: the default plan's link is on the page and opens the default plan");
+    ok(sens.rows.every(x => BLOCKS.nojs.indexOf(m(x.atLo)) > 0 && BLOCKS.nojs.indexOf(m(x.atHi)) > 0), "no-JS: the sensitivity table carries every bar");
+  }
+  // the bar is the same everywhere: the brief's "done when", the rubric's lede and note, the exemplars' levels
+  {
+    const brief = (Q.match(/<li><b>Done when:<\/b>([^<]*)<\/li>/) || [])[1] || "";
+    ok(/"Look for" line/.test(brief) && !/Proficient/.test(brief) && /Look for/.test(C.rubric.note) && /six pages/.test(C.rubric.note) && /Look for/.test(C.rubric.lede) && C.exemplars.answers.every(a => /Look for/.test(a.level)),
+      "the bar is the 'Look for' lines in the brief, the rubric's lede and note and the exemplars; the six-page item is named as the final project's");
+    ok(/owner's goal/.test(Q) && /owner wants/.test(C.exemplars.task) && /owner wants/.test(words.recommend) && /owner's goal/.test(C.note.fields[0].hint), "the owner's goal: in the brief, the task, the strong note and the field's hint");
+    ok(/does any tested input change the recommendation/.test(C.note.fields.find(f => f.key === "change").hint) && !/how far/.test(JSON.stringify(C.note)), "the last field asks whether the tested ranges change the answer, not for an unbracketed threshold");
+    const mod = (Q.match(/Go deeper · Modeler<\/span>[\s\S]*?<\/details>/) || [""])[0];
+    ok(/weekly saving from adding the electrolyzer and tank/.test(mod) && /has no NPV/.test(mod) && !/notebook's NPV/.test(mod), "the Modeler task asks for what the M4 notebook computes (its weekly savings), not an NPV it has not");
+  }
 
   // ---------------- Henry's research: approved sentences only (curriculum §13)
   const SECTIONS = ["E3", "E4"];
@@ -154,7 +196,11 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(ALL) && !/data[- ]cent/i.test(ALL) && !/\bAI\b|artificial intelligence|ChatGPT|Claude/.test(ALL), "no nuclear terms, no data centers, no AI wording");
   const prose = OWN.replace(GEN, " ").replace(/<table[\s\S]*?<\/table>/g, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
     .split(/<\/?(?:p|li|dt|dd|div|summary|h[1-6])\b[^>]*>|\n- /).map(t => norm(t.replace(/\[([^\]]+)\]\{[^}]*\}/g, "$1").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1"))).filter(t => t && /[A-Za-z]/.test(t) && !/^(:::|```)/.test(t));
-  prose.forEach(t => ok(t.split(" ").length <= 45, "text element within 45 words: " + t.slice(0, 70)));
+  prose.forEach(t => ok(t.split(" ").length <= 35, "text element within 35 words: " + t.slice(0, 70)));
+  // the generated text a reader sees: each exemplar line and note, the rubric's lede and note, the chart's note
+  const wc = t => String(t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length;
+  C.exemplars.answers.forEach(a => { a.parts.map(q => typeof q === "string" ? q : q.text).join("").split("\n").forEach(l => ok(wc(l) <= 35, "exemplar line within 35 words (" + wc(l) + "): " + l.slice(0, 50))); EX.marks(a).forEach(x => ok(wc(x.note) <= 35, "exemplar note within 35 words: " + x.note.slice(0, 50))); });
+  [C.exemplars.lede, C.exemplars.task, C.exemplars.note, C.rubric.lede, C.rubric.note, C.note.lede, C.sensitivity.lede, E0.sensWords(D0, sens).note].forEach(t => ok(wc(t) <= 35, "generated text within 35 words (" + wc(t) + "): " + t.slice(0, 50)));
   C.note.fields.forEach(f => ok(f.hint.split(" ").length <= 25, "note field hint within 25 words: " + f.label));
 
   console.log(`${checks - fails}/${checks} checks passed`);
