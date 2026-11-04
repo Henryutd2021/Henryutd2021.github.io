@@ -6,6 +6,15 @@ glossary:
   - id: rolling-horizon
     term: Rolling horizon
     def: "Planning over a window ahead on a forecast, carrying out only the first hours of the plan, then planning again as the real values arrive."
+  - id: cost-of-capital
+    term: Cost of capital
+    def: "The yearly return an owner's lenders and investors require on money tied up in equipment; the real cost of capital leaves inflation out."
+  - id: service-level
+    term: Service level
+    def: "The share of cases in which a rule must hold, such as meeting store demand in 95 of every 100 weeks."
+  - id: deterministic-equivalent
+    term: Deterministic equivalent
+    def: "An ordinary rule, with no chance in it, that holds exactly when a chance constraint holds, so a standard solver can use it."
 requests:
   - "Engine E1 is a shared component: assets/learn/components/engine-e1.js and engine-e1.css (LX.E1: the models, solve, summarize, note, fallback, branch and bound, and the view pieces E1.Line, E1.Bench, E1.Results, E1.HourChart). scripts/build_learn.py (index repo, uncommitted) lists it in W3_ENGINES next to the SB0 builder's engine-e0; please commit that list at the merge. README section added under 'Added in wave W3'."
   - "path.yml prerequisites: the curriculum gives SB1 none, C1 [F7, A14, A4] and M5 [M2, A14]. F7, A14 and A4 have no rows on this branch, so SB1 has after: [9], C1 after: [SB1, M2] and M5 after: [M2]; please make C1 after: [SB1, F7, A14, A4] and M5 after: [M2, A14] at the merge."

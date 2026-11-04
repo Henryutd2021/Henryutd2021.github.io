@@ -54,6 +54,13 @@
 
 /* ---------- results */
 .e1-sized { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--lx-surface-2); font-size: 14.5px; }
+/* a plan that leaves load unserved in a normal year (W3 review SB1 1): said above the results, in the bad tone */
+.e1-short { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--lx-bad-soft); border-left: 4px solid var(--lx-bad); font-size: 14.5px; color: var(--lx-ink); }
+.e1-short b { color: var(--lx-bad); }
+/* the cost's boundary and the outage weights: one short idea a line */
+.e1-cost-notes { margin: 6px 0 0; padding-left: 1.1rem; display: grid; gap: 3px; }
+.e1-cost-notes li { margin: 0; }
+.e1-cost-notes b { font-weight: 600; color: var(--lx-ink-2); }
 .e1-cost td { vertical-align: middle; }
 .e1-cost td:first-child { width: 42%; }
 .e1-sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: baseline; }

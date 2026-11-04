@@ -401,6 +401,12 @@
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
  },
+ "cost-of-capital": {
+  "term": "Cost of capital",
+  "short": "The yearly return an owner's lenders and investors require on money tied up in equipment; the real cost of capital leaves inflation out.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
+ },
  "cost-of-service": {
   "term": "Cost of service",
   "short": "What it costs a utility to serve a customer or a class of customers: energy, plants, wires, meters and billing.",
@@ -544,6 +550,12 @@
   "short": "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "deterministic-equivalent": {
+  "term": "Deterministic equivalent",
+  "short": "An ordinary rule, with no chance in it, that holds exactly when a chance constraint holds, so a standard solver can use it.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
  },
  "developer": {
   "term": "Developer",
@@ -1924,6 +1936,12 @@
   "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "service-level": {
+  "term": "Service level",
+  "short": "The share of cases in which a rule must hold, such as meeting store demand in 95 of every 100 weeks.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
  },
  "shadow-price": {
   "term": "Shadow price",
