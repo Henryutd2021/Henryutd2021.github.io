@@ -9,7 +9,7 @@
   "price": 50,
   "priceRange": [30, 70],
   "priceStep": 1,
-  "priceNote": "$50/MWh: an illustrative fixed sale price for every MWh, in 2025 dollars, as if the farm had a fixed-price contract for its whole life (lesson A2 asks who carries the risk when it does not). Range $30-$70: illustrative.",
+  "priceNote": "$50/MWh: an illustrative sale price for every MWh, fixed in real terms (2025 dollars) for the farm's whole life, as a contract indexed to inflation would be. A contract with a flat nominal price would lose purchasing power each year, so its real revenue would fall. Lesson A2 asks who carries the risk when the price is not fixed. Range $30-$70: illustrative.",
   "rateRange": [0, 10],
   "rateStep": 0.1,
   "debtShareRange": [0, 80],

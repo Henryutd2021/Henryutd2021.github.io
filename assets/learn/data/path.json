@@ -1826,7 +1826,7 @@
    "minutes": 25
   },
   {
-   "title": "Vectors and matrices: what Ax <= b means",
+   "title": "Vectors and matrices: what Ax ≤ b means",
    "ready": true,
    "href": "k06-vectors-matrices.html",
    "code": "K6",

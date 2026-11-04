@@ -107,6 +107,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "battery-margin": {
+  "term": "Battery margin",
+  "short": "What a battery earns per megawatt-hour it discharges, after paying for the power it charged and the energy lost on the way.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "benchmark": {
   "term": "Benchmark",
   "short": "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model.",
@@ -145,7 +151,7 @@
  },
  "break-even-price": {
   "term": "Break-even price",
-  "short": "The sale price at which a project's net present value is exactly zero; for one plant it equals its levelized cost.",
+  "short": "The sale price at which a project's net present value is exactly zero; when electricity is its only revenue, with the same costs, output and discounting, it equals the plant's levelized cost.",
   "lesson": "A1",
   "href": "a01-project-tea.html"
  },
@@ -217,7 +223,7 @@
  },
  "capture-ratio": {
   "term": "Capture ratio",
-  "short": "The average price over the hours a plant produces, as a share of the average price over all hours.",
+  "short": "The average price a plant earns per megawatt-hour it produces, divided by the average market price across all hours: hours with more output count more.",
   "lesson": "A2",
   "href": "a02-contracts-risk.html"
  },
@@ -1642,6 +1648,12 @@
   "short": "What an amount of money paid or received in the future is worth today, once it is discounted.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "pricing-node": {
+  "term": "Pricing node",
+  "short": "A point on the grid, such as a power plant's connection, where the market sets its own price.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
  },
  "primary-energy": {
   "term": "Primary energy",

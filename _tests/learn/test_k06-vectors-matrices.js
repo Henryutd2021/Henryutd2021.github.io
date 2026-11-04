@@ -2,7 +2,10 @@
 // (dayOf, the rules and the costs against assets/learn/10-write-it-down.js), lesson 11's model size is right (against
 // assets/learn/11-solver.js), the vector algebra holds (A x row by row, the ≤ form passes the same plans as the original
 // rules on a grid, checks agree with LX.lp2), the drill's answers are right, and every number the page states matches the
-// model (statements one by one, a whitelist scan, printed calculations recomputed). The no-JS table must equal staticBlocks().
+// model (statements one by one, a whitelist scan, printed calculations recomputed). The whitelist scan is supplementary:
+// it shows that every number on the page is one the model makes, not that each statement is right; the statements, the
+// explain layer's values (explainVals, in the ≤ form) and lesson 11's matrix in both forms are checked one by one (Codex
+// review, 2026-11-03). The no-JS table must equal staticBlocks().
 // Usage (from the site folder):  node _tests/learn/test_k06-vectors-matrices.js [--write]   (--write rewrites the no-JS table)
 "use strict";
 const fs = require("fs");
@@ -51,11 +54,14 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   ok(sol.status === "optimal" && sol.best[0].x === 145 && sol.best[0].y === 0 && near(sol.co2, 53.65, 1e-9) && near(K.dot(M.rows[3].a, [145, 0]), 53.65, 1e-12), "quiz: (145, 0) is lesson 10's best plan; its CO2 row is 53.65");
 }
 
-// ---------------- lesson 11's day as A x ≤ b: 72 rows, 96 columns, 190 non-zero entries
+// ---------------- lesson 11's day: as its solver stores it (72 rows, 24 of them equalities, 190 non-zero entries, sizes as
+// bounds) and written strictly as A x ≤ b (each equality two rows: 96 rows, 286 non-zero entries)
 {
   const W = L11.dayOf(TOWN, YEAR), m = L11.buildLP(W, L11.settings(), 1000);
-  let nz = 0; m.constraints.forEach(c => { nz += Object.keys(c.terms).filter(k => c.terms[k] !== 0).length; });
-  ok(m.variables.length === s.l11.cols && m.constraints.length === s.l11.rows && nz === s.l11.nz, `lesson 11: ${m.constraints.length} rows × ${m.variables.length} columns, ${nz} non-zero entries`);
+  let nz = 0, nzEq = 0, eq = 0; m.constraints.forEach(c => { const k = Object.keys(c.terms).filter(t => c.terms[t] !== 0).length; nz += k; if ("eq" in c) { eq++; nzEq += k; } });
+  ok(m.variables.length === s.l11.cols && m.constraints.length === s.l11.rows && nz === s.l11.nz && eq === s.l11.eq, `lesson 11 as stored: ${m.constraints.length} rows (${eq} equalities) × ${m.variables.length} columns, ${nz} non-zero entries`);
+  ok(m.constraints.length + eq === s.l11.leRows && nz + nzEq === s.l11.leNz && s.l11.leRows === 96 && s.l11.leNz === 286, `lesson 11 strictly as A x ≤ b: ${m.constraints.length + eq} rows, ${nz + nzEq} non-zero entries`);
+  ok(m.variables.filter(v => v.ub != null).length === 72 && m.constraints.every(c => Object.keys(c.terms).length > 0), "lesson 11: plant and spill limits are variable bounds, not rows");
   ok(s.l11.cells === 6912 && (s.l11.share * 100).toFixed(1) === "2.7", "lesson 11: 6,912 entries, 2.7% not zero");
   ok(/The model has 96 decisions and 72 rules/.test(fs.readFileSync(path.join(SITE, "learn/11-solver.qmd"), "utf8")), "lesson 11's own page says 96 decisions and 72 rules");
 }
@@ -72,6 +78,14 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   }
   ok(bad === 0, "checks: the original rules, the ≤ form and LX.lp2 agree on a grid of plans (" + bad + " bad)");
   ok(K.onlyFails(M, [150, 100], "co2") && near(K.dot(M.rows[3].a, [150, 100]), 110.5) && s.co2Max === 110.5, "step 6: (150, 100) fails only the CO2 row, emitting 110.5 t");
+  // the cover rule lets surplus pass: step 6's example stays within the 86 MW of wind and sun lesson 10 could spill
+  const d10 = L10.dayOf(TOWN, YEAR);
+  ok(M.spill === 86 && M.spill === d10.wind[19] + d10.solar[19], "toy model: 86 MW of wind and sun could be spilled at 19:00, as lesson 10");
+  ok(s.target.join() === "130,100" && K.onlyFails(M, s.target, "co2") && near(s.targetCo2, 103.1, 1e-9) && s.targetExtra === 85 && s.targetExtra <= M.spill, "step 6: the example (130, 100) fails only the CO2 row (103.1 t), its 85 MW extra within the spill limit");
+  ok(T.fail(s.target) === "x = (130, 100) passes cover and both sizes but emits 103.1 t: only the CO₂ row fails. Its 85 MW extra would be spilled as wind and sun (lesson 10)." && /Its 105 MW extra exceeds the 86 MW that could be spilled, a limit left out here\./.test(T.fail([150, 100])), "step 6: the message says where a plan's extra goes, or that the toy model lets it pass");
+  ok(/autos\[5\] = function \(\) \{ sl\.set\(s\.target\)/.test(JS), "step 6: the shortcut sets the example within the spill limit");
+  // nonnegativity: the four rows let (150, −5) pass; the sliders stop at 0, and the page says so
+  ok(K.check(M, [150, -5]).every(r => r.pass) && /min: 0, max: 160/.test(JS) && /min: 0, max: 120/.test(JS) && /Outputs cannot be negative, x₁ ≥ 0 and x₂ ≥ 0: the sliders stop at 0/.test(QMD) && /hint: T\.nonneg/.test(JS) && /text: T\.nonneg/.test(JS), "nonnegativity: stated in the data note, step 6 and the explain layer; the sliders enforce it");
   ok(K.check(M, s.plan).every(r => r.pass), "the plan (100, 45) passes every rule");
   // step 6 has a reachable target: the plans on its slider grid that fail only the CO2 row
   let n = 0; for (let x = 0; x <= 160; x += 5) for (let y = 0; y <= 120; y += 5) if (K.onlyFails(M, [x, y], "co2")) n++;
@@ -80,17 +94,31 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 
 // ---------------- the page: statements one by one
 {
-  has("x = (100, 45) is 100 MW from the combined-cycle plant and 45 MW from the peaker; (45, 100) is a different plan.");
-  has("c · x = 40 × 100 + 100 × 45 = 8,500 dollars for the hour.");
+  has("x = (x₁, x₂) = (100, 45) is 100 MW from the <span class=\"lx-term\" data-term=\"combined-cycle\">combined-cycle plant</span> and 45 MW from the <span class=\"lx-term\" data-term=\"peaker\">peaker</span>; (45, 100) is a different plan.");
+  has("Each output lasts one hour (100 MW × 1 h = 100 MWh), so the cost is a dot product: c · x = 40 × 100 + 100 × 45 = 8,500 dollars.");
+  ok(T.hour === "Each output runs one hour: 100 MW × 1 h = 100 MWh, so dollars per MWh times MW gives dollars for the hour." && /H\("p", \{ class: "lx-hint", text: T\.hour \}, act\)/.test(JS), "units: step 2 says each output runs one hour");
   has("A x is every row's dot product with x: (145, 100, 45, 61.75), one number per rule.");
-  has("Multiplying the cover row by −1 turns x + y ≥ 145 into −x − y ≤ −145, so every row reads ≤.");
-  has("(150, 100) covers the 145 MW and fits both plants, but emits 110.5 t, so only the CO₂ row fails.");
-  has("lesson 11's day is 72 rows × 96 columns, with only 190 of its 6,912 entries not zero.");
+  has("Multiplying the cover row by −1 turns x₁ + x₂ ≥ 145 into −x₁ − x₂ ≤ −145, so every row reads ≤.");
+  has("(130, 100) supplies at least the 145 MW and fits both plants, but emits 103.1 t, so only the CO₂ row fails.");
+  has("Lesson 11's day, as its solver stores it, is 72 rows × 96 columns, 24 of the rows equalities; only 190 of its 6,912 entries are not zero.");
+  has("The count depends on the form. Lesson 11's day, as stored, has 72 rows, 24 of them equalities; strictly as A x ≤ b, each becomes two rows: 96 rows, 286 non-zero entries.");
+  has("Lesson 11's day as its solver stores it, 24 of the rows equalities; 190 entries are not zero.");
+  has("A toy model, as lesson 10's chart: the cover rule asks for at least 145 MW. Extra gas would be spilled as wind and sun, at most 86 MW at 19:00, a limit left out here.");
+  has("running costs ($40 and $100 per MWh, 2025 dollars)");
+  has("Lessons 10 and B1 call the two outputs x and y; here they are x₁ and x₂, the entries of the plan vector x.");
   has("the first costs 8,500 dollars, the second 11,800"); has("x + y ≥ 145 and −x − y ≤ −145 pass exactly the same plans.");
   has("(145, 53.65): 1 × 145 + 1 × 0 = 145 and 0.37 × 145 + 0.55 × 0 = 53.65. (145, 79.75) uses the peaker's rate on the combined-cycle MW.");
   ok(near(0.55 * 145, 79.75, 1e-9), "quiz: 79.75 is 0.55 × 145, the named slip");
   has("48 rows × 72 columns: one row per rule (2 × 24 = 48) and one column per decision (3 × 24 = 72).");
   has("190 non-zero entries out of 6,912, about 2.7%");
+  ok(/^title: "Vectors and matrices: what Ax ≤ b means"$/m.test(QMD) && /  title: "Vectors and matrices: what Ax ≤ b means"\n/.test(PATHY) && !/Ax <= b/.test(QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "")), "title: 'Ax ≤ b' with the real ≤, on the page and in path.yml");
+  // every element of the no-JS fallback, the data note and Go deeper holds one idea within the budget (about 35 words)
+  const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>(Boyd|HiGHS documentation|Where this is used)/.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
+  const words = t => t.replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\$[^$]*\$/g, " x ").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
+  const long = elems.filter(t => words(t) > 36).map(t => words(t) + ": " + t.replace(/<[^>]+>/g, "").slice(0, 50));
+  ok(elems.length >= 15 && long.length === 0, "budget: " + elems.length + " fallback, data-note and Go deeper elements are 36 words or fewer: " + JSON.stringify(long));
+  // the D1 explain layer stays at ordered lists, rows and matching entries: no NumPy or sparse-storage code
+  ok(!/np\.|numpy|scipy|csr_matrix|A @ x/i.test(JS.replace(/\/\/.*$/gm, "")) && !/key: "code"/.test(JS) && /Building these arrays in code comes later, in B2 and M1/.test(JS) && /\[B2\]\(b02-python-data\.html\)/.test(QMD), "depth: no NumPy or sparse-storage code in the explain layer; code is B2 and M1's");
   ok(/data-id="ax" data-answer="b"[\s\S]{0,300}<li data-value="b">\(145, 53\.65\)<\/li>/.test(QMD) && /data-id="shape" data-answer="c"[\s\S]{0,300}<li data-value="c">48 rows × 72 columns<\/li>/.test(QMD), "quiz: answers point at the right options");
   Object.keys(BLOCKS).forEach(name => {
     const [ra, end] = blockRe(name), a = QMD.match(ra), b = QMD.indexOf(end);
@@ -109,7 +137,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   let body = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<style>[\s\S]*?<\/style>/g, "")
     .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ");
   const allowed = new Set(), add = v => allowed.add(String(v));
-  [100, 45, 40, 145, 150, 61.75, "8,500", "11,800", 110.5, 0.37, 0.55, 53.65, 79.75, 72, 96, 190, "6,912", "2.7", 48, 24, 3, 2, 4, 1, 0, 19, 10, 11, 5, 7, 2018, 2025, 9781108583664, "10.1017", "00", 930, 9].forEach(add);   // 19:00, EIA-930, M9
+  [100, 45, 40, 145, 150, 61.75, "8,500", "11,800", 110.5, 0.37, 0.55, 53.65, 79.75, 72, 96, 190, "6,912", "2.7", 48, 24, 3, 2, 4, 1, 0, 19, 10, 11, 5, 7, 2018, 2025, 9781108583664, "10.1017", "00", 930, 9, 130, "103.1", 86, 286].forEach(add);   // 19:00, EIA-930, M9
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
   ok(unknown.length === 0, "every number on the page is from the model or a structural count; unknown: " + unknown.join(" "));
@@ -120,7 +148,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 function normCalc(str) { let t = String(str).replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/[−–]/g, "-").replace(/\$/g, ""); while (/(\d),(\d{3})/.test(t)) t = t.replace(/(\d),(\d{3})/g, "$1$2"); return t; }
 function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/"); if (!/^[\d.\s()+\-*/]+$/.test(e)) return null; try { const v = Function('"use strict"; return (' + e + ");")(); return isFinite(v) ? v : null; } catch (err) { return null; } }
 {
-  const msgs = { plan: T.plan, cost: T.cost, rows: T.rows, co2: T.co2, flip: T.flip, fail: T.fail([150, 100]), size: T.size };
+  const msgs = { plan: T.plan, hour: T.hour, cost: T.cost, rows: T.rows, co2: T.co2, flip: T.flip, fail: T.fail(s.target), fail2: T.fail([150, 100]), nonneg: T.nonneg, size: T.size };
   Object.keys(msgs).forEach(k => { const w = msgs[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: message ${k} is ${w} words (≤ 36)`); });
   let calc = 0;
   const runCalc = (label, str) => (normCalc(str).match(/[\d.()+\-× ]+=[ \d.\-]+/g) || []).forEach(run => { const [L, R0] = run.split("="), R = R0.trim().replace(/\.$/, ""); const lv = evalSide(L.trim()); if (lv !== null && /^-?[\d.]+$/.test(R)) { calc++; ok(Math.abs(lv - +R) < 1e-6, `${label}: ${run.trim()}`); } });
@@ -131,13 +159,31 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
     runCalc("drill " + i, it.why);
     if (it.kind === "dot") { const m = /c = \((\d+), (\d+)\).*x = \((\d+), (\d+)\)/.exec(it.q); ok(it.answer === m[1] * m[3] + m[2] * m[4], `drill ${i}: dot`); }
     if (it.kind === "row") { const m = /is \(([\d.]+), ([\d.]+)\).*x = \((\d+), (\d+)\)/.exec(it.q); ok(near(it.answer, m[1] * m[3] + m[2] * m[4], 1e-9), `drill ${i}: row`); }
-    if (it.kind === "pass") { const m = /Rule: (\d)x \+ (\d)y (≥|≤) (-?\d+)\. Does the plan x = \((\d+), (\d+)\)/.exec(it.q), l = m[1] * m[5] + m[2] * m[6]; ok((it.answer === 0) === (m[3] === "≥" ? l >= +m[4] : l <= +m[4]), `drill ${i}: pass`); }
-    if (it.kind === "flip") { const m = /Write (\d)x \+ (\d)y ≥ (\d+)/.exec(it.q); ok(it.choices[it.answer] === "(−" + m[1] + ", −" + m[2] + ") with limit −" + m[3] && new Set(it.choices).size === 4, `drill ${i}: flip`); }
+    if (it.kind === "pass") { const m = /Rule: (\d)x₁ \+ (\d)x₂ (≥|≤) (-?\d+)\. Does the plan x = \((\d+), (\d+)\)/.exec(it.q), l = m[1] * m[5] + m[2] * m[6]; ok((it.answer === 0) === (m[3] === "≥" ? l >= +m[4] : l <= +m[4]), `drill ${i}: pass`); }
+    if (it.kind === "flip") { const m = /Write (\d)x₁ \+ (\d)x₂ ≥ (\d+)/.exec(it.q); ok(it.choices[it.answer] === "(−" + m[1] + ", −" + m[2] + ") with limit −" + m[3] && new Set(it.choices).size === 4, `drill ${i}: flip`); }
     if (it.kind === "size") { const m = /has (\d) decisions and (\d) rules? in each of (\d+) hours?/.exec(it.q); ok(it.choices[it.answer] === (m[2] * m[3]).toLocaleString("en-US") + " rows × " + (m[1] * m[3]).toLocaleString("en-US") + " columns", `drill ${i}: size`); }
     if (it.kind === "matvec") { const m = /A = \[\((\d), (\d)\), \((\d), (\d)\)\].*x = \((\d+), (\d+)\)\. What is entry (\d)/.exec(it.q), r = +m[7] === 1 ? [m[1], m[2]] : [m[3], m[4]]; ok(it.answer === r[0] * m[5] + r[1] * m[6], `drill ${i}: matvec`); }
   });
   ok(Object.keys(counts).length === 6 && calc > 300, "drill: six kinds; the worked answers' arithmetic checked (" + calc + ")");
   ["vector", "dot-product", "matrix"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined and marked"));
+  const GLOSS = fs.readFileSync(path.join(SITE, "learn/glossary.yml"), "utf8");
+  ["combined-cycle", "peaker", "solver"].forEach(id => ok(new RegExp("- id: " + id + "\\n").test(GLOSS) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " (course glossary) marked at first use"));
+  ok(/data-term="combined-cycle"/.test(QMD) && /data-term="peaker"/.test(QMD), "glossary: the fallback marks combined-cycle and peaker");
+  // prompts: one or two sentences each, within the budget; every card reads them from prompts()
+  const Q = K.prompts(s), plain = t => t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1"), sentences = t => (plain(t).match(/[.!?](?=\s+[A-Z(]|$)/g) || []).length;
+  ok(Q.length === 7 && [0, 1, 2, 3, 4, 5, 6].every(i => JS.indexOf("text: Q[" + i + "]") >= 0), "steps: seven cards, each prompt from prompts()");
+  Q.forEach((q, i) => { const w = plain(q).split(/\s+/).length; ok(sentences(q) <= 2 && w <= 35, `prompt ${i + 1}: ${sentences(q)} sentences, ${w} words (≤ 2, ≤ 35)`); });
+  // the explain layer's values are the ≤ form the equation shows (the cover row flipped), the original named apart
+  const ev = K.explainVals(s, s.plan, false), evOwn = K.explainVals(s, [130, 100], true);
+  ok(ev.Ax === "The plan x = (100, 45): A x = (−145, 100, 45, 61.75) in the ≤ form. Before the flip, the cover entry is 145." && K.vec(K.matvec(s.le.A, s.plan)) === "(−145, 100, 45, 61.75)", "explain: A x in the ≤ form");
+  ok(ev.b === "Lesson 10's hour: b = (−145, 150, 100, 100) in the ≤ form. Before the flip, the cover limit is 145, with ≥." && K.vec(s.le.b) === "(−145, 150, 100, 100)", "explain: b in the ≤ form");
+  ok(ev.A === "Lesson 10's hour: 4 rows × 2 columns. In the ≤ form the cover row is (−1, −1), its original (1, 1) times −1." && /^Your last plan, x = \(130, 100\): A x = \(−230, 130, 100, 103\.1\) in the ≤ form/.test(evOwn.Ax) && ev.c === "The plan x = (100, 45): c · x = $8,500 for the hour.", "explain: A, the reader's plan and the cost");
+  ok(/return explainVals\(s, o \|\| s\.plan, !!o\)\[kind\]/.test(JS), "explain: the equation card reads explainVals()");
+  // the matrix rows are buttons whose names say every number with its column and unit
+  ok(K.rowSpeech(M.rows[3], 3, { ax: s.Ax, b: true, check: K.check(M, s.plan) }) === "CO₂ cap row: 0.37 times x₁ plus 0.55 times x₂, A x = 61.75 t of CO₂, at most 100 t of CO₂, passes." &&
+     K.rowSpeech(M.rows[0], 0, { ax: s.Ax, b: true, le: true }) === "Cover row: −1 times x₁ plus −1 times x₂, A x = −145 MW, at most −145 MW." &&
+     K.rowSpeech(M.rows[3], 3, { ax: [145, 100, 45, null], b: true }) === "CO₂ cap row: 0.37 times x₁ plus 0.55 times x₂, not worked out yet, at most 100 t of CO₂.", "a11y: each matrix row's spoken name");
+  ok(/"aria-label": rowSpeech\(r, i, st\)/.test(JS) && /class: "k6-row head", "aria-hidden": "true"/.test(JS), "a11y: row buttons carry rowSpeech(); the visual header is hidden from screen readers");
   ok(/if \(p\[0\] === s\.plan\[0\] && p\[1\] === s\.plan\[1\] && !hit\) \{ hit = true; api\.done\(\)/.test(JS) && /if \(close\(v, s\.cost, 0\.5\)\) \{ api\.done\(\)/.test(JS) && /if \(n === 4\) \{ api\.done\(\)/.test(JS) && /if \(close\(v, s\.co2, 0\.005\)\)/.test(JS) && /if \(only && !hit\) \{ hit = true; api\.done\(\)/.test(JS) && /if \(v === s\.l11\.cols\) \{ api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
   ok(/"aria-live": "polite"/.test(JS) && /LX\.demo\(root,/.test(JS) && /autos\[6\]/.test(JS) && /LX\.Drill\(host, \{/.test(JS) && /LX\.NumAnswer\(act/.test(JS), "live regions, demo hook, NumAnswer and Drill");
   ok(/LX\.EquationCard\(/.test(JS) && /LX\.LinkedViews\(/.test(JS) && /LX\.CompareTable\(/.test(JS), "explain: equation card, linked views, comparison table");
@@ -146,6 +192,37 @@ function evalSide(side) { const e = side.replace(/×/g, "*").replace(/÷/g, "/")
   ok(PATHY.indexOf('subtitle: "' + sub + '"') >= 0, "path.yml: subtitle equals the page's");
   const desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
+}
+
+// ---------------- the page on a stub document: it mounts, with its explain layer; the matrix rows carry their spoken names
+{
+  const vm = require("vm");
+  const { env, load, El } = require("./stubdom.js");
+  if (!El.prototype.contains) El.prototype.contains = function (n) { while (n) { if (n === this) return true; n = n.parentNode; } return false; };   // the stub has no contains()
+  const E = env();
+  E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null;
+  E.LX.lessonRefHTML = (p, c) => "<a>" + c + "</a>";
+  ["numanswer", "drill", "cards", "controls", "lpplane", "equation", "linkedviews", "table"].forEach(n => load(n, E));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "k06") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  const mctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {}, IntersectionObserver: undefined };
+  let threw = null;
+  const xp = E.LX.H("div", { id: "k6-explain" }, E.body);
+  try {
+    vm.runInNewContext(JS, mctx);
+    const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "k06" }, E.body), live = E.LX.H("div", null, root);
+    init(live, { town: TOWN, town_year: YEAR, "10_write_it_down": D10, path: {} }, root);
+  } catch (e) { threw = e.stack || e.message; }
+  ok(!threw && demo && demo.cards, "stub: the page mounts with its explain layer" + (threw ? ": " + threw : ""));
+  if (!threw && demo) try {
+    ok(/Outputs cannot be negative/.test(xp.textContent) && !/np\./.test(xp.textContent), "stub: the explain layer states nonnegativity and shows no NumPy");
+    const card = () => demo.cards.el;
+    [0, 1, 2, 3, 4, 5, 6].forEach(k => { demo.cards.go(k); ok(card().textContent.length > 0, "stub: step " + (k + 1) + " builds"); });
+    demo.cards.go(3);
+    const rows = card().querySelectorAll("button").filter(b => /k6-row/.test(b.getAttribute("class") || ""));
+    ok(rows.length === 4 && rows[3].getAttribute("aria-label") === "CO₂ cap row: 0.37 times x₁ plus 0.55 times x₂, not worked out yet, at most 100 t of CO₂.", "stub: step 4's matrix rows carry their spoken names (" + (rows[3] && rows[3].getAttribute("aria-label")) + ")");
+  } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 
 console.log(`k06-vectors-matrices: ${checks - fails} of ${checks} checks passed`);

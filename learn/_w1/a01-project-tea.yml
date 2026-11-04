@@ -10,7 +10,7 @@ glossary:
     def: "The number of years until the running sum of a project's cash first gets back to zero, with or without discounting."
   - id: break-even-price
     term: Break-even price
-    def: "The sale price at which a project's net present value is exactly zero; for one plant it equals its levelized cost."
+    def: "The sale price at which a project's net present value is exactly zero; when electricity is its only revenue, with the same costs, output and discounting, it equals the plant's levelized cost."
   - id: inflation
     term: Inflation
     def: "The rise in prices in general over time, so that a dollar buys less each year."

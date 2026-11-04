@@ -3,7 +3,9 @@
 // and K3's; the identities hold (NPV at the break-even price is zero, the break-even price is lesson 7's LCOE, 1 MW is
 // $133,575 a year, NPV falls as the rate rises so the IRR is unique); the drill's answers are right; and every number the
 // page states matches the model (statements one by one, a whitelist scan of the visible text, and every printed calculation
-// recomputed from its shown operands). The no-JS tables must equal staticBlocks().
+// recomputed from its shown operands). The whitelist scan is supplementary: it shows that every number on the page is one
+// the model makes, not that each statement is right; the statements are checked one by one. The no-JS tables must equal
+// staticBlocks(). A stub-document run checks step 4's IRR bracket (Codex review, 2026-11-03).
 // Usage (from the site folder):  node _tests/learn/test_a01-project-tea.js [--write]   (--write rewrites the no-JS tables)
 "use strict";
 const fs = require("fs");
@@ -85,6 +87,18 @@ const { usd, musd, signed, pct } = A;
   ok(s.pb.simple === 16 && F[15].cum < 0 && F[16].cum >= 0 && s.pb.years.toFixed(2) === "15.09", "payback: running sum first ≥ 0 in year 16 (15.09 years)");
   ok(s.pb.discounted === 24 && F[23].cumPV < 0 && F[24].cumPV >= 0, "payback: discounted at 4%, year 24");
   ok(s.pb20.simple === 16 && s.pb20.discounted === null && musd(s.npv20) === "−$25.5M", "payback: a 20-year life keeps payback in year 16, never pays back discounted, NPV −$25.5M");
+  // step 4: the IRR is not on the slider's 0.1-point grid, so the card asks for the two settings around it
+  const B = s.irrB, grid = [], st = DA.rateStep;
+  for (let r = DA.rateRange[0]; r <= DA.rateRange[1] + 1e-9; r += st) grid.push(+r.toFixed(1));
+  ok(B.lo === 5.1 && B.hi === 5.2 && grid.indexOf(B.lo) >= 0 && grid.indexOf(B.hi) >= 0 && B.npvLo > 0 && B.npvHi < 0 && signed(B.npvLo) === "+$1.9M" && signed(B.npvHi) === "−$1.0M", "IRR bracket: 5.1% (+$1.9M) and 5.2% (−$1.0M), neighbours on the slider");
+  ok(grid.every(r => Math.abs(A.npv(p, r)) > 0.5e6) && B.lo < s.irr && s.irr < B.hi, "IRR bracket: no slider setting gives an NPV of zero; the IRR lies inside the bracket");
+  ok(grid.filter(r => A.npv(p, r) > 0).pop() === B.lo && grid.filter(r => A.npv(p, r) < 0)[0] === B.hi, "IRR bracket: the last positive and the first negative settings");
+  // the explain layer's code searches −50% to 100%, as irr() does: it brackets every IRR the sliders can reach
+  let badB = 0;
+  for (let pr = DA.priceRange[0]; pr <= DA.priceRange[1]; pr += DA.priceStep) [D7.finance.lifeRange[0], 30, D7.finance.lifeRange[1]].forEach(life => {
+    const q = A.inputs(D7, DA, { price: pr, life: life }); if (!(A.npv(q, -50) > 0 && A.npv(q, 100) < 0 && A.irr(q) !== null)) badB++; });
+  ok(badB === 0 && /brentq\(npv_at, -0\.5, 1\.0\)  # needs npv_at\(-0\.5\) > 0 > npv_at\(1\.0\)/.test(JS) && !/brentq\([^)]*, 0, 1\)/.test(JS), "IRR code: the search range −50% to 100% brackets the IRR at every price and life on the sliders (" + badB + " bad)");
+  ok(pct(A.irr(A.inputs(D7, DA, { price: 30 })), 3) === "−0.323%", "IRR code: at $30/MWh the IRR is negative (−0.323%), inside the range");
 }
 
 // ---------------- the story numbers
@@ -120,7 +134,12 @@ const { usd, musd, signed, pct } = A;
   has("$133,575 a year per MW ÷ 2,960.88 MWh per MW");
   has("<code>=NPV(4%, B3:B32) + B2</code> gives 37.53"); has("<code>=IRR(B2:B32)</code> gives 5.17%");
   ok(near(s.S / 1e6, 22.2066, 1e-9) && near(s.F / 1e6, 5.1855, 1e-9) && (s.npv / 1e6).toFixed(2) === "37.53", "spreadsheet task: 22.2066, 5.1855 and 37.53 are the model's");
-  ok(near(A.sales(A.inputs(D7, DA, { price: 45.11 })) / 1e6, 20.0355, 1e-3) && Math.abs(A.npv(A.inputs(D7, DA, { price: 45.11 }))) < 0.05e6, "spreadsheet task: at $45.11, sales 20.0356 and NPV about zero (" + A.npv(A.inputs(D7, DA, { price: 45.11 })).toFixed(0) + ")");
+  ok((A.sales(A.inputs(D7, DA, { price: 45.11 })) / 1e6).toFixed(4) === "20.0348" && Math.abs(A.npv(A.inputs(D7, DA, { price: 45.11 }))) < 0.05e6, "spreadsheet task: at $45.11, sales 20.0348 and NPV about zero (" + A.npv(A.inputs(D7, DA, { price: 45.11 })).toFixed(0) + ")");
+  has("Change the price to $45.11 (sales 20.0348)");
+  has("Row 1 holds the headers: <code>Year</code> in A1 and <code>Cash ($M)</code> in B1. Years 0 to 30 go in A2 to A32.");
+  has("Cash: −256.8 in B2 (year 0), then 22.2066 − 5.1855 in B3 to B32 (years 1 to 30).");
+  ok((256.8 * 1).toFixed(1) === musd(s.C).replace(/[$M]/g, "") && 32 - 2 === p.life, "spreadsheet task: rows 2 to 32 hold years 0 to 30");
+  has("+$37.5M is the NPV at 4%; simple payback does not depend on the rate.");
   ok(/data-id="seven" data-answer="b"/.test(QMD) && /data-id="spb" data-answer="c"[\s\S]{0,300}<li data-value="c">15\.09 years<\/li>/.test(QMD), "quiz: answers point at the right options");
   ok(/data-id="above" data-answer="fact"/.test(QMD) && /data-id="irr" data-answer="myth"/.test(QMD) && /data-id="payback" data-answer="myth"/.test(QMD) && /data-id="yearly" data-answer="myth"/.test(QMD), "myths: three myths and one fact");
   Object.keys(BLOCKS).forEach(name => {
@@ -130,7 +149,14 @@ const { usd, musd, signed, pct } = A;
   ["07-cost.html", "k03-discounting.html", "k07-spreadsheets.html", "a02-contracts-risk.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0, "links " + h));
   ok(!/href="[^"]*(m11|x05|projects\/|research\.)/i.test(QMD) && /M11 and side shelf X5 \(both upcoming\)/.test(QMD) && /side shelf X5, upcoming/.test(QMD), "upcoming lessons are named, not linked; no project or Research links");
   ok(/EMM_Assumptions\.pdf">EIA, AEO2026 assumptions, Table 3<\/a> \(2025 dollars, April 2026\)/.test(QMD) && /financial_cases_&amp;_methods">2025 ATB<\/a> \(NLR, September 2026\)/.test(QMD) && /5173\.pdf/.test(QMD) && /p\. 39[\s\S]*p\. 52[\s\S]*p\. 56[\s\S]*p\. 57/.test(QMD), "sources: EIA, NLR and the NREL manual with dates and pages");
-  ok(/One price year: every dollar is a real 2025 dollar/.test(QMD) && /the \$50\/MWh price are illustrative/.test(QMD) && /Left out: taxes, tax credits, depreciation/.test(QMD), "data note: price year, illustrative inputs and the boundary are stated");
+  ok(/One price year: every dollar is a real 2025 dollar/.test(QMD) && /Illustrative: the loan and owner rates \(5%, 10%\), the 150 MW size and the \$50\/MWh price, fixed in 2025 dollars as a contract indexed to inflation would be/.test(QMD) && /Left out: taxes, tax credits, depreciation/.test(QMD), "data note: price year, illustrative inputs and the boundary are stated");
+  ok(/fixed in real terms \(2025 dollars\)/.test(DA.priceNote) && /flat nominal price would lose purchasing power/.test(DA.priceNote) && /A price flat in nominal dollars buys less each year, so its real revenue falls/.test(QMD) && /as a contract indexed to inflation would be/.test(JS), "price: fixed in real terms, as an indexed contract; a flat nominal price falls in real terms (data, Go deeper, equation card)");
+  ok(/the real WACC may fall less than the slider shows, or not at all\./.test(QMD) && !/The WACC falls less than the slider shows/.test(QMD), "financing: Go deeper does not claim the WACC falls");
+  // every element of the no-JS fallback, the data note and Go deeper holds one idea within the budget (about 35 words)
+  const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>[A-Z][a-z]+, [A-Z]\./.test(t) && !/Short, W\./.test(t) && !/EIA \(2026\)\.|EIA\. <a|NLR \(2026\)\./.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
+  const words = t => t.replace(/<[^>]+>/g, " ").replace(/\$[^$]*\\[a-z][^$]*\$/g, " x ").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
+  const long = elems.filter(t => words(t) > 36).map(t => words(t) + ": " + t.replace(/<[^>]+>/g, "").slice(0, 50));
+  ok(elems.length >= 20 && long.length === 0, "budget: " + elems.length + " fallback, data-note and Go deeper elements are 36 words or fewer: " + JSON.stringify(long));
   const body = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "");
   ok(!/nuclear|reactor|\bSMR\b|data cent|learning/i.test(body) && !/nuclear|reactor|data cent|learning/i.test(JS.replace(/\/\/.*$/gm, "")), "scope: no nuclear, no data centers, no learning wording");
 }
@@ -146,7 +172,7 @@ const { usd, musd, signed, pct } = A;
   s.tor.rows.forEach(r => m(r.swing));
   B.cash.match(/\d[\d,]*\.\d/g).forEach(add);
   [s.irr, s.irrSmall, s.w60.real].forEach(v => add(v.toFixed(2))); add(s.be.toFixed(2)); add(s.pb.years.toFixed(2)); add(s.w60.nominal.toFixed(1));
-  ["133,575", "2,960.88", "8,760", "0.338", "1,712", "34.57", "33.8", "22.2066", "5.1855", "20.0356", "37.53", "45.11", "17.02", "256.8", "12.00", "8.56", "30.00", "4.08", "40", "32"].forEach(add);
+  ["133,575", "2,960.88", "8,760", "0.338", "1,712", "34.57", "33.8", "22.2066", "5.1855", "20.0348", "37.53", "45.11", "17.02", "256.8", "12.00", "8.56", "30.00", "4.08", "40", "32"].forEach(add);
   [0, 1, 2, 3, 4, 5, 7, 10, 11, 12, 13, 16, 20, 24, 25, 30, 31, 39, 43, 45, 50, 52, 56, 57, 60, 70, 80, 150, 462, 1995, 2025, 2026, 5173, "2.5", "1.0", "6.0"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
@@ -209,10 +235,17 @@ function calcCheck(label, str, skips) {
 
 // ---------------- the step texts and messages: budget, terms, honesty
 {
-  const msgs = { build: T.build, disc: T.disc, waccSaw: T.waccSaw, irr: T.irr, pay: T.pay, be: T.be, tor: T.tor("cf"), wacc: T.wacc(60) + " " + T.waccSaw };
+  const msgs = { build: T.build, disc: T.disc, waccSaw: T.waccSaw, irr: T.irr, irrDown: T.irrDown, irrUp: T.irrUp, restart: T.restart, pay: T.pay, be: T.be, tor: T.tor("cf"), wacc: T.wacc(60) + " " + T.waccSaw };
   Object.keys(msgs).forEach(k => { const w = msgs[k].replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").split(/\s+/).filter(Boolean).length; ok(w <= 36, `budget: message ${k} is ${w} words (≤ 36)`); });
-  const stepTexts = (JS.match(/^      text: "[^\n]*/gm) || []);
-  ok(stepTexts.length === 7, "steps: seven cards (" + stepTexts.length + ")");
+  const Q = A.prompts(s, D7), plain = t => t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1");
+  const sentences = t => (plain(t).match(/[.!?](?=\s+[A-Z(]|$)/g) || []).length;
+  ok(Q.length === 7 && [0, 1, 2, 3, 4, 5, 6].every(i => JS.indexOf("text: Q[" + i + "]") >= 0), "steps: seven cards, each prompt from prompts()");
+  Q.forEach((q, i) => { const w = plain(q).split(/\s+/).length; ok(sentences(q) <= 2 && w <= 35, `prompt ${i + 1}: ${sentences(q)} sentences, ${w} words (≤ 2, ≤ 35)`); });
+  ok(T.irr === "Between 5.1% (NPV +$1.9M) and 5.2% (−$1.0M) the NPV changes sign. The [[internal-rate-of-return|internal rate of return]] lies between: 5.17%. It is above 4%, so the NPV at 4% is positive.", "messages: the IRR bracket message");
+  ok(/Find the two neighbouring settings where it changes sign/.test(Q[3]), "step 4: asks for the two settings around the IRR, not for zero itself");
+  ok(T.waccSaw === "Rates held fixed, more loans lower the WACC and raise the NPV. Real financing shifts risk and required returns, so this slider cannot pick the best loan share." && !/decide the answer/.test(JS), "messages: the loan-share message says what the slider cannot show");
+  ok(T.restart === "Starting again from the default farm: $50/MWh, 4% real, 30 years." && (JS.match(/^        restart\(act\);$/gm) || []).length === 4, "steps 4 to 7 each say they start again from the default farm");
+  ok(/lede: "Tap a symbol: its meaning, unit and value\. NPV, IRR and p follow your last price in step 6; the rest are the default farm's\."/.test(JS) && /title: "The default farm's life, year by year"/.test(JS) && /title: "Five yardsticks for the default farm"/.test(JS), "explain: the reader's price and the default farm are told apart");
   ok(T.wacc(60) === "60% loans: 7.0% nominal, 4.39% real; NPV +$24.1M." && T.wacc(40) === "40% loans: 8.0% nominal, 5.37% real; NPV −$5.7M.", "messages: the WACC line at 60% and 40%");
   ok(/Right\. Capacity factor moves the NPV most \(\$204\.5M across its range\), then discount rate \(\$170\.0M\)/.test(T.tor("cf")) && !/^Right/.test(T.tor("price")), "messages: the tornado names the top two and says Right only for the right guess");
   ok(/would not earn its 4%/.test(T.be) && /lesson 7's LCOE/.test(T.be), "messages: the break-even message ties to lesson 7 and says what negative means");
@@ -221,11 +254,14 @@ function calcCheck(label, str, skips) {
   const desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
   ["internal-rate-of-return", "payback-period", "break-even-price", "inflation"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
+  [["nominal-rate", "k03-discounting"], ["capital-recovery-factor", "07-cost"]].forEach(([id, l]) => ok(new RegExp("id: " + id + "\\n").test(fs.readFileSync(path.join(SITE, "learn/_w1/" + l + ".yml"), "utf8")) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " (defined in " + l + ") marked at its first use"));
+  ok(/\[\[nominal-rate\|nominal\]\]/.test(Q[2]) && /capital recovery factor \(CRF\) " \+ cr\.toFixed\(4\)/.test(JS), "terms: 'nominal' marked in step 3; the drill spells out CRF");
+  ok(/when electricity is its only revenue, with the same costs, output and discounting, it equals the plant's levelized cost\./.test(SIDE) && !/for one plant it equals/.test(SIDE), "glossary: break-even price equals the levelized cost only under stated conditions");
 }
 
 // ---------------- the interactive: the actions Next waits for, live regions, the demo hook, path.yml
 {
-  ok(/if \(on\.build && on\.sales && on\.upkeep\) \{ api\.done\(\)/.test(JS) && /if \(shown\) \{ api\.done\(\)/.test(JS) && /if \(moved\) \{ api\.done\(\)/.test(JS) && /if \(!reached && r >= s\.irr\)/.test(JS) && /if \(tg\.val\(\)\) \{ api\.done\(\)/.test(JS) && /if \(!crossed && v < 0\)/.test(JS) && /onPick: function \(g\) \{ if \(!drawn\) \{ drawn = true; draw\(\); \} pr\.reveal\(\); api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
+  ok(/if \(on\.build && on\.sales && on\.upkeep\) \{ api\.done\(\)/.test(JS) && /if \(shown\) \{ api\.done\(\)/.test(JS) && /if \(moved\) \{ api\.done\(\)/.test(JS) && /if \(!reached && seen\.lo && seen\.hi\) \{ reached = true; api\.done\(\)/.test(JS) && /if \(tg\.val\(\)\) \{ api\.done\(\)/.test(JS) && /if \(!crossed && v < 0\)/.test(JS) && /onPick: function \(g\) \{ if \(!drawn\) \{ drawn = true; draw\(\); \} pr\.reveal\(\); api\.done\(\)/.test(JS), "steps: each card's action is checked before Next opens");
   ok((JS.match(/"aria-live": "polite"/g) || []).length >= 1 && /function readouts\(host, labels, cls\) \{\s*var box = H\("div", \{ class: "lx-readouts" \+ \(cls \? " " \+ cls : ""\), "aria-live": "polite" \}/.test(JS), "steps: readouts are a live region");
   ok(/LX\.demo\(root,/.test(JS) && /state === "mid" \? 1/.test(JS) && /autos\[6\]/.test(JS), "demo: mid, step-N and done states");
   ok(/LX\.EquationCard\(/.test(JS) && /LX\.Timeline\(/.test(JS) && /LX\.CompareTable\(/.test(JS) && /LX\.Tornado\(/.test(JS) && /LX\.Drill\(host, \{/.test(JS), "components: equation card, timeline, comparison table, tornado and drill");
@@ -243,13 +279,49 @@ function calcCheck(label, str, skips) {
     if (it.kind === "payback") { const mm = /costs \$(\d+)M and nets \$(\d+)M a year/.exec(it.q); let c = -mm[1], t = 0; while (c < -1e-9) { c += +mm[2]; t++; } ok(it.answer === t, `drill ${i}: payback year ${t}`); }
     if (it.kind === "irr") { const mm = /nets \$([\d.]+)M a year for (\d+) years/.exec(it.q), ex = A.irrOf(100, +mm[1], +mm[2]); ok(+it.choices[it.answer].replace("%", "") === Math.round(ex) && Math.abs(ex - Math.round(ex)) < 0.02 && new Set(it.choices).size === 4, `drill ${i}: irr (${ex.toFixed(3)})`); }
     if (it.kind === "wacc") { const mm = /Loans pay (\d+)% and owners ask (\d+)%.*loans are (\d+)% of the money; inflation is ([\d.]+)%/.exec(it.q); const nom = mm[3] / 100 * mm[1] + (1 - mm[3] / 100) * mm[2]; ok(near(it.answer, Math.round(((1 + nom / 100) / (1 + mm[4] / 100) - 1) * 1e4) / 100), `drill ${i}: wacc`); }
-    if (it.kind === "breakeven") { const mm = /Building cost \$([\d,]+)\/kW, upkeep \$([\d.]+)\/kW-yr, capacity factor ([\d.]+)%, CRF ([\d.]*\d)/.exec(it.q); ok(near(it.answer, Math.round((+mm[4] * +mm[1].replace(/,/g, "") + +mm[2]) / (mm[3] / 100 * 8.76) * 100) / 100), `drill ${i}: breakeven`); }
+    if (it.kind === "breakeven") { const mm = /Building cost \$([\d,]+)\/kW, upkeep \$([\d.]+)\/kW-yr, capacity factor ([\d.]+)%, capital recovery factor \(CRF\) ([\d.]*\d)/.exec(it.q); ok(near(it.answer, Math.round((+mm[4] * +mm[1].replace(/,/g, "") + +mm[2]) / (mm[3] / 100 * 8.76) * 100) / 100), `drill ${i}: breakeven`); }
     if (it.kind === "pick") { const mm = /A: NPV \$(\d+)M, IRR (\d+)%\. B: NPV \$(-?\d+)M, IRR (\d+)%/.exec(it.q); ok(mm && (it.answer === 1) === (+mm[3] > +mm[1]) && +mm[4] > +mm[2], `drill ${i}: pick by NPV, not IRR`); }
     if (!it.choices) ok(A.close(it.answer, it.answer, it.tol), `drill ${i}: its own answer passes`);
   });
   ok(Object.keys(counts).length === 6, "drill: all six kinds appear: " + JSON.stringify(counts));
   ok(A.drill(7, 12).map(x => x.q).join("|") === A.drill(7, 12).map(x => x.q).join("|"), "drill: a seed replays the same items");
   ok(items.filter(it => it.kind === "pick").some(it => it.answer === 0) && items.filter(it => it.kind === "pick").some(it => it.answer === 1), "drill: the pick items go both ways");
+}
+
+// ---------------- the page on a stub document: step 4 opens Next only on the IRR bracket; steps 4 to 7 say they restart
+{
+  const vm = require("vm");
+  const { env, load } = require("./stubdom.js");
+  const E = env();
+  E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null;
+  ["numanswer", "drill", "cards", "controls", "toggle", "plot", "predict"].forEach(n => load(n, E));
+  let init = null, demo = null;
+  E.LX.mount = (slug, f) => { if (slug === "a01") init = f; };
+  E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
+  E.LX.Tornado = () => ({ draw() {} });
+  const mctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {} };
+  let threw = null;
+  try {
+    vm.runInNewContext(JS, mctx);
+    const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "a01" }, E.body), live = E.LX.H("div", null, root);
+    init(live, { "07_cost": D7, a01_project_tea: DA }, root);
+  } catch (e) { threw = e.message; }
+  ok(!threw && demo && demo.cards, "stub: the page mounts" + (threw ? ": " + threw : ""));
+  if (!threw && demo) try {
+    const card = () => demo.cards.el, btn = re => card().querySelectorAll("button").filter(b => re.test(b.getAttribute("aria-label") || b.textContent))[0];
+    const next = () => btn(/^Next/), saw = () => (card().querySelector(".lx-saw") || { textContent: "" }).textContent;
+    const input = () => card().querySelector("input");
+    demo.cards.go(3);
+    ok(/Starting again from the default farm/.test(card().textContent), "stub: step 4 says it starts again from the default farm");
+    input().value = "6"; input().fire("input");
+    ok(next().disabled && /Past zero/.test(saw()), "stub: 6.0%, past the IRR, does not open Next; the card says to step back");
+    const down = btn(/^Lower Discount rate/), up = btn(/^Raise Discount rate/);
+    for (let i = 0; i < 8; i++) down.click();     // 6.0 → 5.2
+    ok(next().disabled && /Past zero/.test(saw()), "stub: 5.2% alone does not open Next");
+    down.click();                                  // 5.1
+    ok(!next().disabled && /Between 5\.1% \(NPV \+\$1\.9M\) and 5\.2% \(−\$1\.0M\)/.test(saw()), "stub: standing on 5.2% and 5.1% opens Next and names the bracket: " + saw());
+    [4, 5, 6].forEach(k => { demo.cards.go(k); ok(/Starting again from the default farm/.test(card().textContent), "stub: step " + (k + 1) + " says it starts again from the default farm"); });
+  } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 
 console.log(`a01-project-tea: ${checks - fails} of ${checks} checks passed`);

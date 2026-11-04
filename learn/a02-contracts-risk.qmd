@@ -55,6 +55,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a2-hist-t { margin: 0; font-size: 14px; font-weight: 600; color: var(--lx-ink); }
 .a2-ro { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .a2-pick { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.a2-static.a2-words td:last-child { text-align: left; font-family: var(--lx-f-body); }
+.a2-key { margin: 6px 0 0; padding-left: 1.1rem; display: grid; gap: 3px; font-size: 14px; color: var(--lx-ink-2); }
+.a2-key li { margin: 0; }
 </style>
 ```
 
@@ -64,15 +67,24 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <p class="lx-eyebrow">One plant, four contracts, 200 simulated price years (seed 2025; real 2025 dollars)</p>
 <ol>
-<li>A 100 MW solar farm makes 210,240 MWh in a typical year; a buyer needs the same amount, flat. Five things change each year: the hub price, the shape (how much of it solar hours catch), output, basis (node minus hub) and the battery's margin.</li>
+<li>A 100 MW solar farm makes 210,240 MWh in a typical year; a buyer needs the same amount, flat. Five drivers change each year (first table below).</li>
 <li>With no contract, the solar farm's sales run from $3.9M (P10) to $8.2M (P90) a year, and the buyer's bill from $5.2M to $10.2M.</li>
-<li>A fixed price settled at the plant's node leaves the seller only output risk ($5.8M to $6.3M); the buyer carries price, shape and basis ($6.8M to $8.6M).</li>
+<li>A fixed price settled at the node leaves the seller only output risk ($5.8M to $6.3M). The buyer carries price, shape and basis, and shares output risk: the settled MWh follow output ($6.8M to $8.6M).</li>
 <li>Settled at the hub, the basis moves to the seller ($5.3M to $6.7M); the buyer's range narrows ($7.0M to $8.3M).</li>
-<li>A shaped contract, a flat block at a fixed price, fixes the buyer's bill at $7.59M; the seller buys the hours its panels miss ($5.0M to $6.9M).</li>
+<li>A shaped contract, a flat block at a fixed price, fixes the buyer's bill at $7.59M; the seller settles the hours its panels miss too ($5.0M to $6.9M).</li>
 <li>Tolled at $5.17 per kW a month, the battery pays its owner a fixed $3.10M a year, and its margin ($1.9M to $4.5M) moves to the buyer.</li>
 <li>A price $5.00 above fair moves $1.05M a year from the buyer to the seller; who carries which risk stays the same.</li>
 </ol>
 <div class="a2-tables">
+<table class="a2-static a2-words" aria-label="The five drivers of each simulated price year: illustrative, drawn independently">
+<thead><tr><th scope="col">Driver</th><th scope="col">What it is</th></tr></thead>
+<tbody>
+<tr><td>Hub price</td><td>The yearly average price at the <span class="lx-term" data-term="trading-hub">trading hub</span>, a regional reference price</td></tr>
+<tr><td>Shape</td><td>The hub price per MWh of solar output, as a share of the hub's all-hours average (the <span class="lx-term" data-term="capture-ratio">capture ratio</span>)</td></tr>
+<tr><td>Output</td><td>This year's solar output, as a share of a typical year's</td></tr>
+<tr><td>Basis</td><td>The plant's <span class="lx-term" data-term="pricing-node">node</span> price minus the hub price, per MWh of solar output</td></tr>
+<tr><td>Battery margin</td><td>What the battery earns per MWh after paying for its charging and losses</td></tr>
+</tbody></table>
 <!-- a2-table:start (written by _tests/learn/test_a02-contracts-risk.js --write; do not edit) -->
 <table class="a2-static" aria-label="P10 to P90 of 200 simulated price years, seed 2025, solar farm alone, millions of 2025 dollars a year">
 <thead><tr><th scope="col">Contract</th><th scope="col">Fair price</th><th scope="col">Seller's sales, P10 to P90</th><th scope="col">Buyer's bill, P10 to P90</th></tr></thead>
@@ -88,9 +100,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
-<li>A teaching simulation: the plant, the buyer and the five drivers' spreads are illustrative, drawn independently from a seeded generator (seed 2025 here). A price year is one simulated year, not a calendar year and not a forecast.</li>
+<li>A teaching simulation: the plant, the buyer and the five drivers' spreads are illustrative, and the drivers are drawn independently from a seeded generator (seed 2025 here).</li>
+<li>A price year is one simulated year, not a calendar year and not a forecast.</li>
+<li>Every contract here is settled in cash, as a financial PPA: the buyer buys its power at the hub, and the contract pays the price difference.</li>
 <li>P10 and P90 are statistics of the 200 simulated years: one year in ten fell below the P10 and one in ten above the P90 (percentiles as in toolbox <a href="k05-probability-statistics.html">K5</a>).</li>
-<li>Solar capacity factor 24.0%: <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> (U.S. solar PV, 2025; October 2026), as in <a href="07-cost.html">lesson 7</a>. One price year: all dollars are 2025 dollars.</li>
+<li>Solar capacity factor 24.0%: <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> (U.S. utility-scale solar PV generators, 2025; October 2026), as in <a href="07-cost.html">lesson 7</a>.</li>
+<li>One price year: all dollars are 2025 dollars.</li>
 <li>Left out: taxes, a party failing to pay, curtailment, capacity payments, renewable certificates, the battery's wear, and the hours inside each year.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="a01-project-tea.html">A1</a> (a project's cash flows) and toolbox <a href="k05-probability-statistics.html">K5</a> (percentiles and sampling).</p>
@@ -107,9 +122,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Power purchase agreement</dt><dd>A long contract to buy a plant's power, or its value, at a set price.</dd>
-<dt>As generated</dt><dd>The contract covers whatever the plant makes, so the seller keeps the output risk.</dd>
+<dt>As generated</dt><dd>The contract covers whatever the plant makes: the seller is paid on its actual output, and the settled MWh move with it, so the buyer feels output too.</dd>
 <dt>Settled at the node or the hub</dt><dd>The price difference is paid against the plant's own node or a trading hub; the basis between them sits with whoever is not paid at the node.</dd>
-<dt>Shaped</dt><dd>A fixed amount every hour: the seller fills the gaps at the market price, so it carries the shape.</dd>
+<dt>Shaped</dt><dd>A fixed amount every hour, settled in cash: the seller owes the difference in the hours its panels miss, so it carries the shape.</dd>
 <dt>Toll</dt><dd>The buyer pays a fixed fee to run the plant, here the battery, and keeps what it earns.</dd>
 <dt>P10 to P90</dt><dd>The middle 80% of the simulated years: a stated spread, not the worst or best case.</dd>
 </dl>
@@ -124,7 +139,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Lenders size loans on the bad years.** A loan is repaid from the low years' revenue, so a narrower range can carry a larger loan. That logic stays at awareness level here (side shelf X5, upcoming).
+- **Lenders size loans on the bad years.** A loan is repaid from the low years' revenue, so a narrower range can carry a larger loan. This stays at awareness level here (side shelf X5, upcoming).
 - **Fair is not the market price.** Each contract here is signed at its fair price, so on average it moves no money. Real prices also pay one side for the risk it takes on.
 - **A naming trap.** Resource studies often name levels by exceedance: their "P90" output is the level exceeded in 90% of years, this page's P10. Check which convention a study uses.
 
@@ -137,8 +152,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Seeded, so reproducible.** The same seed gives the same 200 years on any computer. A new seed gives other years, and the P10 and P90 move a little: that is sampling noise (K5's standard error).
-- **Independence is an assumption.** Here the five drivers are drawn independently. In real markets a high-price year may also be a wide-spread year for the battery; drawing linked inputs, and global sensitivity, are Modeler lesson [M7](m07-monte-carlo.html).
-- **Hours inside a year.** Each driver is one number per year. An hourly model would settle each hour, and lets the battery fill a shaped contract's evening hours.
+- **Independence is an assumption.** Here the five drivers are drawn independently. In real markets a high-price year may also be a wide-spread year for the battery; linked inputs and global sensitivity are Modeler lesson [M7](m07-monte-carlo.html).
+- **Hours inside a year.** Each driver is one number per year. An hourly model would settle each hour, and lets the battery cover a shaped contract's evening hours.
+- **Cash or delivery.** Every contract here is settled in cash. As physical delivery, the seller buying the hours its panels miss, the flat block gives the same money only if bought at the hub.
 
 ```{=html}
 </div>
@@ -167,7 +183,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="block" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “Under a flat block at a fixed price, the buyer's bill no longer depends on the hub price.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact, in this model: the buyer pays $7.59M every year, and the seller takes the price and shape risk of filling the block.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact, in this model: the buyer pays $7.59M every year, and the seller carries the block's price and shape risk.</p></details>
 </div>
 <div class="lx-qq" data-id="worst" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The P10 is the worst case.”</p>
@@ -178,14 +194,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 <div class="lx-quiz" data-quiz="a2">
 <div class="lx-qq" data-id="highyear" data-answer="c">
-<p class="lx-qtext">In price year 1 the hub averaged $68.14/MWh, the highest of the 200. Under the hub-settled fixed price of $30.69/MWh, what happens that year?</p>
+<p class="lx-qtext">Seed 2025, price year 1: the hub averaged $68.14/MWh, the highest of the 200. Over the solar farm's 210,089 MWh it averaged $54.47/MWh. Under the hub-settled fixed price of $30.69/MWh, what happens?</p>
 <ul class="lx-choices"><li data-value="a">The buyer pays the seller $5.00M</li><li data-value="b">Nobody pays: the price is fixed</li><li data-value="c">The seller pays the buyer $5.00M</li><li data-value="d">The seller keeps the high price</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>The seller pays the buyer $5.00M: the hub price over its hours is above the fixed price, and the contract pays the difference on every MWh it made.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>The seller pays the buyer $5.00M: 210,089 × (30.69 − 54.47) ≈ −5.00 million dollars. The hub price per solar MWh is above the fixed price, so the contract pays the difference to the buyer.</p></details>
 </div>
 <div class="lx-qq" data-id="whichfixed" data-answer="d">
 <p class="lx-qtext">Which contract leaves the buyer's bill the same in every price year of this model?</p>
 <ul class="lx-choices"><li data-value="a">No contract</li><li data-value="b">Fixed price, settled at the node</li><li data-value="c">Fixed price, settled at the hub</li><li data-value="d">A flat block at a fixed price</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>The flat block: the buyer gets the same MWh every hour at one price. Under as-generated contracts it still buys the hours the panels miss at the hub.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>The flat block. Every contract here is settled in cash, and the block's settlement fixes the buyer's bill. Under as-generated contracts the settled MWh follow the panels, so the bill still moves.</p></details>
 </div>
 </div>
 <div id="a2-drill"></div>
@@ -207,7 +223,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td class="n">$3.9M to $8.2M</td><td>The solar farm's yearly sales with no contract, P10 to P90 of 200 simulated price years (seed 2025).</td><td class="s">This lesson's simulation (illustrative drivers)</td></tr>
 <tr><td class="n">$5.3M to $6.7M</td><td>The same, with a fixed price settled at the hub: output and basis stay with the seller.</td><td class="s">This lesson's simulation</td></tr>
 <tr><td class="n">$7.59M</td><td>The buyer's bill every year under a flat block at a fixed price.</td><td class="s">This lesson's simulation</td></tr>
-<tr><td class="n">24.0%</td><td>The capacity factor of U.S. solar photovoltaic plants in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> · final 2025 data, October 2026</td></tr>
+<tr><td class="n">24.0%</td><td>The capacity factor of U.S. utility-scale solar photovoltaic generators in 2025.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> · final 2025 data, October 2026</td></tr>
 </tbody>
 </table>
 </div>

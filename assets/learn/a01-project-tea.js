@@ -10,7 +10,9 @@
 //   assets/learn/data/a01-project-tea.json the farm's size (150 MW, Prairie Town's wind farm), the illustrative sale price
 //                                         ($50/MWh), slider ranges, the timeline's illustrative calendar and the myth's
 //                                         smaller farm
-// One price year: every dollar is a real 2025 dollar, so every rate is a real rate (as in lesson 7 and K3).
+// One price year: every dollar is a real 2025 dollar, so every rate is a real rate (as in lesson 7 and K3). The sale price
+// is fixed in real terms, as a contract indexed to inflation would be (a flat nominal price would fall in real terms).
+// Each card from step 4 on starts again from the default farm ($50/MWh, 4% real, 30 years) and says so.
 //
 // Model (closed form; the project's pre-tax cash flows before any debt payments):
 //   yearly output        E = MW × 8,760 h × CF                                        (MWh a year)
@@ -18,15 +20,18 @@
 //                                                                                     interest during construction)
 //   years 1..n           net = p × E − F, with F = 1,000 × MW × fixed upkeep          (sales at a fixed price p, $/MWh)
 //   present value        net ÷ (1 + r)^t;  NPV(r) = −C + net × AF(r, n),  AF(r, n) = (1 − (1 + r)^−n) ÷ r  (K3)
-//   IRR                  the r with NPV(r) = 0 (bisection). One outlay, then equal positive years: NPV falls as r
-//                        rises, so there is exactly one IRR (the test checks it on a grid)
+//   IRR                  the r with NPV(r) = 0 (bisection between −50% and 100%). One outlay, then equal positive
+//                        years: NPV falls as r rises, so there is exactly one IRR (the test checks it on a grid)
+//   IRR bracket          the two neighbouring settings of step 4's slider (0.1-point steps) where the NPV changes sign,
+//                        5.1% and 5.2%: the root, 5.17%, is not on the slider, so step 4 asks for the bracket
 //   simple payback       the first whole year whose running sum of cash is ≥ 0 (Short, Packey and Holt 1995, p. 56);
 //                        C ÷ net is the same in fractional years
 //   discounted payback   the first whole year whose running sum of discounted cash is ≥ 0 (p. 57); none if it never is
 //   break-even price     p* = (CRF(r, n) × C + F) ÷ E: NPV(p*) = 0. Per kW this is lesson 7's LCOE, (CRF × capex + FOM)
 //                        ÷ (CF × 8.76), $45.11/MWh for the wind farm, and 1 MW costs 1,000 × (CRF × capex + FOM) =
 //                        $133,575 a year (lessons 7 and 13, K3)
-//   WACC (no taxes)      nominal = d × r_loans + (1 − d) × r_owners;  real = (1 + nominal) ÷ (1 + inflation) − 1  (lesson 7)
+//   WACC (no taxes)      nominal = d × r_loans + (1 − d) × r_owners;  real = (1 + nominal) ÷ (1 + inflation) − 1  (lesson 7).
+//                        Both rates are held fixed as d moves, so the slider shows arithmetic, not the best loan share
 //   tornado              NPV with one input at its low and its high value, the others at their defaults
 // Every number the page states is checked against this model by _tests/learn/test_a01-project-tea.js (it also writes
 // the no-JS tables: --write).
@@ -70,6 +75,12 @@
     if (npv(p, lo) < 0 || npv(p, hi) > 0) return null;
     for (var i = 0; i < 200; i++) { var m = (lo + hi) / 2; if (npv(p, m) > 0) lo = m; else hi = m; }
     return (lo + hi) / 2;
+  }
+  // the slider's two neighbouring settings around the IRR (step in % points): lo has NPV > 0, hi has NPV < 0
+  function irrBracket(p, step) {
+    var i = irr(p), dec = (String(step).split(".")[1] || "").length; if (i == null) return null;
+    var lo = +(Math.floor(i / step + 1e-9) * step).toFixed(dec), hi = +(lo + step).toFixed(dec);
+    return { lo: lo, hi: hi, npvLo: npv(p, lo), npvHi: npv(p, hi), irr: i };
   }
   function payback(p, rate) {
     var F = flows(p, rate), s = null, d = null;
@@ -125,7 +136,7 @@
     var p = inputs(D7, DA), f = D7.finance, s = { p: p, fin: f };
     s.E = energy(p); s.C = outlay(p); s.S = sales(p); s.F = upkeep(p); s.net = net(p);
     s.sum = s.net * p.life; s.pvNet = s.net * annuity(p.rate / 100, p.life); s.npv = npv(p);
-    s.irr = irr(p); s.pb = payback(p); s.be = breakEven(p); s.lcoe = lcoePerKW(p); s.perMW = perMWYear(p);
+    s.irr = irr(p); s.irrB = irrBracket(p, DA.rateStep); s.pb = payback(p); s.be = breakEven(p); s.lcoe = lcoePerKW(p); s.perMW = perMWYear(p);
     s.npvLE = npv(p, 0) ; s.pvLast = pv(s.net, p.rate / 100, p.life); s.pvFirst = pv(s.net, p.rate / 100, 1);
     s.life20 = inputs(D7, DA, { life: f.lifeRange[0] }); s.npv20 = npv(s.life20); s.pb20 = payback(s.life20); s.irr20 = irr(s.life20);
     s.w60 = wacc(f, f.debtShare); s.npv60 = npv(p, s.w60.real);
@@ -143,8 +154,11 @@
       build: "Year 0 spends " + musd(s.C) + ". Years 1 to " + p.life + " each sell " + musd(s.S) + " and spend " + musd(s.F) + " on upkeep: " + musd(s.net) + " net. Added up without discounting, that is " + musd(s.sum) + ".",
       disc: "At " + R + ", the " + p.life + " net years are worth " + musd(s.pvNet) + " today. Minus the " + musd(s.C) + " outlay, the [[net-present-value|NPV]] is " + signed(s.npv) + ": the farm is worth building at this rate and price.",
       wacc: function (d) { var W = wacc(s.fin, d), v = npv(p, W.real); return d + "% loans: " + pct(W.nominal, 1) + " nominal, " + pct(W.real, 2) + " real; NPV " + signed(v) + "."; },
-      waccSaw: "With these rates, moving from 40% to 60% loans takes the NPV from " + signed(s.npv40) + " to " + signed(s.npv60) + ". Financing alone can decide the answer.",
-      irr: "The NPV reaches zero at " + pct(s.irr, 2) + ": the [[internal-rate-of-return|internal rate of return]]. It is above the " + R + " rate, so the NPV at " + R + " is positive.",
+      waccSaw: "Rates held fixed, more loans lower the WACC and raise the NPV. Real financing shifts risk and required returns, so this slider cannot pick the best loan share.",
+      irr: "Between " + pct(s.irrB.lo, 1) + " (NPV " + signed(s.irrB.npvLo) + ") and " + pct(s.irrB.hi, 1) + " (" + signed(s.irrB.npvHi) + ") the NPV changes sign. The [[internal-rate-of-return|internal rate of return]] lies between: " + pct(s.irr, 2) + ". It is above " + R + ", so the NPV at " + R + " is positive.",
+      irrDown: "Past zero: the NPV is negative here. Step back with − one notch at a time until it turns positive.",
+      irrUp: "The NPV is still positive. Step up with + one notch at a time until it turns negative.",
+      restart: "Starting again from the default farm: " + usd(p.price, 0) + "/MWh, " + R + " real, " + p.life + " years.",
       pay: "Payback stays in year " + s.pb.simple + ", but the NPV falls from " + signed(s.npv) + " to " + signed(s.npv20) + ". Payback is blind to every year after it.",
       be: "The NPV crosses zero at " + usd(s.be) + "/MWh, lesson 7's LCOE for the same farm. Below it, the NPV is negative: the farm would not earn its " + R + ".",
       tor: function (guess) {
@@ -152,6 +166,19 @@
         return (guess === top.key ? "Right. " : "") + top.label + " moves the NPV most (" + musd(top.swing) + " across its range), then " + second.label.toLowerCase() + " (" + musd(second.swing) + "). Other ranges could change the order.";
       }
     };
+  }
+
+  // the seven cards' prompts (pure, so the test can check each is one or two sentences within the text budget)
+  function prompts(s, D7) {
+    var p = s.p, f = D7.finance, R = pct(p.rate, 0);
+    return [
+      "A " + p.mw + " MW wind farm sells every MWh at " + usd(p.price, 0) + " for " + p.life + " years. Add its three cash flows, year by year: what it costs to build, what it sells, and its upkeep.",
+      "A dollar in year " + p.life + " is worth less than a dollar now (toolbox K3). Switch on today's value: each year's net cash, divided by " + (1 + p.rate / 100).toFixed(2) + " once for every year of waiting.",
+      "The rate is what the money costs: loans at " + pct(f.debtRate, 0) + ", owners asking " + pct(f.equityRate, 0) + " for their riskier share ([[nominal-rate|nominal]], illustrative), [[inflation|inflation]] " + pct(f.inflation, 1) + ". Slide the loan share and watch the [[wacc|WACC]] and the NPV.",
+      "Raise the rate from " + R + " and the NPV falls. Find the two neighbouring settings where it changes sign: the project's own return lies between them.",
+      "[[payback-period|Payback]] counts the years until the cash put in comes back. Read it where each running sum crosses zero, then shorten the farm's life to " + f.lifeRange[0] + " years.",
+      "Lower the sale price from " + usd(p.price, 0) + " until the NPV turns negative. Where it crosses zero is the [[break-even-price|break-even price]].",
+      "Which of six inputs, swung across a plausible range with the others held, moves the NPV most? Guess, then see the [[tornado-chart|tornado chart]]."];
   }
 
   // ---------------------------------------------------------------- no-JS tables (written into the page by the test)
@@ -206,7 +233,7 @@
     if (kind === "breakeven") {
       var cap = pick([1200, 1500, 1712, 2000]), fom = pick([20, 30, 34.57]), cfp = pick([25, 30, 33.8, 40]), cr = +crf(pick([4, 5, 6]) / 100, 30).toFixed(4);
       var Ekw = cfp / 100 * 8.76, be = (cr * cap + fom) / Ekw;
-      return { kind: kind, q: "Building cost $" + cap.toLocaleString("en-US") + "/kW, upkeep $" + fom + "/kW-yr, capacity factor " + cfp + "%, CRF " + cr.toFixed(4) + ". The break-even price, in $/MWh to the cent?", answer: Math.round(be * 100) / 100, tol: 0.06, unit: "$/MWh",
+      return { kind: kind, q: "Building cost $" + cap.toLocaleString("en-US") + "/kW, upkeep $" + fom + "/kW-yr, capacity factor " + cfp + "%, capital recovery factor (CRF) " + cr.toFixed(4) + ". The break-even price, in $/MWh to the cent?", answer: Math.round(be * 100) / 100, tol: 0.06, unit: "$/MWh",
                why: "(" + cr.toFixed(4) + " × " + cap + " + " + fom + ") ÷ (" + (cfp / 100).toFixed(3) + " × 8.76) = " + be.toFixed(2) + " $/MWh." };
     }
     // pick: two mutually exclusive projects; which adds more value?
@@ -218,8 +245,8 @@
   function drill(seed, n) { return DR.series(drillItem, seed, n); }
 
   var model = { HOURS: HOURS, crf: crf, annuity: annuity, pv: pv, realRate: realRate, inputs: inputs, energy: energy, outlay: outlay, upkeep: upkeep, sales: sales,
-                net: net, npv: npv, flows: flows, irr: irr, irrOf: irrOf, payback: payback, breakEven: breakEven, lcoePerKW: lcoePerKW, perMWYear: perMWYear, wacc: wacc,
-                tornado: tornado, milestones: milestones, story: story, texts: texts, staticBlocks: staticBlocks, KINDS: KINDS, drillItem: drillItem, drill: drill,
+                net: net, npv: npv, flows: flows, irr: irr, irrBracket: irrBracket, irrOf: irrOf, payback: payback, breakEven: breakEven, lcoePerKW: lcoePerKW, perMWYear: perMWYear, wacc: wacc,
+                tornado: tornado, milestones: milestones, story: story, texts: texts, prompts: prompts, staticBlocks: staticBlocks, KINDS: KINDS, drillItem: drillItem, drill: drill,
                 close: NA.close, usd: usd, musd: musd, signed: signed, pct: pct, mwh: mwh };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -242,12 +269,14 @@
   }
 
   function view(live, data, root) {
-    var D7 = data["07_cost"], DA = data["a01_project_tea"], s = story(D7, DA), T = texts(s), p = s.p, autos = {}, steps = [];
+    var D7 = data["07_cost"], DA = data["a01_project_tea"], s = story(D7, DA), T = texts(s), Q = prompts(s, D7), p = s.p, autos = {}, steps = [];
     var R = pct(p.rate, 0), N = p.life;
+    // cards 4 to 7 start again from the default farm, whatever an earlier card changed: each says so first
+    function restart(act) { H("p", { class: "lx-hint a1-restart", text: T.restart }, act); }
 
     // ---- step 1: build the cash flows
     steps.push({
-      text: "A " + p.mw + " MW wind farm sells every MWh at " + usd(p.price, 0) + " for " + N + " years. Add its three cash flows, year by year: what it costs to build, what it sells, and its upkeep.",
+      text: Q[0],
       build: function (act, api) {
         var on = { build: false, sales: false, upkeep: false };
         var row = H("div", { class: "lx-choices-row", role: "group", "aria-label": "Add a cash flow" }, act), btn = {};
@@ -280,7 +309,7 @@
 
     // ---- step 2: discount each year
     steps.push({
-      text: "A dollar in year 30 is worth less than a dollar now (toolbox K3). Switch on today's value: each year's net cash, divided by 1.04 once for every year of waiting.",
+      text: Q[1],
       build: function (act, api) {
         var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Discounting" }, act), { label: "Show each year's value today, at " + R, on: false, onChange: draw });
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
@@ -307,7 +336,7 @@
     // ---- step 3: the discount rate is the cost of the money (WACC)
     var fin = D7.finance;
     steps.push({
-      text: "The rate is what the money costs: loans at " + pct(fin.debtRate, 0) + ", owners asking " + pct(fin.equityRate, 0) + " for their riskier share (nominal, illustrative), [[inflation|inflation]] " + pct(fin.inflation, 1) + ". Slide the loan share and watch the [[wacc|WACC]] and the NPV.",
+      text: Q[2],
       build: function (act, api) {
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
         var ro = readouts(act, [["nom", "WACC, nominal"], ["real", "WACC, real (the discount rate)"], ["npv", "NPV at that rate"]]);
@@ -332,14 +361,17 @@
 
     // ---- step 4: the internal rate of return
     steps.push({
-      text: "Raise the discount rate and the NPV falls. Slide it up from " + R + " until the NPV reaches zero. That rate is the project's own return.",
+      text: Q[3],
       build: function (act, api) {
+        restart(act);
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
         var ro = readouts(act, [["r", "Discount rate"], ["npv", "NPV"]]);
         var rg = DA.rateRange, xs = [];
         for (var x = rg[0]; x <= rg[1] + 1e-9; x += 0.5) xs.push(Math.round(x * 10) / 10);
-        var sl = LX.Slider(act, { label: "Discount rate (real)", color: COL.today, min: rg[0], max: rg[1], step: DA.rateStep, value: p.rate, fmt: function (v) { return v.toFixed(1) + "%"; }, onChange: draw });
-        var reached = false;
+        var sl = LX.Slider(act, { label: "Discount rate (real)", color: COL.today, min: rg[0], max: rg[1], step: DA.rateStep, value: p.rate, fmt: function (v) { return v.toFixed(1) + "%"; }, onChange: function () { moved = true; draw(); } });
+        // done when the reader has stood on both settings around the IRR (the root itself is not on the 0.1-point grid)
+        var B = s.irrB, seen = { lo: false, hi: false }, moved = false, hadNeg = false, reached = false;
+        var at = function (r, x) { return Math.abs(r - x) < DA.rateStep / 10; };
         function draw() {
           var r = sl.val(), v = npv(p, r), pts = xs.map(function (q) { return [q, npv(p, q) / 1e6]; }), ax = axisM(pts.map(function (q) { return q[1]; }));
           ro.r.textContent = pct(r, 1); ro.npv.textContent = signed(v);
@@ -349,17 +381,20 @@
             lines: [{ pts: pts, color: COL.today }], marks: marks,
             aria: "NPV of the wind farm against the discount rate: " + signed(npv(p, rg[0])) + " at 0%, zero at " + pct(s.irr, 2) + ", " + signed(npv(p, rg[1])) + " at " + rg[1] + "%; now " + signed(v) + " at " + pct(r, 1) + ".",
             text: { head: ["Discount rate", "NPV"], rows: xs.filter(function (q) { return q % 1 === 0; }).map(function (q) { return [pct(q, 0), signed(npv(p, q))]; }) } });
-          if (!reached && r >= s.irr) { reached = true; api.done(); api.saw(T.irr); draw(); }
+          if (at(r, B.lo)) seen.lo = true; if (at(r, B.hi)) seen.hi = true;
+          if (!reached && seen.lo && seen.hi) { reached = true; api.done(); api.saw(T.irr); draw(); return; }
+          if (!reached && moved) { if (v < 0) { hadNeg = true; api.saw(T.irrDown, true); } else if (hadNeg || at(r, B.lo)) api.saw(T.irrUp, true); }
         }
-        autos[3] = function () { sl.set(Math.ceil(s.irr * 10) / 10, true); };
+        autos[3] = function () { sl.set(B.lo, true); sl.set(B.hi, true); };
         draw();
       }
     });
 
     // ---- step 5: payback, and what it misses
     steps.push({
-      text: "[[payback-period|Payback]] counts the years until the cash put in comes back. Read it where each running sum crosses zero, then shorten the farm's life to " + D7.finance.lifeRange[0] + " years.",
+      text: Q[4],
       build: function (act, api) {
+        restart(act);
         var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Life of the farm" }, act), { label: "A " + D7.finance.lifeRange[0] + "-year life instead of " + N, on: false, onChange: draw });
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
         var ro = readouts(act, [["s", "1 · Simple payback"], ["d", "2 · Discounted payback, " + R], ["npv", "NPV at " + R]]);
@@ -387,8 +422,9 @@
 
     // ---- step 6: the break-even price is lesson 7's LCOE
     steps.push({
-      text: "Lower the sale price from " + usd(p.price, 0) + " until the NPV turns negative. Where it crosses zero is the [[break-even-price|break-even price]].",
+      text: Q[5],
       build: function (act, api) {
+        restart(act);
         var P = LX.Plot(act, { text: "Text version of the chart", box: true });
         var ro = readouts(act, [["p", "Sale price"], ["npv", "NPV at " + R], ["irr", "IRR"]]);
         var rg = DA.priceRange, xs = []; for (var x = rg[0]; x <= rg[1]; x += 5) xs.push(x);
@@ -415,8 +451,9 @@
     // ---- step 7: which input matters most? (tornado)
     var TOR = s.tor.rows, OPTS = TOR.slice().sort(function (a, b) { return ["price", "cf", "capex", "rate", "life", "fom"].indexOf(a.key) - ["price", "cf", "capex", "rate", "life", "fom"].indexOf(b.key); });
     steps.push({
-      text: "Six inputs could be wrong. Which one, swung across a plausible range with the others held, moves the NPV most? Guess, then see the [[tornado-chart|tornado chart]].",
+      text: Q[6],
       build: function (act, api) {
+        restart(act);
         var box = H("div", null, act), drawn = false;
         var pr = LX.Predict(act, { id: "a1-tornado", q: "Moves the NPV most:", options: OPTS.map(function (r) { return { value: r.key, label: r.label }; }), fresh: true, answer: TOR[0].key,
           onPick: function (g) { if (!drawn) { drawn = true; draw(); } pr.reveal(); api.done(); api.saw(T.tor(g)); } });
@@ -452,20 +489,20 @@
     function own() { var o = LX.store.get("a1-own"); return o && typeof o.price === "number" ? inputs(D7, DA, { price: o.price }) : null; }
     function you(kind) {
       return function () {
-        var q = own() || p, head = own() ? "Your last price, " + usd(q.price, 0) + "/MWh: " : "The wind farm: ";
+        var q = own() || p, head = own() ? "Your last price in step 6, " + usd(q.price, 0) + "/MWh: " : "The default farm: ";
         if (kind === "npv") return head + "NPV " + signed(npv(q)) + " at " + R + ".";
         if (kind === "irr") { var i = irr(q); return head + (i == null ? "no IRR in the searched range." : "IRR " + pct(i, 2) + "."); }
-        if (kind === "C") return "The wind farm: 1,000 × " + q.mw + " MW × " + usd(q.capex, 0) + " per kW = " + musd(outlay(q)) + ".";
+        if (kind === "C") return "The default farm: 1,000 × " + q.mw + " MW × " + usd(q.capex, 0) + " per kW = " + musd(outlay(q)) + ".";
         if (kind === "p") return head + "sales " + musd(sales(q)) + " a year.";
-        if (kind === "E") return "The wind farm: " + q.mw + " MW × 8,760 h × " + pct(q.cf, 1) + " = " + mwh(energy(q)) + " MWh a year.";
-        if (kind === "F") return "The wind farm: 1,000 × " + q.mw + " MW × " + usd(q.fom) + " per kW = " + musd(upkeep(q)) + " a year.";
+        if (kind === "E") return "The default farm: " + q.mw + " MW × 8,760 h × " + pct(q.cf, 1) + " = " + mwh(energy(q)) + " MWh a year.";
+        if (kind === "F") return "The default farm: 1,000 × " + q.mw + " MW × " + usd(q.fom) + " per kW = " + musd(upkeep(q)) + " a year.";
         if (kind === "r") return "Lessons 7 and 13, and here: " + R + " a year, real.";
-        if (kind === "n") return "The wind farm: " + q.life + " years.";
+        if (kind === "n") return "The default farm: " + q.life + " years.";
         return null;
       };
     }
     var card = LX.EquationCard(H("div", { class: "lx-xcard a1-eqcard" }, x), {
-      title: "Net present value and the internal rate of return", lede: "Tap a symbol: its meaning, its unit and the wind farm's numbers.",
+      title: "Net present value and the internal rate of return", lede: "Tap a symbol: its meaning, unit and value. NPV, IRR and p follow your last price in step 6; the rest are the default farm's.",
       rows: [
         { parts: [{ k: "npv" }, "=", "−", { k: "C" }, "+", { html: "Σ<sub>t=1</sub><sup>n</sup>" }, { frac: [["(", { k: "p" }, "×", { k: "E" }, "−", { k: "F" }, ")"], ["(1 + ", { k: "r" }, ")", { html: "<sup>t</sup>" }]] }],
           say: "NPV equals minus the building cost C, plus the sum over years t from 1 to n of p times E minus F, divided by one plus r to the power t.", tag: "NPV" },
@@ -474,17 +511,17 @@
       symbols: {
         npv: { sym: "NPV", name: "Net present value", unit: "$", color: "var(--lx-ink)", words: "Every year's cash, discounted to today and added up, the outlay included. Above zero, the project earns more than the rate r.", you: you("npv"), code: "npv = -C + sum((p*E - F) / (1 + r)**t for t in range(1, n + 1))" },
         C: { sym: "C", name: "Building cost", unit: "$, in year 0", color: COL.build, words: "The whole outlay, paid at once in year 0 (no interest during construction here).", you: you("C"), code: "C = 1000 * 150 * 1712" },
-        p: { sym: "p", name: "Sale price", unit: "$ per MWh", color: COL.sales, words: "What each MWh sells for; fixed for the whole life in this lesson (illustrative).", you: you("p"), code: "p = 50" },
+        p: { sym: "p", name: "Sale price", unit: "$ per MWh", color: COL.sales, words: "What each MWh sells for, fixed in 2025 dollars for the whole life, as a contract indexed to inflation would be (illustrative).", you: you("p"), code: "p = 50" },
         E: { sym: "E", name: "Yearly output", unit: "MWh a year", color: "var(--lx-wind)", words: "Size × 8,760 hours × the capacity factor (lesson 5).", you: you("E"), code: "E = 150 * 8760 * 0.338" },
         F: { sym: "F", name: "Fixed upkeep", unit: "$ a year", color: COL.upkeep, words: "[[fixed-om|Fixed operation and maintenance]], paid every year whatever the output.", you: you("F"), code: "F = 1000 * 150 * 34.57" },
         r: { sym: "r", name: "Discount rate", unit: "a fraction per year", color: COL.today, words: "What the money costs, the [[wacc|WACC]]; real, because every dollar here is a 2025 dollar.", you: you("r"), code: "r = 0.04" },
-        irr: { sym: "IRR", name: "Internal rate of return", unit: "a fraction per year", color: "var(--lx-tier-4)", words: "The rate at which the NPV is exactly zero: the project's own return.", you: you("irr"), code: "irr = scipy.optimize.brentq(lambda r: npv_at(r), 0, 1)" } },
+        irr: { sym: "IRR", name: "Internal rate of return", unit: "a fraction per year", color: "var(--lx-tier-4)", words: "The rate at which the NPV is exactly zero: the project's own return.", you: you("irr"), code: "irr = scipy.optimize.brentq(npv_at, -0.5, 1.0)  # needs npv_at(-0.5) > 0 > npv_at(1.0)" } },
       fields: [{ key: "you", label: "Your numbers" }, { key: "code", label: "In code", code: true }], sel: "npv",
       hint: "t counts years from the outlay (year 0); n is the life in years."
     });
     var ms = milestones(p, DA), y0 = DA.schedule.buildYear, src = { label: "This lesson's model; illustrative calendar" };
     LX.Timeline(H("div", { class: "lx-xcard" }, x), {
-      title: "The wind farm's life, year by year", lede: "An illustrative calendar: built in " + y0 + ", selling from " + (y0 + 1) + ". Every dollar is a 2025 dollar.",
+      title: "The default farm's life, year by year", lede: "At " + usd(p.price, 0) + "/MWh, " + R + " real, on an illustrative calendar: built in " + y0 + ", selling from " + (y0 + 1) + ". Every dollar is a 2025 dollar.",
       kinds: { event: "Cash", study: "Yardstick" },
       events: [
         { date: String(ms.build), label: "Year 0: build", kind: "event", key: true, text: "The outlay, " + musd(s.C) + ", all at once.", source: src },
@@ -495,7 +532,7 @@
       note: "Payback reads the first crossing; the NPV also counts every year after it."
     });
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
-      title: "Five yardsticks for one farm", text: true,
+      title: "Five yardsticks for the default farm", text: true,
       columns: [{ key: "name", label: "Yardstick", main: true }, { key: "asks", label: "It answers" }, { key: "misses", label: "It misses" }, { key: "here", label: "This farm" }],
       rows: [
         { key: "npv", color: "var(--lx-ink)", name: "Net present value", asks: "How much value does it add at the cost of money?", misses: "Needs a rate; one number hides the risk.", here: signed(s.npv) + " at " + R },
@@ -514,6 +551,8 @@
     var host = document.getElementById("a1-drill"); if (!host) return; host.innerHTML = "";
     LX.Drill(host, { hint: "Six kinds of item in rotation: NPV, payback, IRR, WACC, break-even price and choosing between projects. A calculator helps; aim for twelve, about 25 minutes.",
                      empty: "Type a number first.", item: drillItem, unit: function (it) { return it.unit || ""; } });
+    // the drill writes its items as plain text, so the one term it needs is marked here, under the card
+    H("p", { class: "lx-hint a1-drill-terms", html: LX.rich("The break-even items give the [[capital-recovery-factor|capital recovery factor]] (CRF) of lesson 7 and K3: the share of the building cost repaid each year, with interest.") }, host);
   }
 
   LX.mount("a01", function (live, data, root) { view(live, data, root); });

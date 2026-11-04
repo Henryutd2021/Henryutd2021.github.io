@@ -1,5 +1,5 @@
 {
-  "about": "Analyst lesson A2 (Who carries the risk?): a solar-plus-storage plant, a buyer, four contracts for the solar output and two ways to run the battery, and a seeded simulation of 200 price years. All money is in real 2025 dollars (one price year for the whole lesson). The distributions of the five yearly drivers are illustrative, chosen to be plausible in size, not fitted to any market; the five are drawn independently of each other. A price year is one simulated year of market conditions, not a calendar year and not a forecast. Left out: taxes, credit risk (a party failing to pay), curtailment, capacity payments, renewable certificates, the battery's own breakdowns and wear, and hour-by-hour detail inside a year.",
+  "about": "Analyst lesson A2 (Who carries the risk?): a solar-plus-storage plant, a buyer, four contracts for the solar output and two ways to run the battery, and a seeded simulation of 200 price years. All money is in real 2025 dollars (one price year for the whole lesson). The distributions of the five yearly drivers are illustrative, chosen to be plausible in size, not fitted to any market; the five are drawn independently of each other. A price year is one simulated year of market conditions, not a calendar year and not a forecast. Every contract is settled in cash (a financial PPA): the buyer buys its power at the hub and the contract pays the difference; no hour-by-hour delivery is modelled. Left out: taxes, credit risk (a party failing to pay), curtailment, capacity payments, renewable certificates, the battery's own breakdowns and wear, and hour-by-hour detail inside a year.",
   "accessed": "2026-11-03",
   "priceYear": 2025,
   "plant": {
@@ -7,7 +7,7 @@
     "batteryMW": 50,
     "batteryHours": 4,
     "cyclesPerYear": 365,
-    "note": "100 MW of solar (capacity factor from lesson 7's data file: 24.0%, EIA, U.S. solar PV, 2025) and a 50 MW, 4-hour battery (200 MWh) that discharges once a day: 73,000 MWh a year. Sizes illustrative."
+    "note": "100 MW of solar (capacity factor from lesson 7's data file: 24.0%, EIA, U.S. utility-scale solar PV generators, 2025) and a 50 MW, 4-hour battery (200 MWh) that discharges once a day: 73,000 MWh a year. Sizes illustrative."
   },
   "buyer": {
     "note": "The buyer, a utility or a large electricity user, buys a flat amount all year equal to the plant's typical solar output (210,240 MWh, a flat 24 MW), priced at the hub's yearly average price when it buys without a contract."
@@ -16,9 +16,9 @@
     "years": 200,
     "seed": 2025,
     "hub": { "median": 35, "sigma": 0.25, "note": "Hub price: the yearly average price at the trading hub, $/MWh. Lognormal: median $35, log standard deviation 0.25. Illustrative." },
-    "capture": { "mean": 0.85, "sd": 0.05, "min": 0.65, "max": 1.05, "note": "Solar capture ratio: the average hub price over the hours the solar farm produces, as a share of the hub's yearly average (below 1 because solar hours are often cheaper). Normal, mean 0.85, standard deviation 0.05, cut at 0.65 and 1.05. Illustrative." },
+    "capture": { "mean": 0.85, "sd": 0.05, "min": 0.65, "max": 1.05, "note": "Solar capture ratio: the hub price earned per MWh the solar farm produces (each hour weighted by its output), as a share of the hub's all-hours yearly average (below 1 because solar hours are often cheaper). Normal, mean 0.85, standard deviation 0.05, cut at 0.65 and 1.05. Illustrative." },
     "volume": { "mean": 1, "sd": 0.04, "min": 0.88, "max": 1.12, "note": "Output: this year's solar output as a share of a typical year's. Normal, mean 1, standard deviation 0.04, cut at 0.88 and 1.12. Illustrative." },
-    "basis": { "mean": -2, "sd": 2.5, "note": "Basis: the plant's node price minus the hub price, averaged over the hours it produces, $/MWh. Normal, mean −$2, standard deviation $2.50. Illustrative." },
+    "basis": { "mean": -2, "sd": 2.5, "note": "Basis: the plant's node price minus the hub price, weighted by the solar farm's output in each hour, $/MWh. Normal, mean −$2, standard deviation $2.50. Illustrative." },
     "spread": { "median": 40, "sigma": 0.35, "note": "Battery margin: what the battery earns per MWh it discharges, after paying for its charging and losses, $/MWh. Lognormal: median $40, log standard deviation 0.35. Illustrative." }
   },
   "priceOffsets": [-5, 5],

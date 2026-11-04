@@ -1181,7 +1181,7 @@
   status: active
   minutes: 25
   practice_minutes: 30
-  title: "Vectors and matrices: what Ax <= b means"
+  title: "Vectors and matrices: what Ax ≤ b means"
   subtitle: "Write a plan as a vector and the rules as a matrix, then check every rule at once"
   short: "Vectors and matrices"
   does: "On lesson 10's hour, write a plan as a vector and its cost as a dot product, stack the rules into a matrix, compute A x, flip a ≥ row to ≤, check every rule at once, and size the matrix of lesson 11's day."
