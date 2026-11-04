@@ -734,7 +734,9 @@
     H("span", { class: "e1-wire", "aria-hidden": "true" }, top);
     var sw = H("div", { class: "e1-node e1-switch" }, top);
     sw.innerHTML = '<span class="e1-sym" aria-hidden="true"><i></i></span><span class="e1-nt"><b>Switch to the grid</b><small class="e1-ss"></small></span>';
-    H("div", { class: "e1-bus", "aria-hidden": "true" }, el).appendChild(H("span", { text: "Campus bus: the shared connection" }));
+    // the bus, named and defined (W3 review C1 8); on phones the label keeps only its name, which fits on one line (the
+    // text version below says what it is)
+    H("div", { class: "e1-bus", "aria-hidden": "true" }, el).appendChild(H("span", { html: 'Campus bus<span class="e1-busdef">: the shared connection</span>' }));
     var cols = H("div", { class: "e1-cols" }, el);
     var sc = H("div", { class: "e1-col" }, cols), lc = H("div", { class: "e1-col" }, cols);
     H("p", { class: "e1-colh", text: "Sources" }, sc); H("p", { class: "e1-colh", text: "Loads, and what stays on in an outage" }, lc);

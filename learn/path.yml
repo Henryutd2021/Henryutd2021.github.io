@@ -1064,7 +1064,7 @@
   status: active
   minutes: 30
   title: "Microgrid Workbench"
-  subtitle: "Island Prairie Campus: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits"
+  subtitle: "Island a fictional campus: set what must stay on, size solar, a battery and diesel, and test hypothetical outages on 2025 solar profiles within the feeder's limits"
   short: "Microgrid Workbench"
   outcome: "Build a campus microgrid plan, run it through outage scenarios within the host feeder's limits, and read its cost, unserved load and emissions per scenario."
   teaches: [one-line diagram, islanding, load priorities in an outage, outage scenarios, host-feeder limits, ownership and cost of capital]

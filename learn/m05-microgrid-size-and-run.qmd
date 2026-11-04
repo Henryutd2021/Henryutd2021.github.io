@@ -111,6 +111,11 @@ td.m5-bad { color: var(--lx-bad); }
 .m5-found:empty { display: none; }
 .m5-ctl { margin: .2rem 0 .4rem; padding-left: 1.2rem; display: grid; gap: 2px; font-size: 14.5px; max-width: 70ch; }
 .m5-gaps { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; }
+/* the symbol table of the sizing model: a real table that scrolls sideways on a phone, so every cell keeps its column */
+.m5-symbols { margin: .4rem 0 .8rem; }
+.m5-symbols table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 14px; margin: 0; }
+.m5-symbols th, .m5-symbols td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--lx-line); }
+.m5-symbols th { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 600; color: var(--lx-ink-2); border-bottom: 2px solid var(--lx-line-2); }
 .m5-more > summary { cursor: pointer; font-family: var(--lx-f-display); font-size: 14px; color: var(--lx-ink-2); margin: .2rem 0; }
 </style>
 ```
@@ -144,6 +149,7 @@ td.m5-bad { color: var(--lx-bad); }
 
 Every hour lasts $\Delta t = 1$ h, so a kW held for an hour is a kWh; "$B/4$" is the battery's power, a quarter of its kWh.
 
+::: {.lx-scroll-x .m5-symbols}
 | Symbol | What it is | Unit | Decided or given |
 |---|---|---|---|
 | $S$, $B$ | solar panels; battery energy (power $B/4$) | kW; kWh | decided, $0 \le S \le 4{,}000$, $0 \le B \le 8{,}000$ |
@@ -157,8 +163,7 @@ Every hour lasts $\Delta t = 1$ h, so a kW held for an hour is a kWh; "$B/4$" is
 | $r_h$, $x$ | tariff in hour $h$; export credit | \$/kWh (EIA's ¢ ÷ 100) | given |
 | $\bar I$, $\bar E$ | the feeder's import and export limits | kW | given |
 | $L^{\text{must}}$, $L^{\text{other}}$ | the must-stay-on load (400 kW here); the other loads (800 kW) | kW | given |
-
-: Every symbol of the sizing model {.lx-facts}
+:::
 
 $$\min\; a_S S + a_B B + a_N N + a_F F + \sum_m w_m \sum_h \big(r_h\, i_{m,h} - x\, e_{m,h}\big)$$
 

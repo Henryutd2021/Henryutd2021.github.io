@@ -20,8 +20,8 @@
 .e1-line.island .e1-feeder { opacity: .55; border-style: dashed; }
 @media (prefers-reduced-motion: reduce) { .e1-switch .e1-sym i { transition: none; } }
 .e1-bus { margin: 10px 0 0; height: 0; border-top: 4px solid var(--lx-ink-2); border-radius: 2px; position: relative; }
-.e1-bus span { position: absolute; left: 50%; top: -11px; transform: translateX(-50%); background: var(--lx-surface); padding: 0 8px;
-  font-family: var(--lx-f-display); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--lx-ink-3); }
+.e1-bus > span { position: absolute; left: 50%; top: -11px; transform: translateX(-50%); background: var(--lx-surface); padding: 0 8px;
+  font-family: var(--lx-f-display); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--lx-ink-3); white-space: nowrap; }
 .e1-top + .e1-bus::before { content: ""; position: absolute; left: 50%; top: -14px; height: 10px; border-left: 2px solid var(--lx-ink-3); }
 .e1-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 14px; margin-top: 12px; }
 .e1-col { display: grid; gap: 6px; align-content: start; padding-left: 14px; border-left: 2px solid var(--lx-ink-3); min-width: 0; }
@@ -40,7 +40,8 @@
 @media (max-width: 640px) {
   .e1-cols { grid-template-columns: minmax(0, 1fr); }
   .e1-top { align-items: flex-start; padding-left: 18px; }
-  .e1-bus span { left: 12px; transform: none; }
+  .e1-bus > span { left: 12px; transform: none; white-space: nowrap; }
+  .e1-bus .e1-busdef { display: none; }
   .e1-top + .e1-bus::before { left: 30px; }
 }
 

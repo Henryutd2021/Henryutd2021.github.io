@@ -46,8 +46,9 @@ function resultRows(E1, R) {
     ["M5's plan: exports capped at 0 kW", Object.assign({}, def, { exp: 0, pv: cfg.reference.m5.plan.pv, bat: cfg.reference.m5.plan.bat, gen: cfg.reference.m5.plan.gen })]];
   const yr = YP.map(([label, st]) => { const avg = E1.readYear(st, P, solveSync(E1.yearModel(st, P))), full = X.fullYear(E1, P, st, solveSync); return { label, st, avg: avg.bill, full: full.bill, ok: full.status === "optimal" && full.unserved < 0.5 && avg.unserved < 0.5 }; });
   const pct = r => (r.full - r.avg) / r.avg * 100;
-  const yearHTML = '<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Plan</th><th scope="col">Grid bill, 12 average days</th><th scope="col">Grid bill, 8,760 hours</th><th scope="col">Difference</th></tr></thead><tbody>' +
-    yr.map(r => "<tr><td>" + r.label + " · " + E1.kilo(r.st.pv) + " kW, " + E1.kilo(r.st.bat) + " kWh</td><td class=\"n\">" + E1.money(r.avg) + "</td><td class=\"n\">" + E1.money(r.full) + "</td><td class=\"n\">" + (Math.abs(pct(r)) < 0.05 ? "the same" : (pct(r) > 0 ? "+" : "") + pct(r).toFixed(1) + "%") + "</td></tr>").join("") +
+  // each cell carries its column's name (data-l, engine-e1.css .e1-lab), so a phone, which shows one block per row, still says what each number is
+  const yearHTML = '<div class="lx-scroll-x"><table class="lx-facts e1-lab"><thead><tr><th scope="col">Plan</th><th scope="col">Grid bill, 12 average days</th><th scope="col">Grid bill, 8,760 hours</th><th scope="col">Difference</th></tr></thead><tbody>' +
+    yr.map(r => "<tr><td>" + r.label + " · " + E1.kilo(r.st.pv) + " kW, " + E1.kilo(r.st.bat) + " kWh</td><td class=\"n\" data-l=\"Grid bill, 12 average days\">" + E1.money(r.avg) + "</td><td class=\"n\" data-l=\"Grid bill, 8,760 hours\">" + E1.money(r.full) + "</td><td class=\"n\" data-l=\"Difference\">" + (Math.abs(pct(r)) < 0.05 ? "the same" : (pct(r) > 0 ? "+" : "") + pct(r).toFixed(1) + "%") + "</td></tr>").join("") +
     "</tbody></table></div>";
   const BLOCKS = { "sb1-bench": () => SS.staticHTML(E1.schema, def), "sb1-results": () => E1.fallback({ cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { sb1: pre }) }) }, "sb1"), "sb1-year": () => yearHTML };
   if (process.argv.includes("--write")) {

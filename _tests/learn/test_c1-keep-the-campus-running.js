@@ -122,6 +122,7 @@ const APPROVED_SNAPSHOT = {
   ok(relab.ok && relab.results.outages[0].must < 0.5 && C.crit(relab.results.outages[0]) > 1000, "the three loads relabelled 'shed': 0 kWh of must-stay-on load but " + E1.kilo(C.crit(relab.results.outages[0])) + " kWh of the brief's critical load, which the page reports (C1 2)");
   const JS = fs.readFileSync(X.L("c1-keep-the-campus-running.js"), "utf8");
   ok(/id: "brief", label: "The brief met: "/.test(JS) && /crit\(l\.R\.outages\[0\]\) < 0\.5/.test(JS), "the note checks the brief's loads, not the plan's own priorities (C1 2)");
+  ok(/class: "c1-crit " \+/.test(JS) && /E1\.Results\(H\("div", \{ class: "lx-sb-results c1-engine" \}, host\)/.test(JS), "the brief's line sits above the engine's results, which draw into a box of their own (E1.Results empties its host)");
 
   // ---------------- the brief and the frame
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp('::: \\{#' + id + ' \\.lx-sec\\}').test(PAGE), "section #" + id));

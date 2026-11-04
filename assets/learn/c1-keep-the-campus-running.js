@@ -89,11 +89,13 @@
         lastR = R;
         var main = {}; for (var k in R) main[k] = R[k];
         main.outages = [R.outages[0]];
-        // the brief's three loads, whatever priorities the plan gives them (W3 review C1 2)
+        // the brief's three loads, whatever priorities the plan gives them (W3 review C1 2), above the engine's results
+        // (E1.Results empties its own host, so it draws into a box of its own)
+        host.innerHTML = "";
         var c0 = crit(R.outages[0]), lab = H("p", { class: "c1-crit " + (c0 > 0.5 ? "bad" : "good"), role: "note" }, host);
         lab.innerHTML = "<b>The brief's critical loads (" + LX.esc(CRIT) + "): " + kilo(c0) + " kWh unserved in the storm.</b> " +
           LX.esc(c0 > 0.5 ? "This plan does not meet the brief" + (st.ph !== "must" || st.pw !== "must" || st.pd !== "must" ? ", whatever priorities it sets." : ".") : "It meets the brief for this storm.");
-        E1.Results(host, main, { P: P, slug: "c1", sizeNote: sizeNote });
+        E1.Results(H("div", { class: "lx-sb-results c1-engine" }, host), main, { P: P, slug: "c1", sizeNote: sizeNote });
         drawSens(H("div", { class: "lx-xcard lx-sb-chart c1-sens" }, host), R);
         rn.refresh();
       },
