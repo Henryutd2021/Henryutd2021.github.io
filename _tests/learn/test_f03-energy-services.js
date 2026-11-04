@@ -103,11 +103,14 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   ok(h.cutoutC === -23 && /cut-out no higher than -10°F \(-23°C\)/.test(D.sources.doe_cchp.where) && M.cop(D, -23) > 2 && M.cop(D, -24) === 1, "cut-out: the compressor runs at −23 °C (COP 2.12) and the backup heater below it (COP 1): the jump is in the model");
   // "COP falls as it gets colder": strictly increasing in T over the compressor's range
   for (let T = h.cutoutC; T < D.day.max; T++) ok(M.cop(D, T) < M.cop(D, T + 1), `COP rises from ${T} to ${T + 1} °C`);
-  // "electricity climbs faster than the heat need": for any two days below 18 °C, the colder one's electricity ratio is larger
+  // "electricity climbs faster than the heat need" holds above the cut-out (and across it, where COP drops to 1); below
+  // the cut-out both days run the backup heater at COP 1, so electricity grows exactly in step with heat (review F3 #3)
   for (let a = D.day.min; a <= D.day.max; a++) for (let b = a + 1; b <= D.day.max; b++) {
     const da = M.day(D, a), db = M.day(D, b);
-    ok(da.el / db.el > da.Q / db.Q - 1e-12, `electricity grows faster than heat from ${b} to ${a} °C`);
+    if (!db.backup) ok(da.el / db.el > da.Q / db.Q + 1e-9, `electricity grows strictly faster than heat from ${b} to ${a} °C (the warmer day runs the heat pump)`);
+    else ok(da.backup && near(da.el / db.el, da.Q / db.Q, 1e-12), `below the cut-out, ${b} to ${a} °C: electricity grows in step with heat (COP 1 both days)`);
   }
+  ok(M.day(D, h.cutoutC - 1).backup && !M.day(D, h.cutoutC).backup, "the backup heater runs only below the cut-out");
   const d5 = M.day(D, 5), d15 = M.day(D, -15);
   ok(d5.Q === 65 && d15.Q === 165 && (d15.Q / d5.Q).toFixed(1) === "2.5" && (d15.el / d5.el).toFixed(1) === "3.8", `5 → −15 °C: heat ×${(d15.Q / d5.Q).toFixed(2)}, electricity ×${(d15.el / d5.el).toFixed(2)}`);
   ok(near(M.day(D, -10).gas, 175) && near(d15.el + d15.air, d15.Q), "furnace gas = heat ÷ 0.80; heat pump: electricity + outdoor heat = heat");
@@ -121,10 +124,15 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   const tb = QMD.match(/The heat pump on a cold day[\s\S]*?<\/table>/)[0];
   [15, 5, -5, -15, -25].forEach(T => {
     const r = M.day(D, T), lbl = (T < 0 ? "−" : "") + Math.abs(T) + " °C";
-    const re = new RegExp("<tr><td>" + lbl + "[^<]*</td><td>" + r.cop.toFixed(2) + "</td><td>" + f(r.Q) + " kWh</td><td>" + f(r.el) + " kWh</td></tr>");
+    const re = new RegExp("<tr><td>" + lbl + "(?:(?!</td>).)*</td><td>" + r.cop.toFixed(2) + "</td><td>" + f(r.Q) + " kWh</td><td>" + f(r.el) + " kWh</td></tr>");
     ok(re.test(tb), `no-JS table, ${lbl}: COP ${r.cop.toFixed(2)}, ${f(r.Q)} kWh heat, ${f(r.el)} kWh electricity`);
   });
   ok(/COP falls from 3\.60 to 2\.40/.test(QMD) && /rises 2\.5 times, but the electricity 3\.8 times/.test(QMD), "explain fallback: 3.60 to 2.40, ×2.5 heat and ×3.8 electricity");
+  // the cold-snap question holds only above the cut-out, and says so
+  const snap = QMD.match(/data-id="snap"[\s\S]*?<\/div>/)[0];
+  ok(/the day stays above the heat pump's cut-out/.test(snap) && /Below the cut-out, the backup heater's COP stays at 1/.test(snap), "snap question: above the cut-out; the answer names the COP-1 case");
+  // the causal chain claims daily electricity only: no peak from daily data (review F3 #2)
+  ok(!/set the peak/.test(JS) && /Cold days raise electricity demand/.test(JS) && /needs hourly data/.test(JS), "causal chain: daily electricity, and the peak needs hourly data");
 }
 
 // ---------------- the Go deeper box on primary energy (F4's heat rate, F6's losses)
@@ -134,10 +142,15 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   ok(Math.round(P.sent / 100) * 100 === 5700 && Math.round(5700 * 7535 / 3412 / 100) * 100 === 12600, "primary: 5,400 ÷ 0.95 = 5,700 kWh sent out; 5,700 × 7,535 ÷ 3,412 = 12,600 kWh of gas (both lines of the box)");
   ok(Math.round(P.gas / 100) * 100 === 12600 && Math.round(P.cut * 100) === 26 && P.furnaceGas === 16900, `primary: ${f(P.gas)} kWh of gas at the plant, ${Math.round(P.cut * 100)}% less than the furnace's 16,900`);
   const box = QMD.match(/Primary energy: count the power plant too[\s\S]*?<\/details>/)[0];
-  ["5{,}400", "1 - 0.05", "5{,}700", "7{,}535", "3{,}412", "12{,}600", "about 12,600 kWh", "16,900 kWh", "about 26% less gas", "7,535 Btu of gas per kWh in 2025", "about 5%"].forEach(s => ok(box.indexOf(s) >= 0, `primary box states "${s}"`));
-  ok(/f04-power-plants\.html/.test(box) && /f06-grid-and-outages\.html/.test(box), "primary box links F4 and F6 (both live)");
+  ["5{,}400", "1 - 0.05", "5{,}700", "7{,}535", "3{,}412", "12{,}600", "about 12,600 kWh", "16,900 kWh", "about 26% less gas", "EIA's 2025 full-load test heat rate, 7,535 Btu of gas per kWh", "about 5%", "U.S. average for 2018–2022"].forEach(s => ok(box.indexOf(s) >= 0, `primary box states "${s}"`));
+  ok(/f04-power-plants\.html/.test(box) && /f06-grid-and-outages\.html/.test(box) && /eia\.gov\/tools\/faqs\/faq\.php\?id=105/.test(box), "primary box links F4, F6 (both live) and EIA's loss estimate");
+  ok(P6.losses.real_years === "2018 through 2022" && /2018 to 2022 data/.test(P6.sources.losses.as_of) && /epa_08_02/.test(P4.sources.eia_t82.url) && /full load/.test(P4.sources.eia_t82.where), "primary box's dates: EIA losses 2018-2022 (F6's data), heat rate at full load (F4's data)");
+  ok(!/primary energy\]\{[^}]*\} is larger/.test(box) && /For electricity from a gas plant, more fuel energy enters the plant than electrical energy reaches the home/.test(box), "primary energy: no universal 'larger' claim, the gas-plant case only (review F3 #5)");
   const md = QMD.match(/From services to demand[\s\S]*?<\/details>/)[0];
-  ok(/318\.15 ÷ 60 = 5\.30/.test(md) && near(318.15 / 60, 5.3025) && /0\.4526 \\times 318\.15 = 144/.test(md) && near(0.4526 * 318.15, 144, 0.01) && /keeps 45%/.test(md), "Modeler box: Carnot 5.30, 45% of it, 144");
+  ok(!/carnot|kelvin|318\.15/i.test(md) && !/carnot|kelvin/i.test(JSON.stringify(D.heatpump)), "Modeler box and data: no device thermodynamics (Carnot derivation removed; curriculum §4.4, D2)");
+  ok(/2\.4 × 60 = 144/.test(md) && near(D.heatpump.anchorCOP * (D.heatpump.supplyC - D.heatpump.anchorC), 144) && /chosen number, not physics/.test(md), "Modeler box: 144 is the chosen curve through COP 2.4 at −15 °C");
+  ok(/COP at or above the −23 °C cut-out \| 144 ÷ \(45 − \$T\$\): 3\.60 at 5 °C, 2\.40 at −15 °C/.test(md) && /COP below the cut-out \| 1:/.test(md) && M.cop(D, 5).toFixed(2) === "3.60", "Modeler box: the piecewise COP rule, with its domain (review F3 #3)");
+  ok((md.match(/\$\$/g) || []).length === 0 && /Above the cut-out, \$E\(T\)\$ grows faster/.test(md) && /below it, \$E\$ grows in step with \$Q\$/.test(md), "Modeler box: a short preview (no display equations); the growth claim carries its domain");
 }
 
 // ---------------- every number with a unit on the page comes from the model or the data
@@ -156,6 +169,7 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   // the practice questions' own arithmetic: 20,000 × 0.80, the 20% left; 10,000 ÷ 2.5, the rest from the air
   [20000, 20000 * 0.8, 20000 * 0.2, 20000 / 0.8, 10000, 10000 / 2.5, 10000 - 10000 / 2.5, 7500].forEach(v => add(v, "kWh"));
   ["1 kWh", "2.4 kWh"].forEach(s => allowed.add(s));   // "1 kWh of electricity delivers 2.4 kWh of heat" at COP 2.4
+  allowed.add(D.day.kWhPerDegreeDay + " kWh");          // the Modeler box: "5 kWh for each °C the day is below 18 °C"
   // sourced numbers
   ["22.8 mpg", "57.6 million Btu", "3,412 Btu", "7,535 Btu", "4,026 trillion Btu", "9,481 trillion Btu"].forEach(s => allowed.add(s));
   ["42%", "80%", "60%", "30%", "26%", "5%", "45%", "54%", "87%", "91%"].forEach(s => allowed.add(s));   // 87%–91%: FOTW #1360's title
@@ -198,6 +212,29 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   steps.forEach(t => { ok(words(t) <= 40 && sentences(t) <= 2, `step text within budget (two sentences, about 35 words): "${t.slice(0, 50)}…"`); ok(t.indexOf("**") < 0, "no ** in step text"); });
   const assembled = [D.predict.q + " Lock in a guess; the next step shows the year in kWh.", D.apply.q];
   assembled.forEach(t => ok(words(t) <= 40 && sentences(t) <= 2, `assembled step text within budget: "${t.slice(0, 50)}…"`));
+  // the visible data note: one short statement; the details sit in the inputs table, a short phrase per cell
+  const dn = QMD.match(/<p class="lx-datanote">[\s\S]*?<span>([\s\S]*?)<\/span><\/p>/)[1].replace(/<[^>]+>/g, "");
+  ok(words(dn) <= 35 && sentences(dn) <= 2, `data note within budget (${words(dn)} words)`);
+  const inp = QMD.match(/<table class="lx-mini-table f3-src">[\s\S]*?<\/table>/)[0];
+  const icells = [...inp.matchAll(/<td>([\s\S]*?)<\/td>/g)].map(x => x[1].replace(/<[^>]+>/g, ""));
+  ok(icells.length === 15, "inputs table: five inputs, each with real-or-illustrative and its source");
+  icells.forEach(c => ok(words(c) <= 16 && sentences(c) === 1, `inputs cell within budget: "${c.slice(0, 40)}…"`));
+  // every feedback text the steps can show, in every variant (verdicts "Right." and "Not quite." are not counted)
+  const fbs = [M.say.tour(), M.say.place(3), M.say.useful(D), M.say.heatPump(D), M.say.furnace(D), M.say.apply(D, true), M.say.apply(D, false), M.say.guess(D, true), M.say.guess(D, false)];
+  for (let r = 0; r <= D.sort.cards.length; r++) fbs.push(M.say.sort(r, D.sort.cards.length));
+  [undefined].concat(D.predict.options.map(o => o.value)).forEach(p => fbs.push(M.say.year(D, p)));
+  for (let T = D.day.min; T <= D.day.goal; T++) fbs.push(M.say.cold(D, T));
+  fbs.forEach(t => { const u = t.replace(/^(Right|Not quite)\. /, ""); ok(words(u) <= 35 && sentences(u) <= 2, `feedback within budget (${words(u)} words): "${t.slice(0, 50)}…"`); });
+  ok(/Below the −23 °C \[\[heat-pump-cut-out\|cut-out\]\] the heat pump stops pumping heat, and a backup heater runs at COP 1: 225 kWh of electricity for 225 kWh of heat\./.test(M.say.cold(D, -27)), "feedback below the cut-out: COP 1, electricity = heat");
+  ok(/At −15 °C the home needs 2\.5 times the heat of a 5 °C day, but the heat pump uses 3\.8 times the electricity: COP 2\.40\./.test(M.say.cold(D, -15)), "feedback at −15 °C: ×2.5 heat, ×3.8 electricity");
+  // practice answers, explain-fallback items and the explain layer's literal texts
+  [...QMD.matchAll(/<details class="lx-answer"><summary>Answer<\/summary><p>([\s\S]*?)<\/p>/g)].map(x => x[1].replace(/<[^>]+>/g, "")).forEach(t => ok(words(t) <= 35 && sentences(t) <= 3, `practice answer within budget (${words(t)} words): "${t.slice(0, 40)}…"`));
+  [...QMD.match(/<dl class="lx-ideas">[\s\S]*?<\/dl>/)[0].matchAll(/<dd>([\s\S]*?)<\/dd>/g)].map(x => x[1].replace(/<[^>]+>/g, "")).forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `explain item within budget: "${t.slice(0, 40)}…"`));
+  [...JS.matchAll(/(?:text|caption|note): "((?:[^"\\]|\\.)*)"/g)].map(x => x[1]).filter(t => words(t) > 3).forEach(t => ok(words(t) <= 35 && sentences(t) <= 2, `explain text within budget: "${t.slice(0, 40)}…"`));
+  ok(!/\bflue\b/i.test(QMD + JS) && !/Energy bought is not energy used/.test(JS), "plain words: 'exhaust vent', not 'flue'; 'not all the energy bought becomes useful' (review F3 #7, #9)");
+  ok(/Assume no duct losses/.test(QMD) && /leaves the furnace as heat/.test(rd("learn/_w1/f03-energy-services.yml")) && /assumes no duct losses/.test(QMD), "AFUE: heat leaving the furnace; the example assumes no duct losses (review F3 #4)");
+  ok(/HSPF2 8\.5, is a heating-season test rating in Btu of heat per Wh of electricity: 8\.5 ÷ 3\.412 is a seasonal COP of about 2\.5/.test(QMD) && M.seasonCOP(D).toFixed(1) === "2.5", "HSPF2 explained, with its unit, as the seasonal COP 2.5");
+  ok(/A different device can change how much energy you buy, which carrier you use, or both\./.test(JS), "comparison caption: a different device, not 'a better device changes the carrier' (review F3 #10)");
   D.services.forEach(s => ok(words(s.want) <= 14 && sentences(s.want) === 1 && (!s.note || sentences(s.note) <= 1), `${s.key}: one short line of what people want`));
   D.sort.cards.forEach(c => ok(sentences(c.why) === 1 && c.why.length < 90, `sort ${c.id}: a one-sentence reason`));
   ok(D.sort.cards.filter(c => c.bin === "service").length === 3 && D.sort.cards.filter(c => c.bin === "carrier").length === 3 && D.sort.cards.filter(c => c.bin === "device").length === 3, "sort: three services, three carriers, three devices");
@@ -215,7 +252,7 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   for (const m of yml.matchAll(/^\s*-? ?id: ([a-z0-9-]+)/gm)) ids.add(m[1]);
   const used = new Set([...(JS + JSON.stringify(D)).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(x => x[1]).concat([...QMD.matchAll(/(?:data-term="|term=")([a-z0-9-]+)"/g)].map(x => x[1])));
   used.forEach(id => ok(ids.has(id), `glossary id "${id}" exists`));
-  ["energy-service", "energy-carrier", "useful-energy", "final-energy", "primary-energy", "coefficient-of-performance", "afue"].forEach(id => ok(used.has(id), `F3 marks its own term "${id}"`));
+  ["energy-service", "energy-carrier", "useful-energy", "final-energy", "primary-energy", "coefficient-of-performance", "afue", "heat-pump-cut-out"].forEach(id => ok(used.has(id), `F3 marks its own term "${id}"`));
 }
 
 // ---------------- scope: deny-list, nuclear-plus-risk combination, data centers, links on the allow-list

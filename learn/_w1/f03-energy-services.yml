@@ -22,7 +22,10 @@ glossary:
     def: "Heat a heat pump delivers divided by the electricity it uses; a COP of 3 means 3 kWh of heat for each kWh of electricity."
   - id: afue
     term: AFUE (annual fuel utilization efficiency)
-    def: "The share of a furnace's fuel energy that ends up as heat in the home over a heating season, under a standard test."
+    def: "The share of a furnace's fuel energy that leaves the furnace as heat over a heating season, under a standard test that leaves out duct losses and the fan's electricity."
+  - id: heat-pump-cut-out
+    term: Cut-out temperature (heat pump)
+    def: "The outdoor temperature below which a heat pump's compressor, the pump that moves its heat, switches off, so a backup heater must take over."
 requests:
   - "Promote LX.Sankey (i-sankey, e-sankey; curriculum §16: F3, F4, F9, F10) from assets/learn/f03-energy-services.js into components/sankey.js and sankey.css. It injects its own small stylesheet (id lx-sankey-css, tokens only) until then. Pure part: layout(spec, W, H, o), band(...), flows(spec) (Node: require('assets/learn/f03-energy-services.js').sankey). View: nodes are buttons (Tab, Enter, Space) that light their flows and say what flows in and out in an aria-live line; numbered badges and a key replace middle-column labels under 560 px; tween between specs (off under reduced motion); a text-version table. F4 loads f03-energy-services.js before its own script for it; drop that script tag from F4 once promoted."
   - "Lesson-local, no promotion needed: HomeScene (the home cutaway with six service buttons) and ColdDay (the COP slider, bars and curve)."
