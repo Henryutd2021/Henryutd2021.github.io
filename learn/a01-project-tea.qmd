@@ -26,7 +26,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">A1</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst · L2</li>
-<li>30 min guided · about 45 min practice</li>
+<li><span class="lx-nw">30 min guided</span> · <span class="lx-nw">about 45 min practice</span></li>
 <li>After <a href="07-cost.html">lesson 7</a> and <a href="k03-discounting.html">K3</a></li>
 <li class="lx-done-tag" data-lesson-id="a01-project-tea" hidden>Completed</li>
 </ul>
@@ -59,7 +59,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ol>
 <li>Year 0 spends $256.8M on building the farm. Years 1 to 30 each sell $22.2M of power at $50/MWh and spend $5.2M on upkeep: $17.0M net.</li>
 <li>Discounted at 4% a year, the 30 net years are worth $294.3M today, so the net present value (NPV) is +$37.5M.</li>
-<li>The discount rate is what the money costs. With loans at 5% and owners at 10% (nominal), 60% loans give 4.39% real and an NPV of +$24.1M; 40% loans give −$5.7M.</li>
+<li>The discount rate is what the money costs. With loans at 5% and owners at 10% (nominal, both held fixed), 60% loans give 4.39% real and an NPV of +$24.1M; 40% loans give −$5.7M.</li>
 <li>The NPV reaches zero at 5.17%, the internal rate of return (IRR).</li>
 <li>The cash put in is back in year 16 (year 24 discounted). With a 20-year life, payback is still year 16, but the NPV is −$25.5M.</li>
 <li>The NPV crosses zero at a price of $45.11/MWh, lesson 7's levelized cost of the same farm.</li>
@@ -85,8 +85,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li>One price year: every dollar is a real 2025 dollar, so every rate is a real rate (inflation taken out), as in <a href="07-cost.html">lesson 7</a> and toolbox <a href="k03-discounting.html">K3</a>.</li>
-<li>Building cost $1,712 per <span class="lx-term" data-term="kilowatt">kW</span> and fixed upkeep $34.57 per kW a year: <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (2025 dollars, April 2026). Capacity factor 33.8%: <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> (U.S. wind, 2025; October 2026).</li>
-<li>4% real over 30 years: a round rate inside the range of the <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">2025 ATB</a> (NLR, September 2026), as in lessons 7, 12 and 13. Loan and owner rates (5%, 10%), the 150 MW size and the $50/MWh price are illustrative.</li>
+<li>Building cost $1,712 per <span class="lx-term" data-term="kilowatt">kW</span> and fixed upkeep $34.57 per kW a year: <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (2025 dollars, April 2026).</li>
+<li>Capacity factor 33.8%: <a href="https://www.eia.gov/electricity/annual/html/epa_04_08_b.html">EIA, Electric Power Annual, Table 4.08.B</a> (U.S. wind, 2025; October 2026).</li>
+<li>4% real over 30 years, as in lessons 7, 12 and 13: a round rate inside the range of the <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">2025 ATB</a> (NLR, September 2026).</li>
+<li>Illustrative: the loan and owner rates (5%, 10%), the 150 MW size and the $50/MWh price, fixed in 2025 dollars as a contract indexed to inflation would be.</li>
 <li>Left out: taxes, tax credits, depreciation, interest during construction, output that falls with age, and the loan's own repayment schedule. These are the project's cash flows before any loan payments.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (present value and the annuity factor) and <a href="07-cost.html">lesson 7</a> (LCOE and the WACC blend).</p>
@@ -134,8 +136,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ```
 
 - **Taxes and credits.** A real project pays income tax and may earn tax credits; depreciation lowers the tax. They change the cash every year, which is why agencies' numbers differ from these.
-- **The money's mix.** Step 3 held both rates fixed. More loans make the owners' share riskier, so owners ask more, and lenders cap a loan by the cash that must repay it. The WACC falls less than the slider shows.
-- **Two views of one project.** These are the project's cash flows before any loan payments, discounted at the WACC. Owners also look at their own cash after loan payments, at their own rate; that gives an owners' IRR.
+- **The money's mix.** Step 3 held both rates fixed. More loans make the owners' share riskier, so owners ask more: the real WACC may fall less than the slider shows, or not at all.
+- **Loan size.** Lenders cap a loan by the cash that must repay it, so the loan share is not free to choose.
+- **Two views of one project.** These are the project's cash flows before loan payments, discounted at the WACC. Owners also judge their own cash after loan payments, at their own rate: the owners' IRR.
 - **Where it stops.** Loan sizing and capital structure stay at awareness level in this course (side shelf X5, upcoming). No investment advice.
 
 ```{=html}
@@ -146,9 +149,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Real or nominal, never mixed.** Here prices stay at 2025 dollars and the rate is real. A nominal analysis inflates each year's cash and uses a nominal rate, $(1 + \text{nominal}) = (1 + \text{real})(1 + \text{inflation})$ (K3); done consistently, it gives the same NPV.
-- **Spreadsheets.** A spreadsheet's NPV function treats its first value as the end of year 1. Add the year-0 outlay outside it: NPV(4%, years 1 to 30) − 256.8. Its IRR function takes all 31 years, year 0 included.
-- **Inside a model.** A planning model charges each MW a yearly cost instead (K3, lesson 13): with these inputs, 1 MW of wind costs \$133,575 a year, and $133{,}575 \div (0.338 \times 8{,}760) = 45.11$ \$/MWh, the break-even price. Modeler lesson M11 (upcoming) puts a project's cash flow inside the optimization.
+- **Real or nominal, never mixed.** Here prices stay in 2025 dollars and the rate is real. A nominal analysis inflates each year's cash and uses a nominal rate, $(1 + \text{nominal}) = (1 + \text{real})(1 + \text{inflation})$ (K3): the same NPV.
+- **A flat contract price.** The $50/MWh here is fixed in 2025 dollars, as a contract indexed to inflation would be. A price flat in nominal dollars buys less each year, so its real revenue falls.
+- **Spreadsheets.** A spreadsheet's NPV function counts its first value as year 1, so add the year-0 outlay outside it: NPV(4%, years 1 to 30) − 256.8. IRR takes all 31 years, year 0 included.
+- **Inside a model.** A planning model charges each MW a yearly cost instead (K3, lesson 13): with these inputs, 1 MW of wind costs \$133,575 a year, and $133{,}575 \div (0.338 \times 8{,}760) = 45.11$ \$/MWh, the break-even price.
+- **Where it goes.** Modeler lesson M11 (upcoming) puts a project's cash flow inside the optimization.
 
 ```{=html}
 </div>
@@ -190,7 +195,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="seven" data-answer="b">
 <p class="lx-qtext">The money costs 7% real instead of 4%. Is the farm still worth building at $50/MWh?</p>
 <ul class="lx-choices"><li data-value="a">Yes: its NPV is +$37.5M</li><li data-value="b">No: its NPV is −$45.6M</li><li data-value="c">Yes: it still pays back in year 16</li><li data-value="d">It cannot be told without taxes</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>No: at 7% the NPV is −$45.6M, because 7% is above the farm's 5.17% IRR. +$37.5M is the NPV at 4%; payback does not depend on the rate.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>No: at 7% the NPV is −$45.6M, because 7% is above the farm's 5.17% IRR. +$37.5M is the NPV at 4%; simple payback does not depend on the rate.</p></details>
 </div>
 <div class="lx-qq" data-id="spb" data-answer="c">
 <p class="lx-qtext">The farm costs $256.8M and nets $17.0M a year. In years, how long until its cash is back, not discounted?</p>
@@ -203,9 +208,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-eyebrow">Build it yourself · about 20 minutes</p>
 <p>Rebuild the farm in a spreadsheet (toolbox <a href="k07-spreadsheets.html">K7</a>) and check this page.</p>
 <ol>
-<li>Column A: years 0 to 30. Column B: −256.8 in year 0, then 22.2066 − 5.1855 in every other year ($M).</li>
+<li>Row 1 holds the headers: <code>Year</code> in A1 and <code>Cash ($M)</code> in B1. Years 0 to 30 go in A2 to A32.</li>
+<li>Cash: −256.8 in B2 (year 0), then 22.2066 − 5.1855 in B3 to B32 (years 1 to 30).</li>
 <li>NPV: <code>=NPV(4%, B3:B32) + B2</code> gives 37.53. IRR: <code>=IRR(B2:B32)</code> gives 5.17%.</li>
-<li>Change the price to $45.11 (sales 20.0356): the NPV should be about zero. Then try a 20-year life.</li>
+<li>Change the price to $45.11 (sales 20.0348): the NPV should be about zero. Then try a 20-year life.</li>
 </ol>
 </div>
 ```

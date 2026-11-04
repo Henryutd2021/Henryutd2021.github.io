@@ -13,7 +13,13 @@ glossary:
     def: "The risk that the price where a plant sells differs from the price at which its contract settles, such as its node against a trading hub."
   - id: capture-ratio
     term: Capture ratio
-    def: "The average price over the hours a plant produces, as a share of the average price over all hours."
+    def: "The average price a plant earns per megawatt-hour it produces, divided by the average market price across all hours: hours with more output count more."
+  - id: pricing-node
+    term: Pricing node
+    def: "A point on the grid, such as a power plant's connection, where the market sets its own price."
+  - id: battery-margin
+    term: Battery margin
+    def: "What a battery earns per megawatt-hour it discharges, after paying for the power it charged and the energy lost on the way."
   - id: tolling-agreement
     term: Tolling agreement
     def: "A contract in which the buyer pays the owner of a plant a fixed fee for the right to run it, and keeps what it earns."
