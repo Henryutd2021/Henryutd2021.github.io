@@ -26,7 +26,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">K5</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-ink-3)"><span class="lx-dot" aria-hidden="true"></span>Math toolbox</li>
-<li>25 min guided · about 30 min practice</li>
+<li><span class="lx-nw">25 min guided</span> · <span class="lx-nw">about 30 min practice</span></li>
 <li>No prerequisites</li>
 <li class="lx-done-tag" data-lesson-id="k05-probability-statistics" hidden>Completed</li>
 </ul>

@@ -106,28 +106,21 @@ ok(bundleJS.indexOf("LX.Stakeholders = ") > 0 && bundleJS.indexOf("LX.Stakeholde
   let n = 0; const labs = [];
   all.forEach(l => {
     const f = path.join(SITE, "learn", l.id + ".qmd"); if (!fs.existsSync(f)) return;
-    const q = fs.readFileSync(f, "utf8"), m = q.match(/<li>(\d+) min guided(?: · ([^<]+?) lab)? · about ([^<]+) practice<\/li>/); if (!m) return;
+    const q = fs.readFileSync(f, "utf8").replace(/<span class="lx-nw">([^<]*)<\/span>/g, "$1"), m = q.match(/<li>(\d+) min guided(?: · ([^<]+?) lab)?(?: · about ([^<]+) practice)?<\/li>/); if (!m) return;
     const data = JSON.parse(q.match(/<script type="application\/json" class="lx-lesson-data">([\s\S]*?)<\/script>/)[1]), pm = data.practice, lm = data.labMinutes;
     n++;
     const hrs = x => x < 120 ? x + " min" : (Math.round(x / 30) / 2) + " h";
-    ok(m[3] === (pm ? hrs(pm) : null), `${l.id}: practice badge "${m[3]}" (${pm} min)`);
+    ok((m[3] || null) === (pm ? hrs(pm) : null), `${l.id}: practice badge "${m[3]}" (${pm} min)`);
     ok((m[2] || null) === (lm ? hrs(lm) : null), `${l.id}: lab in the badge "${m[2] || "none"}" (lab_minutes ${lm || "none"})`);
     const ld = JSON.parse(q.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
     ok(ld.timeRequired === "PT" + (data.minutes + (lm || 0) + (pm || 0)) + "M", `${l.id}: timeRequired ${ld.timeRequired} = guided + lab + practice`);
     if (lm) labs.push(l.id);
   });
-  // every live page whose path.yml row has lab_minutes shows it (M2 and M3 since W2; W3 lessons add theirs: M4, M5, M7, ...);
-  // a page with a lab but no practice set (the capstones C0 and C1) shows "N min guided · lab" in its badge
-  const withLab = [], labOnly = [];
-  all.forEach(l => {
-    const f = path.join(SITE, "learn", l.id + ".qmd"); if (!fs.existsSync(f)) return;
-    const q = fs.readFileSync(f, "utf8"), lm = q.match(/"labMinutes":(\d+)/); if (!lm) return;
-    if (/<li>\d+ min guided(?: · [^<]+? lab)? · about [^<]+ practice<\/li>/.test(q)) { withLab.push(l.id); return; }
-    labOnly.push(l.id);
-    const x = +lm[1], h = x < 120 ? x + " min" : (Math.round(x / 30) / 2) + " h";
-    ok(q.indexOf("<li>" + JSON.parse(q.match(/<script type="application\/json" class="lx-lesson-data">([\s\S]*?)<\/script>/)[1]).minutes + " min guided · " + h + " lab</li>") > 0, `${l.id}: lab in the badge without a practice set (${h})`);
-  });
-  ok(["m02-unit-commitment", "m03-capacity-expansion", "m04-storage-multienergy", "m05-microgrid-size-and-run", "m07-monte-carlo"].every(id => labs.includes(id)) && labs.join() === withLab.join(), `the lab time shows on M2, M3, M4, M5, M7 and every other page with lab_minutes (${labs.join(", ")}; lab only: ${labOnly.join(", ")})`);
+  // every live page whose path.yml row has lab_minutes shows it in the badge, with or without a practice set (the badge
+  // pattern above reads both): M2 and M3 since W2, M4, M5 and M7 in W3, B2 and the capstones C0 and C1
+  const withLab = all.filter(l => { const f = path.join(SITE, "learn", l.id + ".qmd"); return fs.existsSync(f) && /"labMinutes":\d+/.test(fs.readFileSync(f, "utf8")); }).map(l => l.id);
+  ok(["m02-unit-commitment", "m03-capacity-expansion", "m04-storage-multienergy", "m05-microgrid-size-and-run", "m07-monte-carlo"].every(id => labs.includes(id)) && labs.join() === withLab.join(),
+     `the lab time shows on every page with lab_minutes (${labs.join(", ")})`);
   ok(n >= 20, `practice badges checked on ${n} pages; 120 minutes and more read in hours`);
   ok(rd("teaching.qmd").indexOf(all.length + " lessons live; more coming") > 0, `Teaching card: ${all.length} lessons live, as in path.json`);
 }
