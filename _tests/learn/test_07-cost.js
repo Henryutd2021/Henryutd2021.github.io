@@ -201,6 +201,8 @@ Object.keys(D.techs).forEach(k => ok(nWords(D.techs[k].cfNote) <= 35, `${k} cfNo
 Object.keys(D.techs).forEach(k => { const t = D.techs[k].cfNote + " " + D.tornadoRanges.note + (D.techs[k].heatRate ? " " + D.tornadoRanges.gasNote : ""); ok(nWords(t) <= 42, `${k} tornado note: ${nWords(t)} words`); });
 ok(/illustrative bounds in 2025 dollars/.test(D.fuel.gasNote) && /illustrative bounds in 2025 dollars/.test(D.tornadoRanges.gasNote), "gas range: labelled illustrative 2025-dollar bounds (the 2020 and 2022 averages are in their own years' dollars)");
 Object.keys(D.techs).forEach(k => ok(D.techs[k].design, `${k}: the EIA design behind the inputs is named`));
+ok(/U\.S\. utility-scale solar photovoltaic generators in 2025/.test(D.techs.solar.cfNote) && /U\.S\. utility-scale wind and solar photovoltaic generators in 2025/.test(QMD) && !/photovoltaic plants/.test(QMD + JSON.stringify(D)),
+   "solar 24.0%: EIA Table 4.08.B's population, utility-scale generators (W3 shared fix 2; as A2 says it)");
 const all = (QMD + JS + JSON.stringify(D)).toLowerCase();
 ["learning curve", "learning rate", "foak", "noak", "first-of-a-kind", "subsidy-free", "break-even capital", "order book", "projects/", "research.html", "smr"]
   .forEach(w => ok(all.indexOf(w) < 0, `scope: no "${w}"`));
