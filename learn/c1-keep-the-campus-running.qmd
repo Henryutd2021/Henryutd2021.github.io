@@ -27,7 +27,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst to Modeler · L2–L3</li>
 <li>Capstone</li>
-<li>90 min guided · 60 min lab</li>
+<li><span class="lx-nw">90 min guided</span> · <span class="lx-nw">60 min lab</span></li>
 <li>After <a href="sb1-microgrid-workbench.html">SB1</a> and <a href="f07-microgrids.html">F7</a> and <a href="a14-microgrid-value.html">A14</a> and <a href="a04-retail-tariffs.html">A4</a></li>
 <li class="lx-done-tag" data-lesson-id="c1-keep-the-campus-running" hidden>Completed</li>
 </ul>

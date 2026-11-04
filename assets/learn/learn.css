@@ -57,7 +57,7 @@ body.page-learn #title-block-header .quarto-title-meta, body.page-learn #title-b
 body.page-learn .quarto-title h1.title { margin: 0; font-family: var(--lx-f-display); font-weight: 600; font-size: clamp(26px, 1.2rem + 1.6vw, 36px);
   line-height: 1.15; letter-spacing: -.015em; color: var(--lx-ink); text-wrap: balance; }
 body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(--lx-f-display); font-weight: 400; font-size: clamp(16px, .9rem + .4vw, 19px);
-  color: var(--lx-ink-2); opacity: 1; }
+  color: var(--lx-ink-2); opacity: 1; text-wrap: pretty; }   /* pretty: no single word left alone on the last line */
 .page-learn main h2, .page-learn main h3, .page-learn main h4 { font-family: var(--lx-f-display); font-weight: 600; color: var(--lx-ink); letter-spacing: -.01em;
   line-height: 1.2; border: 0; padding: 0; text-wrap: balance; }
 .page-learn main h2 { font-size: 24px; margin: 0 0 .35rem; }
@@ -86,11 +86,13 @@ body.page-learn .quarto-title .subtitle { margin: .35rem 0 0; font-family: var(-
 .lx-crumbs a { color: var(--lx-ink-2) !important; }
 .lx-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .lx-badge, .lx-badges li { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; border-radius: 999px; font-size: 13.5px;
+  flex-wrap: wrap; column-gap: .3em; row-gap: 0; max-width: 100%;   /* a long badge ("After lesson 11 and B1 ...") wraps between its parts */
   color: var(--lx-ink-2); background: var(--lx-surface); border: 1px solid var(--lx-line); }
+.lx-badges li a, .lx-badges .lx-nw { white-space: nowrap; }   /* "lesson 11", "about 90 min practice" never split */
 .lx-badges .lx-dot, .lx-badge .lx-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--lx-tier-1)); }
 .lx-badges .lx-done-tag { color: var(--lx-good); border-color: color-mix(in srgb, var(--lx-good) 45%, var(--lx-line)); }
 .lx-steps ol { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 3px; list-style: none; background: var(--lx-surface-2); border-radius: 11px; }
-.lx-steps a { display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; font-family: var(--lx-f-display); font-size: 14px;
+.lx-steps a { white-space: nowrap; display: inline-flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 8px; font-family: var(--lx-f-display); font-size: 14px;
   font-weight: 500; color: var(--lx-ink-2) !important; text-decoration: none !important; }
 .lx-steps a:hover { background: var(--lx-surface); color: var(--lx-ink) !important; }
 .lx-steps .lx-n { font-family: var(--lx-f-mono); font-size: 11px; color: var(--lx-ink-3); margin-right: 6px; }
@@ -187,6 +189,7 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
   .lx-head { margin-bottom: 1rem; }
   .lx-steps { width: 100%; }
   .lx-steps ol { flex-wrap: nowrap; justify-content: space-between; }
+
   .lx-steps a { padding: 0 9px; font-size: 13.5px; }
   .lx-steps .lx-n { display: none; }
 }
@@ -198,6 +201,9 @@ body.lx-totop-off .to-top { opacity: 0 !important; pointer-events: none !importa
 .lx-landing-note p { margin: 0; }
 .lx-real p:not(.lx-eyebrow), .lx-sources ul, .lx-real ol { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-card > .lx-eyebrow { margin-bottom: 6px; }
+
+/* narrow phones (under 360 px): the four section tabs no longer fit one row, so they wrap as whole labels */
+@media (max-width: 359.98px) { .lx-steps ol { flex-wrap: wrap; justify-content: flex-start; } }
 
 /* scene.css — the Prairie Town picture (scene.js): callouts on wide scenes, numbered legend on narrow ones. */
 .lx-scene { position: relative; border-radius: var(--lx-r); overflow: hidden; border: 1px solid var(--lx-line); background: var(--lx-sky-day-bot); }
@@ -640,7 +646,10 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
   .lx-estop:nth-child(2n)::after { display: none; }
 }
 
-/* metro.css — course map: doors, progress, transit map, legend, preview card (metro.js). */
+/* metro.css — course map: doors, progress, transit map, toolbox shelf, legend, preview card (metro.js).
+   The map is drawn 1:1 (an SVG unit is a CSS pixel), so every label keeps the size set here (11.5 px and up).
+   The card never leaves the map box: metro.js caps its height to the box and the window, and its body (.bd) scrolls
+   under a fixed header, with a "More below" cue (.cue) while more is hidden. The phone map is drawn at most 560 px wide. */
 .lx-doors { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
 .lx-door { position: relative; display: grid; justify-items: center; gap: 6px; padding: 14px 12px 12px; border-radius: 60px 60px 14px 14px; border: 1.5px solid var(--lx-line-2);
   background: var(--lx-surface); color: var(--lx-ink); cursor: pointer; text-align: center; font-family: var(--lx-f-display); transition: border-color .2s, transform .15s; min-width: 0; }
@@ -657,16 +666,21 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .lx-progress { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lx-ink-2); }
 .lx-progress .pbar { width: 140px; height: 8px; border-radius: 4px; background: var(--lx-surface-3); overflow: hidden; display: block; }
 .lx-progress .pbar i { display: block; height: 100%; background: var(--lx-good); width: 0; transition: width .4s; }
-.lx-mapwrap { position: relative; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 10px; overflow: hidden; }
+.lx-mapwrap { position: relative; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r-lg); padding: 10px;
+  overflow: hidden; overflow: clip; }   /* clip: not a scroll container, so scrolling a card into view never shifts the map */
 .lx-mapwrap svg { display: block; width: 100%; height: auto; }
+.lx-mapwrap[data-mode="v"] svg { max-width: 100%; margin-inline: auto; }   /* metro.js sets its width: at most 560 px */
 .lx-mlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--lx-ink-2); margin-top: 10px; }
-.lx-mlegend span { display: inline-flex; align-items: center; gap: 6px; }
+.lx-mlegend.kinds { margin-top: 6px; }
+.lx-mlegend > span { display: inline-flex; align-items: center; gap: 6px; }
 .lx-mlegend i { width: 18px; height: 5px; border-radius: 3px; background: var(--c); }
-.lx-mlegend i.o { width: 12px; height: 12px; border-radius: 50%; background: var(--lx-surface); border: 2.5px solid var(--lx-ink-3); }
-.lx-mlegend i.o.dash { border-style: dashed; }
-.lx-mlegend i.o.fill { background: var(--lx-tier-1); border-color: var(--lx-tier-1); }
+.lx-mlegend i.route { width: 22px; height: 7px; border-radius: 4px; background: linear-gradient(90deg, var(--lx-tier-1) 0 33%, var(--lx-tier-2) 33% 66%, var(--lx-tier-3) 66%); }
+.lx-mlegend .sw svg { display: block; fill: var(--lx-ink-2); stroke: var(--lx-ink-2); stroke-width: 1.5; }
+.lx-mlegend > span.st:first-of-type, .lx-mlegend > span.k + span.st { margin-left: 8px; }
+.lx-mlegend i.o { width: 13px; height: 13px; border-radius: 50%; background: var(--lx-surface); border: 2px solid var(--lx-ink-2); }
+.lx-mlegend i.o.fill { background: var(--lx-ink-2); }
 .lx-mlegend i.o.done { background: var(--lx-good); border-color: var(--lx-good); position: relative; }
-.lx-mlegend i.o.done::after { content: ""; position: absolute; left: 2px; top: 0; width: 3px; height: 6px; border: solid var(--lx-surface); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.lx-mlegend i.o.done::after { content: ""; position: absolute; left: 3px; top: 0.5px; width: 3px; height: 6px; border: solid var(--lx-surface); border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .stn { cursor: pointer; }
 .stn:focus { outline: none; }
 .stn:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 4; }
@@ -678,30 +692,117 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
 .stn .icon { color: var(--c); }
 .stn .ring { fill: none; stroke: transparent; stroke-width: 3; }
 .stn.sel .ring { stroke: var(--lx-ink); }
+/* stations off the starter path: a shape per kind, filled when open, hollow when coming soon */
+.stn.own .hit { fill: transparent; stroke: none; }
+.stn.own .face { fill: var(--c); stroke: var(--c); stroke-width: 2; }
+.stn.own.up .face { fill: var(--lx-surface); stroke-width: 1.8; stroke-dasharray: none; opacity: .8; }
+.stn.own .ring { stroke-width: 2.5; }
+.stn.own:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 3; }
+.mown { stroke-width: 4; opacity: .5; }
+.mown.soon { stroke-dasharray: 2 7; opacity: .45; }
+.mchev { stroke-width: 2.5; opacity: .8; }
+/* the phone map's fold of a tier's upcoming lessons: a hollow station and a real button that opens them in place */
+.mfold-mk { cursor: pointer; }
+.mfold-mk .face { fill: var(--lx-surface); stroke: var(--c); stroke-width: 2; stroke-dasharray: 3 2.5; }
+.mfold-mk .chev { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lx-fold { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 12px; border: 1.5px dashed var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); color: var(--lx-ink-2); font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; cursor: pointer;
+  max-width: 100%; white-space: nowrap; }
+.lx-fold:hover { border-color: var(--lx-ink-3); color: var(--lx-ink); }
+.lx-fold:focus { outline: none; }
+.lx-fold:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 1px; }
+.page-learn .lx-fold .lx-ic { width: 13px; height: 13px; transform: rotate(90deg); transition: transform .2s; }
+.lx-fold[aria-expanded="true"] .lx-ic { transform: rotate(-90deg); }
+.fold-in { animation: lx-fold-in .25s ease-out both; }
+@keyframes lx-fold-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fold-in { animation: none; } .page-learn .lx-fold .lx-ic { transition: none; } }
+.mcol { stroke-width: 4; opacity: .28; stroke-dasharray: 1 9; }
+.mhit { fill: transparent; cursor: pointer; }
+.mown-st text { cursor: pointer; }
 .stn .pulse { fill: none; stroke: var(--c); stroke-width: 2; opacity: .6; transform-box: fill-box; transform-origin: center; animation: lx-pulse 2s ease-out infinite; }
 @keyframes lx-pulse { from { transform: scale(1); opacity: .6; } to { transform: scale(1.7); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .stn .pulse { animation: none; opacity: .35; transform: scale(1.3); } .lx-door { transition: none; } }
-.seg-dim { opacity: .25; }
+@media (prefers-reduced-motion: reduce) { /* stations off the starter path: a shape per kind, filled when open, hollow when coming soon */
+.stn.own .hit { fill: transparent; stroke: none; }
+.stn.own .face { fill: var(--c); stroke: var(--c); stroke-width: 2; }
+.stn.own.up .face { fill: var(--lx-surface); stroke-width: 1.8; stroke-dasharray: none; opacity: .8; }
+.stn.own .ring { stroke-width: 2.5; }
+.stn.own:focus-visible .ring { stroke: var(--lx-accent); stroke-width: 3; }
+.mown { stroke-width: 4; opacity: .5; }
+.mown.soon { stroke-dasharray: 2 7; opacity: .45; }
+.mchev { stroke-width: 2.5; opacity: .8; }
+/* the phone map's fold of a tier's upcoming lessons: a hollow station and a real button that opens them in place */
+.mfold-mk { cursor: pointer; }
+.mfold-mk .face { fill: var(--lx-surface); stroke: var(--c); stroke-width: 2; stroke-dasharray: 3 2.5; }
+.mfold-mk .chev { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lx-fold { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 12px; border: 1.5px dashed var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); color: var(--lx-ink-2); font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; cursor: pointer;
+  max-width: 100%; white-space: nowrap; }
+.lx-fold:hover { border-color: var(--lx-ink-3); color: var(--lx-ink); }
+.lx-fold:focus { outline: none; }
+.lx-fold:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 1px; }
+.page-learn .lx-fold .lx-ic { width: 13px; height: 13px; transform: rotate(90deg); transition: transform .2s; }
+.lx-fold[aria-expanded="true"] .lx-ic { transform: rotate(-90deg); }
+.fold-in { animation: lx-fold-in .25s ease-out both; }
+@keyframes lx-fold-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fold-in { animation: none; } .page-learn .lx-fold .lx-ic { transition: none; } }
+.mcol { stroke-width: 4; opacity: .28; stroke-dasharray: 1 9; }
+.mhit { fill: transparent; cursor: pointer; }
+.mown-st text { cursor: pointer; }
+.stn .pulse { animation: none; opacity: .35; transform: scale(1.3); } .lx-door { transition: none; } }
+/* a door picks a tier: the other tiers' lines and shapes fade, their text turns to a token grey that keeps 4.5:1 */
+.seg-dim path, .seg-dim circle, .seg-dim rect, .seg-dim .icon, path.seg-dim { opacity: .25; }
+.seg-dim text, .seg-dim tspan { fill: var(--lx-ink-3); }
+/* label fonts: metro.js measures text in the same fonts and sizes (measurer) */
 .mlabel { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 500; fill: var(--lx-ink); }
-.mlabel.sub { font-family: var(--lx-f-mono); font-size: 11px; font-weight: 400; fill: var(--lx-ink-3); }
-.mlabel.up { fill: var(--lx-ink-2); }
+.mlabel.sub { font-family: var(--lx-f-mono); font-size: 11.5px; font-weight: 400; fill: var(--lx-ink-3); }
+.mlabel.up { fill: var(--lx-ink-3); }
+.mlabel.code { font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; fill: var(--lx-ink); }
+.mlabel.code.up { font-weight: 400; fill: var(--lx-ink-3); }
+.mlabel .mcode { font-family: var(--lx-f-mono); font-size: 12px; font-weight: 600; }
 .mtext { font-family: var(--lx-f-body); font-size: 12px; fill: var(--lx-ink-3); }
 .mtier { font-family: var(--lx-f-display); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-.lx-preview { position: absolute; z-index: 6; width: min(290px, calc(100% - 20px)); background: var(--lx-surface); border: 1px solid var(--lx-ink); border-radius: 14px;
-  padding: 14px; box-shadow: var(--lx-shadow-lg); display: grid; gap: 8px; }
-.lx-preview .ph { display: flex; gap: 10px; align-items: center; padding-right: 22px; }
+.lx-preview { position: absolute; z-index: 6; box-sizing: border-box; width: min(290px, calc(100% - 20px)); background: var(--lx-surface); border: 1px solid var(--lx-ink);
+  border-radius: 14px; padding: 14px 14px 0; box-shadow: var(--lx-shadow-lg); display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.lx-preview.tier { width: min(440px, calc(100% - 20px)); }
+.lx-preview .ph { flex: none; display: flex; gap: 10px; align-items: center; padding-right: 22px; }
+.lx-preview .bd { display: grid; gap: 8px; align-content: start; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -14px; padding: 0 14px 14px; }
+.lx-preview .cue { position: absolute; left: 0; right: 0; bottom: 0; height: 52px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px;
+  background: linear-gradient(transparent, var(--lx-surface) 60%); pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; }
+.lx-preview.more .cue { opacity: 1; visibility: visible; }
+.lx-preview .cue span { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border: 1px solid var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-2); }
+.page-learn .lx-preview .cue .lx-ic { width: 13px; height: 13px; transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lx-preview .cue { transition: none; } }
 .lx-preview .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 15%, var(--lx-surface)); color: var(--c); flex: none; }
 .lx-preview .ic .lx-ic { width: 22px; height: 22px; }
 .lx-preview .k { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); }
 .page-learn .lx-preview h3 { font-size: 16.5px; margin: 0; }
 .lx-preview p { font-size: 14.5px; color: var(--lx-ink-2); }
 .lx-preview .pf { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-.lx-preview-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14.5px; }
+.lx-preview-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 14.5px; line-height: 1.35; }
 .lx-preview-list .lx-code { font-family: var(--lx-f-mono); font-size: 12px; color: var(--lx-ink-3); margin-right: 6px; }
 .mext { cursor: pointer; }
 .mext:focus { outline: none; }
-.mext:focus-visible text { fill: var(--lx-accent); text-decoration: underline; }
-.mext:hover text { fill: var(--lx-ink); }
+.mext:focus-visible .mhit { stroke: var(--lx-accent); stroke-width: 2.5; }
+.mext:hover .mtext { fill: var(--lx-ink); text-decoration: underline; }
+/* the math toolbox: a shelf of chips under the lines (inside the map box, so cards can open from it) */
+.lx-toolshelf { border-top: 1px dashed var(--lx-line-2); margin: 6px 6px 2px; padding: 10px 0 4px; }
+.lx-toolshelf .hd { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 8px; }
+.lx-toolshelf .tt { font-family: var(--lx-f-display); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--lx-ink-2); }
+.lx-toolshelf .lx-hint { font-size: 13px; }
+.lx-toolshelf .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.lx-tool { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 5px 12px 5px 9px; border: 1.5px solid var(--lx-line-2); border-radius: 999px;
+  background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-body); font-size: 13.5px; line-height: 1.25; text-align: left; cursor: pointer; max-width: 100%; }
+.lx-tool b { font-family: var(--lx-f-mono); font-size: 12.5px; font-weight: 600; }
+.lx-tool .sh { flex: none; width: 11px; height: 11px; border-radius: 3px; background: var(--lx-ink-2); border: 2px solid var(--lx-ink-2); }
+.lx-tool.up { border-style: dashed; color: var(--lx-ink-3); }
+.lx-tool.up b { font-weight: 400; }
+.lx-tool.up .sh { background: var(--lx-surface); border-color: var(--lx-ink-3); }
+.lx-tool.done .sh { background: var(--lx-good); border-color: var(--lx-good); }
+.lx-tool:hover { border-color: var(--lx-ink-2); }
+.lx-tool.sel { border-color: var(--lx-ink); box-shadow: inset 0 0 0 1px var(--lx-ink); }
+.lx-tool:focus { outline: none; }
+.lx-tool:focus-visible { outline: 3px solid var(--lx-accent); outline-offset: 2px; }
 .lx-preview .x { position: absolute; right: 6px; top: 6px; width: 34px; height: 34px; border: 0; background: none; cursor: pointer; font-size: 20px; color: var(--lx-ink-3); border-radius: 8px; }
 @media (max-width: 640px) {
   .lx-doors { gap: 8px; }
@@ -712,6 +813,7 @@ details.lx-deeper .k { font-size: 11.5px; letter-spacing: .07em; text-transform:
   .lx-door small { font-size: 10.5px; letter-spacing: .02em; }
   .lx-door .knob { display: none; }
   .lx-mapwrap { padding: 6px; }
+  .lx-tool { font-size: 13px; }
 }
 /* the list view: the course as plain lists (also what readers without JavaScript see) */
 details.lx-listview { margin-top: 14px; background: var(--lx-surface); border: 1px solid var(--lx-line); border-radius: var(--lx-r); padding: 0 16px; }

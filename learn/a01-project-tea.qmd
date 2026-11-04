@@ -26,7 +26,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">A1</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst · L2</li>
-<li>30 min guided · about 45 min practice</li>
+<li><span class="lx-nw">30 min guided</span> · <span class="lx-nw">about 45 min practice</span></li>
 <li>After <a href="07-cost.html">lesson 7</a> and <a href="k03-discounting.html">K3</a></li>
 <li class="lx-done-tag" data-lesson-id="a01-project-tea" hidden>Completed</li>
 </ul>
