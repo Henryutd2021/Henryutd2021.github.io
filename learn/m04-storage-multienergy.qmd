@@ -26,7 +26,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">M4</li></ol></nav>
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-3)"><span class="lx-dot" aria-hidden="true"></span>Modeler · L3</li>
-<li>40 min guided · 45 min lab · about 90 min practice</li>
+<li><span class="lx-nw">40 min guided</span> · <span class="lx-nw">45 min lab</span> · <span class="lx-nw">about 90 min practice</span></li>
 <li>After <a href="m01-dispatch-to-lmp.html">M1</a> and <a href="a08-storage-duration.html">A8</a></li>
 <li class="lx-done-tag" data-lesson-id="m04-storage-multienergy" hidden>Completed</li>
 </ul>

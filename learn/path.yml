@@ -96,7 +96,7 @@
   subtitle: "Be the grid operator for a day"
   short: "Be the grid operator"
   teaches: [balancing supply and demand, power and energy, dispatchable and variable generation, merit order dispatch]
-  lab: "download and plot a day of hourly U.S. grid data (upcoming)."
+  lab: "load and plot a year of hourly U.S. grid data in Python (bridge B2)."
   does: "Run Prairie Town's power plants hour by hour for one day and keep supply equal to demand."
   outcome: "Say what balancing means and why cheap plants run first."
   after: []
@@ -329,6 +329,8 @@
   status: active
   minutes: 40
   title: "Foundations checkpoint: estimate an unfamiliar situation"
+  subtitle: "Nine tasks on situations you have not seen, the last an estimate with units, a range and a check"
+  short: "Foundations checkpoint"
   does: "Estimate an unfamiliar situation without hints (for example the electricity for a town's school buses if they went electric): units, a range, the main uncertainty and one way to check the answer."
   after: [6, N1]
 - kind: lesson
@@ -342,6 +344,7 @@
   minutes: 30
   practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "From algebra to a linear program: how do equations become a model?"
+  subtitle: "Turn word problems into a linear program, find its best corner on a graph, and hand it to a real solver"
   short: "Algebra to a linear program"
   outcome: "Turn a word problem into a linear program, find its best corner on a graph and write it as Ax <= b."
   teaches: [formulating a linear program, feasible region, Ax <= b form, solver use]
@@ -357,6 +360,7 @@
   icon: chart
   status: active
   minutes: 20
+  lab_minutes: 60   # the notebook lab (its eyebrow on the page: about 60 minutes)
   title: "Python and data for energy: how do you load, plot and check a year of hourly data?"
   subtitle: "Find the bad hours in a real year of grid data"
   short: "Python and data"
@@ -377,6 +381,7 @@
   minutes: 30
   practice_minutes: 45   # the practice set (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "How do you read a formulation, and check that a model is right?"
+  subtitle: "Read a dispatch model line by line, hunt five planted bugs, and check a solved model's balance and duals"
   short: "Read and check a formulation"
   outcome: "Read a published formulation line by line, find planted errors and check a solved model's balance and duals."
   teaches: [reading a formulation, sets, parameters and variables, model verification, dual signs]
@@ -391,7 +396,10 @@
   icon: tower
   status: active
   minutes: 40
+  practice_minutes: 90   # the notebook's practice, after its 45-minute lab (as the page's lab card says)
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired, as on M2 and M3
   title: "From dispatch to locational prices: the linear program behind the market"
+  subtitle: "Solve a day of dispatch, read each hourly price as a dual, then congest a line and watch one price split into three"
   short: "Dispatch to locational prices"
   outcome: "Formulate a dispatch LP, solve it, and explain each bus price as a dual in words."
   teaches: [economic dispatch as a linear program, balance duals, DC power flow, transmission congestion, locational marginal prices]
@@ -629,16 +637,6 @@
   outcome: "Estimate a year's expected outage cost, find the size where one more hour of backup stops paying, and say who pays, who gains and who carries the risk under each owner."
   after: [F7, A1, A4]
 
-# ---------- the rest of each tier (in preparation)
-- {kind: lesson, tier: foundations, title: "The energy system map: from primary energy to the uses we pay for"}
-- {kind: lesson, tier: foundations, title: "How a thermal power plant works"}
-- {kind: lesson, tier: foundations, title: "Wind power"}
-- {kind: lesson, tier: foundations, title: "Solar power"}
-- {kind: lesson, tier: foundations, title: "Nuclear power basics"}
-- {kind: lesson, tier: foundations, title: "Hydro and geothermal power"}
-- {kind: lesson, tier: foundations, title: "Batteries and hydrogen basics"}
-- {kind: lesson, tier: foundations, title: "Transmission and distribution"}
-- {kind: lesson, tier: foundations, title: "Large loads and data centers"}
 - kind: lesson
   id: a01-project-tea
   code: A1
@@ -672,13 +670,34 @@
   does: "Draw price years for a solar-plus-storage plant; sign a fixed price settled at the node, one settled at the hub, a flat block and a battery toll; run 200 seeded price years and see the seller's and the buyer's ranges move."
   outcome: "Say which party carries price, shape, output, basis and battery-margin risk under each contract, and read the risk as a stated statistic of a simulated distribution."
   after: [A1]
-- {kind: lesson, tier: analyst, title: "Markets and institutions: grid operators, FERC and state commissions"}
-- {kind: lesson, tier: analyst, title: "Capacity, reserves and resource adequacy"}
-- {kind: lesson, tier: analyst, title: "Policy instruments: tax credits, carbon prices, large-load tariffs"}
-- {kind: lesson, tier: analyst, title: "Emissions accounting: average or marginal, annual or hourly"}
-- {kind: lesson, tier: analyst, title: "Reading energy data from EIA"}
-- {kind: lesson, tier: analyst, title: "Scenarios and sensitivity in a spreadsheet"}
-- {kind: lesson, tier: analyst, title: "How to read an energy study critically"}
+# ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
+#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 are left out until their excerpts are approved.
+- {kind: lesson, tier: foundations, code: F8, title: "What happens when a data center moves to town?"}
+- {kind: lesson, tier: foundations, code: F9, title: "What does a city run on, and who controls what?"}
+- {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
+- {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}
+- {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
+- {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
+- {kind: lesson, tier: analyst, code: A3, title: "Energy-only or capacity market? How wholesale markets are designed for high renewable shares"}
+- {kind: lesson, tier: analyst, code: A5, title: "Will there be enough power when it matters? Resource adequacy and capacity accreditation"}
+- {kind: lesson, tier: analyst, code: A6, title: "Why does it take years to connect a power plant or a data center?"}
+- {kind: lesson, tier: analyst, code: A9, title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"}
+- {kind: lesson, tier: analyst, code: A10, title: "Which emissions question are you asking? Inventories, consequences and procurement claims"}
+- {kind: lesson, tier: analyst, code: A11, title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"}
+- {kind: lesson, tier: analyst, code: A12, title: "How do governments steer energy? Taxes, credits, standards and carbon prices"}
+- {kind: lesson, tier: analyst, code: A13, title: "Who pays and who benefits? Energy burden, fairness and jobs"}
+- {kind: lesson, tier: analyst, code: A15, title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"}
+- {kind: lesson, tier: analyst, code: A17, title: "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity"}
+- {kind: lesson, tier: analyst, code: A18, title: "How is a city or regional energy plan made?"}
+- {kind: lesson, tier: analyst, code: A19, title: "Where should it go? Siting with maps, from layers to a suitability score"}
+- {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}
+- {kind: lesson, tier: analyst, code: A21, title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"}
+- {kind: lesson, tier: analyst, code: X2, title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"}
+- {kind: lesson, tier: analyst, code: X4, title: "How are energy rules made?"}
+- {kind: lesson, tier: analyst, code: X5, title: "How are big energy projects actually financed?"}
+- {kind: lesson, tier: analyst, code: CK-A, form: checkpoint, title: "Analyst checkpoint: an auditable spreadsheet for a new case"}
+- {kind: lesson, tier: analyst, code: SB3, form: sandbox, title: "City Planner"}
+- {kind: lesson, tier: analyst, code: C3, form: capstone, title: "Prairie City 2040: write the city's energy plan"}
 - kind: lesson
   id: m02-unit-commitment
   path: m02-unit-commitment.qmd
@@ -783,6 +802,10 @@
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 - {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
+- {kind: lesson, tier: modeler, code: SB2, form: sandbox, title: "Grid Room"}
+- {kind: lesson, tier: modeler, code: C2, form: capstone, title: "The Plains Grid in a hard year"}
+- {kind: lesson, tier: modeler, code: SB4, form: sandbox, title: "Pathway Explorer"}
+- {kind: lesson, tier: modeler, code: C4, form: capstone, title: "Prairieland 2050: design and defend a nation's pathway"}
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
 - kind: lesson
   id: ck-m-unseen-problem
@@ -793,6 +816,8 @@
   status: active
   minutes: 240
   title: "Modeler checkpoint: formulate an unseen problem, find a defect, validate a result"
+  subtitle: "About four hours on problems the course has not shown; worked formulations and code open when you submit"
+  short: "Modeler checkpoint"
   does: "Formulate an unseen problem from a one-paragraph brief and implement it (or, in the empirical variant, analyse a supplied dataset); find a planted defect in a supplied model; validate one result against an independent reference. Worked formulations and code open when you submit."
   after: [M1, M3, B3, R5]
 
@@ -920,6 +945,9 @@
   after: [R1, F1]
   next: R2
 
+- {kind: lesson, tier: researcher, code: X6, title: "How do social scientists study energy and people?"}
+- {kind: lesson, tier: researcher, code: CK-R, form: checkpoint, title: "Researcher checkpoint: defend your question and method, then revise"}
+- {kind: lesson, tier: researcher, code: CR, form: capstone, title: "Your own study: from a question to a report"}
 # ---------- research case files (curriculum v2 §13; Henry approved every excerpt sentence on 2026-11-03,
 # reports/learn/excerpts_for_approval.md; live from wave W2; tier confirmed by the coordinator)
 - kind: lesson
@@ -1061,6 +1089,8 @@
   does: "Size Prairie Campus's microgrid (solar, battery, generator, load priorities) to keep the hospital and the dormitories heated through a three-day outage; respect the host feeder's limits; compare utility, co-op and community ownership; report cost, unserved critical load and emissions."
   after: [SB1, F7, A14, A4]
 
+- {kind: lesson, tier: analyst, code: CF3, form: case, title: "Where should hydrogen go when nobody knows how much wind will be built?"}
+- {kind: lesson, tier: analyst, code: CF8, form: case, title: "Learning a wind turbine's power curve from scarce data"}
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
   id: k01-units
@@ -1120,6 +1150,8 @@
   minutes: 15
   practice_minutes: 20   # the drill (Check section); the badge needs build_learn.py to show it (coordinator)
   title: "Linear equations and inequalities"
+  subtitle: "Solve a balance for one unknown, turn words into ≤, ≥ and =, and find the plans that pass several rules at once"
+  short: "Linear equations"
   outcome: "Solve a balance for one unknown and read a set of inequalities as the region of plans that pass them."
   teaches: [linear equations, inequalities, half-planes, systems of rules]
   next: B1
@@ -1164,6 +1196,8 @@
   status: active
   minutes: 20
   title: "Spreadsheets in practice"
+  subtitle: "Work through Prairie Town's real day in a spreadsheet: formulas, fill-down, absolute references and a check cell"
+  short: "Spreadsheets"
   outcome: "Build a small energy calculation in a spreadsheet with relative and absolute references and a check cell."
   teaches: [cell references, fill-down, absolute references, SUM and MAX, check cells]
   next: B2

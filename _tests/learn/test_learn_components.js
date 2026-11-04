@@ -1,7 +1,7 @@
 // test_learn_components.js — Node tests for the Learn component library and course data (no browser needed).
 //   the bundle (assets/learn/learn.js) parses and holds every component; the CSS braces balance; every component file
-//   starts with a header comment; the metro layout works for the real path.json and for a synthetic 4-tier course;
-//   path.json matches the lesson pages; every glossary id marked in a lesson exists.
+//   starts with a header comment; path.json matches the lesson pages; every glossary id marked in a lesson exists.
+//   (The course map's layout is tested in test_metro_layout.js.)
 // Usage (from the site folder):  node _tests/learn/test_learn_components.js
 "use strict";
 const fs = require("fs");
@@ -44,41 +44,8 @@ lessonJs.forEach(f => {
   ok(!bad.length, `${f}: no lesson-local copy of a shared component${bad.length ? " (" + bad.join(", ") + ")" : ""}`);
 });
 
-// ---------------- metro layout: real course, then a synthetic course with a fourth tier
-const ctx = { window: { LX: {} }, module: { exports: {} } };
-vm.runInNewContext(fs.readFileSync(L("components/metro.js"), "utf8"), ctx);
-const layout = ctx.module.exports.metroLayout;
+// ---------------- the course map's layout: _tests/learn/test_metro_layout.js (map v2, every lesson a station)
 const pathJson = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8"));
-function checkLayout(P, label) {
-  ["h", "v"].forEach(mode => {
-    const Lo = layout(P, mode), st = Lo.stations;
-    ok(st.length === P.starter.length && Lo.tiers.length === P.tiers.length && Lo.ext.length === P.tiers.length, `${label} ${mode}: one stop per starter lesson, one line per tier`);
-    ok(st.every(s => s.x > 0 && s.x < Lo.W && s.y > 0 && s.y < Lo.H), `${label} ${mode}: every stop inside the map`);
-    let minD = Infinity;
-    st.forEach((a, i) => st.forEach((b, j) => { if (i < j) minD = Math.min(minD, Math.hypot(a.x - b.x, a.y - b.y)); }));
-    ok(minD >= 40, `${label} ${mode}: stops at least 40 units apart (${minD.toFixed(0)})`);
-    ok(Lo.segs.length === st.length - 1, `${label} ${mode}: the route joins consecutive stops`);
-    const bridges = P.starter.filter(l => l.tier2).length;
-    ok(Lo.caps.length === bridges, `${label} ${mode}: one capsule per bridge lesson (${bridges})`);
-    st.forEach(s => { const t = Lo.tiers[s.row]; ok(mode === "h" ? s.y === t.y : s.x === t.x, `${label} ${mode}: stop ${s.i} sits on a tier line`); });
-  });
-}
-checkLayout(pathJson, "course");
-ok(pathJson.tiers.length === 4 && pathJson.tiers.map(t => t.title).join() === "Foundations,Analyst,Modeler,Researcher", "course: four tiers, Researcher last");
-const res = pathJson.tiers.find(t => t.id === "researcher"), resK = pathJson.tiers.indexOf(res);
-// the Researcher tier went live with the W2 studios (2026-11-03): no starter stops, so its line counts its open lessons
-const resMore = pathJson.more.filter(m => m.tier === "researcher"), resLive = resMore.filter(m => m.ready).length;
-ok(res && res.status !== "upcoming" && layout(pathJson, "h").ext[resK].none && !layout(pathJson, "h").ext[resK].upcoming && resLive > 0 &&
-   layout(pathJson, "h").ext[resK].label === resLive + " Researcher lessons open" + (resMore.length > resLive ? ", " + (resMore.length - resLive) + " in preparation" : ""),
-   "course: the Researcher line has no starter stops, is live, and counts its open lessons (" + layout(pathJson, "h").ext[resK].label + ")");
-const soonT = JSON.parse(JSON.stringify(pathJson)); soonT.tiers[resK].status = "upcoming"; soonT.more.forEach(m => { if (m.tier === "researcher") m.ready = false; });
-ok(/^10 Researcher lessons, coming later$/.test(layout(soonT, "h").ext[resK].label) && layout(soonT, "h").ext[resK].upcoming, "course: an upcoming tier with no open lesson still says it is coming later");
-const extra = JSON.parse(JSON.stringify(pathJson));
-extra.tiers.push({ id: "extra", title: "Extra", level: "L5", slot: 5, icon: "flask", door: "A fifth line" });
-extra.more.push({ tier: "extra", title: "From a question to a paper" }, { tier: "extra", title: "Peer review" });
-checkLayout(extra, "five tiers");
-ok(layout(extra, "h").H > layout(pathJson, "h").H, "five tiers: the map grows a line");
-ok(layout(extra, "h").ext[4].none && /2 Extra lessons in preparation/.test(layout(extra, "h").ext[4].label), "five tiers: an empty line says what is coming");
 // off-path lessons: every live one has a page; every W1 module of curriculum v2 is on the map with its code
 (pathJson.more || []).filter(m => m.ready).forEach(m => ok(fs.existsSync(path.join(SITE, "learn", m.href.replace(/\.html$/, ".qmd"))), `path.json: ${m.code || m.title} page exists`));
 ["N1", "CK-F", "B1", "B2", "B3", "M1"].forEach(c => ok(pathJson.more.some(m => m.code === c && m.id), `path.json: W1 module ${c} is listed with an id`));

@@ -27,7 +27,7 @@ body-classes: "page-learn page-lesson lx-form-capstone"
 <ul class="lx-badges" aria-label="About this lesson">
 <li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst to Modeler · L2–L3</li>
 <li>Capstone</li>
-<li>60 min guided · 45 min lab</li>
+<li><span class="lx-nw">60 min guided</span> · <span class="lx-nw">45 min lab</span></li>
 <li>After <a href="09-storage.html">lesson 9</a> and <a href="a01-project-tea.html">A1</a> and <a href="f04-power-plants.html">F4</a> and <a href="sb0-site-bench.html">SB0</a></li>
 <li class="lx-done-tag" data-lesson-id="c0-behind-one-meter" hidden>Completed</li>
 </ul>
