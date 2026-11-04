@@ -84,7 +84,7 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   ok(typeof sl === "string" && sl.indexOf("The NPV is " + m(sens.base)) === 0 && sl.indexOf(widest.label) < Math.min(...sens.rows.filter(x => x !== widest).map(x => sl.indexOf(x.label))) &&
     sens.rows.every(x => sl.indexOf(m(x.atLo)) > 0 && sl.indexOf(m(x.atHi)) > 0) && /held fixed/.test(sl), "the note's sensitivity is every bar of the chart, widest first: " + sl);
   ok(widest.key === "cost", "for the default plan, the equipment cost moves the NPV most");
-  const note = E0.note(D0, R); note.link = C0.linkOf(SS, E0, D0); note.sensitivity = sl;
+  const note = E0.note(D0, R); note.link = "https://henryutd2021.github.io/learn/c0-behind-one-meter.html" + C0.hashOf(SS, E0, D0); note.sensitivity = sl;
   const words = C0.exemplarWords(C);
   const all = RN.checks(note, words, C.note.fields);
   ok(all.all, "a note in the strong exemplar's words passes every check (" + all.items.filter(i => !i.ok).map(i => i.label).join(", ") + ")");
@@ -110,8 +110,8 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   }
   // the no-JS route: the default plan's link opens the default plan; the table is the fresh sensitivity
   {
-    const lk = C0.linkOf(SS, E0, D0), d = SS.decode(E0.schemaFor("c0"), lk.slice(lk.indexOf("#")));
-    ok(d.status === "ok" && SS.same(E0.schemaFor("c0"), d.state, D0) && BLOCKS.nojs.indexOf(lk) > 0, "no-JS: the default plan's link is on the page and opens the default plan");
+    const lk = C0.hashOf(SS, E0, D0), d = SS.decode(E0.schemaFor("c0"), lk);
+    ok(d.status === "ok" && SS.same(E0.schemaFor("c0"), d.state, D0) && BLOCKS.nojs.indexOf("<code>" + lk + "</code>") > 0, "no-JS: the default plan's link (this page's address and its hash) is on the page and opens the default plan");
     ok(sens.rows.every(x => BLOCKS.nojs.indexOf(m(x.atLo)) > 0 && BLOCKS.nojs.indexOf(m(x.atHi)) > 0), "no-JS: the sensitivity table carries every bar");
   }
   // the bar is the same everywhere: the brief's "done when", the rubric's lede and note, the exemplars' levels

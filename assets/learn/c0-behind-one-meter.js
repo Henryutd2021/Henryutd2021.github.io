@@ -15,13 +15,12 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   // the note's sensitivity part: every bar of the chart in numbers, widest swing first, and what was held or re-run
   function sensLine(s, sens, E0) { var w = E0.sensWords(s, sens); return w ? w.line : null; }
-  // the plan link of a plan on this page (the hand-in link)
-  var PAGE_URL = "https://henryutd2021.github.io/learn/c0-behind-one-meter.html";
-  function linkOf(SS, E0, s) { return PAGE_URL + "#" + SS.encode(E0.schemaFor("c0"), s); }
+  // the plan link's end (after this page's address) for a plan on this page
+  function hashOf(SS, E0, s) { return "#" + SS.encode(E0.schemaFor("c0"), s); }
   // the no-JS route: the default plan's link, and its sensitivity (C.reference, written by the test) as a table
   function nojsHTML(C, E0, SS) {
     var R = C.reference, m = E0.fmt.money;
-    var h = '<p class="lx-eyebrow">The default plan, without JavaScript</p><p class="lx-hint">Its plan link, for your note: <code>' + esc(linkOf(SS, E0, E0.defaults())) + "</code></p>";
+    var h = '<p class="lx-eyebrow">The default plan, without JavaScript</p><p class="lx-hint">Its plan link, for your note: this page\'s address followed by <code>' + esc(hashOf(SS, E0, E0.defaults())) + "</code></p>";
     if (!R || !R.sens) return h;
     var w = E0.sensWords(E0.defaults(), R.sens);
     return h + '<div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Input (the equipment held fixed)</th><th scope="col">Low case</th><th scope="col">NPV</th><th scope="col">High case</th><th scope="col">NPV</th></tr></thead><tbody>' +
@@ -40,7 +39,7 @@
     t.split("\n").forEach(function (line) { var m = /^([A-Z][^:]{0,40}):\s*(.*)$/.exec(line); if (m) L[m[1]] = m[2]; });
     return { recommend: L.Recommendation + " " + L["CO₂"], alone: L.Alone, change: L.Sensitivity };
   }
-  var model = { sensLine: sensLine, staticBlocks: staticBlocks, nojsHTML: nojsHTML, linkOf: linkOf, exemplarWords: exemplarWords, PAGE_URL: PAGE_URL };
+  var model = { sensLine: sensLine, staticBlocks: staticBlocks, nojsHTML: nojsHTML, hashOf: hashOf, exemplarWords: exemplarWords };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 

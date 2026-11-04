@@ -9706,7 +9706,7 @@
     var lo = Math.min.apply(null, sh), hi = Math.max.apply(null, sh);
     return {
       strip: (home ? "Each square is a week: the stronger its colour, the more of the home's use came from the grid, not its own solar ("
-        : "Each square is a week: the stronger its colour, the more of the wind was spilled (") + pct(lo) + " to " + pct(hi) + "). Pick one.",
+        : "Each square is a week: the stronger its colour, the more of the wind was spilled (") + pct(lo, home ? 0 : 1) + " to " + pct(hi, home ? 0 : 1) + "). Pick one.",
       week: home ? "Hours from 00:00, Central standard time. Under the line, the home's use by source: solar first, then the battery, then the grid. Above it: charging and power sent back."
         : "Hours from 00:00, Central standard time. Under the line, where the wind went: sold, to the electrolyzer, into the battery or spilled. Above it: the battery's output.",
       sched: res.stores ? "With storage, this is one least-cost schedule: others can move charging to other hours at the same cost." : null,
@@ -9808,7 +9808,7 @@
       stripL.textContent = cap.strip;
       ps.forEach(function (p, i) {
         var v = p.sums.share, k = hi > lo ? (v - lo) / (hi - lo) : 0, b = H("button", { type: "button", class: "e0-cell" + (i === sel[s.site] ? " on" : ""), style: "--v:" + Math.round(8 + 82 * k) + "%",
-          "aria-pressed": i === sel[s.site] ? "true" : "false", "aria-label": "Week of " + dayLabel(p.start, 0) + ": " + pct(v) + (home ? " from the grid" : " spilled") }, strip);
+          "aria-pressed": i === sel[s.site] ? "true" : "false", "aria-label": "Week of " + dayLabel(p.start, 0) + ": " + pct(v, home ? 0 : 1) + (home ? " not from its own solar" : " spilled") }, strip);
         b.addEventListener("click", function () { pickWeek(s.site, i, true); });
       });
     }
@@ -9834,7 +9834,7 @@
       }
       var ax = axis(0, ymax), top = ax.top, bot = ax.bot;
       var xt = []; for (var d = 0; d < 7; d++) xt.push([d * 24 + 12, dayLabel(p.start, d)]);
-      var spec = { x: { min: 0, max: HPW, ticks: xt, ticksN: xt.filter(function (_, k) { return k % 2 === 0; }) }, y: { min: bot, max: top, step: ax.step, fmt: function (v) { return num(v, ax.step < 1 ? 1 : 0); }, unit: u, zero: true },
+      var spec = { x: { min: 0, max: HPW, ticks: xt, ticksN: xt.filter(function (_, k) { return k % 2 === 0; }) }, y: { min: bot, max: top, step: ax.step, fmt: function (v) { return num(v, Math.abs(ax.step - Math.round(ax.step)) > 1e-9 ? 1 : 0); }, unit: u, zero: true },
         bars: bars, height: 240, heightN: 210, aria: home ? "The week's hours as stacked bars: the home's use by source, then charging and power sent back" : "The week's hours as stacked bars: where the wind went, then the battery's output",
         lines: [{ values: home ? S.need : S.wind, color: "var(--lx-ink)", width: 1.6, step: 1 }],
         refs: home ? [] : [{ y: res.sized.line, label: "line " + num(res.sized.line) + " MW", color: "var(--lx-ink-2)", dash: "4 3" }],
