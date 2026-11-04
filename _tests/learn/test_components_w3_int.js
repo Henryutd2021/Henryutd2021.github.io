@@ -142,6 +142,7 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(F3.sankey.layout === SK.layout && F3.sankey.flows === SK.flows && F3.sankey.band === SK.band, "F3's model keeps the shared layout as .sankey");
     const f3 = rd("f03-energy-services.js"), f4q = fs.readFileSync(path.join(SITE, "learn/f04-power-plants.qmd"), "utf8");
     ok(!/function sankeyLayout|LX\.Sankey = function|lx-sankey-css/.test(f3) && /LX\.Sankey = function/.test(rd("components/sankey.js")), "F3 keeps no copy of the Sankey (code or injected styles)");
+    ok(/\n  var LX = window\.LX, H = LX\.H, S = LX\.S;/.test(f3.slice(f3.indexOf("F3: view"))), "F3's view declares LX, H and S itself (they left with the Sankey's view)");
     ok(f4q.indexOf("f03-energy-services.js") < 0 && /LX\.Sankey\(/.test(rd("f04-power-plants.js")), "F4 draws LX.Sankey from the bundle and no longer loads F3's script");
   }
 
