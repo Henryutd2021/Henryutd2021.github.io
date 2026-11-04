@@ -63,7 +63,7 @@ const APPROVED_SNAPSHOT = {
     "c1-results": () => E1.fallback({ cfg: Object.assign({}, cfg, { precomputed: Object.assign({}, cfg.precomputed, { c1: pre }) }) }, "c1"),
     "c1-note": () => RN.outlineHTML(C.FIELDS),
     "c1-exemplars": () => EX.staticHTML(exo),
-    "c1-rubric": () => RB.staticHTML(C.RUBRIC) };
+    "c1-rubric": () => RB.staticHTML(C.RUBRIC, { bar: C.RUBRIC_BAR }) };
   if (process.argv.includes("--write")) {
     const d = JSON.parse(fs.readFileSync(DPATH, "utf8")); d.precomputed = Object.assign({}, d.precomputed, { c1: pre });
     fs.writeFileSync(DPATH, JSON.stringify(d, null, 1) + "\n");
@@ -128,7 +128,8 @@ const APPROVED_SNAPSHOT = {
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp('::: \\{#' + id + ' \\.lx-sec\\}').test(PAGE), "section #" + id));
   ["keeps electricity flowing to the county hospital, its water and heating plant and the dorms through a three-day winter storm, within the host feeder's limits", "Hand in:", "Done when:", "About 90 minutes: 35 to build and run the plan, 35 to write the note, 20 to check it."].forEach(s => ok(T.indexOf(s) >= 0, "brief: " + s));
   ok(T.indexOf("Assume that powering these loads keeps their heating equipment working: heat demand and indoor temperature are not modeled.") >= 0 && !/\bheated\b/.test(T + JS), "no claim that the model keeps anything heated; the assumption is stated (C1 5)");
-  ok(/self-check reaches Proficient on accounting, uncertainty and realism\. For communication, the one-page note is the bar\./.test(T) && /one-page note: plan link, evidence, sensitivity and limits/.test(C.RUBRIC[3].look), "Done when and the rubric's communication line agree on the one-page note (C1 1)");
+  ok(/self-check reaches Proficient on every competence\./.test(T) && /one-page note with the plan link/.test(C.RUBRIC[3].levels.proficient) && C.RUBRIC_BAR === "the bar for this note" && !/full paper/.test(C.RUBRIC[3].look),
+    "Done when asks for Proficient everywhere; Communication's Proficient is C1's one-page note, in its own words (C1 1; W3 shared fix 7)");
   ok(/section 8, “Your plan”: the cell that starts <code>MY = <\/code>/.test(PAGE), "the Modeler steps name the notebook's section 8 (C1 10)");
   ok(T.indexOf("the capstone becomes a reading exercise: write the note on the sized plan") >= 0, "the no-JS route: a reading exercise on the sized plan (C1 12)");
   ok(T.indexOf("not measured campus output") >= 0 && !/real (hourly )?sun|SPP's real/.test(T), "solar: a teaching profile, not real campus sun (C1 13)");

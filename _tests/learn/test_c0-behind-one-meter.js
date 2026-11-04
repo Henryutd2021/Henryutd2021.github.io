@@ -117,8 +117,10 @@ const QPATH = path.join(SITE, "learn/c0-behind-one-meter.qmd");
   // the bar is the same everywhere: the brief's "done when", the rubric's lede and note, the exemplars' levels
   {
     const brief = (Q.match(/<li><b>Done when:<\/b>([^<]*)<\/li>/) || [])[1] || "";
-    ok(/"Look for" line/.test(brief) && !/Proficient/.test(brief) && /Look for/.test(C.rubric.note) && /six pages/.test(C.rubric.note) && /Look for/.test(C.rubric.lede) && C.exemplars.answers.every(a => /Look for/.test(a.level)),
-      "the bar is the 'Look for' lines in the brief, the rubric's lede and note and the exemplars; the six-page item is named as the final project's");
+    const comm = C.rubric.competences.find(c => c.id === "communication");
+    ok(/"Look for" line/.test(brief) && !/Proficient/.test(brief) && /Look for/.test(C.rubric.note) && !/six pages/.test(C.rubric.note) && /Look for/.test(C.rubric.lede) && C.exemplars.answers.every(a => /Look for/.test(a.level)) &&
+       C.rubric.bar === "the bar for this note" && /^a one-page note with the plan link/.test(comm.levels.proficient),
+      "the bar is the 'Look for' lines in the brief, the rubric's lede and note and the exemplars; Communication's Proficient is C0's one-page note, in its own words (W3 shared fix 7)");
     ok(/owner's goal/.test(Q) && /owner wants/.test(C.exemplars.task) && /owner wants/.test(words.recommend) && /owner's goal/.test(C.note.fields[0].hint), "the owner's goal: in the brief, the task, the strong note and the field's hint");
     ok(/does any tested input change the recommendation/.test(C.note.fields.find(f => f.key === "change").hint) && !/how far/.test(JSON.stringify(C.note)), "the last field asks whether the tested ranges change the answer, not for an unbracketed threshold");
     const mod = (Q.match(/Go deeper · Modeler<\/span>[\s\S]*?<\/details>/) || [""])[0];

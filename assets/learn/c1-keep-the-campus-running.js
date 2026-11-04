@@ -68,7 +68,9 @@
     RUBRIC: [{ id: "accounting", look: "The annual cost and the storm's unserved load and diesel CO₂, each with its boundary; who pays named." },
       { id: "uncertainty", look: "The sensitivity line: what a shorter or longer storm does to the plan held fixed." },
       { id: "realism", look: "What the plan leaves out: fuel deliveries, a set that fails to start, part-load fuel use." },
-      { id: "communication", look: "In C1 the bar is the one-page note: plan link, evidence, sensitivity and limits. The course's Proficient words below describe a full paper, which C1 does not ask for." }],
+      { id: "communication", look: "A page the campus's owner can act on: the recommendation first, then the numbers that back it.",
+        levels: { proficient: "a one-page note with the plan link: the recommendation first, then the evidence (the annual cost, the storm's unserved load and diesel CO₂), the storm-length sensitivity and the plan's limits" } }],
+    RUBRIC_BAR: "the bar for this note",
     FIELDS: [{ key: "recommend", label: "Recommendation", hint: "Two or three sentences: what to build, what stays on, and why.", rows: 3, need: true, at: "top", min: 12 },
       { key: "owner", label: "Owner, and who pays", hint: "One or two sentences: which owner, who pays, who decides.", rows: 2, need: true, min: 8 },
       { key: "cannot", label: "What the plan cannot do", hint: "One or two sentences: what could still leave the hospital short.", rows: 2, need: true, min: 8 }] };
@@ -191,7 +193,7 @@
     var ex = document.getElementById("exemplars"), exFb = ex.querySelector(".lx-fallback");
     var exHost = H("div", { class: "lx-xcard c1-exhost" }, ex);
     var rbh = document.getElementById("c1-rubric"); rbh.innerHTML = "";
-    LX.Rubric(H("div", { class: "lx-xcard" }, rbh), { id: "c1-rubric", code: "C1", title: "Rate your note against the rubric", competences: page.RUBRIC });
+    LX.Rubric(H("div", { class: "lx-xcard" }, rbh), { id: "c1-rubric", code: "C1", title: "Rate your note against the rubric", competences: page.RUBRIC, bar: page.RUBRIC_BAR });
     function exemplarsLive(R) { if (exFb) exFb.hidden = true; exHost.innerHTML = ""; LX.Exemplars(exHost, exemplars(R, paidBy(E1, P, R), P.cfg.fuel.price)); }
     // the strong exemplar's numbers: the defaults sized and run once, quietly, when the self-check comes into view
     var exDone = false;

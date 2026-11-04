@@ -35,14 +35,16 @@
  },
  "rubric": {
   "title": "Rate your note against the course rubric",
-  "lede": "Pick the level your note reaches on each competence. The level words are the course's, for its final project; each \"Look for\" line is what this one-page note needs.",
+  "lede": "Pick the level your note reaches on each competence. The level words are the course's, except Communication's Proficient, written for this one-page note; each \"Look for\" line is what the note needs.",
+  "bar": "the bar for this note",
   "competences": [
    { "id": "accounting", "look": "NPV and CO₂ for the same plan, against the same site with nothing new, in one dollar year, with the CO₂ boundary said." },
    { "id": "uncertainty", "look": "Every bar of the sensitivity chart in the note, the equipment held fixed, and whether any tested input changes the answer." },
    { "id": "realism", "look": "What the site still needs from outside (the grid, a buyer) and what the bench leaves out (outages, storage across weeks)." },
-   { "id": "communication", "look": "A page an owner can act on: the recommendation first, then the numbers that back it." }
+   { "id": "communication", "look": "A page an owner can act on: the recommendation first, then the numbers that back it.",
+     "levels": { "proficient": "a one-page note with the plan link: the recommendation first, then its NPV, its CO₂, the sensitivity chart and what the site cannot do alone" } }
   ],
-  "note": "The bar for this capstone: every \"Look for\" line in your note. The Proficient column's longer items (six pages, a public summary) belong to the course's final project, not to this note."
+  "note": "The bar for this capstone: every \"Look for\" line in your note."
  },
  "sensitivity": {
   "title": "Test the plan: what moves its NPV?",

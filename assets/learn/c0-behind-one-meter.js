@@ -30,7 +30,7 @@
   function staticBlocks(D, C, P, E0, SS, RN, EX, RB) {
     return { plan: SS.staticHTML(E0.schemaFor("c0"), E0.defaults()), nojs: nojsHTML(C, E0, SS), results: E0.fallback(D),
       note: RN.outlineHTML(C.note.fields, { sensitivity: "Sensitivity: every bar of the sensitivity chart in numbers, and what was held fixed" }),
-      exemplars: EX.staticHTML(C.exemplars), rubric: RB.staticHTML(C.rubric.competences), inputs: E0.inputsHTML(D, P) };
+      exemplars: EX.staticHTML(C.exemplars), rubric: RB.staticHTML(C.rubric.competences, { bar: C.rubric.bar }), inputs: E0.inputsHTML(D, P) };
   }
   // the strong exemplar's lines as the note's three fields (the screenshot's "done" state and the test)
   function exemplarWords(C) {
@@ -99,7 +99,7 @@
     var ex = document.getElementById("exemplars"); ex.innerHTML = "";
     LX.Exemplars(H("div", { class: "lx-xcard" }, ex), C.exemplars);
     var rb = document.getElementById("c0-rubric"); rb.innerHTML = "";
-    LX.Rubric(H("div", { class: "lx-xcard" }, rb), { id: "c0-rubric", code: "C0", title: C.rubric.title, lede: C.rubric.lede, competences: C.rubric.competences, note: C.rubric.note });
+    LX.Rubric(H("div", { class: "lx-xcard" }, rb), { id: "c0-rubric", code: "C0", title: C.rubric.title, lede: C.rubric.lede, competences: C.rubric.competences, note: C.rubric.note, bar: C.rubric.bar });
     var first = B.run.run(B.plan());
     // demo states: "mid" = the default plan run and its sensitivity; "done" = that, plus the strong note's words in the
     // note's fields (for the note's screenshot)

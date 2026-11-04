@@ -31,7 +31,9 @@ body-classes: "page-learn page-lesson lx-form-capstone"
      in #note with the allow-listed repository's Colab link). Nothing is saved or sent anywhere: the reader copies the
      note and the link, and the page says so (ReportNote's privacy line).
      Rubric (§3.4): pick the competences (C0 and C1: accounting, uncertainty, realism, communication) and add a "look
-     for" line each; never reword the levels. The exemplars are illustrative and say so; they use the engine's real
+     for" line each; never reword the levels, except where the course's words describe another deliverable: then give
+     that competence its own `levels` and the rubric a `bar` label (C0 and C1: Communication's Proficient is the one-page
+     note; README, Rubric self-check). The exemplars are illustrative and say so; they use the engine's real
      numbers for the default plan, checked by the test.
      Time: path.yml `minutes` is the whole capstone (60 for C0, 90 for C1); `lab_minutes` the Modeler notebook. Count the
      runs and the writing honestly.
