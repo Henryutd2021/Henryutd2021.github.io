@@ -1,5 +1,6 @@
 # Sidecar for A4 (a04-retail-tariffs), builder learn-w3-d, 2026-11-03. Read by scripts/build_learn.py.
 # The real-world box quotes E7.6 (excerpt:code), approved by Henry on 2026-11-03 (reports/learn/excerpts_for_approval.md).
+# W3 fix (learn-w3-fix-d, 2026-11-03): customer-class added (the review asked for "class" to be defined at first use).
 id: a04-retail-tariffs
 lesson: A4
 glossary:
@@ -26,7 +27,10 @@ glossary:
     def: "A tariff for very large new customers, such as data centers or factories, with terms that protect other customers if the load uses less than it promised."
   - id: minimum-billing-demand
     term: Minimum billing demand
-    def: "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however little it uses."
+    def: "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however low its demand."
+  - id: customer-class
+    term: Customer class
+    def: "A group of customers, such as homes or businesses, that a utility bills under the same tariffs."
 requests:
   - "Ledger table: a04-retail-tariffs.js builds the e-ledger as a table.cf-two (rows: parties, columns: options, cells: signed $ with 'above'/'below' words, no colour tones); A7 builds the same for owners and neighbours. Candidate for promotion as LX.Ledger (i-ledger/e-ledger, curriculum §16.1), with a staticHTML for the no-JS block."
   - "path.yml: the old placeholder row 'Policy instruments: tax credits, carbon prices, large-load tariffs' (Analyst, in preparation) overlaps A4 (large-load tariffs) and A12; the coordinator may retitle or drop it."

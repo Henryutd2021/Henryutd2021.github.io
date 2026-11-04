@@ -60,7 +60,7 @@
   { "key": "flat", "name": "Flat", "long": "Flat price", "pays": "every kWh at one price", "rewards": "using less, at any hour" },
   { "key": "tou", "name": "Time-of-use", "long": "Time-of-use", "pays": "kWh at a higher price from 16:00 to 21:00", "rewards": "moving use out of 16:00 to 21:00", "ratio": 3, "peak": [16, 21] },
   { "key": "demand", "name": "Demand charge", "long": "Demand charge", "pays": "kWh at a low price, plus each kW of the month's busiest hour", "rewards": "a flatter day: a lower busiest hour" },
-  { "key": "rtp", "name": "Real-time", "long": "Real-time pricing", "pays": "each kWh at the town's price that hour, plus a wires charge per kWh", "rewards": "following the hourly price" }
+  { "key": "rtp", "name": "Real-time", "long": "Real-time pricing", "pays": "each kWh at the town's price that hour, plus a plant-and-wire charge per kWh", "rewards": "following the hourly price" }
  ],
  "tariffNote": "Illustrative tariffs, each set so that a class pays its total cost before anyone changes what they do. In all four, a kWh sent back earns what a kWh bought costs in that hour (net metering).",
  "scarcity": { "price": 2000, "hours": [20, 21, 22], "days": 5, "label": "five evenings at $2,000 per MWh, 20:00 to 23:00" },
@@ -72,11 +72,11 @@
   "minStart": 0,
   "minSteps": [0, 100, 5],
   "lbnlMedian": 80,
-  "note": "Illustrative: a 100 MW data center (a large load) with its own tariff; the utility's upgrades built to serve it cost $15M a year, recovered by a demand charge on its billing demand. Billing demand = the greater of its use and the minimum share of its contract."
+  "note": "Illustrative: a 100 MW data center (a large load) with its own tariff; the utility's upgrades built to serve it cost $15M a year, recovered by a demand charge on its billing demand. Billing demand = the greater of its highest hourly demand in the month and the minimum share of its contract. Assumed: what it does not pay is recovered from the utility's other customers."
  },
  "facts": [
   { "n": "17.23¢ per kWh", "what": "Average U.S. residential electricity price in 2025 (commercial 13.37¢, industrial 8.51¢).", "source": "EIA, Electric Power Annual, Table 2.4", "url": "https://www.eia.gov/electricity/annual/html/epa_02_04.html", "asof": "accessed 3 November 2026" },
-  { "n": "76.8%", "what": "Share of U.S. electricity meters that were advanced meters in 2024 (128.4 of 167.2 million): time-of-use and real-time tariffs need meters that record each hour.", "source": "FERC staff, 2025 Assessment of Demand Response and Advanced Metering, p. 2 (EIA data)", "url": "https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf", "asof": "December 2025; data for 2024" },
+  { "n": "76.8%", "what": "Share of U.S. electricity meters that were advanced meters in December 2023 (128.4 of 167.2 million). Time-of-use needs use split by price period; real-time pricing needs hourly readings.", "source": "FERC staff, 2025 Assessment of Demand Response and Advanced Metering, p. 2 and Table 2-1, p. 4 (EIA data)", "url": "https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf", "asof": "December 2025; data for December 2023" },
   { "n": "80% · 12 years", "what": "Across 55 large-load tariffs reviewed, the median minimum billing demand was 80% of contract demand; the median minimum contract rose from 5 years (tariffs proposed before 2025) to 12 years (since 2025).", "source": "Berkeley Lab and The Brattle Group, Electricity Rate Designs for Large Loads, 2026 Update, pp. 2, 4, 5", "url": "https://eta-publications.lbl.gov/sites/default/files/2026-08/rate_designs_large_loads_2026.08.10.pdf", "asof": "August 2026; tariffs as of March 2026" }
  ]
 }

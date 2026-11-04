@@ -27,7 +27,7 @@
    6
   ],
   "userStart": 0,
-  "note": "Illustrative: each hour's use may move up or down by at most the flexible share of that hour's demand; the day's total stays the same, plus the losses when they are on (each MWh moved needs 1.1 MWh at its new hour, as when a home is pre-cooled). The users' cost moves in steps of $6 a MWh, so no setting makes a move save exactly nothing (at $40, $56 or $60 a move would tie, and the plants' CO2 would no longer be the same in every least-cost shift)."
+  "note": "Illustrative: each hour's use may move up or down by at most the flexible share of that hour's demand; the day's total stays the same, plus 10% extra energy when it is on (each MWh moved needs 1.1 MWh at its new hour, as when a home is pre-cooled: about 9% of what arrives is lost). The users' cost moves in steps of $6 a MWh, so no setting makes a move save exactly nothing (at $40, $56 or $60 a move would tie, and the plants' CO2 would no longer be the same in every least-cost shift)."
  },
  "vpp": {
   "event": [
@@ -116,7 +116,7 @@
    0.5
   ],
   "start": 5,
-  "note": "Illustrative: under net billing the solar home's midday kWh earn the hour's running cost, $0 on 9 June; its neighbour, the renter, buys at A4's flat price, 14.7¢, of which 9.5¢ pays for plants and wires (A4's real-time wires charge).",
+  "note": "Illustrative: under net billing the solar home's midday kWh earn the hour's running cost, $0 on 9 June; its neighbour, the renter, is on A4's real-time tariff, so in those hours it pays the hour's price, $0, plus A4's plant-and-wire charge, 9.5¢ per kWh (not A4's 14.7¢ flat price). The trade skips that charge unless it pays it.",
   "wires": 0.095185
  },
  "facts": [
