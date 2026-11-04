@@ -1,0 +1,32 @@
+{
+ "about": "Sandbox SB0, the Site Bench (wave W3, 2026-11-03): the words of the page's explain layer. The engine, its data and every number are in assets/learn/components/engine-e0.js and assets/learn/data/e0.json; the check of the 52-week run against one full-year LP is written into e0.json (reference) by _tests/learn/test_sb0-site-bench.js --write.",
+ "rules": {
+  "title": "Decisions, goal and rules, in words",
+  "items": [
+   { "k": "Decisions", "v": "Every hour: how much to buy and send back (home) or sell and spill (farm), what goes into and out of the battery, and what the electrolyzer and tank do." },
+   { "k": "Goal", "v": "The lowest yearly cost for the home, or the highest yearly revenue for the farm, with the sizes you set." },
+   { "k": "Rules", "v": "Each hour balances; nothing runs above its size; the battery loses 15% of what it stores; the line and the buyer's take are limits." },
+   { "k": "Time", "v": "All 8,760 hours of 2025, as 52 weeks and 31 December, one small [[linear-program|linear program]] each." },
+   { "k": "Tie rule", "v": "A tiny wear charge on battery use and, on the farm, a hair's preference for selling earlier in the week. Both are left out of every number shown." },
+   { "k": "Ties", "v": "Every total shown is the same on every least-cost schedule. With storage, the hour-by-hour schedule, and the hour counts read from it, can differ." }
+  ]
+ },
+ "bound": {
+  "title": "Where the bench's answers hold",
+  "holds": [
+   "the weather and prices of 2025 are a fair guide to the next 25 or 30 years;",
+   "the sourced costs, converted to 2025 dollars, hold for the whole horizon;",
+   "the grid is always there to buy from (home) or to sell to, up to the line (farm)."
+  ],
+  "leaves": [
+   "storage carried from one week to the next (the check below measures what that changes);",
+   "outages, taxes, tax credits, incentives and financing;",
+   "how other plants respond to the site: the CO₂ uses one average factor (CF6 explains the difference)."
+  ],
+  "source": "Hourly patterns: EIA-930 for SPP, 2025, reshaped to EIA's capacity factors. Costs and factors: EIA, DOE and NLR, with dates, in the sources below."
+ },
+ "check": {
+  "title": "Checked on one full-year LP",
+  "lede": "The test runs each preset again as one LP over all 8,760 hours, with storage free to carry across weeks."
+ }
+}

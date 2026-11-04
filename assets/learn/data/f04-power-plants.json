@@ -1,0 +1,108 @@
+{
+ "meta": {
+  "title": "F4: how power plants turn heat, water, wind and sunlight into electricity (sources, plants, toy settings)",
+  "note": "Every real number below names its source (sources.*), with where in the document and an as-of date; all were read on 3 November 2026. Prairie Town, its 200 MW solar farm, its combined-cycle plant's 40 MW/h ramp, the hydro plant and its reservoir are illustrative. The solar days are real Southwest Power Pool shapes from town_year.json (EIA-930, 2025), scaled the lesson-0 way: MW = shape x 200 MW, so SPP's highest solar hour of 2025 is the farm at full output. The thermal plants' shares come from EIA's 2025 tested heat rates (3,412 Btu in a kWh / heat rate): full-load test values, not measured annual fuel use. The renewable plants' shares are EIA's notional equipment efficiencies (AER 2010, Table F1) and EIA's description of today's best solar modules; the solar share is DC electricity at the module, before the inverter and other plant losses. The kinds of number are not measured the same way; the page says so. The three solar days are named by their output (high, afternoon dip, low): output alone cannot show the weather behind it.",
+  "checked": "2026-11-03",
+  "btuPerKWh": 3412
+ },
+ "sources": {
+  "eia_t82": { "publisher": "U.S. Energy Information Administration", "title": "Electric Power Annual, Table 8.2: Average Tested Heat Rates by Prime Mover and Energy Source, 2015-2025", "url": "https://www.eia.gov/electricity/annual/html/epa_08_02.html", "where": "2025 column; heat rate at full load, weighted by net summer capacity, utilities and independent power producers", "as_of": "2025 data", "read": "2026-11-03" },
+  "eia_faq107": { "publisher": "U.S. Energy Information Administration", "title": "Frequently Asked Questions: What is the efficiency of different types of power plants?", "url": "https://www.eia.gov/tools/faqs/faq.php?id=107&t=3", "where": "divide 3,412 Btu (one kWh) by the heat rate; 10,500 Btu gives 33%, 7,500 Btu gives 45%", "as_of": "read 3 November 2026", "read": "2026-11-03" },
+  "eia_gloss": { "publisher": "U.S. Energy Information Administration", "title": "Glossary: Heat rate; Heat content", "url": "https://www.eia.gov/tools/glossary/index.php?id=H", "where": "heat rates are typically net heat rates; EIA typically uses gross heat content (higher heating value)", "as_of": "read 3 November 2026", "read": "2026-11-03" },
+  "eia_aer2010": { "publisher": "U.S. Energy Information Administration", "title": "Annual Energy Review 2010, Appendix F, Table F1: Conversion Efficiencies of Noncombustible Renewable Energy Sources", "url": "https://www.eia.gov/totalenergy/data/annual/archive/038410.pdf", "where": "p. 358 (Table F1, notional efficiencies: geothermal 16%, conventional hydroelectric 90%, wind 26% at rated wind speed); p. 340 (Table A6, technology-based geothermal heat rate 21,017 Btu per kWh, 2010)", "as_of": "October 2011", "read": "2026-11-03" },
+  "eia_pv": { "publisher": "U.S. Energy Information Administration", "title": "Solar explained: Photovoltaics and electricity", "url": "https://www.eia.gov/energyexplained/solar/photovoltaics-and-electricity.php", "where": "PV cells are nonmechanical and make direct current; inverters convert it to AC; state-of-the-art modules approach 25% efficiency (under 10% in the mid-1980s)", "as_of": "read 3 November 2026", "read": "2026-11-03" },
+  "eia_gen": { "publisher": "U.S. Energy Information Administration", "title": "Electricity explained: How electricity is generated", "url": "https://www.eia.gov/energyexplained/electricity/how-electricity-is-generated.php", "where": "most electricity comes from turbines driving generators; shares of U.S. generation in 2022: steam turbines about 42%, combined-cycle plants about 34%, wind turbines about 10%, hydroelectric turbines about 6%, photovoltaic plants about 3%", "as_of": "2022 data", "read": "2026-11-03" },
+  "eia_geo": { "publisher": "U.S. Energy Information Administration", "title": "Geothermal explained: Geothermal power plants", "url": "https://www.eia.gov/energyexplained/geothermal/geothermal-power-plants.php", "where": "plants need hot water or steam at 300 to 700 °F; dry steam, flash steam (the most common) and binary-cycle plants; the water is injected back into the ground", "as_of": "read 3 November 2026", "read": "2026-11-03" },
+  "eia_hydro": { "publisher": "U.S. Energy Information Administration", "title": "Hydropower explained", "url": "https://www.eia.gov/energyexplained/hydropower/", "where": "run-of-river, storage and pumped-storage plants; hydropower about 5.6% of U.S. utility-scale generation in 2025", "as_of": "2025 data", "read": "2026-11-03" },
+  "doe_hydro": { "publisher": "U.S. Department of Energy, Water Power Technologies Office", "title": "Types of Hydropower Plants", "url": "https://www.energy.gov/eere/water/types-hydropower-plants", "where": "impoundment (a dam and reservoir, the most common type), diversion (run-of-river) and pumped storage", "as_of": "read 3 November 2026", "read": "2026-11-03" },
+  "doe_gas": { "publisher": "U.S. Department of Energy, Office of Fossil Energy and Carbon Management", "title": "How Gas Turbine Power Plants Work", "url": "https://www.energy.gov/fecm/how-gas-turbine-power-plants-work", "where": "compressor, combustor (more than 2,000 °F), turbine; a heat recovery steam generator (HRSG) makes steam from the exhaust for a steam turbine; simple-cycle efficiency 20 to 35 percent", "as_of": "read 3 November 2026", "read": "2026-11-03" },
+  "eia_startup": { "publisher": "U.S. Energy Information Administration", "title": "About 25% of U.S. power plants can start up within an hour", "url": "https://www.eia.gov/todayinenergy/detail.php?id=45956", "where": "Today in Energy: most hydro turbines go from cold start to full output in under 10 minutes; combustion turbines are relatively fast; most combined-cycle plants take 1 to 12 hours; coal plants more than half a day; ramp rate is how fast a running plant changes its output", "as_of": "19 November 2020", "read": "2026-11-03" },
+  "nrel_dl15": { "publisher": "National Renewable Energy Laboratory", "title": "Power Performance Test Report for the U.S. Department of Energy 1.5-Megawatt Wind Turbine (NREL/TP-5000-63684)", "url": "https://docs.nlr.gov/docs/fy15osti/63684.pdf", "where": "Table 6: the highest binned power coefficient, 0.52 at 7.04 m/s (lesson 5's data file)", "as_of": "2015; test February to June 2011", "read": "2026-11-03" },
+  "eia930": { "publisher": "U.S. Energy Information Administration", "title": "Hourly Electric Grid Monitor (Form EIA-930): Southwest Power Pool, 2025", "url": "https://www.eia.gov/electricity/gridmonitor/", "where": "hourly solar output of the SPP fleet, as shapes in town_year.json", "as_of": "2025 data, accessed 2 November 2026", "read": "2026-11-03" }
+ },
+ "plants": [
+  { "key": "cc", "name": "Gas combined cycle", "short": "Combined cycle", "color": "var(--lx-cc)", "scene": "gas", "inLabel": "Natural gas burned", "lossLabel": "Waste heat (exhaust and cooling water)", "lossShort": "Waste heat", "heatRate": 7535, "src": "eia_t82", "kind": "thermal" },
+  { "key": "ct", "name": "Gas peaker (gas turbine alone)", "short": "Gas peaker", "color": "var(--lx-pk)", "scene": "gas", "inLabel": "Natural gas burned", "lossLabel": "Waste heat (hot exhaust)", "lossShort": "Waste heat", "heatRate": 10975, "src": "eia_t82", "kind": "thermal" },
+  { "key": "coal", "name": "Coal steam plant", "short": "Coal steam", "color": "var(--lx-ink-2)", "scene": "steam", "inLabel": "Coal burned", "lossLabel": "Waste heat (stack and condenser)", "lossShort": "Waste heat", "heatRate": 10040, "src": "eia_t82", "kind": "thermal" },
+  { "key": "geo", "name": "Geothermal plant", "short": "Geothermal", "color": "var(--lx-geo)", "scene": "geo", "inLabel": "Heat in the hot fluid", "lossLabel": "Waste heat (cooling and reinjected water)", "lossShort": "Waste heat", "share": 16, "src": "eia_aer2010", "kind": "notional" },
+  { "key": "hydro", "name": "Hydro dam", "short": "Hydro", "color": "var(--lx-hyd)", "scene": "hydro", "inLabel": "Falling water through the turbine", "lossLabel": "Losses (friction, turbine, generator)", "lossShort": "Losses", "share": 90, "src": "eia_aer2010", "kind": "notional" },
+  { "key": "wind", "name": "Wind turbine, at rated wind speed", "short": "Wind", "color": "var(--lx-wind)", "scene": "wind", "inLabel": "Wind through the rotor", "lossLabel": "Stays in the wind, or lost in the machine", "lossShort": "Not captured", "share": 26, "src": "eia_aer2010", "kind": "notional" },
+  { "key": "pv", "name": "Solar panel, today's best modules", "short": "Solar PV", "color": "var(--lx-solar)", "scene": "pv", "inLabel": "Sunlight on the panel", "outLabel": "DC electricity at the module", "outShort": "DC at module", "lossLabel": "Reflected, or heat in the panel", "lossShort": "Reflected or heat", "share": 25, "src": "eia_pv", "kind": "notional", "shareWord": "nearly" }
+ ],
+ "scenes": [
+  { "key": "gas", "short": "Gas", "name": "Gas plant", "icon": "flame", "color": "var(--lx-cc)", "energy": "Natural gas, burned", "spins": "A gas turbine, then (in a combined cycle) a steam turbine", "chain": ["Chemical energy in the gas", "Hot gas above 2,000 °F", "Spinning turbines", "Electricity"], "text": "Burning gas drives a [[gas-turbine|gas turbine]] like a jet engine. A combined cycle also boils water in an exhaust-heated boiler ([[hrsg|HRSG]]), so a second, [[steam-turbine|steam turbine]] runs on heat the peaker throws away.", "src": "doe_gas" },
+  { "key": "steam", "short": "Steam", "name": "Steam plant", "icon": "plant", "color": "var(--lx-ink-2)", "energy": "Coal or gas burned in a boiler (or heat from fission: F5)", "spins": "A steam turbine", "chain": ["Chemical energy in the fuel", "Heat in the boiler", "High-pressure steam", "Electricity"], "text": "A boiler turns water into steam that spins a steam turbine. A [[condenser|condenser]] cools the steam back to water, and that is where most of the [[waste-heat|waste heat]] leaves.", "src": "eia_gen" },
+  { "key": "hydro", "short": "Hydro", "name": "Hydro dam", "icon": "drop", "color": "var(--lx-hyd)", "energy": "Water falling from a height", "spins": "A water turbine", "chain": ["Water held up high", "Falling through the penstock", "Spinning water turbine", "Electricity"], "text": "A dam holds a [[reservoir|reservoir]]. Water falls through a pipe, the penstock, and spins a turbine; the drop in height is the [[hydraulic-head|head]].", "src": "doe_hydro" },
+  { "key": "geo", "short": "Geothermal", "name": "Flash-steam geothermal plant", "icon": "geo", "color": "var(--lx-geo)", "energy": "Hot water or steam from wells, 300 to 700 °F", "spins": "A steam turbine (binary plants spin theirs with a second fluid)", "chain": ["Heat deep underground", "Hot water rises in a well", "Pressure drops; some water boils", "Electricity"], "text": "[[geothermal|Geothermal]] wells bring up hot water under pressure. In this flash-steam plant, the most common kind, some of it suddenly boils as the pressure drops and spins a turbine; binary plants heat a second fluid instead.", "src": "eia_geo" },
+  { "key": "wind", "short": "Wind", "name": "Wind turbine", "icon": "turbine", "color": "var(--lx-wind)", "energy": "Moving air", "spins": "The rotor, then a generator in the nacelle (the housing on top)", "chain": ["Moving air", "Blades turn the rotor", "Gearbox and generator", "Electricity"], "text": "The wind turns the rotor, which turns a [[generator|generator]] in the [[nacelle|nacelle]], the equipment housing on top of the tower. No rotor can catch more than 59.3% of the wind's power (the Betz limit, lesson 5).", "src": "eia_gen" },
+  { "key": "pv", "short": "Solar PV", "name": "Solar photovoltaic farm", "icon": "sun", "color": "var(--lx-solar)", "energy": "Sunlight", "spins": "Nothing: no moving parts", "chain": ["Sunlight", "Cells make direct current (DC)", "Inverter makes alternating current (AC)", "Electricity"], "text": "[[photovoltaic|Photovoltaic]] cells turn light straight into direct current (DC), which flows one way, with nothing spinning. An [[inverter|inverter]] turns it into the grid's alternating current (AC), which reverses direction many times a second.", "src": "eia_pv" }
+ ],
+ "facts": {
+  "betz": { "value": 59.3, "unit": "%", "note": "16/27 of the wind's power, physics (lesson 5)" },
+  "cpBest": { "value": 0.52, "src": "nrel_dl15" },
+  "pv1985": { "value": 10, "src": "eia_pv", "note": "commercial panels averaged less than 10% in the mid-1980s" },
+  "geoTempF": { "lo": 300, "hi": 700, "src": "eia_geo" },
+  "gasTempF": { "value": 2000, "src": "doe_gas", "note": "burned at more than 2,000 °F" },
+  "simpleCycle": { "lo": 20, "hi": 35, "src": "doe_gas" },
+  "geoHeatRate2010": { "value": 21017, "src": "eia_aer2010" },
+  "shares2022": { "steam": 42, "cc": 34, "wind": 10, "hydro": 6, "pv": 3, "src": "eia_gen" },
+  "hydroShare2025": { "value": 5.6, "src": "eia_hydro" },
+  "startup": { "hydroMin": 10, "ccLoH": 1, "ccHiH": 12, "src": "eia_startup" }
+ },
+ "solar": {
+  "farmMW": 200,
+  "utcOffsetHours": -5,
+  "midFrom": 10,
+  "midTo": 16,
+  "days": [
+   { "key": "clear", "date": "2025-09-11", "label": "High output", "long": "Thursday 11 September 2025", "note": "a smooth bell from sunrise to sunset" },
+   { "key": "clouds", "date": "2025-09-03", "label": "Afternoon dip", "long": "Wednesday 3 September 2025", "note": "lesson 0's day: output dips in the afternoon" },
+   { "key": "overcast", "date": "2025-09-05", "label": "Low output", "long": "Friday 5 September 2025", "note": "the least solar energy of June to September 2025 in the SPP shape" }
+  ],
+  "pickWindow": ["2025-08-27", "2025-09-14"],
+  "eveningHour": 19,
+  "eveningMax": 0.25,
+  "pickNote": "Picked on 3 November 2026 from the SPP solar shape of 27 August to 14 September 2025 (similar day length). 11 September has the most solar energy among those days whose hour from 19:00 stays at or below a quarter of the day's peak (12 September holds its peak through that hour, a likely telemetry error, so it is left out); 5 September has the least solar energy of June to September; 3 September is lesson 0's day. The labels name the output, not the weather: a regional output shape is consistent with clouds or haze but cannot show them, and no dated weather record is used."
+ },
+ "hydro": {
+  "rho": 1000, "g": 9.81, "eta": 0.9, "etaSrc": "eia_aer2010",
+  "head": { "min": 10, "max": 150, "step": 10, "start": 40 },
+  "flow": { "min": 20, "max": 300, "step": 10, "start": 100 },
+  "goalMW": 100,
+  "volumeM3": 20000000,
+  "about": "Illustrative plant. Power P = rho x g x Q x H x eta (W), in MW / 1e6. Toy reservoir: 20 million cubic metres, all of it usable, no water flowing in, and the head and efficiency held constant as it drains; at a flow Q it runs for volume / (Q x 3600) hours and gives P x hours MWh. In a real reservoir the head falls as the water level drops, and release rules can limit the flow."
+ },
+ "ramp": {
+  "date": "2025-09-03",
+  "from": 15, "to": 21,
+  "ccStart": 60,
+  "rampMin": 10, "rampMax": 60, "rampStep": 10,
+  "about": "Prairie Town's 3 September 2025, prepared exactly as in lesson 0 (grid-operator.js prepare): the gas each hour must supply, 15:00 to 21:00. The combined-cycle plant follows that need as closely as its ramp limit and size allow (greedy, hour by hour), starting from the need at 15:00; the peaker fills what is missing, up to its size. Every hour must balance: energy short (the need above what the plants make) and energy over (the combined-cycle plant cannot turn down as fast as the need falls, and nothing else in the toy can take the extra) both keep the step open. The ramp limit slider is illustrative; Prairie Town's own plant is 40 MW per hour (town.json)."
+ },
+ "limits": {
+  "bins": [
+   { "id": "weather", "label": "Weather", "sub": "sun or wind" },
+   { "id": "water", "label": "Stored water", "sub": "the reservoir" },
+   { "id": "fuel", "label": "Fuel", "sub": "gas or coal arriving" },
+   { "id": "ramp", "label": "Ramp rate", "sub": "how fast output can change" }
+  ],
+  "cards": [
+   { "id": "noon", "text": "A cloud bank crosses the solar farm at noon", "bin": "weather", "why": "Weather: a solar farm can make only what the sunlight allows." },
+   { "id": "calm", "text": "A calm night: the wind farm's blades barely turn", "bin": "weather", "why": "Weather: a wind farm can make only what the wind allows." },
+   { "id": "dry", "text": "After a dry year, the dam's reservoir is low", "bin": "water", "why": "Stored water: the head and the hours of full output both shrink." },
+   { "id": "pipe", "text": "A gas pipeline is shut for repair", "bin": "fuel", "why": "Fuel: a gas plant can run only while gas arrives." },
+   { "id": "climb", "text": "Demand climbs 50 MW in an hour; the combined-cycle plant can add only 40 MW", "bin": "ramp", "why": "Ramp rate: the plant has room to give more, just not that fast." }
+  ]
+ },
+ "predict": {
+  "id": "f4-least",
+  "q": "Out of every 100 units of energy that go in, which plant sends the fewest to the wire?",
+  "answer": "geo",
+  "options": [
+   { "value": "cc", "label": "Gas combined cycle", "color": "var(--lx-cc)" },
+   { "value": "ct", "label": "Gas peaker", "color": "var(--lx-pk)" },
+   { "value": "geo", "label": "Geothermal", "color": "var(--lx-geo)" },
+   { "value": "hydro", "label": "Hydro dam", "color": "var(--lx-hyd)" }
+  ]
+ }
+}

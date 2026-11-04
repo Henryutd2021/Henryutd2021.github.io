@@ -15,7 +15,7 @@
       "capex": 1484, "fom": 23.60, "vom": 0, "heatRate": 0, "cf": 24.0,
       "cfRange": [19.4, 31.5],
       "design": "single-axis tracking, EIA's capacity-weighted average of 2024 regional costs",
-      "cfNote": "24.0%: average of U.S. solar photovoltaic plants in 2025. Range 19.4-31.5%: the weakest and best resource classes in the 2025 ATB (2023 values).",
+      "cfNote": "24.0%: average of U.S. utility-scale solar photovoltaic generators in 2025. Range 19.4-31.5%: the weakest and best resource classes in the 2025 ATB (2023 values).",
       "src": ["eia-aeo2026-emm", "eia-epa-cf", "atb2025-pv"]
     },
     "cc": {

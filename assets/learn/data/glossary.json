@@ -11,6 +11,30 @@
   "lesson": "K7",
   "href": "k07-spreadsheets.html"
  },
+ "additionality": {
+  "term": "Additionality",
+  "short": "Whether a purchase brings new clean generation that would not have been built otherwise, rather than claiming output that existed anyway.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
+ "afue": {
+  "term": "AFUE (annual fuel utilization efficiency)",
+  "short": "The share of a furnace's fuel energy that leaves the furnace as heat over a heating season, under a standard test that leaves out duct losses and the fan's electricity.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
+ "aggregator": {
+  "term": "Aggregator",
+  "short": "A company that enrols many customers' devices, offers their combined response to a grid operator or utility, and shares the payment with the owners.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
+ "alkaline-electrolyzer": {
+  "term": "Alkaline electrolyzer",
+  "short": "The older, widely used electrolyzer type, whose cells sit in an alkaline liquid; the units in IRENA's 2020 table must stay above about 15% of their size.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "annuity-factor": {
   "term": "Annuity factor",
   "short": "What one dollar paid every year for a number of years is worth today, once each dollar is discounted.",
@@ -77,11 +101,29 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "baseline": {
+  "term": "Baseline",
+  "short": "An estimate of what a customer would have used without a demand-response event, against which the cut is measured.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
+ "basis-risk": {
+  "term": "Basis risk",
+  "short": "The risk that the price where a plant sells differs from the price at which its contract settles, such as its node against a trading hub.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "battery-duration": {
   "term": "Battery duration",
   "short": "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
+ },
+ "battery-margin": {
+  "term": "Battery margin",
+  "short": "What a battery earns per megawatt-hour it discharges, after paying for the power it charged and the energy lost on the way.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
  },
  "benchmark": {
   "term": "Benchmark",
@@ -119,11 +161,23 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "break-even-price": {
+  "term": "Break-even price",
+  "short": "The sale price at which a project's net present value is exactly zero; when electricity is its only revenue, with the same costs, output and discounting, it equals the plant's levelized cost.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
+ },
  "bridge-power": {
   "term": "Bridge power",
   "short": "Temporary on-site generation that serves part of a load until its grid connection is ready.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "btu": {
+  "term": "Btu (British thermal unit)",
+  "short": "A unit of heat, the energy that warms one pound of water by one degree Fahrenheit; one kilowatt-hour equals 3,412 Btu.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "buffer": {
   "term": "Buffer (GIS)",
@@ -142,6 +196,12 @@
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "caidi": {
+  "term": "CAIDI",
+  "short": "Customer Average Interruption Duration Index: the average minutes to restore one interruption, SAIDI divided by SAIFI.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "capacity": {
   "term": "Capacity",
@@ -179,6 +239,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "capture-ratio": {
+  "term": "Capture ratio",
+  "short": "The average price a plant earns per megawatt-hour it produces, divided by the average market price across all hours: hours with more output count more.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "carbon-budget": {
   "term": "Carbon budget",
   "short": "A cap on the total CO₂ emitted over many years, a limit on a stock rather than on one year's flow.",
@@ -197,6 +263,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "carnot-limit": {
+  "term": "Carnot limit",
+  "short": "The largest share of heat any heat engine can turn into work: 1 minus the cold temperature over the hot temperature, both in kelvin.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "carrying-cost": {
   "term": "Carrying cost",
   "short": "What money tied up in buildings or equipment costs while they earn nothing: the interest, or the return it could have earned elsewhere.",
@@ -209,11 +281,29 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "chain-reaction": {
+  "term": "Chain reaction",
+  "short": "A run of fissions in which the neutrons from each split go on to split more atoms; a reactor holds it steady, with each generation as large as the last.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "chance-constraint": {
+  "term": "Chance constraint",
+  "short": "A rule required to hold with a chosen probability, for example at least a 95% chance of meeting a week's demand, rather than with certainty.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
+ },
  "checksum": {
   "term": "Checksum",
   "short": "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "circuit-breaker": {
+  "term": "Circuit breaker",
+  "short": "A switch that opens by itself when it senses a fault, cutting the power to everything beyond it, and can be closed again.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "clearing-price": {
   "term": "Clearing price",
@@ -239,6 +329,12 @@
   "lesson": "R1",
   "href": "r01-framing.html"
  },
+ "coefficient-of-performance": {
+  "term": "Coefficient of performance (COP)",
+  "short": "Heat a heat pump delivers divided by the electricity it uses; a COP of 3 means 3 kWh of heat for each kWh of electricity.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
@@ -262,6 +358,12 @@
   "short": "A table with papers in rows and ideas in columns, coded by a stated rule, that shows what a literature covers and what it leaves out.",
   "lesson": "R2",
   "href": "r02-literature.html"
+ },
+ "condenser": {
+  "term": "Condenser",
+  "short": "The part of a steam plant that cools the used steam back into water, so it can be pumped back to the boiler; most of the plant's waste heat leaves here.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "conditional-price": {
   "term": "Conditional price",
@@ -293,6 +395,18 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "control-rod": {
+  "term": "Control rod",
+  "short": "A rod of neutron-absorbing material that is pushed into a reactor core to slow the chain reaction, or pulled out to speed it up.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "coolant": {
+  "term": "Coolant",
+  "short": "The fluid, such as water, helium, liquid sodium or molten salt, that carries heat away from a reactor core.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "coordinate-reference-system": {
   "term": "Coordinate reference system (CRS)",
   "short": "The rule that ties map coordinates to places on Earth; some keep areas true, others keep distances, none keeps both everywhere.",
@@ -305,17 +419,59 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "coordination-cost": {
+  "term": "Coordination cost",
+  "short": "What it costs to enrol, meter, control and pay each device or customer in a program, whatever the device's size.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
+ "cost-of-capital": {
+  "term": "Cost of capital",
+  "short": "The yearly return an owner's lenders and investors require on money tied up in equipment; the real cost of capital leaves inflation out.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
+ },
+ "cost-of-service": {
+  "term": "Cost of service",
+  "short": "What it costs a utility to serve a customer or a class of customers: energy, plants, wires, meters and billing.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "counterfactual": {
   "term": "Counterfactual",
   "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "co2e": {
+  "term": "CO₂e (carbon dioxide equivalent)",
+  "short": "Greenhouse gases such as methane counted as the mass of CO₂ that would warm the climate as much over a set period, so they can be added up.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "credit-roles": {
   "term": "CRediT contributor roles",
   "short": "A standard list of 14 names for what each author did, such as conceptualization (shaping the question), data curation (cleaning and documenting data) and formal analysis.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "criticality": {
+  "term": "Critical (of a reactor)",
+  "short": "The steady state of a chain reaction, with a multiplication factor of exactly 1; it is a reactor's normal operating state, not an emergency.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "critical-load": {
+  "term": "Critical load",
+  "short": "The loads that must stay on in an outage, such as a hospital or a water plant; the rest can be switched off.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
+ "cross-subsidy": {
+  "term": "Cross-subsidy",
+  "short": "When some customers pay more than the cost of serving them so that others can pay less.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
  },
  "cube-law": {
   "term": "Cube law",
@@ -329,11 +485,23 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "customer-class": {
+  "term": "Customer class",
+  "short": "A group of customers, such as homes or businesses, that a utility bills under the same tariffs.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "customer-hours": {
   "term": "Customer-hours",
   "short": "Customers without power times the hours they are out: 100 customers out for 3 hours is 300 customer-hours.",
   "lesson": "R10",
   "href": "r10-question-studio.html"
+ },
+ "customer-minutes": {
+  "term": "Customer-minutes",
+  "short": "The number of customers without power times the minutes they wait: 10 homes dark for an hour is 600 customer-minutes.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "cut-in-speed": {
   "term": "Cut-in speed",
@@ -346,6 +514,12 @@
   "short": "The wind speed above which a turbine shuts down to protect itself.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "heat-pump-cut-out": {
+  "term": "Cut-out temperature (heat pump)",
+  "short": "The outdoor temperature below which a heat pump's compressor, the pump that moves its heat, switches off, so a backup heater must take over.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
  },
  "data-licence": {
   "term": "Data licence",
@@ -383,6 +557,12 @@
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
+ "decay-heat": {
+  "term": "Decay heat",
+  "short": "Heat that the radioactive fission products in used fuel keep giving off after the chain reaction has stopped.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "decision-analysis": {
   "term": "Decision analysis",
   "short": "A structured way to choose among options under uncertainty, weighing each possible outcome by how likely and how valuable it is.",
@@ -395,17 +575,41 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "deliverability": {
+  "term": "Deliverability",
+  "short": "Whether power from a plant can actually reach the buyer over the grid, usually judged by both being in the same region.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "demand": {
   "term": "Demand (load)",
   "short": "The total power that all users on a grid draw at a given moment.",
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "demand-charge": {
+  "term": "Demand charge",
+  "short": "A part of a power bill charged per kW of the customer's busiest hour (or interval) in the month, not per kWh.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "demand-response": {
   "term": "Demand response",
   "short": "Electricity users cutting or shifting their use when the grid asks, usually in return for a payment.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "desalination": {
+  "term": "Desalination",
+  "short": "Removing salt from seawater or salty groundwater to make fresh water, with heat or with electricity.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "deterministic-equivalent": {
+  "term": "Deterministic equivalent",
+  "short": "A chance constraint rewritten as an ordinary rule with a safety margin, for example planning for the demand level that is exceeded with only the allowed probability.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
  },
  "developer": {
   "term": "Developer",
@@ -443,11 +647,29 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "distribution": {
+  "term": "Distribution",
+  "short": "The lower-voltage part of the grid, from substations along feeders and laterals to homes and businesses.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "district-heating": {
+  "term": "District heating",
+  "short": "Heat made in one place and piped as hot water or steam to warm many buildings.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "dominated-plan": {
   "term": "Dominated plan",
   "short": "A plan that another plan beats on every count: no more cost, no more emissions, and better on at least one.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "dot-product": {
+  "term": "Dot product",
+  "short": "The sum of the products of two vectors' matching entries, such as costs times outputs, added up.",
+  "lesson": "K6",
+  "href": "k06-vectors-matrices.html"
  },
  "duck-curve": {
   "term": "Duck curve",
@@ -472,6 +694,12 @@
   "short": "The share of the energy put into a plant or device that comes out in the useful form, such as electricity.",
   "lesson": "K2",
   "href": "k02-rates-efficiencies.html"
+ },
+ "electric-current": {
+  "term": "Electric current",
+  "short": "The flow of electric charge through a wire, measured in amperes (A); for the same power, a higher voltage needs less current.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "electrification": {
   "term": "Electrification",
@@ -509,17 +737,35 @@
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "energy-carrier": {
+  "term": "Energy carrier",
+  "short": "A form in which energy is moved to where it is used, such as electricity, natural gas, gasoline or hydrogen.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "energy-security": {
   "term": "Energy security",
   "short": "Keeping energy flowing at bearable prices when a fuel, a supplier or a route is cut off.",
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "energy-service": {
+  "term": "Energy service",
+  "short": "What people actually want from energy, such as a warm room, hot water, cold food, light or a trip; the energy is only the means.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "energy-storage": {
   "term": "Energy storage",
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "enrichment": {
+  "term": "Enrichment (of uranium)",
+  "short": "Raising the share of uranium-235 in uranium: natural uranium has just over 0.7%, and power-plant fuel in the United States 3% to 5%.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "epsg-code": {
   "term": "EPSG code",
@@ -587,6 +833,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "fault": {
+  "term": "Fault",
+  "short": "An unintended electrical path, such as a fallen branch joining a wire to the ground, through which a large current rushes until a protective device opens.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "feasible-region": {
   "term": "Feasible region",
   "short": "The set of all plans that meet every rule of a model; on a two-variable chart it is a shaded polygon.",
@@ -605,11 +857,23 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "feedstock": {
+  "term": "Feedstock",
+  "short": "A material a process consumes to make its product, as an ammonia plant consumes hydrogen.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "fermi-estimate": {
   "term": "Fermi estimate",
   "short": "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "final-energy": {
+  "term": "Final energy",
+  "short": "The energy a home, business or vehicle buys and uses, as on its meters and receipts, such as kWh of electricity or gallons of gasoline.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
  },
  "firm-capacity": {
   "term": "Firm capacity",
@@ -628,6 +892,12 @@
   "short": "The part of a plant's capacity that a grid counts on in its riskiest hours, often estimated as its effective load-carrying capability (ELCC) and set per technology class.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "fission": {
+  "term": "Fission",
+  "short": "The splitting of a heavy atom, such as uranium-235, into two smaller atoms when it absorbs a neutron, which releases heat and a few new neutrons.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "fixed-charge": {
   "term": "Fixed charge",
@@ -665,11 +935,53 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "fuel-assembly": {
+  "term": "Fuel assembly",
+  "short": "A bundle of fuel rods, each a sealed metal tube of stacked uranium pellets, loaded into a reactor core as one unit.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "fuel-cell": {
   "term": "Fuel cell",
   "short": "A device that turns hydrogen (and oxygen from the air) into electricity, with water as the by-product: an electrolyzer run backwards.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
+ "full-cycle": {
+  "term": "Full cycle",
+  "short": "Charging a store's usable energy once and discharging it once; two half charges and discharges count as one full cycle.",
+  "lesson": "A8",
+  "href": "a08-storage-duration.html"
+ },
+ "full-load-hours": {
+  "term": "Full-load hours",
+  "short": "A year's output divided by a machine's size: the hours it would need at full size to make the same amount; divided by 8,760, it is the average utilization.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
+ "fuse": {
+  "term": "Fuse",
+  "short": "A wire that melts on a fault and cuts the power beyond it; a crew must replace it.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "gas-turbine": {
+  "term": "Gas turbine",
+  "short": "An engine that compresses air, burns fuel in it and lets the hot gas spin a turbine, as a jet engine does; alone it is a simple-cycle plant, such as a peaker.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "generator": {
+  "term": "Generator",
+  "short": "A machine that turns the spin of a shaft into electricity, by turning magnets past coils of wire.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "geothermal": {
+  "term": "Geothermal power",
+  "short": "Electricity made from the earth's heat, using hot water or steam brought up from wells.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "gigawatt": {
   "term": "Gigawatt (GW)",
@@ -683,6 +995,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "global-sensitivity-analysis": {
+  "term": "Global sensitivity analysis",
+  "short": "Ranking a model's inputs by their influence on a result while all of them vary together across their assumed ranges, rather than one at a time.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
+ },
  "governor": {
   "term": "Governor",
   "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
@@ -695,11 +1013,41 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "grid-following": {
+  "term": "Grid-following",
+  "short": "Said of an inverter, such as an ordinary solar inverter, that follows a voltage something else sets and stops when there is none.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
+ "grid-forming": {
+  "term": "Grid-forming",
+  "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
  "git-head": {
   "term": "HEAD (Git)",
   "short": "Git's name for the commit you are on now; usually it points at a branch label, which points at that commit.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "hydraulic-head": {
+  "term": "Head (hydropower)",
+  "short": "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "heat-engine": {
+  "term": "Heat engine",
+  "short": "A machine that turns part of a flow of heat into motion, such as a steam or gas turbine; the hotter its heat source, the larger the part it can turn.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "heat-exchanger": {
+  "term": "Heat exchanger",
+  "short": "A device that passes heat from one fluid to another through a wall, without mixing them; heat flows only from the hotter fluid to the cooler one.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "heat-pump": {
   "term": "Heat pump",
@@ -712,6 +1060,12 @@
   "short": "The fuel energy a power plant burns to make one megawatt-hour, for example in MMBtu per MWh, so lower means more efficient.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "hrsg": {
+  "term": "Heat recovery steam generator (HRSG)",
+  "short": "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "hidden-state": {
   "term": "Hidden state",
@@ -743,6 +1097,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "hourly-matching": {
+  "term": "Hourly matching",
+  "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "independent-events": {
   "term": "Independent events",
   "short": "Events where knowing that one happened says nothing about whether the other did, so the chance of both is the product of their chances.",
@@ -767,11 +1127,23 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "inflation": {
+  "term": "Inflation",
+  "short": "The rise in prices in general over time, so that a dollar buys less each year.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
+ },
  "informed-consent": {
   "term": "Informed consent",
   "short": "A person's agreement to take part in research, given freely after being told what will happen, the risks and how their data will be used.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "internal-rate-of-return": {
+  "term": "Internal rate of return (IRR)",
+  "short": "The discount rate at which a project's net present value is exactly zero: the return the project itself earns.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
  },
  "inverter": {
   "term": "Inverter",
@@ -796,6 +1168,18 @@
   "short": "The unit of energy on a household electricity bill: one kilowatt kept up for one hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "large-load-tariff": {
+  "term": "Large-load tariff",
+  "short": "A tariff for very large new customers, such as data centers or factories, with terms that protect other customers if the load uses less than it promised.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
+ "lateral": {
+  "term": "Lateral",
+  "short": "A side branch of a distribution feeder that serves one street or block, often protected by its own fuse.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "latin-hypercube": {
   "term": "Latin hypercube sampling",
@@ -863,6 +1247,18 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "logistics-cost": {
+  "term": "Logistics cost",
+  "short": "The cost of moving and storing goods between factories, warehouses and stores: shipping, warehousing and handling.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
+ },
+ "long-duration-storage": {
+  "term": "Long-duration storage",
+  "short": "Storage that can give its full power for about 10 hours or more; DOE splits it into inter-day (10 to 36 hours) and multi-day or week-long (36 to 160 hours) stores.",
+  "lesson": "A8",
+  "href": "a08-storage-duration.html"
+ },
  "lole": {
   "term": "Loss-of-load expectation (LOLE)",
   "short": "The expected number of days a year on which supply falls short of demand at least once, of any size or length, averaged over many simulated years; an expectation, not a count of real outages.",
@@ -875,11 +1271,23 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "lower-heating-value": {
+  "term": "Lower heating value",
+  "short": "The heat a fuel gives when it burns, not counting the extra heat won by condensing the water vapour it makes; for hydrogen, about 33 kWh per kg.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "lp-relaxation": {
   "term": "LP relaxation",
   "short": "The same model with every whole-number decision allowed to take any value in between, such as a switch anywhere from 0 to 1; its best cost is a lower bound for the real model.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "major-event-day": {
+  "term": "Major event day",
+  "short": "A day with so many outage minutes, usually from a big storm, that it passes a threshold set from a utility's past five years (IEEE 1366); reports give reliability with and without them.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "margin": {
   "term": "Margin",
@@ -904,6 +1312,12 @@
   "short": "The plant that serves the last megawatt of demand, whose offer sets the clearing price.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "matrix": {
+  "term": "Matrix",
+  "short": "A table of numbers in rows and columns; in a model, one row per rule and one column per decision.",
+  "lesson": "K6",
+  "href": "k06-vectors-matrices.html"
  },
  "mcda": {
   "term": "MCDA (multi-criteria decision analysis)",
@@ -941,6 +1355,12 @@
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },
+ "megapascal": {
+  "term": "Megapascal (MPa)",
+  "short": "A unit of pressure, one million pascals; the air pressure at sea level is about 0.1 MPa.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "megawatt": {
   "term": "Megawatt (MW)",
   "short": "A unit of power equal to one million watts, or a thousand kilowatts.",
@@ -965,6 +1385,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "meshed-network": {
+  "term": "Meshed network",
+  "short": "A network with loops, so power can reach a place by more than one path, as transmission networks do.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "method-family": {
   "term": "Method family",
   "short": "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics.",
@@ -977,11 +1403,29 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "mini-grid": {
+  "term": "Mini-grid",
+  "short": "A small local grid, with its own sources, storage and wires, that serves a village or a town that the main grid does not reach.",
+  "lesson": "A14",
+  "href": "a14-microgrid-value.html"
+ },
+ "minimum-billing-demand": {
+  "term": "Minimum billing demand",
+  "short": "The least demand, often a share of the contracted kW or MW, that a customer is billed for each month however low its demand.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "minimum-down-time": {
   "term": "Minimum down time",
   "short": "The hours a plant must stay off once stopped before it may start again.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
+ },
+ "minimum-load": {
+  "term": "Minimum load",
+  "short": "The lowest output at which a machine can keep running; below it the machine must stop, such as an electrolyzer below a set share of its size.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
  },
  "minimum-run-time": {
   "term": "Minimum run time",
@@ -1007,11 +1451,23 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "moderator": {
+  "term": "Moderator",
+  "short": "A material, such as ordinary water or graphite, that slows the fast neutrons from fission so that uranium-235 captures them more easily.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "monte-carlo": {
   "term": "Monte Carlo",
   "short": "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results.",
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
+ },
+ "monte-carlo-error": {
+  "term": "Monte Carlo error",
+  "short": "How far an estimate from a Monte Carlo study would move with another random seed; it shrinks roughly with the square root of the number of runs.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
  },
  "multi-objective": {
   "term": "Multi-objective problem",
@@ -1019,11 +1475,29 @@
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
  },
+ "multiplication-factor": {
+  "term": "Multiplication factor (k)",
+  "short": "In a chain reaction, the number of new fissions each fission leads to on average: below 1 the chain dies out, at 1 it holds steady, above 1 it grows.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "mw-it": {
   "term": "MW-IT",
   "short": "Megawatts of a data center's computing equipment; the grid must supply more, for cooling and the rest of the building.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "mwt-mwe": {
+  "term": "MWt and MWe",
+  "short": "Megawatts of heat (thermal) and megawatts of electricity (electric); a plant's MWe is its MWt times its efficiency.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "nacelle": {
+  "term": "Nacelle",
+  "short": "The equipment housing on top of a wind turbine's tower, holding the gearbox and generator that the rotor turns.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "nadir": {
   "term": "Nadir",
@@ -1037,11 +1511,23 @@
   "lesson": 8,
   "href": "08-merit-order.html"
  },
+ "net-billing": {
+  "term": "Net billing",
+  "short": "A billing rule under which kWh sent back to the grid earn a credit set separately from the retail price, often the value of energy in that hour.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "net-demand": {
   "term": "Net demand (net load)",
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-metering": {
+  "term": "Net metering",
+  "short": "A billing rule under which each kWh a customer sends back to the grid earns the same price as a kWh it buys.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
  },
  "net-present-value": {
   "term": "Net present value",
@@ -1060,6 +1546,12 @@
   "short": "A check that an option's total benefits across all affected parties exceed its total costs, each counted once.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "neutron": {
+  "term": "Neutron",
+  "short": "A particle with no electric charge in the nucleus of an atom; in a reactor, the neutrons from one fission go on to split more atoms.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
  },
  "no-load-cost": {
   "term": "No-load cost",
@@ -1090,6 +1582,12 @@
   "short": "The running program behind a notebook that holds its variables in memory between cells, whatever order the cells were run in.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "n-minus-one": {
+  "term": "N−1",
+  "short": "A planning rule: after any one element, such as a line, fails, the system keeps serving its customers with every remaining part within its limits.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "objective": {
   "term": "Objective",
@@ -1127,6 +1625,12 @@
   "lesson": "K1",
   "href": "k01-units.html"
  },
+ "outlet-temperature": {
+  "term": "Outlet temperature",
+  "short": "The temperature of the coolant as it leaves a reactor core; it sets how hot the heat is that a plant can supply.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "overnight-cost": {
   "term": "Overnight cost",
   "short": "The cost to build a power plant as if it were built overnight, so with no interest paid during construction, usually given per kilowatt.",
@@ -1145,6 +1649,18 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "passive-safety": {
+  "term": "Passive safety",
+  "short": "Safety features that rely on natural effects, such as hot fluid rising and cool fluid sinking, instead of pumps, outside power or operators.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "payback-period": {
+  "term": "Payback period",
+  "short": "The number of years until the running sum of a project's cash first gets back to zero, with or without discounting.",
+  "lesson": "A1",
+  "href": "a01-project-tea.html"
+ },
  "peak-demand": {
   "term": "Peak demand",
   "short": "The highest demand in a period, such as the busiest hour of a year; the grid must be able to meet it, with a margin.",
@@ -1157,11 +1673,23 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "pem-electrolyzer": {
+  "term": "PEM electrolyzer",
+  "short": "An electrolyzer named for the thin polymer membrane in its cells (proton exchange membrane); it follows changing power well and can run down to about 5% of its size.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "penalty": {
   "term": "Penalty",
   "short": "An extra cost added to a model's objective for an action it should not take too freely, such as adjusting an hour's load.",
   "lesson": "CF6",
   "href": "cf6-shifting-load-to-clean-hours.html"
+ },
+ "penstock": {
+  "term": "Penstock",
+  "short": "The large pipe that carries water down from a reservoir to a hydro plant's turbine.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "percentile": {
   "term": "Percentile",
@@ -1193,6 +1721,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "point-of-common-coupling": {
+  "term": "Point of common coupling",
+  "short": "The one place where a microgrid meets the main grid, with the switch that opens to let it run on its own.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
  "power": {
   "term": "Power",
   "short": "How fast electricity is being made or used at a given moment, measured in watts, kilowatts (kW) or megawatts (MW).",
@@ -1211,6 +1745,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "power-purchase-agreement": {
+  "term": "Power purchase agreement (PPA)",
+  "short": "A long contract between a power plant's seller and a buyer that sets the price paid for the plant's power, or for its market value.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "prediction-interval": {
   "term": "Prediction interval",
   "short": "A range that should contain the actual value with a stated probability, drawn as a band around a forecast.",
@@ -1223,17 +1763,47 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "pricing-node": {
+  "term": "Pricing node",
+  "short": "A point on the grid, such as a power plant's connection, where the market sets its own price.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
+ "primary-energy": {
+  "term": "Primary energy",
+  "short": "Energy as found in nature before any conversion, such as the gas burned in a power plant to make the electricity a home later buys.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "primary-response": {
   "term": "Primary frequency response",
   "short": "Automatic extra output from power plants' governors within seconds of a frequency drop; it stops the fall but does not restore 60 Hz.",
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "probability-distribution": {
+  "term": "Probability distribution",
+  "short": "A rule that says how likely each value of an uncertain input is; a uniform distribution makes every value in its range equally likely.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
+ },
+ "procurement-rule": {
+  "term": "Procurement rule",
+  "short": "A rule for which purchased electricity a buyer may count as clean, for example by region, by hour and by how new the plant is; it sets a claim, not the emissions the purchase causes.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
+ },
  "production-credit": {
   "term": "Production credit",
   "short": "A payment for each megawatt-hour a plant produces, set by a policy such as a tax credit.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "productive-use": {
+  "term": "Productive use",
+  "short": "Electricity used to earn a living, such as running a grain mill, a water pump or a cold store, rather than only for lights and phones at home.",
+  "lesson": "A14",
+  "href": "a14-microgrid-value.html"
  },
  "prognostics": {
   "term": "Prognostics",
@@ -1265,6 +1835,12 @@
   "lesson": "R1",
   "href": "r01-framing.html"
  },
+ "radial-network": {
+  "term": "Radial network",
+  "short": "A network shaped like a tree, with one path from the source to each customer, as most distribution feeders are.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
  "ramp-rate": {
   "term": "Ramp rate",
   "short": "How fast a power plant can raise or lower its output, for example in megawatts per minute or per hour.",
@@ -1276,6 +1852,12 @@
   "short": "A fixed starting number for a random-number generator, so a random draw comes out the same on every run.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "rank-correlation": {
+  "term": "Rank correlation (Spearman's ρ)",
+  "short": "The correlation of the ranks of two quantities, from −1 to 1: how consistently one rises or falls with the other, whatever the shape of the link.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
  },
  "rocof": {
   "term": "Rate of change of frequency",
@@ -1313,11 +1895,23 @@
   "lesson": "K3",
   "href": "k03-discounting.html"
  },
+ "real-time-pricing": {
+  "term": "Real-time pricing",
+  "short": "A tariff whose price per kWh follows the wholesale or system price hour by hour, so the bill moves with it.",
+  "lesson": "A4",
+  "href": "a04-retail-tariffs.html"
+ },
  "rebound-effect": {
   "term": "Rebound effect",
   "short": "Part of an efficiency saving taken back because the cheaper service gets used more.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "recloser": {
+  "term": "Recloser",
+  "short": "A breaker on a feeder that opens on a fault and tries closing again in seconds, so a passing fault, such as a brushing branch, causes only a blink.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "refuelling-outage": {
   "term": "Refuelling outage",
@@ -1373,11 +1967,29 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "reservoir": {
+  "term": "Reservoir",
+  "short": "The lake a dam holds back; its water is energy stored for later, up to what it holds.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
+ "reservoir-limit": {
+  "term": "Reservoir limit",
+  "short": "The lowest and highest level a store may hold, such as a tank's minimum pressure or a reservoir's lowest water level; a model writes it as bounds on the level.",
+  "lesson": "M4",
+  "href": "m04-storage-multienergy.html"
+ },
  "resource-adequacy": {
   "term": "Resource adequacy",
   "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation.",
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
+ },
+ "rolling-horizon": {
+  "term": "Rolling horizon",
+  "short": "Planning over a window ahead on a forecast, carrying out only the first hours of the plan, then planning again as the real values arrive.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
  },
  "round-trip-efficiency": {
   "term": "Round-trip efficiency",
@@ -1385,11 +1997,29 @@
   "lesson": 9,
   "href": "09-storage.html"
  },
+ "run-of-river": {
+  "term": "Run-of-river plant",
+  "short": "A hydro plant with little or no reservoir, so it makes what the river's flow brings at the time.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "running-cost": {
   "term": "Running cost",
   "short": "What it costs a plant to make one more megawatt-hour, mostly fuel, leaving out the cost of building it.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "saidi": {
+  "term": "SAIDI",
+  "short": "System Average Interruption Duration Index: the minutes without power the average customer has in a year, customer-minutes divided by customers served.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "saifi": {
+  "term": "SAIFI",
+  "short": "System Average Interruption Frequency Index: the number of sustained interruptions the average customer has in a year, total customer interruptions divided by customers served, so a customer interrupted twice counts twice.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "system-scale": {
   "term": "Scale (of an energy system)",
@@ -1403,6 +2033,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "scenario": {
+  "term": "Scenario",
+  "short": "A coherent what-if set of a model's inputs, such as a 36-month wait; a scenario may be given a probability, though this lesson gives none.",
+  "lesson": "M7",
+  "href": "m07-monte-carlo.html"
+ },
  "scientific-notation": {
   "term": "Scientific notation",
   "short": "A way to write a number as a value at least 1 and less than 10, times a power of ten, so very large and very small numbers are easy to compare.",
@@ -1415,11 +2051,23 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "sector-coupling": {
+  "term": "Sector coupling",
+  "short": "Linking energy carriers such as electricity, hydrogen and heat through devices that convert one into another, so that one carrier's supply and price affect the others.",
+  "lesson": "M4",
+  "href": "m04-storage-multienergy.html"
+ },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
   "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "service-level": {
+  "term": "Service level",
+  "short": "The share of cases in which a rule must hold, such as meeting store demand in 95 of every 100 weeks.",
+  "lesson": "M5",
+  "href": "m05-microgrid-size-and-run.html"
  },
  "shadow-price": {
   "term": "Shadow price",
@@ -1451,6 +2099,12 @@
   "lesson": 11,
   "href": "11-solver.html"
  },
+ "spent-fuel": {
+  "term": "Spent fuel",
+  "short": "Fuel that has been used in a reactor and taken out; it is solid, highly radioactive and still warm, and is kept first in water pools, later in dry casks.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
  "staged-energization": {
   "term": "Staged energization",
   "short": "Switching on part of a large load's grid service early and the rest later, as the grid becomes ready.",
@@ -1481,17 +2135,41 @@
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
  },
+ "standing-loss": {
+  "term": "Standing loss",
+  "short": "Energy a store loses while it waits, used or not, such as heat leaking from a hot tank; it grows with time, unlike the loss of each charge and discharge.",
+  "lesson": "A8",
+  "href": "a08-storage-duration.html"
+ },
  "start-up-cost": {
   "term": "Start-up cost",
   "short": "The fuel and wear spent to bring a plant from off to on, paid once per start.",
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "start-up-time": {
+  "term": "Start-up time",
+  "short": "How long a plant takes to go from shut down to full output; the ramp rate is how fast it changes output once running.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
+ },
  "state-of-charge": {
   "term": "State of charge",
   "short": "The energy a battery holds at a given moment, in MWh; it links each hour of a storage schedule to the next.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "steam-generator": {
+  "term": "Steam generator",
+  "short": "A heat exchanger in which hot water from a reactor's sealed loop boils the water of a second, separate loop into steam.",
+  "lesson": "F5",
+  "href": "f05-nuclear-basics.html"
+ },
+ "steam-turbine": {
+  "term": "Steam turbine",
+  "short": "A turbine spun by high-pressure steam from a boiler or another heat source.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "stock": {
   "term": "Stock",
@@ -1505,11 +2183,17 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "stylized-network": {
+  "term": "Stylized network",
+  "short": "A simplified, made-up network built to show how a model behaves, with invented distances and costs rather than a real company's map.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
+ },
  "substation": {
   "term": "Substation",
-  "short": "A site where transformers lower the voltage from transmission lines for the feeders that serve customers.",
-  "lesson": "R1",
-  "href": "r01-framing.html"
+  "short": "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
  },
  "supply-diversity": {
   "term": "Supply diversity",
@@ -1553,6 +2237,12 @@
   "lesson": "R10",
   "href": "r10-question-studio.html"
  },
+ "techno-economic-optimization": {
+  "term": "Techno-economic optimization",
+  "short": "A model that compares equipment sizes and ways of running them by both their performance and their cost, and picks the best for a stated goal.",
+  "lesson": "F7",
+  "href": "f07-microgrids.html"
+ },
  "telemetry": {
   "term": "Telemetry",
   "short": "Measurements sent automatically from plants and substations to the grid operator.",
@@ -1577,6 +2267,12 @@
   "lesson": "R3",
   "href": "r03-system-and-method.html"
  },
+ "time-of-use": {
+  "term": "Time-of-use tariff",
+  "short": "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak.",
+  "lesson": "CF1",
+  "href": "cf1-supply-chain-microgrids.html"
+ },
  "time-of-use-tariff": {
   "term": "Time-of-use tariff",
   "short": "An electricity price that changes with the hour of the day, usually higher in the evening peak.",
@@ -1589,6 +2285,12 @@
   "lesson": "R2",
   "href": "r02-literature.html"
  },
+ "tolling-agreement": {
+  "term": "Tolling agreement",
+  "short": "A contract in which the buyer pays the owner of a plant a fixed fee for the right to run it, and keeps what it earns.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
  "tornado-chart": {
   "term": "Tornado chart",
   "short": "A chart that ranks inputs by how far a result moves when each input is swung from a low to a high value, one at a time.",
@@ -1600,6 +2302,36 @@
   "short": "A file Git already knows, because it is in the last commit or the staging area; a new file stays untracked until git add.",
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
+ },
+ "trading-hub": {
+  "term": "Trading hub",
+  "short": "A pricing point where many contracts are settled, priced as an average over many nodes of the grid.",
+  "lesson": "A2",
+  "href": "a02-contracts-risk.html"
+ },
+ "transactive-energy": {
+  "term": "Transactive energy",
+  "short": "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
+ "transformer": {
+  "term": "Transformer",
+  "short": "A device with two coils that raises or lowers an alternating voltage, such as from 18 kV to 345 kV at a plant or from 12.47 kV to 240/120 V near a home.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "transmission": {
+  "term": "Transmission",
+  "short": "The high-voltage part of the grid (115 to 765 kV in the U.S.) that carries power over long distances between plants, regions and substations.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "turbine": {
+  "term": "Turbine",
+  "short": "A machine whose blades are pushed round by moving gas, steam, water or wind, turning a shaft.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "unbounded": {
   "term": "Unbounded",
@@ -1631,6 +2363,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "useful-energy": {
+  "term": "Useful energy",
+  "short": "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses.",
+  "lesson": "F3",
+  "href": "f03-energy-services.html"
+ },
  "utm": {
   "term": "UTM (Universal Transverse Mercator)",
   "short": "A set of 60 north-to-south zones, each a flat map in metres that keeps distances close to true inside the zone.",
@@ -1642,6 +2380,18 @@
   "short": "Checking that a model represents the real system well enough for the question it is used to answer.",
   "lesson": "B3",
   "href": "b03-read-check-formulation.html"
+ },
+ "value-of-coupling": {
+  "term": "Value of coupling",
+  "short": "How much cheaper a system is with devices that link its carriers than with each carrier supplied on its own, judged as a difference of optimal costs.",
+  "lesson": "M4",
+  "href": "m04-storage-multienergy.html"
+ },
+ "value-of-lost-load": {
+  "term": "Value of lost load",
+  "short": "What a customer loses when power is cut, per hour or per kWh not delivered; it differs by customer and by how long the outage lasts.",
+  "lesson": "A14",
+  "href": "a14-microgrid-value.html"
  },
  "variable-om": {
   "term": "Variable O&M",
@@ -1655,6 +2405,12 @@
   "lesson": 0,
   "href": "00-grid-operator.html"
  },
+ "vector": {
+  "term": "Vector",
+  "short": "An ordered list of numbers, such as a plan's outputs, in which the position of each number carries its meaning.",
+  "lesson": "K6",
+  "href": "k06-vectors-matrices.html"
+ },
  "verification": {
   "term": "Verification",
   "short": "Checking that a model does what its equations say, with tests such as units, the energy balance and hand-solved cases.",
@@ -1667,11 +2423,23 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "virtual-power-plant": {
+  "term": "Virtual power plant",
+  "short": "Many small devices, such as batteries, thermostats and chargers, controlled together and offered to the grid as one resource.",
+  "lesson": "A7",
+  "href": "a07-flexible-demand.html"
+ },
  "voltage": {
   "term": "Voltage",
-  "short": "The electrical pressure that pushes current along a line; grids hold it within a narrow band at every point.",
-  "lesson": "N1",
-  "href": "n01-news-lens.html"
+  "short": "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V.",
+  "lesson": "F6",
+  "href": "f06-grid-and-outages.html"
+ },
+ "waste-heat": {
+  "term": "Waste heat",
+  "short": "Heat a power plant cannot turn into electricity and releases to the air or to cooling water.",
+  "lesson": "F4",
+  "href": "f04-power-plants.html"
  },
  "watt-hour": {
   "term": "Watt-hour (Wh)",
@@ -1696,6 +2464,12 @@
   "short": "A way to combine several goals into one score by adding them up, each multiplied by a weight.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "well-to-gate": {
+  "term": "Well-to-gate",
+  "short": "An emissions boundary from producing the inputs, such as gas or electricity, to hydrogen leaving the plant; delivery and use are outside it.",
+  "lesson": "A16",
+  "href": "a16-hydrogen-ptx.html"
  },
  "wholesale-price": {
   "term": "Wholesale price",

@@ -1,0 +1,243 @@
+{
+ "about": "Modeler lesson M7 (scenarios, Monte Carlo and global sensitivity). The toy is case file CF7's waiting load (assets/learn/data/cf7-cost-of-waiting.json, idea), with invented ranges around CF7's values: illustrative round numbers, one price level, no inflation. The reference block is written by node _tests/learn/test_m07-monte-carlo.js --write and checked by the same test on every run; the lab notebook (learn/notebooks/m07-monte-carlo.ipynb) asserts it.",
+ "toy": {
+  "title": "One large load waits for the grid",
+  "note": "Illustrative round numbers, not the study's inputs, equations or results.",
+  "loadMW": 100,
+  "strandCap": 0.5,
+  "tariffShare": 0,
+  "bridge": false
+ },
+ "inputs": [
+  {
+   "key": "margin",
+   "label": "Margin once connected",
+   "short": "Margin",
+   "unit": "$ per MW a month",
+   "lo": 30000,
+   "hi": 60000,
+   "base": 45000,
+   "why": "[[margin|Margin]] = revenue minus operating costs, lost for every month of waiting."
+  },
+  {
+   "key": "capital",
+   "label": "Capital ready and idle",
+   "short": "Capital",
+   "unit": "$",
+   "lo": 400000000,
+   "hi": 600000000,
+   "base": 500000000,
+   "why": "Buildings and equipment that sit idle; their [[carrying-cost|carrying cost]] is what the tied-up money would earn at the discount rate."
+  },
+  {
+   "key": "rate",
+   "label": "Discount rate",
+   "short": "Discount rate",
+   "unit": "a year",
+   "lo": 0.06,
+   "hi": 0.1,
+   "base": 0.08,
+   "why": "The yearly rate that turns future money into [[present-value|present value]]; it also sets the carrying cost."
+  },
+  {
+   "key": "upgrade",
+   "label": "Grid upgrades built for it",
+   "short": "Upgrades",
+   "unit": "$",
+   "lo": 40000000,
+   "hi": 80000000,
+   "base": 60000000,
+   "why": "Paid by other customers while the load waits; [[stranded-cost|stranded]] (left without the expected customer) if it never arrives."
+  },
+  {
+   "key": "strand",
+   "label": "Chance it never arrives",
+   "short": "Never arrives",
+   "unit": "percentage points a month",
+   "lo": 0.0025,
+   "hi": 0.0075,
+   "base": 0.005,
+   "why": "Added each month of waiting, not compounded: 24 months × 0.5 points = 12%, at most 50%."
+  }
+ ],
+ "waits": [
+  12,
+  24,
+  36
+ ],
+ "wait": 24,
+ "runs": 1000,
+ "seed": 7,
+ "preview": 10,
+ "near": 0.1,
+ "repeats": {
+  "first": 1,
+  "last": 20,
+  "sizes": [
+   100,
+   1000
+  ]
+ },
+ "binWidth": 5000000,
+ "budget": {
+  "min": 100,
+  "max": 300,
+  "step": 5,
+  "start": 200
+ },
+ "marginWidth": {
+  "min": 1000,
+  "max": 15000,
+  "step": 1000,
+  "start": 15000
+ },
+ "guess": [
+  {
+   "value": "175",
+   "label": "About $175M: near the base"
+  },
+  {
+   "value": "200",
+   "label": "About $200M"
+  },
+  {
+   "value": "235",
+   "label": "About $235M: every input at its high-cost end"
+  },
+  {
+   "value": "300",
+   "label": "Over $300M"
+  }
+ ],
+ "reference": {
+  "about": "Written by node _tests/learn/test_m07-monte-carlo.js --write; recomputed by the same test on every run. Dollars are present values; shares are fractions of the runs.",
+  "firstRuns": [
+   {
+    "margin": 31725.6664583297,
+    "capital": 444350427.476363,
+    "rate": 0.0995760681529064,
+    "upgrade": 58758563.6825114,
+    "strand": 0.00603376369038015
+   },
+   {
+    "margin": 43786.6787079256,
+    "capital": 464101346.490718,
+    "rate": 0.0736980859632697,
+    "upgrade": 71484663.5634732,
+    "strand": 0.00386970021114917
+   },
+   {
+    "margin": 46364.5196383679,
+    "capital": 555391035.466688,
+    "rate": 0.0929867364567146,
+    "upgrade": 67206414.8791227,
+    "strand": 0.00363322064609034
+   }
+  ],
+  "base": {
+   "12": {
+    "dev": 88844897.3725,
+    "rate": 7777777.77778
+   },
+   "24": {
+    "dev": 171108691.236,
+    "rate": 14732510.2881
+   },
+   "36": {
+    "dev": 247278870.739,
+    "rate": 20943453.7418
+   }
+  },
+  "main": {
+   "dev": {
+    "p10": 140872315.095,
+    "p50": 170250628.293,
+    "p90": 200130251.091,
+    "mean": 170998071.02,
+    "min": 119997274.43,
+    "max": 230195333.509
+   },
+   "rate": {
+    "p10": 10173861.2924,
+    "p50": 14455397.6687,
+    "p90": 19753320.8299,
+    "mean": 14729183.9401,
+    "min": 7771656.94128,
+    "max": 25379558.7048
+   },
+   "rhoDev": {
+    "margin": 0.862881178881,
+    "capital": 0.382994194994,
+    "rate": 0.311676935677,
+    "upgrade": 0.00956356556357,
+    "strand": -0.0295294615295
+   },
+   "rhoRate": {
+    "margin": -0.0346733146733,
+    "capital": -0.00370165570166,
+    "rate": 0.299162171162,
+    "upgrade": 0.813744357744,
+    "strand": 0.535591675592
+   }
+  },
+  "corners": {
+   "dev": [
+    111799523.989,
+    234719637.45
+   ],
+   "rate": [
+    6536133.85546,
+    25785123.9669
+   ]
+  },
+  "preview": {
+   "lhs": {
+    "margin": 0,
+    "rate": 0
+   },
+   "random": {
+    "margin": 4,
+    "rate": 3
+   }
+  },
+  "budget": {
+   "12": {
+    "n": 0,
+    "se": 0
+   },
+   "24": {
+    "n": 101,
+    "se": 0.00521536
+   },
+   "36": {
+    "n": 929,
+    "se": 0.00670506
+   }
+  },
+  "p90se": {
+   "100": 2337170,
+   "1000": 654322,
+   "1000random": 800116
+  },
+  "meanse": {
+   "lhs": 31498.4,
+   "random": 803059
+  },
+  "flip": {
+   "half": 5000,
+   "top": "capital",
+   "rho": {
+    "margin": 0.469271893272,
+    "capital": 0.642922638923,
+    "rate": 0.589693489693,
+    "upgrade": 0.00621870621871,
+    "strand": 0.011901995902
+   }
+  },
+  "near": {
+   "share": 0.1,
+   "lo": 0,
+   "hi": 2
+  }
+ }
+}

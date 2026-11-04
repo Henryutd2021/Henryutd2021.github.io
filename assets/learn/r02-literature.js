@@ -249,7 +249,7 @@
     return function (act, api) {
       var ol = H("ol", { class: "r2-ladder" }, act), got = 0, right = 0, lis = [];
       S.ladder.forEach(function (r, i) {
-        var li = H("li", { class: i ? "locked" : "" }, ol), top = H("div", { class: "top" }, li);
+        var li = H("li", { class: i > 1 ? "locked" : "" }, ol), top = H("div", { class: "top" }, li);   // locked: its buttons are not open yet
         H("b", { text: (i + 1) + ". " + ((D.ladder_labels || {})[r.id] || r.label) }, top);
         var n = H("span", { class: "r2-n", text: i ? "?" : f0(r.count) }, top);
         H("code", { text: r.query }, li);
@@ -266,7 +266,7 @@
               var ok = o[0] === q.answer; b.setAttribute("aria-pressed", "true"); b.classList.add(ok ? "right" : "wrong");
               n.textContent = f0(r.count); li.classList.remove("locked"); got++; if (ok) right++;
               saw(fb, ok, "<b>" + (ok ? "Right." : "Not quite.") + "</b> " + f0(S.ladder[i - 1].count) + " → " + f0(r.count) + ". " + LX.esc(q.why));
-              if (lis[i + 1]) [].forEach.call(lis[i + 1].querySelectorAll("button"), function (x) { x.disabled = false; });
+              if (lis[i + 1]) { lis[i + 1].classList.remove("locked"); [].forEach.call(lis[i + 1].querySelectorAll("button"), function (x) { x.disabled = false; }); }
               if (got === D.ladder_q.length) {
                 api.done();
                 api.saw("You called " + right + " of " + got + ". Counts are as of " + dateText(S.meta.as_of) + " and can change as OpenAlex updates its records: log the date with every count, and keep the snapshot.");

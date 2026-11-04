@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Sandbox SB0 of Energy Systems, Step by Step: one site behind one meter, a Prairie Town home or the ridge wind farm; you size the equipment, a linear program runs every hour of 2025, and you read the bills, the CO₂ and the cash flow.">
+
+<title>Site Bench – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="Site Bench – Honglin Li">
+<meta property="og:description" content="Sandbox SB0 of Energy Systems, Step by Step: one site behind one meter, a Prairie Town home or the ridge wind farm; you size the equipment, a linear program runs every hour of 2025, and you read the bills, the CO₂ and the cash flow.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-sandbox quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Field Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Site Bench</h1>
+<p class="subtitle lead">Size a home’s or a wind farm’s equipment, run every hour of 2025, and see the cash flow</p>
+</div>
+
+<div>
+  <div class="description">
+    Sandbox SB0 of Energy Systems, Step by Step: one site behind one meter, a Prairie Town home or the ridge wind farm; you size the equipment, a linear program runs every hour of 2025, and you read the bills, the CO₂ and the cash flow.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- Sandbox SB0 (path.yml form: sandbox; curriculum v2 §16.3 and §16.4), wave W3, builder learn-w3-g, 2026-11-03.
+     Engine E0: assets/learn/components/engine-e0.js (LX.E0, in the bundle) with assets/learn/data/e0.json; the page JS is
+     assets/learn/sb0-site-bench.js with data/sb0-site-bench.json. Every number on the page comes from the engine.
+     Tests: node _tests/learn/test_sb0-site-bench.js [--write] (writes the five sb0-* blocks below from the engine, checks
+     the engine's numbers, the ties, the 52-week run against one full-year LP, the plan link and the failure states).
+     Henry's research does not appear on this page. Prairie Town and its sites are fictional. -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Site Bench Size a home's or a wind farm's equipment, run every hour of 2025, and see the cash flow", "description": "Sandbox SB0 of Energy Systems, Step by Step: one site behind one meter, a Prairie Town home or the ridge wind farm; you size the equipment, a linear program runs every hour of 2025, and you read the bills, the CO₂ and the cash flow.", "learningResourceType": "Simulation", "educationalLevel": "Intermediate", "timeRequired": "PT20M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["sizing equipment behind one meter", "hourly operation as a linear program", "net present value of a plan", "what one site cannot do alone"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/sb0-site-bench.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"sb0-site-bench","starter":null,"total":14,"code":"SB0","title":"Site Bench","subtitle":"Size a home's or a wind farm's equipment, run every hour of 2025, and see the cash flow","short":"Site Bench","tier":"analyst","tier2":"modeler","tierLabel":"Analyst to Modeler · L2–L3","level":"L2","slot":2,"slot2":3,"minutes":20,"does":"One site, one meter: a Prairie Town home or the ridge wind farm. Size the equipment, run all 8,760 hours of 2025 as a linear program, and read the bills, the CO₂ and the cash flow.","outcome":"Size equipment behind one meter, run it hour by hour, and read what a plan saves, costs and emits over its life.","icon":"house","form":"sandbox","scales":[],"teaches":["sizing equipment behind one meter","hourly operation as a linear program","net present value of a plan","what one site cannot do alone"],"lab":null,"href":"sb0-site-bench.html","ready":true,"after":[{"id":"09-storage","starter":9,"title":"How does storage move energy through time?","short":"Storage","does":"A battery with power and energy ratings and losses: charge cheap, sell dear, then compare with the best schedule.","href":"09-storage.html","ready":true}],"prev":null,"next":{"id":"c0-behind-one-meter","code":"C0","title":"Behind one meter: what should one home or one plant install?","short":"Capstone: behind one meter","does":"Pick the Prairie Town home or the ridge wind farm; size solar, a battery and a heat pump, or an electrolyzer and a hydrogen tank; run every hour of 2025; defend the plan with its NPV, its CO₂ and what the site cannot do alone.","href":"c0-behind-one-meter.html","ready":true}}</script>
+<div class="lx-head" data-lesson-id="sb0-site-bench" data-total="14" data-tier="analyst" data-tier2="modeler" data-level="L2" data-minutes="20" data-form="sandbox" data-next-href="c0-behind-one-meter.html">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">SB0</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst to Modeler · L2–L3</li>
+<li>Sandbox</li>
+<li>20 min</li>
+<li>After <a href="09-storage.html">lesson 9</a></li>
+<li class="lx-done-tag" data-lesson-id="sb0-site-bench" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#brief"><span class="lx-n">1</span>Brief</a></li><li><a href="#bench"><span class="lx-n">2</span>Bench</a></li><li><a href="#results"><span class="lx-n">3</span>Results</a></li><li><a href="#explain"><span class="lx-n">4</span>Explain</a></li><li><a href="#sources"><span class="lx-n">5</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<div id="brief" class="lx-sec">
+<div class="lx-card lx-sb-brief">
+<p class="lx-eyebrow">The brief</p>
+<dl class="lx-sb-facts">
+<div><dt>The site</dt><dd><b>A Prairie Town home</b> or <b>the ridge wind farm</b>, behind one meter, through every hour of 2025.</dd></div>
+<div><dt>Its hours</dt><dd>The hourly patterns of the Southwest Power Pool (SPP) grid in 2025, reshaped to EIA's monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>: modelled sites, not measured ones.</dd></div>
+<div><dt>You decide</dt><dd>Home: solar (kW), a battery (kWh), a <span class="lx-term" data-term="heat-pump">heat pump</span>, the <span class="lx-term" data-term="tariff">tariff</span>. Farm: wind, a battery, an <span class="lx-term" data-term="electrolyzer">electrolyzer</span>, a hydrogen tank.</dd></div>
+<div><dt>The engine works out</dt><dd>The cheapest way to run all 8,760 hours, a <span class="lx-term" data-term="linear-program">linear program</span>; then the bills, the CO₂ and the <span class="lx-term" data-term="net-present-value">NPV</span>.</dd></div>
+<div><dt>It leaves out</dt><dd>Outages, taxes and incentives, storage from one week to the next, and costs that change over time.</dd></div>
+</dl>
+<p class="lx-hint">Open-ended: start from a preset, change one thing at a time, and copy the plan link to keep a plan.</p>
+</div>
+</div>
+<div id="bench" class="lx-sec">
+<section id="the-bench" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="the-bench">The bench</h2>
+</section>
+<div class="lx-interactive" data-learn="sb0" data-src="../assets/learn/data/e0.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json ../assets/learn/data/sb0-site-bench.json ../assets/learn/data/path.json">
+<div class="lx-fallback lx-sb-static">
+<!-- sb0-bench:start (written from engine.schema by LX.ShareState.staticHTML in the test's --write mode; do not edit) -->
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Control</th>
+<th data-quarto-table-cell-role="th" scope="col">Default plan</th>
+<th data-quarto-table-cell-role="th" scope="col">Range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Site</td>
+<td class="n">Prairie Town home</td>
+<td>one of: Prairie Town home, Ridge wind farm</td>
+</tr>
+<tr class="even">
+<td>Rooftop solar</td>
+<td class="n">6 kW</td>
+<td>0 to 15 kW, in steps of 0.5 kW</td>
+</tr>
+<tr class="odd">
+<td>Home battery</td>
+<td class="n">0 kWh</td>
+<td>0 to 30 kWh, in steps of 0.5 kWh</td>
+</tr>
+<tr class="even">
+<td>Heat pump</td>
+<td class="n">none (keep the gas furnace)</td>
+<td>one of: none (keep the gas furnace), standard heat pump, high-efficiency heat pump</td>
+</tr>
+<tr class="odd">
+<td>Tariff</td>
+<td class="n">flat price</td>
+<td>one of: flat price, time-of-use</td>
+</tr>
+<tr class="even">
+<td>Export credit</td>
+<td class="n">4 ¢/kWh</td>
+<td>0 to 8 ¢/kWh, in steps of 0.5 ¢/kWh</td>
+</tr>
+<tr class="odd">
+<td>Wind farm</td>
+<td class="n">150 MW</td>
+<td>0 to 300 MW, in steps of 10 MW</td>
+</tr>
+<tr class="even">
+<td>Line to the grid</td>
+<td class="n">100 MW</td>
+<td>10 to 300 MW, in steps of 10 MW</td>
+</tr>
+<tr class="odd">
+<td>Battery (4 hours)</td>
+<td class="n">0 MWh</td>
+<td>0 to 1,000 MWh, in steps of 10 MWh</td>
+</tr>
+<tr class="even">
+<td>Electrolyzer</td>
+<td class="n">0 MW</td>
+<td>0 to 200 MW, in steps of 5 MW</td>
+</tr>
+<tr class="odd">
+<td>Hydrogen tank</td>
+<td class="n">0 t</td>
+<td>0 to 200 t, in steps of 1 t</td>
+</tr>
+<tr class="even">
+<td>Buyer takes at most</td>
+<td class="n">1,000 kg/h</td>
+<td>0 to 5,000 kg/h, in steps of 100 kg/h</td>
+</tr>
+<tr class="odd">
+<td>Hydrogen price</td>
+<td class="n">4 $/kg</td>
+<td>1 to 8 $/kg, in steps of 0.25 $/kg</td>
+</tr>
+<tr class="even">
+<td>Power contract</td>
+<td class="n">fixed $50/MWh</td>
+<td>one of: fixed $50/MWh, time-of-use</td>
+</tr>
+<tr class="odd">
+<td>Discount rate (real)</td>
+<td class="n">4 %</td>
+<td>0 to 10 %, in steps of 0.5 %</td>
+</tr>
+<tr class="even">
+<td>Equipment cost</td>
+<td class="n">100 % of sourced</td>
+<td>50 to 150 % of sourced, in steps of 5 % of sourced</td>
+</tr>
+</tbody>
+</table>
+
+<!-- sb0-bench:end -->
+<p class="lx-hint">With JavaScript on, you change these, run the year in your browser, and copy a link to your plan.</p>
+</div>
+</div>
+<p class="lx-datanote"><span>Hourly patterns: SPP's 2025 demand, wind and solar (EIA-930), reshaped to EIA's 2025 capacity factors. The home's use and heat are illustrative. Costs: EIA, DOE and NLR, in 2025 dollars; sources below.</span></p>
+</div>
+<div id="results" class="lx-sec">
+<section id="results" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+</section>
+<div id="sb0-results" class="lx-xgrid">
+<div class="lx-fallback lx-sb-static">
+<!-- sb0-results:start (written from the engine's precomputed default run by the test's --write mode; do not edit) -->
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Result for the default plan</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Net present value, 25 years <span class="lx-hint">(against the same home with nothing new, at 4.0% real)</span></td>
+<td class="n">−$17,813</td>
+</tr>
+<tr class="even">
+<td>Saved on bills and gas, a year <span class="lx-hint">($2,114 a year before, $1,314 with the plan)</span></td>
+<td class="n">$800</td>
+</tr>
+<tr class="odd">
+<td>Equipment, up front <span class="lx-hint">(upkeep $120 a year)</span></td>
+<td class="n">$28,430</td>
+</tr>
+<tr class="even">
+<td>CO₂ a year, bought power and gas <span class="lx-hint">(down 1.3 t from 5.9 t; net of power sent back, credited at the same factor: 3.1 t)</span></td>
+<td class="n">4.6 t</td>
+</tr>
+<tr class="odd">
+<td>Own solar covers <span class="lx-hint">(of the home's electricity use, at once or through the battery)</span></td>
+<td class="n">48%</td>
+</tr>
+<tr class="even">
+<td>Hours that need the grid <span class="lx-hint">(of 8,760; the busiest hour draws 1.5 kWh)</span></td>
+<td class="n">5,240 h</td>
+</tr>
+</tbody>
+</table>
+<p class="lx-hint">Run on all 52 weeks of 2025 with this engine on 2026-11-03.</p>
+<!-- sb0-results:end -->
+</div>
+</div>
+</div>
+<div id="explain" class="lx-sec">
+<section id="how-the-engine-works-as-diagrams" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="how-the-engine-works-as-diagrams">How the engine works, as diagrams</h2>
+</section>
+<div id="sb0-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<!-- sb0-explain:start (written from data/sb0-site-bench.json and e0.json by the test's --write mode; do not edit) -->
+<dl class="lx-ideas"><dt>Decisions</dt><dd>Every hour: how much to buy and send back (home) or sell and spill (farm), what goes into and out of the battery, and what the electrolyzer and tank do.</dd><dt>Goal</dt><dd>The lowest yearly cost for the home, or the highest yearly revenue for the farm, with the sizes you set.</dd><dt>Rules</dt><dd>Each hour balances; nothing runs above its size; the battery loses 15% of what it stores; the line and the buyer's take are limits.</dd><dt>Time</dt><dd>All 8,760 hours of 2025, as 52 weeks and 31 December, one small <span class="lx-term" data-term="linear-program">linear program</span> each.</dd><dt>Tie rule</dt><dd>A tiny wear charge on battery use and, on the farm, a hair's preference for selling earlier in the week. Both are left out of every number shown.</dd><dt>Ties</dt><dd>Every total shown is the same on every least-cost schedule. With storage, the hour-by-hour schedule, and the hour counts read from it, can differ.</dd><dt>It holds when</dt><dd><ul><li>the weather and prices of 2025 are a fair guide to the next 25 or 30 years;</li><li>the sourced costs, converted to 2025 dollars, hold for the whole horizon;</li><li>the grid is always there to buy from (home) or to sell to, up to the line (farm).</li></ul></dd><dt>It leaves out</dt><dd><ul><li>storage carried from one week to the next (the check below measures what that changes);</li><li>outages, taxes, tax credits, incentives and financing;</li><li>how other plants respond to the site: the CO₂ uses one average factor (CF6 explains the difference).</li></ul></dd></dl><p class="lx-eyebrow">Checked on one full-year LP</p><p class="lx-hint">The test runs each preset again as one LP over all 8,760 hours, with storage free to carry across weeks.</p>
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Preset</th>
+<th data-quarto-table-cell-role="th" scope="col">NPV, 52 weeks</th>
+<th data-quarto-table-cell-role="th" scope="col">NPV, one full-year LP</th>
+<th data-quarto-table-cell-role="th" scope="col">Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Home: solar only</td>
+<td class="n">−$17,813</td>
+<td class="n">−$17,813</td>
+<td>+$0 (0.00% of the equipment cost)</td>
+</tr>
+<tr class="even">
+<td>Home: solar and a battery</td>
+<td class="n">−$37,790</td>
+<td class="n">−$37,789</td>
+<td>+$1 (0.00% of the equipment cost)</td>
+</tr>
+<tr class="odd">
+<td>Home: heat pump only</td>
+<td class="n">−$9,924</td>
+<td class="n">−$9,924</td>
+<td>+$0 (0.00% of the equipment cost)</td>
+</tr>
+<tr class="even">
+<td>Home: all three</td>
+<td class="n">−$51,033</td>
+<td class="n">−$51,035</td>
+<td>−$2 (0.00% of the equipment cost)</td>
+</tr>
+<tr class="odd">
+<td>Wind farm: wind farm alone</td>
+<td class="n">$27.9M</td>
+<td class="n">$27.9M</td>
+<td>+$0 (0.00% of the equipment cost)</td>
+</tr>
+<tr class="even">
+<td>Wind farm: add a battery</td>
+<td class="n">−$54.1M</td>
+<td class="n">−$54.3M</td>
+<td>−$258,298 (0.08% of the equipment cost)</td>
+</tr>
+<tr class="odd">
+<td>Wind farm: add an electrolyzer</td>
+<td class="n">−$94.1M</td>
+<td class="n">−$94.1M</td>
+<td>+$0 (0.00% of the equipment cost)</td>
+</tr>
+<tr class="even">
+<td>Wind farm: electrolyzer and tank</td>
+<td class="n">−$119M</td>
+<td class="n">−$119M</td>
+<td>−$39,802 (0.01% of the equipment cost)</td>
+</tr>
+</tbody>
+</table>
+<p class="lx-hint">Solved on 2026-11-03 with HiGHS by the bench's test.</p>
+<!-- sb0-explain:end -->
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The linear program behind the bench</summary>
+<div class="lx-deeper-body">
+<ul>
+<li>Each hour adds a balance row. For the home: bought − sent back + battery out − battery in = the home’s use − solar.</li>
+<li>For the farm: sold + spilled + into the battery + into the electrolyzer − battery out = wind.</li>
+<li>The battery’s <span class="lx-term" data-term="state-of-charge">state of charge</span> is one more variable per hour: this hour’s level = last hour’s + 0.85 × charge − discharge.</li>
+<li>“Size it for me” makes the sizes decisions too, each charged its yearly cost through the <span class="lx-term" data-term="capital-recovery-factor">capital recovery factor</span>. It runs on a few <span class="lx-term" data-term="representative-period">representative weeks</span>, as <a href="13-capstone.html">lesson 13</a> and <a href="m03-capacity-expansion.html">M3</a> do.</li>
+<li>Storage and coupled carriers, modelling power, hydrogen and heat together (<a href="m04-storage-multienergy.html">M4</a>, in the Modeler tier), writes this model in Python.</li>
+</ul>
+</div>
+</details>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="numbers-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="numbers-sources-and-whats-next">Numbers, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Inputs the engine uses</p>
+<div class="lx-scroll-x">
+<!-- sb0-inputs:start (written from e0.json by the test's --write mode; do not edit) -->
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Input</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Price index</td>
+<td>$1 of 2022 = $1.093 of 2025; $1 of 2024 = $1.028</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/steo/">EIA STEO, Table 9a</a></td>
+</tr>
+<tr class="even">
+<td>Discount rate</td>
+<td>4% real (you can change it)</td>
+<td class="s"><a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">NLR 2025 ATB, financial cases</a></td>
+</tr>
+<tr class="odd">
+<td>Home: household use</td>
+<td>9,000 kWh a year, the town's 2025 demand shape (illustrative)</td>
+<td class="s"><a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930, SPP 2025</a></td>
+</tr>
+<tr class="even">
+<td>Home: heating need</td>
+<td>14,000 kWh of heat a year, from a smooth made-up temperature (illustrative)</td>
+<td class="s">illustrative</td>
+</tr>
+<tr class="odd">
+<td>Home: rooftop solar</td>
+<td>$4,336/kW in 2022 dollars = $4,738/kW; 25 years; upkeep $20/kW a year (illustrative). Output: SPP's 2025 hourly solar pattern, scaled month by month to EIA's 2025 capacity factors and to a 17.6% year</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA AEO2026, residential assumptions, Tables 2-3</a>; <a href="https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf">EIA, distributed generation costs (2024), Table 2-2</a>; <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA Electric Power Monthly, Table 6.07.B</a></td>
+</tr>
+<tr class="even">
+<td>Home: battery</td>
+<td>$1,000/kWh (illustrative); 2.5 hours; 85% round trip; 15 years; upkeep 4% a year</td>
+<td class="s"><a href="https://atb.nlr.gov/electricity/2025/residential_battery_storage">NLR 2025 ATB, residential battery</a></td>
+</tr>
+<tr class="odd">
+<td>Home: heat pumps</td>
+<td>standard: about 2.4 kWh of heat for each kWh of electricity over a season (HSPF 8.2, the heating seasonal performance factor), $6,730 in 2022 dollars = $7,355; high efficiency: about 3.6 (HSPF 12.4), $8,620 = $9,420. HSPF ÷ 3.412 = the season's heat over electricity</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA AEO2026, residential assumptions, Tables 2-3</a></td>
+</tr>
+<tr class="even">
+<td>Home: gas furnace and gas</td>
+<td>80% efficient; $14.81 per thousand cubic feet = $14.30 per MMBtu (a million British thermal units, about 293 kWh of heat); 52.91 kg CO₂ per MMBtu burned</td>
+<td class="s"><a href="https://www.eia.gov/dnav/ng/hist/n3010ks3a.htm">EIA, Kansas residential gas price</a>; <a href="https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php">EIA, British thermal units</a>; <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA, CO₂ emissions coefficients</a></td>
+</tr>
+<tr class="odd">
+<td>Home: tariffs</td>
+<td>14¢/kWh flat; time-of-use 9.66¢ and 28.98¢ (16:00–21:00), illustrative</td>
+<td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b">EIA Electric Power Monthly, Table 5.6.B</a></td>
+</tr>
+<tr class="even">
+<td>Home: export credit</td>
+<td>what the utility pays for each kWh the panels send to the grid (net billing): 4¢ by default, 0 to 8¢ on the bench (illustrative)</td>
+<td class="s">illustrative</td>
+</tr>
+<tr class="odd">
+<td>Home: grid CO₂</td>
+<td>680 lb/MWh = 0.308 kg CO₂/kWh (Kansas, 2024)</td>
+<td class="s"><a href="https://www.eia.gov/electricity/state/kansas/">EIA, Kansas Electricity Profile 2024</a></td>
+</tr>
+<tr class="even">
+<td>Farm: wind</td>
+<td>$1,712/kW and $34.57/kW a year (2025 dollars); 30 years: $133,575 a year per MW at 4%. Output: SPP's 2025 hourly wind pattern, reshaped month by month to EIA's 2025 capacity factors and to a 33.8% year, the best hours at full size</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA AEO2026, electricity assumptions, Table 3</a>; <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA Electric Power Monthly, Table 6.07.B</a></td>
+</tr>
+<tr class="odd">
+<td>Farm: battery</td>
+<td>$1,521/kW for 4 hours = $380.25/kWh; $41.84/kW a year; 85% round trip; 15 years</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA AEO2026, electricity assumptions, Table 3</a>; <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL battery cost projections, 2025</a></td>
+</tr>
+<tr class="even">
+<td>Farm: electrolyzer</td>
+<td>$2,000/kW in 2022 dollars = $2,186/kW; upkeep 5% a year; 57.5 kWh/kg. Stack wear $6.01/MWh used: an illustrative allowance per MWh, based on DOE's stack replacement (11% of the cost after 40,000 operating hours) as if every hour ran at full power</td>
+<td class="s"><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Hydrogen Program Record 24005</a></td>
+</tr>
+<tr class="odd">
+<td>Farm: hydrogen tank</td>
+<td>$800 per kg held (illustrative); 30 years</td>
+<td class="s">illustrative</td>
+</tr>
+<tr class="even">
+<td>Farm: prices</td>
+<td>power $50/MWh fixed, or $40 and $100/MWh (16:00–21:00); hydrogen $4.00/kg by default (all illustrative)</td>
+<td class="s">illustrative</td>
+</tr>
+<tr class="odd">
+<td>Farm: potential CO₂ avoided</td>
+<td>0.18 MMBtu of gas per kg of hydrogen made from natural gas × 52.91 kg CO₂ per MMBtu = 9.52 kg CO₂ per kg, if the farm's hydrogen replaces it</td>
+<td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/HMM_Assumptions.pdf">EIA AEO2026, hydrogen assumptions, Table 2</a>; <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA, CO₂ emissions coefficients</a></td>
+</tr>
+</tbody>
+</table>
+
+<!-- sb0-inputs:end -->
+</div>
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="c0-behind-one-meter">
+<p class="lx-eyebrow">Next</p>
+<p class="lx-next-t"><a href="c0-behind-one-meter.html">C0 · Behind one meter: what should one home or one plant install?</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="sb0-site-bench" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<!-- sb0-sources:start (written from e0.json by the test's --write mode; do not edit) -->
+<ul><li><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3, p. 5 (2025 dollars), and its note on storage losses</a> · April 2026; checked 3 Nov 2026</li><li><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf">EIA, Assumptions to the Annual Energy Outlook 2026: Residential Demand Module, Table 2, p. 4 (heat pumps, furnaces; 2022 dollars) and Table 3, p. 5 (rooftop solar; 2022 dollars, 25-year life)</a> · April 2026; checked 3 Nov 2026</li><li><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/HMM_Assumptions.pdf">EIA, Assumptions to the Annual Energy Outlook 2026: Hydrogen Market Module, Table 2, p. 2 (natural gas per kg of hydrogen from steam methane reforming)</a> · April 2026; checked 3 Nov 2026</li><li><a href="https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf">EIA, Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors, Table 2-2, p. 12 (residential solar: 17.6% capacity factor in 2022)</a> · March 2024; checked 3 Nov 2026</li><li><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B (capacity factors, 2025, annual and monthly): wind 33.8%, solar photovoltaic 24.0%</a> · issue of 23 Oct 2026</li><li><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_6_b">EIA, Electric Power Monthly, Table 5.6.B: Kansas residential average price, 14.27¢/kWh, January to August 2025</a> · issue of 23 Oct 2026</li><li><a href="https://www.eia.gov/electricity/state/kansas/">EIA, Kansas Electricity Profile 2024, Table 1: carbon dioxide 680 lb/MWh</a> · data year 2024; checked 3 Nov 2026</li><li><a href="https://www.eia.gov/dnav/ng/hist/n3010ks3a.htm">EIA, Kansas Price of Natural Gas Delivered to Residential Consumers: $14.81 per thousand cubic feet in 2025</a> · released 30 Oct 2026</li><li><a href="https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php">EIA, Energy Explained, British thermal units: 1 cubic foot of natural gas = 1,036 Btu</a> · checked 3 Nov 2026</li><li><a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA, Carbon Dioxide Emissions Coefficients: natural gas 52.91 kg CO2 per MMBtu</a> · released 18 Sep 2024; checked 2 Nov 2026</li><li><a href="https://www.eia.gov/outlooks/steo/">EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2022 118.035, 2023 122.389, 2024 125.430, 2025 128.989</a> · October 2026 issue (1 Oct 2026)</li><li><a href="https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf">DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology, Table 1, p. 2, and p. 9 (fixed and replacement costs)</a> · 20 May 2024; checked 3 Nov 2026</li><li><a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281, section 3 (15-year life)</a> · June 2025</li><li><a href="https://atb.nlr.gov/electricity/2025/residential_battery_storage">NLR, 2025 Electricity ATB, Residential Battery Storage (5 kW and 12.5 kWh reference system, 85% round trip, 15-year life, fixed upkeep 4% of the cost)</a> · checked 3 Nov 2026</li><li><a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods</a> · checked 2 Nov 2026</li><li><a href="https://www.eia.gov/electricity/gridmonitor/">EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025</a> · accessed 2 Nov 2026</li></ul>
+<!-- sb0-sources:end -->
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20Site%20Bench">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/sb0-site-bench.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

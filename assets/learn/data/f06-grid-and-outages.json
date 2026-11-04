@@ -1,0 +1,109 @@
+{
+ "meta": {
+  "title": "F6: from plant to plug, and a storm on Prairie Town's east side",
+  "note": "Prairie Town, its plant, its east-side substation, feeders, homes, the 5-ohm line and the repair hours are illustrative. The voltage classes, U.S. losses and reliability numbers are real, from the primary sources listed with each item (checked in the documents themselves on 3 November 2026).",
+  "checked": "2026-11-03"
+ },
+ "sources": {
+  "ceser": { "label": "DOE, Office of Cybersecurity, Energy Security, and Emergency Response (CESER), How It Works: Electric Transmission & Distribution and Protective Measures", "url": "https://www.energy.gov/sites/default/files/2023-11/FINAL_CESER%20Electricity%20Grid%20Backgrounder_508.pdf", "as_of": "November 2023", "where": "pp. 2-3" },
+  "pnnl": { "label": "PNNL for DOE (2016), Electricity Distribution System Baseline Report, PNNL-25178", "url": "https://www.energy.gov/sites/prod/files/2017/01/f34/Electricity%20Distribution%20System%20Baseline%20Report.pdf", "as_of": "July 2016", "where": "pp. 25, 27, 38" },
+  "losses": { "label": "EIA, Frequently Asked Questions: How much electricity is lost in electricity transmission and distribution in the United States?", "url": "https://www.eia.gov/tools/faqs/faq.php?id=105&t=3", "as_of": "last updated 7 November 2023 (2018 to 2022 data)", "where": "answer text" },
+  "epa": { "label": "EIA, Electric Power Annual 2025, Table 11.1: Reliability Metrics of U.S. Distribution System (Form EIA-861)", "url": "https://www.eia.gov/electricity/annual/html/epa_11_01.html", "as_of": "released 21 October 2026, data for 2015 to 2025", "where": "Table 11.1, IEEE columns" },
+  "qer": { "label": "DOE (2017), Quadrennial Energy Review, Second Installment, Chapter IV: Ensuring Electricity System Reliability, Security, and Resilience", "url": "https://www.energy.gov/sites/prod/files/2017/02/f34/Chapter%20IV--Ensuring%20Electricity%20System%20Reliability,%20Security,%20and%20Resilience.pdf", "as_of": "January 2017", "where": "p. 4-2, Findings in brief" },
+  "tie2024": { "label": "EIA, Today in Energy: Hurricanes in 2024 led to the most hours without power in the United States in 10 years", "url": "https://www.eia.gov/todayinenergy/detail.php?id=66744", "as_of": "1 December 2025", "where": "text" },
+  "tie2021": { "label": "EIA, Today in Energy: U.S. electricity customers averaged seven hours of power interruptions in 2021", "url": "https://www.eia.gov/todayinenergy/detail.php?id=54639", "as_of": "14 November 2022", "where": "text" }
+ },
+ "voltages": {
+  "generator": { "lo": 5, "hi": 34.5, "unit": "kV", "src": "ceser", "quote": "Power plants generally produce electricity at low voltages (5–34.5 kilovolts (kV))." },
+  "transmission": { "list": [115, 138, 230, 345, 500, 765], "unit": "kV", "src": "ceser", "quote": "Typical transmission voltages include 115 kV, 138 kV, 230 kV, 345 kV, 500 kV, and 765 kV." },
+  "subtransmission": { "list": [34, 46, 69], "unit": "kV", "src": "ceser", "quote": "Sub-transmission networks, used to transmit power over shorter distances, use 34 kV, 46 kV, or 69 kV." },
+  "distribution": { "list": [4.8, 12.47, 22.9, 34.5], "unit": "kV", "src": "pnnl", "page": 27, "quote": "There are four common distribution circuit voltages: 4.8 kV, 12.47 kV, 22.9 kV, and 34.5 kV" },
+  "service": { "text": "240/120 V", "src": "pnnl", "page": 38, "quote": "Residential customers are typically provided with 240/120 V service from a local distribution feeder." }
+ },
+ "town": {
+  "about": "Illustrative values for Prairie Town, each inside the sourced U.S. range of its stop.",
+  "genKV": 18, "txKV": 345, "distKV": 12.47, "serviceV": 240, "socketV": 120, "plant": "the gas combined-cycle plant"
+ },
+ "stops": [
+  { "key": "gen", "n": 1, "name": "Generator", "cls": "gen", "kv": "18 kV", "range": "5–34.5 kV", "src": "ceser", "what": "The plant's turbine spins a generator, which makes alternating current, current that reverses direction many times a second, at a modest [[voltage|voltage]]." },
+  { "key": "up", "n": 2, "name": "Step-up transformer", "cls": "tx", "kv": "18 → 345 kV", "range": "up to 115–765 kV", "src": "ceser", "what": "A [[transformer|transformer]] at the plant raises the voltage, so the same power needs far less [[electric-current|current]]." },
+  { "key": "line", "n": 3, "name": "Transmission line", "cls": "tx", "kv": "345 kV", "range": "115–765 kV", "src": "ceser", "what": "Tall towers carry [[transmission|transmission]] lines over long distances, joined into loops so power has more than one path." },
+  { "key": "sub", "n": 4, "name": "Substation", "cls": "dist", "kv": "345 → 12.47 kV", "range": "down to below 34 kV", "src": "ceser", "what": "A [[substation|substation]] steps the voltage down and holds the [[circuit-breaker|circuit breakers]] that protect each feeder." },
+  { "key": "feeder", "n": 5, "name": "Distribution feeder", "cls": "dist", "kv": "12.47 kV", "range": "4.8–34.5 kV", "src": "pnnl", "what": "A [[feeder|feeder]] on wooden poles runs through the streets; side branches, called [[lateral|laterals]], reach each block." },
+  { "key": "service", "n": 6, "name": "Service transformer", "cls": "low", "kv": "12.47 kV → 240/120 V", "range": "240/120 V", "src": "pnnl", "what": "A small transformer on a pole, or in a green box on the ground, steps down for a few homes: two live wires and a neutral, read as 240/120 V." },
+  { "key": "meter", "n": 7, "name": "Service drop and meter", "cls": "low", "kv": "240/120 V", "range": "240/120 V", "src": "pnnl", "what": "A short cable, the service drop, enters the home through the meter, which counts the [[kilowatt-hour|kWh]] the home buys." },
+  { "key": "socket", "n": 8, "name": "Socket", "cls": "low", "kv": "120 V", "range": "120 V (240 V for big appliances)", "src": "pnnl", "what": "Most sockets give 120 V, between one live wire and the neutral; a dryer or an oven uses 240 V, between the two live wires." }
+ ],
+ "losses": {
+  "about": "Illustrative: 100 MW sent through a balanced three-phase line with 5 ohms in each of its three wires, at each voltage class, with no reactive power (unity power factor). V is the voltage between two wires; current in each wire I = P / (√3 × V); heat lost in the three wires = 3 × I² × R, which equals P² × R / V².",
+  "P_MW": 100, "R_ohm": 5, "classes_kV": [69, 115, 138, 230, 345, 500, 765], "start": 4,
+  "real_pct": 5, "real_years": "2018 through 2022", "real_src": "losses",
+  "real_quote": "EIA estimates that annual electricity transmission and distribution (T&D) losses averaged about 5% of the electricity transmitted and distributed in the United States in 2018 through 2022."
+ },
+ "net": {
+  "about": "Illustrative: Prairie Town's east-side substation on a high-voltage loop, with two radial feeders and 30 homes. Protection is assumed coordinated, so the closest device upstream of a fault (a fuse, a recloser or a breaker) opens first. The loop is checked for connection only: its remaining lines are assumed able to carry the load (no loading or operating limits are checked), and the rest of the Plains Grid and the plant are assumed to have enough power (balancing is lesson 3).",
+  "sources": [ { "id": "G", "name": "Prairie Town's gas plant" }, { "id": "N", "name": "Rest of the Plains Grid" } ],
+  "lines": [
+   { "id": "GS", "name": "The plant–substation line", "short": "Plant–substation line", "from": "G", "to": "S" },
+   { "id": "NS", "name": "The grid–substation line", "short": "Grid–substation line", "from": "N", "to": "S" },
+   { "id": "GN", "name": "The plant–grid line", "short": "Plant–grid line", "from": "G", "to": "N" }
+  ],
+  "xf": { "id": "XF", "name": "The substation transformer", "short": "Substation transformer" },
+  "sections": [
+   { "id": "F1A", "name": "The north feeder's near half", "short": "North feeder's near half", "parent": "S", "dev": "B1", "kind": "main", "homes": 0 },
+   { "id": "L1", "name": "Lateral L1 (Elm Street)", "short": "Elm Street (L1)", "parent": "F1A", "dev": "FU1", "kind": "lateral", "homes": 4 },
+   { "id": "L2", "name": "Lateral L2 (Oak Street)", "short": "Oak Street (L2)", "parent": "F1A", "dev": "FU2", "kind": "lateral", "homes": 6 },
+   { "id": "F1B", "name": "The north feeder's far half", "short": "North feeder's far half", "parent": "F1A", "dev": "R1", "kind": "main", "homes": 0 },
+   { "id": "L3", "name": "Lateral L3 (Pine Street)", "short": "Pine Street (L3)", "parent": "F1B", "dev": "FU3", "kind": "lateral", "homes": 5 },
+   { "id": "L4", "name": "Lateral L4 (Ash Street)", "short": "Ash Street (L4)", "parent": "F1B", "dev": "FU4", "kind": "lateral", "homes": 5 },
+   { "id": "F2A", "name": "The south feeder", "short": "South feeder", "parent": "S", "dev": "B2", "kind": "main", "homes": 0 },
+   { "id": "L5", "name": "Lateral L5 (Mill Road)", "short": "Mill Road (L5)", "parent": "F2A", "dev": "FU5", "kind": "lateral", "homes": 4 },
+   { "id": "L6", "name": "Lateral L6 (Creek Road)", "short": "Creek Road (L6)", "parent": "F2A", "dev": "FU6", "kind": "lateral", "homes": 6 }
+  ],
+  "devices": {
+   "B1": { "kind": "breaker", "name": "North feeder's breaker" },
+   "B2": { "kind": "breaker", "name": "South feeder's breaker" },
+   "R1": { "kind": "recloser", "name": "Recloser R1, halfway along the north feeder" },
+   "FU1": { "kind": "fuse", "name": "Fuse on L1" }, "FU2": { "kind": "fuse", "name": "Fuse on L2" },
+   "FU3": { "kind": "fuse", "name": "Fuse on L3" }, "FU4": { "kind": "fuse", "name": "Fuse on L4" },
+   "FU5": { "kind": "fuse", "name": "Fuse on L5" }, "FU6": { "kind": "fuse", "name": "Fuse on L6" }
+  }
+ },
+ "storm": {
+  "about": "Illustrative storm and repair hours. One distribution crew repairs the three local faults one after another; a separate transmission crew repairs the line, which darkened no home.",
+  "faults": [
+   { "id": "L2", "cause": "A branch falls across Oak Street's lateral", "repair_h": 2 },
+   { "id": "F1B", "cause": "A tree limb brings down the north feeder's far half", "repair_h": 3 },
+   { "id": "F2A", "cause": "Wind snaps a pole on the south feeder", "repair_h": 6 },
+   { "id": "GN", "cause": "Wind topples a tower on the plant–grid line", "repair_h": 12, "crew": "transmission" }
+  ]
+ },
+ "reliability": {
+  "src": "epa",
+  "note": "Utilities using the IEEE 1366 method; minutes per customer per year (SAIDI) and customer interruptions per customer served per year (SAIFI: a customer interrupted twice counts twice), non-momentary interruptions only. 'All events' includes major event days; 'Without MED' leaves them out; 'Loss of supply removed' leaves out outages caused by loss of supply from the high-voltage bulk power system (all events); its reporting group can differ from the all-events column (its 2020 value is higher), so the difference between the two is not the upstream share.",
+  "med_quote": "For utilities using the IEEE method, a Major Event Day is any day that exceeds a daily SAIDI threshold called Tmed. Tmed is a duration statistic calculated from daily SAIDI values from the past five years.",
+  "rows": [
+   { "year": 2015, "saidi": 209, "saifi": 1.275, "saidi_nomed": 117, "saifi_nomed": 1.073, "saidi_nolos": 198.2 },
+   { "year": 2016, "saidi": 268.4, "saifi": 1.327, "saidi_nomed": 119.8, "saifi_nomed": 1.082, "saidi_nolos": 257 },
+   { "year": 2017, "saidi": 505.9, "saifi": 1.42, "saidi_nomed": 117, "saifi_nomed": 1.023, "saidi_nolos": 489.6 },
+   { "year": 2018, "saidi": 349.2, "saifi": 1.34, "saidi_nomed": 121.4, "saifi_nomed": 1.051, "saidi_nolos": 338.5 },
+   { "year": 2019, "saidi": 295.5, "saifi": 1.332, "saidi_nomed": 122.2, "saifi_nomed": 1.04, "saidi_nolos": 289.1 },
+   { "year": 2020, "saidi": 456.1, "saifi": 1.385, "saidi_nomed": 116, "saifi_nomed": 1.013, "saidi_nolos": 460.5 },
+   { "year": 2021, "saidi": 475.8, "saifi": 1.436, "saidi_nomed": 125.7, "saifi_nomed": 1.039, "saidi_nolos": 404.5 },
+   { "year": 2022, "saidi": 333, "saifi": 1.426, "saidi_nomed": 131.1, "saifi_nomed": 1.09, "saidi_nolos": 324.7 },
+   { "year": 2023, "saidi": 366.6, "saifi": 1.348, "saidi_nomed": 123.9, "saifi_nomed": 1.022, "saidi_nolos": 357.7 },
+   { "year": 2024, "saidi": 662.6, "saifi": 1.531, "saidi_nomed": 131.6, "saifi_nomed": 1.065, "saidi_nolos": 646.1 },
+   { "year": 2025, "saidi": 269.2, "saifi": 1.34, "saidi_nomed": 125.3, "saifi_nomed": 1.08, "saidi_nolos": 246.8 }
+  ]
+ },
+ "distribution_share": {
+  "src": "qer",
+  "quote": "Electricity outages disproportionately stem from disruptions on the distribution system (over 90 percent of electric power interruptions), both in terms of the duration and frequency of outages, which are largely due to weather-related events. Damage to the transmission system, while infrequent, can result in more widespread major power outages that affect large numbers of customers with significant economic consequences.",
+  "pct": 90
+ },
+ "year2024": {
+  "src": "tie2024",
+  "hours": 11, "med_share_pct": 80,
+  "quote": "an average of 11 hours of electricity interruptions in 2024 ... Major events such as Hurricanes Beryl, Helene, and Milton accounted for 80% of the hours without electricity in 2024."
+ }
+}

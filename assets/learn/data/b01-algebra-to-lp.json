@@ -8,9 +8,9 @@
  "ready": {
   "groups": {
    "units": {"label": "Power and energy", "route": "starter:1", "advice": "Revisit lesson 1 on power and energy first (about 15 minutes)."},
-   "rates": {"label": "Rates and efficiencies", "route": "tool:K2", "advice": "Toolbox K2, rates and efficiencies, is coming soon; lesson 7's cost steps cover the same ground."},
+   "rates": {"label": "Rates and efficiencies", "route": "tool:K2", "advice": "Take toolbox K2, rates and efficiencies, first (about 10 minutes); lesson 7's cost steps cover the same ground.", "soon": "Toolbox K2, rates and efficiencies, is coming soon; lesson 7's cost steps cover the same ground."},
    "linear": {"label": "Equations and inequalities", "route": "tool:K4", "advice": "Take toolbox K4 first (about 15 minutes): this lesson builds on it at every step."},
-   "vectors": {"label": "Multiply and add", "route": "tool:K6", "advice": "Not needed yet: steps 9 and 10 introduce it gently. Toolbox K6 (coming later) goes further."}
+   "vectors": {"label": "Multiply and add", "route": "tool:K6", "advice": "Not needed yet: steps 9 and 10 introduce it gently. Toolbox K6 goes further.", "soon": "Not needed yet: steps 9 and 10 introduce it gently. Toolbox K6 (coming later) goes further."}
   },
   "items": [
    {"id": "r1", "group": "units", "q": "A plant makes 40 MW for 6 hours. How much energy is that?", "choices": ["46 MWh", "240 MWh", "240 MW", "6.7 MWh"], "answer": 1, "why": "Energy = power × time: 40 MW × 6 h = 240 MWh."},

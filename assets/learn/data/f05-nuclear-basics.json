@@ -1,0 +1,452 @@
+{
+ "meta": {
+  "title": "F5: the chain-reaction toy (illustrative), the plant from fuel to steam, designs by size and outlet temperature (sourced)",
+  "note": "The chain-reaction toy and Prairie Town's 100 MW plant are illustrative. Every real-world number below carries its source, the exact place in the document and the date it was read. Physics and technology only.",
+  "checked": "2026-11-03",
+  "license": "U.S. government sources are public domain; this file CC BY 4.0"
+ },
+ "sources": {
+  "doe101": {
+   "publisher": "U.S. Department of Energy, Office of Nuclear Energy",
+   "title": "NUCLEAR 101: How Does a Nuclear Reactor Work?",
+   "url": "https://www.energy.gov/ne/articles/nuclear-101-how-does-nuclear-reactor-work",
+   "where": "sections on fuel, moderator, control rods, PWRs and BWRs",
+   "as_of": "updated 19 May 2025",
+   "read": "2026-11-03"
+  },
+  "qtr_lwr": {
+   "publisher": "U.S. Department of Energy",
+   "title": "Quadrennial Technology Review 2015, Technology Assessment 4.M: Light Water Reactors",
+   "url": "https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4M-Light-Water-Reactors.pdf",
+   "where": "Introduction (p. 1) and Figure 4.M.4 (p. 4, credit: U.S. NRC); glossary entry SMR (p. 15)",
+   "as_of": "2015",
+   "read": "2026-11-03"
+  },
+  "qtr_htr": {
+   "publisher": "U.S. Department of Energy",
+   "title": "Quadrennial Technology Review 2015, Technology Assessment 4.J: High Temperature Reactors",
+   "url": "https://www.energy.gov/sites/prod/files/2016/03/f30/QTR2015-4J-High-Temperature-Reactors.pdf",
+   "where": "Introduction and Process Heat Applications (p. 1: HTRs have core outlet temperatures between 700 and 950 °C; industrial processes need heat at 650 to 950 °C); Gas-Cooled HTRs (p. 3: an intermediate heat exchanger passes the helium's heat to another fluid); Molten-salt cooled HTR (p. 5: the fluoride salt-cooled high-temperature reactor, FHR, with solid graphite-moderated fuel, high temperature and low pressure, to drive generators or industrial processes); glossary entries FHR (a subset of the high-temperature reactor systems) and Moderator",
+   "as_of": "2015",
+   "read": "2026-11-03"
+  },
+  "qtr_fast": {
+   "publisher": "U.S. Department of Energy",
+   "title": "Quadrennial Technology Review 2015, Technology Assessment 4.H: Fast-spectrum Reactors",
+   "url": "https://www.energy.gov/sites/prod/files/2016/01/f28/QTR2015-4H-Fast-Spectrum-Reactors.pdf",
+   "where": "Introduction (fast reactors are intended for efficient electricity production) and Description of the technology (no slowing of fission neutrons; sodium-cooled reactor materials demonstrated for 500 to 550 °C)",
+   "as_of": "2015",
+   "read": "2026-11-03"
+  },
+  "micro": {
+   "publisher": "U.S. Department of Energy, Office of Nuclear Energy",
+   "title": "What is a Nuclear Microreactor?",
+   "url": "https://www.energy.gov/ne/articles/what-nuclear-microreactor",
+   "where": "whole article: 1 to 20 MW of thermal energy, used directly as heat or converted to electricity; gas, liquid metal, molten salt and heat-pipe concepts; most designs will require fuel with a higher concentration of uranium-235 than today's reactors use, though some may reduce enrichment needs with high-temperature moderating materials",
+   "as_of": "26 February 2021",
+   "read": "2026-11-03"
+  },
+  "soec": {
+   "publisher": "U.S. Department of Energy, Hydrogen and Fuel Cell Technologies Office",
+   "title": "Hydrogen Production: Electrolysis",
+   "url": "https://www.energy.gov/eere/fuelcells/hydrogen-production-electrolysis",
+   "where": "Solid oxide electrolyzers",
+   "as_of": "page undated; read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "spent": {
+   "publisher": "U.S. Department of Energy, Office of Nuclear Energy",
+   "title": "5 Fast Facts about Spent Nuclear Fuel",
+   "url": "https://www.energy.gov/ne/articles/5-fast-facts-about-spent-nuclear-fuel",
+   "where": "facts 1 to 5 (fact 2: about 90,000 metric tons since the 1950s would fit on one football field at a depth of less than 10 yards; the fuel's own volume, not a storage site's footprint)",
+   "as_of": "3 October 2022",
+   "read": "2026-11-03"
+  },
+  "haleu": {
+   "publisher": "U.S. Department of Energy, Office of Nuclear Energy",
+   "title": "What is High-Assay Low-Enriched Uranium (HALEU)?",
+   "url": "https://www.energy.gov/ne/articles/what-high-assay-low-enriched-uranium-haleu",
+   "where": "first section",
+   "as_of": "3 December 2024",
+   "read": "2026-11-03"
+  },
+  "eia_explained": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Nuclear explained",
+   "url": "https://www.eia.gov/energyexplained/nuclear/",
+   "where": "Nuclear energy and fission",
+   "as_of": "page undated; read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "eia_types": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Nuclear explained: Nuclear power plants (types of reactors)",
+   "url": "https://www.eia.gov/energyexplained/nuclear/nuclear-power-plants-types-of-reactors.php",
+   "where": "Boiling-water and pressurized-water reactors",
+   "as_of": "page undated; read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "eia_fuel": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Nuclear explained: The nuclear fuel cycle",
+   "url": "https://www.eia.gov/energyexplained/nuclear/the-nuclear-fuel-cycle.php",
+   "where": "Front end (enrichment, fuel fabrication) and the reactor core",
+   "as_of": "page undated; read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "eia_env": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Nuclear explained: Nuclear power and the environment",
+   "url": "https://www.eia.gov/energyexplained/nuclear/nuclear-power-and-the-environment.php",
+   "where": "Radioactive wastes; spent fuel storage; containment",
+   "as_of": "page undated; read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "eia_heatrate": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Electric Power Annual, Table 8.1: Average Operating Heat Rate for Selected Energy Sources, 2015 through 2025",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_08_01.html",
+   "where": "Nuclear column, 2025; the table's note: the nuclear average heat rate is the weighted average tested heat rate for nuclear units, as reported on Form EIA-860",
+   "as_of": "2025 data, read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "eia_btu": {
+   "publisher": "U.S. Energy Information Administration",
+   "title": "Units and calculators explained: British thermal units (Btu)",
+   "url": "https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php",
+   "where": "1 kilowatthour = 3,412 Btu",
+   "as_of": "page undated; read 3 November 2026",
+   "read": "2026-11-03"
+  },
+  "doe_handbook": {
+   "publisher": "U.S. Department of Energy",
+   "title": "DOE Fundamentals Handbook: Nuclear Physics and Reactor Theory, Volume 1, Module 2 (DOE-HDBK-1019/1-93)",
+   "url": null,
+   "where": "Module 2, prompt and delayed neutrons (cited in plain text; no number is used on the page)",
+   "as_of": "January 1993",
+   "read": "2026-11-03"
+  }
+ },
+ "facts": {
+  "u235_natural_pct": {
+   "value": 0.7,
+   "text": "just over 0.7%",
+   "src": "eia_fuel"
+  },
+  "enrich_lo_pct": {
+   "value": 3,
+   "src": "eia_fuel"
+  },
+  "enrich_hi_pct": {
+   "value": 5,
+   "src": "eia_fuel"
+  },
+  "haleu_lo_pct": {
+   "value": 5,
+   "src": "haleu"
+  },
+  "haleu_hi_pct": {
+   "value": 20,
+   "src": "haleu"
+  },
+  "rod_diameter_cm": {
+   "value": 1,
+   "text": "about 1 centimeter",
+   "src": "eia_fuel"
+  },
+  "rods_per_assembly": {
+   "value": 200,
+   "text": "more than 200",
+   "src": "doe101"
+  },
+  "assemblies_per_core": {
+   "text": "a couple hundred",
+   "src": "doe101"
+  },
+  "pwr_share_pct": {
+   "value": 65,
+   "text": "more than 65%",
+   "src": "doe101"
+  },
+  "bwr_share": {
+   "text": "roughly a third",
+   "src": "doe101"
+  },
+  "pwr_mpa": {
+   "value": 15,
+   "src": "qtr_lwr"
+  },
+  "pwr_c": {
+   "value": 326,
+   "src": "qtr_lwr"
+  },
+  "bwr_mpa": {
+   "value": 7,
+   "src": "qtr_lwr"
+  },
+  "bwr_c": {
+   "value": 288,
+   "src": "qtr_lwr"
+  },
+  "lwr_outlet_c": {
+   "value": 300,
+   "text": "about 300 °C",
+   "src": "qtr_lwr"
+  },
+  "atm_mpa": {
+   "value": 0.101325,
+   "note": "standard sea-level air pressure, 1 atm = 101.325 kPa (definition)"
+  },
+  "heat_rate_btu_kwh": {
+   "value": 10443,
+   "year": 2025,
+   "src": "eia_heatrate"
+  },
+  "btu_per_kwh": {
+   "value": 3412,
+   "src": "eia_btu"
+  },
+  "us_share_pct": {
+   "value": 20,
+   "text": "about 20% of annual U.S. electricity generation since 1990",
+   "src": "eia_explained"
+  },
+  "spent_t": {
+   "value": 90000,
+   "text": "about 90,000 metric tons since the 1950s, as DOE estimated in October 2022",
+   "src": "spent"
+  },
+  "spent_yards": {
+   "value": 10,
+   "text": "a single football field at a depth of less than 10 yards",
+   "src": "spent"
+  },
+  "spent_energy_left_pct": {
+   "value": 90,
+   "text": "more than 90% of its potential energy remains after five years in a reactor",
+   "src": "spent"
+  },
+  "large_mwe": {
+   "value": 1000,
+   "text": "1,000 MWe or higher",
+   "src": "qtr_lwr"
+  },
+  "small_mwe": {
+   "value": 300,
+   "text": "300 MWe or less",
+   "src": "qtr_lwr"
+  },
+  "micro_mwt_lo": {
+   "value": 1,
+   "src": "micro"
+  },
+  "micro_mwt_hi": {
+   "value": 20,
+   "src": "micro"
+  },
+  "htr_lo_c": {
+   "value": 700,
+   "src": "qtr_htr"
+  },
+  "htr_hi_c": {
+   "value": 950,
+   "src": "qtr_htr"
+  },
+  "htr_steam_c": {
+   "value": 750,
+   "src": "qtr_htr"
+  },
+  "htr_eff_850": {
+   "value": 47,
+   "src": "qtr_htr"
+  },
+  "htr_eff_950": {
+   "value": 50,
+   "src": "qtr_htr"
+  },
+  "htr_mwt_max": {
+   "value": 600,
+   "src": "qtr_htr"
+  },
+  "proc_lo_c": {
+   "value": 650,
+   "src": "qtr_htr"
+  },
+  "proc_hi_c": {
+   "value": 950,
+   "src": "qtr_htr"
+  },
+  "sfr_lo_c": {
+   "value": 500,
+   "src": "qtr_fast"
+  },
+  "sfr_hi_c": {
+   "value": 550,
+   "src": "qtr_fast"
+  },
+  "soec_lo_c": {
+   "value": 650,
+   "src": "soec"
+  },
+  "soec_hi_c": {
+   "value": 850,
+   "src": "soec"
+  }
+ },
+ "toy": {
+  "about": "Illustrative chain-reaction toy, not reactor physics data. k = kFull(moderator) x (1 - rodAbsorb x rods): kFull rises in a straight line from kMin with no moderator to kMax with all of it (without slowing, few neutrons split U-235 in low-enriched fuel); fully inserted rods absorb rodAbsorb of the neutrons. N(g+1) = k x N(g), from N0 neutrons, for a set number of generations. Steady (critical) means k = 1 exactly; steadyBand is only a floating-point tolerance, so a setting with k = 0.999 is shown dying out.",
+  "kMin": 0.5,
+  "kMax": 1.25,
+  "rodAbsorb": 0.5,
+  "n0": 100,
+  "generations": 12,
+  "steadyBand": 1e-09,
+  "rods": {
+   "min": 0,
+   "max": 100,
+   "step": 10,
+   "start": 0,
+   "unit": "%"
+  },
+  "moderator": {
+   "min": 0,
+   "max": 100,
+   "step": 10,
+   "start": 100,
+   "unit": "%"
+  }
+ },
+ "plant": {
+  "townMW": 100,
+  "about": "Prairie Town's 100 MW plant (illustrative, town.json) at the efficiency implied by EIA's 2025 weighted average tested heat rate for nuclear units. Core heat minus electricity is rejected heat plus other losses (such as the plant's own use), most of it through the condenser."
+ },
+ "designs": [
+  {
+   "key": "large",
+   "name": "Large water-cooled",
+   "size": "1,000 MWe or higher",
+   "coolant": "ordinary water",
+   "moderator": "ordinary water",
+   "outlet": "about 300 °C",
+   "lo": 288,
+   "hi": 326,
+   "uses": "electricity; some district heating and desalination",
+   "srcs": [
+    "qtr_lwr"
+   ]
+  },
+  {
+   "key": "small",
+   "name": "Small water-cooled",
+   "size": "300 MWe or less",
+   "coolant": "ordinary water",
+   "moderator": "ordinary water",
+   "outlet": "about 300 °C",
+   "lo": 288,
+   "hi": 326,
+   "uses": "electricity; some district heating and desalination; passive safety features in modern designs",
+   "srcs": [
+    "qtr_lwr"
+   ]
+  },
+  {
+   "key": "micro",
+   "name": "Microreactor",
+   "size": "1 to 20 MWt",
+   "coolant": "gas, liquid metal, molten salt or heat pipes",
+   "moderator": "depends on the design",
+   "outlet": "depends on the coolant",
+   "lo": null,
+   "hi": null,
+   "uses": "heat used directly, or electricity",
+   "srcs": [
+    "micro"
+   ]
+  },
+  {
+   "key": "sfr",
+   "name": "Sodium-cooled fast",
+   "size": "varies",
+   "coolant": "liquid sodium, at low pressure",
+   "moderator": "none: fast neutrons",
+   "outlet": "about 500 to 550 °C",
+   "lo": 500,
+   "hi": 550,
+   "uses": "electricity",
+   "srcs": [
+    "qtr_fast"
+   ]
+  },
+  {
+   "key": "htgr",
+   "name": "High-temperature gas-cooled",
+   "size": "up to 600 MWt each",
+   "coolant": "helium",
+   "moderator": "graphite",
+   "outlet": "700 to 950 °C",
+   "lo": 700,
+   "hi": 950,
+   "uses": "electricity; industrial heat at 650 to 950 °C, hydrogen production among it",
+   "srcs": [
+    "qtr_htr"
+   ]
+  },
+  {
+   "key": "msr",
+   "name": "Salt-cooled high-temperature (concept)",
+   "size": "varies",
+   "coolant": "molten fluoride salt, at low pressure",
+   "moderator": "graphite",
+   "outlet": "700 to 950 °C",
+   "lo": 700,
+   "hi": 950,
+   "uses": "electricity or industrial heat",
+   "srcs": [
+    "qtr_htr"
+   ],
+   "note": "DOE (2015) describes the fluoride salt-cooled high-temperature reactor (FHR) as a concept within its 700 to 950 °C high-temperature reactors; other molten-salt reactors, with fuel dissolved in the salt, are left out here."
+  }
+ ],
+ "uses": [
+  {
+   "key": "power",
+   "name": "Electricity from steam",
+   "text": "Every design here can make electricity, most of them by boiling water to spin a turbine; a microreactor's heat can also be used directly.",
+   "srcs": [
+    "doe101",
+    "micro"
+   ],
+   "all": true
+  },
+  {
+   "key": "district",
+   "name": "District heat and desalination",
+   "text": "Today's water-cooled plants already supply both in some places. No temperature band is drawn: the sources here give none.",
+   "srcs": [
+    "qtr_lwr"
+   ],
+   "mark": "[[district-heating|District heat]] and [[desalination|desalination]]"
+  },
+  {
+   "key": "soec",
+   "name": "Solid-oxide electrolysis (hydrogen)",
+   "lo": 650,
+   "hi": 850,
+   "text": "At 650 to 850 °C, heat supplies part of the energy to split water, so less electricity is needed.",
+   "srcs": [
+    "soec"
+   ],
+   "mark": "Solid-oxide [[high-temperature-electrolyzer|electrolysis]] (hydrogen)"
+  },
+  {
+   "key": "industry",
+   "name": "High-temperature industrial heat",
+   "lo": 650,
+   "hi": 950,
+   "text": "Petrochemicals, fertilizer and hydrogen production need heat at 650 to 950 °C.",
+   "srcs": [
+    "qtr_htr"
+   ]
+  }
+ ]
+}

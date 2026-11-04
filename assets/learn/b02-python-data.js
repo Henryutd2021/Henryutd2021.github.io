@@ -233,7 +233,7 @@
       return {
         x: { min: 0, max: bars ? n : Math.max(1, n - 1), ticks: ticks },
         y: { min: 0, max: o.yMax, step: o.yStep || o.yMax / 4, fmt: o.yFmt || int },
-        height: o.height || 200, heightN: o.height || 170, margin: { l: 46, r: 8, t: 10, b: 22 }, title: o.title, aria: o.label,
+        height: o.height || 200, heightN: o.height || 170, margin: { l: 52, r: 8, t: 10, b: 22 }, title: o.title, aria: o.label,
         spans: (o.shade || []).map(function (sp) { return { x0: sp[0], x1: sp[1], color: "var(--lx-bad-soft)" }; }),
         refs: o.level != null ? [{ y: o.level, color: "var(--lx-bad)", dash: "5 4", width: 1.5, label: o.levelLabel, labelColor: "var(--lx-ink-2)" }] : [],
         bars: !bars ? [] : [].concat.apply([], o.series.map(function (s) { return s.values.map(function (v, i) { return v ? { x0: i + 0.15, x1: i + 0.85, y0: 0, y1: v, color: s.color } : null; }).filter(Boolean); })),

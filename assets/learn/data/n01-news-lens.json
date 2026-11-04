@@ -35,7 +35,7 @@
         { "p": "a6", "text": "Cryptocurrency mining is not counted", "tag": "boundary", "also": [], "note": "What counts as a data center is a choice; a study that includes mining reports a larger number." },
         "."
       ],
-      "missing": { "answer": "pays", "also": ["counter"], "note": "Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Upcoming: lesson A4 on large-load tariffs." },
+      "missing": { "answer": "pays", "also": ["counter"], "note": "Who pays for the new lines and plants that serve large loads depends on each utility's tariff rules, and the story does not say. Analyst lesson [[lesson:a04-retail-tariffs|A4]] covers large-load tariffs." },
       "envelope": {
         "kind": "energy-to-power",
         "q": "649 TWh in a year is how much power, on average?",
@@ -69,7 +69,7 @@
         { "p": "b6", "text": "The count covers utility-scale plants of 1 MW and up", "tag": "boundary", "also": [], "note": "Home batteries and rooftop solar sit outside this count." },
         "."
       ],
-      "missing": { "answer": "pays", "also": [], "note": "Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Upcoming: lesson A2 on contracts and risk." },
+      "missing": { "answer": "pays", "also": [], "note": "Who pays for the batteries, and who earns from them, depends on market rules and contracts; the story does not say. Analyst lesson [[lesson:a02-contracts-risk|A2]] covers contracts and risk." },
       "envelope": {
         "kind": "power-to-energy",
         "q": "How much energy can 15 GW of batteries store?",

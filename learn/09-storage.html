@@ -291,7 +291,7 @@ window.Quarto = {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
@@ -576,7 +576,7 @@ e_t = e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0\\
 <li><strong>Losses.</strong> Here the whole loss sits on charging; many models split it, <span class="math inline">\(\sqrt{0.8}\)</span> each way.</li>
 <li><strong>Left out of the goal.</strong> The nuclear plant’s $24,000 for the day is the same in every plan.</li>
 <li><strong>Always an answer.</strong> The page’s code also allows unserved demand at $3,000/MWh, so the model always has a solution; on this day none is needed.</li>
-<li><strong>Next.</strong> <a href="../learn/10-write-it-down.html">Lesson 10</a> writes such a model down and <a href="../learn/11-solver.html">lesson 11</a> checks a solver’s answer. <a href="../learn/m03-capacity-expansion.html">M3</a> (capacity expansion) chooses the battery’s size too, and A8 (how long should storage last?, upcoming) will.</li>
+<li><strong>Next.</strong> <a href="../learn/10-write-it-down.html">Lesson 10</a> writes such a model down and <a href="../learn/11-solver.html">lesson 11</a> checks a solver’s answer. <a href="../learn/m03-capacity-expansion.html">M3</a> (capacity expansion) chooses the battery’s size too, and <a href="a08-storage-duration.html">A8</a> compares how long a store should last.</li>
 </ul>
 </div>
 </details>
@@ -584,7 +584,7 @@ e_t = e_{t-1} + 0.8\,c_t - d_t, \quad e_{-1} = 0\\
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>One day only. A battery's yearly value needs every day of the year, including days with no spilled sun (lesson A8, upcoming).</li>
+<li>One day only. A battery's yearly value needs every day of the year, including days with no spilled sun (<a href="m03-capacity-expansion.html">M3</a> checks a plan on every hour of a year).</li>
 <li>Perfect foresight: the solver knows the whole day in advance. Real operators schedule with forecasts that miss (lesson 4).</li>
 <li>The cost of building the battery and of its wear, which would set a minimum spread worth cycling for (lesson 7).</li>
 <li>The combined-cycle's ramp limit from lesson 0, and any limit on the wires.</li>

@@ -205,7 +205,7 @@
     return { set: function (frac, color, text) { fill.style.width = (frac * 100).toFixed(2) + "%"; fill.style.background = color; lab.innerHTML = text; } };
   }
   function monthBars(host, vals, color, label) {
-    var Wd = 360, Hh = 92, m = { l: 30, r: 4, t: 8, b: 18 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b, bw = iw / 12;
+    var Wd = 360, Hh = 92, m = { l: 34, r: 4, t: 8, b: 18 }, iw = Wd - m.l - m.r, ih = Hh - m.t - m.b, bw = iw / 12;
     var svg = S("svg", { viewBox: "0 0 " + Wd + " " + Hh, role: "img", "aria-label": label, class: "lx5-mbars" }, host);
     [0, 0.5, 1].forEach(function (v) {
       var y = m.t + ih - v * ih;

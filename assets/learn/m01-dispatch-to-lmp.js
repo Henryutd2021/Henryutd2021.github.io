@@ -247,7 +247,7 @@
       ".m1-rule.right{border-color:var(--lx-good);box-shadow:inset 0 0 0 1px var(--lx-good)}",
       ".m1-rule .nm{font-family:var(--lx-f-display);font-weight:500;font-size:15px}",
       ".m1-rule .det{font-size:14.5px;color:var(--lx-ink-2)}",
-      ".m1-sym{font-family:var(--lx-f-mono);font-size:14px;color:var(--lx-ink);overflow-x:auto;white-space:nowrap;padding:2px 0}",
+      ".m1-sym{display:block;max-width:100%;font-family:var(--lx-f-mono);font-size:14px;color:var(--lx-ink);overflow-x:auto;white-space:nowrap;padding:2px 0}",   // block: an inline box cannot scroll
       ".m1-sym i{font-family:var(--lx-f-body);font-style:italic;font-size:15px}",
       ".m1-anno{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}",
       "@media (max-width:760px){.m1-anno{grid-template-columns:minmax(0,1fr)}}",

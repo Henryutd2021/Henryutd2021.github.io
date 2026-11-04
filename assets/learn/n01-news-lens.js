@@ -99,7 +99,7 @@
       // repeats the question, so colour is never the only cue
       ".n1-lens{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}",
       ".n1-q{display:grid;gap:4px;align-content:start;text-align:left;min-height:84px;padding:10px 12px;border-radius:12px;border:1px solid var(--lx-line-2);border-top:4px solid var(--c);background:var(--lx-surface);color:var(--lx-ink);cursor:pointer;font:inherit}",
-      ".n1-q b{font-family:var(--lx-f-display);font-weight:500;font-size:15px;display:flex;gap:6px;align-items:baseline}",
+      ".n1-q b{font-family:var(--lx-f-display);font-weight:500;font-size:15px;display:flex;gap:6px;align-items:baseline;hyphens:auto}",
       ".n1-q small{font-size:12.5px;color:var(--lx-ink-3)}",
       ".n1-q .t{font-size:13.5px;color:var(--lx-ink-2);line-height:1.35}",
       ".n1-q[aria-expanded=true]{background:var(--lx-surface-2)}",
@@ -129,7 +129,8 @@
       var grid = H("div", { class: "n1-lens" }, act), opened = {}, prog = H("p", { class: "n1-count", "aria-live": "polite", text: "0 of " + D.lens.length + " opened." }, act);
       D.lens.forEach(function (l) {
         var b = H("button", { class: "n1-q", type: "button", "aria-expanded": "false", style: "--c:" + l.color }, grid);
-        H("b", { html: LX.PhraseTagger.badge(l, true) }, b);
+        // a soft hyphen where the card is narrow (phones): "Counter-factual" breaks inside the card instead of running out of it
+        H("b", { html: LX.PhraseTagger.badge(Object.assign({}, l, { label: l.label.replace(/^Counterfactual$/, "Counter\u00ADfactual") }), true) }, b);
         H("span", { class: "t", text: l.ask }, b);
         var trap = H("small", { text: "Trap: " + l.trap, hidden: true }, b);
         if (l.sub) H("small", { text: "Covers " + l.sub }, b);

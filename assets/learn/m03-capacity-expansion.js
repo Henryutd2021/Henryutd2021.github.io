@@ -152,8 +152,6 @@
       ".m3-key var{font-family:var(--lx-f-body);font-style:italic}.m3-key b,.m3-info b{color:var(--lx-ink);font-weight:600}",
       ".m3-rules{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 12px;font-size:15px}",
       ".m3-rules dt{font-weight:600;color:var(--lx-ink)}.m3-rules dd{margin:0;color:var(--lx-ink-2)}",
-      ".m3-fail{display:grid;gap:8px;justify-items:start;padding:10px 12px;border:1px solid var(--lx-bad);border-radius:10px;background:var(--lx-surface-2)}",
-      ".m3-fail p{margin:0;font-size:14.5px}",
       "@media (max-width:560px){.m3-tbl table{font-size:13px}.m3-tbl th,.m3-tbl td{white-space:normal;padding:4px 3px}.m3-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
   }
@@ -256,33 +254,13 @@
       }
       return null;
     }
-    function failNote(host, r, again) {
-      var why = r.status === "time-limit" ? "The solver stopped at its time limit before it finished."
-        : r.status === "cancelled" || r.status === "superseded" ? "The run was stopped before it finished."
-        : (LX.solver.describe(r) || "The solver did not finish.") + (r.message && r.status === "error" ? " (" + r.message + ")" : "");
-      var box = H("div", { class: "m3-fail", role: "alert" }, host);
-      H("p", { html: "<b>No result to show.</b> " + LX.esc(why) + " What you did before is kept; on a slow device, close other tabs first." }, box);
-      H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Try again", onclick: function () { again(); } }, box);
-      return box;
-    }
     // one solver action of a step. o: { api, st (an LX.SolverStatus), host, go (the step's own button, or null), job () ->
     // Promise, failed () -> the first failed solve or null, show () -> the results }. Returns the action, for the step's
-    // button or prediction and for "Try again".
+    // button or prediction and for "Try again". LX.SolveStep (components/solvestep.js, promoted from M3, A8 and M4 at the
+    // W3 integration); the note keeps the class m3-fail and M3's last sentence.
     function action(o) {
-      var note = null;
-      function end(r) {
-        o.api.busy(false); if (o.go) o.go.disabled = false;
-        if (r) { o.st.set(""); if (note) note.remove(); note = failNote(o.host, r, attempt); }
-      }
-      function attempt() {
-        if (note) { note.remove(); note = null; }
-        if (o.go) o.go.disabled = true;
-        o.st.set(LX.solver.mode ? "solving" : "loading"); o.api.busy(true);
-        return Promise.resolve().then(o.job).then(function () {
-          var f = o.failed(); end(f); if (!f) o.show();
-        }).catch(function (e) { end({ status: "error", ok: false, message: String((e && e.message) || e) }); });
-      }
-      return attempt;
+      o.cls = "m3-fail"; o.kept = " What you did before is kept; on a slow device, close other tabs first.";
+      return LX.SolveStep.action(o);
     }
 
     var steps = [

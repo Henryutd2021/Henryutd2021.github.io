@@ -1,0 +1,82 @@
+{
+ "about": "Lesson A4 (a04-retail-tariffs), wave W3, 2026-11-03. Prairie Town is fictional: its customers, their hourly use, the utility's unit costs, the four tariffs and the large load are illustrative. The day's prices come from the town's own dispatch on 9 June 2025 (real Southwest Power Pool shapes from EIA-930 in town_year.json, scaled as lesson 9 does: demand = shape x 450 MW, wind = shape x 150 MW, sun = shape x 200 MW, whole MW; the town's 100 MW always-on plant runs flat; then wind and sun, the combined-cycle plant at $40/MWh, the peaker at $100/MWh). The rooftop array follows the same real solar shape. A month is 30 days like this one. Every number on the page is checked by _tests/learn/test_a04-retail-tariffs.js.",
+ "built": "2026-11-03",
+ "day": {
+  "date": "2025-06-09",
+  "dateLabel": "9 June 2025",
+  "utcOffsetHours": -5,
+  "demandPeakMW": 450,
+  "why": "Lesson 9's day and CF6's: nine hours of spare midday sun (08:00-17:00) and an evening that needs the peaker (20:00-23:00)."
+ },
+ "days": 30,
+ "customers": [
+  {
+   "key": "renter",
+   "name": "Renter in an apartment",
+   "short": "Renter",
+   "cls": "home",
+   "color": "var(--lx-tier-3)",
+   "note": "No car, no solar; air conditioning in the evening.",
+   "kw": [0.5, 0.5, 0.45, 0.45, 0.45, 0.5, 0.7, 0.9, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.7, 1.0, 1.4, 1.6, 1.7, 1.6, 1.3, 0.8]
+  },
+  {
+   "key": "solarev",
+   "name": "Home with rooftop solar and an EV",
+   "short": "Solar + EV home",
+   "cls": "home",
+   "color": "var(--lx-solar)",
+   "note": "A larger house with central air, a 4 kW rooftop array and a 7 kW car charger.",
+   "kw": [0.9, 0.8, 0.8, 0.8, 0.8, 0.9, 1.1, 1.3, 1.0, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.7, 2.0, 2.4, 2.6, 2.6, 2.5, 2.2, 1.8, 1.3],
+   "solarKW": 4,
+   "ev": { "kw": 7, "hours": 2, "start": { "evening": 19, "night": 1 }, "label": { "evening": "on arrival, 19:00", "night": "on a timer, 01:00" } }
+  },
+  {
+   "key": "factory",
+   "name": "Small factory",
+   "short": "Factory",
+   "cls": "business",
+   "color": "var(--lx-tier-2)",
+   "note": "Two shifts, 06:00 to 22:00, and a 200 kW batch process that runs two hours a day.",
+   "base": { "shift": 300, "night": 60, "from": 6, "to": 22 },
+   "batch": { "kw": 200, "hours": 2, "start": { "day": 13, "night": 0 }, "label": { "day": "13:00, mid-shift", "night": "midnight" } }
+  }
+ ],
+ "classes": {
+  "home": { "label": "Homes", "meter": 10, "mix": { "renter": 9, "solarev": 1 }, "mixNote": "For setting prices, Prairie Town's homes are taken as nine like the renter for each one like the solar and EV home." },
+  "business": { "label": "Businesses", "meter": 200, "mix": { "factory": 1 }, "mixNote": "The factory stands for its class." }
+ },
+ "costs": {
+  "capacityPerKW": 15,
+  "wiresPerKW": 6,
+  "note": "Illustrative unit costs a month: $15 per kW drawn in the town's tightest hour (plants and lines are sized for hours like it), $6 per kW of the customer's own busiest hour (the local transformer and service line), and the class's meter and billing cost; energy is the town's running cost in each hour."
+ },
+ "parts": [
+  { "key": "energy", "label": "Energy in each hour", "short": "Energy", "color": "var(--lx-cc)" },
+  { "key": "capacity", "label": "Plants for the town's tightest hour", "short": "Plants", "color": "var(--lx-pk)" },
+  { "key": "wires", "label": "Local wires for the customer's busiest hour", "short": "Local wires", "color": "var(--lx-tier-3)" },
+  { "key": "meter", "label": "Meter and billing", "short": "Meter", "color": "var(--lx-ink-3)" }
+ ],
+ "tariffs": [
+  { "key": "flat", "name": "Flat", "long": "Flat price", "pays": "every kWh at one price", "rewards": "using less, at any hour" },
+  { "key": "tou", "name": "Time-of-use", "long": "Time-of-use", "pays": "kWh at a higher price from 16:00 to 21:00", "rewards": "moving use out of 16:00 to 21:00", "ratio": 3, "peak": [16, 21] },
+  { "key": "demand", "name": "Demand charge", "long": "Demand charge", "pays": "kWh at a low price, plus each kW of the month's busiest hour", "rewards": "a flatter day: a lower busiest hour" },
+  { "key": "rtp", "name": "Real-time", "long": "Real-time pricing", "pays": "each kWh at the town's price that hour, plus a plant-and-wire charge per kWh", "rewards": "following the hourly price" }
+ ],
+ "tariffNote": "Illustrative tariffs, each set so that a class pays its total cost before anyone changes what they do. In all four, a kWh sent back earns what a kWh bought costs in that hour (net metering).",
+ "scarcity": { "price": 2000, "hours": [20, 21, 22], "days": 5, "label": "five evenings at $2,000 per MWh, 20:00 to 23:00" },
+ "large": {
+  "contractMW": 100,
+  "upgradeCostPerYear": 15000000,
+  "useStart": 50,
+  "useSteps": [25, 100, 5],
+  "minStart": 0,
+  "minSteps": [0, 100, 5],
+  "lbnlMedian": 80,
+  "note": "Illustrative: a 100 MW data center (a large load) with its own tariff; the utility's upgrades built to serve it cost $15M a year, recovered by a demand charge on its billing demand. Billing demand = the greater of its highest hourly demand in the month and the minimum share of its contract. Assumed: what it does not pay is recovered from the utility's other customers."
+ },
+ "facts": [
+  { "n": "17.23¢ per kWh", "what": "Average U.S. residential electricity price in 2025 (commercial 13.37¢, industrial 8.51¢).", "source": "EIA, Electric Power Annual, Table 2.4", "url": "https://www.eia.gov/electricity/annual/html/epa_02_04.html", "asof": "accessed 3 November 2026" },
+  { "n": "76.8%", "what": "Share of U.S. electricity meters that were advanced meters in December 2023 (128.4 of 167.2 million). Time-of-use needs use split by price period; real-time pricing needs hourly readings.", "source": "FERC staff, 2025 Assessment of Demand Response and Advanced Metering, p. 2 and Table 2-1, p. 4 (EIA data)", "url": "https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf", "asof": "December 2025; data for December 2023" },
+  { "n": "80% · 12 years", "what": "Across 55 large-load tariffs reviewed, the median minimum billing demand was 80% of contract demand; the median minimum contract rose from 5 years (tariffs proposed before 2025) to 12 years (since 2025).", "source": "Berkeley Lab and The Brattle Group, Electricity Rate Designs for Large Loads, 2026 Update, pp. 2, 4, 5", "url": "https://eta-publications.lbl.gov/sites/default/files/2026-08/rate_designs_large_loads_2026.08.10.pdf", "asof": "August 2026; tariffs as of March 2026" }
+ ]
+}

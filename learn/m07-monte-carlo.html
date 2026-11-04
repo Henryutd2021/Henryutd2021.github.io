@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Modeler lesson M7 of Energy Systems, Step by Step: compare scenarios, a one-at-a-time tornado and stacked corners; sample five uncertain inputs of a waiting load’s delay cost with a Latin hypercube, run the model 1,000 times with a stated seed, read percentiles and chances with their Monte Carlo error, and rank the inputs by Spearman’s rank correlation; a Python notebook rebuilds it.">
+
+<title>What could happen? Scenarios, Monte Carlo and global sensitivity – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="What could happen? Scenarios, Monte Carlo and global sensitivity – Honglin Li">
+<meta property="og:description" content="Modeler lesson M7 of Energy Systems, Step by Step: compare scenarios, a one-at-a-time tornado and stacked corners; sample five uncertain inputs of a waiting load’s delay cost with a Latin hypercube, run the model 1,000 times with a stated seed, read percentiles and chances with their Monte Carlo error, and rank the inputs by Spearman’s rank correlation; a Python notebook rebuilds it.">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-cards quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Field Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">What could happen? Scenarios, Monte Carlo and global sensitivity</h1>
+<p class="subtitle lead">Sample five uncertain inputs with a Latin hypercube, run a delay-cost model 1,000 times and rank the inputs by influence</p>
+</div>
+
+<div>
+  <div class="description">
+    Modeler lesson M7 of Energy Systems, Step by Step: compare scenarios, a one-at-a-time tornado and stacked corners; sample five uncertain inputs of a waiting load’s delay cost with a Latin hypercube, run the model 1,000 times with a stated seed, read percentiles and chances with their Monte Carlo error, and rank the inputs by Spearman’s rank correlation; a Python notebook rebuilds it.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- M7 in the model-lab form (step cards, simulation mode, no solver), wave W3, 2026-11-03. Model, step cards and explain
+     layer: assets/learn/m07-monte-carlo.js with assets/learn/data/m07-monte-carlo.json. The toy is case file CF7's waiting
+     load (illustrative; guard G-DC: delay economics only, data centers only as loads). Henry's research enters only
+     through the approved excerpt (excerpt:code, E7.11 and E7.7 word for word), the allow-listed repository
+     (repo:code-delayed-energization) and the citation E7.14. Lab: learn/notebooks/m07-monte-carlo.ipynb (written by
+     scripts/build_learn_m07_notebook.py in the ResearchPortfolio folder; asserts the reference block). Tests: node
+     _tests/learn/test_m07-monte-carlo.js [--write] (--write rewrites the reference block and the no-JS block). -->
+<!-- learn:meta:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "What could happen? Scenarios, Monte Carlo and global sensitivity Sample five uncertain inputs with a Latin hypercube, run a delay-cost model 1,000 times and rank the inputs by influence", "description": "Modeler lesson M7 of Energy Systems, Step by Step: compare scenarios, a one-at-a-time tornado and stacked corners; sample five uncertain inputs of a waiting load's delay cost with a Latin hypercube, run the model 1,000 times with a stated seed, read percentiles and chances with their Monte Carlo error, and rank the inputs by Spearman's rank correlation; a Python notebook rebuilds it.", "learningResourceType": "Interactive lesson", "educationalLevel": "Advanced", "timeRequired": "PT140M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["scenarios", "one-at-a-time sensitivity", "Latin hypercube sampling", "Monte Carlo error", "global sensitivity by rank correlation"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/m07-monte-carlo.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"m07-monte-carlo","starter":null,"total":14,"code":"M7","title":"What could happen? Scenarios, Monte Carlo and global sensitivity","subtitle":"Sample five uncertain inputs with a Latin hypercube, run a delay-cost model 1,000 times and rank the inputs by influence","short":"Scenarios and Monte Carlo","tier":"modeler","tier2":null,"tierLabel":"Modeler · L3","level":"L3","slot":3,"slot2":null,"minutes":35,"does":"Sample uncertain inputs with a Latin hypercube, run a model a thousand times, rank inputs by influence and read the distribution, not one number.","outcome":"Run a seeded Latin hypercube study, report percentiles and chances with their Monte Carlo error, and rank inputs by rank correlation within stated ranges.","icon":"bars","form":"cards","scales":[],"teaches":["scenarios","one-at-a-time sensitivity","Latin hypercube sampling","Monte Carlo error","global sensitivity by rank correlation"],"lab":"a NumPy notebook that reruns the page's seeded study and checks it, then SciPy's Latin hypercube, rank correlations and variance shares, about 45 minutes, then 60 minutes of practice.","href":"m07-monte-carlo.html","ready":true,"after":[{"id":"a01-project-tea","code":"A1","title":"Is this project worth building? Cash flows, discounting and the cost of capital","short":"Is it worth building?","does":"Build a wind farm's cash flows year by year; discount them at the cost of capital; move the loan share, the rate, the life and the price; read NPV, IRR and payback; a tornado chart ranks what matters.","href":"a01-project-tea.html","ready":true},{"id":"b02-python-data","code":"B2","title":"Python and data for energy: how do you load, plot and check a year of hourly data?","short":"Python and data","does":"In a notebook, load a year of hourly grid data, fix time zones and daylight-saving gaps, plot it, compute capacity factors and a duration curve, and write assert checks that catch bad rows.","href":"b02-python-data.html","ready":true},{"id":"k05-probability-statistics","code":"K5","title":"Probability and statistics","short":"Probability and statistics","does":"With a grid operator's real day-ahead forecast errors, build a histogram, compare mean and median, measure spread, read percentiles and intervals, and estimate a chance by counting and by sampling; then combine two plants' outages into a joint chance and an expected value.","href":"k05-probability-statistics.html","ready":true}],"prev":null,"next":null,"practice":60,"labMinutes":45}</script>
+<div class="lx-head" data-lesson-id="m07-monte-carlo" data-total="14" data-tier="modeler" data-level="L3" data-minutes="35" data-form="cards">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">M7</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-3)"><span class="lx-dot" aria-hidden="true"></span>Modeler · L3</li>
+<li><span class="lx-nw">35 min guided</span> · <span class="lx-nw">45 min lab</span> · <span class="lx-nw">about 60 min practice</span></li>
+<li>After <a href="a01-project-tea.html">A1</a> and <a href="b02-python-data.html">B2</a> and <a href="k05-probability-statistics.html">K5</a></li>
+<li class="lx-done-tag" data-lesson-id="m07-monte-carlo" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#steps"><span class="lx-n">1</span>Step by step</a></li><li><a href="#explain"><span class="lx-n">2</span>Explain</a></li><li><a href="#check"><span class="lx-n">3</span>Check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+<!-- learn:meta:end -->
+<style>
+.m7-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.m7-out { font-size: 15.5px; color: var(--lx-ink-2); min-height: 1.5em; margin: .35rem 0 0; }
+.m7-out b { font-family: var(--lx-f-mono); color: var(--lx-ink); font-weight: 600; }
+.m7-out:empty { display: none; }
+.m7-seed { font-family: var(--lx-f-mono); font-size: 14px; color: var(--lx-ink-3); }
+.m7-ins td:first-child, .m7-ins th:first-child { text-align: left; font-family: var(--lx-f-body, inherit); }
+.m7-in-l { display: block; }
+.m7-in-d { display: block; font-size: 13.5px; color: var(--lx-ink-2); margin-top: 2px; line-height: 1.4; }
+.m7-scen { display: grid; gap: 6px; margin: .5rem 0 .2rem; }
+.m7-scen-r { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: center; padding: 4px 6px; border-radius: 8px; }
+.m7-scen-r.on { background: color-mix(in srgb, var(--lx-accent) 9%, transparent); }
+.m7-scen-t { font-family: var(--lx-f-display); font-size: 14.5px; color: var(--lx-ink-2); }
+.m7-scen-c { display: grid; grid-template-columns: minmax(0, 1fr) 4.6em; gap: 6px; align-items: center; min-width: 0; }
+.m7-scen-tr { height: 12px; border-radius: 6px; background: var(--lx-line); position: relative; overflow: hidden; }
+.m7-scen-b { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 6px; background: var(--c); transition: width .35s ease; }
+.m7-scen-v { font-family: var(--lx-f-mono); font-size: 13.5px; color: var(--lx-ink); text-align: right; }
+.m7-key { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin: 0 4px 0 8px; vertical-align: -1px; }
+.m7-key:first-child { margin-left: 0; }
+.m7-rho { display: grid; gap: 4px; margin: .5rem 0 .2rem; }
+.m7-rho-axis { display: grid; grid-template-columns: 8.5em minmax(0, 1fr) 4.4em 5.4em; gap: 8px; padding: 0 7px; font-size: 14px; }
+.m7-rho-ax { position: relative; height: 16px; font-family: var(--lx-f-mono); font-size: 11.5px; color: var(--lx-ink-3); }
+.m7-rho-ax span { position: absolute; top: 0; } .m7-rho-ax span:nth-child(1) { left: 0; } .m7-rho-ax span:nth-child(2) { left: 50%; transform: translateX(-50%); } .m7-rho-ax span:nth-child(3) { right: 0; }
+.m7-rho-list { display: grid; gap: 4px; }
+.m7-rho-row { display: grid; grid-template-columns: 8.5em minmax(0, 1fr) 4.4em 5.4em; gap: 8px; align-items: center; width: 100%; text-align: left; font: inherit; font-size: 14px; background: none; border: 1px solid transparent; border-radius: 8px; padding: 5px 6px; cursor: pointer; color: var(--lx-ink); }
+.m7-rho-row:hover { border-color: var(--lx-line); }
+.m7-rho-row[aria-pressed="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 8%, transparent); }
+.m7-rho-row:focus-visible { outline: 2px solid var(--lx-accent); outline-offset: 2px; }
+.m7-rho-static { cursor: default; }
+.m7-rho-static:hover { border-color: transparent; }
+.m7-rho-l { display: flex; align-items: center; gap: 6px; font-size: 14px; min-width: 0; }
+.m7-rho-l i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; }
+.m7-rho-t { position: relative; height: 14px; border-radius: 4px; background: linear-gradient(to right, transparent calc(50% - .5px), var(--lx-ink-3) calc(50% - .5px), var(--lx-ink-3) calc(50% + .5px), transparent calc(50% + .5px)), var(--lx-line); }
+.m7-rho-b { position: absolute; top: 2px; bottom: 2px; border-radius: 3px; background: var(--c); transition: left .3s ease, width .3s ease; }
+.m7-rho-w { position: absolute; top: 6px; height: 2px; background: var(--lx-ink); transition: left .3s ease, width .3s ease; }
+.m7-rho-v { font-family: var(--lx-f-mono); font-size: 13px; text-align: right; }
+.m7-rho-k { font-size: 12.5px; color: var(--lx-ink-3); }
+@media (max-width: 560px) {
+  .m7-scen-r { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .m7-scen-t { grid-column: 1 / -1; }
+  .m7-rho-axis, .m7-rho-row { grid-template-columns: 7.6em minmax(0, 1fr) 4.6em; gap: 6px; }
+  .m7-rho-k { grid-column: 2 / -1; grid-row: 2; margin-top: -2px; }
+}
+@media (prefers-reduced-motion: reduce) { .m7-scen-b, .m7-rho-b, .m7-rho-w { transition: none; } }
+.m7-fbfig svg { width: 100%; max-width: 560px; height: auto; display: block; }
+.m7-fb-grid { stroke: var(--lx-line); stroke-width: 1; }
+.m7-fb-tick { fill: var(--lx-ink-3); font-size: 11px; font-family: var(--lx-f-mono); }
+.m7-fb-bar { fill: var(--lx-accent); opacity: 0.75; }
+.m7-fb-band { fill: var(--lx-accent); opacity: 0.1; }
+.m7-fb-mid { stroke: var(--lx-ink); stroke-width: 1.4; stroke-dasharray: 4 3; }
+.m7-nb { margin-top: 1.2rem; max-width: 980px; } .m7-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
+.m7-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
+.page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
+.page-learn .lx-datanote li { margin: 0; }
+</style>
+<div id="steps" class="lx-sec">
+<div class="lx-interactive lx-cards" data-learn="m07" data-src="../assets/learn/data/m07-monte-carlo.json">
+<div class="lx-fallback">
+<!-- m7-fallback:start (written by _tests/learn/test_m07-monte-carlo.js --write; do not edit) -->
+<p class="lx-eyebrow">The developer's cost of a 24-month wait, 1,000 runs (illustrative)</p>
+<div class="m7-fbfig">
+<svg viewbox="0 0 440 258" role="img" aria-labelledby="m7-static-title">
+<title id="m7-static-title">Histogram of the developer's cost in 1,000 Latin hypercube runs (seed 7), a 24-month wait, in $5M bins: median $170.3M, 80% of runs from $140.9M to $200.1M.</title>
+<g><line x1="48" x2="428" y1="218.0" y2="218.0" class="m7-fb-grid"></line><text x="42" y="222.0" text-anchor="end" class="m7-fb-tick">0</text><line x1="48" x2="428" y1="178.8" y2="178.8" class="m7-fb-grid"></line><text x="42" y="182.8" text-anchor="end" class="m7-fb-tick">20</text><line x1="48" x2="428" y1="139.6" y2="139.6" class="m7-fb-grid"></line><text x="42" y="143.6" text-anchor="end" class="m7-fb-tick">40</text><line x1="48" x2="428" y1="100.4" y2="100.4" class="m7-fb-grid"></line><text x="42" y="104.4" text-anchor="end" class="m7-fb-tick">60</text><line x1="48" x2="428" y1="61.2" y2="61.2" class="m7-fb-grid"></line><text x="42" y="65.2" text-anchor="end" class="m7-fb-tick">80</text><line x1="48" x2="428" y1="22.0" y2="22.0" class="m7-fb-grid"></line><text x="42" y="26.0" text-anchor="end" class="m7-fb-tick">100</text><text x="48.0" y="234" text-anchor="start" class="m7-fb-tick">$100M</text><text x="174.7" y="234" text-anchor="middle" class="m7-fb-tick">$150M</text><text x="301.3" y="234" text-anchor="middle" class="m7-fb-tick">$200M</text><text x="428.0" y="234" text-anchor="end" class="m7-fb-tick">$250M</text><text x="238.0" y="252" text-anchor="middle" class="m7-fb-tick">developer's cost, present value</text><text x="42" y="10" text-anchor="end" class="m7-fb-tick">runs</text></g>
+<g><rect x="151.5" y="22" width="150.2" height="196" class="m7-fb-band"></rect><rect x="86.5" y="216.0" width="11.7" height="2.0" class="m7-fb-bar"></rect><rect x="99.2" y="196.4" width="11.6" height="21.6" class="m7-fb-bar"></rect><rect x="111.8" y="192.5" width="11.7" height="25.5" class="m7-fb-bar"></rect><rect x="124.5" y="163.1" width="11.7" height="54.9" class="m7-fb-bar"></rect><rect x="137.2" y="145.5" width="11.6" height="72.5" class="m7-fb-bar"></rect><rect x="149.8" y="104.3" width="11.7" height="113.7" class="m7-fb-bar"></rect><rect x="162.5" y="122.0" width="11.7" height="96.0" class="m7-fb-bar"></rect><rect x="175.2" y="98.4" width="11.6" height="119.6" class="m7-fb-bar"></rect><rect x="187.8" y="69.0" width="11.7" height="149.0" class="m7-fb-bar"></rect><rect x="200.5" y="74.9" width="11.7" height="143.1" class="m7-fb-bar"></rect><rect x="213.2" y="43.6" width="11.6" height="174.4" class="m7-fb-bar"></rect><rect x="225.8" y="74.9" width="11.7" height="143.1" class="m7-fb-bar"></rect><rect x="238.5" y="86.7" width="11.7" height="131.3" class="m7-fb-bar"></rect><rect x="251.2" y="86.7" width="11.6" height="131.3" class="m7-fb-bar"></rect><rect x="263.8" y="90.6" width="11.7" height="127.4" class="m7-fb-bar"></rect><rect x="276.5" y="82.8" width="11.7" height="135.2" class="m7-fb-bar"></rect><rect x="289.2" y="96.5" width="11.6" height="121.5" class="m7-fb-bar"></rect><rect x="301.8" y="159.2" width="11.7" height="58.8" class="m7-fb-bar"></rect><rect x="314.5" y="147.4" width="11.7" height="70.6" class="m7-fb-bar"></rect><rect x="327.2" y="192.5" width="11.6" height="25.5" class="m7-fb-bar"></rect><rect x="339.8" y="190.6" width="11.7" height="27.4" class="m7-fb-bar"></rect><rect x="352.5" y="206.2" width="11.7" height="11.8" class="m7-fb-bar"></rect><rect x="365.2" y="216.0" width="11.6" height="2.0" class="m7-fb-bar"></rect><rect x="377.8" y="216.0" width="11.7" height="2.0" class="m7-fb-bar"></rect><line x1="226.0" x2="226.0" y1="22" y2="218" class="m7-fb-mid"></line><text x="231.0" y="30" class="m7-fb-tick">median $170.3M</text></g>
+</svg>
+</div>
+<ol>
+<li>One number: at the base inputs, a 24-month wait costs the developer $171.1M in present value, and other customers $14.7M.</li>
+<li>Scenarios, with no chance attached: the developer's cost is $88.8M, $171.1M and $247.3M for waits of 12, 24 and 36 months.</li>
+<li>One at a time: the margin swings the developer's cost most, from $137.8M to $204.4M; capital and the discount rate swing it by $28.5M and $28.0M.</li>
+<li>Stacked corners: every input at its low-cost end gives $111.8M; at its high-cost end, $234.7M.</li>
+<li>Sampling 10 runs with seed 7: plain random leaves 4 of 10 margin slices and 3 of 10 discount-rate slices empty; a Latin hypercube leaves none.</li>
+<li>1,000 Latin hypercube runs: median $170.3M; 80% of runs from $140.9M to $200.1M; the runs span $120.0M to $230.2M.</li>
+<li>Near a corner (margin, capital and discount rate all in the same outer tenth of their ranges): 2 runs; a chance of 0.1³ per corner predicts 2.</li>
+<li>Monte Carlo error over 20 seeds: P90 $200.1M ± $1.3M (two standard errors) with 1,000 runs, ± $4.7M with 100.</li>
+<li>A chance under these inputs: above $200M, 0.0% of runs at 12 months, 10.1% at 24 and 92.9% at 36.</li>
+<li>Spearman's rank correlation with the developer's cost: margin 0.86 (rank 1); then capital 0.38 and discount rate 0.31 (tied, rank 2–3); with other customers' cost: upgrades 0.81 (rank 1); then never arrives 0.54 (rank 2).</li>
+<li>Narrow the margin's range to ± $5,000: capital 0.64 and discount rate 0.59 (tied, rank 1–2), and the margin (0.47) ranks 3.</li>
+</ol>
+<p class="lx-eyebrow">The summaries on this page</p>
+<div class="lx-scroll-x">
+<table class="lx-facts m7-fbtab caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Summary</th>
+<th data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Runs</td>
+<td class="n">1,000 (Latin hypercube, seed 7)</td>
+</tr>
+<tr class="even">
+<td>Median</td>
+<td class="n">$170.3M</td>
+</tr>
+<tr class="odd">
+<td>P10 and P90</td>
+<td class="n">$140.9M and $200.1M</td>
+</tr>
+<tr class="even">
+<td>P90, Monte Carlo error</td>
+<td class="n">± $1.3M (2 standard errors, 20 seeds)</td>
+</tr>
+<tr class="odd">
+<td>Share above $200M, 24 months</td>
+<td class="n">10.1% ± 1.0 points (2 standard errors)</td>
+</tr>
+<tr class="even">
+<td>Corners</td>
+<td class="n">$111.8M and $234.7M</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="lx-textalt"><summary>Text version of the histogram</summary>
+<div class="lx-scroll-x">
+<table class="lx-mini-table caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Cost, from</th>
+<th data-quarto-table-cell-role="th" scope="col">up to</th>
+<th data-quarto-table-cell-role="th" scope="col">Runs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>$115.0M</td>
+<td>$120.0M</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>$120.0M</td>
+<td>$125.0M</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>$125.0M</td>
+<td>$130.0M</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<td>$130.0M</td>
+<td>$135.0M</td>
+<td>28</td>
+</tr>
+<tr class="odd">
+<td>$135.0M</td>
+<td>$140.0M</td>
+<td>37</td>
+</tr>
+<tr class="even">
+<td>$140.0M</td>
+<td>$145.0M</td>
+<td>58</td>
+</tr>
+<tr class="odd">
+<td>$145.0M</td>
+<td>$150.0M</td>
+<td>49</td>
+</tr>
+<tr class="even">
+<td>$150.0M</td>
+<td>$155.0M</td>
+<td>61</td>
+</tr>
+<tr class="odd">
+<td>$155.0M</td>
+<td>$160.0M</td>
+<td>76</td>
+</tr>
+<tr class="even">
+<td>$160.0M</td>
+<td>$165.0M</td>
+<td>73</td>
+</tr>
+<tr class="odd">
+<td>$165.0M</td>
+<td>$170.0M</td>
+<td>89</td>
+</tr>
+<tr class="even">
+<td>$170.0M</td>
+<td>$175.0M</td>
+<td>73</td>
+</tr>
+<tr class="odd">
+<td>$175.0M</td>
+<td>$180.0M</td>
+<td>67</td>
+</tr>
+<tr class="even">
+<td>$180.0M</td>
+<td>$185.0M</td>
+<td>67</td>
+</tr>
+<tr class="odd">
+<td>$185.0M</td>
+<td>$190.0M</td>
+<td>65</td>
+</tr>
+<tr class="even">
+<td>$190.0M</td>
+<td>$195.0M</td>
+<td>69</td>
+</tr>
+<tr class="odd">
+<td>$195.0M</td>
+<td>$200.0M</td>
+<td>62</td>
+</tr>
+<tr class="even">
+<td>$200.0M</td>
+<td>$205.0M</td>
+<td>30</td>
+</tr>
+<tr class="odd">
+<td>$205.0M</td>
+<td>$210.0M</td>
+<td>36</td>
+</tr>
+<tr class="even">
+<td>$210.0M</td>
+<td>$215.0M</td>
+<td>13</td>
+</tr>
+<tr class="odd">
+<td>$215.0M</td>
+<td>$220.0M</td>
+<td>14</td>
+</tr>
+<tr class="even">
+<td>$220.0M</td>
+<td>$225.0M</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>$225.0M</td>
+<td>$230.0M</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>$230.0M</td>
+<td>$235.0M</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div></details>
+<p class="lx-hint">With JavaScript on, you run these studies yourself, step by step.</p>
+<!-- m7-fallback:end -->
+</div>
+</div>
+<div class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><ul>
+<li><b>Toy:</b> the waiting load of case file <a href="cf7-cost-of-waiting.html">CF7</a>, 100 MW: illustrative round numbers in one price level (no inflation). Other customers pay the utility's costs (no large-load tariff); no bridge power.</li>
+<li><b>Ranges:</b> invented around CF7's values, each uniform and drawn independently; the wait is a scenario of 12, 24 or 36 months.</li>
+<li><b>Accounts:</b> present values, each run at its own discount rate, month by month; the two accounts are never added.</li>
+<li><b>Sampling:</b> Latin hypercube, seed 7, generator mulberry32; percentiles by linear interpolation, as in <a href="k05-probability-statistics.html">K5</a>; Monte Carlo error from 20 repeats with seeds 1 to 20.</li>
+</ul></div>
+<p class="lx-hint" style="margin-top:.6rem">About 35 guided minutes in ten steps. Every run is computed in your browser; nothing is sent anywhere.</p>
+<div class="lx-card lx-notebook m7-nb">
+<p class="lx-eyebrow">Build it in Python · notebook lab, about 45 minutes, then 60 minutes of practice</p>
+<p>The same toy and the same seeded Latin hypercube in NumPy: <code>assert</code> cells check your runs against the page, then SciPy's own Latin hypercube, Spearman's ρ and variance shares (Sobol indices) take over.</p>
+<ol class="m7-nb-steps">
+<li>Download the notebook and the lesson data into one folder (in Colab, upload the data with the folder icon).</li>
+<li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy and SciPy 1.9 or later.</li>
+<li>Run all cells (a few seconds), then try the five practice tasks at the end.</li>
+</ol>
+<p class="m7-dl"><a class="lx-btn small" href="notebooks/m07-monte-carlo.ipynb" download="">Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m07-monte-carlo.json" download="">Lesson data</a></p>
+</div>
+</div>
+<div id="explain" class="lx-sec">
+<section id="what-you-just-did-as-diagrams" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="what-you-just-did-as-diagrams">What you just did, as diagrams</h2>
+</section>
+<div id="m7-explain" class="lx-xgrid">
+<div class="lx-fallback">
+<dl class="lx-ideas">
+<dt>Scenario</dt><dd>A what-if set of inputs; here the wait, 12, 24 or 36 months, each given no probability.</dd>
+<dt>One at a time</dt><dd>Swing one input across its range, the others fixed: a tornado chart; it gives no chances.</dd>
+<dt>Distribution</dt><dd>How likely each value of an input is; uniform here, every value in its range equally likely.</dd>
+<dt>Latin hypercube</dt><dd>Cuts every range into N equal slices and draws exactly once in each, for all inputs at once.</dd>
+<dt>Monte Carlo error</dt><dd>How far an estimate moves with another seed: report it with the run count.</dd>
+<dt>Rank correlation</dt><dd>Spearman's ρ ranks inputs by influence within the assumed ranges, not in the world.</dd>
+</dl>
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The formulas: the toy, the Latin hypercube, ρ and the Monte Carlo error</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong>The toy.</strong> With <span class="math inline">\(i = (1+r)^{1/12} - 1\)</span> and <span class="math inline">\(A = \frac{1 - (1+i)^{-\tau}}{i}\)</span>, the developer’s cost is <span class="math inline">\(D = (m P + K i)\,A\)</span> and other customers’ is <span class="math inline">\(R = U i A + \min(0.5,\, h\tau)\, U (1+i)^{-\tau}\)</span>.</li>
+<li><strong>Symbols.</strong> <span class="math inline">\(m\)</span> margin ($ per MW a month), <span class="math inline">\(P\)</span> = 100 MW, <span class="math inline">\(K\)</span> idle capital ($), <span class="math inline">\(r\)</span> yearly discount rate, <span class="math inline">\(U\)</span> upgrade cost ($), <span class="math inline">\(\tau\)</span> the wait (months).</li>
+<li><strong>The never-arrives chance.</strong> <span class="math inline">\(h\)</span> is in percentage points added a month, not compounded: <span class="math inline">\(h\tau\)</span> = 24 × 0.5 points = 12%, capped at 50%.</li>
+<li><strong>Latin hypercube.</strong> Run <span class="math inline">\(a\)</span>’s draw of input <span class="math inline">\(j\)</span> is <span class="math inline">\(u_{a,j} = (\pi_j(a) + \xi_{a,j})/N\)</span>, with <span class="math inline">\(\pi_j\)</span> a random ordering of <span class="math inline">\(0, \dots, N-1\)</span> and <span class="math inline">\(\xi\)</span> uniform on <span class="math inline">\([0, 1)\)</span>; the value is <span class="math inline">\(\text{lo} + u\,(\text{hi} - \text{lo})\)</span>.</li>
+<li><strong>Spearman’s ρ.</strong> The correlation of the ranks; with no ties, <span class="math inline">\(\rho = 1 - \frac{6 \sum_a d_a^2}{N (N^2 - 1)}\)</span>, where <span class="math inline">\(d_a\)</span> is run <span class="math inline">\(a\)</span>’s rank of the input minus its rank of the cost.</li>
+<li><strong>Monte Carlo error.</strong> The standard error of an estimate is the standard deviation of that estimate over 20 repeats with other seeds; 20 repeats make the error itself rough, about ± 16%.</li>
+<li><strong>What the hypercube buys.</strong> Over 20 seeds, the mean cost of 1,000 runs scatters by $0.03M with a Latin hypercube and $0.80M with plain random draws (one standard error); the P90, by $0.65M and $0.80M.</li>
+<li><strong>A share’s error.</strong> For plain random draws, K5’s <span class="math inline">\(\sqrt{p(1-p)/N}\)</span> gives 0.95 points for the 10.1% above $200M; the Latin hypercube repeats scatter by 0.52 points.</li>
+<li><strong>Near a corner.</strong> With continuous inputs, an exact corner has zero chance. Near one (the margin, capital and discount rate all in the same outer tenth of their ranges) has 0.1³ = 0.1% per corner, so 1,000 runs expect 2; seed 7 has 2, both at the high-cost end.</li>
+</ul>
+</div>
+</details>
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>What a rank correlation misses, and what comes next</summary>
+<div class="lx-deeper-body">
+<ul>
+<li><strong>Monotone effects only.</strong> ρ reads how consistently the cost rises or falls with an input. An input that matters only through another (an interaction) or pushes the cost up and then down can show ρ near 0.</li>
+<li><strong>Variance shares.</strong> Sobol indices split the variance of the cost among the inputs and their interactions; with <span class="math inline">\(k\)</span> inputs they need about <span class="math inline">\(N(k+2)\)</span> runs. The lab estimates them for this toy.</li>
+<li><strong>Inputs that move together.</strong> Draw them with a stated rank correlation (Iman and Conover’s method; the lab’s practice task 3 uses a simplified two-input version), or sample whole records from data, as <a href="k05-probability-statistics.html">K5</a> suggests.</li>
+<li><strong>Slow models.</strong> When 1,000 runs take too long, a fast stand-in fitted to a few runs does the sampling (M9, upcoming); deciding before the uncertainty resolves is M8 (upcoming).</li>
+</ul>
+</div>
+</details>
+</div>
+</div>
+<div id="check" class="lx-sec">
+<section id="check-yourself-then-try-it" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-yourself-then-try-it">Check yourself, then try it</h2>
+</section>
+<div class="lx-myths" data-quiz="m7-myth">
+<div class="lx-qq" data-id="p90" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “A P90 of $200.1M means a 10% chance that the real wait costs more.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. 10% of runs cost more, under the assumed ranges, uniform shapes and independent inputs. Change any of those and the P90 moves.</p></details>
+</div>
+<div class="lx-qq" data-id="runs" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “With 1,000 runs, a Monte Carlo answer is exact.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Over 20 seeds, the P90 of 1,000 runs scatters by ± $1.3M (2 standard errors). More runs shrink that; no run count fixes a wrong range.</p></details>
+</div>
+<div class="lx-qq" data-id="rank" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “The input with the largest rank correlation matters most in the real world.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. ρ ranks inputs within the ranges you assumed: narrow the margin's to ± $5,000 and it drops from first to third.</p></details>
+</div>
+</div>
+
+<div class="lx-quiz" data-quiz="m7">
+<div class="lx-qq" data-id="share" data-answer="a">
+<p class="lx-qtext">50 of 1,000 random runs exceed a budget. The share, with its standard error from K5's formula?</p>
+<ul class="lx-choices"><li data-value="a">5.0% ± 0.7 points</li><li data-value="b">5.0% ± 5.0 points</li><li data-value="c">50% ± 1.6 points</li><li data-value="d">5.0%, exactly</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>5.0% ± 0.7 points: √(0.05 × 0.95 ÷ 1,000) = 0.0069, about 0.7 percentage points.</p></details>
+</div>
+<div class="lx-qq" data-id="report" data-answer="c">
+<p class="lx-qtext">A report says only “P90 cost: $200M”. What should it add first?</p>
+<ul class="lx-choices"><li data-value="a">More decimal places</li><li data-value="b">The cost at the base inputs</li><li data-value="c">Ranges and shapes, run count, seed and scatter</li><li data-value="d">The name of the computer it ran on</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>The inputs, the run count, the seed and the scatter: without them nobody can judge or repeat the P90.</p></details>
+</div>
+</div>
+<div class="lx-card lx-case-try">
+<p class="lx-eyebrow">Try it yourself with open code</p>
+<p class="lx-hint">Optional, about 30 minutes; needs Python 3.10 or later (<a href="b02-python-data.html">lesson B2</a>).</p>
+<ul>
+<li>Clone and install the repository (its README's quick start), then write the illustrative files: <code>code-delay example my_scenario.json --grid grid.json --ranges ranges.json</code>.</li>
+<li>Run <code>code-delay lhs my_scenario.json ranges.json --samples 500 --seed 1 --out-dir outputs/lhs</code>; open <code>rank_correlations.csv</code>.</li>
+<li>Rerun with <code>--seed 2</code>. Do any two inputs swap places? Then treat them as tied, as step 9 does.</li>
+</ul>
+<p><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a>: public example repository · MIT licence · illustrative inputs.</p>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="numbers-sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="numbers-sources-and-whats-next">Numbers, sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-card">
+<p class="lx-eyebrow">Numbers to remember</p>
+
+<table class="lx-facts caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Number</th>
+<th data-quarto-table-cell-role="th" scope="col">What it means</th>
+<th data-quarto-table-cell-role="th" scope="col">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="n">$200.1M ± $1.3M</td>
+<td>The toy's P90 for a 24-month wait: 1,000 Latin hypercube runs, seed 7, ± 2 standard errors over 20 seeds.</td>
+<td class="s">This lesson's model (illustrative)</td>
+</tr>
+<tr class="even">
+<td class="n">× 10 runs, ÷ √10 scatter</td>
+<td>Ten times the runs cut the P90's scatter from ± $4.7M to ± $1.3M, close to the square-root rule.</td>
+<td class="s">This lesson's model; <a href="k05-probability-statistics.html">K5</a></td>
+</tr>
+<tr class="odd">
+<td class="n">0.1³ = 1 in 1,000</td>
+<td>The chance, under these inputs, that the margin, capital and discount rate all land in the top tenth of their ranges: near the high-cost corner. 2 of the 1,000 runs did.</td>
+<td class="s">This lesson's model</td>
+</tr>
+<tr class="even">
+<td class="n">ρ = 0.86</td>
+<td>The margin's rank correlation with the developer's cost, within the assumed ranges.</td>
+<td class="s">This lesson's model</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div class="lx-stack">
+<!-- learn:next:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-next lx-card" data-next-id="">
+<p class="lx-eyebrow">Keep going</p>
+<p class="lx-next-t"><a href="index.html">Back to the course map</a></p>
+<p class="lx-next-d"><strong>Related lab:</strong> a NumPy notebook that reruns the page's seeded study and checks it, then SciPy's Latin hypercube, rank correlations and variance shares, about 45 minutes, then 60 minutes of practice.</p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="m07-monte-carlo" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+<!-- learn:next:end -->
+<div class="lx-card lx-real">
+<p class="lx-eyebrow">Where this came up in research</p>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:code"><p>A present-value framework turns the delayed computing capacity into the grid MW it needs and prices the delay in three ledgers.</p><p>Inputs are screened with Latin hypercube sampling.</p><p>The delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.</p><footer>Approved excerpt of: Li et al. (2026), accepted paper, 2026 North American Power Symposium (NAPS); DOI pending.</footer></blockquote>
+<p>The whole case, with its accounts and a toy of its own: <a href="cf7-cost-of-waiting.html">CF7, the cost of waiting</a>. This page's toy borrows CF7's load. Illustrative round numbers, not the study's inputs, equations or results.</p>
+</div>
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>McKay, M. D., Beckman, R. J., and Conover, W. J. (1979). <a href="https://doi.org/10.1080/00401706.1979.10489755">A Comparison of Three Methods for Selecting Values of Input Variables in the Analysis of Output from a Computer Code</a>. <em>Technometrics</em>, 21(2), 239–245. The Latin hypercube.</li>
+<li>Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., and Tarantola, S. (2008). <a href="https://doi.org/10.1002/9780470725184">Global Sensitivity Analysis: The Primer</a>. Wiley.</li>
+<li>Saltelli, A., Annoni, P., Azzini, I., Campolongo, F., Ratto, M., and Tarantola, S. (2010). <a href="https://doi.org/10.1016/j.cpc.2009.09.018">Variance based sensitivity analysis of model output. Design and estimator for the total sensitivity index</a>. <em>Computer Physics Communications</em>, 181(2), 259–270. The lab's variance shares.</li>
+<li>Iman, R. L., and Conover, W. J. (1982). <a href="https://doi.org/10.1080/03610918208812265">A distribution-free approach to inducing rank correlation among input variables</a>. <em>Communications in Statistics – Simulation and Computation</em>, 11(3), 311–334. The lab's practice task 3.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a> on GitHub, version 1.0.2 (2 November 2026).</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- learn:footer:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20What%20could%20happen?%20Scenarios%2C%20Monte%20Carlo%20and%20global%20sensitivity">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+<!-- learn:footer:end -->
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/m07-monte-carlo.js" defer=""></script>
+
+
+
+</main> <!-- /main -->
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
+                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only) ----------
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  let done = false;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function insert() {
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    box.hidden = false;
+    body.appendChild(frag);
+    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+  }
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
