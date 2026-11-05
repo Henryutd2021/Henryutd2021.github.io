@@ -12,33 +12,59 @@
   function kilo(v) { var r = Math.round(v); return (r < 0 ? "−" : "") + Math.abs(r).toLocaleString("en-US"); }
   function price(v) { var r = Math.round(v); return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
   function moneyK(v) { var r = Math.round(v / 1000) * 1000; return (r < 0 ? "−$" : "$") + Math.abs(r).toLocaleString("en-US"); }
+  // the largest gap between the three zones' prices in any hour of the run, $/MWh
+  function spread(R) {
+    var m = 0;
+    R.days.forEach(function (d) { d.hours.forEach(function (h) { var p = h.z.map(function (x) { return x.price; }); m = Math.max(m, Math.max.apply(null, p) - Math.min.apply(null, p)); }); });
+    return m;
+  }
   // what a run says, one idea a line; R: E2.summarize's results, P: the prepared data. Never more than the run shows.
+  // A link set to 0 MW is open: nothing flows, so it never "reaches its limit", and the zones on its two sides are priced
+  // on their own (SB2 review finding 1); the equal-price line is said only when the prices are within a cent every hour.
   function says(R, P) {
     var T = R.tot, out = [], zn = function (i) { return P.zones[i].name; };
     var shortZ = T.shedZ.map(function (v, i) { return { i: i, v: v }; }).filter(function (x) { return x.v > 0.5; });
     if (shortZ.length) out.push({ kind: "bad", text: "**" + kilo(T.shed) + " MWh unserved** in " + shortZ.map(function (x) { return zn(x.i) + " (" + kilo(x.v) + " MWh)"; }).join(" and ") + ": in those hours the zone's price is the $" + kilo(P.cfg.voll) + "/MWh penalty for unserved load." });
     else out.push({ kind: "good", text: "**Every MWh served** in all " + R.hours + " hours." });
     if (T.rshort > 0.5) out.push({ kind: "bad", text: "**Reserve short by " + kilo(T.rshort) + " MWh** over " + kilo(R.rshortHours) + " hours: each MWh short costs the model $" + kilo(P.cfg.reserveShort) + ", and the reserve price shows it." });
+    var open = 0;
     P.links.forEach(function (l) {
-      var n = T.cong[l.id], a = P.zix[l.from], b = P.zix[l.to], split = 0;
-      R.days.forEach(function (d) { d.hours.forEach(function (h) { var cap = R.sys.caps[l.id]; if (cap > 0 && Math.abs(h.f[l.id]) >= cap - 1e-6 && Math.abs(h.z[a].price - h.z[b].price) >= 0.5) split++; }); });
-      if (n > 0) out.push({ kind: "", text: "**" + l.name + " at its limit for " + kilo(n) + " of " + R.hours + " hours;** in " + (split === n ? (n === 1 ? "that hour" : "all of them") : kilo(split) + " of them") + " the prices on its two sides differ by $1/MWh or more ([[congestion|congestion]])." });
+      var n = T.cong[l.id], a = P.zix[l.from], b = P.zix[l.to], cap = R.sys.caps[l.id], split = 0;
+      R.days.forEach(function (d) { d.hours.forEach(function (h) { if ((cap === 0 || Math.abs(h.f[l.id]) >= cap - 1e-6) && Math.abs(h.z[a].price - h.z[b].price) >= 0.5) split++; }); });
+      if (cap === 0) { open++; out.push({ kind: "", text: "**" + l.name + " is open (set to 0 MW):** nothing flows on it, so " + zn(a) + " and " + zn(b) + " are each priced on their own; their prices differ by $1/MWh or more in " + kilo(split) + " of " + R.hours + " hours." }); }
+      else if (n > 0) out.push({ kind: "", text: "**" + l.name + " at its limit for " + kilo(n) + " of " + R.hours + " hours;** in " + (split === n ? (n === 1 ? "that hour" : "all of them") : kilo(split) + " of them") + " the prices on its two sides differ by $1/MWh or more ([[congestion|congestion]])." });
     });
-    if (P.links.every(function (l) { return T.cong[l.id] === 0; })) out.push({ kind: "", text: "**No link reaches its limit,** so the three zones' prices stay within a cent of each other every hour." });
-    out.push({ kind: "", text: "**" + moneyK(T.upliftAll) + " of uplift:** what committed units' running, no-load and start-up costs exceed their revenue at these prices, paid on top (make-whole)." });
+    if (!open && P.links.every(function (l) { return T.cong[l.id] === 0; })) {
+      var sp = spread(R);
+      out.push({ kind: "", text: sp < 0.01 ? "**No link reaches its limit,** so the three zones' prices stay within a cent of each other every hour." : "**No link reaches its limit,** yet the zones' prices differ by up to " + price(sp) + "/MWh in some hour." });
+    }
+    out.push({ kind: "", text: "**" + moneyK(T.upliftAll) + " of [[uplift|uplift]]:** what committed units' running, [[no-load-cost|no-load]] and start-up costs exceed their revenue at these prices, paid on top (make-whole)." });
+    return out;
+  }
+  // the money card's notes, one idea a line (the large load's line follows the shortfall rule: a zone's unserved load is
+  // shared in proportion to each customer's load that hour, the large load's after its own curtailment)
+  function notes(R, P) {
+    var T = R.tot, out = ["Production cost " + moneyK(T.prod) + ": running " + moneyK(T.running) + ", no-load " + moneyK(T.noload) + ", start-up " + moneyK(T.startup) + " (2025 dollars; penalties not included).",
+      "CO₂ " + kilo(T.co2) + " t, from the fuel burned (EIA's coefficients; operating only). Wind and sun spilled: " + kilo(T.spill) + " MWh.",
+      "Congestion rent " + moneyK(T.rent) + ": what loads pay minus what plants earn when a link is at its limit."];
+    if (R.sys.ll > 0) out.push("The large load: " + kilo(T.llMWh) + " MWh served at " + price(R.llAvg) + "/MWh on average (" + moneyK(T.llPay) + ")" +
+      (T.curtail > 0.5 ? "; it curtailed " + kilo(T.curtail) + " MWh at its $" + kilo(R.sys.bid) + "/MWh bid" : "") +
+      (T.llShed > 0.5 ? "; " + kilo(T.llShed) + " MWh of it unserved, its share of " + P.zones[P.zix[R.sys.llz]].name + "'s shortfall in proportion to load" : "") + ".");
     return out;
   }
   // the readouts beside the controls: [label, value, tone]
   function readouts(R, P) {
     var T = R.tot, ti = P.zix.T;
     return [["Production cost", moneyK(T.prod), ""], ["Average price, Prairie Town", price(R.avgPrice[ti]) + "/MWh", ""],
-      ["Unserved", kilo(T.shed) + " MWh", T.shed > 0.5 ? "bad" : "good"], ["Town–Metro at its limit", kilo(T.cong.TM) + " h", ""]];
+      ["Unserved", kilo(T.shed) + " MWh", T.shed > 0.5 ? "bad" : "good"], ["Town–Metro at its limit", R.sys.caps.TM === 0 ? "open (0 MW)" : kilo(T.cong.TM) + " h", ""]];
   }
-  var page = { says: says, readouts: readouts, kilo: kilo, price: price, moneyK: moneyK,
+  var page = { says: says, notes: notes, spread: spread, readouts: readouts, kilo: kilo, price: price, moneyK: moneyK,
+    TABLE_HINT: "**Table coverage:** only units with an on/off decision. [[peaker|Peakers]] start within minutes and have no minimum output, so the model gives them none.",
+    START_HINT: "**Starting conditions:** the first day assumes any units on at 00:00 were already running, so their earlier start-up costs are left out. Later days carry the state of 23:00 forward.",
     GROUPS: [{ title: "The period", fields: ["per"], hint: "Real 2025 days of the Southwest Power Pool grid, scaled to the three zones." },
-      { title: "A large load (a data center)", fields: ["ll", "llz", "flex", "bid"], color: "var(--lx-demand)", hint: "A load only: flat, every hour, where you connect it; a share of it can stop when the price is high." },
+      { title: "A large load (a data center)", fields: ["ll", "llz", "flex", "bid"], color: "var(--lx-demand)", hint: "A load only, flat every hour. Its flexible share can [[demand-response|curtail]] (cut its own use) when serving it would cost more than its bid; a partial cut can set the price equal to the bid." },
       { title: "The links", fields: ["wt", "tm"], color: "var(--lx-tier-4)", hint: "Each link carries at most its limit, either way." },
-      { title: "Reserves and fuel", fields: ["res", "gas"], color: "var(--lx-cc)", hint: "Spare capacity held every hour; the gas price sets most plants' running costs." }] };
+      { title: "Reserves and fuel", fields: ["res", "gas"], color: "var(--lx-cc)", hint: "[[reserves|Operating reserve]]: spare capacity held every hour. Gas is priced per [[mmbtu|MMBtu]] (a million British thermal units of heat) and sets most plants' running costs." }] };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E2) return;
 
@@ -108,14 +134,10 @@
         U.seg(row, "Day shown", vals, names, 0, showDay);
       }
       showDay(0);
-      H("p", { class: "lx-hint", text: "Peakers start within minutes and have no minimum output, so they have no on/off decision; the table shows only the units that do. The first day starts each unit in whatever state suits 00:00; later days carry the state of 23:00." }, c3);
+      [page.TABLE_HINT, page.START_HINT].forEach(function (t) { H("p", { class: "lx-hint", html: LX.rich(t).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>") }, c3); });
       var c4 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Energy, starts and uplift" }, c4);
       U.moneyTable(c4, P, R);
-      var T = R.tot, notes = ["Production cost " + moneyK(T.prod) + ": running " + moneyK(T.running) + ", no-load " + moneyK(T.noload) + ", start-up " + moneyK(T.startup) + " (2025 dollars; penalties not included).",
-        "CO₂ " + kilo(T.co2) + " t, from the fuel burned (EIA's coefficients; operating only). Wind and sun spilled: " + kilo(T.spill) + " MWh.",
-        "Congestion rent " + moneyK(T.rent) + ": what loads pay minus what plants earn when a link is at its limit."];
-      if (R.sys.ll > 0) notes.push("The large load: " + kilo(T.llMWh) + " MWh served at " + price(R.llAvg) + "/MWh on average (" + moneyK(T.llPay) + ")" + (T.curtail > 0.5 ? "; " + kilo(T.curtail) + " MWh curtailed above its $" + kilo(R.sys.bid) + "/MWh price" : "") + ".");
-      var ul = H("ul", { class: "e2-notes" }, c4); notes.forEach(function (t) { H("li", { text: t }, ul); });
+      var ul = H("ul", { class: "e2-notes" }, c4); page.notes(R, P).forEach(function (t) { H("li", { text: t }, ul); });
     }
 
     // ---- how the engine works
@@ -129,8 +151,8 @@
       ["Settle", "A unit whose day's revenue at those prices misses its running, no-load and start-up costs is paid the difference: [[uplift|uplift]]."]]
       .forEach(function (s, i) { var li = H("li", null, fl); li.innerHTML = "<b>" + (i + 1) + ". " + s[0] + "</b> " + LX.rich(s[1]); });
     LX.Boundary(H("div", { class: "lx-xcard" }, x), { title: "Where the engine's answer holds",
-      holds: ["the three zones share 2025's weather and the loads follow SPP's 2025 shapes, scaled", "each link carries any flow up to its limit (a [[transport-model|transport model]])", "each day is committed alone, knowing its own load, wind and sun exactly", "units never fail and fuel is always there"],
-      leaves: ["power-flow physics, losses and voltage (M1 and A17)", "ramp limits, and the next day when a day is committed", "forecast errors and outages: adequacy needs another tool (A5; C2's check)", "prices from the mixed-integer program itself"],
+      holds: ["the three zones share 2025's weather and the loads follow SPP's 2025 shapes, scaled", "each link carries any flow up to its limit (a [[transport-model|transport model]])", "each day is committed alone, knowing its own load, wind and sun exactly", "the first day starts with any units already on, their earlier start-ups not counted", "units never fail and fuel is always there"],
+      leaves: ["power-flow physics, losses and voltage (M1 and A17)", "ramp limits, and the next day when a day is committed", "forecast errors and outages: adequacy needs another tool (A5; C2's check)", "whether the reserve could reach a zone after a failure: it is one region-wide total", "prices from the mixed-integer program itself"],
       source: "The Plains Grid is fictional; plant data illustrative; fuel prices EIA 2025; 2025 dollars." });
 
     // ---- the first run, once the bench is in view (the solver loads then: about 3.5 MB, once)

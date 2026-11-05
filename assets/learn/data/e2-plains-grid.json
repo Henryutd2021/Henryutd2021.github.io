@@ -304,14 +304,14 @@
    "bat": {
     "label": "Battery cost",
     "unit": "$/kW-year",
-    "def": 179,
+    "def": 178,
     "lo": 134,
-    "hi": 268,
+    "hi": 267,
     "step": 1,
-    "basis": "NREL's 2024 cost, $372/kW plus $241/kWh for 4 hours (2024 dollars, ×1.028 to 2025), 4% of it a year of upkeep, paid over 15 years at 4% real",
+    "basis": "NREL's 2024 cost, $372/kW plus $241/kWh for 4 hours (2024 dollars, ×1.0263 to 2025 by BEA's GDP deflator), 4% of it a year of upkeep, paid over 15 years at 4% real",
     "src": [
      "nrel-battery-2025",
-     "eia-steo-9a",
+     "bea-nipa-119",
      "atb2025-fin"
     ],
     "powerCapex": 372,
@@ -345,8 +345,8 @@
    "note": "4% real cost of capital (a round value inside the 2025 ATB's financing range, as in lesson 13)"
   },
   "deflator": {
-   "2024": 125.43,
-   "2025": 128.989
+   "2024": 125.587,
+   "2025": 128.893
   },
   "bid": 500
  },
@@ -395,10 +395,10 @@
    "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
    "asOf": "checked 2 Nov 2026"
   },
-  "eia-steo-9a": {
-   "text": "EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2024 125.430, 2025 128.989",
-   "url": "https://www.eia.gov/outlooks/steo/",
-   "asOf": "October 2026 issue (1 Oct 2026)"
+  "bea-nipa-119": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "last revised 29 October 2026; accessed 5 November 2026"
   }
  },
  "precomputed": {
@@ -469,11 +469,11 @@
     ],
     [
      "Default: other customers against today's grid, a year",
-     "+$68.3M"
+     "+$68.6M (26-day estimate) · +$89.7M (every day of 2025)"
     ],
     [
      "Default: the large load pays, a year",
-     "$82.9M"
+     "$82.6M (26-day estimate) · $85.3M (every day of 2025)"
     ],
     [
      "Default: hard weeks, unserved · Town's highest price (conditional on the commitment)",
@@ -493,11 +493,11 @@
     ],
     [
      "Reference: other customers against today's grid, a year",
-     "+$72.3M"
+     "+$72.3M (26-day estimate) · +$89.9M (every day of 2025)"
     ],
     [
      "Reference: the large load pays, a year",
-     "$91.5M"
+     "$91.5M (26-day estimate) · $93.0M (every day of 2025)"
     ],
     [
      "Reference: hard weeks, unserved · Town's highest price (conditional on the commitment)",
@@ -505,20 +505,12 @@
     ],
     [
      "Reference: loss-of-load expectation (90% interval)",
-     "0.08 days a year (0.05 to 0.10)"
+     "0.08 days a year (0.05 to 0.1003)"
     ]
    ],
    "note": "Precomputed with this engine on 5 November 2026; today's grid: 0.08 loss-of-load days a year. Without JavaScript, write the note on the reference plan from these numbers, naming the plan in words in place of a link."
   },
   "c2base": {
-   "100": {
-    "pay": 606331919.773425,
-    "rent": 37542686.86000003,
-    "uplift": 8866165.025986219,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
    "150": {
     "pay": 606331919.773425,
     "rent": 37542686.86000003,
@@ -527,58 +519,10 @@
     "prod": 384953790.95153075,
     "co2": 5042057.75209996
    },
-   "200": {
-    "pay": 606331923.525817,
-    "rent": 37542686.93360002,
-    "uplift": 8866163.21392612,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
    "250": {
     "pay": 606331926.70691,
     "rent": 37542687.05760002,
     "uplift": 8866161.896511216,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
-   "300": {
-    "pay": 606331929.9608771,
-    "rent": 37542687.32840002,
-    "uplift": 8866160.647000553,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
-   "350": {
-    "pay": 606331933.6848705,
-    "rent": 37542687.602000006,
-    "uplift": 8866159.058008833,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
-   "400": {
-    "pay": 606331936.258045,
-    "rent": 37542687.847600006,
-    "uplift": 8866157.79013165,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
-   "450": {
-    "pay": 606331937.8204271,
-    "rent": 37542687.9244,
-    "uplift": 8866156.264295788,
-    "served": 21719924,
-    "prod": 384953790.95153075,
-    "co2": 5042057.75209996
-   },
-   "500": {
-    "pay": 606331939.7305424,
-    "rent": 37542687.97560002,
-    "uplift": 8866154.476412723,
     "served": 21719924,
     "prod": 384953790.95153075,
     "co2": 5042057.75209996
@@ -594,7 +538,7 @@
     "res": 250,
     "share": 50,
     "cpk": 74,
-    "cbat": 179,
+    "cbat": 178,
     "cup": 15
    },
    "A": {
@@ -782,6 +726,10 @@
     "maxT": 45.43
    },
    "co2": 6114567,
+   "full": {
+    "ll": 92996596.70853156,
+    "delta": 89869097.39084113
+   },
    "exemplars": {
     "title": "Two notes on the same brief",
     "task": "Recommend how much of the 300 MW connects this year, what to build so the grid stays adequate, and who pays.",
@@ -829,11 +777,11 @@
        ".\n",
        "Adequacy: ",
        {
-        "text": "0.08 loss-of-load days a year (90% interval 0.05 to 0.10), against 0.08 for today's grid and 7.6 if the load connects with nothing built",
-        "note": "The criterion's measure, its Monte Carlo interval and two baselines."
+        "text": "0.08 loss-of-load days a year (90% interval 0.05 to 0.1003: the point estimate meets the 0.1 criterion, the interval crosses it), against 0.08 for today's grid and 7.6 if the load connects with nothing built",
+        "note": "The criterion's measure, its Monte Carlo interval with the warning it carries, and two baselines."
        },
        ".\n",
-       "Sensitivity: ",
+       "Sensitivity (chart attached): ",
        {
         "text": "with these builds held fixed, 0.01 days at 0 MW, 0.02 days at 100 MW, 0.04 days at 200 MW, 0.08 days at 300 MW connected",
         "note": "One input moved, the plan held fixed: where the margin runs out."
@@ -847,8 +795,8 @@
        ".\n",
        "Who pays: ",
        {
-        "text": "the large load $91.5M a year, half the new costs directly; other customers $72.3M a year more than today, from $68.6M to $80.6M across the cost ranges",
-        "note": "Both parties on one boundary, a year, 2025 dollars, with the range the costs allow."
+        "text": "on the 26-day estimate, the large load $91.5M a year, half the new costs directly, and other customers $72.3M a year more than today ($68.6M to $80.6M across the cost ranges); every day of 2025 gives $93.0M and $89.9M",
+        "note": "Both parties on one boundary, a year, 2025 dollars, with the range the costs allow and the estimate checked against a full year."
        },
        ".\n",
        "Emissions: ",
@@ -872,13 +820,30 @@
   "c2check": [
    {
     "label": "Connect it, build nothing",
+    "plan": {
+     "conn": 300,
+     "flex": 0,
+     "pk": 0,
+     "bat": 0,
+     "up": 0,
+     "res": 250,
+     "share": 0,
+     "cpk": 74,
+     "cbat": 178,
+     "cup": 15
+    },
     "est": {
      "prod": 448268262.83187383,
      "priceT": 32.1318723913601,
      "uplift": 11433044.048610354,
      "co2": 6235627.2120294,
      "shed": 122.61942183233649,
-     "cong": 419
+     "cong": 419,
+     "pay": 728397585.0378803,
+     "rent": 10963474.4872,
+     "served": 24347801.380578168,
+     "ll": 2627948.994420145,
+     "llPay": 82559338.01111531
     },
     "f25": {
      "prod": 463044959.251538,
@@ -886,7 +851,12 @@
      "uplift": 6290477.151168801,
      "co2": 6309554.872578022,
      "shed": 269.75068150446737,
-     "cong": 1656
+     "cong": 1656,
+     "pay": 789543895.414921,
+     "rent": 41942451.881200016,
+     "served": 24575558.249318503,
+     "ll": 2627884.7475772975,
+     "llPay": 89145617.78278229
     },
     "f24": {
      "prod": 463888592.4295834,
@@ -894,18 +864,40 @@
      "uplift": 6827475.554080669,
      "co2": 6360549.809991198,
      "shed": 301.611231907654,
-     "cong": 1443
+     "cong": 1443,
+     "pay": 813568672.2428219,
+     "rent": 46894583.044899985,
+     "served": 24575526.38876822,
+     "ll": 2627872.338471395,
+     "llPay": 96668664.10755165
     }
    },
    {
     "label": "Peakers and an uprate",
+    "plan": {
+     "conn": 300,
+     "flex": 0,
+     "pk": 6,
+     "bat": 0,
+     "up": 300,
+     "res": 250,
+     "share": 0,
+     "cpk": 74,
+     "cbat": 178,
+     "cup": 15
+    },
     "est": {
      "prod": 447811265.48172015,
      "priceT": 28.81989075046675,
      "uplift": 11100858.185744647,
      "co2": 6114567.238926539,
      "shed": 0,
-     "cong": 0
+     "cong": 0,
+     "pay": 703646052.0473441,
+     "rent": 0,
+     "served": 24347924,
+     "ll": 2628000,
+     "llPay": 75492561.888
     },
     "f25": {
      "prod": 460484508.44722766,
@@ -913,7 +905,12 @@
      "uplift": 4855945.156328788,
      "co2": 6249805.5034696115,
      "shed": 0,
-     "cong": 5
+     "cong": 5,
+     "pay": 749449524.3052716,
+     "rent": 19281553.102799997,
+     "served": 24575828.000000007,
+     "ll": 2628000,
+     "llPay": 79761616.1367
     },
     "f24": {
      "prod": 461723995.37822413,
@@ -921,18 +918,40 @@
      "uplift": 4628092.4770041965,
      "co2": 6306336.595546977,
      "shed": 0,
-     "cong": 7
+     "cong": 7,
+     "pay": 751538094.6551565,
+     "rent": 16825757.448599994,
+     "served": 24575828.000000127,
+     "ll": 2628000,
+     "llPay": 79885842.19290006
     }
    },
    {
     "label": "Flexible load and a battery",
+    "plan": {
+     "conn": 300,
+     "flex": 20,
+     "pk": 0,
+     "bat": 100,
+     "up": 0,
+     "res": 250,
+     "share": 0,
+     "cpk": 74,
+     "cbat": 178,
+     "cup": 15
+    },
     "est": {
      "prod": 447654398.87357503,
      "priceT": 29.11495854625389,
      "uplift": 13289466.62990016,
      "co2": 6218245.122106348,
      "shed": 0,
-     "cong": 455
+     "cong": 455,
+     "pay": 705759520.5359011,
+     "rent": 747032.8967364703,
+     "served": 24347924,
+     "ll": 2628000,
+     "llPay": 76269792.5613141
     },
     "f25": {
      "prod": 461635044.6423561,
@@ -940,7 +959,12 @@
      "uplift": 6859955.884333592,
      "co2": 6286410.015559892,
      "shed": 0,
-     "cong": 2012
+     "cong": 2012,
+     "pay": 733895298.6969408,
+     "rent": 18208462.754453517,
+     "served": 24575828.000000007,
+     "ll": 2628000,
+     "llPay": 72116635.39816406
     },
     "f24": {
      "prod": 462625431.1412068,
@@ -948,18 +972,40 @@
      "uplift": 7056252.931588522,
      "co2": 6336558.385454903,
      "shed": 0,
-     "cong": 1825
+     "cong": 1825,
+     "pay": 740502500.4780207,
+     "rent": 15475411.410146767,
+     "served": 24575828.000000127,
+     "ll": 2628000,
+     "llPay": 74289374.96761507
     }
    },
    {
     "label": "Stage it: 150 MW now",
+    "plan": {
+     "conn": 150,
+     "flex": 0,
+     "pk": 0,
+     "bat": 0,
+     "up": 0,
+     "res": 250,
+     "share": 0,
+     "cpk": 74,
+     "cbat": 178,
+     "cup": 15
+    },
     "est": {
      "prod": 412615073.9752135,
      "priceT": 25.125796164440708,
      "uplift": 10224834.318188582,
      "co2": 5502146.914595661,
      "shed": 0,
-     "cong": 1425
+     "cong": 1425,
+     "pay": 652280411.235318,
+     "rent": 15331321.741200006,
+     "served": 23033924,
+     "ll": 1314000,
+     "llPay": 32388852.411300004
     },
     "f25": {
      "prod": 431343615.03445834,
@@ -967,7 +1013,12 @@
      "uplift": 6933712.931325981,
      "co2": 5733912.463865052,
      "shed": 0,
-     "cong": 2576
+     "cong": 2576,
+     "pay": 666660064.0202842,
+     "rent": 28367864.8564,
+     "served": 23261828,
+     "ll": 1314000,
+     "llPay": 29227271.71275002
     },
     "f24": {
      "prod": 430885376.9314756,
@@ -975,7 +1026,12 @@
      "uplift": 5854282.726613728,
      "co2": 5779957.128977541,
      "shed": 0,
-     "cong": 2386
+     "cong": 2386,
+     "pay": 675016305.2720286,
+     "rent": 26339951.27320002,
+     "served": 23261828.000000127,
+     "ll": 1314000,
+     "llPay": 30133933.63470002
     }
    }
   ],
@@ -997,6 +1053,24 @@
     0.10027678542937112
    ],
    "lolDays": 31
+  },
+  "c2checkBase": {
+   "f25": {
+    "pay": 613983687.929218,
+    "rent": 42567629.11160001,
+    "uplift": 7442163.44180968,
+    "served": 21947828,
+    "prod": 405391062.89581966,
+    "co2": 5271130.415019047
+   },
+   "f24": {
+    "pay": 614324338.8196448,
+    "rent": 44380071.70680004,
+    "uplift": 6733316.975000736,
+    "served": 21947828.000000127,
+    "prod": 405026769.9170752,
+    "co2": 5343991.577955496
+   }
   }
  }
 }

@@ -4,7 +4,9 @@
 //     engine's precomputed run of the default plan and the 300 MW preset (data file, `precomputed.sb2`), equal to a
 //     fresh run; the inputs table is E2.inputsHTML of the data file
 //   - every number the page states (the brief, the data note, the periods, the tie rule) against the data and the engine
-//   - the run's words (says, readouts): true for every preset on every period, never more than the run shows
+//   - the run's words (says, notes, readouts): true for every preset on every period and for plans with a link set to
+//     0 MW (open: nothing flows, each side priced on its own; review finding 1), never more than the run shows; the
+//     large load's served energy and its share of a shortfall (finding 2)
 //   - the page frame: the sandbox sections, scripts, data-src, the engine in the bundle; prices named as conditional on
 //     the commitment; no nuclear term on the page, in its script, the engine or the data (guard G-DC); no AI wording;
 //     links only to live lessons and allowed sources (the scope scan checks the rest)
@@ -63,30 +65,60 @@ function rowsOf(E2, P, R, tag) {
   ok(cfg.tie.spill[0] < cfg.tie.spill[1] && cfg.tie.spill[1] < cfg.tie.spill[2] && cfg.zones.map(z => z.id).join() === "W,T,M", "tie rule as the page says: Wind Ridge's spill first, then Prairie Town's, then Metro's");
   ok(cfg.tie.shed[2] < cfg.tie.shed[1] && cfg.tie.shed[1] < cfg.tie.shed[0], "tie rule as the page says: Metro's load shed first, then Prairie Town's, then Wind Ridge's");
   ok(Math.max(...cfg.tie.spill, ...cfg.tie.shed, cfg.tie.reserve, cfg.tie.battery + 23 * cfg.tie.batteryHour) < 0.01, "every tie cost is below a cent per MWh, as the page says");
-  has("moves 0.001 MWh up equals the slope when it moves down", "the engine test's step");
-  ok(/bump: \{ row, d: 1e-3 \}/.test(fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e2-engine.js"), "utf8")), "the engine test moves each row by 0.001 MWh");
+  const ET = fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e2-engine.js"), "utf8"), nCases = (ET.slice(ET.indexOf("const cases = ["), ET.indexOf("const shown")).match(/\["(SB2|C2) /g) || []).length;
+  has("runs seven benchmark plans again with the tie weights ×10 and ×0.1: every number shown stays the same", "the engine test's cases");
+  ok(nCases === 7 && /for \(const k of \[10, 0\.1\]\)/.test(ET), "the engine test runs seven benchmark plans with the ties ×10 and ×0.1 (" + nCases + ")");
+  has("moves 0.001 MWh up and when it moves down: no price sits on a corner. Your own plans are not checked this way.", "the engine test's step; the claim covers the benchmark runs only (review finding 7)");
+  ok(/bump: \{ row, d: 1e-3 \}/.test(ET), "the engine test moves each row by 0.001 MWh");
 
-  // ---------------- the run's words, for every preset on every period
-  let wordsOk = true, notes = [];
-  for (const per of P.periodList) for (const pr of E2.presets) {
-    const st = Object.assign({}, def, pr.state, { per }), r = await E2.solve(st, P, { solver });
-    if (!r.ok) { wordsOk = false; notes.push(per + "/" + pr.id + " " + r.status); continue; }
-    const R = r.results, S = PG.says(R, P), txt = S.map(s => s.text).join(" ");
+  // ---------------- the run's words, for every preset on every period, and for plans with a link open (0 MW)
+  let wordsOk = true, notes = [], nRuns = 0, seen = { open: 0, cent: 0, llShed: 0, curtail: 0 };
+  const OPEN = [["both links open, 600 MW at Town", { ll: 600, llz: "T", wt: 0, tm: 0 }], ["Town–Metro open, 300 MW at Town", { ll: 300, llz: "T", tm: 0 }],
+    ["Ridge–Town open", { wt: 0 }], ["both open, 300 MW in Metro, 30% flexible", { ll: 300, llz: "M", flex: 30, bid: 200, wt: 0, tm: 0 }]];
+  const plans = [];
+  for (const per of P.periodList) for (const pr of E2.presets) plans.push([per + "/" + pr.id, Object.assign({}, def, pr.state, { per })]);
+  for (const per of ["peak", "hot"]) for (const [nm, x] of OPEN) plans.push([per + "/" + nm, Object.assign({}, def, x, { per })]);
+  for (const [nm, st] of plans) {
+    const r = await E2.solve(st, P, { solver }); nRuns++;
+    if (!r.ok) { wordsOk = false; notes.push(nm + " " + r.status); continue; }
+    const R = r.results, S = PG.says(R, P), txt = S.map(s => s.text).join(" "), bad = w => { wordsOk = false; notes.push(nm + " " + w); };
     const shed = R.tot.shed > 0.5;
-    if (shed !== /MWh unserved/.test(txt) || (!shed && !/Every MWh served/.test(txt))) { wordsOk = false; notes.push(per + "/" + pr.id + " shed"); }
+    if (shed !== /MWh unserved/.test(txt) || (!shed && !/Every MWh served/.test(txt))) bad("shed");
+    let open = 0;
     P.links.forEach(l => {
-      const n = R.tot.cong[l.id], says = new RegExp(l.name + " at its limit for " + n + " of").test(txt);
-      if ((n > 0) !== says) { wordsOk = false; notes.push(per + "/" + pr.id + " " + l.id); }
+      const n = R.tot.cong[l.id], cap = R.sys.caps[l.id], a = P.zix[l.from], b = P.zix[l.to];
+      let split = 0; R.days.forEach(d => d.hours.forEach(h => { if ((cap === 0 || Math.abs(h.f[l.id]) >= cap - 1e-6) && Math.abs(h.z[a].price - h.z[b].price) >= 0.5) split++; }));
+      if (cap === 0) {
+        open++; seen.open++;
+        if (!txt.includes(l.name + " is open (set to 0 MW):** nothing flows on it") || !txt.includes("differ by $1/MWh or more in " + E2.kilo(split) + " of " + R.hours + " hours") || /at its limit for/.test(txt.split(l.name)[1] || "")) bad("open " + l.id);
+        if (R.days.some(d => d.hours.some(h => Math.abs(h.f[l.id]) > 1e-9))) bad("flow on an open link");
+      } else if ((n > 0) !== new RegExp(l.name + " at its limit for " + n + " of").test(txt)) bad(l.id);
     });
-    if (P.links.every(l => R.tot.cong[l.id] === 0)) {
-      const spread = Math.max(...R.days.map(d => Math.max(...d.hours.map(h => Math.max(...h.z.map(x => x.price)) - Math.min(...h.z.map(x => x.price))))));
-      if (!(spread < 0.01) || !/within a cent/.test(txt)) { wordsOk = false; notes.push(per + "/" + pr.id + " spread " + spread); }
+    const sp = PG.spread(R), cent = /within a cent/.test(txt);
+    if (cent) seen.cent++;
+    if (cent !== (!open && P.links.every(l => R.tot.cong[l.id] === 0) && sp < 0.01)) bad("cent " + sp);
+    if (/within a cent/.test(txt) && !(sp < 0.01)) bad("spread " + sp);
+    if (R.tot.rshort > 0.5 !== /Reserve short by/.test(txt)) bad("reserve");
+    // the money card's notes: the large load's served energy never above its zone's, its share of a shortfall stated
+    const N = PG.notes(R, P).join(" "), zi = P.zix[R.sys.llz];
+    if (R.sys.ll > 0) {
+      if (!N.includes("The large load: " + E2.kilo(R.tot.llMWh) + " MWh served") || R.tot.llMWh > R.served[zi] + 1e-6) bad("ll served");
+      if ((R.tot.llShed > 0.5) !== N.includes(E2.kilo(R.tot.llShed) + " MWh of it unserved, its share of " + P.zones[zi].name + "'s shortfall in proportion to load")) bad("ll shed");
+      if ((R.tot.curtail > 0.5) !== N.includes("it curtailed " + E2.kilo(R.tot.curtail) + " MWh at its $" + E2.kilo(R.sys.bid) + "/MWh bid")) bad("curtail");
+      if (R.tot.llShed > 0.5) seen.llShed++;
+      if (R.tot.curtail > 0.5) seen.curtail++;
     }
-    if (R.tot.rshort > 0.5 !== /Reserve short by/.test(txt)) { wordsOk = false; notes.push(per + "/" + pr.id + " reserve"); }
+    if (/above its|when the price is above/.test(N + txt)) bad("strict curtailment claim");
     const ro = PG.readouts(R, P);
-    if (ro[0][1] !== moneyK(R.tot.prod) || ro[2][1] !== E2.kilo(R.tot.shed) + " MWh" || ro[3][1] !== E2.kilo(R.tot.cong.TM) + " h") { wordsOk = false; notes.push(per + "/" + pr.id + " readouts"); }
+    if (ro[0][1] !== moneyK(R.tot.prod) || ro[2][1] !== E2.kilo(R.tot.shed) + " MWh" || ro[3][1] !== (R.sys.caps.TM === 0 ? "open (0 MW)" : E2.kilo(R.tot.cong.TM) + " h")) bad("readouts");
   }
-  ok(wordsOk, "the run's words and readouts are true for all " + P.periodList.length * E2.presets.length + " preset runs (" + notes.slice(0, 4).join("; ") + ")");
+  ok(wordsOk, "the run's words, notes and readouts are true for all " + nRuns + " runs: every preset on every period and eight with a link open (" + notes.slice(0, 4).join("; ") + ")");
+  ok(seen.open >= 8 && seen.cent > 0 && seen.llShed > 0 && seen.curtail > 0, "the runs cover open links, equal prices, the large load's share of a shortfall and curtailment at its bid (" + JSON.stringify(seen) + ")");
+  // curtailment at the bid: the review's case (peak-demand week, 400 MW, 20% flexible, $300/MWh): hours that curtail at
+  // exactly the bid exist, so the page never says "above"
+  { const r = await E2.solve(Object.assign({}, def, { per: "hot", ll: 400, flex: 20, bid: 300 }), P, { solver }), R = r.results, zi = P.zix.T;
+    const atBid = R.days.reduce((a, d) => a + d.hours.filter(h => h.cl > 1e-6 && Math.abs(h.z[zi].price - 300) < 1e-6).length, 0);
+    ok(r.ok && atBid > 0 && E2.schema.fields.filter(f => f.id === "bid")[0].label === "Curtailment bid" && /a partial cut can set the price equal to the bid/.test(JSON.stringify(PG.GROUPS)), "curtailment can happen at exactly the bid (" + atBid + " hours at $300/MWh): the control is the curtailment bid, and the hint says a partial cut can set the price"); }
 
   // ---------------- the page frame
   ["brief", "bench", "results", "explain", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
@@ -96,7 +128,12 @@ function rowsOf(E2, P, R, tag) {
   ok(/conditional on the commitment/.test(ENG) && (ENG.match(/conditional on the commitment/g) || []).length >= 3 && /Prices, conditional on the commitment/.test(JS), "the prices are labelled conditional on the commitment (chart caption, map note, card title)");
   ok(!/\b(nuclear|reactor|SMR|small modular)\b/i.test(PAGE + JS + ENG + fs.readFileSync(DPATH, "utf8")), "no nuclear term on the page, in its script, the engine or the data (guard G-DC)");
   ok(!/\bAI\b|artificial intelligence|Claude|ChatGPT|generated by/i.test(T + JS), "no AI wording");
-  ["mixed-integer-program", "linear-program", "transport-model", "reserves", "shadow-price"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE), "glossary mark: " + id));
+  ["mixed-integer-program", "unit-commitment", "linear-program", "transport-model", "reserves", "shadow-price"].forEach(id => ok(new RegExp('data-term="' + id + '"').test(PAGE), "glossary mark: " + id));
+  ["demand-response", "reserves", "mmbtu", "peaker", "no-load-cost", "uplift"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\|").test(JS), "the bench marks the term at first use (review finding 9): " + id));
+  ok(/data-term=\\"mmbtu\\"/.test(ENG) && /One <span[^>]*>MMBtu<\/span> is a million British thermal units/.test(PAGE), "the inputs table defines MMBtu");
+  ok(/Starting conditions:\*\* the first day assumes any units on at 00:00 were already running, so their earlier start-up costs are left out/.test(JS) && /whether the reserve could reach a zone after a failure/.test(JS) && /whether the reserve can reach each zone/.test(PAGE),
+    "the first day's free start and the reserve's deliverability are stated (review findings 5 and 8)");
+  [PG.TABLE_HINT, PG.START_HINT, PG.GROUPS[1].hint, PG.GROUPS[3].hint].forEach(t => { const n = t.replace(/\[\[[a-z-]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").split(/\s+/).length; ok(n <= 35, "within the 35-word budget (" + n + "): " + t.slice(0, 40)); });
   const desc = (PAGE.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(desc.split(/\s+/).length <= 35, "the description is within the 35-word budget (" + desc.split(/\s+/).length + " words)");
   const hrefs = [...PAGE.matchAll(/href="([^"]+)"/g)].map(m => m[1]).filter(h => !/^(https?:|mailto:|#|\.\.\/)/.test(h) && !/^index\.html(#|$)/.test(h));

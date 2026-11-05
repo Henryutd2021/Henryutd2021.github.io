@@ -2777,6 +2777,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "uprate": {
+  "term": "Uprate (of a line or link)",
+  "short": "Raising the most power a line or link may carry, for example with new conductors or a second circuit.",
+  "lesson": "SB2",
+  "href": "sb2-grid-room.html"
+ },
  "useful-energy": {
   "term": "Useful energy",
   "short": "The part of the energy bought that a device actually delivers as the wanted heat, light or motion, after its own losses.",
