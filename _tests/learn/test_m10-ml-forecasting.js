@@ -1,8 +1,9 @@
 // test_m10-ml-forecasting.js — Node tests for Modeler lesson M10 (assets/learn/m10-ml-forecasting.js, its settings file,
 // the course's town_year.json and the page learn/m10-ml-forecasting.qmd):
 //   - the clock: Central time with daylight saving (2025: 9 March 23 hours, 2 November 25), every hour ending once, the
-//     issue hour the last hour of the day before, horizons 1 to 24 (25 once); every lag the page uses is at least the
-//     horizon (no look-ahead), except the two leaks of step 5, which are proved to look ahead
+//     issue hour the last hour of the day before, horizons 1 to 24 (25 once); "same hour" is the same clock hour (a
+//     repeated one read as the later, a missing one as the hour before), always known at the issue hour (no look-ahead),
+//     except the two leaks of step 5, which are proved to look ahead
 //   - the split: train 8 January to 30 September, validate October, test November; disjoint, in time order
 //   - the regression from first principles: the Gram-matrix fit equals a direct least-squares solve on its own design;
 //     the residuals are orthogonal to every column; the best mix wins by more than 1 MW (tie rule)
@@ -69,9 +70,16 @@ ok(P.train[P.train.length - 1].i < P.val[0].i && P.val[P.val.length - 1].i < P.t
 // no look-ahead: every honest input is older than the issue hour (or is the issue hour); the leaks are not
 {
   const S = P.train.concat(P.val, P.test);
-  ok(S.every(x => x.i - M.lagDay(x) <= x.issue && x.i - 168 <= x.issue && x.issue >= 0), "every honest input (yesterday, last week, the latest actual) is known at the issue hour");
+  ok(S.every(x => x.yday >= 0 && x.wk >= 0 && x.yday <= x.issue && x.wk <= x.issue && x.issue >= 0), "every honest input (yesterday, last week, the latest actual) is known at the issue hour");
   ok(S.some(x => x.i - 1 > x.issue) && S.filter(x => x.h > 1).every(x => x.i - 1 > x.issue), "the hour before looks ahead for every hour after the first");
-  ok(P.test.filter(x => x.h === 25).every(x => M.lagDay(x) === 48), "the 25th hour of 2 November uses lag 48");
+  // same clock hour (review M10 #3): the day before and seven days before, by the stated rule
+  const dayBefore = (d, n) => new Date(Date.parse(d + "T00:00:00Z") - n * 864e5).toISOString().slice(0, 10);
+  const odd = cal.filter(x => x.yday >= 0 && (cal[x.yday].he !== x.he || cal[x.yday].date !== dayBefore(x.date, 1)));
+  ok(odd.length === 1 && odd[0].date === "2025-03-10" && odd[0].he === 3 && cal[odd[0].yday].he === 2, "same hour yesterday is the same clock hour the day before, except 10 March's hour ending 3 (none on 9 March: the hour before it, ending 2)");
+  ok(cal.filter(x => x.wk >= 0 && (cal[x.wk].he !== x.he || cal[x.wk].date !== dayBefore(x.date, 7))).map(x => x.date + " " + x.he).join() === "2025-03-16 3", "same hour last week: the same clock hour seven days before, except 16 March's hour ending 3");
+  const n2 = cal.filter(x => x.date === "2025-11-02"), n3 = cal.filter(x => x.date === "2025-11-03");
+  ok(n2.length === 25 && n2[24].he === 24 && n2[24].yday === n2[24].issue && n2[24].h === 25 && n2.filter(x => x.he === 2).every(x => cal[x.yday].date === "2025-11-01" && cal[x.yday].he === 2), "2 November: hour ending 24 uses 1 November's hour ending 24 (the issue hour, 25 hours earlier); both hours ending 2 use 1 November's");
+  ok(n3[1].he === 2 && n3[1].yday === n2.filter(x => x.he === 2)[1].i && n3[1].i - n3[1].yday === 24, "3 November's hour ending 2 uses the later of 2 November's two (24 hours earlier)");
 }
 // ---------------- the regression from first principles
 {
@@ -86,7 +94,8 @@ ok(P.train[P.train.length - 1].i < P.val[0].i && P.val[P.val.length - 1].i < P.t
 ok(F.mixes.length === 16 && F.mixes[1].val - F.mixes[0].val > 1 && F.best.key === "week+last+wkend", "16 mixes; the best on October (" + F.best.key + ") leads by " + (F.mixes[1].val - F.mixes[0].val).toFixed(2) + " MW (tie rule: more than 1 MW)");
 // ---------------- the scores by hand
 {
-  const f = M.rule(P, "day"); let ae = 0, se = 0, pe = 0; P.val.forEach(x => { const e = P.d[x.i] - P.d[x.i - M.lagDay(x)]; ae += Math.abs(e); se += e * e; pe += Math.abs(e) / P.d[x.i]; });
+  // same hour yesterday by hand: October has no clock change, so the same clock hour is exactly 24 hours earlier
+  const f = M.rule(P, "day"); let ae = 0, se = 0, pe = 0; P.val.forEach(x => { const e = P.d[x.i] - P.d[x.i - 24]; ae += Math.abs(e); se += e * e; pe += Math.abs(e) / P.d[x.i]; });
   const s = M.point(P, P.val, f);
   ok(near(s.mae, ae / 744, 1e-9) && near(s.rmse, Math.sqrt(se / 744), 1e-9) && near(s.mape, pe / 744, 1e-12), "MAE, RMSE and MAPE of same hour yesterday by hand");
   ok(M.quantile([1, 2, 3, 4], 0.9) === 3.7, "quantiles by linear interpolation at (N - 1) p (K5's rule)");
@@ -98,12 +107,12 @@ ok(F.mixes.length === 16 && F.mixes[1].val - F.mixes[0].val > 1 && F.best.key ==
 // ---------------- claims and the page's numbers
 const B = F.base;
 ok(B.persist.val.mae > B.week.val.mae && B.week.val.mae > B.day.val.mae, "October: the latest hour held flat is the worst baseline, same hour yesterday the best");
-ok(mw(B.day.val.mae) === "1,126 MW" && pc(B.day.val.mape) === "3.6%" && mw(B.persist.val.mae) === "3,186 MW" && mw(B.week.val.mae) === "2,232 MW" && mw(B.day.test.mae) === "1,061 MW", "baselines: 1,126 (3.6%), 3,186, 2,232 on October; 1,061 on November");
+ok(mw(B.day.val.mae) === "1,126 MW" && pc(B.day.val.mape) === "3.6%" && mw(B.persist.val.mae) === "3,186 MW" && mw(B.week.val.mae) === "2,232 MW" && mw(B.day.test.mae) === "1,070 MW", "baselines: 1,126 (3.6%), 3,186, 2,232 on October; 1,070 on November");
 ok(F.horizon.wind.every((v, j) => j === 0 || v > F.horizon.wind[j - 1]) && F.horizon.solar[4] < F.horizon.solar[3] / 4 && F.horizon.wind[0].toFixed(1) === "2.8" && F.horizon.wind[4].toFixed(1) === "18.3" && F.solarZeros === 377, "horizons: wind's error rises 2.8% to 18.3%; solar's falls back at 24 h; 377 solar zeros");
 ok(F.horizon.demand[4] < F.horizon.demand[3] && near(F.horizon.demand[4], 100 * B.day.val.mae / 54411, 0.05), "demand's 24-hour persistence equals same hour yesterday (in % of the peak, rounding aside)");
-ok(mw(F.best.val) === "1,083 MW" && pc(F.skillVal) === "3.8%" && mw(F.best.test) === "978 MW" && pc(F.skillTest) === "7.9%" && mw(F.testBest.test) === "939 MW" && F.testBest.key !== F.best.key, "the chosen mix: 1,083 MW on October (3.8%), 978 MW on November (7.9%); November's own best (939 MW) is another mix");
-ok(F.leakVal.lag1 < F.mixes[F.mixes.length - 1].val && F.leakVal.oracle < F.mixes[0].val && mw(F.leakVal.lag1) === "670 MW" && mw(F.leakVal.oracle) === "821 MW", "both leaks beat every fair mix on October (670 and 821 MW)");
-ok(F.band.cov[80] > 0.8 && pc(F.band.cov[80]) === "83.4%" && mw(F.Q[1]) === "-1,802 MW" && mw(F.Q[17]) === "1,861 MW", "the 80% band: −1,802 to +1,861 MW, holds 83.4% of November (over-covers)");
+ok(mw(F.best.val) === "1,083 MW" && pc(F.skillVal) === "3.8%" && mw(F.best.test) === "981 MW" && pc(F.skillTest) === "8.3%" && mw(F.testBest.test) === "948 MW" && F.testBest.key !== F.best.key, "the chosen mix: 1,083 MW on October (3.8%), 981 MW on November (8.3%); November's own best (948 MW) is another mix");
+ok(F.leakVal.lag1 < F.mixes[F.mixes.length - 1].val && F.leakVal.oracle < F.mixes[0].val && mw(F.leakVal.lag1) === "670 MW" && mw(F.leakVal.oracle) === "822 MW", "both leaks beat every fair mix on October (670 and 822 MW)");
+ok(F.band.cov[80] > 0.8 && pc(F.band.cov[80]) === "83.1%" && mw(F.Q[1]) === "-1,801 MW" && mw(F.Q[17]) === "1,861 MW", "the 80% band: −1,801 to +1,861 MW, holds 83.1% of November (over-covers)");
 ok(F.widths.every((w, j) => j === 0 || w.b.cov[80] >= F.widths[j - 1].b.cov[80]) && F.pbBest.s === 0.75 && F.pbBest.b.pinball < F.widths[F.widths.length - 1].b.pinball && F.pbBest.b.pinball < F.widths[0].b.pinball && pc(F.widths[F.widths.length - 1].b.cov[80]) === "98.6%", "widths: coverage rises with width (98.6% at × 2); pinball loss lowest at × 0.75, higher at both ends");
 ok(F.worst.map(w => w.date).join() === "2025-11-30,2025-11-10,2025-11-27" && pc(F.worstShare, 0) === "25%" && D.holiday.date === "2025-11-27", "the three worst November days hold 25% of the error; the 27th is Thanksgiving");
 { const ref = M.reference(Y, D); ok(JSON.stringify(ref) === JSON.stringify(D.reference), "the settings file's reference block is up to date (run with --write)"); }
@@ -114,11 +123,22 @@ has("A model that scores " + mw(F.leakVal.lag1) + " where the best fair one scor
 has("At twice October's width the 80% band held " + pc(F.widths[F.widths.length - 1].b.cov[80]) + " of November's hours, but its pinball loss was the worst of the widths tried.", "myth 3");
 ok(F.widths[F.widths.length - 1].b.pinball === Math.max(...F.widths.map(w => w.b.pinball)), "myth 3: × 2 has the worst pinball loss of the widths tried");
 has("1 − 950 ÷ 1,000 = 0.05", "quiz 1");
-has("SPP's demand, October 2025: the average miss of same hour yesterday, made at midnight (" + pc(B.day.val.mape) + " MAPE).", "numbers to remember 1");
+has("SPP's demand, October 2025: the average miss of same hour yesterday, issued at 00:00 (" + pc(B.day.val.mape) + " MAPE).", "numbers to remember 1");
 ok(["<td class=\"n\">" + mw(B.day.val.mae) + "</td>", "<td class=\"n\">" + pc(F.skillTest) + "</td><td>Skill of the mix chosen on October", "<td class=\"n\">" + pc(F.band.cov[80]) + "</td><td>Share of November's hours", "<td class=\"n\">" + F.solarZeros + " of " + P.val.length + "</td><td>October 2025 hours"].every(x => OWN.includes(x)), "numbers to remember: 1,126 MW, 7.9%, 83.4%, 377 of 744");
 has("About 40 guided minutes in nine steps.", "the time line");
 has("54,411 MW, so values are rounded to about 54 MW", "data note: the scale");
 has("9 March has 23 hours and 2 November 25.", "data note: the clock");
+{ const st = JSON.parse(fs.readFileSync(L("data/town_days.json"), "utf8")).stats;
+  ok(st.demand_hours_flagged_as_implausible === 699 && st.missing_hours_filled.demand === 699 && TX.includes("699 of 2025's 8,760 demand hours were repaired from the day-ahead forecast scaled to actuals on both sides") && Y.demand.length === 8760, "data note: 699 of 8,760 demand hours repaired (town_days.json stats), using actuals on both sides (review M10 #2)"); }
+has("a demonstration on cleaned data, not an operational backtest.", "data note: retrospective cleaning, said (review M10 #2)");
+has("A clock hour that occurs twice (2 November) is read as the later one; a missing one (9 March), as the hour before it.", "data note: the same-hour rule (review M10 #3)");
+has("A forecast issued at 00:00 on 14 October for the hour ending 18:00 on 14 October. Which input is allowed?", "quiz 2: a dated issue time (review M10 #8)");
+has("Demand at 18:00 on 13 October: 24 hours before the target, and already known at 00:00 on 14 October.", "quiz 2: the answer");
+has("known at 00:00 for the day's first hour, unavailable for every later one. An unexpectedly good score is a reason to check for leakage.", "myth 2 (review M10 #15)");
+ok(2 + 0.6 * 40 + 0.3 * 38 === 37.4 && TX.includes("2 + 0.6 × 40 + 0.3 × 38 = 37.4") === false && /\$\\hat y_t = 2 \+ 0\.6 \\times 40 \+ 0\.3 \\times 38 = 37\.4\$ GW/.test(PAGE), "Go deeper: the worked weighted sum, 37.4 GW (review M10 #9)");
+ok(/a 100 MW miss above the forecast quantile costs 90 MW; the same miss below it costs 10 MW/.test(PAGE) && 0.9 * 100 === 90 && Math.round(0.1 * 100) === 10, "Go deeper: the pinball example at the 90th percentile");
+ok(/\*\*Symbols\.\*\* \$t\$ an hour/.test(PAGE), "Go deeper: a symbol key before the formulas");
+ok(!/midnight|tomorrow's average/.test(TX + JS.replace(/\/\/[^\n]*/g, "")), "the issue time is 00:00 everywhere on the page and in the script (review M10 #8)");
 
 // ---------------- the page on a stub document
 (async () => {
@@ -155,6 +175,8 @@ has("9 March has 23 hours and 2 November 25.", "data note: the clock");
   const sawIs = (i, s) => { ok(!next().disabled && saw() === s, "step " + i + " (" + saw() + ")"); budget("step " + i + " result", saw(), 40); };
   cards.go(0); card().querySelectorAll(".lx-choice")[1].click();
   sawIs(1, "Train on 6,383 hours, choose on 744, test on 721. Hours are never shuffled across those lines: tomorrow must stay unseen.");
+  { const sp = plotSpecs.find(x => x.text && x.text.head[0] === "Date"), dates = Object.keys(P.dayMean).sort();
+    ok(sp && sp.text.rows.length === 365 && sp.text.rows.every((r, k) => r[1] === mw(P.dayMean[dates[k]])) && sp.text.rows.filter(r => r[2] === "test").length === 30 && sp.text.rows.filter(r => r[2] === "choose").length === 31, "step 1: the text version lists every day's mean demand and its period (review M10 #7)"); }
   cards.go(1); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
   sawIs(2, "Same hour yesterday misses by 1,126 MW (3.6%); the latest hour held flat by 3,186 MW. A learned model must beat 1,126 MW on October to earn its place.");
   cards.go(2); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
@@ -171,25 +193,32 @@ has("9 March has 23 hours and 2 November 25.", "data note: the clock");
   sg[0].click(); sg[3].click();
   ok(next().disabled && /Not quite/.test(saw()), "step 5: a wrong mark is not accepted");
   sg[1].click(); sg[3].click();
-  sawIs(5, "At midnight you know neither the hour before 18:00 tomorrow nor tomorrow's average. Scores of 670 MW and 821 MW are look-ahead: a score that looks too good usually is.");
+  sawIs(5, "At 00:00 the hour before is known only for the day's first hour, and the day's average not at all. Scores of 670 and 822 MW use look-ahead: a score this good is a reason to check for leakage.");
   cards.go(5); btns(/Open November/)[0].click();
-  sawIs(6, "November: 978 MW against 1,061 MW, 7.9% better. The mix best on November scores 939 MW, but picking it there would turn the test into training.");
+  sawIs(6, "November: 981 MW against 1,070 MW, 8.3% better. The mix best on November scores 948 MW, but picking it there would turn the test into training.");
   cards.go(6); card().querySelectorAll(".lx-seg button")[0].click();
   ok(next().disabled, "step 7: the 50% band alone does not finish the step");
   card().querySelectorAll(".lx-seg button")[1].click();
-  sawIs(7, "The 80% band holds 83.4% of November's hours, more than 80%: November's misses were smaller, on average, than October's. Hours come in runs, so a month is a small sample.");
-  ok(F.best.test < F.best.val, "step 7: November's mean miss (" + mw(F.best.test) + ") is below October's (" + mw(F.best.val) + ")");
-  ok(plotSpecs[plotSpecs.length - 1].bars.length === 168, "step 7: the band over the last November week (168 hours)");
+  sawIs(7, "The 80% band holds 83.1% of November's hours. It pools October's misses across all hours; coverage can differ by hour and horizon, and a month is a small sample.");
+  { const sp = plotSpecs[plotSpecs.length - 1], h = sp.text.head, rows = sp.text.rows;
+    ok(sp.bars.length === 168, "step 7: the band over the last November week (168 hours)");
+    const lo = h.indexOf("Band, low"), hi = h.indexOf("Band, high"), io = h.indexOf("Inside the band?"), inside = rows.filter(r => r[io] === "yes").length;
+    const wk = P.cal.filter(x => x.date >= D.weeks.test[0] && x.date <= D.weeks.test[1]), byHand = wk.filter(x => { const m = F.best.F.f(x); return P.d[x.i] >= m + F.Q[1] && P.d[x.i] <= m + F.Q[17]; }).length;
+    ok(lo > 0 && hi > 0 && io > 0 && rows.length === 168 && rows.every((r, k) => r[lo] === mw(F.best.F.f(wk[k]) + F.Q[1]) && r[hi] === mw(F.best.F.f(wk[k]) + F.Q[17])) && inside === byHand && sp.text.note === "Inside the band: " + byHand + " of these 168 hours.", "step 7: the text version gives both band edges and whether each hour is inside (" + byHand + " of 168; review M10 #7)"); }
   cards.go(7); const s8 = sliders[sliders.length - 1]; [0, 5, 1].forEach(i => s8._set(i));
-  sawIs(8, "Coverage keeps rising: 98.6% at × 2. Pinball loss is lowest at × 0.75 (395.8 MW) and rises on both sides: it wants bands narrow and honest.");
-  cards.go(8); demo.fn("step-9");
+  sawIs(8, "Coverage keeps rising: 98.6% at × 2. Pinball loss is lowest at × 0.75 (397.3 MW) and rises on both sides: it wants bands narrow and honest.");
+  cards.go(8);
+  { const sp = plotSpecs[plotSpecs.length - 1], k = F.daily.findIndex(x => x.date !== F.worst[0].date); sp.pick.onPick(k);
+    ok(next().disabled && /Not the worst day yet/.test(saw()), "step 9: another day does not complete the step (review M10 #14)"); }
+  demo.fn("step-9");
   sawIs(9, "The three worst days, Sunday 30 November, Monday 10 November, Thursday 27 November, hold 25% of November's error; the 27th is Thanksgiving Day. Report the bad days, not only the mean.");
-  ok(/Sunday 30 November: 2,725 MW, the worst of 30 days\./.test(text(card().innerHTML)), "step 9: the readout of the worst day");
+  ok(/Sunday 30 November: 2,726 MW, the worst of 30 days\./.test(text(card().innerHTML)), "step 9: the readout of the worst day");
   ok(live.querySelectorAll("[aria-live]").length >= 2, "results are announced in aria-live regions");
   ["mid", "step-2", "step-4", "step-5", "step-8"].forEach(sname => { let q = null; try { q = demo.fn(sname); } catch (err) { q = null; } ok(q && q.view === sname, "demo state " + sname + " runs"); });
   const XT = text(xp.innerHTML);
-  ok(/1,083 MW/.test(XT) && /978 MW/.test(XT), "explain: the flowchart's numbers (choose 1,083 MW, test 978 MW)");
-  ok(/M1/.test(XT) && /A3/.test(XT) && /this page builds no price model/.test(XT), "explain: the price card links M1 and names A3 (linked once live)");
+  ok(/1,083 MW/.test(XT) && /981 MW/.test(XT), "explain: the flowchart's numbers (choose 1,083 MW, test 981 MW)");
+  ok(/M1/.test(XT) && /A3/.test(XT) && /this page builds no price model/.test(XT) && XT.includes("In a simple supply-stack model, the marginal plant sets the energy price") && XT.includes("Actual prices also reflect network limits, operating constraints and market rules"), "explain: the price card (a simple supply-stack model; network limits, operating constraints and market rules; review M10 #11) links M1 and A3");
+  ok(XT.includes("cleaned afterwards for the course (EIA-930): a demonstration, not an operational backtest") && XT.includes("data as known at 00:00: the cleaning used later actuals, and repaired hours are scored with the rest"), "explain: the boundary says the data were cleaned afterwards (review M10 #2)");
   ok(XT.includes("377 of 744 October hours at zero") && XT.includes("2.8% at 1 h, 18.3% at 24 h"), "explain: the targets table");
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });

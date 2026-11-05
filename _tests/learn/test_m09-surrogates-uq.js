@@ -156,8 +156,13 @@ has(pct(r[1].byRange[2].cov90, 0) + " against " + pct(r[0].byRange[2].cov90, 0),
 ok(Math.round(16 ** 3 / 3) === 1365 && Math.round(1000 ** 3 / 3 / 1e6) === 333 && TX.includes("about 1,400 for 16 records, about 330 million for 1,000"), "numbers to remember: n³/3 for 16 and 1,000 records");
 has("the page's grid has " + (D.grid.ell.length * D.grid.sf.length * D.grid.sn.length).toLocaleString("en-US") + " settings", "Go deeper: the grid's size");
 has("About 40 guided minutes in nine steps.", "the time line");
+has("outside the approximate 95% sampling range of ± 3 points for independent records, so sampling alone is unlikely to explain it.", "quiz 1: a sampling range, not a boundary of chance (review M9 #6)");
+has("Approximate 95% sampling range of the share of 400 independent new records inside a 90% band (two standard errors).", "numbers to remember: the sampling range");
+ok(!/beyond chance|chance alone|by chance|wide but honest|the most likely of/.test(TX + JS), "no 'beyond chance', 'wide but honest' or 'most likely settings' (review M9 #6, #7, #9)");
+has("$H$ stacks $h$ at every record, one row each.", "Go deeper: H defined");
+ok(/\*\*Symbols\.\*\* \$v\$ wind speed/.test(PAGE), "Go deeper: a symbol key before the formulas (review M9 #4)");
 has("64 to fit (seed 9, used in order) and 400 others to score (seed 2023)", "data note: counts and seeds");
-ok(/12% turbulence\) and 3% lower; each record's power scatters by 15 kW plus a 0\.3 m\/s error/.test(TX) && T.ti === 0.12 && T.loss === 0.03 && T.powErr === 15 && T.windErr === 0.3, "data note: the toy's recipe");
+ok(/12% turbulence\) and 3% lower\./.test(TX) && /power scatter combines 15 kW of background noise with an approximate wind-error term, 0\.3 m\/s times the curve's slope/.test(TX) && T.ti === 0.12 && T.loss === 0.03 && T.powErr === 15 && T.windErr === 0.3, "data note: the toy's recipe");
 ok(/k = 2, c = 8 m\/s\) between 3 and 20 m\/s/.test(TX) && T.weibull.k === 2 && T.weibull.c === 8, "data note: the Weibull wind speeds");
 ok(/1\.645/.test(PAGE) && near(M.ZL[90], 1.6448536269514722, 1e-12), "Go deeper: the 90% band is m ± 1.645 σ");
 
@@ -200,6 +205,12 @@ const sliders = [];
   cards.go(0); card().querySelectorAll(".lx-choice")[2].click();
   ok(!next().disabled && saw() === "Furthest below: 11–12 m/s, 239 kW on average. The real curve is a band, and its shape near rated speed differs from the maker's line.", "step 1 (" + saw() + ")"); sawBudget(1);
   ok(plotSpecs[plotSpecs.length - 1].lines.some(l => l.dots && l.pts.length === 400), "step 1: the chart shows the 400 records");
+  { // the text version of step 1: the records by 1 m/s bin, with count, mean power and mean gap below the maker's curve (review M9 #3)
+    const sp = plotSpecs[plotSpecs.length - 1], h = sp.text.head, rows = sp.text.rows, test = M.heldOut(D), G1 = M.gaps(T, test);
+    const gi = h.indexOf("400 records: mean gap below the maker's curve"), ci = h.indexOf("400 records: count, mean power");
+    ok(rows.length === 17 && gi > 0 && ci > 0 && rows.every((r, k) => r[0] === (3 + k) + "–" + (4 + k) + " m/s" && (G1[k].n ? r[gi] === kw(G1[k].gap) && r[ci].startsWith(G1[k].n + " · ") : r[ci] === "none")), "step 1: the text version gives every bin's record count, mean power and gap (the gaps of step 1)");
+    ok(rows[8][0] === "11–12 m/s" && rows[8][gi] === "239 kW" && rows.reduce((s, r) => s + (r[ci] === "none" ? 0 : +r[ci].split(" · ")[0]), 0) === 400, "step 1: the text version shows 239 kW at 11–12 m/s and counts all 400 records");
+    const b9 = M.recBin(T, test, 9), raw = test.filter(r => r[0] >= 9 && r[0] < 10); ok(b9.n === raw.length && near(b9.mean, raw.reduce((s, r) => s + r[1], 0) / raw.length, 1e-9), "recBin: count and mean power of a bin by hand"); }
   // 2
   cards.go(1); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
   ok(!next().disabled && saw() === "The band is narrow near records and widest beyond the last one: 11.9 m/s with 16 records. Records up to 15.5 m/s cut its mean width from " + kw(F.step2[1].w.mean) + " to " + kw(F.step2[2].w.mean) + ".", "step 2 (" + saw() + ")"); sawBudget(2);
@@ -208,19 +219,21 @@ const sliders = [];
   cards.go(2);
   ok(/below the best on the grid/.test(text(card().innerHTML)), "step 3: the start settings are below the best");
   btns(/Let the records choose/)[0].click();
-  ok(!next().disabled && saw() === "The records choose a length-scale of 4.6 m/s, noise 80 kW and signal size 780 kW: the most likely of 3,808 settings on a grid, searched in your browser.", "step 3 (" + saw() + ")"); sawBudget(3);
-  ok(/the best on the grid\./.test(text(card().innerHTML)) && /Signal size held at 780 kW\./.test(text(card().innerHTML)), "step 3: the readout says best; the signal size is stated");
+  ok(!next().disabled && saw() === "The records choose a length-scale of 4.6 m/s, noise 80 kW and signal size 780 kW: the settings giving these records the highest likelihood among 3,808 on a grid, searched in your browser.", "step 3 (" + saw() + ")"); sawBudget(3);
+  ok(/the best on the grid\./.test(text(card().innerHTML)) && /Signal size, how far the curve may swing from its average, held at 780 kW\./.test(text(card().innerHTML)) && /log-likelihood -?[0-9.]+ \(how probable these records are under the settings; higher is better\)/.test(text(card().innerHTML)), "step 3: the readout says best and explains the log-likelihood; the signal size is stated and explained");
+  ok(/by maximum likelihood\.$/.test(stepText()) && /\[\[maximum-likelihood\|maximum likelihood\]\]/.test(JS), "step 3 text: maximum likelihood, marked in the glossary");
   // 4
   cards.go(3); card().querySelectorAll(".lx-seg button").forEach(x => x.click());
   ok(!next().disabled && saw() === "The very short length-scale threads every record: 2 kW off on its own, 506 kW on new ones. Judge a fit only on records it has not seen.", "step 4 (" + saw() + ")"); sawBudget(4);
   // 5
   cards.go(4); card().querySelectorAll(".lx-seg button")[0].click();
-  ok(/50% band: holds 52\.0% of 400 new records; chance alone moves this by about ± 5 points\./.test(text(card().innerHTML)) && pct(b[0].cov[50]) === "52.0%" && (200 * Math.sqrt(0.25 / 400)).toFixed(0) === "5", "step 5: the 50% readout with its chance band");
+  ok(/50% band: holds 52\.0% of 400 new records; sampling alone moves this by about ± 5 points \(two standard errors, independent records\)\./.test(text(card().innerHTML)) && pct(b[0].cov[50]) === "52.0%" && (200 * Math.sqrt(0.25 / 400)).toFixed(0) === "5", "step 5: the 50% readout with its chance band");
   card().querySelectorAll(".lx-seg button")[2].click();
   ok(!next().disabled && saw() === "The 90% band holds 95.5%: a little wide. By speed, 99%, 88% and 100%: one noise level cannot fit scatter that grows where the curve is steep.", "step 5 (" + saw() + ")"); sawBudget(5);
   // 6
   cards.go(5); card().querySelectorAll(".lx-seg button")[1].click();
-  ok(!next().disabled && saw() === "Same 16 records: two sources cut the RMSE from 126 kW to 85 kW and the band's mean width from 391 kW to 287 kW; it still holds 92.0%.", "step 6 (" + saw() + ")"); sawBudget(6);
+  ok(!next().disabled && saw() === "Same 16 records: two sources cut the RMSE from 126 to 85 kW and the mean band width from 391 to 287 kW. Yet at 8–13 m/s, the steep part, its 90% band holds only 82% (one source: 88%).", "step 6 (" + saw() + ")"); sawBudget(6);
+  ok(/90% band holds, 8–13 m\/s \(131 records\)88%82%/.test(text(card().innerHTML)) && b[1].byRange[1].n === 131 && pct(b[1].byRange[1].cov90) === "81.7%" && pct(b[0].byRange[1].cov90) === "87.8%", "step 6: the table shows both fits' coverage at 8–13 m/s, 88% and 82% of 131 records (review M9 #2)");
   ok(new RegExp("ρ = " + F.rho.toFixed(2) + " times the maker's curve, plus " + kw(F.two.beta[0])).test(text(card().innerHTML)), "step 6: rho and the shift");
   // 7
   cards.go(6); const sl7 = sliders[sliders.length - 1];
@@ -228,7 +241,9 @@ const sliders = [];
   ok(!next().disabled && saw() === "At 16 records two sources are 41 kW closer; at 64, 5 kW. Once records cover the speeds that matter, the cheap curve adds little.", "step 7 (" + saw() + ")"); sawBudget(7);
   // 8
   cards.go(7); card().querySelectorAll(".lx-choice")[0].click();
-  ok(!next().disabled && saw() === "Above 13 m/s the two-source band holds 58% of new records; the one-source band, wide but honest, holds 100%. Cheap data mislead where they are wrong and no record can correct them.", "step 8 (" + saw() + ")"); sawBudget(8);
+  ok(!next().disabled && saw() === "Above 13 m/s the two-source band holds 58% of new records; the wider one-source band holds 100% in this example. Neither was validated beyond its last record: cheap data mislead where they are wrong and unchecked.", "step 8 (" + saw() + ")"); sawBudget(8);
+  { const sp = plotSpecs[plotSpecs.length - 1], h = sp.text.head, r15 = sp.text.rows.find(x => x[0] === "15–16 m/s");
+    ok(h.includes("Field curve (hidden from the fits)") && h.includes("400 new records: count, mean power") && h.includes("16 records: mean gap below the maker's curve") && r15 && r15[h.indexOf("Field curve (hidden from the fits)")] === kw(M.field(T, 15.5, "reduce")), "step 8: the text version lists the hidden field curve and both sets of records by bin (review M9 #3)"); }
   ok(/the first 16 records stop at 11\.9 m\/s\./.test(stepText()), "step 8 text: where the records stop");
   { const a8 = M.fitStored(D, N0, false, "reduce"); ok(new RegExp("falls back toward its average, " + kw(a8.beta[0]).replace(",", ",") + ": close to this turbine by luck").test(text(card().innerHTML)) && a8.beta[0] > 900 && a8.beta[0] < 1000 && M.predict(a8, 20).m < 1200 && M.predict(M.fitStored(D, N0, false), 20).m < 1200 && M.field(T, 20) > 1900, "step 8: the one-source curve falls toward its average beyond the records in both cases (" + kw(a8.beta[0]) + ")"); }
   // 9
@@ -241,7 +256,7 @@ const sliders = [];
   // the explain layer
   const XT = text(xp.innerHTML);
   ok(XT.includes("Reference case, whatever you set above: the first 16 records and the settings they chose (step 3).") && XT.includes("the last record is at 11.9 m/s; the band is widest at 20 m/s"), "explain: the annotated fit states the reference case and its numbers");
-  ok(XT.includes("126 kW, 95.5%") && XT.includes("85 kW, 92.0%") && XT.includes("100%") && XT.includes("58%"), "explain: the comparison table");
+  ok(XT.includes("126 kW, 95.5% (88% at 8–13 m/s)") && XT.includes("85 kW, 92.0% (82% at 8–13 m/s)") && XT.includes("100%") && XT.includes("58%"), "explain: the comparison table");
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
 

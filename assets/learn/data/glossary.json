@@ -551,6 +551,12 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "crps": {
+  "term": "CRPS",
+  "short": "The continuous ranked probability score of a whole forecast distribution: twice its pinball loss averaged over every quantile level; lower is better.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
+ },
  "cube-law": {
   "term": "Cube law",
   "short": "The power carried by the wind grows with the cube of its speed (twice the speed, eight times the power); a turbine's output follows it only between its cut-in and rated speeds.",
@@ -1384,6 +1390,12 @@
   "short": "One person working full time for one year; 100 workers for six months make 50 job-years.",
   "lesson": "F8",
   "href": "f08-large-loads.html"
+ },
+ "kernel-density-estimate": {
+  "term": "Kernel density estimate",
+  "short": "A smooth estimate of where data points are dense, made by placing a small bump on every point and adding them up; sampling from it keeps the data's shape with fewer points.",
+  "lesson": "CF8",
+  "href": "cf8-power-curves-from-scarce-data.html"
  },
  "kilowatt": {
   "term": "Kilowatt (kW)",
@@ -2399,6 +2411,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "scada": {
+  "term": "SCADA records",
+  "short": "The operating records a wind farm's control system logs for each turbine, such as ten-minute averages of wind speed and power (supervisory control and data acquisition).",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
+ },
  "system-scale": {
   "term": "Scale (of an energy system)",
   "short": "A level of an energy system, from one device or plant to a whole nation, set apart by who decides what and by the physics a model of it needs.",
@@ -2435,6 +2453,12 @@
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },
+ "sdwpf": {
+  "term": "SDWPF dataset",
+  "short": "An open dataset of one wind farm's ten-minute operating records (SCADA), shared for research on wind power forecasting.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
+ },
  "search-string": {
   "term": "Search string",
   "short": "The words and operators (AND, OR, quotation marks) typed into a literature database to find papers.",
@@ -2470,6 +2494,12 @@
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "sharpness": {
+  "term": "Sharpness (of a forecast band)",
+  "short": "How narrow a forecast's bands are, on average; narrower is better only if the bands still hold what they claim.",
+  "lesson": "CF8",
+  "href": "cf8-power-curves-from-scarce-data.html"
  },
  "simplex-method": {
   "term": "Simplex method",
@@ -2878,6 +2908,12 @@
   "short": "Wind and solar power, whose output follows the weather: they can be turned down but not up.",
   "lesson": 0,
   "href": "00-grid-operator.html"
+ },
+ "variogram": {
+  "term": "Variogram",
+  "short": "A measure of how much values at two places differ, on average, as a function of the distance between them; here, across a wind plant's turbines.",
+  "lesson": "CF8",
+  "href": "cf8-power-curves-from-scarce-data.html"
  },
  "vector": {
   "term": "Vector",

@@ -12459,8 +12459,10 @@
      load-reducing   (step 8 only) the same turbine in a mode the maker's curve does not show: g(v) x (1 - 0.5 s),
                      s = min(1, max(0, (v - 12.5) / 7.5)): from 12.5 m/s its output falls to half by 20 m/s
      records         10-minute averages: wind speed v ~ Weibull (k 2, c 8 m/s) cut to 3-20 m/s (inverse transform);
-                     power p = max(0, g(v) + sd(v) z), sd(v) = sqrt(15^2 + (0.3 g'(v))^2) kW: 15 kW of other scatter
-                     and a 0.3 m/s error in the recorded wind speed, which matters most where the curve is steep.
+                     power p = max(0, g(v) + sd(v) z), sd(v) = sqrt(15^2 + (0.3 g'(v))^2) kW: 15 kW of background
+                     noise combined with an approximate wind-error term, 0.3 m/s times the curve's slope. The recorded
+                     wind speed itself is never perturbed; this vertical term stands in for a 0.3 m/s error in it, so
+                     the scatter grows where the curve is steep.
                      Generator mulberry32 (LX.mulberry32); one uniform for v, then two for z (Box-Muller, cosine branch).
                      A campaign of 64 records (seed 9; the first n are "n records") and 400 held-out records (seed 2023);
                      the load-reducing case reuses the same uniforms, so only the truth changes. Stored rounded in the
@@ -12690,11 +12692,18 @@
     bins.forEach(function (b) { b.gap = b.n ? b.gap / b.n : null; });
     return bins;
   }
+  // the records in the 1 m/s bin starting at lo (the bins of gaps(): the last one, 19-20 m/s, includes 20): count, mean
+  // power and mean gap below the maker's curve (M9's chart text versions; review M9 #3, 2026-11-05)
+  function recBin(T, recs, lo) {
+    var last = T.range[1] - T.range[0] - 1, n = 0, sp = 0, sg = 0;
+    recs.forEach(function (r) { if (Math.min(last, Math.floor(r[0] - T.range[0])) === lo - T.range[0]) { n++; sp += r[1]; sg += maker(T, r[0]) - r[1]; } });
+    return { n: n, mean: n ? sp / n : null, gap: n ? sg / n : null };
+  }
 
   var model = { rng: rng, maker: maker, field: field, slope: slope, scatter: scatter, weibull: weibull, records: records, reduceShare: reduceShare,
                 chol: chol, fwd: fwd, bwd: bwd, solve: solve, basis: basis, kern: kern, fit: fit, predict: predict, covariance: covariance, search: search,
                 erf: erf, Phi: Phi, phi: phi, invPhi: invPhi, pinball: pinball, scores: scores, LEVELS: LEVELS, RANGES: RANGES, ZL: ZL, TAU: TAU,
-                campaign: campaign, heldOut: heldOut, stored: stored, fitStored: fitStored, curve: curve, widest: widest, gaps: gaps };
+                campaign: campaign, heldOut: heldOut, stored: stored, fitStored: fitStored, curve: curve, widest: widest, gaps: gaps, recBin: recBin };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window !== "undefined" && window.LX) window.LX.M9 = model;
 })();

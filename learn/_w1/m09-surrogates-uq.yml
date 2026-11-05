@@ -29,5 +29,14 @@ glossary:
   - id: pinball-loss
     term: Pinball loss
     def: "The score of a quantile forecast: a miss above the quantile is weighted by its level, a miss below by one minus it; lower is better."
+  - id: scada
+    term: SCADA records
+    def: "The operating records a wind farm's control system logs for each turbine, such as ten-minute averages of wind speed and power (supervisory control and data acquisition)."
+  - id: sdwpf
+    term: SDWPF dataset
+    def: "An open dataset of one wind farm's ten-minute operating records (SCADA), shared for research on wind power forecasting."
+  - id: crps
+    term: CRPS
+    def: "The continuous ranked probability score of a whole forecast distribution: twice its pinball loss averaged over every quantile level; lower is better."
 requests:
   - "M9's Gaussian-process core (Cholesky, triangular solves, generalized least squares for the mean, the predictive band, maximum likelihood on a grid, the standard normal and its inverse, pinball loss) is lesson-local in assets/learn/m09-surrogates-uq.js and exposed as LX.M9 for case file CF8, which loads M9's script: candidate for components/gp.js."
