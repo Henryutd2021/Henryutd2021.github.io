@@ -18,7 +18,8 @@
        equals the highest hour of the whole year with charging added: max_t (c·b_t + D·s_h(t)) = max_h (c·B_h + D·s_h).
        Hence peaks ≥ hours always (a sum of maxima is at least the maximum of a sum).
      k = 0 (2025) is the observed 450 MW.
-   Sampling: 1,000 runs, seed 6, LX.mulberry32 (core.js), each run drawing g, w and e uniformly (in that order); P10, P50,
+   Sampling: 1,000 runs, seed 6, LX.mulberry32 (core.js), each run drawing g, w and e independently and uniformly (in that
+   order): equal odds across each range, an assumption of the illustration that the page states wherever it samples; P10, P50,
    P90 by linear interpolation at rank (N − 1) p (K5's and M7's rule). Inputs are ranked by Spearman's rank correlation with
    the 2035 peak (no ties among continuous draws). Every number the page shows is rounded to 5 MW (the claim and the
    weak exemplar keep the study's own whole-megawatt figures), and a stated difference is the difference of the unrounded
@@ -27,9 +28,11 @@
    Task (step cards): sort twelve uncertainties into the four kinds, plus a pile for the utility's own choices (LX.CardSort);
    pick a treatment for one card of each pile (verdicts, as R9's dilemmas); turn the single number into a band (i-band, on
    LX.Plot): parameters sampled, then scenarios and model form, then a deep what-if line; rewrite the claim for a paper, the
-   board and the public (form-only checks, then an example); write an uncertainty plan for the reader's own study.
-   Exemplars: a weak and a strong uncertainty paragraph (LX.Exemplars), the kinds compared (LX.CompareTable, e-table) and
-   "which treatment?" (LX.Flowchart, e-flowchart). Self-check: the rubric's Uncertainty (LX.Rubric) and a checklist
+   board and the public (form-only checks, then examples written as labelled sentences); write an uncertainty plan for the
+   reader's own study (a row counts only with an uncertainty, a pile and the reader's own treatment; the pile's suggestion
+   stays a placeholder and never enters the copied plan).
+   Exemplars: a weak and a strong uncertainty paragraph (LX.Exemplars), a weak and a strong plan row, the kinds compared
+   (LX.CompareTable, e-table) and "which treatment?" (LX.Flowchart, e-flowchart; its no-JS version is question-action rows). Self-check: the rubric's Uncertainty (LX.Rubric) and a checklist
    (LX.Checklist, e-checklist); the myth cards are page markup.
    Node: module.exports = the pure model; _tests/learn/test_r06-uncertainty-properly.js checks it and writes the page's no-JS
    blocks with --write. */
@@ -193,6 +196,12 @@
     return { text: "Peaks added, " + lab + ": P10 " + R(e.p10) + ", median " + R(e.p50) + ", P90 **" + R(e.p90) + " MW** in 2035, from " + F.runs + " runs. The single number, " + F.claim + " MW, is one point inside it." };
   }
 
+  // the band chart's key: what P10, the median and P90 mean (shown under the chart)
+  var KEY = "[[percentile|Percentiles]] of the runs: P10, about 1 run in 10 is below it; median, half below; P90, about 9 in 10 below.";
+  // the sort's feedback: a count against the course's piles, read as given this exercise's assumptions
+  function sortSaw(g) {
+    return { text: "**" + g.right + " of " + g.total + "** where the course puts them, given this exercise's assumptions. The two choices are the utility's own: a study compares them, it never samples them. A different pile is fair if you can give the reason.", bad: g.right < g.total - 3 };
+  }
   // the rewrite's form checks: which parts each version has (they see words, not quality)
   var RANGE = /\d[\d,.]*\s*(?:MW|megawatts?)?\s*(?:–|—|-|to)\s*\d/i;
   function rwChecks(D, id, t) {
@@ -204,7 +213,7 @@
       { id: "form", label: "the model choice", ok: /(hour|peaks? added|adding peaks|model form|form of the model|coinciden)/i.test(t) },
       { id: "nowill", label: "no bare “will be” one number", ok: words(t) > 0 && !bare }];
     if (id === "board") return [
-      { id: "number", label: "a number to plan for", ok: /\d{2,}/.test(t) },
+      { id: "number", label: "a number from the result", ok: /\d{2,}/.test(t) },
       { id: "case", label: "the case it belongs to", ok: /(central|fast|slow|uptake|scenario|if |under )/i.test(t) },
       { id: "signal", label: "what would change it", ok: /(trigger|review|revisit|update|signal|unless|new forecast)/i.test(t) }];
     return [
@@ -212,16 +221,29 @@
       { id: "plain", label: "plain words" + (jar.length ? " (try without: " + jar.join(", ") + ")" : ""), ok: !jar.length && words(t) > 0 },
       { id: "short", label: "at most 60 words (" + words(t) + ")", ok: words(t) > 0 && words(t) <= 60 }];
   }
-  // the reader's plan as plain text; rows: [{u, kind, how}]
+  // an example rewrite: its labelled sentences, filled; and the same as one text (what the checks read)
+  function exLines(D, id, F) { return D.rewrite.examples[id].map(function (x) { return { k: x.k, v: fill(x.v, F) }; }); }
+  function exText(D, id, F) { return exLines(D, id, F).map(function (x) { return x.v; }).join(" "); }
+  function exHTML(D, id, F, cls) { return '<ul class="' + (cls || "r6-exl") + '">' + exLines(D, id, F).map(function (x) { return "<li><b>" + esc(x.k) + ":</b> " + rich(x.v) + "</li>"; }).join("") + "</ul>"; }
+  // the reader's plan as plain text; rows: [{u, kind, how}]. Only the reader's own words go in: an empty part reads
+  // "(to write)", never the pile's suggestion, so an unfinished plan cannot pass for a finished one
   function planText(D, rows) {
     var out = ["UNCERTAINTY PLAN", "Study: (your question)"];
     (rows || []).forEach(function (r, i) {
-      if (!r || !(String(r.u || "").trim() || r.kind)) return;
-      out.push((i + 1) + ". " + (String(r.u || "").trim() || "(to write)") + " | " + (r.kind ? kindLabel(D, r.kind) : "(kind?)") + " | " + (String(r.how || "").trim() || D.plan.kindHint[r.kind] || "(treatment?)"));
+      if (!r || !(String(r.u || "").trim() || r.kind || String(r.how || "").trim())) return;
+      out.push((i + 1) + ". " + (String(r.u || "").trim() || "(uncertainty: to write)") + " | " + (r.kind ? kindLabel(D, r.kind) : "(pile: to choose)") + " | " + (String(r.how || "").trim() || "(treatment: to write)"));
     });
     return out.join("\n");
   }
-  function planDone(rows) { return (rows || []).filter(function (r) { return r && String(r.u || "").trim() && r.kind; }).length; }
+  // a row counts when it has all three parts: an uncertainty, a pile and the reader's own treatment
+  function planRow(r) { return !!(r && String(r.u || "").trim() && r.kind && String(r.how || "").trim()); }
+  function planDone(rows) { return (rows || []).filter(planRow).length; }
+  // a weak and a strong plan row (the exemplars of the plan itself)
+  function planRowsHTML(D) {
+    var E = D.plan.examples;
+    return '<p class="lx-eyebrow">' + esc(E.title) + '</p><div class="lx-scroll-x"><table class="lx-facts r6-prows"><thead><tr><th scope="col"></th><th scope="col">Uncertainty</th><th scope="col">Pile</th><th scope="col">Treatment, and how you will say it</th><th scope="col">Why</th></tr></thead><tbody>'
+      + E.rows.map(function (r) { return '<tr><th scope="row">' + esc(r.label) + "</th><td>" + esc(r.u) + "</td><td>" + esc(r.kind) + "</td><td>" + esc(r.how) + "</td><td>" + rich(r.note) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+  }
 
   function exemplarsSpec(D, F) { return fillDeep(D.exemplars, F); }
   function kindsHTML(D) {
@@ -233,6 +255,7 @@
   function staticTask(D, M) {
     var F = facts(M), h = [], V = { good: "Defensible", ok: "Partly", bad: "Hard to defend" };
     h.push('<p class="lx-eyebrow">The claim</p><p class="r6-claim">“' + esc(fill(D.study.claim, F)) + "”</p>");
+    h.push('<p class="lx-hint">' + esc(D.study.assume) + "</p>");
     h.push('<details class="lx-textalt"><summary>Twelve uncertainties behind it, sorted, with reasons</summary><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Uncertainty</th><th scope="col">Pile</th><th scope="col">Why</th></tr></thead><tbody>');
     D.cards.forEach(function (c) { h.push("<tr><td>" + esc(c.text) + "</td><td>" + esc(kindLabel(D, c.bin)) + "</td><td>" + rich(c.why) + "</td></tr>"); });
     h.push("</tbody></table></div></details>");
@@ -251,9 +274,9 @@
       h.push("<tr><td>" + FORMS[f] + ", " + esc(M.sc[sc].label.toLowerCase()) + "</td><td class=\"n\">" + fmt(r5(e.p10)) + "</td><td class=\"n\">" + fmt(r5(e.p50)) + "</td><td class=\"n\">" + fmt(r5(e.p90)) + "</td></tr>");
     }); });
     h.push("<tr><td>What-if: " + esc(D.model.newLoad.label.charAt(0).toLowerCase() + D.model.newLoad.label.slice(1)) + " (hours added, central)</td><td class=\"n\" colspan=\"3\">median " + F.cNew + " MW</td></tr>");
-    h.push('</tbody></table></div><p class="lx-hint">MW, rounded to 5; ' + F.runs + " runs, seed " + F.seed + "; no odds across the three uptake scenarios.</p></details>");
+    h.push('</tbody></table></div><p class="lx-hint">MW, rounded to 5; ' + F.runs + " runs, seed " + F.seed + ", each input drawn independently with equal odds across its range; no odds across the three uptake scenarios.</p></details>");
     h.push('<details class="lx-textalt"><summary>The claim rewritten for three readers (examples)</summary><dl class="lx-ideas">');
-    D.rewrite.fields.forEach(function (f) { h.push("<dt>" + esc(f.label) + "</dt><dd>" + rich(fill(D.rewrite.examples[f.id], F)) + "</dd>"); });
+    D.rewrite.fields.forEach(function (f) { h.push("<dt>" + esc(f.label) + "</dt><dd>" + exHTML(D, f.id, F) + "</dd>"); });
     h.push("</dl></details>");
     return h.join("\n");
   }
@@ -267,26 +290,36 @@
       a1: { t: "Compare the options", tN: ["Compare the", "options"], s: "one result each", k: "end" },
       q2: { t: "In the model's form?", tN: ["In the model's", "form?"], k: "q" },
       a2: { t: "Run another form", tN: ["Run another", "form"], s: "report the gap", k: "end" },
-      q3: { t: "A range you can defend?", tN: ["A range you", "can defend?"], k: "q" },
+      q3: { t: "Odds you can defend?", tN: ["Odds you can", "defend?"], s: "a range, and how likely its values are", sN: "range and odds", k: "q" },
       a3: { t: "Sample it with the rest", tN: ["Sample it with", "the rest"], s: "P10–P90; rank inputs", sN: "P10–P90", k: "end" },
-      q4: { t: "A few coherent futures?", tN: ["A few coherent", "futures?"], k: "q" },
-      a4: { t: "Run each scenario", tN: ["Run each", "scenario"], s: "side by side, no odds", sN: "no odds", k: "end" },
+      q4: { t: "Bounds, or a few futures?", tN: ["Bounds, or a", "few futures?"], k: "q" },
+      a4: { t: "Run each case", tN: ["Run each", "case"], s: "side by side, no odds", sN: "no odds", k: "end" },
       a5: { t: "Deep: a what-if", tN: ["Deep:", "a what-if"], s: "robust plan, signposts", sN: "and signposts", k: "end" }
     },
     cols: 3, at: { s: [1, 0], q1: [1, 1], a1: [2, 1.9], q2: [1, 2.4], a2: [2, 3.3], q3: [1, 3.8], a3: [2, 4.7], q4: [1, 5.2], a4: [2, 6.1], a5: [0.2, 6.1] },
     colsN: 2, atN: { s: [0, 0], q1: [0, 1], a1: [1, 1.9], q2: [0, 2.4], a2: [1, 3.3], q3: [0, 3.8], a3: [1, 4.7], q4: [0, 5.2], a4: [1, 6.1], a5: [0, 6.6] },
     edges: [["s", "q1"], ["q1", "a1", "yes"], ["q1", "q2", "no"], ["q2", "a2", "yes"], ["q2", "q3", "no"], ["q3", "a3", "yes"], ["q3", "q4", "no"], ["q4", "a4", "yes"], ["q4", "a5", "no"]],
     traces: [
-      { label: "Growth a year", path: ["s", "q1", "q2", "q3", "a3"], text: "Not a choice, not the model's form, and ten years of meter data bound it: sample it with the other parameters." },
+      { label: "Growth a year", path: ["s", "q1", "q2", "q3", "a3"], text: "Not a choice, not the model's form. This exercise gives it a range with equal odds across it (a real study would need data for both): sample it with the other parameters." },
       { label: "Peaks or hours", path: ["s", "q1", "q2", "a2"], text: "It is how the model is built, so sampling cannot reveal it: run both forms and report the gap." },
-      { label: "Car uptake", path: ["s", "q1", "q2", "q3", "q4", "a4"], text: "No range anyone can defend, but three coherent storylines: run each and show them side by side." },
-      { label: "A large customer", path: ["s", "q1", "q2", "q3", "q4", "a5"], text: "No range and no agreed storylines: a what-if beside the result, a plan that holds either way, and a signal to review." },
+      { label: "Car uptake", path: ["s", "q1", "q2", "q3", "q4", "a4"], text: "No odds anyone can defend, but three storylines the town accepts: run each and show them side by side." },
+      { label: "A large customer", path: ["s", "q1", "q2", "q3", "q4", "a5"], text: "No odds, and no agreed size or arrival: a what-if beside the result, a plan that holds either way, and a signal to review." },
       { label: "Managed charging", path: ["s", "q1", "a1"], text: "The utility's own decision: run the study with and without it, and compare." }
     ], sel: 0 };
+  // the flowchart's no-JS version: one row per question, with what a yes leads to; the last row is "none of these"
+  function flowHTML() {
+    var N = FLOW.nodes, rows = [], q = "q1", yes = function (n) { return FLOW.edges.filter(function (e) { return e[0] === n && e[2] === "yes"; })[0][1]; };
+    var no = function (n) { return FLOW.edges.filter(function (e) { return e[0] === n && e[2] === "no"; })[0][1]; };
+    var act = function (a) { return N[a].t + (N[a].s ? " (" + N[a].s + ")" : ""); };
+    while (N[q] && N[q].k === "q") { rows.push([N[q].t + (N[q].s ? " (" + N[q].s + ")" : ""), act(yes(q))]); var nx = no(q); if (N[nx].k !== "q") { rows.push(["None of these", act(nx)]); break; } q = nx; }
+    return '<p class="lx-eyebrow">' + esc(FLOW.title) + '</p><p class="lx-hint">' + esc(FLOW.lede) + '</p><div class="lx-scroll-x"><table class="lx-facts"><thead><tr><th scope="col">Ask</th><th scope="col">If yes</th></tr></thead><tbody>'
+      + rows.map(function (r) { return '<tr><th scope="row">' + esc(r[0]) + "</th><td>" + esc(r[1]) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+  }
   var model = { KINDS: KINDS, FORMS: FORMS, hourMax: hourMax, prepare: prepare, draws: draws, base: base, charging: charging, peakAt: peakAt, pct: pct, summary: summary,
                 study: study, line: line, r5: r5, rho: rho, ranks: ranks, corr: corr, evpi: evpi, facts: facts, fill: fill, fillDeep: fillDeep, kindLabel: kindLabel,
-                card: card, best: best, bandView: bandView, bandSaw: bandSaw, rwChecks: rwChecks, planText: planText, planDone: planDone, exemplarsSpec: exemplarsSpec,
-                kindsHTML: kindsHTML, staticTask: staticTask, FLOW: FLOW, rich: rich, plain: plain, words: words, fmt: fmt, RANGE: RANGE };
+                card: card, best: best, bandView: bandView, bandSaw: bandSaw, rwChecks: rwChecks, exLines: exLines, exText: exText, exHTML: exHTML,
+                planText: planText, planRow: planRow, planDone: planDone, planRowsHTML: planRowsHTML, exemplarsSpec: exemplarsSpec, kindsHTML: kindsHTML,
+                staticTask: staticTask, FLOW: FLOW, flowHTML: flowHTML, KEY: KEY, sortSaw: sortSaw, rich: rich, plain: plain, words: words, fmt: fmt, RANGE: RANGE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -311,6 +344,7 @@
       ".r6-checks li{display:inline-flex;align-items:center;gap:4px}.r6-checks .lx-ic{width:15px;height:15px}",
       ".r6-checks li.ok{color:var(--lx-good)}",
       ".r6-ex{margin:0;padding:8px 12px;border-radius:10px;background:var(--lx-surface-2);font-size:14.5px;color:var(--lx-ink)}",
+      ".r6-exl{margin:0;padding:0;list-style:none;display:grid;gap:4px}.r6-exl b{font-family:var(--lx-f-display);font-weight:500;color:var(--lx-ink-2)}",
       ".r6-plan{display:grid;gap:10px}",
       ".r6-prow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr) minmax(0,1.6fr);gap:6px 8px;align-items:end}",
       ".r6-prow label{display:grid;gap:3px;font-family:var(--lx-f-display);font-weight:500;font-size:13px;color:var(--lx-ink-2);min-width:0}",
@@ -342,13 +376,14 @@
     // ---- step 1: the sort
     function sortStep(act, api) {
       H("p", { class: "r6-claim", text: "“" + fill(D.study.claim, F) + "”" }, act);
+      H("p", { class: "lx-hint", text: D.study.assume }, act);
       var key = "r6-sort", placed = LX.store.get(key, {}) || {};
       var cs = LX.CardSort(act, { bins: D.kinds, cards: D.cards, maxWhy: 12, checkLabel: "Check my sort",
         onCheck: function (g) {
           LX.store.set(key, cs.placed());
           if (g.placed < g.total) { api.saw("Place every card first: " + (g.total - g.placed) + " still in the pool.", true); return; }
           api.done();
-          api.saw("**" + g.right + " of " + g.total + "** where the course puts them. The two choices are the utility's own: a study compares them, it never samples them. A card can sit near a border; the reasons say why.", g.right < g.total - 3);
+          var sw = sortSaw(g); api.saw(sw.text, sw.bad);
         } });
       cs.place(placed);
       act.addEventListener("click", function () { LX.store.set(key, cs.placed()); });
@@ -381,6 +416,7 @@
         if (which === "deep") { if (!S.params) S.params = true; keep(); }
         var ctl = H("div", { class: "r6-row" }, act), host = H("div", null, act);
         var plot = LX.Plot(host, { caption: true, text: "Text version of the chart", box: true });
+        H("p", { class: "lx-hint", html: LX.rich(KEY) }, act);
         function draw() {
           var V = bandView(M, S), yrs = [], k, specBars = [], lines = [], legend = [], marks = [];
           for (k = M.m.y0; k <= M.m.y1; k++) yrs.push(k);
@@ -422,7 +458,7 @@
           seg(ctl, "Model form", [["peaks", FORMS.peaks], ["hours", FORMS.hours]], S.form, function (v) { S.form = v; keep(); draw(); if (v === "hours") api.done(); });
           if (S.form === "hours") api.done();
         } else {
-          seg(ctl, "A 60 MW customer", [[false, "Not shown"], [true, "Show the what-if"]], S.whatif, function (v) { S.whatif = v; keep(); draw(); if (v) api.done(); });
+          seg(ctl, "A constant 60 MW customer", [[false, "Not shown"], [true, "Show the what-if"]], S.whatif, function (v) { S.whatif = v; keep(); draw(); if (v) api.done(); });
           if (S.whatif) api.done();
         }
         draw();
@@ -441,7 +477,7 @@
       var row = H("div", { class: "r6-row" }, act), cmp = H("button", { class: "lx-btn ghost small", type: "button", text: "Compare with examples", "aria-expanded": "false" }, row);
       var cnt = H("span", { class: "lx-hint", "aria-live": "polite" }, row);
       var ex = H("dl", { class: "lx-ideas", hidden: true }, act);
-      D.rewrite.fields.forEach(function (f) { H("dt", { text: f.label }, ex); H("dd", { class: "r6-ex", html: LX.rich(fill(D.rewrite.examples[f.id], F)) }, ex); });
+      D.rewrite.fields.forEach(function (f) { H("dt", { text: f.label }, ex); H("dd", { class: "r6-ex", html: exHTML(D, f.id, F) }, ex); });
       cmp.addEventListener("click", function () { ex.hidden = !ex.hidden; cmp.setAttribute("aria-expanded", ex.hidden ? "false" : "true"); cmp.textContent = ex.hidden ? "Compare with examples" : "Hide the examples"; LX.emit("layout"); });
       var said = false;
       function paint() {
@@ -470,7 +506,7 @@
         D.kinds.forEach(function (k) { H("option", { value: k.id, text: k.label }, sel); }); sel.value = r.kind || "";
         var l3 = H("label", null, pr); H("span", { text: "Treatment, and how you will say it" }, l3);
         var hw = H("input", { type: "text", maxlength: "240" }, l3); hw.value = r.how || "";
-        function ph() { hw.placeholder = r.kind ? D.plan.kindHint[r.kind] : "Pick a pile for a suggestion"; }
+        function ph() { hw.placeholder = r.kind ? "Suggestion: " + D.plan.kindHint[r.kind] : "Pick a pile for a suggestion"; }
         ph();
         u.addEventListener("input", function () { r.u = u.value; save(); });
         sel.addEventListener("change", function () { r.kind = sel.value; ph(); save(); });
@@ -478,10 +514,15 @@
       });
       var row = H("div", { class: "r6-row" }, act), cp = H("button", { class: "lx-btn small", type: "button", text: "Copy my plan" }, row);
       var st = H("span", { class: "lx-hint", "aria-live": "polite", text: "Your plan stays in this browser." }, row);
-      H("a", { class: "lx-btn small ghost", href: "#exemplars", text: "Compare with two answers" }, row);
+      H("a", { class: "lx-btn small ghost", href: "#exemplars", text: "Compare with two plan rows" }, row);
       cp.addEventListener("click", function () { LX.copyText(pre.textContent).then(function (ok) { st.textContent = ok ? "Copied." : "Select the plan and copy it."; }); });
       function save() { LX.store.set("r6-plan", rows); draw(); }
-      function draw() { pre.textContent = planText(D, rows); if (planDone(rows) >= 3) api.done(); }
+      var said = false, lastN = -1;
+      function draw() {
+        pre.textContent = planText(D, rows); var n = planDone(rows);
+        if (n !== lastN) { lastN = n; st.textContent = Math.min(n, 3) + " of 3 rows complete (uncertainty, pile and your own treatment). Your plan stays in this browser."; }   // announced only when the count changes
+        if (n >= 3) { api.done(); if (!said) { said = true; api.saw("Three complete rows. Compare them with the strong row under Exemplars: a range and its source, how it is drawn, how the result will be said."); } }
+      }
       draw();
     }
     var steps = [{ text: "A study reports one number. Sort the twelve uncertainties behind it into four kinds, plus a pile for the utility's own choices. Tap a card, then its pile.", build: sortStep }];
@@ -489,11 +530,11 @@
       var cd = card(D, t.card);
       steps.push({ text: "Treatment " + (i + 1) + " of 5 · " + kindLabel(D, cd.bin) + ". Choose how you would handle this one, then read why.", build: treatStep(t) });
     });
-    steps.push({ text: "One number hides the spread. Vary the three [[parameter|parameters]] together: growth, a car's daily energy and the year's weather, in " + F.runs + " runs (seed " + F.seed + ").", build: bandStep("params") });
+    steps.push({ text: "One number hides the spread. Vary the three [[parameter|parameters]] together: growth, a car's daily energy and the year's weather, each drawn independently with equal odds across its range, in " + F.runs + " runs (seed " + F.seed + ").", build: bandStep("params") });
     steps.push({ text: "Sampling cannot cover two things. Pick a car-uptake [[scenario|scenario]], then switch the [[structural-uncertainty|model form]]: peaks added, or hours added on 2025's real hourly pattern.", build: bandStep("scen") });
-    steps.push({ text: "Last, a [[deep-uncertainty|deep uncertainty]]: a 60 MW customer that may connect from 2030, or never. Show it as a what-if line, not inside the band.", build: bandStep("deep") });
+    steps.push({ text: "Last, a [[deep-uncertainty|deep uncertainty]]: a customer drawing a constant 60 MW that may connect from 2030, or never. Show it as a what-if line, not inside the band.", build: bandStep("deep") });
     steps.push({ text: "Rewrite the claim for three readers. The checks look only for the parts each version needs; judge the wording yourself against the examples.", build: rewriteStep });
-    steps.push({ text: "Now your own study. List up to four uncertainties, put each on a pile, and note its treatment. Three rows finish here.", build: planStep });
+    steps.push({ text: "Now your own study. List up to four uncertainties, put each on a pile, and write its treatment in your own words. Three complete rows finish here.", build: planStep });
     var cards = LX.StepCards(live, { id: "r6-steps", steps: steps });
     return { cards: cards, D: D, M: M, F: F, P: P, S: S };
   }
@@ -501,6 +542,7 @@
     var x = document.getElementById("r06-exemplars"); if (!x) return;
     x.innerHTML = "";
     LX.Exemplars(H("div", { class: "lx-xcard" }, x), exemplarsSpec(V.D, V.F));
+    H("div", { class: "lx-xcard", html: planRowsHTML(V.D) }, x);
     var tiers = ["var(--lx-tier-2)", "var(--lx-tier-3)", "var(--lx-tier-4)", "var(--lx-tier-5)", "var(--lx-ink-3)"];
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), { title: "The kinds of uncertainty, side by side", text: true,
       columns: [{ key: "name", label: "Kind", main: true }, { key: "here", label: "In this study" }, { key: "treat", label: "Treatment" }, { key: "say", label: "How to say it" }],

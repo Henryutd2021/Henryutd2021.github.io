@@ -18,9 +18,12 @@
                                    fixed: P10–P90 across days at each hour (linear interpolation, K5's rule) and the
                                    year's highest hour
    Task (step cards): sort nine findings into holds as written, missing its conditions, claims more than shown (LX.CardSort);
-   for each chart, diagnose what misleads (feedback on every option, i-quiz) and apply fixes that redraw it (LX.Plot); write
-   a one-sentence finding for each redesigned chart; write a briefing for the city council and a paragraph for the public
-   (form-only checks, then examples; copy as text).
+   for each chart, diagnose what misleads (feedback on every option, i-quiz) and apply fixes that redraw it (LX.Plot). The
+   title and caption always describe what is drawn (a title fixed before the evidence names only what is shown), and a
+   chart counts as repaired only when its key fix and its title fix are both on (chartState). Write a one-sentence finding
+   for each redesigned chart; write a briefing for the city council and a paragraph for the public (form-only checks,
+   then examples; copy as text). A writing step is done only when every form check passes; before that it says which
+   are still open (a draft is not yet the requirements met).
    Exemplars: a weak and a strong briefing (LX.Exemplars), the three charts compared (LX.CompareTable, e-table) and where the
    briefing's main finding holds (LX.Boundary, e-boundary). Self-check: Communication (LX.Rubric) and a checklist
    (LX.Checklist, e-checklist); the myth cards are page markup.
@@ -96,8 +99,11 @@
   function keyFix(c) { return c.fixes.filter(function (f) { return f.key; })[0]; }
 
   // a chart's LX.Plot spec for a set of fixes (fx: {fixId: true}); pure, so the test reads every number it draws
+  // the title a chart shows: the misleading one, or once the title fix is on, the one that names what is drawn (the full
+  // title only when the key fix shows its evidence; partTitle otherwise)
+  function titleOf(D, F, c, fx) { return fill(!fx.title ? c.badTitle : fx[keyFix(c).id] || !c.partTitle ? c.goodTitle : c.partTitle, F); }
   function spec(D, C, F, id, fx) {
-    fx = fx || {}; var c = chart(D, id), title = fill(fx.title ? c.goodTitle : c.badTitle, F), s;
+    fx = fx || {}; var c = chart(D, id), title = titleOf(D, F, c, fx), s;
     if (id === "axis") {
       var y0 = fx.zero ? 0 : TRUNC;
       s = { x: { min: 0, max: 12, ticks: MON.map(function (m, i) { return [i + 0.5, m]; }), ticksN: MON.map(function (m, i) { return [i + 0.5, m.charAt(0)]; }) },
@@ -116,7 +122,7 @@
             lines: [{ pts: pts, color: "var(--lx-wind)", width: yr ? 1.4 : 2.6, dots: !yr }],
             spans: yr && fx.mark ? [{ x0: a + 0.5, x1: a + n + 0.5, color: "var(--lx-warn-soft)", op: 1, label: "the two weeks" }] : [],
             text: { head: ["Day", "Mean wind, % of the windiest hour"], rows: (yr ? C.days : C.days.slice(a, a + n)).map(function (d, i) { return [d.date, (yr ? C.dm[i] : C.dm[a + i]).toFixed(1) + "%"]; }) } };
-      s.caption = title + (fx.title ? " (SPP, daily mean, % of 2025's windiest hour; EIA-930)" : "");
+      s.caption = title + (fx.title ? " (daily mean, % of 2025's windiest hour; EIA-930)" : "");
       s.aria = s.caption + (yr ? ". The whole year: daily means from " + F.dLo + "% to " + F.dHi + "%." : ". " + F.winStart + " to " + F.winEnd + ": from " + F.winA + "% to " + F.winB + "%.");
     } else {
       var H = C.hours;
@@ -125,27 +131,41 @@
             lines: [{ pts: H.map(function (x) { return [x.h, x.mean]; }), color: "var(--lx-accent)", width: 2.6, dots: true }],
             bars: fx.spread ? H.map(function (x) { return { x0: x.h - 0.36, x1: x.h + 0.36, y0: x.p10, y1: x.p90, color: "var(--lx-accent)", op: 0.22, rx: 2 }; }) : [],
             refs: fx.max ? [{ y: C.top.v / 1000 * C.peakMW, label: "Highest hour of 2025: " + F.yearPeak + " MW", labelN: F.yearPeak + " MW", color: "var(--lx-bad)", dash: "5 4" }] : [],
-            text: { head: ["Hour", "Average (MW)"].concat(fx.spread ? ["P10", "P90"] : []), rows: H.map(function (x) { return [hh(x.h), Math.round(x.mean)].concat(fx.spread ? [Math.round(x.p10), Math.round(x.p90)] : []).map(String); }) } };
-      s.caption = title + (fx.title ? " (Prairie Town on SPP's 2025 pattern; band: P10–P90 across days)" : "");
-      s.aria = s.caption + ". Average day peaks at " + F.avgPeak + " MW at " + F.avgHour + (fx.spread ? "; 1 day in 10 the " + F.p90Hour + " hour is above " + F.p90Max + " MW" : "") + ".";
+            text: { head: ["Hour", "Average (MW)"].concat(fx.spread ? ["P10 (MW)", "P90 (MW)"] : []), rows: H.map(function (x) { return [hh(x.h), Math.round(x.mean)].concat(fx.spread ? [Math.round(x.p10), Math.round(x.p90)] : []).map(String); }) } };
+      var topLine = "Highest hourly demand in 2025: " + F.yearPeak + " MW, at " + F.peakHour + " on " + F.peakDay + ".";
+      if (fx.max) s.text.note = topLine;
+      s.caption = title + (fx.title ? " (Prairie Town on SPP's 2025 pattern" + (fx.spread ? "; band: [[percentile|P10–P90]] across days, the middle 8 days in 10" : "") + ")" : "");
+      s.aria = plain(s.caption) + ". Average day peaks at " + F.avgPeak + " MW at " + F.avgHour + (fx.spread ? "; 1 day in 10 the " + F.p90Hour + " hour is above " + F.p90Max + " MW" : "") + "." + (fx.max ? " " + topLine : "");
     }
     s.height = 250; s.heightN = 220;
     return s;
   }
 
+  // a chart's state: repaired only when a diagnosis is picked and the key fix and the title fix are both on, so the title,
+  // the scope and the drawing agree; otherwise what is still open, in one line
+  function chartState(D, F, c, st) {
+    var fx = (st && st.fx) || {}, kf = keyFix(c), tf = c.fixes.filter(function (f) { return f.id === "title"; })[0];
+    var open = [kf, tf].filter(function (f) { return !fx[f.id]; });
+    if (!st || !st.pick) return { done: false, text: null };
+    if (!open.length) { var r = D.chartsTable[D.charts.indexOf(c)]; return { done: true, text: "Redrawn, and the title says what is drawn. " + fill(r.finding, F) + " Next you write that as a sentence." }; }
+    if (open.length === 2) return { done: false, text: "Now apply the fix that removes the problem, “" + kf.label + "”, then make the title match what is drawn." };
+    if (open[0] === kf) return { done: false, text: "The title is honest now, but the drawing still misleads: apply “" + kf.label + "”." };
+    return { done: false, text: "The drawing is fixed, but its title still says “" + fill(c.badTitle, F) + "”: apply “" + tf.label + "”." };
+  }
   // the writing checks (form only: which parts are there)
   var RANGE = /\d[\d,.]*\s*(?:%|MW|megawatts?)?\s*(?:–|—|-|to|and)\s*\d/i;
   function findingChecks(t) {
     t = String(t || ""); var n = words(t);
     return [
       { id: "num", label: "a number with its unit", ok: /\d[\d,.]*\s*(?:%|MW|MWh|kWh|megawatts?|percent)/i.test(t) },
-      { id: "where", label: "where or what", ok: /(U\.S\.|SPP|Prairie Town|fleet|grid|town|wind farms?)/i.test(t) },
-      { id: "when", label: "when", ok: /(20\d\d|month|daily|day|hour|week|summer|winter|spring|January|February|March|April|May|June|July|August|September|October|November|December)/i.test(t) },
+      { id: "where", label: "where or what", ok: /(U\.S\.|\bUS\b|SPP|Southwest Power Pool|Prairie Town|Plains|national|nation|country|region|state|county|city|utility|fleet|grid|town|wind farms?|turbines?|plants?)/i.test(t) },
+      { id: "when", label: "when", ok: /(20\d\d|year|annual|month|quarter|season|daily|day|hour|week|summer|winter|spring|autumn|fall\b|morning|afternoon|evening|night|noon|January|February|March|April|May|June|July|August|September|October|November|December)/i.test(t) },
       { id: "short", label: "one sentence, at most 35 words (" + n + ")", ok: n > 0 && n <= 35 && (t.trim().replace(/U\.S\./g, "US").match(/[.!?](?=\s|$)/g) || []).length <= 1 }];   // "U.S." ends no sentence
   }
   function briefChecks(id, t) {
     t = String(t || ""); var n = words(t);
     if (id === "finding") return [{ id: "range", label: "a range", ok: RANGE.test(t) }, { id: "case", label: "the case it belongs to", ok: /(central|fast|slow|uptake|if |with |under )/i.test(t) }];
+    if (id === "programme") return [{ id: "num", label: "a number with its unit", ok: /\d[\d,.]*\s*(?:%|MW|megawatts?)/i.test(t) }, { id: "case", label: "the case it holds in", ok: /(central|fast|slow|uptake|if |with |when |under |hour by hour|hourly)/i.test(t) }];
     if (id === "change") return [{ id: "signal", label: "a signal to watch", ok: n >= 4 && /(if |when|unless|request|trigger|review|new forecast|would|should)/i.test(t) }];
     return [{ id: "words", label: "at least four words", ok: n >= 4 }];
   }
@@ -157,10 +177,15 @@
       { id: "limit", label: "what it leaves out or depends on", ok: /(leave[s]? out|left out|depend|unless|if |do not include|does not include|not included|would add)/i.test(t) },
       { id: "short", label: "at most " + D.public.limit + " words (" + n + ")", ok: n > 0 && n <= D.public.limit }];
   }
-  function briefExample(D, F) {
-    var E = D.briefing.example;
-    return { decision: fill(E.decision, F), finding: fill(E.finding, F) + " " + fill(E.programme, F), depends: fill(E.depends, F), leaves: fill(E.leaves, F), change: fill(E.change, F) };
+  function briefExample(D, F) { var E = D.briefing.example, o = {}; D.briefing.fields.forEach(function (f) { o[f.id] = fill(E[f.id], F); }); return o; }
+  // a writing step's state: "done" only when every form check of every field passes; else the checks still open
+  function writeState(lists) {
+    var open = []; lists.forEach(function (L) { L.checks.forEach(function (c) { if (!c.ok) open.push((L.label ? L.label + ": " : "") + c.label.replace(/ \(\d+\)$/, "")); }); });
+    return { done: !open.length, open: open };
   }
+  function findingsState(D, v) { return writeState(D.findingsStep.fields.map(function (f) { return { label: f.label.replace(/,.*$/, ""), checks: findingChecks((v || {})[f.id]) }; })); }
+  function briefState(D, v) { return writeState(D.briefing.fields.map(function (f) { return { label: f.label, checks: briefChecks(f.id, (v || {})[f.id]) }; })); }
+  function publicState(D, t) { return writeState([{ label: "", checks: publicChecks(D, t) }]); }
   function briefText(D, v, pub) {
     var out = ["BRIEFING FOR THE CITY COUNCIL"];
     D.briefing.fields.forEach(function (f) { out.push(f.label + ": " + (String((v || {})[f.id] || "").trim() || "(to write)")); });
@@ -196,7 +221,8 @@
       var s = spec(D, C, F, c.id, (function () { var o = {}; c.fixes.forEach(function (f) { o[f.id] = true; }); return o; })());
       if (c.id === "window") h.push("<p>The whole year in numbers: daily means from " + F.dLo + "% to " + F.dHi + "% of 2025's windiest hour, averaging " + F.dMean + "%; " + F.winStart + " to " + F.winEnd + " fell from " + F.winA + "% to " + F.winB + "%.</p>");
       else h.push('<div class="lx-scroll-x"><table class="lx-mini-table"><thead><tr>' + s.text.head.map(function (x) { return '<th scope="col">' + esc(x) + "</th>"; }).join("") + "</tr></thead><tbody>"
-        + s.text.rows.map(function (r) { return "<tr>" + r.map(function (x) { return "<td>" + esc(x) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>");
+        + s.text.rows.map(function (r) { return "<tr>" + r.map(function (x) { return "<td>" + esc(x) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>"
+        + (s.text.note ? '<p class="lx-hint">' + esc(s.text.note) + "</p>" : ""));
       h.push("</details>");
     });
     h.push('<details class="lx-textalt"><summary>R6\'s result, for the briefing and the paragraph</summary>' + factsHTML(D, F) + "</details>");
@@ -208,6 +234,7 @@
     return h.join("\n");
   }
   var model = { MONTH: MONTH, TRUNC: TRUNC, localDays: localDays, prepare: prepare, facts: facts, fill: fill, fillDeep: fillDeep, chart: chart, keyFix: keyFix, spec: spec,
+                titleOf: titleOf, chartState: chartState, findingsState: findingsState, briefState: briefState, publicState: publicState,
                 findingChecks: findingChecks, briefChecks: briefChecks, publicChecks: publicChecks, briefExample: briefExample, briefText: briefText, exemplarsSpec: exemplarsSpec,
                 chartsHTML: chartsHTML, boundaryHTML: boundaryHTML, factsHTML: factsHTML, staticTask: staticTask, pct: pct, mean: mean, rich: rich, plain: plain, words: words, RANGE: RANGE };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -285,12 +312,12 @@
         H("p", { class: "r8-q", text: c.question }, act);
         var opts = H("div", { class: "r8-opts", role: "group", "aria-label": c.question }, act), fb = H("div", { "aria-live": "polite" }, act);
         var fixRow = H("div", { class: "r8-fixes", role: "group", "aria-label": "Fixes to apply" }, act);
-        var kf = keyFix(c);
         function keep() { LX.store.set("r8-chart-" + c.id, st); }
         function draw() { plot.render(spec(D, C, F, c.id, st.fx), false); }
         function maybeDone() {
-          if (st.pick && st.fx[kf.id]) { api.done(); var r = D.chartsTable[D.charts.indexOf(c)]; api.saw("Redrawn. " + fill(r.finding, F) + " Next you write that as a sentence."); }
-          else if (st.pick) api.saw("Now apply the fix that removes the problem: “" + kf.label + "”, plus any that help a reader.", true);
+          var cs = chartState(D, F, c, st);
+          if (cs.done) api.done();
+          if (cs.text) api.saw(cs.text, !cs.done);
         }
         var bs = c.options.map(function (o) {
           var b = H("button", { class: "lx-choice", type: "button", "aria-pressed": st.pick === o.id ? "true" : "false", text: o.text }, opts);
@@ -320,10 +347,14 @@
         ta.addEventListener("input", function () { v[f.id] = ta.value; LX.store.set("r8-findings", v); paint(); });
       });
       exampleBox(act, "Compare with examples", D.findingsStep.fields.map(function (f) { return [f.label, fill(f.example, F)]; }));
-      var said = false;
+      var last = null;
       function paint() {
         D.findingsStep.fields.forEach(function (f) { checkList(lists[f.id], findingChecks(v[f.id])); });
-        if (D.findingsStep.fields.every(function (f) { return words(v[f.id]) >= 8; })) { api.done(); if (!said) { said = true; api.saw("Three findings written. The checks see only which parts are there; whether each would survive a sceptical reader is yours to judge."); } }
+        if (!D.findingsStep.fields.every(function (f) { return words(v[f.id]) >= 8; })) return;
+        var ws = findingsState(D, v), msg = ws.done ? "Every check met in all three findings. The checks see only which parts are there; whether each would survive a sceptical reader is yours to judge."
+          : "Drafts entered; still open: " + ws.open.join("; ") + ".";
+        if (ws.done) api.done();
+        if (msg !== last) { last = msg; api.saw(msg, !ws.done); }   // spoken only when it changes, not at every key
       }
       paint();
     }
@@ -338,10 +369,14 @@
       });
       var E = briefExample(D, F);
       exampleBox(act, "Compare with an example", D.briefing.fields.map(function (f) { return [f.label, E[f.id]]; }));
-      var said = false;
+      var last = null;
       function paint() {
         D.briefing.fields.forEach(function (f) { checkList(lists[f.id], briefChecks(f.id, v[f.id])); });
-        if (D.briefing.fields.every(function (f) { return words(v[f.id]) >= 4; })) { api.done(); if (!said) { said = true; api.saw("A briefing in five parts. Read it as a council member who has ten minutes and no chart: could you vote on it without misreading it?"); } }
+        if (!D.briefing.fields.every(function (f) { return words(v[f.id]) >= 4; })) return;
+        var ws = briefState(D, v), msg = ws.done ? "Every check met in all six parts. Read it as a council member who has ten minutes and no chart: could you vote on it without misreading it?"
+          : "Draft entered; still open: " + ws.open.join("; ") + ".";
+        if (ws.done) api.done();
+        if (msg !== last) { last = msg; api.saw(msg, !ws.done); }
       }
       paint();
     }
@@ -358,11 +393,15 @@
       H("a", { class: "lx-btn small ghost", href: "#exemplars", text: "Compare with two briefings" }, row);
       cp.addEventListener("click", function () { LX.copyText(pre.textContent).then(function (ok) { st.textContent = ok ? "Copied." : "Select the text and copy it."; }); });
       ta.addEventListener("input", function () { LX.store.set("r8-public", ta.value); paint(); });
-      var said = false;
+      var last = null;
       function paint() {
         checkList(ul, publicChecks(D, ta.value));
         pre.textContent = briefText(D, LX.store.get("r8-brief", {}) || {}, ta.value);
-        if (words(ta.value) >= 30) { api.done(); if (!said) { said = true; api.saw("Now ask someone outside the field to read it and tell you what it says. If they repeat a single number, the range did not land."); } }
+        if (words(ta.value) < 30) return;
+        var ws = publicState(D, ta.value), msg = ws.done ? "Every check met. Now ask someone outside the field to read it and tell you what it says. If they repeat a single number, the range did not land."
+          : "Draft entered; still open: " + ws.open.join("; ") + ".";
+        if (ws.done) api.done();
+        if (msg !== last) { last = msg; api.saw(msg, !ws.done); }
       }
       paint();
     }
@@ -371,7 +410,7 @@
       steps.push({ text: "Chart " + (i + 1) + " of 3, drawn from the course's own data. Say what misleads, then apply the fixes and watch it redraw.", build: chartStep(c) });
     });
     steps.push({ text: "Write one sentence for each redesigned chart: the number with its unit, where, when, and nothing it cannot carry.", build: findingsStep });
-    steps.push({ text: "Now R6's result, for the city council, which votes on a managed-charging programme. Five short parts: the decision first, the signal that would change the advice last.", build: briefStep });
+    steps.push({ text: "Now R6's result, for the city council, which votes on a managed-charging programme that moves most charging after 23:00. Six short parts: the decision first, the signal that would change the advice last.", build: briefStep });
     steps.push({ text: "Last, the same result for the public: one paragraph of at most 150 words, with a range and what it leaves out.", build: publicStep });
     var cards = LX.StepCards(live, { id: "r8-steps", steps: steps });
     return { cards: cards, D: D, C: C, F: F, P: P };
@@ -390,7 +429,7 @@
   function selfcheck(V) {
     var x = document.getElementById("r08-rubric"); if (!x) return;
     x.innerHTML = "";
-    LX.Rubric(H("div", { class: "lx-xcard" }, x), V.D.rubric);
+    LX.Rubric(H("div", { class: "lx-xcard" }, x), V.D.rubric);   // bar: the capstone's; R8 rates its practice
     LX.Checklist(H("div", { class: "lx-xcard" }, x), { id: "r8-checklist", title: "Before a result leaves your desk", columns: 2,
       lede: "Run it on your key figure, your findings and your summaries.", doneText: "Then ask someone outside the field to read them back to you.", items: V.D.checklist });
   }
