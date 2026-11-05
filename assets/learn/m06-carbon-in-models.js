@@ -1,0 +1,445 @@
+// m06-carbon-in-models.js — Modeler lesson M6, "Putting carbon in the model: caps, prices, frontiers and procurement rules"
+// (model lab: step cards with solver runs), wave W4, builder learn-w4-c, 2026-11-05.
+//
+// This file also holds the Plains Grid's planning LP that A12 ("How do governments steer energy?") uses: A12's page loads
+// this script and calls window.LX.plainsPlan (lesson-local, shared by two pages; reported for promotion).
+//
+// Data: assets/learn/data/a10-emissions-questions.json (the Plains Grid's existing fleet: a 4,000 MW peak, 3,000 MW of
+// wind, 600 MW of solar, 2,000 MW of gas combined-cycle plants and 2,300 MW of gas peakers, with EIA's 2025 heat rates,
+// gas price and CO2 coefficient), assets/learn/data/m06-carbon-in-models.json (what may be built and at what cost, in
+// 2025 dollars; the four representative days and their weights; the tie rule; the reference block written by the test),
+// town_year.json (SPP 2025 hourly shapes, EIA-930) and cf_targets.json (EIA's 2025 capacity factors).
+//
+// The model: one linear program for a year, estimated on four representative days (one real day per season, the
+// season's medoid; each hour weighted by the days its season has, 365 in all). Decisions:
+//   Wn, Sn, Bn          new wind (MW), new solar (MW) and a new 4-hour battery (MW; 4 MWh per MW)
+//   per hour j:  we, se  existing wind and solar used (at most what the weather gives; the rest is curtailed)
+//                wn, sn  new wind and solar used (at most the hour's capacity factor x Wn or Sn)
+//                cc, ct  gas combined-cycle and peaker output (at most 2,000 and 2,300 MW)
+//                ch, dc, soc  battery charge, discharge (MW) and its energy (MWh), cyclic within each day
+//                un      unserved demand (MW), at the value of lost load ($10,000 per MWh)
+// Rules each hour:  we + se + wn + sn + cc + ct + dc - ch + un = demand (+ a load)     ("b<j>": the balance)
+//                   soc_j = soc_{j-1} + 0.85 ch_j - dc_j (the last hour of a day links to its first); ch, dc <= Bn;
+//                   soc <= 4 Bn; wn <= cfw_j Wn; sn <= cfs_j Sn
+// Goal: the year's cost = sum over hours of weight x (fuel and variable O&M of gas + $10,000 x unserved)
+//                        + annual capital (capital recovery at 4% real over 30 years, a battery's 15) and fixed O&M.
+// Policy (A12) and carbon (M6) options, each an edit of the same LP:
+//   tau  a carbon price, $ per t, added to each gas MWh: cost + tau x CO2 rate     (the emitters pay tau x CO2)
+//   ptc  a production credit, $ per MWh, subtracted from each MWh of new wind and solar used (taxpayers pay)
+//   itc  an investment credit, a share of the capital cost of new wind, solar and batteries (taxpayers pay)
+//   ces  a clean-energy standard: the year's wind and sun used >= ces x the year's demand    ("ces"; its dual is the
+//        certificate price, $ per MWh of clean energy)
+//   cap  a CO2 cap, t a year: the year's gas CO2 <= cap                                       ("cap"; its dual is the
+//        shadow price of the cap, $ per t)
+//   load a flat load added to demand; buy: "annual" | "hourly" adds the buyer's own new wind, solar and battery (Wb, Sb,
+//        Bb) with a matching rule: annual, the year's buyer wind and sun >= the year's load; hourly, every hour the buyer's
+//        wind, sun and battery output >= the load, the buyer's battery charging only from the buyer's wind and sun.
+// Reported numbers leave out transfers: resource cost = new capital and fixed O&M (the full
+// cost, before any credit) + gas fuel and variable O&M + unserved energy at $10,000. Transfers are listed apart: carbon
+// payments, credit payments, certificate payments. Existing plants' fixed costs are sunk and left out.
+// Ties (stated in advance, data "tie"): the pages solve the LP as written, with no tie-breaking costs, and report only
+// numbers that are the same for every best plan: the tests minimize and maximize each over the LP's optimal face
+// (_tests/learn/plains_face.js). Which plant is curtailed in a spilled hour, and how a battery cycles surplus it cannot
+// use, can differ between best plans, so the pages show no such split. build(Y, {tie: true}) adds the hair costs in
+// "tie" (kept for the notebook's practice task on ties); no page uses it.
+(function () {
+  "use strict";
+  var HOURS = 24;
+
+  // ---------------------------------------------------------------- pure model
+  function crf(r, n) { return r / (1 - Math.pow(1 + r, -n)); }
+  function startIndex(year, date, off) { return Math.round((Date.parse(date + "T00:00:00Z") - Date.parse(year.start_utc + "Z")) / 3600000) + 1 - off; }
+  // local offset (Central time) of a 2025 date: daylight time from 9 March to 1 November
+  function offsetOf(date) { return date >= "2025-03-09" && date < "2025-11-02" ? -5 : -6; }
+  function gas(P) {
+    var o = {};
+    ["cc", "ct"].forEach(function (k) { var p = P.plants[k]; o[k] = { mw: p.mw, rate: p.heatRate * P.gas.co2PerMMBtu / 1000, cost: p.heatRate * P.gas.price + p.vom }; });
+    return o;
+  }
+  // the year's 8,760 hours as per-MW shapes (the same scaling for existing and new plants)
+  function profiles(P, year, targets, profile) {
+    var po = { year: year, targets: targets, method: P.profile.method, monthlyCF: P.profile.monthlyCF };
+    var pw = profile("wind", P.windMW, po), ps = profile("solar", P.solarMW, po);
+    return { w: pw.mw.map(function (x) { return x / P.windMW; }), s: ps.mw.map(function (x) { return x / P.solarMW; }) };
+  }
+  // one day: demand and existing output in whole MW, new plants' capacity factors per MW
+  function dayOf(P, year, PF, date) {
+    var i0 = startIndex(year, date, offsetOf(date)), d = { date: date, i0: i0, demand: [], we: [], se: [], cfw: [], cfs: [] };
+    for (var t = 0; t < HOURS; t++) {
+      d.demand.push(Math.round(year.demand[i0 + t] / 1000 * P.demandPeakMW));
+      d.we.push(Math.round(PF.w[i0 + t] * P.windMW)); d.se.push(Math.round(PF.s[i0 + t] * P.solarMW));
+      d.cfw.push(PF.w[i0 + t]); d.cfs.push(PF.s[i0 + t]);
+    }
+    return d;
+  }
+  // every whole local day of 2025, by season, without the two clock-change days
+  function calendar(S) {
+    var out = [], m0 = Date.UTC(2025, 0, 1);
+    for (var k = 0; k < 365; k++) {
+      var date = new Date(m0 + k * 864e5).toISOString().slice(0, 10), mo = +date.slice(5, 7);
+      var se = S.filter(function (s) { return s.months.indexOf(mo) >= 0; })[0];
+      out.push({ date: date, season: se.id, skip: date === "2025-03-09" || date === "2025-11-02" });
+    }
+    return out;
+  }
+  // the season's medoid: the day whose hourly demand (share of the peak), wind and solar (per MW) are closest, in summed
+  // squares, to all the season's other days
+  // plus two extreme days kept with a weight of one day each (curriculum §9.3), taken out of their seasons' weights: the
+  // calmest day (the lowest daily mean wind) and the day of the highest net load (demand less existing wind and solar,
+  // its highest hour)
+  function medoids(P, M, year, PF) {
+    var cal = calendar(M.seasons), all = cal.filter(function (c) { return !c.skip; }).map(function (c) { return { c: c, d: dayOf(P, year, PF, c.date) }; });
+    var calm = all.slice().sort(function (a, b) { return sum(a.d.cfw) - sum(b.d.cfw) || (a.c.date < b.c.date ? -1 : 1); })[0];
+    var net = function (x) { return Math.max.apply(null, x.d.demand.map(function (v, t) { return v - x.d.we[t] - x.d.se[t]; })); };
+    var peak = all.slice().sort(function (a, b) { return net(b) - net(a) || (a.c.date < b.c.date ? -1 : 1); })[0];
+    var out = M.seasons.map(function (s) {
+      var ds = cal.filter(function (c) { return c.season === s.id; }), cand = all.filter(function (x) { return x.c.season === s.id && x !== calm && x !== peak; });
+      var vec = cand.map(function (x) { return x.d.demand.map(function (v) { return v / P.demandPeakMW; }).concat(x.d.cfw, x.d.cfs); });
+      var best = -1, bestV = Infinity;
+      vec.forEach(function (a, i) { var v = 0; vec.forEach(function (b) { for (var q = 0; q < a.length; q++) v += (a[q] - b[q]) * (a[q] - b[q]); }); if (v < bestV - 1e-12) { bestV = v; best = i; } });
+      var wgt = ds.length - (calm.c.season === s.id ? 1 : 0) - (peak.c.season === s.id ? 1 : 0);
+      return { season: s.id, kind: "typical", date: cand[best].c.date, weight: wgt };
+    });
+    out.push({ season: calm.c.season, kind: "calm", date: calm.c.date, weight: 1 }, { season: peak.c.season, kind: "peak", date: peak.c.date, weight: 1 });
+    return out;
+  }
+  function prepare(P, M, year, targets, profile) {
+    var PF = profiles(P, year, targets, profile), G = gas(P);
+    var days = M.days.map(function (x) { var d = dayOf(P, year, PF, x.date); d.weight = x.weight; d.season = x.season; d.kind = x.kind; d.label = x.label; d.dateLabel = x.dateLabel; return d; });
+    var B = M.build, f = M.finance, defl = M.deflator["2025"] / M.deflator["2024"], b = B.battery;
+    var batKW = (b.powerCapex2024 + b.hours * b.energyCapex2024) * defl;   // $ per kW of a 4-hour battery, 2025 dollars
+    var cost = {
+      wind: { cap: B.wind.capex * 1000 * crf(f.rate, f.life), fom: B.wind.fom * 1000 },
+      solar: { cap: B.solar.capex * 1000 * crf(f.rate, f.life), fom: B.solar.fom * 1000 },
+      battery: { cap: batKW * 1000 * crf(f.rate, f.batteryLife), fom: b.fomShare * batKW * 1000, kW: batKW }
+    };
+    var D = 0; days.forEach(function (d) { D += d.weight * sum(d.demand); });
+    return { P: P, M: M, G: G, days: days, cost: cost, eta: b.rte, hours: b.hours, demandMWh: D, PF: PF };
+  }
+  function sum(a) { return a.reduce(function (s, v) { return s + v; }, 0); }
+  // o: { tau, ptc, itc, ces, cap, load, buy: "annual" | "hourly", tie (default true), fix: {Wn, Sn, Bn}, delta: {row: amount} }
+  function build(Y, o) {
+    o = o || {}; var G = Y.G, M = Y.M, tie = o.tie === true ? M.tie : null, tau = o.tau || 0, ptc = o.ptc || 0, itc = o.itc || 0, L = o.load || 0, buy = L ? o.buy || null : null;
+    var vars = [], cons = [], dl = o.delta || {}, n = Y.days.length;
+    function rhs(name, v) { return v + (dl[name] || 0); }
+    function capVar(name, c, max) { var v = { name: name, cost: c, ub: max }; if (o.fix && o.fix[name] != null) { v.lb = o.fix[name]; v.ub = o.fix[name]; } vars.push(v); }
+    var B = M.build, C = Y.cost;
+    capVar("Wn", C.wind.cap * (1 - itc) + C.wind.fom, B.wind.max);
+    capVar("Sn", C.solar.cap * (1 - itc) + C.solar.fom, B.solar.max);
+    capVar("Bn", C.battery.cap * (1 - itc) + C.battery.fom, B.battery.max);
+    if (buy) {
+      capVar("Wb", C.wind.cap * (1 - itc) + C.wind.fom, B.wind.max); capVar("Sb", C.solar.cap * (1 - itc) + C.solar.fom, B.solar.max);
+      capVar("Bb", buy === "hourly" ? C.battery.cap * (1 - itc) + C.battery.fom : 0, buy === "hourly" ? B.battery.max : 0);
+    }
+    var ces = {}, cap = {}, ann = {};
+    for (var k = 0; k < n; k++) {
+      var d = Y.days[k], w = d.weight;
+      for (var t = 0; t < HOURS; t++) {
+        var j = k * HOURS + t, pj = k * HOURS + (t + HOURS - 1) % HOURS;
+        vars.push({ name: "we" + j, ub: d.we[t], cost: w * (tie ? tie.curtail.we : 0) }, { name: "se" + j, ub: d.se[t], cost: w * (tie ? tie.curtail.se : 0) },
+          { name: "wn" + j, cost: w * ((tie ? tie.curtail.wn : 0) - ptc) }, { name: "sn" + j, cost: w * ((tie ? tie.curtail.sn : 0) - ptc) },
+          { name: "cc" + j, ub: G.cc.mw, cost: w * (G.cc.cost + tau * G.cc.rate) }, { name: "ct" + j, ub: G.ct.mw, cost: w * (G.ct.cost + tau * G.ct.rate) },
+          { name: "ch" + j }, { name: "dc" + j, cost: w * (tie ? tie.wear : 0) }, { name: "soc" + j }, { name: "un" + j, cost: w * M.voll });
+        var bal = {}; bal["we" + j] = 1; bal["se" + j] = 1; bal["wn" + j] = 1; bal["sn" + j] = 1; bal["cc" + j] = 1; bal["ct" + j] = 1; bal["dc" + j] = 1; bal["ch" + j] = -1; bal["un" + j] = 1;
+        if (buy) {
+          vars.push({ name: "wb" + j, cost: w * ((tie ? tie.curtail.wn : 0) - ptc) }, { name: "sb" + j, cost: w * ((tie ? tie.curtail.sn : 0) - ptc) });
+          bal["wb" + j] = 1; bal["sb" + j] = 1;
+          cons.push(lin("wbc" + j, [["wb" + j, 1], ["Wb", -d.cfw[t]]], "le", 0), lin("sbc" + j, [["sb" + j, 1], ["Sb", -d.cfs[t]]], "le", 0));
+          if (buy === "hourly") {
+            vars.push({ name: "chb" + j }, { name: "dcb" + j, cost: w * (tie ? tie.wear : 0) }, { name: "socb" + j });
+            bal["dcb" + j] = 1; bal["chb" + j] = -1;
+            cons.push(lin("mat" + j, [["wb" + j, 1], ["sb" + j, 1], ["dcb" + j, 1], ["chb" + j, -1]], "ge", L),
+              lin("chbs" + j, [["chb" + j, 1], ["wb" + j, -1], ["sb" + j, -1]], "le", 0),
+              lin("chbc" + j, [["chb" + j, 1], ["Bb", -1]], "le", 0), lin("dcbc" + j, [["dcb" + j, 1], ["Bb", -1]], "le", 0),
+              lin("socbc" + j, [["socb" + j, 1], ["Bb", -Y.hours]], "le", 0),
+              lin("sbb" + j, [["socb" + j, 1], ["socb" + pj, -1], ["chb" + j, -Y.eta], ["dcb" + j, 1]], "eq", 0));
+          } else { ann["wb" + j] = (ann["wb" + j] || 0) + w; ann["sb" + j] = (ann["sb" + j] || 0) + w; }
+        }
+        cons.push({ name: "b" + j, terms: bal, eq: rhs("b" + j, d.demand[t] + L) });
+        cons.push(lin("wnc" + j, [["wn" + j, 1], ["Wn", -d.cfw[t]]], "le", 0), lin("snc" + j, [["sn" + j, 1], ["Sn", -d.cfs[t]]], "le", 0),
+          lin("chc" + j, [["ch" + j, 1], ["Bn", -1]], "le", 0), lin("dcc" + j, [["dc" + j, 1], ["Bn", -1]], "le", 0),
+          lin("socc" + j, [["soc" + j, 1], ["Bn", -Y.hours]], "le", 0),
+          lin("sb" + j, [["soc" + j, 1], ["soc" + pj, -1], ["ch" + j, -Y.eta], ["dc" + j, 1]], "eq", 0));
+        if (o.ces != null) { ces["we" + j] = w; ces["se" + j] = w; ces["wn" + j] = w; ces["sn" + j] = w; }
+        if (o.cap != null) { cap["cc" + j] = w * G.cc.rate; cap["ct" + j] = w * G.ct.rate; }
+      }
+    }
+    if (o.ces != null) cons.push({ name: "ces", terms: ces, ge: rhs("ces", o.ces * Y.demandMWh) });
+    if (o.cap != null) cons.push({ name: "cap", terms: cap, le: rhs("cap", o.cap) });
+    if (buy === "annual") cons.push({ name: "match", terms: ann, ge: rhs("match", L * HOURS * sumW(Y)) });
+    return { sense: "min", variables: vars, constraints: cons };
+  }
+  // the LP's optimal face: the same rules, the cost held within tol of the optimum `opt`, and a new goal: the year's gas
+  // CO2, minimized (sense 1) or maximized (sense -1). Used to show a tie honestly: the range of CO2 among the best plans.
+  function faceModel(Y, o, opt, sense, tol) {
+    var m = build(Y, o), cost = {}, G = Y.G;
+    m.variables.forEach(function (v) { if (v.cost) cost[v.name] = v.cost; v.cost = 0; });
+    m.variables.forEach(function (v) { var mt = /^(cc|ct)(\d+)$/.exec(v.name); if (mt) { var k = Math.floor(+mt[2] / HOURS); v.cost = sense * Y.days[k].weight * (mt[1] === "cc" ? G.cc.rate : G.ct.rate); } });
+    m.constraints.push({ name: "face", terms: cost, le: opt + (tol == null ? 0.01 + 1e-9 * Math.abs(opt) : tol) });
+    return m;
+  }
+  function sumW(Y) { return Y.days.reduce(function (s, d) { return s + d.weight; }, 0); }
+  function lin(name, pairs, op, v) { var t = {}; pairs.forEach(function (p) { t[p[0]] = (t[p[0]] || 0) + p[1]; }); var c = { name: name, terms: t }; c[op] = v; return c; }
+  // the reported numbers (no hair costs, transfers apart); r: a solved LP
+  function read(Y, o, r) {
+    o = o || {};
+    if (!r || !r.values) return { ok: false, status: r ? r.status : "error" };
+    var v = function (k) { var x = r.values[k]; return x == null || Math.abs(x) < 1e-9 ? 0 : x; }, G = Y.G, C = Y.cost, itc = o.itc || 0;
+    var R = { ok: !!r.ok, status: r.status, Wn: v("Wn"), Sn: v("Sn"), Bn: v("Bn"), Wb: v("Wb"), Sb: v("Sb"), Bb: v("Bb"),
+      co2: 0, gasMWh: 0, ccMWh: 0, ctMWh: 0, fuel: 0, unMWh: 0, clean: 0, newClean: 0, curtailed: 0, demand: Y.demandMWh, load: 0, hourly: [] };
+    Y.days.forEach(function (d, k) {
+      var w = d.weight;
+      for (var t = 0; t < HOURS; t++) {
+        var j = k * HOURS + t, cc = v("cc" + j), ct = v("ct" + j), un = v("un" + j);
+        var nc = v("wn" + j) + v("sn" + j) + v("wb" + j) + v("sb" + j), cl = v("we" + j) + v("se" + j) + nc;
+        var avail = d.we[t] + d.se[t] + d.cfw[t] * (R.Wn + R.Wb) + d.cfs[t] * (R.Sn + R.Sb);
+        R.co2 += w * (cc * G.cc.rate + ct * G.ct.rate); R.ccMWh += w * cc; R.ctMWh += w * ct; R.fuel += w * (cc * G.cc.cost + ct * G.ct.cost);
+        R.unMWh += w * un; R.clean += w * cl; R.newClean += w * nc; R.curtailed += w * Math.max(0, avail - cl);
+        R.hourly.push({ cc: cc, ct: ct, un: un, clean: cl, dc: v("dc" + j) + v("dcb" + j), ch: v("ch" + j) + v("chb" + j) });
+      }
+    });
+    R.gasMWh = R.ccMWh + R.ctMWh; R.load = (o.load || 0) * HOURS * sumW(Y);
+    var capFull = (R.Wn + R.Wb) * (C.wind.cap + C.wind.fom) + (R.Sn + R.Sb) * (C.solar.cap + C.solar.fom) + (R.Bn + R.Bb) * (C.battery.cap + C.battery.fom);
+    R.capital = capFull; R.unserved = R.unMWh * Y.M.voll;
+    R.resource = capFull + R.fuel + R.unserved;
+    R.carbonPay = (o.tau || 0) * R.co2;                                  // emitters to the government
+    R.ptcPay = (o.ptc || 0) * R.newClean;                                // the government to new wind and solar
+    R.itcPay = itc * ((R.Wn + R.Wb) * C.wind.cap + (R.Sn + R.Sb) * C.solar.cap + (R.Bn + R.Bb) * C.battery.cap);
+    R.shareClean = R.clean / (R.demand + R.load);
+    R.duals = r.duals || null;
+    R.cesPrice = r.duals && o.ces != null ? r.duals.ces : null;          // $ per MWh of clean energy (>= 0)
+    R.capPrice = r.duals && o.cap != null ? -r.duals.cap : null;         // $ per t (>= 0 when the cap binds)
+    R.certPay = R.cesPrice != null ? R.cesPrice * o.ces * Y.demandMWh : 0;
+    return R;
+  }
+  var fm = {
+    mt: function (t) { return (t / 1e6).toFixed(2) + " Mt"; },
+    kt: function (t) { return Math.round(t / 1000).toLocaleString("en-US") + " kt"; },
+    musd: function (v) { return (v < 0 ? "−$" : "$") + (Math.abs(v) / 1e6).toFixed(1) + "M"; },
+    gw: function (mw) { return (Math.round(mw) || 0).toLocaleString("en-US") + " MW"; },   // || 0: never "-0 MW"
+    twh: function (mwh) { return (mwh / 1e6).toFixed(2) + " TWh"; },
+    pct: function (x) { return Math.round(x * 100) + "%"; },
+    pt: function (v) { return "$" + Math.round(v).toLocaleString("en-US"); }
+  };
+  var model = { HOURS: HOURS, crf: crf, startIndex: startIndex, offsetOf: offsetOf, gas: gas, profiles: profiles, dayOf: dayOf, calendar: calendar,
+    medoids: medoids, prepare: prepare, build: build, faceModel: faceModel, read: read, sum: sum, fm: fm };
+  if (typeof module !== "undefined" && module.exports) module.exports = model;
+  if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
+  window.LX.plainsPlan = model;
+
+  // ================================================================ M6's page
+  var LX = window.LX, H = LX.H, SLUG = "m06-carbon-in-models";
+  LX.mount(SLUG, function (live, data, root) {
+    var M = data.m06_carbon_in_models, P = data.a10_emissions_questions.plains, REF = M.reference;
+    var Y = prepare(P, M, data.town_year, data.cf_targets, LX.townProfile), saved = LX.store.get("m6", {}) || {};
+    var CAPS = M.caps, S = { cap: CAPS.indexOf(saved.cap) >= 0 ? saved.cap : CAPS[2], tau: typeof saved.tau === "number" && saved.tau % 10 === 0 && saved.tau >= 0 && saved.tau <= 140 ? saved.tau : 30, buy: saved.buy === "hourly" ? "hourly" : "annual", tauFrom: null };
+    function keep() { LX.store.set("m6", { cap: S.cap, tau: S.tau, buy: S.buy }); }
+    var cache = {}, E0 = null, base = null, seq = 0;
+    function solve(o, key) {
+      var k = JSON.stringify(o); if (cache[k]) return Promise.resolve(cache[k]);
+      return LX.solver.solve(build(Y, o), { timeLimit: 10, key: key || "m6" }).then(function (r) {
+        if (!r.ok) return { ok: false, r: r }; var R = read(Y, o, r); R.obj = r.objective; cache[k] = R; return R;
+      }, function (e) { return { ok: false, r: { status: "error", ok: false, message: String((e && e.message) || e) } }; });
+    }
+    function solveBase() { return base ? Promise.resolve(base) : solve({}, "m6-base").then(function (R) { if (R.ok) { base = R; E0 = R.co2; } return R; }); }
+    function capOpt(share) { return { cap: share / 100 * E0 }; }
+    // a price's plan and the range of CO2 among all its best plans (two more solves on the optimal face)
+    function priceRun(tau) {
+      var o = { tau: tau }, k = "range" + tau;
+      if (cache[k]) return Promise.resolve(cache[k]);
+      return solve(o, "m6-tau").then(function (R) {
+        if (!R.ok) return R;
+        return LX.solver.solve(faceModel(Y, o, R.obj, 1), { timeLimit: 10, key: "m6-lo" }).then(function (lo) {
+          if (!lo.ok) return { ok: false, r: lo };
+          return LX.solver.solve(faceModel(Y, o, R.obj, -1), { timeLimit: 10, key: "m6-hi" }).then(function (hi) {
+            if (!hi.ok) return { ok: false, r: hi };
+            var out = { ok: true, R: R, lo: lo.objective, hi: -hi.objective, tau: tau }; cache[k] = out; return out;
+          });
+        });
+      });
+    }
+    var f2 = function (v) { return "$" + v.toFixed(2); }, mt = fm.mt, musd = fm.musd, mw = fm.gw;
+    function dm(v) { var r = Math.round(v / 1e5) / 10; return (r < 0 ? "−$" : r > 0 ? "+$" : "$") + Math.abs(r).toFixed(1) + "M"; }
+    function dmt(v) { var r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r > 0 ? "+" : "") + Math.abs(r).toFixed(2) + " Mt"; }
+
+    // ---------- the stage: the frontier chart and readouts
+    var stage = H("div", { class: "lx-stage" }, live), title = H("h3", null, H("div", { class: "lx-stage-head" }, stage));
+    var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage), fhost = H("div", null, stage);
+    var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
+    var fc = LX.Frontier(fhost, { label: "The Plains Grid's year: cost against CO₂ under each cap", xMax: 5000, yMin: 380, yMax: 540, shadeLabel: "out of reach (approximately)",
+      frontierLabel: "Frontier: the cheapest plan at each cap", fmtX: function (t) { return mt(t); }, priceLabel: function (p) { return "Equal score at " + f2(p) + " per t"; } });
+    function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
+    var view = { cap: null, price: null };
+    function paint() {
+      chips.innerHTML = "";
+      if (!base) { title.textContent = "The Plains Grid's planning LP: not solved yet"; status.textContent = "Solve the plan to start; the solver loads on the first solve (about 3.5 MB, once)."; fc.frontier([], null); fc.plans([]); fc.price(null); return; }
+      var pts = [{ cap: null, co2: base.co2, cost: base.resource, solved: true }];
+      CAPS.forEach(function (c) { var R = cache[JSON.stringify(capOpt(c))]; if (R && R.ok) pts.push({ cap: Math.round(R.co2 / 1000), co2: R.co2, cost: R.resource, solved: true }); });
+      fc.frontier(pts, pts.length > 2 ? "Frontier you traced: solved caps joined by straight lines" : "Solved plans");
+      var plans = [{ id: "N", label: "No carbon rule", co2: base.co2, cost: base.resource, kind: "other", legend: "No carbon rule" }];
+      var Rc = view.cap != null && cache[JSON.stringify(capOpt(view.cap))];
+      if (Rc && Rc.ok) plans.push({ id: "C", label: "Cap at " + view.cap + "%", co2: Rc.co2, cost: Rc.resource, kind: "you", legend: "Your cap", ring: true });
+      var pr = view.price != null && cache["range" + view.price];
+      fc.plans(plans);
+      if (pr && pr.ok) fc.price(pr.tau, { co2: pr.R.co2, cost: pr.R.resource }); else fc.price(null);
+      title.textContent = "The Plains Grid's year" + (Rc && Rc.ok ? " · cap at " + view.cap + "% of " + mt(E0) : "") + (pr && pr.ok ? " · price " + f2(pr.tau) + " per t" : "");
+      chip("No carbon rule", mt(base.co2) + " · " + musd(base.resource));
+      if (Rc && Rc.ok) { chip("Your cap", mt(Rc.co2) + " · " + musd(Rc.resource)); chip("The cap's dual", f2(Rc.capPrice) + " per t"); }
+      if (pr && pr.ok) chip("At " + f2(pr.tau) + " per t", tieText(pr));
+      status.textContent = "Cost: new plants' capital and upkeep plus gas, a year, 2025 dollars; carbon payments are transfers and left out.";
+    }
+    function tieText(pr) { return Math.abs(pr.hi - pr.lo) < 5000 ? mt(pr.R.co2) : "any of " + mt(pr.lo) + " to " + mt(pr.hi); }
+
+    // ---------- step cards
+    function solveAct(act, api, label, job, show) {
+      var row = H("div", { class: "m6-row" }, act), b = label ? H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + label }, row) : null, st = LX.SolverStatus(row);
+      var go = LX.SolveStep.action({ api: api, st: st, host: act, go: b, cls: "m6-fail", job: function () { return job().then(function (R) { return R && R.ok === false ? (R.r || R) : null; }); }, show: show });
+      if (b) b.addEventListener("click", go);
+      return go;
+    }
+    // a step whose controls re-solve on every change: the latest change wins; an older run's answer is dropped
+    function liveRun(act, api, job, show) {
+      var row = H("div", { class: "m6-row" }, act), st = LX.SolverStatus(row), note = null, n = 0;
+      function fail(my, r) { if (my !== n) return; api.busy(false); st.set(""); if (r.status === "superseded") return; note = LX.SolveStep.failNote(act, r, go, { cls: "m6-fail" }); }
+      function go() {
+        if (note) { note.remove(); note = null; }
+        var my = ++n; st.set(LX.solver && LX.solver.mode ? "solving" : "loading"); api.busy(true);
+        return Promise.resolve().then(job).then(function (bad) { if (bad) return fail(my, bad.r || bad); if (my !== n) return; api.busy(false); st.set(""); show(); },
+          function (e) { fail(my, { status: "error", ok: false, message: String((e && e.message) || e) }); });
+      }
+      return go;
+    }
+    function seg(act, id, label, opts, cur, onPick) {
+      var w = H("div", { class: "cf-ctl" }, act); H("p", { class: "cf-ctl-l", id: id, text: label }, w);
+      var s = H("div", { class: "lx-seg", role: "group", "aria-labelledby": id }, w), bs = opts.map(function (o) {
+        var b = H("button", { type: "button", text: o[1] }, s); b.setAttribute("aria-pressed", String(o[0] === cur));
+        b.addEventListener("click", function () { bs.forEach(function (x, i) { x.setAttribute("aria-pressed", String(opts[i][0] === o[0])); }); onPick(o[0]); });
+        return b;
+      });
+    }
+    function capLine(c, R) { return "**Cap at " + c + "%:** CO₂ " + mt(R.co2) + ", cost " + musd(R.resource) + " (" + dm(R.resource - base.resource) + "); new wind " + mw(R.Wn) + ", solar " + mw(R.Sn) + ". The cap's dual: one more tonne allowed would save " + f2(R.capPrice) + "."; }
+    function priceLine(pr) {
+      var tie = Math.abs(pr.hi - pr.lo) >= 5000;
+      return "**A price of " + f2(pr.tau) + " per t:** " + (tie ? "every plan from " + mt(pr.lo) + " to " + mt(pr.hi) + " scores the same, cost plus price times CO₂; the solver returns one of them, so no single plan is the price's answer." : "one best plan, " + mt(pr.R.co2) + " at " + musd(pr.R.resource) + ".");
+    }
+    var BUY = { none: "No rule on what it buys", old: "Certificates from existing wind", annual: "New wind and sun, matched over the year", hourly: "New wind, sun and batteries, matched hour by hour" };
+    function caseOf(k) { return k === "none" || k === "old" ? { load: M.load.mw } : { load: M.load.mw, buy: k }; }
+    function buyLine(k, R) {
+      var noRule = cache[JSON.stringify(caseOf("none"))];
+      return "**" + BUY[k] + ":** the buyer may claim 0 t. It builds " + mw(R.Wb) + " of wind, " + mw(R.Sb) + " of solar and " + mw(R.Bb) + " of batteries; cost " + dm(R.resource - noRule.resource) +
+        " against no rule. The plants emit " + dmt(R.co2 - base.co2) + " against the grid without the data center.";
+    }
+    var steps = [
+      { text: "One linear program plans the Plains Grid's year: what to build and how to run it, at least cost. Six real days of 2025 stand for the year. Solve it with no carbon rule.",
+        build: function (act, api) {
+          view.cap = null; view.price = null; paint();
+          LX.FormulateBox(H("div", { class: "m6-form" }, act), { title: "The planning LP in words",
+            parts: [{ k: "Decisions", color: "var(--lx-tier-2)", text: "New wind, solar and 4-hour batteries (MW); every hour's output of each plant and the battery's charge." },
+                    { k: "Goal", color: "var(--lx-good)", text: "The least yearly cost: new plants' capital and upkeep, plus gas burned." },
+                    { k: "Rules", color: "var(--lx-warn)", text: "Supply meets demand every hour; no plant above its size; the battery's energy balances." },
+                    { k: "Given", color: "var(--lx-ink-3)", text: "A10's fleet, six weighted days of 2025 (EIA-930 shapes), EIA and NREL costs." }] });
+          solveAct(act, api, "Solve: no carbon rule", function () { return solveBase().then(function (R) { return R.ok ? null : R; }); }, function () { paint(); api.saw("**No carbon rule:** nothing new is built; CO₂ " + mt(base.co2) + ", cost " + musd(base.resource) + " a year. " + REF.size.cols.toLocaleString("en-US") + " columns, " + REF.size.rows.toLocaleString("en-US") + " rows."); api.done(); });
+          if (base) api.done();
+        } },
+      { text: "Cap the year's CO₂ at a share of the no-rule plan's: the [[epsilon-constraint|epsilon-constraint]] method. The cap's [[shadow-price|dual]] is the cost saved by allowing one more tonne, a carbon price the cap implies.",
+        build: function (act, api) {
+          var go = liveRun(act, api, function () { var c = S.cap; return solveBase().then(function (b) { return b.ok ? solve(capOpt(c), "m6-cap") : b; }).then(function (R) { return R.ok ? null : R; }); },
+            function () { view.cap = S.cap; paint(); api.saw(capLine(S.cap, cache[JSON.stringify(capOpt(S.cap))])); api.done(); });
+          LX.Slider(H("div", null, act), { label: "Cap, share of the no-rule plan's CO₂", color: "var(--lx-warn)", min: CAPS[CAPS.length - 1], max: CAPS[0], step: 10, value: S.cap,
+            fmt: function (v) { return v + "%"; }, onChange: function (v) { S.cap = v; keep(); go(); } });
+          go();
+        } },
+      { text: "Trace the [[pareto-frontier|frontier]]: solve every cap from 90% down to 30%. Each point is the cheapest plan at its CO₂. Watch the dual climb as the cap tightens.",
+        build: function (act, api) {
+          var tbl = H("div", null, act);
+          solveAct(act, api, "Trace seven caps", function () {
+            return CAPS.reduce(function (p, c) { return p.then(function (bad) { return bad || solve(capOpt(c), "m6-trace").then(function (R) { return R.ok ? null : R; }); }); }, solveBase().then(function (b) { return b.ok ? null : b; }));
+          }, function () {
+            paint(); tbl.innerHTML = "";
+            LX.Ledger(tbl, { cls: "m6-led", caption: "Each cap solved alone; cost a year in 2025 dollars.", columns: ["Cap", "CO₂", "Cost", "Dual, $ per t"],
+              rows: CAPS.map(function (c) { var R = cache[JSON.stringify(capOpt(c))]; return { head: c + "%", cells: [mt(R.co2), musd(R.resource), f2(R.capPrice)] }; }) });
+            var lo = cache[JSON.stringify(capOpt(CAPS[0]))].capPrice, hi = cache[JSON.stringify(capOpt(CAPS[CAPS.length - 1]))].capPrice;
+            api.saw("**The frontier bends:** the dual rises from " + f2(lo) + " at 90% to " + f2(hi) + " at 30%. From 90% to 70% it barely moves: a nearly straight stretch."); api.done();
+          });
+        } },
+      { text: "Now price CO₂ instead: cost plus price times CO₂, the [[weighted-sum|weighted sum]]. Most prices pick one plan. Set the price to your cap's dual and see what happens on that straight stretch.",
+        build: function (act, api) {
+          var tau = null;
+          var run = liveRun(act, api, function () {
+            tau = S.tauFrom != null ? S.tauFrom : S.tau; var t = tau;
+            return solveBase().then(function (b) { return b.ok ? priceRun(t) : b; }).then(function (pr) { return pr.ok ? null : pr; });
+          }, function () { view.price = tau; paint(); api.saw(priceLine(cache["range" + tau])); api.done(); });
+          LX.Slider(H("div", null, act), { label: "Carbon price, $ per t", color: "var(--lx-warn)", min: 0, max: 140, step: 10, value: S.tau,
+            fmt: function (v) { return "$" + v; }, onChange: function (v) { S.tau = v; S.tauFrom = null; keep(); run(); } });
+          var b = H("button", { type: "button", class: "lx-btn small ghost", text: "Use the dual of a cap at " + S.cap + "%" }, H("div", { class: "m6-row" }, act));
+          b.addEventListener("click", function () {
+            solveBase().then(function (bb) { return bb.ok ? solve(capOpt(S.cap), "m6-cap") : bb; }).then(function (R) { if (!R.ok) return; S.tauFrom = R.capPrice; view.cap = S.cap; run(); });
+          });
+          run();
+        } },
+      { text: "Add A10's 300 MW data center, a flat load, with no rule on what it buys. The LP may build for it: this is A10's long-run question, answered by a planning model.",
+        build: function (act, api) {
+          view.price = null; paint();
+          solveAct(act, api, "Solve with the data center", function () { return solveBase().then(function (b) { return b.ok ? solve(caseOf("none"), "m6-load") : b; }); }, function () {
+            var R = cache[JSON.stringify(caseOf("none"))];
+            api.saw("**With the data center, no rule:** CO₂ " + dmt(R.co2 - base.co2) + " (" + (Math.round((R.co2 - base.co2) / (M.load.mw * 8760) * 100) / 100).toFixed(2) + " t per MWh), cost " + dm(R.resource - base.resource) + "; new wind " + mw(R.Wn) + ". Gas serves it.");
+            api.done();
+          });
+        } },
+      { text: "Now the buyer must cover its use with new wind, sun and batteries of its own, over the year or hour by hour: [[hourly-matching|hourly matching]]. Either lets it claim zero. Compare what each costs.",
+        build: function (act, api) {
+          var go = liveRun(act, api, function () {
+            var k = S.buy;
+            return solveBase().then(function (b) { return b.ok ? solve(caseOf("none"), "m6-load") : b; }).then(function (r) { return r.ok ? solve(caseOf(k), "m6-buy") : r; }).then(function (R) { return R.ok ? null : R; });
+          }, function () { api.saw(buyLine(S.buy, cache[JSON.stringify(caseOf(S.buy))])); api.done(); });
+          seg(act, "m6-buy-l", "Matching rule", [["annual", "Over the year"], ["hourly", "Hour by hour"]], S.buy, function (k) { S.buy = k; keep(); go(); });
+          go();
+        } },
+      { text: "Meeting a rule is not causing a cut. Certificates from existing wind meet an annual rule too. Compare what each purchase changes at the plants, against the grid without the data center.",
+        build: function (act, api) {
+          var host = H("div", null, act);
+          solveAct(act, api, "Compare the four purchases", function () {
+            return ["none", "annual", "hourly"].reduce(function (p, k) { return p.then(function (bad) { return bad || solve(caseOf(k), "m6-cmp").then(function (R) { return R.ok ? null : R; }); }); }, solveBase().then(function (b) { return b.ok ? null : b; }));
+          }, function () {
+            host.innerHTML = ""; ledger(host);
+            var none = cache[JSON.stringify(caseOf("none"))];
+            api.saw("**Same claim, different consequences:** all four may claim 0 t, but against no data center the plants emit from " + dmt(cache[JSON.stringify(caseOf("hourly"))].co2 - base.co2) + " to " + dmt(none.co2 - base.co2) + "."); api.done();
+          });
+        } }
+    ];
+    var cards = LX.StepCards(live, { steps: steps });
+    function ledger(host) {
+      var none = cache[JSON.stringify(caseOf("none"))];
+      LX.Ledger(host, { cls: "m6-led", caption: "A year with the 300 MW data center; the plants' change is against the grid without it, the cost against no rule.",
+        columns: ["Purchase", "May claim", "The plants emit", "Cost", "Built for it"],
+        rows: ["none", "old", "annual", "hourly"].map(function (k) {
+          var R = cache[JSON.stringify(caseOf(k))];
+          return { head: BUY[k], sub: k === "old" ? "not additional: nothing new is built" : k === "none" ? "the location-based count applies" : "additional and on this grid",
+            cells: [k === "none" ? "its share at average factors" : "0 t", dmt(R.co2 - base.co2), dm(R.resource - none.resource), k === "annual" || k === "hourly" ? mw(R.Wb) + " wind, " + mw(R.Sb) + " solar, " + mw(R.Bb) + " battery" : "nothing"] };
+        }) });
+    }
+
+    // ---------- the explain layer (precomputed reference until the reader solves)
+    var xhost = document.getElementById("m06-explain");
+    function buildExplain() {
+      if (!xhost) return;
+      xhost.innerHTML = ""; xhost.classList.add("is-live");
+      LX.FormulateBox(H("div", { class: "lx-xcard" }, xhost), { title: "Three ways to put carbon in the LP",
+        parts: [{ k: "A cap", color: "var(--lx-warn)", text: "A rule: the year's CO₂ at most the cap. Its dual is a price per tonne, " + f2(REF.caps[2].dual) + " at 70%." },
+                { k: "A price", color: "var(--lx-good)", text: "A cost: each tonne adds the price to the goal. At the cap's dual, a whole stretch of plans ties." },
+                { k: "A procurement rule", color: "var(--lx-tier-2)", text: "A rule on one buyer's purchases. It sets a claim; what the plants emit is a separate result." }] });
+      LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these answers hold",
+        holds: ["six real days of 2025 stand for the year, two of them extreme;", "perfect foresight, one year, fixed demand, no lines inside the grid;", "costs in 2025 dollars at 4% real; existing gas plants stay."],
+        leaves: ["the full year: the Go deeper box checks two plans on every hour;", "other years' weather, and plants retiring;", "CO₂ beyond the stack, and the cost of the existing fleet."],
+        source: "The Plains Grid is fictional; demand, wind and sun follow the Southwest Power Pool's 2025 hours (EIA-930)." });
+    }
+    buildExplain(); paint();
+    LX.demo(root, function (state) {
+      if (state === "mid") { cards.go(1); return { view: "a cap" }; }
+      if (state === "frontier") { cards.go(2); return { view: "the frontier step" }; }
+      if (state === "buy") { cards.go(6); return { view: "the four purchases" }; }
+      return null;
+    }, cards);
+    root.lxLesson = { Y: Y, S: S, cards: cards, cache: cache };
+  });
+})();

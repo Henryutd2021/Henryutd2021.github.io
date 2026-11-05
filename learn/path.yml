@@ -682,9 +682,41 @@
 - {kind: lesson, tier: analyst, code: A5, title: "Will there be enough power when it matters? Resource adequacy and capacity accreditation"}
 - {kind: lesson, tier: analyst, code: A6, title: "Why does it take years to connect a power plant or a data center?"}
 - {kind: lesson, tier: analyst, code: A9, title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"}
-- {kind: lesson, tier: analyst, code: A10, title: "Which emissions question are you asking? Inventories, consequences and procurement claims"}
+- kind: lesson
+  id: a10-emissions-questions
+  code: A10
+  tier: analyst
+  form: cards
+  icon: cloud
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the Check section and the Go deeper boxes
+  title: "Which emissions question are you asking? Inventories, consequences and procurement claims"
+  subtitle: "Put one new load on the Plains Grid and get four different CO₂ answers: an inventory share, a short-run change, a long-run change and a claim"
+  short: "Which emissions question?"
+  teaches: [inventory shares at average factors, short-run marginal factors and the model behind them, long-run consequences through what gets built, procurement claims with additionality and deliverability]
+  does: "Run a data center or an electrolyzer for a day on the Plains Grid; count its inventory share at average factors, its short-run change at the plants under two dispatch models, its long-run change under three build responses, and what five purchases let it claim."
+  outcome: "Name which of four emissions questions a number answers, compute each for a load with its stated method and assumptions, and say why a claim is not a measure of emissions caused."
+  after: [12, 8]
+  next: A12
 - {kind: lesson, tier: analyst, code: A11, title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"}
-- {kind: lesson, tier: analyst, code: A12, title: "How do governments steer energy? Taxes, credits, standards and carbon prices"}
+- kind: lesson
+  id: a12-policy-instruments
+  code: A12
+  tier: analyst
+  form: cards
+  icon: scale
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the Check section and the Go deeper boxes
+  title: "How do governments steer energy? Taxes, credits, standards and carbon prices"
+  subtitle: "Apply a carbon price, two credits and a clean-energy standard to the same wind, solar, storage and gas plan, and see what each cuts, costs and who pays"
+  short: "Steering with policy"
+  teaches: [carbon prices, production and investment credits, clean-energy standards, resource cost against transfers, cost per tonne avoided, who pays]
+  does: "Re-plan the Plains Grid's wind, solar, storage and gas under a carbon price, a production credit, an investment credit and a clean-energy standard; compare the CO₂ cut, the resource cost, the money that changes hands and the side effects, with a real rule of each kind, its jurisdiction and its date."
+  outcome: "Explain how four policy instruments change a least-cost plan, compare them on emissions cut, resource cost and who pays, and keep transfers apart from real costs."
+  after: [A1, 12]
+  next: M6
 - {kind: lesson, tier: analyst, code: A13, title: "Who pays and who benefits? Energy burden, fairness and jobs"}
 - {kind: lesson, tier: analyst, code: A15, title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"}
 - {kind: lesson, tier: analyst, code: A17, title: "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity"}
@@ -774,7 +806,25 @@
   lab: "a SciPy/HiGHS notebook that rebuilds engine E1's sizing and outage models, asserts the browser's sizing, check and drawn-outage numbers, and runs the rolling horizon beside the browser's, about 60 minutes."
   does: "A MILP sizes solar, a battery and generator sets for Prairie Campus under outage scenarios; add the host feeder's export limit and the utility's tariff and watch the campus optimum change; then run the storm with rolling-horizon dispatch on forecasts and see what forecast error costs."
   after: [M2, A14]
-- {kind: lesson, tier: modeler, code: M6, title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"}
+- kind: lesson
+  id: m06-carbon-in-models
+  code: M6
+  tier: modeler
+  form: cards
+  icon: frontier
+  status: active
+  minutes: 40
+  practice_minutes: 90   # the notebook's practice tasks, after its 45-minute lab
+  lab_minutes: 45   # the notebook lab: build_learn.py adds it to the header badge and timeRequired
+  title: "Putting carbon in the model: caps, prices, frontiers and procurement rules"
+  subtitle: "Cap the Plains Grid's CO₂ in a planning LP, trace the frontier, compare a carbon price, then add an hourly-matching rule and see what it costs and what it changes"
+  short: "Carbon in models"
+  teaches: [epsilon-constraint caps, the cap's dual as a carbon price, ties at a price, procurement rules as constraints, claims against system emissions]
+  lab: "a SciPy/HiGHS notebook that rebuilds the planning LP and asserts the browser's numbers, about 45 minutes, then 90 minutes of practice."
+  does: "Cap CO₂ in the Plains Grid's planning LP and read the cap's dual; trace the cost-emissions frontier; set a carbon price and see where it lands, ties included; add a data center with annual or hourly matching rules and compare what each costs, claims and changes at the plants."
+  outcome: "Put a CO₂ cap, a carbon price and a procurement rule into an LP, read their duals and ties correctly, and show with stated comparisons that meeting a procurement rule is not the same as causing an emissions cut."
+  after: [M1, A10, 12]
+  next: M7
 - kind: lesson
   id: m07-monte-carlo
   path: m07-monte-carlo.qmd

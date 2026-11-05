@@ -1,0 +1,21 @@
+# Sidecar for A10 (a10-emissions-questions), builder learn-w4-c, 2026-11-05. Read by scripts/build_learn.py.
+id: a10-emissions-questions
+lesson: A10
+glossary:
+  - id: emissions-inventory
+    term: Emissions inventory
+    def: "An account that divides emissions that already happened among their sources or users, so that the shares add up to the total."
+  - id: consequential-analysis
+    term: Consequential analysis
+    def: "An analysis of what changes because of a decision, in the short run through how plants run and in the long run through what gets built."
+  - id: must-run
+    term: Must-run rule
+    def: "A rule that keeps a plant running at or above a set output whatever the price, for example because it cannot stop and restart quickly."
+  - id: location-based
+    term: Location-based method
+    def: "A way to report electricity's emissions that counts each MWh at the average emission factor of the grid where it is used."
+  - id: market-based
+    term: Market-based method
+    def: "A way to report electricity's emissions that counts each MWh at the factor of the electricity the buyer purchased, through contracts or certificates."
+requests:
+  - "A10 introduces the Plains Grid's fleet in its data file (a10-emissions-questions.json, block plains): 3,000 MW wind, 600 MW solar, 2,000 MW gas combined cycle, 2,300 MW gas peakers, EIA 2025 heat rates. A12 and M6 read it from there."

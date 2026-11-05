@@ -1,0 +1,19 @@
+# Sidecar for A12 (a12-policy-instruments), builder learn-w4-c, 2026-11-05. Read by scripts/build_learn.py.
+id: a12-policy-instruments
+lesson: A12
+glossary:
+  - id: investment-credit
+    term: Investment credit
+    def: "A payment, often through the tax code, of a share of what a new plant costs to build, whatever it later produces."
+  - id: clean-energy-standard
+    term: Clean-energy standard
+    def: "A rule that a set share of the electricity sold in a year comes from sources the rule counts as clean; sellers prove it with certificates."
+  - id: resource-cost
+    term: Resource cost
+    def: "What a plan uses up, such as plants built, their upkeep and the fuel burned, leaving out payments that only move money between groups."
+  - id: transfer-payment
+    term: Transfer
+    def: "A payment that moves money from one group to another, such as a carbon payment to the government or a credit to a plant owner, without using anything up."
+requests:
+  - "A12 loads assets/learn/m06-carbon-in-models.js for the Plains Grid's planning LP (window.LX.plainsPlan), as lesson 12 once loaded 13-capstone.js: promote it to components/ if a third page needs it."
+  - "_tests/learn/plains_face.js is a shared test helper (not a test): it loads the planning LP with the vendored HiGHS and proves a number unique by minimizing and maximizing it over the LP's optimal face."
