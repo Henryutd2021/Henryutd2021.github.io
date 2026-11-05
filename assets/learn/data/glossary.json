@@ -203,6 +203,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "calibration": {
+  "term": "Calibration (of a band)",
+  "short": "A band is calibrated when it holds what it claims: a 90% band holds about 90% of new outcomes, overall and within groups that matter.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
+ },
  "capacity": {
   "term": "Capacity",
   "short": "The most power a plant can produce at once, often called its nameplate size.",
@@ -971,6 +977,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "gaussian-process": {
+  "term": "Gaussian process",
+  "short": "A way to fit a smooth curve to a few points that also draws a band around it: narrow near the points, wider where there are none.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
+ },
  "generator": {
   "term": "Generator",
   "short": "A machine that turns the spin of a shaft into electricity, by turning magnets past coils of wire.",
@@ -1066,6 +1078,12 @@
   "short": "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "held-out-data": {
+  "term": "Held-out data",
+  "short": "Records kept aside while a model is fitted and used only to score it, so the score shows how it does on data it has not seen.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
  },
  "hidden-state": {
   "term": "Hidden state",
@@ -1186,6 +1204,12 @@
   "short": "A way to draw many sets of uncertain inputs so that the whole range of every input is covered evenly.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "length-scale": {
+  "term": "Length-scale",
+  "short": "In a Gaussian process, how far along the input one point's influence reaches: short length-scales give wiggly fits, long ones stiff fits.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
  },
  "lcoe": {
   "term": "Levelized cost of electricity (LCOE)",
@@ -1318,6 +1342,12 @@
   "short": "A table of numbers in rows and columns; in a model, one row per rule and one column per decision.",
   "lesson": "K6",
   "href": "k06-vectors-matrices.html"
+ },
+ "maximum-likelihood": {
+  "term": "Maximum likelihood",
+  "short": "Choosing a model's settings so that the data actually observed are as probable as possible under the model.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
  },
  "mcda": {
   "term": "MCDA (multi-criteria decision analysis)",
@@ -1468,6 +1498,12 @@
   "short": "How far an estimate from a Monte Carlo study would move with another random seed; it shrinks roughly with the square root of the number of runs.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
+ },
+ "multi-fidelity": {
+  "term": "Multi-fidelity data",
+  "short": "A cheap, approximate source of data combined with a few costly, accurate ones, so the cheap one fills the gaps between them.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
  },
  "multi-objective": {
   "term": "Multi-objective problem",
@@ -1720,6 +1756,12 @@
   "short": "Solar panels that turn sunlight directly into electricity.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
+ "pinball-loss": {
+  "term": "Pinball loss",
+  "short": "The score of a quantile forecast: a miss above the quantile is weighted by its level, a miss below by one minus it; lower is better.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
  },
  "point-of-common-coupling": {
   "term": "Point of common coupling",
@@ -1991,6 +2033,12 @@
   "lesson": "M5",
   "href": "m05-microgrid-size-and-run.html"
  },
+ "rmse": {
+  "term": "Root mean square error (RMSE)",
+  "short": "The square root of the average squared miss, in the units of the quantity; large misses count more than in the mean absolute error.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
+ },
  "round-trip-efficiency": {
   "term": "Round-trip efficiency",
   "short": "The share of the energy put into storage that comes back out.",
@@ -2206,6 +2254,12 @@
   "short": "All the offers to sell power in one hour, lined up from the cheapest to the most expensive.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "surrogate-model": {
+  "term": "Surrogate model",
+  "short": "A cheap stand-in for a model or measurement that is costly to run, fitted to a few samples and then used in its place.",
+  "lesson": "M9",
+  "href": "m09-surrogates-uq.html"
  },
  "synchronous-grid": {
   "term": "Synchronous grid",

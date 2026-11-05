@@ -796,8 +796,44 @@
   after: [A1, B2, K5]
   # next: M8 once M8 is live (until then the box leads back to the course map: no dead end)
 - {kind: lesson, tier: modeler, code: M8, title: "Deciding before the uncertainty resolves: stochastic and robust optimization"}
-- {kind: lesson, tier: modeler, code: M9, title: "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data"}
-- {kind: lesson, tier: modeler, code: M10, title: "Forecasting load, wind, solar and prices with machine learning, and judging it honestly"}
+- kind: lesson
+  id: m09-surrogates-uq
+  path: m09-surrogates-uq.qmd
+  code: M9
+  tier: modeler
+  form: cards
+  icon: curve
+  status: active
+  minutes: 40
+  practice_minutes: 60   # the notebook's practice tasks, after its 45-minute lab (learn_map_v2.yml)
+  lab_minutes: 45   # the notebook lab: in the header badge and timeRequired
+  title: "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data"
+  subtitle: "Fit a wind turbine's power curve from 16 records with a Gaussian process, check its band on 400 new records, and add the maker's curve as a cheap second source"
+  short: "Surrogates and Gaussian processes"
+  outcome: "Fit a Gaussian process to a few records, choose its settings by maximum likelihood, check its band's calibration on held-out records, and say when a cheap second source helps and when it misleads."
+  teaches: [Gaussian process regression, length-scale and noise, maximum likelihood on a grid, held-out scores and calibration, multi-fidelity data, pinball loss]
+  lab: "a NumPy notebook that refits the page's records and checks them, then scikit-learn's Gaussian process, a noise level that changes with wind speed and a surrogate of M7's model, about 45 minutes, then 60 minutes of practice."
+  does: "Fit a wind power curve from a handful of records and check the band on held-out records; add the maker's curve as a cheap source and see when the band narrows and stays calibrated, and when the cheap data mislead."
+  after: [M7, K6]
+- kind: lesson
+  id: m10-ml-forecasting
+  path: m10-ml-forecasting.qmd
+  code: M10
+  tier: modeler
+  form: cards
+  icon: chart
+  status: upcoming
+  minutes: 40
+  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab (learn_map_v2.yml)
+  lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
+  title: "Forecasting load, wind and solar with machine learning, and judging it honestly"
+  subtitle: "Beat 'same hour yesterday' on a held-out month of the Plains' hourly demand, score point and band forecasts honestly, and find the leak in a model that looks too good"
+  short: "Forecasting with machine learning"
+  outcome: "Build baselines and a learned forecast on a chronological split, score them on a held-out month with MAE, skill, pinball loss and coverage, and spot look-ahead leaks."
+  teaches: [persistence and seasonal-naive baselines, chronological train, validation and test split, linear regression with lags, data leakage, quantile forecasts and pinball loss, interval coverage]
+  lab: "a pandas and scikit-learn notebook that rebuilds the page's split and checks it, then gradient boosting and a small neural network on the same features, about 60 minutes, then 90 minutes of practice."
+  does: "Beat persistence and seasonal-naive baselines on a held-out month of real data; fit a learned model; score point and probabilistic forecasts (MAE, pinball loss); find the leak in a model that looks too good."
+  after: [4, M7]
 - {kind: lesson, tier: modeler, code: M11, title: "Techno-economic analysis inside an optimization model"}
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
@@ -1090,7 +1126,23 @@
   after: [SB1, F7, A14, A4]
 
 - {kind: lesson, tier: analyst, code: CF3, form: case, title: "Where should hydrogen go when nobody knows how much wind will be built?"}
-- {kind: lesson, tier: analyst, code: CF8, form: case, title: "Learning a wind turbine's power curve from scarce data"}
+# CF8, builder learn-w4-e (wave W4): a draft in learn/_drafts/ until its review fixes are done (Henry approved E12 and E13
+# on 2026-11-05)
+- kind: lesson
+  id: cf8-power-curves-from-scarce-data
+  code: CF8
+  tier: analyst
+  form: case
+  icon: turbine
+  status: upcoming
+  minutes: 10
+  title: "Learning a wind turbine's power curve from scarce data"
+  subtitle: "Why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few"
+  short: "Power curves from scarce data"
+  does: "A case file in seven parts and a timeline; then turn a power-curve band into a capacity-factor band, and see how the number of records and the theoretical curve change it."
+  outcome: "Say why a measured power curve is a band, what a theoretical curve adds when records are few, and why the verdict depends on the score."
+  teaches: [probabilistic power curves, multi-fidelity data, from a power-curve band to a capacity-factor band]
+  after: [5]
 # ---------- the math toolbox (curriculum v2 K1-K8; guided minutes; K4 and K7 built in wave W1; K1, K2, K3, K5, K8 in W2)
 - kind: tool
   id: k01-units

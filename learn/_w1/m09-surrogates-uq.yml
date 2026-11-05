@@ -1,0 +1,33 @@
+# Sidecar for M9 (m09-surrogates-uq), builder learn-w4-e, 2026-11-05. Read by scripts/build_learn.py.
+id: m09-surrogates-uq
+lesson: M9
+glossary:
+  - id: surrogate-model
+    term: Surrogate model
+    def: "A cheap stand-in for a model or measurement that is costly to run, fitted to a few samples and then used in its place."
+  - id: gaussian-process
+    term: Gaussian process
+    def: "A way to fit a smooth curve to a few points that also draws a band around it: narrow near the points, wider where there are none."
+  - id: length-scale
+    term: Length-scale
+    def: "In a Gaussian process, how far along the input one point's influence reaches: short length-scales give wiggly fits, long ones stiff fits."
+  - id: maximum-likelihood
+    term: Maximum likelihood
+    def: "Choosing a model's settings so that the data actually observed are as probable as possible under the model."
+  - id: held-out-data
+    term: Held-out data
+    def: "Records kept aside while a model is fitted and used only to score it, so the score shows how it does on data it has not seen."
+  - id: rmse
+    term: Root mean square error (RMSE)
+    def: "The square root of the average squared miss, in the units of the quantity; large misses count more than in the mean absolute error."
+  - id: calibration
+    term: Calibration (of a band)
+    def: "A band is calibrated when it holds what it claims: a 90% band holds about 90% of new outcomes, overall and within groups that matter."
+  - id: multi-fidelity
+    term: Multi-fidelity data
+    def: "A cheap, approximate source of data combined with a few costly, accurate ones, so the cheap one fills the gaps between them."
+  - id: pinball-loss
+    term: Pinball loss
+    def: "The score of a quantile forecast: a miss above the quantile is weighted by its level, a miss below by one minus it; lower is better."
+requests:
+  - "M9's Gaussian-process core (Cholesky, triangular solves, generalized least squares for the mean, the predictive band, maximum likelihood on a grid, the standard normal and its inverse, pinball loss) is lesson-local in assets/learn/m09-surrogates-uq.js and exposed as LX.M9 for case file CF8, which loads M9's script: candidate for components/gp.js."

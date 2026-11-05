@@ -1439,17 +1439,25 @@
    "tier": "modeler",
    "code": "M9",
    "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m09-surrogates-uq.html",
+   "scales": [],
+   "id": "m09-surrogates-uq",
+   "minutes": 40,
+   "form": "cards",
+   "short": "Surrogates and Gaussian processes"
   },
   {
    "tier": "modeler",
    "code": "M10",
-   "title": "Forecasting load, wind, solar and prices with machine learning, and judging it honestly",
+   "title": "Forecasting load, wind and solar with machine learning, and judging it honestly",
    "ready": false,
    "href": "index.html#modeler",
-   "scales": []
+   "scales": [],
+   "id": "m10-ml-forecasting",
+   "minutes": 40,
+   "form": "cards",
+   "short": "Forecasting with machine learning"
   },
   {
    "tier": "modeler",
@@ -1781,7 +1789,10 @@
    "ready": false,
    "href": "index.html#analyst",
    "scales": [],
-   "form": "case"
+   "id": "cf8-power-curves-from-scarce-data",
+   "minutes": 10,
+   "form": "case",
+   "short": "Power curves from scarce data"
   }
  ],
  "toolbox": [
