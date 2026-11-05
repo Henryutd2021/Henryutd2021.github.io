@@ -1467,9 +1467,13 @@
    "tier": "modeler",
    "code": "M8",
    "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m08-stochastic-robust.html",
+   "scales": [],
+   "id": "m08-stochastic-robust",
+   "minutes": 45,
+   "form": "cards",
+   "short": "Stochastic and robust"
   },
   {
    "tier": "modeler",
@@ -1816,7 +1820,10 @@
    "ready": false,
    "href": "index.html#analyst",
    "scales": [],
-   "form": "case"
+   "id": "cf3-hydrogen-under-uncertainty",
+   "minutes": 10,
+   "form": "case",
+   "short": "Hydrogen under uncertain wind"
   },
   {
    "tier": "analyst",

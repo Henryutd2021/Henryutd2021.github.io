@@ -911,6 +911,18 @@
   "lesson": "K5",
   "href": "k05-probability-statistics.html"
  },
+ "evpi": {
+  "term": "Expected value of perfect information (EVPI)",
+  "short": "How much a perfect forecast would save, in expectation, against the stochastic plan: the most such a forecast is worth to a planner who weighs only expected cost.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
+ "expected-value-problem": {
+  "term": "Expected-value problem",
+  "short": "The planning problem solved for one average future, every uncertain input set to its mean; its plan is then priced in the real branches.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
  "external-cost": {
   "term": "External cost",
   "short": "A cost that falls on people outside a deal, such as the damage from CO₂, which neither the buyer nor the seller pays.",
@@ -1067,6 +1079,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "gas-reformer": {
+  "term": "Gas reformer",
+  "short": "A plant that makes hydrogen from natural gas and steam, releasing carbon dioxide unless it is captured.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
  "gas-turbine": {
   "term": "Gas turbine",
   "short": "An engine that compresses air, burns fuel in it and lets the hot gas spin a turbine, as a jet engine does; alone it is a simple-cycle plant, such as a peaker.",
@@ -1168,6 +1186,12 @@
   "short": "The boiler of a combined-cycle plant, heated by the gas turbine's hot exhaust instead of a flame.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "here-and-now": {
+  "term": "Here-and-now decision",
+  "short": "A decision that must be made before an uncertainty resolves, such as the size of a plant, and so is the same in every branch.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
  },
  "hidden-state": {
   "term": "Hidden state",
@@ -2117,11 +2141,23 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "recourse": {
+  "term": "Recourse decision",
+  "short": "A decision made after the uncertainty resolves, such as how hard to run a plant in each branch; it can differ from branch to branch.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
  "refuelling-outage": {
   "term": "Refuelling outage",
   "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "regret": {
+  "term": "Regret",
+  "short": "A plan's cost in one future minus the cost of the best plan for that future, known only in hindsight; the least-regret plan keeps the largest regret smallest.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
  },
  "reinforcing-loop": {
   "term": "Reinforcing loop",
@@ -2201,6 +2237,12 @@
   "lesson": "A12",
   "href": "a12-policy-instruments.html"
  },
+ "robust-optimization": {
+  "term": "Robust optimization",
+  "short": "Planning against a set of possible futures without chances: here, choosing the plan whose worst cost over the set is lowest.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
  "rolling-horizon": {
   "term": "Rolling horizon",
   "short": "Planning over a window ahead on a forecast, carrying out only the first hours of the plan, then planning again as the real values arrive.",
@@ -2254,6 +2296,12 @@
   "short": "A coherent what-if set of a model's inputs, such as a 36-month wait; a scenario may be given a probability, though this lesson gives none.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
+ },
+ "scenario-tree": {
+  "term": "Scenario tree",
+  "short": "A picture of a decision under uncertainty: a choice made now at the root, then one branch for each way the future may turn out, each with its chance.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
  },
  "scientific-notation": {
   "term": "Scientific notation",
@@ -2597,6 +2645,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "two-stage-stochastic-program": {
+  "term": "Two-stage stochastic program",
+  "short": "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimise the expected cost over all branches.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
  "unbounded": {
   "term": "Unbounded",
   "short": "Said of a model whose goal can improve without limit, which usually means a rule is missing.",
@@ -2663,6 +2717,12 @@
   "lesson": "A14",
   "href": "a14-microgrid-value.html"
  },
+ "value-of-stochastic-solution": {
+  "term": "Value of the stochastic solution (VSS)",
+  "short": "How much the stochastic program's plan saves, in expectation, against the plan built for the average future.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
+ },
  "variable-om": {
   "term": "Variable O&M",
   "short": "Operation and maintenance costs, apart from fuel, that grow with every megawatt-hour a plant makes.",
@@ -2704,6 +2764,12 @@
   "short": "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "wait-and-see": {
+  "term": "Wait-and-see problem",
+  "short": "The planning problem solved as if the future were known: one best plan for each branch, which no real planner can choose in advance.",
+  "lesson": "M8",
+  "href": "m08-stochastic-robust.html"
  },
  "waste-heat": {
   "term": "Waste heat",
