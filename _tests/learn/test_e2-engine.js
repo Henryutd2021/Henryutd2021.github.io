@@ -13,9 +13,12 @@
 //   - uniqueness (W2 review finding 2; brief §2 item 7): each shown price (zones and reserve) equals the cost slope when
 //     its row moves 0.001 MWh up and down (no corner); every number the pages show is the same with the tie weights
 //     x10 and x0.1; the commitment is the MILP's unique optimum (a second solve that must differ costs more)
+//   - who is short (SB2 and C2 review finding 2): a zone's unserved load is shared in proportion to load, the large
+//     load's after its curtailment; its served energy never exceeds the zone's (both links at 0 MW, 600 MW at Town)
 //   - failure states: solve never rejects; a solver that throws, rejects, returns nothing or an error gives "error"; a
-//     stubbed time limit with a plan gives "time-limit", the plan, its gap and "not proven optimal"; a real 1 ms limit
-//     never says optimal; BenchRun.classify offers Try again and never says optimal
+//     stubbed time limit with a plan gives "time-limit", the plan, its gap and "not proven optimal"; a pricing LP that
+//     stops early gives no result and no prices, whatever the MILP did (SB2 finding 6); a real 1 ms limit never says
+//     optimal; BenchRun.classify offers Try again and never says optimal
 //   - adequacy: the max-flow deficit equals an LP max-flow on 300 seeded instances; Town's slack too; the seeded Monte
 //     Carlo repeats exactly; C2's reference numbers (today's grid within 0.1 days a year; the 300 MW load alone far above)
 // Usage (from the site folder):  node _tests/learn/test_e2-engine.js
@@ -131,6 +134,23 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
   ok(partsOk, "each day: objective = running + no-load + start-up + penalties (+ the other ties, under $2)");
   ok(rHot.results.tot.shed > 1 && rHot.results.tot.cong.TM > 0, "the week has unserved hours and Town–Metro congestion (" + E2.kilo(rHot.results.tot.shed) + " MWh, " + rHot.results.tot.cong.TM + " h)");
 
+  // ---------------- who is short: a zone's unserved load shared in proportion to load (the large load's after curtailment)
+  async function shareCheck(st, name) {
+    const r = await E2.solve(st, P, { solver }), R = r.results, sys = E2.sysOf(st, P), zi = P.zix[sys.llz];
+    let hourOk = true, served = 0, pay = 0, cut = 0;
+    R.days.forEach(d => d.hours.forEach(h => {
+      const x = h.z[zi], want = sys.ll - h.cl, rest = x.load - h.cl, share = rest > 0 ? want * x.shed / rest : 0;
+      if (!near(h.llShed, share, 1e-9) || want - h.llShed > x.load - h.cl - x.shed + 1e-9) hourOk = false;
+      served += want - share; pay += (want - share) * x.price; cut += share;
+    }));
+    ok(r.ok && hourOk && near(R.tot.llMWh, served, 1e-6) && near(R.tot.llPay, pay, 1e-3) && near(R.tot.llShed, cut, 1e-9), name + ": the large load's unserved share is the zone's shortfall × its load ÷ the zone's load, hour by hour; served and paid follow it");
+    ok(R.tot.llMWh <= R.served[zi] + 1e-6 && R.tot.llMWh + R.tot.llShed + R.tot.curtail <= sys.ll * R.hours + 1e-6, name + ": its served energy (" + E2.kilo(R.tot.llMWh) + " MWh) is within the zone's (" + E2.kilo(R.served[zi]) + " MWh), and served + unserved + curtailed = its request");
+    return R;
+  }
+  const Rcut = await shareCheck(Object.assign({}, def, { ll: 600, llz: "T", wt: 0, tm: 0 }), "both links at 0 MW, 600 MW at Town (the review's case)");
+  ok(Rcut.tot.llShed > 1 && Rcut.tot.shedZ[P.zix.T] > Rcut.tot.llShed, "there the large load bears part of Town's shortfall, not all of it (" + E2.kilo(Rcut.tot.llShed) + " of " + E2.kilo(Rcut.tot.shedZ[P.zix.T]) + " MWh)");
+  await shareCheck(stHot, "the peak-demand week, 400 MW, 20% flexible");
+
   // ---------------- no prices from the MILP (§9.2)
   const m0 = E2.dayModel(P, E2.sysOf(def, P), "2025", P.periods.peak.day0, null), r0 = solveSync(m0, { gap: 1e-6 });
   ok(r0.kind === "milp" && r0.duals === null && r0.reducedCosts === null, "the commitment MILP returns no duals");
@@ -165,7 +185,7 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ["C2 default year", c2d, "year"], ["C2 peakers and uprate, hard weeks", Object.assign({}, c2d, E2.c2presets[1].state), "weeks"]];
   const shown = (R, bat) => { const q = R.task === "year" ? 1e5 : 1000; return { prod: Math.round(R.tot.prod / q), up: Math.round(R.tot.upliftAll / q), avg: R.avgPrice.map(v => Math.round(v)).join(), max: R.maxPrice.map(v => Math.round(v)).join(),
     shed: Math.round(R.tot.shed), rs: Math.round(R.tot.rshort), spill: Math.round(R.tot.spill), co2: Math.round(R.tot.co2), cong: JSON.stringify(R.tot.cong), rent: Math.round(R.tot.rent / q),
-    gen: Object.values(R.tot.gen).map(v => Math.round(v)).join(), ll: Math.round(R.tot.llPay / q), com: R.days.map(d => JSON.stringify(d.com.u)).join("|"),
+    gen: Object.values(R.tot.gen).map(v => Math.round(v)).join(), ll: Math.round(R.tot.llPay / q), llE: Math.round(R.tot.llMWh), llShed: Math.round(R.tot.llShed), com: R.days.map(d => JSON.stringify(d.com.u)).join("|"),
     hours: R.days.map(d => d.hours.map(h => h.z.map(x => Math.round(x.price)).join(",") + ";" + Math.round(h.rho) + (bat ? "" : ";" + Math.round(h.f.WT) + "," + Math.round(h.f.TM))).join(" ")).join("|") }; };
   for (const [name, st, task] of cases) {
     const r = await E2.solve(st, P, { solver, task });
@@ -195,6 +215,11 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
   for (const [nm, f] of bad) { const r = await E2.solve(def, P, { solver: f }); ok(r.status === "error" && !r.ok && !r.results && /failed/.test(r.message), "a solver that " + nm + ": status error, no results, a message"); }
   const tl = await E2.solve(Object.assign({}, def, { per: "hot" }), P, { solver: (m, o) => { const r = solveSync(m, o); if (r.values && m.variables.some(v => v.type === "integer")) { r.status = "time-limit"; r.ok = false; r.mipGap = 0.0123; } return Promise.resolve(r); } });
   ok(tl.status === "time-limit" && !tl.ok && tl.results && tl.results.days.length === 7 && /not proven optimal/.test(tl.message) && /1\.23%/.test(tl.message) && /conditional/.test(tl.message), "a time limit with a plan: status time-limit, the results kept, its gap and 'not proven optimal': " + tl.message);
+  const tlp = await E2.solve(def, P, { solver: (m, o) => { const r = solveSync(m, o); if (r.values && !m.variables.some(v => v.type === "integer")) { r.status = "time-limit"; r.ok = false; } return Promise.resolve(r); } });
+  ok(tlp.status === "time-limit" && !tlp.ok && !tlp.results && tlp.commitStatus === "optimal" && tlp.priceStatus === "time-limit" && /prices/.test(tlp.message) && !/best found so far/.test(tlp.message),
+    "a pricing LP stopped at its time limit (duals in hand, the MILP optimal): no result and no prices, the statuses kept apart: " + tlp.message);
+  const cp = BR.classify(tlp, null, true);
+  ok(cp.kind === "early" && !cp.draw && cp.retry, "BenchRun: nothing drawn, Try again offered");
   const c1 = BR.classify(tl, null, true);
   ok(c1.kind === "early" && c1.draw && c1.retry && !/optimal\b(?! )/i.test(c1.text.replace(/not proven optimal/, "")), "BenchRun: a time-limited run is drawn, offers Try again and never says optimal");
   const real = await E2.solve(def, P, { solver: (m, o) => Promise.resolve(X && solveSync(m, Object.assign({}, o, { timeLimit: 0.001 }))) });

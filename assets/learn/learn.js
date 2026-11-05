@@ -11420,7 +11420,11 @@
    fixed (the units on are bounded by pmin x n and pmax x n; units off are left out); its balance duals are the zones'
    prices and its reserve dual the reserve price, "conditional on the commitment". Uplift: a committed group whose
    day's revenue at those prices (energy and reserve) falls short of its running, no-load and start-up costs is paid
-   the difference (make-whole), charged to load in proportion to energy (C2).
+   the difference (make-whole), charged to load in proportion to energy (C2). Prices are shown only when the pricing LP
+   itself reports optimal (SB2 review finding 6): a pricing LP that stops early gives no result, whatever the MILP did.
+   Who is short (SB2 finding 2, C2 finding 2): a zone's unserved load is shared by its customers in proportion to their
+   load that hour (the large load's after its own curtailment); the large load's served energy and payment follow that
+   rule (readDay: h.llShed, tot.llShed).
 
    Tie rule (W2 review finding 2), all in $/MWh (data file, `tie`), far below a cent: spilling wind and sun costs
    0.00001 at Wind Ridge, 0.00002 at Prairie Town, 0.00003 in Metro (the farthest from the city spills first); unserved
@@ -11450,7 +11454,8 @@
    discharged greedily hour by hour; each hour's unserved load is the max-flow deficit of the three zones and two links
    (the largest, over the zone subsets S, of S's load minus S's available supply minus the links' limits into S). The
    large load's flexible share is curtailed before any load is unserved. LOLE: days a year with any load unserved
-   (the common criterion is 0.1); LOLH hours; EUE MWh; a 90% interval of LOLE from the spread of the draw years.
+   (C2's target is 0.1, PJM's criterion of one day in ten years, Manual 20A §1.3); LOLH hours; EUE MWh; a 90% interval
+  of LOLE from the spread of the draw years. The operating reserve plays no part in it (operations, not adequacy).
    Node: module.exports = E2 (no DOM). In a page: LX.E2 and the view kit LX.E2.ui (controls, the zone map, results). */
 (function () {
   "use strict";
@@ -11509,7 +11514,7 @@
       { id: "ll", short: "l", type: "int", min: 0, max: 600, step: 50, def: 0, label: "Large load (a data center)", unit: "MW" },
       { id: "llz", short: "z", type: "enum", values: ["T", "M"], names: { T: "Prairie Town", M: "Metro" }, def: "T", label: "It connects in" },
       { id: "flex", short: "f", type: "int", min: 0, max: 50, step: 10, def: 0, label: "Share it can curtail", unit: "%" },
-      { id: "bid", short: "b", type: "int", min: 100, max: 2000, step: 50, def: 300, label: "It curtails when the price is above", unit: "$/MWh" },
+      { id: "bid", short: "b", type: "int", min: 100, max: 2000, step: 50, def: 300, label: "Curtailment bid", unit: "$/MWh" },
       { id: "wt", short: "w", type: "int", min: 0, max: 1500, step: 50, def: 900, label: "Ridge–Town limit", unit: "MW" },
       { id: "tm", short: "t", type: "int", min: 0, max: 1200, step: 50, def: 400, label: "Town–Metro limit", unit: "MW" },
       { id: "res", short: "r", type: "int", min: 0, max: 600, step: 25, def: 250, label: "Operating reserve required", unit: "MW" },
@@ -11519,7 +11524,7 @@
   var presets = [
     { id: "today", label: "Today's grid", state: { ll: 0, flex: 0, wt: 900, tm: 400 }, note: "No large load; the links as built" },
     { id: "load", label: "Add the 300 MW load", state: { ll: 300, llz: "T", flex: 0 }, note: "A 300 MW data center at Prairie Town, always on" },
-    { id: "flex", label: "Make it flexible", state: { ll: 300, llz: "T", flex: 20, bid: 300 }, note: "The same load, 20% of it curtailed when the price is above $300/MWh" },
+    { id: "flex", label: "Make it flexible", state: { ll: 300, llz: "T", flex: 20, bid: 300 }, note: "The same load, 20% of it curtailable at a $300/MWh bid" },
     { id: "link", label: "Uprate Town–Metro", state: { ll: 300, llz: "T", tm: 800 }, note: "The 300 MW load and a Town–Metro limit of 800 MW" }
   ];
   // C2: the capstone's plan (builds, the link, reserves, the large load's connection and tariff, the cost ranges)
@@ -11530,7 +11535,7 @@
   function c2Schema(cfg) {
     var C = cfg.c2, R = C.costs, f = [
       { id: "conn", short: "c", type: "int", min: 150, max: 300, step: 150, def: 300, label: "Large load connected this year", unit: "MW" },
-      { id: "flex", short: "f", type: "int", min: 0, max: 20, step: 20, def: 0, label: "Share it can curtail (above $" + C.bid + "/MWh)", unit: "%" },
+      { id: "flex", short: "f", type: "int", min: 0, max: 20, step: 20, def: 0, label: "Share it can curtail (bid $" + C.bid + "/MWh)", unit: "%" },
       { id: "pk", short: "k", type: "int", min: 0, max: 6, step: 2, def: 0, label: "New peakers at Prairie Town (50 MW each)", unit: "units" },
       { id: "bat", short: "s", type: "int", min: 0, max: 100, step: 100, def: 0, label: "Battery at Prairie Town (4 hours)", unit: "MW" },
       { id: "up", short: "u", type: "int", min: 0, max: 300, step: 300, def: 0, label: "Town–Metro uprate", unit: "MW" },
@@ -11557,7 +11562,7 @@
   var c2presets = [
     { id: "ask", label: "Connect it, build nothing", state: { conn: 300, flex: 0, pk: 0, bat: 0, up: 0 }, note: "The 300 MW request on today's grid" },
     { id: "firm", label: "Peakers and an uprate", state: { conn: 300, flex: 0, pk: 6, bat: 0, up: 300 }, note: "Six 50 MW peakers at Town and 300 MW more on Town–Metro" },
-    { id: "flex", label: "Flexible load and a battery", state: { conn: 300, flex: 20, pk: 0, bat: 100, up: 0 }, note: "20% curtailable above $500/MWh, and a 100 MW battery" },
+    { id: "flex", label: "Flexible load and a battery", state: { conn: 300, flex: 20, pk: 0, bat: 100, up: 0 }, note: "20% curtailable at a $500/MWh bid, and a 100 MW battery" },
     { id: "staged", label: "Stage it: 150 MW now", state: { conn: 150, flex: 0, pk: 0, bat: 0, up: 0 }, note: "Half the request this year, the rest later" }
   ];
   // the system a plan describes: { ll, llz, flex (share), bid, caps, res, gas, extra (built peakers), bat, add (wind, solar) }
@@ -11685,7 +11690,7 @@
   // milp: the MILP's result (its commitment); lp: the dispatch LP's result (dispatch, prices); both with values
   function readDay(P, sys, y, day, com, lp) {
     var x = lp.values, U = fleet(P, sys), Z = P.zones, out = { y: y, day: day, hours: [] };
-    var tot = { running: 0, noload: 0, startup: 0, co2: 0, shed: 0, rshort: 0, spill: 0, curtail: 0, llMWh: 0, llPay: 0, rent: 0,
+    var tot = { running: 0, noload: 0, startup: 0, co2: 0, shed: 0, rshort: 0, spill: 0, curtail: 0, llMWh: 0, llPay: 0, llShed: 0, rent: 0,
       gen: {}, starts: {}, uplift: {}, rev: {}, cost: {}, pay: Z.map(function () { return 0; }), load: Z.map(function () { return 0; }), base: Z.map(function () { return 0; }),
       cong: {}, spillZ: Z.map(function () { return 0; }), shedZ: Z.map(function () { return 0; }), batIn: 0, batOut: 0 };
     P.links.forEach(function (l) { tot.cong[l.id] = 0; });
@@ -11706,8 +11711,10 @@
       });
       h.cl = x["cl_" + t] || 0; tot.curtail += h.cl;
       if (sys.ll > 0) {
-        var zi = P.zix[sys.llz], served = sys.ll - h.cl;
-        tot.llMWh += served; tot.llPay += served * h.z[zi].price;
+        // the zone's unserved load is shared in proportion to load (the large load's after its own curtailment)
+        var zi = P.zix[sys.llz], want = sys.ll - h.cl, rest = h.z[zi].load - h.cl, cut = rest > 0 ? want * h.z[zi].shed / rest : 0;
+        h.llShed = cut; tot.llShed += cut;
+        tot.llMWh += want - cut; tot.llPay += (want - cut) * h.z[zi].price;
       }
       Z.forEach(function (z, i) { tot.pay[i] += (h.z[i].load - h.z[i].shed - (sys.ll > 0 && i === P.zix[sys.llz] ? h.cl : 0)) * h.z[i].price; });
       if (sys.bat) { h.bc = x["bc_" + t]; h.bd = x["bd_" + t]; h.bq = x["bq_" + t]; h.br = x["br_" + t]; tot.batIn += h.bc; tot.batOut += h.bd; }
@@ -11780,7 +11787,8 @@
         if (stop(rm)) { raw.failed = { day: d, r: rm, step: "commit" }; return; }
         var com = commitment(P, sys, rm);
         return one(dayModel(P, sys, d.y, d.day, prev, { fix: com }), "e2-price").then(function (rl) {
-          if (stop(rl) || !rl.duals) { raw.failed = { day: d, r: rl, step: "price" }; return; }
+          // prices only from a pricing LP that reports optimal (a time-limited LP's duals are not shown, whatever the MILP did)
+          if (stop(rl) || !rl.duals || rl.status !== "optimal") { raw.failed = { day: d, r: rl, step: "price" }; return; }
           var rd = readDay(P, sys, d.y, d.day, com, rl);
           rd.spec = d; rd.milp = { status: rm.status, gap: rm.mipGap, objective: rm.objective }; rd.com = com;
           raw.days.push(rd);
@@ -11795,6 +11803,10 @@
       var gap = gaps.length ? Math.max.apply(null, gaps) : null;
       var res = { status: status, ok: status === "optimal", kind: "milp", task: task, mipGap: status === "optimal" && gap != null && gap < 5e-5 ? 0 : gap, gapRaw: gap,
         ms: { roundTrip: Date.now() - t0 }, raw: raw, results: null, message: null, hint: null };
+      // the commitment's and the pricing's statuses, apart (the pages may show prices only when every pricing LP is optimal)
+      var stOf = function (lb) { var a = raw.solves.filter(function (s) { return s.label === lb; }).map(function (s) { return s.status; }); return a.length ? worst(a) : null; };
+      res.commitStatus = stOf("e2-uc"); res.priceStatus = stOf("e2-price");
+      var priceStop = raw.failed && raw.failed.step === "price" && raw.failed.r && raw.failed.r.status && raw.failed.r.status !== "optimal";
       var complete = raw.days.length === days.length;
       if (complete) res.results = summarize(state, P, raw);
       if (status === "optimal" && !complete) { res.status = "error"; res.ok = false; }
@@ -11802,7 +11814,8 @@
       var what = task === "year" ? n + " days (" + nRep + " representative days and the " + (n - nRep) + " days of the two hard weeks)" : n + " day" + (n === 1 ? "" : "s");
       if (RANK[res.status] === 2) {
         var lim = (limit >= 1 ? Math.round(limit) : limit) + " s";
-        res.message = res.results
+        if (priceStop && !res.results) res.message = "The dispatch linear program that prices " + raw.failed.day.label + " stopped (" + raw.failed.r.status + ") before it proved its prices, so no result is shown: the commitment alone gives no prices. Try again gives the solver more time.";
+        else res.message = res.results
           ? "Stopped at the " + lim + " time limit" + (n > 1 ? " on at least one day" : "") + ": the commitment shown is the best found so far" + (gap != null ? ", within " + (gap * 100).toFixed(2) + "% of the best bound" : "") + ". It is not proven optimal, and its prices are conditional on it. Try again gives the solver more time."
           : "Stopped at the " + lim + " time limit on " + (raw.failed ? raw.failed.day.label : "a day") + " before any commitment was found, so no result is shown. Try again gives the solver more time.";
       } else if (res.status === "optimal") {
@@ -11820,7 +11833,7 @@
   function summarize(state, P, raw) {
     var sys = raw.sys, days = raw.days, task = raw.task, U = fleet(P, sys), Z = P.zones;
     var w = days.map(function (d) { return d.spec && d.spec.weight != null ? d.spec.weight : 1; });
-    var T = { running: 0, noload: 0, startup: 0, prod: 0, co2: 0, shed: 0, rshort: 0, spill: 0, curtail: 0, llMWh: 0, llPay: 0, rent: 0, upliftAll: 0, batIn: 0, batOut: 0,
+    var T = { running: 0, noload: 0, startup: 0, prod: 0, co2: 0, shed: 0, rshort: 0, spill: 0, curtail: 0, llMWh: 0, llPay: 0, llShed: 0, rent: 0, upliftAll: 0, batIn: 0, batOut: 0,
       gen: {}, starts: {}, uplift: {}, pay: Z.map(function () { return 0; }), load: Z.map(function () { return 0; }), base: Z.map(function () { return 0; }),
       cong: {}, spillZ: Z.map(function () { return 0; }), shedZ: Z.map(function () { return 0; }) };
     P.links.forEach(function (l) { T.cong[l.id] = 0; });
@@ -11828,7 +11841,7 @@
     var mx = Z.map(function () { return -Infinity; }), mn = Z.map(function () { return Infinity; }), rhoMax = 0, rshortH = 0, shedH = 0;
     days.forEach(function (d, k) {
       var t = d.tot, wk = w[k];
-      ["running", "noload", "startup", "prod", "co2", "shed", "rshort", "spill", "curtail", "llMWh", "llPay", "rent", "upliftAll", "batIn", "batOut"].forEach(function (q) { T[q] += wk * t[q]; });
+      ["running", "noload", "startup", "prod", "co2", "shed", "rshort", "spill", "curtail", "llMWh", "llPay", "llShed", "rent", "upliftAll", "batIn", "batOut"].forEach(function (q) { T[q] += wk * t[q]; });
       U.forEach(function (u) { T.gen[u.id] += wk * t.gen[u.id]; T.starts[u.id] += wk * t.starts[u.id]; T.uplift[u.id] += wk * t.uplift[u.id]; });
       Z.forEach(function (z, i) { T.pay[i] += wk * t.pay[i]; T.load[i] += wk * t.load[i]; T.base[i] += wk * t.base[i]; T.spillZ[i] += wk * t.spillZ[i]; T.shedZ[i] += wk * t.shedZ[i]; });
       P.links.forEach(function (l) { T.cong[l.id] += wk * t.cong[l.id]; });
@@ -11975,7 +11988,7 @@
       ["Solar built: Ridge · Town · Metro", zl("solar") + " MW", "Illustrative"],
       ["Output per MW: wind · solar", (P.cfg.cf.wind * 100).toFixed(1) + "% · " + (P.cfg.cf.solar * 100).toFixed(1) + "% a year", "SPP's 2025 shapes scaled to EIA's 2025 monthly capacity factors: " + linkA(S.epm607, "EPM Table 6.07.B") + ", " + S.epm607.asOf],
       ["Link limits: Ridge–Town · Town–Metro", P.links.map(function (l) { return kilo(l.cap); }).join(" · ") + " MW", "Illustrative"],
-      ["Fuel: gas · coal", "$" + c.fuels.gas.price.toFixed(2) + " · $" + c.fuels.coal.price.toFixed(2) + "/MMBtu", "Average cost to the electric power industry, 2025: " + linkA(S.epa74, "EIA, Electric Power Annual, Table 7.4") + " · " + S.epa74.asOf],
+      ["Fuel: gas · coal", "$" + c.fuels.gas.price.toFixed(2) + " · $" + c.fuels.coal.price.toFixed(2) + "/MMBtu", "Average cost to the electric power industry, 2025: " + linkA(S.epa74, "EIA, Electric Power Annual, Table 7.4") + " · " + S.epa74.asOf + ". One <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> is a million British thermal units of fuel heat"],
       ["Heat rates", "6.4 to 11.2 MMBtu/MWh", "Illustrative, around EIA's 2025 averages (coal 10.65, gas 7.78 MMBtu/MWh): " + linkA(S.epa81, "Electric Power Annual, Table 8.1") + " · " + S.epa81.asOf],
       ["CO₂: gas · subbituminous coal", c.fuels.gas.co2.toFixed(2) + " · " + c.fuels.coal.co2.toFixed(2) + " kg/MMBtu", linkA(S.co2, "EIA, Carbon Dioxide Emissions Coefficients") + " · " + S.co2.asOf],
       ["Unserved load · reserve short", "$" + kilo(c.voll) + " · $" + kilo(c.reserveShort) + "/MWh", "Illustrative penalties in the objective, not costs anyone pays"]];
@@ -12112,23 +12125,31 @@
       P.zones.forEach(function (z, i) {
         var x = h.z[i], U = fleet(P, R.sys).filter(function (u) { return u.zone === z.id; }), th = U.reduce(function (s, u) { return s + h.p[u.id]; }, 0);
         var bat = R.sys.bat && R.sys.bat.zone === z.id ? h.bd - h.bc : 0;
+        // the load asked for, what the large load chose to curtail (its bid), what went unserved, and what was served
+        var cl = R.sys.ll > 0 && R.sys.llz === z.id ? h.cl : 0, served = x.load - cl - x.shed, part = cl > 0.5 || x.shed > 0.5;
         zEls[i].querySelector(".e2-zp").textContent = priceTxt(x.price) + "/MWh";
-        var rows = [["Load", kilo(x.load) + " MW"], ["Wind and sun used", kilo(x.used) + " MW"], ["Plants", kilo(th) + " MW"]];
+        var rows = [[part ? "Load asked" : "Load", kilo(x.load) + " MW"]];
+        if (cl > 0.5) rows.push(["Curtailed (its bid)", kilo(cl) + " MW"]);
+        if (x.shed > 0.5) rows.push(["Unserved", kilo(x.shed) + " MW"]);
+        if (part) rows.push(["Load served", kilo(served) + " MW"]);
+        rows.push(["Wind and sun used", kilo(x.used) + " MW"], ["Plants", kilo(th) + " MW"]);
         if (Math.abs(bat) > 0.5) rows.push(["Battery", (bat > 0 ? "out " : "in ") + kilo(Math.abs(bat)) + " MW"]);
         if (x.spill > 0.5) rows.push(["Spilled", kilo(x.spill) + " MW"]);
-        if (x.shed > 0.5) rows.push(["Unserved", kilo(x.shed) + " MW"]);
         zEls[i].querySelector(".e2-zd").innerHTML = rows.map(function (r) { return "<div><dt>" + r[0] + "</dt><dd>" + r[1] + "</dd></div>"; }).join("");
         zEls[i].classList.toggle("short", x.shed > 0.5);
-        items.push(z.name + ": price " + priceTxt(x.price) + "/MWh (conditional on the commitment); load " + kilo(x.load) + " MW; wind and sun used " + kilo(x.used) + " MW; plants " + kilo(th) + " MW" +
-          (Math.abs(bat) > 0.5 ? "; battery " + (bat > 0 ? "out " : "in ") + kilo(Math.abs(bat)) + " MW" : "") + (x.spill > 0.5 ? "; " + kilo(x.spill) + " MW spilled" : "") + (x.shed > 0.5 ? "; " + kilo(x.shed) + " MW unserved" : "") + ".");
+        items.push(z.name + ": price " + priceTxt(x.price) + "/MWh (conditional on the commitment); load asked " + kilo(x.load) + " MW" +
+          (cl > 0.5 ? "; " + kilo(cl) + " MW curtailed by the large load at its bid" : "") + (x.shed > 0.5 ? "; " + kilo(x.shed) + " MW unserved" : "") + (part ? "; load served " + kilo(served) + " MW" : "") +
+          "; wind and sun used " + kilo(x.used) + " MW; plants " + kilo(th) + " MW" +
+          (Math.abs(bat) > 0.5 ? "; battery " + (bat > 0 ? "out " : "in ") + kilo(Math.abs(bat)) + " MW" : "") + (x.spill > 0.5 ? "; " + kilo(x.spill) + " MW spilled" : "") + ".");
       });
       P.links.forEach(function (l, i) {
         var f = h.f[l.id], cap = R.sys.caps[l.id], at = cap > 0 && Math.abs(f) >= cap - 1e-6, a = P.zones[P.zix[l.from]], b = P.zones[P.zix[l.to]];
         var dir = Math.abs(f) < 0.5 ? "" : (f > 0 ? "→ " : "← ");
         lEls[i].querySelector(".e2-lf").textContent = dir + kilo(Math.abs(f)) + " MW";
-        lEls[i].querySelector(".e2-lc").textContent = at ? "at its " + kilo(cap) + " MW limit" : "limit " + kilo(cap) + " MW";
+        lEls[i].querySelector(".e2-lc").textContent = cap === 0 ? "open: limit 0 MW" : at ? "at its " + kilo(cap) + " MW limit" : "limit " + kilo(cap) + " MW";
         lEls[i].classList.toggle("at", at);
-        items.push(l.name + " link: " + (Math.abs(f) < 0.5 ? "no flow" : kilo(Math.abs(f)) + " MW from " + (f > 0 ? a.name + " to " + b.name : b.name + " to " + a.name)) + (at ? ", at its " + kilo(cap) + " MW limit." : " (limit " + kilo(cap) + " MW)."));
+        items.push(l.name + " link: " + (cap === 0 ? "open (limit 0 MW), so nothing flows and each side is priced on its own." :
+          (Math.abs(f) < 0.5 ? "no flow" : kilo(Math.abs(f)) + " MW from " + (f > 0 ? a.name + " to " + b.name : b.name + " to " + a.name)) + (at ? ", at its " + kilo(cap) + " MW limit." : " (limit " + kilo(cap) + " MW).")));
       });
       note.textContent = "Prices are conditional on the commitment. Reserve price this hour: " + priceTxt(h.rho) + "/MWh" + (h.rshort > 0.5 ? "; reserve short by " + kilo(h.rshort) + " MW." : ".");
       altList.innerHTML = ""; items.forEach(function (t) { H("li", { text: t }, altList); });

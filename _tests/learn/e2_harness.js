@@ -5,7 +5,8 @@
 //   between, writeBlocks, norm, excerpts, register, portfolio: as in e1_harness.js (re-exported)
 //   fullYear(E2, P, state, solveSync, year)   the plan's whole year, day by day in order (each day a MILP, then the
 //                 dispatch LP with the commitment fixed; the state of 23:00 carried), for the check of the representative
-//                 days (§9.3): { days, tot (summed), avgPrice, ... } as E2.summarize gives them
+//                 days (§9.3): { days, tot (summed), avgPrice, ... } as E2.summarize gives them; it throws unless every
+//                 commitment MILP and every pricing LP reports optimal
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -35,8 +36,9 @@ function fullYear(E2, P, st, solveSync, year) {
   let carry = null;
   for (let d = 0; d < 365; d++) {
     const rm = solveSync(E2.dayModel(P, sys, y, d, carry), { gap: 1e-6 });
-    if (!rm.values) throw new Error("fullYear: day " + d + " " + rm.status);
+    if (!rm.values || rm.status !== "optimal") throw new Error("fullYear: day " + d + " commitment " + rm.status);
     const com = E2.commitment(P, sys, rm), rl = solveSync(E2.dayModel(P, sys, y, d, carry, { fix: com }));
+    if (rl.status !== "optimal" || !rl.duals) throw new Error("fullYear: day " + d + " pricing " + rl.status);   // every solve of a check is optimal
     const rd = E2.readDay(P, sys, y, d, com, rl); rd.spec = { y, day: d, carry: d > 0, weight: 1 }; rd.com = com; rd.milp = { status: rm.status };
     days.push(rd); carry = E2.carry(P, sys, com);
   }
