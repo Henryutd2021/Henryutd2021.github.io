@@ -1487,10 +1487,13 @@
    "tier": "modeler",
    "code": "SB2",
    "title": "Grid Room",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "sb2-grid-room.html",
    "scales": [],
-   "form": "sandbox"
+   "id": "sb2-grid-room",
+   "minutes": 30,
+   "form": "sandbox",
+   "short": "Grid Room"
   },
   {
    "tier": "modeler",

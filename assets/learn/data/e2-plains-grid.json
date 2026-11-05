@@ -1,0 +1,426 @@
+{
+ "about": "Data of engine E2 (assets/learn/components/engine-e2.js): the Plains Grid of Learn's regional scale (S2), used by the Grid Room (SB2) and capstone C2 (wave W4, 2026-11-05). The Plains Grid, its three zones, its plants, its links and every size, cost and outage rate are fictional and illustrative. Hourly demand, wind and solar follow the real 2025 shapes of the Southwest Power Pool grid (town_year.json, EIA-930), scaled per zone; wind and solar per MW use LX.townProfile with EIA's 2025 monthly capacity factors (cf_targets.json). The three zones share one weather: real zones' wind and sun would not move together hour by hour. A second weather year (2024, m03-capacity-expansion-2024.json, 29 February left out) is scaled to 2025's yearly demand energy and used only for the checks. The precomputed block is written by node _tests/learn/test_e2-engine.js --write and re-solved by the same test.",
+ "dollarYear": 2025,
+ "zones": [
+  {
+   "id": "W",
+   "name": "Wind Ridge",
+   "short": "Ridge",
+   "peak": 300,
+   "wind": 2000,
+   "solar": 0,
+   "note": "wind country: little load, most of the wind"
+  },
+  {
+   "id": "T",
+   "name": "Prairie Town",
+   "short": "Town",
+   "peak": 450,
+   "wind": 150,
+   "solar": 200,
+   "note": "the town and its county, where the large load asks to connect"
+  },
+  {
+   "id": "M",
+   "name": "Metro",
+   "short": "Metro",
+   "peak": 3250,
+   "wind": 300,
+   "solar": 600,
+   "note": "the city: most of the load and the large plants"
+  }
+ ],
+ "links": [
+  {
+   "id": "WT",
+   "from": "W",
+   "to": "T",
+   "name": "Ridge–Town",
+   "cap": 900
+  },
+  {
+   "id": "TM",
+   "from": "T",
+   "to": "M",
+   "name": "Town–Metro",
+   "cap": 400
+  }
+ ],
+ "fuels": {
+  "gas": {
+   "label": "natural gas",
+   "price": 3.85,
+   "co2": 52.91
+  },
+  "coal": {
+   "label": "coal",
+   "price": 2.42,
+   "co2": 97.13
+  }
+ },
+ "units": [
+  {
+   "id": "tcc",
+   "zone": "T",
+   "name": "Town combined cycle",
+   "short": "Town CC",
+   "fuel": "gas",
+   "n": 1,
+   "pmax": 200,
+   "pmin": 80,
+   "hr": 7.2,
+   "vom": 3,
+   "nlHeat": 80,
+   "su": 6000,
+   "ut": 4,
+   "dt": 4,
+   "rcap": 60,
+   "for": 0.05,
+   "mttr": 40
+  },
+  {
+   "id": "tpk",
+   "zone": "T",
+   "name": "Town peakers",
+   "short": "Town peakers",
+   "fuel": "gas",
+   "n": 2,
+   "pmax": 50,
+   "pmin": 0,
+   "hr": 11.2,
+   "vom": 6,
+   "nlHeat": 0,
+   "su": 0,
+   "ut": 0,
+   "dt": 0,
+   "rcap": 50,
+   "for": 0.06,
+   "mttr": 30,
+   "fast": true
+  },
+  {
+   "id": "mco",
+   "zone": "M",
+   "name": "Metro coal units",
+   "short": "Coal",
+   "fuel": "coal",
+   "n": 2,
+   "pmax": 500,
+   "pmin": 200,
+   "hr": 10.4,
+   "vom": 4.5,
+   "nlHeat": 300,
+   "su": 25000,
+   "ut": 12,
+   "dt": 8,
+   "rcap": 50,
+   "for": 0.08,
+   "mttr": 60
+  },
+  {
+   "id": "mcc",
+   "zone": "M",
+   "name": "Metro combined cycles",
+   "short": "Metro CC",
+   "fuel": "gas",
+   "n": 4,
+   "pmax": 500,
+   "pmin": 200,
+   "hr": 6.4,
+   "vom": 2.5,
+   "nlHeat": 200,
+   "su": 9000,
+   "ut": 4,
+   "dt": 4,
+   "rcap": 100,
+   "for": 0.05,
+   "mttr": 40
+  },
+  {
+   "id": "mst",
+   "zone": "M",
+   "name": "Metro gas steam unit",
+   "short": "Gas steam",
+   "fuel": "gas",
+   "n": 1,
+   "pmax": 300,
+   "pmin": 100,
+   "hr": 10,
+   "vom": 4,
+   "nlHeat": 200,
+   "su": 7000,
+   "ut": 6,
+   "dt": 6,
+   "rcap": 50,
+   "for": 0.09,
+   "mttr": 50
+  },
+  {
+   "id": "mpk",
+   "zone": "M",
+   "name": "Metro peakers",
+   "short": "Metro peakers",
+   "fuel": "gas",
+   "n": 13,
+   "pmax": 80,
+   "pmin": 0,
+   "hr": 10.5,
+   "vom": 5,
+   "nlHeat": 0,
+   "su": 0,
+   "ut": 0,
+   "dt": 0,
+   "rcap": 80,
+   "for": 0.06,
+   "mttr": 30,
+   "fast": true
+  }
+ ],
+ "voll": 5000,
+ "reserveShort": 1000,
+ "tie": {
+  "spill": [
+   0.00001,
+   0.00002,
+   0.00003
+  ],
+  "shed": [
+   0.3,
+   0.2,
+   0.1
+  ],
+  "reserve": 0.000001,
+  "battery": 0.001,
+  "batteryHour": 0.00001
+ },
+ "periods": [
+  {
+   "id": "peak",
+   "label": "Summer peak day, 29 July 2025",
+   "short": "Summer peak day",
+   "year": 2025,
+   "start": "2025-07-29",
+   "days": 1,
+   "why": "the 2025 summer day with the highest hourly demand (town_days.json)"
+  },
+  {
+   "id": "winter",
+   "label": "Winter peak day, 21 January 2025",
+   "short": "Winter peak day",
+   "year": 2025,
+   "start": "2025-01-21",
+   "days": 1,
+   "why": "the 2025 winter day with the highest hourly demand among days with no repaired hours (town_days.json)"
+  },
+  {
+   "id": "windy",
+   "label": "Windy spring day, 17 April 2025",
+   "short": "Windy spring day",
+   "year": 2025,
+   "start": "2025-04-17",
+   "days": 1,
+   "why": "the 2025 spring day with the most wind energy (town_days.json)"
+  },
+  {
+   "id": "hot",
+   "label": "Peak-demand week, 14–20 August 2025",
+   "short": "Peak-demand week",
+   "year": 2025,
+   "start": "2025-08-14",
+   "days": 7,
+   "why": "the 2025 week with the highest average daily demand peak"
+  },
+  {
+   "id": "calm",
+   "label": "Low-wind winter week, 2–8 January 2025",
+   "short": "Low-wind winter week",
+   "year": 2025,
+   "start": "2025-01-02",
+   "days": 7,
+   "why": "among the two calmest weeks of winter 2025 by mean wind; lesson A8's week"
+  }
+ ],
+ "c2": {
+  "repDays": [
+   "2025-01-27",
+   "2025-02-07",
+   "2025-03-21",
+   "2025-04-11",
+   "2025-05-23",
+   "2025-06-11",
+   "2025-07-11",
+   "2025-08-01",
+   "2025-09-04",
+   "2025-10-08",
+   "2025-11-21",
+   "2025-12-16"
+  ],
+  "weeks": [
+   "hot",
+   "calm"
+  ],
+  "request": 300,
+  "peaker": {
+   "id": "npk",
+   "zone": "T",
+   "name": "New Town peakers",
+   "short": "New peakers",
+   "fuel": "gas",
+   "n": 0,
+   "pmax": 50,
+   "pmin": 0,
+   "hr": 9.142,
+   "vom": 4.17,
+   "nlHeat": 0,
+   "su": 0,
+   "ut": 0,
+   "dt": 0,
+   "rcap": 50,
+   "for": 0.06,
+   "mttr": 30,
+   "fast": true
+  },
+  "battery": {
+   "hours": 4,
+   "eff": 0.85
+  },
+  "costs": {
+   "pk": {
+    "label": "New peaker cost",
+    "unit": "$/kW-year",
+    "def": 74,
+    "lo": 56,
+    "hi": 111,
+    "step": 1
+   },
+   "bat": {
+    "label": "Battery cost",
+    "unit": "$/kW-year",
+    "def": 179,
+    "lo": 134,
+    "hi": 268,
+    "step": 1
+   },
+   "wind": {
+    "label": "Wind cost",
+    "unit": "$/kW-year",
+    "def": 134,
+    "lo": 100,
+    "hi": 200,
+    "step": 1
+   },
+   "solar": {
+    "label": "Solar cost",
+    "unit": "$/kW-year",
+    "def": 109,
+    "lo": 82,
+    "hi": 164,
+    "step": 1
+   },
+   "up": {
+    "label": "Uprate cost",
+    "unit": "$/kW-year",
+    "def": 15,
+    "lo": 5,
+    "hi": 40,
+    "step": 1
+   }
+  },
+  "adequacy": {
+   "seed": 2025,
+   "years": 400,
+   "weather": [
+    "2025",
+    "2024"
+   ],
+   "criterion": 0.1
+  }
+ },
+ "cf": {
+  "wind": 0.338,
+  "solar": 0.24
+ },
+ "sources": {
+  "eia930": {
+   "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), six-month BALANCE files, Southwest Power Pool (SWPP), 2025",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "asOf": "2 Nov 2026"
+  },
+  "epm607": {
+   "text": "EIA, Electric Power Monthly, Table 6.07.B (capacity factors, non-fossil)",
+   "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+   "asOf": "issue of 23 Oct 2026"
+  },
+  "epa74": {
+   "text": "EIA, Electric Power Annual, Table 7.4 (weighted average cost of fossil fuels for the electric power industry)",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_07_04.html",
+   "asOf": "final 2025 data; checked 5 Nov 2026"
+  },
+  "epa81": {
+   "text": "EIA, Electric Power Annual, Table 8.1 (average operating heat rates)",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_08_01.html",
+   "asOf": "2025 data; checked 5 Nov 2026"
+  },
+  "co2": {
+   "text": "EIA, Carbon Dioxide Emissions Coefficients",
+   "url": "https://www.eia.gov/environment/emissions/co2_vol_mass.php",
+   "asOf": "released 18 Sep 2024; checked 5 Nov 2026"
+  }
+ },
+ "precomputed": {
+  "sb2": {
+   "head": "Result: summer peak day, 29 July 2025 (the default plan, then a 300 MW data center at Prairie Town)",
+   "rows": [
+    [
+     "Today's grid: production cost (running, no-load and start-up; 2025 dollars)",
+     "$1,676,000"
+    ],
+    [
+     "Today's grid: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)",
+     "$27 · $27 · $29 /MWh"
+    ],
+    [
+     "Today's grid: highest price in any zone",
+     "$30/MWh"
+    ],
+    [
+     "Today's grid: hours at the limit, Ridge–Town · Town–Metro",
+     "0 · 2 of 24"
+    ],
+    [
+     "Today's grid: unserved · reserve short",
+     "0 MWh · 0 MWh"
+    ],
+    [
+     "Today's grid: uplift (make-whole payments)",
+     "$50,000"
+    ],
+    [
+     "With the 300 MW load: production cost (running, no-load and start-up; 2025 dollars)",
+     "$1,895,000"
+    ],
+    [
+     "With the 300 MW load: average price, Wind Ridge · Prairie Town · Metro (conditional on the commitment)",
+     "$33 · $33 · $33 /MWh"
+    ],
+    [
+     "With the 300 MW load: highest price in any zone",
+     "$45/MWh"
+    ],
+    [
+     "With the 300 MW load: hours at the limit, Ridge–Town · Town–Metro",
+     "0 · 4 of 24"
+    ],
+    [
+     "With the 300 MW load: unserved · reserve short",
+     "0 MWh · 0 MWh"
+    ],
+    [
+     "With the 300 MW load: uplift (make-whole payments)",
+     "$0"
+    ]
+   ],
+   "note": "Precomputed with HiGHS on 5 November 2026: each day a mixed-integer program commits the plants, then the dispatch linear program with that commitment fixed gives the prices. With JavaScript on, the bench runs your own plan."
+  }
+ }
+}

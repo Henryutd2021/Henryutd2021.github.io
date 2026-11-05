@@ -923,6 +923,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "forced-outage-rate": {
+  "term": "Forced outage rate",
+  "short": "The share of time a plant is unexpectedly out of service when it would be needed, such as 6% for a gas turbine.",
+  "lesson": "SB2",
+  "href": "sb2-grid-room.html"
+ },
  "forecast-error": {
   "term": "Forecast error",
   "short": "The difference between what was forecast, such as tomorrow's demand or wind, and what actually happened.",
@@ -1264,6 +1270,12 @@
   "short": "The expected number of days a year on which supply falls short of demand at least once, of any size or length, averaged over many simulated years; an expectation, not a count of real outages.",
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
+ },
+ "lolh": {
+  "term": "Loss-of-load hours (LOLH)",
+  "short": "The expected number of hours a year in which supply falls short of demand, of any size.",
+  "lesson": "SB2",
+  "href": "sb2-grid-room.html"
  },
  "lower-bound": {
   "term": "Lower bound",
@@ -2326,6 +2338,12 @@
   "short": "The high-voltage part of the grid (115 to 765 kV in the U.S.) that carries power over long distances between plants, regions and substations.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "transport-model": {
+  "term": "Transport model",
+  "short": "A network model in which each link can carry any flow up to its limit, with no power-flow physics: power goes where the cheapest routes allow.",
+  "lesson": "SB2",
+  "href": "sb2-grid-room.html"
  },
  "turbine": {
   "term": "Turbine",

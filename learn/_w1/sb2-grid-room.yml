@@ -1,0 +1,16 @@
+# Sidecar for SB2 (sb2-grid-room) and C2 (c2-plains-grid-hard-year), builder learn-w4-g, 2026-11-05. Read by
+# scripts/build_learn.py.
+id: sb2-grid-room
+lesson: SB2
+glossary:
+  - id: transport-model
+    term: Transport model
+    def: "A network model in which each link can carry any flow up to its limit, with no power-flow physics: power goes where the cheapest routes allow."
+  - id: forced-outage-rate
+    term: Forced outage rate
+    def: "The share of time a plant is unexpectedly out of service when it would be needed, such as 6% for a gas turbine."
+  - id: lolh
+    term: Loss-of-load hours (LOLH)
+    def: "The expected number of hours a year in which supply falls short of demand, of any size."
+requests:
+  - "Engine E2 is a shared component: assets/learn/components/engine-e2.js and engine-e2.css (LX.E2: the models, solve, summarize, adequacy, fallback, and the view kit LX.E2.ui). scripts/build_learn.py (index repo, uncommitted) lists it in W4_ENGINES; please commit that list at the merge. README section 'Engine E2' added under 'Added in wave W4'."
