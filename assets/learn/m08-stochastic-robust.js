@@ -2,7 +2,7 @@
 // optimization" (model-lab: step cards with solver runs), wave W4, builder learn-w4-d, 2026-11-05.
 //
 // Data: assets/learn/data/m08-stochastic-robust.json (the windy zone, the three build-outs, the five wind blocks, the
-// electrolyzer and the hydrogen, and a reference block written by the test) and data/path.json (lesson links).
+// electrolyzer and the hydrogen, and a reference block written by the test).
 //
 // The toy (illustrative round numbers in 2025 dollars, not any study's inputs or results). A windy zone has W MW of wind;
 // its lines take at most A = 1,000 MW, so in wind block b (h_b hours a year at capacity factor f_b) the surplus is
@@ -98,6 +98,12 @@
     });
     return { x: x, obj: r.objective, per: per };
   }
+  // step 2's verdict on the reader's size: true for every size (tested on every step of the slider)
+  function lockWords(D, S, v) {
+    var c = S.map(function (s) { return cost(D, s.W, v); });
+    if (v === 0) return "With no electrolyzer, every branch costs " + fm.m(c[0]) + " a year: all the hydrogen comes from gas reformers.";
+    return "Your " + fm.mw(v) + ": expected " + fm.m(expected(D, S, v)) + " a year. It costs most, " + fm.m(c[0]) + ", if none of the planned wind is built, and least, " + fm.m(c[2]) + ", if all of it is.";
+  }
   function presetS(D, id) { var p = D.presets.filter(function (q) { return q.id === id; })[0]; return scen(D, p ? p.p : null); }
   var fm = {
     m: function (v) { return (v < -5e3 ? "−$" : "$") + (Math.abs(v) / 1e6).toFixed(2) + "M"; },
@@ -120,7 +126,7 @@
 
   var model = { HOURS: HOURS, scen: scen, meanW: meanW, surplus: surplus, capMW: capMW, value: value, critHours: critHours, base: base, used: used, cost: cost,
     expected: expected, worst: worst, regret: regret, hoursAbove: hoursAbove, expHoursAbove: expHoursAbove, kinks: kinks, closedBest: closedBest,
-    build: build, read: read, presetS: presetS, fm: fm, staticHTML: staticHTML };
+    build: build, read: read, presetS: presetS, lockWords: lockWords, fm: fm, staticHTML: staticHTML };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -155,7 +161,7 @@
   }
 
   LX.mount("m08", function (live, data, root) {
-    var D = data.m08_stochastic_robust, P = data.path, R = D.reference, S = scen(D);
+    var D = data.m08_stochastic_robust, R = D.reference, S = scen(D);
     var own = LX.store.get(KEY, {}) || {};
     var St = { ws: {}, ev: null, sp: null, rob: null, reg: null, pre: {}, guess: typeof own.guess === "number" ? own.guess : null };
     function remember() { LX.store.set(KEY, { guess: St.guess }); }
@@ -262,9 +268,8 @@
           var row = H("div", { class: "m8-row" }, act);
           H("button", { type: "button", class: "lx-btn small", text: "Lock in this size", onclick: function () {
             var v = sl.val(); St.guess = v; remember(); draw();
-            var c = S.map(function (s) { return cost(D, s.W, v); });
             api.done();
-            api.saw("Your " + fm.mw(v) + ": expected " + fm.m(expected(D, S, v)) + " a year, from " + fm.m(Math.min.apply(null, c)) + " to " + fm.m(Math.max.apply(null, c)) + " across the branches. A size that suits one branch costs more in another.");
+            api.saw(lockWords(D, S, v));
           } }, row);
           paint(x0);
         } },
@@ -339,7 +344,7 @@
             out.innerHTML = ""; var p = St.rob, k = H("div", { class: "m8-kpis" }, out);
             kpi(k, "Size", fm.mw(p.x), "good"); kpi(k, "Worst cost", fm.m(p.worst)); kpi(k, "Expected cost", fm.m(p.exp));
             table(out, perHead, [perRow("Worst case (robust)", p)], "The worst-case plan in every branch");
-            api.done(); api.saw("It builds " + fm.mw(p.x) + ", the plan for the low branch: here more wind lowers the cost of every size, so the worst branch is the lowest build-out. It costs " + fm.m(p.exp - St.sp.exp) + " a year more in expectation than the stochastic plan.");
+            api.done(); api.saw("It builds " + fm.mw(p.x) + ", the best size if none of the planned wind is built: here a size costs no more when more wind is built, so its worst cost is its cost in that branch. It costs " + fm.m(p.exp - St.sp.exp) + " a year more in expectation than the stochastic plan.");
           });
         } },
       // 9 robust: least regret
@@ -349,7 +354,7 @@
             out.innerHTML = ""; var p = St.reg, k = H("div", { class: "m8-kpis" }, out), rg = S.map(function (s) { return p.per[s.id] - St.ws[s.id].cost; });
             kpi(k, "Size", fm.mw(p.x), "good"); kpi(k, "Largest regret", fm.m(Math.max.apply(null, rg))); kpi(k, "Expected cost", fm.m(p.exp));
             table(out, ["Branch", "Cost", "Wait-and-see cost", "Regret"], S.map(function (s, i) { return [s.short, fm.m(p.per[s.id]), fm.m(St.ws[s.id].cost), fm.m(rg[i])]; }), "Regret of the least-regret plan in each branch");
-            api.done(); api.saw("It builds " + fm.mw(p.x) + ": there the regret of building too much for the low branch equals the regret of building too little for the high one, " + fm.m(rg[0]) + " a year each.");
+            api.done(); api.saw("It builds " + fm.mw(p.x) + ": there the regret of too much electrolyzer, if none of the planned wind is built, equals the regret of too little, if all of it is: " + fm.m(rg[0]) + " a year each.");
           });
         } },
       // 10 the chances are a judgement
@@ -402,9 +407,9 @@
       PL.render({
         x: { min: 0, max: xMax, ticks: [[0, "0"], [500, "500"], [1000, "1,000"], [1500, "1,500"], [2000, "2,000"], [2500, "2,500 MW"]], ticksN: [[0, "0"], [1000, "1,000"], [2000, "2,000 MW"]] },
         y: { min: D.chart.yMin, max: D.chart.yMax, step: 80, fmt: function (v) { return "$" + v + "M"; }, unit: "a year" },
-        refs: [{ y: base(D) / 1e6, label: "No electrolyzer", labelN: "None", dash: "3 3", color: "var(--lx-ink-3)" }],
+        refs: [{ y: base(D) / 1e6, label: "", dash: "3 3", color: "var(--lx-ink-3)" }],
         lines: lines, marks: marks, height: 300, heightN: 260,
-        legend: S.map(function (s) { return { label: s.short + " (" + fm.pct(s.p) + ")", color: COL[s.id], dash: DASH[s.id] }; }).concat([{ label: "Expected", color: "var(--lx-ink)" }]),
+        legend: S.map(function (s) { return { label: s.short + " (" + fm.pct(s.p) + ")", color: COL[s.id], dash: DASH[s.id] }; }).concat([{ label: "Expected", color: "var(--lx-ink)" }, { label: "No electrolyzer (" + fm.m(base(D)) + ")", color: "var(--lx-ink-3)", dash: "3 3" }]),
         aria: "Annual cost of the hydrogen supply against the electrolyzer's size, from 0 to 2,500 MW, in each of the three build-outs and in expectation; letters mark the plans found so far.",
         text: { head: ["Size"].concat(S.map(function (s) { return s.short; }), ["Expected"]), rows: rows, note: "Each line is straight between the sizes listed (the kinks of the three branches' costs), so the rows give the whole curve." }
       });
@@ -424,11 +429,11 @@
       return { view: state };
     }, cards);
     root.lxLesson = { model: model, St: St, cards: cards };
-    explain(D, R, P);
+    explain(D, R);
   });
 
   // ---------------------------------------------------------------- explain layer: equation card, comparison table
-  function explain(D, R, P) {
+  function explain(D, R) {
     var x = document.getElementById("m8-explain"); if (!x || !R) return;
     x.innerHTML = ""; x.classList.add("is-live");
     var S = scen(D), sym = LX.EquationCard.sym;
@@ -463,12 +468,12 @@
     });
     var rows = [["rob", "Worst case (robust)", "var(--lx-ink-3)"], ["sp", "Stochastic program", "var(--lx-good)"], ["reg", "Least regret", "var(--lx-ink-3)"], ["ev", "Plan for the average", "var(--lx-bad)"]].map(function (q) {
       var p = R[q[0]], rg = Math.max.apply(null, S.map(function (s) { return p.per[s.id] - R.ws[s.id].cost; })), wc = Math.max.apply(null, S.map(function (s) { return p.per[s.id]; }));
-      return { key: q[0], color: q[2], name: q[1], size: { text: fm.mw(p.x), value: p.x }, exp: { text: fm.m(p.exp), value: p.exp }, worst: { text: fm.m(wc), value: wc }, regret: { text: fm.m(rg), value: rg } };
+      return { key: q[0], color: q[2], name: q[1], note: fm.mw(p.x), size: p.x, exp: { text: fm.m(p.exp), value: p.exp }, worst: { text: fm.m(wc), value: wc }, regret: { text: fm.m(rg), value: rg } };
     });
-    function order(k) { return rows.slice().sort(function (a, b) { return a[k].value - b[k].value; }).map(function (r) { return r.key; }); }
+    function order(k) { var v = function (r) { return typeof r[k] === "number" ? r[k] : r[k].value; }; return rows.slice().sort(function (a, b) { return v(a) - v(b); }).map(function (r) { return r.key; }); }
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
       title: "Four plans, three yardsticks", lede: "Annual cost of the hydrogen supply, 2025 dollars, chances 25%, 50% and 25%. Each plan is best by its own yardstick.",
-      columns: [{ key: "name", label: "Plan", main: true }, { key: "size", label: "Size", num: true }, { key: "exp", label: "Expected cost", phone: "Expected", num: true },
+      columns: [{ key: "name", label: "Plan and size", main: true }, { key: "exp", label: "Expected cost", phone: "Expected", num: true },
                 { key: "worst", label: "Worst cost", phone: "Worst", num: true }, { key: "regret", label: "Largest regret", phone: "Regret", num: true }],
       rows: rows,
       sorts: [{ label: "By size", order: order("size"), note: "From the smallest size to the largest." },

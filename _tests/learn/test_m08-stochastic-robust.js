@@ -180,6 +180,16 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   has("scaled to 33.8%, U.S. wind's 2025 capacity factor", "data note: the capacity factor"); ok(T.targets.wind.cf === 0.338 && T.targets.wind.year === 2025, "33.8% is cf_targets.json's 2025 wind value");
   ok(JS.includes("The windy zone has 3,000 MW of wind, 4,000 MW more is planned, and its lines carry 1,000 MW.") && JS.includes("plan for the average future, 5,000 MW of wind here") && M.meanW(S) === 5000, "step texts: the zone's numbers and the 5,000 MW mean");
   ok(JS.includes('"$" + fm.int(D.electrolyzer.costPerMWYear)') && JS.includes("its $80,000 a year") && D.electrolyzer.costPerMWYear === 80000, "step 5's $80,000 is the data file's");
+  // step 2's verdict on the reader's size: true on every step of the slider (W3 brief §2.5)
+  { let good = true;
+    for (let x = 0; x <= D.chart.xMax; x += D.chart.step) {
+      const c = S.map(s => cost0(s.W, x)), w = M.lockWords(D, S, x);
+      if (x === 0) { if (!(c.every(v => near(v, BASE, 1e-6)) && w === "With no electrolyzer, every branch costs " + fm.m(BASE) + " a year: all the hydrogen comes from gas reformers.")) good = false; }
+      else if (!(c[0] >= Math.max(...c) - 1e-6 && c[2] <= Math.min(...c) + 1e-6 && c[2] < c[0] && w === "Your " + fm.mw(x) + ": expected " + fm.m(E(x)) + " a year. It costs most, " + fm.m(c[0]) + ", if none of the planned wind is built, and least, " + fm.m(c[2]) + ", if all of it is.")) good = false;
+      if (w.split(" ").length > 40) good = false;
+    }
+    ok(good, "step 2's verdict is true for every size on the slider: the none-built branch costs most, the all-built least (all equal at 0 MW)"); }
+  ok(/here a size costs no more when more wind is built, so its worst cost is its cost in that branch/.test(JS), "step 8's reason is the monotonicity the test proves above");
   // the explain fallback's other numbers
   has(`Stochastic program</dt>`.replace(/<[^>]+>/g, ""), "explain fallback");
   // step texts: one or two sentences, 40 words at most (text budget)
@@ -207,7 +217,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // the lessons the page links are live
   const PATHJ = J("path.json"), live = new Set(), walk = o => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === "object") { if (o.href && o.ready === true) live.add(o.href); Object.values(o).forEach(walk); } }; walk(PATHJ);
   hrefs.filter(h => /^[0-9a-z-]+\.html$/.test(h) && h !== "index.html").forEach(h => ok(live.has(h), "linked lesson is live: " + h));
-  ok(/CF3, where hydrogen should go when nobody knows how much wind will be built \(upcoming\)/.test(PAGE) && !/href="cf3-/.test(PAGE), "CF3 (a draft) is named as upcoming, not linked");
+  ok(/CF3 \(upcoming\), where hydrogen should go when nobody knows how much wind will be built\./.test(PAGE) && !/href="cf3-/.test(PAGE), "CF3 (a draft) is named as upcoming, not linked");
   if (NB) {
     ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog"), "notebook: reads the reference block and asserts it with linprog");
     ok(NB.includes("town_year.json") && NB.includes("cf_targets.json"), "notebook: rebuilds the wind blocks from the 2025 shape");

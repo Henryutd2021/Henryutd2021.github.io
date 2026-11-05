@@ -809,7 +809,7 @@
   lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
   title: "Deciding before the uncertainty resolves: stochastic and robust optimization"
   subtitle: "Size an electrolyzer before anyone knows how much wind gets built: plan for the average, hedge across the branches, or guard the worst case"
-  short: "Stochastic and robust optimization"
+  short: "Stochastic and robust"
   outcome: "Formulate a two-stage stochastic linear program, compute the value of the stochastic solution and the expected value of perfect information, and compare the stochastic plan with worst-case and least-regret robust plans."
   teaches: [here-and-now and wait-and-see decisions, two-stage stochastic linear programs, value of the stochastic solution, expected value of perfect information, worst-case and least-regret robust plans]
   lab: "a SciPy/HiGHS notebook that rebuilds the two-stage program, checks the page's plans and grows the tree to nine branches, about 60 minutes, then 90 minutes of practice."
