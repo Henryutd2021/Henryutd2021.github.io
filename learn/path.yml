@@ -680,7 +680,23 @@
 - {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
 - {kind: lesson, tier: analyst, code: A3, title: "Energy-only or capacity market? How wholesale markets are designed for high renewable shares"}
 - {kind: lesson, tier: analyst, code: A5, title: "Will there be enough power when it matters? Resource adequacy and capacity accreditation"}
-- {kind: lesson, tier: analyst, code: A6, title: "Why does it take years to connect a power plant or a data center?"}
+# A6, builder learn-w4-a (wave W4, 2026-11-05)
+- kind: lesson
+  id: a06-interconnection
+  code: A6
+  tier: analyst
+  form: cards
+  icon: clock
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the practice set (Check section)
+  title: "Why does it take years to connect a power plant or a data center?"
+  subtitle: "Walk a wind farm and a data center through their paths, watch one withdrawal ripple through a cluster, then price a three-year wait in three accounts"
+  short: "Getting connected"
+  teaches: [interconnection queues, cluster studies, network upgrades and cost allocation, withdrawals and restudies, N-1 planning for a large load, delay costs in three accounts]
+  does: "Walk a wind farm and a 300 MW data center through their paths to the grid; run a cluster study and see one withdrawal shift costs and add a restudy; match FERC Order 2023's reforms to the problems they target; check what a substation carries with one line out; price a wait for the developer, other customers and society."
+  outcome: "Explain why connecting to the grid takes years, show how cluster studies split upgrade costs and how a withdrawal moves cost and time onto others, size a large load against N−1, and price a wait in separate accounts."
+  after: [F8, 8]
 - {kind: lesson, tier: analyst, code: A9, title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"}
 - {kind: lesson, tier: analyst, code: A10, title: "Which emissions question are you asking? Inventories, consequences and procurement claims"}
 - {kind: lesson, tier: analyst, code: A11, title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"}

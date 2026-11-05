@@ -317,6 +317,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "cluster-study": {
+  "term": "Cluster study",
+  "short": "A study of every interconnection request in one window together, which finds the network upgrades the group needs and splits their cost.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
  "clustering": {
   "term": "Clustering",
   "short": "Grouping similar items, such as days with similar demand and weather, so that one representative can stand for each group.",
@@ -652,6 +658,12 @@
   "short": "The lower-voltage part of the grid, from substations along feeders and laterals to homes and businesses.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "distribution-factor": {
+  "term": "Distribution factor",
+  "short": "The share of a project's output that would flow on a given line, used to split the cost of upgrading that line.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "district-heating": {
   "term": "District heating",
@@ -1139,6 +1151,24 @@
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
  },
+ "interconnection-agreement": {
+  "term": "Interconnection agreement",
+  "short": "The contract that sets how and when a project connects, which upgrades are built and who pays for them.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
+ "interconnection-queue": {
+  "term": "Interconnection queue",
+  "short": "The list of projects asking to connect to the grid, each waiting for studies, upgrades and an agreement before it may run.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
+ "interconnection-request": {
+  "term": "Interconnection request",
+  "short": "A project's formal application to connect to the grid, filed with the transmission provider together with a deposit.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
  "internal-rate-of-return": {
   "term": "Internal rate of return (IRR)",
   "short": "The discount rate at which a project's net present value is exactly zero: the return the project itself earns.",
@@ -1546,6 +1576,12 @@
   "short": "A check that an option's total benefits across all affected parties exceed its total costs, each counted once.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "network-upgrade": {
+  "term": "Network upgrade",
+  "short": "New or stronger lines, transformers or substation equipment that the grid needs before a project can connect.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "neutron": {
   "term": "Neutron",
@@ -2080,6 +2116,12 @@
   "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "site-control": {
+  "term": "Site control",
+  "short": "Proof that a project owns, leases or has the right to use the land it would be built on.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "skill-score": {
   "term": "Skill score",

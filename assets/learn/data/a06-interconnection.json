@@ -1,0 +1,102 @@
+{
+  "about": "Lesson A6 (a06-interconnection), builder learn-w4-a, 2026-11-05. Data centers appear only as loads. Real numbers carry their source and date in 'facts' and 'sources'. Illustrative: Prairie Town's cluster of four generator requests, the line headroom, the upgrade and its cost, each project's impact factor and the most it would pay, the 150-day length of every restudy round, the east substation's two lines, the east side's peak and the proposed 300 MW data center campus. The money ledger uses case file CF7's toy unchanged (cf7-cost-of-waiting.json, 'idea': a 100 MW load, invented round numbers, not the study's inputs, equations or results); this file adds only the starting wait and the staged-service extension.",
+  "built": "2026-11-05",
+  "guess": {
+    "ticks": ["6 months", "1 year", "2 years", "3 years", "Over 5 years"],
+    "answer": 4, "start": 1
+  },
+  "walk": {
+    "tracks": [
+      { "key": "gen", "name": "Ridge wind farm, 200 MW", "short": "Wind farm", "note": "A generator: the federal pro forma rules of Order 2023 (grid operators adapt them).",
+        "stages": [
+          { "key": "req", "name": "Request", "who": "The developer", "time": "45-day window",
+            "what": "Files an [[interconnection-request|interconnection request]] in a 45-day window, with a study deposit based on its MW and [[site-control|control]] of 90% of its site." },
+          { "key": "study", "name": "Cluster study", "who": "The transmission provider", "time": "150 days",
+            "what": "A [[cluster-study|cluster study]] of every request in the window together: which lines each project would overload." },
+          { "key": "share", "name": "Upgrades and shares", "who": "The transmission provider", "time": "part of the study",
+            "what": "Names the [[network-upgrade|network upgrades]] and splits their cost by each project's impact on the overloaded line." },
+          { "key": "wd", "name": "Restudy", "who": "Every developer in the cluster", "time": "a restudy each time",
+            "what": "Projects whose share is too high withdraw; the rest are restudied and their shares change." },
+          { "key": "agr", "name": "Agreement", "who": "Developer and provider", "time": "varies",
+            "what": "Signs the [[interconnection-agreement|interconnection agreement]] and posts a deposit of 20% of its network upgrade costs." },
+          { "key": "build", "name": "Building", "who": "Developer and utility", "time": "varies",
+            "what": "Builds the plant while the utility builds the upgrades; permits, equipment and crews set the pace." },
+          { "key": "on", "name": "Operation", "who": "The grid operator", "time": "",
+            "what": "Starts commercial operation. For projects built in 2025, the median wait from request to here was over five years." }
+        ] },
+      { "key": "load", "name": "Data center campus, 300 MW", "short": "Data center", "note": "A large load: rules differ by utility and state; Prairie Town's steps are illustrative.",
+        "stages": [
+          { "key": "req", "name": "Request", "who": "The developer", "time": "",
+            "what": "Asks the utility for 300 MW of service. In ERCOT's 2026 batch study, a large load posts $50,000 per MW of security." },
+          { "key": "study", "name": "Load study", "who": "The utility", "time": "",
+            "what": "Can the network carry 300 MW with any one line out ([[n-minus-one|N−1]])? Voltage and stability are checked too." },
+          { "key": "share", "name": "Upgrades and who pays", "who": "Utility and state regulator", "time": "",
+            "what": "A third line into the substation. The [[large-load-tariff|large-load tariff]] decides what the campus pays and what other customers carry." },
+          { "key": "agr", "name": "Contract", "who": "Developer and utility", "time": "",
+            "what": "A service contract: a minimum bill, a term and collateral, as lesson A4 sets them." },
+          { "key": "stage", "name": "Staged service", "who": "The utility", "time": "",
+            "what": "200 MW fits on the two lines that exist; the last 100 MW waits for the third line." },
+          { "key": "build", "name": "Building", "who": "The utility", "time": "3 years, here",
+            "what": "The line and substation work. In this lesson the full 300 MW waits three years." },
+          { "key": "on", "name": "Energized", "who": "The utility", "time": "",
+            "what": "[[energization|Energization]]: power flows. What the wait cost, and whom, is step 9." }
+        ] }
+    ]
+  },
+  "cluster": {
+    "line": "the 345 kV line from Wind Ridge into Prairie Town",
+    "headroomMW": 160,
+    "upgradeUSD": 120000000,
+    "upgrade": "rebuild that line",
+    "studyDays": 150,
+    "projects": [
+      { "id": "W", "name": "Ridge wind farm", "short": "Wind", "called": "the wind farm", "mw": 200, "dfax": 0.6, "limitPerKW": 420, "site": true, "color": "var(--lx-wind)" },
+      { "id": "S", "name": "Mill Road solar farm", "short": "Solar", "called": "the solar farm", "mw": 150, "dfax": 0.4, "limitPerKW": 250, "site": true, "color": "var(--lx-solar)" },
+      { "id": "B", "name": "Depot battery", "short": "Battery", "called": "the battery", "mw": 100, "dfax": 0.3, "limitPerKW": 200, "site": true, "color": "var(--lx-bat)" },
+      { "id": "X", "name": "Placeholder request", "short": "Placeholder", "called": "the placeholder", "mw": 250, "dfax": 0.5, "limitPerKW": 100, "site": false, "color": "var(--lx-ink-3)" }
+    ],
+    "forceable": ["W", "S", "B"]
+  },
+  "n1": {
+    "lineMW": 350, "lines": 2, "eastMW": 150, "campusMW": 300,
+    "slider": { "min": 0, "max": 400, "step": 25 }
+  },
+  "ercot": {
+    "requestsGW": 474.7, "noStudyGW": 284.3, "energizedGW": 5.9, "peakMW": 91134, "securityPerMW": 50000, "allocYears": "2028–2032"
+  },
+  "toy": { "startWait": 36, "shorter": 12, "staged": { "share": 0.5, "at": 12 } },
+  "facts": [
+    { "n": "over 5 years", "what": "Median time from interconnection request to commercial operation for U.S. projects built in 2025, where data exist.", "source": "Berkeley Lab, Queued Up: 2026 Edition", "url": "https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics", "asof": "May 2026; data through 2025" },
+    { "n": "13%", "what": "Share of the capacity that asked to connect in 2000–2020 that was operating by the end of 2025; about 75% withdrew and 10% is still waiting.", "source": "Berkeley Lab, Queued Up: 2026 Edition", "url": "https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics", "asof": "May 2026; data through 2025" },
+    { "n": "1,312 GW + 749 GW", "what": "Generation and storage actively seeking interconnection in the U.S. at the end of 2025, in about 8,200 projects.", "source": "Berkeley Lab, Queued Up: 2026 Edition", "url": "https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics", "asof": "May 2026; data through 2025" },
+    { "n": "150 days", "what": "Length of a cluster study in FERC Order 2023's pro forma rules (issued 28 July 2023), not counting facilities and affected-system studies; restudies follow withdrawals.", "source": "MISO, FERC Order No. 2023: An Initial Review, slides 3 and 5", "url": "https://cdn.misoenergy.org/20230808%20IPWG%20Item%2004%20Review%20of%20FERC%20Order%202023629802.pdf", "asof": "8 August 2023" },
+    { "n": "474.7 GW", "what": "Large loads seeking to connect in ERCOT, with requested dates through 2033, about 90% of them data centers; ERCOT's highest demand so far is about 91.1 GW.", "source": "ERCOT to the Texas Senate, slide 6; ERCOT demand records", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "asof": "requests as of June 2026; peak 91,134 MW on 22 July 2026, preliminary" },
+    { "n": "$50,000 per MW", "what": "Financial security a large load posts in ERCOT's first batch study, which is to give each project MW allocations year by year for 2028–2032.", "source": "ERCOT to the Texas Senate, slides 3–5", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "asof": "29 July 2026" }
+  ],
+  "ladder": {
+    "rungs": [
+      { "id": "requested", "label": "Requested", "text": "A request is filed, with a deposit." },
+      { "id": "studied", "label": "Studied", "text": "The grid operator has studied it and named the upgrades." },
+      { "id": "agreement", "label": "Agreement signed", "text": "An agreement is signed and security posted." },
+      { "id": "building", "label": "Under construction", "text": "The plant or load and its upgrades are being built." },
+      { "id": "operating", "label": "Operating", "text": "Energized: power flows." }
+    ],
+    "off": { "id": "projection", "label": "A forecast is not on the ladder" },
+    "items": [
+      { "id": "ercot", "text": "ERCOT's list of large loads seeking to connect totals 474.7 GW.", "answer": ["requested"], "note": "Mostly requests: 284.3 GW had no studies submitted and 5.9 GW were energized (ERCOT, June 2026)." },
+      { "id": "lbnl", "text": "About 2,061 GW of generation and storage sat in U.S. queues at the end of 2025.", "answer": ["requested", "studied"], "note": "Queued projects, studied or not yet: the queue is not a forecast. Berkeley Lab counts 1,312 GW plus 749 GW." },
+      { "id": "ia", "text": "About 549 GW had a draft or signed interconnection agreement but was not yet operating.", "answer": ["studied", "agreement"], "note": "A draft agreement follows the studies; a signed one adds security. Neither is a plant that runs (Berkeley Lab, end of 2025)." },
+      { "id": "campus", "text": "The campus signs a contract with a minimum bill and posts collateral.", "answer": ["agreement"], "note": "Signed and secured, but nothing is built yet." },
+      { "id": "fcst", "text": "A utility says it expects 3 GW of new data centers by 2030 (an invented example).", "answer": ["projection"], "note": "An expectation of loads that are not on the ladder yet; ask how many have signed anything." }
+    ]
+  },
+  "sources": [
+    {"text": "Rand, J., Cheyette, A., Talley, C., Zhang, S., Gorman, W., Wiser, R. H., Seel, J., Jeong, S. and Kahrl, F. (May 2026). Queued Up: 2026 Edition, Characteristics of Power Plants Seeking Transmission Interconnection As of the End of 2025. Berkeley Lab.", "url": "https://eta-publications.lbl.gov/publications/queued-2026-edition-characteristics", "label": "Publication page"},
+    {"text": "MISO (8 August 2023). FERC Order No. 2023: An Initial Review (PDF). Issue date and citation, slide 3; cluster studies and the 150-day pro forma study, slide 5; network upgrade costs by proportional impact, slide 6; site control, deposits and withdrawal penalties, slide 7; penalties for late studies, slide 8.", "url": "https://cdn.misoenergy.org/20230808%20IPWG%20Item%2004%20Review%20of%20FERC%20Order%202023629802.pdf", "label": "Slides"},
+    {"text": "ERCOT (29 July 2026). ERCOT Update, Senate Committee on Business and Commerce (PDF). Batch study outputs, slide 3; milestones, slides 4–5; large-load requests, slide 6.", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "label": "Slides"},
+    {"text": "ERCOT. 2026 all-time and monthly demand records (updated 21 August 2026; values preliminary).", "url": "https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm", "label": "Records page"},
+    {"text": "U.S. Secretary of Energy (2025). Letter to the Federal Energy Regulatory Commission on the interconnection of large loads (PDF). 23 October 2025.", "url": "https://www.energy.gov/sites/default/files/2025-10/403%20Large%20Loads%20Letter.pdf", "label": "Letter"},
+    {"text": "Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.", "url": "", "label": ""},
+    {"text": "code-delayed-energization on GitHub, version 1.0.0 (30 October 2026): open code with illustrative inputs.", "url": "https://github.com/Henryutd2021/code-delayed-energization", "label": "Repository"}
+  ]
+}
