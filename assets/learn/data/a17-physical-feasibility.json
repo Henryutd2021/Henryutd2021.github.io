@@ -26,6 +26,8 @@
     "hi": 1.05,
     "volts": [114, 126],
     "nominalV": 120,
+    "margin": 0.01,
+    "marginNote": "The voltage figures are first estimates. Within 0.01 per unit of a limit the gauges leave the verdict to an AC check; wherever they say within or outside, an AC calculation of the same feeder (exact for one load at the far end) agrees, for every slider setting (checked in the test).",
     "source": "ANSI C84.1 Range A service voltage, as tabulated in NREL (2021), Table 1, p. 4",
     "url": "https://docs.nlr.gov/docs/fy21osti/77156.pdf",
     "asOf": "September 2021; read 5 November 2026"
@@ -36,26 +38,26 @@
     "start": 14
   },
   "inertia": {
-    "about": "Lesson 3's Plains Grid: 60 Hz, a 100 MW trip, stored rotational energy 6 to 30 GW·s (03-balancing.json). A 50 MW battery's headroom (lesson 3's fast response) answers through a grid-following inverter after it has measured the fall (0.5 s here, illustrative) or through a grid-forming inverter from the first instant (a system view: both limited to the battery's 50 MW). The first-second lines are a sketch at the swing equation's starting slope, before load relief and governors bend them.",
+    "about": "Lesson 3's Plains Grid: 60 Hz, a 100 MW trip, stored rotational energy 6 to 30 GW·s (03-balancing.json). A 50 MW battery's headroom (lesson 3's fast response) answers in one of two assumed response profiles: through a grid-following inverter after it has measured the fall (0.5 s here, illustrative), or through a grid-forming inverter at once (a system view: both limited to the battery's 50 MW). These are assumptions, not properties of the inverter types: real responses depend on controls, available power and current limits. The first-second lines are a sketch at the swing equation's starting slope, before load relief and governors bend them.",
     "delayS": 0.5,
     "sketchS": 1,
     "modes": [
       { "key": "none", "label": "No inverter help" },
-      { "key": "gfl", "label": "Grid-following" },
-      { "key": "gfm", "label": "Grid-forming" }
+      { "key": "gfl", "label": "Grid-following, assumed to wait 0.5 s" },
+      { "key": "gfm", "label": "Grid-forming, assumed to answer at once" }
     ]
   },
   "sort": {
     "bins": [
       { "id": "ac", "label": "An AC check", "sub": "voltage and reactive power" },
-      { "id": "time", "label": "Finer time steps", "sub": "or a ramp rule" },
+      { "id": "time", "label": "A ramp check", "sub": "at the time step, with finer steps" },
       { "id": "dyn", "label": "A dynamics check", "sub": "the first seconds" }
     ],
     "cards": [
-      { "id": "thermal", "text": "A line at its MW limit heats past its rating.", "bin": "ac", "why": "Heating follows current, which counts reactive power as well as MW; a DC model carries MW only." },
-      { "id": "sag", "text": "The far end of a feeder sags below 0.95 per unit.", "bin": "ac", "why": "A DC model fixes every voltage at 1.0 per unit and has no feeders." },
+      { "id": "thermal", "text": "A line at its MW limit passes its current rating.", "bin": "ac", "why": "Heating follows current, which counts reactive power as well as MW; a DC model carries MW only." },
+      { "id": "sag", "text": "The far end of a feeder sags below 0.95 per unit.", "bin": "ac", "why": "M1's model omits feeders, and its DC approximation does not calculate voltage-magnitude changes or reactive power." },
       { "id": "rise", "text": "Midday rooftop solar lifts a feeder above 1.05 per unit.", "bin": "ac", "why": "Voltage rise comes from power flowing back through the feeder's resistance; only a voltage check sees it." },
-      { "id": "ramp", "text": "The gas plant is asked to climb 50 MW in one hour.", "bin": "time", "why": "An hourly model without a ramp rule lets output jump between hours." },
+      { "id": "ramp", "text": "The gas plant is asked to climb 50 MW in one hour.", "bin": "time", "why": "Check output changes against ramp limits at the plan's time step; finer steps also show changes hidden inside an hour." },
       { "id": "rocof", "text": "Frequency falls too fast after a plant trips.", "bin": "dyn", "why": "Hourly energy models balance MWh; the first seconds after a trip are not in them." }
     ]
   },
@@ -72,8 +74,8 @@
       "url": "https://www.ercot.com/files/docs/2024/10/07/ERCOT-Ancillary-Services-Study-Final-White-Paper.pdf",
       "asOf": "7 October 2024"
     },
-    "unifi": {
-      "source": "U.S. Department of Energy, UNIFI Consortium",
+    "gfm": {
+      "source": "U.S. Department of Energy: grid-forming inverter overview",
       "url": "https://www.energy.gov/cmei/systems/unifi-consortium",
       "asOf": "page read 5 November 2026"
     },

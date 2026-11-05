@@ -120,6 +120,15 @@
     return esc(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; });
   }
   var SHARE_LABEL = { 0: "Other customers", 0.5: "Half each", 1: "The waiting load" };
+  var LEDGER_NOTE = "One total would hide who pays. A tariff reallocates the utility's costs; earlier service and bridge power change costs differently across the accounts.";
+  // the ledger's words, defined where they first appear (step 9)
+  var LEDGER_WORDS = [
+    ["[[present-value|Present value]]", "future costs stated in today's dollars"],
+    ["Lost [[margin|margin]]", "revenue minus operating costs that the load cannot earn while it waits"],
+    ["[[carrying-cost|Carrying cost]]", "interest on money spent and idle while it waits"],
+    ["Expected [[stranded-cost|stranded]] upgrades", "wires built for a load that may never arrive, weighted by that chance"],
+    ["[[bridge-power|Bridge power]]", "temporary on-site generators that serve part of the load while it waits"]
+  ];
   var PARTS = {
     dev: [["margin", "lost margin"], ["capital", "carrying cost of idle capital"], ["tariff", "utility costs it is charged"], ["bridge", "bridge power premium"]],
     rate: [["carry", "carrying cost of the upgrades"], ["strand", "expected stranded upgrades"]],
@@ -169,10 +178,26 @@
     return out;
   }
   function n1Words(N, c, third) {
-    var r = n1(N, c, third);
-    return r.fits ? "Fits: with any one line out, the others stay within " + N.lineMW + " MW. Without new wires, up to " + r.maxNew + " MW of new load fits." :
-      "Does not fit: with one line out, the other" + (r.lines > 2 ? "s carry " : " carries ") + fmtN(r.cont) + " MW, " + fmtN(r.over) + " MW over its limit. Up to " + r.maxNew + " MW fits.";
+    var r = n1(N, c, third), where = third ? "With the third line" : "Without new wires";
+    return r.fits ? "Fits: with any one line out, the others stay within " + N.lineMW + " MW. " + where + ", up to " + r.maxNew + " MW of new load fits." :
+      "Does not fit: with one line out, the other" + (r.lines > 2 ? "s carry " : " carries ") + fmtN(r.cont) + " MW, " + fmtN(r.over) + " MW over its limit. " + where + ", up to " + r.maxNew + " MW fits.";
   }
+  // the money step's caption: the staged month is the model's effective month (at most the wait)
+  function moneyCaption(I, L, tau, st) {
+    var eff = st && tau > st.at ? st.at : null;
+    return "Present value of a " + tau + "-month wait for a " + I.loadMW + " MW load" + (eff != null ? ", half served at month " + eff : "") + ". The accounts are kept apart.";
+  }
+  // one month of the wait, worked out (CF7's toy): what the developer loses each month, then its present value
+  function workedMonth(I, tau) {
+    var i = monthly(I), m = I.marginPerMWMonth * I.loadMW, k = I.capitalCommitted * i, A = annuity(I, tau), L = ledgers(I, tau, 0, false);
+    return [
+      "Monthly rate: 8% a year is " + (100 * i).toFixed(3) + "% a month.",
+      "Margin lost each month: " + I.loadMW + " MW × $" + fmtN(I.marginPerMWMonth) + " = " + musd2(m) + ".",
+      "Interest on idle capital each month: $" + fmtN(I.capitalCommitted / 1e6) + "M × " + (100 * i).toFixed(3) + "% = " + musd2(k) + ".",
+      tau + " months in today's dollars: " + musd2(m + k) + " × " + A.toFixed(2) + " = " + musd(L.developer) + " for the developer."
+    ];
+  }
+  function musd2(v) { return "$" + (Math.round(v / 1e4) / 100).toFixed(2) + "M"; }
 
   // ---------------------------------------------------------------- no-JS blocks (written into the page by the test's --write)
   function staticSteps(D, I7) {
@@ -194,11 +219,15 @@
       }).join("") + "<td>" + perkw(p.limitPerKW) + "</td></tr>";
     });
     out += "</tbody></table></div><ul>" +
-      "<li><b>The cluster.</b> " + esc(roundWords(C, run.rounds[0])) + " " + esc(roundWords(C, run.rounds[1])) + " In all: " + esc(runWords(C, run)) + "</li>" +
+      "<li><b>Study 1.</b> " + esc(roundWords(C, run.rounds[0]).replace(/^Study 1: /, "")) + "</li>" +
+      "<li><b>Study 2, a restudy.</b> " + esc(roundWords(C, run.rounds[1]).replace(/^Study 2: /, "")) + "</li>" +
+      "<li><b>In all.</b> " + esc(runWords(C, run)) + "</li>" +
       "<li><b>Order 2023's readiness rule.</b> A request without site control cannot enter: " + esc(runWords(C, cluster(C, { readiness: true }))) + "</li>" +
       "<li><b>The data center.</b> Two " + N.lineMW + " MW lines feed the east substation, whose own peak is " + N.eastMW + " MW. With one line out, the other carries it all, so only " + nn.maxNew + " MW of the " + N.campusMW + " MW campus fits before a third line.</li>" +
       "<li><b>Texas.</b> ERCOT's list of large loads seeking to connect totals " + fmtN(E.requestsGW, 1) + " GW, against a record demand near " + fmtN(E.peakMW / 1000, 1) + " GW; at $" + fmtN(E.securityPerMW) + " per MW, the " + N.campusMW + " MW campus would post " + musd(security(N.campusMW, E.securityPerMW)) + " of security.</li>" +
-      "<li><b>The money</b> (case file CF7's toy, a " + I7.loadMW + " MW load, invented round numbers). A " + T.startWait + "-month wait costs the developer " + musd(L.developer) + ", other customers " + musd(L.ratepayers) + " and society " + musd(L.society) + " in present value. Half the load served at month " + T.staged.at + ": the developer's cost falls to " + musd(S.developer) + ". A connection " + T.shorter + " months sooner is worth up to " + musd(av.saves) + " to the developer.</li></ul>";
+      "<li><b>The money.</b> Case file CF7's toy: a " + I7.loadMW + " MW load and invented round numbers. In present value, a " + T.startWait + "-month wait costs the developer " + musd(L.developer) + ", other customers " + musd(L.ratepayers) + " and society " + musd(L.society) + ".</li>" +
+      "<li><b>Staged service.</b> Half the load served at month " + T.staged.at + ": the developer's cost falls to " + musd(S.developer) + ".</li>" +
+      "<li><b>A faster connection.</b> " + T.shorter + " months sooner is worth up to " + musd(av.saves) + " to the developer.</li></ul>";
     return out;
   }
   function staticPractice(D, I7) {
@@ -206,9 +235,9 @@
     var N = D.n1, alt = n1({ lineMW: 400, lines: 2, eastMW: N.eastMW }, 0, false), E = D.ercot, T = D.toy;
     var L = ledgers(I7, T.startWait, 0, false), av = avoided(I7, T.startWait, T.shorter, 0, false, null), A = annuity(I7, T.startWait);
     var items = [
-      ["Split an upgrade by impact.", "A $" + fmtN(C.upgradeUSD / 1e6) + "M upgrade is needed. Four requests put " + C.projects.map(function (p) { return fmtN(p.mw * p.dfax) + " MW"; }).join(", ") + " of flow on the line. What share does the " + fmtN(P.W.mw * P.W.dfax) + " MW one pay?",
+      ["Split an upgrade by impact.", "A $" + fmtN(C.upgradeUSD / 1e6) + "M upgrade is needed. Four requests put " + C.projects.map(function (p) { return fmtN(p.mw * p.dfax) + " MW"; }).join(", ") + " of flow on the line. What does the " + P.W.mw + " MW wind farm, with " + fmtN(P.W.mw * P.W.dfax) + " MW of flow, pay?",
         "$" + fmtN(C.upgradeUSD / 1e6) + "M × " + fmtN(P.W.mw * P.W.dfax) + " ÷ " + fmtN(r1.flow) + " = " + musd(r1.rows[0].share) + ", or " + perkw(r1.rows[0].perKW) + " for its " + P.W.mw + " MW."],
-      ["After a withdrawal.", "The " + fmtN(P.X.mw * P.X.dfax) + " MW request withdraws. Recompute the wind farm's share.",
+      ["After a withdrawal.", "The " + P.X.mw + " MW placeholder, which puts " + fmtN(P.X.mw * P.X.dfax) + " MW of flow on the line, withdraws. Recompute the wind farm's share.",
         "$" + fmtN(C.upgradeUSD / 1e6) + "M × " + fmtN(P.W.mw * P.W.dfax) + " ÷ " + fmtN(r2.flow) + " = " + musd(W.share) + ", or " + perkw(W.perKW) + ": up " + perkw(W.perKW - r1.rows[0].perKW) + ", and " + C.studyDays + " more days of study."],
       ["N−1 with stronger lines.", "Two 400 MW lines feed a substation whose own peak is " + N.eastMW + " MW. How much new load fits before an upgrade?",
         "With one line out, the other must carry everything: 400 − " + N.eastMW + " = " + alt.maxNew + " MW."],
@@ -239,7 +268,7 @@
     }).join("\n") + "\n</ul>";
   }
 
-  var model = { moneyLines: moneyLines, n1Words: n1Words, staticFacts: staticFacts, staticSources: staticSources, cluster: cluster, margins: margins, n1: n1, security: security, monthly: monthly, annuity: annuity, ledgers: ledgers, staged: staged, mix: mix, avoided: avoided,
+  var model = { moneyLines: moneyLines, n1Words: n1Words, moneyCaption: moneyCaption, workedMonth: workedMonth, musd2: musd2, LEDGER_NOTE: LEDGER_NOTE, LEDGER_WORDS: LEDGER_WORDS, staticFacts: staticFacts, staticSources: staticSources, cluster: cluster, margins: margins, n1: n1, security: security, monthly: monthly, annuity: annuity, ledgers: ledgers, staged: staged, mix: mix, avoided: avoided,
                 ledgerRows: ledgerRows, forcedWords: forcedWords, roundWords: roundWords, runWords: runWords, staticSteps: staticSteps, staticPractice: staticPractice,
                 musd: musd, kusd: kusd, perkw: perkw, fmtN: fmtN, SHARE_LABEL: SHARE_LABEL, PARTS: PARTS, byId: byId };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -387,13 +416,24 @@
       var led = H("div", null, w);
       var status = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, w);
       if (o.staged) H("p", { class: "lx-hint", text: "Staged service is this lesson's addition to the toy: that half brings half the capital and half the upgrades." }, w);
+      if (!o.staged) {
+        // the words of the ledger, one month worked out, then the toy's inputs (CF7's own table, unchanged)
+        var dl = H("dl", { class: "a6m-words" }, w);
+        LEDGER_WORDS.forEach(function (x) { H("dt", { html: LX.rich(x[0]) }, dl); H("dd", { text: x[1] }, dl); });
+        var wk = H("div", { class: "a6m-wk" }, w);
+        H("p", { class: "lx-eyebrow", text: "One month of a " + T.startWait + "-month wait, worked out (no bridge power, no tariff share)" }, wk);
+        var ol = H("ol", { class: "a6m-work" }, wk);
+        workedMonth(I7, T.startWait).forEach(function (t) { H("li", { text: t }, ol); });
+        var inp = H("details", { class: "lx-textalt a6m-in" }, w); H("summary", { text: "The toy's inputs (case file CF7)" }, inp);
+        LX.Ledger(inp, { cls: "a6m-tab", caption: "Case file CF7's inputs, invented round numbers.", columns: ["Input", "Value"], rows: I7.assumptions.map(function (a) { return { head: a[0], cells: [a[1]] }; }) });
+      }
       function paint(acted) {
         var st = o.staged && S.stagedOn ? T.staged : null, L = staged(I7, S.tau, S.s, S.bridge, st);
         sb.forEach(function (b, k) { b.setAttribute("aria-pressed", String(I7.tariffShares[k] === S.s)); });
         ro.innerHTML = "";
         chip(ro, "Developer", musd(L.developer)); chip(ro, "Other customers", musd(L.ratepayers)); chip(ro, "Society", musd(L.society));
         led.innerHTML = "";
-        LX.Ledger(led, { cls: "a6-led", caption: "Present value of a " + S.tau + "-month wait for a " + I7.loadMW + " MW load" + (st ? ", half served at month " + st.at : "") + ". The accounts are kept apart.",
+        LX.Ledger(led, { cls: "a6-led", caption: moneyCaption(I7, L, S.tau, st),
           columns: ["Account", "What the wait costs them", "Present value"],
           rows: ledgerRows(L).map(function (r) { return { head: r.head, sub: r.sub, cells: [{ text: r.what, cls: "a6-what" }, musd(r.v)] }; }) });
         status.innerHTML = ""; moneyLines(I7, T, S, !!o.staged).forEach(function (t) { H("p", { text: t }, status); });
@@ -464,7 +504,7 @@
                    { id: "late", label: "Studies run late" }, { id: "shift", label: "A withdrawal shifts cost and time onto others" }],
             cards: [{ id: "site", text: "Control of 90% of the site, and a deposit by MW, at the request", bin: "spec", why: "A request without land or money behind it cannot enter." },
                     { id: "cluster", text: "Cluster studies: every request in a window studied together, 150 days", bin: "serial", why: "One study for the group replaces a chain of single studies." },
-                    { id: "pen", text: "A penalty on the transmission provider for each business day a study is late", bin: "late", why: "$1,000 a business day for a cluster study, paid to the delayed cluster." },
+                    { id: "pen", text: "Penalties on the transmission provider when a study runs late, after a grace period, with caps and exceptions", bin: "late", why: "After a 10-business-day grace period, $1,000 a business day for a late cluster study, capped at the study deposits." },
                     { id: "wd", text: "Withdrawal penalties that grow the later a project leaves", bin: "shift", why: "Leaving late costs the leaver, not only those who stay." },
                     { id: "ia", text: "A deposit of 20% of the upgrade costs at the agreement", bin: "spec", why: "Money at stake before construction filters out projects that are not ready." }],
             onCheck: function (g) { api.done(); api.saw("Order 2023's pro forma rules, as MISO summarised them in August 2023; grid operators adapt them in their own rules."); } });
@@ -507,7 +547,7 @@
           H("p", { class: "lx-hint", html: LX.rich("ERCOT, slides to the Texas Senate, 29 July 2026; requests as of June 2026. In October 2025 the Secretary of Energy also asked FERC to start a rulemaking on connecting large loads to the interstate transmission system.") }, act);
           hooks.sec = function () { na.input.value = String(want); na.go(); };
         } },
-      { text: "A wait costs money, and three accounts carry it. Using case file CF7's toy, price a 36-month wait, then move the tariff and switch on bridge power.",
+      { text: "A wait costs money, and three accounts carry it. Using case file CF7's toy, price a 36-month wait, then move the tariff and switch on [[bridge-power|bridge power]].",
         build: function (act, api) {
           var m = MoneyView(act, { staged: false, onChange: function () { api.done(); } });
           hooks.money = m;
@@ -528,30 +568,46 @@
     function buildExplain() {
       if (!xhost) return;
       xhost.innerHTML = ""; xhost.classList.add("is-live");
-      var run = cluster(C), Wf = run.final.W, nn = n1(N, N.campusMW, false);
+      var run = cluster(C), Wf = run.final.W, nn = n1(N, N.campusMW, false), small = { c: 150 };
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
-        title: "Through the queue: the questions in order", lede: "Trace a request; every withdrawal sends the rest back to be restudied.",
-        nodes: { req: { t: "Request filed", tN: ["Request", "filed"], s: "site control, deposit", sN: "site, deposit" },
+        title: "A generator cluster: the questions in order", lede: "Trace a request. Projects whose share is too high leave the queue; the rest go back to be restudied.",
+        nodes: { req: { t: "Requests filed", tN: ["Requests", "filed"], s: "site control, deposit", sN: "site, deposit" },
                  study: { t: "Study: overload found?", tN: ["Overload", "found?"], k: "q" },
                  up: { t: "Upgrades and shares", tN: ["Upgrades", "and shares"], s: "by impact on the line", sN: "by impact" },
-                 dear: { t: "Share too high?", tN: ["Share too", "high?"], k: "q" },
-                 wd: { t: "Withdraw", s: "the rest are restudied", sN: "rest restudied", k: "end" },
+                 dear: { t: "Any share too high?", tN: ["A share", "too high?"], k: "q" },
+                 wd: { t: "Those projects leave", tN: ["Those", "projects leave"], s: "they exit the queue", sN: "exit the queue" },
+                 rest: { t: "The rest: restudy", tN: ["The rest:", "restudy"], s: C.studyDays + " more days", sN: C.studyDays + " more days" },
                  agr: { t: "Agreement and security", tN: ["Agreement", "and security"] },
                  on: { t: "Built, then operating", tN: ["Built, then", "operating"], k: "end" } },
         cols: 3, colsN: 2,
-        at: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [2, 2], agr: [0, 3], on: [0, 4] },
-        atN: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [1, 3], agr: [0, 3], on: [0, 4] },
-        edges: [["req", "study"], ["study", "up", "yes"], ["study", "agr", "no", { v: true }], ["up", "dear"], ["dear", "wd", "yes"], ["dear", "agr", "no"], ["agr", "on"]],
-        traces: [{ label: "Wind farm", path: ["req", "study", "up", "dear", "agr", "on"], text: "Its share rose to " + perkw(Wf.perKW) + " after the placeholder left, still under the " + perkw(PJ.W.limitPerKW) + " it would pay." },
-                 { label: "Placeholder", path: ["req", "study", "up", "dear", "wd"], text: "Its share, " + perkw(run.rounds[0].rows.filter(function (x) { return x.id === "X"; })[0].perKW) + ", was above the " + perkw(PJ.X.limitPerKW) + " it would pay: it left, and the others were restudied." },
-                 { label: "Data center", path: ["req", "study", "up", "dear", "agr", "on"], text: "The utility's study found an N−1 overload: " + nn.maxNew + " MW fits now, the rest after a third line, paid under the large-load tariff." }],
+        at: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [2, 2], rest: [2, 1], agr: [0, 3], on: [0, 4] },
+        atN: { req: [0, 0], study: [0, 1], up: [1, 1], dear: [1, 2], wd: [1, 3], rest: [1, 4], agr: [0, 4], on: [0, 5] },
+        edges: [["req", "study"], ["study", "up", "yes"], ["study", "agr", "no", { v: true }], ["up", "dear"], ["dear", "wd", "yes"], ["dear", "agr", "no"],
+                ["wd", "rest"], ["rest", "study", "back to study", { d: "M570 100 V78 H200 V103", l: [385, 72], dN: "M323 402 H350 V80 H130 V111", lN: [240, 75] }], ["agr", "on"]],
+        traces: [{ label: "Wind farm", path: ["req", "study", "up", "dear", "wd", "rest", "study", "up", "dear", "agr", "on"], text: "In study 1 the placeholder's share was too high and it left; the wind farm was restudied, and its share rose to " + perkw(Wf.perKW) + ", still under the " + perkw(PJ.W.limitPerKW) + " it would pay." },
+                 { label: "Placeholder", path: ["req", "study", "up", "dear", "wd"], text: "Its share, " + perkw(run.rounds[0].rows.filter(function (x) { return x.id === "X"; })[0].perKW) + ", was above the " + perkw(PJ.X.limitPerKW) + " it would pay: it left the queue after study 1." }],
+        sel: 0 });
+      LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
+        title: "A large load: its utility's process", lede: "Steps differ by utility and state; Order 2023's generator rules do not apply.",
+        nodes: { lreq: { t: "Request for service", tN: ["Request for", "service"], s: "to the utility", sN: "to the utility" },
+                 lfit: { t: "Fits, one line out?", tN: ["Fits, one", "line out?"], k: "q" },
+                 lcon: { t: "Service contract", tN: ["Service", "contract"], s: "minimum bill, collateral", sN: "bill, collateral" },
+                 lup: { t: "Upgrades and contract", tN: ["Upgrades and", "contract"], s: "the tariff sets who pays", sN: "tariff: who pays" },
+                 lstage: { t: "Staged energization", tN: ["Staged", "energization"], s: "part now, the rest later", sN: "part now" },
+                 lon: { t: "Full service", tN: ["Full", "service"], k: "end" } },
+        cols: 3, colsN: 2,
+        at: { lreq: [0, 0], lfit: [0, 1], lcon: [0, 2], lon: [0, 3], lup: [1.5, 1], lstage: [1.5, 2] },
+        atN: { lreq: [0, 0], lfit: [0, 1], lcon: [0, 2], lon: [0, 3], lup: [1, 1], lstage: [1, 2] },
+        edges: [["lreq", "lfit"], ["lfit", "lcon", "yes"], ["lfit", "lup", "no"], ["lup", "lstage"], ["lcon", "lon"], ["lstage", "lon", null, { v: true }]],
+        traces: [{ label: "The " + N.campusMW + " MW campus", path: ["lreq", "lfit", "lup", "lstage", "lon"], text: "With one line out only " + nn.maxNew + " MW fits, so a third line is needed and the large-load tariff sets who pays; " + nn.maxNew + " MW can be served first, the rest after the line." },
+                 { label: "A " + small.c + " MW load", path: ["lreq", "lfit", "lcon", "lon"], text: "With one line out, " + small.c + " MW fits within the " + nn.maxNew + " MW the two lines can carry: no upgrade, a contract, then service." }],
         sel: 0 });
       // the ledger with the reader's settings
       var st = S.stagedOn ? T.staged : null, L = staged(I7, S.tau, S.s, S.bridge, st), lc = H("div", { class: "lx-xcard" }, xhost);
       H("h3", { text: "Ledger: who carries the wait" }, H("header", { class: "lx-x-head" }, lc));
       LX.Ledger(lc, { cls: "a6-led", caption: "Your settings: a " + S.tau + "-month wait, tariff: " + SHARE_LABEL[S.s].toLowerCase() + (S.bridge ? ", bridge power" : "") + (st ? ", staged service" : "") + ". CF7's toy, a " + I7.loadMW + " MW load.",
         columns: ["Account", "What the wait costs them", "Present value"], rows: ledgerRows(L).map(function (r) { return { head: r.head, sub: r.sub, cells: [{ text: r.what, cls: "a6-what" }, musd(r.v)] }; }) });
-      H("p", { class: "lx-hint", text: "One total would hide who pays. A tariff moves cost between accounts; only a shorter or smaller wait shrinks it." }, lc);
+      H("p", { class: "lx-hint", text: LEDGER_NOTE }, lc);
       LX.EvidenceLadder(H("div", { class: "lx-xcard" }, xhost), { title: "Requested is not connected", rungs: D.ladder.rungs, items: D.ladder.items, off: D.ladder.off,
         lede: "A project climbs these rungs. Place each claim on the rung it has reached." });
     }

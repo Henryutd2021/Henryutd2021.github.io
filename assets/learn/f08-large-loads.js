@@ -20,7 +20,7 @@
 //                 shown to the nearest thousand. Not a peak equivalent: homes do not all draw their most at once.
 //   requests      ERCOT's large-load requests (about 474 GW, June 2026) / its record peak (91,134 MW, preliminary)
 //   the wait      illustrative: the campus takes 24 months to build; idle months = max(0, grid month - 24)
-//   jobs and tax  learner-set screening inputs, illustrative: job-years = workers x 24 months / 12 (the build time);
+//   jobs and tax  learner-set rough inputs, illustrative: job-years = workers x 24 months / 12 (the build time);
 //                 permanent jobs as set; local tax a year = taxable value x rate (a transfer, owner to local budgets)
 // Every number on the page comes from this model or from the data file; _tests/learn/test_f08-large-loads.js checks them.
 //
@@ -76,13 +76,14 @@
     options: [{ value: "night", label: "Mostly at night" }, { value: "flat", label: "About the same in every hour" }, { value: "peak", label: "Mostly in the busiest hours" }],
     answer: "flat",
     feedback: {
-      night: "It runs around the clock, so it adds as much at the busiest hour as at night.",
-      flat: "Data centers run around the clock: the grid operator PJM describes such loads as 24/7, all year, hardly moved by the weather.",
-      peak: "It hardly follows the weather or the clock: it adds about the same in every hour, the busiest included."
+      night: "Data centers run around the clock, so they draw power at the busiest hour as well as at night.",
+      flat: "Data centers run around the clock; the grid operator PJM calls such loads 24/7 and hardly moved by the weather.",
+      peak: "Data centers hardly follow the weather or the clock, so they draw power in every hour, the busiest included."
     }
   };
-  function whenExtra(D, s) {
-    return "On " + s.label + " the town's busiest hour rises from " + s.peak + " to " + s.newPeak + " MW; at the campus's full " + D.campus.contractMW + " MW contract, to " + s.atContract + " MW.";
+  // running around the clock is not the same as a constant draw: the steady 240 MW is this lesson's assumption
+  function whenAssume(D) {
+    return "Assumed in this lesson: a steady " + D.campus.drawMW + " MW in every hour. Real campuses vary with their computing work and with cooling.";
   }
   function dayLine(D, s) {
     return s.label + ": the campus is **" + pct(s.share) + "** of the day's electricity. The quietest hour goes from " + s.min + " to " + s.newMin + " MW, " +
@@ -94,23 +95,24 @@
   function homesChain(D, Y, drawMW) {
     var mwh = drawMW * Y.n, h = homes(drawMW, Y.n, D.home_year.value);
     return [{ v: fmtN(drawMW) + " MW", u: "all year" }, { op: "× " + fmtN(Y.n) + " h =" }, { v: fmtN(mwh) + " MWh", u: "a year" },
-            { op: "÷ " + fmtN(D.home_year.value / 1000, 3) + " MWh a home =" }, { v: "about " + fmtN(roundK(h)), u: "homes' yearly use", out: true }];
+            { op: "÷ " + fmtN(D.home_year.value / 1000, 3) + " MWh a home =" }, { v: "about " + fmtN(roundK(h)), u: "homes' yearly purchases", out: true }];
   }
   function homesLine(D, Y, drawMW) {
     var h = homes(drawMW, Y.n, D.home_year.value);
     return fmtN(drawMW) + " MW all year is as much electricity as about **" + fmtN(roundK(h)) + "** average U.S. homes buy in a year, and " + pct(drawMW * Y.n / Y.energy) + " of what Prairie Town uses.";
   }
+  var HOMES_WHATIF = "A what-if for this step only: the next steps keep the campus at its steady 240 MW.";
   var HOMES_NOTE = "This compares a year's energy, not the power in any one hour.";
   function yearLine(D, Y) {
     return "With the campus, demand is above the town's old record in **" + fmtN(Y.above) + " of " + fmtN(Y.n) + "** hours. The quietest hour rises from " + fmtN(Y.min) + " to " + fmtN(Y.withMin) + " MW.";
   }
   function yearSaw(D, Y) {
-    return yearLine(D, Y) + " The [[load-factor|load factor]] rises from " + pct(Y.lf) + " to " + pct(Y.withLf) + ".";
+    return "With the campus, demand is above the town's old record in **" + fmtN(Y.above) + " of " + fmtN(Y.n) + "** hours. The quietest hour rises from " + fmtN(Y.min) + " to " + fmtN(Y.withMin) + " MW, and the [[load-factor|load factor]] from " + pct(Y.lf) + " to " + pct(Y.withLf) + ".";
   }
   var ERCOT_TICKS = ["Half", "Equal", "2 times", "5 times", "10 times"];
   function ercotLine(D) {
     var E = D.ercot;
-    return fmtN(E.requestsGW) + " GW ÷ " + fmtN(E.peakMW / 1000, 1) + " GW = **" + fmtN(ratio(D), 1) + " times** the record. About " + pct(E.dcShare) + " are data centers. Requests are not demand: some are duplicates, and many will never be built.";
+    return fmtN(E.requestsGW) + " GW ÷ " + fmtN(E.peakMW / 1000, 1) + " GW = **" + fmtN(ratio(D), 1) + " times** the record, and about " + pct(E.dcShare) + " are data centers. Requests are proposals, not committed demand: projects may change or be cancelled.";
   }
   function waitLine(D, grid) {
     var b = D.wait.buildMonths, i = idle(D, grid);
@@ -124,18 +126,21 @@
   function taxLine(D, value, rate) {
     return "$" + fmtN(value) + "M of taxable property at " + fmtN(rate, 1) + "% pays **$" + fmtN(taxM(value, rate), 1) + "M a year** to local budgets: a [[transfer|transfer]] from the owner to schools and services, not new wealth.";
   }
-  var TAX_NOTE = "Illustrative: real values, rates and any tax breaks differ by place.";
+  var TAX_NOTE = "Illustrative: real values, rates and any tax breaks differ by place. $M means millions of dollars.";
   function coolLine(c) { return c.name + ": " + c.water + "; " + c.power + "."; }
   var PAY = {
     options: [{ value: "company", label: "The company that cancelled" }, { value: "others", label: "The utility's other customers" }, { value: "nobody", label: "Nobody" }],
     answer: "others",
     feedback: {
-      company: "Only if its contract says so. With no special terms, the cost can land on the utility's other customers.",
+      company: "Only if its contract says so: with no special terms, the cost can land on the utility's other customers.",
       others: "With no special terms, the cost can land on the utility's other customers.",
-      nobody: "Wires cost money whether or not anyone uses them. With no special terms, the cost can land on the utility's other customers."
+      nobody: "Wires cost money whether or not anyone uses them: with no special terms, the cost can land on the utility's other customers."
     },
     extra: "A [[large-load-tariff|large-load tariff]] can make the company pay instead, through a minimum bill or an exit fee ([[lesson:a04-retail-tariffs|A4]])."
   };
+  var SAW7 = "Water, jobs and taxes are local gains and costs that the grid's numbers do not show. Each is a rough estimate: its inputs are yours.";
+  var WATER_HINTS = ["Which design a campus uses changes what it asks of the town's water, and of the grid.",
+    "A closed water loop inside the building can still send its heat out through an evaporative cooling tower (U.S. Department of Energy)."];
 
   // the no-JS version (the test writes it into the page between the f08-fallback markers)
   function staticFallback(D, days, year) {
@@ -143,7 +148,7 @@
     var row = function (s) { return "<tr><td>" + s.label + "</td><td>" + s.peak + " MW</td><td>" + s.min + " MW</td><td>" + s.newPeak + " MW and " + s.newMin + " MW</td><td>" + pct(s.share) + "</td></tr>"; };
     var h = homes(c.drawMW, Y.n, D.home_year.value);
     return "<p class=\"lx-eyebrow\">The idea in one table: a " + c.contractMW + " MW data center joins Prairie Town (illustrative)</p>" +
-      "<p class=\"lx-hint\">The town's demand on two real-shape days, and with the campus's steady " + c.drawMW + " MW added to every hour.</p>" +
+      "<p class=\"lx-hint\">The town's demand on two real-shape days, and with the campus's steady " + c.drawMW + " MW (this lesson's assumption) added to every hour.</p>" +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table f8-fbt\">" +
       "<thead><tr><th scope=\"col\">Day</th><th scope=\"col\">Town's busiest hour</th><th scope=\"col\">Town's quietest hour</th><th scope=\"col\">With the campus: busiest and quietest</th><th scope=\"col\">Campus share of the day</th></tr></thead>" +
       "<tbody>" + row(a) + row(b) + "</tbody></table></div>" +
@@ -151,18 +156,19 @@
       "<li><b>Its contract.</b> Up to " + c.contractMW + " MW: on " + a.label + " the busiest hour could reach " + a.atContract + " MW.</li>" +
       "<li><b>Homes.</b> " + fmtN(c.drawMW) + " MW all year is " + fmtN(c.drawMW * Y.n) + " MWh: as much as about " + fmtN(roundK(h)) + " average U.S. homes buy in a year (" + fmtN(D.home_year.value) + " kWh each), and " + pct(Y.share) + " of the town's own use.</li>" +
       "<li><b>The year.</b> With the campus, demand is above the town's 2025 record in " + fmtN(Y.above) + " of " + fmtN(Y.n) + " hours; the load factor rises from " + pct(Y.lf) + " to " + pct(Y.withLf) + ".</li>" +
-      "<li><b>Requests.</b> ERCOT counted about " + fmtN(D.ercot.requestsGW) + " GW of large loads asking to connect (" + D.ercot.asOf + "), " + fmtN(ratio(D), 1) + " times its record peak of " + fmtN(D.ercot.peakMW) + " MW: requests are not demand.</li>" +
+      "<li><b>Requests.</b> ERCOT counted about " + fmtN(D.ercot.requestsGW) + " GW of large loads asking to connect (" + D.ercot.asOf + "), " + fmtN(ratio(D), 1) + " times its record peak of " + fmtN(D.ercot.peakMW) + " MW: proposals, not committed demand.</li>" +
       "<li><b>The wait.</b> Built in " + D.wait.buildMonths + " months, connected after " + D.wait.grid.start + ": " + idle(D, D.wait.grid.start) + " idle months.</li>" +
       "<li><b>Cooling.</b> " + D.cooling.map(coolLine).join(" ") + "</li>" +
+      "<li><b>A closed loop.</b> " + WATER_HINTS[1] + "</li>" +
       "<li><b>Jobs and taxes.</b> " + fmtN(D.jobs.crew.start) + " workers for " + D.wait.buildMonths + " months make " + fmtN(jobYears(D, D.jobs.crew.start)) + " job-years, then " + D.jobs.staff.start + " permanent jobs; $" + fmtN(D.tax.value.start) + "M of property at " + fmtN(D.tax.rate.start, 1) + "% pays $" + fmtN(taxM(D.tax.value.start, D.tax.rate.start), 1) + "M a year in local tax (illustrative).</li>" +
       "<li><b>Who pays.</b> If the utility builds wires for the campus and the company cancels, the cost can land on other customers, unless a large-load tariff makes the company pay.</li>" +
       "</ul><p class=\"lx-hint\">With JavaScript on, you work through this step by step: the day, a spring day, the homes, the year, the requests, the wait, water, jobs and taxes, and who pays.</p>";
   }
 
   var model = { day: day, yearStats: yearStats, homes: homes, roundK: roundK, nearestTick: nearestTick, ratio: ratio, idle: idle, jobYears: jobYears, taxM: taxM,
-    WHEN: WHEN, whenExtra: whenExtra, dayLine: dayLine, daysSaw: daysSaw, homesChain: homesChain, homesLine: homesLine, HOMES_NOTE: HOMES_NOTE, yearLine: yearLine,
+    WHEN: WHEN, whenAssume: whenAssume, HOMES_WHATIF: HOMES_WHATIF, WATER_HINTS: WATER_HINTS, dayLine: dayLine, daysSaw: daysSaw, homesChain: homesChain, homesLine: homesLine, HOMES_NOTE: HOMES_NOTE, yearLine: yearLine,
     yearSaw: yearSaw, ERCOT_TICKS: ERCOT_TICKS, ercotLine: ercotLine, waitLine: waitLine, jobsLine: jobsLine, taxLine: taxLine, TAX_NOTE: TAX_NOTE, coolLine: coolLine,
-    PAY: PAY, staticFallback: staticFallback, fmtN: fmtN, pct: pct, hm: hm, span: span };
+    PAY: PAY, SAW7: SAW7, staticFallback: staticFallback, fmtN: fmtN, pct: pct, hm: hm, span: span };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -212,11 +218,12 @@
           var s = DAY.summer, Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act);
           var pr = LX.Predict(act, { id: "f8-when", q: WHEN.q, title: false, answer: WHEN.answer, options: WHEN.options, feedback: WHEN.feedback, onPick: function () { show(true); } });
+          var as = H("p", { class: "lx-hint" }, act);
           function show(on) {
             dayChart(Pl, s, on);
-            if (!on) { ro.innerHTML = ""; return; }
-            chips(ro, [["Town's busiest hour", s.peak + " MW"], ["With the campus", s.newPeak + " MW"], ["At its full contract", s.atContract + " MW", "warn"]]);
-            pr.reveal(whenExtra(D, s)); api.done();
+            if (!on) { ro.innerHTML = ""; as.textContent = ""; return; }
+            chips(ro, [["Town's busiest hour", s.peak + " MW"], ["With the campus's steady " + D.campus.drawMW + " MW", s.newPeak + " MW"], ["At its full " + D.campus.contractMW + " MW contract", s.atContract + " MW", "warn"]]);
+            pr.reveal(); as.textContent = whenAssume(D); api.done();
           }
           show(!!pr.picked());
           demo[0] = function () { if (!pr.picked()) { var b = act.querySelectorAll(".lx-choice")[1]; if (b) b.click(); } };
@@ -244,7 +251,7 @@
           pick(sel);
           demo[1] = function () { pick("summer"); pick("spring"); };
         } },
-      { text: "How big is 240 MW, around the clock? Guess how many average U.S. homes use as much electricity in a year as the campus.",
+      { text: "How big is 240 MW, around the clock? Guess how many average U.S. homes buy as much electricity in a year as the campus uses.",
         build: function (act, api) {
           var T = D.homes.ticks, ans = nearestTick(T, homes(D.campus.drawMW, Y.n, D.home_year.value));
           var res = H("div", { class: "f8-res" }, act);
@@ -253,15 +260,16 @@
             if (g != null) H("p", { class: "lx-hint", text: "Your guess: " + fmtN(T[g]) + " homes. " + (g === ans ? "Right order of size." : "The nearest mark is " + fmtN(T[ans]) + ".") }, res);
             var uc = LX.UnitChain(res, { label: "From the campus's MW to homes", steps: homesChain(D, Y, S.draw) });
             var line = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
-            LX.Slider(res, { label: "The campus's average draw", color: CAMPUS, min: D.homes.drawMW.min, max: D.homes.drawMW.max, step: D.homes.drawMW.step, value: S.draw,
+            LX.Slider(res, { label: "What-if: the campus's average draw", color: CAMPUS, min: D.homes.drawMW.min, max: D.homes.drawMW.max, step: D.homes.drawMW.step, value: S.draw,
               fmt: function (v) { return fmtN(v) + " MW"; }, onChange: function (v) { S.draw = v; uc.set(homesChain(D, Y, v)); paint(); } });
-            H("p", { class: "lx-hint", text: HOMES_NOTE + " Homes figure: EIA's average U.S. home, " + fmtN(D.home_year.value) + " kWh a year (2022)." }, res);
+            H("p", { class: "lx-hint", text: HOMES_WHATIF }, res);
+            H("p", { class: "lx-hint", text: HOMES_NOTE + " Homes figure: EIA's average U.S. home buys " + fmtN(D.home_year.value) + " kWh a year (2022)." }, res);
             function paint() { line.innerHTML = LX.rich(homesLine(D, Y, S.draw)).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
             paint(); api.done();
           }
           var g0 = LX.progress.guess("f8-homes");
           if (g0 != null && T[g0] != null) { result(+g0); }
-          else LX.Guess(act, { id: "f8-homes", q: "Homes with the same yearly electricity use", ticks: T.map(function (t) { return fmtN(t); }), answer: ans, start: 0,
+          else LX.Guess(act, { id: "f8-homes", q: "Homes buying as much electricity in a year", ticks: T.map(function (t) { return fmtN(t); }), answer: ans, start: 0,
             onLock: function (g) { result(g); } });
           act.appendChild(res);
           demo[2] = function () { var b = act.querySelector(".lx-guess .lx-btn"); if (b) b.click(); };
@@ -289,7 +297,7 @@
           paint();
           demo[3] = function () { if (!tg.val()) tg.el.click(); };
         } },
-      { text: "Real grids get many requests like this. In June 2026, Texas's main grid operator, [[ercot|ERCOT]], counted about 474 GW of large loads asking to connect. How many times its record peak of about 91 GW is that?",
+      { text: "Real grids get many such requests. In June 2026, Texas's grid operator [[ercot|ERCOT]] counted about 474 GW of large loads asking to connect. How many times its record peak of about 91 GW is that?",
         build: function (act, api) {
           var res = H("div", { class: "f8-res" }, act), ans = ERCOT_TICKS.indexOf("5 times");
           function result() {
@@ -332,7 +340,7 @@
           paint();
           demo[5] = function () { sl.set(42, true); };
         } },
-      { text: "A campus brings more than load. Open each tab: its cooling water, the jobs it creates and the taxes it pays, as screening estimates you set yourself.",
+      { text: "A campus brings more than load. Open each tab: its cooling water, the jobs it creates and the taxes it pays, as rough estimates you set yourself.",
         build: function (act, api) {
           var seen = {}, tabs = [["water", "Cooling water"], ["jobs", "Jobs"], ["tax", "Taxes"]];
           var seg = H("div", { class: "lx-seg f8-tabs", role: "group", "aria-label": "Beyond the wires" }, act);
@@ -345,7 +353,7 @@
             if (k === "water") {
               var cs = H("div", { class: "lx-seg", role: "group", "aria-label": "Cooling design" }, pane), o1 = out(pane), cb = [];
               D.cooling.forEach(function (c, i) { cb[i] = H("button", { type: "button", text: c.name }, cs); cb[i].addEventListener("click", function () { cool(i); }); });
-              H("p", { class: "lx-hint", text: "Which design a campus uses changes what it asks of the town's water, and of the grid." }, pane);
+              WATER_HINTS.forEach(function (t) { H("p", { class: "lx-hint", text: t }, pane); });
               var cool = function (i) { cb.forEach(function (b, j) { b.setAttribute("aria-pressed", String(j === i)); }); o1.textContent = coolLine(D.cooling[i]); };
               cool(0);
             } else if (k === "jobs") {
@@ -361,7 +369,7 @@
               LX.Slider(pane, { label: "Local tax rate (illustrative)", color: "var(--lx-tier-5)", min: X.rate.min, max: X.rate.max, step: X.rate.step, value: S.rate, fmt: function (v) { return fmtN(v, 1) + "%"; }, onChange: function (v) { S.rate = v; keep(); pt(); } });
               pane.appendChild(o3); H("p", { class: "lx-hint", text: TAX_NOTE }, pane); pt();
             }
-            if (seen.water && seen.jobs && seen.tax) { api.done(); api.saw("Water, jobs and taxes are local gains and costs that the grid's numbers do not show. Each is a screening estimate: its inputs are yours."); }
+            if (seen.water && seen.jobs && seen.tax) { api.done(); api.saw(SAW7); }
           }
           open("water");
           demo[6] = function () { open("jobs"); open("tax"); };
@@ -369,7 +377,8 @@
       { text: "The utility builds a new substation for the campus, then the company cancels. Assume regulators let the utility recover such costs from customers, and the contract has no special terms. Who pays?",
         build: function (act, api) {
           var pr = LX.Predict(act, { id: "f8-pay", q: "Who pays for the substation?", title: false, answer: PAY.answer, options: PAY.options, feedback: PAY.feedback, onPick: function () { show(); } });
-          function show() { pr.reveal(PAY.extra); api.done(); }
+          var ex = H("p", { class: "lx-hint" }, act);
+          function show() { pr.reveal(); ex.innerHTML = LX.rich(PAY.extra); api.done(); }
           if (pr.picked()) show();
           H("a", { class: "lx-btn small", style: "justify-self:start;margin-top:10px", href: "#explain", html: "Who decides, pays and benefits, as diagrams" + LX.icon("arrow") }, act);
           demo[7] = function () { if (!pr.picked()) { var b = act.querySelectorAll(".lx-choice")[1]; if (b) b.click(); } };
@@ -393,16 +402,16 @@
           { key: "puc", name: "State regulators", cells: { dec: { v: "yes", t: "approve tariffs: who pays for what" }, pay: { v: "no" }, ben: { v: "no" } } },
           { key: "rto", name: "The grid operator", note: "such as SPP or ERCOT", cells: { dec: { v: "part", t: "checks that the grid can carry the load" }, pay: { v: "no" }, ben: { v: "no" } } },
           { key: "homes", name: "Households and businesses", note: "the ratepayers", cells: { dec: { v: "part", t: "comment at hearings" }, pay: { v: "part", t: "whatever the tariff does not charge the campus" }, ben: { v: "part", t: "only if the campus pays more than the costs it causes" } } },
-          { key: "local", name: "Local government", cells: { dec: { v: "yes", t: "zoning, permits and any tax deal" }, pay: { v: "no" }, ben: { v: "yes", t: "tax revenue, a transfer" } } },
+          { key: "local", name: "Local government", cells: { dec: { v: "yes", t: "zoning, permits and any tax deal" }, pay: { v: "part", t: "possibly: roads, water and services the campus needs" }, ben: { v: "part", t: "tax receipts; the net gain depends on local costs" } } },
           { key: "nbr", name: "Neighbours", cells: { dec: { v: "part", t: "comment at hearings" }, pay: { v: "part", t: "noise, land and water" }, ben: { v: "part", t: "jobs and local spending" } } }],
         note: "Illustrative roles for Prairie Town; real arrangements vary by state and utility." });
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {
         title: "Cause and effect: one campus connects",
         links: [{ title: "A company asks", text: "Its contract is the most it may draw.", value: D.campus.contractMW + " MW contract" },
                 { title: "Studies and new wires", text: "The grid must be able to carry it; checking and building take time.", value: i + " idle months in your timeline" },
-                { title: "It switches on", text: "It draws about the same in every hour.", value: "+" + D.campus.drawMW + " MW" },
+                { title: "It switches on", text: "In this lesson it draws a steady " + D.campus.drawMW + " MW in every hour.", value: "+" + D.campus.drawMW + " MW" },
                 { title: "The record moves", text: "The busiest hour rises, and quiet nights are gone.", value: s.peak + " → " + s.newPeak + " MW" },
-                { title: "More plants and wires", text: "The grid must cover the new busiest hour, with a margin.", value: fmtN(Y.above) + " h above the old record" },
+                { title: "Check supply and wires", text: "Planners check whether existing supply and wires can serve the added load; upgrades may be needed.", value: fmtN(Y.above) + " h above the old record" },
                 { title: "Who pays", text: "The tariff decides how much falls on the campus and how much on others.", value: "set by the tariff (A4)" }],
         note: "Prairie Town's numbers, illustrative. A real grid adds a campus to many other changes at once." });
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {

@@ -51,9 +51,15 @@
     "rate": { "min": 0.5, "max": 2.5, "step": 0.1, "start": 1.0 }
   },
   "cooling": [
-    { "key": "evap", "name": "Evaporative cooling", "water": "uses water: some evaporates to carry heat away", "power": "less electricity for cooling" },
-    { "key": "closed", "name": "Closed-loop cooling", "water": "little water once the loop is filled", "power": "often more electricity, for fans and chillers" }
+    { "key": "evap", "name": "Evaporative heat rejection", "water": "uses water that evaporates in a cooling tower", "power": "less electricity for cooling" },
+    { "key": "dry", "name": "Dry, air-cooled heat rejection", "water": "little operational water on site", "power": "may need more electricity, depending on the weather and the design" }
   ],
+  "coolingSource": {
+    "source": "U.S. Department of Energy, Federal Energy Management Program: Cooling Water Efficiency Opportunities for Federal Data Centers",
+    "url": "https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers",
+    "as_of": "page read 5 November 2026",
+    "note": "Supports: a condenser water loop carries heat to a cooling tower, where evaporation removes it; tower water use comes mainly from evaporation and is high for constant loads such as data centers; air-cooled heat rejection is an alternative. The electricity remark on dry cooling is qualitative."
+  },
   "doe": {
     "source": "U.S. Department of Energy: DOE Releases New Report Evaluating Increase in Electricity Demand from Data Centers",
     "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers",
