@@ -908,9 +908,41 @@
   does: "Find five planted bugs in a one-day battery study (a unit error, a sign flip, a free lunch, a missing rule, a leaked future), each with a named check and a real solver; match a benchmark worked by hand; validate the day-before forecast against measured data and check one input; see why a clean clone fails, rerun it for real in the notebook and write a verification log."
   after: [R4, M1, K8]
   next: R9
-- {kind: lesson, tier: researcher, code: R6, title: "Uncertainty done properly: what to vary, how, and how to say it"}
+- kind: lesson
+  id: r06-uncertainty-properly
+  code: R6
+  tier: researcher
+  form: studio
+  icon: wave
+  status: active
+  minutes: 30
+  practice_minutes: 60
+  title: "Uncertainty done properly: what to vary, how, and how to say it"
+  subtitle: "Sort the uncertainties behind one number, choose a treatment for each, widen it into a band, and say it three ways"
+  short: "Uncertainty, properly"
+  teaches: [parameter uncertainty, structural uncertainty, scenarios, deep uncertainty, choices versus uncertainties, uncertainty bands, reporting ranges]
+  does: "Sort twelve uncertainties into parameter, structural, scenario and deep, with the study's own choices set apart; pick a treatment for each pile; turn a single forecast into bands; rewrite it for a paper, a board and the public; plan your own."
+  outcome: "Classify the uncertainties of a study, choose a defensible treatment for each, and report the result as a range that a paper, a decision-maker and the public can each read correctly."
+  after: [M7]   # curriculum: [M7, M8]; M8 joins when it is live (W4 branch d)
+  next: R8
 - {kind: lesson, tier: researcher, code: R7, title: "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual"}
-- {kind: lesson, tier: researcher, code: R8, title: "How do you show results so people understand their limits?"}
+- kind: lesson
+  id: r08-communicating
+  code: R8
+  tier: researcher
+  form: studio
+  icon: chart
+  status: active
+  minutes: 30
+  practice_minutes: 90
+  title: "How do you show results so people understand their limits?"
+  subtitle: "Fix three misleading charts, write findings with their conditions, and brief a council and the public"
+  short: "Results with limits"
+  teaches: [findings with boundary conditions, truncated axes, cherry-picked time windows, averages and spread, briefings for decision-makers, public summaries]
+  does: "Sort nine findings by whether they hold as written; diagnose and redesign three misleading charts drawn from the course's data; write a one-sentence finding for each; turn R6's result into a briefing for a city council and a paragraph for the public."
+  outcome: "Show a result so that its readers see its limits: an honest key figure, findings with their conditions, a briefing a decision-maker can act on, and a public summary of at most 150 words."
+  after: [R6]
+  next: R9
 - kind: lesson
   id: r09-integrity-stakeholders
   code: R9

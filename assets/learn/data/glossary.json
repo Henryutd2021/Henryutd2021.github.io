@@ -149,6 +149,12 @@
   "lesson": "R2",
   "href": "r02-literature.html"
  },
+ "boundary-condition": {
+  "term": "Boundary condition (of a finding)",
+  "short": "The place, time, data and assumptions a result holds under, stated next to it so readers do not stretch it further.",
+  "lesson": "R8",
+  "href": "r08-communicating.html"
+ },
  "branch": {
   "term": "Branch",
   "short": "A movable label on a line of commits, so a what-if can grow without changing the main line of work.",
@@ -574,6 +580,12 @@
   "short": "A quantity the model is free to choose, such as how much each plant makes each hour.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "deep-uncertainty": {
+  "term": "Deep uncertainty",
+  "short": "A situation where the people involved do not know, or cannot agree on, the possible outcomes, their odds or the right model.",
+  "lesson": "R6",
+  "href": "r06-uncertainty-properly.html"
  },
  "deliverability": {
   "term": "Deliverability",
@@ -2183,6 +2195,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "structural-uncertainty": {
+  "term": "Structural uncertainty",
+  "short": "Doubt about how a model is built (its equations, time steps and what it leaves out), which sampling its inputs cannot reveal; compare model forms instead.",
+  "lesson": "R6",
+  "href": "r06-uncertainty-properly.html"
+ },
  "stylized-network": {
   "term": "Stylized network",
   "short": "A simplified, made-up network built to show how a model behaves, with invented distances and costs rather than a real company's map.",
@@ -2327,6 +2345,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "truncated-axis": {
+  "term": "Truncated axis",
+  "short": "A chart axis that starts above zero; on a bar chart it makes differences look larger than they are.",
+  "lesson": "R8",
+  "href": "r08-communicating.html"
+ },
  "turbine": {
   "term": "Turbine",
   "short": "A machine whose blades are pushed round by moving gas, steam, water or wind, turning a shaft.",
@@ -2386,6 +2410,12 @@
   "short": "How much cheaper a system is with devices that link its carriers than with each carrier supplied on its own, judged as a difference of optimal costs.",
   "lesson": "M4",
   "href": "m04-storage-multienergy.html"
+ },
+ "value-of-information": {
+  "term": "Value of information",
+  "short": "How much a decision-maker would gain, on average, by learning an uncertain quantity before deciding; its upper limit is the value of a perfect forecast.",
+  "lesson": "R6",
+  "href": "r06-uncertainty-properly.html"
  },
  "value-of-lost-load": {
   "term": "Value of lost load",
