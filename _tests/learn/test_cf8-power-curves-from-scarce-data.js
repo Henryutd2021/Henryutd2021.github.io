@@ -19,7 +19,7 @@ const ID = "cf8-power-curves-from-scarce-data";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const M = require(L(ID + ".js"));
-const M9 = require(L("m09-surrogates-uq.js"));
+const M9 = require(L("components/gp.js"));
 const TL = require(L("components/timeline.js"));
 const X = require("./excerpt_check.js");
 const RAW = fs.readFileSync(L("data/" + ID + ".json"), "utf8"), JS = fs.readFileSync(L(ID + ".js"), "utf8");
@@ -130,7 +130,7 @@ ok(!/\bFOAK\b|\bNOAK\b|learning[- ](curve|rate)|projects\/|research\.(html|qmd)/
 const hrefs = [...OWN.matchAll(/\s(?:href|src)="([^"]+)"/g)].map(m => m[1]).concat(D.timeline.events.map(e => e.source.url));
 const OKH = h => /^https:\/\/doi\.org\/10\./.test(h) || /^https:\/\/github\.com\/Henryutd2021\/(mfgpr-wind-power-curve|wind-uq-surrogate)$/.test(h) || /^(\.\.\/assets\/(learn|explainers)\/[a-z0-9/-]+\.(js|json)|[0-9a-z-]+\.html)$/.test(h);
 ok(hrefs.every(OKH), "links: doi.org, the two repositories, learn pages and the page's scripts only: " + hrefs.filter(h => !OKH(h)).join(" "));
-ok(/<script src="\.\.\/assets\/learn\/m09-surrogates-uq\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/cf8-power-curves-from-scarce-data\.js" defer><\/script>/.test(PAGE), "M9's script loads before CF8's (LX.M9)");
+ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/cf8-power-curves-from-scarce-data\.js" defer><\/script>/.test(PAGE) && !/<script src="[^"]*m09-surrogates-uq\.js"/.test(PAGE), "LX.M9 comes with the bundle (components/gp.js, W4 integration); the page loads no other lesson's script");
 const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), entry = PY.split(/\n- kind: /).find(x => new RegExp("\\n  id: " + ID + "\\n").test(x)) || "";
 ok(/\n  form: case\n/.test(entry) && /\n  tier: analyst\n/.test(entry) && /\n  minutes: 10\n/.test(entry) && /after: \[5\]/.test(entry) && /\n  status: upcoming\n/.test(entry) === /_drafts/.test(QPATH), "path.yml: a case, Analyst tier (coordinator), 10 minutes, after lesson 5; upcoming while a draft");
 const fm = k => ((PAGE.match(new RegExp("^" + k + ': "(.*)"$', "m")) || [])[1]), py = k => ((entry.match(new RegExp("\\n  " + k + ': "(.*)"')) || [])[1]);

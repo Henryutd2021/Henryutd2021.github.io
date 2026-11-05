@@ -169,7 +169,7 @@ const sliders = [];
   const E = env();
   E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.isDark = () => false;
   const plotSpecs = [];
-  ["cards", "predict", "table", "boundary"].forEach(n => load(n, E));
+  ["cards", "predict", "table", "boundary", "gp"].forEach(n => load(n, E));
   E.LX.Plot = (host, o) => { const box = E.LX.H("div", { class: "stub-plot" }, host); return { box, render: spec => { plotSpecs.push(spec); box.setAttribute("data-bars", String((spec.bars || []).length)); }, text: null }; };
   E.LX.Slider = (host, o) => { let v = o.value; const w = E.LX.H("div", { class: "stub-slider", "data-label": o.label }, host);
     const sl = { el: w, label: o.label, val: () => v, set: (x, fire) => { v = x; if (fire && o.onChange) o.onChange(v); }, _set(x) { v = x; if (o.onChange) o.onChange(v); } }; sliders.push(sl); return sl; };
@@ -180,7 +180,7 @@ const sliders = [];
                  setTimeout: f => { f(); return 0; }, clearTimeout: () => {}, Event: function (t) { this.type = t; } };
   const xp = E.LX.H("div", { id: "m9-explain" }, E.body);
   vm.runInNewContext(JS, mctx);
-  ok(E.LX.M9 && typeof E.LX.M9.fit === "function", "the script exposes its model as LX.M9 (for CF8)");
+  ok(E.LX.M9 && typeof E.LX.M9.fit === "function", "LX.M9 (components/gp.js, shared with CF8 since the W4 integration) is on the page");
   const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "m09" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
   let threw = null;
   try { init(live, { m09_surrogates_uq: D }, root); } catch (err) { threw = err.stack; }

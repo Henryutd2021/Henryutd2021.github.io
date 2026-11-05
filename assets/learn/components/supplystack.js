@@ -12,10 +12,12 @@
                                  false: right under the chart
    ch.draw(blocks [{ key, mw, offer }] (cheapest first), demand MW, { xMax: 450, hideDemand: false }) -> the clearing result
      (hideDemand: just the blocks, full colour, no price; for building a stack). Money reads "$40.00" and "−$5.00".
+     Tick steps (W4): { xStep: 1000, yStep: 50 } in draw's options, or xStep / yStep in the constructor's options for every
+     draw: MW labels every xStep, $/MWh gridlines every yStep from the axis start (defaults: 100 or 150 MW; $20 or $40).
    ch.el (the chart box). It redraws itself on resize and on the day/night switch.
    Text version (details.lx-textalt): one line per block ("Wind farm: offers 150 MW at $0.00/MWh; runs 120 MW.") and the
    demand, price and spilled MW. The SVG has a spoken summary (role img); nothing to operate by keyboard.
-   Node: module.exports = { clear, scaleOf } (pure: the clearing and the axes). */
+   Node: module.exports = { clear, scaleOf } (pure: the clearing and the axes; scaleOf(blocks, xMax, { xStep, yStep })). */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
@@ -33,12 +35,15 @@
     sk.forEach(function (k) { if (out[k]) spilled += out[k].mw - out[k].run; });
     return { price: price, marginal: marginal, cost: cost, plants: out, short: Math.max(0, left), spilled: spilled, total: total };
   }
-  // the axes: $/MWh from yMin (below zero only for a negative offer) to yMax, gridlines every `step`; MW from 0 to xMax
-  function scaleOf(blocks, xMax) {
+  // the axes: $/MWh from yMin (below zero only for a negative offer) to yMax, gridlines every `step`; MW from 0 to xMax,
+  // labelled every `xStep`; steps.xStep and steps.yStep (positive numbers) replace the default steps
+  function scaleOf(blocks, xMax, steps) {
     var offers = blocks.map(function (b) { return b.offer; });
     var yMax = Math.max(120, Math.ceil((Math.max.apply(null, offers) + 15) / 40) * 40), lowest = Math.min.apply(null, offers);
     var yMin = lowest < 0 ? Math.floor((lowest - 10) / 20) * 20 : 0;
-    return { xMax: xMax || 450, yMax: yMax, yMin: yMin, step: yMax - yMin > 200 ? 40 : 20, xStep: (xMax || 450) > 500 ? 150 : 100 };
+    var st = steps || {};
+    return { xMax: xMax || 450, yMax: yMax, yMin: yMin, step: st.yStep > 0 ? st.yStep : yMax - yMin > 200 ? 40 : 20,
+      xStep: st.xStep > 0 ? st.xStep : (xMax || 450) > 500 ? 150 : 100 };
   }
   if (typeof module !== "undefined" && module.exports) module.exports = { clear: clear, scaleOf: scaleOf };
   if (typeof window === "undefined" || !window.LX) return;
@@ -61,7 +66,7 @@
     function draw(blocks, demand, opt) {
       last = [blocks, demand, opt]; opt = opt || {};
       var res = clr(blocks, demand), W = Math.max(280, w.clientWidth || 640), Hh = W < 480 ? 230 : 250, m = { l: 46, r: 12, t: 26, b: 34 };
-      var sc = scaleOf(blocks, opt.xMax), xMax = sc.xMax, yMax = sc.yMax, yMin = sc.yMin;
+      var sc = scaleOf(blocks, opt.xMax, { xStep: opt.xStep || o.xStep, yStep: opt.yStep || o.yStep }), xMax = sc.xMax, yMax = sc.yMax, yMin = sc.yMin;
       var iw = W - m.l - m.r, ih = Hh - m.t - m.b, x = function (v) { return m.l + v / xMax * iw; }, y = function (v) { return m.t + (yMax - v) / (yMax - yMin) * ih; };
       if (svg) svg.remove();
       var show = opt.hideDemand ? null : res;

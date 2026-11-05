@@ -264,7 +264,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
     const { env, load } = require("./stubdom.js");
     const E2 = env();
     E2.LX.ready = () => {}; E2.LX.progress.guess = () => null; E2.LX.visible = E2.LX.visible || (() => false); E2.LX.onTheme = E2.LX.onTheme || (() => {}); E2.LX.reduced = E2.LX.reduced || (() => true);
-    ["solver", "cards", "predict", "controls", "plot", "solvestep", "numanswer"].forEach(n => load(n, E2));
+    ["solver", "cards", "predict", "controls", "plot", "solvestep", "numanswer", "scenario"].forEach(n => load(n, E2));
     const specs = [], P0 = E2.LX.Plot;
     E2.LX.Plot = (h, o) => { const p = P0(h, o), r0 = p.render; p.render = (sp, a) => { specs.push(sp); return r0(sp, a); }; return p; };
     let failing = true, calls = 0;

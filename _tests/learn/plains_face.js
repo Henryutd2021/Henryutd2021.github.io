@@ -1,5 +1,5 @@
 // plains_face.js — shared by test_a12-policy-instruments.js and test_m06-carbon-in-models.js (not a test itself).
-// Loads the Plains Grid's planning LP (assets/learn/m06-carbon-in-models.js) with the vendored HiGHS, and proves that a
+// Loads the Plains Grid's planning LP (assets/learn/components/plainsplan.js, M6's and A12's) with the vendored HiGHS, and proves that a
 // reported number is the same for every best plan: it minimizes and maximizes that number over the LP's optimal face (the
 // LP as the pages solve it, with no tie-breaking costs, its cost held within `tol` dollars of the optimum).
 //   const F = await require("./plains_face.js")();   // { PP, Y, solve, run(o), face(o, quantities, tol), A, M, year, T }
@@ -18,7 +18,7 @@ module.exports = async function () {
   vm.runInNewContext(fs.readFileSync(L("components/profiles.js"), "utf8"), pctx);
   const PR = pctx.module.exports;
   const J = p => JSON.parse(fs.readFileSync(L("data/" + p), "utf8"));
-  const PP = require(L("m06-carbon-in-models.js"));
+  const PP = require(L("components/plainsplan.js"));
   const A = J("a10-emissions-questions.json"), M = J("m06-carbon-in-models.json"), year = J("town_year.json"), T = J("cf_targets.json");
   const highs = await require(L(`vendor/highs-${VERSION}/highs.js`))();
   const solve = m => core.solveWith(highs, m, { timeLimit: 120 });

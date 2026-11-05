@@ -464,6 +464,7 @@ var res = ch.draw(blocks /* [{key, mw, offer}], cheapest first */, demandMW, { x
 - The legend and text version follow the step's controls (`later: false` puts them right under the chart); `noLegend: true` hides the legend.
 - The price label sits just above the price line; when a block's label is at the same height there (a $0 block next to the axis, on phones), it moves up a line.
 - Replaces lesson 8's `StackChart` (steps 1 to 7). Candidates: A3, M1.
+- Tick steps (W4 integration): `xStep` (MW between labels) and `yStep` ($/MWh between gridlines, from the axis start) in `draw`'s options or the constructor's, for a market larger than lesson 8's (A3's 10,000 MW Plains stack would want `xStep: 2500`); by default 100 or 150 MW and $20 or $40. A3 drew its stacks on `LX.Plot` before the option existed and keeps them. Pure: `scaleOf(blocks, xMax, { xStep, yStep })`.
 
 **Cost and CO₂ frontier** (`frontier.js`): the cheapest plan at each CO₂ level as a line over an "out of reach (approximately)" shade (straight lines join the solved points), labelled plan dots, and an equal-score line for a carbon price.
 
@@ -475,6 +476,7 @@ fc.price(44, { co2, cost });   fc.pick(function (id) {});   fc.focusDot("A");
 ```
 
 - `pick` makes the plan dots buttons (Tab, Enter, Space). Axis texts, scales and labels have options (`xMax`, `yMin`, `xLabel`, `fmtX`, ...).
+- Tick steps (W4 integration): `xStep` (kt between CO₂ gridlines, default 200) and `yStep` ($M between cost gridlines; default 20, 25 or 50 by the axis span), for a grid whose CO₂ runs to thousands of kt (M6's 1 to 5 Mt would want `xMax: 5000, xStep: 1000`) or only a few. M6 drew its frontier on `LX.Plot` before the option existed and keeps it. Pure: `stepOf(yMin, yMax, { xStep, yStep })` → `{ x, y }`.
 - Layout: the shade's label is kept inside the plot (phones); a plan's letter goes up and right of its dot, or to the first free corner (up-left, down-right, down-left) when it would touch another letter or dot.
 - Replaces lesson 13's `FrontierChart`, which lesson 12 read as `LX.townPlan.ui.FrontierChart` (gone from `ui`). With the planning engine (`planengine.js`, W2), it is the i-pareto pair: `LX.townPlan` solves, `LX.Frontier` draws.
 
@@ -1038,6 +1040,29 @@ sk.set({ nodes: [{ id: "gas", label: "Gas", col: 0 }, { id: "heat", label: "Spac
 - M5's `TreeView` and M2's: M2 draws its own engine's nodes (switches fixed, inherited bounds, a grid layout, marks for best and pruned); M5 draws `E1.bb`'s nodes (whole sets ≥ or ≤, a halving layout, a reading panel). A shared tree would take both node schemas and layouts.
 - A8's week LP stays off engine E0 (see Engine E0 above).
 - F4's `PlantExplorer` (six plant cutaways), F5's `PlantDiagram` (fuel to steam) and `HeatLadder` (outlet temperature against uses), F6's `GridNet` (the east side's one-line diagram with hazards) and `VoltPath` (the voltage staircase): each is drawn by one page only.
+
+### Promoted at the W4 integration (2026-11-05)
+
+Promoted only where a second page already loaded another lesson's script for the code (the W3 rule). Each file is the lesson's code, unchanged (only the `require` path of `LX.mulberry32` and the export lines are new); the lesson keeps its own text, drill and view, and in Node its script still exports the shared functions together with its own, so its tests and the solver bench read it as before. The dependent page no longer loads the other lesson's script. The four sit in the bundle after engine E2 (`W4_PROMOTED` in `scripts/build_learn.py`), which adds about 64 kB to `learn.js`. Tests: each lesson's own test (every number unchanged) and `_tests/learn/test_components_w4_int.js`.
+
+**Adequacy simulator** (`adequacy.js`; from A5, which A9 loaded for it): `LX.A5`, loss of load by Monte Carlo on the Plains Grid, seeded with `LX.mulberry32`: two weather years resampled in 7-day blocks, every unit's forced outages as geometric spells, the resources added hour by hour (a battery, demand response, extra peakers), LOLE, LOLH and EUE with the Monte Carlo error, equivalent firm capacity by bisection, accreditation, the reserve margin, and A9's hazards as multipliers (`simulate(D, SRC, seed, { mod, tally })`). Pure; the page passes in `town_year.json`, `m03-capacity-expansion-2024.json`, `cf_targets.json` and `a05-adequacy.json`. A5 keeps its drill and its two feedback texts. C2 can use it for "check adequacy with the probabilistic tool".
+
+**Gaussian processes** (`gp.js`; from M9, which CF8 loaded for it): `LX.M9`, a Gaussian process on small data with a squared-exponential kernel and a mean fitted by generalized least squares (one source, or two with a cheap level: the maker's curve, Kennedy and O'Hagan's form), the posterior covariance on a grid, maximum likelihood on a fixed grid with its tie rule, the normal distribution and its inverse, held-out scores (coverage by range, RMSE, the 90% band's width, pinball loss over 19 quantiles), and the toy turbine they are taught on (`maker`, `field`, the stored records). M9 keeps its facts, reference block and no-JS fallback; CF8 turns `fitStored` and `covariance` into a capacity-factor band.
+
+**Plains planning LP** (`plainsplan.js`; from M6, which A12 loaded for it): `LX.plainsPlan`, the Plains Grid's planning linear program on four representative days (new wind, solar and a 4-hour battery against the existing gas fleet) with its options: a carbon price, production and investment credits, a clean-energy standard, a CO₂ cap, a load with annual or hourly matching. `prepare`, `build`, `faceModel` (the optimal face, for ties), `read` (resource cost apart from transfers), `medoids`, `fm`. The pages solve with `LX.solver`; `_tests/learn/plains_face.js` proves each reported number the same on every best plan.
+
+**Scenario decisions** (`scenario.js`; from M8, which CF3 loaded for it): `LX.m08`, M8's toy two-stage decision (one electrolyzer sized before the wind build-out is known): the branches with their chances, each branch's cost in closed form, the extensive-form LP and its readout, wait-and-see, expected-value, worst-case and least-regret variants, the presets and the formats. M8 keeps step 2's verdict and its no-JS block; CF3 prices a reader's size with `cost` and `expected`.
+
+**Kept lesson-local, and why** (promote when a second page needs the same thing):
+
+- A6's `QueueWalk` (two interconnection paths as a stepper), `ClusterBoard` (a cluster study round by round) and `N1View` (a substation with one line out): only A6 draws them.
+- A17's `LimitGauge` (i-gauge) and `LimitMap` (e-annotated one-line diagram): only A17 draws them; their styles are in A17's style block.
+- M8's scenario tree (`Tree`, i-tree): only M8 draws it; CF3 uses the closed form, not the tree.
+- M9's fit chart (i-fitter, on `LX.Plot`): only M9 draws it; CF8 draws its own capacity-factor band on `LX.Plot`.
+- M10's forecast scoring: it scores empirical quantiles of a model's misses (type 7, as K5), while `LX.M9` scores normal bands; the shared part, pinball loss, is one line each.
+- The writing checks under a text box (R1, R6, R8): each page checks its own parts of a sentence with its own rules; a shared `LX.WriteChecks` would carry only the chip row and the "compare with examples" toggle. No page loads another's script for them.
+- A10's Plains fleet is data (`a10-emissions-questions.json`, block `plains`), read by A12 and M6 through `LX.plainsPlan`; nothing to promote.
+- `_tests/learn/excerpt_check.js` (M9, M10, CF8) and `_tests/learn/plains_face.js` (A12, M6) are shared test helpers, not components.
 
 **Scope and QA** (ResearchPortfolio folder).
 

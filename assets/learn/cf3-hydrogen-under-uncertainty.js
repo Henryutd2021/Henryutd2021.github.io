@@ -9,15 +9,15 @@
 //
 // The idea (illustrative, M8's toy; not the study's inputs or results): one electrolyzer in a windy zone is sized before
 // anyone knows whether none, half or all of the planned wind gets built (chances 25%, 50%, 25%). The reader picks a size;
-// the page prices it in each build-out with M8's closed form (LX.m08, from m08-stochastic-robust.js, which the page loads
-// first) and compares it with the three plans M8 solves: the plan for the average build-out, the hedged plan (the
+// the page prices it in each build-out with M8's closed form (LX.m08: components/scenario.js in the learn.js bundle,
+// promoted from M8 at the W4 integration) and compares it with the three plans M8 solves: the plan for the average build-out, the hedged plan (the
 // two-stage stochastic program) and the worst-case plan. Every number is checked by
 // _tests/learn/test_cf3-hydrogen-under-uncertainty.js, for every size the slider allows.
 (function () {
   "use strict";
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
-  // M: M8's model (require("m08-stochastic-robust.js") in Node, LX.m08 in a page); D8: M8's data with its reference
+  // M: M8's model (require("components/scenario.js") in Node, LX.m08 in a page); D8: M8's data with its reference
   function price(M, D8, x) {
     var S = M.scen(D8), per = S.map(function (s) { return M.cost(D8, s.W, x); });
     return { x: x, per: per, exp: M.expected(D8, S, x), worst: Math.max.apply(null, per), over: M.expected(D8, S, x) - D8.reference.sp.exp };

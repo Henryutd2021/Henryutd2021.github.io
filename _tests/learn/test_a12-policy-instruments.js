@@ -161,7 +161,7 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
     ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
   const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
   ["investment-credit", "clean-energy-standard", "resource-cost", "transfer-payment"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("[[" + id + "|"), "sidecar defines and the page marks " + id));
-  ok(PAGE.indexOf("m06-carbon-in-models.js") > 0 && PAGE.indexOf("m06-carbon-in-models.js") < PAGE.indexOf("a12-policy-instruments.js\" defer"), "the page loads the shared planning LP before its own script");
+  ok(PAGE.indexOf("m06-carbon-in-models.js\" defer") < 0 && PAGE.indexOf("learn.js\" defer") > 0 && PAGE.indexOf("learn.js\" defer") < PAGE.indexOf("a12-policy-instruments.js\" defer"), "the shared planning LP comes with the bundle (components/plainsplan.js, W4 integration); the page loads no other lesson's script");
   { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), r = PY.slice(PY.indexOf("id: " + ID), PY.indexOf("id: " + ID) + 1600);
     ok(/status: active/.test(r.split("- kind:")[0]) && r.includes("after: [A1, 12]") && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active, after A1 and lesson 12, subtitle equal to the page's"); }
 
@@ -170,7 +170,7 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
     const { env, load } = require("./stubdom.js");
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
-    ["solver", "cards", "controls", "plot", "profiles", "solvestep", "costsplit", "ledger", "table", "causal", "boundary"].forEach(n => load(n, E));
+    ["solver", "cards", "controls", "plot", "profiles", "solvestep", "costsplit", "ledger", "table", "causal", "boundary", "plainsplan"].forEach(n => load(n, E));
     let failing = true;
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
     slv.solve = m => { if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = F.solve(m); return Promise.resolve(r); };
@@ -178,7 +178,6 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
     E.LX.mount = (slug, fn) => { if (slug === ID) init = fn; };
     E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
     const ctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, performance: E.window.performance, setTimeout: () => 0, clearTimeout: () => {} };
-    vm.runInNewContext(fs.readFileSync(L("m06-carbon-in-models.js"), "utf8"), ctx);
     vm.runInNewContext(JS, Object.assign({}, ctx, { module: { exports: {} } }));
     const xp = E.LX.H("div", { id: "a12-explain" }, E.body);
     const root = E.LX.H("div", { class: "lx-interactive", "data-learn": ID }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);

@@ -261,7 +261,7 @@ function brute(full, add, Sy) {
   const { env, load } = require("./stubdom.js");
   const E = env();
   E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null; E.LX.progress.done = () => {};
-  ["numanswer", "drill", "cards", "controls", "plot", "predict", "profiles"].forEach(n => load(n, E));
+  ["numanswer", "drill", "cards", "controls", "plot", "predict", "profiles", "adequacy"].forEach(n => load(n, E));
   let init = null, demo = null;
   E.LX.mount = (slug, f) => { if (slug === "a05-adequacy") init = f; };
   E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };

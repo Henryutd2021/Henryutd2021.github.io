@@ -9,7 +9,9 @@
      frontierLabel: "Frontier: the cheapest plan at each CO₂",     the legend's default name of the line
      priceLabel: function (p) { return "Equal score at $" + Math.round(p) + "/t"; },
      fmtX: function (t) { return "530 kt"; }, fmtY: function (usd) { return "$131.4M"; },   text version and spoken labels
-     altTitle: "Text version of the chart" });
+     altTitle: "Text version of the chart",
+     xStep: 200, yStep: 25 });                      tick steps (W4): CO₂ gridlines every xStep kt (default 200); cost
+                                                    gridlines every yStep $M (default 20, 25 or 50 by the axis span)
    Points carry co2 in tonnes and cost in dollars a year (the axes show kt and $M).
    fc.frontier([{ co2, cost, cap (kt, or null for no cap), solved }], label)   the line; solved points get a dot
    fc.plans([{ id: "A", label: "Gas-heavy", co2, cost, color, kind: "plan" | "you" | <other>, mark: "dominated" | "never",
@@ -21,7 +23,7 @@
    fc.pick(fn(id))   plan dots become buttons (Tab, Enter, Space, click), each with a spoken label | fc.focusDot(id) | fc.el
    It redraws at its own width (text stays 12 px), on resize and on the day/night switch.
    Text version (details.lx-textalt): a table of every point and every frontier point (CO₂, cost, note).
-   Node: module.exports = { yTop, scoreLine, sortFrontier } (pure). */
+   Node: module.exports = { yTop, scoreLine, sortFrontier, stepOf } (pure). */
 (function () {
   "use strict";
   // ---------------------------------------------------------------- pure (no DOM; exported for Node)
@@ -35,7 +37,12 @@
     return { x0: 0, y0: through.cost + price * through.co2, x1: xMaxT, y1: through.cost + price * (through.co2 - xMaxT) };
   }
   function sortFrontier(points) { return points.slice().sort(function (a, b) { return a.co2 - b.co2; }); }
-  if (typeof module !== "undefined" && module.exports) module.exports = { yTop: yTop, scoreLine: scoreLine, sortFrontier: sortFrontier };
+  // the gridline steps: the cost axis ($M) by its span unless yStep is given, the CO₂ axis (kt) every xStep or 200
+  function stepOf(yMin, yMax, o) {
+    o = o || {}; var span = yMax - yMin;
+    return { x: o.xStep > 0 ? o.xStep : 200, y: o.yStep > 0 ? o.yStep : span > 250 ? 50 : span > 120 ? 25 : 20 };
+  }
+  if (typeof module !== "undefined" && module.exports) module.exports = { yTop: yTop, scoreLine: scoreLine, sortFrontier: sortFrontier, stepOf: stepOf };
   if (typeof window === "undefined" || !window.LX) return;
 
   // ---------------------------------------------------------------- view
@@ -56,12 +63,12 @@
     function Y(c) { return mt + (1 - (Math.min(st.yMax, c / 1e6) - st.yMin) / (st.yMax - st.yMin)) * (HH - mt - mb); }
     function axes() {
       gA.innerHTML = "";
-      var span = st.yMax - st.yMin, stp = span > 250 ? 50 : span > 120 ? 25 : 20;
-      for (var y = Math.ceil(st.yMin / stp) * stp; y <= st.yMax; y += stp) {
+      var steps = stepOf(st.yMin, st.yMax, o), stp = steps.y;
+      for (var y = Math.ceil(st.yMin / stp) * stp; y <= st.yMax + 1e-9; y = Math.round((y + stp) * 1e6) / 1e6) {
         S("line", { x1: ml, x2: W - mr, y1: Y(y * 1e6), y2: Y(y * 1e6), stroke: "var(--lx-line)" }, gA);
         S("text", { x: ml - 6, y: Y(y * 1e6) + 4, "text-anchor": "end" }, gA).textContent = "$" + y + "M";
       }
-      for (var x = 0; x <= st.xMax; x += 200) {
+      for (var x = 0; x <= st.xMax + 1e-9; x = Math.round((x + steps.x) * 1e6) / 1e6) {
         S("line", { x1: X(x * 1e3), x2: X(x * 1e3), y1: mt, y2: HH - mb, stroke: "var(--lx-line)", "stroke-dasharray": "2 4" }, gA);
         S("text", { x: X(x * 1e3), y: HH - mb + 17, "text-anchor": "middle" }, gA).textContent = x;
       }

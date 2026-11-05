@@ -190,6 +190,5 @@ body-classes: "page-learn page-lesson lx-form-case"
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/m08-stochastic-robust.js" defer></script>
 <script src="../assets/learn/cf3-hydrogen-under-uncertainty.js" defer></script>
 ```

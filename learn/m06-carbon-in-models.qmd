@@ -10,7 +10,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- M6 in the model-lab form (step cards with solver runs), Learn W4, builder learn-w4-c, 2026-11-05. Model and page:
-     assets/learn/m06-carbon-in-models.js (also A12's planning LP) with assets/learn/data/m06-carbon-in-models.json,
+     assets/learn/components/plainsplan.js (the planning LP, shared with A12) and assets/learn/m06-carbon-in-models.js
+     with assets/learn/data/m06-carbon-in-models.json,
      a10-emissions-questions.json, town_year.json and cf_targets.json. Lab: learn/notebooks/m06-carbon-in-models.ipynb
      (written by scripts/build_learn_m06_notebook.py in the ResearchPortfolio folder; SciPy linprog with HiGHS; asserts the
      reference block). Tests: node _tests/learn/test_m06-carbon-in-models.js re-solves every number below and proves each

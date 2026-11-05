@@ -218,6 +218,5 @@ body-classes: "page-learn page-lesson lx-form-case"
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/m09-surrogates-uq.js" defer></script>
 <script src="../assets/learn/cf8-power-curves-from-scarce-data.js" defer></script>
 ```

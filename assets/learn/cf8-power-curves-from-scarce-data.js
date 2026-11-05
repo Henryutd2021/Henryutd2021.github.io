@@ -7,8 +7,8 @@
 //
 // The idea (illustrative; lesson M9's invented turbine and records, assets/learn/data/m09-surrogates-uq.json, not the
 // study's data): a band on a power curve becomes a band on the turbine's capacity factor. Lesson M9's Gaussian-process
-// fits (LX.M9, from m09-surrogates-uq.js, which the page loads first: one source, the records alone; two sources, the
-// maker's curve plus a GP for the gap; settings stored by M9) are averaged over a Weibull wind distribution
+// fits (LX.M9: components/gp.js in the learn.js bundle, promoted from M9 at the W4 integration; one source, the records
+// alone; two sources, the maker's curve plus a GP for the gap; settings stored by M9) are averaged over a Weibull wind distribution
 // (k 2, c 8 m/s) on 3-20 m/s in 0.1 m/s steps (trapezoid weights w_j = pdf(v_j) x 0.1, halved at the ends):
 //   capacity factor   CF = sum_j w_j m(v_j) / 2,000 kW                (below 3 m/s the turbine makes nothing; hours above
 //                                                                      20 m/s, 0.2% of the year, count as nothing too)
@@ -18,7 +18,7 @@
 // Every number on the page is checked by _tests/learn/test_cf8-power-curves-from-scarce-data.js.
 (function () {
   "use strict";
-  var M9 = (typeof window !== "undefined" && window.LX && window.LX.M9) || require("./m09-surrogates-uq.js");
+  var M9 = (typeof window !== "undefined" && window.LX && window.LX.M9) || require("./components/gp.js");
 
   // ---------------------------------------------------------------- pure model (no DOM; exported for Node)
   function grid(I) { var xs = [], n = Math.round((I.grid.to - I.grid.from) / I.grid.step); for (var j = 0; j <= n; j++) xs.push(Math.round((I.grid.from + j * I.grid.step) * 1000) / 1000); return xs; }

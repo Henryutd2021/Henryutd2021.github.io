@@ -5,8 +5,8 @@
 // a05-adequacy.json: the Plains Grid, its units, the 500 resampled years) and assets/learn/data/a09-hazards.json (four
 // hazards, three pairs, five defences with illustrative yearly costs, a budget, real events and preparation steps with
 // their primary sources, and a reference block written by the test).
-// The simulator is lesson A5's (assets/learn/a05-adequacy.js, loaded before this script; LX.A5 on the page, require in
-// Node): the same weather years, outages and seed, with the hazards as multipliers over the calendar hours of every
+// The simulator is lesson A5's, shared since the W4 integration (assets/learn/components/adequacy.js, in the learn.js
+// bundle; LX.A5 on the page, require in Node): the same weather years, outages and seed, with the hazards as multipliers over the calendar hours of every
 // simulated year (A5's o.mod), so a result reads "in a year when the hazard strikes".
 //   mods(H, ids, defs)  multiplier arrays for the hazards ids, eased by the defences defs: in each window of a hazard, every
 //       unit type's availability, wind and demand are multiplied as the data say; a defence that eases hazard h keeps a
@@ -19,7 +19,7 @@
 (function () {
   "use strict";
   var T = 8760, MD = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  var A5 = (typeof window !== "undefined" && window.LX && window.LX.A5) || (typeof require !== "undefined" ? require("./a05-adequacy.js") : null);
+  var A5 = (typeof window !== "undefined" && window.LX && window.LX.A5) || (typeof require !== "undefined" ? require("./components/adequacy.js") : null);
 
   // ---------------------------------------------------------------- pure model
   function dayOf(md) { var m = +md.slice(0, 2), d = +md.slice(3, 5), s = 0; for (var i = 0; i < m - 1; i++) s += MD[i]; return s + d - 1; }

@@ -10,7 +10,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 ---
 
 <!-- A12 in the step-card form with a linear program (Learn W4, builder learn-w4-c, 2026-11-05). The planning LP is
-     shared with M6: assets/learn/m06-carbon-in-models.js (loaded first; window.LX.plainsPlan). Page code:
+     shared with M6: assets/learn/components/plainsplan.js (in learn.js; window.LX.plainsPlan). Page code:
      assets/learn/a12-policy-instruments.js with assets/learn/data/a12-policy-instruments.json, a10-emissions-questions.json,
      m06-carbon-in-models.json, town_year.json and cf_targets.json. Tests: node _tests/learn/test_a12-policy-instruments.js
      re-solves every number below and proves each is the same for every best plan (--write rewrites the reference block).
@@ -234,6 +234,5 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/m06-carbon-in-models.js" defer></script>
 <script src="../assets/learn/a12-policy-instruments.js" defer></script>
 ```

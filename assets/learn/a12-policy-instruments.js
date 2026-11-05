@@ -1,10 +1,11 @@
 // a12-policy-instruments.js — Analyst lesson A12, "How do governments steer energy? Taxes, credits, standards and carbon
 // prices" (step cards with a linear program), wave W4, builder learn-w4-c, 2026-11-05.
 //
-// The model is the Plains Grid's planning LP in assets/learn/m06-carbon-in-models.js (window.LX.plainsPlan; Node:
-// require), which the page loads first. Data: a10-emissions-questions.json (the existing fleet), m06-carbon-in-models.json
-// (what may be built, its costs in 2025 dollars, the representative days, the tie rule), a12-policy-instruments.json (the
-// four instruments, a real rule of each kind, the reference block), town_year.json and cf_targets.json.
+// The model is the Plains Grid's planning LP in assets/learn/components/plainsplan.js (window.LX.plainsPlan, in the
+// learn.js bundle since the W4 integration; Node: require). Data: a10-emissions-questions.json (the existing fleet),
+// m06-carbon-in-models.json (what may be built, its costs in 2025 dollars, the representative days, the tie rule),
+// a12-policy-instruments.json (the four instruments, a real rule of each kind, the reference block), town_year.json and
+// cf_targets.json.
 // One instrument at a time, each against the plan with no policy:
 //   carbon price  tau $ per t on every tonne of gas CO2          emitters pay tau x CO2 to the government
 //   production    ptc $ per MWh of new wind and solar used         the government pays ptc x those MWh

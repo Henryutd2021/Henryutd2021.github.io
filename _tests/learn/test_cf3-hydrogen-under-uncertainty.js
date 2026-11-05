@@ -20,7 +20,7 @@ const ID = "cf3-hydrogen-under-uncertainty";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
 const M = require(L(ID + ".js"));
-const M8 = require(L("m08-stochastic-robust.js"));
+const M8 = require(L("components/scenario.js"));
 const TL = require(L("components/timeline.js"));
 const EX = require(path.join(SITE, "assets/explainers/txh2.js"));
 const D = JSON.parse(fs.readFileSync(L("data/" + ID + ".json"), "utf8"));
@@ -102,7 +102,7 @@ ok(!/\bSMR\b|nuclear|reactor|small modular|131 tons|1,300 tons|92\.4%|310 kiloto
 const PATHJ = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8")), live = new Set(), walk = o => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === "object") { if (o.href && o.ready === true) live.add(o.href); Object.values(o).forEach(walk); } };
 walk(PATHJ);
 hrefs.filter(h => /^[0-9a-z-]+\.html$/.test(h) && h !== "index.html").forEach(h => ok(live.has(h), "linked lesson is live: " + h));
-ok(/<script src="\.\.\/assets\/learn\/m08-stochastic-robust\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/cf3-hydrogen-under-uncertainty\.js" defer>/.test(PAGE) && /LX\.m08/.test(JS), "M8's script loads before CF3's, which reads LX.m08");
+ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/cf3-hydrogen-under-uncertainty\.js" defer>/.test(PAGE) && !/<script src="[^"]*m08-stochastic-robust\.js"/.test(PAGE) && /LX\.m08/.test(JS), "LX.m08 comes with the bundle (components/scenario.js, W4 integration); CF3 reads it and loads no other lesson's script");
 
 // ---------------- research wording (curriculum §13, guard G-SRC)
 // As CF2's test: every sentence that describes the study is (a) an approved sentence of the register (sections E10, E11)

@@ -10,7 +10,7 @@
 const fs = require("fs");
 const path = require("path");
 const SITE = path.resolve(__dirname, "..", "..");
-const A5 = require(path.join(SITE, "assets/learn/a05-adequacy.js"));
+const A5 = require(path.join(SITE, "assets/learn/components/adequacy.js"));
 const M = require(path.join(SITE, "assets/learn/a09-hazards.js"));
 const PR = require(path.join(SITE, "assets/learn/components/profiles.js"));
 const HPATH = path.join(SITE, "assets/learn/data/a09-hazards.json"), QPATH = path.join(SITE, "learn/a09-hazards.qmd");
@@ -175,7 +175,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const sub = (QMD.match(/^subtitle: "([^"]+)"/m) || [])[1], desc = (QMD.match(/^description: "([^"]+)"/m) || [])[1] || "";
   ok(PATHY.indexOf('subtitle: "' + sub + '"') >= 0, "path.yml: subtitle equals the page's");
   ok(desc.split(/\s+/).length <= 35, `budget: the description is ${desc.split(/\s+/).length} words (≤ 35)`);
-  ok(/<script src="\.\.\/assets\/learn\/a05-adequacy\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a09-hazards\.js" defer><\/script>/.test(QMD), "page: loads A5's simulator before its own script");
+  ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a09-hazards\.js" defer><\/script>/.test(QMD) && !/<script src="[^"]*a05-adequacy\.js"/.test(QMD), "page: A5's simulator comes with the bundle (components/adequacy.js, W4 integration); the page loads no other lesson's script");
   const body = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "");
   ok(!/nuclear|reactor|\bSMR\b|data cent|learning/i.test(body + JS.replace(/\/\/.*$/gm, "") + JSON.stringify(H)), "scope: no nuclear, data-center or learning wording");
   ok(!/href="[^"]*(projects\/|research\.)/i.test(QMD) && /href="a05-adequacy\.html"/.test(QMD) && /href="f06-grid-and-outages\.html"/.test(QMD), "links: A5 and F6; no project or Research links");
@@ -188,14 +188,13 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const { env, load } = require("./stubdom.js");
   const E = env();
   E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null; E.LX.progress.done = () => {};
-  ["numanswer", "drill", "cards", "controls", "plot", "predict", "profiles", "cardsort", "timeline"].forEach(n => load(n, E));
+  ["numanswer", "drill", "cards", "controls", "plot", "predict", "profiles", "cardsort", "timeline", "adequacy"].forEach(n => load(n, E));
   let init = null, demo = null;
   E.LX.mount = (slug, f) => { if (slug === "a09-hazards") init = f; };
   E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
   const ctx = { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: undefined, require: undefined, performance: E.window.performance, setTimeout: f => { f(); return 0; }, clearTimeout: () => {} };
   let threw = null;
   try {
-    vm.runInNewContext(fs.readFileSync(path.join(SITE, "assets/learn/a05-adequacy.js"), "utf8"), ctx);
     vm.runInNewContext(JS, ctx);
     const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "a09-hazards" }, E.body), live = E.LX.H("div", null, root);
     init(live, { town_year: Y25, m03_capacity_expansion_2024: Y24, cf_targets: CF, a05_adequacy: D5, a09_hazards: H }, root);
