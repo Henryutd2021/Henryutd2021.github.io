@@ -107,6 +107,12 @@
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
  },
+ "forecast-baseline": {
+  "term": "Baseline forecast",
+  "short": "A simple rule, such as same hour yesterday, that any forecasting model must beat on the same hours to be worth using.",
+  "lesson": "M10",
+  "href": "m10-ml-forecasting.html"
+ },
  "basis-risk": {
   "term": "Basis risk",
   "short": "The risk that the price where a plant sells differs from the price at which its contract settles, such as its node against a trading hub.",
@@ -449,6 +455,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "coverage": {
+  "term": "Coverage",
+  "short": "The share of actual outcomes that land inside a forecast's band; on its own it rewards wide bands.",
+  "lesson": "M10",
+  "href": "m10-ml-forecasting.html"
+ },
  "co2e": {
   "term": "CO₂e (carbon dioxide equivalent)",
   "short": "Greenhouse gases such as methane counted as the mass of CO₂ that would warm the climate as much over a set period, so they can be added up.",
@@ -526,6 +538,12 @@
   "short": "The outdoor temperature below which a heat pump's compressor, the pump that moves its heat, switches off, so a backup heater must take over.",
   "lesson": "F3",
   "href": "f03-energy-services.html"
+ },
+ "data-leakage": {
+  "term": "Data leakage",
+  "short": "Letting a model use information it would not have when the forecast is made, such as a later hour's actual value; it makes scores look better than they can be.",
+  "lesson": "M10",
+  "href": "m10-ml-forecasting.html"
  },
  "data-licence": {
   "term": "Data licence",
@@ -851,6 +869,12 @@
   "lesson": 10,
   "href": "10-write-it-down.html"
  },
+ "feature": {
+  "term": "Feature",
+  "short": "One input a model learns from, such as the same hour yesterday or the day of the week.",
+  "lesson": "M10",
+  "href": "m10-ml-forecasting.html"
+ },
  "feedback-loop": {
   "term": "Feedback loop",
   "short": "A chain of causes that leads back to where it started, so a change comes back to push on itself.",
@@ -934,6 +958,12 @@
   "short": "The difference between what was forecast, such as tomorrow's demand or wind, and what actually happened.",
   "lesson": 4,
   "href": "04-forecasts.html"
+ },
+ "forecast-horizon": {
+  "term": "Forecast horizon",
+  "short": "How far ahead of the moment it is made a forecast looks, such as one hour or one day.",
+  "lesson": "M10",
+  "href": "m10-ml-forecasting.html"
  },
  "frozen-telemetry": {
   "term": "Frozen telemetry",
@@ -1234,6 +1264,12 @@
   "short": "An optimization problem in which the goal and all the rules are linear, so each is a sum of quantities times fixed numbers.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "linear-regression": {
+  "term": "Linear regression",
+  "short": "A model that predicts a quantity as a weighted sum of inputs, with the weights chosen to make the squared misses on past data as small as possible.",
+  "lesson": "M10",
+  "href": "m10-ml-forecasting.html"
  },
  "load-factor": {
   "term": "Load factor",

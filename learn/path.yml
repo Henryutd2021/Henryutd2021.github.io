@@ -822,7 +822,7 @@
   tier: modeler
   form: cards
   icon: chart
-  status: upcoming
+  status: active
   minutes: 40
   practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab (learn_map_v2.yml)
   lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
