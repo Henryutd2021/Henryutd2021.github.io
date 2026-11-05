@@ -40,13 +40,6 @@ body-classes: "page-learn page-lesson lx-form-case"
 ```
 <!-- learn:meta:end -->
 
-```{=html}
-<style>
-/* the explainer's three-way control is set on one line with an ellipsis (assets/explainers.css); on phones its labels may wrap instead, so "Curve + data" stays whole */
-@media (max-width: 480px) { .page-learn .explainer[data-explainer="uq-mfgpr"] .ex-seg-opt span { white-space: normal; overflow: visible; text-overflow: clip; padding: .32rem .3rem; line-height: 1.25; } }
-</style>
-```
-
 ::: {#case .lx-sec}
 ```{=html}
 <div class="lx-case">
