@@ -156,8 +156,28 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     ok(swf.name === "december_generator2025.xlsx" && swf.url === "https://www.eia.gov/electricity/data/eia860m/archive/xls/" + swf.name && /^[0-9a-f]{64}$/.test(swf.sha256) &&
        swf.bytes === 13463993 && swf.accessed === "2026-11-05" && /extract_eia860m_spp_wind\.py/.test(swf.derivedBy), "data note: the file, its URL, size, SHA-256, access date and the script that re-derives the numbers");
     ok(sws && /EIA-860M/.test(sws.text) && /^https:\/\/www\.eia\.gov\//.test(sws.url) && /accessed 5 November 2026/.test(sws.asOf), "source: EIA-860M, dated");
-    ok(/Status \(OP\) Operating/.test(sw.about) && /balancing authority SWPP/.test(sw.about) && /2025 wind output in MWh \(EIA-930\)/.test(sw.about),
-       "the note names the filters and what the like-for-like check still needs");
+    ok(/Status \(OP\) Operating/.test(sw.about) && /balancing authority SWPP/.test(sw.about) && /Table 6\.07\.B/.test(sw.about) && /671 hours of frozen telemetry/.test(sw.about),
+       "the note names the filters, EIA's capacity rule and the cleaning of the output");
+    // the like-for-like benchmark: EIA-930 output over EIA's time-adjusted summer capacity (the same quantity as the 33.8%)
+    ok(sw.outputMWh === 110726210.4 && sw.reportedMWh === 110457436 && sw.frozenHoursReplaced === 671 && sw.timeAdjustedSummerMW === 33384.7 && sw.maxMW === 23960,
+       "SPP wind 2025: 110,726,210 MWh after cleaning (110,457,436 as reported; 671 frozen hours replaced); 33,384.7 MW time-adjusted net summer capacity");
+    ok(near(sw.capacityFactor, Math.round(sw.outputMWh / (sw.timeAdjustedSummerMW * 8760) * 1e5) / 1e5, 1e-12) && near(sw.capacityFactorNameplateAverage, Math.round(sw.outputMWh / (sw.yearAverageNameplateMW * 8760) * 1e5) / 1e5, 1e-12),
+       `capacity factors recomputed: ${(sw.capacityFactor * 100).toFixed(1)}% (EIA's rule), ${(sw.capacityFactorNameplateAverage * 100).toFixed(1)}% (nameplate year average)`);
+    // the course's wind shape is the same cleaned series: its mean over its maximum is the dataset's 52.75%
+    ok(near(sw.outputMWh / 8760 / sw.maxMW * 100, S.cfWind, 0.01), `the output over its own highest hour is the dataset's wind mean (${(sw.outputMWh / 8760 / sw.maxMW * 100).toFixed(2)}% and ${S.cfWind.toFixed(2)}%)`);
+    ok(sw.outputFiles.length === 2 && sw.outputFiles.map(f => f.sha256).join() === year.meta.files.map(f => f.sha256).join() && sw.outputUrl === year.meta.source_url && sw.outputAccessed === "2026-11-05" &&
+       /build_learn_town_data\.py/.test(sw.outputDerivedBy) && sw.src.join() === "eia-860m,eia-930" && J.sources["eia-930"], "data note: the EIA-930 files are the year file's own (same SHA-256), with URL, access date and the cleaning script");
+    const cfL = sw.capacityFactor * 100, n1 = v => (Math.round(v * 10) / 10).toFixed(1);
+    const lfl = "<li><b>Like for like</b>, SPP's 2025 wind output (" + n1(sw.outputMWh / 1e6) + " TWh, EIA-930) over its wind capacity as EIA counts it (" + Math.round(sw.timeAdjustedSummerMW).toLocaleString("en-US") +
+      " MW, EIA-860M) is " + n1(cfL) + "%: " + n1(cfL - 33.8) + " points above the U.S. fleet's 33.8%. The definition explains " + n1(S.cfWind - cfL) + " of the " + n1(S.gap) + " points.</li>";
+    ok(lfl.includes("(110.7 TWh, EIA-930)") && lfl.includes("(33,385 MW, EIA-860M) is 37.9%: 4.1 points") && lfl.includes("explains 14.9 of the 19.0 points") && fs.readFileSync(PAGE, "utf8").includes(lfl),
+       "worked solution: the like-for-like line, on the page: " + lfl.replace(/<[^>]+>/g, ""));
+    const QP = fs.readFileSync(PAGE, "utf8");
+    ok(QP.includes('<tr><td class="n">' + n1(cfL) + "%</td><td>SPP's 2025 wind capacity factor, like for like: " + n1(sw.outputMWh / 1e6) + " TWh of output (EIA-930) over " +
+       Math.round(sw.timeAdjustedSummerMW).toLocaleString("en-US") + " MW of wind capacity as EIA counts it (time-adjusted net summer capacity).</td>") &&
+       QP.includes('<a href="' + J.sources["eia-860m"].url + '">EIA-860M</a> · December 2025 inventory, accessed 5 Nov 2026</td></tr>') &&
+       QP.includes('<a href="' + J.sources["eia-860m"].url + '">Preliminary Monthly Electric Generator Inventory</a> (Form EIA-860M), December 2025'),
+       "numbers to remember and sources: the like-for-like capacity factor and EIA-860M, dated");
     // a linear rescaling keeps the ratio
     const k = 0.338 / (S.cfWind / 100), w = year.wind.map(v => v / 1000 * 150 * k), meanAll = w.reduce((a, b) => a + b, 0) / w.length;
     const meanN = S.topN.reduce((a, i) => a + w[i], 0) / S.topN.length;
@@ -267,6 +287,7 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     });
     ok(!/Worked solution, task/.test(FB) && /nothing here is locked/.test(FB), "no-JS task list: no worked solutions, and it says the solutions below are not locked");
     const BR = L("data/ck-m-unseen-problem-briefs.json"), BJ = fs.existsSync(BR) ? JSON.parse(fs.readFileSync(BR, "utf8")) : null, BT = BJ ? JSON.stringify(BJ) : "";
+    ok(BJ && BJ.empirical && !BJ.empirical.sppWind, "briefs-only download: no like-for-like benchmark (it is part of the worked solution)");
     ok(BJ && BJ.brief && BJ.empirical && BJ.defect && !BJ.variants && !BJ.tasksB && !BJ.ref && !/"(answer|solution|points|why)"/.test(BT) && !/526\.9|106817573|52\.75|18\.95|6,757/.test(BT), "briefs-only download: briefs and model data, no tasks, answers or report");
     ok(QMD.indexOf('href="../assets/learn/data/ck-m-unseen-problem-briefs.json"') > 0 && QMD.indexOf('href="../assets/learn/data/ck-m-unseen-problem.json"') < 0, "page: the JSON download is the briefs-only file");
     ok(/How it is marked, before you start/.test(QMD) && /counts as not right/.test(QMD) && /practice, with no level/.test(QMD), "page: the marking rule, tolerances and early-solution rule come before the tasks");
