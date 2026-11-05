@@ -521,6 +521,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "data-center": {
+  "term": "Data center",
+  "short": "A building full of computers that store and process data; on the grid it is one large customer that draws power around the clock.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
+ },
  "data-licence": {
   "term": "Data licence",
   "short": "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement.",
@@ -1157,6 +1163,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "job-year": {
+  "term": "Job-year",
+  "short": "One person working full time for one year; 100 workers for six months make 50 job-years.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
+ },
  "kilowatt": {
   "term": "Kilowatt (kW)",
   "short": "A unit of power equal to 1,000 watts.",
@@ -1168,6 +1180,12 @@
   "short": "The unit of energy on a household electricity bill: one kilowatt kept up for one hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "large-load": {
+  "term": "Large load",
+  "short": "One customer, such as a data center or a large factory, that draws tens of megawatts or more; utilities and grid operators set their own thresholds.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
  },
  "large-load-tariff": {
   "term": "Large-load tariff",
@@ -1751,6 +1769,12 @@
   "lesson": "A2",
   "href": "a02-contracts-risk.html"
  },
+ "power-usage-effectiveness": {
+  "term": "Power usage effectiveness (PUE)",
+  "short": "A data center's total electricity use divided by the electricity its computing equipment uses; the rest goes to cooling, power conversion and lighting.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
+ },
  "prediction-interval": {
   "term": "Prediction interval",
   "short": "A range that should contain the actual value with a stated probability, drawn as a band around a forecast.",
@@ -2314,6 +2338,12 @@
   "short": "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
+ },
+ "transfer": {
+  "term": "Transfer",
+  "short": "A payment, such as a tax, that moves money from one party to another without using up any resources itself.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
  },
  "transformer": {
   "term": "Transformer",

@@ -1,0 +1,70 @@
+{
+  "about": "Lesson F8 (f08-large-loads), 2026-11-05. A data center appears only as a load: its size, its shape over the day and the year, the wait for its grid connection, and what it brings to a town. Prairie Town and its data-center campus are fictional; the campus's size, draw, building time, wait, jobs, tax and cooling are illustrative. The town's hourly demand follows real Southwest Power Pool shapes (town_days.json, town_year.json; EIA-930, 2025) scaled so its highest hour of 2025 is town.peakMW, as lessons 0 and 2 do. Real-world numbers carry their primary source, URL and date. The real-world box quotes approved excerpt sentences E7.4 and E7.5 (excerpt:code), word for word; no other sentence describes that study.",
+  "built": "2026-11-05",
+  "town": { "peakMW": 450, "note": "Prairie Town's highest hour of 2025 is 450 MW, the scale of lessons 0 and 2." },
+  "days": {
+    "summer": { "key": "summer_peak", "label": "29 July 2025", "short": "29 July", "note": "SPP's highest hour of 2025 fell on this day" },
+    "spring": { "key": "windy_spring", "label": "17 April 2025", "short": "17 April", "note": "a mild spring day" }
+  },
+  "campus": {
+    "contractMW": 300,
+    "drawMW": 240,
+    "note": "Illustrative: a 300 MW contract (the most it may draw from the grid) and a steady 240 MW in every hour of the year, 80% of the contract."
+  },
+  "homes": {
+    "drawMW": { "min": 60, "max": 300, "step": 30 },
+    "ticks": [2000, 20000, 200000, 2000000]
+  },
+  "home_year": {
+    "value": 10791, "unit": "kWh",
+    "what": "Electricity bought by an average U.S. residential customer in a year (about 899 kWh a month)",
+    "source": "EIA, Frequently Asked Questions: How much electricity does an American home use?",
+    "url": "https://www.eia.gov/tools/faqs/faq.php?id=97&t=3",
+    "as_of": "data for 2022 (page updated 8 January 2024); checked 5 November 2026"
+  },
+  "pjm": {
+    "source": "PJM Inside Lines: Providing Reliable Electricity in a New Reality",
+    "url": "https://insidelines.pjm.com/providing-reliable-electricity-in-a-new-reality/",
+    "as_of": "15 October 2026; checked 5 November 2026"
+  },
+  "ercot": {
+    "requestsGW": 474, "dcShare": 0.9, "asOf": "June 2026",
+    "requestsSource": "ERCOT, update to the Texas Senate, 29 July 2026, slide 6 (PDF)",
+    "requestsUrl": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf",
+    "peakMW": 91134, "peakDate": "22 July 2026",
+    "peakSource": "ERCOT, all-time peak demand records (preliminary)",
+    "peakUrl": "https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm",
+    "peakAsOf": "page updated 21 August 2026; checked 5 November 2026",
+    "ticks": [0.5, 1, 2, 5, 10]
+  },
+  "wait": {
+    "buildMonths": 24,
+    "grid": { "min": 12, "max": 60, "step": 6, "start": 36 },
+    "note": "Illustrative: 24 months to build the campus, and grid service after 36 months."
+  },
+  "jobs": {
+    "crew": { "min": 200, "max": 2000, "step": 100, "start": 1000 },
+    "staff": { "min": 20, "max": 200, "step": 10, "start": 50 }
+  },
+  "tax": {
+    "value": { "min": 200, "max": 2000, "step": 100, "start": 1000 },
+    "rate": { "min": 0.5, "max": 2.5, "step": 0.1, "start": 1.0 }
+  },
+  "cooling": [
+    { "key": "evap", "name": "Evaporative cooling", "water": "uses water: some evaporates to carry heat away", "power": "less electricity for cooling" },
+    { "key": "closed", "name": "Closed-loop cooling", "water": "little water once the loop is filled", "power": "often more electricity, for fans and chillers" }
+  ],
+  "doe": {
+    "source": "U.S. Department of Energy: DOE Releases New Report Evaluating Increase in Electricity Demand from Data Centers",
+    "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers",
+    "date": "20 December 2024",
+    "twh2023": 176, "share2023": 4.4, "twh2028": [325, 580], "share2028": [6.7, 12]
+  },
+  "facts": [
+    { "n": "about 4.4%", "what": "Share of U.S. electricity used by data centers in 2023 (about 176 TWh).", "source": "U.S. Department of Energy (Berkeley Lab report)", "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers", "asof": "published 20 December 2024; data for 2023" },
+    { "n": "6.7–12%", "what": "Berkeley Lab's range for data centers' share of U.S. electricity in 2028 (325 to 580 TWh): a range of scenarios, not one forecast.", "source": "U.S. Department of Energy (Berkeley Lab report)", "url": "https://www.energy.gov/articles/doe-releases-new-report-evaluating-increase-electricity-demand-data-centers", "asof": "published 20 December 2024" },
+    { "n": "about 474 GW", "what": "Large loads asking to connect to ERCOT's grid in Texas, about 90% of them data centers: requests, not demand.", "source": "ERCOT, update to the Texas Senate, slide 6", "url": "https://www.ercot.com/files/docs/2026/07/29/ERCOT-Senate-July-29-Panel-1-Assessing-The-Grid.pdf", "asof": "29 July 2026; data as of June 2026" },
+    { "n": "91,134 MW", "what": "ERCOT's all-time peak demand, on 22 July 2026 (preliminary).", "source": "ERCOT, all-time peak demand records", "url": "https://www.ercot.com/static-assets/data/news/content/a-peak-demand/2026/all-time-records.htm", "asof": "page updated 21 August 2026" },
+    { "n": "10,791 kWh", "what": "Electricity bought by an average U.S. home in a year.", "source": "EIA, Frequently Asked Questions", "url": "https://www.eia.gov/tools/faqs/faq.php?id=97&t=3", "asof": "data for 2022; page updated 8 January 2024" }
+  ]
+}
