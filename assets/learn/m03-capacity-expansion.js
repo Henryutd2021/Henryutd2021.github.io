@@ -493,7 +493,7 @@
             cards: cards, onCheck: function (g) {
               if (g.placed < g.total) return;
               api.done(); LX.progress.done(LESSON); remember("sorted", g.right);
-              api.saw(g.right + " of " + g.total + " as the checks say. Adequacy needs many weather years and plant outages: A5 (upcoming) runs that study.");
+              api.saw(g.right + " of " + g.total + " as the checks say. Adequacy needs many weather years and plant outages: [[lesson:a05-adequacy|A5]] runs that study.");
             } });
         } }
     ];

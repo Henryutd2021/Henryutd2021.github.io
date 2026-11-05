@@ -135,7 +135,7 @@ Planners answer it by simulating many weather years with random plant outages.
 - **Longer storage counts more.** PJM counts 59% of a 4-hour battery's MW, 68% at 6 hours, 71% at 8 and 78% at 10.
 - **Classes, not plants.** These are ratings for technology classes; PJM can accredit a single plant differently.
 
-Analyst lesson A5 (upcoming) runs this simulation for the Plains grid.
+Analyst lesson [A5](a05-adequacy.qmd) runs this simulation for the Plains grid.
 
 ```{=html}
 </div>
@@ -170,7 +170,7 @@ $$
 <ul>
 <li>Costs: what each job costs to buy is <a href="07-cost.html">lesson 7</a>.</li>
 <li>Wires: a firm plant behind a full power line cannot help the town that needs it.</li>
-<li>Rules: markets reward the three jobs in different ways (<a href="08-merit-order.html">lesson 8</a>, and Analyst lesson A3, upcoming).</li>
+<li>Rules: markets reward the three jobs in different ways (<a href="08-merit-order.html">lesson 8</a>, and Analyst lesson <a href="a03-market-design.html">A3</a>).</li>
 <li>Averages: every number is a fleet average or one market's rating; single plants differ.</li>
 </ul>
 </div>

@@ -158,7 +158,7 @@ The check: the optimizer's plans, rounded up to the sliders' steps, re-run hour 
 - **Unserved energy.** Tiny: at most 43 MWh, under 0.002% of the year's demand.
 - **Re-optimized on all 8,760 hours.** The cheapest 200 kt plan costs $133.2M, 3% more, and its last tonne $139 instead of $85: seven weeks underestimate the cost of deep cuts.
 
-Planners respond with more or longer periods, extreme weeks and adequacy tests over many weather years (A5, upcoming).
+Planners respond with more or longer periods, extreme weeks and adequacy tests over many weather years ([A5](a05-adequacy.qmd)).
 
 ```{=html}
 </div>

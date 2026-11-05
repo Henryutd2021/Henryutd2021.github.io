@@ -144,7 +144,7 @@ $$
 <div class="lx-deeper-body">
 <ul>
 <li>The rest of the year: whether a store refills before the next calm spell needs the whole year in order (<a href="m03-capacity-expansion.html">M3</a>).</li>
-<li>Adequacy: many weather years and plant outages, judged by a criterion such as a loss-of-load expectation (A5, upcoming).</li>
+<li>Adequacy: many weather years and plant outages, judged by a criterion such as a loss-of-load expectation (<a href="a05-adequacy.html">A5</a>).</li>
 <li>Building the stores: here each is given, at 1,000 MW; choosing sizes is capacity expansion (<a href="13-capstone.html">lesson 13</a>, M3).</li>
 <li>Wires: the Plains Grid is one node with no limits on its lines.</li>
 <li>Wear, fixed upkeep and replacements in the costs; costs differ by site and change over time.</li>

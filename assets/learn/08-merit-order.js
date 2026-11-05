@@ -376,7 +376,7 @@
       title: "Negative prices: a problem or a signal? The strongest case on each side",
       sides: [{ key: "for", title: "A useful signal", points: ["They tell batteries and flexible users exactly when power is plentiful.", "They reward plants that can turn down quickly.", "They show where wires are missing: in Texas, negative prices fell after a major grid expansion (EIA, 2014)."] },
               { key: "against", title: "A sign of a problem", points: ["Payments per MWh produced can keep plants running when the grid has no use for the power.", "Low and negative hours cut the income of every plant, including those needed in calm, dark hours.", "Spilled wind and sun are investment that produces nothing useful in those hours."] }],
-      note: "The evidence on how much each effect matters depends on the market, the year and the policy; lesson A3 (upcoming) compares market designs."
+      note: "The evidence on how much each effect matters depends on the market, the year and the policy; lesson [[lesson:a03-market-design|A3]] compares market designs."
     });
   }
 

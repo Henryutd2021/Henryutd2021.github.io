@@ -261,7 +261,7 @@ Source: [EIA, Electric Power Annual 2025, Table 11.1](https://www.eia.gov/electr
 
 The loop in this lesson only checks that a path is left. Planners check more for [N−1]{.lx-term term="n-minus-one"}: after any one line fails, can the remaining lines carry the power within their limits?
 
-- **Read next.** Analyst lesson A17 (upcoming) checks a plan against grid physics; A9 (upcoming) plans for hazards.
+- **Read next.** Analyst lesson [A17](a17-physical-feasibility.qmd) checks a plan against grid physics; [A9](a09-hazards.qmd) plans for hazards; [F8](f08-large-loads.qmd) puts a large new load on the town's grid, and [A6](a06-interconnection.qmd) checks its substation with one line out.
 - **Later.** [M1](m01-dispatch-to-lmp.html) writes a small network's rules for one case.
 
 ```{=html}
@@ -271,7 +271,7 @@ The loop in this lesson only checks that a path is left. Planners check more for
 <summary><span class="k">Go deeper</span>What this lesson leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Reactive power and voltage: the slider's three-phase line carries real power only; real power flow also needs voltage and reactive power (Analyst lesson A17, upcoming).</li>
+<li>Reactive power and voltage: the slider's three-phase line carries real power only; real power flow also needs voltage and reactive power (Analyst lesson <a href="a17-physical-feasibility.html">A17</a>).</li>
 <li>Protection settings: how fast each fuse, recloser and breaker acts. This lesson assumes they are coordinated, so the closest one opens first.</li>
 <li>Momentary interruptions: a recloser that trips and closes again within seconds, which SAIDI does not count.</li>
 <li>Underground cables, rooftop solar pushing power back up a feeder, and switches that reroute feeders.</li>

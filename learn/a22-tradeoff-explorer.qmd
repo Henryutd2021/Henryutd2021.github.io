@@ -112,7 +112,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 <li><b>Not in this model.</b> Burden needs incomes and whole bills, which this town model does not have.</li>
 <li><b>Security as diversity.</b> A supply is concentrated when one source makes most of it, and diverse when many sources make similar shares.</li>
 <li><b>Diversity indices.</b> Shannon's and the Herfindahl index turn every source's share into one number; the Herfindahl index is the sum of the squared shares, 1 when one source makes everything. Stirling (2010) adds how different the sources are.</li>
-<li><b>Reliability over many years.</b> Loss-of-load expectation counts shortfall hours over many weather years with random plant failures (A5, upcoming).</li>
+<li><b>Reliability over many years.</b> Loss-of-load expectation counts shortfall hours over many weather years with random plant failures (<a href="a05-adequacy.html">A5</a>).</li>
 </ul>
 <p>Reviews of energy decisions with several criteria (Wang and co-authors, 2009) find cost, emissions, reliability and social measures in most studies, each defined in many ways.</p>
 </div>
@@ -140,7 +140,7 @@ The low-income share, worked out for a plan whose fixed costs are 95% of its cos
 
 Same plan, same costs: the tariff alone moves the share by 13.0 points.
 
-Mavrotas (2009) shows how to sweep the limits. Upcoming: M6 (carbon in models) and M12 (a city model with screening fairness outputs).
+Mavrotas (2009) shows how to sweep the limits. Next: [M6](m06-carbon-in-models.qmd) (carbon in models); upcoming: M12 (a city model with screening fairness outputs).
 
 ```{=html}
 </div>

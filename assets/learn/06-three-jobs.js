@@ -199,7 +199,7 @@
                                "Stored energy must cover what other supplies leave unmet for that long, and be recharged before the next calm spell, often by the same wind."] }],
             onOpen: function (side) {
               sides[side] = true;
-              if (sides["for"] && sides.against) { api.done(); keep("steelman", true); api.saw("Both cases rest on real numbers. Rating wind and storage as a pair, for one grid, takes many weather years and a reliability test: Analyst lesson A5 (upcoming)."); }
+              if (sides["for"] && sides.against) { api.done(); keep("steelman", true); api.saw("Both cases rest on real numbers. Rating wind and storage as a pair, for one grid, takes many weather years and a reliability test: Analyst lesson [[lesson:a05-adequacy|A5]]."); }
             }, opened: sides
           });
           if (sides["for"] && sides.against) api.done();
@@ -277,7 +277,7 @@
         { id: "firm", g: "job", label: "Firm capacity", at: [1.4, 1], atN: [1, 2], text: jobBy.firm.question },
         { id: "flex", g: "job", label: "Flexibility", at: [2.35, 1], atN: [2, 2], text: jobBy.flex.question },
         { id: "cf", g: "measure", label: "Capacity factor", lines: ["Capacity", "factor"], at: [0.45, 2], atN: [0, 3], text: "Energy made ÷ (size × hours): lesson 5." },
-        { id: "fs", g: "measure", label: "Firm share", lines: ["Firm", "share"], at: [1.4, 2], atN: [1, 3], text: "The part of a plant's MW a grid counts in its riskiest hours. PJM rates each technology class (ELCC); a single plant can differ.", later: "Later: Analyst lesson A5 (upcoming) estimates it with many weather years." },
+        { id: "fs", g: "measure", label: "Firm share", lines: ["Firm", "share"], at: [1.4, 2], atN: [1, 3], text: "The part of a plant's MW a grid counts in its riskiest hours. PJM rates each technology class (ELCC); a single plant can differ.", later: "Later: Analyst lesson [[lesson:a05-adequacy|A5]] estimates it with many weather years." },
         { id: "ramp", g: "measure", label: "Ramp and start", lines: ["Ramp and", "start"], at: [2.35, 2], atN: [2, 3], text: "How fast a plant changes output, and how quickly it starts: the [[ramp-rate|ramp limit]] of lesson 0." }
       ],
       edges: [["vre", "energy", "mainly"], ["steady", "energy", "mainly"], ["steady", "firm", "also"], ["gas", "firm", "mainly"], ["gas", "flex", "also"],

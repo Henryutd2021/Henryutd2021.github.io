@@ -178,7 +178,7 @@ Other pricing rules have been proposed and used that fold part of these costs in
 <li>The network: one bus here; M1 put the plants on three buses.</li>
 <li>Ramp limits: M1's 40 MW/h rule for the combined-cycle plant is left out (practice question 3 adds it back).</li>
 <li>Reserves: operators also commit spare headroom for a plant that trips.</li>
-<li>Forecast errors and outages: the day is known in advance here. M8 (upcoming) decides before the uncertainty resolves.</li>
+<li>Forecast errors and outages: the day is known in advance here. <a href="m08-stochastic-robust.html">M8</a> decides before the uncertainty resolves.</li>
 <li>Tomorrow and yesterday: the day ends with the combined-cycle plant on, run and down times count within the day (a start at 23:00 owes nothing after midnight), and the hours before it are assumed to meet them; real schedules roll forward.</li>
 <li>Offers and market rules: costs stand in for offers; real settlements follow each market's tariff.</li>
 </ul>

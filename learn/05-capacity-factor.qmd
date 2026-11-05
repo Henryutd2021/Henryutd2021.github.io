@@ -228,7 +228,7 @@ From about 6 to 8 m/s the averages follow the cube law closely. Above that they 
 Source: NREL, [Power Performance Test Report for the U.S. Department of Energy 1.5-Megawatt Wind Turbine](https://docs.nlr.gov/docs/fy15osti/63684.pdf), Table 6 (2015; test from February to June 2011).
 
 - **Research.** Estimating a wind farm's curve, with honest error bars, from few records is an active research topic ([Li et al., 2023](https://doi.org/10.1115/DETC2023-114762); open code: [mfgpr-wind-power-curve](https://github.com/Henryutd2021/mfgpr-wind-power-curve)).
-- **Next.** Modeler lesson M9 (upcoming) fits a curve to data; [bridge B2](b02-python-data.qmd) computes capacity factors in Python.
+- **Next.** Modeler lesson [M9](m09-surrogates-uq.qmd) fits a curve to data; [bridge B2](b02-python-data.qmd) computes capacity factors in Python.
 
 ```{=html}
 </div>

@@ -212,7 +212,7 @@ The check fixes the sizes, adds $g_t \ge 60\,u_t$ and $g_t \le 200\,u_t$ with $u
 <li>Battery wear, fuel deliveries during the storm, and how often outages happen; and a full chronological year: the 12 average days can put a large solar-and-battery plan's bill up to 7% low (the <a href="sb1-microgrid-workbench.html">Workbench</a> shows the check).</li>
 <li>Loads that change through the day: every load is flat here.</li>
 </ul>
-<p>Modeler's note: <a href="m07-monte-carlo.html">M7</a> samples uncertain inputs with Monte Carlo, and M8 (upcoming) decides before the uncertainty resolves.</p>
+<p>Modeler's note: <a href="m07-monte-carlo.html">M7</a> samples uncertain inputs with Monte Carlo, and <a href="m08-stochastic-robust.html">M8</a> decides before the uncertainty resolves.</p>
 </div>
 </details>
 </div>

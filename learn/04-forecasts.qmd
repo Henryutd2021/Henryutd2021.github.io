@@ -131,7 +131,7 @@ $$\text{MAE} = \frac{1}{n}\sum_t |A_t - F_t|, \qquad \text{MAPE} = \frac{1}{n}\s
 $$\frac{c_u}{c_u + c_o} = \frac{300}{300 + 10} \approx 0.97$$
 
 - **On this page.** Applied to the January–April misses, the rule gives a cushion of +5.9%; the cheapest available slider setting is +6.0%.
-- **Next.** Lesson M10 (upcoming) builds forecasts and scores them on months they have not seen.
+- **Next.** Lesson [M10](m10-ml-forecasting.qmd) builds forecasts and scores them on months they have not seen.
 
 ```{=html}
 </div>

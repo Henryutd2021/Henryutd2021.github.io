@@ -147,7 +147,7 @@ Scheduling and planning models usually skip these seconds and keep a rule instea
 <li>Governors have dead bands and limits, and many plants run with no spare capacity at all.</li>
 <li>Real load-shedding programmes cut customers in several smaller steps.</li>
 <li>Real AGC also watches the power flowing to neighbouring regions, not only the frequency.</li>
-<li>Voltage, which can collapse on its own, is not modelled; lesson A17 (upcoming) checks steady voltages and line loadings with a small power flow.</li>
+<li>Voltage, which can collapse on its own, is not modelled; Analyst lesson <a href="a17-physical-feasibility.html">A17</a> makes first estimates of steady voltages and line loadings with short formulas, not a power flow.</li>
 </ul>
 </div>
 </details>

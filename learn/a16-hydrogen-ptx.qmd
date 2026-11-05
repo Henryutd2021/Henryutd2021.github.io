@@ -119,7 +119,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **DOE's example.** A gas reformer with about 95% carbon capture could reach about 4.0, if it uses the average U.S. grid mix and upstream methane leaks stay at or below 1%.
 - **Three tests of the power.** The U.S. clean-hydrogen credit's final rules (January 2025) ask for [deliverability]{.lx-term term="deliverability"} (the same region), temporal matching (the same year or the same hour) and incrementality (new clean power).
 - **Matching is not accounting.** Matching sets which power may count. Separately, from 2030 DOE's 45VH2-GREET manual (December 2025) lets a producer opt to count its electricity's emissions hour by hour, if its annual result is at most 4.0 kg.
-- **A claim is not a cause.** Matching sets what a buyer may claim. Whether emissions fall depends on whether the clean power is new ([additionality]{.lx-term term="additionality"}) and deliverable: the accounting questions of A10 (upcoming).
+- **A claim is not a cause.** Matching sets what a buyer may claim. Whether emissions fall depends on whether the clean power is new ([additionality]{.lx-term term="additionality"}) and deliverable: the accounting questions of [A10](a10-emissions-questions.qmd).
 
 ```{=html}
 </div>

@@ -129,7 +129,7 @@ $$\min \sum_t \left(40\, c_t + 100\, p_t\right) + u \sum_t x_t$$
 - **Rules.** $x_t, y_t \le s\, d_t$; $\sum_t y_t = (1 + \ell) \sum_t x_t$; each hour balances, with $0 \le c_t \le 150$ and $0 \le p_t \le 100$, and spare sun may be spilled.
 - **The page's rule.** It moves use from the dearest hour to the cheapest, one straight piece of the merit order at a time. For every setting on the page it reaches this program's minimum (checked with HiGHS).
 - **Ties.** Hours with the same price can trade places, so the hours moved are one choice among equally cheap ones; the cost and the plants' CO₂ are the same in all of them.
-- **Next.** Carbon in models comes in M6 (upcoming); a microgrid that runs through an outage in [M5](m05-microgrid-size-and-run.html).
+- **Next.** Carbon in models comes in [M6](m06-carbon-in-models.html); a microgrid that runs through an outage in [M5](m05-microgrid-size-and-run.html).
 
 ```{=html}
 </div>

@@ -127,7 +127,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 - In a dispatch model, an hour's marginal emission factor is the change in total CO₂ when that hour's demand grows by one MWh.
 - The toy reads it off each hour's dispatch; a linear program finds it by solving again with one more MWh.
 - It holds for a small change only, and it jumps between plants from hour to hour, so real estimates come from dispatch models or from statistics on years of hourly data.
-- Putting carbon in the model: caps, prices, frontiers and procurement rules (M6, upcoming in the Modeler tier) takes this further.
+- Putting carbon in the model: caps, prices, frontiers and procurement rules (Modeler lesson [M6](m06-carbon-in-models.qmd)) takes this further.
 
 ```{=html}
 </div>

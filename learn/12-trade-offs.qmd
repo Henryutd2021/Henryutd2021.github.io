@@ -116,7 +116,7 @@ $$\min_x \; c(x) \quad \text{subject to} \quad e(x) \le \varepsilon \;\; (\lambd
 - **Here.** A 200 kt cap has $\lambda^* = \$85.2$ per tonne; a \$85.2 price with no cap lands at 199 kt and \$129.4M.
 - **Ties.** On an exactly straight piece every plan ties at its slope; with integer decisions there is no such guarantee at all.
 
-Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Next: [A22](a22-tradeoff-explorer.qmd) (five goals at once); upcoming: M6 (carbon in models).
+Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Next: [A22](a22-tradeoff-explorer.qmd) (five goals at once); [M6](m06-carbon-in-models.qmd) (carbon in models).
 
 ```{=html}
 </div>

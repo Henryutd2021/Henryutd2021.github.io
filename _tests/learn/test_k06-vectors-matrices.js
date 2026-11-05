@@ -126,7 +126,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   });
   ["10-write-it-down.html", "11-solver.html", "b01-algebra-to-lp.html", "k04-linear-equations.html", "m01-dispatch-to-lmp.html"].forEach(h => ok(QMD.indexOf('href="' + h + '"') >= 0 || QMD.indexOf("](" + h + ")") >= 0, "links " + h));
   ok(/LX\.lessonRefHTML\(data\.path, c\)/.test(JS) && /\[10, 11, "B1"\]/.test(JS) && /path\.json/.test(QMD), "step 7 links lessons 10, 11 and B1 through LX.lessonRefHTML");
-  ok(!/href="[^"]*m09/.test(QMD) && /M9, upcoming/.test(QMD), "M9 is named as upcoming, not linked");
+  ok(/\[M9\]\(m09-surrogates-uq\.html\)/.test(QMD) && !/M9, upcoming/.test(QMD), "M9 linked, now that it is live (W4 integration)");
   ok(/doi\.org\/10\.1017\/9781108583664/.test(QMD) && /ergo-code\.github\.io\/HiGHS\/stable\//.test(QMD) && /EIA-930/.test(QMD) && /illustrative/.test(QMD), "sources: Boyd and Vandenberghe, HiGHS docs, EIA-930; illustrative values labelled");
   const body = QMD.replace(/<!-- learn:meta:start[\s\S]*?learn:meta:end -->/, "");
   ok(!/nuclear|reactor|\bSMR\b|data cent|learning/i.test(body) && !/nuclear|reactor|data cent|learning/i.test(JS.replace(/\/\/.*$/gm, "").replace(/f\.nuclear\.mw/g, "")), "scope: no nuclear wording, no data centers, no learning wording");

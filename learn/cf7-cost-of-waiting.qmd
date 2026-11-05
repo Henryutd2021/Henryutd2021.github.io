@@ -111,7 +111,7 @@ body-classes: "page-learn page-lesson lx-form-case"
 - In the toy, 24 → 18 months avoids $40.3M ($171.1M − $130.8M).
 - An option creates an overall net benefit when the savings in all accounts exceed its cost plus any harm it adds, each counted once.
 - Making every party better off may also take compensation; who pays is a separate choice.
-- Sampling uncertain inputs comes in Scenarios, Monte Carlo and global sensitivity ([M7](m07-monte-carlo.html)); why connections take years, in A6 (upcoming).
+- Sampling uncertain inputs comes in Scenarios, Monte Carlo and global sensitivity ([M7](m07-monte-carlo.html)); what a large load is, in [F8](f08-large-loads.qmd); why connections take years, in [A6](a06-interconnection.qmd).
 
 ```{=html}
 </div>

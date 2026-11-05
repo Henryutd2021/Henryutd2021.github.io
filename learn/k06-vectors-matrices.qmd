@@ -135,7 +135,7 @@ button.k6-row.bad .ck { color: var(--lx-bad); font-weight: 600; }
 - **Counting rows.** The count depends on the form. Lesson 11's day, as stored, has 72 rows, 24 of them equalities; strictly as A x ≤ b, each becomes two rows: 96 rows, 286 non-zero entries.
 - **The transpose.** $c^\mathsf{T} x$ (B1's notation) is the dot product written as a row times a column; $\mathsf{T}$ turns a column into a row.
 - **Sparse.** Large models are mostly zeros: each rule touches a few decisions. Lesson 11's stored matrix has 190 non-zero entries out of 6,912, about 2.7%, so solvers keep only those.
-- **Where next.** Building these arrays in code comes in [B2](b02-python-data.html) and [M1](m01-dispatch-to-lmp.html); Gaussian processes (M9, upcoming) work with matrices of similarities between data points.
+- **Where next.** Building these arrays in code comes in [B2](b02-python-data.html) and [M1](m01-dispatch-to-lmp.html); Gaussian processes ([M9](m09-surrogates-uq.html)) work with matrices of similarities between data points.
 
 ```{=html}
 </div>

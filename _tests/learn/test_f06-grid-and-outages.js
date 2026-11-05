@@ -360,7 +360,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   for (const h of own.matchAll(/href="([^"]+)"|\]\(([^)]+)\)|src="([^"]+)"/g)) { const u = (h[1] || h[2] || h[3]).replace(/&amp;/g, "&"); nl++; ok(ALLOW.test(u), `link on the allow-list: ${u}`); }
   ok(nl >= 25, `${nl} links checked`);
   ["03-balancing.html", "f01-five-scales.html", "m01-dispatch-to-lmp.html"].forEach(p => ok((own.indexOf('href="' + p + '"') >= 0 || own.indexOf("](" + p + ")") >= 0) && fs.existsSync(path.join(SITE, "learn", p.replace(/\.html$/, ".qmd"))), `links back to the live ${p}`));
-  ok(/A17 \(upcoming\)/.test(QMD) && /A9 \(upcoming\)/.test(QMD) && !/href="a(09|17)/.test(QMD), "A9 and A17 named as upcoming, not linked");
+  ok(/\[A17\]\(a17-physical-feasibility\.qmd\)/.test(QMD) && /\[A9\]\(a09-hazards\.qmd\)/.test(QMD) && /href="a17-physical-feasibility\.html"/.test(QMD) && !/A(9|17),? \(?upcoming/.test(QMD), "A9 and A17 linked, now that they are live (W4 integration)");
   ok(/LX\.lessonRefHTML\(P, 3\)/.test(JS) && /data\/path\.json/.test((QMD.match(/data-learn="grid-outages"[^>]*/) || [""])[0]), "the script links lesson 3 through path.json");
   ok(!/collaborat|Lambda|Henryutd2021/.test(visible), "no collaborator, workstation or repository names");
 }

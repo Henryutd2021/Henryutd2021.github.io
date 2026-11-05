@@ -174,7 +174,7 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 - **Four typical weeks** leave 879 MWh unserved in 53 hours of 2025, spread over 12 weeks.
 - **The second year.** At 2025's yearly demand energy, 2024's demand peaks at 462 MW, against 450 MW in 2025.
 - **What they cannot tell you.** Even the plan optimal on all of 2025 leaves 235 MWh in 18 hours of 2024 unserved.
-- **Adequacy** is judged over many weather years with plant outages, in a Monte Carlo study (A5, upcoming), by measures such as the [loss-of-load expectation]{.lx-term term="lole"} (LOLE).
+- **Adequacy** is judged over many weather years with plant outages, in a Monte Carlo study ([A5](a05-adequacy.qmd)), by measures such as the [loss-of-load expectation]{.lx-term term="lole"} (LOLE).
 - **LOLE** is the expected number of days a year with a shortage of any size or length. One criterion is 0.1 days a year, “1 day in 10 years” ([PJM Manual 20A](https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf), §1.3, June 2026): an expectation, not a promise of one outage a decade.
 
 ```{=html}
@@ -184,11 +184,11 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 <summary><span class="k">Go deeper</span>What this model leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Plant outages and reserve margins: adequacy studies treat them over many weather years (A5, upcoming).</li>
+<li>Plant outages and reserve margins: adequacy studies treat them over many weather years (<a href="a05-adequacy.html">A5</a>).</li>
 <li>Start-up costs and minimum run times: on/off decisions make a mixed-integer program (<a href="m02-unit-commitment.html">M2</a>).</li>
 <li>Transmission and regions: the town is one bus with no imports.</li>
 <li>Several years of investment, retirements and residual value: a pathway model (M13, upcoming).</li>
-<li>Uncertainty when building: here the weather is known when the sizes are chosen (M8, upcoming, chooses them before it is known).</li>
+<li>Uncertainty when building: here the weather is known when the sizes are chosen (<a href="m08-stochastic-robust.html">M8</a> chooses them before it is known).</li>
 <li>Costs that change with time: every cost is constant within the year modelled.</li>
 </ul>
 <p>Modeler's note: <a href="r05-build-validate.html">R5</a> turns these checks into a verification and validation plan, and the Modeler checkpoint <a href="ck-m-unseen-problem.html">CK-M</a> asks you to formulate, solve and verify a model you have not seen.</p>

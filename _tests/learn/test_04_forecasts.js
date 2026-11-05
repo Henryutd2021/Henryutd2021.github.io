@@ -123,7 +123,7 @@ ok((code.match(/Signed error, % of forecast/g) || []).length === 2, "#5: the too
 ok(/percentage of the forecast/.test(stepSrc[4]) && /in percent of actual/.test(stepSrc[3]), "#5: the band step names its denominator (forecast), MAPE names its own (actual)");
 has("MAPE divides each miss by the actual value", "#5: the Analyst box contrasts the two denominators");
 ok(!/newsvendor|pinball|P\(e \\le/i.test(QMD), "#7: the Modeler box is a preview without the newsvendor formulation or pinball loss");
-has("Lesson M10 (upcoming)", "#7: forward pointer to M10 (upcoming, plain text)");
+has("Lesson [M10](m10-ml-forecasting.qmd) builds forecasts", "#7: forward pointer to M10 (live since W4: a link)");
 ok(!/Wind is harder/.test(code) && /later lessons compare forecasting methods/.test(code), "#8: no unsupported 'wind is harder' claim");
 ok(/cause is unverified/.test(fc.meta.method) && !/rather than a measure of forecast skill/.test(fc.meta.method), "#9: the data file calls the May-December gap unverified");
 has("the cause is unverified", "#9: the data note calls the May-December gap unverified"); has("an editorial choice, pending validation");

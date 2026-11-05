@@ -135,7 +135,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 
 - $\bar d$ is the town's average hour of 2025 (MW) and $d_{\max}$ its busiest hour (MW); a flat load pushes LF toward 1.
 - **A load that is not flat** must be added hour by hour before sorting: the busiest hours of the sum need not be the busiest hours of either part.
-- **Next.** The Grid Room sandbox (SB2, upcoming) adds a large load to a regional grid; resource adequacy (A5, upcoming) asks whether supply is enough in every hour.
+- **Next.** The Grid Room sandbox (SB2, upcoming) adds a large load to a regional grid; resource adequacy ([A5](a05-adequacy.qmd)) asks whether supply is enough in every hour.
 
 ```{=html}
 </div>
@@ -146,7 +146,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 <ul>
 <li>Whether the wires can carry the campus: voltage, lines and stability are Analyst lesson <a href="a17-physical-feasibility.html">A17</a>.</li>
 <li>Which plants run for it, and at what price: the merit order is <a href="08-merit-order.html">lesson 8</a>.</li>
-<li>The emissions it causes or may claim: Analyst lesson A10 (upcoming).</li>
+<li>The emissions it causes or may claim: Analyst lesson <a href="a10-emissions-questions.html">A10</a>.</li>
 <li>Shifting some of its work in time: flexible demand is <a href="a07-flexible-demand.html">A7</a>.</li>
 <li>Real campuses' changing draw, and the real numbers for water, jobs and taxes, which differ by place.</li>
 </ul>
