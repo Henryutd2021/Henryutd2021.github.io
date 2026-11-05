@@ -233,6 +233,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "capacity-market": {
+  "term": "Capacity market",
+  "short": "An auction, run ahead of time, that pays plants and other resources for being available, in an amount a planner sets, on top of energy prices.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
+ },
  "capital-cost": {
   "term": "Capital cost",
   "short": "The money spent to build a power plant, usually given per kilowatt of capacity, before it makes any electricity.",
@@ -244,6 +250,12 @@
   "short": "The share of a building cost that must be repaid each year, with interest, to pay it off over a given number of years.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "capture-price": {
+  "term": "Capture price",
+  "short": "The average market price a plant's output earns, each hour weighted by what the plant produced in it.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
  },
  "capture-ratio": {
   "term": "Capture ratio",
@@ -778,6 +790,12 @@
   "short": "Equipment, such as a battery, that takes in electricity at one time and gives it back later, with some losses.",
   "lesson": 9,
   "href": "09-storage.html"
+ },
+ "energy-only-market": {
+  "term": "Energy-only market",
+  "short": "A wholesale market in which plants are paid only for the energy they sell, so high prices in scarce hours must pay for capacity that is rarely used.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
  },
  "enrichment": {
   "term": "Enrichment (of uranium)",
@@ -1475,6 +1493,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "missing-money": {
+  "term": "Missing money",
+  "short": "The gap between what a plant the grid needs earns from energy and reserves and what it costs to build or keep.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
+ },
  "mixed-integer-program": {
   "term": "Mixed-integer program",
   "short": "An optimization model in which some decisions must be whole numbers, such as a plant being on (1) or off (0).",
@@ -1630,6 +1654,12 @@
   "short": "What an optimization tries to make as small or as large as possible, such as the total cost.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "offer-cap": {
+  "term": "Offer cap",
+  "short": "The highest price a market lets a seller offer, and so the ceiling on scarcity prices; it is set by the market's rules.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
  },
  "operating-emissions": {
   "term": "Operating emissions",

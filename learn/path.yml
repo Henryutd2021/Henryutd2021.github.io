@@ -678,7 +678,23 @@
 - {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}
 - {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
 - {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
-- {kind: lesson, tier: analyst, code: A3, title: "Energy-only or capacity market? How wholesale markets are designed for high renewable shares"}
+# ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)
+- kind: lesson
+  id: a03-market-design
+  code: A3
+  tier: analyst
+  form: cards
+  icon: chart
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the questions in the Check section and the Go deeper boxes
+  title: "Energy-only or capacity market? How wholesale markets are designed for high renewable shares"
+  subtitle: "Clear a year of hourly prices, watch solar's value fall as it grows, then pay for peakers two ways"
+  short: "Market design"
+  teaches: [uniform-price clearing, scarcity pricing, negative prices, solar capture prices, missing money, capacity markets, market designs around the world]
+  does: "Clear a year of hourly prices on the Plains market; watch negative prices and solar's falling capture price as solar grows; see which new plants cover their costs energy-only and with a capacity market, and what consumers pay; match five arrangements around the world."
+  outcome: "Explain how energy-only markets with scarcity pricing and capacity markets each pay for enough capacity, what each costs consumers and who carries which risk, and why more solar lowers solar's own capture price."
+  after: [8]
 # ---------- wave W4 Analyst module A5 (curriculum v2 §18.4; builder learn-w4-b)
 - kind: lesson
   id: a05-adequacy

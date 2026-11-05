@@ -1200,9 +1200,13 @@
    "tier": "analyst",
    "code": "A3",
    "title": "Energy-only or capacity market? How wholesale markets are designed for high renewable shares",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a03-market-design.html",
+   "scales": [],
+   "id": "a03-market-design",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Market design"
   },
   {
    "tier": "analyst",
