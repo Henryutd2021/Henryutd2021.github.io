@@ -79,6 +79,7 @@
       if (id) chip(id === "tau" ? "Carbon payments" : id === "ces" ? "Certificate payments" : "Credits paid", fmt.m(moneyOf(id, R)));
       mix.set([rowOf("base", "No policy", base)].concat(id ? [rowOf("with", "With the " + I[id].short, R)] : []));
       mixText.textContent = "The year's electricity by source; demand is " + fmt.twh(Y.demandMWh) + ". Wind and sun curtailed: " + fmt.twh(R.curtailed) + ".";
+      status.textContent = "Resource cost: new plants' capital and upkeep plus the gas burned, a year in 2025 dollars; payments between groups are left out.";
       buildExplain();
     }
 
@@ -118,7 +119,7 @@
           var row = H("div", { class: "a12-row" }, act), b = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Solve the plan" }, row), st = LX.SolverStatus(row);
           var go = LX.SolveStep.action({ api: api, st: st, host: act, go: b, cls: "a12-fail",
             job: function () { return solve({}, "a12-base").then(function (R) { if (!R.ok) return R.r; base = R; return null; }); },
-            show: function () { paint(); api.saw("**No policy:** nothing new is built; new wind costs more than the gas it would save. CO₂ " + fmt.mt(base.co2) + "; wind and sun meet " + fmt.pct(base.shareClean) + " of demand."); api.done(); } });
+            show: function () { st.set(""); paint(); api.saw("**No policy:** nothing new is built; new wind costs more than the gas it would save. CO₂ " + fmt.mt(base.co2) + "; wind and sun meet " + fmt.pct(base.shareClean) + " of demand."); api.done(); } });
           b.addEventListener("click", go);
           if (base) { paint(); api.done(); }
         } },
@@ -135,7 +136,7 @@
               var first = base ? Promise.resolve(null) : solve({}, "a12-base").then(function (R) { if (!R.ok) return R.r; base = R; return null; });
               return D.instruments.reduce(function (p, x) { return p.then(function (bad) { return bad || solve(opts(x.id, S[x.id]), "a12-all-" + x.id).then(function (R) { return R.ok ? null : R.r; }); }); }, first);
             },
-            show: function () { host.innerHTML = ""; ledger(host); rules(host); api.saw("**Same grid, four instruments:** compare each cut with its change in resource cost, and see who pays."); api.done(); } });
+            show: function () { st.set(""); host.innerHTML = ""; ledger(host); rules(host); api.saw("**Same grid, four instruments:** compare each cut with its change in resource cost, and see who pays."); api.done(); } });
           b.addEventListener("click", go); go();
         } }
     ];

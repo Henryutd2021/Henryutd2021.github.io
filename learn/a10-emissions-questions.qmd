@@ -60,6 +60,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real hours.</b> Demand, wind and sun follow the Southwest Power Pool's hours of 7 November 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), wind and sun scaled to EIA's 2025 capacity factors (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Table 6.07.B</a>). Each hour runs cheapest first, with no ramp limits.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in seven steps.</p>
 <style>/* lesson-local */
+#a10-buy { display: block; width: 100%; max-width: 100%; min-width: 0; }   /* long purchase names: wrap the box, never the page */
 @media (max-width: 640px) { .a10-fb td:first-child { font-weight: 600; } .a10-fb td[data-label]::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
 </style>
 ```

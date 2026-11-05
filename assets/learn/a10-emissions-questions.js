@@ -144,7 +144,7 @@
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
     function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
     function paint() {
-      var q = Q(), mrNow = S.mr && (S.part === "short" || S.part === "model"), g = mrNow ? day(W, { load: q.load, mustRun: A.mustRunMW }) : q.inv.g;
+      var q = Q(), mrNow = S.mr && (S.part === "short" || S.part === "model"), g = !S.load ? day(W) : mrNow ? day(W, { load: q.load, mustRun: A.mustRunMW }) : q.inv.g;
       title.textContent = P.name + ", " + W.dateLabel + (S.load ? " · with the " + name(S.load) : "") + (mrNow ? " · must-run rule on" : "");
       chips.innerHTML = "";
       if (!S.load) chip("Demand that day", fm.mwh(sum(W.demand)));

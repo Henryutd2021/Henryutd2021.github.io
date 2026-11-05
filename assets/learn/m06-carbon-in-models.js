@@ -266,22 +266,42 @@
     var stage = H("div", { class: "lx-stage" }, live), title = H("h3", null, H("div", { class: "lx-stage-head" }, stage));
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, stage), fhost = H("div", null, stage);
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
-    var fc = LX.Frontier(fhost, { label: "The Plains Grid's year: cost against CO₂ under each cap", xMax: 5000, yMin: 380, yMax: 540, shadeLabel: "out of reach (approximately)",
-      frontierLabel: "Frontier: the cheapest plan at each cap", fmtX: function (t) { return mt(t); }, priceLabel: function (p) { return "Equal score at " + f2(p) + " per t"; } });
+    // the frontier as an XY chart (LX.Plot): x CO2 in Mt, y cost in $M; the price's equal-score line clipped to the box
+    var XR = [1, 5], YR = [380, 560], plot = LX.Plot(fhost, { text: "Text version of the chart" });
     function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
+    function clipLine(tau, x0, y0) {   // y = y0 + tau (x0 - x), in Mt and $M; the part inside XR x YR
+      var f = function (x) { return y0 + tau * (x0 - x); }, a = XR[0], b = XR[1];
+      if (tau > 0) { a = Math.max(a, x0 + (y0 - YR[1]) / tau); b = Math.min(b, x0 + (y0 - YR[0]) / tau); }
+      return a < b ? [[a, f(a)], [b, f(b)]] : null;
+    }
     var view = { cap: null, price: null };
     function paint() {
       chips.innerHTML = "";
-      if (!base) { title.textContent = "The Plains Grid's planning LP: not solved yet"; status.textContent = "Solve the plan to start; the solver loads on the first solve (about 3.5 MB, once)."; fc.frontier([], null); fc.plans([]); fc.price(null); return; }
-      var pts = [{ cap: null, co2: base.co2, cost: base.resource, solved: true }];
-      CAPS.forEach(function (c) { var R = cache[JSON.stringify(capOpt(c))]; if (R && R.ok) pts.push({ cap: Math.round(R.co2 / 1000), co2: R.co2, cost: R.resource, solved: true }); });
-      fc.frontier(pts, pts.length > 2 ? "Frontier you traced: solved caps joined by straight lines" : "Solved plans");
-      var plans = [{ id: "N", label: "No carbon rule", co2: base.co2, cost: base.resource, kind: "other", legend: "No carbon rule" }];
+      var pts = [], spec = { x: { min: XR[0], max: XR[1], ticks: [[1, "1"], [2, "2"], [3, "3"], [4, "4"], [5, "5 Mt"]] },
+        y: { min: YR[0], max: YR[1], step: 40, fmt: function (v) { return "$" + v + "M"; }, unit: "Cost a year" }, height: 280, heightN: 240, lines: [], marks: [], spans: [], legend: [] };
+      if (!base) {
+        title.textContent = "The Plains Grid's planning LP: not solved yet"; status.textContent = "Solve the plan to start; the solver loads on the first solve (about 3.5 MB, once).";
+        spec.aria = "An empty chart of cost against CO₂: nothing solved yet."; spec.text = { head: ["Plan", "CO₂", "Cost"], rows: [] }; plot.render(spec); return;
+      }
+      pts.push({ label: "No carbon rule", co2: base.co2, cost: base.resource });
+      CAPS.forEach(function (c) { var R = cache[JSON.stringify(capOpt(c))]; if (R && R.ok) pts.push({ label: "Cap at " + c + "%", co2: R.co2, cost: R.resource, dual: R.capPrice }); });
+      var fr = pts.slice().sort(function (a, b) { return a.co2 - b.co2; });
+      spec.lines.push({ pts: fr.map(function (p) { return [p.co2 / 1e6, p.cost / 1e6]; }), color: "var(--lx-ink)", width: 2.2, dots: true });
+      spec.legend.push({ label: fr.length > 2 ? "Frontier you traced: solved caps joined by straight lines" : "Solved plans", color: "var(--lx-ink)" });
+      spec.marks.push({ x: base.co2 / 1e6, y: base.resource / 1e6, label: "No rule", kind: "ring" });
       var Rc = view.cap != null && cache[JSON.stringify(capOpt(view.cap))];
-      if (Rc && Rc.ok) plans.push({ id: "C", label: "Cap at " + view.cap + "%", co2: Rc.co2, cost: Rc.resource, kind: "you", legend: "Your cap", ring: true });
+      if (Rc && Rc.ok) spec.marks.push({ x: Rc.co2 / 1e6, y: Rc.resource / 1e6, label: "Cap " + view.cap + "%", kind: "dot", pos: "below" });
       var pr = view.price != null && cache["range" + view.price];
-      fc.plans(plans);
-      if (pr && pr.ok) fc.price(pr.tau, { co2: pr.R.co2, cost: pr.R.resource }); else fc.price(null);
+      if (pr && pr.ok) {
+        var seg = clipLine(pr.tau, pr.R.co2 / 1e6, pr.R.resource / 1e6);
+        if (seg) { spec.lines.push({ pts: seg, color: "var(--lx-accent)", width: 2, dash: "6 4" }); spec.legend.push({ label: "Equal score at " + f2(pr.tau) + " per t", color: "var(--lx-accent)", dash: "6 4" }); }
+        if (pr.hi - pr.lo >= 5000) spec.spans.push({ x0: pr.lo / 1e6, x1: pr.hi / 1e6, color: "var(--lx-accent)", op: 0.14, label: "Tied" });
+        else spec.marks.push({ x: pr.R.co2 / 1e6, y: pr.R.resource / 1e6, label: "Price " + f2(pr.tau), kind: "dot", pos: "above", color: "var(--lx-accent)" });
+      }
+      spec.aria = "Cost a year against CO₂ a year for the solved plans" + (pr && pr.ok ? ", with the equal-score line of a " + f2(pr.tau) + " price" : "") + ".";
+      spec.text = { head: ["Plan", "CO₂", "Cost", "Dual, $ per t"], rows: fr.map(function (p) { return [p.label, mt(p.co2), musd(p.cost), p.dual != null ? f2(p.dual) : "–"]; }),
+        note: pr && pr.ok ? "At " + f2(pr.tau) + " per t the best plans emit " + tieText(pr) + "." : "" };
+      plot.render(spec);
       title.textContent = "The Plains Grid's year" + (Rc && Rc.ok ? " · cap at " + view.cap + "% of " + mt(E0) : "") + (pr && pr.ok ? " · price " + f2(pr.tau) + " per t" : "");
       chip("No carbon rule", mt(base.co2) + " · " + musd(base.resource));
       if (Rc && Rc.ok) { chip("Your cap", mt(Rc.co2) + " · " + musd(Rc.resource)); chip("The cap's dual", f2(Rc.capPrice) + " per t"); }
@@ -293,7 +313,8 @@
     // ---------- step cards
     function solveAct(act, api, label, job, show) {
       var row = H("div", { class: "m6-row" }, act), b = label ? H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + label }, row) : null, st = LX.SolverStatus(row);
-      var go = LX.SolveStep.action({ api: api, st: st, host: act, go: b, cls: "m6-fail", job: function () { return job().then(function (R) { return R && R.ok === false ? (R.r || R) : null; }); }, show: show });
+      var go = LX.SolveStep.action({ api: api, st: st, host: act, go: b, cls: "m6-fail", job: function () { return job().then(function (R) { return R && R.ok === false ? (R.r || R) : null; }); },
+        show: function () { st.set(""); paint(); show(); } });   // clear the loading line; redraw the stage with what is solved
       if (b) b.addEventListener("click", go);
       return go;
     }
@@ -436,8 +457,11 @@
     buildExplain(); paint();
     LX.demo(root, function (state) {
       if (state === "mid") { cards.go(1); return { view: "a cap" }; }
-      if (state === "frontier") { cards.go(2); return { view: "the frontier step" }; }
-      if (state === "buy") { cards.go(6); return { view: "the four purchases" }; }
+      if (state === "frontier" || state === "buy") {   // open the step and press its solve button, as a reader would
+        cards.go(state === "frontier" ? 2 : 6);
+        var b = cards.el.querySelectorAll(".m6-row .lx-btn")[0]; if (b) b.click();
+        return { view: state === "frontier" ? "the frontier traced" : "the four purchases compared" };
+      }
       return null;
     }, cards);
     root.lxLesson = { Y: Y, S: S, cards: cards, cache: cache };

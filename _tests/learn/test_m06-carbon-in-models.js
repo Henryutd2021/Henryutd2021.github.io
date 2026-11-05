@@ -263,7 +263,7 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
     const { env, load } = require("./stubdom.js");
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
-    ["solver", "cards", "controls", "plot", "profiles", "solvestep", "frontier", "formulate", "ledger", "boundary"].forEach(n => load(n, E));
+    ["solver", "cards", "controls", "plot", "profiles", "solvestep", "formulate", "ledger", "boundary"].forEach(n => load(n, E));
     let failing = true;
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
     slv.solve = m => { if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); return Promise.resolve(F.solve(m)); };
