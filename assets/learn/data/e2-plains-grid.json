@@ -320,38 +320,6 @@
     "life": 15,
     "hours": 4
    },
-   "wind": {
-    "label": "Wind cost",
-    "unit": "$/kW-year",
-    "def": 134,
-    "lo": 100,
-    "hi": 200,
-    "step": 1,
-    "basis": "EIA: $1,712/kW to build and $34.57/kW a year of upkeep, paid over 30 years at 4% real",
-    "src": [
-     "eia-aeo2026-emm",
-     "atb2025-fin"
-    ],
-    "capex": 1712,
-    "fom": 34.57,
-    "life": 30
-   },
-   "solar": {
-    "label": "Solar cost",
-    "unit": "$/kW-year",
-    "def": 109,
-    "lo": 82,
-    "hi": 164,
-    "step": 1,
-    "basis": "EIA (single-axis tracking): $1,484/kW to build and $23.60/kW a year of upkeep, paid over 30 years at 4% real",
-    "src": [
-     "eia-aeo2026-emm",
-     "atb2025-fin"
-    ],
-    "capex": 1484,
-    "fom": 23.6,
-    "life": 30
-   },
    "up": {
     "label": "Uprate cost",
     "unit": "$/kW-year",
@@ -379,7 +347,8 @@
   "deflator": {
    "2024": 125.43,
    "2025": 128.989
-  }
+  },
+  "bid": 500
  },
  "cf": {
   "wind": 0.338,
@@ -539,7 +508,7 @@
      "0.08 days a year (0.05 to 0.10)"
     ]
    ],
-   "note": "Precomputed with HiGHS on 5 November 2026; today's grid: 0.08 loss-of-load days a year. Without JavaScript, write the note on the reference plan from these numbers, naming the plan in words in place of a link."
+   "note": "Precomputed with this engine on 5 November 2026; today's grid: 0.08 loss-of-load days a year. Without JavaScript, write the note on the reference plan from these numbers, naming the plan in words in place of a link."
   },
   "c2base": {
    "100": {
@@ -619,18 +588,13 @@
    "plan": {
     "conn": 300,
     "flex": 0,
-    "bid": 500,
     "pk": 6,
     "bat": 0,
-    "wind": 0,
-    "solar": 0,
     "up": 300,
     "res": 250,
     "share": 50,
     "cpk": 74,
     "cbat": 179,
-    "cwind": 134,
-    "csolar": 109,
     "cup": 15
    },
    "A": {
@@ -776,18 +740,18 @@
    },
    "L": {
     "ll": {
-     "energy": 75492561.888,
+     "energy": 75492562,
      "rent": 0,
-     "uplift": 1198174.2390906482,
+     "uplift": 1198174.2190422476,
      "fixed": 14790935.991093121,
-     "total": 91481672.11818376
+     "total": 91481672.21013537
     },
     "oth": {
-     "energy": 628153490.1593441,
+     "energy": 628153490,
      "rent": 0,
-     "uplift": 9902683.946654,
+     "uplift": 9902683.780957753,
      "fixed": 11909064.008906879,
-     "total": 649965238.1149049
+     "total": 649965237.7898645
     },
     "b": {
      "energy": 606331926.70691,
@@ -797,9 +761,9 @@
      "total": 577655401.5458212
     },
     "parts": {
-     "energy": 21821563.452434063,
+     "energy": 21821563.293089986,
      "rent": 37542687.05760002,
-     "uplift": 1036522.0501427837,
+     "uplift": 1036521.8844465371,
      "fixed": 11909064.008906879
     },
     "N": 26700000,
@@ -807,17 +771,17 @@
     "Eoth": 21719924,
     "base": 577655401.5458212,
     "baseE": 21719924,
-    "delta": 72309836.56908369,
-    "perMWh": 3.3291938115936173,
-    "llPerMWh": 34.81037751833477,
-    "lo": 68563164.7460568,
-    "hi": 80606038.46292901
+    "delta": 72309836.24404335,
+    "perMWh": 3.32919379662854,
+    "llPerMWh": 34.81037755332396,
+    "lo": 68563164.42101645,
+    "hi": 80606038.13788867
    },
    "W": {
     "shed": 0,
-    "maxT": 45.425000000000004
+    "maxT": 45.43
    },
-   "co2": 6114567.238926539,
+   "co2": 6114567,
    "exemplars": {
     "title": "Two notes on the same brief",
     "task": "Recommend how much of the 300 MW connects this year, what to build so the grid stays adequate, and who pays.",
@@ -1014,6 +978,25 @@
      "cong": 2386
     }
    }
-  ]
+  ],
+  "c2today": {
+   "years": 400,
+   "seed": 2025,
+   "weather": [
+    "2025",
+    "2024"
+   ],
+   "lole": 0.0775,
+   "lolh": 0.3975,
+   "eue": 89.13515037372443,
+   "curtailHours": 0,
+   "curtailMWh": 0,
+   "se": 0.013846070169830464,
+   "ci": [
+    0.054723214570628884,
+    0.10027678542937112
+   ],
+   "lolDays": 31
+  }
  }
 }

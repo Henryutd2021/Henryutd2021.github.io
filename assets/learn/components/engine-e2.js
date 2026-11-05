@@ -138,36 +138,49 @@
     { id: "link", label: "Uprate Town–Metro", state: { ll: 300, llz: "T", tm: 800 }, note: "The 300 MW load and a Town–Metro limit of 800 MW" }
   ];
   // C2: the capstone's plan (builds, the link, reserves, the large load's connection and tariff, the cost ranges)
+  // C2: the capstone's plan. The fields that change the dispatch (DISPATCH) take only the values of the precomputed grid
+  // (each is a min, max and step: 2 x 2 x 4 x 2 x 2 x 2 = 128 plans; the library holds each plan's year, solved by this
+  // engine); the large load's share and the three costs (fixed ranges the reader sets) change only the ledger
+  var C2_DISPATCH = ["conn", "flex", "pk", "bat", "up", "res"];
   function c2Schema(cfg) {
     var C = cfg.c2, R = C.costs, f = [
-      { id: "conn", short: "c", type: "int", min: 0, max: 300, step: 50, def: 300, label: "Large load connected this year", unit: "MW" },
-      { id: "flex", short: "f", type: "int", min: 0, max: 50, step: 10, def: 0, label: "Share it can curtail", unit: "%" },
-      { id: "bid", short: "b", type: "int", min: 100, max: 2000, step: 50, def: 500, label: "It curtails when the price is above", unit: "$/MWh" },
-      { id: "pk", short: "k", type: "int", min: 0, max: 6, step: 1, def: 0, label: "New peakers at Prairie Town (50 MW each)", unit: "units" },
-      { id: "bat", short: "s", type: "int", min: 0, max: 400, step: 25, def: 0, label: "Battery at Prairie Town (4 hours)", unit: "MW" },
-      { id: "wind", short: "w", type: "int", min: 0, max: 1000, step: 50, def: 0, label: "New wind at Wind Ridge", unit: "MW" },
-      { id: "solar", short: "o", type: "int", min: 0, max: 500, step: 25, def: 0, label: "New solar at Prairie Town", unit: "MW" },
-      { id: "up", short: "u", type: "int", min: 0, max: 600, step: 50, def: 0, label: "Town–Metro uprate", unit: "MW" },
-      { id: "res", short: "r", type: "int", min: 100, max: 500, step: 50, def: 250, label: "Operating reserve required", unit: "MW" },
+      { id: "conn", short: "c", type: "int", min: 150, max: 300, step: 150, def: 300, label: "Large load connected this year", unit: "MW" },
+      { id: "flex", short: "f", type: "int", min: 0, max: 20, step: 20, def: 0, label: "Share it can curtail (above $" + C.bid + "/MWh)", unit: "%" },
+      { id: "pk", short: "k", type: "int", min: 0, max: 6, step: 2, def: 0, label: "New peakers at Prairie Town (50 MW each)", unit: "units" },
+      { id: "bat", short: "s", type: "int", min: 0, max: 100, step: 100, def: 0, label: "Battery at Prairie Town (4 hours)", unit: "MW" },
+      { id: "up", short: "u", type: "int", min: 0, max: 300, step: 300, def: 0, label: "Town–Metro uprate", unit: "MW" },
+      { id: "res", short: "r", type: "int", min: 150, max: 250, step: 100, def: 250, label: "Operating reserve required", unit: "MW" },
       { id: "share", short: "h", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Share of new costs the large load pays", unit: "%" }];
-    ["pk", "bat", "wind", "solar", "up"].forEach(function (k) {
+    ["pk", "bat", "up"].forEach(function (k) {
       var r = R[k];
       f.push({ id: "c" + k, short: "c" + k, type: "int", min: r.lo, max: r.hi, step: r.step, def: r.def, label: r.label, unit: r.unit });
     });
     return { key: "c2", version: 1, title: "C2 plan", fields: f };
   }
+  // every plan of the grid, in a fixed order (the library's), each with the schema's defaults for the other fields
+  function c2Grid(S, def) {
+    var out = [{}];
+    C2_DISPATCH.forEach(function (k) {
+      var f = S.fields.filter(function (x) { return x.id === k; })[0], vals = [], nx = [];
+      for (var v = f.min; v <= f.max + 1e-9; v += f.step) vals.push(v);
+      out.forEach(function (o) { vals.forEach(function (v2) { var p = {}; for (var q in o) p[q] = o[q]; p[k] = v2; nx.push(p); }); });
+      out = nx;
+    });
+    return out.map(function (o) { var p = {}, q; for (q in def) p[q] = def[q]; for (q in o) p[q] = o[q]; return p; });
+  }
+  function c2Key(st) { return C2_DISPATCH.map(function (k) { return k + st[k]; }).join("-"); }
   var c2presets = [
-    { id: "ask", label: "Connect it, build nothing", state: { conn: 300, flex: 0, pk: 0, bat: 0, wind: 0, solar: 0, up: 0 }, note: "The 300 MW request on today's grid" },
+    { id: "ask", label: "Connect it, build nothing", state: { conn: 300, flex: 0, pk: 0, bat: 0, up: 0 }, note: "The 300 MW request on today's grid" },
     { id: "firm", label: "Peakers and an uprate", state: { conn: 300, flex: 0, pk: 6, bat: 0, up: 300 }, note: "Six 50 MW peakers at Town and 300 MW more on Town–Metro" },
-    { id: "flex", label: "Flexible load and a battery", state: { conn: 300, flex: 20, bid: 500, pk: 0, bat: 100, up: 0 }, note: "20% curtailable above $500/MWh, and a 100 MW battery" },
+    { id: "flex", label: "Flexible load and a battery", state: { conn: 300, flex: 20, pk: 0, bat: 100, up: 0 }, note: "20% curtailable above $500/MWh, and a 100 MW battery" },
     { id: "staged", label: "Stage it: 150 MW now", state: { conn: 150, flex: 0, pk: 0, bat: 0, up: 0 }, note: "Half the request this year, the rest later" }
   ];
   // the system a plan describes: { ll, llz, flex (share), bid, caps, res, gas, extra (built peakers), bat, add (wind, solar) }
   function sysOf(st, P) {
     var C = P.cfg.c2;
     if (st.conn != null) {   // C2
-      var s = { kind: "c2", ll: st.conn, llz: "T", flex: st.flex / 100, bid: st.bid, caps: { WT: linkCap(P, "WT"), TM: linkCap(P, "TM") + st.up }, res: st.res, gas: P.cfg.fuels.gas.price,
-        extra: [], bat: null, add: { W: { wind: st.wind, solar: 0 }, T: { wind: 0, solar: st.solar }, M: { wind: 0, solar: 0 } } };
+      var s = { kind: "c2", ll: st.conn, llz: "T", flex: st.flex / 100, bid: C.bid, caps: { WT: linkCap(P, "WT"), TM: linkCap(P, "TM") + st.up }, res: st.res, gas: P.cfg.fuels.gas.price,
+        extra: [], bat: null, add: null };
       if (st.pk > 0) { var u = {}; for (var k in C.peaker) u[k] = C.peaker[k]; u.n = st.pk; s.extra.push(u); }
       if (st.bat > 0) s.bat = { zone: "T", mw: st.bat, hours: C.battery.hours, eff: C.battery.eff };
       return s;
@@ -352,6 +365,7 @@
       var less = wk.filter(function (x) { return dateOf(x.day).m === r.month; }).length;
       return { y: r.year, day: r.day, carry: false, weight: r.weight - less, rep: true, label: dayLong(r.day) };
     }).concat(wk);
+    if (task === "day") return [];   // solve() fills in opts.only
     var p = P.periods[state.per] || P.periods[P.periodList[0]], o = [];
     for (var k = 0; k < p.days; k++) o.push({ y: String(p.year), day: p.day0 + k, carry: k > 0, period: p.id, label: dayLong(p.day0 + k) });
     return o;
@@ -361,7 +375,7 @@
     var task = opts.task || (state.conn != null ? "year" : "period"), attempt = opts.attempt || 1;
     var limit = opts.timeLimit != null ? opts.timeLimit : (attempt > 1 ? 10 : 3);
     var call = opts.solver || (typeof window !== "undefined" && window.LX && window.LX.solver ? function (m, so) { return window.LX.solver.solve(m, so); } : null);
-    var t0 = Date.now(), sys = sysOf(state, P), days = daysOf(state, P, task), raw = { task: task, state: state, sys: sys, days: [], solves: [] };
+    var t0 = Date.now(), sys = sysOf(state, P), days = opts.only ? [{ y: String(opts.only.y), day: opts.only.day, carry: false, label: dayLong(opts.only.day) }] : daysOf(state, P, task), raw = { task: task, state: state, sys: sys, days: [], solves: [] };
     function fail(e) { return { status: "error", ok: false, kind: "milp", message: "The run failed before it gave an answer" + (e && e.message ? " (" + e.message + ")." : "."), results: null, mipGap: null }; }
     if (!call) return Promise.resolve(fail(new Error("no solver")));
     function one(model, label, gap) {
@@ -404,7 +418,7 @@
       if (RANK[res.status] === 2) {
         var lim = (limit >= 1 ? Math.round(limit) : limit) + " s";
         res.message = res.results
-          ? "Stopped at the " + lim + " time limit on at least one day: the commitment shown is the best found so far" + (gap != null ? ", within " + (gap * 100).toFixed(2) + "% of the best bound" : "") + ". It is not proven optimal, and its prices are conditional on it. Try again gives the solver more time."
+          ? "Stopped at the " + lim + " time limit" + (n > 1 ? " on at least one day" : "") + ": the commitment shown is the best found so far" + (gap != null ? ", within " + (gap * 100).toFixed(2) + "% of the best bound" : "") + ". It is not proven optimal, and its prices are conditional on it. Try again gives the solver more time."
           : "Stopped at the " + lim + " time limit on " + (raw.failed ? raw.failed.day.label : "a day") + " before any commitment was found, so no result is shown. Try again gives the solver more time.";
       } else if (res.status === "optimal") {
         res.message = "Done: " + what + ", each committed by a mixed-integer program (reported optimal) and priced by the dispatch linear program with that commitment fixed.";
@@ -595,7 +609,7 @@
 
   var E2 = { VERSION: 1, MD: MD, MON: MON, MONTHS: MONTHS, TIE: TIE, dayIndex: dayIndex, dateOf: dateOf, dayLabel: dayLabel, dayLong: dayLong, hh: hh,
     prepare: prepare, runCost: runCost, nlCost: nlCost, co2Run: co2Run, co2NL: co2NL, fleet: fleet, hourInputs: hourInputs, tieOf: tieOf,
-    schema: schema, sb2Schema: sb2Schema, c2Schema: c2Schema, presets: presets, c2presets: c2presets, sysOf: sysOf, linkCap: linkCap,
+    schema: schema, sb2Schema: sb2Schema, c2Schema: c2Schema, c2Grid: c2Grid, c2Key: c2Key, C2_DISPATCH: C2_DISPATCH, presets: presets, c2presets: c2presets, sysOf: sysOf, linkCap: linkCap,
     dayModel: dayModel, commitment: commitment, carry: carry, readDay: readDay, daysOf: daysOf, solve: solve, worst: worst, summarize: summarize,
     priceSlopes: priceSlopes, fallback: fallback, inputsHTML: inputsHTML, escH: escH, deficit: deficit, slackT: slackT, adequacy: adequacy, adequacyResult: adequacyResult,
     money: money, kilo: kilo, mwh: mwh, priceTxt: priceTxt, millions: millions };
