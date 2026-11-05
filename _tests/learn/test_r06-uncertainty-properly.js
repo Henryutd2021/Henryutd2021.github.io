@@ -8,8 +8,13 @@
 //   - every number the page states: facts() against an independent recomputation; differences shown beside rounded values
 //     equal the difference of the rounded values; the band's feedback true in every state; Monte Carlo error below the
 //     rounding step; the rank order of the inputs; the EVPI toy
-//   - the rewrite checks: the examples pass their own checks, an empty text passes none, the claim fails "no bare will"
-//   - the no-JS blocks equal the model's (--write rewrites them); text budget; links on allow-listed hosts; no out-of-scope words
+//   - the rewrite checks: the examples pass their own checks, an empty text passes none, the claim fails "no bare will";
+//     "about 9 in 10" and "about 8 in 10" in the examples are the runs' own shares
+//   - what the page says about its own assumptions (W4 review, 2026-11-05): the sampling rule (independent, equal odds) wherever
+//     it samples; illustrative ranges never given a data source; the flowchart samples only with odds; the plan counts a row
+//     only with the reader's own treatment; the checklist keeps scenario and bounded routes open
+//   - the no-JS blocks equal the model's (--write rewrites them); text budget for every element, feedback and example line;
+//     links on allow-listed hosts; no out-of-scope words
 // Usage (from the site folder):  node _tests/learn/test_r06-uncertainty-properly.js [--write]
 "use strict";
 const fs = require("fs");
@@ -32,7 +37,7 @@ const M = R.prepare(D, Y), F = R.facts(M);
 const rich = s => CORE.rich(s);
 const BLOCKS = {
   "r06-task": () => R.staticTask(D, M),
-  "r06-exemplars": () => EX.staticHTML(R.exemplarsSpec(D, F)) + "\n" + R.kindsHTML(D),
+  "r06-exemplars": () => EX.staticHTML(R.exemplarsSpec(D, F)) + "\n" + R.planRowsHTML(D) + "\n" + R.kindsHTML(D) + "\n" + R.flowHTML(),
   "r06-rubric": () => RB.staticHTML(D.rubric.competences) + '\n<p class="lx-eyebrow">An uncertainty check for your own study</p>\n<ul>'
     + D.checklist.map(c => "<li><b>" + R.rich(c.label) + ":</b> " + R.rich(c.text) + "</li>").join("") + "</ul>"
 };
@@ -154,8 +159,17 @@ ok(F.cNew === String(r5(IND.c.p50) + 60), "the what-if median: " + F.c50 + " + 6
 
 // ---------------- the rewrite checks
 {
-  const ex = R.fillDeep(D.rewrite.examples, F);
+  const ex = {}; ["paper", "board", "public"].forEach(id => { ex[id] = R.exText(D, id, F); });
   ["paper", "board", "public"].forEach(id => ok(R.rwChecks(D, id, ex[id]).every(c => c.ok), id + " example passes its own checks: " + R.rwChecks(D, id, ex[id]).filter(c => !c.ok).map(c => c.label).join("; ")));
+  ["paper", "board", "public"].forEach(id => ok(R.exLines(D, id, F).length >= 3 && R.exLines(D, id, F).every(x => x.k && x.v && !/\{/.test(x.v)), id + " example: labelled sentences, filled"));
+  // "about 9 in 10 model runs below" the rounded P90, and "about 8 in 10" between the rounded P10 and P90
+  const share = (v, lo, hi) => v.filter(x => x > lo && x < hi).length / v.length;
+  const vc = runs("central", "hours", false), vf = runs("fast", "hours", false);
+  ok(near(share(vc, -Infinity, +F.c90), 0.9, 0.04) && near(share(vf, -Infinity, +F.f90), 0.9, 0.04) && /about 9 in 10 model runs/.test(ex.board), "board: about 9 in 10 runs below " + F.c90 + " (" + (100 * share(vc, -Infinity, +F.c90)).toFixed(1) + "%) and below " + F.f90 + " (" + (100 * share(vf, -Infinity, +F.f90)).toFixed(1) + "%)");
+  ok(near(share(vc, +F.c10, +F.c90), 0.8, 0.04) && /about 8 in 10 of our model runs/.test(ex.public), "public: about 8 in 10 central runs between " + F.c10 + " and " + F.c90 + " (" + (100 * share(vc, +F.c10, +F.c90)).toFixed(1) + "%)");
+  ok(/central car uptake/.test(ex.paper) && /central car uptake/.test(ex.board) && /middle pace/.test(ex.public) && /compared with 450 in 2025/.test(ex.public) && !/today/.test(ex.public + ex.board), "each example keeps its case and dates the 450 MW to 2025");
+  ok(/higher values are possible/.test(ex.public) && /reliability target and the cost of falling short/.test(ex.board) && !/^Plan for/.test(ex.board), "public: higher outcomes possible; board: a percentile is not a plan by itself");
+  ok(/constant 60 MW would raise each figure by 60 MW/.test(ex.board), "board: the what-if's load shape (constant) stated with its effect");
   ok(R.words(ex.public) <= 60, "public example at most 60 words (" + R.words(ex.public) + ")");
   ["paper", "board", "public"].forEach(id => ok(R.rwChecks(D, id, "").every(c => !c.ok), id + ": an empty text passes no check"));
   const claim = R.fill(D.study.claim, F);
@@ -163,10 +177,31 @@ ok(F.cNew === String(r5(IND.c.p50) + 60), "the what-if median: " + F.c50 + " + 6
   ok(!R.rwChecks(D, "public", "Between 480 and 535 MW: P10 to P90 of Monte Carlo runs.").find(c => c.id === "plain").ok, "jargon is caught in the public version");
   ok(R.rwChecks(D, "paper", "The 2035 peak is 480 to 535 MW").find(c => c.id === "range").ok && R.rwChecks(D, "paper", "480–535 MW").find(c => c.id === "range").ok, "ranges written with 'to' or a dash both count");
   ok(/P10–P90/.test(ex.paper) && ex.paper.indexOf(F.c10 + "–" + F.c90) >= 0 && ex.board.indexOf(F.c90 + " MW") >= 0 && ex.public.indexOf(F.c10 + " to " + F.c90) >= 0, "examples quote the model's bands");
+  ok(/independently, with equal odds across each range/.test(ex.paper), "paper example states the sampling assumption");
 }
-// the reader's plan
-ok(R.planDone([{ u: "a", kind: "deep" }, { u: "b", kind: "" }, { u: "", kind: "scenario" }, { u: "c", kind: "choice" }]) === 2, "plan: a row counts when it has an uncertainty and a pile");
-ok(/1\. Growth \| Parameter \| Range from data/.test(R.planText(D, [{ u: "Growth", kind: "parameter", how: "" }])), "plan text: the pile's treatment fills an empty treatment");
+// the reader's plan: a row counts only with all three parts; the pile's suggestion never enters the copied plan
+ok(R.planDone([{ u: "a", kind: "deep", how: "what-if" }, { u: "b", kind: "", how: "x" }, { u: "", kind: "scenario", how: "x" }, { u: "c", kind: "choice", how: "" }, { u: "d", kind: "choice", how: "  " }]) === 1, "plan: a row counts only with an uncertainty, a pile and a treatment");
+ok(R.planDone([{ u: "a", kind: "parameter" }, { u: "b", kind: "deep" }, { u: "c", kind: "choice" }]) === 0, "plan: three rows with blank treatments are not complete");
+{ const t = R.planText(D, [{ u: "Growth", kind: "parameter", how: "" }]);
+  ok(/1\. Growth \| Parameter \| \(treatment: to write\)/.test(t) && Object.keys(D.plan.kindHint).every(k => t.indexOf(D.plan.kindHint[k]) < 0), "plan text: an empty treatment reads '(treatment: to write)', never a suggestion"); }
+ok(/Three complete rows finish here/.test(JS) && /"Suggestion: " \+ D\.plan\.kindHint/.test(JS), "plan step: complete rows finish it; the suggestion is a labelled placeholder");
+ok(D.plan.examples.rows.length === 2 && D.plan.examples.rows.map(r => r.key).join() === "weak,good" && R.planRowsHTML(D).indexOf("Strong row") >= 0, "a weak and a strong plan row, as exemplars of the plan");
+
+// ---------------- what the page says about its own assumptions
+{
+  const sampling = /drawn independently,? with equal odds across (its|each) range/;
+  ok(sampling.test(JS) && sampling.test(PAGE) && sampling.test(EX.plain(R.exemplarsSpec(D, F).answers[1])) && sampling.test(D.meta.note) && sampling.test(R.staticTask(D, M)), "the sampling assumption is stated in the step, the data note, the strong answer, the meta note and the no-JS band");
+  const whys = D.cards.map(c => c.why).join(" ") + R.FLOW.traces.map(t => t.text).join(" ");
+  ok(!/meter data bound|ten years of|range from data|from driving surveys or meter data: sample/.test(whys) && /illustrative/.test(cards("growth").why + cards("kwh").why + cards("heat").why), "no invented data source for the illustrative ranges");
+  ok(/Odds you can defend/.test(R.FLOW.nodes.q3.t) && /Bounds/.test(R.FLOW.nodes.q4.t) && /no odds/.test(R.FLOW.nodes.a4.s), "flowchart: sampling needs defensible odds; bounds go side by side with no odds");
+  ok(/accepts three car-uptake storylines but no odds/.test(D.study.assume) && /could move pile/.test(D.study.assume) && R.staticTask(D, M).indexOf(R.rich(D.study.assume)) >= 0 && /A different pile is fair if you can give the reason/.test(R.sortSaw({ right: 12, total: 12 }).text), "the sort's assumptions stated; another pile is fair with a reason");
+  ok(/constant 60 MW/.test(D.model.newLoad.label) && /constant 60 MW/.test(JS), "the what-if names its load shape (a constant 60 MW)");
+  const cl = {}; D.checklist.forEach(c => { cl[c.id] = c; });
+  ok(/if sampled/.test(cl.together.label) && /scenario envelope or a bounded case/.test(cl.ranges.text), "checklist: sampling lines conditional; scenario and bounded routes allowed (rubric: scenario or global sensitivity)");
+  ok(!/fixed but unknown/.test(PAGE) && /assumes one constant growth rate/.test(PAGE), "go deeper: the model's constant rate, not a fixed true rate");
+  ok(/with bounds only, compare low and high cases/.test(D.plan.kindHint.parameter) && /with bounds only, compare low and high cases/.test(PAGE), "bounds only: compare cases, no probabilities");
+}
+function cards(id) { return D.cards.find(c => c.id === id); }
 
 // ---------------- exemplars, page, blocks
 const spec = R.exemplarsSpec(D, F);
@@ -183,6 +218,7 @@ ok(/1,000 runs, seed 6/.test(PAGE) && /16:00 on 29 July 2025/.test(PAGE) && /450
 ok(/33 to 66%/.test(PAGE) && /42%/.test(PAGE), "sourced numbers on the page");
 ok(!/\[\[/.test(R.staticTask(D, M) + R.kindsHTML(D)), "no-JS blocks: glossary marks become term spans");
 ok(D.cards.every(c => R.staticTask(D, M).indexOf(R.rich(c.text).replace(/&amp;/g, "&amp;")) >= 0), "no-JS task: every card");
+ok(!/<dt>Which treatment\?<\/dt>/.test(PAGE) && PAGE.indexOf(R.flowHTML()) >= 0, "the flowchart's no-JS version is the generated question-action rows");
 // links, scope, Henry's research
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const urls = (OWN + JSON.stringify(D) + JS).match(/https?:\/\/[^\s"'<>)\\]+/g) || [];
@@ -199,6 +235,24 @@ D.cards.forEach(c => { ok(words(c.text) <= 18, c.id + ": a short card (" + words
 D.treatments.forEach(t => t.options.forEach(o => { ok(words(o.why) <= 35, t.id + "/" + o.id + ": reason at most 35 words (" + words(o.why) + ")"); ok(words(o.text) <= 30, t.id + "/" + o.id + ": option at most 30 words"); }));
 D.kindsTable.forEach(r => ["what", "here", "treat", "say"].forEach(k => ok(words(r[k]) <= 25, r.kind + "/" + k + ": at most 25 words")));
 R.FLOW.traces.forEach(t => ok(words(t.text) <= 35, "flowchart trace " + t.label + ": at most 35 words"));
+["paper", "board", "public"].forEach(id => R.exLines(D, id, F).forEach((x, i) => ok(words(x.v) <= 35, id + " example line " + (i + 1) + ": at most 35 words (" + words(x.v) + ")")));
+ok(words(R.exText(D, "public", F)) <= 60, "public example: at most 60 words in all (" + words(R.exText(D, "public", F)) + ")");
+D.rewrite.fields.forEach(f => ok(words(f.hint) <= 30, f.id + " hint: at most 30 words"));
+Object.keys(D.plan.kindHint).forEach(k => ok(words(D.plan.kindHint[k]) <= 30, "suggestion " + k + ": at most 30 words (" + words(D.plan.kindHint[k]) + ")"));
+D.plan.examples.rows.forEach(r => ["u", "how", "note"].forEach(k => ok(words(r[k]) <= 30, "plan row " + r.key + "/" + k + ": at most 30 words")));
+ok(words(D.study.assume) <= 35 && words(R.KEY) <= 35, "the sort's assumptions and the chart key: at most 35 words each");
+D.checklist.forEach(c => ok(words(c.text) <= 25, "checklist " + c.id + ": at most 25 words"));
+{ let all = true; const long = [];
+  ["slow", "central", "fast", "all"].forEach(sc => ["peaks", "hours"].forEach(f => [false, true].forEach(p => [false, true].forEach(w => { const t = R.bandSaw(M, { params: p, scen: sc, form: f, whatif: w }).text; if (words(t.replace(/\*\*/g, "")) > 40) { all = false; long.push(words(t)); } }))));
+  ok(all, "band feedback: every state at most 40 words (" + long.join(", ") + ")"); }
+[0, 6, 12].forEach(n => ok(words(R.sortSaw({ right: n, total: 12 }).text.replace(/\*\*/g, "")) <= 40, "sort feedback at most 40 words"));
+{ const fl = R.flowHTML().match(/<tr><th scope="row">[\s\S]*?<\/tr>/g) || [];
+  ok(fl.length === 5, "flowchart fallback: four questions and 'none of these', one row each (" + fl.length + ")");
+  fl.forEach((r, i) => ok(words(r.replace(/<[^>]+>/g, " ")) <= 20, "flowchart fallback row " + (i + 1) + ": at most 20 words")); }
+// every paragraph of the myth answers, the task card's hints and the Go deeper bullets
+(PAGE.match(/<details class="lx-answer">[\s\S]*?<\/details>/g) || []).forEach((a, i) => (a.match(/<p[^>]*>[\s\S]*?<\/p>/g) || []).forEach(p => ok(words(p.replace(/<[^>]+>/g, " ")) <= 35, "myth answer " + (i + 1) + ": each paragraph at most 35 words (" + words(p.replace(/<[^>]+>/g, " ")) + ")")));
+(PAGE.slice(PAGE.indexOf('<div class="lx-card lx-studio-brief">'), PAGE.indexOf('<div class="lx-interactive')).match(/<(li|p class="lx-hint")>[\s\S]*?<\/(li|p)>/g) || []).forEach((p, i) => ok(words(p.replace(/<[^>]+>/g, " ")) <= 40, "task card line " + (i + 1) + ": at most 40 words (" + words(p.replace(/<[^>]+>/g, " ")) + ")"));
+(PAGE.match(/<div class="lx-deeper-body">[\s\S]*?<\/div>/g) || []).forEach((b, i) => (b.match(/<li>[\s\S]*?<\/li>/g) || []).forEach(l => ok(words(l.replace(/<[^>]+>/g, " ")) <= 40, "go deeper " + (i + 1) + " bullet: at most 40 words (" + words(l.replace(/<[^>]+>/g, " ")) + ")")));
 { const dn = (PAGE.match(/<p class="lx-datanote">[\s\S]*?<\/p>/) || [""])[0].split(/<br>/).map(r => r.replace(/<[^>]+>/g, " "));
   ok(dn.length >= 3, "data note in labelled rows"); dn.forEach((r, i) => ok(words(r) <= 35, "data note row " + (i + 1) + ": at most 35 words (" + words(r) + ")")); }
 {

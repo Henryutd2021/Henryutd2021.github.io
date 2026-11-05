@@ -2465,6 +2465,12 @@
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
  },
+ "spp": {
+  "term": "SPP (Southwest Power Pool)",
+  "short": "The regional grid operator that runs the transmission grid and wholesale electricity market across much of the central U.S.; the course's hourly data come from its area (EIA-930).",
+  "lesson": "R8",
+  "href": "r08-communicating.html"
+ },
  "staged-energization": {
   "term": "Staged energization",
   "short": "Switching on part of a large load's grid service early and the rest later, as the grid becomes ready.",
