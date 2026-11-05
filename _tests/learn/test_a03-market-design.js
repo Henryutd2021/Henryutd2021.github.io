@@ -1,11 +1,15 @@
 // test_a03-market-design.js — Node tests for Analyst lesson A3 (assets/learn/a03-market-design.js): the costs are lesson
 // 7's; each hour clears as stated (merit order, the scarcity adder, the cap when short, dispatch equal to demand); the
 // year's numbers, the solar sweep, which new plants cover their costs, the energy-only resting point and the capacity
-// market's price match the page; the claims hold over every slider setting a card can produce; the five arrangements
-// carry sources on the allow-list; no design is called best; every number on the page is accounted for; and the page
-// mounts and runs its eight cards on a stub document.
+// market's price match the page; the displayed equations reproduce the model in every hour (the cap when short, the
+// adder's floor, the credit in renewable margins, the capacity price's floor); scarcity hours include the hours short;
+// the claims hold over every slider setting a card can produce; step 3's solar stays in step 3 and later steps say so;
+// the five arrangements carry dated sources on the allow-list, and the no-JS page lists them; no design is called
+// best; every displayed note keeps the text budget; the unexpected-number scan finds no number nobody accounted for (it
+// does not prove what a number means: the statements do); and the page mounts and runs its eight cards on a stub
+// document.
 // Usage (from the site folder):  node _tests/learn/test_a03-market-design.js [--write]
-//   --write rewrites the no-JS table in learn/a03-market-design.qmd and the reference block of data/a03-market-design.json
+//   --write rewrites the no-JS tables in learn/a03-market-design.qmd and the reference block of data/a03-market-design.json
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -21,7 +25,7 @@ const { usd, usd0, int, pct, mwday } = M.fm;
 const G = D.market, S0 = G.solar.value, C0 = G.peakers.value;
 const EO = M.year(D, X, { solar: S0, ct: C0, design: "eo" }), CM = M.year(D, X, { solar: S0, ct: C0, design: "cm" });
 const NOON = M.hour(D, X, M.hourOf(D.hours[0]), { solar: S0, ct: C0, design: "eo" }), EVE = M.hour(D, X, M.hourOf(D.hours[1]), { solar: S0, ct: C0, design: "eo" });
-const RP = M.restingPoint(D, X, S0);
+const RP = M.restingPoint(D, X, S0), STAY = M.upkeepPoint(D, X, S0);
 const SOL = []; for (let s = G.solar.min; s <= G.solar.max; s += G.solar.step) SOL.push(M.year(D, X, { solar: s, ct: C0, design: "eo" }));
 const reference = {
   about: "Written by node _tests/learn/test_a03-market-design.js --write at the defaults (1,200 MW of solar, 700 MW of peakers) and checked on every run.",
@@ -29,19 +33,28 @@ const reference = {
   eo: { avg: +EO.avg.toFixed(4), neg: EO.neg, scarce: EO.scarce, short: EO.short, top: +EO.top.toFixed(2), consumer: +EO.consumer.toFixed(4) },
   cm: { avg: +CM.avg.toFixed(4), capPrice: +CM.capPrice.toFixed(4), consumer: +CM.consumer.toFixed(4), top: +CM.top.toFixed(2) },
   noon: { price: +NOON.price.toFixed(2), spare: +NOON.spare.toFixed(1) }, eve: { price: +EVE.price.toFixed(2), spare: +EVE.spare.toFixed(1), adder: +EVE.adder.toFixed(2) },
-  resting: { pays: RP.below.ct, fails: RP.above.ct, shortAtPays: RP.below.r.short }
+  resting: { pays: RP.below.ct, fails: RP.above.ct, shortAtPays: RP.below.r.short, stays: STAY }
 };
 const NAMES = { wind: "Wind farm", solar: "Solar farm", cc: "Gas combined cycle", ct: "Gas peaker" };
 function staticTable() {
   const row = k => `<tr><td>${NAMES[k]}</td><td>${usd0(X.fixed[k])}</td><td>${usd0(EO.perKW[k])}</td><td>${usd0(CM.perKW[k] + CM.capPrice * D.designs.ratings[k])}</td></tr>`;
-  return [`<table class="a3-static" aria-label="What a new plant earns per kW a year against its fixed cost, with 1,200 MW of solar and 700 MW of peakers">`,
-    `<thead><tr><th scope="col">New plant</th><th scope="col">Fixed cost ($/kW a year)</th><th scope="col">Earns, energy-only</th><th scope="col">Earns, capacity market</th></tr></thead>`,
+  return [`<table class="a3-static" aria-label="Each new plant's margin after running costs per kW a year against its fixed cost, with 1,200 MW of solar and 700 MW of peakers">`,
+    `<thead><tr><th scope="col">New plant</th><th scope="col">Fixed cost ($/kW a year)</th><th scope="col">Margin after running costs, energy-only</th><th scope="col">Margin with the payment, simplified capacity market</th></tr></thead>`,
     `<tbody>`, ...["wind", "solar", "cc", "ct"].map(row), `<tr><td>Consumers pay ($/MWh)</td><td>–</td><td>${usd(EO.consumer)}</td><td>${usd(CM.consumer)}</td></tr>`, `</tbody></table>`].join("\n");
 }
-const BLOCK = /(<!-- a3-table:start[^>]*-->\n)([\s\S]*?)(<!-- a3-table:end -->)/;
+// the five arrangements for readers without JavaScript: where, how capacity is paid for, dated sources
+const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const richH = t => escH(t).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, '<span class="lx-term" data-term="$1">$2</span>');
+function worldTable() {
+  const src = x => x.url ? `<a href="${x.url}">${escH(x.label)}</a>` : escH(x.label);
+  return [`<table class="a3-static a3-world" aria-label="Five arrangements around the world: how each pays for enough capacity, with dated sources">`,
+    `<thead><tr><th scope="col">Where</th><th scope="col">How capacity is paid for</th><th scope="col">Sources</th></tr></thead>`, `<tbody>`,
+    ...D.world.map(w => `<tr><td>${escH(w.label)}</td><td>${richH(w.how)} ${richH(w.facts)}</td><td>${w.sources.map(src).join("; ")}</td></tr>`), `</tbody></table>`].join("\n");
+}
+const BLOCK = /(<!-- a3-table:start[^>]*-->\n)([\s\S]*?)(<!-- a3-table:end -->)/, WBLOCK = /(<!-- a3-world:start[^>]*-->\n)([\s\S]*?)(<!-- a3-world:end -->)/;
 if (process.argv.includes("--write")) {
   D.reference = reference; fs.writeFileSync(DPATH, JSON.stringify(D, null, 2) + "\n");
-  let q = fs.readFileSync(QPATH, "utf8"); q = q.replace(BLOCK, (m, a, b, c) => a + staticTable() + "\n" + c); fs.writeFileSync(QPATH, q);
+  let q = fs.readFileSync(QPATH, "utf8"); q = q.replace(BLOCK, (m, a, b, c) => a + staticTable() + "\n" + c).replace(WBLOCK, (m, a, b, c) => a + worldTable() + "\n" + c); fs.writeFileSync(QPATH, q);
   console.log("reference block and no-JS table written"); D = JSON.parse(fs.readFileSync(DPATH, "utf8"));
 }
 const QMD = fs.readFileSync(QPATH, "utf8"), JS = fs.readFileSync(path.join(SITE, "assets/learn/a03-market-design.js"), "utf8");
@@ -75,6 +88,28 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     sum += h.price;
   }
   ok(bad === 0 && near(sum / 8760, EO.avg, 1e-9), "clearing: dispatch meets demand, the price is the last offer, plus the adder below 600 MW spare, the cap when short (" + bad + " bad)");
+  // the page's equations (Go deeper · Modeler) give the model's price in every hour of every slider fleet, both designs,
+  // including shortage hours (the cap, never above it)
+  let eq = 0, over = 0, nShort = 0;
+  for (let c = G.peakers.min; c <= G.peakers.max; c += G.peakers.step) ["eo", "cm"].forEach(dz => {
+    const cap = D.designs[dz].cap;
+    for (let t = 0; t < 8760; t++) {
+      const h = M.hour(D, X, t, { solar: S0, ct: c, design: dz }), sp = h.spare;
+      const pEq = sp < 0 ? cap : h.offer + (cap - h.offer) * Math.pow(Math.max(0, 1 - sp / 600), 2);
+      if (!near(h.price, pEq, 1e-9)) eq++; if (h.price > cap + 1e-9) over++; if (sp < 0) nShort++;
+    }
+  });
+  ok(eq === 0 && over === 0 && nShort > 0 && /With \$s_t < 0\$, demand exceeds supply: \$p_t = \\bar p\$/.test(QMD) && /\\max\(0, 1 - s_t\/600\)\^2/.test(QMD), "equations: the page's price formula, with its shortage branch, equals the model in every hour of every fleet (" + nShort + " shortage hours checked); no price above the cap");
+  // margins: wind and solar earn the credit too, as the page's equation says
+  const wm = (() => { let m = 0; for (let t = 0; t < 8760; t++) { const h = M.hour(D, X, t, { solar: S0, ct: C0, design: "eo" }); m += (h.price + G.credit) * h.Wd; } return m; })();
+  ok(near(EO.perKW.wind, wm / (G.windMW * 1000), 1e-9) && /\\sum_t \(p_t \+ 25\)\\,q_t\$, the credit included/.test(QMD), "equations: wind's margin is the sum of (price + $25 credit) × output, as the page says");
+  // the capacity price's floor: a peaker whose energy margin already covers its fixed cost gets no payment
+  const Xlow = Object.assign({}, X, { fixed: Object.assign({}, X.fixed, { ct: 1 }) }), low = M.year(D, Xlow, { solar: S0, ct: C0, design: "cm" });
+  ok(low.capPrice === 0 && low.perKW.ct > 1 && /\\max\(0, F - \\pi\)\/0\.93\$/.test(QMD), "equations: the capacity price never goes below zero (max(0, F − π)/0.93)");
+  // scarcity hours include the hours short (a shortage hour is priced at the cap, with no adder)
+  const y4 = M.year(D, X, { solar: S0, ct: 400, design: "eo" });
+  let adderOnly = 0; for (let t = 0; t < 8760; t++) { const h = M.hour(D, X, t, { solar: S0, ct: 400, design: "eo" }); if (h.adder > 0) adderOnly++; }
+  ok(y4.short === 20 && adderOnly === 409 && y4.scarce === 429, "scarcity hours at 400 MW of peakers: 409 with an adder + 20 short = 429");
   ok(near(NOON.price, -25) && NOON.W + NOON.S > NOON.d && NOON.marginal === "ren", "spring midday: wind and sun exceed demand; price −$25.00");
   ok(EVE.marginal === "ct" && int(EVE.spare) === "401" && usd(EVE.price) === "$586.76" && usd(EVE.adder) === "$547.40" && D.hours[1].date === read("town_days.json").days.summer_peak.date, "summer evening (SPP's 2025 peak day): 401 MW spare, $586.76, adder $547.40");
   const sq = 1 - 401 / 600, q = 39.37 + 4960.63 * Math.round(sq * sq * 1000) / 1000;
@@ -91,9 +126,17 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   ok(SOL.filter(r => r.o.solar >= 2800).every(r => r.solarCapture < s1200.solarCapture && r.neg > s1200.neg), "step 3: its message is true for every value that opens Next (2,800 and 3,200 MW)");
   ok(EO.covers.ct < 0 && usd0(-EO.covers.ct) === "$25" && EO.covers.wind > 0 && EO.covers.solar > 0 && EO.covers.cc > 0, "energy-only at 700 MW: a new peaker falls $25 short; wind, solar and gas CC cover their costs");
   ok(RP.below.ct === 600 && RP.above.ct === 700 && RP.below.r.short === 2 && RP.below.r.covers.ct >= 0, "resting point: a new peaker pays at 600 MW, not at 700; 2 hours short at 600");
+  ok(STAY === 900 && near(X.fom.ct, 7.18) && M.year(D, X, { solar: S0, ct: 900, design: "eo" }).perKW.ct >= 7.18 && M.year(D, X, { solar: S0, ct: 1000, design: "eo" }).perKW.ct < 7.18 && usd0(EO.perKW.ct - X.fom.ct) === "$41", "upkeep: an existing peaker covers its $7.18 upkeep up to 900 MW, not at 1,000; at 700 MW it has $41 per kW a year over upkeep");
+  let ups = true; for (let c = G.peakers.min; c <= G.peakers.max; c += G.peakers.step) { const r = M.year(D, X, { solar: S0, ct: c, design: "eo" }); if ((c <= 900) !== (r.perKW.ct - X.fom.ct >= 0)) ups = false; }
+  ok(ups, "upkeep: one crossing, between 900 and 1,000 MW");
+  const tt = M.thresholdText(RP, STAY, G.peakers);
+  ok(tt === "New peakers pay at 600 MW, not at 700; existing ones cover their upkeep up to 900 MW. **Between the two, none is built and none retires: simplified thresholds, not a forecast.**", "step 5's message: " + tt);
+  ok(/never pay across 400 to 1,400 MW; existing ones cover their upkeep across the range\. \*\*Simplified/.test(M.thresholdText({ below: { ct: 1400 }, above: { ct: 0 } }.below ? { below: null, above: { ct: 400 } } : null, 1400, G.peakers)) && /always pay across/.test(M.thresholdText({ below: { ct: 1400 }, above: null }, null, G.peakers)) && /miss their upkeep at every fleet/.test(M.thresholdText({ below: { ct: 1400 }, above: null }, null, G.peakers)), "step 5's message: true when either threshold lies outside the slider's range");
   let steps = true; for (let c = G.peakers.min; c <= G.peakers.max; c += G.peakers.step) { const r = M.year(D, X, { solar: S0, ct: c, design: "eo" }); if ((c <= 600) !== (r.covers.ct >= 0)) steps = false; }
   ok(steps, "resting point: a new peaker pays at every fleet up to 600 MW and at none above (one crossing)");
   ok(near(CM.capPrice, (X.fixed.ct - CM.perKW.ct) / 0.93) && near(CM.covers.ct, 0, 1e-9) && mwday(CM.capPrice) === "$191" && usd(CM.capPrice) === "$69.59", "capacity market: the capacity price fills a new peaker's gap exactly: $69.59 per rated kW a year, $191/MW-day");
+  let byCon = true; for (let c = G.peakers.min; c <= G.peakers.max; c += G.peakers.step) { const r = M.year(D, X, { solar: S0, ct: c, design: "cm" }); if (!near(r.covers.ct, 0, 1e-9)) byCon = false; }
+  ok(byCon && /Capacity market \(simplified\)/.test(D.designs.cm.label) && /breaks even by construction/.test(D.designs.cmNotes.join(" ")) && /no auction buys against a requirement/.test(D.designs.cmNotes.join(" ")) && /separate illustrative assumption/.test(D.designs.cmNotes.join(" ")), "simplified capacity market: a new peaker breaks even at every fleet, by construction, and the page says so (no auction, the $1,000 cap a separate assumption)");
   ok(usd(EO.consumer) === "$39.89" && usd(CM.consumer) === "$40.79" && usd0(CM.top) === "$935", "consumers: $39.89/MWh energy-only, $40.79 with a capacity market; top price $935 under the $1,000 cap");
   ok(near(CM.consumer * CM.demand, CM.energyPay + CM.capPay, 1e-3) && near(CM.rated, 0.92 * 1000 + 0.95 * 1600 + 0.93 * 700 + 0.16 * 3000 + 0.15 * 1200, 1e-9), "capacity market: consumers pay energy plus capacity on rated MW");
   ok(JSON.stringify(D.reference) === JSON.stringify(reference), "reference block: equals the model (run --write after a change)");
@@ -105,10 +148,12 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   has("On a spring midday wind and sun exceed demand and the price is −$25.00/MWh; on a summer evening only 401 MW are spare and scarcity pricing lifts it to $586.76.");
   has("Over the year the price averages $35.79/MWh, with 111 negative-price hours and 155 scarcity hours.");
   has("From 1,200 to 2,800 MW of solar, solar's capture price falls from $33.16 to $7.38 per MWh.");
-  has("Energy-only, a new peaker falls $25 per kW a year short of its fixed cost; at 600 MW of peakers it pays, and the year has 2 hours short.");
-  has("With a capacity market the capacity price is $191/MW-day, and consumers pay $40.79/MWh against $39.89 energy-only (table below).");
-  has("in 111 hours of the year"); has("Here its capture price is 93% of the average at 1,200 MW and 32% at 2,800 MW; in CAISO in 2023 it was 38%.");
-  has("with 700 MW of peakers here, consumers pay $39.89/MWh energy-only and $40.79/MWh with a capacity market.");
+  has("Energy-only, a new peaker falls $25 per kW a year short of its fixed cost; at 600 MW of peakers a new one pays, and the year has 2 hours short.");
+  has("Existing peakers cover their upkeep up to 900 MW, so from 700 to 900 MW none is built and none retires: simplified thresholds.");
+  has("With the simplified capacity market, its price set to fill a new peaker's gap, the capacity price is $191/MW-day; consumers pay $40.79/MWh against $39.89 energy-only (table below).");
+  has("in 111 hours of the year"); has("Here its capture price is 93% of the average at 1,200 MW and 32% at 2,800 MW. In CAISO in 2023 solar's value factor, a broader measure with capacity value, was 38%.");
+  has("with 700 MW of peakers here, consumers pay $39.89/MWh energy-only and $40.79/MWh with the simplified capacity market.");
+  ok(/value factor was 38%/.test(D.solarValue.what) && /counts energy and capacity value against a flat 24-hour block's; this lesson's capture ratio counts energy only/.test(D.solarValue.measure) && /energy plus capacity value, over a flat block's/.test(QMD) && !/its output-weighted price over the average price/.test(JSON.stringify(D)), "solar value: LBNL's 38% is a value factor with capacity value (slide 50), kept apart from the energy-only capture ratio");
   has("39.37 + (5,000 − 39.37) × (1 − 401 ÷ 600)² = 39.37 + 4,960.63 × 0.110 ≈ $585 per MWh. Step 1 shows $586.76: its spare is 400.7 MW before rounding.");
   has("69.59 × 1,000 ÷ 365 = 190.66, about $191 per MW-day");
   ok(/data-id="adder" data-answer="c"[\s\S]{0,500}<li data-value="c">About \$585<\/li>/.test(QMD) && /data-id="mwday" data-answer="b"[\s\S]{0,400}<li data-value="b">About \$191<\/li>/.test(QMD), "quiz: answers point at the right options");
@@ -118,10 +163,13 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 // ---------------- the world: sources on the allow-list, neutral wording, a sort with one answer each
 {
   const hosts = ["ferc.gov", "pjm.com", "misoenergy.org", "ercot.com", "ec.europa.eu", "ember-energy.org", "lbl.gov", "eia.gov"];
-  const all = D.world.reduce((a, w) => a.concat(w.sources), []).concat([D.solarValue.source]);
-  ok(D.world.length === 5 && all.every(s => hosts.some(h => new URL(s.url).hostname === h || new URL(s.url).hostname.endsWith("." + h))), "world: five arrangements, every source on the allow-list (" + all.length + ")");
-  ok(new Set(D.world.map(w => w.how)).size === 5 && D.world.every(w => w.how.split(/\s+/).length <= 40 && w.facts.length > 0), "world: five distinct descriptions for the sort");
-  ok(/16 July 2024/.test(JSON.stringify(D.world)) && /5 December 2025/.test(JSON.stringify(D.world)) && /start of 2024/.test(JSON.stringify(D.world)) && /\$269\.92\/MW-day for 2025\/26 and \$325/.test(JSON.stringify(D.world)), "world: dated facts (EU 16 July 2024, ERCOT 5 December 2025, China 2024, PJM $269.92 and $325)");
+  const all = D.world.reduce((a, w) => a.concat(w.sources), []).concat([D.solarValue.source]), linked = all.filter(s => s.url), unlinked = all.filter(s => !s.url);
+  ok(D.world.length === 5 && linked.every(s => hosts.some(h => new URL(s.url).hostname === h || new URL(s.url).hostname.endsWith("." + h))), "world: five arrangements, every linked source on the allow-list (" + linked.length + ")");
+  ok(unlinked.length === 2 && unlinked.every(s => /\b(19|20)\d\d\)?/.test(s.label)) && /^NDRC, /.test(unlinked[0].label + "") === false ? true : unlinked.some(s => /^NDRC, .*30 January 2026/.test(s.label)) && unlinked.some(s => /^Regulation \(EU\) 2024\/1747, Article 19d/.test(s.label)), "world: two primary sources named without a link (NDRC, 30 January 2026; Regulation (EU) 2024/1747), until their domains are allow-listed");
+  ok(new Set(D.world.map(w => w.how)).size === 5 && D.world.every(w => w.how.split(/\s+/).length <= 36 && w.facts.split(/\s+/).length <= 40), "world: five distinct sorting cards of 36 words or fewer; facts of 40 or fewer");
+  const WJ = JSON.stringify(D.world);
+  ok(/16 July 2024/.test(WJ) && /from 17 July 2027, new direct price support/.test(WJ) && /5 December 2025/.test(WJ) && /coal's since 2024; a January 2026 notice revised them/.test(WJ) && /\$269\.92\/MW-day for most of its region in 2025\/26 \(two zones cleared higher, at their caps\) and \$325, at the cap, for its entire region in 2028\/29/.test(WJ) && /The NDRC/.test(WJ) && !/widened to gas/.test(WJ), "world: dated facts (EU in force 16 July 2024, CfDs from 17 July 2027; ERCOT 5 December 2025; China's 2026 notice revised its mechanisms, the NDRC named; PJM $269.92 for most of its region, $325 for all of it)");
+  const wm2 = QMD.match(WBLOCK); ok(wm2 && wm2[2].trim() === worldTable().trim() && /<td>The European Union<\/td>/.test(worldTable()), "page: the no-JS page lists the five arrangements with their sources (run --write)");
   const vis = QMD.replace(/<!--[\s\S]*?-->/g, "") + JS.replace(/\/\/.*$/gm, "") + JSON.stringify(D);
   ok(!/\b(best|better|superior|worse|should adopt|the right design)\b/i.test(vis), "neutral: no design is called best or better");
   ok(/takes no side/.test(JS) && /For energy-only/.test(JS) && /For a capacity market/.test(JS), "neutral: the Steelman card gives each design its strongest case");
@@ -132,15 +180,23 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const plain = t => t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "");
   const words = t => plain(t).split(/\s+/).filter(Boolean).length;
   const prompts = [...JS.matchAll(/\{ text: ("(?:[^\n])*?"),\n\s*build/g)].map(m => m[1].replace(/^"|"$/g, ""));
+  ok(/Slide to 2,800 MW or more/.test(prompts[2]) && /no capacity payment: energy and reserve sales must pay for plants/.test(prompts[3]) && /an existing one stays while it covers its upkeep/.test(prompts[4]) && /This toy is simplified: no auction against a requirement/.test(prompts[5]), "prompts: step 3 names the target; energy-only includes reserves; entry and upkeep thresholds; the simplified capacity market");
   ok(prompts.length === 8, "steps: eight cards (" + prompts.length + ")");
   prompts.forEach((p, i) => { const s = (plain(p).match(/[.?!](?=\s+[A-Z(]|$)/g) || []).length; ok(words(p) <= 35 && s <= 2, `prompt ${i + 1}: ${words(p)} words, ${s} sentences (≤ 35, ≤ 2)`); });
   const msgs = [M.solarText(SOL[3], SOL[7]), "Midday: wind and sun exceed demand, so a credit-backed offer sets −$25.00. Evening: only 401 MW spare, so [[scarcity-price|scarcity pricing]] lifts the price to $586.76.",
     "155 scarcity hours reach up to $4,665/MWh, while 111 hours go [[negative-price|negative]]. The average, $35.79, hides both ends.",
-    "A peaker lives on a few scarcity hours; wind and solar on many ordinary ones, plus the credit. **A shortfall is [[missing-money|missing money]]: energy-only, rare high prices are the pay for being there.**",
-    "A new peaker pays at 600 MW but not at 700 MW. At 600 MW the year has 2 hours short: **an energy-only market buys reliability through those prices.**",
-    "With 700 MW of peakers, consumers pay $39.89/MWh energy-only and $40.79/MWh with a capacity market at $191/MW-day. **The same fleet, paid in different hours and by different rules.**"];
-  msgs.forEach((t, i) => ok(words(t) <= 36, `message ${i + 1}: ${words(t)} words (≤ 36)`));
-  ["capture-price", "energy-only-market", "capacity-market", "missing-money", "offer-cap"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
+    "A peaker lives on a few scarcity hours; wind and solar on many ordinary ones, plus the credit. **A new plant's shortfall is [[missing-money|missing money]] only if the grid needs that plant to stay reliable.**",
+    M.thresholdText(RP, STAY, G.peakers),
+    "With 700 MW of peakers, consumers pay $39.89/MWh energy-only and $40.79/MWh with the simplified capacity market at $191/MW-day. **The same fleet, paid in different hours and by different rules.**",
+    ...D.designs.curveNotes, ...D.designs.cmNotes, G.creditNote, D.solarValue.what, D.solarValue.measure, ...D.world.map(w => w.how), "Market here: 1,200 MW of solar (the default; step 3's slider stays in step 3) and 700 MW of peakers."];
+  msgs.forEach((t, i) => ok(words(t) <= 36, `message or displayed note ${i + 1}: ${words(t)} words (≤ 36)`));
+  ok(!/D\.designs\.curve\b|ratingsNote/.test(JS) && D.designs.curveNotes.length === 3 && D.designs.cmNotes.length === 3, "notes: one idea per displayed note (the scarcity curve and the capacity market each in three)");
+  ok(/scarcity hours" \+ \(r\.short \? " \(" \+ int\(r\.short\) \+ " of them short\)"/.test(JS) && /Scarcity hours \(short ones included\)/.test(JS), "step 2: scarcity hours counted with the hours short, and labelled so");
+  ok(/per kW-yr/.test(JS) && /Margin after running costs/.test(JS) && !/"Earns \(\$\/kW a year\)"/.test(JS), "units: the peaker KPIs say per kW a year; tables say margin after running costs, not earnings");
+  ok(/one shortfall event in ten years/.test(JS) && /one shortfall event in ten years/.test(QMD) && !/1-in-10/.test(JS + QMD), "terms: PJM's reliability standard in words");
+  ["capture-price", "energy-only-market", "capacity-market", "missing-money", "offer-cap", "rto"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && (JS + JSON.stringify(D)).indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
+  ["capacity-accreditation", "reserve-margin", "scarcity-price"].forEach(id => ok((JS + JSON.stringify(D)).indexOf("[[" + id + "|") >= 0, "glossary: " + id + " marked"));
+  ok(/no separate capacity market, in which energy and reserve prices/.test(SIDE) && /clearing prices can still rise above it/.test(SIDE) && !/ceiling on scarcity prices/.test(SIDE), "glossary: energy-only includes reserve revenue; an offer cap limits offers, not clearing prices");
   const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>(FERC|ERCOT \(|PJM\.|MISO|European|Ember|LBNL)/.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
   const w2 = t => t.replace(/<[^>]+>/g, " ").replace(/\$[^$]*\$/g, "x").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
   const long = elems.filter(t => w2(t) > 36).map(t => w2(t) + ": " + t.replace(/<[^>]+>/g, "").slice(0, 60));
@@ -149,14 +205,16 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 
 // ---------------- every number in the visible text is accounted for
 {
-  let body = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<style>[\s\S]*?<\/style>/g, "")
-    .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ").replace(/\$[^$]*\$/g, " ");
+  let body = QMD.replace(BLOCK, " ").replace(WBLOCK, " ").replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<style>[\s\S]*?<\/style>/g, "")
+    .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ")
+    .replace(/^(- \*\*|\|).*$/gm, l => l.replace(/\$[^$\n]*\$/g, " "));   // math only in Go deeper bullets and tables, so a dollar amount never pairs with another
   const allowed = new Set(), add = v => allowed.add(String(v));
   staticTable().replace(/<[^>]+>/g, " ").match(/\d[\d,]*(?:\.\d+)?/g).forEach(add);
-  ["3,000", "1,200", "700", "25.00", "401", "586.76", "35.79", "111", "155", "2,800", "33.16", "7.38", "26", "600", "2", "191", "40.79", "39.89", "25", "1,000", "930", "2025", "7", "4", "30", "5,000", "1", "2022", "2014", "5", "2023", "93", "32", "38", "325", "2028", "29", "6,831", "10", "39.37", "585", "0.110", "4,960.63", "400.7", "69.59", "190.66", "365", "1,000", "9,000", "2021", "2026", "269.92", "2025", "26", "27", "47", "50", "16", "2024", "0.93", "60", "66", "72", "63", "18", "17", "14", "12", "3", "1.3", "15", "8", "0.19", "25,400", "190.66", "110525", "04", "24", "5.1", "2029", "21"].forEach(add);
+  worldTable().replace(/<[^>]+>/g, " ").replace(/https?:\/\/\S+/g, " ").match(/\d[\d,]*(?:\.\d+)?/g).forEach(add);
+  ["3,000", "1,200", "700", "25.00", "401", "586.76", "35.79", "111", "155", "2,800", "33.16", "7.38", "26", "600", "2", "191", "40.79", "39.89", "25", "1,000", "930", "2025", "7", "4", "30", "5,000", "1", "2022", "2014", "5", "2023", "93", "32", "38", "325", "2028", "29", "6,831", "10", "39.37", "585", "0.110", "4,960.63", "400.7", "69.59", "190.66", "365", "1,000", "9,000", "2021", "2026", "269.92", "2025", "26", "27", "47", "50", "16", "2024", "0.93", "60", "66", "72", "63", "18", "17", "14", "12", "3", "1.3", "15", "8", "0.19", "25,400", "190.66", "110525", "04", "24", "5.1", "2029", "21", "900", "1747", "19", "2027", "1,690"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
-  ok(unknown.length === 0, "every number on the page is from the model, a source or a structural count; unknown: " + unknown.join(" "));
+  ok(unknown.length === 0, "unexpected-number check: no number on the page is outside the model's, the sources' and the structural counts; unknown: " + unknown.join(" "));
 }
 
 // ---------------- path.yml, scope
@@ -194,14 +252,21 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     demo.cards.go(0); btns(/^A spring midday$/)[0].click(); btns(/^A summer evening$/)[0].click();
     ok(/^Midday: wind and sun exceed demand, so a credit-backed offer sets −\$25\.00\. Evening: only 401 MW spare/.test(saw()), "stub: step 1: " + saw().slice(0, 80));
     demo.cards.go(1); btns(/Clear the year/)[0].click();
-    ok(/^155 scarcity hours reach up to \$4,665\/MWh, while 111 hours go negative/.test(saw()), "stub: step 2: " + saw().slice(0, 80));
+    ok(/^155 scarcity hours reach up to \$4,665\/MWh, while 111 hours go negative/.test(saw()) && /Here the offer cap also caps the clearing price, a simplification/.test(card().textContent), "stub: step 2: " + saw().slice(0, 80));
+    demo.cards.go(2); const raise = () => card().querySelectorAll("button").filter(b => /^Raise Solar on the Plains market/.test(b.getAttribute("aria-label") || ""))[0];
+    for (let i = 0; i < 4; i++) raise().click();
+    ok(/^From 1,200 to 2,800 MW of solar/.test(saw()) && /The next steps go back to the default 1,200 MW of solar/.test(card().textContent), "stub: step 3 at 2,800 MW, and it says the next steps use the default: " + saw().slice(0, 50));
+    demo.cards.go(3);
+    ok(/Market here: 1,200 MW of solar \(the default; step 3's slider stays in step 3\) and 700 MW of peakers/.test(card().textContent), "stub: step 4 says which market it shows");
+    demo.cards.go(2);
+    ok(/2,800 MW/.test(card().querySelector("output").textContent), "stub: back in step 3, its slider keeps 2,800 MW");
     demo.cards.go(3); btns(/^No$/)[0].click();
-    ok(/A shortfall is missing money/.test(saw()) && /falls \$25 short per kW a year/.test(card().textContent), "stub: step 4 shows what each new plant earns");
+    ok(/missing money only if the grid needs that plant/.test(saw()) && /falls \$25 short per kW a year/.test(card().textContent) && /Margin after running costs/.test(card().textContent), "stub: step 4 shows each new plant's margin after running costs");
     demo.cards.go(4); const up = btns(/^(Lower|Decrease|−|-)|Lower Gas peakers/)[0] || card().querySelectorAll("button").filter(b => /Gas peakers/.test(b.getAttribute("aria-label") || ""))[0];
     if (up) up.click();
-    ok(/^A new peaker pays at 600 MW but not at 700 MW\. At 600 MW the year has 2 hours short/.test(saw()), "stub: step 5: " + saw().slice(0, 80));
-    demo.cards.go(5); btns(/^Energy-only with scarcity pricing$/)[0].click(); btns(/^Capacity market$/)[0].click();
-    ok(/consumers pay \$\d+\.\d\d\/MWh energy-only and \$\d+\.\d\d\/MWh with a capacity market at \$\d+\/MW-day/.test(saw()), "stub: step 6: " + saw().slice(0, 100));
+    ok(/^New peakers pay at 600 MW, not at 700; existing ones cover their upkeep up to 900 MW/.test(saw()) && /per kW-yr/.test(card().textContent) && /An existing peaker \(upkeep only\)/.test(card().textContent), "stub: step 5: " + saw().slice(0, 80));
+    demo.cards.go(5); btns(/^Energy-only with scarcity pricing$/)[0].click(); btns(/^Capacity market \(simplified\)$/)[0].click();
+    ok(/consumers pay \$\d+\.\d\d\/MWh energy-only and \$\d+\.\d\d\/MWh with the simplified capacity market at \$\d+\/MW-day/.test(saw()) && /breaks even by construction/.test(card().textContent), "stub: step 6: " + saw().slice(0, 100));
     demo.cards.go(6); btns(/reserves are thinner/)[0].click();
     ok(/A capacity price is set by a demand curve/.test(saw()) && /6,831 MW/.test(card().textContent), "stub: step 7");
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }

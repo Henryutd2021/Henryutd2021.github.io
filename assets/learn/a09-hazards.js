@@ -14,7 +14,10 @@
 //       Overlapping hazards multiply. tally: the share of demand switched off directly, hour by hour (the shutoffs).
 //   run(A5, D5, SRC, H, ids, defs, seed)  the simulated years with the hazards and defences: LOLE, LOLH and EUE (A5's
 //       evaluate, with a battery or demand response added when chosen) and the customer energy cut directly by
-//       shutoffs (MWh a year), which A5's supply measures do not count.
+//       shutoffs (MWh a year). Switched-off demand leaves the supply balance (A5's o.tally): LOLE and EUE are shortfalls
+//       for the customers still connected, and the switched-off energy is counted on its own.
+//   Pairs: two pairs overlap in time (a compound hazard); the cold snap and the wildfire shutoffs fall months apart in
+//       the same year, so the page labels that pair "months apart" (overlap()).
 // Every number the page states comes from these functions; _tests/learn/test_a09-hazards.js checks them.
 (function () {
   "use strict";
@@ -50,6 +53,8 @@
     (defs || []).forEach(function (x) { var d = defence(H, x); if (d && d.add) add = A5.plus(add, A5.block(D5, d.add)); });
     return add;
   }
+  // the defences chosen, in words, with their yearly cost
+  function packageText(H, defs) { var n = (defs || []).map(function (x) { return defence(H, x).short; }); return (n.length > 1 ? n.slice(0, -1).join(", ") + " and " + n[n.length - 1] : n[0] || "none") + ", " + money(cost(H, defs)) + " a year"; }
   function cost(H, defs) { return (defs || []).reduce(function (s, x) { var d = defence(H, x); return s + (d ? d.cost : 0); }, 0); }
   function run(D5, SRC, H, ids, defs, seed) {
     var m = mods(H, ids, defs), S = A5.simulate(D5, SRC, seed == null ? H.seed : seed, { mod: m.mod, tally: m.tally }), e = A5.evaluate(S, addsOf(D5, H, defs));
@@ -66,6 +71,8 @@
   function overlap(H, a, b) { var A = mods(H, [a]).tally, x = mods(H, [a]).mod, y = mods(H, [b]).mod; void A;
     for (var t = 0; t < T; t++) { var ha = x.demand[t] !== 1 || x.wind[t] !== 1 || x.avail.cc[t] !== 1 || x.avail.ct[t] !== 1 || x.avail.coal[t] !== 1, hb = y.demand[t] !== 1 || y.wind[t] !== 1 || y.avail.cc[t] !== 1 || y.avail.ct[t] !== 1 || y.avail.coal[t] !== 1; if (ha && hb) return true; }
     return false; }
+  // a pair's button: "A + b" when the two overlap in time, "A, then b (months apart)" when they do not
+  function pairLabel(H, a, b) { var la = hazard(H, a).label, lb = hazard(H, b).label.toLowerCase(); return overlap(H, a, b) ? la + " + " + lb : la + ", then " + lb + " (months apart)"; }
   function compound(base, a, b, ab) { var sum = (a.eue - base.eue) + (b.eue - base.eue), both = ab.eue - base.eue; return { sum: sum, both: both, ratio: sum > 0 ? both / sum : null }; }
 
   // ---------------------------------------------------------------- formats and texts (shared by the page and the test)
@@ -75,12 +82,14 @@
   function times(r) { return (Math.round(r * 10) / 10).toFixed(1); }
   function money(v) { return "$" + int(v) + "M"; }
   function pairText(H, a, b, c) {
-    var la = hazard(H, a).label, lb = hazard(H, b).label.toLowerCase();
-    if (c.ratio == null || c.sum <= 0) return la + " and " + lb + " together: " + int(c.both) + " MWh a year more unserved energy than with neither.";
-    if (c.ratio > 1.05) return la + " and " + lb + " together add " + int(c.both) + " MWh a year of unserved energy, " + times(c.ratio) + " times the " + int(c.sum) + " MWh of the two alone. **Together they bite deeper than the sum.**";
-    if (c.ratio < 0.95) return la + " and " + lb + " together add " + int(c.both) + " MWh a year, less than the " + int(c.sum) + " MWh of the two alone: they hit different hours or the same scarce ones.";
-    return la + " and " + lb + " together add " + int(c.both) + " MWh a year, about the " + int(c.sum) + " MWh of the two alone" + (overlap(H, a, b) ? "." : ": they strike at different times, so their harms simply add.");
+    var la = hazard(H, a).label, lb = hazard(H, b).label.toLowerCase(), at = overlap(H, a, b), both = la + " and " + lb + (at ? " together" : " in the same year");
+    if (c.ratio == null || c.sum <= 0) return both + ": " + int(c.both) + " MWh a year more unserved energy than with neither.";
+    if (!at) return both + " add " + int(c.both) + " MWh a year, against " + int(c.sum) + " MWh for the two alone: they strike months apart" + (Math.abs(c.ratio - 1) <= 0.05 ? ", so their harms simply add." : ".");
+    if (c.ratio > 1.05) return both + " add " + int(c.both) + " MWh a year of unserved energy, " + times(c.ratio) + " times the " + int(c.sum) + " MWh of the two alone. **Together they bite deeper than the sum.**";
+    if (c.ratio < 0.95) return both + " add " + int(c.both) + " MWh a year, less than the " + int(c.sum) + " MWh of the two alone: they hit different hours or the same scarce ones.";
+    return both + " add " + int(c.both) + " MWh a year, about the " + int(c.sum) + " MWh of the two alone.";
   }
+  var CLOSING = "Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Some defences target one hazard; storage and flexible demand help in several, but cannot restore switched-off lines.**";
   function defenceText(H, before, after, defs) {
     var best = null;
     H.hazards.forEach(function (hz) { var cut = before[hz.id].eue - after[hz.id].eue; if (!best || cut > best.cut) best = { id: hz.id, cut: cut }; });
@@ -98,11 +107,11 @@
     }
     var base = 50 + 10 * Math.floor(r() * 10), a = base + 50 * (1 + Math.floor(r() * 8)), b = base + 50 * (1 + Math.floor(r() * 8)), ab = a + b - base + 50 * Math.floor(r() * 12);
     var sum = (a - base) + (b - base), ratio = Math.round(((ab - base) / sum) * 10) / 10;
-    return { kind: "ratio", q: "Unserved energy: " + base + " MWh with no hazard, " + a + " with hazard A, " + b + " with hazard B, " + int(ab) + " with both. Both together add how many times the sum of each alone?", answer: ratio, tol: 0.06, unit: "times",
+    return { kind: "ratio", q: "Unserved energy: " + base + " MWh with no hazard, " + a + " with hazard A, " + b + " with hazard B, " + int(ab) + " with both. Subtract the no-hazard value from each: the increase with both is how many times the sum of the two separate increases?", answer: ratio, tol: 0.06, unit: "times",
              why: "(" + int(ab) + " − " + base + ") ÷ ((" + a + " − " + base + ") + (" + b + " − " + base + ")) = " + ratio.toFixed(1) + "." };
   }
   var model = { T: T, dayOf: dayOf, drillItem: drillItem, hazard: hazard, defence: defence, keep: keep, mods: mods, addsOf: addsOf, cost: cost, run: run, sweep: sweep, compound: compound, overlap: overlap,
-                pairText: pairText, defenceText: defenceText, fm: { int: int, d3: d3, times: times, money: money } };
+                pairText: pairText, pairLabel: pairLabel, packageText: packageText, defenceText: defenceText, CLOSING: CLOSING, fm: { int: int, d3: d3, times: times, money: money } };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -123,6 +132,7 @@
       ".a9-facts{margin:0;padding:0;list-style:none;display:grid;gap:6px}.a9-facts li{font-size:14px}.a9-facts b{font-family:var(--lx-f-mono);font-weight:600;margin-right:6px}",
       ".a9-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}.a9-busy{font-size:13.5px;color:var(--lx-ink-2);margin:0;min-height:1.3em}",
       ".a9-budget{font-family:var(--lx-f-mono);font-size:14px;margin:0}.a9-budget.over{color:var(--lx-bad)}",
+      ".a9-warn{color:var(--lx-bad)}.a9-stale{opacity:.5}",
       "@media (max-width:560px){.a9-tbl table{font-size:12.5px}.a9-tbl th,.a9-tbl td{padding:4px 3px}.a9-tbl .ph{display:none}}"
     ].join("\n") }, document.head);
   }
@@ -136,7 +146,7 @@
   }
   function facts(host, list, src) {
     var ul = H_("ul", { class: "a9-facts" }, host);
-    list.forEach(function (f) { var li = H_("li", null, ul); H_("b", { text: f.n }, li); li.appendChild(document.createTextNode(f.what)); });
+    list.forEach(function (f) { var li = H_("li", null, ul); H_("b", { text: f.n }, li); H_("span", { html: LX.rich(f.what) }, li); });
     if (src) H_("p", { class: "a9-note", html: "Source: <a href=\"" + LX.esc(src.url) + "\">" + LX.esc(src.label) + "</a>." }, host);
   }
   function chip(hz) { return { html: "<i style='--c:" + hz.color + "'></i>" + LX.esc(hz.label) }; }
@@ -157,9 +167,9 @@
             cards: [
               { id: "ac", text: "Air conditioners run harder in a heat wave.", bin: "demand", why: "Heat raises demand, most in the afternoon and evening." },
               { id: "heatpump", text: "Electric heating peaks in a cold snap.", bin: "demand", why: "Cold raises demand where homes heat with electricity." },
-              { id: "cooling", text: "Cooling water is too warm or too scarce, so plants cut output.", bin: "plants", why: "Thermal plants need cooling; drought and heat derate them." },
+              { id: "cooling", text: "Cooling water is too warm or too scarce, so plants cut output.", bin: "plants", why: "Coal and gas plants need cooling water; drought and heat [[derate|derate]] them: their maximum output falls." },
               { id: "freeze", text: "Instruments and pipes freeze at a plant.", bin: "plants", why: "In Uri, freezing caused 44.2% of the unit outages." },
-              { id: "gas", text: "Wellheads freeze and gas stops reaching power plants.", bin: "fuel", why: "In Uri, fuel problems caused 31.4% of the unit outages." },
+              { id: "gas", text: "Gas wells freeze where the gas leaves the ground, and gas stops reaching power plants.", bin: "fuel", why: "In Uri, fuel problems caused 31.4% of the unit outages." },
               { id: "psps", text: "A utility switches lines off in dry, gusty weather to avoid starting a fire.", bin: "wires", why: "A [[public-safety-power-shutoff|safety shutoff]]: customers on those lines lose power, whatever the supply." }
             ],
             onCheck: function (g) { if (g.placed < g.total) return; api.done(); remember("sort", g.right); api.saw(g.right + " of " + g.total + " placed as planners would. **A cold snap hits all three of demand, plants and fuel at once.**"); } });
@@ -200,19 +210,19 @@
           });
         } },
       // 4 two at once
-      { text: "Hazards come together: a drought often comes with heat. Run a [[compound-hazard|pair at once]] and compare it with the two alone.",
+      { text: "Hazards come together: a drought often comes with heat. Run two hazards in one year against each alone: two pairs [[compound-hazard|overlap]], one falls months apart.",
         build: function (act, api) {
           var row = H_("div", { class: "a9-row", role: "group", "aria-label": "Pair of hazards" }, act), busy = H_("p", { class: "a9-busy", "aria-live": "polite" }, act), out = H_("div", null, act);
           H.pairs.forEach(function (p) {
-            var a = H.hazards.filter(function (h) { return h.id === p[0]; })[0], b = H.hazards.filter(function (h) { return h.id === p[1]; })[0];
-            var bt = H_("button", { type: "button", class: "lx-btn ghost small", "aria-pressed": "false", text: a.label + " + " + b.label.toLowerCase() }, row);
+            var a = H.hazards.filter(function (h) { return h.id === p[0]; })[0], b = H.hazards.filter(function (h) { return h.id === p[1]; })[0], at = overlap(H, p[0], p[1]);
+            var bt = H_("button", { type: "button", class: "lx-btn ghost small", "aria-pressed": "false", text: pairLabel(H, p[0], p[1]) }, row);
             bt.addEventListener("click", function () {
               busy.textContent = "Simulating…"; api.busy(true);
               later(function () {
                 try {
                   var n = get([]), ra = get([p[0]]), rb = get([p[1]]), ab = get(p), c = compound(n, ra, rb, ab);
                   busy.textContent = ""; out.innerHTML = "";
-                  table(out, ["Year with", "LOLE (days/yr)", "Unserved energy (MWh/yr)"], [["No hazard", d3(n.lole), int(n.eue)], [chip(a), d3(ra.lole), int(ra.eue)], [chip(b), d3(rb.lole), int(rb.eue)], [a.label + " and " + b.label.toLowerCase(), d3(ab.lole), int(ab.eue)]], "A pair of hazards against each alone");
+                  table(out, ["Year with", "LOLE (days/yr)", "Unserved energy (MWh/yr)"], [["No hazard", d3(n.lole), int(n.eue)], [chip(a), d3(ra.lole), int(ra.eue)], [chip(b), d3(rb.lole), int(rb.eue)], [(at ? a.label + " and " + b.label.toLowerCase() + " together" : a.label + ", then " + b.label.toLowerCase()), d3(ab.lole), int(ab.eue)]], "A pair of hazards against each alone");
                   bt.setAttribute("aria-pressed", "true"); api.done(); remember("pair", p.join("+")); api.saw(pairText(H, p[0], p[1], c));
                 } catch (e) { busy.textContent = "The run stopped. Try again."; }
                 api.busy(false);
@@ -227,12 +237,13 @@
           var list = H_("ul", { class: "a9-facts" }, act);
           H.defences.forEach(function (d) { var li = H_("li", null, list); H_("b", { text: money(d.cost) }, li); li.appendChild(document.createTextNode(d.label + ": " + d.what)); });
           var go = H_("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Run the hazard years" }, H_("div", { class: "a9-row" }, act));
-          var busy = H_("p", { class: "a9-busy", "aria-live": "polite" }, act), out = H_("div", null, act);
+          var busy = H_("p", { class: "a9-busy", "aria-live": "polite" }, act), stale = H_("p", { class: "a9-note a9-warn", hidden: true, text: "Your choice has changed: the results below are for the previous one. Run again." }, act), out = H_("div", null, act), ran = null;
           function defs() { return H.defences.filter(function (d) { return chosen[d.id]; }).map(function (d) { return d.id; }); }
+          function fresh() { var same = ran && ran.ds.join() === defs().join(); stale.hidden = !ran || same; out.classList.toggle("a9-stale", !!ran && !same); if (ran) api.saw(same ? ran.text : "Your choice has changed since the last run: run the hazard years again to see its results.", !same); }
           function paint() { var c = cost(H, defs()); bud.textContent = "Chosen: " + money(c) + " of " + money(H.budget) + " a year" + (c > H.budget ? " (over budget)" : ""); bud.classList.toggle("over", c > H.budget); go.disabled = c > H.budget || !defs().length; }
           H.defences.forEach(function (d) {
             var bt = H_("button", { type: "button", class: "lx-btn ghost small", "aria-pressed": "false", text: d.short + " · " + money(d.cost) }, row);
-            bt.addEventListener("click", function () { chosen[d.id] = !chosen[d.id]; bt.setAttribute("aria-pressed", chosen[d.id] ? "true" : "false"); paint(); });
+            bt.addEventListener("click", function () { chosen[d.id] = !chosen[d.id]; bt.setAttribute("aria-pressed", chosen[d.id] ? "true" : "false"); paint(); fresh(); });
           });
           go.addEventListener("click", function () {
             var ds = defs(); if (!ds.length || cost(H, ds) > H.budget) return;
@@ -242,8 +253,10 @@
                 var before = {}, after = {};
                 H.hazards.forEach(function (hz) { before[hz.id] = get([hz.id]); after[hz.id] = get([hz.id], ds); });
                 busy.textContent = ""; out.innerHTML = "";
-                table(out, ["Year with", "Unserved before (MWh/yr)", "With your defences", "~Switched off directly"], H.hazards.map(function (hz) { return [chip(hz), int(before[hz.id].eue), int(after[hz.id].eue), int(before[hz.id].shut) + " → " + int(after[hz.id].shut)]; }), "Unserved energy in each hazard year, before and with your defences");
-                api.done(); remember("defs", ds); api.saw(defenceText(H, before, after, ds));
+                H_("p", { class: "a9-note", text: "Results for: " + packageText(H, ds) + "." }, out);
+                table(out, ["Year with", "Unserved before (MWh/yr)", "With your defences (MWh/yr)", "Switched off directly, before → with (MWh/yr)"], H.hazards.map(function (hz) { return [chip(hz), int(before[hz.id].eue), int(after[hz.id].eue), int(before[hz.id].shut) + " → " + int(after[hz.id].shut)]; }), "Unserved energy and energy switched off directly in each hazard year, before and with your defences");
+                ran = { ds: ds, text: defenceText(H, before, after, ds) }; fresh();
+                api.done(); remember("defs", ds);
               } catch (e) { busy.textContent = "The run stopped. Try again."; }
               api.busy(false); paint();
             });
@@ -256,7 +269,7 @@
         build: function (act, api) {
           LX.Timeline(act, { events: H.prepare, kinds: { study: "Report", policy: "Rule" } });
           var bt = H_("button", { type: "button", class: "lx-btn small", text: "Done reading" }, H_("div", { class: "a9-row" }, act));
-          bt.addEventListener("click", function () { api.done(); LX.progress.done(SLUG); api.saw("Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Each defence answers one hazard; none answers all four.**"); });
+          bt.addEventListener("click", function () { api.done(); LX.progress.done(SLUG); api.saw(CLOSING); });
         } }
     ];
     var cardsHost = H_("div", null, live);
@@ -290,17 +303,23 @@
     LX.CompareTable(H_("div", { class: "lx-xcard" }, x), {
       title: "Four hazards, four ways in", text: true,
       columns: [{ key: "name", label: "Hazard", main: true }, { key: "hits", label: "What it hits here" }, { key: "ev", label: "Real case" }, { key: "def", label: "Defence that eases it" }, { key: "eue", label: "Unserved, MWh/yr", num: true }],
-      rows: rows, sorts: [{ label: "As listed", order: rows.map(function (r) { return r.key; }), note: "Unserved energy in a year when the hazard strikes, seed 2025; " + (Y.none ? int(Y.none.eue) : "–") + " MWh a year with none." },
-                          { label: "By unserved energy", order: rows.slice().sort(function (a, b) { return b.eue.value - a.eue.value; }).map(function (r) { return r.key; }), ranked: true, note: "The cold snap hits demand, plants and fuel at once." }]
+      rows: rows, sorts: [{ label: "As listed", order: rows.map(function (r) { return r.key; }), note: "Unserved energy for connected customers in a year when the hazard strikes, seed 2025; " + (Y.none ? int(Y.none.eue) : "–") + " MWh a year with none." },
+                          { label: "By unserved energy", order: rows.slice().sort(function (a, b) { return b.eue.value - a.eue.value; }).map(function (r) { return r.key; }), ranked: true, note: "The cold snap hits demand, plants and fuel at once. A battery and demand response ease every hazard's shortfall, not its shutoffs." }]
     });
-    LX.CausalChain(H_("div", { class: "lx-xcard" }, x), {
-      title: "Cause and effect: a cold snap",
-      links: [{ title: "Cold raises demand", text: "Electric heating runs hard.", value: "+12% here" },
-              { title: "Equipment freezes", text: "Instruments, pipes and turbines stop.", value: "Uri: 44.2% of outages" },
-              { title: "Gas stops arriving", text: "Wellheads and pipelines freeze.", value: "Uri: 31.4%" },
-              { title: "Reserves run out", text: "Many units fail at once, not one by one.", value: "Uri: 1,045 units" },
-              { title: "Operators shed load", text: "Rotating outages keep the grid from collapse.", value: "Uri: 20,000 MW" }],
-      note: "Independent outages, as in lesson A5, miss this chain: the failures share one cause."
+    // one cause, three effects at the same time, one supply deficit (not a sequence)
+    LX.ConceptMap(H_("div", { class: "lx-xcard" }, x), {
+      title: "Cause and effect: a cold snap", lede: "One cause hits demand, equipment and fuel at the same time. Tap a node.",
+      groups: { cause: ["Cause", "var(--lx-hyd)"], hit: ["Three hits at once", "var(--lx-warn)"], out: ["Result", "var(--lx-bad)"] },
+      cols: 3, rows: 4, colsN: 3, rowsN: 4, sel: "deficit",
+      nodes: [
+        { id: "cold", g: "cause", label: "Extreme cold", lines: ["Extreme", "cold"], at: [1, 0], atN: [1, 0], text: "One cause for many failures at once: the outages are correlated, not independent as in lesson A5." },
+        { id: "demand", g: "hit", label: "Demand rises", lines: ["Demand", "rises"], at: [0, 1], atN: [0, 1], text: "Electric heating runs hard: demand is 12% higher in this lesson's cold snap." },
+        { id: "equip", g: "hit", label: "Equipment freezes", lines: ["Equipment", "freezes"], at: [1, 1], atN: [1, 1], text: "Instruments, pipes and turbines stop. In Uri, freezing caused 44.2% of the unit outages." },
+        { id: "fuel", g: "hit", label: "Gas stops arriving", lines: ["Gas stops", "arriving"], at: [2, 1], atN: [2, 1], text: "Gas wells and pipelines freeze. In Uri, fuel problems caused 31.4% of the unit outages." },
+        { id: "deficit", g: "out", label: "Supply falls short", lines: ["Supply", "falls short"], at: [1, 2], atN: [1, 2], text: "Many units are out at the same time. In Uri, 1,045 units were affected over 8 to 20 February." },
+        { id: "shed", g: "out", label: "Operators shed load", lines: ["Operators", "shed load"], at: [1, 3], atN: [1, 3], text: "Rotating outages keep the grid from collapse. In Uri, ERCOT shed 20,000 MW of firm load at the worst point." }
+      ],
+      edges: [["cold", "demand", "raises"], ["cold", "equip", "freezes"], ["cold", "fuel", "cuts"], ["demand", "deficit", "more to serve"], ["equip", "deficit", "less supply"], ["fuel", "deficit", "less supply"], ["deficit", "shed", "forces"]]
     });
     LX.Flowchart(H_("div", { class: "lx-xcard" }, x), {
       title: "Planning for hazards, move by move", lede: "Trace how a planner turns a hazard into a defence.",

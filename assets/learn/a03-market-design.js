@@ -14,13 +14,21 @@
 //   available      coal 1,000 MW x 92%, combined cycle 1,600 MW x 95%, peakers (slider) x 93%; wind and solar as above
 //   clearing       uniform price, cheapest first; the marginal offer sets the price. Spare = available - demand. If spare <
 //                  0, the price is the design's cap and -spare MW go unserved. If 0 <= spare < 600 MW, the price is the
-//                  offer + (cap - offer) (1 - spare/600)^2 (a scarcity adder). Ties: wind and solar offer the same, so they
-//                  share a partly used block in proportion to their output.
-//   designs        energy-only: cap $5,000/MWh. Capacity market: cap $1,000/MWh (illustrative) and a capacity price equal
-//                  to a new peaker's missing money (its yearly fixed cost minus its energy margin, at least 0), paid on every
-//                  rated MW (units at their availability, wind 16% and solar 15%: lesson A5's ratings, held fixed).
+//                  offer + (cap - offer) (1 - spare/600)^2 (a scarcity adder). The price never exceeds the cap (a teaching
+//                  simplification: a real offer cap limits offers, and clearing prices can exceed it). Ties: wind and solar
+//                  offer the same, so they share a partly used block in proportion to their output. Scarcity hours: an
+//                  adder or a shortage (a shortage hour is priced at the cap with no adder, and counts too).
+//   designs        energy-only: cap $5,000/MWh. Capacity market, simplified: cap $1,000/MWh (illustrative, a separate
+//                  assumption) and a capacity price SET to a new peaker's missing money (its yearly fixed cost minus its
+//                  energy margin, at least 0) per rated kW, so a new peaker breaks even by construction at any fleet. There
+//                  is no auction against a requirement. Paid on every rated MW (units at their availability, wind 16% and
+//                  solar 15%: lesson A5's ratings, held fixed).
 //   per class      energy margin = sum over hours (price - running cost) x output (wind and solar also earn the credit),
 //                  per kW installed; fixed cost = building cost x CRF(4%, 30 years) + fixed upkeep (lesson 7, 2025 $).
+//                  New entry pays when the margin covers the fixed cost; an existing plant covers its upkeep (fixed
+//                  operating cost) when the margin covers that alone: two thresholds (restingPoint, upkeepPoint).
+//   scenario       step 3's solar slider is its own: steps 4 to 6 and the explain layer use the default 1,200 MW of solar
+//                  and say so; the peaker fleet chosen in step 5 carries on to step 6.
 //   consumers      energy payments (price x demand served) + capacity payments, per MWh of demand (the credit is paid by
 //                  taxpayers, outside this bill).
 // Every number the page states comes from these functions; _tests/learn/test_a03-market-design.js checks them.
@@ -34,10 +42,10 @@
     var G = D.market, o = { year: year, targets: targets, method: G.profileMethod, monthlyCF: G.monthlyCF, monthDays: MD };
     var w = profile("wind", 1, o).mw, s = profile("solar", 1, o).mw, d = new Float64Array(T), wf = new Float64Array(T), sf = new Float64Array(T);
     for (var i = 0; i < T; i++) { d[i] = G.peakMW * year.demand[i] / 1000; wf[i] = w[i]; sf[i] = s[i]; }
-    var cost = {}, fixed = {}, k = crf(L7.finance.wacc / 100, L7.finance.life);
+    var cost = {}, fixed = {}, fom = {}, k = crf(L7.finance.wacc / 100, L7.finance.life);
     G.units.forEach(function (u) { cost[u.id] = u.offer != null ? u.offer : L7.techs[u.tech].heatRate * L7.fuel.gas + L7.techs[u.tech].vom; });
-    ["wind", "solar", "cc", "peaker"].forEach(function (t) { fixed[t === "peaker" ? "ct" : t] = L7.techs[t].capex * k + L7.techs[t].fom; });
-    return { d: d, w: wf, s: sf, cost: cost, fixed: fixed, crf: k, gas: L7.fuel.gas };
+    ["wind", "solar", "cc", "peaker"].forEach(function (t) { var id = t === "peaker" ? "ct" : t; fixed[id] = L7.techs[t].capex * k + L7.techs[t].fom; fom[id] = L7.techs[t].fom; });
+    return { d: d, w: wf, s: sf, cost: cost, fixed: fixed, fom: fom, crf: k, gas: L7.fuel.gas };
   }
   function avail(D, id, ctMW) { var u = D.market.units.filter(function (x) { return x.id === id; })[0]; return (id === "ct" ? ctMW : u.mw) * u.avail; }
   // one hour: o = {solar MW, ct MW, design "eo"|"cm"}
@@ -58,7 +66,7 @@
     var neg = 0, scarce = 0, short = 0, unserved = 0, pay = 0, served = 0, demand = 0, top = -Infinity, cr = D.market.credit;
     for (var t = 0; t < T; t++) {
       var h = hour(D, X, t, o), p = h.price; P[t] = p;
-      if (p < 0) neg++; if (h.adder > 0) scarce++; if (h.short > 0) { short++; unserved += h.short; }
+      if (p < 0) neg++; if (h.adder > 0 || h.short > 0) scarce++; if (h.short > 0) { short++; unserved += h.short; }
       if (p > top) top = p;
       m.coal += (p - X.cost.coal) * h.run.coal; m.cc += (p - X.cost.cc) * h.run.cc; m.ct += (p - X.cost.ct) * h.run.ct;
       m.wind += (p + cr) * h.Wd; m.solar += (p + cr) * h.Sd;
@@ -86,6 +94,13 @@
     for (var c = G.min; c <= G.max; c += G.step) { var r = year(D, X, { solar: solar, ct: c, design: "eo" }); if (r.covers.ct < 0) return { below: prev, above: { ct: c, r: r } }; prev = { ct: c, r: r }; }
     return { below: prev, above: null };
   }
+  // the largest peaker fleet (slider steps) at which an existing peaker still covers its upkeep (fixed operating cost)
+  // from energy-only prices: above it, peakers would retire (a simplified exit threshold)
+  function upkeepPoint(D, X, solar) {
+    var G = D.market.peakers, last = null;
+    for (var c = G.min; c <= G.max; c += G.step) { var r = year(D, X, { solar: solar, ct: c, design: "eo" }); if (r.perKW.ct - X.fom.ct >= 0) last = c; }
+    return last;
+  }
   function dayIndex(date) { var m = +date.slice(5, 7), d = +date.slice(8, 10), s = 0; for (var i = 0; i < m - 1; i++) s += MD[i]; return s + d - 1; }
   function hourOf(H) { return dayIndex(H.date) * 24 + H.hour; }
   // sorted prices for a duration curve, clipped for drawing
@@ -99,11 +114,18 @@
   function pct(f) { return Math.round(100 * f) + "%"; }
   function mwday(perKWyr) { return usd0(perKWyr * 1000 / 365); }   // $/kW-year to $/MW-day, whole dollars
   function coverText(k, v) { return (v >= 0 ? "covers its cost, " + usd0(v) + " to spare" : "falls " + usd0(-v) + " short") + " per kW a year"; }
+  // step 5's message, true for any slider position: the entry threshold, the upkeep threshold, and what lies between
+  function thresholdText(rp, stay, G) {
+    var entry = rp.below && rp.above ? "New peakers pay at " + int(rp.below.ct) + " MW, not at " + int(rp.above.ct) : "New peakers " + (rp.above ? "never pay" : "always pay") + " across " + int(G.min) + " to " + int(G.max) + " MW";
+    var exit = stay == null ? "existing ones miss their upkeep at every fleet here" : stay >= G.max ? "existing ones cover their upkeep across the range" : "existing ones cover their upkeep up to " + int(stay) + " MW";
+    var between = rp.below && rp.above && stay != null && stay > rp.below.ct ? " **Between the two, none is built and none retires: simplified thresholds, not a forecast.**" : " **Simplified thresholds, not a forecast.**";
+    return entry + "; " + exit + "." + between;
+  }
   function solarText(a, b) {
     return "From " + int(a.o.solar) + " to " + int(b.o.solar) + " MW of solar, its capture price falls from " + usd(a.solarCapture) + " to " + usd(b.solarCapture) + " per MWh and negative-price hours rise from " + int(a.neg) + " to " + int(b.neg) + ". **Solar sells most when the price is lowest.**";
   }
   var fm = { usd: usd, usd0: usd0, int: int, pct: pct, mwday: mwday };
-  var model = { T: T, MD: MD, crf: crf, setup: setup, avail: avail, hour: hour, year: year, restingPoint: restingPoint, dayIndex: dayIndex, hourOf: hourOf, duration: duration, coverText: coverText, solarText: solarText, fm: fm };
+  var model = { T: T, MD: MD, crf: crf, setup: setup, avail: avail, hour: hour, year: year, restingPoint: restingPoint, upkeepPoint: upkeepPoint, dayIndex: dayIndex, hourOf: hourOf, duration: duration, coverText: coverText, thresholdText: thresholdText, solarText: solarText, fm: fm };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -144,9 +166,10 @@
     css(); root.classList.add("a3-lab");
     var D = data.a03_market_design, G = D.market, X = setup(D, data.town_year, data.cf_targets, LX.townProfile, data["07_cost"]);
     var own = LX.store.get(KEY, {}) || {}; function remember(k, v) { own[k] = v; LX.store.set(KEY, own); }
-    var ST = { solar: G.solar.value, ct: G.peakers.value }, cache = {};
+    var ST = { solar: G.solar.value, ct: G.peakers.value, solar3: G.solar.value }, cache = {};   // solar3: step 3's own slider
     function get(o) { var k = o.solar + "|" + o.ct + "|" + o.design; if (!cache[k]) cache[k] = year(D, X, o); return cache[k]; }
     function base(design) { return get({ solar: ST.solar, ct: ST.ct, design: design || "eo" }); }
+    function context(act) { H("p", { class: "a3-note a3-ctx", text: "Market here: " + int(ST.solar) + " MW of solar (the default; step 3's slider stays in step 3) and " + int(ST.ct) + " MW of peakers." }, act); }
     function coverRows(r) { return ["wind", "solar", "cc", "ct"].filter(function (k) { return r.covers[k] != null; }).map(function (k) { var v = r.covers[k]; return [NAMES[k], usd0(r.perKW[k] + (r.o.design === "cm" ? r.capPrice * D.designs.ratings[k] : 0)), usd0(X.fixed[k]), { text: v >= 0 ? "yes" : "no", cls: v >= 0 ? "ok" : "no" }]; }); }
 
     var steps = [
@@ -187,7 +210,7 @@
           go.addEventListener("click", function () {
             var r = base("eo"), s = duration(r.prices); out.innerHTML = "";
             var k = H("div", { class: "a3-kpis" }, out);
-            kpi(k, "Average price", usd(r.avg) + "/MWh"); kpi(k, "Negative-price hours", int(r.neg)); kpi(k, "Scarcity hours", int(r.scarce), "bad"); kpi(k, "Hours short", int(r.short), r.short ? "bad" : "good");
+            kpi(k, "Average price", usd(r.avg) + "/MWh"); kpi(k, "Negative-price hours", int(r.neg)); kpi(k, "Scarcity hours (short ones included)", int(r.scarce), "bad"); kpi(k, "Hours short", int(r.short), r.short ? "bad" : "good");
             var P1 = LX.Plot(H("div", null, out), { box: true, text: "Text version of the price duration curve" });
             P1.render({ x: { min: 0, max: T, ticks: [[0, "0"], [2190, "2,190"], [4380, "4,380"], [6570, "6,570"], [8760, "8,760 h"]], ticksN: [[0, "0"], [4380, "4,380"], [8760, "8,760 h"]] },
               y: { min: -50, max: 200, step: 50, fmt: function (v) { return (v < 0 ? "−$" : "$") + Math.abs(v); }, unit: "$/MWh" },
@@ -197,80 +220,81 @@
               text: { head: ["Hours", "At or above"], rows: [[int(s.filter(function (v) { return v >= 1000; }).length), "$1,000/MWh"], [int(s.filter(function (v) { return v >= 200; }).length), "$200/MWh"], [int(s.filter(function (v) { return v >= 0; }).length), "$0/MWh"], [int(T), "the lowest, " + usd(s[T - 1])]] } });
             H("p", { class: "a3-note", text: "The axis stops at $200: " + int(s.filter(function (v) { return v > 200; }).length) + " hours lie above it, up to " + usd0(r.top) + "/MWh." }, out);
             api.done(); remember("year", r.avg);
-            api.saw(int(r.scarce) + " scarcity hours" + (r.short ? " and " + int(r.short) + " hours short" : "") + " reach up to " + usd0(r.top) + "/MWh, while " + int(r.neg) + " hours go [[negative-price|negative]]. The average, " + usd(r.avg) + ", hides both ends.");
+            api.saw(int(r.scarce) + " scarcity hours" + (r.short ? " (" + int(r.short) + " of them short)" : "") + " reach up to " + usd0(r.top) + "/MWh, while " + int(r.neg) + " hours go [[negative-price|negative]]. The average, " + usd(r.avg) + ", hides both ends.");
           });
-          H("p", { class: "a3-note", html: LX.rich(D.designs.curve.replace("the price is the cap", "the price is the cap ([[offer-cap|offer cap]])")) }, act);
+          D.designs.curveNotes.forEach(function (t) { H("p", { class: "a3-note", html: LX.rich(t) }, act); });
         } },
       // 3 solar grows
-      { text: "Add solar: every solar farm sells in the same sunny hours. Watch solar's [[capture-price|capture price]], the average price its output earns.",
+      { text: "Add solar: every solar farm sells in the same sunny hours. Slide to 2,800 MW or more and watch solar's [[capture-price|capture price]], the average price its output earns.",
         build: function (act, api) {
           var out = H("div", { "aria-live": "polite" }, act), first = base("eo");
           function show(v) {
-            var r = get({ solar: v, ct: ST.ct, design: "eo" }); out.innerHTML = "";
+            ST.solar3 = v; var r = get({ solar: v, ct: ST.ct, design: "eo" }); out.innerHTML = "";
             var k = H("div", { class: "a3-kpis" }, out);
             kpi(k, "Solar's capture price", r.solarCapture != null ? usd(r.solarCapture) + "/MWh" : "–"); kpi(k, "Average price", usd(r.avg) + "/MWh"); kpi(k, "Capture ratio", r.solarRatio != null ? pct(r.solarRatio) : "–"); kpi(k, "Negative-price hours", int(r.neg));
             if (v >= 2800 && first.solarCapture != null) { api.done(); remember("solar", v); api.saw(solarText(first, r)); }
           }
-          LX.Slider(act, { label: "Solar on the Plains market", min: G.solar.min, max: G.solar.max, step: G.solar.step, value: ST.solar, fmt: function (v) { return int(v) + " MW"; }, onChange: function (v) { show(v); } });
-          show(ST.solar);
+          LX.Slider(act, { label: "Solar on the Plains market", min: G.solar.min, max: G.solar.max, step: G.solar.step, value: ST.solar3, fmt: function (v) { return int(v) + " MW"; }, onChange: function (v) { show(v); } });
+          show(ST.solar3);
           H("p", { class: "a3-note", text: "Real: " + D.solarValue.what + " (" + D.solarValue.source.label + ")." }, act);
+          H("p", { class: "a3-note", text: D.solarValue.measure }, act);
+          H("p", { class: "a3-note", text: "The next steps go back to the default " + int(ST.solar) + " MW of solar." }, act);
         } },
       // 4 does a new plant pay
-      { text: "In an [[energy-only-market|energy-only market]], plants earn only from selling energy. Does each kind of new plant earn back its building and upkeep costs?",
+      { text: "In an [[energy-only-market|energy-only market]] there is no capacity payment: energy and reserve sales must pay for plants (here, reserves are folded into scarcity prices). Does each new plant earn back building and upkeep?",
         build: function (act, api) {
-          var out = H("div", null, act);
+          context(act); var out = H("div", null, act);
           var pr = LX.Predict(act, { id: "a3-peaker", fresh: true, q: "Will a new gas peaker cover its costs from energy prices alone?", answer: base("eo").covers.ct >= 0 ? "yes" : "no",
             options: [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }],
             feedback: { yes: "", no: "" },
             onPick: function () {
               var r = base("eo"); out.innerHTML = "";
-              table(out, ["New plant", "Earns ($/kW a year)", "Fixed cost ($/kW a year)", "Covers it?"], coverRows(r), "What each new plant earns against its fixed cost, energy-only");
+              table(out, ["New plant", "Margin after running costs ($/kW a year)", "Fixed cost ($/kW a year)", "Covers it?"], coverRows(r), "Each new plant's margin after running costs against its fixed cost, energy-only");
               pr.reveal("With " + int(ST.ct) + " MW of peakers, a new peaker " + coverText("ct", r.covers.ct) + ": it runs mostly in the " + int(r.scarce) + " scarcity hours.");
               api.done(); remember("covers", r.covers);
-              api.saw("A peaker lives on a few scarcity hours; wind and solar on many ordinary ones, plus the credit. **A shortfall is [[missing-money|missing money]]: energy-only, rare high prices are the pay for being there.**");
+              api.saw("A peaker lives on a few scarcity hours; wind and solar on many ordinary ones, plus the credit. **A new plant's shortfall is [[missing-money|missing money]] only if the grid needs that plant to stay reliable.**");
             } });
         } },
       // 5 the resting point
-      { text: "If peakers lose money, some retire; if they earn more than their cost, more are built. Move the peaker fleet and find where a new one just pays.",
+      { text: "A new peaker is built only if it expects to earn back building and upkeep; an existing one stays while it covers its upkeep. Move the fleet: where does a new one just pay?",
         build: function (act, api) {
-          var out = H("div", { "aria-live": "polite" }, act), moved = false;
+          var ctx = H("div", null, act), out = H("div", { "aria-live": "polite" }, act), moved = false;
           function show(v) {
-            ST.ct = v; var r = get({ solar: ST.solar, ct: v, design: "eo" }); out.innerHTML = "";
-            var k = H("div", { class: "a3-kpis" }, out);
-            kpi(k, "A new peaker", r.covers.ct >= 0 ? "pays, +" + usd0(r.covers.ct) : "loses " + usd0(-r.covers.ct), r.covers.ct >= 0 ? "good" : "bad"); kpi(k, "Scarcity hours", int(r.scarce)); kpi(k, "Hours short", int(r.short), r.short ? "bad" : "good"); kpi(k, "Unserved", int(r.unserved) + " MWh");
-            if (moved) {
-              var rp = restingPoint(D, X, ST.solar); api.done(); remember("ct", v);
-              api.saw(rp.below && rp.above ? "A new peaker pays at " + int(rp.below.ct) + " MW but not at " + int(rp.above.ct) + " MW. At " + int(rp.below.ct) + " MW the year has " + int(rp.below.r.short) + " hours short: **an energy-only market buys reliability through those prices.**"
-                : "Across this range a new peaker " + (rp.above ? "never pays" : "always pays") + ": the resting point lies outside it.");
-            }
+            ST.ct = v; var r = get({ solar: ST.solar, ct: v, design: "eo" }); out.innerHTML = ""; ctx.innerHTML = ""; context(ctx);
+            var k = H("div", { class: "a3-kpis" }, out), up = r.perKW.ct - X.fom.ct;
+            kpi(k, "A new peaker (building and upkeep)", (r.covers.ct >= 0 ? "pays, +" + usd0(r.covers.ct) : "loses " + usd0(-r.covers.ct)) + " per kW-yr", r.covers.ct >= 0 ? "good" : "bad");
+            kpi(k, "An existing peaker (upkeep only)", (up >= 0 ? "covers it, +" + usd0(up) : "short " + usd0(-up)) + " per kW-yr", up >= 0 ? "good" : "bad");
+            kpi(k, "Scarcity hours", int(r.scarce)); kpi(k, "Hours short", int(r.short), r.short ? "bad" : "good"); kpi(k, "Unserved", int(r.unserved) + " MWh");
+            if (moved) { api.done(); remember("ct", v); api.saw(thresholdText(restingPoint(D, X, ST.solar), upkeepPoint(D, X, ST.solar), G.peakers)); }
           }
           LX.Slider(act, { label: "Gas peakers on the market", min: G.peakers.min, max: G.peakers.max, step: G.peakers.step, value: ST.ct, fmt: function (v) { return int(v) + " MW"; }, onChange: function (v) { moved = true; show(v); } });
           show(ST.ct);
         } },
       // 6 capacity market
-      { text: "A [[capacity-market|capacity market]] adds a second payment: a planner sets how much capacity to buy, energy prices stop at a lower cap, and the capacity price fills a new peaker's gap.",
+      { text: "A [[capacity-market|capacity market]] adds a payment for [[capacity-accreditation|rated]] MW. This toy is simplified: no auction against a requirement; energy prices stop at a lower cap, and the capacity price fills a new peaker's gap.",
         build: function (act, api) {
+          context(act);
           var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Market design" }, act), out = H("div", { "aria-live": "polite" }, act), seen = {};
           function show(dz) {
             Array.prototype.forEach.call(seg.children, function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-k") === dz ? "true" : "false"); });
             var r = base(dz), eo = base("eo"), cm = base("cm"); out.innerHTML = "";
             var k = H("div", { class: "a3-kpis" }, out);
             kpi(k, "Consumers pay", usd(r.consumer) + "/MWh"); kpi(k, "Capacity price", dz === "cm" ? mwday(r.capPrice) + "/MW-day" : "none"); kpi(k, "Highest price", usd0(r.top) + "/MWh"); kpi(k, "Hours short", int(r.short), r.short ? "bad" : "good");
-            table(out, ["New plant", "Earns ($/kW a year)", "Fixed cost ($/kW a year)", "Covers it?"], coverRows(r), "What each new plant earns against its fixed cost, " + D.designs[dz].label);
+            table(out, ["New plant", dz === "cm" ? "Margin after running costs, with the capacity payment ($/kW a year)" : "Margin after running costs ($/kW a year)", "Fixed cost ($/kW a year)", "Covers it?"], coverRows(r), "Each new plant's margin against its fixed cost, " + D.designs[dz].label);
             seen[dz] = true;
             if (seen.eo && seen.cm) { api.done(); remember("design", true);
-              api.saw("With " + int(ST.ct) + " MW of peakers, consumers pay " + usd(eo.consumer) + "/MWh energy-only and " + usd(cm.consumer) + "/MWh with a capacity market at " + mwday(cm.capPrice) + "/MW-day. **The same fleet, paid in different hours and by different rules.**"); }
+              api.saw("With " + int(ST.ct) + " MW of peakers, consumers pay " + usd(eo.consumer) + "/MWh energy-only and " + usd(cm.consumer) + "/MWh with the simplified capacity market at " + mwday(cm.capPrice) + "/MW-day. **The same fleet, paid in different hours and by different rules.**"); }
           }
           ["eo", "cm"].forEach(function (dz) { var b = H("button", { type: "button", "aria-pressed": "false", "data-k": dz, text: D.designs[dz].label }, seg); b.addEventListener("click", function () { show(dz); }); });
-          H("p", { class: "a3-note", text: "Capacity market: energy capped at $" + int(D.designs.cm.cap) + "/MWh (illustrative), the capacity price paid on rated MW. " + D.designs.ratingsNote }, act);
+          D.designs.cmNotes.forEach(function (t) { H("p", { class: "a3-note", html: LX.rich(t) }, act); });
         } },
       // 7 real prices
       { text: "PJM's 2028/29 capacity auction cleared at its cap of $325/MW-day and short of its target. Does that mean blackouts are coming?",
         build: function (act, api) {
           var pr = LX.Predict(act, { id: "a3-pjm", fresh: true, q: "", title: false, answer: "no",
             options: [{ value: "yes", label: "Yes, outages are certain" }, { value: "no", label: "No, reserves are thinner than the target" }],
-            feedback: { no: "Yes: the shortfall is measured against PJM's 1-in-10 criterion; it means thinner reserves, not certain outages.", yes: "Not so: the shortfall is measured against PJM's 1-in-10 criterion; it means thinner reserves, not certain outages." },
-            onPick: function () { pr.reveal("PJM's 2028/29 auction was 6,831 MW short of its reliability requirement, with a 14.7% reserve margin (PJM release, 14 July 2026)."); api.done(); remember("pjm", true); api.saw("A capacity price is set by a demand curve, a cap and a forecast. **Read it with the rules that made it: lesson [[lesson:a05-adequacy|A5]] shows how the requirement is set.**"); } });
+            feedback: { no: "Yes: the shortfall is measured against PJM's standard of one shortfall event in ten years; it means thinner reserves, not certain outages.", yes: "Not so: the shortfall is measured against PJM's standard of one shortfall event in ten years; it means thinner reserves, not certain outages." },
+            onPick: function () { pr.reveal("PJM's 2028/29 auction was 6,831 MW short of its reliability requirement, with a 14.7% [[reserve-margin|reserve margin]] (PJM release, 14 July 2026)."); api.done(); remember("pjm", true); api.saw("A capacity price is set by a demand curve, a cap and a forecast. **Read it with the rules that made it: lesson [[lesson:a05-adequacy|A5]] shows how the requirement is set.**"); } });
         } },
       // 8 around the world
       { text: "Grids organize this differently. Match each arrangement to where it is used.",
@@ -303,22 +327,22 @@
     x.innerHTML = ""; x.classList.add("is-live");
     var R = D.reference || {};
     var rows = [
-      { key: "eo", name: "Energy-only with scarcity pricing", who: "investors, from expected prices", pays: "a few scarcity hours", risk: "spikes for buyers; uncertain revenue for plants", ex: "ERCOT" },
+      { key: "eo", name: "Energy-only with scarcity pricing", who: "investors, from expected prices", pays: "energy and reserve prices, high in a few scarcity hours", risk: "spikes for buyers; uncertain revenue for plants", ex: "ERCOT" },
       { key: "cm", name: "Capacity market", who: "a planner's requirement", pays: "energy plus a capacity price", risk: "rules and forecasts set the price; consumers pay for the MW bought", ex: "PJM, MISO, NYISO, ISO-NE" },
       { key: "res", name: "Reserve products", who: "the operator's reserve needs", pays: "prices for spare capacity, hour by hour", risk: "depends on how the demand curves are drawn", ex: "both kinds of market" }
     ];
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
       title: "Three ways to pay for enough capacity", text: true,
       columns: [{ key: "name", label: "Design", main: true }, { key: "who", label: "How much capacity: set by" }, { key: "pays", label: "What pays a peaker" }, { key: "risk", label: "Trade-off" }, { key: "ex", label: "Where" }],
-      rows: rows, sorts: [{ label: "As listed", order: ["eo", "cm", "res"], note: R.eo ? "Plains market, " + int(R.ct) + " MW of peakers: consumers pay " + usd(R.eo.consumer) + "/MWh energy-only and " + usd(R.cm.consumer) + "/MWh with a capacity market." : "" }]
+      rows: rows, sorts: [{ label: "As listed", order: ["eo", "cm", "res"], note: R.eo ? "Default Plains market (" + int(R.solar) + " MW of solar, " + int(R.ct) + " MW of peakers): consumers pay " + usd(R.eo.consumer) + "/MWh energy-only and " + usd(R.cm.consumer) + "/MWh with the simplified capacity market." : "" }]
     });
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "How one hour's price forms", lede: "Trace two hours of the Plains market.",
+      title: "How one hour's price forms", lede: "Trace two hours of the default Plains market (1,200 MW of solar, 700 MW of peakers).",
       nodes: {
         s: { t: "Stack the offers", tN: ["Stack the", "offers"], s: "cheapest first", sN: "cheapest first" },
         m: { t: "Find the last one needed", tN: ["Last one", "needed"], s: "it sets the price", sN: "sets the price" },
         q: { t: "Spare under 600 MW?", tN: ["Spare under", "600 MW?"], k: "q" },
-        a: { t: "Add the scarcity adder", tN: ["Add the", "scarcity adder"], s: "up to the cap", sN: "up to the cap" },
+        a: { t: "Add the scarcity adder", tN: ["Add the", "scarcity adder"], s: "the cap if short", sN: "cap if short" },
         p: { t: "One price for everyone", tN: ["One price for", "everyone"], k: "end" }
       },
       cols: 2, at: { s: [0, 0], m: [0, 1], q: [0, 2], a: [1, 2], p: [1, 3] }, colsN: 2, atN: { s: [0, 0], m: [0, 1], q: [0, 2], a: [1, 2], p: [1, 3] },

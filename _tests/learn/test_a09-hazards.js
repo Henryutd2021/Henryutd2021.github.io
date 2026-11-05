@@ -1,9 +1,12 @@
 // test_a09-hazards.js — Node tests for Analyst lesson A9 (assets/learn/a09-hazards.js, on lesson A5's simulator): the
-// hazards enter as the data say (windows, multipliers, the defences' eased shares, the shutoff tally); a hazard only ever
-// lowers the supply margin; the page's results at seed 2025 (each hazard, the pairs, the defences, the best portfolio
+// hazards enter as the data say (windows, multipliers, the defences' eased shares, the shutoff tally); switched-off demand
+// leaves the supply balance (the margins equal a run with that demand removed); a supply hazard only ever lowers the
+// supply margin; the page's results at seed 2025 (each hazard, the pairs, the defences, the best portfolio
 // within the budget, found by trying every one) match the model; the messages say what the numbers show for every
 // input; the real events' numbers are those of their sources; every number on the page is accounted for; the drill's
-// answers are right; and the page mounts and runs its six cards on a stub document.
+// answers are right; and the page mounts and runs its six cards on a stub document. The number scan is an
+// unexpected-number check: it flags a number nobody accounted for; it does not prove what a number means (the
+// statements above do that).
 // Usage (from the site folder):  node _tests/learn/test_a09-hazards.js [--write]
 //   --write rewrites the no-JS table in learn/a09-hazards.qmd and the reference block of data/a09-hazards.json
 "use strict";
@@ -39,11 +42,12 @@ const reference = {
   pairs: PAIRS.map(x => ({ ids: x.p, lole: x.ab.lole, eue: +x.ab.eue.toFixed(2), ratio: +x.c.ratio.toFixed(4) })),
   best: { defences: BEST.ds, cost: BEST.c, total: +BEST.total.toFixed(2), portfolios: PORT.length }
 };
+const shutCell = (a, b) => a < 0.5 && b < 0.5 ? "0" : int(a) + " → " + int(b);
 function staticTable() {
-  const rows = H.hazards.map(h => `<tr><td>${h.label}</td><td>${h.when}</td><td>${d3(SW[h.id].lole)}</td><td>${int(SW[h.id].eue)}</td><td>${int(BEST.s[h.id].eue)}</td></tr>`);
-  return [`<table class="a9-static" aria-label="The Plains Grid in a year when each hazard strikes: LOLE and unserved energy, 500 resampled years, seed 2025">`,
-    `<thead><tr><th scope="col">Year with</th><th scope="col">When</th><th scope="col">LOLE (days a year)</th><th scope="col">Unserved energy (MWh a year)</th><th scope="col">With winterizing, hardened lines and demand response</th></tr></thead>`,
-    `<tbody>`, `<tr><td>No hazard</td><td>–</td><td>${d3(SW.none.lole)}</td><td>${int(SW.none.eue)}</td><td>–</td></tr>`, ...rows, `</tbody></table>`].join("\n");
+  const rows = H.hazards.map(h => `<tr><td>${h.label}</td><td>${h.when}</td><td>${d3(SW[h.id].lole)}</td><td>${int(SW[h.id].eue)}</td><td>${int(BEST.s[h.id].eue)}</td><td>${shutCell(SW[h.id].shut, BEST.s[h.id].shut)}</td></tr>`);
+  return [`<table class="a9-static" aria-label="The Plains Grid in a year when each hazard strikes: LOLE, unserved energy and energy switched off directly, 500 resampled years, seed 2025">`,
+    `<thead><tr><th scope="col">Year with</th><th scope="col">When</th><th scope="col">LOLE (days a year)</th><th scope="col">Unserved energy (MWh a year)</th><th scope="col">With winterizing, hardened lines and demand response</th><th scope="col">Switched off directly (MWh a year), without → with those defences</th></tr></thead>`,
+    `<tbody>`, `<tr><td>No hazard</td><td>–</td><td>${d3(SW.none.lole)}</td><td>${int(SW.none.eue)}</td><td>–</td><td>0</td></tr>`, ...rows, `</tbody></table>`].join("\n");
 }
 const BLOCK = /(<!-- a9-table:start[^>]*-->\n)([\s\S]*?)(<!-- a9-table:end -->)/;
 if (process.argv.includes("--write")) {
@@ -66,10 +70,12 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   ok(count(heat.demand) === 31 * 24 && heat.demand[195 * 24] === 1.07 && heat.demand[195 * 24 - 1] === 1 && near(heat.avail.cc[200 * 24], 0.95) && count(heat.avail.coal) === 0, "heat wave: 15 July to 14 August, demand ×1.07, gas units ×0.95");
   ok(count(cold.demand) === 7 * 24 && near(cold.avail.cc[13 * 24], 0.7) && near(cold.avail.coal[13 * 24], 0.9) && near(cold.wind[19 * 24 + 23], 0.7) && cold.wind[20 * 24] === 1, "cold snap: 14 to 20 January, demand ×1.12, gas ×0.7, coal ×0.9, wind ×0.7");
   const f0 = M.dayOf("08-01") * 24;
-  ok(count(fire.mod.wind) === 21 * 8 && fire.mod.wind[f0 + 11] === 1 && near(fire.mod.wind[f0 + 12], 0.6667) && fire.mod.wind[f0 + 20] === 1 && near(fire.tally[f0 + 12], 0.05) && fire.tally[f0 + 20] === 0, "wildfire: 1 to 21 August, 12:00 to 20:00, a third of the wind and 5% of customers switched off");
+  ok(count(fire.mod.wind) === 21 * 8 && fire.mod.wind[f0 + 11] === 1 && near(fire.mod.wind[f0 + 12], 0.6667) && fire.mod.wind[f0 + 20] === 1 && near(fire.tally[f0 + 12], 0.05) && fire.tally[f0 + 20] === 0 && near(fire.mod.avail.cc[f0 + 12], 0.75) && fire.mod.avail.ct[f0 + 12] === 1, "wildfire: 1 to 21 August, 12:00 to 20:00, a third of the wind output and a quarter of the available combined-cycle output cut off, 5% of demand switched off (the page's words)");
+  ok(/a third of the wind output and a quarter of the available combined-cycle output/.test(M.hazard(H, "fire").what) && /5% of demand/.test(M.hazard(H, "fire").what) && !/400 MW gas unit|customers/.test(M.hazard(H, "fire").what), "wildfire: the description matches the model (a share of every available combined-cycle unit, a share of demand)");
   // defences keep a share of each loss; demand is never eased
   const w = M.mods(H, ["cold"], ["winterize"]).mod, fh = M.mods(H, ["fire"], ["harden"]);
   ok(near(w.avail.cc[13 * 24], 1 - (1 / 3) * 0.3, 1e-4) && near(w.demand[13 * 24], 1.12) && near(fh.tally[f0 + 12], 0.4 * 0.05) && near(fh.mod.wind[f0 + 12], 1 - 0.4 * (1 - 0.6667)), "defences: winterizing keeps a third of the cold losses (gas 30% to 10%), demand unchanged; hardening keeps 40% of the shutoff");
+  { const c0 = M.mods(H, ["cold"]).mod, t = 13 * 24, k = 0.3333; ok(["cc", "ct", "coal"].every(u => near(w.avail[u][t], 1 - k * (1 - c0.avail[u][t]), 1e-12)) && near(w.wind[t], 1 - k * 0.3, 1e-12) && /gas, coal and wind/.test(M.defence(H, "winterize").what) && /wind turbines/.test(M.defence(H, "winterize").label), "winterizing eases gas, coal and wind alike, and its name and text say so"); }
   ok(M.keep(H, "heat", ["cooling"]) === 0.5 && M.keep(H, "drought", ["cooling"]) === 0.3333 && M.keep(H, "cold", ["cooling"]) === 1, "defences: cooling eases heat and drought only");
   ok(M.cost(H, ["winterize", "harden", "dr"]) === 60 && H.budget === 60 && M.cost(H, ["battery", "cooling"]) === 85, "costs: $25M + $20M + $15M = $60M, the budget");
   // a hazard only lowers the margin: every kept hour of every year is at or below the no-hazard margin
@@ -77,27 +83,32 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   let worse = true; HZ.forEach(id => { const S1 = A5.simulate(D5, SRC, 2025, { years: 30, mod: M.mods(H, [id]).mod });
     S0.years.forEach((y, n) => { const m1 = new Map(); S1.years[n].idx.forEach((t, j) => m1.set(t, S1.years[n].m[j])); y.idx.forEach((t, j) => { if (!m1.has(t) || m1.get(t) > y.m[j] + 1e-3) worse = false; }); }); });
   ok(worse, "hazards: in 30 years, every hour short of 1,500 MW of margin without a hazard stays at or below it with each hazard");
+  // switched-off demand leaves the balance: the margins with the tally equal a run whose demand is cut by the same share
+  const fm = M.mods(H, ["fire"]), dem = Float64Array.from(fm.mod.demand, (v, t) => v * (1 - fm.tally[t]));
+  const Sa = A5.simulate(D5, SRC, 2025, { years: 30, mod: fm.mod, tally: fm.tally }), Sb = A5.simulate(D5, SRC, 2025, { years: 30, mod: Object.assign({}, fm.mod, { demand: dem }) });
+  let same = Sa.years.length === Sb.years.length; Sa.years.forEach((y, n) => { const z = Sb.years[n]; if (y.idx.join() !== z.idx.join() || !y.m.every((v, j) => Math.abs(v - z.m[j]) < 1e-3)) same = false; });
+  ok(same && Sa.tally > 0 && Sb.tally === 0, "shutoffs: switched-off demand leaves the supply balance (30 years: the same kept hours and margins as with that demand removed); its energy is counted apart");
   ok(M.overlap(H, "heat", "drought") && M.overlap(H, "heat", "fire") && !M.overlap(H, "cold", "fire"), "pairs: heat overlaps drought and wildfire; the cold snap overlaps neither");
 }
 
 // ---------------- results at seed 2025: the page's statements
 {
   ok(d3(SW.none.lole) === "0.228" && int(SW.none.eue) === "108", "no hazard: A5's grid, 0.228 days and 108 MWh a year");
-  ok(int(SW.heat.eue) === "451" && int(SW.drought.eue) === "357" && int(SW.cold.eue) === "5,802" && int(SW.fire.eue) === "501" && int(SW.fire.shut) === "28,871", "hazard years: 451, 357, 5,802 and 501 MWh; 28,871 MWh switched off directly");
+  ok(int(SW.heat.eue) === "451" && int(SW.drought.eue) === "357" && int(SW.cold.eue) === "5,802" && int(SW.fire.eue) === "230" && int(SW.fire.shut) === "28,871", "hazard years: 451, 357, 5,802 and 230 MWh; 28,871 MWh switched off directly");
   ok(Math.max(...HZ.map(h => SW[h].eue)) === SW.cold.eue, "the cold snap is the worst hazard year");
   const hd = PAIRS[0];
   ok(hd.p.join() === "heat,drought" && int(hd.ab.eue) === "1,649" && int(hd.c.both) === "1,541" && int(hd.c.sum) === "591" && times(hd.c.ratio) === "2.6", "heat and drought: 1,649 MWh, adding 1,541 against 591, 2.6 times");
   ok(PAIRS[1].c.ratio > 0.999 && PAIRS[1].c.ratio < 1.001 && PAIRS[2].c.ratio > 1.05, "pairs: cold snap and wildfire simply add; heat and wildfire compound");
-  ok(BEST.ds.join() === "winterize,harden,dr" && BEST.c === 60 && int(BEST.total) === "690" && PORT[1].total - BEST.total > 1, `best portfolio within $60M by total unserved energy over the four years: winterize, harden, DR (690 MWh), unique (next ${int(PORT[1].total)}) of ${PORT.length}`);
+  ok(BEST.ds.join() === "winterize,harden,dr" && BEST.c === 60 && int(BEST.total) === "686" && PORT[1].total - BEST.total > 1, `best portfolio within $60M by total unserved energy over the four years: winterize, harden, DR (686 MWh), unique (next ${int(PORT[1].total)}) of ${PORT.length}`);
   ok(int(WINT.s.cold.eue) === "528" && int(BAT.s.cold.eue) === "3,365" && WINT.c * 2 < BAT.c, "battery myth: the battery alone leaves 3,365 MWh in the cold-snap year, winterizing 528, at less than half the cost");
   ok(JSON.stringify(H.reference) === JSON.stringify(reference), "reference block: equals the model (run --write after a change)");
   has("Unserved energy rises from 108 MWh a year with no hazard to 5,802 MWh in a cold-snap year (table below).");
   has("A heat wave and a drought together add 1,541 MWh a year, 2.6 times the 591 MWh of the two alone.");
-  has("Within $60M a year, winterizing, hardening lines and demand response together leave the least unserved energy across the four hazard years: 690 MWh.");
+  has("Within $60M a year, winterizing, hardening lines and demand response together leave the least unserved energy across the four hazard years: 686 MWh.");
   has("A heat wave and a drought together added 2.6 times the unserved energy of the two alone");
-  has("28,871 MWh a year switched off directly, against 501 MWh of supply shortfall.");
+  has("28,871 MWh a year switched off directly, against 230 MWh of supply shortfall in that year.");
   has("A 4-hour battery alone leaves 3,365 MWh unserved in the cold-snap year, against 528 MWh with winterizing at less than half its cost.");
-  has("With no hazard, 108 MWh a year go unserved; with a heat wave 451, with a drought 357, with both 1,649.");
+  has("With no hazard, 108 MWh a year go unserved; with a heat wave 451, with a drought 357, with both 1,649. Subtract the no-hazard 108 from each: the increase with both is how many times the sum of the two separate increases?");
   has("(1,649 − 108) ÷ ((451 − 108) + (357 − 108)) = 1,541 ÷ 592 ≈ 2.6 times (from the rounded numbers).");
   ok((1649 - 108) === 1541 && (451 - 108) + (357 - 108) === 592 && Math.round(SW.heat.eue) + Math.round(SW.drought.eue) - 2 * Math.round(SW.none.eue) === 592 && (1541 / 592).toFixed(1) === "2.6" && Math.round(PAIRS[0].ab.eue) === 1649, "quiz: the worked line recomputes from the rounded numbers it shows: 1,541 ÷ 592 = 2.6");
   ok(/data-id="ratio" data-answer="b"[\s\S]{0,500}<li data-value="b">2\.6 times<\/li>/.test(QMD), "quiz: the answer points at 2.6 times");
@@ -110,6 +121,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 {
   const ev = id => H.events.filter(e => e.id === id)[0], txt = id => JSON.stringify(ev(id));
   ok(/1,045 units/.test(txt("uri")) && /4,124 outages/.test(txt("uri")) && /75\.6%/.test(txt("uri")) && /44\.2%/.test(txt("uri")) && /31\.4%/.test(txt("uri")) && /58%, 27%, 6%/.test(txt("uri")) && /20,000 MW/.test(txt("uri")) && /23,418 MW/.test(txt("uri")) && /59\.304 Hz/.test(txt("uri")) && /4 minutes 23 seconds/.test(txt("uri")) && /printed pp\. 9, 15 and 137/.test(ev("uri").source.label), "Uri: FERC–NERC report figures, printed pages 9, 15, 137");
+  ok(/not counting units already out before the storm/.test(txt("elliott")) && /not counting units already out/.test(QMD) && /over 8 to 20 February/.test(txt("uri")), "Elliott's 90,500 MW excludes units already out (report p. 5); Uri's 1,045 units are counted over 8 to 20 February");
   ok(/90,500 MW/.test(txt("elliott")) && /55%/.test(txt("elliott")) && /31%/.test(txt("elliott")) && /24%/.test(txt("elliott")) && /over 5,400 MW/.test(txt("elliott")) && /pp\. 5, 6 and 18/.test(ev("elliott").source.label), "Elliott: 90,500 MW, 55% (31% + 24%), over 5,400 MW; pages 5, 6, 18");
   ok(/491,600/.test(txt("caiso")) && /321,000/.test(txt("caiso")) && /pp\. 1 and 34–35/.test(ev("caiso").source.label) && /48%/.test(txt("drought")) && /14%/.test(txt("drought")) && /738,000/.test(txt("psps")) && /13%/.test(txt("psps")), "heat, drought and shutoff events: CAISO RCA, EIA figures");
   ok(H.prepare.length === 4 && H.prepare.every(p => p.source && /^https:\/\//.test(p.source.url)) && /EOP-012-3/.test(JSON.stringify(H.prepare)) && /2025-10-01/.test(JSON.stringify(H.prepare)), "preparation timeline: four dated steps, each with a source");
@@ -122,7 +134,9 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const plain = t => t.replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "");
   const words = t => plain(t).split(/\s+/).filter(Boolean).length;
   // pairText: compound only when the ratio is above 1.05; "different times" only when the windows do not overlap
-  ok(/bite deeper than the sum/.test(M.pairText(H, "heat", "drought", PAIRS[0].c)) && /strike at different times/.test(M.pairText(H, "cold", "fire", PAIRS[1].c)) && !/different times/.test(M.pairText(H, "heat", "fire", { sum: 100, both: 100, ratio: 1 })), "texts: the pair message follows the ratio and the overlap");
+  ok(/bite deeper than the sum/.test(M.pairText(H, "heat", "drought", PAIRS[0].c)) && /in the same year add [\d,]+ MWh a year, against [\d,]+ MWh for the two alone: they strike months apart, so their harms simply add\./.test(M.pairText(H, "cold", "fire", PAIRS[1].c)) && !/bite deeper|together/.test(M.pairText(H, "cold", "fire", { sum: 100, both: 300, ratio: 3 })) && !/months apart/.test(M.pairText(H, "heat", "fire", { sum: 100, both: 100, ratio: 1 })), "texts: the pair message follows the ratio and the overlap; a pair months apart is never called a compound");
+  ok(M.pairLabel(H, "heat", "drought") === "Heat wave + drought" && M.pairLabel(H, "heat", "fire") === "Heat wave + wildfire shutoffs" && M.pairLabel(H, "cold", "fire") === "Cold snap, then wildfire shutoffs (months apart)", "texts: pair buttons say when a pair falls months apart");
+  ok(M.packageText(H, ["winterize", "harden", "dr"]) === "Winterize, Harden lines and Demand response, $60M a year" && M.packageText(H, ["battery"]) === "Battery, $55M a year", "texts: results name the defences they belong to");
   ok(/less than the/.test(M.pairText(H, "heat", "drought", { sum: 100, both: 50, ratio: 0.5 })), "texts: a pair can also add less than the sum");
   const dt = M.defenceText(H, SW, BEST.s, BEST.ds);
   ok(/^For \$60M a year: in the cold snap year, unserved energy falls from 5,802 to 288 MWh, the largest cut\. \*\*Some risk remains/.test(dt) && words(dt) <= 36, "texts: the defence message (" + words(dt) + " words): " + dt);
@@ -131,12 +145,14 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   ok(prompts.length === 6, "steps: six cards (" + prompts.length + ")");
   prompts.forEach((p, i) => { const s = (plain(p).match(/[.?!](?=\s+[A-Z(\[]|$)/g) || []).length; ok(words(p) <= 35 && s <= 2, `prompt ${i + 1}: ${words(p)} words, ${s} sentences (≤ 35, ≤ 2)`); });
   const msgs = ["Uri was a [[correlated-failure|correlated failure]]: cold raised demand while freezing and fuel problems took units of every kind out together. **Lesson A5 drew outages independently; here they are not.**",
-    "A cold snap year: 5,802 MWh unserved against 108 without. Shutoffs add 393 MWh of shortfall, and switch off 28,871 MWh of customers' power directly.",
+    "A cold snap year: 5,802 MWh unserved against 108 without. Shutoffs add 122 MWh of shortfall, and switch off 28,871 MWh of customers' power directly.",
     M.pairText(H, "heat", "drought", PAIRS[0].c), M.pairText(H, "cold", "fire", PAIRS[1].c), dt,
-    "Planners now test grids against correlated hazards, require cold-weather plans and harden lines. **Each defence answers one hazard; none answers all four.**"];
+    M.CLOSING];
   msgs.forEach((t, i) => ok(words(t) <= 36, `message ${i + 1}: ${words(t)} words (≤ 36)`));
-  ok(int(SW.fire.eue - SW.none.eue) === "393", "step 3: shutoffs add 393 MWh of shortfall");
-  ["correlated-failure", "compound-hazard", "public-safety-power-shutoff", "winterization", "stress-test"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
+  ok(int(SW.fire.eue - SW.none.eue) === "122", "step 3: shutoffs add 122 MWh of shortfall");
+  ok(/Some defences target one hazard; storage and flexible demand help in several, but cannot restore switched-off lines/.test(M.CLOSING) && DEF.filter(d => M.defence(H, d).add).every(d => HZ.every(h => PORT.filter(p => p.ds.join() === d)[0].s[h].eue < SW[h].eue - 1 && PORT.filter(p => p.ds.join() === d)[0].s[h].shut === SW[h].shut)), "step 6: the battery and demand response cut the shortfall in all four hazard years and leave the shutoffs as they are (the closing message)");
+  ["correlated-failure", "compound-hazard", "public-safety-power-shutoff", "winterization", "stress-test", "derate", "firm-load-shed"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && (JS + JSON.stringify(H)).indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
+  ok(!/Thermal plants|Wellheads/.test(JS) && /\[\[derate\|derates\]\]/.test(JSON.stringify(H)), "terms: no unexplained 'thermal plants' or 'wellheads'; derates and firm load shed marked");
   const elems = [].concat((QMD.match(/<li>[\s\S]*?<\/li>/g) || []).filter(t => !/data-value=/.test(t) && !/<li>(FERC|CAISO|EIA|NERC|ERCOT)/.test(t)), QMD.match(/^- \*\*[\s\S]*?$/gm) || []);
   const w2 = t => t.replace(/<[^>]+>/g, " ").replace(/\$[^$]*\$/g, "x").replace(/\*\*/g, "").split(/\s+/).filter(Boolean).length;
   const long = elems.filter(t => w2(t) > 36).map(t => w2(t) + ": " + t.replace(/<[^>]+>/g, "").slice(0, 60));
@@ -146,13 +162,14 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
 // ---------------- every number in the visible text is accounted for (whitelist scan)
 {
   let body = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<style>[\s\S]*?<\/style>/g, "")
-    .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ").replace(/\$[^$]*\$/g, " ");
+    .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ")
+    .replace(/^(- \*\*|\|).*$/gm, l => l.replace(/\$[^$\n]*\$/g, " "));   // math only in Go deeper bullets and tables, so a dollar amount never pairs with another
   const allowed = new Set(), add = v => allowed.add(String(v));
   staticTable().replace(/<[^>]+>/g, " ").match(/\d[\d,]*(?:\.\d+)?/g).forEach(add);
-  ["500", "2025", "2021", "58", "1,045", "27", "6", "108", "5,802", "1,541", "2.6", "591", "60", "690", "28,871", "501", "3,365", "528", "451", "357", "1,649", "75.6", "20,000", "90,500", "2022", "2023", "2025", "1", "12", "44.2", "31.4", "31", "24", "4", "1.0", "1.9", "0.5", "15", "9", "137", "5", "18", "592", "2020", "13", "34", "35", "2019", "17", "30", "14", "2012", "012", "3", "7", "M-A120721", "01", "9,000", "5,000", "11", "41714", "51839", "54639", "2024", "2"].forEach(add);
+  ["500", "2025", "2021", "58", "1,045", "27", "6", "108", "5,802", "1,541", "2.6", "591", "60", "686", "28,871", "230", "3,365", "528", "451", "357", "1,649", "75.6", "20,000", "90,500", "2022", "2023", "2025", "1", "12", "44.2", "31.4", "31", "24", "4", "1.0", "1.9", "0.5", "15", "9", "137", "5", "18", "592", "2020", "13", "34", "35", "2019", "17", "30", "14", "2012", "012", "3", "7", "M-A120721", "120721", "01", "9,000", "5,000", "11", "41714", "51839", "54639", "2024", "2"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
-  ok(unknown.length === 0, "every number on the page is from the model, a source or a structural count; unknown: " + unknown.join(" "));
+  ok(unknown.length === 0, "unexpected-number check: no number on the page is outside the model's, the sources' and the structural counts; unknown: " + unknown.join(" "));
 }
 
 // ---------------- the drill
@@ -206,17 +223,25 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     demo.cards.go(1); btns(/^Gas units$/)[0].click();
     ok(/Uri was a correlated failure/.test(saw()) && /1,045 units/.test(card().textContent), "stub: step 2 shows Uri's facts");
     demo.cards.go(2); btns(/^Cold snap$/)[0].click(); btns(/^Wildfire shutoffs$/)[0].click();
-    ok(/^A cold snap year: 5,802 MWh unserved against 108 without\. Shutoffs add 393 MWh of shortfall, and switch off 28,871 MWh/.test(saw()), "stub: step 3: " + saw().slice(0, 90));
+    ok(/^A cold snap year: 5,802 MWh unserved against 108 without\. Shutoffs add 122 MWh of shortfall, and switch off 28,871 MWh/.test(saw()), "stub: step 3: " + saw().slice(0, 90));
     demo.cards.go(3); btns(/^Heat wave \+ drought$/)[0].click();
     ok(/^Heat wave and drought together add 1,541 MWh a year of unserved energy, 2\.6 times the 591 MWh/.test(saw()), "stub: step 4: " + saw().slice(0, 90));
+    btns(/^Cold snap, then wildfire shutoffs \(months apart\)$/)[0].click();
+    ok(/Cold snap, then wildfire shutoffs/.test(card().textContent) && /strike months apart/.test(saw()), "stub: step 4's pair months apart is labelled so: " + saw().slice(0, 90));
     demo.cards.go(4); ["Winterize", "Harden lines", "Demand response"].forEach(l => btns(new RegExp("^" + l + " · "))[0].click());
     ok(/Chosen: \$60M of \$60M a year/.test(card().textContent), "stub: step 5's budget line");
     btns(/Run the hazard years/)[0].click();
     ok(/^For \$60M a year: in the cold snap year, unserved energy falls from 5,802 to 288 MWh/.test(saw()), "stub: step 5: " + saw().slice(0, 90));
+    ok(/Results for: Winterize, Harden lines and Demand response, \$60M a year\./.test(card().textContent) && /28,871 → 11,548/.test(card().textContent) && /Switched off directly, before → with \(MWh\/yr\)/.test(card().textContent), "stub: step 5 labels its results with their defences and shows the direct shutoffs on every screen");
+    const stale = () => card().querySelector(".a9-warn");
+    ok(stale() && stale().hidden, "stub: step 5: no stale warning right after a run");
     btns(/^Battery · /)[0].click();
     ok(/over budget/.test(card().textContent) && btns(/Run the hazard years/)[0].disabled, "stub: step 5 refuses a plan over the budget");
+    ok(!stale().hidden && /Your choice has changed/.test(saw()), "stub: step 5 marks the old results stale when the choice changes");
+    btns(/^Battery · /)[0].click();
+    ok(stale().hidden && /^For \$60M a year/.test(saw()), "stub: step 5: back to the choice that was run, the results are current again");
     demo.cards.go(5); btns(/Done reading/)[0].click();
-    ok(/Each defence answers one hazard/.test(saw()) && /EOP-012-3/.test(card().textContent), "stub: step 6 shows the preparation timeline");
+    ok(/Some defences target one hazard/.test(saw()) && /EOP-012-3/.test(card().textContent), "stub: step 6 shows the preparation timeline");
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 

@@ -17,6 +17,12 @@ glossary:
   - id: stress-test
     term: Stress test
     def: "Running a system model through a severe event on purpose, to see what breaks and what a defence would change."
+  - id: derate
+    term: Derate
+    def: "A cut in the most a power plant can produce while it keeps running, for example when its cooling water is too warm or its equipment freezes."
+  - id: firm-load-shed
+    term: Firm load shed
+    def: "Disconnecting customers whose supply is normally assured, on the grid operator's order and usually in rotation, so that a grid short of supply does not collapse."
 requests:
   - "A9 loads assets/learn/a05-adequacy.js for its simulator (LX.A5), as lesson 12 loads 13-capstone.js: promote A5's simulator to a shared component (also for C2)."
   - "Cross-links for the coordinator: F6 (learn/f06-grid-and-outages.qmd, 'A9 (upcoming) plans for hazards') still calls A9 upcoming."

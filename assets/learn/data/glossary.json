@@ -695,6 +695,12 @@
   "lesson": 6,
   "href": "06-three-jobs.html"
  },
+ "derate": {
+  "term": "Derate",
+  "short": "A cut in the most a power plant can produce while it keeps running, for example when its cooling water is too warm or its equipment freezes.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
+ },
  "desalination": {
   "term": "Desalination",
   "short": "Removing salt from seawater or salty groundwater to make fresh water, with heat or with electricity.",
@@ -871,7 +877,7 @@
  },
  "energy-only-market": {
   "term": "Energy-only market",
-  "short": "A wholesale market in which plants are paid only for the energy they sell, so high prices in scarce hours must pay for capacity that is rarely used.",
+  "short": "A wholesale market design with no separate capacity market, in which energy and reserve prices, high in scarce hours, must pay for capacity that is rarely used.",
   "lesson": "A3",
   "href": "a03-market-design.html"
  },
@@ -1018,6 +1024,12 @@
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "firm-load-shed": {
+  "term": "Firm load shed",
+  "short": "Disconnecting customers whose supply is normally assured, on the grid operator's order and usually in rotation, so that a grid short of supply does not collapse.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
  },
  "firm-output": {
   "term": "Firm output",
@@ -1873,7 +1885,7 @@
  },
  "offer-cap": {
   "term": "Offer cap",
-  "short": "The highest price a market lets a seller offer, and so the ceiling on scarcity prices; it is set by the market's rules.",
+  "short": "The highest price a market's rules let a seller put in an offer; clearing prices can still rise above it, for example through scarcity pricing or congestion.",
   "lesson": "A3",
   "href": "a03-market-design.html"
  },
@@ -2230,6 +2242,12 @@
   "short": "The planned weeks when a reactor is shut down to replace part of its fuel and carry out maintenance.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "rto": {
+  "term": "Regional transmission organization (RTO)",
+  "short": "An independent organization, such as PJM or MISO, that runs a region's transmission grid and its wholesale electricity markets.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
  },
  "regret": {
   "term": "Regret",

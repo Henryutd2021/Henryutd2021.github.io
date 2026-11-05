@@ -157,6 +157,19 @@
       }
     ]
   },
+  "texts": {
+    "about": "Notes and feedback the page shows (step 2's interval and seed, step 4's screen, a rating at a zero target, step 8's question); the test checks each against the model and the text budget.",
+    "ZERO_NOTE": "No shortfall is left in the 500 years, so the rating is the smallest perfect MW that also leaves none: a limit of the sample, not proof of zero risk.",
+    "SE_NOTE": "± two [[standard-error|standard errors]] of the average over 500 years ([[monte-carlo-error|Monte Carlo error]]), given these inputs. It leaves out uncertainty in the weather history and the model's assumptions.",
+    "SEED_NOTE": "The [[random-seed|seed]] numbers the random draws so a run can be repeated; another seed draws other years with the same assumptions.",
+    "SCREEN_NOTE": "A deliberately crude screen: every MW counts at nameplate, and 500 MW of demand response counts as 500 MW of supply against the gross 4,000 MW peak.",
+    "PJM_SAW": "A rating belongs to one grid, one mix and one model. **Correlated outages, such as a cold snap knocking out many units at once, can lower a peaker's rating; Analyst lesson [[lesson:a09-hazards|A9]] brings such hazards in.**",
+    "PJM_Q": {
+      "weather": "Yes: PJM simulates outages as a function of weather (Manual 20A, section 2.3); here they are independent. It is one possible contributor; the grids, mixes and formulas differ too.",
+      "metric": "No: both rate by expected unserved energy (Manual 20A, sections 2.4 and 2.6), though PJM's formula is a ratio of EUE improvements and this lesson matches perfect MW. The weather assumption differs.",
+      "same": "No: PJM ties outages to the weather and this lesson draws them independently; the grids, mixes and formulas differ too."
+    }
+  },
   "reference": {
     "about": "Written by node _tests/learn/test_a05-adequacy.js --write at seed 2025 and checked on every run; repeats use seeds 1 to 20.",
     "base": {

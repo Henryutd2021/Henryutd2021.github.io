@@ -57,9 +57,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <p class="lx-eyebrow">The Plains Grid over 500 simulated years (seed 2025; illustrative fleet, resampled weather)</p>
 <ol>
 <li>4,000 MW of coal and gas units, 3,000 MW of wind and 1,200 MW of solar serve a 4,000 MW peak. Units fail at random.</li>
-<li>Over 500 simulated years the loss-of-load expectation is 0.228 days a year (± 0.049), above the 1-in-10 criterion of 0.1. In 410 years nothing went short.</li>
+<li>Over 500 simulated years the loss-of-load expectation is 0.228 days a year (± 0.049 from sampling alone), above the 1-in-10 criterion of 0.1. In 410 years nothing went short.</li>
 <li>Shortfalls bunch on summer evenings: 81% of the shortfall hours fall in June to September.</li>
-<li>Each 500 MW added lifts a nameplate reserve margin from 105.0% to 117.5%, yet LOLE ends anywhere from 0.012 to 0.200.</li>
+<li>Each 500 MW added, demand response counted as supply, lifts a nameplate reserve margin from 105.0% to 117.5%, yet LOLE ends anywhere from 0.012 to 0.200.</li>
 <li>Rated by the perfect MW that cut unserved energy as much, the five resources range from 89% (peakers) to 15% (solar) of their 500 MW (table below).</li>
 <li>Three blocks of solar in a row: 15%, then 6%, then 3%. Beside a 500 MW battery, solar's first block rates 31%.</li>
 </ol>
@@ -85,7 +85,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Weather is resampled, not observed: each week of a simulated year is a real week of 2024 or 2025, shifted by up to a week. The extremes are days that happened then.</li>
 <li>Real shapes: demand, wind and sun of the Southwest Power Pool (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>, 2024 and 2025); wind and solar scaled to EIA's 2025 monthly <span class="lx-term" data-term="capacity-factor">capacity factors</span>, as in <a href="m03-capacity-expansion.html">M3</a>.</li>
 <li>Units fail independently of each other and of the weather. Planned maintenance, the network and imports are left out.</li>
-<li>A simulated year is not a forecast; LOLE, LOLH and EUE are averages over the 500 years, with their Monte Carlo error.</li>
+<li>A simulated year is not a forecast; LOLE, LOLH and EUE are averages over the 500 years. LOLE is shown with its Monte Carlo error, which leaves out uncertainty in the weather history and the assumptions.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="03-balancing.html">Lesson 3</a> (reserves), <a href="06-three-jobs.html">lesson 6</a> (firm capacity) and toolbox <a href="k05-probability-statistics.html">K5</a> (Monte Carlo and standard error).</p>
 ```
@@ -103,8 +103,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Resource adequacy</dt><dd>Enough supply in nearly every hour, judged over many weather years and plant outages.</dd>
 <dt>Loss-of-load expectation (LOLE)</dt><dd>Shortfall days a year, averaged over the simulated years; the common criterion is 0.1, one day in ten years.</dd>
 <dt>Expected unserved energy (EUE)</dt><dd>Unserved MWh a year: how deep and long the shortfalls are, which LOLE does not say.</dd>
-<dt>Reserve-margin screen</dt><dd>MW installed over the peak: quick, but blind to when the MW show up.</dd>
-<dt>Accreditation</dt><dd>The perfect MW that would cut unserved energy as much, as a share of the MW added; it changes with the mix.</dd>
+<dt>Reserve-margin screen</dt><dd>MW installed over the peak, demand response counted as supply: quick, but blind to when the MW show up.</dd>
+<dt>Accreditation</dt><dd>The smallest perfect MW that would cut unserved energy as much, as a share of the MW added; it changes with the mix.</dd>
 </dl>
 </div>
 </div>
@@ -119,20 +119,31 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 - **Two measures, two answers.** LOLE counts days of any shortfall; EUE weighs each by its MWh. Demand response here removes many short, shallow days but less energy, so its rating depends on which is matched.
 - **This lesson matches EUE.** In 500 years a count of days moves in steps of 0.002, too coarse to rate one block. PJM rates its classes by EUE too (Manual 20A, sections 2.4 and 2.6).
-- **Marginal, not average.** Each block is rated on top of the blocks before it. An average over all blocks hides how little the last one adds.
+- **Marginal, not average.** Each block is rated against the mix already present. An average can hide how the contribution of the next block differs.
 
 ```{=html}
 </div>
 </details>
 <details class="lx-deeper">
-<summary><span class="k">Go deeper · Modeler</span>The simulation in four lines</summary>
+<summary><span class="k">Go deeper · Modeler</span>The simulation in five lines, and its symbols</summary>
 <div class="lx-deeper-body">
 ```
 
 - **Outages.** Each unit is up or out, in spells of random length: out for $r$ hours on average, up for $r(1-f)/f$, so out a share $f$ of the time.
 - **Margin.** $M_t = \text{units}_t + 3{,}000\,w_t + 1{,}200\,s_t - 4{,}000\,d_t$ MW. A battery discharges only when $M_t < 0$ and charges from any surplus.
-- **Accreditation.** Find $C$ with $\text{EUE}(\text{grid} + C) = \text{EUE}(\text{grid} + \text{resource})$, by bisection; $C$ is unique because EUE falls strictly while above zero.
+- **Accreditation.** The smallest $C$ with $\text{EUE}(\text{grid} + C) \le \text{EUE}(\text{grid} + \text{resource})$, by bisection: halve the range of MW again and again until the two match.
+- **Unique, or a boundary.** EUE falls strictly while above zero, so $C$ is unique. If the resource leaves no shortfall in the sample, the smallest $C$ is a limit of 500 years, not zero risk.
 - **Correlated outages.** Real studies tie outage rates to temperature (PJM's Manual 20A, section 2.3); open tools such as PRAS do this at scale. <a href="a09-hazards.html">A9</a> adds hazards.
+
+| Symbol | Meaning | Unit |
+|---|---|---|
+| $f$ | forced outage rate: the share of time a unit is out | share |
+| $r$ | average length of one outage, the repair time | hours |
+| $t$ | hour of the simulated year | hour |
+| $\text{units}_t$ | coal and gas units not out in hour $t$ | MW |
+| $w_t$, $s_t$ | wind and solar output per MW installed | share |
+| $d_t$ | demand over its own yearly peak | share |
+| $C$ | perfect capacity: always available, never out | MW |
 
 ```{=html}
 </div>

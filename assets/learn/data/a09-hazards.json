@@ -62,7 +62,7 @@
       "label": "Wildfire shutoffs",
       "color": "var(--lx-pk)",
       "when": "1 to 21 August, 12:00 to 20:00",
-      "what": "A line is switched off in high wind: a third of the wind and one 400 MW gas unit cut off, and 5% of customers lose power directly.",
+      "what": "A line is switched off in high wind: a third of the wind output and a quarter of the available combined-cycle output are cut off, and 5% of demand loses power directly.",
       "windows": [
         {
           "from": "08-01",
@@ -97,13 +97,13 @@
   "defences": [
     {
       "id": "winterize",
-      "label": "Winterize gas plants, firm up fuel",
+      "label": "Winterize plants and wind turbines, firm up gas",
       "short": "Winterize",
       "cost": 25,
       "eases": {
         "cold": 0.3333
       },
-      "what": "Cold-snap losses of units cut to a third (gas 30% to 10%)."
+      "what": "Cold-snap losses of gas, coal and wind output cut to a third (gas 30% to 10%)."
     },
     {
       "id": "cooling",
@@ -124,7 +124,7 @@
       "eases": {
         "fire": 0.4
       },
-      "what": "Shutoffs cut 40% as much supply and as many customers."
+      "what": "Shutoffs cut 40% as much supply and as much demand."
     },
     {
       "id": "battery",
@@ -154,7 +154,7 @@
       "facts": [
         {
           "n": "1,045 units",
-          "what": "had 4,124 outages, derates or failures to start; 75.6% were caused by freezing (44.2%) or fuel problems (31.4%)."
+          "what": "had 4,124 outages, [[derate|derates]] or failures to start over 8 to 20 February; 75.6% were caused by freezing (44.2%) or fuel problems (31.4%)."
         },
         {
           "n": "58%, 27%, 6%",
@@ -162,7 +162,7 @@
         },
         {
           "n": "20,000 MW",
-          "what": "of firm load shed by ERCOT at the worst point; 23,418 MW across ERCOT, SPP and MISO."
+          "what": "of [[firm-load-shed|firm load shed]] by ERCOT at the worst point; 23,418 MW across ERCOT, SPP and MISO."
         },
         {
           "n": "59.304 Hz",
@@ -194,7 +194,7 @@
       "facts": [
         {
           "n": "90,500 MW",
-          "what": "of generating units out, derated or failing to start at the same time, at the worst point."
+          "what": "of unplanned outages, derates and failures to start at the same time, at the worst point, not counting units already out before the storm."
         },
         {
           "n": "55%",
@@ -202,7 +202,7 @@
         },
         {
           "n": "over 5,400 MW",
-          "what": "of firm load shed in total, the largest in the Eastern Interconnection's history."
+          "what": "of [[firm-load-shed|firm load shed]] in total, the largest in the Eastern Interconnection's history."
         }
       ],
       "source": {
@@ -338,8 +338,8 @@
         "shut": 0
       },
       "fire": {
-        "lole": 1.06,
-        "eue": 501.38,
+        "lole": 0.556,
+        "eue": 230.2,
         "shut": 28871
       }
     },
@@ -358,8 +358,8 @@
           "cold",
           "fire"
         ],
-        "lole": 3.624,
-        "eue": 6194.92,
+        "lole": 3.12,
+        "eue": 5923.74,
         "ratio": 1
       },
       {
@@ -367,9 +367,9 @@
           "heat",
           "fire"
         ],
-        "lole": 3.206,
-        "eue": 2089.81,
-        "ratio": 2.6933
+        "lole": 1.734,
+        "eue": 1008.24,
+        "ratio": 1.9375
       }
     ],
     "best": {
@@ -379,7 +379,7 @@
         "dr"
       ],
       "cost": 60,
-      "total": 689.88,
+      "total": 685.92,
       "portfolios": 12
     }
   }
