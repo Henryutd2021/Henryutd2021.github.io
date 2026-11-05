@@ -672,7 +672,23 @@
   after: [A1]
 # ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
 #            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 are left out until their excerpts are approved.
-- {kind: lesson, tier: foundations, code: F8, title: "What happens when a data center moves to town?"}
+# ---------- wave W4 Foundations module F8 (curriculum v2 §18.4; builder learn-w4-a)
+- kind: lesson
+  id: f08-large-loads
+  code: F8
+  tier: foundations
+  form: cards
+  icon: blocks
+  status: active
+  minutes: 15
+  practice_minutes: 10   # the myths and questions (Check section)
+  title: "What happens when a data center moves to town?"
+  subtitle: "Add a 300 MW data center to Prairie Town's busiest day and its whole year, count the homes it equals, the wait to connect, and who pays"
+  short: "A data center in town"
+  teaches: [large loads, data centers as loads, flat load and the load-duration curve, annual-energy equivalents, requests against demand, job-years and transfers, who decides and pays]
+  does: "Add a steady 300 MW data center to Prairie Town's busiest day, a spring day and its whole year; count the homes it equals; read real requests to connect; time the wait for grid service; set water, jobs and taxes; see who pays if it cancels."
+  outcome: "Describe a large load by its size, shape and wait to connect, tell an annual-energy equivalent from a peak one and a request from demand, and name who decides, pays and benefits when it connects."
+  after: [2, F6]
 - {kind: lesson, tier: foundations, code: F9, title: "What does a city run on, and who controls what?"}
 - {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
 - {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}

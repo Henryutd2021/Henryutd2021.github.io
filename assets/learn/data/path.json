@@ -1152,9 +1152,13 @@
    "tier": "foundations",
    "code": "F8",
    "title": "What happens when a data center moves to town?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f08-large-loads.html",
+   "scales": [],
+   "id": "f08-large-loads",
+   "minutes": 15,
+   "form": "cards",
+   "short": "A data center in town"
   },
   {
    "tier": "foundations",
