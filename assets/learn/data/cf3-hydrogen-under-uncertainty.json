@@ -30,9 +30,18 @@
   "note": "M8's toy: one windy zone, three build-outs with chances 25%, 50% and 25%, illustrative round numbers in 2025 dollars.",
   "start": 600,
   "plans": [
-   {"key": "ev", "label": "Plan for the average"},
-   {"key": "sp", "label": "Hedged plan"},
-   {"key": "rob", "label": "Worst-case plan"}
-  ]
+   {"key": "ev", "label": "Plan for the average", "def": "the best size if the wind built were sure to equal its average, 5,000 MW."},
+   {"key": "sp", "label": "Hedged plan", "def": "the size with the lowest [[expected-value|expected cost]], each build-out's cost weighted by its chance."},
+   {"key": "rob", "label": "Worst-case plan", "def": "the size whose cost in the worst build-out is lowest; it uses no chances."}
+  ],
+  "workedNote": "A chance-weighted average: not a guaranteed cost, and not what any one build-out costs.",
+  "assumptionsTitle": "The toy's assumptions and its wind blocks",
+  "assumptions": [
+   "Surplus wind is free: the electrolyzer pays only its own yearly cost, and wind it does not use is [[curtailment|curtailed]].",
+   "The year is five blocks of hours sorted by wind output (a [[duration-curve|duration curve]]), not 8,760 hours in time order.",
+   "Industry's hydrogen demand is steady: the same in every hour and every build-out.",
+   "One zone: no hydrogen storage, no fuel cells and no pipelines; reformer hydrogen has one fixed price."
+  ],
+  "blocksCaption": "The five wind blocks: SPP's 2025 hourly wind shape scaled to 33.8%, sorted and cut"
  }
 }

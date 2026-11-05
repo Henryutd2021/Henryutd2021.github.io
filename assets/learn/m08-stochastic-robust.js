@@ -18,6 +18,8 @@
     if (v === 0) return "With no electrolyzer, every branch costs " + fm.m(c[0]) + " a year: all the hydrogen comes from gas reformers.";
     return "Your " + fm.mw(v) + ": expected " + fm.m(expected(D, S, v)) + " a year. It costs most, " + fm.m(c[0]) + ", if none of the planned wind is built, and least, " + fm.m(c[2]) + ", if all of it is.";
   }
+  // the chances in words: "25%, 50% and 25%"
+  function chancesText(S) { var p = S.map(function (s) { return fm.pct(s.p); }); return p.slice(0, -1).join(", ") + " and " + p[p.length - 1]; }
   // the steps' no-JS block (written into the page by the test's --write mode)
   function staticHTML(D, R) {
     var S = scen(D), th = S.map(function (s) { return "<th scope=\"col\">" + s.short + "</th>"; }).join("");
@@ -146,7 +148,7 @@
 
     var steps = [
       // 1 the tree
-      { text: "The windy zone has 3,000 MW of wind, 4,000 MW more is planned, and its lines carry 1,000 MW. Tap each branch of the [[scenario-tree|scenario tree]]: how much surplus wind does each build-out leave?",
+      { text: "The windy zone has 3,000 MW of wind and 4,000 MW planned; its lines carry 1,000 MW, and an [[electrolyzer|electrolyzer]] could use the rest. Tap each branch of the [[scenario-tree|scenario tree]]: how much surplus wind does each build-out leave?",
         build: function (act, api) {
           var seen = {}, out = H("div", { "aria-live": "polite" }, act);
           var t = Tree(act, S, { onPick: function (i) {
@@ -162,7 +164,7 @@
           } });
         } },
       // 2 the reader's own size, here and now
-      { text: "Choose a size now, as the planner must: a [[here-and-now|here-and-now]] decision. The chart below gives its cost a year in each branch, and the expected cost with the branches' chances.",
+      { text: "Choose a size now, as the planner must: a [[here-and-now|here-and-now]] decision. Hydrogen the electrolyzer cannot make comes from [[gas-reformer|gas reformers]]; the chart below gives the yearly cost in each branch and in expectation.",
         build: function (act, api) {
           var k = H("div", { class: "m8-kpis", "aria-live": "polite" }, act), x0 = St.guess != null ? St.guess : 600;
           var sl = LX.Slider(act, { label: "Electrolyzer size", min: 0, max: D.chart.xMax, step: D.chart.step, value: x0, color: "var(--lx-good)",
@@ -248,9 +250,9 @@
         build: function (act, api) {
           solveRow(act, api, "Solve the worst-case plan", function () { return chain([function () { return jobRobust("worst"); }, function () { return jobSP(); }]); }, function (out) {
             out.innerHTML = ""; var p = St.rob, k = H("div", { class: "m8-kpis" }, out);
-            kpi(k, "Size", fm.mw(p.x), "good"); kpi(k, "Worst cost", fm.m(p.worst)); kpi(k, "Expected cost", fm.m(p.exp));
+            kpi(k, "Size", fm.mw(p.x), "good"); kpi(k, "Worst cost", fm.m(p.worst)); kpi(k, "Expected cost", fm.m(p.exp)); kpi(k, "Expected, above the stochastic plan", fm.m(p.exp - St.sp.exp), "bad");
             table(out, perHead, [perRow("Worst case (robust)", p)], "The worst-case plan in every branch");
-            api.done(); api.saw("It builds " + fm.mw(p.x) + ", the best size if none of the planned wind is built: here a size costs no more when more wind is built, so its worst cost is its cost in that branch. It costs " + fm.m(p.exp - St.sp.exp) + " a year more in expectation than the stochastic plan.");
+            api.done(); api.saw("It builds " + fm.mw(p.x) + ", the best size if none of the planned wind is built: a size costs no more when more wind is built, so that branch is its worst.");
           });
         } },
       // 9 robust: least regret
@@ -266,22 +268,30 @@
       // 10 the chances are a judgement
       { text: "The chances are a judgement. Re-solve with a pessimistic or an optimistic tree: which plans move, and which stay?",
         build: function (act, api) {
-          var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Chances of the three branches" }, act), bs = [], seen = {}, sel = null;
+          // one preset solves at a time: its buttons are off until the run ends, and each run keeps its own preset (id), so
+          // a quick second tap cannot mix two presets' results
+          var seg = H("div", { class: "lx-seg", role: "group", "aria-label": "Chances of the three branches" }, act), bs = [], seen = {}, pick = null, last = null;
           var st = LX.SolverStatus(act), out = H("div", { "aria-live": "polite" }, act);
+          function lock(on) { bs.forEach(function (b) { b.disabled = on; }); }
           var go = action({ api: api, st: st, host: act, go: null,
-            job: function () { var S2 = presetS(D, sel); return chain([function () { return jobSP(S2, sel); }, function () { return jobEV(S2, sel); }, function () { return jobRobust("worst"); }]); },
+            job: function () {
+              var id = pick, S2 = presetS(D, id); lock(true);
+              return chain([function () { return jobSP(S2, id); }, function () { return jobEV(S2, id); }, function () { return jobRobust("worst"); }])
+                .then(function (bad) { lock(false); if (!bad) last = id; return bad; }, function (e) { lock(false); throw e; });
+            },
             show: function () {
-              st.set(""); seen[sel] = 1; out.innerHTML = ""; draw();
-              bs.forEach(function (b, i) { b.setAttribute("aria-pressed", String(D.presets[i].id === sel)); });
+              st.set(""); seen[last] = 1; out.innerHTML = ""; draw();
+              bs.forEach(function (b, i) { b.setAttribute("aria-pressed", String(D.presets[i].id === last)); });
               var rows = D.presets.filter(function (q) { return St.pre[q.id] && St.pre[q.id].sp && St.pre[q.id].ev; }).map(function (q) {
                 return [q.label + " (" + q.p.map(fm.pct).join(", ") + ")", fm.mw(St.pre[q.id].sp.x), fm.mw(St.pre[q.id].ev.x), fm.mw(St.rob.x)];
               });
               table(out, ["Chances", "Stochastic", "For the average", "Worst case"], rows, "Plans under three sets of chances");
+              H("p", { class: "m8-note", text: "Table only: the chart below keeps the chances " + chancesText(S) + "." }, out);
               if (Object.keys(seen).length >= 2) {
                 api.done(); api.saw("The stochastic plan and the plan for the average move with the chances; the worst-case plan stays at " + fm.mw(St.rob.x) + ", because it does not use them. So does the least-regret plan.");
               }
             } });
-          D.presets.forEach(function (q) { bs.push(H("button", { type: "button", "aria-pressed": "false", text: q.label + " " + q.p.map(fm.pct).join("/"), onclick: function () { sel = q.id; go(); } }, seg)); });
+          D.presets.forEach(function (q) { bs.push(H("button", { type: "button", "aria-pressed": "false", text: q.label + " " + q.p.map(fm.pct).join("/"), onclick: function () { pick = q.id; lock(true); go(); } }, seg)); });
         } },
       // 11 formulate it
       { text: "You built a two-stage stochastic linear program and three ways to plan with it. The explain layer writes the model out; the notebook rebuilds it in Python.",
@@ -294,7 +304,7 @@
 
     // ---- the cost curves, under the cards: three branches and the expected cost, with the plans found so far
     var chartHost = H("div", { class: "lx-card m8-chart" }, live);
-    H("p", { class: "lx-eyebrow", text: "Annual cost against the electrolyzer's size (illustrative)" }, chartHost);
+    H("p", { class: "lx-eyebrow", text: "Annual cost against the electrolyzer's size, chances " + chancesText(S) + " (illustrative)" }, chartHost);
     var PL = LX.Plot(chartHost, { box: true, text: "Text version of the chart" });
     var keyEl = H("ul", { class: "m8-key", "aria-live": "polite" }, chartHost);
     var cur = null;
@@ -378,7 +388,7 @@
     });
     function order(k) { var v = function (r) { return typeof r[k] === "number" ? r[k] : r[k].value; }; return rows.slice().sort(function (a, b) { return v(a) - v(b); }).map(function (r) { return r.key; }); }
     LX.CompareTable(H("div", { class: "lx-xcard" }, x), {
-      title: "Four plans, three yardsticks", lede: "Annual cost of the hydrogen supply, 2025 dollars, chances 25%, 50% and 25%. Each plan is best by its own yardstick.",
+      title: "Four plans, three yardsticks", lede: "Annual cost of the hydrogen supply, 2025 dollars, chances " + chancesText(S) + ". The rules optimize different objectives; here the plan for the average does worse than the stochastic plan on all three measures shown.",
       columns: [{ key: "name", label: "Plan and size", main: true }, { key: "exp", label: "Expected cost", phone: "Expected", num: true },
                 { key: "worst", label: "Worst cost", phone: "Worst", num: true }, { key: "regret", label: "Largest regret", phone: "Regret", num: true }],
       rows: rows,

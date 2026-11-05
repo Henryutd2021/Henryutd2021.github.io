@@ -10,8 +10,11 @@
 // The idea (illustrative, M8's toy; not the study's inputs or results): one electrolyzer in a windy zone is sized before
 // anyone knows whether none, half or all of the planned wind gets built (chances 25%, 50%, 25%). The reader picks a size;
 // the page prices it in each build-out with M8's closed form (LX.m08: components/scenario.js in the learn.js bundle,
-// promoted from M8 at the W4 integration) and compares it with the three plans M8 solves: the plan for the average build-out, the hedged plan (the
-// two-stage stochastic program) and the worst-case plan. Every number is checked by
+// promoted from M8 at the W4 integration) and compares it with the three plans M8 solves: the plan for the average
+// build-out, the hedged plan (the two-stage stochastic program) and the worst-case plan, each defined in one line. One
+// worked line shows how the hedged plan's expected cost is made from its three branch costs (fixed to that plan: its
+// rounded terms add up to its rounded total, which is not so at every size), and the toy's assumptions and wind blocks
+// are listed with and without JavaScript (review CF3 #2 and #3). Every number is checked by
 // _tests/learn/test_cf3-hydrogen-under-uncertainty.js, for every size the slider allows.
 (function () {
   "use strict";
@@ -34,6 +37,25 @@
       "; if all of it is built, " + fm.m(r.per[2]) + ".");
     return out;
   }
+  // the plans in one line each (data: idea.plans[].def)
+  function defsHTML(I) {
+    return "<ul class=\"lx-hint cf3-defs\">" + I.plans.map(function (p) { return "<li><b>" + p.label + ":</b> " + rich(p.def) + "</li>"; }).join("") + "</ul>";
+  }
+  // how an expected cost is made, on the hedged plan: each branch's cost times its chance, added up
+  function worked(M, D8) {
+    var fm = M.fm, S = M.scen(D8), R = D8.reference, x = R.sp.x, per = S.map(function (s) { return M.cost(D8, s.W, x); });
+    return { x: x, per: per, exp: M.expected(D8, S, x),
+      text: "Expected cost of the hedged plan: " + S.map(function (s, i) { return fm.pct(s.p) + " × " + fm.m(per[i]); }).join(" + ") + " = " + fm.m(M.expected(D8, S, x)) + " a year." };
+  }
+  function workedHTML(M, D8, I) { return "<p class=\"cf3-worked\">" + worked(M, D8).text + "</p><p class=\"lx-hint\">" + rich(I.workedNote) + "</p>"; }
+  // the toy's assumptions (M8's notes, then the boundary that sets its sizes) and its five wind blocks
+  function assumptionsHTML(M, D8, I) {
+    var fm = M.fm, notes = [D8.zone.note, D8.wind.note, D8.electrolyzer.note, D8.hydrogen.note].map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("");
+    return "<ul>" + notes + I.assumptions.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul>" +
+      "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table\"><caption class=\"lx-hint\">" + rich(I.blocksCaption) + "</caption><thead><tr><th scope=\"col\">Wind block</th><th scope=\"col\">Hours a year</th><th scope=\"col\">Capacity factor</th></tr></thead><tbody>" +
+      D8.blocks.labels.map(function (l, b) { return "<tr><th scope=\"row\">" + l + "</th><td class=\"n\">" + fm.int(D8.blocks.hours[b]) + "</td><td class=\"n\">" + Math.round(D8.blocks.cf[b] * 1000) / 10 + "%</td></tr>"; }).join("") +
+      "</tbody></table></div>";
+  }
   function rich(t) {
     return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) {
       return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>";
@@ -43,17 +65,19 @@
   function staticIdea(M, D8, I) {
     var fm = M.fm, S = M.scen(D8);
     var rows = plans(I, D8).map(function (p) { var r = price(M, D8, p.x); return "<tr><th scope=\"row\">" + p.label + "</th><td class=\"n\">" + fm.mw(p.x) + "</td>" + r.per.map(function (v) { return "<td class=\"n\">" + fm.m(v) + "</td>"; }).join("") + "<td class=\"n\">" + fm.m(r.exp) + "</td></tr>"; }).join("");
-    return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p><p class=\"lx-hint\">" + I.note + "</p>" +
+    return "<p class=\"lx-eyebrow\">" + I.title + " (illustrative)</p><p class=\"lx-hint\">" + I.note + "</p>" + defsHTML(I) +
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf3-res\"><caption class=\"lx-hint\">Annual cost of the hydrogen supply for three sizes, in each build-out and in expectation</caption><thead><tr><th scope=\"col\">Plan</th><th scope=\"col\">Size</th>" +
       S.map(function (s) { return "<th scope=\"col\">" + s.short + " (" + fm.pct(s.p) + ")</th>"; }).join("") + "<th scope=\"col\">Expected</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
-      "<p class=\"lx-hint\">With gas reformers alone, every build-out costs " + fm.m(M.base(D8)) + " a year.</p>";
+      workedHTML(M, D8, I) +
+      "<p class=\"lx-hint\">With gas reformers alone, every build-out costs " + fm.m(M.base(D8)) + " a year.</p>" +
+      "<details class=\"lx-textalt\"><summary>" + I.assumptionsTitle + "</summary>" + assumptionsHTML(M, D8, I) + "</details>";
   }
   function staticBoundary(b) {
     var ul = function (a) { return "<ul>" + a.map(function (t) { return "<li>" + rich(t) + "</li>"; }).join("") + "</ul>"; };
     return "<p class=\"lx-eyebrow\">" + rich(b.title) + "</p><dl class=\"lx-ideas\"><dt>It holds when</dt><dd>" + ul(b.holds) + "</dd><dt>It leaves out</dt><dd>" + ul(b.leaves) + "</dd></dl>" +
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
-  var model = { price: price, plans: plans, status: status, staticIdea: staticIdea, staticBoundary: staticBoundary };
+  var model = { price: price, plans: plans, status: status, worked: worked, staticIdea: staticIdea, staticBoundary: staticBoundary };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -90,10 +114,12 @@
       b.addEventListener("click", function () { sl.set(p.x, true); });
       return b;
     });
+    H("div", { html: defsHTML(I) }, sc);
     var tbl = H("div", { class: "cf3-led" }, stage);
     var st = H("div", { class: "lx-stage-status", "aria-live": "polite", style: "display:grid;gap:4px" }, stage);
-    var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: "The toy's assumptions" }, why);
-    H("ul", { html: [D8.zone.note, D8.wind.note, D8.electrolyzer.note, D8.hydrogen.note].map(function (t) { return "<li>" + LX.esc(t) + "</li>"; }).join("") }, why);
+    H("div", { class: "cf3-work", html: workedHTML(M, D8, I) }, stage);
+    var why = H("details", { class: "lx-textalt" }, stage); H("summary", { text: I.assumptionsTitle }, why);
+    H("div", { html: assumptionsHTML(M, D8, I) }, why);
     function paint(v, save) {
       var r = price(M, D8, v);
       bs.forEach(function (b, i) { b.setAttribute("aria-pressed", String(Math.abs(P[i].x - v) < 1e-9)); });

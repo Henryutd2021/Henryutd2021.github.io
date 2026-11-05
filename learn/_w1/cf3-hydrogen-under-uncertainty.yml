@@ -1,0 +1,12 @@
+# Sidecar for CF3 (cf3-hydrogen-under-uncertainty), builder learn-w4-d, 2026-11-05; fixes learn-w4-fix-d. Read by
+# scripts/build_learn.py. The two agency names in the approved sentence E11.5 stay as approved; these terms spell them
+# out where they are marked (review CF3 #1).
+id: cf3-hydrogen-under-uncertainty
+lesson: CF3
+glossary:
+  - id: eia
+    term: EIA
+    def: "The Energy Information Administration, the statistics agency of the United States Department of Energy, which publishes data on energy production, use and prices."
+  - id: lbnl
+    term: LBNL
+    def: "Lawrence Berkeley National Laboratory, a laboratory of the United States Department of Energy that publishes, among other datasets, a yearly one of the projects waiting in interconnection queues across the country."

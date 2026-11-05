@@ -48,7 +48,9 @@ for (const P of PROMO) {
   ok(E.LX[P.lx] && P.keys.every(k => E.LX[P.lx][k] !== undefined), "on a page, components/" + P.file + ".js sets LX." + P.lx);
   // the pages: none loads the other lesson's script; the dependent one has no copy of the code
   P.users.forEach(u => {
-    const q = fs.readFileSync(path.join(SITE, "learn", u + ".qmd"), "utf8"), scripts = [...q.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
+    // a draft named here may have gone live since (learn/_drafts/<id>.qmd moved to learn/<id>.qmd): read whichever exists
+    const qp = [u, u.replace(/^_drafts\//, "")].map(v => path.join(SITE, "learn", v + ".qmd")).find(p => fs.existsSync(p)) || path.join(SITE, "learn", u + ".qmd");
+    const q = fs.readFileSync(qp, "utf8"), scripts = [...q.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
     ok(scripts.filter(s => /assets\/learn\/[a-z0-9-]+\.js$/.test(s) && !/learn\.js$/.test(s)).length === 1, u + ": loads learn.js and only its own lesson script: " + scripts.join(" "));
     if (ownScript[u]) {
       const js = rd(ownScript[u]);
