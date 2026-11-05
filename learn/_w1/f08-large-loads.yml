@@ -1,0 +1,24 @@
+# Sidecar for F8 (f08-large-loads), builder learn-w4-a (F8 fork), 2026-11-05. Read by scripts/build_learn.py.
+# The real-world box quotes E7.4 and E7.5 (excerpt:code), approved by Henry on 2026-11-03 (reports/learn/excerpts_for_approval.md):
+# a new placement of approved sentences, listed for Henry by the coordinator.
+id: f08-large-loads
+lesson: F8
+glossary:
+  - id: data-center
+    term: Data center
+    def: "A building full of computers that store and process data; on the grid it is one large customer that draws power around the clock."
+  - id: large-load
+    term: Large load
+    def: "One customer, such as a data center or a large factory, that draws tens of megawatts or more; utilities and grid operators set their own thresholds."
+  - id: power-usage-effectiveness
+    term: Power usage effectiveness (PUE)
+    def: "A data center's total electricity use divided by the electricity its computing equipment uses; the rest goes to cooling, power conversion and lighting."
+  - id: job-year
+    term: Job-year
+    def: "One person working full time for one year; 100 workers for six months make 50 job-years."
+  - id: transfer
+    term: Transfer
+    def: "A payment, such as a tax, that moves money from one party to another without using up any resources itself."
+requests:
+  - "F6 (f06-grid-and-outages) could link F8 once it is live, for example from its N−1 Go deeper box (a large load on the grid)."
+  - "A4's real-world box (large-load tariffs) and CF7's puzzle (a large new load) could name F8 as the Foundations lesson on large loads."

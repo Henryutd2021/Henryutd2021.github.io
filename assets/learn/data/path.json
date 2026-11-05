@@ -1152,9 +1152,13 @@
    "tier": "foundations",
    "code": "F8",
    "title": "What happens when a data center moves to town?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f08-large-loads.html",
+   "scales": [],
+   "id": "f08-large-loads",
+   "minutes": 15,
+   "form": "cards",
+   "short": "A data center in town"
   },
   {
    "tier": "foundations",
@@ -1216,9 +1220,13 @@
    "tier": "analyst",
    "code": "A6",
    "title": "Why does it take years to connect a power plant or a data center?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a06-interconnection.html",
+   "scales": [],
+   "id": "a06-interconnection",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Getting connected"
   },
   {
    "tier": "analyst",
@@ -1272,9 +1280,13 @@
    "tier": "analyst",
    "code": "A17",
    "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a17-physical-feasibility.html",
+   "scales": [],
+   "id": "a17-physical-feasibility",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Will it work on the wires?"
   },
   {
    "tier": "analyst",

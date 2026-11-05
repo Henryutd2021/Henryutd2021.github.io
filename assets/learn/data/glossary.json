@@ -47,6 +47,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "apparent-power": {
+  "term": "Apparent power",
+  "short": "The combined size of real and reactive power, the square root of MW² plus Mvar², in megavolt-amperes (MVA); a wire's heating follows it, not MW alone.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "array": {
   "term": "Array",
   "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
@@ -323,6 +329,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "cluster-study": {
+  "term": "Cluster study",
+  "short": "A study of every interconnection request in one window together, which finds the network upgrades the group needs and splits their cost.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
  "clustering": {
   "term": "Clustering",
   "short": "Grouping similar items, such as days with similar demand and weather, so that one representative can stand for each group.",
@@ -527,6 +539,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "data-center": {
+  "term": "Data center",
+  "short": "A building full of computers that store and process data; on the grid it is one large customer that draws power around the clock.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
+ },
  "data-licence": {
   "term": "Data licence",
   "short": "The terms under which a dataset may be used and shared, such as public domain, CC BY or a signed data agreement.",
@@ -664,6 +682,12 @@
   "short": "The lower-voltage part of the grid, from substations along feeders and laterals to homes and businesses.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "distribution-factor": {
+  "term": "Distribution factor",
+  "short": "The share of a project's output that would flow on a given line, used to split the cost of upgrading that line.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "district-heating": {
   "term": "District heating",
@@ -1103,6 +1127,12 @@
   "lesson": "R3",
   "href": "r03-system-and-method.html"
  },
+ "hosting-capacity": {
+  "term": "Hosting capacity",
+  "short": "How much solar or other generation a feeder can take, at its existing settings and without upgrades, before a limit such as its voltage band is crossed.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "hour-ending": {
   "term": "Hour ending",
   "short": "A time stamp that labels each hour by its last moment, so 01:00 means the hour from midnight to 01:00.",
@@ -1151,6 +1181,24 @@
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
  },
+ "interconnection-agreement": {
+  "term": "Interconnection agreement",
+  "short": "The contract that sets how and when a project connects, which upgrades are built and who pays for them.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
+ "interconnection-queue": {
+  "term": "Interconnection queue",
+  "short": "The list of projects asking to connect to the grid, each waiting for studies, upgrades and an agreement before it may run.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
+ "interconnection-request": {
+  "term": "Interconnection request",
+  "short": "A project's formal application to connect to the grid, filed with the transmission provider together with a deposit.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
  "internal-rate-of-return": {
   "term": "Internal rate of return (IRR)",
   "short": "The discount rate at which a project's net present value is exactly zero: the return the project itself earns.",
@@ -1169,6 +1217,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "job-year": {
+  "term": "Job-year",
+  "short": "One person working full time for one year; 100 workers for six months make 50 job-years.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
+ },
  "kilowatt": {
   "term": "Kilowatt (kW)",
   "short": "A unit of power equal to 1,000 watts.",
@@ -1180,6 +1234,12 @@
   "short": "The unit of energy on a household electricity bill: one kilowatt kept up for one hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "large-load": {
+  "term": "Large load",
+  "short": "One customer, such as a data center or a large factory, that draws tens of megawatts or more; utilities and grid operators set their own thresholds.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
  },
  "large-load-tariff": {
   "term": "Large-load tariff",
@@ -1559,6 +1619,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "network-upgrade": {
+  "term": "Network upgrade",
+  "short": "New or stronger lines, transformers or substation equipment that the grid needs before a project can connect.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
+ },
  "neutron": {
   "term": "Neutron",
   "short": "A particle with no electric charge in the nucleus of an atom; in a reactor, the neutrons from one fission go on to split more atoms.",
@@ -1703,6 +1769,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "per-unit": {
+  "term": "Per unit",
+  "short": "A voltage written as a fraction of its nominal value: 1.00 per unit is 120 V on a 120 V service, 0.95 is 114 V.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "percentile": {
   "term": "Percentile",
   "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
@@ -1757,11 +1829,23 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "power-factor": {
+  "term": "Power factor",
+  "short": "Real power divided by apparent power, MW ÷ MVA: 1 when no reactive power flows, lower as more does.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "power-purchase-agreement": {
   "term": "Power purchase agreement (PPA)",
   "short": "A long contract between a power plant's seller and a buyer that sets the price paid for the plant's power, or for its market value.",
   "lesson": "A2",
   "href": "a02-contracts-risk.html"
+ },
+ "power-usage-effectiveness": {
+  "term": "Power usage effectiveness (PUE)",
+  "short": "A data center's total electricity use divided by the electricity its computing equipment uses; the rest goes to cooling, power conversion and lighting.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
  },
  "prediction-interval": {
   "term": "Prediction interval",
@@ -2081,6 +2165,12 @@
   "lesson": "M5",
   "href": "m05-microgrid-size-and-run.html"
  },
+ "service-voltage-range": {
+  "term": "Service voltage range",
+  "short": "The voltage a utility keeps at a customer's meter in normal operation; in the U.S., ANSI C84.1 Range A, 114 to 126 V on a 120 V service (0.95 to 1.05 per unit).",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "shadow-price": {
   "term": "Shadow price",
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
@@ -2092,6 +2182,12 @@
   "short": "A way to solve linear programs by moving from corner to neighbouring corner of the feasible region, never making the goal worse, until no neighbour is better.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "site-control": {
+  "term": "Site control",
+  "short": "Proof that a project owns, leases or has the right to use the land it would be built on.",
+  "lesson": "A6",
+  "href": "a06-interconnection.html"
  },
  "skill-score": {
   "term": "Skill score",
@@ -2273,6 +2369,12 @@
   "lesson": 1,
   "href": "01-power-energy.html"
  },
+ "thermal-rating": {
+  "term": "Thermal rating",
+  "short": "The most current, or MVA at the line's voltage, that a line or transformer can carry before its wires get too hot and sag.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "thermal-storage": {
   "term": "Thermal storage",
   "short": "Storing energy as heat, for example in tanks of hot molten salt, to use it hours later.",
@@ -2332,6 +2434,12 @@
   "short": "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
+ },
+ "transfer": {
+  "term": "Transfer",
+  "short": "A payment, such as a tax, that moves money from one party to another without using up any resources itself.",
+  "lesson": "F8",
+  "href": "f08-large-loads.html"
  },
  "transformer": {
   "term": "Transformer",
