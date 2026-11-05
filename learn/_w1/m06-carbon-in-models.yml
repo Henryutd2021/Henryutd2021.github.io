@@ -1,0 +1,8 @@
+# Sidecar for M6 (m06-carbon-in-models), builder learn-w4-c, 2026-11-05. Read by scripts/build_learn.py.
+id: m06-carbon-in-models
+lesson: M6
+glossary: []
+requests:
+  - "assets/learn/m06-carbon-in-models.js holds the Plains Grid's planning LP (window.LX.plainsPlan: prepare, build, faceModel, read, medoids) used by M6 and A12. Promote it to components/ (a planning engine for the regional grid) if SB2, C2 or M13 need it."
+  - "The notebook learn/notebooks/m06-carbon-in-models.ipynb is written by scripts/build_learn_m06_notebook.py in the ResearchPortfolio folder (uncommitted there)."
+  - "M6 links CF6 in its Real-world box; CF6's Go deeper names M6 as upcoming in plain text: the coordinator's cross-link pass can link it."

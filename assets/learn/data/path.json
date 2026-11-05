@@ -1252,9 +1252,13 @@
    "tier": "analyst",
    "code": "A10",
    "title": "Which emissions question are you asking? Inventories, consequences and procurement claims",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a10-emissions-questions.html",
+   "scales": [],
+   "id": "a10-emissions-questions",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Which emissions question?"
   },
   {
    "tier": "analyst",
@@ -1268,9 +1272,13 @@
    "tier": "analyst",
    "code": "A12",
    "title": "How do governments steer energy? Taxes, credits, standards and carbon prices",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a12-policy-instruments.html",
+   "scales": [],
+   "id": "a12-policy-instruments",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Steering with policy"
   },
   {
    "tier": "analyst",
@@ -1435,9 +1443,13 @@
    "tier": "modeler",
    "code": "M6",
    "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m06-carbon-in-models.html",
+   "scales": [],
+   "id": "m06-carbon-in-models",
+   "minutes": 40,
+   "form": "cards",
+   "short": "Carbon in models"
   },
   {
    "tier": "modeler",

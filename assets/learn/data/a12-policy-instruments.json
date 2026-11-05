@@ -1,0 +1,139 @@
+{
+ "about": "Learn A12, How do governments steer energy? (wave W4, builder learn-w4-c, 2026-11-05). The four instruments with their slider ranges and defaults, a real rule of each kind with its jurisdiction and date, and a reference block written by the test (node _tests/learn/test_a12-policy-instruments.js --write). The model is the Plains Grid's planning LP in assets/learn/m06-carbon-in-models.js, with the fleet in a10-emissions-questions.json and the costs in m06-carbon-in-models.json. Money in 2025 dollars a year.",
+ "accessed": "2026-11-05",
+ "instruments": [
+  {
+   "id": "tau",
+   "label": "Carbon price",
+   "short": "carbon price",
+   "unit": "$ per t CO₂",
+   "min": 0,
+   "max": 100,
+   "step": 10,
+   "def": 30,
+   "color": "var(--lx-warn)",
+   "pays": "Gas plants pay the price on every tonne, to the government.",
+   "side": "Every gas MWh costs more, the cleaner plant's too."
+  },
+  {
+   "id": "ptc",
+   "label": "Production credit",
+   "short": "production credit",
+   "unit": "$ per MWh of new wind and solar used",
+   "min": 0,
+   "max": 30,
+   "step": 5,
+   "def": 10,
+   "color": "var(--lx-wind)",
+   "pays": "Taxpayers pay the credit on every MWh new wind and solar deliver.",
+   "side": "It pays per MWh used, so plants get built past what the grid can take in windy hours."
+  },
+  {
+   "id": "itc",
+   "label": "Investment credit",
+   "short": "investment credit",
+   "unit": "share of the capital cost of new wind, solar and batteries",
+   "min": 0,
+   "max": 50,
+   "step": 10,
+   "def": 30,
+   "color": "var(--lx-solar)",
+   "pays": "Taxpayers pay a share of what is built, whatever it later produces.",
+   "side": "It rewards capacity, not output: a plant that is often curtailed earns the same credit."
+  },
+  {
+   "id": "ces",
+   "label": "Clean-energy standard",
+   "short": "clean-energy standard",
+   "unit": "share of the year's demand met by wind and sun",
+   "min": 50,
+   "max": 80,
+   "step": 5,
+   "def": 65,
+   "color": "var(--lx-good)",
+   "pays": "Electricity customers pay for certificates, which every clean MWh earns.",
+   "side": "Wind and sun that ran anyway earn certificates too."
+  }
+ ],
+ "rules": [
+  {
+   "id": "tau",
+   "kind": "Carbon price",
+   "where": "European Union",
+   "name": "EU Emissions Trading System",
+   "text": "A cap-and-trade scheme launched in 2005: covered plants, electricity and heat generation among them, surrender one allowance per tonne of CO₂ equivalent.",
+   "source": {
+    "label": "European Commission, About the EU Emissions Trading System (page updated 13 May 2026)",
+    "url": "https://climate.ec.europa.eu/eu-action/carbon-markets/about-eu-ets_en",
+    "asOf": "read 5 November 2026"
+   }
+  },
+  {
+   "id": "ptc",
+   "kind": "Production credit",
+   "where": "United States, federal",
+   "name": "Clean electricity production credit, tax code section 45Y",
+   "text": "For wind and solar, Public Law 119-21 (2025) ends it for plants that begin construction after 4 July 2026 and enter service after 31 December 2027.",
+   "source": {
+    "label": "IRS, Notice 2025-42, Internal Revenue Bulletin 2025-36, sections 1 and 2.02",
+    "asOf": "2 September 2025; read 5 November 2026"
+   }
+  },
+  {
+   "id": "itc",
+   "kind": "Investment credit",
+   "where": "United States, federal",
+   "name": "Clean electricity investment credit, tax code section 48E",
+   "text": "The same law sets the same end dates for wind and solar plants.",
+   "source": {
+    "label": "IRS, Notice 2025-42, Internal Revenue Bulletin 2025-36, sections 1 and 2.02",
+    "asOf": "2 September 2025; read 5 November 2026"
+   }
+  },
+  {
+   "id": "ces",
+   "kind": "Clean-energy standard",
+   "where": "U.S. states",
+   "name": "100% clean electricity standards",
+   "text": "Lawrence Berkeley National Laboratory counted 16 states that had adopted a 100% clean electricity standard, with data through 2023.",
+   "source": {
+    "label": "Barbose, U.S. State Renewables Portfolio & Clean Electricity Standards: 2024 Status Update, LBNL (August 2024)",
+    "url": "https://eta-publications.lbl.gov/publications/us-state-renewables-portfolio-clean-0",
+    "asOf": "read 5 November 2026"
+   }
+  }
+ ],
+ "reference": {
+  "about": "Written by node _tests/learn/test_a12-policy-instruments.js --write; re-solved on every run.",
+  "base": {
+   "co2": 4777392.205142699,
+   "resource": 388910266.25449985
+  },
+  "defaults": {
+   "tau": {
+    "cut": "38%",
+    "per": "$23 per t",
+    "co2": 2950663.1454817336,
+    "resource": 430475745.9121574
+   },
+   "ptc": {
+    "cut": "36%",
+    "per": "$23 per t",
+    "co2": 3040463.350144507,
+    "resource": 428008237.5430263
+   },
+   "itc": {
+    "cut": "36%",
+    "per": "$22 per t",
+    "co2": 3070743.732674721,
+    "resource": 427263863.8415032
+   },
+   "ces": {
+    "cut": "34%",
+    "per": "$22 per t",
+    "co2": 3161270.7861735667,
+    "resource": 425171550.65369
+   }
+  }
+ }
+}

@@ -335,6 +335,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "clean-energy-standard": {
+  "term": "Clean-energy standard",
+  "short": "A rule that a set share of the electricity sold in a year comes from sources the rule counts as clean; sellers prove it with certificates.",
+  "lesson": "A12",
+  "href": "a12-policy-instruments.html"
+ },
  "clearing-price": {
   "term": "Clearing price",
   "short": "The price at which supply meets demand in a market, paid to every seller that runs in that hour.",
@@ -430,6 +436,12 @@
   "short": "What loads pay at their locational prices minus what generators are paid at theirs; in a DC model it equals the sum, over the full lines, of each line's shadow price times its flow.",
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
+ },
+ "consequential-analysis": {
+  "term": "Consequential analysis",
+  "short": "An analysis of what changes because of a decision, in the short run through how plants run and in the long run through what gets built.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
  },
  "constraint": {
   "term": "Constraint",
@@ -784,6 +796,12 @@
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "emissions-inventory": {
+  "term": "Emissions inventory",
+  "short": "An account that divides emissions that already happened among their sources or users, so that the shares add up to the total.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
  },
  "energization": {
   "term": "Energization",
@@ -1259,6 +1277,12 @@
   "lesson": 3,
   "href": "03-balancing.html"
  },
+ "investment-credit": {
+  "term": "Investment credit",
+  "short": "A payment, often through the tax code, of a share of what a new plant costs to build, whatever it later produces.",
+  "lesson": "A12",
+  "href": "a12-policy-instruments.html"
+ },
  "islanding": {
   "term": "Islanding",
   "short": "A microgrid or part of a grid disconnecting from the main grid and keeping its own loads supplied.",
@@ -1355,6 +1379,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "location-based": {
+  "term": "Location-based method",
+  "short": "A way to report electricity's emissions that counts each MWh at the average emission factor of the grid where it is used.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
+ },
  "locational-marginal-price": {
   "term": "Locational marginal price (LMP)",
   "short": "The extra cost per megawatt-hour of serving a small increase in demand at one place on the grid in one interval, given the plants running and the limits of the lines.",
@@ -1438,6 +1468,12 @@
   "short": "The plant that serves the last megawatt of demand, whose offer sets the clearing price.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "market-based": {
+  "term": "Market-based method",
+  "short": "A way to report electricity's emissions that counts each MWh at the factor of the electricity the buyer purchased, through contracts or certificates.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
  },
  "matrix": {
   "term": "Matrix",
@@ -1612,6 +1648,12 @@
   "short": "In a chain reaction, the number of new fissions each fission leads to on average: below 1 the chain dies out, at 1 it holds steady, above 1 it grows.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "must-run": {
+  "term": "Must-run rule",
+  "short": "A rule that keeps a plant running at or above a set output whatever the price, for example because it cannot stop and restart quickly.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
  },
  "mw-it": {
   "term": "MW-IT",
@@ -2153,6 +2195,12 @@
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },
+ "resource-cost": {
+  "term": "Resource cost",
+  "short": "What a plan uses up, such as plants built, their upkeep and the fuel burned, leaving out payments that only move money between groups.",
+  "lesson": "A12",
+  "href": "a12-policy-instruments.html"
+ },
  "rolling-horizon": {
   "term": "Rolling horizon",
   "short": "Planning over a window ahead on a forecast, carrying out only the first hours of the plan, then planning again as the real values arrive.",
@@ -2512,6 +2560,12 @@
   "short": "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
+ },
+ "transfer-payment": {
+  "term": "Transfer",
+  "short": "A payment that moves money from one group to another, such as a carbon payment to the government or a credit to a plant owner, without using anything up.",
+  "lesson": "A12",
+  "href": "a12-policy-instruments.html"
  },
  "transfer": {
   "term": "Transfer",
