@@ -114,6 +114,7 @@
     H("style", { id: "a3-css", text: [
       ".a3-lab .lx-stepcard{grid-template-columns:minmax(0,1fr)}.a3-lab .lx-step-act{grid-template-columns:minmax(0,1fr)}.a3-lab .lx-stepcard>*,.a3-lab .lx-step-act>*{min-width:0}",
       ".a3-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
+      ".a3-row .lx-btn.ghost[aria-pressed=\"true\"]{background:var(--lx-accent-soft);border-color:var(--lx-accent);color:var(--lx-ink)}",
       ".a3-kpis{display:flex;flex-wrap:wrap;gap:8px}",
       ".a3-kpi{display:grid;padding:7px 11px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface-2);min-width:104px}",
       ".a3-kpi small{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-display)}.a3-kpi b{font-family:var(--lx-f-mono);font-size:16px;font-weight:600}",
@@ -153,15 +154,26 @@
       { text: "Every hour, offers stack up from cheapest to dearest and the last one needed sets the price for all. Look at two hours of the Plains market.",
         build: function (act, api) {
           var row = H("div", { class: "a3-row", role: "group", "aria-label": "Hour" }, act), host = H("div", null, act), note = H("p", { class: "a3-note", "aria-live": "polite" }, act), seen = {};
-          var ch = LX.SupplyStack(host, { series: { ren: { name: "Wind and solar", short: "Wind + sun", color: "var(--lx-wind)" }, coal: { name: "Coal steam", short: "Coal", color: "var(--lx-steel)" }, cc: { name: "Gas combined cycle", short: "Gas CC", color: "var(--lx-cc)" }, ct: { name: "Gas peakers", short: "Peakers", color: "var(--lx-pk)" } },
-            clear: function (blocks, demand) { var r = LX.SupplyStack.clear(blocks, demand, ["ren"]); return r; }, later: false });
+          var NM = { ren: ["Wind and solar", "var(--lx-wind)"], coal: ["Coal steam", "var(--lx-steel)"], cc: ["Gas combined cycle", "var(--lx-cc)"], ct: ["Gas peakers", "var(--lx-pk)"] };
+          // the hour's offers as blocks (as wide as their MW, as high as their offer), drawn on LX.Plot: lesson 8's supply
+          // stack at a regional scale (LX.SupplyStack's MW ticks are fixed for a town's few hundred MW)
+          function stack(h) {
+            host.innerHTML = ""; var P1 = LX.Plot(host, { box: true, text: "Text version of the hour's offers" }), x0 = 0, bars = [];
+            h.blocks.forEach(function (b) { var used = h.run[b.key]; bars.push({ x0: x0, x1: x0 + used, y0: Math.min(0, b.offer), y1: Math.max(0, b.offer), color: NM[b.key][1] }); if (b.mw > used) bars.push({ x0: x0 + used, x1: x0 + b.mw, y0: Math.min(0, b.offer), y1: Math.max(0, b.offer), color: NM[b.key][1], op: 0.3 }); x0 += b.mw; });
+            P1.render({ x: { min: 0, max: 10000, ticks: [[0, "0"], [2500, "2,500"], [5000, "5,000"], [7500, "7,500"], [10000, "10,000 MW"]], ticksN: [[0, "0"], [5000, "5,000"], [10000, "10,000 MW"]] },
+              y: { min: -40, max: 60, step: 20, fmt: function (v) { return (v < 0 ? "−$" : "$") + Math.abs(v); }, unit: "$/MWh offered" }, bars: bars,
+              marks: [{ x: h.d, y: 55, kind: "ring", vline: true, label: "Demand " + int(h.d) + " MW" }],
+              legend: ["ren", "coal", "cc", "ct"].map(function (k) { return { label: NM[k][0], color: NM[k][1] }; }),
+              aria: "Offers stacked cheapest first, with demand at " + int(h.d) + " MW; the last offer needed is " + usd(h.offer) + "/MWh.",
+              text: { head: ["Offer", "MW available", "MW used", "$/MWh offered"], rows: h.blocks.map(function (b) { return [NM[b.key][0], int(b.mw), int(h.run[b.key]), usd(b.offer)]; }) } });
+          }
           D.hours.forEach(function (hh) {
             var bt = H("button", { type: "button", class: "lx-btn ghost small", "aria-pressed": "false", text: hh.label }, row);
             bt.addEventListener("click", function () {
               Array.prototype.forEach.call(row.children, function (x) { x.setAttribute("aria-pressed", x === bt ? "true" : "false"); });
               var h = hour(D, X, hourOf(hh), { solar: ST.solar, ct: ST.ct, design: "eo" });
-              ch.draw(h.blocks.map(function (b) { return { key: b.key, mw: Math.round(b.mw), offer: Math.round(b.offer * 100) / 100 }; }), Math.round(h.d), { xMax: 9000 });
-              note.textContent = hh.label + " (" + hh.date + ", hour starting " + hh.hour + ":00 standard time): demand " + int(h.d) + " MW, spare " + int(h.spare) + " MW, price " + usd(h.price) + "/MWh" + (h.adder > 0 ? ", of which " + usd(h.adder) + " is the scarcity adder." : ".");
+              stack(h);
+              note.textContent = hh.label + " (" + hh.date + ", hour starting " + hh.hour + ":00 standard time): demand " + int(h.d) + " MW, spare " + int(h.spare) + " MW, last offer " + usd(h.offer) + ", price " + usd(h.price) + "/MWh" + (h.adder > 0 ? " with a scarcity adder of " + usd(h.adder) + "." : ".");
               seen[hh.id] = h;
               if (seen.noon && seen.eve) { api.done(); remember("hours", true); api.saw("Midday: wind and sun exceed demand, so a credit-backed offer sets " + usd(seen.noon.price) + ". Evening: only " + int(seen.eve.spare) + " MW spare, so [[scarcity-price|scarcity pricing]] lifts the price to " + usd(seen.eve.price) + "."); }
             });
@@ -169,7 +181,7 @@
           H("p", { class: "a3-note", text: G.creditNote }, act);
         } },
       // 2 a year of prices
-      { text: "Now all 8,760 hours of a year. Sort the prices from highest to lowest: a few hours carry very high prices, many sit near zero.",
+      { text: "Now all 8,760 hours of a year. Sort the prices from highest to lowest: a few hours are very high, most sit at a coal or gas plant's offer.",
         build: function (act, api) {
           var go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Clear the year" }, H("div", { class: "a3-row" }, act)), out = H("div", { "aria-live": "polite" }, act);
           go.addEventListener("click", function () {
@@ -185,7 +197,7 @@
               text: { head: ["Hours", "At or above"], rows: [[int(s.filter(function (v) { return v >= 1000; }).length), "$1,000/MWh"], [int(s.filter(function (v) { return v >= 200; }).length), "$200/MWh"], [int(s.filter(function (v) { return v >= 0; }).length), "$0/MWh"], [int(T), "the lowest, " + usd(s[T - 1])]] } });
             H("p", { class: "a3-note", text: "The axis stops at $200: " + int(s.filter(function (v) { return v > 200; }).length) + " hours lie above it, up to " + usd0(r.top) + "/MWh." }, out);
             api.done(); remember("year", r.avg);
-            api.saw(int(r.scarce) + " scarcity hours and " + int(r.short) + " hours short reach up to " + usd0(r.top) + "/MWh, while " + int(r.neg) + " hours go [[negative-price|negative]]. The average, " + usd(r.avg) + ", hides both ends.");
+            api.saw(int(r.scarce) + " scarcity hours" + (r.short ? " and " + int(r.short) + " hours short" : "") + " reach up to " + usd0(r.top) + "/MWh, while " + int(r.neg) + " hours go [[negative-price|negative]]. The average, " + usd(r.avg) + ", hides both ends.");
           });
           H("p", { class: "a3-note", html: LX.rich(D.designs.curve.replace("the price is the cap", "the price is the cap ([[offer-cap|offer cap]])")) }, act);
         } },
@@ -301,7 +313,7 @@
       rows: rows, sorts: [{ label: "As listed", order: ["eo", "cm", "res"], note: R.eo ? "Plains market, " + int(R.ct) + " MW of peakers: consumers pay " + usd(R.eo.consumer) + "/MWh energy-only and " + usd(R.cm.consumer) + "/MWh with a capacity market." : "" }]
     });
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "How one hour's price forms", lede: "Trace three hours of the Plains market.",
+      title: "How one hour's price forms", lede: "Trace two hours of the Plains market.",
       nodes: {
         s: { t: "Stack the offers", tN: ["Stack the", "offers"], s: "cheapest first", sN: "cheapest first" },
         m: { t: "Find the last one needed", tN: ["Last one", "needed"], s: "it sets the price", sN: "sets the price" },
@@ -309,8 +321,8 @@
         a: { t: "Add the scarcity adder", tN: ["Add the", "scarcity adder"], s: "up to the cap", sN: "up to the cap" },
         p: { t: "One price for everyone", tN: ["One price for", "everyone"], k: "end" }
       },
-      cols: 2, at: { s: [0, 0], m: [0, 1], q: [0, 2], a: [1, 2], p: [0, 3] }, colsN: 2, atN: { s: [0, 0], m: [0, 1], q: [0, 2], a: [1, 2], p: [0, 3] },
-      edges: [["s", "m"], ["m", "q"], ["q", "a", "yes"], ["a", "p"], ["q", "p", "no"]],
+      cols: 2, at: { s: [0, 0], m: [0, 1], q: [0, 2], a: [1, 2], p: [1, 3] }, colsN: 2, atN: { s: [0, 0], m: [0, 1], q: [0, 2], a: [1, 2], p: [1, 3] },
+      edges: [["s", "m"], ["m", "q"], ["q", "a", "yes"], ["a", "p"], ["q", "p", "no", { v: true }]],
       traces: [{ label: "Spring midday", path: ["s", "m", "q", "p"], text: R.noon ? "Wind and sun set " + usd(R.noon.price) + "." : "Wind and sun set the price." },
                { label: "Summer evening", path: ["s", "m", "q", "a", "p"], text: R.eve ? "Spare " + int(R.eve.spare) + " MW: " + usd(R.eve.price) + "." : "The adder lifts the price." }], sel: 1
     });
@@ -322,9 +334,9 @@
         { id: "cons", g: "buy", label: "Consumers", at: [0, 0], atN: [0, 0], text: "Pay for energy, and in a capacity market for capacity too, through their bills." },
         { id: "op", g: "run", label: "Grid operator", lines: ["Grid", "operator"], at: [1, 0], atN: [1, 0], text: "Runs the hourly market and, where there is one, the capacity auction." },
         { id: "reg", g: "run", label: "Regulators", at: [2, 0], atN: [2, 0], text: "Approve the rules: caps, demand curves, requirements. FERC for most U.S. markets; states for utilities." },
-        { id: "gen", g: "sell", label: "Plants", at: [0.5, 1], atN: [0, 1], text: "Earn energy margins; peakers depend on scarcity hours or a capacity price." },
-        { id: "plan", g: "run", label: "Planner", at: [1.5, 1], atN: [1, 1], text: "Sets how much capacity a capacity market buys, from an adequacy study (A5)." },
-        { id: "inv", g: "sell", label: "Investors", at: [2.5, 1], atN: [2, 1], text: "Build when expected revenue covers cost; both designs try to make that happen." }
+        { id: "gen", g: "sell", label: "Plants", at: [0, 1], atN: [0, 1], text: "Earn energy margins; peakers depend on scarcity hours or a capacity price." },
+        { id: "plan", g: "run", label: "Planner", at: [1, 1], atN: [1, 1], text: "Sets how much capacity a capacity market buys, from an adequacy study (A5)." },
+        { id: "inv", g: "sell", label: "Investors", at: [2, 1], atN: [2, 1], text: "Build when expected revenue covers cost; both designs try to make that happen." }
       ],
       edges: [["cons", "op", "pay"], ["op", "gen", "pays"], ["reg", "op", "rules"], ["plan", "op", "requirement"], ["inv", "gen", "build"]]
     });

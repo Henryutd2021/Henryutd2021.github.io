@@ -135,7 +135,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   ok(prompts.length === 8, "steps: eight cards (" + prompts.length + ")");
   prompts.forEach((p, i) => { const s = (plain(p).match(/[.?!](?=\s+[A-Z(]|$)/g) || []).length; ok(words(p) <= 35 && s <= 2, `prompt ${i + 1}: ${words(p)} words, ${s} sentences (≤ 35, ≤ 2)`); });
   const msgs = [M.solarText(SOL[3], SOL[7]), "Midday: wind and sun exceed demand, so a credit-backed offer sets −$25.00. Evening: only 401 MW spare, so [[scarcity-price|scarcity pricing]] lifts the price to $586.76.",
-    "155 scarcity hours and 0 hours short reach up to $4,665/MWh, while 111 hours go [[negative-price|negative]]. The average, $35.79, hides both ends.",
+    "155 scarcity hours reach up to $4,665/MWh, while 111 hours go [[negative-price|negative]]. The average, $35.79, hides both ends.",
     "A peaker lives on a few scarcity hours; wind and solar on many ordinary ones, plus the credit. **A shortfall is [[missing-money|missing money]]: energy-only, rare high prices are the pay for being there.**",
     "A new peaker pays at 600 MW but not at 700 MW. At 600 MW the year has 2 hours short: **an energy-only market buys reliability through those prices.**",
     "With 700 MW of peakers, consumers pay $39.89/MWh energy-only and $40.79/MWh with a capacity market at $191/MW-day. **The same fleet, paid in different hours and by different rules.**"];
@@ -176,7 +176,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
   const { env, load } = require("./stubdom.js");
   const E = env();
   E.LX.ready = () => {}; E.LX.visible = () => false; E.LX.progress.guess = () => null; E.LX.progress.done = () => {};
-  ["numanswer", "drill", "cards", "controls", "plot", "predict", "profiles", "cardsort", "supplystack"].forEach(n => load(n, E));
+  ["numanswer", "drill", "cards", "controls", "plot", "predict", "profiles", "cardsort"].forEach(n => load(n, E));
   let init = null, demo = null;
   E.LX.mount = (slug, f) => { if (slug === "a03-market-design") init = f; };
   E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
@@ -194,7 +194,7 @@ const has = (str, msg) => ok(QMD.indexOf(str) >= 0, "page states " + (msg || JSO
     demo.cards.go(0); btns(/^A spring midday$/)[0].click(); btns(/^A summer evening$/)[0].click();
     ok(/^Midday: wind and sun exceed demand, so a credit-backed offer sets −\$25\.00\. Evening: only 401 MW spare/.test(saw()), "stub: step 1: " + saw().slice(0, 80));
     demo.cards.go(1); btns(/Clear the year/)[0].click();
-    ok(/^155 scarcity hours and 0 hours short reach up to \$4,665\/MWh, while 111 hours go negative/.test(saw()), "stub: step 2: " + saw().slice(0, 80));
+    ok(/^155 scarcity hours reach up to \$4,665\/MWh, while 111 hours go negative/.test(saw()), "stub: step 2: " + saw().slice(0, 80));
     demo.cards.go(3); btns(/^No$/)[0].click();
     ok(/A shortfall is missing money/.test(saw()) && /falls \$25 short per kW a year/.test(card().textContent), "stub: step 4 shows what each new plant earns");
     demo.cards.go(4); const up = btns(/^(Lower|Decrease|−|-)|Lower Gas peakers/)[0] || card().querySelectorAll("button").filter(b => /Gas peakers/.test(b.getAttribute("aria-label") || ""))[0];

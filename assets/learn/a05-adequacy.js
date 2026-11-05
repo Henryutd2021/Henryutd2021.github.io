@@ -264,6 +264,7 @@
     H("style", { id: "a5-css", text: [
       ".a5-lab .lx-stepcard{grid-template-columns:minmax(0,1fr)}.a5-lab .lx-step-act{grid-template-columns:minmax(0,1fr)}.a5-lab .lx-stepcard>*,.a5-lab .lx-step-act>*{min-width:0}",
       ".a5-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
+      ".a5-row .lx-btn.ghost[aria-pressed=\"true\"]{background:var(--lx-accent-soft);border-color:var(--lx-accent);color:var(--lx-ink)}",
       ".a5-kpis{display:flex;flex-wrap:wrap;gap:8px}",
       ".a5-kpi{display:grid;padding:7px 11px;border:1px solid var(--lx-line);border-radius:10px;background:var(--lx-surface-2);min-width:104px}",
       ".a5-kpi small{font-size:12px;color:var(--lx-ink-3);font-family:var(--lx-f-display)}.a5-kpi b{font-family:var(--lx-f-mono);font-size:16px;font-weight:600}",
@@ -554,12 +555,12 @@
         n: { t: "500 years done?", tN: ["500 years", "done?"], k: "q" },
         m: { t: "LOLE, LOLH, EUE", tN: ["LOLE, LOLH,", "EUE"], s: "with their error", sN: "± error" },
         c: { t: "Meets 0.1 days/yr?", tN: ["Meets 0.1", "days/yr?"], k: "q" },
-        a: { t: "Add a resource", tN: ["Add a", "resource"], s: "rate it by EUE", sN: "rate by EUE" },
+        a: { t: "Add a resource, re-run", tN: ["Add a resource,", "re-run"], s: "same seed; rate by EUE", sN: "same seed" },
         r: { t: "Report the rating with its mix", tN: ["Report rating", "with its mix"], k: "end" }
       },
       cols: 3, at: { w: [1, 0], o: [1, 1], h: [1, 2], n: [1, 3], m: [1, 4], c: [1, 5], a: [2, 5], r: [1, 6] },
       colsN: 2, atN: { w: [0, 0], o: [0, 1], h: [0, 2], n: [0, 3], m: [0, 4], c: [0, 5], a: [1, 5], r: [0, 6] },
-      edges: [["w", "o"], ["o", "h"], ["h", "n"], ["n", "w", "no", { l: "next year" }], ["n", "m", "yes"], ["m", "c"], ["c", "a", "no"], ["a", "w", "re-run", { l: "same seed" }], ["c", "r", "yes"]],
+      edges: [["w", "o"], ["o", "h"], ["h", "n"], ["n", "w", "no"], ["n", "m", "yes"], ["m", "c"], ["c", "a", "no"], ["a", "w"], ["c", "r", "yes"]],
       traces: [
         { label: "This grid", path: ["w", "o", "h", "n", "m", "c", "a"], text: "LOLE " + d3(R.base ? R.base.lole : b.lole) + " fails the criterion: add a resource and re-run with the same seed." },
         { label: "With 500 MW of peakers", path: ["w", "o", "h", "n", "m", "c", "r"], text: A.ct ? "LOLE " + d3(A.ct.lole) + ": it meets 0.1, accredited at " + pct(A.ct.share) + "." : "It meets the criterion." }

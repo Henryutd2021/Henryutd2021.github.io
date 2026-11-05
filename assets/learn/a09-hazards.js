@@ -113,6 +113,7 @@
     H_("style", { id: "a9-css", text: [
       ".a9-lab .lx-stepcard{grid-template-columns:minmax(0,1fr)}.a9-lab .lx-step-act{grid-template-columns:minmax(0,1fr)}.a9-lab .lx-stepcard>*,.a9-lab .lx-step-act>*{min-width:0}",
       ".a9-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}",
+      ".a9-row .lx-btn.ghost[aria-pressed=\"true\"]{background:var(--lx-accent-soft);border-color:var(--lx-accent);color:var(--lx-ink)}",
       ".a9-tbl{overflow-x:auto;max-width:100%}.a9-tbl table{width:100%;border-collapse:collapse;font-size:14px}",
       ".a9-tbl th,.a9-tbl td{padding:5px 6px;border-bottom:1px solid var(--lx-line);text-align:right;font-weight:400;vertical-align:top}",
       ".a9-tbl th:first-child,.a9-tbl td:first-child{text-align:left}",
@@ -307,11 +308,11 @@
         h: { t: "Name the hazard", tN: ["Name the", "hazard"], s: "what it hits", sN: "what it hits" },
         s: { t: "Stress-test the grid", tN: ["Stress-test", "the grid"], s: "correlated outages", sN: "correlated" },
         q: { t: "Risk acceptable?", tN: ["Risk", "acceptable?"], k: "q" },
-        d: { t: "Choose defences", tN: ["Choose", "defences"], s: "cost against MWh avoided", sN: "cost vs MWh" },
+        d: { t: "Choose defences, re-test", tN: ["Choose defences,", "re-test"], s: "cost against MWh avoided", sN: "cost vs MWh" },
         r: { t: "Rules, drills, reports", tN: ["Rules, drills,", "reports"], k: "end" }
       },
       cols: 2, at: { h: [0, 0], s: [0, 1], q: [0, 2], d: [1, 2], r: [0, 3] }, colsN: 2, atN: { h: [0, 0], s: [0, 1], q: [0, 2], d: [1, 2], r: [0, 3] },
-      edges: [["h", "s"], ["s", "q"], ["q", "d", "no"], ["d", "s", "re-test"], ["q", "r", "yes"]],
+      edges: [["h", "s"], ["s", "q"], ["q", "d", "no"], ["d", "s"], ["q", "r", "yes"]],
       traces: [{ label: "A cold snap", path: ["h", "s", "q", "d", "s", "q", "r"], text: "Winterizing cuts the units' losses; since October 2025 the standard EOP-012-3 requires cold-weather plans for generators." },
                { label: "Wildfire shutoffs", path: ["h", "s", "q", "d"], text: "Customers on switched-off lines lose far more energy than the supply shortfall adds: the defence is on the wires." }], sel: 0
     });
