@@ -1272,9 +1272,13 @@
    "tier": "analyst",
    "code": "A17",
    "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a17-physical-feasibility.html",
+   "scales": [],
+   "id": "a17-physical-feasibility",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Will it work on the wires?"
   },
   {
    "tier": "analyst",

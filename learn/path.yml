@@ -687,7 +687,23 @@
 - {kind: lesson, tier: analyst, code: A12, title: "How do governments steer energy? Taxes, credits, standards and carbon prices"}
 - {kind: lesson, tier: analyst, code: A13, title: "Who pays and who benefits? Energy burden, fairness and jobs"}
 - {kind: lesson, tier: analyst, code: A15, title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"}
-- {kind: lesson, tier: analyst, code: A17, title: "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity"}
+# A17, builder learn-w4-a (A17 fork, wave W4)
+- kind: lesson
+  id: a17-physical-feasibility
+  code: A17
+  tier: analyst
+  form: cards
+  icon: wave
+  status: active
+  minutes: 30
+  practice_minutes: 20   # the practice set (Check section)
+  title: "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity"
+  subtitle: "Check a plan that balances every hour against the wires: a line's heating, a feeder's voltage, rooftop solar's limit, a ramp and the first second after a trip"
+  short: "Will it work on the wires?"
+  teaches: [apparent and reactive power, thermal ratings, voltage drop and rise on a feeder, hosting capacity, ramp limits, inertia and the rate of change of frequency, grid-following and grid-forming inverters]
+  does: "Take M1's plan that balances every hour; add reactive power until a line overheats, load a feeder until its far end sags, add rooftop solar until its voltage tops out, find a ramp the plan assumed, and cut inertia to compare grid-following and grid-forming inverters after a trip."
+  outcome: "Name the physical limits an hourly energy plan can break, say when each binds, and say which check (an AC check, a ramp rule or finer time steps, or a check of the first seconds) would catch it."
+  after: [F6, 3]
 - {kind: lesson, tier: analyst, code: A18, title: "How is a city or regional energy plan made?"}
 - {kind: lesson, tier: analyst, code: A19, title: "Where should it go? Siting with maps, from layers to a suitability score"}
 - {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}

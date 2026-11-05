@@ -47,6 +47,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "apparent-power": {
+  "term": "Apparent power",
+  "short": "The combined size of real and reactive power, the square root of MW² plus Mvar², in megavolt-amperes (MVA); a wire's heating follows it, not MW alone.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "array": {
   "term": "Array",
   "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
@@ -1091,6 +1097,12 @@
   "lesson": "R3",
   "href": "r03-system-and-method.html"
  },
+ "hosting-capacity": {
+  "term": "Hosting capacity",
+  "short": "How much solar or other generation a feeder can take, at its existing settings and without upgrades, before a limit such as its voltage band is crossed.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "hour-ending": {
   "term": "Hour ending",
   "short": "A time stamp that labels each hour by its last moment, so 01:00 means the hour from midnight to 01:00.",
@@ -1691,6 +1703,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "per-unit": {
+  "term": "Per unit",
+  "short": "A voltage written as a fraction of its nominal value: 1.00 per unit is 120 V on a 120 V service, 0.95 is 114 V.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "percentile": {
   "term": "Percentile",
   "short": "The value that a given share of a sorted set stays at or below: 90% of values are at or below the 90th percentile.",
@@ -1744,6 +1762,12 @@
   "short": "A chart of how much power a wind turbine makes at each wind speed.",
   "lesson": 5,
   "href": "05-capacity-factor.html"
+ },
+ "power-factor": {
+  "term": "Power factor",
+  "short": "Real power divided by apparent power, MW ÷ MVA: 1 when no reactive power flows, lower as more does.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
  },
  "power-purchase-agreement": {
   "term": "Power purchase agreement (PPA)",
@@ -2069,6 +2093,12 @@
   "lesson": "M5",
   "href": "m05-microgrid-size-and-run.html"
  },
+ "service-voltage-range": {
+  "term": "Service voltage range",
+  "short": "The voltage a utility keeps at a customer's meter in normal operation; in the U.S., ANSI C84.1 Range A, 114 to 126 V on a 120 V service (0.95 to 1.05 per unit).",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
+ },
  "shadow-price": {
   "term": "Shadow price",
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
@@ -2254,6 +2284,12 @@
   "short": "A unit of energy equal to a billion kilowatt-hours, used for the yearly electricity use of regions and countries.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "thermal-rating": {
+  "term": "Thermal rating",
+  "short": "The most current, or MVA at the line's voltage, that a line or transformer can carry before its wires get too hot and sag.",
+  "lesson": "A17",
+  "href": "a17-physical-feasibility.html"
  },
  "thermal-storage": {
   "term": "Thermal storage",
