@@ -191,6 +191,7 @@ CF7's toy discounts month by month at $i = (1+r)^{1/12} - 1$, with $r$ = 8% a ye
 <li>Voltage, short-circuit and stability limits, which can bind before a line's thermal limit.</li>
 <li>Permits, land, supply chains and construction crews, which set much of the time after the agreement.</li>
 <li>Why the most a project would pay is what it is: here it is simply given.</li>
+<li>What a large load does to a whole grid's plants, prices and adequacy: capstone <a href="c2-plains-grid-hard-year.html">C2</a> connects one to the Plains Grid.</li>
 </ul>
 </div>
 </details>

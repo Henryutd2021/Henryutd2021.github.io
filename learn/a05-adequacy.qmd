@@ -226,7 +226,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>PJM. <a href="https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf">ELCC Class Ratings for the 2028/2029 Base Residual Auction</a> (PDF), dated February 2026.</li>
 <li>NERC (2026). <a href="https://www.nerc.com/globalassets/our-work/assessments/nerc_ltra_2025.pdf">2025 Long-Term Reliability Assessment</a> (PDF), January 2026: how adequacy risk is assessed and reported across North America.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (Form EIA-930)</a>, Southwest Power Pool, 2024 and 2025: the demand, wind and solar shapes.</li>
-<li>Where this goes: Analyst lesson <a href="a09-hazards.html">A9</a> adds hazards that knock out many units at once; Modeler lesson <a href="m03-capacity-expansion.html">M3</a> plans capacity with representative periods.</li>
+<li>Where this goes: Analyst lesson <a href="a09-hazards.html">A9</a> adds hazards that knock out many units at once; Modeler lesson <a href="m03-capacity-expansion.html">M3</a> plans capacity with representative periods; capstone <a href="c2-plains-grid-hard-year.html">C2</a> checks a plan's adequacy on the Plains Grid.</li>
 </ul>
 </div>
 ```

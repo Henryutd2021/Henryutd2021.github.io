@@ -135,7 +135,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 
 - $\bar d$ is the town's average hour of 2025 (MW) and $d_{\max}$ its busiest hour (MW); a flat load pushes LF toward 1.
 - **A load that is not flat** must be added hour by hour before sorting: the busiest hours of the sum need not be the busiest hours of either part.
-- **Next.** The Grid Room sandbox (SB2, upcoming) adds a large load to a regional grid; resource adequacy ([A5](a05-adequacy.qmd)) asks whether supply is enough in every hour.
+- **Next.** The Grid Room sandbox ([SB2](sb2-grid-room.qmd)) adds a large load to a regional grid; resource adequacy ([A5](a05-adequacy.qmd)) asks whether supply is enough in every hour.
 
 ```{=html}
 </div>

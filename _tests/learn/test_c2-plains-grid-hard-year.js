@@ -191,7 +191,7 @@ const APPROVED_SNAPSHOT = {
   ok(T.indexOf("the year of each of the 128 plans on the grid (half or all of the load, flexible or not, 0, 2, 4 or 6 new peakers, a battery or not, an uprate or not, a 150 or 250 MW reserve), solved with this engine on " + LIB.date) >= 0 && LIB.date === RUN_DATE, "the page states the grid and the library's date");
   ok(/The choices step across a precomputed grid of " \+ LIB\.plans\.length \+ " plans/.test(fs.readFileSync(X.L("c2-plains-grid-hard-year.js"), "utf8")) && /Precomputed with this engine on/.test(fs.readFileSync(X.L("c2-plains-grid-hard-year.js"), "utf8")), "the bench labels the year as precomputed with this engine, with its date");
   // ---------------- the brief, the time, the frame and the guards
-  const PY = fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: c2-plains-grid-hard-year"), PY.indexOf("after: [SB2, M2]"));
+  const PY = fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: c2-plains-grid-hard-year"), PY.indexOf("after: [SB2, M2, A5, A6, A9]"));
   ok(/minutes: 180/.test(row) && /About 180 minutes: 70 to build and test plans, 70 to write the note, 40 to check it\./.test(T), "the time: 180 minutes = 70 + 70 + 40, as path.yml and the curriculum give it");
   ok(/sandbox: SB2/.test(row) && /lab_minutes: 45/.test(row) && /lab_minutes: 45/.test(PY.slice(PY.indexOf("id: m02-unit-commitment"), PY.indexOf("id: m02-unit-commitment") + 800)), "built on SB2; the Modeler version's 45 minutes are M2's notebook lab");
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
