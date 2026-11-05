@@ -48,19 +48,23 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>3 · Long run, a new 300 MW gas plant</td><td data-label="Data center">+2,372 t</td><td data-label="Electrolyzer">+934 t</td></tr>
 <tr><td>3 · Long run, new wind for its yearly energy</td><td data-label="Data center">+133 t</td><td data-label="Electrolyzer">+24 t</td></tr>
 <tr><td>4 · Claim, certificates matched over the year</td><td data-label="Data center">0 t</td><td data-label="Electrolyzer">0 t</td></tr>
-<tr><td>4 · Claim, new wind matched hour by hour</td><td data-label="Data center">441 t</td><td data-label="Electrolyzer">137 t</td></tr>
+<tr><td>4 · Claim, new wind matched hour by hour (short hours at the grid average, a proxy)</td><td data-label="Data center">441 t</td><td data-label="Electrolyzer">137 t</td></tr>
 </tbody>
 </table>
+<p class="lx-hint">Claims follow illustrative rules after the GHG Protocol's Scope 2 Guidance (2015): certificates are assumed to be the buyer's alone, retired for it and from the same market.</p>
+<p class="lx-hint">New wind is assumed to be built for the buyer (additional) and to reach this grid (deliverable).</p>
 <p class="lx-hint">The electrolyzer runs from 00:00 to 12:00, the 12 hours with the lowest average factor (0.10 to 0.17 t CO₂ per MWh). Each of its extra MWh is still served by the combined-cycle plants, at 0.40 t.</p>
 <p class="lx-hint">With JavaScript on, you pick the load, switch the model's rule, choose what gets built and compare five purchases.</p>
 </div>
 </div>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative grid.</b> The Plains Grid is fictional: a 4,000 MW peak; 3,000 MW of wind, 600 MW of solar, 2,000 MW of gas combined-cycle plants and 2,300 MW of gas peakers.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real plant data.</b> Gas plants burn 7,535 and 10,975 Btu per kWh (<a href="https://www.eia.gov/electricity/annual/html/epa_08_02.html">EIA, 2025</a>) at 52.91 kg CO₂ per MMBtu (<a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA</a>): 0.40 and 0.58 t per MWh, counted at the stack.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real plant data.</b> Gas plants' full-load <span class="lx-term" data-term="heat-rate">heat rates</span> are 7,535 and 10,975 Btu per kWh (<a href="https://www.eia.gov/electricity/annual/html/epa_08_02.html">EIA, 2025</a>), held at every output; gas emits 52.91 kg CO₂ per MMBtu (<a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA</a>).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>From heat to CO₂.</b> 7,535 Btu per kWh = 7.535 <span class="lx-term" data-term="mmbtu">MMBtu</span> per MWh; × 52.91 kg = 399 kg. So 0.40 and 0.58 t per MWh, counted at the stack; t is a metric tonne, 1,000 kg.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Real hours.</b> Demand, wind and sun follow the Southwest Power Pool's hours of 7 November 2025 (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), wind and sun scaled to EIA's 2025 capacity factors (<a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Table 6.07.B</a>). Each hour runs cheapest first, with no ramp limits.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 30 guided minutes in seven steps.</p>
 <style>/* lesson-local */
 #a10-buy { display: block; width: 100%; max-width: 100%; min-width: 0; }   /* long purchase names: wrap the box, never the page */
+.a10-rules { margin: .5rem 0 .6rem; padding-left: 1.1rem; display: grid; gap: 4px; }
 @media (max-width: 640px) { .a10-fb td:first-child { font-weight: 600; } .a10-fb td[data-label]::before { content: attr(data-label) ": "; color: var(--lx-ink-3); font-size: 12.5px; } }
 </style>
 ```
@@ -79,7 +83,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>Short run</dt><dd>Marginal factors ask what changes: the data center adds 3,039 t, mostly at the combined-cycle plants.</dd>
 <dt>The model matters</dt><dd>With a rule that keeps 800 MW of combined-cycle plants running, night wind would be spilled, and the electrolyzer's change falls from 1,435 t to 607 t.</dd>
 <dt>Long run</dt><dd>What gets built decides the answer: +2,372 t with a new gas plant, +133 t with new wind, for the data center that day.</dd>
-<dt>Claim</dt><dd>A purchase sets what may be reported; the plants change only when it adds clean power that reaches this grid.</dd>
+<dt>Claim</dt><dd>A purchase sets what may be reported under a stated rule. In these scenarios the plants change only when we assume it adds clean power that reaches this grid.</dd>
 </dl>
 </div>
 </div>
@@ -92,9 +96,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
+- **[Scope 2]{.lx-term term="scope-2"}.** A company's reported emissions from the electricity, heat or steam it buys. Where buyers can choose contracts, the GHG Protocol's Scope 2 Guidance (2015) asks for two counts.
 - **[Location-based]{.lx-term term="location-based"}.** Each MWh is counted at the grid's average factor where it is used: question 1.
 - **[Market-based]{.lx-term term="market-based"}.** Each MWh is counted at the factor of the electricity the buyer purchased, through contracts or certificates: question 4.
-- **Rules change.** The GHG Protocol opened a public consultation on its Scope 2 guidance on 20 October 2025; it proposes hourly matching and deliverability for the market-based method.
+- **Conditions.** Among other criteria, a certificate must be the buyer's alone, retired for it and from the same market (Table 7.1). Unclaimed use takes a [residual mix]{.lx-term term="residual-mix"}; this lesson uses the grid average instead, as a proxy.
+- **Rules under review.** The GHG Protocol consulted on a revision from 20 October 2025 to 31 January 2026. Hourly matching and deliverability are proposals, not adopted rules; its summary of 29 July 2026 reports low support for them as proposed.
 - **Neither method** measures what the plants do differently: that is questions 2 and 3.
 
 ```{=html}
@@ -121,6 +127,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Life-cycle emissions: building plants, and methane leaks before the gas reaches the plant.</li>
 <li>Imports, exports and the lines inside the grid: its plants serve its load from one point.</li>
 <li>Start-ups, ramp limits and reserves, which change which plant responds.</li>
+<li>Part-load efficiency: each plant burns its full-load fuel per MWh at every output.</li>
 </ul>
 </div>
 </details>
@@ -207,7 +214,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>EIA. <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">Carbon Dioxide Emissions Coefficients</a>, 18 September 2024.</li>
 <li>EIA. <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a>, Table 3 (a new combined-cycle plant; variable O&amp;M), April 2026.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor (Form EIA-930)</a>, Southwest Power Pool, 2025; <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a>, issue of 23 October 2026.</li>
-<li>GHG Protocol. <a href="https://ghgprotocol.org/blog/release-ghg-protocol-opens-public-consultations-scope-2-and-electricity-sector-consequential">Public consultations on Scope 2 and on consequential electricity-sector accounting</a>, opened 20 October 2025.</li>
+<li>GHG Protocol. <a href="https://ghgprotocol.org/sites/default/files/2023-03/Scope%202%20Guidance.pdf">Scope 2 Guidance</a> (2015), Table 7.1: Scope 2 Quality Criteria, page 60.</li>
+<li>GHG Protocol. <a href="https://ghgprotocol.org/blog/release-ghg-protocol-opens-public-consultations-scope-2-and-electricity-sector-consequential">Public consultations on Scope 2 and on consequential electricity-sector accounting</a>, opened 20 October 2025; <a href="https://ghgprotocol.org/sites/default/files/2026-07/S2-ExecutiveSummary-PublicConsultation%20ummaryofFeedback-2026.07.29.pdf">Scope 2 Public Consultation Feedback Summary: Executive Summary</a>, 29 July 2026.</li>
 <li>Siler-Evans, K., Azevedo, I. L. and Morgan, M. G. (2012). <a href="https://doi.org/10.1021/es300145v">Marginal Emissions Factors for the U.S. Electricity System</a>. Environmental Science &amp; Technology 46(9), 4742–4748.</li>
 <li>Gagnon, P. and Cole, W. (2022). <a href="https://doi.org/10.1016/j.isci.2022.103915">Planning for the evolution of the electric grid with a long-run marginal emission rate</a>. iScience 25(3), 103915.</li>
 <li>Ricks, W., Xu, Q. and Jenkins, J. (2023). <a href="https://doi.org/10.1088/1748-9326/acacb5">Minimizing emissions from grid-based hydrogen production in the United States</a>. Environmental Research Letters 18(1), 014025.</li>

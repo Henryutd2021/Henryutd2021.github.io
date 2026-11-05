@@ -2321,6 +2321,12 @@
   "lesson": "M4",
   "href": "m04-storage-multienergy.html"
  },
+ "residual-mix": {
+  "term": "Residual mix",
+  "short": "The emission factor of the electricity left after every contract and certificate has been claimed, used for a buyer's unclaimed use.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
+ },
  "resource-adequacy": {
   "term": "Resource adequacy",
   "short": "Whether a power system has enough supply to meet demand in nearly every hour, judged with many weather years and plant outages against a criterion such as a loss-of-load expectation.",
@@ -2410,6 +2416,12 @@
   "short": "A way to write a number as a value at least 1 and less than 10, times a power of ten, so very large and very small numbers are easy to compare.",
   "lesson": "K1",
   "href": "k01-units.html"
+ },
+ "scope-2": {
+  "term": "Scope 2 emissions",
+  "short": "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it.",
+  "lesson": "A10",
+  "href": "a10-emissions-questions.html"
  },
  "search-string": {
   "term": "Search string",

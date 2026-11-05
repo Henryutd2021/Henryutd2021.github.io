@@ -30,15 +30,18 @@
      ptc  a production credit, $ per MWh, subtracted from each MWh of new wind and solar used (taxpayers pay)
      itc  an investment credit, a share of the capital cost of new wind, solar and batteries (taxpayers pay)
      ces  a clean-energy standard: the year's wind and sun used >= ces x the year's demand    ("ces"; its dual is the
-          certificate price, $ per MWh of clean energy)
+          marginal compliance cost, $ per MWh of clean energy; the pages read it as the certificate price only under a
+          stated assumption: certificates trade at that cost in a competitive market and customers fund them)
      cap  a CO2 cap, t a year: the year's gas CO2 <= cap                                       ("cap"; its dual is the
           shadow price of the cap, $ per t)
      load a flat load added to demand; buy: "annual" | "hourly" adds the buyer's own new wind, solar and battery (Wb, Sb,
           Bb) with a matching rule: annual, the year's buyer wind and sun >= the year's load; hourly, every hour the buyer's
           wind, sun and battery output >= the load, the buyer's battery charging only from the buyer's wind and sun.
    Reported numbers leave out transfers: resource cost = new capital and fixed O&M (the full
-   cost, before any credit) + gas fuel and variable O&M + unserved energy at $10,000. Transfers are listed apart: carbon
-   payments, credit payments, certificate payments. Existing plants' fixed costs are sunk and left out.
+   cost, before any credit) + gas fuel and variable O&M + unserved energy at $10,000. Transfers are listed apart, a year:
+   carbon payments, credit payments, certificate payments (illustrative, as above). The investment credit's payment is
+   an annual equivalent (its share of the annual capital recovery); itcUpfront is the cash credit at the build, its share
+   of the overnight capital cost. Existing plants' fixed costs are sunk and left out.
    Ties (stated in advance, data "tie"): the pages solve the LP as written, with no tie-breaking costs, and report only
    numbers that are the same for every best plan: the tests minimize and maximize each over the LP's optimal face
    (_tests/learn/plains_face.js). Which plant is curtailed in a spilled hour, and how a battery cycles surplus it cannot
@@ -207,7 +210,9 @@
     R.resource = capFull + R.fuel + R.unserved;
     R.carbonPay = (o.tau || 0) * R.co2;                                  // emitters to the government
     R.ptcPay = (o.ptc || 0) * R.newClean;                                // the government to new wind and solar
-    R.itcPay = itc * ((R.Wn + R.Wb) * C.wind.cap + (R.Sn + R.Sb) * C.solar.cap + (R.Bn + R.Bb) * C.battery.cap);
+    R.itcPay = itc * ((R.Wn + R.Wb) * C.wind.cap + (R.Sn + R.Sb) * C.solar.cap + (R.Bn + R.Bb) * C.battery.cap);   // annual equivalent
+    var B = Y.M.build;
+    R.itcUpfront = itc * ((R.Wn + R.Wb) * B.wind.capex * 1000 + (R.Sn + R.Sb) * B.solar.capex * 1000 + (R.Bn + R.Bb) * C.battery.kW * 1000);   // at the build
     R.shareClean = R.clean / (R.demand + R.load);
     R.duals = r.duals || null;
     R.cesPrice = r.duals && o.ces != null ? r.duals.ces : null;          // $ per MWh of clean energy (>= 0)
