@@ -5,6 +5,8 @@
        free: true }                                             // free: Next is open from the start (no action needed)
    ], onStep: function (i) {} });
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
+   Next past the last card (a script's click on the hidden button, e.g. a demo hook run twice) and Back on the first
+   card do nothing.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
@@ -27,12 +29,12 @@
       var foot = H("div", { class: "lx-step-foot" }, card);
       var back = H("button", { class: "lx-btn ghost small", type: "button", text: "Back" }, foot);
       back.disabled = i === 0;
-      back.addEventListener("click", function () { render(i - 1); });
+      back.addEventListener("click", function () { if (i > 0) render(i - 1); });
       var nx = H("button", { class: "lx-btn small", type: "button", html: "Next" + LX.icon("arrow") }, foot);
       var st = o.steps[i];
       if (st.free) unlocked[i] = true;
       nx.disabled = !unlocked[i]; nx.hidden = i === N - 1;
-      nx.addEventListener("click", function () { if (unlocked[i] && !busy) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
+      nx.addEventListener("click", function () { if (unlocked[i] && !busy && i < N - 1) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
         done: function () { unlocked[k] = true; nx.disabled = busy; },
         busy: function (on) {

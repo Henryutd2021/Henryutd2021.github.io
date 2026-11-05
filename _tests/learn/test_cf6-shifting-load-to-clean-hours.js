@@ -5,7 +5,8 @@
 //   - the three preset moves: average-factor accounting against what the plants emit, as the page states them; a move
 //     that crosses from one plant to the next is re-dispatched, not multiplied by the next-MWh factor
 //   - the allow-listed explainer (assets/explainers/ghg.js) counts average intensity and grows with the range, as the page
-//     says; its starting day is on the page as a table
+//     says; its starting day is on the page as a table; with JavaScript the table follows the slider and the toggle (the
+//     explainer's "explainer-update" event, run here with a fake helper kit; the page's writer on the stub document)
 //   - every number on the page (comparison table, myth answers, numbers to remember) matches the model or the data file
 //   - the four no-JS blocks (timeline, idea, boundary, explainer table) equal what the components write from the data
 //     (--write rewrites them)
@@ -105,6 +106,35 @@ const e3 = EX.model({ range: 0.03, grid: "large" }), e8 = EX.model({ range: 0.08
 ok(e8.reductionPct > e3.reductionPct && e8.reductionPct > s8.reductionPct && near(e8.newTotal, e8.total, 1e-6), "explainer: total kept; wider range and larger swing give larger attributed reductions");
 const e5 = EX.model({ range: 0.05, grid: "large" });
 ok(e5.adjust.every((y, t) => Math.abs(y) <= 0.05 * e5.load[t] * 2 + 1e-9) && near(e5.newTotal, e5.total, 1e-9) && e5.reductionPct > 0, "explainer's starting day (±5%, large swing): total kept, a positive reduction (its text version on the page)");
+
+// ---------------- the explainer's own text table follows its controls (W4 carry-over)
+{
+  // the explainer's view with a fake helper kit: controls are captured, drawing is skipped, events are recorded
+  const ctl = {}, events = [], noop = () => {};
+  const fakeEl = () => ({ appendChild: noop, setAttribute: noop, style: {}, firstChild: null });
+  const h = { scaffold: () => ({ controls: {}, figure: {}, side: {} }), el: fakeEl, color: () => "#000", fmt: (v, d) => Number(v).toFixed(d || 0),
+              slider: (p, o) => { ctl.slider = o; return { set: v => o.onInput(v) }; }, toggle: (p, o) => { ctl.toggle = o; return { set: v => o.onChange(v) }; },
+              readouts: () => noop, sentence: () => noop, responsive: () => noop, onTheme: noop };
+  const root = { dispatchEvent: e => { events.push(e); return true; } };
+  EX.view(root, h);
+  const last = () => events[events.length - 1], same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  ok(ctl.slider.value === 5 && events.length === 1 && last().type === "explainer-update" && last().bubbles && last().detail.slug === "ghg" &&
+     same(last().detail.model, EX.model({ range: 0.05, grid: "large" })) && last().detail.range === 0.05 && last().detail.grid === "large",
+     "explainer: its first update says what it shows (±5%, large swing), the state the page's no-JS table holds");
+  let all = true;
+  ["small", "large"].forEach(g => { ctl.toggle.onChange(g); for (let r = 0; r <= 10; r++) { ctl.slider.onInput(r); const d = last().detail; if (!(d.range === r / 100 && d.grid === g && same(d.model, EX.model({ range: r / 100, grid: g })))) all = false; } });
+  ok(all && events.length === 1 + 2 * 12, "explainer: every slider step and both swings send the model's result for that state (" + events.length + " updates)");
+  // the page's writer on the stub document: the table and the summary follow the state; the no-JS block is the default
+  const { env } = require("./stubdom.js"), E = env(), H = E.LX.H;
+  const det = H("details", { class: "lx-textalt" }, E.body), sum = H("summary", { text: "Text version: the slider's starting day, hour by hour" }, det), box = H("div", { class: "cf6-ex-table" }, det);
+  const d7 = { range: 0.07, grid: "small", model: EX.model({ range: 0.07, grid: "small" }) };
+  ok(M.liveTable(det, d7) && box.innerHTML === M.staticExplainer(d7.model, 0.07, "small") && sum.textContent === M.LIVE_SUMMARY,
+     "page: the explainer's update rewrites the hour-by-hour table (±7%, small swing) and the summary says it follows the slider");
+  const rows = (box.innerHTML.match(/<tr><td>/g) || []).length, after = [...box.innerHTML.matchAll(/<tr><td>[^<]+<\/td><td class="n">\d+<\/td><td class="n">[\d.]+<\/td><td class="n">([\d.]+)<\/td>/g)].map(m => +m[1]);
+  ok(rows === 24 && after.length === 24 && near(after.reduce((a, b) => a + b, 0), d7.model.total, 24 * 0.05 + 1e-9) && /At ±7% on the small-swing day/.test(box.innerHTML), "page: 24 hours, the After column keeps the day's total, the setting named");
+  ok(!M.liveTable(det, null) && box.innerHTML === M.staticExplainer(d7.model, 0.07, "small"), "page: an event without a model changes nothing");
+  ok(/addEventListener\("explainer-update", function \(e\) \{ liveTable\(alt, e\.detail\); \}\)/.test(JS) && /details\.lx-textalt/.test(JS), "page script: listens to the explainer and writes into its text version");
+}
 
 // ---------------- numbers on the page
 const T = text(PAGE);

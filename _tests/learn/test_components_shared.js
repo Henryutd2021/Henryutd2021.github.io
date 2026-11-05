@@ -6,7 +6,9 @@
 //     number is not submitted, and says why); solutions, points and choice feedback take [[glossary|marks]]
 //   - sheet.js (LX.Sheet): "Fill down" follows the selected cell after Enter and after set(), not only after a move
 //   - cards.js (LX.StepCards): api.busy(on) holds Next shut while a solve runs (and marks the card aria-busy); a late call
-//     from a card no longer shown changes nothing; M1 step 8 uses it instead of reaching into the card's buttons
+//     from a card no longer shown changes nothing; M1 step 8 uses it instead of reaching into the card's buttons; Next
+//     past the last card (a script's click on the hidden button, as a demo hook run twice does) and Back on the first card
+//     do nothing (W4 carry-over: they threw before)
 //   - unitchain.js/.css (LX.UnitChain) is .lx-uchain, so a page with a causal chain (.lx-chain, chains.css) keeps both
 //     layouts (the bundle's rules cascaded onto stub elements)
 //   - flowchart.js (LX.Flowchart): update(traces) changes the traces without redrawing; lesson 3 uses it
@@ -341,6 +343,30 @@ ok(CP.checkEstimate(est, 439, 440, "MWh per year").ordered && CP.checkEstimate(e
   api[0].done(); ok(next().disabled, "cards: a late done() from step 1 does not unlock step 2");
   api[1].busy(true); api[1].busy(false); ok(next().disabled, "cards: busy(false) on a step not yet done leaves Next shut");
   cards.go(0); ok(!next().disabled && busyAttr() === null, "cards: going back, a done step is open and not busy");
+})();
+
+// ---------------------------------------------------------------- step cards: Next past the last card, Back before the first
+(function () {
+  const E = env(); load("cards", E);
+  const host = E.LX.H("div", null, E.body); const seen = [];
+  const cards = E.LX.StepCards(host, { steps: [{ text: "One.", free: true }, { text: "Two.", free: true }, { text: "Three.", build: (act, a) => { a.done(); } }],
+    onStep: i => seen.push(i) });
+  const card = cards.el, foot = () => card.querySelector(".lx-step-foot"), back = () => foot().children[0], next = () => foot().children[1];
+  next().click(); next().click();
+  ok(cards.index() === 2 && next().hidden && !next().disabled && card.querySelector(".lx-step-n").textContent === "Step 3 of 3",
+     "cards: the last card hides Next (done, so it is not disabled, and a script can still click it)");
+  let threw = null; const before = seen.length, text = card.querySelector(".lx-step-text").innerHTML;
+  try { next().click(); next().fire("click"); } catch (e) { threw = e; }
+  ok(threw === null, "cards: Next past the last card does not throw" + (threw ? " (" + threw.message + ")" : ""));
+  ok(cards.index() === 2 && seen.length === before && card.querySelector(".lx-step-text").innerHTML === text && card.querySelector(".lx-step-n").textContent === "Step 3 of 3",
+     "cards: Next past the last card is a no-op (same card, no re-render, onStep not called)");
+  cards.go(0); threw = null;
+  try { back().fire("click"); } catch (e) { threw = e; }
+  ok(threw === null && cards.index() === 0 && back().disabled, "cards: Back on the first card (disabled) does nothing, even when its listener runs");
+  // a demo hook that plays steps 1..3 twice, clicking Next after each step, as B2's does
+  const play = () => { for (let k = 0; k < 3; k++) next().click(); };
+  threw = null; try { play(); play(); } catch (e) { threw = e; }
+  ok(threw === null && cards.index() === 2, "cards: a demo run twice ends on the last card without an error");
 })();
 
 // ---------------------------------------------------------------- a causal chain and a unit chain on one page

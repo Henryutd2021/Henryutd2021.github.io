@@ -322,9 +322,9 @@
   }
  },
  "reference": {
-  "about": "Written by node _tests/learn/test_sb0-site-bench.js --write: the default plan's results (the no-JS blocks) and the check of the 52-week run against one full-year LP for each preset.",
+  "about": "Written by node _tests/learn/test_sb0-site-bench.js --write: the default plan's results (the no-JS blocks) and the check of the run in 52 weeks and 31 December against one full-year LP for each preset.",
   "default": {
-   "date": "2026-11-03",
+   "date": "2026-11-05",
    "state": {
     "site": "home",
     "pv": 6,
@@ -383,7 +383,7 @@
    ]
   },
   "check": {
-   "date": "2026-11-03",
+   "date": "2026-11-05",
    "rows": [
     {
      "id": "solar",

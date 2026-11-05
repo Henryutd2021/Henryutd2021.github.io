@@ -48,15 +48,15 @@ body-classes: "page-learn page-lesson lx-form-play"
 <tr><td>600 kt</td><td>$108.8M</td><td>181 MW</td><td>54 MW</td><td>367 MW</td><td>0 MW</td><td>0 / 0</td></tr>
 <tr><td>400 kt</td><td>$117.3M</td><td>389 MW</td><td>50 MW</td><td>341 MW</td><td>0 MW</td><td>0 / 0</td></tr>
 <tr><td>200 kt</td><td>$129.3M</td><td>576 MW</td><td>100 MW</td><td>302 MW</td><td>0 MW</td><td>15 / 15</td></tr>
-<tr><td>100 kt</td><td>$143.0M</td><td>649 MW</td><td>216 MW</td><td>280 MW</td><td>0 MW</td><td>28 / 40</td></tr>
-<tr><td>0 kt</td><td>$288.5M</td><td>220 MW</td><td>59 MW</td><td>0 MW</td><td>330 MW</td><td>62 / 447</td></tr>
+<tr><td>100 kt</td><td>$143.1M</td><td>649 MW</td><td>216 MW</td><td>280 MW</td><td>0 MW</td><td>28 / 40</td></tr>
+<tr><td>0 kt</td><td>$288.9M</td><td>220 MW</td><td>59 MW</td><td>0 MW</td><td>330 MW</td><td>62 / 447</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">kt: thousand tonnes. A battery has two sizes: power (MW, how fast it charges or discharges) and energy (MWh, how much it holds).</p>
 <p class="lx-hint">With JavaScript on, you choose the plants yourself, run the year in a solver and ask it for the cheapest plan under a CO₂ cap.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.<br><b>Prairie Town:</b> fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263).<br><b>Prairie Town:</b> fictional.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 15 guided minutes. Practice, about 20 more: by hand, earn all nine stars with a plan under 100 kt, or try a gas price of $6/MMBtu.</p>
 ```
 :::
@@ -150,8 +150,8 @@ The check: the optimizer's plans, rounded up to the sliders' steps, re-run hour 
 | Plan | Cost, 7 weeks | Cost, full year | CO₂, 7 weeks | CO₂, full year | Unserved, full year |
 |---|---|---|---|---|---|
 | Optimizer at 400 kt | $118.6M | $118.7M | 392 kt | 393 kt | 43 MWh |
-| Optimizer at 200 kt | $130.5M | $132.0M | 197 kt | 215 kt | 33 MWh |
-| Optimizer at 100 kt | $144.3M | $147.1M | 98 kt | 131 kt | 0 MWh |
+| Optimizer at 200 kt | $130.5M | $132.1M | 197 kt | 215 kt | 33 MWh |
+| Optimizer at 100 kt | $144.4M | $147.2M | 98 kt | 131 kt | 0 MWh |
 
 - **Cost.** Each plan costs at most 2% more on the full year.
 - **CO₂.** Deeper cuts overshoot their caps: 215 kt against 200 kt (7% over) and 131 kt against 100 kt (31% over). Seven weeks miss some still, hot evenings when gas must run.
@@ -216,7 +216,7 @@ Planners respond with more or longer periods, extreme weeks and adequacy tests o
 <tr><td class="n">$1,712/kW</td><td><span class="lx-term" data-term="capital-cost">Overnight capital cost</span> (the building cost, as if paid at once) of a new onshore wind farm; solar with tracking: $1,484/kW.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · 2025 dollars, April 2026</td></tr>
 <tr><td class="n">$1,086/kW</td><td>A new gas combined-cycle plant; a combustion-turbine peaker: $1,158/kW.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · 2025 dollars, April 2026</td></tr>
 <tr><td class="n">$8,255/kW</td><td>EIA's overnight cost for a large light-water nuclear plant: the lesson's default, which you can change.</td><td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · 2025 dollars, April 2026</td></tr>
-<tr><td class="n">$241/kWh + $372/kW</td><td>A lithium-ion battery's energy and power costs; a 4-hour battery: $334/kWh.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL, battery cost projections, 2025 update</a> (PDF) · 2024 costs, June 2025</td></tr>
+<tr><td class="n">$247/kWh + $382/kW</td><td>A lithium-ion battery's energy and power costs in 2025 dollars (NREL's $241 and $372 in 2024 dollars, converted); a 4-hour battery: $343/kWh.</td><td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL, battery cost projections, 2025 update</a> (PDF) · 2024 costs, June 2025; <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA, NIPA Table 1.1.9</a> · revised 29 Oct 2026</td></tr>
 <tr><td class="n">$3.85/MMBtu</td><td>Average cost of natural gas to U.S. power plants in 2025. MMBtu: a million Btu of fuel energy.</td><td class="s"><a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">EIA, Electric Power Annual, Table 7.4</a> · 2025 data</td></tr>
 <tr><td class="n">91.1%</td><td>Capacity factor of the U.S. nuclear fleet in 2025. For simplicity, the lesson's plant makes a constant 91.1% of its size every hour; real output varies, with <span class="lx-term" data-term="refuelling-outage">refuelling outages</span>, so this cannot show reliability.</td><td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · 2025 data</td></tr>
 </tbody>
@@ -246,7 +246,8 @@ Planners respond with more or longer periods, extreme weeks and adequacy tests o
 <li>EIA (2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a> (PDF), Table 3: capital, O&amp;M and heat rates.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4</a> (gas price) and <a href="https://www.eia.gov/electricity/annual/html/epa_08_04.html">Table 8.4</a> (nuclear fuel, 6.64 mills/kWh in 2025).</li>
 <li>EIA. <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">Carbon Dioxide Emissions Coefficients</a>: 52.91 kg CO₂ per MMBtu of natural gas.</li>
-<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281. Only the 2024 costs, life and efficiency are used.</li>
+<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281. Only the 2024 costs (converted to 2025 dollars), life and efficiency are used.</li>
+<li>U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893. Last revised 29 October 2026; accessed 5 November 2026. It converts the battery's 2024 costs to 2025 dollars.</li>
 <li>NLR. <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">2025 Electricity ATB: Financial Cases and Methods</a>: the 30-year cost recovery period.</li>
 <li>Kotzur, L. et al. (2018). <a href="https://doi.org/10.1016/j.apenergy.2018.01.023">Time series aggregation for energy system design: Modeling seasonal storage</a>. Applied Energy 213.</li>
 <li>NLR (2025). <a href="https://docs.nlr.gov/docs/fy26osti/93617.pdf">Regional Energy Deployment System (ReEDS) Model Documentation: 2025</a> (PDF).</li>

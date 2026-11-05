@@ -1,6 +1,17 @@
 {
  "about": "Lesson 13 (What should Prairie Town build?) and lesson 12 (Cheap or clean?): the planning model's inputs. Prairie Town is fictional; its demand, wind and solar follow the real 2025 hourly shapes of the Southwest Power Pool grid (town_year.json, EIA-930). Demand = shape x 450 MW (lesson 0's scale). Wind and solar output per MW built = LX.townProfile('scale') scaled to EIA's 2025 U.S. capacity factors (cf_targets.json). Technology costs are constant for the whole year modelled (no change over time). The reader can change two inputs: the gas price and the nuclear capital cost.",
  "accessed": "2026-11-02",
+ "priceYear": 2025,
+ "deflator": {
+  "index": {
+   "2024": 125.587,
+   "2025": 128.893
+  },
+  "note": "One price year: every cost is in 2025 dollars. The battery costs, which the source gives in 2024 dollars, are converted with the GDP implicit price deflator (index, 2017 = 100, annual): x 128.893 / 125.587. The plant costs and the gas price are 2025 values already.",
+  "src": [
+   "bea-nipa-119"
+  ]
+ },
  "town": {
   "demandPeakMW": 450,
   "profileMethod": "scale"
@@ -72,19 +83,24 @@
   "battery": {
    "label": "Lithium-ion battery",
    "short": "Battery",
-   "powerCapex": 372,
-   "energyCapex": 241,
+   "powerCapex": 381.79,
+   "energyCapex": 247.34,
+   "source": {
+    "dollarYear": 2024,
+    "powerCapex": 372,
+    "energyCapex": 241
+   },
    "fomShare": 0.04,
    "life": 15,
    "rte": 0.85,
-   "note": "Cost = $241 per kWh of energy + $372 per kW of power (2024 dollars); a 4-hour battery costs $334/kWh. Fixed O&M 4% of capital cost per year; 15-year life; 85% round trip.",
+   "note": "Cost = $247.34 per kWh of energy + $381.79 per kW of power in 2025 dollars (the source's $241 and $372 in 2024 dollars, converted with the deflator); a 4-hour battery costs $342.79/kWh. Fixed O&M 4% of capital cost per year; 15-year life; 85% round trip.",
    "src": [
     "nrel-battery-2025"
    ]
   }
  },
  "units": {
-  "capex": "$ per kW, overnight capital cost (2025 dollars; battery 2024 dollars); battery energy in $ per kWh",
+  "capex": "$ per kW, overnight capital cost (2025 dollars; the battery converted from 2024 dollars, see deflator); battery energy in $ per kWh",
   "fom": "$ per kW per year (fixed operation and maintenance)",
   "vom": "$ per MWh (variable operation and maintenance)",
   "fuel": "$ per MWh (nuclear fuel expense)",
@@ -196,6 +212,12 @@
    "text": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025",
    "url": "https://www.eia.gov/electricity/gridmonitor/",
    "asOf": "accessed 2 Nov 2026"
+  },
+  "bea-nipa-119": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1 (index, 2017 = 100), annual: 2024 125.587, 2025 128.893",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "last revised 29 Oct 2026; accessed 5 Nov 2026",
+   "short": "BEA, NIPA Table 1.1.9"
   }
  },
  "weeks": {
@@ -331,39 +353,39 @@
    },
    {
     "cap": 300,
-    "cost": 122215133,
+    "cost": 122215169,
     "co2": 300000,
-    "dual": 55.17,
-    "spilled": 0.0076,
+    "dual": 55.16,
+    "spilled": 0.0077,
     "plan": {
      "wind": 493.5,
      "solar": 52.8,
-     "cc": 250.8,
-     "pk": 75.6,
+     "cc": 251,
+     "pk": 76.6,
      "nuc": 0,
-     "bp": 1.2,
-     "be": 1.2
+     "bp": 0,
+     "be": 0
     }
    },
    {
     "cap": 250,
-    "cost": 125355109,
+    "cost": 125366483,
     "co2": 250000,
-    "dual": 71.36,
-    "spilled": 0.0193,
+    "dual": 71.44,
+    "spilled": 0.0195,
     "plan": {
-     "wind": 550.8,
-     "solar": 54.6,
-     "cc": 245.2,
-     "pk": 69,
+     "wind": 551.1,
+     "solar": 54.2,
+     "cc": 245.5,
+     "pk": 69.4,
      "nuc": 0,
-     "bp": 6,
-     "be": 6
+     "bp": 5.4,
+     "be": 5.4
     }
    },
    {
     "cap": 200,
-    "cost": 129253235,
+    "cost": 129284794,
     "co2": 200000,
     "dual": 85.18,
     "spilled": 0.0269,
@@ -379,7 +401,7 @@
    },
    {
     "cap": 150,
-    "cost": 134517023,
+    "cost": 134548729,
     "co2": 150000,
     "dual": 136.26,
     "spilled": 0.0486,
@@ -395,7 +417,7 @@
    },
    {
     "cap": 100,
-    "cost": 143037067,
+    "cost": 143105113,
     "co2": 100000,
     "dual": 211.21,
     "spilled": 0.0873,
@@ -411,57 +433,57 @@
    },
    {
     "cap": 75,
-    "cost": 149521793,
+    "cost": 149678224,
     "co2": 75000,
-    "dual": 314.52,
-    "spilled": 0.1117,
+    "dual": 317.09,
+    "spilled": 0.112,
     "plan": {
-     "wind": 684.5,
-     "solar": 238.8,
-     "cc": 201.8,
-     "pk": 51.1,
+     "wind": 685.2,
+     "solar": 238.5,
+     "cc": 201.7,
+     "pk": 51.4,
      "nuc": 0,
-     "bp": 50.4,
-     "be": 112.6
+     "bp": 50,
+     "be": 111.2
     }
    },
    {
     "cap": 50,
-    "cost": 159784666,
+    "cost": 160003545,
     "co2": 50000,
-    "dual": 500.92,
-    "spilled": 0.16,
+    "dual": 501.43,
+    "spilled": 0.1607,
     "plan": {
-     "wind": 730.7,
-     "solar": 286.6,
-     "cc": 204.6,
-     "pk": 28.3,
+     "wind": 732.1,
+     "solar": 285.6,
+     "cc": 204.8,
+     "pk": 28.4,
      "nuc": 0,
-     "bp": 64.5,
-     "be": 168.3
+     "bp": 64,
+     "be": 165.6
     }
    },
    {
     "cap": 25,
-    "cost": 178095989,
+    "cost": 178479900,
     "co2": 25000,
-    "dual": 1293.81,
-    "spilled": 0.2345,
+    "dual": 1309.86,
+    "spilled": 0.2385,
     "plan": {
-     "wind": 843.8,
-     "solar": 303.3,
-     "cc": 169,
-     "pk": 28.3,
+     "wind": 854.4,
+     "solar": 296.1,
+     "cc": 171.8,
+     "pk": 27.1,
      "nuc": 0,
-     "bp": 85.8,
-     "be": 335.5
+     "bp": 82.9,
+     "be": 316.5
     }
    },
    {
     "cap": 0,
-    "cost": 288459004,
+    "cost": 288905788,
     "co2": 0,
-    "dual": 231283.17,
+    "dual": 236640.68,
     "spilled": 0.2751,
     "plan": {
      "wind": 220,

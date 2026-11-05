@@ -215,9 +215,9 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   ok(D.storage.energyCapexNote.includes("An " + ILL + ", " + NOT) && D.storage.energyCapexNote.includes("$" + D.storage.energyCapex + " per kWh") &&
      D.storage.energyCapexNote.includes("$" + cfg.techs.battery.energyCapex + " per kWh"), "data file: the what-if storage cost carries its illustrative note");
   onPage(`with storage energy at $${D.storage.energyCapex} per kWh: an ${ILL}, ${NOT}.`, "the no-JS fallback's what-if label");
-  onPage(`<b>Storage what-if (step 8):</b> battery energy at $${D.storage.energyCapex} per kWh instead of the sourced $${cfg.techs.battery.energyCapex} (lesson 13): an ${ILL}, ${NOT}.`, "the data note's what-if label");
+  onPage(`<b>Storage what-if (step 8):</b> battery energy at $${D.storage.energyCapex} per kWh instead of the sourced $${Math.round(cfg.techs.battery.energyCapex)} in ${cfg.priceYear} dollars (lesson 13): an ${ILL}, ${NOT}.`, "the data note's what-if label");
   onPage(`In an ${ILL} with storage energy at $${D.storage.energyCapex} per kWh (${NOT})`, "the myth answer's what-if label");
-  ok(JS.includes('["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $"') && JS.includes(" (lesson 13). An " + ILL + ", " + NOT + ".") &&
+  ok(JS.includes('["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + Math.round(cfg.techs.battery.energyCapex) + " in " + cfg.priceYear + " dollars (lesson 13). An ' + ILL + ", " + NOT + '."') &&
      JS.includes("In this " + ILL + ", no link") && JS.includes("at the " + ILL + " storage cost"),
      "step 8: the what-if line, the result line and the table name label the what-if");
   ok((PAGE.match(/\$20 per kWh/g) || []).length === 3 && (JS.match(/D\.storage\.energyCapex \+ " per kWh/g) || []).length === 1, "the what-if cost appears only where it is labelled (three page places, one step note)");
@@ -284,10 +284,12 @@ const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
   // 12: LOLE defined, with a dated primary source
   onPage("https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf", "the PJM Manual 20A link"); onPage("§1.2–1.3 (rev. 3, effective 24 June 2026)", "the LOLE source's sections and date");
   ok(!/one day of (outage|shortage) in ten years|one-day-in-ten-years/.test(PAGE + JS + SIDE + NBtext) && /id: lole\b/.test(SIDE), "no undefined one-day-in-ten shorthand; the sidecar defines LOLE");
-  // 13: price years stated
+  // 13: one price year stated (W4 carry-over), with the deflator's ratio from lesson 13's data
   const batShare = (C.techs.bp.fixed * S7.wk7.plan.bp + C.techs.be.fixed * S7.wk7.plan.be) / S7.wk7.cost;
   ok(batShare < 0.01, `the battery is under 1% of the seven-week plan's yearly cost (${(batShare * 100).toFixed(2)}%)`);
-  onPage("plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion. The battery is under 1% of the seven-week plan's yearly cost.", "the price years (data note)");
+  const PF = cfg.deflator.index[String(cfg.priceYear)] / cfg.deflator.index[String(cfg.techs.battery.source.dollarYear)];
+  onPage("<b>Price year:</b> " + cfg.priceYear + " dollars throughout; NREL's " + cfg.techs.battery.source.dollarYear + " battery costs are converted with BEA's GDP implicit price deflator (×" + PF.toFixed(4) + "). The battery is under 1% of the seven-week plan's yearly cost.", "one price year (data note)");
+  ok(PAGE.indexOf("without conversion") < 0 && PAGE.indexOf("battery cost projections (2024 dollars)") < 0, "no unconverted price-year mix left on the page");
   // 14, 15: labels
   ok(JS.includes('"2025 full-year-optimal plan, run on 2024"') && !JS.includes('"Full-year optimum, 2024"') && !JS.includes("Bigger LPs estimate better"), "step 9's label names the plan; the size caption no longer claims bigger is better");
 

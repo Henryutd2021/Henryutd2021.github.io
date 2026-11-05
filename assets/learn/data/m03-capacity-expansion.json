@@ -60,7 +60,7 @@
   "set": "wk7",
   "cap": 200,
   "energyCapex": 20,
-  "energyCapexNote": "An illustrative what-if, not a forecast or a sourced cost: battery energy at $20 per kWh (lesson 13 uses the sourced $241 per kWh in 13-capstone.json, techs.battery), chosen so that the solver builds a battery large enough for the three rules between weeks to differ.",
+  "energyCapexNote": "An illustrative what-if, not a forecast or a sourced cost: battery energy at $20 per kWh (lesson 13 uses the sourced $247.34 per kWh in 2025 dollars, NREL's $241 in 2024 dollars converted, in 13-capstone.json, techs.battery), chosen so that the solver builds a battery large enough for the three rules between weeks to differ.",
   "modes": [
    "linked",
    "cyclic",
@@ -110,10 +110,10 @@
      "bp": 1.645,
      "be": 1.645
     },
-    "cost": 125895803,
+    "cost": 125899251,
     "co2": 200000,
     "y2025": {
-     "cost": 127377172,
+     "cost": 127380620,
      "co2": 217867,
      "unserved": 878.9,
      "hours": 53,
@@ -134,7 +134,7 @@
      ]
     },
     "y2024": {
-     "cost": 127091270,
+     "cost": 127094717,
      "co2": 214474,
      "unserved": 2343.1,
      "hours": 85,
@@ -212,10 +212,10 @@
      "bp": 15.057,
      "be": 15.057
     },
-    "cost": 129253235,
+    "cost": 129284794,
     "co2": 200000,
     "y2025": {
-     "cost": 130705594,
+     "cost": 130737152,
      "co2": 217467,
      "unserved": 107.9,
      "hours": 8,
@@ -226,7 +226,7 @@
      ]
     },
     "y2024": {
-     "cost": 130459860,
+     "cost": 130491419,
      "co2": 214552,
      "unserved": 588.5,
      "hours": 35,
@@ -305,10 +305,10 @@
      "bp": 19.43,
      "be": 19.43
     },
-    "cost": 127579790,
+    "cost": 127620513,
     "co2": 200000,
     "y2025": {
-     "cost": 128392865,
+     "cost": 128433590,
      "co2": 209800,
      "unserved": 750,
      "hours": 42,
@@ -326,7 +326,7 @@
      ]
     },
     "y2024": {
-     "cost": 128022931,
+     "cost": 128063655,
      "co2": 205386,
      "unserved": 2559.4,
      "hours": 83,
@@ -428,10 +428,10 @@
      "bp": 15.01,
      "be": 15.01
     },
-    "cost": 130856898,
+    "cost": 130888359,
     "co2": 200000,
     "y2025": {
-     "cost": 131634819,
+     "cost": 131666279,
      "co2": 209372,
      "unserved": 16.6,
      "hours": 1,
@@ -441,7 +441,7 @@
      ]
     },
     "y2024": {
-     "cost": 131336375,
+     "cost": 131367835,
      "co2": 205826,
      "unserved": 395.2,
      "hours": 23,
@@ -550,30 +550,30 @@
      }
     ],
     "plan": {
-     "wind": 548.029,
-     "solar": 145.94,
-     "cc": 218.663,
-     "pk": 105.929,
+     "wind": 549.342,
+     "solar": 144.353,
+     "cc": 219.292,
+     "pk": 105.693,
      "nuc": 0,
-     "bp": 8.999,
-     "be": 8.999
+     "bp": 8.576,
+     "be": 8.576
     },
-    "cost": 131691745,
+    "cost": 131710142,
     "co2": 200000,
     "y2025": {
-     "cost": 132548132,
-     "co2": 210311,
+     "cost": 132567063,
+     "co2": 210318,
      "unserved": 0,
      "hours": 0,
      "maxShort": 0,
      "shortWeeks": []
     },
     "y2024": {
-     "cost": 132262535,
-     "co2": 206925,
-     "unserved": 44.9,
-     "hours": 9,
-     "maxShort": 17.4,
+     "cost": 132283164,
+     "co2": 206952,
+     "unserved": 39.6,
+     "hours": 7,
+     "maxShort": 9.5,
      "shortWeeks": [
       1,
       2
@@ -592,9 +592,9 @@
      "bp": 80.973,
      "be": 729.25
     },
-    "cost": 126267014,
+    "cost": 126370021,
     "full": {
-     "cost": 127748173,
+     "cost": 127851181,
      "co2": 217866,
      "unserved": 2101.3,
      "hours": 59,
@@ -608,7 +608,7 @@
      ]
     },
     "fullCo2": 217866,
-    "realCost": 129253235
+    "realCost": 129284794
    },
    "cyclic": {
     "plan": {
@@ -620,9 +620,9 @@
      "bp": 80.975,
      "be": 729.284
     },
-    "cost": 126270305,
+    "cost": 126373315,
     "full": {
-     "cost": 127750098,
+     "cost": 127853109,
      "co2": 217849,
      "unserved": 2101.4,
      "hours": 59,
@@ -636,7 +636,7 @@
      ]
     },
     "fullCo2": 217849,
-    "realCost": 129264970
+    "realCost": 129296529
    },
    "free": {
     "plan": {
@@ -648,9 +648,9 @@
      "bp": 136.737,
      "be": 2684.627
     },
-    "cost": 123744751,
+    "cost": 123918698,
     "full": {
-     "cost": 127636011,
+     "cost": 127809957,
      "co2": 246750,
      "unserved": 8111.8,
      "hours": 118,
@@ -668,30 +668,30 @@
      ]
     },
     "fullCo2": 246750,
-    "realCost": 129231194
+    "realCost": 129262753
    }
   },
   "full": {
    "cols": 43807,
    "rows": 52561,
    "plan": {
-    "wind": 551.501,
-    "solar": 160.97,
-    "cc": 239.243,
-    "pk": 72.673,
+    "wind": 552.006,
+    "solar": 160.373,
+    "cc": 239.223,
+    "pk": 72.839,
     "nuc": 0,
-    "bp": 12.249,
-    "be": 12.249
+    "bp": 12.089,
+    "be": 12.089
    },
-   "cost": 133221913,
+   "cost": 133247423,
    "co2": 200000,
-   "capDual": 138.6,
+   "capDual": 139.49,
    "y2024": {
-    "cost": 132881776,
-    "co2": 195945,
-    "unserved": 238.6,
+    "cost": 132908024,
+    "co2": 195955,
+    "unserved": 235.1,
     "hours": 18,
-    "maxShort": 29.5,
+    "maxShort": 22.5,
     "shortWeeks": [
      1,
      2

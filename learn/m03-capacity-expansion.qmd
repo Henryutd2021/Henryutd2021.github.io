@@ -49,14 +49,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>4 typical + 3 extreme weeks</td><td data-label="Estimate">$129.3M</td><td data-label="Error">−3.0%</td><td data-label="Unserved, 2025">108 MWh</td><td data-label="Unserved, 2024">589 MWh</td><td data-label="CO₂, 2025">217 kt</td></tr>
 <tr><td>8 typical weeks</td><td data-label="Estimate">$127.6M</td><td data-label="Error">−4.2%</td><td data-label="Unserved, 2025">750 MWh</td><td data-label="Unserved, 2024">2,559 MWh</td><td data-label="CO₂, 2025">210 kt</td></tr>
 <tr><td>8 typical + 3 extreme weeks</td><td data-label="Estimate">$130.9M</td><td data-label="Error">−1.8%</td><td data-label="Unserved, 2025">17 MWh</td><td data-label="Unserved, 2024">395 MWh</td><td data-label="CO₂, 2025">209 kt</td></tr>
-<tr><td>12 typical + 3 extreme weeks</td><td data-label="Estimate">$131.7M</td><td data-label="Error">−1.1%</td><td data-label="Unserved, 2025">0</td><td data-label="Unserved, 2024">45 MWh</td><td data-label="CO₂, 2025">210 kt</td></tr>
+<tr><td>12 typical + 3 extreme weeks</td><td data-label="Estimate">$131.7M</td><td data-label="Error">−1.2%</td><td data-label="Unserved, 2025">0</td><td data-label="Unserved, 2024">40 MWh</td><td data-label="CO₂, 2025">210 kt</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">Estimate error: the weeks' cost against the full-year optimum: $133.2M, an LP with 43,807 columns solved on all 8,760 hours. kt: thousand tonnes. Unserved: demand the plan's plants cannot meet when the plan is re-run hour by hour.</p>
 <p class="lx-hint">With JavaScript on, you solve these plans yourself in the browser, check them on both years and try three rules for a battery between weeks, with storage energy at $20 per kWh: an illustrative what-if, not a forecast or a sourced cost.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s planning LP with EIA and NREL costs, dated in <a href="13-capstone.html#sources">its sources</a>; constant within the year.<br><b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion. The battery is under 1% of the seven-week plan's yearly cost.<br><b>Weather and demand:</b> real 2025 and 2024 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>2024:</b> scaled to 2025's yearly demand energy and <span class="lx-term" data-term="capacity-factor">capacity factors</span>; 29 February left out.<br><b>Precomputed:</b> the 11- and 15-week plans and the full-year optimum, labelled where shown. <b>Prairie Town:</b> fictional.<br><b>Storage what-if (step 8):</b> battery energy at $20 per kWh instead of the sourced $241 (lesson 13): an illustrative what-if, not a forecast or a sourced cost.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s planning LP with EIA and NREL costs, dated in <a href="13-capstone.html#sources">its sources</a>; constant within the year.<br><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263). The battery is under 1% of the seven-week plan's yearly cost.<br><b>Weather and demand:</b> real 2025 and 2024 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>2024:</b> scaled to 2025's yearly demand energy and <span class="lx-term" data-term="capacity-factor">capacity factors</span>; 29 February left out.<br><b>Precomputed:</b> the 11- and 15-week plans and the full-year optimum, labelled where shown. <b>Prairie Town:</b> fictional.<br><b>Storage what-if (step 8):</b> battery energy at $20 per kWh instead of the sourced $247 in 2025 dollars (lesson 13): an illustrative what-if, not a forecast or a sourced cost.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 45 guided minutes in ten steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <div class="lx-card lx-notebook m3-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 60 minutes, then 120 minutes of practice</p>
@@ -173,7 +173,7 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 
 - **Four typical weeks** leave 879 MWh unserved in 53 hours of 2025, spread over 12 weeks.
 - **The second year.** At 2025's yearly demand energy, 2024's demand peaks at 462 MW, against 450 MW in 2025.
-- **What they cannot tell you.** Even the plan optimal on all of 2025 leaves 239 MWh in 18 hours of 2024 unserved.
+- **What they cannot tell you.** Even the plan optimal on all of 2025 leaves 235 MWh in 18 hours of 2024 unserved.
 - **Adequacy** is judged over many weather years with plant outages, in a Monte Carlo study (A5, upcoming), by measures such as the [loss-of-load expectation]{.lx-term term="lole"} (LOLE).
 - **LOLE** is the expected number of days a year with a shortage of any size or length. One criterion is 0.1 days a year, “1 day in 10 years” ([PJM Manual 20A](https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf), §1.3, June 2026): an expectation, not a promise of one outage a decade.
 
@@ -225,9 +225,9 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 
 <div class="lx-quiz" data-quiz="m3">
 <div class="lx-qq" data-id="err" data-answer="a">
-<p class="lx-qtext">The seven weeks estimate $129.25M a year; the full-year optimum costs $133.22M. What is the estimate error, as this lesson defines it?</p>
+<p class="lx-qtext">The seven weeks estimate $129.28M a year; the full-year optimum costs $133.25M. What is the estimate error, as this lesson defines it?</p>
 <ul class="lx-choices"><li data-value="a">−3.0%</li><li data-value="b">+3.1%</li><li data-value="c">0.970</li><li data-value="d">−$3.97M</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>−3.0%: 129.25 ÷ 133.22 − 1 = −0.030, with the reference in the denominator. +3.1% reverses the comparison: the full-year optimum is 3.1% above the estimate (133.22 ÷ 129.25 − 1). 0.970 is the ratio before subtracting 1, and −$3.97M is the gap in dollars.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>−3.0%: 129.28 ÷ 133.25 − 1 = −0.030, with the reference in the denominator. +3.1% reverses the comparison: the full-year optimum is 3.1% above the estimate (133.25 ÷ 129.28 − 1). 0.970 is the ratio before subtracting 1, and −$3.96M is the gap in dollars.</p></details>
 </div>
 </div>
 ```
@@ -283,7 +283,7 @@ Cyclic storage replaces the link with $s_{p,168} = 0$ for every $p$; no link dro
 <li>Hoffmann, M., Kotzur, L., Stolten, D. and Robinius, M. (2020). <a href="https://doi.org/10.3390/en13030641">A Review on Time Series Aggregation Methods for Energy System Models</a>. Energies 13(3), 641.</li>
 <li>GenX. <a href="https://genxproject.github.io/GenX.jl/stable/Model_Reference/Resources/long_duration_storage/">Long duration storage</a>: the standard storage balance and the inter-period link (documentation, accessed 3 Nov 2026).</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data for 2025 and 2024 (six-month files, accessed 3 Nov 2026).</li>
-<li>Costs: EIA's Annual Energy Outlook 2026 assumptions (2025 dollars) and NREL's battery cost projections (2024 dollars), as listed in <a href="13-capstone.html#sources">lesson 13</a>.</li>
+<li>Costs: EIA's Annual Energy Outlook 2026 assumptions (2025 dollars) and NREL's battery cost projections (2024 dollars, converted to 2025 dollars with BEA's GDP implicit price deflator), as listed in <a href="13-capstone.html#sources">lesson 13</a>.</li>
 <li>PJM, Resource Adequacy Planning (2026). <a href="https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf">PJM Manual 20A: Resource Adequacy Analysis</a>, revision 3, effective 24 June 2026: §1.2 defines the loss-of-load expectation in days per year, §1.3 sets the criterion of 1 day in 10 years, or 0.1 days per year (p. 8; accessed 3 Nov 2026).</li>
 <li>HiGHS. <a href="https://ergo-code.github.io/HiGHS/">Documentation</a> of the open-source solver used in the page and, through SciPy, in the notebook.</li>
 </ul>

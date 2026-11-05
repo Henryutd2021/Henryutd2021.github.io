@@ -153,6 +153,9 @@
 
     function update() {
       var m = model({ range: state.range / 100, grid: state.grid });
+      // tell the host page what is shown, for its own text version (Learn's case file CF6 writes the hour-by-hour table)
+      if (root.dispatchEvent && typeof CustomEvent === "function")
+        root.dispatchEvent(new CustomEvent("explainer-update", { bubbles: true, detail: { slug: "ghg", range: state.range / 100, grid: state.grid, model: m } }));
       var r = state.range, red = m.reductionPct;
       read({ red: r === 0 ? "0%" : "−" + h.fmt(red, 2) + "%",
              moved: h.fmt(m.movedPct, 1) + "%",
@@ -177,5 +180,5 @@
   }
 
   if (typeof window !== "undefined" && window.Explainer) window.Explainer.register("ghg", view);
-  if (typeof module !== "undefined" && module.exports) module.exports = { model: model, LOAD: LOAD, GRIDS: GRIDS };
+  if (typeof module !== "undefined" && module.exports) module.exports = { model: model, view: view, LOAD: LOAD, GRIDS: GRIDS };
 })();

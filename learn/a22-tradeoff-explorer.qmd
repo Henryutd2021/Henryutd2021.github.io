@@ -48,13 +48,13 @@ body-classes: "page-learn page-lesson lx-form-play"
 <tbody>
 <tr><td>A · Gas only</td><td data-l="Cheap">$103.9M</td><td data-l="Clean">815 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">31.3%</td><td data-l="Secure">100%</td><td data-l="Verdict">unbeaten</td></tr>
 <tr><td>B · Gas + wind</td><td data-l="Cheap">$119.5M</td><td data-l="Clean">521 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">32.8%</td><td data-l="Secure">64%</td><td data-l="Verdict">unbeaten</td></tr>
-<tr><td>C · Wind, sun and battery, full gas backup</td><td data-l="Cheap">$161.2M</td><td data-l="Clean">146 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.3%</td><td data-l="Secure">18%</td><td data-l="Verdict">beaten by D</td></tr>
-<tr><td>D · Wind, sun and battery, lean gas backup</td><td data-l="Cheap">$155.3M</td><td data-l="Clean">146 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.3%</td><td data-l="Secure">18%</td><td data-l="Verdict">unbeaten</td></tr>
-<tr><td>E · Sun and battery, gas backup</td><td data-l="Cheap">$165.7M</td><td data-l="Clean">428 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">33.6%</td><td data-l="Secure">52%</td><td data-l="Verdict">unbeaten</td></tr>
+<tr><td>C · Wind, sun and battery, full gas backup</td><td data-l="Cheap">$161.7M</td><td data-l="Clean">146 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.3%</td><td data-l="Secure">18%</td><td data-l="Verdict">beaten by D</td></tr>
+<tr><td>D · Wind, sun and battery, lean gas backup</td><td data-l="Cheap">$155.8M</td><td data-l="Clean">146 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.3%</td><td data-l="Secure">18%</td><td data-l="Verdict">unbeaten</td></tr>
+<tr><td>E · Sun and battery, gas backup</td><td data-l="Cheap">$166.6M</td><td data-l="Clean">428 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">33.6%</td><td data-l="Secure">52%</td><td data-l="Verdict">unbeaten</td></tr>
 <tr><td>F · Nuclear and gas</td><td data-l="Cheap">$233.7M</td><td data-l="Clean">66 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.1%</td><td data-l="Secure">8%</td><td data-l="Verdict">unbeaten</td></tr>
-<tr><td>G · Even mix</td><td data-l="Cheap">$176.0M</td><td data-l="Clean">164 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.0%</td><td data-l="Secure">20%</td><td data-l="Verdict">unbeaten</td></tr>
+<tr><td>G · Even mix</td><td data-l="Cheap">$176.2M</td><td data-l="Clean">164 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.0%</td><td data-l="Secure">20%</td><td data-l="Verdict">unbeaten</td></tr>
 <tr><td>H · Wind with thin gas backup</td><td data-l="Cheap">$116.2M</td><td data-l="Clean">424 kt</td><td data-l="Reliable">1,605 MWh</td><td data-l="Fair">33.1%</td><td data-l="Secure">52%</td><td data-l="Verdict">unbeaten</td></tr>
-<tr><td>I · Deep clean</td><td data-l="Cheap">$220.7M</td><td data-l="Clean">27 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.6%</td><td data-l="Secure">3%</td><td data-l="Verdict">unbeaten</td></tr>
+<tr><td>I · Deep clean</td><td data-l="Cheap">$221.6M</td><td data-l="Clean">27 kt</td><td data-l="Reliable">0 MWh</td><td data-l="Fair">34.6%</td><td data-l="Secure">3%</td><td data-l="Verdict">unbeaten</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">Verdicts compare values as shown: two values that round to the same number count as a tie.</p>
@@ -99,7 +99,7 @@ body-classes: "page-learn page-lesson lx-form-play"
 <li><b>Equal weights carry a price.</b> One spoke of cost ($150M) counts as much as one spoke of CO₂ (850 kt): about $176 a tonne, set by the scales, not by anyone's judgement of harm (<a href="12-trade-offs.html">lesson 12</a>: weights carry units).</li>
 <li><b>Squeezed spokes.</b> Under a fixed charge per home, every plan's low-income share lies between 31.3% and 34.6%, so Fair scores span only 0.03 to 0.25: a weight on Fair barely moves a pick.</li>
 <li><b>Shape, not area.</b> Reordering the spokes changes a polygon's area; compare plans spoke by spoke.</li>
-<li><b>Ties as shown.</b> Verdicts treat values that round to the same shown number as equal. Under the income-graduated charge, C's share (21.61%) and D's (21.64%) both show 21.6%, so D beats C; at full precision, C is unbeaten.</li>
+<li><b>Ties as shown.</b> Verdicts treat values that round to the same shown number as equal. Under the income-graduated charge, C's share (21.61%) and D's (21.63%) both show 21.6%, so D beats C; at full precision, C is unbeaten.</li>
 </ul>
 </div>
 </details>

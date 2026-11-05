@@ -4,7 +4,7 @@
 //     factors, the time-of-use tariff revenue-neutral on the household use, the heat pumps' seasonal COP = HSPF / 3.412),
 //     the price index (2022 and 2024 dollars to 2025), the capital recovery factor (1 MW of wind = $133,575 a year)
 //   - the LP: energy balances, battery losses and hydrogen yields in every run; closed forms where there is no storage
-//     (the home without a battery, the farm alone); the 52-week run against one full-year LP (storage across weeks)
+//     (the home without a battery, the farm alone); the run in 52 weeks and 31 December against one full-year LP (storage across weeks)
 //   - ties: the totals the page reports are the same on the whole optimal face (each pushed up and down), own solar's
 //     share too; the busiest grid hour is not (a second least-cost schedule found), so with storage it is labelled
 //   - each hour followed (split): the bars under the chart's line add up to the line, the whole bar to the hour's sources;
@@ -142,7 +142,7 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     ok(hit && (q => near(q.solarHome + q.batHome + q.gridHome, hit.S.need[hit.h], 1e-9) && near(q.gridBat, hit.S.ch[hit.h], 1e-9))(E0.split("home", hit.S, hit.h)), "an hour that charges from the grid: the bars under the line are the home's use; the charge is drawn above it");
   }
 
-  // ---------------- the 52-week run against one full-year LP (storage free to carry across weeks)
+  // ---------------- the run in 52 weeks and 31 December against one full-year LP (storage free to carry across weeks)
   const check = { date: null, rows: [] };
   for (const p of E0.presets) {
     const s = E0.withPreset(E0.defaults(), p), a = results[p.id], b = await run(s, { full: true });
@@ -254,7 +254,12 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
     const r = await E0.solve(st({}), P, { solver: slow, signal: ac });
     ok(r.status === "cancelled" && n === 3, "a cancelled run stops between weeks (" + n + " weeks solved)");
     const ok1 = await run(st({}));
-    ok(BR.classify(ok1).kind === "ok" && /optimal/.test(BR.classify(ok1, { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks (the solver reports each one optimal)." }).text), "a finished run says optimal, from the solver's status");
+    // the run's status words, as the bench passes them, and the note's run line name 31 December, as the model box does
+    const E0SRC = fs.readFileSync(L("components/engine-e0.js"), "utf8"), okWords = (/words: \{ ok: "([^"]+)" \}/.exec(E0SRC) || [])[1] || "";
+    ok(BR.classify(ok1).kind === "ok" && /optimal/.test(BR.classify(ok1, { ok: okWords }).text), "a finished run says optimal, from the solver's status");
+    const boxTime = (/<dt>Time<\/dt><dd>([^<]*)/.exec(fs.readFileSync(path.join(SITE, "learn/sb0-site-bench.qmd"), "utf8")) || [])[1] || "";
+    ok(/as 52 weeks and 31 December/.test(boxTime) && /every hour of 2025, as 52 weeks and 31 December \(/.test(okWords) && E0.note(st({}), ok1.results).run.text === "every hour of 2025, as 52 weeks and 31 December",
+       "the run's status words and the note's run line say 52 weeks and 31 December, as the model box does (" + okWords + ")");
     const mid = await E0.solve(st({}), P, { solver: (() => { let k = 0; return m => (++k === 10 ? { status: "time-limit", ok: false } : solver(m)); })() });
     ok(mid.status === "time-limit" && mid.message.indexOf("week of " + E0.periods(P, st({}), "week")[9].start) >= 0, "a stop in week 10 says which week (" + mid.message + ")");
     const said = BR.classify(mid).text;
@@ -320,7 +325,7 @@ const QPATH = path.join(SITE, "learn/sb0-site-bench.qmd");
   // ---------------- the page's generated blocks and numbers
   if (WRITE) {
     const def = await run(D0);
-    D.reference = { about: "Written by node _tests/learn/test_sb0-site-bench.js --write: the default plan's results (the no-JS blocks) and the check of the 52-week run against one full-year LP for each preset.",
+    D.reference = { about: "Written by node _tests/learn/test_sb0-site-bench.js --write: the default plan's results (the no-JS blocks) and the check of the run in 52 weeks and 31 December against one full-year LP for each preset.",
       "default": { date: new Date().toLocaleDateString("en-CA"), state: D0, readouts: def.results.readouts }, check: Object.assign(check, { date: new Date().toLocaleDateString("en-CA") }) };
     fs.writeFileSync(L("data/e0.json"), JSON.stringify(D, null, 1) + "\n");
   }
