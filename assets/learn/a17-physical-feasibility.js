@@ -241,7 +241,7 @@
       var net = LX.Network(host, { label: "M1's three buses at 12:00: Wind Ridge, Gas Hub and Prairie Town, joined by three lines, with each line's flow.",
         buses: M1.buses.map(function (b) {
           return { id: b.id, name: b.name, short: b.short, color: b.color, at: POS[b.id],
-            note: b.id === "R" ? "sends " + inj.ridge + " MW" : b.id === "G" ? "sends " + inj.gas + " MW" : "makes " + inj.flat + ", uses " + inj.demand + " MW", desc: b.id === "T" ? "uses " + inj.demand + " MW and makes " + inj.flat : null };
+            note: b.id === "R" ? "sends " + inj.ridge + " MW" : b.id === "G" ? "sends " + inj.gas + " MW" : "uses " + inj.demand + " MW", desc: b.id === "T" ? "uses " + inj.demand + " MW and makes " + inj.flat : null };
         }),
         lines: M1.lines.map(function (l) {
           var a = POS[l.from], c = POS[l.to], mx = (a[0] + c[0]) / 2, my = (a[1] + c[1]) / 2;
