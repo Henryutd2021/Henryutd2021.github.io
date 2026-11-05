@@ -1,0 +1,22 @@
+# Sidecar for Analyst lesson A9 (a09-hazards), builder learn-w4-b, 2026-11-05. Read by scripts/build_learn.py.
+id: a09-hazards
+lesson: A9
+glossary:
+  - id: correlated-failure
+    term: Correlated failure
+    def: "Many parts of a system failing together because they share one cause, such as extreme cold freezing plants and gas supply at once."
+  - id: compound-hazard
+    term: Compound hazard
+    def: "Two or more hazards striking at the same time, such as heat and drought, whose combined harm can exceed the sum of each alone."
+  - id: public-safety-power-shutoff
+    term: Wildfire safety shutoff
+    def: "A utility switching off power lines in dry, windy weather so that they cannot start a fire; the customers on those lines lose power."
+  - id: winterization
+    term: Winterization
+    def: "Protecting power plants and fuel supply against freezing, with insulation, heat tracing, enclosures and cold-weather procedures."
+  - id: stress-test
+    term: Stress test
+    def: "Running a system model through a severe event on purpose, to see what breaks and what a defence would change."
+requests:
+  - "A9 loads assets/learn/a05-adequacy.js for its simulator (LX.A5), as lesson 12 loads 13-capstone.js: promote A5's simulator to a shared component (also for C2)."
+  - "Cross-links for the coordinator: F6 (learn/f06-grid-and-outages.qmd, 'A9 (upcoming) plans for hazards') still calls A9 upcoming."

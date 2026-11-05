@@ -221,6 +221,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "capacity-accreditation": {
+  "term": "Capacity accreditation",
+  "short": "The share of a resource's MW that a grid counts toward its adequacy target, judged by how much the resource lowers the risk of a shortfall.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
+ },
  "capacity-credit": {
   "term": "Capacity credit",
   "short": "The share of a plant's size that planners count on to meet the year's peak, judged by how much it lowers the risk of a shortage.",
@@ -239,6 +245,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "capacity-market": {
+  "term": "Capacity market",
+  "short": "An auction, run ahead of time, that pays plants and other resources for being available, in an amount a planner sets, on top of energy prices.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
+ },
  "capital-cost": {
   "term": "Capital cost",
   "short": "The money spent to build a power plant, usually given per kilowatt of capacity, before it makes any electricity.",
@@ -250,6 +262,12 @@
   "short": "The share of a building cost that must be repaid each year, with interest, to pay it off over a given number of years.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "capture-price": {
+  "term": "Capture price",
+  "short": "The average market price a plant's output earns, each hour weighted by what the plant produced in it.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
  },
  "capture-ratio": {
   "term": "Capture ratio",
@@ -365,6 +383,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "compound-hazard": {
+  "term": "Compound hazard",
+  "short": "Two or more hazards striking at the same time, such as heat and drought, whose combined harm can exceed the sum of each alone.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
+ },
  "concentrated-solar": {
   "term": "Concentrated solar power",
   "short": "Mirrors focus sunlight to heat a fluid; the heat runs a turbine or a process, and it can be stored for hours in tanks.",
@@ -442,6 +466,12 @@
   "short": "What it costs to enrol, meter, control and pay each device or customer in a program, whatever the device's size.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
+ },
+ "correlated-failure": {
+  "term": "Correlated failure",
+  "short": "Many parts of a system failing together because they share one cause, such as extreme cold freezing plants and gas supply at once.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
  },
  "cost-of-capital": {
   "term": "Cost of capital",
@@ -797,6 +827,12 @@
   "lesson": 9,
   "href": "09-storage.html"
  },
+ "energy-only-market": {
+  "term": "Energy-only market",
+  "short": "A wholesale market in which plants are paid only for the energy they sell, so high prices in scarce hours must pay for capacity that is rarely used.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
+ },
  "enrichment": {
   "term": "Enrichment (of uranium)",
   "short": "Raising the share of uranium-235 in uranium: natural uranium has just over 0.7%, and power-plant fuel in the United States 3% to 5%.",
@@ -814,6 +850,12 @@
   "short": "A way to trace a trade-off by optimizing one goal while capping the other, then moving the cap step by step.",
   "lesson": 12,
   "href": "12-trade-offs.html"
+ },
+ "equivalent-firm-capacity": {
+  "term": "Equivalent firm capacity",
+  "short": "The MW of a perfect, always-available plant that would make a grid as reliable as a given resource does; divided by the resource's MW, it is an accreditation.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
  },
  "ercot": {
   "term": "ERCOT",
@@ -958,6 +1000,12 @@
   "short": "A rate that fills or drains a stock, such as megawatts into a battery or tonnes of CO₂ a year; only flows change a stock.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "forced-outage-rate": {
+  "term": "Forced outage rate",
+  "short": "The share of time a power plant is unexpectedly out of service, waiting for repair, rather than out for planned maintenance.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
  },
  "forecast-error": {
   "term": "Forecast error",
@@ -1337,6 +1385,12 @@
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
  },
+ "lolh": {
+  "term": "Loss-of-load hours (LOLH)",
+  "short": "The expected number of hours a year in which supply falls short of demand, averaged over many simulated years.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
+ },
  "lower-bound": {
   "term": "Lower bound",
   "short": "A value the best answer cannot fall below; in a cost-minimising model, the cost of a relaxation is one.",
@@ -1511,6 +1565,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "missing-money": {
+  "term": "Missing money",
+  "short": "The gap between what a plant the grid needs earns from energy and reserves and what it costs to build or keep.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
+ },
  "mixed-integer-program": {
   "term": "Mixed-integer program",
   "short": "An optimization model in which some decisions must be whole numbers, such as a plant being on (1) or off (0).",
@@ -1672,6 +1732,12 @@
   "short": "What an optimization tries to make as small or as large as possible, such as the total cost.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "offer-cap": {
+  "term": "Offer cap",
+  "short": "The highest price a market lets a seller offer, and so the ceiling on scarcity prices; it is set by the market's rules.",
+  "lesson": "A3",
+  "href": "a03-market-design.html"
  },
  "operating-emissions": {
   "term": "Operating emissions",
@@ -2045,6 +2111,12 @@
   "lesson": "B2",
   "href": "b02-python-data.html"
  },
+ "resampled-weather": {
+  "term": "Resampled weather year",
+  "short": "A simulated year stitched together from pieces of real years, such as whole weeks, so that demand, wind and sun stay consistent within each piece; it is not an observed year.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
+ },
  "research-gap": {
   "term": "Research gap",
   "short": "A question the literature has not answered, shown with a logged search and the closest prior work, not just asserted.",
@@ -2290,6 +2362,12 @@
   "short": "Money already spent on equipment that is no longer used as planned, such as grid upgrades built for a load that never arrives.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "stress-test": {
+  "term": "Stress test",
+  "short": "Running a system model through a severe event on purpose, to see what breaks and what a defence would change.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
  },
  "structural-uncertainty": {
   "term": "Structural uncertainty",
@@ -2614,5 +2692,17 @@
   "short": "The price at which electricity is traded between power plants and the companies that sell it to customers, often set hour by hour.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "public-safety-power-shutoff": {
+  "term": "Wildfire safety shutoff",
+  "short": "A utility switching off power lines in dry, windy weather so that they cannot start a fire; the customers on those lines lose power.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
+ },
+ "winterization": {
+  "term": "Winterization",
+  "short": "Protecting power plants and fuel supply against freezing, with insulation, heat tracing, enclosures and cold-weather procedures.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
  }
 }

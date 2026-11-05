@@ -1,0 +1,22 @@
+# Sidecar for Analyst lesson A3 (a03-market-design), builder learn-w4-b, 2026-11-05. Read by scripts/build_learn.py.
+id: a03-market-design
+lesson: A3
+glossary:
+  - id: capture-price
+    term: Capture price
+    def: "The average market price a plant's output earns, each hour weighted by what the plant produced in it."
+  - id: energy-only-market
+    term: Energy-only market
+    def: "A wholesale market in which plants are paid only for the energy they sell, so high prices in scarce hours must pay for capacity that is rarely used."
+  - id: capacity-market
+    term: Capacity market
+    def: "An auction, run ahead of time, that pays plants and other resources for being available, in an amount a planner sets, on top of energy prices."
+  - id: missing-money
+    term: Missing money
+    def: "The gap between what a plant the grid needs earns from energy and reserves and what it costs to build or keep."
+  - id: offer-cap
+    term: Offer cap
+    def: "The highest price a market lets a seller offer, and so the ceiling on scarcity prices; it is set by the market's rules."
+requests:
+  - "Cross-links for the coordinator: live pages still call A3 'upcoming' (lesson 6, its page; lesson 8, its page and assets/learn/08-merit-order.js)."
+  - "Neutral by design: no market design is called best; the explain layer's Steelman gives the strongest case for each."

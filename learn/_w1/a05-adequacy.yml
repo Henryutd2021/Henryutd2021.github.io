@@ -1,0 +1,22 @@
+# Sidecar for Analyst lesson A5 (a05-adequacy), builder learn-w4-b, 2026-11-05. Read by scripts/build_learn.py.
+id: a05-adequacy
+lesson: A5
+glossary:
+  - id: capacity-accreditation
+    term: Capacity accreditation
+    def: "The share of a resource's MW that a grid counts toward its adequacy target, judged by how much the resource lowers the risk of a shortfall."
+  - id: equivalent-firm-capacity
+    term: Equivalent firm capacity
+    def: "The MW of a perfect, always-available plant that would make a grid as reliable as a given resource does; divided by the resource's MW, it is an accreditation."
+  - id: forced-outage-rate
+    term: Forced outage rate
+    def: "The share of time a power plant is unexpectedly out of service, waiting for repair, rather than out for planned maintenance."
+  - id: lolh
+    term: Loss-of-load hours (LOLH)
+    def: "The expected number of hours a year in which supply falls short of demand, averaged over many simulated years."
+  - id: resampled-weather
+    term: Resampled weather year
+    def: "A simulated year stitched together from pieces of real years, such as whole weeks, so that demand, wind and sun stay consistent within each piece; it is not an observed year."
+requests:
+  - "Promotion candidate for C2 (learn-w4-g; curriculum: 'check adequacy with the probabilistic tool') and lesson A9: A5's simulator (sources, simulate, evaluate, efc, accredit in assets/learn/a05-adequacy.js, exposed as LX.A5) could become a shared engine component."
+  - "Cross-links for the coordinator: live pages still call A5 'upcoming' (lessons 6, 13, A8, A22, K5 and M3, pages and scripts)."
