@@ -79,8 +79,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>With fixed settings, the 90% band is widest where there are no records; records up to 15.5 m/s cut its mean width from 1,220 kW (16 records) to 576 kW (32).</li>
 <li>The 16 records choose a length-scale of 4.6 m/s, noise 80 kW and signal size 780 kW (maximum likelihood on a grid of 3,808 settings).</li>
 <li>RMSE on its own records against 400 new ones: 75 kW and 126 kW for the records' choice; 2 kW and 506 kW for a very short length-scale.</li>
-<li>On 400 new records the 90% band holds 95.5% (± 3 points by chance): 99% at 3–8 m/s, 88% at 8–13 m/s, 100% at 13–20 m/s.</li>
-<li>Adding the maker's curve as a second source cuts the RMSE from 126 kW to 85 kW and the band's mean width from 391 kW to 287 kW; the band holds 92.0%.</li>
+<li>On 400 new records the 90% band holds 95.5% (sampling alone: about ± 3 points): 99% at 3–8 m/s, 88% at 8–13 m/s, 100% at 13–20 m/s.</li>
+<li>Adding the maker's curve as a second source cuts the RMSE from 126 kW to 85 kW and the band's mean width from 391 kW to 287 kW; the band holds 92.0% overall but 82% at 8–13 m/s (one source: 88%).</li>
 <li>Two sources are 41 kW closer with 16 records and 5 kW with 64.</li>
 <li>With a load-reducing mode above 12.5 m/s that the maker's curve leaves out, the two-source band holds 58% of new records at 13–20 m/s; the one-source band holds 100%.</li>
 <li>In that case pinball loss rates the two fits about equal (27.9 and 27.7 kW), while RMSE is 92 kW and 107 kW.</li>
@@ -100,7 +100,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 </div>
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
-<li><b>Toy:</b> one invented 2,000 kW turbine, not a real one. Its field curve is the maker's curve averaged over gusts (12% turbulence) and 3% lower; each record's power scatters by 15 kW plus a 0.3 m/s error in the recorded wind speed.</li>
+<li><b>Toy:</b> one invented 2,000 kW turbine, not a real one. Its field curve is the maker's curve averaged over gusts (12% turbulence) and 3% lower.</li>
+<li><b>Scatter:</b> power scatter combines 15 kW of background noise with an approximate wind-error term, 0.3 m/s times the curve's slope, so it grows where the curve is steep.</li>
 <li><b>Records:</b> ten-minute averages, wind speeds Weibull-distributed (k = 2, c = 8 m/s) between 3 and 20 m/s; 64 to fit (seed 9, used in order) and 400 others to score (seed 2023), generator mulberry32.</li>
 <li><b>Fits:</b> a squared-exponential kernel and one noise level; settings by maximum likelihood on a fixed grid. Settings for 24 to 64 records are stored with the page and checked by its test.</li>
 </ul></div>
@@ -111,7 +112,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ol class="m9-nb-steps">
 <li>Download the notebook and the lesson data into one folder (in Colab, upload the data with the folder icon).</li>
 <li>Open it in Google Colab (<em>File → Upload notebook</em>) or locally with Python 3, NumPy, SciPy and scikit-learn.</li>
-<li>Run all cells (under a minute), then try the five practice tasks at the end.</li>
+<li>Run all cells (under a minute: about 5 seconds on a 2025 laptop), then try the five practice tasks at the end.</li>
 </ol>
 <p class="m9-dl"><a class="lx-btn small" href="notebooks/m09-surrogates-uq.ipynb" download>Notebook (.ipynb)</a> <a class="lx-btn small ghost" href="../assets/learn/data/m09-surrogates-uq.json" download>Lesson data</a></p>
 </div>
@@ -145,8 +146,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
+- **Symbols.** $v$ wind speed (m/s); $y$ the records' power, one entry per record (kW); $n$ the number of records; $I$ the $n \times n$ identity matrix; $^\top$ the transpose, rows written as columns ([K6](k06-vectors-matrices.html)); $|K|$ the determinant of $K$; $\sigma$ the band's standard deviation.
 - **Kernel.** $k(v, v') = s_f^2 \exp\!\left(-\frac{(v - v')^2}{2\ell^2}\right)$, with $\ell$ the length-scale (m/s) and $s_f$ the signal size (kW); the records carry noise $s_n$ (kW): $K = [k(v_i, v_j)] + s_n^2 I$.
-- **Mean.** A basis $h(v)$ sets the shape far from the records: $[1]$ for one source, $[1,\ f(v)/1000]$ with the maker's curve $f$ for two. Its weights come from generalized least squares, $\hat\beta = (H^\top K^{-1} H)^{-1} H^\top K^{-1} y$.
+- **Mean.** A basis $h(v)$ sets the shape far from the records: $[1]$ for one source, $[1,\ f(v)/1000]$ with the maker's curve $f$ for two. $H$ stacks $h$ at every record, one row each. Its weights come from generalized least squares, $\hat\beta = (H^\top K^{-1} H)^{-1} H^\top K^{-1} y$.
 - **Prediction.** $m(v) = h(v)^\top \hat\beta + k_v^\top K^{-1}(y - H\hat\beta)$, where $k_v$ lists $k(v, v_i)$ for every record.
 - **Band.** The curve's variance is $s_f^2 - k_v^\top K^{-1} k_v + u^\top (H^\top K^{-1} H)^{-1} u$ with $u = h(v) - H^\top K^{-1} k_v$; a new record adds $s_n^2$. The 90% band is $m \pm 1.645\,\sigma$.
 - **Solving.** One Cholesky factor $K = LL^\top$ gives every solve; it costs about $n^3/3$ operations, which is why GP training sets stay small (vectors and matrices: [K6](k06-vectors-matrices.html)).
@@ -200,8 +202,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-quiz" data-quiz="m9">
 <div class="lx-qq" data-id="chance" data-answer="b">
 <p class="lx-qtext">A 90% band holds 86% of 400 new records. Two standard errors of a share near 90% are √(0.9 × 0.1 ÷ 400) × 2 = 3 points. What do you conclude?</p>
-<ul class="lx-choices"><li data-value="a">Nothing: 86% is close to 90%</li><li data-value="b">The band is likely too narrow: 4 points below is beyond chance</li><li data-value="c">The band is too wide</li><li data-value="d">The records are wrong</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Likely too narrow: 86% is 4 points below 90%, more than the 3 points chance alone would move it.</p></details>
+<ul class="lx-choices"><li data-value="a">Nothing: 86% is close to 90%</li><li data-value="b">The band is likely too narrow: 4 points below is outside the sampling range</li><li data-value="c">The band is too wide</li><li data-value="d">The records are wrong</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Likely too narrow: 86% is 4 points below 90%, outside the approximate 95% sampling range of ± 3 points for independent records, so sampling alone is unlikely to explain it. Consecutive real records are not independent, so their range is wider.</p></details>
 </div>
 <div class="lx-qq" data-id="gap" data-answer="c">
 <p class="lx-qtext">You fit a one-source GP to 16 records, all below 12 m/s. Where will its band be widest?</p>
@@ -241,7 +243,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">126 → 85 kW</td><td>RMSE on 400 new records of the toy's one-source and two-source fits, both from the same 16 records.</td><td class="s">This lesson's model (illustrative)</td></tr>
-<tr><td class="n">± 3 points</td><td>How far chance alone moves the share of 400 new records inside a 90% band (two standard errors).</td><td class="s">This lesson's model; <a href="k05-probability-statistics.html">K5</a></td></tr>
+<tr><td class="n">± 3 points</td><td>Approximate 95% sampling range of the share of 400 independent new records inside a 90% band (two standard errors).</td><td class="s">This lesson's model; <a href="k05-probability-statistics.html">K5</a></td></tr>
 <tr><td class="n">58% against 100%</td><td>Share of new records at 13–20 m/s inside the 90% band, two sources against one, when the maker's curve is wrong there.</td><td class="s">This lesson's model (illustrative)</td></tr>
 <tr><td class="n">n³ ÷ 3</td><td>Floating-point operations to factor a GP's matrix for n records (Cholesky): about 1,400 for 16 records, about 330 million for 1,000.</td><td class="s">Arithmetic, as in Go deeper</td></tr>
 </tbody>
@@ -265,8 +267,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">Where this came up in research</p>
 <blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>From the course author's research: a wind turbine's real power curve is a band, not a line. Adding the turbine's theoretical curve to about two hundred measurements can narrow that band, but whether it helps depends on how the fit is scored. (<a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>)</p></blockquote>
-<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled SCADA points from the open SDWPF dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</p><p>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</p><footer>Approved excerpt of: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
-<blockquote class="lx-excerpt" data-source="excerpt:wind-uq"><p>In a research project (2022–2023), the course author worked on this question: can uncertainty metrics of a wind power model's inputs (weather data products, forecast ensembles and turbine-level data) predict calibrated plant-level power uncertainty at wind plants that have no power measurements?</p><p>The course author developed the surrogate-modeling workflow: calibrated uncertainty targets, surrogate models and validation on held-out plants.</p><p>Inputs: uncertainty metrics of four kinds: how a series varies over time (moving windows), how data sources disagree, how widely a forecast ensemble spreads, and how values vary across a plant's turbines (a variogram).</p><p>Targets: at plants with power measurements, the scale of a predictive distribution around the point forecast, chosen to minimize pinball loss.</p><p>Surrogates: Gaussian process regression and other regressors learn a mapping from the metrics to that scale, then predict probabilistic power at plants without measurements.</p><p>Validation holds out whole plants, scored with pinball loss, CRPS and reliability, with recalibration of the predictive distributions.</p><p>A surrogate is useful only if it beats a constant baseline on held-out plants.</p><p>The project has no paper. The public framework is a fresh implementation tested on synthetic data; project data and results are not public.</p><footer>This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:uq-mfgpr"><p>Linear (autoregressive) and nonlinear multi-fidelity Gaussian process regression fuse the turbine type's theoretical power curve (low fidelity) with a few hundred kernel-density-sampled <span class="lx-term" data-term="scada">SCADA</span> points from the open <span class="lx-term" data-term="sdwpf">SDWPF</span> dataset (high fidelity), and are compared with single-fidelity regression on point and probabilistic metrics.</p><p>The kernel density sample keeps the shape of the scatter without manual cleaning; a compact training set matters because a Gaussian process solve grows with the cube of the training points.</p><footer>Approved excerpt of: <a href="https://doi.org/10.1115/detc2023-114762">Li et al., ASME IDETC 2023</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:wind-uq"><p>In a research project (2022–2023), the course author worked on this question: can uncertainty metrics of a wind power model's inputs (weather data products, forecast ensembles and turbine-level data) predict calibrated plant-level power uncertainty at wind plants that have no power measurements?</p><p>The course author developed the surrogate-modeling workflow: calibrated uncertainty targets, surrogate models and validation on held-out plants.</p><p>Inputs: uncertainty metrics of four kinds: how a series varies over time (moving windows), how data sources disagree, how widely a forecast ensemble spreads, and how values vary across a plant's turbines (a variogram).</p><p>Targets: at plants with power measurements, the scale of a predictive distribution around the point forecast, chosen to minimize pinball loss.</p><p>Surrogates: Gaussian process regression and other regressors learn a mapping from the metrics to that scale, then predict probabilistic power at plants without measurements.</p><p>Validation holds out whole plants, scored with <span class="lx-term" data-term="pinball-loss">pinball loss</span>, <span class="lx-term" data-term="crps">CRPS</span> and <span class="lx-term" data-term="calibration">reliability</span>, with recalibration of the predictive distributions.</p><p>A surrogate is useful only if it beats a constant baseline on held-out plants.</p><p>The project has no paper. The public framework is a fresh implementation tested on synthetic data; project data and results are not public.</p><footer>This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</footer></blockquote>
 <p>This page's turbine is a toy: invented round numbers, not the studies' data, equations or results.</p>
 </div>
 <div class="lx-card lx-sources">

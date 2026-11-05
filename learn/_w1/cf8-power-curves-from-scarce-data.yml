@@ -1,8 +1,17 @@
 # Sidecar for CF8 (cf8-power-curves-from-scarce-data), builder learn-w4-e, 2026-11-05. Read by scripts/build_learn.py.
 id: cf8-power-curves-from-scarce-data
 lesson: CF8
-glossary: []
+glossary:
+  - id: kernel-density-estimate
+    term: Kernel density estimate
+    def: "A smooth estimate of where data points are dense, made by placing a small bump on every point and adding them up; sampling from it keeps the data's shape with fewer points."
+  - id: sharpness
+    term: Sharpness (of a forecast band)
+    def: "How narrow a forecast's bands are, on average; narrower is better only if the bands still hold what they claim."
+  - id: variogram
+    term: Variogram
+    def: "A measure of how much values at two places differ, on average, as a function of the distance between them; here, across a wind plant's turbines."
 requests:
   - "Shared fix (forms.css, case files with an explainer): at 375 and 414 px the uq-mfgpr explainer's three-way control cuts 'Curve + data' to an ellipsis (assets/explainers.css sets white-space: nowrap and text-overflow: ellipsis on .ex-seg-opt span); the layout audit reports it as a medium clip on CF8. Case files keep no page style, so the fix belongs in forms.css, e.g. @media (max-width: 480px) { .page-learn .explainer .ex-seg-opt span { white-space: normal; overflow: visible; text-overflow: clip; padding: .32rem .3rem; line-height: 1.25; } }."
-  - "CF8 loads lesson M9's script before its own (LX.M9: the Gaussian-process fits and their covariance), as lesson 12 loads 13-capstone.js; promote M9's GP core to components/gp.js."
+  - "Shared fix (assets/explainers/uq-mfgpr.js, a site explainer): its SVG title gives only the average band widths. A text version that follows the slider (by wind-speed region: measured points, both estimates and their bands) would serve the project page too; CF8 carries a static text version at 5, 10 and 25 points meanwhile (review CF8 #7)."
   - "Mentions of CF8 in other lessons (M9, M10, lesson 5) are the coordinator's, once CF8 is live."

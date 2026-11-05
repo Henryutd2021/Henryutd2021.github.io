@@ -12,7 +12,7 @@
   var M9 = (typeof window !== "undefined" && window.LX && window.LX.M9) || require("./components/gp.js");
   var maker = M9.maker, field = M9.field, scatter = M9.scatter, records = M9.records, fit = M9.fit, predict = M9.predict, search = M9.search,
       pinball = M9.pinball, scores = M9.scores, LEVELS = M9.LEVELS, ZL = M9.ZL, campaign = M9.campaign, heldOut = M9.heldOut, stored = M9.stored,
-      fitStored = M9.fitStored, curve = M9.curve, widest = M9.widest, gaps = M9.gaps;
+      fitStored = M9.fitStored, curve = M9.curve, widest = M9.widest, gaps = M9.gaps, recBin = M9.recBin;
 
   // ---------------------------------------------------------------- every number the page states, in one place
   function kwS(v) { return Math.round(v).toLocaleString("en-US") + " kW"; }
@@ -69,8 +69,8 @@
       "With fixed settings, the 90% band is widest where there are no records; records up to " + msS(s2[2].vmax) + " cut its mean width from " + kwS(s2[1].w.mean) + " (" + s2[1].n + " records) to " + kwS(s2[2].w.mean) + " (" + s2[2].n + ").",
       "The " + N0 + " records choose a length-scale of " + msS(F.ml.hp.ell) + ", noise " + kwS(F.ml.hp.sn) + " and signal size " + kwS(F.ml.hp.sf) + " (maximum likelihood on a grid of " + (D.grid.ell.length * D.grid.sf.length * D.grid.sn.length).toLocaleString("en-US") + " settings).",
       "RMSE on its own records against 400 new ones: " + kwS(st4[0].own) + " and " + kwS(st4[0].held) + " for the records' choice; " + kwS(st4[1].own) + " and " + kwS(st4[1].held) + " for a very short length-scale.",
-      "On 400 new records the 90% band holds " + pctS(b[0].cov[90]) + " (± " + (100 * F.se90).toFixed(0) + " points by chance): " + b[0].byRange.map(function (q) { return pctS(q.cov90, 0) + " at " + q.label; }).join(", ") + ".",
-      "Adding the maker's curve as a second source cuts the RMSE from " + kwS(b[0].rmse) + " to " + kwS(b[1].rmse) + " and the band's mean width from " + kwS(b[0].width) + " to " + kwS(b[1].width) + "; the band holds " + pctS(b[1].cov[90]) + ".",
+      "On 400 new records the 90% band holds " + pctS(b[0].cov[90]) + " (sampling alone: about ± " + (100 * F.se90).toFixed(0) + " points): " + b[0].byRange.map(function (q) { return pctS(q.cov90, 0) + " at " + q.label; }).join(", ") + ".",
+      "Adding the maker's curve as a second source cuts the RMSE from " + kwS(b[0].rmse) + " to " + kwS(b[1].rmse) + " and the band's mean width from " + kwS(b[0].width) + " to " + kwS(b[1].width) + "; the band holds " + pctS(b[1].cov[90]) + " overall but " + pctS(b[1].byRange[1].cov90, 0) + " at 8–13 m/s (one source: " + pctS(b[0].byRange[1].cov90, 0) + ").",
       "Two sources are " + kwS(F.sc.base[SW[0]][0].rmse - F.sc.base[SW[0]][1].rmse) + " closer with " + SW[0] + " records and " + kwS(F.sc.base[last][0].rmse - F.sc.base[last][1].rmse) + " with " + last + ".",
       "With a load-reducing mode above " + msS(T.reduce.from) + " that the maker's curve leaves out, the two-source band holds " + pctS(r[1].byRange[2].cov90, 0) + " of new records at 13–20 m/s; the one-source band holds " + pctS(r[0].byRange[2].cov90, 0) + ".",
       "In that case pinball loss rates the two fits about equal (" + r[0].pinball.toFixed(1) + " and " + r[1].pinball.toFixed(1) + " kW), while RMSE is " + kwS(r[0].rmse) + " and " + kwS(r[1].rmse) + "."
@@ -133,8 +133,9 @@
     // records as dots only: LX.Plot skips a width-0 line's dots, so the joining path is drawn invisible (op 0)
     (o.recs || []).forEach(function (s) { lines.push({ pts: s.r.map(function (p) { return [p[0], p[1]]; }), color: s.color, width: 0.01, op: 0, dots: true }); legend.push({ label: s.label, color: s.color }); });
     curves.forEach(function (c) { lines.push({ pts: c.c.map(function (p) { return [p.v, p.m]; }), color: c.f.color, width: 2.6 }); legend.push({ label: c.f.label + ", with its 90% band", color: c.f.color }); });
-    var rows = [];
-    for (var s = X0; s <= X1; s += 1) rows.push([ms(s)].concat(o.maker ? [kw(maker(T, s))] : [], (o.fits || []).map(function (f) { var q = predict(f.F, s); return kw(q.m) + " (" + kw(q.m - Z90 * q.sd) + " to " + kw(q.m + Z90 * q.sd) + ")"; })));
+    // the text version, one row per 1 m/s bin of wind speed: each set of records as its count and mean power in the bin
+    // (and, beside the maker's curve, their mean gap below it), then every curve and band at the bin's centre
+    var rows = binText(T, o);
     return {
       x: { min: X0, max: X1, ticks: [[3, "3"], [6, "6"], [9, "9"], [12, "12"], [15, "15"], [18, "18"], [20, "20 m/s", "end"]], ticksN: [[3, "3"], [8, "8"], [13, "13"], [20, "20 m/s", "end"]] },
       y: { min: -500, max: 2500, step: 500, fmt: function (v) { return int(v); }, unit: "kW", zero: true },
@@ -146,9 +147,28 @@
         return t;
       }, tipStep: 0.5,
       aria: o.aria || "Power against wind speed.",
-      text: { head: ["Wind speed"].concat(o.maker ? ["Maker's curve"] : [], (o.fits || []).map(function (f) { return f.label + " (90% band)"; })), rows: rows,
-              note: (o.recs || []).map(function (s) { return s.label + ": " + s.r.length + " records."; }).join(" ") }
+      text: { head: rows.head, rows: rows.rows, note: "Records are counted within each 1 m/s bin; curves and bands are read at the bin's centre." }
     };
+  }
+  function binText(T, o) {
+    var head = ["Wind speed"], out = [];
+    (o.recs || []).forEach(function (s) { head.push(s.label + ": count, mean power"); if (o.maker) head.push(s.label + ": mean gap below the maker's curve"); });
+    if (o.maker) head.push("Maker's curve");
+    if (o.field) head.push("Field curve (hidden from the fits)");
+    (o.fits || []).forEach(function (f) { head.push(f.label + " (90% band)"); });
+    for (var lo = T.range[0]; lo < T.range[1]; lo += 1) {
+      var c = lo + 0.5, r = [lo + "–" + (lo + 1) + " m/s"];
+      (o.recs || []).forEach(function (s) {
+        var b = recBin(T, s.r, lo);
+        r.push(b.n ? b.n + " · " + kw(b.mean) : "none");
+        if (o.maker) r.push(b.n ? kw(b.gap) : "–");
+      });
+      if (o.maker) r.push(kw(maker(T, c)));
+      if (o.field) r.push(kw(field(T, c, o.field === "reduce" ? "reduce" : null)));
+      (o.fits || []).forEach(function (f) { var q = predict(f.F, c); r.push(kw(q.m) + " (" + kw(q.m - Z90 * q.sd) + " to " + kw(q.m + Z90 * q.sd) + ")"); });
+      out.push(r);
+    }
+    return { head: head, rows: out };
   }
 
   LX.mount("m09", function (live, data, root) {
@@ -189,7 +209,7 @@
       build: function (act, api) {
         var seen = {}, P, out;
         seg(row(act), D.steps2.map(function (n) { return n + " records"; }), -1, function (i) { show(D.steps2[i]); }, "Records used");
-        H("p", { class: "lx-hint", text: "Settings fixed for now: length-scale " + ms(D.fixed.ell) + ", signal size " + kw(D.fixed.sf) + ", noise " + kw(D.fixed.sn) + ". Step 3 lets the records choose." }, act);
+        H("p", { class: "lx-hint", text: "Settings fixed for now: length-scale " + ms(D.fixed.ell) + ", signal size " + kw(D.fixed.sf) + " (how far the curve may swing from its average), noise " + kw(D.fixed.sn) + ". Step 3 lets the records choose." }, act);
         P = LX.Plot(act, { text: "Text version of the chart" }); out = readout(act);
         function show(n) {
           seen[n] = 1;
@@ -208,7 +228,7 @@
 
     // ---- 3 the settings, then the records' own choice (maximum likelihood on the grid)
     steps.push({
-      text: "Two settings shape the fit: the [[length-scale|length-scale]], how far one record reaches, and the noise, the scatter expected around the curve. Move them, then let the " + N0 + " records choose.",
+      text: "Two settings shape the fit: the [[length-scale|length-scale]], how far one record reaches, and the noise, the scatter expected around the curve. Move them, then let the " + N0 + " records choose by [[maximum-likelihood|maximum likelihood]].",
       build: function (act, api) {
         var recs = campaign(D, N0), G = D.grid, best = null, P, out, hp;
         var ML = stored(D, null, false, N0);
@@ -216,20 +236,20 @@
         var sl = LX.Slider(act, { label: "Length-scale", color: COL.one, min: 0, max: G.ell.length - 1, step: 1, value: G.ell.indexOf(hp.ell), fmt: function (i) { return ms(G.ell[i]); }, onChange: function (i) { hp.ell = G.ell[i]; draw(true); } });
         var sn = LX.Slider(act, { label: "Noise", color: COL.held, min: 0, max: G.sn.length - 1, step: 1, value: G.sn.indexOf(hp.sn), fmt: function (i) { return kw(G.sn[i]); }, onChange: function (i) { hp.sn = G.sn[i]; draw(true); } });
         var r = row(act), b = H("button", { type: "button", class: "lx-btn small", text: "Let the records choose" }, r);
-        H("span", { class: "m9-note", text: "Signal size held at " + kw(ML.sf) + "." }, r);
+        H("span", { class: "m9-note", text: "Signal size, how far the curve may swing from its average, held at " + kw(ML.sf) + "." }, r);
         P = LX.Plot(act, { text: "Text version of the chart" }); out = readout(act);
         b.addEventListener("click", function () {
           if (!best) best = search(T, recs, false, G);
           hp = { ell: best.hp.ell, sf: best.hp.sf, sn: best.hp.sn };
           sl.set(G.ell.indexOf(hp.ell)); sn.set(G.sn.indexOf(hp.sn)); draw(false);
-          api.done(); api.saw("The records choose a length-scale of " + ms(hp.ell) + ", noise " + kw(hp.sn) + " and signal size " + kw(hp.sf) + ": the most likely of " + int(G.ell.length * G.sf.length * G.sn.length) + " settings on a grid, searched in your browser.");
+          api.done(); api.saw("The records choose a length-scale of " + ms(hp.ell) + ", noise " + kw(hp.sn) + " and signal size " + kw(hp.sf) + ": the settings giving these records the highest likelihood among " + int(G.ell.length * G.sf.length * G.sn.length) + " on a grid, searched in your browser.");
         });
         function draw(user) {
           var F = fit(T, recs, hp, false);
           if (!best) best = search(T, recs, false, G);
           P.render(fitSpec(T, { fits: [{ F: F, color: COL.one, label: "Gaussian process" }], recs: [{ r: recs, color: COL.rec, label: N0 + " records" }], aria: "A Gaussian process fitted to " + N0 + " records with the settings chosen." }));
           var gap = best.ll - F.ll;
-          out.innerHTML = "Length-scale " + ms(hp.ell) + ", noise " + kw(hp.sn) + ": log-likelihood <b>" + F.ll.toFixed(1) + "</b>, " + (gap < 1e-9 ? "the best on the grid." : gap.toFixed(1) + " below the best on the grid.");
+          out.innerHTML = "Length-scale " + ms(hp.ell) + ", noise " + kw(hp.sn) + ": log-likelihood <b>" + F.ll.toFixed(1) + "</b> (how probable these records are under the settings; higher is better), " + (gap < 1e-9 ? "the best on the grid." : gap.toFixed(1) + " below the best on the grid.");
           keep("ell", hp.ell); keep("sn", hp.sn);
           if (user) api.saw("Short length-scales chase single records; long ones cannot bend at rated speed. Now let the records choose.", true);
         }
@@ -267,7 +287,7 @@
         function draw(i) {
           table(tb, ["Band", "Should hold", "Holds, 400 new records"], LEVELS.filter(function (l, j) { return seen[j]; }).map(function (l) { return [l + "% band", l + "%", pct(s.cov[l])]; }));
           if (seen[2]) table(tb2, ["Wind speed", "New records", "90% band holds"], s.byRange.map(function (r) { return [r.label, String(r.n), pct(r.cov90, 0)]; }));
-          out.innerHTML = LEVELS[i] + "% band: holds <b>" + pct(s.cov[LEVELS[i]]) + "</b> of 400 new records; chance alone moves this by about ± " + (200 * Math.sqrt(LEVELS[i] / 100 * (1 - LEVELS[i] / 100) / s.n)).toFixed(0) + " points.";
+          out.innerHTML = LEVELS[i] + "% band: holds <b>" + pct(s.cov[LEVELS[i]]) + "</b> of 400 new records; sampling alone moves this by about ± " + (200 * Math.sqrt(LEVELS[i] / 100 * (1 - LEVELS[i] / 100) / s.n)).toFixed(0) + " points (two standard errors, independent records).";
           if (seen[2] && Object.keys(seen).length >= 2) {
             var b = s.byRange;
             api.done(); api.saw("The 90% band holds " + pct(s.cov[90]) + ": a little wide. By speed, " + pct(b[0].cov90, 0) + ", " + pct(b[1].cov90, 0) + " and " + pct(b[2].cov90, 0) + ": one noise level cannot fit scatter that grows where the curve is steep.");
@@ -287,9 +307,9 @@
         function draw(i) {
           var fits = i ? [{ F: a, color: COL.one, label: "One source" }, { F: b, color: COL.two, label: "Two sources" }] : [{ F: a, color: COL.one, label: "One source" }];
           P.render(fitSpec(T, { fits: fits, maker: !!i, recs: [{ r: recs, color: COL.rec, label: N0 + " records" }], aria: "One-source and two-source fits to " + N0 + " records." }));
-          table(tb, ["On 400 new records", "One source", "Two sources"], [["RMSE", kw(sa.rmse), seen[1] ? kw(sb.rmse) : "?"], ["90% band holds", pct(sa.cov[90]), seen[1] ? pct(sb.cov[90]) : "?"], ["90% band, mean width", kw(sa.width), seen[1] ? kw(sb.width) : "?"]]);
+          table(tb, ["On 400 new records", "One source", "Two sources"], [["RMSE", kw(sa.rmse), seen[1] ? kw(sb.rmse) : "?"], ["90% band holds", pct(sa.cov[90]), seen[1] ? pct(sb.cov[90]) : "?"], ["90% band holds, 8–13 m/s (" + sa.byRange[1].n + " records)", pct(sa.byRange[1].cov90, 0), seen[1] ? pct(sb.byRange[1].cov90, 0) : "?"], ["90% band, mean width", kw(sa.width), seen[1] ? kw(sb.width) : "?"]]);
           out.innerHTML = i ? "Two sources: ρ = " + (b.beta[1] / 1000).toFixed(2) + " times the maker's curve, plus " + kw(b.beta[0]) + ", plus a learned gap." : "One source: the records alone.";
-          if (seen[1]) { api.done(); api.saw("Same " + N0 + " records: two sources cut the RMSE from " + kw(sa.rmse) + " to " + kw(sb.rmse) + " and the band's mean width from " + kw(sa.width) + " to " + kw(sb.width) + "; it still holds " + pct(sb.cov[90]) + "."); }
+          if (seen[1]) { api.done(); api.saw("Same " + N0 + " records: two sources cut the RMSE from " + int(sa.rmse) + " to " + kw(sb.rmse) + " and the mean band width from " + int(sa.width) + " to " + kw(sb.width) + ". Yet at 8–13 m/s, the steep part, its 90% band holds only " + pct(sb.byRange[1].cov90, 0) + " (one source: " + pct(sa.byRange[1].cov90, 0) + ")."); }
         }
         out.textContent = "Pick one.";
       }
@@ -326,12 +346,12 @@
     // ---- 8 when the cheap curve misleads: a load-reducing mode above 12.5 m/s
     var R = T.reduce;
     steps.push({
-      text: "Suppose this turbine runs a load-reducing mode above " + ms(R.from) + " that the maker's curve leaves out, and the first " + N0 + " records stop at " + ms(Math.max.apply(null, campaign(D, N0).map(function (p) { return p[0]; }))) + ". Which band do you trust at 15 m/s?",
+      text: "Suppose this turbine runs a load-reducing mode above " + ms(R.from) + " that the maker's curve leaves out, and the first " + N0 + " records stop at " + ms(Math.max.apply(null, campaign(D, N0).map(function (p) { return p[0]; }))) + ". Which band would you rather use at 15 m/s?",
       build: function (act, api) {
         var a = lab.fit(N0, false, "reduce"), b = lab.fit(N0, true, "reduce"), sa = lab.sc(N0, false, "reduce"), sb = lab.sc(N0, true, "reduce"), host = H("div", null, act);
         var pr = LX.Predict(act, { id: "m9-trust", q: "Your pick:", answer: "one", fresh: true, title: false,
           options: [{ value: "one", label: "One source", color: COL.one }, { value: "two", label: "Two sources", color: COL.two }],
-          feedback: { one: "Its band is wide where no record is, and that is honest.", two: "It trusts the maker's curve where no record can correct it." },
+          feedback: { one: "The more cautious choice: its band widens where no record is. Here it covers the new records, but nothing checked it there in advance.", two: "It trusts the maker's curve where no record can correct it." },
           onPick: function (v) { keep("trust", v); draw(); pr.reveal(); } });
         act.appendChild(host);
         function draw() {
@@ -344,7 +364,7 @@
           var tb = H("div", null, host);
           table(tb, ["On 400 new records", "One source", "Two sources"], [["RMSE", kw(sa.rmse), kw(sb.rmse)], ["90% band holds, all speeds", pct(sa.cov[90]), pct(sb.cov[90])], ["90% band holds, 13–20 m/s (" + sa.byRange[2].n + " records)", pct(sa.byRange[2].cov90, 0), pct(sb.byRange[2].cov90, 0)]]);
           api.done();
-          api.saw("Above 13 m/s the two-source band holds " + pct(sb.byRange[2].cov90, 0) + " of new records; the one-source band, wide but honest, holds " + pct(sa.byRange[2].cov90, 0) + ". Cheap data mislead where they are wrong and no record can correct them.");
+          api.saw("Above 13 m/s the two-source band holds " + pct(sb.byRange[2].cov90, 0) + " of new records; the wider one-source band holds " + pct(sa.byRange[2].cov90, 0) + " in this example. Neither was validated beyond its last record: cheap data mislead where they are wrong and unchecked.");
         }
       }
     });
@@ -415,8 +435,8 @@
       title: "One source or two? The " + N0 + " records, scored on 400 new ones", text: true,
       columns: [{ key: "name", label: "Fit", main: true }, { key: "base", label: "As built: RMSE, 90% band holds" }, { key: "red", label: "Load-reducing mode: holds at 13–20 m/s" }, { key: "when", label: "Use it when", phoneHide: true }],
       rows: [
-        { key: "one", color: COL.one, name: "One source (GP on the records)", base: kw(s1.rmse) + ", " + pct(s1.cov[90]), red: pct(r1.byRange[2].cov90, 0), when: "the cheap curve may be wrong where records are missing" },
-        { key: "two", color: COL.two, name: "Two sources (maker's curve + GP on the gap)", base: kw(s2.rmse) + ", " + pct(s2.cov[90]), red: pct(r2.byRange[2].cov90, 0), when: "the cheap curve is right in shape and records are few" }
+        { key: "one", color: COL.one, name: "One source (GP on the records)", base: kw(s1.rmse) + ", " + pct(s1.cov[90]) + " (" + pct(s1.byRange[1].cov90, 0) + " at 8–13 m/s)", red: pct(r1.byRange[2].cov90, 0), when: "the cheap curve may be wrong where records are missing" },
+        { key: "two", color: COL.two, name: "Two sources (maker's curve + GP on the gap)", base: kw(s2.rmse) + ", " + pct(s2.cov[90]) + " (" + pct(s2.byRange[1].cov90, 0) + " at 8–13 m/s)", red: pct(r2.byRange[2].cov90, 0), when: "the cheap curve is right in shape and records are few" }
       ],
       sorts: [{ label: "As built", order: ["one", "two"], note: "Neither wins on every score: say which score, and where it was measured." }]
     });

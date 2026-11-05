@@ -6,18 +6,22 @@
 // is the hour ENDING at start_utc + i hours, UTC; cleaning rules in its meta). Demand in MW = shape / 1000 x 54,411 MW,
 // SPP's 2025 peak hour (04-forecasts.json), so values are rounded to 54 MW; wind and solar stay in % of their maximum.
 //
-// The forecast (made at local midnight for every hour of the next local day; Central time with daylight saving, as
+// The forecast (issued at local 00:00 for every hour of the local day just starting; Central time with daylight saving, as
 // people live by it: 2025's change days have 23 and 25 hours). For a target hour i of local date t, the issue hour is the
-// last hour of the day before; the horizon h = i - issue (1 to 24, 25 on 2 November). A lag L may be used only if L >= h:
+// last hour of the day before; the horizon h = i - issue (1 to 24, 25 on 2 November). An input must be known at the
+// issue hour (its index at most the issue's):
 //   persistence           y(issue): the latest actual, held flat
-//   same hour yesterday   y(i - 24 ceil(h / 24))            (lag 48 for the 25th hour of 2 November)
-//   same hour last week   y(i - 168)
+//   same hour yesterday   the same clock hour (hour ending) on the day before: 24 hours earlier on most days, 23 or 25
+//                         next to a clock change. Rule (review M10 #3): a clock hour that occurs twice (hour ending 2 on
+//                         2 November) is read as the later one; one that does not exist (hour ending 3 on 9 March) as
+//                         the clock hour before it (hour ending 2). Always on the day before, so known at the issue hour.
+//   same hour last week   the same clock hour seven days earlier, by the same rule
 //   linear regression     least squares on chosen features (always same hour yesterday; optional: same hour last week,
 //                         the latest actual, hour of day as 23 indicators, Saturday and Sunday indicators), in GW, with an
 //                         intercept; normal equations solved by Cholesky (one Gram matrix of all columns, subsets read
 //                         from it, so every mix of features is exact and quick)
-//   leaks (step 5)        "the hour before" y(i - 1) (known at midnight only for the first hour) and "tomorrow's average"
-//                         (the mean of the actual demand on date t): neither exists when the forecast is made
+//   leaks (step 5)        "the hour before" y(i - 1) (known at the issue hour only for the day's first hour) and "the
+//                         day's actual average" (the mean of the actual demand on date t): not known at the issue hour
 // Split by time, never shuffled: train 8 January to 30 September (the first week only feeds lag 168), validate (choose)
 // on October, test once on November. Tie rule for the best mix: the lowest validation MAE; the test proves the winner
 // leads by more than 1 MW.
@@ -40,6 +44,15 @@
       out.push({ i: i, he: he, date: date, dow: dt.getUTCDay(), month: dt.getUTCMonth() + 1 });
     }
     out.forEach(function (x) { x.issue = first[x.date] - 1; x.h = x.i - x.issue; });
+    // the same clock hour 1 and 7 days earlier (x.yday, x.wk; -1 before the data start): a repeated clock hour is
+    // read as the later one (the map keeps the last index), a missing one as the clock hour before it
+    var at = {};
+    out.forEach(function (x) { at[x.date + "|" + x.he] = x.i; });
+    var back = function (x, days) {
+      var t = new Date(Date.parse(x.date + "T00:00:00Z") - days * 864e5).toISOString().slice(0, 10);
+      return (t + "|" + x.he) in at ? at[t + "|" + x.he] : (t + "|" + (x.he - 1)) in at ? at[t + "|" + (x.he - 1)] : -1;
+    };
+    out.forEach(function (x) { x.yday = back(x, 1); x.wk = back(x, 7); });
     return out;
   }
   function demandMW(Y, D) { return Y.demand.map(function (v) { return v / 1000 * D.peakMW; }); }
@@ -51,11 +64,10 @@
     return { Y: Y, D: D, cal: cal, d: d, dayMean: dayMean, byDate: byDate,
              train: cal.filter(function (x) { return inR(x, S.train); }), val: cal.filter(function (x) { return inR(x, S.val); }), test: cal.filter(function (x) { return inR(x, S.test); }) };
   }
-  function lagDay(x) { return 24 * Math.ceil(x.h / 24); }
   var RULES = {
     persist: function (P, x) { return P.d[x.issue]; },
-    day: function (P, x) { return P.d[x.i - lagDay(x)]; },
-    week: function (P, x) { return P.d[x.i - 168]; }
+    day: function (P, x) { return P.d[x.yday]; },
+    week: function (P, x) { return P.d[x.wk]; }
   };
   // the columns of the full design: group of each column, and its value for hour x (GW)
   var GROUPS = ["day", "week", "last", "hour", "wkend", "lag1", "oracle"];
@@ -70,8 +82,8 @@
     return COLS.map(function (c) {
       switch (c.g) {
         case "const": return 1;
-        case "day": return P.d[x.i - lagDay(x)] / 1000;
-        case "week": return P.d[x.i - 168] / 1000;
+        case "day": return P.d[x.yday] / 1000;
+        case "week": return P.d[x.wk] / 1000;
         case "last": return P.d[x.issue] / 1000;
         case "hour": return x.he === c.he ? 1 : 0;
         case "wkend": return x.dow === c.dow ? 1 : 0;
@@ -198,7 +210,7 @@
   }
   function mw(v) { return Math.round(v).toLocaleString("en-US") + " MW"; }
   function pc(f, d) { return (100 * f).toFixed(d == null ? 1 : d) + "%"; }
-  var NAMES = { week: "same hour last week", last: "the latest actual", hour: "hour of day", wkend: "Saturday and Sunday", day: "same hour yesterday", lag1: "the hour before", oracle: "tomorrow's average" };
+  var NAMES = { week: "same hour last week", last: "the latest actual", hour: "hour of day", wkend: "Saturday and Sunday", day: "same hour yesterday", lag1: "the hour before", oracle: "the day's actual average" };
   function mixName(use) { return ["same hour yesterday"].concat(use.map(function (g) { return NAMES[g]; })).join(" + "); }
   function dayLabel(date) { var t = new Date(date + "T12:00:00Z"); return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][t.getUTCDay()] + " " + t.getUTCDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][t.getUTCMonth()]; }
   // the no-JS version (the test's --write puts it in the page)
@@ -207,11 +219,11 @@
     var li = [
       "Split by time: train on " + F.P.train.length.toLocaleString("en-US") + " hours (8 January to 30 September 2025), choose on October (" + F.P.val.length + " hours), test once on November (" + F.P.test.length + ").",
       "On October, same hour yesterday misses by " + mw(b.day.val.mae) + " on average (MAPE " + pc(b.day.val.mape) + "); same hour last week by " + mw(b.week.val.mae) + "; the latest hour held flat by " + mw(b.persist.val.mae) + ".",
-      "Persistence error, in % of each series' 2025 maximum, at 1 and 12 hours ahead: demand " + F.horizon.demand[0].toFixed(1) + " and " + F.horizon.demand[3].toFixed(1) + "; wind " + F.horizon.wind[0].toFixed(1) + " and " + F.horizon.wind[3].toFixed(1) + "; solar " + F.horizon.solar[0].toFixed(1) + " and " + F.horizon.solar[3].toFixed(1) + ". Solar is zero in " + F.solarZeros + " of " + F.P.val.length + " October hours.",
+      "Persistence error, issued every hour from the reading h hours earlier, in % of each series' 2025 maximum, at 1 and 12 hours ahead: demand " + F.horizon.demand[0].toFixed(1) + " and " + F.horizon.demand[3].toFixed(1) + "; wind " + F.horizon.wind[0].toFixed(1) + " and " + F.horizon.wind[3].toFixed(1) + "; solar " + F.horizon.solar[0].toFixed(1) + " and " + F.horizon.solar[3].toFixed(1) + ". Solar is zero in " + F.solarZeros + " of " + F.P.val.length + " October hours.",
       "The best of 16 feature mixes on October: " + mixName(F.best.use) + ", " + mw(F.best.val) + ", " + pc(F.skillVal) + " better than same hour yesterday.",
-      "Leaks: adding the hour before scores " + mw(F.leakVal.lag1) + " on October, adding tomorrow's average " + mw(F.leakVal.oracle) + "; neither exists at midnight.",
+      "Leaks: adding the hour before scores " + mw(F.leakVal.lag1) + " on October, adding the day's actual average " + mw(F.leakVal.oracle) + "; at 00:00 neither is known for every hour of the day.",
       "November, opened once: " + mw(F.best.test) + " against " + mw(b.day.test.mae) + " for same hour yesterday (" + pc(F.skillTest) + " better).",
-      "An 80% band from October's misses (" + mw(F.Q[1]).replace(/^-/, "−") + " to +" + mw(F.Q[17]) + ") holds " + pc(F.band.cov[80]) + " of November's hours; its pinball loss is " + F.band.pinball.toFixed(1) + " MW.",
+      "An 80% band from October's misses, pooled over all hours (" + mw(F.Q[1]).replace(/^-/, "−") + " to +" + mw(F.Q[17]) + "), holds " + pc(F.band.cov[80]) + " of November's hours; its pinball loss is " + F.band.pinball.toFixed(1) + " MW.",
       "The three worst November days (" + F.worst.map(function (w) { return dayLabel(w.date); }).join(", ") + ") hold " + pc(F.worstShare, 0) + " of the month's absolute error."
     ];
     var rows = [["Same hour yesterday, October and November", mw(b.day.val.mae) + " and " + mw(b.day.test.mae)], ["Best mix by October, October and November", mw(F.best.val) + " and " + mw(F.best.test)],
@@ -221,7 +233,7 @@
       rows.map(function (q) { return '<tr><td>' + q[0] + '</td><td class="n">' + q[1] + '</td></tr>'; }).join("\n") + '\n</tbody></table></div>\n<p class="lx-hint">With JavaScript on, you build and score these forecasts yourself, step by step.</p>';
   }
 
-  var model = { calendar: calendar, demandMW: demandMW, prepare: prepare, lagDay: lagDay, RULES: RULES, GROUPS: GROUPS, COLS: COLS, row: row, gram: gram, chol: chol, solve: solve,
+  var model = { calendar: calendar, demandMW: demandMW, prepare: prepare, RULES: RULES, GROUPS: GROUPS, COLS: COLS, row: row, gram: gram, chol: chol, solve: solve,
                 fitLS: fitLS, point: point, rule: rule, OPT: OPT, mixes: mixes, quantile: quantile, TAU: TAU, residualQ: residualQ, bands: bands, persistAt: persistAt, zeros: zeros,
                 daily: daily, facts: facts, reference: reference, staticFallback: staticFallback, mw: mw, pc: pc, mixName: mixName, dayLabel: dayLabel, NAMES: NAMES };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
@@ -266,8 +278,24 @@
       legend: [{ label: "Actual demand", color: COL.actual }].concat(lines.map(function (l) { return { label: l.label, color: l.color, dash: l.dash }; }), band ? [{ label: band.label, color: "color-mix(in srgb, var(--lx-accent) 30%, transparent)" }] : []),
       tip: function (xv) { var k = Math.max(0, Math.min(S.length - 1, Math.floor(xv))), x = S[k]; return "<div><b>" + dayLabel(x.date) + ", hour ending " + x.he + ":00</b></div><div>Actual " + mw(P.d[x.i]) + "</div>" + lines.map(function (l) { return "<div>" + l.label + ": " + mw(l.f(x)) + "</div>"; }).join(""); },
       tipStep: 1, aria: aria,
-      text: { head: ["Hour", "Actual"].concat(lines.map(function (l) { return l.label; })), rows: S.map(function (x) { return [dayLabel(x.date) + " " + x.he + ":00", mw(P.d[x.i])].concat(lines.map(function (l) { return mw(l.f(x)); })); }) }
+      text: bandText(P, S, lines, band)
     };
+  }
+  // a week chart's text version: every hour's actual and forecasts; with a band, its two edges and whether the actual
+  // falls inside (review M10 #7)
+  function bandText(P, S, lines, band) {
+    var inside = 0, rows = S.map(function (x) {
+      var r = [dayLabel(x.date) + ", hour ending " + x.he + ":00", mw(P.d[x.i])].concat(lines.map(function (l) { return mw(l.f(x)); }));
+      if (band) { var m = band.f(x), a = m + band.lo, b = m + band.hi, ok = P.d[x.i] >= a && P.d[x.i] <= b; if (ok) inside++; r.push(mw(a), mw(b), ok ? "yes" : "no"); }
+      return r;
+    });
+    return { head: ["Hour", "Actual"].concat(lines.map(function (l) { return l.label; }), band ? ["Band, low", "Band, high", "Inside the band?"] : []), rows: rows,
+             note: band ? "Inside the band: " + inside + " of these " + S.length + " hours." : null };
+  }
+  // the first chart's text version: every day's mean demand and its period (review M10 #7)
+  function dailyRows(P, D) {
+    var S = D.split, per = function (k) { return k >= S.train[0] && k <= S.train[1] ? "train" : k >= S.val[0] && k <= S.val[1] ? "choose" : k >= S.test[0] && k <= S.test[1] ? "test" : k < S.train[0] ? "inputs only (lags)" : "not used"; };
+    return Object.keys(P.dayMean).sort().map(function (k) { return [dayLabel(k), mw(P.dayMean[k]), per(k)]; });
   }
 
   LX.mount("m10", function (live, data, root) {
@@ -278,7 +306,7 @@
 
     // ---- 1 the task, the split and a guess
     steps.push({
-      text: "Forecast every hour of tomorrow's Plains (SPP) [[demand|demand]] at midnight, with 2025 split by time: train to September, choose on October, test once on November. Which simple rule misses least?",
+      text: "At 00:00, forecast every hour of the day just starting for SPP's [[demand|demand]], with 2025 split by time: train to September, choose on October, test once on November. Which simple rule misses least?",
       build: function (act, api) {
         var P1 = LX.Plot(act, { text: "Text version of the chart" }), dm = [], dates = Object.keys(P.dayMean).sort();
         dates.forEach(function (k) { dm.push(P.dayMean[k]); });
@@ -289,7 +317,8 @@
                     lines: [{ values: dm, x0: 0.5, color: COL.actual, width: 1.8 }],
                     legend: [{ label: "Daily mean demand", color: COL.actual }, { label: "Train: 8 January to 30 September", color: COL.train }, { label: "Choose: October", color: COL.val }, { label: "Test: November", color: COL.test }],   // span names in the legend: October and November are too narrow to label on phones
                     aria: "SPP's daily mean demand in 2025, with the training, choosing and test periods shaded.",
-                    text: { head: ["Period", "Dates", "Hours"], rows: [["Train", "8 January to 30 September", String(P.train.length)], ["Choose (validate)", "October", String(P.val.length)], ["Test", "November", String(P.test.length)]] } });
+                    text: { head: ["Date", "Daily mean demand", "Period"], rows: dailyRows(P, D),
+                            note: "Train: 8 January to 30 September, " + P.train.length.toLocaleString("en-US") + " hours; choose: October, " + P.val.length + "; test: November, " + P.test.length + "." } });
         LX.Predict(act, { id: "m10-rule", q: "Your pick:", answer: "day", fresh: true, title: false,
           options: D.guess.map(function (g) { return { value: g.value, label: g.label, color: COL[g.value] }; }),
           lockText: "Locked in. Step 2 scores all three on October.",
@@ -299,7 +328,7 @@
 
     // ---- 2 the baselines on October
     steps.push({
-      text: "Score the three [[forecast-baseline|baselines]] on October, as [[mae|MAE]] in MW and [[mape|MAPE]]. Any learned model must beat the best of them.",
+      text: "Score the three [[forecast-baseline|baselines]] on October, as [[mae|MAE]] and [[rmse|RMSE]] in MW and as [[mape|MAPE]]. Any learned model must beat the best of them.",
       build: function (act, api) {
         var seen = {}, keys = ["persist", "day", "week"];
         seg(rowEl(act), keys.map(function (k) { return RNAME[k]; }), -1, function (i) { seen[keys[i]] = 1; draw(keys[i]); }, "Baseline");
@@ -317,7 +346,7 @@
 
     // ---- 3 targets and horizons
     steps.push({
-      text: "Which baseline wins depends on the target and the [[forecast-horizon|horizon]]. Compare holding the latest value 1 to 24 hours ahead for demand, wind and solar, on October.",
+      text: "Which baseline wins depends on the target and the [[forecast-horizon|horizon]]. For this comparison only, issue a new forecast every hour from the reading h hours earlier, for demand, wind and solar.",
       build: function (act, api) {
         var seen = {}, keys = ["demand", "wind", "solar"], lab = { demand: "Demand", wind: "Wind", solar: "Solar" }, Hs = D.horizons;
         seg(rowEl(act), keys.map(function (k) { return lab[k]; }), -1, function (i) { seen[keys[i]] = 1; draw(); }, "Target");
@@ -326,8 +355,8 @@
           var ks = keys.filter(function (k) { return seen[k]; });
           P3.render({ x: { min: 0, max: 24, ticks: Hs.map(function (h, j) { return [h, h + " h", j === Hs.length - 1 ? "end" : "middle"]; }) }, y: { min: 0, max: 50, step: 10, fmt: function (v) { return v + "%"; }, unit: "% of max" }, height: 210, heightN: 190,
                      lines: ks.map(function (k) { return { pts: Hs.map(function (h, j) { return [h, F.horizon[k][j]]; }), color: COL[k], dots: true }; }), legend: ks.map(function (k) { return { label: lab[k], color: COL[k] }; }),
-                     aria: "Mean absolute error of holding the latest value, by hours ahead, in % of each series' 2025 maximum.",
-                     text: { head: ["Hours ahead"].concat(ks.map(function (k) { return lab[k]; })), rows: Hs.map(function (h, j) { return [String(h)].concat(ks.map(function (k) { return F.horizon[k][j].toFixed(1) + "%"; })); }) } });
+                     aria: "October: mean absolute error of a forecast issued every hour that holds the reading h hours earlier, by hours ahead h, in % of each series' 2025 maximum.",
+                     text: { head: ["Hours ahead (issued every hour)"].concat(ks.map(function (k) { return lab[k]; })), rows: Hs.map(function (h, j) { return [String(h)].concat(ks.map(function (k) { return F.horizon[k][j].toFixed(1) + "%"; })); }) } });
           out.innerHTML = ks.map(function (k) { return lab[k] + ": " + F.horizon[k][0].toFixed(1) + "% at 1 h, " + F.horizon[k][3].toFixed(1) + "% at 12 h, " + F.horizon[k][4].toFixed(1) + "% at 24 h"; }).join("; ") + ".";
           if (ks.length === 3) { api.done(); api.saw("Wind's error grows from " + F.horizon.wind[0].toFixed(1) + "% to " + F.horizon.wind[4].toFixed(1) + "% over a day; solar's falls back at 24 hours, when the sun returns. Solar is zero in " + F.solarZeros + " of " + P.val.length + " October hours, so MAPE cannot score it."); }
           else api.saw("Targets compared: " + ks.length + " of 3.", true);
@@ -338,7 +367,7 @@
 
     // ---- 4 a learned model: pick features, fit on the training months, score on October
     steps.push({
-      text: "Fit a [[linear-regression|linear regression]] on January to September with [[feature|features]] you pick, then score it on October. Every feature must be known at midnight.",
+      text: "Fit a [[linear-regression|linear regression]] on January to September with [[feature|features]] you pick, then score it on October. Every feature must be known at 00:00, when the forecast is issued.",
       build: function (act, api) {
         var use = {}, tried = {};
         H("p", { class: "lx-hint", text: "Always in: same hour yesterday. Add:" }, act);
@@ -368,9 +397,9 @@
 
     // ---- 5 find the leak
     steps.push({
-      text: "Two more models score far better on October. Mark each one fair or a [[data-leakage|leak]]: could you know its extra feature at midnight, for every hour of tomorrow?",
+      text: "Two more models score far better on October. Mark each one fair or a [[data-leakage|leak]]: at 00:00, could you know its extra feature for every hour of the day ahead?",
       build: function (act, api) {
-        var cands = [{ k: "lag1", label: "+ the hour before", val: F.leakVal.lag1, leak: true }, { k: "oracle", label: "+ tomorrow's average demand", val: F.leakVal.oracle, leak: true }], marks = {}, out = readout(act);
+        var cands = [{ k: "lag1", label: "+ the hour before", val: F.leakVal.lag1, leak: true }, { k: "oracle", label: "+ the day's actual average demand", val: F.leakVal.oracle, leak: true }], marks = {}, out = readout(act);
         H("p", { class: "lx-hint", text: "The best mix scores " + mw(best.val) + " on October." }, act);
         cands.forEach(function (c) {
           var r = rowEl(act); H("span", { class: "m10-cand", html: "<b>" + c.label + "</b>: " + mw(c.val) }, r);
@@ -380,8 +409,8 @@
         function check() {
           var n = Object.keys(marks).length, right = cands.filter(function (c) { return marks[c.k] === c.leak; }).length;
           out.innerHTML = "Marked " + n + " of 2; " + (n === 2 ? right + " right." : "");
-          if (n === 2 && right === 2) { api.done(); api.saw("At midnight you know neither the hour before 18:00 tomorrow nor tomorrow's average. Scores of " + mw(F.leakVal.lag1) + " and " + mw(F.leakVal.oracle) + " are look-ahead: a score that looks too good usually is."); }
-          else if (n === 2) api.saw("Not quite: ask whether each value exists at midnight for 18:00 tomorrow.", true);
+          if (n === 2 && right === 2) { api.done(); api.saw("At 00:00 the hour before is known only for the day's first hour, and the day's average not at all. Scores of " + Math.round(F.leakVal.lag1).toLocaleString("en-US") + " and " + mw(F.leakVal.oracle) + " use look-ahead: a score this good is a reason to check for leakage."); }
+          else if (n === 2) api.saw("Not quite: issued at 00:00, does each value exist yet for the hour ending 18:00 that day?", true);
         }
         out.textContent = "Mark both.";
       }
@@ -416,7 +445,7 @@
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(weekSpec(P, D.weeks.test[0], D.weeks.test[1], [{ f: fBest, color: COL.model, label: "Chosen mix" }], { f: fBest, lo: lo, hi: hi, label: l[0] + "% band from October's misses" }, "The last November week with a " + l[0] + "% band."));
           out.innerHTML = l[0] + "% band: " + mw(lo).replace(/^-/, "−") + " to +" + mw(hi) + " around the forecast; it holds <b>" + pc(F.band.cov[l[0]]) + "</b> of November's hours.";
-          if (seen[1]) { api.done(); api.saw("The 80% band holds " + pc(F.band.cov[80]) + " of November's hours, more than 80%: November's misses were smaller, on average, than October's. Hours come in runs, so a month is a small sample."); }
+          if (seen[1]) { api.done(); api.saw("The 80% band holds " + pc(F.band.cov[80]) + " of November's hours. It pools October's misses across all hours; coverage can differ by hour and horizon, and a month is a small sample."); }
           else api.saw("Pick the 80% band too.", true);
         }
         out.textContent = "Pick a band.";
@@ -443,7 +472,7 @@
 
     // ---- 9 the worst days
     steps.push({
-      text: "Averages hide bad days. Tap the November day the chosen model missed most; it has no temperature or holiday input.",
+      text: "Averages hide bad days. Find and tap the November day the chosen model missed most; it has no temperature or holiday input.",
       build: function (act, api) {
         var DL = F.daily, P9 = LX.Plot(act, { text: "Text version of the chart" }), out = readout(act), sel = -1;
         function draw() {
@@ -459,6 +488,7 @@
           sel = k; draw();
           var x = DL[k], rank = DL.slice().sort(function (a, b) { return b.mae - a.mae; }).indexOf(x) + 1;
           out.innerHTML = dayLabel(x.date) + (x.date === D.holiday.date ? " (" + D.holiday.name + ")" : "") + ": <b>" + mw(x.mae) + "</b>, the " + (rank === 1 ? "worst" : rank + (rank === 2 ? "nd" : rank === 3 ? "rd" : "th") + " worst") + " of " + DL.length + " days.";
+          if (rank !== 1) { api.saw("Not the worst day yet: look for the tallest bar, or the largest MAE in the text version.", true); return; }
           api.done(); api.saw("The three worst days, " + F.worst.map(function (w) { return dayLabel(w.date); }).join(", ") + ", hold " + pc(F.worstShare, 0) + " of November's error; the 27th is " + D.holiday.name + ". Report the bad days, not only the mean.");
         }
         draw();
@@ -492,12 +522,12 @@
     x.innerHTML = "";
     var B = F.base;
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "An honest forecast, move by move", lede: "The reference case, whatever you set above: SPP demand, made at midnight for the next day. Trace three cases.",
+      title: "An honest forecast, move by move", lede: "The reference case, whatever you set above: SPP demand, issued at 00:00 for each hour of that day. Trace three cases.",
       nodes: {
         q: { t: "Target and horizon", tN: ["Target and", "horizon"], s: "demand, 1–24 h", sN: "1–24 h", k: "end" },
         sp: { t: "Split by time", tN: ["Split", "by time"], s: "train · choose · test", sN: "never shuffle" },
         bl: { t: "Baselines first", tN: ["Baselines", "first"], s: "same hour yesterday", sN: "yesterday" },
-        ft: { t: "Known at midnight?", tN: ["Known at", "midnight?"], k: "q" },
+        ft: { t: "Known at 00:00?", tN: ["Known at", "00:00?"], k: "q" },
         lk: { t: "Leak: drop it", tN: ["Leak:", "drop it"], s: "look-ahead", sN: "look-ahead", k: "end" },
         fit: { t: "Fit on train", tN: ["Fit on", "train"], s: "16 mixes", sN: "16 mixes" },
         ch: { t: "Choose on October", tN: ["Choose on", "October"], s: mw(F.best.val), sN: "October" },
@@ -509,7 +539,7 @@
       edges: [["q", "sp"], ["sp", "bl"], ["bl", "ft"], ["ft", "lk", "no"], ["ft", "fit", "yes"], ["fit", "ch"], ["ch", "te"], ["te", "rp"]],
       traces: [
         { label: "The chosen mix", path: ["q", "sp", "bl", "ft", "fit", "ch", "te", "rp"], text: "October " + mw(F.best.val) + ", November " + mw(F.best.test) + ": " + pc(F.skillTest) + " better than same hour yesterday." },
-        { label: "+ the hour before", path: ["q", "sp", "bl", "ft", "lk"], text: mw(F.leakVal.lag1) + " on October, from a value nobody has at midnight." },
+        { label: "+ the hour before", path: ["q", "sp", "bl", "ft", "lk"], text: mw(F.leakVal.lag1) + " on October, from a value unknown at 00:00 for every hour after the first." },
         { label: "Chosen on November", path: ["q", "sp", "bl", "ft", "fit", "te", "rp"], text: "Skipping October would report " + mw(F.testBest.test) + ": a test that also chose is no longer a test." }
       ], sel: 0
     });
@@ -526,10 +556,11 @@
     var pc2 = H("div", { class: "lx-xcard" }, x);
     H("header", { class: "lx-x-head", html: "<h3>Why prices are harder</h3>" }, pc2);
     var ref = function (c) { return PATH && LX.lessonRefHTML ? LX.lessonRefHTML(PATH, c) : c + " (upcoming)"; };
-    H("p", { html: "A price is set by the last plant needed (" + ref("M1") + "), so it jumps when demand nears the supply's steep end, and it changes with market rules (" + ref("A3") + "). Spikes and regime changes make yesterday a poor guide; this page builds no price model." }, pc2);
+    H("p", { html: "In a simple supply-stack model, the marginal plant sets the energy price (" + ref("M1") + "), so it jumps when demand nears the supply's steep end." }, pc2);
+    H("p", { html: "Actual prices also reflect network limits, operating constraints and market rules (" + ref("A3") + "). Spikes and regime changes make yesterday a poor guide; this page builds no price model." }, pc2);
     LX.Boundary(H("div", { class: "lx-xcard" }, x), { title: "Where this lesson's numbers hold",
-      holds: ["SPP's reported 2025 demand, as cleaned in the course's data (EIA-930);", "a forecast made at local midnight for every hour of the next day;", "train January to September, choose on October, test on November 2025;", "linear least squares with lags and calendar features."],
-      leaves: ["weather forecasts and temperature, the strongest real inputs;", "holidays and daylight-saving days as features;", "updates during the day, as operators make them;", "other months: one test month is a small sample."],
+      holds: ["SPP's reported 2025 demand, cleaned afterwards for the course (EIA-930): a demonstration, not an operational backtest;", "a forecast issued at local 00:00 for every hour of that day; same clock hour for the lags;", "train January to September, choose on October, test on November 2025;", "linear least squares with lags and calendar features."],
+      leaves: ["data as known at 00:00: the cleaning used later actuals, and repaired hours are scored with the rest;", "weather forecasts and temperature, the strongest real inputs;", "holidays and daylight-saving days as features;", "updates during the day, as operators make them;", "other months: one test month is a small sample."],
       source: "Data: EIA-930 via the course's town_year.json; SPP's 2025 peak " + D.peakMW.toLocaleString("en-US") + " MW." });
   }
 })();

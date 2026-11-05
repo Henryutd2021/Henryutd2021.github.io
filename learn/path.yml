@@ -996,7 +996,7 @@
   short: "Forecasting with machine learning"
   outcome: "Build baselines and a learned forecast on a chronological split, score them on a held-out month with MAE, skill, pinball loss and coverage, and spot look-ahead leaks."
   teaches: [persistence and seasonal-naive baselines, chronological train, validation and test split, linear regression with lags, data leakage, quantile forecasts and pinball loss, interval coverage]
-  lab: "a pandas and scikit-learn notebook that rebuilds the page's split and checks it, then gradient boosting and a small neural network on the same features, about 60 minutes, then 90 minutes of practice."
+  lab: "a pandas and scikit-learn notebook that rebuilds the page's split and checks it, then gradient boosting and a small neural network on the linear mix's inputs and on a wider set, about 60 minutes, then 90 minutes of practice."
   does: "Beat persistence and seasonal-naive baselines on a held-out month of real data; fit a learned model; score point and probabilistic forecasts (MAE, pinball loss); find the leak in a model that looks too good."
   after: [4, M7]
 - {kind: lesson, tier: modeler, code: M11, title: "Techno-economic analysis inside an optimization model"}
@@ -1378,7 +1378,7 @@
   tier: analyst
   form: case
   icon: turbine
-  status: upcoming
+  status: active
   minutes: 10
   title: "Learning a wind turbine's power curve from scarce data"
   subtitle: "Why a measured power curve is a band, and how a turbine's theoretical curve can narrow it when records are few"
