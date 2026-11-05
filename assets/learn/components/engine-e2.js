@@ -37,14 +37,16 @@
    day's revenue at those prices (energy and reserve) falls short of its running, no-load and start-up costs is paid
    the difference (make-whole), charged to load in proportion to energy (C2).
 
-   Tie rule (W2 review finding 2), all costs in $/MWh and tiny against every real cost: spilling wind and sun costs
-   0.001 at Wind Ridge, 0.002 at Prairie Town, 0.003 in Metro (the farthest from the city spills first); unserved load
-   costs 0.3, 0.2, 0.1 above $5,000 in W, T, M (Metro's load is shed first when several zones could be); reserve costs
-   0.0001 x (the group's place in the list + 1) per MWh, so the groups listed first carry reserve first; the battery
-   0.01 per MWh in or out, plus 0.0001 x hour on charging and 0.0001 x (23 - hour) on discharging (earlier charging,
-   later discharging when prices tie). The test re-solves with other tie weights and checks every number the pages show
-   (totals, prices, flows, uplift); each shown price is checked as the slope of the cost when the zone's load moves
-   0.1 MWh up and down (equal slopes: no corner, so the price is unique).
+   Tie rule (W2 review finding 2), all in $/MWh (data file, `tie`), far below a cent: spilling wind and sun costs
+   0.00001 at Wind Ridge, 0.00002 at Prairie Town, 0.00003 in Metro (the farthest from the city spills first); unserved
+   load 0.003, 0.002, 0.001 above $5,000 in W, T, M (Metro's load is shed first when several zones could be); reserve
+   0.000001 x (the group's place in the list + 1), so the groups listed first carry reserve first; the battery 0.001 per
+   MWh in or out, plus 0.00001 x hour on charging and 0.00001 x (23 - hour) on discharging (earlier charging, later
+   discharging when prices tie). The test re-solves with the tie weights x10 and x0.1 and checks every number the pages
+   show (totals, prices, flows, uplift, commitments; with a battery its hourly schedule and the flows may differ, and the
+   pages say so); each shown price (zones and reserve) is checked as the slope of the cost when its row moves 0.001 MWh
+   up and down (equal slopes: no corner, so the price is unique); and the commitment of the first days of each tested
+   run is the MILP's unique optimum (the best commitment that differs anywhere costs more).
    Every MILP stops only within 0.0001% of its best bound (mip_rel_gap 1e-6). "Optimal" only when every solve of a run
    is optimal; a time limit with a plan returns status "time-limit", the plan, its gap and "not proven optimal".
 
@@ -156,7 +158,7 @@
   }
   var c2presets = [
     { id: "ask", label: "Connect it, build nothing", state: { conn: 300, flex: 0, pk: 0, bat: 0, wind: 0, solar: 0, up: 0 }, note: "The 300 MW request on today's grid" },
-    { id: "firm", label: "Peakers and an uprate", state: { conn: 300, flex: 0, pk: 4, bat: 0, up: 300 }, note: "Four 50 MW peakers at Town and 300 MW more on Town–Metro" },
+    { id: "firm", label: "Peakers and an uprate", state: { conn: 300, flex: 0, pk: 6, bat: 0, up: 300 }, note: "Six 50 MW peakers at Town and 300 MW more on Town–Metro" },
     { id: "flex", label: "Flexible load and a battery", state: { conn: 300, flex: 20, bid: 500, pk: 0, bat: 100, up: 0 }, note: "20% curtailable above $500/MWh, and a 100 MW battery" },
     { id: "staged", label: "Stage it: 150 MW now", state: { conn: 150, flex: 0, pk: 0, bat: 0, up: 0 }, note: "Half the request this year, the rest later" }
   ];
@@ -341,12 +343,15 @@
   function worst(list) { var w = "optimal"; list.forEach(function (s) { if ((RANK[s] == null ? 5 : RANK[s]) > (RANK[w] == null ? 5 : RANK[w])) w = s; }); return w; }
   // the days a task runs: [{ y, day, carry (use yesterday's state), label }]
   function daysOf(state, P, task) {
-    if (task === "year") return P.rep.map(function (r) { return { y: r.year, day: r.day, carry: false, weight: r.weight, label: dayLong(r.day) }; });
-    if (task === "weeks") {
-      var out = [];
-      P.cfg.c2.weeks.forEach(function (id) { var pr = P.periods[id]; for (var d = 0; d < pr.days; d++) out.push({ y: String(pr.year), day: pr.day0 + d, carry: d > 0, period: id, label: dayLong(pr.day0 + d) }); });
-      return out;
-    }
+    // C2's year (§9.3): the 12 representative days, each weighted by its month's days, less the days of a kept hard week
+    // in that month; then the two hard weeks, day by day in order (weight 1 each): 365 days in all
+    var wk = [];
+    if (task === "year" || task === "weeks") P.cfg.c2.weeks.forEach(function (id) { var pr = P.periods[id]; for (var d = 0; d < pr.days; d++) wk.push({ y: String(pr.year), day: pr.day0 + d, carry: d > 0, period: id, weight: 1, label: dayLong(pr.day0 + d) }); });
+    if (task === "weeks") return wk;
+    if (task === "year") return P.rep.map(function (r) {
+      var less = wk.filter(function (x) { return dateOf(x.day).m === r.month; }).length;
+      return { y: r.year, day: r.day, carry: false, weight: r.weight - less, rep: true, label: dayLong(r.day) };
+    }).concat(wk);
     var p = P.periods[state.per] || P.periods[P.periodList[0]], o = [];
     for (var k = 0; k < p.days; k++) o.push({ y: String(p.year), day: p.day0 + k, carry: k > 0, period: p.id, label: dayLong(p.day0 + k) });
     return o;
@@ -414,7 +419,7 @@
   // R: { task, sys, days: [readDay], tot (sums over the days, or weighted to a year for task "year"), avg, max, ... }
   function summarize(state, P, raw) {
     var sys = raw.sys, days = raw.days, task = raw.task, U = fleet(P, sys), Z = P.zones;
-    var w = days.map(function (d) { return task === "year" ? d.spec.weight : 1; });
+    var w = days.map(function (d) { return d.spec && d.spec.weight != null ? d.spec.weight : 1; });
     var T = { running: 0, noload: 0, startup: 0, prod: 0, co2: 0, shed: 0, rshort: 0, spill: 0, curtail: 0, llMWh: 0, llPay: 0, rent: 0, upliftAll: 0, batIn: 0, batOut: 0,
       gen: {}, starts: {}, uplift: {}, pay: Z.map(function () { return 0; }), load: Z.map(function () { return 0; }), base: Z.map(function () { return 0; }),
       cong: {}, spillZ: Z.map(function () { return 0; }), shedZ: Z.map(function () { return 0; }) };
@@ -666,7 +671,8 @@
       g.fields.forEach(function (id) {
         var f = S.fields.filter(function (x) { return x.id === id; })[0];
         if (f.type === "enum") {
-          var row = H("div", { class: "e2-segrow" }, fs); H("span", { class: "e2-segl", text: f.label }, row);
+          var row = H("div", { class: "e2-segrow" }, fs);
+          if (g.fields.length > 1) H("span", { class: "e2-segl", text: f.label }, row);   // a group of one: its legend names it
           ctl[id] = seg(row, f.label, f.values, f.names, plan[id], function (v) { var p = copy(plan); p[id] = v; onChange(p); });
           ctl[id].kind = "enum";
         } else {

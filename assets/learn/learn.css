@@ -2233,3 +2233,14 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e2-say.bad b { color: var(--lx-bad); }
 .e2-say.good { background: var(--lx-good-soft); border-left: 4px solid var(--lx-good); }
 .e2-notes { margin: .3rem 0 0; padding-left: 1.1rem; display: grid; gap: 2px; font-size: 13.5px; color: var(--lx-ink-2); }
+
+/* row labels of the data tables: plain words, not the column headings' small capitals; on phones (base.css shows one
+   block per row with the header hidden) each cell is labelled with its column */
+.lx-facts.e2-lab tbody th, .e2-units tbody th { text-transform: none; letter-spacing: 0; font-size: 14.5px; font-weight: 500; color: var(--lx-ink); }
+@media (max-width: 640px) {
+  .lx-facts.e2-lab th[scope="row"], .e2-units th[scope="row"] { display: block; padding: 2px 0; border: 0; }
+  .lx-facts.e2-lab td[data-l]::before, .e2-units td[data-l]::before { content: attr(data-l) ": "; font-family: var(--lx-f-display); font-weight: 400; font-size: 12.5px; color: var(--lx-ink-3); white-space: normal; }
+}
+
+/* the inputs table: values may wrap, so the source column keeps its room */
+.e2-inputs td.n { white-space: normal; min-width: 6.5em; }

@@ -20,10 +20,11 @@
     else out.push({ kind: "good", text: "**Every MWh served** in all " + R.hours + " hours." });
     if (T.rshort > 0.5) out.push({ kind: "bad", text: "**Reserve short by " + kilo(T.rshort) + " MWh** over " + kilo(R.rshortHours) + " hours: each MWh short costs the model $" + kilo(P.cfg.reserveShort) + ", and the reserve price shows it." });
     P.links.forEach(function (l) {
-      var n = T.cong[l.id];
-      if (n > 0) out.push({ kind: "", text: "**" + l.name + " at its limit for " + kilo(n) + " of " + R.hours + " hours:** in those hours the prices on its two sides differ." });
+      var n = T.cong[l.id], a = P.zix[l.from], b = P.zix[l.to], split = 0;
+      R.days.forEach(function (d) { d.hours.forEach(function (h) { var cap = R.sys.caps[l.id]; if (cap > 0 && Math.abs(h.f[l.id]) >= cap - 1e-6 && Math.abs(h.z[a].price - h.z[b].price) >= 0.5) split++; }); });
+      if (n > 0) out.push({ kind: "", text: "**" + l.name + " at its limit for " + kilo(n) + " of " + R.hours + " hours;** in " + (split === n ? (n === 1 ? "that hour" : "all of them") : kilo(split) + " of them") + " the prices on its two sides differ by $1/MWh or more ([[congestion|congestion]])." });
     });
-    if (P.links.every(function (l) { return T.cong[l.id] === 0; })) out.push({ kind: "", text: "**No link reaches its limit,** so the three zones' prices stay within a few cents of each other every hour." });
+    if (P.links.every(function (l) { return T.cong[l.id] === 0; })) out.push({ kind: "", text: "**No link reaches its limit,** so the three zones' prices stay within a cent of each other every hour." });
     out.push({ kind: "", text: "**" + moneyK(T.upliftAll) + " of uplift:** what committed units' running, no-load and start-up costs exceed their revenue at these prices, paid on top (make-whole)." });
     return out;
   }
