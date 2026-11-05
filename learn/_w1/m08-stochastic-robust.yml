@@ -1,0 +1,40 @@
+# Sidecar for M8 (m08-stochastic-robust), builder learn-w4-d, 2026-11-05. Read by scripts/build_learn.py.
+id: m08-stochastic-robust
+lesson: M8
+glossary:
+  - id: scenario-tree
+    term: Scenario tree
+    def: "A picture of a decision under uncertainty: a choice made now at the root, then one branch for each way the future may turn out, each with its chance."
+  - id: here-and-now
+    term: Here-and-now decision
+    def: "A decision that must be made before an uncertainty resolves, such as the size of a plant, and so is the same in every branch."
+  - id: recourse
+    term: Recourse decision
+    def: "A decision made after the uncertainty resolves, such as how hard to run a plant in each branch; it can differ from branch to branch."
+  - id: wait-and-see
+    term: Wait-and-see problem
+    def: "The planning problem solved as if the future were known: one best plan for each branch, which no real planner can choose in advance."
+  - id: expected-value-problem
+    term: Expected-value problem
+    def: "The planning problem solved for one average future, every uncertain input set to its mean; its plan is then priced in the real branches."
+  - id: two-stage-stochastic-program
+    term: Two-stage stochastic program
+    def: "An optimization model that chooses the here-and-now decisions and each branch's recourse together, to minimise the expected cost over all branches."
+  - id: value-of-stochastic-solution
+    term: Value of the stochastic solution (VSS)
+    def: "How much the stochastic program's plan saves, in expectation, against the plan built for the average future."
+  - id: evpi
+    term: Expected value of perfect information (EVPI)
+    def: "How much a perfect forecast would save, in expectation, against the stochastic plan: the most such a forecast is worth to a planner who weighs only expected cost."
+  - id: robust-optimization
+    term: Robust optimization
+    def: "Planning against a set of possible futures without chances: here, choosing the plan whose worst cost over the set is lowest."
+  - id: regret
+    term: Regret
+    def: "A plan's cost in one future minus the cost of the best plan for that future, known only in hindsight; the least-regret plan keeps the largest regret smallest."
+  - id: gas-reformer
+    term: Gas reformer
+    def: "A plant that makes hydrogen from natural gas and steam, releasing carbon dioxide unless it is captured."
+requests:
+  - "M7's path.yml row says 'next: M8 once M8 is live': M8 is live in this branch, so M7's next box can lead to M8 (coordinator)."
+  - "LX.m08 (the closed form of M8's toy) is read by case file CF3, which loads m08-stochastic-robust.js: candidate for promotion if a second page needs it."
