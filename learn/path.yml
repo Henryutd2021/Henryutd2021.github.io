@@ -1003,8 +1003,39 @@
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
 - {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
-- {kind: lesson, tier: modeler, code: SB2, form: sandbox, title: "Grid Room"}
-- {kind: lesson, tier: modeler, code: C2, form: capstone, title: "The Plains Grid in a hard year"}
+- kind: lesson
+  id: sb2-grid-room
+  code: SB2
+  tier: modeler
+  form: sandbox
+  icon: tower
+  status: active
+  minutes: 30
+  title: "Grid Room"
+  subtitle: "Run a fictional three-zone grid on real 2025 days: commit the plants, price each zone conditional on that commitment, and add a large load"
+  short: "Grid Room"
+  does: "Three zones on a transport model with two link limits, unit commitment as a mixed-integer program, operating reserves, then prices from the dispatch linear program with the commitment fixed; add a 300 MW data center as a load and watch the prices, flows and uplift."
+  outcome: "Run unit commitment and conditional pricing on a three-zone grid, and explain how a large load, a link limit or the reserve requirement changes prices, flows and who is short."
+  teaches: [unit commitment, prices conditional on the commitment, transfer limits and congestion, operating reserves, uplift, a large load on the grid]
+  after: [M2, M1]
+- kind: lesson
+  id: c2-plains-grid-hard-year
+  code: C2
+  tier: modeler
+  form: capstone
+  sandbox: SB2
+  icon: target
+  status: active
+  minutes: 180
+  lab_minutes: 45   # the Modeler version adds M2's notebook (learn_map_v2.yml: M2 lab_minutes)
+  title: "The Plains Grid in a hard year"
+  subtitle: "A 300 MW data center asks to connect at Prairie Town: choose what connects and what to build, test a peak-demand week and a low-wind winter week, check adequacy and show who pays"
+  short: "The Plains Grid in a hard year"
+  does: "Three zones linked by transfer limits, one congested link, a 300 MW large load asking to connect, a peak-demand week and a low-wind winter week: choose builds, transmission, reserves and who pays; commit units with the MILP, price with the dispatch LP (conditional prices), check adequacy with a Monte Carlo and report who pays."
+  outcome: "Recommend how a large load connects and what to build, defended with conditional prices, an adequacy check with its uncertainty, a ledger of who pays and the study's limits, in a two-page note."
+  teaches: [capstone plan and study note, representative days with extreme weeks kept, adequacy by Monte Carlo, who pays for a large load, conditional prices and uplift]
+  lab: "M2's notebook: unit commitment and conditional prices in SciPy and HiGHS, about 45 minutes."
+  after: [SB2, M2]   # curriculum: [M2, A5, A6, A9]; A5, A6 and A9 join at the merge, once their rows are live
 - {kind: lesson, tier: modeler, code: SB4, form: sandbox, title: "Pathway Explorer"}
 - {kind: lesson, tier: modeler, code: C4, form: capstone, title: "Prairieland 2050: design and defend a nation's pathway"}
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2

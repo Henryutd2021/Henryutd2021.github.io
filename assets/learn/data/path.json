@@ -1535,19 +1535,25 @@
    "tier": "modeler",
    "code": "SB2",
    "title": "Grid Room",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "sb2-grid-room.html",
    "scales": [],
-   "form": "sandbox"
+   "id": "sb2-grid-room",
+   "minutes": 30,
+   "form": "sandbox",
+   "short": "Grid Room"
   },
   {
    "tier": "modeler",
    "code": "C2",
    "title": "The Plains Grid in a hard year",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "c2-plains-grid-hard-year.html",
    "scales": [],
-   "form": "capstone"
+   "id": "c2-plains-grid-hard-year",
+   "minutes": 180,
+   "form": "capstone",
+   "short": "The Plains Grid in a hard year"
   },
   {
    "tier": "modeler",

@@ -84,8 +84,8 @@ const F1 = JSON.parse(rd("assets/learn/data/f01-five-scales.json")), R3 = JSON.p
   const sr = host.querySelector("p.lx-sr");
   ok(!sr.hidden && sr.textContent === SS.tickSummary(F1.scales, ticks), "view (F1): the sorts summed up for screen readers");
   const les2 = lis[2].querySelector(".lx-ss-les"), links2 = les2.querySelectorAll("a");
-  ok(links2.map(a => a.getAttribute("href")).join() === "00-grid-operator.html,03-balancing.html,08-merit-order.html,m01-dispatch-to-lmp.html,m02-unit-commitment.html" &&
-     /; upcoming: C2 \(the Plains Grid in a hard year\)$/.test(les2.textContent), "view (F1): S2's lessons, M2 linked now that it is live, C2 still upcoming");
+  ok(links2.map(a => a.getAttribute("href")).join() === "00-grid-operator.html,03-balancing.html,08-merit-order.html,m01-dispatch-to-lmp.html,m02-unit-commitment.html,c2-plains-grid-hard-year.html" &&
+     !/upcoming/.test(les2.textContent), "view (F1): S2's lessons, M2 and C2 linked now that they are live (W4: C2 went live on learn-w4-g)");
   const les1 = lis[1].querySelector(".lx-ss-les");
   ok(les1.textContent === "Go further: F7, M5, C1" && les1.querySelectorAll("a").map(a => a.getAttribute("href")).join() === "f07-microgrids.html,m05-microgrid-size-and-run.html,c1-keep-the-campus-running.html",
      "view (F1): S1 links F7, M5 and C1 now that all three are live (W3)");

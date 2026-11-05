@@ -2723,6 +2723,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "transport-model": {
+  "term": "Transport model",
+  "short": "A network model in which each link can carry any flow up to its limit, with no power-flow physics: power goes where the cheapest routes allow.",
+  "lesson": "SB2",
+  "href": "sb2-grid-room.html"
+ },
  "truncated-axis": {
   "term": "Truncated axis",
   "short": "A chart axis that starts above zero; on a bar chart it makes differences look larger than they are.",

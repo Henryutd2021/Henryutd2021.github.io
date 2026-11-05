@@ -35,7 +35,7 @@ const code = s => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'])\/\/.*$/
     ok(bundleJS.indexOf(js.trim()) > 0 && bundleCSS.indexOf(css.trim()) > 0, `${n}: in learn.js and learn.css as written`);
   });
   const head = bundleJS.split("\n")[0];
-  ok(/engine-e1, ledger, solvestep, sankey[,)]/.test(head), "bundle order: ledger, solvestep and sankey after the W3 engines (later waves add after them) (" + head.slice(-60) + ")");
+  ok(/engine-e1, ledger, solvestep, sankey(, engine-e2)?(, adequacy, gp, plainsplan, scenario)?\)/.test(head), "bundle order: ledger, solvestep and sankey after the W3 engines (W4's engine-e2, then the W4 promotions, may follow) (" + head.slice(-60) + ")");
 
   // ---------------------------------------------------------------- LX.Ledger
   {
