@@ -47,16 +47,16 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>A · Gas only</td><td>$103.9M</td><td>815 kt</td><td>cheapest at no carbon price</td></tr>
 <tr><td>B · Gas + 300 MW wind</td><td>$119.4M</td><td>521 kt</td><td>wins between $53 and $64 a tonne</td></tr>
 <tr><td>C · Gas + 500 MW solar</td><td>$131.4M</td><td>488 kt</td><td>not dominated, but no carbon price picks it</td></tr>
-<tr><td>D · Gas + 600 MW wind</td><td>$136.8M</td><td>249 kt</td><td>wins between $64 and $163 a tonne</td></tr>
+<tr><td>D · Gas + 600 MW wind</td><td>$136.8M</td><td>249 kt</td><td>wins between $64 and $166 a tonne</td></tr>
 <tr><td>E · Gas + 800 MW solar</td><td>$159.6M</td><td>433 kt</td><td>dominated: D costs less and emits less</td></tr>
-<tr><td>F · Wind, solar, battery and gas backup</td><td>$158.6M</td><td>115 kt</td><td>wins above $163 a tonne</td></tr>
+<tr><td>F · Wind, solar, battery and gas backup</td><td>$159.1M</td><td>115 kt</td><td>wins above $166 a tonne</td></tr>
 </tbody>
 </table>
 <p class="lx-hint">Plan F: 600 MW wind, 200 MW solar, a 100 MW / 400 MWh battery, and 300 MW of combined-cycle gas plus 80 MW of peakers as backup.</p>
 <p class="lx-hint">With JavaScript on, you pick the dominated plan, slide a carbon price and trace the frontier with a solver.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s; it estimates each plan's year from seven representative weeks, and a full-year check is separate.<br><b>Data:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>Costs:</b> EIA's and NREL's, dated in lesson 13's sources.<br><b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.<br><b>Plans:</b> illustrative, not recommendations; Prairie Town is fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Model:</b> <a href="13-capstone.html">lesson 13</a>'s; it estimates each plan's year from seven representative weeks, and a full-year check is separate.<br><b>Data:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>).<br><b>Costs:</b> EIA's and NREL's, dated in lesson 13's sources.<br><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263).<br><b>Plans:</b> illustrative, not recommendations; Prairie Town is fictional.</span></p>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (how a building cost becomes a cost a year).</p>
 ```
 :::
@@ -113,7 +113,7 @@ $$\min_x \; c(x) \quad \text{subject to} \quad e(x) \le \varepsilon \;\; (\lambd
 
 - **Duality.** For a linear program, strong duality (a theorem that pairs every LP with a "dual" LP of prices) guarantees a $\lambda^* \ge 0$ for which the cap's best plan also minimizes the [weighted sum]{.lx-term term="weighted-sum"} $c(x) + \lambda^* e(x)$. Other plans may tie with it, and a solver may return one of them.
 - **Slope.** Where the frontier is smooth, $\lambda^* = -\,\mathrm{d}c^*/\mathrm{d}\varepsilon$; at a kink, $\lambda^*$ lies between the slopes on either side.
-- **Here.** A 200 kt cap has $\lambda^* = \$85.2$ per tonne; a \$85.2 price with no cap lands at 199 kt and \$129.3M.
+- **Here.** A 200 kt cap has $\lambda^* = \$85.2$ per tonne; a \$85.2 price with no cap lands at 199 kt and \$129.4M.
 - **Ties.** On an exactly straight piece every plan ties at its slope; with integer decisions there is no such guarantee at all.
 
 Mavrotas (2009) shows how to sweep $\varepsilon$ efficiently. Next: [A22](a22-tradeoff-explorer.qmd) (five goals at once); upcoming: M6 (carbon in models).

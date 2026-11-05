@@ -32,7 +32,10 @@ const page = fs.readFileSync(path.join(SITE, "learn/12-trade-offs.qmd"), "utf8")
 const JS = fs.readFileSync(L("12-trade-offs.js"), "utf8");
 let checks = 0, fails = 0;
 function ok(cond, msg) { checks++; if (!cond) { fails++; console.log("FAIL:", msg); } }
-ok(page.indexOf("<b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.") > 0, "data note: the price years of the costs, added unconverted (as lesson 13 and M3)");
+// one price year (W4 carry-over): the data note, as lesson 13 and M3 state it, with the deflator's ratio from the data
+const PF = cfg.deflator.index[String(cfg.priceYear)] / cfg.deflator.index[String(cfg.techs.battery.source.dollarYear)];
+ok(page.indexOf("<b>Price year:</b> " + cfg.priceYear + " dollars throughout; NREL's " + cfg.techs.battery.source.dollarYear + " battery costs are converted with BEA's GDP implicit price deflator (×" + PF.toFixed(4) + ").") > 0 &&
+   page.indexOf("without conversion") < 0, "data note: one price year, with the deflator (as lesson 13 and M3)");
 const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-6 : tol);
 const musd = v => "$" + (v / 1e6).toFixed(1) + "M", kt = v => Math.round(v / 1e3).toLocaleString("en-US") + " kt";
 const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
@@ -58,7 +61,7 @@ const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
   ok(by.D.cost < by.E.cost && by.D.co2 < by.E.co2, `D beats E on both counts: ${musd(by.E.cost - by.D.cost)} less, ${kt(by.E.co2 - by.D.co2)} less`);
   ok(W.intervals.map(w => w.id).join() === "A,B,D,F", "as the price rises the winner moves A, B, D, F");
   const bp = W.intervals.map(w => w.to);
-  ok(near(bp[0], 53.0, 0.05) && near(bp[1], 64.0, 0.05) && near(bp[2], 162.6, 0.05), `breakpoints $${bp.slice(0, 3).map(x => x.toFixed(1)).join(", $")} a tonne`);
+  ok(near(bp[0], 53.0, 0.05) && near(bp[1], 64.0, 0.05) && near(bp[2], 166.1, 0.05), `breakpoints $${bp.slice(0, 3).map(x => x.toFixed(1)).join(", $")} a tonne (F's, $166.1, with the battery in 2025 dollars)`);
   ok(BIG.never.join() === "C,E" && M.supported(plans).join() === "A,B,D,F", "C and E never win at any price; A, B, D, F are supported");
   let cWins = false; for (let p = 0; p <= 1e5; p += p < 1000 ? 0.5 : 50) if (M.winner(plans, p).id === "C") cWins = true;
   ok(!cWins, "scan: C wins at no price from $0 to $100,000 a tonne");
@@ -78,9 +81,10 @@ const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
   const pE = t12.plans.find(p => p.id === "E").plan;
   ok(!pE.wind && !pE.nuc && pE.solar > 0 && /" farm spills "\) \+ fm\.pct\(e\.spilled, 0\) \+ " of what "/.test(JS) && !/of its output, mostly solar/.test(JS), "E's spill is a share of what its solar farm could make (E has no wind or nuclear)");
   // fallback table
-  const notes = { A: "cheapest at no carbon price", B: "wins between $53 and $64 a tonne", C: "not dominated, but no carbon price picks it", D: "wins between $64 and $163 a tonne",
-                  E: "dominated: D costs less and emits less", F: "wins above $163 a tonne" };
-  ok(Math.round(bp[0]) === 53 && Math.round(bp[1]) === 64 && Math.round(bp[2]) === 163, "fallback notes: $53, $64, $163");
+  const rb = bp.map(Math.round);
+  const notes = { A: "cheapest at no carbon price", B: `wins between $${rb[0]} and $${rb[1]} a tonne`, C: "not dominated, but no carbon price picks it", D: `wins between $${rb[1]} and $${rb[2]} a tonne`,
+                  E: "dominated: D costs less and emits less", F: `wins above $${rb[2]} a tonne` };
+  ok(rb[0] === 53 && rb[1] === 64 && rb[2] === 166, "fallback notes: $53, $64, $166");
   plans.forEach(p => onPage(`<tr><td>${p.id} · ${p.label}</td><td>${musd(p.cost)}</td><td>${kt(p.co2)}</td><td>${notes[p.id]}</td></tr>`, `the fallback row for ${p.id}`));
   onPage(`Plan C (${musd(by.C.cost)}, ${kt(by.C.co2)})`, "plan C in Go deeper");
   // quick question

@@ -13,7 +13,9 @@
 //   - timings of the solves the page makes (Node, this machine)
 // Usage (from the site folder):  node _tests/learn/test_13-capstone.js [--full] [--write]
 //   --full   also solve the optimizer on all 8,760 hours (slow: about a minute) and print its error against seven weeks
-//   --write  recompute the precomputed frontier (13-capstone.json) and lesson 12's six plans (12-trade-offs.json) first
+//   --write  recompute the precomputed frontier (13-capstone.json) and lesson 12's six plans (12-trade-offs.json) first;
+//            before them, the battery's costs in the data's price year (techs.battery.source, in the source's dollars,
+//            times the deflator's ratio, rounded to the cent) and the battery's note
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -40,6 +42,20 @@ const rel = (a, b, r) => Math.abs(a - b) <= r * Math.max(1, Math.abs(b));
 const musd = v => "$" + (v / 1e6).toFixed(1) + "M", kt = v => Math.round(v / 1e3).toLocaleString("en-US") + " kt";
 const onPage = (s, what) => ok(page.includes(s), `page states ${what}: "${s}"`);
 const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.floor(b.length / 2)]; };
+// one price year (W4 carry-over): the battery's source costs (2024 dollars) times BEA's GDP deflator ratio, to the cent
+const priceFactor = (cfg, year) => cfg.deflator.index[String(cfg.priceYear)] / cfg.deflator.index[String(year)];
+const cents = v => Math.round(v * 100) / 100, usd2 = v => "$" + v.toFixed(2);
+function batteryInPriceYear(cfg) {
+  const b = cfg.techs.battery, f = priceFactor(cfg, b.source.dollarYear);
+  return { power: cents(b.source.powerCapex * f), energy: cents(b.source.energyCapex * f), f };
+}
+function batteryNote(cfg) {
+  const b = cfg.techs.battery, s = b.source;
+  return "Cost = " + usd2(b.energyCapex) + " per kWh of energy + " + usd2(b.powerCapex) + " per kW of power in " + cfg.priceYear + " dollars (the source's $" +
+    s.energyCapex + " and $" + s.powerCapex + " in " + s.dollarYear + " dollars, converted with the deflator); a 4-hour battery costs " +
+    usd2(b.energyCapex + b.powerCapex / 4) + "/kWh. Fixed O&M " + Math.round(b.fomShare * 100) + "% of capital cost per year; " + b.life + "-year life; " +
+    Math.round(b.rte * 100) + "% round trip.";
+}
 
 (async () => {
   const highs = await loadHighs();
@@ -52,6 +68,9 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   // ---------------- --write: the precomputed frontier and lesson 12's plans
   if (WRITE) {
     const r1 = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
+    const bc = batteryInPriceYear(cfg);
+    cfg.techs.battery.powerCapex = bc.power; cfg.techs.battery.energyCapex = bc.energy; cfg.techs.battery.note = batteryNote(cfg);
+    C = M.costs(cfg, {});
     cfg.frontier.points = cfg.frontier.caps.map(cap => {
       const o = cap == null ? {} : { cap: cap * 1e3 }, r = solve(M.weekModel(C, RW, o)), s = M.summarize(C, per, r, o);
       const plan = {}; M.KEYS.forEach(k => { plan[k] = r1(s.plan[k], 1); });
@@ -75,8 +94,20 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   ok(tc.cc.capex === 1086 && tc.cc.fom === 16.23 && tc.cc.vom === 3.49 && tc.cc.heatRate === 6.226, "EIA Table 3: combined-cycle single-shaft $1,086/kW, $16.23, $3.49/MWh, 6,226 Btu/kWh");
   ok(tc.pk.capex === 1158 && tc.pk.fom === 7.18 && tc.pk.vom === 4.17 && tc.pk.heatRate === 9.142, "EIA Table 3: industrial-frame turbine $1,158/kW, $7.18, $4.17/MWh, 9,142 Btu/kWh");
   ok(tc.nuc.capex === 8255 && tc.nuc.fom === 163.4 && tc.nuc.vom === 2.62 && tc.nuc.fuel === 6.64 && tc.nuc.avail === T.reference.nuclear.cf, "EIA: light-water $8,255/kW, $163.40, $2.62/MWh; fuel 6.64 mills/kWh; 91.1% (cf_targets.json)");
-  ok(tc.battery.energyCapex === 241 && tc.battery.powerCapex === 372 && near(tc.battery.energyCapex + tc.battery.powerCapex / 4, 334) && tc.battery.rte === 0.85 && tc.battery.life === 15 && tc.battery.fomShare === 0.04,
-     "NREL battery 2025 update: $241/kWh + $372/kW (4-hour $334/kWh), 85% round trip, 15 years, O&M 4%");
+  const bs = tc.battery.source, bc = batteryInPriceYear(cfg);
+  ok(bs.dollarYear === 2024 && bs.energyCapex === 241 && bs.powerCapex === 372 && near(bs.energyCapex + bs.powerCapex / 4, 334) && tc.battery.rte === 0.85 && tc.battery.life === 15 && tc.battery.fomShare === 0.04,
+     "NREL battery 2025 update, as the source gives it: $241/kWh + $372/kW in 2024 dollars (4-hour $334/kWh), 85% round trip, 15 years, O&M 4%");
+  // one price year: BEA's GDP implicit price deflator, NIPA Table 1.1.9 line 1, annual (last revised 29 Oct 2026)
+  ok(cfg.priceYear === 2025 && cfg.deflator.index["2024"] === 125.587 && cfg.deflator.index["2025"] === 128.893 && near(bc.f, 128.893 / 125.587, 1e-15),
+     "price year 2025; BEA's GDP deflator 2024 125.587, 2025 128.893 (x" + bc.f.toFixed(4) + ")");
+  const bea = cfg.sources[cfg.deflator.src[0]];
+  ok(cfg.deflator.src.length === 1 && bea && /^https:\/\/apps\.bea\.gov\/iTable\/\?reqid=19&step=3&isuri=1&1921=survey&1903=13&.*1906=a/.test(bea.url) && /NIPA Table 1\.1\.9/.test(bea.text) &&
+     bea.text.includes("2024 125.587, 2025 128.893") && /last revised 29 Oct 2026; accessed 5 Nov 2026/.test(bea.asOf), "deflator source: BEA's Table 1.1.9 (annual view), its values and its dates");
+  ok(tc.battery.energyCapex === bc.energy && tc.battery.powerCapex === bc.power && tc.battery.energyCapex === 247.34 && tc.battery.powerCapex === 381.79,
+     `battery in 2025 dollars: $${tc.battery.energyCapex}/kWh + $${tc.battery.powerCapex}/kW (the source's values times the deflator ratio, to the cent; --write sets them)`);
+  ok(tc.battery.note === batteryNote(cfg), "the battery's note states its 2025-dollar costs, the source's 2024 values and the 4-hour cost (--write sets it): " + tc.battery.note);
+  ok(Object.keys(tc).every(k => k === "battery" || !/\b20\d\d dollars/.test(tc[k].note || "") || /2025 dollars/.test(tc[k].note)) && !/battery 2024 dollars/.test(cfg.units.capex),
+     "no other price year left in the technology notes or the units");
   ok(cfg.fuel.gas === 3.85 && cfg.fuel.co2PerMMBtu === 52.91 && cfg.finance.wacc === 4 && cfg.finance.life === 30, "gas $3.85/MMBtu, 52.91 kg/MMBtu, 4% real, 30 years");
   Object.keys(tc).forEach(k => (tc[k].src || []).forEach(id => {
     const s = cfg.sources[id];
@@ -90,7 +121,7 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   ok(near(C.techs.cc.run, 6.226 * 3.85 + 3.49, 1e-9) && near(C.techs.cc.run, 27.46, 0.005), `combined-cycle running cost $${C.techs.cc.run.toFixed(2)}/MWh`);
   ok(near(C.techs.cc.co2, 6.226 * 0.05291, 1e-12) && near(C.techs.cc.co2, 0.329, 0.0005) && near(C.techs.pk.co2, 0.484, 0.0005), "CO2: 0.329 t/MWh (CC), 0.484 (peaker)");
   ok(near(C.techs.nuc.fixedTotal, C.techs.nuc.fixed + (6.64 + 2.62) * 0.911 * 8760, 1e-6), "nuclear runs flat: fuel and O&M per MWh become a yearly cost per MW");
-  ok(near(C.techs.be.fixed, 1000 * 241 * (M.crf(0.04, 15) + 0.04), 1e-6) && near(C.techs.bp.fixed, 1000 * 372 * (M.crf(0.04, 15) + 0.04), 1e-6), "battery: energy and power parts, 15-year recovery + 4% O&M");
+  ok(near(C.techs.be.fixed, 1000 * 247.34 * (M.crf(0.04, 15) + 0.04), 1e-6) && near(C.techs.bp.fixed, 1000 * 381.79 * (M.crf(0.04, 15) + 0.04), 1e-6), "battery: energy and power parts in 2025 dollars, 15-year recovery + 4% O&M");
   onPage("0.0578", "the capital recovery factor"); onPage("1{,}712 \\times 0.05783 + 34.57 = \\$133.6", "wind's yearly cost");
   ok((1712 * 0.05783 + 34.57).toFixed(1) === "133.6" && (1712 * M.crf(0.04, 30) + 34.57).toFixed(1) === "133.6", "the printed factor 0.05783 reproduces the printed $133.6 (shared fix 11, K3)");
   onPage("6.226 \\times \\$3.85 + \\$3.49 = \\$27.46", "the CC running cost"); onPage("6.226 \\times 0.05291 = 0.329", "the CC CO2 rate");
@@ -240,8 +271,18 @@ const median = a => { const b = a.slice().sort((x, y) => x - y); return b[Math.f
   const strs = []; (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") Object.values(o).forEach(walk); })(cfg);
   const bad = []; strs.forEach(s => s.split(/(?<=[.;:!?])\s+/).forEach(x => { if (NUC.test(x) && RISK.test(x.replace(/merit[- ]order|in order to/gi, ""))) bad.push(x); }));
   ok(!bad.length, "no data sentence pairs nuclear with a risk term: " + bad.join(" | "));
-  // the data note labels the price-year mix (shared fix 9; converting to one price year is a W3 item)
-  onPage("<b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.", "the price years of the costs, added unconverted");
+  // one price year (W4 carry-over; shared fix 9 labelled the mix): the data note, the numbers to remember, the sources
+  // and the boundary card, every number from the data (the deflator's ratio, the battery in 2025 dollars, rounded)
+  onPage("<b>Price year:</b> " + cfg.priceYear + " dollars throughout; NREL's " + bs.dollarYear + " battery costs are converted with BEA's GDP implicit price deflator (×" + bc.f.toFixed(4) + ").", "one price year, with the deflator's ratio");
+  ok(page.indexOf("Price years:") < 0 && page.indexOf("without conversion") < 0 && page.indexOf("battery costs in 2024 dollars") < 0, "no unconverted price-year mix left on the page");
+  const tb = tc.battery, d0 = v => "$" + Math.round(v), beaHref = bea.url.replace(/&/g, "&amp;");
+  onPage('<tr><td class="n">' + d0(tb.energyCapex) + "/kWh + " + d0(tb.powerCapex) + "/kW</td><td>A lithium-ion battery's energy and power costs in " + cfg.priceYear + " dollars (NREL's $" + bs.energyCapex +
+    " and $" + bs.powerCapex + " in " + bs.dollarYear + " dollars, converted); a 4-hour battery: " + d0(tb.energyCapex + tb.powerCapex / 4) + "/kWh.</td>", "the battery's costs in numbers to remember");
+  onPage('<a href="' + beaHref + '">BEA, NIPA Table 1.1.9</a> · revised 29 Oct 2026</td></tr>', "the deflator's source and date in numbers to remember");
+  onPage('<a href="' + beaHref + '">NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 ' + cfg.deflator.index["2024"] + ", 2025 " + cfg.deflator.index["2025"] +
+    ". Last revised 29 October 2026; accessed 5 November 2026.", "the deflator in the sources, with its values and dates");
+  ok(JS.indexOf('"costs stay as entered, all in " + cfg.priceYear + " dollars (the battery\'s " + cfg.techs.battery.source.dollarYear + " costs converted with BEA\'s GDP price index), the same in every year;"') > 0 &&
+     JS.indexOf("the battery in 2024 dollars") < 0, "the boundary card: all costs in the price year, the battery converted");
   // the data file's `about`: constant costs and the reader-set nuclear capital cost are separate sentences (shared fix 8)
   const aboutS = cfg.about.split(/(?<=[.!?])\s+/);
   ok(aboutS.indexOf("Technology costs are constant for the whole year modelled (no change over time).") >= 0 && aboutS.indexOf("The reader can change two inputs: the gas price and the nuclear capital cost.") >= 0 &&

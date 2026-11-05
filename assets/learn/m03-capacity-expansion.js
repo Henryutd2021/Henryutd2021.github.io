@@ -400,7 +400,7 @@
            ["No link", "each week may start at any level."]].forEach(function (r) { H("dt", { text: r[0] }, rules); H("dd", { text: r[1] }, rules); });
           // the what-if, as short labelled lines (W2 review, finding 11)
           var info = H("ul", { class: "m3-info" }, act);
-          [["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + cfg.techs.battery.energyCapex + " (lesson 13). An illustrative what-if, not a forecast or a sourced cost."],
+          [["What-if", "battery energy at $" + D.storage.energyCapex + " per kWh, not the sourced $" + Math.round(cfg.techs.battery.energyCapex) + " in " + cfg.priceYear + " dollars (lesson 13). An illustrative what-if, not a forecast or a sourced cost."],
            ["Why", "so the solver builds a battery large enough for the rules to differ."],
            ["Runs", "three solves, a few seconds on a laptop. Each plan's full-year run was solved in advance; a plan that differs is run here."]]
             .forEach(function (r) { H("li", { html: "<b>" + r[0] + ":</b> " + LX.esc(r[1]) }, info); });
@@ -440,7 +440,7 @@
             feedback: { linked: "Linked keeps the books: energy carried into a week must have been stored before.", cyclic: "Cyclic forbids carrying energy between weeks, so it cannot look cheaper than no rule at all.", free: "With no link, each week may start charged, for free." },
             onPick: function () { pr.reveal(); run(); } });
           st = LX.SolverStatus(H("div", { class: "m3-row" }, act)); tb = H("div", null, act);
-          H("p", { class: "m3-note", html: LX.rich("At the sourced $" + cfg.techs.battery.energyCapex + "/kWh the three rules' estimates agree within $0.1M: the battery built holds about an hour, so it has little to carry from one week to the next.") }, act);
+          H("p", { class: "m3-note", html: LX.rich("At the sourced $" + Math.round(cfg.techs.battery.energyCapex) + "/kWh the three rules' estimates agree within $0.1M: the battery built holds about an hour, so it has little to carry from one week to the next.") }, act);
           run = action({ api: api, st: st, host: act, go: null, job: solveAll,
             failed: function () { return D.storage.modes.every(function (m) { return out[m]; }) ? null : fail || { status: "error", ok: false, message: "no result" }; },
             show: function () {

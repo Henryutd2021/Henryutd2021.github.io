@@ -114,7 +114,35 @@
   "solarMW": 200,
   "topN": 100,
   "eiaWind": 0.338,
-  "eiaSolar": 0.24
+  "eiaSolar": 0.24,
+  "sppWind": {
+   "about": "Southwest Power Pool (balancing authority SWPP) operating wind capacity from EIA's monthly generator inventory: units with Status (OP) Operating and Technology Onshore Wind Turbine, nameplate MW summed. The year's average weights each unit by the share of 2025 it was in service, from its operating month; no SWPP wind unit retired in 2025. A like-for-like capacity factor also needs SPP's 2025 wind output in MWh (EIA-930), which the course data hold only as a shape.",
+   "asOf": "end of December 2025",
+   "units": 254,
+   "plants": 230,
+   "nameplateMW": 35463.4,
+   "netSummerMW": 34585.4,
+   "outOfService": {
+    "units": 2,
+    "nameplateMW": 30
+   },
+   "added2025": {
+    "units": 6,
+    "nameplateMW": 1612.6
+   },
+   "yearAverageNameplateMW": 34395.6,
+   "file": {
+    "name": "december_generator2025.xlsx",
+    "url": "https://www.eia.gov/electricity/data/eia860m/archive/xls/december_generator2025.xlsx",
+    "accessed": "2026-11-05",
+    "bytes": 13463993,
+    "sha256": "1264f1c37cf51ef41319067c4c0915f951535851df93c97d02e2e823e337ea2b",
+    "derivedBy": "scripts/extract_eia860m_spp_wind.py (ResearchPortfolio repository)"
+   },
+   "src": [
+    "eia-860m"
+   ]
+  }
  },
  "defect": {
   "about": "The supplied model: what should Prairie Town build (wind, solar, a gas combined-cycle plant, a gas peaker) to meet demand on three representative days of 2025, each weighted by the days of the year it stands for? One planted defect.",
@@ -518,6 +546,11 @@
    "text": "EIA, Electric Power Monthly, Table 6.07.B (capacity factors, U.S. utility-scale fleets)",
    "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
    "asOf": "2025 annual values (wind 33.8%, solar 24.0%); issue of 23 October 2026, accessed 2 November 2026"
+  },
+  "eia-860m": {
+   "text": "EIA, Preliminary Monthly Electric Generator Inventory (Form EIA-860M), December 2025 data (file december_generator2025.xlsx)",
+   "url": "https://www.eia.gov/electricity/data/eia860m/",
+   "asOf": "December 2025 inventory, file last modified 26 January 2026; accessed 5 November 2026"
   }
  }
 }

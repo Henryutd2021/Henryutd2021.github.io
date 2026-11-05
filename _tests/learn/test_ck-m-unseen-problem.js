@@ -147,6 +147,17 @@ const usd = v => "$" + (Math.round(v * 100) / 100).toLocaleString("en-US", { min
     // the tie rule: stated in the brief, and it matters at the cut
     ok(S.tieD && S.tieN && E.facts.some(f => /earlier one first/.test(f[1])), "empirical: hours tie at the 100th place, so the brief states the tie rule");
     ok(C.topHours([3, 5, 5, 1], 2).join() === "1,2", "tie rule: the earlier hour first");
+    // SPP's operating wind capacity (EIA-860M; W4 carry-over): derived numbers, with the data note that re-derives them
+    const sw = E.sppWind || {}, swf = sw.file || {}, sws = J.sources[(sw.src || [])[0]];
+    ok(sw.units === 254 && sw.plants === 230 && sw.nameplateMW === 35463.4 && sw.netSummerMW === 34585.4 && sw.yearAverageNameplateMW === 34395.6 && sw.asOf === "end of December 2025",
+       "SPP wind (EIA-860M, December 2025): 254 operating units at 230 plants, 35,463.4 MW nameplate; 34,395.6 MW on average over 2025");
+    ok(sw.added2025 && sw.nameplateMW - sw.added2025.nameplateMW < sw.yearAverageNameplateMW && sw.yearAverageNameplateMW < sw.nameplateMW,
+       "the year's average lies between the capacity before 2025's additions and the year-end capacity");
+    ok(swf.name === "december_generator2025.xlsx" && swf.url === "https://www.eia.gov/electricity/data/eia860m/archive/xls/" + swf.name && /^[0-9a-f]{64}$/.test(swf.sha256) &&
+       swf.bytes === 13463993 && swf.accessed === "2026-11-05" && /extract_eia860m_spp_wind\.py/.test(swf.derivedBy), "data note: the file, its URL, size, SHA-256, access date and the script that re-derives the numbers");
+    ok(sws && /EIA-860M/.test(sws.text) && /^https:\/\/www\.eia\.gov\//.test(sws.url) && /accessed 5 November 2026/.test(sws.asOf), "source: EIA-860M, dated");
+    ok(/Status \(OP\) Operating/.test(sw.about) && /balancing authority SWPP/.test(sw.about) && /2025 wind output in MWh \(EIA-930\)/.test(sw.about),
+       "the note names the filters and what the like-for-like check still needs");
     // a linear rescaling keeps the ratio
     const k = 0.338 / (S.cfWind / 100), w = year.wind.map(v => v / 1000 * 150 * k), meanAll = w.reduce((a, b) => a + b, 0) / w.length;
     const meanN = S.topN.reduce((a, i) => a + w[i], 0) / S.topN.length;

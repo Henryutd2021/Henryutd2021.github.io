@@ -109,6 +109,16 @@
       "<div class=\"lx-scroll-x\"><table class=\"lx-facts\"><caption class=\"lx-hint\">Each hour of the stylized day: average intensity (g CO₂ per kWh), load before and after (MWh) and the change.</caption>" +
       "<thead><tr><th scope=\"col\">Hour</th><th scope=\"col\">Intensity</th><th scope=\"col\">Before</th><th scope=\"col\">After</th><th scope=\"col\">Change</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
+  // the explainer's own text version, live (W4 carry-over): its "explainer-update" event (d = {range, grid, model}) rewrites
+  // the table in the page's text version (details.lx-textalt > .cf6-ex-table) and its summary; nothing is announced
+  var LIVE_SUMMARY = "Text version: the day hour by hour, at the slider's setting";
+  function liveTable(details, d) {
+    var box = details && details.querySelector(".cf6-ex-table"), sum = details && details.querySelector("summary");
+    if (!box || !d || !d.model) return false;
+    box.innerHTML = staticExplainer(d.model, d.range, d.grid);
+    if (sum && sum.textContent !== LIVE_SUMMARY) sum.textContent = LIVE_SUMMARY;
+    return true;
+  }
   function rich(t) {
     // glossary marks to spans (the attribute is built in pieces so the build's term scanner does not read "$1" as an id)
     return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) {
@@ -121,7 +131,8 @@
       "<p class=\"lx-hint\">" + rich(b.source) + "</p>";
   }
   var model = { HOURS: HOURS, prepare: prepare, hour: hour, move: move, changes: changes, hm: hm, span: span, f2: f2, tco2: tco2, PLANT: PLANT,
-                statusLines: statusLines, staticExplainer: staticExplainer, staticIdea: staticIdea, staticBoundary: staticBoundary };
+                statusLines: statusLines, staticExplainer: staticExplainer, staticIdea: staticIdea, staticBoundary: staticBoundary,
+                liveTable: liveTable, LIVE_SUMMARY: LIVE_SUMMARY };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
 
@@ -133,6 +144,9 @@
     LX.Timeline(H("div", { class: "lx-card" }, live), D.timeline);
     var x = document.getElementById("cf6-explain");
     if (x) { x.innerHTML = ""; x.classList.add("is-live"); LX.Boundary(H("div", { class: "lx-xcard" }, x), D.boundary); }
+    // the explainer's text version follows its slider and toggle (the no-JS block shows its starting day)
+    var ex = document.querySelector('.explainer[data-explainer="ghg"]'), alt = ex && ex.parentNode.querySelector("details.lx-textalt");
+    if (ex && alt) ex.addEventListener("explainer-update", function (e) { liveTable(alt, e.detail); });
   });
 
   LX.mount("cf6-idea", function (live, data, root) {

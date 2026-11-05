@@ -680,7 +680,7 @@
     var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" };
     var rerun = rows.filter(function (r) { return r.rerun; }).map(function (r) { return NAME[r.key] || r.label.toLowerCase(); });
     var lim = rows.some(function (r) { return r.limit; });
-    var held = "The equipment is held fixed." + (rerun.length ? " Re-run over all 52 weeks: " + joinAnd(rerun) + "." : "");
+    var held = "The equipment is held fixed." + (rerun.length ? " Re-run over 52 weeks and 31 December: " + joinAnd(rerun) + "." : "");
     return { line: "The NPV is " + money(sens.base) + " at this plan. " + parts.join(". ") + ". " + held + (lim ? " The line's cases change the connection limit; its cost is not counted." : ""),
       note: "Green: above your NPV; red: below. " + held, widest: rows[0] };
   }
@@ -741,7 +741,7 @@
   function resultsHTML(res, date) {
     return '<table class="lx-facts"><thead><tr><th scope="col">Result for the default plan</th><th scope="col">Value</th></tr></thead><tbody>' +
       res.readouts.map(function (r) { return "<tr><td>" + esc(r.label) + ' <span class="lx-hint">(' + esc(r.note) + ')</span></td><td class="n">' + esc(r.value) + "</td></tr>"; }).join("") +
-      "</tbody></table>" + (date ? '<p class="lx-hint">Run on all 52 weeks of 2025 with this engine on ' + esc(date) + ".</p>" : "");
+      "</tbody></table>" + (date ? '<p class="lx-hint">Run on every hour of 2025, as 52 weeks and 31 December, with this engine on ' + esc(date) + ".</p>" : "");
   }
   // the default plan's precomputed results (D.reference.default, written by the test) as the no-JS block
   function fallback(D) {
@@ -786,7 +786,7 @@
   function sourcesHTML(D) {
     return "<ul>" + Object.keys(D.sources).map(function (k) { var x = D.sources[k]; return '<li><a href="' + esc(x.url) + '">' + esc(x.text) + "</a> · " + esc(x.asOf) + "</li>"; }).join("") + "</ul>";
   }
-  // the check of the 52-week run (D.reference.check, written by the test): [{ id, label, weeks, year, sized }]
+  // the check of the run in 52 weeks and 31 December (D.reference.check, written by the test): [{ id, label, weeks, year, sized }]
   function checkRows(check) {
     return (check && check.rows || []).map(function (r) {
       return [r.label, money(r.weeks), money(r.year), (r.year - r.weeks >= 0 ? "+" : "−") + money(Math.abs(r.year - r.weeks)).replace("−", "") + " (" + num(Math.abs(r.year - r.weeks) / Math.max(1, Math.abs(r.capex || r.weeks)) * 100, 2) + "% of the equipment cost)"];
@@ -794,7 +794,7 @@
   }
   function checkHTML(check) {
     if (!check) return "";
-    return '<table class="lx-facts"><thead><tr><th scope="col">Preset</th><th scope="col">NPV, 52 weeks</th><th scope="col">NPV, one full-year LP</th><th scope="col">Difference</th></tr></thead><tbody>' +
+    return '<table class="lx-facts"><thead><tr><th scope="col">Preset</th><th scope="col">NPV, 52 weeks and 31 December</th><th scope="col">NPV, one full-year LP</th><th scope="col">Difference</th></tr></thead><tbody>' +
       checkRows(check).map(function (r) { return "<tr><td>" + esc(r[0]) + '</td><td class="n">' + esc(r[1]) + '</td><td class="n">' + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table>" +
       (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + ' with HiGHS by the bench\'s test.</p>' : "");
   }

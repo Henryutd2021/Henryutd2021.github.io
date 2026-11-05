@@ -984,6 +984,8 @@
        free: true }                                             // free: Next is open from the start (no action needed)
    ], onStep: function (i) {} });
    cards.go(i) | cards.index() | cards.count   progress dots, "Step n of N", Back and Next; the last card hides Next.
+   Next past the last card (a script's click on the hidden button, e.g. a demo hook run twice) and Back on the first
+   card do nothing.
    api.saw(text, bad) shows what the reader saw; text takes glossary marks and **bold**.
    api.busy(on) holds Next shut while on (e.g. while a solve runs; the card is aria-busy), whatever done() said; busy(false)
    restores it. A call from a card that is no longer shown (a late solve after Back) changes nothing on screen.
@@ -1006,12 +1008,12 @@
       var foot = H("div", { class: "lx-step-foot" }, card);
       var back = H("button", { class: "lx-btn ghost small", type: "button", text: "Back" }, foot);
       back.disabled = i === 0;
-      back.addEventListener("click", function () { render(i - 1); });
+      back.addEventListener("click", function () { if (i > 0) render(i - 1); });
       var nx = H("button", { class: "lx-btn small", type: "button", html: "Next" + LX.icon("arrow") }, foot);
       var st = o.steps[i];
       if (st.free) unlocked[i] = true;
       nx.disabled = !unlocked[i]; nx.hidden = i === N - 1;
-      nx.addEventListener("click", function () { if (unlocked[i] && !busy) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
+      nx.addEventListener("click", function () { if (unlocked[i] && !busy && i < N - 1) { render(i + 1); card.scrollIntoView({ block: "nearest", behavior: LX.reduced() ? "auto" : "smooth" }); } });
       var api = {
         done: function () { unlocked[k] = true; nx.disabled = busy; },
         busy: function (on) {
@@ -9608,7 +9610,7 @@
     var NAME = { cost: "the equipment cost (stack wear)", xc: "the export credit", h2: "the hydrogen price", line: "the line limit" };
     var rerun = rows.filter(function (r) { return r.rerun; }).map(function (r) { return NAME[r.key] || r.label.toLowerCase(); });
     var lim = rows.some(function (r) { return r.limit; });
-    var held = "The equipment is held fixed." + (rerun.length ? " Re-run over all 52 weeks: " + joinAnd(rerun) + "." : "");
+    var held = "The equipment is held fixed." + (rerun.length ? " Re-run over 52 weeks and 31 December: " + joinAnd(rerun) + "." : "");
     return { line: "The NPV is " + money(sens.base) + " at this plan. " + parts.join(". ") + ". " + held + (lim ? " The line's cases change the connection limit; its cost is not counted." : ""),
       note: "Green: above your NPV; red: below. " + held, widest: rows[0] };
   }
@@ -9644,7 +9646,7 @@
   function note(s, res) {
     var home = s.site === "home", M = res.money, n = {
       heading: heading(s), made: "the Site Bench (engine E0, a linear program)",
-      run: { ok: true, stale: false, text: "every hour of 2025, as 52 weeks" },
+      run: { ok: true, stale: false, text: "every hour of 2025, as 52 weeks and 31 December" },
       plan: planRows(s),
       // every readout with its note: the boundaries (CO₂, the wind-only comparison, what the cost per kg leaves out) travel
       results: res.readouts.map(function (r) { return { label: r.label, value: r.value, note: r.note }; }),
@@ -9669,7 +9671,7 @@
   function resultsHTML(res, date) {
     return '<table class="lx-facts"><thead><tr><th scope="col">Result for the default plan</th><th scope="col">Value</th></tr></thead><tbody>' +
       res.readouts.map(function (r) { return "<tr><td>" + esc(r.label) + ' <span class="lx-hint">(' + esc(r.note) + ')</span></td><td class="n">' + esc(r.value) + "</td></tr>"; }).join("") +
-      "</tbody></table>" + (date ? '<p class="lx-hint">Run on all 52 weeks of 2025 with this engine on ' + esc(date) + ".</p>" : "");
+      "</tbody></table>" + (date ? '<p class="lx-hint">Run on every hour of 2025, as 52 weeks and 31 December, with this engine on ' + esc(date) + ".</p>" : "");
   }
   // the default plan's precomputed results (D.reference.default, written by the test) as the no-JS block
   function fallback(D) {
@@ -9714,7 +9716,7 @@
   function sourcesHTML(D) {
     return "<ul>" + Object.keys(D.sources).map(function (k) { var x = D.sources[k]; return '<li><a href="' + esc(x.url) + '">' + esc(x.text) + "</a> · " + esc(x.asOf) + "</li>"; }).join("") + "</ul>";
   }
-  // the check of the 52-week run (D.reference.check, written by the test): [{ id, label, weeks, year, sized }]
+  // the check of the run in 52 weeks and 31 December (D.reference.check, written by the test): [{ id, label, weeks, year, sized }]
   function checkRows(check) {
     return (check && check.rows || []).map(function (r) {
       return [r.label, money(r.weeks), money(r.year), (r.year - r.weeks >= 0 ? "+" : "−") + money(Math.abs(r.year - r.weeks)).replace("−", "") + " (" + num(Math.abs(r.year - r.weeks) / Math.max(1, Math.abs(r.capex || r.weeks)) * 100, 2) + "% of the equipment cost)"];
@@ -9722,7 +9724,7 @@
   }
   function checkHTML(check) {
     if (!check) return "";
-    return '<table class="lx-facts"><thead><tr><th scope="col">Preset</th><th scope="col">NPV, 52 weeks</th><th scope="col">NPV, one full-year LP</th><th scope="col">Difference</th></tr></thead><tbody>' +
+    return '<table class="lx-facts"><thead><tr><th scope="col">Preset</th><th scope="col">NPV, 52 weeks and 31 December</th><th scope="col">NPV, one full-year LP</th><th scope="col">Difference</th></tr></thead><tbody>' +
       checkRows(check).map(function (r) { return "<tr><td>" + esc(r[0]) + '</td><td class="n">' + esc(r[1]) + '</td><td class="n">' + esc(r[2]) + "</td><td>" + esc(r[3]) + "</td></tr>"; }).join("") + "</tbody></table>" +
       (check.date ? '<p class="lx-hint">Solved on ' + esc(check.date) + ' with HiGHS by the bench\'s test.</p>' : "");
   }
@@ -9978,7 +9980,7 @@
       solve: function (st, ctx) { return solve(st, P, { signal: ctx.signal, timeLimit: ctx.attempt > 1 ? 30 : 10 }); },
       render: function (r, st, full) { res.draw(r, st); chips(r); if (o.onRun) o.onRun(r, st, full); },
       results: [res.el, roBox], stale: staleP, busy: o.api && o.api.busy, onDone: function (r, st) { if (o.onDone) o.onDone(r, st); },
-      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks (the solver reports each one optimal)." } });
+      words: { ok: "Done: the cheapest way to run this plan through every hour of 2025, as 52 weeks and 31 December (the solver reports each one optimal)." } });
     var sizer = null;
     if (sizeBox) {
       var sizeHint = H("p", { class: "lx-hint" }, sizeBox);

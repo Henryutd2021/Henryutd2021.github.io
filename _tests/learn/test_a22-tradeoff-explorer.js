@@ -17,7 +17,9 @@
 //   - wording: illustrative labels, sources with dates, the radar's text version
 //   - the re-solve behind the sliders (M.resolver, fake timers): 260 ms debounce, a newer change aborts a running solve,
 //     stale results are dropped, Next is held until the newest result, results are announced in a live region
-// Usage (from the site folder):  node _tests/learn/test_a22-tradeoff-explorer.js
+// Usage (from the site folder):  node _tests/learn/test_a22-tradeoff-explorer.js [--write]
+//   --write  re-solve the nine plans on all 8,760 hours and store their measures ('m' in a22-tradeoff-explorer.json) first
+//            (W4 carry-over: lesson 13's battery costs moved to 2025 dollars)
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -33,7 +35,8 @@ const TP = require(L("components/planengine.js"));
 const M = require(L("a22-tradeoff-explorer.js"));
 const loadHighs = require(L(`vendor/highs-${VERSION}/highs.js`));
 const cfg = JSON.parse(fs.readFileSync(L("data/13-capstone.json"), "utf8"));
-const A = JSON.parse(fs.readFileSync(L("data/a22-tradeoff-explorer.json"), "utf8"));
+const A_PATH = L("data/a22-tradeoff-explorer.json"), WRITE = process.argv.includes("--write");
+const A = JSON.parse(fs.readFileSync(A_PATH, "utf8"));
 const year = JSON.parse(fs.readFileSync(L("data/town_year.json"), "utf8"));
 const T = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
 const page = fs.readFileSync(path.join(SITE, "learn/a22-tradeoff-explorer.qmd"), "utf8");
@@ -60,6 +63,17 @@ function val(m, axis, defs) {
   const Y = TP.prepareYear(year, T, cfg, pctx.module.exports.townProfile), C = TP.costs(cfg, {}), RW = TP.selectWeeks(Y, cfg.weeks), per = TP.periodsOf(RW);
   const g = A.groups;
   const D = { cv: M.capValues(Y, A.reserve.hours), peak: Y.peak, groups: { homes: g.homesM / g.totalHomesM, use: g.kwhB / g.totalKwhB }, graded: A.graded, batteryHours: A.reserve.batteryHours };
+  // ---------------- --write: each plan's stored year, from a fresh full-year solve, rounded as stored
+  if (WRITE) {
+    const rd = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
+    const round = (m) => ({ cost: rd(m.cost, 0), fixed: rd(m.fixed, 0), running: rd(m.running, 0), f: rd(m.f, 6), co2: rd(m.co2, 0), unserved: rd(m.unserved, 1),
+      unservedShare: rd(m.unservedShare, 6), hoursShort: m.hoursShort, spilledShare: rd(m.spilledShare, 6),
+      shares: { wind: rd(m.shares.wind, 6), solar: rd(m.shares.solar, 6), nuc: rd(m.shares.nuc, 6), gas: rd(m.shares.gas, 6) },
+      gas: rd(m.gas, 6), largest: rd(m.largest, 6), rm: rd(m.rm, 6), fair: { fixed: rd(m.fair.fixed, 6), graded: rd(m.fair.graded, 6), flat: rd(m.fair.flat, 6) } });
+    A.plans.forEach(p => { const plan = M.blank(p.plan), r = solve(TP.fullYearModel(C, Y, { plan })); if (!r.ok) throw new Error("plan " + p.id + ": " + r.status); p.m = round(M.measure(C, Y, r, plan, D)); });
+    fs.writeFileSync(A_PATH, JSON.stringify(A, null, 1) + "\n");
+    console.log("wrote the nine plans' measures (a22-tradeoff-explorer.json)");
+  }
   const LIB = A.plans.map(p => ({ id: p.id, m: p.m, plan: M.blank(p.plan) })), BY = {};
   LIB.forEach(p => { BY[p.id] = p; });
 
@@ -123,10 +137,11 @@ function val(m, axis, defs) {
      "full precision gives the same unbeaten plans as the shown values, except under the income-graduated charge");
   ok(exact(ALT.graded) === "A,B,C,D,H,I" && M.unbeaten(LIB, ALT.graded).join() === "A,B,D,H,I", "income-graduated: C unbeaten at full precision, beaten by D as shown");
   const hid = M.hiddenByRounding(LIB, ALT.graded);
-  ok(hid.length === 1 && hid[0].id === "C" && hid[0].by === "D" && hid[0].key === "fair" && (hid[0].v * 100).toFixed(2) === "21.61" && (hid[0].vs * 100).toFixed(2) === "21.64" && pct(hid[0].v, 1) === pct(hid[0].vs, 1),
-     "the rounding note: C's 21.61% against D's 21.64%, both shown as 21.6%");
+  const hc = hid.length ? (hid[0].v * 100).toFixed(2) : "", hd = hid.length ? (hid[0].vs * 100).toFixed(2) : "";
+  ok(hid.length === 1 && hid[0].id === "C" && hid[0].by === "D" && hid[0].key === "fair" && hc === "21.61" && hd === "21.63" && pct(hid[0].v, 1) === pct(hid[0].vs, 1),
+     `the rounding note: C's ${hc}% against D's ${hd}%, both shown as ${pct(hid[0].v, 1)}`);
   ok([DEF, ALT.flat, ALT.largest, ALT.rm].every(df => M.hiddenByRounding(LIB, df).length === 0), "no rounding note under the other definitions");
-  onPage("Under the income-graduated charge, C's share (21.61%) and D's (21.64%) both show 21.6%, so D beats C; at full precision, C is unbeaten.", "the ties-as-shown bullet");
+  onPage(`Under the income-graduated charge, C's share (${hc}%) and D's (${hd}%) both show ${pct(hid[0].v, 1)}, so D beats C; at full precision, C is unbeaten.`, "the ties-as-shown bullet");
   onPage("Verdicts compare values as shown: two values that round to the same number count as a tie.", "the fallback's tie rule");
   onJS("Values count as equal when they look equal: rounded to $0.1M, 1 kt, 1 MWh, 0.1 point of the low-income share and 1 point of the gas share.", "step 4's tie rule");
   ok(M.shown(0.0005, "fair") === 0.001 && M.shown(1e5 * 0.49, "cost") === 0 && M.shown(499, "co2") === 0 && M.shown(0.49, "unserved") === 0 && M.shown(0.0049, "gas") === 0, "the stated steps match PREC");
@@ -207,7 +222,7 @@ function val(m, axis, defs) {
     const g1 = yearCheck(200, 25, 33, "graded");
     ok(g1.wc.pass, "200 kt, 25% gas, 33% share, income-graduated: met on the seven weeks");
     ok(!g1.yc.pass && !g1.yc.co2 && !g1.yc.gas && g1.yc.fair && !g1.yc.served, "...but the full-year check fails on CO₂, the gas share and unserved energy (the share is met)");
-    ok(kt(g1.yv.co2) === "215 kt" && Math.round(g1.yv.unserved) === 33 && pct(g1.yv.gas, 1) === "26.3%" && musd(g1.yv.cost) === "$132.0M", `full year: ${kt(g1.yv.co2)}, ${Math.round(g1.yv.unserved)} MWh unserved, gas ${pct(g1.yv.gas, 1)}, ${musd(g1.yv.cost)} (lesson 13 states 215 kt and 33 MWh)`);
+    ok(kt(g1.yv.co2) === "215 kt" && Math.round(g1.yv.unserved) === 33 && pct(g1.yv.gas, 1) === "26.3%" && musd(g1.yv.cost) === "$132.1M", `full year: ${kt(g1.yv.co2)}, ${Math.round(g1.yv.unserved)} MWh unserved, gas ${pct(g1.yv.gas, 1)}, ${musd(g1.yv.cost)} (lesson 13 states 215 kt and 33 MWh)`);
     onPage("With the income-graduated charge the seven weeks meet them, but the full year emits 215 kt and leaves 33 MWh unserved.", "the fallback's full-year check");
     const g2 = yearCheck(800, 100, 35, "fixed");
     ok(g2.wc.pass && g2.yc.pass && g2.yv.unserved < 0.5, `loose limits (800 kt, 100% gas, 35%): the full-year check passes (${kt(g2.yv.co2)}, gas ${pct(g2.yv.gas, 1)})`);
