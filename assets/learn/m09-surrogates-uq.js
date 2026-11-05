@@ -360,7 +360,8 @@
     });
     if (o.maker) { var mk = []; for (var v = X0; v <= X1 + 1e-9; v += 0.1) mk.push([v, maker(T, v)]); lines.push({ pts: mk, color: COL.maker, dash: "6 4", width: 2 }); legend.push({ label: "The maker's curve", color: COL.maker, dash: "6 4" }); }
     if (o.field) { var fd = []; for (var w = X0; w <= X1 + 1e-9; w += 0.1) fd.push([w, field(T, w, o.field === "reduce" ? "reduce" : null)]); lines.push({ pts: fd, color: COL.field, dash: "2 3", width: 1.6 }); legend.push({ label: "The field curve (hidden from the fits)", color: COL.field, dash: "2 3" }); }
-    (o.recs || []).forEach(function (s) { lines.push({ pts: s.r.map(function (p) { return [p[0], p[1]]; }), color: s.color, width: 0, dots: true, op: s.faint ? 0.45 : 1 }); legend.push({ label: s.label, color: s.color }); });
+    // records as dots only: LX.Plot skips a width-0 line's dots, so the joining path is drawn invisible (op 0)
+    (o.recs || []).forEach(function (s) { lines.push({ pts: s.r.map(function (p) { return [p[0], p[1]]; }), color: s.color, width: 0.01, op: 0, dots: true }); legend.push({ label: s.label, color: s.color }); });
     curves.forEach(function (c) { lines.push({ pts: c.c.map(function (p) { return [p.v, p.m]; }), color: c.f.color, width: 2.6 }); legend.push({ label: c.f.label + ", with its 90% band", color: c.f.color }); });
     var rows = [];
     for (var s = X0; s <= X1; s += 1) rows.push([ms(s)].concat(o.maker ? [kw(maker(T, s))] : [], (o.fits || []).map(function (f) { var q = predict(f.F, s); return kw(q.m) + " (" + kw(q.m - Z90 * q.sd) + " to " + kw(q.m + Z90 * q.sd) + ")"; })));
@@ -569,6 +570,7 @@
           P.render(fitSpec(T, { fits: [{ F: a, color: COL.one, label: "One source" }, { F: b, color: COL.two, label: "Two sources" }], maker: true, field: "reduce",
                                 recs: [{ r: testR, color: COL.held, label: "400 new records", faint: true }, { r: campaign(D, N0, "reduce"), color: COL.rec, label: N0 + " records" }],
                                 aria: "Both fits in the load-reducing case, with 400 new records." }));
+          H("p", { class: "lx-hint", text: "Beyond its last record the one-source curve falls back toward its average, " + kw(a.beta[0]) + ": close to this turbine by luck, far from the turbine of step 6." }, host);
           var tb = H("div", null, host);
           table(tb, ["On 400 new records", "One source", "Two sources"], [["RMSE", kw(sa.rmse), kw(sb.rmse)], ["90% band holds, all speeds", pct(sa.cov[90]), pct(sb.cov[90])], ["90% band holds, 13–20 m/s (" + sa.byRange[2].n + " records)", pct(sa.byRange[2].cov90, 0), pct(sb.byRange[2].cov90, 0)]]);
           api.done();

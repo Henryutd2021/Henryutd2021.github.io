@@ -43,7 +43,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .m10-out { font-size: 15.5px; color: var(--lx-ink-2); min-height: 1.5em; margin: .35rem 0 0; }
 .m10-out b { font-family: var(--lx-f-mono); color: var(--lx-ink); font-weight: 600; }
 .m10-out:empty { display: none; }
-.m10-cand { font-size: 15px; min-width: 14em; }
+.m10-cand { font-size: 15px; min-width: 17em; }
 .lx-step-act .lx-mini-table th[scope="row"] { text-align: left; font-weight: 500; }
 .m10-nb { margin-top: 1.2rem; max-width: 980px; } .m10-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .m10-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }

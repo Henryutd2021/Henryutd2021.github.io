@@ -164,7 +164,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Kennedy and O'Hagan's form.** The costly source is $\rho$ times the cheap one plus an independent GP for the gap. Here the cheap curve is known exactly at every speed, so it enters as a basis function; when the cheap source is itself a slow model, both levels get a GP.
 - **Nonlinear fusion.** When the costly source is not a scaled copy of the cheap one, nonlinear multi-fidelity models put the cheap output in as an extra input; the lab's open code compares both.
 - **Slow models.** The same fit replaces a model too slow to run a thousand times: run it at a few inputs, fit the GP, then sample the GP, as [M7](m07-monte-carlo.html) did with its fast toy. The lab's practice task 4 does this for M7's model.
-- **Scores across sites.** When a fit must work at places with no records, hold out whole places, not single records: M10 (upcoming) splits by time for the same reason.
+- **Scores across sites.** When a fit must work at places with no records, hold out whole places, not single records: [M10](m10-ml-forecasting.html) splits by time for the same reason.
 
 ```{=html}
 </div>

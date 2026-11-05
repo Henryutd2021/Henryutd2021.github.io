@@ -230,6 +230,7 @@ const sliders = [];
   cards.go(7); card().querySelectorAll(".lx-choice")[0].click();
   ok(!next().disabled && saw() === "Above 13 m/s the two-source band holds 58% of new records; the one-source band, wide but honest, holds 100%. Cheap data mislead where they are wrong and no record can correct them.", "step 8 (" + saw() + ")"); sawBudget(8);
   ok(/the first 16 records stop at 11\.9 m\/s\./.test(stepText()), "step 8 text: where the records stop");
+  { const a8 = M.fitStored(D, N0, false, "reduce"); ok(new RegExp("falls back toward its average, " + kw(a8.beta[0]).replace(",", ",") + ": close to this turbine by luck").test(text(card().innerHTML)) && a8.beta[0] > 900 && a8.beta[0] < 1000 && M.predict(a8, 20).m < 1200 && M.predict(M.fitStored(D, N0, false), 20).m < 1200 && M.field(T, 20) > 1900, "step 8: the one-source curve falls toward its average beyond the records in both cases (" + kw(a8.beta[0]) + ")"); }
   // 9
   cards.go(8); card().querySelectorAll(".lx-seg button")[3].click();
   ok(next().disabled && /This one shows the failure/.test(saw()), "step 9: high-wind coverage shows the failure, Next still waits");

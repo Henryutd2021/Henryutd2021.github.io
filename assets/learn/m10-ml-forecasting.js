@@ -242,11 +242,13 @@
   }
   function rowEl(host) { return H("div", { class: "m10-row" }, host); }
   function readout(host) { return H("p", { class: "m10-out", "aria-live": "polite" }, host); }
-  function table(host, head, rows) {
+  // a small table; cells from column numFrom on are numbers (right-aligned, mono), the ones before are words
+  function table(host, head, rows, numFrom) {
+    numFrom = numFrom == null ? 1 : numFrom;
     host.innerHTML = "";
     var sc = H("div", { class: "lx-scroll-x" }, host), t = H("table", { class: "lx-mini-table" }, sc), hr = H("tr", null, H("thead", null, t)), bd = H("tbody", null, t);
     head.forEach(function (h) { H("th", { scope: "col", text: h }, hr); });
-    rows.forEach(function (r) { var tr = H("tr", null, bd); r.forEach(function (c, i) { H(i ? "td" : "th", i ? { text: c, class: "n" } : { scope: "row", text: c }, tr); }); });
+    rows.forEach(function (r) { var tr = H("tr", null, bd); r.forEach(function (c, i) { H(i ? "td" : "th", i ? { text: c, class: i >= numFrom ? "n" : null } : { scope: "row", text: c }, tr); }); });
   }
   function gw(v) { return (v / 1000).toFixed(1); }
   function vs(a, b) { var f = 1 - a / b; return pc(Math.abs(f)) + (f >= 0 ? " better" : " worse"); }
@@ -356,7 +358,7 @@
         ab.setAttribute("aria-disabled", "true");
         ab.addEventListener("click", function () {
           if (ab.getAttribute("aria-disabled") === "true") return;
-          table(tb, ["Rank", "Features", "MAE, October"], F.mixes.map(function (z, j) { return [String(j + 1), mixName(z.use), mw(z.val)]; }));
+          table(tb, ["Rank", "Features", "MAE, October"], F.mixes.map(function (z, j) { return [String(j + 1), mixName(z.use), mw(z.val)]; }), 2);
           api.done(); api.saw("Best on October: " + mixName(best.use) + ", " + mw(best.val) + ", " + pc(F.skillVal) + " better than same hour yesterday. Small, but earned on hours the fit never saw.");
         });
         out.textContent = "Pick features, then fit.";
@@ -413,7 +415,7 @@
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(weekSpec(P, D.weeks.test[0], D.weeks.test[1], [{ f: fBest, color: COL.model, label: "Chosen mix" }], { f: fBest, lo: lo, hi: hi, label: l[0] + "% band from October's misses" }, "The last November week with a " + l[0] + "% band."));
           out.innerHTML = l[0] + "% band: " + mw(lo).replace(/^-/, "−") + " to +" + mw(hi) + " around the forecast; it holds <b>" + pc(F.band.cov[l[0]]) + "</b> of November's hours.";
-          if (seen[1]) { api.done(); api.saw("The 80% band holds " + pc(F.band.cov[80]) + " of November's hours, more than 80%: November's misses were smaller than October's. Hours come in runs, so a month is a small sample."); }
+          if (seen[1]) { api.done(); api.saw("The 80% band holds " + pc(F.band.cov[80]) + " of November's hours, more than 80%: November's misses were smaller, on average, than October's. Hours come in runs, so a month is a small sample."); }
           else api.saw("Pick the 80% band too.", true);
         }
         out.textContent = "Pick a band.";
@@ -447,6 +449,7 @@
           P9.render({ x: { min: 0, max: DL.length, ticks: [[0, "Nov 1", "start"], [9, "10"], [19, "20"], [DL.length, "30", "end"]] }, y: { min: 0, max: 3000, step: 500, fmt: function (v) { return v.toLocaleString("en-US"); }, unit: "MW" }, height: 200, heightN: 180,
                       bars: DL.map(function (x, k) { return { x0: k + 0.1, x1: k + 0.9, y0: 0, y1: x.mae, color: x.date === D.holiday.date ? COL.test : COL.model, op: k === sel ? 0.95 : 0.6 }; }),
                       pick: { n: DL.length, sel: sel, onPick: function (k) { sel = k; pick(k); } },
+                      legend: [{ label: "Chosen mix, mean miss of the day", color: COL.model }, { label: D.holiday.name, color: COL.test }],
                       aria: "Mean absolute error of the chosen model on each day of November.",
                       text: { head: ["Day", "MAE"], rows: DL.map(function (x) { return [dayLabel(x.date), mw(x.mae)]; }) } });
         }

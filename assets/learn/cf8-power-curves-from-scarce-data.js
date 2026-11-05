@@ -76,10 +76,10 @@
     function paint() {
       var n = I.sweep[St.i], f = A.fits[n], show = St.two ? [0, 1] : [0], col = ["var(--lx-tier-3)", "var(--lx-accent)"], lab = ["One source", "Two sources"];
       P.render({ x: { min: 28, max: 36, ticks: [[28, "28%", "start"], [30, "30%"], [32, "32%"], [34, "34%"], [36, "36%", "end"]] }, y: { min: 0, max: 2, ticks: [] }, height: 140, heightN: 140, ml: 14,
-                 bars: show.map(function (k) { return { x0: 100 * f[k].lo, x1: 100 * f[k].hi, y0: 1.35 - 0.6 * k, y1: 1.65 - 0.6 * k, color: col[k], op: 0.55, rx: 3 }; }),
-                 marks: [{ x: 100 * A.maker, y: 0.35, label: "Maker " + pts(A.maker) + "%", kind: "dot", pos: "below", color: "var(--lx-wind)" }, { x: 100 * A.field, y: 1.9, label: "Field " + pts(A.field) + "%", kind: "dot", pos: "above", color: "var(--lx-ink)" }]
-                   .concat(show.map(function (k) { return { x: 100 * f[k].cf, y: 1.5 - 0.6 * k, kind: "dot", color: col[k] }; })),
-                 legend: show.map(function (k) { return { label: lab[k] + ", 90% band", color: col[k] }; }),
+                 bars: show.map(function (k) { return { x0: 100 * f[k].lo, x1: 100 * f[k].hi, y0: 1.35 - 0.6 * k, y1: 1.65 - 0.6 * k, color: col[k], op: 0.55, rx: 3 }; })
+                   .concat([[A.maker, "var(--lx-wind)"], [A.field, "var(--lx-ink)"]].map(function (r) { return { x0: 100 * r[0] - 0.025, x1: 100 * r[0] + 0.025, y0: 0, y1: 2, color: r[1], op: 0.9 }; })),   // the two reference values as thin vertical bars
+                 marks: show.map(function (k) { return { x: 100 * f[k].cf, y: 1.5 - 0.6 * k, kind: "dot", color: col[k] }; }),
+                 legend: show.map(function (k) { return { label: lab[k] + ", 90% band", color: col[k] }; }).concat([{ label: "Maker's curve, " + pts(A.maker) + "%", color: "var(--lx-wind)" }, { label: "Field curve (hidden), " + pts(A.field) + "%", color: "var(--lx-ink)" }]),
                  aria: "The capacity factor estimated from " + n + " records with its 90% band, against the maker's and the field curve's.",
                  text: { head: ["Estimate", "Capacity factor", "90% band"], rows: [["Maker's curve", pts(A.maker) + "%", "–"], ["Field curve (hidden)", pts(A.field) + "%", "–"]].concat(show.map(function (k) { return [lab[k] + ", " + n + " records", pts(f[k].cf) + "%", pts(f[k].lo) + "% to " + pts(f[k].hi) + "%"]; })) } });
       status.innerHTML = show.map(function (k) { return "<p>" + lab[k] + ", " + n + " records: <b>" + pts(f[k].cf) + "% ± " + pts(f[k].hi - f[k].cf) + " points</b>.</p>"; }).join("") +
