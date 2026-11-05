@@ -1,0 +1,386 @@
+{
+  "about": "Data of Learn lesson A9, How do heat waves, droughts, wildfires and cold snaps break energy systems? (wave W4, 2026-11-05). The hazards are stress tests on lesson A5's Plains Grid (a05-adequacy.json: the same illustrative fleet, the same 500 resampled weather years, seed 2025): each hazard's dates, sizes and the defences' effects and yearly costs are illustrative, chosen to show the mechanisms the real events below record. A hazard is applied in every simulated year, so a result reads 'in a year when it strikes', not a forecast of how often it strikes. The events are real, each from a primary report, with dates. The reference block is written by node _tests/learn/test_a09-hazards.js --write and recomputed by the same test on every run.",
+  "seed": 2025,
+  "hazards": [
+    {
+      "id": "heat",
+      "label": "Heat wave",
+      "color": "var(--lx-bad)",
+      "when": "15 July to 14 August",
+      "what": "Demand 7% higher; gas units lose 5% of their output in the heat.",
+      "windows": [
+        {
+          "from": "07-15",
+          "to": "08-14",
+          "demand": 1.07,
+          "avail": {
+            "cc": 0.95,
+            "ct": 0.95
+          }
+        }
+      ]
+    },
+    {
+      "id": "drought",
+      "label": "Drought",
+      "color": "var(--lx-warn)",
+      "when": "July to September",
+      "what": "Coal and combined-cycle units lose 15% of their output: cooling water too warm or too scarce.",
+      "windows": [
+        {
+          "from": "07-01",
+          "to": "09-30",
+          "avail": {
+            "coal": 0.85,
+            "cc": 0.85
+          }
+        }
+      ]
+    },
+    {
+      "id": "cold",
+      "label": "Cold snap",
+      "color": "var(--lx-hyd)",
+      "when": "14 to 20 January",
+      "what": "Demand 12% higher; gas units lose 30% to frozen equipment and fuel, coal 10%, wind 30% to icing.",
+      "windows": [
+        {
+          "from": "01-14",
+          "to": "01-20",
+          "demand": 1.12,
+          "avail": {
+            "cc": 0.7,
+            "ct": 0.7,
+            "coal": 0.9
+          },
+          "wind": 0.7
+        }
+      ]
+    },
+    {
+      "id": "fire",
+      "label": "Wildfire shutoffs",
+      "color": "var(--lx-pk)",
+      "when": "1 to 21 August, 12:00 to 20:00",
+      "what": "A line is switched off in high wind: a third of the wind and one 400 MW gas unit cut off, and 5% of customers lose power directly.",
+      "windows": [
+        {
+          "from": "08-01",
+          "to": "08-21",
+          "hours": [
+            12,
+            20
+          ],
+          "avail": {
+            "cc": 0.75
+          },
+          "wind": 0.6667,
+          "shutoff": 0.05
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    [
+      "heat",
+      "drought"
+    ],
+    [
+      "cold",
+      "fire"
+    ],
+    [
+      "heat",
+      "fire"
+    ]
+  ],
+  "defences": [
+    {
+      "id": "winterize",
+      "label": "Winterize gas plants, firm up fuel",
+      "short": "Winterize",
+      "cost": 25,
+      "eases": {
+        "cold": 0.3333
+      },
+      "what": "Cold-snap losses of units cut to a third (gas 30% to 10%)."
+    },
+    {
+      "id": "cooling",
+      "label": "Cooling upgrades",
+      "short": "Cooling",
+      "cost": 30,
+      "eases": {
+        "drought": 0.3333,
+        "heat": 0.5
+      },
+      "what": "Drought losses cut to a third, heat-wave losses of units halved."
+    },
+    {
+      "id": "harden",
+      "label": "Harden lines, narrower shutoffs",
+      "short": "Harden lines",
+      "cost": 20,
+      "eases": {
+        "fire": 0.4
+      },
+      "what": "Shutoffs cut 40% as much supply and as many customers."
+    },
+    {
+      "id": "battery",
+      "label": "500 MW 4-hour battery",
+      "short": "Battery",
+      "cost": 55,
+      "add": "battery",
+      "what": "Charges from any surplus, covers shortfalls (lesson A5's battery)."
+    },
+    {
+      "id": "dr",
+      "label": "500 MW demand response",
+      "short": "Demand response",
+      "cost": 15,
+      "add": "dr",
+      "what": "Load cut on call, at most 4 hours a day (lesson A5's program)."
+    }
+  ],
+  "budget": 60,
+  "costNote": "Yearly costs in millions of 2025 dollars, illustrative: chosen to make the choice a trade-off, not estimates for any real grid.",
+  "events": [
+    {
+      "id": "uri",
+      "date": "2021-02-15",
+      "label": "Winter Storm Uri, Texas and the central U.S.",
+      "hazard": "cold",
+      "facts": [
+        {
+          "n": "1,045 units",
+          "what": "had 4,124 outages, derates or failures to start; 75.6% were caused by freezing (44.2%) or fuel problems (31.4%)."
+        },
+        {
+          "n": "58%, 27%, 6%",
+          "what": "of the affected units were gas, wind and coal: every type failed (shares of unit counts, not of MW lost)."
+        },
+        {
+          "n": "20,000 MW",
+          "what": "of firm load shed by ERCOT at the worst point; 23,418 MW across ERCOT, SPP and MISO."
+        },
+        {
+          "n": "59.304 Hz",
+          "what": "the lowest frequency; it stayed below 59.4 Hz for 4 minutes 23 seconds on 15 February."
+        }
+      ],
+      "source": {
+        "label": "FERC, NERC and Regional Entity staff, The February 2021 Cold Weather Outages in Texas and the South Central United States (November 2021), printed pp. 9, 15 and 137",
+        "url": "https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf",
+        "as_of": "2021-11"
+      },
+      "more": [
+        {
+          "n": "about 4.5 million",
+          "what": "customers lost power in Texas.",
+          "source": {
+            "label": "EIA, Today in Energy (14 November 2022)",
+            "url": "https://www.eia.gov/todayinenergy/detail.php?id=54639",
+            "as_of": "2022-11-14"
+          }
+        }
+      ]
+    },
+    {
+      "id": "elliott",
+      "date": "2022-12",
+      "label": "Winter Storm Elliott, eastern U.S.",
+      "hazard": "cold",
+      "facts": [
+        {
+          "n": "90,500 MW",
+          "what": "of generating units out, derated or failing to start at the same time, at the worst point."
+        },
+        {
+          "n": "55%",
+          "what": "of those outages were caused by freezing (31%) or fuel problems (24%)."
+        },
+        {
+          "n": "over 5,400 MW",
+          "what": "of firm load shed in total, the largest in the Eastern Interconnection's history."
+        }
+      ],
+      "source": {
+        "label": "FERC, NERC and Regional Entity staff, Winter Storm Elliott report (October 2023), pp. 5, 6 and 18",
+        "url": "https://www.ferc.gov/sites/default/files/2024-02/24_Winter-Storm_Elliot_0207_UPDATE.pdf",
+        "as_of": "2023-10"
+      }
+    },
+    {
+      "id": "caiso",
+      "date": "2020-08-14",
+      "label": "Heat wave, California",
+      "hazard": "heat",
+      "facts": [
+        {
+          "n": "14 and 15 August 2020",
+          "what": "rotating outages in the California grid operator's area: about 491,600 and 321,000 customers of state-regulated utilities."
+        },
+        {
+          "n": "three causes",
+          "what": "extreme weather, resource adequacy and planning processes, and market practices; no single root cause."
+        }
+      ],
+      "source": {
+        "label": "CAISO, CPUC and CEC, Final Root Cause Analysis: Mid-August 2020 Extreme Heat Wave (13 January 2021), pp. 1 and 34–35",
+        "url": "https://www.caiso.com/Documents/Final-Root-Cause-Analysis-Mid-August-2020-Extreme-Heat-Wave.pdf",
+        "as_of": "2021-01-13"
+      }
+    },
+    {
+      "id": "drought",
+      "date": "2021",
+      "label": "Drought, California",
+      "hazard": "drought",
+      "facts": [
+        {
+          "n": "48%",
+          "what": "California's hydropower generation in 2021 below its 2011–2020 average; the Pacific Northwest's 14% below."
+        }
+      ],
+      "source": {
+        "label": "EIA, Today in Energy (30 March 2022)",
+        "url": "https://www.eia.gov/todayinenergy/detail.php?id=51839",
+        "as_of": "2022-03-30"
+      }
+    },
+    {
+      "id": "psps",
+      "date": "2019-10-09",
+      "label": "Wildfire shutoffs, northern California",
+      "hazard": "fire",
+      "facts": [
+        {
+          "n": "about 738,000",
+          "what": "customers of a northern California utility had their power shut off from 9 October 2019 in gusty, dry weather, about 13% of its customers."
+        }
+      ],
+      "source": {
+        "label": "EIA, Today in Energy (17 October 2019)",
+        "url": "https://www.eia.gov/todayinenergy/detail.php?id=41714",
+        "as_of": "2019-10-17"
+      }
+    }
+  ],
+  "prepare": [
+    {
+      "date": "2021-11",
+      "label": "FERC–NERC report on Uri",
+      "text": "Finds that freezing and fuel problems caused 75.6% of the units' outages, derates and failures to start.",
+      "kind": "study",
+      "source": {
+        "label": "FERC–NERC report, November 2021",
+        "url": "https://www.ferc.gov/sites/default/files/2021-11/Cold%20Weather%20Report_%20November%202021.pdf",
+        "as_of": "2021-11"
+      }
+    },
+    {
+      "date": "2022-01-01",
+      "label": "ERCOT's offer cap lowered",
+      "text": "The high system-wide offer cap falls from $9,000 to $5,000 per MWh.",
+      "kind": "policy",
+      "source": {
+        "label": "ERCOT market notice M-A120721-01 (7 December 2021)",
+        "url": "https://ercot.com/services/comm/mkt_notices/M-A120721-01",
+        "as_of": "2021-12-07"
+      }
+    },
+    {
+      "date": "2023-10",
+      "label": "FERC–NERC report on Elliott",
+      "text": "Freezing and fuel problems again cause most of the outages.",
+      "kind": "study",
+      "source": {
+        "label": "FERC–NERC Elliott report, October 2023",
+        "url": "https://www.ferc.gov/sites/default/files/2024-02/24_Winter-Storm_Elliot_0207_UPDATE.pdf",
+        "as_of": "2023-10"
+      }
+    },
+    {
+      "date": "2025-10-01",
+      "label": "Cold-weather standard EOP-012-3 in force",
+      "text": "Each generator owner must have and carry out plans to keep its units running in extreme cold.",
+      "kind": "policy",
+      "key": true,
+      "source": {
+        "label": "NERC Reliability Standard EOP-012-3, purpose A.3; approved by FERC on 18 September 2025",
+        "url": "https://www.nerc.com/globalassets/standards/approved-standards/eop/eop-012-3.pdf",
+        "as_of": "2025-10-01"
+      }
+    }
+  ],
+  "reference": {
+    "about": "Written by node _tests/learn/test_a09-hazards.js --write at seed 2025 and checked on every run.",
+    "years": {
+      "none": {
+        "lole": 0.228,
+        "eue": 108.06,
+        "shut": 0
+      },
+      "heat": {
+        "lole": 0.738,
+        "eue": 450.54,
+        "shut": 0
+      },
+      "drought": {
+        "lole": 0.818,
+        "eue": 356.76,
+        "shut": 0
+      },
+      "cold": {
+        "lole": 2.792,
+        "eue": 5801.6,
+        "shut": 0
+      },
+      "fire": {
+        "lole": 1.06,
+        "eue": 501.38,
+        "shut": 28871
+      }
+    },
+    "pairs": [
+      {
+        "ids": [
+          "heat",
+          "drought"
+        ],
+        "lole": 2.61,
+        "eue": 1648.96,
+        "ratio": 2.6065
+      },
+      {
+        "ids": [
+          "cold",
+          "fire"
+        ],
+        "lole": 3.624,
+        "eue": 6194.92,
+        "ratio": 1
+      },
+      {
+        "ids": [
+          "heat",
+          "fire"
+        ],
+        "lole": 3.206,
+        "eue": 2089.81,
+        "ratio": 2.6933
+      }
+    ],
+    "best": {
+      "defences": [
+        "winterize",
+        "harden",
+        "dr"
+      ],
+      "cost": 60,
+      "total": 689.88,
+      "portfolios": 12
+    }
+  }
+}

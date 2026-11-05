@@ -26,7 +26,8 @@
 //                Only hours with M_t < threshold (1,500 MW) are kept; resources added only raise M, so no other hour can
 //                fall short, and a battery of at most 1,500 MW charges at full power in every hour not kept (exact).
 //       o.mod    optional changes for lesson A9 (hazards): arrays of 8,760 multipliers over the calendar hours of every
-//                simulated year: demand, wind, and the available MW of each unit type
+//                simulated year: demand, wind, and the available MW of each unit type; o.tally (8,760 weights) returns
+//                the yearly mean of sum(weight x demand) as S.tally (A9: customer energy cut directly by shutoffs)
 //   evaluate(S, add, detail)  the simulated years with resources added: add = {C perfect MW, wind MW, solar MW, sP and sE
 //       a battery's MW and MWh, eta, dr MW and drH hours a day, ct 0 or 1 blocks of extra peakers}. Each hour: x = M + C +
 //       wind x w_t + solar x s_t + extra peakers; if x >= 0 the battery charges min(P, x) x eta; if x < 0 the battery
@@ -79,7 +80,7 @@
     var G = D.grid, N = o.years || D.sim.years, TH = D.sim.threshold, X = D.adds.ct, mod = o.mod || {};
     var r = mulberry32(seed), rx = mulberry32((seed ^ 0x5bd1e995) >>> 0);
     var map = new Int32Array(T), U = D.units, diffs = U.map(function () { return new Float64Array(T + 1); }), dx = new Float64Array(T + 1);
-    var years = [], full = null, kept = 0;
+    var years = [], full = null, kept = 0, tally = 0, tw = o.tally || null;
     for (var n = 0; n < N; n++) {
       var blocks = o.keep === n ? [] : null;
       weather(r, map, blocks);
@@ -95,13 +96,14 @@
         var q = map[t], y = q >= T ? 1 : 0, h = q - y * T, S = SRC[y];
         var dem = G.peakMW * S.d[h] * (mod.demand ? mod.demand[t] : 1), wi = G.windMW * S.w[h] * (mod.wind ? mod.wind[t] : 1), so = G.solarMW * S.s[h];
         var M = av + wi + so - dem;
+        if (tw) tally += tw[t] * dem;
         if (full) { full.demand[t] = dem; full.wind[t] = wi; full.solar[t] = so; full.units[t] = av; full.margin[t] = M; }
         if (M < TH) { idx.push(t); m.push(M); src.push(q); ct.push(b); }
       }
       kept += idx.length;
       years.push({ idx: Uint16Array.from(idx), m: Float32Array.from(m), src: Uint16Array.from(src), ct: Uint16Array.from(ct) });
     }
-    return { seed: seed, N: N, years: years, SRC: SRC, full: full, kept: kept, threshold: TH, cap: capacity(D), mod: !!o.mod, windW: o.mod && o.mod.wind ? o.mod.wind : null };
+    return { seed: seed, N: N, years: years, SRC: SRC, full: full, kept: kept, threshold: TH, cap: capacity(D), mod: !!o.mod, windW: o.mod && o.mod.wind ? o.mod.wind : null, tally: tally / N };
   }
   function plus(a, b) {
     var o = {}, k;

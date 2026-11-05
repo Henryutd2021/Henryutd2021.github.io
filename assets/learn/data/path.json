@@ -1228,9 +1228,13 @@
    "tier": "analyst",
    "code": "A9",
    "title": "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a09-hazards.html",
+   "scales": [],
+   "id": "a09-hazards",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Hazards and defences"
   },
   {
    "tier": "analyst",

@@ -353,6 +353,12 @@
   "lesson": "K8",
   "href": "k08-git-notebooks.html"
  },
+ "compound-hazard": {
+  "term": "Compound hazard",
+  "short": "Two or more hazards striking at the same time, such as heat and drought, whose combined harm can exceed the sum of each alone.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
+ },
  "concentrated-solar": {
   "term": "Concentrated solar power",
   "short": "Mirrors focus sunlight to heat a fluid; the heat runs a turbine or a process, and it can be stored for hours in tanks.",
@@ -430,6 +436,12 @@
   "short": "What it costs to enrol, meter, control and pay each device or customer in a program, whatever the device's size.",
   "lesson": "A7",
   "href": "a07-flexible-demand.html"
+ },
+ "correlated-failure": {
+  "term": "Correlated failure",
+  "short": "Many parts of a system failing together because they share one cause, such as extreme cold freezing plants and gas supply at once.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
  },
  "cost-of-capital": {
   "term": "Cost of capital",
@@ -2213,6 +2225,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "stress-test": {
+  "term": "Stress test",
+  "short": "Running a system model through a severe event on purpose, to see what breaks and what a defence would change.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
+ },
  "stylized-network": {
   "term": "Stylized network",
   "short": "A simplified, made-up network built to show how a model behaves, with invented distances and costs rather than a real company's map.",
@@ -2506,5 +2524,17 @@
   "short": "The price at which electricity is traded between power plants and the companies that sell it to customers, often set hour by hour.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "public-safety-power-shutoff": {
+  "term": "Wildfire safety shutoff",
+  "short": "A utility switching off power lines in dry, windy weather so that they cannot start a fire; the customers on those lines lose power.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
+ },
+ "winterization": {
+  "term": "Winterization",
+  "short": "Protecting power plants and fuel supply against freezing, with insulation, heat tracing, enclosures and cold-weather procedures.",
+  "lesson": "A9",
+  "href": "a09-hazards.html"
  }
 }

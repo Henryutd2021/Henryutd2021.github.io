@@ -697,7 +697,23 @@
   outcome: "Estimate a grid's loss-of-load expectation from a simulation with its Monte Carlo error, rate a resource by the firm capacity it adds at equal reliability, and explain why a rating depends on the grid and its mix."
   after: [3, 6, K5]
 - {kind: lesson, tier: analyst, code: A6, title: "Why does it take years to connect a power plant or a data center?"}
-- {kind: lesson, tier: analyst, code: A9, title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"}
+# ---------- wave W4 Analyst module A9 (curriculum v2 §18.4; builder learn-w4-b)
+- kind: lesson
+  id: a09-hazards
+  code: A9
+  tier: analyst
+  form: cards
+  icon: cloud
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the questions and the drill (Check section)
+  title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"
+  subtitle: "Hit the Plains Grid with four hazards, alone and two at once, then choose defences under a budget"
+  short: "Hazards and defences"
+  teaches: [extreme weather and the grid, correlated failures, compound hazards, wildfire shutoffs, stress tests, defences under a budget]
+  does: "Sort what heat waves, droughts, cold snaps and wildfire shutoffs hit; read Winter Storm Uri from the FERC–NERC report; stress the Plains Grid with each hazard and with two at once; choose defences under a budget."
+  outcome: "Explain how each hazard breaks a power system, why correlated failures defeat independent-outage planning, and compare defences by what they avoid for what they cost."
+  after: [F6, A5]
 - {kind: lesson, tier: analyst, code: A10, title: "Which emissions question are you asking? Inventories, consequences and procurement claims"}
 - {kind: lesson, tier: analyst, code: A11, title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"}
 - {kind: lesson, tier: analyst, code: A12, title: "How do governments steer energy? Taxes, credits, standards and carbon prices"}
