@@ -1,0 +1,93 @@
+{
+ "about": "Case file CF8's data: the studies' dated steps (LX.Timeline), where the result holds (LX.Boundary) and the toy's settings. Research text here is approved excerpt wording (reports/learn/excerpts_for_approval.md, E12 and E13, approved 2026-11-05); the toy reuses lesson M9's illustrative turbine and records (m09-surrogates-uq.json).",
+ "built": "builder learn-w4-e, 2026-11-05",
+ "timeline": {
+  "title": "The studies in time",
+  "kinds": {
+   "event": "Code"
+  },
+  "events": [
+   {
+    "date": "2022",
+    "label": "Related research project, 2022–2023",
+    "kind": "study",
+    "text": "A research project asks whether uncertainty metrics of a wind power model's inputs can predict calibrated plant-level power uncertainty at plants without power measurements.",
+    "source": {
+     "label": "wind-uq-surrogate on GitHub",
+     "url": "https://github.com/Henryutd2021/wind-uq-surrogate",
+     "as_of": "2026-11-05"
+    },
+    "deeper": "This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy."
+   },
+   {
+    "date": "2023-08",
+    "label": "Conference paper (this case)",
+    "kind": "study",
+    "key": true,
+    "text": "A turbine type's theoretical power curve and measured records, condensed by kernel density sampling, are fused by multi-fidelity Gaussian process regression; presented at ASME IDETC 2023 (20–23 August 2023), online in November 2023.",
+    "source": {
+     "label": "Li et al. (2023), ASME IDETC 2023, V03AT03A034",
+     "url": "https://doi.org/10.1115/detc2023-114762"
+    }
+   },
+   {
+    "date": "2026-10-30",
+    "label": "Code released",
+    "kind": "event",
+    "text": "A documented, runnable implementation of the method, with synthetic examples (version 1.0.1).",
+    "source": {
+     "label": "mfgpr-wind-power-curve on GitHub",
+     "url": "https://github.com/Henryutd2021/mfgpr-wind-power-curve",
+     "as_of": "2026-11-05"
+    }
+   },
+   {
+    "date": "2026-11-02",
+    "label": "Code released",
+    "kind": "event",
+    "text": "A documented, runnable framework for the uncertainty metrics and the surrogate workflow, implemented afresh and tested on synthetic data (version 1.0.0).",
+    "source": {
+     "label": "wind-uq-surrogate on GitHub",
+     "url": "https://github.com/Henryutd2021/wind-uq-surrogate",
+     "as_of": "2026-11-05"
+    },
+    "deeper": "This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy."
+   }
+  ]
+ },
+ "boundary": {
+  "title": "Where the result holds",
+  "holds": [
+   "one wind farm's records from one open dataset;",
+   "one generic theoretical curve for the turbine type;",
+   "about two hundred sampled measurements;",
+   "point scores for nine test turbines and probabilistic scores for one;",
+   "which model ranks first depends on the metric."
+  ],
+  "leaves": [
+   "other wind farms, datasets and theoretical curves."
+  ],
+  "source": "From the approved excerpt of Li et al. (2023), ASME IDETC 2023."
+ },
+ "idea": {
+  "title": "From a band on the curve to a band on the capacity factor (illustrative)",
+  "note": "Lesson M9's toy turbine and records: invented round numbers, not the study's data.",
+  "weibull": {
+   "k": 2,
+   "c": 8
+  },
+  "grid": {
+   "from": 3,
+   "to": 20,
+   "step": 0.1
+  },
+  "sweep": [
+   16,
+   24,
+   32,
+   48,
+   64
+  ],
+  "level": 90
+ }
+}

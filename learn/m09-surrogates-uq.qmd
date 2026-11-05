@@ -223,6 +223,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Run <code>python examples/minimal.py</code>: in its printed scores, does each model beat the constant baseline?</li>
 </ul>
 <p><a href="https://github.com/Henryutd2021/wind-uq-surrogate">wind-uq-surrogate</a>: public example repository · MIT licence · synthetic data.</p>
+<p class="lx-hint">This work was developed based upon funding from the Alliance for Sustainable Energy, LLC, Managing and Operating Contractor for the National Renewable Energy Laboratory for the U.S. Department of Energy.</p>
 </div>
 ```
 :::

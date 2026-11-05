@@ -132,6 +132,27 @@
     var lat = Math.max(0, F.hp.sf * F.hp.sf - q + ex);
     return { m: m, lat: lat, sd: Math.sqrt(lat + F.hp.sn * F.hp.sn) };
   }
+  // the joint posterior covariance of the latent curve at speeds xs (no record noise): sf^2 C(xs, xs) - Ks^T K^-1 Ks
+  // + U^T (H^T K^-1 H)^-1 U, U = H(xs)^T - H^T K^-1 Ks (case file CF8 averages the curve over a wind distribution)
+  function covariance(F, xs) {
+    var n = F.n, m = xs.length, W = [], KI = [], U = [], i, j, c;
+    for (j = 0; j < m; j++) {
+      var k = new Float64Array(n); for (i = 0; i < n; i++) k[i] = kern(xs[j], F.X[i], F.hp);
+      var w = fwd(F.L, k), ki = bwd(F.L, w), h = basis(F.T, xs[j], F.two);
+      W.push(w); U.push(h.map(function (hc, cc) { var s = 0; for (var q = 0; q < n; q++) s += F.H[q][cc] * ki[q]; return hc - s; }));
+    }
+    var out = [];
+    for (j = 0; j < m; j++) {
+      out.push(new Float64Array(m));
+      var uu = solve(F.Lm, U[j]);
+      for (var l = 0; l < m; l++) {
+        var s = kern(xs[j], xs[l], F.hp); for (i = 0; i < n; i++) s -= W[j][i] * W[l][i];
+        for (c = 0; c < uu.length; c++) s += U[l][c] * uu[c];
+        out[j][l] = s;
+      }
+    }
+    return out;
+  }
   // maximum likelihood over the grid; the first best in grid order wins; margin = best - runner-up log-likelihood;
   // edge lists the settings that sit at an end of their grid
   function search(T, recs, two, G) {
@@ -290,7 +311,7 @@
   var Z9 = ZL[90];
 
   var model = { rng: rng, maker: maker, field: field, slope: slope, scatter: scatter, weibull: weibull, records: records, reduceShare: reduceShare,
-                chol: chol, fwd: fwd, bwd: bwd, solve: solve, basis: basis, kern: kern, fit: fit, predict: predict, search: search,
+                chol: chol, fwd: fwd, bwd: bwd, solve: solve, basis: basis, kern: kern, fit: fit, predict: predict, covariance: covariance, search: search,
                 erf: erf, Phi: Phi, phi: phi, invPhi: invPhi, pinball: pinball, scores: scores, LEVELS: LEVELS, RANGES: RANGES, ZL: ZL, TAU: TAU,
                 campaign: campaign, heldOut: heldOut, stored: stored, fitStored: fitStored, curve: curve, widest: widest, gaps: gaps,
                 facts: facts, reference: reference, staticFallback: staticFallback };
