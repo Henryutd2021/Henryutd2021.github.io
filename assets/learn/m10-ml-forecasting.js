@@ -285,8 +285,9 @@
         var idx = function (d) { return dates.indexOf(d); };
         P1.render({ x: { min: 0, max: dates.length, ticks: [[0, "Jan", "start"], [idx("2025-04-01"), "Apr"], [idx("2025-07-01"), "Jul"], [idx("2025-10-01"), "Oct"], [dates.length, "Dec 31", "end"]] },
                     y: { min: 20000, max: 50000, step: 10000, fmt: function (v) { return gw(v); }, unit: "GW" }, height: 200, heightN: 180,
-                    spans: [{ x0: idx(D.split.train[0]), x1: idx(D.split.train[1]) + 1, color: COL.train, op: 0.08, label: "Train" }, { x0: idx(D.split.val[0]), x1: idx(D.split.val[1]) + 1, color: COL.val, op: 0.16, label: "Choose" }, { x0: idx(D.split.test[0]), x1: idx(D.split.test[1]) + 1, color: COL.test, op: 0.16, label: "Test" }],
-                    lines: [{ values: dm, x0: 0.5, color: COL.actual, width: 1.8 }], legend: [{ label: "Daily mean demand", color: COL.actual }],
+                    spans: [{ x0: idx(D.split.train[0]), x1: idx(D.split.train[1]) + 1, color: COL.train, op: 0.08 }, { x0: idx(D.split.val[0]), x1: idx(D.split.val[1]) + 1, color: COL.val, op: 0.16 }, { x0: idx(D.split.test[0]), x1: idx(D.split.test[1]) + 1, color: COL.test, op: 0.16 }],
+                    lines: [{ values: dm, x0: 0.5, color: COL.actual, width: 1.8 }],
+                    legend: [{ label: "Daily mean demand", color: COL.actual }, { label: "Train: 8 January to 30 September", color: COL.train }, { label: "Choose: October", color: COL.val }, { label: "Test: November", color: COL.test }],   // span names in the legend: October and November are too narrow to label on phones
                     aria: "SPP's daily mean demand in 2025, with the training, choosing and test periods shaded.",
                     text: { head: ["Period", "Dates", "Hours"], rows: [["Train", "8 January to 30 September", String(P.train.length)], ["Choose (validate)", "October", String(P.val.length)], ["Test", "November", String(P.test.length)]] } });
         LX.Predict(act, { id: "m10-rule", q: "Your pick:", answer: "day", fresh: true, title: false,
