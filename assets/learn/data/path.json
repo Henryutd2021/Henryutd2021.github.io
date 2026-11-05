@@ -1208,9 +1208,13 @@
    "tier": "analyst",
    "code": "A5",
    "title": "Will there be enough power when it matters? Resource adequacy and capacity accreditation",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a05-adequacy.html",
+   "scales": [],
+   "id": "a05-adequacy",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Enough power?"
   },
   {
    "tier": "analyst",

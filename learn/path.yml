@@ -679,7 +679,23 @@
 - {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
 - {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
 - {kind: lesson, tier: analyst, code: A3, title: "Energy-only or capacity market? How wholesale markets are designed for high renewable shares"}
-- {kind: lesson, tier: analyst, code: A5, title: "Will there be enough power when it matters? Resource adequacy and capacity accreditation"}
+# ---------- wave W4 Analyst module A5 (curriculum v2 §18.4; builder learn-w4-b)
+- kind: lesson
+  id: a05-adequacy
+  code: A5
+  tier: analyst
+  form: cards
+  icon: dial
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the questions and the drill (Check section)
+  title: "Will there be enough power when it matters? Resource adequacy and capacity accreditation"
+  subtitle: "Simulate 500 years of weather and plant outages, count the days that run short, then rate what each new resource is worth"
+  short: "Enough power?"
+  teaches: [resource adequacy, loss-of-load expectation, expected unserved energy, forced outages, reserve margins, capacity accreditation]
+  does: "Simulate 500 resampled weather years with random plant outages on the Plains Grid; estimate the loss-of-load expectation; accredit peakers, wind, solar, a battery and demand response by the firm capacity each adds at equal reliability; watch ratings change with the mix; compare with a reserve-margin screen."
+  outcome: "Estimate a grid's loss-of-load expectation from a simulation with its Monte Carlo error, rate a resource by the firm capacity it adds at equal reliability, and explain why a rating depends on the grid and its mix."
+  after: [3, 6, K5]
 - {kind: lesson, tier: analyst, code: A6, title: "Why does it take years to connect a power plant or a data center?"}
 - {kind: lesson, tier: analyst, code: A9, title: "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?"}
 - {kind: lesson, tier: analyst, code: A10, title: "Which emissions question are you asking? Inventories, consequences and procurement claims"}

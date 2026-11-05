@@ -209,6 +209,12 @@
   "lesson": 5,
   "href": "05-capacity-factor.html"
  },
+ "capacity-accreditation": {
+  "term": "Capacity accreditation",
+  "short": "The share of a resource's MW that a grid counts toward its adequacy target, judged by how much the resource lowers the risk of a shortfall.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
+ },
  "capacity-credit": {
   "term": "Capacity credit",
   "short": "The share of a plant's size that planners count on to meet the year's peak, judged by how much it lowers the risk of a shortage.",
@@ -779,6 +785,12 @@
   "lesson": 12,
   "href": "12-trade-offs.html"
  },
+ "equivalent-firm-capacity": {
+  "term": "Equivalent firm capacity",
+  "short": "The MW of a perfect, always-available plant that would make a grid as reliable as a given resource does; divided by the resource's MW, it is an accreditation.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
+ },
  "ercot": {
   "term": "ERCOT",
   "short": "The Electric Reliability Council of Texas: the grid operator, and its wholesale market, for most of Texas.",
@@ -922,6 +934,12 @@
   "short": "A rate that fills or drains a stock, such as megawatts into a battery or tonnes of CO₂ a year; only flows change a stock.",
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
+ },
+ "forced-outage-rate": {
+  "term": "Forced outage rate",
+  "short": "The share of time a power plant is unexpectedly out of service, waiting for repair, rather than out for planned maintenance.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
  },
  "forecast-error": {
   "term": "Forecast error",
@@ -1264,6 +1282,12 @@
   "short": "The expected number of days a year on which supply falls short of demand at least once, of any size or length, averaged over many simulated years; an expectation, not a count of real outages.",
   "lesson": "M3",
   "href": "m03-capacity-expansion.html"
+ },
+ "lolh": {
+  "term": "Loss-of-load hours (LOLH)",
+  "short": "The expected number of hours a year in which supply falls short of demand, averaged over many simulated years.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
  },
  "lower-bound": {
   "term": "Lower bound",
@@ -1948,6 +1972,12 @@
   "short": "Regroup a time series to a coarser step, such as hours to days, by averaging or summing.",
   "lesson": "B2",
   "href": "b02-python-data.html"
+ },
+ "resampled-weather": {
+  "term": "Resampled weather year",
+  "short": "A simulated year stitched together from pieces of real years, such as whole weeks, so that demand, wind and sun stay consistent within each piece; it is not an observed year.",
+  "lesson": "A5",
+  "href": "a05-adequacy.html"
  },
  "research-gap": {
   "term": "Research gap",
