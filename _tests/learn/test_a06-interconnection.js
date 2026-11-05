@@ -57,6 +57,7 @@ if (process.argv.includes("--write")) {
 }
 const PAGE = fs.readFileSync(QPATH, "utf8");
 Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + " block is up to date (run with --write)"); });
+const nSent = t => String(t).replace(/U\.S\./g, "US").replace(/\b(no|vs|e\.g)\./gi, "$1").split(/(?<=[.?!])\s+(?=[A-Z“"$0-9−+])/).filter(x => /[A-Za-z]/.test(x)).length;
 const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
 const T = text(PAGE);
 // the string literals of the script (what the page shows; comments are not shown)
@@ -156,23 +157,62 @@ ok(near(E.requestsGW, 474.7) && near(E.noStudyGW + E.energizedGW, 290.2) && (E.r
 ok(/the placeholder's withdrawal raised the wind farm's share from \$215 to \$343 per kW and added a 150-day restudy/.test(T) && /150 more days and the wind farm's share from \$215 to \$343 per kW/.test(T), "myth and explain: $215 → $343 per kW, 150 days");
 ok(/the other must carry everything: 350 MW\. With the east side's own 150 MW, only 200 MW of new load fits/.test(T) && /two 350 MW lines serve 350 MW, not 700 MW/.test(T), "N−1 on the page = the model");
 ok(/Of ERCOT's 474\.7 GW of large-load requests, 284\.3 GW had no studies submitted and 5\.9 GW were energized \(June 2026\)/.test(T), "myth 4 = the data");
-ok(/\$120M ÷ 335 MW = \$358,209 in study 1; ÷ 210 MW = \$571,429 in study 2/.test(T), "Go deeper: per MW of flow");
+ok(/\$120M ÷ 335 MW = \$358,209 per MW of line flow in study 1; ÷ 210 MW = \$571,429 per MW in study 2/.test(T), "Go deeper: per MW of flow, with its unit");
+ok(/The wind farm's \$43\.0M ÷ \(200 MW × 1,000 kW per MW\) = \$215 per kW/.test(T) && near(sh(r1, "W").share / (200 * 1000), 215, 0.5), "Go deeper: one MW-to-kW conversion, $43.0M → $215 per kW");
+ok(/The sum\*\* \$\\sum_j m_j d_j\$ adds the line flow of every project still in the study, \$j\$ running over them/.test(PAGE), "Go deeper: the summation index is defined");
+ok(/\*\*\$L\(t\)\$\*\* is an account's present value when the whole load waits \$t\$ months/.test(PAGE), "Go deeper: L(t) is defined before it is used");
+ok(/\*\*Monthly rate\.\*\* \$i = \(1\+r\)\^\{1\/12\} - 1\$ with \$r\$ = 8% a year: 0\.643% a month/.test(PAGE) && (100 * M.monthly(I7)).toFixed(3) === "0.643", "Go deeper: discounting in labelled steps (0.643% a month)");
 ok(/\| Ridge wind farm \| 200 \| 120 MW \| \$43\.0M \| \$68\.6M \|/.test(PAGE) && /\| Mill Road solar farm \| 150 \| 60 MW \| \$21\.5M \| \$34\.3M \|/.test(PAGE) && /\| Depot battery \| 100 \| 30 MW \| \$10\.7M \| \$17\.1M \|/.test(PAGE) && /\| Placeholder request \| 250 \| 125 MW \| \$44\.8M \| withdrew \|/.test(PAGE), "Go deeper table = the model");
 ok(/\$A\(36\) = 32\.04\$/.test(PAGE) && /lost margin \$144\.2M plus the carrying cost of idle capital \$103\.1M: \$247\.3M/.test(T) && /\$12\.4M plus expected stranded upgrades \$8\.6M: \$20\.9M/.test(T), "Go deeper Modeler: the parts at 36 months");
 ok(/0\.5 × \$88\.8M \+ 0\.5 × \$247\.3M = \$168\.1M/.test(T) && /\$247\.3M − \$171\.1M = \$76\.2M/.test(T), "Go deeper Modeler: staged and avoided cost");
 ok(/a 36-month wait costs the developer \$247\.3M\. Half the load is served at month 12 instead/.test(T) && /half the load waits 12 months \(\$88\.8M for the whole load\) and half waits 36 \(\$247\.3M\)/.test(T), "quiz = the model");
 ok(/\$247\.3M<\/li><li data-value="b">\$168\.1M<\/li><li data-value="c">\$123\.6M/.test(PAGE), "quiz choices = the model");
 ok(/13% was operating by the end of 2025/.test(T) && D.facts[1].what.indexOf("13%") < 0 && D.facts[1].n === "13%", "13%: page and data agree");
+ok(/Myth or fact\? “Most of the capacity that asks to connect ends up operating\.”/.test(T) && !/Most projects in the interconnection queue/.test(T) && /Of the capacity that asked to connect/.test(D.facts[1].what.replace("Share of the capacity", "Of the capacity")), "myth 1 asks about capacity, the statistic's own denominator");
 ok(/Now the campus\. Two 350 MW lines feed the east substation, whose own peak is 150 MW\. How much of the 300 MW fits before new wires\?/.test(LIT) && N.lineMW === 350 && N.eastMW === 150 && N.campusMW === 300, "step 7's text = the data");
 ok(/a 200 MW wind farm wants to send power in, and a 300 MW data center campus/.test(LIT) && P.W.mw === 200, "step 1's text = the data");
 ok(/asks each large load for \$50,000 of security per MW\. What would the 300 MW campus post\?/.test(LIT) && E.securityPerMW === 50000, "step 8's text = the data");
 ok(/price a 36-month wait/.test(LIT) && /Order 2023 \(July 2023\)/.test(LIT), "step 9 and 5 texts = the data");
-ok(/"\$1,000 a business day for a cluster study, paid to the delayed cluster\."/.test(JS) && /\$1,000 a business day for a cluster study, \$2,000 for a restudy, \$2,500 for a facilities study/.test(T), "late-study penalties as MISO slide 8 gives them");
+ok(/text: "Penalties on the transmission provider when a study runs late, after a grace period, with caps and exceptions"/.test(JS) && /After a 10-business-day grace period, \$1,000 a business day for a late cluster study, capped at the study deposits\./.test(JS) &&
+   /penalties can apply after a 10-business-day grace period, capped at the study deposits, with exceptions: \$1,000 a business day for a cluster study, \$2,000 for a restudy, \$2,500 for a facilities study/.test(T) && /not before the third cluster cycle/.test(T) && !/for each business day a study is late/.test(JS),
+   "late-study penalties as MISO slide 8 gives them: after a grace period, capped, with exceptions");
+ok(/a 45-day request window, a 60-day customer engagement window, then a 150-day study/.test(T) && /After a 60-day customer engagement window, a \[\[cluster-study\|cluster study\]\]/.test(RAW) && /after a 45-day request window and a 60-day customer engagement window/.test(T) && /Before it come a 45-day request window and a 60-day customer engagement window/.test(T),
+   "the federal timeline includes the 60-day customer engagement window (MISO slide 5)");
+ok(/It counts study days only; the real 45-day request and 60-day engagement windows come before the first study/.test(T), "the toy's study-only clock is said apart from the real windows");
 ok(/Each restudy takes 150 days here, as long as a cluster study/.test(T) && C.studyDays === 150, "the datanote says the toy's restudy length");
 // the step cards' text budget
 const stepTexts = [...JS.matchAll(/\n      \{ text: "((?:[^"\\]|\\.)*)",\n        build/g)].map(m => m[1].replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1"));
 ok(stepTexts.length === 10, "ten step cards (" + stepTexts.length + ")");
-stepTexts.forEach(t => ok(t.split(" ").length <= 40, "step text of " + t.split(" ").length + " words: " + t.slice(0, 60)));
+stepTexts.forEach(t => ok(t.split(" ").length <= 36 && nSent(t) <= 3, "step text of " + t.split(" ").length + " words, " + nSent(t) + " sentences: " + t.slice(0, 60)));
+
+// ---------------- the review's fixes (2026-11-05)
+for (let c = N.slider.min; c <= N.slider.max; c += N.slider.step) {
+  const w0 = M.n1Words(N, c, false), w3 = M.n1Words(N, c, true);
+  if (!(/Without new wires, up to 200 MW/.test(w0) && /With the third line, up to 550 MW/.test(w3) && !/Without new wires/.test(w3))) ok(false, "the N−1 verdict names the selected lines at " + c + " MW");
+}
+ok(true, "the N−1 verdict names the selected lines at every slider value");
+for (let t = 0; t <= I7.delays.max; t += I7.delays.step) [null, TOY.staged].forEach(sg => {
+  const cap = M.moneyCaption(I7, null, t, sg), x = M.staged(I7, t, 0, false, sg);
+  const said = (cap.match(/half served at month (\d+)/) || [])[1];
+  if (sg && t > sg.at ? !(said && +said === x.staged.at && x.staged.at === sg.at) : !!said) ok(false, "the money caption's staged month follows the model at " + t + " months (" + cap + ")");
+});
+ok(!/half served at month/.test(M.moneyCaption(I7, null, 6, TOY.staged)) && M.staged(I7, 6, 0, false, TOY.staged).staged.at === 6, "a 6-month wait with staged service: the caption claims no month-12 half (the model connects all by month 6)");
+ok(/caption: moneyCaption\(I7, L, S\.tau, st\)/.test(JS), "the step's caption comes from moneyCaption");
+{ const L36b = M.ledgers(I7, 36, 0, true);
+  ok(L36b.total < L36.total && near(L36b.developer, 210268822.985, 1) && near(L36b.society, 11695815.957, 1), "bridge power changes the total ($268.2M → $242.9M at 36 months): a wait's cost is not shrunk only by a shorter wait");
+  ok(!/only a shorter or smaller wait/.test(PAGE + JS) && /A tariff reallocates the utility's costs; earlier service and bridge power change costs differently across the accounts\./.test(T + " " + LIT), "the ledger's note no longer says only a shorter wait shrinks the cost"); }
+{ const W = M.workedMonth(I7, 36), i = M.monthly(I7), m = I7.marginPerMWMonth * I7.loadMW, k = I7.capitalCommitted * i;
+  ok(W.length === 4 && W[1] === "Margin lost each month: 100 MW × $45,000 = $4.50M." && W[2] === "Interest on idle capital each month: $500M × 0.643% = $3.22M." && W[3] === "36 months in today's dollars: $7.72M × 32.04 = $247.3M for the developer.",
+    "one month worked out: $4.50M + $3.22M = $7.72M a month, × 32.04 = $247.3M");
+  ok(near((m + k) * M.annuity(I7, 36), L36.developer, 1e-3) && M.musd(7.72e6 * 32.04) === M.musd(L36.developer), "the worked month gives the ledger's developer cost, also from the rounded figures shown");
+  W.forEach(t => ok(t.split(" ").length <= 20, "worked line short: " + t)); }
+ok(/I7\.assumptions\.map/.test(JS) && I7.assumptions.length === 9 && I7.assumptions.every(a => a.length === 2), "the toy's inputs: CF7's own assumptions table, shown beside the ledger");
+ok(/LEDGER_WORDS\.forEach/.test(JS) && ["present-value", "margin", "carrying-cost", "stranded-cost", "bridge-power"].every(t => new RegExp("\\[\\[" + t + "\\|").test(JS)) && /\[\[bridge-power\|bridge power\]\]/.test(LIT), "step 9 defines present value, margin, carrying cost, stranded upgrades and bridge power (temporary on-site generation)");
+{ const GL = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")); const used = [...JS.matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]); ok(used.every(t => GL[t]), "every glossary mark in the script is defined: " + used.filter(t => !GL[t]).join(", ")); }
+ok(/\["wd", "rest"\], \["rest", "study", "back to study"/.test(JS) && /wd: \{ t: "Those projects leave"[^}]*s: "they exit the queue"/.test(JS) && /rest: \{ t: "The rest: restudy"/.test(JS), "the explain flowchart: leaving the queue is apart from the rest's return to study, with the return arrow drawn");
+ok(/title: "A large load: its utility's process"/.test(JS) && /path: \["lreq", "lfit", "lup", "lstage", "lon"\]/.test(JS) && !/label: "Data center", path: \["req"/.test(JS), "the large load has its own trace (utility study, upgrades and contract, staged energization), not the generator's nodes");
+ok(M.n1(N, 150, false).fits && /A " \+ small\.c \+ " MW load/.test(JS) && /small = \{ c: 150 \}/.test(JS), "the small-load trace (150 MW) fits with one line out");
+ok(/What does the 200 MW wind farm, with 120 MW of flow, pay\?/.test(T) && /The 250 MW placeholder, which puts 125 MW of flow on the line, withdraws\./.test(T) && !/The 125 MW request withdraws/.test(T), "practice: project size and line flow kept apart");
 
 // ---------------- sources and the ladder
 D.facts.forEach(f => {
@@ -296,9 +336,10 @@ ok(!/\b(published)\b[^.]{0,60}(NAPS|Li et al)/i.test(T + RAW), "the paper is acc
 ok(T.indexOf("0.7 billion") < 0 && T.indexOf("300 MW-IT") < 0, "the page does not show E7.4 next to its toy (the money stays at 100 MW)");
 
 // ---------------- text budget of the page's own prose (one idea, about 35 words)
-const GENERATED = /<!-- (a06-[a-z]+):start[\s\S]*?<!-- \1:end -->/g;
-const prose = elements(OWN.replace(GENERATED, " ").replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ").replace(/^\|.*\|$/gm, " ").replace(/\$\$[\s\S]*?\$\$/g, " "));
-prose.forEach(s => { const w = s.split(" ").length; ok(w <= 45 || approved(s), "text element of " + w + " words: " + s.slice(0, 70)); });
+// the generated no-JS blocks count too (their markers only are dropped); facts and sources are reference lists
+const prose = elements(OWN.replace(/<!-- a06-(fallback|practice):(start|end)[^>]*-->/g, " ").replace(/<!-- (a06-(?:facts|sources)):start[\s\S]*?<!-- \1:end -->/g, " ").replace(/<style>[\s\S]*?<\/style>/g, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " ").replace(/^\|.*\|$/gm, " ").replace(/\$\$[\s\S]*?\$\$/g, " "));
+prose.forEach(s => { const w = s.split(" ").length, n = nSent(s.replace(/^(Study \d|Step|Request|Upgrade|The [a-z]+|Order 2023's [a-z ]+|Texas|In all|Staged service|A faster connection|[A-Z][a-z−0-9]+(?: [a-z−0-9]+){0,4})\. /, ""));
+  ok((w <= 40 && n <= 3) || approved(s), "text element of " + w + " words, " + n + " sentences (≤ 40, ≤ 3): " + s.slice(0, 70)); });
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

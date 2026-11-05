@@ -813,8 +813,8 @@
   subtitle: "Check a plan that balances every hour against the wires: a line's heating, a feeder's voltage, rooftop solar's limit, a ramp and the first second after a trip"
   short: "Will it work on the wires?"
   teaches: [apparent and reactive power, thermal ratings, voltage drop and rise on a feeder, hosting capacity, ramp limits, inertia and the rate of change of frequency, grid-following and grid-forming inverters]
-  does: "Take M1's plan that balances every hour; add reactive power until a line overheats, load a feeder until its far end sags, add rooftop solar until its voltage tops out, find a ramp the plan assumed, and cut inertia to compare grid-following and grid-forming inverters after a trip."
-  outcome: "Name the physical limits an hourly energy plan can break, say when each binds, and say which check (an AC check, a ramp rule or finer time steps, or a check of the first seconds) would catch it."
+  does: "Take M1's plan that balances every hour; add reactive power until a line passes its rating, load a feeder until its far end sags, add rooftop solar until its voltage tops out, find a ramp the plan assumed, and cut inertia to compare two assumed inverter responses after a trip."
+  outcome: "Name the physical limits an hourly energy plan can break, say when each binds, and say which check (an AC check, a ramp check at the plan's time step and finer, or a check of the first seconds) would catch it."
   after: [F6, 3]
 - {kind: lesson, tier: analyst, code: A18, title: "How is a city or regional energy plan made?"}
 - {kind: lesson, tier: analyst, code: A19, title: "Where should it go? Siting with maps, from layers to a suitability score"}
