@@ -11,9 +11,15 @@
 //     and sun; claims are 0; certificates from existing wind change nothing (the annual rule is met by the existing
 //     fleet's wind); every shown number is unique; the full-year checks in Go deeper (annual energy, unmatched hours)
 //   - the page's blocks (fallback, explain, check, full year, reference block) are written from the model (--write)
-//   - research wording: every excerpt sentence is approved (E6, E10, E11.10) word for word in the register; the repository
+//   - research wording: every excerpt sentence is approved (E6, E10) word for word in the register (E11.10 left out by the
+//     coordinator's decision of 2026-11-05: nothing public says total demand stays constant); the repository
 //     commands are the README's; scope; links; text budget; the notebook reads the same data and asserts the reference;
 //     the page on a stub document with a failing, then working, solver
+//   - review fixes (2026-11-05): the printed (rounded) dual does not tie, the unrounded one does; the full-year check
+//     reports only the unmatched energy (the optimum; which hours carry it can differ); the no-rule purchase is counted
+//     at average factors, not 0 t; the dual is the magnitude of the frontier's downward slope; the stage switches to the
+//     year with the data center in steps 5-7; the explain layer follows the reader's cap; a solve that ends after the
+//     reader left its step paints nothing; every line the page assembles, at every setting, within the text budget
 // Usage (from the site folder):  node _tests/learn/test_m06-carbon-in-models.js [--write]
 "use strict";
 const fs = require("fs");
@@ -78,7 +84,7 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
     const r = F.solve(PP.build(Y, { tau })), lo = F.solve(PP.faceModel(Y, { tau }, r.objective, 1)), hi = F.solve(PP.faceModel(Y, { tau }, r.objective, -1));
     prices.push({ tau, R: PP.read(Y, { tau }, r), lo: lo.objective, hi: -hi.objective });
   }
-  ok(prices.every(p => p.hi - p.lo < 5000 && mt(p.lo) === mt(p.hi)), "every slider price picks one plan (the CO2 range among best plans is under 5 kt and prints the same)");
+  ok(prices.every(p => p.hi - p.lo < 5000 && mt(p.lo) === mt(p.hi)), "every slider price picks one CO2 outcome (the CO2 range among best plans is under 5 kt and prints the same); schedules may still differ");
   caps.forEach(z => {
     const tau = z.x.R.capPrice, r = F.solve(PP.build(Y, { tau })), lo = F.solve(PP.faceModel(Y, { tau }, r.objective, 1)).objective, hi = -F.solve(PP.faceModel(Y, { tau }, r.objective, -1)).objective;
     ties.push({ c: z.c, tau, lo, hi, co2: z.x.R.co2 });
@@ -86,6 +92,8 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
     ok(near(z.x.R.resource + tau * z.x.R.co2, r.objective, 1), `cap ${z.c}%: the cap's plan scores the price's optimum (cost + price x CO2)`);
   });
   ok(ties.filter(t => t.c >= 70).every(t => t.hi - t.lo > 0.3e6), "on the straight stretch (90% to 70%) the cap's dual ties plans spread over more than 0.3 Mt");
+  { const t70r = +ties.find(t => t.c === 70).tau.toFixed(2), r = F.solve(PP.build(Y, { tau: t70r })), lo = F.solve(PP.faceModel(Y, { tau: t70r }, r.objective, 1)).objective, hi = -F.solve(PP.faceModel(Y, { tau: t70r }, r.objective, -1)).objective;
+    ok(t70r === 22.81 && hi - lo < 5000, `the printed dual, $${t70r.toFixed(2)}, does not tie (best plans ${mt(lo)}..${mt(hi)}): the tie needs the dual's full precision, as the page says`); }
   // ---------------- procurement
   const L0 = D.load.mw, cases = { none: F.run({ load: L0 }), annual: F.run({ load: L0, buy: "annual" }), hourly: F.run({ load: L0, buy: "hourly" }) };
   Object.keys(cases).forEach(k => ok(cases[k].R.ok && balanced(cases[k], L0) && cases[k].R.unMWh < 1e-6, k + ": optimal, balanced with the load, nothing unserved"));
@@ -113,11 +121,13 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
       { name: "q" + i, terms: { ["c" + i]: 1, ["w" + i]: -1, ["s" + i]: -1 }, le: 0 },
       { name: "b" + i, terms: { ["e" + i]: 1, ["e" + p]: -1, ["c" + i]: -0.85, ["d" + i]: 1 }, eq: 0 });
   }
-  const fy = F.solve({ sense: "min", variables: vars, constraints: cons }), shortH = [...Array(H8).keys()].filter(i => (fy.values["u" + i] || 0) > 0.5).length;
+  const fy = F.solve({ sense: "min", variables: vars, constraints: cons }), shortI = [...Array(H8).keys()].filter(i => (fy.values["u" + i] || 0) > 1e-6);
   ok(fy.ok, "full-year check of the hourly portfolio: optimal (least unmatched energy, the battery cyclic over the year)");
-  const FY = { annualShare: annualTWh / loadYear, shortHours: shortH, shortMWh: fy.objective, matched: 1 - fy.objective / loadYear };
+  const FY = { annualShare: annualTWh / loadYear, shortMWh: fy.objective, matched: 1 - fy.objective / loadYear };
   { const six = Y.days.reduce((s, d) => s + d.weight * PP.sum(d.cfw), 0) / (365 * 24);
-    ok(FY.annualShare < 1 && FY.shortHours > 0 && six > 0.338 && near(FY.annualShare, 0.338 / six, 1e-9), `the full year shows what six days miss: the six weighted days' wind (${(six * 100).toFixed(1)}%) is above the year's 33.8%, so annual matching falls short; some hours go unmatched`); }
+    ok(FY.annualShare < 1 && FY.shortMWh > 1 && six > 0.338 && near(FY.annualShare, 0.338 / six, 1e-9), `the full year shows what six days miss: the six weighted days' wind (${(six * 100).toFixed(1)}%) is above the year's 33.8%, so annual matching falls short; some energy goes unmatched`); }
+  ok(shortI.length > 0 && shortI.every(i => PF.w[i] * hr.Wb + PF.s[i] * hr.Sb < L0), "the unmatched energy falls in hours of low wind and sun (the portfolio's own output below 300 MW) in the solved schedule: " + shortI.map(i => (PF.w[i] * hr.Wb + PF.s[i] * hr.Sb).toFixed(0) + " MW").join(", "));
+  ok(Math.round(FY.shortMWh) === 290 && (FY.shortMWh / loadYear * 100).toFixed(2) === "0.01", "the full year: about 290 MWh unmatched, 0.01% of the load's year (the least possible: the optimum, the same for every best schedule)");
 
   // ---------------- the reference block and the page's generated blocks
   const ref = { about: "Written by node _tests/learn/test_m06-carbon-in-models.js --write; re-solved by the same test on every run. CO2 in t, money in $ a year (2025 dollars).",
@@ -137,7 +147,7 @@ function dmt(v) { const r = Math.round(v / 1e4) / 100; return (r < 0 ? "−" : r
 ${caps.map(z => `<tr><td>${z.c}%</td><td data-label="CO₂">${mt(z.x.R.co2)}</td><td data-label="Cost">${musd(z.x.R.resource)}</td><td data-label="Dual">${f2(z.x.R.capPrice)}</td></tr>`).join("\n")}
 </tbody>
 </table>
-<p class="lx-hint">At ${f2(t70.tau)} per t, the 70% cap's dual, every plan from ${mt(t70.lo)} to ${mt(t70.hi)} scores the same: a price there picks no single plan.</p>
+<p class="lx-hint">At the 70% cap's dual, ${f2(t70.tau)} per t rounded (the tie needs its full precision), every plan from ${mt(t70.lo)} to ${mt(t70.hi)} scores the same: a price there picks no single plan.</p>
 <table class="lx-facts m6-fb">
 <thead><tr><th scope="col">The 300 MW data center buys</th><th scope="col">May claim</th><th scope="col">The plants emit</th><th scope="col">Cost</th><th scope="col">Built for it</th></tr></thead>
 <tbody>
@@ -150,21 +160,21 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
 <p class="lx-hint">The plants' change is against the grid without the data center; the cost against no rule. A year in 2025 dollars.</p>`;
   const EXPLAIN = `<dl class="lx-ideas">
 <dt>A cap</dt><dd>A rule on the year's CO₂. At 70% of ${mt(E0)} the plan costs ${dm(c70.x.R.resource - base.R.resource).replace("+", "")} more, and the cap's dual is ${f2(c70.x.R.capPrice)} per t.</dd>
-<dt>The frontier</dt><dd>Its slope is the dual: from ${f2(caps[0].x.R.capPrice)} at 90% to ${f2(caps[caps.length - 1].x.R.capPrice)} at 30%.</dd>
-<dt>A price and its ties</dt><dd>A price at the 70% cap's dual ties every plan from ${mt(t70.lo)} to ${mt(t70.hi)}; the cap picks one.</dd>
+<dt>The frontier</dt><dd>The dual is the extra cost of cutting one more tonne, the magnitude of the frontier's downward slope: from ${f2(caps[0].x.R.capPrice)} at 90% to ${f2(caps[caps.length - 1].x.R.capPrice)} at 30%.</dd>
+<dt>A price and its ties</dt><dd>A price at the 70% cap's unrounded dual ties every plan from ${mt(t70.lo)} to ${mt(t70.hi)}; the cap picks one CO₂ level.</dd>
 <dt>A procurement rule</dt><dd>A rule on one buyer's purchases. Hourly matching costs ${dm(Hr.resource - An.resource).replace("+", "")} a year more than annual matching here.</dd>
-<dt>Claim and cause</dt><dd>All four purchases may claim 0 t; the plants emit from ${dmt(Hr.co2 - E0)} to ${dmt(N.co2 - E0)} against the grid without the data center.</dd>
+<dt>Claim and cause</dt><dd>The three certificate or matching purchases may claim 0 t; with no rule, the load's share counts at average factors. The plants emit from ${dmt(Hr.co2 - E0)} to ${dmt(N.co2 - E0)} against the grid without the data center.</dd>
 </dl>`;
   const FULL = `<ul>
 <li><b>Annual matching.</b> On all 8,760 hours of 2025 the ${mw(An.Wb)} of wind make ${Math.round(FY.annualShare * 100)}% of the data center's load over the year: the six weighted days were windier than the year.</li>
-<li><b>Hourly matching.</b> Run hour by hour through 2025, the portfolio leaves ${FY.shortHours.toLocaleString("en-US")} hours short, ${Math.round(FY.shortMWh).toLocaleString("en-US")} MWh in all: still-air hours the six days did not include.</li>
+<li><b>Hourly matching.</b> Run hour by hour through 2025, the portfolio leaves at least ${Math.round(FY.shortMWh).toLocaleString("en-US")} MWh unmatched, ${(FY.shortMWh / loadYear * 100).toFixed(2)}% of the load's year, in hours of low wind and sun. Which hours carry it can differ between equally good schedules.</li>
 <li><b>So:</b> a rule met on representative days is a representative-day result. Check it on the full year, as the notebook does.</li>
 </ul>`;
   const CHECK = `<div class="lx-myths" data-quiz="m6-myth">
 <div class="lx-qq" data-id="price-cap" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A carbon price equal to a cap's dual gives back exactly the cap's plan.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. At the 70% cap's dual, ${f2(t70.tau)} per t, every plan from ${mt(t70.lo)} to ${mt(t70.hi)} scores the same; the cap's plan is one of them.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At the 70% cap's dual (${f2(t70.tau)} per t, rounded; the tie needs its full precision), every plan from ${mt(t70.lo)} to ${mt(t70.hi)} scores the same. The cap's plan is one of them.</p></details>
 </div>
 <div class="lx-qq" data-id="hourly-cut" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If a buyer's purchases let it claim zero emissions, the plants emit no more than without it.”</p>
@@ -180,8 +190,8 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
 <div class="lx-quiz" data-quiz="m6">
 <div class="lx-qq" data-id="dual" data-answer="b">
 <p class="lx-qtext">A cap's dual is ${f2(c70.x.R.capPrice)} per t. Loosening the cap by 1,000 t changes the best cost by about how much?</p>
-<ul class="lx-choices"><li data-value="a">It rises by $${Math.round(c70.x.R.capPrice * 1000).toLocaleString("en-US")}</li><li data-value="b">It falls by $${Math.round(c70.x.R.capPrice * 1000).toLocaleString("en-US")}</li><li data-value="c">It falls by $${c70.x.R.capPrice.toFixed(2)}</li><li data-value="d">Nothing: the dual is only a price</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>It falls by about $${Math.round(c70.x.R.capPrice * 1000).toLocaleString("en-US")}: ${f2(c70.x.R.capPrice)} × 1,000 t, while the cap stays in the dual's range.</p></details>
+<ul class="lx-choices"><li data-value="a">It rises by about $${(+c70.x.R.capPrice.toFixed(2) * 1000).toLocaleString("en-US")}</li><li data-value="b">It falls by about $${(+c70.x.R.capPrice.toFixed(2) * 1000).toLocaleString("en-US")}</li><li data-value="c">It falls by $${c70.x.R.capPrice.toFixed(2)}</li><li data-value="d">Nothing: the dual is only a price</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>It falls by about $${(+c70.x.R.capPrice.toFixed(2) * 1000).toLocaleString("en-US")}: ${f2(c70.x.R.capPrice)} × 1,000 t, the dual rounded to the cent, while the cap stays in the dual's range.</p></details>
 </div>
 </div>`;
   const blocks = { "m06-fallback": FALLBACK, "m06-explain": EXPLAIN, "m06-fullyear": FULL, "m06-check": CHECK };
@@ -206,15 +216,14 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
     "E10.1": "A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighbouring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.",
     "E10.2": "When gas-fired backup power became much more expensive, the model built fuel cells and turned stored green hydrogen back into electricity.",
     "E10.3": "Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.",
-    "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.",
-    "E11.10": "Modest load flexibility (±5%) reduced CO₂ emissions from combined-cycle gas generation."
+    "E10.4": "Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled."
   };
   const RP = portfolio(); let APPROVED = SNAP;
   if (RP) {
     const md = fs.readFileSync(path.join(RP, "reports/learn/excerpts_for_approval.md"), "utf8"), reg = {};
     md.split("\n").forEach(line => { const m = line.match(/^\| (E(6|10|11)\.\d+)(?: \[N\])? \| (.*) \|\s*$/); if (m && !reg[m[1]]) reg[m[1]] = norm(m[3].split(" | ")[0]); });
     Object.keys(SNAP).forEach(k => ok(reg[k] === SNAP[k], `register ${k} equals the snapshot`));
-    ok(/E11\.10 optional in CF3 and M6/.test(md) && /E10 in CF3, M8, A10, M6/.test(md) && /E6 in A10, M6/.test(md), "the register records the M6 placements (E6, E10; E11.10 optional)");
+    ok(/E10 in CF3, M8, A10, M6/.test(md) && /E6 in A10, M6/.test(md), "the register records the M6 placements (E6, E10)");
     APPROVED = reg;
     const bib = fs.readFileSync(path.join(RP, "inputs/publications.bib"), "utf8").toLowerCase();
     [...PAGE.matchAll(/<li>Li et al\. \(\d{4}\)\. <a href="(https:\/\/doi\.org\/[^"]+)">([^<]+)<\/a>/g)].forEach(m => {
@@ -227,7 +236,8 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
   ok(quotes.map(q => q[1]).join(",") === "excerpt:ghg,excerpt:txh2", "two excerpts: ghg and txh2");
   quotes.forEach(q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].forEach(p => ok(approved(p[1]), `${q[1]}: approved sentence: ${norm(p[1]).slice(0, 60)}`)));
   const paras = q => [...q[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(p => norm(p[1])).join(" ");
-  ok(paras(quotes[0]) === SNAP["E6.6"] && paras(quotes[1]) === [SNAP["E10.1"], SNAP["E10.2"], SNAP["E10.3"], SNAP["E11.10"]].join(" "), "ghg: E6.6; txh2: E10.1, E10.2, E10.3, E11.10, word for word");
+  ok(paras(quotes[0]) === SNAP["E6.6"] && paras(quotes[1]) === [SNAP["E10.1"], SNAP["E10.2"], SNAP["E10.3"]].join(" "), "ghg: E6.6; txh2: E10.1, E10.2, E10.3, word for word");
+  ok(!/Modest load flexibility/.test(PAGE + JS), "E11.10 is not placed in M6 (coordinator, 2026-11-05)");
   ok(PAGE.includes(`<p class="lx-hint">${SNAP["E10.4"]}</p>`), "E10.4 under the txh2 excerpt");
   const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/^---[\s\S]*?\n---\n/, "");
   const RX = /\b(stud(y|ies)|paper|Li et al|course author|excerpt|ERCOT|Texas|weather zones?|load regulation)\b/i;
@@ -247,7 +257,13 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
   const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|docs\.nlr\.gov|atb\.nlr\.gov|ergo-code\.github\.io|github\.com\/Henryutd2021\/ghg-load-regulation)(\/|$)|notebooks\/m06-carbon-in-models\.ipynb$|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
   ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
   const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
-  ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "seven step texts of 40 words at most: " + stepTexts.map(t => t.split(/\s+/).length).join(","));
+  const sentences = t => t.replace(/\*\*/g, "").split(/(?<=[.?!])\s+(?=[A-Z0-9“"$])/).filter(x => /[A-Za-z]/.test(x)).length;
+  ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40 && sentences(t) <= 2), "seven step texts of 40 words and two sentences at most: " + stepTexts.map(t => t.split(/\s+/).length + "/" + sentences(t)).join(","));
+  ok(/\(battery; each day ends with the energy it began with\)/.test(PAGE) && /\(what exists\)/.test(PAGE) && /\(build limits\)/.test(PAGE) && /Every variable is zero or more\./.test(PAGE) && /W, S \\le 8\{,\}000, \\quad B &\\le 4\{,\}000/.test(PAGE) && D.build.wind.max === 8000 && D.build.solar.max === 8000 && D.build.battery.max === 4000 && F.A.plains.plants.cc.mw === 2000 && F.A.plains.plants.ct.mw === 2300,
+    "the algebra box states every bound the LP has (what exists, build limits, nonnegativity) with the data's values");
+  ok(/\| \$V\$ \| the value of lost load, \\\$10,000 \| \\\$\/MWh \|/.test(PAGE) && /\| \$u_t\$ \| unserved demand \| MW \|/.test(PAGE) && /combined-cycle plants and of the gas peakers/.test(PAGE) && /each step lasts one hour/.test(PAGE), "symbols: u and V apart with their units; cc and ct named; one-hour steps");
+  ok(/magnitude of its downward slope/.test(PAGE) && !/Its slope is the dual/.test(PAGE) && /This is complementary slackness: a rule with a nonzero dual holds exactly/.test(PAGE), "the dual is the magnitude of the frontier's slope; complementary slackness in plain words");
+  ok(!/still-air/.test(PAGE + JS) && !/\d+ hours short/.test(PAGE), "the full-year box gives no hour count and no 'still-air'");
   { const O2 = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/<blockquote[\s\S]*?<\/blockquote>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "");
     const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary|footer)\b[^>]*>|\n/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
     const long = els.filter(x => x.split(" ").length > 40);
@@ -264,9 +280,10 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
     ["solver", "cards", "controls", "plot", "profiles", "solvestep", "formulate", "ledger", "boundary", "plainsplan"].forEach(n => load(n, E));
-    let failing = true;
+    let failing = true, hold = false; const held = [];
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
-    slv.solve = m => { if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); return Promise.resolve(F.solve(m)); };
+    slv.solve = m => { if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = F.solve(m);
+      if (hold) return new Promise(res => held.push(() => res(r))); return Promise.resolve(r); };
     let init = null, demo = null;
     E.LX.mount = (slug, fn) => { if (slug === ID) init = fn; };
     E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
@@ -292,6 +309,34 @@ ${buyRow("New wind, sun and batteries, matched hour by hour", Hr, "0 t", `${mw(H
       demo.cards.go(6); await tick(4); btns(/Compare the four purchases/)[0].click(); await tick(30);
       ok(card().textContent.includes(dmt(N.co2 - E0)) && card().textContent.includes(dmt(Hr.co2 - E0)), "step 7: the purchase ledger");
       ok(xp.textContent.includes("Three ways to put carbon in the LP"), "explain: the three ways");
+      const ttl = () => live.querySelector("h3").textContent;
+      ok(/with the 300 MW data center/.test(ttl()) && !live.textContent.includes("Your cap") && !live.textContent.includes("The cap's dual"), "steps 5-7: the stage shows the year with the data center, not the earlier cap: " + ttl());
+      ok(card().textContent.includes("three purchases may claim 0 t") && !card().textContent.includes("all four may claim"), "step 7: three purchases claim 0 t; the no-rule case counts at average factors");
+      // every line the page assembles, at every setting: 40 words and two sentences at most
+      const said = [], over = [];
+      const grab = () => card().querySelectorAll(".lx-saw, .lx-hint, li, td, th").forEach(e => said.push(e.textContent.replace(/\s+/g, " ").trim()));
+      const press = re => card().querySelectorAll("button").filter(b => re.test(b.getAttribute("aria-label") || ""))[0];
+      demo.cards.go(0); await tick(4); grab();
+      demo.cards.go(1); await tick(8);
+      for (let i = 0; i < 4; i++) { press(/^Lower/).click(); await tick(8); }
+      for (let i = 0; i < 7; i++) { grab(); if (i < 6) { press(/^Raise/).click(); await tick(8); } }
+      ok(xp.textContent.includes("at your cap of 90%"), "explain: the cap card follows the reader's solved cap");
+      demo.cards.go(2); await tick(4); btns(/Trace seven caps/)[0].click(); await tick(40); grab();
+      demo.cards.go(3); await tick(10);
+      for (let i = 0; i < 4; i++) { press(/^Lower/).click(); await tick(12); }
+      for (let i = 0; i < 15; i++) { grab(); if (i < 14) { press(/^Raise/).click(); await tick(12); } }
+      btns(/Use the dual/)[0].click(); await tick(20); grab();
+      ok(said.some(t => /^A price at the cap's exact dual \(\$\d+\.\d\d per t, rounded\): every plan from/.test(t)), "step 4: the dual's price is labelled exact, its print rounded");
+      demo.cards.go(4); await tick(4); btns(/Solve with the data center/)[0].click(); await tick(10); grab();
+      demo.cards.go(5); await tick(10); grab(); btns(/^Hour by hour/)[0].click(); await tick(10); grab();
+      ok(live.textContent.includes("Built for it") && /hour by hour/.test(ttl()), "step 6: the purchase's capacities are readouts on the stage, not in the sentence");
+      demo.cards.go(6); await tick(4); btns(/Compare the four purchases/)[0].click(); await tick(30); grab();
+      said.filter(t => /[A-Za-z]/.test(t)).forEach(t => { if (t.split(" ").length > 40 || sentences(t) > 2) over.push(t.slice(0, 70) + " (" + t.split(" ").length + "/" + sentences(t) + ")"); });
+      ok(said.length > 60 && over.length === 0, "every assembled line (" + said.length + ") is 40 words and two sentences at most: " + over.slice(0, 4).join(" | "));
+      // a solve that ends after the reader has left its step paints nothing
+      demo.cards.go(1); await tick(8); hold = true; press(/^Lower/).click(); await tick(2);
+      demo.cards.go(4); await tick(4); const before = ttl(); hold = false; held.splice(0).forEach(f => f()); await tick(12);
+      ok(ttl() === before && /data center/.test(ttl()), "a late cap solve does not paint the data-center step: " + ttl());
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
   }
 

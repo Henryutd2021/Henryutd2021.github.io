@@ -1,5 +1,5 @@
 {
- "about": "Learn A12, How do governments steer energy? (wave W4, builder learn-w4-c, 2026-11-05). The four instruments with their slider ranges and defaults, a real rule of each kind with its jurisdiction and date, and a reference block written by the test (node _tests/learn/test_a12-policy-instruments.js --write). The model is the Plains Grid's planning LP in assets/learn/m06-carbon-in-models.js, with the fleet in a10-emissions-questions.json and the costs in m06-carbon-in-models.json. Money in 2025 dollars a year.",
+ "about": "Learn A12, How do governments steer energy? (wave W4, builder learn-w4-c, 2026-11-05). The four instruments with their slider ranges and defaults, a real rule of each kind with its jurisdiction and date, and a reference block written by the test (node _tests/learn/test_a12-policy-instruments.js --write). The model is the Plains Grid's planning LP in assets/learn/components/plainsplan.js, with the fleet in a10-emissions-questions.json and the costs in m06-carbon-in-models.json. Money in 2025 dollars a year.",
  "accessed": "2026-11-05",
  "instruments": [
   {
@@ -13,6 +13,7 @@
    "def": 30,
    "color": "var(--lx-warn)",
    "pays": "Gas plants pay the price on every tonne, to the government.",
+   "payer": "gas plants, to the government",
    "side": "Every gas MWh costs more, the cleaner plant's too."
   },
   {
@@ -26,6 +27,7 @@
    "def": 10,
    "color": "var(--lx-wind)",
    "pays": "Taxpayers pay the credit on every MWh new wind and solar deliver.",
+   "payer": "taxpayers, to new wind and solar",
    "side": "It pays per MWh used, so plants get built past what the grid can take in windy hours."
   },
   {
@@ -38,7 +40,8 @@
    "step": 10,
    "def": 30,
    "color": "var(--lx-solar)",
-   "pays": "Taxpayers pay a share of what is built, whatever it later produces.",
+   "pays": "Taxpayers pay a share of what is built, up front; shown as its annual equivalent over the plant's life.",
+   "payer": "taxpayers, to new plants' owners",
    "side": "It rewards capacity, not output: a plant that is often curtailed earns the same credit."
   },
   {
@@ -51,7 +54,8 @@
    "step": 5,
    "def": 65,
    "color": "var(--lx-good)",
-   "pays": "Electricity customers pay for certificates, which every clean MWh earns.",
+   "pays": "Customers are assumed to fund the certificates, at the model's marginal compliance cost; who bears it in the end is not modeled.",
+   "payer": "customers, assumed",
    "side": "Wind and sun that ran anyway earn certificates too."
   }
  ],
@@ -93,13 +97,20 @@
   {
    "id": "ces",
    "kind": "Clean-energy standard",
-   "where": "U.S. states",
-   "name": "100% clean electricity standards",
-   "text": "Lawrence Berkeley National Laboratory counted 16 states that had adopted a 100% clean electricity standard, with data through 2023.",
+   "where": "California",
+   "name": "Renewables Portfolio Standard (a renewables-only standard)",
+   "text": "Senate Bill 100 (2018) raised it to 60% of retail electricity sales by 2030, from eligible renewable plants, such as wind and solar, anywhere in the Western Electricity Coordinating Council's region.",
    "source": {
-    "label": "Barbose, U.S. State Renewables Portfolio & Clean Electricity Standards: 2024 Status Update, LBNL (August 2024)",
-    "url": "https://eta-publications.lbl.gov/publications/us-state-renewables-portfolio-clean-0",
+    "label": "California Public Utilities Commission, Renewables Portfolio Standard (RPS) Program page",
     "asOf": "read 5 November 2026"
+   },
+   "context": {
+    "text": "For scale: Lawrence Berkeley National Laboratory counted 16 states that had adopted a 100% clean electricity standard, with data through 2023.",
+    "source": {
+     "label": "Barbose, U.S. State Renewables Portfolio & Clean Electricity Standards: 2024 Status Update, LBNL (August 2024)",
+     "url": "https://eta-publications.lbl.gov/publications/us-state-renewables-portfolio-clean-0",
+     "asOf": "read 5 November 2026"
+    }
    }
   }
  ],

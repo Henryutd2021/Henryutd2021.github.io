@@ -12,6 +12,10 @@
 //   - the page's blocks (fallback, explain, check, rules) are written from the model (--write) and checked otherwise
 //   - guard G-POL: instruments act on wind, solar, storage and gas only; no nuclear term; no break-even or threshold search
 //     or wording; links only to allowed domains; text budget; the page on a stub document with a failing, then working, solver
+//   - review fixes (2026-11-05): a solve that ends after the reader left its step paints nothing; the investment credit's
+//     yearly figure is an annual equivalent, with its cash up front (overnight capital x share, unique on the optimal face);
+//     certificate spending is illustrative, with its market assumption; no battery is built, said with the reason the LP
+//     gives; cost per tonne worked through; every line the page assembles, at every slider setting, within the budget
 // Usage (from the site folder):  node _tests/learn/test_a12-policy-instruments.js [--write]
 "use strict";
 const fs = require("fs");
@@ -44,6 +48,7 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
     if (x.id !== "ces") ok(r.co2 <= base.co2 + 1, tag + ": CO2 never above no policy");
     else ok(r.clean >= o.ces * Y.demandMWh - 1 && r.cesPrice >= -1e-9 && Math.abs(r.certPay - r.cesPrice * o.ces * Y.demandMWh) < 1e-3, tag + ": the standard is met; certificate payments = price x required MWh");
     ok(r.Bn < 1e-6, tag + ": no battery is built");
+    ok(Math.abs(r.itcUpfront - (o.itc || 0) * (r.Wn * 1712e3 + r.Sn * 1484e3 + r.Bn * C.battery.kW * 1e3)) < 1e-3 && (!o.itc || Math.abs(r.itcPay - r.itcUpfront * (0.04 / (1 - Math.pow(1.04, -30)))) < 1e-3 * r.itcPay + 1e-3 || r.Bn > 0), tag + ": the investment credit up front = share x overnight capital; its yearly figure = the up-front amount x the capital recovery factor (4%, 30 years)");
   });
   // the capital costs from first principles (2025 dollars)
   { const crf = (r, n) => r / (1 - Math.pow(1 + r, -n)), defl = 128.989 / 125.43;
@@ -59,7 +64,11 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
       const [lo, hi] = fc[n], val = r[FIELD[n] || n], s = SHOW[n];
       if (!(s(lo) === s(hi) && s(lo) === s(val))) tieBad.push((x ? x.id + v : "base") + " " + n + " " + s(lo) + ".." + s(hi) + " shown " + s(val));
     });
-    // money and resource cost follow from unique quantities; the per-tonne cost from unique differences
+    // money and resource cost follow from unique quantities; the per-tonne cost from unique differences. The investment
+    // credit's up-front cash is a positive mix of the three sizes, so it lies between the mix of their face minima and
+    // of their maxima: both ends must print the same
+    if (x && x.id === "itc") { const c = { Wn: 1712e3, Sn: 1484e3, Bn: Y.cost.battery.kW * 1e3 }, at = i => o.itc * ["Wn", "Sn", "Bn"].reduce((s, k) => s + c[k] * fc[k][i], 0);
+      if (!(f.m(at(0)) === f.m(at(1)) && f.m(at(0)) === f.m(r.itcUpfront))) tieBad.push(x.id + v + " up front " + f.m(at(0)) + ".." + f.m(at(1))); }
   });
   ok(tieBad.length === 0, "every shown number is the same for every best plan at every slider setting:\n  " + tieBad.slice(0, 8).join("\n  "));
   // the certificate price: unique (one-sided changes of the cost)
@@ -73,23 +82,31 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
   const cuts = defs.map(z => z.c.cutPct), pers = defs.map(z => z.c.perT);
   ok(Math.max(...cuts) - Math.min(...cuts) < 0.06 && Math.max(...pers) - Math.min(...pers) < 3, "defaults: similar cuts (within 6 points) at similar cost per tonne (within $3)");
   ok(A12.compare(base, R.ptc30).perT > A12.compare(base, R.ptc10).perT + 10 && R.ptc30.curtailed > 1e6, "a $30 production credit costs much more per tonne than $10, and curtails over 1 TWh");
+  ok(f.m(R.itc30.itcUpfront) === "$681.3M" && f.m(R.itc30.itcPay) === "$39.4M", "the default investment credit: $681.3M up front, $39.4M a year as its annual equivalent");
+  // no battery: building one is not worth its annual cost here (the reduced cost of a battery MW is positive at every setting)
+  grid.concat([[null, 0]]).forEach(([x, v]) => { const o = x ? A12.opts(x.id, v) : {}, r0 = F.run(o).r.objective, r1 = F.solve(PP.build(Y, Object.assign({}, o, { fix: { Bn: 1 } }))).objective;
+    ok(r1 > r0 + 1, (x ? x.id + " " + v : "no policy") + ": a 1 MW battery raises the year's cost (its energy shifting saves less than its annual cost): +$" + Math.round(r1 - r0).toLocaleString("en-US")); });
 
   // ---------------- the page's generated blocks
-  const ROWS = defs.map(z => `<tr><td>${z.x.label}, ${f.val(z.x, z.x.def)}</td><td data-label="CO₂">${f.mt(z.r.co2)}</td><td data-label="Cut">${f.pct(z.c.cutPct)}</td><td data-label="Resource cost">${f.dm(z.c.dRes)}</td><td data-label="Per tonne">${f.pt(z.c.perT)}</td><td data-label="Money moved">${f.m(A12.moneyOf(z.x.id, z.r))}</td></tr>`).join("\n");
+  const ROWS = defs.map(z => `<tr><td>${z.x.label}, ${f.val(z.x, z.x.def)}</td><td data-label="CO₂">${f.mt(z.r.co2)}</td><td data-label="Cut">${f.pct(z.c.cutPct)}</td><td data-label="Resource cost">${f.dm(z.c.dRes)}</td><td data-label="Per tonne">${f.pt(z.c.perT)}</td><td data-label="Money moved, a year">${A12.moneyCell(z.x.id, z.r)}</td></tr>`).join("\n");
+  const t0 = defs[0];
   const FALLBACK = `<p class="lx-hint">No policy: nothing new is built; CO₂ ${f.mt(base.co2)} a year, resource cost ${f.m(base.resource)}, wind and sun ${f.pct(base.shareClean)} of demand.</p>
 <table class="lx-facts a12-fb">
-<thead><tr><th scope="col">Instrument, default setting</th><th scope="col">CO₂</th><th scope="col">Cut</th><th scope="col">Resource cost</th><th scope="col">Per tonne avoided</th><th scope="col">Money that changes hands</th></tr></thead>
+<thead><tr><th scope="col">Instrument, default setting</th><th scope="col">CO₂</th><th scope="col">Cut</th><th scope="col">Resource cost</th><th scope="col">Per tonne avoided</th><th scope="col">Money that changes hands, a year</th></tr></thead>
 <tbody>
 ${ROWS}
 </tbody>
 </table>
-<p class="lx-hint">Similar cuts at similar cost per tonne; the money that changes hands, and who pays it, differs.</p>`;
+<p class="lx-hint">Per tonne avoided = the change in resource cost ÷ the CO₂ avoided, from unrounded values: at ${f.val(t0.x, t0.x.def)}, ${f.dm(t0.c.dRes).replace("+", "")} ÷ ${f.mt(t0.c.cut)} = ${f.pt(t0.c.perT)}.</p>
+<p class="lx-hint">Similar cuts at similar cost per tonne; the money that changes hands, and who pays it, differs. Certificate spending assumes certificates trade at the model's marginal compliance cost.</p>`;
   const per = defs.map(z => z.c.perT), lo = Math.min(...per), hi = Math.max(...per);
   const EXPLAIN = `<dl class="lx-ideas">
 <dt>Same lever, different hands</dt><dd>At the defaults each instrument cuts ${f.pct(Math.min(...cuts))} to ${f.pct(Math.max(...cuts))} of CO₂ for ${f.pt(lo).replace(" per t", "")} to ${f.pt(hi)} avoided; the money that changes hands runs from ${f.m(Math.min(...defs.map(z => A12.moneyOf(z.x.id, z.r))))} to ${f.m(Math.max(...defs.map(z => A12.moneyOf(z.x.id, z.r))))} a year.</dd>
-<dt>Carbon price</dt><dd>Raises every gas MWh's cost; gas plants pay ${f.m(defs[0].r.carbonPay)} at ${f.val(defs[0].x, defs[0].x.def)}.</dd>
+<dt>Per tonne avoided</dt><dd>The change in resource cost ÷ the CO₂ avoided, both against no policy: at ${f.val(t0.x, t0.x.def)}, ${f.dm(t0.c.dRes).replace("+", "")} ÷ ${f.mt(t0.c.cut)} = ${f.pt(t0.c.perT)}. Carbon payments are left out.</dd>
+<dt>Carbon price</dt><dd>Raises every gas MWh's cost; gas plants pay ${f.m(defs[0].r.carbonPay)} a year at ${f.val(defs[0].x, defs[0].x.def)}.</dd>
 <dt>Credits</dt><dd>Lower the cost of new wind and solar; taxpayers pay. A $30 production credit costs ${f.pt(A12.compare(base, R.ptc30).perT)} avoided, against ${f.pt(A12.compare(base, R.ptc10).perT)} at $10.</dd>
-<dt>Standard</dt><dd>Requires a clean share; customers pay certificates at ${"$" + R.ces65.cesPrice.toFixed(2)} per MWh at 65%, wind that ran anyway included.</dd>
+<dt>Investment credit</dt><dd>Paid up front: ${f.m(R.itc30.itcUpfront)} at 30%, or ${f.m(R.itc30.itcPay)} a year spread over the plants' life at 4%.</dd>
+<dt>Standard</dt><dd>Requires a clean share. If certificates trade at the marginal compliance cost, ${"$" + R.ces65.cesPrice.toFixed(2)} per MWh at 65%, customers would spend ${f.m(R.ces65.certPay)} a year, wind that ran anyway included.</dd>
 <dt>Real costs and transfers</dt><dd>The resource cost changes only with the plan; payments between groups are transfers.</dd>
 </dl>`;
   const c30 = A12.compare(base, R.ptc30), c10 = A12.compare(base, R.ptc10), dc = defs[3];
@@ -107,12 +124,12 @@ ${ROWS}
 <div class="lx-qq" data-id="standard-free" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A clean-energy standard costs nothing, because it costs taxpayers nothing.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. At 65% the resource cost rises by ${f.dm(dc.c.dRes).replace("+", "")} a year, and customers pay ${f.m(dc.r.certPay)} for certificates.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At 65% the resource cost rises by ${f.dm(dc.c.dRes).replace("+", "")} a year. If customers fund certificates at the marginal compliance cost, they spend ${f.m(dc.r.certPay)}.</p></details>
 </div>
 <div class="lx-qq" data-id="battery" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Any policy that favors clean power gets batteries built.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth, here</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, here. No setting of these sliders builds a battery: the gas plants already cover the peak, and a battery would only move energy between hours.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, here. No slider setting builds a battery: under these costs and six representative days, its energy-shifting savings do not cover its annual cost. Reserves and other reliability services are not valued.</p></details>
 </div>
 </div>
 <div class="lx-quiz" data-quiz="a12">
@@ -125,7 +142,8 @@ ${ROWS}
   const RULES = `<div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world: one rule of each kind</p>
 <ul class="a12-rules">
-${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.name)}.</p><p>${esc(r.text)}</p><p class="lx-hint">Source: ${r.source.url ? `<a href="${esc(r.source.url)}">${esc(r.source.label)}</a>` : esc(r.source.label)}, ${esc(r.source.asOf)}.</p></li>`).join("\n")}
+${D.rules.map(r => { const src = x => `<p class="lx-hint">Source: ${x.url ? `<a href="${esc(x.url)}">${esc(x.label)}</a>` : esc(x.label)}, ${esc(x.asOf)}.</p>`;
+    return `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.name)}.</p><p>${esc(r.text)}</p>${src(r.source)}${r.context ? `<p>${esc(r.context.text)}</p>${src(r.context.source)}` : ""}</li>`; }).join("\n")}
 </ul>
 <p class="lx-hint">The model's instruments are simpler than these rules: no phase-outs, eligibility tests or trading.</p>
 </div>`;
@@ -154,13 +172,17 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
   const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|docs\.nlr\.gov|atb\.nlr\.gov|climate\.ec\.europa\.eu|eta-publications\.lbl\.gov|ergo-code\.github\.io)\/|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
   ok(hrefs.every(h => ALLOW.test(h.replace(/&amp;/g, "&"))), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
   const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:|instrumentStep\("\w+", "([^"]+)"\)/g)].map(m => (m[1] || m[2]).replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
-  ok(stepTexts.length === 6 && stepTexts.every(t => t.split(/\s+/).length <= 40), "six step texts of 40 words at most: " + stepTexts.map(t => t.split(/\s+/).length).join(","));
+  const sent2 = t => t.split(/(?<=[.?!])\s+(?=[A-Z])/).length;
+  ok(stepTexts.length === 6 && stepTexts.every(t => t.split(/\s+/).length <= 40 && sent2(t) <= 2), "six step texts of 40 words and two sentences at most: " + stepTexts.map(t => t.split(/\s+/).length + "/" + sent2(t)).join(","));
   { const O2 = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "");
     const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
     const long = els.filter(x => x.split(" ").length > 40);
     ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
   const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
   ["investment-credit", "clean-energy-standard", "resource-cost", "transfer-payment"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("[[" + id + "|"), "sidecar defines and the page marks " + id));
+  ok(["heat-rate", "net-demand", "shadow-price"].every(id => PAGE.includes('data-term="' + id + '"') || PAGE.includes('term="' + id + '"')) && JS.includes("[[curtailment|curtailed]]") && JS.includes("Mt = million tonnes of CO₂; TWh = million MWh"), "course glossary terms marked (heat rates, net load, curtailed, shadow price); Mt and TWh spelled out");
+  ok(/\*\*Symbols\.\*\* \$t\$: an hour of the six days; \$w_t\$: the days it stands for/.test(PAGE), "the Modeler box's symbols, with units");
+  { const ca = D.rules.find(r => r.id === "ces"); ok(ca.where === "California" && /Senate Bill 100 \(2018\)/.test(ca.text) && /60% of retail electricity sales by 2030/.test(ca.text) && /California Public Utilities Commission/.test(ca.source.label) && /read 5 November 2026/.test(ca.source.asOf) && /16 states/.test(ca.context.text) && /lbl\.gov/.test(ca.context.source.url), "the standard's real rule: California's RPS (SB 100, 2018: 60% by 2030; CPUC page), the LBNL count as context"); }
   ok(PAGE.indexOf("m06-carbon-in-models.js\" defer") < 0 && PAGE.indexOf("learn.js\" defer") > 0 && PAGE.indexOf("learn.js\" defer") < PAGE.indexOf("a12-policy-instruments.js\" defer"), "the shared planning LP comes with the bundle (components/plainsplan.js, W4 integration); the page loads no other lesson's script");
   { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), r = PY.slice(PY.indexOf("id: " + ID), PY.indexOf("id: " + ID) + 1600);
     ok(/status: active/.test(r.split("- kind:")[0]) && r.includes("after: [A1, 12]") && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active, after A1 and lesson 12, subtitle equal to the page's"); }
@@ -171,9 +193,10 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
     const E = env();
     E.LX.ready = () => {}; E.LX.progress.guess = () => null; E.LX.visible = E.LX.visible || (() => false); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.reduced = E.LX.reduced || (() => true);
     ["solver", "cards", "controls", "plot", "profiles", "solvestep", "costsplit", "ledger", "table", "causal", "boundary", "plainsplan"].forEach(n => load(n, E));
-    let failing = true;
+    let failing = true, hold = false; const held = [];
     const slv = E.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
-    slv.solve = m => { if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = F.solve(m); return Promise.resolve(r); };
+    slv.solve = m => { if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 10000 } }); const r = F.solve(m);
+      if (hold) return new Promise(res => held.push(() => res(r))); return Promise.resolve(r); };
     let init = null, demo = null;
     E.LX.mount = (slug, fn) => { if (slug === ID) init = fn; };
     E.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
@@ -197,6 +220,29 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
       demo.cards.go(5); for (let i = 0; i < 20; i++) await tick();
       ok(card().textContent.includes("EU Emissions Trading System") && card().textContent.includes(f.m(R["ces" + D.instruments[3].def].certPay)), "step 6: the ledger of all four and the real rules");
       ok(xp.textContent.includes("Four instruments, one plan"), "explain: the comparison table");
+      ok(card().textContent.includes("California") && card().textContent.includes("16 states") && card().querySelectorAll(".a12-rules li").every(li => li.querySelectorAll("p").length >= 3), "step 6: each real rule as name, mechanism and source, the LBNL count as context");
+      // a solve that ends after the reader has left its step paints nothing (review finding 1): enter the production
+      // credit at a new setting, go Back to step 1 before the solve ends, then let it end
+      const ttl = () => live.querySelector("h3").textContent;
+      demo.cards.go(2); for (let i = 0; i < 6; i++) await tick();
+      hold = true; card().querySelectorAll("button").filter(b => /^Raise/.test(b.getAttribute("aria-label") || ""))[0].click(); await tick();
+      demo.cards.go(0); for (let i = 0; i < 4; i++) await tick();
+      const before = ttl(); hold = false; held.splice(0).forEach(f => f()); for (let i = 0; i < 8; i++) await tick();
+      ok(/no policy/.test(before) && ttl() === before && !/production credit/.test(ttl()) && !card().textContent.includes("Taxpayers pay"), "a late solve does not paint step 1: " + ttl());
+      // every line the page assembles, at every slider setting: 40 words and two sentences at most
+      const said = [], over = [], sentences = t => t.replace(/\*\*/g, "").split(/(?<=[.?!])\s+(?=[A-Z0-9“"$])/).filter(x => /[A-Za-z]/.test(x)).length;
+      const grab = () => card().querySelectorAll(".lx-saw, .lx-hint, p, li, td, th").forEach(e => { if (!e.querySelectorAll("p").length) said.push(e.textContent.replace(/\s+/g, " ").trim()); });
+      for (let k = 1; k <= 4; k++) {
+        const x = D.instruments[k - 1]; demo.cards.go(k); for (let i = 0; i < 8; i++) await tick();
+        const lower = () => card().querySelectorAll("button").filter(b => /^Lower/.test(b.getAttribute("aria-label") || ""))[0], raise = () => card().querySelectorAll("button").filter(b => /^Raise/.test(b.getAttribute("aria-label") || ""))[0];
+        for (let v = x.def; v > x.min; v -= x.step) { lower().click(); for (let i = 0; i < 6; i++) await tick(); }
+        for (let v = x.min; v <= x.max; v += x.step) { grab(); if (v < x.max) { raise().click(); for (let i = 0; i < 6; i++) await tick(); } }
+      }
+      demo.cards.go(5); for (let i = 0; i < 20; i++) await tick(); grab();
+      const saws = said.filter(t => /[A-Za-z]/.test(t));
+      saws.forEach(t => { if (t.split(" ").length > 40 || (sentences(t) > 2 && !/^Source:/.test(t))) over.push(t.slice(0, 70) + " (" + t.split(" ").length + "/" + sentences(t) + ")"); });
+      ok(saws.length > 60 && over.length === 0, "every assembled line (" + saws.length + ") is 40 words and two sentences at most: " + over.slice(0, 4).join(" | "));
+      ok(saws.some(t => /Taxpayers pay \$681\.3M up front: \$39\.4M a year as an annual equivalent\./.test(t)) && saws.some(t => /customers would spend \$\d+\.\dM a year \(illustrative\)/.test(t)) && saws.some(t => /per tonne avoided, \$41\.6M ÷ 1\.83 Mt = \$23 per t/.test(t)), "the money lines: the credit up front and as an annual equivalent; certificate spending illustrative; per tonne avoided worked");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
   }
 

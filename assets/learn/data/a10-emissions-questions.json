@@ -33,7 +33,7 @@
   },
   "sources": {
    "heat": {
-    "label": "EIA, Electric Power Annual, Table 8.2: average tested heat rates by prime mover, 2025 (natural gas combined cycle 7,535 Btu per kWh; gas turbine 10,975)",
+    "label": "EIA, Electric Power Annual, Table 8.2: average tested heat rates by prime mover, 2025 (natural gas combined cycle 7,535 Btu per kWh; gas turbine 10,975), reported at full load",
     "url": "https://www.eia.gov/electricity/annual/html/epa_08_02.html",
     "asOf": "2025 data, release of 21 October 2026; read 5 November 2026"
    },
@@ -105,30 +105,48 @@
    "label": "Certificates from an existing wind farm, matched over the year",
    "claim": "zero",
    "supply": "none",
-   "note": "Not additional: the wind farm ran anyway, so nothing on the grid changes."
+   "note": "Assume the wind farm ran anyway: the purchase changes nothing on the grid."
   },
   {
    "id": "far",
-   "label": "A new wind farm on another grid, matched over the year",
+   "label": "A new wind farm on another grid in the same certificate market, matched over the year",
    "claim": "zero",
    "supply": "none",
-   "note": "Not deliverable here: its output changes another grid, not this one."
+   "note": "Assume it is built for this buyer but its output enters another grid, not this one."
   },
   {
    "id": "new",
    "label": "A new wind farm on this grid, matched over the year",
    "claim": "zero",
    "supply": "wind",
-   "note": "Additional and deliverable: its output enters this grid."
+   "note": "Assume the purchase gets it built (additional) and no line limits (deliverable): its output enters this grid."
   },
   {
    "id": "hourly",
    "label": "The same new wind farm, matched hour by hour",
    "claim": "hourly",
    "supply": "wind",
-   "note": "Hours its output falls short are counted at the hour's average factor."
+   "note": "Hours its output falls short are counted at the grid average, a teaching proxy; a residual mix is left out."
   }
  ],
+ "claimRules": {
+  "label": "Illustrative reporting rules, after the GHG Protocol's Scope 2 Guidance (2015), market-based method",
+  "assume": "Each certificate is assumed to be this buyer's alone, retired for it, and from the same market as its use (Table 7.1, criteria 2, 3 and 5).",
+  "proxy": "Shortfall hours use the grid average as a teaching proxy; the guidance asks for a residual mix (the factor of unclaimed power) where one exists.",
+  "status": "The GHG Protocol consulted on a revision from 20 October 2025 to 31 January 2026; hourly matching and deliverability are proposals, not adopted rules (feedback summary, 29 July 2026).",
+  "sources": [
+   {
+    "label": "GHG Protocol, Scope 2 Guidance (2015), Table 7.1: Scope 2 Quality Criteria, page 60",
+    "url": "https://ghgprotocol.org/sites/default/files/2023-03/Scope%202%20Guidance.pdf",
+    "asOf": "read 5 November 2026"
+   },
+   {
+    "label": "GHG Protocol, Scope 2 Public Consultation Feedback Summary: Executive Summary",
+    "url": "https://ghgprotocol.org/sites/default/files/2026-07/S2-ExecutiveSummary-PublicConsultation%20ummaryofFeedback-2026.07.29.pdf",
+    "asOf": "29 July 2026; read 5 November 2026"
+   }
+  ]
+ },
  "sort": {
   "bins": [
    {
@@ -199,7 +217,7 @@
     "id": "match",
     "text": "Our contract matches every hour of use with a new solar farm on the same grid.",
     "bin": "claim",
-    "why": "Hourly matching, additional and deliverable: a stricter claim, still a rule about the buyer's portfolio."
+    "why": "Hourly matching with new supply on the same grid: a stricter claim, still a rule about the buyer's portfolio."
    }
   ]
  },

@@ -27,10 +27,16 @@
 //   3 long run    the same difference after a stated build response: none; a new 300 MW combined-cycle plant (EIA's new
 //                 design, 6.226 MMBtu per MWh); new wind sized to make the load's yearly energy at 33.8% (the day's output
 //                 from the same hourly shape)
-//   4 claim       what the buyer may report: location-based (= 1); zero with certificates matched over the year; with
+//   4 claim       what the buyer may report under illustrative rules after the GHG Protocol's Scope 2 Guidance (2015),
+//                 market-based method (data block claimRules: certificates assumed exclusively owned, retired for the
+//                 buyer and from the same market): location-based (= 1); zero with certificates matched over the year; with
 //                 hourly matching, each hour's shortfall of the new wind farm's output against the load at that hour's
-//                 average factor. The plants' change for a purchase is 2 when it adds nothing to this grid, 3 (new wind)
-//                 when it does.
+//                 grid-average factor (a teaching proxy; a residual mix is left out). The plants' change for a purchase is
+//                 2 when it is assumed to add nothing to this grid, 3 (new wind) when it is assumed additional and
+//                 deliverable (the purchase gets the farm built; no line limits).
+// A 300 MW step can overflow the combined-cycle plants' spare room: in such an hour part of it runs on the peakers, so
+// the next-MWh marginal factor times the load is not the change. The page draws the load's own extra CO2 per MWh, (CO2
+// with - CO2 without) / load, and lists each hour's change; hourDelta() and overflow() below.
 // Every number on the page is checked by _tests/learn/test_a10-emissions-questions.js.
 (function () {
   "use strict";
@@ -106,8 +112,16 @@
     });
     return { key: key, load: load, mwh: mwh, inv: inv, invMR: invMR, short: b1.co2 - b0.co2, shortDefault: shortDefault, ch: changes(b0, b1),
       chDefault: changes(base, day(W, { load: load })), base: b0, withLoad: b1, long: long, newWindMW: nwMW, newWindMWh: sum(nw), newWind: nw,
-      hourlyClaim: hourly, hourlyShort: short, claims: claims, plants: plants };
+      hourlyClaim: hourly, hourlyShort: short, claims: claims, plants: plants, day0: base, gCC: gCC, gW: gW };
   }
+  // hour by hour, what adding the load (and any build) changes: CO2 (t) and each plant's MWh; a against b, same hours
+  function hourDelta(a, b) {
+    var o = []; for (var t = 0; t < HOURS; t++) o.push({ co2: b.h[t].co2 - a.h[t].co2, ccn: b.h[t].ccn - a.h[t].ccn, cc: b.h[t].cc - a.h[t].cc, ct: b.h[t].ct - a.h[t].ct, spill: a.h[t].sp - b.h[t].sp });
+    return o;
+  }
+  // hours where the load's step runs on two plants (combined cycle and peakers both rise): there the next-MWh marginal
+  // factor times the load differs from the change
+  function overflow(a, b, load) { return hourDelta(a, b).filter(function (d, t) { return load[t] > 0 && d.cc > 1e-9 && d.ct > 1e-9; }).length; }
   function hm(t) { return (t < 10 ? "0" : "") + t + ":00"; }
   function span(t) { return hm(t) + "–" + hm(t + 1); }
   // runs of hours where the load is on: [[from, to)] for the chart's shading and the text
@@ -122,7 +136,7 @@
   };
   var PLANT = { spill: "spilled wind and sun", ccn: "the new combined-cycle plant", cc: "the combined-cycle plants", ct: "the peakers", short: "unserved demand" };
   var model = { HOURS: HOURS, sum: sum, fleet: fleet, prepare: prepare, hour: hour, day: day, loadShape: loadShape, inventory: inventory, changes: changes,
-    newWindMW: newWindMW, questions: questions, hm: hm, span: span, runs: runs, fm: fm, PLANT: PLANT };
+    newWindMW: newWindMW, questions: questions, hourDelta: hourDelta, overflow: overflow, hm: hm, span: span, runs: runs, fm: fm, PLANT: PLANT };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
@@ -143,9 +157,20 @@
     var plot = LX.Plot(stage, { text: "Text version of the chart" });
     var status = H("p", { class: "lx-stage-status", "aria-live": "polite" }, stage);
     function chip(label, value, tone) { var c = H("div", { class: "lx-readout" + (tone ? " " + tone : "") }, chips); H("span", { text: label }, c); H("b", { text: value }, c); }
+    // what the chart draws for the current step: the grid as run (g) against the same model's day without the load (b),
+    // with the build response (step 5) or the purchase's new wind (step 6) when they add plants
+    function scene(q) {
+      if (!S.load) return { g: day(W), b: null, label: "" };
+      var mrNow = S.mr && S.part === "model", none = q.inv.g;
+      if (S.part === "short" || S.part === "model") return { g: mrNow ? q.withLoad : none, b: mrNow ? q.base : q.day0, label: mrNow ? " · must-run rule on" : "", inc: true };
+      if (S.part === "long" && S.build === "cc") return { g: q.gCC, b: q.day0, label: " · a new 300 MW gas plant", build: true };
+      if ((S.part === "long" && S.build === "wind") || (S.part === "claim" && supplyOf(S.buy) === "wind")) return { g: q.gW, b: q.day0, label: " · " + fm.mw(q.newWindMW) + " of new wind", build: true };
+      return { g: none, b: q.day0, label: "" };
+    }
+    function supplyOf(id) { return A.procure.filter(function (x) { return x.id === id; })[0].supply; }
     function paint() {
-      var q = Q(), mrNow = S.mr && (S.part === "short" || S.part === "model"), g = !S.load ? day(W) : mrNow ? day(W, { load: q.load, mustRun: A.mustRunMW }) : q.inv.g;
-      title.textContent = P.name + ", " + W.dateLabel + (S.load ? " · with the " + name(S.load) : "") + (mrNow ? " · must-run rule on" : "");
+      var q = Q(), sc = scene(q), g = sc.g, dl = sc.b ? hourDelta(sc.b, g) : null;
+      title.textContent = P.name + ", " + W.dateLabel + (S.load ? " · with the " + name(S.load) : "") + sc.label;
       chips.innerHTML = "";
       if (!S.load) chip("Demand that day", fm.mwh(sum(W.demand)));
       else {
@@ -153,19 +178,24 @@
         if (S.part !== "day") chip("1 · Inventory share", fm.t(q.inv.share));
         if (["short", "model", "long", "claim", "sort"].indexOf(S.part) >= 0) chip("2 · Short-run change", fm.dt(q.short), q.short > 0 ? "bad" : null);
         if (["long", "claim", "sort"].indexOf(S.part) >= 0) chip("3 · Long run, " + BUILD.filter(function (b) { return b[0] === S.build; })[0][1].toLowerCase(), fm.dt(q.long[S.build]), q.long[S.build] > 0 ? "bad" : "good");
-        if (["claim", "sort"].indexOf(S.part) >= 0) chip("4 · What may be claimed", fm.t(q.claims[S.buy]));
+        if (["claim", "sort"].indexOf(S.part) >= 0) { chip("4 · Claim, illustrative rule", fm.t(q.claims[S.buy])); chip("The plants, with this purchase", fm.dt(q.plants[S.buy]), q.plants[S.buy] > 0 ? "bad" : "good"); }
       }
       var spans = S.load ? runs(q.load).map(function (r, i) { return { x0: r[0], x1: r[1], color: "var(--lx-dr)", op: 0.12, label: i === 0 ? "The " + name(S.load) + " runs" : "" }; }) : [];
+      var lines = [{ values: g.marg, step: 1, color: "var(--lx-warn)", width: 2.2, dash: "6 4" }, { values: g.avg, step: 1, color: "var(--lx-accent)", width: 2.6 }];
+      var legend = [{ label: "Average factor (the hour's CO₂ ÷ its use)", color: "var(--lx-accent)" }, { label: "Marginal factor (the plant serving one more MWh)", color: "var(--lx-warn)", dash: "6 4" }];
+      if (sc.inc) {   // the load's own extra CO2 per MWh: it differs from the marginal factor where 300 MW runs on two plants
+        lines.push({ values: q.load.map(function (l, t) { return l > 0 ? dl[t].co2 / l : null; }), step: 1, color: "var(--lx-dr)", width: 2.4 });
+        legend.push({ label: "Your load's own extra CO₂ per MWh: (with − without) ÷ its MWh", color: "var(--lx-dr)" });
+      }
+      var head = ["Hour", "Use, MW", "Average, t/MWh", "Marginal, t/MWh", "On the margin"].concat(S.load ? ["Load, MW", "CO₂ change against no load, t"] : []);
       plot.render({
         x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h"]] },
-        y: { min: 0, max: 0.7, step: 0.1, fmt: function (v) { return v.toFixed(1); }, unit: "t CO₂ per MWh" }, height: 250, heightN: 220, spans: spans,
-        lines: [{ values: g.marg, step: 1, color: "var(--lx-warn)", width: 2.2, dash: "6 4" }, { values: g.avg, step: 1, color: "var(--lx-accent)", width: 2.6 }],
-        legend: [{ label: "Average factor (the hour's CO₂ ÷ its use)", color: "var(--lx-accent)" }, { label: "Marginal factor (the plant serving one more MWh)", color: "var(--lx-warn)", dash: "6 4" }],
-        aria: P.name + " on " + W.dateLabel + ": average and marginal CO₂ factors in each hour" + (S.load ? ", with the " + name(S.load) + "." : "."),
-        text: { head: ["Hour", "Use, MW", "Average, t/MWh", "Marginal, t/MWh", "On the margin"].concat(S.load ? ["Load, MW"] : []),
-                rows: g.avg.map(function (a, t) { return [span(t), String(W.demand[t] + (S.load ? q.load[t] : 0)), fm.f2(a), fm.f2(g.marg[t]), PLANT[g.key[t]]].concat(S.load ? [String(q.load[t])] : []); }) }
+        y: { min: 0, max: 0.7, step: 0.1, fmt: function (v) { return v.toFixed(1); }, unit: "t CO₂ per MWh" }, height: 250, heightN: 220, spans: spans, lines: lines, legend: legend,
+        aria: P.name + " on " + W.dateLabel + ": average and marginal CO₂ factors in each hour" + (S.load ? ", with the " + name(S.load) + sc.label.replace(" · ", ", ") + (sc.inc ? ", and the load's own extra CO₂ per MWh." : ".") : "."),
+        text: { head: head,
+                rows: g.avg.map(function (a, t) { return [span(t), String(W.demand[t] + (S.load ? q.load[t] : 0)), fm.f2(a), fm.f2(g.marg[t]), PLANT[g.key[t]]].concat(S.load ? [String(q.load[t]), fm.dt(dl[t].co2)] : []); }) }
       });
-      status.textContent = S.load ? "The " + name(S.load) + " " + A.loads[S.load].how + "." : "Wind is high at night and falls in the afternoon; gas fills the rest.";
+      status.textContent = S.load ? "The " + name(S.load) + " " + A.loads[S.load].how + "." + (sc.build ? " The chart includes" + sc.label.replace(" · ", " ") + "." : "") : "Wind is high at night and falls in the afternoon; gas fills the rest.";
       buildExplain();
     }
 
@@ -182,11 +212,20 @@
       return bs;
     }
     function ensureLoad() { if (!S.load) { S.load = "dc"; keep(); } }
+    // the load's energy, worked: MW x hours = MWh
+    function lineLoad(k) { var q = questions(W, k, false), h = q.load.filter(function (v) { return v > 0; }).length; return "The " + name(k) + " " + A.loads[k].how + ": " + A.loads[k].mw + " MW × " + h + " h = " + fm.mwh(q.mwh) + " that day."; }
     function lineInv(q) { return "**Inventory:** the " + name(q.key) + "'s share is " + fm.t(q.inv.share) + " (" + fm.per(q.inv.share, q.mwh) + "); everyone else's " + fm.t(q.inv.others) + "; together the grid's " + fm.t(q.inv.total) + ". One daily average would say " + fm.t(q.inv.dayAvg) + "."; }
     function lineShort(q) {
-      var c = S.mr ? q.ch : q.chDefault, parts = [];
-      if (c.cc > 0.5) parts.push("combined-cycle +" + fm.mwh(c.cc)); if (c.ct > 0.5) parts.push("peakers +" + fm.mwh(c.ct)); if (c.spill > 0.5) parts.push(fm.mwh(c.spill) + " of spilled wind used");
+      var c = S.mr ? q.ch : q.chDefault, F = W.F, parts = [];
+      if (c.cc > 0.5) parts.push("combined-cycle +" + fm.mwh(c.cc) + " (" + fm.dt(c.cc * F.cc.rate) + ")"); if (c.ct > 0.5) parts.push("peakers +" + fm.mwh(c.ct) + " (" + fm.dt(c.ct * F.ct.rate) + ")");
+      if (c.spill > 0.5) parts.push(fm.mwh(c.spill) + " of spilled wind used");
       return "**Short run:** the plants emit " + fm.dt(q.short) + " (" + fm.per(q.short, q.mwh) + "): " + parts.join(", ") + ". The inventory said " + fm.t(q.inv.share) + ".";
+    }
+    // the hint under step 3: where the 300 MW step runs on two plants, the next-MWh marginal factor misleads
+    function overflowHint(q) {
+      var n = overflow(q.day0, q.inv.g, q.load);
+      return n > 0 ? "In " + n + " hours the 300 MW overflows the combined-cycle plants' spare room onto the peakers. There the marginal factor (the next MWh) is not the load's own extra CO₂ per MWh, the third line."
+        : "Every extra MWh fits in the combined-cycle plants' spare room, so the marginal factor times the load gives the change exactly.";
     }
     function lineModel(q) {
       var other = questions(W, q.key, !S.mr);
@@ -201,15 +240,15 @@
     }
     function lineClaim(q) {
       var p = A.procure.filter(function (x) { return x.id === S.buy; })[0];
-      return "**" + p.label + ":** the buyer may claim " + fm.t(q.claims[p.id]) + "; the plants emit " + fm.dt(q.plants[p.id]) + " against the day without the load. " + p.note;
+      return "**" + p.label + ":** the buyer may claim " + fm.t(q.claims[p.id]) + "; the plants emit " + fm.dt(q.plants[p.id]) + " against the day without the load.";
     }
     var steps = [
-      { text: "A 300 MW load joins the Plains Grid on " + W.dateLabel + ". Pick it: a data center running every hour, or an electrolyzer that runs in the 12 hours with the lowest [[average-emission-factor|average CO₂ factor]].",
+      { text: "A 300 MW load joins the Plains Grid on " + W.dateLabel + ". Pick it: a data center running every hour, or an [[electrolyzer|electrolyzer]] that runs in the 12 hours with the lowest [[average-emission-factor|average CO₂ factor]].",
         build: function (act, api) {
           S.part = "day"; paint();
           seg(act, "a10-load-l", "The new load", [["dc", "Data center, flat"], ["ez", "Electrolyzer, 12 cleanest hours"]], S.load, function (k) {
-            S.load = k; keep(); paint(); api.saw("The " + name(k) + " " + A.loads[k].how + ": " + fm.mwh(Q().mwh) + " that day."); api.done(); });
-          if (S.load) { api.done(); api.saw("The " + name(S.load) + " " + A.loads[S.load].how + ": " + fm.mwh(Q().mwh) + " that day."); }
+            S.load = k; keep(); paint(); api.saw(lineLoad(k)); api.done(); });
+          if (S.load) { api.done(); api.saw(lineLoad(S.load)); }
           H("p", { class: "lx-hint", text: "Four questions follow. Each has its own method, and each gives a different number for the same load." }, act);
         } },
       { text: "Question 1, the [[emissions-inventory|inventory]]: what share of the grid's CO₂ belongs to this load? Count each MWh at its hour's average factor; every user's shares add up to the grid's total.",
@@ -222,9 +261,10 @@
         build: function (act, api) {
           ensureLoad(); S.part = "short"; if (S.mr) { S.mr = false; keep(); } paint();
           var b = H("button", { type: "button", class: "lx-btn small", text: "Dispatch with and without" }, act);
-          b.addEventListener("click", function () { paint(); api.saw(lineShort(Q())); api.done(); });
+          var note = H("p", { class: "lx-hint", hidden: true }, act);
+          b.addEventListener("click", function () { paint(); var q = Q(); api.saw(lineShort(q)); note.textContent = overflowHint(q); note.hidden = false; api.done(); });
         } },
-      { text: "A marginal factor comes from a model, and its rules matter. Turn on a [[must-run|must-run]] rule: the combined-cycle plants keep 800 MW running all day. Compare both short-run answers.",
+      { text: "A marginal factor comes from a model, and its rules matter. Turn on a [[must-run|must-run]] rule (the combined-cycle plants keep 800 MW running all day) and compare both short-run answers.",
         build: function (act, api) {
           ensureLoad(); S.part = "model"; paint();
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Rule in the dispatch model" }, act), { label: "Must-run: 800 MW of combined-cycle plants stay on", on: S.mr,
@@ -238,13 +278,15 @@
           if (S.build !== "none") { api.done(); api.saw(lineLong(Q())); }
           H("p", { class: "lx-hint", text: "New wind is sized to make the load's yearly energy at 33.8%, the U.S. fleet's 2025 capacity factor." }, act);
         } },
-      { text: "Question 4, the claim: what may the buyer report? A [[procurement-rule|procurement rule]] sets the claim; the plants change only if the purchase adds clean power that reaches this grid.",
+      { text: "Question 4, the claim: what may the buyer report under an illustrative [[procurement-rule|procurement rule]]? Here the plants change only when we assume the purchase is [[additionality|additional]] and [[deliverability|deliverable]] to this grid.",
         build: function (act, api) {
           ensureLoad(); S.part = "claim"; S.mr = false; keep(); paint();
           var sel = H("div", { class: "cf-ctl" }, act); H("label", { for: "a10-buy", class: "cf-ctl-l", text: "The purchase" }, sel);
           var s = H("select", { id: "a10-buy" }, sel);
           A.procure.forEach(function (p) { H("option", { value: p.id, text: p.label }, s); });
           s.value = S.buy;
+          var R = A.claimRules, rl = H("ul", { class: "a10-rules" }, act);
+          [R.label + ".", R.assume, R.proxy].forEach(function (t) { H("li", { class: "lx-hint", text: t }, rl); });
           var host = H("div", null, act);
           function draw() { host.innerHTML = ""; claimTable(host); }
           s.addEventListener("change", function () { S.buy = s.value; keep(); paint(); draw(); api.saw(lineClaim(Q())); if (S.buy !== "location") api.done(); });
@@ -261,8 +303,8 @@
 
     function claimTable(host) {
       var q = Q();
-      LX.Ledger(host, { cls: "a10-led", caption: "The " + name(q.key) + " on " + W.dateLabel + "; the plants' change is against the day without the load.",
-        columns: ["Purchase", "May claim", "The plants emit"],
+      LX.Ledger(host, { cls: "a10-led", caption: "The " + name(q.key) + " on " + W.dateLabel + "; claims under the illustrative rules; the plants' change is against the day without the load.",
+        columns: ["Purchase", "May claim (illustrative)", "The plants emit"],
         rows: A.procure.map(function (p) { return { head: p.label, sub: p.note, cells: [fm.t(q.claims[p.id]), fm.dt(q.plants[p.id])] }; }) });
     }
 
@@ -280,10 +322,10 @@
           { key: "inv", color: "var(--lx-accent)", name: "1 · Whose share?", how: "Average factors, hour by hour", you: fm.t(q.inv.share), miss: "Read as the CO₂ the load causes" },
           { key: "short", color: "var(--lx-warn)", name: "2 · What changes tomorrow?", how: "Marginal factors from a stated model", you: fm.dt(q.short) + (S.mr ? " (must-run)" : ""), miss: "Treated as a fixed property of the grid" },
           { key: "long", color: "var(--lx-tier-3)", name: "3 · What changes over years?", how: "What gets built in response", you: fm.dt(q.long[S.build]) + " (" + BUILD.filter(function (b) { return b[0] === S.build; })[0][1].toLowerCase() + ")", miss: "Skipped" },
-          { key: "claim", color: "var(--lx-dr)", name: "4 · What may be claimed?", how: "Procurement rules, with additionality and deliverability stated", you: fm.t(q.claims[S.buy]), miss: "Read as the emissions caused" }
+          { key: "claim", color: "var(--lx-dr)", name: "4 · What may be claimed?", how: "A reporting rule; additionality and deliverability assumed or not", you: fm.t(q.claims[S.buy]), miss: "Read as the emissions caused" }
         ] });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these answers hold",
-        holds: ["one illustrative day on a fictional grid, on real 2025 hourly shapes;", "plants run cheapest first, with no ramp limits or start-ups;", "CO₂ at the stack, from EIA's heat rates and coefficient for gas."],
+        holds: ["one illustrative day on a fictional grid, on real 2025 hourly shapes;", "plants run cheapest first, with no ramp limits or start-ups;", "CO₂ at the stack, from EIA's full-load heat rates (held at every output) and coefficient for gas;", "claims under illustrative rules, not a ruling on any real report."],
         leaves: ["a year: one windy November day stands for nothing else;", "imports, exports and lines inside the grid;", "life-cycle emissions: building plants, and gas leaks upstream."],
         source: "The Plains Grid is fictional; its sizes are illustrative. Demand, wind and sun follow the Southwest Power Pool's 2025 hours (EIA-930)." });
     }

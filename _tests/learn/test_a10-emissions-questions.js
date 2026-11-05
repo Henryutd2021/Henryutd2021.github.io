@@ -10,6 +10,10 @@
 //     load's MWh (energy balance); must-run: spill appears only below 800 MW of gas need; question 3 and 4 as the header
 //   - every number on the page (fallback, explain, myths, quiz) against the model; ties: the dispatch is cheapest first
 //     with distinct costs, so every number is unique (no LP)
+//   - review fixes (2026-11-05): the 300 MW step's overflow onto the peakers (hourly changes add to the short-run change;
+//     next-MWh marginal factors miss it in 4 hours); the chart draws each step's scenario; claims under illustrative
+//     rules after the Scope 2 Guidance (2015), additionality and deliverability as assumptions, the grid-average proxy
+//     named; the heat-to-CO2 bridge; every line the page assembles, for every input, is 40 words and two sentences at most
 //   - research wording (curriculum §13): every excerpt sentence is approved (E6, E10) word for word in the register; no
 //     number from the txh2 paper; citation titles as in inputs/publications.bib
 //   - scope: no nuclear term in the lesson's own files; data centers only as a load; links only to allowed domains;
@@ -96,7 +100,7 @@ row("2 · The same, with a must-run rule", fm.dt(Q.dcM.short), fm.dt(Q.ezM.short
 row("3 · Long run, a new 300 MW gas plant", fm.dt(Q.dc.long.cc), fm.dt(Q.ez.long.cc));
 row("3 · Long run, new wind for its yearly energy", fm.dt(Q.dc.long.wind), fm.dt(Q.ez.long.wind));
 row("4 · Claim, certificates matched over the year", fm.t(Q.dc.claims.old), fm.t(Q.ez.claims.old));
-row("4 · Claim, new wind matched hour by hour", fm.t(Q.dc.claims.hourly), fm.t(Q.ez.claims.hourly));
+row("4 · Claim, new wind matched hour by hour (short hours at the grid average, a proxy)", fm.t(Q.dc.claims.hourly), fm.t(Q.ez.claims.hourly));
 onPage(`Each of its extra MWh is still served by the combined-cycle plants, at ${F.cc.rate.toFixed(2)} t.`, "fallback: the electrolyzer's margin");
 onPage(`the data center's ${fm.t(Q.dc.inv.share)} and everyone else's ${fm.t(Q.dc.inv.others)} add up to the grid's ${fm.t(Q.dc.inv.total)}`, "explain: inventory");
 onPage(`the data center adds ${fm.t(Q.dc.short)}, mostly at the combined-cycle plants`, "explain: short run"); ok(Q.dc.ch.cc > Q.dc.ch.ct && Q.dc.ch.spill === 0, "the data center's short-run MWh are mostly combined cycle");
@@ -108,6 +112,18 @@ ok(2000 / 8000 * 100 === 25, "quiz: 2,000 / 8,000 x 100 = 25"); onPage("2,000 ÷
 onPage(`40 t would be the ${F.cc.rate.toFixed(2)} t of a combined-cycle plant`, "quiz: the marginal distractor");
 onPage(`${P.windMW.toLocaleString("en-US")} MW of wind, ${P.solarMW} MW of solar, ${P.plants.cc.mw.toLocaleString("en-US")} MW of gas combined-cycle plants and ${P.plants.ct.mw.toLocaleString("en-US")} MW of gas peakers`, "data note: the fleet");
 onPage("0.40 and 0.58 t per MWh, counted at the stack", "data note: the rates");
+ok(Math.round(7.535 * 52.91) === 399, "the worked bridge: 7.535 MMBtu per MWh x 52.91 kg = 399 kg"); onPage("7,535 Btu per kWh = 7.535 <span class=\"lx-term\" data-term=\"mmbtu\">MMBtu</span> per MWh; × 52.91 kg = 399 kg", "data note: the worked bridge");
+onPage("t is a metric tonne, 1,000 kg", "data note: t is a metric tonne");
+ok(/full-load <span class="lx-term" data-term="heat-rate">heat rates<\/span>/.test(PAGE) && /held at every output/.test(PAGE) && /Part-load efficiency: each plant burns its full-load fuel per MWh at every output/.test(PAGE) && /reported at full load/.test(P.sources.heat.label), "heat rates: full load (EIA Table 8.2's note), held at every output, said on the page");
+// a 300 MW step can overflow the combined-cycle plants' spare room: the next-MWh marginal factor times the load is then not
+// the change; the page draws the load's own extra CO2 per MWh, whose load-weighted sum is the change
+["dc", "ez"].forEach(k => {
+  const q = Q[k], dl = M.hourDelta(q.day0, q.inv.g), n = M.overflow(q.day0, q.inv.g, q.load);
+  ok(near(dl.reduce((s, d) => s + d.co2, 0), q.short, 1e-6) && near(q.load.reduce((s, l, t) => s + (l > 0 ? l * (dl[t].co2 / l) : 0), 0), q.short, 1e-6), k + ": the hourly changes (and the load's own extra CO2 per MWh x its MWh) add up to the short-run change");
+  const margSum = q.load.reduce((s, l, t) => s + l * q.inv.g.marg[t], 0);
+  ok(n > 0 ? Math.abs(margSum - q.short) > 50 : near(margSum, q.short, 1e-6), k + ": " + n + " overflow hours; next-MWh marginal factors x the load " + (n > 0 ? "miss" : "give") + " the change (" + margSum.toFixed(0) + " t against " + q.short.toFixed(0) + " t)");
+});
+ok(M.overflow(Q.dc.day0, Q.dc.inv.g, Q.dc.load) === 4 && M.overflow(Q.ez.day0, Q.ez.inv.g, Q.ez.load) === 0, "overflow hours: 4 for the data center, none for the electrolyzer");
 ok(A.mustRunMW === 800 && JS.includes("800 MW of combined-cycle plants stay on") && PAGE.includes("800 MW of combined-cycle plants running"), "the must-run rule's 800 MW is the data's");
 A.facts.forEach(f => { const i = PAGE.indexOf('<td class="n">' + f.n + "</td><td>" + f.what + "</td>"); ok(i >= 0 && PAGE.slice(i, i + 600).includes(f.url) && PAGE.slice(i, i + 600).includes(f.asof), "numbers to remember: " + f.n); });
 
@@ -171,12 +187,17 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
 const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|ghgprotocol\.org)\/|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
 ok(hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
 const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/" \+ W\.dateLabel \+ "/g, "7 November 2025").replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
-ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40), "seven step texts of 40 words at most: " + stepTexts.map(t => t.split(/\s+/).length).join(","));
+const sentences = t => t.replace(/\*\*/g, "").split(/(?<=[.?!])\s+(?=[A-Z0-9“"])/).filter(x => /[A-Za-z]/.test(x)).length;
+ok(stepTexts.length === 7 && stepTexts.every(t => t.split(/\s+/).length <= 40 && sentences(t) <= 2), "seven step texts of 40 words and two sentences at most: " + stepTexts.map(t => t.split(/\s+/).length + "/" + sentences(t)).join(","));
 { const O2 = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/<blockquote[\s\S]*?<\/blockquote>/g, "");
   const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary|footer)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
   const long = els.filter(x => x.split(" ").length > 40);
   ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
-["emissions-inventory", "consequential-analysis", "must-run", "location-based", "market-based"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "sidecar defines and the page marks " + id));
+["emissions-inventory", "consequential-analysis", "must-run", "location-based", "market-based", "scope-2", "residual-mix"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "sidecar defines and the page marks " + id));
+["electrolyzer", "additionality", "deliverability", "procurement-rule"].forEach(id => ok(JS.includes("[[" + id + "|"), "the page marks the course glossary's " + id));
+{ const R = A.claimRules; ok(/Scope 2 Guidance \(2015\)/.test(R.label) && /alone/.test(R.assume) && /retired/.test(R.assume) && /same market/.test(R.assume) && /teaching proxy/.test(R.proxy) && /residual mix/.test(R.proxy) && /proposals, not adopted rules/.test(R.status) &&
+    R.sources.length === 2 && R.sources.every(x => /^https:\/\/ghgprotocol\.org\//.test(x.url) && /read 5 November 2026/.test(x.asOf)) && /Table 7\.1/.test(R.sources[0].label) && /29 July 2026/.test(R.sources[1].asOf), "claims: illustrative rules with the Scope 2 Guidance's conditions (Table 7.1), the grid-average proxy and the consultation's status, each dated");
+  ok(A.procure.filter(p => p.supply === "wind").every(p => /grid average, a teaching proxy|Assume the purchase gets it built \(additional\) and no line limits \(deliverable\)/.test(p.note)) && /^Assume/.test(A.procure.find(p => p.id === "old").note) && /same certificate market/.test(A.procure.find(p => p.id === "far").label), "purchases: additionality and deliverability are stated assumptions, not facts"); }
 ok(A.sort.cards.length === 8 && A.sort.cards.every(c => A.sort.bins.some(b => b.id === c.bin) && c.why.split(" ").length <= 30) && A.sort.bins.every(b => A.sort.cards.filter(c => c.bin === b.id).length === 2), "card sort: eight cards, two per question, each with a short reason");
 ok(!/\b(always|never)\b/i.test(strs.join(" ")), "no 'always' or 'never' in the page's strings");
 { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), r = PY.slice(PY.indexOf("id: " + ID), PY.indexOf("id: " + ID) + 1500);
@@ -212,6 +233,30 @@ ok(!/\b(always|never)\b/i.test(strs.join(" ")), "no 'always' or 'never' in the p
     demo.cards.go(5);
     ok(card().textContent.includes(fm.t(Q.ez.claims.hourly)) && card().textContent.includes(fm.dt(Q.ez.plants.old)), "step 6: the purchase table");
     ok(xp.textContent.includes("Four questions, four methods") && xp.textContent.includes(fm.t(Q.ez.inv.share)), "explain: the four-question table with the reader's numbers");
+    // the chart draws the scenario of the step: new wind in step 5 and with a new-wind purchase in step 6, not the old fleet
+    demo.cards.go(4); btns(/^New wind/)[0].click();
+    const ttl = () => live.querySelector("h3").textContent;
+    ok(ttl().includes(fm.mw(Q.ez.newWindMW) + " of new wind") && live.textContent.includes("CO₂ change against no load, t"), "step 5: the chart's title and text table show the grid with the new wind: " + ttl());
+    btns(/^A new 300 MW gas plant/)[0].click(); ok(ttl().includes("a new 300 MW gas plant"), "step 5: and with the new gas plant");
+    demo.cards.go(5); const sel = card().querySelector("#a10-buy"); sel.value = "old"; sel.fire("change");
+    ok(!/new wind|gas plant/.test(ttl()), "step 6: a purchase that adds nothing shows the grid without new plants");
+    sel.value = "hourly"; sel.fire("change"); ok(ttl().includes(fm.mw(Q.ez.newWindMW) + " of new wind"), "step 6: a new-wind purchase shows the new wind");
+    ok(card().textContent.includes("Illustrative reporting rules") && card().textContent.includes("teaching proxy"), "step 6: the illustrative rules and the grid-average proxy are stated");
+    // every line the page assembles, for every input: 40 words and two sentences at most
+    const said = [], over = [];
+    const grab = () => { card().querySelectorAll(".lx-saw, .lx-hint, li").forEach(e => said.push(e.textContent.replace(/\s+/g, " ").trim())); };
+    for (const ld of ["Data center", "Electrolyzer"]) {
+      demo.cards.go(0); btns(new RegExp("^" + ld))[0].click(); grab();
+      demo.cards.go(1); btns(/^Count its share/)[0].click(); grab();
+      demo.cards.go(2); btns(/^Dispatch with and without/)[0].click(); grab();
+      demo.cards.go(3); for (let i = 0; i < 2; i++) { card().querySelectorAll("button").filter(b => /Must-run/.test(b.textContent) || /Must-run/.test(b.getAttribute("aria-label") || ""))[0].click(); grab(); }
+      demo.cards.go(4); for (const b of ["New wind", "A new 300 MW gas plant", "Nothing new"]) { btns(new RegExp("^" + b))[0].click(); grab(); }
+      demo.cards.go(5); for (const p of A.procure) { const s2 = card().querySelector("#a10-buy"); s2.value = p.id; s2.fire("change"); grab(); }
+    }
+    said.filter(t => /[A-Za-z]/.test(t)).forEach(t => { if (t.split(" ").length > 40 || sentences(t) > 2) over.push(t.slice(0, 70) + " (" + t.split(" ").length + "/" + sentences(t) + ")"); });
+    ok(said.length > 40 && over.length === 0, "every assembled line (" + said.length + ") is 40 words and two sentences at most: " + over.slice(0, 4).join(" | "));
+    ok(said.some(t => t.includes("300 MW × 24 h = 7,200 MWh")) && said.some(t => t.includes("300 MW × 12 h = 3,600 MWh")), "step 1: MW x hours = MWh, worked");
+    ok(said.some(t => t.startsWith("In 4 hours the 300 MW overflows")) && said.some(t => t.startsWith("Every extra MWh fits")), "step 3: the overflow hint for the data center, the exact one for the electrolyzer");
   } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
 }
 

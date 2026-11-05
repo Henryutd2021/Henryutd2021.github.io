@@ -56,7 +56,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>30%</td><td data-label="CO₂">1.43 Mt</td><td data-label="Cost">$525.8M</td><td data-label="Dual">$130.61</td></tr>
 </tbody>
 </table>
-<p class="lx-hint">At $22.81 per t, the 70% cap's dual, every plan from 3.15 Mt to 3.64 Mt scores the same: a price there picks no single plan.</p>
+<p class="lx-hint">At the 70% cap's dual, $22.81 per t rounded (the tie needs its full precision), every plan from 3.15 Mt to 3.64 Mt scores the same: a price there picks no single plan.</p>
 <table class="lx-facts m6-fb">
 <thead><tr><th scope="col">The 300 MW data center buys</th><th scope="col">May claim</th><th scope="col">The plants emit</th><th scope="col">Cost</th><th scope="col">Built for it</th></tr></thead>
 <tbody>
@@ -105,10 +105,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- m06-explain:start (written from the model by the test's --write mode; do not edit) -->
 <dl class="lx-ideas">
 <dt>A cap</dt><dd>A rule on the year's CO₂. At 70% of 4.78 Mt the plan costs $32.1M more, and the cap's dual is $22.81 per t.</dd>
-<dt>The frontier</dt><dd>Its slope is the dual: from $21.98 at 90% to $130.61 at 30%.</dd>
-<dt>A price and its ties</dt><dd>A price at the 70% cap's dual ties every plan from 3.15 Mt to 3.64 Mt; the cap picks one.</dd>
+<dt>The frontier</dt><dd>The dual is the extra cost of cutting one more tonne, the magnitude of the frontier's downward slope: from $21.98 at 90% to $130.61 at 30%.</dd>
+<dt>A price and its ties</dt><dd>A price at the 70% cap's unrounded dual ties every plan from 3.15 Mt to 3.64 Mt; the cap picks one CO₂ level.</dd>
 <dt>A procurement rule</dt><dd>A rule on one buyer's purchases. Hourly matching costs $104.1M a year more than annual matching here.</dd>
-<dt>Claim and cause</dt><dd>All four purchases may claim 0 t; the plants emit from −2.48 Mt to +1.14 Mt against the grid without the data center.</dd>
+<dt>Claim and cause</dt><dd>The three certificate or matching purchases may claim 0 t; with no rule, the load's share counts at average factors. The plants emit from −2.48 Mt to +1.14 Mt against the grid without the data center.</dd>
 </dl>
 <!-- m06-explain:end -->
 </div>
@@ -122,7 +122,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-For each hour $t$ of the six days, with weight $w_t$ (the days it stands for):
+For each hour $t$ of the six days, with weight $w_t$ (the days it stands for); each step lasts one hour, so $x$ MW for an hour is $x$ MWh:
 
 $$\min\; \sum_{k} C_k X_k + \sum_t w_t \big( c_{cc}\,\mathit{cc}_t + c_{ct}\,\mathit{ct}_t + V\,u_t \big)$$
 
@@ -130,18 +130,25 @@ $$
 \begin{aligned}
 \mathit{we}_t + \mathit{se}_t + \mathit{wn}_t + \mathit{sn}_t + \mathit{cc}_t + \mathit{ct}_t + d_t - c_t + u_t &= D_t && \text{(balance)}\\
 \mathit{wn}_t \le f^w_t\, W, \quad \mathit{sn}_t \le f^s_t\, S, \quad c_t, d_t \le B, \quad e_t &\le 4B && \text{(sizes)}\\
-e_t = e_{t-1} + 0.85\, c_t - d_t &&& \text{(battery, cyclic each day)}\\
+\mathit{we}_t \le \bar w_t, \quad \mathit{se}_t \le \bar s_t, \quad \mathit{cc}_t \le 2{,}000, \quad \mathit{ct}_t &\le 2{,}300 && \text{(what exists)}\\
+W, S \le 8{,}000, \quad B &\le 4{,}000 && \text{(build limits)}\\
+e_t = e_{t-1} + 0.85\, c_t - d_t &&& \text{(battery; each day ends with the energy it began with)}\\
 \sum_t w_t \big( r_{cc}\,\mathit{cc}_t + r_{ct}\,\mathit{ct}_t \big) &\le \varepsilon && \text{(the cap)}
 \end{aligned}
 $$
+
+Every variable is zero or more.
 
 | Symbol | Meaning | Unit |
 |---|---|---|
 | $X_k$, $C_k$ | new wind $W$, solar $S$, battery $B$; each one's yearly capital and upkeep | MW; \$ per MW a year |
 | $\mathit{we}, \mathit{se}, \mathit{wn}, \mathit{sn}$ | existing and new wind and solar used | MW |
-| $\mathit{cc}, \mathit{ct}$; $c$, $r$ | gas output; its cost and CO₂ per MWh | MW; \$/MWh, t/MWh |
-| $c_t, d_t, e_t$ | battery charge, discharge and energy | MW, MWh |
-| $u_t$, $V$ | unserved demand, at \$10,000 per MWh | MW |
+| $\bar w_t$, $\bar s_t$ | what the existing wind and solar could make that hour | MW |
+| $\mathit{cc}$, $\mathit{ct}$ | output of the gas combined-cycle plants and of the gas peakers (combustion turbines) | MW |
+| $c_{cc}$, $c_{ct}$; $r_{cc}$, $r_{ct}$ | their running cost and CO₂ per MWh | \$/MWh; t/MWh |
+| $c_t, d_t, e_t$ | battery charge, discharge and energy | MW; MW; MWh |
+| $u_t$ | unserved demand | MW |
+| $V$ | the value of lost load, \$10,000 | \$/MWh |
 | $f^w_t$, $f^s_t$, $D_t$ | capacity factors per MW, and demand | share; MW |
 | $\varepsilon$ | the cap | t a year |
 
@@ -157,9 +164,9 @@ $$
 <div class="lx-deeper-body">
 ```
 
-- **A binding cap has one dual here.** The test checks that loosening and tightening each cap by 1,000 t changes the cost at the same rate.
-- **A positive dual means the cap binds in every best plan** (complementary slackness): the cap's CO₂ is the same for all of them.
-- **A price ties a stretch.** Where the frontier is straight, a price equal to its slope makes every plan on that stretch score the same; the solver returns one of them.
+- **One dual, checked by finite steps.** The test loosens and tightens each cap by 1,000 t; the cost changes at the dual's rate both ways. That is a sensitivity check, not a proof.
+- **A positive dual means the cap binds in every best plan.** This is complementary slackness: a rule with a nonzero dual holds exactly. So the cap's CO₂ is the same for all of them, though their schedules may differ.
+- **A price ties a stretch.** Where the frontier is straight, a price equal to the magnitude of its downward slope makes every plan on that stretch score the same; the solver returns one of them.
 - **So report the range.** The page solves twice more at each price, for the least and the most CO₂ among the best plans, and shows the range when they differ.
 
 ```{=html}
@@ -171,7 +178,7 @@ $$
 <!-- m06-fullyear:start (written from the model by the test's --write mode; do not edit) -->
 <ul>
 <li><b>Annual matching.</b> On all 8,760 hours of 2025 the 844 MW of wind make 95% of the data center's load over the year: the six weighted days were windier than the year.</li>
-<li><b>Hourly matching.</b> Run hour by hour through 2025, the portfolio leaves 6 hours short, 290 MWh in all: still-air hours the six days did not include.</li>
+<li><b>Hourly matching.</b> Run hour by hour through 2025, the portfolio leaves at least 290 MWh unmatched, 0.01% of the load's year, in hours of low wind and sun. Which hours carry it can differ between equally good schedules.</li>
 <li><b>So:</b> a rule met on representative days is a representative-day result. Check it on the full year, as the notebook does.</li>
 </ul>
 <!-- m06-fullyear:end -->
@@ -203,7 +210,7 @@ $$
 <div class="lx-qq" data-id="price-cap" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A carbon price equal to a cap's dual gives back exactly the cap's plan.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. At the 70% cap's dual, $22.81 per t, every plan from 3.15 Mt to 3.64 Mt scores the same; the cap's plan is one of them.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At the 70% cap's dual ($22.81 per t, rounded; the tie needs its full precision), every plan from 3.15 Mt to 3.64 Mt scores the same. The cap's plan is one of them.</p></details>
 </div>
 <div class="lx-qq" data-id="hourly-cut" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “If a buyer's purchases let it claim zero emissions, the plants emit no more than without it.”</p>
@@ -219,8 +226,8 @@ $$
 <div class="lx-quiz" data-quiz="m6">
 <div class="lx-qq" data-id="dual" data-answer="b">
 <p class="lx-qtext">A cap's dual is $22.81 per t. Loosening the cap by 1,000 t changes the best cost by about how much?</p>
-<ul class="lx-choices"><li data-value="a">It rises by $22,806</li><li data-value="b">It falls by $22,806</li><li data-value="c">It falls by $22.81</li><li data-value="d">Nothing: the dual is only a price</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>It falls by about $22,806: $22.81 × 1,000 t, while the cap stays in the dual's range.</p></details>
+<ul class="lx-choices"><li data-value="a">It rises by about $22,810</li><li data-value="b">It falls by about $22,810</li><li data-value="c">It falls by $22.81</li><li data-value="d">Nothing: the dual is only a price</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>It falls by about $22,810: $22.81 × 1,000 t, the dual rounded to the cent, while the cap stays in the dual's range.</p></details>
 </div>
 </div>
 <!-- m06-check:end -->
@@ -250,7 +257,7 @@ $$
 <p class="lx-eyebrow">In the real world</p>
 <blockquote class="lx-excerpt" data-source="excerpt:ghg"><p>Reductions are computed under average-emission-intensity accounting with perfect foresight; they are not estimates of the consequential (marginal) system response.</p><footer>Approved excerpt of: Li et al. (2025), <a href="https://doi.org/10.1016/j.crsus.2025.100367">Cell Reports Sustainability</a>.</footer></blockquote>
 <p class="lx-hint">Case file <a href="cf6-shifting-load-to-clean-hours.html">CF6</a>: how much shifting load to cleaner hours can cut emissions, and when.</p>
-<blockquote class="lx-excerpt" data-source="excerpt:txh2"><p>A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighbouring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.</p><p>When gas-fired backup power became much more expensive, the model built fuel cells and turned stored green hydrogen back into electricity.</p><p>Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.</p><p>Modest load flexibility (±5%) reduced CO₂ emissions from combined-cycle gas generation.</p><footer>Approved excerpt of: Li et al. (2025), <a href="https://doi.org/10.1016/j.ijhydene.2025.02.303">International Journal of Hydrogen Energy</a>.</footer></blockquote>
+<blockquote class="lx-excerpt" data-source="excerpt:txh2"><p>A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighbouring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.</p><p>When gas-fired backup power became much more expensive, the model built fuel cells and turned stored green hydrogen back into electricity.</p><p>Industry then drew more hydrogen from gas reformers, and the round trip from power to hydrogen and back lost energy, so total emissions rose although gas-plant emissions fell.</p><footer>Approved excerpt of: Li et al. (2025), <a href="https://doi.org/10.1016/j.ijhydene.2025.02.303">International Journal of Hydrogen Energy</a>.</footer></blockquote>
 <p class="lx-hint">Inputs reflect 2022–2023 conditions; post-2023 federal hydrogen credit rules are not modeled.</p>
 <div class="lx-case-try">
 <p class="lx-eyebrow">Try it yourself</p>

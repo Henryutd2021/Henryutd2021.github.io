@@ -44,22 +44,23 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- a12-fallback:start (written from the model by the test's --write mode; do not edit) -->
 <p class="lx-hint">No policy: nothing new is built; CO₂ 4.78 Mt a year, resource cost $388.9M, wind and sun 47% of demand.</p>
 <table class="lx-facts a12-fb">
-<thead><tr><th scope="col">Instrument, default setting</th><th scope="col">CO₂</th><th scope="col">Cut</th><th scope="col">Resource cost</th><th scope="col">Per tonne avoided</th><th scope="col">Money that changes hands</th></tr></thead>
+<thead><tr><th scope="col">Instrument, default setting</th><th scope="col">CO₂</th><th scope="col">Cut</th><th scope="col">Resource cost</th><th scope="col">Per tonne avoided</th><th scope="col">Money that changes hands, a year</th></tr></thead>
 <tbody>
-<tr><td>Carbon price, $30 per t</td><td data-label="CO₂">2.95 Mt</td><td data-label="Cut">38%</td><td data-label="Resource cost">+$41.6M</td><td data-label="Per tonne">$23 per t</td><td data-label="Money moved">$88.5M</td></tr>
-<tr><td>Production credit, $10 per MWh</td><td data-label="CO₂">3.04 Mt</td><td data-label="Cut">36%</td><td data-label="Resource cost">+$39.1M</td><td data-label="Per tonne">$23 per t</td><td data-label="Money moved">$42.1M</td></tr>
-<tr><td>Investment credit, 30%</td><td data-label="CO₂">3.07 Mt</td><td data-label="Cut">36%</td><td data-label="Resource cost">+$38.4M</td><td data-label="Per tonne">$22 per t</td><td data-label="Money moved">$39.4M</td></tr>
-<tr><td>Clean-energy standard, 65%</td><td data-label="CO₂">3.16 Mt</td><td data-label="Cut">34%</td><td data-label="Resource cost">+$36.3M</td><td data-label="Per tonne">$22 per t</td><td data-label="Money moved">$136.0M</td></tr>
+<tr><td>Carbon price, $30 per t</td><td data-label="CO₂">2.95 Mt</td><td data-label="Cut">38%</td><td data-label="Resource cost">+$41.6M</td><td data-label="Per tonne">$23 per t</td><td data-label="Money moved, a year">$88.5M</td></tr>
+<tr><td>Production credit, $10 per MWh</td><td data-label="CO₂">3.04 Mt</td><td data-label="Cut">36%</td><td data-label="Resource cost">+$39.1M</td><td data-label="Per tonne">$23 per t</td><td data-label="Money moved, a year">$42.1M</td></tr>
+<tr><td>Investment credit, 30%</td><td data-label="CO₂">3.07 Mt</td><td data-label="Cut">36%</td><td data-label="Resource cost">+$38.4M</td><td data-label="Per tonne">$22 per t</td><td data-label="Money moved, a year">$39.4M (annual equivalent of $681.3M up front)</td></tr>
+<tr><td>Clean-energy standard, 65%</td><td data-label="CO₂">3.16 Mt</td><td data-label="Cut">34%</td><td data-label="Resource cost">+$36.3M</td><td data-label="Per tonne">$22 per t</td><td data-label="Money moved, a year">$136.0M (illustrative)</td></tr>
 </tbody>
 </table>
-<p class="lx-hint">Similar cuts at similar cost per tonne; the money that changes hands, and who pays it, differs.</p>
+<p class="lx-hint">Per tonne avoided = the change in resource cost ÷ the CO₂ avoided, from unrounded values: at $30 per t, $41.6M ÷ 1.83 Mt = $23 per t.</p>
+<p class="lx-hint">Similar cuts at similar cost per tonne; the money that changes hands, and who pays it, differs. Certificate spending assumes certificates trade at the model's marginal compliance cost.</p>
 <!-- a12-fallback:end -->
 <p class="lx-hint">With JavaScript on, you set each instrument yourself and the solver re-plans the year in your browser.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative grid.</b> The Plains Grid of <a href="a10-emissions-questions.html">A10</a>, fictional: a 4,000 MW peak, 3,000 MW of wind, 600 MW of solar and gas plants with EIA's 2025 heat rates and gas price.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Illustrative grid.</b> The Plains Grid of <a href="a10-emissions-questions.html">A10</a>, fictional: a 4,000 MW peak, 3,000 MW of wind, 600 MW of solar and gas plants with EIA's 2025 <span class="lx-term" data-term="heat-rate">heat rates</span> and gas price.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>What may be built.</b> Wind and solar at <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA's AEO2026 costs</a>; a 4-hour battery at <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL's 2025 update</a>, moved from 2024 to 2025 dollars; all at 4% real.</span></p>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>A year from six days.</b> Four typical days of 2025, one per season, plus the calmest day and the day of the highest net load, each weighted by the days it stands for (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> shapes).</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>A year from six days.</b> Four typical days of 2025, one per season, plus the calmest day and the day of the highest <span class="lx-term" data-term="net-demand">net load</span>, each weighted by the days it stands for (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a> shapes).</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in six steps. Solver: <a href="https://ergo-code.github.io/HiGHS/">HiGHS</a> (open source), loaded on your first solve (about 3.5 MB, once).</p>
 <style>/* lesson-local */
 .a12-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -80,9 +81,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- a12-explain:start (written from the model by the test's --write mode; do not edit) -->
 <dl class="lx-ideas">
 <dt>Same lever, different hands</dt><dd>At the defaults each instrument cuts 34% to 38% of CO₂ for $22 to $23 per t avoided; the money that changes hands runs from $39.4M to $136.0M a year.</dd>
-<dt>Carbon price</dt><dd>Raises every gas MWh's cost; gas plants pay $88.5M at $30 per t.</dd>
+<dt>Per tonne avoided</dt><dd>The change in resource cost ÷ the CO₂ avoided, both against no policy: at $30 per t, $41.6M ÷ 1.83 Mt = $23 per t. Carbon payments are left out.</dd>
+<dt>Carbon price</dt><dd>Raises every gas MWh's cost; gas plants pay $88.5M a year at $30 per t.</dd>
 <dt>Credits</dt><dd>Lower the cost of new wind and solar; taxpayers pay. A $30 production credit costs $46 per t avoided, against $23 per t at $10.</dd>
-<dt>Standard</dt><dd>Requires a clean share; customers pay certificates at $9.39 per MWh at 65%, wind that ran anyway included.</dd>
+<dt>Investment credit</dt><dd>Paid up front: $681.3M at 30%, or $39.4M a year spread over the plants' life at 4%.</dd>
+<dt>Standard</dt><dd>Requires a clean share. If certificates trade at the marginal compliance cost, $9.39 per MWh at 65%, customers would spend $136.0M a year, wind that ran anyway included.</dd>
 <dt>Real costs and transfers</dt><dd>The resource cost changes only with the plan; payments between groups are transfers.</dd>
 </dl>
 <!-- a12-explain:end -->
@@ -110,10 +113,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Carbon price** $\tau$: each gas MWh's cost $c_g$ becomes $c_g + \tau\, e_g$, with $e_g$ its CO₂ in t per MWh.
-- **Production credit** $\pi$: each new wind and solar MWh used costs $-\pi$.
-- **Investment credit** $\iota$: each new plant's annual capital cost is multiplied by $1 - \iota$.
-- **Clean-energy standard** $s$: one more rule, $\sum_t w_t\, \mathit{clean}_t \ge s \sum_t w_t\, d_t$; its dual is the certificate price.
+- **Carbon price** $\tau$ (\$ per t): each gas MWh's cost $c_g$ (\$ per MWh) becomes $c_g + \tau\, e_g$, with $e_g$ its CO₂ in t per MWh.
+- **Production credit** $\pi$ (\$ per MWh): each new wind and solar MWh used costs $-\pi$.
+- **Investment credit** $\iota$ (a share): each new plant's annual capital cost is multiplied by $1 - \iota$.
+- **Clean-energy standard** $s$ (a share): one more rule, $\sum_t w_t\, \mathit{clean}_t \ge s \sum_t w_t\, d_t$. Its dual, a [shadow price]{.lx-term term="shadow-price"}, is the cost of one more required MWh.
+- **Symbols.** $t$: an hour of the six days; $w_t$: the days it stands for; $\mathit{clean}_t$: wind and sun used and $d_t$: demand, in MW over one hour, so MWh.
 - **Next.** [M6](m06-carbon-in-models.html) writes this LP out, caps CO₂ instead of pricing it, and adds a procurement rule.
 
 ```{=html}
@@ -155,12 +159,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="standard-free" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A clean-energy standard costs nothing, because it costs taxpayers nothing.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. At 65% the resource cost rises by $36.3M a year, and customers pay $136.0M for certificates.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. At 65% the resource cost rises by $36.3M a year. If customers fund certificates at the marginal compliance cost, they spend $136.0M.</p></details>
 </div>
 <div class="lx-qq" data-id="battery" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Any policy that favors clean power gets batteries built.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth, here</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, here. No setting of these sliders builds a battery: the gas plants already cover the peak, and a battery would only move energy between hours.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, here. No slider setting builds a battery: under these costs and six representative days, its energy-shifting savings do not cover its annual cost. Reserves and other reliability services are not valued.</p></details>
 </div>
 </div>
 <div class="lx-quiz" data-quiz="a12">
@@ -188,7 +192,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><p><b>Carbon price · European Union.</b> EU Emissions Trading System.</p><p>A cap-and-trade scheme launched in 2005: covered plants, electricity and heat generation among them, surrender one allowance per tonne of CO₂ equivalent.</p><p class="lx-hint">Source: <a href="https://climate.ec.europa.eu/eu-action/carbon-markets/about-eu-ets_en">European Commission, About the EU Emissions Trading System (page updated 13 May 2026)</a>, read 5 November 2026.</p></li>
 <li><p><b>Production credit · United States, federal.</b> Clean electricity production credit, tax code section 45Y.</p><p>For wind and solar, Public Law 119-21 (2025) ends it for plants that begin construction after 4 July 2026 and enter service after 31 December 2027.</p><p class="lx-hint">Source: IRS, Notice 2025-42, Internal Revenue Bulletin 2025-36, sections 1 and 2.02, 2 September 2025; read 5 November 2026.</p></li>
 <li><p><b>Investment credit · United States, federal.</b> Clean electricity investment credit, tax code section 48E.</p><p>The same law sets the same end dates for wind and solar plants.</p><p class="lx-hint">Source: IRS, Notice 2025-42, Internal Revenue Bulletin 2025-36, sections 1 and 2.02, 2 September 2025; read 5 November 2026.</p></li>
-<li><p><b>Clean-energy standard · U.S. states.</b> 100% clean electricity standards.</p><p>Lawrence Berkeley National Laboratory counted 16 states that had adopted a 100% clean electricity standard, with data through 2023.</p><p class="lx-hint">Source: <a href="https://eta-publications.lbl.gov/publications/us-state-renewables-portfolio-clean-0">Barbose, U.S. State Renewables Portfolio &amp; Clean Electricity Standards: 2024 Status Update, LBNL (August 2024)</a>, read 5 November 2026.</p></li>
+<li><p><b>Clean-energy standard · California.</b> Renewables Portfolio Standard (a renewables-only standard).</p><p>Senate Bill 100 (2018) raised it to 60% of retail electricity sales by 2030, from eligible renewable plants, such as wind and solar, anywhere in the Western Electricity Coordinating Council's region.</p><p class="lx-hint">Source: California Public Utilities Commission, Renewables Portfolio Standard (RPS) Program page, read 5 November 2026.</p><p>For scale: Lawrence Berkeley National Laboratory counted 16 states that had adopted a 100% clean electricity standard, with data through 2023.</p><p class="lx-hint">Source: <a href="https://eta-publications.lbl.gov/publications/us-state-renewables-portfolio-clean-0">Barbose, U.S. State Renewables Portfolio &amp; Clean Electricity Standards: 2024 Status Update, LBNL (August 2024)</a>, read 5 November 2026.</p></li>
 </ul>
 <p class="lx-hint">The model's instruments are simpler than these rules: no phase-outs, eligibility tests or trading.</p>
 </div>

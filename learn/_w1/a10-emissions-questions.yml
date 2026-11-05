@@ -17,5 +17,11 @@ glossary:
   - id: market-based
     term: Market-based method
     def: "A way to report electricity's emissions that counts each MWh at the factor of the electricity the buyer purchased, through contracts or certificates."
+  - id: scope-2
+    term: Scope 2 emissions
+    def: "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it."
+  - id: residual-mix
+    term: Residual mix
+    def: "The emission factor of the electricity left after every contract and certificate has been claimed, used for a buyer's unclaimed use."
 requests:
   - "A10 introduces the Plains Grid's fleet in its data file (a10-emissions-questions.json, block plains): 3,000 MW wind, 600 MW solar, 2,000 MW gas combined cycle, 2,300 MW gas peakers, EIA 2025 heat rates. A12 and M6 read it from there."
