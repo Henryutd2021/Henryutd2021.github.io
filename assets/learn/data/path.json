@@ -1595,9 +1595,13 @@
    "tier": "researcher",
    "code": "R6",
    "title": "Uncertainty done properly: what to vary, how, and how to say it",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r06-uncertainty-properly.html",
+   "scales": [],
+   "id": "r06-uncertainty-properly",
+   "minutes": 30,
+   "form": "studio",
+   "short": "Uncertainty done properly"
   },
   {
    "tier": "researcher",
@@ -1611,9 +1615,13 @@
    "tier": "researcher",
    "code": "R8",
    "title": "How do you show results so people understand their limits?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r08-communicating.html",
+   "scales": [],
+   "id": "r08-communicating",
+   "minutes": 30,
+   "form": "studio",
+   "short": "Showing results with their limits"
   },
   {
    "tier": "researcher",
