@@ -81,6 +81,7 @@
       ".a5-cols{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}@media (min-width:760px){.a5-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}",
       ".a5-cols h4{margin:0 0 6px;font-size:14px;font-weight:600}",
       ".a5-note{font-size:13.5px;color:var(--lx-ink-3);margin:0}",
+      ".a5-opts{margin:0;padding-left:1.1rem;display:grid;gap:2px;font-size:13.5px;color:var(--lx-ink-2)}",
       ".a5-busy{font-size:13.5px;color:var(--lx-ink-2);margin:0;min-height:1.3em}",
       "@media (max-width:560px){.a5-tbl table{font-size:12.5px}.a5-tbl th,.a5-tbl td{padding:4px 3px}.a5-tbl .ph{display:none}.a5-bars li{grid-template-columns:minmax(5em,7.5em) minmax(0,1fr) 4.2em;font-size:13px}}"
     ].join("\n") }, document.head);
@@ -126,18 +127,19 @@
     function reseed(s) { ST.seed = s; ST.S = null; current(); }
     function cached(key, f) { var c = ST.cache; if (!(key in c)) c[key] = f(); return c[key]; }
     function opt(id) { return D.adds.options.filter(function (o) { return o.id === id; })[0]; }
-    var crit = D.criterion.lole, B = D.adds.blockMW;
+    var crit = D.criterion.lole, B = D.adds.blockMW, TX = D.texts;
 
     var steps = [
       // 1 one year
-      { text: "The Plains Grid has 4,000 MW of coal and gas units, 3,000 MW of wind and 1,200 MW of solar for a 4,000 MW peak. Roll simulated years and look for days that run short.",
+      { text: "The Plains Grid has 4,000 MW of coal and gas units, 3,000 MW of wind and 1,200 MW of solar for a 4,000 MW peak. Roll three simulated years; look for days that run short.",
         build: function (act, api) {
           var row = H("div", { class: "a5-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Roll a year" }, row);
+          var count = H("span", { class: "a5-note", "aria-live": "polite", text: "0 of 3 years rolled" }, row);
           var k = H("div", { class: "a5-kpis", "aria-live": "polite" }, act), ph = H("div", null, act), rolls = 0;
           go.addEventListener("click", function () {
             var st = current(), n = rolls, Sy = simulate(D, SRC, st.seed, { years: n + 1, keep: n }), dl = daily(Sy.full), short = dl.filter(function (x) { return x.min < 0; }).length;
             var tight = dl.slice().sort(function (a, b) { return a.min - b.min || a.day - b.day; })[0];
-            rolls++; k.innerHTML = "";
+            rolls++; k.innerHTML = ""; count.textContent = Math.min(rolls, 3) + " of 3 years rolled" + (rolls > 3 ? " (" + rolls + " in all)" : "");
             kpi(k, "Simulated year", String(n + 1)); kpi(k, "Days with a shortfall", String(short), short ? "bad" : "good"); kpi(k, "Tightest day", dateOf(tight.day) + ", " + (tight.min < 0 ? mw(-tight.min) + " short" : mw(tight.min) + " spare"));
             ph.innerHTML = "";
             var P1 = LX.Plot(ph, { box: true, text: "Text version of the year" }), ticks = [], tN = [], s0 = 0;
@@ -157,7 +159,7 @@
       { text: "Now 500 simulated years. Count the days with any shortfall and divide by 500: that is the [[lole|loss-of-load expectation]] (LOLE).",
         build: function (act, api) {
           var row = H("div", { class: "a5-row" }, act), go = H("button", { type: "button", class: "lx-btn small", html: LX.icon("play") + "Run 500 years" }, row);
-          var again = H("button", { type: "button", class: "lx-btn ghost small", text: "New seed", hidden: true }, row);
+          var again = H("button", { type: "button", class: "lx-btn ghost small", text: "Draw another 500 years", hidden: true }, row);
           var seedL = H("span", { class: "a5-note", "aria-live": "polite" }, row), out = H("div", { "aria-live": "polite" }, act);
           function show() {
             var st = current(), b = st.base, se = loleSE(b), h = histogram(b), y0 = h[0];
@@ -166,7 +168,9 @@
             kpi(k, "LOLE", d3(b.lole) + " ± " + d3(2 * se) + " days/yr", b.lole > crit ? "bad" : "good"); kpi(k, "Criterion", String(crit) + " days/yr");
             kpi(k, "Shortfall hours", d2(b.lolh) + " h/yr"); kpi(k, "Unserved energy", int(b.eue) + " MWh/yr");
             bars(out, [{ label: "No shortfall day", value: h[0], text: String(h[0]) }, { label: "1 day", value: h[1], text: String(h[1]) }, { label: "2 days", value: h[2], text: String(h[2]) }, { label: "3 days or more", value: h[3], text: String(h[3]) }], st.S.N, "Simulated years by their number of shortfall days");
-            H("p", { class: "a5-note", html: LX.rich("± two [[monte-carlo-error|Monte Carlo errors]]: another seed moves the LOLE about this much. Shortfall hours are the [[lolh|LOLH]]. Bars: years by shortfall days.") }, out);
+            H("p", { class: "a5-note", html: LX.rich(TX.SE_NOTE) }, out);
+            H("p", { class: "a5-note", html: LX.rich("Shortfall hours are the [[lolh|LOLH]]. Bars: years by their number of shortfall days.") }, out);
+            H("p", { class: "a5-note", html: LX.rich(TX.SEED_NOTE) }, out);
             again.hidden = false; api.done(); remember("lole", b.lole);
             api.saw("LOLE " + d3(b.lole) + " days a year, " + (b.lole > crit ? "above" : "within") + " the 1-in-10 criterion of " + String(crit) + ". In " + y0 + " of " + st.S.N + " years nothing went short; the [[expected-unserved-energy|unserved energy]] averages " + int(b.eue) + " MWh a year.");
           }
@@ -202,7 +206,7 @@
             var rows = [["Nothing added", fm.rm(reserveMargin(D)), d3(b.lole), { text: b.lole <= crit ? "yes" : "no", cls: b.lole <= crit ? "ok" : "no" }]];
             D.adds.options.forEach(function (o) { if (!tried[o.id]) return; var e = cached("one-" + o.id, function () { return evaluate(st.S, block(D, o.id)); });
               rows.push([{ html: "<i style='--c:" + o.color + "'></i>" + LX.esc(o.label) }, fm.rm(reserveMargin(D, B)), d3(e.lole), { text: e.lole <= crit ? "yes" : "no", cls: e.lole <= crit ? "ok" : "no" }]); });
-            table(out, ["500 MW added", "Margin at nameplate", "LOLE (days/yr)", "Meets 1-in-10?"], rows, "The reserve margin and LOLE with each 500 MW added");
+            table(out, ["500 MW added", "Margin at nameplate (crude screen)", "LOLE (days/yr)", "Meets 1-in-10?"], rows, "The reserve margin at nameplate and LOLE with each 500 MW added");
             var n = Object.keys(tried).length;
             if (n >= 3) {
               var ls = Object.keys(tried).map(function (id) { return cached("one-" + id, function () { return evaluate(st.S, block(D, id)); }).lole; });
@@ -214,7 +218,9 @@
             var b = H("button", { type: "button", class: "lx-btn ghost small", "aria-pressed": "false", text: o.label }, row);
             b.addEventListener("click", function () { tried[o.id] = true; b.setAttribute("aria-pressed", "true"); show(); });
           });
-          H("p", { class: "a5-note", text: D.adds.options.map(function (o) { return o.label + ": " + o.detail; }).join(". ") + "." }, act);
+          var ol = H("ul", { class: "a5-opts", "aria-label": "The five resources" }, act);
+          D.adds.options.forEach(function (o) { H("li", { text: o.label + ": " + o.detail + "." }, ol); });
+          H("p", { class: "a5-note", text: TX.SCREEN_NOTE }, act);
           show();
         } },
       // 5 accreditation
@@ -233,6 +239,7 @@
                 var rows = res.map(function (a, i) { var o = ops[i]; return { label: o.label, value: a.share, text: pct(a.share), color: o.color, a: a }; });
                 bars(out, rows, 1, "Accredited share of 500 MW");
                 table(out, ["Resource", "Firm MW at equal unserved energy", "~Unserved energy with it"], rows.map(function (r, i) { var e = cached("one-" + ops[i].id, function () { return evaluate(st.S, block(D, ops[i].id)); }); return [r.label, mw(r.a.mw), int(e.eue) + " MWh/yr"]; }), "Accredited MW of each 500 MW resource");
+                if (res.some(function (a) { return a.zero; })) H("p", { class: "a5-note", text: TX.ZERO_NOTE }, out);
                 api.done(); remember("acc", res.map(function (a) { return a.share; }));
                 var by = {}; res.forEach(function (a, i) { by[ops[i].id] = a; });
                 var eDR = cached("one-dr", function () { return evaluate(st.S, block(D, "dr")); }), eW = cached("one-wind", function () { return evaluate(st.S, block(D, "wind")); });
@@ -240,7 +247,7 @@
                   (eDR.lole < eW.lole && by.dr.share < by.battery.share ? " Demand response removes many short days but less energy: long evenings outlast its 4 hours." : ""));
               });
           });
-          H("p", { class: "a5-note", html: LX.rich("The perfect MW is the [[equivalent-firm-capacity|equivalent firm capacity]]. Equal reliability here means equal unserved energy, as PJM rates its classes; a count of days moves in whole steps.") }, act);
+          H("p", { class: "a5-note", html: LX.rich("The perfect MW is the [[equivalent-firm-capacity|equivalent firm capacity]]: the smallest that cuts unserved energy as much. Equal unserved energy, not days: a count of days moves in whole steps.") }, act);
         } },
       // 6 more of the same
       { text: "Add more of the same. Pick a resource and rate three blocks of 500 MW, each on top of the blocks before it.",
@@ -255,7 +262,8 @@
                 btns.forEach(function (x) { x.disabled = false; }); api.busy(false);
                 if (!r) { busy.textContent = "The rating stopped. Try again."; return; }
                 busy.textContent = ""; out.innerHTML = "";
-                bars(out, r.rows.map(function (x) { return { label: "Block " + x.k + " (" + int(B * (x.k - 1)) + " MW before it)", value: x.share, text: pct(x.share), color: o.color }; }), 1, o.label + ": accreditation of each 500 MW block");
+                bars(out, r.rows.map(function (x) { return { label: "Block " + x.k + " (" + int(B * (x.k - 1)) + " MW before it)", value: x.share, text: pct(x.share) + (x.zero ? "*" : ""), color: o.color }; }), 1, o.label + ": accreditation of each 500 MW block");
+                if (r.rows.some(function (x) { return x.zero; })) H("p", { class: "a5-note", text: "* " + TX.ZERO_NOTE }, out);
                 api.done(); remember("blocks-" + id, r.rows.map(function (x) { return x.share; }));
                 api.saw(blocksText(o, r));
               }, 0);
@@ -275,6 +283,7 @@
               if (!m) { busy.textContent = "The rating stopped. Try again."; return; }
               busy.textContent = ""; out.innerHTML = "";
               table(out, ["500 MW of", "Alone", "Beside the other"], [["Solar (beside a 500 MW battery)", pct(m.solar), pct(m.solarWithBattery)], ["Battery (beside 1,000 MW more solar)", pct(m.battery), pct(m.batteryWithSolar)]], "Accreditation alone and beside another resource");
+              if (m.zero) H("p", { class: "a5-note", text: TX.ZERO_NOTE }, out);
               var R = D.reference.repeats;
               if (R) H("p", { class: "a5-note", text: "Repeated with seeds 1 to 20: solar rated higher beside the battery in " + R.solarUp + " of 20, the battery higher beside more solar in " + R.batteryUp + " of 20." }, out);
               api.done(); remember("mix", m);
@@ -283,19 +292,19 @@
           });
         } },
       // 8 real ratings
-      { text: "PJM, the largest U.S. grid operator, rates each class for its 2028/29 capacity auction: gas peakers 67%, below this lesson's peakers. Why might that be?",
+      { text: "PJM, the largest U.S. grid operator, rates gas peakers 67% for its 2028/29 capacity auction, below this lesson's. Which model assumption differs between the two?",
         build: function (act, api) {
           var out = H("div", null, act);
           var pr = LX.Predict(act, { id: "a5-pjm", fresh: true, q: "", title: false, answer: "weather",
-            options: [{ value: "weather", label: "PJM's outages depend on the weather" }, { value: "size", label: "PJM's peakers are larger" }, { value: "years", label: "PJM simulates fewer years" }],
-            feedback: { weather: "Yes: PJM simulates outages as a function of weather (its Manual 20A); here they are independent.", size: "Size is not the reason given: PJM simulates outages as a function of weather.", years: "Not the reason: PJM simulates outages as a function of weather; here they are independent." },
+            options: [{ value: "weather", label: "PJM ties outages to the weather; here they are independent" }, { value: "metric", label: "PJM rates by shortfall days, this lesson by MWh" }, { value: "same", label: "None: the two models are the same" }],
+            feedback: TX.PJM_Q,
             onPick: function () {
               var st = current(); out.innerHTML = "";
               var mine = {}; D.adds.options.forEach(function (o) { var a = st.cache["acc-" + o.id]; if (a) mine[o.id] = a.share; });
               table(out, ["Class", "PJM 2028/29", "This lesson"], D.pjm.rows.filter(function (r) { return r.id !== "cc"; }).map(function (r) { return [r.label, r.pct + "%", mine[r.id] != null && r.id !== "solar-fixed" ? pct(mine[r.id]) : "–"]; }), "PJM's class ratings next to this lesson's");
               H("p", { class: "a5-note", text: "PJM: " + D.pjm.source + " (" + D.pjm.asOf + "). One auction's ratings for one grid, not values for every grid." }, out);
               pr.reveal(); api.done(); LX.progress.done(SLUG);
-              api.saw("A rating belongs to one grid, one mix and one model. **Cold snaps that knock out many units at once lower the peakers' rating; Analyst lesson [[lesson:a09-hazards|A9]] brings such hazards in.**");
+              api.saw(TX.PJM_SAW);
             } });
         } }
     ];
@@ -329,7 +338,7 @@
     x.innerHTML = ""; x.classList.add("is-live");
     var b = st.base, R = D.reference, A = R.single || {};
     LX.ConceptMap(H("div", { class: "lx-xcard" }, x), {
-      title: "What an adequacy study connects", lede: "Tap a node to see what it means in this lesson.",
+      title: "What an adequacy study connects", lede: "Tap a node to see what it means in this lesson. Numbers are the reference run's (seed 2025), whatever seed you drew.",
       groups: { in: ["Inputs", "var(--lx-wind)"], sim: ["Simulation", "var(--lx-accent)"], out: ["Measures", "var(--lx-bad)"] },
       cols: 4, rows: 3, colsN: 3, rowsN: 4, sel: "margin",
       nodes: [
@@ -338,14 +347,14 @@
         { id: "fleet", g: "in", label: "Fleet and mix", lines: ["Fleet and", "mix"], at: [2, 0], atN: [2, 0], text: "What is installed: units, wind, solar, storage, demand response." },
         { id: "margin", g: "sim", label: "Hourly margin", lines: ["Hourly", "margin"], at: [1, 1], atN: [1, 1], text: "Available supply minus demand, every hour of every simulated year; storage and demand response act on it." },
         { id: "short", g: "sim", label: "Shortfall", at: [2.6, 1], atN: [1, 2], text: "Any hour the margin stays below zero: demand that cannot be served." },
-        { id: "lole", g: "out", label: "LOLE", at: [0.4, 2], atN: [0, 3], text: "Shortfall days a year: " + d3(R.base ? R.base.lole : b.lole) + " here, against a criterion of 0.1." },
+        { id: "lole", g: "out", label: "LOLE", at: [0.4, 2], atN: [0, 3], text: "Shortfall days a year: " + d3(R.base ? R.base.lole : b.lole) + " in the reference run (seed 2025), against a criterion of 0.1." },
         { id: "eue", g: "out", label: "EUE", at: [1.5, 2], atN: [1, 3], text: "Unserved MWh a year: depth and length, which LOLE ignores." },
         { id: "acc", g: "out", label: "Accreditation", at: [2.6, 2], atN: [2, 3], text: "Perfect MW giving the same unserved energy, as a share of the MW added; it changes with the mix." }
       ],
       edges: [["weather", "margin", "sets demand and output"], ["outages", "margin", "removes MW"], ["fleet", "margin", "adds MW"], ["margin", "short", "below zero"], ["short", "lole", "count days"], ["short", "eue", "add MWh"], ["eue", "acc", "matched by"]]
     });
     LX.Flowchart(H("div", { class: "lx-xcard" }, x), {
-      title: "An adequacy study, move by move", lede: "Trace how a planner checks a grid and rates a new resource.",
+      title: "An adequacy study, move by move", lede: "Trace how a planner checks a grid and rates a new resource (reference run, seed 2025).",
       nodes: {
         w: { t: "Draw a weather year", tN: ["Draw a", "weather year"], s: "resampled weeks", sN: "weeks" },
         o: { t: "Draw unit outages", tN: ["Draw unit", "outages"], s: "random, independent", sN: "random" },
@@ -360,8 +369,8 @@
       colsN: 2, atN: { w: [0, 0], o: [0, 1], h: [0, 2], n: [0, 3], m: [0, 4], c: [0, 5], a: [1, 5], r: [0, 6] },
       edges: [["w", "o"], ["o", "h"], ["h", "n"], ["n", "w", "no"], ["n", "m", "yes"], ["m", "c"], ["c", "a", "no"], ["a", "w"], ["c", "r", "yes"]],
       traces: [
-        { label: "This grid", path: ["w", "o", "h", "n", "m", "c", "a"], text: "LOLE " + d3(R.base ? R.base.lole : b.lole) + " fails the criterion: add a resource and re-run with the same seed." },
-        { label: "With 500 MW of peakers", path: ["w", "o", "h", "n", "m", "c", "r"], text: A.ct ? "LOLE " + d3(A.ct.lole) + ": it meets 0.1, accredited at " + pct(A.ct.share) + "." : "It meets the criterion." }
+        { label: "This grid", path: ["w", "o", "h", "n", "m", "c", "a"], text: "Reference run (seed 2025): LOLE " + d3(R.base ? R.base.lole : b.lole) + " fails the criterion; add a resource and re-run with the same seed." },
+        { label: "With 500 MW of peakers", path: ["w", "o", "h", "n", "m", "c", "r"], text: A.ct ? "Reference run (seed 2025): LOLE " + d3(A.ct.lole) + " meets 0.1; the peakers are accredited at " + pct(A.ct.share) + "." : "It meets the criterion." }
       ], sel: 0
     });
     var rows = [

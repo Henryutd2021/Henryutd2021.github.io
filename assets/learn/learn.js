@@ -12232,18 +12232,23 @@
                   Only hours with M_t < threshold (1,500 MW) are kept; resources added only raise M, so no other hour can
                   fall short, and a battery of at most 1,500 MW charges at full power in every hour not kept (exact).
          o.mod    optional changes for lesson A9 (hazards): arrays of 8,760 multipliers over the calendar hours of every
-                  simulated year: demand, wind, and the available MW of each unit type; o.tally (8,760 weights) returns
-                  the yearly mean of sum(weight x demand) as S.tally (A9: customer energy cut directly by shutoffs)
+                  simulated year: demand, wind, and the available MW of each unit type
+         o.tally  optional, for A9: 8,760 shares of demand switched off directly (shutoffs) by calendar hour. That
+                  demand leaves the balance (M_t uses connected demand, demand_t x (1 - share_t): supply need not serve
+                  customers who are disconnected), and its yearly mean energy, sum(share_t x demand_t), is S.tally
      evaluate(S, add, detail)  the simulated years with resources added: add = {C perfect MW, wind MW, solar MW, sP and sE
          a battery's MW and MWh, eta, dr MW and drH hours a day, ct 0 or 1 blocks of extra peakers}. Each hour: x = M + C +
          wind x w_t + solar x s_t + extra peakers; if x >= 0 the battery charges min(P, x) x eta; if x < 0 the battery
          discharges min(P, -x, stored), then demand response cuts min(dr, rest) if the day has used fewer than drH hours;
          what is left is unserved. A day with any unserved hour is a loss-of-load day.
            LOLE = loss-of-load days / N (days a year); LOLH = unserved hours / N; EUE = unserved MWh / N.
-     efc(S, base, add)  equivalent firm capacity: the perfect MW C that gives base + C the same EUE as base + add. EUE falls
-         continuously and strictly with C while it is above zero, so C is unique; bisection on [0, the block's MW], 18
-         halvings (to 0.002 MW). Accreditation = C / MW added. PJM likewise rates classes by expected unserved energy
-         (Manual 20A, sections 2.4 and 2.6); its own formula is a ratio of EUE improvements, not this matching.
+     efc(S, base, add)  equivalent firm capacity: the smallest perfect MW C that gives base + C an EUE no higher than
+         base + add's (bisection on [0, the block's MW]: halve the range 18 times, to 0.002 MW). EUE falls continuously
+         and strictly with C while it is above zero, so when the target is above zero C is the unique match. When base +
+         add leaves no unserved energy in the sampled years (target 0), every C above the smallest also gives 0: the
+         result is flagged zero, a boundary of the finite sample, not proof of zero risk. Accreditation = C / MW added.
+         PJM also rates classes by expected unserved energy (Manual 20A, sections 2.4 and 2.6), with its own formula (a
+         ratio of EUE improvements), not this matching.
    Every number A5 and A9 state comes from these functions; their tests check them.
 */
 (function () {
@@ -12302,8 +12307,8 @@
         b += dx[t];
         var q = map[t], y = q >= T ? 1 : 0, h = q - y * T, S = SRC[y];
         var dem = G.peakMW * S.d[h] * (mod.demand ? mod.demand[t] : 1), wi = G.windMW * S.w[h] * (mod.wind ? mod.wind[t] : 1), so = G.solarMW * S.s[h];
-        var M = av + wi + so - dem;
-        if (tw) tally += tw[t] * dem;
+        var cut = tw ? tw[t] * dem : 0, M = av + wi + so - (dem - cut);
+        tally += cut;
         if (full) { full.demand[t] = dem; full.wind[t] = wi; full.solar[t] = so; full.units[t] = av; full.margin[t] = M; }
         if (M < TH) { idx.push(t); m.push(M); src.push(q); ct.push(b); }
       }
@@ -12373,9 +12378,9 @@
   function efc(S, base, add, B) {
     base = base || {};
     var target = evaluate(S, plus(base, add)).eue, eb = evaluate(S, base).eue, hi = B, lo = 0;
-    if (eb <= target + 1e-9) return { mw: 0, target: target, base: eb };
+    if (eb <= target + 1e-9) return { mw: 0, target: target, base: eb, zero: target <= 1e-9 };
     for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2; if (evaluate(S, plus(base, { C: mid })).eue <= target) hi = mid; else lo = mid; }
-    return { mw: (lo + hi) / 2, target: target, base: eb };
+    return { mw: (lo + hi) / 2, target: target, base: eb, zero: target <= 1e-9 };
   }
   function accredit(D, S, base, id) { var r = efc(S, base, block(D, id), D.adds.blockMW); r.share = r.mw / D.adds.blockMW; r.id = id; return r; }
   // the yearly reserve margin counted at nameplate: every MW installed, over the planning peak
@@ -12408,14 +12413,14 @@
   }
   function blocks(D, S, id, n) {
     var rows = [];
-    for (var b = 0; b < (n || D.adds.maxBlocks); b++) { var a = efc(S, block(D, id, b), block(D, id), D.adds.blockMW); rows.push({ k: b + 1, mw: a.mw, share: a.mw / D.adds.blockMW }); }
+    for (var b = 0; b < (n || D.adds.maxBlocks); b++) { var a = efc(S, block(D, id, b), block(D, id), D.adds.blockMW); rows.push({ k: b + 1, mw: a.mw, share: a.mw / D.adds.blockMW, zero: a.zero }); }
     var all = efc(S, {}, block(D, id, rows.length), D.adds.blockMW * rows.length);
     return { id: id, rows: rows, total: all.mw, average: all.mw / (D.adds.blockMW * rows.length) };
   }
   function mix(D, S) {
     var sol = accredit(D, S, {}, "solar"), solB = accredit(D, S, block(D, "battery"), "solar");
     var bat = accredit(D, S, {}, "battery"), batS = accredit(D, S, block(D, "solar", 2), "battery");
-    return { solar: sol.share, solarWithBattery: solB.share, battery: bat.share, batteryWithSolar: batS.share };
+    return { solar: sol.share, solarWithBattery: solB.share, battery: bat.share, batteryWithSolar: batS.share, zero: sol.zero || solB.zero || bat.zero || batS.zero };
   }
 
   // ---------------------------------------------------------------- formats (shared by the page and the test)

@@ -7,7 +7,7 @@ glossary:
     def: "The average market price a plant's output earns, each hour weighted by what the plant produced in it."
   - id: energy-only-market
     term: Energy-only market
-    def: "A wholesale market in which plants are paid only for the energy they sell, so high prices in scarce hours must pay for capacity that is rarely used."
+    def: "A wholesale market design with no separate capacity market, in which energy and reserve prices, high in scarce hours, must pay for capacity that is rarely used."
   - id: capacity-market
     term: Capacity market
     def: "An auction, run ahead of time, that pays plants and other resources for being available, in an amount a planner sets, on top of energy prices."
@@ -16,7 +16,10 @@ glossary:
     def: "The gap between what a plant the grid needs earns from energy and reserves and what it costs to build or keep."
   - id: offer-cap
     term: Offer cap
-    def: "The highest price a market lets a seller offer, and so the ceiling on scarcity prices; it is set by the market's rules."
+    def: "The highest price a market's rules let a seller put in an offer; clearing prices can still rise above it, for example through scarcity pricing or congestion."
+  - id: rto
+    term: Regional transmission organization (RTO)
+    def: "An independent organization, such as PJM or MISO, that runs a region's transmission grid and its wholesale electricity markets."
 requests:
   - "Cross-links for the coordinator: live pages still call A3 'upcoming' (lesson 6, its page; lesson 8, its page and assets/learn/08-merit-order.js)."
   - "Neutral by design: no market design is called best; the explain layer's Steelman gives the strongest case for each."

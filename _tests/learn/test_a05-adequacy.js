@@ -3,8 +3,11 @@
 // kept-hours shortcut is exact against a brute-force pass over all 8,760 hours, with a battery; accreditation is unique
 // (EUE falls strictly through the matched value); the claims made on the page hold (at seed 2025, and where a card says so
 // for any seed, over seeds 1 to 20); every number the page states matches the model (statements one by one and a
-// whitelist scan); the drill's answers are right; the reference block and the no-JS table are what the model gives; and
-// the page mounts and runs its eight cards on a stub document.
+// unexpected-number scan); the drill's answers are right; the reference block and the no-JS table are what the model
+// gives; and the page mounts and runs its eight cards on a stub document. Accreditation is the smallest perfect MW that
+// matches: unique while the target is above zero (checked for every single block and every block in a row), a flagged
+// boundary of the sample when it is zero. The number scan flags a number nobody accounted for; it does not prove what a
+// number means (the statements do that).
 // Usage (from the site folder):  node _tests/learn/test_a05-adequacy.js [--write]
 //   --write rewrites the no-JS table in learn/a05-adequacy.qmd and the reference block of data/a05-adequacy.json
 "use strict";
@@ -138,6 +141,20 @@ function brute(full, add, Sy) {
     if (!(f(Math.round(a.mw) - 0.5) > t || f(Math.round(a.mw) + 0.5) < t)) bad++;
   });
   ok(bad === 0, "accreditation: EUE crosses the matched value inside half a MW of each rating, so each whole-MW rating is unique");
+  // blocks in a row (step 6): unique above a zero target; at a zero target, the smallest perfect MW, flagged
+  let bb = 0, zeros = [], adds0 = [];
+  ["solar", "wind", "battery", "dr"].forEach(id => {
+    const r = M.blocks(D, S, id);
+    r.rows.forEach((x, b) => {
+      const base = M.block(D, id, b), e = M.efc(S, base, M.block(D, id), 500), f = c => M.evaluate(S, M.plus(base, { C: c })).eue;
+      if (Math.abs(e.mw - x.mw) > 1e-9 || e.zero !== x.zero) bb++;
+      if (e.base <= e.target + 1e-9) { adds0.push(id + " " + (b + 1)); if (x.mw !== 0) bb++; return; }
+      if (e.target > 1e-9) { if (!(f(x.mw - 0.5) > e.target && f(x.mw + 0.5) < e.target) || x.zero) bb++; }
+      else { zeros.push(id + " " + (b + 1)); if (!(x.zero && f(x.mw - 0.5) > 0 && f(x.mw + 0.5) === 0 && f(x.mw + 100) === 0)) bb++; }
+    });
+  });
+  ok(bb === 0 && zeros.join() === "battery 3" && adds0.join() === "dr 3", "accreditation of blocks in a row: unique where the target is above zero; battery block 3 leaves no shortfall (flagged: the smallest perfect MW, " + pct(M.blocks(D, S, "battery").rows[2].share) + "); demand response's block 3 adds nothing (" + bb + " bad)");
+  ok(/smallest perfect MW that also leaves none: a limit of the sample, not proof of zero risk/.test(D.texts.ZERO_NOTE) && /smallest \$C\$/.test(QMD) && /not zero risk/.test(QMD), "accreditation: the page calls a zero-target rating a boundary of the sample");
   let mono = true; let zero = null; for (let c = 0; c < 900; c += 25) { const e0 = M.evaluate(S, { C: c }).eue, e1 = M.evaluate(S, { C: c + 25 }).eue; if (e0 > 0 && !(e1 < e0)) mono = false; if (e0 > 0 && e1 === 0 && zero === null) zero = c + 25; }
   ok(mono && zero > 500, "accreditation: EUE falls strictly as perfect MW are added, until it reaches zero (by " + zero + " MW)");
   const A = ST.single;
@@ -176,18 +193,25 @@ function brute(full, add, Sy) {
     "LOLE 0.228 days a year, above the 1-in-10 criterion of 0.1. In 410 of 500 years nothing went short; the [[expected-unserved-energy|unserved energy]] averages 108 MWh a year.",
     "81% of the 349 shortfall hours fall in June to September, most often in the hour starting 19:00; December to February hold most of the rest.",
     "Peakers 89%, battery 55%, demand response 26%, wind 16%, solar 15%. Demand response removes many short days but less energy: long evenings outlast its 4 hours."];
-  msgs.forEach((t, i) => ok(words(t) <= 36, `message ${i + 1}: ${words(t)} words (≤ 36)`));
+  msgs.push(D.texts.ZERO_NOTE, D.texts.SE_NOTE, D.texts.SEED_NOTE, D.texts.SCREEN_NOTE, D.texts.PJM_SAW, D.texts.PJM_Q.weather, D.texts.PJM_Q.metric, D.texts.PJM_Q.same, ...D.adds.options.map(o => o.label + ": " + o.detail + "."));
+  msgs.forEach((t, i) => ok(words(t) <= 36, `message or note ${i + 1}: ${words(t)} words (≤ 36)`));
+  ok(!/\.join\("\. "\)/.test(JS) && /a5-opts/.test(JS), "step 4: one line per resource, not one long paragraph");
+  ok(/one possible contributor/.test(D.texts.PJM_Q.weather) && /both rate by expected unserved energy/.test(D.texts.PJM_Q.metric) && /can lower a peaker's rating/.test(D.texts.PJM_SAW) && !/lower the peakers' rating;/.test(JS), "step 8: the PJM gap is not pinned on one cause; the question asks which assumption differs");
   ok(JS.indexOf('"Most simulated years have no shortfall day, and a few have several. **Adequacy is about the rare bad year, so one year shows little.**"') >= 0 && JS.indexOf('the [[expected-unserved-energy|unserved energy]] averages " + int(b.eue) + " MWh a year."') >= 0, "texts: the checked messages are the page's");
   ["capacity-accreditation", "equivalent-firm-capacity", "forced-outage-rate", "lolh", "resampled-weather"].forEach(id => ok(new RegExp("id: " + id + "\\n").test(SIDE) && JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " defined in the sidecar and marked"));
-  ["lole", "expected-unserved-energy", "reserve-margin", "monte-carlo-error"].forEach(id => ok(JS.indexOf("[[" + id + "|") >= 0, "glossary: " + id + " marked"));
+  ["lole", "expected-unserved-energy", "reserve-margin", "monte-carlo-error", "standard-error", "random-seed"].forEach(id => ok((JS + JSON.stringify(D.texts)).indexOf("[[" + id + "|") >= 0, "glossary: " + id + " marked"));
 }
 
 // ---------------- the page at seed 2025: statements one by one
 {
   has("4,000 MW of coal and gas units, 3,000 MW of wind and 1,200 MW of solar serve a 4,000 MW peak.");
-  has("Over 500 simulated years the loss-of-load expectation is 0.228 days a year (± 0.049), above the 1-in-10 criterion of 0.1. In 410 years nothing went short.");
+  has("Over 500 simulated years the loss-of-load expectation is 0.228 days a year (± 0.049 from sampling alone), above the 1-in-10 criterion of 0.1. In 410 years nothing went short.");
+  ok(/two \[\[standard-error\|standard errors\]\] of the average over 500 years/.test(D.texts.SE_NOTE) && /leaves out uncertainty in the weather history and the model's assumptions/.test(D.texts.SE_NOTE) && /LOLE is shown with its Monte Carlo error, which leaves out uncertainty in the weather history and the assumptions/.test(QMD) && !/another seed moves the LOLE about this much/.test(JS), "uncertainty: ± two standard errors of sampling, given the inputs; only LOLE carries one");
   has("81% of the shortfall hours fall in June to September.");
-  has("Each 500 MW added lifts a nameplate reserve margin from 105.0% to 117.5%, yet LOLE ends anywhere from 0.012 to 0.200.");
+  has("Each 500 MW added, demand response counted as supply, lifts a nameplate reserve margin from 105.0% to 117.5%, yet LOLE ends anywhere from 0.012 to 0.200.");
+  ok(/deliberately crude screen/.test(D.texts.SCREEN_NOTE) && /500 MW of demand response counts as 500 MW of supply against the gross 4,000 MW peak/.test(D.texts.SCREEN_NOTE), "screen: demand response counted as supply-equivalent MW, said so");
+  has("- **Marginal, not average.** Each block is rated against the mix already present. An average can hide how the contribution of the next block differs.");
+  ok(/\| \$f\$ \| forced outage rate/.test(QMD) && /\| \$r\$ \| average length of one outage/.test(QMD) && /\| \$w_t\$, \$s_t\$ \| wind and solar output per MW installed/.test(QMD) && /\| \$d_t\$ \| demand over its own yearly peak/.test(QMD) && /halve the range of MW again and again/.test(QMD), "formula box: every symbol defined with its unit; bisection explained");
   ok(d3(Math.min(...IDS.map(id => ST.single[id].lole))) === "0.012" && d3(Math.max(...IDS.map(id => ST.single[id].lole))) === "0.200", "fallback: LOLE from 0.012 to 0.200 over the five additions");
   has("the five resources range from 89% (peakers) to 15% (solar) of their 500 MW");
   has("Three blocks of solar in a row: 15%, then 6%, then 3%. Beside a 500 MW battery, solar's first block rates 31%.");
@@ -217,13 +241,14 @@ function brute(full, add, Sy) {
 // ---------------- every number in the visible text is one the model or a source gives (whitelist scan)
 {
   let body = QMD.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1:end -->/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<style>[\s\S]*?<\/style>/g, "")
-    .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ").replace(/\$[^$]*\$/g, " ");
+    .replace(/<script[\s\S]*?<\/script>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/\{[^}]*\}/g, " ").replace(/https?:\/\/\S+/g, " ")
+    .replace(/^(- \*\*|\|).*$/gm, l => l.replace(/\$[^$\n]*\$/g, " "));   // math only in Go deeper bullets and tables, so a dollar amount never pairs with another
   const allowed = new Set(), add = v => allowed.add(String(v));
   staticTable().replace(/<[^>]+>/g, " ").match(/\d[\d,]*(?:\.\d+)?/g).forEach(add);
   ["0.228", "0.049", "0.1", "410", "81", "105.0", "117.5", "0.012", "0.200", "89", "15", "6", "3", "31", "0.70", "114", "79", "16", "34", "67", "59", "10", "7", "12.5", "4,000", "3,000", "1,200", "500", "2024", "2025", "2026", "2028", "29", "2029", "1.3", "2.3", "2.4", "2.6", "20", "21", "8", "16", "24", "4", "1", "2", "0.002", "100", "20A", "9", "930", "2.28"].forEach(add);
   const found = (body.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(t => t.replace(/[.,]$/, ""));
   const unknown = [...new Set(found.filter(t => !allowed.has(t)))];
-  ok(unknown.length === 0, "every number on the page is from the model, a source or a structural count; unknown: " + unknown.join(" "));
+  ok(unknown.length === 0, "unexpected-number check: no number on the page is outside the model's, the sources' and the structural counts; unknown: " + unknown.join(" "));
   ok(found.length > 60, `the scan saw the page's numbers (${found.length})`);
 }
 
@@ -276,25 +301,29 @@ function brute(full, add, Sy) {
   if (!threw && demo) try {
     const card = () => demo.cards.el, saw = () => { const a = card().querySelectorAll(".lx-saw"); return a.length ? a[a.length - 1].textContent : ""; };
     const btns = re => card().querySelectorAll("button").filter(b => re.test(b.getAttribute("aria-label") || b.textContent));
-    demo.cards.go(0); const roll = btns(/Roll a year/)[0]; roll.click(); roll.click(); roll.click();
-    ok(/Most simulated years have no shortfall day/.test(saw()) && /Simulated year\s*3/.test(card().textContent), "stub: step 1 rolls three years: " + card().textContent.slice(0, 200));
+    demo.cards.go(0); const roll = btns(/Roll a year/)[0]; roll.click();
+    ok(/1 of 3 years rolled/.test(card().textContent) && !/Most simulated years/.test(saw()), "stub: step 1 counts the rolls: 1 of 3");
+    roll.click(); roll.click();
+    ok(/Most simulated years have no shortfall day/.test(saw()) && /Simulated year\s*3/.test(card().textContent) && /3 of 3 years rolled/.test(card().textContent), "stub: step 1 rolls three years: " + card().textContent.slice(0, 200));
     demo.cards.go(1); btns(/Run 500 years/)[0].click();
-    ok(/LOLE 0\.228 days a year, above the 1-in-10 criterion of 0\.1\. In 410 of 500 years nothing went short/.test(saw()) && /Seed 2025 · 500 years/.test(card().textContent), "stub: step 2 runs 500 years at seed 2025: " + saw().slice(0, 80));
+    ok(/LOLE 0\.228 days a year, above the 1-in-10 criterion of 0\.1\. In 410 of 500 years nothing went short/.test(saw()) && /Seed 2025 · 500 years/.test(card().textContent) && /standard errors of the average over 500 years/.test(card().textContent) && /numbers the random draws/.test(card().textContent), "stub: step 2 runs 500 years at seed 2025, with what the ± and the seed mean: " + saw().slice(0, 80));
     demo.cards.go(2); btns(/Summer evenings/)[0].click();
     ok(/^81% of the 349 shortfall hours fall in June to September, most often in the hour starting 19:00/.test(saw()), "stub: step 3: " + saw().slice(0, 80));
     demo.cards.go(3); ["Gas peakers", "Wind farm", "Solar farm"].forEach(l => btns(new RegExp("^" + l + "$"))[0].click());
-    ok(/LOLE runs from 0\.012 to 0\.200/.test(saw()) && /12\.5% added each time/.test(saw()), "stub: step 4: " + saw().slice(0, 90));
+    ok(/LOLE runs from 0\.012 to 0\.200/.test(saw()) && /12\.5% added each time/.test(saw()) && card().querySelectorAll(".a5-opts li").length === 5 && /deliberately crude screen/.test(card().textContent), "stub: step 4: " + saw().slice(0, 90));
     demo.cards.go(4); btns(/Rate all five/)[0].click();
     ok(/^Peakers 89%, battery 55%, demand response 26%, wind 16%, solar 15%\. Demand response removes many short days/.test(saw()), "stub: step 5: " + saw().slice(0, 90));
     demo.cards.go(5); btns(/^Solar farm$/)[0].click();
-    ok(/^Solar farm: 15%, then 6%, then 3%\. Each block counts less than the one before/.test(saw()), "stub: step 6: " + saw().slice(0, 90));
+    ok(/^Solar farm: 15%, then 6%, then 3%\. Each block counts less than the one before/.test(saw()) && !/limit of the sample/.test(card().textContent), "stub: step 6: " + saw().slice(0, 90));
+    btns(/^4-hour battery$/)[0].click();
+    ok(/^4-hour battery: 55%, then 37%, then 8%\./.test(saw()) && /8%\*/.test(card().textContent) && /\* No shortfall is left in the 500 years/.test(card().textContent), "stub: step 6's battery block 3 leaves no shortfall and says so: " + saw().slice(0, 60));
     demo.cards.go(6); btns(/Rate the pairs/)[0].click();
     ok(/^Solar 15% alone, 31% beside the battery; the battery 55% alone, 78% beside more solar\./.test(saw()) && new RegExp("in " + reference.repeats.solarUp + " of 20").test(card().textContent), "stub: step 7: " + saw().slice(0, 90));
-    demo.cards.go(7); btns(/outages depend on the weather/)[0].click();
+    demo.cards.go(7); btns(/ties outages to the weather/)[0].click();
     ok(/A rating belongs to one grid, one mix and one model/.test(saw()) && /Gascombustionturbine67%89%/.test(card().textContent.replace(/\s+/g, "")), "stub: step 8 compares PJM's 67% with this lesson's 89%: " + (card().textContent.replace(/\s+/g, "").match(/Gascomb.{0,40}/) || ["none"])[0]);
     // a new seed changes the numbers and the cached ratings
-    demo.cards.go(1); btns(/New seed/)[0].click();
-    ok(/Seed 1 · 500 years/.test(card().textContent) && new RegExp("LOLE " + d3(REP[0].b.lole).replace(".", "\\.")).test(saw()), "stub: New seed draws seed 1's years: " + saw().slice(0, 40));
+    demo.cards.go(1); btns(/Draw another 500 years/)[0].click();
+    ok(/Seed 1 · 500 years/.test(card().textContent) && new RegExp("LOLE " + d3(REP[0].b.lole).replace(".", "\\.")).test(saw()), "stub: Draw another 500 years draws seed 1's years: " + saw().slice(0, 40));
   } catch (e) { ok(false, "stub: the page test threw: " + (e && e.stack || e)); }
 }
 

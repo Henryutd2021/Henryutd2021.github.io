@@ -44,6 +44,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a3-static td { font-family: var(--lx-f-mono); }
 .a3-static td:first-child { text-align: left; font-family: var(--lx-f-body); }
 .a3-tables { overflow-x: auto; }
+.a3-world { margin-top: 10px; }
+.a3-world td, .a3-world td:first-child { text-align: left; font-family: var(--lx-f-body); font-size: 13.5px; }
+.a3-world td:nth-child(2) { min-width: 16em; }
 .page-learn .lx-datanote ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; }
 .page-learn .lx-datanote li { margin: 0; }
 </style>
@@ -58,13 +61,14 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>On a spring midday wind and sun exceed demand and the price is −$25.00/MWh; on a summer evening only 401 MW are spare and scarcity pricing lifts it to $586.76.</li>
 <li>Over the year the price averages $35.79/MWh, with 111 negative-price hours and 155 scarcity hours.</li>
 <li>From 1,200 to 2,800 MW of solar, solar's capture price falls from $33.16 to $7.38 per MWh.</li>
-<li>Energy-only, a new peaker falls $25 per kW a year short of its fixed cost; at 600 MW of peakers it pays, and the year has 2 hours short.</li>
-<li>With a capacity market the capacity price is $191/MW-day, and consumers pay $40.79/MWh against $39.89 energy-only (table below).</li>
+<li>Energy-only, a new peaker falls $25 per kW a year short of its fixed cost; at 600 MW of peakers a new one pays, and the year has 2 hours short.</li>
+<li>Existing peakers cover their upkeep up to 900 MW, so from 700 to 900 MW none is built and none retires: simplified thresholds.</li>
+<li>With the simplified capacity market, its price set to fill a new peaker's gap, the capacity price is $191/MW-day; consumers pay $40.79/MWh against $39.89 energy-only (table below).</li>
 </ol>
 <div class="a3-tables">
 <!-- a3-table:start (written by _tests/learn/test_a03-market-design.js --write; do not edit) -->
-<table class="a3-static" aria-label="What a new plant earns per kW a year against its fixed cost, with 1,200 MW of solar and 700 MW of peakers">
-<thead><tr><th scope="col">New plant</th><th scope="col">Fixed cost ($/kW a year)</th><th scope="col">Earns, energy-only</th><th scope="col">Earns, capacity market</th></tr></thead>
+<table class="a3-static" aria-label="Each new plant's margin after running costs per kW a year against its fixed cost, with 1,200 MW of solar and 700 MW of peakers">
+<thead><tr><th scope="col">New plant</th><th scope="col">Fixed cost ($/kW a year)</th><th scope="col">Margin after running costs, energy-only</th><th scope="col">Margin with the payment, simplified capacity market</th></tr></thead>
 <tbody>
 <tr><td>Wind farm</td><td>$134</td><td>$160</td><td>$162</td></tr>
 <tr><td>Solar farm</td><td>$109</td><td>$122</td><td>$118</td></tr>
@@ -73,6 +77,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <tr><td>Consumers pay ($/MWh)</td><td>–</td><td>$39.89</td><td>$40.79</td></tr>
 </tbody></table>
 <!-- a3-table:end -->
+<!-- a3-world:start (written by _tests/learn/test_a03-market-design.js --write; do not edit) -->
+<table class="a3-static a3-world" aria-label="Five arrangements around the world: how each pays for enough capacity, with dated sources">
+<thead><tr><th scope="col">Where</th><th scope="col">How capacity is paid for</th><th scope="col">Sources</th></tr></thead>
+<tbody>
+<tr><td>U.S. markets with a capacity market</td><td>An energy market with shortage pricing, plus auctions that buy capacity ahead of time: PJM's base auction is normally held three years before the delivery year; MISO's auction has run by season since 2023. PJM's capacity price was $269.92/MW-day for most of its region in 2025/26 (two zones cleared higher, at their caps) and $325, at the cap, for its entire region in 2028/29.</td><td><a href="https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf">FERC staff, Energy Primer (December 2023), p. 72</a>; <a href="https://www.pjm.com/-/media/DotCom/documents/manuals/m18.pdf">PJM Manual 18, Rev. 63 (effective 24 September 2026), section 5.1</a>; <a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2026-releases/20260714-pjm-capacity-auction-procures-138318-mw-of-generation-resources.pdf">PJM, 2028/2029 auction release (14 July 2026)</a>; <a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2024-releases/20240730-pjm-capacity-auction-procures-sufficient-resources-to-meet-rto-reliability-requirement.ashx">PJM, 2025/2026 auction release (30 July 2024)</a>; <a href="https://www.pjm.com/-/media/DotCom/markets-ops/rpm/rpm-auction-info/2025-2026/2025-2026-base-residual-auction-report.pdf">PJM, 2025/2026 Base Residual Auction report</a>; <a href="https://www.misoenergy.org/meet-miso/media-center/2023/new-approach-to-planning-resource-auction-delivers-positive-results/">MISO, news release (17 May 2023): the new seasonal approach</a></td></tr>
+<tr><td>Texas (ERCOT)</td><td>An energy market with no capacity market; offers are capped at $5,000/MWh. A reserve demand curve added a scarcity adder from 2014; since 5 December 2025, energy and reserves are priced together. The offer cap fell from $9,000 to $5,000 per MWh on 1 January 2022.</td><td><a href="https://www.ercot.com/files/docs/2024/10/31/2024-biennial-ercot-report-on-the-ordc-20241031.pdf">ERCOT, 2024 Biennial Report on the ORDC (1 November 2024), pp. 1 and 7–10</a>; <a href="https://www.ercot.com/services/comm/mkt_notices/M-F110525-04">ERCOT market notice M-F110525-04 (5 December 2025): real-time co-optimization live</a>; <a href="https://ercot.com/services/comm/mkt_notices/M-A120721-01">ERCOT market notice M-A120721-01 (7 December 2021)</a>; <a href="https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf">FERC staff, Energy Primer (December 2023), p. 66</a></td></tr>
+<tr><td>U.S. regions without a regional market (RTO)</td><td>Utilities, frequently vertically integrated, own and run plants and wires and plan their supply with their state regulators. About two-thirds of the U.S. population is served by markets that <span class="lx-term" data-term="rto">RTOs</span> run; much of the rest by these utilities.</td><td><a href="https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf">FERC staff, Energy Primer (December 2023), pp. 60 and 66</a></td></tr>
+<tr><td>The European Union</td><td>Energy markets set the wholesale price; a country may add a capacity mechanism, approved as state aid. The 2024 reform entered into force on 16 July 2024; from 17 July 2027, new direct price support for wind, solar and some other plants must be two-way contracts for difference: top-ups below an agreed price, paybacks above.</td><td><a href="https://energy.ec.europa.eu/topics/markets-and-consumers/electricity-market-design_en">European Commission, Electricity market design (page accessed 5 November 2026)</a>; Regulation (EU) 2024/1747, Article 19d, adopted 13 June 2024 (Official Journal, 26 June 2024): two-way contracts for difference from 17 July 2027; <a href="https://ec.europa.eu/commission/presscorner/api/files/document/print/av/qanda_24_2260/">European Commission, questions and answers QANDA/24/2260 (21 May 2024)</a>; <a href="https://energy.ec.europa.eu/news/report-and-proposals-streamlining-procedures-capacity-mechanisms-2025-03-12_en">European Commission, news (12 March 2025)</a></td></tr>
+<tr><td>China</td><td>Capacity payments set nationally, technology by technology, coal's since 2024; a January 2026 notice revised them and set a national framework for grid-side storage. Coal's payment covered 30% of a set fixed cost in most provinces in 2024–25 and at least 50% from 2026. Once a province's spot market runs continuously, one payment for reliable capacity is to replace payments by technology.</td><td>NDRC, questions and answers with NDRC and National Energy Administration officials on the notice improving the generation-side capacity price mechanism (30 January 2026); <a href="https://ember-energy.org/app/uploads/2026/02/From-baseload-to-flexibility-How-is-coals-role-in-China-changing-PDF.pdf">Ember, From baseload to flexibility: How is coal's role in China changing (10 February 2026), section 1.3.1, pp. 14–16</a></td></tr>
+</tbody></table>
+<!-- a3-world:end -->
 </div>
 <p class="lx-hint">With JavaScript on, you clear hours and a year, add solar, move the peaker fleet and switch between the two designs.</p>
 </div>
@@ -82,7 +97,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Real shapes: the Southwest Power Pool's 2025 demand, wind and sun (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to EIA's 2025 capacity factors.</li>
 <li>Gas running costs and new plants' building and upkeep costs are <a href="07-cost.html">lesson 7</a>'s, from EIA, in 2025 dollars, at 4% real over 30 years.</li>
 <li>One year, every unit at its average availability: no random outages (<a href="a05-adequacy.html">A5</a> adds them), no network, no imports.</li>
-<li>The $5,000/MWh cap is ERCOT's offer cap since 1 January 2022; a real market's rules differ in many details.</li>
+<li>The $5,000/MWh cap is ERCOT's offer cap since 1 January 2022. Here it also caps the clearing price, a simplification; real rules differ in many details.</li>
+<li>The capacity market is simplified: its price is set to fill a new peaker's gap, with no auction against a requirement.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:10px">Need a refresher? <a href="08-merit-order.html">Lesson 8</a> (merit order and the clearing price) and <a href="07-cost.html">lesson 7</a> (what electricity costs to make).</p>
 ```
@@ -97,11 +113,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div id="a3-explain" class="lx-xgrid">
 <div class="lx-fallback">
 <dl class="lx-ideas">
-<dt>Energy-only market</dt><dd>Plants earn only from selling energy; scarcity prices in a few hours pay for capacity that is rarely used.</dd>
-<dt>Capacity market</dt><dd>A planner sets how much capacity to buy, and an auction pays for it on top of energy prices.</dd>
+<dt>Energy-only market</dt><dd>No separate capacity payment: energy and reserve prices, high in a few scarce hours, pay for capacity that is rarely used.</dd>
+<dt>Capacity market</dt><dd>A planner sets how much capacity to buy, and an auction pays for it on top of energy prices; this lesson's version is simplified.</dd>
 <dt>Reserve products</dt><dd>Spare capacity is priced hour by hour together with energy, in either kind of market.</dd>
 <dt>Capture price</dt><dd>The average price a plant's output earns; for solar it falls as more solar sells in the same hours.</dd>
-<dt>Missing money</dt><dd>The gap between what a needed plant earns from energy and what it costs to keep.</dd>
+<dt>Missing money</dt><dd>The gap between what a needed plant earns from energy and reserves and what it costs to keep.</dd>
 </dl>
 </div>
 </div>
@@ -126,9 +142,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-- **Price.** $p_t = c_{m(t)} + (\bar p - c_{m(t)})\,\max(0, 1 - s_t/600)^2$, where $c_{m(t)}$ is the last offer needed, $s_t$ the spare MW and $\bar p$ the cap.
-- **Margin.** A plant earns $\sum_t (p_t - c)\,q_t$ a year; it pays if that, per kW, tops its fixed cost.
-- **Capacity price.** $(F - \pi)/0.93$ per rated kW a year, where $F$ is a new peaker's fixed cost and $\pi$ its energy margin.
+- **Price.** With spare $s_t \ge 0$ MW: $p_t = c_{m(t)} + (\bar p - c_{m(t)})\,\max(0, 1 - s_t/600)^2$ per MWh, where $c_{m(t)}$ is the last offer needed and $\bar p$ the cap.
+- **Short.** With $s_t < 0$, demand exceeds supply: $p_t = \bar p$ and $-s_t$ MW go unserved. So $p_t \le \bar p$ in every hour.
+- **Margin.** A plant earns $\sum_t (p_t - c)\,q_t$ a year, with $q_t$ its MWh in hour $t$ and $c$ its running cost; wind and solar earn $\sum_t (p_t + 25)\,q_t$, the credit included.
+- **Capacity price.** $\max(0, F - \pi)/0.93$ per rated kW a year, with $F$ a new peaker's fixed cost and $\pi$ its energy margin per kW: the gap is filled by construction.
 
 ```{=html}
 </div>
@@ -152,17 +169,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="average" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “A solar farm earns about the average market price.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth, once solar is common. Here its capture price is 93% of the average at 1,200 MW and 32% at 2,800 MW; in CAISO in 2023 it was 38%.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth, once solar is common. Here its capture price is 93% of the average at 1,200 MW and 32% at 2,800 MW. In CAISO in 2023 solar's value factor, a broader measure with capacity value, was 38%.</p></details>
 </div>
 <div class="lx-qq" data-id="free" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “An energy-only market avoids paying for capacity.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. It pays through scarcity prices instead: with 700 MW of peakers here, consumers pay $39.89/MWh energy-only and $40.79/MWh with a capacity market.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. It pays through scarcity prices instead: with 700 MW of peakers here, consumers pay $39.89/MWh energy-only and $40.79/MWh with the simplified capacity market.</p></details>
 </div>
 <div class="lx-qq" data-id="cap" data-answer="fact">
 <p class="lx-qtext">Myth or fact? “A capacity auction clearing at its cap can mean thinner reserves without certain outages.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. PJM's 2028/29 auction cleared at its cap, 6,831 MW short of its requirement, measured against a 1-in-10 criterion.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. PJM's 2028/29 auction cleared at its cap, 6,831 MW short of its requirement, measured against a standard of one shortfall event in ten years.</p></details>
 </div>
 </div>
 
@@ -194,8 +211,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <thead><tr><th scope="col">Number</th><th scope="col">What it means</th><th scope="col">Source</th></tr></thead>
 <tbody>
 <tr><td class="n">$5,000/MWh</td><td>ERCOT's system-wide offer cap since 1 January 2022, down from $9,000.</td><td class="s"><a href="https://ercot.com/services/comm/mkt_notices/M-A120721-01">ERCOT notice M-A120721-01</a> · 7 December 2021</td></tr>
-<tr><td class="n">$325/MW-day</td><td>PJM's 2028/29 capacity price, at its cap; $269.92 for 2025/26.</td><td class="s"><a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2026-releases/20260714-pjm-capacity-auction-procures-138318-mw-of-generation-resources.pdf">PJM release</a> · 14 July 2026</td></tr>
-<tr><td class="n">38%</td><td>Solar's value factor in CAISO in 2023, where solar served 27% of load.</td><td class="s"><a href="https://eta-publications.lbl.gov/sites/default/files/2024-10/utility_scale_solar_2024_edition_slides.pdf">LBNL, Utility-Scale Solar 2024</a>, slides 47 and 50</td></tr>
+<tr><td class="n">$325/MW-day</td><td>PJM's 2028/29 capacity price, at its cap, for its entire region; $269.92 for most of its region in 2025/26.</td><td class="s"><a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2026-releases/20260714-pjm-capacity-auction-procures-138318-mw-of-generation-resources.pdf">PJM release</a> · 14 July 2026</td></tr>
+<tr><td class="n">38%</td><td>Solar's value factor in CAISO in 2023 (energy plus capacity value, over a flat block's), where solar served 27% of load.</td><td class="s"><a href="https://eta-publications.lbl.gov/sites/default/files/2024-10/utility_scale_solar_2024_edition_slides.pdf">LBNL, Utility-Scale Solar 2024</a>, slides 47 and 50</td></tr>
 <tr><td class="n">16 July 2024</td><td>The EU's electricity market design reform enters into force.</td><td class="s"><a href="https://energy.ec.europa.eu/topics/markets-and-consumers/electricity-market-design_en">European Commission</a> · accessed 5 November 2026</td></tr>
 </tbody>
 </table>
@@ -219,9 +236,10 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <ul>
 <li>FERC staff (2023). <a href="https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf">Energy Primer: A Handbook of Energy Market Basics</a> (PDF), December 2023. Traditional markets: p. 60. RTOs and ERCOT: p. 66. Capacity auctions and shortage pricing: p. 72.</li>
 <li>ERCOT (2024). <a href="https://www.ercot.com/files/docs/2024/10/31/2024-biennial-ercot-report-on-the-ordc-20241031.pdf">2024 Biennial Report on the Operating Reserve Demand Curve</a> (PDF), 1 November 2024, pp. 1 and 7–10; and <a href="https://www.ercot.com/services/comm/mkt_notices/M-F110525-04">market notice M-F110525-04</a> (5 December 2025).</li>
-<li>PJM. <a href="https://www.pjm.com/-/media/DotCom/documents/manuals/m18.pdf">Manual 18: Capacity Market</a> (PDF), Rev. 63, effective 24 September 2026, section 5.1; <a href="https://www.pjm.com/-/media/DotCom/markets-ops/rpm/rpm-auction-info/2025-2026/2025-2026-base-residual-auction-report.pdf">2025/2026 auction report</a>; <a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2026-releases/20260714-pjm-capacity-auction-procures-138318-mw-of-generation-resources.pdf">2028/2029 auction release</a> (14 July 2026).</li>
+<li>PJM. <a href="https://www.pjm.com/-/media/DotCom/documents/manuals/m18.pdf">Manual 18: Capacity Market</a> (PDF), Rev. 63, effective 24 September 2026, section 5.1; <a href="https://www.pjm.com/-/media/DotCom/markets-ops/rpm/rpm-auction-info/2025-2026/2025-2026-base-residual-auction-report.pdf">2025/2026 auction report</a>; <a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2024-releases/20240730-pjm-capacity-auction-procures-sufficient-resources-to-meet-rto-reliability-requirement.ashx">2025/2026 auction release</a> (30 July 2024); <a href="https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2026-releases/20260714-pjm-capacity-auction-procures-138318-mw-of-generation-resources.pdf">2028/2029 auction release</a> (14 July 2026).</li>
 <li>MISO. <a href="https://www.misoenergy.org/meet-miso/media-center/2023/new-approach-to-planning-resource-auction-delivers-positive-results/">News release on the seasonal capacity auction</a> (17 May 2023).</li>
-<li>European Commission. <a href="https://energy.ec.europa.eu/topics/markets-and-consumers/electricity-market-design_en">Electricity market design</a>; <a href="https://ec.europa.eu/commission/presscorner/api/files/document/print/av/qanda_24_2260/">questions and answers</a> (21 May 2024); <a href="https://energy.ec.europa.eu/news/report-and-proposals-streamlining-procedures-capacity-mechanisms-2025-03-12_en">capacity mechanisms</a> (12 March 2025).</li>
+<li>European Commission. <a href="https://energy.ec.europa.eu/topics/markets-and-consumers/electricity-market-design_en">Electricity market design</a>; <a href="https://ec.europa.eu/commission/presscorner/api/files/document/print/av/qanda_24_2260/">questions and answers</a> (21 May 2024); <a href="https://energy.ec.europa.eu/news/report-and-proposals-streamlining-procedures-capacity-mechanisms-2025-03-12_en">capacity mechanisms</a> (12 March 2025). Regulation (EU) 2024/1747, Article 19d (Official Journal, 26 June 2024): two-way contracts for difference from 17 July 2027.</li>
+<li>NDRC (2026). Questions and answers with NDRC and National Energy Administration officials on the notice improving the generation-side capacity price mechanism, 30 January 2026.</li>
 <li>Ember (2026). <a href="https://ember-energy.org/app/uploads/2026/02/From-baseload-to-flexibility-How-is-coals-role-in-China-changing-PDF.pdf">From baseload to flexibility: How is coal's role in China changing</a> (PDF), 10 February 2026, section 1.3.1, pp. 14–16. Ember compiles official sources.</li>
 <li>LBNL (2024). <a href="https://eta-publications.lbl.gov/sites/default/files/2024-10/utility_scale_solar_2024_edition_slides.pdf">Utility-Scale Solar, 2024 Edition</a> (slides), October 2024, slides 47–50.</li>
 </ul>
