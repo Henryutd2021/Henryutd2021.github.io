@@ -1,0 +1,24 @@
+# Sidecar for M10 (m10-ml-forecasting), builder learn-w4-e, 2026-11-05. Read by scripts/build_learn.py.
+id: m10-ml-forecasting
+lesson: M10
+glossary:
+  - id: forecast-baseline
+    term: Baseline forecast
+    def: "A simple rule, such as same hour yesterday, that any forecasting model must beat on the same hours to be worth using."
+  - id: forecast-horizon
+    term: Forecast horizon
+    def: "How far ahead of the moment it is made a forecast looks, such as one hour or one day."
+  - id: linear-regression
+    term: Linear regression
+    def: "A model that predicts a quantity as a weighted sum of inputs, with the weights chosen to make the squared misses on past data as small as possible."
+  - id: feature
+    term: Feature
+    def: "One input a model learns from, such as the same hour yesterday or the day of the week."
+  - id: data-leakage
+    term: Data leakage
+    def: "Letting a model use information it would not have when the forecast is made, such as a later hour's actual value; it makes scores look better than they can be."
+  - id: coverage
+    term: Coverage
+    def: "The share of actual outcomes that land inside a forecast's band; on its own it rewards wide bands."
+requests:
+  - "M10's page title follows the coordinator's 2026-11-05 decision: 'Forecasting load, wind and solar with machine learning, and judging it honestly' (no real hourly price series in the course); learn_map_v2.yml and curriculum_v2.md still name prices. One card in the explain layer says why prices are harder and links M1 and A3 through LX.lessonRefHTML (A3 links itself once live)."
