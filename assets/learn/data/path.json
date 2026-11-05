@@ -1220,9 +1220,13 @@
    "tier": "analyst",
    "code": "A6",
    "title": "Why does it take years to connect a power plant or a data center?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a06-interconnection.html",
+   "scales": [],
+   "id": "a06-interconnection",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Getting connected"
   },
   {
    "tier": "analyst",

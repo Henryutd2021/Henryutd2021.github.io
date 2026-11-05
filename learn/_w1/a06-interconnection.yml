@@ -1,0 +1,26 @@
+# Sidecar for A6 (a06-interconnection), builder learn-w4-a, 2026-11-05. Read by scripts/build_learn.py.
+id: a06-interconnection
+lesson: A6
+glossary:
+  - id: interconnection-queue
+    term: Interconnection queue
+    def: "The list of projects asking to connect to the grid, each waiting for studies, upgrades and an agreement before it may run."
+  - id: interconnection-request
+    term: Interconnection request
+    def: "A project's formal application to connect to the grid, filed with the transmission provider together with a deposit."
+  - id: cluster-study
+    term: Cluster study
+    def: "A study of every interconnection request in one window together, which finds the network upgrades the group needs and splits their cost."
+  - id: network-upgrade
+    term: Network upgrade
+    def: "New or stronger lines, transformers or substation equipment that the grid needs before a project can connect."
+  - id: site-control
+    term: Site control
+    def: "Proof that a project owns, leases or has the right to use the land it would be built on."
+  - id: interconnection-agreement
+    term: Interconnection agreement
+    def: "The contract that sets how and when a project connects, which upgrades are built and who pays for them."
+  - id: distribution-factor
+    term: Distribution factor
+    def: "The share of a project's output that would flow on a given line, used to split the cost of upgrading that line."
+requests: []
