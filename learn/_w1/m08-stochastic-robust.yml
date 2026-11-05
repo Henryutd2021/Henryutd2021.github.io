@@ -37,4 +37,3 @@ glossary:
     def: "A plant that makes hydrogen from natural gas and steam, releasing carbon dioxide unless it is captured."
 requests:
   - "M7's path.yml row says 'next: M8 once M8 is live': M8 is live in this branch, so M7's next box can lead to M8 (coordinator)."
-  - "LX.m08 (the closed form of M8's toy) is read by case file CF3, which loads m08-stochastic-robust.js: candidate for promotion if a second page needs it."

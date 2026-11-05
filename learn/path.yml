@@ -1353,7 +1353,7 @@
   does: "Size Prairie Campus's microgrid (solar, battery, generator, load priorities) to keep power to the hospital, its water and heating plant and the dormitories through a three-day outage; respect the host feeder's limits; compare utility, co-op and community ownership; report cost, unserved critical load and emissions."
   after: [SB1, F7, A14, A4]
 
-# CF3, builder learn-w4-d (wave W4): a draft in learn/_drafts/ until its review fixes are done (Henry approved E11 on
+# CF3, builder learn-w4-d (wave W4); Henry approved E11 on 2026-11-05; live after its review fixes (learn-w4-fix-d,
 # 2026-11-05); Analyst tier, as CF1 and CF2 (coordinator, 2026-11-05)
 - kind: lesson
   id: cf3-hydrogen-under-uncertainty
@@ -1361,7 +1361,7 @@
   tier: analyst
   form: case
   icon: map
-  status: upcoming
+  status: active
   minutes: 10
   title: "Where should hydrogen go when nobody knows how much wind will be built?"
   subtitle: "Why a hydrogen plan sized for one forecast can cost too much in the others, and how a plan that weighs every build-out differs"

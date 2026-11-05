@@ -4,14 +4,17 @@
 //   - the closed form from first principles (W3 brief §2.3): surplus, the cost of a size in each branch, the critical
 //     hours; every LP (wait-and-see, expected-value, stochastic, worst case, least regret, a plan priced with its size
 //     fixed) equals the closed form
-//   - ties (W2 finding 2): every reported size is the only best size (1 MW more or less costs more, by the closed form and
-//     by re-solving the LP with the size fixed); each branch's operation is unique given the size
+//   - ties (W2 finding 2): every reported size is the only best size. Each cost is convex and piecewise linear in the size,
+//     so the proof is its exact one-sided slopes: negative just below the size, positive just above (review M8 #3); the
+//     1 MW neighbour check (closed form and the LP re-solved with the size fixed) is kept as a second, weaker check; each
+//     branch's operation is unique given the size
 //   - the order WS <= RP <= EEV, VSS and EVPI >= 0; the worst-case plan is the low branch's plan because a branch's cost
 //     does not rise with more wind (checked on a grid); the robust plans do not use the chances; the least-regret plan
 //     equalises the low and high branches' regrets
 //   - every number on the page (no-JS block, data notes, step texts, explain fallback, Go deeper, myths, quiz, numbers
 //     to remember) against the model and the reference block; the excerpt sentences word for word against the register
-//   - the page on a stub document with a solver that fails, then works
+//   - the page on a stub document with a solver that fails, then works: every step's feedback within the text budget;
+//     step 10 with a slow solver (a second preset tap while one solves changes nothing; review M8 #1)
 // Usage (from the site folder):  node _tests/learn/test_m08-stochastic-robust.js [--write]
 "use strict";
 const fs = require("fs");
@@ -102,21 +105,38 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   const kinks = S2 => M.kinks(D, S2, 3000);
   const argmin = (f, xs) => xs.reduce((b, x) => (f(x) < b.f - 1e-6 ? { x, f: f(x) } : b), { x: null, f: Infinity });
   // ---------------- every LP against the closed form, and each size unique
-  const unique = (f, x, what) => { const f0 = f(x); ok(f(x + 1) > f0 + 1 && (x < 1 || f(x - 1) > f0 + 1), `${what}: ${fm.mw(x)} is the only best size (1 MW more costs ${(f(x + 1) - f0).toFixed(0)} more${x >= 1 ? ", 1 MW less " + (f(x - 1) - f0).toFixed(0) + " more" : ""})`); };
+  // Exact one-sided slopes of the convex, piecewise-linear costs ($ per MW): one more MW costs c and, in every hour of a
+  // block whose surplus lies above the size, saves v. Just above x (side +1) a block counts if its surplus exceeds x; just
+  // below (side -1), if its surplus reaches x. A max of such costs (worst case, regret) takes the slopes of the branches
+  // at the max: the largest just above, the smallest just below.
+  const hAbove = (W, x, side) => D.blocks.hours.reduce((a, hb, b) => a + (sig(W, b) > x + side * 1e-6 ? hb : 0), 0);
+  const bSlope = (W, x, side) => c - v * hAbove(W, x, side);
+  const pSlope = (S2, x, side) => S2.reduce((a, s) => a + s.p * bSlope(s.W, x, side), 0);
+  const mSlope = (list, x, side) => { const val = list.map(q => cost0(q.W, x) - q.k), top = Math.max(...val), sl = list.filter((q, i) => val[i] >= top - 1).map(q => bSlope(q.W, x, side)); return side > 0 ? Math.max(...sl) : Math.min(...sl); };
+  // unique: the slopes prove it (negative just below, positive just above: a convex function has no other minimum);
+  // the 1 MW neighbour check alone would miss a flat stretch narrower than 2 MW
+  const unique = (f, x, what, slope) => {
+    const f0 = f(x), lo = slope(-1), hi = slope(1);
+    ok(lo < 0 && hi > 0, `${what}: ${fm.mw(x)} is the only best size: the slope just below is ${fm.int(lo)} and just above ${fm.int(hi)} $ per MW (convex, piecewise linear)`);
+    ok(f(x + 1) > f0 + 1 && (x < 1 || f(x - 1) > f0 + 1), `${what}: neighbour check, 1 MW more costs ${(f(x + 1) - f0).toFixed(0)} more${x >= 1 ? ", 1 MW less " + (f(x - 1) - f0).toFixed(0) + " more" : ""}`);
+  };
+  // the slopes are the cost's own: they equal the difference quotients on a tiny step (no other kink that close)
+  { const x = R.sp.x, d = 1e-3; ok(near((E(x + d) - E(x)) / d, pSlope(S, x, 1), 0.5) && near((E(x) - E(x - d)) / d, pSlope(S, x, -1), 0.5), "the one-sided slopes equal the closed form's difference quotients at the stochastic plan"); }
   S.forEach(s => {
     const q = solveX(one(s)), cf = argmin(x => cost0(s.W, x), kinks([s]));
     ok(q.r.status === "optimal" && near(q.o.x, cf.x, 1e-6) && near(q.r.objective, cf.f, 0.5) && near(q.o.x, R.ws[s.id].x, 1e-6) && near(q.r.objective, R.ws[s.id].cost, 0.6), `wait and see, ${s.short}: ${fm.mw(q.o.x)}, ${fm.m(q.r.objective)} (closed form ${fm.mw(cf.x)})`);
-    unique(x => cost0(s.W, x), q.o.x, "wait and see, " + s.short);
+    unique(x => cost0(s.W, x), q.o.x, "wait and see, " + s.short, side => bSlope(s.W, q.o.x, side));
     ok(M.hoursAbove(D, s.W, q.o.x - 1e-6) === 3000 && M.hoursAbove(D, s.W, q.o.x + 1e-6) === 1500, `wait and see, ${s.short}: an extra MW runs 3,000 hours just below the plan, 1,500 just above (critical 2,963)`);
   });
   const WS = S.reduce((a, s) => a + s.p * R.ws[s.id].cost, 0);
   ok(near(WS, R.wsExp, 1), "WS = the chance-weighted wait-and-see costs");
   { const q = solveX([{ id: "ev", p: 1, W: 5000 }]), cf = argmin(x => cost0(5000, x), kinks([{ W: 5000 }]));
     ok(near(q.o.x, cf.x) && near(q.o.x, R.ev.x) && near(q.r.objective, R.ev.own, 0.6) && near(R.ev.x, R.ws.mid.x), `expected-value problem: ${fm.mw(q.o.x)} expecting ${fm.m(q.r.objective)}; the mean is the middle branch, so its plan is that branch's`);
+    unique(x => cost0(5000, x), q.o.x, "expected-value problem", side => bSlope(5000, q.o.x, side));
     const pp = priced(S, q.o.x); ok(near(pp.exp, E(q.o.x), 0.5) && near(pp.exp, R.ev.exp, 0.6) && S.every(s => near(pp.per[s.id], cost0(s.W, q.o.x), 0.5) && near(pp.per[s.id], R.ev.per[s.id], 0.6)), `the average's plan priced in every branch (x fixed): ${fm.m(pp.exp)}`); }
   { const q = solveX(S), cf = argmin(E, kinks(S));
     ok(q.r.status === "optimal" && near(q.o.x, cf.x) && near(q.o.x, R.sp.x) && near(q.r.objective, cf.f, 0.5) && near(q.r.objective, R.sp.exp, 0.6) && S.every(s => near(q.o.per[s.id], cost0(s.W, q.o.x), 0.5)), `stochastic program: ${fm.mw(q.o.x)}, ${fm.m(q.r.objective)} (closed form ${fm.mw(cf.x)})`);
-    unique(E, q.o.x, "stochastic program");
+    unique(E, q.o.x, "stochastic program", side => pSlope(S, q.o.x, side));
     const lpU = [q.o.x - 1, q.o.x + 1].map(x => solve(M.build(D, S, { fix: x })).objective);
     ok(lpU.every(f => f > q.r.objective + 1), "stochastic program: re-solved with the size 1 MW smaller or larger, the LP costs more (unique)");
     ok(R.sp.below === 3750 && R.sp.above === 2750 && R.sp.below * v > c && R.sp.above * v < c, "critical hours at the stochastic plan: 3,750 expected hours below, 2,750 above, against 2,963"); }
@@ -126,7 +146,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   const regretF = x => Math.max(...S.map(s => cost0(s.W, x) - wsC[s.id]));
   { const q = solveX(S, { mode: "worst" }), cf = argmin(worst, kinks(S));
     ok(q.r.status === "optimal" && near(q.o.x, cf.x) && near(q.o.x, R.rob.x) && near(q.o.x, R.ws.low.x) && near(q.r.objective, R.ws.low.cost, 0.6), `worst case: ${fm.mw(q.o.x)}, the low branch's own plan, worst cost ${fm.m(q.r.objective)}`);
-    unique(worst, q.o.x, "worst case");
+    unique(worst, q.o.x, "worst case", side => mSlope(S.map(s => ({ W: s.W, k: 0 })), q.o.x, side));
     let mono = true; for (let x = 0; x <= 2500; x += 50) for (let W = 3000; W < 7000; W += 100) if (cost0(W + 100, x) > cost0(W, x) + 1e-6) mono = false;
     ok(mono, "for every size, a branch's cost does not rise with more wind (grid of 3,000 to 7,000 MW): the worst branch is the lowest build-out, so the worst case over any build-out in that range is the same plan");
     const S2 = M.presetS(D, "opt"); ok(near(solveX(S2, { mode: "worst" }).o.x, q.o.x), "the worst-case plan does not change with the chances");
@@ -135,7 +155,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
     // the closed-form crossing of the low branch's rising regret and the high branch's falling regret, by bisection
     let lo = R.ws.low.x, hi = R.ws.high.x; for (let i = 0; i < 200; i++) { const m = (lo + hi) / 2; if (cost0(3000, m) - wsC.low < cost0(7000, m) - wsC.high) lo = m; else hi = m; }
     ok(q.r.status === "optimal" && near(q.o.x, lo, 1e-4) && near(q.o.x, R.reg.x, 1e-4) && near(q.r.objective, regretF(lo), 1) && near(q.r.objective, R.reg.z, 1), `least regret: ${q.o.x.toFixed(4)} MW (closed form ${lo.toFixed(4)}), largest regret ${fm.m(q.r.objective)}`);
-    unique(regretF, q.o.x, "least regret");
+    unique(regretF, q.o.x, "least regret", side => mSlope(S.map(s => ({ W: s.W, k: wsC[s.id] })), q.o.x, side));
     ok(near(cost0(3000, q.o.x) - wsC.low, cost0(7000, q.o.x) - wsC.high, 1) && cost0(5000, q.o.x) - wsC.mid < q.r.objective - 1e6, "least regret: the low and high branches' regrets are equal there; the middle branch's is smaller");
     ok(near(solveX(M.presetS(D, "pess"), { mode: "regret", ws: wsC }).o.x, q.o.x, 1e-6), "the least-regret plan does not change with the chances");
     const pp = priced(S, q.o.x); ok(near(pp.exp, R.reg.exp, 0.6), `least regret priced: expected ${fm.m(pp.exp)}`); }
@@ -143,7 +163,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   D.presets.forEach(p => {
     const S2 = M.presetS(D, p.id), E2 = x => S2.reduce((a, s) => a + s.p * cost0(s.W, x), 0), q = solveX(S2), W2 = M.meanW(S2), ev = solveX([{ id: "ev", p: 1, W: W2 }]);
     ok(near(q.o.x, R.presets[p.id].sp) && near(q.o.x, argmin(E2, kinks(S2)).x) && near(ev.o.x, R.presets[p.id].ev.x) && near(ev.o.x, argmin(x => cost0(W2, x), kinks([{ W: W2 }])).x), `${p.label}: stochastic ${fm.mw(q.o.x)}, for the average (${W2} MW) ${fm.mw(ev.o.x)}`);
-    unique(E2, q.o.x, p.label + " stochastic"); unique(x => cost0(W2, x), ev.o.x, p.label + " plan for the average");
+    unique(E2, q.o.x, p.label + " stochastic", side => pSlope(S2, q.o.x, side)); unique(x => cost0(W2, x), ev.o.x, p.label + " plan for the average", side => bSlope(W2, ev.o.x, side));
   });
   ok(R.presets.pess.sp < R.presets.even.sp && R.presets.even.sp < R.presets.opt.sp && R.presets.pess.ev.x < R.presets.opt.ev.x, "the stochastic plan and the plan for the average grow with the chance of more wind");
   { const m0 = M.build(D, S); ok(m0.variables.length === 31 && m0.constraints.length === 30 && R.size.cols === 31 && R.size.rows === 30, "the extensive form: 31 columns and 30 rows (1 + 10 × 3)"); }
@@ -164,7 +184,10 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   has(`WS ≤ RP ≤ EEV: here ${fm.m(R.wsExp)} ≤ ${fm.m(R.sp.exp)} ≤ ${fm.m(R.ev.exp)}.`, "Go deeper: the order of the costs");
   has(`31 columns and 30 rows; with $n$ branches it has $1 + 10n$ columns`, "Go deeper: the LP's size"); ok(M.build(D, M.scen(D).concat([{ id: "x4", p: 0, W: 4000 }])).variables.length === 41, "1 + 10n columns (four branches: 41)");
   has(`$80,000 ÷ $27 = 2,963 hours a year`, "Go deeper: the critical hours"); ok(Math.round(80000 / 27) === 2963, "80,000 ÷ 27 = 2,963");
-  has(`Below ${fm.int(R.ws.low.x)} MW (none built), ${fm.int(R.ws.mid.x)} MW (half) or ${fm.int(R.ws.high.x)} MW (all), an extra MW runs 3,000 hours; just above, 1,500.`, "Go deeper: each branch's count");
+  has(`Just below its own best size, ${fm.int(R.ws.low.x)} MW (none built), ${fm.int(R.ws.mid.x)} MW (half) or ${fm.int(R.ws.high.x)} MW (all), an extra MW runs 3,000 hours; just above, 1,500.`, "Go deeper: each branch's count, local to its plan (review M8 #4)");
+  { let local = true; S.forEach(s => { const x = R.ws[s.id].x; if (hAbove(s.W, x, -1) !== 3000 || hAbove(s.W, x, 1) !== 1500) local = false; if (hAbove(s.W, 100, 1) === 3000) local = false; });
+    ok(local, "the 3,000 and 1,500 hours hold just below and just above each branch's own plan, and not at 100 MW (5,000 or 8,760 hours there)"); }
+  ok(!/only the linear program finds it/.test(PAGE) && PT.includes("that needs a coupled model, here a linear program."), "Go deeper: a coupled model is needed, here an LP (review M8 #9)");
   has(`an extra MW just below ${fm.int(R.sp.x)} MW runs ${fm.int(R.sp.below)} hours; just above, ${fm.int(R.sp.above)}.`, "Go deeper: the expected count");
   has(`Here the plan for ${fm.int(R.ev.W)} MW of wind expects ${fm.m(R.ev.own)} a year; priced in the three branches with their chances, it costs ${fm.m(R.ev.exp)}.`, "myth 1");
   has(`The worst-case plan has the lowest worst cost, ${fm.m(rw)}, but it costs ${fm.m(R.rob.exp - R.sp.exp)} a year more in expectation than the stochastic plan.`, "myth 2");
@@ -175,10 +198,13 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // data notes and step texts against the data file
   has("a fictional windy zone with 3,000 MW of wind and 4,000 MW planned; its lines take 1,000 MW", "data note: the zone");
   ok(D.wind.existingMW === 3000 && D.wind.plannedMW === 4000 && D.zone.lineMW === 1000, "the zone's numbers are the data file's");
-  has("$80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind. Industry takes 54,000 kg an hour; gas reformers supply the rest at $1.50 per kg.", "data note: the electrolyzer");
+  has("Electrolyzer: it uses electricity to make hydrogen from water. $80,000 per MW a year; 18 kg of hydrogen per MWh; it runs only on surplus wind.", "data note: the electrolyzer, defined (review M8 #6)");
+  has("Hydrogen: industry takes 54,000 kg an hour; gas reformers, which make hydrogen from natural gas and steam, supply the rest at $1.50 per kg.", "data note: the hydrogen and the gas reformers, defined");
   ok(D.electrolyzer.costPerMWYear === 80000 && D.electrolyzer.kgPerMWh === 18 && D.hydrogen.demandKgPerHour === 54000 && D.hydrogen.reformerPerKg === 1.5, "the electrolyzer's numbers are the data file's");
   has("scaled to 33.8%, U.S. wind's 2025 capacity factor", "data note: the capacity factor"); ok(T.targets.wind.cf === 0.338 && T.targets.wind.year === 2025, "33.8% is cf_targets.json's 2025 wind value");
-  ok(JS.includes("The windy zone has 3,000 MW of wind, 4,000 MW more is planned, and its lines carry 1,000 MW.") && JS.includes("plan for the average future, 5,000 MW of wind here") && M.meanW(S) === 5000, "step texts: the zone's numbers and the 5,000 MW mean");
+  ok(JS.includes("The windy zone has 3,000 MW of wind and 4,000 MW planned; its lines carry 1,000 MW, and an [[electrolyzer|electrolyzer]] could use the rest.") && JS.includes("plan for the average future, 5,000 MW of wind here") && M.meanW(S) === 5000, "step texts: the zone's numbers and the 5,000 MW mean");
+  { const st = [...JS.matchAll(/\{ text: "([^"]+)",\s*\n\s*(?:build|free)/g)].map(m => m[1]);
+    ok(/\[\[electrolyzer\|electrolyzer\]\]/.test(st[0]) && /\[\[gas-reformer\|gas reformers\]\]/.test(st[1]) && !/\[\[(electrolyzer|gas-reformer)\|/.test(st.slice(2).join(" ")), "steps 1 and 2 mark the electrolyzer and the gas reformers at first use (review M8 #6)"); }
   ok(JS.includes('"$" + fm.int(D.electrolyzer.costPerMWYear)') && JS.includes("its $80,000 a year") && D.electrolyzer.costPerMWYear === 80000, "step 5's $80,000 is the data file's");
   // step 2's verdict on the reader's size: true on every step of the slider (W3 brief §2.5)
   { let good = true;
@@ -189,7 +215,12 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
       if (w.split(" ").length > 40) good = false;
     }
     ok(good, "step 2's verdict is true for every size on the slider: the none-built branch costs most, the all-built least (all equal at 0 MW)"); }
-  ok(/here a size costs no more when more wind is built, so its worst cost is its cost in that branch/.test(JS), "step 8's reason is the monotonicity the test proves above");
+  ok(/a size costs no more when more wind is built, so that branch is its worst\./.test(JS) && /"Expected, above the stochastic plan"/.test(JS), "step 8's reason is the monotonicity the test proves above; the cost comparison is a figure of its own (review M8 #5)");
+  // the comparison table's lede is true: the plan for the average loses to the stochastic plan on all three yardsticks (review CF3 #6)
+  { const yard = k => { const p = R[k]; return { exp: p.exp, worst: Math.max(...S.map(s => p.per[s.id])), regret: Math.max(...S.map(s => p.per[s.id] - wsC[s.id])) }; }, a = yard("ev"), b = yard("sp");
+    ok(a.exp > b.exp && a.worst > b.worst && a.regret > b.regret && /here the plan for the average does worse than the stochastic plan on all three measures shown/.test(JS) && !/Each plan is best by its own yardstick/.test(JS),
+      `the table's lede: the plan for the average is worse on expected (${fm.m(a.exp)} > ${fm.m(b.exp)}), worst (${fm.m(a.worst)} > ${fm.m(b.worst)}) and largest regret (${fm.m(a.regret)} > ${fm.m(b.regret)})`); }
+  ok(/"Annual cost against the electrolyzer's size, chances " \+ chancesText\(S\)/.test(JS) && /Table only: the chart below keeps the chances/.test(JS) && M.scen(D).map(s => s.p).join() === "0.25,0.5,0.25", "the chart names its chances (25%, 50% and 25%); step 10's table says the chart keeps them (review M8 #8)");
   // the explain fallback's other numbers
   has(`Stochastic program</dt>`.replace(/<[^>]+>/g, ""), "explain fallback");
   // step texts: one or two sentences, 40 words at most (text budget)
@@ -217,7 +248,7 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
   // the lessons the page links are live
   const PATHJ = J("path.json"), live = new Set(), walk = o => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === "object") { if (o.href && o.ready === true) live.add(o.href); Object.values(o).forEach(walk); } }; walk(PATHJ);
   hrefs.filter(h => /^[0-9a-z-]+\.html$/.test(h) && h !== "index.html").forEach(h => ok(live.has(h), "linked lesson is live: " + h));
-  ok(/CF3 \(upcoming\), where hydrogen should go when nobody knows how much wind will be built\./.test(PAGE) && !/href="cf3-/.test(PAGE), "CF3 (a draft) is named as upcoming, not linked");
+  ok(/The whole case: <a href="cf3-hydrogen-under-uncertainty\.html">CF3<\/a>, where hydrogen should go when nobody knows how much wind will be built\./.test(PAGE) && !/CF3 \(upcoming\)/.test(PAGE), "the Real-world box links CF3 (live since the W4 fixes)");
   if (NB) {
     ok(NB.includes(ID + ".json") && NB.includes("reference") && NB.includes("assert") && NB.includes("linprog"), "notebook: reads the reference block and asserts it with linprog");
     ok(NB.includes("town_year.json") && NB.includes("cf_targets.json"), "notebook: rebuilds the wind blocks from the 2025 shape");
@@ -267,9 +298,10 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
     ["solver", "cards", "predict", "controls", "plot", "solvestep", "numanswer", "scenario"].forEach(n => load(n, E2));
     const specs = [], P0 = E2.LX.Plot;
     E2.LX.Plot = (h, o) => { const p = P0(h, o), r0 = p.render; p.render = (sp, a) => { specs.push(sp); return r0(sp, a); }; return p; };
-    let failing = true, calls = 0;
+    let failing = true, calls = 0, hold = false; const held = [];
     const slv = E2.LX.solver; slv.preload = () => Promise.resolve("worker"); slv.mode = "worker";
-    slv.solve = m => { calls++; if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 5000 } }); const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms); return Promise.resolve(r); };
+    // hold: a slow solver; each solve waits in held[] until the test releases it
+    slv.solve = m => { calls++; if (failing) return Promise.resolve({ status: "time-limit", ok: false, values: null, ms: { roundTrip: 5000 } }); const r = solve(m); r.ms = Object.assign({ roundTrip: 1 }, r.ms); return hold ? new Promise(res => held.push(() => res(r))) : Promise.resolve(r); };
     let init = null, demo = null;
     E2.LX.mount = (slug, f) => { if (slug === "m08") init = f; };
     E2.LX.demo = (root, fn, cards) => { demo = { fn, cards }; return () => null; };
@@ -283,37 +315,62 @@ const text = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\\\$
     ok(E2.LX.m08 && typeof E2.LX.m08.cost === "function", "the page exports its closed form as LX.m08 (CF3 reads it)");
     const flush = () => new Promise(r => setImmediate(r));
     const card = () => demo.cards.el, btns = re => card().querySelectorAll("button").filter(b => re.test(b.textContent)), next = () => btns(/Next/)[0], failBox = () => card().querySelector(".m8-fail");
+    // every step's feedback (api.saw), read as shown: one or two ideas, 40 words at most (review M8 #5)
+    const sawn = {}, saw = n => { const el = card().querySelector(".lx-saw"); if (el) sawn[n] = el.textContent.replace(/\s+/g, " ").trim(); };
     try {
       // step 1: the tree, all three branches
       demo.cards.go(0); card().querySelectorAll(".m8-br").forEach(b => b.click());
-      ok(!next().disabled && /The largest surplus is 713 MW with none of the planned wind built and 2,997 MW with all of it/.test(card().textContent), "step 1: three branches seen unlock Next; the surpluses are the model's");
+      ok(!next().disabled && /The largest surplus is 713 MW with none of the planned wind built and 2,997 MW with all of it/.test(card().textContent), "step 1: three branches seen unlock Next; the surpluses are the model's"); saw(1);
+      // step 2: lock in the default size
+      demo.cards.go(1); btns(/Lock in this size/)[0].click(); ok(!next().disabled, "step 2: locking a size unlocks Next"); saw(2);
       // step 3: fails, then works
       demo.cards.go(2); failing = true; calls = 0;
       btns(/Solve the three branches/)[0].click(); await flush();
       ok(failBox() && failBox().getAttribute("role") === "alert" && /time limit/.test(failBox().textContent) && /Try again/.test(failBox().textContent), "step 3: a failed solve shows a plain message and Try again");
       ok(card().getAttribute("aria-busy") == null && next().disabled && !btns(/Solve the three branches/)[0].disabled, "step 3: busy cleared, the button works again, Next waits");
       failing = false; calls = 0; btns(/Try again/)[0].click(); await flush(); await flush();
-      ok(!failBox() && !next().disabled && calls === 3 && /380 MW, 1,300 MW or 2,220 MW/.test(card().textContent), "step 3: Try again solves the three branches and unlocks Next (" + calls + " solves)");
+      ok(!failBox() && !next().disabled && calls === 3 && /380 MW, 1,300 MW or 2,220 MW/.test(card().textContent), "step 3: Try again solves the three branches and unlocks Next (" + calls + " solves)"); saw(3);
       // step 4: the average's plan priced in every branch
       demo.cards.go(3); calls = 0; btns(/Solve, then price the plan/)[0].click(); await flush(); await flush();
-      ok(calls === 2 && card().textContent.includes(fm.m(R.ev.exp)) && card().textContent.includes(fm.m(R.ev.own)), "step 4: two solves (the problem, then the plan priced); its costs are the reference's");
+      ok(calls === 2 && card().textContent.includes(fm.m(R.ev.exp)) && card().textContent.includes(fm.m(R.ev.own)), "step 4: two solves (the problem, then the plan priced); its costs are the reference's"); saw(4);
+      // steps 5 and 6: the stochastic program, then the prediction on VSS
+      demo.cards.go(4); btns(/Solve the stochastic program/)[0].click(); await flush(); await flush();
+      ok(!next().disabled && card().textContent.includes(fm.mw(R.sp.x)), "step 5: the stochastic plan (" + fm.mw(R.sp.x) + ")"); saw(5);
+      demo.cards.go(5); card().querySelectorAll(".lx-choice")[0].click(); await flush(); await flush();
+      ok(!next().disabled && card().textContent.includes(fm.m(R.vss)), "step 6: the prediction reveals VSS " + fm.m(R.vss)); saw(6);
       // step 7 solves what is missing on its own, then grades EVPI
       demo.cards.go(6); await flush(); await flush();
       const box = card().querySelector("input");
       ok(box && card().textContent.includes(fm.m(R.sp.exp)), "step 7: the stochastic program solved on arrival; the box is there");
-      if (box) { box.value = "10"; btns(/Check/)[0].click(); ok(next().disabled, "step 7: a wrong EVPI does not unlock Next"); box.value = (R.evpi / 1e6).toFixed(2); btns(/Check/)[0].click(); ok(!next().disabled && card().textContent.includes("EVPI = " + fm.m(R.sp.exp)), "step 7: the right EVPI unlocks Next"); }
+      if (box) { box.value = "10"; btns(/Check/)[0].click(); ok(next().disabled, "step 7: a wrong EVPI does not unlock Next"); box.value = (R.evpi / 1e6).toFixed(2); btns(/Check/)[0].click(); ok(!next().disabled && card().textContent.includes("EVPI = " + fm.m(R.sp.exp)), "step 7: the right EVPI unlocks Next"); saw(7); }
+      // step 8: the worst-case plan; the cost comparison is a figure, apart from the reason
+      demo.cards.go(7); btns(/Solve the worst-case plan/)[0].click(); await flush(); await flush();
+      ok(!next().disabled && card().textContent.includes(fm.m(R.rob.exp - R.sp.exp)) && /Expected, above the stochastic plan/.test(card().textContent), "step 8: the worst-case plan, and what it costs above the stochastic plan in expectation"); saw(8);
       // step 9: least regret, then step 10 with two presets
       demo.cards.go(8); calls = 0; btns(/Solve the least-regret plan/)[0].click(); await flush(); await flush();
-      ok(card().textContent.includes(fm.mw(R.reg.x)) && !next().disabled, "step 9: the least-regret plan (" + fm.mw(R.reg.x) + ")");
+      ok(card().textContent.includes(fm.mw(R.reg.x)) && !next().disabled, "step 9: the least-regret plan (" + fm.mw(R.reg.x) + ")"); saw(9);
       demo.cards.go(9); const seg = () => card().querySelectorAll(".lx-seg button");
       failing = true; seg()[0].click(); await flush();
       ok(failBox() && next().disabled, "step 10: a failed preset solve shows the note");
       failing = false; btns(/Try again/)[0].click(); await flush(); await flush(); await flush();
       seg()[2].click(); await flush(); await flush(); await flush();
-      ok(!next().disabled && card().textContent.includes(fm.mw(R.presets.pess.sp)) && card().textContent.includes(fm.mw(R.presets.opt.sp)) && /stays at 380 MW/.test(card().textContent), "step 10: two presets solved; the stochastic plan moves, the worst-case plan stays");
+      ok(!next().disabled && card().textContent.includes(fm.mw(R.presets.pess.sp)) && card().textContent.includes(fm.mw(R.presets.opt.sp)) && /stays at 380 MW/.test(card().textContent), "step 10: two presets solved; the stochastic plan moves, the worst-case plan stays"); saw(10);
+      // step 10 with a slow solver: while Even solves, every preset button is off, so a tap on Pessimistic changes nothing;
+      // the Even row then shows Even's own plans (before the fix, a second tap mixed two presets' results)
+      hold = true; seg()[1].click(); await flush();
+      ok(held.length === 1 && seg().every(b => b.disabled), "step 10, slow solver: one solve waiting, every preset button off while it runs");
+      seg()[0].click(); hold = false;
+      while (held.length) { held.shift()(); await flush(); await flush(); await flush(); }
+      await flush(); await flush();
+      const rows10 = card().querySelectorAll("tbody tr").map(r => r.textContent);
+      const evenRow = rows10.find(t => /^Even/.test(t)) || "";
+      ok(seg().every(b => !b.disabled) && seg()[1].getAttribute("aria-pressed") === "true" && seg()[0].getAttribute("aria-pressed") === "false" &&
+         evenRow.includes(fm.mw(R.presets.even.sp)) && evenRow.includes(fm.mw(R.presets.even.ev.x)) && rows10.length === 3,
+         "step 10, slow solver: Even's row shows Even's plans (" + fm.mw(R.presets.even.sp) + ", " + fm.mw(R.presets.even.ev.x) + "), Even is pressed, the buttons are back on: " + rows10.join(" | "));
+      ok(Object.keys(sawn).length === 10 && Object.keys(sawn).every(k => sawn[k].split(" ").length <= 40), "every step's feedback is 40 words at most: " + Object.keys(sawn).filter(k => sawn[k].split(" ").length > 40).map(k => "step " + k + " (" + sawn[k].split(" ").length + ")").join(", ") + " [" + Object.keys(sawn).map(k => k + ":" + sawn[k].split(" ").length).join(" ") + "]");
       // the chart: the plans found so far are marked; its text version lists every kink
       const last = specs[specs.length - 1];
-      ok(last && last.marks.map(m => m.n).join("") === "WSRA" && last.text.rows.length === M.kinks(D, S, 2500).length, "the chart marks W, S, R and A after the steps and lists every kink (" + (last ? last.marks.map(m => m.n).join("") : "") + ")");
+      ok(last && last.marks.map(m => m.n).join("") === "YWSRA" && last.text.rows.length === M.kinks(D, S, 2500).length, "the chart marks the reader's size (Y), then W, S, R and A after the steps, and lists every kink (" + (last ? last.marks.map(m => m.n).join("") : "") + ")");
     } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
     process.removeListener("unhandledRejection", onUn);
     ok(!unhandled.length, "no unhandled promise rejection: " + unhandled.join(" | "));

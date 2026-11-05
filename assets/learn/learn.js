@@ -12959,7 +12959,8 @@
    Ties (W2 review finding 2): every size the page reports is the only best size. Given a size, each branch's operation is
    unique (every MWh of surplus used saves $27), so every cost shown is unique. The robust LPs fix only the size; each
    plan's branch costs come from re-solving with the size fixed. _tests/learn/test_m08-stochastic-robust.js proves each
-   size unique (a size 1 MW larger or smaller costs more) and recomputes every number from the closed form.
+   size unique (every cost here is convex and piecewise linear in the size, and its slope is negative just below each
+   reported size and positive just above it) and recomputes every number from the closed form.
 */
 (function () {
   "use strict";

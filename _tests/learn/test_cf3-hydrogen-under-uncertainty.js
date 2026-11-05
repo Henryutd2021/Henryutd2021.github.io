@@ -4,18 +4,22 @@
 //     prices equal M8's closed form, recomputed here from first principles; the hedged plan is the cheapest size in
 //     expectation on every step of the slider; the live status is true for every size the slider allows (W3 brief §2.5)
 //   - the allow-listed explainer (assets/explainers/txh2.js) shows the mechanism of the excerpt E10.2–E10.3 (stylized)
-//   - every number on the page (the myths) matches the toy; no Numbers to remember (coordinator, 2026-11-05)
+//   - every number on the page (the myths) matches the toy; no Numbers to remember (coordinator, 2026-11-05); the three
+//     plans' one-line definitions are true of the toy; the worked expected cost adds up as shown; the toy's assumptions and
+//     wind blocks are listed with and without JavaScript (review CF3 #2, #3); the live stage on a stub document
 //   - the three no-JS blocks (timeline, toy, boundary) equal what the components write from the data (--write rewrites them)
 //   - research wording (curriculum §13, guard G-SRC): every sentence on the page, in the data file and in this lesson's
 //     script that describes the course author's study is an approved sentence of reports/learn/excerpts_for_approval.md
-//     (E10 and E11), word for word; the excerpts are the approved ones, in the approved places; E11.10 is marked optional
+//     (E10 and E11), word for word; the excerpts are the approved ones, in the approved places; the optional E11.10 is left
+//     out (review CF3 #5); technical terms are marked at first use (review CF3 #1)
 //   - citations: the paper's title is the one in inputs/publications.bib; links: doi.org, the allow-listed repository and
-//     learn pages only; text budget of every text element
+//     learn pages only; text budget of every text element, approved or not, generated blocks included (review CF3 #4)
 // Usage (from the site folder):  node _tests/learn/test_cf3-hydrogen-under-uncertainty.js [--write]
 "use strict";
 const fs = require("fs");
 const path = require("path");
 const cp = require("child_process");
+const vm = require("vm");
 const ID = "cf3-hydrogen-under-uncertainty";
 const SITE = path.resolve(__dirname, "..", "..");
 const L = p => path.join(SITE, "assets/learn", p);
@@ -79,6 +83,39 @@ ok(allOK, "the toy's prices equal the closed form recomputed here, for every siz
 ok(minOK, "the hedged plan is the cheapest in expectation by more than $1,000 against every other size on the slider (unique)");
 ok(statusOK, "the live status is true and short for every size on the slider; it says 'more than gas reformers alone' only when that branch costs more");
 ok(M.price(M8, D8, R8.sp.x).per[0] > base && M.price(M8, D8, R8.rob.x).per[0] < base, "with none built, the hedged plan costs more than reformers alone; the worst-case plan does not (the myth's numbers)");
+// plain text of a data string: glossary marks and tags dropped
+const plainT = t => String(t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+// the plans' one-line definitions are true of the toy (review CF3 #2)
+{ const defs = Object.fromEntries(I.plans.map(p => [p.key, plainT(p.def)]));
+  let worstMin = true; for (let x = 0; x <= D8.chart.xMax; x += D8.chart.step) if (x !== R8.rob.x && !(Math.max(...S.map(s => cost0(s.W, x))) > Math.max(...S.map(s => cost0(s.W, R8.rob.x))))) worstMin = false;
+  const W5 = S.reduce((a, s) => a + s.p * s.W, 0);
+  let evMin = true; for (let x = 0; x <= D8.chart.xMax; x += D8.chart.step) if (x !== R8.ev.x && !(cost0(W5, x) > cost0(W5, R8.ev.x))) evMin = false;
+  ok(defs.ev === "the best size if the wind built were sure to equal its average, " + fm.int(W5) + " MW." && W5 === R8.ev.W && evMin, "definition: the plan for the average is the best size for the average wind (" + fm.int(W5) + " MW), on every slider step");
+  ok(defs.sp === "the size with the lowest expected cost, each build-out's cost weighted by its chance." && minOK, "definition: the hedged plan has the lowest expected cost");
+  ok(defs.rob === "the size whose cost in the worst build-out is lowest; it uses no chances." && worstMin, "definition: the worst-case plan has the lowest worst cost on every slider step"); }
+// the worked expected cost (review CF3 #2): the hedged plan's three costs times their chances; the rounded terms add up
+// to the rounded total as shown (at some other sizes they would not, so the line stays on the hedged plan)
+{ const w = M.worked(M8, D8), r2 = v => Math.round(v / 1e4) / 100;
+  ok(w.text === "Expected cost of the hedged plan: 25% × " + fm.m(R8.sp.per.low) + " + 50% × " + fm.m(R8.sp.per.mid) + " + 25% × " + fm.m(R8.sp.per.high) + " = " + fm.m(R8.sp.exp) + " a year." &&
+     near(Math.round(S.reduce((a, s, i) => a + s.p * r2(w.per[i]), 0) * 100) / 100, r2(w.exp), 1e-9) && near(w.exp, R8.sp.exp, 1) && w.per.every(v => fm.m(v) !== fm.m(w.exp)),
+     "worked line: " + w.text + " (the terms add up as shown; no branch costs the expected value)");
+  ok(PAGE.includes(w.text) && PAGE.includes(I.workedNote), "the worked line and its note are in the no-JS block"); }
+// the toy's assumptions and wind blocks, with and without JavaScript (review CF3 #3)
+ok(I.assumptions.length === 4 && /Surplus wind is free/.test(I.assumptions[0]) && /five blocks/.test(I.assumptions[1]) && /steady/.test(I.assumptions[2]) && /no hydrogen storage, no fuel cells and no pipelines/.test(I.assumptions[3]), "the assumptions name free surplus wind, the five blocks, steady demand, and no storage, fuel cells or pipelines");
+ok(PAGE.includes("<details class=\"lx-textalt\"><summary>" + I.assumptionsTitle + "</summary>") && D8.blocks.labels.every(l => PAGE.includes("<th scope=\"row\">" + l + "</th>")) && I.assumptions.every(t => text(PAGE).includes(plainT(t))), "the no-JS block lists the assumptions and the five wind blocks");
+ok(cost0(3000, 845) === 80000 * 845 + 1.5 * (54000 * 8760 - 18 * D8.blocks.hours.reduce((a, h, b) => a + h * Math.min(845, Math.max(0, 3000 * D8.blocks.cf[b] - 1000)), 0)), "free surplus wind: the toy's cost has no term for the wind the electrolyzer uses");
+// the live stage on a stub document: definitions, the worked line, the assumptions; a plan button moves the slider
+{ const { env, load } = require("./stubdom.js"), E = env();
+  E.LX.reduced = E.LX.reduced || (() => true); E.LX.onTheme = E.LX.onTheme || (() => {}); E.LX.visible = E.LX.visible || (() => false);
+  ["controls", "ledger", "scenario"].forEach(n => load(n, E));
+  let init = null, threw = null; E.LX.mount = (slug, f) => { if (slug === "cf3-idea") init = f; }; E.LX.demo = () => () => null;
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: undefined, setTimeout: () => 0, clearTimeout: () => {} });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "cf3-idea" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  try { init(live, { cf3_hydrogen_under_uncertainty: D, m08_stochastic_robust: D8 }, root); } catch (e) { threw = e.stack || e.message; }
+  const T3 = (live.textContent || "").replace(/\s+/g, " ");
+  ok(!threw && I.plans.every(p => T3.includes(p.label + ": " + plainT(p.def))) && T3.includes(M.worked(M8, D8).text) && I.assumptions.every(t => T3.includes(plainT(t))) && D8.blocks.labels.every(l => T3.includes(l)),
+    "live: the stage shows the three definitions, the worked line, the assumptions and the wind blocks" + (threw ? ": " + threw : ""));
+  if (!threw) { const b = live.querySelectorAll(".lx-seg button")[1]; b.click(); ok(b.getAttribute("aria-pressed") === "true" && live.textContent.includes(fm.mw(R8.sp.x) + " is the hedged plan"), "live: the hedged plan's button sets " + fm.mw(R8.sp.x)); } }
 
 // ---------------- the explainer: the excerpt's mechanism, stylized
 const lo = EX.model({ price: EX.C.pMin }), hi = EX.model({ price: EX.C.pMax });
@@ -109,7 +146,7 @@ ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\n<script src="
 // or (b) a recorded revision; a page sentence may be a clause of an approved row where the row itself breaks (": ", "; ",
 // ". "). Strict zones: the case parts and excerpts with their notes, the case's data note, the explainer's no-JS steps
 // and note, the try-it paragraph, the sources list; the data file's timeline texts and boundary. Signalled: everything else.
-const CF = { prefix: "cf3", sections: ["E10", "E11"], excerpts: 5, question: "E11.2", papers: 1 };
+const CF = { prefix: "cf3", sections: ["E10", "E11"], excerpts: 4, question: "E11.2", papers: 1 };
 const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E10 (approved 2026-11-03) and E11 (approved 2026-11-05)
   "E10.1": "A two-stage stochastic linear program sized electrolyzers, hydrogen tanks and fuel cells once in each of ERCOT's eight weather zones, with hydrogen pipelines between neighbouring zones, then scheduled the system hour by hour over a full year in nine scenarios: three completion rates of planned renewable capacity by three electricity-demand levels.",
   "E10.2": "When gas-fired backup power became much more expensive, the model built fuel cells and turned stored green hydrogen back into electricity.",
@@ -151,6 +188,7 @@ const NOT_RESEARCH = [
   [/^Birge, J\. R\., and Louveaux, F\. \(2011\)\. Introduction to Stochastic Programming, 2nd ed\. Springer\. The toy's idea: chapter 4, The Value of Information and the Stochastic Solution\.$/, "citation (textbook), not the study"],
   [/^M8's toy: one windy zone, three build-outs with chances 25%, 50% and 25%, illustrative round numbers in 2025 dollars\.$/, "provenance label (the toy)"],
   [/^Data of case file CF3 /, "the data file's about line"],
+  [/^The method in general: choose equipment sizes now, then run them differently in each possible future, weighing each future's cost by its chance\.$/, "general idea of the method (review CF3 #1), no study claim"],
   [/^(Sizes chosen before the uncertainty resolves are here-and-now decisions; how the equipment runs in each scenario is recourse\.|One linear program holds both: one size, one copy of the operation for each scenario, each copy's cost weighted by its chance\.|M8 builds a small one in the browser, prices the plan for the average future against it, and compares robust plans that use no chances\.)$/, "general idea (Go deeper), no study claim"]
 ];
 const norm = s => String(s).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'")
@@ -235,12 +273,19 @@ signalled("data", strings(D).filter(x => ["url", "date", "as_of", "built", "kind
 const literals = JS.replace(/\/\/[^\n]*/g, " ").match(/"(?:[^"\\\n]|\\.)*"/g) || [];
 signalled("script", literals.map(l => l.slice(1, -1).replace(/\\"/g, '"')));
 ok(bad.length === 0, "research wording: every sentence about the study is approved or a recorded revision:\n  " + bad.join("\n  "));
-// the excerpts themselves: E10.2, E10.3, E11.8, E11.9, E11.10, in that order; the question; the notes under them
+// the excerpts themselves: E10.2, E10.3, E11.8, E11.9, in that order; the question; the notes under them
 const sentences = [...PAGE.matchAll(/<blockquote class="lx-excerpt"[^>]*>([\s\S]*?)<footer>/g)].flatMap(m => [...m[1].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => norm(x[1])));
-ok(sentences.length === CF.excerpts && sentences.join("|") === ["E10.2", "E10.3", "E11.8", "E11.9", "E11.10"].map(k => APPROVED[k]).join("|"), CF.excerpts + " excerpt sentences: E10.2, E10.3, E11.8, E11.9 and E11.10, word for word");
-ok(/<!-- E11\.10 \(approved as optional\): drop this paragraph to remove it --><p>Modest load flexibility/.test(PAGE), "E11.10 is marked optional, easy to drop");
+ok(sentences.length === CF.excerpts && sentences.join("|") === ["E10.2", "E10.3", "E11.8", "E11.9"].map(k => APPROVED[k]).join("|"), CF.excerpts + " excerpt sentences: E10.2, E10.3, E11.8 and E11.9, word for word");
+// E11.10 (optional) is left out: "±5%" alone does not say whether total demand stays the same, and neither the project
+// page, the abstract nor the README says it (review CF3 #5); the try-it sentence E11.17 keeps the code's option by name
+ok(!/Modest load flexibility/.test(PAGE + JSON.stringify(D)) && !/E11\.10/.test(PAGE.replace(/<!--[\s\S]*?-->/g, "")), "the optional E11.10 is not placed (review CF3 #5)");
 ok(norm((PAGE.match(/<p class="lx-case-q">([\s\S]*?)<\/p>/) || [])[1] || "") === APPROVED[CF.question], "the question is " + CF.question + ", word for word");
-ok(PAGE.includes('</blockquote>\n<p class="lx-hint">' + APPROVED["E10.4"] + '</p>\n<p class="lx-hint">' + norm(APPROVED["E11.11"]) + "</p>"), "the notes under the excerpt: E10.4, then E11.11");
+{ const e11 = APPROVED["E11.11"].split(/(?<=\.) (?=Leaves out:)/);
+  ok(e11.length === 2 && PAGE.includes('</blockquote>\n<p class="lx-hint">' + APPROVED["E10.4"] + '</p>\n<p class="lx-hint">' + e11[0] + '</p>\n<p class="lx-hint">' + e11[1] + "</p>"), "the notes under the excerpt: E10.4, then E11.11 in its two sentences, word for word"); }
+// long approved sentences shown in parts, each part at the sentence's own break, the words unchanged (review CF3 #4)
+{ const T2 = norm(text(PAGE));
+  ok(["E11.1", "E10.1", "E11.11", "E11.17"].every(k => T2.includes(norm(APPROVED[k]))), "E11.1, E10.1, E11.11 and E11.17 read word for word across their parts");
+  ok(/nine scenarios: <ul><li>three completion rates of planned renewable capacity by three electricity-demand levels\.<\/li><\/ul><\/li>/.test(PAGE) && (PAGE.match(/<p>Try it yourself:[\s\S]*?<\/p>\n<p>Halve[\s\S]*?<\/p>\n<p>Its numbers say nothing about ERCOT or Texas\.<\/p>/) || []).length === 1, "E10.1 breaks at its colon; E11.17 is three lines, one sentence each"); }
 ok(["E11.1", "E11.3", "E11.4", "E11.5", "E10.1", "E11.6"].every(k => norm(text(PAGE)).includes(APPROVED[k].split(/(?<=[.?!])\s/)[0].replace(/^(Inside|Decisions): /, ""))), "parts 1, 3, 4 and 5 carry E11.1, E11.3, E11.4, E11.5, E10.1 and E11.6");
 ok(norm(D.timeline.events[0].text) === APPROVED["E11.15"] && norm(D.timeline.events[1].text) === APPROVED["E11.16"], "the timeline is E11.15 and E11.16, word for word");
 if (RP) {
@@ -251,9 +296,25 @@ if (RP) {
   cites.forEach(c => ok(titles.indexOf(c[3].toLowerCase().replace(/[’']/g, "'")) >= 0 && /^https:\/\/doi\.org\//.test(c[2]), "sources: '" + c[3].slice(0, 50) + "' is the title in publications.bib, with its DOI"));
 }
 
-// ---------------- text budget: every text element of the page's own prose stays short (one idea, about 35 words)
-const prose = elements(OWN.replace(GENERATED, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
-prose.forEach(s => { const w = s.split(" ").length; ok(w <= 40 || approved(s), "text element of " + w + " words (40 at most unless one approved sentence): " + s.slice(0, 70)); });
+// ---------------- text budget (review CF3 #4): every text element of the page, generated blocks included, is 40 words at
+// most, approved or not (approval settles the wording, not the length); a long approved sentence is shown in parts at its
+// own sentence or clause breaks. The timeline's no-JS items carry a date, a label and a source beside the approved text:
+// the text itself is checked, from the data file.
+const prose = elements(OWN.replace(/<!-- cf3-timeline:start[\s\S]*?<!-- cf3-timeline:end -->/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/^---[\s\S]*?\n---\n/, " "));
+const longEls = prose.filter(s => s.split(" ").length > 40);
+ok(prose.length > 60 && longEls.length === 0, "every text element is 40 words at most (" + prose.length + " elements): " + longEls.map(s => s.slice(0, 60) + " (" + s.split(" ").length + ")").join(" | "));
+D.timeline.events.forEach(e => ok(norm(e.text).split(" ").length <= 40, "timeline " + e.date + ": its text is 40 words at most (" + norm(e.text).split(" ").length + ")"));
+[I.note, I.workedNote].concat(I.plans.map(p => p.label + ": " + p.def), I.assumptions).forEach(t => ok(norm(t).split(" ").length <= 40, "data, the toy's text is 40 words at most: " + norm(t).slice(0, 50)));
+
+// ---------------- glossary marks: technical terms at first use (review CF3 #1)
+{ const G = JSON.parse(fs.readFileSync(L("data/glossary.json"), "utf8")), SIDE = fs.readFileSync(path.join(SITE, "learn/_w1", ID + ".yml"), "utf8");
+  const marks = [...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]).concat([...PAGE.matchAll(/\{\.lx-term term="([a-z0-9-]+)"\}/g)].map(m => m[1]), [...JSON.stringify(D).matchAll(/\[\[([a-z0-9-]+)\|/g)].map(m => m[1]));
+  ok(marks.every(m => G[m] || new RegExp("id: " + m + "\\b").test(SIDE)), "every glossary mark is a known term: " + marks.filter(m => !G[m] && !new RegExp("id: " + m + "\\b").test(SIDE)).join(", "));
+  ok(/id: eia\b/.test(SIDE) && /id: lbnl\b/.test(SIDE), "the sidecar spells out EIA and LBNL");
+  const CASE = (PAGE.match(/<div class="lx-case">[\s\S]*?\n<\/div>\n(?=<div class="lx-interactive")/) || [""])[0];
+  const first = (re, term) => { const i = CASE.search(re), j = CASE.indexOf('data-term="' + term + '"'); return i >= 0 && j >= 0 && j < i + 60 && j > i - 60; };
+  ok(first(/reformer hydrogen/, "gas-reformer") && first(/expected cost/, "expected-value") && first(/LBNL/, "lbnl") && first(/EIA<\/span> data/, "eia") && first(/interconnection queue/, "interconnection-queue") && first(/capacity factors/, "capacity-factor") && first(/two-stage stochastic linear program/, "two-stage-stochastic-program"),
+    "reformer hydrogen, expected cost, LBNL, the interconnection queue, EIA, capacity factors and the two-stage program are marked where they first appear"); }
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

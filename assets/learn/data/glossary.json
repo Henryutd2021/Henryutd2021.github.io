@@ -797,6 +797,12 @@
   "lesson": "K2",
   "href": "k02-rates-efficiencies.html"
  },
+ "eia": {
+  "term": "EIA",
+  "short": "The Energy Information Administration, the statistics agency of the United States Department of Energy, which publishes data on energy production, use and prices.",
+  "lesson": "CF3",
+  "href": "cf3-hydrogen-under-uncertainty.html"
+ },
  "electric-current": {
   "term": "Electric current",
   "short": "The flow of electric charge through a wire, measured in amperes (A); for the same power, a higher voltage needs less current.",
@@ -1402,6 +1408,12 @@
   "short": "A way to draw many sets of uncertain inputs so that the whole range of every input is covered evenly.",
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
+ },
+ "lbnl": {
+  "term": "LBNL",
+  "short": "Lawrence Berkeley National Laboratory, a laboratory of the United States Department of Energy that publishes, among other datasets, a yearly one of the projects waiting in interconnection queues across the country.",
+  "lesson": "CF3",
+  "href": "cf3-hydrogen-under-uncertainty.html"
  },
  "length-scale": {
   "term": "Length-scale",
