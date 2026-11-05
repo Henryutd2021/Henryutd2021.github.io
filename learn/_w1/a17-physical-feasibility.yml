@@ -1,0 +1,25 @@
+# Sidecar for A17 (a17-physical-feasibility), builder learn-w4-a (A17 fork), 2026-11-05. Read by scripts/build_learn.py.
+id: a17-physical-feasibility
+lesson: A17
+glossary:
+  - id: apparent-power
+    term: Apparent power
+    def: "The combined size of real and reactive power, the square root of MW² plus Mvar², in megavolt-amperes (MVA); a wire's heating follows it, not MW alone."
+  - id: power-factor
+    term: Power factor
+    def: "Real power divided by apparent power, MW ÷ MVA: 1 when no reactive power flows, lower as more does."
+  - id: thermal-rating
+    term: Thermal rating
+    def: "The most current, or MVA at the line's voltage, that a line or transformer can carry before its wires get too hot and sag."
+  - id: hosting-capacity
+    term: Hosting capacity
+    def: "How much solar or other generation a feeder can take, at its existing settings and without upgrades, before a limit such as its voltage band is crossed."
+  - id: per-unit
+    term: Per unit
+    def: "A voltage written as a fraction of its nominal value: 1.00 per unit is 120 V on a 120 V service, 0.95 is 114 V."
+  - id: service-voltage-range
+    term: Service voltage range
+    def: "The voltage a utility keeps at a customer's meter in normal operation; in the U.S., ANSI C84.1 Range A, 114 to 126 V on a 120 V service (0.95 to 1.05 per unit)."
+requests:
+  - "Promote LimitGauge (i-gauge: a value on a track with its allowed band, role=meter, the state in words) and LimitMap (e-annotated: a one-line diagram with numbered limits, a button list and a detail panel, two layouts) from assets/learn/a17-physical-feasibility.js when a second page needs them; their styles are in the page's style block (a17g-, a17m-)."
+  - "Cross-links for the coordinator: F6's static text names 'Analyst lesson A17 (upcoming)' twice (Go deeper 'N−1 is more than a second path' and 'What this lesson leaves out'); link learn/a17-physical-feasibility.html once A17 is live. M1's explain layer or Go deeper could point to A17 for what its DC model drops."
