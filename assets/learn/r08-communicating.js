@@ -316,7 +316,7 @@
       D.findingsStep.fields.forEach(function (f) {
         var lab = H("label", null, form); H("span", { text: f.label }, lab);
         var ta = H("textarea", { rows: 2, maxlength: "400" }, lab); ta.value = v[f.id] || "";
-        lists[f.id] = H("ul", { class: "r8-checks", "aria-live": "polite" }, form);
+        lists[f.id] = H("ul", { class: "r8-checks", "aria-label": "Parts found" }, form);
         ta.addEventListener("input", function () { v[f.id] = ta.value; LX.store.set("r8-findings", v); paint(); });
       });
       exampleBox(act, "Compare with examples", D.findingsStep.fields.map(function (f) { return [f.label, fill(f.example, F)]; }));
@@ -333,7 +333,7 @@
       D.briefing.fields.forEach(function (f) {
         var lab = H("label", null, form); H("span", { text: f.label }, lab); H("span", { class: "lx-hint", text: f.hint }, lab);
         var ta = H("textarea", { rows: 2, maxlength: "500" }, lab); ta.value = v[f.id] || "";
-        lists[f.id] = H("ul", { class: "r8-checks", "aria-live": "polite" }, form);
+        lists[f.id] = H("ul", { class: "r8-checks", "aria-label": "Parts found" }, form);
         ta.addEventListener("input", function () { v[f.id] = ta.value; LX.store.set("r8-brief", v); paint(); });
       });
       var E = briefExample(D, F);
@@ -350,7 +350,7 @@
       var form = H("div", { class: "r8-form" }, act), lab = H("label", null, form);
       H("span", { text: "For the public: the town's newsletter" }, lab); H("span", { class: "lx-hint", text: "Plain words, a range, what it leaves out, at most " + D.public.limit + " words." }, lab);
       var ta = H("textarea", { rows: 6, maxlength: "1500" }, lab); ta.value = LX.store.get("r8-public", "") || "";
-      var ul = H("ul", { class: "r8-checks", "aria-live": "polite" }, form);
+      var ul = H("ul", { class: "r8-checks", "aria-label": "Parts found" }, form);
       exampleBox(act, "Compare with an example", [["For the public", fill(D.public.example, F)]]);
       var pre = H("pre", { class: "r8-pre" }, act);
       var row = H("div", { class: "r8-row" }, act), cp = H("button", { class: "lx-btn small", type: "button", text: "Copy briefing and paragraph" }, row);

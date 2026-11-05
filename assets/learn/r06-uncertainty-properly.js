@@ -435,7 +435,7 @@
       D.rewrite.fields.forEach(function (f) {
         var lab = H("label", null, form); H("span", { text: f.label }, lab); H("span", { class: "lx-hint", text: f.hint }, lab);
         var ta = H("textarea", { rows: 3, maxlength: "900" }, lab); ta.value = v[f.id] || "";
-        lists[f.id] = H("ul", { class: "r6-checks", "aria-live": "polite" }, form);
+        lists[f.id] = H("ul", { class: "r6-checks", "aria-label": "Parts found in this version" }, form);   // not live: the count line below speaks
         ta.addEventListener("input", function () { v[f.id] = ta.value; LX.store.set("r6-rewrite", v); paint(); });
       });
       var row = H("div", { class: "r6-row" }, act), cmp = H("button", { class: "lx-btn ghost small", type: "button", text: "Compare with examples", "aria-expanded": "false" }, row);
@@ -450,7 +450,8 @@
           rwChecks(D, f.id, v[f.id]).forEach(function (c) { H("li", { class: c.ok ? "ok" : "", html: LX.icon(c.ok ? "check" : "question") + "<span>" + LX.esc(c.label) + "</span>" }, ul); });
         });
         var n = D.rewrite.fields.filter(function (f) { return words(v[f.id]) >= 8; }).length;
-        cnt.textContent = n + " of 3 versions written (8 words or more).";
+        var cs = n + " of 3 versions written (8 words or more).";
+        if (cnt.textContent !== cs) cnt.textContent = cs;   // announced only when the count changes, not at every key
         if (n === 3) { api.done(); if (!said) { said = true; api.saw("Three versions written. The checks see only which parts are there; compare your wording with the examples."); } }
       }
       paint();

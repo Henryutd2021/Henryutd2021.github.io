@@ -919,11 +919,11 @@
   practice_minutes: 60
   title: "Uncertainty done properly: what to vary, how, and how to say it"
   subtitle: "Sort the uncertainties behind one number, choose a treatment for each, widen it into a band, and say it three ways"
-  short: "Uncertainty done properly"
+  short: "Uncertainty, properly"
   teaches: [parameter uncertainty, structural uncertainty, scenarios, deep uncertainty, choices versus uncertainties, uncertainty bands, reporting ranges]
   does: "Sort twelve uncertainties into parameter, structural, scenario and deep, with the study's own choices set apart; pick a treatment for each pile; turn a single forecast into bands; rewrite it for a paper, a board and the public; plan your own."
   outcome: "Classify the uncertainties of a study, choose a defensible treatment for each, and report the result as a range that a paper, a decision-maker and the public can each read correctly."
-  after: [M7, M8]
+  after: [M7]   # curriculum: [M7, M8]; M8 joins when it is live (W4 branch d)
   next: R8
 - {kind: lesson, tier: researcher, code: R7, title: "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual"}
 - kind: lesson
@@ -937,7 +937,7 @@
   practice_minutes: 90
   title: "How do you show results so people understand their limits?"
   subtitle: "Fix three misleading charts, write findings with their conditions, and brief a council and the public"
-  short: "Showing results with their limits"
+  short: "Results with limits"
   teaches: [findings with boundary conditions, truncated axes, cherry-picked time windows, averages and spread, briefings for decision-makers, public summaries]
   does: "Sort nine findings by whether they hold as written; diagnose and redesign three misleading charts drawn from the course's data; write a one-sentence finding for each; turn R6's result into a briefing for a city council and a paragraph for the public."
   outcome: "Show a result so that its readers see its limits: an honest key figure, findings with their conditions, a briefing a decision-maker can act on, and a public summary of at most 150 words."

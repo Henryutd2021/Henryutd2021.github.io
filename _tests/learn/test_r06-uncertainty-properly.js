@@ -214,7 +214,7 @@ R.FLOW.traces.forEach(t => ok(words(t.text) <= 35, "flowchart trace " + t.label 
 // path.yml says what the data hold
 { const P = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), row = P.slice(P.indexOf("id: r06-uncertainty-properly"), P.indexOf("code: R7"));
   ok(/Sort twelve uncertainties/.test(row) && D.cards.length === 12, "path.yml: 'Sort twelve uncertainties', as many as the data hold");
-  ok(/after: \[M7, M8\]/.test(row) && /practice_minutes: 60/.test(row) && /minutes: 30/.test(row), "path.yml: prerequisites and minutes as the curriculum row"); }
+  ok(/after: \[M7(, M8)?\]/.test(row) && /practice_minutes: 60/.test(row) && /minutes: 30/.test(row), "path.yml: prerequisites (M7; M8 once live) and minutes as the curriculum row"); }
 
 console.log(`${checks - fails} of ${checks} checks passed`);
 process.exit(fails ? 1 : 0);
