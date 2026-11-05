@@ -75,9 +75,8 @@
    "name": "Clean electricity production credit, tax code section 45Y",
    "text": "For wind and solar, Public Law 119-21 (2025) ends it for plants that begin construction after 4 July 2026 and enter service after 31 December 2027.",
    "source": {
-    "label": "EIA, Summary of Legislation and Regulations Included in the Annual Energy Outlook 2026",
-    "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/Legs_Regs_2026.pdf",
-    "asOf": "April 2026"
+    "label": "IRS, Notice 2025-42, Internal Revenue Bulletin 2025-36, sections 1 and 2.02",
+    "asOf": "2 September 2025; read 5 November 2026"
    }
   },
   {
@@ -87,9 +86,8 @@
    "name": "Clean electricity investment credit, tax code section 48E",
    "text": "The same law sets the same end dates for wind and solar plants.",
    "source": {
-    "label": "EIA, Summary of Legislation and Regulations Included in the Annual Energy Outlook 2026",
-    "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/Legs_Regs_2026.pdf",
-    "asOf": "April 2026"
+    "label": "IRS, Notice 2025-42, Internal Revenue Bulletin 2025-36, sections 1 and 2.02",
+    "asOf": "2 September 2025; read 5 November 2026"
    }
   },
   {

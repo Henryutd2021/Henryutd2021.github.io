@@ -153,7 +153,7 @@
     }
     function rules(host) {
       var ul = H("ul", { class: "a12-rules" }, host);
-      D.rules.forEach(function (r) { H("li", { html: "<b>" + LX.esc(r.kind) + " · " + LX.esc(r.where) + ".</b> " + LX.esc(r.name) + ": " + LX.esc(r.text) + ' <span class="lx-hint">(<a href="' + LX.esc(r.source.url) + '">' + LX.esc(r.source.label) + "</a>)</span>" }, ul); });
+      D.rules.forEach(function (r) { H("li", { html: "<b>" + LX.esc(r.kind) + " · " + LX.esc(r.where) + ".</b> " + LX.esc(r.name) + ": " + LX.esc(r.text) + ' <span class="lx-hint">(' + (r.source.url ? '<a href="' + LX.esc(r.source.url) + '">' + LX.esc(r.source.label) + "</a>" : LX.esc(r.source.label)) + ", " + LX.esc(r.source.asOf) + ")</span>" }, ul); });
     }
 
     // ---------- the explain layer, with the reader's numbers when solved, else the reference block

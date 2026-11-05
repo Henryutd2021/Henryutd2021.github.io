@@ -125,7 +125,7 @@ ${ROWS}
   const RULES = `<div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world: one rule of each kind</p>
 <ul class="a12-rules">
-${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.name)}.</p><p>${esc(r.text)}</p><p class="lx-hint">Source: <a href="${esc(r.source.url)}">${esc(r.source.label)}</a>, ${esc(r.source.asOf)}.</p></li>`).join("\n")}
+${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.name)}.</p><p>${esc(r.text)}</p><p class="lx-hint">Source: ${r.source.url ? `<a href="${esc(r.source.url)}">${esc(r.source.label)}</a>` : esc(r.source.label)}, ${esc(r.source.asOf)}.</p></li>`).join("\n")}
 </ul>
 <p class="lx-hint">The model's instruments are simpler than these rules: no phase-outs, eligibility tests or trading.</p>
 </div>`;
@@ -149,7 +149,8 @@ ${D.rules.map(r => `<li><p><b>${esc(r.kind)} · ${esc(r.where)}.</b> ${esc(r.nam
   ok(!/break[- ]?even|breaks even|threshold|zero[- ]credit|at which .* (pays|starts)/i.test(ALLTXT), "G-POL: no break-even or threshold search or wording");
   ok(!/data cent/i.test(ALLTXT) && !/\bAI\b/.test(ALLTXT), "no data centers, no AI wording");
   ok(D.instruments.map(x => x.id).join() === "tau,ptc,itc,ces" && /wind, solar and batteries/.test(D.instruments[2].unit) && /new wind and solar/.test(D.instruments[1].unit), "credits act on new wind, solar and batteries only");
-  const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat(D.rules.map(r => r.source.url));
+  const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat(D.rules.map(r => r.source.url).filter(Boolean));
+  ok(D.rules.filter(r => r.id === "ptc" || r.id === "itc").every(r => /Notice 2025-42, Internal Revenue Bulletin 2025-36/.test(r.source.label) && /2 September 2025/.test(r.source.asOf) && /begin construction after 4 July 2026 and enter service after 31 December 2027|same end dates/.test(r.text)), "the credits' end dates cite IRS Notice 2025-42 (IRB 2025-36, 2 September 2025)");
   const ALLOW = /^(https:\/\/(doi\.org|www\.eia\.gov|docs\.nlr\.gov|atb\.nlr\.gov|climate\.ec\.europa\.eu|eta-publications\.lbl\.gov|ergo-code\.github\.io)\/|[0-9a-z-]+\.html|\.\.\/assets\/|#)/;
   ok(hrefs.every(h => ALLOW.test(h.replace(/&amp;/g, "&"))), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
   const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:|instrumentStep\("\w+", "([^"]+)"\)/g)].map(m => (m[1] || m[2]).replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
