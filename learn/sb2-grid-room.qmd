@@ -75,6 +75,8 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 .page-learn .sb2-note li { margin: 0; }
 .sb2-note b { font-weight: 600; color: var(--lx-ink-2); }
 .sb2-res { display: grid; gap: 14px; min-width: 0; }
+.sb2-res > * { min-width: 0; }   /* a wide table (the commitment) scrolls inside its card */
+.sb2-res .lx-xcard { grid-template-columns: minmax(0, 1fr); }   /* a card is a grid: its one column must not grow with a wide table */
 .sb2-says { display: grid; gap: 6px; }
 .sb2-prog { margin: 0 !important; font-size: 13.5px; }
 .sb2-flow { margin: .4rem 0 0; padding-left: 0; list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }

@@ -834,7 +834,7 @@
   outcome: "Recommend how a large load connects and what to build, defended with conditional prices, an adequacy check with its uncertainty, a ledger of who pays and the study's limits, in a two-page note."
   teaches: [capstone plan and study note, representative days with extreme weeks kept, adequacy by Monte Carlo, who pays for a large load, conditional prices and uplift]
   lab: "M2's notebook: unit commitment and conditional prices in SciPy and HiGHS, about 45 minutes."
-  after: [SB2, M2, A5, A6, A9]
+  after: [SB2, M2]   # curriculum: [M2, A5, A6, A9]; A5, A6 and A9 join at the merge, once their rows are live
 - {kind: lesson, tier: modeler, code: SB4, form: sandbox, title: "Pathway Explorer"}
 - {kind: lesson, tier: modeler, code: C4, form: capstone, title: "Prairieland 2050: design and defend a nation's pathway"}
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2

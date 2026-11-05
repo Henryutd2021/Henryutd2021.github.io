@@ -11770,14 +11770,15 @@
       var complete = raw.days.length === days.length;
       if (complete) res.results = summarize(state, P, raw);
       if (status === "optimal" && !complete) { res.status = "error"; res.ok = false; }
-      var n = days.length, word = task === "year" ? "representative day" : "day";
+      var n = days.length, nRep = days.filter(function (d) { return d.rep; }).length;
+      var what = task === "year" ? n + " days (" + nRep + " representative days and the " + (n - nRep) + " days of the two hard weeks)" : n + " day" + (n === 1 ? "" : "s");
       if (RANK[res.status] === 2) {
         var lim = (limit >= 1 ? Math.round(limit) : limit) + " s";
         res.message = res.results
           ? "Stopped at the " + lim + " time limit on at least one day: the commitment shown is the best found so far" + (gap != null ? ", within " + (gap * 100).toFixed(2) + "% of the best bound" : "") + ". It is not proven optimal, and its prices are conditional on it. Try again gives the solver more time."
           : "Stopped at the " + lim + " time limit on " + (raw.failed ? raw.failed.day.label : "a day") + " before any commitment was found, so no result is shown. Try again gives the solver more time.";
       } else if (res.status === "optimal") {
-        res.message = "Done: " + n + " " + word + (n === 1 ? "" : "s") + ", each committed by a mixed-integer program (reported optimal) and priced by the dispatch linear program with that commitment fixed.";
+        res.message = "Done: " + what + ", each committed by a mixed-integer program (reported optimal) and priced by the dispatch linear program with that commitment fixed.";
       } else if (/infeasible/.test(res.status)) {
         res.message = "No dispatch meets every rule on " + (raw.failed ? raw.failed.day.label : "a day") + ".";
         res.hint = "This should not happen (unserved load is allowed at a penalty): please report the plan link.";
@@ -12116,13 +12117,14 @@
   }
 
   // ---- results: prices, flows, the commitment and the money, each with a text version
+  function tickStep(n) { return n > 168 ? 48 : n > 48 ? 24 : 6; }
   function priceChart(host, P, R, o) {
     o = o || {};
     var n = R.days.length * 24, all = [], cap = 0;
     R.days.forEach(function (d) { d.hours.forEach(function (h) { all.push(h); h.z.forEach(function (x) { cap = Math.max(cap, x.price); }); }); });
     var top = Math.max(60, Math.min(300, Math.ceil(cap * 1.15 / 20) * 20)), clipped = cap > top;
     var step = top <= 100 ? 20 : top <= 200 ? 40 : 60, ticks = [];
-    for (var k = 0; k <= n; k += (n > 48 ? 24 : 6)) ticks.push([k, k === n ? "" : (n > 48 ? dayLabel(R.days[k / 24].day) : hh(k % 24)), k === 0 ? "start" : null]);
+    for (var k = 0; k <= n; k += tickStep(n)) ticks.push([k, k === n ? "" : (n > 48 ? dayLabel(R.days[k / 24].day) : hh(k % 24)), k === 0 ? "start" : null]);
     var lines = P.zones.map(function (z, i) { return { values: all.map(function (h) { return Math.min(top, h.z[i].price); }), x0: 0, step: 1, color: ZCOL[z.id], width: 2.2, dash: i === 1 ? "5 3" : null, offset: i - 1 }; });
     var marks = [];
     if (clipped) all.forEach(function (h, i) { var m = Math.max.apply(null, h.z.map(function (x) { return x.price; })); if (m > top && (i === 0 || Math.max.apply(null, all[i - 1].z.map(function (x) { return x.price; })) <= top)) marks.push({ x: i + 0.5, y: top, label: priceTxt(m), kind: "dot", pos: "below", color: "var(--lx-bad)" }); });
@@ -12140,12 +12142,12 @@
     R.days.forEach(function (d) { d.hours.forEach(function (h) { all.push(h); }); });
     P.links.forEach(function (l) { mx = Math.max(mx, R.sys.caps[l.id]); all.forEach(function (h) { mx = Math.max(mx, Math.abs(h.f[l.id])); }); });
     var top = Math.ceil(mx * 1.1 / 200) * 200;
-    for (var k = 0; k <= n; k += (n > 48 ? 24 : 6)) ticks.push([k, k === n ? "" : (n > 48 ? dayLabel(R.days[k / 24].day) : hh(k % 24)), k === 0 ? "start" : null]);
+    for (var k = 0; k <= n; k += tickStep(n)) ticks.push([k, k === n ? "" : (n > 48 ? dayLabel(R.days[k / 24].day) : hh(k % 24)), k === 0 ? "start" : null]);
     var pl = LX.Plot(host, { caption: true, text: "Text version: every hour's flows", box: true });
     pl.render({ x: { min: 0, max: n, ticks: ticks, ticksN: ticks.filter(function (t, i) { return i % 2 === 0; }) }, y: { min: -top, max: top, step: top / 2, fmt: function (v) { return kilo(v); }, unit: "MW", zero: true }, height: 220, heightN: 190,
       caption: "Flow on each link, MW: above zero toward Metro (Ridge to Town, Town to Metro), below zero toward Wind Ridge",
       lines: P.links.map(function (l) { return { values: all.map(function (h) { return h.f[l.id]; }), x0: 0, step: 1, color: LCOL[l.id], width: 2.2, dash: l.id === "TM" ? "5 3" : null }; }),
-      refs: P.links.map(function (l) { return { y: R.sys.caps[l.id], label: l.name + " limit", labelN: "", color: LCOL[l.id], dash: "2 3" }; })
+      refs: P.links.map(function (l) { return { y: R.sys.caps[l.id], label: l.name + " limit", labelN: "", color: LCOL[l.id], labelColor: "var(--lx-ink-2)", dash: "2 3" }; })
         .concat(P.links.map(function (l) { return { y: -R.sys.caps[l.id], label: "", color: LCOL[l.id], dash: "2 3" }; })),
       legend: P.links.map(function (l) { return { label: l.name, color: LCOL[l.id], dash: l.id === "TM" ? "5 3" : null }; }),
       aria: "Hourly flows on the two links against their limits; hours at a limit: " + P.links.map(function (l) { return l.name + " " + kilo(R.tot.cong[l.id]); }).join(", ") + ".",

@@ -2195,6 +2195,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e2-zrow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: stretch; }
 .e2-zone { border: 1px solid var(--lx-line-2); border-top: 5px solid var(--c); border-radius: 12px; background: var(--lx-surface); padding: 8px 12px; min-width: 0; }
 .e2-zone.short { border-color: var(--lx-bad); background: var(--lx-bad-soft); }
+.e2-zone.short .e2-zd dt { color: var(--lx-ink-2); }   /* 4.5:1 on the bad-soft ground */
 .e2-zn { margin: 0; font-family: var(--lx-f-display); font-size: 14.5px; }
 .e2-zp { margin: 2px 0 4px; font-family: var(--lx-f-mono); font-size: 20px; font-weight: 600; color: var(--lx-ink); }
 .e2-zd { margin: 0; display: grid; gap: 1px; font-size: 13px; }
@@ -2217,7 +2218,7 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 }
 
 /* ---------- the commitment table: one row per unit group, a cell per hour */
-.e2-commit { max-width: 100%; }
+.e2-commit { max-width: 100%; overflow-x: auto; }
 .e2-ct { border-collapse: separate; border-spacing: 2px; font-size: 12.5px; font-family: var(--lx-f-mono); }
 .e2-ct caption { caption-side: top; text-align: left; font-family: var(--lx-f-body); font-size: 13.5px; color: var(--lx-ink-2); padding-bottom: 4px; }
 .e2-ct th { font-weight: 500; color: var(--lx-ink-3); padding: 0 2px; text-align: center; }

@@ -37,6 +37,9 @@
     var parts = { energy: oth.energy - b.energy, rent: oth.rent - b.rent, uplift: oth.uplift - b.uplift, fixed: oth.fixed };
     return { ll: ll, oth: oth, b: b, parts: parts, N: N, Ell: Ell, Eoth: Eoth, base: b.total, baseE: B.served, delta: oth.total - b.total, perMWh: Eoth > 0 ? (oth.total - b.total) / Eoth : 0, llPerMWh: Ell > 0 ? ll.total / Ell : null };
   }
+  // true when two plans differ only in the costs or the large load's share (fields that move only the ledger)
+  var MONEY = ["share", "cpk", "cbat", "cwind", "csolar", "cup"];
+  function moneyOnly(S, a, b) { return S.fields.every(function (f) { return MONEY.indexOf(f.id) >= 0 || a[f.id] === b[f.id]; }); }
   // the largest error of Town's average price in the representative-day check (four plans, 2025 and 2024), in %
   function priceErr(cfg) {
     var e = 0; (cfg.precomputed.c2check || []).forEach(function (r) { [r.f25, r.f24].forEach(function (f) { e = Math.max(e, Math.abs((r.est.priceT - f.priceT) / f.priceT * 100)); }); });
@@ -96,7 +99,7 @@
         return "<tr><td>" + names[k] + "</td><td class=\"n\">$" + c.def + "/kW-yr</td><td class=\"n\">$" + c.lo + " to $" + c.hi + "</td><td class=\"s\">" + e(c.basis) + (src ? ". " + src : "") + "</td></tr>";
       }).join("") + "</tbody></table></div>";
   }
-  var page = { SWEEP: SWEEP, priceErr: priceErr, partsWords: partsWords, exemplars: exemplars, costsHTML: costsHTML, newCost: newCost, ledger: ledger, costRange: costRange, adequacyWords: adequacyWords, sensitivity: sensitivity, kilo: kilo, mil: mil, price: price,
+  var page = { SWEEP: SWEEP, MONEY: MONEY, moneyOnly: moneyOnly, priceErr: priceErr, partsWords: partsWords, exemplars: exemplars, costsHTML: costsHTML, newCost: newCost, ledger: ledger, costRange: costRange, adequacyWords: adequacyWords, sensitivity: sensitivity, kilo: kilo, mil: mil, price: price,
     GROUPS: [{ title: "The large load (a data center at Prairie Town)", fields: ["conn", "flex", "bid"], color: "var(--lx-demand)", hint: "It asks for 300 MW, flat, every hour; connect part of it this year, and let a share of it stop when the price is high." },
       { title: "What to build", fields: ["pk", "bat", "wind", "solar", "up"], color: "var(--lx-cc)", hint: "New peakers, a 4-hour battery and solar at Prairie Town, wind at Wind Ridge, and more room on Town–Metro." },
       { title: "Operations and who pays", fields: ["res", "share"], color: "var(--lx-tier-4)", hint: "The reserve held every hour, and the share of the new costs the large load pays itself." },
@@ -137,7 +140,17 @@
       render: function (R, st, r) { last = { plan: U.copy(st), R: R, r: r }; draw(R, st); rn.refresh(); } });
     stopB.attach(run); run.button.parentNode.appendChild(prog);
     side.appendChild(ro); side.insertBefore(ss.status, pre); side.appendChild(ss.el);
-    function change(p) { plan = p; C.set(plan); ss.set(plan); run.changed(plan); AD.changed(plan); rn.refresh(); }
+    // the costs and the share move only the ledger (what is built does not change with its cost): such a change redraws
+    // the results of the last run on the spot, and the runs stay current
+    function change(p) {
+      var moneyOnly = !!last && page.moneyOnly(S, last.plan, p);
+      plan = p; C.set(plan); ss.set(plan);
+      if (moneyOnly) {
+        last.plan = U.copy(p); draw(last.R, last.plan);
+        if (adeq && page.moneyOnly(S, adeq.plan, p)) adeq.plan = U.copy(p); else AD.changed(plan);
+      } else { run.changed(plan); AD.changed(plan); }
+      rn.refresh();
+    }
     function base(st) { return cfg.precomputed.c2base[String(st.res)]; }
 
     // ---- the year's results: what it says, who pays, the hard weeks
@@ -155,7 +168,7 @@
         rows: [{ head: "The large load", sub: kilo(L.Ell / 1000) + " GWh served", cells: row(L.ll) }, { head: "Other customers", sub: kilo(L.Eoth / 1000) + " GWh served", cells: row(L.oth) },
           { head: "Other customers, today's grid", sub: "no large load, nothing built", cells: row(L.b), total: true }], cls: "c2-led" });
       var cr = page.costRange(st, R, base(st), cfg);
-      var notes = ["**Other customers pay " + page.mil(Math.abs(L.delta)) + " a year " + (L.delta >= 0 ? "more" : "less") + " than today** (" + (L.perMWh >= 0 ? "+" : "−") + "$" + Math.abs(L.perMWh).toFixed(2) + " per MWh); across the cost ranges you can set, from " + page.mil(cr.lo) + " to " + page.mil(cr.hi) + ".",
+      var notes = ["**Other customers pay " + page.mil(Math.abs(L.delta)) + " a year " + (L.delta >= 0 ? "more" : "less") + " than today** (" + (L.perMWh >= 0 ? "+" : "−") + "$" + Math.abs(L.perMWh).toFixed(2) + " per MWh)" + (Math.abs(cr.hi - cr.lo) >= 5e4 ? "; across the cost ranges you can set, from " + page.mil(cr.lo) + " to " + page.mil(cr.hi) : "; nothing is built, so the cost ranges do not move it") + ".",
         "**Where the change comes from:** " + page.partsWords(L) + ".",
         "**The large load pays " + page.mil(L.ll.total) + "** for " + kilo(L.Ell / 1000) + " GWh" + (L.llPerMWh != null ? " ($" + L.llPerMWh.toFixed(2) + " per MWh)" : "") + "; new capacity and the uprate cost " + page.mil(L.N) + " a year, " + st.share + "% of it paid by the large load directly.",
         "**Rules:** each MWh served pays its zone's price; congestion rent and uplift are shared by energy; unserved energy is not priced here (see adequacy). The prices come from the year's estimate on 26 days: for the four plans checked against every day, Town's average price came within " + page.priceErr(cfg) + "% (the check is below)."];

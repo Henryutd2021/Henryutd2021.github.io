@@ -126,6 +126,8 @@ const APPROVED_SNAPSHOT = {
   ok(C.priceErr(D) === Math.ceil(Math.max(...c2check.flatMap(r => [r.f25, r.f24].map(f => Math.abs(pct(r.est.priceT, f.priceT)))))) && T.indexOf("Town's average price within " + C.priceErr(D) + "%") >= 0, "the ledger's price caution and the check's caption give the same error (" + C.priceErr(D) + "%)");
   ok(near(refL.ll.fixed, refL.N * 0.5 + refL.N * 0.5 * refL.Ell / (refL.Ell + refL.Eoth), 1e-3), "the reference plan: the large load pays half the new costs directly, and its energy share of the rest");
   ok(refCR.lo <= refL.delta && refL.delta <= refCR.hi, "the cost range brackets the default (" + C.mil(refCR.lo) + " ≤ " + C.mil(refL.delta) + " ≤ " + C.mil(refCR.hi) + ")");
+  ok(C.moneyOnly(S, def, Object.assign({}, def, { cpk: 90, share: 40 })) && !C.moneyOnly(S, def, Object.assign({}, def, { pk: 1 })) && !C.moneyOnly(S, def, Object.assign({}, def, { res: 300 })) &&
+    C.MONEY.every(k => S.fields.some(f => f.id === k)), "only the costs and the share count as money-only changes (they redraw the ledger without a new run; the reserve and the builds need one)");
   // the adequacy numbers behind the brief and the presets
   ok(refA.today.lole < cfg.c2.adequacy.criterion, "today's grid is within 0.1 loss-of-load days a year (" + refA.today.lole.toFixed(3) + ")");
   ok(A0.lole > 1, "the default plan (all 300 MW, nothing built) is far above it (" + A0.lole.toFixed(2) + ")");
@@ -151,7 +153,7 @@ const APPROVED_SNAPSHOT = {
   ok(PAGE.indexOf("<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>") >= 0, "the citation is CF7's (E7.14), word for word");
 
   // ---------------- the brief, the time, the frame and the guards
-  const PY = fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: c2-plains-grid-hard-year"), PY.indexOf("after: [SB2, M2, A5, A6, A9]"));
+  const PY = fs.readFileSync(path.join(X.SITE, "learn/path.yml"), "utf8"), row = PY.slice(PY.indexOf("id: c2-plains-grid-hard-year"), PY.indexOf("after: [SB2, M2]"));
   ok(/minutes: 180/.test(row) && /About 180 minutes: 70 to build and test plans, 70 to write the note, 40 to check it\./.test(T), "the time: 180 minutes = 70 + 70 + 40, as path.yml and the curriculum give it");
   ok(/sandbox: SB2/.test(row) && /lab_minutes: 45/.test(row) && /lab_minutes: 45/.test(PY.slice(PY.indexOf("id: m02-unit-commitment"), PY.indexOf("id: m02-unit-commitment") + 800)), "built on SB2; the Modeler version's 45 minutes are M2's notebook lab");
   ["brief", "plan", "note", "selfcheck", "sources"].forEach(id => ok(new RegExp("::: \\{#" + id + " \\.lx-sec\\}").test(PAGE), "section #" + id));
