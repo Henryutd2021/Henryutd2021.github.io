@@ -91,6 +91,9 @@ body-classes: "page-learn page-lesson lx-form-studio"
 .r07-opts .lx-choice { max-width: 100%; text-align: left; }
 .r07-bcard { margin: 0 0 .6rem; }
 .r07-checks { list-style: none; margin: .5rem 0; padding: 0; display: grid; gap: 3px; font-size: 14px; }
+.r07-tab { width: 100%; margin: .3rem 0 0; font-size: 14px; }
+.r07-tab caption { caption-side: bottom; padding-top: 4px; font-size: 13px; color: var(--lx-ink-3); }
+.r07-tab td { font-family: var(--lx-f-mono); font-variant-numeric: tabular-nums; }
 .r07-led td.r07-pick { font-weight: 700; }
 .r07-note { display: block; width: 100%; max-width: 100%; min-height: 9rem; padding: 8px 10px; border: 1px solid var(--lx-line-2); border-radius: 10px; background: var(--lx-surface); color: var(--lx-ink); font: inherit; }
 </style>

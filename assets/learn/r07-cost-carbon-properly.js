@@ -184,8 +184,10 @@
     H("p", { class: "r07-head", text: fillT(D.study.headline, F0) }, paper);
     H("p", { class: "lx-hint", text: D.study.method }, paper);
     var S0 = run(D, all(false));
-    LX.Ledger(paper, { cls: "r07-led", caption: "Its tables: a year, 2025 dollars.", columns: ["", "Electric", "Diesel"],
-      rows: [{ head: "Cost", cells: [money(S0.e.total), money(S0.d.total)] }, { head: "CO₂", cells: [t(S0.co2.e), t(S0.co2.d)] }] });
+    var tb = H("table", { class: "lx-facts r07-tab" }, paper); H("caption", { text: "Its tables: a year, 2025 dollars." }, tb);
+    var hr0 = H("tr", null, H("thead", null, tb)); ["", "Electric", "Diesel"].forEach(function (x) { H("th", { scope: "col", text: x }, hr0); });
+    var tbd = H("tbody", null, tb);
+    [["Cost", money(S0.e.total), money(S0.d.total)], ["CO₂", t(S0.co2.e), t(S0.co2.d)]].forEach(function (r) { var tr = H("tr", null, tbd); H("th", { scope: "row", text: r[0] }, tr); H("td", { text: r[1] }, tr); H("td", { text: r[2] }, tr); });
     var audit = H("section", { class: "r07-audit", "aria-label": "Your audit" }, cols);
     H("p", { class: "lx-eyebrow", text: "Your audit" }, audit);
     var chips = H("div", { class: "lx-readouts", "aria-live": "polite" }, audit), fixList = H("ul", { class: "r07-fixes" }, audit), verdictEl = H("p", { class: "r07-verdict" }, audit);
@@ -195,7 +197,7 @@
       chips.innerHTML = "";
       chip(r.saving >= 0 ? "Electric saves, a year" : "Electric costs more, a year", money(r.saving), r.saving >= 0 ? "good" : "bad");
       chip("CO₂ cut, a year", t(r.co2.cut) + " (" + pct(r.co2.pct) + ")");
-      chip("Cost per tonne avoided", r.perTonne ? "about $" + grp(r.perTonne) : "none: it saves money");
+      chip("Cost per tonne avoided", r.perTonne ? "about $" + grp(r.perTonne) : "none: electric saves money");
       fixList.innerHTML = "";
       D.fixes.forEach(function (f) { var li = H("li", { class: S.fx[f.id] ? "on" : "" }, fixList); H("span", { class: "r07-tick", "aria-hidden": "true", html: LX.icon(S.fx[f.id] ? "check" : "cross") }, li); H("span", { text: f.label + ": " + (S.fx[f.id] ? f.short : "not fixed yet") }, li); });
       verdictEl.textContent = verdict(r) + (S.fx.boundary ? " CO₂ at " + r.co2.factor.toFixed(3) + " t per MWh of charging." : "");

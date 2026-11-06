@@ -356,7 +356,7 @@
             onChange: function (on) { S.wide = on; keep(); box.paint(); buildExplain(); api.saw(lineLand(D, on)); api.done(); } });
           draw();
           if (S.wide) { api.saw(lineLand(D, true)); api.done(); }
-          H("p", { class: "lx-hint", text: "Land between gas wells can still be farmed; land under panels mostly cannot. Count what a decision needs, and say which." }, act);
+          H("p", { class: "lx-hint", text: "Land held is not all land lost: what else it can do differs by site. Count what a decision needs, and say which." }, act);
         } },
       { text: "A data center is a load, so count per MWh it uses: at its fence it consumes cooling water. Drag the boundary to take in the power plants that make its electricity.",
         build: function (act, api) {
@@ -397,8 +397,9 @@
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Water year" }, act), { label: "Drought case (EIA, May 2022)", on: S.drought,
             onChange: function (on) { S.drought = on; keep(); draw(); api.saw(lineDrought(D, on)); if (on) api.done(); } });
           draw(); if (S.drought) { api.saw(lineDrought(D, true)); api.done(); }
-          H("p", { class: "lx-hint", html: "In 2021 California's hydropower made " + D.drought.ca2021Below + "% less than its 2011–2020 average (EIA). Warm, low rivers can also force thermal plants to cut output: " + ref("A9") + "." }, act);
-          H("p", { class: "lx-hint", text: "A data center's indirect water sits in these plants and reservoirs: LBNL counts reservoir evaporation with the power plants' water." }, act);
+          H("p", { class: "lx-hint", text: "In 2021 California's hydropower made " + D.drought.ca2021Below + "% less than its 2011–2020 average (EIA)." }, act);
+          H("p", { class: "lx-hint", html: "Plants cooled by rivers can be forced to cut output when the water runs warm or low: " + ref("A9") + " stress-tests it. EIA did not expect a significant effect in California in 2022." }, act);
+          H("p", { class: "lx-hint", text: "A data center's indirect water sits in these plants and reservoirs: LBNL names thermal plants' cooling and hydropower reservoirs' evaporation." }, act);
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });
@@ -412,7 +413,7 @@
       var row = function (k) { return function (m) { var r = full(D, k, m, o), wn = wholeNote(D, k, m, 0, 3); return totalText(m, r) + (wn ? " (" + wn + ")" : ""); }; };
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
         title: "Three footprints, cradle to grave", text: true,
-        caption: "Your choices: " + cool.label.toLowerCase() + " cooling; land " + (S.wide ? "with the land between" : "as footprints") + ". Medians; stages not counted are named.",
+        caption: "Your choices: " + cool.label.toLowerCase() + " cooling; land " + (S.wide ? "with the land between" : "as footprints") + ". Medians and 2023 averages; stages not counted are flagged.",
         columns: [{ key: "name", label: "Object", main: true }, { key: "c", label: "Carbon" }, { key: "w", label: "Water consumed" }, { key: "l", label: "Land" }],
         rows: [["solar", "var(--lx-solar)"], ["gas", "var(--lx-cc)"], ["dc", "var(--lx-dr)"]].map(function (x) {
           var f = row(x[0]); return { key: x[0], color: x[1], name: D.objects[x[0]].name, note: D.objects[x[0]].per, c: f("carbon"), w: f("water"), l: f("land") }; }) });
@@ -431,7 +432,7 @@
         edges: [["fu", "bound", "sets the frame for"], ["bound", "carbon", "decides"], ["bound", "water", "decides"], ["bound", "land", "decides"], ["carbon", "attr", "answers"], ["carbon", "cons", "answers"], ["drought", "water", "tightens"]],
         cols: 4, rows: 3, colsN: 3, rowsN: 4, gameLabel: "In this lesson" });
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these footprints hold",
-        holds: ["each number is a published median for its technology and stage, not one real plant;", "carbon in CO₂ equivalents over 100 years, as the studies NREL reviewed counted them;", "water is consumption in U.S. conditions; land is held area, not damage to it;", "the data center is the 2023 U.S. average of LBNL's report."],
+        holds: ["each number is a published median for its technology and stage, or a 2023 U.S. average, not one real plant;", "carbon in CO₂ equivalents: methane and other gases converted to CO₂'s warming effect;", "water is consumption in U.S. conditions; land is held area, not damage to it;", "the data center is the 2023 U.S. average of LBNL's report."],
         leaves: ["one site's sun, gas field, river or grid: ranges show how far a real plant can sit from the median;", "the land and water of mines and factories;", "a data center's servers, buildings and site;", "air pollution and health."],
         source: "Sources: NREL (2021), Meldrum et al. (2013), Macknick et al. (2012), Bolinger and Bolinger (2022), Lovering et al. (2022), LBNL (2024), EIA and USGS; dates in Sources below." });
       H("p", { class: "lx-hint", html: "Air pollution and health, from a tonne of fuel to the people who breathe it: " + ref("F11") + "." }, xhost);

@@ -59,7 +59,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <!-- a11-fallback:end -->
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians, not one plant.</b> Each footprint is the median of published studies for its technology and stage; ranges come from the same reviews. A real plant can sit anywhere in them.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Medians and averages, not one plant.</b> Each footprint is a published median for its technology and stage, or for data centers a 2023 U.S. average. Ranges come from the same reviews; a real plant can sit anywhere in them.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>Carbon:</b> NREL's 2021 medians by life-cycle phase, g <span class="lx-term" data-term="co2e">CO₂e</span> per kWh. <b>Water:</b> gallons consumed per MWh (1 gallon = 3.785 litres), from two NREL-led reviews. <b>Land:</b> square metres held per MWh made in a year.</span></p>
 <p class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><span><b>The data center</b> is a load: Berkeley Lab's 2023 averages for U.S. data centers, per MWh used. Lesson F8's campus draws 240 MW in every hour.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in eight steps.</p>
@@ -133,7 +133,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 - **Medians need not add.** Gas's phases add to 461 g per kWh, its total median is 486 g.
 - **Harmonized.** Re-running studies on common assumptions narrows the spread: crystalline-silicon panels 45 g per kWh (middle half 39 to 49), combined-cycle plants 450 g (420 to 480). Both from the papers' abstracts.
 - **What moves a solar number most.** Sunshine, panel life and efficiency, and the grid that powered the factory.
-- **What moves a gas number most.** The plant's efficiency, and methane leaked on the way from the well: CO₂e counts methane at its 100-year warming effect.
+- **What moves a gas number most.** The plant's efficiency, and methane leaked on the way from the well. The harmonized gas studies count methane at its 100-year warming effect (Heath et al., 2014).
 
 ```{=html}
 </div>
@@ -241,6 +241,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Meldrum, J., Nettles-Anderson, S., Heath, G. and Macknick, J. (2013). <a href="https://doi.org/10.1088/1748-9326/8/1/015031">Life cycle water use for electricity generation: a review and harmonization of literature estimates</a>. Environmental Research Letters 8, 015031; Tables 5, 6 and 11.</li>
 <li>Macknick, J., Newmark, R., Heath, G. and Hallett, K. C. (2012). <a href="https://doi.org/10.1088/1748-9326/7/4/045802">Operational water consumption and withdrawal factors for electricity generating technologies: a review of existing literature</a>. Environmental Research Letters 7, 045802; Tables 1 to 3.</li>
 <li>Bolinger, M. and Bolinger, G. (2022). <a href="https://emp.lbl.gov/publications/land-requirements-utility-scale-pv">Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density</a>. IEEE Journal of Photovoltaics; Berkeley Lab summary of 1 February 2022 (2019 medians: 394 MWh a year per acre for tracking plants, 447 for fixed tilt).</li>
+<li>Heath, G. A., O'Donoughue, P., Arent, D. J. and Bazilian, M. (2014). <a href="https://doi.org/10.1073/pnas.1309334111">Harmonization of initial estimates of shale gas life cycle greenhouse gas emissions for electric power generation</a>. PNAS 111(31), E3167–E3176.</li>
 <li>Lovering, J., Swain, M., Blomqvist, L. and Hernandez, R. R. (2022). <a href="https://doi.org/10.1371/journal.pone.0270155">Land-use intensity of electricity production and tomorrow's energy landscape</a>. PLOS ONE 17(7), e0270155.</li>
 <li>Shehabi, A. et al. (2024). <a href="https://doi.org/10.71468/P1WC7Q">2024 United States Data Center Energy Usage Report</a>. Lawrence Berkeley National Laboratory, LBNL-2001637, December 2024; pages 5, 55 and 57.</li>
 <li>USGS. <a href="https://www.usgs.gov/mission-areas/water-resources/science/thermoelectric-power-water-use">Thermoelectric Power Water Use</a>, 2020 estimates (Galanter et al., 2023); page read 6 November 2026.</li>
