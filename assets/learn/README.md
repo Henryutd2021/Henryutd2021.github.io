@@ -1098,6 +1098,34 @@ Promoted only where a second page already loaded another lesson's script for the
 
 Every diagram ships a "Text version" and keyboard focus. Use colours from tokens only (`--lx-*` in `base.css`); day and night both work. Animations stop under `prefers-reduced-motion`. Inline `code` takes the tokens by itself (`base.css`, at zero specificity, so a page's own code rule still wins): a page needs no night-theme override for it.
 
+## Prairie City data (wave W5)
+
+`data/prairie-city.json` (about 60 KB) is the one source of Prairie City's numbers, the fictional city of the S3 scale (curriculum v2 §6): about 250,000 people in three districts (dense core, suburbs, rural fringe), one substation per district (a teaching simplification, said in the file), farms, an industrial park (food processing; a fertilizer plant that uses hydrogen made in gas reformers), a data-center campus (a load only, guard G-DC), wind to the west and a gas grid. It is anchored to the U.S. Plains as Prairie Town and the Plains Grid are: Wichita's income and household size (Census), Wichita's 1991-2020 weather normals (NOAA), Kansas's 2025 prices (EIA), SPP's 2025 hourly shapes (`town_year.json`), eGRID's SPP North CO2 rate. Everything else is set for teaching, and the builder says which is which, constant by constant.
+
+**The rule: pages read these numbers, never retype them.** Load the file with the page's `data-src` and take every Prairie City number from it (W4 finding 8). Every interactive that shows Prairie City carries `about.line`, "Prairie City is fictional; its numbers are illustrative." A change goes through the builder, by request to the coordinator: `python3 scripts/build_learn_prairie_city.py --site <site>` (ResearchPortfolio folder; standard library; deterministic; `--check` compares without writing), then `node _tests/learn/test_prairie_city.js` (internal consistency, numbers recomputed from the inputs, scope). Lesson-specific coefficients (jobs, tax, measure costs, engine E3's settings) belong in the lesson's own data file, not here.
+
+| Field | What it holds (units) | Read by |
+|---|---|---|
+| `about` | `line` (the fictional line, word for word), what the file is, how it was built (`method`), the `simplifications` to state on a page | every page |
+| `dollarYear`, `units` | 2025 dollars; MWh, MW, C, m2 unless a key says otherwise; Btu factors (EIA) and MWh per MMBtu | every page |
+| `city` | people, households, persons per household, median household income (2025 $; Wichita's, BEA-deflated), `ami` (set for teaching), `anchors`, and `totals`: the sums of the districts | F9, A13, C3 |
+| `dwellingTypes`, `vintages` | heated m2 per home by type; delivered space heat per m2 a year by envelope vintage (teaching) | A15, M12, SB3 |
+| `districts`, `districtsNote` | per district: people, households, dwellings by type, heated floor area, homes by heating fuel (gas furnace, electric resistance, heat pump, propane), envelope shares, commercial m2, vehicles and EVs, rooftop solar; `heat` (annual heat need, `uaMWperC`, heat shares by fuel), `annualMWh` (base, heating, EV, farm), `gasMMBtu`, `propaneGal`, `peak2025MW`, `substationMW` (the peak-hour limit) | A15, SB3/E3, M12, C3 |
+| `homes`, `commercial` | per-home end uses (RECS 2020 West North Central), furnace and water-heater efficiencies (F3's DOE figures); commercial intensities (teaching) | A15, M12 |
+| `householdsByGroup`, `groups`, `groupsNote` | five income groups (LEAD's AMI bands, the top two merged; why in `groupsNote.bands`): households (also by district), mean income, use, spending on electricity, gas, propane and motor fuel, `burden` (home energy / income, LEAD's definition) and `transportBurden` apart; the 0-80% and other groups' burdens against LEAD's 6% and 2% | F11, A13, M12, SB3, C3, CK-A |
+| `transport`, `farms` | vehicles, 2025 EV share (AFDC over FHWA), miles and mpg (F3's car), buses, trucks, `evProfile` (24 shares of a day's charging); farm fuels | A15, A18, M12, SB3 |
+| `industry` | `processHeat` by temperature band (below 100 C, 100-400 C, above 400 C), food processing, the fertilizer plant (hydrogen t a year, gas per kg from EIA, ammonia, the electrolysis equivalent from DOE) | A15, A18, C3 |
+| `dataCenter` | contract and IT MW, utilization, PUE against temperature, annual energy, peak, cooling, why its size differs from F8's 300 MW campus (`sizeReason`) | A15, A18, SB3, C3 |
+| `supply` | rooftop solar, wind to the west (per-MW output is in `days[].wind`), distribution losses (teaching), the gas grid | F9, SB3, M12 |
+| `flows`, `balance`, `annual` | the 2025 Sankey in GWh (`LX.Sankey`'s spec: sources, carriers, sectors, useful energy, hydrogen, losses; every node balances; the useful-energy convention in `flows.note`); final energy by sector and carrier; city totals in native units | F9, A18, C3 |
+| `inventory2025` | t CO2 by sector, location-based, operating only (method stated) | A18, F11, C3 |
+| `prices`, `emissions` | Kansas 2025 electricity by sector, gas (residential, commercial; industrial set for teaching), Midwest gasoline and diesel, Kansas propane; eGRID2023 SPP North and South, Kansas in-state (SB0's, a different boundary), EIA fuel factors | A13, A18, F11, M12, SB3, CK-A |
+| `heatModel`, `cop` | degree-hours below 18.3 C (NOAA's base), NOAA's normals, the design and heat-wave temperatures; F3's cold-climate heat-pump COP curve | A15, M12, SB3/E3 |
+| `days`, `daysNote` | eight representative days of 2025 (weights sum to 365; one `design: true` cold winter design day; SPP's summer peak day): hourly temperature, SPP demand shape, wind and solar per MW (`LX.townProfile` with EIA's monthly factors), per district `base` and `heat` MW, the campus's MW | SB3/E3, M12, A15, C3 |
+| `sources` | title, publisher, date, URL (allow-listed) or "no link", and where in the source | every page's sources step |
+
+Heating electricity on a day is `heat × (share.resistance + share.heatPump / COP(T))`; EV charging is `evMWhPerDay × transport.evProfile[h]`; a district's load is `base + heating electricity + EV`. The industrial park and the campus have their own substations. The base load follows SPP's whole-grid shape, which carries the region's own heating and cooling: say so where a page shows a winter base load.
+
 ## Checks before handing a lesson to Henry
 
 Run:
