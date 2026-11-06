@@ -601,7 +601,7 @@
         const key = "p:" + pid;
         const label = p.n + (p.w ? ", " + p.w : "") + " — " + visits.map(function (e) { return e.w; }).filter(function (w, i, a) { return a.indexOf(w) === i; }).join("; ");
         const g = el("g", { class: "jr-mark jr-dot" + (p.h ? " is-home" : "") + (p.s ? " is-peak" : ""), tabindex: "-1", role: "button",
-          style: "--ch: var(--ch-" + first.ch + ")", "aria-label": label, transform: "translate(" + q[0].toFixed(1) + "," + q[1].toFixed(1) + ")" }, gDots);
+          style: "--ch: var(--ch-" + (p.lc || first.ch) + ")", "aria-label": label, transform: "translate(" + q[0].toFixed(1) + "," + q[1].toFixed(1) + ")" }, gDots);
         el("circle", { class: "jr-hit", r: 12 }, g);
         if (p.s) el("path", { class: "jr-vis", d: "M0,-6.2 L5.6,3.9 L-5.6,3.9 Z" }, g);   // a summit: a small triangle
         else el("circle", { class: "jr-vis", r: p.h ? 5.5 : (W < 576 ? 3.6 : 4.2) }, g);
