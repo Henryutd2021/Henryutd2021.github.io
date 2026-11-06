@@ -574,9 +574,28 @@
         marks.push({ kind: "route", key: key, e: e, ch: e.ch, g: g, at: pts[0], order: e.i, sub: 0 });
       });
 
-      Object.keys(data.placeVisits).forEach(function (pid) {
-        const p = D.places[pid], q = proj(p.ll);
-        if (!inView(q)) return;
+      // dots that would sit on top of each other (Abu Dhabi and Dubai at world scale) are nudged apart a little, so every
+      // place keeps a dot of its own that can be seen and clicked
+      const pos = {};
+      const ids = Object.keys(data.placeVisits).filter(function (pid) { const q = proj(D.places[pid].ll); if (inView(q)) { pos[pid] = q.slice(); return true; } return false; });
+      const gapPx = W < 576 ? 6 : 8;
+      for (let round = 0; round < 8; round++) {
+        let moved = false;
+        for (let a = 0; a < ids.length; a++) {
+          for (let b = a + 1; b < ids.length; b++) {
+            const A = pos[ids[a]], B = pos[ids[b]];
+            let dx = B[0] - A[0], dy = B[1] - A[1], dist = Math.hypot(dx, dy);
+            if (dist >= gapPx) continue;
+            if (dist < 0.01) { dx = 1; dy = 0; dist = 1; }
+            const push = (gapPx - dist) / 2;
+            A[0] -= dx / dist * push; A[1] -= dy / dist * push; B[0] += dx / dist * push; B[1] += dy / dist * push;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      ids.forEach(function (pid) {
+        const p = D.places[pid], q = pos[pid];
         const visits = data.placeVisits[pid];
         const first = visits[0];
         const key = "p:" + pid;
