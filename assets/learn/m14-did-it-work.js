@@ -236,7 +236,7 @@
   function ladderSpec(rows, truth, aria) {
     var vals = [truth, 0]; rows.forEach(function (r) { vals.push(r.lo != null ? r.lo : r.est, r.hi != null ? r.hi : r.est); });
     var lo = Math.floor(Math.min.apply(null, vals) * 5) / 5 - 0.2, hi = Math.min(0.2, Math.ceil(Math.max.apply(null, vals) * 5) / 5 + 0.2);
-    return { x: { min: 0, max: rows.length, ticks: rows.map(function (r, i) { return [i + 0.5, r.short]; }) },
+    return { x: { min: 0, max: rows.length, ticks: rows.map(function (r, i) { return [i + 0.5, r.short]; }), ticksN: rows.map(function (r, i) { return [i + 0.5, r.shortN || r.short]; }) },
       y: { min: lo, max: hi, step: 0.2, fmt: function (v) { return sgn(v, 1); }, unit: "kW", zero: true }, height: 220, heightN: 200,
       refs: [{ y: truth, label: "Truth " + kw(truth), labelN: k2(truth), color: COL.truth, dash: "6 4", labelColor: "color-mix(in srgb, var(--lx-good) 70%, var(--lx-ink))" }],
       bars: rows.filter(function (r) { return r.lo != null; }).map(function (r) { var i = rows.indexOf(r); return { x0: i + 0.42, x1: i + 0.58, y0: r.lo, y1: r.hi, color: COL.ci, op: 0.35 }; }),
@@ -352,7 +352,7 @@
           LX.Plot(host, { text: "Text version of the chart" }).render(ladderSpec([
             { label: "Naive after-period gap", short: "Naive", est: E.naive.est, lo: ci(E.naive)[0], hi: ci(E.naive)[1], ok: covers(E.naive, truth) },
             { label: "Regression with home size", short: "Controls", est: E.reg.size },
-            { label: "Before against after", short: "Before–after", est: E.ba.est, lo: ci(E.ba)[0], hi: ci(E.ba)[1], ok: covers(E.ba, truth) },
+            { label: "Before against after", short: "Before–after", shortN: "Pre–post", est: E.ba.est, lo: ci(E.ba)[0], hi: ci(E.ba)[1], ok: covers(E.ba, truth) },
             { label: "Difference-in-differences", short: "DiD", est: E.did.est, lo: ci(E.did)[0], hi: ci(E.did)[1], ok: covers(E.did, truth) }], truth, "Four estimates of the tariff's effect against the truth."));
           api.done(); api.saw("DiD: **" + kw(E.did.est) + "**, about 95% interval " + band(E.did, kw) + ", around the truth " + kw(truth) + ". It removes fixed differences between homes and changes common to both groups.");
         } });
@@ -491,7 +491,7 @@
         rep: { t: "Report effect, interval, for whom", tN: ["Effect, interval,", "for whom"], k: "end" }
       },
       cols: 3, at: { q: [1, 0], d: [1, 1], rnd: [1, 2], did: [0, 3], pt: [0, 4], stop: [0, 5], thr: [1, 5], rep: [1, 6] },
-      colsN: 2, atN: { q: [0, 0], d: [0, 1], rnd: [0, 2], did: [0, 3], pt: [0, 4], stop: [1, 4], thr: [0, 5], rep: [0, 6] },
+      colsN: 2, atN: { q: [0, 0], d: [0, 1], rnd: [0, 2], did: [0, 3], pt: [0, 4], stop: [0, 5], thr: [1, 5], rep: [1, 6] },
       edges: [["q", "d"], ["d", "rnd"], ["rnd", "thr", "yes"], ["rnd", "did", "no"], ["did", "pt"], ["pt", "thr", "yes"], ["pt", "stop", "no"], ["thr", "rep"]],
       traces: [
         { label: "This tariff, as simulated", path: ["q", "d", "rnd", "did", "pt", "thr", "rep"], text: "DiD " + kw(E.did.est) + " (" + band(E.did, kw) + ") for the " + E.nOn + " homes that opted in; truth " + kw(truth) + "." },
