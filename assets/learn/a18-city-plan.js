@@ -488,7 +488,7 @@
         cols: 2, colsN: 2,
         at: { inv: [0, 0], tgt: [0, 1], opt: [0, 2], irp: [1, 2], scr: [0, 3], ok: [0, 4], rev: [1, 4], plan: [0, 5], mon: [0, 6] },
         atN: { inv: [0, 0], tgt: [0, 1], opt: [0, 2], irp: [1, 2], scr: [0, 3], ok: [0, 4], rev: [1, 4], plan: [0, 5], mon: [0, 6] },
-        edges: [["inv", "tgt"], ["tgt", "opt"], ["opt", "irp", "supply"], ["opt", "scr"], ["irp", "scr", null, { v: true }], ["scr", "ok"], ["ok", "plan", "yes"], ["ok", "rev", "no"], ["plan", "mon"]],
+        edges: [["inv", "tgt"], ["tgt", "opt"], ["opt", "irp"], ["opt", "scr"], ["irp", "scr", null, { v: true }], ["scr", "ok"], ["ok", "plan", "yes"], ["ok", "rev", "no"], ["plan", "mon"]],
         traces: [
           { label: "Your plan", path: n ? ["inv", "tgt", "opt", "scr", "ok", pass ? "plan" : "rev"].concat(pass ? ["mon"] : []) : ["inv", "tgt", "opt"],
             text: !n ? "No measures yet: the plan stops at the options." : pass ? "It reaches the target, fits the budget and keeps every substation within its limit: the council could adopt it, and the inventory tracks it each year." :
@@ -506,7 +506,7 @@
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this curve holds",
         holds: ["Prairie City, a fictional city, with 2025 prices and costs in 2025 dollars;", "ten years, each measure at its stated potential, equipment replaced only when it wears out;",
           "CO₂ at each fuel's coefficient and the grid's average rate (location-based), with 5% lost on the wires;", "costs spread over each item's life at a 4% real rate, energy at retail prices."],
-        leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "rebound, comfort, health and soft costs;", "how lower sales move rates for everyone (" + refRich("A13") + ");", "the cost of a bigger substation."],
+        leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "rebound, comfort, health and soft costs;", "how lower sales move rates for everyone: " + refRich("A13") + ";", "the cost of a bigger substation."],
         source: "Costs: EIA (2022 dollars), LBNL (2012), ORNL (2008), in 2025 dollars with BEA's deflator. Prairie City is fictional; its numbers are illustrative." });
     }
 
