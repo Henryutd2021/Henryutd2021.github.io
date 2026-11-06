@@ -1127,7 +1127,7 @@
       [["Cheap", "Cost a year", "<a href='07-cost.html'>Lesson 7</a> (cost) and <a href='13-capstone.html'>lesson 13</a> (the plan)"],
        ["Clean", "CO₂", "<a href='12-trade-offs.html'>Lesson 12</a> (cost against CO₂); <a href='a10-emissions-questions.html'>A10</a> (emissions questions)"],
        ["Reliable", "Unserved energy, reserve margin", "<a href='03-balancing.html'>Lesson 3</a> and <a href='06-three-jobs.html'>lesson 6</a>; <a href='a05-adequacy.html'>A5</a> (adequacy)"],
-       ["Fair", "Who pays", "<a href='a04-retail-tariffs.html'>A4</a>, tariffs; A13, energy burden (upcoming)"],
+       ["Fair", "Who pays", "<a href='a04-retail-tariffs.html'>A4</a>, tariffs; <a href='a13-fairness-jobs.html'>A13</a>, energy burden"],
        ["Secure", "Fuel and supply risk", "<a href='f02-systems-and-map.html'>F2</a>, the whole-system map, and A21, resilience (upcoming)"]].forEach(function (r) {
         var li = H("li", null, ul); H("b", { text: r[0] }, li); H("span", { class: "a22-sub", text: r[1] }, li); H("span", { html: r[2] }, li);
       });

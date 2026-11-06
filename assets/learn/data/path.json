@@ -1180,9 +1180,13 @@
    "tier": "foundations",
    "code": "F11",
    "title": "What does energy do to the air, the climate and people's lives?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f11-air-climate-people.html",
+   "scales": [],
+   "id": "f11-air-climate-people",
+   "minutes": 20,
+   "form": "cards",
+   "short": "Air, climate and bills"
   },
   {
    "tier": "foundations",
@@ -1288,9 +1292,13 @@
    "tier": "analyst",
    "code": "A13",
    "title": "Who pays and who benefits? Energy burden, fairness and jobs",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a13-fairness-jobs.html",
+   "scales": [],
+   "id": "a13-fairness-jobs",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Who pays, who benefits"
   },
   {
    "tier": "analyst",

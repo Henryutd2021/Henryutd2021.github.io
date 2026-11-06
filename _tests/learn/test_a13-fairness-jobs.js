@@ -1,0 +1,220 @@
+// test_a13-fairness-jobs.js — Node tests for lesson A13: the accounting layer (assets/learn/a13-who-pays-and-benefits.js,
+// LX.A13, also for SB3 and C3), the lesson's words (assets/learn/a13-fairness-jobs.js), its data file and the page
+// (learn/a13-fairness-jobs.qmd):
+//   - the accounting from first principles: each design recovers exactly the cost; transfers between designs sum to zero;
+//     merged groups' burden = total spending / total income and matches prairie-city.json's own LEAD-band figures; the
+//     options SB3 and C3 need (use after the plan, other spending changes); jobs and tax recomputed by hand
+//   - every reveal and line is true over its whole input range (every cost, design, grouping, multiplier, MW, cost per kW,
+//     job-years per $M, jobs per 100 MW, displacement, tax rate and taxable share on the sliders); rounded values agree
+//   - Ridge County keeps the national-strategy dossier's anchors (20 million people, 3% of the workforce, coal 40% of the
+//     county's tax revenue) and carries its W6 note; Prairie City's numbers are read, never retyped
+//   - every number stated on the page matches the model; the no-JS block and the practice set equal what the model writes
+//     (--write rewrites them); every output is labelled a screening estimate with assumptions; both fictional lines appear
+//   - scope: no nuclear term, no "AI", links on the allow-list; text budget
+// Usage (from the site folder):  node _tests/learn/test_a13-fairness-jobs.js [--write]
+"use strict";
+const fs = require("fs");
+const path = require("path");
+const ID = "a13-fairness-jobs";
+const SITE = path.resolve(__dirname, "..", "..");
+const L = p => path.join(SITE, "assets/learn", p);
+const M = require(L(ID + ".js"));
+const A13 = require(L("a13-who-pays-and-benefits.js"));
+const RAW = fs.readFileSync(L("data/" + ID + ".json"), "utf8");
+const D = JSON.parse(RAW);
+const PC = require(L("data/prairie-city.json"));
+const JS = fs.readFileSync(L(ID + ".js"), "utf8");
+const ACC = fs.readFileSync(L("a13-who-pays-and-benefits.js"), "utf8");
+const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8");
+const QPATH = path.join(SITE, "learn", ID + ".qmd");
+let checks = 0, fails = 0;
+function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } }
+const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-9 : t);
+const range = r => { const out = []; for (let k = 0; ; k++) { const v = +(r.min + k * r.step).toFixed(6); if (v > r.max + 1e-9) break; out.push(v); } return out; };
+
+// ---------------- the generated blocks: write (--write) or check
+const BLOCKS = { "a13-fallback": () => M.staticFallback(D, PC), "a13-practice": () => M.practice(D, PC) };
+function between(q, name) {
+  const a = q.match(new RegExp("<!-- " + name + ":start[^>]*-->\\n")), b = q.indexOf("<!-- " + name + ":end -->");
+  if (!a || b < a.index) throw new Error(name + " markers missing in " + QPATH);
+  return { from: a.index + a[0].length, to: b };
+}
+if (process.argv.includes("--write")) {
+  let q = fs.readFileSync(QPATH, "utf8");
+  Object.keys(BLOCKS).forEach(k => { const r = between(q, k); q = q.slice(0, r.from) + BLOCKS[k]() + "\n" + q.slice(r.to); });
+  fs.writeFileSync(QPATH, q);
+  console.log("blocks written: " + Object.keys(BLOCKS).join(", "));
+}
+const PAGE = fs.readFileSync(QPATH, "utf8");
+Object.keys(BLOCKS).forEach(k => { const r = between(PAGE, k); ok(PAGE.slice(r.from, r.to) === BLOCKS[k]() + "\n", k + " block is up to date (run with --write)"); });
+const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
+const text = s => s.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+const T_PAGE = text(OWN);
+const has = (s, msg) => ok(T_PAGE.indexOf(s) >= 0, msg + ": '" + s + "'");
+
+// ---------------- the accounting layer (LX.A13), from first principles
+const R = A13.groupsFrom(PC);
+ok(R.length === 5 && R.every((r, i) => r.households === PC.groups[i].households && r.income === PC.groups[i].income && r.kWh === PC.groups[i].use.electricityKWh && r.spend === PC.groups[i].homeEnergy), "groups read from prairie-city.json");
+ok(R.reduce((s, r) => s + r.households, 0) === PC.city.households, "the groups' households add up to the city's");
+const E = R.reduce((s, r) => s + r.households * r.kWh, 0), Hh = R.reduce((s, r) => s + r.households, 0), Y = R.reduce((s, r) => s + r.households * r.income, 0);
+range(D.plan.costM).forEach(cM => {
+  const C = cM * 1e6;
+  ["kwh", "fixed", "income"].forEach(k => {
+    const a = A13.allocate(R, C, k);
+    if (!near(a.total, C, 1e-6)) ok(false, k + " recovers exactly the cost at $" + cM + "M");
+    a.rows.forEach((r, i) => {
+      const c = k === "kwh" ? C * R[i].kWh / E : k === "fixed" ? C / Hh : C * R[i].income / Y;
+      if (!near(r.charge, c, 1e-9) || !near(r.burdenAfter, (R[i].spend + c) / R[i].income, 1e-12) || !near(r.group, c * R[i].households, 1e-6)) ok(false, k + " charge and burden of " + r.key + " at $" + cM + "M");
+    });
+  });
+  ["fixed", "income"].forEach(k => { const t = A13.transfers(A13.allocate(R, C, "kwh"), A13.allocate(R, C, k)); if (!near(t.sum, 0, 1e-5)) ok(false, "transfers sum to zero: " + k + " at $" + cM + "M"); });
+});
+ok(true, "every design recovers the cost and every transfer sums to zero over the cost slider");
+{ const a = A13.allocate(R, 24e6, "income"); ok(a.rows.every(r => near(r.delta, a.rows[0].delta, 1e-12)), "by income, every group's burden rises by the same share"); }
+{ const a = A13.allocate(R, 24e6, "fixed"); ok(a.rows.every(r => near(r.charge, a.rows[0].charge)) && a.rows[0].delta > a.rows[4].delta, "a fixed charge: same dollars, the largest burden for the lowest income"); }
+// regrouping: total spending over total income; matches prairie-city.json's LEAD-band figures
+{ const a = A13.allocate(R, 0, "kwh"), g = A13.regroup(a, D.bands.two.groups, D.bands.two.labels);
+  ok(near(g[0].burden, PC.groupsNote.lowIncomeBurden, 5e-5) && near(g[1].burden, PC.groupsNote.otherBurden, 5e-5), "two bands: 6.1% and 2.0%, as prairie-city.json's groupsNote says");
+  ok(g[0].households + g[1].households === Hh && g[0].keys.join() === "g1,g2,g3", "the bands cover every household once"); }
+{ const a = A13.allocate(R, 24e6, "kwh"), g = A13.regroup(a, D.bands.five.groups); ok(g.every((x, i) => near(x.burden, a.rows[i].burden, 1e-12) && near(x.burdenAfter, a.rows[i].burdenAfter, 1e-12)), "five single-group bands reproduce the groups"); }
+// the options SB3 and C3 need: use after the plan, and other changes in spending
+{ const kAfter = { g1: 10000, g2: 11000, g3: 12000, g4: 12500, g5: 14000 }, sd = { g1: -100, g2: -120, g3: -140, g4: -150, g5: -200 };
+  const a = A13.allocate(R, 30e6, "kwh", { kWh: kAfter, spendDelta: sd }), E2 = R.reduce((s, r) => s + r.households * kAfter[r.key], 0);
+  ok(near(a.total, 30e6, 1e-6) && a.rows.every(r => near(r.charge, 30e6 * kAfter[r.key] / E2) && near(r.spendAfter, r.spend + sd[r.key] + r.charge) && r.kWhAfter === kAfter[r.key]), "options: per-kWh charge on use after the plan; other spending changes in the burden after");
+  ok(near(A13.allocate(R, 30e6, "fixed", { spendDelta: sd }).rows[0].burdenAfter, (R[0].spend - 100 + 30e6 / Hh) / R[0].income), "options: spendDelta with a fixed charge"); }
+{ let threw = false; try { A13.allocate(R, 1, "nonsense"); } catch (e) { threw = true; } ok(threw, "an unknown design is refused"); }
+{ const a = A13.allocate(R, 24e6, "kwh"), ab = A13.above(a, 0.06, true), b0 = A13.above(a, 0.06, false); ok(ab.groups === 2 && b0.groups === 2 && ab.households === R[0].households + R[1].households, "above 6%: the two lowest groups, before and after"); }
+ok(A13.VERSION && /Screening estimate/.test(A13.SCREENING) && A13.ASSUME.split.length && A13.ASSUME.jobs.length && A13.ASSUME.tax.length, "the layer carries its label and assumptions");
+ok(/allocate\(rows, cost, design, opts\)/.test(ACC) && /SB3/.test(ACC) && /C3/.test(ACC) && !/document\.|window\.document|LX\.H\(/.test(ACC), "the layer documents its API for SB3 and C3 and touches no DOM");
+
+// ---------------- jobs and tax, by hand
+const S0 = M.defaults(D), J0 = A13.jobs(M.jobInputs(D, PC, S0)), RC = D.ridgeCounty;
+ok(J0.lostDirect === RC.plant.staff + RC.plant.mineJobs && near(J0.lostTotal, 1150 * 1.6) && J0.capexM === 2000 * 1500 / 1000 && J0.localM === 900 && near(J0.buildJobYears, 900 * 5 * 1.6) && near(J0.buildJobsAvg, 7200 / 2), "jobs at the defaults: 1,150 on site, 1,840 total; $3,000M, $900M local; 7,200 job-years; 3,600 a year for 2 years");
+ok(near(J0.newPermGross, 2000 / 100 * 6 * 1.6) && near(J0.newPermNet, 192 * 0.8) && near(J0.netPerm, 153.6 - 1840) && near(J0.horizon.lostPerm, 1840 * 20) && near(J0.horizon.net, 7200 + 153.6 * 20 - 36800), "jobs: 192 gross, 153.6 net, −1,686.4; 36,800 job-years lost over 20 years");
+const T0 = A13.taxBase(M.taxInputs(D, S0));
+ok(T0.plantTaxM === 60 && near(T0.newTaxM, 30) && near(T0.changeM, -30) && T0.revenueBeforeM === 900 && near(T0.changeShare, -30 / 900), "tax at the defaults: $60M lost, $30M gained, −$30M of $900M");
+// Ridge County's anchors (national-strategy dossier §8.0) and its W6 note
+ok(RC.prairielandPeople === 20000000 && RC.workforceShare === 0.03 && near(T0.coalShareBefore, RC.coalTaxShare) && RC.coalTaxShare === 0.40, "Ridge County: 20 million people in Prairieland, 3% of its workforce, coal 40% of the county's tax revenue at the default rate");
+ok(/W6/.test(RC.note) && /SB4/.test(RC.note) && /C4/.test(RC.note) && /fictional/.test(RC.fiction), "Ridge County carries its W6 note and its fictional line");
+
+// ---------------- every line, over its whole input range
+const SH = M.shortOf(PC);
+ok(SH.join() === "0–30%,30–50%,50–80%,80–100%,100%+", "group short labels from prairie-city.json's AMI bands");
+range(D.plan.costM).forEach(cM => {
+  ["kwh", "fixed", "income"].forEach(k => {
+    const a = M.split(D, PC, cM, k), line = M.designLine(D, PC, cM, k);
+    if (line.indexOf("The poorest group pays " + M.money(a.rows[0].charge) + " a year (" + M.pts(a.rows[0].delta) + ")") < 0 || line.indexOf("the top group " + M.money(a.rows[4].charge) + " (" + M.pts(a.rows[4].delta) + ")") < 0) ok(false, "design line " + k + " at $" + cM + "M");
+    if (cM > 0 && k === "kwh" && !(a.rows[0].delta === Math.max(...a.rows.map(r => r.delta)))) ok(false, "per kWh the 0–30% group's burden rises most at $" + cM + "M");
+    [["five"], ["two"]].forEach(([b]) => { const gl = M.groupLine(D, PC, cM, k, b), g = A13.regroup(a, D.bands[b].groups, D.bands[b].labels || null);
+      if (gl.indexOf("**" + M.pct(b === "two" ? g[0].burdenAfter : a.rows[0].burdenAfter) + "**") < 0) ok(false, "group line " + b + " " + k + " at $" + cM + "M"); });
+  });
+  const ds = M.designSaw(D, PC, cM);
+  if (cM === 0 ? !/no burden moves/.test(ds) : ds.indexOf("**" + M.fmtN(100 * M.split(D, PC, cM, "kwh").rows[0].delta, 1) + "** points per kWh") < 0) ok(false, "design reveal at $" + cM + "M");
+  ["fixed", "income"].forEach(k => { const tl = M.transferLine(D, PC, cM, k), x = M.moved(D, PC, cM, k);
+    if (cM === 0 ? !/nothing moves/.test(tl) : (tl.indexOf("**" + M.moneyM(x.up / 1e6) + "**") < 0 || tl.indexOf("stays " + M.moneyM(cM, 0)) < 0 || tl.indexOf(k === "fixed" ? "onto three groups" : "onto one group") < 0)) ok(false, "transfer line " + k + " at $" + cM + "M"); });
+});
+ok(M.RISE.answer === "g1" && PC.groups.every(g => M.RISE.feedback[g.key]), "step 1: the 0–30% group; feedback for every group");
+ok(M.riseSaw(D, PC, 24) === "At 2.07¢ a kWh the poorest group pays $192 a year, **+1.5 points** of burden; the top group pays $269, +0.2 points.", "step 1 reveal at the default");
+ok(M.designSaw(D, PC, 24) === "At $24M a year the poorest group's burden rises **1.5** points per kWh, 1.8 with a fixed charge and 0.3 by income.", "step 2 reveal at the default");
+ok(M.transferLine(D, PC, 24, "fixed") === "Against per kWh, fixed charge moves **$1.34M** a year onto three groups; the total stays $24M, so the money moved adds up to zero.", "step 3 line, fixed");
+ok(M.groupSaw(D, PC) === "Before any plan, the merged group averages 6.1%, near LEAD's national average of about 6%, while the poorest group averages 14.9%. Say how you grouped households.", "step 4 reveal");
+const J = D.jobs, T = D.tax;
+range(J.multiplier).forEach(m => { const S = Object.assign({}, S0, { m: m }), j = A13.jobs(M.jobInputs(D, PC, S));
+  if (M.lostLine(D, PC, S).indexOf("about **" + M.fmtN(Math.round(j.lostTotal)) + "**") < 0 || M.lostSaw(D, PC, S).indexOf(M.pct(j.lostTotal / 300000, 2) + " of Ridge County's 300,000 workers") < 0) ok(false, "lost lines at multiplier " + m); });
+range(J.newMW).forEach(mw => range(J.capexPerKW).forEach(cx => [1, 5, 10].forEach(jy => {
+  const S = Object.assign({}, S0, { mw: mw, capex: cx, jy: jy }), j = A13.jobs(M.jobInputs(D, PC, S)), bl = M.buildLine(D, PC, S);
+  if (mw === 0 ? !/No new farms/.test(bl) : (bl.indexOf(M.moneyM(j.localM, 0) + " spent") < 0 || bl.indexOf("**" + M.fmtN(Math.round(j.buildJobYears)) + " job-years**") < 0 || bl.indexOf("about " + M.fmtN(Math.round(j.buildJobsAvg)) + " jobs for 2 years") < 0)) ok(false, "build line at " + mw + " MW, $" + cx + ", " + jy);
+  if (M.buildSaw(D, PC, S).indexOf("about " + M.fmtN(Math.round(j.horizon.lostPerm)) + " job-years over 20 years") < 0) ok(false, "build reveal at " + mw + " MW");
+})));
+range(J.omPer100MW).forEach(om => range(J.displacement).forEach(dp => [0, 2000, 4000].forEach(mw => {
+  const S = Object.assign({}, S0, { om: om, disp: dp, mw: mw }), j = A13.jobs(M.jobInputs(D, PC, S)), pl = M.permLine(D, PC, S), ps = M.permSaw(D, PC, S);
+  const sgn = v => (v < 0 ? "−" : "+") + M.fmtN(Math.abs(Math.round(v)));
+  if (pl.indexOf("**" + M.fmtN(Math.round(j.newPermGross)) + "**") < 0 || pl.indexOf(M.fmtN(Math.round(j.newPermNet)) + " net of " + dp + "%") < 0 || pl.indexOf("a net change of " + sgn(j.netPerm)) < 0) ok(false, "permanent line at " + om + ", " + dp + "%, " + mw + " MW");
+  if (ps.indexOf(sgn(j.horizon.net) + " job-years net") < 0) ok(false, "permanent reveal at " + om + ", " + dp + "%");
+  if (j.newPermNet > j.newPermGross + 1e-9) ok(false, "net never exceeds gross");
+})));
+range(T.rate).forEach(r => range(T.taxableShare).forEach(sh => [0, 2000, 4000].forEach(mw => {
+  const S = Object.assign({}, S0, { rate: r, taxable: sh, mw: mw }), t = A13.taxBase(M.taxInputs(D, S)), tl = M.taxLine(D, S), ts = M.taxSaw(D, S);
+  if (!near(t.plantTaxM, 3000 * r / 100) || !near(t.newTaxM, mw * 1.5 * sh / 100 * r / 100)) ok(false, "tax by hand at " + r + "%, " + sh + "%");
+  const sc = (t.changeShare < 0 ? "−" : "+") + M.fmtN(Math.abs(100 * t.changeShare), 1) + "%";
+  if (tl.indexOf("**" + M.signed0(t.changeM, 1) + "**") < 0 || tl.indexOf(sc + " of its " + M.moneyM(t.revenueBeforeM, 0)) < 0 || tl.indexOf("paid " + M.moneyM(t.plantTaxM, 1)) < 0) ok(false, "tax line at " + r + "%, " + sh + "%, " + mw + " MW");
+  if (ts.indexOf("from " + M.pct(t.coalShareBefore, 0) + " to " + M.pct(t.coalShareAfter, 0)) < 0 || !/transfer/.test(ts)) ok(false, "tax reveal at " + r + "%");
+})));
+// a zero change prints as $0.0M, never a bare sign
+{ const S = Object.assign({}, S0, { rate: 2.0, taxable: 100, mw: 2000 }); const t = A13.taxBase(M.taxInputs(D, S)); ok(near(t.changeM, 0) && M.taxLine(D, S).indexOf("**$0.0M**") >= 0 && !/\*\*\*\*/.test(M.taxLine(D, S)), "a zero tax change prints as $0.0M"); }
+
+// ---------------- numbers on the page (ideas, myths, Go deeper)
+has("Per kWh the poorest group's burden rises 1.5 points, with a fixed charge 1.8 and by income 0.3, for the same $24M a year", "ideas: designs");
+has("Moving from per kWh to a fixed charge shifts $1.34M a year between groups", "ideas: transfer");
+has("Below 80% of area median income the merged burden is 6.1%; the poorest group alone carries 14.9%", "ideas: grouping");
+has("7,200 job-years of building last two years; 1,840 permanent jobs lost add up to 36,800 job-years over 20 years", "ideas: job-years");
+has("192 new permanent jobs gross, 154 net of displacement: a net change of −1,686 against the jobs lost", "ideas: gross and net");
+has("The county's revenue falls $30.0M a year", "ideas: tax");
+has("Every design here recovers the same $24M a year", "myth: cheaper");
+has("$237 a year is 1.8 points of burden for the poorest group and 0.2 for the top group", "myth: fixed");
+has("A two-year construction boom of 3,600 jobs replaces 1,840 permanent jobs", "myth: boom (question)");
+has("building gives 7,200 job-years; the lost jobs add up to 36,800 job-years over 20 years", "myth: boom (answer)");
+has("the county receives $30.0M a year less", "myth: tax");
+{ const f = M.split(D, PC, 24, "fixed"); ok(M.money(f.rate.perHousehold) === "$237" && M.fmtN(100 * f.rows[0].delta, 1) === "1.8" && M.fmtN(100 * f.rows[4].delta, 1) === "0.2", "myth: fixed-charge numbers"); }
+ok(Math.round(J0.newPermNet) === 154 && Math.round(J0.netPerm) === -1686 && Math.round(J0.buildJobsAvg) === 3600, "page numbers 154, −1,686, 3,600");
+ok(D.plan.costM.start === 24, "the default cost the page names is the data's");
+// numbers to remember come from the data file's sources
+ok(/LEAD/.test(D.sources.lead.title) && OWN.indexOf(D.sources.lead.url) >= 0 && OWN.indexOf(D.sources.aceee.url) >= 0 && OWN.indexOf(D.sources.jediResults.url) >= 0 && OWN.indexOf(D.sources.jediLimits.url) >= 0, "numbers to remember: LEAD, ACEEE, JEDI pages");
+["rims", "qcew", "useer"].forEach(k => ok(OWN.indexOf(D.sources[k].url) >= 0, "source linked: " + k));
+ok(/2,080-hour|2,080 hours/.test(D.sources.jediResults.where) && /only the gross impacts/.test(D.sources.jediLimits.where), "JEDI claims as read from the pages");
+ok(/CPUC Decision 24-05-028/.test(PAGE) && !/cpuc\.ca\.gov/.test(PAGE + RAW + JS) && D.sources.cpuc.url === null, "CPUC cited by name and date, no link");
+
+// ---------------- labels: screening estimates, assumptions, fiction
+ok((JS.match(/assume\(act/g) || []).length >= 4 && /Assumptions behind this screening estimate/.test(JS), "assumptions beside the split, the jobs and the tax");
+ok(/Screening estimate/.test(JS) && (JS.match(/[Ss]creening estimate/g) || []).length >= 5, "outputs labelled screening estimates");
+ok(M.FICTION_PC === PC.about.line && PAGE.indexOf("<b>" + PC.about.line + "</b>") >= 0 && M.staticFallback(D, PC).indexOf(PC.about.line) >= 0 && /FICTION_PC/.test(JS), "Prairie City's fictional line, word for word");
+ok(PAGE.indexOf("<b>" + RC.fiction + "</b>") >= 0 && (JS.match(/ridgeCounty\.fiction/g) || []).length >= 2, "Ridge County's fictional line on the page and with its steps");
+ok(/An energy model does not produce these outcomes by itself/.test(PAGE) && /An energy model gives costs and MW/.test(JS), "the page says the accounting layer, not the energy model, produces these outcomes");
+ok(/not predictions/.test(PAGE) && /\(illustrative\)/.test(JS), "coefficients are learner inputs, not predictions");
+ok(!/(?<![\d,$])(13,?000|145,?000|16,?225|101,?410|9,?295|13,?012|1,?940|2,?702)(?![\d,])/.test(JS + RAW + ACC), "no Prairie City number is retyped in the scripts or the data file");
+
+// ---------------- scope and links
+const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + ACC + "\n" + SIDE;
+ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term anywhere in A13");
+ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
+ok(!/projects\/|research\.html/.test(PAGE + JS), "no project page and no Research page");
+const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
+const okHref = h => /^https:\/\/(www\.energy\.gov|www\.nlr\.gov|apps\.bea\.gov|www\.bls\.gov)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
+ok(hrefs.every(okHref), "links: DOE, NLR, BEA, BLS and learn pages only (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
+ok(/a04-retail-tariffs\.html/.test(OWN) && /f11-air-climate-people\.html/.test(OWN), "links back to A4 and F11");
+ok(/not a ranking|Illustrative roles/.test(JS), "roles, not blame");
+
+// ---------------- text budget
+const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
+const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
+const nSent = t => plain(t).replace(/U\.S\./g, "US").replace(/(\d)\.(\d)/g, "$1,$2").split(/(?<=[.?!])\s+(?=[A-Z“$0-9−])/).filter(x => /[A-Za-z]/.test(x)).length;
+const stepTexts = [...JS.matchAll(/\{ text: "((?:[^"\\]|\\.)*)",\n\s*build/g)].map(m => m[1].replace(/\\"/g, '"'));
+ok(stepTexts.length === 9, "nine step cards (" + stepTexts.length + ")");
+stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 37, "step " + (i + 1) + ": " + n + " words (about 35)"); ok(nSent(t) <= 3, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+const lines = [M.riseSaw(D, PC, 24), M.designSaw(D, PC, 24), M.TRANSFER_SAW, M.groupSaw(D, PC), M.lostSaw(D, PC, S0), M.buildSaw(D, PC, S0), M.permSaw(D, PC, S0), M.taxSaw(D, S0)]
+  .concat(["kwh", "fixed", "income"].map(k => M.designLine(D, PC, 60, k)), ["fixed", "income"].map(k => M.transferLine(D, PC, 60, k)), ["five", "two"].map(b => M.groupLine(D, PC, 60, "fixed", b)),
+          [M.lostLine(D, PC, S0), M.buildLine(D, PC, S0), M.permLine(D, PC, S0), M.taxLine(D, S0)], A13.ASSUME.split, A13.ASSUME.jobs, A13.ASSUME.tax);
+lines.forEach(t => { ok(nWords(t) <= 36, "a line of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a line of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+Object.keys(M.RISE.feedback).forEach(v => { const t = (v === M.RISE.answer ? "You called it. " : "Not quite. ") + M.RISE.feedback[v]; ok(nWords(t) <= 35 && nSent(t) <= 2, "RISE feedback for " + v); });
+const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<!-- a13-(fallback|practice):start[\s\S]*?<!-- a13-\1:end -->/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
+  .replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
+PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
+  const n = nWords(x); ok(n <= 45, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+
+// ---------------- the practice set balances (W4 finding 6)
+{ const P = M.practice(D, PC), a = M.split(D, PC, 24, "kwh"), f = M.split(D, PC, 24, "fixed");
+  ok((P.match(/<li>/g) || []).length === 6, "six worked exercises");
+  ok(P.indexOf("$24M ÷ " + M.fmtN(E) + " kWh = $" + M.fmtN(a.rate.perKWh, 4)) >= 0 && near(24e6 / E, a.rate.perKWh), "exercise 1 balances");
+  ok(P.indexOf("236.66 ÷ 13,000 = " + M.pct(f.rows[0].delta, 2)) >= 0 && near(Number(M.fmtN(f.rate.perHousehold, 2)) / 13000, f.rows[0].delta, 1e-6), "exercise 2 balances (rounded charge within rounding)");
+  ok(P.indexOf("$3,000M × 30% = $900M; × 5.0 × 1.6 = 7,200 job-years, against 1,840 × 20 = 36,800 job-years lost") >= 0, "exercise 5 balances");
+  ok(P.indexOf("$60M lost, $30M gained: −$30M a year for the county") >= 0, "exercise 6 balances");
+  ok(/Screening estimate/.test(P) && P.indexOf(PC.about.line) >= 0 && P.indexOf(RC.fiction) >= 0, "the practice set carries the labels"); }
+
+// ---------------- the page's controls
+ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a13"/.test(JS), "live regions; settings persist in this browser");
+ok((JS.match(/LX\.demo\(/g) || []).length === 1 && /"mid"/.test(JS) && (JS.match(/demo\[\d\] = function/g) || []).length === 9, "a demo hook for each of the nine steps");
+ok(/a13-who-pays-and-benefits\.js" defer><\/script>\n<script src="\.\.\/assets\/learn\/a13-fairness-jobs\.js"/.test(PAGE), "the accounting layer loads before the lesson's script");
+["area-median-income", "employment-multiplier", "gross-jobs", "net-jobs", "tax-base", "screening-estimate", "income-based-charge"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the sidecar defines and the page marks " + id));
+
+console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
+process.exit(fails ? 1 : 0);

@@ -1,0 +1,29 @@
+# Sidecar for A13 (a13-fairness-jobs), builder learn-w5-b, 2026-11-06. Read by scripts/build_learn.py.
+id: a13-fairness-jobs
+lesson: A13
+glossary:
+  - id: area-median-income
+    term: Area median income (AMI)
+    def: "The middle family income of an area, used to sort households into income bands such as 0-30% or 50-80% of it."
+  - id: employment-multiplier
+    term: Employment multiplier
+    def: "The total jobs, on site plus at suppliers and from workers' spending, that go with each on-site job, taken from a regional input-output table."
+  - id: gross-jobs
+    term: Gross jobs
+    def: "The jobs a project creates, counted on their own, without subtracting jobs lost or work that would have happened anyway."
+  - id: net-jobs
+    term: Net jobs
+    def: "Jobs created minus jobs lost and minus work that would have existed anyway, so the change a project really makes."
+  - id: tax-base
+    term: Tax base
+    def: "The total value a local government can tax, such as the assessed value of homes, businesses and power plants in a county."
+  - id: screening-estimate
+    term: Screening estimate
+    def: "A quick estimate from stated assumptions and coefficients a reader can change, used to compare options, not to predict outcomes."
+  - id: income-based-charge
+    term: Income-based charge
+    def: "A utility charge that varies with household income, such as a fixed charge set in a few income tiers."
+requests:
+  - "A4 (a04-retail-tariffs.qmd), Go deeper · Modeler: 'who pays and who benefits in A13 (upcoming)' is stale once A13 is live; link a13-fairness-jobs.html instead (coordinator's cross-link pass)."
+  - "A22 (a22-tradeoff-explorer) could link A13 from its fairness indicator (energy burden)."
+  - "SB3 and C3 can load assets/learn/a13-who-pays-and-benefits.js (LX.A13) for household burden by group, transfers between rate designs, jobs (job-years, gross and net) and tax base; its header documents inputs and outputs."
