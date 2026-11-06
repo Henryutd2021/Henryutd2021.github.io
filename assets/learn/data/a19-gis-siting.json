@@ -1,0 +1,1068 @@
+{
+ "about": "Lesson A19 (a19-gis-siting), 2026-11-06. The map of the region around Prairie City for siting a solar farm, a wind farm, a transmission corridor and a data-center campus. Prairie City is fictional; its numbers are illustrative. Every layer is generated from the seed and the recipe below by assets/learn/a19.js (and, the same way, by the lesson's notebook): nothing here was downloaded. Land per MW, setbacks, slope rules and the line cost come from the dated sources listed under sources; every other number is set for teaching and says so. The reference block is written by node _tests/learn/test_a19-gis-siting.js --write. The data-center campus's size comes from the shared Prairie City data (prairie-city.json), read at run time; the region's geography (districts' extent, river, transmission substations) is this lesson's own.",
+ "built": "2026-11-06",
+ "fictional": "Prairie City is fictional; its numbers are illustrative.",
+ "grid": {
+  "W": 44,
+  "H": 30,
+  "cellKm": 1,
+  "seed": 2040,
+  "sub": 4,
+  "note": "44 × 30 cells of 1 km × 1 km (1,320 km²); x runs east, y runs south from the north-west corner; each cell is checked for setbacks at 4 × 4 points."
+ },
+ "city": {
+  "name": "Prairie City",
+  "cx": 31,
+  "cy": 15,
+  "ax": 1.15,
+  "ay": 0.9,
+  "wobble": 1.6,
+  "core": 2.6,
+  "built": 6,
+  "fringe": 9.5,
+  "districts": {
+   "core": "Dense core",
+   "suburbs": "Suburbs",
+   "fringe": "Rural fringe"
+  },
+  "note": "Built-up land is where a stretched distance from the centre, plus a seeded wobble, is at most 6 km: the core within 2.6 km, the suburbs beyond; the rural fringe district runs out to 9.5 km. Illustrative."
+ },
+ "river": {
+  "name": "Prairie River",
+  "y0": 20.5,
+  "amp": 3,
+  "scale": 9,
+  "salt": 11,
+  "tilt": -0.06,
+  "tiltAt": 22,
+  "flood": {
+   "base": 1,
+   "amp": 2,
+   "scale": 6,
+   "salt": 21
+  },
+  "note": "The river's centre line runs west to east south of the city; the flood zone (standing in for a 1% annual chance flood zone) is 1 to 3 km either side. Illustrative."
+ },
+ "protected": [
+  {
+   "id": "P1",
+   "name": "Cedar Bluffs Wildlife Area",
+   "cx": 8,
+   "cy": 6,
+   "rx": 4.5,
+   "ry": 3.2,
+   "salt": 31
+  },
+  {
+   "id": "P2",
+   "name": "Big Bluestem Preserve",
+   "cx": 16.5,
+   "cy": 11,
+   "rx": 2.2,
+   "ry": 5.5,
+   "salt": 33
+  },
+  {
+   "id": "P3",
+   "name": "Prairie River Preserve",
+   "riparian": true,
+   "x0": 5,
+   "x1": 13
+  }
+ ],
+ "slope": {
+  "base": 0.6,
+  "baseAmp": 2.4,
+  "baseScale": 5,
+  "baseSalt": 41,
+  "bluff": 7,
+  "bluffKm": 1.5,
+  "ridge": {
+   "x0": 7,
+   "amp": 3,
+   "scale": 8,
+   "salt": 51,
+   "half": 2.5,
+   "peak": 8
+  },
+  "hills": {
+   "scale": 3,
+   "salt": 61,
+   "from": 0.62,
+   "gain": 30,
+   "xMax": 22
+  },
+  "note": "Mean slope within each cell, in percent: gentle prairie, steeper river bluffs and the flanks of a ridge in the west, a few hills. Illustrative."
+ },
+ "wind": {
+  "east": 7.1,
+  "westGain": 1.4,
+  "ridgeGain": 0.6,
+  "ridgeKm": 1.8,
+  "amp": 0.5,
+  "scale": 7,
+  "salt": 71,
+  "note": "Mean wind speed at 100 m, m/s: faster to the west and on the ridge. Illustrative, of the size Plains wind maps show."
+ },
+ "sun": {
+  "base": 4.86,
+  "southGain": 0.18,
+  "amp": 0.08,
+  "scale": 10,
+  "salt": 81,
+  "note": "Sunshine as global horizontal irradiance, kWh per m² per day: nearly even across 44 km. Illustrative."
+ },
+ "land": {
+  "base": 3200,
+  "amp": 2400,
+  "scale": 6,
+  "salt": 91,
+  "cityGain": 15000,
+  "cityKm": 3,
+  "note": "Land price, dollars per acre (2025 dollars): farmland about $3,000 to $6,000, much more next to the city. Set for teaching."
+ },
+ "industrial": {
+  "name": "Industrial park",
+  "i0": 35,
+  "i1": 37,
+  "j0": 16,
+  "j1": 17,
+  "note": "Food processing and a fertilizer plant; zoned for industry, so a data-center campus may go here but solar and wind farms do not. Illustrative."
+ },
+ "homes": {
+  "pFringe": 0.4,
+  "pRural": 0.09,
+  "salt": 101,
+  "vintage": 2019,
+  "newer": {
+   "pGrow": 0.35,
+   "salt": 111,
+   "i0": 33,
+   "i1": 43,
+   "j0": 2,
+   "j1": 9,
+   "year": 2025
+  },
+  "note": "Farmsteads and fringe homes as points, seeded; the layer is dated 2019. The homes built since then (to 2025) are acreages along the north county road, east of the highway. Illustrative."
+ },
+ "roads": [
+  {
+   "name": "Interstate",
+   "axis": "h",
+   "at": 15.5
+  },
+  {
+   "name": "U.S. highway",
+   "axis": "v",
+   "at": 31.5
+  },
+  {
+   "name": "State road",
+   "axis": "v",
+   "at": 12.5
+  },
+  {
+   "name": "North county road",
+   "axis": "h",
+   "at": 5.5
+  },
+  {
+   "name": "South county road",
+   "axis": "h",
+   "at": 25.5
+  }
+ ],
+ "substations": [
+  {
+   "id": "S1",
+   "name": "Central",
+   "x": 31.5,
+   "y": 15.5,
+   "headroomMW": 60
+  },
+  {
+   "id": "S2",
+   "name": "North",
+   "x": 29.5,
+   "y": 10.5,
+   "headroomMW": 120
+  },
+  {
+   "id": "S3",
+   "name": "West",
+   "x": 22.5,
+   "y": 14.5,
+   "headroomMW": 250
+  },
+  {
+   "id": "S4",
+   "name": "East hub",
+   "x": 41.5,
+   "y": 6.5,
+   "headroomMW": 600
+  }
+ ],
+ "substationNote": "S1 to S4 are transmission substations on the regional grid, where new plants and large loads connect. They are not the districts' own substations in prairie-city.json (one per district, serving homes and businesses, with their peak-hour limits). Spare capacity (headroom) is the MW a new plant or load could connect at one without an upgrade. Positions and spare capacity are set for teaching.",
+ "lines": [
+  {
+   "from": "S4",
+   "to": "S1"
+  },
+  {
+   "from": "S1",
+   "to": "S2"
+  },
+  {
+   "from": "S1",
+   "to": "S3"
+  },
+  {
+   "from": "S4",
+   "to": "S2"
+  },
+  {
+   "from": "S4",
+   "to": [
+    44,
+    3.5
+   ]
+  },
+  {
+   "from": "S4",
+   "to": [
+    44,
+    9.5
+   ]
+  }
+ ],
+ "types": {
+  "solar": {
+   "label": "Solar farm",
+   "short": "Solar",
+   "mw": 150,
+   "blockKm": 2,
+   "gap": 1,
+   "dcac": 1.29,
+   "acresPerMWdc": 4.2,
+   "exclusions": {
+    "protected": true,
+    "flood": true,
+    "slope": true,
+    "setback": true
+   },
+   "slopeMax": 10,
+   "slopeOptions": [
+    10,
+    5
+   ],
+   "setbackM": 61,
+   "setbackOptions": [
+    61,
+    152
+   ],
+   "criteria": [
+    "res",
+    "sub",
+    "road",
+    "land",
+    "homes"
+   ],
+   "weights": {
+    "res": 20,
+    "sub": 35,
+    "road": 15,
+    "land": 20,
+    "homes": 10
+   },
+   "ramps": {
+    "sub": [
+     0,
+     15
+    ],
+    "road": [
+     0,
+     8
+    ],
+    "land": [
+     2500,
+     15000
+    ],
+    "homes": [
+     0.1,
+     1.5
+    ]
+   },
+   "note": "150 MW (AC) of single-axis tracking panels, 1.29 MW of panels (DC) per MW of inverters; arrays need 4.2 acres per MW (DC), so 813 acres, in a 2 km × 2 km block (988 acres) with room for roads and setbacks."
+  },
+  "wind": {
+   "label": "Wind farm",
+   "short": "Wind",
+   "mw": 150,
+   "blockKm": 7,
+   "gap": 0,
+   "needShare": 0.5,
+   "directHaPerMW": 0.3,
+   "exclusions": {
+    "protected": true,
+    "flood": true,
+    "slope": true,
+    "setback": true
+   },
+   "slopeMax": 25,
+   "slopeOptions": [
+    25,
+    13
+   ],
+   "setbackM": 220,
+   "setbackOptions": [
+    220,
+    400
+   ],
+   "setbackMaxM": 1500,
+   "criteria": [
+    "res",
+    "sub",
+    "road",
+    "land",
+    "homes"
+   ],
+   "weights": {
+    "res": 40,
+    "sub": 20,
+    "road": 10,
+    "land": 10,
+    "homes": 20
+   },
+   "ramps": {
+    "sub": [
+     0,
+     25
+    ],
+    "road": [
+     0,
+     8
+    ],
+    "land": [
+     2500,
+     15000
+    ],
+    "homes": [
+     0.2,
+     2
+    ]
+   },
+   "cfPerMs": 0.07,
+   "note": "150 MW in a 7 km × 7 km block (49 km², 33 ha per MW, near NREL's 34.5 ha per MW average total area); turbines need at least half the block buildable (set for teaching). Land bought: the permanent direct impact, 0.3 ha per MW."
+  },
+  "dc": {
+   "label": "Data-center campus",
+   "short": "Data center",
+   "mwFrom": "prairie-city.json, dataCenter.contractMW",
+   "blockKm": 1,
+   "gap": 2,
+   "needKm2": 0.5,
+   "exclusions": {
+    "protected": true,
+    "flood": true,
+    "slope": true,
+    "setback": true
+   },
+   "slopeMax": 10,
+   "slopeOptions": [
+    10,
+    5
+   ],
+   "setbackM": 300,
+   "setbackOptions": [
+    300,
+    600
+   ],
+   "criteria": [
+    "water",
+    "sub",
+    "road",
+    "land",
+    "homes"
+   ],
+   "weights": {
+    "water": 25,
+    "sub": 35,
+    "road": 15,
+    "land": 15,
+    "homes": 10
+   },
+   "ramps": {
+    "sub": [
+     0,
+     10
+    ],
+    "water": [
+     0,
+     6
+    ],
+    "road": [
+     0,
+     5
+    ],
+    "land": [
+     2500,
+     15000
+    ],
+    "homes": [
+     0.3,
+     1.8
+    ]
+   },
+   "note": "Prairie City's campus: its contract, the most it may draw from the grid, is read from prairie-city.json (dataCenter.contractMW) by A19.withCity, never typed here. It builds its own substation, joined by a new line to a transmission substation with that much spare capacity (prairie-city.json: its own substation on the transmission grid, not a district's). Set for teaching here: 0.5 km² (124 acres) of land, a 300 m noise buffer from homes, water from the river or the city's mains, and a road. A data center here is a load and a building, nothing more."
+  }
+ },
+ "criteria": {
+  "res": {
+   "solar": "Sunshine",
+   "wind": "Wind speed"
+  },
+  "water": "Water nearby",
+  "sub": "Near a substation with room",
+  "road": "Near a paved road",
+  "land": "Cheap land",
+  "homes": "Away from homes"
+ },
+ "presets": {
+  "developer": {
+   "label": "A developer",
+   "res": 30,
+   "water": 30,
+   "sub": 35,
+   "road": 15,
+   "land": 20,
+   "homes": 0
+  },
+  "neighbours": {
+   "label": "Neighbours",
+   "res": 10,
+   "water": 10,
+   "sub": 10,
+   "road": 5,
+   "land": 5,
+   "homes": 70
+  },
+  "equal": {
+   "label": "Equal weights",
+   "res": 20,
+   "water": 20,
+   "sub": 20,
+   "road": 20,
+   "land": 20,
+   "homes": 20
+  }
+ },
+ "corridor": {
+  "need": "wind",
+  "protected": "forbid",
+  "note": "From the wind farm to the nearest substation with 150 MW spare, along the cheapest path over the cost surface; steps between neighbouring cells, diagonals included."
+ },
+ "costs": {
+  "year": 2025,
+  "deflator": {
+   "index": {
+    "2022": 118.026,
+    "2025": 128.893
+   },
+   "src": "bea-deflator",
+   "note": "Every cost on the page is in 2025 dollars. NREL's line and mitigation costs are 2022 dollars, converted with BEA's GDP implicit price deflator (2017 = 100, annual): × 128.893 / 118.026. The teaching values (access road, water main, land prices) are set in 2025 dollars."
+  },
+  "lineUSDperMile": 1615100,
+  "lineYear": 2022,
+  "lineNote": "Baseline cost of a new 138 kV line per mile, MISO costs (also used for SPP), pastureland, 2022 dollars: NREL's supply curves, Table 11.",
+  "mult": {
+   "farmland": 1,
+   "fringe": 1.1,
+   "built": 1.2,
+   "wet": 1.8,
+   "hilly": 1.1
+  },
+  "multNote": "Land-cover multipliers for the same column, NREL's Table 12: pasture or farmland 1.0, suburban 1.1, urban 1.2, wetland 1.8 (used here for the flood zone and the river), hilly 1.1 (used here for slopes above 5%).",
+  "hillyFrom": 5,
+  "mitigationUSDperMile": 38000,
+  "mitigationYear": 2022,
+  "mitigationNote": "NREL's highest natural and cultural risk mitigation cost, per mile (2022 dollars), used here for a line through protected land when it is allowed.",
+  "roadUSDperKm": 600000,
+  "roadYear": 2025,
+  "roadNote": "An access road to the nearest paved road, per km, 2025 dollars. Set for teaching.",
+  "waterUSDperKm": 1500000,
+  "waterYear": 2025,
+  "waterNote": "A water main to the river or the city's mains, per km, 2025 dollars. Set for teaching.",
+  "solarCF": "the region's average sunshine gets EIA's 2025 U.S. utility-scale solar capacity factor (cf_targets.json), and a site's factor scales with its sunshine",
+  "windCF": "the region's average wind speed gets EIA's 2025 U.S. wind capacity factor (cf_targets.json), plus 7 percentage points per m/s above it (set for teaching)"
+ },
+ "sensitivity": {
+  "draws": 500,
+  "seed": 19
+ },
+ "sources": {
+  "bea-deflator": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2022 118.026, 2025 128.893 (read through FRED's annual series A191RD3A086NBEA, BEA the originator, updated 30 September 2026; its 2024 125.587 and 2025 128.893 equal the course's other pages).",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "read 6 November 2026"
+  },
+  "lbnl-pv": {
+   "text": "Bolinger, M., and Bolinger, G. (2022). Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density. IEEE Journal of Photovoltaics. Webinar slides, Lawrence Berkeley National Laboratory, 1 February 2022 (PDF): 2019 medians, 4.2 acres per MW (DC) for single-axis tracking arrays, slide 13; DC:AC ratio 1.29 for 2019 tracking plants, slide 8; array area, not the whole site, slide 7.",
+   "url": "https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf",
+   "doi": "https://doi.org/10.1109/JPHOTOV.2021.3136805",
+   "asOf": "slides of 1 February 2022; read 6 November 2026"
+  },
+  "nrel-pv-2013": {
+   "text": "Ong, S., Campbell, C., Denholm, P., Margolis, R., and Heath, G. (2013). Land-Use Requirements for Solar Power Plants in the United States. NREL/TP-6A20-56290 (PDF): large single-axis PV, total area 8.3 acres per MW (AC), Table ES-1, p. v.",
+   "url": "https://docs.nlr.gov/docs/fy13osti/56290.pdf",
+   "asOf": "June 2013; read 6 November 2026"
+  },
+  "nrel-wind-2009": {
+   "text": "Denholm, P., Hand, M., Jackson, M., and Ong, S. (2009). Land-Use Requirements of Modern Wind Power Plants in the United States. NREL/TP-6A2-45834 (PDF): total area 34.5 ± 22.4 ha per MW; permanent direct impact 0.3 ± 0.3 ha per MW; Table 1, p. 10.",
+   "url": "https://docs.nlr.gov/docs/fy09osti/45834.pdf",
+   "asOf": "August 2009; read 6 November 2026"
+  },
+  "nrel-sc-2024": {
+   "text": "Lopez, A., et al. (2025). Renewable Energy Technical Potential and Supply Curves for the Contiguous United States: 2024 Edition. NREL/TP-6A20-91900, revised June 2025 (PDF): wind siting, Table 7, pp. 20–23 (structure setback 220 m reference, 400 m limited; slope above 25% or 13%); solar siting, Table 9, pp. 26–29 (building setback 61 m or 152 m; slope above 10% or 5%); reference = the median of existing local ordinances, limited = the 90th percentile, p. 19; transmission by least-cost path, §2.5; Tables 11 and 12 and the mitigation costs, p. 34.",
+   "url": "https://docs.nlr.gov/docs/fy25osti/91900.pdf",
+   "asOf": "revised June 2025; read 6 November 2026"
+  }
+ },
+ "reference": {
+  "note": "Written by node _tests/learn/test_a19-gis-siting.js --write from the page's model; the notebook rebuilds these numbers from the seed and asserts them.",
+  "cityDataCenter": {
+   "contractMW": 150,
+   "from": "prairie-city.json, dataCenter.contractMW (copied here by the test for the notebook, which reads only this file)"
+  },
+  "layers": {
+   "sums": {
+    "slope": 4183.499293,
+    "wind": 10383.754368,
+    "sun": 6525.509317,
+    "land": 11233727.844864,
+    "dHome": 1860.31221,
+    "dRoad": 2790,
+    "dWater": 7973.638835
+   },
+   "counts": {
+    "water": 44,
+    "flood": 103,
+    "built": 103,
+    "ind": 6,
+    "prot": 105,
+    "subc": 4
+   },
+   "homes": 159,
+   "newer": 36,
+   "cells": [
+    {
+     "n": 0,
+     "slope": 2.820982,
+     "wind": 8.4656,
+     "sun": 4.891151,
+     "land": 5419.379227
+    },
+    {
+     "n": 300,
+     "slope": 1.648574,
+     "wind": 7.378419,
+     "sun": 4.888177,
+     "land": 8228.705722
+    },
+    {
+     "n": 615,
+     "slope": 2.102525,
+     "wind": 7.225895,
+     "sun": 4.931939,
+     "land": 7996.707429
+    },
+    {
+     "n": 900,
+     "slope": 1.36624,
+     "wind": 7.926205,
+     "sun": 4.983597,
+     "land": 8229.092461
+    },
+    {
+     "n": 1319,
+     "slope": 2.153771,
+     "wind": 7.158838,
+     "sun": 5.015767,
+     "land": 4804.449636
+    }
+   ],
+   "fracSum": {
+    "m61": 1215,
+    "m220": 1181.25,
+    "m400": 1118.4375
+   }
+  },
+  "solar": {
+   "eligibleKm2": 953.5,
+   "blocks": 759,
+   "top": [
+    {
+     "id": "A",
+     "i": 42,
+     "j": 6,
+     "score": 0.729917,
+     "cell": 306,
+     "connect": 1095979,
+     "land": 5358061,
+     "road": 600000,
+     "water": 0,
+     "upfront": 7054040,
+     "sub": "S4",
+     "mwh": 312649
+    },
+    {
+     "id": "B",
+     "i": 39,
+     "j": 6,
+     "score": 0.699765,
+     "cell": 303,
+     "connect": 2191958,
+     "land": 6374554,
+     "road": 600000,
+     "water": 0,
+     "upfront": 9166512,
+     "sub": "S4",
+     "mwh": 312039
+    },
+    {
+     "id": "C",
+     "i": 18,
+     "j": 15,
+     "score": 0.678831,
+     "cell": 678,
+     "connect": 5244176,
+     "land": 7736185,
+     "road": 0,
+     "water": 0,
+     "upfront": 12980361,
+     "sub": "S3",
+     "mwh": 316528
+    },
+    {
+     "id": "D",
+     "i": 41,
+     "j": 3,
+     "score": 0.673751,
+     "cell": 173,
+     "connect": 3287937,
+     "land": 4756031,
+     "road": 1200000,
+     "water": 0,
+     "upfront": 9243967,
+     "sub": "S4",
+     "mwh": 310565
+    },
+    {
+     "id": "E",
+     "i": 15,
+     "j": 16,
+     "score": 0.657243,
+     "cell": 719,
+     "connect": 8921881,
+     "land": 5544631,
+     "road": 600000,
+     "water": 0,
+     "upfront": 15066512,
+     "sub": "S3",
+     "mwh": 316261
+    }
+   ]
+  },
+  "wind": {
+   "eligibleKm2": 960.125,
+   "blocks": 670,
+   "top": [
+    {
+     "id": "A",
+     "i": 10,
+     "j": 8,
+     "score": 0.695813,
+     "cell": 497,
+     "connect": 15309714,
+     "land": 675931,
+     "road": 600000,
+     "water": 0,
+     "upfront": 16585645,
+     "sub": "S3",
+     "mwh": 469600
+    },
+    {
+     "id": "B",
+     "i": 5,
+     "j": 20,
+     "score": 0.663181,
+     "cell": 1020,
+     "connect": 24472267,
+     "land": 569800,
+     "road": 1200000,
+     "water": 0,
+     "upfront": 26242067,
+     "sub": "S3",
+     "mwh": 508987
+    },
+    {
+     "id": "C",
+     "i": 2,
+     "j": 12,
+     "score": 0.655728,
+     "cell": 665,
+     "connect": 20719231,
+     "land": 577626,
+     "road": 0,
+     "water": 0,
+     "upfront": 21296857,
+     "sub": "S3",
+     "mwh": 508005
+    },
+    {
+     "id": "D",
+     "i": 2,
+     "j": 0,
+     "score": 0.643302,
+     "cell": 93,
+     "connect": 27682983,
+     "land": 504811,
+     "road": 1800000,
+     "water": 0,
+     "upfront": 29987794,
+     "sub": "S3",
+     "mwh": 513134
+    },
+    {
+     "id": "E",
+     "i": 12,
+     "j": 15,
+     "score": 0.619422,
+     "cell": 807,
+     "connect": 9829819,
+     "land": 744900,
+     "road": 1800000,
+     "water": 0,
+     "upfront": 12374719,
+     "sub": "S3",
+     "mwh": 457768
+    }
+   ]
+  },
+  "dc": {
+   "eligibleKm2": 912.4375,
+   "blocks": 952,
+   "top": [
+    {
+     "id": "A",
+     "i": 23,
+     "j": 15,
+     "score": 0.672169,
+     "cell": 683,
+     "connect": 1704943,
+     "land": 2283429,
+     "road": 0,
+     "water": 1500000,
+     "upfront": 5488372,
+     "sub": "S3"
+    },
+    {
+     "id": "B",
+     "i": 41,
+     "j": 5,
+     "score": 0.629381,
+     "cell": 261,
+     "connect": 1095979,
+     "land": 783686,
+     "road": 0,
+     "water": 12727922,
+     "upfront": 14607587,
+     "sub": "S4"
+    },
+    {
+     "id": "C",
+     "i": 20,
+     "j": 15,
+     "score": 0.595472,
+     "cell": 680,
+     "connect": 2910520,
+     "land": 1584677,
+     "road": 0,
+     "water": 6000000,
+     "upfront": 10495197,
+     "sub": "S3"
+    },
+    {
+     "id": "D",
+     "i": 38,
+     "j": 5,
+     "score": 0.577686,
+     "cell": 258,
+     "connect": 3741906,
+     "land": 853745,
+     "road": 0,
+     "water": 10062306,
+     "upfront": 14657957,
+     "sub": "S4"
+    },
+    {
+     "id": "E",
+     "i": 23,
+     "j": 12,
+     "score": 0.553404,
+     "cell": 551,
+     "connect": 2910520,
+     "land": 2243190,
+     "road": 1800000,
+     "water": 1500000,
+     "upfront": 8453710,
+     "sub": "S3"
+    }
+   ]
+  },
+  "dcAny": {
+   "eligibleKm2": 912.4375,
+   "blocks": 952,
+   "top": [
+    {
+     "id": "A",
+     "i": 23,
+     "j": 15,
+     "score": 0.672169,
+     "cell": 683,
+     "connect": 1704943,
+     "land": 2283429,
+     "road": 0,
+     "water": 1500000,
+     "upfront": 5488372,
+     "sub": "S3"
+    },
+    {
+     "id": "B",
+     "i": 30,
+     "j": 9,
+     "score": 0.642169,
+     "cell": 426,
+     "connect": 1782440,
+     "land": 2437239,
+     "road": 600000,
+     "water": 1500000,
+     "upfront": 6319680,
+     "sub": "S2"
+    },
+    {
+     "id": "C",
+     "i": 41,
+     "j": 5,
+     "score": 0.629381,
+     "cell": 261,
+     "connect": 1095979,
+     "land": 783686,
+     "road": 0,
+     "water": 12727922,
+     "upfront": 14607587,
+     "sub": "S4"
+    },
+    {
+     "id": "D",
+     "i": 20,
+     "j": 15,
+     "score": 0.595472,
+     "cell": 680,
+     "connect": 2910520,
+     "land": 1584677,
+     "road": 0,
+     "water": 6000000,
+     "upfront": 10495197,
+     "sub": "S3"
+    },
+    {
+     "id": "E",
+     "i": 38,
+     "j": 5,
+     "score": 0.577686,
+     "cell": 258,
+     "connect": 3741906,
+     "land": 853745,
+     "road": 0,
+     "water": 10062306,
+     "upfront": 14657957,
+     "sub": "S4"
+    }
+   ]
+  },
+  "windSetback": [
+   {
+    "setbackM": 220,
+    "eligibleKm2": 960.125,
+    "blocks": 670
+   },
+   {
+    "setbackM": 400,
+    "eligibleKm2": 908.25,
+    "blocks": 638
+   },
+   {
+    "setbackM": 800,
+    "eligibleKm2": 739.125,
+    "blocks": 434
+   },
+   {
+    "setbackM": 1500,
+    "eligibleKm2": 434.3125,
+    "blocks": 90
+   }
+  ],
+  "corridor": {
+   "forbid": {
+    "sub": "S3",
+    "km": 13.656854,
+    "cost": 15309714,
+    "cells": 13,
+    "start": 497,
+    "end": 638
+   },
+   "allow": {
+    "sub": "S3",
+    "km": 10.242641,
+    "cost": 11697350,
+    "cells": 10,
+    "start": 497,
+    "end": 638
+   }
+  },
+  "shares": {
+   "draws": 500,
+   "seed": 19,
+   "wins": {
+    "A": 123,
+    "B": 0,
+    "C": 4,
+    "D": 69,
+    "E": 0
+   },
+   "other": 304
+  },
+  "coarse": {
+   "eligibleKm2": 888.6875,
+   "blocks": 221,
+   "top": [
+    {
+     "id": "A",
+     "i": 21,
+     "j": 3,
+     "score": 0.733402,
+     "cell": 87,
+     "mwh": 312649
+    },
+    {
+     "id": "B",
+     "i": 19,
+     "j": 2,
+     "score": 0.679493,
+     "cell": 63,
+     "mwh": 310659
+    },
+    {
+     "id": "C",
+     "i": 8,
+     "j": 8,
+     "score": 0.677913,
+     "cell": 184,
+     "mwh": 316489
+    },
+    {
+     "id": "D",
+     "i": 11,
+     "j": 12,
+     "score": 0.643124,
+     "cell": 275,
+     "mwh": 319182
+    },
+    {
+     "id": "E",
+     "i": 10,
+     "j": 9,
+     "score": 0.63686,
+     "cell": 208,
+     "mwh": 317461
+    }
+   ]
+  },
+  "newer": {
+   "eligibleKm2": 953.3125,
+   "blocks": 759,
+   "top": [
+    {
+     "id": "A",
+     "i": 18,
+     "j": 15,
+     "score": 0.678831,
+     "cell": 678,
+     "connect": 5244176,
+     "land": 7736185,
+     "road": 0,
+     "water": 0,
+     "upfront": 12980361,
+     "sub": "S3",
+     "mwh": 316528
+    },
+    {
+     "id": "B",
+     "i": 41,
+     "j": 4,
+     "score": 0.67462,
+     "cell": 217,
+     "connect": 2191958,
+     "land": 4958074,
+     "road": 600000,
+     "water": 0,
+     "upfront": 7750032,
+     "sub": "S4",
+     "mwh": 311136
+    },
+    {
+     "id": "C",
+     "i": 15,
+     "j": 16,
+     "score": 0.657243,
+     "cell": 719,
+     "connect": 8921881,
+     "land": 5544631,
+     "road": 600000,
+     "water": 0,
+     "upfront": 15066512,
+     "sub": "S3",
+     "mwh": 316261
+    },
+    {
+     "id": "D",
+     "i": 38,
+     "j": 5,
+     "score": 0.643777,
+     "cell": 258,
+     "connect": 3741906,
+     "land": 5947419,
+     "road": 0,
+     "water": 0,
+     "upfront": 9689325,
+     "sub": "S4",
+     "mwh": 311309
+    },
+    {
+     "id": "E",
+     "i": 19,
+     "j": 18,
+     "score": 0.640265,
+     "cell": 811,
+     "connect": 6133310,
+     "land": 7072647,
+     "road": 1800000,
+     "water": 0,
+     "upfront": 15005957,
+     "sub": "S3",
+     "mwh": 317400
+    }
+   ]
+  }
+ }
+}

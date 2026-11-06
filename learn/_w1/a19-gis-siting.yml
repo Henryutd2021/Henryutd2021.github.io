@@ -1,0 +1,37 @@
+# Sidecar for A19 (a19-gis-siting), builder learn-w5-e, 2026-11-06. Read by scripts/build_learn.py.
+id: a19-gis-siting
+lesson: A19
+glossary:
+  - id: raster
+    term: Raster
+    def: "A map stored as a grid of equal cells, each holding one number or one class, such as slope or land cover."
+  - id: exclusion-layer
+    term: Exclusion layer
+    def: "A map layer that removes land from a siting screen outright, whatever else the land offers, because a rule or a hard limit forbids building there."
+  - id: setback
+    term: Setback
+    def: "The least distance a project must keep from a home, road, line or other feature, usually set by local rules."
+  - id: weighted-overlay
+    term: Weighted overlay
+    def: "Combining several criterion maps cell by cell: each criterion is scored from 0 to 1, multiplied by its weight, and the results are added into one suitability map."
+  - id: suitability-score
+    term: Suitability score
+    def: "A cell's or a site's weighted score in a siting screen, here from 0 to 100: a ranking under stated weights, not a cost and not a verdict."
+  - id: cost-surface
+    term: Cost surface
+    def: "A map that gives the cost of building a line or a road through each cell, for example in dollars per km."
+  - id: least-cost-path
+    term: Least-cost path
+    def: "The route between two places across a cost surface whose summed costs are the lowest."
+  - id: spatial-resolution
+    term: Spatial resolution
+    def: "The size of a raster's cells: finer cells show smaller features, such as a setback, but need more data and more computing."
+  - id: flood-zone
+    term: Flood zone
+    def: "Land mapped as likely to flood; in the U.S., FEMA's Special Flood Hazard Area is land with at least a 1% chance of flooding in any year."
+  - id: spare-capacity
+    term: Spare capacity (headroom)
+    def: "The MW a substation or line can still take for a new load or plant without an upgrade."
+requests:
+  - "Promote assets/learn/a19.js (LX.A19, the pure siting model, and LX.SiteMap, the map view) to components/ once C3 loads it: C3 sites one solar farm with it (A19.build, A19.cfg, A19.sites, A19.cost; LX.SiteMap.draw). Its styles (a19-) are in A19's page style block and would move to a sitemap.css."
+  - "Integration: A19's curriculum prerequisite A11 is not live yet; add `after: [A11]` to A19's path.yml row once A11 is active."

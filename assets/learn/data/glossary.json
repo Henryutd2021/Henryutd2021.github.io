@@ -509,6 +509,12 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "cost-surface": {
+  "term": "Cost surface",
+  "short": "A map that gives the cost of building a line or a road through each cell, for example in dollars per km.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "counterfactual": {
   "term": "Counterfactual",
   "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
@@ -941,6 +947,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "exclusion-layer": {
+  "term": "Exclusion layer",
+  "short": "A map layer that removes land from a siting screen outright, whatever else the land offers, because a rule or a hard limit forbids building there.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "exogenous": {
   "term": "Exogenous",
   "short": "Set from outside a model as an input, rather than worked out by the model.",
@@ -1084,6 +1096,12 @@
   "short": "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "flood-zone": {
+  "term": "Flood zone",
+  "short": "Land mapped as likely to flood; in the U.S., FEMA's Special Flood Hazard Area is land with at least a 1% chance of flooding in any year.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "flow": {
   "term": "Flow",
@@ -1444,6 +1462,12 @@
   "short": "Lawrence Berkeley National Laboratory, a laboratory of the United States Department of Energy that publishes, among other datasets, a yearly one of the projects waiting in interconnection queues across the country.",
   "lesson": "CF3",
   "href": "cf3-hydrogen-under-uncertainty.html"
+ },
+ "least-cost-path": {
+  "term": "Least-cost path",
+  "short": "The route between two places across a cost surface whose summed costs are the lowest.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "length-scale": {
   "term": "Length-scale",
@@ -2219,6 +2243,12 @@
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
+ "raster": {
+  "term": "Raster",
+  "short": "A map stored as a grid of equal cells, each holding one number or one class, such as slope or land cover.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "rocof": {
   "term": "Rate of change of frequency",
   "short": "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second.",
@@ -2519,6 +2549,12 @@
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
  },
+ "setback": {
+  "term": "Setback",
+  "short": "The least distance a project must keep from a home, road, line or other feature, usually set by local rules.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "shadow-price": {
   "term": "Shadow price",
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
@@ -2560,6 +2596,18 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "spare-capacity": {
+  "term": "Spare capacity (headroom)",
+  "short": "The MW a substation or line can still take for a new load or plant without an upgrade.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
+ "spatial-resolution": {
+  "term": "Spatial resolution",
+  "short": "The size of a raster's cells: finer cells show smaller features, such as a setback, but need more data and more computing.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "spent-fuel": {
   "term": "Spent fuel",
@@ -2674,6 +2722,12 @@
   "short": "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "suitability-score": {
+  "term": "Suitability score",
+  "short": "A cell's or a site's weighted score in a siting screen, here from 0 to 100: a ranking under stated weights, not a cost and not a verdict.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "supply-diversity": {
   "term": "Supply diversity",
@@ -3016,6 +3070,12 @@
   "short": "The blended return a project must pay its lenders and its owners, used as the project's discount rate.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "weighted-overlay": {
+  "term": "Weighted overlay",
+  "short": "Combining several criterion maps cell by cell: each criterion is scored from 0 to 1, multiplied by its weight, and the results are added into one suitability map.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "weighted-sum": {
   "term": "Weighted sum",
