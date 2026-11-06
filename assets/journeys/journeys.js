@@ -29,7 +29,8 @@
   const chapterOf = {};
   D.chapters.forEach(function (c, i) { c.i = i; chapterOf[c.id] = c; });
   D.entries.forEach(function (e, i) { e.i = i; });
-  const state = { firsts: false, year: D.now, view: "world" };
+  // the map's timeline steps through the entries in time order: state.upto is the last entry shown (-1: only home)
+  const state = { firsts: false, upto: D.entries.length - 1, view: "world" };
   let redraw = null;   // set once the map exists
 
   // ---------- 1. firsts filter ----------
@@ -103,6 +104,26 @@
       if (next) move(next);
     });
   });
+
+  // ---------- 2b. chapter pages: previous / next on wide screens (the pages scroll sideways there; stacked on phones) ----------
+  (function () {
+    const list = root.querySelector("#jr-pages");
+    const nav = root.querySelector(".jr-pages-nav");
+    if (!list || !nav) return;
+    const prev = nav.querySelector(".jr-pg-prev"), next = nav.querySelector(".jr-pg-next");
+    function update() {
+      const scrolls = list.scrollWidth > list.clientWidth + 4;
+      nav.hidden = !scrolls;
+      prev.disabled = list.scrollLeft <= 4;
+      next.disabled = list.scrollLeft + list.clientWidth >= list.scrollWidth - 4;
+    }
+    function by(dir) { list.scrollBy({ left: dir * list.clientWidth, behavior: reduceMotion ? "auto" : "smooth" }); }
+    prev.addEventListener("click", function () { by(-1); });
+    next.addEventListener("click", function () { by(1); });
+    list.addEventListener("scroll", function () { window.requestAnimationFrame(update); }, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
 
   // ---------- 3. the map ----------
   const box = root.querySelector(".jr-mapbox");
@@ -234,7 +255,7 @@
     const viewBtns = root.querySelectorAll(".jr-views button");
     const usNames = {};
     Object.keys(D.names).forEach(function (k) { if (k.indexOf("US-") === 0) usNames[D.names[k]] = k; });
-    let marks = [], focusIdx = 0, shown = new Set(), shownRegions = new Set(), proj = null, openKey = null, lastW = 0, maskSeq = 0;
+    let marks = [], focusIdx = 0, shown = new Set(), shownRegions = new Set(), proj = null, openKey = null, lastW = 0, maskSeq = 0, animEnd = 0;
     let usLoading = null;
 
     function viewBox(view) {   // the region each view frames (MultiPoints, fitted into the map box)
@@ -257,16 +278,16 @@
     }
 
     // ---------- what is shown ----------
-    function visible(e) { return e.y <= state.year && (!state.firsts || (e.f && e.f.length) || e.ms); }
+    function visible(e) { return e.i <= state.upto && (!state.firsts || (e.f && e.f.length) || e.ms); }
     function collect() {
       const ents = D.entries.filter(visible);
       const placeVisits = {};
       ents.forEach(function (e) { e.pl.forEach(function (pid) { (placeVisits[pid] = placeVisits[pid] || []).push(e); }); });
       return { ents: ents, placeVisits: placeVisits };
     }
-    function region(code) {   // [year, chapter, inferred] if visited by the slider's year
+    function region(code) {   // [year, chapter, inferred, first entry] if visited by the timeline's position (home: from the start)
       const r = D.regions[code];
-      return r && r[0] <= state.year ? r : null;
+      return r && r[3] <= state.upto ? r : null;
     }
 
     // ---------- geometry ----------
@@ -350,7 +371,8 @@
       }
     }
     function loadUS() {
-      if (geo.states || usLoading) return usLoading;
+      if (geo.states) return Promise.resolve();
+      if (usLoading) return usLoading;
       mapEl.classList.add("is-loading");
       usLoading = fetchData(DATA.us).then(function (topo) {
         geo.states = window.topojson.feature(topo, topo.objects.states).features;
@@ -447,7 +469,8 @@
       if (!L) { defs.removeChild(mask); return; }
       mp.style.strokeDasharray = L + " " + L; mp.style.strokeDashoffset = L;
       v.setAttribute("mask", "url(#" + id + ")");
-      const ms = fixedMs || Math.min(1600, 500 + L * 1.2);
+      const ms = fixedMs || Math.min(2200, 800 + L * 1.6);
+      animEnd = Math.max(animEnd, delay + ms);
       window.setTimeout(function () { mp.style.transition = "stroke-dashoffset " + ms + "ms " + (ease || "ease-in-out"); mp.style.strokeDashoffset = "0"; }, delay + 30);
       window.setTimeout(function () { v.removeAttribute("mask"); if (mask.parentNode) mask.parentNode.removeChild(mask); }, delay + ms + 120);
     }
@@ -455,7 +478,8 @@
     // ---------- draw ----------
     function draw(animate) {
       const W = mapEl.clientWidth;
-      if (!W) return;
+      animEnd = 0;
+      if (!W) return 0;
       if (state.view === "us" && !geo.states) loadUS();
       const H = heightFor(W);
       mapEl.style.height = H + "px";
@@ -511,7 +535,7 @@
               const lens = vs.map(function (v) { return v.getTotalLength ? v.getTotalLength() : 1; });
               const total = lens.reduce(function (a, b) { return a + b; }, 0) || 1;
               let t = stagger * 320;
-              vs.forEach(function (v, k) { const ms = Math.max(40, 1700 * lens[k] / total); drawIn(v, legs[k].d, t, W, H, ms, "linear"); t += ms; });
+              vs.forEach(function (v, k) { const ms = Math.max(60, 3400 * lens[k] / total); drawIn(v, legs[k].d, t, W, H, ms, "linear"); t += ms; });
             }
             return;
           }
@@ -551,9 +575,10 @@
       if (focusIdx >= marks.length) focusIdx = Math.max(0, marks.length - 1);
       marks.forEach(function (m, i) { m.g.setAttribute("tabindex", i === focusIdx ? "0" : "-1"); });
       empty.hidden = marks.length > 0 || (state.view === "us" && !geo.states);
-      empty.textContent = state.firsts ? "No firsts in this view up to " + state.year + "." : "Nothing in this view up to " + state.year + " yet.";
+      empty.textContent = state.firsts ? "No firsts in this view yet." : "Nothing in this view yet.";
       const still = openKey && marks.find(function (m) { return m.key === openKey; });
       if (still) openCard(still, false); else closeCard(false);
+      return animEnd;
     }
     function setFocus(i, move) {
       if (!marks.length) return;
@@ -573,43 +598,150 @@
     card.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { ev.preventDefault(); closeCard(true); } });
     svg.addEventListener("click", function () { closeCard(false); });
 
-    // ---------- controls ----------
-    function readout() {
-      const y = state.year;
-      const chs = D.chapters.filter(function (c) { return c.y0 <= y && y <= c.y1; }).map(function (c) { return c.n; });
-      out.textContent = D.since + "–" + y + (chs.length ? " · " + chs.join(", ") : "");
+    // ---------- controls: a timeline that steps through the entries ----------
+    // Choosing a view resets its timeline and plays it from the start (the first footprint in that view; the home province
+    // or country is lit from the start). Each step shows one more entry; a step waits for its routes to finish drawing,
+    // and the chapter changes get a pause. With reduced motion nothing plays by itself: the map shows the final state.
+    const STEP = 1300, CHAPTER_PAUSE = 1700;
+    const last = D.entries.length - 1;
+    let timer = null, seq = [], pos = -1;
+    function inViewNow(e) {   // does this entry put a footprint in the current view?
+      const W = mapEl.clientWidth, H = mapEl.clientHeight;
+      const ok = function (ll) { const q = proj && proj(ll); return q && q[0] >= 0 && q[0] <= W && q[1] >= 0 && q[1] <= H; };
+      return e.pl.some(function (pid) { return ok(D.places[pid].ll); }) || (e.r || []).some(function (r) { return r.p.some(ok); });
     }
-    slider.addEventListener("input", function () { stop(); state.year = +slider.value; readout(); draw(false); });
+    function sequence() { return D.entries.filter(inViewNow).map(function (e) { return e.i; }); }
+    function readout() {
+      const e = state.upto >= 0 ? D.entries[state.upto] : null;
+      const y = e ? e.y : D.since;
+      out.textContent = y + (e ? " · " + chapterOf[e.ch].n : " · home");
+      slider.value = y;
+    }
+    slider.addEventListener("input", function () {
+      stop();
+      const y = +slider.value;
+      let k = -1;
+      D.entries.forEach(function (e) { if (e.y <= y) k = e.i; });
+      state.upto = k; readout(); draw(false);
+    });
+    function setPlaying(on) {
+      play.innerHTML = '<i class="bi bi-' + (on ? "pause" : "play") + '-fill" aria-hidden="true"></i>';
+      play.setAttribute("aria-label", on ? "Pause" : "Play the journeys from the start");
+      root.classList.toggle("is-playing", on);
+    }
+    function stop() {
+      if (timer) { window.clearTimeout(timer); timer = null; }
+      setPlaying(false);
+    }
+    function tick() {
+      pos += 1;
+      if (pos >= seq.length) { timer = null; setPlaying(false); return; }
+      const prev = state.upto >= 0 ? D.entries[state.upto].ch : null;
+      state.upto = seq[pos];
+      const cur = D.entries[state.upto].ch;
+      readout();
+      const drawing = draw(!reduceMotion);
+      const wait = Math.max(STEP, drawing + 250) + (prev && prev !== cur ? CHAPTER_PAUSE : 0);
+      timer = window.setTimeout(tick, wait);
+    }
+    function playFrom(start) {
+      stop(); closeCard(false);
+      seq = sequence();
+      if (start || state.upto >= seq[seq.length - 1]) {
+        state.upto = -1; pos = -1; readout(); draw(false);
+        setPlaying(true);
+        timer = window.setTimeout(tick, reduceMotion ? 300 : 900);
+        return;
+      }
+      pos = -1;
+      while (pos + 1 < seq.length && seq[pos + 1] <= state.upto) pos += 1;
+      setPlaying(true);
+      tick();
+    }
+    function showFinal() { stop(); state.upto = last; readout(); draw(false); }
+    play.addEventListener("click", function () { if (timer) stop(); else playFrom(false); });
     viewBtns.forEach(function (b) {
       b.addEventListener("click", function () {
         state.view = b.getAttribute("data-view");
         viewBtns.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-        focusIdx = 0; closeCard(false); draw(false);
+        focusIdx = 0; closeCard(false);
+        stop(); state.upto = last; draw(false);   // lay out the view (and its projection) first
+        if (reduceMotion) { showFinal(); return; }
+        if (state.view === "us" && !geo.states) { loadUS().then(function () { playFrom(true); }); return; }
+        playFrom(true);
       });
-    });
-    let timer = null;
-    function stop() {
-      if (!timer) return;
-      window.clearInterval(timer); timer = null;
-      play.innerHTML = '<i class="bi bi-play-fill" aria-hidden="true"></i>';
-      play.setAttribute("aria-label", "Play the years from " + D.since);
-      root.classList.remove("is-playing");
-    }
-    play.addEventListener("click", function () {
-      if (timer) { stop(); return; }
-      if (state.year >= D.now) state.year = D.since; else state.year += 1;
-      slider.value = state.year; readout(); closeCard(false); draw(true);
-      play.innerHTML = '<i class="bi bi-pause-fill" aria-hidden="true"></i>';
-      play.setAttribute("aria-label", "Pause");
-      root.classList.add("is-playing");
-      timer = window.setInterval(function () {
-        if (state.year >= D.now) { stop(); return; }
-        state.year += 1; slider.value = state.year; readout(); draw(true);
-      }, reduceMotion ? 1400 : 1900);
     });
     redraw = function () { draw(false); };
     readout();
     draw(false);
+    // the world view plays once by itself when the map first comes into view
+    if (!reduceMotion && "IntersectionObserver" in window) {
+      const seen = new IntersectionObserver(function (es) {
+        if (es.some(function (e) { return e.isIntersecting; })) { seen.disconnect(); playFrom(true); }
+      }, { threshold: 0.5 });
+      seen.observe(mapEl);
+    }
+    drawPages();
+    // ---------- the chapter pages: a small map of each chapter's footprints and routes ----------
+    function drawPages() {
+      const holders = root.querySelectorAll(".jr-pg-map[data-ch]");
+      if (!holders.length) return;
+      const go = function () { holders.forEach(drawPage); };
+      loadUS().then(go, go);
+    }
+    function drawPage(h) {
+      const id = h.getAttribute("data-ch");
+      const ents = D.entries.filter(function (e) { return e.ch === id; });
+      const pts = [];
+      ents.forEach(function (e) {
+        e.pl.forEach(function (pid) { pts.push(D.places[pid].ll); });
+        (e.r || []).forEach(function (r) { r.p.forEach(function (p) { pts.push(p); }); });
+      });
+      if (!pts.length) return;
+      const W = 480, H = 270;
+      const lons = pts.map(function (p) { return p[0]; }), lats = pts.map(function (p) { return p[1]; });
+      const cx = (Math.min.apply(null, lons) + Math.max.apply(null, lons)) / 2, cy = (Math.min.apply(null, lats) + Math.max.apply(null, lats)) / 2;
+      const frame = pts.concat([[cx - 6, cy - 3.5], [cx + 6, cy + 3.5]]);   // at least a few degrees across
+      const pj = d3.geoNaturalEarth1().rotate([-cx, 0]).fitExtent([[14, 14], [W - 14, H - 14]], { type: "MultiPoint", coordinates: frame });
+      const path = d3.geoPath(pj);
+      const msvg = el("svg", { viewBox: "0 0 " + W + " " + H, class: "jr-mini", focusable: "false" });
+      const base = el("g", {}, msvg);
+      const fillOf = function (code) { const r = code && D.regions[code]; return r && r[1] === id ? r : null; };
+      const reg = function (f, code, cls) {
+        const d = path(f); if (!d) return;
+        const r = fillOf(code);
+        const n = el("path", { d: d, class: "jr-reg" + (cls ? " " + cls : "") + (r ? " is-visited" + (r[2] ? " is-inferred" : "") : "") }, base);
+        if (r) n.style.setProperty("--ch", "var(--ch-" + id + ")");
+      };
+      geo.countries.forEach(function (f) { reg(f, f.id, ""); });
+      geo.china.forEach(function (f) { reg(f, f.properties.code, "jr-prov"); });
+      (geo.states || []).forEach(function (f) { reg(f, usNames[f.properties.name] || "", "jr-state"); });
+      const gr = el("g", {}, msvg);
+      const mproj = function (ll) { return pj(ll); };
+      ents.forEach(function (e) {
+        (e.r || []).forEach(function (r) {
+          let d = "";
+          if (r.m === "ground") {
+            const q = r.p.map(mproj).filter(Boolean);
+            if (q.length > 1) { d = "M" + q.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join("L"); }
+          } else {
+            d = path({ type: "LineString", coordinates: r.p }) || "";
+          }
+          if (d) el("path", { d: d, class: "jr-mini-route jr-m-" + r.m, style: "stroke: " + (r.lg ? "var(--ch-" + id + ")" : "var(--ch-" + id + ")") }, gr);
+        });
+      });
+      const seen = {};
+      ents.forEach(function (e) {
+        e.pl.forEach(function (pid) {
+          if (seen[pid]) return; seen[pid] = 1;
+          const q = pj(D.places[pid].ll); if (!q) return;
+          el("circle", { cx: q[0].toFixed(1), cy: q[1].toFixed(1), r: D.places[pid].h ? 4.2 : 3, class: "jr-mini-dot" + (D.places[pid].h ? " is-home" : ""), style: "--ch: var(--ch-" + id + ")" }, gr);
+        });
+      });
+      h.appendChild(msvg);
+      h.classList.add("is-drawn");
+    }
+
     let rt = null;
     window.addEventListener("resize", function () {
       window.clearTimeout(rt);
