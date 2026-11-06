@@ -6,7 +6,8 @@
 //     overstates it; two sources narrow the band most with the fewest records
 //   - the averaging step: the bins' contributions add up to the maker's capacity factor; the band is said to be the fitted
 //     curve's uncertainty only (review CF8 #1, #3)
-//   - the explainer's text version (review CF8 #7) recomputed from explainer:uq-mfgpr's own exported model
+//   - the explainer's text version (review CF8 #7) recomputed from explainer:uq-mfgpr's own exported model; it follows the
+//     slider (the explainer's "explainer-update" event, run here with a fake helper kit; the page's writer on the stub document)
 //   - the no-JS blocks (timeline with its footers, toy, boundary, myths, numbers, the explainer's text version) equal what
 //     the components write (--write rewrites them)
 //   - research wording (curriculum §13, guard G-SRC): every sentence on the page, in the data file and in this script
@@ -93,11 +94,39 @@ ok(!/A band on the curve is a band on the year's energy/.test(PAGE + RAW + JS), 
   const marks = [...PAGE.matchAll(/data-term="([a-z0-9-]+)"/g)].map(m => m[1]), GL = fs.readFileSync(path.join(SITE, "learn/glossary.yml"), "utf8") + fs.readdirSync(path.join(SITE, "learn/_w1")).map(f => fs.readFileSync(path.join(SITE, "learn/_w1", f), "utf8")).join("\n");
   ok(marks.length >= 12 && ["multi-fidelity", "gaussian-process", "kernel-density-estimate", "rmse", "pinball-loss", "sharpness", "calibration", "scada", "variogram", "crps"].every(m => marks.includes(m)) && marks.every(m => new RegExp("id: " + m + "\\n").test(GL)), "glossary marks on the essential terms, each defined: " + marks.filter(m => !new RegExp("id: " + m + "\\n").test(GL)).join(", "));
 }
-{ // the explainer's text version (review CF8 #7): its own model, by region
-  const rows = M.explainerRows(EXM, D.explainer), m5 = EXM.model({ n: 5, xs: [17.5] });
-  ok(rows.length === D.explainer.n.length * D.explainer.regions.length && rows[3][0] === "5" && rows[3][1] === "15–20 m/s" && rows[3][2] === "0" && rows[3][4] === Math.round(m5.sf.mean[0]).toLocaleString("en-US") + " kW ± " + Math.round(1.96 * m5.sf.sd[0]) && rows[3][5] === Math.round(m5.mf.mean[0]).toLocaleString("en-US") + " kW ± " + Math.round(1.96 * m5.mf.sd[0]), "the explainer's text version: at 5 points none above 15 m/s, where the data-only band is widest");
-  ok(D.explainer.n.every(n => rows.filter(r => r[0] === String(n)).reduce((s, r) => s + +r[2], 0) === n), "the explainer's text version counts every measured point once");
-  ok(/<details class="lx-textalt"><summary>Text version of the explainer/.test(PAGE), "the explainer's text version sits under it");
+{ // the explainer's text version (review CF8 #7): its own model, by region, at one slider setting
+  const X0 = D.explainer, rows = M.explainerRows(EXM, X0, X0.start), m5 = EXM.model({ n: 5, xs: [17.5] });
+  ok(X0.start === 5 && rows.length === X0.regions.length && rows[3][0] === "15–20 m/s" && rows[3][1] === "0" && rows[3][3] === Math.round(m5.sf.mean[0]).toLocaleString("en-US") + " kW ± " + Math.round(1.96 * m5.sf.sd[0]) && rows[3][4] === Math.round(m5.mf.mean[0]).toLocaleString("en-US") + " kW ± " + Math.round(1.96 * m5.mf.sd[0]), "the explainer's text version: at the slider's start (5 points) none above 15 m/s, where the data-only band is widest");
+  let counted = true;
+  for (let n = 2; n <= 25; n++) if (M.explainerRows(EXM, X0, n).reduce((s, r) => s + +r[1], 0) !== n) counted = false;
+  ok(counted, "the explainer's text version counts every measured point once, at every slider setting (2 to 25)");
+  ok(/<details class="lx-textalt"><summary>Text version of the explainer/.test(PAGE) && PAGE.indexOf('<div class="cf8-ex-table">') > 0 && PAGE.indexOf("<caption class=\"lx-hint\">With 5 measured points</caption>") > 0, "the explainer's text version sits under it, at the slider's start (no-JS)");
+}
+{ // ... and follows the slider (final W4 integration): the explainer sends "explainer-update"; the page's writer rewrites it
+  const ctl = {}, events = [], noop = () => {};
+  const fakeEl = () => ({ appendChild: noop, setAttribute: noop, removeChild: noop, style: {}, firstChild: null });
+  const h = { scaffold: () => ({ controls: {}, figure: {}, side: {} }), el: fakeEl, color: () => "#000", fmt: (v, d) => Number(v).toFixed(d || 0),
+              slider: (p, o) => { ctl.slider = o; return { set: v => o.onInput(v) }; }, toggle: (p, o) => { ctl.toggle = o; return { set: v => o.onChange(v) }; },
+              readouts: () => noop, sentence: () => noop, responsive: () => noop, onTheme: noop };
+  const root = { dispatchEvent: e => { events.push(e); return true; } };
+  EXM.view(root, h);
+  const last = () => events[events.length - 1], same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  ok(ctl.slider.value === D.explainer.start && events.length === 1 && last().type === "explainer-update" && last().bubbles && last().detail.slug === "uq-mfgpr" &&
+     last().detail.n === 5 && last().detail.mode === "both" && same(last().detail.model, EXM.model({ n: 5 })) && last().detail.api.model === EXM.model && last().detail.api.truth === EXM.truth,
+     "explainer: its first update says what it shows (5 points, both estimates), the state the page's no-JS table holds, with its pure model");
+  let all = true;
+  ["sf", "mf", "both"].forEach(mode => { ctl.toggle.onChange(mode); for (let n = ctl.slider.min; n <= ctl.slider.max; n++) { ctl.slider.onInput(n); const d = last().detail; if (!(d.n === n && d.mode === mode && same(d.model, EXM.model({ n: n })))) all = false; } });
+  ok(all && events.length === 1 + 3 * (1 + (1 + ctl.slider.max - ctl.slider.min)), "explainer: every Show choice and every slider step sends the model's result for that state (" + events.length + " updates)");
+  const { env } = require("./stubdom.js"), E = env(), HH = E.LX.H;
+  const det = HH("details", { class: "lx-textalt" }, E.body), sum = HH("summary", { text: D.explainer.summary }, det), box = HH("div", { class: "cf8-ex-table" }, det);
+  const d12 = { n: 12, api: EXM };
+  ok(M.liveTable(det, d12, D.explainer) && box.innerHTML === M.explainerBody(EXM, D.explainer, 12) && sum.textContent === D.explainer.liveSummary && /With 12 measured points/.test(box.innerHTML),
+     "page: the explainer's update rewrites the table (12 points) and the summary says it follows the slider");
+  const tds = [...box.innerHTML.matchAll(/<tr><td>[^<]+<\/td><td>(\d+)<\/td>/g)].map(m => +m[1]);
+  ok(tds.length === D.explainer.regions.length && tds.reduce((a, b) => a + b, 0) === 12, "page: one row per region; the points there add up to 12");
+  ok(!M.liveTable(det, null, D.explainer) && !M.liveTable(det, { n: 7 }, D.explainer) && box.innerHTML === M.explainerBody(EXM, D.explainer, 12), "page: an event without the model changes nothing");
+  ok(/addEventListener\("explainer-update", function \(e\) \{ exLast = e\.detail; if \(exX\) liveTable\(exAlt, exLast, exX\); \}\)/.test(JS) && /details\.lx-textalt/.test(JS) && /exX = D\.explainer; if \(exLast && exAlt\) liveTable\(exAlt, exLast, exX\);/.test(JS),
+     "page script: listens to the explainer from the start and writes into its text version (a move before the data loads is kept)");
 }
 ok(A.maker > A.field && pts(A.maker) === "32.4" && pts(A.field) === "31.3", "the maker's curve overstates the capacity factor: 32.4% against 31.3%");
 {

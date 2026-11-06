@@ -109,13 +109,10 @@
   ]
  },
  "explainer": {
-  "summary": "Text version of the explainer: its synthetic turbine at 5, 10 and 25 measured points",
-  "note": "From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's centre, in kW. The slider starts at 5 points.",
-  "n": [
-   5,
-   10,
-   25
-  ],
+  "summary": "Text version of the explainer: its synthetic turbine at the slider's start, 5 measured points",
+  "liveSummary": "Text version of the explainer: its synthetic turbine at the slider's setting",
+  "note": "From the explainer's own synthetic data: estimates and 95% bands of the curve at each region's centre, in kW.",
+  "start": 5,
   "regions": [
    [
     0,

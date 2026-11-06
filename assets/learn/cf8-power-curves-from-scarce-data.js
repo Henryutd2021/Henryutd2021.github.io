@@ -21,8 +21,10 @@
 //   for reference     the maker's curve and the field curve (hidden from the fits) averaged the same way
 //   the averaging     bins(): the same weights grouped into wind-speed bins, with the maker's mean power in each, so the
 //                     contributions add up to the maker's capacity factor (review CF8 #3)
-// The explainer's text version (review CF8 #7): explainerRows() reads explainer:uq-mfgpr's own exported model (its
-// synthetic data) at three slider settings, by wind-speed region; the test writes it into the page.
+// The explainer's text version (review CF8 #7): explainerRows() reads explainer:uq-mfgpr's own model (its synthetic data)
+// at one slider setting, by wind-speed region. The test writes the slider's start (5 points) into the page (no-JS); in the
+// browser the explainer sends its "explainer-update" event on every move (detail: n and its pure model as `api`), and
+// liveTable() rewrites the table and the summary, so the text version follows the slider (final W4 integration).
 // Every number on the page is checked by _tests/learn/test_cf8-power-curves-from-scarce-data.js.
 (function () {
   "use strict";
@@ -99,33 +101,45 @@
       "<div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-res\"><caption class=\"lx-hint\">" + esc(I.caption) + "</caption><thead><tr><th scope=\"col\">Records</th><th scope=\"col\">One source</th><th scope=\"col\">Two sources</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
       "<p class=\"lx-eyebrow\">" + esc(I.binsTitle) + "</p>" + binsHTML(I, M9D);
   }
-  // the explainer's text version: explainer:uq-mfgpr's model (its own synthetic turbine, 95% band of the curve) at the
-  // slider settings I.explainer.n, by wind-speed region I.explainer.regions: measured points there, then the true curve
-  // (hidden from both models), the data-only and the curve-plus-data estimates with their band, at the region's centre
-  function explainerRows(EXM, X) {
-    var out = [];
-    X.n.forEach(function (n) {
-      var cs = X.regions.map(function (r) { return (r[0] + r[1]) / 2; }), m = EXM.model({ n: n, xs: cs });
-      X.regions.forEach(function (r, k) {
-        var last = k === X.regions.length - 1, c = m.points.x.filter(function (v) { return v >= r[0] && (v < r[1] || (last && v <= r[1])); }).length;
-        out.push([String(n), r[0] + "–" + r[1] + " m/s", String(c), kw(EXM.truth(cs[k])), kw(m.sf.mean[k]) + " ± " + Math.round(1.96 * m.sf.sd[k]), kw(m.mf.mean[k]) + " ± " + Math.round(1.96 * m.mf.sd[k])]);
-      });
+  // the explainer's text version: explainer:uq-mfgpr's model (its own synthetic turbine, 95% band of the curve) at n
+  // measured points, by wind-speed region X.regions: measured points there, then the true curve (hidden from both
+  // models), the data-only and the curve-plus-data estimates with their band, at the region's centre
+  function explainerRows(EXM, X, n) {
+    var cs = X.regions.map(function (r) { return (r[0] + r[1]) / 2; }), m = EXM.model({ n: n, xs: cs });
+    return X.regions.map(function (r, k) {
+      var last = k === X.regions.length - 1, c = m.points.x.filter(function (v) { return v >= r[0] && (v < r[1] || (last && v <= r[1])); }).length;
+      return [r[0] + "–" + r[1] + " m/s", String(c), kw(EXM.truth(cs[k])), kw(m.sf.mean[k]) + " ± " + Math.round(1.96 * m.sf.sd[k]), kw(m.mf.mean[k]) + " ± " + Math.round(1.96 * m.mf.sd[k])];
     });
-    return out;
   }
-  function explainerHTML(EXM, X) {
-    var head = ["Measured points", "Wind speed", "Points there", "True curve (hidden)", "Data only, 95% band", "Curve + data, 95% band"];
-    return "<details class=\"lx-textalt\"><summary>" + esc(X.summary) + "</summary><div><p class=\"lx-hint\">" + esc(X.note) + "</p><div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-ex\"><thead><tr>" +
+  function explainerBody(EXM, X, n) {
+    var head = ["Wind speed", "Points there", "True curve (hidden)", "Data only, 95% band", "Curve + data, 95% band"];
+    return "<p class=\"lx-hint\">" + esc(X.note) + "</p><div class=\"lx-scroll-x\"><table class=\"lx-mini-table cf8-ex\"><caption class=\"lx-hint\">With " + n + " measured points</caption><thead><tr>" +
       head.map(function (h) { return "<th scope=\"col\">" + esc(h) + "</th>"; }).join("") + "</tr></thead><tbody>" +
-      explainerRows(EXM, X).map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div></div></details>";
+      explainerRows(EXM, X, n).map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+  }
+  // the no-JS block: the slider's start
+  function explainerHTML(EXM, X) {
+    return "<details class=\"lx-textalt\"><summary>" + esc(X.summary) + "</summary><div class=\"cf8-ex-table\">" + explainerBody(EXM, X, X.start) + "</div></details>";
+  }
+  // live: the explainer's "explainer-update" event (d = {n, api}) rewrites the table and the summary; nothing is announced
+  function liveTable(details, d, X) {
+    var box = details && details.querySelector(".cf8-ex-table"), sum = details && details.querySelector("summary");
+    if (!box || !X || !d || !d.api || !(d.n >= 1)) return false;
+    box.innerHTML = explainerBody(d.api, X, d.n);
+    if (sum && sum.textContent !== X.liveSummary) sum.textContent = X.liveSummary;
+    return true;
   }
   var model = { grid: grid, weibullPdf: weibullPdf, weibullCdf: weibullCdf, weights: weights, cfOf: cfOf, cfFit: cfFit, all: all, pts: pts, bins: bins, binsWords: binsWords, binsHTML: binsHTML,
-                staticBoundary: staticBoundary, staticTimeline: staticTimeline, staticIdea: staticIdea, explainerRows: explainerRows, explainerHTML: explainerHTML };
+                staticBoundary: staticBoundary, staticTimeline: staticTimeline, staticIdea: staticIdea, explainerRows: explainerRows, explainerBody: explainerBody, explainerHTML: explainerHTML, liveTable: liveTable };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX || !window.LX.H) return;
 
   // ================================================================ view
   var LX = window.LX, H = LX.H, KEY = "cf8_power_curves_from_scarce_data";
+  // the explainer's text version follows its slider: listen from the start (a move made before the data has loaded is
+  // kept and written when it arrives); the no-JS block shows the slider's start
+  var exX = null, exLast = null, exEl = document.querySelector('.explainer[data-explainer="uq-mfgpr"]'), exAlt = exEl && exEl.parentNode.querySelector("details.lx-textalt");
+  if (exEl && exAlt) exEl.addEventListener("explainer-update", function (e) { exLast = e.detail; if (exX) liveTable(exAlt, exLast, exX); });
   LX.mount("cf8", function (live, data) {
     var D = data[KEY];
     var tl = LX.Timeline(H("div", { class: "lx-card" }, live), D.timeline), lis = tl.el.querySelectorAll(".lx-tl-ev");
@@ -133,6 +147,7 @@
     tl.events.forEach(function (e, k) { if (e.footer && lis[k]) H("p", { class: "lx-hint lx-tl-foot", text: e.footer }, lis[k].querySelector(".lx-tl-body") || lis[k]); });
     var x = document.getElementById("cf8-explain");
     if (x) { x.innerHTML = ""; x.classList.add("is-live"); LX.Boundary(H("div", { class: "lx-xcard" }, x), D.boundary); }
+    exX = D.explainer; if (exLast && exAlt) liveTable(exAlt, exLast, exX);
   });
   LX.mount("cf8-idea", function (live, data, root) {
     var I = data[KEY].idea, M9D = data.m09_surrogates_uq, A = all(I, M9D), St = { i: 0, two: false };
