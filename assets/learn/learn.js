@@ -13766,8 +13766,8 @@
     if (!pre) return '<p class="lx-hint">With JavaScript on, the bench runs the plan in your browser.</p>';
     return tableHTML([pre.head, "Value"], pre.rows) + '<p class="lx-hint">' + esc(pre.note) + "</p>";
   }
-  function inputsHTML(P) {
-    var cfg = P.cfg, c = P.city, S = sysOf(defaults(sb3Schema(cfg)), P);
+  function inputsHTML(P, o) {
+    var cfg = P.cfg, c = P.city;
     var rows = [
       ["Substation limits: core · suburbs · fringe", P.D.map(function (D) { return kilo(D.L); }).join(" · ") + " MW", "prairie-city.json: 15% above each district's 2025 busiest hour (teaching)"],
       ["Electricity, Kansas 2025: homes · businesses", (P.price.res / 10).toFixed(2) + "¢ · " + (P.price.com / 10).toFixed(2) + "¢ per kWh", c.sources[c.prices.electricitySrc].title + " (EIA)"],
@@ -13779,6 +13779,13 @@
       ["Battery, 4 hours", money(cfg.battery.capex) + " per kW, " + cfg.battery.life + " years", "NREL 2025 update (2024 dollars, converted)"],
       ["Retrofit, district heat, store, upgrades", "ranges you set", "set for teaching (illustrative)"],
       ["Yearly payments", pct(P.rate) + " real, over each item's life", "lesson 13's rate (NLR ATB 2025)"]];
+    if (o && o.c3) {
+      var c3 = cfg.c3;
+      rows.push(["Wind farm · solar farm", money(c3.wind.capex) + " · " + money(c3.solarFarm.capex) + " per kW, " + c3.wind.life + " years", "EIA AEO2026, electricity (2025 dollars; via lesson 13)"],
+        ["Electrolyzer", money(c3.electrolyzer.capex) + " per kW, " + c3.electrolyzer.life + " years; 57.5 kWh per kg", "DOE Record 24005 (2022 dollars, converted)"],
+        ["Industrial heat pump · value of a contract MWh", money(c3.indHP.capex) + " per kW of heat · $" + c3.avoided.def + "/MWh", "set for teaching (illustrative)"],
+        ["Budget, up front 2026 to 2040", "$" + kilo(c3.budget.def) + " million", "set for teaching (illustrative)"]);
+    }
     return tableHTML(["Input", "Value", "Source"], rows, "e3-inputs", [null, "n", "s"]);
   }
 

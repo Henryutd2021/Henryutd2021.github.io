@@ -849,7 +849,7 @@
   form: capstone
   sandbox: SB3
   icon: target
-  status: upcoming
+  status: active
   minutes: 150
   lab_minutes: 60   # the Modeler version adds M12's notebook
   title: "Prairie City 2040: write the city's energy plan"

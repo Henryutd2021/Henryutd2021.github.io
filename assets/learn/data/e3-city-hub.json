@@ -384,6 +384,132 @@
     "cap": 80,
     "base": 1921977
    }
+  },
+  "c3": {
+   "head": "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm)",
+   "rows": [
+    [
+     "2025: up front, 2026 to 2040 (2025 dollars)",
+     "$0.0M of a $1,500.0M budget"
+    ],
+    [
+     "2025: the city's yearly cost against 2025",
+     "$0.0M"
+    ],
+    [
+     "2025: the city's CO₂ (location-based, operating)",
+     "2,765,433 t a year"
+    ],
+    [
+     "2025: busiest hour against the limit, core · suburbs · fringe",
+     "213/250 · 192/230 · 48/60 MW"
+    ],
+    [
+     "2025: energy burden, homes below 80% of area median income (screening)",
+     "6.1%"
+    ],
+    [
+     "Reference plan: up front, 2026 to 2040 (2025 dollars)",
+     "$1,222.6M of a $1,500.0M budget"
+    ],
+    [
+     "Reference plan: the city's yearly cost against 2025",
+     "−$29.2M"
+    ],
+    [
+     "Reference plan: the city's CO₂ (location-based, operating)",
+     "2,121,410 t a year"
+    ],
+    [
+     "Reference plan: busiest hour against the limit, core · suburbs · fringe",
+     "250/250 · 256/230 · 60/60 MW"
+    ],
+    [
+     "Reference plan: energy burden, homes below 80% of area median income (screening)",
+     "6.3%"
+    ]
+   ],
+   "note": "Precomputed with HiGHS on 6 November 2026. Prairie City is fictional; its numbers are illustrative. With JavaScript on, you run your own plan."
+  },
+  "c3ex": {
+   "title": "Two summaries of the same brief",
+   "task": "Recommend Prairie City's 2040 energy plan within the budget, and say who gains and who pays.",
+   "id": "c3-ex",
+   "lines": true,
+   "answers": [
+    {
+     "key": "weak",
+     "label": "Weak summary",
+     "level": "Developing",
+     "parts": [
+      "Prairie City should ",
+      {
+       "text": "go green with heat pumps and wind",
+       "note": "No sizes, no shares, no budget: the council cannot check or cost it."
+      },
+      ". ",
+      {
+       "text": "Emissions will fall a lot",
+       "note": "By how much, on what boundary, against which year?"
+      },
+      " and ",
+      {
+       "text": "everyone will save money",
+       "note": "Who? The household table is a screening estimate with an adoption rule; name the groups and the numbers."
+      },
+      ". ",
+      {
+       "text": "Some people objected but the plan is the best",
+       "note": "Each objection needs an answer: what you would change, or why you would not."
+      },
+      "."
+     ]
+    },
+    {
+     "key": "good",
+     "label": "Strong summary",
+     "level": "Proficient",
+     "parts": [
+      "Recommendation: ",
+      {
+       "text": "switch 70% of furnaces and resistance heat to heat pumps, retrofit 10% of buildings, make 40% of cars electric with managed charging, add 30 MW of substation batteries, move the food plants' low-temperature heat to heat pumps, and contract 200 MW of wind and a 100 MW solar farm at site B",
+       "note": "Every lever with its size: a plan the council can cost and check."
+      },
+      ".\n",
+      "Budget and cost: ",
+      {
+       "text": "$1,222.6M up front against $1,500.0M; the city's yearly cost −$29.2M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
+       "note": "Up front and yearly kept apart, on one boundary."
+      },
+      ".\n",
+      "CO₂ and the grid: ",
+      {
+       "text": "the city's CO₂ 2,121,410 t a year, 23% below 2025 (location-based, operating); 26 MW of substation upgrades, the suburbs the tightest",
+       "note": "The cut with its boundary, and where the plan needs grid room."
+      },
+      ".\n",
+      "Who pays (screening): ",
+      {
+       "text": "energy burden of homes below 80% of area median income 6.1% → 6.3%, every group adopting alike; heat pumps raise winter electricity bills while cars' fuel savings sit outside the burden",
+       "note": "The rule stated, and the estimate labelled as a screening estimate."
+      },
+      ".\n",
+      "Panel: ",
+      {
+       "text": "to the electric utility, low-income advocates, climate group, industrial park, farmers and rural residents: a line each on what I would change and why",
+       "note": "Every objection answered."
+      },
+      ".\n",
+      "Limits: ",
+      {
+       "text": "2025's people and prices held to 2040, one substation per district, eight representative days, the household rule an assumption, jobs not yet estimated",
+       "note": "What the plan leaves out, so the council does not over-read it."
+      },
+      "."
+     ]
+    }
+   ],
+   "note": "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it."
   }
  }
 }

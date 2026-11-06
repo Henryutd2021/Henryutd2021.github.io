@@ -11,7 +11,7 @@
   "use strict";
   // ---------------------------------------------------------------- pure words (Node: the test reads them)
   function kilo(v) { var r = Math.round(v); return (r < 0 ? "−" : "") + Math.abs(r).toLocaleString("en-US"); }
-  function mil(v) { var x = Math.round(v / 1e5) / 10; return (x < 0 ? "−$" : "$") + Math.abs(x).toFixed(1) + "M"; }
+  function mil(v) { var x = Math.round(v / 1e5) / 10; return (x < 0 ? "−$" : "$") + Math.abs(x).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "M"; }
   function signed(v, f) { return (v > 0 ? "+" : v < 0 ? "−" : "") + f(Math.abs(v)); }
   function pct1(v) { return (v * 100).toFixed(1) + "%"; }
   // what a run says, one idea a line (R: E3.summarize's results); never more than the run shows

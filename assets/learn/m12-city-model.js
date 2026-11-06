@@ -12,7 +12,7 @@
   "use strict";
   // ---------------------------------------------------------------- pure (Node: the test reads it)
   function kilo(v) { var r = Math.round(v); return (r < 0 ? "−" : "") + Math.abs(r).toLocaleString("en-US"); }
-  function mil(v) { var x = Math.round(v / 1e5) / 10; return (x < 0 ? "−$" : "$") + Math.abs(x).toFixed(1) + "M"; }
+  function mil(v) { var x = Math.round(v / 1e5) / 10; return (x < 0 ? "−$" : "$") + Math.abs(x).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "M"; }
   function signedMil(v) { return (v > 0 ? "+" : "") + mil(v); }
   function pct1(v) { return (v * 100).toFixed(1) + "%"; }
   function pct0(v) { return Math.round(v * 100) + "%"; }
