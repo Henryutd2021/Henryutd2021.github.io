@@ -290,6 +290,8 @@
     function O() { return settings(W, S); }
     function R() { return evaluate(W, S.plan, O()); }
     var onPlan = null;                                   // the open step's hook, called after the plan or a setting changes
+    function refRich(code) { var r = LX.lessonRef(PATH, code); return r.ready ? "[[lesson:" + r.href.replace(/\.html$/, "") + "|" + r.label + "]]" : r.label + " (upcoming)"; }
+    function refText(code) { var r = LX.lessonRef(PATH, code); return r.ready ? r.label : r.label + " (upcoming)"; }
 
     // ---------- the stage: title, readouts, the chart, the measures
     var stage = H("div", { class: "lx-stage a18-stage" }, live), head = H("div", { class: "lx-stage-head" }, stage), title = H("h3", null, head);
@@ -378,7 +380,7 @@
     }
     function ledgerGroups(host) {
       host.innerHTML = ""; var r = R(), G = groups(W, r, S.who);
-      LX.Ledger(host, { cls: "a18-led", caption: "A screening estimate for one year by 2035 (" + A.participation[S.who].label.toLowerCase() + "): bills at 2025 prices, equipment as an annual equivalent; rate changes and transfers are left to A13.",
+      LX.Ledger(host, { cls: "a18-led", caption: "A screening estimate for one year by 2035 (" + A.participation[S.who].label.toLowerCase() + "): bills at 2025 prices, equipment as an annual equivalent; rate changes and transfers are left to " + refText("A13") + ".",
         columns: ["Household group", "Home measures per 100 homes", "A home that takes none, a year", "Average per home, a year"],
         rows: G.map(function (g) { return { head: g.label, sub: g.hh.toLocaleString("en-US") + " households", cells: [g.per100.toFixed(0), "−" + fm.usd(g.charge), fm.usd(g.avg)] }; }) });
       return G;
@@ -386,14 +388,14 @@
     var steps = [
       { text: "A plan starts with an [[emissions-inventory|inventory]]. Sort eight activities into the GPC's [[scope-1|scopes]]: burned in the city (scope 1), grid electricity used in it (scope 2), or caused outside it ([[scope-3|scope 3]]).",
         build: function (act, api) {
-          S.part = "inv"; S.order = false; paint();
+          onPlan = null; S.part = "inv"; S.order = false; paint();
           LX.CardSort(act, { bins: A.scopeSort.bins.map(function (b, i) { return { id: b.id, label: b.label, sub: b.sub, color: ["var(--lx-warn)", "var(--lx-accent)", "var(--lx-ink-3)"][i] }; }),
             cards: A.scopeSort.cards, onCheck: function (g) { if (g.placed === g.total) { S.sorted = true; keep(); paint(); api.done(); api.saw("You placed " + g.right + " of " + g.total + " as the GPC does. " + lineInventory(I)); } } });
           if (S.sorted) { api.done(); api.saw(lineInventory(I)); }
         } },
       { text: "Next, a target: the share of 2025's emissions to cut by 2035. A city council adopts it, and the inventory is the yardstick. Set it.",
         build: function (act, api) {
-          S.part = "target"; S.order = false; paint();
+          onPlan = null; S.part = "target"; S.order = false; paint();
           var all = evaluate(W, IDS, O());
           LX.Slider(act, { label: "Cut by 2035, share of 2025", min: A.target.min, max: A.target.max, step: A.target.step, value: S.target, fmt: function (v) { return v + "%"; },
             onChange: function (v) { S.target = v; keep(); paint(); api.saw(lineTarget(W, v, evaluate(W, IDS, O()))); api.done(); } });
@@ -438,7 +440,7 @@
         } },
       { text: "Where the curve misleads, 1: each bar was priced alone. Show them in order, so each bar gives only what it adds to the bars before it. A heat pump in a weatherized home saves less.",
         build: function (act, api) {
-          S.part = "order"; paint();
+          onPlan = null; S.part = "order"; paint();
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "How the bars are counted" }, act), { label: "Bars in order", on: S.order,
             onChange: function (on) { S.order = on; paint(); api.saw(lineOrder(W, O())); api.done(); } });
           H("p", { class: "lx-hint", text: "Lock-in: a furnace bought in 2026 lasts " + W.M.furnace.life + " years on average, past 2045; a home that buys one is out of the heat-pump bar until then." }, act);
@@ -446,7 +448,7 @@
         } },
       { text: "Where it misleads, 2: the [[baseline|baseline]]. A bar's tonnes depend on what would happen anyway: the grid's CO₂ per MWh in 2035, and whether the old air conditioner is due too.",
         build: function (act, api) {
-          S.part = "base"; S.order = false; paint();
+          onPlan = null; S.part = "base"; S.order = false; paint();
           function say() { api.saw(lineBaseline(W, O())); api.done(); }
           seg(act, "a18-grid-l", "The grid in 2035", A.options.grid.map(function (g) { return [g.key, g.label + " (" + (g.t == null ? W.grid23 : g.t).toFixed(2) + " t/MWh)"]; }), S.grid, function (k) { S.grid = k; keep(); paint(); say(); });
           LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "What a heat pump replaces" }, act), { label: "The air conditioner is due too", on: S.ac,
@@ -455,7 +457,7 @@
         } },
       { text: "Where it misleads, 3: a curve is a snapshot of prices and costs. Move the gas price and use EIA's 2030 cost for rooftop solar; watch bars change height and order.",
         build: function (act, api) {
-          S.part = "static"; S.order = false; paint();
+          onPlan = null; S.part = "static"; S.order = false; paint();
           function say() { api.saw(lineStatic(W, O())); api.done(); }
           seg(act, "a18-gas-l", "Gas price", A.options.gas.map(function (g) { return [g.key, g.label + " (×" + g.x + ")"]; }), S.gas, function (k) { S.gas = k; keep(); paint(); say(); });
           seg(act, "a18-sol-l", "Rooftop solar cost", A.options.solar.map(function (g) { return [g.key, g.label]; }), S.solar, function (k) { S.solar = k; keep(); paint(); say(); });
@@ -463,7 +465,7 @@
         } },
       { text: "Where it misleads, 4: bars below zero rarely happen by themselves. Sort what a bar's cost counts and what it leaves out; programmes and rules exist for the gap.",
         build: function (act, api) {
-          S.part = "barrier"; S.order = false; paint();
+          onPlan = null; S.part = "barrier"; S.order = false; paint();
           LX.CardSort(act, { bins: A.barrierSort.bins.map(function (b, i) { return { id: b.id, label: b.label, sub: b.sub, color: ["var(--lx-good)", "var(--lx-bad)"][i] }; }),
             cards: A.barrierSort.cards, onCheck: function (g) { api.saw("You placed " + g.right + " of " + g.total + " as the sources do. A bar's cost is the equipment's, not the whole effort of getting it installed."); if (g.placed === g.total) api.done(); } });
         } }
@@ -477,7 +479,7 @@
       var o = O(), r = R(), P = peaks(W, r), over = P.filter(function (x) { return x.over > 1e-9; }), need = targetT(W, S.target), n = planIds(S).length;
       xhost.innerHTML = ""; xhost.classList.add("is-live");
       var F = {}; A.flow.steps.forEach(function (s) { F[s.id] = s; });
-      function nd(id) { var s = F[id], o2 = { t: s.t, tN: s.t.length > 14 ? splitWords(s.t) : [s.t] }; if (s.s) { o2.s = s.s; o2.sN = s.s.length > 18 ? s.s.split(",")[0] : s.s; } if (id === "ok") o2.k = "q"; if (id === "mon" || id === "rev") o2.k = "end"; return o2; }
+      function nd(id) { var s = F[id], o2 = { t: s.t, tN: s.t.length > 14 ? splitWords(s.t) : [s.t] }; if (s.s) { o2.s = s.s; o2.sN = s.sN || s.s; } if (id === "ok") o2.k = "q"; if (id === "mon" || id === "rev") o2.k = "end"; return o2; }
       function splitWords(t) { var w = t.split(" "), h = Math.ceil(w.length / 2); return [w.slice(0, h).join(" "), w.slice(h).join(" ")]; }
       var pass = n > 0 && r.t >= need && r.upfront <= S.budget * 1e6 && !over.length;
       LX.Flowchart(H("div", { class: "lx-xcard" }, xhost), {
@@ -504,7 +506,7 @@
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where this curve holds",
         holds: ["Prairie City, a fictional city, with 2025 prices and costs in 2025 dollars;", "ten years, each measure at its stated potential, equipment replaced only when it wears out;",
           "CO₂ at each fuel's coefficient and the grid's average rate (location-based), with 5% lost on the wires;", "costs spread over each item's life at a 4% real rate, energy at retail prices."],
-        leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "rebound, comfort, health and soft costs;", "how lower sales move rates for everyone (A13);", "the cost of a bigger substation."],
+        leaves: ["transport, the industrial park and the grid's own plan: no bar here;", "rebound, comfort, health and soft costs;", "how lower sales move rates for everyone (" + refRich("A13") + ");", "the cost of a bigger substation."],
         source: "Costs: EIA (2022 dollars), LBNL (2012), ORNL (2008), in 2025 dollars with BEA's deflator. Prairie City is fictional; its numbers are illustrative." });
     }
 

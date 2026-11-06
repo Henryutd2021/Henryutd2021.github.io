@@ -395,31 +395,36 @@
     "id": "inv",
     "t": "Inventory",
     "s": "city staff, GPC",
-    "who": "The city counts its emissions with a standard such as the GPC (December 2014), from the utilities' sales data."
+    "who": "The city counts its emissions with a standard such as the GPC (December 2014), from the utilities' sales data.",
+    "sN": "city, GPC"
    },
    {
     "id": "tgt",
     "t": "Target",
     "s": "city council",
-    "who": "The council adopts a cut and a year, as Los Angeles's council did by motions in 2016 and 2017."
+    "who": "The council adopts a cut and a year, as Los Angeles's council did by motions in 2016 and 2017.",
+    "sN": "council"
    },
    {
     "id": "opt",
     "t": "Options",
     "s": "city, utility, owners",
-    "who": "The city lists what it can do (codes, its own buildings and fleet, programmes); owners and the utility hold the rest."
+    "who": "The city lists what it can do (codes, its own buildings and fleet, programmes); owners and the utility hold the rest.",
+    "sN": "many hands"
    },
    {
     "id": "irp",
     "t": "Utility resource plan",
     "s": "utility; regulator reviews",
-    "who": "Supply is the utility's: where utilities own their plants, regulators set the rules and guidelines for its resource plan (LBNL, September 2016)."
+    "who": "Supply is the utility's: where utilities own their plants, regulators set the rules and guidelines for its resource plan (LBNL, September 2016).",
+    "sN": "utility"
    },
    {
     "id": "scr",
     "t": "Screening",
     "s": "cost per tonne, then tests",
-    "who": "City staff or consultants price the options, then test budget, peaks and who benefits."
+    "who": "City staff or consultants price the options, then test budget, peaks and who benefits.",
+    "sN": "cost, then tests"
    },
    {
     "id": "ok",
@@ -430,18 +435,21 @@
     "id": "plan",
     "t": "Adopt the plan",
     "s": "council; regulator for utility parts",
-    "who": "The council adopts the city's part; the state regulator approves the utility's rates and programme budgets."
+    "who": "The council adopts the city's part; the state regulator approves the utility's rates and programme budgets.",
+    "sN": "council, regulator"
    },
    {
     "id": "rev",
     "t": "Revise and screen again",
-    "s": "other measures or order"
+    "s": "other measures or order",
+    "sN": "other measures"
    },
    {
     "id": "mon",
     "t": "Monitor",
     "s": "inventory each year",
-    "who": "The GPC recommends updating the inventory every year to track progress."
+    "who": "The GPC recommends updating the inventory every year to track progress.",
+    "sN": "each year"
    }
   ],
   "note": "Typical U.S. practice, simplified: who does what differs by state and city. A city-owned utility, such as Los Angeles's, takes direction from its city council (LA100, 2021)."

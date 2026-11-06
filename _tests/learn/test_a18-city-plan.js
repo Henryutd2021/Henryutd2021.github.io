@@ -171,7 +171,10 @@ const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
 const ALLOW = /^(https:\/\/(www\.eia\.gov|apps\.bea\.gov|www\.energy\.gov|ghgprotocol\.org|eta-publications\.lbl\.gov|docs\.nlr\.gov)\/|[0-9a-z-]+\.html|#)/;
 ok(hrefs.length >= 10 && hrefs.every(h => ALLOW.test(h)), "links only to allowed domains and learn pages: " + hrefs.filter(h => !ALLOW.test(h)).join(", "));
 ok(!/nyc\.gov|fred\.stlouisfed/.test(OWN.replace(/\(nyc\.gov; no link\)/, "")), "sources off the allow-list are named without a link");
-["a01-project-tea", "a10-emissions-questions", "12-trade-offs"].forEach(p => ok(PATH.starter.concat(PATH.more || []).length >= 0 && fs.existsSync(path.join(SITE, "learn", p + ".qmd")), "linked lesson is live: " + p));
+{ const core = require(path.join(SITE, "assets/learn/components/core.js"));
+  [["A1", "a01-project-tea.html"], ["A10", "a10-emissions-questions.html"], [12, "12-trade-offs.html"]].forEach(([c, h]) => { const r = core.lessonRef(PATH, c); ok(r.ready && r.href === h && OWN.includes('href="' + h + '"'), "a static link only to a live lesson: " + h); });
+  ["A13", "M12", "SB3", "C3"].forEach(c => ok(new RegExp('class="a18-ref" data-code="' + c + '">' + c + ' \\(upcoming\\)</span>').test(OWN) || core.lessonRef(PATH, c).ready, c + ": named through LX.lessonRef, '(upcoming)' until live"));
+  ok(!/\bA13\b/.test(JS.replace(/refText\("A13"\)|refRich\("A13"\)|lessonRefHTML\(PATH, "A13"\)/g, "")), "A13 is named only through LX.lessonRef in the script"); }
 const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$1"));
 ok(stepTexts.length === 10 && stepTexts.every(t => words(t) <= 40 && sentences(t) <= 3), "ten step texts of 40 words and three sentences at most: " + stepTexts.map(t => words(t) + "/" + sentences(t)).join(","));
 { const O2 = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "").replace(/\$\$[\s\S]*?\$\$/g, "");

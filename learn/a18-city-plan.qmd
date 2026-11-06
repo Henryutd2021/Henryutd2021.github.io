@@ -141,7 +141,7 @@ $$\text{cost per tonne} = \frac{\text{extra capital} \times \mathrm{CRF} + \text
 <ul>
 <li>Transport, 31% of the inventory, the industrial park and the grid's own plan: none has a bar here.</li>
 <li>Rebound, comfort, health and the soft costs of taking part.</li>
-<li>How lower sales move rates for every customer, and energy burden: lesson A13.</li>
+<li>How lower sales move rates for every customer, and energy burden: <span class="a18-ref" data-code="A13">A13 (upcoming)</span>.</li>
 <li>The cost of a bigger substation, and furnace fans at the peak hour.</li>
 <li>Cooling when a heat pump replaces an air conditioner: counted as unchanged.</li>
 </ul>
