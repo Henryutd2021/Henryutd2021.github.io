@@ -50,7 +50,7 @@
    "short": "Shops and offices",
    "who": "utility",
    "sector": "commercial",
-   "what": "Rebate programmes (mostly lighting and controls) save 10% of the electricity that shops, offices and public buildings use.",
+   "what": "Rebate programmes save 10% of the electricity that shops, offices and public buildings use.",
    "share": 0.1,
    "cse": 0.045,
    "cseYear": 2012,
