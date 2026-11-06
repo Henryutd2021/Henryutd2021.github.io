@@ -239,50 +239,56 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-pg-head h3 { margin: .1rem 0 0; font-size: 1.5rem; font-weight: 750; letter-spacing: -.02em; line-height: 1.15; color: var(--ink); }
 .jr-pg-where { margin: 0; font-size: .88rem; color: var(--muted); }
 .jr-pg-text { margin: 0; font-size: .95rem; line-height: 1.6; color: var(--ink-2); max-width: 62ch; }
-.jr-pg-map:not(.is-drawn) { display: none; }
-/* the chapter's atlas pair: main map (the largest cluster), an optional second panel, a world locator in the corner */
-.jr-atlas { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; width: 100%; margin: 0; padding: 0; border: 0; background: none;
-  font: inherit; color: inherit; text-align: left; }
-.jr-atlas.has-second { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
-.jr-atlas-btn { cursor: zoom-in; border-radius: var(--r); }
-.jr-atlas-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.jr-atlas-btn:hover .jr-atlas-main, .jr-atlas-btn:hover .jr-atlas-second { border-color: var(--line-strong); }
-.jr-atlas-panel { display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
-.jr-atlas-cap { font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); line-height: 1.3; }
-.jr-atlas-main, .jr-atlas-second { position: relative; display: block; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: var(--jr-ocean); }
+/* the chapter's map: chips that zoom to its regions, then one zoomable world map (drawn by journeys.js; its box keeps
+   its size from the start, so nothing moves when it is drawn) */
+.jr-pg-map { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
+.jr-pg-map[hidden] { display: none; }
+.jr-zchips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.jr-zchip { appearance: none; min-height: 28px; padding: .2rem .75rem; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface);
+  font: inherit; font-size: .76rem; font-weight: 600; letter-spacing: .02em; color: var(--ink-2); cursor: pointer;
+  transition: background .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease); }
+.jr-zchip:hover { border-color: var(--ch); color: var(--jr-ch-ink); }
+.jr-zchip[aria-pressed="true"] { background: color-mix(in srgb, var(--ch) 14%, var(--surface)); border-color: var(--ch); color: var(--jr-ch-ink); }
+.jr-zchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.jr-zchip[hidden] { display: none; }
+.jr-zm { position: relative; aspect-ratio: 3 / 2; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--jr-ocean); }
+.jr-zm:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.jr-zsvg { display: block; width: 100%; height: 100%; }
+.jr-zm .jr-reg { stroke-width: .5; }
+.jr-zm .jr-reg.is-visited { fill: color-mix(in srgb, var(--ch) 26%, var(--jr-land)); }   /* lighter on the chapter maps, so routes and dots read */
+.jr-zm .jr-reg.is-visited.is-inferred { fill: color-mix(in srgb, var(--ch) 14%, var(--jr-land)); }
+.jr-zr { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .9; vector-effect: non-scaling-stroke; }
+.jr-zr.jr-m-flight { stroke-width: 1.3; stroke-dasharray: 5 4; stroke-linecap: butt; }
+.jr-zr.jr-m-unknown { stroke-dasharray: .1 4; stroke-width: 1.8; }
+.jr-zover { pointer-events: none; }
 .jr-mini-label { fill: var(--ink); stroke: var(--jr-ocean); paint-order: stroke; stroke-linejoin: round; font-family: var(--font); font-weight: 600;
   pointer-events: none; }
-.jr-mini { display: block; width: 100%; height: auto; }
-.jr-mini-sea { fill: var(--jr-ocean); }
-.jr-mini .jr-reg.is-visited { fill: color-mix(in srgb, var(--ch) 26%, var(--jr-land)); }   /* lighter on the close-up maps, so routes and dots read */
-.jr-mini .jr-reg.is-visited.is-inferred { fill: color-mix(in srgb, var(--ch) 14%, var(--jr-land)); }
-.jr-atlas-loc { position: absolute; right: 6px; bottom: 6px; width: 36%; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-strong);
-  box-shadow: var(--shadow-sm); background: var(--jr-ocean); line-height: 0; }
-.jr-atlas-loc.at-br { right: 6px; bottom: 6px; left: auto; top: auto; }
-.jr-atlas-loc.at-bl { left: 6px; bottom: 6px; right: auto; top: auto; }
-.jr-atlas-loc.at-tr { right: 6px; top: 6px; left: auto; bottom: auto; }
-.jr-atlas-loc.at-tl { left: 6px; top: 6px; right: auto; bottom: auto; }
-.jr-loc { display: block; width: 100%; height: auto; }
-.jr-loc-land { fill: var(--jr-land); stroke: none; }
-.jr-loc-route { fill: none; stroke-width: 1.1; opacity: .9; }
-.jr-loc-frame { fill: none; stroke: var(--ink); stroke-width: 1.3; }
-/* the larger maps, in a modal dialog */
-.jr-dlg { width: min(1100px, 94vw); max-height: 92vh; overflow: auto; padding: 1rem 1.1rem 1.1rem; border: 1px solid var(--line); border-top: 4px solid var(--ch, var(--accent));
-  border-radius: var(--r-lg); background: var(--surface); color: var(--ink-2); box-shadow: var(--shadow-lg); }
-.jr-dlg::backdrop { background: rgba(15, 23, 42, .5); }
-.jr-dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .7rem; }
-.jr-dlg-head h2 { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--ink); border: 0; padding: 0; }
-.jr-dlg-close { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface);
-  color: var(--ink-2); cursor: pointer; flex: none; }
-.jr-dlg-close:hover, .jr-dlg-close:focus-visible { color: var(--ink); border-color: var(--ink-2); }
-.jr-dlg .jr-atlas-loc { width: 30%; }
-.jr-dlg-note { margin: .6rem 0 0; font-size: .8rem; color: var(--muted); }
-.jr-mini .jr-reg { stroke-width: .5; }
-.jr-mini-route { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
-.jr-mini-route.jr-m-flight { stroke-width: 1.3; stroke-dasharray: 5 4; }
-.jr-mini-route.jr-m-unknown { stroke-dasharray: .1 4; stroke-width: 1.8; }
 .jr-mini-dot { fill: var(--ch); stroke: var(--surface); stroke-width: 1.2; }
 .jr-mini-dot.is-home { fill: var(--surface); stroke: var(--ch); stroke-width: 2.2; }
+
+/* ---------- zoom and pan (every map) ---------- */
+.jr-zoomable .jr-svg, .jr-zoomable .jr-zsvg { cursor: grab; }
+.jr-zoomable .jr-svg:active, .jr-zoomable .jr-zsvg:active { cursor: grabbing; }
+.jr-zm.jr-zoomable { touch-action: pan-x pan-y; }   /* one finger scrolls the page; two fingers zoom the map */
+.jr-zoomable.is-exploring, .jr-zoomable.is-exploring svg { touch-action: none; }   /* after "Tap to explore": one finger pans */
+.jr-zsea { fill: var(--jr-ocean); stroke: none; }
+.jr-reg, .jr-cn-edge, .jr-route .jr-vis, .jr-route .jr-hit { vector-effect: non-scaling-stroke; }   /* lines keep their width at any zoom */
+.jr-zctl { position: absolute; top: 8px; right: 8px; z-index: 3; display: flex; flex-direction: column; gap: 4px; }
+.jr-zbtn { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border-radius: 7px; border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink-2); font-size: .95rem; box-shadow: var(--shadow-sm); cursor: pointer;
+  transition: color .15s var(--ease), border-color .15s var(--ease); }
+.jr-zbtn:hover { color: var(--accent); border-color: var(--accent); }
+.jr-zbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.jr-zpill { display: none; position: absolute; left: 8px; bottom: 8px; z-index: 3; align-items: center; gap: .35rem; min-height: 32px; padding: .25rem .8rem;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font: inherit; font-size: .8rem; font-weight: 600;
+  box-shadow: var(--shadow-sm); cursor: pointer; }
+.jr-zpill[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+@media (hover: none) and (pointer: coarse) { .jr-zpill { display: inline-flex; } }
+.jr-ztoast { position: absolute; left: 50%; top: 50%; z-index: 4; transform: translate(-50%, -50%); max-width: calc(100% - 24px); padding: .4rem .85rem;
+  border-radius: 999px; background: color-mix(in srgb, var(--ink) 82%, transparent); color: var(--bg); font-size: .82rem; font-weight: 600;
+  text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s var(--ease); }
+.jr-ztoast.is-on { opacity: 1; }
+.jr-card.is-moving { visibility: hidden; }   /* while the map moves; placed again beside its footprint when it stops */
 .jr-pg-nums { list-style: none; margin: 0; padding: .55rem 0; display: flex; flex-wrap: wrap; gap: .2rem 1.4rem; border-block: 1px dashed var(--line-strong);
   font-size: .78rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
 .jr-pg-nums strong { font-size: 1.15rem; letter-spacing: -.01em; color: var(--ink); margin-right: .25rem; font-variant-numeric: tabular-nums; }
@@ -358,9 +364,7 @@ body.quarto-dark .jr-modes .is-other { --m: #64748b; } body.quarto-dark .jr-mode
   .jr-tilegrid { gap: 3px; }
   .jr-tile .jr-yr { display: none; }
   .jr-page { padding: 1.1rem 1rem 1.2rem 1.2rem; }
-  .jr-atlas.has-second { grid-template-columns: minmax(0, 1fr); }
-  .jr-atlas-loc { width: 42%; }
-  .jr-dlg { padding: .8rem; }
+  .jr-zm { aspect-ratio: 4 / 3; }
   .jr-pg-head h3 { font-size: 1.3rem; }
   .jr-pstamp { min-width: 0; max-width: calc(50% - .4rem); padding: .4rem .55rem .45rem; }
   .jr-pstamp.is-first, .jr-pstamp.is-summit { padding-inline: .7rem; }
@@ -372,5 +376,5 @@ body.quarto-dark .jr-modes .is-other { --m: #64748b; } body.quarto-dark .jr-mode
   .jr-tiles-us .jr-tile .jr-yr { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .jr-route .jr-vis, .jr-dot .jr-vis, .jr-views button, .jr-firsts-btn, .jr-play { transition: none; }
+  .jr-route .jr-vis, .jr-dot .jr-vis, .jr-views button, .jr-firsts-btn, .jr-play, .jr-zchip, .jr-zbtn, .jr-ztoast { transition: none; }
 }
