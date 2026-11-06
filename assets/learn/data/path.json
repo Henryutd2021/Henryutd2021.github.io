@@ -1336,9 +1336,14 @@
    "tier": "analyst",
    "code": "A19",
    "title": "Where should it go? Siting with maps, from layers to a suitability score",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a19-gis-siting.html",
+   "scales": [],
+   "id": "a19-gis-siting",
+   "tier2": "modeler",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Siting with maps"
   },
   {
    "tier": "analyst",

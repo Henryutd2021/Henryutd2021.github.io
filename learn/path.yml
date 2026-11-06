@@ -882,7 +882,25 @@
   does: "Sort Prairie City's emissions into the GPC's scopes, set a 2035 target, build a plan from a cost curve of six measures, test it against an up-front budget, each district's substation on the coldest morning and who benefits, then see the curve mislead through overlaps, order, the baseline, prices and hidden costs."
   outcome: "Build a city's inventory by scope, read and use a marginal abatement cost curve, test a plan against money, peaks and fairness, and name five ways the curve misleads and who decides each step of a U.S. city plan."
   after: [A1]
-- {kind: lesson, tier: analyst, code: A19, title: "Where should it go? Siting with maps, from layers to a suitability score"}
+- kind: lesson
+  id: a19-gis-siting
+  path: a19-gis-siting.qmd
+  code: A19
+  tier: analyst
+  tier2: modeler
+  form: cards
+  icon: map
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the practice set (Check section)
+  lab_minutes: 60   # the optional notebook lab: in the header badge and timeRequired
+  title: "Where should it go? Siting with maps, from layers to a suitability score"
+  subtitle: "Screen Prairie City's region for a solar farm, a wind farm, a new line and a data-center campus: exclusions, weights, a least-cost path, and what the map cannot tell you"
+  short: "Siting with maps"
+  outcome: "Screen a region for a site with exclusion layers and a weighted overlay, route a line along a least-cost path, and say how the weights, the cell size and the data's date change the short list."
+  teaches: [raster layers, exclusion layers, setbacks, weighted overlay, suitability score, weight sensitivity, cost surface, least-cost path, spatial resolution]
+  lab: "an optional NumPy notebook that rebuilds the map from the same seed, checks the page's sites and line, and passes the sites to a cost model, about 60 minutes."
+  does: "Stack map layers for the region around Prairie City; exclude land by rule and weight the criteria for a solar farm, a wind farm and a data-center campus; route a new line along a least-cost path; then change the cell size and the homes layer's date."
 - {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}
 - {kind: lesson, tier: analyst, code: A21, title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"}
 - {kind: lesson, tier: analyst, code: X2, title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"}
