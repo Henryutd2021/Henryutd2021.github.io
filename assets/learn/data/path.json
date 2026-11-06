@@ -1164,9 +1164,13 @@
    "tier": "foundations",
    "code": "F9",
    "title": "What does a city run on, and who controls what?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f09-city-energy.html",
+   "scales": [],
+   "id": "f09-city-energy",
+   "minutes": 15,
+   "form": "cards",
+   "short": "A city's energy"
   },
   {
    "tier": "foundations",
@@ -1292,9 +1296,13 @@
    "tier": "analyst",
    "code": "A15",
    "title": "How much can efficiency and electrification change demand? Buildings, heat, transport and industry",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a15-efficiency-electrification.html",
+   "scales": [],
+   "id": "a15-efficiency-electrification",
+   "minutes": 35,
+   "form": "cards",
+   "short": "Efficiency and electrification"
   },
   {
    "tier": "analyst",

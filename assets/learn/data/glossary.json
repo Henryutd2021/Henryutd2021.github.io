@@ -389,6 +389,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "coincident-peak": {
+  "term": "Coincident peak",
+  "short": "The most a group of customers draws in the same hour; it is lower than the sum of their own peaks when they peak at different times.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "combined-cycle": {
   "term": "Combined-cycle plant",
   "short": "A gas power plant that burns gas in a turbine and uses the hot exhaust to make steam for a second turbine, so it gets more electricity from the same fuel.",
@@ -502,6 +508,12 @@
   "short": "The yearly return an owner's lenders and investors require on money tied up in equipment; the real cost of capital leaves inflation out.",
   "lesson": "M5",
   "href": "m05-microgrid-size-and-run.html"
+ },
+ "cost-of-saved-energy": {
+  "term": "Cost of saved energy",
+  "short": "What a measure costs per unit of energy it saves: its extra cost spread over its life at a discount rate, divided by the energy it saves each year.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
  },
  "cost-of-service": {
   "term": "Cost of service",
@@ -712,6 +724,12 @@
   "short": "Removing salt from seawater or salty groundwater to make fresh water, with heat or with electricity.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "design-day": {
+  "term": "Design day",
+  "short": "A cold (or hot) day of planning weather, colder than most, for which heating systems and the wires that feed them are sized.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
  },
  "deterministic-equivalent": {
   "term": "Deterministic equivalent",
@@ -1019,6 +1037,12 @@
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
+ "ferc": {
+  "term": "FERC (Federal Energy Regulatory Commission)",
+  "short": "The federal regulator of interstate electricity transmission, wholesale power sales and interstate gas pipelines in the United States.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
  "fermi-estimate": {
   "term": "Fermi estimate",
   "short": "A quick estimate built from round numbers and a few simple steps, aiming to get the order of magnitude right.",
@@ -1253,6 +1277,12 @@
   "lesson": "F4",
   "href": "f04-power-plants.html"
  },
+ "heat-pump-water-heater": {
+  "term": "Heat-pump water heater",
+  "short": "A water heater that moves heat from the surrounding air into the tank, using a fraction of the electricity an electric-resistance heater needs.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "held-out-data": {
   "term": "Held-out data",
   "short": "Records kept aside while a model is fitted and used only to score it, so the score shows how it does on data it has not seen.",
@@ -1378,6 +1408,12 @@
   "short": "A payment, often through the tax code, of a share of what a new plant costs to build, whatever it later produces.",
   "lesson": "A12",
   "href": "a12-policy-instruments.html"
+ },
+ "investor-owned-utility": {
+  "term": "Investor-owned utility",
+  "short": "An electric or gas utility owned by shareholders; its retail rates are typically set or approved by the state's utility commission.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
  },
  "islanding": {
   "term": "Islanding",
@@ -2129,6 +2165,12 @@
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
+ "process-heat": {
+  "term": "Process heat",
+  "short": "Heat that factories use to make things, such as hot water for washing, steam for cooking and drying, or ovens and furnaces above a few hundred degrees.",
+  "lesson": "A15",
+  "href": "a15-efficiency-electrification.html"
+ },
  "procurement-rule": {
   "term": "Procurement rule",
   "short": "A rule for which purchased electricity a buyer may count as clean, for example by region, by hour and by how new the plant is; it sets a claim, not the emissions the purchase causes.",
@@ -2164,6 +2206,18 @@
   "short": "The documented origin and history of a piece of data: source, version, access date, checksums and every change made to it.",
   "lesson": "R4",
   "href": "r04-data.html"
+ },
+ "public-power-utility": {
+  "term": "Public power utility",
+  "short": "An electric utility owned by a city or another public body, generally regulated by its own local government rather than the state commission.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
+ },
+ "public-utility-commission": {
+  "term": "Public utility commission",
+  "short": "A state's utility regulator (in Kansas, the Kansas Corporation Commission), which sets or approves the rates and service rules of the utilities it oversees.",
+  "lesson": "F9",
+  "href": "f09-city-energy.html"
  },
  "quartile": {
   "term": "Quartile",

@@ -1,0 +1,20 @@
+# Sidecar for F9 (f09-city-energy), builder learn-w5-a, 2026-11-06. Read by scripts/build_learn.py.
+# No excerpt of Henry's research appears in F9. The data-center campus appears only as a load (guard G-DC).
+id: f09-city-energy
+lesson: F9
+glossary:
+  - id: public-utility-commission
+    term: Public utility commission
+    def: "A state's utility regulator (in Kansas, the Kansas Corporation Commission), which sets or approves the rates and service rules of the utilities it oversees."
+  - id: investor-owned-utility
+    term: Investor-owned utility
+    def: "An electric or gas utility owned by shareholders; its retail rates are typically set or approved by the state's utility commission."
+  - id: public-power-utility
+    term: Public power utility
+    def: "An electric utility owned by a city or another public body, generally regulated by its own local government rather than the state commission."
+  - id: ferc
+    term: FERC (Federal Energy Regulatory Commission)
+    def: "The federal regulator of interstate electricity transmission, wholesale power sales and interstate gas pipelines in the United States."
+requests:
+  - "F9 reads prairie-city.json's flows, balance, supply, transport.engineEfficiency and sources; no change requested."
+  - "F9's explain layer names A15, A18, F11, SB3 and A4 through LX.lessonRefHTML, so they link once live; no static links to upcoming lessons."

@@ -1,0 +1,427 @@
+{
+  "about": "Lesson A15's own inputs: the building measures of the cost-of-saved-energy curve (costs, lives, savings, each with its source), the rebound range, the electrification settings, the district-heat and thermal-store settings, and the industry card. Prairie City's own numbers (homes, floor area, heat, days, COP, prices, substations) are read from prairie-city.json at run time, never copied here.",
+  "priceYear": 2025,
+  "deflator": {
+    "index": {
+      "2016": 98.241,
+      "2019": 103.979,
+      "2022": 118.026,
+      "2024": 125.587,
+      "2025": 128.893
+    },
+    "note": "BEA's GDP implicit price deflator (2017 = 100, annual): a cost in year y dollars x index(2025) / index(y) gives 2025 dollars, as lesson 13 and SB0 do. 2024 and 2025 are the values prairie-city.json and e2-plains-grid.json use.",
+    "src": "bea-nipa-119"
+  },
+  "rate": {
+    "start": 0.06,
+    "min": 0.02,
+    "max": 0.1,
+    "step": 0.01,
+    "note": "Real discount rate. LBNL's cost-of-saved-electricity study uses 6% real, as an approximation of an investor-owned utility's cost of capital.",
+    "src": "lbnl-cose-2018"
+  },
+  "rebound": {
+    "start": 0,
+    "min": 0,
+    "max": 0.3,
+    "step": 0.05,
+    "household": 0.3,
+    "note": "Direct rebound: part of a saving taken back as more use (a warmer home, longer showers). The review's abstract: for household energy services in the OECD the direct rebound effect should generally be less than 30%. Applied here to the homes' measures only.",
+    "src": "sorrell-2009"
+  },
+  "measures": [
+    {
+      "key": "led",
+      "label": "LED tubes in fluorescent fixtures, shops and offices",
+      "short": "LED tubes",
+      "carrier": "el",
+      "price": "commercial",
+      "household": false,
+      "basis": "retrofit",
+      "cost2022": {
+        "lamps": 22.22,
+        "laborHours": 0.4,
+        "laborRate": 66.0
+      },
+      "t8Watts": 63.1,
+      "t8Lumens": 5082,
+      "ledWatts": 27.4,
+      "ledLumens": 3686,
+      "lifeHours": 54000,
+      "hoursPerYear": 3541,
+      "who": "2-lamp T8 fixtures in shops and offices",
+      "note": "EIA's 2022 typical: a pair of 4-ft LED tubes (27.4 W, 3,686 lm, $22.22 installed as listed, plus the table's 0.4 hours of labor at $66) against a 2-lamp T8 F32 fixture (63.1 W, 5,082 lm). The tubes give less light, so the curve counts them at equal light: 5,082 / 3,686 pairs of tubes per fixture, cost and watts alike.",
+      "src": [
+        "eia-equip-2023-c"
+      ]
+    },
+    {
+      "key": "hpwh",
+      "label": "Heat-pump water heaters, homes heated with electricity",
+      "short": "Heat-pump water heaters",
+      "carrier": "el",
+      "price": "residential",
+      "household": true,
+      "basis": "replacement",
+      "cost2022": {
+        "efficient": [
+          870,
+          2230
+        ],
+        "standard": [
+          500,
+          1310
+        ]
+      },
+      "uef": 3.33,
+      "life": 15.1,
+      "who": "homes heated with electricity (they heat water with electric resistance)",
+      "note": "EIA's 2022 typical heat-pump water heater (UEF 3.33, $870 to $2,230 installed) against an electric resistance storage heater ($500 to $1,310), mid-points of the ranges; the extra cost when the old heater is replaced anyway. Prairie City's electric water heaters run at 90% (its homes data).",
+      "src": [
+        "eia-equip-2023-a"
+      ]
+    },
+    {
+      "key": "hp",
+      "label": "Heat pumps in homes heated by electric resistance",
+      "short": "Heat pumps (from resistance)",
+      "carrier": "el",
+      "price": "residential",
+      "household": true,
+      "basis": "replacement",
+      "cost2022": {
+        "efficient": 6940,
+        "standard": 1480
+      },
+      "life": 15.3,
+      "who": "homes heated by electric resistance furnaces or baseboards",
+      "note": "EIA's 2023 cold-climate air-source heat pump (3-ton split, HSPF2 8.1, $6,940 installed) against an electric resistance furnace ($1,480); the extra cost when the old system is replaced anyway. Savings from Prairie City's heat model and F3's COP curve, weighted over the representative days.",
+      "src": [
+        "eia-equip-2023-a"
+      ]
+    },
+    {
+      "key": "envEl",
+      "label": "Air sealing and attic insulation, pre-1980 homes heated by resistance",
+      "short": "Envelope (electric homes)",
+      "carrier": "el",
+      "price": "residential",
+      "household": true,
+      "basis": "retrofit",
+      "cost2019": [
+        1827,
+        730
+      ],
+      "life": 25,
+      "saving": 0.3636,
+      "who": "pre-1980 homes heated by electric resistance",
+      "note": "LBNL's median installed costs per project, attic insulation $1,827 and whole-house air sealing $730 (2019 dollars); NREL ResStock's air sealing, attic and duct package saves 36.36% of electric heating per upgraded home (a stock average); envelope parts typically last more than 25 years (DOE).",
+      "src": [
+        "lbnl-costs-2022",
+        "nlr-96347",
+        "doe-envelope-2019"
+      ]
+    },
+    {
+      "key": "wallsEl",
+      "label": "Wall insulation on top of the attic package, pre-1980 homes heated by resistance",
+      "short": "Walls too (electric homes)",
+      "carrier": "el",
+      "price": "residential",
+      "household": true,
+      "basis": "retrofit",
+      "cost2019": [
+        2106
+      ],
+      "life": 25,
+      "saving": 0.0717,
+      "after": "envEl",
+      "who": "pre-1980 homes heated by electric resistance, after the attic package",
+      "note": "LBNL's median installed cost of insulating all walls, $2,106 (2019 dollars); ResStock's package with drill-and-fill walls saves 43.53% of electric heating against 36.36% without them, so the walls add 7.17 points per upgraded home.",
+      "src": [
+        "lbnl-costs-2022",
+        "nlr-96349",
+        "doe-envelope-2019"
+      ]
+    },
+    {
+      "key": "condensing",
+      "label": "Condensing gas furnaces (95%) at replacement",
+      "short": "Condensing furnaces",
+      "carrier": "gas",
+      "price": "residential",
+      "household": true,
+      "basis": "replacement",
+      "cost2022": {
+        "efficient": 4150,
+        "standard": 3690
+      },
+      "afue": 0.95,
+      "life": 22.5,
+      "who": "homes heated with gas",
+      "note": "EIA's 2022 furnaces for the North (80 kBtu/h): 95% AFUE $4,150 against the 80% standard $3,690, an average life of 22.5 years; the extra cost when the old furnace is replaced anyway.",
+      "src": [
+        "eia-equip-2023-a"
+      ]
+    },
+    {
+      "key": "envGas",
+      "label": "Air sealing and attic insulation, pre-1980 homes heated with gas",
+      "short": "Envelope (gas homes)",
+      "carrier": "gas",
+      "price": "residential",
+      "household": true,
+      "basis": "retrofit",
+      "cost2019": [
+        1827,
+        730
+      ],
+      "life": 25,
+      "saving": 0.4004,
+      "who": "pre-1980 homes heated with gas",
+      "note": "The same package and cost as the electric homes' envelope; ResStock saves 40.04% of gas heating per upgraded home.",
+      "src": [
+        "lbnl-costs-2022",
+        "nlr-96347",
+        "doe-envelope-2019"
+      ]
+    },
+    {
+      "key": "wallsGas",
+      "label": "Wall insulation on top of the attic package, pre-1980 homes heated with gas",
+      "short": "Walls too (gas homes)",
+      "carrier": "gas",
+      "price": "residential",
+      "household": true,
+      "basis": "retrofit",
+      "cost2019": [
+        2106
+      ],
+      "life": 25,
+      "saving": 0.085,
+      "after": "envGas",
+      "who": "pre-1980 homes heated with gas, after the attic package",
+      "note": "The same wall cost; ResStock's package with walls saves 48.54% of gas heating against 40.04% without them: 8.5 points more per upgraded home.",
+      "src": [
+        "lbnl-costs-2022",
+        "nlr-96349",
+        "doe-envelope-2019"
+      ]
+    }
+  ],
+  "lighting": {
+    "m2PerFixture": 10,
+    "shareFluorescent": 0.4,
+    "set": "teaching",
+    "note": "Set for teaching: one 2-lamp fluorescent fixture per 10 m2 across 40% of Prairie City's commercial floor; the rest already has LEDs or other lighting."
+  },
+  "vintageNote": "Pre-1980 homes are counted as each district's pre-1980 share of floor area, spread evenly over heating fuels and over homes of the average size (a teaching assumption); each uses Prairie City's pre-1980 heat intensity.",
+  "lbnl": {
+    "totalCSE2016": 0.049,
+    "residentialTotal2016": 0.039,
+    "paCSE2016": 0.025,
+    "dollarYear": 2016,
+    "src": "lbnl-cose-2018",
+    "note": "Utility customer-funded efficiency programs, 2009-2015, national savings-weighted averages at a 6% real discount rate: total cost of saved electricity (program and participants) $0.049 per kWh for the whole portfolio, $0.039 for residential programs; programs' own cost $0.025 (2016 dollars)."
+  },
+  "electrify": {
+    "gas": {
+      "start": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.05
+    },
+    "res": {
+      "start": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.05
+    },
+    "env": {
+      "start": 0,
+      "min": 0,
+      "max": 1,
+      "step": 0.05
+    },
+    "ev": {
+      "min": 0,
+      "max": 0.6,
+      "step": 0.05
+    },
+    "managedHours": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "envelopeCut": 0.3636,
+    "note": "A heat pump replaces the chosen share of gas and propane heat (or electric resistance heat) in every building of the district, with F3's COP curve at the hour's outdoor temperature. The envelope upgrade cuts the heat of the chosen share of pre-1980 homes by ResStock's 36.36% (its electric-heating figure, the smaller of its two). EV charging uses the 2025 energy per EV, the same every day, in three illustrative rules: as today (Prairie City's evening profile); a timer that spreads each day's charging evenly over 00:00 to 06:00; and filling the valleys, which raises the district's lowest hours to one level (any hour allowed, a teaching simplification).",
+    "rules": [
+      {
+        "key": "evening",
+        "label": "As today (evening)"
+      },
+      {
+        "key": "timer",
+        "label": "A timer at midnight"
+      },
+      {
+        "key": "fill",
+        "label": "Fill the valleys"
+      }
+    ]
+  },
+  "districtHeat": {
+    "share": {
+      "start": 0.3,
+      "min": 0,
+      "max": 0.6,
+      "step": 0.05
+    },
+    "sourceC": 10,
+    "lossShare": 0.1,
+    "deltaK": 40,
+    "set": "teaching",
+    "note": "Set for teaching: a district network in the dense core takes over the chosen share of the core's gas and propane heat. A large heat pump with a heat source that stays at 10 C (treated wastewater, say) runs F3's COP curve at that temperature, delivering at the same 45 C; 10% of the heat sent out is lost from the pipes. Its thermal store is hot water cycled over 40 K. The plant sits on the core's substation."
+  },
+  "water": {
+    "cp": 4.186,
+    "rho": 1000,
+    "note": "Standard properties of water: 4.186 kJ per kg per K, 1,000 kg per m3; a store cycled over 40 K holds about 46.5 kWh of heat per m3."
+  },
+  "industry": {
+    "cop": {
+      "start": 2.9,
+      "min": 1.6,
+      "max": 5.8,
+      "step": 0.1
+    },
+    "hpMaxC": 165,
+    "boilerEff": 0.98,
+    "ovenEff": 0.98,
+    "note": "Industrial heat pumps up to 165 C are commercially available at scale; their COP ranges from 1.6 to 5.8 at temperature lifts of 130 to 40 K (LBNL, 2022); DOE's tip sheet works an example from 40 to 100 C at a COP of about 2.92. Electric boilers 98% (EIA). Electric ovens and furnaces are taken as 98% too (illustrative). Every band is assumed fully electrified, a ceiling, not a forecast.",
+    "src": [
+      "lbnl-ihp-2022",
+      "doe-iac-tip2",
+      "eia-equip-2023-a"
+    ]
+  },
+  "coldClimate": {
+    "cop": 1.75,
+    "atF": 5,
+    "atC": -15,
+    "note": "ENERGY STAR's cold-climate criteria for air-source heat pumps, as EIA's equipment study lists them: a COP of at least 1.75 at 5 F.",
+    "src": "eia-equip-2023-a"
+  },
+  "facts": [
+    {
+      "n": "$0.049 per kWh",
+      "what": "Total cost of saving electricity (programs and participants) through U.S. utility customer-funded efficiency programs, 2009 to 2015, national average, 2016 dollars at a 6% real discount rate.",
+      "source": "LBNL, The Cost of Saving Electricity Through Energy Efficiency Programs Funded by Utility Customers: 2009-2015, Table 6-1",
+      "url": "https://eta-publications.lbl.gov/publications/cost-saving-electricity-through",
+      "asof": "June 2018"
+    },
+    {
+      "n": "less than 30%",
+      "what": "The direct rebound effect for household energy services in OECD countries, as a review concludes (abstract).",
+      "source": "Sorrell, Dimitropoulos and Sommerville, Energy Policy 37(4)",
+      "url": "https://doi.org/10.1016/j.enpol.2008.11.026",
+      "asof": "2009"
+    },
+    {
+      "n": "up to 165 C",
+      "what": "Heat-sink temperatures of industrial heat pumps commercially available at scale.",
+      "source": "LBNL, Electrification of U.S. Manufacturing With Industrial Heat Pumps, p. 4",
+      "url": "https://eta-publications.lbl.gov/sites/default/files/us_industrial_heat_pump-final.pdf",
+      "asof": "October 2022"
+    },
+    {
+      "n": "COP 1.75 at 5 F",
+      "what": "The least heating COP at 5 F (-15 C) for ENERGY STAR's cold-climate criteria, as EIA's equipment study lists them.",
+      "source": "EIA, Updated Buildings Sector Appliance and Equipment Costs and Efficiencies, Appendix A, p. 40",
+      "url": "https://www.eia.gov/analysis/studies/buildings/equipcosts/",
+      "asof": "March 2023"
+    }
+  ],
+  "sources": {
+    "eia-equip-2023-a": {
+      "title": "Updated Buildings Sector Appliance and Equipment Costs and Efficiencies, Appendix A (reference case)",
+      "publisher": "U.S. Energy Information Administration (prepared by Guidehouse and Leidos)",
+      "date": "released 23 March 2023; 2022 dollars",
+      "url": "https://www.eia.gov/analysis/studies/buildings/equipcosts/pdf/appendix-a.pdf",
+      "where": "p. 10 (gas furnaces, North: 80% $3,690, 95% $4,150, life 22.5 years); p. 23 (electric resistance furnace $1,480); pp. 39-40 (air-source heat pump, cold-climate criteria $6,940, HSPF2 8.1, life 15.3 years; COP at 5 F of at least 1.75); p. 62 (electric storage water heater $500-1,310, UEF 0.92, life 15.1); p. 65 (heat-pump water heater $870-2,230, UEF 3.33, life 15.1); p. 117 (commercial electric boilers, 98%)"
+    },
+    "eia-equip-2023-c": {
+      "title": "Updated Buildings Sector Appliance and Equipment Costs and Efficiencies, Appendix C (lighting)",
+      "publisher": "U.S. Energy Information Administration (prepared by Guidehouse and Leidos)",
+      "date": "released 23 March 2023; 2022 dollars",
+      "url": "https://www.eia.gov/analysis/studies/buildings/equipcosts/pdf/appendix-c.pdf",
+      "where": "p. 59 (commercial 4-ft T8 F32, 2-lamp system: 63.1 W, 5,082 lm); p. 62 (4-ft linear LED replacement lamps in a 2-lamp system, 2022 typical: 27.4 W, 3,686 lm, 54,000 h, 3,541 h a year, $22.22 installed, 0.4 hours of labor at $66 an hour)"
+    },
+    "lbnl-costs-2022": {
+      "title": "The Costs of Home Decarbonization in the US",
+      "publisher": "Lawrence Berkeley National Laboratory (Walker, Less, Casquero-Modrego and Rainer)",
+      "date": "June 2022; 2019 dollars",
+      "url": "https://doi.org/10.20357/B7DP43",
+      "where": "Figure 4: median installed cost per project, attic insulation (framed floor) $1,827, whole-house air sealing $730, all walls $2,106"
+    },
+    "nlr-96347": {
+      "title": "ResStock measure documentation: air sealing, attic floor insulation and duct sealing (NLR/TP-5500-96347)",
+      "publisher": "National Laboratory of the Rockies (formerly NREL)",
+      "date": "April 2026",
+      "url": "https://docs.nlr.gov/docs/fy26osti/96347.pdf",
+      "where": "Table 5: savings per upgraded unit, heating natural gas 40.04%, heating electricity 36.36%"
+    },
+    "nlr-96349": {
+      "title": "ResStock measure documentation: air sealing, attic floor insulation, duct sealing and drill-and-fill wall insulation (NLR/TP-5500-96349)",
+      "publisher": "National Laboratory of the Rockies (formerly NREL)",
+      "date": "April 2026",
+      "url": "https://docs.nlr.gov/docs/fy26osti/96349.pdf",
+      "where": "Table 5: savings per upgraded unit, heating natural gas 48.54%, heating electricity 43.53%"
+    },
+    "doe-envelope-2019": {
+      "title": "Grid-interactive Efficient Buildings Technical Report Series: Windows and Opaque Envelope",
+      "publisher": "U.S. Department of Energy",
+      "date": "December 2019",
+      "url": "https://www1.eere.energy.gov/buildings/pdfs/75387.pdf",
+      "where": "p. 38: the long lifetime (more than 25 years) of typical envelope components"
+    },
+    "lbnl-cose-2018": {
+      "title": "The Cost of Saving Electricity Through Energy Efficiency Programs Funded by Utility Customers: 2009-2015",
+      "publisher": "Lawrence Berkeley National Laboratory (Hoffman, Goldman, Murphy, Mims Frick, Leventis and Schwartz)",
+      "date": "June 2018; 2016 dollars",
+      "url": "https://eta-publications.lbl.gov/publications/cost-saving-electricity-through",
+      "where": "section 2.4, p. 10: a 6% real discount rate; Table 6-1: total cost of saved electricity $0.049 per kWh (full portfolio), $0.039 (residential); program administrator $0.025 (executive summary)"
+    },
+    "sorrell-2009": {
+      "title": "Empirical estimates of the direct rebound effect: A review",
+      "publisher": "Sorrell, S., Dimitropoulos, J. and Sommerville, M., Energy Policy 37(4), 1356-1371",
+      "date": "2009",
+      "url": "https://doi.org/10.1016/j.enpol.2008.11.026",
+      "where": "abstract: for household energy services in the OECD, the direct rebound effect should generally be less than 30%"
+    },
+    "lbnl-ihp-2022": {
+      "title": "Electrification of U.S. Manufacturing With Industrial Heat Pumps (LBNL-2001478)",
+      "publisher": "Lawrence Berkeley National Laboratory (Zuberi, Hasanbeigi and Morrow)",
+      "date": "October 2022",
+      "url": "https://eta-publications.lbl.gov/sites/default/files/us_industrial_heat_pump-final.pdf",
+      "where": "p. 4: heat-sink temperatures up to 165 C commercially available at scale; COP from 1.6 to 5.8 at temperature lifts of 130 to 40 K"
+    },
+    "doe-iac-tip2": {
+      "title": "Industrial Assessment Center Decarbonization Tip Sheet 2: Install Heat Pumps for Process Heating and Cooling",
+      "publisher": "U.S. Department of Energy and Lawrence Berkeley National Laboratory",
+      "date": "11 January 2024",
+      "url": "https://industrialapplications.lbl.gov/sites/default/files/pdf-embeds/IAC%20Decarb%20Tipsheet%202.pdf",
+      "where": "heat pumps deliver up to about 175 C; worked example from 40 C to 100 C, COP about 2.92"
+    },
+    "bea-nipa-119": {
+      "title": "NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100)",
+      "publisher": "U.S. Bureau of Economic Analysis",
+      "date": "data published 29 October 2026; read 6 November 2026",
+      "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+      "where": "2016 98.241; 2019 103.979; 2022 118.026; 2024 125.587; 2025 128.893"
+    }
+  }
+}

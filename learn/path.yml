@@ -689,7 +689,23 @@
   does: "Add a steady 300 MW data center to Prairie Town's busiest day, a spring day and its whole year; count the homes it equals; read real requests to connect; time the wait for grid service; set water, jobs and taxes; see who pays if it cancels."
   outcome: "Describe a large load by its size, shape and wait to connect, tell an annual-energy equivalent from a peak one and a request from demand, and name who decides, pays and benefits when it connects."
   after: [2, F6]
-- {kind: lesson, tier: foundations, code: F9, title: "What does a city run on, and who controls what?"}
+# ---------- wave W5 Foundations module F9 (curriculum v2 §18.4; builder learn-w5-a)
+- kind: lesson
+  id: f09-city-energy
+  code: F9
+  tier: foundations
+  form: cards
+  icon: city
+  status: active
+  minutes: 15
+  practice_minutes: 10   # the myths and questions (Check section)
+  title: "What does a city run on, and who controls what?"
+  subtitle: "Follow Prairie City's year of energy from its sources to its sectors, then see who decides each part"
+  short: "A city's energy"
+  teaches: [a city's energy flows by carrier and sector, final and useful energy at city scale, the city's accounting boundary, who decides what in U.S. energy, typical against universal roles]
+  does: "Follow Prairie City's 2025 energy from the gas grid, fuels, the SPP grid and rooftop solar to homes, shops, transport, industry and a data-center campus; group it by sector; then sort who usually decides each lever (the city, the utility, the state regulator, owners or federal rules) and light up each one's part of the flows."
+  outcome: "Read a city's energy flows by carrier and sector, say where its accounting starts and how little of its electricity it makes, and name who typically decides rates, codes, standards, wires and equipment, knowing that the roles differ by state and utility."
+  after: [F3, F6]
 - {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
 - {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}
 - {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
@@ -798,7 +814,23 @@
   after: [A1, 12]
   next: M6
 - {kind: lesson, tier: analyst, code: A13, title: "Who pays and who benefits? Energy burden, fairness and jobs"}
-- {kind: lesson, tier: analyst, code: A15, title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"}
+# ---------- wave W5 Analyst module A15 (curriculum v2 §18.4; builder learn-w5-a)
+- kind: lesson
+  id: a15-efficiency-electrification
+  code: A15
+  tier: analyst
+  form: cards
+  icon: bulb
+  status: active
+  minutes: 35
+  practice_minutes: 30   # the myths, the question and the seven worked exercises (Check section)
+  title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"
+  subtitle: "Price saved energy for Prairie City's buildings, electrify its districts on the coldest day, and sort industry's heat by temperature"
+  short: "Efficiency and electrification"
+  teaches: [cost of saved energy, capital recovery factor for savings, efficiency supply curves, rebound, interactions between measures, electrification and the design-day peak, coincident peaks against substation limits, managed EV charging, district heat with thermal storage, process heat by temperature]
+  does: "Build a cost-of-saved-energy curve for Prairie City's buildings (water heaters, heat pumps, envelopes, LED tubes, condensing furnaces) with a rebound check; electrify heat and cars district by district on the cold design day against each substation; try three charging rules and a heat network with a store; sort the industrial park's heat by temperature."
+  outcome: "Price a saved MWh with the capital recovery factor and judge it against what it saves, show how rebound and the order of measures change the curve, and explain why electrifying heat raises the cold-day peak more than the year's energy, and what envelopes, stores and charging rules do about it."
+  after: [F3, F9]
 # A17, builder learn-w4-a (A17 fork, wave W4)
 - kind: lesson
   id: a17-physical-feasibility
