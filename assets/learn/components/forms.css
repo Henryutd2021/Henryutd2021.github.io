@@ -53,14 +53,6 @@
    the site defines only on project pages (.theme-*, pubs.css); on Learn pages they take the Learn accent, day and night */
 body.page-learn { --t: var(--lx-accent); }
 .page-learn .explainer { --t-ink: var(--lx-accent); --t-soft: var(--lx-accent-soft); --t-line: color-mix(in srgb, var(--lx-accent) 30%, var(--lx-line)); margin: 0; }
-/* W4 (CF8): an explainer's segmented control (assets/explainers.css cuts each option to one line with an ellipsis) wraps
-   its words on phones instead, so a three-way control such as "Curve + data" stays readable at 375 and 414 px; every
-   option fills the control's height, so a chosen one-line option is shaded as tall as a two-line one */
-@media (max-width: 480px) {
-  .page-learn .explainer .ex-seg-opt { display: flex; }
-  .page-learn .explainer .ex-seg-opt span { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; white-space: normal;
-    overflow: visible; text-overflow: clip; padding: .32rem .3rem; line-height: 1.25; }
-}
 .lx-rb-static th[scope="row"] { font-family: var(--lx-f-display); font-weight: 500; text-align: left; vertical-align: top; padding: 9px 8px;
   border-bottom: 1px solid var(--lx-line); }
 .lx-rb-static td { font-size: 14px; }

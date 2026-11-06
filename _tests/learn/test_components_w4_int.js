@@ -6,7 +6,9 @@
 //     page (live or draft) loads another lesson's script for them; a few numbers agree between the component and the
 //     lesson (the lessons' own tests check every number)
 //   - LX.SupplyStack and LX.Frontier tick steps (xStep, yStep): defaults unchanged, the options honoured
-//   - forms.css: an explainer's segmented control wraps its words on phones (CF8's "Curve + data" was cut at 375 px)
+//   - an explainer's segmented control (CF8's and the uq-mfgpr project page's "Curve + data" was cut at 1,024, 414 and
+//     375 px): since W5 the site's assets/explainers.css sizes each option to its label and wraps words at every width,
+//     and the W4 phone-only copy of the rule in forms.css is gone
 // Usage (from the site folder):  node _tests/learn/test_components_w4_int.js
 "use strict";
 const fs = require("fs");
@@ -88,13 +90,16 @@ for (const P of PROMO) {
   ok(/stepOf\(st\.yMin, st\.yMax, o\)/.test(rd("components/frontier.js")), "frontier: the axes use stepOf with the chart's options");
 }
 
-// ---------------------------------------------------------------- forms.css: an explainer's segmented control on phones
+// ---------------------------------------------------------------- an explainer's segmented control (assets/explainers.css)
 {
-  const css = rd("components/forms.css");
-  const m = css.match(/@media \(max-width: 480px\) \{([\s\S]*?)\n\}/);
-  ok(m && /\.page-learn \.explainer \.ex-seg-opt span \{[^}]*white-space: normal;[^}]*text-overflow: clip;/.test(m[1]) && /\.page-learn \.explainer \.ex-seg-opt \{ display: flex; \}/.test(m[1]),
-     "forms.css: under 481 px an explainer's segment wraps its words and fills the control's height");
-  ok(rd("learn.css").includes(".page-learn .explainer .ex-seg-opt span { flex: 1 1 auto;"), "the bundle carries the rule");
+  const css = fs.readFileSync(path.join(SITE, "assets/explainers.css"), "utf8");
+  const rule = sel => { const m = css.match(new RegExp("^" + sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + " \\{([^}]*)\\}", "m")); return m ? m[1] : null; };
+  const opt = rule(".ex-seg-opt"), span = rule(".ex-seg-opt span");
+  ok(opt && /flex: 1 1 auto;/.test(opt) && /display: flex;/.test(opt) && !/min-width: 0/.test(opt),
+     "explainers.css: an option starts at its label's width and never shrinks below its longest word");
+  ok(span && /display: flex;/.test(span) && /flex: 1 1 auto;/.test(span) && !/white-space: nowrap|text-overflow: ellipsis|overflow: hidden/.test(span),
+     "explainers.css: a label wraps its words instead of being cut, and fills the control's height");
+  ok(!/\.ex-seg-opt/.test(rd("components/forms.css")) && !/\.ex-seg-opt/.test(rd("learn.css")), "Learn keeps no copy of the rule (forms.css, the bundle)");
 }
 
 console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w4_int)` : `ok ${checks}/${checks} checks (test_components_w4_int)`);
