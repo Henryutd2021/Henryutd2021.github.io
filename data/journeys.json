@@ -112,7 +112,7 @@
     "new-york": {"name": "New York", "admin": "US-NY", "country": "US", "lat": 40.71, "lon": -74.01},
     "walden": {"name": "Walden Pond", "admin": "US-MA", "country": "US", "lat": 42.44, "lon": -71.34},
     "rockport": {"name": "Rockport", "admin": "US-MA", "country": "US", "lat": 42.66, "lon": -70.62},
-    "vermont": {"name": "Montpelier", "admin": "US-VT", "country": "US", "lat": 44.26, "lon": -72.58},
+    "vermont": {"name": "Montpelier", "admin": "US-VT", "country": "US", "lat": 44.26, "lon": -72.58, "draft": "Was Montpelier a separate visit? (asked)"},
     "new-brunswick": {"name": "Rutgers University, New Brunswick", "admin": "US-NJ", "country": "US", "lat": 40.5, "lon": -74.45},
     "new-hampshire": {"name": "White Mountains", "admin": "US-NH", "country": "US", "lat": 44.27, "lon": -71.3},
     "portland-me": {"name": "Portland, Maine", "admin": "US-ME", "country": "US", "lat": 43.66, "lon": -70.26},
@@ -130,7 +130,8 @@
     "lanzhou": {"name": "Lanzhou", "admin": "CN-GS", "country": "CN", "lat": 36.06, "lon": 103.83},
     "xining": {"name": "Xining", "admin": "CN-QH", "country": "CN", "lat": 36.62, "lon": 101.78},
     "grand-teton": {"name": "Grand Teton National Park", "admin": "US-WY", "country": "US", "lat": 43.79, "lon": -110.68},
-    "houghton": {"name": "Houghton, Michigan", "admin": "US-MI", "country": "US", "lat": 47.12, "lon": -88.57}
+    "houghton": {"name": "Houghton, Michigan", "admin": "US-MI", "country": "US", "lat": 47.12, "lon": -88.57},
+    "lowell-lake": {"name": "Lowell Lake State Park", "admin": "US-VT", "country": "US", "lat": 43.148, "lon": -72.842}
   },
   "entries": [
     {"id": "leave-home-2010", "chapter": "baotou", "date": "2010-09", "text": "From home in Shouguang to university in Baotou: the farthest I had been.", "places": ["shouguang", "baotou"], "first": ["First time away from home"], "route": {"mode": "unknown", "path": ["shouguang", "baotou"]}, "stamp": "Baotou"},
@@ -198,7 +199,8 @@
     {"id": "home-2024", "chapter": "dallas", "date": "2024-02", "when": "Winter 2023–24", "text": "Home for the Spring Festival, the first since leaving for America, and a climb up Yunmen Mountain with my father.", "places": ["istanbul", "beijing", "shouguang", "yunmen"], "first": ["First Spring Festival home from the U.S."], "route": {"mode": "flight", "path": ["dallas", "istanbul", "beijing"], "by_words": "by plane by way of Istanbul; the way back not recorded"}, "stamp": "Shouguang", "transit": ["istanbul", "beijing"], "draft": "The way back to Dallas in early 2024 is not recorded (asked); no return line is drawn."},
     {"id": "drive-boston-2024", "chapter": "boston", "date": "2024-08", "text": "From Dallas to Boston by car, across the Mississippi and through the Appalachians to Washington, DC and New York.", "places": ["washington", "new-york", "boston"], "first": ["First time in New York", "First sight of the Mississippi"], "route": {"mode": "ground", "path": ["dallas", "@32.52,-93.75", "@32.35,-90.88", "@32.30,-90.18", "@33.52,-86.80", "@34.73,-86.59", "@36.16,-86.78", "@38.04,-84.50", "@38.35,-81.63", "@39.10,-78.20", "washington", "@39.29,-76.61", "@39.74,-75.55", "@39.68,-75.47", "@39.80,-75.25", "@40.05,-74.62", "@40.42,-74.40", "new-york", "@41.31,-72.92", "@41.82,-71.41", "boston"], "passes": ["US-TX", "US-LA", "US-MS", "US-AL", "US-TN", "US-KY", "US-WV", "US-VA", "US-MD", "US-DC", "US-DE", "US-NJ", "US-NY", "US-CT", "US-RI", "US-MA"], "note": "The states are the ones you listed; the stops between them are read from the route image.", "by": "car"}, "stamp": "Dallas to Boston"},
     {"id": "walden-rockport-2024", "chapter": "boston", "date": "2024-09", "when": "2024–25", "text": "Walden Pond, many times, and Rockport on Cape Ann.", "places": ["walden", "rockport"], "list": false},
-    {"id": "vermont-2024", "chapter": "boston", "date": "2024-10", "when": "Early Oct 2024", "text": "Camping in Vermont among the autumn leaves.", "places": ["vermont"], "route": {"mode": "ground", "path": ["boston", "vermont"], "by": "car"}, "stamp": "Vermont"},
+    {"id": "vermont-2024", "chapter": "boston", "date": "2024-10", "when": "Early Oct 2024", "text": "Camping at Lowell Lake in southern Vermont, among the autumn leaves, by way of southwestern New Hampshire.", "places": ["lowell-lake"], "route": {"mode": "ground", "by": "car", "path": ["boston", "@42.617,-71.582", "@42.688,-71.889", "@42.758,-72.320", "lowell-lake"], "passes": ["US-MA", "US-NH", "US-VT"]}, "stamp": "Lowell Lake, Vermont"},
+    {"id": "montpelier-2024", "chapter": "boston", "date": "2024-10", "when": "2024", "text": "Montpelier, Vermont's capital.", "places": ["vermont"], "list": false},
     {"id": "aurora-2024", "chapter": "boston", "date": "2024-10", "when": "Oct 2024", "text": "An aurora over Boston, and meteors in mid-October.", "places": ["boston"], "first": ["First aurora"], "stamp": "Boston"},
     {"id": "rutgers-2024", "chapter": "boston", "date": "2024-10", "when": "Oct 2024", "text": "By car to Rutgers University in New Jersey, for a conference.", "places": ["new-brunswick"], "route": {"mode": "ground", "path": ["boston", "@41.82,-71.41", "@41.31,-72.92", "@40.95,-73.85", "new-brunswick"], "by": "car"}, "list": false},
     {"id": "new-hampshire-2024", "chapter": "boston", "date": "2024-11", "text": "A day in New Hampshire.", "places": ["new-hampshire"], "route": {"mode": "ground", "path": ["boston", "new-hampshire"], "by": "car"}, "list": false},
