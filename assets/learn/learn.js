@@ -13132,9 +13132,9 @@
    district's average, scaled by the group's use index), shared costs (upgrades, batteries) on every kWh, district heat
    billed at its average cost. Equipment bought by adopting households is not in bills (LEAD's definition of burden).
 
-   Tie rule (W2 review finding 2): stated costs far below any real one (e3-city-hub.json `tie`): $5 a year per MW of each
-   district's busiest hour, $2 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50
-   per MWh out of the heat store, $0.01 x the hour's share of SPP's peak per MWh of managed charging. Left out of every
+   Tie rule (W2 review finding 2): stated costs far below any real one (e3-city-hub.json `tie`): $20 a year per MW of each
+   district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50
+   per MWh out of the heat store, $0.10 x the hour's share of SPP's peak per MWh of managed charging. Left out of every
    reported cost. _tests/learn/test_e3-engine.js re-solves with the tie costs x10 and x0.1 and checks every reported
    number on the optimal face (min and max of each over the plans within 0.0001% of the best cost).
 
@@ -13319,11 +13319,12 @@
       [0, 1].forEach(function (e) {
         SYS.forEach(function (k) {
           if (k === "dh" && i !== 0) return;
-          var fix = sd.y[e][k], cost = 0, f = (1 - S.save * e) * D.Qann;
+          // shares are in percent inside the LP (0 to 100), which keeps the matrix's numbers close in size for HiGHS
+          var fix = sd.y[e][k] * 100, cost = 0, f = (1 - S.save * e) * D.Qann / 100;
           if (k === "fuel") cost = f / P.eta * ((1 - D.pf) * D.pGas + D.pf * P.price.propMWh);
           if (size) {
-            if (e === 1) cost += S.a.ret * D.homeEq;
-            if (k === "dh") cost += S.a.net * D.homeEq;
+            if (e === 1) cost += S.a.ret * D.homeEq / 100;
+            if (k === "dh") cost += S.a.net * D.homeEq / 100;
             out[e][k] = v("y" + i + e + k, 0, Infinity, cost);
           } else out[e][k] = v("y" + i + e + k, fix, fix, cost);
           if (k === "fuel") co2.push([out[e][k], f / P.eta * ((1 - D.pf) * P.ef.gas + D.pf * P.galPerMWh * P.ef.propGal)]);
@@ -13332,14 +13333,14 @@
       if (size) {
         var all = [];
         [0, 1].forEach(function (e) { for (var k in out[e]) all.push([out[e][k], 1]); });
-        row("yall" + i, all, 1, 1);
-        row("yfuel" + i, [[out[0].fuel, 1], [out[1].fuel, 1]], null, D.s0.fuel);
-        row("yres" + i, [[out[0].res, 1], [out[1].res, 1]], null, D.s0.res);
+        row("yall" + i, all, 100, 100);
+        row("yfuel" + i, [[out[0].fuel, 1], [out[1].fuel, 1]], null, D.s0.fuel * 100);
+        row("yres" + i, [[out[0].res, 1], [out[1].res, 1]], null, D.s0.res * 100);
         var r1 = []; for (var k1 in out[1]) r1.push([out[1][k1], 1]);
-        row("yret" + i, r1, null, o.retMax == null ? 1 : o.retMax);
-        if (i === 0) row("ydh", [[out[0].dh, 1], [out[1].dh, 1]], null, o.dhMax == null ? 0.5 : o.dhMax);
-        var zh = v("zhp" + i, 0, Infinity, S.a.hp * D.homeEq);   // heat pumps beyond 2025's
-        row("zhp" + i, [[zh, 1], [out[0].hp, -1], [out[1].hp, -1]], -D.s0.hp, null);
+        row("yret" + i, r1, null, (o.retMax == null ? 1 : o.retMax) * 100);
+        if (i === 0) row("ydh", [[out[0].dh, 1], [out[1].dh, 1]], null, (o.dhMax == null ? 0.5 : o.dhMax) * 100);
+        var zh = v("zhp" + i, 0, Infinity, S.a.hp * D.homeEq / 100);   // heat pumps beyond 2025's (percent)
+        row("zhp" + i, [[zh, 1], [out[0].hp, -1], [out[1].hp, -1]], -D.s0.hp * 100, null);
       }
       return out;
     });
@@ -13368,11 +13369,14 @@
           }
           // electric heating from the building shares
           [0, 1].forEach(function (e) {
-            var q = (1 - S.save * e) * D.Q[k][h];
+            var q = (1 - S.save * e) * D.Q[k][h] / 100;
             if (q > 0) { bal.push([Y[i][e].res, -q]); bal.push([Y[i][e].hp, -q / P.cop[k][h]]); }
           });
           // EV charging
-          if (S.evm === "managed") { var ev = v("v" + t, 0, sd.E / cfg.ev.minHours, T.ev * tk * P.shape[k][h] / 1000 * w); bal.push([ev, -1]); }
+          if (S.evm === "managed") {
+            var ev = v("v" + t, 0, sd.E / cfg.ev.minHours, T.ev * tk * P.shape[k][h] / 1000 * w); bal.push([ev, -1]);
+            if (h === 23) { var day = []; for (var hv = 0; hv < 24; hv++) day.push(["v" + i + "_" + k + "_" + hv, 1]); row("ve" + i + "_" + k, day, sd.E, sd.E); }
+          }
           else rhs += sd.E * P.evProfile[h];
           // batteries
           if (size || sd.bat > 0) {
@@ -13387,7 +13391,8 @@
           }
           // the network's plant draws on the core's substation
           if (i === 0 && dhOn) {
-            var hpH = v("dp" + tag, 0, size ? Infinity : S.dhp), boil = v("db" + tag, 0, Infinity, w * P.price.gasCom / dh.plant.boilerEff);
+            // the plant buys at the industrial (large-customer) price, though its power comes through the core's substation
+            var hpH = v("dp" + tag, 0, size ? Infinity : S.dhp, w * (P.price.ind - D.pEl) / copP), boil = v("db" + tag, 0, Infinity, w * P.price.gasCom / dh.plant.boilerEff);
             co2.push([boil, w * P.ef.gas / dh.plant.boilerEff]);
             bal.push([hpH, -1 / copP]);
             if (size) row("dpc" + tag, [[hpH, 1], [dhpV, -1]], null, 0);
@@ -13399,7 +13404,7 @@
               row("ts" + tag, [[sq, 1], ["tq" + k + "_" + (h + 23) % 24, -keep], [si, -1], [so, 1]], 0, 0);
               if (size) { row("tci" + tag, [[si, 1], [stoV, -1 / dh.store.minHours]], null, 0); row("tco" + tag, [[so, 1], [stoV, -1 / dh.store.minHours]], null, 0); row("tcq" + tag, [[sq, 1], [stoV, -1]], null, 0); }
             }
-            [0, 1].forEach(function (e) { var q = (1 - S.save * e) * D.Q[k][h] / net; if (q > 0) heat.push([Y[0][e].dh, -q]); });
+            [0, 1].forEach(function (e) { var q = (1 - S.save * e) * D.Q[k][h] / net / 100; if (q > 0) heat.push([Y[0][e].dh, -q]); });
             row("dh" + tag, heat, 0, 0);
           }
           row("b" + t, bal, rhs, rhs);
@@ -13444,7 +13449,7 @@
     var raw = { status: r.status, days: [], y: [], sizes: {}, upg: [], pk: [], obj: r.objective, meta: m };
     P.D.forEach(function (D, i) {
       var y = [{}, {}];
-      [0, 1].forEach(function (e) { SYS.forEach(function (k) { y[e][k] = k === "dh" && i !== 0 ? 0 : val("y" + i + e + k); }); });
+      [0, 1].forEach(function (e) { SYS.forEach(function (k) { y[e][k] = k === "dh" && i !== 0 ? 0 : val("y" + i + e + k) / 100; }); });
       raw.y.push(y); raw.upg.push(val("upg" + i)); raw.pk.push(val("pk" + i));
     });
     raw.pkC = val("pkC");
@@ -13452,7 +13457,7 @@
     for (var k = 0; k < K; k++) {
       var day = { d: [], dh: null, farm: null };
       P.D.forEach(function (D, i) {
-        var o = { imp: [], pv: [], pvAvail: [], heat: [], ev: [], bc: [], bd: [], bq: [], plant: [], base: D.B[k].slice(), lim: [], bal: [] };
+        var o = { imp: [], pv: [], pvAvail: [], heat: [], ev: [], bc: [], bd: [], bq: [], plant: [], base: D.B[k].slice(), lim: [], bal: [], tie: [] };
         var pvMW = m.size ? D.pv0 + raw.sizes.pvAdd * P.pvShare[i] : S.d[i].pv;
         var E = S.d[i].E;
         for (var h = 0; h < 24; h++) {
@@ -13468,6 +13473,7 @@
           // weight is in it), and the balance row's marginal cost per MWh in that hour
           o.lim.push(du ? -(du["l" + t] || 0) : null);
           o.bal.push(du ? (du["b" + t] || 0) / P.w[k] : null);
+          o.tie.push(du ? -(du["p" + t] || 0) - (du["c" + k + "_" + h] || 0) : null);   // the tie rule's share, $ for the year
         }
         day.d.push(o);
       });
@@ -13520,7 +13526,7 @@
       o.peak = raw.pk[i]; o.limit = D.L; o.upg = raw.upg[i];
       o.pvAdd = mz.pvAdd * P.pvShare[i]; o.bat = mz.batAdd * P.batShare[i];
       o.hpNew = Math.max(0, o.share.hp - D.s0.hp);
-      M.elec += o.imp * D.pEl; M.gas += o.gas * D.pGas; M.propane += o.propane * P.price.propMWh; M.gasoline += o.gasoline * P.price.gasoline;
+      M.elec += o.imp * D.pEl - o.plant * (D.pEl - P.price.ind); M.gas += o.gas * D.pGas; M.propane += o.propane * P.price.propMWh; M.gasoline += o.gasoline * P.price.gasoline;
       Z.elec += o.imp * efEl; Z.gas += o.gas * P.ef.gas; Z.propane += o.propane * P.galPerMWh * P.ef.propGal; Z.gasoline += o.gasoline * P.ef.gasoline;
       M.hp += o.hpNew * D.homeEq * S.a.hp; U.hp += o.hpNew * D.homeEq * S.capex.hp;
       M.ret += o.retShare * D.homeEq * S.a.ret; U.ret += o.retShare * D.homeEq * S.capex.ret;
@@ -13626,7 +13632,7 @@
     // shared costs on every kWh the districts use; district heat at its average cost (network, plant, store, energy)
     var meterMWh = sum(A.d.map(function (o) { return o.imp + o.pvUsed; }));
     var adder = (A.money.up + A.money.bat) / meterMWh;                       // $ per MWh
-    var dhPrice = A.dhHeat > 0 ? (A.money.net + A.money.plant + A.money.store + A.money.boiler + A.d[0].plant * P.D[0].pEl) / A.dhHeat : 0;
+    var dhPrice = A.dhHeat > 0 ? (A.money.net + A.money.plant + A.money.store + A.money.boiler + A.d[0].plant * P.price.ind) / A.dhHeat : 0;
     var rows = G.map(function (gr, g) {
       var Hg = gr.households, u = gr.use;
       var el = u.electricityKWh / 1000 + D.el[g] / Hg, gas = u.gasMMBtu * P.city.units.mwhPerMMBtu + D.gas[g] / Hg, prop = u.propaneGal / P.galPerMWh + D.prop[g] / Hg,

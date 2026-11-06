@@ -135,12 +135,12 @@
   "set": "teaching"
  },
  "tie": {
-  "peak": 5,
-  "cityPeak": 2,
+  "peak": 20,
+  "cityPeak": 10,
   "wear": 1,
   "storeWear": 0.5,
-  "ev": 0.01,
-  "note": "Stated small costs, far below any real one, that pick one plan when several cost the same: $5 a year per MW of each district's busiest hour, $2 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50 per MWh out of the heat store, and $0.01 per MWh of managed charging times the hour's share of SPP's peak demand (charging prefers quieter hours). They are left out of every reported cost."
+  "ev": 0.1,
+  "note": "Stated small costs, far below any real one, that pick one plan when several cost the same: $20 a year per MW of each district's busiest hour, $10 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50 per MWh out of the heat store, and $0.10 per MWh of managed charging times the hour's share of SPP's peak demand (charging prefers quieter hours). They are left out of every reported cost."
  },
  "c3": {
   "budget": {
