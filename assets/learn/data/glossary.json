@@ -53,6 +53,12 @@
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
  },
+ "area-median-income": {
+  "term": "Area median income (AMI)",
+  "short": "The middle family income of an area, used to sort households into income bands such as 0-30% or 50-80% of it.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "array": {
   "term": "Array",
   "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
@@ -857,6 +863,12 @@
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },
+ "employment-multiplier": {
+  "term": "Employment multiplier",
+  "short": "The total jobs, on site plus at suppliers and from workers' spending, that go with each on-site job, taken from a regional input-output table.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "energization": {
   "term": "Energization",
   "short": "Switching on a customer's grid service, so that power can flow to it.",
@@ -1235,6 +1247,12 @@
   "lesson": "F7",
   "href": "f07-microgrids.html"
  },
+ "gross-jobs": {
+  "term": "Gross jobs",
+  "short": "The jobs a project creates, counted on their own, without subtracting jobs lost or work that would have happened anyway.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "git-head": {
   "term": "HEAD (Git)",
   "short": "Git's name for the commit you are on now; usually it points at a branch label, which points at that commit.",
@@ -1330,6 +1348,12 @@
   "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "income-based-charge": {
+  "term": "Income-based charge",
+  "short": "A utility charge that varies with household income, such as a fixed charge set in a few income tiers.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "independent-events": {
   "term": "Independent events",
@@ -1864,6 +1888,12 @@
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-jobs": {
+  "term": "Net jobs",
+  "short": "Jobs created minus jobs lost and minus work that would have existed anyway, so the change a project really makes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "net-metering": {
   "term": "Net metering",
@@ -2489,6 +2519,12 @@
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
  },
+ "screening-estimate": {
+  "term": "Screening estimate",
+  "short": "A quick estimate from stated assumptions and coefficients a reader can change, used to compare options, not to predict outcomes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "scrubber": {
   "term": "Scrubber",
   "short": "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide.",
@@ -2728,6 +2764,12 @@
   "short": "The rule for calculating electricity bills: fixed charges, prices per kWh, or both.",
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
+ },
+ "tax-base": {
+  "term": "Tax base",
+  "short": "The total value a local government can tax, such as the assessed value of homes, businesses and power plants in a county.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "techno-economic-analysis": {
   "term": "Techno-economic analysis (TEA)",

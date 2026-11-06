@@ -1,0 +1,66 @@
+{
+  "about": "Lesson A13 (a13-fairness-jobs), 2026-11-06, builder learn-w5-b. Part 1 splits the yearly cost of a Prairie City plan across its five household groups (prairie-city.json, read and never retyped) by kWh, by a fixed charge and in proportion to income, and reads energy burden before and after; the cost is a learner input. Part 2 counts jobs and Ridge County's tax base when its coal plant retires and wind and solar are built there; every coefficient (jobs per $M, jobs per 100 MW, the multiplier, displacement, the tax rate, the taxable share) is a learner input set for teaching, with the sources real coefficients come from. Every output is a screening estimate. The accounting is the pure model assets/learn/a13-who-pays-and-benefits.js (LX.A13), which SB3 and C3 can load.",
+  "built": "2026-11-06",
+  "plan": {
+    "costM": { "min": 0, "max": 60, "step": 2, "start": 24 },
+    "what": "the yearly cost of a Prairie City plan that its households pay through their electricity bills (illustrative; an annual amount in 2025 dollars, such as the yearly charge that recovers new wires and programmes)",
+    "set": "teaching"
+  },
+  "designs": [
+    { "key": "kwh", "name": "Per kWh", "long": "a charge on every kWh", "note": "households pay in proportion to the electricity they use" },
+    { "key": "fixed", "name": "Fixed charge", "long": "the same yearly charge for every household", "note": "every household pays the same dollars" },
+    { "key": "income", "name": "By income", "long": "a charge in proportion to household income", "note": "every household pays the same share of its income; real income-based designs use a few income tiers" }
+  ],
+  "bands": {
+    "five": { "name": "Five groups", "groups": [["g1"], ["g2"], ["g3"], ["g4"], ["g5"]] },
+    "two": { "name": "Two groups", "groups": [["g1", "g2", "g3"], ["g4", "g5"]], "labels": ["0-80% of area median income", "80% of area median income or more"] }
+  },
+  "lines": { "high": 0.06, "severe": 0.10 },
+  "ridgeCounty": {
+    "note": "Ridge County is Prairieland's coal-dependent county (curriculum v2 §6, scale S4). A13 sets its numbers here and wave W6 (SB4, C4) reuses them: change them together with W6. Anchors from the national-strategy dossier §8.0: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
+    "fiction": "Ridge County and Prairieland are fictional; their numbers are illustrative.",
+    "prairielandPeople": 20000000,
+    "prairielandWorkforce": 10000000,
+    "workforceShare": 0.03,
+    "coalTaxShare": 0.40,
+    "otherRevenueM": 840,
+    "mineCoalTaxM": 300,
+    "plant": { "name": "Ridge Station", "mw": 2400, "staff": 450, "mineJobs": 700, "valueM": 3000 },
+    "set": "teaching: the workforce, the county's tax revenue other than the plant's ($840M a year, of which $300M is paid by the coal mines), the plant's size, staff, taxable value and the mine jobs that supply it"
+  },
+  "jobs": {
+    "multiplier": { "min": 1.0, "max": 2.5, "step": 0.1, "start": 1.6 },
+    "newMW": { "min": 0, "max": 4000, "step": 100, "start": 2000 },
+    "capexPerKW": { "min": 1000, "max": 2500, "step": 100, "start": 1500 },
+    "jobYearsPerM": { "min": 1, "max": 10, "step": 0.5, "start": 5 },
+    "localShare": 0.30,
+    "buildYears": 2,
+    "omPer100MW": { "min": 0, "max": 20, "step": 1, "start": 6 },
+    "displacement": { "min": 0, "max": 50, "step": 5, "start": 20 },
+    "horizonYears": 20,
+    "set": "teaching: every coefficient is a learner input with an illustrative default, not a prediction; the local share of construction spending (30%), the two building years and the 20-year horizon are fixed for the lesson"
+  },
+  "tax": {
+    "rate": { "min": 0.5, "max": 3.0, "step": 0.1, "start": 2.0 },
+    "taxableShare": { "min": 0, "max": 100, "step": 10, "start": 50 },
+    "set": "teaching: one effective property tax rate for the plant and the new farms; the new farms' taxable value as a share of their cost (abatements and depreciation lower it)"
+  },
+  "sources": {
+    "jediResults": { "title": "Interpreting JEDI Results", "publisher": "National Laboratory of the Rockies (formerly NREL), Jobs and Economic Development Impact models", "date": "last updated 28 Jan 2026; read 6 Nov 2026", "url": "https://www.nlr.gov/analysis/jedi/results",
+      "where": "construction-period jobs are full-time equivalents of 2,080 hours, one job for one year; operations jobs are annual and last the project's life; results are an estimate of potential activity, not a precise forecast" },
+    "jediLimits": { "title": "Limitations of JEDI Models", "publisher": "National Laboratory of the Rockies (formerly NREL)", "date": "last updated 28 May 2026; read 6 Nov 2026", "url": "https://www.nlr.gov/analysis/jedi/limitations",
+      "where": "input-output based screening tools; the model reports only the gross impacts of the project; net effects include the displacement of other economic activity" },
+    "rims": { "title": "RIMS II: Regional Input-Output Modeling System", "publisher": "U.S. Bureau of Economic Analysis", "date": "new multipliers released 5 May 2026 (2024 regional data); read 6 Nov 2026", "url": "https://apps.bea.gov/regional/rims/rimsii/",
+      "where": "regional multipliers for output, value added, earnings and employment, sold per region" },
+    "qcew": { "title": "Quarterly Census of Employment and Wages", "publisher": "U.S. Bureau of Labor Statistics", "date": "release of 28 Aug 2026 (first quarter 2026); read 6 Nov 2026", "url": "https://www.bls.gov/cew/",
+      "where": "employment and wages reported by employers, more than 95 percent of U.S. jobs, by county and industry" },
+    "useer": { "title": "2026 U.S. Energy and Employment Report (USEER)", "publisher": "U.S. Department of Energy", "date": "2026; read 6 Nov 2026", "url": "https://www.energy.gov/policy/2026-us-energy-employment-report-useer",
+      "where": "energy employment by sector and technology at national, state and county levels" },
+    "lead": { "title": "Low-Income Energy Affordability Data (LEAD) Tool", "publisher": "U.S. Department of Energy", "date": "ACS 2018-2022 data; read 6 Nov 2026", "url": "https://www.energy.gov/cmei/scep/low-income-energy-affordability-data-lead-tool",
+      "where": "energy burden = home energy spending / income, by income band (shares of area median income); 6% or more is called high" },
+    "aceee": { "title": "How High Are Household Energy Burdens?", "publisher": "American Council for an Energy-Efficient Economy (ACEEE)", "date": "Sep 2020 (copy on energy.gov)", "url": "https://www.energy.gov/sites/default/files/2023-05/Attachment%20J%20-%20ACEEE%2C%20How%20High%20are%20Household%20Energy%20Burdens.pdf",
+      "where": "above 6% is called high and above 10% severe" },
+    "cpuc": { "title": "Decision 24-05-028 (income-graduated fixed charge)", "publisher": "California Public Utilities Commission", "date": "May 2024", "url": null,
+      "where": "a fixed charge in three income tiers for the large California utilities; cited by name and date only" }
+  }
+}

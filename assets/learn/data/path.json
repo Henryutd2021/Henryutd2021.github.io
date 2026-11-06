@@ -1288,9 +1288,13 @@
    "tier": "analyst",
    "code": "A13",
    "title": "Who pays and who benefits? Energy burden, fairness and jobs",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a13-fairness-jobs.html",
+   "scales": [],
+   "id": "a13-fairness-jobs",
+   "minutes": 30,
+   "form": "cards",
+   "short": "Who pays, who benefits"
   },
   {
    "tier": "analyst",
