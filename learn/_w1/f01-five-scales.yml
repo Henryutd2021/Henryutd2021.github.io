@@ -22,7 +22,7 @@ glossary:
     def: "The set of prices a utility charges its customers for electricity, such as a price per kWh, a fixed monthly charge or a different price at different hours."
   - id: synchronous-grid
     term: Synchronous grid
-    def: "A grid whose generators all turn in step at one shared frequency; the Lower 48 states have three main ones, called interconnections."
+    def: "A grid that runs at one shared frequency, so every spinning generator in it turns in step; the Lower 48 states have three main ones, called interconnections."
   - id: building-code
     term: Building code
     def: "The rules a city, county or state sets for how new buildings must be built, such as insulation, wiring and safety."

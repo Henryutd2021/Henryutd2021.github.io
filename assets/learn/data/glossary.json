@@ -2665,7 +2665,7 @@
  },
  "synchronous-grid": {
   "term": "Synchronous grid",
-  "short": "A grid whose generators all turn in step at one shared frequency; the Lower 48 states have three main ones, called interconnections.",
+  "short": "A grid that runs at one shared frequency, so every spinning generator in it turns in step; the Lower 48 states have three main ones, called interconnections.",
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
