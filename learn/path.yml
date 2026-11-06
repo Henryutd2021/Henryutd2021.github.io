@@ -779,7 +779,24 @@
   outcome: "Name which of four emissions questions a number answers, compute each for a load with its stated method and assumptions, and say why a claim is not a measure of emissions caused."
   after: [12, 8]
   next: A12
-- {kind: lesson, tier: analyst, code: A11, title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"}
+# A11, builder learn-w5-c (wave W5)
+- kind: lesson
+  id: a11-lca-nexus
+  code: A11
+  tier: analyst
+  form: cards
+  icon: drop
+  status: active
+  minutes: 25
+  practice_minutes: 30   # the Check section and the Go deeper boxes
+  title: "What does 'clean' mean from cradle to grave? Life cycles, water and land"
+  subtitle: "Drag a boundary around a solar farm, a gas plant and a data center, and watch carbon, water and land change with what you count"
+  short: "Life cycles, water and land"
+  teaches: [life-cycle stages, system boundaries, functional units, water withdrawal against consumption, land-use intensity, attributional against consequential answers, water and power in a drought]
+  does: "Drag a life-cycle boundary around a solar farm, a gas plant and a data center and read carbon, water and land by stage from published medians and ranges; compare on one boundary; pick a cooling system; count the land between; compare an attributional and a consequential answer; switch on a drought."
+  outcome: "Name the boundary and functional unit behind a footprint, compare options on one boundary, tell water withdrawn from water consumed, and say whether a number is an attributional share or a consequential change."
+  after: []   # curriculum prerequisite F11 is not live yet (integration to-do)
+  next: A12
 - kind: lesson
   id: a12-policy-instruments
   code: A12

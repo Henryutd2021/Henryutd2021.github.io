@@ -1,0 +1,25 @@
+# Sidecar for A11 (a11-lca-nexus), builder learn-w5-c, 2026-11-06. Read by scripts/build_learn.py.
+id: a11-lca-nexus
+lesson: A11
+glossary:
+  - id: functional-unit
+    term: Functional unit
+    def: "The amount of service a footprint is counted per, such as one kWh made or one MWh used, so that options are compared on the same service."
+  - id: water-withdrawal
+    term: Water withdrawal
+    def: "Water taken from a river, lake or aquifer; a power plant returns most of what it withdraws, warmer."
+  - id: water-consumption
+    term: Water consumption
+    def: "Water taken and not returned, mostly lost to evaporation, so it is no longer available downstream."
+  - id: land-use-intensity
+    term: Land-use intensity
+    def: "The land a plant holds for each unit of energy it makes in a year, here square metres per MWh a year."
+  - id: attributional-analysis
+    term: Attributional analysis
+    def: "An analysis that gives a product its share of today's burdens from average data, so the shares of all products add up."
+  - id: interquartile-range
+    term: Interquartile range
+    def: "The middle half of a set of values, from the 25th to the 75th percentile."
+requests:
+  - "A11 keeps its life-cycle boundary box (LifeBox: a chain of stages with a draggable boundary, keyboard handles and tappable stages; i-boundary) lesson-local in a11-lca-nexus.js. Promote it when a second page needs it (R3 or A19 could)."
+  - "A11's prerequisite F11 is not live yet: add F11 to A11's after list when it goes live (curriculum row: prereqs F11)."

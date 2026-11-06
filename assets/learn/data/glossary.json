@@ -71,6 +71,12 @@
   "lesson": "CF6",
   "href": "cf6-shifting-load-to-clean-hours.html"
  },
+ "attributional-analysis": {
+  "term": "Attributional analysis",
+  "short": "An analysis that gives a product its share of today's burdens from average data, so the shares of all products add up.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "agc": {
   "term": "Automatic generation control (AGC)",
   "short": "The grid operator's computer system that raises or lowers plants over minutes to bring frequency back to 60 Hz.",
@@ -1133,6 +1139,12 @@
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
  },
+ "functional-unit": {
+  "term": "Functional unit",
+  "short": "The amount of service a footprint is counted per, such as one kWh made or one MWh used, so that options are compared on the same service.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "fuse": {
   "term": "Fuse",
   "short": "A wire that melts on a fault and cuts the power beyond it; a crew must replace it.",
@@ -1367,6 +1379,12 @@
   "lesson": "A1",
   "href": "a01-project-tea.html"
  },
+ "interquartile-range": {
+  "term": "Interquartile range",
+  "short": "The middle half of a set of values, from the 25th to the 75th percentile.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
  "inverter": {
   "term": "Inverter",
   "short": "Power electronics that convert the direct current of solar panels and batteries, or a wind turbine's varying output, into the grid's alternating current.",
@@ -1408,6 +1426,12 @@
   "short": "The unit of energy on a household electricity bill: one kilowatt kept up for one hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "land-use-intensity": {
+  "term": "Land-use intensity",
+  "short": "The land a plant holds for each unit of energy it makes in a year, here square metres per MWh a year.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
  },
  "large-load": {
   "term": "Large load",
@@ -2962,6 +2986,18 @@
   "short": "Heat a power plant cannot turn into electricity and releases to the air or to cooling water.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "water-consumption": {
+  "term": "Water consumption",
+  "short": "Water taken and not returned, mostly lost to evaporation, so it is no longer available downstream.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
+ },
+ "water-withdrawal": {
+  "term": "Water withdrawal",
+  "short": "Water taken from a river, lake or aquifer; a power plant returns most of what it withdraws, warmer.",
+  "lesson": "A11",
+  "href": "a11-lca-nexus.html"
  },
  "watt-hour": {
   "term": "Watt-hour (Wh)",

@@ -1264,9 +1264,13 @@
    "tier": "analyst",
    "code": "A11",
    "title": "What does 'clean' mean from cradle to grave? Life cycles, water and land",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a11-lca-nexus.html",
+   "scales": [],
+   "id": "a11-lca-nexus",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Life cycles, water and land"
   },
   {
    "tier": "analyst",

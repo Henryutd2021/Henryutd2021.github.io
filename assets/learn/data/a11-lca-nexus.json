@@ -1,0 +1,149 @@
+{
+  "about": "Data of Learn lesson A11 (a11-lca-nexus), What does 'clean' mean from cradle to grave? Life cycles, water and land (wave W5, builder learn-w5-c, 2026-11-06). Every footprint here is a published median or range from a primary source, by life-cycle stage, with its source and the date it was read; the lesson's script turns them into the page's numbers (litres to gallons, acres to square metres) and its test recomputes every one. A data center appears only as a load: the electricity and water it uses. The gas plant's stack check reads lesson A10's EIA heat rate and CO2 coefficient (a10-emissions-questions.json); the campus is lesson F8's (f08-large-loads.json, 240 MW in every hour). Values marked about are NREL's own approximate (tilde) entries.",
+  "stages": [
+    { "id": "build", "label": "Build", "sub": "materials, making, construction" },
+    { "id": "supply", "label": "Supply", "sub": "fuel or power brought in, upkeep" },
+    { "id": "run", "label": "On site", "sub": "running: burning, cooling, the site" },
+    { "id": "end", "label": "End of life", "sub": "taking down, recycling" }
+  ],
+  "meters": [
+    { "id": "carbon", "label": "Carbon", "unit": "g CO₂e per kWh", "short": "g/kWh" },
+    { "id": "water", "label": "Water consumed", "unit": "gallons per MWh", "short": "gal/MWh" },
+    { "id": "land", "label": "Land", "unit": "m² per MWh a year", "short": "m²" }
+  ],
+  "objects": {
+    "solar": {
+      "name": "Solar farm",
+      "kind": "Utility-scale solar panels",
+      "per": "per MWh it makes",
+      "stageNames": { "build": "Panels made, farm built", "supply": "Upkeep", "run": "Panels at work", "end": "Taken down" },
+      "carbon": {
+        "build": { "v": 28, "about": true, "src": "nrel" },
+        "supply": { "v": 10, "about": true, "src": "nrel", "note": "NREL's ongoing non-combustion phase: operation and maintenance" },
+        "run": { "v": 0, "src": "nrel", "note": "nothing burns" },
+        "end": { "v": 5, "about": true, "src": "nrel" }
+      },
+      "water": {
+        "build": { "v": 81, "lo": 10, "hi": 210, "src": "meldrum", "note": "crystalline silicon: making, building, transport and taking down" },
+        "supply": { "none": "no fuel" },
+        "run": { "v": 1, "lo": 0, "hi": 5, "src": "macknick", "note": "cleaning panels" },
+        "end": { "with": "build" }
+      },
+      "land": {
+        "build": { "nc": "mines and factories: not counted here" },
+        "supply": { "none": "no fuel" },
+        "run": { "fromDensity": "pvTracking", "src": "lbnlLand", "note": "the arrays and nearby equipment, single-axis tracking plants of 2019 (median)" },
+        "end": { "nc": "not counted" }
+      }
+    },
+    "gas": {
+      "name": "Gas plant",
+      "kind": "Natural gas combined-cycle plant",
+      "per": "per MWh it makes",
+      "stageNames": { "build": "Plant built", "supply": "Gas produced and piped", "run": "Gas burned, plant cooled", "end": "Taken down" },
+      "carbon": {
+        "build": { "v": 0.8, "src": "nrel" },
+        "supply": { "v": 71, "src": "nrel", "note": "NREL's ongoing non-combustion phase: for gas, the fuel cycle (producing, processing and delivering the gas, methane leaks among them) and upkeep" },
+        "run": { "v": 389, "src": "nrel", "note": "NREL's ongoing combustion phase: the stack" },
+        "end": { "v": 0.02, "src": "nrel" }
+      },
+      "water": {
+        "build": { "v": 1, "lo": 0.5, "hi": 1, "loText": "under 1", "src": "meldrum", "note": "building and taking down the plant" },
+        "supply": { "v": 16, "lo": 3, "hi": 210, "src": "meldrum", "note": "shale gas; conventional gas: 4 (1 to 26)" },
+        "run": { "cooling": true, "src": "macknick" },
+        "end": { "with": "build" }
+      },
+      "land": {
+        "build": { "nc": "not counted" },
+        "supply": { "share": "indirect", "src": "lovering", "note": "well pads, access roads and pipelines" },
+        "run": { "share": "direct", "src": "lovering", "note": "the plant's own site" },
+        "end": { "nc": "not counted" }
+      }
+    },
+    "dc": {
+      "name": "Data center",
+      "kind": "A data center, as a load",
+      "per": "per MWh it uses",
+      "stageNames": { "build": "Servers and building made", "supply": "Its electricity, made elsewhere", "run": "On site: cooling", "end": "Taken down" },
+      "carbon": {
+        "build": { "nc": "servers and buildings: not in LBNL's report" },
+        "supply": { "dc": "ghg", "src": "lbnlDC", "note": "at the power plants that supply U.S. data centers, 2023 (combustion, from EPA plant data; not their life cycles)" },
+        "run": { "nc": "on-site generators: not counted" },
+        "end": { "nc": "not counted" }
+      },
+      "water": {
+        "build": { "nc": "not counted" },
+        "supply": { "dc": "indirect", "src": "lbnlDC", "note": "consumed at the power plants and hydropower reservoirs that make its electricity, U.S. data centers, 2023" },
+        "run": { "dc": "direct", "src": "lbnlDC", "note": "evaporated in its own cooling, U.S. data centers, 2023: 66 billion litres over 176 TWh" },
+        "end": { "nc": "not counted" }
+      },
+      "land": {
+        "build": { "nc": "not counted" },
+        "supply": { "nc": "depends on which plants supply it: not counted" },
+        "run": { "nc": "site area: no national figure, not counted" },
+        "end": { "nc": "not counted" }
+      }
+    }
+  },
+  "nrelTotals": { "solar": 43, "gas": 486, "wind": 13, "windOngoing": 0.74 },
+  "harmonized": {
+    "solar": { "median": 45, "lo": 39, "hi": 49, "what": "crystalline silicon panels, harmonized (Hsu et al., 2012, abstract)", "src": "hsu" },
+    "gas": { "median": 450, "lo": 420, "hi": 480, "what": "combined-cycle plants, harmonized (O'Donoughue et al., 2014, abstract)", "src": "odonoughue" }
+  },
+  "cooling": [
+    { "id": "tower", "label": "Cooling tower", "use": 205, "useLo": 130, "useHi": 300, "wd": 255, "wdLo": 150, "wdHi": 283, "how": "water is reused; some evaporates" },
+    { "id": "once", "label": "Once-through", "use": 100, "useLo": 20, "useHi": 100, "wd": 11380, "wdLo": 7500, "wdHi": 20000, "how": "river or lake water passes once and goes back warmer" },
+    { "id": "pond", "label": "Cooling pond", "use": 240, "useLo": 240, "useHi": 240, "wd": 5950, "wdLo": 5950, "wdHi": 5950, "how": "a pond holds the water; one estimate only" },
+    { "id": "dry", "label": "Dry (air)", "use": 2, "useLo": 0, "useHi": 4, "wd": 2, "wdLo": 0, "wdHi": 4, "how": "air cools the steam; the plant loses some efficiency" }
+  ],
+  "land": {
+    "acreM2": 4046.8564224,
+    "pvTracking": 394,
+    "pvFixed": 447,
+    "copperArrayAcres": 945,
+    "copperSiteAcres": 1375,
+    "gasFootprint": 410,
+    "gasSpacing": 1900,
+    "gasIndirectMin": 0.9
+  },
+  "dcData": {
+    "twh2023": 176,
+    "share2023": 4.4,
+    "directL2023": 66,
+    "directL2014": 21.2,
+    "indirectL2023": 800,
+    "indirectLperKWh": 4.52,
+    "ghgKgPerKWh": 0.34,
+    "usLperKWh": 4.35,
+    "usKgPerKWh": 0.35
+  },
+  "litresPerGallon": 3.785411784,
+  "usgs": { "year": 2020, "freshWithdrawal": 59889, "consumptive": 2359 },
+  "eiaWater": { "ngccWithdrawal2021": 2803, "dryLess": 95, "dryNgccShare": 15 },
+  "drought": {
+    "ca2021Below": 48,
+    "pnw2021Below": 14,
+    "summer": { "median": { "hydro": 15, "gas": 45 }, "drought": { "hydro": 8, "gas": 50 } }
+  },
+  "consequential": [
+    { "id": "gas", "label": "Gas plants run less", "note": "Each MWh of solar replaces a MWh from gas plants that already exist: their gas supply and burning stop for it; their construction is already done." },
+    { "id": "spill", "label": "Nothing: its output is spilled", "note": "The grid had more clean power than it could use at those hours, so the new farm's MWh replace nothing." },
+    { "id": "wind", "label": "Wind farms run less", "note": "Each MWh of solar replaces a MWh from wind farms that already exist: only their upkeep changes." }
+  ],
+  "sources": {
+    "nrel": { "label": "NREL, Life Cycle Greenhouse Gas Emissions from Electricity Generation: Update (NREL/FS-6A50-80580), Table 1", "url": "https://docs.nlr.gov/docs/fy21osti/80580.pdf", "asOf": "September 2021; read 6 November 2026" },
+    "hsu": { "label": "Hsu et al. (2012), Journal of Industrial Ecology 16(S1), abstract", "url": "https://doi.org/10.1111/j.1530-9290.2011.00439.x", "asOf": "2012; read 6 November 2026" },
+    "odonoughue": { "label": "O'Donoughue et al. (2014), Journal of Industrial Ecology 18(1), 125–144, abstract", "url": "https://doi.org/10.1111/jiec.12084", "asOf": "2014; read 6 November 2026" },
+    "ipcc": { "label": "IPCC (2022), Climate Change 2022: Mitigation of Climate Change, Working Group III, Annex III: Scenarios and modelling methods, Part I, Section 1", "url": "https://doi.org/10.1017/9781009157926.022", "asOf": "2022; read 6 November 2026" },
+    "meldrum": { "label": "Meldrum et al. (2013), Environmental Research Letters 8, 015031, Tables 5, 6 and 11", "url": "https://doi.org/10.1088/1748-9326/8/1/015031", "asOf": "2013; read 6 November 2026" },
+    "macknick": { "label": "Macknick et al. (2012), Environmental Research Letters 7, 045802, Tables 1 to 3", "url": "https://doi.org/10.1088/1748-9326/7/4/045802", "asOf": "2012; read 6 November 2026" },
+    "lbnlLand": { "label": "Bolinger and Bolinger (2022), IEEE Journal of Photovoltaics; Berkeley Lab summary slides of 1 February 2022, slides 7 and 13", "url": "https://emp.lbl.gov/publications/land-requirements-utility-scale-pv", "asOf": "plants built through 2019; read 6 November 2026" },
+    "lovering": { "label": "Lovering et al. (2022), PLOS ONE 17(7), e0270155", "url": "https://doi.org/10.1371/journal.pone.0270155", "asOf": "2022; read 6 November 2026" },
+    "lbnlDC": { "label": "Shehabi et al. (2024), 2024 United States Data Center Energy Usage Report, Berkeley Lab (LBNL-2001637), pages 5, 55 and 57", "url": "https://doi.org/10.71468/P1WC7Q", "asOf": "December 2024, data for 2023; read 6 November 2026" },
+    "usgs": { "label": "USGS, Thermoelectric Power Water Use (2020 estimates, Galanter et al., 2023)", "url": "https://www.usgs.gov/mission-areas/water-resources/science/thermoelectric-power-water-use", "asOf": "data for 2020; page read 6 November 2026" },
+    "eiaWater": { "label": "EIA, Today in Energy: U.S. electric power sector continues water efficiency gains", "url": "https://www.eia.gov/todayinenergy/detail.php?id=56820", "asOf": "14 June 2023, data for 2021" },
+    "eiaDry": { "label": "EIA, Today in Energy: Some U.S. electricity generating plants use dry cooling", "url": "https://www.eia.gov/todayinenergy/detail.php?id=36773", "asOf": "29 August 2018" },
+    "eiaHydro": { "label": "EIA, Today in Energy: Drought effects on hydroelectricity generation in western U.S. differed by region in 2021", "url": "https://www.eia.gov/todayinenergy/detail.php?id=51839", "asOf": "30 March 2022" },
+    "eiaSteo": { "label": "EIA, Short-Term Energy Outlook Supplement: Drought Effects on California Electricity Generation and Western Power Markets, Summary", "url": "https://www.eia.gov/outlooks/steo/special/supplements/2022/2022_sp_02.pdf", "asOf": "May 2022" }
+  }
+}
