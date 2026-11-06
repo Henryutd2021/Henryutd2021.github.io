@@ -728,64 +728,207 @@
       seen.observe(mapEl);
     }
     drawPages();
-    // ---------- the chapter pages: a small map of each chapter's footprints and routes ----------
-    function drawPages() {
-      const holders = root.querySelectorAll(".jr-pg-map[data-ch]");
-      if (!holders.length) return;
-      const go = function () { holders.forEach(drawPage); };
-      loadUS().then(go, go);
+    // ---------- the chapter pages: an atlas pair for each chapter, computed from the data ----------
+    // The chapter's footprints (its places and the waypoints of its road routes) are grouped into clusters (single
+    // linkage, 400 km). The main map frames the largest cluster in a conic equal-area projection fitted to it, with the
+    // road routes and dots in full detail; a second cluster with at least 3 footprints gets a panel of its own beside it;
+    // a world locator in the corner shows all of the chapter's routes (the long flights too) and the frames of the panels.
+    // Clicking a map (or Enter) opens the same maps larger in a dialog.
+    const RAD = Math.PI / 180;
+    function km(a, b) {
+      const p1 = a[1] * RAD, p2 = b[1] * RAD, dp = p2 - p1, dl = (b[0] - a[0]) * RAD;
+      const h = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+      return 2 * 6371 * Math.asin(Math.sqrt(h));
     }
-    function drawPage(h) {
-      const id = h.getAttribute("data-ch");
+    function chapterAtlas(id) {
       const ents = D.entries.filter(function (e) { return e.ch === id; });
-      const pts = [];
+      const pts = [], seenPl = {};
       ents.forEach(function (e) {
-        e.pl.forEach(function (pid) { pts.push(D.places[pid].ll); });
-        (e.r || []).forEach(function (r) { r.p.forEach(function (p) { pts.push(p); }); });
+        e.pl.forEach(function (pid) { if (!seenPl[pid]) { seenPl[pid] = 1; pts.push({ ll: D.places[pid].ll, pid: pid }); } });
+        (e.r || []).forEach(function (r) { if (r.m === "ground") r.p.forEach(function (ll) { pts.push({ ll: ll }); }); });
       });
-      if (!pts.length) return;
-      const W = 480, H = 270;
-      const lons = pts.map(function (p) { return p[0]; }), lats = pts.map(function (p) { return p[1]; });
-      const cx = (Math.min.apply(null, lons) + Math.max.apply(null, lons)) / 2, cy = (Math.min.apply(null, lats) + Math.max.apply(null, lats)) / 2;
-      const frame = pts.concat([[cx - 6, cy - 3.5], [cx + 6, cy + 3.5]]);   // at least a few degrees across
-      const pj = worldMaker().rotate([-cx, 0]).fitExtent([[14, 14], [W - 14, H - 14]], { type: "MultiPoint", coordinates: frame });
-      const path = d3.geoPath(pj);
-      const msvg = el("svg", { viewBox: "0 0 " + W + " " + H, class: "jr-mini", focusable: "false" });
-      const base = el("g", {}, msvg);
-      const fillOf = function (code) { const r = code && D.regions[code]; return r && r[1] === id ? r : null; };
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) if (km(pts[i].ll, pts[j].ll) < 400) parent[find(i)] = find(j);
+      const groups = {};
+      pts.forEach(function (p, i) { (groups[find(i)] = groups[find(i)] || []).push(p); });
+      const clusters = Object.keys(groups).map(function (k) {
+        const g = groups[k];
+        return { pts: g, places: g.filter(function (p) { return p.pid; }).length, n: g.length };
+      }).sort(function (a, b) { return b.places - a.places || b.n - a.n; });
+      return { ents: ents, all: pts, main: clusters[0] || null, second: clusters.slice(1).find(function (c) { return c.n >= 3; }) || null };
+    }
+    function boxOf(cl) {
+      const lons = cl.pts.map(function (p) { return p.ll[0]; }), lats = cl.pts.map(function (p) { return p.ll[1]; });
+      let x0 = Math.min.apply(null, lons), x1 = Math.max.apply(null, lons), y0 = Math.min.apply(null, lats), y1 = Math.max.apply(null, lats);
+      const padX = Math.max(1.2, (x1 - x0) * 0.12), padY = Math.max(0.9, (y1 - y0) * 0.12);
+      x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
+      return [x0, y0, x1, y1];
+    }
+    function localProjection(box, W, H) {
+      const cx = (box[0] + box[2]) / 2, y0 = box[1], y1 = box[3];
+      const p0 = y0 + (y1 - y0) / 6, p1 = y1 - (y1 - y0) / 6;
+      return d3.geoConicEqualArea().parallels(Math.abs(p1 - p0) < 1 ? [((y0 + y1) / 2) - 1, ((y0 + y1) / 2) + 1] : [p0, p1]).rotate([-cx, 0])
+        .fitExtent([[6, 6], [W - 6, H - 6]], { type: "MultiPoint", coordinates: [[box[0], y0], [box[2], y0], [box[0], y1], [box[2], y1], [cx, y0], [cx, y1]] });
+    }
+    function inBox(ll, box) { return ll[0] >= box[0] - 0.01 && ll[0] <= box[2] + 0.01 && ll[1] >= box[1] - 0.01 && ll[1] <= box[3] + 0.01; }
+    function drawBaseInto(g, path, id) {
       const reg = function (f, code, cls) {
-        const d = path(f); if (!d) return;
-        const r = fillOf(code);
-        const n = el("path", { d: d, class: "jr-reg" + (cls ? " " + cls : "") + (r ? " is-visited" + (r[2] ? " is-inferred" : "") : "") }, base);
-        if (r) n.style.setProperty("--ch", "var(--ch-" + id + ")");
+        const dd = path(f); if (!dd) return;
+        const r = code && D.regions[code];
+        const mine = r && r[1] === id;
+        const n = el("path", { d: dd, class: "jr-reg" + (cls ? " " + cls : "") + (mine ? " is-visited" + (r[2] ? " is-inferred" : "") : "") }, g);
+        if (mine) n.style.setProperty("--ch", "var(--ch-" + id + ")");
       };
       geo.countries.forEach(function (f) { reg(f, f.id, ""); });
       geo.china.forEach(function (f) { reg(f, f.properties.code, "jr-prov"); });
       (geo.states || []).forEach(function (f) { reg(f, usNames[f.properties.name] || "", "jr-state"); });
-      const gr = el("g", {}, msvg);
-      const mproj = function (ll) { return pj(ll); };
-      ents.forEach(function (e) {
+    }
+    // one local panel (main or secondary): base, road routes in detail, short flights inside the frame, dots
+    function localPanel(id, A, cl, W, H, big) {
+      const box = boxOf(cl);
+      const pj = localProjection(box, W, H);
+      const path = d3.geoPath(pj);
+      const svgEl = el("svg", { viewBox: "0 0 " + W + " " + H, class: "jr-mini", focusable: "false", "aria-hidden": "true" });
+      el("rect", { x: 0, y: 0, width: W, height: H, class: "jr-mini-sea" }, svgEl);
+      drawBaseInto(el("g", {}, svgEl), path, id);
+      const gr = el("g", {}, svgEl);
+      A.ents.forEach(function (e) {
         (e.r || []).forEach(function (r) {
-          let d = "";
           if (r.m === "ground") {
-            const q = r.p.map(mproj).filter(Boolean);
-            if (q.length > 1) { d = "M" + q.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join("L"); }
+            const q = r.p.map(function (ll) { return pj(ll); });
+            if (q.some(function (x) { return !x; }) || !r.p.some(function (ll) { return inBox(ll, box); })) return;
+            if (r.lg) {   // the 2013 loop: leg by leg in its colours
+              let from = 0;
+              r.lg.forEach(function (leg) { el("path", { d: smooth(q, from, leg[0]), class: "jr-mini-route jr-m-ground", style: "stroke: " + leg[1] }, gr); from = leg[0]; });
+            } else {
+              el("path", { d: smooth(q), class: "jr-mini-route jr-m-ground", style: "stroke: var(--ch-" + id + ")" }, gr);
+            }
           } else {
-            d = path({ type: "LineString", coordinates: r.p }) || "";
+            for (let i = 0; i < r.p.length - 1; i++) {   // flights only when both ends are inside the frame (the long ones are in the locator)
+              const a = r.p[i], b = r.p[i + 1];
+              if (!inBox(a, box) || !inBox(b, box)) continue;
+              const P = pj(a), Q = pj(b); if (!P || !Q) continue;
+              const dx = Q[0] - P[0], dy = Q[1] - P[1], len = Math.hypot(dx, dy) || 1;
+              let nx = -dy / len, ny = dx / len; if (ny > 0) { nx = -nx; ny = -ny; }
+              const k = Math.min(0.2 * len, 60), C = [(P[0] + Q[0]) / 2 + nx * k, (P[1] + Q[1]) / 2 + ny * k];
+              el("path", { d: "M" + P[0].toFixed(1) + "," + P[1].toFixed(1) + "Q" + C[0].toFixed(1) + "," + C[1].toFixed(1) + " " + Q[0].toFixed(1) + "," + Q[1].toFixed(1),
+                class: "jr-mini-route jr-m-" + r.m, style: "stroke: var(--ch-" + id + ")" }, gr);
+            }
           }
-          if (d) el("path", { d: d, class: "jr-mini-route jr-m-" + r.m, style: "stroke: " + (r.lg ? "var(--ch-" + id + ")" : "var(--ch-" + id + ")") }, gr);
         });
       });
       const seen = {};
-      ents.forEach(function (e) {
+      A.ents.forEach(function (e) {
         e.pl.forEach(function (pid) {
           if (seen[pid]) return; seen[pid] = 1;
-          const q = pj(D.places[pid].ll); if (!q) return;
-          el("circle", { cx: q[0].toFixed(1), cy: q[1].toFixed(1), r: D.places[pid].h ? 4.2 : 3, class: "jr-mini-dot" + (D.places[pid].h ? " is-home" : ""), style: "--ch: var(--ch-" + id + ")" }, gr);
+          const ll = D.places[pid].ll; if (!inBox(ll, box)) return;
+          const q = pj(ll); if (!q) return;
+          el("circle", { cx: q[0].toFixed(1), cy: q[1].toFixed(1), r: (D.places[pid].h ? 4.4 : 3.2) * (big ? 1.4 : 1), class: "jr-mini-dot" + (D.places[pid].h ? " is-home" : ""),
+            style: "--ch: var(--ch-" + (D.places[pid].lc || id) + ")" }, gr);
         });
       });
-      h.appendChild(msvg);
-      h.classList.add("is-drawn");
+      return { svg: svgEl, box: box };
+    }
+    // the world locator: every route of the chapter, and the frames of the panels
+    function locator(id, A, boxes, W, H) {
+      const lons = A.all.map(function (p) { return p.ll[0]; });
+      A.ents.forEach(function (e) { (e.r || []).forEach(function (r) { r.p.forEach(function (ll) { lons.push(ll[0]); }); }); });
+      const cx = (Math.min.apply(null, lons) + Math.max.apply(null, lons)) / 2;
+      const pj = worldMaker().rotate([-(Math.abs(cx) > 120 ? 10 : cx), 0]).fitExtent([[2, 2], [W - 2, H - 2]], { type: "Sphere" });
+      const path = d3.geoPath(pj);
+      const svgEl = el("svg", { viewBox: "0 0 " + W + " " + H, class: "jr-loc", focusable: "false", "aria-hidden": "true" });
+      el("rect", { x: 0, y: 0, width: W, height: H, class: "jr-mini-sea" }, svgEl);
+      const g = el("g", {}, svgEl);
+      geo.countries.forEach(function (f) { const dd = path(f); if (dd) el("path", { d: dd, class: "jr-loc-land" }, g); });
+      geo.china.forEach(function (f) { const dd = path(f); if (dd) el("path", { d: dd, class: "jr-loc-land" }, g); });
+      A.ents.forEach(function (e) {
+        (e.r || []).forEach(function (r) {
+          const dd = path({ type: "LineString", coordinates: r.p });
+          if (dd) el("path", { d: dd, class: "jr-loc-route", style: "stroke: var(--ch-" + id + ")" }, g);
+        });
+      });
+      boxes.forEach(function (b) {
+        const ring = [];
+        for (let t = 0; t <= 8; t++) ring.push([b[0] + (b[2] - b[0]) * t / 8, b[1]]);
+        for (let t = 0; t <= 8; t++) ring.push([b[2], b[1] + (b[3] - b[1]) * t / 8]);
+        for (let t = 0; t <= 8; t++) ring.push([b[2] - (b[2] - b[0]) * t / 8, b[3]]);
+        for (let t = 0; t <= 8; t++) ring.push([b[0], b[3] - (b[3] - b[1]) * t / 8]);
+        const dd = path({ type: "LineString", coordinates: ring });
+        if (dd) el("path", { d: dd, class: "jr-loc-frame" }, g);
+      });
+      return svgEl;
+    }
+    function atlasInto(host, id, big) {
+      const A = chapterAtlas(id);
+      if (!A.main) return false;
+      host.classList.toggle("has-second", !!A.second);
+      const W = big ? 900 : 480, H = big ? 600 : 340;
+      const mainWrap = document.createElement("div");
+      mainWrap.className = "jr-atlas-main";
+      const m = localPanel(id, A, A.main, W, H, big);
+      mainWrap.appendChild(m.svg);
+      const boxes = [m.box];
+      let secWrap = null;
+      if (A.second) {
+        const sP = localPanel(id, A, A.second, big ? 520 : 300, H, big);
+        secWrap = document.createElement("div");
+        secWrap.className = "jr-atlas-second";
+        secWrap.appendChild(sP.svg);
+        boxes.push(sP.box);
+      }
+      const loc = document.createElement("div");
+      loc.className = "jr-atlas-loc";
+      loc.appendChild(locator(id, A, boxes, big ? 300 : 200, big ? 150 : 100));
+      mainWrap.appendChild(loc);
+      host.appendChild(mainWrap);
+      if (secWrap) host.appendChild(secWrap);
+      return true;
+    }
+    // the dialog that shows a chapter's maps larger (native modal dialog: focus stays inside, Escape closes it)
+    let dlg = null, dlgFrom = null;
+    function openAtlas(id, from) {
+      if (!dlg) {
+        dlg = document.createElement("dialog");
+        dlg.className = "jr-dlg";
+        dlg.setAttribute("aria-labelledby", "jr-dlg-h");
+        dlg.innerHTML = '<div class="jr-dlg-head"><h2 id="jr-dlg-h"></h2><button type="button" class="jr-dlg-close" aria-label="Close">' +
+          '<i class="bi bi-x-lg" aria-hidden="true"></i></button></div><div class="jr-dlg-body jr-atlas"></div>' +
+          '<p class="jr-dlg-note">Main map: where most of the chapter happened. Corner: the whole world, with every route of the chapter and the frames of the maps. Routes are approximate.</p>';
+        root.appendChild(dlg);   // inside the page root, so the chapter colours and map tokens apply
+        dlg.querySelector(".jr-dlg-close").addEventListener("click", function () { dlg.close(); });
+        dlg.addEventListener("close", function () { if (dlgFrom) dlgFrom.focus({ preventScroll: true }); });
+        dlg.addEventListener("click", function (ev) { if (ev.target === dlg) dlg.close(); });   // a click on the backdrop
+        dlg.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && dlg.open) { ev.preventDefault(); dlg.close(); } });
+      }
+      const c = chapterOf[id];
+      dlg.querySelector("#jr-dlg-h").textContent = c.n + " · " + c.w;
+      const body = dlg.querySelector(".jr-dlg-body");
+      while (body.firstChild) body.removeChild(body.firstChild);
+      dlg.style.setProperty("--ch", "var(--ch-" + id + ")");
+      atlasInto(body, id, true);
+      dlgFrom = from;
+      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+      dlg.querySelector(".jr-dlg-close").focus({ preventScroll: true });
+    }
+    function drawPages() {
+      const holders = root.querySelectorAll(".jr-pg-map[data-ch]");
+      if (!holders.length) return;
+      const go = function () {
+        holders.forEach(function (h) {
+          const id = h.getAttribute("data-ch");
+          const btn = document.createElement("button");
+          btn.type = "button"; btn.className = "jr-atlas jr-atlas-btn";
+          btn.setAttribute("aria-haspopup", "dialog");
+          btn.setAttribute("aria-label", "Open a larger map of the chapter " + chapterOf[id].n);
+          if (!atlasInto(btn, id, false)) return;
+          btn.addEventListener("click", function () { openAtlas(id, btn); });
+          h.appendChild(btn);
+          h.removeAttribute("aria-hidden");
+          h.classList.add("is-drawn");
+        });
+      };
+      loadUS().then(go, go);
     }
 
     let rt = null;
