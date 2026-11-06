@@ -1527,9 +1527,13 @@
    "tier": "modeler",
    "code": "M14",
    "title": "Did it work? Learning from data with regression and natural experiments",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m14-did-it-work.html",
+   "scales": [],
+   "id": "m14-did-it-work",
+   "minutes": 40,
+   "form": "cards",
+   "short": "Regression and natural experiments"
   },
   {
    "tier": "modeler",

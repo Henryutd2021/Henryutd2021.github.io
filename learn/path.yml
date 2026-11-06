@@ -1002,7 +1002,26 @@
 - {kind: lesson, tier: modeler, code: M11, title: "Techno-economic analysis inside an optimization model"}
 - {kind: lesson, tier: modeler, code: M12, title: "Model a city's energy system: an energy hub with grid limits and screening fairness outputs"}
 - {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
-- {kind: lesson, tier: modeler, code: M14, title: "Did it work? Learning from data with regression and natural experiments"}
+# M14, builder learn-w5-g (wave W5)
+- kind: lesson
+  id: m14-did-it-work
+  path: m14-did-it-work.qmd
+  code: M14
+  tier: modeler
+  form: cards
+  icon: target
+  status: active
+  minutes: 40
+  practice_minutes: 90   # the notebook's practice tasks, after its 60-minute lab (learn_map_v2.yml)
+  lab_minutes: 60   # the notebook lab: in the header badge and timeRequired
+  title: "Did it work? Learning from data with regression and natural experiments"
+  subtitle: "Estimate a tariff's effect on simulated homes whose true effect is known, then break difference-in-differences on purpose with selection, confounding, spillovers and anticipation"
+  short: "Regression and natural experiments"
+  outcome: "Estimate a programme's effect with a regression and a difference-in-differences design, check parallel trends with an event study, and name the threats to validity (selection, confounding, spillovers, anticipation) before trusting the answer."
+  teaches: [counterfactuals, selection bias, regression with controls, before-after comparisons, difference-in-differences, parallel trends, event studies, clustered standard errors, threats to validity]
+  lab: "a NumPy notebook that rebuilds the page's two simulated panels and checks them, then the two-way fixed-effects regression, standard errors clustered by home, an event-study regression and 200 redrawn panels, about 60 minutes, then 90 minutes of practice."
+  does: "Ask whether a time-of-use tariff lowered household peaks or whether a policy changed investment, on simulated panels with known effects: describe, regress, try a difference-in-differences design, and list the threats to validity (confounding, selection, spillovers, anticipation) before trusting the answer."
+  after: [B2, K5]
 - kind: lesson
   id: sb2-grid-room
   code: SB2
