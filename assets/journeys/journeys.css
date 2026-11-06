@@ -239,9 +239,34 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-pg-head h3 { margin: .1rem 0 0; font-size: 1.5rem; font-weight: 750; letter-spacing: -.02em; line-height: 1.15; color: var(--ink); }
 .jr-pg-where { margin: 0; font-size: .88rem; color: var(--muted); }
 .jr-pg-text { margin: 0; font-size: .95rem; line-height: 1.6; color: var(--ink-2); max-width: 62ch; }
-.jr-pg-map { aspect-ratio: 16 / 9; border-radius: var(--r); background: var(--jr-ocean); border: 1px solid var(--line); overflow: hidden; }
 .jr-pg-map:not(.is-drawn) { display: none; }
-.jr-mini { display: block; width: 100%; height: 100%; }
+/* the chapter's atlas pair: main map (the largest cluster), an optional second panel, a world locator in the corner */
+.jr-atlas { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; width: 100%; margin: 0; padding: 0; border: 0; background: none;
+  font: inherit; color: inherit; text-align: left; }
+.jr-atlas.has-second { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+.jr-atlas-btn { cursor: zoom-in; border-radius: var(--r); }
+.jr-atlas-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.jr-atlas-btn:hover .jr-atlas-main, .jr-atlas-btn:hover .jr-atlas-second { border-color: var(--line-strong); }
+.jr-atlas-main, .jr-atlas-second { position: relative; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: var(--jr-ocean); }
+.jr-mini { display: block; width: 100%; height: auto; }
+.jr-mini-sea { fill: var(--jr-ocean); }
+.jr-atlas-loc { position: absolute; right: 6px; bottom: 6px; width: 36%; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-sm); background: var(--jr-ocean); line-height: 0; }
+.jr-loc { display: block; width: 100%; height: auto; }
+.jr-loc-land { fill: var(--jr-land); stroke: none; }
+.jr-loc-route { fill: none; stroke-width: 1.1; opacity: .9; }
+.jr-loc-frame { fill: none; stroke: var(--ink); stroke-width: 1.3; }
+/* the larger maps, in a modal dialog */
+.jr-dlg { width: min(1100px, 94vw); max-height: 92vh; overflow: auto; padding: 1rem 1.1rem 1.1rem; border: 1px solid var(--line); border-top: 4px solid var(--ch, var(--accent));
+  border-radius: var(--r-lg); background: var(--surface); color: var(--ink-2); box-shadow: var(--shadow-lg); }
+.jr-dlg::backdrop { background: rgba(15, 23, 42, .5); }
+.jr-dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .7rem; }
+.jr-dlg-head h2 { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--ink); border: 0; padding: 0; }
+.jr-dlg-close { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface);
+  color: var(--ink-2); cursor: pointer; flex: none; }
+.jr-dlg-close:hover, .jr-dlg-close:focus-visible { color: var(--ink); border-color: var(--ink-2); }
+.jr-dlg .jr-atlas-loc { width: 30%; }
+.jr-dlg-note { margin: .6rem 0 0; font-size: .8rem; color: var(--muted); }
 .jr-mini .jr-reg { stroke-width: .5; }
 .jr-mini-route { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
 .jr-mini-route.jr-m-flight { stroke-width: 1.3; stroke-dasharray: 5 4; }
@@ -323,6 +348,9 @@ body.quarto-dark .jr-modes .is-other { --m: #64748b; } body.quarto-dark .jr-mode
   .jr-tilegrid { gap: 3px; }
   .jr-tile .jr-yr { display: none; }
   .jr-page { padding: 1.1rem 1rem 1.2rem 1.2rem; }
+  .jr-atlas.has-second { grid-template-columns: minmax(0, 1fr); }
+  .jr-atlas-loc { width: 42%; }
+  .jr-dlg { padding: .8rem; }
   .jr-pg-head h3 { font-size: 1.3rem; }
   .jr-pstamp { min-width: 0; max-width: calc(50% - .4rem); padding: .4rem .55rem .45rem; }
   .jr-pstamp.is-first, .jr-pstamp.is-summit { padding-inline: .7rem; }
