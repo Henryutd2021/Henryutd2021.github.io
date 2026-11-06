@@ -21,9 +21,19 @@
      A19.surface(R, D, { protected })   cost surface, $ per km of new line ("forbid" makes protected land impassable)
      A19.paths(R, D, surf, needMW)      multi-source Dijkstra from substations with that much room: { dist, pred, src }
      A19.route(R, P, cell)              the least-cost path from a cell: { cells, km, cost, sub, parts }
-     A19.cost(R, D, type, site, cfg, P) a site's costs (2022 dollars): { land, connect, road, water, upfront, cf, mwh, sub }
+     A19.cost(R, D, type, site, cfg, P) a site's costs (2025 dollars): { land, connect, road, water, upfront, cf, mwh, sub }
      A19.shares(R, D, type, cfg, sites, draws, seed)  how often each site wins under random weights
      A19.need(D, type), A19.place(R, i, j, k), A19.cellText(R, n)   helpers
+     A19.withCity(D, PC)                D with Prairie City's shared numbers filled in (PC = data/prairie-city.json): the
+                                        data-center campus's MW is PC.dataCenter.contractMW, read here, never typed in D;
+                                        call it first (the lesson, its test, C3)
+     A19.usd(D, amount, year)           an amount of a given year in the page's dollars (2025), by BEA's GDP deflator
+   Substations: S1 to S4 (D.substations) are transmission substations, where new plants and large loads connect, each with
+   its spare capacity (headroomMW, set for teaching). They are not the districts' own substations of prairie-city.json
+   (districts[].substationMW, the peak-hour limits of distribution substations); the campus builds its own substation and
+   a line to one of S1 to S4, as prairie-city.json's dataCenter.connection says.
+   Costs: 2025 dollars. NREL's line and mitigation costs (2022 dollars) are converted with D.costs.deflator; the teaching
+   values (road, water main, land) are set in 2025 dollars. Each input names its year (lineYear, mitigationYear, ...).
    View (browser): LX.SiteMap(host, { R, D, label }) → { draw(state), cursor(n), el } — an SVG map with a keyboard
      cursor (arrow keys) and a live line describing the cell under it; see SiteMap below.
    Data: data/a19-gis-siting.json and cf_targets.json (EIA's 2025 capacity factors). */
@@ -369,9 +379,18 @@
     if ((R.flood[n] || R.water[n]) && M.wet > mult) { mult = M.wet; cls = "wet"; }
     return { mult: mult, cls: cls };
   }
+  // an amount of a given year in the page's dollar year (D.costs.year), by the GDP deflator's ratio
+  function usd(D, amount, year) { var ix = D.costs.deflator.index; return amount * (ix[D.costs.year] / ix[year]); }
+  function withCity(D, PC) {
+    var out = Object.assign({}, D), types = {};
+    Object.keys(D.types).forEach(function (k) { types[k] = Object.assign({}, D.types[k]); });
+    types.dc.mw = PC.dataCenter.contractMW;
+    out.types = types; out.city2 = { dataCenter: PC.dataCenter, line: PC.about.line };
+    return out;
+  }
   function surface(R, D, o) {
     o = o || {};
-    var K = D.costs, base = K.lineUSDperMile / KM_PER_MILE, mit = K.mitigationUSDperMile / KM_PER_MILE, c = new Float64Array(R.N), cls = [];
+    var K = D.costs, base = usd(D, K.lineUSDperMile, K.lineYear) / KM_PER_MILE, mit = usd(D, K.mitigationUSDperMile, K.mitigationYear) / KM_PER_MILE, c = new Float64Array(R.N), cls = [];
     for (var n = 0; n < R.N; n++) {
       var cc = cellClass(R, D, n);
       cls.push(R.prot[n] ? "protected" : cc.cls);
@@ -444,8 +463,8 @@
     var T = D.types[type], K = D.costs, out = { type: type };
     var rt = P ? route(R, P, site.cell) : null;
     out.route = rt; out.connect = rt ? rt.cost : Infinity; out.sub = rt ? rt.sub : null;
-    out.roadKm = R.dRoad[site.cell]; out.road = out.roadKm * K.roadUSDperKm;
-    out.waterKm = type === "dc" ? R.dWater[site.cell] : 0; out.water = out.waterKm * K.waterUSDperKm;
+    out.roadKm = R.dRoad[site.cell]; out.road = out.roadKm * usd(D, K.roadUSDperKm, K.roadYear);
+    out.waterKm = type === "dc" ? R.dWater[site.cell] : 0; out.water = out.waterKm * usd(D, K.waterUSDperKm, K.waterYear);
     out.acres = type === "solar" ? T.mw * T.dcac * T.acresPerMWdc : type === "wind" ? T.mw * T.directHaPerMW * ACRES_PER_KM2 / 100 : T.needKm2 * ACRES_PER_KM2;
     out.land = out.acres * site.land;
     out.upfront = out.connect + out.road + out.water + out.land;
@@ -498,7 +517,7 @@
   var A19 = { build: build, coarsen: coarsen, cfg: cfg, exclude: exclude, criteria: criteria, suitability: suitability, need: need, blocks: blocks,
     blockScore: blockScore, sites: sites, surface: surface, paths: paths, route: route, cost: cost, shares: shares, place: place, cellText: cellText,
     REASONS: REASONS, riverY: riverY, floodHalf: floodHalf, ridgeX: ridgeX, roadDist: roadDist, subDist: subDist, noise: noise, fbm: fbm, lattice: lattice,
-    ACRES_PER_KM2: ACRES_PER_KM2, KM_PER_MILE: KM_PER_MILE, overlap: overlap, connCell: connCell, needMW: needMW };
+    ACRES_PER_KM2: ACRES_PER_KM2, KM_PER_MILE: KM_PER_MILE, overlap: overlap, connCell: connCell, needMW: needMW, usd: usd, withCity: withCity };
   if (typeof module !== "undefined" && module.exports) module.exports = A19;
   if (typeof window === "undefined" || !window.LX) return;
 

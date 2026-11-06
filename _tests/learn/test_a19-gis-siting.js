@@ -29,7 +29,9 @@ const A19 = require(L("a19.js"));
 const LS = require(L(ID + ".js"));
 const DPATH = L("data/" + ID + ".json");
 let RAW = fs.readFileSync(DPATH, "utf8");
-const D = JSON.parse(RAW);
+const D0 = JSON.parse(RAW);
+const PC = JSON.parse(fs.readFileSync(L("data/prairie-city.json"), "utf8"));
+const D = A19.withCity(D0, PC);   // the campus's MW from the shared Prairie City data, as the page does
 const CF = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
 const JS = fs.readFileSync(L(ID + ".js"), "utf8"), MJS = fs.readFileSync(L("a19.js"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
@@ -53,6 +55,7 @@ function reference() {
   const sh = M.shares("solar");
   return {
     note: "Written by node _tests/learn/test_a19-gis-siting.js --write from the page's model; the notebook rebuilds these numbers from the seed and asserts them.",
+    cityDataCenter: { contractMW: PC.dataCenter.contractMW, from: "prairie-city.json, dataCenter.contractMW (copied here by the test for the notebook, which reads only this file)" },
     layers: { sums: { slope: r6(sum(R.slope)), wind: r6(sum(R.wind)), sun: r6(sum(R.sun)), land: r6(sum(R.land)), dHome: r6(sum(R.dHome)), dRoad: r6(sum(R.dRoad)), dWater: r6(sum(R.dWater)) },
       counts: { water: cnt(R.water), flood: cnt(R.flood), built: cnt(R.built), ind: cnt(R.ind), prot: cnt(R.prot), subc: cnt(R.subc) }, homes: R.homes.length, newer: R.nNewer,
       cells: [0, 300, 615, 900, 1319].map(n => ({ n, slope: r6(R.slope[n]), wind: r6(R.wind[n]), sun: r6(R.sun[n]), land: r6(R.land[n]) })),
@@ -154,8 +157,13 @@ for (const type of ["solar", "wind", "dc"]) {
 { const a = { score: 0.5, i: 3, j: 2 }, b = { score: 0.5, i: 1, j: 4 }; const BL = [b, a]; const s = BL.slice().sort((x, y) => (x.score > y.score || (x.score === y.score && (x.j < y.j || (x.j === y.j && x.i < y.i)))) ? -1 : 1); ok(s[0] === a, "tie rule: equal scores, the more northern block first"); }
 
 // ---------------- 3 least-cost paths: an independent Dijkstra, the path's sum, uniqueness
-const base = D.costs.lineUSDperMile / 1.609344;
-ok(Math.round(base) === 1003577 && D.costs.lineUSDperMile === 1615100 && D.costs.mult.wet === 1.8 && D.costs.mult.built === 1.2 && D.costs.mitigationUSDperMile === 38000, "NREL Table 11–12 figures: $1,615,100 a mile = $1,003,577 a km; wetland × 1.8, urban × 1.2; mitigation $38,000 a mile");
+const base = A19.usd(D, D.costs.lineUSDperMile, D.costs.lineYear) / 1.609344;
+const IX = D.costs.deflator.index;
+ok(D.costs.year === 2025 && IX["2025"] === 128.893 && IX["2022"] === 118.026 && D.costs.lineYear === 2022 && D.costs.mitigationYear === 2022 && D.costs.roadYear === 2025 && D.costs.waterYear === 2025, "one dollar year, 2025: NREL's 2022 costs through BEA's deflator (2022 118.026, 2025 128.893); teaching values in 2025 dollars; each input names its year");
+ok(IX["2025"] === PC.city.anchors.gdpDeflator["2025"], "the 2025 deflator value equals the shared Prairie City data's");
+ok(near(base, 1615100 * 128.893 / 118.026 / 1.609344, 1e-6) && Math.round(base) === 1095979 && D.costs.mult.wet === 1.8 && D.costs.mult.built === 1.2 && D.costs.mitigationUSDperMile === 38000, "NREL Table 11–12 figures: $1,615,100 a mile (2022) = $1,095,979 a km in 2025 dollars; wetland × 1.8, urban × 1.2; mitigation $38,000 a mile (2022)");
+{ const s = A19.surface(R, D, { protected: "allow" }); let n0 = -1; for (let n = 0; n < N; n++) if (s.cls[n] === "farmland") { n0 = n; break; }
+  ok(near(s.c[n0], base, 1e-6) && near(s.mit, 38000 * 128.893 / 118.026 / 1.609344, 1e-9), "the cost surface uses 2025 dollars (farmland cell = the converted baseline; mitigation converted too)"); }
 function slowDijkstra(surf, srcCells) {
   const dist = new Float64Array(N).fill(Infinity), done = new Uint8Array(N);
   srcCells.forEach(c => { dist[c] = 0; });
@@ -200,21 +208,21 @@ for (const prot of ["forbid", "allow"]) {
   ok(near(Object.values(c.route.parts).reduce((a, b) => a + b, 0), c.route.km, 1e-9), "the land types along the " + prot + " path add up to its length");
 }
 const cF = LS.corridor(M, 220, "forbid"), cA = LS.corridor(M, 220, "allow");
-ok(cF.route.sub === "S3" && F.km(cF.route.km) === "13.7 km" && F.musd(cF.route.cost) === "$14.0 million" && F.km(cA.route.km) === "10.2 km" && F.musd(cA.route.cost) === "$10.7 million" && F.km(cA.route.parts.protected) === "3.4 km" && !cF.route.parts.protected,
-  "corridor: forbidden 13.7 km, $14.0 million; allowed 10.2 km, $10.7 million, 3.4 km through protected land");
-ok(F.musd(cF.route.cost - cA.route.cost) === "$3.3 million", "forbidding protected land adds $3.3 million");
+ok(cF.route.sub === "S3" && F.km(cF.route.km) === "13.7 km" && F.musd(cF.route.cost) === "$15.3 million" && F.km(cA.route.km) === "10.2 km" && F.musd(cA.route.cost) === "$11.7 million" && F.km(cA.route.parts.protected) === "3.4 km" && !cF.route.parts.protected,
+  "corridor: forbidden 13.7 km, $15.3 million; allowed 10.2 km, $11.7 million, 3.4 km through protected land (2025 dollars)");
+ok(F.musd(cF.route.cost - cA.route.cost) === "$3.6 million", "forbidding protected land adds $3.6 million");
 
 // ---------------- 4 costs, energy, random weights
 {
   const r = M.run("wind"), s = r.top[0], k = r.costs[0];
-  ok(near(k.land, 150 * 0.3 * 2.47105 * s.land, 1e-6) && near(k.road, R.dRoad[s.cell] * 600000, 1e-9) && near(k.upfront, k.connect + k.road + k.land, 1e-6), "wind site A's costs: land (0.3 ha per MW), access road, line");
+  ok(near(k.land, 150 * 0.3 * 2.47105 * s.land, 1e-6) && near(k.road, R.dRoad[s.cell] * 600000, 1e-6) && near(k.upfront, k.connect + k.road + k.land, 1e-6), "wind site A's costs: land (0.3 ha per MW), access road, line");
   ok(near(k.cf, CF.targets.wind.cf + 0.07 * (s.res - R.windMean), 1e-12) && near(k.mwh, 150 * k.cf * 8760, 1e-6), "wind energy: EIA's 33.8% at the region's mean, 7 points per m/s");
   const rs = M.run("solar"), ss = rs.top[0], ks = rs.costs[0];
   ok(near(ks.cf, CF.targets.solar.cf * ss.res / R.sunMean, 1e-12) && near(ks.land, 812.7 * ss.land, 1e-6), "solar energy in proportion to sunshine (EIA's 24.0% at the mean); land for 812.7 acres");
   const rd = M.run("dc"), kd = rd.costs[0];
   ok(near(kd.water, R.dWater[rd.top[0].cell] * 1500000, 1e-9) && near(kd.land, 0.5 * 247.105 * rd.top[0].land, 1e-6) && kd.mwh === undefined, "data center: water main, 0.5 km² of land, no energy column");
   ok(rs.costs.every(x => x.upfront === x.connect + x.road + x.water + x.land) && rs.costs.every(x => x.mwh > 0), "up front and a year's energy are kept apart, never added");
-  ok(F.musd(r.costs[0].upfront) === "$15.3 million" && F.musd(r.costs[4].upfront) === "$11.5 million" && r.top[0].score > r.top[4].score, "myth: wind site A $15.3 million, site E $11.5 million, A scores higher");
+  ok(F.musd(r.costs[0].upfront) === "$16.6 million" && F.musd(r.costs[4].upfront) === "$12.4 million" && r.top[0].score > r.top[4].score, "myth: wind site A $16.6 million, site E $12.4 million, A scores higher");
 }
 {
   const rng = require(L("components/core.js")).mulberry32(19); let bad = 0;
@@ -270,7 +278,7 @@ for (let sb = 100; sb <= T.wind.setbackMaxM; sb += 20) {
 }
 ok(/\$38,000 a mile barely deters it/.test(LS.s6Saw(M, 220)), "step 6 reveal at 220 m: the mitigation cost barely deters the line");
 budget(LS.s7Saw(M), "step 7 reveal", 40, 2);
-ok(/site B would use North \(S2\), which has only 180 MW spare/.test(LS.s7Saw(M)) && LS.s7Saw(M).indexOf(F.musd(M.run("dc").costs[0].upfront)) > 0, "step 7 reveal: with any substation, B uses North (S2) with 180 MW spare");
+ok(/site B would use North \(S2\), which has only 120 MW spare/.test(LS.s7Saw(M)) && LS.s7Saw(M).indexOf(F.musd(M.run("dc").costs[0].upfront)) > 0, "step 7 reveal: with any substation, B uses North (S2) with 180 MW spare");
 const HX = LS.hints(M); Object.keys(HX).forEach(k => budget(HX[k], "hint " + k, 35, 2));
 ok(/function keep\(k, v\) \{[^\n]*setTimeout\(buildExplain/.test(JS), "every saved setting refreshes the explain layer");
 
@@ -280,14 +288,14 @@ has("solar arrays take 4.2 acres per MW of panels, single-axis tracking, with 1.
 ok(T.solar.acresPerMWdc === 4.2 && T.solar.dcac === 1.29, "data: 4.2 acres per MW (DC), DC:AC 1.29");
 has("wind farms spread over 34.5 ha per MW");
 has("150 × 1.29 × 4.2 = 812.7 acres = 3.29 km² of a 4 km² block");
-has("$1,003,577 per km on farmland, × 1.8 in flood zones");
+has("$1,095,979 per km on farmland (2025 dollars), × 1.8 in flood zones");
 has("1 at 0 km, 0 from 15 km (solar)"); ok(T.solar.ramps.sub[0] === 0 && T.solar.ramps.sub[1] === 15, "solar ramp near a substation: 0 to 15 km");
 has("default solar weights 20, 35, 15, 20, 10"); ok(["res", "sub", "road", "land", "homes"].map(k => T.solar.weights[k]).join(",") === "20,35,15,20,10", "data: default solar weights");
 has("land price falls from 1 at $2,500 an acre to 0 at $15,000"); ok(T.solar.ramps.land.join(",") === "2500,15000", "data: the land ramp");
-has("NREL's $1,615,100 a mile divided by 1.609344 km a mile");
+has("NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile");
 has("checked at 16 points"); ok(D.grid.sub * D.grid.sub === 16, "16 setback points per cell");
 has("about 67,000 cells of 11.5 km × 11.5 km");
-has("Wind site A costs $15.3 million up front, site E $11.5 million.");
+has("Wind site A costs $16.6 million up front, site E $12.4 million.");
 has("Priced at $38,000 a mile, the new line crossed 3.4 km of protected land");
 has("sunshine differs by only 4.5% across the 44 km region");
 has("this map checks 16 points in each cell, and NREL's supply curves check setbacks on 90 m cells");
@@ -302,7 +310,8 @@ has("In step 8, 36 homes built since 2019 push solar site A out of the top five.
   ok(near(200 * 1.3 * 4.2, 1092, 1e-9) && (1092 / 247.105).toFixed(2) === "4.42", "practice 3: 1,092 acres = 4.42 km²"); has("200 × 1.3 × 4.2 = 1,092 acres, about 4.42 km²");
   ok(100 * 34.5 === 3450 && 100 * 0.3 === 30 && 30 / 3450 < 0.01, "practice 4: 3,450 ha, 30 ha, under 1%"); has("3,450 ha (34.5 km²) in all; 30 ha for good, under 1%");
   ok((40 * Math.PI * 0.16).toFixed(1) === "20.1" && (40 * Math.PI * 0.22 * 0.22).toFixed(1) === "6.1", "practice 5: 20.1 and 6.1 km²"); has("40 × π × 0.4² = 20.1 km² against 40 × π × 0.22² = 6.1 km²");
-  ok((base * (8 + 4 * 1.8) / 1e6).toFixed(1) === "15.3", "practice 6: $15.3 million"); has("$1,003,577 a km × (8 + 4 × 1.8) = $15.3 million");
+  ok((base * (8 + 4 * 1.8) / 1e6).toFixed(1) === "16.7" && (128.893 / 118.026).toFixed(4) === "1.0921" && Math.round(1615100 * (128.893 / 118.026) / 1.609344) === 1095979, "practice 6: $16.7 million in 2025 dollars");
+  has("$1,615,100 × 1.0921 ÷ 1.609344 = $1,095,979 a km; × (8 + 4 × 1.8) = $16.7 million in 2025 dollars.");
   // practice 7: Dijkstra on the 3 × 3 grid, side-by-side moves only
   const G = [[1, 1, 4], [1, 5, 1], [2, 1, 1]], dist = [[Infinity, Infinity, Infinity], [Infinity, Infinity, Infinity], [Infinity, Infinity, Infinity]], done = {};
   dist[0][0] = 0;
@@ -317,6 +326,14 @@ ok(T.wind.setbackM === 220 && T.solar.setbackM === 61 && T.wind.setbackOptions[1
 ok(/34\.5 ± 22\.4 ha per MW/.test(RAW) && /0\.3 ± 0\.3 ha per MW/.test(RAW) && /Table 1, p\. 10/.test(RAW), "data: NREL 2009 Table 1");
 ok(/4\.2 acres per MW \(DC\) for single-axis tracking arrays, slide 13/.test(RAW) && /DC:AC ratio 1\.29 for 2019 tracking plants, slide 8/.test(RAW), "data: LBNL slides 8 and 13");
 
+// the shared Prairie City data: the campus's MW is read, never typed; S1–S4 are transmission substations
+ok(D0.types.dc.mw === undefined && /prairie-city\.json/.test(D0.types.dc.mwFrom) && T.dc.mw === PC.dataCenter.contractMW && T.dc.mw === 150, "the campus's MW is prairie-city.json's dataCenter.contractMW (150), read through A19.withCity");
+has("the data-center campus's " + PC.dataCenter.contractMW + " MW contract comes from Prairie City's data");
+ok(/prairie-city\.json/.test(PAGE.match(/data-src="[^"]+"/)[0]) && /A19\.withCity\(data\.a19_gis_siting, data\.prairie_city\)/.test(JS), "the page loads prairie-city.json and reads the campus through A19.withCity");
+ok(/transmission substations/.test(D0.substationNote) && D0.substations.every(s => s.district === undefined) && /not the districts' own substations/.test(D0.substationNote), "S1–S4 are transmission substations, not the districts' own (prairie-city.json)");
+ok(/own substation on the transmission grid/i.test(PC.dataCenter.connection), "prairie-city.json connects the campus on the transmission grid, as the map does");
+ok(!/2022 dollars/.test(LS.hints(M).dc + LS.staticFallback(M).replace(/NREL's 2022 line costs/, "")), "no cost shown in 2022 dollars, except NREL's inputs named as such");
+
 // ---------------- 7 scope
 const MINE = PAGE + "\n" + RAW + "\n" + JS + "\n" + MJS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(MINE), "no nuclear technology on the page, in the data, the scripts or the sidecar");
@@ -328,7 +345,7 @@ ok(dcS.length >= 3 && dcS.every(s => !/\b(supply|supplies|supplied|power plant|g
 ok(/load and a building/.test(PAGE + JS), "the page says what a data center is here: a load and a building");
 const OWN = PAGE.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?<!-- learn:\1:end -->/g, "");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1]).concat([...OWN.matchAll(/\]\((https?:[^)]+)\)/g)].map(m => m[1]));
-const ALLOW = /^https:\/\/(www\.)?(eia\.gov|emp\.lbl\.gov|docs\.nlr\.gov|doi\.org|fema\.gov|docs\.qgis\.org)\//;
+const ALLOW = /^https:\/\/(www\.)?(eia\.gov|emp\.lbl\.gov|docs\.nlr\.gov|doi\.org|fema\.gov|docs\.qgis\.org|apps\.bea\.gov)\//;
 ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.test(h) || /^notebooks\/a19-gis-siting\.ipynb$/.test(h) || h === "../assets/learn/data/a19-gis-siting.json"), "links: learn pages and allowed domains only: " + hrefs.filter(h => !(ALLOW.test(h) || /^[0-9a-z-]+\.html$/.test(h))).join(", "));
 ["m03-capacity-expansion.html", "cf7-cost-of-waiting.html", "a06-interconnection.html"].forEach(h => ok(OWN.indexOf('href="' + h + '"') >= 0 || OWN.indexOf("](" + h + ")") >= 0, "links " + h));
 // the approved excerpt: E7.2 and E7.3, word for word, with CF7's footer; E7.8 under it
@@ -383,8 +400,7 @@ ok(hrefs.length > 8 && hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html$/.te
   try { vm.runInContext(MJS, ctx); vm.runInContext(JS, ctx); } catch (e) { threw = e.stack; }
   ok(!threw && E.LX.A19 && E.LX.SiteMap, "a19.js sets LX.A19 and LX.SiteMap" + (threw ? ": " + threw : ""));
   const root = E.LX.H("div", { class: "lx-interactive", "data-learn": "siting" }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
-  const PJ = JSON.parse(fs.readFileSync(L("data/path.json"), "utf8"));
-  try { init(live, { a19_gis_siting: D, cf_targets: CF, path: PJ }, root); } catch (e) { threw = e.stack; }
+  try { init(live, { a19_gis_siting: D0, cf_targets: CF, prairie_city: PC }, root); } catch (e) { threw = e.stack; }
   ok(!threw && demo && demo.cards, "the page mounts on the stub document" + (threw ? ": " + threw : ""));
   try {
     ok(/Your solar run/.test(xp.textContent) && /Five limits of a suitability map/.test(xp.textContent) && /Where this screen holds/.test(xp.textContent), "explain layer: flowchart, comparison table, boundary box");

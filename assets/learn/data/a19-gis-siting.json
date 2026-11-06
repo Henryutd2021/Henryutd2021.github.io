@@ -1,5 +1,5 @@
 {
- "about": "Lesson A19 (a19-gis-siting), 2026-11-06. The map of the region around Prairie City for siting a solar farm, a wind farm, a transmission corridor and a data-center campus. Prairie City is fictional; its numbers are illustrative. Every layer is generated from the seed and the recipe below by assets/learn/a19.js (and, the same way, by the lesson's notebook): nothing here was downloaded. Land per MW, setbacks, slope rules and the line cost come from the dated sources listed under sources; every other number is set for teaching and says so. The reference block is written by node _tests/learn/test_a19-gis-siting.js --write. The region's own geography (districts, river, substations) is this lesson's; the shared Prairie City data (prairie-city.json) may place things differently, and the coordinator aligns the two at integration.",
+ "about": "Lesson A19 (a19-gis-siting), 2026-11-06. The map of the region around Prairie City for siting a solar farm, a wind farm, a transmission corridor and a data-center campus. Prairie City is fictional; its numbers are illustrative. Every layer is generated from the seed and the recipe below by assets/learn/a19.js (and, the same way, by the lesson's notebook): nothing here was downloaded. Land per MW, setbacks, slope rules and the line cost come from the dated sources listed under sources; every other number is set for teaching and says so. The reference block is written by node _tests/learn/test_a19-gis-siting.js --write. The data-center campus's size comes from the shared Prairie City data (prairie-city.json), read at run time; the region's geography (districts' extent, river, transmission substations) is this lesson's own.",
  "built": "2026-11-06",
  "fictional": "Prairie City is fictional; its numbers are illustrative.",
  "grid": {
@@ -119,7 +119,7 @@
   "salt": 91,
   "cityGain": 15000,
   "cityKm": 3,
-  "note": "Land price, dollars per acre (2022 dollars): farmland about $3,000 to $6,000, much more next to the city. Set for teaching."
+  "note": "Land price, dollars per acre (2025 dollars): farmland about $3,000 to $6,000, much more next to the city. Set for teaching."
  },
  "industrial": {
   "name": "Industrial park",
@@ -175,8 +175,7 @@
  "substations": [
   {
    "id": "S1",
-   "name": "Core",
-   "district": "core",
+   "name": "Central",
    "x": 31.5,
    "y": 15.5,
    "headroomMW": 60
@@ -184,15 +183,13 @@
   {
    "id": "S2",
    "name": "North",
-   "district": "suburbs",
    "x": 29.5,
    "y": 10.5,
-   "headroomMW": 180
+   "headroomMW": 120
   },
   {
    "id": "S3",
    "name": "West",
-   "district": "fringe",
    "x": 22.5,
    "y": 14.5,
    "headroomMW": 250
@@ -200,13 +197,12 @@
   {
    "id": "S4",
    "name": "East hub",
-   "district": "outside the city, on the Plains Grid",
    "x": 41.5,
    "y": 6.5,
    "headroomMW": 600
   }
  ],
- "substationNote": "One substation per district, a teaching simplification, plus a hub on the regional grid. Spare capacity (headroom) is the MW a new load or plant could connect without an upgrade. Set for teaching.",
+ "substationNote": "S1 to S4 are transmission substations on the regional grid, where new plants and large loads connect. They are not the districts' own substations in prairie-city.json (one per district, serving homes and businesses, with their peak-hour limits). Spare capacity (headroom) is the MW a new plant or load could connect at one without an upgrade. Positions and spare capacity are set for teaching.",
  "lines": [
   {
    "from": "S4",
@@ -361,7 +357,7 @@
   "dc": {
    "label": "Data-center campus",
    "short": "Data center",
-   "mw": 200,
+   "mwFrom": "prairie-city.json, dataCenter.contractMW",
    "blockKm": 1,
    "gap": 2,
    "needKm2": 0.5,
@@ -417,7 +413,7 @@
      1.8
     ]
    },
-   "note": "A 200 MW campus (its most draw from the grid) on 0.5 km² (124 acres), with a 300 m noise buffer from homes; it needs a substation with 200 MW spare, water from the river or the city's mains, and a road. All set for teaching; a data center here is a load and a building, nothing more."
+   "note": "Prairie City's campus: its contract, the most it may draw from the grid, is read from prairie-city.json (dataCenter.contractMW) by A19.withCity, never typed here. It builds its own substation, joined by a new line to a transmission substation with that much spare capacity (prairie-city.json: its own substation on the transmission grid, not a district's). Set for teaching here: 0.5 km² (124 acres) of land, a 300 m noise buffer from homes, water from the river or the city's mains, and a road. A data center here is a load and a building, nothing more."
   }
  },
  "criteria": {
@@ -466,8 +462,17 @@
   "note": "From the wind farm to the nearest substation with 150 MW spare, along the cheapest path over the cost surface; steps between neighbouring cells, diagonals included."
  },
  "costs": {
-  "year": 2022,
+  "year": 2025,
+  "deflator": {
+   "index": {
+    "2022": 118.026,
+    "2025": 128.893
+   },
+   "src": "bea-deflator",
+   "note": "Every cost on the page is in 2025 dollars. NREL's line and mitigation costs are 2022 dollars, converted with BEA's GDP implicit price deflator (2017 = 100, annual): × 128.893 / 118.026. The teaching values (access road, water main, land prices) are set in 2025 dollars."
+  },
   "lineUSDperMile": 1615100,
+  "lineYear": 2022,
   "lineNote": "Baseline cost of a new 138 kV line per mile, MISO costs (also used for SPP), pastureland, 2022 dollars: NREL's supply curves, Table 11.",
   "mult": {
    "farmland": 1,
@@ -479,11 +484,14 @@
   "multNote": "Land-cover multipliers for the same column, NREL's Table 12: pasture or farmland 1.0, suburban 1.1, urban 1.2, wetland 1.8 (used here for the flood zone and the river), hilly 1.1 (used here for slopes above 5%).",
   "hillyFrom": 5,
   "mitigationUSDperMile": 38000,
+  "mitigationYear": 2022,
   "mitigationNote": "NREL's highest natural and cultural risk mitigation cost, per mile (2022 dollars), used here for a line through protected land when it is allowed.",
   "roadUSDperKm": 600000,
-  "roadNote": "An access road to the nearest paved road, per km. Set for teaching.",
+  "roadYear": 2025,
+  "roadNote": "An access road to the nearest paved road, per km, 2025 dollars. Set for teaching.",
   "waterUSDperKm": 1500000,
-  "waterNote": "A water main to the river or the city's mains, per km. Set for teaching.",
+  "waterYear": 2025,
+  "waterNote": "A water main to the river or the city's mains, per km, 2025 dollars. Set for teaching.",
   "solarCF": "the region's average sunshine gets EIA's 2025 U.S. utility-scale solar capacity factor (cf_targets.json), and a site's factor scales with its sunshine",
   "windCF": "the region's average wind speed gets EIA's 2025 U.S. wind capacity factor (cf_targets.json), plus 7 percentage points per m/s above it (set for teaching)"
  },
@@ -492,6 +500,11 @@
   "seed": 19
  },
  "sources": {
+  "bea-deflator": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2022 118.026, 2025 128.893 (read through FRED's annual series A191RD3A086NBEA, BEA the originator, updated 30 September 2026; its 2024 125.587 and 2025 128.893 equal the course's other pages).",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "read 6 November 2026"
+  },
   "lbnl-pv": {
    "text": "Bolinger, M., and Bolinger, G. (2022). Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density. IEEE Journal of Photovoltaics. Webinar slides, Lawrence Berkeley National Laboratory, 1 February 2022 (PDF): 2019 medians, 4.2 acres per MW (DC) for single-axis tracking arrays, slide 13; DC:AC ratio 1.29 for 2019 tracking plants, slide 8; array area, not the whole site, slide 7.",
    "url": "https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf",
@@ -516,6 +529,10 @@
  },
  "reference": {
   "note": "Written by node _tests/learn/test_a19-gis-siting.js --write from the page's model; the notebook rebuilds these numbers from the seed and asserts them.",
+  "cityDataCenter": {
+   "contractMW": 150,
+   "from": "prairie-city.json, dataCenter.contractMW (copied here by the test for the notebook, which reads only this file)"
+  },
   "layers": {
    "sums": {
     "slope": 4183.499293,
@@ -589,11 +606,11 @@
      "j": 6,
      "score": 0.729917,
      "cell": 306,
-     "connect": 1003577,
+     "connect": 1095979,
      "land": 5358061,
      "road": 600000,
      "water": 0,
-     "upfront": 6961638,
+     "upfront": 7054040,
      "sub": "S4",
      "mwh": 312649
     },
@@ -603,11 +620,11 @@
      "j": 6,
      "score": 0.699765,
      "cell": 303,
-     "connect": 2007153,
+     "connect": 2191958,
      "land": 6374554,
      "road": 600000,
      "water": 0,
-     "upfront": 8981707,
+     "upfront": 9166512,
      "sub": "S4",
      "mwh": 312039
     },
@@ -617,11 +634,11 @@
      "j": 15,
      "score": 0.678831,
      "cell": 678,
-     "connect": 4802038,
+     "connect": 5244176,
      "land": 7736185,
      "road": 0,
      "water": 0,
-     "upfront": 12538223,
+     "upfront": 12980361,
      "sub": "S3",
      "mwh": 316528
     },
@@ -631,11 +648,11 @@
      "j": 3,
      "score": 0.673751,
      "cell": 173,
-     "connect": 3010730,
+     "connect": 3287937,
      "land": 4756031,
      "road": 1200000,
      "water": 0,
-     "upfront": 8966760,
+     "upfront": 9243967,
      "sub": "S4",
      "mwh": 310565
     },
@@ -645,11 +662,11 @@
      "j": 16,
      "score": 0.657243,
      "cell": 719,
-     "connect": 8169675,
+     "connect": 8921881,
      "land": 5544631,
      "road": 600000,
      "water": 0,
-     "upfront": 14314306,
+     "upfront": 15066512,
      "sub": "S3",
      "mwh": 316261
     }
@@ -665,11 +682,11 @@
      "j": 8,
      "score": 0.695813,
      "cell": 497,
-     "connect": 14018948,
+     "connect": 15309714,
      "land": 675931,
      "road": 600000,
      "water": 0,
-     "upfront": 15294879,
+     "upfront": 16585645,
      "sub": "S3",
      "mwh": 469600
     },
@@ -679,11 +696,11 @@
      "j": 20,
      "score": 0.663181,
      "cell": 1020,
-     "connect": 22409004,
+     "connect": 24472267,
      "land": 569800,
      "road": 1200000,
      "water": 0,
-     "upfront": 24178804,
+     "upfront": 26242067,
      "sub": "S3",
      "mwh": 508987
     },
@@ -693,11 +710,11 @@
      "j": 12,
      "score": 0.655728,
      "cell": 665,
-     "connect": 18972388,
+     "connect": 20719231,
      "land": 577626,
      "road": 0,
      "water": 0,
-     "upfront": 19550014,
+     "upfront": 21296857,
      "sub": "S3",
      "mwh": 508005
     },
@@ -707,11 +724,11 @@
      "j": 0,
      "score": 0.643302,
      "cell": 93,
-     "connect": 25349024,
+     "connect": 27682983,
      "land": 504811,
      "road": 1800000,
      "water": 0,
-     "upfront": 27653835,
+     "upfront": 29987794,
      "sub": "S3",
      "mwh": 513134
     },
@@ -721,11 +738,11 @@
      "j": 15,
      "score": 0.619422,
      "cell": 807,
-     "connect": 9001065,
+     "connect": 9829819,
      "land": 744900,
      "road": 1800000,
      "water": 0,
-     "upfront": 11545965,
+     "upfront": 12374719,
      "sub": "S3",
      "mwh": 457768
     }
@@ -741,11 +758,11 @@
      "j": 15,
      "score": 0.672169,
      "cell": 683,
-     "connect": 1561199,
+     "connect": 1704943,
      "land": 2283429,
      "road": 0,
      "water": 1500000,
-     "upfront": 5344628,
+     "upfront": 5488372,
      "sub": "S3"
     },
     {
@@ -754,11 +771,11 @@
      "j": 5,
      "score": 0.629381,
      "cell": 261,
-     "connect": 1003577,
+     "connect": 1095979,
      "land": 783686,
      "road": 0,
      "water": 12727922,
-     "upfront": 14515184,
+     "upfront": 14607587,
      "sub": "S4"
     },
     {
@@ -767,11 +784,11 @@
      "j": 15,
      "score": 0.595472,
      "cell": 680,
-     "connect": 2665133,
+     "connect": 2910520,
      "land": 1584677,
      "road": 0,
      "water": 6000000,
-     "upfront": 10249811,
+     "upfront": 10495197,
      "sub": "S3"
     },
     {
@@ -780,11 +797,11 @@
      "j": 5,
      "score": 0.577686,
      "cell": 258,
-     "connect": 3426425,
+     "connect": 3741906,
      "land": 853745,
      "road": 0,
      "water": 10062306,
-     "upfront": 14342476,
+     "upfront": 14657957,
      "sub": "S4"
     },
     {
@@ -793,11 +810,11 @@
      "j": 12,
      "score": 0.553404,
      "cell": 551,
-     "connect": 2665133,
+     "connect": 2910520,
      "land": 2243190,
      "road": 1800000,
      "water": 1500000,
-     "upfront": 8208323,
+     "upfront": 8453710,
      "sub": "S3"
     }
    ]
@@ -812,11 +829,11 @@
      "j": 15,
      "score": 0.672169,
      "cell": 683,
-     "connect": 1561199,
+     "connect": 1704943,
      "land": 2283429,
      "road": 0,
      "water": 1500000,
-     "upfront": 5344628,
+     "upfront": 5488372,
      "sub": "S3"
     },
     {
@@ -825,11 +842,11 @@
      "j": 9,
      "score": 0.642169,
      "cell": 426,
-     "connect": 1632162,
+     "connect": 1782440,
      "land": 2437239,
      "road": 600000,
      "water": 1500000,
-     "upfront": 6169402,
+     "upfront": 6319680,
      "sub": "S2"
     },
     {
@@ -838,11 +855,11 @@
      "j": 5,
      "score": 0.629381,
      "cell": 261,
-     "connect": 1003577,
+     "connect": 1095979,
      "land": 783686,
      "road": 0,
      "water": 12727922,
-     "upfront": 14515184,
+     "upfront": 14607587,
      "sub": "S4"
     },
     {
@@ -851,11 +868,11 @@
      "j": 15,
      "score": 0.595472,
      "cell": 680,
-     "connect": 2665133,
+     "connect": 2910520,
      "land": 1584677,
      "road": 0,
      "water": 6000000,
-     "upfront": 10249811,
+     "upfront": 10495197,
      "sub": "S3"
     },
     {
@@ -864,11 +881,11 @@
      "j": 5,
      "score": 0.577686,
      "cell": 258,
-     "connect": 3426425,
+     "connect": 3741906,
      "land": 853745,
      "road": 0,
      "water": 10062306,
-     "upfront": 14342476,
+     "upfront": 14657957,
      "sub": "S4"
     }
    ]
@@ -899,7 +916,7 @@
    "forbid": {
     "sub": "S3",
     "km": 13.656854,
-    "cost": 14018948,
+    "cost": 15309714,
     "cells": 13,
     "start": 497,
     "end": 638
@@ -907,7 +924,7 @@
    "allow": {
     "sub": "S3",
     "km": 10.242641,
-    "cost": 10711143,
+    "cost": 11697350,
     "cells": 10,
     "start": 497,
     "end": 638
@@ -981,11 +998,11 @@
      "j": 15,
      "score": 0.678831,
      "cell": 678,
-     "connect": 4802038,
+     "connect": 5244176,
      "land": 7736185,
      "road": 0,
      "water": 0,
-     "upfront": 12538223,
+     "upfront": 12980361,
      "sub": "S3",
      "mwh": 316528
     },
@@ -995,11 +1012,11 @@
      "j": 4,
      "score": 0.67462,
      "cell": 217,
-     "connect": 2007153,
+     "connect": 2191958,
      "land": 4958074,
      "road": 600000,
      "water": 0,
-     "upfront": 7565227,
+     "upfront": 7750032,
      "sub": "S4",
      "mwh": 311136
     },
@@ -1009,11 +1026,11 @@
      "j": 16,
      "score": 0.657243,
      "cell": 719,
-     "connect": 8169675,
+     "connect": 8921881,
      "land": 5544631,
      "road": 600000,
      "water": 0,
-     "upfront": 14314306,
+     "upfront": 15066512,
      "sub": "S3",
      "mwh": 316261
     },
@@ -1023,11 +1040,11 @@
      "j": 5,
      "score": 0.643777,
      "cell": 258,
-     "connect": 3426425,
+     "connect": 3741906,
      "land": 5947419,
      "road": 0,
      "water": 0,
-     "upfront": 9373844,
+     "upfront": 9689325,
      "sub": "S4",
      "mwh": 311309
     },
@@ -1037,11 +1054,11 @@
      "j": 18,
      "score": 0.640265,
      "cell": 811,
-     "connect": 5616209,
+     "connect": 6133310,
      "land": 7072647,
      "road": 1800000,
      "water": 0,
-     "upfront": 14488856,
+     "upfront": 15005957,
      "sub": "S3",
      "mwh": 317400
     }

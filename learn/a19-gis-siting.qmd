@@ -15,7 +15,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
      only; a data center is a load and a building. The map and its model: assets/learn/a19.js (LX.A19, LX.SiteMap; a
      lesson-local component for C3); the lesson: assets/learn/a19-gis-siting.js with data/a19-gis-siting.json (the seeded
      recipe of the fictional region, the sourced land-per-MW, setback, slope and line-cost figures, and the notebook's
-     reference block) and cf_targets.json (EIA's 2025 capacity factors). Tests: node
+     reference block), cf_targets.json (EIA's 2025 capacity factors) and prairie-city.json (the shared Prairie City data: the
+     campus's contract MW, read through A19.withCity; the map's S1-S4 are transmission substations, not the districts' own).
+     Costs in 2025 dollars (NREL's 2022 line costs through BEA's GDP deflator). Tests: node
      _tests/learn/test_a19-gis-siting.js [--write] (--write rewrites the no-JS block between the a19-fallback markers and the
      data file's reference block). Lab: learn/notebooks/a19-gis-siting.ipynb, written by
      scripts/build_learn_a19_notebook.py in the ResearchPortfolio folder. Henry's research enters only through the approved
@@ -147,18 +149,18 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="siting" data-src="../assets/learn/data/a19-gis-siting.json ../assets/learn/data/cf_targets.json">
+<div class="lx-interactive lx-cards" data-learn="siting" data-src="../assets/learn/data/a19-gis-siting.json ../assets/learn/data/cf_targets.json ../assets/learn/data/prairie-city.json">
 <div class="lx-fallback">
 <!-- a19-fallback:start (written from the model by the test's --write mode; do not edit) -->
 <p class="lx-eyebrow">The default runs, from the same model (Prairie City is fictional; its numbers are illustrative.)</p>
 <p class="a19-fb-h"><b>Solar farm, 150 MW: the five best 2 km × 2 km blocks</b>. Land left after exclusions: 954 km².</p>
-<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr><th scope="col">Site</th><th scope="col">Where (from the centre)</th><th scope="col">Score</th><th scope="col">Up front</th><th scope="col">Substation</th><th scope="col">Energy a year</th></tr></thead><tbody><tr><th scope="row">A</th><td>12 km E, 8 km N</td><td>73</td><td>$7.0M</td><td>East hub (S4)</td><td>313 GWh</td></tr><tr><th scope="row">B</th><td>9 km E, 8 km N</td><td>70</td><td>$9.0M</td><td>East hub (S4)</td><td>312 GWh</td></tr><tr><th scope="row">C</th><td>12 km W, 1 km S</td><td>68</td><td>$12.5M</td><td>West (S3)</td><td>317 GWh</td></tr><tr><th scope="row">D</th><td>11 km E, 11 km N</td><td>67</td><td>$9.0M</td><td>East hub (S4)</td><td>311 GWh</td></tr><tr><th scope="row">E</th><td>15 km W, 2 km S</td><td>66</td><td>$14.3M</td><td>West (S3)</td><td>316 GWh</td></tr></tbody></table></div>
+<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr><th scope="col">Site</th><th scope="col">Where (from the centre)</th><th scope="col">Score</th><th scope="col">Up front</th><th scope="col">Substation</th><th scope="col">Energy a year</th></tr></thead><tbody><tr><th scope="row">A</th><td>12 km E, 8 km N</td><td>73</td><td>$7.1M</td><td>East hub (S4)</td><td>313 GWh</td></tr><tr><th scope="row">B</th><td>9 km E, 8 km N</td><td>70</td><td>$9.2M</td><td>East hub (S4)</td><td>312 GWh</td></tr><tr><th scope="row">C</th><td>12 km W, 1 km S</td><td>68</td><td>$13.0M</td><td>West (S3)</td><td>317 GWh</td></tr><tr><th scope="row">D</th><td>11 km E, 11 km N</td><td>67</td><td>$9.2M</td><td>East hub (S4)</td><td>311 GWh</td></tr><tr><th scope="row">E</th><td>15 km W, 2 km S</td><td>66</td><td>$15.1M</td><td>West (S3)</td><td>316 GWh</td></tr></tbody></table></div>
 <p class="a19-fb-h"><b>Wind farm, 150 MW: the five best 7 km × 7 km blocks</b>. Land left after exclusions: 960 km².</p>
-<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr><th scope="col">Site</th><th scope="col">Where (from the centre)</th><th scope="col">Score</th><th scope="col">Up front</th><th scope="col">Substation</th><th scope="col">Energy a year</th></tr></thead><tbody><tr><th scope="row">A</th><td>17 km W, 3 km N</td><td>70</td><td>$15.3M</td><td>West (S3)</td><td>470 GWh</td></tr><tr><th scope="row">B</th><td>22 km W, 9 km S</td><td>66</td><td>$24.2M</td><td>West (S3)</td><td>509 GWh</td></tr><tr><th scope="row">C</th><td>25 km W, 1 km S</td><td>66</td><td>$19.6M</td><td>West (S3)</td><td>508 GWh</td></tr><tr><th scope="row">D</th><td>25 km W, 11 km N</td><td>64</td><td>$27.7M</td><td>West (S3)</td><td>513 GWh</td></tr><tr><th scope="row">E</th><td>15 km W, 4 km S</td><td>62</td><td>$11.5M</td><td>West (S3)</td><td>458 GWh</td></tr></tbody></table></div>
-<p class="a19-fb-h"><b>Data-center campus, 200 MW: the five best 1 km cells, at least 2 km apart</b>. Land left after exclusions: 912 km².</p>
-<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr><th scope="col">Site</th><th scope="col">Where (from the centre)</th><th scope="col">Score</th><th scope="col">Up front</th><th scope="col">Substation</th><th scope="col">Water main</th></tr></thead><tbody><tr><th scope="row">A</th><td>7 km W, 1 km S</td><td>67</td><td>$5.3M</td><td>West (S3)</td><td>1.0 km</td></tr><tr><th scope="row">B</th><td>11 km E, 9 km N</td><td>63</td><td>$14.5M</td><td>East hub (S4)</td><td>8.5 km</td></tr><tr><th scope="row">C</th><td>10 km W, 1 km S</td><td>60</td><td>$10.2M</td><td>West (S3)</td><td>4.0 km</td></tr><tr><th scope="row">D</th><td>8 km E, 9 km N</td><td>58</td><td>$14.3M</td><td>East hub (S4)</td><td>6.7 km</td></tr><tr><th scope="row">E</th><td>7 km W, 2 km N</td><td>55</td><td>$8.2M</td><td>West (S3)</td><td>1.0 km</td></tr></tbody></table></div>
-<p><b>Corridor</b> from wind site A to West (S3): 13.7 km for $14.0 million with protected land forbidden; 10.2 km for $10.7 million when it is allowed at NREL's mitigation cost (3.4 km through it).</p>
-<p>Up-front costs are 2022 dollars: the new line, an access road, land and, for the data center, a water main. Energy is a year's output; the two are never added.</p>
+<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr><th scope="col">Site</th><th scope="col">Where (from the centre)</th><th scope="col">Score</th><th scope="col">Up front</th><th scope="col">Substation</th><th scope="col">Energy a year</th></tr></thead><tbody><tr><th scope="row">A</th><td>17 km W, 3 km N</td><td>70</td><td>$16.6M</td><td>West (S3)</td><td>470 GWh</td></tr><tr><th scope="row">B</th><td>22 km W, 9 km S</td><td>66</td><td>$26.2M</td><td>West (S3)</td><td>509 GWh</td></tr><tr><th scope="row">C</th><td>25 km W, 1 km S</td><td>66</td><td>$21.3M</td><td>West (S3)</td><td>508 GWh</td></tr><tr><th scope="row">D</th><td>25 km W, 11 km N</td><td>64</td><td>$30.0M</td><td>West (S3)</td><td>513 GWh</td></tr><tr><th scope="row">E</th><td>15 km W, 4 km S</td><td>62</td><td>$12.4M</td><td>West (S3)</td><td>458 GWh</td></tr></tbody></table></div>
+<p class="a19-fb-h"><b>Data-center campus, 150 MW: the five best 1 km cells, at least 2 km apart</b>. Land left after exclusions: 912 km².</p>
+<div class="lx-scroll-x"><table class="lx-facts a19-fb"><thead><tr><th scope="col">Site</th><th scope="col">Where (from the centre)</th><th scope="col">Score</th><th scope="col">Up front</th><th scope="col">Substation</th><th scope="col">Water main</th></tr></thead><tbody><tr><th scope="row">A</th><td>7 km W, 1 km S</td><td>67</td><td>$5.5M</td><td>West (S3)</td><td>1.0 km</td></tr><tr><th scope="row">B</th><td>11 km E, 9 km N</td><td>63</td><td>$14.6M</td><td>East hub (S4)</td><td>8.5 km</td></tr><tr><th scope="row">C</th><td>10 km W, 1 km S</td><td>60</td><td>$10.5M</td><td>West (S3)</td><td>4.0 km</td></tr><tr><th scope="row">D</th><td>8 km E, 9 km N</td><td>58</td><td>$14.7M</td><td>East hub (S4)</td><td>6.7 km</td></tr><tr><th scope="row">E</th><td>7 km W, 2 km N</td><td>55</td><td>$8.5M</td><td>West (S3)</td><td>1.0 km</td></tr></tbody></table></div>
+<p><b>Corridor</b> from wind site A to West (S3): 13.7 km for $15.3 million with protected land forbidden; 10.2 km for $11.7 million when it is allowed at NREL's mitigation cost (3.4 km through it).</p>
+<p>Up-front costs are 2025 dollars (NREL's 2022 line costs converted with BEA's GDP deflator): the new line, an access road, land and, for the data center, a water main. Energy is a year's output; the two are never added.</p>
 <!-- a19-fallback:end -->
 <p class="lx-hint">With JavaScript on, you work through the screen yourself: a map of the region with its layers, switches for the exclusions, sliders for the weights, a line routed to a substation and a table of the best sites under the map.</p>
 </div>
@@ -166,8 +168,9 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-datanote"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Fictional:</b> Prairie City is fictional; its numbers are illustrative. Every layer is generated from a seed and a stated recipe; nothing was downloaded.</li>
 <li><b>Sourced:</b> solar arrays take 4.2 acres per MW of panels, single-axis tracking, with 1.29 MW of panels per MW of inverters (<a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a>, 2019 plants); wind farms spread over 34.5 ha per MW (<a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">NREL, 2009</a>, Table 1).</li>
-<li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile come from <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), in 2022 dollars.</li>
-<li><b>Set for teaching:</b> the substations' spare capacity, land prices, access roads, water mains, block sizes and the capacity-factor rules.</li>
+<li><b>Sourced:</b> setbacks, slope rules and the line's cost per mile come from <a href="https://docs.nlr.gov/docs/fy25osti/91900.pdf">NREL's 2024 supply curves</a> (Tables 7, 9, 11 and 12), in 2022 dollars, shown in 2025 dollars with <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA's GDP deflator</a>.</li>
+<li><b>Shared city data:</b> the data-center campus's 150 MW contract comes from Prairie City's data, as on the course's other city pages.</li>
+<li><b>Set for teaching:</b> the four transmission substations S1–S4 and their spare capacity, land prices, access roads, water mains, block sizes and the capacity-factor rules.</li>
 </ul></div>
 <p class="lx-hint" style="margin-top:.6rem">About 25 guided minutes in eight steps. Practice, about 30 more: the set under Check.</p>
 <div class="lx-card lx-notebook a19-nb">
@@ -215,13 +218,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 | A criterion's score | $s = 1 - \min\!\big(1, \max(0, \tfrac{d - d_0}{d_1 - d_0})\big)$ | near a substation: 1 at 0 km, 0 from 15 km (solar) |
 | Suitability | $S = \sum_k w_k s_k \,/\, \sum_k w_k$ | default solar weights 20, 35, 15, 20, 10 |
 | Room in a block | $B = \sum_c a_c f_c \ge$ the land needed | 150 × 1.29 × 4.2 = 812.7 acres = 3.29 km² of a 4 km² block |
-| A line's cost | $\sum_\text{steps} \tfrac{c_u + c_v}{2}\,\ell$ | $c$ = $1,003,577 per km on farmland, × 1.8 in flood zones |
+| A line's cost | $\sum_\text{steps} \tfrac{c_u + c_v}{2}\,\ell$ | $c$ = $1,095,979 per km on farmland (2025 dollars), × 1.8 in flood zones |
 
 - **Scores.** $d$ is a distance in km and $d_0$, $d_1$ the ramp's ends; $w_k$ is a weight and $s_k$ a score from 0 to 1.
 - **Blocks.** $a_c$ is a cell's area in km² and $f_c$ its share outside setbacks, checked at 16 points.
 - **Lines.** $c_u$ and $c_v$ are two neighbouring cells' costs per km; the step $\ell$ is 1 km, or $\sqrt{2}$ km on a diagonal.
 - **Resources** are rescaled from the region's lowest (0) to its highest (1); land price falls from 1 at $2,500 an acre to 0 at $15,000.
-- **The line's cost per km** is NREL's $1,615,100 a mile divided by 1.609344 km a mile.
+- **The line's cost per km** is NREL's $1,615,100 a mile (2022 dollars) × 128.893 / 118.026 (BEA's GDP deflator, to 2025 dollars) ÷ 1.609344 km a mile.
 - **Ties.** Equal scores go to the more northern, then the more western block. Equal-cost paths can differ in their steps; the page draws the first its search finds, and its length and cost are the same on all of them.
 
 ```{=html}
@@ -275,7 +278,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-qq" data-id="cheap" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “The site with the highest suitability score is the cheapest to build.”</p>
 <ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Myth. Wind site A costs $15.3 million up front, site E $11.5 million. A score mixes criteria by chosen weights; a cost model prices them.</p></details>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. Wind site A costs $16.6 million up front, site E $12.4 million. A score mixes criteria by chosen weights; a cost model prices them.</p></details>
 </div>
 <div class="lx-qq" data-id="weight" data-answer="myth">
 <p class="lx-qtext">Myth or fact? “Excluding land and giving it a low weight do the same job.”</p>
@@ -314,7 +317,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><p><b>Land for solar.</b> A 200 MW (AC) farm has 1.3 MW of panels per MW of inverters. At LBNL's 4.2 acres per MW of panels, how much land do the arrays need?</p><details class="lx-answer"><summary>Answer</summary><p>200 × 1.3 × 4.2 = 1,092 acres, about 4.42 km²; the whole site is larger (roads, fences, setbacks).</p></details></li>
 <li><p><b>Land for wind.</b> A 100 MW wind farm at NREL's average of 34.5 ha per MW: how large is it, and how much of it do turbines, roads and substations occupy for good, at 0.3 ha per MW?</p><details class="lx-answer"><summary>Answer</summary><p>3,450 ha (34.5 km²) in all; 30 ha for good, under 1%: farming goes on between the turbines.</p></details></li>
 <li><p><b>Setbacks.</b> 40 farmsteads, none within 800 m of another. How much land does a 400 m setback remove, and how much a 220 m one?</p><details class="lx-answer"><summary>Answer</summary><p>40 × π × 0.4² = 20.1 km² against 40 × π × 0.22² = 6.1 km²: the area grows with the square of the setback.</p></details></li>
-<li><p><b>A line's cost.</b> A 12 km route runs 8 km over farmland and 4 km through a flood zone. At $1,615,100 a mile and a flood-zone multiplier of 1.8, what does it cost?</p><details class="lx-answer"><summary>Answer</summary><p>$1,003,577 a km × (8 + 4 × 1.8) = $15.3 million.</p></details></li>
+<li><p><b>A line's cost.</b> A 12 km route runs 8 km over farmland and 4 km through a flood zone (× 1.8). At NREL's $1,615,100 a mile in 2022 dollars, what does it cost in 2025 dollars (deflator 128.893 / 118.026)?</p><details class="lx-answer"><summary>Answer</summary><p>$1,615,100 × 1.0921 ÷ 1.609344 = $1,095,979 a km; × (8 + 4 × 1.8) = $16.7 million in 2025 dollars.</p></details></li>
 <li><p><b>A least-cost path by hand.</b> A 3 × 3 grid's costs per km, by row: 1 1 4 / 1 5 1 / 2 1 1. A step to a side-by-side cell costs the two cells' average. Cheapest path, top-left to bottom-right?</p><details class="lx-answer"><summary>Answer</summary><p>Down the left column, then along the bottom row: 1 + 1.5 + 1.5 + 1 = 5. Along the top row and down the right column costs 7.</p></details></li>
 <li><p><b>Read a claim critically.</b> A report says: “Our map shows the best solar site in the county.” What four questions would you ask?</p><details class="lx-answer"><summary>Answer</summary><p>Whose weights, and would other weights pick another site; which land was excluded, by what rule; how fine and how recent the layers are; who was asked, and what a visit found.</p></details></li>
 </ol>
@@ -368,6 +371,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Bolinger, M., and Bolinger, G. (2022). <a href="https://doi.org/10.1109/JPHOTOV.2021.3136805">Land Requirements for Utility-Scale PV: An Empirical Update on Power and Energy Density</a>. <em>IEEE Journal of Photovoltaics</em>. Summary slides, <a href="https://emp.lbl.gov/sites/default/files/emp-files/land_requirements_for_utility-scale_pv.pdf">LBNL</a> (PDF), 1 February 2022: 2019 medians, slide 13; DC:AC ratios, slide 8; array area only, slide 7.</li>
 <li>Denholm, P., Hand, M., Jackson, M., and Ong, S. (2009). <a href="https://docs.nlr.gov/docs/fy09osti/45834.pdf">Land-Use Requirements of Modern Wind Power Plants in the United States</a> (PDF). NREL/TP-6A2-45834. Table 1, p. 10.</li>
 <li>Ong, S., Campbell, C., Denholm, P., Margolis, R., and Heath, G. (2013). <a href="https://docs.nlr.gov/docs/fy13osti/56290.pdf">Land-Use Requirements for Solar Power Plants in the United States</a> (PDF). NREL/TP-6A20-56290. Whole sites, Table ES-1, p. v.</li>
+<li>Dollar years: U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9, Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual: 2022 118.026, 2025 128.893 (as of 30 September 2026, read through FRED's annual series on 6 November 2026).</li>
 <li>Capacity factors for the energy column: EIA. <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a>, U.S. utility-scale fleets, 2025 (accessed 2 November 2026).</li>
 <li>Flood zones: FEMA. <a href="https://www.fema.gov/glossary/special-flood-hazard-area-sfha">Special Flood Hazard Area</a>, glossary (page read 6 November 2026).</li>
 <li>Learn to do it with open tools: the <a href="https://docs.qgis.org/latest/en/docs/training_manual/">QGIS Training Manual</a>.</li>

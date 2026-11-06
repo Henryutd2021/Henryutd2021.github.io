@@ -3,7 +3,8 @@
    The map and its model are assets/learn/a19.js (LX.A19, LX.SiteMap), loaded before this file. This file holds the
    lesson's own numbers and words (pure, exported for Node: _tests/learn/test_a19-gis-siting.js checks every one), the
    eight step cards, the demo states and the explain layer.
-   Data: data/a19-gis-siting.json and data/cf_targets.json (EIA's 2025 capacity factors).
+   Data: data/a19-gis-siting.json, data/cf_targets.json (EIA's 2025 capacity factors) and data/prairie-city.json (the
+   shared Prairie City data: the data-center campus's contract MW, read through A19.withCity).
    Shared components: LX.StepCards, LX.Slider, LX.Toggle, LX.Flowchart, LX.CompareTable, LX.Boundary; lesson links through LX.rich. */
 (function () {
   "use strict";
@@ -81,8 +82,8 @@
       weights: "A weight of 0 drops a criterion; only the ratios between weights matter. Scores run from 0 to 100 for land that is left.",
       random: "Each draw picks five weights at random that sum to 1, all mixes equally likely; seed " + D.sensitivity.seed + ".",
       wind: "Turbines go on the buildable cells; the farm's total area includes the farmland between them, as NREL's 34.5 ha per MW average does.",
-      corridor: "Costs: NREL's 138 kV baseline, $" + comma(D.costs.lineUSDperMile) + " a mile in 2022 dollars, times " + D.costs.mult.wet + " in flood zones, " + D.costs.mult.built + " through built-up land.",
-      dc: "A data center here is a load and a building: its grid draw, water, land and access road. Its water need depends on its cooling, which this map leaves out.",
+      corridor: "Costs: NREL's 138 kV baseline, $" + comma(D.costs.lineUSDperMile) + " a mile in 2022 dollars ($" + comma(Math.round(A19.usd(D, D.costs.lineUSDperMile, D.costs.lineYear))) + " in 2025 dollars), times " + D.costs.mult.wet + " in flood zones, " + D.costs.mult.built + " through built-up land.",
+      dc: "A data center here is a load and a building: Prairie City's " + T.dc.mw + " MW campus (shared city data), with its water, land and road. Its cooling sets its water need, left out here.",
       limits: "The 2 km check runs on the solar farm with your step 2 rules and default weights. The newer homes are acreages along the north county road."
     };
   }
@@ -165,7 +166,7 @@
     });
     var f = corridor(M, T.wind.setbackM, "forbid"), a = corridor(M, T.wind.setbackM, "allow");
     out.push("<p><b>Corridor</b> from wind site A to " + subName(D, f.route.sub) + ": " + km(f.route.km) + " for " + musd(f.route.cost) + " with protected land forbidden; " + km(a.route.km) + " for " + musd(a.route.cost) + " when it is allowed at NREL's mitigation cost (" + km(a.route.parts.protected || 0) + " through it).</p>");
-    out.push("<p>Up-front costs are 2022 dollars: the new line, an access road, land" + " and, for the data center, a water main. Energy is a year's output; the two are never added.</p>");
+    out.push("<p>Up-front costs are 2025 dollars (NREL's 2022 line costs converted with BEA's GDP deflator): the new line, an access road, land and, for the data center, a water main. Energy is a year's output; the two are never added.</p>");
     return out.join("\n");
   }
   function limitRows(M, st) {
@@ -210,7 +211,7 @@
     function set(rows, opts) {
       opts = opts || {};
       cap.textContent = opts.caption || "The five best sites, the map's text version (km from the city centre)";
-      note.textContent = opts.note || "Up front: the site's own costs in 2022 dollars (the new line, an access road" + (opts.lastKey === "water" ? ", land and a water main); the campus itself" : " and land); the plant itself") + " costs the same anywhere and is left out.";
+      note.textContent = opts.note || "Up front: the site's own costs in 2025 dollars (the new line, an access road" + (opts.lastKey === "water" ? ", land and a water main); the campus itself" : " and land); the plant itself") + " costs the same anywhere and is left out.";
       var head = ["Site", "Where", "Score", "Up front", "Grid", opts.last || "Energy a year"];
       tbl.innerHTML = "";
       var th = H("thead", null, tbl), tr = H("tr", null, th);
@@ -228,7 +229,7 @@
   }
 
   function view(live, data, root) {
-    var D = data.a19_gis_siting, M = model(D, data.cf_targets), TX = hints(M), T = D.types;
+    var D = A19.withCity(data.a19_gis_siting, data.prairie_city), M = model(D, data.cf_targets), TX = hints(M), T = D.types;
     var log = LX.store.get("a19-log", {}) || {}, refreshT = null;
     function keep(k, v) { log[k] = v; LX.store.set("a19-log", log); clearTimeout(refreshT); refreshT = setTimeout(buildExplain, 150); }
     function st() { return { ex: Object.assign({}, T.solar.exclusions, log.ex || {}), strict: !!log.strict, w: weightsOf(D, "solar", log.w), sb: log.sb || T.wind.setbackM }; }
@@ -475,7 +476,7 @@
       var c3 = H("div", { class: "lx-xcard" }, host);
       LX.Boundary(c3, { title: "Where this screen holds",
         lede: "A suitability map is a screening tool: it finds places worth a closer look.",
-        holds: ["the layers are current and finer than the rules they apply;", "the exclusions are real rules, and the weights are stated as choices;", "costs are first estimates: a straight new line along the cheapest path, land at a typical price, 2022 dollars."],
+        holds: ["the layers are current and finer than the rules they apply;", "the exclusions are real rules, and the weights are stated as choices;", "costs are first estimates: a straight new line along the cheapest path, land at a typical price, 2025 dollars."],
         leaves: ["the people who live there, and what they would accept;", "grid studies: whether the network can take the power or the load ([[lesson:a06-interconnection|A6]]);", "two projects sharing one substation's spare capacity, wildlife surveys, title and permits."],
         source: "Prairie City is fictional; its numbers are illustrative. Land per MW, setbacks, slope rules and line costs: NREL and LBNL (Sources)." });
     }
