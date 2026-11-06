@@ -201,12 +201,12 @@
     h.push("<li><b>Screening estimates:</b> the cost shift assumes the utility resets its rates so other customers make up what it does not save, with the avoided costs in the log; a model of the school's bill does not produce this by itself, the accounting of who pays does.</li>");
     h.push("<li><b>Not in money:</b> about " + n0(r.co2t) + " t of CO₂ a year at Kansas's 2024 average factor (an inventory number, not the change caused); no resilience (no islanding equipment costed); installation is job-years, not permanent jobs, and is not estimated.</li></ul></div>");
     // sensitivity
-    h.push('<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cka-sens">');
+    h.push('<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cf-two cka-sens">');
     h.push('<thead><tr><th scope="col">Input</th><th scope="col">Low to high</th><th scope="col">NPV at low</th><th scope="col">NPV at high</th></tr></thead><tbody>');
     var lab = {}; D.log.forEach(function (x) { lab[x.id] = x; });
     S.forEach(function (s) {
       var lr = s.ids.length > 1 ? { unit: "$ (2025)", id: "upkeep" } : lab[s.ids[0]];
-      h.push('<tr><th scope="row">' + esc(s.label) + (s.ids.length > 1 ? " (a year)" : "") + '</th><td class="n">' + showVal(lr, s.lo) + " to " + showVal(lr, s.hi) + '</td><td class="n">' + usd(s.atLo) + '</td><td class="n">' + usd(s.atHi) + "</td></tr>");
+      h.push('<tr><th scope="row">' + esc(s.label) + (s.ids.length > 1 ? " (a year)" : "") + '</th><td class="n" data-l="Low to high">' + showVal(lr, s.lo) + " to " + showVal(lr, s.hi) + '</td><td class="n" data-l="NPV at low">' + usd(s.atLo) + '</td><td class="n" data-l="NPV at high">' + usd(s.atHi) + "</td></tr>");
     });
     h.push("</tbody></table></div>");
     h.push('<p class="lx-hint">Sorted by swing. A higher demand charge lowers the energy charge (the tariff still gives the school EIA\'s average), so the solar saves less than the battery gains: the result falls.</p>');

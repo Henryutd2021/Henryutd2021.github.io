@@ -105,7 +105,7 @@
   },
   {
    "key": "bundle",
-   "label": "Confounding: a second change",
+   "label": "Confounding (a second change)",
    "short": "Thermostat offer",
    "kind": "confounding",
    "text": "From month 13 the most engaged TOU homes (engagement above 0.5) also got a smart thermostat, worth a further 0.15 kW."

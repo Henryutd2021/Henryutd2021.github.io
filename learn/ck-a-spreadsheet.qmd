@@ -145,16 +145,16 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><b>Adds up:</b> school −$776,324 + other customers −$192,941 = resource view −$969,265.</li>
 <li><b>Screening estimates:</b> the cost shift assumes the utility resets its rates so other customers make up what it does not save, with the avoided costs in the log; a model of the school's bill does not produce this by itself, the accounting of who pays does.</li>
 <li><b>Not in money:</b> about 118 t of CO₂ a year at Kansas's 2024 average factor (an inventory number, not the change caused); no resilience (no islanding equipment costed); installation is job-years, not permanent jobs, and is not estimated.</li></ul></div>
-<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cka-sens">
+<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cf-two cka-sens">
 <thead><tr><th scope="col">Input</th><th scope="col">Low to high</th><th scope="col">NPV at low</th><th scope="col">NPV at high</th></tr></thead><tbody>
-<tr><th scope="row">Up-front cost</th><td class="n">$649,535 to $1,082,558</td><td class="n">−$559,813</td><td class="n">−$992,836</td></tr>
-<tr><th scope="row">Average electricity price</th><td class="n">$0.0894 to $0.134</td><td class="n">−$876,265</td><td class="n">−$676,384</td></tr>
-<tr><th scope="row">Battery's cut in the billed peak</th><td class="n">30% to 90%</td><td class="n">−$860,683</td><td class="n">−$691,965</td></tr>
-<tr><th scope="row">Upkeep, solar and battery (a year)</th><td class="n">$11,229 to $18,715</td><td class="n">−$717,850</td><td class="n">−$834,798</td></tr>
-<tr><th scope="row">Demand charge</th><td class="n">$5 to $20</td><td class="n">−$753,317</td><td class="n">−$822,339</td></tr>
-<tr><th scope="row">Solar capacity factor</th><td class="n">16.0% to 19.6%</td><td class="n">−$809,986</td><td class="n">−$742,663</td></tr>
-<tr><th scope="row">Share used at the school</th><td class="n">60% to 90%</td><td class="n">−$807,108</td><td class="n">−$745,540</td></tr>
-<tr><th scope="row">Discount rate</th><td class="n">2% to 7%</td><td class="n">−$754,804</td><td class="n">−$790,985</td></tr>
+<tr><th scope="row">Up-front cost</th><td class="n" data-l="Low to high">$649,535 to $1,082,558</td><td class="n" data-l="NPV at low">−$559,813</td><td class="n" data-l="NPV at high">−$992,836</td></tr>
+<tr><th scope="row">Average electricity price</th><td class="n" data-l="Low to high">$0.0894 to $0.134</td><td class="n" data-l="NPV at low">−$876,265</td><td class="n" data-l="NPV at high">−$676,384</td></tr>
+<tr><th scope="row">Battery's cut in the billed peak</th><td class="n" data-l="Low to high">30% to 90%</td><td class="n" data-l="NPV at low">−$860,683</td><td class="n" data-l="NPV at high">−$691,965</td></tr>
+<tr><th scope="row">Upkeep, solar and battery (a year)</th><td class="n" data-l="Low to high">$11,229 to $18,715</td><td class="n" data-l="NPV at low">−$717,850</td><td class="n" data-l="NPV at high">−$834,798</td></tr>
+<tr><th scope="row">Demand charge</th><td class="n" data-l="Low to high">$5 to $20</td><td class="n" data-l="NPV at low">−$753,317</td><td class="n" data-l="NPV at high">−$822,339</td></tr>
+<tr><th scope="row">Solar capacity factor</th><td class="n" data-l="Low to high">16.0% to 19.6%</td><td class="n" data-l="NPV at low">−$809,986</td><td class="n" data-l="NPV at high">−$742,663</td></tr>
+<tr><th scope="row">Share used at the school</th><td class="n" data-l="Low to high">60% to 90%</td><td class="n" data-l="NPV at low">−$807,108</td><td class="n" data-l="NPV at high">−$745,540</td></tr>
+<tr><th scope="row">Discount rate</th><td class="n" data-l="Low to high">2% to 7%</td><td class="n" data-l="NPV at low">−$754,804</td><td class="n" data-l="NPV at high">−$790,985</td></tr>
 </tbody></table></div>
 <p class="lx-hint">Sorted by swing. A higher demand charge lowers the energy charge (the tariff still gives the school EIA's average), so the solar saves less than the battery gains: the result falls.</p>
 <div id="cka-tornado"></div></div>

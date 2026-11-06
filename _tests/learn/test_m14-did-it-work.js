@@ -199,7 +199,7 @@ ok((TX.match(/[Ss]imulated/g) || []).length >= 6, "the page says 'simulated' thr
   cards.go(8); const sg9 = () => card().querySelectorAll(".lx-seg button");
   sg9()[1].click(); ok(next().disabled, "step 9: one threat is not enough");
   sg9()[2].click();
-  ok(/Claimed in all 14: 196 MW a year; the simulation's net change across all 30 regions: 76\./.test(text(card().innerHTML)), "step 9: the border case's gross and net");
+  ok(/Claimed in all 14: 196 MW a year; the simulation's net change across all 30 regions: 76 MW a year\./.test(text(card().innerHTML)), "step 9: the border case's gross and net");
   sawIs(9, "A boom shows in the years before 2021. Projects that moved across the border do not: they shrink the comparison group, so DiD reads 14.0 MW a year where the net change was 76 MW a year in all.");
   { const sp = plotSpecs.filter(x => x.text && x.text.head[0] === "Year").pop(); ok(sp && sp.text.rows.length === 10 && sp.text.rows[4][2] === "reference" && sp.text.rows[4][0] === "2020", "step 9: the regions' event study, 2020 the reference"); }
   cards.go(9);

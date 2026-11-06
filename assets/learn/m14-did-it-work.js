@@ -236,7 +236,7 @@
   function ladderSpec(rows, truth, aria) {
     var vals = [truth, 0]; rows.forEach(function (r) { vals.push(r.lo != null ? r.lo : r.est, r.hi != null ? r.hi : r.est); });
     var lo = Math.floor(Math.min.apply(null, vals) * 5) / 5 - 0.2, hi = Math.min(0.2, Math.ceil(Math.max.apply(null, vals) * 5) / 5 + 0.2);
-    return { x: { min: 0, max: rows.length, ticks: rows.map(function (r, i) { return [i + 0.5, r.short]; }), ticksN: rows.map(function (r, i) { return [i + 0.5, r.shortN || r.short]; }) },
+    return { x: { min: 0, max: rows.length + 0.9, ticks: rows.map(function (r, i) { return [i + 0.5, r.short]; }), ticksN: rows.map(function (r, i) { return [i + 0.5, r.shortN || r.short]; }) },
       y: { min: lo, max: hi, step: 0.2, fmt: function (v) { return sgn(v, 1); }, unit: "kW", zero: true }, height: 220, heightN: 200,
       refs: [{ y: truth, label: "Truth " + kw(truth), labelN: k2(truth), color: COL.truth, dash: "6 4", labelColor: "color-mix(in srgb, var(--lx-good) 70%, var(--lx-ink))" }],
       bars: rows.filter(function (r) { return r.lo != null; }).map(function (r) { var i = rows.indexOf(r); return { x0: i + 0.42, x1: i + 0.58, y0: r.lo, y1: r.hi, color: COL.ci, op: 0.35 }; }),
@@ -247,7 +247,7 @@
   function eventSpec(es, o) {
     var vals = [0]; es.forEach(function (x) { vals.push(x.est - 1.96 * x.se, x.est + 1.96 * x.se); }); if (o.truth != null) vals.push(o.truth);
     var st = o.step, lo = Math.floor(Math.min.apply(null, vals) / st) * st, hi = Math.ceil(Math.max.apply(null, vals) / st) * st;
-    var x0 = es[0].k - 0.5, x1 = es[es.length - 1].k + 0.5;
+    var x0 = es[0].k - 0.5, x1 = es[es.length - 1].k + 1.4;   // room on the right for the truth label
     return { x: { min: x0, max: x1, ticks: o.ticks, ticksN: o.ticksN || o.ticks },
       y: { min: lo, max: hi, step: st, fmt: o.fmt, unit: o.unit, zero: true }, height: 220, heightN: 200,
       spans: [{ x0: -0.5, x1: x1, color: COL.post, op: 0.08, label: o.postLabel }],
@@ -351,7 +351,7 @@
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(ladderSpec([
             { label: "Naive after-period gap", short: "Naive", est: E.naive.est, lo: ci(E.naive)[0], hi: ci(E.naive)[1], ok: covers(E.naive, truth) },
-            { label: "Regression with home size", short: "Controls", est: E.reg.size },
+            { label: "Regression with home size", short: "Controls", shortN: "Reg.", est: E.reg.size },
             { label: "Before against after", short: "Before–after", shortN: "Pre–post", est: E.ba.est, lo: ci(E.ba)[0], hi: ci(E.ba)[1], ok: covers(E.ba, truth) },
             { label: "Difference-in-differences", short: "DiD", est: E.did.est, lo: ci(E.did)[0], hi: ci(E.did)[1], ok: covers(E.did, truth) }], truth, "Four estimates of the tariff's effect against the truth."));
           api.done(); api.saw("DiD: **" + kw(E.did.est) + "**, about 95% interval " + band(E.did, kw) + ", around the truth " + kw(truth) + ". It removes fixed differences between homes and changes common to both groups.");
@@ -421,7 +421,7 @@
           host.innerHTML = "";
           LX.Plot(host, { text: "Text version of the chart" }).render(regionEvent(R, X, "Event study for the regions: each year's difference-in-differences against 2020, with about-95% intervals.", R.effect));
           var t = "DiD <b>" + mwy(X.did.est) + "</b> per adopting region (" + band(X.did, mwy) + "); truth +10.0.";
-          if (k === "border") t += " Claimed in all " + X.nOn + ": " + Math.round(F.border.claimed) + " MW a year; the simulation's net change across all 30 regions: " + Math.round(F.border.net) + ".";
+          if (k === "border") t += " Claimed in all " + X.nOn + ": " + Math.round(F.border.claimed) + " MW a year; the simulation's net change across all 30 regions: " + Math.round(F.border.net) + " MW a year.";
           out.innerHTML = t;
           if (seen[0] && seen[1] && seen[2]) { api.done(); api.saw("A boom shows in the years before 2021. Projects that moved across the border do not: they shrink the comparison group, so DiD reads " + mwy(F.rthreat.border.did.est) + " where the net change was " + Math.round(F.border.net) + " MW a year in all."); }
           else api.saw("Try all three.", true);
@@ -463,9 +463,9 @@
       if (n === 3) { clickIn(".lx-step-act .lx-toggles button", 0); clickIn(".lx-step-act .m14-row .lx-btn"); }
       if (n === 5) { var inp = cardsHost.querySelector(".lx-step-act input"); if (inp) { inp.value = k2(E.did.est).replace("−", "-"); clickIn(".lx-step-act .lx-na button"); } }
       if (n === 6) clickIn(".lx-step-act .lx-seg button", 0);
-      if (n === 7 && S.draw7) [1, 3, 4].forEach(function (i) { S.draw7(i); });
+      if (n === 7) [1, 3, 4].forEach(function (i) { clickIn(".lx-step-act .lx-seg button", i); });
       if (n === 8) clickIn(".lx-step-act .lx-choice", 2);
-      if (n === 9 && S.draw9) [1, 2].forEach(function (i) { S.draw9(i); });
+      if (n === 9) [1, 2].forEach(function (i) { clickIn(".lx-step-act .lx-seg button", i); });
       if (n === 10) D.classify.forEach(function (c, k) { var segs = cardsHost.querySelectorAll(".lx-step-act .m14-case .lx-seg"); var b = segs[k] && segs[k].querySelectorAll("button")[Object.keys(D.kinds).indexOf(c.answer)]; if (b) b.click(); });
       return { view: state };
     }, cards);
