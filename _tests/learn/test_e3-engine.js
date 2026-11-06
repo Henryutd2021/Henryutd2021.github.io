@@ -166,10 +166,10 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     const dGas = h.rows.reduce((s, x) => s + x.households * x.d.gas, 0);
     let eng = 0; P.D.forEach((D, i) => { eng += D.rho * ((A.d[i].gas - D.otherGas) - (R0.acc.d[i].gas - D.otherGas)); });
     ok(near(dGas, eng, Math.abs(eng) * 1e-6 + 1), "electrify: the groups' gas change adds up to the homes' change in the engine (" + Math.round(dGas) + " vs " + Math.round(eng) + " MWh)");
-    const n = E3.spread([100, 100, 100], 0.5, 60, "low");
-    ok(n[0] === 50 && n[1] === 10 && n[2] === 0, "lower incomes first: the lowest group's eligible homes fill first");
-    const e = E3.spread([100, 300, 100], 1, 100, "even");
-    ok(near(e[0], 20) && near(e[1], 60) && near(e[2], 20), "every group alike: in proportion to eligible homes");
+    const n = E3.spread([50, 50, 50], 60, "low");
+    ok(n[0] === 50 && n[1] === 10 && n[2] === 0, "lower incomes first: the lowest group's potential fills first");
+    const e = E3.spread([100, 300, 100], 100, "even");
+    ok(near(e[0], 20) && near(e[1], 60) && near(e[2], 20), "every group alike: in proportion to each group's potential");
   }
 
   // ---------------- failure states and hints
