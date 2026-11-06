@@ -270,10 +270,11 @@
     }
 
     // ---------- geometry ----------
-    function smooth(pts) {   // Catmull-Rom spline through the points, as cubic Beziers
+    function smooth(pts, from, to) {   // Catmull-Rom spline through the points, as cubic Beziers (optionally segments from..to only)
       if (pts.length < 2) return "";
-      let d = "M" + pts[0][0].toFixed(1) + "," + pts[0][1].toFixed(1);
-      for (let i = 0; i < pts.length - 1; i++) {
+      from = from || 0; to = to == null ? pts.length - 1 : to;
+      let d = "M" + pts[from][0].toFixed(1) + "," + pts[from][1].toFixed(1);
+      for (let i = from; i < to; i++) {
         const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
         const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
         const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
@@ -304,6 +305,13 @@
     function routeD(r, path) {
       if (r.m === "ground") return smooth(r.p.map(function (p) { return proj(p); }).filter(Boolean));
       return arcs(r, path);
+    }
+    // a route drawn leg by leg in its own colours (the 2013 loop, as Henry's route image shows it): [{d, color}]
+    function legsD(r) {
+      const pts = r.p.map(function (p) { return proj(p); });
+      if (pts.some(function (q) { return !q; })) return null;
+      let from = 0;
+      return r.lg.map(function (leg) { const d = smooth(pts, from, leg[0]); from = leg[0]; return { d: d, color: leg[1] }; });
     }
 
     // ---------- the base map: borders and the colours of the places visited ----------
@@ -430,7 +438,7 @@
     }
 
     // a new route draws itself: a mask stroke runs along the line (works for dashed and dotted lines too)
-    function drawIn(v, d, delay, W, H) {
+    function drawIn(v, d, delay, W, H, fixedMs, ease) {
       const id = "jr-mask-" + (++maskSeq);
       const mask = el("mask", { id: id, maskUnits: "userSpaceOnUse", x: -50, y: -50, width: W + 100, height: H + 100 }, defs);
       const mp = el("path", { d: d, fill: "none", stroke: "#fff", "stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round" }, mask);
@@ -438,8 +446,8 @@
       if (!L) { defs.removeChild(mask); return; }
       mp.style.strokeDasharray = L + " " + L; mp.style.strokeDashoffset = L;
       v.setAttribute("mask", "url(#" + id + ")");
-      const ms = Math.min(1600, 500 + L * 1.2);
-      window.setTimeout(function () { mp.style.transition = "stroke-dashoffset " + ms + "ms ease-in-out"; mp.style.strokeDashoffset = "0"; }, delay + 30);
+      const ms = fixedMs || Math.min(1600, 500 + L * 1.2);
+      window.setTimeout(function () { mp.style.transition = "stroke-dashoffset " + ms + "ms " + (ease || "ease-in-out"); mp.style.strokeDashoffset = "0"; }, delay + 30);
       window.setTimeout(function () { v.removeAttribute("mask"); if (mask.parentNode) mask.parentNode.removeChild(mask); }, delay + ms + 120);
     }
 
@@ -495,6 +503,17 @@
         }
         ds.forEach(function (x) {
           el("path", { class: "jr-hit", d: x.d }, g);
+          const legs = x.r.lg && legsD(x.r);
+          if (legs) {   // leg by leg, each in its colour; during Play they draw one after another, as one stroke in 1.7 s
+            const vs = legs.map(function (leg) { return el("path", { class: "jr-vis jr-m-" + x.r.m + " jr-leg", d: leg.d, style: "stroke: " + leg.color }, g); });
+            if (fresh) {
+              const lens = vs.map(function (v) { return v.getTotalLength ? v.getTotalLength() : 1; });
+              const total = lens.reduce(function (a, b) { return a + b; }, 0) || 1;
+              let t = stagger * 320;
+              vs.forEach(function (v, k) { const ms = Math.max(40, 1700 * lens[k] / total); drawIn(v, legs[k].d, t, W, H, ms, "linear"); t += ms; });
+            }
+            return;
+          }
           const v = el("path", { class: "jr-vis jr-m-" + x.r.m, d: x.d }, g);
           if (fresh) drawIn(v, x.d, stagger * 320, W, H);
         });
