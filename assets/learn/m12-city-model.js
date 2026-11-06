@@ -55,7 +55,7 @@
   var LX = window.LX, H = LX.H, E3 = LX.E3, U = E3.ui;
   LX.mount("m12", function (live, data, root) {
     var P = E3.prepare(data.prairie_city, data.e3_city_hub), S = E3.sb3Schema(P.cfg), DEF = E3.defaults(S);
-    var S0 = { runs: {}, choose: null, cap: CHOOSE.capDef, rule: "even" }, stub = null;
+    var S0 = { runs: {}, choose: null, cap: CHOOSE.capDef, rule: "even", runners: {} }, stub = null;
     function planOf(id) { return Object.assign({}, DEF, PLANS[id].state); }
     function solver() { if (!stub) return null; stub = null; return function () { return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" }); }; }
     function kpi(host, label, value, tone) { var d = H("div", { class: "lx-readout " + (tone || "") }, host); H("span", { text: label }, d); H("b", { text: value }, d); }
@@ -76,6 +76,7 @@
         } });
       act.appendChild(kp); act.appendChild(res);
       if (S0.runs[id]) api.done();
+      S0.runners[id] = function () { run.run(planOf(id)); };
       return run;
     }
     var steps = [
@@ -137,6 +138,7 @@
               refreshExplain();
             } });
           act.appendChild(stale); act.appendChild(kp); act.appendChild(res);
+          S0.runners.choose = function () { run.run({ cap: S0.cap }); };
           H("p", { class: "lx-hint", text: "Half the cars electric with managed charging, fixed; retrofits up to 60% of buildings, district heat up to 40% of the core's heat. Below about 65% no plan within these limits meets the cap: gasoline and water heating stay." }, act);
           if (S0.choose) api.done();
         } },
@@ -209,8 +211,9 @@
 
     // ---- demo states: mid (steps 3 and 4 run), fail
     LX.demo(root, function (s) {
-      if (s === "mid") { cards.go(3); return { view: "mid" }; }
-      if (s === "fail") { stub = "fail"; cards.go(2); return { view: "mid" }; }
+      if (s === "mid") { cards.go(3); S0.runners.electrify(); return { view: "mid" }; }
+      if (s === "step-6") { cards.go(5); S0.runners.choose(); return { view: "mid" }; }
+      if (s === "fail") { cards.go(2); stub = "fail"; S0.runners.today(); return { view: "mid" }; }
       return null;
     }, cards);
   });

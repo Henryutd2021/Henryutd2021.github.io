@@ -1041,7 +1041,7 @@
   tier: modeler
   form: cards
   icon: city
-  status: upcoming
+  status: active
   minutes: 45
   practice_minutes: 120   # the notebook's practice tasks, after its 60-minute lab
   lab_minutes: 60   # the notebook lab (learn_map_v2.yml)

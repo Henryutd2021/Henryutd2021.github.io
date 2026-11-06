@@ -11,10 +11,13 @@
 .e3-line { margin: 0 0 6px !important; font-size: 13.5px; color: var(--lx-ink-2); }
 
 /* ---------- a district's day */
-.e3-day { display: grid; gap: 8px; min-width: 0; }
+.e3-day { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
 .e3-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.e3-sel-l { display: inline-flex; align-items: center; gap: 6px; font-family: var(--lx-f-display); font-size: 14px; color: var(--lx-ink-2); }
-.e3-sel { font: inherit; color: var(--lx-ink); background: var(--lx-surface); border: 1px solid var(--lx-line-2); border-radius: 8px; padding: 6px 10px; max-width: 100%; }
+.e3-sel-l { display: inline-flex; align-items: center; gap: 6px; font-family: var(--lx-f-display); font-size: 14px; color: var(--lx-ink-2); max-width: 100%; min-width: 0; }
+.e3-sel { font: inherit; color: var(--lx-ink); background: var(--lx-surface); border: 1px solid var(--lx-line-2); border-radius: 8px; padding: 6px 10px; max-width: 100%; min-width: 0; flex: 1 1 auto; }
+/* a card that holds a district's day keeps one column that can shrink (a card is a grid; its column must not grow with
+   the chart or the day picker) */
+.lx-xcard:has(> .e3-day) { grid-template-columns: minmax(0, 1fr); }
 .e3-day-say { margin: 0 !important; }
 
 /* ---------- tables */

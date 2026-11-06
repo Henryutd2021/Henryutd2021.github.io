@@ -13579,17 +13579,19 @@
   }
 
   // ---------------------------------------------------------------- screening household outputs (an accounting layer)
-  // Each measure's adopters are spread over the five income groups by the plan's rule (even: in proportion to the
-  // eligible homes; low or high: one group after another, lowest or highest income first), district by district; an
-  // adopting home changes by the district's average for that measure, scaled by its group's use index (so each district's
-  // changes add up to the engine's); shared costs (substation upgrades, batteries) go on every kWh the districts use;
-  // district heat is billed at its average cost. Bills at 2025 residential prices; burden = home energy bills / income.
-  function spread(H, cap, N, rule) {
-    var n = H.map(function () { return 0; }), room = H.map(function (x) { return x * cap; }), tot = sum(room);
+  // Each measure's adoption is spread over the five income groups by the plan's rule, district by district. A group's
+  // potential for a measure is its eligible homes times its use index (the measure's carrier: gas for heating measures,
+  // gasoline for cars, electricity for rooftop solar), so a group's share of a measure's change can never pass its own
+  // share of the 2025 use it changes; the rule fills that potential (even: every group at the same rate; low or high:
+  // one group after another, lowest or highest income first). Each district's changes add up to the engine's. Shared
+  // costs (substation upgrades, batteries) go on every kWh the districts use; district heat is billed at its average
+  // cost. Bills at 2025 residential prices; burden = home energy bills / income (DOE LEAD's definition).
+  function spread(room, N, rule) {
+    var n = room.map(function () { return 0; }), tot = sum(room);
     if (N <= 0 || tot <= 0) return n;
     N = Math.min(N, tot);
     if (rule === "even") return room.map(function (r) { return r / tot * N; });
-    var order = H.map(function (x, j) { return j; });
+    var order = room.map(function (x, j) { return j; });
     if (rule === "high") order.reverse();
     order.forEach(function (j) { var a = Math.min(room[j], N); n[j] = a; N -= a; });
     return n;
@@ -13603,7 +13605,7 @@
     P.D.forEach(function (Dd, i) {
       var a = A.d[i], a0 = A0.d[i], H = P.hhDG[i], Hd = sum(H), r = Dd.rho;
       // measures: (1) heating systems switched at the 2025 envelope, (2) retrofits on the switched mix, (3) EVs, (4) solar
-      var s0 = Dd.s0, s1 = S.d[i] ? S.d[i].after : null;
+      var s0 = Dd.s0;
       var share = a.share, ret = a.retShare, Qr = r * Dd.Qann;
       var mix = function (sh) { return { el: Qr * (sh.res + sh.hp * Dd.eps), gas: Qr * sh.fuel * (1 - Dd.pf) / P.eta, prop: Qr * sh.fuel * Dd.pf / P.eta, dh: Qr * sh.dh }; };
       var m0 = mix(s0), m1 = mix(share);
@@ -13611,21 +13613,23 @@
       var sw = { el: m1.el - m0.el, gas: m1.gas - m0.gas, prop: m1.prop - m0.prop, dh: m1.dh - m0.dh };
       var rt = { el: -S.save * ret * m1.el, gas: -S.save * ret * m1.gas, prop: -S.save * ret * m1.prop, dh: -S.save * ret * m1.dh };
       var meas = [
-        { n: changed * Hd, cap: changed, dl: sw, key: "hp" },
-        { n: ret * Hd, cap: ret > 0 ? 1 : 0, dl: rt, key: "ret" }];
+        // eligible homes: any home not already on a heat pump (the switch); every home (a retrofit, rooftop solar); every
+        // car not already electric (the EVs). The rule decides which eligible homes adopt first.
+        { n: changed * Hd, cap: Math.max(changed, 1 - s0.hp), dl: sw, key: "hp", idx: "gas" },
+        { n: ret * Hd, cap: 1, dl: rt, key: "ret", idx: "gas" }];
       var evN = S.d[i].evs - Dd.evs0;
-      meas.push({ n: evN, cap: evN / Hd, dl: { el: evN * P.evDay * 365, gal: -evN * P.galPerCar }, key: "ev" });
-      var pvHomes = a.pvAdd / 0.006;   // a 6 kW system a home (set for teaching)
-      meas.push({ n: Math.min(pvHomes, Hd), cap: Math.min(1, pvHomes / Hd), dl: { el: -(a.pvUsed - a0.pvUsed) }, key: "pv" });
+      meas.push({ n: evN, cap: (Dd.ldv - Dd.evs0) / Hd, dl: { el: evN * P.evDay * 365, gal: -evN * P.galPerCar }, key: "ev", idx: "gasoline" });
+      var pvHomes = a.pvAdd / 0.005;   // a 5 kW system a home (set for teaching)
+      meas.push({ n: Math.min(pvHomes, Hd), cap: 1, dl: { el: -(a.pvUsed - a0.pvUsed) }, key: "pv", idx: "electricity" });
       meas.forEach(function (ms) {
-        if (!(ms.n > 0)) return;
+        if (!(ms.n > 0) || !(ms.cap > 0)) return;
         adopters[ms.key] += ms.n;
-        var rule = S.rule || "even", n = spread(H, ms.cap, ms.n, rule);
-        [["el", "electricity"], ["gas", "gas"], ["prop", "propane"], ["gal", "gasoline"], ["dh", "gas"]].forEach(function (c) {
-          var tot = ms.dl[c[0]]; if (!tot) return;
-          var wsum_ = 0; for (var g2 = 0; g2 < ng; g2++) wsum_ += n[g2] * idx(g2, c[1]);
-          if (wsum_ <= 0) return;
-          for (var g3 = 0; g3 < ng; g3++) D[c[0]][g3] += tot * n[g3] * idx(g3, c[1]) / wsum_;
+        var pot = H.map(function (h, g) { return ms.cap * h * idx(g, ms.idx); }), f = Math.min(1, ms.n / (ms.cap * Hd));
+        var got = spread(pot, f * sum(pot), S.rule || "even"), A = sum(got);
+        if (A <= 0) return;
+        ["el", "gas", "prop", "gal", "dh"].forEach(function (c) {
+          var tot = ms.dl[c]; if (!tot) return;
+          for (var g3 = 0; g3 < ng; g3++) D[c][g3] += tot * got[g3] / A;
         });
       });
     });
