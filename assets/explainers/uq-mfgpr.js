@@ -19,6 +19,10 @@
 //                      changes only because of the data: GP s = 1500, l = 5; multi-fidelity s0 = 1000, l0 = 3, rho = 0.9,
 //                      s1 = 150, l1 = 3; noise sd 60 kW (measured) and 1 kW (theoretical points).
 // The band is the 95% interval of the latent curve (Eq. 5, without measurement noise). Illustrative only.
+//
+// Host pages: on every update the explainer sends an "explainer-update" event (bubbling from its container) with what it
+// shows: {slug, n, mode, model: model({n}), api: {model, truth, theoretical}}; nothing on the explainer's own page changes.
+// Learn's case file CF8 writes its text version (a table by wind-speed region) from it, so that version follows the slider.
 (function () {
   "use strict";
 
@@ -138,6 +142,7 @@
   }
 
   var P_MAX = 2500;
+  var API = { model: model, truth: truth, theoretical: theoretical };   // the pure model, for a host page's text version
 
   function view(root, h) {
     var state = { n: 5, mode: "both" };
@@ -233,6 +238,9 @@
 
     function update() {
       var m = model({ n: state.n });
+      // tell the host page what is shown, for its own text version (Learn's case file CF8 writes the table by region)
+      if (root.dispatchEvent && typeof CustomEvent === "function")
+        root.dispatchEvent(new CustomEvent("explainer-update", { bubbles: true, detail: { slug: "uq-mfgpr", n: m.n, mode: state.mode, model: m, api: API } }));
       read({ sf: "±" + h.fmt(m.bandSF, 0) + " kW", mf: "±" + h.fmt(m.bandMF, 0) + " kW", pct: h.fmt(m.narrowerPct, 0) + "%" });
       var s;
       var ratio = m.bandMF / m.bandSF, sf = "±" + h.fmt(m.bandSF, 0), mf = "<strong>±" + h.fmt(m.bandMF, 0) + " kW</strong>";
@@ -259,7 +267,7 @@
 
   if (typeof window !== "undefined" && window.Explainer) window.Explainer.register("uq-mfgpr", view);
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { model: model, predictSF: predictSF, predictMF: predictMF, cholesky: cholesky, DATA: DATA, HYP: HYP,
+    module.exports = { model: model, view: view, predictSF: predictSF, predictMF: predictMF, cholesky: cholesky, DATA: DATA, HYP: HYP,
                        theoretical: theoretical, truth: truth, se: se };
   }
 })();

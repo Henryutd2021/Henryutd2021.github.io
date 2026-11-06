@@ -1,150 +1,241 @@
 [
   {
-    "objectID": "learn/sb1-microgrid-workbench.html",
-    "href": "learn/sb1-microgrid-workbench.html",
-    "title": "Microgrid Workbench",
+    "objectID": "learn/sb2-grid-room.html",
+    "href": "learn/sb2-grid-room.html",
+    "title": "Grid Room",
     "section": "",
-    "text": "LearnSB1\n\nAnalyst to Modeler · L2–L3\nSandbox\n30 min\nAfter lesson 9\nCompleted\n\n\n1Brief2Bench3Results4Explain5Sources"
+    "text": "LearnSB2\n\nModeler · L3\nSandbox\n30 min\nAfter M2 and M1\nCompleted\n\n\n1Brief2Bench3Results4Explain5Sources"
   },
   {
-    "objectID": "learn/sb1-microgrid-workbench.html#the-bench",
-    "href": "learn/sb1-microgrid-workbench.html#the-bench",
-    "title": "Microgrid Workbench",
+    "objectID": "learn/sb2-grid-room.html#the-bench",
+    "href": "learn/sb2-grid-room.html#the-bench",
+    "title": "Grid Room",
     "section": "The bench",
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb1-microgrid-workbench.html#results",
-    "href": "learn/sb1-microgrid-workbench.html#results",
-    "title": "Microgrid Workbench",
+    "objectID": "learn/sb2-grid-room.html#results",
+    "href": "learn/sb2-grid-room.html#results",
+    "title": "Grid Room",
     "section": "Results",
     "text": "Results"
   },
   {
-    "objectID": "learn/sb1-microgrid-workbench.html#how-the-engine-works-as-diagrams",
-    "href": "learn/sb1-microgrid-workbench.html#how-the-engine-works-as-diagrams",
-    "title": "Microgrid Workbench",
+    "objectID": "learn/sb2-grid-room.html#how-the-engine-works-as-diagrams",
+    "href": "learn/sb2-grid-room.html#how-the-engine-works-as-diagrams",
+    "title": "Grid Room",
     "section": "How the engine works, as diagrams",
     "text": "How the engine works, as diagrams"
   },
   {
-    "objectID": "learn/sb1-microgrid-workbench.html#numbers-sources-and-whats-next",
-    "href": "learn/sb1-microgrid-workbench.html#numbers-sources-and-whats-next",
-    "title": "Microgrid Workbench",
+    "objectID": "learn/sb2-grid-room.html#numbers-sources-and-whats-next",
+    "href": "learn/sb2-grid-room.html#numbers-sources-and-whats-next",
+    "title": "Grid Room",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/r10-question-studio.html",
-    "href": "learn/r10-question-studio.html",
-    "title": "What could you study? The question studio",
+    "objectID": "learn/sb0-site-bench.html",
+    "href": "learn/sb0-site-bench.html",
+    "title": "Site Bench",
     "section": "",
-    "text": "LearnR10\n\nResearcher · L4\nResearch studio\n40 min guided · about 60 min practice\nAfter R1 and F1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+    "text": "LearnSB0\n\nAnalyst to Modeler · L2–L3\nSandbox\n20 min\nAfter lesson 9\nCompleted\n\n\n1Brief2Bench3Results4Explain5Sources"
   },
   {
-    "objectID": "learn/r10-question-studio.html#two-answers-to-the-same-task",
-    "href": "learn/r10-question-studio.html#two-answers-to-the-same-task",
-    "title": "What could you study? The question studio",
+    "objectID": "learn/sb0-site-bench.html#the-bench",
+    "href": "learn/sb0-site-bench.html#the-bench",
+    "title": "Site Bench",
+    "section": "The bench",
+    "text": "The bench"
+  },
+  {
+    "objectID": "learn/sb0-site-bench.html#results",
+    "href": "learn/sb0-site-bench.html#results",
+    "title": "Site Bench",
+    "section": "Results",
+    "text": "Results"
+  },
+  {
+    "objectID": "learn/sb0-site-bench.html#how-the-engine-works-as-diagrams",
+    "href": "learn/sb0-site-bench.html#how-the-engine-works-as-diagrams",
+    "title": "Site Bench",
+    "section": "How the engine works, as diagrams",
+    "text": "How the engine works, as diagrams"
+  },
+  {
+    "objectID": "learn/sb0-site-bench.html#numbers-sources-and-whats-next",
+    "href": "learn/sb0-site-bench.html#numbers-sources-and-whats-next",
+    "title": "Site Bench",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/r09-integrity-stakeholders.html",
+    "href": "learn/r09-integrity-stakeholders.html",
+    "title": "Research integrity, and working with the people your study is about",
+    "section": "",
+    "text": "LearnR9\n\nResearcher · L4\nResearch studio\n30 min guided · about 30 min practice\nAfter R1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+  },
+  {
+    "objectID": "learn/r09-integrity-stakeholders.html#two-answers-to-the-same-task",
+    "href": "learn/r09-integrity-stakeholders.html#two-answers-to-the-same-task",
+    "title": "Research integrity, and working with the people your study is about",
     "section": "Two answers to the same task",
     "text": "Two answers to the same task"
   },
   {
-    "objectID": "learn/r10-question-studio.html#check-your-own-work-against-the-rubric",
-    "href": "learn/r10-question-studio.html#check-your-own-work-against-the-rubric",
-    "title": "What could you study? The question studio",
+    "objectID": "learn/r09-integrity-stakeholders.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r09-integrity-stakeholders.html#check-your-own-work-against-the-rubric",
+    "title": "Research integrity, and working with the people your study is about",
     "section": "Check your own work against the rubric",
     "text": "Check your own work against the rubric"
   },
   {
-    "objectID": "learn/r10-question-studio.html#sources-and-whats-next",
-    "href": "learn/r10-question-studio.html#sources-and-whats-next",
-    "title": "What could you study? The question studio",
+    "objectID": "learn/r09-integrity-stakeholders.html#sources-and-whats-next",
+    "href": "learn/r09-integrity-stakeholders.html#sources-and-whats-next",
+    "title": "Research integrity, and working with the people your study is about",
     "section": "Sources and what’s next",
     "text": "Sources and what’s next"
   },
   {
-    "objectID": "learn/r05-build-validate.html",
-    "href": "learn/r05-build-validate.html",
-    "title": "Can you trust your analysis? Verification, validation and reproducibility",
+    "objectID": "learn/r06-uncertainty-properly.html",
+    "href": "learn/r06-uncertainty-properly.html",
+    "title": "Uncertainty done properly: what to vary, how, and how to say it",
     "section": "",
-    "text": "LearnR5\n\nResearcher · L4\nResearch studio\n35 min guided · about 2 h practice\nAfter R4 and M1 and K8\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+    "text": "LearnR6\n\nResearcher · L4\nResearch studio\n30 min guided · about 60 min practice\nAfter M7 and M8\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
   },
   {
-    "objectID": "learn/r05-build-validate.html#two-logs-for-the-same-study",
-    "href": "learn/r05-build-validate.html#two-logs-for-the-same-study",
-    "title": "Can you trust your analysis? Verification, validation and reproducibility",
-    "section": "Two logs for the same study",
-    "text": "Two logs for the same study"
-  },
-  {
-    "objectID": "learn/r05-build-validate.html#check-your-own-log",
-    "href": "learn/r05-build-validate.html#check-your-own-log",
-    "title": "Can you trust your analysis? Verification, validation and reproducibility",
-    "section": "Check your own log",
-    "text": "Check your own log"
-  },
-  {
-    "objectID": "learn/r05-build-validate.html#sources-and-whats-next",
-    "href": "learn/r05-build-validate.html#sources-and-whats-next",
-    "title": "Can you trust your analysis? Verification, validation and reproducibility",
-    "section": "Sources and what’s next",
-    "text": "Sources and what’s next"
-  },
-  {
-    "objectID": "learn/r03-system-and-method.html",
-    "href": "learn/r03-system-and-method.html",
-    "title": "Which system, which boundary, which method?",
-    "section": "",
-    "text": "LearnR3\n\nResearcher · L4\nResearch studio\n30 min guided · about 60 min practice\nAfter R1 and F1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
-  },
-  {
-    "objectID": "learn/r03-system-and-method.html#two-answers-to-the-same-task",
-    "href": "learn/r03-system-and-method.html#two-answers-to-the-same-task",
-    "title": "Which system, which boundary, which method?",
+    "objectID": "learn/r06-uncertainty-properly.html#two-answers-to-the-same-task",
+    "href": "learn/r06-uncertainty-properly.html#two-answers-to-the-same-task",
+    "title": "Uncertainty done properly: what to vary, how, and how to say it",
     "section": "Two answers to the same task",
     "text": "Two answers to the same task"
   },
   {
-    "objectID": "learn/r03-system-and-method.html#check-your-own-work-against-the-rubric",
-    "href": "learn/r03-system-and-method.html#check-your-own-work-against-the-rubric",
-    "title": "Which system, which boundary, which method?",
+    "objectID": "learn/r06-uncertainty-properly.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r06-uncertainty-properly.html#check-your-own-work-against-the-rubric",
+    "title": "Uncertainty done properly: what to vary, how, and how to say it",
     "section": "Check your own work against the rubric",
     "text": "Check your own work against the rubric"
   },
   {
-    "objectID": "learn/r03-system-and-method.html#sources-and-whats-next",
-    "href": "learn/r03-system-and-method.html#sources-and-whats-next",
-    "title": "Which system, which boundary, which method?",
+    "objectID": "learn/r06-uncertainty-properly.html#sources-and-whats-next",
+    "href": "learn/r06-uncertainty-properly.html#sources-and-whats-next",
+    "title": "Uncertainty done properly: what to vary, how, and how to say it",
     "section": "Sources and what’s next",
     "text": "Sources and what’s next"
   },
   {
-    "objectID": "learn/r01-framing.html",
-    "href": "learn/r01-framing.html",
-    "title": "What makes a question worth researching?",
+    "objectID": "learn/r04-data.html",
+    "href": "learn/r04-data.html",
+    "title": "Data you can defend: sources, cleaning, licences and provenance",
     "section": "",
-    "text": "LearnR1\n\nResearcher · L4\nResearch studio\n30 min guided · about 60 min practice\nAfter lesson 13 and A22\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+    "text": "LearnR4\n\nResearcher · L4\nResearch studio\n30 min guided · about 2 h practice\nAfter R3 and B2\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
   },
   {
-    "objectID": "learn/r01-framing.html#two-answers-to-the-same-task",
-    "href": "learn/r01-framing.html#two-answers-to-the-same-task",
-    "title": "What makes a question worth researching?",
+    "objectID": "learn/r04-data.html#two-answers-to-the-same-task",
+    "href": "learn/r04-data.html#two-answers-to-the-same-task",
+    "title": "Data you can defend: sources, cleaning, licences and provenance",
     "section": "Two answers to the same task",
     "text": "Two answers to the same task"
   },
   {
-    "objectID": "learn/r01-framing.html#check-your-own-work-against-the-rubric",
-    "href": "learn/r01-framing.html#check-your-own-work-against-the-rubric",
-    "title": "What makes a question worth researching?",
+    "objectID": "learn/r04-data.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r04-data.html#check-your-own-work-against-the-rubric",
+    "title": "Data you can defend: sources, cleaning, licences and provenance",
     "section": "Check your own work against the rubric",
     "text": "Check your own work against the rubric"
   },
   {
-    "objectID": "learn/r01-framing.html#sources-and-whats-next",
-    "href": "learn/r01-framing.html#sources-and-whats-next",
-    "title": "What makes a question worth researching?",
+    "objectID": "learn/r04-data.html#sources-and-whats-next",
+    "href": "learn/r04-data.html#sources-and-whats-next",
+    "title": "Data you can defend: sources, cleaning, licences and provenance",
     "section": "Sources and what’s next",
     "text": "Sources and what’s next"
+  },
+  {
+    "objectID": "learn/r02-literature.html",
+    "href": "learn/r02-literature.html",
+    "title": "How do you find out what is already known?",
+    "section": "",
+    "text": "LearnR2\n\nResearcher · L4\nResearch studio\n30 min guided · about 4 h practice\nAfter R1 and N1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+  },
+  {
+    "objectID": "learn/r02-literature.html#two-answers-to-the-same-task",
+    "href": "learn/r02-literature.html#two-answers-to-the-same-task",
+    "title": "How do you find out what is already known?",
+    "section": "Two answers to the same task",
+    "text": "Two answers to the same task"
+  },
+  {
+    "objectID": "learn/r02-literature.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r02-literature.html#check-your-own-work-against-the-rubric",
+    "title": "How do you find out what is already known?",
+    "section": "Check your own work against the rubric",
+    "text": "Check your own work against the rubric"
+  },
+  {
+    "objectID": "learn/r02-literature.html#sources-and-whats-next",
+    "href": "learn/r02-literature.html#sources-and-whats-next",
+    "title": "How do you find out what is already known?",
+    "section": "Sources and what’s next",
+    "text": "Sources and what’s next"
+  },
+  {
+    "objectID": "learn/n01-news-lens.html",
+    "href": "learn/n01-news-lens.html",
+    "title": "How do you read an energy headline like a researcher?",
+    "section": "",
+    "text": "LearnN1\n\nFoundations to Analyst · L1–L2\n20 min\nAfter lesson 1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/n01-news-lens.html#what-you-just-did-as-a-checklist-and-a-ladder",
+    "href": "learn/n01-news-lens.html#what-you-just-did-as-a-checklist-and-a-ladder",
+    "title": "How do you read an energy headline like a researcher?",
+    "section": "What you just did, as a checklist and a ladder",
+    "text": "What you just did, as a checklist and a ladder"
+  },
+  {
+    "objectID": "learn/n01-news-lens.html#check-yourself",
+    "href": "learn/n01-news-lens.html#check-yourself",
+    "title": "How do you read an energy headline like a researcher?",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/n01-news-lens.html#numbers-sources-and-whats-next",
+    "href": "learn/n01-news-lens.html#numbers-sources-and-whats-next",
+    "title": "How do you read an energy headline like a researcher?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/m09-surrogates-uq.html",
+    "href": "learn/m09-surrogates-uq.html",
+    "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
+    "section": "",
+    "text": "LearnM9\n\nModeler · L3\n40 min guided · 45 min lab · about 60 min practice\nAfter M7 and K6\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/m09-surrogates-uq.html#what-you-just-did-as-diagrams",
+    "href": "learn/m09-surrogates-uq.html#what-you-just-did-as-diagrams",
+    "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/m09-surrogates-uq.html#check-yourself-then-try-it",
+    "href": "learn/m09-surrogates-uq.html#check-yourself-then-try-it",
+    "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
+    "section": "Check yourself, then try it",
+    "text": "Check yourself, then try it"
+  },
+  {
+    "objectID": "learn/m09-surrogates-uq.html#numbers-sources-and-whats-next",
+    "href": "learn/m09-surrogates-uq.html#numbers-sources-and-whats-next",
+    "title": "Learning from few runs: surrogates, Gaussian processes and multi-fidelity data",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
   },
   {
     "objectID": "learn/m07-monte-carlo.html",
@@ -175,170 +266,198 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/m04-storage-multienergy.html",
-    "href": "learn/m04-storage-multienergy.html",
-    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
+    "objectID": "learn/m05-microgrid-size-and-run.html",
+    "href": "learn/m05-microgrid-size-and-run.html",
+    "title": "Size and run a microgrid that survives an outage",
     "section": "",
-    "text": "LearnM4\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter M1 and A8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnM5\n\nModeler · L3\n45 min guided · 60 min lab · about 90 min practice\nAfter M2 and A14\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/m04-storage-multienergy.html#what-you-just-did-as-diagrams",
-    "href": "learn/m04-storage-multienergy.html#what-you-just-did-as-diagrams",
-    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
+    "objectID": "learn/m05-microgrid-size-and-run.html#what-you-just-did-as-diagrams",
+    "href": "learn/m05-microgrid-size-and-run.html#what-you-just-did-as-diagrams",
+    "title": "Size and run a microgrid that survives an outage",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/m04-storage-multienergy.html#check-yourself",
-    "href": "learn/m04-storage-multienergy.html#check-yourself",
-    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
+    "objectID": "learn/m05-microgrid-size-and-run.html#check-yourself",
+    "href": "learn/m05-microgrid-size-and-run.html#check-yourself",
+    "title": "Size and run a microgrid that survives an outage",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/m04-storage-multienergy.html#numbers-sources-and-whats-next",
-    "href": "learn/m04-storage-multienergy.html#numbers-sources-and-whats-next",
-    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
+    "objectID": "learn/m05-microgrid-size-and-run.html#numbers-sources-and-whats-next",
+    "href": "learn/m05-microgrid-size-and-run.html#numbers-sources-and-whats-next",
+    "title": "Size and run a microgrid that survives an outage",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/m02-unit-commitment.html",
-    "href": "learn/m02-unit-commitment.html",
-    "title": "On or off? Unit commitment as a mixed-integer program",
+    "objectID": "learn/m03-capacity-expansion.html",
+    "href": "learn/m03-capacity-expansion.html",
+    "title": "What should be built? Capacity expansion with representative periods, validated",
     "section": "",
-    "text": "LearnM2\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter M1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnM3\n\nModeler · L3\n45 min guided · 60 min lab · about 2 h practice\nAfter M1 and lesson 7 and lesson 13\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/m02-unit-commitment.html#what-you-just-did-as-diagrams",
-    "href": "learn/m02-unit-commitment.html#what-you-just-did-as-diagrams",
-    "title": "On or off? Unit commitment as a mixed-integer program",
+    "objectID": "learn/m03-capacity-expansion.html#what-you-just-did-as-diagrams",
+    "href": "learn/m03-capacity-expansion.html#what-you-just-did-as-diagrams",
+    "title": "What should be built? Capacity expansion with representative periods, validated",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/m02-unit-commitment.html#check-yourself",
-    "href": "learn/m02-unit-commitment.html#check-yourself",
-    "title": "On or off? Unit commitment as a mixed-integer program",
+    "objectID": "learn/m03-capacity-expansion.html#check-yourself",
+    "href": "learn/m03-capacity-expansion.html#check-yourself",
+    "title": "What should be built? Capacity expansion with representative periods, validated",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/m02-unit-commitment.html#numbers-sources-and-whats-next",
-    "href": "learn/m02-unit-commitment.html#numbers-sources-and-whats-next",
-    "title": "On or off? Unit commitment as a mixed-integer program",
+    "objectID": "learn/m03-capacity-expansion.html#numbers-sources-and-whats-next",
+    "href": "learn/m03-capacity-expansion.html#numbers-sources-and-whats-next",
+    "title": "What should be built? Capacity expansion with representative periods, validated",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/k08-git-notebooks.html",
-    "href": "learn/k08-git-notebooks.html",
-    "title": "Git and reproducible notebooks",
+    "objectID": "learn/m01-dispatch-to-lmp.html",
+    "href": "learn/m01-dispatch-to-lmp.html",
+    "title": "From dispatch to locational prices: the linear program behind the market",
     "section": "",
-    "text": "LearnK8\n\nMath toolbox\n20 min guided · about 30 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnM1\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter lesson 11 and lesson 8 and B1 and B2 and B3\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k08-git-notebooks.html#what-you-just-did-as-diagrams",
-    "href": "learn/k08-git-notebooks.html#what-you-just-did-as-diagrams",
-    "title": "Git and reproducible notebooks",
+    "objectID": "learn/m01-dispatch-to-lmp.html#what-you-just-did-as-diagrams",
+    "href": "learn/m01-dispatch-to-lmp.html#what-you-just-did-as-diagrams",
+    "title": "From dispatch to locational prices: the linear program behind the market",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k08-git-notebooks.html#check-yourself",
-    "href": "learn/k08-git-notebooks.html#check-yourself",
-    "title": "Git and reproducible notebooks",
+    "objectID": "learn/m01-dispatch-to-lmp.html#check-yourself",
+    "href": "learn/m01-dispatch-to-lmp.html#check-yourself",
+    "title": "From dispatch to locational prices: the linear program behind the market",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k08-git-notebooks.html#commands-sources-and-whats-next",
-    "href": "learn/k08-git-notebooks.html#commands-sources-and-whats-next",
-    "title": "Git and reproducible notebooks",
-    "section": "Commands, sources and what’s next",
-    "text": "Commands, sources and what’s next"
-  },
-  {
-    "objectID": "learn/k06-vectors-matrices.html",
-    "href": "learn/k06-vectors-matrices.html",
-    "title": "Vectors and matrices: what Ax ≤ b means",
-    "section": "",
-    "text": "LearnK6\n\nMath toolbox\n25 min guided · about 30 min practice\nAfter K4\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
-  },
-  {
-    "objectID": "learn/k06-vectors-matrices.html#what-you-just-did-as-diagrams",
-    "href": "learn/k06-vectors-matrices.html#what-you-just-did-as-diagrams",
-    "title": "Vectors and matrices: what Ax ≤ b means",
-    "section": "What you just did, as diagrams",
-    "text": "What you just did, as diagrams"
-  },
-  {
-    "objectID": "learn/k06-vectors-matrices.html#check-yourself",
-    "href": "learn/k06-vectors-matrices.html#check-yourself",
-    "title": "Vectors and matrices: what Ax ≤ b means",
-    "section": "Check yourself",
-    "text": "Check yourself"
-  },
-  {
-    "objectID": "learn/k06-vectors-matrices.html#numbers-sources-and-whats-next",
-    "href": "learn/k06-vectors-matrices.html#numbers-sources-and-whats-next",
-    "title": "Vectors and matrices: what Ax ≤ b means",
+    "objectID": "learn/m01-dispatch-to-lmp.html#numbers-sources-and-whats-next",
+    "href": "learn/m01-dispatch-to-lmp.html#numbers-sources-and-whats-next",
+    "title": "From dispatch to locational prices: the linear program behind the market",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/k04-linear-equations.html",
-    "href": "learn/k04-linear-equations.html",
-    "title": "Linear equations and inequalities",
+    "objectID": "learn/k07-spreadsheets.html",
+    "href": "learn/k07-spreadsheets.html",
+    "title": "Spreadsheets in practice",
     "section": "",
-    "text": "LearnK4\n\nMath toolbox\n15 min guided · about 20 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnK7\n\nMath toolbox\n20 min\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k04-linear-equations.html#what-you-just-did-as-diagrams",
-    "href": "learn/k04-linear-equations.html#what-you-just-did-as-diagrams",
-    "title": "Linear equations and inequalities",
+    "objectID": "learn/k07-spreadsheets.html#what-you-just-did-as-diagrams",
+    "href": "learn/k07-spreadsheets.html#what-you-just-did-as-diagrams",
+    "title": "Spreadsheets in practice",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k04-linear-equations.html#check-yourself",
-    "href": "learn/k04-linear-equations.html#check-yourself",
-    "title": "Linear equations and inequalities",
+    "objectID": "learn/k07-spreadsheets.html#check-yourself",
+    "href": "learn/k07-spreadsheets.html#check-yourself",
+    "title": "Spreadsheets in practice",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k04-linear-equations.html#signs-sources-and-whats-next",
-    "href": "learn/k04-linear-equations.html#signs-sources-and-whats-next",
-    "title": "Linear equations and inequalities",
-    "section": "Signs, sources and what’s next",
-    "text": "Signs, sources and what’s next"
+    "objectID": "learn/k07-spreadsheets.html#habits-sources-and-whats-next",
+    "href": "learn/k07-spreadsheets.html#habits-sources-and-whats-next",
+    "title": "Spreadsheets in practice",
+    "section": "Habits, sources and what’s next",
+    "text": "Habits, sources and what’s next"
   },
   {
-    "objectID": "learn/k02-rates-efficiencies.html",
-    "href": "learn/k02-rates-efficiencies.html",
-    "title": "Rates and efficiencies",
+    "objectID": "learn/k05-probability-statistics.html",
+    "href": "learn/k05-probability-statistics.html",
+    "title": "Probability and statistics",
     "section": "",
-    "text": "LearnK2\n\nMath toolbox\n10 min guided · about 10 min practice\nAfter K1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnK5\n\nMath toolbox\n25 min guided · about 30 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k02-rates-efficiencies.html#what-you-just-did-as-diagrams",
-    "href": "learn/k02-rates-efficiencies.html#what-you-just-did-as-diagrams",
-    "title": "Rates and efficiencies",
+    "objectID": "learn/k05-probability-statistics.html#what-you-just-did-as-diagrams",
+    "href": "learn/k05-probability-statistics.html#what-you-just-did-as-diagrams",
+    "title": "Probability and statistics",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k02-rates-efficiencies.html#check-yourself",
-    "href": "learn/k02-rates-efficiencies.html#check-yourself",
-    "title": "Rates and efficiencies",
+    "objectID": "learn/k05-probability-statistics.html#check-yourself",
+    "href": "learn/k05-probability-statistics.html#check-yourself",
+    "title": "Probability and statistics",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k02-rates-efficiencies.html#numbers-sources-and-whats-next",
-    "href": "learn/k02-rates-efficiencies.html#numbers-sources-and-whats-next",
-    "title": "Rates and efficiencies",
+    "objectID": "learn/k05-probability-statistics.html#numbers-sources-and-whats-next",
+    "href": "learn/k05-probability-statistics.html#numbers-sources-and-whats-next",
+    "title": "Probability and statistics",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/k03-discounting.html",
+    "href": "learn/k03-discounting.html",
+    "title": "Exponentials and discounting",
+    "section": "",
+    "text": "LearnK3\n\nMath toolbox\n15 min guided · about 15 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/k03-discounting.html#what-you-just-did-as-diagrams",
+    "href": "learn/k03-discounting.html#what-you-just-did-as-diagrams",
+    "title": "Exponentials and discounting",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/k03-discounting.html#check-yourself",
+    "href": "learn/k03-discounting.html#check-yourself",
+    "title": "Exponentials and discounting",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/k03-discounting.html#numbers-sources-and-whats-next",
+    "href": "learn/k03-discounting.html#numbers-sources-and-whats-next",
+    "title": "Exponentials and discounting",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/k01-units.html",
+    "href": "learn/k01-units.html",
+    "title": "Units and orders of magnitude",
+    "section": "",
+    "text": "LearnK1\n\nMath toolbox\n10 min guided · about 10 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/k01-units.html#what-you-just-did-as-diagrams",
+    "href": "learn/k01-units.html#what-you-just-did-as-diagrams",
+    "title": "Units and orders of magnitude",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/k01-units.html#check-yourself",
+    "href": "learn/k01-units.html#check-yourself",
+    "title": "Units and orders of magnitude",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/k01-units.html#numbers-sources-and-whats-next",
+    "href": "learn/k01-units.html#numbers-sources-and-whats-next",
+    "title": "Units and orders of magnitude",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
@@ -483,32 +602,60 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/cf6-shifting-load-to-clean-hours.html",
-    "href": "learn/cf6-shifting-load-to-clean-hours.html",
-    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
+    "objectID": "learn/cf7-cost-of-waiting.html",
+    "href": "learn/cf7-cost-of-waiting.html",
+    "title": "What does waiting for the grid cost, and who pays?",
     "section": "",
-    "text": "LearnCF6\n\nAnalyst · L2\nCase file\n10 min\nAfter lesson 12\nCompleted\n\n\n1The case2Explain3Check4Sources"
+    "text": "LearnCF7\n\nAnalyst · L2\nCase file\n10 min\nAfter lesson 8\nCompleted\n\n\n1The case2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/cf6-shifting-load-to-clean-hours.html#the-idea-behind-it-then-where-the-result-holds",
-    "href": "learn/cf6-shifting-load-to-clean-hours.html#the-idea-behind-it-then-where-the-result-holds",
-    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
+    "objectID": "learn/cf7-cost-of-waiting.html#the-idea-behind-it-then-where-the-result-holds",
+    "href": "learn/cf7-cost-of-waiting.html#the-idea-behind-it-then-where-the-result-holds",
+    "title": "What does waiting for the grid cost, and who pays?",
     "section": "The idea behind it, then where the result holds",
     "text": "The idea behind it, then where the result holds"
   },
   {
-    "objectID": "learn/cf6-shifting-load-to-clean-hours.html#check-yourself-then-try-it",
-    "href": "learn/cf6-shifting-load-to-clean-hours.html#check-yourself-then-try-it",
-    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
+    "objectID": "learn/cf7-cost-of-waiting.html#check-yourself-then-try-it",
+    "href": "learn/cf7-cost-of-waiting.html#check-yourself-then-try-it",
+    "title": "What does waiting for the grid cost, and who pays?",
     "section": "Check yourself, then try it",
     "text": "Check yourself, then try it"
   },
   {
-    "objectID": "learn/cf6-shifting-load-to-clean-hours.html#numbers-sources-and-whats-next",
-    "href": "learn/cf6-shifting-load-to-clean-hours.html#numbers-sources-and-whats-next",
-    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
+    "objectID": "learn/cf7-cost-of-waiting.html#numbers-sources-and-whats-next",
+    "href": "learn/cf7-cost-of-waiting.html#numbers-sources-and-whats-next",
+    "title": "What does waiting for the grid cost, and who pays?",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/cf3-hydrogen-under-uncertainty.html",
+    "href": "learn/cf3-hydrogen-under-uncertainty.html",
+    "title": "Where should hydrogen go when nobody knows how much wind will be built?",
+    "section": "",
+    "text": "LearnCF3\n\nAnalyst · L2\nCase file\n10 min\nAfter lesson 12\nCompleted\n\n\n1The case2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/cf3-hydrogen-under-uncertainty.html#the-idea-behind-it-then-where-the-result-holds",
+    "href": "learn/cf3-hydrogen-under-uncertainty.html#the-idea-behind-it-then-where-the-result-holds",
+    "title": "Where should hydrogen go when nobody knows how much wind will be built?",
+    "section": "The idea behind it, then where the result holds",
+    "text": "The idea behind it, then where the result holds"
+  },
+  {
+    "objectID": "learn/cf3-hydrogen-under-uncertainty.html#check-yourself-then-try-it",
+    "href": "learn/cf3-hydrogen-under-uncertainty.html#check-yourself-then-try-it",
+    "title": "Where should hydrogen go when nobody knows how much wind will be built?",
+    "section": "Check yourself, then try it",
+    "text": "Check yourself, then try it"
+  },
+  {
+    "objectID": "learn/cf3-hydrogen-under-uncertainty.html#sources-and-whats-next",
+    "href": "learn/cf3-hydrogen-under-uncertainty.html#sources-and-whats-next",
+    "title": "Where should hydrogen go when nobody knows how much wind will be built?",
+    "section": "Sources and what’s next",
+    "text": "Sources and what’s next"
   },
   {
     "objectID": "learn/cf1-supply-chain-microgrids.html",
@@ -539,93 +686,121 @@
     "text": "Sources and what’s next"
   },
   {
-    "objectID": "learn/c0-behind-one-meter.html",
-    "href": "learn/c0-behind-one-meter.html",
-    "title": "Behind one meter: what should one home or one plant install?",
+    "objectID": "learn/c1-keep-the-campus-running.html",
+    "href": "learn/c1-keep-the-campus-running.html",
+    "title": "Keep the campus running: a microgrid for a three-day winter outage",
     "section": "",
-    "text": "LearnC0\n\nAnalyst to Modeler · L2–L3\nCapstone\n60 min guided · 45 min lab\nAfter lesson 9 and A1 and F4 and SB0\nCompleted\n\n\n1Brief2Plan3Note4Self-check5Sources"
+    "text": "LearnC1\n\nAnalyst to Modeler · L2–L3\nCapstone\n90 min guided · 60 min lab\nAfter SB1 and F7 and A14 and A4\nCompleted\n\n\n1Brief2Plan3Note4Self-check5Sources"
   },
   {
-    "objectID": "learn/c0-behind-one-meter.html#build-and-run-your-plan",
-    "href": "learn/c0-behind-one-meter.html#build-and-run-your-plan",
-    "title": "Behind one meter: what should one home or one plant install?",
+    "objectID": "learn/c1-keep-the-campus-running.html#build-and-run-your-plan",
+    "href": "learn/c1-keep-the-campus-running.html#build-and-run-your-plan",
+    "title": "Keep the campus running: a microgrid for a three-day winter outage",
     "section": "Build and run your plan",
     "text": "Build and run your plan"
   },
   {
-    "objectID": "learn/c0-behind-one-meter.html#write-your-one-page-note",
-    "href": "learn/c0-behind-one-meter.html#write-your-one-page-note",
-    "title": "Behind one meter: what should one home or one plant install?",
+    "objectID": "learn/c1-keep-the-campus-running.html#write-your-one-page-note",
+    "href": "learn/c1-keep-the-campus-running.html#write-your-one-page-note",
+    "title": "Keep the campus running: a microgrid for a three-day winter outage",
     "section": "Write your one-page note",
     "text": "Write your one-page note"
   },
   {
-    "objectID": "learn/c0-behind-one-meter.html#check-your-note",
-    "href": "learn/c0-behind-one-meter.html#check-your-note",
-    "title": "Behind one meter: what should one home or one plant install?",
+    "objectID": "learn/c1-keep-the-campus-running.html#check-your-note",
+    "href": "learn/c1-keep-the-campus-running.html#check-your-note",
+    "title": "Keep the campus running: a microgrid for a three-day winter outage",
     "section": "Check your note",
     "text": "Check your note"
   },
   {
-    "objectID": "learn/c0-behind-one-meter.html#numbers-sources-and-whats-next",
-    "href": "learn/c0-behind-one-meter.html#numbers-sources-and-whats-next",
-    "title": "Behind one meter: what should one home or one plant install?",
+    "objectID": "learn/c1-keep-the-campus-running.html#numbers-sources-and-whats-next",
+    "href": "learn/c1-keep-the-campus-running.html#numbers-sources-and-whats-next",
+    "title": "Keep the campus running: a microgrid for a three-day winter outage",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/b02-python-data.html",
-    "href": "learn/b02-python-data.html",
-    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
+    "objectID": "learn/b03-read-check-formulation.html",
+    "href": "learn/b03-read-check-formulation.html",
+    "title": "How do you read a formulation, and check that a model is right?",
     "section": "",
-    "text": "LearnB2\n\nAnalyst to Modeler · L2–L3\n20 min guided · 60 min lab\nAfter lesson 5 and K7\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnB3\n\nAnalyst to Modeler · L2–L3\n30 min guided · about 45 min practice\nAfter B1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/b02-python-data.html#what-you-just-did-as-a-flowchart-and-a-checklist",
-    "href": "learn/b02-python-data.html#what-you-just-did-as-a-flowchart-and-a-checklist",
-    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
-    "section": "What you just did, as a flowchart and a checklist",
-    "text": "What you just did, as a flowchart and a checklist"
-  },
-  {
-    "objectID": "learn/b02-python-data.html#check-yourself",
-    "href": "learn/b02-python-data.html#check-yourself",
-    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
-    "section": "Check yourself",
-    "text": "Check yourself"
-  },
-  {
-    "objectID": "learn/b02-python-data.html#numbers-sources-and-whats-next",
-    "href": "learn/b02-python-data.html#numbers-sources-and-whats-next",
-    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
-    "section": "Numbers, sources and what’s next",
-    "text": "Numbers, sources and what’s next"
-  },
-  {
-    "objectID": "learn/a22-tradeoff-explorer.html",
-    "href": "learn/a22-tradeoff-explorer.html",
-    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
-    "section": "",
-    "text": "LearnA22\n\nAnalyst · L2\n25 min guided · about 20 min practice\nAfter F2 and lesson 12\nCompleted\n\n\n1Play2Explain3Check4Sources"
-  },
-  {
-    "objectID": "learn/a22-tradeoff-explorer.html#what-you-just-did-as-diagrams",
-    "href": "learn/a22-tradeoff-explorer.html#what-you-just-did-as-diagrams",
-    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
+    "objectID": "learn/b03-read-check-formulation.html#what-you-just-did-as-diagrams",
+    "href": "learn/b03-read-check-formulation.html#what-you-just-did-as-diagrams",
+    "title": "How do you read a formulation, and check that a model is right?",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/a22-tradeoff-explorer.html#check-yourself",
-    "href": "learn/a22-tradeoff-explorer.html#check-yourself",
-    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
+    "objectID": "learn/b03-read-check-formulation.html#check-yourself",
+    "href": "learn/b03-read-check-formulation.html#check-yourself",
+    "title": "How do you read a formulation, and check that a model is right?",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/a22-tradeoff-explorer.html#numbers-sources-and-whats-next",
-    "href": "learn/a22-tradeoff-explorer.html#numbers-sources-and-whats-next",
-    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
+    "objectID": "learn/b03-read-check-formulation.html#checks-sources-and-whats-next",
+    "href": "learn/b03-read-check-formulation.html#checks-sources-and-whats-next",
+    "title": "How do you read a formulation, and check that a model is right?",
+    "section": "Checks, sources and what’s next",
+    "text": "Checks, sources and what’s next"
+  },
+  {
+    "objectID": "learn/b01-algebra-to-lp.html",
+    "href": "learn/b01-algebra-to-lp.html",
+    "title": "From algebra to a linear program: how do equations become a model?",
+    "section": "",
+    "text": "LearnB1\n\nAnalyst to Modeler · L2–L3\n30 min guided · about 45 min practice\nAfter lesson 10 and K4\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/b01-algebra-to-lp.html#what-you-just-did-as-diagrams",
+    "href": "learn/b01-algebra-to-lp.html#what-you-just-did-as-diagrams",
+    "title": "From algebra to a linear program: how do equations become a model?",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/b01-algebra-to-lp.html#check-yourself",
+    "href": "learn/b01-algebra-to-lp.html#check-yourself",
+    "title": "From algebra to a linear program: how do equations become a model?",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/b01-algebra-to-lp.html#numbers-sources-and-whats-next",
+    "href": "learn/b01-algebra-to-lp.html#numbers-sources-and-whats-next",
+    "title": "From algebra to a linear program: how do equations become a model?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a17-physical-feasibility.html",
+    "href": "learn/a17-physical-feasibility.html",
+    "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
+    "section": "",
+    "text": "LearnA17\n\nAnalyst · L2\n30 min guided · about 20 min practice\nAfter F6 and lesson 3\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a17-physical-feasibility.html#what-you-just-did-as-diagrams",
+    "href": "learn/a17-physical-feasibility.html#what-you-just-did-as-diagrams",
+    "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a17-physical-feasibility.html#check-yourself",
+    "href": "learn/a17-physical-feasibility.html#check-yourself",
+    "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a17-physical-feasibility.html#numbers-sources-and-whats-next",
+    "href": "learn/a17-physical-feasibility.html#numbers-sources-and-whats-next",
+    "title": "Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
@@ -658,30 +833,114 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/a07-flexible-demand.html",
-    "href": "learn/a07-flexible-demand.html",
-    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "objectID": "learn/a10-emissions-questions.html",
+    "href": "learn/a10-emissions-questions.html",
+    "title": "Which emissions question are you asking? Inventories, consequences and procurement claims",
     "section": "",
-    "text": "LearnA7\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 9 and A4\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnA10\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 12 and lesson 8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/a07-flexible-demand.html#what-you-just-did-as-diagrams",
-    "href": "learn/a07-flexible-demand.html#what-you-just-did-as-diagrams",
-    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "objectID": "learn/a10-emissions-questions.html#what-you-just-did-as-diagrams",
+    "href": "learn/a10-emissions-questions.html#what-you-just-did-as-diagrams",
+    "title": "Which emissions question are you asking? Inventories, consequences and procurement claims",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/a07-flexible-demand.html#check-yourself",
-    "href": "learn/a07-flexible-demand.html#check-yourself",
-    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "objectID": "learn/a10-emissions-questions.html#check-yourself",
+    "href": "learn/a10-emissions-questions.html#check-yourself",
+    "title": "Which emissions question are you asking? Inventories, consequences and procurement claims",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/a07-flexible-demand.html#numbers-sources-and-whats-next",
-    "href": "learn/a07-flexible-demand.html#numbers-sources-and-whats-next",
-    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "objectID": "learn/a10-emissions-questions.html#numbers-sources-and-whats-next",
+    "href": "learn/a10-emissions-questions.html#numbers-sources-and-whats-next",
+    "title": "Which emissions question are you asking? Inventories, consequences and procurement claims",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a08-storage-duration.html",
+    "href": "learn/a08-storage-duration.html",
+    "title": "How long should storage last? From batteries to seasonal stores",
+    "section": "",
+    "text": "LearnA8\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 9 and lesson 13\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a08-storage-duration.html#what-you-just-did-as-diagrams",
+    "href": "learn/a08-storage-duration.html#what-you-just-did-as-diagrams",
+    "title": "How long should storage last? From batteries to seasonal stores",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a08-storage-duration.html#check-yourself",
+    "href": "learn/a08-storage-duration.html#check-yourself",
+    "title": "How long should storage last? From batteries to seasonal stores",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a08-storage-duration.html#numbers-sources-and-whats-next",
+    "href": "learn/a08-storage-duration.html#numbers-sources-and-whats-next",
+    "title": "How long should storage last? From batteries to seasonal stores",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a06-interconnection.html",
+    "href": "learn/a06-interconnection.html",
+    "title": "Why does it take years to connect a power plant or a data center?",
+    "section": "",
+    "text": "LearnA6\n\nAnalyst · L2\n25 min guided · about 30 min practice\nAfter F8 and lesson 8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a06-interconnection.html#what-you-just-did-as-diagrams",
+    "href": "learn/a06-interconnection.html#what-you-just-did-as-diagrams",
+    "title": "Why does it take years to connect a power plant or a data center?",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a06-interconnection.html#check-yourself",
+    "href": "learn/a06-interconnection.html#check-yourself",
+    "title": "Why does it take years to connect a power plant or a data center?",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a06-interconnection.html#numbers-sources-and-whats-next",
+    "href": "learn/a06-interconnection.html#numbers-sources-and-whats-next",
+    "title": "Why does it take years to connect a power plant or a data center?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a04-retail-tariffs.html",
+    "href": "learn/a04-retail-tariffs.html",
+    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "section": "",
+    "text": "LearnA4\n\nAnalyst · L2\n25 min guided · about 30 min practice\nAfter lesson 8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a04-retail-tariffs.html#what-you-just-did-as-diagrams",
+    "href": "learn/a04-retail-tariffs.html#what-you-just-did-as-diagrams",
+    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a04-retail-tariffs.html#check-yourself",
+    "href": "learn/a04-retail-tariffs.html#check-yourself",
+    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a04-retail-tariffs.html#numbers-sources-and-whats-next",
+    "href": "learn/a04-retail-tariffs.html#numbers-sources-and-whats-next",
+    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
@@ -914,7 +1173,7 @@
     "href": "learn/index.html",
     "title": "Energy Systems, Step by Step",
     "section": "",
-    "text": "One small fictional town and a power grid you run yourself. Start with a game, then climb as far as you like: from how the grid works to building and questioning your own models.\n\n\n\n\n\nAll lessons as a list\n\n\nThe starter path: 14 lessons across the tiers\n\n\nHow does the grid keep the lights on? · Foundations · 15 min · open\n\nPower or energy? What is the difference between kW and kWh? · Foundations · 15 min · open\n\nWhy does electricity demand rise and fall? · Foundations · 15 min · open\n\nHow does the grid stay balanced every second? · Foundations · 15 min · open\n\nForecasts and surprises: how do you plan for weather you can't see yet? · Foundations to Analyst · 15 min · open\n\nCapacity factor: why is 1 MW not always 1 MW? · Foundations · 15 min · open\n\nCheap energy, firm capacity, flexibility: which plant does which job? · Foundations · 15 min · open\n\nWhat does electricity cost to make? · Analyst · 15 min · open\n\nWho runs, and what sets the price? · Analyst · 15 min · open\n\nHow does storage move energy through time? · Analyst · 15 min · open\n\nWrite it down: what are the decisions, the goal and the rules? · Analyst · 15 min · open\n\nAsk the solver, then check its answer · Modeler · 15 min · open\n\nCheap or clean? How do you weigh cost against emissions? · Analyst · 15 min · open\n\nWhat should Prairie Town build? Plan its power system · Analyst to Modeler · 15 min · open\n\n\n\n\n\nFoundations · L1\nExplain how the power system works and reason with its numbers.\n\n\nLesson 0How does the grid keep the lights on? · starter path · 15 min · openLesson 1Power or energy? What is the difference between kW and kWh? · starter path · 15 min · openLesson 2Why does electricity demand rise and fall? · starter path · 15 min · openLesson 3How does the grid stay balanced every second? · starter path · 15 min · openLesson 4Forecasts and surprises: how do you plan for weather you can't see yet? · starter path · 15 min · openLesson 5Capacity factor: why is 1 MW not always 1 MW? · starter path · 15 min · openLesson 6Cheap energy, firm capacity, flexibility: which plant does which job? · starter path · 15 min · open\nF1Who decides what, from a light switch to a nation? · 15 min · openF2How does everything connect? Stocks, flows, feedback and the whole-system map · 25 min · openF3What do people actually want from energy? · 20 min · openF4How do power plants turn heat, water, wind and sunlight into electricity? · 20 min · openF5How does a nuclear reactor make electricity, and heat? · 15 min · openF6How does power reach your plug, and why does it sometimes fail? · 20 min · openF7What is a microgrid? From a hospital that keeps its lights on to a village with no grid · 20 min · openF8What happens when a data center moves to town? · coming soonF9What does a city run on, and who controls what? · coming soonF10Why does every country's energy system look different? · coming soonF11What does energy do to the air, the climate and people's lives? · coming soonN1How do you read an energy headline like a researcher? · 20 min · openX1What engineering lies beneath the system? · coming soonX3How fast have energy transitions happened before? · coming soonCK-FFoundations checkpoint: estimate an unfamiliar situation · checkpoint · 40 min · open\n\n\n\n\n\nAnalyst · L2\nWork out costs, prices and trade-offs on paper and in a spreadsheet, and read an energy study critically.\n\n\nLesson 7What does electricity cost to make? · starter path · 15 min · openLesson 8Who runs, and what sets the price? · starter path · 15 min · openLesson 9How does storage move energy through time? · starter path · 15 min · openLesson 10Write it down: what are the decisions, the goal and the rules? · starter path · 15 min · openLesson 12Cheap or clean? How do you weigh cost against emissions? · starter path · 15 min · open\nA1Is this project worth building? Cash flows, discounting and the cost of capital · 30 min · openA2Who carries the risk? Power purchase agreements and risk allocation · 25 min · openA3Energy-only or capacity market? How wholesale markets are designed for high renewable shares · coming soonA4How should an electricity bill be designed? Retail, dynamic and large-load tariffs · 25 min · openA5Will there be enough power when it matters? Resource adequacy and capacity accreditation · coming soonA6Why does it take years to connect a power plant or a data center? · coming soonA7Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading · 30 min · openA8How long should storage last? From batteries to seasonal stores · 30 min · openA9How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare? · coming soonA10Which emissions question are you asking? Inventories, consequences and procurement claims · coming soonA11What does 'clean' mean from cradle to grave? Life cycles, water and land · coming soonA12How do governments steer energy? Taxes, credits, standards and carbon prices · coming soonA13Who pays and who benefits? Energy burden, fairness and jobs · coming soonA14Does a microgrid pay off, and for whom? · 25 min · openA15How much can efficiency and electrification change demand? Buildings, heat, transport and industry · coming soonA16Where does hydrogen make sense? From renewables to electrolysis, storage and use · 30 min · openA17Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity · coming soonA18How is a city or regional energy plan made? · coming soonA19Where should it go? Siting with maps, from layers to a suitability score · coming soonA20Why do national energy scenarios disagree? · coming soonA21What makes a nation's energy secure? Imports, minerals, supply chains and factories · coming soonA22Cheap, clean, reliable, fair, secure: can you have them all? · 25 min · openB1From algebra to a linear program: how do equations become a model? · 30 min · openB2Python and data for energy: how do you load, plot and check a year of hourly data? · 20 min · openB3How do you read a formulation, and check that a model is right? · 30 min · openX2What happens to gas, coal and oil systems in a transition, and can carbon be removed? · coming soonX4How are energy rules made? · coming soonX5How are big energy projects actually financed? · coming soonCF1Where should a factory go when sun and wind are part of the decision? · case file · 10 min · openCF2When the cost per kilogram and the cost of the system disagree · case file · 10 min · openCF3Where should hydrogen go when nobody knows how much wind will be built? · case file · coming soonCF6How much can shifting load to cleaner hours cut emissions, and when? · case file · 10 min · openCF7What does waiting for the grid cost, and who pays? · case file · 10 min · openCF8Learning a wind turbine's power curve from scarce data · case file · coming soonSB0Site Bench · sandbox · 20 min · openSB1Microgrid Workbench · sandbox · 30 min · openSB3City Planner · sandbox · coming soonCK-AAnalyst checkpoint: an auditable spreadsheet for a new case · checkpoint · coming soonC0Behind one meter: what should one home or one plant install? · capstone · 60 min · openC1Keep the campus running: a microgrid for a three-day winter outage · capstone · 90 min · openC3Prairie City 2040: write the city's energy plan · capstone · coming soon\n\n\n\n\n\nModeler · L3\nFormulate, build, solve and critique an energy-system optimization model.\n\n\nLesson 11Ask the solver, then check its answer · starter path · 15 min · openLesson 13What should Prairie Town build? Plan its power system · starter path · 15 min · open\nM1From dispatch to locational prices: the linear program behind the market · 40 min · openM2On or off? Unit commitment as a mixed-integer program · 40 min · openM3What should be built? Capacity expansion with representative periods, validated · 45 min · openM4Storage and coupled carriers: modelling power, hydrogen and heat together · 40 min · openM5Size and run a microgrid that survives an outage · 45 min · openM6Putting carbon in the model: caps, prices, frontiers and procurement rules · coming soonM7What could happen? Scenarios, Monte Carlo and global sensitivity · 35 min · openM8Deciding before the uncertainty resolves: stochastic and robust optimization · coming soonM9Learning from few runs: surrogates, Gaussian processes and multi-fidelity data · coming soonM10Forecasting load, wind, solar and prices with machine learning, and judging it honestly · coming soonM11Techno-economic analysis inside an optimization model · coming soonM12Model a city's energy system: an energy hub with grid limits and screening fairness outputs · coming soonM13Build a nation's pathway: a multi-region, multi-decade model · coming soonM14Did it work? Learning from data with regression and natural experiments · coming soonSB2Grid Room · sandbox · coming soonSB4Pathway Explorer · sandbox · coming soonCK-MModeler checkpoint: formulate an unseen problem, find a defect, validate a result · checkpoint · 240 min · openC2The Plains Grid in a hard year · capstone · coming soonC4Prairieland 2050: design and defend a nation's pathway · capstone · coming soon\n\n\n\n\n\nResearcher · L4\nPrepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.\n\n\n\nR1What makes a question worth researching? · studio · 30 min · openR2How do you find out what is already known? · studio · 30 min · openR3Which system, which boundary, which method? · studio · 30 min · openR4Data you can defend: sources, cleaning, licences and provenance · studio · 30 min · openR5Can you trust your analysis? Verification, validation and reproducibility · studio · 35 min · openR6Uncertainty done properly: what to vary, how, and how to say it · studio · coming soonR7Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual · studio · coming soonR8How do you show results so people understand their limits? · studio · coming soonR9Research integrity, and working with the people your study is about · studio · 30 min · openR10What could you study? The question studio · studio · 40 min · openX6How do social scientists study energy and people? · coming soonCK-RResearcher checkpoint: defend your question and method, then revise · checkpoint · coming soonCRYour own study: from a question to a report · capstone · coming soon\n\n\n\n\n\nThe math toolbox\nK1Units and orders of magnitude · 10 min · openK2Rates and efficiencies · 10 min · openK3Exponentials and discounting · 15 min · openK4Linear equations and inequalities · 15 min · openK5Probability and statistics · 25 min · openK6Vectors and matrices: what Ax ≤ b means · 25 min · openK7Spreadsheets in practice · 20 min · openK8Git and reproducible notebooks · 20 min · open\n\n\n\n\nNo matching items\n\n  \n\n\n\nPrairie Town is fictional; every real-world number in the lessons carries a source and a date. Your guesses and progress stay in this browser. Written by Honglin Li.\n\n\n\nSpotted an error, or stuck? Write to hlli@ksu.edu. Corrections are made in place and dated here.\nText licensed CC BY 4.0, code MIT: teachers and students may reuse and adapt it, with credit to Honglin Li."
+    "text": "One small fictional town and a power grid you run yourself. Start with a game, then climb as far as you like: from how the grid works to building and questioning your own models.\n\n\n\n\n\nAll lessons as a list\n\n\nThe starter path: 14 lessons across the tiers\n\n\nHow does the grid keep the lights on? · Foundations · 15 min · open\n\nPower or energy? What is the difference between kW and kWh? · Foundations · 15 min · open\n\nWhy does electricity demand rise and fall? · Foundations · 15 min · open\n\nHow does the grid stay balanced every second? · Foundations · 15 min · open\n\nForecasts and surprises: how do you plan for weather you can't see yet? · Foundations to Analyst · 15 min · open\n\nCapacity factor: why is 1 MW not always 1 MW? · Foundations · 15 min · open\n\nCheap energy, firm capacity, flexibility: which plant does which job? · Foundations · 15 min · open\n\nWhat does electricity cost to make? · Analyst · 15 min · open\n\nWho runs, and what sets the price? · Analyst · 15 min · open\n\nHow does storage move energy through time? · Analyst · 15 min · open\n\nWrite it down: what are the decisions, the goal and the rules? · Analyst · 15 min · open\n\nAsk the solver, then check its answer · Modeler · 15 min · open\n\nCheap or clean? How do you weigh cost against emissions? · Analyst · 15 min · open\n\nWhat should Prairie Town build? Plan its power system · Analyst to Modeler · 15 min · open\n\n\n\n\n\nFoundations · L1\nExplain how the power system works and reason with its numbers.\n\n\nLesson 0How does the grid keep the lights on? · starter path · 15 min · openLesson 1Power or energy? What is the difference between kW and kWh? · starter path · 15 min · openLesson 2Why does electricity demand rise and fall? · starter path · 15 min · openLesson 3How does the grid stay balanced every second? · starter path · 15 min · openLesson 4Forecasts and surprises: how do you plan for weather you can't see yet? · starter path · 15 min · openLesson 5Capacity factor: why is 1 MW not always 1 MW? · starter path · 15 min · openLesson 6Cheap energy, firm capacity, flexibility: which plant does which job? · starter path · 15 min · open\nF1Who decides what, from a light switch to a nation? · 15 min · openF2How does everything connect? Stocks, flows, feedback and the whole-system map · 25 min · openF3What do people actually want from energy? · 20 min · openF4How do power plants turn heat, water, wind and sunlight into electricity? · 20 min · openF5How does a nuclear reactor make electricity, and heat? · 15 min · openF6How does power reach your plug, and why does it sometimes fail? · 20 min · openF7What is a microgrid? From a hospital that keeps its lights on to a village with no grid · 20 min · openF8What happens when a data center moves to town? · 15 min · openF9What does a city run on, and who controls what? · coming soonF10Why does every country's energy system look different? · coming soonF11What does energy do to the air, the climate and people's lives? · coming soonN1How do you read an energy headline like a researcher? · 20 min · openX1What engineering lies beneath the system? · coming soonX3How fast have energy transitions happened before? · coming soonCK-FFoundations checkpoint: estimate an unfamiliar situation · checkpoint · 40 min · open\n\n\n\n\n\nAnalyst · L2\nWork out costs, prices and trade-offs on paper and in a spreadsheet, and read an energy study critically.\n\n\nLesson 7What does electricity cost to make? · starter path · 15 min · openLesson 8Who runs, and what sets the price? · starter path · 15 min · openLesson 9How does storage move energy through time? · starter path · 15 min · openLesson 10Write it down: what are the decisions, the goal and the rules? · starter path · 15 min · openLesson 12Cheap or clean? How do you weigh cost against emissions? · starter path · 15 min · open\nA1Is this project worth building? Cash flows, discounting and the cost of capital · 30 min · openA2Who carries the risk? Power purchase agreements and risk allocation · 25 min · openA3Energy-only or capacity market? How wholesale markets are designed for high renewable shares · 30 min · openA4How should an electricity bill be designed? Retail, dynamic and large-load tariffs · 25 min · openA5Will there be enough power when it matters? Resource adequacy and capacity accreditation · 30 min · openA6Why does it take years to connect a power plant or a data center? · 25 min · openA7Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading · 30 min · openA8How long should storage last? From batteries to seasonal stores · 30 min · openA9How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare? · 25 min · openA10Which emissions question are you asking? Inventories, consequences and procurement claims · 30 min · openA11What does 'clean' mean from cradle to grave? Life cycles, water and land · coming soonA12How do governments steer energy? Taxes, credits, standards and carbon prices · 25 min · openA13Who pays and who benefits? Energy burden, fairness and jobs · coming soonA14Does a microgrid pay off, and for whom? · 25 min · openA15How much can efficiency and electrification change demand? Buildings, heat, transport and industry · coming soonA16Where does hydrogen make sense? From renewables to electrolysis, storage and use · 30 min · openA17Will it work on the wires? Voltage, reactive power, inertia, ramps and hosting capacity · 30 min · openA18How is a city or regional energy plan made? · coming soonA19Where should it go? Siting with maps, from layers to a suitability score · coming soonA20Why do national energy scenarios disagree? · coming soonA21What makes a nation's energy secure? Imports, minerals, supply chains and factories · coming soonA22Cheap, clean, reliable, fair, secure: can you have them all? · 25 min · openB1From algebra to a linear program: how do equations become a model? · 30 min · openB2Python and data for energy: how do you load, plot and check a year of hourly data? · 20 min · openB3How do you read a formulation, and check that a model is right? · 30 min · openX2What happens to gas, coal and oil systems in a transition, and can carbon be removed? · coming soonX4How are energy rules made? · coming soonX5How are big energy projects actually financed? · coming soonCF1Where should a factory go when sun and wind are part of the decision? · case file · 10 min · openCF2When the cost per kilogram and the cost of the system disagree · case file · 10 min · openCF3Where should hydrogen go when nobody knows how much wind will be built? · case file · 10 min · openCF6How much can shifting load to cleaner hours cut emissions, and when? · case file · 10 min · openCF7What does waiting for the grid cost, and who pays? · case file · 10 min · openCF8Learning a wind turbine's power curve from scarce data · case file · 10 min · openSB0Site Bench · sandbox · 20 min · openSB1Microgrid Workbench · sandbox · 30 min · openSB3City Planner · sandbox · coming soonCK-AAnalyst checkpoint: an auditable spreadsheet for a new case · checkpoint · coming soonC0Behind one meter: what should one home or one plant install? · capstone · 60 min · openC1Keep the campus running: a microgrid for a three-day winter outage · capstone · 90 min · openC3Prairie City 2040: write the city's energy plan · capstone · coming soon\n\n\n\n\n\nModeler · L3\nFormulate, build, solve and critique an energy-system optimization model.\n\n\nLesson 11Ask the solver, then check its answer · starter path · 15 min · openLesson 13What should Prairie Town build? Plan its power system · starter path · 15 min · open\nM1From dispatch to locational prices: the linear program behind the market · 40 min · openM2On or off? Unit commitment as a mixed-integer program · 40 min · openM3What should be built? Capacity expansion with representative periods, validated · 45 min · openM4Storage and coupled carriers: modelling power, hydrogen and heat together · 40 min · openM5Size and run a microgrid that survives an outage · 45 min · openM6Putting carbon in the model: caps, prices, frontiers and procurement rules · 40 min · openM7What could happen? Scenarios, Monte Carlo and global sensitivity · 35 min · openM8Deciding before the uncertainty resolves: stochastic and robust optimization · 45 min · openM9Learning from few runs: surrogates, Gaussian processes and multi-fidelity data · 40 min · openM10Forecasting load, wind and solar with machine learning, and judging it honestly · 40 min · openM11Techno-economic analysis inside an optimization model · coming soonM12Model a city's energy system: an energy hub with grid limits and screening fairness outputs · coming soonM13Build a nation's pathway: a multi-region, multi-decade model · coming soonM14Did it work? Learning from data with regression and natural experiments · coming soonSB2Grid Room · sandbox · 30 min · openSB4Pathway Explorer · sandbox · coming soonCK-MModeler checkpoint: formulate an unseen problem, find a defect, validate a result · checkpoint · 240 min · openC2The Plains Grid in a hard year · capstone · 180 min · openC4Prairieland 2050: design and defend a nation's pathway · capstone · coming soon\n\n\n\n\n\nResearcher · L4\nPrepare for supervised research: design, run and communicate a study at one chosen scale, and form independent, well-founded views.\n\n\n\nR1What makes a question worth researching? · studio · 30 min · openR2How do you find out what is already known? · studio · 30 min · openR3Which system, which boundary, which method? · studio · 30 min · openR4Data you can defend: sources, cleaning, licences and provenance · studio · 30 min · openR5Can you trust your analysis? Verification, validation and reproducibility · studio · 35 min · openR6Uncertainty done properly: what to vary, how, and how to say it · studio · 30 min · openR7Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual · studio · coming soonR8How do you show results so people understand their limits? · studio · 30 min · openR9Research integrity, and working with the people your study is about · studio · 30 min · openR10What could you study? The question studio · studio · 40 min · openX6How do social scientists study energy and people? · coming soonCK-RResearcher checkpoint: defend your question and method, then revise · checkpoint · coming soonCRYour own study: from a question to a report · capstone · coming soon\n\n\n\n\n\nThe math toolbox\nK1Units and orders of magnitude · 10 min · openK2Rates and efficiencies · 10 min · openK3Exponentials and discounting · 15 min · openK4Linear equations and inequalities · 15 min · openK5Probability and statistics · 25 min · openK6Vectors and matrices: what Ax ≤ b means · 25 min · openK7Spreadsheets in practice · 20 min · openK8Git and reproducible notebooks · 20 min · open\n\n\n\n\nNo matching items\n\n  \n\n\n\nPrairie Town is fictional; every real-world number in the lessons carries a source and a date. Your guesses and progress stay in this browser. Written by Honglin Li.\n\n\n\nSpotted an error, or stuck? Write to hlli@ksu.edu. Corrections are made in place and dated here.\nText licensed CC BY 4.0, code MIT: teachers and students may reuse and adapt it, with credit to Honglin Li."
   },
   {
     "objectID": "field-notes/perspectives.html",
@@ -1603,58 +1862,142 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/a04-retail-tariffs.html",
-    "href": "learn/a04-retail-tariffs.html",
-    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "objectID": "learn/a03-market-design.html",
+    "href": "learn/a03-market-design.html",
+    "title": "Energy-only or capacity market? How wholesale markets are designed for high renewable shares",
     "section": "",
-    "text": "LearnA4\n\nAnalyst · L2\n25 min guided · about 30 min practice\nAfter lesson 8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnA3\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/a04-retail-tariffs.html#what-you-just-did-as-diagrams",
-    "href": "learn/a04-retail-tariffs.html#what-you-just-did-as-diagrams",
-    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "objectID": "learn/a03-market-design.html#what-you-just-did-as-diagrams",
+    "href": "learn/a03-market-design.html#what-you-just-did-as-diagrams",
+    "title": "Energy-only or capacity market? How wholesale markets are designed for high renewable shares",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/a04-retail-tariffs.html#check-yourself",
-    "href": "learn/a04-retail-tariffs.html#check-yourself",
-    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "objectID": "learn/a03-market-design.html#check-yourself",
+    "href": "learn/a03-market-design.html#check-yourself",
+    "title": "Energy-only or capacity market? How wholesale markets are designed for high renewable shares",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/a04-retail-tariffs.html#numbers-sources-and-whats-next",
-    "href": "learn/a04-retail-tariffs.html#numbers-sources-and-whats-next",
-    "title": "How should an electricity bill be designed? Retail, dynamic and large-load tariffs",
+    "objectID": "learn/a03-market-design.html#numbers-sources-and-whats-next",
+    "href": "learn/a03-market-design.html#numbers-sources-and-whats-next",
+    "title": "Energy-only or capacity market? How wholesale markets are designed for high renewable shares",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/a08-storage-duration.html",
-    "href": "learn/a08-storage-duration.html",
-    "title": "How long should storage last? From batteries to seasonal stores",
+    "objectID": "learn/a05-adequacy.html",
+    "href": "learn/a05-adequacy.html",
+    "title": "Will there be enough power when it matters? Resource adequacy and capacity accreditation",
     "section": "",
-    "text": "LearnA8\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 9 and lesson 13\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnA5\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 3 and lesson 6 and K5\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/a08-storage-duration.html#what-you-just-did-as-diagrams",
-    "href": "learn/a08-storage-duration.html#what-you-just-did-as-diagrams",
-    "title": "How long should storage last? From batteries to seasonal stores",
+    "objectID": "learn/a05-adequacy.html#what-you-just-did-as-diagrams",
+    "href": "learn/a05-adequacy.html#what-you-just-did-as-diagrams",
+    "title": "Will there be enough power when it matters? Resource adequacy and capacity accreditation",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/a08-storage-duration.html#check-yourself",
-    "href": "learn/a08-storage-duration.html#check-yourself",
-    "title": "How long should storage last? From batteries to seasonal stores",
+    "objectID": "learn/a05-adequacy.html#check-yourself",
+    "href": "learn/a05-adequacy.html#check-yourself",
+    "title": "Will there be enough power when it matters? Resource adequacy and capacity accreditation",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/a08-storage-duration.html#numbers-sources-and-whats-next",
-    "href": "learn/a08-storage-duration.html#numbers-sources-and-whats-next",
-    "title": "How long should storage last? From batteries to seasonal stores",
+    "objectID": "learn/a05-adequacy.html#numbers-sources-and-whats-next",
+    "href": "learn/a05-adequacy.html#numbers-sources-and-whats-next",
+    "title": "Will there be enough power when it matters? Resource adequacy and capacity accreditation",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a07-flexible-demand.html",
+    "href": "learn/a07-flexible-demand.html",
+    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "section": "",
+    "text": "LearnA7\n\nAnalyst · L2\n30 min guided · about 30 min practice\nAfter lesson 9 and A4\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a07-flexible-demand.html#what-you-just-did-as-diagrams",
+    "href": "learn/a07-flexible-demand.html#what-you-just-did-as-diagrams",
+    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a07-flexible-demand.html#check-yourself",
+    "href": "learn/a07-flexible-demand.html#check-yourself",
+    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a07-flexible-demand.html#numbers-sources-and-whats-next",
+    "href": "learn/a07-flexible-demand.html#numbers-sources-and-whats-next",
+    "title": "Can demand and small resources act like a power plant? Demand response, EV charging, virtual power plants and local trading",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a09-hazards.html",
+    "href": "learn/a09-hazards.html",
+    "title": "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?",
+    "section": "",
+    "text": "LearnA9\n\nAnalyst · L2\n25 min guided · about 30 min practice\nAfter F6 and A5\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a09-hazards.html#what-you-just-did-as-diagrams",
+    "href": "learn/a09-hazards.html#what-you-just-did-as-diagrams",
+    "title": "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a09-hazards.html#check-yourself",
+    "href": "learn/a09-hazards.html#check-yourself",
+    "title": "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a09-hazards.html#numbers-sources-and-whats-next",
+    "href": "learn/a09-hazards.html#numbers-sources-and-whats-next",
+    "title": "How do heat waves, droughts, wildfires and cold snaps break energy systems, and how do planners prepare?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/a12-policy-instruments.html",
+    "href": "learn/a12-policy-instruments.html",
+    "title": "How do governments steer energy? Taxes, credits, standards and carbon prices",
+    "section": "",
+    "text": "LearnA12\n\nAnalyst · L2\n25 min guided · about 30 min practice\nAfter A1 and lesson 12\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/a12-policy-instruments.html#what-you-just-did-as-diagrams",
+    "href": "learn/a12-policy-instruments.html#what-you-just-did-as-diagrams",
+    "title": "How do governments steer energy? Taxes, credits, standards and carbon prices",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/a12-policy-instruments.html#check-yourself",
+    "href": "learn/a12-policy-instruments.html#check-yourself",
+    "title": "How do governments steer energy? Taxes, credits, standards and carbon prices",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/a12-policy-instruments.html#numbers-sources-and-whats-next",
+    "href": "learn/a12-policy-instruments.html#numbers-sources-and-whats-next",
+    "title": "How do governments steer energy? Taxes, credits, standards and carbon prices",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
@@ -1687,93 +2030,128 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/b01-algebra-to-lp.html",
-    "href": "learn/b01-algebra-to-lp.html",
-    "title": "From algebra to a linear program: how do equations become a model?",
+    "objectID": "learn/a22-tradeoff-explorer.html",
+    "href": "learn/a22-tradeoff-explorer.html",
+    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
     "section": "",
-    "text": "LearnB1\n\nAnalyst to Modeler · L2–L3\n30 min guided · about 45 min practice\nAfter lesson 10 and K4\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnA22\n\nAnalyst · L2\n25 min guided · about 20 min practice\nAfter F2 and lesson 12\nCompleted\n\n\n1Play2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/b01-algebra-to-lp.html#what-you-just-did-as-diagrams",
-    "href": "learn/b01-algebra-to-lp.html#what-you-just-did-as-diagrams",
-    "title": "From algebra to a linear program: how do equations become a model?",
+    "objectID": "learn/a22-tradeoff-explorer.html#what-you-just-did-as-diagrams",
+    "href": "learn/a22-tradeoff-explorer.html#what-you-just-did-as-diagrams",
+    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/b01-algebra-to-lp.html#check-yourself",
-    "href": "learn/b01-algebra-to-lp.html#check-yourself",
-    "title": "From algebra to a linear program: how do equations become a model?",
+    "objectID": "learn/a22-tradeoff-explorer.html#check-yourself",
+    "href": "learn/a22-tradeoff-explorer.html#check-yourself",
+    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/b01-algebra-to-lp.html#numbers-sources-and-whats-next",
-    "href": "learn/b01-algebra-to-lp.html#numbers-sources-and-whats-next",
-    "title": "From algebra to a linear program: how do equations become a model?",
+    "objectID": "learn/a22-tradeoff-explorer.html#numbers-sources-and-whats-next",
+    "href": "learn/a22-tradeoff-explorer.html#numbers-sources-and-whats-next",
+    "title": "Cheap, clean, reliable, fair, secure: can you have them all?",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/b03-read-check-formulation.html",
-    "href": "learn/b03-read-check-formulation.html",
-    "title": "How do you read a formulation, and check that a model is right?",
+    "objectID": "learn/b02-python-data.html",
+    "href": "learn/b02-python-data.html",
+    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
     "section": "",
-    "text": "LearnB3\n\nAnalyst to Modeler · L2–L3\n30 min guided · about 45 min practice\nAfter B1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnB2\n\nAnalyst to Modeler · L2–L3\n20 min guided · 60 min lab\nAfter lesson 5 and K7\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/b03-read-check-formulation.html#what-you-just-did-as-diagrams",
-    "href": "learn/b03-read-check-formulation.html#what-you-just-did-as-diagrams",
-    "title": "How do you read a formulation, and check that a model is right?",
-    "section": "What you just did, as diagrams",
-    "text": "What you just did, as diagrams"
+    "objectID": "learn/b02-python-data.html#what-you-just-did-as-a-flowchart-and-a-checklist",
+    "href": "learn/b02-python-data.html#what-you-just-did-as-a-flowchart-and-a-checklist",
+    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
+    "section": "What you just did, as a flowchart and a checklist",
+    "text": "What you just did, as a flowchart and a checklist"
   },
   {
-    "objectID": "learn/b03-read-check-formulation.html#check-yourself",
-    "href": "learn/b03-read-check-formulation.html#check-yourself",
-    "title": "How do you read a formulation, and check that a model is right?",
+    "objectID": "learn/b02-python-data.html#check-yourself",
+    "href": "learn/b02-python-data.html#check-yourself",
+    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/b03-read-check-formulation.html#checks-sources-and-whats-next",
-    "href": "learn/b03-read-check-formulation.html#checks-sources-and-whats-next",
-    "title": "How do you read a formulation, and check that a model is right?",
-    "section": "Checks, sources and what’s next",
-    "text": "Checks, sources and what’s next"
+    "objectID": "learn/b02-python-data.html#numbers-sources-and-whats-next",
+    "href": "learn/b02-python-data.html#numbers-sources-and-whats-next",
+    "title": "Python and data for energy: how do you load, plot and check a year of hourly data?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/c1-keep-the-campus-running.html",
-    "href": "learn/c1-keep-the-campus-running.html",
-    "title": "Keep the campus running: a microgrid for a three-day winter outage",
+    "objectID": "learn/c0-behind-one-meter.html",
+    "href": "learn/c0-behind-one-meter.html",
+    "title": "Behind one meter: what should one home or one plant install?",
     "section": "",
-    "text": "LearnC1\n\nAnalyst to Modeler · L2–L3\nCapstone\n90 min guided · 60 min lab\nAfter SB1 and F7 and A14 and A4\nCompleted\n\n\n1Brief2Plan3Note4Self-check5Sources"
+    "text": "LearnC0\n\nAnalyst to Modeler · L2–L3\nCapstone\n60 min guided · 45 min lab\nAfter lesson 9 and A1 and F4 and SB0\nCompleted\n\n\n1Brief2Plan3Note4Self-check5Sources"
   },
   {
-    "objectID": "learn/c1-keep-the-campus-running.html#build-and-run-your-plan",
-    "href": "learn/c1-keep-the-campus-running.html#build-and-run-your-plan",
-    "title": "Keep the campus running: a microgrid for a three-day winter outage",
+    "objectID": "learn/c0-behind-one-meter.html#build-and-run-your-plan",
+    "href": "learn/c0-behind-one-meter.html#build-and-run-your-plan",
+    "title": "Behind one meter: what should one home or one plant install?",
     "section": "Build and run your plan",
     "text": "Build and run your plan"
   },
   {
-    "objectID": "learn/c1-keep-the-campus-running.html#write-your-one-page-note",
-    "href": "learn/c1-keep-the-campus-running.html#write-your-one-page-note",
-    "title": "Keep the campus running: a microgrid for a three-day winter outage",
+    "objectID": "learn/c0-behind-one-meter.html#write-your-one-page-note",
+    "href": "learn/c0-behind-one-meter.html#write-your-one-page-note",
+    "title": "Behind one meter: what should one home or one plant install?",
     "section": "Write your one-page note",
     "text": "Write your one-page note"
   },
   {
-    "objectID": "learn/c1-keep-the-campus-running.html#check-your-note",
-    "href": "learn/c1-keep-the-campus-running.html#check-your-note",
-    "title": "Keep the campus running: a microgrid for a three-day winter outage",
+    "objectID": "learn/c0-behind-one-meter.html#check-your-note",
+    "href": "learn/c0-behind-one-meter.html#check-your-note",
+    "title": "Behind one meter: what should one home or one plant install?",
     "section": "Check your note",
     "text": "Check your note"
   },
   {
-    "objectID": "learn/c1-keep-the-campus-running.html#numbers-sources-and-whats-next",
-    "href": "learn/c1-keep-the-campus-running.html#numbers-sources-and-whats-next",
-    "title": "Keep the campus running: a microgrid for a three-day winter outage",
+    "objectID": "learn/c0-behind-one-meter.html#numbers-sources-and-whats-next",
+    "href": "learn/c0-behind-one-meter.html#numbers-sources-and-whats-next",
+    "title": "Behind one meter: what should one home or one plant install?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/c2-plains-grid-hard-year.html",
+    "href": "learn/c2-plains-grid-hard-year.html",
+    "title": "The Plains Grid in a hard year",
+    "section": "",
+    "text": "LearnC2\n\nModeler · L3\nCapstone\n180 min guided · 45 min lab\nAfter SB2 and M2 and A5 and A6 and A9\nCompleted\n\n\n1Brief2Plan3Note4Self-check5Sources"
+  },
+  {
+    "objectID": "learn/c2-plains-grid-hard-year.html#build-and-test-your-plan",
+    "href": "learn/c2-plains-grid-hard-year.html#build-and-test-your-plan",
+    "title": "The Plains Grid in a hard year",
+    "section": "Build and test your plan",
+    "text": "Build and test your plan"
+  },
+  {
+    "objectID": "learn/c2-plains-grid-hard-year.html#write-your-two-page-study-note",
+    "href": "learn/c2-plains-grid-hard-year.html#write-your-two-page-study-note",
+    "title": "The Plains Grid in a hard year",
+    "section": "Write your two-page study note",
+    "text": "Write your two-page study note"
+  },
+  {
+    "objectID": "learn/c2-plains-grid-hard-year.html#check-your-note",
+    "href": "learn/c2-plains-grid-hard-year.html#check-your-note",
+    "title": "The Plains Grid in a hard year",
+    "section": "Check your note",
+    "text": "Check your note"
+  },
+  {
+    "objectID": "learn/c2-plains-grid-hard-year.html#numbers-sources-and-whats-next",
+    "href": "learn/c2-plains-grid-hard-year.html#numbers-sources-and-whats-next",
+    "title": "The Plains Grid in a hard year",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
@@ -1806,30 +2184,58 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/cf7-cost-of-waiting.html",
-    "href": "learn/cf7-cost-of-waiting.html",
-    "title": "What does waiting for the grid cost, and who pays?",
+    "objectID": "learn/cf6-shifting-load-to-clean-hours.html",
+    "href": "learn/cf6-shifting-load-to-clean-hours.html",
+    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
     "section": "",
-    "text": "LearnCF7\n\nAnalyst · L2\nCase file\n10 min\nAfter lesson 8\nCompleted\n\n\n1The case2Explain3Check4Sources"
+    "text": "LearnCF6\n\nAnalyst · L2\nCase file\n10 min\nAfter lesson 12\nCompleted\n\n\n1The case2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/cf7-cost-of-waiting.html#the-idea-behind-it-then-where-the-result-holds",
-    "href": "learn/cf7-cost-of-waiting.html#the-idea-behind-it-then-where-the-result-holds",
-    "title": "What does waiting for the grid cost, and who pays?",
+    "objectID": "learn/cf6-shifting-load-to-clean-hours.html#the-idea-behind-it-then-where-the-result-holds",
+    "href": "learn/cf6-shifting-load-to-clean-hours.html#the-idea-behind-it-then-where-the-result-holds",
+    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
     "section": "The idea behind it, then where the result holds",
     "text": "The idea behind it, then where the result holds"
   },
   {
-    "objectID": "learn/cf7-cost-of-waiting.html#check-yourself-then-try-it",
-    "href": "learn/cf7-cost-of-waiting.html#check-yourself-then-try-it",
-    "title": "What does waiting for the grid cost, and who pays?",
+    "objectID": "learn/cf6-shifting-load-to-clean-hours.html#check-yourself-then-try-it",
+    "href": "learn/cf6-shifting-load-to-clean-hours.html#check-yourself-then-try-it",
+    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
     "section": "Check yourself, then try it",
     "text": "Check yourself, then try it"
   },
   {
-    "objectID": "learn/cf7-cost-of-waiting.html#numbers-sources-and-whats-next",
-    "href": "learn/cf7-cost-of-waiting.html#numbers-sources-and-whats-next",
-    "title": "What does waiting for the grid cost, and who pays?",
+    "objectID": "learn/cf6-shifting-load-to-clean-hours.html#numbers-sources-and-whats-next",
+    "href": "learn/cf6-shifting-load-to-clean-hours.html#numbers-sources-and-whats-next",
+    "title": "How much can shifting load to cleaner hours cut emissions, and when?",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/cf8-power-curves-from-scarce-data.html",
+    "href": "learn/cf8-power-curves-from-scarce-data.html",
+    "title": "Learning a wind turbine’s power curve from scarce data",
+    "section": "",
+    "text": "LearnCF8\n\nAnalyst · L2\nCase file\n10 min\nAfter lesson 5\nCompleted\n\n\n1The case2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/cf8-power-curves-from-scarce-data.html#the-idea-behind-it-then-where-the-result-holds",
+    "href": "learn/cf8-power-curves-from-scarce-data.html#the-idea-behind-it-then-where-the-result-holds",
+    "title": "Learning a wind turbine’s power curve from scarce data",
+    "section": "The idea behind it, then where the result holds",
+    "text": "The idea behind it, then where the result holds"
+  },
+  {
+    "objectID": "learn/cf8-power-curves-from-scarce-data.html#check-yourself-then-try-it",
+    "href": "learn/cf8-power-curves-from-scarce-data.html#check-yourself-then-try-it",
+    "title": "Learning a wind turbine’s power curve from scarce data",
+    "section": "Check yourself, then try it",
+    "text": "Check yourself, then try it"
+  },
+  {
+    "objectID": "learn/cf8-power-curves-from-scarce-data.html#numbers-sources-and-whats-next",
+    "href": "learn/cf8-power-curves-from-scarce-data.html#numbers-sources-and-whats-next",
+    "title": "Learning a wind turbine’s power curve from scarce data",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
@@ -1946,345 +2352,457 @@
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/k01-units.html",
-    "href": "learn/k01-units.html",
-    "title": "Units and orders of magnitude",
+    "objectID": "learn/f08-large-loads.html",
+    "href": "learn/f08-large-loads.html",
+    "title": "What happens when a data center moves to town?",
     "section": "",
-    "text": "LearnK1\n\nMath toolbox\n10 min guided · about 10 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnF8\n\nFoundations · L1\n15 min guided · about 10 min practice\nAfter lesson 2 and F6\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k01-units.html#what-you-just-did-as-diagrams",
-    "href": "learn/k01-units.html#what-you-just-did-as-diagrams",
-    "title": "Units and orders of magnitude",
+    "objectID": "learn/f08-large-loads.html#what-you-just-did-as-diagrams",
+    "href": "learn/f08-large-loads.html#what-you-just-did-as-diagrams",
+    "title": "What happens when a data center moves to town?",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k01-units.html#check-yourself",
-    "href": "learn/k01-units.html#check-yourself",
-    "title": "Units and orders of magnitude",
+    "objectID": "learn/f08-large-loads.html#check-yourself",
+    "href": "learn/f08-large-loads.html#check-yourself",
+    "title": "What happens when a data center moves to town?",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k01-units.html#numbers-sources-and-whats-next",
-    "href": "learn/k01-units.html#numbers-sources-and-whats-next",
-    "title": "Units and orders of magnitude",
+    "objectID": "learn/f08-large-loads.html#numbers-sources-and-whats-next",
+    "href": "learn/f08-large-loads.html#numbers-sources-and-whats-next",
+    "title": "What happens when a data center moves to town?",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/k03-discounting.html",
-    "href": "learn/k03-discounting.html",
-    "title": "Exponentials and discounting",
+    "objectID": "learn/k02-rates-efficiencies.html",
+    "href": "learn/k02-rates-efficiencies.html",
+    "title": "Rates and efficiencies",
     "section": "",
-    "text": "LearnK3\n\nMath toolbox\n15 min guided · about 15 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnK2\n\nMath toolbox\n10 min guided · about 10 min practice\nAfter K1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k03-discounting.html#what-you-just-did-as-diagrams",
-    "href": "learn/k03-discounting.html#what-you-just-did-as-diagrams",
-    "title": "Exponentials and discounting",
+    "objectID": "learn/k02-rates-efficiencies.html#what-you-just-did-as-diagrams",
+    "href": "learn/k02-rates-efficiencies.html#what-you-just-did-as-diagrams",
+    "title": "Rates and efficiencies",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k03-discounting.html#check-yourself",
-    "href": "learn/k03-discounting.html#check-yourself",
-    "title": "Exponentials and discounting",
+    "objectID": "learn/k02-rates-efficiencies.html#check-yourself",
+    "href": "learn/k02-rates-efficiencies.html#check-yourself",
+    "title": "Rates and efficiencies",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k03-discounting.html#numbers-sources-and-whats-next",
-    "href": "learn/k03-discounting.html#numbers-sources-and-whats-next",
-    "title": "Exponentials and discounting",
+    "objectID": "learn/k02-rates-efficiencies.html#numbers-sources-and-whats-next",
+    "href": "learn/k02-rates-efficiencies.html#numbers-sources-and-whats-next",
+    "title": "Rates and efficiencies",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/k05-probability-statistics.html",
-    "href": "learn/k05-probability-statistics.html",
-    "title": "Probability and statistics",
+    "objectID": "learn/k04-linear-equations.html",
+    "href": "learn/k04-linear-equations.html",
+    "title": "Linear equations and inequalities",
     "section": "",
-    "text": "LearnK5\n\nMath toolbox\n25 min guided · about 30 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnK4\n\nMath toolbox\n15 min guided · about 20 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k05-probability-statistics.html#what-you-just-did-as-diagrams",
-    "href": "learn/k05-probability-statistics.html#what-you-just-did-as-diagrams",
-    "title": "Probability and statistics",
+    "objectID": "learn/k04-linear-equations.html#what-you-just-did-as-diagrams",
+    "href": "learn/k04-linear-equations.html#what-you-just-did-as-diagrams",
+    "title": "Linear equations and inequalities",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k05-probability-statistics.html#check-yourself",
-    "href": "learn/k05-probability-statistics.html#check-yourself",
-    "title": "Probability and statistics",
+    "objectID": "learn/k04-linear-equations.html#check-yourself",
+    "href": "learn/k04-linear-equations.html#check-yourself",
+    "title": "Linear equations and inequalities",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k05-probability-statistics.html#numbers-sources-and-whats-next",
-    "href": "learn/k05-probability-statistics.html#numbers-sources-and-whats-next",
-    "title": "Probability and statistics",
-    "section": "Numbers, sources and what’s next",
-    "text": "Numbers, sources and what’s next"
+    "objectID": "learn/k04-linear-equations.html#signs-sources-and-whats-next",
+    "href": "learn/k04-linear-equations.html#signs-sources-and-whats-next",
+    "title": "Linear equations and inequalities",
+    "section": "Signs, sources and what’s next",
+    "text": "Signs, sources and what’s next"
   },
   {
-    "objectID": "learn/k07-spreadsheets.html",
-    "href": "learn/k07-spreadsheets.html",
-    "title": "Spreadsheets in practice",
+    "objectID": "learn/k06-vectors-matrices.html",
+    "href": "learn/k06-vectors-matrices.html",
+    "title": "Vectors and matrices: what Ax ≤ b means",
     "section": "",
-    "text": "LearnK7\n\nMath toolbox\n20 min\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnK6\n\nMath toolbox\n25 min guided · about 30 min practice\nAfter K4\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/k07-spreadsheets.html#what-you-just-did-as-diagrams",
-    "href": "learn/k07-spreadsheets.html#what-you-just-did-as-diagrams",
-    "title": "Spreadsheets in practice",
+    "objectID": "learn/k06-vectors-matrices.html#what-you-just-did-as-diagrams",
+    "href": "learn/k06-vectors-matrices.html#what-you-just-did-as-diagrams",
+    "title": "Vectors and matrices: what Ax ≤ b means",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/k07-spreadsheets.html#check-yourself",
-    "href": "learn/k07-spreadsheets.html#check-yourself",
-    "title": "Spreadsheets in practice",
+    "objectID": "learn/k06-vectors-matrices.html#check-yourself",
+    "href": "learn/k06-vectors-matrices.html#check-yourself",
+    "title": "Vectors and matrices: what Ax ≤ b means",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/k07-spreadsheets.html#habits-sources-and-whats-next",
-    "href": "learn/k07-spreadsheets.html#habits-sources-and-whats-next",
-    "title": "Spreadsheets in practice",
-    "section": "Habits, sources and what’s next",
-    "text": "Habits, sources and what’s next"
+    "objectID": "learn/k06-vectors-matrices.html#numbers-sources-and-whats-next",
+    "href": "learn/k06-vectors-matrices.html#numbers-sources-and-whats-next",
+    "title": "Vectors and matrices: what Ax ≤ b means",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/m01-dispatch-to-lmp.html",
-    "href": "learn/m01-dispatch-to-lmp.html",
-    "title": "From dispatch to locational prices: the linear program behind the market",
+    "objectID": "learn/k08-git-notebooks.html",
+    "href": "learn/k08-git-notebooks.html",
+    "title": "Git and reproducible notebooks",
     "section": "",
-    "text": "LearnM1\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter lesson 11 and lesson 8 and B1 and B2 and B3\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnK8\n\nMath toolbox\n20 min guided · about 30 min practice\nNo prerequisites\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/m01-dispatch-to-lmp.html#what-you-just-did-as-diagrams",
-    "href": "learn/m01-dispatch-to-lmp.html#what-you-just-did-as-diagrams",
-    "title": "From dispatch to locational prices: the linear program behind the market",
+    "objectID": "learn/k08-git-notebooks.html#what-you-just-did-as-diagrams",
+    "href": "learn/k08-git-notebooks.html#what-you-just-did-as-diagrams",
+    "title": "Git and reproducible notebooks",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/m01-dispatch-to-lmp.html#check-yourself",
-    "href": "learn/m01-dispatch-to-lmp.html#check-yourself",
-    "title": "From dispatch to locational prices: the linear program behind the market",
+    "objectID": "learn/k08-git-notebooks.html#check-yourself",
+    "href": "learn/k08-git-notebooks.html#check-yourself",
+    "title": "Git and reproducible notebooks",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/m01-dispatch-to-lmp.html#numbers-sources-and-whats-next",
-    "href": "learn/m01-dispatch-to-lmp.html#numbers-sources-and-whats-next",
-    "title": "From dispatch to locational prices: the linear program behind the market",
-    "section": "Numbers, sources and what’s next",
-    "text": "Numbers, sources and what’s next"
+    "objectID": "learn/k08-git-notebooks.html#commands-sources-and-whats-next",
+    "href": "learn/k08-git-notebooks.html#commands-sources-and-whats-next",
+    "title": "Git and reproducible notebooks",
+    "section": "Commands, sources and what’s next",
+    "text": "Commands, sources and what’s next"
   },
   {
-    "objectID": "learn/m03-capacity-expansion.html",
-    "href": "learn/m03-capacity-expansion.html",
-    "title": "What should be built? Capacity expansion with representative periods, validated",
+    "objectID": "learn/m02-unit-commitment.html",
+    "href": "learn/m02-unit-commitment.html",
+    "title": "On or off? Unit commitment as a mixed-integer program",
     "section": "",
-    "text": "LearnM3\n\nModeler · L3\n45 min guided · 60 min lab · about 2 h practice\nAfter M1 and lesson 7 and lesson 13\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnM2\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter M1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/m03-capacity-expansion.html#what-you-just-did-as-diagrams",
-    "href": "learn/m03-capacity-expansion.html#what-you-just-did-as-diagrams",
-    "title": "What should be built? Capacity expansion with representative periods, validated",
+    "objectID": "learn/m02-unit-commitment.html#what-you-just-did-as-diagrams",
+    "href": "learn/m02-unit-commitment.html#what-you-just-did-as-diagrams",
+    "title": "On or off? Unit commitment as a mixed-integer program",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/m03-capacity-expansion.html#check-yourself",
-    "href": "learn/m03-capacity-expansion.html#check-yourself",
-    "title": "What should be built? Capacity expansion with representative periods, validated",
+    "objectID": "learn/m02-unit-commitment.html#check-yourself",
+    "href": "learn/m02-unit-commitment.html#check-yourself",
+    "title": "On or off? Unit commitment as a mixed-integer program",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/m03-capacity-expansion.html#numbers-sources-and-whats-next",
-    "href": "learn/m03-capacity-expansion.html#numbers-sources-and-whats-next",
-    "title": "What should be built? Capacity expansion with representative periods, validated",
+    "objectID": "learn/m02-unit-commitment.html#numbers-sources-and-whats-next",
+    "href": "learn/m02-unit-commitment.html#numbers-sources-and-whats-next",
+    "title": "On or off? Unit commitment as a mixed-integer program",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/m05-microgrid-size-and-run.html",
-    "href": "learn/m05-microgrid-size-and-run.html",
-    "title": "Size and run a microgrid that survives an outage",
+    "objectID": "learn/m04-storage-multienergy.html",
+    "href": "learn/m04-storage-multienergy.html",
+    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
     "section": "",
-    "text": "LearnM5\n\nModeler · L3\n45 min guided · 60 min lab · about 90 min practice\nAfter M2 and A14\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnM4\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter M1 and A8\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/m05-microgrid-size-and-run.html#what-you-just-did-as-diagrams",
-    "href": "learn/m05-microgrid-size-and-run.html#what-you-just-did-as-diagrams",
-    "title": "Size and run a microgrid that survives an outage",
+    "objectID": "learn/m04-storage-multienergy.html#what-you-just-did-as-diagrams",
+    "href": "learn/m04-storage-multienergy.html#what-you-just-did-as-diagrams",
+    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
     "section": "What you just did, as diagrams",
     "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/m05-microgrid-size-and-run.html#check-yourself",
-    "href": "learn/m05-microgrid-size-and-run.html#check-yourself",
-    "title": "Size and run a microgrid that survives an outage",
+    "objectID": "learn/m04-storage-multienergy.html#check-yourself",
+    "href": "learn/m04-storage-multienergy.html#check-yourself",
+    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/m05-microgrid-size-and-run.html#numbers-sources-and-whats-next",
-    "href": "learn/m05-microgrid-size-and-run.html#numbers-sources-and-whats-next",
-    "title": "Size and run a microgrid that survives an outage",
+    "objectID": "learn/m04-storage-multienergy.html#numbers-sources-and-whats-next",
+    "href": "learn/m04-storage-multienergy.html#numbers-sources-and-whats-next",
+    "title": "Storage and coupled carriers: modelling power, hydrogen and heat together",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/n01-news-lens.html",
-    "href": "learn/n01-news-lens.html",
-    "title": "How do you read an energy headline like a researcher?",
+    "objectID": "learn/m06-carbon-in-models.html",
+    "href": "learn/m06-carbon-in-models.html",
+    "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
     "section": "",
-    "text": "LearnN1\n\nFoundations to Analyst · L1–L2\n20 min\nAfter lesson 1\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+    "text": "LearnM6\n\nModeler · L3\n40 min guided · 45 min lab · about 90 min practice\nAfter M1 and A10 and lesson 12\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/n01-news-lens.html#what-you-just-did-as-a-checklist-and-a-ladder",
-    "href": "learn/n01-news-lens.html#what-you-just-did-as-a-checklist-and-a-ladder",
-    "title": "How do you read an energy headline like a researcher?",
-    "section": "What you just did, as a checklist and a ladder",
-    "text": "What you just did, as a checklist and a ladder"
+    "objectID": "learn/m06-carbon-in-models.html#what-you-just-did-as-diagrams",
+    "href": "learn/m06-carbon-in-models.html#what-you-just-did-as-diagrams",
+    "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
   },
   {
-    "objectID": "learn/n01-news-lens.html#check-yourself",
-    "href": "learn/n01-news-lens.html#check-yourself",
-    "title": "How do you read an energy headline like a researcher?",
+    "objectID": "learn/m06-carbon-in-models.html#check-yourself",
+    "href": "learn/m06-carbon-in-models.html#check-yourself",
+    "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
     "section": "Check yourself",
     "text": "Check yourself"
   },
   {
-    "objectID": "learn/n01-news-lens.html#numbers-sources-and-whats-next",
-    "href": "learn/n01-news-lens.html#numbers-sources-and-whats-next",
-    "title": "How do you read an energy headline like a researcher?",
+    "objectID": "learn/m06-carbon-in-models.html#numbers-sources-and-whats-next",
+    "href": "learn/m06-carbon-in-models.html#numbers-sources-and-whats-next",
+    "title": "Putting carbon in the model: caps, prices, frontiers and procurement rules",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   },
   {
-    "objectID": "learn/r02-literature.html",
-    "href": "learn/r02-literature.html",
-    "title": "How do you find out what is already known?",
+    "objectID": "learn/m08-stochastic-robust.html",
+    "href": "learn/m08-stochastic-robust.html",
+    "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
     "section": "",
-    "text": "LearnR2\n\nResearcher · L4\nResearch studio\n30 min guided · about 4 h practice\nAfter R1 and N1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+    "text": "LearnM8\n\nModeler · L3\n45 min guided · 60 min lab · about 90 min practice\nAfter M3 and M7\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
   },
   {
-    "objectID": "learn/r02-literature.html#two-answers-to-the-same-task",
-    "href": "learn/r02-literature.html#two-answers-to-the-same-task",
-    "title": "How do you find out what is already known?",
+    "objectID": "learn/m08-stochastic-robust.html#what-you-just-did-as-diagrams",
+    "href": "learn/m08-stochastic-robust.html#what-you-just-did-as-diagrams",
+    "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/m08-stochastic-robust.html#check-yourself-then-try-it",
+    "href": "learn/m08-stochastic-robust.html#check-yourself-then-try-it",
+    "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
+    "section": "Check yourself, then try it",
+    "text": "Check yourself, then try it"
+  },
+  {
+    "objectID": "learn/m08-stochastic-robust.html#numbers-sources-and-whats-next",
+    "href": "learn/m08-stochastic-robust.html#numbers-sources-and-whats-next",
+    "title": "Deciding before the uncertainty resolves: stochastic and robust optimization",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/m10-ml-forecasting.html",
+    "href": "learn/m10-ml-forecasting.html",
+    "title": "Forecasting load, wind and solar with machine learning, and judging it honestly",
+    "section": "",
+    "text": "LearnM10\n\nModeler · L3\n40 min guided · 60 min lab · about 90 min practice\nAfter lesson 4 and M7\nCompleted\n\n\n1Step by step2Explain3Check4Sources"
+  },
+  {
+    "objectID": "learn/m10-ml-forecasting.html#what-you-just-did-as-diagrams",
+    "href": "learn/m10-ml-forecasting.html#what-you-just-did-as-diagrams",
+    "title": "Forecasting load, wind and solar with machine learning, and judging it honestly",
+    "section": "What you just did, as diagrams",
+    "text": "What you just did, as diagrams"
+  },
+  {
+    "objectID": "learn/m10-ml-forecasting.html#check-yourself",
+    "href": "learn/m10-ml-forecasting.html#check-yourself",
+    "title": "Forecasting load, wind and solar with machine learning, and judging it honestly",
+    "section": "Check yourself",
+    "text": "Check yourself"
+  },
+  {
+    "objectID": "learn/m10-ml-forecasting.html#numbers-sources-and-whats-next",
+    "href": "learn/m10-ml-forecasting.html#numbers-sources-and-whats-next",
+    "title": "Forecasting load, wind and solar with machine learning, and judging it honestly",
+    "section": "Numbers, sources and what’s next",
+    "text": "Numbers, sources and what’s next"
+  },
+  {
+    "objectID": "learn/r01-framing.html",
+    "href": "learn/r01-framing.html",
+    "title": "What makes a question worth researching?",
+    "section": "",
+    "text": "LearnR1\n\nResearcher · L4\nResearch studio\n30 min guided · about 60 min practice\nAfter lesson 13 and A22\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+  },
+  {
+    "objectID": "learn/r01-framing.html#two-answers-to-the-same-task",
+    "href": "learn/r01-framing.html#two-answers-to-the-same-task",
+    "title": "What makes a question worth researching?",
     "section": "Two answers to the same task",
     "text": "Two answers to the same task"
   },
   {
-    "objectID": "learn/r02-literature.html#check-your-own-work-against-the-rubric",
-    "href": "learn/r02-literature.html#check-your-own-work-against-the-rubric",
-    "title": "How do you find out what is already known?",
+    "objectID": "learn/r01-framing.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r01-framing.html#check-your-own-work-against-the-rubric",
+    "title": "What makes a question worth researching?",
     "section": "Check your own work against the rubric",
     "text": "Check your own work against the rubric"
   },
   {
-    "objectID": "learn/r02-literature.html#sources-and-whats-next",
-    "href": "learn/r02-literature.html#sources-and-whats-next",
-    "title": "How do you find out what is already known?",
+    "objectID": "learn/r01-framing.html#sources-and-whats-next",
+    "href": "learn/r01-framing.html#sources-and-whats-next",
+    "title": "What makes a question worth researching?",
     "section": "Sources and what’s next",
     "text": "Sources and what’s next"
   },
   {
-    "objectID": "learn/r04-data.html",
-    "href": "learn/r04-data.html",
-    "title": "Data you can defend: sources, cleaning, licences and provenance",
+    "objectID": "learn/r03-system-and-method.html",
+    "href": "learn/r03-system-and-method.html",
+    "title": "Which system, which boundary, which method?",
     "section": "",
-    "text": "LearnR4\n\nResearcher · L4\nResearch studio\n30 min guided · about 2 h practice\nAfter R3 and B2\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+    "text": "LearnR3\n\nResearcher · L4\nResearch studio\n30 min guided · about 60 min practice\nAfter R1 and F1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
   },
   {
-    "objectID": "learn/r04-data.html#two-answers-to-the-same-task",
-    "href": "learn/r04-data.html#two-answers-to-the-same-task",
-    "title": "Data you can defend: sources, cleaning, licences and provenance",
+    "objectID": "learn/r03-system-and-method.html#two-answers-to-the-same-task",
+    "href": "learn/r03-system-and-method.html#two-answers-to-the-same-task",
+    "title": "Which system, which boundary, which method?",
     "section": "Two answers to the same task",
     "text": "Two answers to the same task"
   },
   {
-    "objectID": "learn/r04-data.html#check-your-own-work-against-the-rubric",
-    "href": "learn/r04-data.html#check-your-own-work-against-the-rubric",
-    "title": "Data you can defend: sources, cleaning, licences and provenance",
+    "objectID": "learn/r03-system-and-method.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r03-system-and-method.html#check-your-own-work-against-the-rubric",
+    "title": "Which system, which boundary, which method?",
     "section": "Check your own work against the rubric",
     "text": "Check your own work against the rubric"
   },
   {
-    "objectID": "learn/r04-data.html#sources-and-whats-next",
-    "href": "learn/r04-data.html#sources-and-whats-next",
-    "title": "Data you can defend: sources, cleaning, licences and provenance",
+    "objectID": "learn/r03-system-and-method.html#sources-and-whats-next",
+    "href": "learn/r03-system-and-method.html#sources-and-whats-next",
+    "title": "Which system, which boundary, which method?",
     "section": "Sources and what’s next",
     "text": "Sources and what’s next"
   },
   {
-    "objectID": "learn/r09-integrity-stakeholders.html",
-    "href": "learn/r09-integrity-stakeholders.html",
-    "title": "Research integrity, and working with the people your study is about",
+    "objectID": "learn/r05-build-validate.html",
+    "href": "learn/r05-build-validate.html",
+    "title": "Can you trust your analysis? Verification, validation and reproducibility",
     "section": "",
-    "text": "LearnR9\n\nResearcher · L4\nResearch studio\n30 min guided · about 30 min practice\nAfter R1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+    "text": "LearnR5\n\nResearcher · L4\nResearch studio\n35 min guided · about 2 h practice\nAfter R4 and M1 and K8\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
   },
   {
-    "objectID": "learn/r09-integrity-stakeholders.html#two-answers-to-the-same-task",
-    "href": "learn/r09-integrity-stakeholders.html#two-answers-to-the-same-task",
-    "title": "Research integrity, and working with the people your study is about",
+    "objectID": "learn/r05-build-validate.html#two-logs-for-the-same-study",
+    "href": "learn/r05-build-validate.html#two-logs-for-the-same-study",
+    "title": "Can you trust your analysis? Verification, validation and reproducibility",
+    "section": "Two logs for the same study",
+    "text": "Two logs for the same study"
+  },
+  {
+    "objectID": "learn/r05-build-validate.html#check-your-own-log",
+    "href": "learn/r05-build-validate.html#check-your-own-log",
+    "title": "Can you trust your analysis? Verification, validation and reproducibility",
+    "section": "Check your own log",
+    "text": "Check your own log"
+  },
+  {
+    "objectID": "learn/r05-build-validate.html#sources-and-whats-next",
+    "href": "learn/r05-build-validate.html#sources-and-whats-next",
+    "title": "Can you trust your analysis? Verification, validation and reproducibility",
+    "section": "Sources and what’s next",
+    "text": "Sources and what’s next"
+  },
+  {
+    "objectID": "learn/r08-communicating.html",
+    "href": "learn/r08-communicating.html",
+    "title": "How do you show results so people understand their limits?",
+    "section": "",
+    "text": "LearnR8\n\nResearcher · L4\nResearch studio\n30 min guided · about 90 min practice\nAfter R6\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
+  },
+  {
+    "objectID": "learn/r08-communicating.html#two-answers-to-the-same-task",
+    "href": "learn/r08-communicating.html#two-answers-to-the-same-task",
+    "title": "How do you show results so people understand their limits?",
     "section": "Two answers to the same task",
     "text": "Two answers to the same task"
   },
   {
-    "objectID": "learn/r09-integrity-stakeholders.html#check-your-own-work-against-the-rubric",
-    "href": "learn/r09-integrity-stakeholders.html#check-your-own-work-against-the-rubric",
-    "title": "Research integrity, and working with the people your study is about",
+    "objectID": "learn/r08-communicating.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r08-communicating.html#check-your-own-work-against-the-rubric",
+    "title": "How do you show results so people understand their limits?",
     "section": "Check your own work against the rubric",
     "text": "Check your own work against the rubric"
   },
   {
-    "objectID": "learn/r09-integrity-stakeholders.html#sources-and-whats-next",
-    "href": "learn/r09-integrity-stakeholders.html#sources-and-whats-next",
-    "title": "Research integrity, and working with the people your study is about",
+    "objectID": "learn/r08-communicating.html#sources-and-whats-next",
+    "href": "learn/r08-communicating.html#sources-and-whats-next",
+    "title": "How do you show results so people understand their limits?",
     "section": "Sources and what’s next",
     "text": "Sources and what’s next"
   },
   {
-    "objectID": "learn/sb0-site-bench.html",
-    "href": "learn/sb0-site-bench.html",
-    "title": "Site Bench",
+    "objectID": "learn/r10-question-studio.html",
+    "href": "learn/r10-question-studio.html",
+    "title": "What could you study? The question studio",
     "section": "",
-    "text": "LearnSB0\n\nAnalyst to Modeler · L2–L3\nSandbox\n20 min\nAfter lesson 9\nCompleted\n\n\n1Brief2Bench3Results4Explain5Sources"
+    "text": "LearnR10\n\nResearcher · L4\nResearch studio\n40 min guided · about 60 min practice\nAfter R1 and F1\nCompleted\n\n\n1Task2Exemplars3Self-check4Sources"
   },
   {
-    "objectID": "learn/sb0-site-bench.html#the-bench",
-    "href": "learn/sb0-site-bench.html#the-bench",
-    "title": "Site Bench",
+    "objectID": "learn/r10-question-studio.html#two-answers-to-the-same-task",
+    "href": "learn/r10-question-studio.html#two-answers-to-the-same-task",
+    "title": "What could you study? The question studio",
+    "section": "Two answers to the same task",
+    "text": "Two answers to the same task"
+  },
+  {
+    "objectID": "learn/r10-question-studio.html#check-your-own-work-against-the-rubric",
+    "href": "learn/r10-question-studio.html#check-your-own-work-against-the-rubric",
+    "title": "What could you study? The question studio",
+    "section": "Check your own work against the rubric",
+    "text": "Check your own work against the rubric"
+  },
+  {
+    "objectID": "learn/r10-question-studio.html#sources-and-whats-next",
+    "href": "learn/r10-question-studio.html#sources-and-whats-next",
+    "title": "What could you study? The question studio",
+    "section": "Sources and what’s next",
+    "text": "Sources and what’s next"
+  },
+  {
+    "objectID": "learn/sb1-microgrid-workbench.html",
+    "href": "learn/sb1-microgrid-workbench.html",
+    "title": "Microgrid Workbench",
+    "section": "",
+    "text": "LearnSB1\n\nAnalyst to Modeler · L2–L3\nSandbox\n30 min\nAfter lesson 9\nCompleted\n\n\n1Brief2Bench3Results4Explain5Sources"
+  },
+  {
+    "objectID": "learn/sb1-microgrid-workbench.html#the-bench",
+    "href": "learn/sb1-microgrid-workbench.html#the-bench",
+    "title": "Microgrid Workbench",
     "section": "The bench",
     "text": "The bench"
   },
   {
-    "objectID": "learn/sb0-site-bench.html#results",
-    "href": "learn/sb0-site-bench.html#results",
-    "title": "Site Bench",
+    "objectID": "learn/sb1-microgrid-workbench.html#results",
+    "href": "learn/sb1-microgrid-workbench.html#results",
+    "title": "Microgrid Workbench",
     "section": "Results",
     "text": "Results"
   },
   {
-    "objectID": "learn/sb0-site-bench.html#how-the-engine-works-as-diagrams",
-    "href": "learn/sb0-site-bench.html#how-the-engine-works-as-diagrams",
-    "title": "Site Bench",
+    "objectID": "learn/sb1-microgrid-workbench.html#how-the-engine-works-as-diagrams",
+    "href": "learn/sb1-microgrid-workbench.html#how-the-engine-works-as-diagrams",
+    "title": "Microgrid Workbench",
     "section": "How the engine works, as diagrams",
     "text": "How the engine works, as diagrams"
   },
   {
-    "objectID": "learn/sb0-site-bench.html#numbers-sources-and-whats-next",
-    "href": "learn/sb0-site-bench.html#numbers-sources-and-whats-next",
-    "title": "Site Bench",
+    "objectID": "learn/sb1-microgrid-workbench.html#numbers-sources-and-whats-next",
+    "href": "learn/sb1-microgrid-workbench.html#numbers-sources-and-whats-next",
+    "title": "Microgrid Workbench",
     "section": "Numbers, sources and what’s next",
     "text": "Numbers, sources and what’s next"
   }

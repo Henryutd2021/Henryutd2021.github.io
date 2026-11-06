@@ -1,0 +1,396 @@
+{
+ "about": "Learn M6, Putting carbon in the model (wave W4, builder learn-w4-c, 2026-11-05). The Plains Grid's planning LP (also used by A12): what may be built and at what cost, the six representative days and their weights, the tie rule, the caps and the procurement cases, and a reference block written by the test. The existing fleet is in a10-emissions-questions.json. Money in 2025 dollars.",
+ "accessed": "2026-11-05",
+ "priceYear": 2025,
+ "deflator": {
+  "2024": 125.43,
+  "2025": 128.989,
+  "note": "GDP implicit price deflator (2017 = 100), yearly means, as engine E0 uses them: a 2024 dollar is 1.028 2025 dollars.",
+  "src": "eia-steo-9a"
+ },
+ "finance": {
+  "rate": 0.04,
+  "life": 30,
+  "batteryLife": 15,
+  "note": "4% real cost of capital; 30-year cost recovery, a battery's 15-year life (as lesson 13).",
+  "src": "atb2025-fin"
+ },
+ "build": {
+  "wind": {
+   "label": "New wind",
+   "capex": 1712,
+   "fom": 34.57,
+   "max": 8000,
+   "src": "eia-aeo2026-emm"
+  },
+  "solar": {
+   "label": "New solar",
+   "capex": 1484,
+   "fom": 23.6,
+   "max": 8000,
+   "src": "eia-aeo2026-emm"
+  },
+  "battery": {
+   "label": "New 4-hour battery",
+   "powerCapex2024": 372,
+   "energyCapex2024": 241,
+   "hours": 4,
+   "fomShare": 0.04,
+   "rte": 0.85,
+   "max": 4000,
+   "src": "nrel-battery-2025"
+  }
+ },
+ "voll": 10000,
+ "tie": {
+  "wear": 0.01,
+  "curtail": {
+   "se": 0.001,
+   "we": 0.002,
+   "sn": 0.003,
+   "wn": 0.004
+  },
+  "note": "No tie-breaking costs on the pages: every reported number is the same for every best plan of the LP (the tests prove it over the optimal face), and the pages show no split that can differ between best plans (which plant is curtailed, how a battery cycles surplus). These hair costs ($0.01 per MWh discharged; existing solar $0.001, existing wind $0.002, new solar $0.003, new wind $0.004 per MWh used) are used only by build(Y, {tie: true}), for the notebook's practice task on ties."
+ },
+ "seasons": [
+  {
+   "id": "winter",
+   "label": "Winter",
+   "months": [
+    12,
+    1,
+    2
+   ]
+  },
+  {
+   "id": "spring",
+   "label": "Spring",
+   "months": [
+    3,
+    4,
+    5
+   ]
+  },
+  {
+   "id": "summer",
+   "label": "Summer",
+   "months": [
+    6,
+    7,
+    8
+   ]
+  },
+  {
+   "id": "fall",
+   "label": "Fall",
+   "months": [
+    9,
+    10,
+    11
+   ]
+  }
+ ],
+ "days": [
+  {
+   "date": "2025-12-16",
+   "season": "winter",
+   "kind": "typical",
+   "weight": 90,
+   "dateLabel": "16 December 2025",
+   "label": "typical winter day"
+  },
+  {
+   "date": "2025-05-20",
+   "season": "spring",
+   "kind": "typical",
+   "weight": 92,
+   "dateLabel": "20 May 2025",
+   "label": "typical spring day"
+  },
+  {
+   "date": "2025-07-11",
+   "season": "summer",
+   "kind": "typical",
+   "weight": 91,
+   "dateLabel": "11 July 2025",
+   "label": "typical summer day"
+  },
+  {
+   "date": "2025-10-08",
+   "season": "fall",
+   "kind": "typical",
+   "weight": 90,
+   "dateLabel": "8 October 2025",
+   "label": "typical fall day"
+  },
+  {
+   "date": "2025-09-06",
+   "season": "fall",
+   "kind": "calm",
+   "weight": 1,
+   "dateLabel": "6 September 2025",
+   "label": "the calmest day"
+  },
+  {
+   "date": "2025-08-19",
+   "season": "summer",
+   "kind": "peak",
+   "weight": 1,
+   "dateLabel": "19 August 2025",
+   "label": "the day of the highest net load"
+  }
+ ],
+ "load": {
+  "mw": 300,
+  "label": "a 300 MW data center, flat (A10's)"
+ },
+ "sources": {
+  "eia-aeo2026-emm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3 (overnight capital and fixed O&M of new wind and solar, 2025 dollars)",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+   "asOf": "April 2026"
+  },
+  "nrel-battery-2025": {
+   "text": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281 ($241 per kWh and $372 per kW in 2024 dollars; 4% fixed O&M, 15 years, 85% round trip)",
+   "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+   "asOf": "June 2025"
+  },
+  "atb2025-fin": {
+   "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+   "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+   "asOf": "checked 2 November 2026"
+  },
+  "eia-steo-9a": {
+   "text": "EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2024 125.430 and 2025 128.989",
+   "url": "https://www.eia.gov/outlooks/steo/",
+   "asOf": "October 2026 issue"
+  }
+ },
+ "caps": [
+  90,
+  80,
+  70,
+  60,
+  50,
+  40,
+  30
+ ],
+ "reference": {
+  "about": "Written by node _tests/learn/test_m06-carbon-in-models.js --write; re-solved by the same test on every run. CO2 in t, money in $ a year (2025 dollars).",
+  "size": {
+   "cols": 1443,
+   "rows": 1008
+  },
+  "E0": 4777392.205142699,
+  "base": {
+   "cost": 388910266.25449985
+  },
+  "caps": [
+   {
+    "cap": 90,
+    "co2": 4299652.984628424,
+    "cost": 399408405.61678064,
+    "dual": 21.981451877019595,
+    "Wn": 369.43986380913367,
+    "Sn": 0
+   },
+   {
+    "cap": 80,
+    "co2": 3821913.76411416,
+    "cost": 410144996.533728,
+    "dual": 22.59178359183487,
+    "Wn": 740.7522358549045,
+    "Sn": 0
+   },
+   {
+    "cap": 70,
+    "co2": 3344174.543599893,
+    "cost": 421000310.76260334,
+    "dual": 22.8056544588309,
+    "Wn": 1112.9969162673694,
+    "Sn": 0
+   },
+   {
+    "cap": 60,
+    "co2": 2866435.323085619,
+    "cost": 433156690.4630274,
+    "dual": 32.361029236149605,
+    "Wn": 1495.0218239554408,
+    "Sn": 0
+   },
+   {
+    "cap": 50,
+    "co2": 2388696.1025713477,
+    "cost": 450003069.7456079,
+    "dual": 40.346578245984944,
+    "Wn": 1839.6272217227176,
+    "Sn": 88.29428173893952
+   },
+   {
+    "cap": 40,
+    "co2": 1910956.8820570786,
+    "cost": 476541680.0940646,
+    "dual": 83.49914247522248,
+    "Wn": 2259.234355011815,
+    "Sn": 173.77116128004354
+   },
+   {
+    "cap": 30,
+    "co2": 1433217.6615428084,
+    "cost": 525755876.83634686,
+    "dual": 130.61432187384594,
+    "Wn": 2386.980883545399,
+    "Sn": 823.3019097497381
+   }
+  ],
+  "ties": [
+   {
+    "cap": 90,
+    "tau": 21.981451877019595,
+    "lo": 4247384.986251628,
+    "hi": 4765099.668836383
+   },
+   {
+    "cap": 80,
+    "tau": 22.59178359183487,
+    "lo": 3635624.4267545296,
+    "hi": 4138103.9810116887
+   },
+   {
+    "cap": 70,
+    "tau": 22.8056544588309,
+    "lo": 3148351.0607598745,
+    "hi": 3635629.166790761
+   },
+   {
+    "cap": 60,
+    "tau": 32.361029236149605,
+    "lo": 2862473.3252259563,
+    "hi": 2923259.340409801
+   },
+   {
+    "cap": 50,
+    "tau": 40.346578245984944,
+    "lo": 2343797.962340112,
+    "hi": 2415025.156505607
+   },
+   {
+    "cap": 40,
+    "tau": 83.49914247522248,
+    "lo": 1904076.1968181774,
+    "hi": 1940981.0233340056
+   },
+   {
+    "cap": 30,
+    "tau": 130.61432187384594,
+    "lo": 1428602.5761437076,
+    "hi": 1460139.3555089242
+   }
+  ],
+  "prices": [
+   {
+    "tau": 0,
+    "co2": 4777392.205142699,
+    "cost": 388910266.25449985
+   },
+   {
+    "tau": 10,
+    "co2": 4777392.205142699,
+    "cost": 388910266.25449985
+   },
+   {
+    "tau": 20,
+    "co2": 4777392.205142699,
+    "cost": 388910266.25449985
+   },
+   {
+    "tau": 30,
+    "co2": 2950663.1454817336,
+    "cost": 430475745.9121574
+   },
+   {
+    "tau": 40,
+    "co2": 2415024.5256233793,
+    "cost": 448940807.96484566
+   },
+   {
+    "tau": 50,
+    "co2": 2215657.2610124913,
+    "cost": 457273513.1527747
+   },
+   {
+    "tau": 60,
+    "co2": 2080319.7721405807,
+    "cost": 464409680.7299588
+   },
+   {
+    "tau": 70,
+    "co2": 2003451.8846171438,
+    "cost": 469186176.7972074
+   },
+   {
+    "tau": 80,
+    "co2": 1963290.9366781083,
+    "cost": 472222883.8759992
+   },
+   {
+    "tau": 90,
+    "co2": 1884067.6050721142,
+    "cost": 478840685.05568415
+   },
+   {
+    "tau": 100,
+    "co2": 1809438.5718881136,
+    "cost": 485806138.3884594
+   },
+   {
+    "tau": 110,
+    "co2": 1500724.5509199053,
+    "cost": 517222162.048123
+   },
+   {
+    "tau": 120,
+    "co2": 1490561.6560581075,
+    "cost": 518385543.703279
+   },
+   {
+    "tau": 130,
+    "co2": 1460138.9163423378,
+    "cost": 522239575.3967135
+   },
+   {
+    "tau": 140,
+    "co2": 1386126.5766508062,
+    "cost": 532292024.71440756
+   }
+  ],
+  "buy": {
+   "none": {
+    "co2": 5915732.120769901,
+    "cost": 481251923.2864999,
+    "Wb": 0,
+    "Sb": 0,
+    "Bb": 0
+   },
+   "annual": {
+    "co2": 4812588.279031937,
+    "cost": 504292853.0060956,
+    "Wb": 843.645428698639,
+    "Sb": 0,
+    "Bb": 0
+   },
+   "hourly": {
+    "co2": 2298311.3606902612,
+    "cost": 608397035.2890526,
+    "Wb": 2381.6990740759843,
+    "Sb": 615.3655120373256,
+    "Bb": 199.33087753880335
+   }
+  },
+  "fullYear": {
+   "annualShare": 0.950507183000458,
+   "shortMWh": 290.3993429183905,
+   "matched": 0.999889497966926
+  }
+ }
+}

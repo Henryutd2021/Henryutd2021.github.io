@@ -1,0 +1,47 @@
+{
+ "about": "Data of case file CF3 (where should hydrogen go when nobody knows how much wind will be built?). Every sentence about the study is approved excerpt wording (reports/learn/excerpts_for_approval.md, E10 and E11, approved 2026-11-03 and 2026-11-05), word for word. The toy ('idea') is lesson M8's: its data and plans are read from m08-stochastic-robust.json.",
+ "built": "2026-11-05, builder learn-w4-d",
+ "timeline": {
+  "title": "The study in time",
+  "events": [
+   {"date": "2025-03", "label": "Journal article (this case)", "kind": "study", "key": true, "text": "Electrolyzers, hydrogen tanks and fuel cells are sized for [[ercot|ERCOT]]'s eight weather zones under uncertain renewable build-out and electricity demand, with hydrogen pipelines between neighbouring zones; published online on 2 March 2025, in the March 2025 issue.", "source": {"label": "Li et al. (2025), International Journal of Hydrogen Energy 113, 77–89", "url": "https://doi.org/10.1016/j.ijhydene.2025.02.303"}},
+   {"date": "2026-10-30", "label": "Code released", "kind": "study", "text": "A documented, runnable implementation of the planning framework, with synthetic examples (version 1.0.2).", "source": {"label": "txh2-ercot-hydrogen on GitHub", "url": "https://github.com/Henryutd2021/txh2-ercot-hydrogen", "as_of": "2026-11-05"}}
+  ]
+ },
+ "boundary": {
+  "title": "Where the result holds",
+  "holds": [
+   "[[ercot|ERCOT]]'s eight weather zones, every hour of one year, in nine scenarios of renewable build-out and electricity demand;",
+   "inputs reflect 2022–2023 conditions;",
+   "hydrogen demand is held fixed across scenarios;",
+   "the CO₂ from gas plants and reformers is captured and stored at a cost;",
+   "the emissions result comes from sensitivity runs in which power from gas-fired plants became more expensive."
+  ],
+  "leaves": [
+   "post-2023 federal hydrogen credit rules;",
+   "uncertainty in hydrogen demand;",
+   "truck and rail transport of hydrogen."
+  ],
+  "source": "From the approved excerpt of Li et al. (2025), International Journal of Hydrogen Energy."
+ },
+ "scale": {"mark": "S2", "markText": "This case sits here."},
+ "idea": {
+  "title": "Size it before the wind is built",
+  "note": "M8's toy: one windy zone, three build-outs with chances 25%, 50% and 25%, illustrative round numbers in 2025 dollars.",
+  "start": 600,
+  "plans": [
+   {"key": "ev", "label": "Plan for the average", "def": "the best size if the wind built were sure to equal its average, 5,000 MW."},
+   {"key": "sp", "label": "Hedged plan", "def": "the size with the lowest [[expected-value|expected cost]], each build-out's cost weighted by its chance."},
+   {"key": "rob", "label": "Worst-case plan", "def": "the size whose cost in the worst build-out is lowest; it uses no chances."}
+  ],
+  "workedNote": "A chance-weighted average: not a guaranteed cost, and not what any one build-out costs.",
+  "assumptionsTitle": "The toy's assumptions and its wind blocks",
+  "assumptions": [
+   "Surplus wind is free: the electrolyzer pays only its own yearly cost, and wind it does not use is [[curtailment|curtailed]].",
+   "The year is five blocks of hours sorted by wind output (a [[duration-curve|duration curve]]), not 8,760 hours in time order.",
+   "Industry's hydrogen demand is steady: the same in every hour and every build-out.",
+   "One zone: no hydrogen storage, no fuel cells and no pipelines; reformer hydrogen has one fixed price."
+  ],
+  "blocksCaption": "The five wind blocks: SPP's 2025 hourly wind shape scaled to 33.8%, sorted and cut"
+ }
+}

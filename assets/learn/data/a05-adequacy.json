@@ -1,0 +1,232 @@
+{
+  "about": "Data of Learn lesson A5, Will there be enough power when it matters? (wave W4, 2026-11-05). The Plains Grid, its fleet, its outage rates and every resource added are fictional and illustrative. Demand, wind and sun follow the real hourly shapes of the Southwest Power Pool grid in 2025 (town_year.json) and 2024 (m03-capacity-expansion-2024.json), both from EIA-930, scaled as stated below. The 500 simulated years are resampled: each week of a simulated year is a real week of 2024 or 2025, shifted by at most one week; they are not 500 observed weather years. The reference block is written by node _tests/learn/test_a05-adequacy.js --write and recomputed by the same test on every run.",
+  "grid": {
+    "name": "Plains Grid",
+    "note": "Illustrative: a grid planned for a 4,000 MW peak, with a gas and coal fleet, wind and solar, set so that it misses the 1-in-10 criterion before anything is added. Not a model of any real grid.",
+    "peakMW": 4000,
+    "windMW": 3000,
+    "solarMW": 1200,
+    "profileMethod": "scale",
+    "monthlyCF": true
+  },
+  "units": [
+    {
+      "id": "coal",
+      "label": "Coal steam units",
+      "short": "Coal",
+      "n": 2,
+      "mw": 500,
+      "forcedOutage": 0.08,
+      "repairHours": 72,
+      "color": "var(--lx-steel)"
+    },
+    {
+      "id": "cc",
+      "label": "Gas combined-cycle units",
+      "short": "Gas CC",
+      "n": 4,
+      "mw": 400,
+      "forcedOutage": 0.05,
+      "repairHours": 48,
+      "color": "var(--lx-cc)"
+    },
+    {
+      "id": "ct",
+      "label": "Gas peakers (combustion turbines)",
+      "short": "Gas peaker",
+      "n": 14,
+      "mw": 100,
+      "forcedOutage": 0.07,
+      "repairHours": 24,
+      "color": "var(--lx-pk)"
+    }
+  ],
+  "unitsNote": "Forced outage rates and repair times are illustrative. Each unit is either available or out; an outage starts at random and lasts a random number of hours with the stated average, independently of every other unit and of the weather. Planned maintenance is left out.",
+  "adds": {
+    "blockMW": 500,
+    "maxBlocks": 3,
+    "options": [
+      {
+        "id": "ct",
+        "label": "Gas peakers",
+        "short": "Peakers",
+        "detail": "5 units of 100 MW, each out 7% of the time",
+        "color": "var(--lx-pk)"
+      },
+      {
+        "id": "wind",
+        "label": "Wind farm",
+        "short": "Wind",
+        "detail": "500 MW, the same shape as the grid's wind",
+        "color": "var(--lx-wind)"
+      },
+      {
+        "id": "solar",
+        "label": "Solar farm",
+        "short": "Solar",
+        "detail": "500 MW, the same shape as the grid's solar",
+        "color": "var(--lx-solar)"
+      },
+      {
+        "id": "battery",
+        "label": "4-hour battery",
+        "short": "Battery",
+        "detail": "500 MW, 2,000 MWh, 85% round trip",
+        "color": "var(--lx-bat)"
+      },
+      {
+        "id": "dr",
+        "label": "Demand response",
+        "short": "Demand response",
+        "detail": "500 MW of load that can be cut, at most 4 hours a day",
+        "color": "var(--lx-dr)"
+      }
+    ],
+    "ct": {
+      "n": 5,
+      "mw": 100,
+      "forcedOutage": 0.07,
+      "repairHours": 24
+    },
+    "battery": {
+      "hours": 4,
+      "eta": 0.85
+    },
+    "dr": {
+      "hoursPerDay": 4
+    }
+  },
+  "sim": {
+    "years": 500,
+    "seed": 2025,
+    "blockDays": 7,
+    "shiftWeeks": 1,
+    "threshold": 1500,
+    "repeats": {
+      "first": 1,
+      "last": 20
+    },
+    "dispatch": "Each hour: wind, sun and the available units first; a battery discharges only in a shortfall and charges from any surplus, starting each year full; demand response is called in the first shortfall hours of a day, up to 4 hours a day; anything left is unserved."
+  },
+  "criterion": {
+    "lole": 0.1,
+    "label": "1 day in 10 years",
+    "source": "PJM Manual 20A: Resource Adequacy Analysis, Rev. 3, effective 24 June 2026, section 1.3 (p. 8)",
+    "url": "https://www.pjm.com/-/media/DotCom/documents/manuals/m20a.pdf"
+  },
+  "pjm": {
+    "about": "PJM's ELCC class ratings for its 2028/2029 Base Residual Auction: the share of each class's capacity PJM counts toward adequacy in that one auction, not universal technology values. PJM's model simulates forced outages as a function of weather (Manual 20A, section 2.3) and rates classes by expected unserved energy (sections 2.4 and 2.6).",
+    "source": "PJM, ELCC Class Ratings for the 2028/2029 Base Residual Auction",
+    "url": "https://www.pjm.com/-/media/DotCom/planning/res-adeq/elcc/28-29-bra-elcc-class-ratings.pdf",
+    "asOf": "2028/2029 auction; PDF dated February 2026",
+    "rows": [
+      {
+        "id": "dr",
+        "label": "Demand resource",
+        "pct": 91
+      },
+      {
+        "id": "cc",
+        "label": "Gas combined cycle",
+        "pct": 78
+      },
+      {
+        "id": "ct",
+        "label": "Gas combustion turbine",
+        "pct": 67
+      },
+      {
+        "id": "battery",
+        "label": "4-hour storage",
+        "pct": 59
+      },
+      {
+        "id": "wind",
+        "label": "Onshore wind",
+        "pct": 34
+      },
+      {
+        "id": "solar",
+        "label": "Tracking solar",
+        "pct": 10
+      },
+      {
+        "id": "solar-fixed",
+        "label": "Fixed-tilt solar",
+        "pct": 7
+      }
+    ]
+  },
+  "texts": {
+    "about": "Notes and feedback the page shows (step 2's interval and seed, step 4's screen, a rating at a zero target, step 8's question); the test checks each against the model and the text budget.",
+    "ZERO_NOTE": "No shortfall is left in the 500 years, so the rating is the smallest perfect MW that also leaves none: a limit of the sample, not proof of zero risk.",
+    "SE_NOTE": "± two [[standard-error|standard errors]] of the average over 500 years ([[monte-carlo-error|Monte Carlo error]]), given these inputs. It leaves out uncertainty in the weather history and the model's assumptions.",
+    "SEED_NOTE": "The [[random-seed|seed]] numbers the random draws so a run can be repeated; another seed draws other years with the same assumptions.",
+    "SCREEN_NOTE": "A deliberately crude screen: every MW counts at nameplate, and 500 MW of demand response counts as 500 MW of supply against the gross 4,000 MW peak.",
+    "PJM_SAW": "A rating belongs to one grid, one mix and one model. **Correlated outages, such as a cold snap knocking out many units at once, can lower a peaker's rating; Analyst lesson [[lesson:a09-hazards|A9]] brings such hazards in.**",
+    "PJM_Q": {
+      "weather": "Yes: PJM simulates outages as a function of weather (Manual 20A, section 2.3); here they are independent. It is one possible contributor; the grids, mixes and formulas differ too.",
+      "metric": "No: both rate by expected unserved energy (Manual 20A, sections 2.4 and 2.6), though PJM's formula is a ratio of EUE improvements and this lesson matches perfect MW. The weather assumption differs.",
+      "same": "No: PJM ties outages to the weather and this lesson draws them independently; the grids, mixes and formulas differ too."
+    }
+  },
+  "reference": {
+    "about": "Written by node _tests/learn/test_a05-adequacy.js --write at seed 2025 and checked on every run; repeats use seeds 1 to 20.",
+    "base": {
+      "lole": 0.228,
+      "lolh": 0.698,
+      "eue": 108.06,
+      "se": 0.02452,
+      "yearsWith": 90,
+      "days": 114
+    },
+    "single": {
+      "ct": {
+        "lole": 0.012,
+        "eue": 4.87,
+        "mw": 446.95,
+        "share": 0.8939
+      },
+      "wind": {
+        "lole": 0.16,
+        "eue": 64.59,
+        "mw": 78.98,
+        "share": 0.158
+      },
+      "solar": {
+        "lole": 0.2,
+        "eue": 66.09,
+        "mw": 75.44,
+        "share": 0.1509
+      },
+      "battery": {
+        "lole": 0.014,
+        "eue": 19.52,
+        "mw": 275.61,
+        "share": 0.5512
+      },
+      "dr": {
+        "lole": 0.048,
+        "eue": 46.58,
+        "mw": 132.31,
+        "share": 0.2646
+      }
+    },
+    "solarBlocks": [
+      0.1509,
+      0.056,
+      0.0303
+    ],
+    "mix": {
+      "solar": 0.1509,
+      "solarWithBattery": 0.3074,
+      "battery": 0.5512,
+      "batteryWithSolar": 0.7828
+    },
+    "repeats": {
+      "n": 20,
+      "solarUp": 16,
+      "batteryUp": 19
+    }
+  }
+}

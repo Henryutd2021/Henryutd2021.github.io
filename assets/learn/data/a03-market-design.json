@@ -1,0 +1,261 @@
+{
+  "about": "Data of Learn lesson A3, Energy-only or capacity market? (wave W4, 2026-11-05). The Plains market is fictional and illustrative: one year of hourly uniform-price clearing on the 2025 shapes of the Southwest Power Pool (town_year.json, EIA-930), every unit at its average availability (no random outages: a closed-form year, not lesson A5's simulation). Gas running costs and every new plant's building and upkeep costs are lesson 7's (07-cost.json: EIA, 2025 dollars, 4% real over 30 years); the coal running cost, the production credit, the scarcity curve, the capacity market's energy cap and the wind and solar ratings are illustrative and say so. The reference block is written by node _tests/learn/test_a03-market-design.js --write and checked on every run.",
+  "market": {
+    "name": "Plains market",
+    "peakMW": 4000,
+    "windMW": 3000,
+    "solar": {
+      "min": 0,
+      "max": 3200,
+      "step": 400,
+      "value": 1200
+    },
+    "peakers": {
+      "min": 400,
+      "max": 1400,
+      "step": 100,
+      "value": 700
+    },
+    "profileMethod": "scale",
+    "monthlyCF": true,
+    "credit": 25,
+    "creditNote": "Wind and solar offer at minus $25/MWh: an illustrative production credit, as in lesson 8, paid per MWh produced, so they keep running at prices down to minus the credit.",
+    "units": [
+      {
+        "id": "coal",
+        "label": "Coal steam",
+        "short": "Coal",
+        "mw": 1000,
+        "avail": 0.92,
+        "offer": 24,
+        "offerNote": "illustrative",
+        "color": "var(--lx-steel)"
+      },
+      {
+        "id": "cc",
+        "label": "Gas combined cycle",
+        "short": "Gas CC",
+        "mw": 1600,
+        "avail": 0.95,
+        "tech": "cc",
+        "color": "var(--lx-cc)"
+      },
+      {
+        "id": "ct",
+        "label": "Gas peakers",
+        "short": "Peakers",
+        "avail": 0.93,
+        "tech": "peaker",
+        "color": "var(--lx-pk)"
+      }
+    ],
+    "gas": 3.85,
+    "availNote": "Each unit type runs at its average availability (1 minus an illustrative forced outage rate, as in lesson A5): coal 92%, combined cycle 95%, peakers 93%."
+  },
+  "designs": {
+    "eo": {
+      "label": "Energy-only with scarcity pricing",
+      "short": "Energy-only",
+      "cap": 5000,
+      "capNote": "ERCOT's system-wide offer cap since 1 January 2022"
+    },
+    "cm": {
+      "label": "Capacity market (simplified)",
+      "short": "Capacity market",
+      "cap": 1000,
+      "capNote": "illustrative, a separate assumption"
+    },
+    "reserve": 600,
+    "curveNotes": [
+      "When spare capacity (available supply minus demand) falls below 600 MW, a [[scarcity-price|scarcity]] adder lifts the price above the last offer, reaching the cap at zero spare; the formula is in Go deeper.",
+      "When demand exceeds supply, the price is the cap and some demand goes unserved. Here the [[offer-cap|offer cap]] also caps the clearing price, a simplification.",
+      "Illustrative, in the spirit of ERCOT's operating reserve demand curve."
+    ],
+    "ratings": {
+      "coal": 0.92,
+      "cc": 0.95,
+      "ct": 0.93,
+      "wind": 0.16,
+      "solar": 0.15
+    },
+    "cmNotes": [
+      "Simplified: no auction buys against a requirement. The capacity price is set to a new peaker's missing money per rated kW, so a new peaker breaks even by construction, at any fleet.",
+      "The $1,000/MWh energy cap is a separate illustrative assumption: energy prices fall at the same time as the payment starts.",
+      "Rated MW ([[capacity-accreditation|accreditation]]): each unit at its average availability; wind and solar at lesson A5's first-block ratings, 16% and 15%, held fixed although A5 shows them falling as more is added."
+    ]
+  },
+  "hours": [
+    {
+      "id": "noon",
+      "label": "A spring midday",
+      "date": "2025-04-13",
+      "hour": 12,
+      "why": "Chosen on 2026-11-05: a windy, sunny Sunday in April 2025, with wind and sun above demand."
+    },
+    {
+      "id": "eve",
+      "label": "A summer evening",
+      "date": "2025-07-29",
+      "hour": 19,
+      "why": "Chosen on 2026-11-05: the evening of SPP's 2025 peak-demand day, as the sun sets, with little wind."
+    }
+  ],
+  "world": [
+    {
+      "id": "rto-cap",
+      "label": "U.S. markets with a capacity market",
+      "who": "PJM, MISO, NYISO and ISO-NE: regional transmission organizations (RTOs), which run a region's grid and wholesale markets",
+      "how": "An energy market with shortage pricing, plus auctions that buy capacity ahead of time: PJM's base auction is normally held three years before the delivery year; MISO's auction has run by season since 2023.",
+      "facts": "PJM's capacity price was $269.92/MW-day for most of its region in 2025/26 (two zones cleared higher, at their caps) and $325, at the cap, for its entire region in 2028/29.",
+      "sources": [
+        {
+          "label": "FERC staff, Energy Primer (December 2023), p. 72",
+          "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf"
+        },
+        {
+          "label": "PJM Manual 18, Rev. 63 (effective 24 September 2026), section 5.1",
+          "url": "https://www.pjm.com/-/media/DotCom/documents/manuals/m18.pdf"
+        },
+        {
+          "label": "PJM, 2028/2029 auction release (14 July 2026)",
+          "url": "https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2026-releases/20260714-pjm-capacity-auction-procures-138318-mw-of-generation-resources.pdf"
+        },
+        {
+          "label": "PJM, 2025/2026 auction release (30 July 2024)",
+          "url": "https://www.pjm.com/-/media/DotCom/about-pjm/newsroom/2024-releases/20240730-pjm-capacity-auction-procures-sufficient-resources-to-meet-rto-reliability-requirement.ashx"
+        },
+        {
+          "label": "PJM, 2025/2026 Base Residual Auction report",
+          "url": "https://www.pjm.com/-/media/DotCom/markets-ops/rpm/rpm-auction-info/2025-2026/2025-2026-base-residual-auction-report.pdf"
+        },
+        {
+          "label": "MISO, news release (17 May 2023): the new seasonal approach",
+          "url": "https://www.misoenergy.org/meet-miso/media-center/2023/new-approach-to-planning-resource-auction-delivers-positive-results/"
+        }
+      ]
+    },
+    {
+      "id": "ercot",
+      "label": "Texas (ERCOT)",
+      "who": "ERCOT, the one RTO that FERC does not regulate",
+      "how": "An energy market with no capacity market; offers are capped at $5,000/MWh. A reserve demand curve added a scarcity adder from 2014; since 5 December 2025, energy and reserves are priced together.",
+      "facts": "The offer cap fell from $9,000 to $5,000 per MWh on 1 January 2022.",
+      "sources": [
+        {
+          "label": "ERCOT, 2024 Biennial Report on the ORDC (1 November 2024), pp. 1 and 7–10",
+          "url": "https://www.ercot.com/files/docs/2024/10/31/2024-biennial-ercot-report-on-the-ordc-20241031.pdf"
+        },
+        {
+          "label": "ERCOT market notice M-F110525-04 (5 December 2025): real-time co-optimization live",
+          "url": "https://www.ercot.com/services/comm/mkt_notices/M-F110525-04"
+        },
+        {
+          "label": "ERCOT market notice M-A120721-01 (7 December 2021)",
+          "url": "https://ercot.com/services/comm/mkt_notices/M-A120721-01"
+        },
+        {
+          "label": "FERC staff, Energy Primer (December 2023), p. 66",
+          "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf"
+        }
+      ]
+    },
+    {
+      "id": "vertical",
+      "label": "U.S. regions without a regional market (RTO)",
+      "who": "Vertically integrated utilities in much of the Southeast and the West outside California",
+      "how": "Utilities, frequently vertically integrated, own and run plants and wires and plan their supply with their state regulators.",
+      "facts": "About two-thirds of the U.S. population is served by markets that [[rto|RTOs]] run; much of the rest by these utilities.",
+      "sources": [
+        {
+          "label": "FERC staff, Energy Primer (December 2023), pp. 60 and 66",
+          "url": "https://www.ferc.gov/sites/default/files/2024-01/24_Energy-Markets-Primer_0117_DIGITAL_0.pdf"
+        }
+      ]
+    },
+    {
+      "id": "eu",
+      "label": "The European Union",
+      "who": "Member states' markets under EU rules",
+      "how": "Energy markets set the wholesale price; a country may add a capacity mechanism, approved as state aid.",
+      "facts": "The 2024 reform entered into force on 16 July 2024; from 17 July 2027, new direct price support for wind, solar and some other plants must be two-way contracts for difference: top-ups below an agreed price, paybacks above.",
+      "sources": [
+        {
+          "label": "European Commission, Electricity market design (page accessed 5 November 2026)",
+          "url": "https://energy.ec.europa.eu/topics/markets-and-consumers/electricity-market-design_en"
+        },
+        {
+          "label": "Regulation (EU) 2024/1747, Article 19d, adopted 13 June 2024 (Official Journal, 26 June 2024): two-way contracts for difference from 17 July 2027",
+          "url": ""
+        },
+        {
+          "label": "European Commission, questions and answers QANDA/24/2260 (21 May 2024)",
+          "url": "https://ec.europa.eu/commission/presscorner/api/files/document/print/av/qanda_24_2260/"
+        },
+        {
+          "label": "European Commission, news (12 March 2025)",
+          "url": "https://energy.ec.europa.eu/news/report-and-proposals-streamlining-procedures-capacity-mechanisms-2025-03-12_en"
+        }
+      ]
+    },
+    {
+      "id": "china",
+      "label": "China",
+      "who": "The NDRC, China's national planning and price regulator, and the provinces",
+      "how": "Capacity payments set nationally, technology by technology, coal's since 2024; a January 2026 notice revised them and set a national framework for grid-side storage.",
+      "facts": "Coal's payment covered 30% of a set fixed cost in most provinces in 2024–25 and at least 50% from 2026. Once a province's spot market runs continuously, one payment for reliable capacity is to replace payments by technology.",
+      "sources": [
+        {
+          "label": "NDRC, questions and answers with NDRC and National Energy Administration officials on the notice improving the generation-side capacity price mechanism (30 January 2026)",
+          "url": ""
+        },
+        {
+          "label": "Ember, From baseload to flexibility: How is coal's role in China changing (10 February 2026), section 1.3.1, pp. 14–16",
+          "url": "https://ember-energy.org/app/uploads/2026/02/From-baseload-to-flexibility-How-is-coals-role-in-China-changing-PDF.pdf"
+        }
+      ]
+    }
+  ],
+  "solarValue": {
+    "n": "38%",
+    "what": "In CAISO in 2023, where solar served 27% of load, solar's value factor was 38%.",
+    "source": {
+      "label": "LBNL, Utility-Scale Solar, 2024 Edition (October 2024), slides 47 and 50",
+      "url": "https://eta-publications.lbl.gov/sites/default/files/2024-10/utility_scale_solar_2024_edition_slides.pdf"
+    },
+    "measure": "A value factor counts energy and capacity value against a flat 24-hour block's; this lesson's capture ratio counts energy only."
+  },
+  "reference": {
+    "about": "Written by node _tests/learn/test_a03-market-design.js --write at the defaults (1,200 MW of solar, 700 MW of peakers) and checked on every run.",
+    "ct": 700,
+    "solar": 1200,
+    "eo": {
+      "avg": 35.7911,
+      "neg": 111,
+      "scarce": 155,
+      "short": 0,
+      "top": 4665.39,
+      "consumer": 39.888
+    },
+    "cm": {
+      "avg": 27.8898,
+      "capPrice": 69.593,
+      "consumer": 40.7899,
+      "top": 935.2
+    },
+    "noon": {
+      "price": -25,
+      "spare": 3298.2
+    },
+    "eve": {
+      "price": 586.76,
+      "spare": 400.7,
+      "adder": 547.4
+    },
+    "resting": {
+      "pays": 600,
+      "fails": 700,
+      "shortAtPays": 2,
+      "stays": 900
+    }
+  }
+}

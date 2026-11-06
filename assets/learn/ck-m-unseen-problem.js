@@ -314,6 +314,14 @@
     return h.join("\n");
   }
   function pct(v) { return n1(v) + "%"; }
+  // the like-for-like benchmark (W4 carry-over): SPP's 2025 wind output (EIA-930) over its wind capacity as EIA counts it
+  // (EIA-860M, time-adjusted net summer MW), from E.sppWind; the rest of the gap is the dataset's definition
+  function likeForLike(E, S) {
+    var W = E.sppWind, cf = W.capacityFactor * 100;
+    return "<li><b>Like for like</b>, SPP's 2025 wind output (" + n1(W.outputMWh / 1e6) + " TWh, EIA-930) over its wind capacity as EIA counts it (" + n0(W.timeAdjustedSummerMW) +
+      " MW, EIA-860M) is " + pct(cf) + ": " + n1(cf - E.eiaWind * 100) + " points above the U.S. fleet's " + pct(E.eiaWind * 100) + ". The definition explains " + n1(S.cfWind - cf) +
+      " of the " + n1(S.gap) + " points.</li>";
+  }
   function solEmpiricalHTML(J, S) {
     var E = J.empirical, row = function (a, b, c, d) { return "<tr><td>" + a + '</td><td class="n">' + b + '</td><td class="n">' + c + '</td><td class="n">' + d + "</td></tr>"; };
     var h = ['<ol class="ckm-list"><li><b>Design first:</b> a descriptive screen; metrics in % of each farm\'s size and in MW; 100% means SPP\'s highest 2025 hour, so the year\'s mean is not a capacity factor; the top hours sorted from the highest, the earlier hour first on ties.</li>' +
@@ -328,7 +336,7 @@
       "<li><b>At the net-load peaks</b> (evenings, winter nights and mornings): wind gives " + r2(S.ratioTopN) + " of its average, and solar almost nothing. These are the hours the rest of the fleet must cover.</li>" +
       "<li><b>Against the benchmark:</b> the dataset's wind mean, " + pct(S.cfWind) + " of its highest hour, is " + n1(S.gap) + " percentage points above EIA's 2025 U.S. capacity factor of 33.8%; solar's " + pct(S.cfSolar) + " is close to EIA's 24.0%.</li>" +
       "<li><b>What the gap shows:</b> a definition difference (shares of the highest hour, not of capacity), plus SPP's own fleet and wind. These data cannot split the two, so the comparison checks a definition; it does not validate the numbers.</li>" +
-      "<li><b>A like-for-like check</b> would divide SPP's 2025 wind output by its installed wind capacity: the same quantity, boundary and year as EIA's.</li>" +
+      likeForLike(E, S) +
       "<li><b>What survives, for the same hours:</b> rescaled linearly to 33.8% (each hour × 0.338 ÷ " + (S.cfWind / 100).toFixed(4) + "), wind's MW and percentages fall by one factor, so its ratio to its own average in these " + E.topN + " net-load hours stays " + r2(S.ratioTopNSame) + ".</li>" +
       "<li><b>If the hours are picked again</b> after rescaling, less wind raises net load in windy hours: " + S.keptTopN + " of the " + E.topN + " hours stay, and the ratio becomes " + r2(S.ratioTopNPicked) + ". Both are valid; say which you did.</li>" +
       '<li><b>What it leaves out:</b> one weather year, outages, imports and an <span class="lx-term" data-term="resource-adequacy">adequacy</span> model; averages over top hours screen, they do not measure a <span class="lx-term" data-term="capacity-credit">capacity credit</span>.</li></ul>');

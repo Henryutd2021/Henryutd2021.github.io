@@ -548,7 +548,7 @@ window.Quarto = {
 <summary><span class="k">Go deeper</span>What this model leaves out</summary>
 <div class="lx-deeper-body">
 <ul>
-<li>Losses, voltage magnitudes and reactive power: a DC model uses only voltage-angle differences, holds voltage magnitudes fixed and is lossless. A17 (upcoming) runs a small AC power flow to show when that matters.</li>
+<li>Losses, voltage magnitudes and reactive power: a DC model uses only voltage-angle differences, holds voltage magnitudes fixed and is lossless. <a href="a17-physical-feasibility.html">A17</a> estimates line heating and feeder voltage with short formulas to show when that matters, and says when an AC power flow is needed to check.</li>
 <li>Outages: real dispatch keeps flows safe if any one line or plant fails (the N-1 rule).</li>
 <li>Start-ups and minimum run times: those need on/off decisions, a mixed-integer program (<a href="m02-unit-commitment.html">M2</a>).</li>
 <li>Offers and price-responsive demand: here costs stand in for offers, and demand is fixed.</li>

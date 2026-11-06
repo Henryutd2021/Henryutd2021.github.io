@@ -478,7 +478,7 @@ window.Quarto = {
 </tr>
 <tr class="odd">
 <td>100 kt</td>
-<td>$143.0M</td>
+<td>$143.1M</td>
 <td>649 MW</td>
 <td>216 MW</td>
 <td>280 MW</td>
@@ -487,7 +487,7 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td>0 kt</td>
-<td>$288.5M</td>
+<td>$288.9M</td>
 <td>220 MW</td>
 <td>59 MW</td>
 <td>0 MW</td>
@@ -501,7 +501,7 @@ window.Quarto = {
 <p class="lx-hint">With JavaScript on, you choose the plants yourself, run the year in a solver and ask it for the cheapest plan under a CO₂ cap.</p>
 </div>
 </div>
-<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Price years:</b> plant costs and the gas price in 2025 dollars, battery costs in 2024 dollars, as the sources give them, added without conversion.<br><b>Prairie Town:</b> fictional.</span></p>
+<p class="lx-datanote"><svg class="lx-ic" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5M12 8v.2"></path></svg><span><b>Weather and demand:</b> real 2025 hourly shapes of the Southwest Power Pool grid (<a href="https://www.eia.gov/electricity/gridmonitor/">EIA-930</a>), scaled to a 450 MW peak.<br><b>Wind and solar:</b> output matched to EIA's 2025 U.S. capacity factors.<br><b>Costs:</b> EIA's and NREL's, dated under Sources; constant within a scenario.<br><b>Price year:</b> 2025 dollars throughout; NREL's 2024 battery costs are converted with BEA's GDP implicit price deflator (×1.0263).<br><b>Prairie Town:</b> fictional.</span></p>
 <p class="lx-hint" style="margin-top:.6rem">About 15 guided minutes. Practice, about 20 more: by hand, earn all nine stars with a plan under 100 kt, or try a gas price of $6/MMBtu.</p>
 </div>
 <div id="explain" class="lx-sec">
@@ -669,15 +669,15 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <tr class="even">
 <td>Optimizer at 200 kt</td>
 <td>$130.5M</td>
-<td>$132.0M</td>
+<td>$132.1M</td>
 <td>197 kt</td>
 <td>215 kt</td>
 <td>33 MWh</td>
 </tr>
 <tr class="odd">
 <td>Optimizer at 100 kt</td>
-<td>$144.3M</td>
-<td>$147.1M</td>
+<td>$144.4M</td>
+<td>$147.2M</td>
 <td>98 kt</td>
 <td>131 kt</td>
 <td>0 MWh</td>
@@ -690,7 +690,7 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <li><strong>Unserved energy.</strong> Tiny: at most 43 MWh, under 0.002% of the year’s demand.</li>
 <li><strong>Re-optimized on all 8,760 hours.</strong> The cheapest 200 kt plan costs $133.2M, 3% more, and its last tonne $139 instead of $85: seven weeks underestimate the cost of deep cuts.</li>
 </ul>
-<p>Planners respond with more or longer periods, extreme weeks and adequacy tests over many weather years (A5, upcoming).</p>
+<p>Planners respond with more or longer periods, extreme weeks and adequacy tests over many weather years (<a href="../learn/a05-adequacy.html">A5</a>).</p>
 </div>
 </details>
 </div>
@@ -758,9 +758,9 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <td class="s"><a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">EIA, AEO2026 assumptions, Table 3</a> (PDF) · 2025 dollars, April 2026</td>
 </tr>
 <tr class="even">
-<td class="n">$241/kWh + $372/kW</td>
-<td>A lithium-ion battery's energy and power costs; a 4-hour battery: $334/kWh.</td>
-<td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL, battery cost projections, 2025 update</a> (PDF) · 2024 costs, June 2025</td>
+<td class="n">$247/kWh + $382/kW</td>
+<td>A lithium-ion battery's energy and power costs in 2025 dollars (NREL's $241 and $372 in 2024 dollars, converted); a 4-hour battery: $343/kWh.</td>
+<td class="s"><a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">NREL, battery cost projections, 2025 update</a> (PDF) · 2024 costs, June 2025; <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">BEA, NIPA Table 1.1.9</a> · revised 29 Oct 2026</td>
 </tr>
 <tr class="odd">
 <td class="n">$3.85/MMBtu</td>
@@ -794,7 +794,8 @@ Need a refresher? Toolbox <a href="k03-discounting.html">K3</a> (discounting and
 <li>EIA (2026). <a href="https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf">Assumptions to the Annual Energy Outlook 2026: Electricity Market Module</a> (PDF), Table 3: capital, O&amp;M and heat rates.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/annual/html/epa_07_04.html">Electric Power Annual, Table 7.4</a> (gas price) and <a href="https://www.eia.gov/electricity/annual/html/epa_08_04.html">Table 8.4</a> (nuclear fuel, 6.64 mills/kWh in 2025).</li>
 <li>EIA. <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">Carbon Dioxide Emissions Coefficients</a>: 52.91 kg CO₂ per MMBtu of natural gas.</li>
-<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281. Only the 2024 costs, life and efficiency are used.</li>
+<li>Cole, W., Ramasamy, V. and Turan, M. (2025). <a href="https://docs.nlr.gov/docs/fy25osti/93281.pdf">Cost Projections for Utility-Scale Battery Storage: 2025 Update</a> (PDF). NREL/TP-6A40-93281. Only the 2024 costs (converted to 2025 dollars), life and efficiency are used.</li>
+<li>U.S. Bureau of Economic Analysis. <a href="https://apps.bea.gov/iTable/?reqid=19&amp;step=3&amp;isuri=1&amp;1921=survey&amp;1903=13&amp;1904=2022&amp;1905=2026&amp;1906=a&amp;1911=0">NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product</a>, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893. Last revised 29 October 2026; accessed 5 November 2026. It converts the battery's 2024 costs to 2025 dollars.</li>
 <li>NLR. <a href="https://atb.nlr.gov/electricity/2025/financial_cases_&amp;_methods">2025 Electricity ATB: Financial Cases and Methods</a>: the 30-year cost recovery period.</li>
 <li>Kotzur, L. et al. (2018). <a href="https://doi.org/10.1016/j.apenergy.2018.01.023">Time series aggregation for energy system design: Modeling seasonal storage</a>. Applied Energy 213.</li>
 <li>NLR (2025). <a href="https://docs.nlr.gov/docs/fy26osti/93617.pdf">Regional Energy Deployment System (ReEDS) Model Documentation: 2025</a> (PDF).</li>

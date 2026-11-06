@@ -1,0 +1,254 @@
+{
+ "about": "Learn A10, Which emissions question are you asking? (wave W4, builder learn-w4-c, 2026-11-05). The Plains Grid's fleet (also read by A12 and M6), the day, the two loads, the long-run and procurement options, the card sort and the numbers to remember. The Plains Grid is fictional and its plant sizes are illustrative; the plants' heat rates, fuel prices and CO2 coefficients are EIA's, with their tables and dates in sources.",
+ "accessed": "2026-11-05",
+ "plains": {
+  "name": "Plains Grid",
+  "note": "Illustrative: a fictional regional grid with a 4,000 MW peak (as in lesson 3), much wind, some solar and gas plants. Not a model of any real grid.",
+  "demandPeakMW": 4000,
+  "windMW": 3000,
+  "solarMW": 600,
+  "profile": {
+   "method": "scale",
+   "monthlyCF": true
+  },
+  "gas": {
+   "price": 3.85,
+   "co2PerMMBtu": 52.91
+  },
+  "plants": {
+   "cc": {
+    "label": "Gas combined-cycle plants",
+    "short": "combined-cycle",
+    "mw": 2000,
+    "heatRate": 7.535,
+    "vom": 3.49
+   },
+   "ct": {
+    "label": "Gas combustion turbines (peakers)",
+    "short": "peakers",
+    "mw": 2300,
+    "heatRate": 10.975,
+    "vom": 4.17
+   }
+  },
+  "sources": {
+   "heat": {
+    "label": "EIA, Electric Power Annual, Table 8.2: average tested heat rates by prime mover, 2025 (natural gas combined cycle 7,535 Btu per kWh; gas turbine 10,975), reported at full load",
+    "url": "https://www.eia.gov/electricity/annual/html/epa_08_02.html",
+    "asOf": "2025 data, release of 21 October 2026; read 5 November 2026"
+   },
+   "fuel": {
+    "label": "EIA, Electric Power Annual, Table 7.4: average cost of natural gas to the electric power industry, 2025 ($3.85 per MMBtu)",
+    "url": "https://www.eia.gov/electricity/annual/html/epa_07_04.html",
+    "asOf": "2025 data; read 5 November 2026"
+   },
+   "co2": {
+    "label": "EIA, Carbon Dioxide Emissions Coefficients: natural gas 52.91 kg CO₂ per MMBtu",
+    "url": "https://www.eia.gov/environment/emissions/co2_vol_mass.php",
+    "asOf": "released 18 September 2024; read 5 November 2026"
+   },
+   "vom": {
+    "label": "EIA, Assumptions to the Annual Energy Outlook 2026, Electricity Market Module, Table 3: variable O&M of a combined-cycle plant ($3.49 per MWh) and of a combustion turbine ($4.17), 2025 dollars",
+    "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+    "asOf": "April 2026"
+   },
+   "shapes": {
+    "label": "EIA, Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025: hourly demand, wind and solar shapes",
+    "url": "https://www.eia.gov/electricity/gridmonitor/",
+    "asOf": "accessed 2 November 2026"
+   },
+   "cf": {
+    "label": "EIA, Electric Power Monthly, Table 6.07.B: capacity factors in 2025, wind 33.8%, solar PV 24.0%, and the monthly values",
+    "url": "https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b",
+    "asOf": "issue of 23 October 2026"
+   }
+  }
+ },
+ "day": {
+  "date": "2025-11-07",
+  "dateLabel": "7 November 2025",
+  "utcOffsetHours": -6
+ },
+ "loads": {
+  "dc": {
+   "label": "Data center",
+   "mw": 300,
+   "rule": "flat",
+   "how": "runs at 300 MW every hour"
+  },
+  "ez": {
+   "label": "Electrolyzer",
+   "mw": 300,
+   "rule": "cleanest",
+   "hours": 12,
+   "how": "runs at 300 MW in the 12 hours with the lowest average CO₂ factor, read from the grid without it (ties: the earlier hour)"
+  }
+ },
+ "mustRunMW": 800,
+ "newCC": {
+  "mw": 300,
+  "heatRate": 6.226,
+  "vom": 3.49,
+  "source": "EIA, AEO2026 Electricity Market Module, Table 3: a new combined-cycle plant (single shaft), heat rate 6,226 Btu per kWh, variable O&M $3.49 per MWh"
+ },
+ "windCF": 0.338,
+ "procure": [
+  {
+   "id": "location",
+   "label": "No purchase: the grid's average",
+   "claim": "location",
+   "supply": "none",
+   "note": "Location-based: each MWh at its hour's average factor."
+  },
+  {
+   "id": "old",
+   "label": "Certificates from an existing wind farm, matched over the year",
+   "claim": "zero",
+   "supply": "none",
+   "note": "Assume the wind farm ran anyway: the purchase changes nothing on the grid."
+  },
+  {
+   "id": "far",
+   "label": "A new wind farm on another grid in the same certificate market, matched over the year",
+   "claim": "zero",
+   "supply": "none",
+   "note": "Assume it is built for this buyer but its output enters another grid, not this one."
+  },
+  {
+   "id": "new",
+   "label": "A new wind farm on this grid, matched over the year",
+   "claim": "zero",
+   "supply": "wind",
+   "note": "Assume the purchase gets it built (additional) and no line limits (deliverable): its output enters this grid."
+  },
+  {
+   "id": "hourly",
+   "label": "The same new wind farm, matched hour by hour",
+   "claim": "hourly",
+   "supply": "wind",
+   "note": "Hours its output falls short are counted at the grid average, a teaching proxy; a residual mix is left out."
+  }
+ ],
+ "claimRules": {
+  "label": "Illustrative reporting rules, after the GHG Protocol's Scope 2 Guidance (2015), market-based method",
+  "assume": "Each certificate is assumed to be this buyer's alone, retired for it, and from the same market as its use (Table 7.1, criteria 2, 3 and 5).",
+  "proxy": "Shortfall hours use the grid average as a teaching proxy; the guidance asks for a residual mix (the factor of unclaimed power) where one exists.",
+  "status": "The GHG Protocol consulted on a revision from 20 October 2025 to 31 January 2026; hourly matching and deliverability are proposals, not adopted rules (feedback summary, 29 July 2026).",
+  "sources": [
+   {
+    "label": "GHG Protocol, Scope 2 Guidance (2015), Table 7.1: Scope 2 Quality Criteria, page 60",
+    "url": "https://ghgprotocol.org/sites/default/files/2023-03/Scope%202%20Guidance.pdf",
+    "asOf": "read 5 November 2026"
+   },
+   {
+    "label": "GHG Protocol, Scope 2 Public Consultation Feedback Summary: Executive Summary",
+    "url": "https://ghgprotocol.org/sites/default/files/2026-07/S2-ExecutiveSummary-PublicConsultation%20ummaryofFeedback-2026.07.29.pdf",
+    "asOf": "29 July 2026; read 5 November 2026"
+   }
+  ]
+ },
+ "sort": {
+  "bins": [
+   {
+    "id": "inv",
+    "label": "Inventory",
+    "sub": "average factors"
+   },
+   {
+    "id": "short",
+    "label": "Short run",
+    "sub": "marginal factors"
+   },
+   {
+    "id": "long",
+    "label": "Long run",
+    "sub": "what gets built"
+   },
+   {
+    "id": "claim",
+    "label": "Claim",
+    "sub": "procurement rules"
+   }
+  ],
+  "cards": [
+   {
+    "id": "share",
+    "text": "The electrolyzer's share of the region's CO₂ in 2025.",
+    "bin": "inv",
+    "why": "A share of a total that already happened: average factors, and the shares add up."
+   },
+   {
+    "id": "shift",
+    "text": "Moving batch jobs to hours with a lower grid average shrinks the data center's footprint.",
+    "bin": "inv",
+    "why": "Counted at average factors, so it is an attributed footprint, as in CF6, not a measured change at the plants."
+   },
+   {
+    "id": "tomorrow",
+    "text": "If the data center switches on tomorrow, how much more will the gas plants burn?",
+    "bin": "short",
+    "why": "The fleet is fixed and only output changes: marginal factors from a dispatch model."
+   },
+   {
+    "id": "model",
+    "text": "A dispatch model says each extra MWh at 03:00 comes from the combined-cycle plants.",
+    "bin": "short",
+    "why": "A marginal plant read from one model; another model's rules can name another plant."
+   },
+   {
+    "id": "decade",
+    "text": "Over ten years, does the new load lead to more wind farms or more gas plants?",
+    "bin": "long",
+    "why": "What gets built in response: a planning model or a long-run marginal factor."
+   },
+   {
+    "id": "plan",
+    "text": "A planning model adds the load and compares the build-out with and without it.",
+    "bin": "long",
+    "why": "Consequential through investment: the difference of two plans."
+   },
+   {
+    "id": "zero",
+    "text": "We may report zero Scope 2 emissions because we bought certificates.",
+    "bin": "claim",
+    "why": "A reporting rule for purchases: it sets what may be claimed, not what the plants do."
+   },
+   {
+    "id": "match",
+    "text": "Our contract matches every hour of use with a new solar farm on the same grid.",
+    "bin": "claim",
+    "why": "Hourly matching with new supply on the same grid: a stricter claim, still a rule about the buyer's portfolio."
+   }
+  ]
+ },
+ "facts": [
+  {
+   "n": "52.91 kg per MMBtu",
+   "what": "CO₂ from burning natural gas, per million Btu of heat; a gas plant's CO₂ per MWh is this times its heat rate.",
+   "label": "EIA, Carbon Dioxide Emissions Coefficients",
+   "url": "https://www.eia.gov/environment/emissions/co2_vol_mass.php",
+   "asof": "released 18 September 2024"
+  },
+  {
+   "n": "7,535 and 10,975 Btu per kWh",
+   "what": "Average tested heat rates of U.S. natural gas combined-cycle plants and gas turbines in 2025.",
+   "label": "EIA, Electric Power Annual, Table 8.2",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_08_02.html",
+   "asof": "2025 data, released 21 October 2026"
+  }
+ ],
+ "sources": [
+  {
+   "label": "Siler-Evans, K., Azevedo, I. L. and Morgan, M. G. (2012). Marginal emissions factors for the U.S. electricity system. Environmental Science & Technology 46(9), 4742–4748.",
+   "url": "https://doi.org/10.1021/es300145v"
+  },
+  {
+   "label": "Gagnon, P. and Cole, W. (2022). Planning for the evolution of the electric grid with a long-run marginal emission rate. iScience 25, 103915.",
+   "url": "https://www.nrel.gov/docs/fy22osti/80472.pdf"
+  },
+  {
+   "label": "Ricks, W., Xu, Q. and Jenkins, J. D. (2023). Minimizing emissions from grid-based hydrogen production in the United States. Environmental Research Letters 18, 014025.",
+   "url": "https://doi.org/10.1088/1748-9326/acacb5"
+  }
+ ]
+}

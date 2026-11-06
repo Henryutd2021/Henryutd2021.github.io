@@ -314,7 +314,7 @@
             cards: [
               { id: "battery", text: "A 4-hour battery alone cannot carry the grid through these calm days.", bin: "shown", why: "It covers " + (b && b.ok ? fm.pct(b.covered) + " of the shortfall in your run." : fm.pct(ref.covered) + " of the shortfall in the lesson's reference run (step 5).") },
               { id: "power", text: "A store's power limits it in the worst hours, however much energy it holds.", bin: "shown", why: "The hydrogen store's leftover shortfall equals the MWh above firm output plus its power." },
-              { id: "adequate", text: "With the hydrogen store, the grid is adequate.", bin: "untested", why: "Adequacy needs many weather years and plant outages (A5, upcoming), not one week." },
+              { id: "adequate", text: "With the hydrogen store, the grid is adequate.", bin: "untested", why: "Adequacy needs many weather years and plant outages ([[lesson:a05-adequacy|A5]]), not one week." },
               { id: "refill", text: "The store can refill before the next calm spell.", bin: "untested", why: "That needs the whole year in order, as M3's linked weeks keep it." },
               { id: "pays", text: "A seasonal store pays for itself.", bin: "untested", why: "Its value depends on the year's prices and how often it cycles, not on one week." }
             ],

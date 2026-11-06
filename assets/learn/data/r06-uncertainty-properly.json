@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "title": "R6 research studio: uncertainty done properly. A fictional study of Prairie Town's 2035 peak, its uncertainties, treatments, exemplars and rubric line",
+    "version": "r6-v2",
+    "as_of": "2026-11-05",
+    "note": "Prairie Town, its utility and the study are fictional. Every range, car count, charging profile and the 60 MW customer is illustrative, and each input is drawn independently with equal odds across its range: an assumption of this illustration, not a finding. The 2025 hourly shape of demand is real: SPP's 2025 demand from EIA-930 (town_year.json), scaled so the town's 2025 peak hour is 450 MW, as in lesson 0. Text in braces, such as {c90}, is filled from the model on the page, so the words and the numbers cannot drift apart.",
+    "license": "CC BY 4.0"
+  },
+  "model": {
+    "p0": 450,
+    "y0": 2025,
+    "y1": 2035,
+    "growth": [0.004, 0.016],
+    "growthBase": 0.010,
+    "weather": [0.96, 1.04],
+    "weatherBase": 1,
+    "kwh": [7, 13],
+    "kwhBase": 10,
+    "cars2025": 2000,
+    "scenarios": [
+      { "id": "slow", "label": "Slow uptake", "short": "Slow", "cars2035": 6000 },
+      { "id": "central", "label": "Central uptake", "short": "Central", "cars2035": 15000 },
+      { "id": "fast", "label": "Fast uptake", "short": "Fast", "cars2035": 30000 }
+    ],
+    "profiles": {
+      "about": "Share of a car's daily charging energy in each local hour, starting at 00:00 (percent; each list sums to 100). Unmanaged: most cars plug in on arrival home in the early evening. Managed: a programme moves most charging after 23:00. Both illustrative.",
+      "unmanaged": [4, 2, 1, 1, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 8, 12, 14, 13, 10, 7, 4],
+      "managed": [16, 16, 14, 12, 8, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 12]
+    },
+    "newLoad": { "mw": 60, "year": 2030, "label": "A customer drawing a constant 60 MW from 2030" },
+    "runs": 1000,
+    "seed": 6,
+    "round": 5
+  },
+  "study": {
+    "question": "How high could Prairie Town's peak demand be in 2035, as electric cars spread?",
+    "claim": "Prairie Town's peak demand will reach {claim} MW in 2035.",
+    "who": "Prairie Town's municipal utility, which the city council oversees",
+    "assume": "In this exercise the town accepts three car-uptake storylines but no odds for them, and no one can agree on a new customer's size or arrival. With other facts, a card could move pile."
+  },
+  "kinds": [
+    { "id": "parameter", "label": "Parameter", "sub": "a number in the model that data or judgement can bound", "color": "var(--lx-tier-2)" },
+    { "id": "structural", "label": "Structural", "sub": "how the model is built: its equations, time steps, what it leaves out", "color": "var(--lx-tier-3)" },
+    { "id": "scenario", "label": "Scenario", "sub": "an outside future that could unfold in a few coherent ways", "color": "var(--lx-tier-4)" },
+    { "id": "deep", "label": "Deep", "sub": "no agreed list of outcomes, odds or model", "color": "var(--lx-tier-5)" },
+    { "id": "choice", "label": "A choice, not an uncertainty", "sub": "set apart from the four kinds: compare the options, never sample them", "color": "var(--lx-ink-3)" }
+  ],
+  "cards": [
+    { "id": "growth", "bin": "parameter", "text": "How fast demand grows each year, apart from cars (0.4 to 1.6%)", "why": "A number inside the model. Its range here is illustrative; a real study would set it from meter records. Give it a range, and odds if you can defend them." },
+    { "id": "kwh", "bin": "parameter", "text": "How much energy one electric car draws on an average day (7 to 13 kWh)", "why": "Another number inside the model. The range here is illustrative; a real study would need driving surveys or charger meter data to set it." },
+    { "id": "heat", "bin": "parameter", "text": "How hot the hottest afternoon of 2035 turns out to be", "why": "Year-to-year weather is variability no study can know in advance. A real study takes its range from past years; the ±4% here is illustrative." },
+    { "id": "coincide", "bin": "structural", "text": "Whether car charging adds to the town's peak hour, or mostly to later hours", "why": "The form of the model: adding peaks assumes they come in the same hour; adding hour by hour does not. Run both forms." },
+    { "id": "shape", "bin": "structural", "text": "Using 2025's hourly pattern of demand for every year to 2035", "why": "A choice of structure (one year's pattern stands for all). Test it with another year's pattern, or state it as a limit." },
+    { "id": "home", "bin": "structural", "text": "Counting only cars charged at home, none charged at work", "why": "What a model leaves out is part of its structure. State it, and test a version with workplace charging." },
+    { "id": "cars", "bin": "scenario", "text": "How many electric cars the town has in 2035: 6,000, 15,000 or 30,000", "why": "Here the town accepts three storylines (car prices, models, policy) but no odds for them. Run each one; with odds you could defend, you could sample them." },
+    { "id": "code", "bin": "scenario", "text": "Whether the state requires all-electric new homes after 2028", "why": "An outside policy path with two or three clear versions: a scenario, run one by one." },
+    { "id": "newload", "bin": "deep", "text": "Whether a large new customer, such as a factory, asks to connect, and when", "why": "Here no one can agree on its size, its arrival or any odds. Show it as a separate what-if, and plan to adapt." },
+    { "id": "fleets", "bin": "deep", "text": "How travel changes if shared self-driving fleets arrive", "why": "Experts disagree on whether, when and how it changes charging: the outcomes themselves are unknown." },
+    { "id": "programme", "bin": "choice", "text": "Whether the utility funds a managed-charging programme", "why": "A decision the study should inform. Run the study with and without it and compare; sampling it would hide the comparison." },
+    { "id": "margin", "bin": "choice", "text": "How large a safety margin the utility plans above its forecast", "why": "A value judgement about risk. Show the range, and say what each margin implies; never average over margins." }
+  ],
+  "treatments": [
+    { "id": "t-growth", "card": "growth", "options": [
+      { "id": "a", "verdict": "bad", "text": "Use the midpoint, 1.0% a year, and report one peak.", "why": "One number hides the range, and the reader cannot see how sure you are: the rubric's Developing level, “single numbers”." },
+      { "id": "b", "verdict": "ok", "text": "Swing it from 0.4 to 1.6% with everything else fixed, as one bar of a tornado chart.", "why": "A fair first screen, but a [[tornado-chart|tornado chart]] moves one input at a time: it leaves most combinations unexplored and shows sensitivity to your chosen range, not the spread of outcomes." },
+      { "id": "c", "verdict": "good", "text": "Give it odds you can defend, sample it with the other parameters (Monte Carlo), report P10 to P90 and rank the inputs.", "why": "With odds you can defend, [[monte-carlo|Monte Carlo]] moves all parameters together: the band shows the spread they imply ([[percentile|P10 to P90]]), and the ranking names the input that matters most." }
+    ] },
+    { "id": "t-coincide", "card": "coincide", "options": [
+      { "id": "a", "verdict": "bad", "text": "Widen the growth range until the band covers both model forms.", "why": "It hides a question about the model inside a parameter, and the band then answers neither." },
+      { "id": "b", "verdict": "good", "text": "Run both model forms and report the gap between them.", "why": "Sampling cannot reveal a structural choice; comparing forms can, and the gap tells readers how much the choice matters." },
+      { "id": "c", "verdict": "ok", "text": "Use whichever form gives the higher peak, to be safe.", "why": "Sometimes wise for a planner, but say so: readers would take a cautious bound for your best estimate." }
+    ] },
+    { "id": "t-cars", "card": "cars", "options": [
+      { "id": "a", "verdict": "bad", "text": "Average the three and report the mean.", "why": "The average of three stories is a future nobody described, and it hides the spread between them." },
+      { "id": "b", "verdict": "ok", "text": "Call the central one the forecast, and the other two the extremes.", "why": "Fine if you can say why the central one is more likely; otherwise readers take a storyline for a prediction." },
+      { "id": "c", "verdict": "good", "text": "Run each one and show them side by side, with no odds attached.", "why": "Each storyline keeps its own band, and readers can see which assumptions drive the difference." }
+    ] },
+    { "id": "t-newload", "card": "newload", "options": [
+      { "id": "a", "verdict": "bad", "text": "Give it a 50% chance and add it to the sampled runs.", "why": "An invented 50% turns “we don't know” into a number that looks like knowledge, and it blurs the band for everyone." },
+      { "id": "b", "verdict": "ok", "text": "Leave it out of the numbers, and mention it in the limits.", "why": "Better than silence, but a 60 MW what-if is wider than much of the band: show it beside the result." },
+      { "id": "c", "verdict": "good", "text": "Show it as a separate what-if, look for a plan that holds with and without it, and name the signal that would trigger a review.", "why": "The approach of decision making under deep uncertainty: test plans across futures, and adapt when a signpost moves." }
+    ] },
+    { "id": "t-programme", "card": "programme", "options": [
+      { "id": "a", "verdict": "bad", "text": "Sample it: half the runs with the programme, half without.", "why": "Mixing the two options blurs the very comparison the utility needs to make." },
+      { "id": "b", "verdict": "good", "text": "Run the study with and without the programme, and compare the two bands.", "why": "A choice is compared, not sampled: each option gets its own result, and the difference is what the programme is worth to the peak." },
+      { "id": "c", "verdict": "ok", "text": "Assume the programme happens, since the utility has planned it.", "why": "A plan is not a fact. Report the other case too, so readers can see what the programme changes." }
+    ] }
+  ],
+  "rewrite": {
+    "fields": [
+      { "id": "paper", "label": "For a paper's results section", "hint": "Say what varied and how it was drawn, the range and what it means, and the model choice behind it." },
+      { "id": "board", "label": "For the utility's board, which decides what to plan for", "hint": "The top of the range, the case it belongs to, what the forecast alone cannot decide, and the signal that would change it." },
+      { "id": "public", "label": "For the public, in the town's newsletter", "hint": "Plain words and a range, what it depends on, at most 60 words." }
+    ],
+    "examples": {
+      "about": "Each example is a list of sentences, each labelled with the job it does; the checks read them joined.",
+      "paper": [
+        { "k": "What varied", "v": "We drew growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and the year's weather (±4%) independently, with equal odds across each range, in 1,000 runs." },
+        { "k": "The range", "v": "Under central car uptake the 2035 peak is {c10}–{c90} MW (P10–P90 of the runs); under fast uptake, {f10}–{f90} MW." },
+        { "k": "Model form", "v": "Demand is added hour by hour on 2025's pattern; adding the two peaks instead raises the central median by {gap} MW." }
+      ],
+      "board": [
+        { "k": "The range", "v": "Under central car uptake, about 9 in 10 model runs put the 2035 peak below {c90} MW; under fast uptake, below {f90} MW." },
+        { "k": "Not decided here", "v": "How much to plan for needs a reliability target and the cost of falling short; this forecast does not set them." },
+        { "k": "Not in the range", "v": "A customer drawing a constant 60 MW would raise each figure by 60 MW." },
+        { "k": "The signal", "v": "A connection request, or car numbers on the fast path, should trigger a new forecast." }
+      ],
+      "public": [
+        { "k": "The range", "v": "If electric cars spread at a middle pace, about 8 in 10 of our model runs put the town's busiest hour in 2035 at {c10} to {c90} megawatts, compared with 450 in 2025." },
+        { "k": "What moves it", "v": "Faster spread shifts that range up, and higher values are possible. How fast demand grows matters most." },
+        { "k": "What it leaves out", "v": "A large new factory would add more." }
+      ]
+    },
+    "jargon": ["P10", "P90", "P50", "percentile", "Monte Carlo", "stochastic", "parameter", "structural", "distribution", "sampled", "scenario"]
+  },
+  "plan": {
+    "rows": 4,
+    "kindHint": {
+      "parameter": "A range from data or judgement. With odds you can defend, sample with the others and report P10–P90; with bounds only, compare low and high cases.",
+      "structural": "Run an alternative form, or state it as a limit; report the gap.",
+      "scenario": "Run each storyline; show them side by side, no odds.",
+      "deep": "A separate what-if; a plan that holds across futures; a signal to review.",
+      "choice": "Compare the options, one result each; do not sample."
+    },
+    "examples": {
+      "title": "Two rows of an uncertainty plan",
+      "rows": [
+        { "key": "weak", "label": "Weak row", "u": "Future demand", "kind": "Parameter", "how": "Sensitivity analysis.", "note": "Too broad to treat: no range, no source, no way to say the result." },
+        { "key": "good", "label": "Strong row", "u": "A car's daily charging energy, 7–13 kWh", "kind": "Parameter", "how": "Range to set from charger meter records, with equal odds across it; sampled with the other inputs; reported as P10–P90, with its rank.", "note": "One quantity, its range and source, how it is drawn, and how the result will be said." }
+      ]
+    }
+  },
+  "exemplars": {
+    "id": "r6-ex",
+    "title": "Two uncertainty paragraphs for the same study",
+    "task": "Report the 2035 peak in a paper's results section, with its uncertainty.",
+    "lines": true,
+    "answers": [
+      { "key": "weak", "label": "Weak answer", "level": "Developing", "parts": [
+        "Our model shows that ", { "text": "Prairie Town's peak demand will reach {claim} MW in 2035", "note": "One number, to the megawatt, with “will”: no range and no conditions." },
+        ". ", { "text": "We tested the sensitivity of the results and found them robust", "note": "Which inputs, over what ranges? “Robust” is asserted, not shown." },
+        ". ", { "text": "Electric cars add {evA} MW to the peak", "note": "Only if charging and the peak come in the same hour: a structural choice left unstated." },
+        ". ", { "text": "Uncertainties remain, such as future policy", "note": "Not classified and not treated: which ones matter, and what was done about them?" },
+        "."
+      ] },
+      { "key": "good", "label": "Strong answer", "level": "Proficient", "parts": [
+        "Varied: ", { "text": "growth (0.4–1.6% a year), a car's daily energy (7–13 kWh) and the year's weather (±4%), drawn independently with equal odds across each range, in 1,000 runs (seed 6)", "note": "Parameters named, with their ranges and the sampling assumption: independent draws, equal odds across each range." },
+        ".\nScenarios: ", { "text": "slow, central and fast car uptake, with no odds attached", "note": "Scenarios kept apart, with no invented probabilities." },
+        ".\nModel form: ", { "text": "demand added hour by hour on 2025's pattern; adding peaks instead raises the central median by {gap} MW", "note": "The structural choice stated, with what the other form changes." },
+        ".\nResult: ", { "text": "{c10}–{c90} MW (P10–P90) under central uptake, {f10}–{f90} MW under fast uptake", "note": "Results as ranges, labelled as the central 80% of the modelled runs." },
+        ".\nDrivers: ", { "text": "growth matters most (rank correlation {rg}), then weather ({rw})", "note": "A [[global-sensitivity-analysis|global sensitivity]] ranking: [[rank-correlation|rank correlation]] says how closely an input's ranking and the result's move together." },
+        ".\nNot in the band: ", { "text": "a customer drawing a constant 60 MW from 2030, shown as a what-if", "note": "The deep uncertainty named and shown, not hidden in the band." },
+        "."
+      ] }
+    ],
+    "diff": [
+      { "label": "The number", "weak": "One, with “will”", "good": "Ranges, with what they mean" },
+      { "label": "Uncertainties", "weak": "“Remain”", "good": "Classified, each with a treatment" },
+      { "label": "Model form", "weak": "Unstated", "good": "Stated, with its effect" },
+      { "label": "New customer", "weak": "Missing", "good": "A separate what-if" }
+    ],
+    "note": "Both paragraphs are illustrative, about the fictional study on this page; their numbers come from the page's model."
+  },
+  "kindsTable": [
+    { "kind": "Parameter", "what": "A number in the model that data or judgement can bound.", "here": "Growth, a car's daily energy, the year's weather.", "treat": "With odds you can defend, sample together and rank the inputs; with bounds only, compare low and high cases.", "say": "P10–P90 of the runs, or the bounded cases, with the ranges, odds and their sources." },
+    { "kind": "Structural", "what": "How the model is built, and what it leaves out.", "here": "Peaks added or hours added; one year's pattern; home charging only.", "treat": "Run an alternative form, or benchmark against another model.", "say": "The choice made, and the gap to the alternative." },
+    { "kind": "Scenario", "what": "An outside future with a few coherent versions.", "here": "Slow, central or fast car uptake; a building code.", "treat": "Run each storyline separately.", "say": "Side by side, with no odds unless you can defend them." },
+    { "kind": "Deep", "what": "No agreed outcomes, odds or model.", "here": "A large new customer; self-driving fleets.", "treat": "Test plans across many futures; set signposts and triggers.", "say": "A what-if beside the result, and the signal that would change the advice." },
+    { "kind": "A choice (not an uncertainty)", "what": "A decision or value judgement the study informs.", "here": "Managed charging; the planning margin.", "treat": "Compare the options.", "say": "One result per option." }
+  ],
+  "rubric": {
+    "id": "r6-rubric",
+    "code": "R6",
+    "title": "Rate your plan and your result against the rubric",
+    "lede": "The course rubric's own words. R6 builds one competence of nine.",
+    "competences": [
+      { "id": "uncertainty", "look": "Your plan names each uncertainty's kind and its treatment, keeps your own choices apart, and your result is a range with what it means." }
+    ],
+    "note": "Your rating stays in this browser. A studio is practice, not a certificate: the course's readiness claim also needs the checkpoints and a research capstone."
+  },
+  "checklist": [
+    { "id": "list", "label": "Listed", "text": "The inputs and assumptions that could change your answer, one line each." },
+    { "id": "kind", "label": "Classified", "text": "Each tagged parameter, structural, scenario or deep; your own choices set apart." },
+    { "id": "range", "label": "Ranges sourced", "text": "Every range, and any odds across it, says where it comes from." },
+    { "id": "together", "label": "Varied together, if sampled", "text": "Parameters drawn together, not only one at a time, with their odds stated; inputs ranked by influence." },
+    { "id": "scen", "label": "Scenarios apart", "text": "Each storyline run on its own, with no odds unless you can defend them." },
+    { "id": "form", "label": "Model form tested", "text": "At least one alternative form run, or the choice stated as a limit." },
+    { "id": "ranges", "label": "Results as ranges", "text": "Each range says what it is: a percentile interval of the runs, a scenario envelope or a bounded case; never a guarantee." },
+    { "id": "digits", "label": "Honest digits", "text": "Numbers rounded to what the inputs support." },
+    { "id": "deep", "label": "Deep ones named", "text": "What has no odds is shown as a what-if, with the signal that would trigger a review." }
+  ],
+  "evpi": { "a": [12, 2], "b": [6, 6], "p": [0.5, 0.5] }
+}

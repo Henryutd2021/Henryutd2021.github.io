@@ -490,7 +490,7 @@
         { title: "One cause hits both plants", text: "Illustrative: a cold spell, or a shared fuel supply, hitting plants A and B.", value: "not independent" },
         { title: "Outages come together", text: "One plant being out makes the other more likely to be out." },
         { title: "Both out more often", text: "The joint chance rises above the product.", value: "> " + share(S.plants.both, 2) },
-        { title: "A count that multiplies looks too safe", text: "Adequacy studies sample outages together when causes are shared (A5, upcoming)." }],
+        { title: "A count that multiplies looks too safe", text: "Adequacy studies sample outages together when causes are shared ([[lesson:a05-adequacy|A5]])." }],
       note: "Holding each plant's outage chance at " + share(S.plants.p, 0) + ", dependence leaves expected MW out (" + S.plants.ev + " MW) unchanged; only the joint chances change."
     });
   }

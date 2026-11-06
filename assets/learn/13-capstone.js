@@ -521,13 +521,13 @@
       lede: "A model's plan is only as good as what it includes. This one is built to teach; read its answers with these limits.",
       holds: [
         "the weather of 2025 is a fair guide: one year of real Southwest Power Pool shapes, scaled to the town;",
-        "costs stay as entered: EIA's 2026 values in 2025 dollars, the battery in 2024 dollars, the same in every year;",
+        "costs stay as entered, all in " + cfg.priceYear + " dollars (the battery's " + cfg.techs.battery.source.dollarYear + " costs converted with BEA's GDP price index), the same in every year;",
         "the town is an island: no imports, no transmission limits inside it;",
         "nuclear output is a constant " + Math.round(cfg.techs.nuc.avail * 1000) / 10 + "% of its size every hour: a fleet's yearly average, which cannot show reliability;",
         "seven weeks stand in for the year (check it on all 8,760 hours in the debrief)." ],
       leaves: [
         "start-up costs, minimum output and ramp limits of gas plants (lesson 0 had a ramp limit);",
-        "plant outages and a reserve margin: adequacy needs many weather years (A5, upcoming);",
+        "plant outages and a reserve margin: adequacy needs many weather years ([[lesson:a05-adequacy|A5]]);",
         "taxes, tax credits and financing beyond a 4% real cost of capital;",
         "who pays, jobs, land and local air quality: costs here are the system's, not any one household's." ],
       source: "Data: EIA-930 hourly data for 2025; costs from EIA's Annual Energy Outlook 2026 and an NREL battery study, listed under Sources."

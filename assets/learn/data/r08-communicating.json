@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "title": "R8 research studio: how do you show results so people understand their limits? Findings, three charts, a briefing and a public paragraph",
+    "version": "r8-v2",
+    "as_of": "2026-11-05",
+    "note": "The three charts are drawn in the page from the course's own data: cf_targets.json (EIA, Electric Power Monthly, Table 6.07.B, 2025 monthly capacity factors) and town_year.json (the course's cleaned and normalized series of SPP's 2025 hourly demand and wind, EIA-930: implausible demand hours and frozen wind readings replaced, each series divided by its 2025 maximum, in thousandths). The briefing and the public paragraph report R6's fictional study; fromR6 holds its numbers, which the test recomputes with R6's model. Text in braces, such as {c90}, is filled from these numbers on the page.",
+    "license": "CC BY 4.0"
+  },
+  "fromR6": {
+    "about": "R6's model (assets/learn/r06-uncertainty-properly.js): 1,000 runs, seed 6, demand added hour by hour unless named; MW rounded to 5. The test recomputes every value.",
+    "claim": "515", "c10": "480", "c50": "505", "c90": "535", "f10": "495", "f50": "520", "f90": "550", "fm50": "500", "mHours": "20", "newMW": "60"
+  },
+  "bins": [
+    { "id": "holds", "label": "Holds as written", "sub": "the number, its scope and its conditions are all there", "color": "var(--lx-good)" },
+    { "id": "missing", "label": "Missing its conditions", "sub": "true in the study, but silent on where, when or under what assumptions", "color": "var(--lx-warn)" },
+    { "id": "over", "label": "Claims more than shown", "sub": "a cause, a certainty or a verdict the analysis cannot carry", "color": "var(--lx-bad)" }
+  ],
+  "findings": [
+    { "id": "cf", "bin": "holds", "text": "The U.S. utility-scale wind fleet's capacity factor was {cfYear}% in 2025 (EIA).", "why": "A number, the fleet (plants of 1 MW or more), the year and the source: a reader can check it and knows where it stops. [[capacity-factor|Capacity factor]]: output over full-power output." },
+    { "id": "pk", "bin": "holds", "text": "In SPP's 2025 data, the busiest hour of demand began at {peakHour} on {peakDay}.", "why": "Place, year, hour and data named; it says when, and claims nothing about why." },
+    { "id": "band", "bin": "holds", "text": "With central car uptake, the town's 2035 peak is {c10}–{c90} MW in about 8 of 10 model runs.", "why": "A range, the case it belongs to (central uptake: 15,000 electric cars in 2035) and what the range means. The model's other conditions belong in the next sentence." },
+    { "id": "third", "bin": "missing", "text": "Wind farms run at about a third of their capacity.", "why": "Which fleet, which year? True of the U.S. fleet in 2025 ({cfYear}%), but it moved from {cfLo}% to {cfHi}% month to month." },
+    { "id": "after", "bin": "missing", "text": "Demand peaks in the afternoon.", "why": "In summer, yes: all {sumDays} June to August days peaked between 12:00 and 18:00. In winter, {winMorn} of {winDays} days peaked before noon (SPP, 2025)." },
+    { "id": "cut", "bin": "missing", "text": "Managed charging cuts the 2035 peak by {mHours} MW.", "why": "Only with fast car uptake, at the [[median|median]], with demand added hour by hour. Adding the separate peaks ignores when charging happens, so it cannot show this effect." },
+    { "id": "unrel", "bin": "over", "text": "Wind power is unreliable.", "why": "A verdict the data cannot carry. They show a capacity factor that moved between {cfLo}% and {cfHi}% by month, which planners can use." },
+    { "id": "heat", "bin": "over", "text": "Hot weather caused 2025's peak.", "why": "The data show when the peak came, not why. Heat is likely, but showing a cause needs weather data and a method that separates it." },
+    { "id": "solve", "bin": "over", "text": "Managed charging will solve the town's peak problem.", "why": "“Will solve” claims a certainty and a goal the study never set. It shows a cut of about {mHours} MW in one case." }
+  ],
+  "charts": [
+    { "id": "axis",
+      "badTitle": "Wind collapses in late summer",
+      "goodTitle": "Wind's capacity factor peaks in spring and dips in late summer",
+      "question": "What makes the late-summer dip look so deep?",
+      "options": [
+        { "id": "a", "verdict": "bad", "text": "The months run in calendar order.", "why": "Calendar order is right for a seasonal pattern; it misleads nothing." },
+        { "id": "b", "verdict": "good", "text": "The axis starts at 20%, so the bars' lengths no longer compare the values.", "why": "On this axis March's bar is {truncRatio} times September's; the values differ by a factor of {realRatio}. Bars show length, so they start at zero." },
+        { "id": "c", "verdict": "ok", "text": "It shows the national fleet, not one farm.", "why": "Worth saying on the chart, but it does not deepen the dip." }
+      ],
+      "fixes": [
+        { "id": "zero", "key": true, "label": "Start the axis at zero" },
+        { "id": "scope", "label": "Name the fleet, the year and the source" },
+        { "id": "title", "label": "Make the title say what the data show" }
+      ]
+    },
+    { "id": "window",
+      "badTitle": "Wind output fell {winFall}% in two weeks",
+      "goodTitle": "SPP's daily wind output swung widely through 2025",
+      "partTitle": "SPP's daily wind output, {winStart} to {winEnd} 2025",
+      "question": "Why does wind seem to be falling?",
+      "options": [
+        { "id": "a", "verdict": "good", "text": "Two weeks were cut from a year, starting on a windy day and ending on a calm one.", "why": "The window makes a fall look like a trend. Over the whole year, daily output swung between {dLo}% and {dHi}% of the windiest hour, averaging {dMean}%." },
+        { "id": "b", "verdict": "bad", "text": "Output is shown as a share of the year's windiest hour.", "why": "A fair scale, if the axis says so. It does not create the fall." },
+        { "id": "c", "verdict": "ok", "text": "Daily averages hide the hours.", "why": "True, but the hours would show the same fall. The window creates it." }
+      ],
+      "fixes": [
+        { "id": "year", "key": true, "label": "Show the whole year" },
+        { "id": "mark", "label": "Mark the two weeks on it" },
+        { "id": "title", "label": "Make the title say what is measured" }
+      ]
+    },
+    { "id": "average",
+      "badTitle": "Prairie Town's demand peaks at {avgPeak} MW",
+      "goodTitle": "The average of 365 days, hour by hour, with the spread across days",
+      "partTitle": "The average of 365 days, hour by hour",
+      "question": "Why would planning for this line fail?",
+      "options": [
+        { "id": "a", "verdict": "bad", "text": "It is drawn in local time.", "why": "Local time is right for a daily pattern; the hours match what people live by." },
+        { "id": "b", "verdict": "ok", "text": "The line is too smooth to read.", "why": "Smoothness is the symptom, not the cause: averaging 365 days removed the spread." },
+        { "id": "c", "verdict": "good", "text": "It averages 365 days; the busiest days go far higher.", "why": "On 1 day in 10 the {p90Hour} hour is above {p90Max} MW, and the year's highest hour was {yearPeak} MW, against the average day's {avgPeak}." }
+      ],
+      "fixes": [
+        { "id": "spread", "key": true, "label": "Show the spread across days" },
+        { "id": "max", "label": "Add the year's highest hour" },
+        { "id": "title", "label": "Make the title name the line" }
+      ]
+    }
+  ],
+  "findingsStep": {
+    "fields": [
+      { "id": "axis", "label": "Chart 1, the wind fleet by month", "example": "In 2025, the U.S. utility-scale wind fleet's monthly capacity factor ranged from {cfLo}% in September to {cfHi}% in March (EIA)." },
+      { "id": "window", "label": "Chart 2, SPP's daily wind", "example": "In SPP's 2025 data, daily wind output ranged from {dLo}% to {dHi}% of the year's windiest hour, averaging {dMean}%; a two-week window cannot show a trend." },
+      { "id": "average", "label": "Chart 3, Prairie Town's average day", "example": "On Prairie Town's 2025 pattern, the average day peaks at {avgPeak} MW at {avgHour}, but on 1 day in 10 the {p90Hour} hour tops {p90Max} MW, and the year's highest hour was {yearPeak} MW." }
+    ]
+  },
+  "briefing": {
+    "facts": [
+      { "k": "The 2035 peak", "v": "{c10}–{c90} MW with central car uptake (15,000 electric cars), {f10}–{f90} MW with fast uptake (30,000): [[percentile|P10–P90]], about 8 in 10 of 1,000 runs. 450 MW in 2025." },
+      { "k": "Managed charging", "v": "A programme moving most charging after 23:00. With fast uptake, the [[median|median]] falls from {f50} to {fm50} MW when demand is added hour by hour; adding the separate peaks ignores timing and misses this." },
+      { "k": "Inputs", "v": "Varied in the runs: growth (0.4–1.6% a year), the year's weather (±4%) and a car's daily energy (7–13 kWh). Fixed: 2025's hourly pattern; cars charging at home." },
+      { "k": "Not in the model", "v": "A new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, the programme's cost and sign-up. Outcomes outside the ranges remain possible." }
+    ],
+    "fields": [
+      { "id": "decision", "label": "The decision", "hint": "What the council is deciding, in its own words." },
+      { "id": "finding", "label": "What we found", "hint": "The result as a range, what the range means, the case it belongs to and the 2025 value for scale." },
+      { "id": "programme", "label": "What the programme changes", "hint": "Its effect on the peak, with the case and the model it holds in." },
+      { "id": "depends", "label": "What it depends on", "hint": "The assumptions a council member could challenge." },
+      { "id": "leaves", "label": "What it leaves out", "hint": "What the study cannot say, next to what it can." },
+      { "id": "change", "label": "What would change this advice", "hint": "The signal that would make the briefing out of date." }
+    ],
+    "example": {
+      "decision": "Whether to fund a managed-charging programme before 2030.",
+      "finding": "In about 8 of 10 illustrative model runs, the 2035 peak is {c10}–{c90} MW with central car uptake and {f10}–{f90} MW with fast uptake, against 450 MW in 2025.",
+      "programme": "With fast uptake the programme lowers the median by about {mHours} MW, when demand is added hour by hour.",
+      "depends": "Growth, the year's weather and a car's daily energy, varied within illustrative ranges; 2025's daily pattern of demand; cars charging at home.",
+      "leaves": "A large new customer (a constant 60 MW would raise each 2035 figure by 60 MW), workplace charging, and the programme's cost and sign-up; outcomes outside the ranges remain possible.",
+      "change": "A connection request from a large customer, or car numbers on the fast path, would call for a new forecast."
+    }
+  },
+  "public": {
+    "limit": 150,
+    "example": "Prairie Town uses the most electricity on summer afternoons. We looked at how that busiest hour could change by 2035 as more people drive electric cars. If they spread at a middle pace, about 8 in 10 of our model runs put it between {c10} and {c90} megawatts, compared with 450 in 2025. If they spread fast, the range moves up to {f10} to {f90}, and higher values are possible. Charging cars late at night instead of in the early evening would keep it lower, by about {mHours} megawatts if car numbers grow fast. These numbers leave out a large new factory or business, which would add more, and we will update them as new car numbers come in.",
+    "jargon": ["P10", "P90", "P50", "percentile", "Monte Carlo", "median", "stochastic", "parameter", "scenario", "uptake", "capacity factor"]
+  },
+  "exemplars": {
+    "id": "r8-ex",
+    "title": "Two briefings for the same council",
+    "task": "Brief the city council on the 2035 peak, ahead of its vote on a managed-charging programme.",
+    "lines": true,
+    "answers": [
+      { "key": "weak", "label": "Weak answer", "level": "Developing", "parts": [
+        "Our analysis shows that ", { "text": "the town's peak will grow to {claim} MW by 2035", "note": "One number with “will”: no range, no case, no conditions." },
+        ". ", { "text": "Managed charging is the solution and should be funded", "note": "Advice past the evidence: the study measured a peak, not the programme's cost or sign-up." },
+        ". ", { "text": "See the attached figures for details", "note": "A council member cannot act on figures nobody walked them through." },
+        ". ", { "text": "The model has been validated", "note": "Asserted, not shown; and checking a model does not remove the future's uncertainty." },
+        "."
+      ] },
+      { "key": "good", "label": "Strong answer", "level": "Proficient", "parts": [
+        "Decision: ", { "text": "whether to fund a managed-charging programme before 2030", "note": "Opens with the council's decision, not the method." },
+        ".\nFinding: ", { "text": "in about 8 of 10 illustrative model runs, the 2035 peak is {c10}–{c90} MW with central car uptake and {f10}–{f90} MW with fast uptake, against 450 MW in 2025", "note": "Ranges with the case each belongs to, what a range means, and the 2025 value for scale." },
+        ".\nProgramme: ", { "text": "with fast uptake it lowers the median by about {mHours} MW, when demand is added hour by hour", "note": "The effect, with the case and the model condition it rests on." },
+        ".\nDepends on: ", { "text": "growth, the year's weather and a car's daily energy, varied within illustrative ranges; 2025's daily pattern; cars charging at home", "note": "The assumptions a member could challenge, with what the runs varied, in plain words." },
+        ".\nLeaves out: ", { "text": "a large new customer (a constant 60 MW would raise each figure by 60 MW), workplace charging, the programme's cost; outcomes outside the ranges remain possible", "note": "The limits beside the result, not at the end." },
+        ".\nWould change it: ", { "text": "a connection request from a large customer, or car numbers on the fast path", "note": "Signposts: what would make the advice out of date." },
+        "."
+      ] }
+    ],
+    "diff": [
+      { "label": "Opens with", "weak": "The model's result", "good": "The council's decision" },
+      { "label": "Numbers", "weak": "One, with “will”", "good": "Ranges, each with its case and its meaning" },
+      { "label": "Limits", "weak": "None", "good": "Beside the result" },
+      { "label": "Advice", "weak": "Beyond the evidence", "good": "What the evidence shows, and what would change it" }
+    ],
+    "note": "Both briefings are illustrative, about R6's fictional study; their numbers come from R6's model."
+  },
+  "chartsTable": [
+    { "chart": "Wind fleet by month", "misled": "An axis from 20% made a {realRatio}× difference look {truncRatio}×.", "fix": "Bars from zero; fleet, year and source named.", "finding": "Monthly [[capacity-factor|capacity factor]] ranged from {cfLo}% to {cfHi}% in 2025 (U.S. fleet, EIA)." },
+    { "chart": "SPP's daily wind", "misled": "Two weeks chosen from windy to calm looked like a fall of {winFall}%.", "fix": "The whole year, with the two weeks marked.", "finding": "Daily output swung between {dLo}% and {dHi}% of the windiest hour through 2025; two weeks cannot show a trend." },
+    { "chart": "Prairie Town's average day", "misled": "An average of 365 days peaked at {avgPeak} MW; no plan can use that alone.", "fix": "The spread across days, and the year's highest hour.", "finding": "The average day peaks at {avgPeak} MW; 1 day in 10 tops {p90Max} MW; the highest hour was {yearPeak} MW." }
+  ],
+  "boundary": {
+    "title": "Where the managed-charging finding holds",
+    "lede": "The briefing's programme sentence, as a box a council member can read in ten seconds.",
+    "holds": [
+      "demand is added hour by hour on 2025's pattern, and every day's charging follows the same managed profile;",
+      "car uptake is fast (30,000 cars in 2035); with central uptake the cut is smaller;",
+      "growth, weather and a car's daily energy stay inside the ranges R6 sampled."
+    ],
+    "leaves": [
+      "a large new customer;",
+      "workplace charging;",
+      "the programme's cost, and how many drivers sign up;",
+      "other years' patterns of demand."
+    ],
+    "source": "Model: R6's, 1,000 runs, seed 6. Data: SPP's 2025 hourly demand (EIA-930)."
+  },
+  "rubric": {
+    "id": "r8-rubric",
+    "code": "R8",
+    "title": "Rate your R8 practice against the rubric's Communication line",
+    "lede": "The course rubric's own words. Proficient asks for a six-page paper, which the capstone assesses; here, rate only the parts R8 practises.",
+    "competences": [
+      { "id": "communication", "look": "the parts R8 practises (one key figure that passes the checklist, findings with their conditions, limits beside the result, a briefing, and a public summary of at most 150 words)." }
+    ],
+    "note": "Your rating stays in this browser and rates R8's practice only. Proficient in full also needs the capstone's six-page paper."
+  },
+  "checklist": [
+    { "id": "one", "label": "One message", "text": "Each figure makes one point, and its title or caption says which." },
+    { "id": "axes", "label": "Honest axes", "text": "Units on every axis; bars start at zero; any zoom is labelled." },
+    { "id": "window", "label": "The whole picture", "text": "The time window and any selection said; the context shown or one click away." },
+    { "id": "spread", "label": "Spread, not only averages", "text": "A band or the range beside any average, and what the band means." },
+    { "id": "finding", "label": "Findings with conditions", "text": "Each finding: a number with its unit, the place, the time and the main assumption." },
+    { "id": "limits", "label": "Limits beside results", "text": "What the study leaves out, next to what it found, not at the end." },
+    { "id": "brief", "label": "The decision first", "text": "A briefing opens with the reader's decision and ends with what would change the advice." },
+    { "id": "public", "label": "A public version", "text": "Plain words, at most 150, read back to you by someone outside the field." },
+    { "id": "colour", "label": "Not colour alone", "text": "Colour-blind-safe colours, with labels or patterns that carry the meaning too." }
+  ]
+}

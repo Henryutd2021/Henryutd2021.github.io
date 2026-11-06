@@ -1063,7 +1063,7 @@ window.Quarto = {
 </tbody>
 </table>
 </div>
-<ul class="ckm-list"><li><b>At the demand peaks</b> (summer afternoons): both farms give more than their year averages.</li><li><b>At the net-load peaks</b> (evenings, winter nights and mornings): wind gives 0.56 of its average, and solar almost nothing. These are the hours the rest of the fleet must cover.</li><li><b>Against the benchmark:</b> the dataset's wind mean, 52.8% of its highest hour, is 19.0 percentage points above EIA's 2025 U.S. capacity factor of 33.8%; solar's 23.4% is close to EIA's 24.0%.</li><li><b>What the gap shows:</b> a definition difference (shares of the highest hour, not of capacity), plus SPP's own fleet and wind. These data cannot split the two, so the comparison checks a definition; it does not validate the numbers.</li><li><b>A like-for-like check</b> would divide SPP's 2025 wind output by its installed wind capacity: the same quantity, boundary and year as EIA's.</li><li><b>What survives, for the same hours:</b> rescaled linearly to 33.8% (each hour × 0.338 ÷ 0.5275), wind's MW and percentages fall by one factor, so its ratio to its own average in these 100 net-load hours stays 0.56.</li><li><b>If the hours are picked again</b> after rescaling, less wind raises net load in windy hours: 82 of the 100 hours stay, and the ratio becomes 0.71. Both are valid; say which you did.</li><li><b>What it leaves out:</b> one weather year, outages, imports and an <span class="lx-term" data-term="resource-adequacy">adequacy</span> model; averages over top hours screen, they do not measure a <span class="lx-term" data-term="capacity-credit">capacity credit</span>.</li></ul>
+<ul class="ckm-list"><li><b>At the demand peaks</b> (summer afternoons): both farms give more than their year averages.</li><li><b>At the net-load peaks</b> (evenings, winter nights and mornings): wind gives 0.56 of its average, and solar almost nothing. These are the hours the rest of the fleet must cover.</li><li><b>Against the benchmark:</b> the dataset's wind mean, 52.8% of its highest hour, is 19.0 percentage points above EIA's 2025 U.S. capacity factor of 33.8%; solar's 23.4% is close to EIA's 24.0%.</li><li><b>What the gap shows:</b> a definition difference (shares of the highest hour, not of capacity), plus SPP's own fleet and wind. These data cannot split the two, so the comparison checks a definition; it does not validate the numbers.</li><li><b>Like for like</b>, SPP's 2025 wind output (110.7 TWh, EIA-930) over its wind capacity as EIA counts it (33,385 MW, EIA-860M) is 37.9%: 4.1 points above the U.S. fleet's 33.8%. The definition explains 14.9 of the 19.0 points.</li><li><b>What survives, for the same hours:</b> rescaled linearly to 33.8% (each hour × 0.338 ÷ 0.5275), wind's MW and percentages fall by one factor, so its ratio to its own average in these 100 net-load hours stays 0.56.</li><li><b>If the hours are picked again</b> after rescaling, less wind raises net load in windy hours: 82 of the 100 hours stay, and the ratio becomes 0.71. Both are valid; say which you did.</li><li><b>What it leaves out:</b> one weather year, outages, imports and an <span class="lx-term" data-term="resource-adequacy">adequacy</span> model; averages over top hours screen, they do not measure a <span class="lx-term" data-term="capacity-credit">capacity credit</span>.</li></ul>
 <!-- ckm-sol-empirical:end -->
 <p class="ckm-dl"><a class="lx-btn small" href="notebooks/ck-m-solution-empirical.ipynb" download="">Worked code: empirical variant (.ipynb)</a></p>
 </div>
@@ -1258,6 +1258,11 @@ window.Quarto = {
 <td class="s"><a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">EIA, Electric Power Monthly, Table 6.07.B</a> · 2025 annual values, accessed 2 Nov 2026</td>
 </tr>
 <tr class="odd">
+<td class="n">37.9%</td>
+<td>SPP's 2025 wind capacity factor, like for like: 110.7 TWh of output (EIA-930) over 33,385 MW of wind capacity as EIA counts it (time-adjusted net summer capacity).</td>
+<td class="s"><a href="https://www.eia.gov/electricity/data/eia860m/">EIA-860M</a> · December 2025 inventory, accessed 5 Nov 2026</td>
+</tr>
+<tr class="even">
 <td class="n">Water brief, costs</td>
 <td>Water use, pump and tower sizes, energy per m³, tariff and demand charge; the supplied model's costs.</td>
 <td class="s">Illustrative</td>
@@ -1279,6 +1284,7 @@ window.Quarto = {
 <ul>
 <li>EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930): the Southwest Power Pool data behind the dataset and the three representative days.</li>
 <li>EIA. <a href="https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_6_07_b">Electric Power Monthly, Table 6.07.B</a>: capacity factors for utility-scale generators.</li>
+<li>EIA. <a href="https://www.eia.gov/electricity/data/eia860m/">Preliminary Monthly Electric Generator Inventory</a> (Form EIA-860M), December 2025: SPP's operating wind units, for the like-for-like check.</li>
 <li>HiGHS. <a href="https://ergo-code.github.io/HiGHS/">Documentation</a> of the open-source solver used on this page and, through SciPy, in the notebooks.</li>
 </ul>
 </div>

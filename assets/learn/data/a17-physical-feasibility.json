@@ -1,0 +1,98 @@
+{
+  "about": "A17 (Will it work on the wires?), step cards, wave W4, 2026-11-05. Five checks of a plan that balances on paper: a line's heating (apparent power and current), a feeder's voltage drop in the evening and its rise under midday rooftop solar (hosting capacity), a ramp an hourly schedule assumes, and the first second after a plant trips (inertia; grid-following and grid-forming inverters). Closed-form, first-estimate formulas only: no power-flow solving beyond M1's DC flows. M1's precomputed 12:00 dispatch (m01-dispatch-to-lmp.json, 'reference') and its day (lesson 0's real day, 3 September 2025, Southwest Power Pool shapes from EIA-930) and lesson 3's Plains Grid (03-balancing.json) are read from their own data files. Every network value below (voltages, ratings, ohms, set points, loads, delays) is illustrative; the voltage band and the real-world anchors carry their sources.",
+  "built": "2026-11-05",
+  "line": {
+    "about": "M1's Ridge–Town line at 12:00 with its limit set to 110 MW (M1's precomputed case). Here it is taken to be a 138 kV line whose wires can carry 120 MVA (illustrative).",
+    "id": "RT",
+    "kV": 138,
+    "ratingMVA": 120,
+    "q": { "min": 0, "max": 60, "step": 5, "start": 0, "unit": "Mvar" }
+  },
+  "feeder": {
+    "about": "Prairie Town's north feeder (illustrative): 12.47 kV (F6's feeder voltage), 8 km of overhead wire, all load and all rooftop solar lumped at the far end (a simple worst case). The substation's regulator holds 1.03 per unit, set so the far end stays in the band at the evening peak. Voltages in per unit of nominal; the drop through the last transformer and the service wires is left out.",
+    "kV": 12.47,
+    "km": 8,
+    "rOhmPerKm": 0.25,
+    "xOhmPerKm": 0.40,
+    "vSub": 1.03,
+    "loadPF": 0.95,
+    "evening": { "min": 1, "max": 6, "step": 0.5, "start": 2, "unit": "MW" },
+    "noonLoadMW": 1.0,
+    "pv": { "min": 0, "max": 8, "step": 0.25, "start": 0, "unit": "MW" },
+    "pvAbsorbPF": 0.95
+  },
+  "band": {
+    "lo": 0.95,
+    "hi": 1.05,
+    "volts": [114, 126],
+    "nominalV": 120,
+    "margin": 0.01,
+    "marginNote": "The voltage figures are first estimates. Within 0.01 per unit of a limit the gauges leave the verdict to an AC check; wherever they say within or outside, an AC calculation of the same feeder (exact for one load at the far end) agrees, for every slider setting (checked in the test).",
+    "source": "ANSI C84.1 Range A service voltage, as tabulated in NREL (2021), Table 1, p. 4",
+    "url": "https://docs.nlr.gov/docs/fy21osti/77156.pdf",
+    "asOf": "September 2021; read 5 November 2026"
+  },
+  "ramp": {
+    "about": "M1's one-bus day without the ramp rule: the gas combined-cycle plant follows what the town's flat 100 MW plant, wind and solar leave, hour by hour (the cheapest plan; M1's test and this lesson's test solve it as M1's linear program). The plant can change its output by at most 40 MW from one hour to the next (lesson 0's town.json, illustrative).",
+    "limitMWh": 40,
+    "start": 14
+  },
+  "inertia": {
+    "about": "Lesson 3's Plains Grid: 60 Hz, a 100 MW trip, stored rotational energy 6 to 30 GW·s (03-balancing.json). A 50 MW battery's headroom (lesson 3's fast response) answers in one of two assumed response profiles: through a grid-following inverter after it has measured the fall (0.5 s here, illustrative), or through a grid-forming inverter at once (a system view: both limited to the battery's 50 MW). These are assumptions, not properties of the inverter types: real responses depend on controls, available power and current limits. The first-second lines are a sketch at the swing equation's starting slope, before load relief and governors bend them.",
+    "delayS": 0.5,
+    "sketchS": 1,
+    "modes": [
+      { "key": "none", "label": "No inverter help" },
+      { "key": "gfl", "label": "Grid-following, assumed to wait 0.5 s" },
+      { "key": "gfm", "label": "Grid-forming, assumed to answer at once" }
+    ]
+  },
+  "sort": {
+    "bins": [
+      { "id": "ac", "label": "An AC check", "sub": "voltage and reactive power" },
+      { "id": "time", "label": "A ramp check", "sub": "at the time step, with finer steps" },
+      { "id": "dyn", "label": "A dynamics check", "sub": "the first seconds" }
+    ],
+    "cards": [
+      { "id": "thermal", "text": "A line at its MW limit passes its current rating.", "bin": "ac", "why": "Heating follows current, which counts reactive power as well as MW; a DC model carries MW only." },
+      { "id": "sag", "text": "The far end of a feeder sags below 0.95 per unit.", "bin": "ac", "why": "M1's model omits feeders, and its DC approximation does not calculate voltage-magnitude changes or reactive power." },
+      { "id": "rise", "text": "Midday rooftop solar lifts a feeder above 1.05 per unit.", "bin": "ac", "why": "Voltage rise comes from power flowing back through the feeder's resistance; only a voltage check sees it." },
+      { "id": "ramp", "text": "The gas plant is asked to climb 50 MW in one hour.", "bin": "time", "why": "Check output changes against ramp limits at the plan's time step; finer steps also show changes hidden inside an hour." },
+      { "id": "rocof", "text": "Frequency falls too fast after a plant trips.", "bin": "dyn", "why": "Hourly energy models balance MWh; the first seconds after a trip are not in them." }
+    ]
+  },
+  "real": {
+    "loudoun": {
+      "mw": 1500, "points": 60, "subs": 25, "kV": 230, "when": "July 2024", "place": "Loudoun County, Virginia",
+      "source": "NERC slides on large-load integration, posted by FERC (regional-grid dossier row 19, verified 2 November 2026)",
+      "url": "https://www.ferc.gov/sites/default/files/2025-04/Presentation%20NERC%20Seeks%20to%20Address%20Reliability%20Impacts%20from%C2%A0Large%20Load%20Integration_1.pdf",
+      "asOf": "posted 17 April 2025; event of July 2024"
+    },
+    "ercotInertia": {
+      "gws": 100,
+      "source": "ERCOT, Ancillary Services Study, final white paper (regional-grid dossier, verified 2 November 2026)",
+      "url": "https://www.ercot.com/files/docs/2024/10/07/ERCOT-Ancillary-Services-Study-Final-White-Paper.pdf",
+      "asOf": "7 October 2024"
+    },
+    "gfm": {
+      "source": "U.S. Department of Energy: grid-forming inverter overview",
+      "url": "https://www.energy.gov/cmei/systems/unifi-consortium",
+      "asOf": "page read 5 November 2026"
+    },
+    "inverters": {
+      "source": "Narang, Mahmud, Ingram and Hoke (2021), NREL/TP-5D00-77156, section 2.4, p. 8",
+      "url": "https://docs.nlr.gov/docs/fy21osti/77156.pdf",
+      "asOf": "September 2021; read 5 November 2026"
+    },
+    "atlas": {
+      "source": "U.S. Department of Energy, U.S. Atlas of Electric Distribution System Hosting Capacity Maps",
+      "url": "https://www.energy.gov/eere/us-atlas-electric-distribution-system-hosting-capacity-maps",
+      "asOf": "updated July 2025; read 5 November 2026"
+    },
+    "pjm5": {
+      "source": "PJM, energy market practices for intermittent resources (regional-grid dossier, verified 2 November 2026)",
+      "url": "https://www.pjm.com/-/media/DotCom/committees-groups/committees/oc/2022/20220222-special/20220222-item-06-energy-market-practices-for-intermittant-resources.ashx",
+      "asOf": "22 February 2022"
+    }
+  }
+}
