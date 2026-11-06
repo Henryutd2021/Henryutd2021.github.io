@@ -754,9 +754,11 @@
       pts.forEach(function (p, i) { (groups[find(i)] = groups[find(i)] || []).push(p); });
       const clusters = Object.keys(groups).map(function (k) {
         const g = groups[k];
-        return { pts: g, places: g.filter(function (p) { return p.pid; }).length, n: g.length };
-      }).sort(function (a, b) { return b.places - a.places || b.n - a.n; });
-      return { ents: ents, all: pts, main: clusters[0] || null, second: clusters.slice(1).find(function (c) { return c.n >= 3; }) || null };
+        const home = g.some(function (p) { return p.pid && D.places[p.pid].h; }) ? 1 : 0;
+        return { pts: g, places: g.filter(function (p) { return p.pid; }).length, n: g.length, home: home };
+      }).sort(function (a, b) { return b.places - a.places || b.home - a.home || b.n - a.n; });
+      return { ents: ents, all: pts, main: clusters[0] || null,
+               second: clusters.slice(1).find(function (c) { return c.n >= 3 && c.places >= 1; }) || null };
     }
     function boxOf(cl) {
       const lons = cl.pts.map(function (p) { return p.ll[0]; }), lats = cl.pts.map(function (p) { return p.ll[1]; });
@@ -820,17 +822,22 @@
           }
         });
       });
-      const seen = {};
+      const seen = {}, dots = [];
       A.ents.forEach(function (e) {
         e.pl.forEach(function (pid) {
           if (seen[pid]) return; seen[pid] = 1;
           const ll = D.places[pid].ll; if (!inBox(ll, box)) return;
           const q = pj(ll); if (!q) return;
-          el("circle", { cx: q[0].toFixed(1), cy: q[1].toFixed(1), r: (D.places[pid].h ? 4.4 : 3.2) * (big ? 1.4 : 1), class: "jr-mini-dot" + (D.places[pid].h ? " is-home" : ""),
+          const rr = (D.places[pid].h ? 4.4 : 3.2) * (big ? 1.4 : 1);
+          el("circle", { cx: q[0].toFixed(1), cy: q[1].toFixed(1), r: rr, class: "jr-mini-dot" + (D.places[pid].h ? " is-home" : ""),
             style: "--ch: var(--ch-" + (D.places[pid].lc || id) + ")" }, gr);
+          // label priority: places lived, then places on the chapter's stamps, then the rest
+          const stamped = A.ents.some(function (x) { return x.pl.indexOf(pid) >= 0 && x.ls; });
+          dots.push({ pid: pid, q: q, r: rr, rank: D.places[pid].h ? 0 : stamped ? 1 : 2 });
         });
       });
-      return { svg: svgEl, box: box };
+      const labels = el("g", { class: "jr-mini-labels" }, svgEl);
+      return { svg: svgEl, box: box, W: W, H: H, dots: dots, routes: gr, labels: labels };
     }
     // the world locator: every route of the chapter, and the frames of the panels
     function locator(id, A, boxes, W, H) {
@@ -861,31 +868,103 @@
       });
       return svgEl;
     }
+    function shortName(pid) {
+      const p = D.places[pid];
+      if (p.lb) return p.lb;
+      return p.n.split(", ")[0].replace(/ \(home\)$/, "").replace(/ (National|State) Park$/, "");
+    }
+    function caption(id, k, cl) {   // the chapter's own words for its panels (data), else the place lived in the cluster
+      const c = chapterOf[id];
+      if (c.cap && c.cap[k]) return c.cap[k];
+      const home = cl.pts.find(function (p) { return p.pid && D.places[p.pid].h; });
+      const any = cl.pts.find(function (p) { return p.pid; });
+      return home ? shortName(home.pid) + " and around" : any ? shortName(any.pid) + " and around" : "";
+    }
+    // once a panel is in the page: label sizes in screen pixels, labels placed without collisions, locator corner
+    function finishPanel(P, locEl) {
+      const bw = P.svg.getBoundingClientRect().width;
+      if (!bw) return;
+      const k = P.W / bw;   // view-box units per screen pixel
+      const fs = 11.5 * k, pad = 3 * k;
+      const taken = [];
+      let locRect = null;
+      if (locEl) {   // the corner with the fewest dots and route points under it
+        const lw = locEl.getBoundingClientRect().width * k, lh = lw / 2, m = 6 * k;
+        const pts = P.dots.map(function (d) { return d.q; });
+        P.routes.querySelectorAll("path").forEach(function (pe) {
+          const L = pe.getTotalLength ? pe.getTotalLength() : 0;
+          for (let t = 0; t <= 40 && L; t++) { const pt = pe.getPointAtLength(L * t / 40); pts.push([pt.x, pt.y]); }
+        });
+        const corners = { tl: [m, m], tr: [P.W - m - lw, m], bl: [m, P.H - m - lh], br: [P.W - m - lw, P.H - m - lh] };
+        let best = "br", bestN = Infinity;
+        ["br", "bl", "tr", "tl"].forEach(function (c) {
+          const o = corners[c];
+          const n = pts.filter(function (q) { return q[0] >= o[0] - 4 * k && q[0] <= o[0] + lw + 4 * k && q[1] >= o[1] - 4 * k && q[1] <= o[1] + lh + 4 * k; }).length;
+          if (n < bestN) { best = c; bestN = n; }
+        });
+        locEl.className = "jr-atlas-loc at-" + best;
+        locRect = { l: corners[best][0], t: corners[best][1], r: corners[best][0] + lw, b: corners[best][1] + lh };
+        taken.push(locRect);
+      }
+      P.dots.forEach(function (d) { taken.push({ l: d.q[0] - d.r, t: d.q[1] - d.r, r: d.q[0] + d.r, b: d.q[1] + d.r }); });
+      const hit = function (b) {
+        if (b.l < 2 * k || b.t < 2 * k || b.r > P.W - 2 * k || b.b > P.H - 2 * k) return true;
+        return taken.some(function (o) { return !(b.r <= o.l || b.l >= o.r || b.b <= o.t || b.t >= o.b); });
+      };
+      while (P.labels.firstChild) P.labels.removeChild(P.labels.firstChild);
+      const order = P.dots.slice().sort(function (a, b) { return a.rank - b.rank; });
+      let placed = 0;
+      order.forEach(function (d) {
+        if (placed >= 6) return;
+        const name = shortName(d.pid), tw = name.length * 0.56 * fs, th = fs;
+        const off = d.r + pad;
+        const tries = [[d.q[0] + off, d.q[1] + th * 0.35, "start"], [d.q[0] - off, d.q[1] + th * 0.35, "end"],
+                       [d.q[0], d.q[1] - off, "middle"], [d.q[0], d.q[1] + off + th * 0.8, "middle"]];
+        for (const t of tries) {
+          const l = t[2] === "start" ? t[0] : t[2] === "end" ? t[0] - tw : t[0] - tw / 2;
+          const b = { l: l - pad / 2, t: t[1] - th * 0.85, r: l + tw + pad / 2, b: t[1] + th * 0.25 };
+          if (hit(b)) continue;
+          const tx = el("text", { x: t[0].toFixed(1), y: t[1].toFixed(1), "text-anchor": t[2], class: "jr-mini-label", "font-size": fs.toFixed(1),
+            "stroke-width": (3 * k).toFixed(1) }, P.labels);
+          tx.textContent = name;
+          taken.push(b); placed++;
+          break;
+        }
+      });
+    }
     function atlasInto(host, id, big) {
       const A = chapterAtlas(id);
-      if (!A.main) return false;
+      if (!A.main) return null;
       host.classList.toggle("has-second", !!A.second);
       const W = big ? 900 : 480, H = big ? 600 : 340;
-      const mainWrap = document.createElement("div");
-      mainWrap.className = "jr-atlas-main";
+      const panel = function (P, cls, cap) {   // a caption line, then the map
+        const fig = document.createElement("span");
+        fig.className = "jr-atlas-panel";
+        const c = document.createElement("span");
+        c.className = "jr-atlas-cap"; c.textContent = cap;
+        const wrap = document.createElement("span");
+        wrap.className = cls;
+        wrap.appendChild(P.svg);
+        fig.appendChild(c); fig.appendChild(wrap);
+        fig.mapEl = wrap;
+        return fig;
+      };
       const m = localPanel(id, A, A.main, W, H, big);
-      mainWrap.appendChild(m.svg);
+      const mainWrap = panel(m, "jr-atlas-main", caption(id, 0, A.main));
       const boxes = [m.box];
-      let secWrap = null;
+      let secWrap = null, sP = null;
       if (A.second) {
-        const sP = localPanel(id, A, A.second, big ? 520 : 300, H, big);
-        secWrap = document.createElement("div");
-        secWrap.className = "jr-atlas-second";
-        secWrap.appendChild(sP.svg);
+        sP = localPanel(id, A, A.second, big ? 520 : 300, H, big);
+        secWrap = panel(sP, "jr-atlas-second", caption(id, 1, A.second));
         boxes.push(sP.box);
       }
-      const loc = document.createElement("div");
-      loc.className = "jr-atlas-loc";
+      const loc = document.createElement("span");
+      loc.className = "jr-atlas-loc at-br";
       loc.appendChild(locator(id, A, boxes, big ? 300 : 200, big ? 150 : 100));
-      mainWrap.appendChild(loc);
+      mainWrap.mapEl.appendChild(loc);
       host.appendChild(mainWrap);
       if (secWrap) host.appendChild(secWrap);
-      return true;
+      return function finish() { finishPanel(m, loc); if (sP) finishPanel(sP, null); };
     }
     // the dialog that shows a chapter's maps larger (native modal dialog: focus stays inside, Escape closes it)
     let dlg = null, dlgFrom = null;
@@ -908,11 +987,15 @@
       const body = dlg.querySelector(".jr-dlg-body");
       while (body.firstChild) body.removeChild(body.firstChild);
       dlg.style.setProperty("--ch", "var(--ch-" + id + ")");
-      atlasInto(body, id, true);
+      const fin = atlasInto(body, id, true);
       dlgFrom = from;
       if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+      if (fin) fin();
       dlg.querySelector(".jr-dlg-close").focus({ preventScroll: true });
     }
+    const finishers = [];   // labels and locator corners depend on the drawn size: redone on resize
+    let rtPages = null;
+    window.addEventListener("resize", function () { window.clearTimeout(rtPages); rtPages = window.setTimeout(function () { finishers.forEach(function (f) { f(); }); }, 200); });
     function drawPages() {
       const holders = root.querySelectorAll(".jr-pg-map[data-ch]");
       if (!holders.length) return;
@@ -923,9 +1006,13 @@
           btn.type = "button"; btn.className = "jr-atlas jr-atlas-btn";
           btn.setAttribute("aria-haspopup", "dialog");
           btn.setAttribute("aria-label", "Open a larger map of the chapter " + chapterOf[id].n);
-          if (!atlasInto(btn, id, false)) return;
+          const fin = atlasInto(btn, id, false);
+          if (!fin) return;
           btn.addEventListener("click", function () { openAtlas(id, btn); });
           h.appendChild(btn);
+          h.classList.add("is-drawn");
+          fin();
+          finishers.push(fin);
           h.removeAttribute("aria-hidden");
           h.classList.add("is-drawn");
         });
