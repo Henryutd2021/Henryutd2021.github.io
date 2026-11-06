@@ -41,6 +41,12 @@
   "lesson": "K3",
   "href": "k03-discounting.html"
  },
+ "anticipation-effect": {
+  "term": "Anticipation",
+  "short": "When people change their behaviour before a programme starts because they know it is coming.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "api-key": {
   "term": "API key",
   "short": "A private code that identifies you to an online data service; treat it like a password and keep it out of shared files.",
@@ -436,6 +442,12 @@
   "short": "A financial or other tie that could bias, or seem to bias, a researcher's work, and so must be declared.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "confounding": {
+  "term": "Confounding",
+  "short": "When something other than the programme, such as a second change at the same time, also differs between the groups and moves the outcome.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
  },
  "congestion": {
   "term": "Congestion",
@@ -928,6 +940,12 @@
   "short": "The committee that reviews research with people before it starts; in the United States, an institutional review board.",
   "lesson": "R9",
   "href": "r09-integrity-stakeholders.html"
+ },
+ "event-study": {
+  "term": "Event study",
+  "short": "A difference-in-differences estimated period by period around the start date, so the periods before the start can be checked for parallel trends.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
  },
  "evidence-ladder": {
   "term": "Evidence ladder",
@@ -1955,6 +1973,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "parallel-trends": {
+  "term": "Parallel trends",
+  "short": "The assumption behind difference-in-differences: without the programme, the treated and comparison groups would have changed by the same amount.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "parameter": {
   "term": "Parameter",
   "short": "A number a model is given and takes as it is, such as demand or a plant's running cost, as opposed to a decision it makes.",
@@ -2471,6 +2495,12 @@
   "lesson": "M4",
   "href": "m04-storage-multienergy.html"
  },
+ "selection-bias": {
+  "term": "Selection bias",
+  "short": "A false effect that appears when the people or places that take up a programme differ, before it starts, from those that do not.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "sensitivity-analysis": {
   "term": "Sensitivity analysis",
   "short": "Changing a model's inputs one at a time and re-solving, to see which inputs the answer depends on.",
@@ -2536,6 +2566,12 @@
   "short": "Fuel that has been used in a reactor and taken out; it is solid, highly radioactive and still warm, and is kept first in water pools, later in dry casks.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "spillover-effect": {
+  "term": "Spillover",
+  "short": "When a programme also changes the comparison group, for example neighbours copying a habit or projects moving across a border.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
  },
  "spp": {
   "term": "SPP (Southwest Power Pool)",

@@ -1368,10 +1368,13 @@
    "tier": "analyst",
    "code": "CK-A",
    "title": "Analyst checkpoint: an auditable spreadsheet for a new case",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "ck-a-spreadsheet.html",
    "scales": [],
-   "form": "checkpoint"
+   "id": "ck-a-spreadsheet",
+   "minutes": 150,
+   "form": "checkpoint",
+   "short": "Analyst checkpoint"
   },
   {
    "tier": "analyst",
@@ -1527,9 +1530,13 @@
    "tier": "modeler",
    "code": "M14",
    "title": "Did it work? Learning from data with regression and natural experiments",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m14-did-it-work.html",
+   "scales": [],
+   "id": "m14-did-it-work",
+   "minutes": 40,
+   "form": "cards",
+   "short": "Regression and natural experiments"
   },
   {
    "tier": "modeler",
