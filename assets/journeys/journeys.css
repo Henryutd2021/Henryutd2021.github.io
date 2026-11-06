@@ -275,9 +275,9 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-mode-seg { min-width: 3px; }
 .jr-mode-seg + .jr-mode-seg { box-shadow: inset 2px 0 0 var(--bg); }
 .jr-modes .is-plane { --m: #2563eb; } .jr-modes .is-car { --m: #ea580c; } .jr-modes .is-train { --m: #0d9488; }
-.jr-modes .is-other { --m: #94a3b8; } .jr-modes .is-bike { --m: #a21caf; } .jr-modes .is-foot { --m: #65a30d; }
+.jr-modes .is-other { --m: #94a3b8; } .jr-modes .is-bus { --m: #ca8a04; } .jr-modes .is-bike { --m: #a21caf; } .jr-modes .is-foot { --m: #65a30d; }
 body.quarto-dark .jr-modes .is-plane { --m: #3f83e8; } body.quarto-dark .jr-modes .is-car { --m: #dc6a2c; } body.quarto-dark .jr-modes .is-train { --m: #139484; }
-body.quarto-dark .jr-modes .is-other { --m: #64748b; } body.quarto-dark .jr-modes .is-bike { --m: #b45bc8; } body.quarto-dark .jr-modes .is-foot { --m: #5f9a1c; }
+body.quarto-dark .jr-modes .is-other { --m: #64748b; } body.quarto-dark .jr-modes .is-bus { --m: #c08316; } body.quarto-dark .jr-modes .is-bike { --m: #b45bc8; } body.quarto-dark .jr-modes .is-foot { --m: #5f9a1c; }
 .jr-mode-seg { background: var(--m); }
 .jr-mode-legend { list-style: none; margin: .6rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem 1.3rem; font-size: .84rem; color: var(--ink-2); }
 .jr-mode-legend li { display: inline-flex; align-items: center; gap: .4rem; }

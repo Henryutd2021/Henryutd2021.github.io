@@ -223,7 +223,7 @@
     io.observe(box);
   } else start();
 
-  const BY = { plane: ["airplane", "by plane"], train: ["train-front", "by train"], car: ["car-front", "by car"],
+  const BY = { plane: ["airplane", "by plane"], train: ["train-front", "by train"], bus: ["bus-front", "by bus"], car: ["car-front", "by car"],
                bike: ["bicycle", "by bicycle"], foot: ["person-walking", "on foot"] };
   const TILT = [-4, 2.5, -1.5, 3.5, -2.5, 1.5];
 
@@ -420,7 +420,7 @@
         '<ul class="jr-c-visits">' + items + "</ul>";
     }
     function routeCard(e) {
-      const parts = (e.r || []).map(function (r) { return r.b ? BY[r.b][1] : r.m === "flight" ? "by plane" : r.m === "ground" ? "by road or rail" : "way of travel not recorded"; });
+      const parts = (e.r || []).map(function (r) { return r.bw ? r.bw : r.b ? BY[r.b][1] : r.m === "flight" ? "by plane" : r.m === "ground" ? "by road or rail" : "way of travel not recorded"; });
       const kinds = parts.filter(function (x, i) { return parts.indexOf(x) === i; }).join(", then ");
       const km = (e.r || []).reduce(function (s, r) { return s + (r.km || 0); }, 0);
       const st = stamps(e);
