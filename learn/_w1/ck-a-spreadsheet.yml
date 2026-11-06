@@ -1,0 +1,7 @@
+# Sidecar for CK-A (ck-a-spreadsheet), builder learn-w5-g, 2026-11-06. Read by scripts/build_learn.py.
+id: ck-a-spreadsheet
+lesson: CK-A
+requests:
+  - "path.yml: CK-A's curriculum prerequisites are A1, A4, A13 and A15 (curriculum v2 §3.3). A13 (learn-w5-b) and A15 (learn-w5-a) are not live on this branch, so CK-A lists after: [A1, A4]; make it [A1, A4, A13, A15] at the W5 merge, and link A13 from the case's 'who pays' part (task 6 names A13 in its 'draws on' line already)."
+  - "The case is the school's solar-plus-storage project only. The town heat-pump programme would need A15's numbers (not live); it can become a second variant later, as CK-M has two."
+  - "Downloads: assets/learn/data/ck-a-starter.xlsx and ck-a-worked.xlsx (XLSX with live formulas, written with ck-a-spreadsheet.json by scripts/build_learn_cka_sheet.py in the ResearchPortfolio folder; standard library only). assets/learn/data/ is in _quarto.yml's resources, so both are published."

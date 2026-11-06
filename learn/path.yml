@@ -823,7 +823,21 @@
 - {kind: lesson, tier: analyst, code: X2, title: "What happens to gas, coal and oil systems in a transition, and can carbon be removed?"}
 - {kind: lesson, tier: analyst, code: X4, title: "How are energy rules made?"}
 - {kind: lesson, tier: analyst, code: X5, title: "How are big energy projects actually financed?"}
-- {kind: lesson, tier: analyst, code: CK-A, form: checkpoint, title: "Analyst checkpoint: an auditable spreadsheet for a new case"}
+# CK-A, builder learn-w5-g (wave W5). Curriculum prerequisites A1, A4, A13, A15; A13 and A15 are built in parallel
+# (learn-w5-b, learn-w5-a): add them to `after` at the W5 merge.
+- kind: lesson
+  id: ck-a-spreadsheet
+  code: CK-A
+  tier: analyst
+  form: checkpoint
+  icon: check
+  status: active
+  minutes: 150
+  title: "Analyst checkpoint: an auditable spreadsheet for a new case"
+  subtitle: "About two and a half hours: build a spreadsheet for a school's rooftop solar and battery, say who pays and who benefits, test the result, then check it against a worked workbook"
+  short: "Analyst checkpoint"
+  does: "Build an auditable spreadsheet for a new case (a school's solar-plus-storage project): state the boundary, the assumptions with sources, who pays and who benefits, and a sensitivity of the main result. A worked workbook with live formulas, an assumptions log and the course rubric open when you submit."
+  after: [A1, A4]
 - {kind: lesson, tier: analyst, code: SB3, form: sandbox, title: "City Planner"}
 - {kind: lesson, tier: analyst, code: C3, form: capstone, title: "Prairie City 2040: write the city's energy plan"}
 - kind: lesson
