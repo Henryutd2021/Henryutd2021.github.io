@@ -7,9 +7,9 @@
     "set": "teaching"
   },
   "designs": [
-    { "key": "kwh", "name": "Per kWh", "long": "a charge on every kWh", "note": "households pay in proportion to the electricity they use" },
-    { "key": "fixed", "name": "Fixed charge", "long": "the same yearly charge for every household", "note": "every household pays the same dollars" },
-    { "key": "income", "name": "By income", "long": "a charge in proportion to household income", "note": "every household pays the same share of its income; real income-based designs use a few income tiers" }
+    { "key": "kwh", "name": "Per kWh", "lower": "per kWh", "long": "a charge on every kWh", "note": "households pay in proportion to the electricity they use" },
+    { "key": "fixed", "name": "Fixed charge", "lower": "fixed charge", "long": "the same yearly charge for every household", "note": "every household pays the same dollars" },
+    { "key": "income", "name": "By income", "lower": "by income", "long": "a charge in proportion to household income", "note": "every household pays the same share of its income; real income-based designs use a few income tiers" }
   ],
   "bands": {
     "five": { "name": "Five groups", "groups": [["g1"], ["g2"], ["g3"], ["g4"], ["g5"]] },

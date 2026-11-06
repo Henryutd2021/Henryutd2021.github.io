@@ -88,7 +88,7 @@
   function transferLine(D, PC, costM, key) {
     if (costM === 0) return "With no cost, nothing moves between groups.";
     var x = moved(D, PC, costM, key), gain = x.t.rows.filter(function (r) { return r.group > 0; }).length;
-    return "Against per kWh, " + design(D, key).name.toLowerCase() + " moves **" + moneyM(x.up / 1e6) + "** a year onto " + (["no group", "one group", "two groups", "three groups", "four groups"][gain]) + "; the total stays " + moneyM(costM, 0) + ", so the money moved adds up to zero.";
+    return "Against per kWh, " + design(D, key).lower + " moves **" + moneyM(x.up / 1e6) + "** a year onto " + (["no group", "one group", "two groups", "three groups", "four groups"][gain]) + "; the total stays " + moneyM(costM, 0) + ", so the money moved adds up to zero.";
   }
   var TRANSFER_SAW = "Who pays changes; what the plan costs does not. A [[transfer|transfer]] moves money between groups and uses up nothing, so it never adds to the plan's real cost.";
   function groupLine(D, PC, costM, key, bands) {
@@ -222,10 +222,10 @@
         bs.push({ x0: i + 0.5, x1: i + 0.5 + w, y0: 0, y1: 100 * r.burdenAfter, color: "var(--lx-tier-2)" });
       });
       Pl.render({
-        x: { min: 0, max: a.rows.length, ticks: a.rows.map(function (r, i) { return [i + 0.5, SH[i]]; }) },
+        x: { min: 0, max: a.rows.length, ticks: a.rows.map(function (r, i) { return [i + 0.5, SH[i]]; }), ticksN: a.rows.map(function (r, i) { return [i + 0.5, SH[i].replace("%", "")]; }) },
         y: { min: 0, max: 20, step: 5, fmt: function (v) { return v + "%"; }, unit: "share of income" }, height: 220, heightN: 200, bars: bs,
         refs: [{ y: 100 * D.lines.high, label: "6%", dash: "5 4", color: "var(--lx-warn)" }, { y: 100 * D.lines.severe, label: "10%", dash: "5 4", color: "var(--lx-bad)" }],
-        legend: [{ label: "Burden before", color: "var(--lx-ink-3)" }, { label: "After the plan's charge (" + design(D, a.design).name.toLowerCase() + ")", color: "var(--lx-tier-2)" }],
+        legend: [{ label: "Burden before", color: "var(--lx-ink-3)" }, { label: "After the plan's charge (" + design(D, a.design).lower + ")", color: "var(--lx-tier-2)" }],
         aria: "Energy burden by income group before and after the charge: " + a.rows.map(function (r, i) { return SH[i] + " " + pct(r.burden) + " to " + pct(r.burdenAfter); }).join(", ") + ".",
         text: { head: ["Group", "Before", "After"], rows: a.rows.map(function (r, i) { return [SH[i], pct(r.burden), pct(r.burdenAfter)]; }) }
       });
@@ -270,7 +270,7 @@
           function paint() {
             paintSeg(S.versus); var a = split(D, PC, S.costM, "kwh"), b = split(D, PC, S.costM, S.versus), t = A13.transfers(a, b);
             lg.innerHTML = "";
-            LX.Ledger(lg, { caption: "Each group's yearly total, $M (rounded); money moved = " + design(D, S.versus).name.toLowerCase() + " minus per kWh.", columns: ["Group", "Per kWh", design(D, S.versus).name, "Money moved"],
+            LX.Ledger(lg, { caption: "Each group's yearly total, $M (rounded); money moved = " + design(D, S.versus).lower + " minus per kWh.", columns: ["Group", "Per kWh", design(D, S.versus).name, "Money moved"],
               rows: a.rows.map(function (r, i) { return { head: SH[i], cells: [moneyM(r.group / 1e6), moneyM(b.rows[i].group / 1e6), { text: signed0(t.rows[i].group / 1e6), cls: t.rows[i].group > 0 ? "up" : "down" }] }; })
                 .concat([{ head: "= All", cells: [moneyM(a.total / 1e6), moneyM(b.total / 1e6), signed0(t.sum / 1e6)], total: true }]), cls: "a13-led" });
             line.innerHTML = bold(transferLine(D, PC, S.costM, S.versus));
@@ -288,7 +288,7 @@
             S.bands = k; seen[k] = true; Object.keys(b).forEach(function (j) { b[j].setAttribute("aria-pressed", String(j === k)); });
             var a = split(D, PC, S.costM, S.design), B = D.bands[k], g = A13.regroup(a, B.groups, k === "five" ? SH : B.labels);
             tb.innerHTML = "";
-            LX.Ledger(tb, { caption: "Burden = the group's total home energy spending ÷ its total income; after: with the plan's charge (" + design(D, S.design).name.toLowerCase() + ", " + moneyM(S.costM, 0) + ").",
+            LX.Ledger(tb, { caption: "Burden = the group's total home energy spending ÷ its total income; after: with the plan's charge (" + design(D, S.design).lower + ", " + moneyM(S.costM, 0) + ").",
               columns: ["Group", "Households", "Burden before", "Burden after"], rows: g.map(function (x) { return { head: x.label, cells: [fmtN(x.households), pct(x.burden), pct(x.burdenAfter)] }; }), cls: "a13-led" });
             line.innerHTML = bold(groupLine(D, PC, S.costM, S.design, k));
             if (seen.five && seen.two) { api.done(); api.saw(groupSaw(D, PC)); }
@@ -402,7 +402,7 @@
       LX.Boundary(H("div", { class: "lx-xcard" }, xhost), { title: "Where these estimates hold",
         holds: ["The coefficients you set are right for the place and the year.", "Each group's average stands for its households.", "Lost jobs are not refilled elsewhere in the county."],
         leaves: ["Responses to prices, moves, retraining and new firms.", "Health, emissions and what the plan delivers to each group.", "Who gets a say: procedure, not only money."],
-        source: "Accounting: LX.A13 (screening estimates). Prairie City from the course's city data; Ridge County fictional." });
+        source: "Accounting: this page's screening model. Prairie City from the course's shared city data; Ridge County fictional." });
     }
 
     LX.demo(root, function (state) {

@@ -393,7 +393,7 @@
               if (S.motor) bs.push({ x0: i + 0.5, x1: i + 0.5 + w, y0: 0, y1: 100 * g.transport, color: "var(--lx-pk)", op: 0.75 });
             });
             Pl.render({
-              x: { min: 0, max: G.length, ticks: G.map(function (g, i) { return [i + 0.5, short[i]]; }) },
+              x: { min: 0, max: G.length, ticks: G.map(function (g, i) { return [i + 0.5, short[i]]; }), ticksN: G.map(function (g, i) { return [i + 0.5, short[i].replace("%", "")]; }) },
               y: { min: 0, max: 16, step: 4, fmt: function (v) { return v + "%"; }, unit: "share of income" }, height: 230, heightN: 210,
               bars: bs,
               refs: [{ y: 100 * D.burden.high, label: "6%: high", dash: "5 4", color: "var(--lx-warn)" }, { y: 100 * D.burden.severe, label: "10%: severe", dash: "5 4", color: "var(--lx-bad)" }],
