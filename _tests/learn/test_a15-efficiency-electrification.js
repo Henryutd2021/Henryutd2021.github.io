@@ -25,6 +25,8 @@ const M = require(L(ID + ".js"));
 const RAW = fs.readFileSync(L("data/" + ID + ".json"), "utf8");
 const D = JSON.parse(RAW);
 const C = require(L("data/prairie-city.json"));
+const E0 = require(L("data/e0.json"));
+M.link(D, E0);
 const JS = fs.readFileSync(L(ID + ".js"), "utf8");
 const SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/" + ID + ".yml"), "utf8");
 const QPATH = path.join(SITE, "learn", ID + ".qmd");
@@ -60,7 +62,8 @@ ok(!/"(substationMW|peak2025MW|households|heatedFloorM2|uaMWperC|electricityCent
 ok(!/\b(250|230|60) MW\b|144\.4|111\.9|48\.8|14\.44|11\.19|14\.295|212\.8|192\.4/.test(JS.replace(/\/\/[^\n]*/g, "")), "the script retypes no Prairie City number (limits, prices, peaks)");
 const e2 = require(L("data/e2-plains-grid.json")), c13 = require(L("data/13-capstone.json"));
 ok(D.deflator.index["2024"] === c13.deflator.index["2024"] && D.deflator.index["2025"] === c13.deflator.index["2025"] && /2024 125\.587, 2025 128\.893/.test(e2.sources["bea-nipa-119"].text), "BEA's 2024 and 2025 deflator values equal the course's");
-ok(/2016 98\.241; 2019 103\.979; 2022 118\.026; 2024 125\.587; 2025 128\.893/.test(D.sources["bea-nipa-119"].where), "every deflator value is in the source line");
+ok(/2008 88\.013; 2016 98\.241; 2022 118\.026; 2024 125\.587; 2025 128\.893/.test(D.sources["bea-nipa-119"].where) && D.deflator.index["2008"] === 88.013 && D.deflator.index["2022"] === 118.026, "every deflator value is in the source line (2008 and 2022 as A18 has them)");
+ok(E0.home.hp.high.capex === 8620 && E0.home.hp.capexYear === 2022 && D.measures.filter(m => m.key === "hp")[0].cost2022.efficient === "e0" && !/8,?620/.test(RAW.replace(/"where": "[^"]*"/g, "")), "the heat pump's cost is read from e0.json (SB0's and A18's $8,620, 2022 dollars), not copied");
 const F3 = require(L("data/f03-energy-services.json"));
 ok(C.cop.anchorCOP === F3.heatpump.anchorCOP && C.cop.anchorC === F3.heatpump.anchorC && C.cop.supplyC === F3.heatpump.supplyC && C.cop.cutoutC === F3.heatpump.cutoutC, "the COP curve is F3's");
 
@@ -83,6 +86,8 @@ ok(near(M.prices(C).residential, P.res) && near(M.prices(C).commercial, P.com) &
 const defl = y => 128.893 / D.deflator.index[String(y)];
 const MS = {}; D.measures.forEach(m => MS[m.key] = m);
 // units and savings, recomputed here
+const CUT = (C.vintages.pre1980.heatKWhPerM2 - C.vintages.y1980_2009.heatKWhPerM2) / C.vintages.pre1980.heatKWhPerM2;
+ok(near(M.weatherCut(C), CUT) && near(CUT, 35 / 115), "weatherization brings a pre-1980 home from 115 to 80 kWh per m2 (prairie-city.json's vintages), as A18 does");
 function mine(key) {
   let units = 0, save = 0;
   C.districts.forEach(d => {
@@ -92,43 +97,42 @@ function mine(key) {
     let n, s;
     switch (key) {
       case "led": n = d.commercialM2 * 0.4 / 10; s = (63.1 - 27.4 * 5082 / 3686) * 3541 / 1e6; break;
-      case "hpwh": n = d.heating.resistance + d.heating.heatPump; s = wh * (1 / 0.9 - 1 / 3.33); break;
+      case "hpwh": n = d.heating.resistance + d.heating.heatPump; s = wh * (1 / 0.92 - 1 / 3.73); break;
       case "hp": n = d.heating.resistance; s = heat * (1 - 1 / SCOP); break;
-      case "envEl": n = d.heating.resistance * d.envelope.pre1980; s = pre * 0.3636; break;
-      case "wallsEl": n = d.heating.resistance * d.envelope.pre1980; s = pre * (0.4353 - 0.3636); break;
-      case "condensing": n = d.heating.gas; s = heat * (1 / 0.8 - 1 / 0.95); break;
-      case "envGas": n = d.heating.gas * d.envelope.pre1980; s = pre / 0.8 * 0.4004; break;
-      case "wallsGas": n = d.heating.gas * d.envelope.pre1980; s = pre / 0.8 * (0.4854 - 0.4004); break;
+      case "weatherEl": n = d.heating.resistance * d.envelope.pre1980; s = pre * CUT; break;
+      case "condensing": n = d.heating.gas; s = heat * (1 / 0.8 - 1 / 0.99); break;
+      case "weatherGas": n = d.heating.gas * d.envelope.pre1980; s = pre * CUT / 0.8; break;
     }
     units += n; save += n * s;
   });
   return { units, save };
 }
-ok(C.homes.recsWNC.waterHeatGasMMBtu === 17.4 && C.homes.gasWaterHeaterEfficiency === 0.6 && C.homes.electricWaterHeaterEfficiency === 0.9 && C.homes.furnaceEfficiency === 0.8, "the city's hot water and efficiencies (as recomputed here)");
-ok(MS.wallsEl.saving === Math.round((0.4353 - 0.3636) * 1e4) / 1e4 && MS.wallsGas.saving === Math.round((0.4854 - 0.4004) * 1e4) / 1e4, "the walls' extra points = ResStock's packages with and without walls");
-const COST = { led: (22.22 + 0.4 * 66) * 5082 / 3686 * defl(2022), hpwh: ((870 + 2230) / 2 - (500 + 1310) / 2) * defl(2022), hp: (6940 - 1480) * defl(2022), envEl: (1827 + 730) * defl(2019),
-  wallsEl: 2106 * defl(2019), condensing: (4150 - 3690) * defl(2022), envGas: (1827 + 730) * defl(2019), wallsGas: 2106 * defl(2019) };
-const LIFE = { led: 54000 / 3541, hpwh: 15.1, hp: 15.3, envEl: 25, wallsEl: 25, condensing: 22.5, envGas: 25, wallsGas: 25 };
+ok(C.homes.recsWNC.waterHeatGasMMBtu === 17.4 && C.homes.gasWaterHeaterEfficiency === 0.6 && C.homes.furnaceEfficiency === 0.8, "the city's hot water and furnace efficiency (as recomputed here)");
+const COST = { led: (22.22 + 0.4 * 66) * 5082 / 3686 * defl(2022), hpwh: (1715 - 905) * defl(2022), hp: (8620 - 1480) * defl(2022), weatherEl: 4695 * defl(2008),
+  condensing: (4320 - 3690) * defl(2022), weatherGas: 4695 * defl(2008) };
+const LIFE = { led: 54000 / 3541, hpwh: 15.1, hp: 15.3, weatherEl: 20, condensing: 22.5, weatherGas: 20 };
+const EXTRA = { led: 0, hpwh: 0, hp: (150 - 50) * defl(2022), weatherEl: 0, condensing: (130 - 120) * defl(2022) + (725 - 386) / 1000 * P.res, weatherGas: 0 };
 Object.keys(COST).forEach(k => {
   const u = M.unitsAndSave(C, D, MS[k]), m = mine(k);
   ok(rel(u.units, m.units, 1e-12) && rel(u.save, m.save, 1e-12), k + ": units and MWh saved recomputed (" + Math.round(m.units) + " units)");
-  ok(rel(M.unitCost(D, MS[k]), COST[k], 1e-12) && rel(M.lifeOf(MS[k]), LIFE[k], 1e-12), k + ": cost " + COST[k].toFixed(2) + " and life " + LIFE[k].toFixed(2));
+  ok(rel(M.unitCost(D, MS[k]), COST[k], 1e-12) && rel(M.lifeOf(MS[k]), LIFE[k], 1e-12) && near(M.extraYear(C, D, MS[k]), EXTRA[k], 1e-9), k + ": cost " + COST[k].toFixed(2) + ", life " + LIFE[k].toFixed(2) + ", yearly extra " + EXTRA[k].toFixed(2));
 });
 ok(Math.round(mine("hp").units) === C.city.totals.heating.resistance && Math.round(mine("hpwh").units) === C.city.totals.heating.resistance + C.city.totals.heating.heatPump, "units equal the city's homes by heating fuel");
+ok(MS.hpwh.uef === 3.73 && MS.hpwh.baseUEF === 0.92 && MS.condensing.afue === 0.99 && /\$1,715/.test(D.sources["eia-rdm-2026"].where) && /\$4,695/.test(D.sources["ornl-wap-2014"].where), "the shared measures carry A18's values and sources");
 const RATES = range(D.rate), REB = range(D.rebound);
 ok(RATES.length === 9 && REB.length === 7 && D.rate.start === 0.06 && /6% real/.test(D.sources["lbnl-cose-2018"].where), "rates 2-10% (LBNL's 6% the default); rebound 0-30%");
 let tie = false;
 RATES.forEach(r => REB.forEach(rb => ["el", "gas"].forEach(cr => {
   const list = M.curve(C, D, { rate: r, rebound: rb }, cr);
   list.forEach((b, i) => {
-    const m = mine(b.key), net = m.save / m.units * (MS[b.key].household ? 1 - rb : 1), cse = COST[b.key] * crf(r, LIFE[b.key]) / net, pr = cr === "gas" ? P.gas : MS[b.key].price === "commercial" ? P.com : P.res;
+    const m = mine(b.key), net = m.save / m.units * (MS[b.key].household ? 1 - rb : 1), cse = (COST[b.key] * crf(r, LIFE[b.key]) + EXTRA[b.key]) / net, pr = cr === "gas" ? P.gas : MS[b.key].price === "commercial" ? P.com : P.res;
     if (!(rel(b.cse, cse, 1e-10) && near(b.price, pr) && b.pays === (cse < pr) && rel(b.mwh, m.units * net, 1e-10) && (i === 0 || b.cse >= list[i - 1].cse) && near(b.x0, i ? list[i - 1].x1 : 0, 1e-6)))
       ok(false, "curve " + cr + " at " + r + "/" + rb + ": " + b.key);
     if (i && Math.abs(b.cse - list[i - 1].cse) < 1e-6) tie = true;
   });
 })));
 ok(!tie, "no two blocks tie in cost per MWh at any rate and rebound (the order is unique)");
-ok(M.curve(C, D, { rate: 0.06, rebound: 0 }, "el").every(b => b.m.carrier === "el") && M.curve(C, D, { rate: 0.06, rebound: 0 }, "gas").length === 3, "two curves: five electricity blocks, three gas blocks");
+ok(M.curve(C, D, { rate: 0.06, rebound: 0 }, "el").every(b => b.m.carrier === "el") && M.curve(C, D, { rate: 0.06, rebound: 0 }, "el").length === 4 && M.curve(C, D, { rate: 0.06, rebound: 0 }, "gas").length === 2, "two curves: four electricity blocks, two gas blocks");
 
 // ---------------- electrification against the file
 const dd = M.design(C);
@@ -145,7 +149,7 @@ C.districts.forEach((d, k) => {
   const r = M.districtDay(C, D, 0, dd, { gas: 0.5 }), fuel = sh.gas + sh.propane;
   ok(near(r.hel[h], Q * (sh.resistance + (sh.heatPump + 0.5 * fuel) / COP(T)), 1e-9), "heating electricity at 07:00 with half the fuel heat switched");
   const env = M.districtDay(C, D, 0, dd, { env: 1 }), pre = d.heatedFloorM2 * d.envelope.pre1980 * C.vintages.pre1980.heatKWhPerM2 / 1000;
-  ok(near(env.heat[h], Q * (1 - 0.3636 * pre / (d.heat.residentialMWh + d.heat.commercialMWh)), 1e-9), "the envelope cuts the heat by 36.36% of the pre-1980 homes' share");
+  ok(near(env.heat[h], Q * (1 - CUT * pre / (d.heat.residentialMWh + d.heat.commercialMWh)), 1e-9), "weatherization cuts the pre-1980 homes' heat to the 1980-2009 intensity");
   const allR = M.districtDay(C, D, 0, dd, { res: 1 });
   ok(near(allR.hel[h], Q * (sh.resistance + sh.heatPump) / COP(T), 1e-9), "every resistance heater to a heat pump");
   ok(M.districtDay(C, D, 0, dd, { gas: 1 }).peak > M.districtDay(C, D, 0, dd, { gas: 1, env: 1 }).peak, "the envelope lowers the electrified peak");
@@ -251,7 +255,7 @@ ok(PR.length === 7, "seven worked exercises");
 // the page's own numbers
 ok(/about \$0\.049 per kWh in 2009–2015 \(2016 dollars, LBNL\)/.test(OWN) && D.lbnl.totalCSE2016 === 0.049, "Go deeper: LBNL's total cost of saved electricity");
 ok(D.facts.every(f => /^https:\/\//.test(f.url) && f.asof), "every fact has a link and a date");
-ok(D.coldClimate.cop === 1.75 && /COP at 5 F of at least 1\.75/.test(D.sources[D.coldClimate.src].where), "the cold-climate COP and its source line");
+ok(D.coldClimate.cop === 1.75 && /a COP of at least 1\.75 at 5 F/.test(D.sources[D.coldClimate.src].where), "the cold-climate COP and its source line");
 
 // ---------------- scope, links, the fictional line
 const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;

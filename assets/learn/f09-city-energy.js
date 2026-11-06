@@ -133,6 +133,14 @@
   function lensLine(F, key) { var a = F.actors.filter(function (x) { return x.key === key; })[0]; return "**" + a.label + "**: " + a.levers; }
   var LENS_SAW = "No one owns the whole picture: the city's levers sit on buildings and transport, while its electricity supply belongs to the utility, under the regulator and federal rules.";
   function muniSaw(C, F, picked) { return F.muni.feedback[picked]; }
+  function srcShort(F, k) {
+    var s = F.sources[k], d = s.date, ab = /about ([A-Za-z]+ \d{4})/.exec(d);
+    d = ab ? "about " + ab[1] : /^undated/.test(d) ? d.replace(/^undated[^;]*; /, "") : d.split(";")[0];
+    return s.publisher.split(",")[0] + ", " + d;
+  }
+  function whyItems(F) {   // every lever's reason with its sources, for the list under the sort
+    return F.levers.map(function (l) { return { text: l.text, why: l.why, src: l.src.map(function (k) { return srcShort(F, k); }).join("; ") }; });
+  }
 
   // the no-JS block, the ideas, the check and the sources (written into the page by the test)
   function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
@@ -190,7 +198,7 @@
 
   var model = { detailed: detailed, grouped: grouped, balance: balance, carriers: carriers, sectors: sectors, power: power, lens: lens, into: into, outOf: outOf,
     STEPS: STEPS, Q_CARRIER: Q_CARRIER, carrierQ: carrierQ, sectorLine: sectorLine, sectorSaw: sectorSaw, Q_LOSS: Q_LOSS, lossQ: lossQ, lossLine: lossLine,
-    OWN_TICKS: OWN_TICKS, OWN_VAL: OWN_VAL, ownTick: ownTick, powerLine: powerLine, POWER_SAW: POWER_SAW, lensLine: lensLine, LENS_SAW: LENS_SAW, muniSaw: muniSaw,
+    OWN_TICKS: OWN_TICKS, OWN_VAL: OWN_VAL, ownTick: ownTick, powerLine: powerLine, POWER_SAW: POWER_SAW, lensLine: lensLine, LENS_SAW: LENS_SAW, muniSaw: muniSaw, whyItems: whyItems,
     staticFallback: staticFallback, ideasHTML: ideasHTML, checkHTML: checkHTML, factsHTML: factsHTML, sourcesHTML: sourcesHTML, CITY_SRC: CITY_SRC, fmtN: fmtN, pct: pct, gwh: gwh };
   if (typeof module !== "undefined" && module.exports) module.exports = model;
   if (typeof window === "undefined" || !window.LX) return;
@@ -252,7 +260,10 @@
           var bins = F.actors.map(function (a) { return { id: a.key, label: a.label, sub: a.sub, color: a.color }; });
           var cards = F.levers.map(function (l) { return { id: l.id, text: l.text, bin: l.bin, why: l.why }; });
           var note = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
-          var cs = LX.CardSort(act, { bins: bins, cards: cards, maxWhy: 9, onCheck: function (g) { note.textContent = g.right + " of " + g.total + " match the typical roles; each reason names its source below the lesson."; api.done(); buildExplain(); } });
+          var why = H("details", { class: "lx-textalt f9-why" }), wl;
+          H("summary", { text: "Every reason, with its source" }, why); wl = H("ul", null, why);
+          whyItems(F).forEach(function (x) { H("li", { html: "<b>" + LX.esc(x.text) + ".</b> " + LX.rich(x.why) + " <span class=\"f9-src\">(" + LX.esc(x.src) + ")</span>" }, wl); });
+          var cs = LX.CardSort(act, { bins: bins, cards: cards, maxWhy: 9, onCheck: function (g) { note.textContent = g.right + " of " + g.total + " match the typical roles. Open the reasons for their sources."; act.appendChild(why); api.done(); buildExplain(); } });
           act.appendChild(note);
           H("p", { class: "lx-hint", text: "Typical U.S. roles, each from a dated primary source (listed under Sources). A city that owns its utility, or another state, can differ." }, act);
           demo[4] = function () { var m = {}; cards.forEach(function (c) { m[c.id] = c.bin; }); cs.place(m); cs.check(); };
