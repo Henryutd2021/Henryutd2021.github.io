@@ -1264,9 +1264,13 @@
    "tier": "analyst",
    "code": "A11",
    "title": "What does 'clean' mean from cradle to grave? Life cycles, water and land",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a11-lca-nexus.html",
+   "scales": [],
+   "id": "a11-lca-nexus",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Life cycles, water, land"
   },
   {
    "tier": "analyst",
@@ -1668,9 +1672,13 @@
    "tier": "researcher",
    "code": "R7",
    "title": "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r07-cost-carbon-properly.html",
+   "scales": [],
+   "id": "r07-cost-carbon-properly",
+   "minutes": 35,
+   "form": "studio",
+   "short": "Cost and carbon, properly"
   },
   {
    "tier": "researcher",
