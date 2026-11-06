@@ -143,6 +143,9 @@
     china: { url: CDN + "echarts@4.9.0/map/json/china.json", sri: "sha256-05L2UaSOYhPJv8g/QGcRBp3ilsF/Qmz/wK0RSAeO4iY=" },
     nanhai: { url: CDN + "echarts@4.9.0/lib/coord/geo/fix/nanhai.js", sri: "sha256-dvBK/3U91HPpFH2iTTVCxGBAnOtmAq1oZoDgs7qShzQ=", text: true },
     us: { url: CDN + "us-atlas@3.0.1/states-10m.json", sri: "sha256-12s5HM+ov/YB1R4+PaXUOon6Rs1crKcs5zGzg75VltA=" },
+    // finer land (Natural Earth 1:50m) for the chapter maps outside the China and U.S. data (Bali, West Africa, the
+    // Gulf, Europe, Korea); fetched once, only when such a map first comes into view or its dialog opens
+    world50: { url: CDN + "world-atlas@2.0.2/countries-50m.json", sri: "sha256-BDQs3B4wFrzX2xYw3pVoTWe3n+PIxGAyHoeu9GlQI5Q=" },
   };
   box.hidden = false;
 
@@ -203,6 +206,26 @@
     return { type: "Feature", properties: { code: "nanhai" }, geometry: { type: "MultiPolygon", coordinates: d3Winding(d3, rings.map(function (r) { return [r]; })) } };
   }
 
+  // world-atlas countries, minus the parts the China standard map draws itself (China, Taiwan, and at 1:50m Hong Kong
+  // and Macao); France's overseas parts are drawn but not coloured (only Paris was visited), so they become a feature
+  // of their own without a code
+  function countriesOf(topo) {
+    const d3 = window.d3;
+    return window.topojson.feature(topo, topo.objects.countries).features
+      .filter(function (f) { return ["156", "158", "344", "446"].indexOf(f.id) < 0; })
+      .reduce(function (acc, f) {
+        if (f.id !== "250" || f.geometry.type !== "MultiPolygon") { acc.push(f); return acc; }
+        const home = [], away = [];
+        f.geometry.coordinates.forEach(function (poly) {
+          const c = d3.geoCentroid({ type: "Polygon", coordinates: poly });
+          (c[0] > -10 && c[0] < 20 && c[1] > 35 ? home : away).push(poly);   // metropolitan France and Corsica
+        });
+        acc.push({ type: "Feature", id: "250", properties: f.properties, geometry: { type: "MultiPolygon", coordinates: home } });
+        if (away.length) acc.push({ type: "Feature", id: "", properties: {}, geometry: { type: "MultiPolygon", coordinates: away } });
+        return acc;
+      }, []);
+  }
+
   function start() {
     const libs = LIBS.reduce(function (p, lib) { return p.then(function () { return loadScript(lib); }); }, Promise.resolve());
     Promise.race([libs, timeout(20000)]).then(function () {
@@ -214,16 +237,7 @@
     }).then(function (res) {
       const d3 = window.d3;
       const geo = { countries: [], china: [], nanhai: null, states: null };
-      if (res[0]) geo.countries = window.topojson.feature(res[0], res[0].objects.countries).features
-        .filter(function (f) { return f.id !== "156" && f.id !== "158"; })   // China and Taiwan come from the China standard map
-        .reduce(function (acc, f) {   // France's overseas parts (French Guiana) are drawn but not coloured: only Paris was visited
-          if (f.id !== "250" || f.geometry.type !== "MultiPolygon") { acc.push(f); return acc; }
-          const home = [], away = [];
-          f.geometry.coordinates.forEach(function (poly) { (window.d3.geoCentroid({ type: "Polygon", coordinates: poly })[0] > -30 ? home : away).push(poly); });
-          acc.push({ type: "Feature", id: "250", properties: f.properties, geometry: { type: "MultiPolygon", coordinates: home } });
-          if (away.length) acc.push({ type: "Feature", id: "", properties: {}, geometry: { type: "MultiPolygon", coordinates: away } });
-          return acc;
-        }, []);
+      if (res[0]) geo.countries = countriesOf(res[0]);
       if (res[1]) geo.china = decodeChina(d3, res[1]);
       if (res[2]) geo.nanhai = nanhaiFeature(d3, res[2]);
       init(geo);
@@ -757,8 +771,11 @@
         const home = g.some(function (p) { return p.pid && D.places[p.pid].h; }) ? 1 : 0;
         return { pts: g, places: g.filter(function (p) { return p.pid; }).length, n: g.length, home: home };
       }).sort(function (a, b) { return b.places - a.places || b.home - a.home || b.n - a.n; });
+      // the second panel: the one around the place its caption names (chapter data), else the next with enough footprints
+      const at = (chapterOf[id].at || [])[1];
+      const named = at && clusters.slice(1).find(function (c) { return c.pts.some(function (p) { return p.pid === at; }); });
       return { ents: ents, all: pts, main: clusters[0] || null,
-               second: clusters.slice(1).find(function (c) { return c.n >= 3 && c.places >= 1; }) || null };
+               second: named || clusters.slice(1).find(function (c) { return c.n >= 3 && c.places >= 1; }) || null };
     }
     function boxOf(cl) {
       const lons = cl.pts.map(function (p) { return p.ll[0]; }), lats = cl.pts.map(function (p) { return p.ll[1]; });
@@ -778,7 +795,23 @@
         .fitExtent([[6, 6], [W - 6, H - 6]], { type: "MultiPoint", coordinates: [[box[0], y0], [box[2], y0], [box[0], y1], [box[2], y1], [cx, y0], [cx, y1]] });
     }
     function inBox(ll, box) { return ll[0] >= box[0] - 0.01 && ll[0] <= box[2] + 0.01 && ll[1] >= box[1] - 0.01 && ll[1] <= box[3] + 0.01; }
-    function drawBaseInto(g, path, id) {
+    // the finer land, loaded once on demand; if it cannot be loaded, the chapter maps keep the 1:110m land
+    let w50Loading = null;
+    function loadWorld50() {
+      if (geo.countries50 !== undefined) return Promise.resolve();
+      if (!w50Loading) {
+        w50Loading = fetchData(DATA.world50).then(function (topo) { geo.countries50 = countriesOf(topo); })
+          .catch(function () { geo.countries50 = null; });
+      }
+      return w50Loading;
+    }
+    const CN_US = { CN: 1, HK: 1, MO: 1, TW: 1, US: 1 };   // places drawn on the China standard map or the U.S. states
+    function outside(cl) { return cl.pts.some(function (p) { return p.pid && !CN_US[D.places[p.pid].c]; }); }
+    function needsFine(id) {
+      const A = chapterAtlas(id);
+      return [A.main, A.second].some(function (cl) { return cl && outside(cl); });
+    }
+    function drawBaseInto(g, path, id, fine) {
       const reg = function (f, code, cls) {
         const dd = path(f); if (!dd) return;
         const r = code && D.regions[code];
@@ -786,7 +819,7 @@
         const n = el("path", { d: dd, class: "jr-reg" + (cls ? " " + cls : "") + (mine ? " is-visited" + (r[2] ? " is-inferred" : "") : "") }, g);
         if (mine) n.style.setProperty("--ch", "var(--ch-" + id + ")");
       };
-      geo.countries.forEach(function (f) { reg(f, f.id, ""); });
+      ((fine && geo.countries50) || geo.countries).forEach(function (f) { reg(f, f.id, ""); });
       geo.china.forEach(function (f) { reg(f, f.properties.code, "jr-prov"); });
       (geo.states || []).forEach(function (f) { reg(f, usNames[f.properties.name] || "", "jr-state"); });
     }
@@ -797,7 +830,7 @@
       const path = d3.geoPath(pj);
       const svgEl = el("svg", { viewBox: "0 0 " + W + " " + H, class: "jr-mini", focusable: "false", "aria-hidden": "true" });
       el("rect", { x: 0, y: 0, width: W, height: H, class: "jr-mini-sea" }, svgEl);
-      drawBaseInto(el("g", {}, svgEl), path, id);
+      drawBaseInto(el("g", {}, svgEl), path, id, outside(cl));
       const gr = el("g", {}, svgEl);
       A.ents.forEach(function (e) {
         (e.r || []).forEach(function (r) {
@@ -974,6 +1007,7 @@
     // the dialog that shows a chapter's maps larger (native modal dialog: focus stays inside, Escape closes it)
     let dlg = null, dlgFrom = null;
     function openAtlas(id, from) {
+      if (needsFine(id) && geo.countries50 === undefined) { loadWorld50().then(function () { openAtlas(id, from); }); return; }
       if (!dlg) {
         dlg = document.createElement("dialog");
         dlg.className = "jr-dlg";
@@ -1004,8 +1038,8 @@
     function drawPages() {
       const holders = root.querySelectorAll(".jr-pg-map[data-ch]");
       if (!holders.length) return;
-      const go = function () {
-        holders.forEach(function (h) {
+      const drawOne = function (h) {
+          if (h.classList.contains("is-drawn")) return;
           const id = h.getAttribute("data-ch");
           const btn = document.createElement("button");
           btn.type = "button"; btn.className = "jr-atlas jr-atlas-btn";
@@ -1020,7 +1054,19 @@
           finishers.push(fin);
           h.removeAttribute("aria-hidden");
           h.classList.add("is-drawn");
-        });
+      };
+      // maps on the China or U.S. data are drawn at once; the others wait for the finer land, which is fetched when
+      // the first of their pages comes near the screen (the holder itself is hidden until drawn, so its page is watched)
+      const go = function () {
+        const later = [];
+        holders.forEach(function (h) { if (needsFine(h.getAttribute("data-ch")) && geo.countries50 === undefined) later.push(h); else drawOne(h); });
+        if (!later.length) return;
+        const fine = function () { loadWorld50().then(function () { later.forEach(drawOne); }); };
+        if (!("IntersectionObserver" in window)) { fine(); return; }
+        const io = new IntersectionObserver(function (es) {
+          if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); fine(); }
+        }, { rootMargin: "400px 0px" });
+        later.forEach(function (h) { io.observe(h.closest(".jr-page") || h.parentElement); });
       };
       loadUS().then(go, go);
     }
