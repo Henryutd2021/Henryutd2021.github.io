@@ -225,7 +225,7 @@ body.quarto-dark .jr-play { color: #0b1220; }
 
 /* ---------- chapters as passport pages: side by side and browsable on wide screens, stacked on phones ---------- */
 .jr-pages-wrap { position: relative; }
-.jr-pages { list-style: none; margin: 0; padding: .4rem .2rem 1rem; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 1.4rem) / 2);
+.jr-pages { list-style: none; margin: 0; padding: .4rem .2rem 1rem; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 1.4rem) / 2); align-items: start;
   gap: 1.4rem; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: thin; }
 .jr-pages:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--r-lg); }
 .jr-page { scroll-snap-align: start; position: relative; display: flex; flex-direction: column; gap: .7rem; padding: 1.3rem 1.4rem 1.4rem;
@@ -247,13 +247,21 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-atlas-btn { cursor: zoom-in; border-radius: var(--r); }
 .jr-atlas-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .jr-atlas-btn:hover .jr-atlas-main, .jr-atlas-btn:hover .jr-atlas-second { border-color: var(--line-strong); }
-.jr-atlas-main, .jr-atlas-second { position: relative; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: var(--jr-ocean); }
+.jr-atlas-panel { display: flex; flex-direction: column; gap: .3rem; min-width: 0; }
+.jr-atlas-cap { font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); line-height: 1.3; }
+.jr-atlas-main, .jr-atlas-second { position: relative; display: block; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: var(--jr-ocean); }
+.jr-mini-label { fill: var(--ink); stroke: var(--jr-ocean); paint-order: stroke; stroke-linejoin: round; font-family: var(--font); font-weight: 600;
+  pointer-events: none; }
 .jr-mini { display: block; width: 100%; height: auto; }
 .jr-mini-sea { fill: var(--jr-ocean); }
 .jr-mini .jr-reg.is-visited { fill: color-mix(in srgb, var(--ch) 26%, var(--jr-land)); }   /* lighter on the close-up maps, so routes and dots read */
 .jr-mini .jr-reg.is-visited.is-inferred { fill: color-mix(in srgb, var(--ch) 14%, var(--jr-land)); }
 .jr-atlas-loc { position: absolute; right: 6px; bottom: 6px; width: 36%; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-strong);
   box-shadow: var(--shadow-sm); background: var(--jr-ocean); line-height: 0; }
+.jr-atlas-loc.at-br { right: 6px; bottom: 6px; left: auto; top: auto; }
+.jr-atlas-loc.at-bl { left: 6px; bottom: 6px; right: auto; top: auto; }
+.jr-atlas-loc.at-tr { right: 6px; top: 6px; left: auto; bottom: auto; }
+.jr-atlas-loc.at-tl { left: 6px; top: 6px; right: auto; bottom: auto; }
 .jr-loc { display: block; width: 100%; height: auto; }
 .jr-loc-land { fill: var(--jr-land); stroke: none; }
 .jr-loc-route { fill: none; stroke-width: 1.1; opacity: .9; }
