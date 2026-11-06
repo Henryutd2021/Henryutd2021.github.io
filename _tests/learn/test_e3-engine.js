@@ -46,6 +46,9 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
   ok(cfg.c3.wind.capex === t13.techs.wind.capex && cfg.c3.solarFarm.capex === t13.techs.solar.capex && cfg.finance.rate === t13.finance.wacc / 100, "wind, solar farm and the rate: lesson 13's");
   ok(cfg.c3.electrolyzer.capex === Math.round(e0.farm.electrolyzer.capex * k22), "electrolyzer: E0's DOE cost x EIA's deflator");
   ok(cfg.about.line === city.about.line && cfg.about.line === "Prairie City is fictional; its numbers are illustrative.", "the fictional line, word for word");
+  ok(near(E3.copAt(city.cop, -15), 2.4, 1e-9) && near(E3.copAt(city.cop, 0), 3.2, 1e-9) && city.cop.cutoutC === -23 && E3.copAt(city.cop, -23.5) === 1, "the COP the inputs table states: 2.4 at -15 C, 3.2 at 0 C, 1 below -23 C");
+  const inp = E3.inputsHTML(P);
+  ok(inp.indexOf(P.D.map(D => E3.kilo(D.L)).join(" · ") + " MW") >= 0 && inp.indexOf(E3.kilo(city.emissions.gridLbPerMWh.sppNorth) + " lb per MWh") >= 0 && inp.indexOf(E3.money(cfg.heatPump.capex)) >= 0, "the inputs table reads the data");
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(SRC + DATA), "no nuclear term in the engine or its data (guard G-DC)");
   ok(!/\bAI\b|artificial intelligence/.test(SRC + DATA), "no AI wording");
 
