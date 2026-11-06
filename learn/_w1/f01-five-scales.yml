@@ -28,4 +28,3 @@ glossary:
     def: "The rules a city, county or state sets for how new buildings must be built, such as insulation, wiring and safety."
 requests:
   - "Promote two lesson-local components if later lessons want them: ScaleZoom (assets/learn/f01-five-scales.js: a powers-of-ten zoom through five drawn scenes with a keyboard rail, Zoom in/out and a text version; the scenes use only --lx-* tokens) and ScaleStrip (e-scale-strip: five scales with the reader's sort ticks, signals passed down and needs passed up, lessons per scale). Lesson 1's t1-strip could then use ScaleStrip."
-  - "Add a scale palette to base.css if the five-scale colours should be shared (F1 defines --f1-s0 ... --f1-s4 locally, day and night): T1, R3, the course map's scale filter and later scale routes could reuse it."

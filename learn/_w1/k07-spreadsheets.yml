@@ -5,5 +5,3 @@ glossary:
   - id: absolute-reference
     term: Absolute reference
     def: "A spreadsheet address with $ signs, such as $E$1, that stays the same when a formula is copied to other cells."
-requests:
-  - "K7 holds a small spreadsheet engine (tokenize, parse, evaluate with errors and cycles, fill-down shift) in assets/learn/k07-spreadsheets.js. If B2 or T7 want an in-page sheet, promote it as a shared component rather than copying it."

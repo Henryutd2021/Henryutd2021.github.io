@@ -38,5 +38,3 @@ glossary:
   - id: crps
     term: CRPS
     def: "The continuous ranked probability score of a whole forecast distribution: twice its pinball loss averaged over every quantile level; lower is better."
-requests:
-  - "M9's Gaussian-process core (Cholesky, triangular solves, generalized least squares for the mean, the predictive band, maximum likelihood on a grid, the standard normal and its inverse, pinball loss) is lesson-local in assets/learn/m09-surrogates-uq.js and exposed as LX.M9 for case file CF8, which loads M9's script: candidate for components/gp.js."

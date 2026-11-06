@@ -33,5 +33,3 @@ glossary:
     def: "A group of customers, such as homes or businesses, that a utility bills under the same tariffs."
 requests:
   - "Ledger table: a04-retail-tariffs.js builds the e-ledger as a table.cf-two (rows: parties, columns: options, cells: signed $ with 'above'/'below' words, no colour tones); A7 builds the same for owners and neighbours. Candidate for promotion as LX.Ledger (i-ledger/e-ledger, curriculum §16.1), with a staticHTML for the no-JS block."
-  - "path.yml: the old placeholder row 'Policy instruments: tax credits, carbon prices, large-load tariffs' (Analyst, in preparation) overlaps A4 (large-load tariffs) and A12; the coordinator may retitle or drop it."
-  - "A4 is live now: A22's explain table (assets/learn/a22-tradeoff-explorer.js, 'A4, tariffs, and A13, energy burden (upcoming)') and F2's data (assets/learn/data/f02-systems-and-map.json, 'Analyst lesson A4 (upcoming)') still name A4 as upcoming; neither is checked by a test. This branch changed only what the QA checks: F1's two static mentions now link A4, and teaching.qmd's card says 45 lessons live (A4 and A7)."

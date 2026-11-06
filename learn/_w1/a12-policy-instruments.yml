@@ -15,5 +15,4 @@ glossary:
     term: Transfer
     def: "A payment that moves money from one group to another, such as a carbon payment to the government or a credit to a plant owner, without using anything up."
 requests:
-  - "A12 loads assets/learn/m06-carbon-in-models.js for the Plains Grid's planning LP (window.LX.plainsPlan), as lesson 12 once loaded 13-capstone.js: promote it to components/ if a third page needs it."
   - "_tests/learn/plains_face.js is a shared test helper (not a test): it loads the planning LP with the vendored HiGHS and proves a number unique by minimizing and maximizing it over the LP's optimal face."

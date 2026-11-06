@@ -35,5 +35,3 @@ glossary:
   - id: gas-reformer
     term: Gas reformer
     def: "A plant that makes hydrogen from natural gas and steam, releasing carbon dioxide unless it is captured."
-requests:
-  - "M7's path.yml row says 'next: M8 once M8 is live': M8 is live in this branch, so M7's next box can lead to M8 (coordinator)."

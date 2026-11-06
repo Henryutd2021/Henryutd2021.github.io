@@ -5,5 +5,3 @@ glossary:
   - id: efficiency
     term: Efficiency
     def: "The share of the energy put into a plant or device that comes out in the useful form, such as electricity."
-requests:
-  - "K2 keeps a numeric answer box (numInput, with a tolerance) and the seeded practice drill view that K3 and K4 also copy; a shared LX.NumAnswer and LX.Drill would remove the copies."

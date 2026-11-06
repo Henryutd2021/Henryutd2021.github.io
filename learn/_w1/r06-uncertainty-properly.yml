@@ -4,7 +4,3 @@ glossary:
   - {id: structural-uncertainty, term: "Structural uncertainty", def: "Doubt about how a model is built (its equations, time steps and what it leaves out), which sampling its inputs cannot reveal; compare model forms instead."}
   - {id: deep-uncertainty, term: "Deep uncertainty", def: "A situation where the people involved do not know, or cannot agree on, the possible outcomes, their odds or the right model."}
   - {id: value-of-information, term: "Value of information", def: "How much a decision-maker would gain, on average, by learning an uncertain quantity before deciding; its upper limit is the value of a perfect forecast."}
-requests:
-  - "path.yml: R6's prerequisites in the curriculum are M7 and M8. M8 is not live on this branch (W4 branch d builds it), and the surface check warns on a prerequisite that is not live, so R6 lists after: [M7]. Make it [M7, M8] at the W4 merge, once M8 is live."
-  - "R5's path.yml row has next: R9; with R6 live, the studio track (curriculum §11.1) reads R5 → R6 → R8 → R9. Consider next: R6 on R5's row (not edited here: R5's row is not this branch's)."
-  - "Pages that name R6 as upcoming in static text may now link it (the coordinator's cross-link pass); R1's card already links it through LX.lessonRef."

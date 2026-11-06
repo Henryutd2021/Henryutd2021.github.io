@@ -34,6 +34,4 @@ glossary:
     term: Uplift payment
     def: "A payment outside the market price that covers costs a scheduled plant cannot recover at the price, such as start-up and no-load costs; also called a make-whole payment."
 requests:
-  - "M2 is live: link it where earlier pages still say upcoming. M1 (learn/m01-dispatch-to-lmp.qmd) Go deeper 'When a price is not unique' and 'What this model leaves out' say 'M2, upcoming'; lesson 11 (learn/11-solver.qmd, Go deeper on mixed-integer solves, and the flowchart node 'see lesson M2' in assets/learn/11-solver.js) says 'Lesson M2 (upcoming)'. Also add `next: M2` to M1's path.yml entry (its next box now says 'Back to the course map')."
   - "Promote, if wanted: SwitchBoard (on/off switches of several units over 24 hours, fractional switches hatched, an hour picker and a text table) and TreeView with the pure tree engine (tree, treePending, treeAccept, treeBranch, treeBound, treeGap, treeRun, treeLayout) from assets/learn/m02-unit-commitment.js, as the curriculum's i-tree (M8 needs a scenario tree)."
-  - "scripts/learn_solver_bench.mjs: its usage line lists the --only ids; this branch adds m2milp, m2relax and m2fixed to lessonSet in _tests/learn/solver_models.js."

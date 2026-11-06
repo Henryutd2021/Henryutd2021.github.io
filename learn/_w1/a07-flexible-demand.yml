@@ -20,5 +20,4 @@ glossary:
     term: Transactive energy
     def: "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid."
 requests:
-  - "Ledger tables (owners' earnings, the neighbours' trade) are table.cf-two built in the lesson, as in A4: see A4's sidecar for the LX.Ledger promotion request."
   - "A7 reads A4's data file (a04-retail-tariffs.json) for the neighbours' trade, and keeps A4's real-time wires charge in its own data (trade.wires); its test checks the two agree. If A4's tariffs change, rerun both tests."

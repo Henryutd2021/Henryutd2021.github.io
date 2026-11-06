@@ -13,5 +13,4 @@ glossary:
     def: "How much cheaper a system is with devices that link its carriers than with each carrier supplied on its own, judged as a difference of optimal costs."
 requests:
   - "Notebook builder (ResearchPortfolio folder, not committed by this builder): scripts/build_learn_m04_notebook.py writes learn/notebooks/m04-storage-multienergy.ipynb; run as python3 scripts/build_learn_m04_notebook.py SITE/learn/notebooks/m04-storage-multienergy.ipynb."
-  - "Solver benchmark: M4's instances (the coupled week LP, 2,520 x 1,176, and its on/off MILP) are added to scripts/learn_solver_bench.mjs as the W3 set (m4all, m4milp)."
   - "Allow-listed repository: repo:reopt-hydrogen-framework README re-read on 2026-11-03 (public, MIT, synthetic examples; examples/configurations.py and ModelOptions(electrolyzer_operation=\"constant\") exist)."
