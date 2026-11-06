@@ -133,7 +133,7 @@
     const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
       { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
 
-    // popups fit the map box: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
+    // popups fit inside the map: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
     function popupOptions() {
       const w = root.clientWidth, h = root.clientHeight, narrow = w < 480;
       return { maxWidth: narrow ? Math.max(170, w - 130) : 300, maxHeight: Math.max(140, h - (narrow ? 110 : 80)), closeButton: true,
