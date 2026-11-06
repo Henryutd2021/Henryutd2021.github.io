@@ -305,10 +305,6 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../research.html"> 
 <span class="menu-text">Research</span></a>
   </li>  
@@ -334,11 +330,15 @@ window.Quarto = {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../field-notes.html"> 
-<span class="menu-text">Field Notes</span></a>
+<span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../cv.html"> 
 <span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../journeys.html"> 
+<span class="menu-text">Journeys</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -843,6 +843,17 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
     body.insertBefore(skip, body.firstChild);
   }
 
+  // the brand (the name at the left of the navbar) is the link to the home page, the About page, which has no navbar
+  // item of its own since Journeys joined the navbar (2026-11-05)
+  const brand = document.querySelector("#quarto-header .navbar-brand");
+  if (brand) {
+    brand.setAttribute("aria-label", "Honglin Li, home");
+    const here = location.pathname.replace(/\/index\.html$/, "/");
+    if (brand.pathname && brand.pathname.replace(/\/index\.html$/, "/") === here) brand.setAttribute("aria-current", "page");
+  }
+  // the navbar says "Notes" for Field Notes (to fit at 1,200 px); its accessible name keeps the full name
+  document.querySelectorAll('#quarto-header .nav-link[href$="field-notes.html"]').forEach(function (a) { a.setAttribute("aria-label", "Field Notes"); });
+
   // back-to-top button
   const top = document.createElement("button");
   top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
@@ -1050,7 +1061,7 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
 //   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
 //   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
 // Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
-// page has loaded, so it never blocks rendering, and the "Visitors" box is hidden again if it fails or draws nothing.
+// page has loaded, so it never blocks rendering, and the "Visitors" section is hidden again if it fails or draws nothing.
 
 // ---------- 1. collaboration map ----------
 (function () {
@@ -1171,13 +1182,22 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
     const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
       { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
 
+    // popups fit inside the map: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
+    function popupOptions() {
+      const w = root.clientWidth, h = root.clientHeight, narrow = w < 480;
+      return { maxWidth: narrow ? Math.max(170, w - 130) : 300, maxHeight: Math.max(140, h - (narrow ? 110 : 80)), closeButton: true,
+               autoPanPaddingTopLeft: narrow ? L.point(46, 12) : L.point(64, 24), autoPanPaddingBottomRight: narrow ? L.point(10, 12) : L.point(24, 24) };
+    }
+
     // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
     const markers = [];
     function add(kind, lat, lon, size, label, popup, z) {
-      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: "<span></span>",
-                               iconSize: [size, size], iconAnchor: [size / 2, size / 2], popupAnchor: [0, -size / 2] });
+      // the marker's box is at least 24 px (a touch target), the dot inside it keeps its own size (2026-11-05)
+      const box = Math.max(24, size);
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: '<span style="width:' + size + "px;height:" + size + 'px"></span>',
+                               iconSize: [box, box], iconAnchor: [box / 2, box / 2], popupAnchor: [0, -size / 2] });
       const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
-        .bindPopup(popup, { maxWidth: 300, autoPanPaddingTopLeft: L.point(64, 24), autoPanPaddingBottomRight: L.point(24, 24), closeButton: true }).addTo(map);
+        .bindPopup(popup, popupOptions()).addTo(map);
       m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
       const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
       m.cmapSize = size;
@@ -1307,31 +1327,73 @@ K_i,\ g_{p,h},\ q_{p,h},\ c_{p,h},\ d_{p,h},\ S_i \ge 0, \quad s_{p,h} \text{ fr
   }
 })();
 
-// ---------- 2. visitor map (third-party widget, About page only) ----------
+// ---------- 2. visitor map (third-party widget, About page only; own section since 2026-11-05) ----------
+// MapMyVisitors' loader reads from its own URL: w (width; "a" = its parent's width), co (the panel colour, i.e. the ocean),
+// cl (the land colour of the generated background image) and ct (the text colour). Here co, cl and ct are set to the
+// site's day or night colours before the snippet runs; on high-DPI screens the widget is drawn at twice the column width
+// in a box scaled to one half, so its land image stays crisp (map.css enlarges the widget's text and dots to match).
+// A day/night switch after loading recolours the panel and text through map.css and swaps the land image for the other
+// theme's. The frame follows the column's width on resize.
 (function () {
   "use strict";
   const box = document.getElementById("visitor-map");
   const tpl = document.getElementById("visitor-map-tpl");
   const body = document.getElementById("visitor-map-body");
   if (!box || !tpl || !body || !("content" in tpl)) return;
-  let done = false;
+  const THEME = { light: { co: "eef2f7", cl: "cbd5e1", ct: "374151" }, dark: { co: "1c212a", cl: "3b4351", ct: "d1d5db" } };
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
+  let done = false, inner = null;
   function hide() { if (!done) { done = true; box.hidden = true; } }
-  function drawn() { return Array.prototype.some.call(body.children, function (el) { return el.tagName !== "SCRIPT"; }); }
+  function drawn() {
+    return !!inner && Array.prototype.some.call(inner.children, function (el) { return el.tagName !== "SCRIPT" && el.tagName !== "STYLE"; });
+  }
+  function themedSrc(src) {
+    try {
+      const u = new URL(src, location.href);
+      if (!/(^|\.)mapmyvisitors\.com$/.test(u.hostname)) return src;
+      const t = THEME[isDark() ? "dark" : "light"];
+      Object.keys(t).forEach(function (key) { u.searchParams.set(key, t[key]); });
+      return u.toString();
+    } catch (e) { return src; }
+  }
+  function fit() {   // scale the widget to the frame's width and the frame's height to the widget
+    if (!inner || !inner.offsetWidth) return;
+    const s = body.clientWidth / inner.offsetWidth;
+    inner.style.transform = s === 1 ? "" : "scale(" + s + ")";
+    body.style.height = Math.ceil(inner.offsetHeight * s) + "px";
+  }
   function insert() {
+    box.hidden = false;
+    inner = document.createElement("div");
+    inner.className = "visitor-scale" + (k > 1 ? " is-2x" : "");
+    inner.style.width = Math.floor(body.clientWidth * k) + "px";
+    body.appendChild(inner);
     const frag = tpl.content.cloneNode(true);
-    // scripts cloned from a template never run: recreate them (same attributes), asynchronous by nature
+    // scripts cloned from a template never run: recreate them (same attributes, themed colours), asynchronous by nature
     frag.querySelectorAll("script").forEach(function (old) {
       const s = document.createElement("script");
-      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.name === "src" ? themedSrc(a.value) : a.value); });
       if (old.textContent.trim()) s.text = old.textContent;
       s.async = true;
       s.addEventListener("error", hide);
       old.parentNode.replaceChild(s, old);
     });
-    box.hidden = false;
-    body.appendChild(frag);
-    window.setTimeout(function () { if (!drawn()) hide(); else done = true; }, 15000);
+    inner.appendChild(frag);
+    fit();
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(inner);
+    window.addEventListener("resize", fit);
+    window.setTimeout(function () { if (!drawn()) hide(); else { done = true; fit(); } }, 15000);
   }
+  // day / night after loading: the panel and text colours follow map.css; the land image is swapped here
+  new MutationObserver(function () {
+    if (!inner) return;
+    const t = THEME[isDark() ? "dark" : "light"];
+    inner.querySelectorAll(".mapmyvisitors-map").forEach(function (m) {
+      const bg = m.style.backgroundImage;
+      if (bg) m.style.backgroundImage = bg.replace(/co_[0-9a-f]{6}/i, "co_" + t.co).replace(/cl_[0-9a-f]{6}/i, "cl_" + t.cl);
+    });
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   if (document.readyState === "complete") insert();
   else window.addEventListener("load", insert, { once: true });
 })();

@@ -445,6 +445,7 @@ body.page-folio main .chip { font-size: .78rem; padding: .16rem .6rem; color: va
 /* proposal */
 .page-research .sei { margin-top: 1.4rem; padding: 1.4rem 1.6rem 1.3rem; border: 1px solid var(--t-line); border-radius: var(--r); background: var(--t-soft); }
 .page-research .sei-head h3 { margin: .35rem 0 .1rem; font-size: 1.15rem; font-weight: 700; color: var(--ink); }
+.page-research .sei-head .label { color: var(--ink-2); }   /* AA on the tinted panel (muted grey was 4.3:1; 2026-11-05) */
 .page-research .sei-src { margin: 0 0 .8rem; font-size: .88rem; color: var(--muted); }
 .page-research .sei p { margin: 0 0 .8rem; font-size: .96rem; line-height: 1.7; color: var(--ink-2); }
 .page-research .sei-modules { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; margin: .2rem 0 1rem; padding: 0; list-style: none; counter-reset: mod; }
