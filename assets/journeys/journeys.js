@@ -7,7 +7,8 @@
 //      section nears the viewport: China (its 34 provincial-level divisions and the South China Sea inset) from the China
 //      standard map in Apache ECharts 4.9.0 (map/json/china.json and the inset in lib/coord/geo/fix/nanhai.js, Apache-2.0);
 //      other countries from Natural Earth via world-atlas 2.0.2, China and Taiwan left out underneath so China's outline is
-//      the standard one in every view; U.S. states from us-atlas 3.0.1 (loaded when that view is first opened). Places
+//      the standard one in every view; U.S. states from us-atlas 3.0.1 (loaded when that view is first opened). The world
+//      view uses the Patterson cylindrical projection (d3-geo-projection 4.0.0), central meridian 10°E, 55°S to 78°N. Places
 //      visited are filled in the colour of the chapter of the first visit. Places are dots (rings for places lived), journeys
 //      are lines (smooth curves through waypoints; flights and trips whose way of travel is not recorded as gentle arcs).
 //      A year slider with Play adds the footprints year by year, drawing each new route stroke by stroke. Clicking a dot or a
@@ -135,6 +136,8 @@
     { src: CDN + "d3-geo@3.1.1/dist/d3-geo.min.js", sri: "sha256-I+V08ejUcW1iK85FNWo3m2aidxYrFF9fFH5Mja77c9I=" },
     { src: CDN + "topojson-client@3.1.0/dist/topojson-client.min.js", sri: "sha256-Jc0CrkhsxQY+AhWk5M+xXeg3AMh6xIusTVfcaq8+u4k=" },
   ];
+  // the world view's projection (Patterson cylindrical, Henry 2026-11-06); optional: without it the world view falls back
+  const PROJ_LIB = { src: CDN + "d3-geo-projection@4.0.0/dist/d3-geo-projection.min.js", sri: "sha256-gxNpQbz283+4qeQzGGAd+s8CkB3GBN7BO4FaLNicgTs=" };
   const DATA = {
     world: { url: CDN + "world-atlas@2.0.2/countries-110m.json", sri: "sha256-JRbJFYZ8e68Y3exyeuxGwxVUGgfPs9eaZVmwXV6U7ug=" },
     china: { url: CDN + "echarts@4.9.0/map/json/china.json", sri: "sha256-05L2UaSOYhPJv8g/QGcRBp3ilsF/Qmz/wK0RSAeO4iY=" },
@@ -204,13 +207,23 @@
     const libs = LIBS.reduce(function (p, lib) { return p.then(function () { return loadScript(lib); }); }, Promise.resolve());
     Promise.race([libs, timeout(20000)]).then(function () {
       if (!(window.d3 && window.d3.geoPath && window.topojson)) throw new Error("libraries missing");
+      return Promise.race([loadScript(PROJ_LIB), timeout(15000)]).catch(function () { return null; });
+    }).then(function () {
       return Promise.all([fetchData(DATA.world).catch(function () { return null; }), fetchData(DATA.china).catch(function () { return null; }),
                           fetchData(DATA.nanhai).catch(function () { return null; })]);
     }).then(function (res) {
       const d3 = window.d3;
       const geo = { countries: [], china: [], nanhai: null, states: null };
       if (res[0]) geo.countries = window.topojson.feature(res[0], res[0].objects.countries).features
-        .filter(function (f) { return f.id !== "156" && f.id !== "158"; });   // China and Taiwan come from the China standard map
+        .filter(function (f) { return f.id !== "156" && f.id !== "158"; })   // China and Taiwan come from the China standard map
+        .reduce(function (acc, f) {   // France's overseas parts (French Guiana) are drawn but not coloured: only Paris was visited
+          if (f.id !== "250" || f.geometry.type !== "MultiPolygon") { acc.push(f); return acc; }
+          const home = [], away = [];
+          f.geometry.coordinates.forEach(function (poly) { (window.d3.geoCentroid({ type: "Polygon", coordinates: poly })[0] > -30 ? home : away).push(poly); });
+          acc.push({ type: "Feature", id: "250", properties: f.properties, geometry: { type: "MultiPolygon", coordinates: home } });
+          if (away.length) acc.push({ type: "Feature", id: "", properties: {}, geometry: { type: "MultiPolygon", coordinates: away } });
+          return acc;
+        }, []);
       if (res[1]) geo.china = decodeChina(d3, res[1]);
       if (res[2]) geo.nanhai = nanhaiFeature(d3, res[2]);
       init(geo);
@@ -263,7 +276,20 @@
       if (view === "us") return { type: "MultiPoint", coordinates: [[-124.7, 48.4], [-124.4, 40], [-117, 32.5], [-97.5, 25.8], [-80.2, 25], [-67, 44.8], [-69, 47.4], [-95, 49], [-160, 19], [-155, 19], [-150, 61], [-170, 60]] };
       return { type: "MultiPoint", coordinates: [[-128, 56], [132, 56], [-128, -12], [132, -12], [2, 62]] };
     }
+    // the world: Patterson cylindrical (geoMiller, then Natural Earth, if the projection library did not load), central
+    // meridian 10°E, the whole width of the world, cropped to 55°S to 78°N
+    const worldMaker = d3.geoPatterson || d3.geoMiller || d3.geoNaturalEarth1;
+    function worldFrame(W) {
+      const p = worldMaker().rotate([-10, 0]).scale(1).translate([0, 0]);
+      const xL = p([-169.999, 0])[0], xR = p([189.999, 0])[0], yT = p([10, 78])[1], yB = p([10, -55])[1];
+      const k = W / (xR - xL);
+      return { k: k, xL: xL, yT: yT, h: (yB - yT) * k };
+    }
     function projection(view, W, H) {
+      if (view === "world") {
+        const f = worldFrame(W);
+        return worldMaker().rotate([-10, 0]).scale(f.k).translate([-f.xL * f.k, -f.yT * f.k + (H - f.h) / 2]);
+      }
       const pad = Math.max(10, Math.round(W * 0.02));
       const p = view === "china" ? d3.geoConicEqualArea().parallels([25, 47]).rotate([-105, 0])
         : view === "us" ? d3.geoAlbersUsa()
@@ -273,7 +299,8 @@
     function heightFor(W) {
       const vh = window.innerHeight || 800;
       const phone = W < 576;
-      const ratio = state.view === "world" ? (phone ? 0.74 : 0.45) : state.view === "china" ? (phone ? 0.86 : 0.66) : (phone ? 0.72 : 0.58);
+      if (state.view === "world") return Math.round(Math.max(phone ? 170 : 240, worldFrame(W).h));
+      const ratio = state.view === "china" ? (phone ? 0.86 : 0.66) : (phone ? 0.72 : 0.58);
       return Math.round(Math.max(240, Math.min(W * ratio, 640, vh * 0.74)));
     }
 
@@ -702,7 +729,7 @@
       const lons = pts.map(function (p) { return p[0]; }), lats = pts.map(function (p) { return p[1]; });
       const cx = (Math.min.apply(null, lons) + Math.max.apply(null, lons)) / 2, cy = (Math.min.apply(null, lats) + Math.max.apply(null, lats)) / 2;
       const frame = pts.concat([[cx - 6, cy - 3.5], [cx + 6, cy + 3.5]]);   // at least a few degrees across
-      const pj = d3.geoNaturalEarth1().rotate([-cx, 0]).fitExtent([[14, 14], [W - 14, H - 14]], { type: "MultiPoint", coordinates: frame });
+      const pj = worldMaker().rotate([-cx, 0]).fitExtent([[14, 14], [W - 14, H - 14]], { type: "MultiPoint", coordinates: frame });
       const path = d3.geoPath(pj);
       const msvg = el("svg", { viewBox: "0 0 " + W + " " + H, class: "jr-mini", focusable: "false" });
       const base = el("g", {}, msvg);
