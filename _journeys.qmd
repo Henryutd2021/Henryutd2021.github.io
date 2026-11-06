@@ -1,0 +1,568 @@
+```{=html}
+<!-- _journeys.qmd: written by scripts/build_journeys.py from data/journeys.json; edit the data or the script, not this file.
+     Map, grids' tooltips and the Firsts filter: assets/journeys/journeys.js (d3-geo, topojson-client and the Natural Earth
+     land file load from jsDelivr after the page). Styles: assets/journeys/journeys.css. Without JS the map stays hidden and
+     the chapter list is the content. -->
+<style>
+body.quarto-light .jr-root { --ch-baotou: #d97706; --ch-shanghai-bali: #db2777; --ch-between: #7c3aed; --ch-lagos: #ea580c; --ch-san-marcos: #0d9488; --ch-dallas: #2563eb; --ch-boston: #e11d48; --ch-idaho-falls: #0891b2; --ch-austin: #b45309; --ch-manhattan: #4f46e5; }
+body.quarto-dark .jr-root { --ch-baotou: #c08316; --ch-shanghai-bali: #d4569a; --ch-between: #8b6ff0; --ch-lagos: #dc6a2c; --ch-san-marcos: #139484; --ch-dallas: #3f83e8; --ch-boston: #e2475f; --ch-idaho-falls: #148fae; --ch-austin: #a8702a; --ch-manhattan: #6d74ea; }
+body.quarto-light.page-journeys .quarto-title-banner .quarto-title::before { background: linear-gradient(90deg, #d97706 0% 10%, #db2777 10% 20%, #7c3aed 20% 30%, #ea580c 30% 40%, #0d9488 40% 50%, #2563eb 50% 60%, #e11d48 60% 70%, #0891b2 70% 80%, #b45309 80% 90%, #4f46e5 90% 100%); }
+body.quarto-dark.page-journeys .quarto-title-banner .quarto-title::before { background: linear-gradient(90deg, #c08316 0% 10%, #d4569a 10% 20%, #8b6ff0 20% 30%, #dc6a2c 30% 40%, #139484 40% 50%, #3f83e8 50% 60%, #e2475f 60% 70%, #148fae 70% 80%, #a8702a 80% 90%, #6d74ea 90% 100%); }
+</style>
+<div class="jr-root" id="journeys">
+<ul class="jr-stats" aria-label="Journeys at a glance">
+  <li><strong>16</strong><span>years on the road, since 2010</span></li>
+  <li><strong>17</strong><span>countries and regions</span></li>
+  <li><strong>36</strong><span>U.S. states and DC</span></li>
+  <li><strong>24</strong><span>of China's 34 provincial-level divisions</span></li>
+  <li><strong>119,000</strong><span>km of mapped routes, roughly</span></li>
+</ul>
+<p class="jr-stats-note">A landing counts as a footprint: Brunei was a transit without entry.</p>
+
+<section class="jr-sec jr-map-sec" aria-labelledby="h-jr-map">
+  <h2 id="h-jr-map" class="visually-hidden">Map of the journeys</h2>
+  <div class="jr-mapbox" hidden>
+    <div class="jr-toolbar">
+      <div class="jr-views" role="group" aria-label="Map view"><button type="button" data-view="world" aria-pressed="true">World</button><button type="button" data-view="china" aria-pressed="false">China</button><button type="button" data-view="us" aria-pressed="false">United States</button></div>
+      <button type="button" class="jr-firsts-btn" aria-pressed="false"><span class="jr-star" aria-hidden="true"></span>Firsts only</button>
+    </div>
+    <div class="jr-map is-loading" id="jr-map"></div>
+    <div class="jr-time">
+      <button type="button" class="jr-play" aria-label="Play the years from 2010"><i class="bi bi-play-fill" aria-hidden="true"></i></button>
+      <label class="visually-hidden" for="jr-year">Show the footprints up to this year</label>
+      <input type="range" id="jr-year" min="2010" max="2026" step="1" value="2026">
+      <output class="jr-year-out" for="jr-year" aria-live="polite">2010–2026</output>
+    </div>
+    <ul class="jr-legend" aria-label="Life chapters (colours)">
+      <li style="--ch: var(--ch-baotou)"><span class="jr-key" aria-hidden="true"></span>Baotou</li>
+      <li style="--ch: var(--ch-shanghai-bali)"><span class="jr-key" aria-hidden="true"></span>Shanghai and Bali</li>
+      <li style="--ch: var(--ch-between)"><span class="jr-key" aria-hidden="true"></span>China, between postings</li>
+      <li style="--ch: var(--ch-lagos)"><span class="jr-key" aria-hidden="true"></span>Lagos</li>
+      <li style="--ch: var(--ch-san-marcos)"><span class="jr-key" aria-hidden="true"></span>San Marcos</li>
+      <li style="--ch: var(--ch-dallas)"><span class="jr-key" aria-hidden="true"></span>Dallas</li>
+      <li style="--ch: var(--ch-boston)"><span class="jr-key" aria-hidden="true"></span>Boston</li>
+      <li style="--ch: var(--ch-idaho-falls)"><span class="jr-key" aria-hidden="true"></span>Idaho Falls</li>
+      <li style="--ch: var(--ch-austin)"><span class="jr-key" aria-hidden="true"></span>Austin</li>
+      <li style="--ch: var(--ch-manhattan)"><span class="jr-key" aria-hidden="true"></span>Manhattan</li>
+    </ul>
+    <ul class="jr-legend jr-legend-lines" aria-label="Lines">
+      <li><span class="jr-line jr-line-ground" aria-hidden="true"></span>By road or rail</li>
+      <li><span class="jr-line jr-line-flight" aria-hidden="true"></span>Flight</li>
+      <li><span class="jr-line jr-line-unknown" aria-hidden="true"></span>Way of travel not recorded</li>
+      <li><span class="jr-ring" aria-hidden="true"></span>Places I have lived</li>
+    </ul>
+    <p class="jr-hint">Routes are approximate. Click a dot or a line for its story. Keyboard: Tab into the map, then the arrow keys move through the footprints in time order; Enter opens a card. The <a href="#chapters">chapters below</a> list every place.</p>
+  </div>
+</section>
+
+<section class="jr-sec jr-lit" aria-labelledby="h-jr-lit">
+  <div class="jr-head"><h2 id="h-jr-lit">Lit up</h2><p>Every province and state I have set foot in, with the year of the first visit. Road trips count the ones they crossed; a landing counts too.</p></div>
+  <div class="jr-tiles-pair">
+    <figure class="jr-tiles jr-tiles-cn">
+      <figcaption><strong>24</strong> of China's 34 provincial-level divisions</figcaption>
+      <ol class="jr-tilegrid" style="--cols:8;--rows:8" aria-label="China&#x27;s 34 provincial-level divisions">
+        <li class="jr-tile" style="--c:8;--r:1" data-name="Heilongjiang"><span class="jr-code" aria-hidden="true">HL</span><span class="visually-hidden">Heilongjiang, not yet</span></li>
+        <li class="jr-tile" style="--c:1;--r:2" data-name="Xinjiang"><span class="jr-code" aria-hidden="true">XJ</span><span class="visually-hidden">Xinjiang, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:2" data-name="Inner Mongolia" data-year="2010"><span class="jr-code" aria-hidden="true">NM</span><span class="jr-yr" aria-hidden="true">2010</span><span class="visually-hidden">Inner Mongolia, first visit 2010</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:2" data-name="Beijing" data-year="2013"><span class="jr-code" aria-hidden="true">BJ</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Beijing, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:2" data-name="Liaoning" data-year="2013"><span class="jr-code" aria-hidden="true">LN</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Liaoning, first visit 2013</span></li>
+        <li class="jr-tile" style="--c:8;--r:2" data-name="Jilin"><span class="jr-code" aria-hidden="true">JL</span><span class="visually-hidden">Jilin, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:3;--r:3" data-name="Gansu" data-year="2013"><span class="jr-code" aria-hidden="true">GS</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Gansu, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:3" data-name="Ningxia" data-year="2011"><span class="jr-code" aria-hidden="true">NX</span><span class="jr-yr" aria-hidden="true">2011</span><span class="visually-hidden">Ningxia, first visit 2011</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:3" data-name="Shanxi" data-year="2012"><span class="jr-code" aria-hidden="true">SX</span><span class="jr-yr" aria-hidden="true">2012</span><span class="visually-hidden">Shanxi, first visit 2012</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:3" data-name="Hebei" data-year="2013"><span class="jr-code" aria-hidden="true">HE</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Hebei, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:3" data-name="Tianjin" data-year="2013"><span class="jr-code" aria-hidden="true">TJ</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Tianjin, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:2;--r:4" data-name="Qinghai" data-year="2013"><span class="jr-code" aria-hidden="true">QH</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Qinghai, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:4" data-name="Shaanxi" data-year="2013"><span class="jr-code" aria-hidden="true">SN</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Shaanxi, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:4" data-name="Henan" data-year="2013"><span class="jr-code" aria-hidden="true">HA</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Henan, first visit 2013</span></li>
+        <li class="jr-tile is-lit is-homeland" style="--c:6;--r:4" data-name="Shandong" data-year="2010"><span class="jr-code" aria-hidden="true">SD</span><span class="jr-yr" aria-hidden="true">home</span><span class="visually-hidden">Shandong, home province</span></li>
+        <li class="jr-tile is-lit" style="--c:1;--r:5" data-name="Tibet" data-year="2013"><span class="jr-code" aria-hidden="true">XZ</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Tibet, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:3;--r:5" data-name="Sichuan" data-year="2017"><span class="jr-code" aria-hidden="true">SC</span><span class="jr-yr" aria-hidden="true">2017</span><span class="visually-hidden">Sichuan, first visit 2017</span></li>
+        <li class="jr-tile" style="--c:4;--r:5" data-name="Chongqing"><span class="jr-code" aria-hidden="true">CQ</span><span class="visually-hidden">Chongqing, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:5" data-name="Hubei" data-year="2013"><span class="jr-code" aria-hidden="true">HB</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Hubei, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:5" data-name="Anhui" data-year="2015"><span class="jr-code" aria-hidden="true">AH</span><span class="jr-yr" aria-hidden="true">2015</span><span class="visually-hidden">Anhui, first visit 2015</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:5" data-name="Jiangsu" data-year="2015"><span class="jr-code" aria-hidden="true">JS</span><span class="jr-yr" aria-hidden="true">2015</span><span class="visually-hidden">Jiangsu, first visit 2015</span></li>
+        <li class="jr-tile is-lit" style="--c:3;--r:6" data-name="Yunnan" data-year="2013"><span class="jr-code" aria-hidden="true">YN</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Yunnan, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:6" data-name="Guizhou" data-year="2013"><span class="jr-code" aria-hidden="true">GZ</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Guizhou, first visit 2013</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:6" data-name="Hunan" data-year="2013"><span class="jr-code" aria-hidden="true">HN</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Hunan, first visit 2013</span></li>
+        <li class="jr-tile" style="--c:6;--r:6" data-name="Jiangxi"><span class="jr-code" aria-hidden="true">JX</span><span class="visually-hidden">Jiangxi, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:6" data-name="Zhejiang" data-year="2014"><span class="jr-code" aria-hidden="true">ZJ</span><span class="jr-yr" aria-hidden="true">2014</span><span class="visually-hidden">Zhejiang, first visit 2014</span></li>
+        <li class="jr-tile is-lit" style="--c:8;--r:6" data-name="Shanghai" data-year="2014"><span class="jr-code" aria-hidden="true">SH</span><span class="jr-yr" aria-hidden="true">2014</span><span class="visually-hidden">Shanghai, first visit 2014</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:7" data-name="Guangxi" data-year="2013"><span class="jr-code" aria-hidden="true">GX</span><span class="jr-yr" aria-hidden="true">2013</span><span class="visually-hidden">Guangxi, first visit 2013</span></li>
+        <li class="jr-tile" style="--c:5;--r:7" data-name="Guangdong"><span class="jr-code" aria-hidden="true">GD</span><span class="visually-hidden">Guangdong, not yet</span></li>
+        <li class="jr-tile" style="--c:6;--r:7" data-name="Fujian"><span class="jr-code" aria-hidden="true">FJ</span><span class="visually-hidden">Fujian, not yet</span></li>
+        <li class="jr-tile" style="--c:8;--r:7" data-name="Taiwan"><span class="jr-code" aria-hidden="true">TW</span><span class="visually-hidden">Taiwan, not yet</span></li>
+        <li class="jr-tile" style="--c:4;--r:8" data-name="Hainan"><span class="jr-code" aria-hidden="true">HI</span><span class="visually-hidden">Hainan, not yet</span></li>
+        <li class="jr-tile" style="--c:5;--r:8" data-name="Macao"><span class="jr-code" aria-hidden="true">MO</span><span class="visually-hidden">Macao, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:8" data-name="Hong Kong" data-year="2015"><span class="jr-code" aria-hidden="true">HK</span><span class="jr-yr" aria-hidden="true">2015</span><span class="visually-hidden">Hong Kong, first visit 2015</span></li>
+      </ol>
+    </figure>
+    <figure class="jr-tiles jr-tiles-us">
+      <figcaption><strong>36</strong> of the 50 U.S. states, and DC</figcaption>
+      <ol class="jr-tilegrid" style="--cols:11;--rows:8" aria-label="the 50 U.S. states, and DC">
+        <li class="jr-tile" style="--c:1;--r:1" data-name="Alaska"><span class="jr-code" aria-hidden="true">AK</span><span class="visually-hidden">Alaska, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:11;--r:1" data-name="Maine" data-year="2024"><span class="jr-code" aria-hidden="true">ME</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Maine, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:10;--r:2" data-name="Vermont" data-year="2024"><span class="jr-code" aria-hidden="true">VT</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Vermont, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:11;--r:2" data-name="New Hampshire" data-year="2024"><span class="jr-code" aria-hidden="true">NH</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">New Hampshire, first visit 2024</span></li>
+        <li class="jr-tile" style="--c:1;--r:3" data-name="Washington"><span class="jr-code" aria-hidden="true">WA</span><span class="visually-hidden">Washington, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:2;--r:3" data-name="Idaho" data-year="2025"><span class="jr-code" aria-hidden="true">ID</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Idaho, first visit 2025</span></li>
+        <li class="jr-tile" style="--c:3;--r:3" data-name="Montana"><span class="jr-code" aria-hidden="true">MT</span><span class="visually-hidden">Montana, not yet</span></li>
+        <li class="jr-tile" style="--c:4;--r:3" data-name="North Dakota"><span class="jr-code" aria-hidden="true">ND</span><span class="visually-hidden">North Dakota, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:3" data-name="Minnesota" data-year="2019"><span class="jr-code" aria-hidden="true">MN</span><span class="jr-yr" aria-hidden="true">2019</span><span class="visually-hidden">Minnesota, first visit 2019</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:3" data-name="Illinois" data-year="2025"><span class="jr-code" aria-hidden="true">IL</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Illinois, first visit 2025</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:3" data-name="Wisconsin" data-year="2019"><span class="jr-code" aria-hidden="true">WI</span><span class="jr-yr" aria-hidden="true">2019</span><span class="visually-hidden">Wisconsin, first visit 2019</span></li>
+        <li class="jr-tile" style="--c:8;--r:3" data-name="Michigan"><span class="jr-code" aria-hidden="true">MI</span><span class="visually-hidden">Michigan, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:9;--r:3" data-name="New York" data-year="2024"><span class="jr-code" aria-hidden="true">NY</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">New York, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:10;--r:3" data-name="Rhode Island" data-year="2024"><span class="jr-code" aria-hidden="true">RI</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Rhode Island, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:11;--r:3" data-name="Massachusetts" data-year="2022"><span class="jr-code" aria-hidden="true">MA</span><span class="jr-yr" aria-hidden="true">2022</span><span class="visually-hidden">Massachusetts, first visit 2022</span></li>
+        <li class="jr-tile" style="--c:1;--r:4" data-name="Oregon"><span class="jr-code" aria-hidden="true">OR</span><span class="visually-hidden">Oregon, not yet</span></li>
+        <li class="jr-tile" style="--c:2;--r:4" data-name="Nevada"><span class="jr-code" aria-hidden="true">NV</span><span class="visually-hidden">Nevada, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:3;--r:4" data-name="Wyoming" data-year="2025"><span class="jr-code" aria-hidden="true">WY</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Wyoming, first visit 2025</span></li>
+        <li class="jr-tile" style="--c:4;--r:4" data-name="South Dakota"><span class="jr-code" aria-hidden="true">SD</span><span class="visually-hidden">South Dakota, not yet</span></li>
+        <li class="jr-tile is-lit is-draft" style="--c:5;--r:4" data-name="Iowa" data-year="2025"><span class="jr-code" aria-hidden="true">IA</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Iowa, first visit 2025</span></li>
+        <li class="jr-tile is-lit is-draft" style="--c:6;--r:4" data-name="Indiana" data-year="2025"><span class="jr-code" aria-hidden="true">IN</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Indiana, first visit 2025</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:4" data-name="Ohio" data-year="2025"><span class="jr-code" aria-hidden="true">OH</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Ohio, first visit 2025</span></li>
+        <li class="jr-tile is-lit is-draft" style="--c:8;--r:4" data-name="Pennsylvania" data-year="2025"><span class="jr-code" aria-hidden="true">PA</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Pennsylvania, first visit 2025</span></li>
+        <li class="jr-tile is-lit" style="--c:9;--r:4" data-name="New Jersey" data-year="2024"><span class="jr-code" aria-hidden="true">NJ</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">New Jersey, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:10;--r:4" data-name="Connecticut" data-year="2024"><span class="jr-code" aria-hidden="true">CT</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Connecticut, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:1;--r:5" data-name="California" data-year="2019"><span class="jr-code" aria-hidden="true">CA</span><span class="jr-yr" aria-hidden="true">2019</span><span class="visually-hidden">California, first visit 2019</span></li>
+        <li class="jr-tile is-lit" style="--c:2;--r:5" data-name="Utah" data-year="2025"><span class="jr-code" aria-hidden="true">UT</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Utah, first visit 2025</span></li>
+        <li class="jr-tile is-lit" style="--c:3;--r:5" data-name="Colorado" data-year="2023"><span class="jr-code" aria-hidden="true">CO</span><span class="jr-yr" aria-hidden="true">2023</span><span class="visually-hidden">Colorado, first visit 2023</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:5" data-name="Nebraska" data-year="2025"><span class="jr-code" aria-hidden="true">NE</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Nebraska, first visit 2025</span></li>
+        <li class="jr-tile" style="--c:5;--r:5" data-name="Missouri"><span class="jr-code" aria-hidden="true">MO</span><span class="visually-hidden">Missouri, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:5" data-name="Kentucky" data-year="2024"><span class="jr-code" aria-hidden="true">KY</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Kentucky, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:5" data-name="West Virginia" data-year="2024"><span class="jr-code" aria-hidden="true">WV</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">West Virginia, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:8;--r:5" data-name="Virginia" data-year="2024"><span class="jr-code" aria-hidden="true">VA</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Virginia, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:9;--r:5" data-name="Maryland" data-year="2024"><span class="jr-code" aria-hidden="true">MD</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Maryland, first visit 2024</span></li>
+        <li class="jr-tile is-lit is-draft" style="--c:10;--r:5" data-name="Delaware" data-year="2024"><span class="jr-code" aria-hidden="true">DE</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Delaware, first visit 2024</span></li>
+        <li class="jr-tile is-lit is-draft" style="--c:2;--r:6" data-name="Arizona" data-year="2025"><span class="jr-code" aria-hidden="true">AZ</span><span class="jr-yr" aria-hidden="true">2025</span><span class="visually-hidden">Arizona, first visit 2025</span></li>
+        <li class="jr-tile is-lit" style="--c:3;--r:6" data-name="New Mexico" data-year="2021"><span class="jr-code" aria-hidden="true">NM</span><span class="jr-yr" aria-hidden="true">2021</span><span class="visually-hidden">New Mexico, first visit 2021</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:6" data-name="Kansas" data-year="2023"><span class="jr-code" aria-hidden="true">KS</span><span class="jr-yr" aria-hidden="true">2023</span><span class="visually-hidden">Kansas, first visit 2023</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:6" data-name="Arkansas" data-year="2023"><span class="jr-code" aria-hidden="true">AR</span><span class="jr-yr" aria-hidden="true">2023</span><span class="visually-hidden">Arkansas, first visit 2023</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:6" data-name="Tennessee" data-year="2024"><span class="jr-code" aria-hidden="true">TN</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Tennessee, first visit 2024</span></li>
+        <li class="jr-tile" style="--c:7;--r:6" data-name="North Carolina"><span class="jr-code" aria-hidden="true">NC</span><span class="visually-hidden">North Carolina, not yet</span></li>
+        <li class="jr-tile" style="--c:8;--r:6" data-name="South Carolina"><span class="jr-code" aria-hidden="true">SC</span><span class="visually-hidden">South Carolina, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:9;--r:6" data-name="District of Columbia" data-year="2020"><span class="jr-code" aria-hidden="true">DC</span><span class="jr-yr" aria-hidden="true">2020</span><span class="visually-hidden">District of Columbia, first visit 2020</span></li>
+        <li class="jr-tile is-lit is-draft" style="--c:4;--r:7" data-name="Oklahoma" data-year="2023"><span class="jr-code" aria-hidden="true">OK</span><span class="jr-yr" aria-hidden="true">2023</span><span class="visually-hidden">Oklahoma, first visit 2023</span></li>
+        <li class="jr-tile is-lit" style="--c:5;--r:7" data-name="Louisiana" data-year="2024"><span class="jr-code" aria-hidden="true">LA</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Louisiana, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:6;--r:7" data-name="Mississippi" data-year="2024"><span class="jr-code" aria-hidden="true">MS</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Mississippi, first visit 2024</span></li>
+        <li class="jr-tile is-lit" style="--c:7;--r:7" data-name="Alabama" data-year="2024"><span class="jr-code" aria-hidden="true">AL</span><span class="jr-yr" aria-hidden="true">2024</span><span class="visually-hidden">Alabama, first visit 2024</span></li>
+        <li class="jr-tile" style="--c:8;--r:7" data-name="Georgia"><span class="jr-code" aria-hidden="true">GA</span><span class="visually-hidden">Georgia, not yet</span></li>
+        <li class="jr-tile" style="--c:1;--r:8" data-name="Hawaii"><span class="jr-code" aria-hidden="true">HI</span><span class="visually-hidden">Hawaii, not yet</span></li>
+        <li class="jr-tile is-lit" style="--c:4;--r:8" data-name="Texas" data-year="2019"><span class="jr-code" aria-hidden="true">TX</span><span class="jr-yr" aria-hidden="true">2019</span><span class="visually-hidden">Texas, first visit 2019</span></li>
+        <li class="jr-tile" style="--c:9;--r:8" data-name="Florida"><span class="jr-code" aria-hidden="true">FL</span><span class="visually-hidden">Florida, not yet</span></li>
+      </ol>
+    </figure>
+  </div>
+</section>
+
+<section class="jr-sec jr-chapters" id="chapters" aria-labelledby="h-jr-chapters">
+  <div class="jr-head jr-head-row"><h2 id="h-jr-chapters">Chapters</h2><button type="button" class="jr-firsts-btn" aria-pressed="false" hidden><span class="jr-star" aria-hidden="true"></span>Firsts only</button></div>
+  <p class="jr-firsts-note" hidden>Showing the firsts and the milestones only.</p>
+  <ol class="jr-chapter-list">
+    <li class="jr-chapter" id="ch-baotou" style="--ch: var(--ch-baotou)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Baotou <span class="jr-ch-where">Inner Mongolia, China</span></h3>
+        <p class="jr-ch-when">Sep 2010 – Jun 2014</p>
+        <p class="jr-ch-line">Four years of English studies on the edge of the grasslands.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-leave-home-2010" data-entry="leave-home-2010">
+          <span class="jr-when">Sep 2010</span>
+          <p class="jr-text">Left home in Shouguang, Shandong, for university in Baotou: my first time away from home, and the farthest I had been. <span class="jr-badge jr-badge-first">First time away from home</span></p>
+        </li>
+        <li class="jr-entry" id="e-ordos-hohhot" data-entry="ordos-hohhot">
+          <span class="jr-when">2010–2014</span>
+          <p class="jr-text">Ordos and Hohhot, many times: both are close to Baotou.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-yinchuan-2011" data-entry="yinchuan-2011">
+          <span class="jr-when">May 2011</span>
+          <p class="jr-text">Yinchuan, Ningxia, over the May Day holiday: my first real trip that was not for school. <span class="jr-badge jr-badge-first">First trip of my own</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-mt-heng-2012" data-entry="mt-heng-2012">
+          <span class="jr-when">May 2012</span>
+          <p class="jr-text">Datong, Shanxi: climbed Mount Heng, the North of the Five Great Mountains and my first of the five. <span class="jr-badge jr-badge-first">First of the Five Great Mountains</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-qingdao-2012" data-entry="qingdao-2012">
+          <span class="jr-when">Summer 2012</span>
+          <p class="jr-text">Qingdao, for the first time, in the summer holiday. <span class="jr-badge jr-badge-first">First time in Qingdao</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-kubuqi-2012" data-entry="kubuqi-2012">
+          <span class="jr-when">Sep 2012</span>
+          <p class="jr-text">Cycled from Baotou to the Kubuqi Desert: my first desert. <span class="jr-badge jr-badge-first">First desert</span></p>
+        </li>
+        <li class="jr-entry is-first has-stops" id="e-china-loop-2013" data-entry="china-loop-2013">
+          <span class="jr-when">Jul–Sep 2013</span>
+          <p class="jr-text">Sixty days around China in the summer holiday: 17 provinces and regions, 33 cities and 12,162 km, and the last of the Five Great Mountains, all climbed and descended on foot. <span class="jr-badge jr-badge-ms">All Five Great Mountains</span></p>
+          <ol class="jr-stops" aria-label="Main stops">
+            <li class="jr-entry" id="e-loop-xian" data-entry="loop-xian">
+              <span class="jr-when"></span>
+              <p class="jr-text">Xi&#x27;an: Mount Hua (the West), the Qinling, the Terracotta Army, Datang Everbright City and the Big Wild Goose Pagoda.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-qinghai" data-entry="loop-qinghai">
+              <span class="jr-when"></span>
+              <p class="jr-text">Qinghai: Qinghai Lake, Riyue Mountain and the rapeseed fields in flower.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-lhasa" data-entry="loop-lhasa">
+              <span class="jr-when"></span>
+              <p class="jr-text">By train from Qinghai to Lhasa: the Jokhang Temple and Namtso.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-yunnan" data-entry="loop-yunnan">
+              <span class="jr-when"></span>
+              <p class="jr-text">Yunnan: Shangri-La, Lijiang, Dali and Kunming.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-guizhou-guangxi" data-entry="loop-guizhou-guangxi">
+              <span class="jr-when"></span>
+              <p class="jr-text">Guizhou, then Guilin and Yangshuo in Guangxi.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-hunan" data-entry="loop-hunan">
+              <span class="jr-when"></span>
+              <p class="jr-text">Hunan: Mount Heng (the South) and the old town of Fenghuang; then north through Hubei.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-henan" data-entry="loop-henan">
+              <span class="jr-when"></span>
+              <p class="jr-text">Henan: the Shaolin Temple and Mount Song (the Centre), and Kaifeng.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-shandong" data-entry="loop-shandong">
+              <span class="jr-when"></span>
+              <p class="jr-text">Shandong: Mount Tai (the East), the last of the five.</p>
+            </li>
+            <li class="jr-entry" id="e-loop-bohai" data-entry="loop-bohai">
+              <span class="jr-when"></span>
+              <p class="jr-text">Around the Bohai Sea through Liaoning, Hebei, Tianjin and Beijing, and back through Shanxi to Baotou.</p>
+            </li>
+          </ol>
+        </li>
+        <li class="jr-entry is-first" id="e-jinan-2014" data-entry="jinan-2014">
+          <span class="jr-when">Spring 2014</span>
+          <p class="jr-text">Jinan, for the first time. <span class="jr-badge jr-badge-first">First time in Jinan</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-ba-2014" data-entry="ba-2014">
+          <span class="jr-when">2014</span>
+          <p class="jr-text">Graduated with a B.A. in English. <span class="jr-badge jr-badge-ms">B.A.</span></p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-shanghai-bali" style="--ch: var(--ch-shanghai-bali)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Shanghai and Bali <span class="jr-ch-where">China and Indonesia</span></h3>
+        <p class="jr-ch-when">Jul 2014 – Oct 2015</p>
+        <p class="jr-ch-line">A first job, and thirteen months abroad on my first project.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-shanghai-2014" data-entry="shanghai-2014">
+          <span class="jr-when">Jul 2014</span>
+          <p class="jr-text">Moved to Shanghai for my first job. <span class="jr-badge jr-badge-first">First job</span></p>
+        </li>
+        <li class="jr-entry" id="e-hangzhou-wuzhen-2014" data-entry="hangzhou-wuzhen-2014">
+          <span class="jr-when">Summer 2014</span>
+          <p class="jr-text">In the two months before going abroad: Hangzhou, Wuzhen and other places around Shanghai.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-bali-2014" data-entry="bali-2014">
+          <span class="jr-when">Sep 2014</span>
+          <p class="jr-text">Flew to Bali for my first project abroad, changing planes in Brunei without leaving the airport: Indonesia is my first country abroad. <span class="jr-badge jr-badge-first">First country abroad</span><span class="jr-tag">Brunei: transit, no entry</span></p>
+        </li>
+        <li class="jr-entry" id="e-bali-2014-15" data-entry="bali-2014-15">
+          <span class="jr-when">Sep 2014 – Oct 2015</span>
+          <p class="jr-text">Thirteen months in Bali, at a power plant being built on the northwest coast; I came to know nearly every corner of the island.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-bali-firsts" data-entry="bali-firsts">
+          <span class="jr-when">Sep 2014 – Oct 2015</span>
+          <p class="jr-text">On Bali I learned to dive, snorkelling and then scuba, and earned a scuba certification; I also flew a paraglider and surfed for the first time. <span class="jr-badge jr-badge-first">Learned to dive</span><span class="jr-badge jr-badge-first">First paragliding flight</span><span class="jr-badge jr-badge-first">First surf</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-transits-2015" data-entry="transits-2015">
+          <span class="jr-when">2014–2015</span>
+          <p class="jr-text">One trip home, changing planes in Beijing and Hong Kong: my first steps in both cities. <span class="jr-badge jr-badge-first">First time in Beijing and Hong Kong</span><span class="jr-tag">Beijing: transit</span><span class="jr-tag">Hong Kong: transit</span></p>
+        </li>
+        <li class="jr-entry" id="e-nusa-lembongan-2015" data-entry="nusa-lembongan-2015">
+          <span class="jr-when">Aug 2015</span>
+          <p class="jr-text">Nusa Lembongan, the small island off Bali&#x27;s southeast coast.</p>
+        </li>
+        <li class="jr-entry" id="e-bali-loop-2015" data-entry="bali-loop-2015">
+          <span class="jr-when">Before Oct 2015</span>
+          <p class="jr-text">A loop around the whole island before leaving Bali.</p>
+        </li>
+        <li class="jr-entry" id="e-hong-kong-2015" data-entry="hong-kong-2015">
+          <span class="jr-when">Oct 2015</span>
+          <p class="jr-text">Left Bali for nearly a week in Hong Kong.</p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-between" style="--ch: var(--ch-between)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>China, between postings <span class="jr-ch-where">Shanghai and home</span></h3>
+        <p class="jr-ch-when">Oct 2015 – Sep 2016</p>
+        <p class="jr-ch-line">Back in China for a year before the next posting.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry" id="e-home-2015" data-entry="home-2015">
+          <span class="jr-when">Oct 2015</span>
+          <p class="jr-text">A rest at home in Shouguang, then back to Shanghai at the end of October.</p>
+        </li>
+        <li class="jr-entry" id="e-huangshan-2015" data-entry="huangshan-2015">
+          <span class="jr-when">Nov 2015</span>
+          <p class="jr-text">Mount Huang.</p>
+        </li>
+        <li class="jr-entry" id="e-nantong-2015" data-entry="nantong-2015">
+          <span class="jr-when">Dec 2015</span>
+          <p class="jr-text">A month in Nantong, Jiangsu.</p>
+        </li>
+        <li class="jr-entry" id="e-dmu-2016" data-entry="dmu-2016">
+          <span class="jr-when">Feb 2016</span>
+          <p class="jr-text">Began a part-time master&#x27;s at Dalian Maritime University.</p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-lagos" style="--ch: var(--ch-lagos)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Lagos <span class="jr-ch-where">Nigeria</span></h3>
+        <p class="jr-ch-when">Sep 2016 – Apr 2019</p>
+        <p class="jr-ch-line">Posted to West Africa, home on leave about every six months; a part-time master&#x27;s along the way.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry" id="e-lagos-2016" data-entry="lagos-2016">
+          <span class="jr-when">Sep 2016</span>
+          <p class="jr-text">Flew to Lagos to live and work in Nigeria; home on leave about every six months.</p>
+        </li>
+        <li class="jr-entry" id="e-west-africa" data-entry="west-africa">
+          <span class="jr-when">2016–2019</span>
+          <p class="jr-text">From Lagos, north to Niger and west to Ghana and Togo.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-doha-2017" data-entry="doha-2017">
+          <span class="jr-when">Feb 2017</span>
+          <p class="jr-text">Doha, Qatar, for the first time. <span class="jr-badge jr-badge-first">First time in Qatar</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-siguniang-2017" data-entry="siguniang-2017">
+          <span class="jr-when">Oct 2017</span>
+          <p class="jr-text">On leave: summited the second peak of Mount Siguniang, my first snow peak; then Chengdu and Wuhan. <span class="jr-badge jr-badge-first">First snow peak</span></p>
+        </li>
+        <li class="jr-entry" id="e-doha-2017b" data-entry="doha-2017b">
+          <span class="jr-when">Oct and Nov 2017</span>
+          <p class="jr-text">Doha twice more: changing planes, with time to look around each time.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-abuja-2018" data-entry="abuja-2018">
+          <span class="jr-when">May 2018</span>
+          <p class="jr-text">Abuja, for the first time. <span class="jr-badge jr-badge-first">First time in Abuja</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-beijing-dubai-2018" data-entry="beijing-dubai-2018">
+          <span class="jr-when">Jul 2018</span>
+          <p class="jr-text">Beijing, properly this time; then Dubai, with Abu Dhabi, for the first time. <span class="jr-badge jr-badge-first">First real visit to Beijing</span><span class="jr-badge jr-badge-first">First time in Dubai</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-istanbul-2018" data-entry="istanbul-2018">
+          <span class="jr-when">Dec 2018</span>
+          <p class="jr-text">Istanbul, for the first time. <span class="jr-badge jr-badge-first">First time in Istanbul</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-dmu-2018" data-entry="dmu-2018">
+          <span class="jr-when">Dec 2018</span>
+          <p class="jr-text">Completed the part-time master&#x27;s (M.E. in Computer Engineering, Dalian Maritime University). <span class="jr-badge jr-badge-ms">M.E.</span></p>
+        </li>
+        <li class="jr-entry" id="e-leave-nigeria-2019" data-entry="leave-nigeria-2019">
+          <span class="jr-when">Apr 2019</span>
+          <p class="jr-text">Left Nigeria through Istanbul, one last time, and went home to China.</p>
+        </li>
+        <li class="jr-entry" id="e-visa-2019" data-entry="visa-2019">
+          <span class="jr-when">May–Jun 2019</span>
+          <p class="jr-text">Beijing and Shanghai, for my U.S. visa.</p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-san-marcos" style="--ch: var(--ch-san-marcos)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>San Marcos <span class="jr-ch-where">Texas, United States</span></h3>
+        <p class="jr-ch-when">Aug 2019 – Jul 2021</p>
+        <p class="jr-ch-line">My first home in the United States: an M.S. at Texas State University, and six months in Washington, DC.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-leave-home-2019" data-entry="leave-home-2019">
+          <span class="jr-when">8 August 2019, 8:08 a.m.</span>
+          <p class="jr-text">Left home in Shouguang at 8:08 in the morning: by road to Shanghai, then a flight to the United States. <span class="jr-badge jr-badge-ms">Left for the U.S.</span></p>
+        </li>
+        <li class="jr-entry" id="e-seoul-2019" data-entry="seoul-2019">
+          <span class="jr-when">Aug 2019</span>
+          <p class="jr-text">A day in Seoul on the way.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-sf-2019" data-entry="sf-2019">
+          <span class="jr-when">Aug 2019</span>
+          <p class="jr-text">First landing in the United States: a day in San Francisco. <span class="jr-badge jr-badge-first">First landing in the U.S.</span></p>
+        </li>
+        <li class="jr-entry" id="e-san-marcos-2019" data-entry="san-marcos-2019">
+          <span class="jr-when">Aug 2019</span>
+          <p class="jr-text">On to Austin, then by taxi to San Marcos, my home for the next two years.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-midwest-2019" data-entry="midwest-2019">
+          <span class="jr-when">Dec 2019</span>
+          <p class="jr-text">My first American winter and my first trip to another state: Madison, Wisconsin, then the Twin Cities. <span class="jr-badge jr-badge-first">First trip to another state</span></p>
+        </li>
+        <li class="jr-entry" id="e-pandemic-2020" data-entry="pandemic-2020">
+          <span class="jr-when">Early 2020</span>
+          <p class="jr-text">The pandemic begins.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-nasa-2020" data-entry="nasa-2020">
+          <span class="jr-when">Sep 2020</span>
+          <p class="jr-text">NASA in Houston, for the first time. <span class="jr-badge jr-badge-first">First time at NASA</span></p>
+        </li>
+        <li class="jr-entry" id="e-dc-2020" data-entry="dc-2020">
+          <span class="jr-when">Late 2020 – Jun 2021</span>
+          <p class="jr-text">Six months living in Washington, DC.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-ms-defence-2021" data-entry="ms-defence-2021">
+          <span class="jr-when">16 July 2021</span>
+          <p class="jr-text">Defended my master&#x27;s at Texas State University. <span class="jr-badge jr-badge-ms">M.S. defence</span></p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-dallas" style="--ch: var(--ch-dallas)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Dallas <span class="jr-ch-where">Texas, United States</span></h3>
+        <p class="jr-ch-when">Jul 2021 – Aug 2024</p>
+        <p class="jr-ch-line">Ph.D. years at The University of Texas at Dallas, and the first long drives.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-dallas-2021" data-entry="dallas-2021">
+          <span class="jr-when">Jul 2021</span>
+          <p class="jr-text">Moved to Dallas to begin my Ph.D. at The University of Texas at Dallas. <span class="jr-badge jr-badge-ms">Ph.D. begins</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-west-loop-2021" data-entry="west-loop-2021">
+          <span class="jr-when">Nov 2021</span>
+          <p class="jr-text">Thanksgiving, my first long road trip: west to Carlsbad and White Sands, through Guadalupe Mountains and Big Bend, and home by San Antonio. <span class="jr-badge jr-badge-first">First long road trip</span></p>
+        </li>
+        <li class="jr-entry" id="e-europe-2022" data-entry="europe-2022">
+          <span class="jr-when">May–Jun 2022</span>
+          <p class="jr-text">Europe, for a conference: landed in the Netherlands, by train to Cologne, then Belgium, Paris, Antwerp, Bruges, Delft, Rotterdam, The Hague and Amsterdam.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-boston-2022" data-entry="boston-2022">
+          <span class="jr-when">Jul 2022</span>
+          <p class="jr-text">Boston for the first time: two weeks in the city. <span class="jr-badge jr-badge-first">First time in Boston</span></p>
+        </li>
+        <li class="jr-entry" id="e-thanksgiving-2022" data-entry="thanksgiving-2022">
+          <span class="jr-when">Nov 2022</span>
+          <p class="jr-text">Thanksgiving in West Texas, San Antonio once more, and Wonder World park.</p>
+        </li>
+        <li class="jr-entry" id="e-new-year-2023" data-entry="new-year-2023">
+          <span class="jr-when">Jan 2023</span>
+          <p class="jr-text">New Year&#x27;s fireworks in Dallas.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-arkansas-2023" data-entry="arkansas-2023">
+          <span class="jr-when">May 2023</span>
+          <p class="jr-text">Arkansas: hiking in Hot Springs, my first U.S. national park, and my first off-road drive; then Caddo Lake. <span class="jr-badge jr-badge-first">First U.S. national park</span><span class="jr-badge jr-badge-first">First off-road drive</span></p>
+        </li>
+        <li class="jr-entry" id="e-boston-2023" data-entry="boston-2023">
+          <span class="jr-when">Aug 2023</span>
+          <p class="jr-text">Boston again, for a conference.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-denver-loop-2023" data-entry="denver-loop-2023">
+          <span class="jr-when">Oct 2023</span>
+          <p class="jr-text">My first road trip driving alone, a loop: north to Salina, Kansas, west on I-70 to a conference in Denver and Rocky Mountain National Park, south to Santa Fe, and home. <span class="jr-badge jr-badge-first">First solo road trip</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-caddo-grasslands-2023" data-entry="caddo-grasslands-2023">
+          <span class="jr-when">Nov 2023</span>
+          <p class="jr-text">Caddo National Grasslands in North Texas: my first night camping alone. <span class="jr-badge jr-badge-first">First solo camping</span></p>
+        </li>
+        <li class="jr-entry is-first" id="e-home-2024" data-entry="home-2024">
+          <span class="jr-when">Winter 2023–24</span>
+          <p class="jr-text">Home for the Spring Festival, the first time since moving to the U.S.; climbed Yunmen Mountain in Qingzhou with my father. <span class="jr-badge jr-badge-first">First Spring Festival home from the U.S.</span></p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-boston" style="--ch: var(--ch-boston)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Boston <span class="jr-ch-where">Massachusetts, United States</span></h3>
+        <p class="jr-ch-when">Aug 2024 – Jan 2025</p>
+        <p class="jr-ch-line">A half-year internship, and New England in autumn.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-drive-boston-2024" data-entry="drive-boston-2024">
+          <span class="jr-when">Aug 2024</span>
+          <p class="jr-text">Drove from Dallas to Boston for an internship, through nine states and Washington, DC; my first time in New York, and my first sight of the Mississippi. <span class="jr-badge jr-badge-first">First time in New York</span><span class="jr-badge jr-badge-first">First sight of the Mississippi</span></p>
+        </li>
+        <li class="jr-entry" id="e-walden-rockport-2024" data-entry="walden-rockport-2024">
+          <span class="jr-when">2024</span>
+          <p class="jr-text">Walden Pond and Rockport.</p>
+        </li>
+        <li class="jr-entry" id="e-vermont-2024" data-entry="vermont-2024">
+          <span class="jr-when">Early Oct 2024</span>
+          <p class="jr-text">Drove to Vermont to camp among the autumn leaves.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-aurora-2024" data-entry="aurora-2024">
+          <span class="jr-when">Oct 2024</span>
+          <p class="jr-text">My first aurora, seen from Boston, and meteors in mid-October. <span class="jr-badge jr-badge-first">First aurora</span></p>
+        </li>
+        <li class="jr-entry" id="e-rutgers-2024" data-entry="rutgers-2024">
+          <span class="jr-when">Late Oct 2024</span>
+          <p class="jr-text">Drove to Rutgers University in New Jersey for a conference.</p>
+        </li>
+        <li class="jr-entry" id="e-new-hampshire-2024" data-entry="new-hampshire-2024">
+          <span class="jr-when">Nov 2024</span>
+          <p class="jr-text">A day in New Hampshire.</p>
+        </li>
+        <li class="jr-entry" id="e-new-year-2025" data-entry="new-year-2025">
+          <span class="jr-when">Dec 2024</span>
+          <p class="jr-text">The last day of 2024: north through New Hampshire to Portland, Maine; the New Year in Boston.</p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-idaho-falls" style="--ch: var(--ch-idaho-falls)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Idaho Falls <span class="jr-ch-where">Idaho, United States</span></h3>
+        <p class="jr-ch-when">Jan 2025 – Dec 2025</p>
+        <p class="jr-ch-line">An internship at Idaho National Laboratory, Yellowstone, and my Ph.D. defence.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry" id="e-drive-idaho-2025" data-entry="drive-idaho-2025">
+          <span class="jr-when">Jan 2025</span>
+          <p class="jr-text">Drove from Boston to Idaho Falls: Niagara Falls from Buffalo, Cleveland, a few days in Chicago, Omaha, a night in Cheyenne, then Salt Lake City and the Great Salt Lake.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-yellowstone-2025" data-entry="yellowstone-2025">
+          <span class="jr-when">May 2025</span>
+          <p class="jr-text">Yellowstone for the first time; a week later, camping nearby. <span class="jr-badge jr-badge-first">First time in Yellowstone</span></p>
+        </li>
+        <li class="jr-entry" id="e-inl-2025" data-entry="inl-2025">
+          <span class="jr-when">Aug 2025</span>
+          <p class="jr-text">Finished the internship at Idaho National Laboratory, and stayed on in Idaho Falls.</p>
+        </li>
+        <li class="jr-entry is-first" id="e-phd-defence-2025" data-entry="phd-defence-2025">
+          <span class="jr-when">10 September 2025</span>
+          <p class="jr-text">Defended my Ph.D. <span class="jr-badge jr-badge-ms">Ph.D. defence</span></p>
+        </li>
+        <li class="jr-entry" id="e-drive-texas-2025" data-entry="drive-texas-2025">
+          <span class="jr-when">Dec 2025</span>
+          <p class="jr-text">South to Texas the eastern way: Arches, Monument Valley and the road where Forrest Gump stopped running, the deserts of western New Mexico, Santa Fe, and on to Austin.</p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-austin" style="--ch: var(--ch-austin)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Austin <span class="jr-ch-where">Texas, United States</span></h3>
+        <p class="jr-ch-when">Dec 2025 – Apr 2026</p>
+        <p class="jr-ch-line">A winter in Austin, graduation in Dallas, and a postdoc offer from Kansas.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-graduation-2025" data-entry="graduation-2025">
+          <span class="jr-when">12 December 2025</span>
+          <p class="jr-text">Commencement in Dallas: Ph.D. in Mechanical Engineering, The University of Texas at Dallas. <span class="jr-badge jr-badge-ms">Graduation</span></p>
+        </li>
+        <li class="jr-entry" id="e-austin-2026" data-entry="austin-2026">
+          <span class="jr-when">Winter 2025–26</span>
+          <p class="jr-text">A winter in Austin, and an offer of a postdoc at Kansas State University.</p>
+        </li>
+      </ol>
+    </li>
+    <li class="jr-chapter" id="ch-manhattan" style="--ch: var(--ch-manhattan)">
+      <div class="jr-ch-head">
+        <h3><span class="jr-key" aria-hidden="true"></span>Manhattan <span class="jr-ch-where">Kansas, United States</span></h3>
+        <p class="jr-ch-when">Apr 2026 – now</p>
+        <p class="jr-ch-line">Postdoctoral Fellow at Kansas State University.</p>
+      </div>
+      <ol class="jr-entries">
+        <li class="jr-entry is-first" id="e-manhattan-2026" data-entry="manhattan-2026">
+          <span class="jr-when">Apr 2026</span>
+          <p class="jr-text">Moved to Manhattan, Kansas, as a Postdoctoral Fellow at Kansas State University. <span class="jr-badge jr-badge-ms">Postdoc begins</span></p>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</section>
+
+<script type="application/json" id="jr-data">{"since":2010,"now":2026,"chapters":[{"id":"baotou","n":"Baotou","w":"Sep 2010 – Jun 2014","y0":2010,"y1":2014},{"id":"shanghai-bali","n":"Shanghai and Bali","w":"Jul 2014 – Oct 2015","y0":2014,"y1":2015},{"id":"between","n":"China, between postings","w":"Oct 2015 – Sep 2016","y0":2015,"y1":2016},{"id":"lagos","n":"Lagos","w":"Sep 2016 – Apr 2019","y0":2016,"y1":2019},{"id":"san-marcos","n":"San Marcos","w":"Aug 2019 – Jul 2021","y0":2019,"y1":2021},{"id":"dallas","n":"Dallas","w":"Jul 2021 – Aug 2024","y0":2021,"y1":2024},{"id":"boston","n":"Boston","w":"Aug 2024 – Jan 2025","y0":2024,"y1":2025},{"id":"idaho-falls","n":"Idaho Falls","w":"Jan 2025 – Dec 2025","y0":2025,"y1":2025},{"id":"austin","n":"Austin","w":"Dec 2025 – Apr 2026","y0":2025,"y1":2026},{"id":"manhattan","n":"Manhattan","w":"Apr 2026 – now","y0":2026,"y1":2026}],"places":{"shouguang":{"n":"Shouguang (home)","w":"Shandong, China","ll":[118.79,36.88],"h":1},"baotou":{"n":"Baotou","w":"Inner Mongolia, China","ll":[109.84,40.66],"h":1},"ordos":{"n":"Ordos","w":"Inner Mongolia, China","ll":[109.78,39.61],"h":0},"hohhot":{"n":"Hohhot","w":"Inner Mongolia, China","ll":[111.75,40.84],"h":0},"yinchuan":{"n":"Yinchuan","w":"Ningxia, China","ll":[106.23,38.49],"h":0},"mt-heng-north":{"n":"Datong and Mount Heng","w":"Shanxi, China","ll":[113.73,39.67],"h":0},"qingdao":{"n":"Qingdao","w":"Shandong, China","ll":[120.38,36.07],"h":0},"kubuqi":{"n":"Kubuqi Desert","w":"Inner Mongolia, China","ll":[109.98,40.28],"h":0},"xian":{"n":"Xi'an","w":"Shaanxi, China","ll":[108.94,34.34],"h":0},"mt-hua":{"n":"Mount Hua","w":"Shaanxi, China","ll":[110.09,34.48],"h":0},"qinghai-lake":{"n":"Qinghai Lake","w":"Qinghai, China","ll":[100.2,36.9],"h":0},"riyue":{"n":"Riyue Mountain","w":"Qinghai, China","ll":[101.03,36.43],"h":0},"lhasa":{"n":"Lhasa","w":"Tibet, China","ll":[91.13,29.65],"h":0},"namtso":{"n":"Namtso","w":"Tibet, China","ll":[90.63,30.72],"h":0},"shangrila":{"n":"Shangri-La","w":"Yunnan, China","ll":[99.71,27.83],"h":0},"lijiang":{"n":"Lijiang","w":"Yunnan, China","ll":[100.23,26.87],"h":0},"dali":{"n":"Dali","w":"Yunnan, China","ll":[100.27,25.61],"h":0},"kunming":{"n":"Kunming","w":"Yunnan, China","ll":[102.71,25.04],"h":0},"guizhou":{"n":"Guizhou","w":"China","ll":[106.63,26.65],"h":0},"guilin":{"n":"Guilin","w":"Guangxi, China","ll":[110.29,25.27],"h":0},"yangshuo":{"n":"Yangshuo","w":"Guangxi, China","ll":[110.49,24.78],"h":0},"fenghuang":{"n":"Fenghuang","w":"Hunan, China","ll":[109.6,27.95],"h":0},"mt-heng-south":{"n":"Mount Heng (South)","w":"Hunan, China","ll":[112.7,27.25],"h":0},"mt-song":{"n":"Mount Song and the Shaolin Temple","w":"Henan, China","ll":[112.95,34.5],"h":0},"kaifeng":{"n":"Kaifeng","w":"Henan, China","ll":[114.31,34.8],"h":0},"mt-tai":{"n":"Mount Tai","w":"Shandong, China","ll":[117.1,36.25],"h":0},"jinan":{"n":"Jinan","w":"Shandong, China","ll":[117.12,36.65],"h":0},"shanghai":{"n":"Shanghai","w":"China","ll":[121.47,31.23],"h":1},"hangzhou":{"n":"Hangzhou","w":"Zhejiang, China","ll":[120.15,30.27],"h":0},"wuzhen":{"n":"Wuzhen","w":"Zhejiang, China","ll":[120.49,30.75],"h":0},"beijing":{"n":"Beijing","w":"China","ll":[116.41,39.9],"h":0},"hong-kong":{"n":"Hong Kong","w":"","ll":[114.17,22.32],"h":0},"huangshan":{"n":"Mount Huang","w":"Anhui, China","ll":[118.17,30.13],"h":0},"nantong":{"n":"Nantong","w":"Jiangsu, China","ll":[120.89,31.98],"h":0},"siguniang":{"n":"Mount Siguniang","w":"Sichuan, China","ll":[102.9,31.1],"h":0},"chengdu":{"n":"Chengdu","w":"Sichuan, China","ll":[104.07,30.57],"h":0},"wuhan":{"n":"Wuhan","w":"Hubei, China","ll":[114.31,30.59],"h":0},"yunmen":{"n":"Yunmen Mountain, Qingzhou","w":"Shandong, China","ll":[118.48,36.66],"h":0},"brunei":{"n":"Brunei","w":"","ll":[114.93,4.94],"h":0},"bali":{"n":"Bali","w":"Indonesia","ll":[115.09,-8.34],"h":1},"nusa-lembongan":{"n":"Nusa Lembongan","w":"Indonesia","ll":[115.45,-8.68],"h":0},"lagos":{"n":"Lagos","w":"Nigeria","ll":[3.38,6.52],"h":1},"abuja":{"n":"Abuja","w":"Nigeria","ll":[7.4,9.08],"h":0},"niger":{"n":"Niger","w":"","ll":[2.11,13.51],"h":0},"ghana":{"n":"Ghana","w":"","ll":[-0.19,5.6],"h":0},"togo":{"n":"Togo","w":"","ll":[1.22,6.13],"h":0},"doha":{"n":"Doha","w":"Qatar","ll":[51.53,25.29],"h":0},"dubai":{"n":"Dubai","w":"United Arab Emirates","ll":[55.27,25.2],"h":0},"abu-dhabi":{"n":"Abu Dhabi","w":"United Arab Emirates","ll":[54.38,24.45],"h":0},"istanbul":{"n":"Istanbul","w":"Turkey","ll":[28.98,41.01],"h":0},"seoul":{"n":"Seoul","w":"South Korea","ll":[126.98,37.57],"h":0},"amsterdam":{"n":"Amsterdam","w":"Netherlands","ll":[4.9,52.37],"h":0},"delft":{"n":"Delft","w":"Netherlands","ll":[4.36,52.01],"h":0},"rotterdam":{"n":"Rotterdam","w":"Netherlands","ll":[4.48,51.92],"h":0},"the-hague":{"n":"The Hague","w":"Netherlands","ll":[4.3,52.08],"h":0},"cologne":{"n":"Cologne","w":"Germany","ll":[6.96,50.94],"h":0},"antwerp":{"n":"Antwerp","w":"Belgium","ll":[4.4,51.22],"h":0},"bruges":{"n":"Bruges","w":"Belgium","ll":[3.22,51.21],"h":0},"paris":{"n":"Paris","w":"France","ll":[2.35,48.86],"h":0},"san-francisco":{"n":"San Francisco","w":"California, United States","ll":[-122.42,37.77],"h":0},"austin":{"n":"Austin","w":"Texas, United States","ll":[-97.74,30.27],"h":1},"san-marcos":{"n":"San Marcos","w":"Texas, United States","ll":[-97.94,29.88],"h":1},"madison":{"n":"Madison","w":"Wisconsin, United States","ll":[-89.4,43.07],"h":0},"twin-cities":{"n":"Minneapolis and Saint Paul","w":"Minnesota, United States","ll":[-93.2,44.97],"h":0},"nasa":{"n":"NASA Johnson Space Center, Houston","w":"Texas, United States","ll":[-95.09,29.56],"h":0},"washington":{"n":"Washington, DC","w":"United States","ll":[-77.04,38.91],"h":0},"dallas":{"n":"Dallas","w":"Texas, United States","ll":[-96.8,32.78],"h":1},"carlsbad":{"n":"Carlsbad","w":"New Mexico, United States","ll":[-104.23,32.42],"h":0},"white-sands":{"n":"White Sands","w":"New Mexico, United States","ll":[-106.17,32.78],"h":0},"guadalupe":{"n":"Guadalupe Mountains","w":"Texas, United States","ll":[-104.87,31.92],"h":0},"big-bend":{"n":"Big Bend","w":"Texas, United States","ll":[-103.25,29.25],"h":0},"san-antonio":{"n":"San Antonio","w":"Texas, United States","ll":[-98.49,29.42],"h":0},"boston":{"n":"Boston","w":"Massachusetts, United States","ll":[-71.06,42.36],"h":1},"hot-springs":{"n":"Hot Springs National Park","w":"Arkansas, United States","ll":[-93.04,34.52],"h":0},"caddo-lake":{"n":"Caddo Lake","w":"Texas, United States","ll":[-94.13,32.71],"h":0},"salina":{"n":"Salina","w":"Kansas, United States","ll":[-97.61,38.84],"h":0},"denver":{"n":"Denver","w":"Colorado, United States","ll":[-104.99,39.74],"h":0},"rmnp":{"n":"Rocky Mountain National Park","w":"Colorado, United States","ll":[-105.68,40.34],"h":0},"santa-fe":{"n":"Santa Fe","w":"New Mexico, United States","ll":[-105.94,35.69],"h":0},"caddo-grasslands":{"n":"Caddo National Grasslands","w":"Texas, United States","ll":[-95.95,33.73],"h":0},"new-york":{"n":"New York","w":"United States","ll":[-74.01,40.71],"h":0},"walden":{"n":"Walden Pond","w":"Massachusetts, United States","ll":[-71.34,42.44],"h":0},"rockport":{"n":"Rockport","w":"Massachusetts, United States","ll":[-70.62,42.66],"h":0},"vermont":{"n":"Vermont","w":"United States","ll":[-72.7,44.1],"h":0},"new-brunswick":{"n":"Rutgers University, New Brunswick","w":"New Jersey, United States","ll":[-74.45,40.5],"h":0},"new-hampshire":{"n":"New Hampshire","w":"United States","ll":[-71.54,43.2],"h":0},"portland-me":{"n":"Portland, Maine","w":"Maine, United States","ll":[-70.26,43.66],"h":0},"niagara":{"n":"Buffalo and Niagara Falls","w":"New York, United States","ll":[-78.95,42.95],"h":0},"cleveland":{"n":"Cleveland","w":"Ohio, United States","ll":[-81.69,41.5],"h":0},"chicago":{"n":"Chicago","w":"Illinois, United States","ll":[-87.63,41.88],"h":0},"omaha":{"n":"Omaha","w":"Nebraska, United States","ll":[-95.93,41.26],"h":0},"cheyenne":{"n":"Cheyenne","w":"Wyoming, United States","ll":[-104.82,41.14],"h":0},"salt-lake-city":{"n":"Salt Lake City","w":"Utah, United States","ll":[-111.89,40.76],"h":0},"idaho-falls":{"n":"Idaho Falls","w":"Idaho, United States","ll":[-112.03,43.49],"h":1},"yellowstone":{"n":"Yellowstone","w":"Wyoming, United States","ll":[-110.5,44.6],"h":0},"arches":{"n":"Arches National Park","w":"Utah, United States","ll":[-109.59,38.73],"h":0},"monument-valley":{"n":"Monument Valley","w":"Utah, United States","ll":[-110.1,37.0],"h":0},"manhattan-ks":{"n":"Manhattan, Kansas","w":"Kansas, United States","ll":[-96.57,39.18],"h":1}},"entries":[{"id":"leave-home-2010","ch":"baotou","y":2010,"w":"Sep 2010","t":"Left home in Shouguang, Shandong, for university in Baotou: my first time away from home, and the farthest I had been.","pl":["shouguang","baotou"],"f":["First time away from home"],"r":[{"m":"unknown","p":[[118.79,36.88],[109.84,40.66]],"km":882}]},{"id":"ordos-hohhot","ch":"baotou","y":2010,"w":"2010–2014","t":"Ordos and Hohhot, many times: both are close to Baotou.","pl":["ordos","hohhot"]},{"id":"yinchuan-2011","ch":"baotou","y":2011,"w":"May 2011","t":"Yinchuan, Ningxia, over the May Day holiday: my first real trip that was not for school.","pl":["yinchuan"],"f":["First trip of my own"],"r":[{"m":"unknown","p":[[109.84,40.66],[106.23,38.49]],"km":392}]},{"id":"mt-heng-2012","ch":"baotou","y":2012,"w":"May 2012","t":"Datong, Shanxi: climbed Mount Heng, the North of the Five Great Mountains and my first of the five.","pl":["mt-heng-north"],"f":["First of the Five Great Mountains"],"r":[{"m":"unknown","p":[[109.84,40.66],[113.73,39.67]],"km":348}]},{"id":"qingdao-2012","ch":"baotou","y":2012,"w":"Summer 2012","t":"Qingdao, for the first time, in the summer holiday.","pl":["qingdao"],"f":["First time in Qingdao"]},{"id":"kubuqi-2012","ch":"baotou","y":2012,"w":"Sep 2012","t":"Cycled from Baotou to the Kubuqi Desert: my first desert.","pl":["kubuqi"],"f":["First desert"],"r":[{"m":"ground","p":[[109.84,40.66],[109.98,40.28]],"km":44}]},{"id":"china-loop-2013","ch":"baotou","y":2013,"w":"Jul–Sep 2013","t":"Sixty days around China in the summer holiday: 17 provinces and regions, 33 cities and 12,162 km, and the last of the Five Great Mountains, all climbed and descended on foot.","pl":[],"ms":"All Five Great Mountains","r":[{"m":"ground","p":[[109.84,40.66],[109.73,38.29],[109.49,36.6],[110.09,34.48],[108.94,34.34],[103.83,36.06],[101.78,36.62],[101.03,36.43],[100.2,36.9],[97.37,37.37],[94.9,36.4],[91.95,32.8],[92.05,31.48],[91.13,29.65],[94.36,29.65],[98.59,29.68],[98.91,28.49],[99.71,27.83],[100.23,26.87],[100.27,25.61],[102.71,25.04],[106.63,26.65],[110.49,24.78],[110.29,25.27],[109.6,27.95],[112.7,27.25],[114.31,30.59],[112.95,34.5],[114.31,34.8],[117.1,36.25],[121.45,37.46],[121.6,38.91],[122.24,40.67],[119.6,39.94],[117.2,39.13],[116.41,39.9],[113.3,40.08],[111.66,40.82],[109.84,40.66]],"km":12162}]},{"id":"loop-xian","ch":"baotou","y":2013,"w":"Jul 2013","t":"Xi'an: Mount Hua (the West), the Qinling, the Terracotta Army, Datang Everbright City and the Big Wild Goose Pagoda.","pl":["xian","mt-hua"],"pa":"china-loop-2013"},{"id":"loop-qinghai","ch":"baotou","y":2013,"w":"Jul 2013","t":"Qinghai: Qinghai Lake, Riyue Mountain and the rapeseed fields in flower.","pl":["qinghai-lake","riyue"],"pa":"china-loop-2013"},{"id":"loop-lhasa","ch":"baotou","y":2013,"w":"Jul 2013","t":"By train from Qinghai to Lhasa: the Jokhang Temple and Namtso.","pl":["lhasa","namtso"],"pa":"china-loop-2013"},{"id":"loop-yunnan","ch":"baotou","y":2013,"w":"Aug 2013","t":"Yunnan: Shangri-La, Lijiang, Dali and Kunming.","pl":["shangrila","lijiang","dali","kunming"],"pa":"china-loop-2013"},{"id":"loop-guizhou-guangxi","ch":"baotou","y":2013,"w":"Aug 2013","t":"Guizhou, then Guilin and Yangshuo in Guangxi.","pl":["guizhou","guilin","yangshuo"],"pa":"china-loop-2013"},{"id":"loop-hunan","ch":"baotou","y":2013,"w":"Aug 2013","t":"Hunan: Mount Heng (the South) and the old town of Fenghuang; then north through Hubei.","pl":["fenghuang","mt-heng-south"],"pa":"china-loop-2013"},{"id":"loop-henan","ch":"baotou","y":2013,"w":"Aug 2013","t":"Henan: the Shaolin Temple and Mount Song (the Centre), and Kaifeng.","pl":["mt-song","kaifeng"],"pa":"china-loop-2013"},{"id":"loop-shandong","ch":"baotou","y":2013,"w":"Aug 2013","t":"Shandong: Mount Tai (the East), the last of the five.","pl":["mt-tai"],"pa":"china-loop-2013"},{"id":"loop-bohai","ch":"baotou","y":2013,"w":"Sep 2013","t":"Around the Bohai Sea through Liaoning, Hebei, Tianjin and Beijing, and back through Shanxi to Baotou.","pl":[],"pa":"china-loop-2013"},{"id":"jinan-2014","ch":"baotou","y":2014,"w":"Spring 2014","t":"Jinan, for the first time.","pl":["jinan"],"f":["First time in Jinan"]},{"id":"ba-2014","ch":"baotou","y":2014,"w":"2014","t":"Graduated with a B.A. in English.","pl":[],"ms":"B.A."},{"id":"shanghai-2014","ch":"shanghai-bali","y":2014,"w":"Jul 2014","t":"Moved to Shanghai for my first job.","pl":["shanghai"],"f":["First job"],"r":[{"m":"unknown","p":[[109.84,40.66],[121.47,31.23]],"km":1479}]},{"id":"hangzhou-wuzhen-2014","ch":"shanghai-bali","y":2014,"w":"Summer 2014","t":"In the two months before going abroad: Hangzhou, Wuzhen and other places around Shanghai.","pl":["hangzhou","wuzhen"]},{"id":"bali-2014","ch":"shanghai-bali","y":2014,"w":"Sep 2014","t":"Flew to Bali for my first project abroad, changing planes in Brunei without leaving the airport: Indonesia is my first country abroad.","pl":["brunei","bali"],"tr":["brunei"],"ne":["brunei"],"f":["First country abroad"],"r":[{"m":"flight","p":[[121.47,31.23],[114.93,4.94],[115.09,-8.34]],"km":4479}]},{"id":"bali-2014-15","ch":"shanghai-bali","y":2014,"w":"Sep 2014 – Oct 2015","t":"Thirteen months in Bali, at a power plant being built on the northwest coast; I came to know nearly every corner of the island.","pl":["bali"]},{"id":"bali-firsts","ch":"shanghai-bali","y":2014,"w":"Sep 2014 – Oct 2015","t":"On Bali I learned to dive, snorkelling and then scuba, and earned a scuba certification; I also flew a paraglider and surfed for the first time.","pl":["bali"],"f":["Learned to dive","First paragliding flight","First surf"]},{"id":"transits-2015","ch":"shanghai-bali","y":2015,"w":"2014–2015","t":"One trip home, changing planes in Beijing and Hong Kong: my first steps in both cities.","pl":["beijing","hong-kong"],"tr":["beijing","hong-kong"],"f":["First time in Beijing and Hong Kong"]},{"id":"nusa-lembongan-2015","ch":"shanghai-bali","y":2015,"w":"Aug 2015","t":"Nusa Lembongan, the small island off Bali's southeast coast.","pl":["nusa-lembongan"]},{"id":"bali-loop-2015","ch":"shanghai-bali","y":2015,"w":"Before Oct 2015","t":"A loop around the whole island before leaving Bali.","pl":[],"r":[{"m":"ground","p":[[115.22,-8.65],[115.09,-8.62],[114.62,-8.36],[114.43,-8.17],[114.83,-8.19],[115.03,-8.16],[115.59,-8.28],[115.57,-8.51],[115.26,-8.69],[115.1,-8.82],[115.22,-8.65]],"km":344}]},{"id":"hong-kong-2015","ch":"shanghai-bali","y":2015,"w":"Oct 2015","t":"Left Bali for nearly a week in Hong Kong.","pl":["hong-kong"],"r":[{"m":"flight","p":[[115.09,-8.34],[114.17,22.32]],"km":3411}]},{"id":"home-2015","ch":"between","y":2015,"w":"Oct 2015","t":"A rest at home in Shouguang, then back to Shanghai at the end of October.","pl":["shouguang","shanghai"],"r":[{"m":"unknown","p":[[114.17,22.32],[118.79,36.88]],"km":1679}]},{"id":"huangshan-2015","ch":"between","y":2015,"w":"Nov 2015","t":"Mount Huang.","pl":["huangshan"]},{"id":"nantong-2015","ch":"between","y":2015,"w":"Dec 2015","t":"A month in Nantong, Jiangsu.","pl":["nantong"]},{"id":"dmu-2016","ch":"between","y":2016,"w":"Feb 2016","t":"Began a part-time master's at Dalian Maritime University.","pl":[]},{"id":"lagos-2016","ch":"lagos","y":2016,"w":"Sep 2016","t":"Flew to Lagos to live and work in Nigeria; home on leave about every six months.","pl":["lagos"],"r":[{"m":"flight","p":[[121.47,31.23],[3.38,6.52]],"km":12226}]},{"id":"west-africa","ch":"lagos","y":2016,"w":"2016–2019","t":"From Lagos, north to Niger and west to Ghana and Togo.","pl":["niger","ghana","togo"]},{"id":"doha-2017","ch":"lagos","y":2017,"w":"Feb 2017","t":"Doha, Qatar, for the first time.","pl":["doha"],"f":["First time in Qatar"]},{"id":"siguniang-2017","ch":"lagos","y":2017,"w":"Oct 2017","t":"On leave: summited the second peak of Mount Siguniang, my first snow peak; then Chengdu and Wuhan.","pl":["siguniang","chengdu","wuhan"],"f":["First snow peak"]},{"id":"doha-2017b","ch":"lagos","y":2017,"w":"Oct and Nov 2017","t":"Doha twice more: changing planes, with time to look around each time.","pl":["doha"]},{"id":"abuja-2018","ch":"lagos","y":2018,"w":"May 2018","t":"Abuja, for the first time.","pl":["abuja"],"f":["First time in Abuja"],"r":[{"m":"unknown","p":[[3.38,6.52],[7.4,9.08]],"km":526}]},{"id":"beijing-dubai-2018","ch":"lagos","y":2018,"w":"Jul 2018","t":"Beijing, properly this time; then Dubai, with Abu Dhabi, for the first time.","pl":["beijing","dubai","abu-dhabi"],"f":["First real visit to Beijing","First time in Dubai"]},{"id":"istanbul-2018","ch":"lagos","y":2018,"w":"Dec 2018","t":"Istanbul, for the first time.","pl":["istanbul"],"f":["First time in Istanbul"]},{"id":"dmu-2018","ch":"lagos","y":2018,"w":"Dec 2018","t":"Completed the part-time master's (M.E. in Computer Engineering, Dalian Maritime University).","pl":[],"ms":"M.E."},{"id":"leave-nigeria-2019","ch":"lagos","y":2019,"w":"Apr 2019","t":"Left Nigeria through Istanbul, one last time, and went home to China.","pl":["istanbul"],"r":[{"m":"flight","p":[[3.38,6.52],[28.98,41.01],[121.47,31.23]],"km":12583}]},{"id":"visa-2019","ch":"lagos","y":2019,"w":"May–Jun 2019","t":"Beijing and Shanghai, for my U.S. visa.","pl":["beijing","shanghai"]},{"id":"leave-home-2019","ch":"san-marcos","y":2019,"w":"8 August 2019, 8:08 a.m.","t":"Left home in Shouguang at 8:08 in the morning: by road to Shanghai, then a flight to the United States.","pl":["shouguang"],"ms":"Left for the U.S.","r":[{"m":"ground","p":[[118.79,36.88],[121.47,31.23]],"km":675}]},{"id":"seoul-2019","ch":"san-marcos","y":2019,"w":"Aug 2019","t":"A day in Seoul on the way.","pl":["seoul"],"r":[{"m":"flight","p":[[121.47,31.23],[126.98,37.57]],"km":867}]},{"id":"sf-2019","ch":"san-marcos","y":2019,"w":"Aug 2019","t":"First landing in the United States: a day in San Francisco.","pl":["san-francisco"],"f":["First landing in the U.S."],"r":[{"m":"flight","p":[[126.98,37.57],[-122.42,37.77]],"km":9029}]},{"id":"san-marcos-2019","ch":"san-marcos","y":2019,"w":"Aug 2019","t":"On to Austin, then by taxi to San Marcos, my home for the next two years.","pl":["austin","san-marcos"],"r":[{"m":"flight","p":[[-122.42,37.77],[-97.74,30.27]],"km":2414},{"m":"ground","p":[[-97.74,30.27],[-97.94,29.88]],"km":47}]},{"id":"midwest-2019","ch":"san-marcos","y":2019,"w":"Dec 2019","t":"My first American winter and my first trip to another state: Madison, Wisconsin, then the Twin Cities.","pl":["madison","twin-cities"],"f":["First trip to another state"],"r":[{"m":"unknown","p":[[-97.94,29.88],[-89.4,43.07],[-93.2,44.97]],"km":2021}]},{"id":"pandemic-2020","ch":"san-marcos","y":2020,"w":"Early 2020","t":"The pandemic begins.","pl":[]},{"id":"nasa-2020","ch":"san-marcos","y":2020,"w":"Sep 2020","t":"NASA in Houston, for the first time.","pl":["nasa"],"f":["First time at NASA"]},{"id":"dc-2020","ch":"san-marcos","y":2020,"w":"Late 2020 – Jun 2021","t":"Six months living in Washington, DC.","pl":["washington"],"r":[{"m":"unknown","p":[[-97.94,29.88],[-77.04,38.91]],"km":2157}]},{"id":"ms-defence-2021","ch":"san-marcos","y":2021,"w":"16 July 2021","t":"Defended my master's at Texas State University.","pl":[],"ms":"M.S. defence"},{"id":"dallas-2021","ch":"dallas","y":2021,"w":"Jul 2021","t":"Moved to Dallas to begin my Ph.D. at The University of Texas at Dallas.","pl":["dallas"],"ms":"Ph.D. begins","r":[{"m":"unknown","p":[[-97.94,29.88],[-96.8,32.78]],"km":340}]},{"id":"west-loop-2021","ch":"dallas","y":2021,"w":"Nov 2021","t":"Thanksgiving, my first long road trip: west to Carlsbad and White Sands, through Guadalupe Mountains and Big Bend, and home by San Antonio.","pl":["carlsbad","white-sands","guadalupe","big-bend","san-antonio"],"f":["First long road trip"],"r":[{"m":"ground","p":[[-96.8,32.78],[-102.08,32.0],[-104.23,32.42],[-106.17,32.78],[-104.87,31.92],[-103.25,29.25],[-98.49,29.42],[-97.35,31.1],[-96.8,32.78]],"km":2259}]},{"id":"europe-2022","ch":"dallas","y":2022,"w":"May–Jun 2022","t":"Europe, for a conference: landed in the Netherlands, by train to Cologne, then Belgium, Paris, Antwerp, Bruges, Delft, Rotterdam, The Hague and Amsterdam.","pl":["cologne","paris","antwerp","bruges","delft","rotterdam","the-hague","amsterdam"],"r":[{"m":"flight","p":[[-96.8,32.78],[4.9,52.37]],"km":7901},{"m":"ground","p":[[4.9,52.37],[6.96,50.94],[4.35,50.85],[2.35,48.86],[4.35,50.85],[4.4,51.22],[3.22,51.21],[4.36,52.01],[4.48,51.92],[4.3,52.08],[4.9,52.37]],"km":1253},{"m":"flight","p":[[4.9,52.37],[-96.8,32.78]],"km":7901}]},{"id":"boston-2022","ch":"dallas","y":2022,"w":"Jul 2022","t":"Boston for the first time: two weeks in the city.","pl":["boston"],"f":["First time in Boston"],"r":[{"m":"unknown","p":[[-96.8,32.78],[-71.06,42.36]],"km":2493}]},{"id":"thanksgiving-2022","ch":"dallas","y":2022,"w":"Nov 2022","t":"Thanksgiving in West Texas, San Antonio once more, and Wonder World park.","pl":["san-antonio"]},{"id":"new-year-2023","ch":"dallas","y":2023,"w":"Jan 2023","t":"New Year's fireworks in Dallas.","pl":["dallas"]},{"id":"arkansas-2023","ch":"dallas","y":2023,"w":"May 2023","t":"Arkansas: hiking in Hot Springs, my first U.S. national park, and my first off-road drive; then Caddo Lake.","pl":["hot-springs","caddo-lake"],"f":["First U.S. national park","First off-road drive"],"r":[{"m":"ground","p":[[-96.8,32.78],[-94.05,33.43],[-93.04,34.52],[-94.13,32.71],[-96.8,32.78]],"km":894}]},{"id":"boston-2023","ch":"dallas","y":2023,"w":"Aug 2023","t":"Boston again, for a conference.","pl":["boston"],"r":[{"m":"unknown","p":[[-96.8,32.78],[-71.06,42.36]],"km":2493}]},{"id":"denver-loop-2023","ch":"dallas","y":2023,"w":"Oct 2023","t":"My first road trip driving alone, a loop: north to Salina, Kansas, west on I-70 to a conference in Denver and Rocky Mountain National Park, south to Santa Fe, and home.","pl":["salina","denver","rmnp","santa-fe"],"f":["First solo road trip"],"r":[{"m":"ground","p":[[-96.8,32.78],[-97.52,35.47],[-97.34,37.69],[-97.61,38.84],[-99.33,38.88],[-103.69,39.26],[-104.99,39.74],[-105.68,40.34],[-107.32,39.55],[-108.55,39.06],[-107.88,38.48],[-107.88,37.28],[-105.94,35.69],[-101.83,35.22],[-98.49,33.91],[-96.8,32.78]],"km":3092}]},{"id":"caddo-grasslands-2023","ch":"dallas","y":2023,"w":"Nov 2023","t":"Caddo National Grasslands in North Texas: my first night camping alone.","pl":["caddo-grasslands"],"f":["First solo camping"],"r":[{"m":"ground","p":[[-96.8,32.78],[-95.95,33.73]],"km":132}]},{"id":"home-2024","ch":"dallas","y":2024,"w":"Winter 2023–24","t":"Home for the Spring Festival, the first time since moving to the U.S.; climbed Yunmen Mountain in Qingzhou with my father.","pl":["shouguang","yunmen"],"f":["First Spring Festival home from the U.S."],"r":[{"m":"unknown","p":[[-96.8,32.78],[118.79,36.88]],"km":11434}]},{"id":"drive-boston-2024","ch":"boston","y":2024,"w":"Aug 2024","t":"Drove from Dallas to Boston for an internship, through nine states and Washington, DC; my first time in New York, and my first sight of the Mississippi.","pl":["washington","new-york","boston"],"f":["First time in New York","First sight of the Mississippi"],"r":[{"m":"ground","p":[[-96.8,32.78],[-93.75,32.52],[-90.88,32.35],[-90.18,32.3],[-86.8,33.52],[-86.78,36.16],[-84.5,38.04],[-81.63,38.35],[-78.2,39.1],[-77.04,38.91],[-76.61,39.29],[-75.55,39.74],[-74.01,40.71],[-72.92,41.31],[-71.41,41.82],[-71.06,42.36]],"km":2863}]},{"id":"walden-rockport-2024","ch":"boston","y":2024,"w":"2024","t":"Walden Pond and Rockport.","pl":["walden","rockport"]},{"id":"vermont-2024","ch":"boston","y":2024,"w":"Early Oct 2024","t":"Drove to Vermont to camp among the autumn leaves.","pl":["vermont"],"r":[{"m":"ground","p":[[-71.06,42.36],[-72.7,44.1]],"km":235}]},{"id":"aurora-2024","ch":"boston","y":2024,"w":"Oct 2024","t":"My first aurora, seen from Boston, and meteors in mid-October.","pl":["boston"],"f":["First aurora"]},{"id":"rutgers-2024","ch":"boston","y":2024,"w":"Late Oct 2024","t":"Drove to Rutgers University in New Jersey for a conference.","pl":["new-brunswick"],"r":[{"m":"ground","p":[[-71.06,42.36],[-71.41,41.82],[-72.92,41.31],[-73.85,40.95],[-74.45,40.5]],"km":363}]},{"id":"new-hampshire-2024","ch":"boston","y":2024,"w":"Nov 2024","t":"A day in New Hampshire.","pl":["new-hampshire"],"r":[{"m":"ground","p":[[-71.06,42.36],[-71.54,43.2]],"km":101}]},{"id":"new-year-2025","ch":"boston","y":2024,"w":"Dec 2024","t":"The last day of 2024: north through New Hampshire to Portland, Maine; the New Year in Boston.","pl":["portland-me"],"r":[{"m":"ground","p":[[-71.06,42.36],[-70.76,43.07],[-70.26,43.66]],"km":160}]},{"id":"drive-idaho-2025","ch":"idaho-falls","y":2025,"w":"Jan 2025","t":"Drove from Boston to Idaho Falls: Niagara Falls from Buffalo, Cleveland, a few days in Chicago, Omaha, a night in Cheyenne, then Salt Lake City and the Great Salt Lake.","pl":["niagara","cleveland","chicago","omaha","cheyenne","salt-lake-city","idaho-falls"],"r":[{"m":"ground","p":[[-71.06,42.36],[-73.75,42.65],[-76.15,43.05],[-78.95,42.95],[-80.09,42.13],[-81.69,41.5],[-83.54,41.65],[-87.35,41.59],[-87.63,41.88],[-93.62,41.59],[-95.93,41.26],[-96.7,40.81],[-100.77,41.13],[-104.82,41.14],[-105.59,41.31],[-109.2,41.59],[-111.89,40.76],[-111.97,41.22],[-112.45,42.86],[-112.03,43.49]],"km":3831}]},{"id":"yellowstone-2025","ch":"idaho-falls","y":2025,"w":"May 2025","t":"Yellowstone for the first time; a week later, camping nearby.","pl":["yellowstone"],"f":["First time in Yellowstone"],"r":[{"m":"ground","p":[[-112.03,43.49],[-111.45,44.1],[-110.5,44.6]],"km":176}]},{"id":"inl-2025","ch":"idaho-falls","y":2025,"w":"Aug 2025","t":"Finished the internship at Idaho National Laboratory, and stayed on in Idaho Falls.","pl":["idaho-falls"]},{"id":"phd-defence-2025","ch":"idaho-falls","y":2025,"w":"10 September 2025","t":"Defended my Ph.D.","pl":[],"ms":"Ph.D. defence"},{"id":"drive-texas-2025","ch":"idaho-falls","y":2025,"w":"Dec 2025","t":"South to Texas the eastern way: Arches, Monument Valley and the road where Forrest Gump stopped running, the deserts of western New Mexico, Santa Fe, and on to Austin.","pl":["arches","monument-valley","santa-fe","austin"],"r":[{"m":"ground","p":[[-112.03,43.49],[-112.45,42.86],[-111.89,40.76],[-110.16,38.99],[-109.59,38.73],[-109.34,37.87],[-109.99,37.1],[-110.1,37.0],[-110.25,36.73],[-108.74,35.53],[-106.65,35.08],[-105.94,35.69],[-103.2,34.4],[-101.86,33.58],[-99.73,32.45],[-97.74,30.27]],"km":2331}]},{"id":"graduation-2025","ch":"austin","y":2025,"w":"12 December 2025","t":"Commencement in Dallas: Ph.D. in Mechanical Engineering, The University of Texas at Dallas.","pl":["dallas"],"ms":"Graduation","r":[{"m":"unknown","p":[[-97.74,30.27],[-96.8,32.78]],"km":293}]},{"id":"austin-2026","ch":"austin","y":2026,"w":"Winter 2025–26","t":"A winter in Austin, and an offer of a postdoc at Kansas State University.","pl":["austin"]},{"id":"manhattan-2026","ch":"manhattan","y":2026,"w":"Apr 2026","t":"Moved to Manhattan, Kansas, as a Postdoctoral Fellow at Kansas State University.","pl":["manhattan-ks"],"ms":"Postdoc begins","r":[{"m":"unknown","p":[[-97.74,30.27],[-96.57,39.18]],"km":996}]}]}</script>
+</div>
+```

@@ -1,11 +1,12 @@
 <!--
-  _visitor_widget.html: optional visitor map (MapMyVisitors / ClustrMaps style) on the About page, below the
-  collaboration map. Only this page loads it.
+  _visitor_widget.html: optional visitor map (MapMyVisitors / ClustrMaps style) on the About page, in its own
+  "Visitors" section below the collaboration map. Only this page loads it.
 
   While this file holds only comments, the site outputs nothing for it (the container in _map.qmd stays hidden).
   With a snippet below this comment, scripts/build_map.py puts it in an inert <template> in _map.qmd; assets/map.js
-  then inserts it after the page has loaded (never blocking the page) and hides the "Visitors" box again if the
-  provider's script fails or draws nothing within 15 seconds.
+  then inserts it after the page has loaded (never blocking the page), sizes it to the column (drawn at twice the
+  size on high-DPI screens), sets the MapMyVisitors colours (co, cl, ct) to the site's day or night theme, and hides
+  the "Visitors" section again if the provider's script fails or draws nothing within 15 seconds.
 
   To change or add the widget:
     1. Copy the provider's HTML snippet (use an explicit https:// URL in src).

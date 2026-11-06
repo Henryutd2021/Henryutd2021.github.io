@@ -12,10 +12,14 @@ listing:
     sort: "date desc"
     max-items: 1
     fields: [date, title, description]
+# This page's own include-in-header replaces the one in _quarto.yml, so the two project-level lines (the Academicons
+# stylesheet for the Google Scholar and ORCID icons, and the theme colour) are repeated here (2026-11-05).
 include-in-header:
   text: |
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+    <meta name="theme-color" content="#ffffff">
     <meta name="google-site-verification" content="HYz_8CxZxTFlFVPVBRmrgRHyec1XTOszSbx0ergwHH4" />
-    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Honglin Li", "honorificSuffix": "Ph.D.", "url": "https://henryutd2021.github.io/", "image": "https://henryutd2021.github.io/images/profile-square.jpg", "email": "mailto:hlli@ksu.edu", "jobTitle": "Postdoctoral Fellow", "worksFor": {"@type": "CollegeOrUniversity", "name": "Kansas State University", "department": "Department of Electrical and Computer Engineering"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "The University of Texas at Dallas"}, {"@type": "CollegeOrUniversity", "name": "Texas State University"}, {"@type": "CollegeOrUniversity", "name": "Dalian Maritime University"}], "knowsAbout": ["Energy systems optimization", "Techno-economic analysis", "Small modular reactors", "AI data center power supply", "Hydrogen energy systems", "Electricity markets", "Stochastic optimization"], "sameAs": ["https://scholar.google.com/citations?user=O1BZdHQAAAAJ", "https://orcid.org/0000-0002-8405-3032", "https://www.linkedin.com/in/honglin-li-998b18221/", "https://github.com/Henryutd2021"]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Honglin Li", "alternateName": "李洪林", "honorificSuffix": "Ph.D.", "url": "https://henryutd2021.github.io/", "image": "https://henryutd2021.github.io/images/profile-square.jpg", "email": "mailto:hlli@ksu.edu", "jobTitle": "Postdoctoral Fellow", "worksFor": {"@type": "CollegeOrUniversity", "name": "Kansas State University", "department": "Department of Electrical and Computer Engineering"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "The University of Texas at Dallas"}, {"@type": "CollegeOrUniversity", "name": "Texas State University"}, {"@type": "CollegeOrUniversity", "name": "Dalian Maritime University"}], "knowsAbout": ["Energy systems optimization", "Techno-economic analysis", "Small modular reactors", "AI data center power supply", "Hydrogen energy systems", "Electricity markets", "Stochastic optimization"], "sameAs": ["https://scholar.google.com/citations?user=O1BZdHQAAAAJ", "https://orcid.org/0000-0002-8405-3032", "https://www.linkedin.com/in/honglin-li-998b18221/", "https://github.com/Henryutd2021"]}</script>
 ---
 
 <!-- About (home) page — third redesign, 2026-10-30: al-folio "about" layout with Hugo Academic touches.
@@ -31,7 +35,7 @@ include-in-header:
   <div class="about-text">
     <!-- class quarto-title-block: tells Quarto this page already has its title header, so it leaves the h1 in place -->
     <header class="about-head quarto-title-block">
-      <h1 id="h-name"><span class="first">Honglin</span> Li</h1>
+      <h1 id="h-name"><span class="first">Honglin</span> Li <span class="name-zh" lang="zh-Hans">(李洪林)</span></h1>
       <p class="about-desc"><span class="segs"><span class="seg">Postdoctoral Fellow</span> <span class="seg">Electrical and Computer Engineering</span> <span class="seg"><a href="https://www.k-state.edu/">Kansas State University</a></span></span></p>
     </header>
 
@@ -96,7 +100,7 @@ include-in-header:
 
 </section>
 
-<!-- ============ 2b. START HERE: three doors by reader (Learn launch, 2026-11-02; reports/09_learn_design.md §6) ============ -->
+<!-- ============ 2b. START HERE: four doors by reader (Learn launch, 2026-11-02; Journeys door added 2026-11-05) ============ -->
 <nav id="start-here" class="home-wrap home-doors" aria-label="Start here">
   <ul class="door-grid">
     <li><a class="door" href="research.html">
@@ -111,6 +115,10 @@ include-in-header:
       <span class="door-icon" aria-hidden="true"><i class="bi bi-signpost-split"></i></span>
       <span class="door-who">I'm new to energy systems</span>
       <span class="door-what">Learn: free interactive lessons, from running a town's grid to building optimization models</span></a></li>
+    <li><a class="door door-journeys" href="journeys.html">
+      <span class="door-icon" aria-hidden="true"><i class="bi bi-compass"></i></span>
+      <span class="door-who">I'd like to know the person</span>
+      <span class="door-what">Journeys: the places I have lived and travelled since 2010</span></a></li>
   </ul>
 </nav>
 

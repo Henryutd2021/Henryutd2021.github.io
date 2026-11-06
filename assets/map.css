@@ -33,8 +33,8 @@ body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) inver
 .cmap.leaflet-container .leaflet-control-attribution a { color: var(--ink-2); }
 
 /* ---------- markers (divIcons; the inner span is what you see, so it can be nudged apart when markers overlap) ---------- */
-.cmap-mk { background: none; border: 0; }
-.cmap-mk > span { display: block; width: 100%; height: 100%; border-radius: 50%; box-sizing: border-box;
+.cmap-mk { background: none; border: 0; display: grid; place-items: center; }
+.cmap-mk > span { display: block; flex: none; border-radius: 50%; box-sizing: border-box;
   transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(calc(var(--s, 1) * var(--k, 1))) rotate(var(--rot, 0deg));
   transition: transform .2s var(--ease), box-shadow .2s var(--ease); box-shadow: 0 1px 3px rgba(0, 0, 0, .28); }
 .cmap-mk--collab > span { background: var(--accent); border: 2px solid var(--surface); }
@@ -49,7 +49,7 @@ body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) inver
   border-radius: var(--r); box-shadow: var(--shadow-lg); }
 .cmap.leaflet-container .leaflet-popup-tip { background: var(--surface); box-shadow: none; border: 1px solid var(--line); }
 .cmap.leaflet-container .leaflet-popup-content { margin: .8rem 1rem .85rem; font-size: .84rem; line-height: 1.45; }
-.cmap.leaflet-container a.leaflet-popup-close-button { color: var(--muted); top: 4px; right: 4px; }
+.cmap.leaflet-container a.leaflet-popup-close-button { color: var(--ink-2); top: 4px; right: 4px; }
 .cmap.leaflet-container a.leaflet-popup-close-button:hover { color: var(--ink); }
 .cmap-pop h3 { margin: 0 1rem .15rem 0; font-size: .95rem; font-weight: 650; line-height: 1.3; color: var(--ink); }
 .cmap .cmap-pop p { margin: 0; }
@@ -82,7 +82,7 @@ body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) inver
 /* ---------- list of institutions by country (always shown; the content when the map cannot load) ---------- */
 .cmap-list { columns: 3 250px; column-gap: 2.2rem; margin-top: 1.6rem; }
 .cmap-country { margin-bottom: 1.1rem; }
-.cmap-country h3 { margin: 0 0 .45rem; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+.cmap-country h3 { opacity: 1; margin: 0 0 .45rem; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
   color: var(--muted); break-after: avoid; }
 .cmap-country ul { margin: 0; padding: 0; list-style: none; }
 .cmap-country li { break-inside: avoid; display: grid; grid-template-columns: 14px 1fr; column-gap: .5rem; align-items: baseline;
@@ -93,15 +93,24 @@ body.quarto-dark .cmap.tiles-osm .leaflet-tile-pane { filter: grayscale(1) inver
   letter-spacing: .03em; color: var(--accent-ink); background: var(--accent-soft); border: 1px solid var(--accent-line); vertical-align: 1px; }
 .cmap-meta { display: block; font-size: .8rem; color: var(--muted); }
 
-/* ---------- visitor map (third-party widget from site/_visitor_widget.html; inserted by map.js after load) ---------- */
-.visitor-map { margin-top: 1.6rem; max-width: 480px; }
-.cmap-sub { margin: 0 0 .2rem; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.visitor-note { margin: 0 0 .6rem; font-size: .8rem; color: var(--muted); }
-/* the widget draws its own blue panel with white text (readable in both themes); a quiet neutral frame around it */
-.visitor-map-body { min-height: 120px; padding: 6px; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2);
-  overflow: hidden; }
-.visitor-map-body > * { max-width: 100%; }
-.visitor-map-body img { max-width: 100%; height: auto; }
+/* ---------- visitor map: its own centred section (third-party widget from site/_visitor_widget.html; inserted and sized by
+   map.js after load, 2026-11-05). The panel and text colours follow the site's day and night themes (the inline colours
+   the widget sets are overridden here); on high-DPI screens the widget is drawn at twice the size and scaled to one half,
+   so its text and dots are enlarged to match. ---------- */
+body.quarto-light .visitor-sec { --vm-ocean: #eef2f7; --vm-ink: #374151; }
+body.quarto-dark  .visitor-sec { --vm-ocean: #1c212a; --vm-ink: #d1d5db; }
+.visitor-sec .visitor-map { max-width: 760px; margin: 0 auto; }
+.visitor-map-body { position: relative; min-height: 120px; border: 1px solid var(--line); border-radius: var(--r); background: var(--vm-ocean);
+  overflow: hidden; box-shadow: var(--shadow-sm); }
+.visitor-scale { transform-origin: 0 0; }
+.visitor-scale a { text-decoration: none !important; }
+.visitor-sec .mapmyvisitors-map-container { background-color: var(--vm-ocean) !important; }
+.visitor-sec .mpmvs, .visitor-sec #clstminf { color: var(--vm-ink) !important; }
+.visitor-scale.is-2x .mpmvs { font-size: 26px !important; line-height: 34px !important; }
+.visitor-scale.is-2x #clstminf { font-size: 22px !important; }
+.visitor-scale.is-2x .jvectormap-container circle { r: 8px; stroke-width: 3px; }   /* the dots at their usual size after the half scale */
+.visitor-scale .jvectormap-zoomin, .visitor-scale .jvectormap-zoomout { background: var(--surface) !important; color: var(--ink-2) !important;
+  border: 1px solid var(--line-strong); }
 
 @media (max-width: 600px) {
   .cmap { height: 320px; }

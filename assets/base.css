@@ -98,6 +98,8 @@ a.card:hover, a.glow-card:hover, .card.is-link:hover { box-shadow: var(--shadow-
 /* ---------- footer ---------- */
 .nav-footer { border-top: 1px solid var(--line); background: var(--bg-2) !important; font-size: .86rem; color: var(--muted); }
 .nav-footer a { color: var(--ink-2); }
+/* keep the footer's right-hand text clear of the back-to-top button at the bottom of the page (2026-11-05) */
+@media (min-width: 768px) { .nav-footer .nav-footer-right { padding-right: 3.6rem; } }
 
 @media (prefers-reduced-motion: reduce) {
   .js-reveal .reveal { opacity: 1; transform: none; transition: none; }
