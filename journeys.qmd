@@ -1,0 +1,21 @@
+---
+title: "Journeys"
+subtitle: '[行万里路]{lang="zh-Hans"} · The long road since 2010'
+description: "Honglin Li's travel log since 2010: the places he has lived and travelled in China, the United States and beyond, on a map with a time line."
+title-block-banner: true
+page-layout: full
+toc: false
+anchor-sections: false
+body-classes: "page-inner page-folio page-journeys"
+css: assets/journeys/journeys.css
+---
+
+<!-- Journeys page (2026-11-05; design: the site's Journeys design note). A personal travel log, open to anyone curious.
+     The body is generated: scripts/build_journeys.py writes _journeys.qmd from data/journeys.json (edit the data, not the
+     output). Map and filters: assets/journeys/journeys.js; styles: assets/journeys/journeys.css. -->
+
+{{< include _journeys.qmd >}}
+
+```{=html}
+<script src="assets/journeys/journeys.js" defer></script>
+```
