@@ -134,6 +134,7 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-rib-seg { background: var(--ch); min-width: 2px; }
 .jr-rib-seg + .jr-rib-seg { box-shadow: inset 1px 0 0 var(--bg); }
 .jr-rib-gap { background: transparent; }
+.jr-rib-home { background: var(--line-strong); min-width: 2px; }   /* between chapters: time at home (no chapter of its own) */
 .jr-year-out { flex: none; min-width: 10rem; font-size: .88rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* ---------- legends and hint ---------- */
