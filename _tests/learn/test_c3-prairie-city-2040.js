@@ -29,7 +29,11 @@ const RUN_DATE = "6 November 2026";
   const RN = require(L("components/reportnote.js")), EX = require(L("components/exemplars.js")), RB = require(L("components/rubric.js"));
   const S = E3.c3Schema(cfg), def = SS.defaults(S), ref = Object.assign({}, def, PG.REF_PLAN);
   ok(!SS.validate(S, ref).length, "the reference plan is a valid plan");
-  const r0 = await E3.solve(def, P, { solver }), r1 = await E3.solve(ref, P, { solver });
+  // A19's map model, as the page builds it (HOOK(A19), wired): the region, the five best solar blocks and their costs
+  const A19 = require(L("a19.js")), AD = A19.withCity(JSON.parse(fs.readFileSync(L("data/a19-gis-siting.json"), "utf8")), city), CFT = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
+  const SM = PG.siteModel(A19, AD, { solar: CFT.targets.solar.cf, wind: CFT.targets.wind.cf });
+  const withSite = st => { const x = Object.assign({}, st); if (st.farm > 0) x.siteInfo = PG.siteInfo(SM, st.site, st.farm); return x; };
+  const r0 = await E3.solve(def, P, { solver }), r1 = await E3.solve(withSite(ref), P, { solver });
   ok(r0.ok && r1.ok, "2025 and the reference plan run optimal");
   const R1 = r1.results, b1 = PG.budget(R1, P);
   ok(b1.within, "the reference plan is within the budget (" + PG.mil(b1.upfront) + ")");
@@ -37,7 +41,7 @@ const RUN_DATE = "6 November 2026";
     [tag + ": the city's yearly cost against 2025", PG.smil(R.delta.cityCost)], [tag + ": the city's CO₂ (location-based, operating)", E3.kilo(R.acc.city.co2) + " t a year"],
     [tag + ": busiest hour against the limit, core · suburbs · fringe", R.dist.map(d => E3.kilo(d.peak) + "/" + E3.kilo(d.limit)).join(" · ") + " MW"],
     [tag + ": energy burden, homes below 80% of area median income (screening)", PG.pct1(R.hh.low.burden)]];
-  const pre = { head: "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm)",
+  const pre = { head: "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm at A19's site " + ref.site + ")",
     rows: rows(r0.results, "2025").concat(rows(R1, "Reference plan")),
     note: "Precomputed with HiGHS on " + RUN_DATE + ". Prairie City is fictional; its numbers are illustrative. With JavaScript on, you run your own plan." };
   const worst = R1.dist.slice().sort((a, b) => b.peak / b.limit - a.peak / a.limit)[0].label.toLowerCase();
@@ -76,9 +80,9 @@ const RUN_DATE = "6 November 2026";
     strong.indexOf(R.wind + " MW of wind") >= 0 && strong.indexOf(R.farm + " MW solar farm at site " + R.site) >= 0 && R.ihp === 100 && R.dh === 0 && R.ely === 0 && R.pv === 0, "the strong summary's levers are the reference plan's");
 
   // ---------------- the panel, for every preset and the reference plan
-  const plans = E3.c3presets.map(p => E3.withPreset(def, p)).concat([ref, Object.assign({}, ref, { wind: 400, farm: 300 })]);
+  const plans = E3.c3presets.map(p => E3.withPreset(def, p)).concat([ref, Object.assign({}, ref, { wind: 400, farm: 150, site: "E" })]);
   for (const st of plans) {
-    const r = await E3.solve(st, P, { solver }); ok(r.ok, "plan optimal");
+    const r = await E3.solve(withSite(st), P, { solver }); ok(r.ok, "plan optimal");
     if (!r.ok) continue;
     const Rr = r.results, pn = PG.panel(Rr, P), byKey = {}; pn.forEach(p => { byKey[p.key] = p.cell; });
     const b = PG.budget(Rr, P), up = PG.upTotal(Rr), dB = Rr.hh.low.burden - Rr.hh.low.burden0, cut = PG.co2Cut(Rr);
@@ -88,7 +92,7 @@ const RUN_DATE = "6 November 2026";
     ok(byKey.climate.v === (cut >= 0.35 ? "yes" : cut >= 0.15 ? "part" : "no"), "climate: CO2 rule (" + (cut * 100).toFixed(1) + "%)");
     const pc = PG.parkCost(Rr, P), pc0 = PG.parkCost(Rr.base, P), dp = (pc - pc0) / pc0;
     ok(byKey.park.v === (dp <= 0 ? "yes" : dp <= 0.1 ? "part" : "no"), "park: cost rule (" + (dp * 100).toFixed(1) + "%)");
-    ok(byKey.rural.v === (st.farm > 0 ? "part" : "yes"), "rural: siting rule");
+    ok(byKey.rural.v === (st.farm > 0 ? "part" : "yes") && (st.farm === 0 || byKey.rural.t.indexOf(E3.kilo(Rr.sys.siteAdj.acres) + " acres") >= 0), "rural: siting rule, with the site's acres from A19");
     ok(PG.PANEL.every(p => p.rule && p.rule.length > 10), "each stakeholder's rule is stated");
     // the park's cost: its electricity at the industrial price, the gas it still burns, its new equipment
     const S1 = Rr.sys, el = P.out.foodEl + P.out.fertEl + (S1.ihpElMW + S1.elyMW) * 8760;
@@ -99,7 +103,7 @@ const RUN_DATE = "6 November 2026";
   for (const sx of PG.SENS.filter(s => !s.solve)) {
     const f = S.fields.filter(q => q.id === sx.key)[0];
     for (const v of [f.min, f.max]) {
-      const s = Object.assign({}, ref, { [sx.key]: v }), acc = E3.summarize(s, P, R1.raw, R1.base), re = (await E3.solve(s, P, { solver })).results;
+      const s = withSite(Object.assign({}, ref, { [sx.key]: v })), acc = E3.summarize(s, P, R1.raw, R1.base), re = (await E3.solve(s, P, { solver })).results;
       ok(near(acc.delta.cityCost, re.delta.cityCost, 50), sx.key + " at " + v + ": the accounting equals a re-solve (" + PG.mil(acc.delta.cityCost) + ")");
     }
   }
@@ -107,13 +111,21 @@ const RUN_DATE = "6 November 2026";
   ok(/the plan held fixed/.test(sw), "the sensitivity line says the plan is held fixed");
 
   // ---------------- the hooks
-  const s2 = Object.assign({}, ref, { site: "D" }), rD = (await E3.solve(s2, P, { solver })).results;
-  ok(near(rD.acc.city.money, R1.acc.city.money, 1e-6) && near(rD.acc.city.co2, R1.acc.city.co2, 1e-6), "HOOK(A19): until the map is wired, the site changes no number (and the page says so)");
+  ok(SM.top.length === 5 && SM.top.map(t => t.id).join("") === "ABCDE" && S.fields.filter(f => f.id === "site")[0].values.join("") === "ABCDE", "HOOK(A19): A19's five best solar blocks are the plan's sites A to E");
+  ok(SM.mw === 150 && S.fields.filter(f => f.id === "farm")[0].max === SM.mw, "a farm is at most A19's 150 MW block");
+  SM.top.forEach((t, k) => {
+    const x = PG.siteInfo(SM, t.id, 150), co = SM.costs[k];
+    ok(isFinite(x.connectUSD) && x.connectUSD > 0 && near(x.connectUSD, co.connect + co.road + co.land, 1e-6) && near(x.cfK * CFT.targets.solar.cf, co.cf, 1e-12) && /^S[1-4]$/.test(x.sub), "site " + t.id + ": line, road and land from A19's cost (" + PG.mil(x.connectUSD) + ", " + (x.cf * 100).toFixed(1) + "%, to " + x.sub + ")");
+    ok(near(PG.siteInfo(SM, t.id, 75).land, co.land / 2, 1e-6) && near(PG.siteInfo(SM, t.id, 75).line, co.connect, 1e-6), "site " + t.id + ": land in proportion to the MW, the line as A19 costs it");
+  });
+  const rNo = (await E3.solve(ref, P, { solver })).results, x1 = PG.siteInfo(SM, ref.site, ref.farm);
+  const farmOnly = Object.assign({}, ref, { wind: 0 }), fA = (await E3.solve(withSite(farmOnly), P, { solver })).results, fB = (await E3.solve(farmOnly, P, { solver })).results;
+  ok(near(R1.acc.upfrontTotal - rNo.acc.upfrontTotal, x1.connectUSD, 1) && Math.abs(fA.acc.outside.farmGen / fB.acc.outside.farmGen - x1.cfK) < 1e-9, "the chosen site's up-front cost and output factor reach the plan (" + x1.cfK.toFixed(4) + ")");
+  const rD = (await E3.solve(withSite(Object.assign({}, ref, { site: "D" })), P, { solver })).results;
+  ok(Math.abs(rD.acc.city.money - R1.acc.city.money) > 1, "another site changes the plan's cost");
   ok(/HOOK\(A19\)/.test(JS) && /HOOK\(A13\)/.test(JS) && PG.jobs(R1) === null, "both hooks are marked; jobs show no number until A13's model is merged");
-  has("the sites differ only by name and change no number");
   ok(/not yet estimated/.test(JS), "the page says jobs are not yet estimated");
-  const sh = Object.assign({}, ref, { siteInfo: { connectUSD: 5e6, cfK: 1.05 } }), rH = (await E3.solve(sh, P, { solver })).results;
-  ok(rH.acc.outside.farmGen > R1.acc.outside.farmGen && near(rH.acc.upfrontTotal - R1.acc.upfrontTotal, 5e6, 1), "the hook's interface works: a site's output factor and connection cost reach the plan");
+  ok(/<script src="\.\.\/assets\/learn\/a19\.js" defer><\/script>\s*<script src="\.\.\/assets\/learn\/c3-prairie-city-2040\.js"/.test(PAGE) && /a19-gis-siting\.json/.test(PAGE) && /cf_targets\.json/.test(PAGE), "the page loads A19's map before its own script, and A19's data");
 
   // ---------------- guard G-GIS and the rest
   const siting = (T.match(/\b(site|siting|sited)\b[^.]*\./gi) || []).join(" ");

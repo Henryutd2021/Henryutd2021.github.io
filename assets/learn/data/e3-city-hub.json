@@ -386,7 +386,7 @@
    }
   },
   "c3": {
-   "head": "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm)",
+   "head": "Result: 2025 as it is, then the reference plan of the exemplars (70% heat pumps, 40% electric cars, 200 MW of wind, a 100 MW solar farm at A19's site B)",
    "rows": [
     [
      "2025: up front, 2026 to 2040 (2025 dollars)",
@@ -410,15 +410,15 @@
     ],
     [
      "Reference plan: up front, 2026 to 2040 (2025 dollars)",
-     "$1,222.6M of a $1,500.0M budget"
+     "$1,229.7M of a $1,500.0M budget"
     ],
     [
      "Reference plan: the city's yearly cost against 2025",
-     "−$29.2M"
+     "−$29.1M"
     ],
     [
      "Reference plan: the city's CO₂ (location-based, operating)",
-     "2,121,410 t a year"
+     "2,122,343 t a year"
     ],
     [
      "Reference plan: busiest hour against the limit, core · suburbs · fringe",
@@ -478,13 +478,13 @@
       ".\n",
       "Budget and cost: ",
       {
-       "text": "$1,222.6M up front against $1,500.0M; the city's yearly cost −$29.2M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
+       "text": "$1,229.7M up front against $1,500.0M; the city's yearly cost −$29.1M against 2025 (energy bills plus equipment as yearly payments, 2025 dollars)",
        "note": "Up front and yearly kept apart, on one boundary."
       },
       ".\n",
       "CO₂ and the grid: ",
       {
-       "text": "the city's CO₂ 2,121,410 t a year, 23% below 2025 (location-based, operating); 26 MW of substation upgrades, the suburbs the tightest",
+       "text": "the city's CO₂ 2,122,343 t a year, 23% below 2025 (location-based, operating); 26 MW of substation upgrades, the suburbs the tightest",
        "note": "The cut with its boundary, and where the plan needs grid room."
       },
       ".\n",

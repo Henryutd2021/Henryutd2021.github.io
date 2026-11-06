@@ -842,7 +842,7 @@
 - {kind: lesson, tier: analyst, code: X4, title: "How are energy rules made?"}
 - {kind: lesson, tier: analyst, code: X5, title: "How are big energy projects actually financed?"}
 - {kind: lesson, tier: analyst, code: CK-A, form: checkpoint, title: "Analyst checkpoint: an auditable spreadsheet for a new case"}
-# SB3 and C3, builder learn-w5-h (wave W5), on engine E3; F9, A15, A13, A18, A19 join their after lists at integration
+# SB3 and C3, builder learn-w5-h (wave W5), on engine E3; F9, A15, A13, A18 join their after lists at integration (A19 is in C3's)
 - kind: lesson
   id: sb3-city-planner
   code: SB3
@@ -877,7 +877,7 @@
   outcome: "Write a city energy plan for 2040 defended with its cost, CO2, substation peaks and a screening of who pays, with its assumptions stated and the stakeholders' objections answered."
   teaches: [capstone plan summary, a plan within a budget, siting with map layers, screening outputs with stated assumptions, answering stakeholders]
   lab: "M12's notebook: Prairie City's energy hub in SciPy and HiGHS, about 60 minutes."
-  after: [SB3]
+  after: [SB3, A19]
 - kind: lesson
   id: m02-unit-commitment
   path: m02-unit-commitment.qmd

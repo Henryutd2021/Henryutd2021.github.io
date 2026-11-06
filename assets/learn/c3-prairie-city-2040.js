@@ -7,13 +7,15 @@
 // the stakeholder panel, the sensitivity chart), the two-page plan summary (LX.ReportNote), the self-check (LX.Exemplars,
 // LX.Rubric) and the sources. Every number comes from E3 and is checked by _tests/learn/test_c3-prairie-city-2040.js.
 //
-// Two pieces arrive from parallel branches at integration; each has a clearly marked hook below (search "HOOK"):
-//   HOOK(A19)  the siting step: A19's map component (assets/learn/a19.js, branch learn-w5-e) draws the region's layers and
-//              its candidate solar sites; the chosen site's connection cost and output factor go into the plan as
-//              state.siteInfo = { connectUSD, cfK } (2025 dollars). Until then the five sites are named only and change
-//              nothing, and the page says so.
-//   HOOK(A13)  the screening accounting: A13's household and jobs model (branch learn-w5-b). Until then the household
-//              table is E3's own accounting layer and jobs are "not yet estimated" (no number is shown).
+// Two pieces come from parallel lessons; each sits behind a clearly marked hook (search "HOOK"):
+//   HOOK(A19)  wired (learn-w5-e merged, 2026-11-06): the siting step runs A19's map model (assets/learn/a19.js, LX.A19,
+//              lesson-local; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
+//              solar blocks by A19's default weights, each with a least-cost line to a transmission substation (S1 to S4,
+//              not the districts' substations), its access road, its land and its capacity factor, in 2025 dollars. The
+//              chosen site enters the plan as state.siteInfo = { connectUSD, cfK } (siteInfo below); a farm is at most
+//              A19's 150 MW block. G-GIS: the only siting here is a solar farm.
+//   HOOK(A13)  the screening accounting: A13's household and jobs model (branch learn-w5-b), not merged yet. Until then
+//              the household table is E3's own accounting layer and jobs are "not yet estimated" (no number is shown).
 // Prairie City is fictional; its numbers are illustrative.
 (function () {
   "use strict";
@@ -43,7 +45,8 @@
     out.advocates = dB <= 0 ? { v: "yes", t: "Burden " + pct1(R.hh.low.burden0) + " → " + pct1(R.hh.low.burden) + " (screening)." } : dB < 0.003 ? { v: "part", t: "Burden up slightly, " + pct1(R.hh.low.burden0) + " → " + pct1(R.hh.low.burden) + " (screening)." } : { v: "no", t: "Burden up, " + pct1(R.hh.low.burden0) + " → " + pct1(R.hh.low.burden) + " (screening)." };
     out.climate = cut >= 0.35 ? { v: "yes", t: "The city's CO₂ down " + pct0(cut) + "." } : cut >= 0.15 ? { v: "part", t: "Down " + pct0(cut) + ": not deep enough." } : { v: "no", t: "Down only " + pct0(Math.max(0, cut)) + "." };
     out.park = dPark <= 0 ? { v: "yes", t: "Its yearly cost " + smil(park - park0) + "." } : dPark <= 0.1 ? { v: "part", t: "Its yearly cost " + smil(park - park0) + " (" + pct0(dPark) + ")." } : { v: "no", t: "Its yearly cost " + smil(park - park0) + " (" + pct0(dPark) + ")." };
-    out.rural = S.farm > 0 ? { v: "part", t: kilo(S.farm) + " MW at site " + S.site + (S.siteAdj ? "." : "; the map's layers (A19) are not wired in yet.") } : { v: "yes", t: "No solar farm, no land used." };
+    var si = S.siteAdj;
+    out.rural = S.farm > 0 ? { v: "part", t: kilo(S.farm) + " MW at site " + S.site + (si && si.acres ? ", " + si.where + " of the centre, on about " + kilo(si.acres) + " acres of farmland." : ".") } : { v: "yes", t: "No solar farm, no land used." };
     return PANEL.map(function (p) { return { key: p.key, name: p.name, note: p.note, cell: out[p.key] }; });
   }
   // the park's yearly energy and equipment cost (2025 dollars): electricity at the industrial price, gas, its new equipment
@@ -52,6 +55,24 @@
     var gas = P.out.foodGas + P.out.fertGas - (S.c3 ? S.ihp * P.out.lowHeat / P.out.burner + S.ely * P.out.fertGas : 0);
     var eq = R.acc ? (R.acc.money.ihp || 0) + (R.acc.money.ely || 0) : 0;
     return el * P.price.ind + gas * P.price.gasInd + eq;
+  }
+  // HOOK(A19): the solar farm's candidate sites from A19's map model, and what a chosen site adds to the plan
+  function siteModel(A19, D, cft) {
+    var R = A19.build(D, {}), c = A19.cfg(D, "solar"), X = A19.exclude(R, D, "solar", c), CR = A19.criteria(R, D, "solar", c);
+    var BL = A19.blocks(R, D, "solar", c, X, CR), top = A19.sites(R, D, "solar", c, 5, X, CR, BL);
+    var Pp = A19.paths(R, D, A19.surface(R, D, { protected: "forbid" }), A19.needMW(D, "solar", c));
+    var costs = top.map(function (st) { return A19.cost(R, D, "solar", st, c, Pp, cft); });
+    return { A19: A19, R: R, D: D, c: c, X: X, suit: A19.suitability(R, D, "solar", c), top: top, costs: costs, mw: D.types.solar.mw, cft: cft };
+  }
+  // a site for a farm of farmMW: the line to the substation and the access road as A19 costs them for its block (the
+  // same at any size up to the block's), the land in proportion to the farm's MW; cfK = the site's capacity factor over
+  // EIA's 2025 average (E3 scales the farm's hourly output by it)
+  function siteInfo(M, id, farmMW) {
+    if (!M) return null;
+    var k = M.top.map(function (t) { return t.id; }).indexOf(id); if (k < 0) return null;
+    var co = M.costs[k], t = M.top[k], f = farmMW / M.mw;
+    return { id: id, connectUSD: co.connect + co.road + co.land * f, cfK: co.cf / M.cft.solar, cf: co.cf, line: co.connect, road: co.road, land: co.land * f,
+      acres: co.acres * f, km: co.route ? co.route.km : null, sub: co.sub, where: M.A19.place(M.R, t.i, t.j, t.k), score: t.score };
   }
   // the sensitivity: the plan held fixed, one input at a time (re-solved where the LP depends on it)
   var SENS = [{ key: "upc", label: "Upgrade cost", unit: "$/kW", solve: true }, { key: "av", label: "Value of a contract MWh", unit: "$/MWh" },
@@ -77,7 +98,7 @@
           "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days, the household rule an assumption, jobs not yet estimated", note: "What the plan leaves out, so the council does not over-read it." }, "."] }],
       note: "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it." };
   }
-  var page = { REF_PLAN: REF_PLAN, exemplars: exemplars, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost, SENS: SENS, sensWords: sensWords,
+  var page = { REF_PLAN: REF_PLAN, exemplars: exemplars, siteModel: siteModel, siteInfo: siteInfo, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost, SENS: SENS, sensWords: sensWords,
     GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "Heat pumps' [[coefficient-of-performance|COP]] falls on cold nights; retrofits cut the heat buildings need." },
       { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network: a large heat pump, a gas boiler for the rest, and a heat store." },
       { title: "Cars", fields: ["ev", "evm"], color: "var(--lx-demand)", hint: "[[managed-charging|Managed charging]] moves each day's charge within the day." },
@@ -115,24 +136,36 @@
     var ss = LX.ShareState(side, { schema: S, id: "c3-link", onLoad: function (s) { plan = s; C.set(plan); site.set(plan); run.changed(plan); rn.refresh(); } });
     plan = ss.state;
     var C = U.controls(ctr, S, plan, page.GROUPS, change);
-    // ---- HOOK(A19): the siting step. A19's map (LX.SiteMap with LX.A19's region and candidate solar sites) goes here;
-    // it sets plan.site and, through siteInfo(site), the connection cost and output factor E3 uses. Until it is merged
-    // the step lists the five candidate sites by name only.
+    // ---- HOOK(A19): the siting step on A19's map (LX.A19, LX.SiteMap): the five best solar blocks, the chosen one's
+    // least-cost line, and what each adds to the plan
+    var SM = window.LX.A19 && data.a19_gis_siting && data.cf_targets ? page.siteModel(window.LX.A19, window.LX.A19.withCity(data.a19_gis_siting, data.prairie_city),
+      { solar: data.cf_targets.targets.solar.cf, wind: data.cf_targets.targets.wind.cf }) : null;
     var site = (function () {
       var fs = H("fieldset", { class: "lx-sb-group c3-site" }, ctr); H("legend", { text: "Site the solar farm" }, fs);
       var f = S.fields.filter(function (x) { return x.id === "site"; })[0];
-      var hint = H("p", { class: "lx-hint e3-ghint" }, fs);
-      hint.innerHTML = LX.rich("Pick one of the five candidate sites. A19's map layers (protected land, slopes, homes, flood zones) and each site's connection cost arrive with lesson A19; until then the sites differ only by name and change no number.");
+      H("p", { class: "lx-hint e3-ghint", html: LX.rich(SM ? "A19's screen for a " + SM.mw + " MW block: protected land, flood zones, steep slopes and setbacks left out, the rest scored ([[lesson:a19-gis-siting|A19]]). Pick one of its five best blocks; its line, road and land go into your plan." : "The siting map could not load: the sites differ only by name and change no number.") }, fs);
+      var mapBox = H("div", { class: "c3-mapbox" }, fs), map = SM ? LX.SiteMap(mapBox, { R: SM.R, D: SM.D, label: "Map of the region around Prairie City with the five best solar blocks" }) : null;
       var sg = U.seg(H("div", { class: "e3-segrow" }, fs), f.label, f.values, f.names, plan.site, function (v) { var p = U.copy(plan); p.site = v; change(p); });
-      var gs = ctr.querySelectorAll("fieldset.lx-sb-group");
-      if (gs.length > 6) ctr.insertBefore(fs, gs[5]);   // after "Local supply and storage", before "The grid"
-      return { set: function (p) { sg.set(p.site); }, info: function () { return null; } };
+      var tb = H("div", { class: "c3-sites" }, fs);
+      function paint(p) {
+        if (!SM) return;
+        var k = SM.top.map(function (t) { return t.id; }).indexOf(p.site), co = SM.costs[k];
+        map.draw({ layer: "suit", suit: SM.suit, X: SM.X, sites: SM.top, sel: p.site, path: co && co.route ? co.route.cells : null, sitesKey: "Five best solar blocks, A best" });
+        tb.innerHTML = "";
+        U.table(tb, ["Site", "Where", "Line to", "Up front: line, road, land", "Capacity factor"], SM.top.map(function (t) {
+          var x = page.siteInfo(SM, t.id, Math.max(p.farm, 10));
+          return [t.id + (t.id === p.site ? " (yours)" : ""), x.where + " of the centre", x.sub + ", " + x.km.toFixed(1) + " km", mil(x.connectUSD), (x.cf * 100).toFixed(1) + "%"];
+        }), "c3-sitetbl");
+        H("p", { class: "lx-hint", text: "Up front for a " + kilo(Math.max(p.farm, 10)) + " MW farm (2025 dollars; the land in proportion to the MW, the line and road as A19 costs them for its block). The panels themselves are in the plan's solar-farm cost." }, tb);
+      }
+      paint(plan);
+      return { set: function (p) { sg.set(p.site); paint(p); }, info: function (id, mw) { return page.siteInfo(SM, id, mw); } };
     })();
     var pre = H("div", { class: "lx-sb-presets", role: "group", "aria-label": "Start from a preset (only the choices it names change)" }, side);
     E3.c3presets.forEach(function (pr) { H("button", { class: "lx-btn ghost small", type: "button", text: pr.label, onclick: function () { change(E3.withPreset(plan, pr)); } }, pre); });
     var stale = H("p", null, rh), res = H("div", { class: "lx-sb-results c3-res" }, rh), ro = H("div", { class: "lx-readouts e3-ro" }), stopB = U.stopper();
     function solver() { if (!stub) return null; stub = null; return function () { return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" }); }; }
-    function withSite(st) { var s = U.copy(st), inf = site.info(s.site); if (inf) s.siteInfo = inf; return s; }
+    function withSite(st) { var s = U.copy(st), inf = st.farm > 0 ? site.info(s.site, st.farm) : null; if (inf) s.siteInfo = inf; return s; }
     var run = LX.BenchRun(side, { label: "Run the 2040 plan", state: function () { return plan; }, results: [res, ro], stale: stale,
       busy: function (on) { stopB.busy(on); },
       solve: function (st, ctx) { return E3.solve(withSite(st), P, { signal: ctx.signal, attempt: ctx.attempt, solver: solver() }); },
