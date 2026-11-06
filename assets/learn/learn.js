@@ -13247,7 +13247,7 @@
       { id: "ihp", short: "i", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Food plants' heat below 100 °C from heat pumps", unit: "%" },
       { id: "ely", short: "y", type: "int", min: 0, max: 100, step: 10, def: 0, label: "Fertilizer plant's hydrogen from electrolysis", unit: "%" },
       { id: "wind", short: "w", type: "int", min: 0, max: 400, step: 10, def: 0, label: "Wind contract to the west", unit: "MW" },
-      { id: "farm", short: "f", type: "int", min: 0, max: 300, step: 10, def: 0, label: "Solar farm", unit: "MW" },
+      { id: "farm", short: "f", type: "int", min: 0, max: 150, step: 10, def: 0, label: "Solar farm", unit: "MW" },
       { id: "site", short: "t", type: "enum", values: ["A", "B", "C", "D", "E"], names: { A: "Site A", B: "Site B", C: "Site C", D: "Site D", E: "Site E" }, def: "A", label: "Solar farm's site" },
       { id: "av", short: "x", type: "int", min: av.lo, max: av.hi, step: av.step, def: av.def, label: "Value of a contract MWh", unit: "$/MWh" }]);
     return S;
@@ -13260,7 +13260,7 @@
   var c3presets = [
     { id: "today", label: "2025 as it is", state: presets[0].state },
     { id: "buildings", label: "Buildings first", state: { hp: 70, ret: 50, dh: 30, dhp: 100, sto: 800, ev: 40, evm: "managed", pv: 60, bat: 20, ihp: 50, ely: 0, wind: 100, farm: 50 } },
-    { id: "supply", label: "Supply first", state: { hp: 40, ret: 10, dh: 0, dhp: 0, sto: 0, ev: 40, evm: "home", pv: 150, bat: 0, ihp: 0, ely: 50, wind: 300, farm: 200 } }];
+    { id: "supply", label: "Supply first", state: { hp: 40, ret: 10, dh: 0, dhp: 0, sto: 0, ev: 40, evm: "home", pv: 150, bat: 0, ihp: 0, ely: 50, wind: 300, farm: 150 } }];
   function defaults(S) { var o = {}; S.fields.forEach(function (f) { o[f.id] = f.def; }); return o; }
   function withPreset(s, pr) { var o = copy(s); for (var k in pr.state) o[k] = pr.state[k]; return o; }
 

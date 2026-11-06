@@ -18,9 +18,6 @@ glossary:
   - id: tie-rule
     term: Tie rule
     def: "A stated way to pick one answer when several plans cost exactly the same, usually tiny costs that are left out of the reported results."
-  - id: screening-estimate
-    term: Screening estimate
-    def: "A first, rough number from stated assumptions, used to see whether something matters and for whom; not a prediction."
 requests:
   - "Engine E3 is a shared component: assets/learn/components/engine-e3.js and engine-e3.css (LX.E3: the hub LP, solve, the accounting and household layers, the no-JS blocks, and the view kit LX.E3.ui). Please add it to scripts/build_learn.py as W5_ENGINES = [\"engine-e3\"] after W4_PROMOTED (the branch's learn.js was built that way, with a scratch copy of the script). README section 'Engine E3' added under 'Prairie City data (wave W5)'."
   - "Engine E3's data: assets/learn/data/e3-city-hub.json from scripts/build_learn_e3_data.py (index repo, uncommitted); its precomputed block from the SB3, M12 and C3 tests' --write."
