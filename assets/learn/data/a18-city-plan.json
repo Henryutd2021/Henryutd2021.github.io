@@ -2,43 +2,163 @@
  "about": "Analyst lesson A18 (How is a city or regional energy plan made?): the measures of Prairie City's marginal abatement cost curve, their sources and the settings of the plan's tests. Prairie City's own numbers (inventory, districts, days, prices, emission factors, household groups) are read from prairie-city.json; the rooftop-solar cost, the heat pump's cost and the discount rate from e0.json (lesson SB0's engine), so they stay the same as there. Every cost is in 2025 dollars (one price year), converted with BEA's GDP implicit price deflator. Numbers marked teaching are set for the lesson, not measured.",
  "built": "2026-11-06",
  "priceYear": 2025,
- "horizon": { "from": 2025, "to": 2035, "years": 10, "note": "Set for teaching: the plan runs ten years, 2026 to 2035. Equipment is replaced only when it wears out, and the ages of the city's furnaces and water heaters are assumed spread evenly, so by 2035 a share of 10 / (average life) of them has been replaced." },
+ "horizon": {
+  "from": 2025,
+  "to": 2035,
+  "years": 10,
+  "note": "Set for teaching: the plan runs ten years, 2026 to 2035. Equipment is replaced only when it wears out, and the ages of the city's furnaces and water heaters are assumed spread evenly, so by 2035 a share of 10 / (average life) of them has been replaced."
+ },
  "deflator": {
-  "index": { "2008": 88.013, "2012": 93.185, "2022": 118.026, "2025": 128.893 },
+  "index": {
+   "2008": 88.013,
+   "2012": 93.185,
+   "2022": 118.026,
+   "2025": 128.893
+  },
   "note": "GDP implicit price deflator (index, 2017 = 100, annual), BEA NIPA Table 1.1.9, read through FRED series A191RD3A086NBEA (BEA as originator, last updated 30 September 2026). A 2022 dollar is 128.893 / 118.026 = 1.092 2025 dollars; 2008 and 2012 dollars likewise. The 2025 value is the one prairie-city.json and lesson 13 use.",
   "src": "bea-deflator"
  },
  "measures": [
-  { "id": "hpwh", "n": 1, "label": "Heat-pump water heaters", "short": "Water heaters", "who": "owners", "sector": "homes",
-    "what": "Homes heated with electricity put in a heat-pump water heater instead of a new electric one when the old one wears out.",
-    "baseUEF": 0.92, "newUEF": 3.73, "baseCost": 905, "newCost": 1715, "costYear": 2022, "life": 15.1, "upkeepSame": true,
-    "src": ["eia-rdm-t2", "eia-equip"],
-    "note": "EIA, AEO2026 Residential Demand Module, Table 2 (2022 dollars): an electric storage water heater at the minimum standard (UEF 0.92) $905, a heat-pump water heater (UEF 3.73) $1,715. Average life 15.1 years for both and the same upkeep (EIA's equipment report, Appendix A, pp. 62 and 65). Hot water per home is prairie-city.json's (RECS 2020, West North Central)." },
-  { "id": "furnace", "n": 2, "label": "Condensing gas furnaces", "short": "Furnaces", "who": "owners", "sector": "homes",
-    "what": "Homes heated with gas put in a 99% furnace instead of an 80% one when the old furnace wears out.",
-    "baseAFUE": 0.80, "newAFUE": 0.99, "baseCost": 3690, "newCost": 4320, "baseUpkeep": 120, "newUpkeep": 130, "baseFanKWh": 386, "newFanKWh": 725, "costYear": 2022, "life": 22.5,
-    "src": ["eia-rdm-t2", "eia-equip"],
-    "note": "EIA, AEO2026 Residential Demand Module, Table 2 and EIA's equipment report, Appendix A, p. 10 (gas furnaces, North; 2022 dollars): 80% AFUE $3,690 and $120 a year of upkeep, 386 kWh a year for the fan; 99% AFUE $4,320, $130 and 725 kWh. Average life 22.5 years (DOE's 2022 furnace analysis, cited there)." },
-  { "id": "hp", "n": 3, "label": "Heat pumps instead of gas furnaces", "short": "Heat pumps", "who": "owners", "sector": "homes",
-    "what": "Homes heated with gas put in an electric heat pump instead of a new 80% furnace when the old furnace wears out.",
-    "life": 15.3, "upkeep": 150, "acCost": 5250, "acUpkeep": 150, "acLife": 15.3, "costYear": 2022,
-    "src": ["e0-hp", "eia-rdm-t2", "eia-equip", "pc-cop"],
-    "note": "The heat pump costs $8,620 (2022 dollars), the most efficient unit in EIA's table, standing in for a cold-climate unit; lesson SB0 uses the same figure (e0.json). Average life 15.3 years and $150 a year of upkeep (EIA's equipment report, Appendix A, p. 39). It runs on lesson F3's cold-climate efficiency curve over Prairie City's eight days. When the air conditioner is due too, the heat pump also replaces a central air conditioner: $5,250 and $150 a year (Appendix A, p. 27), its life assumed equal to the heat pump's (EIA's range is 11 to 25 years)." },
-  { "id": "weather", "n": 4, "label": "Weatherize homes built before 1980", "short": "Weatherize", "who": "programme", "sector": "homes",
-    "what": "Air sealing and insulation bring 40% of the homes built before 1980 to the heat need of homes built 1980 to 2009.",
-    "share": 0.40, "costPerHome": 4695, "costYear": 2008, "life": 20, "measuredMMBtu": 29.3,
-    "src": ["ornl-wap", "pc-vintages"],
-    "note": "Cost: $4,695 per home, the average cost of a home weatherized in DOE's Weatherization Assistance Program in programme year 2008 (ORNL/TM-2014/338, September 2014), taken as 2008 dollars. Set for teaching: 40% of the homes built before 1980 by 2035, the heat need falling from 115 to 80 kWh per m2 a year (prairie-city.json's vintages), a 20-year life, and homes built before 1980 holding the same share of homes as of floor area. For comparison, that study measured 29.3 MMBtu of first-year savings in an average weatherized site-built home." },
-  { "id": "comm", "n": 5, "label": "Efficiency programmes in shops and offices", "short": "Shops, offices", "who": "utility", "sector": "commercial",
-    "what": "Rebate programmes (mostly lighting and controls) save 10% of the electricity that shops, offices and public buildings use.",
-    "share": 0.10, "cse": 0.045, "cseYear": 2012, "cseRate": 0.06, "life": 12,
-    "src": ["lbnl-total-cse"],
-    "note": "Cost: $0.045 per kWh saved, the total cost (programme and participant) of commercial and industrial prescriptive rebate programmes, 2009 to 2013, levelized at a 6% real rate, in 2012 dollars (LBNL, April 2015, p. 16). Set for teaching: 10% of the commercial electricity by 2035 and a 12-year life (the brief gives no programme life), used to turn the levelized cost back into an up-front cost." },
-  { "id": "solar", "n": 6, "label": "Rooftop solar on homes", "short": "Rooftop solar", "who": "owners", "sector": "homes",
-    "what": "Homes add 60 MW of rooftop panels, valued at the retail price of the electricity they replace.",
-    "addMW": 60, "systemKW": 6.7, "cost2030": 3199,
-    "src": ["e0-pv", "eia-rdm-t3", "pc-solar"],
-    "note": "Cost $4,336 per kW in 2022 dollars, 25-year life, $20 per kW a year of upkeep (illustrative): lesson SB0's figures (e0.json; EIA, AEO2026 Residential Demand Module, Table 3, systems of 2020, 6.7 kW on average). EIA's figure for systems of 2030 is $3,199 per kW. Output at Prairie City's 17.6% capacity factor (prairie-city.json). Set for teaching: 60 MW more by 2035, every kWh worth the residential retail price (as if used at home or net-metered)." }
+  {
+   "id": "hpwh",
+   "n": 1,
+   "label": "Heat-pump water heaters",
+   "short": "Water heaters",
+   "who": "owners",
+   "sector": "homes",
+   "what": "Homes heated with electricity put in a heat-pump water heater instead of a new electric one when the old one wears out.",
+   "baseUEF": 0.92,
+   "newUEF": 3.73,
+   "baseCost": 905,
+   "newCost": 1715,
+   "costYear": 2022,
+   "life": 15.1,
+   "upkeepSame": true,
+   "src": [
+    "eia-rdm-t2",
+    "eia-equip"
+   ],
+   "note": "EIA, AEO2026 Residential Demand Module, Table 2 (2022 dollars): an electric storage water heater at the minimum standard (UEF 0.92) $905, a heat-pump water heater (UEF 3.73) $1,715. Average life 15.1 years for both and the same upkeep (EIA's equipment report, Appendix A, pp. 62 and 65). Hot water per home is prairie-city.json's (RECS 2020, West North Central).",
+   "whoText": "Owners decide; utility rebates can help.",
+   "color": "var(--lx-hyd)",
+   "bar": "the water-heater bar"
+  },
+  {
+   "id": "furnace",
+   "n": 2,
+   "label": "Condensing gas furnaces",
+   "short": "Furnaces",
+   "who": "owners",
+   "sector": "homes",
+   "what": "Homes heated with gas put in a 99% furnace instead of an 80% one when the old furnace wears out.",
+   "baseAFUE": 0.8,
+   "newAFUE": 0.99,
+   "baseCost": 3690,
+   "newCost": 4320,
+   "baseUpkeep": 120,
+   "newUpkeep": 130,
+   "baseFanKWh": 386,
+   "newFanKWh": 725,
+   "costYear": 2022,
+   "life": 22.5,
+   "src": [
+    "eia-rdm-t2",
+    "eia-equip"
+   ],
+   "note": "EIA, AEO2026 Residential Demand Module, Table 2 and EIA's equipment report, Appendix A, p. 10 (gas furnaces, North; 2022 dollars): 80% AFUE $3,690 and $120 a year of upkeep, 386 kWh a year for the fan; 99% AFUE $4,320, $130 and 725 kWh. Average life 22.5 years (DOE's 2022 furnace analysis, cited there).",
+   "whoText": "Owners decide, within federal efficiency standards.",
+   "color": "var(--lx-cc)",
+   "bar": "the furnace bar"
+  },
+  {
+   "id": "hp",
+   "n": 3,
+   "label": "Heat pumps instead of gas furnaces",
+   "short": "Heat pumps",
+   "who": "owners",
+   "sector": "homes",
+   "what": "Homes heated with gas put in an electric heat pump instead of a new 80% furnace when the old furnace wears out.",
+   "life": 15.3,
+   "upkeep": 150,
+   "acCost": 5250,
+   "acUpkeep": 150,
+   "acLife": 15.3,
+   "costYear": 2022,
+   "src": [
+    "e0-hp",
+    "eia-rdm-t2",
+    "eia-equip",
+    "pc-cop"
+   ],
+   "note": "The heat pump costs $8,620 (2022 dollars), the most efficient unit in EIA's table, standing in for a cold-climate unit; lesson SB0 uses the same figure (e0.json). Average life 15.3 years and $150 a year of upkeep (EIA's equipment report, Appendix A, p. 39). It runs on lesson F3's cold-climate efficiency curve over Prairie City's eight days. When the air conditioner is due too, the heat pump also replaces a central air conditioner: $5,250 and $150 a year (Appendix A, p. 27), its life assumed equal to the heat pump's (EIA's range is 11 to 25 years).",
+   "whoText": "Owners decide; a city cannot order it for existing homes alone.",
+   "color": "var(--lx-dr)",
+   "bar": "the heat-pump bar"
+  },
+  {
+   "id": "weather",
+   "n": 4,
+   "label": "Weatherize homes built before 1980",
+   "short": "Weatherize",
+   "who": "programme",
+   "sector": "homes",
+   "what": "Air sealing and insulation bring 40% of the homes built before 1980 to the heat need of homes built 1980 to 2009.",
+   "share": 0.4,
+   "costPerHome": 4695,
+   "costYear": 2008,
+   "life": 20,
+   "measuredMMBtu": 29.3,
+   "src": [
+    "ornl-wap",
+    "pc-vintages"
+   ],
+   "note": "Cost: $4,695 per home, the average cost of a home weatherized in DOE's Weatherization Assistance Program in programme year 2008 (ORNL/TM-2014/338, September 2014), taken as 2008 dollars. Set for teaching: 40% of the homes built before 1980 by 2035, the heat need falling from 115 to 80 kWh per m2 a year (prairie-city.json's vintages), a 20-year life, and homes built before 1980 holding the same share of homes as of floor area. For comparison, that study measured 29.3 MMBtu of first-year savings in an average weatherized site-built home.",
+   "whoText": "A city or utility programme, with owners and landlords.",
+   "color": "var(--lx-warn)",
+   "bar": "the weatherization bar"
+  },
+  {
+   "id": "comm",
+   "n": 5,
+   "label": "Efficiency programmes in shops and offices",
+   "short": "Shops and offices",
+   "who": "utility",
+   "sector": "commercial",
+   "what": "Rebate programmes (mostly lighting and controls) save 10% of the electricity that shops, offices and public buildings use.",
+   "share": 0.1,
+   "cse": 0.045,
+   "cseYear": 2012,
+   "cseRate": 0.06,
+   "life": 12,
+   "src": [
+    "lbnl-total-cse"
+   ],
+   "note": "Cost: $0.045 per kWh saved, the total cost (programme and participant) of commercial and industrial prescriptive rebate programmes, 2009 to 2013, levelized at a 6% real rate, in 2012 dollars (LBNL, April 2015, p. 16). Set for teaching: 10% of the commercial electricity by 2035 and a 12-year life (the brief gives no programme life), used to turn the levelized cost back into an up-front cost.",
+   "whoText": "The utility runs it; the state regulator approves its budget.",
+   "color": "var(--lx-tier-2)",
+   "bar": "the shops-and-offices bar"
+  },
+  {
+   "id": "solar",
+   "n": 6,
+   "label": "Rooftop solar on homes",
+   "short": "Rooftop solar",
+   "who": "owners",
+   "sector": "homes",
+   "what": "Homes add 60 MW of rooftop panels, valued at the retail price of the electricity they replace.",
+   "addMW": 60,
+   "systemKW": 6.7,
+   "cost2030": 3199,
+   "src": [
+    "e0-pv",
+    "eia-rdm-t3",
+    "pc-solar"
+   ],
+   "note": "Cost $4,336 per kW in 2022 dollars, 25-year life, $20 per kW a year of upkeep (illustrative): lesson SB0's figures (e0.json; EIA, AEO2026 Residential Demand Module, Table 3, systems of 2020, 6.7 kW on average). EIA's figure for systems of 2030 is $3,199 per kW. Output at Prairie City's 17.6% capacity factor (prairie-city.json). Set for teaching: 60 MW more by 2035, every kWh worth the residential retail price (as if used at home or net-metered).",
+   "whoText": "Owners decide, under the state's rules for paying for exports.",
+   "color": "var(--lx-solar)",
+   "bar": "the rooftop-solar bar"
+  }
  ],
  "rule": {
   "order": "Bars are sorted by cost per tonne, cheapest first. Tie rule: two bars whose costs per tonne round to the same cent keep the order of this file.",
@@ -47,27 +167,283 @@
  },
  "options": {
   "grid": [
-   { "key": "egrid", "label": "As in 2023", "t": null, "note": "eGRID2023's SPP North rate, prairie-city.json's factor." },
-   { "key": "cleaner", "label": "Cleaner", "t": 0.30, "note": "Set for teaching." },
-   { "key": "clean", "label": "Much cleaner", "t": 0.15, "note": "Set for teaching." }
+   {
+    "key": "egrid",
+    "label": "As in 2023",
+    "t": null,
+    "note": "eGRID2023's SPP North rate, prairie-city.json's factor."
+   },
+   {
+    "key": "cleaner",
+    "label": "Cleaner",
+    "t": 0.3,
+    "note": "Set for teaching."
+   },
+   {
+    "key": "clean",
+    "label": "Much cleaner",
+    "t": 0.15,
+    "note": "Set for teaching."
+   }
   ],
   "gas": [
-   { "key": "low", "label": "Lower", "x": 0.7 },
-   { "key": "y2025", "label": "As in 2025", "x": 1 },
-   { "key": "high", "label": "Higher", "x": 1.4 }
+   {
+    "key": "low",
+    "label": "Lower",
+    "x": 0.7
+   },
+   {
+    "key": "y2025",
+    "label": "As in 2025",
+    "x": 1
+   },
+   {
+    "key": "high",
+    "label": "Higher",
+    "x": 1.4
+   }
   ],
   "gasNote": "Set for teaching: 30% below and 40% above Kansas's 2025 gas prices for homes and businesses.",
   "solar": [
-   { "key": "y2020", "label": "Systems of 2020" },
-   { "key": "y2030", "label": "EIA's 2030 figure" }
+   {
+    "key": "y2020",
+    "label": "Systems of 2020"
+   },
+   {
+    "key": "y2030",
+    "label": "EIA's 2030 figure"
+   }
   ]
  },
- "target": { "def": 4, "min": 1, "max": 8, "step": 0.5, "note": "Set by the reader: the cut by 2035 as a share of the 2025 inventory (BASIC+)." },
- "budget": { "def": 250, "min": 0, "max": 700, "step": 10, "note": "Set by the reader: up-front money available for the plan over ten years, $M (2025 dollars), whoever pays it." },
- "programme": { "share": 0.40, "note": "Set for teaching: a utility programme pays 40% of the home measures' cost and recovers it on all homes' bills, in proportion to what each home spends on energy. In LBNL's 2009-2013 data, participants paid 59% of residential prescriptive programmes' total cost and 36% of whole-home retrofit programmes' (April 2015, pp. 13-14)." },
+ "target": {
+  "def": 4,
+  "min": 1,
+  "max": 8,
+  "step": 0.5,
+  "note": "Set by the reader: the cut by 2035 as a share of the 2025 inventory (BASIC+)."
+ },
+ "budget": {
+  "def": 250,
+  "min": 0,
+  "max": 700,
+  "step": 10,
+  "note": "Set by the reader: up-front money available for the plan over ten years, $M (2025 dollars), whoever pays it."
+ },
+ "programme": {
+  "share": 0.4,
+  "note": "Set for teaching: a utility programme pays 40% of the home measures' cost and recovers it on all homes' bills, in proportion to what each home spends on energy. In LBNL's 2009-2013 data, participants paid 59% of residential prescriptive programmes' total cost and 36% of whole-home retrofit programmes' (April 2015, pp. 13-14)."
+ },
  "participation": {
-  "first": { "label": "First come", "w": [0.5, 0.7, 0.9, 1.1, 1.3] },
-  "low": { "label": "Low-income homes first", "w": [1.3, 1.1, 0.9, 0.7, 0.5] },
+  "first": {
+   "label": "First come",
+   "w": [
+    0.5,
+    0.7,
+    0.9,
+    1.1,
+    1.3
+   ]
+  },
+  "low": {
+   "label": "Low-income homes first",
+   "w": [
+    1.3,
+    1.1,
+    0.9,
+    0.7,
+    0.5
+   ]
+  },
   "note": "Set for teaching: each group's share of the plan's home measures is its households times a weight. First come: richer households, more of them owners with cash, take more. Low-income first: a programme that seeks out the 0-80% groups."
+ },
+ "scopeSort": {
+  "bins": [
+   {
+    "id": "s1",
+    "label": "Scope 1",
+    "sub": "burned or released in the city"
+   },
+   {
+    "id": "s2",
+    "label": "Scope 2",
+    "sub": "grid electricity used in the city"
+   },
+   {
+    "id": "s3",
+    "label": "Scope 3",
+    "sub": "outside the city, caused by it"
+   }
+  ],
+  "cards": [
+   {
+    "id": "hgas",
+    "text": "Gas burned in furnaces and water heaters at home",
+    "bin": "s1",
+    "why": "Burned inside the city boundary: scope 1, stationary energy, residential buildings."
+   },
+   {
+    "id": "hel",
+    "text": "Electricity used in homes",
+    "bin": "s2",
+    "why": "Grid-supplied electricity used in the city: scope 2, counted where it is used."
+   },
+   {
+    "id": "car",
+    "text": "Gasoline burned by cars driving in the city",
+    "bin": "s1",
+    "why": "In-boundary transportation: scope 1. The part of a trip outside the city is scope 3 in BASIC+."
+   },
+   {
+    "id": "dc",
+    "text": "Electricity the data-center campus uses",
+    "bin": "s2",
+    "why": "A load like any other: grid electricity used in the city is scope 2."
+   },
+   {
+    "id": "fert",
+    "text": "Gas the fertilizer plant burns or turns into hydrogen",
+    "bin": "s1",
+    "why": "Released in the city: scope 1. The GPC puts gas used as feedstock under industrial processes (IPPU), which BASIC+ adds."
+   },
+   {
+    "id": "loss",
+    "text": "Electricity lost on the wires on its way to the city's meters",
+    "bin": "s3",
+    "why": "Transmission and distribution losses of grid-supplied energy are scope 3, counted in BASIC+ only."
+   },
+   {
+    "id": "farm",
+    "text": "Diesel burned by tractors on the farms",
+    "bin": "s1",
+    "why": "Burned in the city boundary; the GPC files farm machinery under stationary energy, agriculture (Table 6.5)."
+   },
+   {
+    "id": "shop",
+    "text": "Electricity used by shops and offices",
+    "bin": "s2",
+    "why": "Grid-supplied electricity used in the city: scope 2."
+   }
+  ]
+ },
+ "barrierSort": {
+  "bins": [
+   {
+    "id": "in",
+    "label": "In the bar's cost",
+    "sub": "counted in the cost per tonne"
+   },
+   {
+    "id": "out",
+    "label": "Left out of it",
+    "sub": "real, but not in the bar"
+   }
+  ],
+  "cards": [
+   {
+    "id": "equip",
+    "text": "The equipment and its installation",
+    "bin": "in",
+    "why": "Every bar counts what the equipment and its installation cost, against the usual replacement."
+   },
+   {
+    "id": "upkeep",
+    "text": "Extra upkeep of the new equipment",
+    "bin": "in",
+    "why": "EIA's upkeep figures are in the furnace and heat-pump bars."
+   },
+   {
+    "id": "admin",
+    "text": "Programme staff and marketing, in the shops-and-offices bar",
+    "bin": "in",
+    "why": "LBNL's total cost counts everything a programme spends; the bars built on EIA's installed costs leave it out."
+   },
+   {
+    "id": "time",
+    "text": "Time to find a contractor and wait at home for one",
+    "bin": "out",
+    "why": "LBNL's total cost leaves out participants' time and transaction costs (April 2015, p. 2, note 7)."
+   },
+   {
+    "id": "split",
+    "text": "A tenant's savings when the landlord pays",
+    "bin": "out",
+    "why": "The bar adds costs and savings as if one person paid and saved; a landlord who pays gets none of a tenant's savings."
+   },
+   {
+    "id": "claimed",
+    "text": "Savings that turn out smaller than claimed",
+    "bin": "out",
+    "why": "LBNL used programmes' claimed savings; measured savings can differ."
+   },
+   {
+    "id": "rate",
+    "text": "Borrowing at more than 4% a year",
+    "bin": "out",
+    "why": "Every bar is spread over its life at 4% real; a household borrowing at more sees a higher cost."
+   },
+   {
+    "id": "sub",
+    "text": "A bigger substation",
+    "bin": "out",
+    "why": "No bar carries the grid's costs; test 2 checks the substations separately."
+   }
+  ]
+ },
+ "flow": {
+  "steps": [
+   {
+    "id": "inv",
+    "t": "Inventory",
+    "s": "city staff, GPC",
+    "who": "The city counts its emissions with a standard such as the GPC (December 2014), from the utilities' sales data."
+   },
+   {
+    "id": "tgt",
+    "t": "Target",
+    "s": "city council",
+    "who": "The council adopts a cut and a year, as Los Angeles's council did by motions in 2016 and 2017."
+   },
+   {
+    "id": "opt",
+    "t": "Options",
+    "s": "city, utility, owners",
+    "who": "The city lists what it can do (codes, its own buildings and fleet, programmes); owners and the utility hold the rest."
+   },
+   {
+    "id": "irp",
+    "t": "Utility resource plan",
+    "s": "utility; regulator reviews",
+    "who": "Supply is the utility's: where utilities own their plants, regulators set the rules and guidelines for its resource plan (LBNL, September 2016)."
+   },
+   {
+    "id": "scr",
+    "t": "Screening",
+    "s": "cost per tonne, then tests",
+    "who": "City staff or consultants price the options, then test budget, peaks and who benefits."
+   },
+   {
+    "id": "ok",
+    "t": "Passes the tests?",
+    "s": ""
+   },
+   {
+    "id": "plan",
+    "t": "Adopt the plan",
+    "s": "council; regulator for utility parts",
+    "who": "The council adopts the city's part; the state regulator approves the utility's rates and programme budgets."
+   },
+   {
+    "id": "rev",
+    "t": "Revise and screen again",
+    "s": "other measures or order"
+   },
+   {
+    "id": "mon",
+    "t": "Monitor",
+    "s": "inventory each year",
+    "who": "The GPC recommends updating the inventory every year to track progress."
+   }
+  ],
+  "note": "Typical U.S. practice, simplified: who does what differs by state and city. A city-owned utility, such as Los Angeles's, takes direction from its city council (LA100, 2021)."
  }
 }
