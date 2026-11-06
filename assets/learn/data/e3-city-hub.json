@@ -1,0 +1,253 @@
+{
+ "about": {
+  "what": "Engine E3's settings and costs: Prairie City's energy hub (the three districts behind their substation limits) as a linear program over prairie-city.json's eight representative days. Prairie City's own numbers are in prairie-city.json; this file holds only what the engine adds.",
+  "line": "Prairie City is fictional; its numbers are illustrative.",
+  "built": "2026-11-06",
+  "builtBy": "scripts/build_learn_e3_data.py (ResearchPortfolio repository): python3 scripts/build_learn_e3_data.py --site <site>; the `precomputed` block is written by the tests' --write mode",
+  "set": "Costs read from other course files say so in `via`; everything marked \"teaching\" is illustrative, set for this course, with a range the reader can change."
+ },
+ "dollarYear": 2025,
+ "finance": {
+  "rate": 0.04,
+  "plantLife": 30,
+  "note": "Every up-front cost is paid as a yearly amount: the up-front cost x the capital recovery factor at a 4% real rate over the item's life, plus its upkeep. 4% real is lesson 13's rate (a round value inside the 2025 ATB's financing range).",
+  "via": "13-capstone.json finance",
+  "src": [
+   "atb2025-fin"
+  ]
+ },
+ "heatPump": {
+  "capex": 7355,
+  "capexSource": 6730,
+  "capexYear": 2022,
+  "life": 15,
+  "note": "EIA's minimum-efficiency air-source heat pump, installed, per home ($6,730 in 2022 dollars, x 1.0928 to 2025 dollars with EIA's GDP deflator, as engine E0 does); 15-year life. Its efficiency through the year is Prairie City's COP curve (prairie-city.json, cop), not this unit's rating. Commercial buildings are counted as home-equivalents by their heat need.",
+  "via": "e0.json home.hp.standard",
+  "src": [
+   "eia-aeo2026-rdm",
+   "eia-steo-9a"
+  ]
+ },
+ "retrofit": {
+  "cost": {
+   "def": 9000,
+   "lo": 3000,
+   "hi": 25000,
+   "step": 500
+  },
+  "save": {
+   "def": 18,
+   "lo": 10,
+   "hi": 50,
+   "step": 1
+  },
+  "life": 30,
+  "anchor": {
+   "gasCut": 17.8,
+   "costPerHome": 4695,
+   "costYear": 2008,
+   "programYear": 2008
+  },
+  "note": "Set for teaching: an envelope package (air sealing, attic and wall insulation, duct sealing) that cuts a home's space-heat need by the share you set, at a cost per home you set (2025 dollars), lasting 30 years. For scale: ORNL's national evaluation of DOE's Weatherization Assistance Program found that gas-heated single-family homes weatherized in program year 2008 cut their gas use by 17.8%, at an average cost of $4,695 a home in 2008 dollars (not converted here).",
+  "set": "teaching",
+  "src": [
+   "ornl-wap-2014"
+  ]
+ },
+ "dh": {
+  "network": {
+   "cost": {
+    "def": 12000,
+    "lo": 5000,
+    "hi": 25000,
+    "step": 500
+   },
+   "life": 40
+  },
+  "plant": {
+   "cop": 3.0,
+   "capex": {
+    "def": 1200,
+    "lo": 600,
+    "hi": 2000,
+    "step": 50
+   },
+   "life": 25,
+   "boilerEff": 0.9
+  },
+  "store": {
+   "capex": {
+    "def": 3000,
+    "lo": 1000,
+    "hi": 8000,
+    "step": 250
+   },
+   "life": 30,
+   "lossPerHour": 0.005,
+   "minHours": 4
+  },
+  "loss": 0.1,
+  "note": "Set for teaching: a hot-water network in the dense core; each connected home-equivalent costs the network sum you set (pipes and connections, 40 years); 10% of the heat sent out is lost in the pipes. The plant is a large electric heat pump on a steady heat source (COP 3.0 every hour, fed through the core's substation; cost per kW of heat, 25 years) with a gas boiler (90%) for the rest, which is assumed to exist already and is counted at its fuel only. The store is a water tank: cost per MWh of heat it holds (30 years), 0.5% of its heat lost each hour, filled or emptied in 4 hours or more.",
+  "set": "teaching"
+ },
+ "ev": {
+  "minHours": 6,
+  "note": "Managed charging moves each day's charging energy to any hour of the same day, at most one sixth of it in one hour (a day's charge takes 6 hours or more): it assumes cars can plug in at home or at work. Unmanaged charging follows prairie-city.json's evening profile. Vehicles' prices are outside the boundary: only their fuel and electricity are counted.",
+  "set": "teaching"
+ },
+ "rooftop": {
+  "capex": 4738,
+  "capexSource": 4336,
+  "capexYear": 2022,
+  "fom": 20,
+  "life": 25,
+  "note": "EIA's residential solar system, installed, per kW ($4,336 in 2022 dollars, x 1.0928 to 2025 dollars, as engine E0 does); upkeep $20 per kW a year (illustrative, E0's); 25-year life. Output per MW follows prairie-city.json's solar shape on each day, scaled to EIA's 17.6% rooftop capacity factor.",
+  "via": "e0.json home.pv",
+  "src": [
+   "eia-aeo2026-rdm",
+   "eia-steo-9a",
+   "eia-dg-2024"
+  ]
+ },
+ "battery": {
+  "capex": 1371,
+  "fomShare": 0.04,
+  "life": 15,
+  "hours": 4,
+  "rte": 0.85,
+  "note": "Neighbourhood batteries at the substations, 4 hours: NREL's 2024 cost ($372 per kW plus $241 per kWh, 2024 dollars, x 1.0263 to 2025 dollars with BEA's deflator, as capstone C2 does), 4% of it a year of upkeep, 15 years; 85% of a charge comes back (the loss is taken on charging).",
+  "via": "e2-plains-grid.json c2.costs.bat; e0.json farm.battery.rte",
+  "src": [
+   "nrel-battery-2025",
+   "bea-nipa-119",
+   "eia-aeo2026-emm"
+  ]
+ },
+ "upgrade": {
+  "capex": {
+   "def": 800,
+   "lo": 200,
+   "hi": 2000,
+   "step": 50
+  },
+  "life": 40,
+  "note": "Set for teaching: more room at a district's substation (a transformer and feeders), an up-front cost per kW you set, paid over 40 years. The model buys only what the busiest hour needs after every flexible load has moved.",
+  "set": "teaching"
+ },
+ "tie": {
+  "peak": 5,
+  "cityPeak": 2,
+  "wear": 1,
+  "storeWear": 0.5,
+  "ev": 0.01,
+  "note": "Stated small costs, far below any real one, that pick one plan when several cost the same: $5 a year per MW of each district's busiest hour, $2 per MW of the three districts' busiest hour together, $1 per MWh out of a battery, $0.50 per MWh out of the heat store, and $0.01 per MWh of managed charging times the hour's share of SPP's peak demand (charging prefers quieter hours). They are left out of every reported cost."
+ },
+ "c3": {
+  "budget": {
+   "def": 1500,
+   "unit": "$ million up front, 2026 to 2040",
+   "set": "teaching"
+  },
+  "wind": {
+   "capex": 1712,
+   "fom": 34.57,
+   "life": 30,
+   "via": "13-capstone.json techs.wind",
+   "src": [
+    "eia-aeo2026-emm"
+   ]
+  },
+  "solarFarm": {
+   "capex": 1484,
+   "fom": 23.6,
+   "life": 30,
+   "via": "13-capstone.json techs.solar",
+   "src": [
+    "eia-aeo2026-emm"
+   ]
+  },
+  "electrolyzer": {
+   "capex": 2186,
+   "capexSource": 2000,
+   "capexYear": 2022,
+   "fomShare": 0.05,
+   "stackShare": 0.11,
+   "stackHours": 40000,
+   "life": 30,
+   "via": "e0.json farm.electrolyzer",
+   "src": [
+    "doe-h2-24005",
+    "eia-steo-9a"
+   ]
+  },
+  "indHP": {
+   "cop": 3.0,
+   "capex": 900,
+   "life": 20,
+   "set": "teaching",
+   "note": "Set for teaching: industrial heat pumps for the food plants' heat below 100 C (washing, pasteurizing, hot water), COP 3.0, $900 per kW of heat, 20 years, running flat all year."
+  },
+  "avoided": {
+   "def": 35,
+   "lo": 20,
+   "hi": 80,
+   "step": 5,
+   "set": "teaching",
+   "note": "Set for teaching: what one MWh from the wind contract or the solar farm saves the city's supplier when it replaces a bought MWh; the wires part of the bill is still paid."
+  },
+  "note": "C3 plans Prairie City for 2040 with 2025's people, homes, weather and prices: only the plan changes. The industrial park and the data-center campus take power at their own substations (no limit modelled); the park's new loads are flat all year."
+ },
+ "sources": {
+  "atb2025-fin": {
+   "text": "NLR, 2025 Electricity Annual Technology Baseline, Financial Cases and Methods",
+   "url": "https://atb.nlr.gov/electricity/2025/financial_cases_&_methods",
+   "asOf": "checked 2 Nov 2026 (via 13-capstone.json)"
+  },
+  "eia-aeo2026-rdm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Residential Demand Module, Table 2, p. 4 (heat pumps, furnaces; 2022 dollars) and Table 3, p. 5 (rooftop solar; 2022 dollars, 25-year life)",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/RDM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, residential assumptions, Tables 2-3"
+  },
+  "eia-aeo2026-emm": {
+   "text": "EIA, Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Table 3, p. 5 (2025 dollars), and its note on storage losses",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+   "asOf": "April 2026; checked 3 Nov 2026",
+   "short": "EIA AEO2026, electricity assumptions, Table 3"
+  },
+  "eia-steo-9a": {
+   "text": "EIA, Short-Term Energy Outlook, Table 9a: GDP implicit price deflator (2017 = 100), yearly means 2022 118.035, 2023 122.389, 2024 125.430, 2025 128.989",
+   "url": "https://www.eia.gov/outlooks/steo/",
+   "asOf": "October 2026 issue (1 Oct 2026)",
+   "short": "EIA STEO, Table 9a"
+  },
+  "eia-dg-2024": {
+   "text": "EIA, Distributed Generation, Battery Storage, and Combined Heat and Power System Characteristics and Costs in the Buildings and Industrial Sectors, Table 2-2, p. 12 (residential solar: 17.6% capacity factor in 2022)",
+   "url": "https://www.eia.gov/analysis/studies/buildings/dg_storage_chp/pdf/dg_storage_chp.pdf",
+   "asOf": "March 2024; checked 3 Nov 2026",
+   "short": "EIA, distributed generation costs (2024), Table 2-2"
+  },
+  "doe-h2-24005": {
+   "text": "DOE Hydrogen Program Record 24005, Clean Hydrogen Production Cost Scenarios with PEM Electrolyzer Technology, Table 1, p. 2, and p. 9 (fixed and replacement costs)",
+   "url": "https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/24005-clean-hydrogen-production-cost-pem-electrolyzer.pdf",
+   "asOf": "20 May 2024; checked 3 Nov 2026",
+   "short": "DOE Hydrogen Program Record 24005"
+  },
+  "nrel-battery-2025": {
+   "text": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281 (2024 costs, section 2 and Figure 2; O&M and life, section 3)",
+   "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+   "asOf": "June 2025"
+  },
+  "bea-nipa-119": {
+   "text": "U.S. Bureau of Economic Analysis, NIPA Table 1.1.9: Implicit Price Deflators for Gross Domestic Product, line 1, annual (2017 = 100): 2024 125.587, 2025 128.893",
+   "url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&1921=survey&1903=13&1904=2022&1905=2026&1906=a&1911=0",
+   "asOf": "last revised 29 October 2026; accessed 5 November 2026"
+  },
+  "ornl-wap-2014": {
+   "text": "Tonn and others, Weatherization Works: Summary of Findings from the Retrospective Evaluation of the U.S. Department of Energy's Weatherization Assistance Program, ORNL/TM-2014/338, Oak Ridge National Laboratory: executive summary p. xiv ($4,695 average cost a unit, program year 2008) and section 3.1, p. 12 (gas use of single-family gas-heated homes down 17.8%)",
+   "url": "no link",
+   "asOf": "September 2014; read 6 Nov 2026"
+  }
+ },
+ "precomputed": {}
+}
