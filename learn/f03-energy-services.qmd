@@ -219,7 +219,7 @@ A demand model starts from the service and divides by the device's efficiency. O
 
 **What it means for a model.** Above the cut-out, $E(T)$ grows faster than $Q(T)$ as $T$ falls, so a model that uses one average temperature underestimates the electricity of the coldest days. At the cut-out $E$ jumps up; below it, $E$ grows in step with $Q$.
 
-Analyst lesson A15 (upcoming) prices efficiency and electrification; Modeler lesson M12 (upcoming) puts heat, buildings and transport into one city model.
+Analyst lesson [A15](a15-efficiency-electrification.html) prices efficiency and electrification; Modeler lesson M12 (upcoming) puts heat, buildings and transport into one city model.
 
 ```{=html}
 </div>
