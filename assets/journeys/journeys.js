@@ -443,7 +443,7 @@
       }).join("");
       return '<p class="jr-c-kind">' + (p.h ? "A place I lived" : "Place") + "</p>" +
         '<h3 id="jr-card-h">' + esc(p.n) + "</h3>" + (p.w ? '<p class="jr-c-where">' + esc(p.w) + "</p>" : "") +
-        (p.s ? '<p class="jr-c-peak"><i class="bi bi-triangle-fill" aria-hidden="true"></i>' + Number(p.s[1]).toLocaleString("en-US") + " m · " + esc(p.s[0]) + " · on foot</p>" : "") +
+        (p.s ? '<p class="jr-c-peak"><i class="bi bi-triangle-fill" aria-hidden="true"></i>' + esc(p.s[1]) + (p.s[0] ? " · " + esc(p.s[0]) : "") + " · on foot</p>" : "") +
         '<ul class="jr-c-visits">' + items + "</ul>";
     }
     function routeCard(e) {
