@@ -59,6 +59,12 @@
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
  },
+ "area-median-income": {
+  "term": "Area median income (AMI)",
+  "short": "The middle family income of an area, used to sort households into income bands such as 0-30% or 50-80% of it.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "array": {
   "term": "Array",
   "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
@@ -154,6 +160,12 @@
   "short": "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model.",
   "lesson": "R5",
   "href": "r05-build-validate.html"
+ },
+ "benefit-per-ton": {
+  "term": "Benefit per ton",
+  "short": "An estimate of the health harm, in dollars, avoided by not emitting one more ton of a pollutant from a given kind of source, averaged over where those sources are.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "forecast-bias": {
   "term": "Bias",
@@ -533,6 +545,12 @@
   "lesson": "A18",
   "href": "a18-city-plan.html"
  },
+ "cost-surface": {
+  "term": "Cost surface",
+  "short": "A map that gives the cost of building a line or a road through each cell, for example in dollars per km.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "counterfactual": {
   "term": "Counterfactual",
   "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
@@ -863,6 +881,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "emission-factor": {
+  "term": "Emission factor",
+  "short": "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "emissions-cap": {
   "term": "Emissions cap",
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
@@ -874,6 +898,12 @@
   "short": "An account that divides emissions that already happened among their sources or users, so that the shares add up to the total.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "employment-multiplier": {
+  "term": "Employment multiplier",
+  "short": "The total jobs, on site plus at suppliers and from workers' spending, that go with each on-site job, taken from a regional input-output table.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "energization": {
   "term": "Energization",
@@ -971,6 +1001,12 @@
   "lesson": "N1",
   "href": "n01-news-lens.html"
  },
+ "exclusion-layer": {
+  "term": "Exclusion layer",
+  "short": "A map layer that removes land from a siting screen outright, whatever else the land offers, because a rule or a hard limit forbids building there.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "exogenous": {
   "term": "Exogenous",
   "short": "Set from outside a model as an input, rather than worked out by the model.",
@@ -1067,6 +1103,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "fine-particles": {
+  "term": "Fine particles (PM2.5)",
+  "short": "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
@@ -1114,6 +1156,12 @@
   "short": "The ability of a plant, a store or a group of users to raise or lower power quickly when the grid asks.",
   "lesson": 6,
   "href": "06-three-jobs.html"
+ },
+ "flood-zone": {
+  "term": "Flood zone",
+  "short": "Land mapped as likely to flood; in the U.S., FEMA's Special Flood Hazard Area is land with at least a 1% chance of flooding in any year.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "flow": {
   "term": "Flow",
@@ -1229,6 +1277,12 @@
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
+ "global-warming-potential": {
+  "term": "Global warming potential (GWP)",
+  "short": "How much a tonne of a gas warms the climate over a chosen horizon, such as 100 years, compared with a tonne of CO₂.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "governor": {
   "term": "Governor",
   "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
@@ -1252,6 +1306,12 @@
   "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it.",
   "lesson": "F7",
   "href": "f07-microgrids.html"
+ },
+ "gross-jobs": {
+  "term": "Gross jobs",
+  "short": "The jobs a project creates, counted on their own, without subtracting jobs lost or work that would have happened anyway.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "git-head": {
   "term": "HEAD (Git)",
@@ -1348,6 +1408,12 @@
   "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "income-based-charge": {
+  "term": "Income-based charge",
+  "short": "A utility charge that varies with household income, such as a fixed charge set in a few income tiers.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "independent-events": {
   "term": "Independent events",
@@ -1492,6 +1558,12 @@
   "short": "Lawrence Berkeley National Laboratory, a laboratory of the United States Department of Energy that publishes, among other datasets, a yearly one of the projects waiting in interconnection queues across the country.",
   "lesson": "CF3",
   "href": "cf3-hydrogen-under-uncertainty.html"
+ },
+ "least-cost-path": {
+  "term": "Least-cost path",
+  "short": "The route between two places across a cost surface whose summed costs are the lowest.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "length-scale": {
   "term": "Length-scale",
@@ -1739,6 +1811,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "methane-leak": {
+  "term": "Methane leak",
+  "short": "Natural gas that escapes from wells, pipes, compressors and tanks before it is burned; it is mostly methane, a strong warming gas.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "method-family": {
   "term": "Method family",
   "short": "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics.",
@@ -1883,11 +1961,23 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "net-calorific-value": {
+  "term": "Net calorific value",
+  "short": "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "net-demand": {
   "term": "Net demand (net load)",
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-jobs": {
+  "term": "Net jobs",
+  "short": "Jobs created minus jobs lost and minus work that would have existed anyway, so the change a project really makes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "net-metering": {
   "term": "Net metering",
@@ -2267,6 +2357,12 @@
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
+ "raster": {
+  "term": "Raster",
+  "short": "A map stored as a grid of equal cells, each holding one number or one class, such as slope or land cover.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "rocof": {
   "term": "Rate of change of frequency",
   "short": "How fast the grid's frequency moves in the first instant after a disturbance, in hertz per second.",
@@ -2531,6 +2627,18 @@
   "lesson": "A18",
   "href": "a18-city-plan.html"
  },
+ "screening-estimate": {
+  "term": "Screening estimate",
+  "short": "A quick estimate from stated assumptions and coefficients a reader can change, used to compare options, not to predict outcomes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
+ "scrubber": {
+  "term": "Scrubber",
+  "short": "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "sdwpf": {
   "term": "SDWPF dataset",
   "short": "An open dataset of one wind farm's ten-minute operating records (SCADA), shared for research on wind power forecasting.",
@@ -2573,6 +2681,12 @@
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
  },
+ "setback": {
+  "term": "Setback",
+  "short": "The least distance a project must keep from a home, road, line or other feature, usually set by local rules.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "shadow-price": {
   "term": "Shadow price",
   "short": "How much the best total cost would change if one rule were loosened by one unit; for the rule that supply equals demand, it is the price of one more megawatt-hour.",
@@ -2614,6 +2728,18 @@
   "short": "Software that finds the best solution of an optimization problem, or shows that none exists.",
   "lesson": 11,
   "href": "11-solver.html"
+ },
+ "spare-capacity": {
+  "term": "Spare capacity (headroom)",
+  "short": "The MW a substation or line can still take for a new load or plant without an upgrade.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
+ "spatial-resolution": {
+  "term": "Spatial resolution",
+  "short": "The size of a raster's cells: finer cells show smaller features, such as a setback, but need more data and more computing.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "spent-fuel": {
   "term": "Spent fuel",
@@ -2735,6 +2861,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "suitability-score": {
+  "term": "Suitability score",
+  "short": "A cell's or a site's weighted score in a siting screen, here from 0 to 100: a ranking under stated weights, not a cost and not a verdict.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
+ },
  "supply-diversity": {
   "term": "Supply diversity",
   "short": "How evenly the energy supply is spread over different sources, so that losing one does not lose most of it.",
@@ -2776,6 +2908,12 @@
   "short": "The rule for calculating electricity bills: fixed charges, prices per kWh, or both.",
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
+ },
+ "tax-base": {
+  "term": "Tax base",
+  "short": "The total value a local government can tax, such as the assessed value of homes, businesses and power plants in a county.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "techno-economic-analysis": {
   "term": "Techno-economic analysis (TEA)",
@@ -3082,6 +3220,12 @@
   "short": "The blended return a project must pay its lenders and its owners, used as the project's discount rate.",
   "lesson": 7,
   "href": "07-cost.html"
+ },
+ "weighted-overlay": {
+  "term": "Weighted overlay",
+  "short": "Combining several criterion maps cell by cell: each criterion is scored from 0 to 1, multiplied by its weight, and the results are added into one suitability map.",
+  "lesson": "A19",
+  "href": "a19-gis-siting.html"
  },
  "weighted-sum": {
   "term": "Weighted sum",
