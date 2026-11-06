@@ -691,7 +691,23 @@
   after: [2, F6]
 - {kind: lesson, tier: foundations, code: F9, title: "What does a city run on, and who controls what?"}
 - {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
-- {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}
+# F11, builder learn-w5-b (wave W5)
+- kind: lesson
+  id: f11-air-climate-people
+  code: F11
+  tier: foundations
+  form: cards
+  icon: cloud
+  status: active
+  minutes: 20
+  practice_minutes: 10   # the myths and questions (Check section)
+  title: "What does energy do to the air, the climate and people's lives?"
+  subtitle: "Burn a tonne of coal, gas or oil: count its CO₂, leaked methane and air pollutants, follow the smoke downwind, then weigh Prairie City's energy bills against income"
+  short: "Air, climate and bills"
+  teaches: [CO₂ per tonne and per unit of heat, leaked methane and GWP, air pollutants and controls, how harm spreads downwind, health estimates per ton, energy burden by income]
+  does: "Burn one tonne of coal, natural gas or oil and count its CO₂, the methane leaked before gas is burned and its SO₂, NOx and fine particles before and after controls; walk away from the stack; price the harm with EPA's estimates; then slide a Prairie City household's income and read its energy burden."
+  outcome: "Explain why fuels compare by heat, not by tonne; count leaked methane as CO₂e with a stated GWP; tell pollutants that controls catch from CO₂ that they do not; and read energy burden as bills over income against conventional lines."
+  after: [F4]
 - {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
 - {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
 # ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)
@@ -797,7 +813,23 @@
   outcome: "Explain how four policy instruments change a least-cost plan, compare them on emissions cut, resource cost and who pays, and keep transfers apart from real costs."
   after: [A1, 12]
   next: M6
-- {kind: lesson, tier: analyst, code: A13, title: "Who pays and who benefits? Energy burden, fairness and jobs"}
+# A13, builder learn-w5-b (wave W5)
+- kind: lesson
+  id: a13-fairness-jobs
+  code: A13
+  tier: analyst
+  form: cards
+  icon: scale
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the myths and the six worked exercises (Check section)
+  title: "Who pays and who benefits? Energy burden, fairness and jobs"
+  subtitle: "Split a Prairie City plan's cost across household groups three ways and watch energy burden move, then count jobs and the tax base when a coal county's plant retires"
+  short: "Who pays, who benefits"
+  teaches: [cost allocation by kWh, fixed charge and income, energy burden by household group, transfers against real costs, how households are grouped, job-years against permanent jobs, gross against net jobs, local tax base, screening estimates]
+  does: "Recover a Prairie City plan's yearly cost per kWh, by a fixed charge and by income and read each group's energy burden; see that the money moved adds up to zero; regroup the households; then count the jobs and tax base Ridge County loses when its coal plant retires and what wind and solar farms bring, with every coefficient set by you."
+  outcome: "Allocate a cost across household groups under three designs and read the burden each produces, tell a transfer from a real cost, and report jobs and tax effects as screening estimates that keep job-years apart from permanent jobs and gross apart from net."
+  after: [A4, F11]
 - {kind: lesson, tier: analyst, code: A15, title: "How much can efficiency and electrification change demand? Buildings, heat, transport and industry"}
 # A17, builder learn-w4-a (A17 fork, wave W4)
 - kind: lesson

@@ -53,6 +53,12 @@
   "lesson": "A17",
   "href": "a17-physical-feasibility.html"
  },
+ "area-median-income": {
+  "term": "Area median income (AMI)",
+  "short": "The middle family income of an area, used to sort households into income bands such as 0-30% or 50-80% of it.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
  "array": {
   "term": "Array",
   "short": "An ordered list or table of numbers; a linear program's costs c, rule table A and limits b are arrays.",
@@ -142,6 +148,12 @@
   "short": "A case whose right answer is known in advance, from a hand calculation or an independent source, used to test a model.",
   "lesson": "R5",
   "href": "r05-build-validate.html"
+ },
+ "benefit-per-ton": {
+  "term": "Benefit per ton",
+  "short": "An estimate of the health harm, in dollars, avoided by not emitting one more ton of a pollutant from a given kind of source, averaged over where those sources are.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "forecast-bias": {
   "term": "Bias",
@@ -839,6 +851,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "emission-factor": {
+  "term": "Emission factor",
+  "short": "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "emissions-cap": {
   "term": "Emissions cap",
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
@@ -850,6 +868,12 @@
   "short": "An account that divides emissions that already happened among their sources or users, so that the shares add up to the total.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "employment-multiplier": {
+  "term": "Employment multiplier",
+  "short": "The total jobs, on site plus at suppliers and from workers' spending, that go with each on-site job, taken from a regional input-output table.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "energization": {
   "term": "Energization",
@@ -1049,6 +1073,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "fine-particles": {
+  "term": "Fine particles (PM2.5)",
+  "short": "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
@@ -1211,6 +1241,12 @@
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
  },
+ "global-warming-potential": {
+  "term": "Global warming potential (GWP)",
+  "short": "How much a tonne of a gas warms the climate over a chosen horizon, such as 100 years, compared with a tonne of CO₂.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "governor": {
   "term": "Governor",
   "short": "A plant's speed control that opens or closes its steam, gas or water valves as the grid frequency changes.",
@@ -1234,6 +1270,12 @@
   "short": "Said of an inverter or a generator that sets voltage and frequency itself, so it can start and hold an island with no grid behind it.",
   "lesson": "F7",
   "href": "f07-microgrids.html"
+ },
+ "gross-jobs": {
+  "term": "Gross jobs",
+  "short": "The jobs a project creates, counted on their own, without subtracting jobs lost or work that would have happened anyway.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "git-head": {
   "term": "HEAD (Git)",
@@ -1330,6 +1372,12 @@
   "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "income-based-charge": {
+  "term": "Income-based charge",
+  "short": "A utility charge that varies with household income, such as a fixed charge set in a few income tiers.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "independent-events": {
   "term": "Independent events",
@@ -1721,6 +1769,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "methane-leak": {
+  "term": "Methane leak",
+  "short": "Natural gas that escapes from wells, pipes, compressors and tanks before it is burned; it is mostly methane, a strong warming gas.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "method-family": {
   "term": "Method family",
   "short": "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics.",
@@ -1865,11 +1919,23 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "net-calorific-value": {
+  "term": "Net calorific value",
+  "short": "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "net-demand": {
   "term": "Net demand (net load)",
   "short": "Demand minus the output of wind and solar, which is what the other power plants must still supply.",
   "lesson": 2,
   "href": "02-demand.html"
+ },
+ "net-jobs": {
+  "term": "Net jobs",
+  "short": "Jobs created minus jobs lost and minus work that would have existed anyway, so the change a project really makes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "net-metering": {
   "term": "Net metering",
@@ -2509,9 +2575,15 @@
  },
  "screening-estimate": {
   "term": "Screening estimate",
-  "short": "A first, rough number from stated assumptions, used to see whether something matters and for whom; not a prediction.",
-  "lesson": "SB3",
-  "href": "sb3-city-planner.html"
+  "short": "A quick estimate from stated assumptions and coefficients a reader can change, used to compare options, not to predict outcomes.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
+ },
+ "scrubber": {
+  "term": "Scrubber",
+  "short": "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "sdwpf": {
   "term": "SDWPF dataset",
@@ -2770,6 +2842,12 @@
   "short": "The rule for calculating electricity bills: fixed charges, prices per kWh, or both.",
   "lesson": "A22",
   "href": "a22-tradeoff-explorer.html"
+ },
+ "tax-base": {
+  "term": "Tax base",
+  "short": "The total value a local government can tax, such as the assessed value of homes, businesses and power plants in a county.",
+  "lesson": "A13",
+  "href": "a13-fairness-jobs.html"
  },
  "techno-economic-analysis": {
   "term": "Techno-economic analysis (TEA)",

@@ -1,0 +1,27 @@
+# Sidecar for F11 (f11-air-climate-people), builder learn-w5-b, 2026-11-06. Read by scripts/build_learn.py.
+id: f11-air-climate-people
+lesson: F11
+glossary:
+  - id: global-warming-potential
+    term: Global warming potential (GWP)
+    def: "How much a tonne of a gas warms the climate over a chosen horizon, such as 100 years, compared with a tonne of CO₂."
+  - id: methane-leak
+    term: Methane leak
+    def: "Natural gas that escapes from wells, pipes, compressors and tanks before it is burned; it is mostly methane, a strong warming gas."
+  - id: emission-factor
+    term: Emission factor
+    def: "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements."
+  - id: fine-particles
+    term: Fine particles (PM2.5)
+    def: "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx."
+  - id: scrubber
+    term: Scrubber
+    def: "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide."
+  - id: benefit-per-ton
+    term: Benefit per ton
+    def: "An estimate of the health harm, in dollars, avoided by not emitting one more ton of a pollutant from a given kind of source, averaged over where those sources are."
+  - id: net-calorific-value
+    term: Net calorific value
+    def: "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value."
+requests:
+  - "A10 (a10-emissions-questions) and F4 (f04-power-plants) could link F11 for the CO₂ per tonne and per MWh of heat of coal, gas and oil, and for leaked methane."
