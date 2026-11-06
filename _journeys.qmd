@@ -573,7 +573,7 @@ body.quarto-dark.page-journeys .quarto-title-banner .quarto-title::before { back
       <div class="jr-ch-head">
         <p class="jr-ch-when">Jan 2025 – Dec 2025</p>
         <h3><span class="jr-key" aria-hidden="true"></span>Idaho Falls <span class="jr-ch-where">Idaho, United States</span></h3>
-        <p class="jr-ch-line">Across the whole country by car to eastern Idaho, for an internship at Idaho National Laboratory. Yellowstone was a short drive away; the Ph.D. was defended here, and the year ended with the long drive south.</p>
+        <p class="jr-ch-line">Across the whole country by car to eastern Idaho, for an internship at Idaho National Laboratory. Yellowstone was a short drive away; the Ph.D. was defended that September, and the year ended with the long drive south.</p>
       </div>
       <ol class="jr-entries">
         <li class="jr-entry" id="e-drive-idaho-2025" data-entry="drive-idaho-2025">
