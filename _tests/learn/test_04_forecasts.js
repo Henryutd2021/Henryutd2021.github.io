@@ -139,7 +139,7 @@ const visible = QMD.replace(/<!-- learn:(meta|next|footer):start[\s\S]*?learn:\1
 DENY.forEach(rx => { ok(!rx.test(visible), "page: no " + rx); ok(!rx.test(JS.replace(/\/\/.*$/gm, "")), "script: no " + rx); });
 (visible.match(/href="([^"]+)"/g) || []).forEach(h => {
   const u = h.slice(6, -1);
-  ok(/^(https:\/\/(www\.)?(eia\.gov|otexts\.com|doi\.org|creativecommons\.org\/licenses|opensource\.org\/license)\/|#|\.\.\/assets\/|index\.html|0\d-[a-z-]+\.html|k0\d-[a-z-]+\.html|mailto:)/.test(u), "page: allowed link " + u);
+  ok(/^(https:\/\/(www\.)?(eia\.gov|otexts\.com|doi\.org|creativecommons\.org\/licenses|opensource\.org\/license)\/|#|\.\.\/assets\/|index\.html|0\d-[a-z-]+\.html|k0\d-[a-z-]+\.html|cf8-power-curves-from-scarce-data\.html|mailto:)/.test(u), "page: allowed link " + u);
 });
 // the approved research excerpt (E1, Henry 2026-11-03): word for word in the Real-world box, with its DOI, in no other lesson part
 const E1 = "From the course author's research: a wind turbine's real power curve is a band, not a line. Adding the turbine's theoretical curve to about two hundred measurements can narrow that band, but whether it helps depends on how the fit is scored.";

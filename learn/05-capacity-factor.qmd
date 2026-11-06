@@ -327,6 +327,7 @@ Source: NREL, [Power Performance Test Report for the U.S. Department of Energy 1
 <div class="lx-card lx-real">
 <p class="lx-eyebrow">In the real world</p>
 <p>EIA publishes these capacity factors every month for every kind of plant. Turning a wind farm's scattered measurements into a power curve with honest error bars is still a research question (<a href="https://doi.org/10.1115/DETC2023-114762">Li et al., 2023</a>).</p>
+<p class="lx-hint">Case file <a href="cf8-power-curves-from-scarce-data.html">CF8</a>: learning a wind turbine's power curve from scarce data.</p>
 </div>
 <div class="lx-card lx-sources">
 <p class="lx-eyebrow">Sources and further reading</p>

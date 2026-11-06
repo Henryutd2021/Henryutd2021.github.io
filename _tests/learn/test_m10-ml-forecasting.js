@@ -258,7 +258,8 @@ function researchWording(entry, OWN) {
   if (!R) { console.log("note: register not found; research wording not checked"); return; }
   const RX = /\b(the study|study's|paper|article|IDETC|Li et al|course author|excerpt|nine-turbine|multi-fidelity regression)\b/i;
   const NOT = [[/^Where this came up in research$/, "heading"], [/^Approved excerpt of: Li et al\., ASME IDETC 2023\.$/, "provenance label"],
-               [/^The same lesson as this page: say which score, on which held-out data\.$/, "the page's own link line"], [/^The method is in M9\.$/, "navigation"]];
+               [/^The same lesson as this page: say which score, on which held-out data\.$/, "the page's own link line"], [/^The method is in M9\.$/, "navigation"],
+               [/^Case file CF8: learning a wind turbine's power curve from scarce data\.$/, "navigation (the case file's title)"]];
   const bad = [], strict = (w, l) => l.forEach(s => { const o = X.offending(R, NOT, s); if (o) bad.push(w + ": " + o); }), signalled = (w, l) => l.forEach(s => { if (RX.test(s)) { const o = X.offending(R, NOT, s); if (o) bad.push(w + ": " + o); } });
   let REST = OWN.replace(/<!-- m10-fallback:start[\s\S]*?<!-- m10-fallback:end -->/, " ").replace(/<style>[\s\S]*?<\/style>/, " ").replace(/<!--[\s\S]*?-->/g, " ");
   const real = (REST.match(/<div class="lx-card lx-real">[\s\S]*?\n<\/div>/) || [""])[0];

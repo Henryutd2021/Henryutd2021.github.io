@@ -36,7 +36,7 @@
    "id": "S2", "key": "s2", "place": "The Plains Grid", "name": "Regional bulk grid", "short": "Regional grid", "icon": "tower",
    "setting": "The Plains Grid: three zones, with Prairie Town one node in the west",
    "power": "MW to GW",
-   "gloss": "All the generators on one [[synchronous-grid|synchronous grid]] turn in step at one [[frequency|frequency]]; several operators can share it, each balancing its own region.",
+   "gloss": "A [[synchronous-grid|synchronous grid]] shares one AC [[frequency|frequency]]. Synchronous generators rotate in step electrically; [[inverter|inverters]] connect other resources to that frequency; several operators can share the grid, each balancing its own region.",
    "question": "Will there be enough power, what sets prices, and how should a large new load connect?",
    "who": "A grid operator (a regional market operator or a utility, acting as balancing authority), overseen by regulators",
    "what": "Which plants run in its region, reserves, new transmission, capacity and connections",

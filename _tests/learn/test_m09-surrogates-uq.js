@@ -305,6 +305,7 @@ function researchWording(entry) {
     [/^Where this came up in research$/, "heading"],
     [/^Approved excerpt of: Li et al\., ASME IDETC 2023\.$/, "provenance label (E12.16's short citation, as E1's)"],
     [/^This page's turbine is a toy: invented round numbers, not the studies' data, equations or results\.$/, "provenance of the toy"],
+    [/^Case file CF8: learning a wind turbine's power curve from scarce data\.$/, "navigation (the case file's title)"],
     [/^(mfgpr-wind-power-curve|wind-uq-surrogate): public example repository · MIT licence · synthetic data\.$/, "repository label"],
     [/^Try it yourself with open code$/, "heading"],
     [/^Optional, about 30 minutes each; needs Python 3\.10 or later \(lesson B2\)\.$/, "time"]
