@@ -250,6 +250,8 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-atlas-main, .jr-atlas-second { position: relative; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); background: var(--jr-ocean); }
 .jr-mini { display: block; width: 100%; height: auto; }
 .jr-mini-sea { fill: var(--jr-ocean); }
+.jr-mini .jr-reg.is-visited { fill: color-mix(in srgb, var(--ch) 26%, var(--jr-land)); }   /* lighter on the close-up maps, so routes and dots read */
+.jr-mini .jr-reg.is-visited.is-inferred { fill: color-mix(in srgb, var(--ch) 14%, var(--jr-land)); }
 .jr-atlas-loc { position: absolute; right: 6px; bottom: 6px; width: 36%; border-radius: 6px; overflow: hidden; border: 1px solid var(--line-strong);
   box-shadow: var(--shadow-sm); background: var(--jr-ocean); line-height: 0; }
 .jr-loc { display: block; width: 100%; height: auto; }
