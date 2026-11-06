@@ -24,7 +24,5 @@ glossary:
     term: Tariff
     def: "The rule for calculating electricity bills: fixed charges, prices per kWh, or both."
 requests:
-  - "path.yml: A22's prerequisites are F2 and T12 (curriculum). F2 has no path.yml entry on learn-w2 yet, so the entry says after: [12]; add F2 to `after` when F2's entry lands."
   - "A22 uses the shared planning engine (components/planengine.js, LX.townPlan: prepareYear, selectWeeks, costs, fullYearModel, weekModel, periodsOf, summarize, ceilPlan, KEYS, and ui.TECH for slider labels and colours); merged with learn-w2 at 7a00f41, no 13-capstone.js tag."
   - "Promote: i-radar (Radar and Radar.glyph in assets/learn/a22-tradeoff-explorer.js: five-score radar with up to three series, tweened, a text-version table, small glyphs for cards) and e-stakeholders (Stakeholders: who decides, pays, benefits, as a table that becomes cards on phones)."
-  - "practice_minutes: 20 for A22 (the practice set in Check); the header badge shows it once build_learn.py prints practice minutes for every lesson."

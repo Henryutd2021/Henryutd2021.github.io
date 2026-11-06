@@ -27,7 +27,5 @@ glossary:
     term: Cut-out temperature (heat pump)
     def: "The outdoor temperature below which a heat pump's compressor, the pump that moves its heat, switches off, so a backup heater must take over."
 requests:
-  - "Promote LX.Sankey (i-sankey, e-sankey; curriculum §16: F3, F4, F9, F10) from assets/learn/f03-energy-services.js into components/sankey.js and sankey.css. It injects its own small stylesheet (id lx-sankey-css, tokens only) until then. Pure part: layout(spec, W, H, o), band(...), flows(spec) (Node: require('assets/learn/f03-energy-services.js').sankey). View: nodes are buttons (Tab, Enter, Space) that light their flows and say what flows in and out in an aria-live line; numbered badges and a key replace middle-column labels under 560 px; tween between specs (off under reduced motion); a text-version table. F4 loads f03-energy-services.js before its own script for it; drop that script tag from F4 once promoted."
   - "Lesson-local, no promotion needed: HomeScene (the home cutaway with six service buttons) and ColdDay (the COP slider, bars and curve)."
-  - "Cross-lesson edits made on learn-w3-a outside F3's files, because the shared tests require them once F3-F6 are live: learn/f01-five-scales.qmd links F6 instead of 'F6 (upcoming)'; teaching.qmd counts 47 lessons live. Other W3 branches will change the same count; take the merged total."
   - "When A15, F9, F10 and M12 go live, F3 names them in plain text as upcoming (Go deeper boxes); link them then."

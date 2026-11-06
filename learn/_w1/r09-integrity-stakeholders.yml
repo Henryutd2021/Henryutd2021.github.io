@@ -8,5 +8,4 @@ glossary:
   - {id: credit-roles, term: "CRediT contributor roles", def: "A standard list of 14 names for what each author did, such as conceptualization (shaping the question), data curation (cleaning and documenting data) and formal analysis."}
   - {id: synthetic-sample, term: "Synthetic sample", def: "A few invented records with the same columns and realistic values as data that cannot be shared, so others can run the code without the real data."}
 requests:
-  - "Shared component candidate: StakeholderMap in assets/learn/r09-integrity-stakeholders.js (e-stakeholders: rings of groups as buttons, what each is owed and the cases they appear in, with a text version). Other modules with e-stakeholders (curriculum §16.2) could reuse it."
   - "Step text: the dilemma cards are built from one template ('Dilemma N of 6 · title. Read the case...'); the test checks it."

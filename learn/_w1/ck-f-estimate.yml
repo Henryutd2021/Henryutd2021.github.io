@@ -4,5 +4,3 @@ lesson: CK-F
 requests:
   - "W1 validation: CK-F's 'Copy my results' gives a plain-text summary (level by the published rule; per task: first answer right or not, tries, time to first answer, active time on task, solution opened before answering; the estimate, self-ratings and the tester's own words; screen width). The coordinator needs a form (or a shared document) for testers to paste it into, and should tell testers that the summary includes what they typed."
   - "The task message called the page ck-f; learn/path.yml and learn_map_v2.yml use the id ck-f-estimate, so the page is learn/ck-f-estimate.qmd."
-  - "Shared checkpoint component: assets/learn/ck-f-estimate.js holds a reusable runner (one task at a time, a visibility-aware clock, first-try recording, choice / order / number-with-unit / open / estimate tasks, a rubric self-rating read from the page's rubric table, and the copyable summary). CK-A, CK-M and CK-R can reuse it once it is promoted to components/checkpoint.js."
-  - "After the W1 merge, the data note's links to lessons 1-6 (index.html#lesson-1) can point at the live pages."

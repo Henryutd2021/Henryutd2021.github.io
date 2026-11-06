@@ -17,6 +17,3 @@ glossary:
   - id: resampled-weather
     term: Resampled weather year
     def: "A simulated year stitched together from pieces of real years, such as whole weeks, so that demand, wind and sun stay consistent within each piece; it is not an observed year."
-requests:
-  - "Promotion candidate for C2 (learn-w4-g; curriculum: 'check adequacy with the probabilistic tool') and lesson A9: A5's simulator (sources, simulate, evaluate, efc, accredit in assets/learn/a05-adequacy.js, exposed as LX.A5) could become a shared engine component."
-  - "Cross-links for the coordinator: live pages still call A5 'upcoming' (lessons 6, 13, A8, A22, K5 and M3, pages and scripts)."

@@ -21,9 +21,5 @@ glossary:
     def: "A scale on which each equal step multiplies the value by the same factor, often 10, so tiny and huge values fit on one chart."
 requests:
   - "Promote lesson-local components from assets/learn/01-power-energy.js: the appliance board (toggles, power and energy meters, two-panel power and energy chart with a text version), the energy ladder (place items on Wh to TWh rungs), the bathtub annotated diagram, and the scale strip (the curriculum's e-scale-strip). Their CSS is in the style block at the end of learn/01-power-energy.qmd (classes t1-*)."
-  - "LX.CompareTable: an option for text-heavy rows. On phones the shared layout (22px | 1fr | auto | auto, right-aligned cells) overlaps long text; lessons 1 and 2 override it locally with .t1-tt and .t2-tt (one column, left-aligned labelled lines)."
-  - "LX.ConceptMap: a configurable heading for the per-node example (o.gameLabel); step-card lessons have no game, so 'In the game' should read 'In the lesson'."
-  - "LX.Slider: an optional output formatter (thousands separators, decimals); with step 0.1 the output shows floating-point noise, and 1230 W prints without a separator."
   - "LX.Predict and LX.Guess inside step cards: a way to read a stored guess back as a label (lesson 1 keeps its own map)."
-  - "build_learn.py: sidecar glossary `lesson` values arrive as strings ('1'), while glossary.yml gives numbers; glossary.js compares with ===, so the tooltip on lesson 1 still offers 'Taught in lesson 1'. Suggest coercing to int."
   - "Lesson-local icons laptop, tv, microwave, dryer (hair dryer), car (EV) and phone could join LX.IC."

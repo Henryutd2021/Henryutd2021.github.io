@@ -21,5 +21,4 @@ glossary:
     term: Regional transmission organization (RTO)
     def: "An independent organization, such as PJM or MISO, that runs a region's transmission grid and its wholesale electricity markets."
 requests:
-  - "Cross-links for the coordinator: live pages still call A3 'upcoming' (lesson 6, its page; lesson 8, its page and assets/learn/08-merit-order.js)."
   - "Neutral by design: no market design is called best; the explain layer's Steelman gives the strongest case for each."

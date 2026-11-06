@@ -22,4 +22,3 @@ glossary:
     def: "The voltage a utility keeps at a customer's meter in normal operation; in the U.S., ANSI C84.1 Range A, 114 to 126 V on a 120 V service (0.95 to 1.05 per unit)."
 requests:
   - "Promote LimitGauge (i-gauge: a value on a track with its allowed band, role=meter, the state in words) and LimitMap (e-annotated: a one-line diagram with numbered limits, a button list and a detail panel, two layouts) from assets/learn/a17-physical-feasibility.js when a second page needs them; their styles are in the page's style block (a17g-, a17m-)."
-  - "Cross-links for the coordinator: F6's static text names 'Analyst lesson A17 (upcoming)' twice (Go deeper 'N−1 is more than a second path' and 'What this lesson leaves out'); link learn/a17-physical-feasibility.html once A17 is live. M1's explain layer or Go deeper could point to A17 for what its DC model drops."

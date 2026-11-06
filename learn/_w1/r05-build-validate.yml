@@ -23,5 +23,4 @@ glossary:
     term: Checksum
     def: "A short fingerprint computed from a file's bytes, such as SHA-256, that changes if even one byte of the file changes."
 requests:
-  - "R5 is live: link it from B3 (learn/b03-read-check-formulation.qmd, its verification-versus-validation card and Go deeper) and from M1's 'What this model leaves out', where they point to verification in the Researcher tier. In R5's text, K8 (Git and reproducible notebooks) and M5 are named in plain text; link them once they are live."
   - "Promote, if wanted: none needed. R5 uses StepCards, PlotCard, SolverStatus, Flowchart, Exemplars, Checklist, Rubric and copyText; its bug card (run, symptom chips, check picker, code diff, fix and rerun) is lesson-local in assets/learn/r05-build-validate.js and could become a shared i-bughunt if another studio needs it."

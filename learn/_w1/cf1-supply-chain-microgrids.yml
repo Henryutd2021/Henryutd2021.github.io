@@ -22,7 +22,6 @@ glossary:
     term: Logistics cost
     def: "The cost of moving and storing goods between factories, warehouses and stores: shipping, warehousing and handling."
 requests:
-  - "CF1 is live (learn-w3-fix-b, 2026-11-03): moved to learn/, status: active; F7's and A14's Real-world boxes link it. M5 and C1 should link it too (coordinator)."
   - "New glossary terms here (deterministic-equivalent, stylized-network, logistics-cost) are marked in CF1, F7 and A14."
   - "Tier: CF1 is filed under analyst (like CF2, CF6 and CF7); please confirm."
   - "Excerpts: the page uses E8.1, E8.3-E8.10 and E8.13-E8.17 word for word (approved 2026-11-03); E8.11 and E8.12 (JORS) are left out, as Henry decided. E8 proposes no numbers to remember, so the case file has no numbers card."

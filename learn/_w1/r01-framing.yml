@@ -11,9 +11,4 @@ glossary:
   - {id: time-of-use-tariff, term: "Time-of-use tariff", def: "An electricity price that changes with the hour of the day, usually higher in the evening peak."}
   - {id: substation, term: "Substation", def: "A site where transformers lower the voltage from transmission lines for the feeders that serve customers."}
 requests:
-  - "path.yml: R1's prerequisites are T13 and A22 (curriculum v2 §7.6). A22 has no code on this branch, so R1 lists after: [13]; add A22 at the merge."
-  - "Researcher tier: path.yml still has status: upcoming on the tier. With R1, R3 and R10 (and the other W2 studios) live, set it active, or decide how live studios show in an upcoming tier."
-  - "Studio template: learn/_template-studio.qmd puts the task list (Produce, From, Done when) inside .lx-fallback, which is hidden once the interactive mounts, so readers with JavaScript never see the task. R1, R3 and R10 put it in a card above the interactive (div.lx-card.lx-studio-brief, spaced by a small page <style>). Suggest moving .lx-studio-brief into forms.css and the template."
-  - "LX.Exemplars: answers written as a card (one field per line) need white-space: pre-line on .lx-ex-text and on the static <p> of staticHTML. R1 and R10 set it with a page <style> and injected CSS; suggest an option (lines: true) and a forms.css rule."
-  - "Lesson links that follow readiness: R1, R3 and R10 each carry a small ref(P, code) helper that links a lesson when data/path.json marks it ready and names it 'upcoming' otherwise (so links to R2, R4, R6, R9, A4, K1 appear by themselves after the merge). Candidate for core.js (LX.lessonRef)."
   - "Rubric competence picks are per studio (R1: framing). The rubric note on all three studios says a studio is practice, not a certificate (curriculum v2 §3.1)."

@@ -16,6 +16,4 @@ glossary:
     term: Uprate (of a line or link)
     def: "Raising the most power a line or link may carry, for example with new conductors or a second circuit."
 requests:
-  - "Engine E2 is a shared component: assets/learn/components/engine-e2.js and engine-e2.css (LX.E2: the models, solve, summarize, adequacy, fallback, and the view kit LX.E2.ui). scripts/build_learn.py (index repo, uncommitted) lists it in W4_ENGINES; please commit that list at the merge. README section 'Engine E2' added under 'Added in wave W4'."
   - "C2 (c2-plains-grid-hard-year) quotes approved E7 sentences word for word (E7.2, E7.3, E7.5, E7.6; excerpt:code, CF7's footer, no title; Henry confirmed W4 placements of E7). E7.4 is left out on purpose: its 300 MW-IT number sits too close to C2's own 300 MW load."
-  - "path.yml: the curriculum gives C2 the prerequisites M2, A5, A6 and A9; A5, A6 and A9 are on other W4 branches (not live here), so C2 has after: [SB2, M2]; please make it [SB2, M2, A5, A6, A9] at the merge. SB2's after is [M2, M1]. Cross-links to add at the merge: A5 and A6 to C2 (adequacy, the large load's connection), F8 to SB2."

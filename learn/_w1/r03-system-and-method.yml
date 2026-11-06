@@ -10,7 +10,3 @@ glossary:
   - {id: monte-carlo, term: "Monte Carlo simulation", def: "Running a model many times with inputs drawn at random, to see the range of outcomes and how likely each is."}
   - {id: expected-unserved-energy, term: "Expected unserved energy", def: "Demand left unmet, averaged over many simulated years, in MWh a year: an amount of energy, unlike a load's size in MW."}
   - {id: difference-in-differences, term: "Difference-in-differences", def: "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not."}
-requests:
-  - "path.yml: R3's prerequisites are R1 and F1 (curriculum v2 §7.6). F1 is on learn-w2-a, not this branch, so R3 lists after: [R1]; add F1 at the merge."
-  - "e-scale-strip: R3 has a lesson-local scale strip (.r3-strip: the five scales with who decides, typical time step and horizon, and the reader's brief marked). Builder learn-w2-a's F1 has a ScaleStrip (sorts, signals down and needs up). Merge the two into one promoted component, with an option to mark one scale and show step and horizon."
-  - "The method-family comparison uses LX.CompareTable in text mode with one sort (the default order) to get its caption line; a CompareTable 'caption' option without sorts would be cleaner."

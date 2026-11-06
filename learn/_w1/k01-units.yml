@@ -8,6 +8,3 @@ glossary:
   - id: order-of-magnitude
     term: Order of magnitude
     def: "The power of ten a quantity sits at; two quantities are an order of magnitude apart when one is about ten times the other."
-requests:
-  - "Lesson 1 states Prairie Town's day as 6,956 MWh (its townDay sums the unrounded scaled demand); lesson 0's prepare(), K4, K7 and K1 use the rounded hourly demand, which sums to 6,957 MWh. Consider making lesson 1 use prepare() so every page says 6,957 MWh."
-  - "Cross-links (coordinator, files outside this builder's set): lessons 1, 5 and 7 could point to toolbox K1 (units and prefixes) and K2 (rates and efficiencies) where they first use kW against kWh, MW x 8,760 h and $/MWh; lessons 7, 12 and 13 to K3 where they discount or annualise; lesson 4 to K5 for the forecast-error statistics; B2 and M1 to K8."
