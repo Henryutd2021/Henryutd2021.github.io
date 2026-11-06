@@ -154,7 +154,7 @@ ok(M.lineInventory(I).split(/\s+/).length <= 45 && M.lineTarget(W, 4, all).split
   ok(M.peaks(W, all).every(x => x.over < 0), "all six measures: every district within its limit");
   const sol = M.peaks(W, M.evaluate(W, ["solar"], o0)); ok(sol.every((x, i) => P0[i].mw - x.mw < 0.1 && P0[i].mw - x.mw >= 0 && x.h === 7 && x.day === "winter_design"), "myth 4: 60 MW of panels lower each highest hour (07:00, design day) by under 0.1 MW");
   onPage("Each district's highest hour is 07:00 on the cold design day, before the sun is up enough: 60 MW of new panels lower it by under 0.1 MW.", "myth 4"); }
-ok(W.M.solar.addMW === 60 && W.M.weather.share === 0.4 && A.programme.share === 0.4, "teaching settings named on the page: 60 MW, 40%, 40%");
+ok(W.M.solar.addMW === 60 && W.M.weather.share === 0.4 && A.programme.share === 0.4 && JS.includes("a programme paying 40% of the cost") && /60 MW of rooftop panels/.test(W.M.solar.what) && /40% of the homes built before 1980/.test(W.M.weather.what), "teaching settings named on the page: 60 MW, 40%, 40%");
 onPage("A measure costs $300 a year more to own and saves $100 a year of energy. It avoids 2 t of CO₂ a year.", "quiz"); ok((300 - 100) / 2 === 100, "quiz: (300 - 100) / 2 = 100");
 // facts
 onPage("<td class=\"n\">$8,620 and $3,690</td>", "fact: heat pump and furnace"); ok(E0.home.hp.high.capex === 8620 && W.M.furnace.baseCost === 3690, "fact numbers are the data's");
