@@ -216,7 +216,7 @@
     return "At " + pct(S.rate) + " a saved MWh costs **" + usd(b.cse, 1) + "**, " + (b.pays ? "below" : "above") + " the " + usd(b.price, 1) + " a home pays per MWh bought (2025).";
   }
   function blockLine(b) {
-    return "**" + b.n + ". " + b.label + "**: " + fmtN(b.units) + " units, " + fmtN(b.net, 2) + " MWh saved a year each, " + usd(b.cost) + " extra, " + fmtN(b.life, 1) + " years: " +
+    return "**" + b.n + ". " + b.label + "**: " + fmtN(b.units) + " units, " + fmtN(b.net, 2) + " MWh saved a year each, " + usd(b.cost) + (b.m.basis === "replacement" ? " extra" : "") + " up front" + (b.extra > 0.005 ? " and " + usd(b.extra) + " a year" : "") + ", " + fmtN(b.life, 1) + " years: " +
       fmtCSE(b.cse) + ", " + (b.pays ? "below" : "above") + " its " + usd(b.price, 1) + " price.";
   }
   function curveSaw(list, carrier) {
@@ -436,14 +436,16 @@
         bars.push({ x0: b.x0, x1: b.x1, y0: b.price - yMax * 0.006, y1: b.price + yMax * 0.006, color: "var(--lx-ink)", op: 0.9, rx: 0 });
         marks.push({ x: (b.x0 + b.x1) / 2, y: b.cse, n: String(b.n), kind: "dot", pos: "above" });
       });
-      var refs = carrier === "gas" ? [{ y: Pr.gas, label: "Gas, homes " + usd(Pr.gas, 1), labelN: usd(Pr.gas, 1), dash: "5 4", color: "var(--lx-ink-3)" }]
-        : [{ y: Pr.residential, label: "Electricity, homes " + usd(Pr.residential, 1), labelN: usd(Pr.residential, 1), dash: "5 4", color: "var(--lx-ink-3)" },
-           { y: Pr.commercial, label: "shops " + usd(Pr.commercial, 1), labelN: usd(Pr.commercial, 1), dash: "2 3", color: "var(--lx-ink-3)", below: true }];
+      // the price lines' words go in the legend: a label on the line would sit on the blocks
+      var refs = carrier === "gas" ? [{ y: Pr.gas, dash: "5 4", color: "var(--lx-ink-3)" }]
+        : [{ y: Pr.residential, dash: "5 4", color: "var(--lx-ink-3)" }, { y: Pr.commercial, dash: "2 3", color: "var(--lx-ink-3)" }];
+      var priceLeg = carrier === "gas" ? [{ label: "Gas, homes: " + usd(Pr.gas, 1) + " per MWh", color: "var(--lx-ink-3)", dash: "5 4" }]
+        : [{ label: "Electricity, homes: " + usd(Pr.residential, 1) + " per MWh", color: "var(--lx-ink-3)", dash: "5 4" }, { label: "Electricity, shops: " + usd(Pr.commercial, 1), color: "var(--lx-ink-3)", dash: "2 3" }];
       Pl.render({
         x: { min: 0, max: xMax, ticks: xt, ticksN: xt.filter(function (t, i) { return i % 2 === 0; }) },
         y: { min: 0, max: yMax, step: yMax > 300 ? 100 : 50, fmt: function (v) { return "$" + fmtN(v); }, unit: "$ per MWh saved" }, height: 260, heightN: 230,
         bars: bars, marks: marks, refs: refs,
-        legend: [{ label: "Pays: below the price it competes with (block width: MWh saved a year)", color: COL[carrier] }, { label: "Each block's price (black tick)", color: "var(--lx-ink)" }],
+        legend: [{ label: "Pays: below the price it competes with (block width: MWh saved a year)", color: COL[carrier] }, { label: "Each block's price (the tick across it)", color: "var(--lx-ink)" }].concat(priceLeg),
         tip: function (x) { var b = list.filter(function (q) { return x >= q.x0 && x <= q.x1; })[0]; return b ? "<div><b>" + b.n + ". " + LX.esc(b.short) + "</b></div><div>" + usd(b.cse, 1) + " per MWh · " + fmtN(b.mwh) + " MWh a year</div>" : null; },
         aria: "Cost-of-saved-energy curve for " + (carrier === "gas" ? "gas" : "electricity") + ": " + list.map(function (b) { return b.n + " " + b.short + " " + usd(b.cse, 0) + " per MWh"; }).join("; ") + ".",
         text: { head: ["#", "Measure", "MWh saved a year", "$ per MWh saved", "Price"], rows: list.map(function (b) { return [String(b.n), b.label, fmtN(b.mwh), usd(b.cse, 1), usd(b.price, 1)]; }) }
@@ -685,8 +687,8 @@
       var e = curve(C, D, S, "el"), g = curve(C, D, S, "gas");
       LX.CompareTable(H("div", { class: "lx-xcard" }, xhost), {
         title: "The measures, side by side (your rate " + pct(S.rate) + ", rebound " + pct(S.rebound) + ")", text: true,
-        columns: [{ key: "name", label: "Measure", main: true }, { key: "cost", label: "Extra cost, 2025 $" }, { key: "life", label: "Life" }, { key: "save", label: "Saves a year" }, { key: "cse", label: "Per MWh saved" }, { key: "pays", label: "Against its price" }],
-        rows: e.concat(g).map(function (b) { return { key: b.key, color: COL[b.carrier], name: b.label, cost: usd(b.cost), life: fmtN(b.life, 1) + " years", save: fmtN(b.net, 2) + " MWh of " + (b.carrier === "gas" ? "gas" : "electricity"), cse: usd(b.cse, 1), pays: (b.pays ? "pays, under " : "does not pay, over ") + usd(b.price, 1) }; }),
+        columns: [{ key: "name", label: "Measure", main: true }, { key: "cost", label: "Extra cost, 2025 $ (up front, and a year)" }, { key: "life", label: "Life" }, { key: "save", label: "Saves a year" }, { key: "cse", label: "Per MWh saved" }, { key: "pays", label: "Against its price" }],
+        rows: e.concat(g).map(function (b) { return { key: b.key, color: COL[b.carrier], name: b.label, cost: usd(b.cost) + (b.extra > 0.005 ? " + " + usd(b.extra) + " a year" : ""), life: fmtN(b.life, 1) + " years", save: fmtN(b.net, 2) + " MWh of " + (b.carrier === "gas" ? "gas" : "electricity"), cse: usd(b.cse, 1), pays: (b.pays ? "pays, under " : "does not pay, over ") + usd(b.price, 1) }; }),
         caption: C.about.line + " Costs from EIA, LBNL and ResStock (sources below); 2025 Kansas retail prices." });
       var core = districtDay(C, D, 0, dd, sOf("core"));
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {

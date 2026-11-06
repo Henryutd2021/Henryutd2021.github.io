@@ -42,6 +42,8 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .f9-res { display: grid; gap: 10px; margin-top: 8px; min-width: 0; }
 .page-learn .f9-fict { margin: 6px 0 0; }
 .f9-actors { flex-wrap: wrap; }
+/* Bootstrap hides an empty .badge (.badge:empty { display: none }), which takes the Sankey's phone badge discs with it: keep them shown here (shared fix requested for sankey.css) */
+.page-learn .lx-sk circle.badge { display: inline; }
 .page-learn .f9-why ul { margin: 6px 0 0; padding-left: 1.1rem; display: grid; gap: 4px; font-size: 14px; } .page-learn .f9-src { color: var(--lx-ink-3); }
 .page-learn .f9-next { margin: 6px 0 0; padding-left: 1.2rem; display: grid; gap: 3px; }
 .page-learn .f9-note ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 2px; } .page-learn .f9-note li { margin: 0; }
