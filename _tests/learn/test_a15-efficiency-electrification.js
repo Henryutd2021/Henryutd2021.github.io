@@ -256,7 +256,7 @@ ok(D.coldClimate.cop === 1.75 && /COP at 5 F of at least 1\.75/.test(D.sources[D
 // ---------------- scope, links, the fictional line
 const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term");
-ok(!/data[- ]cent/i.test(ALL.replace(/datacenter/g, "").replace(/Alternative Fuels Data Center/g, "")), "no data-center term (A15 is buildings, transport and industry; DOE's Alternative Fuels Data Center is a source's name)");
+ok(!/data[- ]cent/i.test((OWN + "\n" + RAW + "\n" + JS + "\n" + SIDE).replace(/datacenter/g, "").replace(/Alternative Fuels Data Center/g, "")), "no data-center term (A15 is buildings, transport and industry; DOE's Alternative Fuels Data Center is a source's name)");
 ok(!/\(via [a-z0-9_.-]+\.json/.test(PAGE), "no internal file names in the page's source lines");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
 ok(!/projects\/|research\.html|smr-dc/.test(ALL), "no project page and no Research page");

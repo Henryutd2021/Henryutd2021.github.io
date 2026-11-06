@@ -32,7 +32,7 @@
   function colorOf(F, n) { return F.colors[n.id] || (n.kind === "sector" ? F.colors.sector : "var(--lx-ink-3)"); }
   // the detailed spec (the file's own nodes), coloured
   function detailed(C, F) {
-    return { nodes: C.flows.nodes.map(function (n) { return { id: n.id, label: n.label, short: n.short, col: n.col, kind: n.kind === "loss" ? "loss" : n.kind, color: colorOf(F, n) }; }),
+    return { nodes: C.flows.nodes.map(function (n) { return { id: n.id, label: n.short, short: n.short, note: n.label, col: n.col, kind: n.kind === "loss" ? "loss" : n.kind, color: colorOf(F, n) }; }),
              links: C.flows.links.map(function (l) { return { from: l.from, to: l.to, value: l.value }; }) };
   }
   // four sectors: the users merged into groups; links between the same two nodes summed
@@ -41,8 +41,8 @@
     var nodes = [];
     C.flows.nodes.forEach(function (n) {
       if (n.kind === "sector") return;
-      nodes.push({ id: n.id, label: n.label, short: n.short, col: n.col, kind: n.kind === "loss" ? "loss" : n.kind, color: colorOf(F, n) });
-      if (n.col === 1 && n.id === "air") F.groups.forEach(function (x) { nodes.push({ id: x.key, label: x.label, short: x.short, col: 2, kind: "sector", color: F.colors.sector }); });
+      nodes.push({ id: n.id, label: n.short, short: n.short, note: n.label, col: n.col, kind: n.kind === "loss" ? "loss" : n.kind, color: colorOf(F, n) });
+      if (n.col === 1 && n.id === "air") F.groups.forEach(function (x) { nodes.push({ id: x.key, label: x.short, short: x.short, note: x.label, col: 2, kind: "sector", color: F.colors.sector }); });
     });
     var acc = {}, order = [];
     C.flows.links.forEach(function (l) {
@@ -75,7 +75,7 @@
   }
   // the lens: an actor's nodes lit, the rest pale
   function lens(C, F, key) {
-    var a = F.actors.filter(function (x) { return x.key === key; })[0], spec = detailed(C, F), lit = {};
+    var a = F.actors.filter(function (x) { return x.key === key; })[0], spec = grouped(C, F), lit = {};
     a.nodes.forEach(function (id) { lit[id] = true; });
     spec.nodes.forEach(function (n) { if (!lit[n.id]) n.color = "var(--lx-line-2)"; else n.color = a.color; });
     spec.links.forEach(function (l) { l.color = lit[l.from] || lit[l.to] ? a.color : "var(--lx-line-2)"; });
@@ -204,14 +204,14 @@
     var C = data.prairie_city, F = data[KEY], P = data.path, demo = [];
     var last = { view: "grouped", actor: "city" };
     function fictional(host) { H("p", { class: "lx-hint f9-fict", text: C.about.line }, host); }
-    function sankey(host, label) { return LX.Sankey(host, { label: label, unit: "GWh", fmt: fmtG, height: 330, heightN: 420, textHead: ["From", "To", "GWh in 2025"], colNames: ["Sources", "Carriers", "Sectors", "Becomes"] }); }
+    function sankey(host, label, h) { return LX.Sankey(host, { label: label, unit: "GWh", fmt: fmtG, height: h || 340, heightN: 420, textHead: ["From", "To", "GWh in 2025"], colNames: ["Sources", "Carriers", "Sectors", "Becomes"] }); }
 
     var steps = [
       { text: STEPS[0], build: function (act, api) {
           var Q = carrierQ(C), res = H("div", { class: "f9-res" }, act);
           var pr = LX.Predict(act, { id: "f9-carrier", q: "The biggest carrier", title: false, answer: Q.answer, options: Q_CARRIER.options, feedback: Q.feedback, onPick: function () { show(); } });
           act.appendChild(res);
-          function show() { pr.reveal(); res.innerHTML = ""; sankey(res, "Prairie City's energy in 2025, sources to carriers to sectors to useful energy, in GWh").set(detailed(C, F)); fictional(res); api.done(); }
+          function show() { pr.reveal(); res.innerHTML = ""; sankey(res, "Prairie City's energy in 2025, sources to carriers to users to useful energy, in GWh", 400).set(detailed(C, F)); fictional(res); api.done(); }
           if (pr.picked()) show();
           demo[0] = function () { if (!pr.picked()) { var b = act.querySelector(".lx-choice"); if (b) b.click(); } };
         } },
@@ -239,7 +239,7 @@
           var res = H("div", { class: "f9-res" }, act), ans = ownTick(power(C).own);
           function result() {
             res.innerHTML = "";
-            var sk = sankey(res, "Prairie City's energy in 2025, in GWh"); sk.set(detailed(C, F)); sk.pick("el");
+            var sk = sankey(res, "Prairie City's energy in 2025 by sector, in GWh"); sk.set(grouped(C, F)); sk.pick("el");
             H("p", { class: "lx-step-line", html: bold(powerLine(C)) }, res); fictional(res); api.done(); api.saw(POWER_SAW);
           }
           var g0 = LX.progress.guess("f9-own");

@@ -72,8 +72,7 @@
       "sub": "council, permits, its own buildings and buses",
       "color": "var(--lx-tier-1)",
       "nodes": [
-        "homes",
-        "commercial",
+        "buildings",
         "transport",
         "src_solar"
       ],
@@ -109,13 +108,10 @@
       "sub": "households, businesses, the plants and the campus",
       "color": "var(--lx-tier-4)",
       "nodes": [
-        "homes",
-        "commercial",
-        "food",
-        "fertilizer",
-        "datacenter",
-        "farms",
-        "transport"
+        "buildings",
+        "transport",
+        "industry",
+        "datacenter"
       ],
       "levers": "What to install, which car to buy and how to use them: furnaces, heat pumps, vehicles, processes."
     },
@@ -128,8 +124,7 @@
         "src_grid",
         "src_gas",
         "gas",
-        "homes",
-        "commercial",
+        "buildings",
         "gasoline"
       ],
       "levers": "Interstate transmission, wholesale power and interstate gas pipelines (FERC); efficiency standards for equipment sold (DOE); pipeline safety (PHMSA); fuel economy (NHTSA)."

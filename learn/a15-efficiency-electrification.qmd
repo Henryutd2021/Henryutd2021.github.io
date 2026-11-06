@@ -225,6 +225,7 @@ $$\text{CSE} = \frac{C \times \text{CRF}(r, n)}{\Delta E}, \qquad \text{CRF}(r, 
 </div>
 ```
 <!-- learn:footer:end -->
+:::
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>

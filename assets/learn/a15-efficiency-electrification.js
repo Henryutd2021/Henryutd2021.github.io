@@ -175,12 +175,12 @@
     var core = C.districts[0], dd = design(C);
     return [
       "Treat a saving like a power plant: what does a saved MWh cost? A [[heat-pump-water-heater|heat-pump water heater]] costs more, then uses less electricity for " + fmtN(M_(D, "hpwh").life, 1) + " years. Is its saved MWh cheaper than a bought one?",
-      "Now every electricity measure for Prairie City's buildings, cheapest first: a [[cost-of-saved-energy|cost-of-saved-energy]] curve. Each block is as wide as the MWh it saves a year and as tall as their cost. Open three blocks.",
+      "Now every electricity measure for Prairie City's buildings, cheapest first: a [[cost-of-saved-energy|cost-of-saved-energy]] curve. Each block is as wide as the MWh it saves a year and as tall as the cost of each. Open three blocks.",
       "Most homes here heat with gas, and gas is cheap: " + usd(prices(C).gas, 1) + " per MWh in 2025, against " + usd(prices(C).residential, 1) + " for electricity. Switch to the gas curve: which measures still beat their price?",
       "Engineering savings assume nothing else changes. Add a [[rebound-effect|rebound]], homes kept a little warmer once heat is cheaper, and change the discount rate. Which blocks cross their price?",
       "Now electrify: the dense core's [[substation|substation]] can carry " + core.substationMW + " MW. On the cold [[design-day|design day]], " + num(dd.tmin) + " °C before dawn, its gas furnaces become heat pumps. Will the peak fit?",
       "Efficiency first: insulate and seal the core's older homes, and swap its resistance heaters for heat pumps. How far does the design day's peak come down?",
-      "Cars next, in the suburbs. Raise the share of electric cars and choose when they charge. Which charging rule keeps the cold day's peak lowest?",
+      "Cars next, in the suburbs: set the share of electric cars (" + pct(C.transport.evShare2025, 1) + " in 2025) and choose when they charge. Which charging rule keeps the cold day's peak lowest?",
       "District by district: each has its own substation, and the city's peak is their sum, hour by hour. Electrify all three and compare each [[coincident-peak|peak]] with its limit.",
       "A heat network for the core instead: one large heat pump on a steady " + fmtN(D.districtHeat.sourceC) + " °C source, with a hot-water [[thermal-storage|store]]. Compare it with heat pumps in every building.",
       "Industry last: the park's [[process-heat|process heat]] by temperature. Sort each band to the electric option that can reach it, then see the electricity full electrification would need."
@@ -430,7 +430,7 @@
         x: { min: 0, max: xMax, ticks: xt, ticksN: xt.filter(function (t, i) { return i % 2 === 0; }) },
         y: { min: 0, max: yMax, step: yMax > 300 ? 100 : 50, fmt: function (v) { return "$" + fmtN(v); }, unit: "$ per MWh saved" }, height: 260, heightN: 230,
         bars: bars, marks: marks, refs: refs,
-        legend: [{ label: "Pays: below the price it competes with", color: COL[carrier] }, { label: "Each block's price (black tick)", color: "var(--lx-ink)" }],
+        legend: [{ label: "Pays: below the price it competes with (block width: MWh saved a year)", color: COL[carrier] }, { label: "Each block's price (black tick)", color: "var(--lx-ink)" }],
         tip: function (x) { var b = list.filter(function (q) { return x >= q.x0 && x <= q.x1; })[0]; return b ? "<div><b>" + b.n + ". " + LX.esc(b.short) + "</b></div><div>" + usd(b.cse, 1) + " per MWh · " + fmtN(b.mwh) + " MWh a year</div>" : null; },
         aria: "Cost-of-saved-energy curve for " + (carrier === "gas" ? "gas" : "electricity") + ": " + list.map(function (b) { return b.n + " " + b.short + " " + usd(b.cse, 0) + " per MWh"; }).join("; ") + ".",
         text: { head: ["#", "Measure", "MWh saved a year", "$ per MWh saved", "Price"], rows: list.map(function (b) { return [String(b.n), b.label, fmtN(b.mwh), usd(b.cse, 1), usd(b.price, 1)]; }) }
@@ -453,7 +453,7 @@
       Pl.render({
         x: { min: 0, max: 24, ticks: [[0, "00:00"], [6, "06:00"], [12, "12:00"], [18, "18:00"], [24, "24:00"]], ticksN: [[0, "0"], [6, "6"], [12, "12"], [18, "18"], [24, "24 h"]] },
         y: { min: 0, max: yMax, step: yMax > 300 ? 100 : 50, fmt: function (v) { return fmtN(v); }, unit: "MW" }, height: 250, heightN: 220, bars: bars,
-        refs: [{ y: r.limit, label: "Limit " + r.limit + " MW", labelN: r.limit + " MW", dash: "5 4", color: COL.limit }],
+        refs: [{ y: r.limit, dash: "5 4", color: COL.limit }],   // its words are in the legend: a label here would sit on the bars
         marks: opts.marks || [{ x: r.hour + 0.5, y: r.peak, label: "Peak " + fmtN(r.peak, 1) + " MW", kind: "dot", pos: "above" }],
         legend: legend,
         aria: (opts.title || r.label) + " on the design day, hour by hour: peak " + fmtN(r.peak, 1) + " MW at " + hm(r.hour) + " against a " + r.limit + " MW limit.",
@@ -532,6 +532,7 @@
           var full = districtDay(C, D, 0, dd, { gas: 1 }), ans = full.peak > full.limit ? "over" : "fits";
           var fb = { fits: (ans === "fits" ? "Right" : "No") + ": with every furnace replaced the design day peaks at " + fmtN(full.peak, 1) + " MW against " + full.limit + " MW.",
                      over: (ans === "over" ? "Right" : "No") + ": with every furnace replaced the design day peaks at " + fmtN(full.peak, 1) + " MW against " + full.limit + " MW." };
+          var sl5 = null;
           var pr = LX.Predict(act, { id: "a15-fit", q: "Does the core's peak fit its substation?", title: false, answer: ans, options: opts, feedback: fb, onPick: function () { show(); } });
           var res = H("div", { class: "a15-res" }, act);
           function show() {
@@ -540,7 +541,7 @@
             var Pl = LX.Plot(H("div", null, res), { text: "Text version of the chart", legend: true });
             var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, res), av = H("p", { class: "lx-hint", "aria-live": "polite" }, res);
             [["winter_design", "Design day"], ["winter", "A normal winter day"]].forEach(function (t) { btn[t[0]] = H("button", { type: "button", text: t[1] }, tabs); btn[t[0]].addEventListener("click", function () { day = t[0]; paint(); }); });
-            slider(res, "Gas and propane heat to heat pumps", D.electrify.gas, S.dist.core.gas, pctF, COL.heat, function (v) { S.dist.core.gas = v; keep(); paint(); api.done(); buildExplain(); });
+            sl5 = slider(res, "Gas and propane heat to heat pumps", D.electrify.gas, S.dist.core.gas, pctF, COL.heat, function (v) { S.dist.core.gas = v; keep(); paint(); api.done(); buildExplain(); });
             fictional(res);
             function paint() {
               Object.keys(btn).forEach(function (j) { btn[j].setAttribute("aria-pressed", String(j === day)); });
@@ -551,7 +552,7 @@
             paint(); if (S.dist.core.gas > 0) api.done();
           }
           if (pr.picked()) show();
-          demo[4] = function () { if (!pr.picked()) { var b = act.querySelectorAll(".lx-choice")[1]; if (b) b.click(); } S.dist.core.gas = 1; keep(); var c = act.querySelector(".lx-seg button"); if (c) c.click(); api.done(); };
+          demo[4] = function () { if (!pr.picked()) { var b = act.querySelectorAll(".lx-choice")[1]; if (b) b.click(); } if (sl5) sl5.set(1, true); };
         } },
       { text: texts[5], build: function (act, api) {
           var Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
@@ -574,6 +575,7 @@
           var Pl = LX.Plot(H("div", null, act), { text: "Text version of the chart", legend: true });
           var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, act);
           slider(act, "Electric share of the suburbs' cars", D.electrify.ev, S.evShare, pctF, COL.ev, function (v) { S.evShare = v; keep(); paint(); });
+          H("p", { class: "lx-hint", text: "Step 8 keeps your share and rule for the suburbs." }, act);
           H("p", { class: "lx-hint", text: "Illustrative rules: a timer spreads each day's charging over 00:00 to 06:00; filling the valleys raises the lowest hours to one level, at any hour." }, act);
           fictional(act);
           D.electrify.rules.forEach(function (t) { btn[t.key] = H("button", { type: "button", text: t.label }, tabs); btn[t.key].addEventListener("click", function () { S.rule = t.key; seen[t.key] = true; keep(); paint(); }); });
@@ -637,7 +639,7 @@
           demo[8] = function () { ["plant", "store", "hp"].forEach(function (k) { btn[k].click(); }); btn.store.click(); };
         } },
       { text: texts[9], build: function (act, api) {
-          var I = D.industry, bands = C.industry.processHeat;
+          var I = D.industry, bands = C.industry.processHeat.map(function (b) { return { band: b.band, deliveredMWh: b.deliveredMWh, label: b.label.replace(/(\d) C\b/g, "$1 °C") }; });
           var bins = [{ id: "hp", label: "Industrial heat pump", sub: "up to about " + I.hpMaxC + " °C", color: "var(--lx-good)" }, { id: "boiler", label: "Electric boiler", sub: "steam", color: "var(--lx-bat)" },
                       { id: "oven", label: "Electric ovens and furnaces", sub: "resistance or induction", color: "var(--lx-tier-4)" }, { id: "elys", label: "Hydrogen by electrolysis", sub: "a feedstock, not only heat", color: "var(--lx-hyd)" }];
           var cards = [
@@ -654,7 +656,6 @@
             var ln = H("p", { class: "lx-step-line", "aria-live": "polite" }, res);
             slider(res, "Industrial heat pump COP", I.cop, S.cop, function (v) { return fmtN(v, 1); }, "var(--lx-good)", function (v) { S.cop = v; keep(); lineP(ln, indLine(C, D, S.cop)); });
             H("p", { class: "lx-hint", text: "LBNL (2022): COP from 1.6 to 5.8 at temperature lifts of 130 to 40 K. Electric boilers and ovens at 98%. A ceiling, not a forecast." }, res);
-            fictional(res);
             lineP(ln, indLine(C, D, S.cop)); api.done();
           }
           demo[9] = function () { var m = {}; cards.forEach(function (c) { m[c.id] = c.bin; }); cs.place(m); cs.check(); };
@@ -676,7 +677,7 @@
       var core = districtDay(C, D, 0, dd, sOf("core"));
       LX.CausalChain(H("div", { class: "lx-xcard" }, xhost), {
         title: "Cause and effect: a cold night on electrified heat",
-        links: [{ title: "The design day", text: "The coldest planning day: every home heats at once, before dawn.", value: fmtN(dd.tmin) + " °C at its coldest" },
+        links: [{ title: "The design day", text: "The coldest planning day: every home heats at once, before dawn.", value: num(dd.tmin) + " °C at its coldest" },
                 { title: "COP falls", text: "An air-source heat pump moves less heat per kWh when the air is colder.", value: "COP " + fmtN(cop(C, dd.tmin), 2) + " against " + fmtN(scop(C), 2) + " over the year" },
                 { title: "The peak grows", text: "Heating electricity rises faster than the year's MWh.", value: fmtN(core.peak, 1) + " MW in the core (your settings)" },
                 { title: "The substation binds", text: "The wires and transformers are sized for the peak hour, not the year.", value: core.limit + " MW limit" },

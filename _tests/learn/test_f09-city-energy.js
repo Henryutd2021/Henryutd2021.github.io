@@ -85,7 +85,7 @@ ok(near(P.meters * P.lossShare, P.lost, 0.1), "the wires lose 5% of what the met
   ok(M.powerLine(C).indexOf("**" + M.pct(P.own, 1) + "**") >= 0 && M.powerLine(C).indexOf(M.gwh(P.grid)) >= 0, "step 4 line");
   F.actors.forEach(a => {
     const Lz = M.lens(C, F, a.key);
-    ok(Lz.spec.nodes.every(n => (a.nodes.includes(n.id) ? n.color === a.color : n.color === "var(--lx-line-2)")) && a.nodes.every(id => C.flows.nodes.some(n => n.id === id)), "step 6: the lens lights only " + a.key + "'s nodes");
+    ok(Lz.spec.nodes.every(n => (a.nodes.includes(n.id) ? n.color === a.color : n.color === "var(--lx-line-2)")) && a.nodes.every(id => M.grouped(C, F).nodes.some(n => n.id === id)), "step 6: the lens lights only " + a.key + "'s nodes (on the four-sector Sankey)");
     ok(a.levers && a.levers.split(/\s+/).length <= 30, "step 6: " + a.key + "'s levers line");
   });
   ok(M.muniSaw(C, F, "rates") === F.muni.feedback.rates && F.muni.answer === "rates" && F.muni.options.every(o => F.muni.feedback[o.value]), "step 7: feedback for every choice");

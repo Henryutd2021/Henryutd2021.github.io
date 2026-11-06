@@ -180,6 +180,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 </div>
 ```
 <!-- learn:footer:end -->
+:::
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
