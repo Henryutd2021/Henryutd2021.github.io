@@ -763,10 +763,12 @@
     function boxOf(cl) {
       const lons = cl.pts.map(function (p) { return p.ll[0]; }), lats = cl.pts.map(function (p) { return p.ll[1]; });
       let x0 = Math.min.apply(null, lons), x1 = Math.max.apply(null, lons), y0 = Math.min.apply(null, lats), y1 = Math.max.apply(null, lats);
-      const padX = Math.max(1.2, (x1 - x0) * 0.12), padY = Math.max(0.9, (y1 - y0) * 0.12);
-      x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
-      // at least about 8 by 5 degrees, so a tight cluster keeps its surroundings (the state or province around it)
-      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hw = Math.max((x1 - x0) / 2, 4), hh = Math.max((y1 - y0) / 2, 2.6);
+      // about 30% padding around the footprints, at least about 2.5 by 1.6 degrees (some 250 km); a panel that would
+      // show a single point keeps a wider view (about 8 by 5 degrees), so its region stays recognisable
+      const single = x1 - x0 < 0.05 && y1 - y0 < 0.05;
+      x0 -= (x1 - x0) * 0.3; x1 += (x1 - x0) * 0.3 / 1.3; y0 -= (y1 - y0) * 0.3; y1 += (y1 - y0) * 0.3 / 1.3;
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+      const hw = Math.max((x1 - x0) / 2, single ? 4 : 1.25), hh = Math.max((y1 - y0) / 2, single ? 2.6 : 0.8);
       return [cx - hw, cy - hh, cx + hw, cy + hh];
     }
     function localProjection(box, W, H) {
