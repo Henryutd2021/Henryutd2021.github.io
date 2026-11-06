@@ -763,7 +763,9 @@
       let x0 = Math.min.apply(null, lons), x1 = Math.max.apply(null, lons), y0 = Math.min.apply(null, lats), y1 = Math.max.apply(null, lats);
       const padX = Math.max(1.2, (x1 - x0) * 0.12), padY = Math.max(0.9, (y1 - y0) * 0.12);
       x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
-      return [x0, y0, x1, y1];
+      // at least about 8 by 5 degrees, so a tight cluster keeps its surroundings (the state or province around it)
+      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hw = Math.max((x1 - x0) / 2, 4), hh = Math.max((y1 - y0) / 2, 2.6);
+      return [cx - hw, cy - hh, cx + hw, cy + hh];
     }
     function localProjection(box, W, H) {
       const cx = (box[0] + box[2]) / 2, y0 = box[1], y1 = box[3];
