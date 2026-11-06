@@ -418,7 +418,7 @@
           var b = H("button", { type: "button", class: "lx-btn small", text: "Compare" }, act);
           b.addEventListener("click", function () { api.saw(lineBudget(R(), S.budget)); api.done(); });
         } },
-      { text: "Test 2, the coldest morning. Each district has one [[substation|substation]] with a limit. Run your plan through Prairie City's eight days, the cold [[design-day|design day]] included. Then switch heat pumps on and check again.",
+      { text: "Test 2, the coldest morning: each district has one [[substation|substation]] with a limit. Run your plan through Prairie City's eight days, the cold [[design-day|design day]] included; then switch heat pumps on and check again.",
         build: function (act, api) {
           S.part = "peak"; S.order = false; paint();
           var b = H("button", { type: "button", class: "lx-btn small", text: "Check the peaks" }, act), host = H("div", null, act);

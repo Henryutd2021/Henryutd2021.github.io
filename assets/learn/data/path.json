@@ -1312,9 +1312,13 @@
    "tier": "analyst",
    "code": "A18",
    "title": "How is a city or regional energy plan made?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a18-city-plan.html",
+   "scales": [],
+   "id": "a18-city-plan",
+   "minutes": 30,
+   "form": "cards",
+   "short": "A city's energy plan"
   },
   {
    "tier": "analyst",

@@ -816,7 +816,23 @@
   does: "Take M1's plan that balances every hour; add reactive power until a line passes its rating, load a feeder until its far end sags, add rooftop solar until its voltage tops out, find a ramp the plan assumed, and cut inertia to compare two assumed inverter responses after a trip."
   outcome: "Name the physical limits an hourly energy plan can break, say when each binds, and say which check (an AC check, a ramp check at the plan's time step and finer, or a check of the first seconds) would catch it."
   after: [F6, 3]
-- {kind: lesson, tier: analyst, code: A18, title: "How is a city or regional energy plan made?"}
+# A18, builder learn-w5-d (wave W5)
+- kind: lesson
+  id: a18-city-plan
+  code: A18
+  tier: analyst
+  form: cards
+  icon: blueprint
+  status: active
+  minutes: 30
+  practice_minutes: 30   # the Check section and the Go deeper boxes
+  title: "How is a city or regional energy plan made?"
+  subtitle: "Count Prairie City's emissions, pick measures from a cost curve, test the plan against budget, winter peaks and who benefits, and see where the curve misleads"
+  short: "A city's energy plan"
+  teaches: [city emissions inventories by scope (GPC), targets, marginal abatement cost curves, cost per tonne avoided, budget, peak and distribution tests, interactions and lock-in, baselines, who decides in a city plan]
+  does: "Sort Prairie City's emissions into the GPC's scopes, set a 2035 target, build a plan from a cost curve of six measures, test it against an up-front budget, each district's substation on the coldest morning and who benefits, then see the curve mislead through overlaps, order, the baseline, prices and hidden costs."
+  outcome: "Build a city's inventory by scope, read and use a marginal abatement cost curve, test a plan against money, peaks and fairness, and name five ways the curve misleads and who decides each step of a U.S. city plan."
+  after: [A1]
 - {kind: lesson, tier: analyst, code: A19, title: "Where should it go? Siting with maps, from layers to a suitability score"}
 - {kind: lesson, tier: analyst, code: A20, title: "Why do national energy scenarios disagree?"}
 - {kind: lesson, tier: analyst, code: A21, title: "What makes a nation's energy secure? Imports, minerals, supply chains and factories"}
