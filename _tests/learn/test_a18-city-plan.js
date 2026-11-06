@@ -95,7 +95,7 @@ ok(A.barrierSort.cards.length === 8 && A.barrierSort.cards.every(c => ["in", "ou
 
 // ---------------- the curve at the default settings, interactions and order
 const B = M.bars(W, o0), all = M.evaluate(W, IDS, o0), alone = B.reduce((s, b) => s + b.t, 0);
-ok(B.map(b => b.id).join() === "hpwh,comm,furnace,weather,solar,hp", "default order: " + B.map(b => b.id).join());
+ok(B.map(b => b.id).join() === "hpwh,comm,furnace,weather,solar,hp" && B.every((b, i) => b.m.n === i + 1) && IDS.join() === A.measures.map(m => m.id).join(), "default order: " + B.map(b => b.id).join() + "; numbered 1 to 6 in that order, as in the data file");
 ok(B.filter(b => b.per < 0).length === 3 && B.filter(b => b.per < 0).every(b => ["hpwh", "comm", "furnace"].indexOf(b.id) >= 0), "three efficiency measures below zero");
 { const rows = [...PAGE0.matchAll(/<tr><td>(\d) · ([^<]+)<\/td><td>([^<]+)<\/td><td>([^<]+)<\/td><td>([^<]+)<\/td><\/tr>/g)];
   ok(rows.length === 6 && rows.every((m, i) => +m[1] === i + 1 && m[2] === B[i].m.label && m[3] === fm.t(B[i].t) && m[4] === fm.per(B[i].per) && m[5] === fm.musd(B[i].up)), "fallback table: the six bars in order with tonnes, cost per tonne and up front"); }
@@ -136,7 +136,7 @@ COMBOS.forEach(c => {
   LONG(M.lineOrder(W, o)); LONG(M.lineBaseline(W, o)); LONG(M.lineStatic(W, o));
   subsets.forEach(ids => {
     const R = M.evaluate(W, ids, o), P = M.peaks(W, R), lp = M.linePeak(P), overN = P.filter(x => x.over > 1e-9).length;
-    LONG(lp); ok((overN > 0) === / over by /.test(lp), "peak line's verdict equals the model's");
+    LONG(lp); ok((overN > 0) === /Over the limit: /.test(lp), "peak line's verdict equals the model's");
     [1, 4, 8].forEach(pct => { const l = M.linePlan(W, R, pct); LONG(l); ok(!ids.length || (R.t >= M.targetT(W, pct)) === /reaches/.test(l), "plan line's verdict: " + ids.join("+") + " at " + pct + "%"); });
     [0, 250, 700].forEach(bm => { const l = M.lineBudget(R, bm); LONG(l); ok(!ids.length || (R.upfront <= bm * 1e6) === /fits/.test(l), "budget line's verdict: " + ids.join("+") + " $" + bm + "M"); });
     ["first", "low"].forEach(k => { const G = M.groups(W, R, k), l = M.lineGroups(W, G, R); LONG(l);
@@ -210,7 +210,7 @@ ok(!/\b(always|never)\b/i.test(JS.replace(/\/\/[^\n]*/g, "") + OWN), "no 'always
     demo.cards.go(2);
     btns(/^Cheapest first$/)[0].click();
     const S = root.lxLesson.S, R = M.evaluate(W, S.plan, o0);
-    ok(M.planIds(S).join() === "hpwh,furnace,weather,comm,solar" && R.t >= M.targetT(W, A.target.def), "step 3: cheapest first reaches the 4% target from an empty plan");
+    ok(M.planIds(S).join() === "hpwh,comm,furnace,weather,solar" && R.t >= M.targetT(W, A.target.def), "step 3: cheapest first reaches the 4% target from an empty plan");
     ok(card().textContent.includes(M.linePlan(W, R, A.target.def).replace(/\*\*/g, "")), "step 3: the plan line");
     // the shortcut continues from the reader's plan: start with heat pumps on
     IDS.forEach(k => { S.plan[k] = k === "hp"; }); btns(/^Cheapest first$/)[0].click();

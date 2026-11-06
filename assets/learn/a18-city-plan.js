@@ -24,7 +24,7 @@
 // Every number on the page is checked by _tests/learn/test_a18-city-plan.js.
 (function () {
   "use strict";
-  var IDS = ["hpwh", "furnace", "hp", "weather", "comm", "solar"];
+  var IDS = ["hpwh", "comm", "furnace", "weather", "solar", "hp"];     // the data file's order: the default curve, cheapest first
   var HOME = { hpwh: 1, furnace: 1, hp: 1, weather: 1, solar: 1 };
 
   // ---------------------------------------------------------------- pure model
@@ -235,7 +235,7 @@
     var over = P.filter(function (x) { return x.over > 1e-9; });
     var s = "Highest hours: " + P.map(function (x) { return x.label.toLowerCase() + " " + fm.mw(x.mw) + " of " + x.limit; }).join(", ") + " MW. ";
     if (!over.length) return s + "Every district stays within its substation's limit.";
-    return s + over.map(function (x) { return x.label + " is over by " + fm.mw(x.over); }).join("; ") + ": an upgrade the curve does not price.";
+    return s + "Over the limit: " + over.map(function (x) { return x.label.toLowerCase() + " by " + fm.mw(x.over); }).join(", ") + ", an upgrade the curve does not price.";
   }
   function lineGroups(W, G, R) {
     if (!(R.homeUnits > 0)) return "The plan has no home measures yet, so no household gains or pays through it.";
@@ -345,13 +345,13 @@
       if (inv) { chip("Inventory, 2025", fm.kt(I.tot.total)); if (S.sorted) { chip("Scope 1", fm.kt(I.tot.s1)); chip("Scope 2", fm.kt(I.tot.s2)); chip("Scope 3", fm.kt(I.tot.s3)); } }
       else {
         chip("Target", fm.t(need) + " a year"); chip("Your plan cuts", fm.t(r.t), r.t >= need && planIds(S).length ? "good" : null);
-        chip("Net cost a year", fm.musd(r.net), r.net > 0 ? "bad" : "good"); chip("Up front, one-time", fm.musd(r.upfront));
+        chip("Net cost a year", fm.musd(r.net), Math.abs(r.net) < 5e4 ? null : r.net > 0 ? "bad" : "good"); chip("Up front, one-time", fm.musd(r.upfront));
       }
       invHost.hidden = !inv; maccHost.hidden = inv;
       if (inv) drawInventory(); else drawCurve();
       IDS.forEach(function (k) { toggles[k].set(!!S.plan[k]); });
       status.textContent = inv ? "Scope 1 is burned in the city; scope 2 is grid electricity used in it; scope 3 happens outside it because of the city." :
-        "Each bar alone, cheapest first: width = tonnes avoided a year by 2035, height = cost per tonne." + (S.order ? " Now each bar shows what it adds after the bars before it." : "");
+        (S.order ? "Bars in order, cheapest first: width = tonnes each adds after the bars before it, height = its cost per tonne." : "Each bar alone, cheapest first: width = tonnes avoided a year by 2035, height = cost per tonne.");
       buildExplain();
     }
 
@@ -517,7 +517,7 @@
       if (state === "mid") { S.sorted = true; IDS.forEach(function (k) { S.plan[k] = false; }); keep(); cards.go(2); cheapest(); return { view: "cheapest bars to the target" }; }
       if (state === "peak") { S.sorted = true; IDS.forEach(function (k) { S.plan[k] = k === "hp"; }); keep(); cards.go(4); paint();
         Array.prototype.forEach.call(live.querySelectorAll("button"), function (x) { if (x.textContent === "Check the peaks") x.click(); }); return { view: "heat pumps alone on the cold design day" }; }
-      if (state === "order") { S.sorted = true; keep(); cards.go(6); Array.prototype.forEach.call(live.querySelectorAll("button[aria-pressed]"), function (x) { if (/Bars in order/.test(x.textContent) && x.getAttribute("aria-pressed") !== "true") x.click(); }); return { view: "bars in order" }; }
+      if (state === "order") { S.sorted = true; IDS.forEach(function (k) { S.plan[k] = false; }); keep(); cards.go(2); cheapest(); cards.go(6); Array.prototype.forEach.call(live.querySelectorAll("button[aria-pressed]"), function (x) { if (/Bars in order/.test(x.textContent) && x.getAttribute("aria-pressed") !== "true") x.click(); }); return { view: "bars in order" }; }
       return null;
     }, cards);
     root.lxLesson = { model: model, W: W, S: S, cards: cards };

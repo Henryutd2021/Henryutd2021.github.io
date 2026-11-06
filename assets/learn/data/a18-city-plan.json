@@ -44,8 +44,29 @@
    "bar": "the water-heater bar"
   },
   {
-   "id": "furnace",
+   "id": "comm",
    "n": 2,
+   "label": "Efficiency programmes in shops and offices",
+   "short": "Shops and offices",
+   "who": "utility",
+   "sector": "commercial",
+   "what": "Rebate programmes (mostly lighting and controls) save 10% of the electricity that shops, offices and public buildings use.",
+   "share": 0.1,
+   "cse": 0.045,
+   "cseYear": 2012,
+   "cseRate": 0.06,
+   "life": 12,
+   "src": [
+    "lbnl-total-cse"
+   ],
+   "note": "Cost: $0.045 per kWh saved, the total cost (programme and participant) of commercial and industrial prescriptive rebate programmes, 2009 to 2013, levelized at a 6% real rate, in 2012 dollars (LBNL, April 2015, p. 16). Set for teaching: 10% of the commercial electricity by 2035 and a 12-year life (the brief gives no programme life), used to turn the levelized cost back into an up-front cost.",
+   "whoText": "The utility runs it; the state regulator approves its budget.",
+   "color": "var(--lx-tier-2)",
+   "bar": "the shops-and-offices bar"
+  },
+  {
+   "id": "furnace",
+   "n": 3,
    "label": "Condensing gas furnaces",
    "short": "Furnaces",
    "who": "owners",
@@ -71,31 +92,6 @@
    "bar": "the furnace bar"
   },
   {
-   "id": "hp",
-   "n": 3,
-   "label": "Heat pumps instead of gas furnaces",
-   "short": "Heat pumps",
-   "who": "owners",
-   "sector": "homes",
-   "what": "Homes heated with gas put in an electric heat pump instead of a new 80% furnace when the old furnace wears out.",
-   "life": 15.3,
-   "upkeep": 150,
-   "acCost": 5250,
-   "acUpkeep": 150,
-   "acLife": 15.3,
-   "costYear": 2022,
-   "src": [
-    "e0-hp",
-    "eia-rdm-t2",
-    "eia-equip",
-    "pc-cop"
-   ],
-   "note": "The heat pump costs $8,620 (2022 dollars), the most efficient unit in EIA's table, standing in for a cold-climate unit; lesson SB0 uses the same figure (e0.json). Average life 15.3 years and $150 a year of upkeep (EIA's equipment report, Appendix A, p. 39). It runs on lesson F3's cold-climate efficiency curve over Prairie City's eight days. When the air conditioner is due too, the heat pump also replaces a central air conditioner: $5,250 and $150 a year (Appendix A, p. 27), its life assumed equal to the heat pump's (EIA's range is 11 to 25 years).",
-   "whoText": "Owners decide; a city cannot order it for existing homes alone.",
-   "color": "var(--lx-dr)",
-   "bar": "the heat-pump bar"
-  },
-  {
    "id": "weather",
    "n": 4,
    "label": "Weatherize homes built before 1980",
@@ -118,29 +114,8 @@
    "bar": "the weatherization bar"
   },
   {
-   "id": "comm",
-   "n": 5,
-   "label": "Efficiency programmes in shops and offices",
-   "short": "Shops and offices",
-   "who": "utility",
-   "sector": "commercial",
-   "what": "Rebate programmes (mostly lighting and controls) save 10% of the electricity that shops, offices and public buildings use.",
-   "share": 0.1,
-   "cse": 0.045,
-   "cseYear": 2012,
-   "cseRate": 0.06,
-   "life": 12,
-   "src": [
-    "lbnl-total-cse"
-   ],
-   "note": "Cost: $0.045 per kWh saved, the total cost (programme and participant) of commercial and industrial prescriptive rebate programmes, 2009 to 2013, levelized at a 6% real rate, in 2012 dollars (LBNL, April 2015, p. 16). Set for teaching: 10% of the commercial electricity by 2035 and a 12-year life (the brief gives no programme life), used to turn the levelized cost back into an up-front cost.",
-   "whoText": "The utility runs it; the state regulator approves its budget.",
-   "color": "var(--lx-tier-2)",
-   "bar": "the shops-and-offices bar"
-  },
-  {
    "id": "solar",
-   "n": 6,
+   "n": 5,
    "label": "Rooftop solar on homes",
    "short": "Rooftop solar",
    "who": "owners",
@@ -158,6 +133,31 @@
    "whoText": "Owners decide, under the state's rules for paying for exports.",
    "color": "var(--lx-solar)",
    "bar": "the rooftop-solar bar"
+  },
+  {
+   "id": "hp",
+   "n": 6,
+   "label": "Heat pumps instead of gas furnaces",
+   "short": "Heat pumps",
+   "who": "owners",
+   "sector": "homes",
+   "what": "Homes heated with gas put in an electric heat pump instead of a new 80% furnace when the old furnace wears out.",
+   "life": 15.3,
+   "upkeep": 150,
+   "acCost": 5250,
+   "acUpkeep": 150,
+   "acLife": 15.3,
+   "costYear": 2022,
+   "src": [
+    "e0-hp",
+    "eia-rdm-t2",
+    "eia-equip",
+    "pc-cop"
+   ],
+   "note": "The heat pump costs $8,620 (2022 dollars), the most efficient unit in EIA's table, standing in for a cold-climate unit; lesson SB0 uses the same figure (e0.json). Average life 15.3 years and $150 a year of upkeep (EIA's equipment report, Appendix A, p. 39). It runs on lesson F3's cold-climate efficiency curve over Prairie City's eight days. When the air conditioner is due too, the heat pump also replaces a central air conditioner: $5,250 and $150 a year (Appendix A, p. 27), its life assumed equal to the heat pump's (EIA's range is 11 to 25 years).",
+   "whoText": "Owners decide; a city cannot order it for existing homes alone.",
+   "color": "var(--lx-dr)",
+   "bar": "the heat-pump bar"
   }
  ],
  "rule": {
