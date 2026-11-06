@@ -65,7 +65,7 @@
    "life": 40
   },
   "plant": {
-   "cop": 3.0,
+   "cop": 3,
    "capex": {
     "def": 1200,
     "lo": 600,
@@ -181,7 +181,7 @@
    ]
   },
   "indHP": {
-   "cop": 3.0,
+   "cop": 3,
    "capex": 900,
    "life": 20,
    "set": "teaching",
@@ -249,5 +249,52 @@
    "asOf": "September 2014; read 6 Nov 2026"
   }
  },
- "precomputed": {}
+ "precomputed": {
+  "sb3": {
+   "head": "Result: 2025 as it is, then \"Electrify heat and cars\" (80% of furnaces and resistance heat to heat pumps, half the cars electric)",
+   "rows": [
+    [
+     "2025 as it is: yearly cost against 2025 (2025 dollars; equipment and upgrades as yearly payments)",
+     "$0.0M"
+    ],
+    [
+     "2025 as it is: CO₂ of the three districts' buildings and cars",
+     "1,921,977 t a year"
+    ],
+    [
+     "2025 as it is: busiest hour against the limit, core · suburbs · fringe",
+     "213/250 · 192/230 · 48/60 MW"
+    ],
+    [
+     "2025 as it is: substation upgrades bought",
+     "0 MW"
+    ],
+    [
+     "2025 as it is: energy burden, homes below 80% of area median income (screening estimate)",
+     "6.1%"
+    ],
+    [
+     "Electrify heat and cars: yearly cost against 2025 (2025 dollars; equipment and upgrades as yearly payments)",
+     "−$65.8M"
+    ],
+    [
+     "Electrify heat and cars: CO₂ of the three districts' buildings and cars",
+     "1,527,234 t a year"
+    ],
+    [
+     "Electrify heat and cars: busiest hour against the limit, core · suburbs · fringe",
+     "276/250 · 288/230 · 67/60 MW"
+    ],
+    [
+     "Electrify heat and cars: substation upgrades bought",
+     "91 MW"
+    ],
+    [
+     "Electrify heat and cars: energy burden, homes below 80% of area median income (screening estimate)",
+     "6.5%"
+    ]
+   ],
+   "note": "Precomputed with HiGHS on 6 November 2026: the hub as a linear program over eight representative days. Prairie City is fictional; its numbers are illustrative. With JavaScript on, the bench runs your own plan."
+  }
+ }
 }

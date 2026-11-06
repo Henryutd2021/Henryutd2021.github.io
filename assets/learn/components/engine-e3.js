@@ -543,15 +543,17 @@
     var dhPrice = A.dhHeat > 0 ? (A.money.net + A.money.plant + A.money.store + A.money.boiler + A.d[0].plant * P.price.ind) / A.dhHeat : 0;
     var rows = G.map(function (gr, g) {
       var Hg = gr.households, u = gr.use;
-      var el = u.electricityKWh / 1000 + D.el[g] / Hg, gas = u.gasMMBtu * P.city.units.mwhPerMMBtu + D.gas[g] / Hg, prop = u.propaneGal / P.galPerMWh + D.prop[g] / Hg,
-        gal = u.gasolineGal + D.gal[g] / Hg, dh = D.dh[g] / Hg;
-      if (el < 0 || gas < 0 || prop < 0 || gal < 0) clamp = true;
-      el = Math.max(0, el); gas = Math.max(0, gas); prop = Math.max(0, prop); gal = Math.max(0, gal);
-      var bill = { el: el * (pr.res + adder), gas: gas * pr.gasRes, prop: prop * pr.propMWh, dh: dh * dhPrice };
-      var home = bill.el + bill.gas + bill.prop + bill.dh, home0 = gr.homeEnergy;
+      // each home's change (MWh, gal) a year; bills are 2025's (prairie-city.json) plus the changes at 2025 prices, so a
+      // plan that changes nothing changes no bill
+      var dEl = D.el[g] / Hg, dGas = D.gas[g] / Hg, dProp = D.prop[g] / Hg, dGal = D.gal[g] / Hg, dh = D.dh[g] / Hg;
+      var el = u.electricityKWh / 1000 + dEl;
+      if (el < 0 || u.gasMMBtu * P.city.units.mwhPerMMBtu + dGas < -1e-9 || u.propaneGal / P.galPerMWh + dProp < -1e-9 || u.gasolineGal + dGal < -1e-9) clamp = true;
+      var sp = gr.spending;
+      var bill = { el: sp.electricity + dEl * pr.res + Math.max(0, el) * adder, gas: sp.gas + dGas * pr.gasRes, prop: sp.propane + dProp * pr.propMWh, dh: dh * dhPrice };
+      var home = bill.el + bill.gas + bill.prop + bill.dh, home0 = gr.homeEnergy, fuel = sp.motorFuel + dGal * pr.gasoline;
       return { key: gr.key, label: gr.label, households: Hg, income: gr.income, home0: home0, home: home, change: home - home0,
-        burden0: home0 / gr.income, burden: home / gr.income, fuel0: gr.spending.motorFuel, fuel: gal * pr.gasoline,
-        tburden0: gr.spending.motorFuel / gr.income, tburden: gal * pr.gasoline / gr.income, bill: bill };
+        burden0: home0 / gr.income, burden: home / gr.income, fuel0: sp.motorFuel, fuel: fuel,
+        tburden0: sp.motorFuel / gr.income, tburden: fuel / gr.income, bill: bill, d: { el: dEl, gas: dGas, prop: dProp, gal: dGal, dh: dh } };
     });
     function agg(sel, key) { var h = 0, i = 0; sel.forEach(function (x) { h += x.households * x[key]; i += x.households * x.income; }); return h / i; }
     return { rows: rows, low: { burden0: agg(rows.slice(0, 3), "home0"), burden: agg(rows.slice(0, 3), "home") }, other: { burden0: agg(rows.slice(3), "home0"), burden: agg(rows.slice(3), "home") },
@@ -658,9 +660,10 @@
 
   // ---------------------------------------------------------------- the no-JS blocks
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function tableHTML(head, rows, cls) {
+  // a plain table for a no-JS block; colCls: each column's class after the first (default "n", a number)
+  function tableHTML(head, rows, cls, colCls) {
     return '<div class="lx-scroll-x"><table class="lx-facts' + (cls ? " " + cls : "") + '"><thead><tr>' + head.map(function (h) { return '<th scope="col">' + esc(h) + "</th>"; }).join("") +
-      "</tr></thead><tbody>" + rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? '<td class="n">' + esc(c) + "</td>" : "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+      "</tr></thead><tbody>" + rows.map(function (r) { return "<tr>" + r.map(function (c, i) { return i ? '<td class="' + ((colCls && colCls[i]) || "n") + '">' + esc(c) + "</td>" : "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
   }
   function fallback(P, key) {
     var pre = P.cfg.precomputed && P.cfg.precomputed[key];
@@ -680,7 +683,7 @@
       ["Battery, 4 hours", money(cfg.battery.capex) + " per kW, " + cfg.battery.life + " years", "NREL 2025 update (2024 dollars, converted)"],
       ["Retrofit, district heat, store, upgrades", "ranges you set", "set for teaching (illustrative)"],
       ["Yearly payments", pct(P.rate) + " real, over each item's life", "lesson 13's rate (NLR ATB 2025)"]];
-    return tableHTML(["Input", "Value", "Source"], rows, "e3-inputs");
+    return tableHTML(["Input", "Value", "Source"], rows, "e3-inputs", [null, "n", "s"]);
   }
 
   var E3 = { prepare: prepare, sb3Schema: sb3Schema, c3Schema: c3Schema, presets: presets, c3presets: c3presets, defaults: defaults, withPreset: withPreset,
@@ -749,7 +752,8 @@
   // the readouts beside the bench: [label, value, tone]
   function readouts(R) {
     var up = sum(R.dist.map(function (d) { return d.upg; })), worst = R.dist.slice().sort(function (a, b) { return b.peak / b.limit - a.peak / a.limit; })[0];
-    return [["Yearly cost against 2025", millions(R.sys.c3 ? R.delta.cityCost : R.delta.cost), ""],
+    var dCars = R.acc.money.cars - (R.base ? R.base.acc.money.cars : R.acc.money.cars);
+    return [R.sys.c3 ? ["Yearly cost against 2025, the whole city", millions(R.delta.cityCost), ""] : ["Buildings and grid, a year, against 2025", (R.delta.cost - dCars > 0 ? "+" : "") + millions(R.delta.cost - dCars), ""],
       ["CO₂ against 2025", (R.delta[R.sys.c3 ? "city" : "co2"] > 0 ? "+" : "−") + kilo(Math.abs(R.delta[R.sys.c3 ? "city" : "co2"])) + " t", R.delta[R.sys.c3 ? "city" : "co2"] > 0 ? "bad" : "good"],
       ["Busiest substation", worst.label + " " + kilo(worst.peak) + " of " + kilo(worst.limit) + " MW", worst.peak > worst.limit + 0.5 ? "warn" : ""],
       ["Upgrades bought", kilo(up) + " MW", up > 0.5 ? "warn" : "good"]];

@@ -74,7 +74,7 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
   ok(near(A0c.city.co2 + roofCO2, city.inventory2025.total, 100), "city CO2 + rooftop solar at the grid rate = the 2025 inventory (" + Math.round(A0c.city.co2) + " + " + Math.round(roofCO2) + " vs " + city.inventory2025.total + ")");
   ok(near(roofCO2, 12700, 50), "the stated gap is about 12,700 t (" + Math.round(roofCO2) + ")");
   const g0 = R0.hh;
-  g0.rows.forEach((x, j) => ok(near(x.home0, city.groups[j].homeEnergy, 0.01) && near(x.home, x.home0, 2) && near(x.burden, city.groups[j].burden, 1e-4), "households " + x.key + ": 2025 bills and burden as prairie-city.json (" + Math.round(x.home) + ")"));
+  g0.rows.forEach((x, j) => ok(near(x.home0, city.groups[j].homeEnergy, 0.01) && near(x.home, x.home0, 1e-6) && near(x.fuel, x.fuel0, 1e-6) && near(x.burden, city.groups[j].burden, 1e-4), "households " + x.key + ": 2025 bills and burden as prairie-city.json (" + Math.round(x.home) + ")"));
   ok(near(g0.low.burden0, city.groupsNote.lowIncomeBurden, 1e-4) && near(g0.other.burden0, city.groupsNote.otherBurden, 1e-4), "0-80% and other groups' burden as prairie-city.json");
 
   // ---------------- the model as built, every preset
@@ -163,7 +163,7 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     // the measures' changes add up to the engine's: electricity, gas and propane of the homes, summed over the groups
     const { S, raw } = runs["sb3 electrify"], A = E3.account(P, S, raw), h = E3.households(P, S, A, R0.acc);
     const G = city.groups, mm = city.units.mwhPerMMBtu;
-    const dGas = h.rows.reduce((s, x, j) => s + x.households * (x.bill.gas / P.price.gasRes - G[j].use.gasMMBtu * mm), 0);
+    const dGas = h.rows.reduce((s, x) => s + x.households * x.d.gas, 0);
     let eng = 0; P.D.forEach((D, i) => { eng += D.rho * ((A.d[i].gas - D.otherGas) - (R0.acc.d[i].gas - D.otherGas)); });
     ok(near(dGas, eng, Math.abs(eng) * 1e-6 + 1), "electrify: the groups' gas change adds up to the homes' change in the engine (" + Math.round(dGas) + " vs " + Math.round(eng) + " MWh)");
     const n = E3.spread([100, 100, 100], 0.5, 60, "low");
