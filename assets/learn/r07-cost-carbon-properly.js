@@ -90,8 +90,8 @@
   // ---- the no-JS blocks (written by the test's --write mode)
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function rich(s) { return esc(s).replace(/\[\[([a-z0-9-]+)\|([^\]]+)\]\]/g, function (m, id, w) { return '<span class="lx-term" data-term=' + '"' + id + '">' + w + "</span>"; }); }
-  function ledgerRows(D, gid) {
-    var S0 = run(D, all(false), gid), A = run(D, all(true), gid);
+  function ledgerRows(D, gid, Fx) {   // [line, study, audited (or the fixes Fx), note]
+    var S0 = run(D, all(false), gid), A = run(D, Fx ? Fx : all(true), gid);
     return [
       ["Electric: buses and chargers, net of the credit", S0.e.capital, A.e.capital, "up front " + money(S0.e.upfront)],
       ["Electric: electricity", S0.e.energy, A.e.energy, null],
@@ -248,7 +248,14 @@
         } },
       { text: "Flaw 4, a credit counted twice: the state's " + money(D.inputs.buses * D.inputs.credit.perBus) + " credit appears in two lines. Which line should go?",
         build: function (act, api) {
-          choice(act, D.creditLines, function () { fix("credit", true); api.saw(lineCredit(D)); api.done(); });
+          var led = H("div", null, act);
+          function drawLed() {
+            led.innerHTML = "";
+            LX.Ledger(led, { cls: "r07-led", caption: "The electric fleet's lines, thousands of 2025 dollars a year (rounded).", columns: ["Line", "Study", "Now"],
+              rows: ledgerRows(D, S.grid).slice(0, 7).map(function (r, i) { var now = ledgerRows(D, S.grid, S.fx)[i]; return { head: r[0], sub: r[3] || null, total: i === 6, cells: [thou(r[1]), thou(now[2])].map(function (c) { return i === 0 || i === 5 ? { text: c, cls: "r07-pick" } : c; }) }; }) });
+          }
+          drawLed();
+          choice(act, D.creditLines, function () { fix("credit", true); drawLed(); api.saw(lineCredit(D)); api.done(); });
           H("p", { class: "lx-hint", html: LX.rich("For the agency and the state together the credit is a [[transfer-payment|transfer]], not a saving: see the ledger under Exemplars.") + " " + ref("A12") + " shows why." }, act);
           if (S.fx.credit) api.done();
         } },
@@ -279,7 +286,7 @@
           Object.keys(gb).forEach(function (k) { gb[k].setAttribute("aria-pressed", String(k === S.grid)); });
           draw();
           var A = run(D, all(true)), msg = predicted === "more" ? "You predicted it: " : "You predicted otherwise: ";
-          H("p", { class: "lx-hint", text: (predicted ? msg : "") + "audited, " + verdict(A).charAt(0).toLowerCase() + verdict(A).slice(1) }, act);
+          H("p", { class: "lx-hint", text: predicted ? msg + "audited, " + verdict(A).charAt(0).toLowerCase() + verdict(A).slice(1) : "Audited: " + verdict(A) }, act);
           H("p", { class: "lx-hint", html: "The same audit inside an optimization model, where the plan itself responds: " + ref("M11") + "." }, act);
         } },
       { text: "Write your audit note: each flaw, its fix and its effect, then the corrected conclusion with its condition. The checks see only whether each part is there; compare with the strong note under Exemplars.",
@@ -313,7 +320,8 @@
       }
       var h = xhost._who; h.innerHTML = "";
       var hd = H("header", { class: "lx-x-head" }, h); H("h3", { text: "Who pays, who gains: the audited plan" }, hd);
-      LX.Ledger(h, { cls: "r07-who", caption: "A year, against new diesel buses; 2025 dollars, rounded.", columns: ["Who", "Cost or change", "Per tonne of CO₂ avoided"], rows: whoRows(D) });
+      LX.Ledger(h, { cls: "r07-who", caption: "A year, against new diesel buses; 2025 dollars, rounded.", columns: ["Who", "Cost or change", "Per tonne of CO₂ avoided"],
+        rows: whoRows(D).map(function (r) { return { head: r.head, sub: r.sub, cells: r.cells.map(function (c) { return { text: c, cls: "who" }; }) }; }) });
     }
     var rhost = document.getElementById("r07-rubric");
     if (rhost) {

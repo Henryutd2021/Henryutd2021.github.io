@@ -65,22 +65,22 @@
     {
       "id": "boundary",
       "label": "One boundary",
-      "short": "Charging's CO₂ counted"
+      "short": "charging's CO₂ counted"
     },
     {
       "id": "baseline",
       "label": "A fair baseline",
-      "short": "New diesel buses as the counterfactual"
+      "short": "new diesel buses as the counterfactual"
     },
     {
       "id": "grid",
       "label": "Grid costs",
-      "short": "Depot connection and demand charges added"
+      "short": "depot connection and demand charges added"
     },
     {
       "id": "credit",
       "label": "The credit once",
-      "short": "The second count of the credit removed"
+      "short": "the second count of the credit removed"
     }
   ],
   "boundaryItems": [
@@ -226,28 +226,33 @@
         "label": "Strong note",
         "level": "Proficient",
         "parts": [
+          "Boundary: ",
           {
-            "text": "Boundary: charging is in the cost but its CO₂ is not; counted at EIA's 2023 U.S. average, the electric fleet emits {eCO2} a year.",
+            "text": "charging is in the cost but its CO₂ is not; counted at EIA's 2023 U.S. average, the electric fleet emits {eCO2} a year.",
             "note": "Names the mismatch, the fix and the factor's source."
           },
           "\n",
+          "Baseline: ",
           {
-            "text": "Baseline: without the project the agency buys new diesel buses ({newMpg} mpg), not the 2009 fleet ({oldMpg} mpg).",
+            "text": "without the project the agency buys new diesel buses ({newMpg} mpg), not the 2009 fleet ({oldMpg} mpg).",
             "note": "The counterfactual, stated from the agency's own plan."
           },
           "\n",
+          "Grid: ",
           {
-            "text": "Grid: add the depot connection ({depot} up front) and demand charges ({demand} a year).",
+            "text": "add the depot connection ({depot} up front) and demand charges ({demand} a year).",
             "note": "Up front and annual kept apart."
           },
           "\n",
+          "Credit: ",
           {
-            "text": "Credit: counted once, in the capital line; the second {creditYear} a year removed.",
+            "text": "counted once, in the capital line; the second {creditYear} a year removed.",
             "note": "Says which count stays and why."
           },
           "\n",
+          "Conclusion: ",
           {
-            "text": "Conclusion: for the agency, electric costs {extra} a year more and cuts {cut} of CO₂ ({cutPctA}), about {perTonne} per tonne, if the grid is at the 2023 U.S. average.",
+            "text": "for the agency, electric costs {extra} a year more and cuts {cut} of CO₂ ({cutPctA}), about {perTonne} per tonne, if the grid is at the 2023 U.S. average.",
             "note": "Cost and CO₂ on one boundary, whose cost, and the condition that moves it most."
           }
         ]

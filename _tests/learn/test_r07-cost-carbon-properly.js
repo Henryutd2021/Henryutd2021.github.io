@@ -167,12 +167,14 @@ ok(D.rubric.competences.map(c => c.id).join() === "accounting,realism" && D.chec
     ok(live.textContent.includes("Electric saves $1.15 million a year and cuts CO₂ by 4,192 t (100%)."), "the scene opens on the study's own conclusion");
     demo.cards.go(0); btn(/^cost more/).click(); grab();
     demo.cards.go(1); for (const it of D.boundaryItems) { btn(new RegExp("^" + it.label)).click(); grab(); }
-    ok(S.fx.boundary && live.textContent.includes("1,160 t") === false || S.fx.boundary, "step 2: the right item fixes the boundary");
+    ok(S.fx.boundary && live.textContent.includes("3,033 t (72%)"), "step 2: the right item fixes the boundary; the scene shows 3,033 t (72%)");
     demo.cards.go(2); for (const it of D.counterfactuals) { btn(new RegExp("^" + it.label.slice(0, 20))).click(); grab(); }
     ok(S.fx.baseline, "step 3: the counterfactual fixes the baseline");
     demo.cards.go(3); const tg = card().querySelectorAll(".lx-toggle"); tg[0].click(); ok(!S.fx.grid, "step 4: one grid cost alone is not the fix"); tg[1].click(); grab();
     ok(S.fx.grid, "step 4: both grid costs fix it");
-    demo.cards.go(4); for (const it of D.creditLines) { btn(new RegExp("^" + it.label.slice(0, 20))).click(); grab(); }
+    demo.cards.go(4);
+    ok(card().textContent.includes("−500") && card().textContent.includes(M.thou(S0.e.capital)), "step 5: the ledger shows the credit in the capital line and again as income (−500 thousand a year)");
+    for (const it of D.creditLines) { btn(new RegExp("^" + it.label.slice(0, 20))).click(); grab(); }
     ok(S.fx.credit && live.textContent.includes("Electric costs $0.65 million a year more and cuts 2,101 t of CO₂ (64%): about $309 per tonne."), "step 5: all four fixed; the scene's conclusion is the audit's");
     demo.cards.go(5); grab();
     for (const g of D.co2.gridChoices) { btn(new RegExp(g.v != null ? "^" + g.v.toFixed(2) : "^0\\.366")).click(); grab(); }
