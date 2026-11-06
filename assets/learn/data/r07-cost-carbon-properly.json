@@ -1,0 +1,431 @@
+{
+  "meta": {
+    "about": "Data of Learn research studio R7 (r07-cost-carbon-properly), Cost and carbon done properly (wave W5, builder learn-w5-c, 2026-11-06). The study, its authors, its consultancy, its city and its transit agency are fictional, and every fleet, price and cost input is illustrative, in 2025 dollars. Two numbers are real and dated: diesel's CO2 per gallon (EIA) and the U.S. grid's average CO2 per kWh in 2023 (EIA). The lesson's script recomputes every number the page shows from these inputs, and its test checks each one.",
+    "dollarYear": 2025
+  },
+  "study": {
+    "title": "Electric buses for Port Alder: cheaper and carbon-free",
+    "authors": "R. Okonjo and L. Varga, Harbourline Consulting (fictional), report to Port Alder Transit (fictional), 2026",
+    "headline": "Replacing Port Alder Transit's 40 oldest diesel buses with battery-electric buses saves {saving} a year and cuts the fleet's CO₂ by {cutPct}.",
+    "method": "Annual costs over a 12-year bus life at a 3% real discount rate; CO₂ from the buses' tailpipes."
+  },
+  "inputs": {
+    "buses": 40,
+    "milesPerBus": 36000,
+    "life": 12,
+    "rate": 0.03,
+    "electric": {
+      "price": 1000000,
+      "charger": 60000,
+      "kWhPerMile": 2.2,
+      "energyPrice": 0.09,
+      "maintPerMile": 0.6
+    },
+    "diesel": {
+      "price": 560000,
+      "fuelPrice": 3.6,
+      "newMpg": 4.5,
+      "newMaintPerMile": 0.85,
+      "oldMpg": 3.5,
+      "oldMaintPerMile": 1.2,
+      "oldYear": 2009
+    },
+    "grid": {
+      "depotUpgrade": 1800000,
+      "peakKW": 1600,
+      "demandCharge": 15
+    },
+    "credit": {
+      "perBus": 150000,
+      "name": "the state's clean-bus credit (fictional)"
+    }
+  },
+  "co2": {
+    "dieselKgPerGal": 10.19,
+    "gridTonnes2023": 1530000000.0,
+    "gridKWh2023": 4180000000000.0,
+    "gridChoices": [
+      {
+        "id": "clean",
+        "v": 0.1,
+        "label": "0.10, a mostly clean grid"
+      },
+      {
+        "id": "us",
+        "label": "U.S. average, 2023"
+      },
+      {
+        "id": "dirty",
+        "v": 0.7,
+        "label": "0.70, a coal-heavy grid"
+      }
+    ]
+  },
+  "fixes": [
+    {
+      "id": "boundary",
+      "label": "One boundary",
+      "short": "Charging's CO₂ counted"
+    },
+    {
+      "id": "baseline",
+      "label": "A fair baseline",
+      "short": "New diesel buses as the counterfactual"
+    },
+    {
+      "id": "grid",
+      "label": "Grid costs",
+      "short": "Depot connection and demand charges added"
+    },
+    {
+      "id": "credit",
+      "label": "The credit once",
+      "short": "The second count of the credit removed"
+    }
+  ],
+  "boundaryItems": [
+    {
+      "id": "buy",
+      "label": "Bus purchases",
+      "cost": true,
+      "co2": false,
+      "fb": "in the cost only, for both fleets; making the buses is outside both CO₂ counts, a limit that a life-cycle study would add (A11)."
+    },
+    {
+      "id": "elec",
+      "label": "Electricity for charging",
+      "cost": true,
+      "co2": false,
+      "right": true,
+      "fb": "the study pays for charging but counts none of its CO₂. On one boundary each fleet's energy counts where it is burned, at the tailpipe or the power plant."
+    },
+    {
+      "id": "fuel",
+      "label": "Diesel fuel",
+      "cost": true,
+      "co2": true,
+      "fb": "it is inside both: its price in the cost, its CO₂ at the tailpipe."
+    },
+    {
+      "id": "repair",
+      "label": "Repairs",
+      "cost": true,
+      "co2": false,
+      "fb": "in the cost only, for both fleets alike; their CO₂ is small and outside both counts."
+    }
+  ],
+  "counterfactuals": [
+    {
+      "id": "keep",
+      "label": "Keep the 2009 buses running 12 more years",
+      "fb": "the agency's replacement plan retires them in 2026, and the study already prices new buses, then runs them like the old ones."
+    },
+    {
+      "id": "new",
+      "label": "Buy 40 new diesel buses, as the replacement plan says",
+      "right": true,
+      "fb": "that is what would happen without the project. New buses burn less fuel and need fewer repairs."
+    },
+    {
+      "id": "hybrid",
+      "label": "Buy 40 diesel-electric hybrids",
+      "fb": "a real option worth comparing, but not what happens without the project: the plan names diesel buses."
+    }
+  ],
+  "creditLines": [
+    {
+      "id": "capital",
+      "label": "In the capital line: buses net of the credit",
+      "fb": "that count is the right one: it takes the credit off the price when it is paid, up front. Remove the other."
+    },
+    {
+      "id": "benefit",
+      "label": "In the benefits: the credit again, as {creditYear} a year",
+      "right": true,
+      "fb": "the same {credit}, counted a second time as yearly income. Count it once."
+    },
+    {
+      "id": "both",
+      "label": "Neither: the agency gains it, and so does the state",
+      "fb": "the state pays it, so for the two together it moves money and saves nothing. Count it once, in the agency's ledger."
+    }
+  ],
+  "writeChecks": [
+    {
+      "id": "boundary",
+      "label": "The boundary",
+      "re": "boundar|electricity|charging|power plant"
+    },
+    {
+      "id": "baseline",
+      "label": "The baseline or counterfactual",
+      "re": "baseline|counterfactual|without the project|new diesel"
+    },
+    {
+      "id": "grid",
+      "label": "The grid costs",
+      "re": "demand charge|depot|connection|grid cost"
+    },
+    {
+      "id": "credit",
+      "label": "The credit",
+      "re": "credit"
+    },
+    {
+      "id": "money",
+      "label": "A cost figure in dollars",
+      "re": "\\$ ?[0-9]"
+    },
+    {
+      "id": "co2",
+      "label": "A CO₂ figure",
+      "re": "[0-9][0-9,.]* ?(t|tonnes|%)"
+    },
+    {
+      "id": "cond",
+      "label": "A condition on the result",
+      "re": "\\b(if|assuming|at a|at the|when|unless|depends)\\b"
+    }
+  ],
+  "exemplars": {
+    "id": "r07-ex",
+    "lines": true,
+    "title": "Two audit notes on the same study",
+    "task": "Audit the Port Alder study and say what its conclusion becomes.",
+    "note": "Both notes are illustrative, on the course's fictional study.",
+    "answers": [
+      {
+        "key": "weak",
+        "label": "Weak note",
+        "level": "Developing",
+        "parts": [
+          "Audit: ",
+          {
+            "text": "the study looks optimistic",
+            "note": "No flaw is named, so no one can check or fix it."
+          },
+          ". ",
+          {
+            "text": "Electric buses still have no emissions",
+            "note": "True at the tailpipe only; the power plants that charge them emit."
+          },
+          ", but ",
+          {
+            "text": "costs are probably higher",
+            "note": "No number, no baseline, no 'whose cost'."
+          },
+          ". ",
+          {
+            "text": "More research is needed.",
+            "note": "It says nothing a reader could act on."
+          }
+        ]
+      },
+      {
+        "key": "good",
+        "label": "Strong note",
+        "level": "Proficient",
+        "parts": [
+          {
+            "text": "Boundary: charging is in the cost but its CO₂ is not; counted at EIA's 2023 U.S. average, the electric fleet emits {eCO2} a year.",
+            "note": "Names the mismatch, the fix and the factor's source."
+          },
+          "\n",
+          {
+            "text": "Baseline: without the project the agency buys new diesel buses ({newMpg} mpg), not the 2009 fleet ({oldMpg} mpg).",
+            "note": "The counterfactual, stated from the agency's own plan."
+          },
+          "\n",
+          {
+            "text": "Grid: add the depot connection ({depot} up front) and demand charges ({demand} a year).",
+            "note": "Up front and annual kept apart."
+          },
+          "\n",
+          {
+            "text": "Credit: counted once, in the capital line; the second {creditYear} a year removed.",
+            "note": "Says which count stays and why."
+          },
+          "\n",
+          {
+            "text": "Conclusion: for the agency, electric costs {extra} a year more and cuts {cut} of CO₂ ({cutPctA}), about {perTonne} per tonne, if the grid is at the 2023 U.S. average.",
+            "note": "Cost and CO₂ on one boundary, whose cost, and the condition that moves it most."
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "label": "Flaws",
+        "weak": "None named",
+        "good": "Four, each with its fix"
+      },
+      {
+        "label": "Numbers",
+        "weak": "None",
+        "good": "Cost, CO₂ and cost per tonne"
+      },
+      {
+        "label": "Whose cost",
+        "weak": "Unsaid",
+        "good": "The agency's, with the credit once"
+      },
+      {
+        "label": "Conditions",
+        "weak": "None",
+        "good": "The grid's CO₂ factor"
+      }
+    ]
+  },
+  "ladder": {
+    "title": "How far up the ladder is each number?",
+    "lede": "A saving is only as sure as its inputs. Place each statement about Port Alder's buses on the evidence ladder.",
+    "rungs": [
+      {
+        "id": "announced",
+        "label": "Announced",
+        "text": "Someone says it will happen."
+      },
+      {
+        "id": "funded",
+        "label": "Funded",
+        "text": "The money is committed."
+      },
+      {
+        "id": "permitted",
+        "label": "Permitted",
+        "text": "Regulators have approved it."
+      },
+      {
+        "id": "construction",
+        "label": "Under construction",
+        "text": "Work has started on site."
+      },
+      {
+        "id": "operating",
+        "label": "Operating",
+        "text": "It runs and is counted as in service."
+      },
+      {
+        "id": "design",
+        "label": "At design output",
+        "text": "It delivers what it was built to deliver."
+      }
+    ],
+    "off": {
+      "id": "projection",
+      "label": "Not on the ladder: a projection"
+    },
+    "items": [
+      {
+        "id": "e1",
+        "text": "The transit board voted the money for 40 electric buses.",
+        "answer": [
+          "funded"
+        ],
+        "note": "Funded: money committed, nothing built yet."
+      },
+      {
+        "id": "e2",
+        "text": "The utility approved the depot's new service connection.",
+        "answer": [
+          "permitted"
+        ],
+        "note": "Permitted: approved, not yet built; its cost estimate is still an estimate."
+      },
+      {
+        "id": "e3",
+        "text": "Ten electric buses have carried passengers since March.",
+        "answer": [
+          "operating"
+        ],
+        "note": "Operating: in service, but a few months do not show a year's energy use."
+      },
+      {
+        "id": "e4",
+        "text": "Over a full year the ten buses used their expected energy per mile, winter included.",
+        "answer": [
+          "design"
+        ],
+        "note": "At design output: the 2.2 kWh per mile now rests on measured service, not a brochure."
+      },
+      {
+        "id": "e5",
+        "text": "The study's corrected cost per tonne of CO₂ avoided.",
+        "answer": [
+          "projection"
+        ],
+        "note": "A projection: a model's output from inputs on several rungs, not a stage of anything built."
+      }
+    ]
+  },
+  "rubric": {
+    "id": "r07-rubric",
+    "code": "R7",
+    "title": "Rate your audit note against the rubric",
+    "lede": "The course rubric's own words, for the two competences R7 builds.",
+    "competences": [
+      {
+        "id": "accounting",
+        "look": "cost and CO₂ on one boundary, the emissions question named (what changes against a stated counterfactual), and whose cost each number is."
+      },
+      {
+        "id": "realism",
+        "look": "each key input with its evidence status, and a list of what the audit leaves out."
+      }
+    ]
+  },
+  "checklist": [
+    {
+      "id": "unit",
+      "label": "Same service",
+      "text": "Both options deliver the same service: the same routes and miles, the same years."
+    },
+    {
+      "id": "boundary",
+      "label": "One boundary",
+      "text": "Everything inside the cost boundary is inside the CO₂ boundary, and the reverse; what is left out is said."
+    },
+    {
+      "id": "counter",
+      "label": "A stated counterfactual",
+      "text": "One sentence says what happens without the project, from a plan or a rule, not a convenient past."
+    },
+    {
+      "id": "question",
+      "label": "The emissions question",
+      "text": "Average or marginal factor, and why: whose share, or what changes."
+    },
+    {
+      "id": "grid",
+      "label": "Grid and connection costs",
+      "text": "Upgrades, demand charges and connection fees are priced, with who pays them."
+    },
+    {
+      "id": "once",
+      "label": "Credits once",
+      "text": "Each grant or credit appears in one line, and is a transfer for the state and the agency together."
+    },
+    {
+      "id": "time",
+      "label": "Up front and annual apart",
+      "text": "One-time amounts and their annual equivalents are labelled, with the rate and the life."
+    },
+    {
+      "id": "range",
+      "label": "The condition that moves it",
+      "text": "The input that changes the conclusion most is named, with the result at its other values."
+    }
+  ],
+  "sources": {
+    "diesel": {
+      "label": "EIA, Carbon Dioxide Emissions Coefficients",
+      "url": "https://www.eia.gov/environment/emissions/co2_vol_mass.php",
+      "asOf": "18 September 2024"
+    },
+    "grid": {
+      "label": "EIA, Frequently Asked Questions: How much carbon dioxide is produced per kilowatthour of U.S. electricity generation?",
+      "url": "https://www.eia.gov/tools/faqs/faq.php?id=74&t=11",
+      "asOf": "data for 2023; page updated 11 December 2024"
+    }
+  }
+}

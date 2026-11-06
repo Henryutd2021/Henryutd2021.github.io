@@ -1665,9 +1665,13 @@
    "tier": "researcher",
    "code": "R7",
    "title": "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "r07-cost-carbon-properly.html",
+   "scales": [],
+   "id": "r07-cost-carbon-properly",
+   "minutes": 35,
+   "form": "studio",
+   "short": "Cost and carbon, properly"
   },
   {
    "tier": "researcher",

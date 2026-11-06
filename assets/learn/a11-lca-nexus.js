@@ -200,7 +200,7 @@
     var chain = H("div", { class: "a11-chain" }, wrap);
     var bnd = H("div", { class: "a11-bnd" }, chain);   // drawn above the tiles, clicks pass through it; its two handles are sliders
     var tiles = STAGES.map(function (sid, i) {
-      var b = H("button", { type: "button", class: "a11-tile", style: "--c:" + SCOL[sid] + ";grid-column:" + (i + 1) }, chain);
+      var b = H("button", { type: "button", class: "a11-tile", style: "--c:" + SCOL[sid] + ";--i:" + (i + 1) }, chain);
       b.addEventListener("click", function () { tap(i); });
       return b;
     });
@@ -215,8 +215,9 @@
       });
       h.addEventListener("pointerdown", function (e) {
         e.preventDefault(); if (h.setPointerCapture) h.setPointerCapture(e.pointerId); h.focus();
-        function mv(ev) {
-          var r = chain.getBoundingClientRect(), idx = Math.max(0, Math.min(3, Math.floor((ev.clientX - r.left) / (r.width / 4))));
+        function mv(ev) {   // the chain runs across from 561 px, down on phones (the page's CSS)
+          var r = chain.getBoundingClientRect(), down = window.matchMedia && window.matchMedia("(max-width: 560px)").matches;
+          var idx = Math.max(0, Math.min(3, Math.floor(down ? (ev.clientY - r.top) / (r.height / 4) : (ev.clientX - r.left) / (r.width / 4))));
           var nL = side === "l" ? Math.min(idx, S.R) : S.L, nR = side === "r" ? Math.max(idx, S.L) : S.R;
           if (nL !== S.L || nR !== S.R) { S.L = nL; S.R = nR; change(h); }
         }
@@ -247,7 +248,7 @@
       Object.keys(objB).forEach(function (k) { objB[k].setAttribute("aria-pressed", String(k === S.obj)); });
       Object.keys(metB).forEach(function (k) { metB[k].setAttribute("aria-pressed", String(k === S.meter)); });
       head.innerHTML = ""; H("b", { text: ob.name }, head); H("span", { text: " · " + ob.kind + " · footprints " + ob.per }, head);
-      bnd.style.gridColumn = (S.L + 1) + " / " + (S.R + 2);
+      chain.style.setProperty("--span", (S.L + 1) + " / " + (S.R + 2));
       STAGES.forEach(function (sid, i) {
         var s = stage(D, S.obj, S.meter, sid, o), t = tiles[i], inB = i >= S.L && i <= S.R, st = D.stages[i];
         t.innerHTML = ""; t.classList.toggle("out", !inB); t.classList.toggle("nc", s.kind === "nc");
@@ -293,7 +294,7 @@
     var stageEl = H("div", { class: "lx-stage a11-stage" }, live);
     H("p", { class: "a11-how lx-hint", text: "Drag the dashed boundary's edges, tap a stage to bring it in or move it out, or pick a preset." }, stageEl);
     var box = LifeBox(stageEl, D, S, function () { if (watch) watch(); buildExplain(); });
-    function set(o) { Object.keys(o).forEach(function (k) { S[k] = o[k]; }); box.paint(); buildExplain(); }
+    function set(o) { Object.keys(o).forEach(function (k) { S[k] = o[k]; }); box.paint(); buildExplain(); if (watch) watch(); }
 
     var steps = [
       { text: "Is a solar farm clean? Inside a [[system-boundary|boundary]] around its panels at work nothing burns, so carbon is 0 g per kWh; drag the edges out, from the factory to the scrapyard.",

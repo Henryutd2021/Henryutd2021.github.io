@@ -62,9 +62,9 @@
     },
     "dc": {
       "name": "Data center",
-      "kind": "A data center, as a load",
+      "kind": "A facility and a load",
       "per": "per MWh it uses",
-      "stageNames": { "build": "Servers and building made", "supply": "Its electricity, made elsewhere", "run": "On site: cooling", "end": "Taken down" },
+      "stageNames": { "build": "Servers and building made", "supply": "Its electricity, made elsewhere", "run": "Its own cooling", "end": "Taken down" },
       "carbon": {
         "build": { "nc": "servers and buildings: not in LBNL's report" },
         "supply": { "dc": "ghg", "src": "lbnlDC", "note": "at the power plants that supply U.S. data centers, 2023 (combustion, from EPA plant data; not their life cycles)" },
