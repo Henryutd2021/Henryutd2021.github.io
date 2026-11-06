@@ -388,8 +388,9 @@
       const items = visits.map(function (e) {
         const parent = e.pa ? D.entries.find(function (x) { return x.id === e.pa; }) : null;
         const st = stamps(e);
+        const hk = e.hk && e.hk[0] === pid ? '<span class="jr-peakchip jr-hikechip"><i class="bi bi-person-walking" aria-hidden="true"></i>Hike, ' + esc(e.hk[1]) + "</span>" : "";
         return '<li style="--ch: var(--ch-' + e.ch + ')"><span class="jr-c-when">' + esc(parent ? parent.w : e.w) + "</span>" +
-          icons(modesOf(e)) + esc(e.t) + transitTag(e, pid) + (st ? '<span class="jr-c-stamps">' + st + "</span>" : "") + "</li>";
+          icons(modesOf(e)) + esc(e.t) + transitTag(e, pid) + (st || hk ? '<span class="jr-c-stamps">' + st + hk + "</span>" : "") + "</li>";
       }).join("");
       return '<p class="jr-c-kind">' + (p.h ? "A place I lived" : "Place") + "</p>" +
         '<h3 id="jr-card-h">' + esc(p.n) + "</h3>" + (p.w ? '<p class="jr-c-where">' + esc(p.w) + "</p>" : "") +

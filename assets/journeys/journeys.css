@@ -187,7 +187,9 @@ body.quarto-dark .jr-play { color: #0b1220; }
 .jr-chart-base { stroke: var(--line-strong); stroke-width: 1; }
 
 /* ---------- summits: medals ---------- */
-.jr-summit-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1rem; }
+.jr-summit-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.jr-hike .jr-medal { border-radius: 18px; font-size: 1.7rem; color: var(--ch); }   /* hiking badges: a rounded square, a walker */
+.jr-hike .jr-hk-d { font-size: 1.15rem; }
 .jr-summit { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .15rem; padding: 1rem .6rem .95rem; border-radius: var(--r-lg);
   background: linear-gradient(180deg, color-mix(in srgb, var(--ch) 10%, var(--surface)), var(--surface) 70%); border: 1px solid var(--line); }
 .jr-medal { display: grid; place-items: center; width: 64px; height: 64px; margin-bottom: .45rem; border-radius: 50%;
@@ -259,7 +261,7 @@ body.quarto-dark .jr-play { color: #0b1220; }
   .jr-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 1rem; }
   .jr-stats li:nth-child(4) { border-left: 0; padding-left: 0; }
   .jr-records-row { grid-template-columns: minmax(0, 1fr); }
-  .jr-summit-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .jr-summit-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .jr-tiles-pair { grid-template-columns: minmax(0, 1fr); }
   .jr-tiles-cn { max-width: 520px; }
 }
