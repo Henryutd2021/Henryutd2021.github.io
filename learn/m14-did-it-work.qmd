@@ -62,7 +62,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>TOU homes after against before: −0.36 kW, because flat homes also changed by −0.06 kW (a cooler second summer).</li>
 <li>Difference-in-differences: −0.30 kW (about 95% interval −0.33 to −0.27 kW), against the truth −0.29 kW. Before month 13 the monthly gaps stay within 0.04 kW of zero.</li>
 <li>Threats move it: already cutting −0.44 kW, early cuts −0.26 kW, neighbours copy −0.22 kW, a thermostat offer −0.42 kW.</li>
-<li>If every home were put on the tariff by default, the average cut would be −0.20 kW, not −0.29 kW: those who opt in respond more.</li>
+<li>If every home were put on the tariff by default, the average effect would be −0.20 kW, not −0.29 kW: those who opt in respond more.</li>
 <li>Simulated regions: 14 of 30 adopt a policy in 2021. DiD: 10.0 MW a year of new solar per adopting region (truth +10.0). If the policy followed a boom: 22.5 MW a year; if projects moved across the border: 14.0 MW a year.</li></ol>
 <div class="lx-scroll-x"><table class="lx-facts m14-fbtab">
 <thead><tr><th scope="col">Estimate of the tariff's effect</th><th scope="col">kW</th></tr></thead>

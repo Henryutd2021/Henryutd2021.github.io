@@ -143,6 +143,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 </tbody></table></div>
 <ul class="cka-list"><li><b>Gross against net:</b> of the school's $31,965 gross bill saving a year, $19,615 is a real cost the utility avoids; $12,351 is a <span class="lx-term" data-term="transfer">transfer</span> from its other customers.</li>
 <li><b>Adds up:</b> school −$776,324 + other customers −$192,941 = resource view −$969,265.</li>
+<li><b>Screening estimates:</b> the cost shift assumes the utility resets its rates so other customers make up what it does not save, with the avoided costs in the log; a model of the school's bill does not produce this by itself, the accounting of who pays does.</li>
 <li><b>Not in money:</b> about 118 t of CO₂ a year at Kansas's 2024 average factor (an inventory number, not the change caused); no resilience (no islanding equipment costed); installation is job-years, not permanent jobs, and is not estimated.</li></ul></div>
 <div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cka-sens">
 <thead><tr><th scope="col">Input</th><th scope="col">Low to high</th><th scope="col">NPV at low</th><th scope="col">NPV at high</th></tr></thead><tbody>
@@ -150,8 +151,8 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <tr><th scope="row">Average electricity price</th><td class="n">$0.0894 to $0.134</td><td class="n">−$876,265</td><td class="n">−$676,384</td></tr>
 <tr><th scope="row">Battery's cut in the billed peak</th><td class="n">30% to 90%</td><td class="n">−$860,683</td><td class="n">−$691,965</td></tr>
 <tr><th scope="row">Upkeep, solar and battery (a year)</th><td class="n">$11,229 to $18,715</td><td class="n">−$717,850</td><td class="n">−$834,798</td></tr>
-<tr><th scope="row">Demand charge</th><td class="n">5 to 20</td><td class="n">−$753,317</td><td class="n">−$822,339</td></tr>
-<tr><th scope="row">Solar capacity factor</th><td class="n">16% to 20%</td><td class="n">−$809,986</td><td class="n">−$742,663</td></tr>
+<tr><th scope="row">Demand charge</th><td class="n">$5 to $20</td><td class="n">−$753,317</td><td class="n">−$822,339</td></tr>
+<tr><th scope="row">Solar capacity factor</th><td class="n">16.0% to 19.6%</td><td class="n">−$809,986</td><td class="n">−$742,663</td></tr>
 <tr><th scope="row">Share used at the school</th><td class="n">60% to 90%</td><td class="n">−$807,108</td><td class="n">−$745,540</td></tr>
 <tr><th scope="row">Discount rate</th><td class="n">2% to 7%</td><td class="n">−$754,804</td><td class="n">−$790,985</td></tr>
 </tbody></table></div>
@@ -163,7 +164,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <li><b>Reported apart:</b> the other customers, federal taxpayers and the resource view.</li></ul>
 <details class="lx-textalt"><summary>The worked assumptions log (36 rows)</summary><div class="lx-scroll-x"><table class="lx-mini-table cka-log"><thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Unit</th><th scope="col">Type</th><th scope="col">Source</th></tr></thead><tbody>
 <tr><td>Solar array size</td><td>250</td><td>kW-DC</td><td>Choice</td><td>EIA distributed-generation cost report (2024)</td></tr>
-<tr><td>Solar capacity factor</td><td>18%</td><td>fraction</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
+<tr><td>Solar capacity factor</td><td>17.8%</td><td>fraction</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>Share of solar output used at the school</td><td>75%</td><td>fraction</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>Battery power</td><td>150</td><td>kW</td><td>Choice</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>Battery energy</td><td>300</td><td>kWh</td><td>Choice</td><td>EIA distributed-generation cost report (2024)</td></tr>
@@ -173,13 +174,13 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <tr><td>School electricity use</td><td>1,000,000</td><td>kWh a year</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>School monthly billed peak</td><td>400</td><td>kW</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>Average commercial electricity price, Kansas</td><td>$0.1117</td><td>$/kWh</td><td>Sourced</td><td>EIA Electric Power Monthly, Table 5.6.B</td></tr>
-<tr><td>Demand charge</td><td>10</td><td>$/kW-month</td><td>Illustrative</td><td>this case</td></tr>
+<tr><td>Demand charge</td><td>$10</td><td>$/kW-month</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>Credit for each kWh sent to the grid</td><td>$0.03</td><td>$/kWh</td><td>Illustrative</td><td>this case</td></tr>
-<tr><td>Installed cost, solar + battery, per kW-DC of solar</td><td>3,170</td><td>$/kW-DC (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
-<tr><td>Installed cost, solar alone (check only)</td><td>1,903</td><td>$/kW-DC (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
-<tr><td>Standalone battery cost, for the replacement</td><td>2,492</td><td>$/kW (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
-<tr><td>Solar upkeep</td><td>17.63</td><td>$/kW-DC a year (2023 $)</td><td>Sourced</td><td>NLR ATB 2025, Commercial PV</td></tr>
-<tr><td>Battery upkeep</td><td>63</td><td>$/kW a year (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
+<tr><td>Installed cost, solar + battery, per kW-DC of solar</td><td>$3,170</td><td>$/kW-DC (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
+<tr><td>Installed cost, solar alone (check only)</td><td>$1,903</td><td>$/kW-DC (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
+<tr><td>Standalone battery cost, for the replacement</td><td>$2,492</td><td>$/kW (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
+<tr><td>Solar upkeep</td><td>$17.63</td><td>$/kW-DC a year (2023 $)</td><td>Sourced</td><td>NLR ATB 2025, Commercial PV</td></tr>
+<tr><td>Battery upkeep</td><td>$63</td><td>$/kW a year (2022 $)</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>Price index, 2022</td><td>118.035</td><td>index (2017 = 100)</td><td>Course data</td><td>EIA STEO Table 9a</td></tr>
 <tr><td>Price index, 2023</td><td>122.389</td><td>index (2017 = 100)</td><td>Course data</td><td>EIA STEO Table 9a</td></tr>
 <tr><td>Price index, 2025</td><td>128.989</td><td>index (2017 = 100)</td><td>Course data</td><td>EIA STEO Table 9a</td></tr>
@@ -187,7 +188,7 @@ body-classes: "page-learn page-lesson lx-form-checkpoint"
 <tr><td>Analysis period</td><td>25</td><td>years</td><td>Choice</td><td>this case</td></tr>
 <tr><td>Battery useful life</td><td>15</td><td>years</td><td>Sourced</td><td>EIA distributed-generation cost report (2024)</td></tr>
 <tr><td>Utility's avoided energy cost</td><td>$0.03</td><td>$/kWh</td><td>Illustrative</td><td>this case</td></tr>
-<tr><td>Utility's avoided capacity cost</td><td>180</td><td>$/kW a year</td><td>Course data</td><td>this case</td></tr>
+<tr><td>Utility's avoided capacity cost</td><td>$180</td><td>$/kW a year</td><td>Course data</td><td>this case</td></tr>
 <tr><td>Share of the battery's peak cut that falls in the system's tightest hours</td><td>50%</td><td>fraction</td><td>Illustrative</td><td>this case</td></tr>
 <tr><td>Grid CO2 factor</td><td>680</td><td>lb per MWh</td><td>Sourced</td><td>EIA Kansas Electricity Profile 2024</td></tr>
 <tr><td>2022 dollars to 2025 dollars</td><td>1.0928</td><td>factor</td><td>Derived</td><td>formula in the log</td></tr>

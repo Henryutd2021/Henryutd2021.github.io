@@ -82,8 +82,9 @@
   function pct(f, d) { return (100 * f).toFixed(d == null ? 0 : d) + "%"; }
   function n0(v) { return Math.round(v).toLocaleString("en-US"); }
   function showVal(r, v) {
-    if (r.unit === "fraction" || r.unit === "per year" && r.id === "rate") return pct(v, v < 0.1 && v > 0 && Math.round(v * 1000) % 10 ? 1 : 0);
+    if (r.unit === "fraction" || r.unit === "per year" && r.id === "rate") return pct(v, Math.abs(v * 100 - Math.round(v * 100)) > 1e-9 ? 1 : 0);
     if (/\$\/kWh/.test(r.unit)) return "$" + v.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+    if (/^\$\//.test(r.unit)) return "$" + (Number.isInteger(v) ? v.toLocaleString("en-US") : v.toFixed(2));
     if (/^\$ \(2025\)/.test(r.unit)) return usd(v);
     if (r.unit === "factor") return v.toFixed(4);
     if (r.unit === "t per MWh") return v.toFixed(4);
@@ -197,6 +198,7 @@
     h.push("</tbody></table></div>");
     h.push('<ul class="cka-list"><li><b>Gross against net:</b> of the school\'s ' + usd(r.billSave) + " gross bill saving a year, " + usd(r.avoided) + " is a real cost the utility avoids; " + usd(r.shift) + " is a <span class=\"lx-term\" data-term=\"transfer\">transfer</span> from its other customers.</li>");
     h.push("<li><b>Adds up:</b> school " + usd(r.npvSchool) + " + other customers " + usd(r.npvOthers) + " = resource view " + usd(r.npvSociety) + ".</li>");
+    h.push("<li><b>Screening estimates:</b> the cost shift assumes the utility resets its rates so other customers make up what it does not save, with the avoided costs in the log; a model of the school's bill does not produce this by itself, the accounting of who pays does.</li>");
     h.push("<li><b>Not in money:</b> about " + n0(r.co2t) + " t of CO₂ a year at Kansas's 2024 average factor (an inventory number, not the change caused); no resilience (no islanding equipment costed); installation is job-years, not permanent jobs, and is not estimated.</li></ul></div>");
     // sensitivity
     h.push('<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cka-sens">');

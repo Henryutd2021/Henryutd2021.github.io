@@ -179,7 +179,7 @@
       "TOU homes after against before: " + kw(E.ba.est) + ", because flat homes also changed by " + kw(F.flatChange) + " (a cooler second summer).",
       "Difference-in-differences: " + kw(E.did.est) + " (about 95% interval " + band(E.did, kw) + "), against the truth " + kw(E.att) + ". Before month 13 the monthly gaps stay within " + kw(E.preMax).replace(" kW", "") + " kW of zero.",
       "Threats move it: already cutting " + kw(T.trend.did.est) + ", early cuts " + kw(T.anticipate.did.est) + ", neighbours copy " + kw(T.spill.did.est) + ", a thermostat offer " + kw(T.bundle.did.est) + ".",
-      "If every home were put on the tariff by default, the average cut would be " + kw(E.ate) + ", not " + kw(E.att) + ": those who opt in respond more.",
+      "If every home were put on the tariff by default, the average effect would be " + kw(E.ate) + ", not " + kw(E.att) + ": those who opt in respond more.",
       "Simulated regions: " + R.nOn + " of 30 adopt a policy in 2021. DiD: " + mwy(R.did.est) + " of new solar per adopting region (truth +10.0). If the policy followed a boom: " + mwy(RT.boom.did.est) + "; if projects moved across the border: " + mwy(RT.border.did.est) + "."
     ];
     return ['<p class="lx-eyebrow">Simulated panels with known effects: what each estimate says</p>', "<ol>" + li.map(function (x) { return "<li>" + x + "</li>"; }).join("\n") + "</ol>",
