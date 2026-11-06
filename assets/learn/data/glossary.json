@@ -527,6 +527,12 @@
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
  },
+ "abatement-cost": {
+  "term": "Cost per tonne avoided",
+  "short": "A measure's net yearly cost, its capital spread over its life plus upkeep minus the energy it saves, divided by the tonnes of CO2 it avoids a year.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "counterfactual": {
   "term": "Counterfactual",
   "short": "What would have happened without the change being judged; every saving or effect is measured against one.",
@@ -730,6 +736,12 @@
   "short": "Removing salt from seawater or salty groundwater to make fresh water, with heat or with electricity.",
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
+ },
+ "design-day": {
+  "term": "Design day",
+  "short": "A cold (or hot) day chosen for planning, so that equipment and networks are sized for its highest hour rather than for an average day.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "deterministic-equivalent": {
   "term": "Deterministic equivalent",
@@ -1613,6 +1625,12 @@
   "lesson": "CF7",
   "href": "cf7-cost-of-waiting.html"
  },
+ "marginal-abatement-cost-curve": {
+  "term": "Marginal abatement cost curve",
+  "short": "A chart of measures that cut emissions, each a bar as wide as the tonnes it avoids and as high as its cost per tonne, sorted cheapest first.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "marginal-cost": {
   "term": "Marginal cost",
   "short": "What one more unit costs, here the extra running cost of one more megawatt-hour of demand.",
@@ -2495,11 +2513,23 @@
   "lesson": "K1",
   "href": "k01-units.html"
  },
+ "scope-1": {
+  "term": "Scope 1 emissions",
+  "short": "Emissions from sources inside the boundary being counted: a company's own boilers and vehicles, or, for a city, fuels burned inside its border.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
+ },
  "scope-2": {
   "term": "Scope 2 emissions",
   "short": "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "scope-3": {
+  "term": "Scope 3 emissions",
+  "short": "Other emissions that happen outside the boundary because of activities inside it, such as electricity lost on the wires that bring a city its power.",
+  "lesson": "A18",
+  "href": "a18-city-plan.html"
  },
  "sdwpf": {
   "term": "SDWPF dataset",
