@@ -14,8 +14,9 @@
 //              not the districts' substations), its access road, its land and its capacity factor, in 2025 dollars. The
 //              chosen site enters the plan as state.siteInfo = { connectUSD, cfK } (siteInfo below); a farm is at most
 //              A19's 150 MW block. G-GIS: the only siting here is a solar farm.
-//   HOOK(A13)  the screening accounting: A13's household and jobs model (branch learn-w5-b), not merged yet. Until then
-//              the household table is E3's own accounting layer and jobs are "not yet estimated" (no number is shown).
+//   HOOK(A13)  wired (learn-w5-b merged, 2026-11-06): the household table's money and burden come from lesson A13's
+//              accounting layer (LX.A13.allocate, through E3.households) and the jobs from LX.A13.jobs with A13's
+//              coefficients (data/a13-fairness-jobs.json); both are screening estimates and say so.
 // Prairie City is fictional; its numbers are illustrative.
 (function () {
   "use strict";
@@ -74,6 +75,22 @@
     return { id: id, connectUSD: co.connect + co.road + co.land * f, cfK: co.cf / M.cft.solar, cf: co.cf, line: co.connect, road: co.road, land: co.land * f,
       acres: co.acres * f, km: co.route ? co.route.km : null, sub: co.sub, where: M.A19.place(M.R, t.i, t.j, t.k), score: t.score };
   }
+  // HOOK(A13), wired (learn-w5-b merged, 2026-11-06): jobs by lesson A13's model (LX.A13.jobs) with A13's coefficients
+  // (data/a13-fairness-jobs.json, `jobs`: the reader can change them on A13's page; here at their defaults). Building:
+  // job-years from all the plan's up-front spending, the share spent locally times A13's job-years per $M, times the
+  // multiplier, over the 15 years 2026 to 2040. Permanent: the wind and solar farms' upkeep jobs per 100 MW (gross), and
+  // net of displacement. Other equipment's upkeep jobs are not counted. Nothing retires in this plan (no jobs lost).
+  function jobs(R, A13, Jd) {
+    if (!A13 || !Jd || !R) return null;
+    var c = { staff: 0, mineJobs: 0, multiplier: Jd.multiplier.start, localShare: Jd.localShare, jobYearsPerM: Jd.jobYearsPerM.start,
+      displacement: Jd.displacement.start / 100, horizonYears: Jd.horizonYears, buildYears: 15 };
+    var b = A13.jobs(Object.assign({}, c, { newMW: R.acc.upfrontTotal / 1e6, capexPerKW: 1000, omPer100MW: 0 }));   // capexM = up front, $M
+    var mw = (R.sys.wind || 0) + (R.sys.farm || 0), o = A13.jobs(Object.assign({}, c, { newMW: mw, capexPerKW: 0, omPer100MW: Jd.omPer100MW.start }));
+    return { jobYears: b.buildJobYears, perYear: b.buildJobsAvg, permGross: o.newPermGross, permNet: o.newPermNet, mw: mw, c: c, omPer100MW: Jd.omPer100MW.start,
+      note: "Building " + Math.round(c.localShare * 100) + "% of the up-front spending locally at " + c.jobYearsPerM + " job-years per $M, times " + c.multiplier +
+        "; permanent: " + Jd.omPer100MW.start + " jobs per 100 MW of wind and solar, times " + c.multiplier + ", less " + Math.round(c.displacement * 100) + "% displacement. Other equipment's upkeep not counted; nothing retires.",
+      screening: A13.SCREENING, assume: A13.ASSUME.jobs };
+  }
   // the sensitivity: the plan held fixed, one input at a time (re-solved where the LP depends on it)
   var SENS = [{ key: "upc", label: "Upgrade cost", unit: "$/kW", solve: true }, { key: "av", label: "Value of a contract MWh", unit: "$/MWh" },
     { key: "rc", label: "Retrofit cost", unit: "$/home" }, { key: "dhc", label: "Network cost", unit: "$/home" }, { key: "save", label: "Heat a retrofit saves", unit: "%", solve: true }];
@@ -105,7 +122,7 @@
       { title: "The industrial park", fields: ["ihp", "ely"], color: "var(--lx-hyd)", hint: "Flat new loads at the park's own substation; the gas they replace is saved." },
       { title: "Local supply and storage", fields: ["pv", "bat", "wind", "farm"], color: "var(--lx-solar)", hint: "A wind contract and a solar farm count against what the city buys, hour by hour; output the city cannot use earns nothing." },
       { title: "The grid", fields: ["up", "upc"], color: "var(--lx-bad)", hint: "Each district's [[substation|substation]] carries at most its limit each hour, unless the plan buys an upgrade." },
-      { title: "Assumptions you can change", fields: ["av", "save", "rc", "dhc", "rule"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" moves only the household table." }],
+      { title: "Assumptions you can change", fields: ["av", "save", "rc", "dhc", "rule", "rec"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" and how shared costs are recovered move only the household table ([[lesson:a13-fairness-jobs|A13]])." }],
     RUBRIC: [{ id: "accounting", look: "Cost and CO₂ on one boundary (the whole city, a year, 2025 dollars); who pays and who gains named by household group, as a screening estimate." },
       { id: "uncertainty", look: "The sensitivity chart attached; the inputs that could flip the recommendation named." },
       { id: "realism", look: "What the plan leaves out: power flow inside districts, 2025's people and prices held to 2040, the household rule an assumption, the map's site data." },
@@ -119,8 +136,7 @@
       { key: "siting", label: "The solar farm's site", hint: "One or two sentences: which site and why, or why no farm.", rows: 2, need: true, min: 8 },
       { key: "panel", label: "Your answers to the stakeholder panel", hint: "One line for each stakeholder who objects: what you would change, or why you would not.", rows: 5, need: true, min: 15 }],
     TWO_PAGES: 1100,
-    // HOOK(A13): the jobs screening. Returns null until A13's model is merged; then { jobYears, permanent, note }.
-    jobs: function (R) { return null; } };
+    jobs: jobs };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E3) return;
 
@@ -196,12 +212,13 @@
       dv.set(R, { d: best, k: R.dist[best].at.k });
       U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade", "1 MW more room saves a year (LP dual)"], R.dist.map(function (d) { return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value)]; }), "c3-sub");
       var c3 = H("div", { class: "lx-xcard" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c3);
-      // HOOK(A13): A13's accounting model replaces E3's household layer here at integration
+      // HOOK(A13), wired: the table is E3.households, whose money and burden are LX.A13.allocate
       U.hhTable(c3, R);
-      var jb = page.jobs(R);
-      H("p", { class: "lx-hint", text: jb ? "Jobs (screening): " + kilo(jb.jobYears) + " job-years while building, " + kilo(jb.permanent) + " permanent jobs. " + jb.note
-        : "Jobs: not yet estimated here. Lesson A13's jobs model (job-years against permanent jobs, gross against net) joins this page when A13 goes live; say so in your summary." }, c3);
-      H("p", { class: "lx-hint", text: "Not from the LP: an accounting layer after it, with the adoption rule you set. Burden = home energy bills ÷ income (DOE LEAD); motor fuel apart." }, c3);
+      var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
+      if (jb) U.table(c3, ["Jobs (screening, lesson A13's model)", "Estimate"], [["Building, 2026 to 2040", kilo(jb.jobYears) + " job-years (about " + kilo(jb.perYear) + " a year)"],
+        ["Permanent, at the wind and solar farms (" + kilo(jb.mw) + " MW)", kilo(jb.permGross) + " gross, " + kilo(jb.permNet) + " net"]], "c3-jobs");
+      H("p", { class: "lx-hint", text: jb ? jb.screening + " " + jb.note + " Job-years are one job for one year; permanent jobs last the farms' life." : "Jobs: lesson A13's model did not load." }, c3);
+      H("p", { class: "lx-hint", text: (R.hh ? R.hh.screening + " " : "") + "Not from the LP: lesson A13's accounting layer after it, with the adoption rule and the recovery design you set. Burden = home energy bills ÷ income (DOE LEAD); motor fuel apart." }, c3);
       var c4 = H("div", { class: "lx-xcard" }, res);
       LX.Stakeholders(c4, { title: "The stakeholder panel reacts", lede: "Each reacts to your run by a stated rule (set for teaching). Answer every objection in your summary.",
         cols: [{ key: "r", label: "Reaction" }, { key: "why", label: "Their rule" }],
@@ -259,9 +276,9 @@
         n.link = ss.url(); n.run = { ok: true, stale: !LX.ShareState.same(S, last.state, plan), text: "the 2040 plan over eight representative days" };
         n.made = "the City Planner's engine E3 (a linear program), on capstone C3";
         panel(R, P).forEach(function (x) { n.results.push({ label: "Panel: " + x.name, value: LX.Stakeholders.WORD[x.cell.v], note: x.cell.t }); });
-        var jb = page.jobs(R);
-        if (jb) n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " job-years; " + kilo(jb.permanent) + " permanent", note: jb.note });
-        else n.limits = n.limits.concat(["Jobs are not estimated yet: lesson A13's model joins this capstone when it goes live."]);
+        var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
+        if (jb) { n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " job-years building; " + kilo(jb.permGross) + " permanent (gross), " + kilo(jb.permNet) + " net", note: jb.note });
+          n.assumptions = n.assumptions.concat(jb.assume); }
         n.sensitivity = sens && LX.ShareState.same(S, sens.state, plan) ? sensWords(sens.base, sens.rows) : null;   // the check waits for Test the plan
         return n;
       } });

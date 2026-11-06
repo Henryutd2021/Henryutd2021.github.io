@@ -123,8 +123,14 @@ const RUN_DATE = "6 November 2026";
   ok(near(R1.acc.upfrontTotal - rNo.acc.upfrontTotal, x1.connectUSD, 1) && Math.abs(fA.acc.outside.farmGen / fB.acc.outside.farmGen - x1.cfK) < 1e-9, "the chosen site's up-front cost and output factor reach the plan (" + x1.cfK.toFixed(4) + ")");
   const rD = (await E3.solve(withSite(Object.assign({}, ref, { site: "D" })), P, { solver })).results;
   ok(Math.abs(rD.acc.city.money - R1.acc.city.money) > 1, "another site changes the plan's cost");
-  ok(/HOOK\(A19\)/.test(JS) && /HOOK\(A13\)/.test(JS) && PG.jobs(R1) === null, "both hooks are marked; jobs show no number until A13's model is merged");
-  ok(/not yet estimated/.test(JS), "the page says jobs are not yet estimated");
+  // HOOK(A13), wired: jobs by A13's model at A13's default coefficients
+  const A13 = require(L("a13-who-pays-and-benefits.js")), JD = JSON.parse(fs.readFileSync(L("data/a13-fairness-jobs.json"), "utf8")).jobs, jb = PG.jobs(R1, A13, JD);
+  const exp = A13.jobs({ staff: 0, mineJobs: 0, multiplier: JD.multiplier.start, localShare: JD.localShare, jobYearsPerM: JD.jobYearsPerM.start, displacement: JD.displacement.start / 100,
+    horizonYears: JD.horizonYears, buildYears: 15, newMW: R1.acc.upfrontTotal / 1e6, capexPerKW: 1000, omPer100MW: 0 });
+  ok(jb && near(jb.jobYears, R1.acc.upfrontTotal / 1e6 * JD.localShare * JD.jobYearsPerM.start * JD.multiplier.start, 1e-6) && near(jb.jobYears, exp.buildJobYears, 1e-9), "jobs: building job-years from all up-front spending by A13's model (" + Math.round(jb.jobYears) + ")");
+  ok(near(jb.permGross, (ref.wind + ref.farm) / 100 * JD.omPer100MW.start * JD.multiplier.start, 1e-9) && near(jb.permNet, jb.permGross * (1 - JD.displacement.start / 100), 1e-9), "jobs: permanent gross and net from the wind and solar farms' MW");
+  ok(/HOOK\(A19\)/.test(JS) && /HOOK\(A13\)/.test(JS) && PG.jobs(R1, null, JD) === null, "both hooks are marked; without A13's model no jobs number is shown");
+  ok(/a13-who-pays-and-benefits\.js/.test(PAGE) && /a13-fairness-jobs\.json/.test(PAGE), "the page loads A13's accounting layer and its coefficients");
   ok(/<script src="\.\.\/assets\/learn\/a19\.js" defer><\/script>\s*<script src="\.\.\/assets\/learn\/c3-prairie-city-2040\.js"/.test(PAGE) && /a19-gis-siting\.json/.test(PAGE) && /cf_targets\.json/.test(PAGE), "the page loads A19's map before its own script, and A19's data");
 
   // ---------------- guard G-GIS and the rest

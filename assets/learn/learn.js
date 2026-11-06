@@ -13237,7 +13237,8 @@
       { id: "save", short: "a", type: "int", min: sv.lo, max: sv.hi, step: sv.step, def: sv.def, label: "Heat a retrofit saves", unit: "%" },
       { id: "rc", short: "k", type: "int", min: rc.lo, max: rc.hi, step: rc.step, def: rc.def, label: "Retrofit cost", unit: "$/home" },
       { id: "dhc", short: "n", type: "int", min: nc.lo, max: nc.hi, step: nc.step, def: nc.def, label: "Network cost", unit: "$/home" },
-      { id: "rule", short: "o", type: "enum", values: ["even", "low", "high"], names: { even: "Every group alike", low: "Lower incomes first", high: "Higher incomes first" }, def: "even", label: "Who adopts first" }] };
+      { id: "rule", short: "o", type: "enum", values: ["even", "low", "high"], names: { even: "Every group alike", low: "Lower incomes first", high: "Higher incomes first" }, def: "even", label: "Who adopts first" },
+      { id: "rec", short: "q", type: "enum", values: ["kwh", "fixed", "income"], names: { kwh: "Per kWh", fixed: "Fixed charge", income: "By income" }, def: "kwh", label: "Shared costs recovered" }] };
   }
   // C3: the same plan for 2040, plus the industrial park and local supply (sited with the map: A19's hook)
   function c3Schema(cfg) {
@@ -13268,7 +13269,7 @@
   function sysOf(s, P) {
     var cfg = P.cfg, rate = P.rate, c3 = s.ihp != null;
     var S = { s: s, c3: c3, hp: s.hp / 100, ret: s.ret / 100, save: s.save / 100, dh: s.dh / 100, dhp: s.dh > 0 ? s.dhp : 0, sto: s.dh > 0 ? s.sto : 0,
-      evm: s.evm, up: s.up === "yes", pvAdd: s.pv, batAdd: s.bat, rule: s.rule };
+      evm: s.evm, up: s.up === "yes", pvAdd: s.pv, batAdd: s.bat, rule: s.rule, rec: s.rec || "kwh" };
     // yearly cost per unit (2025 dollars): capital x capital recovery at the course's rate over the item's life, plus upkeep
     S.a = { hp: yearly(cfg.heatPump.capex, cfg.heatPump.life, rate), ret: yearly(s.rc, cfg.retrofit.life, rate), net: yearly(s.dhc, cfg.dh.network.life, rate),
       plant: yearly(cfg.dh.plant.capex.def * 1000, cfg.dh.plant.life, rate), store: yearly(cfg.dh.store.capex.def, cfg.dh.store.life, rate),
@@ -13579,13 +13580,16 @@
   }
 
   // ---------------------------------------------------------------- screening household outputs (an accounting layer)
-  // Each measure's adoption is spread over the five income groups by the plan's rule, district by district. A group's
-  // potential for a measure is its eligible homes times its use index (the measure's carrier: gas for heating measures,
-  // gasoline for cars, electricity for rooftop solar), so a group's share of a measure's change can never pass its own
-  // share of the 2025 use it changes; the rule fills that potential (even: every group at the same rate; low or high:
-  // one group after another, lowest or highest income first). Each district's changes add up to the engine's. Shared
-  // costs (substation upgrades, batteries) go on every kWh the districts use; district heat is billed at its average
-  // cost. Bills at 2025 residential prices; burden = home energy bills / income (DOE LEAD's definition).
+  // Screening household outputs (§9.6) in two parts, never from the LP. (1) E3 spreads each measure's change in the homes'
+  // energy over the five income groups, district by district: a group's potential for a measure is its eligible homes
+  // times its use index (gas for heating measures, gasoline for cars, electricity for rooftop solar), filled by the plan's
+  // rule (even: every group at the same rate; low or high: one group after another, lowest or highest income first), so
+  // each district's changes add up to the engine's. (2) Lesson A13's accounting layer (LX.A13, assets/learn/
+  // a13-who-pays-and-benefits.js) turns them into money and burden: allocate(rows, cost, design, { kWh, spendDelta }),
+  // with the homes' energy changes at 2025 residential prices as spendDelta (district heat billed at its average cost),
+  // and the households' share of the shared costs (substation upgrades and batteries, by their share of the districts'
+  // electricity) recovered by the plan's design (per kWh, a fixed charge, or by income). Burden = home energy spending /
+  // income (DOE LEAD); A13's assumptions and label travel with the result. Motor fuel is shown apart.
   function spread(room, N, rule) {
     var n = room.map(function () { return 0; }), tot = sum(room);
     if (N <= 0 || tot <= 0) return n;
@@ -13633,27 +13637,38 @@
         });
       });
     });
-    // shared costs on every kWh the districts use; district heat at its average cost (network, plant, store, energy)
+    // district heat at its average cost (network, plant, store, energy); the households' share of the shared costs
     var meterMWh = sum(A.d.map(function (o) { return o.imp + o.pvUsed; }));
-    var adder = (A.money.up + A.money.bat) / meterMWh;                       // $ per MWh
     var dhPrice = A.dhHeat > 0 ? (A.money.net + A.money.plant + A.money.store + A.money.boiler + A.d[0].plant * P.price.ind) / A.dhHeat : 0;
-    var rows = G.map(function (gr, g) {
-      var Hg = gr.households, u = gr.use;
-      // each home's change (MWh, gal) a year; bills are 2025's (prairie-city.json) plus the changes at 2025 prices, so a
-      // plan that changes nothing changes no bill
-      var dEl = D.el[g] / Hg, dGas = D.gas[g] / Hg, dProp = D.prop[g] / Hg, dGal = D.gal[g] / Hg, dh = D.dh[g] / Hg;
-      var el = u.electricityKWh / 1000 + dEl;
-      if (el < 0 || u.gasMMBtu * P.city.units.mwhPerMMBtu + dGas < -1e-9 || u.propaneGal / P.galPerMWh + dProp < -1e-9 || u.gasolineGal + dGal < -1e-9) clamp = true;
-      var sp = gr.spending;
-      var bill = { el: sp.electricity + dEl * pr.res + Math.max(0, el) * adder, gas: sp.gas + dGas * pr.gasRes, prop: sp.propane + dProp * pr.propMWh, dh: dh * dhPrice };
-      var home = bill.el + bill.gas + bill.prop + bill.dh, home0 = gr.homeEnergy, fuel = sp.motorFuel + dGal * pr.gasoline;
-      return { key: gr.key, label: gr.label, households: Hg, income: gr.income, home0: home0, home: home, change: home - home0,
-        burden0: home0 / gr.income, burden: home / gr.income, fuel0: sp.motorFuel, fuel: fuel,
-        tburden0: sp.motorFuel / gr.income, tburden: fuel / gr.income, bill: bill, d: { el: dEl, gas: dGas, prop: dProp, gal: dGal, dh: dh } };
+    var M = a13();
+    if (!M) return null;
+    var rows = M.groupsFrom(P.city), kWh = {}, spendDelta = {}, resMWh = 0;
+    rows.forEach(function (r, g) {
+      var Hg = r.households, dEl = D.el[g] / Hg, dGas = D.gas[g] / Hg, dProp = D.prop[g] / Hg, dh = D.dh[g] / Hg;
+      kWh[r.key] = r.kWh + dEl * 1000;
+      if (kWh[r.key] < 0 || G[g].use.gasMMBtu * P.city.units.mwhPerMMBtu + dGas < -1e-9 || G[g].use.propaneGal / P.galPerMWh + dProp < -1e-9 || G[g].use.gasolineGal + D.gal[g] / Hg < -1e-9) clamp = true;
+      spendDelta[r.key] = dEl * pr.res + dGas * pr.gasRes + dProp * pr.propMWh + dh * dhPrice;
+      resMWh += Hg * kWh[r.key] / 1000;
     });
-    function agg(sel, key) { var h = 0, i = 0; sel.forEach(function (x) { h += x.households * x[key]; i += x.households * x.income; }); return h / i; }
-    return { rows: rows, low: { burden0: agg(rows.slice(0, 3), "home0"), burden: agg(rows.slice(0, 3), "home") }, other: { burden0: agg(rows.slice(3), "home0"), burden: agg(rows.slice(3), "home") },
-      adder: adder, dhPrice: dhPrice, adopters: adopters, clamped: clamp, rule: S.rule };
+    var shared = A.money.up + A.money.bat, cost = shared * Math.min(1, resMWh / meterMWh);
+    var al = M.allocate(rows, cost, S.rec || "kwh", { kWh: kWh, spendDelta: spendDelta });
+    var two = M.regroup(al, [["g1", "g2", "g3"], ["g4", "g5"]]);
+    var out = al.rows.map(function (x, g) {
+      var gr = G[g], fuel = gr.spending.motorFuel + D.gal[g] / x.households * pr.gasoline;
+      return { key: x.key, label: x.label, households: x.households, income: x.income, home0: x.spend, home: x.spendAfter, change: x.spendAfter - x.spend,
+        burden0: x.burden, burden: x.burdenAfter, charge: x.charge, fuel0: gr.spending.motorFuel, fuel: fuel, tburden0: gr.spending.motorFuel / x.income, tburden: fuel / x.income,
+        d: { el: D.el[g] / x.households, gas: D.gas[g] / x.households, prop: D.prop[g] / x.households, gal: D.gal[g] / x.households, dh: D.dh[g] / x.households } };
+    });
+    return { rows: out, low: { burden0: two[0].burden, burden: two[0].burdenAfter }, other: { burden0: two[1].burden, burden: two[1].burdenAfter },
+      shared: shared, cost: cost, design: al.design, rate: al.rate, dhPrice: dhPrice, adopters: adopters, clamped: clamp, rule: S.rule,
+      screening: M.SCREENING, assume: M.ASSUME.split, a13: al };
+  }
+  // LX.A13 (lesson A13's accounting layer): the page loads assets/learn/a13-who-pays-and-benefits.js after learn.js;
+  // Node requires it beside the components folder
+  function a13() {
+    if (typeof window !== "undefined" && window.LX && window.LX.A13) return window.LX.A13;
+    if (typeof require === "function") { try { return require("../a13-who-pays-and-benefits.js"); } catch (e) { return null; } }
+    return null;
   }
 
   // ---------------------------------------------------------------- results: every number a page shows
@@ -13790,7 +13805,7 @@
   }
 
   var E3 = { prepare: prepare, sb3Schema: sb3Schema, c3Schema: c3Schema, presets: presets, c3presets: c3presets, defaults: defaults, withPreset: withPreset,
-    sysOf: sysOf, build: build, read: read, account: account, households: households, spread: spread, summarize: summarize, solve: solve, baseState: baseState,
+    sysOf: sysOf, build: build, read: read, account: account, households: households, spread: spread, a13: a13, summarize: summarize, solve: solve, baseState: baseState,
     note: note, planRows: planRows, fallback: fallback, inputsHTML: inputsHTML, tableHTML: tableHTML, hubFixedCO2: hubFixedCO2, parkMW: parkMW,
     crf: crf, yearly: yearly, copAt: copAt, kilo: kilo, money: money, millions: millions, pct: pct, hh: hh, SYS: SYS, WORDS: WORDS };
   if (typeof module !== "undefined" && module.exports) module.exports = E3;

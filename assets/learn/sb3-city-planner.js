@@ -44,7 +44,7 @@
       { title: "Cars", fields: ["ev", "evm"], color: "var(--lx-demand)", hint: "Managed charging moves each day's charge to other hours of the same day." },
       { title: "Local supply and storage", fields: ["pv", "bat"], color: "var(--lx-solar)", hint: "Rooftop solar a district cannot use is spilled; batteries sit at the substations." },
       { title: "The grid", fields: ["up", "upc"], color: "var(--lx-bad)", hint: "Each district's [[substation|substation]] carries at most its limit each hour, unless the plan buys an upgrade." },
-      { title: "Assumptions you can change", fields: ["save", "rc", "dhc", "rule"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" only moves the household table." }] };
+      { title: "Assumptions you can change", fields: ["save", "rc", "dhc", "rule", "rec"], color: "var(--lx-ink-2)", hint: "Set for teaching. \"Who adopts first\" and how shared costs are recovered move only the household table ([[lesson:a13-fairness-jobs|A13]])." }] };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E3) return;
 
@@ -108,9 +108,9 @@
       var c4 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c4);
       U.hhTable(c4, R);
       var ul = H("ul", { class: "e3-notes" }, c4);
-      ["Not from the LP: an accounting layer after it. An energy model does not produce these outcomes by itself.",
+      [R.hh.screening + " Not from the LP: lesson A13's accounting layer after it; an energy model does not produce these outcomes by itself.",
         "Adopters: " + S.fields.filter(function (f) { return f.id === "rule"; })[0].names[R.sys.rule].toLowerCase() + "; each adopting home changes by its district's average, scaled by its group's use.",
-        "Upgrades and batteries add $" + R.hh.adder.toFixed(2) + " per MWh to every kWh in the districts." + (R.hh.dhPrice > 0 ? " District heat is billed at its average cost, $" + kilo(R.hh.dhPrice) + " per MWh of heat." : ""),
+        "Households pay " + mil(R.hh.cost) + " a year of the upgrades and batteries (their share of the districts' electricity), " + S.fields.filter(function (f) { return f.id === "rec"; })[0].names[R.hh.design].toLowerCase() + "." + (R.hh.dhPrice > 0 ? " District heat is billed at its average cost, $" + kilo(R.hh.dhPrice) + " per MWh of heat." : ""),
         "Burden = home energy bills ÷ income (DOE LEAD's definition): equipment bought by households and car prices are not in it; motor fuel is shown apart."].forEach(function (t) { H("li", { text: t }, ul); });
     }
 

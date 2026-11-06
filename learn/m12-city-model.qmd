@@ -249,5 +249,6 @@ When the LP chooses (step 6): $\sum_{e,s} y_{d,e,s} = 1$, furnaces and resistanc
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
+<script src="../assets/learn/a13-who-pays-and-benefits.js" defer></script>
 <script src="../assets/learn/m12-city-model.js" defer></script>
 ```

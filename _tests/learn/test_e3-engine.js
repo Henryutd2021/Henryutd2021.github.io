@@ -169,6 +169,16 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     const dGas = h.rows.reduce((s, x) => s + x.households * x.d.gas, 0);
     let eng = 0; P.D.forEach((D, i) => { eng += D.rho * ((A.d[i].gas - D.otherGas) - (R0.acc.d[i].gas - D.otherGas)); });
     ok(near(dGas, eng, Math.abs(eng) * 1e-6 + 1), "electrify: the groups' gas change adds up to the homes' change in the engine (" + Math.round(dGas) + " vs " + Math.round(eng) + " MWh)");
+    // the money and the burden are lesson A13's (LX.A13.allocate): bills = 2025's + the energy changes at 2025 prices +
+    // the households' share of the shared costs by the plan's design; the designs move the same cost (a transfer)
+    const A13 = require(L("a13-who-pays-and-benefits.js"));
+    ok(E3.a13() === A13 && h.a13 && h.a13.design === "kwh", "the household layer's money is A13's allocate (per kWh by default)");
+    ok(h.rows.every((x, j) => near(x.home, city.groups[j].homeEnergy + h.a13.rows[j].spendAfter - h.a13.rows[j].spend, 1e-6)) && near(h.a13.total, h.cost, 1e-6), "bills = 2025's + the changes + the shared-cost charge; the charges add to the cost recovered");
+    const meter = A.d.reduce((t, o) => t + o.imp + o.pvUsed, 0), adder = (A.money.up + A.money.bat) / meter;
+    ok(h.rows.every((x, j) => near(x.charge, adder * h.a13.rows[j].kWhAfter / 1000, 1e-6)), "per kWh: every household pays the shared costs' rate on each kWh, as the districts' customers do");
+    const others = ["fixed", "income"].map(rec => E3.households(P, Object.assign({}, S, { rec }), A, R0.acc));
+    others.forEach(o => { const t = A13.transfers(h.a13, o.a13); ok(Math.abs(t.sum) < 1e-6 && near(o.cost, h.cost, 1e-9), o.design + ": the same cost moved between groups (a transfer, sum " + t.sum.toExponential(1) + ")"); });
+    ok(others[1].rows[0].charge < h.rows[0].charge && others[0].rows[0].charge > others[1].rows[0].charge, "by income the lowest group pays least; a fixed charge more than by income");
     const n = E3.spread([50, 50, 50], 60, "low");
     ok(n[0] === 50 && n[1] === 10 && n[2] === 0, "lower incomes first: the lowest group's potential fills first");
     const e = E3.spread([100, 300, 100], 100, "even");
