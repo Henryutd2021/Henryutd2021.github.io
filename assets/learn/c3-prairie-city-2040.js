@@ -158,6 +158,8 @@
       { solar: data.cf_targets.targets.solar.cf, wind: data.cf_targets.targets.wind.cf }) : null;
     var site = (function () {
       var fs = H("fieldset", { class: "lx-sb-group c3-site" }, ctr); H("legend", { text: "Site the solar farm" }, fs);
+      var gs = ctr.querySelectorAll("fieldset.lx-sb-group");
+      if (gs.length > 6) ctr.insertBefore(fs, gs[5]);   // after "Local supply and storage", before "The grid"
       var f = S.fields.filter(function (x) { return x.id === "site"; })[0];
       H("p", { class: "lx-hint e3-ghint", html: LX.rich(SM ? "A19's screen for a " + SM.mw + " MW block: protected land, flood zones, steep slopes and setbacks left out, the rest scored ([[lesson:a19-gis-siting|A19]]). Pick one of its five best blocks; its line, road and land go into your plan." : "The siting map could not load: the sites differ only by name and change no number.") }, fs);
       var mapBox = H("div", { class: "c3-mapbox" }, fs), map = SM ? LX.SiteMap(mapBox, { R: SM.R, D: SM.D, label: "Map of the region around Prairie City with the five best solar blocks" }) : null;
@@ -218,7 +220,7 @@
       if (jb) U.table(c3, ["Jobs (screening, lesson A13's model)", "Estimate"], [["Building, 2026 to 2040", kilo(jb.jobYears) + " job-years (about " + kilo(jb.perYear) + " a year)"],
         ["Permanent, at the wind and solar farms (" + kilo(jb.mw) + " MW)", kilo(jb.permGross) + " gross, " + kilo(jb.permNet) + " net"]], "c3-jobs");
       H("p", { class: "lx-hint", text: jb ? jb.screening + " " + jb.note + " Job-years are one job for one year; permanent jobs last the farms' life." : "Jobs: lesson A13's model did not load." }, c3);
-      H("p", { class: "lx-hint", text: (R.hh ? R.hh.screening + " " : "") + "Not from the LP: lesson A13's accounting layer after it, with the adoption rule and the recovery design you set. Burden = home energy bills ÷ income (DOE LEAD); motor fuel apart." }, c3);
+      H("p", { class: "lx-hint", text: "Not from the LP: lesson A13's accounting layer after it, with the adoption rule and the recovery design you set. Burden = home energy bills ÷ income (DOE LEAD); motor fuel apart." }, c3);
       var c4 = H("div", { class: "lx-xcard" }, res);
       LX.Stakeholders(c4, { title: "The stakeholder panel reacts", lede: "Each reacts to your run by a stated rule (set for teaching). Answer every objection in your summary.",
         cols: [{ key: "r", label: "Reaction" }, { key: "why", label: "Their rule" }],
