@@ -118,7 +118,7 @@ include-in-header:
     <li><a class="door door-journeys" href="journeys.html">
       <span class="door-icon" aria-hidden="true"><i class="bi bi-compass"></i></span>
       <span class="door-who">I'd like to know the person</span>
-      <span class="door-what">Journeys: the places I have lived and travelled since 2010</span></a></li>
+      <span class="door-what">Read widely, travel far: the places I have lived and travelled since 2010</span></a></li>
   </ul>
 </nav>
 

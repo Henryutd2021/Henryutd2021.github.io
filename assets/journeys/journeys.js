@@ -1,14 +1,18 @@
-// journeys.js — the Journeys page (journeys.qmd, 2026-11-05). Loaded only by that page.
+// journeys.js — the Journeys page (journeys.qmd; v2, 2026-11-05). Loaded only by that page.
 // The markup, the chapter list and the data (<script id="jr-data">) come from scripts/build_journeys.py (_journeys.qmd);
 // styles in assets/journeys/journeys.css. Without JS the map box stays hidden and the chapter list is the content.
 //   1. "Firsts only": one toggle (in the map's toolbar and above the chapters) shows only the firsts and the milestones.
 //   2. Tile grids: the year of the first visit on hover, focus or tap; one Tab stop per grid, arrow keys move.
-//   3. Map: land only (Natural Earth 1:110m, public domain, world-atlas@2.0.2) drawn as SVG with d3-geo and topojson-client,
-//      pinned and loaded from jsDelivr (with SRI) when the section nears the viewport. Three views (World, China, United
-//      States); places are dots (rings for places lived), journeys are lines (smooth curves through waypoints; flights and
-//      trips whose way of travel is not recorded as gentle arcs). A year slider with Play adds the footprints year by year.
-//      Clicking a dot or a line opens a small card. Keyboard: one Tab stop; the arrow keys move through the footprints in
-//      time order, Enter opens the card, Escape closes it. If the libraries cannot load, the map box is hidden again.
+//   3. Map: an atlas drawn as SVG with d3-geo and topojson-client. Map data, pinned and loaded from jsDelivr with SRI when the
+//      section nears the viewport: China (its 34 provincial-level divisions and the South China Sea inset) from the China
+//      standard map in Apache ECharts 4.9.0 (map/json/china.json and the inset in lib/coord/geo/fix/nanhai.js, Apache-2.0);
+//      other countries from Natural Earth via world-atlas 2.0.2, China and Taiwan left out underneath so China's outline is
+//      the standard one in every view; U.S. states from us-atlas 3.0.1 (loaded when that view is first opened). Places
+//      visited are filled in the colour of the chapter of the first visit. Places are dots (rings for places lived), journeys
+//      are lines (smooth curves through waypoints; flights and trips whose way of travel is not recorded as gentle arcs).
+//      A year slider with Play adds the footprints year by year, drawing each new route stroke by stroke. Clicking a dot or a
+//      line opens a small card. Keyboard: one Tab stop; the arrow keys move through the footprints in time order, Enter
+//      opens the card, Escape closes it. If the libraries cannot load, the map box is hidden again.
 (function () {
   "use strict";
   const root = document.getElementById("journeys");
@@ -110,7 +114,12 @@
     { src: CDN + "d3-geo@3.1.1/dist/d3-geo.min.js", sri: "sha256-I+V08ejUcW1iK85FNWo3m2aidxYrFF9fFH5Mja77c9I=" },
     { src: CDN + "topojson-client@3.1.0/dist/topojson-client.min.js", sri: "sha256-Jc0CrkhsxQY+AhWk5M+xXeg3AMh6xIusTVfcaq8+u4k=" },
   ];
-  const LAND = { url: CDN + "world-atlas@2.0.2/land-110m.json", sri: "sha256-6tX2gRnEmpJQkC59owO8sgk0G7uP7+c2mkObSLcEZYo=" };
+  const DATA = {
+    world: { url: CDN + "world-atlas@2.0.2/countries-110m.json", sri: "sha256-JRbJFYZ8e68Y3exyeuxGwxVUGgfPs9eaZVmwXV6U7ug=" },
+    china: { url: CDN + "echarts@4.9.0/map/json/china.json", sri: "sha256-05L2UaSOYhPJv8g/QGcRBp3ilsF/Qmz/wK0RSAeO4iY=" },
+    nanhai: { url: CDN + "echarts@4.9.0/lib/coord/geo/fix/nanhai.js", sri: "sha256-dvBK/3U91HPpFH2iTTVCxGBAnOtmAq1oZoDgs7qShzQ=", text: true },
+    us: { url: CDN + "us-atlas@3.0.1/states-10m.json", sri: "sha256-12s5HM+ov/YB1R4+PaXUOon6Rs1crKcs5zGzg75VltA=" },
+  };
   box.hidden = false;
 
   function loadScript(lib) {
@@ -122,15 +131,68 @@
     });
   }
   function timeout(ms) { return new Promise(function (_, reject) { window.setTimeout(function () { reject(new Error("timeout")); }, ms); }); }
+  function fetchData(f) {
+    return Promise.race([fetch(f.url, { integrity: f.sri, mode: "cors", credentials: "omit" })
+      .then(function (r) { if (!r.ok) throw new Error(f.url); return f.text ? r.text() : r.json(); }), timeout(20000)]);
+  }
+
+  // ECharts map data (v4) stores coordinates compressed: zigzag-encoded deltas in strings (UTF8Encoding). This is the
+  // decoder ECharts itself uses (Apache-2.0); then rings are put in d3's winding order, so no polygon fills the globe.
+  function decodeRing(str, offsets, scale) {
+    const out = [];
+    let px = offsets[0], py = offsets[1];
+    for (let i = 0; i < str.length; i += 2) {
+      let x = str.charCodeAt(i) - 64, y = str.charCodeAt(i + 1) - 64;
+      x = (x >> 1) ^ (-(x & 1)); y = (y >> 1) ^ (-(y & 1));
+      x += px; y += py; px = x; py = y;
+      out.push([x / scale, y / scale]);
+    }
+    return out;
+  }
+  function d3Winding(d3, polys) {   // polys: array of polygons (arrays of rings)
+    return polys.map(function (rings) {
+      return d3.geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI ? rings.map(function (r) { return r.slice().reverse(); }) : rings;
+    });
+  }
+  function decodeChina(d3, json) {
+    const scale = json.UTF8Scale || 1024;
+    return json.features.map(function (f) {
+      const g = f.geometry;
+      let polys;
+      if (!json.UTF8Encoding) polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+      else if (g.type === "Polygon") polys = [g.coordinates.map(function (ring, i) { return decodeRing(ring, g.encodeOffsets[i], scale); })];
+      else polys = g.coordinates.map(function (poly, i) { return poly.map(function (ring, k) { return decodeRing(ring, g.encodeOffsets[i][k], scale); }); });
+      const code = "CN-" + (D.cnGB[String(f.properties.id || f.id || "").slice(0, 2)] || "");
+      return { type: "Feature", properties: { code: code }, geometry: { type: "MultiPolygon", coordinates: d3Winding(d3, polys) } };
+    });
+  }
+  // the South China Sea inset of the China standard map, as ECharts draws it (lib/coord/geo/fix/nanhai.js): its polygons
+  // in a local frame, placed at 126°E 25°N with ECharts' own scaling
+  function nanhaiFeature(d3, text) {
+    const m = /var\s+points\s*=\s*(\[[\s\S]*?\]);/.exec(text || "");
+    if (!m) return null;
+    let pts;
+    try { pts = JSON.parse(m[1]); } catch (e) { return null; }
+    const g = /var\s+geoCoord\s*=\s*\[\s*([\d.]+)\s*,\s*([\d.]+)\s*\]/.exec(text) || [0, 126, 25];
+    const gx = +g[1], gy = +g[2];
+    const rings = pts.map(function (ring) { return ring.map(function (p) { return [p[0] / 10.5 + gx, p[1] / (-10.5 / 0.75) + gy]; }); });
+    return { type: "Feature", properties: { code: "nanhai" }, geometry: { type: "MultiPolygon", coordinates: d3Winding(d3, rings.map(function (r) { return [r]; })) } };
+  }
+
   function start() {
     const libs = LIBS.reduce(function (p, lib) { return p.then(function () { return loadScript(lib); }); }, Promise.resolve());
     Promise.race([libs, timeout(20000)]).then(function () {
       if (!(window.d3 && window.d3.geoPath && window.topojson)) throw new Error("libraries missing");
-      return Promise.race([
-        fetch(LAND.url, { integrity: LAND.sri, mode: "cors", credentials: "omit" }).then(function (r) { if (!r.ok) throw new Error("land"); return r.json(); }),
-        timeout(20000)]).catch(function () { return null; });   // without land, the dots and lines still draw
-    }).then(function (topo) {
-      init(topo ? window.topojson.feature(topo, topo.objects.land) : null);
+      return Promise.all([fetchData(DATA.world).catch(function () { return null; }), fetchData(DATA.china).catch(function () { return null; }),
+                          fetchData(DATA.nanhai).catch(function () { return null; })]);
+    }).then(function (res) {
+      const d3 = window.d3;
+      const geo = { countries: [], china: [], nanhai: null, states: null };
+      if (res[0]) geo.countries = window.topojson.feature(res[0], res[0].objects.countries).features
+        .filter(function (f) { return f.id !== "156" && f.id !== "158"; });   // China and Taiwan come from the China standard map
+      if (res[1]) geo.china = decodeChina(d3, res[1]);
+      if (res[2]) geo.nanhai = nanhaiFeature(d3, res[2]);
+      init(geo);
     }).catch(function () { box.hidden = true; });
   }
   if ("IntersectionObserver" in window) {
@@ -140,7 +202,11 @@
     io.observe(box);
   } else start();
 
-  function init(land) {
+  const BY = { plane: ["airplane", "by plane"], train: ["train-front", "by train"], car: ["car-front", "by car"],
+               bike: ["bicycle", "by bicycle"], foot: ["person-walking", "on foot"] };
+  const TILT = [-4, 2.5, -1.5, 3.5, -2.5, 1.5];
+
+  function init(geo) {
     const d3 = window.d3;
     const NS = "http://www.w3.org/2000/svg";
     const el = function (tag, attrs, parent) {
@@ -150,8 +216,9 @@
       return n;
     };
     mapEl.classList.remove("is-loading");
-    const svg = el("svg", { class: "jr-svg", role: "group", "aria-label": "Map of my journeys: places are dots and journeys are lines. The chapters below give the same places as text." }, mapEl);
-    const gLand = el("path", { class: "jr-land", "aria-hidden": "true" }, svg);
+    const svg = el("svg", { class: "jr-svg", role: "group", "aria-label": "Map of my journeys: places visited are coloured, places are dots and journeys are lines. The chapters below give the same places as text." }, mapEl);
+    const defs = el("defs", {}, svg);
+    const gBase = el("g", { class: "jr-base", "aria-hidden": "true" }, svg);
     const gRoutes = el("g", { class: "jr-routes" }, svg);
     const gDots = el("g", { class: "jr-dots" }, svg);
     const card = document.createElement("div");
@@ -165,25 +232,28 @@
     const out = root.querySelector(".jr-year-out");
     const play = root.querySelector(".jr-play");
     const viewBtns = root.querySelectorAll(".jr-views button");
-    let marks = [], focusIdx = 0, shown = new Set(), proj = null, openKey = null, lastW = 0;
+    const usNames = {};
+    Object.keys(D.names).forEach(function (k) { if (k.indexOf("US-") === 0) usNames[D.names[k]] = k; });
+    let marks = [], focusIdx = 0, shown = new Set(), shownRegions = new Set(), proj = null, openKey = null, lastW = 0, maskSeq = 0;
+    let usLoading = null;
 
     function viewBox(view) {   // the region each view frames (MultiPoints, fitted into the map box)
-      if (view === "china") return { type: "MultiPoint", coordinates: [[73.5, 40], [80, 30], [97, 28], [109.5, 18.2], [123, 25], [135, 48], [121, 53.5], [87, 49]] };
-      if (view === "us") return { type: "MultiPoint", coordinates: [[-124.7, 48.4], [-124.4, 40], [-117, 32.5], [-97.5, 25.8], [-80.2, 25], [-67, 44.8], [-69, 47.4], [-95, 49]] };
+      if (view === "china") return { type: "MultiPoint", coordinates: [[73.5, 40], [80, 30], [97, 28], [109.5, 18.2], [124, 18.5], [133, 25], [135, 48], [121, 53.5], [87, 49]] };
+      if (view === "us") return { type: "MultiPoint", coordinates: [[-124.7, 48.4], [-124.4, 40], [-117, 32.5], [-97.5, 25.8], [-80.2, 25], [-67, 44.8], [-69, 47.4], [-95, 49], [-160, 19], [-155, 19], [-150, 61], [-170, 60]] };
       return { type: "MultiPoint", coordinates: [[-128, 56], [132, 56], [-128, -12], [132, -12], [2, 62]] };
     }
     function projection(view, W, H) {
       const pad = Math.max(10, Math.round(W * 0.02));
       const p = view === "china" ? d3.geoConicEqualArea().parallels([25, 47]).rotate([-105, 0])
-        : view === "us" ? d3.geoAlbers()
+        : view === "us" ? d3.geoAlbersUsa()
         : d3.geoNaturalEarth1();
       return p.fitExtent([[pad, pad], [W - pad, H - pad]], viewBox(view));
     }
     function heightFor(W) {
       const vh = window.innerHeight || 800;
       const phone = W < 576;
-      const ratio = state.view === "world" ? (phone ? 0.74 : 0.45) : state.view === "china" ? (phone ? 0.92 : 0.64) : (phone ? 0.8 : 0.6);
-      return Math.round(Math.max(240, Math.min(W * ratio, 640, vh * 0.72)));
+      const ratio = state.view === "world" ? (phone ? 0.74 : 0.45) : state.view === "china" ? (phone ? 0.86 : 0.66) : (phone ? 0.72 : 0.58);
+      return Math.round(Math.max(240, Math.min(W * ratio, 640, vh * 0.74)));
     }
 
     // ---------- what is shown ----------
@@ -191,10 +261,12 @@
     function collect() {
       const ents = D.entries.filter(visible);
       const placeVisits = {};
-      ents.forEach(function (e) {
-        e.pl.forEach(function (pid) { (placeVisits[pid] = placeVisits[pid] || []).push(e); });
-      });
+      ents.forEach(function (e) { e.pl.forEach(function (pid) { (placeVisits[pid] = placeVisits[pid] || []).push(e); }); });
       return { ents: ents, placeVisits: placeVisits };
+    }
+    function region(code) {   // [year, chapter, inferred] if visited by the slider's year
+      const r = D.regions[code];
+      return r && r[0] <= state.year ? r : null;
     }
 
     // ---------- geometry ----------
@@ -213,7 +285,10 @@
       let d = "";
       for (let i = 0; i < r.p.length - 1; i++) {
         const a = r.p[i], b = r.p[i + 1];
-        if (Math.abs(a[0] - b[0]) > 180) { d += path({ type: "LineString", coordinates: [a, b] }) || ""; continue; }   // across the date line: the great circle, cut at the map's edge
+        if (Math.abs(a[0] - b[0]) > 180) {   // across the date line: the great circle, cut at the map's edge (not in the U.S. view, whose insets would catch it)
+          if (state.view !== "us") d += path({ type: "LineString", coordinates: [a, b] }) || "";
+          continue;
+        }
         const A = proj(a), B = proj(b);
         if (!A || !B) continue;
         const dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy);
@@ -231,12 +306,70 @@
       return arcs(r, path);
     }
 
+    // ---------- the base map: borders and the colours of the places visited ----------
+    function regionPath(f, code, path, parent, cls, animate) {
+      const d = path(f);
+      if (!d) return;
+      const r = code ? region(code) : null;
+      const n = el("path", { d: d, class: "jr-reg" + (cls ? " " + cls : "") + (r ? " is-visited" + (r[2] ? " is-inferred" : "") : "") }, parent);
+      if (r) {
+        n.style.setProperty("--ch", "var(--ch-" + r[1] + ")");
+        if (animate && !shownRegions.has(code) && !reduceMotion) n.classList.add("is-new");
+        nextRegions.add(code);
+      }
+      const name = code && D.names[code];
+      if (name) el("title", {}, n).textContent = name + (r ? (code === D.home ? ", home" : ", first visit " + r[0] + (r[2] ? " (passed through)" : "")) : "");
+    }
+    let nextRegions = new Set();
+    function drawBase(path, animate) {
+      while (gBase.firstChild) gBase.removeChild(gBase.firstChild);
+      nextRegions = new Set();
+      if (state.view === "us") {
+        if (!geo.states) return;
+        geo.states.forEach(function (f) { regionPath(f, usNames[f.properties.name] || "", path, gBase, "", animate); });
+        return;
+      }
+      // other countries (Natural Earth), China and Taiwan left out
+      geo.countries.forEach(function (f) { regionPath(f, f.id && D.regions[f.id] ? f.id : "", path, gBase, "", animate); });
+      if (state.view === "world") {
+        // China from the standard map as one country: a border pass, then the fills on top (no inner borders)
+        const g = el("g", { class: "jr-china-world" }, gBase);
+        geo.china.forEach(function (f) { const d = path(f); if (d) el("path", { d: d, class: "jr-reg jr-cn-edge" }, g); });
+        geo.china.forEach(function (f) { regionPath(f, "156", path, g, "jr-cn-fill", animate); });
+      } else {
+        geo.china.forEach(function (f) { regionPath(f, f.properties.code, path, gBase, "jr-prov", animate); });
+        if (geo.nanhai) { const d = path(geo.nanhai); if (d) el("path", { d: d, class: "jr-nanhai" }, gBase); }
+      }
+    }
+    function loadUS() {
+      if (geo.states || usLoading) return usLoading;
+      mapEl.classList.add("is-loading");
+      usLoading = fetchData(DATA.us).then(function (topo) {
+        geo.states = window.topojson.feature(topo, topo.objects.states).features;
+      }).catch(function () { geo.states = []; }).then(function () { mapEl.classList.remove("is-loading"); usLoading = null; draw(false); });
+      return usLoading;
+    }
+
     // ---------- cards ----------
-    function badges(e) {
+    function stamps(e) {
       let h = "";
-      (e.f || []).forEach(function (f) { h += '<span class="jr-badge jr-badge-first">' + esc(f) + "</span>"; });
+      (e.f || []).forEach(function (f, i) {
+        h += '<span class="jr-stamp' + (f.length <= 24 ? " is-round" : "") + '" style="--ch: var(--ch-' + e.ch + "); --rot: " + TILT[(e.i + i) % TILT.length] + 'deg">' + esc(f) + "</span>";
+      });
       if (e.ms) h += '<span class="jr-badge jr-badge-ms">' + esc(e.ms) + "</span>";
       return h;
+    }
+    function icons(modes) {
+      if (!modes.length) return "";
+      const words = modes.map(function (m) { return BY[m][1]; }).join(" and ");
+      return '<span class="jr-by" role="img" aria-label="' + esc(words.charAt(0).toUpperCase() + words.slice(1)) + '">' +
+        modes.map(function (m) { return '<i class="bi bi-' + BY[m][0] + '" aria-hidden="true"></i>'; }).join("") + "</span>";
+    }
+    function modesOf(e) {
+      const ms = [];
+      (e.r || []).forEach(function (r) { if (r.b && ms.indexOf(r.b) < 0) ms.push(r.b); });
+      (e.by || []).forEach(function (b) { if (ms.indexOf(b) < 0) ms.push(b); });
+      return ms;
     }
     function transitTag(e, pid) {
       if (!(e.tr || []).includes(pid)) return "";
@@ -246,21 +379,24 @@
       const p = D.places[pid];
       const items = visits.map(function (e) {
         const parent = e.pa ? D.entries.find(function (x) { return x.id === e.pa; }) : null;
+        const st = stamps(e);
         return '<li style="--ch: var(--ch-' + e.ch + ')"><span class="jr-c-when">' + esc(parent ? parent.w : e.w) + "</span>" +
-          esc(e.t) + transitTag(e, pid) + (badges(e) ? " " + badges(e) : "") + "</li>";
+          icons(modesOf(e)) + esc(e.t) + transitTag(e, pid) + (st ? '<span class="jr-c-stamps">' + st + "</span>" : "") + "</li>";
       }).join("");
       return '<p class="jr-c-kind">' + (p.h ? "A place I lived" : "Place") + "</p>" +
         '<h3 id="jr-card-h">' + esc(p.n) + "</h3>" + (p.w ? '<p class="jr-c-where">' + esc(p.w) + "</p>" : "") +
+        (p.s ? '<p class="jr-c-peak"><i class="bi bi-triangle-fill" aria-hidden="true"></i>' + Number(p.s[1]).toLocaleString("en-US") + " m · " + esc(p.s[0]) + " · on foot</p>" : "") +
         '<ul class="jr-c-visits">' + items + "</ul>";
     }
     function routeCard(e) {
-      const parts = (e.r || []).map(function (r) { return r.m === "flight" ? "flight" : r.m === "ground" ? "by road or rail" : "way of travel not recorded"; });
-      const kinds = parts.filter(function (x, i) { return parts.indexOf(x) === i; }).join(" and ");
+      const parts = (e.r || []).map(function (r) { return r.b ? BY[r.b][1] : r.m === "flight" ? "by plane" : r.m === "ground" ? "by road or rail" : "way of travel not recorded"; });
+      const kinds = parts.filter(function (x, i) { return parts.indexOf(x) === i; }).join(", then ");
       const km = (e.r || []).reduce(function (s, r) { return s + (r.km || 0); }, 0);
+      const st = stamps(e);
       return '<p class="jr-c-kind">Journey · ' + esc(kinds) + "</p>" +
-        '<h3 id="jr-card-h" class="jr-c-date">' + esc(e.w) + "</h3>" +
-        '<p class="jr-c-text">' + esc(e.t) + "</p>" + (badges(e) ? '<p class="jr-c-badges">' + badges(e) + "</p>" : "") +
-        '<p class="jr-c-note">' + esc(chapterOf[e.ch].n) + " years · approximate route, about " + Math.round(km / 10) * 10 + " km</p>";
+        '<h3 id="jr-card-h" class="jr-c-date">' + icons(modesOf(e)) + esc(e.w) + "</h3>" +
+        '<p class="jr-c-text">' + esc(e.t) + "</p>" + (st ? '<p class="jr-c-badges">' + st + "</p>" : "") +
+        '<p class="jr-c-note">' + esc(chapterOf[e.ch].n) + " years · approximate route, about " + (Math.round(km / 10) * 10).toLocaleString("en-US") + " km</p>";
     }
     function openCard(m, viaKeyboard) {
       openKey = m.key;
@@ -293,10 +429,25 @@
       if (returnFocus && marks[focusIdx]) marks[focusIdx].g.focus({ preventScroll: true });
     }
 
+    // a new route draws itself: a mask stroke runs along the line (works for dashed and dotted lines too)
+    function drawIn(v, d, delay, W, H) {
+      const id = "jr-mask-" + (++maskSeq);
+      const mask = el("mask", { id: id, maskUnits: "userSpaceOnUse", x: -50, y: -50, width: W + 100, height: H + 100 }, defs);
+      const mp = el("path", { d: d, fill: "none", stroke: "#fff", "stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round" }, mask);
+      const L = mp.getTotalLength ? mp.getTotalLength() : 0;
+      if (!L) { defs.removeChild(mask); return; }
+      mp.style.strokeDasharray = L + " " + L; mp.style.strokeDashoffset = L;
+      v.setAttribute("mask", "url(#" + id + ")");
+      const ms = Math.min(1600, 500 + L * 1.2);
+      window.setTimeout(function () { mp.style.transition = "stroke-dashoffset " + ms + "ms ease-in-out"; mp.style.strokeDashoffset = "0"; }, delay + 30);
+      window.setTimeout(function () { v.removeAttribute("mask"); if (mask.parentNode) mask.parentNode.removeChild(mask); }, delay + ms + 120);
+    }
+
     // ---------- draw ----------
     function draw(animate) {
       const W = mapEl.clientWidth;
       if (!W) return;
+      if (state.view === "us" && !geo.states) loadUS();
       const H = heightFor(W);
       mapEl.style.height = H + "px";
       lastW = W;
@@ -304,29 +455,33 @@
       const path = d3.geoPath(proj);
       svg.setAttribute("viewBox", "0 0 " + W + " " + H);
       svg.setAttribute("width", W); svg.setAttribute("height", H);
-      gLand.setAttribute("d", land ? path(land) || "" : "");
+      while (defs.firstChild) defs.removeChild(defs.firstChild);
+      drawBase(path, animate);
+      shownRegions = nextRegions;
       while (gRoutes.firstChild) gRoutes.removeChild(gRoutes.firstChild);
       while (gDots.firstChild) gDots.removeChild(gDots.firstChild);
       const data = collect();
       const next = new Set();
       marks = [];
       const inView = function (pt) { return pt && pt[0] >= -2 && pt[0] <= W + 2 && pt[1] >= -2 && pt[1] <= H + 2; };
+      let stagger = 0;
 
       data.ents.forEach(function (e) {
         if (!e.r) return;
         const ds = e.r.map(function (r) { return { r: r, d: routeD(r, path) }; }).filter(function (x) { return x.d; });
         if (!ds.length) return;
-        // only routes with some part in view; the card anchors at the route's first point in view
         const pts = [];
         e.r.forEach(function (r) { r.p.forEach(function (p) { const q = proj(p); if (inView(q)) pts.push(q); }); });
         if (!pts.length) return;
         const key = "r:" + e.id;
+        const fresh = animate && !shown.has(key) && !reduceMotion;
         // a route drawn smaller than a fingertip on a phone stays as a picture only (its places and the list carry it)
         const tiny = W < 576 && (function () { const xs = pts.map(function (q) { return q[0]; }), ys = pts.map(function (q) { return q[1]; });
           return Math.max.apply(null, xs) - Math.min.apply(null, xs) < 24 && Math.max.apply(null, ys) - Math.min.apply(null, ys) < 24; })();
         if (tiny) {
           const deco = el("g", { class: "jr-route is-deco", "aria-hidden": "true", style: "--ch: var(--ch-" + e.ch + ")" }, gRoutes);
           ds.forEach(function (x) { el("path", { class: "jr-vis jr-m-" + x.r.m, d: x.d }, deco); });
+          next.add(key);
           return;
         }
         const g = el("g", { class: "jr-mark jr-route", tabindex: "-1", role: "button", style: "--ch: var(--ch-" + e.ch + ")",
@@ -341,14 +496,9 @@
         ds.forEach(function (x) {
           el("path", { class: "jr-hit", d: x.d }, g);
           const v = el("path", { class: "jr-vis jr-m-" + x.r.m, d: x.d }, g);
-          if (animate && !shown.has(key) && !reduceMotion && x.r.m === "ground") {
-            const L = v.getTotalLength ? v.getTotalLength() : 0;
-            if (L) { v.style.strokeDasharray = L + " " + L; v.style.strokeDashoffset = L; v.getBoundingClientRect();
-              v.style.transition = "stroke-dashoffset 1s ease-out"; v.style.strokeDashoffset = "0";
-              window.setTimeout(function () { v.style.strokeDasharray = ""; v.style.strokeDashoffset = ""; v.style.transition = ""; }, 1100); }
-          }
+          if (fresh) drawIn(v, x.d, stagger * 320, W, H);
         });
-        if (animate && !shown.has(key) && !reduceMotion) g.classList.add("is-new");
+        if (fresh) stagger++;
         next.add(key);
         marks.push({ kind: "route", key: key, e: e, ch: e.ch, g: g, at: pts[0], order: e.i, sub: 0 });
       });
@@ -360,15 +510,15 @@
         const first = visits[0];
         const key = "p:" + pid;
         const label = p.n + (p.w ? ", " + p.w : "") + " — " + visits.map(function (e) { return e.w; }).filter(function (w, i, a) { return a.indexOf(w) === i; }).join("; ");
-        const g = el("g", { class: "jr-mark jr-dot" + (p.h ? " is-home" : ""), tabindex: "-1", role: "button",
+        const g = el("g", { class: "jr-mark jr-dot" + (p.h ? " is-home" : "") + (p.s ? " is-peak" : ""), tabindex: "-1", role: "button",
           style: "--ch: var(--ch-" + first.ch + ")", "aria-label": label, transform: "translate(" + q[0].toFixed(1) + "," + q[1].toFixed(1) + ")" }, gDots);
         el("circle", { class: "jr-hit", r: 12 }, g);
-        el("circle", { class: "jr-vis", r: p.h ? 5.5 : (W < 576 ? 3.6 : 4.2) }, g);
-        if (animate && !shown.has(key) && !reduceMotion) g.classList.add("is-new");
+        if (p.s) el("path", { class: "jr-vis", d: "M0,-6.2 L5.6,3.9 L-5.6,3.9 Z" }, g);   // a summit: a small triangle
+        else el("circle", { class: "jr-vis", r: p.h ? 5.5 : (W < 576 ? 3.6 : 4.2) }, g);
+        if (animate && !shown.has(key) && !reduceMotion) { g.classList.add("is-new"); g.style.setProperty("--delay", Math.min(stagger, 6) * 320 + "ms"); }
         next.add(key);
         marks.push({ kind: "place", key: key, pid: pid, ch: first.ch, g: g, at: q, order: first.i, sub: 1 });
       });
-      // homes on top of other dots
       Array.prototype.slice.call(gDots.querySelectorAll(".is-home")).forEach(function (n) { gDots.appendChild(n); });
       shown = next;
 
@@ -376,14 +526,12 @@
       marks.forEach(function (m, i) {
         m.g.addEventListener("click", function (ev) { ev.stopPropagation(); setFocus(i, false); openCard(m, false); });
         m.g.addEventListener("keydown", onKey);
-        m.g.addEventListener("focus", function () { focusIdx = i; m.g.classList.add("is-focus"); });
-        m.g.addEventListener("blur", function () { m.g.classList.remove("is-focus"); });
+        m.g.addEventListener("focus", function () { focusIdx = i; });
       });
       if (focusIdx >= marks.length) focusIdx = Math.max(0, marks.length - 1);
       marks.forEach(function (m, i) { m.g.setAttribute("tabindex", i === focusIdx ? "0" : "-1"); });
-      empty.hidden = marks.length > 0;
+      empty.hidden = marks.length > 0 || (state.view === "us" && !geo.states);
       empty.textContent = state.firsts ? "No firsts in this view up to " + state.year + "." : "Nothing in this view up to " + state.year + " yet.";
-      // keep an open card if its mark is still there, else close it
       const still = openKey && marks.find(function (m) { return m.key === openKey; });
       if (still) openCard(still, false); else closeCard(false);
     }
@@ -425,6 +573,7 @@
       window.clearInterval(timer); timer = null;
       play.innerHTML = '<i class="bi bi-play-fill" aria-hidden="true"></i>';
       play.setAttribute("aria-label", "Play the years from " + D.since);
+      root.classList.remove("is-playing");
     }
     play.addEventListener("click", function () {
       if (timer) { stop(); return; }
@@ -432,10 +581,11 @@
       slider.value = state.year; readout(); closeCard(false); draw(true);
       play.innerHTML = '<i class="bi bi-pause-fill" aria-hidden="true"></i>';
       play.setAttribute("aria-label", "Pause");
+      root.classList.add("is-playing");
       timer = window.setInterval(function () {
         if (state.year >= D.now) { stop(); return; }
         state.year += 1; slider.value = state.year; readout(); draw(true);
-      }, reduceMotion ? 1400 : 1100);
+      }, reduceMotion ? 1400 : 1900);
     });
     redraw = function () { draw(false); };
     readout();
