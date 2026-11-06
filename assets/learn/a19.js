@@ -510,22 +510,30 @@
   /* LX.SiteMap(host, { R, D, label, onCell(n) }) → { draw(state), cursor(n), el }
      state: { layer: "base" | "protected" | "slope" | "homes" | "flood" | "grid" | "roads" | "wind" | "sun" | "land" | "suit",
               R (another region, e.g. coarsened), suit (Float64Array 0..1, NaN where excluded), X (exclude()'s result: hatch
-              the excluded cells, shade cells cut by setbacks), sites ([{ id, i, j, k }]), sel (a site id), path ([cells]) } */
+              the excluded cells, by kind; shade cells cut by setbacks), sites ([{ id, i, j, k, label }]; label replaces the
+              letter), sitesKey (the legend's words for them), sel (a site id), ghost ({ i, j, k, label, key }: a dashed
+              block, e.g. where a site was before a change), path ([cells]), homes (true: draw the homes) }
+     Site letters go to the first free place (inside a large block, above, beside, below) that covers no substation,
+     the city's name or another letter. */
   LX.SiteMap = function (host, o) {
     var R0 = o.R, D = o.D, uid = "a19m" + Math.floor(Math.random() * 1e6);
     var wrap = H("div", { class: "a19-map" }, host);
     var fig = H("div", { class: "a19-fig", tabindex: "0", role: "group", "aria-label": (o.label || "Map of the region around Prairie City") + ". Arrow keys move a cursor over the cells; the line under the map describes the cell." }, wrap);
     var svg = S("svg", { viewBox: "0 0 " + R0.W * VB + " " + R0.H * VB, class: "a19-svg", "aria-hidden": "true", focusable: "false" }, fig);
     var defs = S("defs", null, svg);
-    var pat = S("pattern", { id: uid + "-hatch", width: 4, height: 4, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
-    S("rect", { width: 4, height: 4, class: "a19-hatch-bg" }, pat);
-    S("line", { x1: 0, y1: 0, x2: 0, y2: 4, class: "a19-hatch-ln" }, pat);
+    // one hatch per kind of exclusion, so the reader can tell them apart (legend: "Out: protected land", ...)
+    var HATCH = { 4: "prot", 5: "flood", 6: "slope", 3: "other", 7: "other" };
+    ["prot", "flood", "slope", "other"].forEach(function (k) {
+      var pat = S("pattern", { id: uid + "-h-" + k, width: 4, height: 4, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
+      S("rect", { width: 4, height: 4, class: "a19-hatch-bg" }, pat);
+      S("line", { x1: 0, y1: 0, x2: 0, y2: 4, class: "a19-hatch-ln " + k }, pat);
+    });
     var gCells = S("g", { class: "a19-cells" }, svg), gHatch = S("g", { class: "a19-hatch" }, svg), gFeat = S("g", { class: "a19-feat" }, svg);
     var gSites = S("g", { class: "a19-sites" }, svg), gPath = S("g", { class: "a19-path" }, svg), gLab = S("g", { class: "a19-labs" }, svg);
     var cur = S("rect", { class: "a19-cur", width: VB, height: VB, x: 0, y: 0, visibility: "hidden" }, svg);
     var legend = H("div", { class: "a19-legend" }, wrap);
-    var live = H("p", { class: "a19-cell", "aria-live": "polite" }, wrap);
-    var st = { layer: "base" }, R = R0, curN = null, cellEls = [];
+    var live = H("p", { class: "a19-cell", "aria-live": "polite", text: "Tap a cell, or focus the map and use the arrow keys, to read what is there." }, wrap);
+    var st = { layer: "base" }, R = R0, curN = null, cellEls = [], suitRange = null;
 
     // features that do not change: river, roads, lines, substations, the city's districts
     (function features() {
@@ -543,11 +551,21 @@
       });
     })();
     var gHomes = S("g", { class: "a19-homes" }, gFeat);
+    // label and marker boxes the site letters must not cover (SVG units; sc > 1 on phones, where labels are drawn larger)
+    function fixedBoxes(sc) {
+      var out = [];
+      D.substations.forEach(function (s) {
+        out.push([s.x * VB - 6, s.y * VB - 6, 12, 12], s.x > 38 ? [s.x * VB - 8 - 22 * sc, s.y * VB - 7 - 14 * sc, 22 * sc, 17 * sc] : [s.x * VB + 6, s.y * VB - 7 - 14 * sc, 22 * sc, 17 * sc]);
+      });
+      out.push([D.city.cx * VB - 50 * sc, (D.city.cy - 2.2) * VB - 14 * sc, 100 * sc, 18 * sc]);
+      return out;
+    }
     D.substations.forEach(function (s) {
       S("rect", { x: s.x * VB - 5, y: s.y * VB - 5, width: 10, height: 10, class: "a19-sub" }, gLab);
       TX({ x: s.x * VB + (s.x > 38 ? -8 : 8), y: s.y * VB - 7, class: "a19-lab" + (s.x > 38 ? " end" : "") }, gLab, s.id);
     });
     TX({ x: D.city.cx * VB, y: (D.city.cy - 2.2) * VB, class: "a19-lab city" }, gLab, D.city.name);
+    function hits(b, list) { return list.some(function (q) { return b[0] < q[0] + q[2] && q[0] < b[0] + b[2] && b[1] < q[1] + q[3] && q[1] < b[1] + b[3]; }); }
 
     function cellsFor(Rx) {
       gCells.innerHTML = ""; cellEls = [];
@@ -582,11 +600,23 @@
         if (layer === "wind") { r = range(Rx.wind); lo = r[0].toFixed(1) + " m/s"; hi = r[1].toFixed(1) + " m/s"; }
         if (layer === "sun") { r = range(Rx.sun); lo = r[0].toFixed(2); hi = r[1].toFixed(2) + " kWh/m² a day"; }
         if (layer === "land") { r = range(Rx.land); lo = "$" + Math.round(r[0] / 100) * 100; hi = "$" + Math.round(r[1] / 1000) + ",000 an acre"; }
+        if (layer === "suit" && suitRange) { lo = String(Math.round(100 * suitRange[0])); hi = Math.round(100 * suitRange[1]) + " of 100"; }
         var s2 = H("span", { class: "a19-key ramp" }, legend);
-        H("span", { text: L.what + ": " + lo }, s2); H("i", { class: "a19-ramp " + L.cls, "aria-hidden": "true" }, s2); H("span", { text: hi }, s2);
+        H("span", { text: L.what + ":" }, s2);
+        var nw = H("span", { class: "a19-nw" }, s2);
+        H("span", { text: lo }, nw); H("i", { class: "a19-ramp " + L.cls, "aria-hidden": "true" }, nw); H("span", { text: hi }, nw);
       }
-      if (st.X) { var sh = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-excl", "aria-hidden": "true" }, sh); H("span", { text: "Excluded" }, sh); }
-      if (st.sites && st.sites.length) { var sk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-site", "aria-hidden": "true" }, sk); H("span", { text: "Top sites, A best" }, sk); }
+      if (st.X) {
+        var seen = {}; for (var n = 0; n < st.X.reason.length; n++) if (HATCH[st.X.reason[n]]) seen[HATCH[st.X.reason[n]]] = true;
+        [["prot", "Out: protected land"], ["flood", "Out: flood zone"], ["slope", "Out: too steep"], ["other", "Out: other"]].forEach(function (h) {
+          if (!seen[h[0]]) return;
+          var sh = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-excl " + h[0], "aria-hidden": "true" }, sh); H("span", { text: h[1] }, sh);
+        });
+        var cutAny = false; for (n = 0; n < st.X.frac.length; n++) if (!st.X.reason[n] && st.X.frac[n] < 1) { cutAny = true; break; }
+        if (cutAny) { var sc = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-cutk", "aria-hidden": "true" }, sc); H("span", { text: "Part lost to setbacks" }, sc); }
+      }
+      if (st.sites && st.sites.length) { var sk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-site", "aria-hidden": "true" }, sk); H("span", { text: st.sitesKey || "Top sites, A best" }, sk); }
+      if (st.ghost) { var gk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-ghost", "aria-hidden": "true" }, gk); H("span", { text: st.ghost.key }, gk); }
       if (st.path) { var pk = H("span", { class: "a19-key" }, legend); H("i", { class: "a19-sw a19-c-path", "aria-hidden": "true" }, pk); H("span", { text: "New line" }, pk); }
     }
 
@@ -596,10 +626,13 @@
       if (Rx !== R) { R = Rx; cellsFor(R); }
       var layer = st.layer, rr = null;
       if (layer === "wind") rr = range(R.wind); if (layer === "sun") rr = range(R.sun); if (layer === "land") rr = range(R.land);
+      // suitability: the shading stretches from the lowest to the highest score on land that is left (the legend says which)
+      suitRange = null;
+      if (layer === "suit" && st.suit) { var lo = Infinity, hi = -Infinity; for (var z = 0; z < st.suit.length; z++) if (!isNaN(st.suit[z])) { lo = Math.min(lo, st.suit[z]); hi = Math.max(hi, st.suit[z]); } if (lo < hi) suitRange = [lo, hi]; }
       for (var n = 0; n < R.N; n++) {
         var el = cellEls[n], cls = "a19-c-farm", op = 1;
         if (R.water[n]) cls = "a19-c-water";
-        else if (layer === "suit" && st.suit) { if (isNaN(st.suit[n])) cls = "a19-c-none"; else { cls = "a19-c-suit"; op = 0.06 + 0.9 * st.suit[n]; } }
+        else if (layer === "suit" && st.suit) { if (isNaN(st.suit[n])) cls = "a19-c-none"; else { cls = "a19-c-suit"; op = 0.05 + 0.9 * (suitRange ? (st.suit[n] - suitRange[0]) / (suitRange[1] - suitRange[0]) : 0.5); } }
         else if (layer === "slope") { cls = "a19-c-slope"; op = 0.05 + 0.9 * clamp01(R.slope[n] / 15); }
         else if (layer === "wind" || layer === "sun" || layer === "land") { var A = R[layer]; cls = "a19-c-" + layer; op = 0.06 + 0.9 * (A[n] - rr[0]) / (rr[1] - rr[0]); }
         else if (R.built[n]) cls = "a19-c-built";
@@ -614,8 +647,8 @@
         var v = R.cellKm * VB;
         for (n = 0; n < R.N; n++) {
           var i = n % R.W, j = (n - i) / R.W, rs = st.X.reason[n];
-          if (rs >= 3) S("rect", { x: i * v, y: j * v, width: v, height: v, fill: "url(#" + uid + "-hatch)", class: "a19-ex" }, gHatch);
-          else if (!rs && st.X.frac[n] < 1) S("rect", { x: i * v, y: j * v, width: v, height: v, class: "a19-cut", "fill-opacity": (0.75 * (1 - st.X.frac[n])).toFixed(3) }, gHatch);
+          if (rs >= 3) S("rect", { x: i * v, y: j * v, width: v, height: v, fill: "url(#" + uid + "-h-" + HATCH[rs] + ")", class: "a19-ex" }, gHatch);
+          else if (!rs && st.X.frac[n] < 1) S("rect", { x: i * v, y: j * v, width: v, height: v, class: "a19-cut", "fill-opacity": (0.6 * (1 - st.X.frac[n])).toFixed(3) }, gHatch);
         }
       }
       gHomes.innerHTML = "";
@@ -623,11 +656,30 @@
       if (showHomes) (R.homes || R0.homes).forEach(function (h) { S("circle", { cx: (h.x * VB).toFixed(1), cy: (h.y * VB).toFixed(1), r: h.newer ? 2.4 : 1.7, class: "a19-home" + (h.newer ? " new" : "") }, gHomes); });
       gFeat.setAttribute("data-layer", layer);
       gSites.innerHTML = "";
-      (st.sites || []).forEach(function (p) {
-        var v2 = R.cellKm * VB, on = st.sel === p.id;
-        S("rect", { x: p.i * v2, y: p.j * v2, width: p.k * v2, height: p.k * v2, class: "a19-site" + (on ? " on" : "") }, gSites);
-        var tx = p.i * v2 + 2, ty = p.j * v2 - 3 < 10 ? p.j * v2 + 12 : p.j * v2 - 3;
-        TX({ x: tx, y: ty, class: "a19-site-lab" + (on ? " on" : "") }, gSites, p.id);
+      // site letters: the first place, in this order, that covers no substation, city or earlier letter and stays on the map
+      var bw = fig.getBoundingClientRect ? fig.getBoundingClientRect().width : 0, sc = bw && bw < 480 ? 1.4 : 1;
+      svg.classList.toggle("big", sc > 1);
+      var placed = fixedBoxes(sc), MW = R0.W * VB, MH = R0.H * VB, v2 = R.cellKm * VB;
+      if (st.ghost) {
+        var g = st.ghost;
+        S("rect", { x: g.i * v2, y: g.j * v2, width: g.k * v2, height: g.k * v2, class: "a19-site ghost" }, gSites);
+      }
+      (st.sites || []).forEach(function (p) { placed.push([p.i * v2, p.j * v2, p.k * v2, p.k * v2]); });
+      (st.sites || []).concat(st.ghost ? [Object.assign({ ghost: true }, st.ghost)] : []).forEach(function (p) {
+        var on = st.sel === p.id, word = p.label || p.id, w = (9 * word.length + 4) * sc, h = 15 * sc, x0 = p.i * v2, y0 = p.j * v2, sz = p.k * v2;
+        if (!p.ghost) S("rect", { x: x0, y: y0, width: sz, height: sz, class: "a19-site" + (on ? " on" : "") }, gSites);
+        var cands = [[x0, y0 - h - 1], [x0 + sz - w, y0 - h - 1], [x0 + sz + 2, y0], [x0 - w - 2, y0], [x0, y0 + sz + 2], [x0 + sz - w, y0 + sz + 2],
+          [x0 + sz + 2, y0 + sz - h], [x0 - w - 2, y0 + sz - h], [x0 - w - 2, y0 + sz + 2], [x0 - w - 2, y0 - h - 1], [x0 - w - 14, y0 + sz + 6]];
+        if (sz >= h + 4) cands.unshift([x0 + 2, y0 + 2]);
+        var box = null;
+        for (var c = 0; c < cands.length && !box; c++) {
+          var b = [cands[c][0], cands[c][1], w, h];
+          if (b[0] < 0 || b[1] < 0 || b[0] + b[2] > MW || b[1] + b[3] > MH) continue;
+          if (!hits(b, placed.filter(function (q) { return !(q[0] === x0 && q[1] === y0 && q[2] === sz); }))) box = b;
+        }
+        if (!box) box = [Math.max(0, Math.min(MW - w, x0)), Math.max(0, y0 - h - 1), w, h];
+        placed.push(box);
+        TX({ x: box[0] + 2 * sc, y: box[1] + 12 * sc, class: "a19-site-lab" + (on ? " on" : "") + (p.ghost ? " ghost" : "") }, gSites, word);
       });
       gPath.innerHTML = "";
       if (st.path && st.path.length) {

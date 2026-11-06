@@ -15,7 +15,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
      only; a data center is a load and a building. The map and its model: assets/learn/a19.js (LX.A19, LX.SiteMap; a
      lesson-local component for C3); the lesson: assets/learn/a19-gis-siting.js with data/a19-gis-siting.json (the seeded
      recipe of the fictional region, the sourced land-per-MW, setback, slope and line-cost figures, and the notebook's
-     reference block), cf_targets.json (EIA's 2025 capacity factors) and path.json. Tests: node
+     reference block) and cf_targets.json (EIA's 2025 capacity factors). Tests: node
      _tests/learn/test_a19-gis-siting.js [--write] (--write rewrites the no-JS block between the a19-fallback markers and the
      data file's reference block). Lab: learn/notebooks/a19-gis-siting.ipynb, written by
      scripts/build_learn_a19_notebook.py in the ResearchPortfolio folder. Henry's research enters only through the approved
@@ -53,19 +53,21 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a19-c-farm { fill: var(--lx-ground); fill-opacity: .35; }
 .a19-c-built { fill: var(--lx-ink-3); fill-opacity: .55; }
 .a19-c-ind { fill: var(--lx-steel); fill-opacity: .7; }
-.a19-c-water { fill: var(--lx-hyd); }
+.a19-c-water { fill: var(--lx-hyd); fill-opacity: .35; }
+.a19-sw.a19-c-water { background: color-mix(in srgb, var(--lx-hyd) 35%, var(--lx-surface)); }
 .a19-c-prot { fill: var(--lx-tree); fill-opacity: .8; }
 .a19-c-flood { fill: var(--lx-hyd); fill-opacity: .35; }
 .a19-c-slope { fill: var(--lx-warn); }
 .a19-c-wind { fill: var(--lx-wind); }
 .a19-c-sun { fill: var(--lx-solar); }
 .a19-c-land { fill: var(--lx-tier-4); }
-.a19-c-suit { fill: var(--lx-accent); }
+.a19-c-suit { fill: var(--lx-good); }
 .a19-c-none { fill: var(--lx-surface-3); }
 .a19-hatch-bg { fill: var(--lx-surface-2); }
-.a19-hatch-ln { stroke: var(--lx-ink-3); stroke-width: 1.4; }
+.a19-hatch-ln { stroke: var(--lx-ink-3); stroke-width: 1.6; }
+.a19-hatch-ln.prot { stroke: var(--lx-tree); } .a19-hatch-ln.flood { stroke: var(--lx-hyd); } .a19-hatch-ln.slope { stroke: var(--lx-warn); }
 .a19-ex { opacity: .85; }
-.a19-cut { fill: var(--lx-ink-2); }
+.a19-cut { fill: var(--lx-ink-3); }
 .a19-river { fill: none; stroke: var(--lx-hyd); stroke-width: 3; stroke-linejoin: round; }
 .a19-road { stroke: var(--lx-road); stroke-width: 1.2; opacity: .9; }
 .a19-road.major { stroke-width: 2.2; }
@@ -82,13 +84,17 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a19-site.on { stroke: var(--lx-bad); stroke-width: 3.2; }
 .a19-site-lab { font-family: var(--lx-f-mono); font-size: 14px; font-weight: 700; fill: var(--lx-ink); paint-order: stroke; stroke: var(--lx-surface); stroke-width: 3.5px; }
 .a19-site-lab.on { fill: var(--lx-bad); }
+.a19-site.ghost { stroke: var(--lx-ink-2); stroke-dasharray: 4 3; stroke-width: 2; }
+.a19-site-lab.ghost { fill: var(--lx-ink-2); font-weight: 600; }
+.a19-svg.big .a19-lab { font-size: 18px; stroke-width: 4.5px; } .a19-svg.big .a19-lab.city { font-size: 19px; }
+.a19-svg.big .a19-site-lab { font-size: 19px; stroke-width: 4.5px; } .a19-svg.big .a19-home { r: 2.6px; }
 .a19-route { fill: none; stroke: var(--lx-bad); stroke-width: 3.2; stroke-linejoin: round; stroke-linecap: round; }
 .a19-cur { fill: none; stroke: var(--lx-accent); stroke-width: 2.4; }
 .a19-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--lx-ink-2); line-height: 1.4; }
 .a19-key { display: inline-flex; align-items: center; gap: 6px; }
 .a19-sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--lx-line-2); }
 .a19-sw.a19-c-built { background: color-mix(in srgb, var(--lx-ink-3) 55%, var(--lx-surface)); }
-.a19-sw.a19-c-ind { background: var(--lx-steel); } .a19-sw.a19-c-water { background: var(--lx-hyd); }
+.a19-sw.a19-c-ind { background: var(--lx-steel); }
 .a19-sw.a19-c-farm { background: color-mix(in srgb, var(--lx-ground) 35%, var(--lx-surface)); }
 .a19-sw.a19-c-prot { background: var(--lx-tree); } .a19-sw.a19-c-flood { background: color-mix(in srgb, var(--lx-hyd) 35%, var(--lx-surface)); }
 .a19-sw.a19-c-home { background: var(--lx-ink); border-radius: 50%; width: 8px; height: 8px; }
@@ -96,6 +102,12 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a19-sw.a19-c-line { height: 0; border: 0; border-top: 2px dashed var(--lx-wire); border-radius: 0; }
 .a19-sw.a19-c-road { height: 0; border: 0; border-top: 2px solid var(--lx-road); border-radius: 0; }
 .a19-sw.a19-c-excl { background: repeating-linear-gradient(45deg, var(--lx-ink-3) 0 1.5px, var(--lx-surface-2) 1.5px 4px); }
+.a19-sw.a19-c-excl.prot { background: repeating-linear-gradient(45deg, var(--lx-tree) 0 1.5px, var(--lx-surface-2) 1.5px 4px); }
+.a19-sw.a19-c-excl.flood { background: repeating-linear-gradient(45deg, var(--lx-hyd) 0 1.5px, var(--lx-surface-2) 1.5px 4px); }
+.a19-sw.a19-c-excl.slope { background: repeating-linear-gradient(45deg, var(--lx-warn) 0 1.5px, var(--lx-surface-2) 1.5px 4px); }
+.a19-sw.a19-c-cutk { background: color-mix(in srgb, var(--lx-ink-3) 45%, var(--lx-surface)); }
+.a19-sw.a19-c-ghost { background: transparent; border: 2px dashed var(--lx-ink-2); }
+.a19-nw { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .a19-sw.a19-c-site { background: transparent; border: 2px solid var(--lx-ink); }
 .a19-sw.a19-c-path { height: 0; border: 0; border-top: 3px solid var(--lx-bad); border-radius: 0; }
 .a19-ramp { display: inline-block; width: 70px; height: 10px; border-radius: 3px; border: 1px solid var(--lx-line-2); }
@@ -103,14 +115,18 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a19-r-wind { background: linear-gradient(90deg, var(--lx-surface), var(--lx-wind)); }
 .a19-r-sun { background: linear-gradient(90deg, var(--lx-surface), var(--lx-solar)); }
 .a19-r-land { background: linear-gradient(90deg, var(--lx-surface), var(--lx-tier-4)); }
-.a19-r-suit { background: linear-gradient(90deg, var(--lx-surface), var(--lx-accent)); }
+.a19-r-suit { background: linear-gradient(90deg, var(--lx-surface), var(--lx-good)); }
 .a19-cell { margin: 0; min-height: 2.6em; font-size: 13.5px; color: var(--lx-ink-2); line-height: 1.35; }
 .a19-ctl { margin: 8px 0 4px; }
 .a19-seg { max-width: 100%; }
 .a19-sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 4px 18px; margin: 8px 0; }
 .a19-sites-box { margin: 8px 0; min-width: 0; }
 .a19-tcap { margin: 0 0 4px; font-family: var(--lx-f-display); font-size: 13.5px; color: var(--lx-ink-2); }
-.a19-tbl { width: 100%; font-size: 14px; }
+.a19-tbl { width: 100%; font-size: 14px; border-collapse: collapse; }
+.a19-tbl thead th { font-family: var(--lx-f-display); font-size: 12.5px; color: var(--lx-ink-3); font-weight: 600; border-bottom: 1px solid var(--lx-line-2); }
+.a19-tbl tbody tr { border-bottom: 1px solid var(--lx-line); }
+.a19-tbl td.n { font-variant-numeric: tabular-nums; }
+.a19-tnote { margin: 4px 0 0; font-size: 13px; color: var(--lx-ink-3); }
 .a19-tbl td, .a19-tbl th { padding: 3px 8px 3px 0; text-align: left; vertical-align: top; }
 .a19-tbl tr.on td, .a19-tbl tr.on th { background: var(--lx-accent-soft); }
 .a19-pick { min-width: 36px; min-height: 32px; border: 1px solid var(--lx-line-2); border-radius: 8px; background: var(--lx-surface); color: var(--lx-ink); font-family: var(--lx-f-mono); font-weight: 700; cursor: pointer; }
@@ -125,13 +141,13 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .a19-fb-h { margin: .8rem 0 .2rem; }
 .a19-nb { margin-top: 1.2rem; max-width: 980px; } .a19-dl { margin-top: .6rem !important; display: flex; flex-wrap: wrap; gap: 8px; }
 .a19-nb-steps { margin: .4rem 0 0; padding-left: 1.3rem; display: grid; gap: 2px; }
-@media (max-width: 560px) { .a19-barlist li { grid-template-columns: minmax(0, 1fr) 3em; } .a19-bt { grid-column: 1 / -1; grid-row: 2; } }
+@media (max-width: 560px) { .a19-tbl { font-size: 13px; } .a19-tbl td, .a19-tbl th { padding-right: 6px; } .a19-barlist li { grid-template-columns: minmax(0, 1fr) 3em; } .a19-bt { grid-column: 1 / -1; grid-row: 2; } }
 </style>
 ```
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="siting" data-src="../assets/learn/data/a19-gis-siting.json ../assets/learn/data/cf_targets.json ../assets/learn/data/path.json">
+<div class="lx-interactive lx-cards" data-learn="siting" data-src="../assets/learn/data/a19-gis-siting.json ../assets/learn/data/cf_targets.json">
 <div class="lx-fallback">
 <!-- a19-fallback:start (written from the model by the test's --write mode; do not edit) -->
 <p class="lx-eyebrow">The default runs, from the same model (Prairie City is fictional; its numbers are illustrative.)</p>
