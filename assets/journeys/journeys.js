@@ -918,7 +918,11 @@
       let placed = 0;
       order.forEach(function (d) {
         if (placed >= 6) return;
-        const name = shortName(d.pid), tw = name.length * 0.56 * fs, th = fs;
+        const name = shortName(d.pid), th = fs;
+        // the label's real width, measured once in the page (the font's own metrics)
+        const tx = el("text", { x: 0, y: 0, class: "jr-mini-label", "font-size": fs.toFixed(1), "stroke-width": (3 * k).toFixed(1) }, P.labels);
+        tx.textContent = name;
+        const tw = (tx.getComputedTextLength ? tx.getComputedTextLength() : name.length * 0.62 * fs) + 2 * k;
         const off = d.r + pad;
         const tries = [[d.q[0] + off, d.q[1] + th * 0.35, "start"], [d.q[0] - off, d.q[1] + th * 0.35, "end"],
                        [d.q[0], d.q[1] - off, "middle"], [d.q[0], d.q[1] + off + th * 0.8, "middle"]];
@@ -926,12 +930,11 @@
           const l = t[2] === "start" ? t[0] : t[2] === "end" ? t[0] - tw : t[0] - tw / 2;
           const b = { l: l - pad / 2, t: t[1] - th * 0.85, r: l + tw + pad / 2, b: t[1] + th * 0.25 };
           if (hit(b)) continue;
-          const tx = el("text", { x: t[0].toFixed(1), y: t[1].toFixed(1), "text-anchor": t[2], class: "jr-mini-label", "font-size": fs.toFixed(1),
-            "stroke-width": (3 * k).toFixed(1) }, P.labels);
-          tx.textContent = name;
+          tx.setAttribute("x", t[0].toFixed(1)); tx.setAttribute("y", t[1].toFixed(1)); tx.setAttribute("text-anchor", t[2]);
           taken.push(b); placed++;
-          break;
+          return;
         }
+        P.labels.removeChild(tx);   // no free spot: this place stays unlabelled here (its card still names it)
       });
     }
     function atlasInto(host, id, big) {
