@@ -418,16 +418,16 @@
         rows: [["solar", "var(--lx-solar)"], ["gas", "var(--lx-cc)"], ["dc", "var(--lx-dr)"]].map(function (x) {
           var f = row(x[0]); return { key: x[0], color: x[1], name: D.objects[x[0]].name, note: D.objects[x[0]].per, c: f("carbon"), w: f("water"), l: f("land") }; }) });
       LX.ConceptMap(H("div", { class: "lx-xcard" }, xhost), { title: "The ideas, and how they connect", lede: "Tap an idea.",
-        groups: { frame: ["Framing", "var(--lx-accent)"], foot: ["Footprints", "var(--lx-tier-2)"], q: ["Questions", "var(--lx-warn)"] },
+        groups: { frame: ["Framing", "var(--lx-accent)"], foot: ["Footprints", "var(--lx-tier-3)"], q: ["Questions", "var(--lx-warn)"] },
         nodes: [
           { id: "fu", g: "frame", label: "Functional unit", lines: ["Functional", "unit"], text: "What one unit of service is: a kWh made, or a MWh a data center uses.", at: [0, 0], atN: [0, 0] },
           { id: "bound", g: "frame", label: "Boundary", text: "Which life-cycle stages are counted: on site only, supply and site, or cradle to grave.", at: [1.5, 0], atN: [2, 0] },
           { id: "carbon", g: "foot", label: "Carbon", text: "Solar is mostly in Build; gas is mostly in burning and supply.", at: [0, 1], atN: [0, 1] },
           { id: "water", g: "foot", label: "Water", text: "Withdrawn is not consumed: once-through cooling takes a lot and returns most.", at: [1.5, 1], atN: [1, 1.6] },
           { id: "land", g: "foot", label: "Land", text: "Footprint or the land between: the order can reverse.", at: [3, 1], atN: [2, 1] },
-          { id: "attr", g: "q", label: "Attributional", text: "Its share of today's burdens, from average data.", at: [0.5, 2], atN: [0, 2.4] },
-          { id: "cons", g: "q", label: "Consequential", lines: ["Conse-", "quential"], text: "What changes because of a decision; it depends on what responds.", at: [2.5, 2], atN: [2, 2.4] },
-          { id: "drought", g: "q", label: "Drought", text: "Less hydropower, more gas burned and more cooling water consumed.", at: [3, 0], atN: [1, 3.2] }
+          { id: "attr", g: "q", label: "Attributional", text: "Its share of today's burdens, from average data.", at: [0, 2], atN: [0, 2.4] },
+          { id: "cons", g: "q", label: "Consequential", lines: ["Conse-", "quential"], text: "What changes because of a decision; it depends on what responds.", at: [1.3, 2], atN: [2, 2.4] },
+          { id: "drought", g: "q", label: "Drought", text: "Less hydropower, more gas burned and more cooling water consumed.", at: [3, 2], atN: [1, 3.2] }
         ],
         edges: [["fu", "bound", "sets the frame for"], ["bound", "carbon", "decides"], ["bound", "water", "decides"], ["bound", "land", "decides"], ["carbon", "attr", "answers"], ["carbon", "cons", "answers"], ["drought", "water", "tightens"]],
         cols: 4, rows: 3, colsN: 3, rowsN: 4, gameLabel: "In this lesson" });
