@@ -691,7 +691,23 @@
   after: [2, F6]
 - {kind: lesson, tier: foundations, code: F9, title: "What does a city run on, and who controls what?"}
 - {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
-- {kind: lesson, tier: foundations, code: F11, title: "What does energy do to the air, the climate and people's lives?"}
+# F11, builder learn-w5-b (wave W5)
+- kind: lesson
+  id: f11-air-climate-people
+  code: F11
+  tier: foundations
+  form: cards
+  icon: cloud
+  status: active
+  minutes: 20
+  practice_minutes: 10   # the myths and questions (Check section)
+  title: "What does energy do to the air, the climate and people's lives?"
+  subtitle: "Burn a tonne of coal, gas or oil: count its CO₂, leaked methane and air pollutants, follow the smoke downwind, then weigh Prairie City's energy bills against income"
+  short: "Air, climate and bills"
+  teaches: [CO₂ per tonne and per unit of heat, leaked methane and GWP, air pollutants and controls, how harm spreads downwind, health estimates per ton, energy burden by income]
+  does: "Burn one tonne of coal, natural gas or oil and count its CO₂, the methane leaked before gas is burned and its SO₂, NOx and fine particles before and after controls; walk away from the stack; price the harm with EPA's estimates; then slide a Prairie City household's income and read its energy burden."
+  outcome: "Explain why fuels compare by heat, not by tonne; count leaked methane as CO₂e with a stated GWP; tell pollutants that controls catch from CO₂ that they do not; and read energy burden as bills over income against conventional lines."
+  after: [F4]
 - {kind: lesson, tier: foundations, code: X1, title: "What engineering lies beneath the system?"}
 - {kind: lesson, tier: foundations, code: X3, title: "How fast have energy transitions happened before?"}
 # ---------- wave W4 Analyst module A3 (curriculum v2 §18.4; builder learn-w4-b)

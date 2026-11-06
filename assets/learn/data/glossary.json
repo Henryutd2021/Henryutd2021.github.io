@@ -143,6 +143,12 @@
   "lesson": "R5",
   "href": "r05-build-validate.html"
  },
+ "benefit-per-ton": {
+  "term": "Benefit per ton",
+  "short": "An estimate of the health harm, in dollars, avoided by not emitting one more ton of a pollutant from a given kind of source, averaged over where those sources are.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "forecast-bias": {
   "term": "Bias",
   "short": "The average signed miss of a forecast, showing whether it tends to run too high or too low.",
@@ -833,6 +839,12 @@
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
  },
+ "emission-factor": {
+  "term": "Emission factor",
+  "short": "The average mass of a pollutant released per unit of fuel burned or of output, such as kilograms of SO₂ per tonne of coal, taken from measurements.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "emissions-cap": {
   "term": "Emissions cap",
   "short": "A limit on the total CO2 that may be emitted in a period, such as a year.",
@@ -1031,6 +1043,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "fine-particles": {
+  "term": "Fine particles (PM2.5)",
+  "short": "Airborne particles no wider than 2.5 micrometres, small enough to reach deep into the lungs; burning releases them and also forms them in the air from SO₂ and NOx.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "firm-capacity": {
   "term": "Firm capacity",
   "short": "Power that can be counted on whenever it is needed, whatever the weather.",
@@ -1186,6 +1204,12 @@
   "short": "Ranking a model's inputs by their influence on a result while all of them vary together across their assumed ranges, rather than one at a time.",
   "lesson": "M7",
   "href": "m07-monte-carlo.html"
+ },
+ "global-warming-potential": {
+  "term": "Global warming potential (GWP)",
+  "short": "How much a tonne of a gas warms the climate over a chosen horizon, such as 100 years, compared with a tonne of CO₂.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "governor": {
   "term": "Governor",
@@ -1679,6 +1703,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "methane-leak": {
+  "term": "Methane leak",
+  "short": "Natural gas that escapes from wells, pipes, compressors and tanks before it is burned; it is mostly methane, a strong warming gas.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
+ },
  "method-family": {
   "term": "Method family",
   "short": "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics.",
@@ -1822,6 +1852,12 @@
   "short": "A billing rule under which kWh sent back to the grid earn a credit set separately from the retail price, often the value of energy in that hour.",
   "lesson": "A4",
   "href": "a04-retail-tariffs.html"
+ },
+ "net-calorific-value": {
+  "term": "Net calorific value",
+  "short": "The heat a fuel gives when burned, not counting the heat in the water vapour it forms; it is a little lower than the gross value.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "net-demand": {
   "term": "Net demand (net load)",
@@ -2452,6 +2488,12 @@
   "short": "A company's reported emissions from the electricity, steam, heat or cooling it buys, counted at the plants that make it.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "scrubber": {
+  "term": "Scrubber",
+  "short": "Equipment that sprays a wet or dry chemical such as limestone through a plant's exhaust to capture most of its sulfur dioxide.",
+  "lesson": "F11",
+  "href": "f11-air-climate-people.html"
  },
  "sdwpf": {
   "term": "SDWPF dataset",

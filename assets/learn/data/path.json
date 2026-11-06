@@ -1180,9 +1180,13 @@
    "tier": "foundations",
    "code": "F11",
    "title": "What does energy do to the air, the climate and people's lives?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f11-air-climate-people.html",
+   "scales": [],
+   "id": "f11-air-climate-people",
+   "minutes": 20,
+   "form": "cards",
+   "short": "Air, climate and bills"
   },
   {
    "tier": "foundations",

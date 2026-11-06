@@ -283,7 +283,7 @@
           pick(S.per);
           demo[1] = function () { pick("mwh"); };
         } },
-      { text: "Some gas escapes before it is burned, from wells, pipes and compressors. Slide the share that leaks, and count the methane as CO₂ over 100 years.",
+      { text: "Some gas escapes before it is burned, from wells, pipes and compressors. Slide the share that [[methane-leak|leaks]], and count the methane as CO₂ over 100 years.",
         build: function (act, api) {
           var M = D.methane.leak, res = H("div", { class: "f11-res" }, act);
           var uc = LX.UnitChain(res, { label: "From a leak to CO₂e", steps: leakChain(D, S.leak) });
@@ -301,12 +301,12 @@
           paint(); api.done();
           demo[2] = function () { sl.set(3, true); };
         } },
-      { text: "Smoke carries more than CO₂. Pick a fuel to see the sulfur dioxide, nitrogen oxides and fine particles from one tonne, then add the controls EPA describes.",
+      { text: "Smoke carries more than CO₂. Pick a fuel to see the sulfur dioxide, nitrogen oxides and [[fine-particles|fine particles]] from one tonne, then add the controls EPA describes, such as a [[scrubber|scrubber]].",
         build: function (act, api) {
           var paintSeg = fuelSeg(act, function (k) { S.fuel = k; keep(); paint(); });
           var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Pollution controls" }, act), { label: "Add the controls", on: S.controls, onChange: function (v) { S.controls = v; keep(); paint(); done(); } });
           var ro = H("div", { class: "lx-readouts", "aria-live": "polite" }, act), line = H("p", { class: "lx-step-line" }, act), ctl = H("p", { class: "lx-hint" }, act);
-          H("p", { class: "lx-hint", text: "Illustrative coal with 2% sulfur and 10% ash, and oil with 0.2% sulfur; EPA's AP-42 factors are averages of tests." }, act);
+          H("p", { class: "lx-hint", html: LX.rich("Illustrative coal with 2% sulfur and 10% ash, and oil with 0.2% sulfur; EPA's AP-42 [[emission-factor|emission factors]] are averages of tests.") }, act);
           function done() { api.done(); api.saw(pollSaw(D)); }
           function paint() {
             paintSeg(S.fuel); var p = pollutants(D, S.fuel, S.controls);
@@ -344,7 +344,7 @@
           paint();
           demo[4] = function () { sl.set(stops.indexOf(300), true); };
         } },
-      { text: "EPA puts a dollar value on that harm, mostly early deaths it expects to avoid. Apply its 2025 power-plant values to your tonne, with and without controls.",
+      { text: "EPA puts a dollar value on that harm, mostly early deaths it expects to avoid. Apply its 2025 [[benefit-per-ton|values per ton]] for power plants to your tonne, with and without controls.",
         build: function (act, api) {
           var paintSeg = fuelSeg(act, function (k) { S.fuel = k; keep(); paint(); });
           var tg = LX.Toggle(H("div", { class: "lx-toggles", role: "group", "aria-label": "Pollution controls" }, act), { label: "Add the controls", on: S.controls, onChange: function (v) { S.controls = v; keep(); paint(); } });
