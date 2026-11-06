@@ -244,7 +244,7 @@ const R = Object.fromEntries(rows.map(r => [r.year, r]));
   const sub = (blk.match(/subtitle: "([^"]+)"/) || [])[1];
   ok(sub && fm.indexOf('subtitle: "' + sub + '"') >= 0, "front-matter subtitle = path.yml subtitle");
   ok(/code: F6/.test(blk) && /minutes: 20/.test(blk) && /practice_minutes: 10/.test(blk) && /status: active/.test(blk) && /after: \[3\]/.test(blk) && /next: F7/.test(blk), "path.yml: F6, 20 + 10 min, active, after lesson 3, next F7 (set at the W3 integration, as the sidecar asked)");
-  ok(/add `next: F7`/.test(SIDE), "sidecar asks the coordinator for next: F7");
+  ok(!/add `next: F7`/.test(SIDE), "sidecar: its request for next: F7 is done (the line above) and gone from the build output (W5)");
   ok(/data-learn="grid-outages"/.test(QMD) && /id="f6-explain"/.test(QMD) && /LX\.mount\("grid-outages"/.test(JS) && /getElementById\("f6-explain"\)/.test(JS), "mount points match");
   ok((QMD.match(/class="lx-qq"/g) || []).length === 9, "practice: three myths and six questions");
   // glossary marks: every id used is defined in glossary.yml or this sidecar
