@@ -5,8 +5,9 @@
 #   kind: tier    one per tier, in display order; any number of tiers (the map draws one line each, first at the bottom).
 #                 id, title, level, slot (colour 1-5: --lx-tier-<slot> in assets/learn/components/base.css), icon (a name
 #                 in LX.IC), door (the entry-door question), doord, reader, math, assumes, goal
-#   kind: scale   optional system scales (e.g. microgrid, regional grid, city, nation): id, title, short, icon;
-#                 lessons list theirs in `scales: [id, ...]`
+#   kind: scale   the course's system scales, S0 device and plant to S4 nation: id, title, short, icon (a name in LX.IC);
+#                 lessons list theirs in `scales: [id, ...]`, the primary scale first (in path.json and each lesson's
+#                 data; the course map does not draw them)
 #   kind: lesson  starter: N puts the lesson on the starter path as stop N; tier is where it sits; tier2 marks a lesson that
 #                 bridges two tiers; path only for lessons that exist (others show as coming soon); after = starter lessons
 #                 it builds on; form: play (opens with the game: lessons 0 and 13) or cards (step cards; the default);
@@ -82,6 +83,34 @@
   doorcta: "Go to the Researcher tier"
   doorlink: "#researcher"
 
+# ---------- the course's five scales (curriculum S0-S4), with the names lesson F1 teaches; each lesson lists the scales
+# its curriculum row names (`scales:`, its primary scale first); a tier's checkpoint and the toolbox name none
+- kind: scale
+  id: S0
+  title: "Device and plant"
+  short: "Device and plant"
+  icon: house
+- kind: scale
+  id: S1
+  title: "Microgrid and community"
+  short: "Microgrid"
+  icon: plant
+- kind: scale
+  id: S2
+  title: "Regional bulk grid"
+  short: "Regional grid"
+  icon: tower
+- kind: scale
+  id: S3
+  title: "City and region"
+  short: "City"
+  icon: city
+- kind: scale
+  id: S4
+  title: "Nation"
+  short: "Nation"
+  icon: globe
+
 # ---------- the starter path: 14 lessons, the guided tour across the tiers
 - kind: lesson
   id: 00-grid-operator
@@ -89,6 +118,7 @@
   form: play
   icon: gauge
   tier: foundations
+  scales: [S2]
   status: active
   path: 00-grid-operator.qmd
   minutes: 15
@@ -106,6 +136,7 @@
   form: cards
   icon: bolt
   tier: foundations
+  scales: [S0]
   status: active
   path: 01-power-energy.qmd
   minutes: 15
@@ -121,6 +152,7 @@
   form: cards
   icon: curve
   tier: foundations
+  scales: [S2, S0]
   status: active
   path: 02-demand.qmd
   minutes: 15
@@ -136,6 +168,7 @@
   form: cards
   icon: wave
   tier: foundations
+  scales: [S2]
   status: active
   minutes: 15
   title: "How does the grid stay balanced every second?"
@@ -152,6 +185,7 @@
   icon: cloud
   tier: foundations
   tier2: analyst
+  scales: [S2]
   status: active
   minutes: 15
   title: "Forecasts and surprises: how do you plan for weather you can't see yet?"
@@ -167,6 +201,7 @@
   form: cards
   icon: turbine
   tier: foundations
+  scales: [S0]
   status: active
   path: 05-capacity-factor.qmd
   minutes: 15
@@ -184,6 +219,7 @@
   form: cards
   icon: blocks
   tier: foundations
+  scales: [S2]
   status: active
   path: 06-three-jobs.qmd
   minutes: 15
@@ -200,6 +236,7 @@
   form: cards
   icon: coin
   tier: analyst
+  scales: [S0]
   status: active
   path: 07-cost.qmd
   minutes: 15
@@ -215,6 +252,7 @@
   form: cards
   icon: stairs
   tier: analyst
+  scales: [S2]
   status: active
   path: 08-merit-order.qmd
   minutes: 15
@@ -231,6 +269,7 @@
   form: cards
   icon: battery
   tier: analyst
+  scales: [S0, S2]
   minutes: 15
   title: "How does storage move energy through time?"
   subtitle: "Charge with midday sun, discharge at sunset"
@@ -246,6 +285,7 @@
   form: cards
   icon: pencil
   tier: analyst
+  scales: [S2]
   minutes: 15
   title: "Write it down: what are the decisions, the goal and the rules?"
   subtitle: "Sort a model into its parts, then find the best plan on a graph"
@@ -261,6 +301,7 @@
   form: cards
   icon: target
   tier: modeler
+  scales: [S2]
   minutes: 15
   title: "Ask the solver, then check its answer"
   subtitle: "HiGHS in your browser: solve, check, and read prices"
@@ -275,6 +316,7 @@
   form: cards
   icon: frontier
   tier: analyst
+  scales: [S2]
   status: active
   path: 12-trade-offs.qmd
   minutes: 15
@@ -291,6 +333,7 @@
   icon: blueprint
   tier: modeler
   tier2: analyst
+  scales: [S2]
   status: active
   path: 13-capstone.qmd
   minutes: 15
@@ -308,6 +351,7 @@
   code: N1
   tier: foundations
   tier2: analyst
+  scales: [S0, S1, S2, S3, S4]
   form: cards
   icon: globe
   status: active
@@ -338,6 +382,7 @@
   code: B1
   tier: analyst
   tier2: modeler
+  scales: [S2]
   form: cards
   icon: pencil
   status: active
@@ -356,6 +401,7 @@
   code: B2
   tier: analyst
   tier2: modeler
+  scales: [S0, S2]
   form: cards
   icon: chart
   status: active
@@ -375,6 +421,7 @@
   code: B3
   tier: analyst
   tier2: modeler
+  scales: [S2]
   form: cards
   icon: question
   status: active
@@ -392,6 +439,7 @@
   id: m01-dispatch-to-lmp
   code: M1
   tier: modeler
+  scales: [S2]
   form: cards
   icon: tower
   status: active
@@ -413,6 +461,7 @@
   id: f01-five-scales
   code: F1
   tier: foundations
+  scales: [S0, S1, S2, S3, S4]
   form: cards
   icon: city
   status: active
@@ -431,6 +480,7 @@
   code: F2
   tier: foundations
   tier2: analyst
+  scales: [S0, S1, S2, S3, S4]
   form: play
   icon: map
   status: active
@@ -450,6 +500,7 @@
   id: f03-energy-services
   code: F3
   tier: foundations
+  scales: [S0]
   form: cards
   icon: house
   status: active
@@ -467,6 +518,7 @@
   id: f04-power-plants
   code: F4
   tier: foundations
+  scales: [S0]
   form: cards
   icon: plant
   status: active
@@ -484,6 +536,7 @@
   id: f05-nuclear-basics
   code: F5
   tier: foundations
+  scales: [S0]
   form: cards
   icon: atom
   status: active
@@ -501,6 +554,7 @@
   id: f06-grid-and-outages
   code: F6
   tier: foundations
+  scales: [S2, S3]
   form: cards
   icon: tower
   status: active
@@ -519,6 +573,7 @@
   id: a22-tradeoff-explorer
   code: A22
   tier: analyst
+  scales: [S0, S1, S2, S3, S4]
   form: play
   icon: scale
   status: active
@@ -537,6 +592,7 @@
   id: a04-retail-tariffs
   code: A4
   tier: analyst
+  scales: [S0, S1]
   form: cards
   icon: house
   status: active
@@ -554,6 +610,7 @@
   id: a07-flexible-demand
   code: A7
   tier: analyst
+  scales: [S1, S2]
   form: cards
   icon: dial
   status: active
@@ -571,6 +628,7 @@
   id: a08-storage-duration
   code: A8
   tier: analyst
+  scales: [S2, S4]
   form: cards
   icon: stairs
   status: active
@@ -588,6 +646,7 @@
   id: a16-hydrogen-ptx
   code: A16
   tier: analyst
+  scales: [S0, S3]
   form: cards
   icon: flask
   status: active
@@ -607,6 +666,7 @@
   id: f07-microgrids
   code: F7
   tier: foundations
+  scales: [S1]
   form: cards
   icon: lamp
   status: active
@@ -624,6 +684,7 @@
   id: a14-microgrid-value
   code: A14
   tier: analyst
+  scales: [S1]
   form: cards
   icon: coin
   status: active
@@ -641,6 +702,7 @@
   id: a01-project-tea
   code: A1
   tier: analyst
+  scales: [S0]
   form: cards
   icon: coin
   status: active
@@ -658,6 +720,7 @@
   id: a02-contracts-risk
   code: A2
   tier: analyst
+  scales: [S0, S2]
   form: cards
   icon: scale
   status: active
@@ -678,6 +741,7 @@
   id: f08-large-loads
   code: F8
   tier: foundations
+  scales: [S2]
   form: cards
   icon: blocks
   status: active
@@ -695,6 +759,7 @@
   id: f09-city-energy
   code: F9
   tier: foundations
+  scales: [S3]
   form: cards
   icon: city
   status: active
@@ -712,6 +777,7 @@
   id: f10-nations-differ
   code: F10
   tier: foundations
+  scales: [S4]
   form: cards
   icon: globe
   status: active
@@ -729,6 +795,7 @@
   id: f11-air-climate-people
   code: F11
   tier: foundations
+  scales: [S4, S3]
   form: cards
   icon: cloud
   status: active
@@ -746,6 +813,7 @@
   id: x01-under-the-hood
   code: X1
   tier: foundations
+  scales: [S0]
   form: cards
   icon: blocks
   status: active
@@ -762,6 +830,7 @@
   id: x03-transitions-history
   code: X3
   tier: foundations
+  scales: [S4]
   form: cards
   icon: clock
   status: active
@@ -778,6 +847,7 @@
   id: a03-market-design
   code: A3
   tier: analyst
+  scales: [S2]
   form: cards
   icon: chart
   status: active
@@ -795,6 +865,7 @@
   id: a05-adequacy
   code: A5
   tier: analyst
+  scales: [S2]
   form: cards
   icon: dial
   status: active
@@ -812,6 +883,7 @@
   id: a06-interconnection
   code: A6
   tier: analyst
+  scales: [S2]
   form: cards
   icon: clock
   status: active
@@ -829,6 +901,7 @@
   id: a09-hazards
   code: A9
   tier: analyst
+  scales: [S2, S3]
   form: cards
   icon: cloud
   status: active
@@ -845,6 +918,7 @@
   id: a10-emissions-questions
   code: A10
   tier: analyst
+  scales: [S2]
   form: cards
   icon: cloud
   status: active
@@ -863,6 +937,7 @@
   id: a11-lca-nexus
   code: A11
   tier: analyst
+  scales: [S0, S3]
   form: cards
   icon: drop
   status: active
@@ -880,6 +955,7 @@
   id: a12-policy-instruments
   code: A12
   tier: analyst
+  scales: [S4, S2]
   form: cards
   icon: scale
   status: active
@@ -898,6 +974,7 @@
   id: a13-fairness-jobs
   code: A13
   tier: analyst
+  scales: [S3]
   form: cards
   icon: scale
   status: active
@@ -915,6 +992,7 @@
   id: a15-efficiency-electrification
   code: A15
   tier: analyst
+  scales: [S3]
   form: cards
   icon: bulb
   status: active
@@ -932,6 +1010,7 @@
   id: a17-physical-feasibility
   code: A17
   tier: analyst
+  scales: [S2, S1, S3]
   form: cards
   icon: wave
   status: active
@@ -949,6 +1028,7 @@
   id: a18-city-plan
   code: A18
   tier: analyst
+  scales: [S3]
   form: cards
   icon: blueprint
   status: active
@@ -967,6 +1047,7 @@
   code: A19
   tier: analyst
   tier2: modeler
+  scales: [S3, S4]
   form: cards
   icon: map
   status: active
@@ -986,6 +1067,7 @@
   id: a20-national-scenarios
   code: A20
   tier: analyst
+  scales: [S4]
   form: cards
   icon: curve
   status: active
@@ -1003,6 +1085,7 @@
   id: a21-security-minerals
   code: A21
   tier: analyst
+  scales: [S4]
   form: cards
   icon: lock
   status: active
@@ -1020,6 +1103,7 @@
   id: x02-fossil-transition
   code: X2
   tier: analyst
+  scales: [S4, S3]
   form: cards
   icon: flame
   status: active
@@ -1037,6 +1121,7 @@
   id: x04-rules-law
   code: X4
   tier: analyst
+  scales: [S2, S4]
   form: cards
   icon: scale
   status: active
@@ -1053,6 +1138,7 @@
   id: x05-project-finance
   code: X5
   tier: analyst
+  scales: [S0]
   form: cards
   icon: coin
   status: active
@@ -1084,6 +1170,7 @@
   code: SB3
   tier: analyst
   tier2: modeler
+  scales: [S3]
   form: sandbox
   icon: city
   status: active
@@ -1100,6 +1187,7 @@
   code: C3
   tier: analyst
   tier2: modeler
+  scales: [S3]
   form: capstone
   sandbox: SB3
   icon: target
@@ -1119,6 +1207,7 @@
   path: m02-unit-commitment.qmd
   code: M2
   tier: modeler
+  scales: [S2]
   form: cards
   icon: lamp
   status: active
@@ -1138,6 +1227,7 @@
   id: m03-capacity-expansion
   code: M3
   tier: modeler
+  scales: [S2, S4]
   form: cards
   icon: blueprint
   status: active
@@ -1157,6 +1247,7 @@
   id: m04-storage-multienergy
   code: M4
   tier: modeler
+  scales: [S0, S3]
   form: cards
   icon: blocks
   status: active
@@ -1176,6 +1267,7 @@
   id: m05-microgrid-size-and-run
   code: M5
   tier: modeler
+  scales: [S1]
   form: cards
   icon: battery
   status: active
@@ -1194,6 +1286,7 @@
   id: m06-carbon-in-models
   code: M6
   tier: modeler
+  scales: [S2]
   form: cards
   icon: frontier
   status: active
@@ -1214,6 +1307,7 @@
   path: m07-monte-carlo.qmd
   code: M7
   tier: modeler
+  scales: [S0, S1, S2, S3, S4]
   form: cards
   icon: bars
   status: active
@@ -1235,6 +1329,7 @@
   path: m08-stochastic-robust.qmd
   code: M8
   tier: modeler
+  scales: [S2, S3]
   form: cards
   icon: frontier
   status: active
@@ -1254,6 +1349,7 @@
   path: m09-surrogates-uq.qmd
   code: M9
   tier: modeler
+  scales: [S0]
   form: cards
   icon: curve
   status: active
@@ -1273,6 +1369,7 @@
   path: m10-ml-forecasting.qmd
   code: M10
   tier: modeler
+  scales: [S2]
   form: cards
   icon: chart
   status: active
@@ -1291,6 +1388,7 @@
   id: m11-tea-in-models
   code: M11
   tier: modeler
+  scales: [S0, S1]
   form: cards
   icon: coin
   status: active
@@ -1310,6 +1408,7 @@
   id: m12-city-model
   code: M12
   tier: modeler
+  scales: [S3]
   form: cards
   icon: city
   status: active
@@ -1330,6 +1429,7 @@
   id: m13-national-pathway
   code: M13
   tier: modeler
+  scales: [S4]
   form: cards
   icon: frontier
   status: active
@@ -1350,6 +1450,7 @@
   path: m14-did-it-work.qmd
   code: M14
   tier: modeler
+  scales: [S0, S1, S2, S3, S4]
   form: cards
   icon: target
   status: active
@@ -1368,6 +1469,7 @@
   id: sb2-grid-room
   code: SB2
   tier: modeler
+  scales: [S2]
   form: sandbox
   icon: tower
   status: active
@@ -1383,6 +1485,7 @@
   id: c2-plains-grid-hard-year
   code: C2
   tier: modeler
+  scales: [S2]
   form: capstone
   sandbox: SB2
   icon: target
@@ -1402,6 +1505,7 @@
   id: sb4-pathway-explorer
   code: SB4
   tier: modeler
+  scales: [S4]
   form: sandbox
   icon: map
   status: active
@@ -1418,6 +1522,7 @@
   code: C4
   tier: modeler
   tier2: researcher
+  scales: [S4]
   form: capstone
   sandbox: SB4
   icon: target
@@ -1451,6 +1556,7 @@
   id: r01-framing
   code: R1
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: question
   status: active
@@ -1468,6 +1574,7 @@
   id: r02-literature
   code: R2
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: map
   status: active
@@ -1485,6 +1592,7 @@
   id: r03-system-and-method
   code: R3
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: blocks
   status: active
@@ -1502,6 +1610,7 @@
   id: r04-data
   code: R4
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: chart
   status: active
@@ -1519,6 +1628,7 @@
   id: r05-build-validate
   code: R5
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: target
   status: active
@@ -1537,6 +1647,7 @@
   id: r06-uncertainty-properly
   code: R6
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: wave
   status: active
@@ -1555,6 +1666,7 @@
   id: r07-cost-carbon-properly
   code: R7
   tier: researcher
+  scales: [S0, S1, S2]
   form: studio
   icon: check
   status: active
@@ -1572,6 +1684,7 @@
   id: r08-communicating
   code: R8
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: chart
   status: active
@@ -1589,6 +1702,7 @@
   id: r09-integrity-stakeholders
   code: R9
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: scale
   status: active
@@ -1606,6 +1720,7 @@
   id: r10-question-studio
   code: R10
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: studio
   icon: lamp
   status: active
@@ -1625,6 +1740,7 @@
   id: x06-social-methods
   code: X6
   tier: researcher
+  scales: [S3]
   form: cards
   icon: question
   status: active
@@ -1657,6 +1773,7 @@
   id: cr-your-own-study
   code: CR
   tier: researcher
+  scales: [S0, S1, S2, S3, S4]
   form: capstone
   icon: flask
   status: active
@@ -1676,6 +1793,7 @@
   id: cf2-cost-per-kg-vs-system-cost
   code: CF2
   tier: analyst
+  scales: [S0]
   form: case
   icon: coin
   status: active
@@ -1691,6 +1809,7 @@
   id: cf6-shifting-load-to-clean-hours
   code: CF6
   tier: analyst
+  scales: [S2]
   form: case
   icon: clock
   status: active
@@ -1706,6 +1825,7 @@
   id: cf7-cost-of-waiting
   code: CF7
   tier: analyst
+  scales: [S2]
   form: case
   icon: scale
   status: active
@@ -1723,6 +1843,7 @@
   id: cf1-supply-chain-microgrids
   code: CF1
   tier: analyst
+  scales: [S1]
   form: case
   icon: map
   status: active
@@ -1743,6 +1864,7 @@
   code: SB0
   tier: analyst
   tier2: modeler
+  scales: [S0]
   form: sandbox
   icon: house
   status: active
@@ -1760,6 +1882,7 @@
   code: C0
   tier: analyst
   tier2: modeler
+  scales: [S0]
   form: capstone
   sandbox: SB0
   icon: target
@@ -1781,6 +1904,7 @@
   code: SB1
   tier: analyst
   tier2: modeler
+  scales: [S1]
   form: sandbox
   icon: battery
   status: active
@@ -1797,6 +1921,7 @@
   code: C1
   tier: analyst
   tier2: modeler
+  scales: [S1]
   form: capstone
   sandbox: SB1
   icon: house
@@ -1817,6 +1942,7 @@
   id: cf3-hydrogen-under-uncertainty
   code: CF3
   tier: analyst
+  scales: [S2]
   form: case
   icon: map
   status: active
@@ -1834,6 +1960,7 @@
   id: cf4-existing-reactors-hydrogen
   code: CF4
   tier: analyst
+  scales: [S4]
   form: case
   icon: atom
   status: active
@@ -1851,6 +1978,7 @@
   id: cf5-drawing-the-boundary
   code: CF5
   tier: analyst
+  scales: [S1]
   form: case
   icon: scale
   status: active
@@ -1868,6 +1996,7 @@
   id: cf8-power-curves-from-scarce-data
   code: CF8
   tier: analyst
+  scales: [S0]
   form: case
   icon: turbine
   status: active
