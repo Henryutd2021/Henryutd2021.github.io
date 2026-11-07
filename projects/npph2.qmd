@@ -94,6 +94,7 @@ toc: false
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
+<a class="btn-xs" href="../files/papers/Li2026.pdf" title="Published version, open access (CC BY-NC-ND 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">Code</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 3</a>
@@ -122,6 +123,7 @@ toc: false
 <h2 id="h-outputs"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>Outputs</h2>
 <div class="out-btns">
 <a class="btn-solid" href="https://doi.org/10.1038/s41467-026-73630-y"><i class="bi bi-journal-text" aria-hidden="true"></i>Paper (DOI)</a>
+<a class="btn-outline" href="../files/papers/Li2026.pdf" title="Published version, open access (CC BY-NC-ND 4.0)"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>Paper (PDF)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration"><i class="bi bi-github" aria-hidden="true"></i>Model framework (GitHub)</a>
 </div>
 </section>

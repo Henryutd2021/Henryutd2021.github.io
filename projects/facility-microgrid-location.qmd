@@ -125,6 +125,7 @@ toc: false
 <div class="pub-venue"><em>Journal of the Operational Research Society</em>, vol. 73, pp. 2395–2411, 2022.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1080/01605682.2022.2035273">DOI</a>
+<a class="btn-xs" href="../files/papers/jin2021supply.pdf" title="Accepted manuscript (Taylor &amp; Francis sharing policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jin2021supply">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 10</a>
 </div>
@@ -155,6 +156,7 @@ toc: false
 <a class="btn-solid" href="https://doi.org/10.1016/j.apm.2023.02.014"><i class="bi bi-journal-text" aria-hidden="true"></i>AMM paper (DOI)</a>
 <a class="btn-outline" href="https://doi.org/10.1109/segre58867.2023.00071"><i class="bi bi-journal-text" aria-hidden="true"></i>SEGRE paper (DOI)</a>
 <a class="btn-outline" href="https://doi.org/10.1080/01605682.2022.2035273"><i class="bi bi-journal-text" aria-hidden="true"></i>JORS paper (DOI)</a>
+<a class="btn-outline" href="../files/papers/jin2021supply.pdf" title="Accepted manuscript (Taylor &amp; Francis sharing policy); the published version is at the DOI"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>JORS accepted manuscript (PDF)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/supply-chain-microgrid-models"><i class="bi bi-github" aria-hidden="true"></i>Model framework (GitHub)</a>
 </div>
 </section>

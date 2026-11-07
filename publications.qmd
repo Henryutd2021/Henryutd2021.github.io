@@ -14,7 +14,7 @@ body-classes: "page-inner page-publications"
 <div class="pg">
 <div class="pub-head">
 <div class="pub-head-text">
-<p class="pg-lede">Newest first: 8 journal articles, 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>.</p>
+<p class="pg-lede">Newest first: 8 journal articles, 10 conference papers and 2 theses. My name is shown in <span class="me">bold</span>; * marks equal contribution. The list is also on <a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>. PDF links give the open-access published version or, where the publisher allows it, the accepted manuscript with the publisher&#8217;s notice.</p>
 <p class="pub-cites"><i class="bi bi-quote" aria-hidden="true"></i><span><strong>121 citations</strong> · h-index 7 · i10-index 6 (<a href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en">Google Scholar</a>, as of October 30, 2026). Per-paper counts are from the same profile; papers it does not list use OpenAlex.</span></p>
 </div>
 <figure class="pub-chart" data-type="all">
@@ -58,6 +58,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
+<a class="btn-xs" href="files/papers/Li2026.pdf" title="Published version, open access (CC BY-NC-ND 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">Code</a>
 <a class="btn-xs" href="projects/npph2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
@@ -86,6 +87,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 3, article 100820, 2026. <span class="pub-tag tag-note">Co-first authors</span></div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.crsus.2026.100820">DOI</a>
+<a class="btn-xs" href="files/papers/jacob2026role.pdf" title="Published version, open access (CC BY-NC 4.0)">PDF</a>
 <a class="btn-xs" href="projects/smr-dc.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jacob2026role">Bib</button>
 </div>
@@ -188,6 +190,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 2, article 100367, 2025.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.crsus.2025.100367">DOI</a>
+<a class="btn-xs" href="files/papers/li2025ghg.pdf" title="Published version, open access (CC BY-NC 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/ghg-load-regulation">Code</a>
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <a class="btn-xs" href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">News</a>
@@ -217,6 +220,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>International Journal of Hydrogen Energy</em>, vol. 113, pp. 77–89, 2025.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.ijhydene.2025.02.303">DOI</a>
+<a class="btn-xs" href="files/papers/li2025hydrogen.pdf" title="Accepted manuscript, CC BY-NC-ND 4.0 (Elsevier sharing policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">Code</a>
 <a class="btn-xs" href="projects/txh2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025hydrogen">Bib</button>
@@ -272,6 +276,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Journal of Mechanical Design</em>, vol. 146, article 020903, 2024. <span class="pub-tag tag-featured">Featured Article</span></div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1115/1.4063971">DOI</a>
+<a class="btn-xs" href="files/papers/li2024towards.pdf" title="Accepted manuscript, © ASME (ASME self-archiving policy); the version of record is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/wind-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2024towards">Bib</button>
@@ -302,6 +307,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Journal of Physics: Conference Series</em>, vol. 2767, article 062016, 2024.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1088/1742-6596/2767/6/062016">DOI</a>
+<a class="btn-xs" href="files/papers/li2024techno.pdf" title="Published version, open access (CC BY 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/offshore-wind-hydrogen-om.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2024techno">Bib</button>
@@ -330,6 +336,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-authors">G. Shen, <span class="me">H. Li</span>, G. Singh, A. Behjat, G. Toge, S. Senemmar, C. Feng, J. Zhang, A. Mehmani</div>
 <div class="pub-venue"><em>2024 ACEEE Summer Study on Energy Efficiency in Buildings</em>, 2024.</div>
 <div class="pub-links">
+<a class="btn-xs" href="files/papers/shen2024demand.pdf" title="Published version; the authors keep the copyright (ACEEE holds a non-exclusive licence)">PDF</a>
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-shen2024demand">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 1</a>
@@ -387,6 +394,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Proceedings of the ASME 2023 IDETC-CIE, Paper No. IDETC2023-114762</em>, article V03AT03A034, 2023.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1115/detc2023-114762">DOI</a>
+<a class="btn-xs" href="files/papers/li2023multi.pdf" title="Accepted manuscript, © ASME; the version of record is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">Code</a>
 <a class="btn-xs" href="projects/uq-mfgpr.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023multi">Bib</button>
@@ -441,6 +449,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>2023 19th International Conference on the European Energy Market (EEM)</em>, pp. 1–6, 2023.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1109/eem58374.2023.10161786">DOI</a>
+<a class="btn-xs" href="files/papers/li2023techno.pdf" title="Accepted manuscript, © IEEE (IEEE author posting policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/solar-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023techno">Bib</button>
@@ -473,6 +482,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Journal of the Operational Research Society</em>, vol. 73, pp. 2395–2411, 2022.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1080/01605682.2022.2035273">DOI</a>
+<a class="btn-xs" href="files/papers/jin2021supply.pdf" title="Accepted manuscript (Taylor &amp; Francis sharing policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="projects/facility-microgrid-location.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jin2021supply">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 10</a>
@@ -501,6 +511,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>2022 IEEE Kansas Power and Energy Conference (KPEC)</em>, pp. 1–6, 2022.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1109/kpec54747.2022.9814722">DOI</a>
+<a class="btn-xs" href="files/papers/badakhshan2022integrating.pdf" title="Accepted manuscript, © IEEE (IEEE author posting policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="projects/wind-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-badakhshan2022integrating">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 18</a>
@@ -527,6 +538,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>Journal of Physics: Conference Series</em>, vol. 2265, article 042063, 2022.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1088/1742-6596/2265/4/042063">DOI</a>
+<a class="btn-xs" href="files/papers/li2022optimal.pdf" title="Published version, open access (CC BY 3.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <a class="btn-xs" href="projects/wind-hydrogen.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2022optimal">Bib</button>
@@ -585,6 +597,7 @@ body-classes: "page-inner page-publications"
 <div class="pub-venue"><em>M.S. thesis, Texas State University</em>, 2021.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://hdl.handle.net/10877/17829">Handle</a>
+<a class="btn-xs" href="files/papers/li2021thesis.pdf" title="Thesis as deposited at Texas State University">PDF</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2021thesis">Bib</button>
 </div>
 <div class="pub-bib" id="bib-li2021thesis" hidden>

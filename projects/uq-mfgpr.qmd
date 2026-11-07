@@ -80,6 +80,7 @@ toc: false
 <div class="pub-venue"><em>Proceedings of the ASME 2023 IDETC-CIE, Paper No. IDETC2023-114762</em>, article V03AT03A034, 2023.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1115/detc2023-114762">DOI</a>
+<a class="btn-xs" href="../files/papers/li2023multi.pdf" title="Accepted manuscript, © ASME; the version of record is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve">Code</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2023multi">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 1</a>
@@ -108,6 +109,7 @@ toc: false
 <h2 id="h-outputs"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>Outputs</h2>
 <div class="out-btns">
 <a class="btn-solid" href="https://doi.org/10.1115/detc2023-114762"><i class="bi bi-journal-text" aria-hidden="true"></i>Paper (DOI)</a>
+<a class="btn-outline" href="../files/papers/li2023multi.pdf" title="Accepted manuscript, © ASME; the version of record is at the DOI"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>Accepted manuscript (PDF)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/mfgpr-wind-power-curve"><i class="bi bi-github" aria-hidden="true"></i>Method framework (GitHub)</a>
 </div>
 </section>
