@@ -132,7 +132,8 @@
     }).join("\n");
   }
   function staticTasks(D) {
-    var h = ['<p class="lx-hint">Without JavaScript nothing here is locked, and the worked solution is further down the page. Write task 1, your review, before you open the marked tasks: their questions name concerns your review should find. The level rule is in the rubric section.</p>', '<ol class="ckr-static">'];
+    var h = ['<p class="lx-hint"><b>Without JavaScript:</b> nothing here is locked or marked, and the worked solution is further down the page, so use this list as practice. A level needs the interactive tasks.</p>',
+      '<p class="lx-hint">Write task 1, your review, before you open the marked tasks: their questions name concerns your review should find.</p>', '<ol class="ckr-static">'];
     D.tasks.forEach(function (t) {
       var x = "<p>" + plain(t.prompt) + "</p>" + (t.tolNote ? '<p class="lx-hint">' + plain(t.tolNote) + "</p>" : "");
       if (t.kind === "choice") x += "<ul>" + t.options.map(function (o) { return "<li>" + o[0] + ". " + plain(o[1]) + "</li>"; }).join("") + "</ul>";
