@@ -1199,7 +1199,26 @@
   teaches: [energy hub as a linear program, building stock as shares, linearized feeder limits, duals of grid room and of a CO2 cap, representative days, screening household outputs]
   lab: "a SciPy/HiGHS notebook that rebuilds engine E3's hub and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
   after: [M4, A15, A13]
-- {kind: lesson, tier: modeler, code: M13, title: "Build a nation's pathway: a multi-region, multi-decade model"}
+# M13, builder learn-w6-h (wave W6), on engine E4; A20 and A21 (curriculum prerequisites, built in parallel on
+# learn-w6-b) join `after` at integration
+- kind: lesson
+  id: m13-national-pathway
+  code: M13
+  tier: modeler
+  form: cards
+  icon: frontier
+  status: upcoming
+  minutes: 45
+  practice_minutes: 120   # the notebook's practice tasks, after its 60-minute lab
+  lab_minutes: 60   # the notebook lab (learn_map_v2.yml)
+  title: "Build a nation's pathway: a multi-region, multi-decade model"
+  subtitle: "Write Prairieland's five regions to 2050 as one linear program with vintages, residual value, links, a cumulative carbon budget and an import cap, then test it against foresight, shocks and full years of hours"
+  short: "A nation's pathway"
+  does: "A five-region Prairieland model to 2050 with asset vintages, retirements and residual value, transmission, a cumulative carbon budget built from period emissions, and a cap on import share; representative slices checked against full-year runs of selected years; compare perfect foresight with decade-by-decade decisions; inject shocks."
+  outcome: "Formulate a multi-region, multi-decade capacity-expansion LP with vintages, residual value, a cumulative budget and an import cap, read its budget dual as a carbon value that rises at the discount rate, and say which conclusions survive myopic decisions, shocks and full years of hours."
+  teaches: [multi-period capacity expansion, asset vintages and residual value, cumulative carbon budgets, import-share caps, perfect against myopic foresight, the budget's dual as a carbon value, representative slices checked against full years, near-optimal plans]
+  lab: "a SciPy/HiGHS notebook that rebuilds engine E4's pathway LP and asserts the browser's numbers, about 60 minutes, then 120 minutes of practice."
+  after: [M3, M8]
 # M14, builder learn-w5-g (wave W5)
 - kind: lesson
   id: m14-did-it-work
@@ -1253,8 +1272,41 @@
   teaches: [capstone plan and study note, representative days with extreme weeks kept, adequacy by Monte Carlo, who pays for a large load, conditional prices and uplift]
   lab: "M2's notebook: unit commitment and conditional prices in SciPy and HiGHS, about 45 minutes."
   after: [SB2, M2, A5, A6, A9]
-- {kind: lesson, tier: modeler, code: SB4, form: sandbox, title: "Pathway Explorer"}
-- {kind: lesson, tier: modeler, code: C4, form: capstone, title: "Prairieland 2050: design and defend a nation's pathway"}
+# SB4 and C4, builder learn-w6-h (wave W6), on engine E4; A20 and A21 join C4's `after` at integration (learn-w6-b)
+- kind: lesson
+  id: sb4-pathway-explorer
+  code: SB4
+  tier: modeler
+  form: sandbox
+  icon: map
+  status: active
+  minutes: 30
+  title: "Pathway Explorer"
+  subtitle: "Plan Prairieland's five regions to 2050 within a carbon budget and an import cap, run the pathway as one linear program, and test it against shocks and full years of hours"
+  short: "Pathway Explorer"
+  does: "Five regions to 2050 with vintages, transmission, a cumulative carbon budget, an import cap, a peak-hour rule, security indicators and shocks, as one linear program on twelve time slices; perfect foresight or decade by decade; a labelled precomputed library for phones and for the full-year checks."
+  outcome: "Run a national pathway model, read what its budget and cap cost and what their duals say, and tell which results survive a shock, myopic decisions and a full year of hours."
+  teaches: [national pathway model, cumulative carbon budget, import-share cap, perfect and myopic foresight, shocks and re-planning, representative slices against full years]
+  after: [M3]
+- kind: lesson
+  id: c4-prairieland-2050
+  code: C4
+  tier: modeler
+  tier2: researcher
+  form: capstone
+  sandbox: SB4
+  icon: target
+  status: upcoming
+  minutes: 240
+  lab_minutes: 60   # the Modeler version adds M13's notebook
+  title: "Prairieland 2050: design and defend a nation's pathway"
+  subtitle: "Choose a pathway for five regions to 2050, test it against four shocks, and defend its cost, emissions, security, affordability and Ridge County's jobs in a two-page policy brief"
+  short: "Prairieland 2050"
+  does: "Choose a pathway for five regions to 2050 on the Pathway Explorer's engine; test it against a gas-price spike, a drought, a mineral export restriction and a demand surprise; report cost, emissions against the cumulative budget, security, screening affordability and Ridge County jobs with stated assumptions; write a two-page policy brief with uncertainty."
+  outcome: "Defend a national pathway in a two-page policy brief: its cost, emissions against the budget, security under four shocks, a screening of affordability and of Ridge County's jobs (gross and net), and the uncertainty that would change the recommendation."
+  teaches: [capstone policy brief, stress tests against shocks, cumulative budgets in practice, screening affordability, a just transition in numbers, uncertainty in a recommendation]
+  lab: "M13's notebook: Prairieland's pathway in SciPy and HiGHS, about 60 minutes."
+  after: [SB4, M13, A12]
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
 - kind: lesson
   id: ck-m-unseen-problem
