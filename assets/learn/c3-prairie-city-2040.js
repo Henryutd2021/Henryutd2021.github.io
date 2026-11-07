@@ -8,8 +8,8 @@
 // LX.Rubric) and the sources. Every number comes from E3 and is checked by _tests/learn/test_c3-prairie-city-2040.js.
 //
 // Two pieces come from parallel lessons; each sits behind a clearly marked hook (search "HOOK"):
-//   HOOK(A19)  wired (learn-w5-e merged, 2026-11-06): the siting step runs A19's map model (assets/learn/a19.js, LX.A19,
-//              lesson-local; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
+//   HOOK(A19)  wired (learn-w5-e merged, 2026-11-06): the siting step runs A19's map model (assets/learn/components/siting.js,
+//              LX.A19 and LX.SiteMap, in the bundle since the W5 integration; data a19-gis-siting.json, read through A19.withCity with prairie-city.json): the five best
 //              solar blocks by A19's default weights, each with a least-cost line to a transmission substation (S1 to S4,
 //              not the districts' substations), its access road, its land and its capacity factor, in 2025 dollars. The
 //              chosen site enters the plan as state.siteInfo = { connectUSD, cfK } (siteInfo below); a farm is at most

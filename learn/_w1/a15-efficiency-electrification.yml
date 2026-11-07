@@ -11,7 +11,7 @@ glossary:
     def: "A water heater that moves heat from the surrounding air into the tank, using a fraction of the electricity an electric-resistance heater needs."
   - id: design-day
     term: Design day
-    def: "A cold (or hot) day of planning weather, colder than most, for which heating systems and the wires that feed them are sized."
+    def: "A cold (or hot) day of planning weather, harsher than most, whose highest hour sets the size of heating equipment and of the wires that feed it."
   - id: coincident-peak
     term: Coincident peak
     def: "The most a group of customers draws in the same hour; it is lower than the sum of their own peaks when they peak at different times."

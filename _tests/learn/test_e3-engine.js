@@ -171,7 +171,7 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(near(dGas, eng, Math.abs(eng) * 1e-6 + 1), "electrify: the groups' gas change adds up to the homes' change in the engine (" + Math.round(dGas) + " vs " + Math.round(eng) + " MWh)");
     // the money and the burden are lesson A13's (LX.A13.allocate): bills = 2025's + the energy changes at 2025 prices +
     // the households' share of the shared costs by the plan's design; the designs move the same cost (a transfer)
-    const A13 = require(L("a13-who-pays-and-benefits.js"));
+    const A13 = require(L("components/whopays.js"));
     ok(E3.a13() === A13 && h.a13 && h.a13.design === "kwh", "the household layer's money is A13's allocate (per kWh by default)");
     ok(h.rows.every((x, j) => near(x.home, city.groups[j].homeEnergy + h.a13.rows[j].spendAfter - h.a13.rows[j].spend, 1e-6)) && near(h.a13.total, h.cost, 1e-6), "bills = 2025's + the changes + the shared-cost charge; the charges add to the cost recovered");
     const meter = A.d.reduce((t, o) => t + o.imp + o.pvUsed, 0), adder = (A.money.up + A.money.bat) / meter;

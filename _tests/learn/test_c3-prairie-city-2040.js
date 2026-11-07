@@ -30,7 +30,7 @@ const RUN_DATE = "6 November 2026";
   const S = E3.c3Schema(cfg), def = SS.defaults(S), ref = Object.assign({}, def, PG.REF_PLAN);
   ok(!SS.validate(S, ref).length, "the reference plan is a valid plan");
   // A19's map model, as the page builds it (HOOK(A19), wired): the region, the five best solar blocks and their costs
-  const A19 = require(L("a19.js")), AD = A19.withCity(JSON.parse(fs.readFileSync(L("data/a19-gis-siting.json"), "utf8")), city), CFT = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
+  const A19 = require(L("components/siting.js")), AD = A19.withCity(JSON.parse(fs.readFileSync(L("data/a19-gis-siting.json"), "utf8")), city), CFT = JSON.parse(fs.readFileSync(L("data/cf_targets.json"), "utf8"));
   const SM = PG.siteModel(A19, AD, { solar: CFT.targets.solar.cf, wind: CFT.targets.wind.cf });
   const withSite = st => { const x = Object.assign({}, st); if (st.farm > 0) x.siteInfo = PG.siteInfo(SM, st.site, st.farm); return x; };
   const r0 = await E3.solve(def, P, { solver }), r1 = await E3.solve(withSite(ref), P, { solver });
@@ -124,14 +124,14 @@ const RUN_DATE = "6 November 2026";
   const rD = (await E3.solve(withSite(Object.assign({}, ref, { site: "D" })), P, { solver })).results;
   ok(Math.abs(rD.acc.city.money - R1.acc.city.money) > 1, "another site changes the plan's cost");
   // HOOK(A13), wired: jobs by A13's model at A13's default coefficients
-  const A13 = require(L("a13-who-pays-and-benefits.js")), JD = JSON.parse(fs.readFileSync(L("data/a13-fairness-jobs.json"), "utf8")).jobs, jb = PG.jobs(R1, A13, JD);
+  const A13 = require(L("components/whopays.js")), JD = JSON.parse(fs.readFileSync(L("data/a13-fairness-jobs.json"), "utf8")).jobs, jb = PG.jobs(R1, A13, JD);
   const exp = A13.jobs({ staff: 0, mineJobs: 0, multiplier: JD.multiplier.start, localShare: JD.localShare, jobYearsPerM: JD.jobYearsPerM.start, displacement: JD.displacement.start / 100,
     horizonYears: JD.horizonYears, buildYears: 15, newMW: R1.acc.upfrontTotal / 1e6, capexPerKW: 1000, omPer100MW: 0 });
   ok(jb && near(jb.jobYears, R1.acc.upfrontTotal / 1e6 * JD.localShare * JD.jobYearsPerM.start * JD.multiplier.start, 1e-6) && near(jb.jobYears, exp.buildJobYears, 1e-9), "jobs: building job-years from all up-front spending by A13's model (" + Math.round(jb.jobYears) + ")");
   ok(near(jb.permGross, (ref.wind + ref.farm) / 100 * JD.omPer100MW.start * JD.multiplier.start, 1e-9) && near(jb.permNet, jb.permGross * (1 - JD.displacement.start / 100), 1e-9), "jobs: permanent gross and net from the wind and solar farms' MW");
   ok(/HOOK\(A19\)/.test(JS) && /HOOK\(A13\)/.test(JS) && PG.jobs(R1, null, JD) === null, "both hooks are marked; without A13's model no jobs number is shown");
-  ok(/a13-who-pays-and-benefits\.js/.test(PAGE) && /a13-fairness-jobs\.json/.test(PAGE), "the page loads A13's accounting layer and its coefficients");
-  ok(/<script src="\.\.\/assets\/learn\/a19\.js" defer><\/script>\s*<script src="\.\.\/assets\/learn\/c3-prairie-city-2040\.js"/.test(PAGE) && /a19-gis-siting\.json/.test(PAGE) && /cf_targets\.json/.test(PAGE), "the page loads A19's map before its own script, and A19's data");
+  ok(!/a13-who-pays-and-benefits\.js|whopays\.js"/.test(PAGE) && /a13-fairness-jobs\.json/.test(PAGE), "A13's accounting layer comes in the bundle (components/whopays.js); the page loads its coefficients");
+  ok(/<script src="\.\.\/assets\/learn\/learn\.js" defer><\/script>\s*<script src="\.\.\/assets\/learn\/c3-prairie-city-2040\.js"/.test(PAGE) && !/a19\.js"/.test(PAGE) && !/\.a19-map \{/.test(PAGE) && /a19-gis-siting\.json/.test(PAGE) && /cf_targets\.json/.test(PAGE), "A19's map comes in the bundle (components/siting.js and siting.css; no copied styles); the page loads A19's data");
 
   // ---------------- guard G-GIS and the rest
   const siting = (T.match(/\b(site|siting|sited)\b[^.]*\./gi) || []).join(" ");

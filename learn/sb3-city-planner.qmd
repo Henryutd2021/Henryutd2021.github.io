@@ -213,6 +213,5 @@ body-classes: "page-learn page-lesson lx-form-sandbox"
 
 ```{=html}
 <script src="../assets/learn/learn.js" defer></script>
-<script src="../assets/learn/a13-who-pays-and-benefits.js" defer></script>
 <script src="../assets/learn/sb3-city-planner.js" defer></script>
 ```

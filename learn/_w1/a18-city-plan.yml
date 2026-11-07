@@ -16,7 +16,7 @@ glossary:
     def: "A measure's net yearly cost, its capital spread over its life plus upkeep minus the energy it saves, divided by the tonnes of CO2 it avoids a year."
   - id: design-day
     term: Design day
-    def: "A cold (or hot) day chosen for planning, so that equipment and networks are sized for its highest hour rather than for an average day."
+    def: "A cold (or hot) day of planning weather, harsher than most, whose highest hour sets the size of heating equipment and of the wires that feed it."
 requests:
   - "Cross-page numbers: A18 reads the heat pump's cost ($8,620, 2022 dollars), rooftop solar's cost, life and upkeep and the 4% real rate from e0.json, and every Prairie City number from prairie-city.json. A15 (branch a) prices envelopes, heat pumps and lighting too: at integration, one source for shared measure costs (A18's are EIA AEO2026 RDM Table 2 and EIA's equipment report Appendix A, LBNL April 2015, ORNL/TM-2014/338)."
   - "path.yml: A18's after list keeps A1; F9 (curriculum prerequisite) is left out until F9 is live. Add F9 at integration."

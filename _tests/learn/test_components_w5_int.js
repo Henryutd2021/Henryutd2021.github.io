@@ -23,9 +23,9 @@ function ok(c, msg) { checks++; if (!c) { fails++; console.log("FAIL:", msg); } 
 const bundleJS = rd("learn.js"), bundleCSS = rd("learn.css");
 const PROMO = [
   { file: "lifebox", lx: "LifeBox", old: null, css: true, users: ["a11-lca-nexus"], keys: ["tap", "key", "drag"] },
-  { file: "siting", lx: "A19", lx2: "SiteMap", old: "a19.js", css: true, users: ["a19-gis-siting"],
+  { file: "siting", lx: "A19", lx2: "SiteMap", old: "a19.js", css: true, users: ["a19-gis-siting", "c3-prairie-city-2040"],
     keys: ["build", "coarsen", "cfg", "exclude", "criteria", "suitability", "blocks", "sites", "surface", "paths", "route", "cost", "shares", "withCity", "usd"] },
-  { file: "whopays", lx: "A13", old: "a13-who-pays-and-benefits.js", css: false, users: ["a13-fairness-jobs"],
+  { file: "whopays", lx: "A13", old: "a13-who-pays-and-benefits.js", css: false, users: ["a13-fairness-jobs", "sb3-city-planner", "m12-city-model", "c3-prairie-city-2040"],
     keys: ["groupsFrom", "allocate", "transfers", "regroup", "above", "jobs", "taxBase", "SCREENING", "ASSUME"] }
 ];
 const w4end = bundleJS.indexOf("window.LX.m08 = model");

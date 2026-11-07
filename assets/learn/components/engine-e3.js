@@ -493,7 +493,7 @@
   // times its use index (gas for heating measures, gasoline for cars, electricity for rooftop solar), filled by the plan's
   // rule (even: every group at the same rate; low or high: one group after another, lowest or highest income first), so
   // each district's changes add up to the engine's. (2) Lesson A13's accounting layer (LX.A13, assets/learn/
-  // a13-who-pays-and-benefits.js) turns them into money and burden: allocate(rows, cost, design, { kWh, spendDelta }),
+  // components/whopays.js, in the bundle before this engine) turns them into money and burden: allocate(rows, cost, design, { kWh, spendDelta }),
   // with the homes' energy changes at 2025 residential prices as spendDelta (district heat billed at its average cost),
   // and the households' share of the shared costs (substation upgrades and batteries, by their share of the districts'
   // electricity) recovered by the plan's design (per kWh, a fixed charge, or by income). Burden = home energy spending /
@@ -571,11 +571,11 @@
       shared: shared, cost: cost, design: al.design, rate: al.rate, dhPrice: dhPrice, adopters: adopters, clamped: clamp, rule: S.rule,
       screening: M.SCREENING, assume: M.ASSUME.split, a13: al };
   }
-  // LX.A13 (lesson A13's accounting layer): the page loads assets/learn/a13-who-pays-and-benefits.js after learn.js;
-  // Node requires it beside the components folder
+  // LX.A13 (lesson A13's accounting layer, components/whopays.js): in the learn.js bundle on a page; Node requires it
+  // from this folder
   function a13() {
     if (typeof window !== "undefined" && window.LX && window.LX.A13) return window.LX.A13;
-    if (typeof require === "function") { try { return require("../a13-who-pays-and-benefits.js"); } catch (e) { return null; } }
+    if (typeof require === "function") { try { return require("./whopays.js"); } catch (e) { return null; } }
     return null;
   }
 
