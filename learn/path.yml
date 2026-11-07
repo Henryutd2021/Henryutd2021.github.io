@@ -1387,7 +1387,7 @@
   title: "Cost and carbon done properly: one boundary, a fair baseline, a stated counterfactual"
   subtitle: "Audit a fictional bus study with four flaws, fix each one, and watch its conclusion change"
   short: "Cost and carbon, properly"
-  teaches: [one boundary for cost and emissions, fair baselines, stated counterfactuals, grid connection costs, credits counted once, cost per tonne avoided, audit notes]
+  teaches: [one boundary for cost and emissions, fair baselines, stated counterfactuals, grid connection costs, credits counted once, cost per attributed tonne, audit notes]
   does: "Audit a fictional study of 40 electric buses: put cost and CO₂ on one boundary, replace a convenient baseline with the stated counterfactual, add the missing grid costs and count a credit once; watch the saving and the CO₂ cut change, then write the audit note."
   outcome: "Find and fix the four most common cost-and-carbon flaws in a study, recompute its conclusion on one boundary against a stated counterfactual, and write an audit note that names whose cost each number is."
   after: [A1, A11, M11]

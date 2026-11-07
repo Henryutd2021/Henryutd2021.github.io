@@ -4,14 +4,17 @@
 //     "nearly 800 billion litres" over 176 TWh, the solar density 1 acre / 394 MWh, the gas footprint 410 and spacing 1,900
 //     ha per TWh a year, the gas stack from A10's EIA heat rate (7.535 x 52.91), F8's campus (240 MW x 8,760 h)
 //   - NREL's phases: solar's add to its total median (43); gas's add to 460.82 against a 486 median (said on the page);
-//     the brochure's 9 times and the fair 11 times; the consequential changes (−417, +43, +42)
+//     the brochure's 9 times and the fair 11 times; the consequential changes against not building the farm (−417, +43,
+//     +43: an existing wind farm's upkeep goes on, review 2026-11-06), with their arithmetic shown
 //   - the boundary: every contiguous boundary of every object, footprint, cooling and land rule: the total inside is the
 //     sum of its counted stages; stages not counted are listed and never added; gas land inside both stages is the
 //     whole total, one stage alone is a bound (over / under)
 //   - every number on the page (fallbacks, myths, quiz, Go deeper, numbers to remember, sources) against the model; the
 //     no-JS blocks equal the model's (--write rewrites them)
 //   - scope: no nuclear term in the lesson's own files; data centers only as a load; links on allowed hosts; text budget
-//     (steps and every line the page assembles, for every input: 40 words and two sentences at most); glossary marks
+//     (steps, page elements and every line the page assembles, for every input: 35 words and two sentences at most);
+//     glossary marks; the review's wording (units per kWh or MWh made or used, withdrawal, the drought, the illustrative
+//     land scaling, the stack check's date and load, the water boundary)
 //   - the page on a stub document: every step's action, the boundary's handles (keyboard) and tiles (tap)
 // Usage (from the site folder):  node _tests/learn/test_a11-lca-nexus.js [--write]
 "use strict";
@@ -75,8 +78,10 @@ ok(sc.build.v + sc.supply.v + sc.run.v + sc.end.v === D.nrelTotals.solar && D.nr
 ok(near(gc.build.v + gc.supply.v + gc.run.v + gc.end.v, 460.82, 1e-9) && D.nrelTotals.gas === 486, "gas's NREL phases add to 460.82; the total median is 486 (medians need not add)");
 ok(M.grp(M.full(D, "gas", "carbon").v) === "461" && M.wholeNote(D, "gas", "carbon", 0, 3) === "stages added; whole-life median 486", "the page says 461 with the whole-life median beside it");
 ok(Math.round(M.brochureRatio(D)) === 9 && Math.round(M.fairRatio(D)) === 11, "the brochure's 389 / 43 = 9 times; on one boundary 486 / 43 = 11 times");
-ok(M.consequential(D, "gas") === 43 - 71 - 389 && M.signed(M.consequential(D, "gas")) === "−417" && M.consequential(D, "spill") === 43 && M.signed(M.consequential(D, "wind")) === "+42",
-  "consequential changes: 43 − (71 + 389) = −417; spilled +43; wind upkeep 0.74 avoided: +42");
+ok(M.consequential(D, "gas") === 43 - 71 - 389 && M.signed(M.consequential(D, "gas")) === "−417" && M.consequential(D, "spill") === 43 && M.consequential(D, "wind") === 43 && M.avoided(D, "wind") === 0,
+  "consequential changes: 43 − (71 + 389) = −417; spilled +43; existing wind's upkeep goes on, so +43");
+ok(M.consArith(D, "gas") === "43 − (71 + 389) = −417" && M.consArith(D, "wind") === "43 − 0 = +43" && M.consArith(D, "spill") === "43 − 0 = +43", "the consequential arithmetic is shown: 43 − (71 + 389) = −417; 43 − 0 = +43");
+ok(M.lineCons(D, "gas").includes("against not building the farm") && M.lineCons(D, "gas").includes("417 g avoided, not removed"), "the consequential line names its baseline and says avoided, not removed");
 // water
 const cool = id => M.coolingOf(D, id);
 ok(cool("tower").use === 205 && cool("tower").wd === 255 && cool("once").use === 100 && cool("once").wd === 11380 && cool("dry").use === 2 && cool("pond").wd === 5950, "Macknick et al. medians: tower 255 / 205, once-through 11,380 / 100, pond 5,950 / 240, dry 2 / 2");
@@ -87,6 +92,15 @@ ok((U.freshWithdrawal / 1000).toFixed(1) === "59.9" && (U.consumptive / 1000).to
 // drought
 const dr = D.drought.summer;
 ok(100 - dr.median.hydro - dr.median.gas === 40 && 100 - dr.drought.hydro - dr.drought.gas === 42, "drought: other in-state sources 40% and 42%");
+// the review's wording (2026-11-06)
+ok(M.unitLine("solar", "carbon") === "carbon in g CO₂e per kWh made (= kg per MWh)" && M.unitLine("dc", "water") === "water in gallons consumed per MWh used" && M.unitLine("gas", "land") === "land in m² held per MWh made in a year",
+  "the header names each footprint's own denominator, made or used (no 'per MWh' over a g-per-kWh number)");
+ok(["solar", "gas", "dc"].every(k => !/per MWh/.test(D.objects[k].per)), "the objects' 'per' says per unit of electricity, not per MWh");
+ok(!/more cooling water\./.test(M.lineDrought(D, true)) && /this page does not total it/.test(M.lineDrought(D, true)) && !/more cooling water consumed/.test(JS), "the drought line does not claim a water result the page does not compute");
+ok(/illustrative/.test(M.lineLand(D, true)) && /In this example/.test(M.lineLand(D, true)) && /illustrative/.test(M.stage(D, "solar", "land", "run", { wide: true }).note), "solar's land between is labelled an illustrative scaling");
+ok(/2025/.test(M.stackHint(A10)) && /full load/.test(M.stackHint(A10)) && /\[\[heat-rate\|/.test(M.stackHint(A10)) && /2025/.test(A10.plains.sources.heat.asOf) && /full load/.test(A10.plains.sources.heat.label), "the stack check names EIA's 2025 tested full-load heat rate (as A10's source says)");
+ok(!/returns most/.test(SIDE) && !/returns most of it/.test(JS), "withdrawal is not said to return most of the water (a cooling tower consumes about 80%)");
+ok(!/land and water of mines/.test(JS) && !/factories' land and water/.test(PAGE), "the stated exclusions match the water data (Build water includes making and building)");
 
 // ---------------- the boundary: every contiguous boundary, object, footprint, cooling and land rule
 let nb = 0, bad = [];
@@ -138,16 +152,16 @@ const plain = t => t.replace(/\*\*/g, "").replace(/\[\[[^|]+\|([^\]]+)\]\]/g, "$
 const sentences = t => plain(t).split(/(?<=[.?!])\s+(?=[A-Z0-9“"])/).filter(x => /[A-Za-z]/.test(x)).length;
 const words = t => plain(t).trim().split(/\s+/).length;
 const stepTexts = [...JS.matchAll(/\{ text: "([^\n]+)",\n\s+build:/g)].map(m => m[1].replace(/" \+ D\.objects\.gas\.carbon\.run\.v \+ "/g, "389").replace(/" \+ D\.nrelTotals\.solar \+ "/g, "43").replace(/" \+ Math\.round\(brochureRatio\(D\)\) \+ "/g, "9"));
-ok(stepTexts.length === 8 && stepTexts.every(t => words(t) <= 40 && sentences(t) <= 2), "eight step texts of 40 words and two sentences at most: " + stepTexts.map(t => words(t) + "/" + sentences(t)).join(","));
+ok(stepTexts.length === 8 && stepTexts.every(t => words(t) <= 35 && sentences(t) <= 2), "eight step texts of 35 words and two sentences at most: " + stepTexts.map(t => words(t) + "/" + sentences(t)).join(","));
 { const O2 = OWN.replace(/^---[\s\S]*?\n---\n/, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, "").replace(/<style>[\s\S]*?<\/style>/g, "");
   const els = O2.replace(/^- (.*)$/gm, "<li>$1</li>").split(/<\/?(?:p|li|dd|dt|td|th|summary)\b[^>]*>/i).map(x => x.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()).filter(x => /[A-Za-z]/.test(x));
-  const long = els.filter(x => x.split(" ").length > 40);
-  ok(long.length === 0, "every page element is 40 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
+  const long = els.filter(x => x.split(" ").length > 35);
+  ok(long.length === 0, "every page element is 35 words or fewer: " + long.map(x => x.slice(0, 60) + " (" + x.split(" ").length + ")").join(" | ")); }
 const NEW = ["functional-unit", "water-withdrawal", "water-consumption", "land-use-intensity", "attributional-analysis", "interquartile-range"];
 NEW.forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("[[" + id + "|"), "sidecar defines and the page marks " + id));
-["system-boundary", "life-cycle-assessment", "consequential-analysis"].forEach(id => ok(JS.includes("[[" + id + "|"), "the page marks the course glossary's " + id));
+["system-boundary", "life-cycle-assessment", "consequential-analysis", "median", "heat-rate"].forEach(id => ok(JS.includes("[[" + id + "|") || PAGE.includes('data-term="' + id + '"'), "the page marks the course glossary's " + id));
 { const PY = fs.readFileSync(path.join(SITE, "learn/path.yml"), "utf8"), i = PY.indexOf("id: " + ID), r = PY.slice(i, i + 2000).split("\n- ")[0];
-  ok(i > 0 && /status: active/.test(r) && /form: cards/.test(r) && /minutes: 25/.test(r) && /practice_minutes: 30/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active cards row, 25 + 30 minutes, subtitle equal to the page's"); }
+  ok(i > 0 && /status: active/.test(r) && /form: cards/.test(r) && /minutes: 25/.test(r) && /practice_minutes: 30/.test(r) && /after: \[F11\]/.test(r) && PAGE.includes('subtitle: "' + (r.match(/subtitle: "([^"]+)"/) || [])[1] + '"'), "path.yml: active cards row, 25 + 30 minutes, after F11 (the curriculum's prerequisite), subtitle equal to the page's"); }
 
 // ---------------- the page on a stub document
 {
@@ -190,24 +204,25 @@ NEW.forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && JS.includes("
     ok(live.textContent.includes("Water consumed inside") && live.textContent.includes("19 gal per MWh"), "step 4: the box's water total with dry cooling (1 + 16 + 2 = 19)");
     // step 5
     demo.cards.go(4); const tg = card().querySelector(".lx-toggle"); tg.click(); grab();
-    ok(S.wide && card().textContent.includes("reverses the order"), "step 5: the land between"); tg.click(); grab(); tg.click();
+    ok(S.wide && card().textContent.includes("the order reverses") && card().textContent.includes("illustrative"), "step 5: the land between, labelled illustrative"); tg.click(); grab(); tg.click();
     // step 6
     demo.cards.go(5); ok(S.obj === "dc" && S.L === 2, "step 6: the data center at its fence"); key(box.handles[0], "ArrowLeft");
     ok(card().textContent.includes("99 + 1,194 = 1,293") && card().textContent.includes("2.7 billion gallons a year"), "step 6: with its power: water and the campus's year"); grab();
     // step 7
     demo.cards.go(6); for (const c of D.consequential) { btn(card(), new RegExp("^" + c.label.replace(/[:]/g, "\\$&"))).click(); grab(); }
-    ok(card().textContent.includes("+42 g per kWh") && card().textContent.includes("about 43 g per kWh"), "step 7: consequential and attributional readouts");
+    ok(card().textContent.includes("43 − 0 = +43 g per kWh") && card().textContent.includes("about 43 g per kWh") && said.some(t => t.includes("43 − (71 + 389) = −417")), "step 7: consequential (with its arithmetic) and attributional readouts");
     // step 8
     demo.cards.go(7); const dt = card().querySelector(".lx-toggle"); dt.click(); grab(); dt.click(); grab();
     ok(card().textContent.includes("Hydropower") && said.some(t => t.includes("falls to 8%")), "step 8: the drought case");
+    dt.click(); ok([...card().querySelectorAll("table")].some(tb => /Drought case/.test(tb.textContent) && /8%/.test(tb.textContent) && /15%/.test(tb.textContent) && /45%/.test(tb.textContent) && /42%/.test(tb.textContent)), "step 8: a visible table lists both cases' shares"); dt.click();
     ok(xp.textContent.includes("Three footprints, cradle to grave") && xp.textContent.includes("stages added; whole-life median 486"), "explain: the comparison table with the whole-life note");
     // every assembled line, for every input
-    const over = said.filter(t => /[A-Za-z]/.test(t) && (words(t) > 40 || sentences(t) > 2));
-    ok(said.length > 25 && over.length === 0, "every assembled line (" + said.length + ") is 40 words and two sentences at most: " + over.slice(0, 3).join(" | "));
+    const over = said.filter(t => /[A-Za-z]/.test(t) && (words(t) > 35 || sentences(t) > 2));
+    ok(said.length > 25 && over.length === 0, "every assembled line (" + said.length + ") is 35 words and two sentences at most: " + over.slice(0, 3).join(" | "));
     // every line function for every input, too
     const lines = [M.lineSolar(D), M.lineGas(D), M.stackHint(A10), M.lineCompare(D), M.lineLand(D, false), M.lineLand(D, true), M.lineDC(D, F8), M.lineDrought(D, false), M.lineDrought(D, true)]
       .concat(D.cooling.map(c => M.lineWater(D, c.id)), D.consequential.map(c => M.lineCons(D, c.id)));
-    ok(lines.every(t => words(t) <= 40 && sentences(t) <= 2), "every line function, every input: 40 words and two sentences at most");
+    ok(lines.every(t => words(t) <= 35 && sentences(t) <= 2), "every line function, every input: 35 words and two sentences at most: " + lines.filter(t => words(t) > 35 || sentences(t) > 2).join(" | "));
   } catch (e) { ok(false, "the stub page test threw: " + (e && e.stack || e)); }
 }
 

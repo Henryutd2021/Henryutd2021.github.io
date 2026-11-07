@@ -3313,7 +3313,7 @@
  },
  "water-withdrawal": {
   "term": "Water withdrawal",
-  "short": "Water taken from a river, lake or aquifer; a power plant returns most of what it withdraws, warmer.",
+  "short": "Water taken from a river, lake or aquifer, of which the part not returned is consumption; how much returns depends on the cooling system.",
   "lesson": "A11",
   "href": "a11-lca-nexus.html"
  },
