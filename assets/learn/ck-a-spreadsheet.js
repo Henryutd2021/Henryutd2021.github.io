@@ -21,8 +21,11 @@
 // the other customers. School + other customers = the resource view (the test proves it).
 //
 // Level rule (the page's rubric section says it in words): first-try answers of the seven auto-marked tasks and the points
-// ticked in the two written tasks; a task whose worked solution was opened first counts as not right; an attempt during
-// which the full worked solution had been open before the last task was submitted is practice, with no level (CK-M's rule).
+// ticked in the two written tasks; a task whose worked solution was opened first counts as not right; a task first
+// answered after the full worked solution opened (submitting task 9 opens it) counts as not right too, and a written task
+// submitted after it gets no points (review, 2026-11-06: skipping to task 9 and copying the solution no longer earns a
+// level); an attempt during which the full worked solution had been open before the last task was submitted is practice,
+// with no level (CK-M's rule).
 (function () {
   "use strict";
   var CODE = "CK-A", KEY = "cka-v1";
@@ -81,6 +84,10 @@
   function usdK(v) { return (v < 0 ? "−" : "") + "$" + (Math.round(Math.abs(v) / 1000) * 1000).toLocaleString("en-US"); }
   function pct(f, d) { return (100 * f).toFixed(d == null ? 0 : d) + "%"; }
   function n0(v) { return Math.round(v).toLocaleString("en-US"); }
+  // a low-to-high range with its unit, for the sensitivity table and the tornado's labels (review #9)
+  function unitOf(r) { return /\$\/kWh/.test(r.unit) ? " per kWh" : r.unit === "$/kW-month" ? " per kW-month" : /^\$ \(2025\)/.test(r.unit) && r.id === "upkeep" ? " a year" : ""; }
+  function showRange(r, lo, hi) { return showVal(r, lo) + " to " + showVal(r, hi) + unitOf(r); }
+  function showOne(r, v) { var u = unitOf(r); return showVal(r, v) + (u === " per kWh" ? "/kWh" : u === " per kW-month" ? "/kW-month" : u); }
   function showVal(r, v) {
     if (r.unit === "fraction" || r.unit === "per year" && r.id === "rate") return pct(v, Math.abs(v * 100 - Math.round(v * 100)) > 1e-9 ? 1 : 0);
     if (/\$\/kWh/.test(r.unit)) return "$" + v.toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
@@ -96,7 +103,13 @@
   var CPK = (typeof window !== "undefined" && window.LX && window.LX.Checkpoint) || require("./components/checkpoint.js");
   function isAuto(t) { return t.kind === "choice" || t.kind === "order" || t.kind === "numeric"; }
   function points(st, t) { var r = st.tasks[t.id] || {}; return (r.points || []).filter(Boolean).length; }
-  function firstRight(st, t) { return CPK.firstRight(st.tasks[t.id], "not-right"); }
+  // a task first answered after the page's full worked solution opened (D.solOpen: ISO time, the runner's record; the
+  // submit task itself opens it, so it is never "after")
+  function after(D, st, t) {
+    var r = st.tasks[t.id], g = D.tasks[D.tasks.length - 1];
+    return !!(D.solOpen && t.id !== g.id && r && r.at && r.at > D.solOpen);
+  }
+  function firstRight(st, t, D) { return CPK.firstRight(st.tasks[t.id], "not-right") && !(D && after(D, st, t)); }
   // practice: the full worked solution was open before the last task was submitted (by this attempt or an earlier one)
   function assisted(D, st) {
     var g = D.tasks[D.tasks.length - 1], r = st.tasks[g.id] || {};
@@ -106,22 +119,25 @@
   }
   function level(D, st) {
     var R = D.rule, auto = D.tasks.filter(isAuto), opens = D.tasks.filter(function (t) { return t.kind === "open-short"; });
-    var k = auto.filter(function (t) { return firstRight(st, t); }).length, pa = points(st, opens[0]), pb = points(st, opens[1]);
+    var k = auto.filter(function (t) { return firstRight(st, t, D); }).length;
+    var pa = after(D, st, opens[0]) ? 0 : points(st, opens[0]), pb = after(D, st, opens[1]) ? 0 : points(st, opens[1]);
+    var late = D.tasks.filter(function (t) { return after(D, st, t); }).length;
     var na = opens[0].points.length, nb = opens[1].points.length, help = assisted(D, st);
     var complete = auto.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].first != null; }) && opens.every(function (t) { return st.tasks[t.id] && st.tasks[t.id].answer; });
-    var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst; }).length;
+    var early = auto.filter(function (t) { return st.tasks[t.id] && st.tasks[t.id].solFirst && !after(D, st, t); }).length;
     var lv = R.levels[0];
     if (help) lv = R.practice;
     else if (k >= R.autoStrong && pa === na && pb === nb) lv = R.levels[3];
     else if (k >= R.autoProficient && pa >= R.pointsProficient && pb >= R.pointsProficient) lv = R.levels[2];
     else if (k >= R.autoDeveloping) lv = R.levels[1];
-    return { level: lv, auto: k, autoOf: auto.length, pointsA: pa, pointsAOf: na, pointsB: pb, pointsBOf: nb, complete: complete, early: early, assisted: help, estMin: -1, explainOk: pa === na };
+    return { level: lv, auto: k, autoOf: auto.length, pointsA: pa, pointsAOf: na, pointsB: pb, pointsBOf: nb, complete: complete, early: early, late: late, assisted: help, estMin: -1, explainOk: pa === na };
   }
   function describe(D, L) {
     if (L.assisted) return (L.assisted === "early" ? "The worked solution was opened before task " + D.tasks.length + " was submitted" : "The worked solution had already been open in this browser (an earlier attempt)") +
       ", so this attempt is practice and gets no level. Your answers and their feedback stay.";
     return "Auto-marked tasks right on the first try: " + L.auto + " of " + L.autoOf + (L.early ? " (" + L.early + " with the solution opened first, counted as not right)" : "") +
-      ". Points you ticked: " + L.pointsA + " of " + L.pointsAOf + " for the boundary, " + L.pointsB + " of " + L.pointsBOf + " for the log and sensitivity." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
+      (L.late ? ". Answered after the worked solution opened, so counted as not right or without points: " + L.late + " task" + (L.late > 1 ? "s" : "") : "") +
+      ". Points counted: " + L.pointsA + " of " + L.pointsAOf + " for the boundary, " + L.pointsB + " of " + L.pointsBOf + " for the log and sensitivity." + (L.complete ? "" : " Some tasks are not finished; the level counts them as not right.");
   }
   function summary(D, st, env) {
     env = env || {};
@@ -134,7 +150,7 @@
     lines.push("# | Part | Task | First answer | Tries | Time to first answer | Solution opened before answering");
     D.tasks.forEach(function (t, i) {
       var r = st.tasks[t.id] || {}, w = !r || r.first == null ? (r && r.answer ? "submitted" : "not answered") : t.kind === "open-short" ? (r.points || []).filter(Boolean).length + " of " + t.points.length + " points (self)" : r.first ? "right" : "not right";
-      lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (r.solFirst ? "yes" : "no"));
+      lines.push((i + 1) + " | " + t.part + " | " + t.title + " | " + w + " | " + (r.tries || 0) + " | " + CPK.fmtMs(r.msFirst) + " | " + (after(D, st, t) ? "yes (the full worked solution)" : r.solFirst ? "yes" : "no"));
     });
     D.tasks.forEach(function (t) {
       var r = st.tasks[t.id]; if (!r || !r.answer) return;
@@ -153,9 +169,15 @@
   // ---- static blocks (written into the page by the test's --write mode; the page reads the same data)
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function plain(t) { return esc(String(t).replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")); }
+  // text with glossary marks to safe HTML with the page's term spans, in static blocks: the course's own writer (core.js)
+  var RICH = (typeof window !== "undefined" && window.LX && window.LX.rich) || require("./components/core.js").rich;
+  function term(t) { return RICH(t); }
+  // the case in three parts: situation, deliverable, inputs (review #7)
   function staticBrief(D) {
-    return "<p>" + esc(D.case.text) + ' <span class="lx-hint">' + esc(D.case.fictional) + "</span></p>\n" +
-      '<ul class="cka-facts">' + D.case.facts.map(function (f) { return "<li><b>" + esc(f[0]) + ":</b> " + esc(f[1]) + "</li>"; }).join("") + "</ul>";
+    return '<p><b>Situation:</b> ' + term(D.case.situation) + "</p>\n<p><b>Deliverable:</b> " + term(D.case.deliverable) + "</p>\n" +
+      '<p class="lx-eyebrow cka-in">Inputs, illustrative where marked</p>\n' +
+      '<ul class="cka-facts">' + D.case.facts.map(function (f) { return "<li><b>" + esc(f[0]) + ":</b> " + term(f[1]) + "</li>"; }).join("") + "</ul>\n" +
+      '<p class="lx-hint">' + esc(D.case.fictional) + "</p>";
   }
   function staticTasks(D) {
     var h = ['<p class="lx-hint">Without JavaScript nothing here is locked: the worked solution is further down the page. Build your spreadsheet first, write your answers down, then compare.</p>', '<ol class="cka-static">'];
@@ -184,37 +206,41 @@
     h.push(row("Up-front cost", usd(b.capital) + " (2025 dollars; " + usd(b.capKW * b.pvKW) + " in 2022 dollars × " + b.defl22.toFixed(4) + ")"));
     h.push(row("Bill saving, gross", usd(r.billSave) + " a year = " + usd(r.sEnergy) + " energy + " + usd(r.sExport) + " exports + " + usd(r.sDemand) + " demand − " + usd(-r.sLoss) + " losses"));
     h.push(row("Upkeep", usd(r.upkeep) + " a year (" + usd(b.omPV) + " solar, " + usd(b.omBat) + " battery)"));
-    h.push(row("Annuity factor", r.af.toFixed(2) + " (" + b.years + " years at " + pct(b.rate) + ")"));
-    h.push(row("Battery replacement, year " + b.batLife, usd(b.repl) + "; present value " + usd(r.pvRepl) + "; residual at year " + b.years + " " + usd(r.residual) + " (present value " + usd(r.pvResidual) + ")"));
+    h.push(row('<span class="lx-term" data-term="annuity-factor">Annuity factor</span>', r.af.toFixed(2) + " (" + b.years + " years at " + pct(b.rate) + ")"));
+    h.push(row("Battery replacement, year " + b.batLife, usd(b.repl) + "; present value " + usd(r.pvRepl)));
+    h.push(row('<span class="lx-term" data-term="residual-value">Residual value</span>, year ' + b.years, usd(r.residual) + " (" + (b.batLife - (b.years - b.batLife)) + " of " + b.batLife + " years left, straight line); present value " + usd(r.pvResidual)));
     h.push(row("Net present value to the school", usd(r.npvSchool)));
     h.push("</tbody></table></div>");
     h.push('<p class="lx-hint">Check in the workbook: the year-by-year cash flow sums to the same ' + usd(F.pvSum) + ". The installed cost read as per kW-DC of solar is " + pct(b.coloc) + " below the two systems' separate costs, as the report says installing together saves.</p></div>");
     // who pays
     h.push('<div class="lx-xcard"><header class="lx-x-head"><h3>Who pays and who benefits</h3></header><div class="lx-scroll-x"><table class="lx-facts cf-two cka-led">');
     h.push('<thead><tr><th scope="col">Party</th><th scope="col">A year</th><th scope="col">Present value</th></tr></thead><tbody>');
-    [["The school district", r.net, r.npvSchool], ["The utility's other customers (once rates are reset)", -r.shift, r.npvOthers], ["Federal taxpayers (no credit counted)", 0, 0], ["Resource view: all parties together", r.avoided - r.upkeep, r.npvSociety]].forEach(function (p) {
+    [["The school district", r.net, r.npvSchool], ["The utility's other customers (at the next rate reset)", -r.shift, r.npvOthers], ["Federal taxpayers (no credit counted)", 0, 0], ["Resource view: all parties together", r.avoided - r.upkeep, r.npvSociety]].forEach(function (p) {
       h.push('<tr><th scope="row">' + esc(p[0]) + '</th><td class="n" data-l="A year">' + usd(p[1]) + '</td><td class="n" data-l="Present value">' + usd(p[2]) + "</td></tr>");
     });
     h.push("</tbody></table></div>");
     h.push('<ul class="cka-list"><li><b>Gross against net:</b> of the school\'s ' + usd(r.billSave) + " gross bill saving a year, " + usd(r.avoided) + " is a real cost the utility avoids; " + usd(r.shift) + " is a <span class=\"lx-term\" data-term=\"transfer\">transfer</span> from its other customers.</li>");
     h.push("<li><b>Adds up:</b> school " + usd(r.npvSchool) + " + other customers " + usd(r.npvOthers) + " = resource view " + usd(r.npvSociety) + ".</li>");
-    h.push("<li><b>Screening estimates:</b> the cost shift assumes the utility resets its rates so other customers make up what it does not save, with the avoided costs in the log; a model of the school's bill does not produce this by itself, the accounting of who pays does.</li>");
-    h.push("<li><b>Not in money:</b> about " + n0(r.co2t) + " t of CO₂ a year at Kansas's 2024 average factor (an inventory number, not the change caused); no resilience (no islanding equipment costed); installation is job-years, not permanent jobs, and is not estimated.</li></ul></div>");
+    h.push("<li><b>Screening estimate:</b> the cost shift holds only under the brief's rate-reset assumption. It comes from the accounting of who pays, not from the model of the school's bill.</li>");
+    h.push("<li><b>CO₂, not valued:</b> about " + n0(r.co2t) + " t a year at Kansas's 2024 average factor: an inventory number, not the change the project causes.</li>");
+    h.push('<li><b>Resilience, not counted:</b> no <span class="lx-term" data-term="islanding">islanding</span> equipment is costed, so the battery gives no backup in an outage.</li>');
+    h.push("<li><b>Jobs, not estimated:</b> installation is job-years of temporary work, not permanent jobs.</li></ul></div>");
     // sensitivity
     h.push('<div class="lx-xcard" id="cka-sens"><header class="lx-x-head"><h3>Sensitivity of the main result</h3></header><div class="lx-scroll-x"><table class="lx-facts cf-two cka-sens">');
     h.push('<thead><tr><th scope="col">Input</th><th scope="col">Low to high</th><th scope="col">NPV at low</th><th scope="col">NPV at high</th></tr></thead><tbody>');
     var lab = {}; D.log.forEach(function (x) { lab[x.id] = x; });
     S.forEach(function (s) {
       var lr = s.ids.length > 1 ? { unit: "$ (2025)", id: "upkeep" } : lab[s.ids[0]];
-      h.push('<tr><th scope="row">' + esc(s.label) + (s.ids.length > 1 ? " (a year)" : "") + '</th><td class="n" data-l="Low to high">' + showVal(lr, s.lo) + " to " + showVal(lr, s.hi) + '</td><td class="n" data-l="NPV at low">' + usd(s.atLo) + '</td><td class="n" data-l="NPV at high">' + usd(s.atHi) + "</td></tr>");
+      h.push('<tr><th scope="row">' + esc(s.label) + '</th><td class="n" data-l="Low to high">' + showRange(lr, s.lo, s.hi) + '</td><td class="n" data-l="NPV at low">' + usd(s.atLo) + '</td><td class="n" data-l="NPV at high">' + usd(s.atHi) + "</td></tr>");
     });
     h.push("</tbody></table></div>");
-    h.push('<p class="lx-hint">Sorted by swing. A higher demand charge lowers the energy charge (the tariff still gives the school EIA\'s average), so the solar saves less than the battery gains: the result falls.</p>');
+    h.push('<p class="lx-hint">Sorted by swing. The demand-charge row varies the demand charge while holding the school\'s pre-project annual bill constant, so the energy charge falls as it rises.</p>');
+    h.push('<p class="lx-hint">Then the reduction in solar savings exceeds the increase in battery savings: the result falls.</p>');
     h.push('<div id="cka-tornado"></div></div>');
     // boundary and log
     h.push('<div class="lx-xcard"><header class="lx-x-head"><h3>Boundary and assumptions log</h3></header>');
-    h.push('<ul class="cka-list"><li><b>Counted:</b> the school district\'s money: bill saving, capital, upkeep, the battery\'s replacement and its residual value; ' + b.years + " years, real 2025 dollars, " + pct(b.rate) + ".</li>");
-    h.push("<li><b>Left out:</b> tax credits (a transfer if claimed through elective pay), financing, resilience, CO₂'s value, solar wear, tariff changes over time.</li>");
+    h.push('<ul class="cka-list"><li><b>Counted:</b> the school district\'s money: bill saving, capital, upkeep, the battery\'s replacement and its residual value; ' + b.years + ' years, real 2025 dollars, a ' + pct(b.rate) + ' <span class="lx-term" data-term="real-rate">real discount rate</span>.</li>');
+    h.push('<li><b>Left out:</b> tax credits (a transfer if claimed through <span class="lx-term" data-term="elective-pay">elective pay</span>), financing, resilience, CO₂\'s value, solar wear, tariff changes over time.</li>');
     h.push("<li><b>Reported apart:</b> the other customers, federal taxpayers and the resource view.</li></ul>");
     h.push('<details class="lx-textalt"><summary>The worked assumptions log (' + D.log.length + " rows)</summary><div class=\"lx-scroll-x\"><table class=\"lx-mini-table cka-log\"><thead><tr><th scope=\"col\">Input</th><th scope=\"col\">Value</th><th scope=\"col\">Unit</th><th scope=\"col\">Type</th><th scope=\"col\">Source</th></tr></thead><tbody>");
     D.log.forEach(function (x) {
@@ -232,7 +258,7 @@
   }
   function tornadoRows(D, F) {
     var lab = {}; D.log.forEach(function (x) { lab[x.id] = x; });
-    return F.sens.map(function (s) { var lr = s.ids.length > 1 ? { unit: "$ (2025)", id: "upkeep" } : lab[s.ids[0]]; return { label: s.label, loText: showVal(lr, s.lo), hiText: showVal(lr, s.hi), atLo: s.atLo, atHi: s.atHi }; });
+    return F.sens.map(function (s) { var lr = s.ids.length > 1 ? { unit: "$ (2025)", id: "upkeep" } : lab[s.ids[0]]; return { label: s.label, loText: showOne(lr, s.lo), hiText: showOne(lr, s.hi), atLo: s.atLo, atHi: s.atHi }; });
   }
   var RUBRIC = [
     { id: "accounting", look: "One boundary for every cost and saving, in 2025 dollars; the school's result kept apart from the other customers' and the resource view; transfers kept apart from real costs." },
@@ -241,7 +267,7 @@
     { id: "realism", look: "Illustrative inputs labelled as such; what the spreadsheet leaves out listed (credits, resilience, solar wear, tariff changes)." }
   ];
   var api = { derive: derive, model: model, vals: vals, sensitivity: sensitivity, facts: facts, level: level, describe: describe, summary: summary, runnerData: runnerData,
-    staticBrief: staticBrief, staticTasks: staticTasks, staticSolution: staticSolution, tornadoRows: tornadoRows, usd: usd, usdK: usdK, pct: pct, showVal: showVal, RUBRIC: RUBRIC, KEY: KEY, CODE: CODE,
+    staticBrief: staticBrief, staticTasks: staticTasks, staticSolution: staticSolution, tornadoRows: tornadoRows, usd: usd, usdK: usdK, pct: pct, showVal: showVal, showRange: showRange, after: after, RUBRIC: RUBRIC, KEY: KEY, CODE: CODE,
     checkNumeric: CPK.checkNumeric };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window === "undefined" || !window.LX || !window.LX.Checkpoint) return;
@@ -252,7 +278,7 @@
     var D = data.ck_a_spreadsheet, F = facts(D), RD = runnerData(D);
     Object.defineProperty(RD, "solOpen", { get: function () { return LX.Checkpoint.solOpened(KEY); } });
     var cp = LX.Checkpoint(live, { data: RD, key: KEY, code: CODE, lessonId: "ck-a-spreadsheet",
-      intro: ["Nine tasks on your own spreadsheet: two short texts you rate yourself, and seven answers marked at once.", "No hints. Build the spreadsheet first (about two hours); each task's worked answer opens after your first answer, and opening one early is recorded.", "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share, with what you typed."],
+      intro: ["Nine tasks on your own spreadsheet: two short texts you rate yourself, and seven answers marked at once.", "No hints. Build the spreadsheet first (about two hours); each task's worked answer opens after your first answer, and opening one early is recorded.", "Submit task 9 last: it opens the full worked solution, and a task answered after that counts as not right.", "Your answers and times stay in this browser. At the end, “Copy my results” gives a plain-text summary for you to share, with what you typed."],
       lock: "#cka-lock", solution: "#cka-solution-body", submitTask: D.tasks[D.tasks.length - 1].id, level: level, describe: describe, summary: summary, openFirst: "not-right" });
     var tw = document.getElementById("cka-tornado");
     if (tw && LX.Tornado) {
@@ -268,7 +294,8 @@
     LX.demo(root, function (state) {
       if (state === "mid") { cp.show(1); return { view: "task 2" }; }
       if (state === "done") { cp.results(); return { view: "results" }; }
-      if (state === "solution") { var lk = document.getElementById("cka-lock"), body = document.getElementById("cka-solution-body"); if (lk) lk.hidden = true; if (body) body.classList.add("is-open"); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
+      // the solution state opens it as the lock button does, recorded (practice), never silently (review #1)
+      if (state === "solution") { cp.solutionNow(); var s = document.getElementById("solution"); if (s) s.scrollIntoView(); return { view: "solution" }; }
       return null;
     });
   });

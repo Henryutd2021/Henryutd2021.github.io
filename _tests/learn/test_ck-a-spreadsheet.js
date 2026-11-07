@@ -6,8 +6,12 @@
 //     from the course's data (e0.json: price index, rate, CO2 factor; A4: capacity cost)
 //   - the worked workbook: unzipped here; every formula evaluated with the course's own engine (components/sheet.js, the
 //     sheets laid end to end) equals its cached value and the model; the starter has no formulas and no worked values
-//   - the tasks: answers equal the model; the level rule on sample attempts; the sensitivity's claims (no sign change, the
-//     largest swing, a higher demand charge lowering the result)
+//   - the tasks: answers equal the model; the level rule on sample attempts, including answers given after the full
+//     worked solution opened (pure, and on the real runner: task 9 first, then the shown answers, earns no level; the same
+//     answers in order earn Strong); the demo opens the solution only through the recorded path; the sensitivity's
+//     claims (no sign change, the largest swing, a higher demand charge lowering the result); the conventions the answers
+//     rest on (residual value, the battery's energy basis, the rate reset, the demand-charge scenario) stated before
+//     the tasks; units in the sensitivity
 //   - every number on the page (static blocks, numbers used, the rubric in the course's words) and the page on a stub
 //   - scope: no nuclear term, no "AI", no deny-listed term; links only to allow-listed domains, learn pages and downloads
 // Usage (from the site folder):  node _tests/learn/test_ck-a-spreadsheet.js [--write]
@@ -153,6 +157,14 @@ ok(task("solar").units.filter(u => u[1] === null).length === 2, "the solar task 
   ok(M.level(D, early).level === "Practice (no level)", "the worked solution opened before task 9: practice");
   const seen = st(7, 4, 4); ok(M.level(Object.assign({ solOpen: "2026-11-05T00:00:00Z" }, D), seen).level === "Practice (no level)" && M.level(Object.assign({ solOpen: "2026-11-06T10:00:00Z" }, D), seen).level === "Strong", "opened by an earlier attempt: practice; opened by submitting task 9: counts");
   const opened = st(7, 4, 4); opened.tasks.solar.solFirst = true; ok(M.level(D, opened).auto === 6, "a task opened before answering counts as not right");
+  // review #1: task 9 submitted first (it opens the full worked solution), then every other task answered from it
+  const late = st(7, 4, 4); T.forEach(t => { late.tasks[t.id].at = t.id === "log" ? "2026-11-06T10:00:00.000Z" : "2026-11-06T10:05:00.000Z"; });
+  const LL = M.level(Object.assign({ solOpen: "2026-11-06T10:00:00.000Z" }, D), late);
+  ok(LL.level === "Not yet" && LL.auto === 0 && LL.pointsA === 0 && LL.pointsB === 4 && LL.late === 8, "answers given after task 9 opened the solution earn no level: " + LL.level + ", " + LL.auto + " of 7, boundary points " + LL.pointsA);
+  ok(/Answered after the worked solution opened, so counted as not right or without points: 8 tasks/.test(M.describe(D, LL)), "the results sentence says why");
+  ok(/yes \(the full worked solution\)/.test(M.summary(Object.assign({ solOpen: "2026-11-06T10:00:00.000Z" }, D), late, {})), "the copied summary marks the late answers");
+  const inOrder = st(7, 4, 4); T.forEach(t => { inOrder.tasks[t.id].at = t.id === "log" ? "2026-11-06T10:05:00.000Z" : "2026-11-06T10:00:00.000Z"; });
+  ok(M.level(Object.assign({ solOpen: "2026-11-06T10:05:00.000Z" }, D), inOrder).level === "Strong", "the same answers before task 9: Strong");
   ok(/^Learn · CK-A results \(ck-a v1 \(6 Nov 2026\)\)\n/.test(M.summary(D, st(7, 4, 4), { width: 375 })), "the copied summary's first line");
 }
 
@@ -168,7 +180,27 @@ ok(rel(-776324 - 192941, -969265, 1e-6), "and they do (rounded)");
   ok(v.price === 0.1117 && v.capKW === 3170 && v.pvCF === 0.178 && v.batOM === 63 && v.pvOM === 17.63 && v.co2lb === 680 && v.rte === 0.9 && v.batLife === 15, "the numbers-used table matches the log");
   ["11.17¢/kWh", "$3,170/kW-DC", "17.8%", "$63/kW a year", "$17.63/kW-DC a year", "680 lb/MWh"].forEach(s => ok(OWN.includes('<td class="n">' + s + "</td>"), "numbers used: " + s)); }
 { const mins = [...OWN.matchAll(/\(about (\d+) min\)/g)].map(m => +m[1]); ok(mins.length === 5 && mins.reduce((a, x) => a + x, 0) === 150, "the parts add up to about 150 minutes: " + mins.join(" + ")); }
-has("Enter your results in the nine tasks below. The worked workbook opens when you submit task 9.", "nine tasks, task 9");
+has("Enter your results in the nine tasks below, task 9 last: submitting it opens the worked workbook.", "nine tasks, task 9 last");
+has("After the worked workbook opens: a task answered after that counts as not right, and a written task gets no points.", "the late-answer rule, before the tasks");
+has("Answered late: a task first answered after the worked workbook opened counts as not right; a written task submitted after it gets no points.", "the late-answer rule, in the rubric");
+// the conventions the answers depend on, stated before the tasks (reviews #2, #3, #4, #5)
+{ const BR = text(PAGE.slice(between(PAGE, "cka-brief").from, between(PAGE, "cka-brief").to));
+  ok(BR.includes("End value: at year 25 the replacement battery has 5 of its 15 years left: count 5/15 of its cost as its residual value (straight line)") && rel(r.residual, b.repl * 5 / 15, 1e-12), "the brief states the straight-line residual value the answer uses (5/15 of the replacement)");
+  ok(BR.includes("about 200 full cycles a year, each taking in 300 kWh from the school's supply and returning 90%; the 10% lost is bought at the energy charge") && rel(r.lossKWh, 200 * 300 * 0.1, 1e-12) && rel(r.sLoss, -r.lossKWh * r.energyCharge, 1e-12), "the brief defines the battery's energy basis: 300 kWh taken in per full cycle, 10% lost, bought at the energy charge (6,000 kWh)");
+  ok(BR.includes("Rate reset: assume the utility recovers its whole remaining revenue shortfall from its other customers at the next rate reset"), "the brief gives the rate-reset assumption the cost shift needs");
+  ok(BR.includes("Situation:") && BR.includes("Deliverable:") && BR.includes("Inputs, illustrative where marked"), "the case in three parts: situation, deliverable, inputs");
+  const words = x => x.split(/\s+/).filter(Boolean).length;
+  ok([D.case.situation, D.case.deliverable].concat(D.case.facts.map(f => f[1].replace(/\[\[[a-z0-9-]+\|([^\]]+)\]\]/g, "$1")))
+    .every(x => words(x) <= 35), "every part of the brief is at most 35 words"); }
+ok(task("tornado").options.find(o => o[0] === "c")[1].includes("with the energy charge re-set so the pre-project bill is unchanged") && /pre-project bill held/.test(F.sens.find(x => x.key === "demand").label), "the demand-charge swing is named as a rebalancing (pre-project bill held), before and after");
+ok(/Under the brief's rate-reset assumption, who pays it\?$/.test(task("transfer").prompt) && /^Under the same assumption/.test(task("shift").prompt) && /counting the brief's residual value/.test(task("npc").prompt), "tasks 5 to 7 say which given convention they rest on");
+ok(/Submit this task last: it opens the worked workbook\.$/.test(task("log").prompt), "task 9 says to submit it last");
+// units in the sensitivity (review #9)
+{ const SO = text(M.staticSolution(D));
+  ok(SO.includes("$0.0894 to $0.134 per kWh") && SO.includes("$5 to $20 per kW-month") && SO.includes("$11,229 to $18,715 a year"), "the sensitivity table keeps its units");
+  const tr = M.tornadoRows(D, F), pr = tr.find(x => /price/.test(x.label)), dm = tr.find(x => /Demand/.test(x.label));
+  ok(pr.loText === "$0.0894/kWh" && pr.hiText === "$0.134/kWh" && dm.loText === "$5/kW-month" && dm.hiText === "$20/kW-month", "the tornado's labels keep their units");
+  ok(["kw-dc", "residual-value", "annuity-factor", "real-rate", "islanding", "elective-pay", "full-cycle"].every(k => PAGE.includes('data-term="' + k + '"')), "kW-DC, residual value, annuity factor, real rate, islanding, elective pay and full cycles are glossary terms on the page"); }
 has("Prairie Town is fictional; its numbers are illustrative where the log says so.", "the fictional line");
 ok(OWN.includes('href="../assets/learn/data/ck-a-starter.xlsx" download') && M.staticSolution(D).includes('href="../assets/learn/data/ck-a-worked.xlsx" download'), "the starter downloads from the task; the worked workbook from the (gated) solution only");
 ok(!between(PAGE, "cka-tasks") || !PAGE.slice(between(PAGE, "cka-tasks").from, between(PAGE, "cka-tasks").to).includes("ck-a-worked.xlsx"), "the task list does not link the worked workbook");
@@ -204,8 +236,57 @@ ok(!between(PAGE, "cka-tasks") || !PAGE.slice(between(PAGE, "cka-tasks").from, b
   ok(tornado && tornado.rows.length === 8 && rel(tornado.base, r.npvSchool, 1e-12) && tornado.rows.every((x, i) => rel(x.atLo, F.sens[i].atLo, 1e-12)), "the tornado draws the eight swings around the base NPV");
   ok(cr.querySelectorAll("fieldset").length === 4 || /Consistent accounting/.test(cr.innerHTML), "the course rubric draws its four competences");
   ["mid", "done", "solution"].forEach(s => { let q = null; try { q = demo(s); } catch (err) { q = null; } ok(q && q.view, "demo state " + s + " runs"); });
+  ok(E.LX.store.get(M.KEY + "-sol-open", null) && E.body.querySelector("#cka-solution-body").classList.contains("is-open") && E.body.querySelector("#cka-lock").hidden, "the solution demo opens the worked solution through the runner, recorded");
+  { const st9 = E.LX.store.get(M.KEY, {}); ok(st9.tasks && st9.tasks.log && st9.tasks.log.solFirst === true && M.level(Object.assign({ solOpen: E.LX.store.get(M.KEY + "-sol-open") }, D), st9).level === "Practice (no level)", "opening it by the demo makes the attempt practice"); }
+  await reviewersSequence();
+  await inOrderSequence();
   finish();
 })().catch(err => { ok(false, "the stub page test threw: " + (err && err.stack || err)); finish(); });
+
+// mount the page on a fresh stub document (a fresh browser)
+function mountFresh() {
+  const { env, load, El } = require("./stubdom.js");
+  if (!El.prototype.getBoundingClientRect) El.prototype.getBoundingClientRect = () => ({ top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 });
+  const E = env(); E.LX.ready = () => {}; E.LX.reduced = () => true; E.window.innerWidth = 1280;
+  ["checkpoint", "rubric", "tornado"].forEach(n => load(n, E));
+  let init = null; E.LX.mount = (slug, f) => { if (slug === ID) init = f; }; E.LX.demo = () => () => null;
+  const lock = E.LX.H("div", { id: "cka-lock", hidden: "" }, E.body); E.LX.H("button", { type: "button" }, lock);
+  E.LX.H("div", { id: "cka-solution-body", class: "lx-ck-gated" }, E.body); E.LX.H("div", { id: "cka-tornado" }, E.body); E.LX.H("div", { id: "cka-course-rubric" }, E.body);
+  vm.runInNewContext(JS, { window: E.window, document: E.document, location: E.location, navigator: {}, console, module: { exports: {} }, setTimeout: f => { f(); return 0; }, clearTimeout: () => {}, require });
+  const root = E.LX.H("div", { class: "lx-interactive", "data-learn": ID }, E.body), live = E.LX.H("div", { class: "lx-live" }, root);
+  init(live, { ck_a_spreadsheet: D }, root);
+  const btn = re => live.querySelectorAll("button").filter(x => re.test(x.textContent))[0];
+  const goTo = i => { for (let k = 0; k < 12; k++) { const tag = live.querySelector(".lx-ck-tag"); const cur = tag ? +/Task (\d+)/.exec(tag.textContent)[1] - 1 : -1; if (cur === i) return; (cur < i ? btn(/Next task|Start the checkpoint|Resume/) : btn(/^Back$/)).click(); } };
+  // answer task i right on its first try (written tasks: submit a text, then tick every point)
+  const answer = i => {
+    goTo(i); const t = D.tasks[i];
+    if (t.kind === "numeric") { live.querySelector("input").value = String(t.answer.value); live.querySelector("select").value = t.units.find(u => u[1] === 1)[0]; btn(/^Check$/).click(); }
+    if (t.kind === "choice") live.querySelectorAll(".lx-choice").filter(b => b.textContent === t.options.find(o => o[0] === t.answer)[1])[0].click();
+    if (t.kind === "open-short") { live.querySelector("textarea").value = "My own text for " + t.id + "."; btn(/Submit my explanation/).click();
+      live.querySelectorAll(".lx-ck-points input").forEach(cb => { cb.checked = true; cb.fire("change"); }); }
+  };
+  const level = () => { btn(/See my results|Next task/) && goTo(8); btn(/See my results/).click(); return text(live.querySelector(".lx-ck-level").textContent); };
+  return { E, live, answer, level };
+}
+function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
+// review #1, reproduced: skip to task 9, submit it (the full solution opens), then answer the others from it
+async function reviewersSequence() {
+  const P = mountFresh();
+  P.answer(8);
+  ok(P.E.body.querySelector("#cka-solution-body").classList.contains("is-open") && P.E.LX.store.get(M.KEY + "-sol-open", null), "runner: submitting task 9 opens the worked solution and records when");
+  await sleep(5);
+  for (let i = 0; i < 8; i++) P.answer(i);
+  const lv = P.level(), st = P.E.LX.store.get(M.KEY, {});
+  ok(lv === "Level: Not yet" && D.tasks.slice(0, 8).every(t => st.tasks[t.id].at > P.E.LX.store.get(M.KEY + "-sol-open")), "runner: the reviewer's sequence (task 9 first, then the shown answers) earns no level: " + lv);
+  ok(/counted as not right or without points: 8 tasks/.test(text(P.live.innerHTML)), "runner: the results say why");
+}
+// the same answers in the published order earn Strong
+async function inOrderSequence() {
+  const P = mountFresh();
+  for (let i = 0; i < 9; i++) P.answer(i);
+  const lv = P.level();
+  ok(lv === "Level: Strong", "runner: every task right, task 9 last: " + lv);
+}
 
 function finish() {
   const ALL = [PAGE, RAW, JS, fs.existsSync(SIDE) ? fs.readFileSync(SIDE, "utf8") : ""].concat(WB.names.map((n, i) => WB.z["xl/worksheets/sheet" + (i + 1) + ".xml"]), SB.names.map((n, i) => SB.z["xl/worksheets/sheet" + (i + 1) + ".xml"])).join("\n");

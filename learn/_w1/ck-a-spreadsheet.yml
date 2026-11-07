@@ -1,6 +1,16 @@
 # Sidecar for CK-A (ck-a-spreadsheet), builder learn-w5-g, 2026-11-06. Read by scripts/build_learn.py.
 id: ck-a-spreadsheet
 lesson: CK-A
+glossary:
+  - id: kw-dc
+    term: kW-DC
+    def: "A solar array's size as the direct-current rating of its panels at standard test conditions; its AC output, after the inverter, is a little lower."
+  - id: residual-value
+    term: Residual value
+    def: "The value an asset is assumed to keep at the end of an analysis, such as the unused years of a battery bought late, counted as a credit in the last year."
+  - id: elective-pay
+    term: Elective pay
+    def: "A rule of United States tax law that lets tax-exempt and governmental bodies, such as school districts, receive the value of certain clean-energy tax credits as a payment from the IRS."
 requests:
   - "path.yml: CK-A's curriculum prerequisites are A1, A4, A13 and A15 (curriculum v2 §3.3). A13 was added at the W5 batch-1 merge; add A15 (learn-w5-a) when it is live."
   - "The case is the school's solar-plus-storage project only. The town heat-pump programme would need A15's numbers (not live); it can become a second variant later, as CK-M has two."

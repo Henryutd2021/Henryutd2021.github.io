@@ -509,6 +509,12 @@
   "lesson": "F5",
   "href": "f05-nuclear-basics.html"
  },
+ "control-variable": {
+  "term": "Control variable",
+  "short": "A measured trait, such as home size, put into a regression so that groups are compared at equal values of it; it cannot fix a difference nobody measured.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "coolant": {
   "term": "Coolant",
   "short": "The fluid, such as water, helium, liquid sodium or molten salt, that carries heat away from a reactor core.",
@@ -857,6 +863,12 @@
   "lesson": 2,
   "href": "02-demand.html"
  },
+ "dummy-variable": {
+  "term": "Dummy variable",
+  "short": "A 0/1 flag in a regression, such as 1 for a home on the tariff and 0 for one that is not; its coefficient is the fitted difference between the two groups.",
+  "lesson": "M14",
+  "href": "m14-did-it-work.html"
+ },
  "duration-curve": {
   "term": "Duration curve",
   "short": "A year of hourly values sorted from highest to lowest, showing for how many hours each level is reached.",
@@ -880,6 +892,12 @@
   "short": "The Energy Information Administration, the statistics agency of the United States Department of Energy, which publishes data on energy production, use and prices.",
   "lesson": "CF3",
   "href": "cf3-hydrogen-under-uncertainty.html"
+ },
+ "elective-pay": {
+  "term": "Elective pay",
+  "short": "A rule of United States tax law that lets tax-exempt and governmental bodies, such as school districts, receive the value of certain clean-energy tax credits as a payment from the IRS.",
+  "lesson": "CK-A",
+  "href": "ck-a-spreadsheet.html"
  },
  "electric-current": {
   "term": "Electric current",
@@ -1588,6 +1606,12 @@
   "short": "The unit of energy on a household electricity bill: one kilowatt kept up for one hour.",
   "lesson": 1,
   "href": "01-power-energy.html"
+ },
+ "kw-dc": {
+  "term": "kW-DC",
+  "short": "A solar array's size as the direct-current rating of its panels at standard test conditions; its AC output, after the inverter, is a little lower.",
+  "lesson": "CK-A",
+  "href": "ck-a-spreadsheet.html"
  },
  "land-use-intensity": {
   "term": "Land-use intensity",
@@ -2614,6 +2638,12 @@
   "short": "The emission factor of the electricity left after every contract and certificate has been claimed, used for a buyer's unclaimed use.",
   "lesson": "A10",
   "href": "a10-emissions-questions.html"
+ },
+ "residual-value": {
+  "term": "Residual value",
+  "short": "The value an asset is assumed to keep at the end of an analysis, such as the unused years of a battery bought late, counted as a credit in the last year.",
+  "lesson": "CK-A",
+  "href": "ck-a-spreadsheet.html"
  },
  "resource-adequacy": {
   "term": "Resource adequacy",
