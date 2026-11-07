@@ -25,11 +25,11 @@
    },
    "nuclear": {
     "vom": 9,
-    "note": "existing nuclear plants' running cost, $ per MWh, set for teaching"
+    "note": "variable O&M of these existing plants, $ per MWh, set for teaching"
    }
   },
   "gasFromNew": "Existing gas plants have the new plants' fixed and variable O&M (prairieland.json costs.technologies gasCC and gasCT) at their own efficiencies.",
-  "fixedLeftOut": "The fixed O&M of existing hydro, wind, solar, nuclear and battery plants is the same in every pathway (they run to their retirement years) and is left out of the pathway cost; existing plants' capital is sunk.",
+  "fixedLeftOut": "The fixed O&M of every existing plant that burns no fossil fuel (hydro, wind, solar, batteries and the steady plants of Capital Valley) is the same in every pathway (they run to their retirement years) and is left out of the pathway cost; existing plants' capital is sunk.",
   "set": "teaching: availability factors stand in for outages (the planning model has none); coal and oil plants' fixed and variable O&M ($ per kW-year, $ per MWh) are illustrative"
  },
  "conventions": {
@@ -46,7 +46,7 @@
   "unservedPerMWh": 10000,
   "budgetPerT": 1000,
   "importPerGJ": 100,
-  "what": "Penalty costs, never part of a reported cost: electricity not served ($10,000 per MWh: above what a gas turbine costs for the 12 hours of the peak net-load day, so the plan serves every slice), CO2 above the cumulative budget ($1,000 per tonne, above the cost of every cut the model can make) imports above the cap ($100 per GJ) and a shortfall at a stress hour ($750,000 per MW a year, ten times a new gas turbine's yearly cost). They keep every run solvable: a plan that cannot meet its budget or cap shows by how much it misses, instead of failing. Serving demand comes first: a coal plant's tonne per MWh costs less than an unserved MWh.",
+  "what": "Penalty costs, never part of a reported cost: electricity not served ($10,000 per MWh), CO2 above the cumulative budget ($1,000 per tonne), imports above the cap ($100 per GJ) and a shortfall at a stress hour ($750,000 per MW a year, ten times a new gas turbine's yearly cost). They keep every run solvable. The budget and the cap are limits, not prices: a run that misses either at these penalties is solved twice more, for the least overshoot (with no more electricity unserved and no more stress-hour shortfall: serving demand comes first) and then for the least cost at that overshoot. A plan within reach is the least-cost plan within the limits, whatever their dual; a plan out of reach shows the closest pathway and by how much it misses.",
   "reservePerMWYear": 750000
  },
  "tie": {
@@ -82,6 +82,12 @@
    "drought": 2035,
    "mineralBan": 2035,
    "demandSurprise": 2035
+  },
+  "shockRule": {
+   "mineralBan": {
+    "keep": "before",
+    "what": "A price shock on new plants meets the plants not yet bought: the plan's decisions through the model year before the shock are kept, and the shock year's new plants are re-planned at the shock's price. The other shocks meet plants already built: decisions through the shock's model year are kept, that year runs what was built, later years re-plan."
+   }
   },
   "budget": {
    "def": 3600,
@@ -205,6 +211,7 @@
    "i": 5563,
    "when": "20 Aug 2025, 19:00",
    "label": "the peak net-load hour (20 Aug 2025, 19:00)",
+   "season": "summer",
    "demand": 1.3826,
    "wind": [
     0.2211,
@@ -227,6 +234,7 @@
    "i": 151,
    "when": "7 Jan 2025, 07:00",
    "label": "the busiest hour of the scarce-wind week (7 Jan 2025, 07:00)",
+   "season": "winter",
    "demand": 1.2596,
    "wind": [
     0.0844,

@@ -42,7 +42,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <p class="lx-eyebrow">The lesson in one table: Prairieland's pathway, run as one linear program (2025 dollars, illustrative)</p>
 <!-- m13-static:start -->
-<div class="lx-scroll-x"><table class="lx-facts m13-table"><thead><tr><th scope="col">Pathway</th><th scope="col">Cost to 2050 (present value)</th><th scope="col">CO₂ 2026–2050</th><th scope="col">Imports, highest year</th><th scope="col">Full years of hours (2030, 2050; 2025 and 2024 weather)</th></tr></thead><tbody><tr><td>Central, perfect foresight</td><td class="n">$401.6 billion</td><td class="n">3,600 of 3,600 Mt</td><td class="n">32%</td><td class="n">all 4 checks survive</td></tr><tr><td>Central, decade by decade</td><td class="n">$412.0 billion</td><td class="n">3,600 of 3,600 Mt</td><td class="n">36%</td><td class="n">all 4 checks survive</td></tr><tr><td>Deep cuts (3,000 Mt), perfect foresight</td><td class="n">$394.6 billion</td><td class="n">3,000 of 3,000 Mt</td><td class="n">35%</td><td class="n">2 of 4 checks fail (up to 0 hours unserved)</td></tr><tr><td>Central without the peak-hour rule</td><td class="n">$391.9 billion</td><td class="n">3,600 of 3,600 Mt</td><td class="n">35%</td><td class="n">4 of 4 checks fail (up to 240 hours unserved)</td></tr></tbody></table></div><p class="lx-hint">Precomputed with this engine on 7 November 2026. Cost: the supply side and every fuel bought, 2026–2050 in 2025 dollars; end-use equipment left out.</p>
+<div class="lx-scroll-x"><table class="lx-facts m13-table"><thead><tr><th scope="col">Pathway</th><th scope="col">Cost to 2050 (present value)</th><th scope="col">CO₂ 2026–2050</th><th scope="col">Imports, highest year</th><th scope="col">Full years of hours (2030, 2050; 2025 and 2024 weather)</th></tr></thead><tbody><tr><td>Central, perfect foresight</td><td class="n">$401.6 billion</td><td class="n">3,600 of 3,600 Mt</td><td class="n">32%</td><td class="n">all 4 checks survive</td></tr><tr><td>Central, decade by decade</td><td class="n">$412.0 billion</td><td class="n">3,600 of 3,600 Mt</td><td class="n">36%</td><td class="n">all 4 checks survive</td></tr><tr><td>Deep cuts (3,000 Mt), perfect foresight</td><td class="n">$394.6 billion</td><td class="n">3,000 of 3,000 Mt</td><td class="n">35%</td><td class="n">2 of 4 checks fail (CO₂ more than 10% above the slices)</td></tr><tr><td>Central without the peak-hour rule</td><td class="n">$391.9 billion</td><td class="n">3,600 of 3,600 Mt</td><td class="n">35%</td><td class="n">4 of 4 checks fail (demand unserved, up to 240 hours)</td></tr></tbody></table></div><p class="lx-hint">Precomputed with this engine on 7 November 2026. Cost: the supply side and every fuel bought, 2026–2050 in 2025 dollars; end-use equipment left out.</p>
 <!-- m13-static:end -->
 <p class="lx-hint">With JavaScript on, you solve each pathway with a real solver in your browser, move the budget and read its dual, compare perfect foresight with decade-by-decade decisions, inject a shock and map near-optimal plans. Prairieland is fictional; its numbers are illustrative.</p>
 </div>
@@ -52,6 +52,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li><b>Based on public data:</b> new plants' costs from EIA's 2026 assumptions, fuel prices from EIA's 2025 data, CO₂ factors from the IPCC, hourly shapes from SPP's 2025 and 2024 grid (EIA-930).</li>
 <li><b>Left out of the cost:</b> end-use equipment (heat pumps, cars, boilers): electrification is a choice you set, not one the model makes.</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once). The full-year checks come from a library precomputed with this engine.</li>
+<li><b>Against lesson A20:</b> no pathway here gets below about 2,700 Mt (straight-line counting, central demand). <a href="a20-national-scenarios.html">A20</a> meets 2,600 Mt because its fastest path electrifies buildings and industry years sooner (step 7).</li>
 </ul></div>
 <div class="lx-card lx-notebook m13-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 60 minutes, then 120 minutes of practice</p>
@@ -98,7 +99,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <dl class="lx-ideas">
 <dt>Vintages</dt><dd>A plant runs in its model year and the later ones its life covers; it pays only for the years up to 2050, the rest is its residual value.</dd>
-<dt>The budget</dt><dd>CO₂ summed over the model years, each with its weight, stays within the budget; its dual is a carbon value that rises at the discount rate.</dd>
+<dt>The budget</dt><dd>CO₂ summed over the model years, each with its weight, stays within the budget; its dual is what one more tonne allowed would save.</dd>
 <dt>The import cap</dt><dd>Crude imports and LNG stay within a share of primary energy in every model year.</dd>
 <dt>Foresight</dt><dd>Perfect foresight plans 2030–2050 at once; decade by decade sees two model years at a time and costs more.</dd>
 <dt>Time</dt><dd>Twelve slices stand for each year; a full year of hours checks which conclusions survive.</dd>
@@ -114,7 +115,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-deeper-body">
 ```
 
-Regions $r$ (5), model years $p$ (5; each stands for the five years ending in it), slices $s$ (12, with hours $h_s$), technologies $g$, links $\ell$ (7).
+Regions $r$ (5), model years $p$ (5; each stands for the five years ending in it), slices $s$ (12, with hours $h_s$), technologies $g$, links $\ell$ (7). The rows below are selected and schematic; money is in millions of 2025 dollars (\$M).
 
 ::: {.lx-scroll-x .m13-symbols}
 | Symbol | What it is | Unit | Decided or given |
@@ -124,19 +125,32 @@ Regions $r$ (5), model years $p$ (5; each stands for the five years ending in it
 | $x_{\cdot,s,p}$ | output, battery charge and discharge, link flows in slice $s$ | MW (slice average) | decided |
 | $a_{\ell,q}$ | transfer limit added to link $\ell$ | MW | decided |
 | $f_p$ | fuels bought: domestic and imported crude, domestic gas and LNG, coal | PJ a year | decided |
+| $y_p$, $i$ | the calendar year of model year $p$ (2030, …, 2050); the real discount rate, as a decimal (5% is 0.05) | year; per year | given |
 | $D_p$ | $\sum_{t=y_p-4}^{y_p} (1+i)^{-(t-2025)}$, the discount sum of a model year | years | given |
 | $A_g$ | capital × the capital recovery factor over the life, plus fixed O&M | \$ per kW a year | given (fixed ranges) |
-| $L_{r,p}$, $d_s$ | average load at the busbar; the slice's demand factor | MW; ratio | given (the plan) |
+| $L_{r,p}$, $d_s$ | average busbar load (the region's use plus 6% grid losses, at the plants' outlets); the slice's demand factor | MW; ratio | given (the plan) |
+| $c_f$ | the price of fuel $f$ (domestic gas, LNG, coal, crude oil), on net calorific values | \$ per GJ | given (fixed ranges) |
+| $\alpha_{g,s}$ | availability of plant type $g$ in slice $s$ (wind and solar: that slice's output per MW) | share | given |
+| $\lambda_\ell$ | the share of a link's flow lost on the way (1% per 100 km) | share | given |
+| $x^{\text{dis}}$, $x^{\text{ch}}$, $u_{r,s,p}$ | battery discharge and charge; electricity not served | MW (slice average) | decided |
 | $w_p$ | the budget's weight of each model year (2, 5, 5, 5, 5, 3 with straight lines between) | years | given |
 :::
 
-$$\min \sum_p D_p \Big(\sum_f c_f f_p + \sum \text{O\&M}_p\Big) + \sum_{r,g,q} A_g\, n_{r,g,q} \sum_{p \ge q,\; y_p - y_q < \text{life}_g} D_p$$
+$$\min \sum_p D_p \Big(\sum_f c_f f_p + \text{O\&M}_p\Big) + \sum_{r,g,q} \frac{A_g}{1000}\, n_{r,g,q} \sum_{p \ge q,\; y_p - y_q < \text{life}_g} D_p + \text{links} + \text{penalties} + \text{ties}$$
 
-$$\sum_g x_{g,r,s,p} + \sum_{\ell \to r} (1 - \lambda_\ell)\, x_{\ell,s,p} - \sum_{r \to \ell} x_{\ell,s,p} = L_{r,p}\, d_s \qquad x_{g,r,s,p} \le \alpha_{g,s}\Big(K^{\text{exist}}_{g,r,p} + \sum_{q \le p,\; y_p - y_q < \text{life}_g} n_{r,g,q}\Big)$$
+Fuel $f_p$ in PJ times $c_f$ in \$ per GJ is \$M (1 PJ is a million GJ); $A_g$ in \$ per kW-year times MW, divided by 1,000, is \$M a year. Penalties and the tie rule are never part of a reported cost.
+
+$$\sum_g x_{g,r,s,p} + x^{\text{dis}}_{r,s,p} - x^{\text{ch}}_{r,s,p} + \sum_{\ell \to r} (1 - \lambda_\ell)\, x_{\ell,s,p} - \sum_{r \to \ell} x_{\ell,s,p} + u_{r,s,p} = L_{r,p}\, d_s$$
+
+$$x_{g,r,s,p} \le \alpha_{g,s}\Big(K^{\text{exist}}_{g,r,p} + \sum_{q \le p,\; y_p - y_q < \text{life}_g} n_{r,g,q}\Big)$$
 
 $$\sum_p w_p\, \text{CO}_2(f_p) + w_{2025}\cdot 214.9 \le B \qquad \text{imports}(f_p) \le \text{cap} \cdot \text{primary}_p \quad \forall p$$
 
-The budget's dual $\mu$ is in present-value dollars a tonne; as a carbon price in year $t$ it is $\mu (1+i)^{t-2025}$. Batteries cycle within each representative day; the scarce-wind week's store may enter full and run down over seven days. At two stress hours of 2025 each region's load plus 10% must be covered by available capacity and the links.
+<ul class="m13-rules">
+<li><b>The dual as a price.</b> The budget's dual $\mu$ is in present-value dollars a tonne. As a price in model year $p$'s own dollars it is $\mu\, w_p / D_p$; only in a model of every year, each counted once, is it $\mu (1+i)^{t-2025}$.</li>
+<li><b>Batteries.</b> They cycle within each representative day; the scarce-wind week's store may enter full and run down over seven days.</li>
+<li><b>Stress hours.</b> At two stress hours of 2025, each region's load plus 10% must be covered by available capacity and the links.</li>
+</ul>
 
 ```{=html}
 </div>
@@ -166,8 +180,8 @@ The budget's dual $\mu$ is in present-value dollars a tonne; as a carbon price i
 <div class="lx-myths" data-quiz="m13-myths">
 <div class="lx-qq" data-id="residual" data-answer="myth"><p class="lx-qtext">A wind farm built in 2045 should be charged its whole cost in a model that ends in 2050.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Myth. It serves for decades after 2050; charging only its payments to 2050 leaves the rest as residual value, so late builds are not penalised.</p></details></div>
-<div class="lx-qq" data-id="dual" data-answer="fact"><p class="lx-qtext">Under a cumulative budget, the carbon value the dual implies rises at the discount rate.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
-<details class="lx-answer"><summary>Answer</summary><p>Fact. One tonne anywhere in 2026–2050 uses the same budget, so its present value is the same: in each year's dollars it grows at the rate.</p></details></div>
+<div class="lx-qq" data-id="dual" data-answer="fact"><p class="lx-qtext">Under a cumulative budget, one tonne cut in any year of 2026–2050 has the same value in present-value dollars.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. Every tonne uses the same budget. In a model of every year its price in each year's dollars then rises at the discount rate; here the model years' weights bend that path (step 6).</p></details></div>
 <div class="lx-qq" data-id="slices" data-answer="myth"><p class="lx-qtext">If twelve slices serve every MWh, so will the full year.</p><ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
 <details class="lx-answer"><summary>Answer</summary><p>Myth. Without the peak-hour rule, the central plan leaves demand unserved for up to 240 hours in 2024's weather: slice averages hide the tightest hours.</p></details></div>
 </div>
@@ -184,7 +198,7 @@ The budget's dual $\mu$ is in present-value dollars a tonne; as a carbon price i
 <div class="lx-card">
 <p class="lx-eyebrow">Inputs the model uses</p>
 <!-- m13-inputs:start -->
-<div class="lx-scroll-x"><table class="lx-facts e4-inputs"><thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead><tbody><tr><td>Wind farm, capital</td><td class="n">$1,500/kW to $2,400/kW (default $1,712/kW)</td><td class="n">EIA AEO2026 assumptions, Tables 3 and 4 (2025 dollars)</td></tr><tr><td>Solar farm, capital</td><td class="n">$1,350/kW to $1,900/kW (default $1,484/kW)</td><td class="n">EIA AEO2026, Tables 3 and 4</td></tr><tr><td>Battery (4 hours, 85% round trip), capital</td><td class="n">$1,380/kW to $1,690/kW (default $1,521/kW)</td><td class="n">EIA AEO2026, Table 3; NREL's 2025 battery update</td></tr><tr><td>Gas combined cycle, capital</td><td class="n">$850/kW to $1,400/kW (default $1,032/kW)</td><td class="n">EIA AEO2026, Tables 3 and 4</td></tr><tr><td>Gas turbine, capital</td><td class="n">$950/kW to $1,580/kW (default $1,158/kW)</td><td class="n">EIA AEO2026, Tables 3 and 4</td></tr><tr><td>Generic firm clean plant, capital</td><td class="n">$3,000/kW to $11,000/kW (default $7,000/kW)</td><td class="n">inside EIA AEO2026 Table 4's span for firm low-carbon plants that burn no fuel</td></tr><tr><td>New transmission</td><td class="n">$800 per MW-km to $3,000 per MW-km (default $1,500 per MW-km)</td><td class="n">set for teaching</td></tr><tr><td>Domestic gas</td><td class="n">$2.00/GJ to $9.00/GJ (default $4.05/GJ)</td><td class="n">EIA Electric Power Annual, Table 7.4 (2025), on net calorific values</td></tr><tr><td>LNG imports</td><td class="n">$6.00/GJ to $30.00/GJ (default $10.00/GJ)</td><td class="n">set for teaching</td></tr><tr><td>Coal (Ridge County)</td><td class="n">$1.50/GJ to $4.00/GJ (default $2.41/GJ)</td><td class="n">EIA Electric Power Annual, Table 7.4 (2025)</td></tr><tr><td>Crude oil</td><td class="n">$7.00/GJ to $22.00/GJ (default $12.00/GJ)</td><td class="n">set for teaching (about $70 a barrel at the default)</td></tr><tr><td>CO₂ factors: crude oil, gas, coal</td><td class="n">73.3, 56.1, 94.6 t per TJ</td><td class="n">IPCC 2006 Guidelines, Volume 2, net calorific values</td></tr><tr><td>Build limits, a region a period</td><td class="n">wind 6, solar 8, batteries 6, gas 4 + 4, firm 2 GW</td><td class="n">set for teaching: one generic rule, no technology's own timeline</td></tr><tr><td>Discount rate (real)</td><td class="n">2% to 8% (default 5%)</td><td class="n">set for teaching</td></tr><tr><td>Hourly shapes</td><td class="n">SPP's 2025 grid (slices); 2024 for the independent year</td><td class="n">EIA Hourly Electric Grid Monitor (Form EIA-930)</td></tr></tbody></table></div>
+<div class="lx-scroll-x"><table class="lx-facts e4-inputs"><thead><tr><th scope="col">Input (2025 dollars)</th><th scope="col">Default</th><th scope="col">Range you can set (set for teaching)</th><th scope="col">Source, and the source's own range</th></tr></thead><tbody><tr><td>Wind farm, capital</td><td class="n">$1,712/kW (EIA Table 3)</td><td class="n">$1,500/kW to $2,400/kW</td><td class="n">EIA AEO2026 Table 4, its regions: $1,478/kW to $4,335/kW</td></tr><tr><td>Solar farm, capital</td><td class="n">$1,484/kW (EIA Table 3)</td><td class="n">$1,350/kW to $1,900/kW</td><td class="n">EIA AEO2026 Table 4, its regions: $1,342/kW to $1,949/kW</td></tr><tr><td>Battery (4 hours, 85% round trip), capital</td><td class="n">$1,521/kW (EIA Table 3)</td><td class="n">$1,380/kW to $1,690/kW</td><td class="n">NREL's 2025 battery update (low) and EIA AEO2026 Table 4 (high): $1,371/kW to $1,698/kW</td></tr><tr><td>Gas combined cycle, capital</td><td class="n">$1,032/kW (EIA Table 3)</td><td class="n">$850/kW to $1,400/kW</td><td class="n">EIA AEO2026 Table 4, its regions: $830/kW to $1,445/kW</td></tr><tr><td>Gas turbine, capital</td><td class="n">$1,158/kW (EIA Table 3)</td><td class="n">$950/kW to $1,580/kW</td><td class="n">EIA AEO2026 Table 4, its regions: $946/kW to $1,585/kW</td></tr><tr><td>Generic firm clean plant, capital</td><td class="n">$7,000/kW (set for teaching)</td><td class="n">$3,000/kW to $11,000/kW</td><td class="n">EIA AEO2026 Table 4, firm low-carbon plants that burn no fuel: $2,685/kW to $11,568/kW</td></tr><tr><td>New transmission</td><td class="n">$1,500 per MW-km (set for teaching)</td><td class="n">$800 per MW-km to $3,000 per MW-km</td><td class="n">set for teaching</td></tr><tr><td>Domestic gas</td><td class="n">$4.05/GJ (EIA, 2025: $3.85 per MMBtu, on net calorific values)</td><td class="n">$2.00/GJ to $9.00/GJ</td><td class="n">EIA Electric Power Annual, Table 7.4</td></tr><tr><td>LNG imports</td><td class="n">$10.00/GJ (set for teaching)</td><td class="n">$6.00/GJ to $30.00/GJ</td><td class="n">set for teaching</td></tr><tr><td>Coal (Ridge County)</td><td class="n">$2.41/GJ (EIA, 2025: $2.42 per MMBtu, on net calorific values)</td><td class="n">$1.50/GJ to $4.00/GJ</td><td class="n">EIA Electric Power Annual, Table 7.4</td></tr><tr><td>Crude oil</td><td class="n">$12.00/GJ (set for teaching: about $70 a barrel)</td><td class="n">$7.00/GJ to $22.00/GJ</td><td class="n">set for teaching</td></tr><tr><td>CO₂ factors: crude oil, gas, coal</td><td class="n">73.3, 56.1, 94.6 t per TJ</td><td class="n">fixed</td><td class="n">IPCC 2006 Guidelines, Volume 2, net calorific values</td></tr><tr><td>Build limits, a region a period</td><td class="n">wind 6, solar 8, batteries 6, gas 4 + 4, firm 2 GW</td><td class="n">fixed</td><td class="n">set for teaching: one generic rule, no technology's own timeline</td></tr><tr><td>Discount rate (real)</td><td class="n">5% (set for teaching)</td><td class="n">2% to 8%</td><td class="n">set for teaching</td></tr><tr><td>Hourly shapes</td><td class="n">SPP's 2025 grid (slices); 2024 for the independent year</td><td class="n">fixed</td><td class="n">EIA Hourly Electric Grid Monitor (Form EIA-930)</td></tr></tbody></table></div>
 <!-- m13-inputs:end -->
 </div>
 ```

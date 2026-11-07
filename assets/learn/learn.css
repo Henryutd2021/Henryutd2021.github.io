@@ -2450,6 +2450,10 @@ body.page-learn.quarto-dark { --lx-scale-0: #5CC0B1; --lx-scale-1: #5AAED2; --lx
 .e4-fold[open] > summary { margin-bottom: 4px; }
 .e4-fold > .lx-sb-group { margin-bottom: 10px; }
 .e4-inputs td.n { white-space: normal; min-width: 7em; }
+/* a fieldset sizes to its widest content: let the shock table scroll inside it instead of widening the page (fix-h) */
+.e4-sb .lx-sb-group { min-width: 0; }
+/* tables whose cells are words, not numbers (the shock table, the map's mix by source): wrap them (fix-h) */
+.lx-facts.e4-wrap td.n { white-space: normal; font-family: inherit; font-weight: 400; min-width: 9em; }
 
 /* ---------- the nation's map */
 .e4-map, .e4-mix, .e4-co2, .e4-imp { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
