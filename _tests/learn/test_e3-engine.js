@@ -4,8 +4,10 @@
 //     and converted as those lessons convert them; the fictional line is prairie-city.json's; no nuclear term
 //   - the plan links: SB3's and C3's schemas valid; defaults and presets valid and round-trip
 //   - 2025 as it is: each district buys its 2025 electricity less the rooftop solar it uses; its busiest hour is
-//     prairie-city.json's peak2025MW; the city's CO2 equals the 2025 inventory less the rooftop solar the inventory counts
-//     at the grid rate (E3 counts what is bought; the gap is stated on the pages)
+//     prairie-city.json's peak2025MW; the city's CO2 agrees with the 2025 inventory (both count grid-supplied electricity
+//     since learn-w5-pc): row by row except distribution losses, within the rounding of the hourly data; the losses row
+//     differs by 5% of the rooftop MWh at the grid rate (the inventory takes losses on all electricity used, E3 on
+//     electricity bought), about 600 t
 //   - the model as built, for every preset of SB3 and C3: every district-hour balances; imports within the limit plus the
 //     upgrade; batteries and the heat store follow their state equations, cyclic in each day; managed charging moves
 //     each day's energy within the day; the network's heat balances; the farms never exceed their output or the city's load
@@ -14,11 +16,15 @@
 //     balance dual of a district-hour is its retail price plus the substation's value that hour; the CO2 cap's dual equals
 //     the cost slope when the cap moves 100 t
 //   - ties (W2 review finding 2): every reported number (cost, CO2, busiest hours, upgrades, the city's busiest hour, the
-//     household table) is the same with the tie costs x10 and x0.1, and the min and max of each over the optimal face
-//     agree (within half a MW, 0.05 MW, 1 t, $1,000)
+//     household table) is the same with the tie costs x2 and x0.1, and the min and max of each over the optimal face
+//     agree (within half a MW, 0.05 MW, 1 t, $1,000); the tie costs trade less than $30 a year of economic cost (the
+//     economic optimum: ties x0) on every preset and the SB3 review's plan (SB3 review finding 4)
+//   - location-based CO2 (C3 review finding 1): contract wind and solar never change it; the market-based claim is
+//     reported apart; hours at the limit are weighted by the days (SB3 review finding 3)
 //   - the household layer (§9.6): 2025 as it is reproduces prairie-city.json's group bills and burdens; each measure's
-//     changes add up to the engine's district changes; no group's use goes below zero for any preset or rule; lower
-//     incomes first puts the first adopters in the lowest group
+//     changes add up to the engine's district changes; no group's use goes below zero for any preset, rule or slider end
+//     (SB3 and C3 review finding 2); the fitted gasoline table adds up both ways; the charging the plan adds is
+//     transport, not home energy (SB3 review finding 1); lower incomes first puts the first adopters in the lowest group
 //   - failure states: solve never rejects; a solver that errors gives "error"; a plan that needs upgrades when they are
 //     not allowed is infeasible with a hint naming each district's shortfall (equal to the upgrade it would buy); a cap
 //     no plan meets is infeasible with a hint
@@ -47,7 +53,13 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
   ok(cfg.c3.electrolyzer.capex === Math.round(e0.farm.electrolyzer.capex * k22), "electrolyzer: E0's DOE cost x EIA's deflator");
   ok(cfg.about.line === city.about.line && cfg.about.line === "Prairie City is fictional; its numbers are illustrative.", "the fictional line, word for word");
   ok(near(E3.copAt(city.cop, -15), 2.4, 1e-9) && near(E3.copAt(city.cop, 0), 3.2, 1e-9) && city.cop.cutoutC === -23 && E3.copAt(city.cop, -23.5) === 1, "the COP the inputs table states: 2.4 at -15 C, 3.2 at 0 C, 1 below -23 C");
-  const inp = E3.inputsHTML(P);
+  const inp = E3.inputsHTML(P), inpF = E3.inputsHTML(P, { fixed: true }), inpC = E3.inputsHTML(P, { c3: true });
+  ok(/an illustrative curve/.test(inp) && /anchored to DOE&#39;s|anchored to DOE's/.test(inp) && /resistance backup assumed below −23 °C/.test(inp) && /24 Sep 2021/.test(inp), "COP: an illustrative curve anchored to DOE's dated target, backup assumed (SB3 9, M12 7, C3 10)");
+  const hr = city.districts.map(x => Math.round((x.substationMW / x.peak2025MW - 1) * 100) + "%");
+  ok(inp.indexOf("× 1.15, rounded up to the next 10 MW (" + hr[0] + ", " + hr[1] + " and " + hr[2] + " above it") >= 0 && hr.join() === "17%,20%,25%", "the limits: 2025 peak x 1.15 rounded up to 10 MW, " + hr.join(", ") + " above it (SB3 12, M12 6)");
+  ok(!/ranges you set/.test(inp + inpF) && inpF.indexOf(E3.money(cfg.retrofit.cost.def) + " · " + cfg.retrofit.save.def + "% · ") >= 0 && inpF.indexOf(E3.money(cfg.upgrade.capex.def) + " per kW") >= 0 && /fixed here at the defaults/.test(inpF) && /which you change on the bench/.test(inp), "the teaching costs shown with their defaults and lives, and where they can be changed (M12 5)");
+  ok(/assumed to exist already: its fuel is counted, not its construction/.test(inp) && /plugged in at home or work/.test(inp), "the boiler and managed-charging assumptions are stated (SB3 7, 8)");
+  ok(inpC.indexOf("$" + city.prices.gasPerMcf.industrial.toFixed(2) + " per thousand cubic feet") >= 0 && /EIA publishes no 2025 Kansas industrial price/.test(inpC), "C3: the park's gas price, its derivation and source (C3 9)");
   ok(inp.indexOf(P.D.map(D => E3.kilo(D.L)).join(" · ") + " MW") >= 0 && inp.indexOf(E3.kilo(city.emissions.gridLbPerMWh.sppNorth) + " lb per MWh") >= 0 && inp.indexOf(E3.money(cfg.heatPump.capex)) >= 0, "the inputs table reads the data");
   ok(!/nuclear|reactor|\bSMR\b|small modular/i.test(SRC + DATA), "no nuclear term in the engine or its data (guard G-DC)");
   ok(!/\bAI\b|artificial intelligence/.test(SRC + DATA), "no AI wording");
@@ -73,9 +85,16 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(R0.dist[i].upg < 1e-6, x.key + ": no upgrade in 2025");
   });
   const rc0 = await E3.solve(c3d, P, { solver }), A0c = rc0.results.acc;
-  const roofCO2 = R0.acc.d.reduce((s, o) => s + o.pvUsed, 0) * P.ef.grid * (1 + P.ef.loss);
-  ok(near(A0c.city.co2 + roofCO2, city.inventory2025.total, 100), "city CO2 + rooftop solar at the grid rate = the 2025 inventory (" + Math.round(A0c.city.co2) + " + " + Math.round(roofCO2) + " vs " + city.inventory2025.total + ")");
-  ok(near(roofCO2, 12700, 50), "the stated gap is about 12,700 t (" + Math.round(roofCO2) + ")");
+  // E3 and the 2025 inventory: both count grid-supplied electricity (rooftop solar used on site is not bought). Without
+  // the losses row they agree within the rounding of the hourly data (0.1 MW) and of the file's yearly figures; the
+  // losses row differs by 5% of the rooftop MWh at the grid rate, because the inventory takes distribution losses on all
+  // the electricity used (rooftop solar too) and E3 on what is bought through the substations
+  const inv = city.inventory2025, pvUsed0 = R0.acc.d.reduce((s, o) => s + o.pvUsed, 0);
+  const lossE3 = (A0c.d.reduce((s, o) => s + o.imp, 0) + A0c.outside.el) * P.ef.grid * P.ef.loss, roofLoss = pvUsed0 * P.ef.grid * P.ef.loss;
+  ok(near(pvUsed0, city.supply.rooftopMWh, 1), "2025: the rooftop solar used is prairie-city.json's rooftop MWh (" + Math.round(pvUsed0) + ")");
+  ok(near(A0c.city.co2 - lossE3, inv.total - inv.sectors.grid_losses, 100), "the city's CO2 without the losses row = the inventory's (" + Math.round(A0c.city.co2 - lossE3) + " vs " + (inv.total - inv.sectors.grid_losses) + ")");
+  ok(near(inv.sectors.grid_losses - lossE3, roofLoss, 30), "the losses rows differ by 5% of the rooftop MWh at the grid rate (" + Math.round(inv.sectors.grid_losses - lossE3) + " vs " + Math.round(roofLoss) + " t)");
+  ok(near(inv.total - A0c.city.co2, 665, 100) && Math.abs(inv.total - A0c.city.co2) / inv.total < 5e-4, "E3's 2025 city CO2 is within 0.05% of the inventory, about 600 t lower, as the README says (" + Math.round(inv.total - A0c.city.co2) + " t)");
   const g0 = R0.hh;
   g0.rows.forEach((x, j) => ok(near(x.home0, city.groups[j].homeEnergy, 0.01) && near(x.home, x.home0, 1e-6) && near(x.fuel, x.fuel0, 1e-6) && near(x.burden, city.groups[j].burden, 1e-4), "households " + x.key + ": 2025 bills and burden as prairie-city.json (" + Math.round(x.home) + ")"));
   ok(near(g0.low.burden0, city.groupsNote.lowIncomeBurden, 1e-4) && near(g0.other.burden0, city.groupsNote.otherBurden, 1e-4), "0-80% and other groups' burden as prairie-city.json");
@@ -156,6 +175,43 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     });
   }
 
+  // the tie costs' price in economic cost: the economic optimum (ties x0) against the economic cost of the tie rule's
+  // schedule, on every preset and the SB3 review's plan (50% district heat, a 250 MW heat pump, a 2,000 MWh store, 200 MW
+  // of batteries, managed charging): under $30 a year, the bound the pages state
+  {
+    const extra = [["sb3 review", Object.assign({}, def, { dh: 50, dhp: 250, sto: 2000, bat: 200, evm: "managed" })], ["sb3 review, half EVs", Object.assign({}, def, { dh: 50, dhp: 250, sto: 2000, bat: 200, evm: "managed", ev: 50 })]];
+    let worstGap = 0;
+    for (const [id, S, m, r] of Object.keys(runs).map(k => [k, runs[k].S, runs[k].m, runs[k].r]).concat(extra.map(([id, st]) => { const S = E3.sysOf(st, P), m = E3.build(P, S); return [id, S, m, solveSync(m)]; }))) {
+      const m0 = E3.build(P, S, { tie: 0 }), r0 = solveSync(m0);
+      const econ = m0.variables.reduce((t, v) => t + v.cost * (r.values[v.name] || 0), 0), gap = econ - r0.objective;
+      worstGap = Math.max(worstGap, gap);
+      ok(r0.status === "optimal" && gap > -1e-3 && gap < 30, id + ": the tie rule costs $" + gap.toFixed(2) + " a year of economic cost (under $30)");
+    }
+    ok(worstGap > 20, "the review's plan is the one where the ties cost most ($" + worstGap.toFixed(2) + " a year; the pages say under $30)");
+  }
+
+  // ---------------- hours at the limit (SB3 review finding 3): weighted by the days, from the slack
+  {
+    const { S, raw } = runs["sb3 flex"], A = E3.account(P, S, raw), R = E3.summarize(E3.withPreset(def, E3.presets[2]), P, raw, { raw: R0.raw, acc: R0.acc });
+    R.dist.forEach((d, i) => {
+      let hrs = 0, slots = 0; raw.days.forEach((day, k) => day.d[i].imp.forEach((v, h) => { if (v >= P.D[i].L + raw.upg[i] - 1e-3) hrs += P.w[k]; if (day.d[i].lim[h] > 1e-6) slots++; }));
+      ok(near(d.bindHours, hrs) && d.bindSlots === slots && (d.bindHours === 0 || d.bindHours >= d.bindSlots), "flex " + d.key + ": " + d.bindHours + " hours a year at the limit (weighted, from the slack); " + slots + " representative hours with a positive dual");
+    });
+    ok(R.dist[0].bindHours === 36 && R.dist[0].bindSlots === 9, "flex, the core: 36 hours a year at its limit, 9 representative hours with a positive dual (the review's count)");
+  }
+
+  // ---------------- C3: location-based CO2; the contract's market-based claim apart (C3 review finding 1)
+  {
+    const wind = Object.assign({}, c3d, { wind: 400, farm: 150 }), rw = await E3.solve(wind, P, { solver }), Rw = rw.results;
+    ok(rw.ok && near(Rw.acc.city.co2, A0c.city.co2, 1e-6) && Rw.acc.contract.mwh > 1e5, "contract wind and solar alone leave the city's location-based CO2 as in 2025 (" + Math.round(Rw.acc.city.co2) + ")");
+    ok(near(Rw.acc.contract.t, Rw.acc.contract.mwh * P.ef.grid, 1e-6) && Rw.acc.contract.mwh <= Rw.acc.contract.gen + 1e-6, "the market-based claim is the contract MWh used at the grid's average rate, reported apart");
+    const n = E3.note(wind, Rw, P);
+    ok(n.results.some(x => /Contract wind and solar the city used/.test(x.label) && /not deducted/.test(x.note)) && n.assumptions.some(x => /does not lower the location-based CO₂/.test(x)), "the note keeps the contract apart from the location-based CO2");
+    ok(JSON.stringify(E3.c3presets[0].state) === JSON.stringify({ hp: 0, ret: 0, dh: 0, dhp: 0, sto: 0, ev: 1, evm: "home", pv: 0, bat: 0, up: "yes", ihp: 0, ely: 0, wind: 0, farm: 0 }), "C3's \"2025 as it is\" resets every lever of the plan (C3 review finding 4)");
+    const back = E3.withPreset(Object.assign({}, c3d, { hp: 70, ihp: 100, ely: 50, wind: 200, farm: 100 }), E3.c3presets[0]), rb = await E3.solve(back, P, { solver });
+    ok(rb.ok && near(rb.results.acc.upfrontTotal, 0, 1e-6) && near(rb.results.acc.city.co2, A0c.city.co2, 1e-6), "after a plan, \"2025 as it is\" brings back 2025: no spending, 2025's CO2");
+  }
+
   // ---------------- the household layer
   for (const id of Object.keys(runs)) {
     const { S, raw } = runs[id], A = E3.account(P, S, raw), h = E3.households(P, S, A, R0.acc);
@@ -179,6 +235,30 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     const others = ["fixed", "income"].map(rec => E3.households(P, Object.assign({}, S, { rec }), A, R0.acc));
     others.forEach(o => { const t = A13.transfers(h.a13, o.a13); ok(Math.abs(t.sum) < 1e-6 && near(o.cost, h.cost, 1e-9), o.design + ": the same cost moved between groups (a transfer, sum " + t.sum.toExponential(1) + ")"); });
     ok(others[1].rows[0].charge < h.rows[0].charge && others[0].rows[0].charge > others[1].rows[0].charge, "by income the lowest group pays least; a fixed charge more than by income");
+    // the fitted gasoline table: rows are the districts' non-electric cars' gasoline, columns the groups' (prairie-city.json)
+    const FM = E3.fuelMatrix(P), colSum = j => FM.M.reduce((t, r) => t + r[j], 0);
+    ok(FM.M.every((r, i) => near(r.reduce((a, b) => a + b, 0), (P.D[i].ldv - P.D[i].evs0) * P.galPerCar, 1e-3)) && city.groups.every((g, j) => near(colSum(j), g.households * g.use.gasolineGal, 0.01 * g.households)) && FM.M.every(r => r.every(x => x > 0)),
+      "the gasoline table adds up to each district's cars and to each group's gasoline (within the file's rounding)");
+    // charging is transport (SB3 review finding 1): a plan that changes only the cars leaves home bills as in 2025 except
+    // the shared costs' charge; the charging added equals the engine's EVs x a car's charging
+    for (const evm of ["home", "managed"]) {
+      const st = Object.assign({}, def, { ev: 50, evm }), r = await E3.solve(st, P, { solver }), hc = r.results.hh;
+      ok(hc.rows.every(x => near(x.home - x.home0, x.charge, 1e-6)) && near(hc.evMWh, P.D.reduce((t, D, i) => t + (r.results.sys.d[i].evs - D.evs0), 0) * P.evDay * 365, 1e-6),
+        "cars only (" + evm + "): home bills change by the shared-cost charge alone; the added charging (" + Math.round(hc.evMWh) + " MWh) is transport");
+      ok(hc.rows.every(x => near(x.tr, x.fuel + x.charging, 1e-9) && x.charging > 0 && x.fuel < x.fuel0) && near(hc.costAll, hc.cost + hc.evCost, 1e-9) && hc.costAll <= hc.shared + 1e-6, "cars only (" + evm + "): transport = motor fuel + charging; households and charging pay no more than the shared costs");
+      if (evm === "home") { const b1 = hc.low.burden - hc.low.burden0; ok(b1 >= -1e-9 && b1 < 0.002, "cars only: the low-income burden moves by the shared-cost charge only (" + (b1 * 100).toFixed(2) + " points)"); }
+    }
+    // every slider end, alone and together, with each rule: no group's use below zero, motor fuel never negative
+    // (SB3 and C3 review finding 2)
+    const ends = [{ ev: 100 }, { hp: 100 }, { ret: 100 }, { pv: 400 }, { ev: 100, evm: "managed" }, { hp: 100, ret: 100, ev: 100, pv: 400, dh: 50, dhp: 250, sto: 2000, bat: 200 }];
+    for (const e of ends) for (const rule of ["even", "low", "high"]) {
+      const r = await E3.solve(Object.assign({}, def, e, { rule }), P, { solver }), hx = r.results.hh;
+      ok(r.ok && !hx.clamped && hx.rows.every(x => x.fuel >= 0 && x.home > 0 && x.tr >= 0), JSON.stringify(e) + " " + rule + ": every group's use stays at or above zero (motor fuel " + hx.rows.map(x => Math.round(x.fuel)).join(", ") + ")");
+      if (e.ev === 100 && !e.hp) ok(hx.rows.every(x => near(x.fuel, 0, 0.5)), "every car electric: no group buys motor fuel");
+    }
+    const rf = await E3.solve(Object.assign({}, def, { ev: 100 }), P, { solver }), af = E3.hhAssume(rf.results);
+    ok(af.some(x => /every group alike/.test(x) && /average household/.test(x)) && af.some(x => /substation upgrades and batteries/.test(x) && /per kWh/.test(x) && /rest of the plan's cost is not in their bills/.test(x)) && af.some(x => /equipment households buy is left out/.test(x) && /transport/.test(x)),
+      "the household table's assumptions name the rule, what households pay and how, what is left out and how cars count (M12 finding 4, C3 finding 7)");
     const n = E3.spread([50, 50, 50], 60, "low");
     ok(n[0] === 50 && n[1] === 10 && n[2] === 0, "lower incomes first: the lowest group's potential fills first");
     const e = E3.spread([100, 300, 100], 100, "even");
@@ -209,6 +289,19 @@ const near = (a, b, t) => Math.abs(a - b) <= (t == null ? 1e-6 : t);
     ok(near((r.objective - zu) / 100, raw.capDual, 0.01 * raw.capDual) && near((zd - r.objective) / 100, raw.capDual, 0.01 * raw.capDual), "the cap's dual is the cost slope both ways (" + ((r.objective - zu) / 100).toFixed(1) + ", " + ((zd - r.objective) / 100).toFixed(1) + ")");
     const A = E3.account(P, S, raw);
     ok(near(A.co2Hub, cap, 1), "the hub's CO2 sits on the cap (" + Math.round(A.co2Hub) + ")");
+    // the LP's own plans (M12's caps) under every rule: no group's use below zero; the settling step keeps each carrier's
+    // total and moves cuts only along the rule's order (SB3 and C3 review finding 2, M12 step 7)
+    const G = city.groups, mm = city.units.mwhPerMMBtu;
+    for (const cp of [1, 0.8, 0.65]) {
+      const Sx = E3.sysOf(st, P), mx = E3.build(P, Sx, Object.assign({ cap: cp * R0.acc.co2Hub }, o, { pvMax: 400, batMax: 200 })), rx = solveSync(mx), rw = E3.read(P, Sx, mx, rx), Ax = E3.account(P, Sx, rw);
+      for (const rule of ["even", "low", "high"]) {
+        const hx = E3.households(P, Object.assign({}, Sx, { rule }), Ax, R0.acc);
+        const left = hx.rows.map((x, g) => [G[g].use.electricityKWh / 1000 + x.d.el, G[g].use.gasMMBtu * mm + x.d.gas, G[g].use.propaneGal / P.galPerMWh + x.d.prop]);
+        ok(rx.status === "optimal" && !hx.clamped && left.every(v => v.every(q => q >= -1e-9)), "the LP's plan at " + Math.round(cp * 100) + "%, " + rule + ": every group's electricity, gas and propane at or above zero" + (hx.settled.el > 0.5 ? " (" + Math.round(hx.settled.el) + " MWh of the cut moved on)" : ""));
+      }
+    }
+    const dd = [-5, 1, 2], moved = E3.settle([3, 4, 5], dd, "low");
+    ok(moved === 2 && dd[0] === -3 && dd[1] === -1 && dd[2] === 2 && E3.settle([1, 1], [-3, 0], "even") === -1, "settle: the cut a group cannot take passes to the next in the rule's order; a cut larger than all use cannot be spread");
   }
 
   console.log((fails ? "FAILED " : "ok ") + (checks - fails) + "/" + checks + " checks (engine E3)");

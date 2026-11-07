@@ -42,20 +42,21 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-fallback">
 <p class="lx-eyebrow">The lesson in one table: Prairie City's districts, run as one linear program (2025 dollars, illustrative)</p>
 <!-- m12-static:start -->
-<div class="lx-scroll-x"><table class="lx-facts m12-table"><thead><tr><th scope="col">Plan</th><th scope="col">Yearly cost against 2025</th><th scope="col">CO₂ of the districts (a year)</th><th scope="col">Substation upgrades</th><th scope="col">Burden, homes below 80% of AMI (screening)</th></tr></thead><tbody><tr><td>2025 as it is</td><td class="n">$0.0M</td><td class="n">1,921,977 t</td><td class="n">0 MW</td><td class="n">6.1%</td></tr><tr><td>Electrify heat and cars</td><td class="n">−$65.8M</td><td class="n">1,527,234 t</td><td class="n">91 MW</td><td class="n">6.4%</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class="n">−$60.5M</td><td class="n">1,527,266 t</td><td class="n">48 MW</td><td class="n">6.5%</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class="n">−$86.2M</td><td class="n">1,537,582 t</td><td class="n">5 MW</td><td class="n">6.0%</td></tr></tbody></table></div><p class="lx-hint">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>
+<div class="lx-scroll-x"><table class="lx-facts m12-table"><thead><tr><th scope="col">Plan</th><th scope="col">Yearly cost against 2025</th><th scope="col">CO₂ of the districts (a year)</th><th scope="col">Substation upgrades</th><th scope="col">Burden, homes below 80% of area median income (AMI; screening)</th></tr></thead><tbody><tr><td>2025 as it is</td><td class="n">$0.0M</td><td class="n">1,921,977 t</td><td class="n">0 MW</td><td class="n">6.1%</td></tr><tr><td>Electrify heat and cars</td><td class="n">−$65.8M</td><td class="n">1,527,234 t</td><td class="n">91 MW</td><td class="n">5.4%</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class="n">−$60.5M</td><td class="n">1,527,266 t</td><td class="n">48 MW</td><td class="n">5.5%</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class="n">−$86.2M</td><td class="n">1,537,582 t</td><td class="n">5 MW</td><td class="n">5.1%</td></tr></tbody></table></div><p class="lx-hint">Precomputed with HiGHS on 6 November 2026. Cost includes the cars' fuel and charging, not their prices; equipment and upgrades as yearly payments.</p>
 <!-- m12-static:end -->
 <p class="lx-hint">With JavaScript on, you run each plan with a real solver in your browser, read the substations' duals, let the LP choose under a CO₂ cap, and change who adopts first in the household table. Prairie City is fictional; its numbers are illustrative.</p>
 </div>
 </div>
 <div class="lx-datanote m12-note"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
-<li><b>Illustrative:</b> Prairie City, its three districts, one substation each and its household groups (prairie-city.json); retrofit, district-heat and upgrade costs are set for teaching.</li>
+<li><b>Illustrative:</b> Prairie City, its three districts, one substation each and its household groups (prairie-city.json); retrofit, district-heat and upgrade costs are set for teaching, fixed here at their defaults (the inputs table lists them; the <a href="sb3-city-planner.html">City Planner</a> changes them).</li>
 <li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), SPP's 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands; heat pumps and rooftop solar from EIA, batteries from NREL, 2025 dollars.</li>
-<li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept.</li>
+<li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept. Weather: NOAA's normals on SPP's 2025 days (synthetic).</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once).</li>
 </ul></div>
 <div class="lx-card lx-notebook m12-nb">
 <p class="lx-eyebrow">Build it in Python · notebook lab, about 60 minutes, then 120 minutes of practice</p>
-<p>The engine's hub with <code>scipy.optimize.linprog</code> and HiGHS: the balances, the substation rows and their duals, managed charging, batteries, the heat network, the building shares as decisions under a CO₂ cap, and the household layer after the LP.</p>
+<p>The engine's hub with <code>scipy.optimize.linprog</code> and HiGHS.</p>
+<ul class="m12-nb-steps"><li><b>The LP:</b> balances, substation rows and their duals, managed charging, batteries, the heat network.</li><li><b>Choosing:</b> the building shares as decisions under a CO₂ cap.</li><li><b>After the LP:</b> the household layer.</li></ul>
 <p><b>What it checks:</b> <code>assert</code> cells match the browser's busiest hours, upgrades, costs, CO₂, the duals and the LP's chosen shares.</p>
 <ol class="m12-nb-steps">
 <li>Download the notebook and the two data files; put them in one folder.</li>
@@ -80,6 +81,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 .m12-symbols th, .m12-symbols td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--lx-line); }
 .m12-symbols th { font-family: var(--lx-f-display); font-size: 12.5px; font-weight: 600; color: var(--lx-ink-2); border-bottom: 2px solid var(--lx-line-2); }
 .m12-rules { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: 2px; }
+.lx-facts.m12-ties td.n, .lx-facts.m12-lin td.n { white-space: normal; text-align: left; }   /* words, not numbers: they wrap on phones */
 </style>
 ```
 :::
@@ -125,13 +127,19 @@ Every hour lasts $\Delta t = 1$ h, so a MW held for an hour is a MWh. Days $k$ (
 | $B_{dkh}$, $Q_{dkh}$ | base load; heat needed | MW; MW of heat | given (prairie-city.json) |
 | $\sigma$, $COP_{kh}$ | heat a retrofit saves; heat pump's heat per unit of power | share; MWh/MWh | given |
 | $L_d$, $S_{dkh}$, $E_{dk}$ | substation limit; rooftop output; the day's charging energy | MW; MW; MWh | given |
+| $pl_{kh}$ | the heat network's plant power (core only): its heat pump's heat $\div$ 3 | MW | decided |
+| $hp_{kh}$, $boil_{kh}$, $si_{kh}$, $so_{kh}$ | the network's heat pump, gas boiler (assumed to exist: fuel only), store in and out | MW of heat | decided |
 :::
 
 $$\min\; \sum_k w_k \sum_h \sum_d p_d\, imp_{dkh} \;+\; a \sum_d up_d \;+\; \text{fuel}(y) \;[+\; \text{equipment}(y, \text{sizes})]$$
 
 Each district-hour (the balance; its dual is the marginal cost of one more MWh there):
 
-$$imp + pv + o - c - ev - \sum_{e,s} Q_{dkh}\,(1 - \sigma e)\; y_{d,e,s}\;\kappa_s = B_{dkh}, \qquad \kappa_{res} = 1,\; \kappa_{hp} = \frac{1}{COP_{kh}},\; \kappa_{fuel} = \kappa_{dh} = 0$$
+$$imp + pv + o - c - ev - \sum_{e,s} Q_{dkh}\,(1 - \sigma e)\; y_{d,e,s}\;\kappa_s - [d = \text{core}]\, pl_{kh} = B_{dkh}, \qquad \kappa_{res} = 1,\; \kappa_{hp} = \frac{1}{COP_{kh}},\; \kappa_{fuel} = \kappa_{dh} = 0$$
+
+The heat network in the core (its own heat balance, with 10% lost in the pipes and a store that loses 0.5% an hour):
+
+$$hp_{kh} + boil_{kh} + so_{kh} - si_{kh} = \frac{1}{0.9}\sum_{e} Q_{\text{core},kh}\,(1 - \sigma e)\; y_{\text{core},e,dh}, \qquad pl_{kh} = \frac{hp_{kh}}{3}$$
 
 The substation (its dual: what one more MW of room is worth that hour), the sun, the battery and the day's charging:
 
@@ -145,8 +153,16 @@ When the LP chooses (step 6): $\sum_{e,s} y_{d,e,s} = 1$, furnaces and resistanc
 <details class="lx-deeper">
 <summary><span class="k">Go deeper · Modeler</span>When two answers cost the same: the tie rule</summary>
 <div class="lx-deeper-body">
-<p>With one price all day, many schedules tie. Small stated costs, left out of every reported number, pick one: $20 a year per MW of each district's busiest hour, $10 per MW of the three together, $1 per MWh out of a battery, $0.50 per MWh out of the heat store, and $0.10 per MWh of managed charging times the hour's share of SPP's peak demand.</p>
+<p>With one price all day, many schedules tie. Small stated costs, left out of every reported number, pick one:</p>
+<div class="lx-scroll-x"><table class="lx-facts m12-ties"><thead><tr><th scope="col">Tie cost</th><th scope="col">Size</th></tr></thead><tbody>
+<tr><td>Each district's busiest hour</td><td class="n">$20 a year per MW</td></tr>
+<tr><td>The three districts' busiest hour together</td><td class="n">$10 per MW</td></tr>
+<tr><td>Out of a battery</td><td class="n">$1 per MWh</td></tr>
+<tr><td>Out of the heat store</td><td class="n">$0.50 per MWh</td></tr>
+<tr><td>Managed charging</td><td class="n">$0.10 per MWh × the hour's share of SPP's peak demand</td></tr>
+</tbody></table></div>
 <ul class="m12-rules">
+<li>The LP minimises the cost plus these small costs: on a few plans it pays under $30 a year, in the engine's test, to keep a busiest hour that is under its limit lower.</li>
 <li>The engine's test finds the lowest and highest value of each busiest hour, each upgrade and the energy bought over every plan within $1 of the best cost: they agree.</li>
 <li>The tie costs also enter the balance duals, by a few dollars at most on the busiest hours: read them as "about".</li>
 <li>The substation duals summed over the year are checked as cost slopes: the cost moves by the same amount when the limit moves 0.1 MW up or down.</li>
@@ -194,7 +210,7 @@ When the LP chooses (step 6): $\sum_{e,s} y_{d,e,s} = 1$, furnaces and resistanc
 <div class="lx-card">
 <p class="lx-eyebrow">Inputs the model uses</p>
 <!-- m12-inputs:start -->
-<div class="lx-scroll-x"><table class="lx-facts e3-inputs"><thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead><tbody><tr><td>Substation limits: core · suburbs · fringe</td><td class="n">250 · 230 · 60 MW</td><td class="s">prairie-city.json: 15% above each district's 2025 busiest hour (teaching)</td></tr><tr><td>Electricity, Kansas 2025: homes · businesses</td><td class="n">14.44¢ · 11.19¢ per kWh</td><td class="s">Electric Power Annual, Table 2.10: Average Price of Electricity to Ultimate Customers by End-Use Sector, by State, 2025 and 2024 (EIA)</td></tr><tr><td>Gas, Kansas 2025: homes · businesses</td><td class="n">$14.81 · $11.90 per thousand cubic feet</td><td class="s">Natural Gas Prices, Kansas (annual) (EIA)</td></tr><tr><td>Grid CO₂</td><td class="n">862 lb per MWh, plus 5% losses</td><td class="s">EPA eGRID2023, SPP North</td></tr><tr><td>Heat pump COP</td><td class="n">2.4 at −15 °C, 3.2 at 0 °C, 1 below −23 °C</td><td class="s">DOE cold-climate challenge (via lesson F3)</td></tr><tr><td>Heat pump, per home</td><td class="n">$7,355, 15 years</td><td class="s">EIA AEO2026, residential (2022 dollars, converted)</td></tr><tr><td>Rooftop solar</td><td class="n">$4,738 per kW, 25 years</td><td class="s">EIA AEO2026, residential (2022 dollars, converted)</td></tr><tr><td>Battery, 4 hours</td><td class="n">$1,371 per kW, 15 years</td><td class="s">NREL 2025 update (2024 dollars, converted)</td></tr><tr><td>Retrofit, district heat, store, upgrades</td><td class="n">ranges you set</td><td class="s">set for teaching (illustrative)</td></tr><tr><td>Yearly payments</td><td class="n">4% real, over each item's life</td><td class="s">lesson 13's rate (NLR ATB 2025)</td></tr></tbody></table></div>
+<div class="lx-scroll-x"><table class="lx-facts e3-inputs"><thead><tr><th scope="col">Input</th><th scope="col">Value</th><th scope="col">Source</th></tr></thead><tbody><tr><td>Substation limits: core · suburbs · fringe</td><td class="n">250 · 230 · 60 MW</td><td class="s">prairie-city.json: each district's 2025 busiest hour × 1.15, rounded up to the next 10 MW (17%, 20% and 25% above it; teaching)</td></tr><tr><td>Electricity, Kansas 2025: homes · businesses</td><td class="n">14.44¢ · 11.19¢ per kWh</td><td class="s">Electric Power Annual, Table 2.10: Average Price of Electricity to Ultimate Customers by End-Use Sector, by State, 2025 and 2024 (EIA)</td></tr><tr><td>Gas, Kansas 2025: homes · businesses</td><td class="n">$14.81 · $11.90 per thousand cubic feet</td><td class="s">Natural Gas Prices, Kansas (annual) (EIA)</td></tr><tr><td>Grid CO₂</td><td class="n">862 lb per MWh, plus 5% losses</td><td class="s">EPA eGRID2023, SPP North</td></tr><tr><td>Heat pump COP, an illustrative curve</td><td class="n">2.4 at −15 °C; 3.2 at 0 °C; 1 below −23 °C</td><td class="s">anchored to DOE's cold-climate challenge target, 2.4 at −15 °C (U.S. Department of Energy, 24 Sep 2021); the rest is the course's curve (lesson F3), with resistance backup assumed below −23 °C</td></tr><tr><td>Heat pump, per home</td><td class="n">$7,355, 15 years</td><td class="s">EIA AEO2026, residential (2022 dollars, converted)</td></tr><tr><td>Rooftop solar</td><td class="n">$4,738 per kW, 25 years</td><td class="s">EIA AEO2026, residential (2022 dollars, converted)</td></tr><tr><td>Battery, 4 hours</td><td class="n">$1,371 per kW, 15 years</td><td class="s">NREL 2025 update (2024 dollars, converted)</td></tr><tr><td>Retrofit: cost a home · heat saved · life</td><td class="n">$9,000 · 18% · 30 years</td><td class="s">set for teaching (illustrative); fixed here at the defaults: change them in the City Planner or the notebook</td></tr><tr><td>Heat network: per home-equivalent · plant heat pump · heat store</td><td class="n">$12,000 (40 years) · $1,200 per kW of heat, COP 3 (25 years) · $3,000 per MWh (30 years)</td><td class="s">set for teaching (illustrative); 10% of the heat lost in the pipes; the gas boiler (90%) is assumed to exist already: its fuel is counted, not its construction</td></tr><tr><td>Substation upgrade</td><td class="n">$800 per kW, 40 years</td><td class="s">set for teaching (illustrative); fixed here at the defaults: change them in the City Planner or the notebook</td></tr><tr><td>Managed charging</td><td class="n">any hours of the same day, at most a sixth of the day's charge in one hour</td><td class="s">set for teaching: cars plugged in at home or work whenever needed (an upper bound on what managed charging can do)</td></tr><tr><td>Yearly payments</td><td class="n">4% real, over each item's life</td><td class="s">lesson 13's rate (NLR ATB 2025)</td></tr></tbody></table></div>
 <!-- m12-inputs:end -->
 </div>
 ```

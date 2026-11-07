@@ -233,6 +233,12 @@
   "lesson": "F1",
   "href": "f01-five-scales.html"
  },
+ "building-envelope": {
+  "term": "Building envelope",
+  "short": "A building's insulating shell: its walls, roof, floor, windows and doors, which set how fast heat leaks out.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
+ },
  "bus": {
   "term": "Bus",
   "short": "A point of the network where plants, loads and lines meet, such as a substation; a network model has one balance rule per bus.",
@@ -880,6 +886,12 @@
   "short": "The flow of electric charge through a wire, measured in amperes (A); for the same power, a higher voltage needs less current.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "electric-vehicle": {
+  "term": "Electric vehicle (EV)",
+  "short": "A car, bus or truck driven by an electric motor from a battery charged from the grid, instead of by burning gasoline or diesel.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "electrification": {
   "term": "Electrification",

@@ -60,6 +60,15 @@ function rowsOf(E3, R, tag) {
   has("$" + tie.wear + " per MWh out of a battery and $" + tie.storeWear.toFixed(2) + " per MWh out of the heat store");
   has("$" + tie.ev.toFixed(2) + " per MWh of managed charging");
   has("×2 and ×0.1"); ok(/\[2, 0\.1\]/.test(fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e3-engine.js"), "utf8")), "the engine test runs the ties x2 and x0.1, as the page says");
+  has("under $30 a year in the engine's test"); ok(/gap < 30/.test(fs.readFileSync(path.join(X.SITE, "_tests/learn/test_e3-engine.js"), "utf8")), "the tie rule's economic price: under $30 a year, as the engine test checks (SB3 review finding 4)");
+  // the review's other fixes, where the reader sees them
+  ok(/Siting with map layers is in the capstone <a href="c3-prairie-city-2040\.html">C3<\/a>/.test(PAGE), "the brief says where siting with map layers is (C3, on this engine; SB3 review finding 6, to the coordinator)");
+  ok(/assumed to exist already \(its fuel counts, not its construction\)/.test(JS) && /plugged in at home or work when needed/.test(JS), "beside the controls: the existing boiler and the managed-charging assumption (SB3 review findings 7, 8)");
+  ok(/"Hours a year at the limit"/.test(JS) && !/Hours it binds/.test(JS), "the substation table counts hours a year at the limit, weighted (SB3 review finding 3)");
+  ok(/not checked against a full year of hours/.test(JS) && /synthetic weather/.test(JS) && !/people, homes and weather/.test(JS), "the boundary: representative-day estimates and synthetic weather (SB3 review finding 5)");
+  ok(/data-term="substation"/.test(PAGE) && /data-term="electric-vehicle">electric cars \(EVs\)/.test(PAGE) && /linear program \(LP\)/.test(PAGE) && /data-term="energy-burden"/.test(PAGE) && /area median income \(AMI\)/.test(PAGE) && /\[\[linearized-feeder-limit\|/.test(JS), "terms glossed or expanded at first use (SB3 review finding 10)");
+  ok(/U\.keys\(c1, \[\["Read the lines"/.test(JS) && /\["The value"/.test(JS) && /\["Its assumptions"/.test(JS), "the chart and dual explanations split into labelled lines (SB3 review finding 11)");
+  ok(/energycodes|bto-cchp-tech-challenge-spec-102521\.pdf/.test(PAGE), "the DOE specification is in the sources, dated (SB3 review finding 9)");
   has("paid yearly at 4% real over each item's life"); ok(cfg.finance.rate === 0.04, "4% real");
   has("eGRID's 2023 SPP North CO₂ rate"); ok(city.emissions.gridLbPerMWh.year === 2023, "eGRID 2023");
 
