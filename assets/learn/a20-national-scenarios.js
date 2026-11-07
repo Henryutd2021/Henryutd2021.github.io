@@ -422,10 +422,11 @@
         var y0 = it.y0 == null ? 0 : it.y0, y1 = it.y1; ys.push(y0, y1);
         bs.push({ x0: i + 0.15, x1: i + 0.85, y0: Math.min(y0, y1), y1: Math.max(y0, y1), color: it.total ? "var(--lx-accent)" : y1 < y0 ? "var(--lx-good)" : "var(--lx-bad)", op: 0.85, rx: 3 });
         tk.push([i + 0.5, it.mid || it.short]); tkN.push([i + 0.5, it.short]);
-        marks.push({ x: i + 0.5, y: Math.max(y0, y1), label: it.text.replace(/ (Mt|TWh|PJ)$/, ""), kind: "dot", pos: "above" });
+        var down = y1 < y0 || (y1 < 0 && y0 <= 0);   // a fall, or a negative value: its label goes under the bar
+        marks.push({ x: i + 0.5, y: down ? Math.min(y0, y1) : Math.max(y0, y1), label: it.text.replace(/ (Mt|TWh|PJ)$/, ""), kind: "dot", pos: down ? "below" : "above" });
       });
       var lo = Math.min.apply(null, ys.concat([0])), hi = Math.max.apply(null, ys.concat([0])), span = hi - lo || 1, st = niceStep(span);
-      var y = { min: Math.floor(lo / st) * st, max: Math.ceil((hi + span * 0.12) / st) * st, step: st, fmt: function (v) { return fmtN(v); }, unit: D.outputs.filter(function (x) { return x.key === o; })[0].unit, zero: true };
+      var y = { min: Math.floor((lo < 0 ? lo - span * 0.12 : lo) / st) * st, max: Math.ceil((hi + span * 0.12) / st) * st, step: st, fmt: function (v) { return fmtN(v); }, unit: D.outputs.filter(function (x) { return x.key === o; })[0].unit, zero: true };
       Pl.render({ x: { min: 0, max: items.length, ticks: tk, ticksN: tkN }, y: y, height: 250, heightN: 230, bars: bs, marks: marks,
         legend: [{ label: "Raises it", color: "var(--lx-bad)" }, { label: "Lowers it", color: "var(--lx-good)" }, { label: "A scenario's own value", color: "var(--lx-accent)" }],
         aria: title + ": " + items.map(function (it) { return it.label + " " + it.text; }).join("; ") + ".",

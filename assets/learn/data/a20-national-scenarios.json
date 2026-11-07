@@ -88,8 +88,8 @@
   ],
   "sort": {
     "bins": [
-      { "id": "exploratory", "label": "Exploratory", "sub": "starts from assumptions and asks what happens" },
-      { "id": "target", "label": "Target-seeking", "sub": "starts from a goal and asks what it takes" }
+      { "id": "exploratory", "label": "Exploratory", "sub": "from assumptions" },
+      { "id": "target", "label": "Target-seeking", "sub": "from a goal" }
     ],
     "cards": [
       { "id": "current", "text": "Prairieland: Current policies", "bin": "exploratory", "why": "It sets today's policies and asks what follows; nothing forces a result." },
