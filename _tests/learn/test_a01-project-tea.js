@@ -50,7 +50,7 @@ const { usd, musd, signed, pct } = A;
   ok(DA.farm.mw === TOWN.fleet.wind.mw && p.mw === 150, "inputs: 150 MW, Prairie Town's wind farm (town.json)");
   ok(D7.finance.debtRate === 5 && D7.finance.equityRate === 10 && D7.finance.debtShare === 60 && D7.finance.inflation === 2.5, "inputs: lesson 7's illustrative blend: 5% loans, 10% owners, 60% loans, 2.5% inflation");
   ok(DA.priceYear === 2025 && /real 2025 dollars/.test(DA.about) && /one price year/i.test(DA.about), "price year: one, 2025, stated in the data file");
-  ok(/data-src="\.\.\/assets\/learn\/data\/07-cost\.json \.\.\/assets\/learn\/data\/a01-project-tea\.json"/.test(QMD) && /data\["07_cost"\]/.test(JS) && /data\["a01_project_tea"\]/.test(JS), "inputs: the page reads lesson 7's data file and its own");
+  ok(/data-src="\.\.\/assets\/learn\/data\/07-cost\.json \.\.\/assets\/learn\/data\/a01-project-tea\.json \.\.\/assets\/learn\/data\/path\.json"/.test(QMD) && /data\["07_cost"\]/.test(JS) && /data\["a01_project_tea"\]/.test(JS), "inputs: the page reads lesson 7's data file and its own");
 }
 
 // ---------------- formulas: as lesson 7 and K3

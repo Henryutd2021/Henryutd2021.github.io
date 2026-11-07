@@ -917,6 +917,12 @@
   "lesson": 7,
   "href": "07-cost.html"
  },
+ "discounted-cash-flow": {
+  "term": "Discounted cash flow",
+  "short": "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate: their sum is the net present value, while the internal rate of return (the rate that makes that sum zero) and the payback time are found from the same flows.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
+ },
  "dispatch": {
   "term": "Dispatch",
   "short": "Deciding how much power each plant should make, hour by hour or minute by minute.",
@@ -1540,6 +1546,12 @@
   "short": "The height the water falls through a hydro plant, from the reservoir's surface down to where it leaves the turbine, in metres.",
   "lesson": "F4",
   "href": "f04-power-plants.html"
+ },
+ "reserve-headroom": {
+  "term": "Headroom (for reserves)",
+  "short": "The output a running unit could still add, or the load it could still shed, which it can offer to the grid as a reserve.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
  },
  "heat-engine": {
   "term": "Heat engine",
@@ -2183,6 +2195,12 @@
   "lesson": "M2",
   "href": "m02-unit-commitment.html"
  },
+ "minimum-up-down-time": {
+  "term": "Minimum up and down times",
+  "short": "The shortest time a unit must stay on once started, and off once stopped, before it may switch again.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
+ },
  "missing-money": {
   "term": "Missing money",
   "short": "The gap between what a plant the grid needs earns from energy and reserves and what it costs to build or keep.",
@@ -2543,6 +2561,12 @@
   "lesson": "F10",
   "href": "f10-nations-differ.html"
  },
+ "piecewise-linear": {
+  "term": "Piecewise-linear curve",
+  "short": "A curve drawn as straight pieces joined end to end, so a linear or mixed-integer program can follow it.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
+ },
  "pinball-loss": {
   "term": "Pinball loss",
   "short": "The score of a quantile forecast: a miss above the quantile is weighted by its level, a miss below by one minus it; lower is better.",
@@ -2614,6 +2638,12 @@
   "short": "Two federal conditions of many clean-energy tax credits, the hydrogen credit among them, that raise the credit fivefold when both are met: those who build or repair the facility are paid at least the local prevailing wage, and apprentices from registered programs work a set number of hours.",
   "lesson": "M11",
   "href": "m11-tea-in-models.html"
+ },
+ "price-taker": {
+  "term": "Price-taker",
+  "short": "A seller or buyer too small to move the market price, so a model takes the prices as given.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
  },
  "pricing-node": {
   "term": "Pricing node",
@@ -3292,6 +3322,12 @@
   "short": "A cell's or a site's weighted score in a siting screen, here from 0 to 100: a ranking under stated weights, not a cost and not a verdict.",
   "lesson": "A19",
   "href": "a19-gis-siting.html"
+ },
+ "sunk-cost": {
+  "term": "Sunk cost",
+  "short": "Money already spent that no choice made now can change, such as what an existing plant cost to build; it drops out when options are compared.",
+  "lesson": "CF4",
+  "href": "cf4-existing-reactors-hydrogen.html"
  },
  "supply-diversity": {
   "term": "Supply diversity",

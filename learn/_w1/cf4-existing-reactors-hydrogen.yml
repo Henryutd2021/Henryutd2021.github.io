@@ -1,0 +1,27 @@
+# Sidecar for CF4 (cf4-existing-reactors-hydrogen), wave W6, 2026-11-07; live since Henry approved E15 on 2026-11-07.
+# Read by scripts/build_learn.py. Depth D2 (working knowledge), closed-form toy, as CF5-CF8. Glossary: the six terms CF4
+# teaches, each marked at its first use on the page; ancillary-services is CF5's (its sidecar defines it, with the same
+# wording CF4's draft used), so CF4 only marks it.
+id: cf4-existing-reactors-hydrogen
+lesson: CF4
+glossary:
+  - id: sunk-cost
+    term: Sunk cost
+    def: "Money already spent that no choice made now can change, such as what an existing plant cost to build; it drops out when options are compared."
+  - id: price-taker
+    term: Price-taker
+    def: "A seller or buyer too small to move the market price, so a model takes the prices as given."
+  - id: piecewise-linear
+    term: Piecewise-linear curve
+    def: "A curve drawn as straight pieces joined end to end, so a linear or mixed-integer program can follow it."
+  - id: minimum-up-down-time
+    term: Minimum up and down times
+    def: "The shortest time a unit must stay on once started, and off once stopped, before it may switch again."
+  - id: reserve-headroom
+    term: Headroom (for reserves)
+    def: "The output a running unit could still add, or the load it could still shed, which it can offer to the grid as a reserve."
+  - id: discounted-cash-flow
+    term: Discounted cash flow
+    def: "Valuing a project's future yearly cash flows in today's money, each discounted at a chosen rate: their sum is the net present value, while the internal rate of return (the rate that makes that sum zero) and the payback time are found from the same flows."
+requests:
+  - "Curriculum row (scripts/learn_curriculum/data.py, CF4): add depth: D2 and model_mode: closed-form, as CF5-CF8 have (CF4 review #10)."

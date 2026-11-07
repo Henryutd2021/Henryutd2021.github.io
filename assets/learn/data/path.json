@@ -1950,6 +1950,18 @@
   },
   {
    "tier": "analyst",
+   "code": "CF4",
+   "title": "Can existing reactors earn more by making hydrogen and providing grid services?",
+   "ready": true,
+   "href": "cf4-existing-reactors-hydrogen.html",
+   "scales": [],
+   "id": "cf4-existing-reactors-hydrogen",
+   "minutes": 10,
+   "form": "case",
+   "short": "Hydrogen at existing plants"
+  },
+  {
+   "tier": "analyst",
    "code": "CF5",
    "title": "Where should a cogeneration study's boundary be drawn?",
    "ready": true,

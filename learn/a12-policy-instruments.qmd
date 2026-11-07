@@ -38,7 +38,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="a12-policy-instruments" data-src="../assets/learn/data/a12-policy-instruments.json ../assets/learn/data/a10-emissions-questions.json ../assets/learn/data/m06-carbon-in-models.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json">
+<div class="lx-interactive lx-cards" data-learn="a12-policy-instruments" data-src="../assets/learn/data/a12-policy-instruments.json ../assets/learn/data/a10-emissions-questions.json ../assets/learn/data/m06-carbon-in-models.json ../assets/learn/data/town_year.json ../assets/learn/data/cf_targets.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The Plains Grid's plan for a year: four instruments, each against no policy</p>
 <!-- a12-fallback:start (written from the model by the test's --write mode; do not edit) -->

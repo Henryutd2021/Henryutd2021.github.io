@@ -671,8 +671,8 @@
   outcome: "Say which party carries price, shape, output, basis and battery-margin risk under each contract, and read the risk as a stated statistic of a simulated distribution."
   after: [A1]
 # ---------- the rest of each tier, in curriculum v2 order (reports/learn/learn_map_v2.yml; coming soon until built).
-#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 is left out until its excerpts are approved (CF5 went
-#            live on 2026-11-07, with the case files below).
+#            Replaces the pre-v2 placeholder rows (2026-11-03). CF4 and CF5 went live on 2026-11-07, with the case files
+#            below.
 # ---------- wave W4 Foundations module F8 (curriculum v2 §18.4; builder learn-w4-a)
 - kind: lesson
   id: f08-large-loads
@@ -1828,6 +1828,23 @@
   outcome: "Say how a two-stage stochastic program sizes equipment before renewable build-out is known, and why its plan differs from a plan for the average future."
   teaches: [sizing before uncertainty resolves, scenarios with chances, reading a published stochastic planning model]
   after: [12]
+# CF4, builder learn-w6-cf4 (wave W6); review fixes on learn-w6-cf4; went live on 2026-11-07 after Henry approved E15 and
+# its revisions after review (register, "W6 sources"; DECISIONS 2026-11-07): framing C; analyst tier, as the other case files
+- kind: lesson
+  id: cf4-existing-reactors-hydrogen
+  code: CF4
+  tier: analyst
+  form: case
+  icon: atom
+  status: active
+  minutes: 10
+  title: "Can existing reactors earn more by making hydrogen and providing grid services?"
+  subtitle: "Follow one study through six parts, then run a toy plant that sells power, makes hydrogen and holds reserves at prices you set"
+  short: "Hydrogen at existing plants"
+  does: "A case file in six parts and a timeline; then split a toy plant's output hour by hour between the grid, an electrolyzer and reserves, at prices you set, and see what the day earns against selling all the power."
+  outcome: "Say what an hourly dispatch model and a lifetime cash flow each add when judging hydrogen at an existing plant, why the plant's own capital drops out, and which assumptions a result rests on."
+  teaches: ["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"]
+  after: [7]
 # CF5, builder learn-w5-f (wave W5); review fixes on learn-w5-cf5; went live on 2026-11-07 after Henry approved E14
 # (register, "W5 sources"; DECISIONS 2026-11-07): framing C, E14.16b; analyst tier (coordinator, 2026-11-06)
 - kind: lesson
