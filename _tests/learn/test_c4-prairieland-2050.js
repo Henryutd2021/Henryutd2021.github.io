@@ -12,6 +12,10 @@
 //     the Ridge region's wind and solar; gross and net kept apart; recomputed by hand
 //   - the words (says, the sensitivity line, the exemplars) true for every library plan, numbers as run
 //   - the brief's checks (two pages, the fields) and its assumptions say what is left out (equipment, the stand-in groups)
+//   - the reviews (2026-11-07): the assumptions follow the plan (the budget's counting, the peak-hour rule, the household
+//     share, the county assumption for new jobs, the full-year status); the strong exemplar meets its own rubric; the
+//     sensitivity one result a line; the shock table is the engine's, one sentence a shock; the notebook is part of the
+//     hand-in; the budget gap with A20; units and terms
 //   - the page frame: capstone sections, scripts, data-src, the fictional line, the notebook's section 8; no reactor named,
 //     the firm option never called nuclear; no AI wording
 // --write: writes the marker blocks.
@@ -57,7 +61,8 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   ok(near(tot, af.perHH * Hpc, 1e-6 * Math.abs(af.perHH * Hpc) + 1e-6), "the groups' charges add to the households' share (Prairie City's households as the stand-in)");
   ["kwh", "fixed", "income"].forEach(d => { const a2 = PG.afford(V, Vr, Object.assign({}, def, { rc: d }), PL, PC, A13); ok(near(a2.rows.reduce((s, r) => s + r.group, 0), tot, 1e-6 * Math.abs(tot) + 1e-6) && a2.design === d, "design " + d + ": the same total, spread differently"); });
   const a0 = PG.afford(V, Vr, Object.assign({}, def, { hs: 0 }), PL, PC, A13); ok(a0.rows.every(r => near(r.charge, 0)), "households paying 0% change no bill");
-  ok(/Heat pumps and cars bought are not in it/.test(PG.says(V, Xl, af, PG.ridgeJobs(V, def, PL, A, A13))[3].text) && (af.perHH >= 0 ? /a cost/ : /a saving/).test(PG.says(V, Xl, af, PG.ridgeJobs(V, def, PL, A, A13))[3].text), "the affordability line says what is left out, and a cost or a saving as run");
+  const affLine = PG.says(V, Xl, af, PG.ridgeJobs(V, def, PL, A, A13)).find(x => /Affordability/.test(x.text)).text;
+  ok(/Heat pumps and cars bought are not in it/.test(affLine) && (af.perHH >= 0 ? /a cost/ : /a saving/).test(affLine), "the affordability line says what is left out, and a cost or a saving as run");
   // ---------------- Ridge County's jobs
   const jb = PG.ridgeJobs(V, def, PL, A, A13), rc = PL.ridgeCounty, per = rc.a13.plant.mineJobs / rc.ridgeStationFuel2025PJ, coalLost = PL.balance.primary.coal - V.ridge.coal[4];
   const ri = PL.regions.findIndex(r => r.key === "ridge"), mw = (V.builtR[ri].wind + V.builtR[ri].solar) * 1000;
@@ -72,17 +77,24 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
     ok(s[0].text.indexOf(PG.bn(e.view.pv.total)) >= 0 && (e.view.over > 0.5) === /out of reach/.test(s[0].text), tag + ": the cost and carbon line as run");
     const sl = PG.sensLine(e.view, e.shocks), d = Object.values(e.shocks).map(x => x.dPV);
     ok(sl.indexOf(PG.sbn(Math.min(...d))) >= 0 && sl.indexOf(PG.sbn(Math.max(...d))) >= 0 && (Object.values(e.shocks).some(x => x.over > 0.5) ? /missed under/.test(sl) : /met under all four/.test(sl)), tag + ": the sensitivity line's range and the budget as run");
-    ok(s[4].text.indexOf(PG.kilo(jb2.j.lostTotal) + " jobs lost") >= 0 && s[4].text.indexOf(PG.kilo(jb2.j.newPermNet) + " net") >= 0, tag + ": Ridge County's line, gross and net");
+    const rl = s.find(x => /Ridge County \(screening\)/.test(x.text)).text;
+    ok(rl.indexOf(PG.kilo(jb2.j.lostTotal) + " jobs lost") >= 0 && rl.indexOf(PG.kilo(jb2.j.newPermNet) + " net") >= 0 && /if all the Ridge region's new wind and solar is in the county/.test(rl), tag + ": Ridge County's line, gross and net, with the county assumption");
+    ok(PG.sensLines(e.view, e.shocks).length === 4 && PG.sensLines(e.view, e.shocks).every(x => x.split(" ").length <= 35), tag + ": the sensitivity, one result a line (cost, carbon, imports, peak hours), each under 35 words");
   }
-  const exd = PG.exemplars(e0.view, e0.shocks, af, jb);
+  const s0 = PG.libEntry(LIB, SS, E4, P, E4.withPreset(def, cfg.presets.find(p => p.id === "secure")));
+  const exd = PG.exemplars(e0.view, e0.shocks, af, jb, s0.view, def, e0.full, E4);
   let exOk = true; try { EX.validate(exd); } catch (er) { exOk = false; console.log(er.message); }
-  ok(exOk && EX.plain(exd.answers[1]).indexOf(PG.bn(e0.view.pv.total)) >= 0 && EX.plain(exd.answers[1]).indexOf(PG.sensLine(e0.view, e0.shocks)) >= 0, "the strong exemplar quotes the default plan's run (cost, the shocks' line)");
+  const strong = EX.plain(exd.answers[1]);
+  ok(exOk && s0.preset === "secure" && s0.foresight === "perfect" && strong.indexOf(PG.bn(e0.view.pv.total)) >= 0 && strong.indexOf(PG.sensLine(e0.view, e0.shocks)) >= 0, "the strong exemplar quotes the default plan's run (cost, the shocks' lines)");
+  ok(strong.indexOf(PG.fix(e0.view.built.firm.reduce((a, b) => a + b, 0), 1) + " GW of the generic firm option") >= 0 && strong.indexOf(PG.fix(e0.view.built.battery.reduce((a, b) => a + b, 0), 1) + " GW of batteries") >= 0 &&
+    strong.indexOf("a security-first plan (imports at most 25%) costs " + PG.bn(s0.view.pv.total - e0.view.pv.total) + " more" + (s0.view.capOver[0] > 0.5 ? " and still cannot meet its cap in 2030" : "")) >= 0 && /What would change it/.test(strong) && /Limits: /.test(strong) &&
+    strong.indexOf("multiplier of " + PG.fix(def.jm, 1) + ", " + def.jd + "% displacement") >= 0 && /Other recommendations reach Proficient/.test(exd.note), "the strong exemplar meets its own rubric: every lever with its size (the firm option and batteries too), a reason against another pathway, what would change it, the screening assumptions, the limits; other answers can reach Proficient");
 
   // ---------------- the blocks
   const fbRes = () => E4.fallbackHTML(e0.view, P, { date: LIB.date, label: "the default pathway (" + cfg.presets.find(p => p.id === "central").label + ")" }) +
     E4.tableHTML(["Shock (model year)", "Cost to 2050, against the plan", "CO₂ 2026–2050", "Imports that year", "Peak-hour rule that year", "Not served that year"], PG.shockRows(e0.view, e0.shocks), "c4-shocks") +
     E4.tableHTML(["Screening (A13's accounting layer)", "Value"], [["Households' change in 2050 at " + def.hs + "% (against the 2025-policies pathway; equipment left out)", (af.perHH >= 0 ? "+$" : "−$") + PG.kilo(Math.abs(af.perHH)) + " a household a year"],
-      ["Ridge County: jobs lost (Ridge Station and the mines, × " + PG.fix(def.jm, 1) + ")", PG.kilo(jb.j.lostTotal)], ["Ridge County: new ongoing jobs, gross and net of " + def.jd + "% displacement", PG.kilo(jb.j.newPermGross) + " and " + PG.kilo(jb.j.newPermNet)],
+      ["Ridge County: jobs lost (Ridge Station and the mines, × " + PG.fix(def.jm, 1) + ")", PG.kilo(jb.j.lostTotal)], ["Ridge County: new ongoing jobs, gross and net of " + def.jd + "% displacement (if all the Ridge region's new wind and solar is in the county)", PG.kilo(jb.j.newPermGross) + " and " + PG.kilo(jb.j.newPermNet)],
       ["Ridge County: construction job-years, gross and net", PG.kilo(jb.j.buildJobYears) + " and " + PG.kilo(jb.j.buildJobYearsNet)]], "c4-screen");
   const BLOCKS = { "c4-plan": () => SS.staticHTML(S, def), "c4-results": fbRes, "c4-note": () => RN.outlineHTML(PG.FIELDS), "c4-exemplars": () => EX.staticHTML(exd), "c4-rubric": () => RB.staticHTML(PG.RUBRIC, { bar: PG.RUBRIC_BAR }), "c4-inputs": () => E4.inputsHTML(P) };
   if (process.argv.includes("--write")) { const b = {}; Object.keys(BLOCKS).forEach(k => { b[k] = BLOCKS[k](); }); X.writeBlocks(QPATH, b); console.log("wrote the c4 blocks"); }
@@ -92,8 +104,19 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   // ---------------- the brief
   ok(PG.TWO_PAGES === 2 * RN.PAGE_WORDS, "two pages: twice the one-page note's words (" + PG.TWO_PAGES + ")");
   ok(PG.FIELDS.every(f => f.need) && PG.FIELDS[0].at === "top" && PG.FIELDS.some(f => /what would change/.test(f.label)), "the brief's fields: recommendation first; the uncertainty that would change it asked for");
-  const as = PG.assumptions(def, af, jb);
-  ok(as.some(x => /end-use equipment/.test(x)) && as.some(x => /Prairie City's five groups stand in/.test(x)) && as.some(x => /builds up to the shock's year are kept/.test(x)) && A13.ASSUME.split.every(x => as.indexOf(x) >= 0) && A13.ASSUME.jobs.every(x => as.indexOf(x) >= 0), "the assumptions: equipment left out, the stand-in groups, the shock rule, A13's own");
+  const as = PG.assumptions(def, af, jb, e0.view, e0.full, E4);
+  const keepA13 = A13.ASSUME.split.filter(x => !/recovered in full from households/.test(x));
+  ok(as.some(x => /end-use equipment/.test(x)) && as.some(x => /Prairie City's five groups stand in/.test(x)) && as.some(x => /mineral restriction keeps decisions through the year before it/.test(x)) && keepA13.every(x => as.indexOf(x) >= 0) && A13.ASSUME.jobs.every(x => as.indexOf(x) >= 0), "the assumptions: equipment left out, the stand-in groups, the shock rules, A13's own");
+  ok(!as.some(x => /recovered in full from households/.test(x)) && as.some(x => x.indexOf("The households' share (" + PG.pct(af.share) + ") is spread in full") === 0), "the household assumption is the share set (" + def.hs + "%), not A13's 'recovered in full from households'");
+  ok(as.some(x => x.indexOf(PG.ACC.linear) >= 0) && PG.assumptions(Object.assign({}, def, { acc: "step" }), af, jb, e0.view, e0.full, E4).some(x => x.indexOf(PG.ACC.step) >= 0) && /2, 5, 5, 5, 5, 3/.test(PG.ACC.linear) && PL.carbon.accounting.linearWeights["2025"] === 2 && PL.carbon.accounting.stepWeights["2025"] === 0, "the budget's counting follows the plan (straight lines: 2025 twice; step: 2025 not at all)");
+  ok(PG.assumptions(Object.assign({}, def, { rm: "off" }), af, jb, e0.view, e0.full, E4).some(x => /No peak-hour rule: the stress hours were not tested/.test(x)) && as.some(x => /each region's load plus 10%/.test(x)), "the peak-hour rule as set: off is 'not tested'");
+  ok(as.some(x => /assumed to be in Ridge County: an upper bound for the county/.test(x)) && as.some(x => x.indexOf("a multiplier of " + PG.fix(def.jm, 1)) >= 0), "new Ridge jobs: all the region's new wind and solar assumed in the county, an upper bound");
+  ok(as[as.length - 1] === PG.fullStatus(e0.full, E4) && /pass both tests/.test(PG.fullStatus(e0.full, E4)) && /not known for this plan/.test(PG.fullStatus(null, E4)) && /does not test the cumulative budget/.test(PG.fullStatus(e0.full, E4)), "the full-year status goes into the brief: known for a library plan, 'not known' otherwise");
+  ok(E4.planRows(Object.assign({}, PG.toE4(E4, P, def), { dr: 5.5 }), P).find(r => /Discount rate/.test(r[0]))[1] === "5.5%", "the plan copied into the brief keeps a 5.5% discount rate");
+  const sx = PG.shockRows(e0.view, Object.assign({}, e0.shocks, { drought: Object.assign({}, e0.shocks.drought, { rule: null }) })).find(r => /Drought/.test(r[0]));
+  ok(sx[4] === "not tested (rule off)", "a shock run without the peak-hour rule says 'not tested', never 'met'");
+  const nr = LIB.plans.find(x => x.preset === "central-norule");
+  ok(/not tested, the peak-hour rule is off/.test(PG.sensLine(nr.view, nr.shocks)), "the sensitivity line of a plan without the rule: peak hours not tested");
   ok(RB.COMPETENCES && PG.RUBRIC.every(c => RB.COMPETENCES.some(x => x.id === c.id)), "the rubric's competences are the course's");
 
   // ---------------- the page frame
@@ -101,7 +124,12 @@ const QPATH = path.join(X.SITE, "learn/c4-prairieland-2050.qmd");
   ok(/data-learn="c4" data-src="\.\.\/assets\/learn\/data\/prairieland\.json \.\.\/assets\/learn\/data\/e4-pathways\.json \.\.\/assets\/learn\/data\/e4-library\.json \.\.\/assets\/learn\/data\/a13-fairness-jobs\.json \.\.\/assets\/learn\/data\/prairie-city\.json \.\.\/assets\/learn\/data\/path\.json"/.test(PAGE), "data-src: the nation, the engine, the library, A13's coefficients, Prairie City's groups, the course map");
   ok(/c4-prairieland-2050\.js/.test(PAGE) && /learn\.js/.test(PAGE), "scripts");
   const NB = fs.readFileSync(path.join(X.SITE, "learn/notebooks/m13-national-pathway.ipynb"), "utf8");
-  ok(/## 8\. Your pathway \(the Modeler version of capstone C4\)/.test(NB) && /section 8/.test(PAGE), "the Modeler version points to the notebook's section 8, which is the C4 cell");
+  ok(/## 8\. Your pathway \(capstone C4\)/.test(NB) && /section 8/.test(PAGE), "the hand-in points to the notebook's section 8, which is the C4 cell");
+  ok(T.indexOf("and the lines M13's notebook prints for the same pathway") >= 0 && /Part of the hand-in/.test(PAGE) && !/details class="lx-deeper" id="c4-nb"/.test(PAGE) && PG.FIELDS.some(f => f.key === "notebook" && f.need), "the notebook is part of the hand-in (the brief, a visible card, a required field), not a collapsed extra");
+  ok(T.indexOf("About 240 minutes: 70 to build and test pathways, 30 to read the results, 40 to run your pathway in M13's notebook, 70 to write the brief, 30 to check it.") >= 0 && 70 + 30 + 40 + 70 + 30 === 240, "the 240 minutes include the notebook");
+  ok(T.split("Prairieland's energy minister wants")[1].split(".")[0].split(" ").length <= 35, "the decision statement is under 35 words");
+  ok(/E4\.shockTable\(P\)/.test(JS) && !/shockWhat/.test(JS) && /E4\.GAP\.slice\(0, 2\)/.test(JS) && /no pathway here gets below about 2,700 Mt/.test(T) && /href="a20-national-scenarios\.html"/.test(PAGE), "the shock table is the engine's (one row a shock); the limits group and the data note carry the gap with A20");
+  ok(/data-term="net-calorific-value"/.test(PAGE) && /data-term="primary-energy"/.test(PAGE) && /data-term="lng"/.test(PAGE) && /1 TWh = 3\.6 PJ/.test(T) && /the modelled cost change from tightening the budget by one tonne/.test(T), "units and terms explained at first use, the dual in plain words");
   ok(T.indexOf(PL.about.line) >= 0 && JS.indexOf("P.line") >= 0, "the fictional line");
   ok(!/firm[^.;\n]{0,50}nuclear|nuclear[^.;\n]{0,50}firm/i.test(T + JS) && !/reactor|\bSMR\b|small modular/i.test(PAGE + JS), "the firm option is never named nuclear; no reactor named");
   ok(!/learning curve|learning rate|first[- ]of[- ]a[- ]kind/i.test(PAGE + JS), "no learning curves (G-COST)");

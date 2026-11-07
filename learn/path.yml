@@ -1422,15 +1422,14 @@
   sandbox: SB4
   icon: target
   status: active
-  minutes: 240
-  lab_minutes: 60   # the Modeler version adds M13's notebook
+  minutes: 240      # M13's notebook run on the learner's pathway is part of the hand-in, within the 240 minutes (C4 review 10)
   title: "Prairieland 2050: design and defend a nation's pathway"
   subtitle: "Choose a pathway for five regions to 2050, test it against four shocks, and defend its cost, emissions, security, affordability and Ridge County's jobs in a two-page policy brief"
   short: "Prairieland 2050"
   does: "Choose a pathway for five regions to 2050 on the Pathway Explorer's engine; test it against a gas-price spike, a drought, a mineral export restriction and a demand surprise; report cost, emissions against the cumulative budget, security, screening affordability and Ridge County jobs with stated assumptions; write a two-page policy brief with uncertainty."
   outcome: "Defend a national pathway in a two-page policy brief: its cost, emissions against the budget, security under four shocks, a screening of affordability and of Ridge County's jobs (gross and net), and the uncertainty that would change the recommendation."
   teaches: [capstone policy brief, stress tests against shocks, cumulative budgets in practice, screening affordability, a just transition in numbers, uncertainty in a recommendation]
-  lab: "M13's notebook: Prairieland's pathway in SciPy and HiGHS, about 60 minutes."
+  lab: "M13's notebook, section 8: your pathway in SciPy and HiGHS, part of the hand-in (about 40 of the 240 minutes)."
   after: [SB4, M13, A20, A21, A12]
 # ---------- the Modeler checkpoint (curriculum v2 §3.3), wave W2
 - kind: lesson

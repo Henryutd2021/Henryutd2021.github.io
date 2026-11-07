@@ -26,6 +26,15 @@
 //     peak-hour rule, demand goes unserved in the full year
 //   - the library (data/e4-library.json): every preset, perfect and decade by decade; entries equal fresh runs byte for
 //     byte (the default and one more by default, every entry with --library), written exactly as --write writes it
+//   - limits first (SB4 and M13 reviews, 2026-11-07): the reviewer's 2,800 Mt plan without the firm option meets its budget
+//     (the hard-limit LP's cost and a dual above the $1,000 penalty); the straight line to zero is out of reach, and the
+//     closest pathway is the least-CO2 plan that serves every slice and stress hour; an out-of-reach window has no duals
+//   - the reviews' other engine findings: a unit retired in an earlier window stays at 0 (no reopening); a drought derates
+//     the summer stress hour as it derates the summer slices; the mineral restriction keeps decisions through the year
+//     before it and never reprices plants already decided; the stress shortfall is the worse hour's, never the sum of the
+//     two; the budget's price in a model year is dual x w / D (the gas row's dual says the same); the plan's rows keep each
+//     field's precision (5.5%); a plan without the peak-hour rule has rule null; e4-pathways.json never puts a nuclear term
+//     beside a cost in one string; the done words say what decade by decade does not prove
 //   - failure states: solve never rejects; a solver that errors gives "error"; a time limit is reported as such
 //   - scope: no reactor technology named in the engine or its data; the firm option is never called nuclear
 // --write: recomputes the stress hours into e4-pathways.json and rebuilds the library (about two minutes).
@@ -181,8 +190,11 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
       ok(r.ok && r.results.shock && r.results.shock.key === k, k + ": re-planned");
       const Ss = E4.sysOf(def, P, { shock: k }), sp = Ss.shockP, a = base.results.plan.raw, b = r.results.shock.raw;
       let same = true;
-      for (let q = 0; q <= sp; q++) { P.R.forEach((R, rr) => E4.NEW.forEach(t => { if (Math.abs(a.n[rr][t][q] - b.n[rr][t][q]) > 1e-6) same = false; })); if (Math.abs(a.firm[q] - b.firm[q]) > 1e-6) same = false; P.units.forEach(u => { if (Math.abs(a.k[u.j][q] - b.k[u.j][q]) > 1e-6) same = false; }); }
-      ok(same, k + ": builds and retirements up to " + Ss.shockYear + " stay as planned");
+      const kt = E4.keptThrough(P, k, sp);
+      ok(k === "mineralBan" ? kt === sp - 1 : kt === sp, k + ": decisions kept through " + P.Y[kt] + (k === "mineralBan" ? " (the year before: its batteries were not yet bought)" : " (the shock's year)"));
+      same = true;
+      for (let q = 0; q <= kt; q++) { P.R.forEach((R, rr) => E4.NEW.forEach(t => { if (Math.abs(a.n[rr][t][q] - b.n[rr][t][q]) > 1e-6) same = false; })); if (Math.abs(a.firm[q] - b.firm[q]) > 1e-6) same = false; P.units.forEach(u => { if (Math.abs(a.k[u.j][q] - b.k[u.j][q]) > 1e-6) same = false; }); }
+      ok(same, k + ": builds and retirements up to " + P.Y[kt] + " stay as planned");
       ok(Array.from({ length: sp }, (x, p) => p).every(p => b.per[p] === a.per[p] || JSON.stringify(b.per[p]) === JSON.stringify(a.per[p])), k + ": the years before the shock are the plan's");
       const q = P.shocks[k].params;
       if (k === "gasSpike") ok(near(Ss.price[sp].lng, def.pl * q.lngX) && near(Ss.price[sp].gas, def.pg * q.gasX) && Ss.price[sp + 1].lng === def.pl, k + ": LNG x" + q.lngX + " and gas x" + q.gasX + " in " + Ss.shockYear + " only");
@@ -190,6 +202,68 @@ const WRITE = process.argv.includes("--write"), FULLLIB = process.argv.includes(
       if (k === "mineralBan") ok(near(Ss.capex[sp].battery, def.cb * q.batteryCapexX) && Ss.capex[sp + 1].battery === def.cb, k + ": new batteries x" + q.batteryCapexX + " in " + Ss.shockYear);
       if (k === "demandSurprise") ok(Ss.elPJ.every((e, p) => near(E4.sum(e), E4.sum(E4.sysOf(def, P).elPJ[p]) * (P.Y[p] >= q.from ? q.elX : 1), 1e-9)), k + ": electricity x" + q.elX + " from " + q.from);
     }
+  }
+
+  // ---------------- limits first, and the other engine findings of the reviews (2026-11-07)
+  {
+    // SB4 review 1: the reviewer's plan (buildings, transport, industry at 100%, 78%, 60%; no firm option; 2,800 Mt)
+    const st = Object.assign({}, def, { eb: 100, et: 78, ei: 60, fm: 0, bud: 2800 }), r = await run(st), V = E4.view(r.results.plan, P);
+    const Sx = E4.sysOf(st, P), hard = solveSync(E4.build(P, Sx, { noPenalty: true }));
+    const raw = E4.read(P, Sx, E4.build(P, Sx, { noPenalty: true }), hard), Rh = E4.summarize(st, P, Sx, raw);
+    ok(r.ok && V.over === 0 && V.cum <= 2800 && hard.status === "optimal" && Math.abs(V.pv.total - Math.round(Rh.pv.total)) <= 1 && V.carbonValue[0] > cfg.penalties.budgetPerT && V.reach,
+      "limits first: the reviewer's 2,800 Mt plan meets its budget (" + V.cum + " Mt, $" + (V.pv.total / 1000).toFixed(3) + " bn = the hard-limit LP's; dual $" + V.carbonValue[0] + " a tonne, above the $1,000 penalty)");
+    ok(r.results.models[0].stages === 3 && /least-cost pathway/.test(r.message) && !/out of reach/.test(r.message), "it took the two extra LPs, and the status line does not call it out of reach");
+    // M13 review 2: the straight line to zero at the most electrification: out of reach; the closest is the least-CO2 plan
+    const st2 = Object.assign({}, E4.withPreset(def, cfg.presets.find(x => x.id === "deep")), { bud: PL.carbon.budget.presets.find(x => x.key === "line2050").mt });
+    const r2 = await run(st2), V2 = E4.view(r2.results.plan, P), S2 = E4.sysOf(st2, P), m2 = E4.build(P, S2);
+    const min = { sense: "min", variables: m2.variables.map(v => Object.assign({}, v, { cost: 0, ub: /^(us|ss|oimp)_/.test(v.name) ? 0 : v.ub })), constraints: m2.constraints, objective: { terms: m2.meta.CO2 ? [].concat(...S2.only.map(p => m2.meta.CO2[p].map(x => [x[0], x[1] * S2.w[p]]))) : [] } };
+    const rm = solveSync(min), least = rm.objective + S2.w0 * P.carbon.base2025Mt;
+    ok(r2.ok && V2.over > 0.5 && !V2.reach && V2.carbonValue[0] === null && Math.abs(V2.cum - least) <= 0.5 && /out of reach/.test(r2.message),
+      "the straight line to zero is out of reach: the closest pathway emits " + V2.cum + " Mt, the least any plan serving every slice and stress hour emits (" + least.toFixed(1) + " Mt); no dual reported");
+    ok(Math.round(V2.cum / 100) * 100 === 2700 && E4.GAP[0].indexOf("about 2,700 Mt") >= 0, "the pages' 'about 2,700 Mt' floor is this run's (" + V2.cum + " Mt)");
+    // an out-of-reach window has no duals; decade by decade names the window
+    const r3 = await run(Object.assign({}, E4.withPreset(def, cfg.presets.find(x => x.id === "secure")), { fs: "myopic" })), V3 = E4.view(r3.results.plan, P);
+    ok(V3.windowReach[0] === false && V3.carbonValue[0] === null && V3.importValue[0] === null && V3.carbonPrice[0] === null && /window 2030–2035 cannot meet its share/.test(r3.message) && /not guaranteed the cheapest/.test(r3.message),
+      "security first, decade by decade: the first window cannot meet its share of the limits; its duals are null and the status line says so");
+    // M13 review 4: a unit fully retired in an earlier window stays retired
+    const coal = P.units.find(u => u.tech === "coal" && P.on(u, 2045)), base = solveSync(E4.build(P, E4.sysOf(def, P))), rawB = E4.read(P, E4.sysOf(def, P), E4.build(P, E4.sysOf(def, P)), base);
+    const fx = E4.fixedOf(P, rawB, 1); fx.k["k_" + coal.j + "_1"] = 0; fx.k["k_" + coal.j + "_0"] = 0;
+    const Sw = E4.sysOf(def, P, { only: [2, 3], fixed: fx, fixedThrough: 1, budgetLeft: 5000 }), mw = E4.build(P, Sw), rw = solveSync(mw);
+    ok(rw.status === "optimal" && (rw.values["k_" + coal.j + "_2"] || 0) < 1e-6 && (rw.values["k_" + coal.j + "_3"] || 0) < 1e-6 && mw.constraints.some(c => c.name === "kr_" + coal.j + "_2" && c.ub === 0),
+      "a unit fixed at 0 in 2035 (" + coal.name + ") stays at 0 in the next window, even when it would pay to reopen it");
+    // C4 review 1: the drought derates the summer stress hour as the summer slices
+    const Sd = E4.sysOf(def, P, { shock: "drought" }), md = E4.build(P, Sd), sp = Sd.shockP, hiS = P.stressSummer.indexOf(true), hiW = P.stressSummer.indexOf(false);
+    const cc = P.units.find(u => u.tech === "gasCC" && P.on(u, P.Y[sp])), rowS = md.constraints.find(c => c.name === "st_" + hiS + "_" + cc.r + "_" + sp), rowW = md.constraints.find(c => c.name === "st_" + hiW + "_" + cc.r + "_" + sp);
+    const coefS = rowS.terms.find(t => t[0] === "k_" + cc.j + "_" + sp), coefW = rowW.terms.find(t => t[0] === "k_" + cc.j + "_" + sp);
+    ok(P.stressSummer[hiS] && cfg.stress[hiS].season === "summer" && coefS && Math.abs(coefS[1] - cc.av * P.shocks.drought.params.thermalSummerX) < 1e-12 && Math.abs(coefW[1] - cc.av) < 1e-12,
+      "drought: " + cc.name + " counts " + coefS[1].toFixed(3) + " of its MW at the summer stress hour (availability x " + P.shocks.drought.params.thermalSummerX + "), " + coefW[1] + " at the winter hour");
+    // SB4 review 2: the mineral restriction never reprices plants already decided. The reviewer's plan (central without
+    // the firm option, decade by decade) planned batteries for 2035; under the shock their purchase is re-decided at the
+    // higher price (the 2035 builds are variables of the re-plan), and the years before keep the plan's cost exactly
+    const myo = Object.assign({}, def, { fs: "myopic", fm: 0 }), rm0 = await run(myo), rmB = await run(Object.assign({}, myo, { sh: "mineralBan" }));
+    const Pl = rm0.results.plan, Sh = rmB.results.shock, b35 = E4.view(Pl, P).built.battery[1];
+    const mS = E4.build(P, E4.sysOf(myo, P, { shock: "mineralBan", only: [1], fixed: E4.fixedOf(P, Pl.raw, 0), fixedThrough: 0, budgetLeft: 1e4, horizonEnd: 1 }));
+    ok(b35 > 1 && mS.variables.some(v => v.name === "n_3battery1") && !mS.variables.some(v => /^n_\dbattery0$/.test(v.name)) && Math.abs(Sh.money.yearly[0].total - Pl.money.yearly[0].total) < 1e-6,
+      "mineral restriction on the reviewer's plan (" + b35 + " GW of batteries planned for 2035): 2035's batteries are bought in the re-plan, at the higher price, knowing it; 2030's cost is the plan's; the re-plan costs $" + (E4.shockView(Sh, E4.view(Pl, P), P).dPV / 1000).toFixed(2) + " bn more");
+    // M13 review 7: the shortfall is the worse stress hour's, regions summed within it
+    const rd2 = await run(Object.assign({}, def, { sh: "demandSurprise" })), Q = rd2.results.shock, Xd = E4.shockView(Q, E4.view(rd2.results.plan, P), P), ps = E4.sysOf(def, P, { shock: "demandSurprise" }).shockP;
+    const byHour = cfg.stress.map((H, hi) => E4.sum(P.R.map((R, r) => Q.raw.per[ps].stressShort[hi + "_" + r] || 0)));
+    ok(Math.abs(Xd.reserveShort[ps] - Math.round(Math.max(...byHour))) <= 1 && Xd.reserveShort[ps] < E4.sum(byHour) - 1, "demand surprise in " + P.Y[ps] + ": short " + Xd.reserveShort[ps] + " MW at the worse stress hour (hours " + byHour.map(x => Math.round(x)).join(" and ") + " MW, never their sum)");
+    // M13 review 1: the budget's price in model year p is dual x w_p / D_p; the gas row's dual (LNG at the margin) agrees
+    const Vc = E4.view((await run(def)).results.plan, P), Sc = E4.sysOf(def, P), mc = E4.build(P, Sc), rc = solveSync(mc), rawc = E4.read(P, Sc, mc, rc);
+    const fromGas = P.Y.map((y, p) => rawc.per[p].fuel.lng > 1 && Vc.imp[p] < Vc.cap - 0.01 ? (rawc.per[p].fuelValue.gas - def.pl) * 1000 / P.f.gas : null);
+    ok(fromGas.every((g, p) => g == null || Math.abs(g - Vc.carbonPrice[p]) <= 0.01 * Vc.carbonPrice[p] + 0.2) && fromGas.filter(g => g != null).length >= 3 && P.Y.every((y, p) => Math.abs(Vc.carbonPrice[p] - Vc.carbonValue[0] * Sc.w[p] / Sc.D[p]) <= 0.05 * Sc.w[p] / Sc.D[p] + 0.06),
+      "the budget's price by model year, dual x w / D: $" + Vc.carbonPrice.join(", $") + "; from the gas row's dual: $" + fromGas.map(g => g == null ? "-" : g.toFixed(1)).join(", $"));
+    // C4 review 5: the plan's rows keep each field's precision
+    const pr = E4.planRows(Object.assign({}, def, { dr: 5.5 }), P), drRow = pr.find(x => /Discount rate/.test(x[0]));
+    ok(drRow[1] === "5.5%" && E4.planRows(def, P).find(x => /Discount rate/.test(x[0]))[1] === "5%", "a 5.5% discount rate is copied as 5.5% (5% as 5%)");
+    // SB4 review 4 / C4 review 8: no peak-hour rule is "not tested", never "served"
+    const Voff = E4.view((await run(Object.assign({}, def, { rm: "off" }))).results.plan, P);
+    ok(Voff.rule === null && Vc.rule === 0.1 && Voff.reserve.every(x => x.shortMW === 0) && Voff.reserve[4].margin < 0, "without the rule the view says rule null (pages: not tested), though its stress-hour spare is " + (100 * Voff.reserve[4].margin).toFixed(1) + "% in 2050");
+    // M13 review 3 / SB4 review 6: no string of e4-pathways.json puts a nuclear term beside a cost
+    const strs = []; (function walk(o) { if (typeof o === "string") strs.push(o); else if (o && typeof o === "object") for (const k in o) walk(o[k]); })(cfg);
+    ok(!strs.some(t => /nuclear|reactor/i.test(t) && /\$|cost|price|O&M|capital/i.test(t)) && !strs.some(t => /G-COST|G-NUC|G-GIS/.test(t)), "e4-pathways.json: no string pairs a nuclear term with a cost, and no editorial guard code");
+    ok(E4.doneWords({ fs: "perfect" }, { reach: true }).indexOf("perfect foresight") >= 0 && /not guaranteed the cheapest over 2026–2050/.test(E4.doneWords({ fs: "myopic" }, { reach: true })), "the status line: least cost with perfect foresight; decade by decade, each window optimal, the whole not guaranteed");
   }
 
   // ---------------- the full-year check
