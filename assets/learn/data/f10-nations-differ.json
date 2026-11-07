@@ -1,7 +1,8 @@
 {
-  "about": "Lesson F10's own inputs: six real energy balances (the United States, the European Union, China, India, Brazil and Norway), each as its national statistics office or the EU's statistics office published it, one data year per country, with the rows used, the units and the conversions; the accounting conventions; the four lenses; the regional card each country opens; the numbers to remember. Every value here was read on the cited page or table between 2 and 7 November 2026. Prairieland's numbers are read from prairieland.json at run time, never copied here.",
+  "about": "Lesson F10's own inputs: seven real energy balances (the United States, the European Union, China, India, Japan, Brazil and Norway), each as its national statistics publisher or the EU's statistics office published it, one data year per country, with the rows used, the units and the conversions; the accounting conventions; the four lenses; the regional card each country opens; the numbers to remember. Every value here was read on the cited page or table between 2 and 7 November 2026. Prairieland's numbers are read from prairieland.json at run time, never copied here.",
   "pjPerTWh": 3.6,
   "nuclearHeatEff": 0.33,
+  "geoHeatEff": 0.1,
   "subEff": 0.4,
   "subEffNotes": [
     "The rule: each MWh from nuclear, hydro, wind and solar counts as the fuel a thermal plant would burn to make it.",
@@ -133,6 +134,14 @@
       "renewable": true,
       "say": "geothermal, ambient heat and tide",
       "note": "Geothermal heat, the outdoor heat that heat pumps take in, and tide"
+    },
+    "recov": {
+      "label": "Waste and recovered heat (not split)",
+      "short": "Waste, recovered",
+      "color": "var(--lx-ink-3)",
+      "unsplit": true,
+      "say": "waste and recovered heat",
+      "note": "Waste burned for energy, and heat and power recovered in industry, which the publisher counts as a source and does not split into renewable and fossil parts"
     },
     "waste": {
       "label": "Waste (renewable part not split)",
@@ -379,8 +388,9 @@
         "adjust": "Physical content is the page's estimate: fossil fuels as published, plus the four sources' TWh (nuclear ÷ 0.33). Solar from the 2023 Communiqué; the rest from the 2025 Yearbook."
       },
       "convention": "coal",
-      "noFinal": "China's statistics count the electricity users buy at the coal burned to make it, so its final energy cannot be drawn on the same basis as the others; this page shows its primary energy only.",
+      "noFinal": "China's statistics count the electricity users buy at the coal burned to make it; this page has not converted its final energy to the others' basis, so it shows China's primary energy only.",
       "coverage": "partial estimate: NBS's 'other energy' left out",
+      "primaryTag": "estimate",
       "importDep": {
         "rows": [
           "imports",
@@ -388,7 +398,8 @@
         ],
         "of": "coalTotal",
         "kind": "derived",
-        "text": "net imports ÷ total energy consumption, both in coal equivalent"
+        "text": "net imports ÷ total energy consumption, both in coal equivalent",
+        "basis": "both in coal equivalent"
       },
       "production": {
         "rows": [
@@ -397,7 +408,7 @@
         "of": "coalTotal"
       },
       "resources": "",
-      "institutions": "State-owned grid companies; each province largely dispatches its own plants; spot markets are moving toward one national market.",
+      "institutions": "State-owned grid companies; each province largely decides which of its own plants run; markets that trade power for the next day and hour are moving toward one national market.",
       "src": [
         "nbs-yearbook",
         "nbs-communique"
@@ -489,6 +500,135 @@
         "mospi-units"
       ],
       "resFacts": []
+    },
+    {
+      "key": "jp",
+      "name": "Japan",
+      "year": "fiscal year 2024 (April 2024 to March 2025)",
+      "unit": "tj",
+      "card": "japan-korea",
+      "primary": {
+        "coal": 4292263.685,
+        "oil": 6028114.293,
+        "gas": 3671898.521,
+        "nuclear": 793520.534,
+        "hydro": 626015.466,
+        "wind": 99069.009,
+        "solar": 837937.165,
+        "geo": 32962.167,
+        "bio": 505633.497,
+        "recov": 573930.037
+      },
+      "total": 17461344.373,
+      "otherNote": "rounding",
+      "pubElec": {
+        "mjPerKWh": 8.488403506,
+        "gwh": {
+          "nuclear": 93482.895,
+          "hydro": 73749.494,
+          "wind": 11671.1,
+          "solar": 98126.957,
+          "geo": 3883.2
+        },
+        "note": "METI counts each kWh from these sources at the table's 8.4884 MJ (its primary-side factor; 3.6 MJ on the consumption side): a substitution. Solar's kWh are its photovoltaic power; its 4,996 TJ of solar heat stay as published."
+      },
+      "primaryTag": "converted",
+      "coverage": "converted from METI's counting of electricity; fuels at [[gross-calorific-value|gross calorific value]]; waste and recovered heat counted",
+      "twh": {
+        "nuclear": 93.482895,
+        "hydro": 73.749494,
+        "wind": 11.6711,
+        "solar": 98.126957,
+        "geo": 3.8832
+      },
+      "final": {
+        "industry": [
+          "agMining",
+          "manufacturing",
+          "-neAgMining",
+          "-neManufacturing"
+        ],
+        "transport": [
+          "transport",
+          "-neTransport"
+        ],
+        "buildings": [
+          "commerce",
+          "residential",
+          "-neCommerce"
+        ]
+      },
+      "sectorLabels": {
+        "industry": {
+          "label": "Industry (with farms and fishing)",
+          "short": "Industry"
+        }
+      },
+      "nonEnergy": [
+        "nonEnergy"
+      ],
+      "pub": {
+        "agMining": 354023.829,
+        "manufacturing": 4685645.789,
+        "commerce": 1804734.194,
+        "residential": 1697178.73,
+        "transport": 2738852.564,
+        "finalAll": 11280435.107,
+        "nonEnergy": 1126372.29,
+        "neAgMining": 34618.149,
+        "neManufacturing": 1042354.623,
+        "neCommerce": 13157.408,
+        "neTransport": 36242.11,
+        "production": 3436421.984,
+        "prodCoal": 12449.241,
+        "prodOil": 13887.071,
+        "prodGas": 74434.968,
+        "imports": 15043218.06,
+        "exports": 964732.721
+      },
+      "prov": {
+        "published": "17,461,344 TJ (17.5 EJ) of domestic primary energy supply, fiscal year 2024, final figures.",
+        "method": "Fuels at their gross calorific value. Nuclear, hydro, solar, wind and geothermal electricity at 8.49 MJ per kWh, the fuel of a thermal plant at 42.4%: a kind of substitution.",
+        "coverage": "Waste burned for energy, and heat and power recovered in industry (573,930 TJ), count as a source: the page keeps them, as neither renewable nor fossil.",
+        "adjust": "Physical content is the page's conversion: each kWh at 3.6 MJ, nuclear's and geothermal's as heat (÷ 0.33, ÷ 0.10). Coal includes coal products; farms and fishing sit in industry."
+      },
+      "convention": "sub",
+      "importDep": {
+        "rows": [
+          "imports",
+          "-exports"
+        ],
+        "of": "total",
+        "kind": "derived",
+        "text": "net imports ÷ domestic primary energy supply, both as METI publishes them",
+        "basis": "both as METI publishes them"
+      },
+      "production": {
+        "rows": [
+          "production"
+        ],
+        "of": "total",
+        "split": "electricity from nuclear and renewables counted at METI's 8.49 MJ per kWh"
+      },
+      "resources": "Little coal, oil or gas of its own.",
+      "institutions": "Ten utility areas, nine of them linked; the east runs at 50 Hz and the west at 60 Hz ([[frequency|grid frequency]]), joined by small converter links. Customers choose their supplier; there is a power exchange (JEPX) and a [[capacity-market|capacity market]].",
+      "src": [
+        "meti-balance"
+      ],
+      "resFacts": [
+        {
+          "label": "Coal, oil and gas",
+          "of": "of its production",
+          "num": [
+            "prodCoal",
+            "prodOil",
+            "prodGas"
+          ],
+          "den": [
+            "production"
+          ]
+        }
+      ]
     },
     {
       "key": "br",
@@ -618,6 +758,7 @@
         "hws": 137.7
       },
       "total": null,
+      "coverage": "its electricity, net of trade, counted as renewable: hydro, wind and solar made 98.7% of 2025's generation",
       "twh": {
         "hws": 137.7
       },
@@ -659,6 +800,8 @@
         "exports": 2380,
         "oilGasProduction": 2413.8,
         "hydroGWh": 145476,
+        "windGWh": 13899,
+        "solarGWh": 348,
         "genGWh": 161793
       },
       "prov": {
@@ -757,14 +900,14 @@
       "key": "pec",
       "label": "Physical energy content",
       "short": "Physical content",
-      "who": "the IEA, Eurostat and five of this page's six statistics offices (not China's)",
+      "who": "the IEA, Eurostat and five of the seven publishers on this page (not China's or Japan's)",
       "text": "Nuclear counts as its reactors' heat (measured, or electricity ÷ 0.33 if unknown); hydro, wind and solar as the electricity they make."
     },
     {
       "key": "sub",
       "label": "Substitution",
       "short": "Substitution",
-      "who": "the Energy Institute's former method; China's coal-equivalent method is one kind",
+      "who": "the Energy Institute's former method; China's coal equivalent and Japan's balance are kinds of it",
       "text": "Every MWh from nuclear, hydro, wind and solar counts as the fuel a thermal plant would burn to make it."
     },
     {
@@ -820,6 +963,13 @@
       "asof": "2025 edition; data for 2023"
     },
     {
+      "n": "8.49 MJ per kWh",
+      "what": "What Japan's balance counts for each kWh from nuclear, hydro, solar, wind and geothermal in fiscal year 2024: the fuel of a thermal plant at 42.4%.",
+      "source": "METI, Comprehensive Energy Statistics, fiscal year 2024 balance table",
+      "url": "https://www.enecho.meti.go.jp/statistics/total_energy/results.html",
+      "asof": "final figures published 14 April 2026; data for fiscal year 2024"
+    },
+    {
       "n": "1 ÷ efficiency",
       "what": "The factor by which the substitution method enlarges each MWh from nuclear, hydro, wind and solar: 2.5 at 40%.",
       "source": "this lesson's arithmetic",
@@ -861,7 +1011,7 @@
       "publisher": "Eurostat",
       "date": "read 7 November 2026",
       "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Energy_balance_-_new_methodology",
-      "where": "the physical energy content method: heat is the primary form for nuclear, geothermal and solar thermal; electricity for solar photovoltaic, wind and hydro; 33% advised for nuclear when inputs are not known"
+      "where": "the physical energy content method: heat is the primary form for nuclear, geothermal and solar thermal; electricity for solar photovoltaic, wind and hydro; when inputs are not known, 33% advised for nuclear and 10% for geothermal electricity"
     },
     "nbs-yearbook": {
       "title": "China Statistical Yearbook 2025, chapter 9: Tables 9-1, 9-2 (total energy consumption and its composition), 9-3 (overall energy balance), 9-6 (electricity balance)",
@@ -894,6 +1044,24 @@
       "date": "2024; read 7 November 2026",
       "url": "https://mospi.gov.in/sites/default/files/publication_reports/Energy_Statistics_2024/AnnexureII-Energy_Units_and_Conversion_Factors.pdf",
       "where": "electricity from hydro and renewables 1 GWh = 0.086 ktoe; from nuclear 1 GWh = 0.086 ÷ 0.33 ktoe"
+    },
+    "meti-balance": {
+      "title": "Comprehensive Energy Statistics (総合エネルギー統計), fiscal year 2024, final figures: the energy balance table, its energy-unit and original-unit sheets",
+      "publisher": "Agency for Natural Resources and Energy, Ministry of Economy, Trade and Industry (METI), Japan",
+      "date": "final figures published 14 April 2026; table read 7 November 2026",
+      "url": "https://www.enecho.meti.go.jp/statistics/total_energy/results.html",
+      "also": [{"label": "the fiscal year 2024 table", "url": "https://www.enecho.meti.go.jp/statistics/total_energy/xls/stte_2024.xlsx"}],
+      "where": "fiscal year 2024, TJ at gross calorific value: domestic primary energy supply 17,461,344; final consumption 11,280,435, of it non-energy use 1,126,372; generation in GWh: nuclear 93,483, hydro 73,749, solar 98,127, wind 11,671, geothermal 3,883, each counted at 8.4884 MJ per kWh",
+      "file": {
+        "name": "stte_2024.xlsx",
+        "url": "https://www.enecho.meti.go.jp/statistics/total_energy/xls/stte_2024.xlsx",
+        "lastModified": "21 June 2026 (as the server gave it)",
+        "accessed": "7 November 2026",
+        "sha256": "d05d4aa10581bc4e5a4f000c1257484e9a8241938f5bccbe43937b5a4e0c2980",
+        "sheets": "ｴﾈﾙｷﾞｰ単位表（本表） (energy units, TJ) and 固有単位表 (original units: GWh for electricity; the row of MJ per unit, 8.4884 for every kWh on the supply side)",
+        "rowsRead": "TJ: domestic primary energy supply 17,461,344 (coal 4,300,507 and coal products −8,244; crude oil 5,138,146 and oil products 889,968; natural gas 3,671,805 and city gas 94; nuclear 793,521; hydro 626,015; solar 837,937, of it solar heat 4,996; wind 99,069; geothermal 32,962; biomass 505,633; waste and recovered energy 573,930); production 3,436,422; imports 15,043,218; exports 964,733; stock change −53,563; final consumption 11,280,435 (farms, fishing, mining and construction 354,024; manufacturing 4,685,646; services 1,804,734; households 1,697,179; transport 2,738,853), of it non-energy use 1,126,372 (farms, fishing, mining and construction 34,618; manufacturing 1,042,355; services 13,157; transport 36,242)",
+        "rows": "#110000 production, #120000 imports, #160000 exports, #190000 domestic primary energy supply (columns $0100 to $1100 and the renewable and recovered energy columns $N100 to $N300); #500000 final energy consumption, #610000, #620000, #650000, #700000 and #800000 by sector; #950000 to #953000 non-energy use by sector"
+      }
     },
     "epe-ben": {
       "title": "Balanço Energético Nacional 2026, Relatório Síntese (base year 2025)",
