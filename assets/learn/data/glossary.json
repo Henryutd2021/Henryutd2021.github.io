@@ -929,6 +929,12 @@
   "lesson": "F3",
   "href": "f03-energy-services.html"
  },
+ "energy-hub": {
+  "term": "Energy hub",
+  "short": "A model of a place where energy carriers come in, are converted and stored, and meet the uses: a district, a campus or a city, not a building.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
+ },
  "energy-security": {
   "term": "Energy security",
   "short": "Keeping energy flowing at bearable prices when a fuel, a supplier or a route is cut off.",
@@ -1601,6 +1607,12 @@
   "lesson": "M10",
   "href": "m10-ml-forecasting.html"
  },
+ "linearized-feeder-limit": {
+  "term": "Linearized feeder limit",
+  "short": "A ceiling on the power through a substation or feeder in each hour, written as a straight-line rule a linear program can use, with no voltage or power-flow physics.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
+ },
  "load-factor": {
   "term": "Load factor",
   "short": "Average demand over a period divided by the peak demand in that period.",
@@ -1690,6 +1702,12 @@
   "short": "A day with so many outage minutes, usually from a big storm, that it passes a threshold set from a utility's past five years (IEEE 1366); reports give reliability with and without them.",
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
+ },
+ "managed-charging": {
+  "term": "Managed charging",
+  "short": "Charging electric cars in the hours a utility or an aggregator chooses, within limits the drivers set, instead of as soon as they plug in.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "margin": {
   "term": "Margin",
@@ -2525,6 +2543,12 @@
   "lesson": "A12",
   "href": "a12-policy-instruments.html"
  },
+ "retrofit": {
+  "term": "Retrofit",
+  "short": "Work on an existing building, such as air sealing and insulation, that cuts the heat it needs.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
+ },
  "robust-optimization": {
   "term": "Robust optimization",
   "short": "Planning against a set of possible futures without chances: here, choosing the plan whose worst cost over the set is lowest.",
@@ -2950,6 +2974,12 @@
   "short": "Storing energy as heat, for example in tanks of hot molten salt, to use it hours later.",
   "lesson": "CF2",
   "href": "cf2-cost-per-kg-vs-system-cost.html"
+ },
+ "tie-rule": {
+  "term": "Tie rule",
+  "short": "A stated way to pick one answer when several plans cost exactly the same, usually tiny costs that are left out of the reported results.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
  },
  "time-step": {
   "term": "Time step",

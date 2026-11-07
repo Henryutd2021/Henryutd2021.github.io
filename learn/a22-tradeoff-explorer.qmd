@@ -140,7 +140,7 @@ The low-income share, worked out for a plan whose fixed costs are 95% of its cos
 
 Same plan, same costs: the tariff alone moves the share by 13.0 points.
 
-Mavrotas (2009) shows how to sweep the limits. Next: [M6](m06-carbon-in-models.qmd) (carbon in models); upcoming: M12 (a city model with screening fairness outputs).
+Mavrotas (2009) shows how to sweep the limits. Next: [M6](m06-carbon-in-models.qmd) (carbon in models) and [M12](m12-city-model.qmd) (a city model with screening fairness outputs).
 
 ```{=html}
 </div>

@@ -1409,19 +1409,27 @@
    "tier": "analyst",
    "code": "SB3",
    "title": "City Planner",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "sb3-city-planner.html",
    "scales": [],
-   "form": "sandbox"
+   "id": "sb3-city-planner",
+   "tier2": "modeler",
+   "minutes": 30,
+   "form": "sandbox",
+   "short": "City Planner"
   },
   {
    "tier": "analyst",
    "code": "C3",
    "title": "Prairie City 2040: write the city's energy plan",
-   "ready": false,
-   "href": "index.html#analyst",
+   "ready": true,
+   "href": "c3-prairie-city-2040.html",
    "scales": [],
-   "form": "capstone"
+   "id": "c3-prairie-city-2040",
+   "tier2": "modeler",
+   "minutes": 150,
+   "form": "capstone",
+   "short": "Prairie City 2040"
   },
   {
    "tier": "modeler",
@@ -1547,9 +1555,13 @@
    "tier": "modeler",
    "code": "M12",
    "title": "Model a city's energy system: an energy hub with grid limits and screening fairness outputs",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m12-city-model.html",
+   "scales": [],
+   "id": "m12-city-model",
+   "minutes": 45,
+   "form": "cards",
+   "short": "A city's energy hub"
   },
   {
    "tier": "modeler",

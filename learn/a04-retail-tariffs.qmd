@@ -120,7 +120,7 @@ $$\text{bill}(x) = F + n \sum_{t} p_t\, x_t + d \max_t x_t$$
 - **What it rewards.** One kW less in hour $t$ cuts the bill by $n p_t$. The demand charge falls only when the highest remaining hourly demand falls: all tied peaks must come down (the factory's 13:00 and 14:00 are tied).
 - **What it should reward.** The cost of service has the same shape, with the town's price in $p_t$, plants on the tightest hour's $x_t$ and wires on $\max_t x_t$.
 - **Cost-reflective.** A tariff whose slopes match the cost's slopes sends the right signals for the costs this model represents; this lesson's four each match only part.
-- **Next.** City models with screening fairness outputs come in M12 (upcoming); who pays and who benefits in [A13](a13-fairness-jobs.html); flexible demand in [A7](a07-flexible-demand.html).
+- **Next.** City models with screening fairness outputs come in [M12](m12-city-model.html); who pays and who benefits in [A13](a13-fairness-jobs.html); flexible demand in [A7](a07-flexible-demand.html).
 
 ```{=html}
 </div>
