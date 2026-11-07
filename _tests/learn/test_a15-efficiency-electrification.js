@@ -4,7 +4,8 @@
 //     price, COP or day value; the deflator's 2024 and 2025 values equal the course's (prairie-city.json, e2, 13-capstone)
 //   - first principles: the capital recovery factor; F3's COP curve; the seasonal COP; each measure's units and saving
 //     recomputed here from the city's homes, floor area, heat and hot water; costs from the source values and BEA's
-//     deflator; CSE = cost x CRF / saving; the curve's order and widths; no ties in the order at any setting
+//     deflator; CSE = (cost x CRF + yearly extras) / saving; the curve as a sequence (each block's saving after the blocks
+//     to its left, the cheapest next), its widths adding to the package's saving recomputed here; no ties at any setting
 //   - electrification: with 2025's settings each district's peak over the representative days is the file's
 //     peak2025MW and its year the file's annual MWh; heat pumps, envelopes, EV rules (the timer and the valley fill
 //     conserve each day's charging; the fill levels the lowest hours), the heat network (a store's size from the
@@ -12,8 +13,9 @@
 //   - every feedback and reveal true over its whole input range (rate, rebound, carrier, every slider of every
 //     district, every charging rule, the network share and mode, the industry COP); every worked exercise balances
 //   - the no-JS blocks, ideas, myths, practice, facts and sources equal what the model writes (--write rewrites them)
-//   - scope: no nuclear term, no data-center term, no "AI"; links on the allow-list; the fictional line on every
-//     interactive; text budget of the step cards, reveals and the page's prose
+//   - scope: no nuclear term; the data-center campus only as a load on its own substation (G-DC); no "AI"; links on the
+//     allow-list; the fictional line on every interactive; text budget (one or two sentences) of the step cards, reveals,
+//     hints, the no-JS block, the practice and the page's prose
 // Usage (from the site folder):  node _tests/learn/test_a15-efficiency-electrification.js [--write]
 "use strict";
 const fs = require("fs");
@@ -88,20 +90,23 @@ const MS = {}; D.measures.forEach(m => MS[m.key] = m);
 // units and savings, recomputed here
 const CUT = (C.vintages.pre1980.heatKWhPerM2 - C.vintages.y1980_2009.heatKWhPerM2) / C.vintages.pre1980.heatKWhPerM2;
 ok(near(M.weatherCut(C), CUT) && near(CUT, 35 / 115), "weatherization brings a pre-1980 home from 115 to 80 kWh per m2 (prairie-city.json's vintages), as A18 does");
-function mine(key) {
+// a measure's units and MWh saved a year, alone or after the measure that saves the same energy (done = keys already placed)
+function mine(key, done) {
+  done = done || {};
   let units = 0, save = 0;
   C.districts.forEach(d => {
     const H = d.households, area = d.heatedFloorM2 / H, heat = d.heat.residentialMWh / H, pre = area * C.vintages.pre1980.heatKWhPerM2 / 1000;
+    const wx = d.envelope.pre1980 * pre * CUT;   // the average home's heat that weatherizing its pre-1980 share saves
     let hw = 0; Object.keys(d.dwellings).forEach(k => hw += d.dwellings[k] * C.dwellingTypes[k].hotWaterFactor);
     const wh = 17.4 * C.units.mwhPerMMBtu * 0.6 * hw / H;
     let n, s;
     switch (key) {
       case "led": n = d.commercialM2 * 0.4 / 10; s = (63.1 - 27.4 * 5082 / 3686) * 3541 / 1e6; break;
       case "hpwh": n = d.heating.resistance + d.heating.heatPump; s = wh * (1 / 0.92 - 1 / 3.73); break;
-      case "hp": n = d.heating.resistance; s = heat * (1 - 1 / SCOP); break;
-      case "weatherEl": n = d.heating.resistance * d.envelope.pre1980; s = pre * CUT; break;
-      case "condensing": n = d.heating.gas; s = heat * (1 / 0.8 - 1 / 0.99); break;
-      case "weatherGas": n = d.heating.gas * d.envelope.pre1980; s = pre * CUT / 0.8; break;
+      case "hp": n = d.heating.resistance; s = (heat - (done.weatherEl ? wx : 0)) * (1 - 1 / SCOP); break;
+      case "weatherEl": n = d.heating.resistance * d.envelope.pre1980; s = pre * CUT / (done.hp ? SCOP : 1); break;
+      case "condensing": n = d.heating.gas; s = (heat - (done.weatherGas ? wx : 0)) * (1 / 0.8 - 1 / 0.99); break;
+      case "weatherGas": n = d.heating.gas * d.envelope.pre1980; s = pre * CUT / (done.condensing ? 0.99 : 0.8); break;
     }
     units += n; save += n * s;
   });
@@ -121,16 +126,40 @@ ok(Math.round(mine("hp").units) === C.city.totals.heating.resistance && Math.rou
 ok(MS.hpwh.uef === 3.73 && MS.hpwh.baseUEF === 0.92 && MS.condensing.afue === 0.99 && /\$1,715/.test(D.sources["eia-rdm-2026"].where) && /\$4,695/.test(D.sources["ornl-wap-2014"].where), "the shared measures carry A18's values and sources");
 const RATES = range(D.rate), REB = range(D.rebound);
 ok(RATES.length === 9 && REB.length === 7 && D.rate.start === 0.06 && /6% real/.test(D.sources["lbnl-cose-2018"].where), "rates 2-10% (LBNL's 6% the default); rebound 0-30%");
-let tie = false;
+const cseOf = (key, r, rb, done) => { const m = mine(key, done), net = m.save / m.units * (MS[key].household ? 1 - rb : 1); return { cse: (COST[key] * crf(r, LIFE[key]) + EXTRA[key]) / net, mwh: m.units * net }; };
+function mySequence(r, rb, cr) {   // the curve by hand: the cheapest at its saving after the blocks placed, then the next
+  let left = D.measures.filter(m => m.carrier === cr).map(m => m.key); const done = {}, out = [];
+  while (left.length) {
+    const opts = left.map(k => Object.assign({ key: k }, cseOf(k, r, rb, done))).sort((a, b) => a.cse - b.cse || (a.key < b.key ? -1 : 1));
+    out.push(opts[0]); done[opts[0].key] = true; left = left.filter(k => k !== opts[0].key);
+  }
+  return out;
+}
+let tie = false, everCut = false;
 RATES.forEach(r => REB.forEach(rb => ["el", "gas"].forEach(cr => {
-  const list = M.curve(C, D, { rate: r, rebound: rb }, cr);
+  const list = M.curve(C, D, { rate: r, rebound: rb }, cr), mine2 = mySequence(r, rb, cr);
   list.forEach((b, i) => {
-    const m = mine(b.key), net = m.save / m.units * (MS[b.key].household ? 1 - rb : 1), cse = (COST[b.key] * crf(r, LIFE[b.key]) + EXTRA[b.key]) / net, pr = cr === "gas" ? P.gas : MS[b.key].price === "commercial" ? P.com : P.res;
-    if (!(rel(b.cse, cse, 1e-10) && near(b.price, pr) && b.pays === (cse < pr) && rel(b.mwh, m.units * net, 1e-10) && (i === 0 || b.cse >= list[i - 1].cse) && near(b.x0, i ? list[i - 1].x1 : 0, 1e-6)))
+    const want = mine2[i], pr = cr === "gas" ? P.gas : MS[b.key].price === "commercial" ? P.com : P.res;
+    if (!(b.key === want.key && rel(b.cse, want.cse, 1e-10) && near(b.price, pr) && b.pays === (want.cse < pr) && rel(b.mwh, want.mwh, 1e-10) && (i === 0 || b.cse >= list[i - 1].cse) && near(b.x0, i ? list[i - 1].x1 : 0, 1e-6) && b.n === i + 1))
       ok(false, "curve " + cr + " at " + r + "/" + rb + ": " + b.key);
+    const first = list.slice(0, i).some(q => q.key === M.OVERLAP[b.key]);
+    if (!(first ? b.by === M.OVERLAP[b.key] && rel(b.alone, cseOf(b.key, r, rb, {}).cse, 1e-10) && b.alone < b.cse && b.byN === list.filter(q => q.key === b.by)[0].n : !b.by)) ok(false, "curve " + cr + " at " + r + "/" + rb + ": " + b.key + " names the block it follows");
+    if (first) everCut = true;
     if (i && Math.abs(b.cse - list[i - 1].cse) < 1e-6) tie = true;
   });
+  // the package: every block of the carrier together, computed directly (no rebound), equals the curve's total width
+  if (rb === 0) {
+    const pkg = cr === "el"
+      ? sum(C.districts.map(d => { const H = d.households, heat = d.heat.residentialMWh / H, pre = d.heatedFloorM2 / H * C.vintages.pre1980.heatKWhPerM2 / 1000, wx = d.envelope.pre1980 * pre * CUT;
+          return d.heating.resistance * (heat - (heat - wx) / SCOP); })) + mine("hpwh").save + mine("led").save
+      : sum(C.districts.map(d => { const H = d.households, heat = d.heat.residentialMWh / H, pre = d.heatedFloorM2 / H * C.vintages.pre1980.heatKWhPerM2 / 1000, wx = d.envelope.pre1980 * pre * CUT;
+          return d.heating.gas * (heat / 0.8 - (heat - wx) / 0.99); }));
+    if (!rel(list[list.length - 1].x1, pkg, 1e-10)) ok(false, "the " + cr + " curve's width is the package's saving at " + r + ": " + list[list.length - 1].x1.toFixed(1) + " against " + pkg.toFixed(1));
+  }
 })));
+ok(everCut, "overlapping blocks are counted after the ones to their left (review A15-1)");
+{ const el = M.curve(C, D, { rate: 0.06, rebound: 0 }, "el"), we = el.filter(b => b.key === "weatherEl")[0], alone = M.measure(C, D, MS.weatherEl, { rate: 0.06, rebound: 0 });
+  ok(we.by === "hp" && near(we.mwh, alone.mwh / SCOP, 1e-6) && near(we.cse, alone.cse * SCOP, 1e-9) && Math.round(we.mwh) === 10141 && M.usd(we.cse, 1) === "$467.1", "at 6%: weatherization after the heat pumps saves 10,141 MWh at $467.1 (alone 34,777 MWh at $136.2), as the review found"); }
 ok(!tie, "no two blocks tie in cost per MWh at any rate and rebound (the order is unique)");
 ok(M.curve(C, D, { rate: 0.06, rebound: 0 }, "el").every(b => b.m.carrier === "el") && M.curve(C, D, { rate: 0.06, rebound: 0 }, "el").length === 4 && M.curve(C, D, { rate: 0.06, rebound: 0 }, "gas").length === 2, "two curves: four electricity blocks, two gas blocks");
 
@@ -175,7 +204,8 @@ ok(near(M.districtDay(C, D, 1, dd, {}).evDay, C.districts[1].evMWhPerDay, 1e-9),
   let run = 0, hi = 0, lo = 0; const mean = sum(sent) / 24; sent.forEach(x => { run += x - mean; hi = Math.max(hi, run); lo = Math.min(lo, run); });
   ok(near(c.store, hi - lo, 1e-9) && (share === 0 ? c.store === 0 : c.store > 0), "store size = max - min of the running sum (" + c.store.toFixed(1) + " MWh)");
 });
-ok(near(M.storeM3(D, 1), 3.6e9 / (4186 * 40 * 1000), 1e-9), "store volume: 1 MWh over 40 K is " + (3.6e9 / (4186 * 40 * 1000)).toFixed(1) + " m3 of water");
+ok(M.dhDeltaK(C, D) === 20 && C.cop.supplyC === 45 && D.districtHeat.returnC === 25 && !("deltaK" in D.districtHeat), "the store's range: the network's 45 C supply (F3's delivery temperature, prairie-city.json) minus its 25 C return (review A15-4)");
+ok(near(M.storeM3(C, D, 1), 3.6e9 / (4186 * 20 * 1000), 1e-9) && /23\.3 kWh of heat per m3/.test(D.water.note) && near(4.186 * 20 / 3.6, 23.26, 0.01), "store volume: 1 MWh over 20 K is " + (3.6e9 / (4186 * 20 * 1000)).toFixed(1) + " m3 of water");
 // the city
 [[0, 0, 0], [1, 1, 1], [0.5, 1, 0]].forEach(g => {
   const R = M.city(C, D, { core: { gas: g[0] }, suburbs: { gas: g[1], ev: 0.6, rule: "timer" }, fringe: { gas: g[2] } });
@@ -229,7 +259,8 @@ range(D.districtHeat.share).forEach(share => {
   const f = mode => M.districtDay(C, D, 0, dd, { gas: 1, dh: { share, mode } }), a = f("hp"), b = f("plant"), c = f("store"), sw = M.dhSaw(a, b, c);
   ok(sw.indexOf("**" + M.fmtN(c.peak, 1) + " MW**") >= 0 && (a.peak - c.peak < 0.05 ? /about the same/.test(sw) : b.peak < a.peak - 0.05 ? /steady source cuts the peak/.test(sw) : /store does the cutting/.test(sw)), "heat-network reveal at share " + share);
   ok(c.peak <= a.peak + 1e-9, "the network with a store never raises the core's peak (share " + share + ")");
-  ["hp", "plant", "store"].forEach(m => { const t = M.dhLine(D, f(m), m); if (t.indexOf(M.fmtN(f(m).peak, 1)) < 0) ok(false, "network line " + m + " " + share); });
+  ["hp", "plant", "store"].forEach(m => { const t = M.dhLine(C, D, f(m), m); if (t.indexOf(M.fmtN(f(m).peak, 1)) < 0) ok(false, "network line " + m + " " + share); });
+  if (share > 0) { const t = M.dhLine(C, D, c, "store"); if (t.indexOf(M.fmtN(Math.round(M.storeM3(C, D, c.store) / 100) * 100) + " m³ of water between 45 and 25 °C") < 0) ok(false, "the store's volume names its 45 to 25 C range at share " + share); }
 });
 range(D.industry.cop).forEach(v => { const I = M.industry(C, D, v), t = M.indLine(C, D, v); if (t.indexOf("**" + M.pct(I.share) + "**") < 0 || t.indexOf(M.fmtN(I.mwFlat, 1) + " MW") < 0) ok(false, "industry line at COP " + v); });
 ok(D.industry.cop.min === 1.6 && D.industry.cop.max === 5.8 && /COP from 1\.6 to 5\.8/.test(D.sources["lbnl-ihp-2022"].where), "the COP slider spans LBNL's range");
@@ -246,9 +277,14 @@ ok(PR.length === 7, "seven worked exercises");
   });
   ok(near(PR[2].check.cse, r2(+PR[2].a.match(/\$([0-9.]+) ÷/)[1] / 0.8, 2), 0.005), "exercise 3: ÷ (1 - 0.20)");
   ok(near(PR[3].check.cse, r2(+PR[3].a.match(/\$([0-9.]+) ×/)[1] * +PR[3].a.match(/× ([0-9.]+) =/)[1], 2), 0.005), "exercise 4: × the seasonal COP");
-  const e5 = PR[4].a.match(/([0-9.]+) × \(([0-9.]+) \+ ([0-9.]+) ÷ ([0-9.]+)\) = ([0-9.]+) MW; plus ([0-9.]+) MW base and ([0-9.]+) MW of cars: ([0-9.]+) MW/);
-  ok(e5 && near(r2(+e5[1] * (+e5[2] + +e5[3] / +e5[4]), 1), +e5[5], 0.05) && near(r2(+e5[5] + +e5[6] + +e5[7], 1), +e5[8], 0.051) && near(PR[4].check.model, +e5[8], 0.15), "exercise 5 balances and matches the model");
+  ok(PR[3].check.curve != null && near(PR[3].check.curve, PR[3].check.cse, 0.5) && PR[3].a.indexOf(M.usd(PR[3].check.curve, 2)) > 0, "exercise 4 agrees with the curve's block (the COP unrounded)");
+  const e5 = PR[4].a.replace(/,/g, "").match(/([0-9.]+) \+ \(([0-9.]+) \+ ([0-9.]+)\) ÷ 2 = ([0-9.]+); ([0-9.]+) × \(([0-9.]+) \+ ([0-9.]+) ÷ ([0-9.]+)\) = ([0-9.]+) MW of heating; plus ([0-9.]+) MW base and ([0-9.]+) MW of cars: ([0-9.]+) MW/);
+  ok(e5 && near(+e5[1] + (+e5[2] + +e5[3]) / 2, +e5[4], 0.00051) && +e5[4] === +e5[7] && near(r2(+e5[5] * (+e5[6] + +e5[7] / +e5[8]), 1), +e5[9], 0.05) && near(r2(+e5[9] + +e5[10] + +e5[11], 1), +e5[12], 0.051) && near(PR[4].check.model, +e5[12], 0.15), "exercise 5 balances from its givens and matches the model");
+  // every number exercise 5's answer uses is in its givens (review A15-5)
+  const g5 = PR[4].givens.map(g => g[1]).join(" ").replace(/,/g, "");
+  ok(e5 && [e5[1], e5[2], e5[3], e5[5], e5[6], e5[8], e5[10], e5[11]].every(v => g5.indexOf(v) >= 0), "exercise 5's givens hold every input: the four heat shares, the heat, the COP, the base load and the cars");
   const e6 = PR[5].a.match(/([0-9.]+) × ([0-9.]+) = ([0-9.]+) MW/); ok(e6 && near(r2(+e6[1] * +e6[2], 1), +e6[3], 0.051) && near(PR[5].check.model, +e6[3], 0.06), "exercise 6 balances");
+  ok(PR.every((p, i) => { const html = M.practiceHTML(C, D); return html.indexOf(M.givensHTML(p.givens)) > 0; }), "the givens tables are on the page");
   ok(/140,000 ÷ 2\.5 = 56,000 MWh a year; ÷ 8,760 h = 6\.4 MW/.test(PR[6].a), "exercise 7 balances");
   ok(M.practiceHTML(C, D).indexOf("about 30 minutes") >= 0, "the practice set states its time");
 }
@@ -260,7 +296,11 @@ ok(D.coldClimate.cop === 1.75 && /a COP of at least 1\.75 at 5 F/.test(D.sources
 // ---------------- scope, links, the fictional line
 const ALL = PAGE + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term");
-ok(!/data[- ]cent/i.test((OWN + "\n" + RAW + "\n" + JS + "\n" + SIDE).replace(/datacenter/g, "").replace(/Alternative Fuels Data Center/g, "")), "no data-center term (A15 is buildings, transport and industry; DOE's Alternative Fuels Data Center is a source's name)");
+{ // the campus appears once, as a load on its own substation (G-DC: its energy, shape and connection only)
+  const ALLT = (OWN + "\n" + RAW + "\n" + JS + "\n" + SIDE).replace(/datacenter/g, "").replace(/Alternative Fuels Data Center/g, "");
+  const hits = [...ALLT.matchAll(/data[- ]cent\w*[^.;]{0,90}/gi)].map(m => m[0]);
+  ok(hits.length >= 1 && hits.every(h => /^data-center campus( \(|,| \(" \+| on their own substations)/i.test(h) && !/supply|supplies|generat|power plant|buyer|order|timing|credit|siting/i.test(h)), "the data-center campus appears only as a load on its own substation (" + hits.length + " mentions)");
+}
 ok(!/\(via [a-z0-9_.-]+\.json/.test(PAGE), "no internal file names in the page's source lines");
 ok(!/\bAI\b|artificial intelligence/.test(ALL), "no 'AI'");
 ok(!/projects\/|research\.html|smr-dc/.test(ALL), "no project page and no Research page");
@@ -269,7 +309,7 @@ const ALLOW = /^https:\/\/([a-z0-9.-]+\.)?(eia\.gov|energy\.gov|lbl\.gov|nlr\.go
 ok(hrefs.every(h => ALLOW.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h)), "links on the allow-list (" + hrefs.filter(h => !(ALLOW.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h))).join(", ") + ")");
 ok((JS.match(/fictional\((act|res)\)/g) || []).length >= 9 && /C\.about\.line/.test(JS) && /caption: C\.about\.line/.test(JS) && /note: C\.about\.line/.test(JS), "the fictional line on every interactive, read from prairie-city.json");
 ok(/Prairie City is fictional; its numbers are illustrative\./.test(PAGE), "the page's data note and fallback carry the fictional line");
-ok(/LX\.lessonRefHTML\(P, "SB3"\)/.test(JS), "SB3 is named through LX.lessonRefHTML");
+ok(/refMark\(P, "SB3"\)/.test(JS) && /LX\.lessonRef\(P, code\)/.test(JS) && /\[\[lesson:" \+ r\.href/.test(JS) && !/LX\.lessonRefHTML\(P, "SB3"\)/.test(JS), "SB3 is named through LX.lessonRef as a [[lesson:...]] mark, since LX.Boundary's lede goes through LX.rich (raw HTML there showed as text)");
 
 // ---------------- text budget
 const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
@@ -277,21 +317,61 @@ const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).le
 const nSent = t => plain(t).replace(/U\.S\./g, "US").replace(/[0-9]\.[0-9]/g, "0").split(/(?<=[.?!])\s+(?=[A-Z“$0-9])/).filter(x => /[A-Za-z]/.test(x)).length;
 const ST = M.stepTexts(C, D);
 ok(ST.length === 10, "ten step cards");
-ST.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 3, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
+ST.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 const S0 = { rate: 0.06, rebound: 0 }, lines = [M.line1(C, D, S0), M.reboundLine(C, D, { rate: 0.1, rebound: 0.3 }), M.reboundLine(C, D, S0), M.curveSaw(M.curve(C, D, S0, "el"), "el"), M.gasSaw(M.curve(C, D, S0, "gas")),
   M.peakLine(M.districtDay(C, D, 0, dd, { gas: 1 }), "Design day"), M.avpLine(M.annualVsPeak(C, D, 0, { gas: 1 })), M.evSaw({ evening: M.districtDay(C, D, 1, dd, { ev: 0.3 }), timer: M.districtDay(C, D, 1, dd, { ev: 0.3, rule: "timer" }), fill: M.districtDay(C, D, 1, dd, { ev: 0.3, rule: "fill" }) }),
   M.cityLine(M.city(C, D, { core: { gas: 1 }, suburbs: { gas: 1 }, fringe: { gas: 1 } })), M.dhSaw(M.districtDay(C, D, 0, dd, { gas: 1 }), M.districtDay(C, D, 0, dd, { gas: 1, dh: { share: 0.6, mode: "plant" } }), M.districtDay(C, D, 0, dd, { gas: 1, dh: { share: 0.6, mode: "store" } })),
-  M.dhLine(D, M.districtDay(C, D, 0, dd, { gas: 1, dh: { share: 0.3, mode: "store" } }), "store"), M.indLine(C, D, 2.9)].concat(M.curve(C, D, S0, "el").map(M.blockLine));
-lines.forEach(t => { ok(nWords(t) <= 42, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 3, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
-const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- a15-(fallback|sources|practice|facts):start[\s\S]*?:end -->/g, " ")
+  M.dhLine(C, D, M.districtDay(C, D, 0, dd, { gas: 1, dh: { share: 0.3, mode: "store" } }), "store"), M.indLine(C, D, 2.9), M.subsLine(C, M.city(C, D, { core: { gas: 1 }, suburbs: { gas: 1 }, fringe: { gas: 1 } })),
+  M.netLine(C, D, {}, 0.3), M.annNet(C, D, {}, 0.3, true), M.annNet(C, D, {}, 0.3, false), M.netHint(C, D), M.copHint(D)].concat(M.curve(C, D, S0, "el").map(M.blockLine), M.curve(C, D, S0, "gas").map(M.blockLine), Object.values(M.HINTS), M.industryCards(C, D).map(c => c.why),
+  M.practice(C, D).map(p => p.a), M.practice(C, D).map(p => p.q));
+lines.forEach(t => { ok(nWords(t) <= 40, "a reveal of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a reveal of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); });
+ok(!/class: "lx-hint", text: "[A-Z]/.test(JS), "every hint under a control is a tested constant or function (HINTS, netHint, copHint, subsLine), not an untested literal");
+const PROSE = OWN.replace(/^---[\s\S]*?\n---\n/, " ").replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!-- a15-(sources|facts):start[\s\S]*?:end -->/g, " ")
   .replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
-  const n = nWords(x); ok(n <= 42, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 3, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+  const n = nWords(x); ok(n <= 40, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
+
+// ---------------- review fixes (2026-11-06)
+ok(PR.every(p => Array.isArray(p.givens) && p.givens.length >= 2 && p.givens.every(g => g.length === 2) && nSent(p.q) === 1 && nWords(p.q) <= 20), "every exercise: its givens in a table, one short task sentence (review A15-7)");
+{
+  // A15-2: the three districts are not the whole city
+  const R = M.city(C, D, {}), o = M.ownSubs(C, R), park = (C.industry.food.electricityMWh + C.industry.fertilizer.electricityMWh) / 8760, dcd = dd.dataCenterMW;
+  ok(near(o.park, park, 1e-9) && near(o.dc, dcd[R.hour], 1e-9) && near(o.peak, Math.max(...R.tot.map((v, h) => v + park + dcd[h])), 1e-9), "the loads on their own substations, and the whole city's design-day peak");
+  ok(near(R.peak, 453.2, 0.05) && near(o.peak, 589.7, 0.05), "with 2025's settings: the three districts 453.2 MW, the whole city 589.7 MW (as the review found)");
+  ok(/^The three districts together peak at/.test(M.cityLine(R)) && !/"City peak/.test(JS) && M.subsLine(C, R).indexOf(M.fmtN(o.peak, 1) + " MW") > 0 && /industrial park/.test(M.subsLine(C, R)), "step 8 says 'the three districts' and names what it leaves out (review A15-2)");
+  ok(/subs\.textContent = subsLine\(C, R\)/.test(JS) && /subs = hintP\(act, "", true\)/.test(JS), "step 8's line on the other substations is a live region");
+  // A15-3: the equation and the tables carry the yearly extras; per unit and citywide apart
+  ok(OWN.indexOf("\\text{CSE} = \\frac{C \\times \\text{CRF}(r, n) + A}{\\Delta E}") > 0 && /plus any extra yearly cost/.test(M.ideasHTML(C, D)) && /plus any extra yearly cost/.test(SIDE), "CSE = (C × CRF + A) / ΔE on the page, in the ideas and in the glossary (review A15-3)");
+  const fb = M.staticFallback(C, D);
+  ok(/Extra per unit a year/.test(fb) && /MWh saved per unit a year/.test(fb) && /City MWh saved a year/.test(fb), "the no-JS table shows yearly extras and keeps per-unit and city savings apart");
+  { const cf = M.curve(C, D, { rate: 0.06, rebound: 0 }, "gas").filter(b => b.key === "condensing")[0];
+    ok(near((cf.cost * cf.crf + cf.extra) / cf.net, cf.cse, 1e-9) && near(cf.cost * cf.crf / cf.net, 19.37, 0.01) && M.usd(cf.cse, 2) === "$39.89", "the condensing furnace: capital alone $19.37, with the yearly extras $39.89 (the review's numbers)"); }
+  // A15-6: terms defined where used
+  ok(/\[\[real-rate\|/.test(M.HINTS.rate) && /\[\[capital-recovery-factor\|/.test(M.HINTS.crf) && /\[\[temperature-lift\|temperature lifts\]\] of 130 to 40 K \(a difference of 1 K is 1 °C\)/.test(M.copHint(D)) && /\[\[building-envelope\|/.test(ST[5]) && /term="building-envelope"/.test(OWN) && /term="real-rate"/.test(OWN), "real discount rate, envelope, temperature lift and the kelvin glossed where they appear (review A15-6)");
+  // A15-8: step 9 reaches the explain layer
+  ok(/No heat network in this chart/.test(M.annNet(C, D, {}, 0.3, true)) && M.annNet(C, D, {}, 0.3, true).indexOf(M.netLine(C, D, {}, 0.3)) > 0 && /annNet\(C, D, S\.dist\.core, S\.dh, S\.dhSeen\)/.test(JS) && /dhMode: S\.dhMode/.test(JS) && /dhLine\(C, D, r, S\.dhMode\)\);[\s\S]{0,260}buildExplain\(\);/.test(JS), "the explain chart says it has no network and reports step 9 at the reader's settings, rebuilt as they change (review A15-8)");
+  { const nr = M.netRuns(C, D, {}, 0.3), want = M.districtDay(C, D, 0, dd, { gas: 1, dh: { share: 0.3, mode: "store" } });
+    ok(near(nr.store.peak, want.peak, 1e-9) && near(nr.store.peak, 310.7, 0.05) && M.netLine(C, D, {}, 0.3).indexOf("310.7 MW with one") > 0, "the explain's step-9 line: 310.7 MW with the store at 30% (the review's number)"); }
+  // A15-9: 165 C is this exercise's figure, dated; part of the steam band within reach
+  const med = M.industryCards(C, D).filter(c => c.id === "medium")[0];
+  ok(!/today's commercial heat pumps/i.test(JS) && /the 165 °C this exercise uses \(LBNL, 2022; DOE's 2024 tip sheet says about 175 °C\)/.test(med.why) && /lower-pressure part/.test(med.why) && D.industry.hpMaxC2024 === 175 && /up to about 175 C/.test(D.sources["doe-iac-tip2"].where) && /11 January 2024/.test(D.sources["doe-iac-tip2"].date), "165 C labelled as LBNL 2022's, DOE's 2024 175 C named, part of the steam within reach (review A15-9)");
+  ok(/some low-pressure steam included/.test(M.ideasHTML(C, D)) && /\(LBNL, 2022\)/.test(M.industryBins(D)[0].sub), "the ideas and the bin say the same");
+  // A15-10: "below the average price", not "pays"
+  ok(!/"Pays:|pays, under|does not pay|Paying savings/.test(JS) && /Kansas's 2025 average retail prices of electricity and gas \(EIA\), taken as a flat price per MWh/.test(OWN) && /flat yardstick; real bills add fixed, demand or time-of-use charges/.test(JS), "the yardstick is a flat statewide average price, said so (review A15-10)");
+  // A15-11: the no-JS block covers charging rules, the heat network, the districts and industry
+  ["The suburbs on the design day, with 30% electric cars", "The core's heat on the design day", "Each district on the design day", "The industrial park's heat, sorted by temperature"].forEach(t => ok(fb.indexOf(t) > 0, "the no-JS block has: " + t));
+  { const ev = M.districtDay(C, D, 1, dd, { ev: 0.3, rule: "timer" }), nr = M.netRuns(C, D, {}, D.districtHeat.share.start);
+    ok(fb.indexOf(M.fmtN(ev.peak, 1) + " MW") > 0 && fb.indexOf(M.fmtN(nr.store.peak, 1) + " MW") > 0 && fb.indexOf(M.fmtN(M.industry(C, D, 2.9).el.low)) > 0, "the no-JS tables' numbers are the model's"); }
+  // A15-12: provenance
+  ok(!/ResStock/.test(JS) && /Costs from EIA and ORNL/.test(JS) && /SPP's 2025 electricity shapes, temperatures from NOAA's 1991–2020 normals, and a cold design day set for teaching/.test(JS) && C.days.filter(d => d.tempFrom === "noaa").length >= 6 && dd.tempFrom === "teaching", "the explain layer's provenance: EIA and ORNL costs; SPP 2025 shapes; NOAA normals and a teaching design day (review A15-12)");
+  // A15-13: the minimum is not the peak hour
+  ok(/on a design day whose minimum is −18 °C/.test(M.ideasHTML(C, D)) && dd.tmin === -18 && Math.min(...dd.temp) === -18, "the design day's −18 °C is its minimum, said so (review A15-13)");
+}
 
 // ---------------- the page's controls
 ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a15"/.test(JS), "live regions; the reader's settings persist in this browser");
 ok((JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 10, "a demo hook with an action for each of the ten steps");
-["cost-of-saved-energy", "heat-pump-water-heater", "design-day", "coincident-peak", "process-heat"].forEach(t => ok(new RegExp("id: " + t + "\\b").test(SIDE), "the sidecar defines " + t));
+["cost-of-saved-energy", "heat-pump-water-heater", "design-day", "coincident-peak", "process-heat", "building-envelope", "temperature-lift"].forEach(t => ok(new RegExp("id: " + t + "\\b").test(SIDE), "the sidecar defines " + t));
 
 console.log((fails ? "FAILED " + fails + " of " : "ok: ") + checks + " checks (" + ID + ")");
 process.exit(fails ? 1 : 0);

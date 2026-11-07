@@ -169,6 +169,7 @@
     "set": "teaching",
     "note": "Set for teaching: one 2-lamp fluorescent fixture per 10 m2 across 40% of Prairie City's commercial floor; the rest already has LEDs or other lighting."
   },
+  "sequence": "The curve is a sequence, cheapest first: each block counts only what it saves after the blocks to its left. A heat pump and weatherization in the same resistance-heated home save the same heating electricity (after a heat pump, weatherization saves 1 / the seasonal COP as much; after weatherization, the heat pump works on less heat); a condensing furnace and weatherization in the same gas-heated home save the same gas (after a 99% furnace, weatherization saves heat / 0.99 instead of heat / 0.80). The other measures are taken as independent: their smaller effects on space heating (a heat-pump water heater cools the room it sits in; LEDs give off less heat) are left out. The block widths then add to the package's savings.",
   "vintageNote": "Pre-1980 homes are counted as each district's pre-1980 share of floor area, spread evenly over heating fuels and over homes of the average size (a teaching assumption, as A18 makes); weatherization brings each to the heat need of homes built 1980 to 2009.",
   "lbnl": {
     "totalCSE2016": 0.049,
@@ -236,14 +237,14 @@
     },
     "sourceC": 10,
     "lossShare": 0.1,
-    "deltaK": 40,
+    "returnC": 25,
     "set": "teaching",
-    "note": "Set for teaching: a district network in the dense core takes over the chosen share of the core's gas and propane heat. A large heat pump with a heat source that stays at 10 C (treated wastewater, say) runs F3's COP curve at that temperature, delivering at the same 45 C; 10% of the heat sent out is lost from the pipes. Its thermal store is hot water cycled over 40 K. The plant sits on the core's substation."
+    "note": "Set for teaching: a district network in the dense core takes over the chosen share of the core's gas and propane heat. A large heat pump with a heat source that stays at 10 C (treated wastewater, say) runs F3's COP curve at that temperature, delivering at the curve's 45 C (prairie-city.json's cop.supplyC), so the network's supply is 45 C; water comes back at 25 C; 10% of the heat sent out is lost from the pipes. Its thermal store is a stratified hot-water tank charged at the 45 C supply and emptied down to the 25 C return: 20 K of usable range. The plant sits on the core's substation."
   },
   "water": {
     "cp": 4.186,
     "rho": 1000,
-    "note": "Standard properties of water: 4.186 kJ per kg per K, 1,000 kg per m3; a store cycled over 40 K holds about 46.5 kWh of heat per m3."
+    "note": "Standard properties of water: 4.186 kJ per kg per K, 1,000 kg per m3; a store used between 45 C and 25 C (20 K) holds about 23.3 kWh of heat per m3."
   },
   "industry": {
     "cop": {
@@ -253,9 +254,10 @@
       "step": 0.1
     },
     "hpMaxC": 165,
+    "hpMaxC2024": 175,
     "boilerEff": 0.98,
     "ovenEff": 0.98,
-    "note": "Industrial heat pumps up to 165 C are commercially available at scale; their COP ranges from 1.6 to 5.8 at temperature lifts of 130 to 40 K (LBNL, 2022); DOE's tip sheet works an example from 40 to 100 C at a COP of about 2.92. Electric boilers 98% (EIA). Electric ovens and furnaces are taken as 98% too (illustrative). Every band is assumed fully electrified, a ceiling, not a forecast.",
+    "note": "This exercise takes 165 C as the heat pumps' reach: LBNL's 2022 report finds heat-sink temperatures up to 165 C commercially available at scale, and DOE's January 2024 tip sheet says heat pumps deliver up to about 175 C (hpMaxC2024); either way, part of the steam band is within reach and most of it is not. Their COP ranges from 1.6 to 5.8 at temperature lifts (delivery minus source temperature) of 130 to 40 K (LBNL, 2022); DOE's tip sheet works an example from 40 to 100 C at a COP of about 2.92. Electric boilers 98% (EIA). Electric ovens and furnaces are taken as 98% too (illustrative). Every band is assumed fully electrified, a ceiling, not a forecast.",
     "src": [
       "lbnl-ihp-2022",
       "doe-iac-tip2",
@@ -286,7 +288,7 @@
     },
     {
       "n": "up to 165 C",
-      "what": "Heat-sink temperatures of industrial heat pumps commercially available at scale.",
+      "what": "Heat-sink temperatures of industrial heat pumps commercially available at scale, as LBNL found in 2022 (DOE's January 2024 tip sheet: up to about 175 C).",
       "source": "LBNL, Electrification of U.S. Manufacturing With Industrial Heat Pumps, p. 4",
       "url": "https://eta-publications.lbl.gov/sites/default/files/us_industrial_heat_pump-final.pdf",
       "asof": "October 2022"

@@ -118,7 +118,7 @@
     {
       "key": "federal",
       "label": "Federal rules",
-      "sub": "FERC, DOE, PHMSA, NHTSA",
+      "sub": "grid markets, equipment, pipelines, fuel economy",
       "color": "var(--lx-tier-5)",
       "nodes": [
         "src_grid",
@@ -127,7 +127,7 @@
         "buildings",
         "gasoline"
       ],
-      "levers": "Interstate transmission, wholesale power and interstate gas pipelines (FERC); efficiency standards for equipment sold (DOE); pipeline safety (PHMSA); fuel economy (NHTSA)."
+      "levers": "Interstate transmission, wholesale power and gas pipelines ([[ferc|FERC]]); efficiency standards for equipment sold (the Department of Energy); pipeline safety and fuel economy (Transportation Department agencies)."
     }
   ],
   "levers": [
@@ -145,7 +145,7 @@
       "id": "supply",
       "text": "Which power plants and contracts supply the city's electricity",
       "bin": "utility",
-      "why": "Where utilities are vertically integrated, as in Kansas, the utility builds, owns or buys its supply; the regulator reviews the costs.",
+      "why": "Where utilities are [[vertically-integrated-utility|vertically integrated]], as in Kansas, the utility builds, owns or buys its supply; the regulator reviews the costs.",
       "src": [
         "doe-primer",
         "kcc-rate-study"
@@ -164,7 +164,7 @@
       "id": "wholesale",
       "text": "Rules for interstate transmission and wholesale power sales",
       "bin": "federal",
-      "why": "[[ferc|FERC]] regulates the transmission and wholesale sale of electricity in interstate commerce.",
+      "why": "[[ferc|FERC]] regulates the transmission and [[wholesale-price|wholesale sale]] of electricity in interstate commerce.",
       "src": [
         "ferc-what"
       ]
@@ -189,9 +189,9 @@
     },
     {
       "id": "code",
-      "text": "The energy code new buildings must meet",
+      "text": "The energy code new buildings in Prairie City must meet",
       "bin": "city",
-      "why": "States or local governments adopt energy codes and local permit offices enforce them; Kansas leaves adoption to local governments.",
+      "why": "Kansas leaves the [[building-code|energy code]] to each city or county (home rule), and local permit offices enforce it; in many states the state adopts one code.",
       "src": [
         "doe-codes101",
         "energycodes-ks"
@@ -293,7 +293,8 @@
             "t": "approves the rates they pay"
           },
           "transport": {
-            "v": "no"
+            "v": "part",
+            "t": "approves the utility rates that chargers pay"
           },
           "industry": {
             "v": "part",
@@ -331,7 +332,7 @@
       {
         "key": "federal",
         "name": "Federal rules",
-        "note": "FERC, DOE, PHMSA, NHTSA",
+        "note": "grid markets, equipment, pipelines, fuel economy",
         "cells": {
           "buildings": {
             "v": "part",
@@ -352,7 +353,7 @@
         }
       }
     ],
-    "note": "Typical U.S. roles, not universal: they differ by state, and a city that owns its utility answers to its own local government."
+    "note": "Roles for a Kansas city served by an investor-owned utility. Typical U.S. roles, not universal: they differ by state, and a city that owns its utility answers to its own local government."
   },
   "muni": {
     "q": "Some U.S. cities own their electric utility. If Prairie City did, which lever would move to its own local government?",
