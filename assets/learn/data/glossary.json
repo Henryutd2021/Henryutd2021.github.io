@@ -1871,6 +1871,12 @@
   "lesson": "M1",
   "href": "m01-dispatch-to-lmp.html"
  },
+ "lock-in": {
+  "term": "Lock-in",
+  "short": "When long-lived plants, pipes and habits keep a fuel in use for decades after they are built, because leaving them early is costly.",
+  "lesson": "X2",
+  "href": "x02-fossil-transition.html"
+ },
  "log-scale": {
   "term": "Log scale",
   "short": "A scale on which each equal step multiplies the value by the same factor, often 10, so tiny and huge values fit on one chart.",
