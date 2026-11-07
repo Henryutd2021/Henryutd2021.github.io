@@ -6,7 +6,13 @@ glossary:
   - id: hhi
     term: Herfindahl-Hirschman index (HHI)
     def: "A measure of how concentrated a supply is: the sum of each supplier's squared percentage share, from near 0 for many small suppliers to 10,000 for one."
+  - id: gdp
+    term: Gross domestic product (GDP)
+    def: "The value of all the goods and services an economy produces in a year."
+  - id: petajoule
+    term: Petajoule (PJ)
+    def: "A unit of energy equal to a million gigajoules (10^15 joules, about 278 GWh), used for a country's yearly fuel use."
 requests:
-  - "path.yml: A21's curriculum prerequisite F10 is left out of its after list until F10 (learn-w6-a) is live; add `after: [F10]` at integration, and link F10 from A21's helpful-first line (now 'F10 (upcoming)')."
-  - "prairieland.json, imports.minerals.hhiMethod: 'above 2,500 counts as highly concentrated in the usual reading' is the 2010 U.S. Horizontal Merger Guidelines' line; the 2023 Merger Guidelines (DOJ and FTC, 18 Dec 2023, Guideline 1) say 'Markets with an HHI greater than 1,800 are highly concentrated'. A21 does not show hhiMethod; it cites 1,800 from the 2023 guidelines. Suggest rewording hhiMethod to the 2023 line, or dropping the threshold."
-  - "excerpt placement (new): A21's Real-world card quotes excerpt:supply-chain-mg E8.3 with E8.7 under it, and cites the AMM paper (E8.17); the curriculum row lists excerpt:supply-chain-mg for A21, the register's 'Where it would appear' column does not."
+  - "excerpt placement (new in W6): A21's Real-world card quotes excerpt:supply-chain-mg E8.3 with E8.7 under it, and cites the AMM paper (E8.17); the curriculum row lists excerpt:supply-chain-mg for A21, the register's 'Where it would appear' column does not."
+  - "prairieland.json (W6 fix, via scripts/build_learn_prairieland.py): realWorld 'iea-gcmo-2025' says 'Leading refiner of strategic minerals, 2025', the report year; the IEA's figure uses the latest year available for each mineral. Suggest 'Leading refiner of strategic minerals, IEA report of 2025 (latest year available for each mineral; years vary)'; A21 shows that label from its own data (facts.what) until then."
+  - "prairieland.json (W6 fix): imports.minerals.suppliers lists three countries and 'Other refiners', a group; A21 now calls the four 'supply groups' and its HHI an upper bound. Optional: say so in hhiMethod."

@@ -2,7 +2,7 @@
   "about": {
     "what": "Lesson A21's own settings: the levers' ranges, the assumptions of each stress test, the thresholds named on the page, the lever sort and the real-world context added to Prairieland's. Every Prairieland number (imports, stocks, minerals, the battery factory, the shocks, fuel prices, GDP, primary energy) is read from prairieland.json at run time, never copied here.",
     "built": "2026-11-07",
-    "builtBy": "builder learn-w6-b (hand-written; tested by _tests/learn/test_a21-security-minerals.js)",
+    "tests": "_tests/learn/test_a21-security-minerals.js",
     "dollarYear": 2025
   },
   "levers": {
@@ -75,20 +75,29 @@
     "gasStorageFull": 0.5,
     "gasStorageWhat": "Gas storage is half full when the strait closes (set for teaching).",
     "spike": "The price spike lasts the whole year; domestic gas output stays at its 2025 level, so a cut in gas use comes off LNG first.",
+    "spikeStocks": "More sellers do not remove exposure to a shared world price; stored gas can cushion purchases while it lasts, and this calculation models only using less.",
     "closure": "Oil stocks are counted in days of net oil imports, as the IEA counts them; stocks cover the oil the closed strait stops, net of any demand restraint.",
-    "ban": "During the restriction, the other refiners deliver only their usual shares and recycled material is domestic; nothing else is bought.",
+    "ban": "During the restriction, the other supply groups deliver only their usual shares and recycled material is domestic; nothing else is bought.",
     "fire": "The fire stops the main site; a second site, if any, can run up to its full capacity.",
-    "overlap": "A restriction and a fire in the same two years overlap: the factory loses the larger of the two, not their sum.",
+    "jobs": "Jobs at each site in proportion to its capacity; job-years before any work elsewhere.",
+    "overlap": "Combined, month by month: the factory makes what its scarcest mineral and its open sites allow, up to its 2025 output; minerals that arrive while it is shut wait in stock.",
+    "overlapCount": "Cells made after the restriction ends are not counted; the fire's timing matters only when the restriction is on too.",
     "set": "teaching: every assumption in this block"
   },
   "thresholds": {
     "hhiHigh": 1800,
-    "hhiWhat": "U.S. merger guidelines call a market with an HHI above 1,800 highly concentrated: a competition convention, not a security rule.",
+    "hhiWhat": "The 2023 U.S. Merger Guidelines call a market with an HHI above 1,800 highly concentrated: a competition convention, not a security rule.",
     "hhiSrc": "doj-ftc-2023",
     "oneCountry": 0.65,
-    "oneCountryWhat": "The EU's Critical Raw Materials Act sets a benchmark: no single third country should supply more than 65% of the EU's yearly use of each strategic raw material at any processing stage, by 2030. A benchmark, not a legal cap.",
+    "oneCountryWhat": "The EU's Critical Raw Materials Act sets a benchmark, not a legal cap: by 2030 no single third country should supply more than 65% of its yearly use of any strategic raw material, at any processing stage.",
     "oneCountrySrc": "ec-crma"
   },
+  "fireTiming": [
+    { "key": "start", "label": "At the start" },
+    { "key": "middle", "label": "In the middle" },
+    { "key": "end", "label": "In the last months" }
+  ],
+  "fireTimingWhat": "When the fire starts inside the restriction: its first month, its middle, or its last months (computed from the two shocks' lengths in prairieland.json).",
   "sort": {
     "bins": [
       {
@@ -258,6 +267,10 @@
     }
   },
   "facts": {
+    "what": {
+      "iea-gcmo-2025": "Leading refiner of strategic minerals, IEA report of 2025 (latest year available for each mineral; years vary)"
+    },
+    "whatWhy": "The page's label for this shared fact: the IEA's figures use the latest year available for each mineral, not one observation year.",
     "prairieland": [
       "eurostat-id",
       "iea-gcmo-2025",

@@ -994,7 +994,7 @@
   title: "Why do national energy scenarios disagree?"
   subtitle: "Line up four scenarios for a fictional nation, trace each gap to its assumptions, and sort them as exploratory or target-seeking"
   short: "Why scenarios disagree"
-  teaches: [exploratory and target-seeking scenarios, scenario assumptions (demand, fuel prices, policy, technology costs), one-at-a-time against ordered swaps, interactions between assumptions, the average over every order, an implied carbon price, reading outlooks as their authors describe them]
+  teaches: [exploratory and target-seeking scenarios, "scenario assumptions (demand, fuel prices, policy, technology costs)", one-at-a-time against ordered swaps, interactions between assumptions, the average over every order, an implied carbon price, reading outlooks as their authors describe them]
   does: "Line up four scenarios for Prairieland built on one data set; read each one's question and assumptions; sort them and four real outlooks as exploratory or target-seeking; trace the gaps in CO₂, electricity and imports to demand, fuel prices, policy and fixed technology costs, one at a time and in order; then move a budget and watch the carbon price it needs."
   outcome: "Tell an exploratory scenario from a target-seeking one, trace a gap between two scenarios to their assumptions in a stated order, explain why the parts depend on that order, and say why a target-seeking scenario's policy is an output, not an input."
   after: [A1, 13]

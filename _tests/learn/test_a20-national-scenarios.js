@@ -8,7 +8,10 @@
 //   - gap tracing: every order's steps add up to the gap; the average over 24 orders adds up to it too; each line and
 //     "saw" is true for every pair, result and order
 //   - the page: the generated blocks equal the model's (--write rewrites them); every Prairieland number is read, never
-//     retyped; the fictional line; links on the allow-list; no nuclear term; text budget; the sidecar's terms
+//     retyped; the fictional line; links on the allow-list; no nuclear term; no production wording in the shipped data
+//     file; text budget on every element, the practice set and the no-JS block included; the sidecar's terms
+//   - the cross-page note (W6 fix): this page's accounting meets Prairieland's default budget, and step 7 and the no-JS
+//     block say why engine E4 (M13, SB4) does not; the reader's step 7 run is carried into step 8 and the explain layer
 // Usage (from the site folder):  node _tests/learn/test_a20-national-scenarios.js [--write]
 "use strict";
 const fs = require("fs");
@@ -143,16 +146,18 @@ const G = M.GROUPS, OUTS = D.outputs.map(o => o.key);
 // ---------------- the page: numbers read, not retyped; labels; links; scope
 ok(!/(?<![\d.,$])(214\.9|3,?500|2,?600|1,?712|1,?484|1,?521|7,?000|4\.05|216\.5|980|420|630)(?![\d,])/.test(RAW + JS.replace(/\/\/[^\n]*/g, "")), "no Prairieland number is retyped in the data file or the script");
 ok(OWN.indexOf("<b>" + PL.about.line + "</b>") >= 0 && /var PL = data\.prairieland[^\n]*LINE = PL\.about\.line/.test(JS) && M.staticFallback(P).indexOf(PL.about.line) >= 0 && M.practice(P).indexOf(PL.about.line) >= 0, "the fictional line, read from Prairieland, on the page, the fallback and the practice set");
-ok((JS.match(/LINE/g) || []).length >= 8, "every interactive step carries the fictional line");
+ok((JS.match(/LINE/g) || []).length + (JS.match(/notes\(act, (rule|budget)Notes\(P\)\)/g) || []).length >= 8 && M.ruleNotes(P).concat(M.budgetNotes(P)).filter(t => t === PL.about.line).length === 2, "every interactive step carries the fictional line (steps 4 and 7 in their notes)");
 const ALL = OWN + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term anywhere in A20 (the firm option is generic)");
 ok(!/\bAI\b|artificial intelligence/.test(ALL) && !/projects\/|research\.html/.test(PAGE + JS), "no 'AI', no project page, no Research page");
+ok(!/hand-written|builder learn-|\bG-[A-Z]{2,}\b|\bguard\b/i.test(RAW), "no production wording or guard names in the shipped data file");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
 const okHref = h => /^https:\/\/(www\.iea\.org|www\.eia\.gov|www\.ipcc\.ch|doi\.org)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
 ok(hrefs.every(okHref), "links: IEA, EIA, IPCC, doi.org and learn pages (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
 ok(Object.values(D.sources).every(s => /^https:\/\/(www\.iea\.org|www\.eia\.gov|doi\.org)\//.test(s.url)), "the data file's sources are allow-listed");
 ok(/a01-project-tea\.html/.test(OWN) && /13-capstone\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN) && /sb4-pathway-explorer\.html/.test(OWN) && !/\(upcoming\)/.test(OWN), "links back to A1 and lesson 13; M13 and SB4 linked now they are live (W6 integration)");
-ok(/not a forecast/.test(JS) && /no scenario here is more likely/i.test(JS + PAGE), "no scenario is called a forecast or more likely");
+ok(/not a forecast/.test(JS) && /assigns none, so its results do not tell us which scenario is more likely/.test(PAGE) && /assigns none, so it cannot say which scenario is more likely/.test(JS) && !/no scenario here is more likely/i.test(JS + PAGE), "no scenario is called a forecast; no probabilities are assigned, so none is called more or less likely");
+ok(!/later date/.test(JS) && /within 2026–2050/.test(M.targetSaw(P, M.scenario(P, "budget", { budget: P.budget.lo }))), "an unreachable budget is met only by cuts within its years; changing them changes the question");
 
 // ---------------- the practice set balances (W4 finding 6, W5 finding 6)
 { const Pr = M.practice(P), num = s => Number(s.replace(/,/g, "")); ok((Pr.match(/<li>/g) || []).length === 6, "six worked exercises");
@@ -164,23 +169,57 @@ ok(/not a forecast/.test(JS) && /no scenario here is more likely/i.test(JS + PAG
   ok(m3 && near(num(m3[1]) * num(m3[2]) / 1000, num(m3[3]), 0.0005) && near(num(m3[3]) * num(m3[4]), num(m3[5]), 0.05), "exercise 3 balances as displayed");
   const m4 = Pr.match(/((?:\d × [\d.]+ \+ )+\d × [\d.]+) = ([\d,]+) Mt/);
   ok(m4 && near(m4[1].split(" + ").reduce((s, t) => { const q = t.split(" × "); return s + num(q[0]) * num(q[1]); }, 0), num(m4[2]), 1), "exercise 4 balances as displayed");
-  const m5 = Pr.match(/fuel adds ([\d.]+) − ([\d.]+) = \+([\d.]+) Mt\. Fuel first: ([\d.]+) − ([\d.]+) = \+([\d.]+) Mt\. The average of the two orders: \(([\d.]+) \+ ([\d.]+)\) ÷ 2 = ([\d.]+) Mt/);
-  ok(m5 && near(num(m5[1]) - num(m5[2]), num(m5[3]), 0.05) && near(num(m5[4]) - num(m5[5]), num(m5[6]), 0.05) && near((num(m5[7]) + num(m5[8])) / 2, num(m5[9]), 0.005), "exercise 5 balances as displayed"); }
+  const m5 = Pr.match(/fuel adds ([\d.]+) − ([\d.]+) = \+([\d.]+) Mt; fuel first, ([\d.]+) − ([\d.]+) = \+([\d.]+) Mt\. Averaged over the two orders: \(([\d.]+) \+ ([\d.]+)\) ÷ 2 = ([\d.]+) Mt/);
+  ok(m5 && near(num(m5[1]) - num(m5[2]), num(m5[3]), 0.05) && near(num(m5[4]) - num(m5[5]), num(m5[6]), 0.05) && near((num(m5[7]) + num(m5[8])) / 2, num(m5[9]), 0.005), "exercise 5 balances as displayed");
+  // the givens sit in tables (W6 finding: one short question per item, the numbers beside it)
+  const items = [...Pr.matchAll(/<li><p><b>[^<]+<\/b> ([\s\S]*?)<\/p>([\s\S]*?)<details/g)];
+  ok(items.length === 6 && items.slice(0, 5).every(x => /<table class="lx-mini-table a20-given">/.test(x[2])) && items.every(x => (x[1].match(/\?/g) || []).length === 1), "each exercise asks one question; the first five give their numbers in a table");
+  // the givens tables show the numbers the answers use
+  ok(/<th scope="row">Wind<\/th><td>\$[\d.]+ per MWh; weight 55%<\/td>/.test(Pr) && /Half-width, the cost gap at which all or none is clean<\/th><td>\$20 per MWh/.test(Pr) && /<th scope="row">2050<\/th><td>[\d.]+ Mt; weight 3<\/td>/.test(Pr), "the givens tables carry the costs, the half-width and the weights"); }
+
+const lines0 = [];   // lines checked against the text budget below
+// ---------------- the cross-page card: this page meets the default budget; E4 (M13, SB4) cannot (w6_fix_brief §1a, as
+// corrected by the coordinator on 2026-11-07): the cause is the timing of electrification, not build-rate or transmission
+{ const Rb = M.scenario(P, "budget"), n = M.gapNote(P), nh = M.gapNote(P, true), def = M.fmtN(PL.carbon.budget.def, 0) + " Mt";
+  const E4 = JSON.parse(fs.readFileSync(L("data/e4-pathways.json"), "utf8")), fl = D.pathwayModel.floorMt, y = P.years[1];
+  ok(Rb.target.ok && Rb.cum <= PL.carbon.budget.def, "this accounting meets Prairieland's default budget (" + def + ")");
+  ok(E4.levers.budget.def > PL.carbon.budget.def && E4.levers.budget.why.indexOf("(" + M.fmtN(PL.carbon.budget.def, 0) + " Mt) is out of reach") > 0 && E4.levers.budget.why.indexOf("about " + M.fmtN(fl, 0) + " Mt") > 0 && fl > PL.carbon.budget.def, "E4's own data: the default budget out of its reach, its floor about " + M.fmtN(fl, 0) + " Mt (this lesson's pathwayModel.floorMt)");
+  // the timing: here the Budget pathway's shares jump by the most a period allows; E4's rise in a straight line to 2050
+  const sh = Rb.Y[y].elShare, s0 = Rb.Y[P.base].elShare, mx = PL.demand.electrification.maxSharePerPeriod, eb = E4.levers.electrification;
+  ok(near(sh.buildings - s0.buildings, mx, 1e-9) && near(sh.industry - s0.industry, mx, 1e-9), "by " + y + " the Budget pathway's buildings and industry gain the most a period allows (" + (100 * mx) + " points)");
+  ok(/straight line from 2025/.test(eb.unit) && (y - P.base) / (2050 - P.base) * (1 - s0.buildings) < mx && (y - P.base) / (2050 - P.base) * (PL.demand.electrification.industry.maxShare2050 - s0.industry) < mx, "a straight line to even the most 2050 allows gains less by " + y + " (E4's rule)");
+  ok(n.here.indexOf(M.pct(sh.buildings)) > 0 && n.here.indexOf(M.pct(sh.industry)) > 0 && /straight line to 2050/.test(n.there) && n.there.indexOf("about " + M.fmtN(fl, 0) + " Mt, above the " + def + " budget") > 0, "the card: early and fast here, a straight line there, the floor above the budget");
+  ok(/\[\[lesson:m13-national-pathway\|M13\]\]/.test(n.there) && /\[\[lesson:sb4-pathway-explorer\|SB4\]\]/.test(n.there) && /<a href="m13-national-pathway\.html">M13<\/a>/.test(nh.lineHead), "the card links M13 and SB4; the no-JS line links M13");
+  ok(M.staticFallback(P).indexOf(nh.line) > 0 && /gapNote\(P\)/.test(JS) && /gn\.here/.test(JS) && /gn\.there/.test(JS), "the card is in step 7 and its line in the no-JS block");
+  ok(!/build-rate|transmission limits/i.test(JSON.stringify(n) + JSON.stringify(nh) + M.staticFallback(P) + PAGE), "the stated cause is the timing of electrification, not build-rate or transmission limits");
+  [n.here, n.there, nh.lineHead + " " + nh.line].forEach(t => lines0.push(t)); }
+// reference budgets: Prairieland's presets, listed (the slider has no preset buttons)
+ok(PL.carbon.budget.presets.every(p => M.refBudgets(P).indexOf(M.fmtN(p.mt, 0) + " Mt") > 0) && !/slider's presets/.test(PAGE + JS), "the reference budgets are listed in step 7, not called slider presets");
+// the reader's step 7 run: none while it is the Budget pathway as defined; carried into step 8 and the explain layer
+{ const sc = M.scOf(P, "budget"), def = { budget: PL.carbon.budget.def, cheap: false, pace: sc.policy.elec };
+  ok(M.mine(P, def) === null, "no extra column or row while step 7 keeps the defaults");
+  const Y = M.mine(P, Object.assign({}, def, { budget: 4000 })), Yc = M.mine(P, Object.assign({}, def, { cheap: true, pace: "stated" }));
+  ok(Y && Y.target.budget === 4000 && Y.target.ok && Y.target.price < M.scenario(P, "budget").target.price, "a 4,000 Mt run: its own, lower price (" + (Y && Y.target.price) + ")");
+  ok(Yc && /low ends of their ranges/.test(M.setWords(P, Yc).fuel) && /electrification as announced/.test(M.setWords(P, Yc).policy), "the reader's run is described by its own inputs (cheap gas, the announced pace)");
+  ok(/Your step 7 run/.test(JS) && /mine\(P, S\)/.test(JS) && /function paintExplain\(\)/.test(JS) && /setTimeout\(paintExplain/.test(JS), "step 8 and the explain layer show the reader's run beside the scenarios as defined"); }
 
 // ---------------- text budget
-const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
+// maths: $$...$$, and $...$ whose opening $ is followed by a letter or a backslash (currency, $40 or $ per MWh, is text)
+const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/(^|[^\\])\$(?=[A-Za-z\\])[^$\n]*?[^\s\\]\$(?!\d)/g, "$1x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
 const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
 const nSent = t => plain(t).replace(/U\.S\./g, "US").replace(/(\d)\.(\d)/g, "$1,$2").replace(/et al\./g, "et al").split(/(?<=[.?!])\s+(?=[A-Z“$0-9−])/).filter(x => /[A-Za-z]/.test(x)).length;
 const stepTexts = [...JS.matchAll(/\{ text: "((?:[^"\\]|\\.)*)",\n\s*build/g)].map(m => m[1].replace(/\\"/g, '"'));
 ok(stepTexts.length === 8, "eight step cards (" + stepTexts.length + ")");
 stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step " + (i + 1) + ": " + n + " words (about 35)"); ok(nSent(t) <= 2, "step " + (i + 1) + ": " + nSent(t) + " sentences"); });
 { const Rb = M.scenario(P, "budget"), Xc = M.inputs(P, M.scOf(P, "current"));
-  const lines = [M.sceneSaw(P), M.ruleLine(P, Xc), M.ruleSaw(P, Xc), M.targetLine(P, Rb), M.targetSaw(P, Rb), M.readSaw(P)].concat(Object.values(M.PREDICT.feedback));
+  const lines = lines0.concat([M.sceneSaw(P), M.ruleLine(P, Xc), M.ruleSaw(P, Xc), M.targetLine(P, Rb), M.targetSaw(P, Rb), M.readSaw(P), M.TERMS, M.targetSaw(P, M.scenario(P, "budget", { budget: P.budget.lo })), M.targetSaw(P, M.scenario(P, "budget", { budget: P.budget.hi }))])
+    .concat(Object.values(M.PREDICT.feedback), M.ruleNotes(P), M.budgetNotes(P));
   D.pairs.forEach(pr => OUTS.forEach(o => lines.push(M.aloneLine(P, pr.a, pr.b, o), M.aloneSaw(P, pr.a, pr.b, o), M.orderSaw(P, pr.a, pr.b, o), M.orderLine(P, pr.a, pr.b, o, "fwd"))));
   lines.forEach(t => { ok(nWords(t) <= 36, "a line of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a line of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); }); }
-const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<!-- a20-(fallback|practice):start[\s\S]*?<!-- a20-\1:end -->/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
+// every element of the page, the no-JS block and the practice set included (W6 finding: they were left out)
+const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/^---[\s\S]*?\n---\n/, " ")
   .replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
-PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
+PROSE.replace(/^\|(.*)\|$/gm, (m, row) => "<tr>" + row.split("|").map(c => "<td>" + c + "</td>").join("") + "</tr>").split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 38, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
 
 // ---------------- controls, glossary, demo hooks

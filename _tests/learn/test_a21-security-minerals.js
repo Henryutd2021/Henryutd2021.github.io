@@ -4,7 +4,9 @@
 //     Prairieland's own figures; each HHI against Prairieland's; a cap keeps shares summing to 1, none above the cap
 //   - the stress tests by hand at the defaults and over every lever: the price spike's money (abroad and at home), the
 //     closure against the shock's lost PJ, the restriction's scarcest mineral, the fire with a second site; every line and
-//     "saw" true over the levers' whole ranges; combined shocks: a restriction and a fire overlap (the larger, not the sum)
+//     "saw" true over the levers' whole ranges; combined shocks: a restriction and a fire counted month by month (W6 fix):
+//     with no fire inside it the monthly count equals the restriction's closed form, and together the loss lies between
+//     the larger single loss and the two added, and depends on when the fire comes
 //   - the lever sort agrees with the model where the model can show it (each "yes" lever improves its shock)
 //   - the excerpt: E8.3 word for word against the register, E8.7 under it, the AMM citation; no other research wording
 //   - the page: generated blocks up to date (--write rewrites them); no Prairieland number retyped; the fictional line;
@@ -89,15 +91,32 @@ const I = PL.imports, S0 = M.defaults(PL, D);
   ok(near(f.lost, sh.months / 12 * Fb.output2025GWh) && near(f.jobYears, Fb.jobs * sh.months / 12), "fire: 6.0 GWh and 1,250 job-years with no second site");
   let good = true; range(D.levers.split).forEach(s => { const x = M.fire(PL, Object.assign({}, S0, { split: s })); if (!near(x.lost, sh.months / 12 * Math.max(0, Fb.output2025GWh - Fb.capacityGWh * s / 100)) || (x.lost <= 1e-9) !== /covers the whole loss/.test(M.fireSaw(PL, Object.assign({}, S0, { split: s })))) good = false; });
   ok(good, "fire: the second site runs up to its capacity; the 'saw' is true for every split"); }
-// combined shocks: 16 combinations, levers on and off
-{ let good = true, n = 0; const keys = ["spike", "closure", "ban", "fire"];
+// combined shocks, month by month (W6 review, high): the restriction alone, the fire's timing, the bounds
+{ const AT = D.fireTiming.map(x => x.key), sh = M.shockOf(PL, "mineralBan").params, fm = M.shockOf(PL, "factoryFire").params.months, Fb = PL.factories.battery;
+  ok(AT.join() === "start,middle,end" && M.fireStart(PL, "start") === 0 && M.fireStart(PL, "end") === sh.years * 12 - fm && M.fireStart(PL, "middle") > 0 && M.fireStart(PL, "middle") < M.fireStart(PL, "end"), "the fire starts at month 0, in the middle, or in the restriction's last months");
+  let alone = true, bounds = true, n = 0;
+  range(D.levers.cap).forEach(c => range(D.levers.recycled).forEach(r => range(D.levers.mineralDays).forEach(md => range(D.levers.split).forEach(sp => {
+    const o = Object.assign({}, S0, { cap: c, recycled: r, mineralDays: md, split: sp }), b = M.ban(PL, o), f = M.fire(PL, o); n++;
+    if (!near(M.together(PL, o, null).lost, b.lost, 1e-9)) alone = false;
+    AT.forEach(a => { const t = M.together(PL, o, a); if (t.lost < Math.max(b.lost, f.lost) - 1e-9 || t.lost > b.lost + f.lost + 1e-9 || !near(t.made + t.lost, t.output, 1e-9) || t.perMonth.some(q => q < -1e-12)) bounds = false; });
+  }))));
+  ok(alone && n === 13 * 9 * 13 * 6, "with no fire inside the restriction, the monthly count equals the closed form (" + n + " lever cases)");
+  ok(bounds, "together: never below the larger single loss, never above the two added, made + lost = output, every timing and lever");
+  // by hand at 2025's settings: the fire at the start loses nothing more (what arrives while the site is shut is used
+  // later); in the last months, what arrives during the fire is unused when the restriction ends
+  const g = M.ban(PL, S0).rows.find(x => x.key === "graphite"), need = Fb.output2025GWh, stock = S0.mineralDays / 365 * need;
+  const tS = M.together(PL, S0, "start"), tE = M.together(PL, S0, "end"), madeEnd = stock + g.a * need * (sh.years - fm / 12);
+  ok(near(tS.lost, M.ban(PL, S0).lost, 1e-9) && near(tE.made, madeEnd, 1e-9) && tE.lost > tS.lost + 0.5, "by hand: the fire at the start adds nothing; in the last " + fm + " months the loss is " + tE.lost.toFixed(2) + " GWh, not " + tS.lost.toFixed(2));
+  let good = true, m2 = 0; const keys = ["spike", "closure", "ban", "fire"];
   for (let m = 0; m < 16; m++) { const on = {}; keys.forEach((k, i) => { on[k] = !!(m & (1 << i)); });
-    [S0, Object.assign({}, S0, { cap: 60, recycled: 20, mineralDays: 180, split: 30, stockDays: 90, gasCut: 10 })].forEach(S => { const b = M.board(PL, D, on, S); n++;
-      const bl = on.ban ? M.ban(PL, S).lost : 0, fl = on.fire ? M.fire(PL, S).lost : 0;
-      if (!near(b.cellsLost, Math.max(bl, fl)) || !near(b.cellsSum, bl + fl) || (!on.closure && (b.oilGap || b.gasGap)) || (!on.spike && b.abroad) || (!on.fire && b.jobYears)) good = false;
-      const sw = M.boardSaw(PL, D, on, S); if ((on.ban && on.fire && bl + fl - Math.max(bl, fl) > 1e-9) !== /overlap/.test(sw)) good = false;
-      if (!Object.values(on).some(Boolean) !== /Switch on/.test(M.boardLine(PL, D, on, S))) good = false; }); }
-  ok(good && n === 32, "combined shocks: a restriction and a fire overlap (the larger loss, not the sum); lines true for all 16 combinations"); }
+    [S0, Object.assign({}, S0, { cap: 60, recycled: 20, mineralDays: 180, split: 30, stockDays: 90, gasCut: 10 })].forEach(S => AT.forEach(a => { const b = M.board(PL, D, on, S, a); m2++;
+      const bl = on.ban ? M.ban(PL, S).lost : 0, fl = on.fire ? M.fire(PL, S).lost : 0, both = on.ban && on.fire;
+      if (!near(b.cellsLost, both ? M.together(PL, S, a).lost : Math.max(bl, fl)) || !near(b.cellsSum, bl + fl) || (!on.closure && (b.oilGap || b.gasGap)) || (!on.spike && b.abroad) || (!on.fire && b.jobYears)) good = false;
+      const sw = M.boardSaw(PL, D, on, S, a), shared = both && bl + fl - b.cellsLost > 1e-9;
+      if (shared !== /depend on timing and shared bottlenecks/.test(sw) || (shared && sw.indexOf(M.atWords(PL, a)) < 0) || (shared && (b.cellsLost - bl > 1e-9) !== /unused when it ends/.test(sw))) good = false;
+      if (!Object.values(on).some(Boolean) !== /Switch on/.test(M.boardLine(PL, D, on, S, a))) good = false; })); }
+  ok(good && m2 === 96, "the board: cells lost from the monthly count when both are on; its words name the timing and say why; all 16 combinations x 3 timings");
+  ok(!/larger of the two|not simply added|the larger, not/i.test(JS + RAW + PAGE), "no general 'the larger, not the sum' rule left"); }
 
 // ---------------- the lever sort agrees with the model where it can
 { const it = k => D.sort.items.find(x => x.key === k);
@@ -132,6 +151,7 @@ const ALL = OWN + "\n" + RAW + "\n" + JS + "\n" + SIDE;
 ok(!/nuclear|reactor|\bSMR\b|small modular|fission|uranium/i.test(ALL), "no nuclear term anywhere in A21");
 ok(!/\bAI\b|artificial intelligence/.test(ALL) && !/projects\/|research\.html/.test(OWN + JS), "no 'AI', no project page, no Research page");
 ok(!/\b(threat|hostile|weaponi[sz]|coerc|blackmail|unreliable|aggress)/i.test(ALL), "no verdicts on countries");
+ok(!/hand-written|builder learn-|\bG-[A-Z]{2,}\b|\bguard\b/i.test(RAW), "no production wording or guard names in the shipped data file");
 const hrefs = [...OWN.matchAll(/href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
 const okHref = h => /^https:\/\/(www\.iea\.org|www\.eia\.gov|ec\.europa\.eu|single-market-economy\.ec\.europa\.eu|www\.usgs\.gov|doi\.org)\//.test(h) || /^[0-9a-z-]+\.html(#[a-z-]+)?$/.test(h) || /^#/.test(h);
 ok(hrefs.every(okHref), "links: IEA, EIA, the European Commission, USGS, doi.org and learn pages (" + hrefs.filter(h => !okHref(h)).join(", ") + ")");
@@ -145,10 +165,15 @@ ok(/f10-nations-differ\.html/.test(OWN) && /m13-national-pathway\.html/.test(OWN
   const m3 = P.match(/([\d,]+) PJ × \$([\d.]+) × \((\d) − 1\) = \$([\d,]+) million/); ok(m3 && near(num(m3[1]) * num(m3[2]) * (num(m3[3]) - 1), num(m3[4]), 0.5), "exercise 3 balances");
   const m4 = P.match(/Lost: ([\d,]+) × 63 ÷ 365 = ([\d.]+) PJ; stocks: ([\d,]+) × (\d+) ÷ 365 = ([\d.]+) PJ; short by ([\d.]+) PJ/); ok(m4 && near(num(m4[1]) * 63 / 365, num(m4[2]), 0.05) && near(num(m4[3]) * num(m4[4]) / 365, num(m4[5]), 0.05) && near(num(m4[2]) - num(m4[5]), num(m4[6]), 0.05), "exercise 4 balances as displayed");
   const m5 = P.match(/(\d+)% \+ (\d+)% × (\d+)% = ([\d.]+)% a year; \((\d) × ([\d.]+) \+ (\d+)\/365\) ÷ (\d) = ([\d.]+)/); ok(m5 && near(num(m5[1]) + num(m5[2]) * num(m5[3]) / 100, num(m5[4]), 0.05) && near((num(m5[5]) * num(m5[6]) + num(m5[7]) / 365) / num(m5[8]), num(m5[9]), 0.0006), "exercise 5 balances");
-  const m6 = P.match(/None elsewhere: (\d+)\/12 × (\d+) = ([\d.]+) GWh\. With 30%: (\d+)\/12 × \((\d+) − (\d+) × 0\.3\) = ([\d.]+) GWh/); ok(m6 && near(num(m6[1]) / 12 * num(m6[2]), num(m6[3]), 0.05) && near(num(m6[4]) / 12 * (num(m6[5]) - num(m6[6]) * 0.3), num(m6[7]), 0.05), "exercise 6 balances"); }
+  const m6 = P.match(/(\d+)\/12 × \((\d+) − (\d+) × 0\.3\) = ([\d.]+) GWh, against (\d+)\/12 × (\d+) = ([\d.]+) GWh with one site/); ok(m6 && near(num(m6[1]) / 12 * (num(m6[2]) - num(m6[3]) * 0.3), num(m6[4]), 0.05) && near(num(m6[5]) / 12 * num(m6[6]), num(m6[7]), 0.05), "exercise 6 balances");
+  // one short question per item, its numbers in a table beside it (W6 finding)
+  const items = [...P.matchAll(/<li><p><b>[^<]+<\/b> ([\s\S]*?)<\/p>([\s\S]*?)<details/g)];
+  ok(items.length === 6 && items.every(x => /<table class="lx-mini-table a21-given">/.test(x[2]) && (x[1].match(/\?/g) || []).length === 1), "each exercise asks one question, with its numbers in a table");
+  ok(/<th scope="row">Crude oil imports<\/th><td>[\d,]+ PJ a year, all through the strait/.test(P) && /1 PJ is a million GJ/.test(P), "the givens carry the volumes and the PJ-to-GJ conversion"); }
 
 // ---------------- text budget
-const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/\$[^$\n]+\$/g, "x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
+// maths: $$...$$, and $...$ whose opening $ is followed by a letter or a backslash (currency, $8.40 or $ per GJ, is text)
+const plain = t => String(t).replace(/<[^>]+>/g, " ").replace(/\$\$[\s\S]*?\$\$/g, " ").replace(/(^|[^\\])\$(?=[A-Za-z\\])[^$\n]*?[^\s\\]\$(?!\d)/g, "$1x").replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*/g, "").replace(/&amp;/g, "&").trim();
 const nWords = t => plain(t).split(/\s+/).filter(w => /[A-Za-z0-9$]/.test(w)).length;
 const nSent = t => plain(t).replace(/U\.S\./g, "US").replace(/(\d)\.(\d)/g, "$1,$2").replace(/et al\./g, "et al").split(/(?<=[.?!])\s+(?=[A-Z“$0-9−])/).filter(x => /[A-Za-z]/.test(x)).length;
 const stepTexts = [...JS.matchAll(/\{ text: "((?:[^"\\]|\\.)*)",\n\s*build/g)].map(m => m[1].replace(/\\"/g, '"'));
@@ -158,8 +183,15 @@ stepTexts.forEach((t, i) => { const n = nWords(t); ok(n >= 18 && n <= 36, "step 
   const lines = [M.depLine(PL), M.depLine(PL, "substitution"), M.depSaw(PL), M.straitSaw(PL), M.hhiLine(PL, D, 90), M.hhiLine(PL, D, 30), M.hhiSaw(PL, D, 90), M.spikeLine(PL, 0), M.spikeSaw(PL, 0), M.spikeSaw(PL, 30),
     M.closureLine(PL, D, S), M.closureSaw(PL, D, S), M.closureLine(PL, D, Object.assign({}, S, { weeks: 26, restraint: 20 })), M.closureSaw(PL, D, Object.assign({}, S, { weeks: 26, stockDays: 0 })),
     M.banLine(PL, S), M.banSaw(PL, S), M.fireLine(PL, S), M.fireLine(PL, Object.assign({}, S, { split: 50 })), M.fireSaw(PL, S), M.boardLine(PL, D, on, S), M.boardSaw(PL, D, on, S)].concat(Object.values(M.PREDICT.feedback), [D.thresholds.hhiWhat, D.thresholds.oneCountryWhat]);
+  ["dep", "strait", "hhi", "spike", "closure", "ban", "fire", "board"].forEach(k => lines.push(...M.notesFor(PL, D, k)));
+  D.fireTiming.forEach(x => lines.push(M.boardSaw(PL, D, on, S, x.key), M.boardSaw(PL, D, { spike: false, closure: false, ban: true, fire: true }, S, x.key)));
+  lines.push(M.hhiSaw(PL, D, 30), M.fireLine(PL, Object.assign({}, S, { split: 30 })));
   lines.forEach(t => { ok(nWords(t) <= 40, "a line of " + nWords(t) + " words: " + plain(t).slice(0, 60)); ok(nSent(t) <= 2, "a line of " + nSent(t) + " sentences: " + plain(t).slice(0, 60)); }); }
-const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/, " ").replace(/<ul class="lx-hint a21-holds">[\s\S]*?<\/ul>/, " ").replace(/<!-- a21-(fallback|practice):start[\s\S]*?<!-- a21-\1:end -->/g, " ").replace(/^---[\s\S]*?\n---\n/, " ")
+// every step's notes are on the page through notes(act, key); the assumptions behind each stress test are listed there
+ok(["dep", "strait", "hhi", "spike", "closure", "ban", "fire", "board"].every(k => new RegExp("notes\\(act, \"" + k + "\"\\)").test(JS)) && M.notesFor(PL, D, "board").indexOf(D.assume.overlap) >= 0 && M.notesFor(PL, D, "spike").indexOf(D.assume.spikeStocks) >= 0, "each step lists its notes, one idea per line; the combined count and the stocks caveat among them");
+// every element of the page, the no-JS block and the practice set included (W6 finding: they were left out); the
+// approved excerpt and its two approved lines are word for word and checked above
+const PROSE = OWN.replace(/<div class="lx-card lx-sources">[\s\S]*?<\/div>/, " ").replace(/<blockquote[\s\S]*?<\/blockquote>/, " ").replace(/<ul class="lx-hint a21-holds">[\s\S]*?<\/ul>/, " ").replace(/^---[\s\S]*?\n---\n/, " ")
   .replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<!--[\s\S]*?-->/g, " ").replace(/^- (.*)$/gm, "<li>$1</li>");
 PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).filter(x => /[A-Za-z]/.test(x) && !/^[:{]/.test(x)).forEach(x => {
   const n = nWords(x); ok(n <= 38, "text element of " + n + " words: " + x.slice(0, 70)); ok(nSent(x) <= 2, "text element of " + nSent(x) + " sentences: " + x.slice(0, 70)); });
@@ -168,6 +200,18 @@ PROSE.split(/<\/?(?:p|li|dd|dt|td|th|summary|br|caption)\b[^>]*>/).map(plain).fi
 ok(/aria-live/.test(JS) && /LX\.store\.(get|set)\("a21"/.test(JS), "live regions; levers persist in this browser");
 ok((JS.match(/LX\.demo\(/g) || []).length === 1 && (JS.match(/demo\[\d\] = function/g) || []).length === 10, "a demo hook for each of the ten steps");
 ok(/id: hhi\b/.test(SIDE) && /\[\[hhi\||term="hhi"/.test(JS + PAGE), "the sidecar defines and the page marks hhi");
+["gdp", "petajoule"].forEach(id => ok(new RegExp("id: " + id + "\\b").test(SIDE) && new RegExp("\\[\\[" + id + "\\|").test(JS), "the sidecar defines and the page marks " + id));
+["lng", "primary-energy", "substitution-method", "job-year", "transfer-payment", "shadow-price"].forEach(id => ok(new RegExp("\\[\\[" + id + "\\||term=\"" + id + "\"").test(JS + PAGE), "the page marks " + id + " (W6 finding: terms at first use)"));
+
+// ---------------- W6 review fixes, one check each
+{ const sp = M.spikeSaw(PL, 0), my = M.myths(PL, D);
+  ok(!/do not help|only using less gas helps/.test(sp + my + JS) && /cushions? .*while it lasts/.test(my) && /stored gas can cushion purchases while it lasts/.test(D.assume.spikeStocks) && D.sort.items.find(x => x.key === "stocks").ref.spike === "partly", "stocks against a price spike: partly, in the step, the myth and the sort alike");
+  ok(/supply groups/.test(M.hhiSaw(PL, D, 90)) && /upper bound/.test(M.hhiSaw(PL, D, 90)) && /upper bound/.test(PAGE) && !/four refiners/.test(PAGE + JS), "the four suppliers are supply groups; the HHI shown is an upper bound");
+  ok(PL.imports.minerals.hhiMethod.indexOf(M.fmtN(D.thresholds.hhiHigh)) >= 0 && /2023/.test(PL.imports.minerals.hhiMethod), "the shared data's HHI reading is the 2023 guidelines' " + M.fmtN(D.thresholds.hhiHigh) + ", as the page says");
+  const si = M.straitInputs(PL); ok(si.length === 3 && si[0][1] === M.fmtN(I.oil.importPJ) && si[1][1] === M.fmtN(I.lng.importPJ) && si[2][1] === M.fmtN(M.dependence(PL).primary) && /straitInputs\(PL\)/.test(JS), "step 3 shows the inputs its question needs");
+  ok(/function paintExplain\(\)/.test(JS) && /setTimeout\(paintExplain/.test(JS) && /ban\(PL, S\)/.test(JS) && /with your levers/.test(JS) && /with 2025's settings/.test(JS), "the explain layer is drawn from the reader's levers and says whose numbers they are");
+  ok(/IEA report of 2025 \(latest year available for each mineral; years vary\)/.test(M.facts(PL, D)) && !/Leading refiner of strategic minerals, 2025</.test(M.facts(PL, D)), "the IEA minerals figure is labelled by its report year, its observation years varying");
+  ok(!/its dual value prices/.test(PAGE) && /not the value of security/.test(PAGE), "a shadow price is a modelled cost change, not the value of security"); }
 // import-dependence: one definition for the course, in F10's sidecar since the W6 integration (F10 teaches it first)
 const F10SIDE = fs.readFileSync(path.join(SITE, "learn/_w1/f10-nations-differ.yml"), "utf8");
 ok(/id: import-dependence\b/.test(F10SIDE) && !/id: import-dependence\b/.test(SIDE) && /\[\[import-dependence\||term="import-dependence"/.test(JS + PAGE), "F10's sidecar defines import-dependence (one definition); the page marks it");
