@@ -12,7 +12,7 @@ body-classes: "page-inner page-folio page-teaching"
      Instruction (course card), teaching assistant roles (two cards), mentoring (timeline, from the CV's Mentoring
      Experience) and planned teaching materials (tiles). -->
 
-<!-- website v2 (2026-11-02): "How I teach" condenses Henry's teaching statement; "Interactive explainers" links the six
+<!-- website v2 (2026-11-02): "How I teach" condenses Henry's teaching statement (rewritten in a plainer voice 2026-11-07, at Henry's request); "Interactive explainers" links the six
      mechanism explainers on the project pages (assets/explainers/), which double as teaching material. -->
 
 ::: {.fx-sec .tc-first .teach-approach}
@@ -23,32 +23,32 @@ body-classes: "page-inner page-folio page-teaching"
 ::: {.vignette}
 [<i class="bi bi-chat-square-quote" aria-hidden="true"></i>]{.vg-icon}
 
-During office hours for Numerical Methods, students brought Python code for Newton's method on the Colebrook pipe-friction equation that returned NaN. The code was correct: their initial guess had sent the method outside the equation's domain, which a plot of the function and the iterates made obvious. They could run the method but could not yet explain when it would fail. That gap shapes how I teach.
+In office hours for Numerical Methods at UT Dallas, a few students showed me Python code for the Colebrook pipe-friction equation. After two Newton steps it returned NaN, and they were hunting for a bug. There wasn't one. I asked them to plot the function and mark each step by hand, and the picture told the story: their starting guess had pushed the method to a negative friction factor, where the equation means nothing. They knew how to run Newton's method. They did not yet know when it would fail. Much of my teaching is about closing that gap.
 :::
 
 ::: {.principles}
 ::: {.principle}
 [1]{.pr-num}
 
-[Concepts in context]{.pr-title}
+[Say it in words first]{.pr-title}
 
-Before solving a model, students state its assumptions in words, predict how a change will move the result, and then test the prediction.
+Before solving a model, students put each assumption into plain words and guess how a change will move the answer, then test the guess. "The machine runs eight hours a day" comes before the algebra, and the next question is what one more hour is worth.
 :::
 
 ::: {.principle}
 [2]{.pr-num}
 
-[From guided practice to independent work]{.pr-title}
+[A little less help each time]{.pr-title}
 
-I teach the foundations explicitly, work an example, then ask for a related problem with less support, until students can adapt a model and defend its assumptions.
+I explain an idea, work one example together, then hand over a similar problem with less support. Students in my research projects follow the same path: use a worked model, adapt it to a new case, then defend their own assumptions.
 :::
 
 ::: {.principle}
 [3]{.pr-num}
 
-[Understanding over answers]{.pr-title}
+[The reasoning, not only the answer]{.pr-title}
 
-When explanations are a click away, I assess formulation and interpretation as well as accuracy, and students explain their work and check any generated code.
+An AI tool can explain the Colebrook failure in seconds, but following an explanation is not the same as being able to use it. So I give credit for how a problem is set up and what the result means, and students who use generated code show how they checked it.
 :::
 :::
 :::
@@ -83,9 +83,9 @@ A course for high-school students, undergraduate and graduate students, and curi
 ::: {.lc-principles}
 [The three principles in the lessons]{.label}
 
-1. **Concepts in context:** predict first, then try it in a live model.
-2. **Guided to independent:** practice sets go from worked, to partly worked, to from scratch.
-3. **Understanding over answers:** learners formulate models and read what the solution means.
+1. **Say it in words first:** guess what will happen, then try it in a live model.
+2. **A little less help each time:** practice goes from worked, to partly worked, to from scratch.
+3. **The reasoning, not only the answer:** learners set up models and explain what the solution means.
 :::
 :::
 :::
