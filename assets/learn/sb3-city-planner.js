@@ -3,7 +3,8 @@
 //
 // The page: the brief (static), the bench (buildings, district heat, cars, local supply, the grid, assumptions; Run the
 // hub; readouts; the plan link), the results (what the run says, one district's day against its substation limit, what
-// 1 MW more room is worth from the LP's duals, the yearly cost, CO2, and the screening household table from the
+// 1 MW more room is worth from the LP's duals, the yearly cost, CO2, the full-year check (precomputed for the presets:
+// data/e3-full-year.json; a year of hours is too large to solve on a click), and the screening household table from the
 // accounting layer), then how the engine works (the hub diagram, LX.Boundary) and the sources. Every number the page
 // states comes from E3 and is checked by _tests/learn/test_sb3-city-planner.js (with the engine's test_e3-engine.js).
 // Prairie City is fictional; its numbers are illustrative.
@@ -51,7 +52,7 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, E3 = LX.E3, U = E3.ui;
   LX.mount("sb3", function (live, data, root) {
-    var P = E3.prepare(data.prairie_city, data.e3_city_hub), S = E3.sb3Schema(P.cfg), stub = null;
+    var P = E3.prepare(data.prairie_city, data.e3_city_hub), S = E3.sb3Schema(P.cfg), stub = null, FY = data.e3_full_year || null, FYc = data.prairie_city.fullYear;
     var rh = document.getElementById("sb3-results"), fb = rh.querySelector(".lx-fallback"); if (fb) fb.hidden = true;
     H("p", { class: "lx-hint e3-line", text: P.line }, live);
     var wrap = H("div", { class: "lx-sb e3-sb" }, live);
@@ -111,7 +112,10 @@
         ["Propane", kilo(co20.propane), kilo(co2.propane)], ["Cars' gasoline", kilo(co20.gasoline), kilo(co2.gasoline)], { cls: "e3-tot", cells: ["Total, the three districts", kilo(R.base.acc.co2Hub), kilo(R.acc.co2Hub)] }], "sb3-co2");
       U.keys(c3, [["Money", "2025 dollars: energy at Kansas's 2025 prices, equipment and upgrades as yearly payments at 4% real over their lives."],
         ["CO₂", "[[location-based|location-based]] and operating only: an annual average grid rate, not the hour's."],
-        ["The year", "eight representative days, weighted to 365: an estimate, not checked against a full year of hours."]]);
+        ["The year", "eight representative days, weighted to 365: an estimate. The full-year check below runs the presets on every hour of 2025."]]);
+      // the full-year check of the plan that ran (precomputed for the presets; none for other plans)
+      U.fullCard(res, E3.fullFind(FY, "sb3", S, R.state, LX.ShareState), FYc, P, { date: FY ? FY.date : "",
+        load: { label: "Load the default plan (checked)", go: function () { change(LX.ShareState.defaults(S)); run.run(plan); } } });
       var c4 = H("div", { class: "lx-xcard lx-sb-chart" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c4);
       U.hhTable(c4, R);   // with its assumptions beside it (E3.hhAssume): the rule, what households pay, what is left out
     }
@@ -123,7 +127,7 @@
       holds: ["eight representative days stand for 2025 (weights add to 365), with a cold design day and the summer peak day kept", "each district's substation is one ceiling on each hour's flow (a linearized feeder limit)",
         "batteries, the heat store and managed charging only shift energy within a day", "2025's prices, people and homes; costs fixed in 2025 dollars, whatever is built",
         "synthetic weather: NOAA's 1991–2020 normals for Wichita on SPP's 2025 days, with a cold design day and a heat wave set for teaching"],
-      leaves: ["a check against a full year of hours or another weather year: the annual numbers are representative-day estimates", "power flow inside a district: voltage and each feeder's own limit (A17)", "outages and cold snaps colder than the design day", "how fast the plan could be built, and who decides it", "how bills are really set: the household table is a screening estimate"],
+      leaves: ["a full year of hours for your own plan (the presets are checked) and any other weather year: the annual numbers are representative-day estimates", "power flow inside a district: voltage and each feeder's own limit (A17)", "outages and cold snaps colder than the design day", "how fast the plan could be built, and who decides it", "how bills are really set: the household table is a screening estimate"],
       source: "Prairie City is fictional; its numbers are illustrative. Prices: EIA, Kansas 2025; 2025 dollars." });
 
     // ---- the first run, once the bench is in view (the solver loads then: about 3.5 MB, once)

@@ -5,7 +5,8 @@
 // Steps: predict where the limit bites; the formulation (the hub, building shares as decisions, the balance, the
 // substation's ceiling); run 2025; electrify and read the substation duals; add flexibility; let the LP choose under a
 // CO2 cap and read the cap's dual; the screening household table from the accounting layer (not the LP); compare the
-// plans. Then the explain layer (the hub, the equation card, a comparison table) built from the reader's runs.
+// plans. Then the explain layer (the hub, the equation card, a comparison table) built from the reader's runs, and the
+// full-year check of the lesson's four plans (precomputed: data/e3-full-year.json; never solved on the page).
 // Every number comes from E3; _tests/learn/test_m12-city-model.js checks the words against the engine for each plan.
 // Prairie City is fictional; its numbers are illustrative.
 (function () {
@@ -51,14 +52,30 @@
     });
   }
   var RULES = { even: "Every group alike", low: "Lower incomes first", high: "Higher incomes first" };
-  var page = { PLANS: PLANS, CHOOSE: CHOOSE, RULES: RULES, words: words, chooseWords: chooseWords, compareRows: compareRows, upTotal: upTotal, kilo: kilo, mil: mil, signedMil: signedMil, pct1: pct1, pct0: pct0 };
+  // the full-year check of the lesson's four plans (2025 and electrify are the City Planner's presets; flexibility and the
+  // LP's choice are this lesson's own), one row each, and the gaps in words: what holds, what moves, the cap
+  var FULL = [["sb3", "today", "today"], ["sb3", "electrify", "electrify"], ["m12", "flex", "flex"], ["m12", "choose", null]];
+  function fullEntries(FY) { return FULL.map(function (f) { return FY ? FY.plans.filter(function (e) { return e.page === f[0] && e.id === f[1]; })[0] || null : null; }); }
+  function fullLabel(e, i) { return FULL[i][2] ? PLANS[FULL[i][2]].label : e.label; }
+  function fullKeys(FY, FYc, E3) {
+    var E = fullEntries(FY), worst = E.reduce(function (a, e) { return e.year.unserved > a.year.unserved ? e : a; }, E[0]), ch = E[3];
+    var why = E3.fullWhy(E[1], FYc, FY.date), pick = function (k) { return why.filter(function (x) { return x[0] === k; })[0]; };
+    return [["The check", "each plan as its eight days decided it (step 6's at the 80% cap), run on every hour of 2025 with the same model. Precomputed on " + FY.date + ": too large for a click."],
+      pick("What holds"), pick("Three cold days"),
+      ["The grid", "every plan that buys upgrades leaves load unserved on 19 or 20 February. Flexibility fills the design day up to its limits, so " + (worst === E[2] ? "the plan with managed charging and batteries" : lc(fullLabel(worst, E.indexOf(worst)))) + " misses most: " + kilo(worst.year.unserved) + " MWh."],
+      ["Step 6's cap", ch.year.co2 > ch.cap + 0.5 ? "on the year, the LP's choice is " + kilo(ch.year.co2 - ch.cap) + " t over the cap it was chosen under (" + pct2(ch.year.co2 / ch.cap - 1) + ")." : "on the year, the LP's choice stays within its cap."],
+      pick("Not tested")];
+  }
+  function lc(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+  function pct2(v) { return (v * 100).toFixed(2) + "%"; }
+  var page = { PLANS: PLANS, CHOOSE: CHOOSE, RULES: RULES, FULL: FULL, fullEntries: fullEntries, fullLabel: fullLabel, fullKeys: fullKeys, words: words, chooseWords: chooseWords, compareRows: compareRows, upTotal: upTotal, kilo: kilo, mil: mil, signedMil: signedMil, pct1: pct1, pct0: pct0 };
   if (typeof module !== "undefined" && module.exports) module.exports = page;
   if (typeof window === "undefined" || !window.LX || !window.LX.E3) return;
 
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, E3 = LX.E3, U = E3.ui;
   LX.mount("m12", function (live, data, root) {
-    var P = E3.prepare(data.prairie_city, data.e3_city_hub), S = E3.sb3Schema(P.cfg), DEF = E3.defaults(S);
+    var P = E3.prepare(data.prairie_city, data.e3_city_hub), S = E3.sb3Schema(P.cfg), DEF = E3.defaults(S), FY = data.e3_full_year || null, FYc = data.prairie_city.fullYear;
     var S0 = { runs: {}, choose: null, cap: CHOOSE.capDef, rule: "even", runners: {} }, stub = null;
     function planOf(id) { return Object.assign({}, DEF, PLANS[id].state); }
     function solver() { if (!stub) return null; stub = null; return function () { return Promise.resolve({ status: "error", ok: false, message: "solver stopped (demo)" }); }; }
@@ -232,6 +249,12 @@
           { key: "d", name: "Duals to read", run: { text: "substation room; balance" }, choose: { text: "the same, plus the CO₂ cap" } },
           { key: "hh", name: "Household table", run: { text: "accounting layer after the LP" }, choose: { text: "the same: never in the LP" } }],
         sorts: [{ label: "As listed", order: ["y", "eq", "d", "hh"] }] });
+      // the full-year check of the lesson's four plans (precomputed; the same for every reader)
+      var fc = H("div", { class: "lx-xcard lx-sb-chart e3-full" }, x); H("h3", { text: "Full-year check: the lesson's four plans on 8,760 hours" }, fc);
+      if (!FY) { H("p", { class: "lx-hint", text: "The full-year check did not load." }, fc); return; }
+      U.table(fc, ["Plan", "Yearly cost against 2025, no penalty on unserved energy: eight days → full year", "CO₂ gap", "Upgrades: eight days → sized on the year", "Unserved with the eight days' upgrades"],
+        fullEntries(FY).map(function (e, i) { return E3.fullPlanRow(e, fullLabel(e, i)); }), "e3-fullt");
+      U.keys(fc, fullKeys(FY, FYc, E3));
     }
     refreshExplain();
 

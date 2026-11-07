@@ -38,7 +38,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 
 ::: {#steps .lx-sec}
 ```{=html}
-<div class="lx-interactive lx-cards" data-learn="m12" data-src="../assets/learn/data/prairie-city.json ../assets/learn/data/e3-city-hub.json ../assets/learn/data/path.json">
+<div class="lx-interactive lx-cards" data-learn="m12" data-src="../assets/learn/data/prairie-city.json ../assets/learn/data/e3-city-hub.json ../assets/learn/data/e3-full-year.json ../assets/learn/data/path.json">
 <div class="lx-fallback">
 <p class="lx-eyebrow">The lesson in one table: Prairie City's districts, run as one linear program (2025 dollars, illustrative)</p>
 <!-- m12-static:start -->
@@ -50,7 +50,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <div class="lx-datanote m12-note"><svg class="lx-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></svg><ul>
 <li><b>Illustrative:</b> Prairie City, its three districts, one substation each and its household groups (prairie-city.json); retrofit, district-heat and upgrade costs are set for teaching, fixed here at their defaults (the inputs table lists them; the <a href="sb3-city-planner.html">City Planner</a> changes them).</li>
 <li><b>Based on public data:</b> Kansas's 2025 prices (EIA), Wichita's weather normals (NOAA), SPP's 2025 hourly shapes (EIA-930), eGRID's 2023 SPP North CO₂ rate (EPA), DOE LEAD's income bands; heat pumps and rooftop solar from EIA, batteries from NREL, 2025 dollars.</li>
-<li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept. Weather: NOAA's normals on SPP's 2025 days (synthetic).</li>
+<li><b>Time:</b> eight representative days of 2025, weighted to 365 days; a cold design day and the summer peak day kept. Weather: NOAA's normals on SPP's 2025 days (synthetic). The full-year check, below the steps, runs the four plans on every hour of 2025.</li>
 <li><b>Solver:</b> <a href="https://ergo-code.github.io/HiGHS/dev/">HiGHS</a> (open source), loaded on your first run (about 3.5 MB, once).</li>
 </ul></div>
 <div class="lx-card lx-notebook m12-nb">
@@ -100,7 +100,11 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <dt>The substation's ceiling</dt><dd>Each hour's purchase stays under the limit plus any upgrade; its dual is the value of one more MW of room in that hour.</dd>
 <dt>The cap's dual</dt><dd>When the LP chooses under a CO₂ cap, the cap's dual is the cost of the last tonne cut, under this model's assumptions.</dd>
 <dt>Kept apart</dt><dd>Bills and energy burden by household group come from an accounting layer after the LP, with a stated rule for who adopts first.</dd>
+<dt>The full-year check</dt><dd>The four plans, run again on every hour of 2025 with what the eight days decided kept: cost and CO₂ hold; the upgrades the eight days buy fall a little short on 19 or 20 February.</dd>
 </dl>
+<!-- m12-full:start -->
+<div class="lx-scroll-x"><table class="lx-facts e3-fullt"><thead><tr><th scope="col">Full-year check: plan</th><th scope="col">Yearly cost against 2025, no penalty on unserved energy: eight days → full year</th><th scope="col">CO₂ gap</th><th scope="col">Upgrades: eight days → sized on the year</th><th scope="col">Unserved with the eight days' upgrades</th></tr></thead><tbody><tr><td>2025 as it is</td><td class="n">$0.0M → $0.0M</td><td class="n">+0.01%</td><td class="n">0 → 0 MW</td><td class="n">none</td></tr><tr><td>Electrify heat and cars</td><td class="n">−$65.8M → −$65.8M</td><td class="n">+0.03%</td><td class="n">91 → 100 MW</td><td class="n">26 MWh</td></tr><tr><td>Electrify, managed charging, 40 MW of batteries</td><td class="n">−$60.5M → −$60.4M</td><td class="n">+0.02%</td><td class="n">48 → 55 MW</td><td class="n">161 MWh</td></tr><tr><td>The LP's choice, CO₂ ≤ 80% of 2025</td><td class="n">−$86.2M → −$86.2M</td><td class="n">+0.01%</td><td class="n">5 → 5 MW</td><td class="n">3 MWh</td></tr></tbody></table></div><p class="lx-hint">Precomputed with HiGHS on 7 November 2026: each plan run again on all 8,760 hours of 2025, with what its eight days decided kept. On the year, step 6's plan is 184 t over the CO₂ cap it was chosen under.</p>
+<!-- m12-full:end -->
 </div>
 </div>
 ```
@@ -174,7 +178,8 @@ When the LP chooses (step 6): $\sum_{e,s} y_{d,e,s} = 1$, furnaces and resistanc
 <div class="lx-deeper-body">
 <ul class="m12-rules">
 <li>One ceiling per substation stands for a whole distribution network; real planning checks each feeder's power flow and voltage (<a href="a17-physical-feasibility.html">A17</a>).</li>
-<li>Storage resets every representative day: no carrying heat or charge between days, and no full-year check here.</li>
+<li>Storage resets every day, on the eight days and in the full-year check: no carrying heat or charge between days.</li>
+<li>The full-year check uses the same synthetic weather rule: it tests the choice of days, not another weather year.</li>
 <li>Many plans cost nearly the same; methods that map near-optimal plans show the choice is wider than one optimum.</li>
 </ul>
 </div>

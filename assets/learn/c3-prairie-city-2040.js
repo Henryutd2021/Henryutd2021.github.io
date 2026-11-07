@@ -3,7 +3,8 @@
 //
 // The page: the brief (static), the plan (E3's C3 schema: buildings, district heat, cars, the industrial park, local
 // supply, the grid, assumptions; the solar farm's site; Run the 2040 plan; the plan link), the results (against the
-// $1,500M budget, cost and CO2 against 2025 for the whole city, the substations, the screening household table, jobs,
+// $1,500M budget, cost and CO2 against 2025 for the whole city, the substations, the full-year check (precomputed for
+// the presets and the reference plan: data/e3-full-year.json; never solved on the page), the screening household table, jobs,
 // the stakeholder panel, the sensitivity chart and table: one input at a time, then all together), the answer boxes (one
 // per stakeholder) and the two-page plan summary (LX.ReportNote), the self-check (LX.Exemplars,
 // LX.Rubric) and the sources. Every number comes from E3 and is checked by _tests/learn/test_c3-prairie-city-2040.js.
@@ -178,7 +179,8 @@
   function exemplars(x) {
     // x: { upfront, budget, dCost, co2, cut, up, worst, burden0, burden, altBurden, objectors: [keys], contractT, dPark,
     //      dParkShare, site: { id, connectUSD, km, sub, acres, cf }, jobs: { jobYears, jobYearsNet, permDirect, permGross, permNet, mw },
-    //      sens: { cheap, dear, top: { label, loText, hiText } } } from a run of REF_PLAN
+    //      sens: { cheap, dear, top: { label, loText, hiText } }, full: { extra, days } } from a run of REF_PLAN (full: its
+    //      full-year check, data/e3-full-year.json: the MW of upgrade the year needs beyond the eight days', on which days)
     var obj = x.objectors.map(function (k) { return ANSWER[k](x); });
     return { title: "Two summaries of the same brief", task: "Recommend Prairie City's 2040 energy plan within the budget, and say who gains and who pays.", id: "c3-ex", lines: true,
       answers: [
@@ -194,10 +196,16 @@
           "Site: ", { text: "site " + x.site.id + ", the best of A19's five blocks and the cheapest to connect (" + mil(x.site.connectUSD) + "), at a " + (x.site.cf * 100).toFixed(1) + "% capacity factor", note: "The site's choice with its evidence from the map." }, ".\n",
           "Sensitivity: ", { text: "the yearly cost runs from " + mil(x.sens.cheap) + " to " + mil(x.sens.dear) + " with every input at its lower- or higher-cost end; " + lc1(x.sens.top.label) + " moves it most, " + x.sens.top.loText + " to " + x.sens.top.hiText + "; every tested input is set for teaching", note: "A range, the input that matters most, and what kind of number each input is." }, ".\n",
           "Panel: ", { text: obj.length ? "to " + obj.join("; to ") : "no stakeholder objects", note: "Each objection answered with a reason or a change, from the run's own numbers." }, ".\n",
-          "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather, the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, so the council does not over-read it." }, "."] }],
+          "Limits: ", { text: "2025's people and prices held to 2040, one substation per district, eight representative days of synthetic weather" + (x.full ? " (on all 8,760 hours the upgrades fall " + x.full.extra.toFixed(1) + " MW short, on " + x.full.days + ")" : "") + ", the household rule an assumption, the map's layers simulated", note: "What the plan leaves out, and what the full-year check found, so the council does not over-read it." }, "."] }],
       note: "Both summaries are illustrative. The strong one quotes this engine's numbers for one reference plan within the budget, precomputed; another plan is just as strong when its evidence supports it." };
   }
-  var page = { REF_PLAN: REF_PLAN, ANSWER: ANSWER, exemplars: exemplars, siteModel: siteModel, siteInfo: siteInfo, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost,
+  // the summary's sentence for a plan with a full-year check: the eight days, then what the year found (as short as the
+  // general sentence it replaces)
+  function fullAssume(e) {
+    var extra = e.year.dist.reduce(function (t, d, i) { return t + d.upg - e.days.dist[i].upg; }, 0);
+    return "Eight days stand for the year; on all 8,760 hours its upgrades " + (e.year.unserved >= 0.5 ? "fall " + extra.toFixed(1) + " MW short." : "hold.");
+  }
+  var page = { REF_PLAN: REF_PLAN, ANSWER: ANSWER, exemplars: exemplars, fullAssume: fullAssume, siteModel: siteModel, siteInfo: siteInfo, kilo: kilo, mil: mil, smil: smil, pct1: pct1, pct0: pct0, upTotal: upTotal, budget: budget, co2Cut: co2Cut, PANEL: PANEL, panel: panel, parkCost: parkCost,
     SENS: SENS, lc1: lc1, sensRange: sensRange, gasP: gasP, runSens: runSens, sensWords: sensWords, sensRows: sensRows, biggest: biggest,
     GROUPS: [{ title: "Buildings", fields: ["hp", "ret"], color: "var(--lx-cc)", hint: "Heat pumps' [[coefficient-of-performance|COP]] falls on cold nights; retrofits cut the heat buildings need." },
       { title: "District heat (dense core)", fields: ["dh", "dhp", "sto"], color: "var(--lx-tier-4)", hint: "A hot-water network: a large heat pump, a heat store, and a gas boiler for the rest, assumed to exist already (its fuel counts, not its construction)." },
@@ -240,7 +248,7 @@
   // ---------------------------------------------------------------- view
   var LX = window.LX, H = LX.H, E3 = LX.E3, U = E3.ui;
   LX.mount("c3", function (live, data, root) {
-    var P = E3.prepare(data.prairie_city, data.e3_city_hub), cfg = P.cfg, S = E3.c3Schema(cfg), stub = null, last = null, sens = null;
+    var P = E3.prepare(data.prairie_city, data.e3_city_hub), cfg = P.cfg, S = E3.c3Schema(cfg), stub = null, last = null, sens = null, FY = data.e3_full_year || null, FYc = data.prairie_city.fullYear;
     var rh = document.getElementById("c3-results"), fb = rh.querySelector(".lx-fallback"); if (fb) fb.hidden = true;
     H("p", { class: "lx-hint e3-line", text: P.line }, live);
     var wrap = H("div", { class: "lx-sb e3-sb" }, live);
@@ -267,12 +275,12 @@
         var k = SM.top.map(function (t) { return t.id; }).indexOf(p.site), co = SM.costs[k];
         map.draw({ layer: "suit", suit: SM.suit, X: SM.X, sites: SM.top, sel: p.site, path: co && co.route ? co.route.cells : null, sitesKey: "Five best solar blocks, A best" });
         tb.innerHTML = "";
-        U.table(tb, ["Site", "Where", "Line to", "Up front: line, road, land", "Capacity factor"], SM.top.map(function (t) {
+        U.table(tb, ["Site", "Where", "Line to", "Up front: line, road, land", "Capacity factor (a full year)"], SM.top.map(function (t) {
           var x = page.siteInfo(SM, t.id, Math.max(p.farm, 10));
           return [t.id + (t.id === p.site ? " (yours)" : ""), x.where + " of the centre", x.sub + ", " + x.km.toFixed(1) + " km", mil(x.connectUSD), (x.cf * 100).toFixed(1) + "%"];
         }), "c3-sitetbl");
         U.keys(tb, [["Up front", "for a " + kilo(Math.max(p.farm, 10)) + " MW farm, 2025 dollars: the land in proportion to the MW, the line and road as A19 costs them for its block. The panels are in the solar-farm cost."],
-          ["Capacity factor", "the site's yearly output over what it would make at full power all year ([[capacity-factor|capacity factor]])."]]);
+          ["Capacity factor", "the site's yearly output over what it would make at full power all year ([[capacity-factor|capacity factor]]). The eight representative days carry more sun than the year: see the full-year check."]]);
       }
       paint(plan);
       return { set: function (p) { sg.set(p.site); paint(p); }, info: function (id, mw) { return page.siteInfo(SM, id, mw); } };
@@ -314,6 +322,10 @@
       dv.set(R, { d: best, k: R.dist[best].at.k });
       U.table(c2, ["District", "Busiest hour", "Limit", "Upgrade", "1 MW more room saves a year (LP dual)"], R.dist.map(function (d) { return [d.label, kilo(d.peak) + " MW", kilo(d.limit) + " MW", kilo(d.upg) + " MW", d.value == null ? "–" : "$" + kilo(d.value)]; }), "c3-sub");
       U.keys(c2, [["LP dual", "the substation row's [[shadow-price|dual]], summed over the year: what one more MW of room would save, under this plan's assumptions."]]);
+      // the full-year check of the plan that ran (precomputed for the presets and the reference plan; none for others)
+      U.fullCard(res, E3.fullFind(FY, "c3", S, R.state, LX.ShareState), FYc, P, { date: FY ? FY.date : "",
+        none: "It is precomputed for the presets and the exemplars' reference plan, with every other setting at its default: a year of hours is too large to solve on a click.",
+        load: { label: "Load the reference plan (checked)", go: function () { change(Object.assign(LX.ShareState.defaults(S), page.REF_PLAN)); run.run(plan); } } });
       var c3 = H("div", { class: "lx-xcard" }, res); H("h3", { text: "Who pays: a screening estimate by household group" }, c3);
       // HOOK(A13), wired: the table is E3.households, whose money and burden are LX.A13.allocate
       U.hhTable(c3, R);
@@ -388,6 +400,10 @@
         // the stakeholder table: each one's reaction, objection and the reader's answer (from the answer boxes above the
         // summary) in the results
         n.results = n.results.concat(page.panelRows(panel(R, P), answers, LX.Stakeholders.WORD));
+        // a plan with a full-year check says what it found, in place of the general sentence on the eight days (the two
+        // pages have no room for more)
+        var fe = E3.fullFind(FY, "c3", S, last.state, LX.ShareState);
+        if (fe) n.assumptions = n.assumptions.map(function (t) { return /^Eight representative days/.test(t) ? page.fullAssume(fe) : t; });
         var jb = page.jobs(R, window.LX.A13, data.a13_fairness_jobs && data.a13_fairness_jobs.jobs);
         if (jb) { n.results.push({ label: "Jobs (screening)", value: kilo(jb.jobYears) + " construction job-years gross, " + kilo(jb.jobYearsNet) + " net; ongoing " + kilo(jb.permDirect) + " direct, " + kilo(jb.permGross) + " gross supported, " + kilo(jb.permNet) + " net", note: "lesson A13's coefficients" });
           n.assumptions.push(jb.assumeLine); }

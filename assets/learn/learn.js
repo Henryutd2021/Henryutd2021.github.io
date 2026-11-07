@@ -14311,6 +14311,8 @@
        { status, ok, kind: "lp", message, hint, results, ms }   never rejects; results = E3.summarize(...)
      E3.account(P, sys, raw), E3.households(P, sys, A, A0), E3.summarize(state, P, raw, base), E3.note(state, R, P, o),
      E3.hhAssume(R) (the household table's assumptions, one sentence each), E3.fuelMatrix(P),
+     E3.fullYear(state, P, PY, R8, { solver, base }) -> the full-year check of a plan on all 8,760 hours (Node and the
+       tests only); E3.fullView, fullFind, fullRows, fullWhy, fullPlanRow (its numbers and words) and E3.ui.fullCard
      E3.fallback(P, key), E3.inputsHTML(P, { c3, fixed }); formats money, mw, kilo, pct
    Node: module.exports = E3 (no DOM). In a page: LX.E3 and its view kit LX.E3.ui. */
 (function () {
@@ -14461,7 +14463,9 @@
       S.a.ely = yearly(ez.capex * 1000, ez.life, rate, ez.fomShare + ez.stackShare * 8760 / ez.stackHours);
       S.a.ihp = yearly(c.indHP.capex * 1000, c.indHP.life, rate);
       S.capex.wind = c.wind.capex * 1000; S.capex.farm = c.solarFarm.capex * 1000; S.capex.ely = ez.capex * 1000; S.capex.ihp = c.indHP.capex * 1000;
-      S.siteAdj = s.siteInfo || null;   // set by the page's siting hook: { connectUSD, cfK } (A19's map), else none
+      // set by the page's siting hook: { connectUSD, cfK } (A19's map), else none; only with a solar farm, so a plan without
+      // one (and 2025's baseline, which keeps the plan's other fields) carries no site's line, road or land
+      S.siteAdj = s.farm > 0 ? s.siteInfo || null : null;
       // the park's flat new loads (MW) and the gas they replace (MWh of gas a year)
       S.ihpHeatMW = S.ihp * P.out.lowHeat / 8760;
       S.ihpElMW = S.ihpHeatMW / c.indHP.cop;
@@ -14474,6 +14478,9 @@
   // o.size: the building shares and the sizes of rooftop solar, batteries, the network's plant and store become decisions
   //   (bounds in o: retMax, dhMax, pvMax, batMax, dhpMax, stoMax); o.cap: a CO2 cap (t a year) on the districts' hub
   // o.tie: multiplies the tie costs (the test's x10 and x0.1); o.limits: an override of the substation limits (MW)
+  // o.upFixed: each district's upgrade fixed (MW; the full-year check keeps the eight days' upgrades); o.unserved: $ per
+  //   MWh, a district-hour may then leave part of its load unserved at that penalty (the full-year check; never a reported
+  //   cost). Without them the model is exactly the eight days' run.
   function build(P, S, o) {
     o = o || {};
     var cfg = P.cfg, T = cfg.tie, tk = o.tie == null ? 1 : o.tie, K = P.K, V = [], C = [], size = !!o.size;
@@ -14517,7 +14524,7 @@
     var pvA = size ? v("pvAdd", 0, o.pvMax == null ? 400 : o.pvMax, S.a.pv) : null, batA = size ? v("batAdd", 0, o.batMax == null ? 200 : o.batMax, S.a.bat) : null;
     var dhOn = size ? (o.dhMax == null || o.dhMax > 0) : S.dh > 0;
     var dhpV = dhOn && size ? v("dhp", 0, o.dhpMax == null ? 250 : o.dhpMax, S.a.plant) : null, stoV = dhOn && size ? v("sto", 0, o.stoMax == null ? 2000 : o.stoMax, S.a.store) : null;
-    var upg = P.D.map(function (D, i) { return v("upg" + i, 0, S.up ? Infinity : 0, S.a.up); });
+    var upg = P.D.map(function (D, i) { var f = o.upFixed ? o.upFixed[i] : null; return f != null ? v("upg" + i, f, f, S.a.up) : v("upg" + i, 0, S.up ? Infinity : 0, S.a.up); });
     var pk = P.D.map(function (D, i) { return v("pk" + i, 0, Infinity, T.peak * tk); }), pkC = v("pkC", 0, Infinity, T.cityPeak * tk);
     var lim = o.limits || P.D.map(function (D) { return D.L; });
     var farmOn = S.c3 && (S.wind > 0 || S.farm > 0);
@@ -14576,6 +14583,7 @@
             [0, 1].forEach(function (e) { var q = (1 - S.save * e) * D.Q[k][h] / net / 100; if (q > 0) heat.push([Y[0][e].dh, -q]); });
             row("dh" + tag, heat, 0, 0);
           }
+          if (o.unserved != null) bal.push([v("u" + t, 0, Infinity, w * o.unserved), 1]);
           row("b" + t, bal, rhs, rhs);
           row("l" + t, [[imp, 1], [upg[i], -1]], null, lim[i]);
           row("p" + t, [[imp, 1], [pk[i], -1]], null, 0);
@@ -14598,7 +14606,7 @@
       var cst = hubFixedCO2(P, S);
       model.constraints.push({ name: "cap", terms: co2, ub: o.cap - cst });
     }
-    model.meta = { size: size, dhOn: dhOn, farmOn: farmOn };
+    model.meta = { size: size, dhOn: dhOn, farmOn: farmOn, unserved: o.unserved != null };
     return model;
   }
   // the park's flat electricity (MW): 2025's plants plus C3's heat pumps and electrolyzers
@@ -14625,7 +14633,7 @@
     for (var k = 0; k < K; k++) {
       var day = { d: [], dh: null, farm: null };
       P.D.forEach(function (D, i) {
-        var o = { imp: [], pv: [], pvAvail: [], heat: [], ev: [], bc: [], bd: [], bq: [], plant: [], base: D.B[k].slice(), lim: [], bal: [], tie: [] };
+        var o = { imp: [], pv: [], pvAvail: [], heat: [], ev: [], bc: [], bd: [], bq: [], plant: [], base: D.B[k].slice(), lim: [], bal: [], tie: [], un: [] };
         var pvMW = m.size ? D.pv0 + raw.sizes.pvAdd * P.pvShare[i] : S.d[i].pv;
         var E = S.d[i].E;
         for (var h = 0; h < 24; h++) {
@@ -14635,7 +14643,7 @@
           [0, 1].forEach(function (e) { var q = (1 - S.save * e) * D.Q[k][h]; he += q * (raw.y[i][e].res + raw.y[i][e].hp / P.cop[k][h]); });
           o.heat.push(he);
           o.ev.push(S.evm === "managed" ? val("v" + t) : E * P.evProfile[h]);
-          o.bc.push(val("bc" + t)); o.bd.push(val("bd" + t)); o.bq.push(val("bq" + t));
+          o.bc.push(val("bc" + t)); o.bd.push(val("bd" + t)); o.bq.push(val("bq" + t)); o.un.push(m.unserved ? val("u" + t) : 0);
           o.plant.push(i === 0 && m.dhOn ? val("dp" + k + "_" + h) / P.cfg.dh.plant.cop : 0);
           // duals (LP only): the substation row's value of 1 MW more room that hour ($ per MW, for the year: the day's
           // weight is in it), and the balance row's marginal cost per MWh in that hour
@@ -14684,6 +14692,9 @@
       o.heatEl = wsum(P, function (k, h) { return raw.days[k].d[i].heat[h]; });
       o.ev = S.d[i].E * 365;
       o.plant = wsum(P, function (k, h) { return raw.days[k].d[i].plant[h]; });
+      // what the batteries gave back, and the load left unserved (only the full-year check allows it), MWh a year
+      o.batOut = wsum(P, function (k, h) { return raw.days[k].d[i].bd[h]; });
+      o.unserved = wsum(P, function (k, h) { return raw.days[k].d[i].un[h]; });
       o.fuelHeat = 0; o.dhHeat = 0; o.share = {};
       SYS.forEach(function (k) { o.share[k] = y[0][k] + y[1][k]; });
       o.retShare = SYS.reduce(function (s, k) { return s + y[1][k]; }, 0);
@@ -14705,6 +14716,8 @@
     var boil = 0;
     if (raw.meta.dhOn) boil = wsum(P, function (k, h) { return raw.days[k].dh.boil[h]; }) / cfg.dh.plant.boilerEff;
     A.boilerGas = boil; M.boiler = boil * P.price.gasCom; Z.boiler = boil * P.ef.gas;
+    A.storeOut = raw.meta.dhOn ? wsum(P, function (k, h) { return raw.days[k].dh.so[h]; }) : 0;   // MWh of heat a year
+    A.batOut = sum(A.d.map(function (o) { return o.batOut; })); A.unserved = sum(A.d.map(function (o) { return o.unserved; }));
     A.dhHeat = A.d[0].dhHeat;
     M.plant = mz.dhp * S.a.plant; U.plant = mz.dhp * S.capex.plant;
     M.store = mz.sto * S.a.store; U.store = mz.sto * S.capex.store;
@@ -14924,12 +14937,19 @@
       // the busiest hour, its day, and the summed substation value (LP duals). Hours at the limit come from the slack
       // (the flow within 0.001 MW of the limit plus any upgrade), each representative hour counted for the days its day
       // stands for: hours a year (SB3 review finding 3). bindSlots: representative hours whose dual is positive.
-      var best = -1, at = null, val = 0, slots = 0, hrs = 0, top = o.limit + o.upg;
+      // need: the busiest hour of what the district asked of its substation (bought plus any load left unserved, which
+      // only the full-year check allows); unservedHours: hours with more than 0.05 MW unserved (M3's threshold)
+      var best = -1, at = null, val = 0, slots = 0, hrs = 0, top = o.limit + o.upg, need = -1, nat = null, uh = 0, um = 0;
       raw.days.forEach(function (d, k) { d.d[i].imp.forEach(function (v, h) {
+        var u = d.d[i].un[h];
         if (v > best + 1e-9) { best = v; at = { k: k, h: h }; }
+        if (v + u > need + 1e-9) { need = v + u; nat = { k: k, h: h }; }
         if (v >= top - 1e-3) hrs += P.w[k];
+        if (u > 0.05) uh += P.w[k];
+        if (u > um) um = u;
         if (d.d[i].lim[h] != null) { val += d.d[i].lim[h]; if (d.d[i].lim[h] > 1e-6) slots++; } }); });
-      return { key: o.key, label: o.label, peak: o.peak, at: at, limit: o.limit, upg: o.upg, value: raw.days[0].d[i].lim[0] == null ? null : val, bindHours: hrs, bindSlots: slots, imp: o.imp, share: o.share };
+      return { key: o.key, label: o.label, peak: o.peak, at: at, limit: o.limit, upg: o.upg, value: raw.days[0].d[i].lim[0] == null ? null : val, bindHours: hrs, bindSlots: slots, imp: o.imp, share: o.share,
+        need: need, needAt: nat, unserved: o.unserved, unservedHours: uh, unservedMax: um };
     });
     R.money = A.money; R.co2 = A.co2;
     return R;
@@ -14976,6 +14996,142 @@
       });
     }).then(null, function (e) { return { status: "error", ok: false, kind: "lp", message: "The run failed: " + (e && e.message || e), ms: Date.now() - t0 }; });
   }
+  // ---------------------------------------------------------------- the full-year check (Node and the tests only)
+  // A plan run on the eight days, re-run on all 8,760 hours of 2025 (PY: E3.prepare of prairie-city.json with its days
+  // replaced by the 365 days of fullYear's rule; the tests build it, _tests/learn/e3_harness.js yearCity). The same LP
+  // and the same constraints (storage and managed charging within each day, the tie rule), with what the eight days
+  // decided kept: the building shares and sizes (fixedSys, for a plan the LP sized), and each district's upgrade
+  // (upFixed). Load the substation cannot carry is left unserved at a penalty (cfg.fullYear.unservedPerMWh), never in a
+  // reported cost. The 2025 plan is re-run the same way, so each change against 2025 is like for like. One LP of 80,000
+  // to 240,000 columns for the year (a second one re-buys the upgrades): too slow for a click; the results are
+  // precomputed (data/e3-full-year.json, rebuilt by _tests/learn/test_e3-full-year.js --write).
+  function fixedSys(state, P, raw) {
+    var S = sysOf(state, P), z = raw.sizes;
+    S.pvAdd = z.pvAdd; S.batAdd = z.batAdd; S.dhp = z.dhp; S.sto = z.sto;
+    S.dh = raw.y[0][0].dh + raw.y[0][1].dh;
+    S.d.forEach(function (sd, i) {
+      sd.y = [0, 1].map(function (e) { var q = {}; SYS.forEach(function (k) { q[k] = raw.y[i][e][k]; }); return q; });
+      sd.pvAdd = z.pvAdd * P.pvShare[i]; sd.pv = P.D[i].pv0 + sd.pvAdd; sd.bat = z.batAdd * P.batShare[i];
+    });
+    S.fixed = true;
+    return S;
+  }
+  // fullYear(state, P, PY, R8, o): R8 the eight days' results (E3.solve's results, or summarize's); o: { solver, timeLimit,
+  // base } (base: the year's 2025 run from an earlier call, reused). Never rejects.
+  function fullYear(state, P, PY, R8, o) {
+    o = o || {};
+    var sol = o.solver, pen = PY.cfg.fullYear.unservedPerMWh;
+    function run(st, raw8) {
+      var S = raw8.meta && raw8.meta.size ? fixedSys(st, PY, raw8) : sysOf(st, PY);
+      var m = build(PY, S, { upFixed: raw8.upg, unserved: pen });
+      return Promise.resolve(sol(m, { timeLimit: o.timeLimit || 600 })).then(function (r) {
+        if (r.status !== "optimal") return { fail: r };
+        return { raw: read(PY, S, m, r), S: S, model: { cols: m.variables.length, rows: m.constraints.length } };
+      });
+    }
+    var bp = o.base ? Promise.resolve(o.base) : run(baseState(state), R8.base.raw).then(function (x) { return x.fail ? x : { raw: x.raw, acc: account(PY, x.S, x.raw), model: x.model }; });
+    // the same plan with its upgrades bought on the year instead (when the plan allows upgrades): what the year would buy,
+    // and each district's busiest hour then (pk: with flexible loads the least busiest hour the year allows)
+    function rebuy(st, raw8) {
+      var S = raw8.meta && raw8.meta.size ? fixedSys(st, PY, raw8) : sysOf(st, PY);
+      if (!S.up) return Promise.resolve(null);
+      var m = build(PY, S, {});
+      return Promise.resolve(sol(m, { timeLimit: o.timeLimit || 600 })).then(function (r) {
+        if (r.status !== "optimal") return { fail: r };
+        var raw = read(PY, S, m, r), A = account(PY, S, raw);
+        return { upg: raw.upg, pk: raw.pk, total: S.c3 ? A.city.money : A.total };
+      });
+    }
+    return bp.then(function (b) {
+      if (b.fail) return { status: b.fail.status, ok: false, message: b.fail.message };
+      return run(state, R8.raw).then(function (x) {
+        if (x.fail) return { status: x.fail.status, ok: false, message: x.fail.message };
+        return rebuy(state, R8.raw).then(function (q) {
+          if (q && q.fail) return { status: q.fail.status, ok: false, message: q.fail.message };
+          return { status: "optimal", ok: true, results: summarize(state, PY, x.raw, b), base: b, rebuy: q, model: x.model };
+        });
+      });
+    }).then(null, function (e) { return { status: "error", ok: false, message: String(e && e.message || e) }; });
+  }
+  // one time set's numbers as the check shows them (rounded once, here: the data file stores this; its test compares
+  // fresh runs with it byte for byte). Money in $M (3 decimals), CO2 in t, MW to 0.001 (so a page's whole MW match the
+  // eight days' own tables), energy in MWh (a short day's and a district's to 0.1). Only numbers the LP
+  // fixes are kept: cost and CO2 of the plan as decided; each district's busiest hour and upgrade (on the year, from the
+  // re-buy run q: the upgrades the year would buy); unserved energy day by day (days do not share storage or charging, so
+  // each day's least unserved energy is unique; how it falls across a day's hours is not, so no hour is shown); the hour
+  // of the busiest hour only for a plan with no flexible load (otherwise several hours can tie at it).
+  function rnd(v, d) { var k = Math.pow(10, d == null ? 0 : d), x = Math.round(v * k) / k; return x === 0 ? 0 : x; }
+  function flexible(R) { var S = R.sys; return S.evm === "managed" || R.acc.d.some(function (o) { return o.bat > 0; }) || (R.raw.meta.dhOn && (R.raw.sizes.sto || 0) > 0); }
+  function fullView(R, P, q) {
+    var A = R.acc, c3 = R.sys.c3, bat = sum(A.d.map(function (o) { return o.bat; })), fx = flexible(R);
+    var when = function (at) { var d = P.days[at.k]; return { day: P.K === 365 ? d.date : d.key, h: at.h }; };
+    var short = [];
+    R.raw.days.forEach(function (d, k) { var u = 0; d.d.forEach(function (x) { u += sum(x.un); }); if (u * P.w[k] > 0.05) short.push({ day: P.days[k].date, mwh: rnd(u * P.w[k], 1) }); });
+    return { cost: rnd((c3 ? A.city.money : A.total) / 1e6, 3), dCost: rnd((c3 ? R.delta.cityCost : R.delta.cost) / 1e6, 3),
+      co2: rnd(c3 ? A.city.co2 : A.co2Hub), dCo2: rnd(c3 ? R.delta.city : R.delta.co2), flexible: fx,
+      dist: R.dist.map(function (d, i) { return { key: d.key, peak: rnd(q ? q.pk[i] : d.peak, 3), limit: d.limit, upg: rnd(q ? q.upg[i] : d.upg, 3), at: fx ? null : when(d.needAt), unserved: rnd(d.unserved, 1) }; }),
+      unserved: rnd(A.unserved), shortDays: short, batteryMW: rnd(bat, 1), batteryOut: rnd(A.batOut), storeMWh: rnd(R.raw.sizes.sto || 0), storeOut: rnd(A.storeOut),
+      contractGWh: c3 ? rnd(A.contract.mwh / 1000, 1) : null, rebuyCost: q ? rnd(q.total / 1e6, 3) : null };
+  }
+  // the words of the check (pure; the pages and their tests read them). FY: data/e3-full-year.json; FYc: prairie-city.json
+  // fullYear (the year's rule and sums); P: the eight days' prepared data (for the days' and districts' names)
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function fdate(iso) { return +iso.slice(8, 10) + " " + MON[+iso.slice(5, 7) - 1]; }
+  function andList(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+  function dateList(isos) { return andList(isos.map(fdate)); }
+  function sgn(v, f) { return (v > 0 ? "+" : v < 0 ? "−" : "") + f(Math.abs(v)); }
+  // the entry for a plan: its key is the plan link's, with the household table's two choices (who adopts first, how
+  // shared costs are recovered) at their defaults, since they never change the LP; SS: LX.ShareState (or its Node module)
+  function fullFind(FY, page, S, state, SS) {
+    if (!FY || !FY.plans || !state) return null;
+    var st = copy(state); delete st.siteInfo;
+    S.fields.forEach(function (f) { if (f.id === "rule" || f.id === "rec") st[f.id] = f.def; });
+    var k; try { k = SS.encode(S, st); } catch (e) { return null; }
+    var ok = page === "c3" ? ["c3"] : ["sb3", "m12"];
+    return FY.plans.filter(function (e) { return e.key === k && ok.indexOf(e.page) >= 0; })[0] || null;
+  }
+  function fullById(FY, page, id) { return FY && FY.plans ? FY.plans.filter(function (e) { return e.page === page && e.id === id; })[0] || null : null; }
+  // the card's rows: [what, eight days, full year, gap]
+  function fullRows(e, P) {
+    var D = e.days, Y = e.year, c3 = e.page === "c3";
+    var lab = function (key) { var d = P.days.filter(function (x) { return x.key === key; })[0]; return d ? d.label.toLowerCase() : key; };
+    var grid = function (d, yr) { return kilo(d.peak) + " MW, " + (d.upg >= 0.5 ? kilo(d.upg) + " MW over its " + kilo(d.limit) + " MW limit" : "within its " + kilo(d.limit) + " MW limit") + (d.at ? " (" + (yr ? fdate(d.at.day) : lab(d.at.day)) + ", " + hh(d.at.h) + ")" : ""); };
+    var dmw = function (v) { return Math.abs(v) < 0.5 ? "same" : sgn(Math.round(v), function (x) { return kilo(x) + " MW"; }); };
+    var rows = [[(c3 ? "The city's yearly cost against 2025" : "Yearly cost against 2025") + " (no penalty on unserved energy)", millions(D.dCost * 1e6), millions(Y.dCost * 1e6), Math.abs(Y.dCost - D.dCost) < 0.05 ? "under $0.1M" : sgn(Y.dCost - D.dCost, function (x) { return millions(x * 1e6); })],
+      [c3 ? "The city's CO₂ a year" : "The districts' CO₂ a year", kilo(D.co2) + " t", kilo(Y.co2) + " t", sgn(Y.co2 / D.co2 - 1, function (x) { return pct(x, 2); })]];
+    if (e.cap != null) rows.push(["Against the CO₂ cap, " + kilo(e.cap) + " t", D.co2 <= e.cap + 0.5 ? "within" : kilo(D.co2 - e.cap) + " t over", Y.co2 <= e.cap + 0.5 ? "within" : kilo(Y.co2 - e.cap) + " t over", ""]);
+    D.dist.forEach(function (d, i) { rows.push([P.D[i].label + ": busiest hour, and the upgrade it needs", grid(d, false), grid(Y.dist[i], true), dmw(Y.dist[i].peak - d.peak)]); });
+    rows.push(["Unserved, with only the eight days' upgrades", "none (sized on these days)", Y.unserved < 0.5 ? "none" : kilo(Y.unserved) + " MWh on " + dateList(Y.shortDays.map(function (x) { return x.day; })), ""]);
+    if (D.batteryMW > 0) rows.push(["Batteries: MWh out a year", kilo(D.batteryOut), kilo(Y.batteryOut), sgn(Math.round(Y.batteryOut - D.batteryOut), kilo)]);
+    if (D.storeMWh > 0) rows.push(["Heat store: MWh of heat out a year", D.storeOut < 0.5 ? "not used" : kilo(D.storeOut), Y.storeOut < 0.5 ? "not used" : kilo(Y.storeOut), Math.max(D.storeOut, Y.storeOut) < 0.5 ? "" : sgn(Math.round(Y.storeOut - D.storeOut), kilo)]);
+    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) rows.push(["Contract wind and solar the city used", kilo(D.contractGWh) + " GWh", kilo(Y.contractGWh) + " GWh", sgn(Y.contractGWh / D.contractGWh - 1, function (x) { return pct(x, 1); })]);
+    return rows;
+  }
+  // the gaps in plain words, one idea a line: [[label, text]]
+  function fullWhy(e, FYc, date) {
+    var D = e.days, Y = e.year, out = [], c3 = e.page === "c3";
+    var gap = Math.max(Math.abs(Y.cost / D.cost - 1), Math.abs(Y.co2 / D.co2 - 1));
+    var extra = sum(Y.dist.map(function (y, i) { return y.upg - D.dist[i].upg; })), up = sum(D.dist.map(function (d) { return d.upg; }));
+    var most = Math.max.apply(null, Y.dist.map(function (y, i) { return y.peak - D.dist[i].peak; }));
+    var ua = 1 - FYc.degreeHoursDays / FYc.degreeHours;   // the year's heat-loss rate against the eight days' (same heat need)
+    out.push(["The check", "the plan as the eight days decided it (shares, sizes, substation upgrades), run on every hour of 2025 with the same model. Precomputed on " + date + ": too large for a click."]);
+    out.push(["Two runs", "cost, CO₂ and unserved energy keep the eight days' upgrades; the busiest hours and upgrades come from a second run with the upgrades sized on the year."]);
+    out.push(["What holds", "yearly cost and CO₂, within " + (gap < 0.001 ? "0.1%" : "about " + pct(gap, 1)) + ": like the days, the year is scaled to the city's annual base and heat energy (its heat-loss rate " + pct(ua, 1) + " lower)."]);
+    var cost = extra * e.upYearly;
+    out.push(["Three cold days", "the design day stands for 3 days: in the year, " + dateList(FYc.designDays) + ", equally cold. Only their base load (SPP's demand) differs, and February's is higher in the hours that matter."]);
+    out.push(["The grid", Y.unserved >= 0.5 ? "the eight days' upgrades leave " + kilo(Y.unserved) + " MWh unserved on " + dateList(Y.shortDays.map(function (x) { return x.day; })) + " (load the model's substations cannot carry). Sized on the year, the plan buys " + (extra).toFixed(1) + " MW more, about " + (cost < 1e5 ? money(Math.round(cost / 1000) * 1000) : millions(cost)) + " a year."
+      : "every hour of the year stays within the limits" + (up >= 0.5 ? " and the eight days' upgrades" : "") + (most >= 0.5 ? "; the busiest hour is up to " + kilo(most) + " MW higher than on the eight days." : ".")]);
+    if (c3 && Math.max(D.contractGWh, Y.contractGWh) > 0) out.push(["Wind and sun", "the eight days are picked by their shapes, not scaled: " + pct(FYc.windCF.days, 1) + " wind and " + pct(FYc.solarCF.days, 1) + " solar capacity factors, against 2025's " + pct(FYc.windCF.year, 1) + " and " + pct(FYc.solarCF.year, 1) + ". Hence the contract row and the cost gap."]);
+    out.push(["Not tested", "another weather year, cold beyond the design day, or storage from one day to the next: the year uses the eight days' synthetic weather rule."]);
+    return out;
+  }
+  // one line per plan, for a page that compares plans (M12): [plan, cost against 2025, CO2 gap, upgrades, unserved]
+  function fullPlanRow(e, label) {
+    var D = e.days, Y = e.year, up = function (V) { return sum(V.dist.map(function (d) { return d.upg; })); };
+    return [label || e.label, millions(D.dCost * 1e6) + " → " + millions(Y.dCost * 1e6), sgn(Y.co2 / D.co2 - 1, function (x) { return pct(x, 2); }),
+      kilo(up(D)) + " → " + kilo(up(Y)) + " MW", Y.unserved < 0.5 ? "none" : kilo(Y.unserved) + " MWh"];
+  }
+
   // the 2025 plan the results are compared with: today's buildings, cars and solar, with the plan's own cost settings
   function baseState(state) {
     var b = copy(state);
@@ -15020,7 +15176,7 @@
   // contracts), then the household table's (hhAssume)
   function assumptions(state, R, P) {
     var c3 = R.sys.c3, out = ["Prairie City is fictional; its numbers are illustrative.", "2025 dollars, prices, people and homes; synthetic weather (NOAA's 1991-2020 normals on SPP's 2025 days).",
-      "Eight representative days stand for the year, the design and peak days kept; not checked against a full year of hours.",
+      "Eight representative days stand for the year, the design and peak days kept; full-year checks cover the presets.",
       "One substation per district (a teaching simplification), its limit a ceiling on each hour's flow.",
       "CO₂ location-based: eGRID's 2023 SPP North rate plus 5% losses; fuels at EIA's coefficients."];
     if (state.evm === "managed") out.push("Managed cars are plugged in at home or work when needed; a day's charge takes 6 hours or more.");
@@ -15077,7 +15233,7 @@
   function num(v) { return (v < 0 ? "−" : "") + Math.abs(v); }
 
   var E3 = { prepare: prepare, sb3Schema: sb3Schema, c3Schema: c3Schema, presets: presets, c3presets: c3presets, defaults: defaults, withPreset: withPreset,
-    sysOf: sysOf, build: build, read: read, account: account, households: households, spread: spread, settle: settle, a13: a13, summarize: summarize, solve: solve, baseState: baseState,
+    sysOf: sysOf, build: build, read: read, account: account, households: households, spread: spread, settle: settle, a13: a13, summarize: summarize, solve: solve, baseState: baseState, fixedSys: fixedSys, fullYear: fullYear, fullView: fullView, fullFind: fullFind, fullById: fullById, fullRows: fullRows, fullWhy: fullWhy, fullPlanRow: fullPlanRow, dateList: dateList,
     note: note, assumptions: assumptions, hhAssume: hhAssume, fuelMatrix: fuelMatrix, CLAMPED: CLAMPED, planRows: planRows, fallback: fallback, inputsHTML: inputsHTML, tableHTML: tableHTML, hubFixedCO2: hubFixedCO2, parkMW: parkMW,
     crf: crf, yearly: yearly, copAt: copAt, kilo: kilo, money: money, millions: millions, pct: pct, hh: hh, SYS: SYS, WORDS: WORDS };
   if (typeof module !== "undefined" && module.exports) module.exports = E3;
@@ -15247,7 +15403,21 @@
       '<figcaption>' + LX.rich(o.caption || "The [[energy-hub|energy hub]]: each hour, what comes in through the [[substation|substation]], the pipeline and the roofs must meet the heat, base and charging the district uses. The limit is a ceiling on each hour's flow (a [[linearized-feeder-limit|linearized feeder limit]]).") + "</figcaption>";
     return el;
   }
-  E3.ui = { controls: controls, seg: seg, stopper: stopper, table: table, readouts: readouts, DayView: DayView, valueRows: valueRows, costRows: costRows, costTable: costTable, hhTable: hhTable, keys: keys, hubDiagram: hubDiagram, fmtOf: fmtOf, copy: copy };
+  // the full-year check's card (SB3, M12, C3): the table and the gaps in words, or why there is none for this plan
+  function fullCard(host, e, FYc, P, o) {
+    o = o || {};
+    var c = H("div", { class: "lx-xcard lx-sb-chart e3-full" }, host);
+    H("h3", { text: o.title || "Full-year check: eight days against 8,760 hours" }, c);
+    if (!e) {
+      H("p", { class: "lx-hint", html: "<b>No full-year check for this plan.</b> " + esc(o.none || "It is precomputed for the presets, with every other setting at its default: a year of hours is too large to solve on a click.") }, c);
+      if (o.load) H("button", { class: "lx-btn ghost small", type: "button", text: o.load.label, onclick: o.load.go }, c);
+      return c;
+    }
+    table(c, ["", "Eight days", "Full year", "Gap"], fullRows(e, P), "e3-fullt");
+    keys(c, fullWhy(e, FYc, o.date || ""));
+    return c;
+  }
+  E3.ui = { fullCard: fullCard, controls: controls, seg: seg, stopper: stopper, table: table, readouts: readouts, DayView: DayView, valueRows: valueRows, costRows: costRows, costTable: costTable, hhTable: hhTable, keys: keys, hubDiagram: hubDiagram, fmtOf: fmtOf, copy: copy };
 })();
 
 /* engine-e4.js — LX.E4: engine E4 of Learn, Prairieland's pathway to 2050 (wave W6, builder learn-w6-h, 2026-11-07;
