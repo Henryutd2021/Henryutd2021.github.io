@@ -11,6 +11,7 @@
 //     every task is answered, in any order; early openings recorded on the attempt) and the shared late-answer rule (late
 //     "practice": an answer given after the solution opened counts as practice, not as right; said in the intro), pure
 //     and on a stub runner; CK-F keeps its rule (neither option)
+//   - predict.js (final integration, from the A13 review): with title: false the choices are named by q as plain text
 // Usage (from the site folder):  node _tests/learn/test_components_w5_int.js
 "use strict";
 const fs = require("fs");
@@ -194,6 +195,20 @@ for (const P of PROMO) {
   // CK-F keeps its published rule: neither option on its page
   const ckf = fs.readFileSync(L("ck-f-estimate.js"), "utf8");
   ok(!/gateAll|late:/.test(ckf), "CK-F keeps its rule: its worked solution covers only the estimate, so the options are not used");
+}
+
+// ---------------------------------------------------------------- predict.js: the choices named by q when title is false
+{
+  const E = env(); E.LX.progress.guess = () => null; E.LX.ready = () => {}; load("predict", E);
+  const H = E.LX.H, row = p => p.el.querySelector(".lx-choices-row"), opts = [{ value: "a", label: "Yes" }, { value: "b", label: "No" }];
+  const hidden = E.LX.Predict(H("div", null, E.body), { id: "p1", q: "Does the **core's** peak fit its [[substation|substation]]?", title: false, answer: "a", options: opts });
+  ok(!hidden.el.querySelector(".lx-q") && row(hidden).getAttribute("aria-label") === "Does the core's peak fit its substation?" && !row(hidden).getAttribute("aria-labelledby"), "predict: title false names the choices by q as plain text (marks to words)");
+  const shown = E.LX.Predict(H("div", null, E.body), { id: "p2", q: "Who fills the gap?", answer: "a", options: opts }), qe = shown.el.querySelector(".lx-q");
+  ok(qe && row(shown).getAttribute("aria-labelledby") === qe.id && !row(shown).getAttribute("aria-label"), "predict: with its heading, the choices are labelled by it");
+  ok(row(E.LX.Predict(H("div", null, E.body), { id: "p3", q: "", title: false, answer: "a", options: opts })).getAttribute("aria-label") === "Your prediction" &&
+     row(E.LX.Predict(H("div", null, E.body), { id: "p4", q: "Your pick:", title: false, answer: "a", options: opts })).getAttribute("aria-label") === "Your pick", "predict: no q keeps 'Your prediction'; a trailing colon is dropped");
+  const users = fs.readdirSync(L("")).filter(f => /\.js$/.test(f) && f !== "learn.js" && /title: false/.test(rd(f)));
+  ok(users.length >= 20, "predict: " + users.length + " lesson scripts pass title: false and now get named choices");
 }
 
 console.log(fails ? `FAILED ${fails} of ${checks} checks (test_components_w5_int)` : `ok ${checks}/${checks} checks (test_components_w5_int)`);

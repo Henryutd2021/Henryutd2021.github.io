@@ -1046,15 +1046,23 @@
         <div class="lx-predict" data-predict="id"><p class="lx-q">Question?</p>
           <ul class="lx-choices"><li data-value="a">Option A</li> ...</ul></div>
         <div class="lx-reveal" data-reveal="id" data-answer="a"><details><summary>Show the answer</summary><p>...</p></details></div>
+   title: false hides the question heading (the page shows the question itself); the choices are then named by q as plain
+   text (aria-label), so a screen reader still hears what they answer.
    Guesses stay in this browser (LX.progress.guess). */
 (function () {
   "use strict";
   var LX = window.LX, H = LX.H;
+  // a question as plain text for an accessible name: glossary and lesson marks to their words, no bold marks or tags
+  function plain(s) {
+    return String(s).replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().replace(/:$/, "");
+  }
   LX.Predict = function (host, o) {
     var w = H("div", { class: "lx-predictbox" }, host);
     var qid = LX.uid("q");
     if (o.q && o.title !== false) H("p", { class: "lx-q", id: qid, html: LX.rich(o.q) }, w);
-    var ch = H("div", { class: "lx-choices-row", role: "group", "aria-label": o.q ? null : "Your prediction", "aria-labelledby": o.q && o.title !== false ? qid : null }, w);
+    // the choices are named by the question: through its heading, or, with title: false (the page shows the question
+    // itself), by q as plain text (W5 final integration, from the A13 review); no q: "Your prediction"
+    var ch = H("div", { class: "lx-choices-row", role: "group", "aria-label": !o.q ? "Your prediction" : o.title === false ? plain(o.q) : null, "aria-labelledby": o.q && o.title !== false ? qid : null }, w);
     var out = H("div", { class: "lx-predict-out", "aria-live": "polite" }, w);
     var btns = {}, picked = LX.progress.guess(o.id) || null, labels = (LX._guessLabels = LX._guessLabels || {})[o.id] = {};
     o.options.forEach(function (op) { labels[op.value] = op.label; });
