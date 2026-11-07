@@ -19,7 +19,7 @@ glossary:
     def: "The best plan for one part of a system judged inside its own boundary, which need not be best for the system it sits in."
   - id: tariff
     term: Tariff
-    def: "The set of prices a utility charges its customers for electricity, such as a price per kWh, a fixed monthly charge or a different price at different hours."
+    def: "The rule for calculating electricity bills: fixed charges, prices per kWh, or both."
   - id: synchronous-grid
     term: Synchronous grid
     def: "A grid that runs at one shared frequency, so every spinning generator in it turns in step; the Lower 48 states have three main ones, called interconnections."

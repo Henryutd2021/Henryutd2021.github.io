@@ -917,6 +917,12 @@
   "lesson": "F6",
   "href": "f06-grid-and-outages.html"
  },
+ "electric-vehicle": {
+  "term": "Electric vehicle (EV)",
+  "short": "A car, bus or truck driven by an electric motor from a battery charged from the grid, instead of by burning gasoline or diesel.",
+  "lesson": "SB3",
+  "href": "sb3-city-planner.html"
+ },
  "electrification": {
   "term": "Electrification",
   "short": "Switching a use of energy, such as heating or driving, from burning fuel to using electricity.",

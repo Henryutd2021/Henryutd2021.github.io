@@ -14,7 +14,7 @@ glossary:
     def: "The share of cases in which a rule must hold, such as meeting store demand in 95 of every 100 weeks."
   - id: deterministic-equivalent
     term: Deterministic equivalent
-    def: "An ordinary rule, with no chance in it, that holds exactly when a chance constraint holds, so a standard solver can use it."
+    def: "A chance constraint rewritten as an ordinary rule with a safety margin, for example planning for the demand level that is exceeded with only the allowed probability."
 requests:
   - "Prairie Campus is lesson F7's (learn-w3-b): the four loads (hospital 300 kW, water and heating plant 100 kW, dorms 250 kW, labs 550 kW, flat), the microgrid as built (600 kW solar, 500 kW / 2,000 kWh battery with 90% of a charge back, 400 kW diesel with about 24 hours of fuel) and the solar method (LX.townProfile, monthlyCF) are reused; the 20-22 January window values equal F7's. F7's 400 kW generator is two 200 kW sets here, and its 24 hours of fuel 675 gallons (0.07 gallons per kWh)."
   - "Components for promotion: TreeView (assets/learn/m05-microgrid-size-and-run.js, a small branch-and-bound tree on E1.bb's nodes; M2 has a richer one). F7's CampusLine and E1.Line both draw the campus one-line diagram; consider merging them at promotion."

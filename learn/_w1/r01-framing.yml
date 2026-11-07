@@ -6,9 +6,9 @@ lesson: R1
 glossary:
   - {id: question-type, term: "Question type", def: "The kind of answer a research question asks for: descriptive, explanatory, evaluative, predictive or prescriptive."}
   - {id: falsification-statement, term: "Falsification statement", def: "A sentence naming the result that would show your expected answer wrong."}
-  - {id: energy-burden, term: "Energy burden", def: "The share of a household's income spent on home energy bills."}
+  - {id: energy-burden, term: "Energy burden", def: "The share of a household's income spent on energy bills."}
   - {id: co-op, term: "Co-op (electric cooperative)", def: "An electric utility owned by the members it serves, common in rural areas."}
   - {id: time-of-use-tariff, term: "Time-of-use tariff", def: "An electricity price that changes with the hour of the day, usually higher in the evening peak."}
-  - {id: substation, term: "Substation", def: "A site where transformers lower the voltage from transmission lines for the feeders that serve customers."}
+  - {id: substation, term: "Substation", def: "A fenced yard of transformers, breakers and switches where the grid changes voltage and where feeders start."}
 requests:
   - "Rubric competence picks are per studio (R1: framing). The rubric note on all three studios says a studio is practice, not a certificate (curriculum v2 §3.1)."

@@ -23,6 +23,6 @@ glossary:
     def: "A car, bus or truck driven by an electric motor from a battery charged from the grid, instead of by burning gasoline or diesel."
   - id: building-envelope
     term: Building envelope
-    def: "A building's insulating shell: its walls, roof, floor, windows and doors, which set how fast heat leaks out."
+    def: "A building's outer shell, its walls, roof, windows and floor, whose insulation and air sealing set how fast heat leaks out."
 requests:
   - "Engine E3's data: assets/learn/data/e3-city-hub.json from scripts/build_learn_e3_data.py (index repo, uncommitted); its precomputed block from the SB3, M12 and C3 tests' --write."

@@ -8,10 +8,10 @@ glossary:
     def: "A network model in which each link can carry any flow up to its limit, with no power-flow physics: power goes where the cheapest routes allow."
   - id: forced-outage-rate
     term: Forced outage rate
-    def: "The share of time a plant is unexpectedly out of service when it would be needed, such as 6% for a gas turbine."
+    def: "The share of time a power plant is unexpectedly out of service, waiting for repair, rather than out for planned maintenance."
   - id: lolh
     term: Loss-of-load hours (LOLH)
-    def: "The expected number of hours a year in which supply falls short of demand, of any size."
+    def: "The expected number of hours a year in which supply falls short of demand, averaged over many simulated years."
   - id: uprate
     term: Uprate (of a line or link)
     def: "Raising the most power a line or link may carry, for example with new conductors or a second circuit."

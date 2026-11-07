@@ -7,7 +7,7 @@ glossary:
   - {id: evidence-ladder, term: "Evidence ladder", def: "The stages a project climbs: announced, funded, permitted, under construction, operating and at design output."}
   - {id: gigawatt, term: "Gigawatt (GW)", def: "A thousand megawatts, a rate of energy flow used for large plants, whole fleets and national demand."}
   - {id: battery-duration, term: "Battery duration", def: "How many hours a battery can discharge at its rated power: its energy in MWh divided by its power in MW."}
-  - {id: voltage, term: "Voltage", def: "The electrical pressure that pushes current along a line; grids hold it within a narrow band at every point."}
+  - {id: voltage, term: "Voltage", def: "The electrical push that drives current through a wire, measured in volts (V); 1 kilovolt (kV) is 1,000 V."}
   - {id: reactive-power, term: "Reactive power", def: "The part of alternating-current power that does no net work but holds voltage up; it is supplied and absorbed locally."}
 requests:
   - "Field Notes link: learn_scope_scan.py flags ../field-notes/briefings.html as an internal link outside learn/, so the page names Field Notes in plain text only (scan not weakened). If Henry wants the link, the scanner needs field-notes/ on its internal allow-list."

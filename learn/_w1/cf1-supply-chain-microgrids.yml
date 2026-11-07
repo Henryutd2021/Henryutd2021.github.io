@@ -5,7 +5,7 @@ lesson: CF1
 glossary:
   - id: transactive-energy
     term: Transactive energy
-    def: "Buying and selling electricity with the grid at prices that change over time, so a site that makes power can also earn from it."
+    def: "Buying and selling electricity among many small participants, such as homes and firms with their own generation, as well as with the grid."
   - id: time-of-use
     term: Time-of-use tariff
     def: "A retail electricity price that changes with the hour of the day, higher at peak times and lower off-peak."

@@ -32,7 +32,7 @@ glossary:
     def: "What a business earns from its output after paying its operating costs: revenue minus operating costs."
   - id: tariff
     term: Tariff
-    def: "A utility's approved rules and prices for what a customer pays; a large-load tariff adds rules for very large customers, such as a minimum bill or collateral."
+    def: "The rule for calculating electricity bills: fixed charges, prices per kWh, or both."
   - id: exogenous
     term: Exogenous
     def: "Set from outside a model as an input, rather than worked out by the model."

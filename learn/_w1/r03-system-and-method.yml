@@ -7,6 +7,6 @@ glossary:
   - {id: method-family, term: "Method family", def: "A group of research methods that answer the same kind of question in a similar way, such as optimization, simulation or statistics."}
   - {id: time-step, term: "Time step", def: "The length of one step in a model or dataset, such as five minutes, an hour or a year."}
   - {id: horizon, term: "Horizon", def: "The span of time a study covers, from a day of operation to decades of planning."}
-  - {id: monte-carlo, term: "Monte Carlo simulation", def: "Running a model many times with inputs drawn at random, to see the range of outcomes and how likely each is."}
+  - {id: monte-carlo, term: "Monte Carlo simulation", def: "A method that runs a calculation many times on randomly drawn inputs and reads the spread of the results."}
   - {id: expected-unserved-energy, term: "Expected unserved energy", def: "Demand left unmet, averaged over many simulated years, in MWh a year: an amount of energy, unlike a load's size in MW."}
   - {id: difference-in-differences, term: "Difference-in-differences", def: "A comparison of how much an outcome changed in a group that got a programme against how much it changed in a similar group that did not."}
