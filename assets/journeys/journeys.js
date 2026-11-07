@@ -16,8 +16,9 @@
 //      Clicking a dot or a line opens a small card. Every map zooms and pans (d3-zoom 3): see "zoom and pan" below.
 //      Keyboard: one Tab stop on the footprints; the arrow keys move through them in time order, Enter opens the card,
 //      + and − zoom, Escape closes it. If the libraries cannot load, the map box is hidden again.
-//   4. Chapter pages: one zoomable world map per chapter, framed on the chapter's main cluster, with chips that zoom to
-//      its regions or the whole chapter.
+//   4. Chapter pages: one zoomable world map per chapter, with chips that zoom to its regions or the whole chapter; it
+//      opens on the whole chapter, or on its main region when the far points would shrink that region (see "the chapter
+//      pages" below).
 (function () {
   "use strict";
   const root = document.getElementById("journeys");
@@ -69,7 +70,7 @@
       const y = t.getAttribute("data-year");
       tip.innerHTML = "<strong>" + esc(t.getAttribute("data-name")) + "</strong>" +
         (t.classList.contains("is-homeland") ? "Home province" :
-         y ? "First visit " + esc(y) + (t.classList.contains("is-draft") ? " (passed through)" : "") : "Not yet");
+         y ? "First visit " + esc(y) : "Not yet");
       tip.hidden = false;
       const fr = fig.getBoundingClientRect(), tr = t.getBoundingClientRect();
       const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -658,7 +659,7 @@
     }
     function transitTag(e, pid) {
       if (!(e.tr || []).includes(pid)) return "";
-      return '<span class="jr-tag">' + ((e.ne || []).includes(pid) ? "transit, no entry" : "transit") + "</span>";
+      return '<span class="jr-tag">transit</span>';
     }
     function placeCard(pid, visits) {
       const p = D.places[pid];
@@ -682,7 +683,7 @@
       return '<p class="jr-c-kind">Journey · ' + esc(kinds) + "</p>" +
         '<h3 id="jr-card-h" class="jr-c-date">' + icons(modesOf(e)) + esc(e.w) + "</h3>" +
         '<p class="jr-c-text">' + esc(e.t) + "</p>" + (st ? '<p class="jr-c-badges">' + st + "</p>" : "") +
-        '<p class="jr-c-note">' + esc(chapterOf[e.ch].n) + " years · approximate route, about " + (Math.round(km / 10) * 10).toLocaleString("en-US") + " km</p>";
+        '<p class="jr-c-note">' + esc(chapterOf[e.ch].n) + " years · about " + (Math.round(km / 10) * 10).toLocaleString("en-US") + " km</p>";
     }
     function openCard(m, viaKeyboard) {
       openKey = m.key;
@@ -1023,13 +1024,26 @@
     }
 
     // ---------- the chapter pages: one zoomable world map per chapter ----------
-    // The chapter's footprints (its places and the waypoints of its road routes) are grouped into clusters (single
-    // linkage, 400 km). Each chapter page has one map in the world view's projection, with every route of the chapter (the
-    // long flights too) and its places, opened framed on the largest cluster. The chips above it (the chapter's own
-    // captions, plus "Whole chapter") zoom to a cluster or to all of the chapter's footprints. Places first visited in
-    // the chapter are coloured; labels keep their size and are placed again after each zoom, more of them as the map
+    // Each chapter page has one map in the world view's projection, with every route of the chapter (the long flights
+    // too) and its places. The chips above it (the chapter's own captions, plus "Whole chapter") zoom to:
+    //   first caption   the main region: where Henry lived and the trips from there. Its centre is the chapter's home (the
+    //                   place lived that the chapter's name names, D.chapters[].hm; of two, the one with more places
+    //                   around it), and it holds the chapter's places within CORE_KM of it, except stops made only in
+    //                   transit and visits to the hometown, with the road routes that stay within a quarter more than
+    //                   that (roads detour)
+    //   second caption  the next cluster of footprints (places and road waypoints, single linkage, 400 km), or the one
+    //                   around the place the caption names ("at")
+    //   Whole chapter   every footprint of the chapter
+    // The view a map opens on (and returns to with the reset button): the whole chapter, so every place shows, when it
+    // is readable there: when at most a third (OPEN_ALL) of its places sit within CROWD_PX of another; otherwise the main
+    // region, and the far points (transit hubs, long flights, the drives between homes), which would shrink it to a
+    // speck, are left to "Whole chapter". The test is made on one reference size (600 by 400 px), so a phone and a
+    // desktop open on the same chip; a chapter can pin the view with map_open (data). Every frame is fitted to the panel
+    // with a margin (fitT), so no dot, label or route end sits on an edge or under the zoom buttons. Places first visited
+    // in the chapter are coloured; labels keep their size and are placed again after each zoom, more of them as the map
     // zooms in. Each map is drawn when its page first comes near the screen.
     const RAD = Math.PI / 180;
+    const CORE_KM = 1200, OPEN_ALL = 1 / 3, CROWD_PX = 14;
     function km(a, b) {
       const p1 = a[1] * RAD, p2 = b[1] * RAD, dp = p2 - p1, dl = (b[0] - a[0]) * RAD;
       const h = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
@@ -1040,7 +1054,7 @@
       const pts = [], seenPl = {};
       ents.forEach(function (e) {
         e.pl.forEach(function (pid) { if (!seenPl[pid]) { seenPl[pid] = 1; pts.push({ ll: D.places[pid].ll, pid: pid }); } });
-        (e.r || []).forEach(function (r) { if (r.m === "ground") r.p.forEach(function (ll) { pts.push({ ll: ll }); }); });
+        (e.r || []).forEach(function (r) { if (r.m === "ground") r.p.forEach(function (ll, i) { pts.push({ ll: ll, end: i === 0 || i === r.p.length - 1 }); }); });
       });
       const parent = pts.map(function (_, i) { return i; });
       const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
@@ -1055,18 +1069,45 @@
       // the second chip: the cluster around the place its caption names (chapter data), else the next with enough footprints
       const at = (chapterOf[id].at || [])[1];
       const named = at && clusters.slice(1).find(function (c) { return c.pts.some(function (p) { return p.pid === at; }); });
-      return { ents: ents, all: pts, main: clusters[0] || null,
+      return { ents: ents, all: pts, main: mainRegion(id, ents, seenPl) || clusters[0] || null,
                second: named || clusters.slice(1).find(function (c) { return c.n >= 3 && c.places >= 1; }) || null };
     }
+    // the main region (the first chip): the chapter's home and the trips from there (see above)
+    function mainRegion(id, ents, seenPl) {
+      const pids = Object.keys(seenPl);
+      const transitOnly = function (pid) {
+        return ents.every(function (e) { return e.pl.indexOf(pid) < 0 || (e.tr || []).indexOf(pid) >= 0; });
+      };
+      let best = null;
+      (chapterOf[id].hm || []).forEach(function (h) {
+        if (!seenPl[h]) return;
+        const ll = D.places[h].ll;
+        const near = pids.filter(function (pid) {
+          return pid === h || (pid !== D.hp && !transitOnly(pid) && km(ll, D.places[pid].ll) <= CORE_KM);
+        });
+        if (!best || near.length > best.near.length) best = { h: h, near: near };
+      });
+      if (!best) return null;
+      const home = D.places[best.h].ll;
+      const pts = best.near.map(function (pid) { return { ll: D.places[pid].ll, pid: pid }; });
+      ents.forEach(function (e) {
+        (e.r || []).forEach(function (r) {
+          if (r.m === "ground" && r.p.every(function (ll) { return km(home, ll) <= CORE_KM * 1.25; })) {
+            r.p.forEach(function (ll, i) { pts.push({ ll: ll, end: i === 0 || i === r.p.length - 1 }); });
+          }
+        });
+      });
+      return { pts: pts, home: best.h };
+    }
+    // the box (lon/lat) a frame must show: the footprints, at least about 480 by 320 km (a single place: 900 by 600 km),
+    // so a small region keeps its surroundings (a coast, a neighbouring city) and stays recognisable
     function boxOf(cl) {
       const lons = cl.pts.map(function (p) { return p.ll[0]; }), lats = cl.pts.map(function (p) { return p.ll[1]; });
-      let x0 = Math.min.apply(null, lons), x1 = Math.max.apply(null, lons), y0 = Math.min.apply(null, lats), y1 = Math.max.apply(null, lats);
-      // about 30% padding around the footprints, at least about 2.5 by 1.6 degrees (some 250 km); a frame on a single
-      // point keeps a wider view (about 8 by 5 degrees), so its region stays recognisable
+      const x0 = Math.min.apply(null, lons), x1 = Math.max.apply(null, lons), y0 = Math.min.apply(null, lats), y1 = Math.max.apply(null, lats);
       const single = x1 - x0 < 0.05 && y1 - y0 < 0.05;
-      x0 -= (x1 - x0) * 0.3; x1 += (x1 - x0) * 0.3 / 1.3; y0 -= (y1 - y0) * 0.3; y1 += (y1 - y0) * 0.3 / 1.3;
       const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-      const hw = Math.max((x1 - x0) / 2, single ? 4 : 1.25), hh = Math.max((y1 - y0) / 2, single ? 2.6 : 0.8);
+      const kmLat = 111.32, kmLon = kmLat * Math.max(0.2, Math.cos(cy * RAD));
+      const hw = Math.max((x1 - x0) / 2, (single ? 450 : 240) / kmLon), hh = Math.max((y1 - y0) / 2, (single ? 300 : 160) / kmLat);
       return [cx - hw, cy - hh, cx + hw, cy + hh];
     }
     function shortName(pid) {
@@ -1075,16 +1116,67 @@
       return p.n.split(", ")[0].replace(/ \(home\)$/, "").replace(/ (National|State) Park$/, "");
     }
     function chFill(id) { return function (code) { const r = D.regions[code]; return r && r[1] === id ? r : null; }; }
-    function fitT(M, cl, kMax) {   // the zoom that frames a cluster (its box) in the map
+    // the zoom that frames a set of footprints (its box) in a map: the box fitted into the panel less a margin on every
+    // side (18 px; 14 in a map under 576 px wide), centred in what is left. On the page (F omitted) the dots and the ends
+    // of the road routes are also kept clear of the zoom buttons (top right) and, on touch screens, of "Tap to explore"
+    // (bottom left): each of these may push the margin on its thin side (the buttons: the right; "Tap to explore": the
+    // bottom) past itself; of the ways, the one that hides the fewest dots and route ends, then the one with the largest
+    // zoom (the plain margins first). F: another size to fit for ({proj, W, H}: the reference size that chooses the
+    // opening view)
+    function fitT(M, cl, kMax, F) {
+      const P = F || M;
       const b = boxOf(cl);
       // kept inside the world view's frame (170°W to 190°E, 55°S to 78°N), so a wide box does not wrap round the world
       b[0] = Math.max(b[0], -169.9); b[2] = Math.min(b[2], 189.9); b[1] = Math.max(b[1], -55); b[3] = Math.min(b[3], 78);
       const cx = (b[0] + b[2]) / 2;
-      const pts = [[b[0], b[1]], [b[2], b[1]], [b[0], b[3]], [b[2], b[3]], [cx, b[1]], [cx, b[3]]].map(function (p) { return M.proj(p); }).filter(Boolean);
+      const pts = [[b[0], b[1]], [b[2], b[1]], [b[0], b[3]], [b[2], b[3]], [cx, b[1]], [cx, b[3]]].map(function (p) { return P.proj(p); }).filter(Boolean);
       const xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; });
       const x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
-      const k = Math.max(1, Math.min(kMax || Infinity, M.W / Math.max(1e-6, x1 - x0), M.H / Math.max(1e-6, y1 - y0)));
-      return tOf(k, M.W / 2 - k * (x0 + x1) / 2, M.H / 2 - k * (y0 + y1) / 2);
+      const fit = function (I) {
+        const k = Math.max(1, Math.min(kMax || Infinity, (P.W - I.l - I.r) / Math.max(1e-6, x1 - x0), (P.H - I.t - I.b) / Math.max(1e-6, y1 - y0)));
+        return tOf(k, (I.l + P.W - I.r) / 2 - k * (x0 + x1) / 2, (I.t + P.H - I.b) / 2 - k * (y0 + y1) / 2);
+      };
+      const m = P.W < 576 ? 14 : 18, base = { t: m, r: m, b: m, l: m };
+      if (F || !M.host) return fit(base);
+      const hb = M.host.getBoundingClientRect(), ox = hb.left + M.host.clientLeft, oy = hb.top + M.host.clientTop, obs = [];
+      M.host.querySelectorAll(".jr-zctl, .jr-zpill").forEach(function (n) {
+        const r = n.getBoundingClientRect();
+        if (r.width) obs.push({ l: r.left - ox, t: r.top - oy, r: r.right - ox, b: r.bottom - oy });
+      });
+      const marks = cl.pts.filter(function (p) { return p.pid || p.end; }).map(function (p) { return P.proj(p.ll); }).filter(Boolean);
+      const hidden = function (T) {
+        return marks.filter(function (q) {
+          const s = tApply(T, q);
+          return obs.some(function (o) { return s[0] > o.l - 8 && s[0] < o.r + 8 && s[1] > o.t - 8 && s[1] < o.b + 8; });   // 8 px: a dot and its ring
+        }).length;
+      };
+      let ways = [base];
+      obs.forEach(function (o) {
+        const side = o.l + o.r < P.W ? ["l", o.r + 10] : ["r", P.W - o.l + 10], end = o.t + o.b < P.H ? ["t", o.b + 10] : ["b", P.H - o.t + 10];
+        const thin = (side[0] === "l" ? o.r : P.W - o.l) <= (end[0] === "t" ? o.b : P.H - o.t) ? side : end;
+        ways = ways.concat(ways.map(function (I) { const J = Object.assign({}, I); J[thin[0]] = Math.max(J[thin[0]], thin[1]); return J; }));
+      });
+      let best = null;
+      ways.forEach(function (I) {
+        const T = fit(I), n = hidden(T);
+        if (!best || n < best.n || (n === best.n && T.k > best.T.k + 1e-9)) best = { T: T, n: n };
+      });
+      return best.T;
+    }
+    // the view a chapter map opens on (a chip's key): the chapter's own choice (map_open), else the whole chapter when
+    // at most OPEN_ALL of its places crowd there (another place within CROWD_PX), else the main region; measured on one
+    // reference size (600 by 400 px), so every screen opens on the same chip
+    const OPEN_KEY = { main: "0", second: "1", all: "all" };
+    function openOn(M) {
+      const pin = OPEN_KEY[chapterOf[M.id].mo];
+      if (pin && M.targets[pin]) return pin;
+      const ref = { proj: projection("world", 600, 400), W: 600, H: 400 };
+      const T = fitT(M, M.targets.all, Infinity, ref);
+      const s = M.targets.all.pts.filter(function (p) { return p.pid; }).map(function (p) { return tApply(T, ref.proj(p.ll)); });
+      const crowded = s.filter(function (a) {
+        return s.some(function (b) { return b !== a && Math.hypot(a[0] - b[0], a[1] - b[1]) < CROWD_PX; });
+      }).length;
+      return crowded <= OPEN_ALL * s.length ? "all" : "0";
     }
     function press(M, key) {
       M.chips.forEach(function (b) { b.setAttribute("aria-pressed", key != null && b.getAttribute("data-zoom") === key ? "true" : "false"); });
@@ -1117,7 +1209,7 @@
           seen[pid] = 1;
           const p = D.places[pid], q = M.proj(p.ll);
           if (!q) return;
-          const g = el("g", { class: "jr-zp" }, M.gOv);
+          const g = el("g", { class: "jr-zp", "data-pid": pid }, M.gOv);   // data-pid: for layout checks
           const r = p.h ? 4.6 : 3.4;
           el("circle", { r: r, class: "jr-mini-dot" + (p.h ? " is-home" : ""), style: "--ch: var(--ch-" + (p.lc || M.id) + ")" }, g);
           // label priority: places lived, then places on the chapter's stamps, then the rest (in time order)
@@ -1126,6 +1218,7 @@
         });
       });
       M.items.forEach(function (it) { if (it.rank === 0) M.gOv.appendChild(it.g); });   // places lived on top
+      if (!M.open) M.open = openOn(M);
       // the zoom range: from the whole world to a little closer than the closest chip's frame
       const ks = Object.keys(M.targets).filter(function (k) { return M.targets[k]; }).map(function (k) { return fitT(M, M.targets[k]).k; });
       M.kMax = Math.min(800, Math.max(24, 2.5 * Math.max.apply(null, ks)));
@@ -1143,7 +1236,7 @@
       const vis = M.items.filter(function (it) { return it.s[0] >= 0 && it.s[0] <= W && it.s[1] >= 0 && it.s[1] <= H; });
       const dots = vis.map(function (it) { return { l: it.s[0] - it.r - 1, t: it.s[1] - it.r - 1, r: it.s[0] + it.r + 1, b: it.s[1] + it.r + 1 }; });
       const over = function (b, o) { return !(b.r <= o.l || b.l >= o.r || b.b <= o.t || b.t >= o.b); };
-      const hit = function (b, own) {   // a place lived only avoids labels, controls and its own dot (other dots may sit under it)
+      const hit = function (b, own) {   // own: a place lived's dot, when its label may cover other dots (else every dot is avoided)
         if (b.l < 2 || b.t < 2 || b.r > W - 2 || b.b > H - 2) return true;
         return taken.some(function (o) { return over(b, o); }) || dots.some(function (o) { return (own === null || o === own) && over(b, o); });
       };
@@ -1159,16 +1252,19 @@
         }
         const off = it.r + pad, th = fs;
         const tries = [[off, th * 0.35, "start"], [-off, th * 0.35, "end"], [0, -off, "middle"], [0, off + th * 0.8, "middle"]];
-        const own = it.rank === 0 ? dots[vis.indexOf(it)] : null;
-        for (const tr of tries) {
-          const x = it.s[0] + tr[0], y = it.s[1] + tr[1];
-          const l = tr[2] === "start" ? x : tr[2] === "end" ? x - it.w : x - it.w / 2;
-          const b = { l: l - pad / 2, t: y - th * 0.85, r: l + it.w + pad / 2, b: y + th * 0.25 };
-          if (hit(b, own)) continue;
-          it.tx.setAttribute("x", tr[0].toFixed(1)); it.tx.setAttribute("y", tr[1].toFixed(1)); it.tx.setAttribute("text-anchor", tr[2]);
-          it.tx.removeAttribute("visibility");
-          taken.push(b); placed++;
-          return;
+        // a place lived first looks for a spot clear of every dot too; only then may its label cover other dots
+        const passes = it.rank === 0 ? [null, dots[vis.indexOf(it)]] : [null];
+        for (const own of passes) {
+          for (const tr of tries) {
+            const x = it.s[0] + tr[0], y = it.s[1] + tr[1];
+            const l = tr[2] === "start" ? x : tr[2] === "end" ? x - it.w : x - it.w / 2;
+            const b = { l: l - pad / 2, t: y - th * 0.85, r: l + it.w + pad / 2, b: y + th * 0.25 };
+            if (hit(b, own)) continue;
+            it.tx.setAttribute("x", tr[0].toFixed(1)); it.tx.setAttribute("y", tr[1].toFixed(1)); it.tx.setAttribute("text-anchor", tr[2]);
+            it.tx.removeAttribute("visibility");
+            taken.push(b); placed++;
+            return;
+          }
         }
       });
     }
@@ -1191,8 +1287,8 @@
       M.items.forEach(function (it) { it.g.setAttribute("transform", "translate(" + (dk * it.s[0] + dx).toFixed(1) + "," + (dk * it.s[1] + dy).toFixed(1) + ")"); });
       if (byUser) press(M, null);
     }
-    function cmFrame(M, key) {   // frame a chip's cluster at once (first drawing, a new size)
-      const T = fitT(M, M.targets[key] || M.targets["0"], M.kMax);
+    function cmFrame(M, key) {   // frame a chip's footprints at once (first drawing, a new size)
+      const T = fitT(M, M.targets[key] || M.targets[M.open], M.kMax);
       if (M.Z) M.Z.set(T); else M.gZ.setAttribute("transform", tStr(T));
       M.t = T;
       cmLayout(M);
@@ -1206,11 +1302,11 @@
       const svgEl = el("svg", { class: "jr-zsvg", "aria-hidden": "true", focusable: "false" }, host);
       const gZ = el("g", {}, svgEl);
       const M = { id: id, A: A, h: h, host: host, svg: svgEl, gZ: gZ, gBg: el("g", {}, gZ), gDet: el("g", {}, gZ), gRt: el("g", {}, svgEl),
-                  gOv: el("g", { class: "jr-zover" }, svgEl), items: [], routes: [], t: ID, tR: ID, W: 0, H: 0, active: "0",
+                  gOv: el("g", { class: "jr-zover" }, svgEl), items: [], routes: [], t: ID, tR: ID, W: 0, H: 0, active: null, open: null,
                   targets: { "0": A.main, "1": A.second, all: { pts: A.all } },
                   chips: Array.prototype.slice.call(h.querySelectorAll(".jr-zchip")) };
       M.Z = zoomer({ host: host, svg: svgEl, g: gZ, keys: true, homeLabel: "Back to the first view",
-        home: function () { press(M, "0"); return fitT(M, M.targets["0"], M.kMax); },
+        home: function () { press(M, M.open); return fitT(M, M.targets[M.open], M.kMax); },
         onMove: function (t, byUser) { cmMove(M, t, byUser); },
         onEnd: function (t) { M.t = t; if (!tSame(t, M.tR)) cmLayout(M); } });
       M.chips.forEach(function (b) {
@@ -1223,7 +1319,9 @@
         });
       });
       if (!cmBuild(M)) return;
-      cmFrame(M, "0");
+      press(M, M.open);   // the chip of the view it opens on (cmBuild chose it)
+      h.setAttribute("data-open", M.open);   // for layout checks
+      cmFrame(M, M.open);
       cmaps.push(M);
     }
     (function () {
