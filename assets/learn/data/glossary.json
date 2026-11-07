@@ -185,6 +185,12 @@
   "lesson": 4,
   "href": "04-forecasts.html"
  },
+ "bidding-zone": {
+  "term": "Bidding zone (price zone)",
+  "short": "An area of a power market in which every seller and buyer gets the same wholesale price for each trading period, as in Europe's markets.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "bcf": {
   "term": "Billion cubic feet (Bcf)",
   "short": "A unit of natural-gas volume, a billion cubic feet; EIA often gives gas flows in Bcf a day.",
@@ -1331,6 +1337,12 @@
   "lesson": "F2",
   "href": "f02-systems-and-map.html"
  },
+ "flow-based-coupling": {
+  "term": "Flow-based market coupling",
+  "short": "A form of market coupling that limits trades by how much power would flow on each critical line of the grid, rather than by a fixed amount per border.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "forced-outage-rate": {
   "term": "Forced outage rate",
   "short": "The share of time a power plant is unexpectedly out of service, waiting for repair, rather than out for planned maintenance.",
@@ -1541,6 +1553,12 @@
   "lesson": "A15",
   "href": "a15-efficiency-electrification.html"
  },
+ "heating-degree-days": {
+  "term": "Heating degree days",
+  "short": "A measure of how cold a year was: for each day, the degrees by which its average temperature fell below a base such as 18 °C, added over the year.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
+ },
  "held-out-data": {
   "term": "Held-out data",
   "short": "Records kept aside while a model is fitted and used only to score it, so the score shows how it does on data it has not seen.",
@@ -1600,6 +1618,12 @@
   "short": "A rule that each hour's electricity use is covered by clean generation in that same hour, rather than over a whole year.",
   "lesson": "A16",
   "href": "a16-hydrogen-ptx.html"
+ },
+ "hvdc": {
+  "term": "HVDC (high-voltage direct current)",
+  "short": "A transmission link that carries power as direct current, used for long undersea cables and to join grids that do not run in step.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "implied-carbon-price": {
   "term": "Implied carbon price",
@@ -1960,6 +1984,12 @@
   "short": "The plant that serves the last megawatt of demand, whose offer sets the clearing price.",
   "lesson": 8,
   "href": "08-merit-order.html"
+ },
+ "market-coupling": {
+  "term": "Market coupling",
+  "short": "Joining neighbouring power markets so that one calculation sets their prices and the flows between them, sending power toward higher prices until the links are full.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "market-based": {
   "term": "Market-based method",
@@ -3442,6 +3472,12 @@
   "short": "Said of a model whose goal can improve without limit, which usually means a rule is missing.",
   "lesson": 10,
   "href": "10-write-it-down.html"
+ },
+ "unbundling": {
+  "term": "Unbundling",
+  "short": "Separating the grid from the making and selling of electricity, so that different companies, or legally separate parts of one, run each.",
+  "lesson": "F10",
+  "href": "f10-nations-differ.html"
  },
  "ufls": {
   "term": "Under-frequency load shedding",

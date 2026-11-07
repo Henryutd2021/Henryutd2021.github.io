@@ -21,8 +21,25 @@ glossary:
   - id: non-energy-use
     term: Non-energy use
     def: "Fuels used as raw materials rather than burned for energy, such as natural gas for fertilizer or oil for plastics and asphalt."
+  - id: unbundling
+    term: Unbundling
+    def: "Separating the grid from the making and selling of electricity, so that different companies, or legally separate parts of one, run each."
+  - id: bidding-zone
+    term: Bidding zone (price zone)
+    def: "An area of a power market in which every seller and buyer gets the same wholesale price for each trading period, as in Europe's markets."
+  - id: market-coupling
+    term: Market coupling
+    def: "Joining neighbouring power markets so that one calculation sets their prices and the flows between them, sending power toward higher prices until the links are full."
+  - id: flow-based-coupling
+    term: Flow-based market coupling
+    def: "A form of market coupling that limits trades by how much power would flow on each critical line of the grid, rather than by a fixed amount per border."
+  - id: hvdc
+    term: HVDC (high-voltage direct current)
+    def: "A transmission link that carries power as direct current, used for long undersea cables and to join grids that do not run in step."
+  - id: heating-degree-days
+    term: Heating degree days
+    def: "A measure of how cold a year was: for each day, the degrees by which its average temperature fell below a base such as 18 °C, added over the year."
 requests:
-  - "Allow-list (curriculum §20.3, 'national statistics and regulator domains named on a regional card'): please add stats.gov.cn and nea.gov.cn (China), mospi.gov.in (India), epe.gov.br (Brazil), ssb.no (Norway), cso.ie (Ireland), cer.gov.au (Australia); and, as a question for Henry, aemo.com.au (Australia's market operator, not a regulator). Until then F10 and the regional cards cite these sources by name with 'no link'. The addresses read are listed in the W6-a report."
-  - "learn/regions.qmd (the twelve regional cards) is a reference page outside path.yml: please link it from the course page (learn/index.qmd, e.g. beside the toolbox shelf) and let build_learn.py write its footer block (it has the learn:footer markers)."
   - "F10 reads prairieland.json's nation, balance (primary, final, useful, sankey, conventions), imports.dependence, regions[].climate, about.line and sources (dossier-card, iea-faq, owid-primary); no change requested."
   - "F10's explain layer names A20, A21, M13, X3 and X2 through LX.lessonRefHTML, so they link once live."
+  - "Fix pass (learn-w6-fix-a): the regional cards page marks the terms above (hvdc, bidding-zone, market-coupling, flow-based-coupling, unbundling) with F10 as the lesson that teaches them."
