@@ -1,0 +1,2700 @@
+{
+ "about": {
+  "line": "Prairieland is fictional; its numbers are illustrative.",
+  "what": "Shared data of Prairieland, Learn's national scale (S4, wave W6): five regions, the 2025 energy balance, the supply fleet with vintages, transmission, imports and minerals, the battery factory, fixed cost ranges, the carbon budget, time slices for engine E4, shocks and demand scenarios. Read by F10, A20, A21, M13, SB4 (engine E4) and C4; pages read these numbers and never retype them.",
+  "fictional": "Prairieland is fictional. Its card (people, primary energy and shares, imports, Ridge County) is the course's own; costs come from EIA's 2026 assumptions; hourly shapes from SPP's 2025 grid; CO2 factors from the IPCC. Everything else is set for teaching and labelled so in the builder.",
+  "dollarYear": 2025,
+  "built": "2026-11-07",
+  "builtBy": "scripts/build_learn_prairieland.py (ResearchPortfolio repository): python3 scripts/build_learn_prairieland.py --site <site>; tested by _tests/learn/test_prairieland.js",
+  "method": "Top-down from the card: primary energy 3.5 EJ split by its shares, then refinery, power plants and grid to final energy by sector and carrier, then useful energy; the fleet's generation unit by unit; regions by teaching weights that add up to the nation exactly. Time slices from SPP's 2025 hourly shapes, 12 slices with the peak net-load day and the scarce-wind winter week kept whole.",
+  "simplifications": [
+   "All fossil energy is counted as burned (no non-energy use such as plastics or asphalt).",
+   "One demand shape (SPP's 2025) serves every region; regions differ in size, not in daily shape.",
+   "Wind in each region is the same 2025 shape shifted by a lag and scaled; solar is scaled.",
+   "Transmission is a transport model: transfer limits, no power-flow physics.",
+   "No exports, no international bunkers, no biomass: the card's five sources make all primary energy."
+  ]
+ },
+ "dollarYear": 2025,
+ "units": {
+  "energy": "PJ on net calorific values unless a key says TWh, GWh or MWh",
+  "power": "MW unless a key says GW",
+  "pjPerTWh": 3.6,
+  "money": "2025 dollars",
+  "co2": "Mt CO2 unless a key says t",
+  "gjPerMMBtu": 1.055056,
+  "ncvOverGcv": {
+   "gas": 0.9,
+   "coal": 0.95,
+   "oil": 0.95
+  }
+ },
+ "nation": {
+  "people": 20000000,
+  "workforce": 10000000,
+  "gdpBillionUSD": 1200,
+  "primaryPJ": 3500,
+  "primaryShares": {
+   "oil": 0.35,
+   "gas": 0.3,
+   "coal": 0.2,
+   "nuclear": 0.05,
+   "renewables": 0.1
+  },
+  "renewablesSplitPJ": {
+   "hydro": 94.8,
+   "wind": 181.8,
+   "solar": 73.4
+  },
+  "finalPJ": 2710.9,
+  "usefulPJ": 1805.0,
+  "electricityTWh": {
+   "generation": 216.5,
+   "final": 203.5,
+   "gridLosses": 13.0
+  },
+  "co2Mt": 214.9,
+  "importDependence": 0.4,
+  "perPerson": {
+   "primaryGJ": 175.0,
+   "electricityMWh": 10.18,
+   "co2T": 10.75
+  },
+  "set": "card: people, GDP, primary energy and its shares, the import shares, the CO2 total; teaching: the split of renewables, the workforce (A13's), everything derived below",
+  "src": [
+   "dossier-card"
+  ]
+ },
+ "regions": [
+  {
+   "key": "highlands",
+   "name": "Northern Highlands",
+   "short": "Highlands",
+   "people": 1600000,
+   "peopleShare": 0.08,
+   "story": "Rivers and reservoirs: most of the nation's hydro, an aluminium smelter, few people.",
+   "climate": {
+    "kind": "cold, snowy winters; mild summers",
+    "hdd": 4200,
+    "cdd": 150
+   },
+   "resources": {
+    "windCF": 0.34,
+    "solarCF": 0.14,
+    "windMaxGW": 20,
+    "solarMaxGW": 6,
+    "hydroGW": 7.0,
+    "hydroCF": 0.3854,
+    "coalPJ": 0,
+    "crudePJ": 0.0,
+    "gasPJ": 0.0,
+    "windLagHours": 21
+   },
+   "final": {
+    "industry": {
+     "oil": 5.5,
+     "gas": 16.5,
+     "coal": 0.0,
+     "el": 60.1
+    },
+    "buildings": {
+     "oil": 9.9,
+     "gas": 35.2,
+     "el": 35.3
+    },
+    "transport": {
+     "oil": 77.8,
+     "gas": 0.0,
+     "el": 0.4
+    },
+    "agriculture": {
+     "oil": 6.0,
+     "el": 2.1
+    }
+   },
+   "finalPJ": 248.8,
+   "capacityMW": {
+    "gasCT": 500,
+    "oil": 500,
+    "hydro": 7000,
+    "wind": 3000,
+    "solar": 200
+   },
+   "electricity": {
+    "finalPJ": 97.9,
+    "gridLossPJ": 6.3,
+    "generationPJ": 120.2,
+    "netExportPJ": 16.0,
+    "finalTWh": 27.194,
+    "generationTWh": 33.389,
+    "netExportTWh": 4.444
+   },
+   "co2Mt": 10.657
+  },
+  {
+   "key": "ridge",
+   "name": "Ridge",
+   "short": "Ridge",
+   "people": 2400000,
+   "peopleShare": 0.12,
+   "story": "Ridge County's coal mines, Ridge Station and the steel and cement works; wind on the ridges.",
+   "climate": {
+    "kind": "cool uplands",
+    "hdd": 3300,
+    "cdd": 400
+   },
+   "resources": {
+    "windCF": 0.3,
+    "solarCF": 0.17,
+    "windMaxGW": 12,
+    "solarMaxGW": 10,
+    "hydroGW": 0.8,
+    "hydroCF": 0.3854,
+    "coalPJ": 700.0,
+    "crudePJ": 0.0,
+    "gasPJ": 252.0,
+    "windLagHours": 9
+   },
+   "final": {
+    "industry": {
+     "oil": 10.9,
+     "gas": 49.3,
+     "coal": 72.9,
+     "el": 36.0
+    },
+    "buildings": {
+     "oil": 9.0,
+     "gas": 48.3,
+     "el": 46.1
+    },
+    "transport": {
+     "oil": 111.4,
+     "gas": 0.0,
+     "el": 0.6
+    },
+    "agriculture": {
+     "oil": 11.2,
+     "el": 3.8
+    }
+   },
+   "finalPJ": 399.5,
+   "capacityMW": {
+    "coal": 4000,
+    "gasCC": 1000,
+    "gasCT": 500,
+    "hydro": 800,
+    "wind": 2000,
+    "solar": 500
+   },
+   "electricity": {
+    "finalPJ": 86.5,
+    "gridLossPJ": 5.5,
+    "generationPJ": 122.8,
+    "netExportPJ": 30.8,
+    "finalTWh": 24.028,
+    "generationTWh": 34.111,
+    "netExportTWh": 8.556
+   },
+   "co2Mt": 45.502
+  },
+  {
+   "key": "plains",
+   "name": "Western Plains",
+   "short": "Plains",
+   "people": 2000000,
+   "peopleShare": 0.1,
+   "story": "The best wind, farms and oil and gas fields; far from the big loads.",
+   "climate": {
+    "kind": "dry, windy, hot summers",
+    "hdd": 3000,
+    "cdd": 700
+   },
+   "resources": {
+    "windCF": 0.4,
+    "solarCF": 0.21,
+    "windMaxGW": 60,
+    "solarMaxGW": 40,
+    "hydroGW": 0.0,
+    "hydroCF": 0,
+    "coalPJ": 0,
+    "crudePJ": 171.5,
+    "gasPJ": 378.0,
+    "windLagHours": 0
+   },
+   "final": {
+    "industry": {
+     "oil": 5.5,
+     "gas": 16.4,
+     "coal": 0.0,
+     "el": 15.0
+    },
+    "buildings": {
+     "oil": 9.3,
+     "gas": 33.0,
+     "el": 38.4
+    },
+    "transport": {
+     "oil": 115.0,
+     "gas": 0.0,
+     "el": 0.5
+    },
+    "agriculture": {
+     "oil": 37.4,
+     "el": 12.8
+    }
+   },
+   "finalPJ": 283.3,
+   "capacityMW": {
+    "coal": 1000,
+    "gasCT": 1000,
+    "wind": 9000,
+    "solar": 2000
+   },
+   "electricity": {
+    "finalPJ": 66.7,
+    "gridLossPJ": 4.3,
+    "generationPJ": 148.8,
+    "netExportPJ": 77.8,
+    "finalTWh": 18.528,
+    "generationTWh": 41.333,
+    "netExportTWh": 21.611
+   },
+   "co2Mt": 21.162
+  },
+  {
+   "key": "capital",
+   "name": "Capital Valley",
+   "short": "Capital",
+   "people": 8600000,
+   "peopleShare": 0.43,
+   "story": "The capital and most of the factories, the battery industry among them; the largest load.",
+   "climate": {
+    "kind": "continental: cold winters, hot summers (Prairie City's climate)",
+    "hdd": 2452,
+    "cdd": 985
+   },
+   "resources": {
+    "windCF": 0.25,
+    "solarCF": 0.19,
+    "windMaxGW": 4,
+    "solarMaxGW": 15,
+    "hydroGW": 0.0,
+    "hydroCF": 0,
+    "coalPJ": 0,
+    "crudePJ": 0.0,
+    "gasPJ": 0.0,
+    "windLagHours": 12
+   },
+   "final": {
+    "industry": {
+     "oil": 32.8,
+     "gas": 115.1,
+     "coal": 39.8,
+     "el": 114.2
+    },
+    "buildings": {
+     "oil": 16.0,
+     "gas": 165.4,
+     "el": 156.7
+    },
+    "transport": {
+     "oil": 342.2,
+     "gas": 5.0,
+     "el": 6.7
+    },
+    "agriculture": {
+     "oil": 9.0,
+     "el": 3.1
+    }
+   },
+   "finalPJ": 1006.0,
+   "capacityMW": {
+    "coal": 3500,
+    "gasCC": 6000,
+    "gasCT": 3500,
+    "nuclear": 2000,
+    "wind": 500,
+    "solar": 2500
+   },
+   "electricity": {
+    "finalPJ": 280.7,
+    "gridLossPJ": 17.9,
+    "generationPJ": 225.8,
+    "netExportPJ": -72.8,
+    "finalTWh": 77.972,
+    "generationTWh": 62.722,
+    "netExportTWh": -20.222
+   },
+   "co2Mt": 75.801
+  },
+  {
+   "key": "coast",
+   "name": "South Coast",
+   "short": "Coast",
+   "people": 5400000,
+   "peopleShare": 0.27,
+   "story": "The port beyond the strait: the oil terminal, the refinery and the LNG terminal; offshore crude; the most sun.",
+   "climate": {
+    "kind": "hot, humid summers; mild winters",
+    "hdd": 900,
+    "cdd": 2200
+   },
+   "resources": {
+    "windCF": 0.28,
+    "solarCF": 0.22,
+    "windMaxGW": 6,
+    "solarMaxGW": 30,
+    "hydroGW": 0.0,
+    "hydroCF": 0,
+    "coalPJ": 0,
+    "crudePJ": 73.5,
+    "gasPJ": 0.0,
+    "windLagHours": 33
+   },
+   "final": {
+    "industry": {
+     "oil": 54.6,
+     "gas": 131.5,
+     "coal": 19.9,
+     "el": 75.1
+    },
+    "buildings": {
+     "oil": 13.4,
+     "gas": 74.2,
+     "el": 119.1
+    },
+    "transport": {
+     "oil": 262.7,
+     "gas": 5.0,
+     "el": 2.8
+    },
+    "agriculture": {
+     "oil": 11.2,
+     "el": 3.8
+    }
+   },
+   "finalPJ": 773.3,
+   "capacityMW": {
+    "coal": 2000,
+    "gasCC": 5000,
+    "gasCT": 2500,
+    "oil": 1000,
+    "wind": 1500,
+    "solar": 6000,
+    "battery": 500
+   },
+   "electricity": {
+    "finalPJ": 200.8,
+    "gridLossPJ": 12.8,
+    "generationPJ": 161.8,
+    "netExportPJ": -51.8,
+    "finalTWh": 55.778,
+    "generationTWh": 44.944,
+    "netExportTWh": -14.389
+   },
+   "co2Mt": 61.79
+  }
+ ],
+ "balance": {
+  "unit": "PJ",
+  "year": 2025,
+  "basis": "net calorific values; physical energy content method",
+  "primary": {
+   "oil": {
+    "imported": 980.0,
+    "domestic": 245.0
+   },
+   "gas": {
+    "lng": 420.0,
+    "domestic": 630.0
+   },
+   "coal": 700.0,
+   "nuclear": 175.0,
+   "hydro": 94.8,
+   "wind": 181.8,
+   "solar": 73.4
+  },
+  "transformation": {
+   "refinery": {
+    "in": 1217.8,
+    "out": 1150.8,
+    "loss": 67.0,
+    "lossShare": 0.055
+   },
+   "power": {
+    "in": {
+     "oil": 7.2,
+     "gas": 323.6,
+     "coal": 557.4,
+     "nuclearHeat": 175.0,
+     "hydro": 94.8,
+     "wind": 181.8,
+     "solar": 73.4
+    },
+    "out": 779.4,
+    "loss": 633.8
+   },
+   "ownUse": {
+    "gas": 31.5,
+    "coal": 10.0
+   },
+   "grid": {
+    "in": 779.4,
+    "loss": 46.8,
+    "out": 732.6,
+    "lossShare": 0.06
+   }
+  },
+  "final": {
+   "industry": {
+    "oil": 109.3,
+    "gas": 328.8,
+    "coal": 132.6,
+    "el": 300.4
+   },
+   "buildings": {
+    "oil": 57.6,
+    "gas": 356.1,
+    "el": 395.6
+   },
+   "transport": {
+    "oil": 909.1,
+    "gas": 10.0,
+    "el": 11.0
+   },
+   "agriculture": {
+    "oil": 74.8,
+    "el": 25.6
+   }
+  },
+  "finalByCarrier": {
+   "oil": 1150.8,
+   "gas": 694.9,
+   "coal": 132.6,
+   "el": 732.6
+  },
+  "useful": {
+   "efficiency": {
+    "industry": {
+     "oil": 0.75,
+     "gas": 0.8,
+     "coal": 0.75,
+     "el": 1.0
+    },
+    "buildings": {
+     "oil": 0.8,
+     "gas": 0.8,
+     "el": 1.0
+    },
+    "transport": {
+     "oil": 0.3,
+     "gas": 0.3,
+     "el": 0.89
+    },
+    "agriculture": {
+     "oil": 0.3,
+     "el": 1.0
+    }
+   },
+   "bySector": {
+    "industry": 744.9,
+    "buildings": 726.6,
+    "transport": 285.5,
+    "agriculture": 48.0
+   },
+   "note": "Useful energy, a teaching convention: heat delivered by furnaces and boilers, motion from engines (30%) and EVs (89%) (DOE's figures, read from prairie-city.json); electricity's other uses count at 100% by convention. Heat pumps are few in 2025, so no outdoor heat is shown."
+  },
+  "sankey": {
+   "unit": "PJ",
+   "nodes": [
+    {
+     "id": "src_oil_imp",
+     "label": "Imported crude oil (through the strait)",
+     "short": "Oil imports",
+     "col": 0,
+     "kind": "import"
+    },
+    {
+     "id": "src_oil_dom",
+     "label": "Domestic crude oil",
+     "short": "Domestic oil",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "src_lng",
+     "label": "LNG imports",
+     "short": "LNG",
+     "col": 0,
+     "kind": "import"
+    },
+    {
+     "id": "src_gas_dom",
+     "label": "Domestic natural gas",
+     "short": "Domestic gas",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "src_coal",
+     "label": "Coal from Ridge County",
+     "short": "Coal",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "src_nuclear",
+     "label": "Nuclear heat (existing plants)",
+     "short": "Nuclear",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "src_hydro",
+     "label": "Hydro electricity",
+     "short": "Hydro",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "src_wind",
+     "label": "Wind electricity",
+     "short": "Wind",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "src_solar",
+     "label": "Solar electricity",
+     "short": "Solar",
+     "col": 0,
+     "kind": "source"
+    },
+    {
+     "id": "crude",
+     "label": "Crude oil",
+     "short": "Crude",
+     "col": 1,
+     "kind": "primary"
+    },
+    {
+     "id": "gas_p",
+     "label": "Natural gas supply",
+     "short": "Gas supply",
+     "col": 1,
+     "kind": "primary"
+    },
+    {
+     "id": "coal_p",
+     "label": "Coal supply",
+     "short": "Coal supply",
+     "col": 1,
+     "kind": "primary"
+    },
+    {
+     "id": "refinery",
+     "label": "Refinery",
+     "short": "Refinery",
+     "col": 2,
+     "kind": "conversion"
+    },
+    {
+     "id": "power",
+     "label": "Power plants",
+     "short": "Power",
+     "col": 2,
+     "kind": "conversion"
+    },
+    {
+     "id": "oilp",
+     "label": "Oil products",
+     "short": "Oil products",
+     "col": 3,
+     "kind": "carrier"
+    },
+    {
+     "id": "gas",
+     "label": "Natural gas",
+     "short": "Gas",
+     "col": 3,
+     "kind": "carrier"
+    },
+    {
+     "id": "coal",
+     "label": "Coal",
+     "short": "Coal",
+     "col": 3,
+     "kind": "carrier"
+    },
+    {
+     "id": "el",
+     "label": "Electricity",
+     "short": "Electricity",
+     "col": 3,
+     "kind": "carrier"
+    },
+    {
+     "id": "industry",
+     "label": "Industry",
+     "short": "Industry",
+     "col": 4,
+     "kind": "sector"
+    },
+    {
+     "id": "buildings",
+     "label": "Buildings (homes and services)",
+     "short": "Buildings",
+     "col": 4,
+     "kind": "sector"
+    },
+    {
+     "id": "transport",
+     "label": "Transport",
+     "short": "Transport",
+     "col": 4,
+     "kind": "sector"
+    },
+    {
+     "id": "agriculture",
+     "label": "Agriculture",
+     "short": "Farms",
+     "col": 4,
+     "kind": "sector"
+    },
+    {
+     "id": "useful",
+     "label": "Useful energy",
+     "short": "Useful",
+     "col": 5,
+     "kind": "useful"
+    },
+    {
+     "id": "conv_loss",
+     "label": "Conversion losses and own use",
+     "short": "Conversion losses",
+     "col": 5,
+     "kind": "loss"
+    },
+    {
+     "id": "grid_loss",
+     "label": "Grid losses",
+     "short": "Grid losses",
+     "col": 5,
+     "kind": "loss"
+    },
+    {
+     "id": "end_loss",
+     "label": "End-use losses",
+     "short": "End-use losses",
+     "col": 5,
+     "kind": "loss"
+    }
+   ],
+   "links": [
+    {
+     "from": "src_oil_imp",
+     "to": "crude",
+     "value": 980.0
+    },
+    {
+     "from": "src_oil_dom",
+     "to": "crude",
+     "value": 245.0
+    },
+    {
+     "from": "src_lng",
+     "to": "gas_p",
+     "value": 420.0
+    },
+    {
+     "from": "src_gas_dom",
+     "to": "gas_p",
+     "value": 630.0
+    },
+    {
+     "from": "src_coal",
+     "to": "coal_p",
+     "value": 700.0
+    },
+    {
+     "from": "src_nuclear",
+     "to": "power",
+     "value": 175.0
+    },
+    {
+     "from": "src_hydro",
+     "to": "power",
+     "value": 94.8
+    },
+    {
+     "from": "src_wind",
+     "to": "power",
+     "value": 181.8
+    },
+    {
+     "from": "src_solar",
+     "to": "power",
+     "value": 73.4
+    },
+    {
+     "from": "crude",
+     "to": "refinery",
+     "value": 1217.8
+    },
+    {
+     "from": "crude",
+     "to": "power",
+     "value": 7.2
+    },
+    {
+     "from": "gas_p",
+     "to": "power",
+     "value": 323.6
+    },
+    {
+     "from": "gas_p",
+     "to": "gas",
+     "value": 694.9
+    },
+    {
+     "from": "gas_p",
+     "to": "conv_loss",
+     "value": 31.5
+    },
+    {
+     "from": "coal_p",
+     "to": "power",
+     "value": 557.4
+    },
+    {
+     "from": "coal_p",
+     "to": "coal",
+     "value": 132.6
+    },
+    {
+     "from": "coal_p",
+     "to": "conv_loss",
+     "value": 10.0
+    },
+    {
+     "from": "refinery",
+     "to": "oilp",
+     "value": 1150.8
+    },
+    {
+     "from": "refinery",
+     "to": "conv_loss",
+     "value": 67.0
+    },
+    {
+     "from": "power",
+     "to": "el",
+     "value": 779.4
+    },
+    {
+     "from": "power",
+     "to": "conv_loss",
+     "value": 633.8
+    },
+    {
+     "from": "el",
+     "to": "grid_loss",
+     "value": 46.8
+    },
+    {
+     "from": "oilp",
+     "to": "industry",
+     "value": 109.3
+    },
+    {
+     "from": "gas",
+     "to": "industry",
+     "value": 328.8
+    },
+    {
+     "from": "coal",
+     "to": "industry",
+     "value": 132.6
+    },
+    {
+     "from": "el",
+     "to": "industry",
+     "value": 300.4
+    },
+    {
+     "from": "oilp",
+     "to": "buildings",
+     "value": 57.6
+    },
+    {
+     "from": "gas",
+     "to": "buildings",
+     "value": 356.1
+    },
+    {
+     "from": "el",
+     "to": "buildings",
+     "value": 395.6
+    },
+    {
+     "from": "oilp",
+     "to": "transport",
+     "value": 909.1
+    },
+    {
+     "from": "gas",
+     "to": "transport",
+     "value": 10.0
+    },
+    {
+     "from": "el",
+     "to": "transport",
+     "value": 11.0
+    },
+    {
+     "from": "oilp",
+     "to": "agriculture",
+     "value": 74.8
+    },
+    {
+     "from": "el",
+     "to": "agriculture",
+     "value": 25.6
+    },
+    {
+     "from": "industry",
+     "to": "useful",
+     "value": 744.9
+    },
+    {
+     "from": "industry",
+     "to": "end_loss",
+     "value": 126.2
+    },
+    {
+     "from": "buildings",
+     "to": "useful",
+     "value": 726.6
+    },
+    {
+     "from": "buildings",
+     "to": "end_loss",
+     "value": 82.7
+    },
+    {
+     "from": "transport",
+     "to": "useful",
+     "value": 285.5
+    },
+    {
+     "from": "transport",
+     "to": "end_loss",
+     "value": 644.6
+    },
+    {
+     "from": "agriculture",
+     "to": "useful",
+     "value": 48.0
+    },
+    {
+     "from": "agriculture",
+     "to": "end_loss",
+     "value": 52.4
+    }
+   ],
+   "note": "Prairieland's 2025 energy flows in PJ, rounded to 0.1 PJ; every node balances exactly (each node's loss link is the rounded remainder). Physical energy content method on net calorific values: nuclear enters as reactor heat, of which two thirds is lost in the power plants; hydro, wind and solar enter as electricity."
+  },
+  "conventions": {
+   "used": "physicalContent",
+   "physicalContent": {
+    "primaryPJ": 3500.0,
+    "nuclearPJ": 175.0,
+    "renewablesPJ": 350.0,
+    "renewablesShare": 0.1,
+    "nuclearShare": 0.05,
+    "fossilShare": 0.85
+   },
+   "substitution": {
+    "primaryPJ": 3949.5,
+    "nuclearPJ": 138.0,
+    "renewablesPJ": 836.5,
+    "renewablesShare": 0.2118,
+    "nuclearShare": 0.0349,
+    "fossilShare": 0.7533
+   },
+   "directEquivalent": {
+    "primaryPJ": 3382.8,
+    "nuclearPJ": 57.8,
+    "renewablesPJ": 350.0,
+    "renewablesShare": 0.1035,
+    "nuclearShare": 0.0171,
+    "fossilShare": 0.8795
+   },
+   "substitutionEfficiency": 0.4184,
+   "note": "physicalContent (used here; the IEA's method): nuclear counts as the heat its reactors make (electricity / 0.33), hydro, wind and solar as their electricity. substitution: every MWh of electricity from nuclear, hydro, wind and solar counts as the fossil fuel a thermal plant would have burned to make it, here at Prairieland's own fossil fleet efficiency (41.8%): renewables' share rises from 10% to 21.2%. directEquivalent: all of them at their electricity output. Fossil fuels are the same in all three. Never compare primary shares across sources without checking the method.",
+   "src": [
+    "iea-faq",
+    "owid-primary"
+   ]
+  },
+  "set": "teaching: refinery losses 5.5%, gas own use 3%, mines' own use 10 PJ, grid losses 6%, the sector splits and useful-energy efficiencies; derived: everything else"
+ },
+ "fleet": {
+  "techs": {
+   "coal": {
+    "label": "Coal plant",
+    "life": 55,
+    "cf2025": 0.62
+   },
+   "gasCC": {
+    "label": "Gas combined cycle",
+    "life": 40,
+    "cf2025": 0.38
+   },
+   "gasCT": {
+    "label": "Gas turbine (peaker)",
+    "life": 40,
+    "cf2025": 0.08
+   },
+   "oil": {
+    "label": "Oil-fired plant",
+    "life": 50,
+    "cf2025": 0.05
+   },
+   "nuclear": {
+    "label": "Existing nuclear plant",
+    "life": 60
+   },
+   "hydro": {
+    "label": "Hydro",
+    "life": 100
+   },
+   "wind": {
+    "label": "Wind farm",
+    "life": 25
+   },
+   "solar": {
+    "label": "Solar farm",
+    "life": 30
+   },
+   "battery": {
+    "label": "Battery (4 hours)",
+    "life": 15
+   }
+  },
+  "units": [
+   {
+    "id": "hl-hydro",
+    "name": "Highland hydro",
+    "region": "highlands",
+    "tech": "hydro",
+    "mw": 7000,
+    "built": 1965,
+    "retire": 2065,
+    "gen2025GWh": 23632.5,
+    "cf2025": 0.3854
+   },
+   {
+    "id": "hl-wind",
+    "name": "Highland wind",
+    "region": "highlands",
+    "tech": "wind",
+    "mw": 3000,
+    "built": 2018,
+    "retire": 2043,
+    "gen2025GWh": 8935.2,
+    "cf2025": 0.34
+   },
+   {
+    "id": "hl-solar",
+    "name": "Highland solar",
+    "region": "highlands",
+    "tech": "solar",
+    "mw": 200,
+    "built": 2022,
+    "retire": 2052,
+    "gen2025GWh": 245.3,
+    "cf2025": 0.14
+   },
+   {
+    "id": "hl-oil",
+    "name": "Highland diesel plants",
+    "region": "highlands",
+    "tech": "oil",
+    "mw": 500,
+    "built": 1990,
+    "retire": 2035,
+    "efficiency": 0.33,
+    "gen2025GWh": 219.0,
+    "cf2025": 0.05,
+    "fuel2025PJ": 2.39
+   },
+   {
+    "id": "hl-ct",
+    "name": "Highland gas turbines",
+    "region": "highlands",
+    "tech": "gasCT",
+    "mw": 500,
+    "built": 2005,
+    "retire": 2045,
+    "efficiency": 0.33,
+    "gen2025GWh": 350.4,
+    "cf2025": 0.08,
+    "fuel2025PJ": 3.82
+   },
+   {
+    "id": "rg-ridge",
+    "name": "Ridge Station",
+    "region": "ridge",
+    "tech": "coal",
+    "mw": 2400,
+    "built": 1982,
+    "retire": 2037,
+    "efficiency": 0.35,
+    "gen2025GWh": 13034.9,
+    "cf2025": 0.62,
+    "fuel2025PJ": 134.07
+   },
+   {
+    "id": "rg-north",
+    "name": "Ridge North",
+    "region": "ridge",
+    "tech": "coal",
+    "mw": 1600,
+    "built": 2008,
+    "retire": 2063,
+    "efficiency": 0.4,
+    "gen2025GWh": 8689.9,
+    "cf2025": 0.62,
+    "fuel2025PJ": 78.21
+   },
+   {
+    "id": "rg-hydro",
+    "name": "Ridge hydro",
+    "region": "ridge",
+    "tech": "hydro",
+    "mw": 800,
+    "built": 1960,
+    "retire": 2060,
+    "gen2025GWh": 2700.9,
+    "cf2025": 0.3854
+   },
+   {
+    "id": "rg-wind",
+    "name": "Ridge wind",
+    "region": "ridge",
+    "tech": "wind",
+    "mw": 2000,
+    "built": 2016,
+    "retire": 2041,
+    "gen2025GWh": 5256.0,
+    "cf2025": 0.3
+   },
+   {
+    "id": "rg-solar",
+    "name": "Ridge solar",
+    "region": "ridge",
+    "tech": "solar",
+    "mw": 500,
+    "built": 2023,
+    "retire": 2053,
+    "gen2025GWh": 744.6,
+    "cf2025": 0.17
+   },
+   {
+    "id": "rg-cc",
+    "name": "Ridge combined cycle",
+    "region": "ridge",
+    "tech": "gasCC",
+    "mw": 1000,
+    "built": 2012,
+    "retire": 2052,
+    "efficiency": 0.55,
+    "gen2025GWh": 3328.8,
+    "cf2025": 0.38,
+    "fuel2025PJ": 21.79
+   },
+   {
+    "id": "rg-ct",
+    "name": "Ridge gas turbines",
+    "region": "ridge",
+    "tech": "gasCT",
+    "mw": 500,
+    "built": 2001,
+    "retire": 2041,
+    "efficiency": 0.32,
+    "gen2025GWh": 350.4,
+    "cf2025": 0.08,
+    "fuel2025PJ": 3.94
+   },
+   {
+    "id": "pl-coal",
+    "name": "Plains Station",
+    "region": "plains",
+    "tech": "coal",
+    "mw": 1000,
+    "built": 1978,
+    "retire": 2030,
+    "efficiency": 0.33,
+    "gen2025GWh": 5431.2,
+    "cf2025": 0.62,
+    "fuel2025PJ": 59.25
+   },
+   {
+    "id": "pl-wind1",
+    "name": "Plains wind (first farms)",
+    "region": "plains",
+    "tech": "wind",
+    "mw": 3000,
+    "built": 2010,
+    "retire": 2035,
+    "gen2025GWh": 10512.0,
+    "cf2025": 0.4
+   },
+   {
+    "id": "pl-wind2",
+    "name": "Plains wind (second round)",
+    "region": "plains",
+    "tech": "wind",
+    "mw": 3000,
+    "built": 2017,
+    "retire": 2042,
+    "gen2025GWh": 10512.0,
+    "cf2025": 0.4
+   },
+   {
+    "id": "pl-wind3",
+    "name": "Plains wind (third round)",
+    "region": "plains",
+    "tech": "wind",
+    "mw": 3000,
+    "built": 2023,
+    "retire": 2048,
+    "gen2025GWh": 10512.0,
+    "cf2025": 0.4
+   },
+   {
+    "id": "pl-solar",
+    "name": "Plains solar",
+    "region": "plains",
+    "tech": "solar",
+    "mw": 2000,
+    "built": 2021,
+    "retire": 2051,
+    "gen2025GWh": 3679.2,
+    "cf2025": 0.21
+   },
+   {
+    "id": "pl-ct",
+    "name": "Plains gas turbines",
+    "region": "plains",
+    "tech": "gasCT",
+    "mw": 1000,
+    "built": 2003,
+    "retire": 2043,
+    "efficiency": 0.33,
+    "gen2025GWh": 700.8,
+    "cf2025": 0.08,
+    "fuel2025PJ": 7.65
+   },
+   {
+    "id": "cv-valley",
+    "name": "Valley Station",
+    "region": "capital",
+    "tech": "coal",
+    "mw": 2000,
+    "built": 1985,
+    "retire": 2040,
+    "efficiency": 0.36,
+    "gen2025GWh": 10862.4,
+    "cf2025": 0.62,
+    "fuel2025PJ": 108.62
+   },
+   {
+    "id": "cv-river",
+    "name": "Riverbend",
+    "region": "capital",
+    "tech": "coal",
+    "mw": 1500,
+    "built": 2010,
+    "retire": 2065,
+    "efficiency": 0.41,
+    "gen2025GWh": 8146.8,
+    "cf2025": 0.62,
+    "fuel2025PJ": 71.53
+   },
+   {
+    "id": "cv-cc1",
+    "name": "Capital combined cycle 1",
+    "region": "capital",
+    "tech": "gasCC",
+    "mw": 3000,
+    "built": 2002,
+    "retire": 2042,
+    "efficiency": 0.52,
+    "gen2025GWh": 9986.4,
+    "cf2025": 0.38,
+    "fuel2025PJ": 69.14
+   },
+   {
+    "id": "cv-cc2",
+    "name": "Capital combined cycle 2",
+    "region": "capital",
+    "tech": "gasCC",
+    "mw": 3000,
+    "built": 2016,
+    "retire": 2056,
+    "efficiency": 0.57,
+    "gen2025GWh": 9986.4,
+    "cf2025": 0.38,
+    "fuel2025PJ": 63.07
+   },
+   {
+    "id": "cv-ct1",
+    "name": "Capital gas turbines 1",
+    "region": "capital",
+    "tech": "gasCT",
+    "mw": 1500,
+    "built": 1998,
+    "retire": 2038,
+    "efficiency": 0.31,
+    "gen2025GWh": 1051.2,
+    "cf2025": 0.08,
+    "fuel2025PJ": 12.21
+   },
+   {
+    "id": "cv-ct2",
+    "name": "Capital gas turbines 2",
+    "region": "capital",
+    "tech": "gasCT",
+    "mw": 2000,
+    "built": 2015,
+    "retire": 2055,
+    "efficiency": 0.36,
+    "gen2025GWh": 1401.6,
+    "cf2025": 0.08,
+    "fuel2025PJ": 14.02
+   },
+   {
+    "id": "cv-nuc1",
+    "name": "Capital nuclear unit 1",
+    "region": "capital",
+    "tech": "nuclear",
+    "mw": 1000,
+    "built": 1986,
+    "retire": 2046,
+    "gen2025GWh": 8020.8,
+    "cf2025": 0.9156
+   },
+   {
+    "id": "cv-nuc2",
+    "name": "Capital nuclear unit 2",
+    "region": "capital",
+    "tech": "nuclear",
+    "mw": 1000,
+    "built": 1991,
+    "retire": 2051,
+    "gen2025GWh": 8020.8,
+    "cf2025": 0.9156
+   },
+   {
+    "id": "cv-wind",
+    "name": "Capital wind",
+    "region": "capital",
+    "tech": "wind",
+    "mw": 500,
+    "built": 2019,
+    "retire": 2044,
+    "gen2025GWh": 1095.0,
+    "cf2025": 0.25
+   },
+   {
+    "id": "cv-solar",
+    "name": "Capital solar",
+    "region": "capital",
+    "tech": "solar",
+    "mw": 2500,
+    "built": 2024,
+    "retire": 2054,
+    "gen2025GWh": 4161.0,
+    "cf2025": 0.19
+   },
+   {
+    "id": "co-cc1",
+    "name": "Coast combined cycle 1",
+    "region": "coast",
+    "tech": "gasCC",
+    "mw": 2000,
+    "built": 2000,
+    "retire": 2040,
+    "efficiency": 0.5,
+    "gen2025GWh": 6657.6,
+    "cf2025": 0.38,
+    "fuel2025PJ": 47.93
+   },
+   {
+    "id": "co-cc2",
+    "name": "Coast combined cycle 2",
+    "region": "coast",
+    "tech": "gasCC",
+    "mw": 3000,
+    "built": 2019,
+    "retire": 2059,
+    "efficiency": 0.58,
+    "gen2025GWh": 9986.4,
+    "cf2025": 0.38,
+    "fuel2025PJ": 61.98
+   },
+   {
+    "id": "co-ct",
+    "name": "Coast gas turbines",
+    "region": "coast",
+    "tech": "gasCT",
+    "mw": 2500,
+    "built": 2008,
+    "retire": 2048,
+    "efficiency": 0.35,
+    "gen2025GWh": 1752.0,
+    "cf2025": 0.08,
+    "fuel2025PJ": 18.02
+   },
+   {
+    "id": "co-oil",
+    "name": "Harbor oil plant",
+    "region": "coast",
+    "tech": "oil",
+    "mw": 1000,
+    "built": 1980,
+    "retire": 2030,
+    "efficiency": 0.33,
+    "gen2025GWh": 438.0,
+    "cf2025": 0.05,
+    "fuel2025PJ": 4.78
+   },
+   {
+    "id": "co-coal",
+    "name": "Harbor Station",
+    "region": "coast",
+    "tech": "coal",
+    "mw": 2000,
+    "built": 1990,
+    "retire": 2045,
+    "efficiency": 0.37,
+    "gen2025GWh": 10862.4,
+    "cf2025": 0.62,
+    "fuel2025PJ": 105.69
+   },
+   {
+    "id": "co-wind",
+    "name": "Coast wind",
+    "region": "coast",
+    "tech": "wind",
+    "mw": 1500,
+    "built": 2020,
+    "retire": 2045,
+    "gen2025GWh": 3679.2,
+    "cf2025": 0.28
+   },
+   {
+    "id": "co-solar1",
+    "name": "Coast solar (first farms)",
+    "region": "coast",
+    "tech": "solar",
+    "mw": 3000,
+    "built": 2019,
+    "retire": 2049,
+    "gen2025GWh": 5781.6,
+    "cf2025": 0.22
+   },
+   {
+    "id": "co-solar2",
+    "name": "Coast solar (second round)",
+    "region": "coast",
+    "tech": "solar",
+    "mw": 3000,
+    "built": 2024,
+    "retire": 2054,
+    "gen2025GWh": 5781.6,
+    "cf2025": 0.22
+   },
+   {
+    "id": "co-bat",
+    "name": "Coast battery",
+    "region": "coast",
+    "tech": "battery",
+    "mw": 500,
+    "built": 2024,
+    "retire": 2039,
+    "mwh": 2000
+   }
+  ],
+  "capacityByYearMW": {
+   "2025": {
+    "coal": 10500,
+    "gasCC": 12000,
+    "gasCT": 8000,
+    "oil": 1500,
+    "nuclear": 2000,
+    "hydro": 7800,
+    "wind": 16000,
+    "solar": 11200,
+    "battery": 500
+   },
+   "2030": {
+    "coal": 9500,
+    "gasCC": 12000,
+    "gasCT": 8000,
+    "oil": 500,
+    "nuclear": 2000,
+    "hydro": 7800,
+    "wind": 16000,
+    "solar": 11200,
+    "battery": 500
+   },
+   "2035": {
+    "coal": 9500,
+    "gasCC": 12000,
+    "gasCT": 8000,
+    "oil": 0,
+    "nuclear": 2000,
+    "hydro": 7800,
+    "wind": 13000,
+    "solar": 11200,
+    "battery": 500
+   },
+   "2040": {
+    "coal": 5100,
+    "gasCC": 10000,
+    "gasCT": 6500,
+    "oil": 0,
+    "nuclear": 2000,
+    "hydro": 7800,
+    "wind": 13000,
+    "solar": 11200,
+    "battery": 0
+   },
+   "2045": {
+    "coal": 3100,
+    "gasCC": 7000,
+    "gasCT": 4500,
+    "oil": 0,
+    "nuclear": 2000,
+    "hydro": 7800,
+    "wind": 3000,
+    "solar": 11200,
+    "battery": 0
+   },
+   "2050": {
+    "coal": 3100,
+    "gasCC": 7000,
+    "gasCT": 2000,
+    "oil": 0,
+    "nuclear": 1000,
+    "hydro": 7800,
+    "wind": 0,
+    "solar": 8200,
+    "battery": 0
+   }
+  },
+  "note": "Set for teaching: units, sizes, years built, efficiencies (net calorific values) and the 2025 capacity factors of the fuel plants (coal 62%, combined cycle 38%, turbines 8%, oil 5%). Derived: nuclear output from the card's 5% of primary energy (heat x 0.33), hydro from the card's 10% less wind and solar, wind and solar from each region's capacity factor. A unit retires at the end of its retire year (built + life unless set). Ridge Station's 2,400 MW is A13's."
+ },
+ "transmission": {
+  "links": [
+   {
+    "key": "plains-capital",
+    "from": "plains",
+    "to": "capital",
+    "mw": 4000,
+    "km": 450,
+    "lossShare": 0.045
+   },
+   {
+    "key": "plains-ridge",
+    "from": "plains",
+    "to": "ridge",
+    "mw": 1500,
+    "km": 350,
+    "lossShare": 0.035
+   },
+   {
+    "key": "highlands-capital",
+    "from": "highlands",
+    "to": "capital",
+    "mw": 3500,
+    "km": 500,
+    "lossShare": 0.05
+   },
+   {
+    "key": "highlands-ridge",
+    "from": "highlands",
+    "to": "ridge",
+    "mw": 1000,
+    "km": 300,
+    "lossShare": 0.03
+   },
+   {
+    "key": "ridge-capital",
+    "from": "ridge",
+    "to": "capital",
+    "mw": 5000,
+    "km": 250,
+    "lossShare": 0.025
+   },
+   {
+    "key": "capital-coast",
+    "from": "capital",
+    "to": "coast",
+    "mw": 5000,
+    "km": 300,
+    "lossShare": 0.03
+   },
+   {
+    "key": "ridge-coast",
+    "from": "ridge",
+    "to": "coast",
+    "mw": 1500,
+    "km": 400,
+    "lossShare": 0.04
+   }
+  ],
+  "expansion": {
+   "costPerMWkm": {
+    "def": 1500,
+    "lo": 800,
+    "hi": 3000,
+    "step": 50
+   },
+   "life": 50,
+   "maxAddMWPerPeriod": 3000,
+   "set": "teaching: new transmission in 2025 dollars per MW of transfer limit per km, lines and substations together"
+  },
+  "note": "Set for teaching: existing links between regions, their transfer limits (MW, either way) and lengths; losses 1% per 100 km. A transport model: flows obey the limits, not the laws of power flow."
+ },
+ "imports": {
+  "oil": {
+   "importShare": 0.8,
+   "importPJ": 980.0,
+   "domesticPJ": 245.0,
+   "route": "All imported crude arrives by sea through one strait, then at the South Coast's oil terminal and refinery.",
+   "throughStraitShare": 1.0,
+   "stocksDays": 60,
+   "stocksPJ": 161.1,
+   "benchmarkDays": 90,
+   "benchmarkNote": "IEA members that import oil hold stocks of at least 90 days of their net imports; Prairieland holds 60 (set for teaching), below that benchmark.",
+   "src": [
+    "iea-stocks"
+   ]
+  },
+  "lng": {
+   "shareOfGas": 0.4,
+   "importPJ": 420.0,
+   "domesticPJ": 630.0,
+   "terminal": "coast",
+   "throughStraitShare": 0.25,
+   "storageShareOfYear": 0.15,
+   "note": "Set for teaching: a quarter of the LNG cargoes also pass the strait; gas storage holds 15% of a year's gas use."
+  },
+  "coal": {
+   "importShare": 0.0,
+   "note": "All coal is mined in Ridge County and moved by rail to plants and works in other regions."
+  },
+  "dependence": {
+   "netImportsPJ": 1400.0,
+   "primaryPJ": 3500,
+   "share": 0.4,
+   "throughStraitPJ": 1085.0,
+   "method": "Import dependence = net imports / primary energy (Eurostat's indicator divides by gross available energy; here the two are the same, with no exports or bunkers). E4's import-share cap uses the same ratio in each period."
+  },
+  "minerals": {
+   "suppliers": [
+    "Country R (the leading refiner)",
+    "Country S",
+    "Country T",
+    "Other refiners"
+   ],
+   "items": {
+    "lithium": {
+     "label": "Lithium chemicals",
+     "tPerGWh": 600,
+     "shares": [0.65, 0.15, 0.12, 0.08],
+     "hhi": 4658
+    },
+    "graphite": {
+     "label": "Graphite (anodes)",
+     "tPerGWh": 1000,
+     "shares": [0.9, 0.05, 0.03, 0.02],
+     "hhi": 8138
+    },
+    "nickel": {
+     "label": "Nickel",
+     "tPerGWh": 500,
+     "shares": [0.45, 0.25, 0.2, 0.1],
+     "hhi": 3150
+    },
+    "cobalt": {
+     "label": "Cobalt",
+     "tPerGWh": 80,
+     "shares": [0.75, 0.1, 0.1, 0.05],
+     "hhi": 5850
+    }
+   },
+   "leadingShareAverage": 0.6875,
+   "hhiMethod": "Herfindahl-Hirschman index: the sum of each supplier's squared percentage share (0 to 10,000); above 1,800 counts as highly concentrated under the 2023 U.S. Merger Guidelines (DOJ and FTC; 2,500 under the 2010 guidelines). 'Other refiners' is one group, counted as a single supplier, so the index is a lower bound.",
+   "set": "teaching: shares and tonnes per GWh (a mixed fleet of battery chemistries; real intensities vary by chemistry); the leading refiner's average share is set near the IEA's figure for 2025 (about 70%)",
+   "src": [
+    "iea-gcmo-2025"
+   ]
+  }
+ },
+ "factories": {
+  "battery": {
+   "region": "capital",
+   "capacityGWh": 20,
+   "output2025GWh": 12,
+   "jobs": 2500,
+   "electricityKWhPerKWh": 30,
+   "mineralStockDays": 60,
+   "recycledShare": 0.05,
+   "set": "teaching",
+   "electricity2025GWh": 360,
+   "mineralsT": {
+    "lithium": 7200,
+    "graphite": 12000,
+    "nickel": 6000,
+    "cobalt": 960
+   }
+  },
+  "note": "A battery-cell factory in Capital Valley (set for teaching): its refined minerals come from abroad, most from Country R; output, jobs, electricity and stocks are illustrative."
+ },
+ "costs": {
+  "dollarYear": 2025,
+  "technologies": {
+   "wind": {
+    "label": "Wind farm",
+    "capex": {
+     "def": 1712,
+     "lo": 1500,
+     "hi": 2400,
+     "step": 10
+    },
+    "fom": 34.57,
+    "vom": 0.0,
+    "life": 25,
+    "source": {
+     "lo": 1478,
+     "hi": 4335,
+     "where": "Table 3: $1,712 per kW (capacity-weighted U.S. average); Table 4: $1,478 to $4,335 across the 25 regions"
+    },
+    "src": [
+     "eia-aeo2026-emm"
+    ]
+   },
+   "solar": {
+    "label": "Solar farm (single-axis tracking)",
+    "capex": {
+     "def": 1484,
+     "lo": 1350,
+     "hi": 1900,
+     "step": 10
+    },
+    "fom": 23.6,
+    "vom": 0.0,
+    "life": 30,
+    "source": {
+     "lo": 1342,
+     "hi": 1949,
+     "where": "Table 3: $1,484 per kW; Table 4: $1,342 to $1,949 across the regions"
+    },
+    "src": [
+     "eia-aeo2026-emm"
+    ]
+   },
+   "battery": {
+    "label": "Battery (4 hours)",
+    "capex": {
+     "def": 1521,
+     "lo": 1380,
+     "hi": 1690,
+     "step": 10
+    },
+    "fom": 41.84,
+    "vom": 0.0,
+    "life": 15,
+    "hours": 4,
+    "roundTrip": 0.85,
+    "source": {
+     "lo": 1371.2,
+     "hi": 1698,
+     "where": "EIA Table 3: $1,521 per kW (150 MW plant; Table 4: $1,500 to $1,698); NREL's 2024 cost of a 4-hour battery, read from lesson 13's data: $1,371.2 per kW in 2025 dollars. The 4-hour duration and 85% round trip are set for teaching (lesson 13's)."
+    },
+    "src": [
+     "eia-aeo2026-emm",
+     "nrel-battery-2025"
+    ]
+   },
+   "gasCC": {
+    "label": "Gas combined cycle",
+    "capex": {
+     "def": 1032,
+     "lo": 850,
+     "hi": 1400,
+     "step": 10
+    },
+    "fom": 12.69,
+    "vom": 3.57,
+    "life": 40,
+    "efficiency": 0.6089,
+    "source": {
+     "lo": 830,
+     "hi": 1445,
+     "where": "Table 3 (multi-shaft): $1,032 per kW, heat rate 6,226 Btu per kWh; Table 4: $830 to $1,445"
+    },
+    "src": [
+     "eia-aeo2026-emm"
+    ]
+   },
+   "gasCT": {
+    "label": "Gas turbine (peaker)",
+    "capex": {
+     "def": 1158,
+     "lo": 950,
+     "hi": 1580,
+     "step": 10
+    },
+    "fom": 7.18,
+    "vom": 4.17,
+    "life": 40,
+    "efficiency": 0.4147,
+    "source": {
+     "lo": 946,
+     "hi": 1585,
+     "where": "Table 3 (industrial frame): $1,158 per kW, heat rate 9,142 Btu per kWh; Table 4: $946 to $1,585"
+    },
+    "src": [
+     "eia-aeo2026-emm"
+    ]
+   },
+   "firm": {
+    "label": "Firm clean plant (generic)",
+    "capex": {
+     "def": 7000,
+     "lo": 3000,
+     "hi": 11000,
+     "step": 10
+    },
+    "fom": 150,
+    "vom": 9,
+    "life": 40,
+    "availability": 0.9,
+    "co2": 0,
+    "source": {
+     "lo": 2685,
+     "hi": 11568,
+     "where": "Table 4, the firm low-carbon plants that burn no fuel, from about $2,700 to $11,600 per kW; Prairieland's one generic option spans that range, and its fixed O&M ($150 per kW-year) lies inside Table 3's range for the same plants."
+    },
+    "src": [
+     "eia-aeo2026-emm"
+    ],
+    "what": "One generic firm clean option: steady output up to 90% of its size in every slice, no CO2 in operation, the same constant cost in every period, the generic build limits of every technology. It stands for any firm low-carbon plant, not one design. Variable cost $9 per MWh, availability and life set for teaching.",
+    "fomSource": {
+     "lo": 127.62,
+     "hi": 167.86
+    }
+   }
+  },
+  "fuels": {
+   "gas": {
+    "label": "Domestic gas",
+    "def": 4.05,
+    "lo": 2.0,
+    "hi": 9.0,
+    "step": 0.1,
+    "anchor": {
+     "usdPerMMBtu": 3.85,
+     "what": "average cost of gas to U.S. power plants, 2025 (EIA), via e2-plains-grid.json"
+    },
+    "src": [
+     "eia-epa-gas"
+    ]
+   },
+   "lng": {
+    "label": "LNG imports",
+    "def": 10.0,
+    "lo": 6.0,
+    "hi": 30.0,
+    "step": 0.5,
+    "set": "teaching",
+    "src": []
+   },
+   "coal": {
+    "label": "Coal (Ridge County)",
+    "def": 2.41,
+    "lo": 1.5,
+    "hi": 4.0,
+    "step": 0.1,
+    "anchor": {
+     "usdPerMMBtu": 2.42,
+     "what": "average cost of coal to U.S. power plants, 2025 (EIA), via e2-plains-grid.json"
+    },
+    "src": [
+     "eia-epa-gas"
+    ]
+   },
+   "oil": {
+    "label": "Crude oil",
+    "def": 12.0,
+    "lo": 7.0,
+    "hi": 22.0,
+    "step": 0.5,
+    "set": "teaching",
+    "note": "About $70 a barrel at about 5.8 GJ a barrel (rounded); the range is roughly $40 to $130 a barrel.",
+    "src": []
+   },
+   "note": "Dollars per GJ on net calorific values (the balance's basis). EIA's prices are per MMBtu on gross heating values: x 1/1.055056 GJ per MMBtu and / 0.90 (gas) or / 0.95 (coal) for net values (IEA's convention, rounded). The ranges are set for teaching; each is what a learner may set, constant over the periods unless a shock changes it."
+  },
+  "buildLimits": {
+   "gwPerRegionPerPeriod": {
+    "wind": 6,
+    "solar": 8,
+    "battery": 6,
+    "gasCC": 4,
+    "gasCT": 4,
+    "firm": 2
+   },
+   "availableFrom": 2030,
+   "also": "wind and solar also stop at each region's windMaxGW and solarMaxGW",
+   "set": "teaching: generic limits, the same rule in every region and period; no technology has its own timeline"
+  },
+  "rule": "Every cost is a fixed range the learner sets, the same in every period; no cost changes with how much is built. Defaults are EIA's Table 3 values (2025 dollars); each range lies inside its source's range (`source`).",
+  "note": "Capital in 2025 dollars per kW (battery: per kW of a 4-hour battery), fixed O&M per kW-year, variable O&M per MWh. Annualised at the discount rate (periods.discount) over each life."
+ },
+ "carbon": {
+  "base2025Mt": 214.9,
+  "byFuelMt": {
+   "oil": 89.79,
+   "gas": 58.91,
+   "coal": 66.22
+  },
+  "bySectorMt": {
+   "power": 71.41,
+   "ownUse": 7.62,
+   "industry": 39.0,
+   "buildings": 24.2,
+   "transport": 67.2,
+   "agriculture": 5.48
+  },
+  "factors": {
+   "tPerTJ": {
+    "oil": 73.3,
+    "gas": 56.1,
+    "coal": 94.6
+   },
+   "basis": "net calorific value",
+   "src": [
+    "ipcc-2006"
+   ]
+  },
+  "budget": {
+   "unit": "Mt CO2, 2026 to 2050",
+   "def": 2600,
+   "lo": 500,
+   "hi": 5400,
+   "step": 100,
+   "presets": [
+    {
+     "key": "flat",
+     "label": "Emissions stay at 2025's level",
+     "mt": 5373
+    },
+    {
+     "key": "line2050",
+     "label": "A straight line to zero in 2050",
+     "mt": 2579
+    },
+    {
+     "key": "line2040",
+     "label": "A straight line to zero in 2040",
+     "mt": 1504
+    }
+   ],
+   "set": "teaching: the budget is a learner choice; the presets are arithmetic on 2025's emissions, not a fair share"
+  },
+  "accounting": {
+   "default": "linear",
+   "linearWeights": {
+    "2025": 2,
+    "2030": 5,
+    "2035": 5,
+    "2040": 5,
+    "2045": 5,
+    "2050": 3
+   },
+   "stepWeights": {
+    "2025": 0,
+    "2030": 5,
+    "2035": 5,
+    "2040": 5,
+    "2045": 5,
+    "2050": 5
+   },
+   "method": "Cumulative CO2 2026-2050 = sum over the model years of weight x that year's emissions (Mt a year). linear: yearly emissions move in a straight line between model years, so 2026-2030 count 2 x 2025 + 3 x 2030, and so on (weights 2, 5, 5, 5, 5, 3; they sum to 25 years). step: each model year's emissions count for the five years ending in it (weights 0, 5, 5, 5, 5, 5).",
+   "boundary": "Energy CO2 inside Prairieland: fuels burned (all counted as burned, no non-energy use), refinery and field own use; imported electricity none; methane and other gases left out."
+  },
+  "context": "For scale: 214.9 Mt is about 0.6% of the world's energy CO2 of about 38 Gt in 2025 (IEA), while Prairieland holds about 0.25% of the world's people. A recent peer-reviewed estimate puts the remaining global budget for a 50% chance of 1.5 C at about 130 Gt from the start of 2026 (Forster et al. 2026); how a nation's share is set is a choice (lesson A20).",
+  "src": [
+   "ipcc-2006",
+   "iea-ger-2026",
+   "forster-2026"
+  ]
+ },
+ "periods": {
+  "base": 2025,
+  "years": [2030, 2035, 2040, 2045, 2050],
+  "yearsEach": 5,
+  "horizonEnd": 2050,
+  "note": "Model years 2030, 2035, 2040, 2045 and 2050, each standing for five years; 2025 is the observed base year. The same 12 time slices (weather of 2025) are used in every period; demand scales them.",
+  "residualValue": "Assets whose lives run past 2050 keep a residual value: E4 charges each plant's yearly capital payments (annuities at the discount rate over its life) only for the years up to 2050, so a plant built in the 2045 model year (2041-2045) pays for 2041-2050 only.",
+  "retirement": "Each existing unit retires at the end of its `retire` year (fleet.units); E4 may retire coal and gas earlier, saving their fixed O&M; existing plants' capital is sunk.",
+  "discount": {
+   "def": 5,
+   "lo": 2,
+   "hi": 8,
+   "step": 0.5,
+   "unit": "% a year, real",
+   "baseYear": 2025,
+   "set": "teaching"
+  },
+  "foresight": "Perfect foresight: one LP over 2030-2050. Decade by decade (myopic): solve 2030 and 2035 seeing only them, fix their builds, then 2040 and 2045, then 2050 (M13 compares the two)."
+ },
+ "timeSlices": {
+  "weatherYear": 2025,
+  "count": 12,
+  "slices": [
+   {
+    "key": "winter_day",
+    "label": "Winter, day (08:00-19:59)",
+    "season": "winter",
+    "part": "day",
+    "hours": 996,
+    "days": 83,
+    "extreme": false,
+    "demand": 1.0467,
+    "wind": {
+     "highlands": 0.3474,
+     "ridge": 0.344,
+     "plains": 0.3939,
+     "capital": 0.2983,
+     "coast": 0.3191
+    },
+    "solar": {
+     "highlands": 0.1892,
+     "ridge": 0.2297,
+     "plains": 0.2838,
+     "capital": 0.2567,
+     "coast": 0.2973
+    },
+    "hydro": 0.7486
+   },
+   {
+    "key": "winter_night",
+    "label": "Winter, night (20:00-07:59)",
+    "season": "winter",
+    "part": "night",
+    "hours": 996,
+    "days": 83,
+    "extreme": false,
+    "demand": 1.0184,
+    "wind": {
+     "highlands": 0.388,
+     "ridge": 0.308,
+     "plains": 0.4789,
+     "capital": 0.2441,
+     "coast": 0.2868
+    },
+    "solar": {
+     "highlands": 0.0016,
+     "ridge": 0.002,
+     "plains": 0.0024,
+     "capital": 0.0022,
+     "coast": 0.0025
+    },
+    "hydro": 0.7486
+   },
+   {
+    "key": "spring_day",
+    "label": "Spring, day (08:00-19:59)",
+    "season": "spring",
+    "part": "day",
+    "hours": 1104,
+    "days": 92,
+    "extreme": false,
+    "demand": 0.9306,
+    "wind": {
+     "highlands": 0.3656,
+     "ridge": 0.3274,
+     "plains": 0.4104,
+     "capital": 0.2835,
+     "coast": 0.3075
+    },
+    "solar": {
+     "highlands": 0.2259,
+     "ridge": 0.2743,
+     "plains": 0.3388,
+     "capital": 0.3066,
+     "coast": 0.355
+    },
+    "hydro": 1.3474
+   },
+   {
+    "key": "spring_night",
+    "label": "Spring, night (20:00-07:59)",
+    "season": "spring",
+    "part": "night",
+    "hours": 1104,
+    "days": 92,
+    "extreme": false,
+    "demand": 0.8353,
+    "wind": {
+     "highlands": 0.3727,
+     "ridge": 0.3217,
+     "plains": 0.4529,
+     "capital": 0.258,
+     "coast": 0.3019
+    },
+    "solar": {
+     "highlands": 0.0163,
+     "ridge": 0.0198,
+     "plains": 0.0245,
+     "capital": 0.0222,
+     "coast": 0.0257
+    },
+    "hydro": 1.3474
+   },
+   {
+    "key": "summer_day",
+    "label": "Summer, day (08:00-19:59)",
+    "season": "summer",
+    "part": "day",
+    "hours": 1092,
+    "days": 91,
+    "extreme": false,
+    "demand": 1.2677,
+    "wind": {
+     "highlands": 0.3014,
+     "ridge": 0.269,
+     "plains": 0.3097,
+     "capital": 0.252,
+     "coast": 0.2532
+    },
+    "solar": {
+     "highlands": 0.3644,
+     "ridge": 0.4425,
+     "plains": 0.5466,
+     "capital": 0.4946,
+     "coast": 0.5726
+    },
+    "hydro": 1.0979
+   },
+   {
+    "key": "summer_night",
+    "label": "Summer, night (20:00-07:59)",
+    "season": "summer",
+    "part": "night",
+    "hours": 1092,
+    "days": 91,
+    "extreme": false,
+    "demand": 1.0089,
+    "wind": {
+     "highlands": 0.3066,
+     "ridge": 0.2655,
+     "plains": 0.4024,
+     "capital": 0.1937,
+     "coast": 0.2481
+    },
+    "solar": {
+     "highlands": 0.0289,
+     "ridge": 0.0351,
+     "plains": 0.0433,
+     "capital": 0.0392,
+     "coast": 0.0454
+    },
+    "hydro": 1.0979
+   },
+   {
+    "key": "autumn_day",
+    "label": "Autumn, day (08:00-19:59)",
+    "season": "autumn",
+    "part": "day",
+    "hours": 1092,
+    "days": 91,
+    "extreme": false,
+    "demand": 1.0164,
+    "wind": {
+     "highlands": 0.3198,
+     "ridge": 0.3002,
+     "plains": 0.3446,
+     "capital": 0.2701,
+     "coast": 0.2777
+    },
+    "solar": {
+     "highlands": 0.2906,
+     "ridge": 0.3529,
+     "plains": 0.4359,
+     "capital": 0.3944,
+     "coast": 0.4567
+    },
+    "hydro": 0.7985
+   },
+   {
+    "key": "autumn_night",
+    "label": "Autumn, night (20:00-07:59)",
+    "season": "autumn",
+    "part": "night",
+    "hours": 1092,
+    "days": 91,
+    "extreme": false,
+    "demand": 0.8718,
+    "wind": {
+     "highlands": 0.3386,
+     "ridge": 0.2822,
+     "plains": 0.4325,
+     "capital": 0.2152,
+     "coast": 0.2605
+    },
+    "solar": {
+     "highlands": 0.0077,
+     "ridge": 0.0094,
+     "plains": 0.0116,
+     "capital": 0.0105,
+     "coast": 0.0122
+    },
+    "hydro": 0.7985
+   },
+   {
+    "key": "peak_day",
+    "label": "Peak net-load day (2025-08-20), day (08:00-19:59)",
+    "season": "summer",
+    "part": "day",
+    "hours": 12,
+    "days": 1,
+    "extreme": true,
+    "demand": 1.4076,
+    "wind": {
+     "highlands": 0.1602,
+     "ridge": 0.1117,
+     "plains": 0.127,
+     "capital": 0.1266,
+     "coast": 0.0645
+    },
+    "solar": {
+     "highlands": 0.3781,
+     "ridge": 0.4591,
+     "plains": 0.5671,
+     "capital": 0.5131,
+     "coast": 0.5941
+    },
+    "hydro": 1.0979
+   },
+   {
+    "key": "peak_night",
+    "label": "Peak net-load day (2025-08-20), night (20:00-07:59)",
+    "season": "summer",
+    "part": "night",
+    "hours": 12,
+    "days": 1,
+    "extreme": true,
+    "demand": 1.0975,
+    "wind": {
+     "highlands": 0.0911,
+     "ridge": 0.1567,
+     "plains": 0.2073,
+     "capital": 0.0876,
+     "coast": 0.129
+    },
+    "solar": {
+     "highlands": 0.0214,
+     "ridge": 0.026,
+     "plains": 0.0321,
+     "capital": 0.0291,
+     "coast": 0.0337
+    },
+    "hydro": 1.0979
+   },
+   {
+    "key": "lowwind_day",
+    "label": "Scarce-wind winter week (2025-01-01 to 2025-01-07), day (08:00-19:59)",
+    "season": "winter",
+    "part": "day",
+    "hours": 84,
+    "days": 7,
+    "extreme": true,
+    "demand": 1.0645,
+    "wind": {
+     "highlands": 0.2622,
+     "ridge": 0.2374,
+     "plains": 0.2577,
+     "capital": 0.2248,
+     "coast": 0.2301
+    },
+    "solar": {
+     "highlands": 0.1053,
+     "ridge": 0.1278,
+     "plains": 0.1579,
+     "capital": 0.1428,
+     "coast": 0.1654
+    },
+    "hydro": 0.7486
+   },
+   {
+    "key": "lowwind_night",
+    "label": "Scarce-wind winter week (2025-01-01 to 2025-01-07), night (20:00-07:59)",
+    "season": "winter",
+    "part": "night",
+    "hours": 84,
+    "days": 7,
+    "extreme": true,
+    "demand": 1.0261,
+    "wind": {
+     "highlands": 0.2723,
+     "ridge": 0.2284,
+     "plains": 0.3527,
+     "capital": 0.1657,
+     "coast": 0.2355
+    },
+    "solar": {
+     "highlands": 0.0,
+     "ridge": 0.0,
+     "plains": 0.0,
+     "capital": 0.0,
+     "coast": 0.0
+    },
+    "hydro": 0.7486
+   }
+  ],
+  "hourRule": {
+   "index": "town_year.json index i (0 to 8759): day i // 24 of 2025 and hour i % 24, Central standard time (no clock change).",
+   "season": "winter December-February, spring March-May, summer June-August, autumn September-November (by the day's month).",
+   "part": "day: hours 08 to 19; night: hours 20 to 07.",
+   "extremes": "the 7 days of the scarce-wind winter week and the peak net-load day are taken out of their seasons and kept as their own slices.",
+   "demand": "every region's hourly load = its yearly electricity at the busbar (final + its grid losses) / 8760 x demand[i] / mean(demand): one shape for all regions, SPP's 2025.",
+   "wind": "region r's wind per MW in hour i = windScale[r] x wind[(i - windLagHours[r]) mod 8760] / 1000 (the SPP shape, shifted by the lag, scaled so the year's mean is the region's capacity factor).",
+   "solar": "region r's solar per MW in hour i = solarScale[r] x solar[i] / 1000 (scaled, not shifted).",
+   "hydro": "a season factor (set for teaching: winter 0.75, spring 1.35, summer 1.10, autumn 0.80), scaled so the hour-weighted mean over the year is 1; hydro output in a slice = hydro GW x hydroCF x factor.",
+   "slice": "a slice's demand, wind and solar are the means over its hours of the hourly values above; its weight is its number of hours."
+  },
+  "windScale": {
+   "highlands": 0.644494,
+   "ridge": 0.568671,
+   "plains": 0.758228,
+   "capital": 0.473893,
+   "coast": 0.53076
+  },
+  "solarScale": {
+   "highlands": 0.597723,
+   "ridge": 0.725806,
+   "plains": 0.896584,
+   "capital": 0.811195,
+   "coast": 0.939278
+  },
+  "windLagHours": {
+   "highlands": 21,
+   "ridge": 9,
+   "plains": 0,
+   "capital": 12,
+   "coast": 33
+  },
+  "extremes": {
+   "scarceWindWeek": {
+    "start": "2025-01-01",
+    "end": "2025-01-07",
+    "nationalWindCF": 0.2788,
+    "yearWindCF": 0.3603,
+    "rule": "the 7 whole days inside January-February or inside December with the least wind output of the 2025 fleet, all regions together"
+   },
+   "peakNetLoadDay": {
+    "date": "2025-08-20",
+    "hour": 19,
+    "netLoadGW": 31.34,
+    "rule": "the day of the year's highest hourly national net load (load at the busbar less the 2025 fleet's wind and solar), outside the scarce-wind week"
+   },
+   "loadPeakGW": 39.46
+  },
+  "chronology": {
+   "weights": "Each slice's hours; they sum to 8,760.",
+   "days": "A season's day and night slices form one representative day (12 + 12 hours) that stands for `days` days; batteries cycle within it (end of night = start of day).",
+   "week": "The scarce-wind week is 7 consecutive days: a store may enter it full but must cover the week's shortfall from what it holds (no refill from other seasons).",
+   "extremes": "Kept whole: the peak net-load day and the scarce-wind winter week.",
+   "sameYear": "Load, wind, solar and the hydro factor all come from one weather year (2025), so their correlation survives.",
+   "outages": "Forced outages are left out of the planning LP (availability factors stand in); adequacy is never judged from slices (lesson A5)."
+  },
+  "fullYearCheck": {
+   "periods": [2030, 2050],
+   "weatherYears": [
+    {
+     "year": 2025,
+     "file": "town_year.json",
+     "role": "the year the slices come from"
+    },
+    {
+     "year": 2024,
+     "file": "m03-capacity-expansion-2024.json",
+     "role": "an independent weather year (29 February left out)",
+     "windCF": {
+      "highlands": 0.3446,
+      "ridge": 0.304,
+      "plains": 0.4054,
+      "capital": 0.2534,
+      "coast": 0.2838
+     }
+    }
+   ],
+   "method": "Fix the plan's capacities in each checked period and re-dispatch them hour by hour over the full year by the hourRule (2024: the same rule with that year's shapes, the same windScale and solarScale, so its capacity factors differ by weather), with transmission limits and storage linked hour to hour.",
+   "report": [
+    "unserved energy (MWh and hours)",
+    "CO2 of the year against the slice estimate",
+    "curtailed wind and solar",
+    "hours each link is at its limit",
+    "the scarce-wind week's lowest store level"
+   ],
+   "survives": "Set for teaching: a conclusion survives if it holds in both years: all demand served, CO2 within 10% of the slice estimate, the same ranking of plans. A plan that fails the 2024 year is reported, not hidden."
+  }
+ },
+ "shocks": [
+  {
+   "key": "gasSpike",
+   "label": "Gas-price spike",
+   "in": [
+    "C4",
+    "A21"
+   ],
+   "what": "LNG costs 3 times its price and domestic gas 1.5 times, for one model year the learner picks (default 2030).",
+   "params": {
+    "lngX": 3.0,
+    "gasX": 1.5,
+    "year": 2030
+   },
+   "set": "teaching"
+  },
+  {
+   "key": "drought",
+   "label": "Drought",
+   "in": [
+    "C4"
+   ],
+   "what": "Hydro output 35% lower in every slice of one model year; thermal plants cooled by rivers lose 10% of their capacity in the summer slices.",
+   "params": {
+    "hydroX": 0.65,
+    "thermalSummerX": 0.9,
+    "year": 2035
+   },
+   "set": "teaching"
+  },
+  {
+   "key": "mineralBan",
+   "label": "Mineral export restriction",
+   "in": [
+    "C4",
+    "A21"
+   ],
+   "what": "Country R stops exports of refined battery minerals for two years: the factory runs on other suppliers, recycling and its stock; new batteries cost 1.5 times as much in that model year.",
+   "params": {
+    "supplier": 0,
+    "years": 2,
+    "batteryCapexX": 1.5,
+    "year": 2035
+   },
+   "set": "teaching"
+  },
+  {
+   "key": "demandSurprise",
+   "label": "Demand surprise",
+   "in": [
+    "C4"
+   ],
+   "what": "Electricity demand 10% above the scenario in every slice from 2035 (new large loads, data centers among them, and faster electrification), not known when the earlier periods are planned.",
+   "params": {
+    "elX": 1.1,
+    "from": 2035
+   },
+   "set": "teaching"
+  },
+  {
+   "key": "straitClosure",
+   "label": "Strait closure",
+   "in": [
+    "A21"
+   ],
+   "what": "Ships cannot pass the strait for 8 weeks: all crude imports and a quarter of LNG cargoes stop.",
+   "params": {
+    "weeks": 8,
+    "oilX": 0.0,
+    "lngThroughStraitX": 0.0
+   },
+   "lostPJ": 166.5,
+   "set": "teaching"
+  },
+  {
+   "key": "factoryFire",
+   "label": "Factory fire",
+   "in": [
+    "A21"
+   ],
+   "what": "The battery factory stops for 6 months; batteries must be imported at a premium of 20%.",
+   "params": {
+    "months": 6,
+    "importPremium": 0.2
+   },
+   "set": "teaching"
+  }
+ ],
+ "demand": {
+  "scenarios": [
+   {
+    "key": "low",
+    "label": "Low growth",
+    "growth": {
+     "industry": 0.0,
+     "buildings": 0.3,
+     "transport": 0.2,
+     "agriculture": 0.0
+    },
+    "newLoadsTWh": {
+     "2030": 0,
+     "2040": 5,
+     "2050": 10
+    }
+   },
+   {
+    "key": "central",
+    "label": "Central",
+    "growth": {
+     "industry": 0.8,
+     "buildings": 0.6,
+     "transport": 0.8,
+     "agriculture": 0.3
+    },
+    "newLoadsTWh": {
+     "2030": 5,
+     "2040": 15,
+     "2050": 25
+    }
+   },
+   {
+    "key": "high",
+    "label": "High growth",
+    "growth": {
+     "industry": 1.5,
+     "buildings": 1.0,
+     "transport": 1.4,
+     "agriculture": 0.5
+    },
+    "newLoadsTWh": {
+     "2030": 10,
+     "2040": 30,
+     "2050": 50
+    }
+   }
+  ],
+  "default": "central",
+  "method": "growth: % a year in each sector's useful energy (the services: heat, motion, light), from 2025; newLoadsTWh: extra electricity a year from new large loads (factories and data centers, loads only), straight-line between the years shown.",
+  "electrification": {
+   "buildings": {
+    "ratio": 3.0,
+    "fossil": 0.8,
+    "what": "heat pumps, seasonal COP 3, against gas and oil furnaces at 80%"
+   },
+   "transport": {
+    "ratio": 0.89,
+    "fossil": 0.3,
+    "what": "EVs (89%) against engines (30%): DOE's figures, read from prairie-city.json"
+   },
+   "industry": {
+    "ratio": 1.5,
+    "fossil": 0.8,
+    "maxShare2050": 0.6,
+    "what": "a mix of electric boilers and industrial heat pumps for heat below about 400 C; a 1.5 ratio of useful heat per unit of electricity"
+   },
+   "maxSharePerPeriod": 0.15,
+   "set": "teaching: ratios are useful energy per unit of final energy; at most 15 percentage points of a sector's useful energy can switch to electricity per period; industry at most 60% by 2050; end-use equipment costs are left out"
+  },
+  "realWorld": "For comparison: EIA's AEO2026 cases put U.S. electricity use growing 0.9% to 1.6% a year to 2050 (a spread of cases, not a forecast range).",
+  "set": "teaching",
+  "src": [
+   "eia-aeo2026"
+  ]
+ },
+ "ridgeCounty": {
+  "a13": {
+   "note": "Ridge County is Prairieland's coal-dependent county (curriculum v2 §6, scale S4). A13 sets its numbers here and wave W6 (SB4, C4) reuses them: change them together with W6. Anchors from the national-strategy dossier §8.0: Prairieland has 20 million people; Ridge County holds 3% of its workforce; coal provides 40% of the county's local tax revenue. Everything else is set for teaching.",
+   "fiction": "Ridge County and Prairieland are fictional; their numbers are illustrative.",
+   "prairielandPeople": 20000000,
+   "prairielandWorkforce": 10000000,
+   "workforceShare": 0.03,
+   "coalTaxShare": 0.4,
+   "otherRevenueM": 840,
+   "mineCoalTaxM": 300,
+   "plant": {
+    "name": "Ridge Station",
+    "mw": 2400,
+    "staff": 450,
+    "mineJobs": 700,
+    "valueM": 3000
+   },
+   "set": "teaching: the workforce, the county's tax revenue other than the plant's ($840M a year, of which $300M is paid by the coal mines), the plant's size, staff, taxable value and the mine jobs that supply it"
+  },
+  "region": "ridge",
+  "coalPJ": 700.0,
+  "coalMt": 27.13,
+  "ridgeStationFuel2025PJ": 134.07,
+  "workers": 300000,
+  "note": "Ridge County lies in the Ridge region. Its numbers are A13's, copied whole and unchanged in `a13` (a change goes to A13's data and here together). All of Prairieland's coal is mined there: 27.1 Mt a year at IPCC's 25.8 TJ per kt."
+ },
+ "realWorld": [
+  {
+   "what": "U.S. primary energy consumption, 2025",
+   "value": "96.5 quads (about 101.8 EJ): petroleum 37%, gas 36%, coal 9%, renewables 9%, nuclear 8.5%",
+   "src": "eia-mer-13"
+  },
+  {
+   "what": "EU energy import dependency, 2024",
+   "value": "57.3% (net imports / gross available energy); gas 85.0%, oil 96.6%",
+   "src": "eurostat-id"
+  },
+  {
+   "what": "Leading refiner of strategic minerals (IEA, 2025 report)",
+   "value": "one country is the leading refiner for 19 of the IEA's 20 strategic minerals, with an average share of about 70%",
+   "src": "iea-gcmo-2025"
+  },
+  {
+   "what": "Oil through the Strait of Hormuz, fourth quarter of 2025",
+   "value": "21.6 million barrels a day, about 21% of world oil supply",
+   "src": "eia-steo-security"
+  },
+  {
+   "what": "Oil stocks benchmark",
+   "value": "IEA members that are net importers hold at least 90 days of net imports",
+   "src": "iea-stocks"
+  }
+ ],
+ "sources": {
+  "eia-aeo2026-emm": {
+   "title": "Assumptions to the Annual Energy Outlook 2026: Electricity Market Module, Tables 3 and 4",
+   "publisher": "U.S. Energy Information Administration",
+   "date": "April 2026; read 7 Nov 2026",
+   "url": "https://www.eia.gov/outlooks/aeo/assumptions/pdf/EMM_Assumptions.pdf",
+   "where": "Table 3: total overnight cost, fixed and variable O&M and heat rate of new plants (2025 dollars); Table 4: total overnight cost by each of the 25 regions (2025 dollars per kW), whose lowest and highest values bound each range here"
+  },
+  "nrel-battery-2025": {
+   "title": "Cole, Ramasamy and Turan, Cost Projections for Utility-Scale Battery Storage: 2025 Update, NREL/TP-6A40-93281 (2024 costs, section 2 and Figure 2; O&M, life and efficiency, section 3); the cost basis of the 2025 ATB's battery page",
+   "publisher": "National Laboratory of the Rockies (formerly NREL)",
+   "date": "June 2025 (via 13-capstone.json)",
+   "url": "https://docs.nlr.gov/docs/fy25osti/93281.pdf",
+   "where": "2024 cost: $372 per kW plus $241 per kWh (2024 dollars), converted with BEA's GDP deflator (x 128.893 / 125.587)"
+  },
+  "eia-epa-gas": {
+   "title": "Electric Power Annual, Table 7.4: average cost of fossil fuels for the electric power industry",
+   "publisher": "U.S. Energy Information Administration",
+   "date": "final 2025 data (via e2-plains-grid.json)",
+   "url": "https://www.eia.gov/electricity/annual/html/epa_07_04.html",
+   "where": "2025, dollars per MMBtu: natural gas 3.85, coal 2.42"
+  },
+  "ipcc-2006": {
+   "title": "2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy, chapters 1 and 2",
+   "publisher": "Intergovernmental Panel on Climate Change",
+   "date": "2006; read 2 Nov 2026 for the course dossier",
+   "url": "https://www.ipcc.ch/report/2006-ipcc-guidelines-for-national-greenhouse-gas-inventories/",
+   "where": "default CO2 factors on net calorific values: crude oil 73.3, natural gas 56.1, other bituminous coal 94.6 t per TJ; other bituminous coal 25.8 TJ per Gg"
+  },
+  "iea-faq": {
+   "title": "Statistics questionnaires FAQ",
+   "publisher": "International Energy Agency",
+   "date": "read 7 Nov 2026",
+   "url": "https://www.iea.org/statistics-questionnaires-faq",
+   "where": "the physical energy content method: nuclear's primary energy is its heat, estimated from generation at 33% efficiency; hydro, wind and solar photovoltaic count at their electricity output; the IEA left the substitution method"
+  },
+  "owid-primary": {
+   "title": "Primary energy measurement change",
+   "publisher": "Our World in Data",
+   "date": "read 7 Nov 2026",
+   "url": "https://ourworldindata.org/primary-energy-measurement-change",
+   "where": "how the substitution and physical energy content methods count nuclear, hydro, wind and solar"
+  },
+  "iea-gcmo-2025": {
+   "title": "Global Critical Minerals Outlook 2025, executive summary",
+   "publisher": "International Energy Agency",
+   "date": "2025; read 2 Nov 2026 for the course dossier",
+   "url": "https://www.iea.org/reports/global-critical-minerals-outlook-2025/executive-summary",
+   "where": "one country is the leading refiner for 19 of 20 strategic minerals, with an average share of about 70%"
+  },
+  "iea-stocks": {
+   "title": "Oil stocks of IEA countries",
+   "publisher": "International Energy Agency",
+   "date": "read 2 Nov 2026 for the course dossier",
+   "url": "https://www.iea.org/data-and-statistics/data-tools/oil-stocks-of-iea-countries",
+   "where": "IEA members that are net importers of oil must hold stocks of at least 90 days of their net imports"
+  },
+  "iea-ger-2026": {
+   "title": "Global Energy Review 2026: CO2 emissions",
+   "publisher": "International Energy Agency",
+   "date": "20 Apr 2026; read 2 Nov 2026 for the course dossier",
+   "url": "https://www.iea.org/reports/global-energy-review-2026/co2-emissions",
+   "where": "global energy-related CO2 about 38 Gt in 2025"
+  },
+  "forster-2026": {
+   "title": "Forster et al. 2026, Indicators of Global Climate Change 2025, Earth System Science Data, section 9 and Table 8",
+   "publisher": "Earth System Science Data (Copernicus)",
+   "date": "11 Jun 2026; read 2 Nov 2026 for the course dossier",
+   "url": "no link",
+   "where": "remaining CO2 budget for a 50% chance of 1.5 C: about 130 Gt from the start of 2026 (a peer-reviewed update, not a new IPCC assessment)"
+  },
+  "eia-aeo2026": {
+   "title": "Annual Energy Outlook 2026",
+   "publisher": "U.S. Energy Information Administration",
+   "date": "8 Apr 2026; read 2 Nov 2026 for the course dossier",
+   "url": "https://www.eia.gov/outlooks/aeo/",
+   "where": "modelled U.S. electricity use grows 0.9% to 1.6% a year to 2050 across the cases"
+  },
+  "eia-mer-13": {
+   "title": "Monthly Energy Review, Table 1.3: primary energy consumption by source",
+   "publisher": "U.S. Energy Information Administration",
+   "date": "October 2026 edition; read 2 Nov 2026 for the course dossier",
+   "url": "https://www.eia.gov/totalenergy/data/browser/?tbl=T01.03",
+   "where": "2025: 96.5 quads; petroleum 37%, natural gas 36%, coal 9%, renewables 9%, nuclear 8.5% (rounded)"
+  },
+  "eurostat-id": {
+   "title": "Energy import dependency by products (nrg_ind_id)",
+   "publisher": "Eurostat",
+   "date": "updated 16 Jul 2026; read 2 Nov 2026 for the course dossier",
+   "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_ind_id/default/table",
+   "where": "EU 2024: 57.3%; gas 85.0%, oil 96.6%, solid fossil fuels 34.2%"
+  },
+  "eia-steo-security": {
+   "title": "Short-Term Energy Outlook, energy security supplement, tables 1, 2 and 4",
+   "publisher": "U.S. Energy Information Administration",
+   "date": "12 Aug 2026; read 2 Nov 2026 for the course dossier",
+   "url": "https://www.eia.gov/outlooks/steo/report/energysecurity/article.php",
+   "where": "oil flows through the Strait of Hormuz 21.6 million barrels a day in the fourth quarter of 2025 (about 21% of world supply)"
+  },
+  "eia-930": {
+   "title": "Hourly Electric Grid Monitor (Form EIA-930), Southwest Power Pool, 2025 and 2024",
+   "publisher": "U.S. Energy Information Administration",
+   "date": "accessed 2 and 3 Nov 2026 (via town_year.json and m03-capacity-expansion-2024.json)",
+   "url": "https://www.eia.gov/electricity/gridmonitor/",
+   "where": "hourly demand, wind and solar shapes, each normalised to its own maximum: the weather years of the time slices and of the full-year check"
+  },
+  "noaa-normals": {
+   "title": "U.S. Climate Normals 1991-2020, Wichita Eisenhower National Airport",
+   "publisher": "NOAA National Centers for Environmental Information",
+   "date": "1991-2020 normals (via prairie-city.json)",
+   "url": "https://www.ncei.noaa.gov/products/us-climate-normals",
+   "where": "heating degree days 4,413.6 and cooling degree days 1,773.6 (base 65 F): Capital Valley's climate, in C-days"
+  },
+  "dossier-card": {
+   "title": "Prairieland parameter card (the course's national-strategy dossier, section 8.0)",
+   "publisher": "Learn (this course)",
+   "date": "fact-checked 2 Nov 2026",
+   "url": "no link",
+   "where": "20 million people; GDP $1.2 trillion; primary energy 3.5 EJ (oil 35%, 80% imported through one strait; gas 30%, LNG 40% of it; coal 20%, all from Ridge County; nuclear 5%; wind, solar and hydro 10%); energy CO2 214.9 Mt; Ridge County 3% of the workforce, coal 40% of its local tax"
+  }
+ }
+}

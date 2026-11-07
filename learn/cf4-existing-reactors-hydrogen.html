@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Case file CF4 of Energy Systems, Step by Step. Can existing U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?">
+
+<title>Can existing reactors earn more by making hydrogen and providing grid services? – Honglin Li</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-24969ac2e858442fb45ced1a2b17dbde.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-c0b1642a1007bf633769ed7b0f05c6cc.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha384-cxs0Bj979VdNByRZzAJ2KJWG8vH/kG7fwWZAIZW3Tmsw0rAuP/pu3I3LitFWEs18" crossorigin="anonymous">
+<meta name="theme-color" content="#ffffff">
+
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js" type="text/javascript" integrity="sha384-IgpmJyK7IVIVd18E1Ubslp9a1s6/6VBt9aJFbpzNIJPPMaxwEV7OxR/xY0hHbSck" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/home.css">
+<link rel="stylesheet" href="../assets/pubs.css">
+<link rel="stylesheet" href="../assets/pages.css">
+<link rel="stylesheet" href="../assets/map.css">
+<link rel="stylesheet" href="../assets/explainers.css">
+<link rel="stylesheet" href="../assets/learn/learn.css">
+<meta property="og:title" content="Can existing reactors earn more by making hydrogen and providing grid services? – Honglin Li">
+<meta property="og:description" content="Case file CF4 of Energy Systems, Step by Step. Can existing U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?">
+<meta property="og:image" content="https://henryutd2021.github.io/learn/images/profile-square.jpg">
+<meta property="og:site_name" content="Honglin Li">
+</head>
+
+<body class="nav-fixed page-learn page-lesson lx-form-case quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-xl " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Honglin Li</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../software-data.html"> 
+<span class="menu-text">Software</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../learn/index.html"> 
+<span class="menu-text">Learn</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../field-notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../journeys.html"> 
+<span class="menu-text">Journeys</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en"> <i class="bi bi-mortarboard-fill" role="img" aria-label="Google Scholar">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Henryutd2021"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/honglin-li-998b18221/"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> 
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> 
+    </nav>
+</header>
+
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+
+
+    
+
+<main class="content column-page" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Can existing reactors earn more by making hydrogen and providing grid services?</h1>
+<p class="subtitle lead">Follow one study through six parts, then run a toy plant that sells power, makes hydrogen and holds reserves at prices you set</p>
+</div>
+
+<div>
+  <div class="description">
+    Case file CF4 of Energy Systems, Step by Step. Can existing U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?
+  </div>
+</div>
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Can existing reactors earn more by making hydrogen and providing grid services? Follow one study through six parts, then run a toy plant that sells power, makes hydrogen and holds reserves at prices you set", "description": "Case file CF4 of Energy Systems, Step by Step. Can existing U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?", "learningResourceType": "Case study", "educationalLevel": "Intermediate", "timeRequired": "PT10M", "inLanguage": "en", "isAccessibleForFree": true, "teaches": ["hydrogen at an existing plant", "reserves from an electrolyzer's headroom", "sunk costs", "price-taking", "reading a published dispatch and cash-flow study"], "license": "https://creativecommons.org/licenses/by/4.0/", "author": {"@type": "Person", "name": "Honglin Li", "url": "https://henryutd2021.github.io/"}, "url": "https://henryutd2021.github.io/learn/cf4-existing-reactors-hydrogen.html", "isPartOf": {"@type": "Course", "name": "Energy Systems, Step by Step", "url": "https://henryutd2021.github.io/learn/"}}</script>
+<script type="application/json" class="lx-lesson-data">{"id":"cf4-existing-reactors-hydrogen","starter":null,"total":14,"code":"CF4","title":"Can existing reactors earn more by making hydrogen and providing grid services?","subtitle":"Follow one study through six parts, then run a toy plant that sells power, makes hydrogen and holds reserves at prices you set","short":"Hydrogen at existing plants","tier":"analyst","tier2":null,"tierLabel":"Analyst · L2","level":"L2","slot":2,"slot2":null,"minutes":10,"does":"A case file in six parts and a timeline; then split a toy plant's output hour by hour between the grid, an electrolyzer and reserves, at prices you set, and see what the day earns against selling all the power.","outcome":"Say what an hourly dispatch model and a lifetime cash flow each add when judging hydrogen at an existing plant, why the plant's own capital drops out, and which assumptions a result rests on.","icon":"atom","form":"case","scales":[],"teaches":["hydrogen at an existing plant","reserves from an electrolyzer's headroom","sunk costs","price-taking","reading a published dispatch and cash-flow study"],"lab":null,"href":"cf4-existing-reactors-hydrogen.html","ready":true,"after":[{"id":"07-cost","starter":7,"title":"What does electricity cost to make?","short":"What it costs","does":"Building, fuel and upkeep; a discounting slider; a levelized-cost calculator, and what it misses.","href":"07-cost.html","ready":true}],"prev":null,"next":null}</script>
+<div class="lx-head" data-lesson-id="cf4-existing-reactors-hydrogen" data-total="14" data-tier="analyst" data-level="L2" data-minutes="10" data-form="case">
+<div>
+<nav class="lx-crumbs" aria-label="Breadcrumb"><ol><li><a href="index.html">Learn</a></li><li aria-current="page">CF4</li></ol></nav>
+<ul class="lx-badges" aria-label="About this lesson">
+<li style="--c:var(--lx-tier-2)"><span class="lx-dot" aria-hidden="true"></span>Analyst · L2</li>
+<li>Case file</li>
+<li>10 min</li>
+<li>After <a href="07-cost.html">lesson 7</a></li>
+<li class="lx-done-tag" data-lesson-id="cf4-existing-reactors-hydrogen" hidden="">Completed</li>
+</ul>
+</div>
+<nav class="lx-steps" aria-label="In this lesson"><ol><li><a href="#case"><span class="lx-n">1</span>The case</a></li><li><a href="#explain"><span class="lx-n">2</span>Explain</a></li><li><a href="#check"><span class="lx-n">3</span>Check</a></li><li><a href="#sources"><span class="lx-n">4</span>Sources</a></li></ol></nav>
+</div>
+
+<div id="case" class="lx-sec">
+<div class="lx-case">
+<div class="lx-case-part"><p class="lx-eyebrow">1 · The puzzle</p>
+<div class="cf4-g"><p class="cf4-gl">The pressure</p><p>Nuclear power supplies reliable low-carbon electricity and high-temperature heat, but existing plants face growing pressure to operate more flexibly in markets with rising renewable penetration.</p></div>
+<div class="cf4-g"><p class="cf4-gl">The option</p><div data-e15="E15.2"><p>A nuclear plant can do more than sell electricity around the clock.</p><ul><li>With <span class="lx-term" data-term="high-temperature-electrolyzer">high-temperature electrolysis</span>, part of its electricity and steam can make hydrogen;</li><li>with hydrogen storage and a battery, it can shift its output and offer <span class="lx-term" data-term="ancillary-services">ancillary services</span> to the grid.</li></ul></div></div>
+<div class="cf4-g"><p class="cf4-gl">The open question</p><p>Coupling nuclear reactors with hydrogen production through high-temperature electrolysis may improve <span class="lx-term" data-term="flexibility">flexibility</span> and create additional value, yet its economic potential remains uncertain.</p></div>
+<p class="lx-hint">So can an existing plant earn more by making hydrogen as well as power?</p></div>
+<div class="lx-case-part"><p class="lx-eyebrow">2 · The question in one sentence</p><p class="lx-case-q">Can existing U.S. nuclear power plants improve their economics and operating flexibility by adding high-temperature electrolysis, hydrogen storage and batteries, and by selling energy, hydrogen and ancillary services?</p><p class="lx-hint">Question type: prescriptive (what should be added, and how should it run?).</p></div>
+<div class="lx-case-part"><p class="lx-eyebrow">3 · Scale and boundary</p><dl class="lx-ideas cf4-bnd"><dt>Inside</dt><dd data-e15="E15.5"><ul><li>42 operating U.S. reactors in seven <span class="lx-term" data-term="rto">ISO/RTO</span> markets, each facing its own hourly energy and ancillary-service prices for 2024 (8,760 hours; February 29 is left out);</li><li>a high-temperature electrolyzer, hydrogen storage and a battery added to each plant;</li><li>one year of hourly operation turned into a lifetime cash flow.</li></ul></dd><dt>Assumed throughout</dt><dd data-e15="E15.6"><p>a hydrogen production credit of $3/kg for ten years, counted in hydrogen revenue.</p></dd><dt>Left out</dt><dd data-e15="E15.7"><ul><li>price feedback from large-scale adoption, because every plant takes 2024 prices as given;</li><li>re-optimized operation after the hydrogen credit expires, because the dispatch is held fixed.</li></ul></dd></dl></div>
+<div class="lx-case-part"><p class="lx-eyebrow">4 · Decisions, goal and rules, in words</p><dl class="cf4-dgr"><div><dt>Decisions</dt><dd data-e15="E15.8"><p>in every hour,</p><ul><li>how much of the plant's electricity and steam goes to the electrolyzer;</li><li>when the electrolyzer runs and at what load;</li><li>what goes into and out of hydrogen storage and the battery;</li><li>grid sales and purchases;</li><li>and the bids of the turbine, electrolyzer and battery in the market's ancillary services.</li></ul></dd></div><div><dt>Goal</dt><dd data-e15="E15.9"><p>the largest yearly profit (energy, hydrogen and ancillary-service revenue minus operating and annualized capital costs), with the hydrogen production credit counted in hydrogen revenue.</p></dd></div><div><dt>Rules</dt><dd data-e15="E15.10"><ul><li>turbine and electrolyzer efficiency follow <span class="lx-term" data-term="piecewise-linear">piecewise-linear</span> curves;</li><li>the electrolyzer keeps <span class="lx-term" data-term="minimum-up-down-time">minimum up and down times</span>, <span class="lx-term" data-term="ramp-rate">ramp limits</span> and a minimum stable load, pays a <span class="lx-term" data-term="start-up-cost">start-up cost</span> and degrades with operation and start-ups;</li><li>ancillary-service bids must fit within each unit's <span class="lx-term" data-term="reserve-headroom">headroom</span> and ramp limits.</li></ul></dd></div></dl></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">5 · Data and method</p><ul><li>Seven U.S. markets price energy and ancillary services differently, and each of 42 reactors faces its own prices.</li><li>The study links an hourly <span class="lx-term" data-term="mixed-integer-program">mixed-integer optimization</span> of turbine, electrolyzer and storage <span class="lx-term" data-term="dispatch">dispatch</span>, for 42 reactors in seven U.S. ISO/RTO markets using 2024 prices, to a lifetime cash-flow model.</li><li>The hourly dispatch model co-optimizes electricity sales, hydrogen production, storage and ancillary services under each market's products, and is run for every reactor.</li></ul>
+<details class="lx-deeper cf4-more"><summary><span class="k">Detail</span>What the equipment can do, and the two cases</summary><div class="lx-deeper-body"><ul><li>Electrolyzers and turbines are not ideal: efficiency varies with load, starts wear equipment, and ramping is limited.</li><li>The model represents these limits, so flexibility estimates respect them.</li><li>Each plant is run two ways: business-as-usual operation without any modification for hydrogen production, and a retrofit with high-temperature electrolysis, hydrogen storage and a battery.</li></ul></div></details>
+<details class="lx-deeper cf4-more"><summary><span class="k">Detail</span>From one year to a lifetime</summary><div class="lx-deeper-body"><ul><li>The study treats an existing plant's capital as already spent (a <span class="lx-term" data-term="sunk-cost">sunk cost</span>); the retrofit's cash flow adds the capital cost of the new hydrogen and battery equipment.</li><li>A <span class="lx-term" data-term="discounted-cash-flow">discounted cash-flow analysis</span> turns the optimized year into <span class="lx-term" data-term="net-present-value">net present value</span>, <span class="lx-term" data-term="internal-rate-of-return">internal rate of return</span>, <span class="lx-term" data-term="payback-period">payback</span> and levelized costs, with component-level capital costs and scheduled replacements.</li><li>Electricity and hydrogen prices are taken as given (<span class="lx-term" data-term="price-taker">price-taking</span>): the study evaluates plant operation against observed 2024 prices, and price feedback from wide adoption is stated as a limit and left to future work.</li></ul></div></details>
+<details class="lx-deeper cf4-more"><summary><span class="k">Detail</span>Sensitivity runs</summary><div class="lx-deeper-body"><p>Sensitivity runs on a representative reactor vary the electrolyzer's capacity bound and the level of electricity prices.</p></div></details></div>
+<div class="lx-case-part wide"><p class="lx-eyebrow">6 · What came out, and where it holds</p>
+<blockquote class="lx-excerpt blockquote" data-source="excerpt:npph2-existing"><p>Operated as baseload-only plants at 2024 market prices, with no credits, nearly all of the plants studied had negative <span class="lx-term" data-term="net-present-value">net present value</span>.</p><p>With hydrogen integration, including the assumed hydrogen production credit, a majority of the plants studied reached positive net present value.</p><p>With the assumed hydrogen credit, integrated operation added output flexibility: flexible output (the range of a plant's hourly output to the grid) expanded by more than 115 MW for most of the plants studied.</p><p>Ancillary-service revenue was a few percent of total revenue, which includes the hydrogen credit.</p><footer>Approved excerpt of: Li et al. (2026), <a href="https://doi.org/10.1038/s41467-026-73630-y">Nature Communications</a>.</footer></blockquote>
+<dl class="lx-ideas cf4-holds"><dt>Holds when</dt><dd data-e15="E15.24"><ul><li>2024 prices, taken as given;</li><li>modeled ancillary-service participation parameters;</li><li>the assumed hydrogen credit ($3/kg for ten years), with the dispatch held fixed after the credit expires;</li><li>an existing plant's capital treated as already spent;</li><li>no credits in the baseload case.</li></ul></dd><dt>Leaves out</dt><dd data-e15="E15.24"><p>price feedback from large-scale adoption.</p></dd></dl></div>
+</div>
+<div class="lx-interactive" data-learn="cf4" data-src="../assets/learn/data/cf4-existing-reactors-hydrogen.json ../assets/learn/data/f01-five-scales.json">
+<div class="lx-fallback">
+<p class="lx-eyebrow">The study in time</p>
+
+<ol class="lx-tl-static"><li><b>June 2026</b> · Journal article (this case). Hourly operation of 42 existing reactors with high-temperature electrolysis, hydrogen storage and batteries, in seven U.S. ISO/RTO markets at 2024 prices, is linked to a lifetime cash-flow model; published online on 2 June 2026. <span class="lx-hint">Source: <a href="https://doi.org/10.1038/s41467-026-73630-y">Li et al. (2026), Nature Communications 17, 7090</a></span></li><li><b>2 November 2026</b> · Code released. A documented, runnable implementation of the modelling framework, with synthetic examples (version 1.0.0). <span class="lx-hint">Source: <a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">nuclear-hydrogen-integration on GitHub</a>, as of 7 November 2026</span></li></ol>
+
+</div>
+</div>
+<p class="lx-datanote"><span>The toy below is the course's own, with illustrative numbers, some of them yours; it holds none of the study's inputs or results.</span></p>
+</div>
+<div id="explain" class="lx-sec">
+<section id="run-a-toy-plants-day-yourself-then-where-the-result-holds" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="run-a-toy-plants-day-yourself-then-where-the-result-holds">Run a toy plant’s day yourself, then where the result holds</h2>
+</section>
+<div class="lx-interactive" data-learn="cf4-idea" data-src="../assets/learn/data/cf4-existing-reactors-hydrogen.json ../assets/learn/data/path.json">
+<div class="lx-fallback">
+
+<p class="lx-eyebrow">One day at an existing plant that can also make hydrogen (illustrative)</p><p class="lx-hint">Illustrative round numbers, some of them yours: a generic existing plant, not the study's inputs or results. Power in MW, as an average over each hour; money in dollars for the one day shown.</p><ul><li>The day's grid prices run from $12 to $90 per MWh; a MWh made into hydrogen earns $50 (25 kg at $2.00 per kg), and holding it as a reserve adds $8 per MW-hour.</li><li>The 200 MW electrolyzer runs in 20 of 24 hours; output to the grid: 800 to 1,000 MW.</li></ul><div class="lx-scroll-x">
+<table class="cf-two lx-ledger caption-top table">
+<caption>One illustrative day, in dollars: selling all the power against adding the electrolyzer and reserves. The plant's own fuel and upkeep, the same in both columns, are left out, so neither total is the plant's profit. At the defaults.</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col"></th>
+<th data-quarto-table-cell-role="th" scope="col">Sell all its power</th>
+<th data-quarto-table-cell-role="th" scope="col">With hydrogen and reserves</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Energy sold to the grid</th>
+<td class="n">$893,000</td>
+<td class="n">$774,400</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Hydrogen</th>
+<td class="n">$0</td>
+<td class="n">$200,000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Reserves</th>
+<td class="n">$0</td>
+<td class="n">$32,000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Electrolyzer's daily cost</th>
+<td class="n">$0</td>
+<td class="n">−$80,000</td>
+</tr>
+<tr class="tot odd">
+<th data-quarto-table-cell-role="th" scope="row">Revenue less the electrolyzer's cost</th>
+<td class="n">$893,000</td>
+<td class="n">$926,400</td>
+</tr>
+</tbody>
+</table>
+</div><p>Against selling all its power, the day comes out $33,400 better: $113,400 gained before the electrolyzer's cost, minus its $80,000.</p><details class="lx-textalt"><summary>The day hour by hour</summary><div class="lx-scroll-x">
+<table class="lx-mini-table caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Hour</th>
+<th data-quarto-table-cell-role="th" scope="col">Grid price ($ per MWh)</th>
+<th data-quarto-table-cell-role="th" scope="col">To the grid (MW)</th>
+<th data-quarto-table-cell-role="th" scope="col">To the electrolyzer (MW)</th>
+<th data-quarto-table-cell-role="th" scope="col">Reserve held (MW)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">00:00–01:00</th>
+<td class="n">$30</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">01:00–02:00</th>
+<td class="n">$28</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">02:00–03:00</th>
+<td class="n">$26</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">03:00–04:00</th>
+<td class="n">$25</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">04:00–05:00</th>
+<td class="n">$26</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">05:00–06:00</th>
+<td class="n">$30</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">06:00–07:00</th>
+<td class="n">$38</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">07:00–08:00</th>
+<td class="n">$46</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">08:00–09:00</th>
+<td class="n">$44</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">09:00–10:00</th>
+<td class="n">$36</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">10:00–11:00</th>
+<td class="n">$26</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">11:00–12:00</th>
+<td class="n">$18</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">12:00–13:00</th>
+<td class="n">$14</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">13:00–14:00</th>
+<td class="n">$12</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">14:00–15:00</th>
+<td class="n">$14</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">15:00–16:00</th>
+<td class="n">$20</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">16:00–17:00</th>
+<td class="n">$30</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">17:00–18:00</th>
+<td class="n">$54</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">18:00–19:00</th>
+<td class="n">$72</td>
+<td class="n">1,000</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">19:00–20:00</th>
+<td class="n">$90</td>
+<td class="n">1,000</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">20:00–21:00</th>
+<td class="n">$76</td>
+<td class="n">1,000</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">21:00–22:00</th>
+<td class="n">$62</td>
+<td class="n">1,000</td>
+<td class="n">0</td>
+<td class="n">0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">22:00–23:00</th>
+<td class="n">$42</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">23:00–24:00</th>
+<td class="n">$34</td>
+<td class="n">800</td>
+<td class="n">200</td>
+<td class="n">200</td>
+</tr>
+</tbody>
+</table>
+</div></details><details class="lx-textalt"><summary>The toy's assumptions</summary><ul><li>Illustrative: the plant makes 1,000 MW of electricity in every hour, in both cases.</li><li>Its fuel and upkeep are the same either way, and its own capital is already spent (a <span class="lx-term" data-term="sunk-cost">sunk cost</span>), so none of them changes the comparison.</li><li>Electricity only: the electrolyzer makes 25 kg of hydrogen from each MWh of the plant's electricity it takes (40 kWh per kg), sold at an assumed $2.00 per kg, fixed: $50 per MWh.</li><li>The electrolyzer's capital, as an annual equivalent, and its upkeep: $400 per MW of electrolyzer per day, paid whether it runs or not.</li><li>Reserves, simplified: one product, paid per MW held for an hour (per MW-hour), never called; turning the electrolyzer down sends its electricity to the grid, so its load is the reserve.</li><li>Two different measures: the range of output to the grid over the day, from its lowest hour to its highest, and the reserve, the MW held for the grid in one hour.</li><li>Left out: the steam a high-temperature electrolyzer also takes; the electrolyzer's minimum load, start-ups, ramp limits and wear; hydrogen storage and a battery; prices that move when the plant changes what it sells.</li><li>With no storage and no start-ups, each hour is decided on its own: one hour's choice does not change the next.</li></ul></details>
+
+</div>
+</div>
+<div id="cf4-explain" class="lx-xgrid">
+<div class="lx-fallback">
+
+<p class="lx-eyebrow">Where the result holds</p><dl class="lx-ideas"><dt>It holds when</dt><dd><ul><li>42 existing plants in seven U.S. ISO/RTO markets, each at its own 2024 hourly prices, taken as given;</li><li>one year of hourly operation (8,760 hours) turned into a lifetime cash flow;</li><li>the existing plant's capital treated as already spent, so the capital counted is that of the new hydrogen and battery equipment;</li><li>the assumed hydrogen production credit ($3/kg for ten years) in the retrofit results shown here, with the dispatch held fixed after it expires;</li><li>no credits in the baseload case;</li><li>modeled ancillary-service participation parameters.</li></ul></dd><dt>It leaves out</dt><dd><ul><li>price feedback from large-scale adoption;</li><li>re-optimized operation after the credit expires.</li></ul></dd></dl><p class="lx-hint">Approved excerpt of: Li et al. (2026), Nature Communications.</p>
+
+</div>
+</div>
+<div class="lx-deepers">
+<details class="lx-deeper">
+<summary><span class="k">Go deeper · Modeler</span>The toy's day as a small optimization</summary>
+<div class="lx-deeper-body">
+<p>The toy’s symbols, for each hour <span class="math inline">\(t\)</span> of the day:</p>
+<ul>
+<li><span class="math inline">\(p_t\)</span>: the grid price, in dollars per MWh sold; <span class="math inline">\(P\)</span>: the plant’s output, in MW; <span class="math inline">\(E\)</span>: the electrolyzer’s size, in MW.</li>
+<li><span class="math inline">\(v = k\,\pi_H\)</span>: what a MWh earns as hydrogen, <span class="math inline">\(k\)</span> kg per MWh at an assumed <span class="math inline">\(\pi_H\)</span> dollars per kg.</li>
+<li><span class="math inline">\(q\)</span>: the reserve price, in dollars per MW held for an hour; <span class="math inline">\(c\)</span>: the electrolyzer’s daily cost, in dollars per MW.</li>
+<li>Decisions: <span class="math inline">\(g_t\)</span> MW to the grid, <span class="math inline">\(h_t\)</span> MW to the electrolyzer, <span class="math inline">\(r_t\)</span> MW held as reserve.</li>
+</ul>
+<p><span class="math display">\[\max \; \sum_t \left( p_t\,g_t + v\,h_t + q\,r_t \right) \; - \; c\,E\]</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rule, in every hour</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(g_t + h_t = P\)</span></td>
+<td>the plant runs at full power</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(0 \le h_t \le E\)</span></td>
+<td>the electrolyzer’s size</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(0 \le r_t \le h_t\)</span></td>
+<td>only the electrolyzer’s load can be handed back to the grid</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(g_t \ge P - E \ge 0\)</span></td>
+<td>follows from the first two</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The best choice: <span class="math inline">\(h_t = E\)</span> when <span class="math inline">\(v + q &gt; p_t\)</span>, else <span class="math inline">\(h_t = 0\)</span> (on a tie the toy sells); <span class="math inline">\(r_t = h_t\)</span>, or <span class="math inline">\(q = 0\)</span> and <span class="math inline">\(r_t = 0\)</span> with no reserves.</li>
+<li>Against selling all the power, the day changes by <span class="math inline">\(E \sum_t \max(0,\; v + q - p_t) - c\,E\)</span>; the plant’s own costs appear on both sides, so they cancel.</li>
+<li>Each hour stands alone only because the toy has no storage, start-ups or ramp limits; adding them links the hours into a mixed-integer program, as in <a href="m02-unit-commitment.html">M2</a> and <a href="m11-tea-in-models.html">M11</a>.</li>
+</ul>
+</div>
+</details>
+</div>
+</div>
+<div id="check" class="lx-sec">
+<section id="check-yourself-then-try-it" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="check-yourself-then-try-it">Check yourself, then try it</h2>
+</section>
+<div class="lx-myths" data-quiz="cf4-myth">
+<div class="lx-qq" data-id="sunk" data-answer="myth">
+<p class="lx-qtext">Myth or fact? “Whether the electrolyzer pays depends on what the plant itself cost to build.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Myth. That cost is already spent and the same either way, so it drops out: in the toy only the power sold, the hydrogen and reserves earned, and the electrolyzer's own $80,000 a day change.</p></details>
+</div>
+<div class="lx-qq" data-id="headroom" data-answer="fact">
+<p class="lx-qtext">Myth or fact? “A plant running at full power can still hold reserves if it runs an electrolyzer.”</p>
+<ul class="lx-choices"><li data-value="myth">Myth</li><li data-value="fact">Fact</li></ul>
+<details class="lx-answer"><summary>Answer</summary><p>Fact. Turning the electrolyzer down sends its power to the grid instead, so its load is headroom: in the toy, 200 MW × 20 hours × $8 per MW-hour = $32,000.</p></details>
+</div>
+</div>
+<div class="lx-card lx-case-try">
+<p class="lx-eyebrow">Try it yourself</p>
+<p class="lx-hint">About 5 minutes, in the toy above.</p>
+<p>Start each one from the defaults: press Reset (price level ×1.0, reserve price $8 per MW-hour, electrolyzer 200 MW, reserves offered).</p>
+<ul>
+<li>Set the price level to ×0.6, then to ×1.4. In how many hours does the electrolyzer run, and how does the day compare with selling all the power?</li>
+<li>Turn reserves off. In how many hours does the electrolyzer run now, and how much of the day's gain came from reserves?</li>
+<li>Set the electrolyzer to 0 MW, then to 400 MW. What range of output to the grid does each give, and what happens to its cost?</li>
+<li>Pick 13:00, then 19:00 on a chart. Where does each MWh go, and why?</li>
+</ul>
+
+<details class="lx-answer"><summary>Worked answers, each from the toy's defaults</summary><div class="lx-scroll-x">
+<table class="lx-mini-table caption-top table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" scope="col">Setting, from the defaults</th>
+<th data-quarto-table-cell-role="th" scope="col">Result, against selling all the power</th>
+<th data-quarto-table-cell-role="th" scope="col">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Price level ×0.6</th>
+<td class="n">runs in all 24 hours; $91,240 better</td>
+<td class="n">The dearest hour pays $54 per MWh, less than the $58 a MWh earns as hydrogen and reserve. $171,240 gained before its cost, minus its $80,000.</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Price level ×1.4</th>
+<td class="n">runs in 16 of 24 hours; $8,360 worse</td>
+<td class="n">In 8 hours the grid pays more than $58 per MWh. $71,640 gained before its cost, minus its $80,000.</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Reserves off</th>
+<td class="n">runs in 19 hours, not 20; $2,200 better, not $33,400</td>
+<td class="n">At 17:00 the grid's $54 per MWh beats $50 as hydrogen alone. Reserves were 3.2% of revenue, yet the gain falls by $31,200.</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Electrolyzer 0 MW</th>
+<td class="n">output to the grid 1,000 MW all day; no different</td>
+<td class="n">Nothing goes to hydrogen, and there is no electrolyzer to pay for.</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Electrolyzer 400 MW</th>
+<td class="n">output to the grid 600 to 1,000 MW; $66,800 better</td>
+<td class="n">It runs in the same 20 hours. $226,800 gained before its cost, minus its $160,000.</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th" scope="row">Pick 13:00</th>
+<td class="n">200 MW to the electrolyzer, 800 MW to the grid</td>
+<td class="n">The grid pays $12 per MWh, less than the $58 a MWh earns as hydrogen and reserve.</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th" scope="row">Pick 19:00</th>
+<td class="n">all 1,000 MW sold</td>
+<td class="n">The grid pays $90 per MWh, more than the $58 a MWh earns as hydrogen and reserve.</td>
+</tr>
+</tbody>
+</table>
+</div><p>The plant's own costs are the same in every case, so they never enter.</p></details>
+
+</div>
+<div class="lx-card lx-case-try">
+<p class="lx-eyebrow">With open code</p>
+<p class="lx-hint">Optional, about 30 minutes; needs Python 3.10 or later on your computer (<a href="b02-python-data.html">lesson B2</a>).</p>
+<p>Try it yourself: the framework's minimal example compares business as usual with the integrated system over two synthetic weeks, solved with HiGHS.</p>
+<p>Generate synthetic inputs, then run the hourly operation again with energy prices 15% higher, or with ancillary services in dispatch mode, and compare the revenues and the flexibility.</p>
+<p>Its numbers say nothing about any real plant, market, policy or year.</p>
+<p class="lx-hint">Set it up first: clone the repository and install it as its README's <a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration#quick-start">Quick start</a> says; run the commands in the repository's folder.</p>
+<ul class="cf4-cmds"><li><code>python examples/minimal.py</code></li><li><code>nuclear-h2 synthetic my_inputs/ --storage</code></li><li><code>nuclear-h2 run my_inputs/ --out-dir outputs/base</code></li><li><code>nuclear-h2 run my_inputs/ --price-factor 1.15 --out-dir outputs/price_up</code></li><li><code>nuclear-h2 run my_inputs/ --as-mode dispatch --out-dir outputs/dispatch</code></li></ul>
+<p class="lx-hint">Each run writes <code>revenue_musd_per_yr.csv</code> and <code>summary.json</code> into its <code>--out-dir</code> folder. Compare the revenue tables, and <code>grid_output_range_mw</code> under "flexibility" in <code>summary.json</code>: the range of output to the grid, the toy's measure too.</p>
+<p><a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">nuclear-hydrogen-integration</a>: open code · MIT licence.</p>
+</div>
+</div>
+<div id="sources" class="lx-sec">
+<section id="sources-and-whats-next" class="level2 lx-sec-h">
+<h2 class="anchored" data-anchor-id="sources-and-whats-next">Sources and what’s next</h2>
+</section>
+<div class="lx-end">
+<div class="lx-stack">
+
+<div class="lx-next lx-card" data-next-id="">
+<p class="lx-eyebrow">Keep going</p>
+<p class="lx-next-t"><a href="index.html">Back to the course map</a></p>
+<button type="button" class="lx-btn ghost small lx-complete" data-complete="cf4-existing-reactors-hydrogen" aria-pressed="false" hidden="">Mark this lesson as complete</button>
+</div>
+
+<div class="lx-card lx-sources">
+<p class="lx-eyebrow">Sources and further reading</p>
+<ul>
+<li>Li et al. (2026). <a href="https://doi.org/10.1038/s41467-026-73630-y">Rethinking the economics and flexibility of U.S. nuclear power through hydrogen integration and policy support</a>. Nature Communications 17, 7090.</li>
+<li><a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">nuclear-hydrogen-integration</a> on GitHub, version 1.1.0 (7 November 2026).</li>
+<li>Earlier lessons: <a href="03-balancing.html">lesson 3</a> (reserves), <a href="07-cost.html">lesson 7</a> (what a cost counts) and <a href="a16-hydrogen-ptx.html">A16</a> (hydrogen from electricity). <a href="f05-nuclear-basics.html">F5</a> shows how a reactor makes heat and electricity.</li>
+<li>Where this goes next: <a href="a01-project-tea.html">A1</a> (a project's cash flows), <a href="m11-tea-in-models.html">M11</a> (techno-economic analysis inside a model), <a href="a12-policy-instruments.html">A12</a> (the tools governments use).</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="lx-foot">
+<p class="lx-corrections">Spotted an error, or stuck? Write to <a href="mailto:hlli@ksu.edu?subject=Learn%2C%20Can%20existing%20reactors%20earn%20more%20by%20making%20hydrogen%20and%20providing%20grid%20services?">hlli@ksu.edu</a>. Corrections are made in place and dated here.</p>
+<p class="lx-license">Text licensed <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>, code <a href="https://opensource.org/license/mit">MIT</a>: teachers and students may reuse and adapt it, with credit to Honglin Li.</p>
+</div>
+
+</div>
+<script src="../assets/learn/learn.js" defer=""></script>
+<script src="../assets/learn/cf4-existing-reactors-hydrogen.js" defer=""></script>
+
+
+
+</main> 
+<script>
+// site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
+// back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
+(function () {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // skip link to the page's main landmark
+  const main = document.querySelector("main");
+  if (main) {
+    if (!main.id) main.id = "main-content";
+    const skip = document.createElement("a");
+    skip.className = "skip-link"; skip.href = "#" + main.id; skip.textContent = "Skip to main content";
+    body.insertBefore(skip, body.firstChild);
+  }
+
+  // the brand (the name at the left of the navbar) is the link to the home page, the About page, which has no navbar
+  // item of its own since Journeys joined the navbar (2026-11-05)
+  const brand = document.querySelector("#quarto-header .navbar-brand");
+  if (brand) {
+    brand.setAttribute("aria-label", "Honglin Li, home");
+    const here = location.pathname.replace(/\/index\.html$/, "/");
+    if (brand.pathname && brand.pathname.replace(/\/index\.html$/, "/") === here) brand.setAttribute("aria-current", "page");
+  }
+  // the navbar says "Notes" for Field Notes (to fit at 1,200 px); its accessible name keeps the full name
+  document.querySelectorAll('#quarto-header .nav-link[href$="field-notes.html"]').forEach(function (a) { a.setAttribute("aria-label", "Field Notes"); });
+
+  // back-to-top button
+  const top = document.createElement("button");
+  top.type = "button"; top.className = "to-top"; top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = '<i class="bi bi-arrow-up" aria-hidden="true"></i>';
+  top.hidden = true;  // out of the tab order until the page is scrolled down
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    if (main) { main.setAttribute("tabindex", "-1"); main.focus({ preventScroll: true }); }
+  });
+  body.appendChild(top);
+
+  function onScroll() {
+    const y = window.scrollY;
+    body.classList.toggle("scrolled", y > 8);
+    const show = y > window.innerHeight * 0.8;
+    top.hidden = !show;
+    top.classList.toggle("show", show);
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // gentle fade-in, once per block
+  const auto = document.querySelectorAll("main .card, main .glow-card, main .reveal-auto > *");
+  auto.forEach(function (el) { el.classList.add("reveal"); });
+  const items = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -5% 0px", threshold: 0.05 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+})();
+</script>
+<script>
+// pages.js — publications, projects listing and project pages (third redesign, 2026-10-30).
+// Inlined on every page (scripts/build_site.py writes pages-js.html), so each part is guarded by element presence.
+//   1. BIB buttons: show / hide an entry's BibTeX; copy button (Publications, home page, project pages)
+//   2. Publications: search box and type tabs; hides empty year groups; live result count; the pressed type is
+//      highlighted in the publications-per-year chart; #journal, #conference, #preprint or #thesis in the URL
+//      presses that tab (the About page's stat row, site/_stats.qmd, links there)
+//   3. Projects: theme tabs built from the cards; #<theme> in the URL preselects a theme (project breadcrumbs link there)
+// Without JS every page is complete: the filter bars stay hidden and the BibTeX panels closed.
+(function () {
+  "use strict";
+
+  // a polite live region for short confirmations ("BibTeX copied")
+  let live = null;
+  function announce(msg) {
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "visually-hidden"; live.setAttribute("role", "status"); live.setAttribute("aria-live", "polite");
+      document.body.appendChild(live);
+    }
+    live.textContent = ""; window.setTimeout(function () { live.textContent = msg; }, 30);
+  }
+  const norm = function (s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " "); };
+
+  // ---------- 1. BibTeX ----------
+  document.querySelectorAll(".bib-toggle").forEach(function (btn) {
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!panel) return;
+    btn.addEventListener("click", function () {
+      const open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!open));
+      panel.hidden = open;
+    });
+  });
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {   // fallback (e.g. file:// previews)
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      ta.remove();
+      if (ok) resolve(); else reject(new Error("copy failed"));
+    });
+  }
+  document.querySelectorAll(".bib-copy").forEach(function (btn) {
+    const label = btn.querySelector("span");
+    const code = btn.parentElement.querySelector("code");
+    if (!code) return;
+    btn.addEventListener("click", function () {
+      copyText(code.textContent).then(function () {
+        btn.classList.add("done"); if (label) label.textContent = "Copied"; announce("BibTeX copied to the clipboard");
+      }, function () {
+        if (label) label.textContent = "Select and copy"; announce("Copy failed; select the text and copy it");
+        const sel = window.getSelection(), range = document.createRange();
+        range.selectNodeContents(code); sel.removeAllRanges(); sel.addRange(range);
+      }).then(function () {
+        window.setTimeout(function () { btn.classList.remove("done"); if (label) label.textContent = "Copy"; }, 1800);
+      });
+    });
+  });
+
+  // pressed-state helper for a group of filter tabs
+  function pressTab(tabs, active) {
+    tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === active)); });
+  }
+
+  // ---------- 2. Publications: search and type tabs ----------
+  const pubBar = document.querySelector(".pub-filter");
+  if (pubBar) {
+    const input = pubBar.querySelector("#pub-q");
+    const tabs = Array.prototype.slice.call(pubBar.querySelectorAll(".ftab"));
+    const groups = Array.prototype.slice.call(document.querySelectorAll(".pub-year"));
+    const items = Array.prototype.slice.call(document.querySelectorAll(".pub-years .pub"));
+    const status = document.querySelector(".filter-status");
+    const empty = document.querySelector(".filter-empty");
+    const chart = document.querySelector(".pub-chart");
+    const total = items.length;
+    let type = "all";
+    items.forEach(function (li) {   // search text: badge, title, authors, venue and year (not the BibTeX)
+      li._q = norm([".abbr", ".pub-title", ".pub-authors", ".pub-venue"].map(function (s) {
+        const el = li.querySelector(s); return el ? el.textContent : "";
+      }).join(" ") + " " + li.getAttribute("data-year"));
+    });
+    function apply() {
+      const terms = norm(input.value).trim().split(" ").filter(Boolean);
+      let shown = 0;
+      items.forEach(function (li) {
+        const ok = (type === "all" || li.getAttribute("data-type") === type) && terms.every(function (t) { return li._q.indexOf(t) !== -1; });
+        li.hidden = !ok; if (ok) shown++;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector(".pub:not([hidden])"); });
+      if (empty) empty.hidden = shown > 0;
+      if (chart) chart.setAttribute("data-type", type);
+      if (status) status.textContent = (shown === total && !terms.length) ? "" :
+        "Showing " + shown + " of " + total + " publications" + (terms.length ? " matching “" + input.value.trim() + "”" : "") + ".";
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () { type = t.getAttribute("data-filter"); pressTab(tabs, t); apply(); });
+    });
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) { if (e.key === "Escape" && input.value) { input.value = ""; apply(); } });
+    const reset = document.querySelector(".filter-reset");
+    if (reset) reset.addEventListener("click", function () { input.value = ""; type = "all"; pressTab(tabs, tabs[0]); apply(); input.focus(); });
+    pubBar.hidden = false;
+    function typeFromHash() {   // year anchors (#y2026) match no tab and are left alone
+      const h = decodeURIComponent((location.hash || "").slice(1));
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === h; });
+      if (tab) { type = h; pressTab(tabs, tab); apply(); }
+    }
+    typeFromHash();
+    window.addEventListener("hashchange", typeFromHash);
+  }
+
+  // ---------- 3. Projects: theme tabs ----------
+  const projBar = document.querySelector(".proj-filter");
+  const cells = Array.prototype.slice.call(document.querySelectorAll(".project-grid [data-theme]"));
+  if (projBar && cells.length) {
+    const box = projBar.querySelector(".ftabs");
+    const status = document.querySelector(".filter-status");
+    const themes = [];   // [key, label, count] in card order
+    cells.forEach(function (c) {
+      const k = c.getAttribute("data-theme");
+      const hit = themes.find(function (t) { return t[0] === k; });
+      if (hit) hit[2]++; else themes.push([k, c.getAttribute("data-label"), 1]);
+    });
+    function makeTab(key, label, n) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "ftab" + (key === "all" ? "" : " theme-" + key);
+      b.setAttribute("data-filter", key); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = (key === "all" ? "" : '<span class="tdot" aria-hidden="true"></span>') + "<span></span> " + '<span class="n">' + n + "</span>";
+      b.children[key === "all" ? 0 : 1].textContent = label;
+      box.appendChild(b);
+      return b;
+    }
+    const tabs = [makeTab("all", "All", cells.length)].concat(themes.map(function (t) { return makeTab(t[0], t[1], t[2]); }));
+    function select(key, push) {
+      const tab = tabs.find(function (t) { return t.getAttribute("data-filter") === key; }) || tabs[0];
+      key = tab.getAttribute("data-filter");
+      pressTab(tabs, tab);
+      let shown = 0;
+      cells.forEach(function (c) { const ok = key === "all" || c.getAttribute("data-theme") === key; c.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = key === "all" ? "" : "Showing " + shown + " of " + cells.length + " projects: " + tab.children[1].textContent + ".";
+      if (push && window.history && history.replaceState) history.replaceState(null, "", key === "all" ? location.pathname + location.search : "#" + key);
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { select(t.getAttribute("data-filter"), true); }); });
+    projBar.hidden = false;
+    const initial = decodeURIComponent((location.hash || "").slice(1));
+    select(initial || "all", false);
+    window.addEventListener("hashchange", function () { select(decodeURIComponent(location.hash.slice(1)) || "all", false); });
+  }
+})();
+</script>
+<script>
+// home.js — about/home page (third redesign, 2026-10-30). Guard by element presence.
+</script>
+<script>
+// map.js — "Collaborations around the world" map on the About page (2026-10-30).
+// The section, its legend, the institution list and the data (<script id="cmap-data">) come from scripts/build_map.py
+// (_map.qmd); styles in assets/map.css. Inlined on every page (scripts/build_site.py writes map-js.html), so it does
+// nothing unless #cmap is on the page.
+//   - Lazy: Leaflet 1.9.4 (cdnjs, with SRI) and the tiles load only when the section nears the viewport.
+//   - The basemap follows Quarto's day/night toggle (body.quarto-light / body.quarto-dark): CARTO light_all / dark_all
+//     when #cmap carries data-tiles-key (CARTO basemaps need a free key; set in scripts/build_map.py); otherwise the
+//     OpenStreetMap standard tiles, toned grey by day and inverted by night in map.css (.cmap.tiles-osm).
+//   - Scroll-wheel zoom (and one-finger dragging on touch screens) stays off until the map is clicked.
+//   - Keyboard: the map takes focus (arrows pan, +/- zoom); Tab reaches each marker, Enter opens its popup, Esc closes.
+//   - Markers that overlap at the current zoom are spread apart a little, so each stays visible and clickable.
+//   - Without JS, or if Leaflet cannot load, the map box stays hidden and the list below the map is the content.
+// Visitor map (part 2 below): the provider's snippet waits in <template id="visitor-map-tpl">; it is inserted after the
+// page has loaded, so it never blocks rendering, and the "Visitors" section is hidden again if it fails or draws nothing.
+
+// ---------- 1. collaboration map ----------
+(function () {
+  "use strict";
+  const root = document.getElementById("cmap");
+  const dataEl = document.getElementById("cmap-data");
+  if (!root || !dataEl) return;
+  let data;
+  try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+  const wrap = root.closest(".cmap-wrap");
+  const section = root.closest("section") || root;
+
+  const CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+  const LEAFLET_CSS = { href: CDN + "leaflet.min.css",
+    integrity: "sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" };
+  const LEAFLET_JS = { src: CDN + "leaflet.min.js",
+    integrity: "sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" };
+  const OSM_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  // The CARTO key is restricted to the live site's host, so local previews (file://, localhost) use OpenStreetMap tiles.
+  const LIVE_HOST = "henryutd2021.github.io";
+  const tilesKey = location.hostname === LIVE_HOST ? root.getAttribute("data-tiles-key") : null;
+  const BASEMAP = tilesKey ? {
+    kind: "carto",
+    light: "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    dark: "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=" + encodeURIComponent(tilesKey),
+    attribution: OSM_ATTR + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', maxZoom: 20,
+  } : {
+    kind: "osm",   // one tile set for both themes; map.css tones it (grey by day, inverted by night)
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: OSM_ATTR, maxZoom: 19,
+  };
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // JS is running: reserve the map's space now (a quiet placeholder until Leaflet arrives); hide it again on failure
+  wrap.hidden = false;
+  root.classList.add("is-loading");
+  function fail() { wrap.hidden = true; }
+
+  // ---------- load Leaflet (CSS and JS, both with SRI), once ----------
+  function loadLeaflet(done) {
+    if (window.L && window.L.map) { done(true); return; }
+    let pending = 2, ok = true, finished = false;
+    const timer = window.setTimeout(function () { finish(false); }, 20000);
+    function finish(success) {
+      if (finished) return;
+      if (!success) ok = false;
+      if (--pending > 0 && ok) return;
+      finished = true; window.clearTimeout(timer);
+      done(ok && !!(window.L && window.L.map));
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet"; link.href = LEAFLET_CSS.href; link.integrity = LEAFLET_CSS.integrity;
+    link.crossOrigin = "anonymous"; link.referrerPolicy = "no-referrer";
+    link.onload = function () { finish(true); }; link.onerror = function () { finish(false); };
+    document.head.appendChild(link);
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS.src; script.integrity = LEAFLET_JS.integrity;
+    script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+    script.onload = function () { finish(true); }; script.onerror = function () { finish(false); };
+    document.head.appendChild(script);
+  }
+
+  // ---------- popups ----------
+  function paperList(papers, max) {
+    const items = papers.slice(0, max).map(function (p) {
+      const t = p[2] ? '<a href="https://doi.org/' + esc(p[2]) + '">' + esc(p[0]) + "</a>" : esc(p[0]);
+      const st = p[3] && p[3] !== "published" ? ' <span class="cmap-pop-st">' + esc(p[3]) + "</span>" : "";
+      return "<li>" + t + ' <span class="cmap-pop-yr">' + esc(p[1]) + "</span>" + st + "</li>";
+    });
+    if (papers.length > max) items.push('<li class="cmap-pop-more">and ' + (papers.length - max) + " more</li>");
+    return '<ul class="cmap-pop-papers">' + items.join("") + "</ul>";
+  }
+  function yearSpan(papers) {
+    const ys = papers.map(function (p) { return p[1]; }).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? String(ys[0]) : ys[0] + "–" + ys[ys.length - 1];
+  }
+  function instPopup(i) {
+    const n = i.count, word = n === 1 ? "paper" : "papers";
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind">' + (i.home ? "Home institution" : "Collaborating institution") + "</p>" +
+      "<h3>" + esc(i.name) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([i.place, i.country].filter(Boolean).join(", ")) + "</p>" +
+      '<p class="cmap-pop-n"><strong>' + n + "</strong> " + (i.home ? word : "joint " + word) +
+      (yearSpan(i.papers) ? " · " + yearSpan(i.papers) : "") + "</p>" +
+      paperList(i.papers, i.home ? 3 : 4) + "</div>";
+  }
+  function talkPopup(t) {
+    return '<div class="cmap-pop">' +
+      '<p class="cmap-pop-kind cmap-pop-kind--talk">Conference presentation</p>' +
+      "<h3>" + esc(t.event) + "</h3>" +
+      '<p class="cmap-pop-place">' + esc([t.place, t.country].filter(Boolean).join(", ")) + " · " + esc(t.date) + "</p>" +
+      '<p class="cmap-pop-talk">' + esc(t.title) + "</p></div>";
+  }
+
+  // ---------- the map ----------
+  function init() {
+    const L = window.L;
+    const touch = !!(L.Browser && L.Browser.mobile);
+    const map = L.map(root, {
+      scrollWheelZoom: false, dragging: !touch, worldCopyJump: true, zoomSnap: 1, minZoom: 1, maxZoom: 12,   // whole zoom levels: no seams between scaled tiles
+      keyboard: true, zoomAnimation: !reduceMotion, fadeAnimation: !reduceMotion, markerZoomAnimation: !reduceMotion,
+    });
+    root.classList.remove("is-loading");
+    const hint = wrap.querySelector(".cmap-hint");
+    if (touch && hint) hint.textContent = "Tap the map to move it with one finger; pinch to zoom. Tap a marker for details.";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-roledescription", "map");
+    root.setAttribute("aria-label", root.getAttribute("data-label") || "Map");
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+    root.classList.add("tiles-" + BASEMAP.kind);
+    const tiles = L.tileLayer(isDark() ? BASEMAP.dark : BASEMAP.light,
+      { attribution: BASEMAP.attribution, maxZoom: BASEMAP.maxZoom }).addTo(map);
+
+    // popups fit inside the map: narrower on phones, and scrolling inside when taller than the map (2026-11-05)
+    function popupOptions() {
+      const w = root.clientWidth, h = root.clientHeight, narrow = w < 480;
+      return { maxWidth: narrow ? Math.max(170, w - 130) : 300, maxHeight: Math.max(140, h - (narrow ? 110 : 80)), closeButton: true,
+               autoPanPaddingTopLeft: narrow ? L.point(46, 12) : L.point(64, 24), autoPanPaddingBottomRight: narrow ? L.point(10, 12) : L.point(24, 24) };
+    }
+
+    // markers: home = ring, collaborators = filled circle (size grows with joint papers), presentations = diamond
+    const markers = [];
+    function add(kind, lat, lon, size, label, popup, z) {
+      // the marker's box is at least 24 px (a touch target), the dot inside it keeps its own size (2026-11-05)
+      const box = Math.max(24, size);
+      const icon = L.divIcon({ className: "cmap-mk cmap-mk--" + kind, html: '<span style="width:' + size + "px;height:" + size + 'px"></span>',
+                               iconSize: [box, box], iconAnchor: [box / 2, box / 2], popupAnchor: [0, -size / 2] });
+      const m = L.marker([lat, lon], { icon: icon, title: label, keyboard: true, riseOnHover: true, zIndexOffset: z })
+        .bindPopup(popup, popupOptions()).addTo(map);
+      m.on("add", function () { const el = m.getElement(); if (el) el.setAttribute("aria-label", label); });
+      const el = m.getElement(); if (el) el.setAttribute("aria-label", label);
+      m.cmapSize = size;
+      markers.push(m);
+    }
+    (data.institutions || []).forEach(function (i) {
+      const n = i.count, place = [i.place, i.country].filter(Boolean).join(", ");
+      const label = i.name + ", " + place + " — " + (i.home ? "home institution, " + n + (n === 1 ? " paper" : " papers")
+                                                            : n + (n === 1 ? " joint paper" : " joint papers"));
+      const size = i.home ? Math.round(16 + 2 * Math.sqrt(n)) : Math.round(10 + 3 * Math.sqrt(n));
+      add(i.home ? "home" : "collab", i.lat, i.lon, size, label, instPopup(i), i.home ? 0 : 100);
+    });
+    (data.presentations || []).forEach(function (t) {
+      const label = t.event + ", " + [t.place, t.country].filter(Boolean).join(", ") + " — presentation, " + t.date;
+      add("talk", t.lat, t.lon, 13, label, talkPopup(t), 200);
+    });
+    if (!markers.length) { fail(); return; }
+
+    // spread markers that overlap at the current zoom (visual offset of the inner dot only). Overlapping markers form
+    // a group (chained: A near B, B near C -> one group), laid out on a small circle around the group's centre in the
+    // markers' own compass order, the circle just large enough that neighbours no longer touch. If a spread group
+    // then touches another marker, the two merge and are laid out again.
+    const GAP = 4;
+    function declutter() {
+      const k = map.getZoom() <= 2 ? 0.72 : 1;   // smaller markers at world-wide zoom levels (phones), so fewer collide
+      root.style.setProperty("--k", String(k));
+      const pts = markers.map(function (m) { return { m: m, p: map.latLngToLayerPoint(m.getLatLng()), r: k * m.cmapSize / 2 }; });
+      const parent = pts.map(function (_, i) { return i; });
+      const find = function (i) { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+      const touch = function (i, j, pi, pj) { return pi.distanceTo(pj) < pts[i].r + pts[j].r + GAP; };
+      function layout() {
+        const pos = pts.map(function (q) { return q.p; });
+        const groups = {};
+        pts.forEach(function (_, i) { (groups[find(i)] = groups[find(i)] || []).push(i); });
+        Object.keys(groups).forEach(function (g) {
+          const group = groups[g];
+          if (group.length === 1) return;
+          let cx = 0, cy = 0, rmax = 0;
+          group.forEach(function (k) { cx += pts[k].p.x; cy += pts[k].p.y; rmax = Math.max(rmax, pts[k].r); });
+          cx /= group.length; cy /= group.length;
+          const R = Math.max(rmax + GAP, (2 * rmax + GAP) / (2 * Math.sin(Math.PI / group.length)));
+          const angOf = function (k) { return Math.atan2(pts[k].p.y - cy, pts[k].p.x - cx); };
+          group.sort(function (x, y) { return angOf(x) - angOf(y); });
+          const start = angOf(group[0]);
+          group.forEach(function (k, n) {
+            const ang = start + (2 * Math.PI * n) / group.length;
+            pos[k] = L.point(cx + R * Math.cos(ang), cy + R * Math.sin(ang));
+          });
+        });
+        return pos;
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) { if (touch(i, j, pts[i].p, pts[j].p)) parent[find(i)] = find(j); }
+      }
+      let pos = layout();
+      for (let round = 0; round < 6; round++) {
+        let merged = false;
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            if (find(i) !== find(j) && touch(i, j, pos[i], pos[j])) { parent[find(i)] = find(j); merged = true; }
+          }
+        }
+        if (!merged) break;
+        pos = layout();
+      }
+      pts.forEach(function (q, i) { shift(q.m, pos[i].x - q.p.x, pos[i].y - q.p.y); });
+    }
+    function shift(m, dx, dy) {
+      const el = m.getElement(); if (!el) return;
+      el.style.setProperty("--dx", dx.toFixed(1) + "px"); el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    }
+
+    const bounds = L.latLngBounds(markers.map(function (m) { return m.getLatLng(); }));
+    function fitAll() {
+      const pad = Math.round(Math.min(36, Math.max(12, root.clientWidth * 0.03)));
+      map.fitBounds(bounds, { padding: [pad, pad], maxZoom: 5, animate: !reduceMotion });
+    }
+    map.on("zoomend viewreset", declutter);
+    fitAll();
+    declutter();
+
+    // "show all" control under the zoom buttons
+    const Reset = L.Control.extend({
+      options: { position: "topleft" },
+      onAdd: function () {
+        const box = L.DomUtil.create("div", "leaflet-bar cmap-reset");
+        const b = L.DomUtil.create("a", "", box);
+        b.href = "#"; b.setAttribute("role", "button"); b.title = "Show all markers"; b.setAttribute("aria-label", "Show all markers");
+        b.innerHTML = '<i class="bi bi-globe2" aria-hidden="true"></i>';
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.on(b, "click", function (e) { L.DomEvent.preventDefault(e); map.closePopup(); fitAll(); });
+        return box;
+      },
+    });
+    map.addControl(new Reset());
+
+    // scroll-wheel zoom (and touch dragging) only after a click on the map; off again when the pointer leaves
+    function arm() { map.scrollWheelZoom.enable(); if (touch) map.dragging.enable(); root.classList.add("is-armed"); }
+    function disarm() { map.scrollWheelZoom.disable(); if (touch) map.dragging.disable(); root.classList.remove("is-armed"); }
+    map.on("click", arm);
+    root.addEventListener("mouseleave", disarm);
+    document.addEventListener("touchstart", function (e) { if (!root.contains(e.target)) disarm(); }, { passive: true });
+
+    // day / night basemap: follow Quarto's toggle (it swaps body.quarto-light / body.quarto-dark)
+    new MutationObserver(function () {
+      const url = isDark() ? BASEMAP.dark : BASEMAP.light;
+      if (tiles._url !== url) tiles.setUrl(url);
+    }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // the map may have been laid out while hidden or resized with the page
+    window.addEventListener("resize", function () { map.invalidateSize(); });
+  }
+
+  function start() {
+    loadLeaflet(function (ok) {
+      if (!ok) { fail(); return; }
+      try { init(); } catch (e) { fail(); }
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); start(); }
+    }, { rootMargin: "400px 0px" });
+    io.observe(section);
+  } else {
+    start();
+  }
+})();
+
+// ---------- 2. visitor map (third-party widget, About page only; own section since 2026-11-05) ----------
+// MapMyVisitors' loader reads from its own URL: w (width; "a" = its parent's width), co (the panel colour, i.e. the ocean),
+// cl (the land colour of the generated background image) and ct (the text colour). Here co, cl and ct are set to the
+// site's day or night colours before the snippet runs; on high-DPI screens the widget is drawn at twice the column width
+// in a box scaled to one half, so its land image stays crisp (map.css enlarges the widget's text and dots to match).
+// A day/night switch after loading recolours the panel and text through map.css and swaps the land image for the other
+// theme's. The frame follows the column's width on resize.
+(function () {
+  "use strict";
+  const box = document.getElementById("visitor-map");
+  const tpl = document.getElementById("visitor-map-tpl");
+  const body = document.getElementById("visitor-map-body");
+  if (!box || !tpl || !body || !("content" in tpl)) return;
+  const THEME = { light: { co: "eef2f7", cl: "cbd5e1", ct: "374151" }, dark: { co: "1c212a", cl: "3b4351", ct: "d1d5db" } };
+  const isDark = function () { return document.body.classList.contains("quarto-dark"); };
+  const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
+  let done = false, inner = null;
+  function hide() { if (!done) { done = true; box.hidden = true; } }
+  function drawn() {
+    return !!inner && Array.prototype.some.call(inner.children, function (el) { return el.tagName !== "SCRIPT" && el.tagName !== "STYLE"; });
+  }
+  function themedSrc(src) {
+    try {
+      const u = new URL(src, location.href);
+      if (!/(^|\.)mapmyvisitors\.com$/.test(u.hostname)) return src;
+      const t = THEME[isDark() ? "dark" : "light"];
+      Object.keys(t).forEach(function (key) { u.searchParams.set(key, t[key]); });
+      return u.toString();
+    } catch (e) { return src; }
+  }
+  function fit() {   // scale the widget to the frame's width and the frame's height to the widget
+    if (!inner || !inner.offsetWidth) return;
+    const s = body.clientWidth / inner.offsetWidth;
+    inner.style.transform = s === 1 ? "" : "scale(" + s + ")";
+    body.style.height = Math.ceil(inner.offsetHeight * s) + "px";
+  }
+  function insert() {
+    box.hidden = false;
+    inner = document.createElement("div");
+    inner.className = "visitor-scale" + (k > 1 ? " is-2x" : "");
+    inner.style.width = Math.floor(body.clientWidth * k) + "px";
+    body.appendChild(inner);
+    const frag = tpl.content.cloneNode(true);
+    // scripts cloned from a template never run: recreate them (same attributes, themed colours), asynchronous by nature
+    frag.querySelectorAll("script").forEach(function (old) {
+      const s = document.createElement("script");
+      Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.name === "src" ? themedSrc(a.value) : a.value); });
+      if (old.textContent.trim()) s.text = old.textContent;
+      s.async = true;
+      s.addEventListener("error", hide);
+      old.parentNode.replaceChild(s, old);
+    });
+    inner.appendChild(frag);
+    fit();
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(inner);
+    window.addEventListener("resize", fit);
+    window.setTimeout(function () { if (!drawn()) hide(); else { done = true; fit(); } }, 15000);
+  }
+  // day / night after loading: the panel and text colours follow map.css; the land image is swapped here
+  new MutationObserver(function () {
+    if (!inner) return;
+    const t = THEME[isDark() ? "dark" : "light"];
+    inner.querySelectorAll(".mapmyvisitors-map").forEach(function (m) {
+      const bg = m.style.backgroundImage;
+      if (bg) m.style.backgroundImage = bg.replace(/co_[0-9a-f]{6}/i, "co_" + t.co).replace(/cl_[0-9a-f]{6}/i, "cl_" + t.cl);
+    });
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  if (document.readyState === "complete") insert();
+  else window.addEventListener("load", insert, { once: true });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/henryutd2021\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> 
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 Honglin Li · Kansas State University · <a href="mailto:hlli@ksu.edu">hlli@ksu.edu</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>Last updated: November 2026 · Built with <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

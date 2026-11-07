@@ -79,7 +79,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha384-cxs0Bj979VdNByRZzAJ2KJWG8vH/kG7fwWZAIZW3Tmsw0rAuP/pu3I3LitFWEs18" crossorigin="anonymous">
 <meta name="theme-color" content="#ffffff">
 
 
@@ -328,14 +330,14 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text"></span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
+          </div> 
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-      </div> <!-- /container-fluid -->
+      </div> 
     </nav>
 </header>
-<!-- content -->
+
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-page">
@@ -359,10 +361,10 @@ ul.task-list li input[type="checkbox"] {
     
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
+
+
     
-<!-- main -->
+
 <main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
@@ -370,10 +372,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<!-- Software page (third redesign, 2026-10-30; styles in assets/pages.css).
-     Intro, a strip with what every repository contains, one card per repository (in the order of the research
-     themes), and the data-availability note. Facts per card are taken from the repository README
-     (model type, the papers it accompanies, the Python packages and solvers it uses). -->
+
 <div class="rs-intro sw-intro">
 <div class="rs-lede">
 <p>Documented model frameworks associated with published and accepted research. Each repository gives the model formulation with references to the source equations, describes the data pipeline and the input formats, and includes a runnable implementation with examples on synthetic data and tests.</p>
@@ -430,7 +429,7 @@ ul.task-list li input[type="checkbox"] {
 <p>One repository per framework, each with the paper or papers it accompanies.</p>
 </section>
 <div class="repo-grid">
-<!-- NPPH2 (2026-11-02; published by Henry with scripts/henry_release_npph2_2026-11-02.sh; no PJM data) -->
+
 <div class="repo theme-hydrogen">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-droplet-half" aria-hidden="true"></i></span> <span class="repo-theme">Hydrogen systems</span> <span class="repo-type">Hourly MILP and lifecycle TEA</span></p>
@@ -438,7 +437,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="nuclearhydrogen-integration-framework" class="level3">
 <h3 class="anchored" data-anchor-id="nuclearhydrogen-integration-framework">Nuclear–hydrogen integration framework</h3>
 <p><span class="repo-slug">Henryutd2021/nuclear-hydrogen-integration</span></p>
-<p>Hourly operation and sizing of a nuclear plant with high-temperature electrolysis, hydrogen storage and batteries, selling energy, hydrogen and ancillary services, linked to a lifecycle cash-flow model with federal tax credits. Runs on synthetic data; PJM market inputs require authorization from PJM.</p>
+<p>Hourly operation and sizing of a nuclear plant with high-temperature electrolysis, hydrogen storage and batteries, selling energy, hydrogen and ancillary services, linked to a lifecycle cash-flow model with federal tax credits. Includes the article’s 2024 PJM price inputs (PJM data, under PJM’s terms of use); the other examples run on synthetic data.</p>
 <div class="repo-papers">
 <p><span class="label">Accompanies</span></p>
 <ul>
@@ -449,11 +448,11 @@ ul.task-list li input[type="checkbox"] {
 <p><span class="chip">Python</span> <span class="chip">linopy</span> <span class="chip">HiGHS</span> <span class="chip">Gurobi (optional)</span></p>
 </div>
 <div class="repo-actions">
-<p><a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration" class="btn-outline btn-sm-x"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a> <a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration/blob/main/docs/formulation.md" class="btn-quiet"><i class="bi bi-journal-text" aria-hidden="true"></i> Formulation</a></p>
+<p><a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration" class="btn-outline btn-sm-x"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a> <a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration/blob/main/docs/formulation.md" class="btn-quiet"><i class="bi bi-journal-text" aria-hidden="true"></i> Formulation</a> <a href="https://github.com/Henryutd2021/nuclear-hydrogen-integration/tree/main/data/pjm" class="btn-quiet"><i class="bi bi-table" aria-hidden="true"></i> PJM 2024 data</a></p>
 </div>
 </section>
 </div>
-<!-- SMR cogeneration (website v2, 2026-11-02; published by Henry with scripts/henry_release_nuclear_dc_2026-11-02.sh) -->
+
 <div class="repo theme-datacenter">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span> <span class="repo-theme">Nuclear &amp; data centers</span> <span class="repo-type">Hourly MILP co-optimization</span></p>
@@ -476,7 +475,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </div>
-<!-- CoDE -->
+
 <div class="repo theme-datacenter">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span> <span class="repo-theme">Nuclear &amp; data centers</span> <span class="repo-type">Multi-account cost framework</span></p>
@@ -499,7 +498,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </div>
-<!-- TXH2 -->
+
 <div class="repo theme-hydrogen">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-droplet-half" aria-hidden="true"></i></span> <span class="repo-theme">Hydrogen systems</span> <span class="repo-type">Two-stage stochastic LP</span></p>
@@ -522,7 +521,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </div>
-<!-- REopt hydrogen -->
+
 <div class="repo theme-hydrogen">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-droplet-half" aria-hidden="true"></i></span> <span class="repo-theme">Hydrogen systems</span> <span class="repo-type">MILP</span></p>
@@ -547,7 +546,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </div>
-<!-- GHG -->
+
 <div class="repo theme-carbon">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-globe-americas" aria-hidden="true"></i></span> <span class="repo-theme">Carbon-aware grid</span> <span class="repo-type">MILP</span></p>
@@ -570,7 +569,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </div>
-<!-- Supply chains with on-site microgrids -->
+
 <div class="repo theme-microgrid">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span> <span class="repo-theme">Microgrids &amp; supply chains</span> <span class="repo-type">MILP and LP models</span></p>
@@ -594,7 +593,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </div>
-<!-- Wind UQ (2026-11-02; published by Henry with scripts/henry_release_wind_uq_2026-11-02.sh) -->
+
 <div class="repo theme-wind">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-wind" aria-hidden="true"></i></span> <span class="repo-theme">Wind uncertainty</span> <span class="repo-type">Uncertainty metrics and surrogates</span></p>
@@ -602,7 +601,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="wind-uq-surrogate-framework" class="level3">
 <h3 class="anchored" data-anchor-id="wind-uq-surrogate-framework">Wind UQ surrogate framework</h3>
 <p><span class="repo-slug">Henryutd2021/wind-uq-surrogate</span></p>
-<p>Uncertainty metrics of a wind power model’s inputs, calibrated uncertainty targets at observed plants, and surrogate models validated on held-out plants, for plant-level power uncertainty where no measurements exist.</p>
+<p>Uncertainty metrics of a wind power model’s inputs, calibrated uncertainty targets at observed plants, and surrogate models validated on held-out plants, for plant-level power uncertainty where no measurements exist. Since v1.1.0, a public-data case study of 264 ERCOT wind plants (ARPA-E PERFORM, simulated plant power).</p>
 <div class="repo-papers">
 <p><span class="label">Accompanies</span></p>
 <ul>
@@ -613,11 +612,11 @@ ul.task-list li input[type="checkbox"] {
 <p><span class="chip">Python</span> <span class="chip">NumPy</span> <span class="chip">SciPy</span> <span class="chip">scikit-learn</span></p>
 </div>
 <div class="repo-actions">
-<p><a href="https://github.com/Henryutd2021/wind-uq-surrogate" class="btn-outline btn-sm-x"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a> <a href="https://github.com/Henryutd2021/wind-uq-surrogate/blob/main/docs/metrics.md" class="btn-quiet"><i class="bi bi-journal-text" aria-hidden="true"></i> Metrics</a></p>
+<p><a href="https://github.com/Henryutd2021/wind-uq-surrogate" class="btn-outline btn-sm-x"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a> <a href="https://github.com/Henryutd2021/wind-uq-surrogate/blob/main/docs/metrics.md" class="btn-quiet"><i class="bi bi-journal-text" aria-hidden="true"></i> Metrics</a> <a href="https://github.com/Henryutd2021/wind-uq-surrogate/tree/main/case_studies/perform_ercot" class="btn-quiet"><i class="bi bi-bar-chart" aria-hidden="true"></i> Case study</a></p>
 </div>
 </section>
 </div>
-<!-- MF-GPR -->
+
 <div class="repo theme-wind">
 <div class="repo-top">
 <p><span class="repo-icon"><i class="bi bi-wind" aria-hidden="true"></i></span> <span class="repo-theme">Wind uncertainty</span> <span class="repo-type">Gaussian processes</span></p>
@@ -652,7 +651,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-</main> <!-- /main -->
+</main> 
 <script>
 // site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
 // back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
@@ -1638,7 +1637,7 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
-</div> <!-- /content -->
+</div> 
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">

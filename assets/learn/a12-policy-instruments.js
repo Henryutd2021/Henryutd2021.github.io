@@ -4,8 +4,8 @@
 // The model is the Plains Grid's planning LP in assets/learn/components/plainsplan.js (window.LX.plainsPlan, in the
 // learn.js bundle since the W4 integration; Node: require). Data: a10-emissions-questions.json (the existing fleet),
 // m06-carbon-in-models.json (what may be built, its costs in 2025 dollars, the representative days, the tie rule),
-// a12-policy-instruments.json (the four instruments, a real rule of each kind, the reference block), town_year.json and
-// cf_targets.json.
+// a12-policy-instruments.json (the four instruments, a real rule of each kind, the reference block), town_year.json,
+// cf_targets.json and path.json (the last step names case file CF4 through LX.lessonRefHTML).
 // One instrument at a time, each against the plan with no policy:
 //   carbon price  tau $ per t on every tonne of gas CO2          emitters pay tau x CO2 to the government
 //   production    ptc $ per MWh of new wind and solar used         the government pays ptc x those MWh
@@ -59,7 +59,7 @@
   // ================================================================ the page
   var LX = window.LX, H = LX.H, SLUG = "a12-policy-instruments";
   LX.mount(SLUG, function (live, data, root) {
-    var PP = LX.plainsPlan, D = data.a12_policy_instruments, I = {}, saved = LX.store.get("a12", {}) || {};
+    var PP = LX.plainsPlan, D = data.a12_policy_instruments, I = {}, saved = LX.store.get("a12", {}) || {}, PJ = data.path || null;   // PJ: path.json, for LX.lessonRefHTML
     D.instruments.forEach(function (x) { I[x.id] = x; });
     var Y = PP.prepare(data.a10_emissions_questions.plains, data.m06_carbon_in_models, data.town_year, data.cf_targets, LX.townProfile);
     var S = {}; D.instruments.forEach(function (x) { var v = saved[x.id]; S[x.id] = typeof v === "number" && v >= x.min && v <= x.max && (v - x.min) % x.step === 0 ? v : x.def; });
@@ -154,6 +154,7 @@
             },
             show: function () { st.set(""); if (g !== stepGen) return; paint(); host.innerHTML = ""; ledger(host); rules(host); api.saw("**Same grid, four instruments:** compare each cut with its change in resource cost, and see who pays. A real rule of each kind follows."); api.done(); } });
           b.addEventListener("click", go); go();
+          if (PJ && LX.lessonRefHTML) H("p", { class: "lx-hint", html: "Case file " + LX.lessonRefHTML(PJ, "CF4") + " (hydrogen at existing plants) practises reading which assumptions, a policy among them, a published result rests on." }, act);
         } }
     ];
     var cards = LX.StepCards(live, { steps: steps });

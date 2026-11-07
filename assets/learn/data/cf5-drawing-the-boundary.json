@@ -1,0 +1,130 @@
+{
+ "about": "Data of Learn case file CF5, Where should a cogeneration study's boundary be drawn? (wave W5, builder learn-w5-f, 2026-11-06; review fixes on learn-w5-cf5, 2026-11-06; live since 2026-11-07). The timeline and the boundary card are approved excerpt wording (reports/learn/excerpts_for_approval.md, E14, approved 2026-11-07), word for word (E14.22, E14.21); the boundary card's source line is E14.24. The idea is the course's own toy: a generic steam plant and one generic load with round numbers the reader sets, average power over one hour; nothing in it is the study's input, equation or result.",
+ "built": "2026-11-06",
+ "timeline": {
+  "title": "The study in time",
+  "lede": "One dated step: the accepted paper.",
+  "events": [
+   {
+    "date": "2026",
+    "label": "Paper accepted",
+    "kind": "study",
+    "key": true,
+    "text": "An hourly model prices the steam sent to cooling by the turbine work it gives up, and compares the plant, with and without steam cooling, with grid supply and an on-site gas combined cycle.",
+    "source": {
+     "label": "Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending"
+    }
+   }
+  ]
+ },
+ "boundary": {
+  "title": "Where the result holds",
+  "holds": [
+   "steam sent to cooling is steam the low-pressure turbine does not convert, so it costs the turbine work it gives up;",
+   "one load profile;",
+   "ERCOT's hourly prices for the market years 2022 to 2024;",
+   "hourly average, not marginal, emission factors;",
+   "the plant is one fixed unit;",
+   "steam is taken at the turbine crossover, and a sweep of the penalty tests that choice."
+  ],
+  "leaves": [
+   "demand charges and ancillary-service revenues;",
+   "reliability on a common basis across options;",
+   "other load profiles and sites."
+  ],
+  "source": "Approved excerpt of: Li et al. (2026), accepted paper, Energy Conversion and Management; DOI pending."
+ },
+ "idea": {
+  "title": "One hour at a steam plant beside a large load",
+  "note": "Illustrative round numbers you set: a generic steam plant and one load that needs power and cooling, not the study's inputs or results. Average power during one hour, in MW; auxiliary electricity for pumps and fans is left out.",
+  "plantMW": 100,
+  "start": {
+   "hour": "mild",
+   "load": 40,
+   "cool": 20,
+   "copA": 0.8,
+   "copE": 5,
+   "w": 0.2
+  },
+  "hours": [
+   {
+    "id": "mild",
+    "label": "An ordinary hour"
+   },
+   {
+    "id": "hot",
+    "label": "A hot, humid hour",
+    "derate": 0.75
+   },
+   {
+    "id": "out",
+    "label": "A planned outage",
+    "outage": true
+   }
+  ],
+  "sliders": [
+   {
+    "key": "cool",
+    "label": "Cooling the load needs",
+    "min": 5,
+    "max": 40,
+    "step": 5,
+    "unit": "MW of cooling",
+    "dec": 0,
+    "color": "var(--lx-hyd)"
+   },
+   {
+    "key": "copA",
+    "label": "Absorption chiller: MW of cooling per MW of steam heat",
+    "min": 0.6,
+    "max": 1.4,
+    "step": 0.05,
+    "unit": "",
+    "dec": 2,
+    "color": "var(--lx-hyd)"
+   },
+   {
+    "key": "w",
+    "label": "Turbine work lost per MW of steam heat taken",
+    "min": 0.1,
+    "max": 0.4,
+    "step": 0.02,
+    "unit": "MW",
+    "dec": 2,
+    "color": "var(--lx-cc)"
+   },
+   {
+    "key": "copE",
+    "label": "Electric chiller: MW of cooling per MW of electricity",
+    "min": 3,
+    "max": 7,
+    "step": 0.5,
+    "unit": "",
+    "dec": 1,
+    "color": "var(--lx-tier-4)"
+   }
+  ],
+  "steamModes": [
+   {
+    "id": "priced",
+    "label": "Priced: the turbine work it gives up"
+   },
+   {
+    "id": "free",
+    "label": "Free: turbine loss ignored (deliberately incomplete)"
+   }
+  ],
+  "labels": {
+   "plant-priced": "Plant only, steam priced",
+   "site-priced": "Plant and load, steam priced",
+   "plant-free": "Plant only, turbine loss ignored (incomplete)",
+   "site-free": "Plant and load, turbine loss ignored (incomplete)"
+  },
+  "practice": {
+   "w": [
+    0.14,
+    0.3
+   ]
+  }
+ }
+}

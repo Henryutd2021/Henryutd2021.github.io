@@ -79,7 +79,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha384-cxs0Bj979VdNByRZzAJ2KJWG8vH/kG7fwWZAIZW3Tmsw0rAuP/pu3I3LitFWEs18" crossorigin="anonymous">
 <meta name="theme-color" content="#ffffff">
 
 
@@ -328,14 +330,14 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text"></span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
+          </div> 
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-      </div> <!-- /container-fluid -->
+      </div> 
     </nav>
 </header>
-<!-- content -->
+
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-page">
@@ -359,10 +361,10 @@ ul.task-list li input[type="checkbox"] {
     
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
+
+
     
-<!-- main -->
+
 <main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
@@ -370,34 +372,31 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<!-- Teaching page (third redesign, 2026-10-30; styles in assets/pages.css).
-     Instruction (course card), teaching assistant roles (two cards), mentoring (timeline, from the CV's Mentoring
-     Experience) and planned teaching materials (tiles). -->
-<!-- website v2 (2026-11-02): "How I teach" condenses Henry's teaching statement; "Interactive explainers" links the six
-     mechanism explainers on the project pages (assets/explainers/), which double as teaching material. -->
+
+
 <div class="fx-sec tc-first teach-approach">
 <section id="approach" class="level2 fx-head">
 <h2 class="anchored" data-anchor-id="approach">How I teach</h2>
 </section>
 <div class="vignette">
 <p><span class="vg-icon"><i class="bi bi-chat-square-quote" aria-hidden="true"></i></span></p>
-<p>During office hours for Numerical Methods, students brought Python code for Newton’s method on the Colebrook pipe-friction equation that returned NaN. The code was correct: their initial guess had sent the method outside the equation’s domain, which a plot of the function and the iterates made obvious. They could run the method but could not yet explain when it would fail. That gap shapes how I teach.</p>
+<p>In office hours for Numerical Methods at UT Dallas, a few students showed me Python code for the Colebrook pipe-friction equation. After two Newton steps it returned NaN, and they were hunting for a bug. There wasn’t one. I asked them to plot the function and mark each step by hand, and the picture told the story: their starting guess had pushed the method to a negative friction factor, where the equation means nothing. They knew how to run Newton’s method. They did not yet know when it would fail. Much of my teaching is about closing that gap.</p>
 </div>
 <div class="principles">
 <div class="principle">
 <p><span class="pr-num">1</span></p>
-<p><span class="pr-title">Concepts in context</span></p>
-<p>Before solving a model, students state its assumptions in words, predict how a change will move the result, and then test the prediction.</p>
+<p><span class="pr-title">Say it in words first</span></p>
+<p>Before solving a model, students put each assumption into plain words and guess how a change will move the answer, then test the guess. “The machine runs eight hours a day” comes before the algebra, and the next question is what one more hour is worth.</p>
 </div>
 <div class="principle">
 <p><span class="pr-num">2</span></p>
-<p><span class="pr-title">From guided practice to independent work</span></p>
-<p>I teach the foundations explicitly, work an example, then ask for a related problem with less support, until students can adapt a model and defend its assumptions.</p>
+<p><span class="pr-title">A little less help each time</span></p>
+<p>I explain an idea, work one example together, then hand over a similar problem with less support. Students in my research projects follow the same path: use a worked model, adapt it to a new case, then defend their own assumptions.</p>
 </div>
 <div class="principle">
 <p><span class="pr-num">3</span></p>
-<p><span class="pr-title">Understanding over answers</span></p>
-<p>When explanations are a click away, I assess formulation and interpretation as well as accuracy, and students explain their work and check any generated code.</p>
+<p><span class="pr-title">The reasoning, not only the answer</span></p>
+<p>An AI tool can explain the Colebrook failure in seconds, but following an explanation is not the same as being able to use it. So I give credit for how a problem is set up and what the result means, and students who use generated code show how they checked it.</p>
 </div>
 </div>
 </div>
@@ -412,8 +411,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="energy-systems-step-by-step">Energy Systems, Step by Step</h3>
 <p>A course for high-school students, undergraduate and graduate students, and curious adults. It starts with running a small town’s power grid for one real day and builds up to writing, solving and questioning the optimization models that grid operators and planners use, then to designing a study of your own.</p>
 <div class="lc-facts">
-<!-- learn:teaching:start (generated by scripts/build_learn.py from learn/path.yml; edit the YAML, not this block) -->
-<p><span class="lc-fact"><i class="bi bi-collection" aria-hidden="true"></i> 96 lessons live; more coming</span> <span class="lc-fact"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Four tiers: Foundations, Analyst, Modeler, Researcher</span> <!-- learn:teaching:end --> <span class="lc-fact"><i class="bi bi-graph-up" aria-hidden="true"></i> Real 2025 hourly grid data (EIA-930)</span> <span class="lc-fact"><i class="bi bi-cpu" aria-hidden="true"></i> An optimization solver that runs in the browser</span></p>
+
+<p><span class="lc-fact"><i class="bi bi-collection" aria-hidden="true"></i> 112 lessons live</span> <span class="lc-fact"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Four tiers: Foundations, Analyst, Modeler, Researcher</span>  <span class="lc-fact"><i class="bi bi-graph-up" aria-hidden="true"></i> Real 2025 hourly grid data (EIA-930)</span> <span class="lc-fact"><i class="bi bi-cpu" aria-hidden="true"></i> An optimization solver that runs in the browser</span></p>
 </div>
 <div class="lc-actions">
 <p><a href="./learn/00-grid-operator.html" class="btn-solid">Start with lesson 0</a> <a href="./learn/index.html" class="btn-outline">Course map</a></p>
@@ -423,9 +422,9 @@ ul.task-list li input[type="checkbox"] {
 <div class="lc-principles">
 <p><span class="label">The three principles in the lessons</span></p>
 <ol type="1">
-<li><strong>Concepts in context:</strong> predict first, then try it in a live model.</li>
-<li><strong>Guided to independent:</strong> practice sets go from worked, to partly worked, to from scratch.</li>
-<li><strong>Understanding over answers:</strong> learners formulate models and read what the solution means.</li>
+<li><strong>Say it in words first:</strong> guess what will happen, then try it in a live model.</li>
+<li><strong>A little less help each time:</strong> practice goes from worked, to partly worked, to from scratch.</li>
+<li><strong>The reasoning, not only the answer:</strong> learners set up models and explain what the solution means.</li>
 </ol>
 </div>
 </div>
@@ -533,7 +532,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-</main> <!-- /main -->
+</main> 
 <script>
 // site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
 // back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
@@ -1519,7 +1518,7 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
-</div> <!-- /content -->
+</div> 
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">

@@ -1176,9 +1176,13 @@
    "tier": "foundations",
    "code": "F10",
    "title": "Why does every country's energy system look different?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "f10-nations-differ.html",
+   "scales": [],
+   "id": "f10-nations-differ",
+   "minutes": 20,
+   "form": "cards",
+   "short": "Nations compared"
   },
   {
    "tier": "foundations",
@@ -1196,17 +1200,25 @@
    "tier": "foundations",
    "code": "X1",
    "title": "What engineering lies beneath the system?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "x01-under-the-hood.html",
+   "scales": [],
+   "id": "x01-under-the-hood",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Engineering beneath"
   },
   {
    "tier": "foundations",
    "code": "X3",
    "title": "How fast have energy transitions happened before?",
-   "ready": false,
-   "href": "index.html#foundations",
-   "scales": []
+   "ready": true,
+   "href": "x03-transitions-history.html",
+   "scales": [],
+   "id": "x03-transitions-history",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Past transitions"
   },
   {
    "tier": "analyst",
@@ -1357,41 +1369,61 @@
    "tier": "analyst",
    "code": "A20",
    "title": "Why do national energy scenarios disagree?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a20-national-scenarios.html",
+   "scales": [],
+   "id": "a20-national-scenarios",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Why scenarios disagree"
   },
   {
    "tier": "analyst",
    "code": "A21",
    "title": "What makes a nation's energy secure? Imports, minerals, supply chains and factories",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "a21-security-minerals.html",
+   "scales": [],
+   "id": "a21-security-minerals",
+   "minutes": 25,
+   "form": "cards",
+   "short": "Energy security"
   },
   {
    "tier": "analyst",
    "code": "X2",
    "title": "What happens to gas, coal and oil systems in a transition, and can carbon be removed?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "x02-fossil-transition.html",
+   "scales": [],
+   "id": "x02-fossil-transition",
+   "minutes": 15,
+   "form": "cards",
+   "short": "Fossil systems, carbon removal"
   },
   {
    "tier": "analyst",
    "code": "X4",
    "title": "How are energy rules made?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "x04-rules-law.html",
+   "scales": [],
+   "id": "x04-rules-law",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Energy rules"
   },
   {
    "tier": "analyst",
    "code": "X5",
    "title": "How are big energy projects actually financed?",
-   "ready": false,
-   "href": "index.html#analyst",
-   "scales": []
+   "ready": true,
+   "href": "x05-project-finance.html",
+   "scales": [],
+   "id": "x05-project-finance",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Project finance"
   },
   {
    "tier": "analyst",
@@ -1567,9 +1599,13 @@
    "tier": "modeler",
    "code": "M13",
    "title": "Build a nation's pathway: a multi-region, multi-decade model",
-   "ready": false,
-   "href": "index.html#modeler",
-   "scales": []
+   "ready": true,
+   "href": "m13-national-pathway.html",
+   "scales": [],
+   "id": "m13-national-pathway",
+   "minutes": 45,
+   "form": "cards",
+   "short": "A nation's pathway"
   },
   {
    "tier": "modeler",
@@ -1611,19 +1647,26 @@
    "tier": "modeler",
    "code": "SB4",
    "title": "Pathway Explorer",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "sb4-pathway-explorer.html",
    "scales": [],
-   "form": "sandbox"
+   "id": "sb4-pathway-explorer",
+   "minutes": 30,
+   "form": "sandbox",
+   "short": "Pathway Explorer"
   },
   {
    "tier": "modeler",
    "code": "C4",
    "title": "Prairieland 2050: design and defend a nation's pathway",
-   "ready": false,
-   "href": "index.html#modeler",
+   "ready": true,
+   "href": "c4-prairieland-2050.html",
    "scales": [],
-   "form": "capstone"
+   "id": "c4-prairieland-2050",
+   "tier2": "researcher",
+   "minutes": 240,
+   "form": "capstone",
+   "short": "Prairieland 2050"
   },
   {
    "tier": "modeler",
@@ -1761,27 +1804,37 @@
    "tier": "researcher",
    "code": "X6",
    "title": "How do social scientists study energy and people?",
-   "ready": false,
-   "href": "index.html#researcher",
-   "scales": []
+   "ready": true,
+   "href": "x06-social-methods.html",
+   "scales": [],
+   "id": "x06-social-methods",
+   "minutes": 12,
+   "form": "cards",
+   "short": "Social-science methods"
   },
   {
    "tier": "researcher",
    "code": "CK-R",
    "title": "Researcher checkpoint: defend your question and method, then revise",
-   "ready": false,
-   "href": "index.html#researcher",
+   "ready": true,
+   "href": "ck-r-defend-revise.html",
    "scales": [],
-   "form": "checkpoint"
+   "id": "ck-r-defend-revise",
+   "minutes": 240,
+   "form": "checkpoint",
+   "short": "Researcher checkpoint"
   },
   {
    "tier": "researcher",
    "code": "CR",
    "title": "Your own study: from a question to a report",
-   "ready": false,
-   "href": "index.html#researcher",
+   "ready": true,
+   "href": "cr-your-own-study.html",
    "scales": [],
-   "form": "capstone"
+   "id": "cr-your-own-study",
+   "minutes": 60,
+   "form": "capstone",
+   "short": "Capstone: your own study"
   },
   {
    "tier": "analyst",
@@ -1894,6 +1947,30 @@
    "minutes": 10,
    "form": "case",
    "short": "Hydrogen under uncertain wind"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF4",
+   "title": "Can existing reactors earn more by making hydrogen and providing grid services?",
+   "ready": true,
+   "href": "cf4-existing-reactors-hydrogen.html",
+   "scales": [],
+   "id": "cf4-existing-reactors-hydrogen",
+   "minutes": 10,
+   "form": "case",
+   "short": "Hydrogen at existing plants"
+  },
+  {
+   "tier": "analyst",
+   "code": "CF5",
+   "title": "Where should a cogeneration study's boundary be drawn?",
+   "ready": true,
+   "href": "cf5-drawing-the-boundary.html",
+   "scales": [],
+   "id": "cf5-drawing-the-boundary",
+   "minutes": 10,
+   "form": "case",
+   "short": "Drawing the boundary"
   },
   {
    "tier": "analyst",

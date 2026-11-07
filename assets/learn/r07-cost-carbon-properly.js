@@ -280,6 +280,7 @@
           LX.Boundary(b, { title: "What the study counts", cols: [{ title: "In its cost", items: D.boundaryItems.filter(function (x) { return x.cost; }).map(function (x) { return x.label; }) },
             { title: "In its CO₂", items: D.boundaryItems.filter(function (x) { return x.co2; }).map(function (x) { return x.label; }).concat(["the buses' tailpipes"]) }] });
           choice(act, D.boundaryItems.map(function (x) { return { label: x.label, fb: x.fb, right: x.right }; }), function () { fix("boundary", true); api.saw(lineBoundary(D, S.grid)); api.done(); });
+          H("p", { class: "lx-hint", html: "Case file " + ref("CF5") + ": where should a cogeneration study's boundary be drawn?" }, act);
           if (S.fx.boundary) api.done();
         } },
       { text: "Flaw 2, a convenient [[baseline|baseline]]: the study prices new diesel buses but runs them like its 2009 buses. Without the project, what would the agency do?",

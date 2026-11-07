@@ -109,13 +109,14 @@ ul.task-list li input[type="checkbox"] {
     }
   })
   </script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://mapmyvisitors.com https://code.jquery.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha384-cxs0Bj979VdNByRZzAJ2KJWG8vH/kG7fwWZAIZW3Tmsw0rAuP/pu3I3LitFWEs18" crossorigin="anonymous">
 <meta name="theme-color" content="#ffffff">
 <meta name="google-site-verification" content="HYz_8CxZxTFlFVPVBRmrgRHyec1XTOszSbx0ergwHH4">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Honglin Li", "alternateName": "李洪林", "honorificSuffix": "Ph.D.", "url": "https://henryutd2021.github.io/", "image": "https://henryutd2021.github.io/images/profile-square.jpg", "email": "mailto:hlli@ksu.edu", "jobTitle": "Postdoctoral Fellow", "worksFor": {"@type": "CollegeOrUniversity", "name": "Kansas State University", "department": "Department of Electrical and Computer Engineering"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "The University of Texas at Dallas"}, {"@type": "CollegeOrUniversity", "name": "Texas State University"}, {"@type": "CollegeOrUniversity", "name": "Dalian Maritime University"}], "knowsAbout": ["Energy systems optimization", "Techno-economic analysis", "Small modular reactors", "AI data center power supply", "Hydrogen energy systems", "Electricity markets", "Stochastic optimization"], "sameAs": ["https://scholar.google.com/citations?user=O1BZdHQAAAAJ", "https://orcid.org/0000-0002-8405-3032", "https://www.linkedin.com/in/honglin-li-998b18221/", "https://github.com/Henryutd2021"]}</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js" type="text/javascript" integrity="sha384-IgpmJyK7IVIVd18E1Ubslp9a1s6/6VBt9aJFbpzNIJPPMaxwEV7OxR/xY0hHbSck" crossorigin="anonymous"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -389,33 +390,31 @@ window.Quarto = {
 <span class="menu-text"></span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
+          </div> 
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-      </div> <!-- /container-fluid -->
+      </div> 
     </nav>
 </header>
-<!-- content -->
+
 <div id="quarto-content" class="quarto-container page-layout-custom page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
-<!-- main -->
 
 
 
 
 
-<!-- About (home) page — third redesign, 2026-10-30: al-folio "about" layout with Hugo Academic touches.
-     Facts only from the public CV (Summary, Education, Academic Experience) and the other site pages.
-     Styles: assets/home.css (scoped to main.home). Publication rows: _selected.qmd + assets/pubs.css (not restyled here). -->
+
+
+
+
 <main id="main-content" class="home">
 
-<!-- ============ 1–3. ABOUT: name, description, photo, bio, interests, education, currently ============ -->
+
 <section class="home-wrap about" aria-labelledby="h-name">
 
   <div class="about-text">
-    <!-- class quarto-title-block: tells Quarto this page already has its title header, so it leaves the h1 in place -->
+    
     <header class="about-head quarto-title-block">
       <h1 id="h-name"><span class="first">Honglin</span> Li <span class="name-zh" lang="zh-Hans">(李洪林)</span></h1>
       <p class="about-desc"><span class="segs"><span class="seg">Postdoctoral Fellow</span> <span class="seg">Electrical and Computer Engineering</span> <span class="seg"><a href="https://www.k-state.edu/">Kansas State University</a></span></span></p>
@@ -465,7 +464,7 @@ window.Quarto = {
     <figure class="about-photo figure">
       <img src="images/profile.jpg" alt="Portrait of Honglin Li" width="800" height="1000" class="figure-img">
       <figcaption>
-        <span><i class="bi bi-geo-alt" aria-hidden="true"></i>Manhattan, Kansas</span><!-- workplace: KSU, Manhattan, KS (author line of the NAPS 2026 papers) -->
+        <span><i class="bi bi-geo-alt" aria-hidden="true"></i>Manhattan, Kansas</span>
         <a href="mailto:hlli@ksu.edu"><i class="bi bi-envelope" aria-hidden="true"></i>hlli@ksu.edu</a>
       </figcaption>
     </figure>
@@ -482,7 +481,7 @@ window.Quarto = {
 
 </section>
 
-<!-- ============ 2b. START HERE: four doors by reader (Learn launch, 2026-11-02; Journeys door added 2026-11-05) ============ -->
+
 <nav id="start-here" class="home-wrap home-doors" aria-label="Start here">
   <ul class="door-grid">
     <li><a class="door" href="research.html">
@@ -504,8 +503,7 @@ window.Quarto = {
   </ul>
 </nav>
 
-<!-- ============ 3a. WHAT I BRING: ability cards, each linking to its evidence elsewhere on the site (website v2,
-     reports/07_website_v2_design.md §5). Claims stay general here; the linked sections carry the detail. ============ -->
+
 <section class="home-wrap home-sec" aria-labelledby="h-abilities">
   <div class="section-title"><h2 id="h-abilities">What I bring</h2></div>
   <p class="sec-lede">Each card links to the work that shows it.</p>
@@ -549,11 +547,10 @@ window.Quarto = {
   </ul>
 </section>
 
-<!-- ============ 4. NEWS (al-folio news table) ============ -->
-<!-- ============ 3b. AT A GLANCE (generated: _stats.qmd by scripts/build_site.py) ============ -->
+
+
 <section class="home-wrap home-sec home-stats" aria-label="Publications and citations at a glance">
-<!-- generated by scripts/build_site.py (publication counts from inputs/publications.bib, citations from
-     site/data/citations.json); include it with Quarto's include shortcode; styles: .pub-stats in assets/pubs.css -->
+
 <ul class="pub-stats" aria-label="Publication statistics">
 <li class="pt-journal"><a href="publications.html#journal"><span class="ps-n">8</span><span class="ps-l"><span class="dot" aria-hidden="true"></span>Journal articles</span></a></li>
 <li class="pt-conference"><a href="publications.html#conference"><span class="ps-n">10</span><span class="ps-l"><span class="dot" aria-hidden="true"></span>Conference papers</span></a></li>
@@ -579,7 +576,7 @@ window.Quarto = {
   </table>
 </section>
 
-<!-- ============ 4b. LATEST FROM FIELD NOTES (Quarto listing of the newest briefing; website v3) ============ -->
+
 <section class="home-wrap home-sec home-fn" aria-labelledby="h-fn">
   <div class="section-title"><h2 id="h-fn">Latest from Field Notes</h2><a href="field-notes.html">All Field Notes <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
 <div id="listing-home-fieldnotes" class="quarto-listing quarto-listing-container-default">
@@ -606,7 +603,7 @@ Nov 3, 2026
 </div>
 </section>
 
-<!-- ============ 5. SELECTED PUBLICATIONS (rows generated by scripts/build_site.py; styled by assets/pubs.css) ============ -->
+
 <section class="home-wrap home-sec" aria-labelledby="h-pubs">
   <div class="section-title"><h2 id="h-pubs">Selected publications</h2><a href="publications.html">All publications <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
   <div class="home-pubs">
@@ -619,6 +616,7 @@ Nov 3, 2026
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
+<a class="btn-xs" href="files/papers/Li2026.pdf" title="Published version, open access (CC BY-NC-ND 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">Code</a>
 <a class="btn-xs" href="projects/npph2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
@@ -674,6 +672,7 @@ Nov 3, 2026
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 3, article 100820, 2026. <span class="pub-tag tag-note">Co-first authors</span></div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.crsus.2026.100820">DOI</a>
+<a class="btn-xs" href="files/papers/jacob2026role.pdf" title="Published version, open access (CC BY-NC 4.0)">PDF</a>
 <a class="btn-xs" href="projects/smr-dc.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jacob2026role">Bib</button>
 </div>
@@ -701,6 +700,7 @@ Nov 3, 2026
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 2, article 100367, 2025.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.crsus.2025.100367">DOI</a>
+<a class="btn-xs" href="files/papers/li2025ghg.pdf" title="Published version, open access (CC BY-NC 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/ghg-load-regulation">Code</a>
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <a class="btn-xs" href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">News</a>
@@ -730,6 +730,7 @@ Nov 3, 2026
 <div class="pub-venue"><em>International Journal of Hydrogen Energy</em>, vol. 113, pp. 77–89, 2025.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.ijhydene.2025.02.303">DOI</a>
+<a class="btn-xs" href="files/papers/li2025hydrogen.pdf" title="Accepted manuscript, CC BY-NC-ND 4.0 (Elsevier sharing policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">Code</a>
 <a class="btn-xs" href="projects/txh2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025hydrogen">Bib</button>
@@ -754,7 +755,7 @@ Nov 3, 2026
   </div>
 </section>
 
-<!-- ============ 6. OPEN-SOURCE MODEL FRAMEWORKS (from software-data.qmd) ============ -->
+
 <section class="home-band" aria-labelledby="h-code">
   <div class="home-wrap home-sec">
     <div class="section-title"><h2 id="h-code">Open-source model frameworks</h2><a href="software-data.html">Software <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
@@ -809,10 +810,8 @@ Nov 3, 2026
   </div>
 </section>
 
-<!-- ============ 7b. MAP: collaborating institutions and presentations; visitor map (generated: _map.qmd) ============ -->
-<!-- _map.qmd: written by scripts/build_map.py from site/data/map.json; edit the script, not this file.
-     Map: assets/map.js (Leaflet 1.9.4 and tiles, loaded when the section scrolls into view); styles: assets/map.css.
-     Without JS the map box stays hidden and the list below is the content. -->
+
+
 <section class="home-wrap home-sec cmap-sec" id="collaborations" aria-labelledby="h-map">
   <div class="section-title"><h2 id="h-map">Collaborations around the world</h2></div>
   <p class="sec-lede">Institutions represented in my co-authored research (published, accepted or under review), and places where I have presented.</p>
@@ -865,7 +864,7 @@ Nov 3, 2026
 <script type="text/javascript" id="mapmyvisitors" src="https://mapmyvisitors.com/map.js?d=dTtq3oTCLFrNLMK0zar8qTaqpgqc0SdBITzkxt5uIvg&amp;cl=ffffff&amp;w=a"></script>
   </template>
 </section>
-<!-- ============ 8. SOCIAL ICONS (al-folio contact row) ============ -->
+
 <section class="home-wrap home-social" aria-labelledby="h-contact">
   <h2 id="h-contact" class="visually-hidden">Contact and profiles</h2>
   <ul class="social-icons">
@@ -1864,7 +1863,7 @@ Nov 3, 2026
     }
   });
   </script>
-</div> <!-- /content -->
+</div> 
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">

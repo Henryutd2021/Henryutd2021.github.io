@@ -79,7 +79,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" integrity="sha384-cxs0Bj979VdNByRZzAJ2KJWG8vH/kG7fwWZAIZW3Tmsw0rAuP/pu3I3LitFWEs18" crossorigin="anonymous">
 <meta name="theme-color" content="#ffffff">
 
 
@@ -328,14 +330,14 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text"></span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
+          </div> 
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-      </div> <!-- /container-fluid -->
+      </div> 
     </nav>
 </header>
-<!-- content -->
+
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-page">
@@ -359,10 +361,10 @@ ul.task-list li input[type="checkbox"] {
     
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
+
+
     
-<!-- main -->
+
 <main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
@@ -370,12 +372,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<!-- Research page (website v2, 2026-11-02; reports/07_website_v2_design.md §8; styles in assets/pages.css, "research v2").
-     The story of the research, not the project details: the path, then one question at three scales (Ph.D.), the
-     turning point, firm low-carbon supply for AI data centers (current), supporting capabilities, methods, outlook.
-     Follows the past-research part of Henry's research statement; findings stay within the audited project-page text
-     and the accepted boundary paper (arXiv preprint). Upcoming work: broad question and status only. No collaborator names (Henry 2026-11-02).
-     Anchors linked from the home page: path, flexibility, data-centers, sei, supporting, methods. -->
+
 <div class="rs-intro">
   <div class="rs-lede">
     <p>I build optimization and techno-economic models for decisions about low-carbon energy systems: what to build, where, how to run it, and under which market and policy conditions it pays off.</p>
@@ -392,7 +389,7 @@ ul.task-list li input[type="checkbox"] {
   </nav>
 </div>
 
-<!-- ============ research path: one ordered list, horizontal on wide screens, vertical on phones ============ -->
+
 <section class="rp-sec" id="path" aria-labelledby="h-path">
   <h2 id="h-path" class="rs-h2 anchored">Research path</h2>
   <ol class="rpath">
@@ -437,7 +434,7 @@ ul.task-list li input[type="checkbox"] {
   </p>
 </section>
 
-<!-- ============ chapter 1: flexibility from plant to nation (Ph.D.) ============ -->
+
 <section class="chapter theme-hydrogen" id="flexibility" aria-labelledby="h-flex">
   <div class="ch-head">
     <span class="ch-num">Chapter 1 · Ph.D., The University of Texas at Dallas, and Idaho National Laboratory</span>
@@ -466,8 +463,8 @@ ul.task-list li input[type="checkbox"] {
   </ol>
 </section>
 
-<!-- ============ turning point ============ -->
-<div class="turn" role="note" aria-labelledby="h-turn">  <!-- a div: Quarto moves aside elements into the margin -->
+
+<div class="turn" role="note" aria-labelledby="h-turn">  
   <span class="turn-icon" aria-hidden="true"><i class="bi bi-signpost-split"></i></span>
   <div>
     <h2 id="h-turn" class="turn-title anchored">The question that led to data centers</h2>
@@ -475,7 +472,7 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </div>
 
-<!-- ============ chapter 2: firm low-carbon power for AI data centers (current) ============ -->
+
 <section class="chapter theme-datacenter" id="data-centers" aria-labelledby="h-dc">
   <div class="ch-head">
     <span class="ch-num">Chapter 2 · Research Associate, The University of Texas at Dallas; Postdoctoral Fellow, Kansas State University</span>
@@ -520,7 +517,7 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </section>
 
-<!-- ============ supporting capabilities ============ -->
+
 <section class="support" id="supporting" aria-labelledby="h-support">
   <h2 id="h-support" class="rs-h2 anchored">Supporting capabilities</h2>
   <p class="support-lede">Side studies that built methods and skills used across the main line.</p>
@@ -548,7 +545,7 @@ ul.task-list li input[type="checkbox"] {
     </li>
   </ul>
 </section>
-<!-- ============ Methods and toolkit ============ -->
+
 <div class="fx-sec rs-methods">
 <section id="methods" class="level2 fx-head">
 <h2 class="anchored" data-anchor-id="methods">Methods and toolkit</h2>
@@ -584,7 +581,7 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="./software-data.html" class="method method-link"><span class="m-icon"><i class="bi bi-github" aria-hidden="true"></i></span><span class="m-title">Open model frameworks</span><span class="m-text">Documented, runnable frameworks that accompany my research.</span><span class="m-more">Software <i class="bi bi-arrow-right" aria-hidden="true"></i></span></a></p>
 </div>
 </div>
-<!-- ============ looking ahead: brief and general (Henry 2026-11-02: no named future projects) ============ -->
+
 <section class="outlook" id="outlook" aria-labelledby="h-outlook">
   <h2 id="h-outlook" class="rs-h2 anchored">Looking ahead</h2>
   <p>I want to keep working on how low-carbon energy systems should be planned as electricity demand grows: how large new loads can be supplied reliably and affordably, how to invest when demand and technology costs are uncertain, and who bears the costs. The models behind each study are designed to be reused, checked and extended.</p>
@@ -592,7 +589,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-</main> <!-- /main -->
+</main> 
 <script>
 // site.js — site-wide behaviour (third redesign, 2026-10-30): skip link, navbar shadow once scrolled,
 // back-to-top button, and a gentle one-time fade-in of content blocks. Without JS every page is complete.
@@ -1578,7 +1575,7 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
-</div> <!-- /content -->
+</div> 
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
