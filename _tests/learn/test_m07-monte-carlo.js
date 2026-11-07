@@ -422,7 +422,7 @@ function researchWording(entry) {
   const APPROVED_SNAPSHOT = {
     "E7.7": "The delay is treated as exogenous and parameters are illustrative; network feasibility is not modeled, and the social perspective is illustrated with a single bridge-power example.",
     "E7.11": "A present-value framework turns the delayed computing capacity into the grid MW it needs and prices the delay in three ledgers. Two measures compare cases: a delay cost per MW-month, and the largest payment worth making to shorten the wait. Inputs are screened with Latin hypercube sampling.",
-    "E7.14": "Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending."
+    "E7.14": "Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending."
   };
   // (this lesson says "a Monte Carlo study" in its own sense, so "study" alone does not signal; "the study" and "study's" do)
   const RX = /\b(the study|study's|paper|article|NAPS|Li et al|course author|excerpt|research|published|accepted|300 MW-IT|36-month delay|0\.7 billion|ledgers?|framework|exogenous|net-benefit test|staged (service|energization))\b/i;

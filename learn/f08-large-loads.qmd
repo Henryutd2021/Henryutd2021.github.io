@@ -263,7 +263,7 @@ $$\text{LF} = \frac{\bar d + c}{d_{\max} + c} = \frac{281.9 + 240}{450 + 240} = 
 <li>EIA. <a href="https://www.eia.gov/tools/faqs/faq.php?id=97&amp;t=3">How much electricity does an American home use?</a> Frequently Asked Questions, updated 8 January 2024.</li>
 <li>U.S. Department of Energy, Federal Energy Management Program. <a href="https://www.energy.gov/cmei/femp/cooling-water-efficiency-opportunities-federal-data-centers">Cooling Water Efficiency Opportunities for Federal Data Centers</a>: how cooling towers use water (page read 5 November 2026).</li>
 <li>The town's hourly shapes: EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), Southwest Power Pool, 2025 (accessed 2 November 2026).</li>
-<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
 </ul>
 </div>
 ```

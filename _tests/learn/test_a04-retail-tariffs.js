@@ -244,9 +244,9 @@ if (RP) {
   ok(bq.length === 1 && bq[0][3] === CF7_FOOT, "the excerpt's footer is CF7's citation");
   ok(/<a href="cf7-cost-of-waiting\.html">CF7<\/a>/.test(real), "the real-world box links case file CF7");
   // no other sentence about the study: the only other mention is the citation in the sources list
-  const rest = OWN.replace(/<blockquote[\s\S]*?<\/blockquote>/g, " ").replace(/<li>Li et al\. \(2026\)\. Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium \(NAPS\), presented October 2026; DOI pending\.<\/li>/, " ");
+  const rest = OWN.replace(/<blockquote[\s\S]*?<\/blockquote>/g, " ").replace(/<li>Li et al\. \(2026\)\. Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium \(NAPS\), presented October 2026; DOI pending\.<\/li>/, " ");
   ok(!/\bNAPS\b|Li et al|course author|my (study|research)|\bour (study|research)/i.test(text(rest) + " " + RAW + " " + JS), "no wording about the study outside the excerpt and its citation");
-  ok(OWN.indexOf("<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>") >= 0, "the citation is E7.14, word for word");
+  ok(OWN.indexOf("<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>") >= 0, "the citation is E7.14, word for word");
 }
 
 // ---------------- scope

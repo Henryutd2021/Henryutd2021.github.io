@@ -147,7 +147,7 @@ const APPROVED_SNAPSHOT = {   // excerpts_for_approval.md, E7 with the revisions
   "E7.11": "A present-value framework turns the delayed computing capacity into the grid MW it needs and prices the delay in three ledgers. Two measures compare cases: a delay cost per MW-month, and the largest payment worth making to shorten the wait. Inputs are screened with Latin hypercube sampling.",
   "E7.12": "The delay is priced in three separate accounts: the developer, electricity ratepayers and society.",
   "E7.13": "Where the result holds: the delay is taken as given, not explained; the parameters are illustrative, so the study reports which inputs move the result, not a forecast; the three accounts stay separate, and a net-benefit test says when they may be added. It leaves out: why service is late: the interconnection process itself; whether the network can carry the load (network feasibility); social costs beyond a single bridge-power example.",
-  "E7.14": "Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending."
+  "E7.14": "Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending."
 };
 // names the study, its author, its case or its method: such an element is research text unless approved or listed below
 const RX = /\b(stud(y|y's|ies)|paper|article|NAPS|Li et al|course author|excerpt|research|published|accepted|300 MW-IT|36-month|0\.7 billion|ledgers?|Latin hypercube|framework|exogenous|net-benefit test|staged (service|energization))\b/i;

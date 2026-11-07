@@ -334,7 +334,7 @@ body-classes: "page-learn page-lesson lx-form-cards"
 <li>Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., and Tarantola, S. (2008). <a href="https://doi.org/10.1002/9780470725184">Global Sensitivity Analysis: The Primer</a>. Wiley.</li>
 <li>Saltelli, A., Annoni, P., Azzini, I., Campolongo, F., Ratto, M., and Tarantola, S. (2010). <a href="https://doi.org/10.1016/j.cpc.2009.09.018">Variance based sensitivity analysis of model output. Design and estimator for the total sensitivity index</a>. <em>Computer Physics Communications</em>, 181(2), 259–270. The lab's variance shares.</li>
 <li>Iman, R. L., and Conover, W. J. (1982). <a href="https://doi.org/10.1080/03610918208812265">A distribution-free approach to inducing rank correlation among input variables</a>. <em>Communications in Statistics – Simulation and Computation</em>, 11(3), 311–334. The lab's practice task 3.</li>
-<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
 <li><a href="https://github.com/Henryutd2021/code-delayed-energization">code-delayed-energization</a> on GitHub, version 1.0.2 (2 November 2026).</li>
 </ul>
 </div>

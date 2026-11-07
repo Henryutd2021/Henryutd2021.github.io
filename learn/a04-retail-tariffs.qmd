@@ -218,7 +218,7 @@ $$\text{bill}(x) = F + n \sum_{t} p_t\, x_t + d \max_t x_t$$
 <li>EIA. <a href="https://www.eia.gov/electricity/annual/html/epa_02_04.html">Electric Power Annual, Table 2.4: Average price of electricity to ultimate customers by end-use sector, 2015 through 2025</a> (accessed 3 November 2026).</li>
 <li>FERC staff (December 2025). <a href="https://www.ferc.gov/sites/default/files/2025-12/25_Annual%20Assessment%20of%20Demand%20Response_1212.pdf">2025 Assessment of Demand Response and Advanced Metering</a> (PDF), p. 2 and Table 2-1, p. 4.</li>
 <li>Mims Frick, N., Cappers, P. (Berkeley Lab), Kavlak, G., Lam, L., Hledik, R., Grove, J. and Rotella, S. (The Brattle Group) (August 2026). <a href="https://eta-publications.lbl.gov/sites/default/files/2026-08/rate_designs_large_loads_2026.08.10.pdf">Electricity Rate Designs for Large Loads: Evolving Practices and Opportunities, 2026 Update</a> (PDF), pp. 2–5.</li>
-<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
+<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>
 <li>The day's hourly shapes: EIA. <a href="https://www.eia.gov/electricity/gridmonitor/">Hourly Electric Grid Monitor</a> (Form EIA-930), Southwest Power Pool, 2025 (accessed 2 November 2026).</li>
 </ul>
 </div>

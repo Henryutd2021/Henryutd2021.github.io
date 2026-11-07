@@ -188,7 +188,7 @@ include-in-header:
       <tr><th scope="row">Nov 2026</th><td>Paper on small modular reactor cogeneration for hyperscale data-center IT and cooling loads accepted in <em>Energy Conversion and Management</em>.</td></tr>
       <tr><th scope="row">Fall 2026</th><td>Teaching <strong>ECE 685 Power Systems Design</strong> at Kansas State University.</td></tr>
       <tr><th scope="row">Aug 2026</th><td>Preprint on small modular reactor cogeneration for hyperscale data-center IT and cooling loads posted on <a href="https://arxiv.org/abs/2608.10999">arXiv</a>.</td></tr>
-      <tr><th scope="row">2026</th><td>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed grid energization for AI data centers.</td></tr>
+      <tr><th scope="row">2026</th><td>Two papers accepted at the IEEE North American Power Symposium (NAPS 2026), including the cost of delayed energization for AI data centers.</td></tr>
       <tr><th scope="row">2026</th><td>Our paper on hydrogen integration and policy support for U.S. nuclear power plants is published in <em>Nature Communications</em>.</td></tr>
       <tr><th scope="row">2026</th><td>Perspective on small modular reactors for data centers published in <em>Cell Reports Sustainability</em>.</td></tr>
       <tr><th scope="row">Apr 2026</th><td>Joined the Department of Electrical and Computer Engineering at Kansas State University as a Postdoctoral Fellow.</td></tr>
@@ -270,7 +270,7 @@ include-in-header:
       <li><a class="card fw theme-datacenter" href="https://github.com/Henryutd2021/code-delayed-energization">
         <span class="fw-theme">Nuclear &amp; data centers</span>
         <span class="fw-name">code-delayed-energization</span>
-        <span class="fw-desc">Cost of delayed grid energization for AI data centers: developer, ratepayer and social accounts.</span>
+        <span class="fw-desc">Cost of delayed energization for AI data centers: developer, ratepayer and social accounts.</span>
         <span class="fw-link"><i class="bi bi-github" aria-hidden="true"></i>GitHub</span></a></li>
     </ul>
   </div>

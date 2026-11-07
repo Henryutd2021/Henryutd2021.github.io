@@ -219,7 +219,7 @@ const APPROVED_SNAPSHOT = {
   ok(exs[0].sentences.join("|") === ["E7.2", "E7.3", "E7.5", "E7.6"].map(k => APP[k]).join("|"), "every excerpt sentence is an approved E7 row, word for word, in order (E7.4 left out)");
   const cf7 = fs.readFileSync(path.join(X.SITE, "learn/cf7-cost-of-waiting.qmd"), "utf8"), cf7foot = (cf7.match(/<footer>([\s\S]*?)<\/footer>/) || [])[1];
   ok(exs[0].footer === cf7foot && !/North American Power Symposium.*Delayed|for AI/.test(PAGE), "the footer is CF7's (cited by description, no title)");
-  ok(PAGE.indexOf("<li>Li et al. (2026). Accepted paper on the cost of delayed grid energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>") >= 0, "the citation is CF7's (E7.14), word for word");
+  ok(PAGE.indexOf("<li>Li et al. (2026). Accepted paper on the cost of delayed energization for large loads, 2026 North American Power Symposium (NAPS), presented October 2026; DOI pending.</li>") >= 0, "the citation is CF7's (E7.14), word for word");
 
   ok(T.indexOf("the year of each of the 128 plans on the grid, solved with this engine on " + LIB.date + ", each day's status kept.") >= 0 && T.indexOf("The grid: half or all of the load, flexible or not, 0, 2, 4 or 6 new peakers, a battery or not, an uprate or not, a 150 or 250 MW reserve.") >= 0 && LIB.date === RUN_DATE, "the page states the grid and the library's date");
   ok(/The choices step across a precomputed grid of " \+ LIB\.plans\.length \+ " plans/.test(fs.readFileSync(X.L("c2-plains-grid-hard-year.js"), "utf8")) && /Precomputed with this engine on/.test(fs.readFileSync(X.L("c2-plains-grid-hard-year.js"), "utf8")), "the bench labels the year as precomputed with this engine, with its date");
