@@ -92,6 +92,7 @@ toc: false
 <div class="pub-venue"><em>Journal of Mechanical Design</em>, vol. 146, article 020903, 2024. <span class="pub-tag tag-featured">Featured Article</span></div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1115/1.4063971">DOI</a>
+<a class="btn-xs" href="../files/papers/li2024towards.pdf" title="Accepted manuscript, © ASME (ASME self-archiving policy); the version of record is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2024towards">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 28</a>
@@ -121,6 +122,7 @@ toc: false
 <div class="pub-venue"><em>Journal of Physics: Conference Series</em>, vol. 2265, article 042063, 2022.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1088/1742-6596/2265/4/042063">DOI</a>
+<a class="btn-xs" href="../files/papers/li2022optimal.pdf" title="Published version, open access (CC BY 3.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/reopt-hydrogen-framework">Code</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2022optimal">Bib</button>
 <a class="chip cite-chip" href="https://scholar.google.com/citations?user=O1BZdHQAAAAJ&amp;hl=en" title="Citations on Google Scholar (as of October 30, 2026)"><i class="bi bi-quote" aria-hidden="true"></i>Cited by 17</a>
@@ -156,7 +158,9 @@ toc: false
 <h2 id="h-outputs"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>Outputs</h2>
 <div class="out-btns">
 <a class="btn-solid" href="https://doi.org/10.1115/1.4063971"><i class="bi bi-journal-text" aria-hidden="true"></i>JMD paper (DOI)</a>
+<a class="btn-outline" href="../files/papers/li2024towards.pdf" title="Accepted manuscript, © ASME (ASME self-archiving policy); the version of record is at the DOI"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>JMD accepted manuscript (PDF)</a>
 <a class="btn-outline" href="https://doi.org/10.1088/1742-6596/2265/4/042063"><i class="bi bi-journal-text" aria-hidden="true"></i>TORQUE 2022 paper (DOI)</a>
+<a class="btn-outline" href="../files/papers/li2022optimal.pdf" title="Published version, open access (CC BY 3.0)"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>TORQUE 2022 paper (PDF)</a>
 <a class="btn-outline" href="https://github.com/Henryutd2021/reopt-hydrogen-framework"><i class="bi bi-github" aria-hidden="true"></i>Model framework (GitHub)</a>
 </div>
 </section>

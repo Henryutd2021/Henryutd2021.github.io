@@ -8,6 +8,7 @@
 <div class="pub-venue"><em>Nature Communications</em>, vol. 17, article 7090, 2026.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1038/s41467-026-73630-y">DOI</a>
+<a class="btn-xs" href="files/papers/Li2026.pdf" title="Published version, open access (CC BY-NC-ND 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/nuclear-hydrogen-integration">Code</a>
 <a class="btn-xs" href="projects/npph2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-Li2026">Bib</button>
@@ -63,6 +64,7 @@
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 3, article 100820, 2026. <span class="pub-tag tag-note">Co-first authors</span></div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.crsus.2026.100820">DOI</a>
+<a class="btn-xs" href="files/papers/jacob2026role.pdf" title="Published version, open access (CC BY-NC 4.0)">PDF</a>
 <a class="btn-xs" href="projects/smr-dc.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-jacob2026role">Bib</button>
 </div>
@@ -90,6 +92,7 @@
 <div class="pub-venue"><em>Cell Reports Sustainability</em>, vol. 2, article 100367, 2025.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.crsus.2025.100367">DOI</a>
+<a class="btn-xs" href="files/papers/li2025ghg.pdf" title="Published version, open access (CC BY-NC 4.0)">PDF</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/ghg-load-regulation">Code</a>
 <a class="btn-xs" href="projects/ghg.html">Project</a>
 <a class="btn-xs" href="https://news.utdallas.edu/science-technology/electricity-timing-2025/">News</a>
@@ -119,6 +122,7 @@
 <div class="pub-venue"><em>International Journal of Hydrogen Energy</em>, vol. 113, pp. 77–89, 2025.</div>
 <div class="pub-links">
 <a class="btn-xs" href="https://doi.org/10.1016/j.ijhydene.2025.02.303">DOI</a>
+<a class="btn-xs" href="files/papers/li2025hydrogen.pdf" title="Accepted manuscript, CC BY-NC-ND 4.0 (Elsevier sharing policy); the published version is at the DOI">Accepted manuscript (PDF)</a>
 <a class="btn-xs" href="https://github.com/Henryutd2021/txh2-ercot-hydrogen">Code</a>
 <a class="btn-xs" href="projects/txh2.html">Project</a>
 <button type="button" class="btn-xs bib-toggle" aria-expanded="false" aria-controls="bib-li2025hydrogen">Bib</button>
