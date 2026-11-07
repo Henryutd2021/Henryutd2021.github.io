@@ -38,11 +38,14 @@
     "omPer100MW": { "min": 0, "max": 20, "step": 1, "start": 6 },
     "displacement": { "min": 0, "max": 50, "step": 5, "start": 20 },
     "horizonYears": 20,
-    "set": "teaching: every coefficient is a learner input with an illustrative default, not a prediction; the local share of construction spending (30%), the two building years and the 20-year horizon are fixed for the lesson"
+    "timeline": "the plant retires as year 1 begins; the farms are built in years 1-2 and run in years 3-20; the 20-year comparison counts the lost jobs in every year",
+    "direct": "jobYearsPerM and omPer100MW are direct (on-site) jobs; the multiplier turns them into direct, supplier and spending jobs",
+    "set": "teaching: every coefficient is a learner input with an illustrative default, not a prediction; the local share of construction spending (30%), the two building years, the timeline and the 20-year horizon are fixed for the lesson; the displacement share applies to building and running alike (A13 passes it to LX.A13.jobs as both displacement and buildDisplacement)"
   },
   "tax": {
     "rate": { "min": 0.5, "max": 3.0, "step": 0.1, "start": 2.0 },
     "taxableShare": { "min": 0, "max": 100, "step": 10, "start": 50 },
+    "mines": "the mines' coal taxes (ridgeCounty.mineCoalTaxM, inside otherRevenueM) stay as they are: a plant-property-tax comparison, as if the mines kept selling their coal to other buyers; the page also shows the change if they ended too",
     "set": "teaching: one effective property tax rate for the plant and the new farms; the new farms' taxable value as a share of their cost (abatements and depreciation lower it)"
   },
   "sources": {
