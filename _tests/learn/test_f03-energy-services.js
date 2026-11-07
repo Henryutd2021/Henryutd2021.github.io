@@ -275,8 +275,7 @@ const T0 = M.totals(D, {}), T1 = M.totals(D, { car: true }), T2 = M.totals(D, { 
   ok(nl >= 20, `${nl} links checked`);
   // lessons named on the page: live ones linked, the rest "(upcoming)"
   for (const h of own.matchAll(/href="([0-9a-z-]+)\.html"/g)) ok(fs.existsSync(path.join(SITE, "learn", h[1] + ".qmd")), `linked lesson ${h[1]} exists`);
-  ["F10"].forEach(c => { ok(!CORE.lessonRef(PJ, c).ready, `${c} is not live yet`); ok(new RegExp(c + " \\(upcoming\\)").test(QMD), `${c} is named as upcoming`); });
-  ["F4", "F6", "A15", "M12"].forEach(c => ok(CORE.lessonRef(PJ, c).ready && !new RegExp(c + " \\(upcoming\\)").test(QMD), `${c} is live and linked, never called upcoming`));
+  ["F4", "F6", "F10", "A15", "M12"].forEach(c => ok(CORE.lessonRef(PJ, c).ready && !new RegExp(c + " \\(upcoming\\)").test(QMD), `${c} is live and linked, never called upcoming`));
 }
 
 // ---------------- the rendered page (only when _site holds a render newer than the source; run after quarto render)

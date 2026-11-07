@@ -1,0 +1,863 @@
+{
+  "about": "Lesson F10's own inputs: six real energy balances (the United States, the European Union, China, India, Brazil and Norway), each as its national statistics office or the EU's statistics office published it, one data year per country, with the rows used, the units and the conversions; the accounting conventions; the four lenses; the regional card each country opens; the numbers to remember. Every value here was read on the cited page or table between 2 and 7 November 2026. Prairieland's numbers are read from prairieland.json at run time, never copied here.",
+  "pjPerTWh": 3.6,
+  "nuclearHeatEff": 0.33,
+  "subEff": 0.4,
+  "subEffNote": "Set for teaching: the substitution method counts each MWh from nuclear, hydro, wind and solar as the fuel a thermal plant would burn to make it, at an assumed efficiency; publishers have used different efficiencies in different years, so the page uses one round value, 40%, for every real country (Prairieland uses its own fleet's, from its file).",
+  "units": {
+    "quad": {
+      "label": "quadrillion Btu (quads)",
+      "pj": 1055.06,
+      "src": "un-ires",
+      "note": "1 quad = 1.05506 EJ"
+    },
+    "pj": {
+      "label": "PJ",
+      "pj": 1,
+      "src": null
+    },
+    "tj": {
+      "label": "TJ",
+      "pj": 0.001,
+      "src": null
+    },
+    "tce4": {
+      "label": "10,000 t of coal equivalent",
+      "pj": 0.293076,
+      "src": "un-ires",
+      "note": "1 t of coal equivalent = 29.3076 GJ"
+    },
+    "ktoe": {
+      "label": "thousand t of oil equivalent (ktoe)",
+      "pj": 0.041868,
+      "src": "un-ires",
+      "note": "1 t of oil equivalent = 41.868 GJ"
+    },
+    "mtep": {
+      "label": "million t of oil equivalent (Mtep, Brazil's tep of 10,000 kcal)",
+      "pj": 41.868,
+      "src": "epe-manual",
+      "note": "1 tep = 10,000 kcal = 41.868 GJ"
+    },
+    "twh": {
+      "label": "TWh",
+      "pj": 3.6,
+      "src": null
+    }
+  },
+  "nodes": {
+    "coal": {
+      "label": "Coal",
+      "short": "Coal",
+      "color": "var(--lx-steel)",
+      "fossil": true
+    },
+    "oil": {
+      "label": "Oil",
+      "short": "Oil",
+      "color": "var(--lx-pk)",
+      "fossil": true
+    },
+    "gas": {
+      "label": "Natural gas",
+      "short": "Gas",
+      "color": "var(--lx-cc)",
+      "fossil": true
+    },
+    "nuclear": {
+      "label": "Nuclear",
+      "short": "Nuclear",
+      "color": "var(--lx-nuc)",
+      "elec": true
+    },
+    "hydro": {
+      "label": "Hydro",
+      "short": "Hydro",
+      "color": "var(--lx-hyd)",
+      "elec": true,
+      "renewable": true
+    },
+    "wind": {
+      "label": "Wind",
+      "short": "Wind",
+      "color": "var(--lx-wind)",
+      "elec": true,
+      "renewable": true
+    },
+    "solar": {
+      "label": "Solar",
+      "short": "Solar",
+      "color": "var(--lx-solar)",
+      "elec": true,
+      "renewable": true
+    },
+    "wso": {
+      "label": "Wind, solar and other power",
+      "short": "Wind, solar, other",
+      "color": "var(--lx-wind)",
+      "elec": true,
+      "renewable": true,
+      "say": "wind, solar and other renewable electricity",
+      "note": "Wind, solar and other renewable electricity, with bio-power and small hydro"
+    },
+    "hws": {
+      "label": "Hydro, wind and solar power",
+      "short": "Hydro, wind, solar",
+      "color": "var(--lx-hyd)",
+      "elec": true,
+      "renewable": true,
+      "say": "hydro, wind and solar electricity",
+      "note": "Hydro, wind and solar electricity, after net exports"
+    },
+    "bio": {
+      "label": "Bioenergy and waste",
+      "short": "Bioenergy",
+      "color": "var(--lx-tree)",
+      "renewable": true
+    },
+    "other": {
+      "label": "Other",
+      "short": "Other",
+      "color": "var(--lx-ink-3)"
+    }
+  },
+  "sectors": {
+    "industry": {
+      "label": "Industry",
+      "short": "Industry"
+    },
+    "transport": {
+      "label": "Transport",
+      "short": "Transport"
+    },
+    "buildings": {
+      "label": "Buildings (homes and services)",
+      "short": "Buildings"
+    },
+    "other": {
+      "label": "Farms, fishing and other",
+      "short": "Farms, other"
+    }
+  },
+  "countries": [
+    {
+      "key": "us",
+      "name": "United States",
+      "year": "2025",
+      "unit": "quad",
+      "card": "us",
+      "primary": {
+        "coal": 8.670671,
+        "oil": 36.115218,
+        "gas": 34.623877,
+        "nuclear": 8.195465,
+        "hydro": 0.842843,
+        "wind": 1.584501,
+        "solar": 1.437607,
+        "bio": 4.853097
+      },
+      "total": 96.465716,
+      "otherNote": "geothermal (0.12 quads) and the rest of EIA's total",
+      "twh": {
+        "nuclear": 784.780718,
+        "hydro": 247.02321,
+        "wind": 464.39061,
+        "solar": 388.81986
+      },
+      "final": {
+        "industry": [
+          "industrial",
+          "-nonfuel"
+        ],
+        "transport": [
+          "transportation"
+        ],
+        "buildings": [
+          "residential",
+          "commercial"
+        ]
+      },
+      "nonEnergy": [
+        "nonfuel"
+      ],
+      "pub": {
+        "residential": 11.907478,
+        "commercial": 9.937819,
+        "industrial": 26.652167,
+        "transportation": 28.290759,
+        "nonfuel": 6.53951,
+        "production": 107.16283,
+        "netImports": -11.099192
+      },
+      "published": "96.5 quads of primary energy consumption; EIA counts nuclear at its plants' heat rate and hydro, wind and solar at the heat content of their electricity (3,412 Btu per kWh) since September 2023, close to the physical energy content method; fossil fuels at their gross heat content.",
+      "convention": "pec",
+      "notes": [
+        "End-use energy without electrical system losses (Tables 2.2 to 2.5); EIA's 6.5 quads of non-fuel use, mostly in industry, are shown apart as non-energy use.",
+        "Agriculture is inside EIA's industrial sector, so no farm row.",
+        "Solar includes small-scale solar (Table 10.6)."
+      ],
+      "importDep": {
+        "rows": [
+          "netImports"
+        ],
+        "of": "total",
+        "kind": "derived",
+        "text": "net imports ÷ primary energy consumption"
+      },
+      "production": {
+        "rows": [
+          "production"
+        ],
+        "of": "total"
+      },
+      "resources": "Crude oil, natural gas and coal.",
+      "institutions": "7 ISO/RTO markets plus vertically integrated utilities; 3 weakly coupled interconnections.",
+      "src": [
+        "eia-mer",
+        "eia-method"
+      ],
+      "resFacts": [],
+      "the": true
+    },
+    {
+      "key": "eu",
+      "name": "European Union (27 countries)",
+      "short": "European Union",
+      "year": "2024",
+      "unit": "tj",
+      "card": "eu",
+      "primary": {
+        "coal": 4818703.69,
+        "oil": 21115443.346,
+        "gas": 11478563.027,
+        "nuclear": 6483513.367,
+        "hydro": 1330773.45,
+        "wind": 1764134.988,
+        "solar": 1258250.111,
+        "bio": 5877641.289
+      },
+      "total": 55789527.289,
+      "otherNote": "ambient heat for heat pumps, geothermal, non-renewable waste and electricity and heat trade",
+      "twh": {
+        "nuclear": 649.545843,
+        "hydro": 369.659291,
+        "wind": 490.037497,
+        "solar": 303.976869
+      },
+      "final": {
+        "industry": [
+          "industry"
+        ],
+        "transport": [
+          "transport"
+        ],
+        "buildings": [
+          "households",
+          "services"
+        ],
+        "other": [
+          "agriculture",
+          "fishing",
+          "nes"
+        ]
+      },
+      "nonEnergy": [
+        "nonEnergy"
+      ],
+      "bunkers": [
+        "bunkers"
+      ],
+      "pub": {
+        "industry": 9022609.331,
+        "transport": 11879035.074,
+        "households": 9551379.335,
+        "services": 4970645.161,
+        "agriculture": 1106649.594,
+        "fishing": 56203.062,
+        "nes": 168411.215,
+        "nonEnergy": 3274908.754,
+        "bunkers": 1703632.272,
+        "production": 23002614.941
+      },
+      "published": "55,790 PJ of gross available energy, by the physical energy content method: nuclear as reactor heat; hydro, wind and solar photovoltaic as their electricity.",
+      "convention": "pec",
+      "notes": [
+        "Coal includes peat and oil shale; solar includes solar heat (164 PJ); bioenergy is renewables less hydro, wind, solar, geothermal, tide and ambient heat.",
+        "Gross available energy includes 1,704 PJ of fuel for international shipping, shown apart.",
+        "Electricity by source is gross production (nrg_bal_peh)."
+      ],
+      "importDep": {
+        "value": 0.573,
+        "kind": "published",
+        "text": "Eurostat's import dependency rate: net imports ÷ gross available energy"
+      },
+      "production": {
+        "rows": [
+          "production"
+        ],
+        "of": "total",
+        "split": "renewables 48.1%, nuclear heat 28.2%, oil 3.3% and natural gas 5.1% of that production"
+      },
+      "resources": "",
+      "institutions": "Unbundled zonal markets, coupled day-ahead and intraday; dense interconnection.",
+      "src": [
+        "eurostat-overview",
+        "eurostat-balance",
+        "eurostat-method"
+      ],
+      "resFacts": [],
+      "the": true
+    },
+    {
+      "key": "cn",
+      "name": "China",
+      "year": "2023",
+      "unit": "tce4",
+      "card": "china",
+      "coalEquivalent": {
+        "total": 571327,
+        "shares": {
+          "coal": 0.548,
+          "oil": 0.188,
+          "gas": 0.085,
+          "nonFossil": 0.179
+        },
+        "label": "primary electricity and other energy"
+      },
+      "twh": {
+        "nuclear": 434.7,
+        "hydro": 1285.8,
+        "wind": 885.9,
+        "solar": 584.15
+      },
+      "pub": {
+        "production": 475979,
+        "imports": 145253,
+        "exports": 13625,
+        "coalShareOfProduction": 0.661
+      },
+      "published": "571,327 × 10,000 t of coal equivalent (5.71 billion t, about 167 EJ): coal 54.8%, oil 18.8%, gas 8.5%, primary electricity and other energy 17.9%; electricity from nuclear, hydro, wind and solar is counted at the coal burned per kWh in the year's thermal plants (the coal-equivalent method).",
+      "convention": "coal",
+      "noFinal": "China's statistics count the electricity users buy at the coal burned to make it, so its final energy cannot be drawn on the same basis as the others; this page shows its primary energy only.",
+      "notes": [
+        "Physical energy content here is the page's estimate: fossil fuels as published, plus nuclear, hydro, wind and solar from their TWh; the 'other energy' in NBS's 17.9% is not split by NBS and is left out.",
+        "Solar generation from the 2023 Statistical Communiqué; the rest from the 2025 Statistical Yearbook (2023 data)."
+      ],
+      "importDep": {
+        "rows": [
+          "imports",
+          "-exports"
+        ],
+        "of": "coalTotal",
+        "kind": "derived",
+        "text": "net imports ÷ total energy consumption, both in coal equivalent"
+      },
+      "production": {
+        "rows": [
+          "production"
+        ],
+        "of": "coalTotal"
+      },
+      "resources": "",
+      "institutions": "State-owned grids; provincial dispatch; spot markets moving toward a unified market.",
+      "src": [
+        "nbs-yearbook",
+        "nbs-communique"
+      ],
+      "resFacts": []
+    },
+    {
+      "key": "in",
+      "name": "India",
+      "year": "fiscal year 2023-24 (provisional)",
+      "unit": "ktoe",
+      "card": "india",
+      "primary": {
+        "coal": 543821,
+        "oil": 252286,
+        "gas": 63115,
+        "nuclear": 12493,
+        "hydro": 11559,
+        "wso": 20289
+      },
+      "total": 903158,
+      "otherNote": "net electricity exports",
+      "negOther": "Net electricity exports",
+      "twh": {
+        "nuclear": 47.937,
+        "hydro": 134.405,
+        "wso": 235.915
+      },
+      "final": {
+        "industry": [
+          "industry"
+        ],
+        "transport": [
+          "transport"
+        ],
+        "buildings": [
+          "residential",
+          "commercial"
+        ],
+        "other": [
+          "agriculture",
+          "otherNs"
+        ]
+      },
+      "nonEnergy": [
+        "nonEnergy"
+      ],
+      "pub": {
+        "industry": 311822,
+        "transport": 71945,
+        "residential": 62169,
+        "commercial": 10815,
+        "agriculture": 22564,
+        "otherNs": 111266,
+        "nonEnergy": 23023,
+        "production": 521633,
+        "coalProduction": 413585
+      },
+      "published": "903,158 ktoe (37,813 PJ) of total primary energy supply; hydro, wind and solar at their electricity (1 GWh = 0.086 ktoe), nuclear at its electricity ÷ 0.33.",
+      "convention": "pec",
+      "notes": [
+        "Coal includes lignite; oil is crude oil less net exports of oil products.",
+        "The balance has no row for firewood or other traditional biomass.",
+        "Wind, solar and other renewable electricity includes bio-power and small hydro (not split in the tables read).",
+        "'Other' final use is agriculture and the balance's non-specified other uses."
+      ],
+      "importDep": {
+        "value": 0.4027,
+        "kind": "published",
+        "text": "MoSPI's net energy import dependency"
+      },
+      "production": {
+        "rows": [
+          "production"
+        ],
+        "of": "total",
+        "coal": "coalProduction"
+      },
+      "resources": "",
+      "institutions": "State distribution companies (DISCOMs) buy under long-term contracts; one synchronous grid.",
+      "src": [
+        "mospi-esi",
+        "mospi-units"
+      ],
+      "resFacts": []
+    },
+    {
+      "key": "br",
+      "name": "Brazil",
+      "year": "2025",
+      "unit": "mtep",
+      "card": "latam",
+      "primary": {
+        "oil": 110.6,
+        "gas": 33.9,
+        "coal": 14.7,
+        "nuclear": 4.2,
+        "hydro": 35.2,
+        "wind": 10.0,
+        "solar": 8.8,
+        "bio": 108.3
+      },
+      "total": 328.5,
+      "otherNote": "other non-renewables (2.7 Mtep) and rounding",
+      "twh": {
+        "nuclear": 15.834,
+        "hydro": 401.415,
+        "wind": 116.488,
+        "solar": 88.141
+      },
+      "finalShares": {
+        "of": "finalEnergyUse",
+        "rest": [
+          "energySector",
+          "services",
+          "agriculture"
+        ],
+        "shares": {
+          "energySector": 0.079,
+          "services": 0.052,
+          "agriculture": 0.05
+        }
+      },
+      "final": {
+        "industry": [
+          "industry"
+        ],
+        "transport": [
+          "transport"
+        ],
+        "buildings": [
+          "residential",
+          "services"
+        ],
+        "other": [
+          "agriculture"
+        ]
+      },
+      "nonEnergy": [
+        "finalAll",
+        "-finalEnergyUse"
+      ],
+      "pub": {
+        "industry": 92.2,
+        "transport": 99.2,
+        "residential": 31.0,
+        "finalAll": 291.7,
+        "finalEnergyUse": 275.417,
+        "sugarcane": 52.0,
+        "firewood": 27.1,
+        "liquorOther": 29.2,
+        "hydroGWh": 401415,
+        "totalGWh": 775896
+      },
+      "published": "328.5 Mtep of domestic energy supply (Oferta Interna de Energia); hydro, wind and solar at their electricity (1 kWh = 860 kcal), nuclear at its electricity ÷ 0.33.",
+      "convention": "pec",
+      "notes": [
+        "Bioenergy is sugarcane products (52.0), firewood and charcoal (27.1), and black liquor and other renewables (29.2), in Mtep.",
+        "Hydro includes imported electricity; solar includes solar heat.",
+        "BEN's final consumption includes the energy sector's own use; the page moves it to 'before the meter', as the other countries count it. Services, farms and the energy sector are split by their published shares."
+      ],
+      "importDep": null,
+      "importDepNote": "not on the pages read",
+      "production": null,
+      "resources": "Rivers and sugarcane.",
+      "institutions": "Hydro-dominated national grid; cost-based dispatch; auctions plus a free market.",
+      "src": [
+        "epe-ben",
+        "epe-manual"
+      ],
+      "resFacts": [
+        {
+          "label": "Hydro",
+          "of": "of its electricity",
+          "num": [
+            "hydroGWh"
+          ],
+          "den": [
+            "totalGWh"
+          ]
+        },
+        {
+          "label": "Sugarcane products",
+          "of": "of its supply",
+          "num": [
+            "sugarcane"
+          ],
+          "den": [
+            "@total"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "no",
+      "name": "Norway",
+      "year": "2025",
+      "unit": "twh",
+      "card": "nordics",
+      "primary": {
+        "coal": 8.8,
+        "gas": 47.6,
+        "oil": 107.4,
+        "bio": 24.7,
+        "hws": 137.7
+      },
+      "total": null,
+      "twh": {
+        "hws": 137.7
+      },
+      "final": {
+        "industry": [
+          "industry"
+        ],
+        "transport": [
+          "transport"
+        ],
+        "buildings": [
+          "households"
+        ],
+        "other": [
+          "other"
+        ]
+      },
+      "nonEnergy": [
+        "nonEnergy"
+      ],
+      "pub": {
+        "industry": 73,
+        "transport": 50,
+        "households": 45,
+        "other": 43,
+        "nonEnergy": 26,
+        "production": 2593,
+        "imports": 124,
+        "exports": 2380,
+        "oilGasProduction": 2413.8,
+        "hydroGWh": 145476,
+        "genGWh": 161793
+      },
+      "published": "326 TWh of net domestic energy supply (Table 2; its rows add to 326.2); electricity at its own energy content (1 MWh = 3.6 GJ).",
+      "convention": "pec",
+      "notes": [
+        "Electricity in the supply is production less net exports; its hydro, wind and solar are not split in the balance (hydro made 89.9% of 2025's generation).",
+        "Bioenergy and waste: biofuels 19.5 and waste 5.2 TWh.",
+        "Buildings here are households only: services sit in 'other' with farms and fishing."
+      ],
+      "importDep": {
+        "rows": [
+          "imports",
+          "-exports"
+        ],
+        "of": "sumPrimary",
+        "kind": "derived",
+        "text": "net imports ÷ net domestic energy supply"
+      },
+      "production": {
+        "rows": [
+          "production"
+        ],
+        "of": "sumPrimary",
+        "fossil": "oilGasProduction"
+      },
+      "resources": "Oil and gas, mostly for export; rivers for its own electricity.",
+      "institutions": "Nord Pool bidding zones; flow-based market coupling since October 2024; hydro and dense HVDC links.",
+      "src": [
+        "ssb-balance",
+        "ssb-electricity"
+      ],
+      "resFacts": [
+        {
+          "label": "Hydro",
+          "of": "of its electricity",
+          "num": [
+            "hydroGWh"
+          ],
+          "den": [
+            "genGWh"
+          ]
+        }
+      ]
+    }
+  ],
+  "prairieland": {
+    "key": "pl",
+    "name": "Prairieland",
+    "card": null,
+    "institutions": "Fictional: the course does not set out its institutions.",
+    "map": {
+      "primary": {
+        "oil": [
+          "oil.imported",
+          "oil.domestic"
+        ],
+        "gas": [
+          "gas.lng",
+          "gas.domestic"
+        ],
+        "coal": [
+          "coal"
+        ],
+        "nuclear": [
+          "nuclear"
+        ],
+        "hydro": [
+          "hydro"
+        ],
+        "wind": [
+          "wind"
+        ],
+        "solar": [
+          "solar"
+        ]
+      },
+      "other": "agriculture"
+    }
+  },
+  "mystery": {
+    "key": "no",
+    "options": [
+      "no",
+      "in",
+      "us"
+    ]
+  },
+  "conventions": [
+    {
+      "key": "pec",
+      "label": "Physical energy content",
+      "short": "Physical content",
+      "who": "the IEA and Eurostat, and five of the six statistics offices on this page (China's is the exception)",
+      "text": "Nuclear counts as its reactors' heat (electricity ÷ 0.33); hydro, wind and solar as the electricity they make."
+    },
+    {
+      "key": "sub",
+      "label": "Substitution",
+      "short": "Substitution",
+      "who": "the Energy Institute's former method; China's coal-equivalent method is one kind",
+      "text": "Every MWh from nuclear, hydro, wind and solar counts as the fuel a thermal plant would burn to make it."
+    },
+    {
+      "key": "de",
+      "label": "Direct equivalent",
+      "short": "Direct",
+      "text": "Every MWh from nuclear, hydro, wind and solar counts at its electricity, 3.6 GJ.",
+      "note": "A lower bound: no conversion losses counted for any of them."
+    }
+  ],
+  "lenses": [
+    {
+      "key": "imports",
+      "label": "Import dependence",
+      "text": "net imports as a share of primary energy: high for countries with few fuels of their own."
+    },
+    {
+      "key": "resources",
+      "label": "Resources",
+      "text": "what the country produces at home: rivers, coal, oil, gas, crops."
+    },
+    {
+      "key": "climate",
+      "label": "Climate",
+      "text": "buildings' share of final energy: heating and cooling raise it, and so do bigger homes, higher incomes and how statistics group services; the table cannot tell these apart."
+    },
+    {
+      "key": "institutions",
+      "label": "Institutions",
+      "text": "who runs the power system and how electricity is traded, from the regional cards."
+    }
+  ],
+  "facts": [
+    {
+      "n": "57.3%",
+      "what": "The EU's energy import dependency in 2024: net imports as a share of gross available energy.",
+      "source": "Eurostat, Energy statistics: an overview",
+      "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Energy_statistics_-_an_overview",
+      "asof": "data extracted September 2026; data for 2024"
+    },
+    {
+      "n": "11.1 quads",
+      "what": "U.S. net energy exports in 2025: production 107.2 quads against consumption of 96.5.",
+      "source": "EIA, Monthly Energy Review, Table 1.1",
+      "url": "https://www.eia.gov/totalenergy/data/monthly/",
+      "asof": "October 2026 edition; data for 2025"
+    },
+    {
+      "n": "54.8%",
+      "what": "Coal's share of China's total energy consumption in 2023, in coal equivalent.",
+      "source": "National Bureau of Statistics of China, Statistical Yearbook 2025, Table 9-2",
+      "url": "no link",
+      "asof": "2025 edition; data for 2023"
+    },
+    {
+      "n": "1 ÷ efficiency",
+      "what": "The factor by which the substitution method enlarges each MWh from nuclear, hydro, wind and solar: 2.5 at 40%.",
+      "source": "this lesson's arithmetic",
+      "url": "no link",
+      "asof": "–"
+    }
+  ],
+  "sources": {
+    "eia-mer": {
+      "title": "Monthly Energy Review, October 2026: Tables 1.1 (production and net imports), 1.3 (primary energy consumption by source), 1.13b (non-combustion use), 2.2 to 2.5 (end-use energy by sector), 7.2a (net generation) and 10.6 (solar, with small-scale)",
+      "publisher": "U.S. Energy Information Administration",
+      "date": "released 29 October 2026; annual 2025 rows read 7 November 2026",
+      "url": "https://www.eia.gov/totalenergy/data/monthly/",
+      "where": "2025: primary energy consumption 96.465716 quads; production 107.16283; net imports −11.099192; end use without electrical system losses: residential 11.907, commercial 9.938, industrial 26.652, transportation 28.291 quads"
+    },
+    "eia-method": {
+      "title": "Change to the primary energy of noncombustible renewables",
+      "publisher": "U.S. Energy Information Administration",
+      "date": "read 7 November 2026",
+      "url": "https://www.eia.gov/totalenergy/data/monthly/change/",
+      "where": "beginning with the September 2023 Monthly Energy Review, a constant 3,412 Btu per kWh for hydro, wind, solar and geothermal electricity; nuclear at its plants' average heat rate"
+    },
+    "eurostat-overview": {
+      "title": "Energy statistics: an overview",
+      "publisher": "Eurostat",
+      "date": "data extracted September 2026; read 7 November 2026",
+      "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Energy_statistics_-_an_overview",
+      "where": "2024: gross available energy 55,790 PJ; primary production 23,003 PJ (renewables 48.1%, nuclear heat 28.2%); import dependency 57.3%; final energy consumption 36,755 PJ; non-energy consumption 3,275 PJ"
+    },
+    "eurostat-balance": {
+      "title": "Complete energy balances (nrg_bal_c) and gross production of electricity by fuel (nrg_bal_peh)",
+      "publisher": "Eurostat",
+      "date": "updated 27 August 2026 and 2 June 2026; read 7 November 2026",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_c/default/table",
+      "where": "EU27 2024, TJ: gross available energy by fuel, final energy consumption by sector, non-energy use, international maritime bunkers; GWh: gross electricity production by fuel"
+    },
+    "eurostat-method": {
+      "title": "Energy balance: new methodology",
+      "publisher": "Eurostat",
+      "date": "read 7 November 2026",
+      "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Energy_balance_-_new_methodology",
+      "where": "the physical energy content method: heat is the primary form for nuclear, geothermal and solar thermal; electricity for solar photovoltaic, wind and hydro; 33% advised for nuclear when inputs are not known"
+    },
+    "nbs-yearbook": {
+      "title": "China Statistical Yearbook 2025, chapter 9: Tables 9-1, 9-2 (total energy consumption and its composition), 9-3 (overall energy balance), 9-6 (electricity balance)",
+      "publisher": "National Bureau of Statistics of China",
+      "date": "2025 edition; 2023 data; read 7 November 2026",
+      "url": "no link",
+      "where": "2023: consumption 571,327 × 10,000 tce, coal 54.8%, petroleum 18.8%, natural gas 8.5%, primary electricity and other energy 17.9%; production 475,979; imports 145,253; exports 13,625; hydro 12,858, nuclear 4,347, wind 8,859 (100 million kWh); raw coal 66.1% of production; electricity converted at the year's average coal consumption for generation"
+    },
+    "nbs-communique": {
+      "title": "Statistical Communiqué of the People's Republic of China on the 2023 National Economic and Social Development, Table 4",
+      "publisher": "National Bureau of Statistics of China",
+      "date": "29 February 2024",
+      "url": "no link",
+      "where": "2023 solar generation 5,841.5 (100 million kWh)"
+    },
+    "mospi-esi": {
+      "title": "Energy Statistics India 2025: Table 7.6 (energy balance of India for 2023-24, provisional), Table 3.6 (electricity generation) and Table 8.3 (net energy import dependency)",
+      "publisher": "Ministry of Statistics and Programme Implementation, Government of India",
+      "date": "March 2025; read 7 November 2026",
+      "url": "no link",
+      "where": "2023-24 (P), ktoe: total primary energy supply 903,158; production 521,633; final consumption 613,605 (industry 311,822, transport 71,945, residential 62,169, commercial 10,815, agriculture 22,564, non-specified 111,266, non-energy 23,023); net import dependency 40.27%"
+    },
+    "mospi-units": {
+      "title": "Energy Statistics India 2024, Annexure II: energy units and conversion factors",
+      "publisher": "Ministry of Statistics and Programme Implementation, Government of India",
+      "date": "2024; read 7 November 2026",
+      "url": "no link",
+      "where": "electricity from hydro and renewables 1 GWh = 0.086 ktoe; from nuclear 1 GWh = 0.086 ÷ 0.33 ktoe"
+    },
+    "epe-ben": {
+      "title": "Balanço Energético Nacional 2026, Relatório Síntese (base year 2025)",
+      "publisher": "Empresa de Pesquisa Energética (EPE), Brazil",
+      "date": "published 3 June 2026, updated 31 July 2026; read 7 November 2026",
+      "url": "no link",
+      "where": "2025: Oferta Interna de Energia 328.5 Mtep by source (p. 19); final consumption 291.7 Mtep and its shares (p. 25), 275,417 thousand tep without non-energy use (p. 69); generation by source in GWh (p. 41)"
+    },
+    "epe-manual": {
+      "title": "Manual Metodológico do Balanço Energético Nacional (NT-EPE-DEA-SEE 005/2021)",
+      "publisher": "Empresa de Pesquisa Energética (EPE), Brazil",
+      "date": "2022 edition; read 7 November 2026",
+      "url": "no link",
+      "where": "1 kWh = 860 kcal for hydro and electricity (0.086 tep per MWh); nuclear at its generation ÷ 33%"
+    },
+    "ssb-balance": {
+      "title": "Production and consumption of energy, energy balance and energy account: Tables 1 to 3",
+      "publisher": "Statistics Norway (SSB)",
+      "date": "updated 12 June 2026; read 7 November 2026",
+      "url": "no link",
+      "where": "2025, TWh: production 2,593; imports 124; exports 2,380; total energy supply 326 (by product: coal 8.8, gas 47.6, oil 107.4, biofuels 19.5, waste 5.2, electricity 137.7); final energy consumption 212 (industry and mining 73, transport 50, households 45, other 43); non-energy use 26"
+    },
+    "ssb-electricity": {
+      "title": "Electricity, Table 7: production, imports, exports and consumption of electric power",
+      "publisher": "Statistics Norway (SSB)",
+      "date": "updated 19 October 2026; read 7 November 2026",
+      "url": "no link",
+      "where": "2025, GWh: production 161,793 (hydro 145,476, wind 13,899, solar 348, thermal 2,070)"
+    },
+    "un-ires": {
+      "title": "International Recommendations for Energy Statistics (IRES)",
+      "publisher": "United Nations Statistics Division",
+      "date": "2018",
+      "url": "no link",
+      "where": "conventional values: 1 t of coal equivalent = 29.3076 GJ; 1 t of oil equivalent = 41.868 GJ; 1 Btu = 1,055.06 J"
+    }
+  }
+}

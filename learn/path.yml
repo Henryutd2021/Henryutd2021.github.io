@@ -706,7 +706,23 @@
   does: "Follow Prairie City's 2025 energy from the gas grid, fuels, the SPP grid and rooftop solar to homes, shops, transport, industry and a data-center campus; group it by sector; then sort who usually decides each lever (the city, the utility, the state regulator, owners or federal rules) and light up each one's part of the flows."
   outcome: "Read a city's energy flows by carrier and sector, say where its accounting starts and how little of its electricity it makes, and name who typically decides rates, codes, standards, wires and equipment, knowing that the roles differ by state and utility."
   after: [F3, F6]
-- {kind: lesson, tier: foundations, code: F10, title: "Why does every country's energy system look different?"}
+# ---------- wave W6 Foundations module F10 (curriculum v2 §18.4; builder learn-w6-a)
+- kind: lesson
+  id: f10-nations-differ
+  code: F10
+  tier: foundations
+  form: cards
+  icon: globe
+  status: active
+  minutes: 20
+  practice_minutes: 10   # the myths and questions (Check section)
+  title: "Why does every country's energy system look different?"
+  subtitle: "Draw seven national energy balances as flow diagrams, switch from primary to final to useful energy, count reactors and wind farms three ways, and see how imports, resources, climate and institutions line up with each mix"
+  short: "Nations compared"
+  teaches: [national energy balances as Sankeys, primary against final against useful energy at national scale, accounting conventions for primary energy, import dependence, why national energy mixes differ]
+  does: "Guess a country from its mix; draw the United States, the European Union, China, India, Brazil, Norway and the fictional Prairieland from their own statistics; switch between primary, final and useful energy and between three conventions for nuclear, hydro, wind and solar; turn on four lenses (import dependence, resources, climate, institutions); open the regional cards."
+  outcome: "Read a national energy balance as a Sankey, say how much is lost before the meter and at the point of use, explain why a country's renewable share changes with the accounting convention, and name what lines up with a mix without claiming any one cause."
+  after: [F4]
 # F11, builder learn-w5-b (wave W5)
 - kind: lesson
   id: f11-air-climate-people
